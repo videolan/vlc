@@ -337,11 +337,11 @@ error:
 static block_t *DoRealWork( filter_t *p_filter, block_t *p_in_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    picture_t *p_outpic;
 
     /* First, get a new picture */
-    while( ( p_outpic = vout_GetPicture( p_sys->p_vout ) ) == NULL )
-        msleep( VOUT_OUTMEM_SLEEP );
+    picture_t *p_outpic = vout_GetPicture( p_sys->p_vout );
+    if( unlikely(p_outpic == NULL) )
+        return p_in_buf;
 
     /* Blank the picture */
     for( int i = 0 ; i < p_outpic->i_planes ; i++ )
