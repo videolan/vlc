@@ -172,10 +172,20 @@ struct encoder_t
  */
 
 /**
+ * Updates the video output format.
+ *
  * This function notifies the video output pipeline of a new video output
- * format (fmt_out.video). If there is currently no video output or if the
- * video output format has changed, a new video output will be set up.
- * @return 0 if the video output is working, -1 if not. */
+ * format (fmt_out.video). If there was no video output from the decoder so far
+ * or if the video output format has changed, a new video output will be set
+ * up. decoder_GetPicture() can then be used to allocate picture buffers.
+ *
+ * If the format is unchanged, this function has no effects and returns zero.
+ *
+ * \note
+ * This function is not reentrant.
+ *
+ * @return 0 if the video output was set up succesfully, -1 otherwise.
+ */
 static inline int decoder_UpdateVideoFormat( decoder_t *dec )
 {
     if( dec->pf_vout_format_update != NULL )
@@ -185,11 +195,47 @@ static inline int decoder_UpdateVideoFormat( decoder_t *dec )
 }
 
 /**
- * This function will return a new picture usable by a decoder as an output
- * buffer. You have to release it using picture_Release() or by returning
- * it to the caller as a pf_decode_video return value.
+ * Allocates an output picture buffer.
+ *
+ * This function pulls an output picture buffer for the decoder from the
+ * buffer pool of the video output. The picture must be released with
+ * picture_Release() when it is no longer referenced by the decoder.
+ *
+ * \note
+ * This function is reentrant. However, decoder_UpdateVideoFormat() cannot be
+ * used concurrently; the caller is responsible for serialization.
+ *
+ * \warning
+ * The behaviour is undefined if decoder_UpdateVideoFormat() was not called or
+ * if the last call returned an error.
+ *
+ * \return a picture buffer on success, NULL on error
  */
-VLC_API picture_t * decoder_NewPicture( decoder_t * ) VLC_USED;
+VLC_USED
+static inline picture_t *decoder_GetPicture( decoder_t *dec )
+{
+    return dec->pf_vout_buffer_new( dec );
+}
+
+/**
+ * Checks the format and allocates a picture buffer.
+ *
+ * This common helper function sets the output video output format and
+ * allocates a picture buffer in that format. The picture must be released with
+ * picture_Release() when it is no longer referenced by the decoder.
+ *
+ * \note
+ * Lile decoder_UpdateVideoFormat(), this function is not reentrant.
+ *
+ * \return a picture buffer on success, NULL on error
+ */
+VLC_USED
+static inline picture_t *decoder_NewPicture( decoder_t *dec )
+{
+    if( decoder_UpdateVideoFormat(dec) )
+        return NULL;
+    return decoder_GetPicture( dec );
+}
 
 /**
  * This function notifies the audio output pipeline of a new audio output

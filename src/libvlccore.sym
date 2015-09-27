@@ -76,7 +76,6 @@ decoder_GetDisplayDate
 decoder_GetDisplayRate
 decoder_GetInputAttachments
 decoder_NewAudioBuffer
-decoder_NewPicture
 decoder_NewSubpicture
 decoder_SynchroChoose
 decoder_SynchroDate

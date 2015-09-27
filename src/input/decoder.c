@@ -584,17 +584,6 @@ static int DecoderGetDisplayRate( decoder_t *p_dec )
 /*****************************************************************************
  * Public functions
  *****************************************************************************/
-picture_t *decoder_NewPicture( decoder_t *p_decoder )
-{
-    if( decoder_UpdateVideoFormat( p_decoder ) )
-        return NULL;
-
-    picture_t *p_picture = p_decoder->pf_vout_buffer_new( p_decoder );
-    if( !p_picture )
-        msg_Warn( p_decoder, "can't get output picture" );
-    return p_picture;
-}
-
 block_t *decoder_NewAudioBuffer( decoder_t *dec, int samples )
 {
     if( decoder_UpdateAudioFormat( dec ) )
