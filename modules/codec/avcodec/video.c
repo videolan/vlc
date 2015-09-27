@@ -1052,16 +1052,7 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     frame->opaque = NULL;
 
     wait_mt(sys);
-    if (sys->p_va != NULL)
-    {   /* TODO: Move this to get_format(). We are screwed if it fails here. */
-        if (vlc_va_Setup(sys->p_va, ctx, &dec->fmt_out.video.i_chroma))
-        {
-            post_mt(sys);
-            msg_Err(dec, "hardware acceleration setup failed");
-            return -1;
-        }
-    }
-    else if (!sys->b_direct_rendering)
+    if (sys->p_va == NULL && !sys->b_direct_rendering)
     {
         post_mt(sys);
         return avcodec_default_get_buffer2(ctx, frame, flags);
