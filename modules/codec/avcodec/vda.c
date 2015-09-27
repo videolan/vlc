@@ -149,6 +149,15 @@ static int Open(vlc_va_t *va,
     sys->i_width = avctx->width;
     sys->i_height = avctx->height;
 
+    int i_ret = av_vda_default_init2(avctx, sys->vdactx);
+
+    msg_Dbg(va, "Creating VDA decoder %i", i_ret);
+
+    if (i_ret != 0) {
+        av_vda_default_free(avctx);
+        return VLC_EGENERIC;
+    }
+
     va->sys = sys;
     va->description = (char *)"VDA";
     va->setup = Setup;
@@ -167,16 +176,6 @@ static void Close( vlc_va_t *va, AVCodecContext *avctx )
 
 static int Setup( vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *pi_chroma )
 {
-
-    vlc_va_sys_t *sys = va->sys;
-
-    int i_ret = av_vda_default_init2(avctx, sys->vdactx);
-
-    msg_Dbg(va, "Creating VDA decoder %i", i_ret);
-
-    if (i_ret != 0)
-        return VLC_EGENERIC;
-
     *pi_chroma = VLC_CODEC_I420;
 
     return VLC_SUCCESS;
