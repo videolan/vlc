@@ -143,15 +143,6 @@ static int Copy(vlc_va_t *va, picture_t *pic, uint8_t *data)
 static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
 {
     vlc_va_sys_t *sys = va->sys;
-    VdpChromaType type;
-    uint32_t width, height;
-
-    if (av_vdpau_get_surface_parameters(avctx, &type, &width, &height))
-        return VLC_EGENERIC;
-
-    assert(type == sys->type);
-    if (sys->width != width || sys->height != height)
-        return VLC_EGENERIC;
 
     switch (sys->type)
     {
