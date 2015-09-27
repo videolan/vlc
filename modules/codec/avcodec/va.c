@@ -109,6 +109,16 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
     if (va->module == NULL)
     {
         vlc_object_release(va);
+#ifdef _WIN32
+        return NULL;
+    }
+
+    vlc_fourcc_t chroma;
+    va->setup(va, &chroma);
+    if (chroma != vlc_va_GetChroma(pix_fmt, AV_PIX_FMT_YUV420P))
+    {   /* Mismatch, cannot work, fail */
+        vlc_va_Delete(va, avctx);
+#endif
         va = NULL;
     }
     return va;

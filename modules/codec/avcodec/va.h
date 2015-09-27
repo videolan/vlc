@@ -36,7 +36,10 @@ struct vlc_va_t {
     module_t *module;
     const char *description;
 
+#ifdef _WIN32
+    VLC_DEPRECATED
     void (*setup)(vlc_va_t *, vlc_fourcc_t *output);
+#endif
     int  (*get)(vlc_va_t *, picture_t *pic, uint8_t **data);
     void (*release)(void *pic, uint8_t *surface);
     int  (*extract)(vlc_va_t *, picture_t *pic, uint8_t *data);
@@ -60,15 +63,6 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt);
 vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
                      enum PixelFormat, const es_format_t *fmt,
                      picture_sys_t *p_sys);
-
-/**
- * Initializes the acceleration video decoding back-end for libavcodec.
- * @param output pointer to video chroma output by the back-end [OUT]
- */
-static inline void vlc_va_Setup(vlc_va_t *va, vlc_fourcc_t *output)
-{
-    va->setup(va, output);
-}
 
 /**
  * Allocates a hardware video surface for a libavcodec frame.

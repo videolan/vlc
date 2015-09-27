@@ -48,7 +48,6 @@
 static int Open( vlc_va_t *, AVCodecContext *, enum PixelFormat,
                  const es_format_t *, picture_sys_t * );
 static void Close( vlc_va_t * , AVCodecContext *);
-static void Setup( vlc_va_t *, vlc_fourcc_t *);
 static int Get( vlc_va_t *, picture_t *, uint8_t ** );
 static int Extract( vlc_va_t *, picture_t *, uint8_t * );
 static void Release( void *opaque, uint8_t *data );
@@ -160,7 +159,6 @@ static int Open(vlc_va_t *va,
 
     va->sys = sys;
     va->description = (char *)"VDA";
-    va->setup = Setup;
     va->get = Get;
     va->release = Release;
     va->extract = Extract;
@@ -172,11 +170,6 @@ static void Close( vlc_va_t *va, AVCodecContext *avctx )
 {
     av_vda_default_free(avctx);
     (void) va;
-}
-
-static void Setup( vlc_va_t *va, vlc_fourcc_t *pi_chroma )
-{
-    *pi_chroma = VLC_CODEC_I420;
 }
 
 // Never called

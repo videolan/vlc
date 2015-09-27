@@ -1133,8 +1133,6 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
             picture_Release(test_pic);
         if (va == NULL)
             continue; /* Unsupported codec profile or such */
-
-        vlc_va_Setup(va, &p_dec->fmt_out.video.i_chroma);
         post_mt(p_sys);
 
         if (va->description != NULL)

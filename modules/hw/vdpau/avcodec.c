@@ -140,26 +140,6 @@ static int Copy(vlc_va_t *va, picture_t *pic, uint8_t *data)
     return VLC_SUCCESS;
 }
 
-static void Setup(vlc_va_t *va, vlc_fourcc_t *chromap)
-{
-    vlc_va_sys_t *sys = va->sys;
-
-    switch (sys->type)
-    {
-        case VDP_CHROMA_TYPE_420:
-            *chromap = VLC_CODEC_VDPAU_VIDEO_420;
-            break;
-        case VDP_CHROMA_TYPE_422:
-            *chromap = VLC_CODEC_VDPAU_VIDEO_422;
-            break;
-        case VDP_CHROMA_TYPE_444:
-            *chromap = VLC_CODEC_VDPAU_VIDEO_444;
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
-}
-
 static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
 {
@@ -336,7 +316,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
         infos = "VDPAU";
 
     va->description = infos;
-    va->setup = Setup;
     va->get = Lock;
     va->release = NULL;
     va->extract = Copy;

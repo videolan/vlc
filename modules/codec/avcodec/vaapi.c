@@ -187,11 +187,6 @@ static void Release( void *opaque, uint8_t *data )
     (void) data;
 }
 
-static void Setup( vlc_va_t *va, vlc_fourcc_t *pi_chroma )
-{
-    *pi_chroma = VLC_CODEC_YV12;
-}
-
 static void Delete( vlc_va_t *va, AVCodecContext *avctx )
 {
     vlc_va_sys_t *sys = va->sys;
@@ -462,7 +457,6 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     ctx->hwaccel_context = &sys->hw_ctx;
     va->sys = sys;
     va->description = vaQueryVendorString(sys->hw_ctx.display);
-    va->setup = Setup;
     va->get = Get;
     va->release = Release;
     va->extract = Extract;
