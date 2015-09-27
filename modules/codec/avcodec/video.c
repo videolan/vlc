@@ -766,7 +766,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
              * then picture buffer can be allocated. */
             if (p_sys->p_va == NULL
              && lavc_UpdateVideoFormat(p_dec, p_context, false) == 0)
-                p_pic = decoder_NewPicture(p_dec);
+                p_pic = decoder_GetPicture(p_dec);
 
             if( !p_pic )
             {
@@ -1061,11 +1061,9 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
             return -1;
         }
     }
-
-    /* FIXME: The core forces an extra output format update here, so the
-     * semaphore is still needed. */
-    pic = decoder_NewPicture(dec);
     post_mt(sys);
+
+    pic = decoder_GetPicture(dec);
     if (pic == NULL)
         return -1;
 
@@ -1128,8 +1126,9 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         }
         if (lavc_UpdateVideoFormat(p_dec, p_context, true))
             continue; /* Unsupported brand of hardware acceleration */
+        post_mt(p_sys);
 
-        picture_t *test_pic = decoder_NewPicture(p_dec);
+        picture_t *test_pic = decoder_GetPicture(p_dec);
         assert(!test_pic || test_pic->format.i_chroma == p_dec->fmt_out.video.i_chroma);
         vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt,
                                   &p_dec->fmt_in,
@@ -1137,8 +1136,10 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         if (test_pic)
             picture_Release(test_pic);
         if (va == NULL)
+        {
+            wait_mt(p_sys);
             continue; /* Unsupported codec profile or such */
-        post_mt(p_sys);
+        }
 
         if (va->description != NULL)
             msg_Info(p_dec, "Using %s for hardware decoding", va->description);
