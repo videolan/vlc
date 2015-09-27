@@ -199,17 +199,6 @@ static int lavc_UpdateVideoFormat( decoder_t *p_dec, AVCodecContext *p_context,
     return decoder_UpdateVideoFormat( p_dec );
 }
 
-/* Returns a new picture buffer */
-static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
-                                            AVCodecContext *p_context )
-{
-    bool hwaccel = p_dec->p_sys->p_va != NULL;
-
-    if (lavc_UpdateVideoFormat(p_dec, p_context, hwaccel))
-        return NULL;
-    return decoder_NewPicture( p_dec );
-}
-
 /**
  * Copies a picture from the libavcodec-allocate buffer to a picture_t.
  * This is used when not in direct rendering mode.
@@ -772,10 +761,13 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         picture_t *p_pic = frame->opaque;
         if( p_pic == NULL )
-        {
-            /* Get a new picture */
-            if( p_sys->p_va == NULL )
-                p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
+        {   /* When direct rendering is not used, get_format() and get_buffer()
+             * might not be called. The output video format must be set here
+             * then picture buffer can be allocated. */
+            if (p_sys->p_va == NULL
+             && lavc_UpdateVideoFormat(p_dec, p_context, false) == 0)
+                p_pic = decoder_NewPicture(p_dec);
+
             if( !p_pic )
             {
                 av_frame_free(&frame);
@@ -1052,14 +1044,27 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     frame->opaque = NULL;
 
     wait_mt(sys);
-    if (sys->p_va == NULL && !sys->b_direct_rendering)
+    if (sys->p_va == NULL)
     {
-        post_mt(sys);
-        return avcodec_default_get_buffer2(ctx, frame, flags);
+        if (!sys->b_direct_rendering)
+        {
+            post_mt(sys);
+            return avcodec_default_get_buffer2(ctx, frame, flags);
+        }
+
+        /* Most unaccelerated decoders do not call get_format(), so we need to
+         * update the output video format here. The MT semaphore must be held
+         * to protect p_dec->fmt_out. */
+        if (lavc_UpdateVideoFormat(dec, ctx, false))
+        {
+            post_mt(sys);
+            return -1;
+        }
     }
 
-    /* The semaphore protects updates to fmt_out */
-    pic = ffmpeg_NewPictBuf(dec, ctx);
+    /* FIXME: The core forces an extra output format update here, so the
+     * semaphore is still needed. */
+    pic = decoder_NewPicture(dec);
     post_mt(sys);
     if (pic == NULL)
         return -1;
