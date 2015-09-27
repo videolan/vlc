@@ -37,7 +37,6 @@
 
 #include "avcodec.h"
 #include "va.h"
-#include "../../packetizer/h264_nal.h"
 #include "../../video_chroma/copy.h"
 
 #include <libavcodec/vda.h>
@@ -102,41 +101,31 @@ static int Open(vlc_va_t *va,
 
     (void) fmt;
     (void) p_sys;
-    VLC_UNUSED(avctx);
 
     size_t i_profile = 0xFFFF, i_level = 0xFFFF;
-    bool b_ret = false;
 
-    switch (fmt->i_codec) {
-        case VLC_CODEC_H264:
-            b_ret = h264_get_profile_level(fmt, &i_profile, &i_level, NULL);
-            if (!b_ret) {
-                msg_Warn( va, "H264 profile and level parsing failed because it didn't arrive yet");
-                return VLC_EGENERIC;
-            }
+    switch (avctx->codec_id) {
+        case AV_CODEC_ID_H264:
+            msg_Dbg( va, "trying to decode MPEG-4 Part 10: profile %d, level %d", avctx->profile, avctx->level);
 
-            msg_Dbg( va, "trying to decode MPEG-4 Part 10: profile %zu, level %zu", i_profile, i_level);
-
-            switch (i_profile) {
-                case PROFILE_H264_BASELINE:
-                case PROFILE_H264_MAIN:
-                case PROFILE_H264_HIGH:
+            switch (avctx->profile & ~FF_PROFILE_H264_INTRA) {
+                case FF_PROFILE_H264_CONSTRAINED_BASELINE:
+                case FF_PROFILE_H264_BASELINE:
+                case FF_PROFILE_H264_MAIN:
+                case FF_PROFILE_H264_HIGH:
                     break;
 
                 default:
-                {
-                    msg_Dbg( va, "unsupported H264 profile %zu", i_profile);
+                    msg_Dbg( va, "unsupported H264 profile %d", avctx->profile);
                     return -1;
-                }
             }
             break;
 
         default:
 #ifndef NDEBUG
-            msg_Err( va, "'%4.4s' is not supported", (char *)&fmt->i_codec);
+            msg_Err( va, "codec %d is not supported", avctx->codec_id);
 #endif
             return VLC_EGENERIC;
-            break;
     }
 
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
