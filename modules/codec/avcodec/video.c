@@ -1125,6 +1125,11 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         p_dec->fmt_out.video.i_chroma = vlc_va_GetChroma(hwfmt, swfmt);
         if (p_dec->fmt_out.video.i_chroma == 0)
             continue; /* Unknown brand of hardware acceleration */
+        if (p_context->width == 0 || p_context->height == 0)
+        {   /* should never happen */
+            msg_Err(p_dec, "unspecified video dimensions");
+            continue;
+        }
         if (lavc_UpdateVideoFormat(p_dec, p_context, true))
             continue; /* Unsupported brand of hardware acceleration */
 
@@ -1138,10 +1143,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         if (va == NULL)
             continue; /* Unsupported codec profile or such */
 
-        /* We try to call vlc_va_Setup when possible to detect errors when
-         * possible (later is too late) */
-        if( p_context->width > 0 && p_context->height > 0
-         && vlc_va_Setup(va, p_context, &p_dec->fmt_out.video.i_chroma))
+        if (vlc_va_Setup(va, p_context, &p_dec->fmt_out.video.i_chroma))
         {
             msg_Err( p_dec, "acceleration setup failure" );
             vlc_va_Delete(va, p_context);
