@@ -383,22 +383,21 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
 }
 
 /**
- * It retreives a picture from the vout or NULL if no pictures are
- * available yet.
+ * Allocates a video output picture buffer.
  *
- * You MUST call vout_PutPicture or picture_Release on it.
+ * Either vout_PutPicture() or picture_Release() must be used to return the
+ * buffer to the video output free buffer pool.
  *
  * You may use picture_Hold() (paired with picture_Release()) to keep a
  * read-only reference.
  */
 picture_t *vout_GetPicture(vout_thread_t *vout)
 {
-    picture_t *picture = picture_pool_Get(vout->p->decoder_pool);
-    if (picture) {
+    picture_t *picture = picture_pool_Wait(vout->p->decoder_pool);
+    if (likely(picture != NULL)) {
         picture_Reset(picture);
         VideoFormatCopyCropAr(&picture->format, &vout->p->original);
     }
-
     return picture;
 }
 
