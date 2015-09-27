@@ -204,13 +204,11 @@ static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in
 }
 
 /* */
-static int Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
+static void Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
 {
     vlc_va_sys_t *sys = va->sys;
 
     *chroma = sys->filter == NULL ? VLC_CODEC_D3D9_OPAQUE : VLC_CODEC_YV12;
-
-    return VLC_SUCCESS;
 }
 
 void SetupAVCodecContext(vlc_va_t *va)

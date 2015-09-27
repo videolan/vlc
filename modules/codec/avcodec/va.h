@@ -36,7 +36,7 @@ struct vlc_va_t {
     module_t *module;
     const char *description;
 
-    int  (*setup)(vlc_va_t *, vlc_fourcc_t *output);
+    void (*setup)(vlc_va_t *, vlc_fourcc_t *output);
     int  (*get)(vlc_va_t *, picture_t *pic, uint8_t **data);
     void (*release)(void *pic, uint8_t *surface);
     int  (*extract)(vlc_va_t *, picture_t *pic, uint8_t *data);
@@ -64,11 +64,10 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
 /**
  * Initializes the acceleration video decoding back-end for libavcodec.
  * @param output pointer to video chroma output by the back-end [OUT]
- * @return VLC_SUCCESS on success, otherwise an error code.
  */
-static inline int vlc_va_Setup(vlc_va_t *va, vlc_fourcc_t *output)
+static inline void vlc_va_Setup(vlc_va_t *va, vlc_fourcc_t *output)
 {
-    return va->setup(va, avctx, output);
+    va->setup(va, output);
 }
 
 /**

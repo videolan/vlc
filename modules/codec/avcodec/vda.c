@@ -48,7 +48,7 @@
 static int Open( vlc_va_t *, AVCodecContext *, enum PixelFormat,
                  const es_format_t *, picture_sys_t * );
 static void Close( vlc_va_t * , AVCodecContext *);
-static int Setup( vlc_va_t *, vlc_fourcc_t *);
+static void Setup( vlc_va_t *, vlc_fourcc_t *);
 static int Get( vlc_va_t *, picture_t *, uint8_t ** );
 static int Extract( vlc_va_t *, picture_t *, uint8_t * );
 static void Release( void *opaque, uint8_t *data );
@@ -174,11 +174,9 @@ static void Close( vlc_va_t *va, AVCodecContext *avctx )
     (void) va;
 }
 
-static int Setup( vlc_va_t *va, vlc_fourcc_t *pi_chroma )
+static void Setup( vlc_va_t *va, vlc_fourcc_t *pi_chroma )
 {
     *pi_chroma = VLC_CODEC_I420;
-
-    return VLC_SUCCESS;
 }
 
 // Never called
