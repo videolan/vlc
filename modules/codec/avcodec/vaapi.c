@@ -187,7 +187,7 @@ static void Release( void *opaque, uint8_t *data )
     (void) data;
 }
 
-static int Setup( vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *pi_chroma )
+static int Setup( vlc_va_t *va, vlc_fourcc_t *pi_chroma )
 {
     *pi_chroma = VLC_CODEC_YV12;
     return VLC_SUCCESS;

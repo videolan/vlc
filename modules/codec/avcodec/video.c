@@ -1134,7 +1134,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         if (va == NULL)
             continue; /* Unsupported codec profile or such */
 
-        if (vlc_va_Setup(va, p_context, &p_dec->fmt_out.video.i_chroma))
+        if (vlc_va_Setup(va, &p_dec->fmt_out.video.i_chroma))
         {
             msg_Err( p_dec, "acceleration setup failure" );
             vlc_va_Delete(va, p_context);

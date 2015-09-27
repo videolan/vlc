@@ -144,7 +144,7 @@ static void SetupAVCodecContext(vlc_va_t *);
 static picture_t *DxAllocPicture(vlc_va_t *, const video_format_t *, unsigned index);
 
 /* */
-static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chroma)
+static int Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
 {
     vlc_va_sys_t *sys = va->sys;
 
