@@ -336,6 +336,24 @@ AS_IF([test "$SYS" = linux],[
 ])
 AM_CONDITIONAL(HAVE_ANDROID, test "${HAVE_ANDROID}" = "1")
 
+dnl Tizen (minimum SDK version: 2.3)
+AS_IF([test "$SYS" = linux],[
+    AC_MSG_CHECKING([for Tizen])
+    AC_TRY_COMPILE([#include <tizen.h>
+#if !defined(TIZEN_SDK_MAJOR) && !defined(TIZEN_SDK_MINOR)
+# error Not Tizen
+#endif
+#if TIZEN_SDK_MAJOR < 2 || (TIZEN_SDK_MAJOR == 2 && TIZEN_SDK_MINOR < 3)
+# error Tizen SDK too old
+#endif
+    ],[],[
+      HAVE_TIZEN="1"
+      AC_MSG_RESULT([yes])
+    ],[
+      AC_MSG_RESULT([no])
+    ])
+])
+AM_CONDITIONAL(HAVE_TIZEN, test "${HAVE_TIZEN}" = "1")
 
 dnl
 dnl  Check for the contrib directory
