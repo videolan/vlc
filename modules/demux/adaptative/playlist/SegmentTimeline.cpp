@@ -85,14 +85,22 @@ stime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) c
     {
         const Element *el = *it;
 
-        if(number >= el->number)
+        /* set start time, or from discontinuity */
+        if(it == elements.begin() || el->t)
         {
-            if(number <= el->number + el->r)
-            {
-                return el->t + (number * el->d);
-            }
-            totalscaledtime = el->t + (number * el->d);
+            totalscaledtime = el->t;
         }
+
+        if(number <= el->number)
+            break;
+
+        if(number <= el->number + el->r)
+        {
+            totalscaledtime += el->d * (number - el->number);
+            break;
+        }
+
+        totalscaledtime += (el->d * (el->r + 1));
     }
 
     return totalscaledtime;
