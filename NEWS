@@ -81,6 +81,7 @@ Stream filter:
 Audio output:
  * Complete rewrite of the AudioTrack Android module. This is now the default.
    It now supports HDMI/SPDIF passthrough for AC3, 5.1/7.1 and float output.
+ * Added Tizen audio module.
 
 Video ouput:
  * Linux/BSD default video output is now OpenGL, instead of Xvideo
