@@ -118,76 +118,94 @@ static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 /**
  * Sets the decoder output format.
  */
-static int lavc_UpdateVideoFormat( decoder_t *p_dec, AVCodecContext *p_context,
-                                   bool hwaccel )
+static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
+                               AVCodecContext *ctx, enum AVPixelFormat pix_fmt,
+                               enum AVPixelFormat sw_pix_fmt)
 {
-    int width = p_context->coded_width;
-    int height = p_context->coded_height;
+    int width = ctx->coded_width;
+    int height = ctx->coded_height;
 
-    if( !hwaccel )
-    {
+    video_format_Init(fmt, 0);
+
+    if (pix_fmt == sw_pix_fmt)
+    {   /* software decoding */
         int aligns[AV_NUM_DATA_POINTERS];
 
-        if (GetVlcChroma(&p_dec->fmt_out.video, p_context->pix_fmt))
+        if (GetVlcChroma(fmt, pix_fmt))
             return -1;
 
-        avcodec_align_dimensions2(p_context, &width, &height, aligns);
+        avcodec_align_dimensions2(ctx, &width, &height, aligns);
     }
-    p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
+    else /* hardware decoding */
+        fmt->i_chroma = vlc_va_GetChroma(pix_fmt, sw_pix_fmt);
 
     if( width == 0 || height == 0 || width > 8192 || height > 8192 )
     {
-        msg_Err( p_dec, "Invalid frame size %dx%d.", width, height );
+        msg_Err(dec, "Invalid frame size %dx%d.", width, height);
         return -1; /* invalid display size */
     }
-    p_dec->fmt_out.video.i_width = width;
-    p_dec->fmt_out.video.i_height = height;
-    p_dec->fmt_out.video.i_visible_width = p_context->width;
-    p_dec->fmt_out.video.i_visible_height = p_context->height;
+
+    fmt->i_width = width;
+    fmt->i_height = height;
+    fmt->i_visible_width = ctx->width;
+    fmt->i_visible_height = ctx->height;
 
     /* If an aspect-ratio was specified in the input format then force it */
-    if( p_dec->fmt_in.video.i_sar_num > 0 && p_dec->fmt_in.video.i_sar_den > 0 )
+    if (dec->fmt_in.video.i_sar_num > 0 && dec->fmt_in.video.i_sar_den > 0)
     {
-        p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
-        p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
+        fmt->i_sar_num = dec->fmt_in.video.i_sar_num;
+        fmt->i_sar_den = dec->fmt_in.video.i_sar_den;
     }
     else
     {
-        p_dec->fmt_out.video.i_sar_num = p_context->sample_aspect_ratio.num;
-        p_dec->fmt_out.video.i_sar_den = p_context->sample_aspect_ratio.den;
+        fmt->i_sar_num = ctx->sample_aspect_ratio.num;
+        fmt->i_sar_den = ctx->sample_aspect_ratio.den;
 
-        if( !p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den )
-        {
-            p_dec->fmt_out.video.i_sar_num = 1;
-            p_dec->fmt_out.video.i_sar_den = 1;
-        }
+        if (fmt->i_sar_num == 0 || fmt->i_sar_den == 0)
+            fmt->i_sar_num = fmt->i_sar_den = 1;
     }
 
-    if( p_dec->fmt_in.video.i_frame_rate > 0 &&
-        p_dec->fmt_in.video.i_frame_rate_base > 0 )
+    if (dec->fmt_in.video.i_frame_rate > 0
+     && dec->fmt_in.video.i_frame_rate_base > 0)
     {
-        p_dec->fmt_out.video.i_frame_rate =
-            p_dec->fmt_in.video.i_frame_rate;
-        p_dec->fmt_out.video.i_frame_rate_base =
-            p_dec->fmt_in.video.i_frame_rate_base;
+        fmt->i_frame_rate = dec->fmt_in.video.i_frame_rate;
+        fmt->i_frame_rate_base = dec->fmt_in.video.i_frame_rate_base;
     }
 #if LIBAVCODEC_VERSION_CHECK( 56, 5, 0, 7, 100 )
-    else if( p_context->framerate.num > 0 && p_context->framerate.den > 0 )
+    else if (ctx->framerate.num > 0 && ctx->framerate.den > 0)
     {
-        p_dec->fmt_out.video.i_frame_rate = p_context->framerate.num;
-        p_dec->fmt_out.video.i_frame_rate_base = p_context->framerate.den;
+        fmt->i_frame_rate = ctx->framerate.num;
+        fmt->i_frame_rate_base = ctx->framerate.den;
 # if LIBAVCODEC_VERSION_MICRO <  100
         // for some reason libav don't thinkg framerate presents actually same thing as in ffmpeg
-        p_dec->fmt_out.video.i_frame_rate_base *= __MAX( p_context->ticks_per_frame, 1 );
+        fmt->i_frame_rate_base *= __MAX(ctx->ticks_per_frame, 1);
 # endif
     }
 #endif
-    else if( p_context->time_base.num > 0 && p_context->time_base.den > 0 )
+    else if (ctx->time_base.num > 0 && ctx->time_base.den > 0)
     {
-        p_dec->fmt_out.video.i_frame_rate = p_context->time_base.den;
-        p_dec->fmt_out.video.i_frame_rate_base = p_context->time_base.num * __MAX( p_context->ticks_per_frame, 1 );
+        fmt->i_frame_rate = ctx->time_base.den;
+        fmt->i_frame_rate_base = ctx->time_base.num
+                                 * __MAX(ctx->ticks_per_frame, 1);
     }
-    return decoder_UpdateVideoFormat( p_dec );
+    return 0;
+}
+
+static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
+                                  enum AVPixelFormat fmt,
+                                  enum AVPixelFormat swfmt)
+{
+    video_format_t fmt_out;
+    int val;
+
+    val = lavc_GetVideoFormat(dec, &fmt_out, ctx, fmt, swfmt);
+    if (val)
+        return val;
+
+    es_format_Clean(&dec->fmt_out);
+    es_format_Init(&dec->fmt_out, VIDEO_ES, fmt_out.i_chroma);
+    dec->fmt_out.video = fmt_out;
+    return decoder_UpdateVideoFormat(dec);
 }
 
 /**
@@ -759,7 +777,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
              * might not be called. The output video format must be set here
              * then picture buffer can be allocated. */
             if (p_sys->p_va == NULL
-             && lavc_UpdateVideoFormat(p_dec, p_context, false) == 0)
+             && lavc_UpdateVideoFormat(p_dec, p_context, p_context->pix_fmt,
+                                       p_context->pix_fmt) == 0)
                 p_pic = decoder_GetPicture(p_dec);
 
             if( !p_pic )
@@ -1049,7 +1068,7 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
         /* Most unaccelerated decoders do not call get_format(), so we need to
          * update the output video format here. The MT semaphore must be held
          * to protect p_dec->fmt_out. */
-        if (lavc_UpdateVideoFormat(dec, ctx, false))
+        if (lavc_UpdateVideoFormat(dec, ctx, ctx->pix_fmt, ctx->pix_fmt))
         {
             post_mt(sys);
             return -1;
@@ -1118,7 +1137,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
             msg_Err(p_dec, "unspecified video dimensions");
             continue;
         }
-        if (lavc_UpdateVideoFormat(p_dec, p_context, true))
+        if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt))
             continue; /* Unsupported brand of hardware acceleration */
         post_mt(p_sys);
 
