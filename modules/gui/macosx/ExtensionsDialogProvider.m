@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ExtensionsDialogProvider.m: Mac OS X Extensions Dialogs
  *****************************************************************************
- * Copyright (C) 2010-2013 VLC authors and VideoLAN
+ * Copyright (C) 2010-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan org>
@@ -407,7 +407,7 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
             }
 
             VLCDialogGridView *gridView = (VLCDialogGridView *)[dialogWindow contentView];
-            [gridView addSubview:control atRow:row column:col rowSpan:vsp colSpan:hsp];
+            [gridView updateSubview:control atRow:row column:col rowSpan:vsp colSpan:hsp];
 
             widget->b_update = false;
         }

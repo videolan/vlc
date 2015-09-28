@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCUIWidgets.m: Widgets for VLC's extensions dialogs for Mac OS X
  *****************************************************************************
- * Copyright (C) 2009-2014 the VideoLAN team and authors
+ * Copyright (C) 2009-2015 the VideoLAN team and authors
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan dot>,
@@ -327,6 +327,24 @@
     // Recompute the size of the window after making sure we won't see anymore update
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(recomputeWindowSize) object:nil];
     [self performSelector:@selector(recomputeWindowSize) withObject:nil afterDelay:0.1];
+}
+
+- (void)updateSubview:(NSView *)view
+                atRow:(NSUInteger)row
+               column:(NSUInteger)column
+              rowSpan:(NSUInteger)rowSpan
+              colSpan:(NSUInteger)colSpan
+{
+    NSDictionary *oldDict = [self objectForView:view];
+    if (!oldDict) {
+        [self addSubview:view
+                   atRow:row
+                  column:column
+                 rowSpan:rowSpan
+                 colSpan:colSpan];
+        return;
+    }
+    [self relayout];
 }
 
 - (void)removeSubview:(NSView *)view
