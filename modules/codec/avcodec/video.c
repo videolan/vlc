@@ -142,17 +142,8 @@ static int lavc_UpdateVideoFormat( decoder_t *p_dec, AVCodecContext *p_context,
     }
     p_dec->fmt_out.video.i_width = width;
     p_dec->fmt_out.video.i_height = height;
-
-    if( width != p_context->width || height != p_context->height )
-    {
-        p_dec->fmt_out.video.i_visible_width = p_context->width;
-        p_dec->fmt_out.video.i_visible_height = p_context->height;
-    }
-    else
-    {
-        p_dec->fmt_out.video.i_visible_width = width;
-        p_dec->fmt_out.video.i_visible_height = height;
-    }
+    p_dec->fmt_out.video.i_visible_width = p_context->width;
+    p_dec->fmt_out.video.i_visible_height = p_context->height;
 
     /* If an aspect-ratio was specified in the input format then force it */
     if( p_dec->fmt_in.video.i_sar_num > 0 && p_dec->fmt_in.video.i_sar_den > 0 )
