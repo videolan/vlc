@@ -307,8 +307,11 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/plumbing/FakeESOut.hpp \
     demux/adaptative/plumbing/FakeESOutID.cpp \
     demux/adaptative/plumbing/FakeESOutID.hpp \
+    demux/adaptative/plumbing/SourceStream.cpp \
+    demux/adaptative/plumbing/SourceStream.hpp \
     demux/adaptative/plumbing/StreamOutput.cpp \
     demux/adaptative/plumbing/StreamOutput.hpp \
+    demux/adaptative/ChunksSource.hpp \
     demux/adaptative/PlaylistManager.cpp \
     demux/adaptative/PlaylistManager.h \
     demux/adaptative/SegmentTracker.cpp \
