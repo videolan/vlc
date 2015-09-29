@@ -1446,14 +1446,11 @@ static void *DecoderThread( void *p_data )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     /* The decoder's main loop */
-    vlc_mutex_lock( &p_owner->lock );
+    vlc_fifo_Lock( p_owner->p_fifo );
     for( ;; )
     {
         block_t *p_block;
 
-        vlc_fifo_Lock( p_owner->p_fifo );
-        vlc_cond_signal( &p_owner->wait_acknowledge );
-        vlc_mutex_unlock( &p_owner->lock );
         vlc_fifo_CleanupPush( p_owner->p_fifo );
         /* Check if thread is cancelled before processing input blocks */
         vlc_testcancel();
@@ -1490,9 +1487,12 @@ static void *DecoderThread( void *p_data )
             if( p_owner->p_aout != NULL )
                 aout_DecFlush( p_owner->p_aout, true );
         }
-        p_owner->b_drained = (p_block == NULL);
-
         vlc_restorecancel( canc );
+
+        p_owner->b_drained = (p_block == NULL);
+        vlc_fifo_Lock( p_owner->p_fifo );
+        vlc_cond_signal( &p_owner->wait_acknowledge );
+        vlc_mutex_unlock( &p_owner->lock );
     }
     vlc_assert_unreachable();
 }
