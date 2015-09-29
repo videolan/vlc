@@ -1,7 +1,7 @@
 /*
- * HLSManager.hpp
+ * DASHStream.hpp
  *****************************************************************************
- * Copyright © 2015 - VideoLAN and VLC authors
+ * Copyright (C) 2015 - VideoLAN and VLC authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,29 +17,36 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef HLSMANAGER_HPP
-#define HLSMANAGER_HPP
+#ifndef DASHSTREAM_HPP
+#define DASHSTREAM_HPP
 
-#include "../adaptative/PlaylistManager.h"
-#include "../adaptative/logic/AbstractAdaptationLogic.h"
-#include "playlist/M3U8.hpp"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-namespace hls
+#include "../adaptative/Streams.hpp"
+
+namespace dash
 {
     using namespace adaptative;
 
-    class HLSManager : public PlaylistManager
+    class DASHStream : public AbstractStream
     {
         public:
-            HLSManager( demux_t *, playlist::M3U8 *,
-                        AbstractStreamFactory *,
-                        logic::AbstractAdaptationLogic::LogicType type );
-            virtual ~HLSManager();
-            virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType);
+            DASHStream(demux_t *, const StreamFormat &);
 
-            static bool isHTTPLiveStreaming(stream_t *);
+        protected:
+            virtual block_t *checkBlock(block_t *, bool); /* impl */
+            virtual AbstractDemuxer * createDemux(const StreamFormat &); /* impl */
     };
 
+    class DASHStreamFactory : public AbstractStreamFactory
+    {
+        public:
+            virtual AbstractStream *create(demux_t*, const StreamFormat &,
+                                   AbstractAdaptationLogic *, SegmentTracker *,
+                                   HTTPConnectionManager *) const;
+    };
 }
 
-#endif // HLSMANAGER_HPP
+#endif // DASHSTREAM_HPP

@@ -24,12 +24,16 @@
 # include "config.h"
 #endif
 
-#include <string>
-#include <list>
 #include <vlc_common.h>
-#include <vlc_es.h>
 #include "StreamsType.hpp"
 #include "StreamFormat.hpp"
+#include "ChunksSource.hpp"
+
+#include "plumbing/Demuxer.hpp"
+#include "plumbing/SourceStream.hpp"
+#include "plumbing/FakeESOut.hpp"
+
+#include <string>
 
 namespace adaptative
 {
@@ -50,58 +54,86 @@ namespace adaptative
         class SegmentChunk;
     }
 
-
-    class AbstractStreamOutput;
-    class AbstractStreamOutputFactory;
-
     using namespace http;
     using namespace logic;
     using namespace playlist;
 
-    class Stream
+    class AbstractStream : public ChunksSource,
+                           public ExtraFMTInfoInterface
     {
     public:
-        Stream(demux_t *, const StreamFormat &);
-        ~Stream();
-        bool operator==(const Stream &) const;
+        AbstractStream(demux_t *, const StreamFormat &);
+        virtual ~AbstractStream();
+        bool operator==(const AbstractStream &) const;
         static StreamType mimeToType(const std::string &mime);
-        void create(AbstractAdaptationLogic *, SegmentTracker *,
-                    const AbstractStreamOutputFactory *);
-        void updateFormat(StreamFormat &);
+        void bind(AbstractAdaptationLogic *, SegmentTracker *,
+                  HTTPConnectionManager *);
+
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
         bool isEOF() const;
         mtime_t getPCR() const;
+        mtime_t getBufferingLevel() const;
         mtime_t getFirstDTS() const;
         int esCount() const;
         bool seekAble() const;
         bool isSelected() const;
         bool reactivate(mtime_t);
         bool isDisabled() const;
-        typedef enum {status_eof, status_eop, status_buffering, status_demuxed} status;
-        status demux(HTTPConnectionManager *, mtime_t, bool);
-        bool setPosition(mtime_t, bool);
+        typedef enum {status_eof, status_eop, status_dis, status_buffering, status_demuxed} status;
+        status demux(mtime_t, bool);
+        virtual bool setPosition(mtime_t, bool);
         mtime_t getPosition() const;
         void prune();
         void runUpdates();
 
-    private:
+        virtual block_t *readNextBlock(size_t); /* impl */
+
+        virtual void fillExtraFMTInfo( es_format_t * ) const; /* impl */
+
+    protected:
+        virtual block_t *checkBlock(block_t *, bool) = 0;
+        virtual AbstractDemuxer * createDemux(const StreamFormat &) = 0;
+        virtual bool startDemux();
+        virtual bool restartDemux();
+
+        virtual void prepareFormatChange();
+
+        bool restarting_output;
+        bool discontinuity;
         SegmentChunk *getChunk();
-        size_t read(HTTPConnectionManager *);
-        demux_t *p_demux;
+
+        Demuxer *syncdemux;
+
+        demux_t *p_realdemux;
         StreamType type;
         StreamFormat format;
-        AbstractStreamOutput *output;
+
         AbstractAdaptationLogic *adaptationLogic;
+        HTTPConnectionManager *connManager; /* not owned */
         SegmentTracker *segmentTracker;
+
         SegmentChunk *currentChunk;
         bool disabled;
         bool eof;
+        bool dead;
+        bool flushing;
+        mtime_t pcr;
         std::string language;
         std::string description;
 
-        const AbstractStreamOutputFactory *streamOutputFactory;
+        AbstractDemuxer *demuxer;
+        AbstractSourceStream *demuxersource;
+        FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
     };
 
+    class AbstractStreamFactory
+    {
+        public:
+            virtual ~AbstractStreamFactory() {}
+            virtual AbstractStream *create(demux_t*, const StreamFormat &,
+                                   AbstractAdaptationLogic *, SegmentTracker *,
+                                   HTTPConnectionManager *) const = 0;
+    };
 }
 #endif // STREAMS_HPP

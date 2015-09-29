@@ -309,8 +309,6 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/plumbing/FakeESOutID.hpp \
     demux/adaptative/plumbing/SourceStream.cpp \
     demux/adaptative/plumbing/SourceStream.hpp \
-    demux/adaptative/plumbing/StreamOutput.cpp \
-    demux/adaptative/plumbing/StreamOutput.hpp \
     demux/adaptative/ChunksSource.hpp \
     demux/adaptative/PlaylistManager.cpp \
     demux/adaptative/PlaylistManager.h \
@@ -364,6 +362,8 @@ libadaptative_dash_SOURCES = \
     demux/dash/xml/Node.h \
     demux/dash/DASHManager.cpp \
     demux/dash/DASHManager.h \
+    demux/dash/DASHStream.cpp \
+    demux/dash/DASHStream.hpp \
     demux/dash/DASHStreamFormat.hpp
 
 libadaptative_hls_SOURCES = \

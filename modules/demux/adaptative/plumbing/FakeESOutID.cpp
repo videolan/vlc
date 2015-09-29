@@ -28,6 +28,7 @@ FakeESOutID::FakeESOutID( FakeESOut *fakeesout_, const es_format_t *p_fmt )
     fakeesout = fakeesout_;
     es_format_Init( &fmt, 0, 0 );
     es_format_Copy( &fmt, p_fmt );
+    pending_delete = false;
 }
 
 FakeESOutID::~FakeESOutID()
@@ -45,6 +46,11 @@ void FakeESOutID::notifyData()
     fakeesout->gc();
 }
 
+void FakeESOutID::create()
+{
+    fakeesout->createOrRecycleRealEsID( this );
+}
+
 void FakeESOutID::release()
 {
     fakeesout->recycle( this );
@@ -55,9 +61,24 @@ es_out_id_t * FakeESOutID::realESID()
     return p_real_es_id;
 }
 
-bool FakeESOutID::isCompatible( const es_format_t *p_fmt ) const
+const es_format_t *FakeESOutID::getFmt() const
 {
-    return es_format_IsSimilar( p_fmt, &fmt ) &&
-           p_fmt->i_extra == fmt.i_extra &&
-           (p_fmt->i_extra == 0 || !memcmp( p_fmt->p_extra, fmt.p_extra, p_fmt->i_extra ));
+    return &fmt;
+}
+
+bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
+{
+    return es_format_IsSimilar( &p_other->fmt, &fmt ) &&
+           p_other->fmt.i_extra == fmt.i_extra &&
+           (p_other->fmt.i_extra == 0 || !memcmp( p_other->fmt.p_extra, fmt.p_extra, fmt.i_extra ));
+}
+
+void FakeESOutID::setScheduledForDeletion()
+{
+    pending_delete = true;
+}
+
+bool FakeESOutID::scheduledForDeletion() const
+{
+    return pending_delete;
 }

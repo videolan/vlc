@@ -29,7 +29,6 @@
 #include <inttypes.h>
 
 #include "DASHManager.h"
-#include "DASHStreamFormat.hpp"
 #include "mpd/MPDFactory.h"
 #include "mpd/ProgramInformation.h"
 #include "xml/DOMParser.h"
@@ -47,30 +46,8 @@ using namespace dash;
 using namespace dash::mpd;
 using namespace adaptative::logic;
 
-
-AbstractStreamOutput *DASHStreamOutputFactory::create(demux_t *demux, const StreamFormat &format,
-                                                      AbstractStreamOutput *recycled) const
-{
-    AbstractStreamOutput *ret = NULL;
-    unsigned fmt = format;
-    switch(fmt)
-    {
-        case DASHStreamFormat::MP4:
-            ret = new BaseStreamOutput(demux, format, "mp4", recycled);
-            break;
-
-        case DASHStreamFormat::MPEG2TS:
-            ret = new BaseStreamOutput(demux, format, "ts", recycled);
-            break;
-    }
-
-    delete recycled;
-
-    return ret;
-}
-
 DASHManager::DASHManager(demux_t *demux_, MPD *mpd,
-                         AbstractStreamOutputFactory *factory,
+                         AbstractStreamFactory *factory,
                          AbstractAdaptationLogic::LogicType type) :
              PlaylistManager(demux_, mpd, factory, type)
 {
@@ -118,7 +95,7 @@ bool DASHManager::updatePlaylist()
         }
 
         mtime_t minsegmentTime = 0;
-        std::vector<Stream *>::iterator it;
+        std::vector<AbstractStream *>::iterator it;
         for(it=streams.begin(); it!=streams.end(); it++)
         {
             mtime_t segmentTime = (*it)->getPosition();

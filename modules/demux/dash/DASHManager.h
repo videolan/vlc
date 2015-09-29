@@ -27,24 +27,17 @@
 
 #include "../adaptative/PlaylistManager.h"
 #include "../adaptative/logic/AbstractAdaptationLogic.h"
-#include "../adaptative/plumbing/StreamOutput.hpp"
 #include "mpd/MPD.h"
 
 namespace dash
 {
     using namespace adaptative;
 
-    class DASHStreamOutputFactory : public AbstractStreamOutputFactory
-    {
-        public:
-            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &, AbstractStreamOutput * = NULL) const;
-    };
-
     class DASHManager : public PlaylistManager
     {
         public:
             DASHManager( demux_t *, mpd::MPD *mpd,
-                         AbstractStreamOutputFactory *,
+                         AbstractStreamFactory *,
                          logic::AbstractAdaptationLogic::LogicType type);
             virtual ~DASHManager    ();
 

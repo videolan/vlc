@@ -101,27 +101,19 @@ void EsOutDelCommand::Execute( es_out_t * )
     p_fakeid->release();
 }
 
-EsOutAddCommand::EsOutAddCommand( FakeESOutID *p_es, const es_format_t *p_fmt ) :
+EsOutAddCommand::EsOutAddCommand( FakeESOutID *p_es ) :
     AbstractFakeEsCommand( ES_OUT_PRIVATE_COMMAND_ADD, p_es )
 {
-    es_format_Copy( &fmt, p_fmt );
-    fmt.i_group = 0; /* Always ignore group for adaptative */
 }
 
 EsOutAddCommand::~EsOutAddCommand()
 {
-    es_format_Clean( &fmt );
 }
 
-void EsOutAddCommand::Execute( es_out_t *out )
+void EsOutAddCommand::Execute( es_out_t * )
 {
     /* Create the real ES on the adaptative demux */
-    if( p_fakeid->realESID() == NULL )
-    {
-        es_out_id_t *realid = es_out_Add( out, &fmt );
-        if( likely(realid) )
-            p_fakeid->setRealESID( realid );
-    }
+    p_fakeid->create();
 }
 
 EsOutControlPCRCommand::EsOutControlPCRCommand( int group_, mtime_t pcr_ ) :
@@ -147,9 +139,8 @@ EsOutDestroyCommand::EsOutDestroyCommand() :
 {
 }
 
-void EsOutDestroyCommand::Execute( es_out_t *out )
+void EsOutDestroyCommand::Execute( es_out_t * )
 {
-    es_out_Delete( out );
 }
 
 EsOutControlResetPCRCommand::EsOutControlResetPCRCommand() :
@@ -160,7 +151,6 @@ EsOutControlResetPCRCommand::EsOutControlResetPCRCommand() :
 void EsOutControlResetPCRCommand::Execute( es_out_t * )
 {
 }
-
 
 /*
  * Commands Default Factory
@@ -176,9 +166,9 @@ EsOutDelCommand * CommandsFactory::createEsOutDelCommand( FakeESOutID *id )
     return new (std::nothrow) EsOutDelCommand( id );
 }
 
-EsOutAddCommand * CommandsFactory::createEsOutAddCommand( FakeESOutID *id, const es_format_t *fmt )
+EsOutAddCommand * CommandsFactory::createEsOutAddCommand( FakeESOutID *id )
 {
-    return new (std::nothrow) EsOutAddCommand( id, fmt );
+    return new (std::nothrow) EsOutAddCommand( id );
 }
 
 EsOutControlPCRCommand * CommandsFactory::createEsOutControlPCRCommand( int group, mtime_t pcr )
@@ -203,13 +193,11 @@ CommandsQueue::CommandsQueue()
 {
     bufferinglevel = VLC_TS_INVALID;
     b_drop = false;
-    vlc_mutex_init( &lock );
 }
 
 CommandsQueue::~CommandsQueue()
 {
     Abort( false );
-    vlc_mutex_destroy( &lock );
 }
 
 static bool compareCommands( AbstractCommand *a, AbstractCommand *b )
@@ -219,7 +207,6 @@ static bool compareCommands( AbstractCommand *a, AbstractCommand *b )
 
 void CommandsQueue::Schedule( AbstractCommand *command )
 {
-    vlc_mutex_lock( &lock );
     if( b_drop )
     {
         delete command;
@@ -227,46 +214,53 @@ void CommandsQueue::Schedule( AbstractCommand *command )
     else if( command->getType() == ES_OUT_SET_GROUP_PCR )
     {
         bufferinglevel = command->getTime();
-        FlushLocked();
+        Commit();
         commands.push_back( command );
     }
     else
     {
         incoming.push_back( command );
     }
-    vlc_mutex_unlock( &lock );
 }
 
-void CommandsQueue::Process( es_out_t *out, mtime_t barrier )
+mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
 {
-    vlc_mutex_lock( &lock );
+    mtime_t lastdts = barrier;
+    bool b_datasent = false;
+
     while( !commands.empty() && commands.front()->getTime() <= barrier )
     {
         AbstractCommand *command = commands.front();
+        /* We need to have PCR set for stream before Deleting ES,
+         * or it will get stuck if any waiting decoder buffer */
+        if(command->getType() == ES_OUT_PRIVATE_COMMAND_DEL && b_datasent)
+            break;
+
+        if(command->getType() == ES_OUT_PRIVATE_COMMAND_DISCONTINUITY && b_datasent)
+            break;
+
+        if(command->getType() == ES_OUT_PRIVATE_COMMAND_SEND)
+        {
+            lastdts = command->getTime();
+            b_datasent = true;
+        }
+
         commands.pop_front();
         command->Execute( out );
         delete command;
     }
-    vlc_mutex_unlock( &lock );
+    return lastdts;
 }
 
-void CommandsQueue::FlushLocked()
+void CommandsQueue::Commit()
 {
     /* reorder all blocks by time between 2 PCR and merge with main list */
     incoming.sort( compareCommands );
     commands.splice( commands.end(), incoming );
 }
 
-void CommandsQueue::Flush()
-{
-    vlc_mutex_lock( &lock );
-    FlushLocked();
-    vlc_mutex_unlock( &lock );
-}
-
 void CommandsQueue::Abort( bool b_reset )
 {
-    vlc_mutex_lock( &lock );
     commands.splice( commands.end(), incoming );
     while( !commands.empty() )
     {
@@ -276,36 +270,26 @@ void CommandsQueue::Abort( bool b_reset )
 
     if( b_reset )
         bufferinglevel = VLC_TS_INVALID;
-    vlc_mutex_unlock( &lock );
 }
 
 bool CommandsQueue::isEmpty() const
 {
-    vlc_mutex_lock( const_cast<vlc_mutex_t *>(&lock) );
-    bool b_empty = commands.empty() && incoming.empty();
-    vlc_mutex_unlock( const_cast<vlc_mutex_t *>(&lock) );
-    return b_empty;
+    return commands.empty() && incoming.empty();
 }
 
 void CommandsQueue::setDrop( bool b )
 {
-    vlc_mutex_lock( &lock );
     b_drop = b;
-    vlc_mutex_unlock( &lock );
 }
 
 mtime_t CommandsQueue::getBufferingLevel() const
 {
-    vlc_mutex_lock( const_cast<vlc_mutex_t *>(&lock) );
-    mtime_t buffer = bufferinglevel;
-    vlc_mutex_unlock( const_cast<vlc_mutex_t *>(&lock) );
-    return buffer;
+    return bufferinglevel;
 }
 
 mtime_t CommandsQueue::getFirstDTS() const
 {
     mtime_t i_dts = VLC_TS_INVALID;
-    vlc_mutex_lock( const_cast<vlc_mutex_t *>(&lock) );
     std::list<AbstractCommand *>::const_iterator it;
     for( it = commands.begin(); it != commands.end(); ++it )
     {
@@ -315,6 +299,5 @@ mtime_t CommandsQueue::getFirstDTS() const
             break;
         }
     }
-    vlc_mutex_unlock( const_cast<vlc_mutex_t *>(&lock) );
     return i_dts;
 }

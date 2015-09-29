@@ -87,8 +87,7 @@ namespace adaptative
             virtual void Execute( es_out_t *out );
 
         protected:
-            EsOutAddCommand( FakeESOutID *, const es_format_t * );
-            es_format_t fmt;
+            EsOutAddCommand( FakeESOutID * );
     };
 
     class EsOutControlPCRCommand : public AbstractCommand
@@ -131,7 +130,7 @@ namespace adaptative
             virtual ~CommandsFactory() {}
             virtual EsOutSendCommand * createEsOutSendCommand( FakeESOutID *, block_t * );
             virtual EsOutDelCommand * createEsOutDelCommand( FakeESOutID * );
-            virtual EsOutAddCommand * createEsOutAddCommand( FakeESOutID *, const es_format_t * );
+            virtual EsOutAddCommand * createEsOutAddCommand( FakeESOutID * );
             virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int, mtime_t );
             virtual EsOutControlResetPCRCommand * creatEsOutControlResetPCRCommand();
             virtual EsOutDestroyCommand * createEsOutDestroyCommand();
@@ -144,9 +143,9 @@ namespace adaptative
             CommandsQueue();
             ~CommandsQueue();
             void Schedule( AbstractCommand * );
-            void Process( es_out_t *out, mtime_t );
+            mtime_t Process( es_out_t *out, mtime_t );
             void Abort( bool b_reset );
-            void Flush();
+            void Commit();
             bool isEmpty() const;
             void setDrop( bool );
             mtime_t getBufferingLevel() const;
@@ -155,10 +154,8 @@ namespace adaptative
         private:
             std::list<AbstractCommand *> incoming;
             std::list<AbstractCommand *> commands;
-            void FlushLocked();
             mtime_t bufferinglevel;
             bool b_drop;
-            vlc_mutex_t lock;
     };
 }
 

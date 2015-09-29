@@ -38,14 +38,20 @@ namespace adaptative
             ~FakeESOutID();
             void setRealESID( es_out_id_t * );
             es_out_id_t * realESID();
+            const es_format_t *getFmt() const;
+            void create();
             void release();
             void notifyData();
-            bool isCompatible( const es_format_t * ) const;
+            bool isCompatible( const FakeESOutID * ) const;
+            /* Ensure we won't issue delete command twice */
+            void setScheduledForDeletion();
+            bool scheduledForDeletion() const;
 
         private:
             FakeESOut *fakeesout;
             es_out_id_t *p_real_es_id;
             es_format_t fmt;
+            bool pending_delete;
     };
 }
 

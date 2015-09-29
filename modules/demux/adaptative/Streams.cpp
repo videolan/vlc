@@ -22,37 +22,65 @@
 #include "http/HTTPConnectionManager.h"
 #include "logic/AbstractAdaptationLogic.h"
 #include "playlist/SegmentChunk.hpp"
-#include "plumbing/StreamOutput.hpp"
 #include "SegmentTracker.hpp"
+#include "plumbing/SourceStream.hpp"
+#include "plumbing/CommandsQueue.hpp"
+#include "tools/Debug.hpp"
 #include <vlc_demux.h>
 
 using namespace adaptative;
 using namespace adaptative::http;
 using namespace adaptative::logic;
 
-Stream::Stream(demux_t * demux_, const StreamFormat &format_)
+AbstractStream::AbstractStream(demux_t * demux_, const StreamFormat &format_)
 {
-    p_demux = demux_;
+    p_realdemux = demux_;
     type = UNKNOWN;
     format = format_;
-    output = NULL;
     adaptationLogic = NULL;
     currentChunk = NULL;
     eof = false;
+    dead = false;
     disabled = false;
+    flushing = false;
+    restarting_output = false;
+    discontinuity = false;
     segmentTracker = NULL;
-    streamOutputFactory = NULL;
+    pcr = VLC_TS_INVALID;
+
+    demuxer = NULL;
+    fakeesout = NULL;
+
+    /* Don't even try if not supported */
+    if((unsigned)format == StreamFormat::UNSUPPORTED)
+        throw VLC_EGENERIC;
+
+    demuxersource = new (std::nothrow) ChunksSourceStream( VLC_OBJECT(p_realdemux), this );
+    if(!demuxersource)
+        throw VLC_EGENERIC;
+
+    CommandsFactory *factory = new CommandsFactory();
+    fakeesout = new (std::nothrow) FakeESOut(p_realdemux->out, factory);
+    if(!fakeesout)
+    {
+        delete demuxersource;
+        throw VLC_EGENERIC;
+    }
+    fakeesout->setExtraInfoProvider( this );
 }
 
-Stream::~Stream()
+AbstractStream::~AbstractStream()
 {
     delete currentChunk;
     delete adaptationLogic;
-    delete output;
     delete segmentTracker;
+
+    delete demuxer;
+    delete demuxersource;
+    delete fakeesout;
 }
 
-StreamType Stream::mimeToType(const std::string &mime)
+StreamType AbstractStream::mimeToType(const std::string &mime)
 {
     StreamType mimetype;
     if (!mime.compare(0, 6, "video/"))
@@ -66,97 +94,103 @@ StreamType Stream::mimeToType(const std::string &mime)
     return mimetype;
 }
 
-void Stream::create(AbstractAdaptationLogic *logic, SegmentTracker *tracker,
-                    const AbstractStreamOutputFactory *factory)
+void AbstractStream::bind(AbstractAdaptationLogic *logic, SegmentTracker *tracker,
+                    HTTPConnectionManager *conn)
 {
     adaptationLogic = logic;
     segmentTracker = tracker;
-    streamOutputFactory = factory;
-    updateFormat(format);
+    connManager = conn;
 }
 
-void Stream::updateFormat(StreamFormat &newformat)
+void AbstractStream::prepareFormatChange()
 {
-    if( format == newformat && output )
-        return;
-
-    output = streamOutputFactory->create(p_demux, newformat, output);
-
-    format = newformat;
-    if(!output)
-        throw VLC_EGENERIC;
-    output->setLanguage(language);
-    output->setDescription(description);
+    if(demuxer)
+    {
+        /* Enqueue Del Commands for all current ES */
+        demuxer->drain();
+        /* Enqueue Del Commands for all current ES */
+        fakeesout->scheduleAllForDeletion();
+        fakeesout->schedulePCRReset();
+        fakeesout->commandsqueue.Commit();
+        /* ignoring demuxer's own Del commands */
+        fakeesout->commandsqueue.setDrop(true);
+        delete demuxer;
+        fakeesout->commandsqueue.setDrop(false);
+        demuxer = NULL;
+    }
 }
 
-void Stream::setLanguage(const std::string &lang)
+void AbstractStream::setLanguage(const std::string &lang)
 {
     language = lang;
 }
 
-void Stream::setDescription(const std::string &desc)
+void AbstractStream::setDescription(const std::string &desc)
 {
     description = desc;
 }
 
-bool Stream::isEOF() const
+bool AbstractStream::isEOF() const
 {
-    return false;
+    return dead;
 }
 
-mtime_t Stream::getPCR() const
+mtime_t AbstractStream::getPCR() const
 {
-    if(!output)
-        return 0;
-    return output->getPCR();
+    return pcr;
 }
 
-mtime_t Stream::getFirstDTS() const
+mtime_t AbstractStream::getBufferingLevel() const
 {
-    if(!output)
-        return 0;
-    return output->getFirstDTS();
+    return fakeesout->commandsqueue.getBufferingLevel();
 }
 
-int Stream::esCount() const
+mtime_t AbstractStream::getFirstDTS() const
 {
-    if(!output)
-        return 0;
-    return output->esCount();
+    return fakeesout->commandsqueue.getFirstDTS();
 }
 
-bool Stream::operator ==(const Stream &stream) const
+int AbstractStream::esCount() const
+{
+    return fakeesout->esCount();
+}
+
+bool AbstractStream::operator ==(const AbstractStream &stream) const
 {
     return stream.type == type;
 }
 
-SegmentChunk * Stream::getChunk()
+SegmentChunk * AbstractStream::getChunk()
 {
-    if (currentChunk == NULL && output && !eof)
+    if (currentChunk == NULL && !eof)
     {
         if(esCount() && !isSelected())
         {
             disabled = true;
             return NULL;
         }
-        currentChunk = segmentTracker->getNextChunk(output->switchAllowed());
+        currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting());
         if (currentChunk == NULL)
             eof = true;
     }
     return currentChunk;
 }
 
-bool Stream::seekAble() const
+bool AbstractStream::seekAble() const
 {
-    return (output && output->seekAble());
+    return (demuxer &&
+            !fakeesout->restarting() &&
+            !restarting_output &&
+            !discontinuity &&
+            !flushing );
 }
 
-bool Stream::isSelected() const
+bool AbstractStream::isSelected() const
 {
-    return output && output->isSelected();
+    return fakeesout->hasSelectedEs();
 }
 
-bool Stream::reactivate(mtime_t basetime)
+bool AbstractStream::reactivate(mtime_t basetime)
 {
     if(setPosition(basetime, false))
     {
@@ -170,46 +204,144 @@ bool Stream::reactivate(mtime_t basetime)
     }
 }
 
-bool Stream::isDisabled() const
+bool AbstractStream::startDemux()
+{
+    if(demuxer)
+        return false;
+
+    try
+    {
+        demuxersource->Reset();
+        demuxer = createDemux(format);
+    } catch(int) {
+        msg_Err(p_realdemux, "Failed to create demuxer");
+    }
+
+    return !!demuxer;
+}
+
+bool AbstractStream::restartDemux()
+{
+    if(!demuxer)
+    {
+        return startDemux();
+    }
+    else if(demuxer->reinitsOnSeek())
+    {
+        /* Push all ES as recycling candidates */
+        fakeesout->recycleAll();
+        /* Restart with ignoring pushes to queue */
+        return demuxer->restart(fakeesout->commandsqueue);
+    }
+    return true;
+}
+
+bool AbstractStream::isDisabled() const
 {
     return disabled;
 }
 
-Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_deadline, bool send)
+AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
 {
-    if(!output)
-        return Stream::status_eof;
+    /* Ensure it is configured */
+    if(!adaptationLogic || !segmentTracker || !connManager || dead)
+        return AbstractStream::status_eof;
 
-    if(nz_deadline + VLC_TS_0 > output->getPCR()) /* not already demuxed */
+    if(flushing)
+    {
+        if(!send)
+            return AbstractStream::status_buffering;
+
+        pcr = fakeesout->commandsqueue.Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
+        if(!fakeesout->commandsqueue.isEmpty())
+            return AbstractStream::status_demuxed;
+
+        fakeesout->commandsqueue.Abort(true); /* reset buffering level */
+        flushing = false;
+        pcr = 0;
+        return AbstractStream::status_dis;
+    }
+
+    if(!demuxer && !startDemux())
+    {
+        /* If demux fails because of probing failure / wrong format*/
+        if(restarting_output)
+        {
+            msg_Dbg( p_realdemux, "Flushing on format change" );
+            prepareFormatChange();
+            restarting_output = false;
+            discontinuity = false;
+            flushing = true;
+            return AbstractStream::status_buffering;
+        }
+        dead = true; /* Prevent further retries */
+        return AbstractStream::status_eof;
+    }
+
+    if(nz_deadline + VLC_TS_0 > getBufferingLevel()) /* not already demuxed */
     {
         /* need to read, demuxer still buffering, ... */
-        if(read(connManager) <= 0)
+        if(demuxer->demux() != VLC_DEMUXER_SUCCESS)
         {
-            if(output->isEmpty())
-                return Stream::status_eof;
+            if(restarting_output || discontinuity)
+            {
+                msg_Dbg( p_realdemux, "Flushing on discontinuity" );
+                prepareFormatChange();
+                restarting_output = false;
+                discontinuity = false;
+                flushing = true;
+                return AbstractStream::status_buffering;
+            }
+
+            fakeesout->commandsqueue.Commit();
+            if(fakeesout->commandsqueue.isEmpty())
+                return AbstractStream::status_eof;
         }
-        else if(nz_deadline + VLC_TS_0 > output->getPCR()) /* need to read more */
+        else if(nz_deadline + VLC_TS_0 > getBufferingLevel()) /* need to read more */
         {
-            return Stream::status_buffering;
+            return AbstractStream::status_buffering;
         }
     }
 
-    if(send)
-        output->sendToDecoder(nz_deadline);
+    AdvDebug(msg_Dbg(p_realdemux, "Stream %s pcr %ld dts %ld deadline %ld buflevel %ld",
+             description.c_str(), getPCR(), getFirstDTS(), nz_deadline, getBufferingLevel()));
 
-    return Stream::status_demuxed;
+    if(send)
+        pcr = fakeesout->commandsqueue.Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
+
+    return AbstractStream::status_demuxed;
 }
 
-size_t Stream::read(HTTPConnectionManager *connManager)
+block_t * AbstractStream::readNextBlock(size_t)
 {
     SegmentChunk *chunk = getChunk();
     if(!chunk)
-        return 0;
+        return NULL;
+
+    if(format != chunk->getStreamFormat())
+    {
+        /* Force stream to end for this call */
+        msg_Info(p_realdemux, "Changing stream format %u->%u",
+                 (unsigned)format, (unsigned)chunk->getStreamFormat());
+
+        restarting_output = true;
+        format = chunk->getStreamFormat();
+        /* Next stream will use current unused chunk */
+        return NULL;
+    }
+
+    if(chunk->discontinuity)
+    {
+        discontinuity = true;
+        chunk->discontinuity = false;
+        msg_Info(p_realdemux, "Encountered discontinuity");
+        return NULL;
+    }
 
     if(!chunk->getConnection())
     {
        if(!connManager->connectChunk(chunk))
-        return 0;
+        return NULL;
     }
 
     size_t readsize = 0;
@@ -223,7 +355,7 @@ size_t Stream::read(HTTPConnectionManager *connManager)
             chunk->getConnection()->releaseChunk();
             currentChunk = NULL;
             delete chunk;
-            return 0;
+            return NULL;
         }
         b_segment_head_chunk = true;
     }
@@ -236,7 +368,7 @@ size_t Stream::read(HTTPConnectionManager *connManager)
 
     block_t *block = block_Alloc(readsize);
     if(!block)
-        return 0;
+        return NULL;
 
     mtime_t time = mdate();
     ssize_t ret = chunk->getConnection()->read(block->p_buffer, readsize);
@@ -248,7 +380,7 @@ size_t Stream::read(HTTPConnectionManager *connManager)
         chunk->getConnection()->releaseChunk();
         currentChunk = NULL;
         delete chunk;
-        return 0;
+        return NULL;
     }
     else
     {
@@ -256,13 +388,6 @@ size_t Stream::read(HTTPConnectionManager *connManager)
 
         adaptationLogic->updateDownloadRate(block->i_buffer, time);
         chunk->onDownload(&block);
-
-        StreamFormat chunkStreamFormat = chunk->getStreamFormat();
-        if(output && chunkStreamFormat != output->getStreamFormat())
-        {
-            msg_Info(p_demux, "Changing stream format");
-            updateFormat(chunkStreamFormat);
-        }
 
         if (chunk->getBytesToRead() == 0)
         {
@@ -272,26 +397,20 @@ size_t Stream::read(HTTPConnectionManager *connManager)
         }
     }
 
-    readsize = block->i_buffer;
+    block = checkBlock(block, b_segment_head_chunk);
 
-    if(output)
-        output->pushBlock(block, b_segment_head_chunk);
-    else
-        block_Release(block);
-
-    return readsize;
+    return block;
 }
 
-bool Stream::setPosition(mtime_t time, bool tryonly)
+bool AbstractStream::setPosition(mtime_t time, bool tryonly)
 {
-    if(!output)
+    if(!demuxer)
         return false;
 
-    bool ret = segmentTracker->setPositionByTime(time, output->reinitsOnSeek(), tryonly);
+    bool ret = segmentTracker->setPositionByTime(time, demuxer->reinitsOnSeek(), tryonly);
     if(!tryonly && ret)
     {
-        output->setPosition(time);
-        if(output->reinitsOnSeek())
+        if(demuxer->reinitsOnSeek())
         {
             if(currentChunk)
             {
@@ -299,23 +418,42 @@ bool Stream::setPosition(mtime_t time, bool tryonly)
                 delete currentChunk;
             }
             currentChunk = NULL;
+
+            restartDemux();
+
+            /* Check if we need to set an offset as the demuxer
+             * will start from zero from seek point */
+            if(demuxer->alwaysStartsFromZero())
+                fakeesout->setTimestampOffset(time);
         }
+
+        es_out_Control(p_realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                       VLC_TS_0 + time);
     }
     return ret;
 }
 
-mtime_t Stream::getPosition() const
+mtime_t AbstractStream::getPosition() const
 {
     return segmentTracker->getSegmentStart();
 }
 
-void Stream::prune()
+void AbstractStream::prune()
 {
     segmentTracker->pruneFromCurrent();
 }
 
-void Stream::runUpdates()
+void AbstractStream::runUpdates()
 {
     if(!isDisabled())
         segmentTracker->updateSelected();
 }
+
+void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
+{
+    if(!p_fmt->psz_language && !language.empty())
+        p_fmt->psz_language = strdup(language.c_str());
+    if(!p_fmt->psz_description && !description.empty())
+        p_fmt->psz_description = strdup(description.c_str());
+}
+

@@ -48,11 +48,13 @@ namespace adaptative
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
 
             /* Used by FakeES ID */
-            void registerFakeEsID( FakeESOutID *id );
             void recycle( FakeESOutID *id );
+            void createOrRecycleRealEsID( FakeESOutID * );
 
             /**/
-            void recycleAll();
+            void schedulePCRReset();
+            void scheduleAllForDeletion(); /* Queue Del commands for non Del issued ones */
+            void recycleAll(); /* Cancels all commands and send fakees for recycling */
             void gc();
 
             /* static callbacks for demuxer */
@@ -66,13 +68,12 @@ namespace adaptative
 
         private:
             es_out_t *real_es_out;
-            FakeESOutID * createOrRecycle( const es_format_t * );
+            FakeESOutID * createNewID( const es_format_t * );
             ExtraFMTInfoInterface *extrainfo;
             mtime_t getTimestampOffset() const;
             CommandsFactory *commandsFactory;
             es_out_t *fakeesout;
             mtime_t timestamps_offset;
-            vlc_mutex_t lock;
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;
     };

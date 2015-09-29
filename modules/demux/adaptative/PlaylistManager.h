@@ -43,20 +43,17 @@ namespace adaptative
     using namespace logic;
     using namespace http;
 
-    class AbstractStreamFactory;
-    class AbstractStreamOutputFactory;
-
     class PlaylistManager
     {
         public:
             PlaylistManager( demux_t *, AbstractPlaylist *,
-                             AbstractStreamOutputFactory *,
+                             AbstractStreamFactory *,
                              AbstractAdaptationLogic::LogicType type );
             virtual ~PlaylistManager    ();
 
             bool    start();
 
-            Stream::status demux(mtime_t, bool);
+            AbstractStream::status demux(mtime_t, bool);
             mtime_t getDuration() const;
             mtime_t getPCR() const;
             mtime_t getFirstDTS() const;
@@ -82,9 +79,9 @@ namespace adaptative
             HTTPConnectionManager              *conManager;
             AbstractAdaptationLogic::LogicType  logicType;
             AbstractPlaylist                    *playlist;
-            AbstractStreamOutputFactory         *streamOutputFactory;
+            AbstractStreamFactory               *streamFactory;
             demux_t                             *p_demux;
-            std::vector<Stream *>                streams;
+            std::vector<AbstractStream *>        streams;
             time_t                               nextPlaylistupdate;
             mtime_t                              i_nzpcr;
             BasePeriod                          *currentPeriod;

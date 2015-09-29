@@ -31,8 +31,8 @@ namespace hls
     {
         public:
             static const unsigned UNKNOWN   = StreamFormat::UNSUPPORTED + 1; /* will probe */
-            static const unsigned MPEG2TS   = StreamFormat::UNSUPPORTED + 2;
-            static const unsigned PACKEDAAC = StreamFormat::UNSUPPORTED + 3;
+            static const unsigned MPEG2TS   = StreamFormat::UNSUPPORTED + 1;
+            static const unsigned PACKEDAAC = StreamFormat::UNSUPPORTED + 2;
 
             static StreamFormat mimeToFormat(const std::string &mime)
             {

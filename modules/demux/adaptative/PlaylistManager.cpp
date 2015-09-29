@@ -33,7 +33,7 @@
 #include "logic/AlwaysBestAdaptationLogic.h"
 #include "logic/RateBasedAdaptationLogic.h"
 #include "logic/AlwaysLowestAdaptationLogic.hpp"
-#include "plumbing/StreamOutput.hpp"
+#include "tools/Debug.hpp"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 
@@ -45,12 +45,12 @@ using namespace adaptative;
 
 PlaylistManager::PlaylistManager( demux_t *p_demux_,
                                   AbstractPlaylist *pl,
-                                  AbstractStreamOutputFactory *factory,
+                                  AbstractStreamFactory *factory,
                                   AbstractAdaptationLogic::LogicType type ) :
              conManager     ( NULL ),
              logicType      ( type ),
              playlist       ( pl ),
-             streamOutputFactory( factory ),
+             streamFactory  ( factory ),
              p_demux        ( p_demux_ ),
              nextPlaylistupdate  ( 0 ),
              i_nzpcr        ( 0 )
@@ -61,14 +61,14 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
 PlaylistManager::~PlaylistManager   ()
 {
     delete conManager;
-    delete streamOutputFactory;
+    delete streamFactory;
     unsetPeriod();
     delete playlist;
 }
 
 void PlaylistManager::unsetPeriod()
 {
-    std::vector<Stream *>::iterator it;
+    std::vector<AbstractStream *>::iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
         delete *it;
     streams.clear();
@@ -84,50 +84,46 @@ bool PlaylistManager::setupPeriod()
     for(it=sets.begin();it!=sets.end();++it)
     {
         BaseAdaptationSet *set = *it;
-        if(set)
+        if(set && streamFactory)
         {
-            Stream *st = new (std::nothrow) Stream(p_demux, set->getStreamFormat());
-            if(!st)
-                continue;
             AbstractAdaptationLogic *logic = createLogic(logicType);
             if(!logic)
+                continue;
+
+            SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, set);
+            if(!tracker)
             {
-                delete st;
+                delete logic;
                 continue;
             }
 
-            SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, set);
-            try
+            AbstractStream *st = streamFactory->create(p_demux, set->getStreamFormat(),
+                                               logic, tracker, conManager);
+            if(!st)
             {
-                if(!tracker || !streamOutputFactory)
-                {
-                    delete tracker;
-                    delete logic;
-                    throw VLC_ENOMEM;
-                }
-
-                std::list<std::string> languages;
-                if(!set->getLang().empty())
-                {
-                    languages = set->getLang();
-                }
-                else if(!set->getRepresentations().empty())
-                {
-                    languages = set->getRepresentations().front()->getLang();
-                }
-
-                if(!languages.empty())
-                    st->setLanguage(languages.front());
-
-                if(!set->description.Get().empty())
-                    st->setDescription(set->description.Get());
-
-                st->create(logic, tracker, streamOutputFactory);
-
-                streams.push_back(st);
-            } catch (int) {
-                delete st;
+                delete tracker;
+                delete logic;
+                continue;
             }
+
+            streams.push_back(st);
+
+            /* Generate stream description */
+            std::list<std::string> languages;
+            if(!set->getLang().empty())
+            {
+                languages = set->getLang();
+            }
+            else if(!set->getRepresentations().empty())
+            {
+                languages = set->getRepresentations().front()->getLang();
+            }
+
+            if(!languages.empty())
+                st->setLanguage(languages.front());
+
+            if(!set->description.Get().empty())
+                st->setDescription(set->description.Get());
         }
     }
     return true;
@@ -135,11 +131,10 @@ bool PlaylistManager::setupPeriod()
 
 bool PlaylistManager::start()
 {
-    if(!setupPeriod())
+    if(!conManager && !(conManager = new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(p_demux->s))))
         return false;
 
-    conManager = new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(p_demux->s));
-    if(!conManager)
+    if(!setupPeriod())
         return false;
 
     playlist->playbackStart.Set(time(NULL));
@@ -148,14 +143,14 @@ bool PlaylistManager::start()
     return true;
 }
 
-Stream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
+AbstractStream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
 {
-    Stream::status i_return = Stream::status_eof;
+    AbstractStream::status i_return = AbstractStream::status_eof;
 
-    std::vector<Stream *>::iterator it;
+    std::vector<AbstractStream *>::iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        Stream *st = *it;
+        AbstractStream *st = *it;
 
         if (st->isDisabled())
         {
@@ -165,25 +160,28 @@ Stream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
                 continue;
         }
 
-        Stream::status i_ret = st->demux(conManager, nzdeadline, send);
-
-        if(i_ret == Stream::status_buffering)
+        AbstractStream::status i_ret = st->demux(nzdeadline, send);
+        if(i_ret == AbstractStream::status_buffering)
         {
-            i_return = Stream::status_buffering;
+            i_return = AbstractStream::status_buffering;
         }
-        else if(i_ret == Stream::status_demuxed &&
-                i_return != Stream::status_buffering)
+        else if(i_ret == AbstractStream::status_demuxed &&
+                i_return != AbstractStream::status_buffering)
         {
-            i_return = Stream::status_demuxed;
+            i_return = AbstractStream::status_demuxed;
+        }
+        else if(i_ret == AbstractStream::status_dis)
+        {
+            i_return = AbstractStream::status_dis;
         }
     }
 
     /* might be end of current period */
-    if(i_return == Stream::status_eof && currentPeriod)
+    if(i_return == AbstractStream::status_eof && currentPeriod)
     {
         unsetPeriod();
         currentPeriod = playlist->getNextPeriod(currentPeriod);
-        i_return = (setupPeriod()) ? Stream::status_eop : Stream::status_eof;
+        i_return = (setupPeriod()) ? AbstractStream::status_eop : AbstractStream::status_eof;
     }
 
     return i_return;
@@ -192,10 +190,10 @@ Stream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
 mtime_t PlaylistManager::getPCR() const
 {
     mtime_t pcr = VLC_TS_INVALID;
-    std::vector<Stream *>::const_iterator it;
+    std::vector<AbstractStream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if ((*it)->isDisabled())
+        if ((*it)->isDisabled() || (*it)->isEOF())
             continue;
         if(pcr == VLC_TS_INVALID || pcr > (*it)->getPCR())
             pcr = (*it)->getPCR();
@@ -206,10 +204,10 @@ mtime_t PlaylistManager::getPCR() const
 mtime_t PlaylistManager::getFirstDTS() const
 {
     mtime_t dts = VLC_TS_INVALID;
-    std::vector<Stream *>::const_iterator it;
+    std::vector<AbstractStream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if ((*it)->isDisabled())
+        if ((*it)->isDisabled() || (*it)->isEOF())
             continue;
         if(dts == VLC_TS_INVALID || dts > (*it)->getFirstDTS())
             dts = (*it)->getFirstDTS();
@@ -220,7 +218,7 @@ mtime_t PlaylistManager::getFirstDTS() const
 int PlaylistManager::esCount() const
 {
     int es = 0;
-    std::vector<Stream *>::const_iterator it;
+    std::vector<AbstractStream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
         es += (*it)->esCount();
@@ -242,7 +240,7 @@ bool PlaylistManager::setPosition(mtime_t time)
     for(int real = 0; real < 2; real++)
     {
         /* Always probe if we can seek first */
-        std::vector<Stream *>::iterator it;
+        std::vector<AbstractStream *>::iterator it;
         for(it=streams.begin(); it!=streams.end(); ++it)
         {
             ret &= (*it)->setPosition(time, !real);
@@ -258,7 +256,7 @@ bool PlaylistManager::seekAble() const
     if(playlist->isLive())
         return false;
 
-    std::vector<Stream *>::const_iterator it;
+    std::vector<AbstractStream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
         if(!(*it)->seekAble())
@@ -269,7 +267,7 @@ bool PlaylistManager::seekAble() const
 
 bool PlaylistManager::updatePlaylist()
 {
-    std::vector<Stream *>::const_iterator it;
+    std::vector<AbstractStream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
         (*it)->runUpdates();
 
@@ -287,7 +285,7 @@ int PlaylistManager::doDemux(int64_t increment)
 {
     if(i_nzpcr == VLC_TS_INVALID)
     {
-        if( Stream::status_eof == demux(i_nzpcr + increment, false) )
+        if( AbstractStream::status_eof == demux(i_nzpcr + increment, false) )
         {
             return VLC_DEMUXER_EOF;
         }
@@ -296,19 +294,20 @@ int PlaylistManager::doDemux(int64_t increment)
             i_nzpcr = getPCR();
     }
 
-    Stream::status status = demux(i_nzpcr + increment, true);
-
+    AbstractStream::status status = demux(i_nzpcr + increment, true);
+    AdvDebug(msg_Dbg( p_demux, "doDemux() status %d dts %ld pcr %ld", status, getFirstDTS(), getPCR() ));
     switch(status)
     {
-    case Stream::status_eof:
+    case AbstractStream::status_eof:
         return VLC_DEMUXER_EOF;
-    case Stream::status_buffering:
+    case AbstractStream::status_buffering:
         break;
-    case Stream::status_eop:
+    case AbstractStream::status_dis:
+    case AbstractStream::status_eop:
         i_nzpcr = VLC_TS_INVALID;
         es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         break;
-    case Stream::status_demuxed:
+    case AbstractStream::status_demuxed:
         if( i_nzpcr != VLC_TS_INVALID )
         {
             i_nzpcr += increment;

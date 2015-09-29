@@ -29,14 +29,18 @@
 
 namespace adaptative
 {
+    class CommandsQueue;
+    class AbstractSourceStream;
 
     class AbstractDemuxer
     {
         public:
             AbstractDemuxer();
             virtual ~AbstractDemuxer();
-            virtual bool restart() = 0;
-            virtual bool feed(block_t *, bool) = 0;
+            virtual int demux() = 0;
+            virtual void drain() = 0;
+            virtual bool create() = 0;
+            virtual bool restart(CommandsQueue &) = 0;
             bool alwaysStartsFromZero() const;
             bool reinitsOnSeek() const;
 
@@ -45,19 +49,23 @@ namespace adaptative
             bool b_reinitsonseek;
     };
 
-    class StreamDemux : public AbstractDemuxer
+    class Demuxer : public AbstractDemuxer
     {
         public:
-            StreamDemux(demux_t *, const std::string &, es_out_t *);
-            virtual ~StreamDemux();
-            virtual bool restart(); /* impl */
-            virtual bool feed(block_t *, bool); /* impl */
+            Demuxer(demux_t *, const std::string &, es_out_t *, AbstractSourceStream *);
+            virtual ~Demuxer();
+            virtual int demux(); /* impl */
+            virtual void drain(); /* impl */
+            virtual bool create(); /* impl */
+            virtual bool restart(CommandsQueue &); /* impl */
 
         private:
-            stream_t *demuxstream;
+            AbstractSourceStream *sourcestream;
             demux_t *p_realdemux;
+            demux_t *p_demux;
             std::string name;
             es_out_t *p_es_out;
+            bool b_eof;
     };
 
 }

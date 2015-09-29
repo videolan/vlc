@@ -18,7 +18,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "Demuxer.hpp"
+
 #include <vlc_stream.h>
+#include <vlc_demux.h>
+#include "SourceStream.hpp"
+#include "CommandsQueue.hpp"
+#include "../ChunksSource.hpp"
 
 using namespace adaptative;
 
@@ -43,44 +48,71 @@ bool AbstractDemuxer::reinitsOnSeek() const
     return b_reinitsonseek;
 }
 
-StreamDemux::StreamDemux(demux_t *p_realdemux_, const std::string &name_, es_out_t *out)
+Demuxer::Demuxer(demux_t *p_realdemux_, const std::string &name_, es_out_t *out, AbstractSourceStream *source)
     : AbstractDemuxer()
 {
-    demuxstream = NULL;
     p_es_out = out;
     name = name_;
     p_realdemux = p_realdemux_;
+    p_demux = NULL;
+    b_eof = false;
+    sourcestream = source;
 
     if(name == "mp4")
     {
         b_startsfromzero = true;
     }
 
-    restart();
-
-    if(!demuxstream)
+    if(!create())
         throw VLC_EGENERIC;
 }
 
-StreamDemux::~StreamDemux()
+Demuxer::~Demuxer()
 {
-    if (demuxstream)
-        stream_Delete(demuxstream);
+    if(p_demux)
+    {
+        p_demux->s = NULL; // otherwise tries to delete below inner stream
+        demux_Delete(p_demux);
+    }
 }
 
-bool StreamDemux::feed(block_t *p_block, bool)
+bool Demuxer::create()
 {
-    stream_DemuxSend(demuxstream, p_block);
-    return true;
-}
-
-bool StreamDemux::restart()
-{
-    if(demuxstream)
-        stream_Delete(demuxstream);
-
-    demuxstream = stream_DemuxNew(p_realdemux, name.c_str(), p_es_out);
-    if(!demuxstream)
+    p_demux = demux_New( VLC_OBJECT(p_realdemux), name.c_str(), "",
+                         sourcestream->getStream(), p_es_out );
+    if(!p_demux)
+    {
+        b_eof = true;
         return false;
+    }
     return true;
+}
+
+bool Demuxer::restart(CommandsQueue &queue)
+{
+    if(p_demux)
+    {
+        queue.setDrop(true);
+        p_demux->s = NULL; // otherwise tries to delete below inner stream
+        demux_Delete(p_demux);
+        p_demux = NULL;
+        queue.setDrop(false);
+    }
+    sourcestream->Reset();
+    return create();
+}
+
+void Demuxer::drain()
+{
+    while(p_demux && demux_Demux(p_demux) == VLC_DEMUXER_SUCCESS);
+}
+
+int Demuxer::demux()
+{
+    if(b_eof)
+        return VLC_DEMUXER_EOF;
+    int i_ret = demux_Demux(p_demux);
+    if(i_ret != VLC_DEMUXER_SUCCESS)
+        b_eof = true;
+    return i_ret;
 }

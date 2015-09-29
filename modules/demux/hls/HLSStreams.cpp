@@ -23,41 +23,70 @@
 
 using namespace hls;
 
-AbstractStreamOutput *HLSStreamOutputFactory::create(demux_t *demux, const StreamFormat &format,
-                                                     AbstractStreamOutput *recycled) const
+HLSStream::HLSStream(demux_t *demux, const StreamFormat &format)
+    :AbstractStream(demux, format)
 {
-    AbstractStreamOutput *ret = NULL;
-    unsigned fmt = format;
-    switch(fmt)
+    b_timestamps_offset_set = false;
+    i_aac_offset = 0;
+}
+
+bool HLSStream::setPosition(mtime_t time, bool tryonly)
+{
+    bool b_ret = AbstractStream::setPosition(time, tryonly);
+    if(!tryonly && b_ret)
+    {
+        /* Should be correct, has a restarted demux shouldn't have been fed with data yet */
+        fakeesout->setTimestampOffset( VLC_TS_INVALID );
+        b_timestamps_offset_set = false;
+    }
+    return b_ret;
+}
+
+bool HLSStream::restartDemux()
+{
+    bool b_ret = AbstractStream::restartDemux();
+    if(b_ret)
+        b_timestamps_offset_set = false;
+    return b_ret;
+}
+
+AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
+{
+    AbstractDemuxer *ret = NULL;
+    switch((unsigned)format)
     {
         case HLSStreamFormat::PACKEDAAC:
-            ret = new HLSPackedStreamOutput(demux, format, "any", recycled);
+            ret = new Demuxer(p_realdemux, "any", fakeesout->getEsOut(), demuxersource);
             break;
 
-        case HLSStreamFormat::UNKNOWN:
         case HLSStreamFormat::MPEG2TS:
-            ret = new BaseStreamOutput(demux, format, "ts", recycled);
+            ret = new Demuxer(p_realdemux, "ts", fakeesout->getEsOut(), demuxersource);
+            break;
 
-        case HLSStreamFormat::UNSUPPORTED:
         default:
+        case StreamFormat::UNSUPPORTED:
             break;
     }
-
-    delete recycled;
-
     return ret;
 }
 
-HLSPackedStreamOutput::HLSPackedStreamOutput(demux_t *demux, const StreamFormat &format, const std::string &name,
-                                             AbstractStreamOutput *recycled) :
-    BaseStreamOutput(demux, format, name, recycled)
+void HLSStream::prepareFormatChange()
 {
-    b_timestamps_offset_set = false;
+    AbstractStream::prepareFormatChange();
+    if((unsigned)format == HLSStreamFormat::PACKEDAAC)
+    {
+        fakeesout->setTimestampOffset( i_aac_offset );
+    }
+    else
+    {
+        fakeesout->setTimestampOffset( 0 );
+    }
 }
 
-void HLSPackedStreamOutput::pushBlock(block_t *p_block, bool b_first)
+block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 {
-    if(b_first && p_block && p_block->i_buffer >= 10 && !memcmp(p_block->p_buffer, "ID3", 3))
+    if(b_first && p_block &&
+       p_block->i_buffer >= 10 && !memcmp(p_block->p_buffer, "ID3", 3))
     {
         uint32_t size = GetDWBE(&p_block->p_buffer[6]) + 10;
         size = __MIN(p_block->i_buffer, size);
@@ -66,7 +95,7 @@ void HLSPackedStreamOutput::pushBlock(block_t *p_block, bool b_first)
             if(!memcmp(&p_block->p_buffer[10], "PRIV", 4) &&
                !memcmp(&p_block->p_buffer[20], "com.apple.streaming.transportStreamTimestamp", 45))
             {
-                fakeesout->setTimestampOffset( GetQWBE(&p_block->p_buffer[65]) * 100 / 9 );
+                i_aac_offset = GetQWBE(&p_block->p_buffer[65]) * 100 / 9;
                 b_timestamps_offset_set = true;
             }
         }
@@ -76,13 +105,20 @@ void HLSPackedStreamOutput::pushBlock(block_t *p_block, bool b_first)
         p_block->i_buffer -= size;
     }
 
-    BaseStreamOutput::pushBlock(p_block, b_first);
+    return p_block;
 }
 
-void HLSPackedStreamOutput::setPosition(mtime_t nztime)
+AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
+                               AbstractAdaptationLogic *logic, SegmentTracker *tracker,
+                               HTTPConnectionManager *manager) const
 {
-    BaseStreamOutput::setPosition(nztime);
-    /* Should be correct, has a restarted demux shouldn't have been fed with data yet */
-    fakeesout->setTimestampOffset( VLC_TS_INVALID );
-    b_timestamps_offset_set = false;
+    HLSStream *stream;
+    try
+    {
+        stream = new HLSStream(realdemux, format);
+    } catch (int) {
+        return NULL;
+    }
+    stream->bind(logic, tracker, manager);
+    return stream;
 }

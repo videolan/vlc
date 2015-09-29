@@ -36,7 +36,7 @@ using namespace hls;
 using namespace hls::playlist;
 
 HLSManager::HLSManager(demux_t *demux_, M3U8 *playlist,
-                       AbstractStreamOutputFactory *factory,
+                       AbstractStreamFactory *factory,
                        AbstractAdaptationLogic::LogicType type) :
              PlaylistManager(demux_, playlist, factory, type)
 {

@@ -24,29 +24,37 @@
 # include "config.h"
 #endif
 
-#include "../adaptative/plumbing/StreamOutput.hpp"
+#include "../adaptative/Streams.hpp"
 
 namespace hls
 {
     using namespace adaptative;
 
-    class HLSStreamOutputFactory : public AbstractStreamOutputFactory
+    class HLSStream : public AbstractStream
     {
         public:
-            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &,
-                                                 AbstractStreamOutput * = NULL) const;
-    };
+            HLSStream(demux_t *, const StreamFormat &);
+            virtual bool setPosition(mtime_t, bool); /* reimpl */
 
-    class HLSPackedStreamOutput : public BaseStreamOutput
-    {
-        public:
-            HLSPackedStreamOutput(demux_t *, const StreamFormat &, const std::string &,
-                                  AbstractStreamOutput * = NULL);
-            virtual void pushBlock(block_t *, bool); /* reimpl */
-            virtual void setPosition(mtime_t); /* reimpl */
+        protected:
+            virtual AbstractDemuxer * createDemux(const StreamFormat &); /* reimpl */
+            virtual bool restartDemux(); /* reimpl */
+            virtual void prepareFormatChange(); /* reimpl */
+
+            virtual block_t *checkBlock(block_t *, bool); /* reimpl */
 
         private:
             bool b_timestamps_offset_set;
+            mtime_t i_aac_offset;
     };
+
+    class HLSStreamFactory : public AbstractStreamFactory
+    {
+        public:
+            virtual AbstractStream *create(demux_t*, const StreamFormat &,
+                                   AbstractAdaptationLogic *, SegmentTracker *,
+                                   HTTPConnectionManager *) const;
+    };
+
 }
 #endif // HLSSTREAMS_HPP

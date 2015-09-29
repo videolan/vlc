@@ -37,6 +37,7 @@
 #include "../dash/xml/DOMParser.h"
 #include "../dash/mpd/MPDFactory.h"
 #include "../dash/DASHManager.h"
+#include "../dash/DASHStream.hpp"
 
 #include "../hls/HLSManager.hpp"
 #include "../hls/HLSStreams.hpp"
@@ -138,7 +139,7 @@ static int Open(vlc_object_t *p_obj)
         }
 
         p_manager = new DASHManager( p_demux, p_playlist,
-                                     new (std::nothrow) DASHStreamOutputFactory,
+                                     new (std::nothrow) DASHStreamFactory,
                                      static_cast<AbstractAdaptationLogic::LogicType>(logic) );
     }
     else if(HLSManager::isHTTPLiveStreaming(p_demux->s))
@@ -153,7 +154,7 @@ static int Open(vlc_object_t *p_obj)
 
         p_manager =
                 new (std::nothrow) HLSManager(p_demux, p_playlist,
-                                              new (std::nothrow) HLSStreamOutputFactory,
+                                              new (std::nothrow) HLSStreamFactory,
                                               static_cast<AbstractAdaptationLogic::LogicType>(logic));
     }
 
