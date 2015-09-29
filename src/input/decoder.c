@@ -98,12 +98,9 @@ struct decoder_owner_sys_t
 
     /* -- Theses variables need locking on read *and* write -- */
     /* Pause */
-    bool b_paused;
-    struct
-    {
-        mtime_t i_date;
-        int     i_ignore;
-    } pause;
+    mtime_t pause_date;
+    unsigned frames_countdown;
+    bool paused;
 
     /* Waiting */
     bool b_waiting;
@@ -324,11 +321,6 @@ static int aout_update_format( decoder_t *p_dec )
 
         DecoderUpdateFormatLocked( p_dec );
         aout_FormatPrepare( &p_owner->fmt.audio );
-
-        if( unlikely(p_owner->b_paused) && p_aout != NULL )
-            /* fake pause if needed */
-            aout_DecChangePause( p_aout, true, mdate() );
-
         vlc_mutex_unlock( &p_owner->lock );
 
         if( p_owner->p_input != NULL )
@@ -546,7 +538,7 @@ static mtime_t DecoderGetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->b_waiting || p_owner->b_paused )
+    if( p_owner->b_waiting )
         i_ts = VLC_TS_INVALID;
     vlc_mutex_unlock( &p_owner->lock );
 
@@ -638,21 +630,8 @@ static bool DecoderWaitUnblock( decoder_t *p_dec )
     {
         if( p_owner->b_flushing )
             break;
-        if( p_owner->b_paused )
-        {
-            if( p_owner->b_waiting && !p_owner->b_has_data )
-                break;
-            if( p_owner->pause.i_ignore > 0 )
-            {
-                p_owner->pause.i_ignore--;
-                break;
-            }
-        }
-        else
-        {
-            if( !p_owner->b_waiting || !p_owner->b_has_data )
-                break;
-        }
+        if( !p_owner->b_waiting || !p_owner->b_has_data )
+            break;
         vlc_cond_wait( &p_owner->wait_request, &p_owner->lock );
     }
 
@@ -928,6 +907,16 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
 
     vlc_mutex_unlock( &p_owner->lock );
 
+    /* FIXME: The *input* FIFO should not be locked here. This will not work
+     * properly if/when pictures are queued asynchronously (c.f. assert()). */
+    vlc_fifo_Lock( p_owner->p_fifo );
+    if( p_owner->paused )
+    {
+       assert( p_owner->frames_countdown > 0 );
+       p_owner->frames_countdown--;
+    }
+    vlc_fifo_Unlock( p_owner->p_fifo );
+
     /* */
     if( !p_picture->b_force && p_picture->date <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify video_output/*
         b_reject = true;
@@ -1094,7 +1083,6 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
 
     /* */
     vlc_mutex_lock( &p_owner->lock );
-race:
     if( p_owner->b_waiting )
     {
         p_owner->b_has_data = true;
@@ -1102,7 +1090,6 @@ race:
     }
 
     bool b_reject = DecoderWaitUnblock( p_dec );
-    bool b_paused = p_owner->b_paused;
 
     /* */
     int i_rate = INPUT_RATE_DEFAULT;
@@ -1118,16 +1105,12 @@ race:
     DecoderWaitDate( p_dec, &b_reject,
                      p_audio->i_pts - AOUT_MAX_PREPARE_TIME );
 
-    if( unlikely(p_owner->b_paused != b_paused) )
-        goto race; /* race with input thread? retry... */
-
     audio_output_t *p_aout = p_owner->p_aout;
     if( p_aout == NULL )
         b_reject = true;
 
     if( !b_reject )
     {
-        assert( !p_owner->b_paused );
         if( !aout_DecPlay( p_aout, p_audio, i_rate ) )
             *pi_played_sum += 1;
         *pi_lost_sum += aout_DecGetResetLost( p_aout );
@@ -1444,37 +1427,58 @@ static void *DecoderThread( void *p_data )
 {
     decoder_t *p_dec = (decoder_t *)p_data;
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    bool paused = false;
 
     /* The decoder's main loop */
     vlc_fifo_Lock( p_owner->p_fifo );
+    vlc_fifo_CleanupPush( p_owner->p_fifo );
+
     for( ;; )
     {
-        block_t *p_block;
+        if( paused != p_owner->paused )
+        {   /* Update playing/paused status of the output */
+            int canc = vlc_savecancel();
+            mtime_t date = p_owner->pause_date;
 
-        vlc_fifo_CleanupPush( p_owner->p_fifo );
-        /* Check if thread is cancelled before processing input blocks */
-        vlc_testcancel();
+            paused = p_owner->paused;
+            vlc_fifo_Unlock( p_owner->p_fifo );
 
-        vlc_cond_signal( &p_owner->wait_fifo );
+            /* NOTE: Only the audio and video outputs care about pause. */
+            msg_Dbg( p_dec, "toggling %s", paused ? "resume" : "pause" );
+            if( p_owner->p_vout != NULL )
+                vout_ChangePause( p_owner->p_vout, paused, date );
+            if( p_owner->p_aout != NULL )
+                aout_DecChangePause( p_owner->p_aout, paused, date );
 
-        while( vlc_fifo_IsEmpty( p_owner->p_fifo ) )
-        {
-            if( p_owner->b_draining )
-            {   /* We have emptied the FIFO and there is a pending request to
-                 * drain. Pass p_block = NULL to decoder just once. */
-                p_owner->b_draining = false;
-                break;
-            }
-
-            p_owner->b_idle = true;
-            vlc_fifo_Wait( p_owner->p_fifo );
-            /* Make sure there is no cancellation point other than this one^^.
-             * If you need one, be sure to push cleanup of p_block. */
-            p_owner->b_idle = false;
+            vlc_restorecancel( canc );
+            vlc_fifo_Lock( p_owner->p_fifo );
+            continue;
         }
 
-        p_block = vlc_fifo_DequeueUnlocked( p_owner->p_fifo );
-        vlc_cleanup_pop();
+        if( p_owner->paused && p_owner->frames_countdown == 0 )
+        {   /* Wait for resumption from pause */
+            vlc_fifo_Wait( p_owner->p_fifo );
+            continue;
+        }
+
+        vlc_cond_signal( &p_owner->wait_fifo );
+        vlc_testcancel(); /* forced expedited cancellation in case of stop */
+
+        block_t *p_block = vlc_fifo_DequeueUnlocked( p_owner->p_fifo );
+        if( p_block == NULL )
+        {
+            if( likely(!p_owner->b_draining) )
+            {   /* Wait for a block to decode (or a request to drain) */
+                p_owner->b_idle = true;
+                vlc_fifo_Wait( p_owner->p_fifo );
+                p_owner->b_idle = false;
+                continue;
+            }
+            /* We have emptied the FIFO and there is a pending request to
+             * drain. Pass p_block = NULL to decoder just once. */
+            p_owner->b_draining = false;
+        }
+
         vlc_fifo_Unlock( p_owner->p_fifo );
 
         int canc = vlc_savecancel();
@@ -1494,6 +1498,7 @@ static void *DecoderThread( void *p_data )
         vlc_cond_signal( &p_owner->wait_acknowledge );
         vlc_mutex_unlock( &p_owner->lock );
     }
+    vlc_cleanup_pop();
     vlc_assert_unreachable();
 }
 
@@ -1542,9 +1547,9 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->b_fmt_description = false;
     p_owner->p_description = NULL;
 
-    p_owner->b_paused = false;
-    p_owner->pause.i_date = VLC_TS_INVALID;
-    p_owner->pause.i_ignore = 0;
+    p_owner->paused = false;
+    p_owner->pause_date = VLC_TS_INVALID;
+    p_owner->frames_countdown = 0;
 
     p_owner->b_waiting = false;
     p_owner->b_first = true;
@@ -1831,7 +1836,7 @@ void input_DecoderDelete( decoder_t *p_dec )
 
     /* Make sure we aren't paused/waiting/decoding anymore */
     vlc_mutex_lock( &p_owner->lock );
-    p_owner->b_paused = false;
+    p_owner->paused = false;
     p_owner->b_waiting = false;
     p_owner->b_flushing = true;
     vlc_cond_signal( &p_owner->wait_request );
@@ -2058,30 +2063,12 @@ void input_DecoderChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
     /* Normally, p_owner->b_paused != b_paused here. But if a track is added
      * while the input is paused (e.g. add sub file), then b_paused is
      * (incorrectly) false. FIXME: This is a bug in the decoder owner. */
-    if( unlikely(p_owner->b_paused == b_paused) )
-        return;
-
-    vlc_mutex_lock( &p_owner->lock );
-    p_owner->b_paused = b_paused;
-    p_owner->pause.i_date = i_date;
-    p_owner->pause.i_ignore = 0;
-    vlc_cond_signal( &p_owner->wait_request );
-
-    /* XXX only audio and video output have to be paused.
-     * - for sout it is useless
-     * - for subs, it is done by the vout
-     */
-    if( p_owner->fmt.i_cat == AUDIO_ES )
-    {
-        if( p_owner->p_aout )
-            aout_DecChangePause( p_owner->p_aout, b_paused, i_date );
-    }
-    else if( p_owner->fmt.i_cat == VIDEO_ES )
-    {
-        if( p_owner->p_vout )
-            vout_ChangePause( p_owner->p_vout, b_paused, i_date );
-    }
-    vlc_mutex_unlock( &p_owner->lock );
+    vlc_fifo_Lock( p_owner->p_fifo );
+    p_owner->paused = b_paused;
+    p_owner->pause_date = i_date;
+    p_owner->frames_countdown = 0;
+    vlc_fifo_Signal( p_owner->p_fifo );
+    vlc_fifo_Unlock( p_owner->p_fifo );
 }
 
 void input_DecoderChangeDelay( decoder_t *p_dec, mtime_t i_delay )
@@ -2145,17 +2132,19 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
+    assert( p_owner->paused );
     *pi_duration = 0;
+
+    vlc_fifo_Lock( p_owner->p_fifo );
+    p_owner->frames_countdown++;
+    vlc_fifo_Signal( p_owner->p_fifo );
+    vlc_fifo_Unlock( p_owner->p_fifo );
 
     vlc_mutex_lock( &p_owner->lock );
     if( p_owner->fmt.i_cat == VIDEO_ES )
     {
-        if( p_owner->b_paused && p_owner->p_vout )
-        {
+        if( p_owner->p_vout )
             vout_NextPicture( p_owner->p_vout, pi_duration );
-            p_owner->pause.i_ignore++;
-            vlc_cond_signal( &p_owner->wait_request );
-        }
     }
     else
     {
