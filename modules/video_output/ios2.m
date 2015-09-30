@@ -367,6 +367,7 @@ void Close (vlc_object_t *this)
 
         [sys->glESView release];
 
+        /* when using the traditional pipeline, the cross-platform code will free the the pool */
         if (sys->zero_copy) {
             if (sys->picturePool)
                 picture_pool_Release(sys->picturePool);
@@ -615,13 +616,11 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
     /* a client app may have already created a rendering context,
      * so re-use it if it is valid */
     EAGLContext *existingContext = [EAGLContext currentContext];
-    if (existingContext) {
-        if ([existingContext API] == kEAGLRenderingAPIOpenGLES2)
-             _eaglContext = [EAGLContext currentContext];
-    }
-
-    if (!_eaglContext)
+    if (existingContext != nil)
+        _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup: existingContext.sharegroup];
+    else
         _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+
     if (unlikely(!_eaglContext))
         return nil;
     if (unlikely(![EAGLContext setCurrentContext:_eaglContext]))
@@ -691,6 +690,7 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 - (void)destroyBuffers
 {
     /* re-set current context */
+    EAGLContext *previousContext = [EAGLContext currentContext];
     [EAGLContext setCurrentContext:_eaglContext];
 
     /* clear frame buffer */
@@ -700,15 +700,21 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
     /* clear render buffer */
     glDeleteRenderbuffers(1, &_renderBuffer);
     _renderBuffer = 0;
+    [EAGLContext setCurrentContext:previousContext];
 }
 
 - (void)resetBuffers
 {
+    EAGLContext *previousContext = [EAGLContext currentContext];
+    [EAGLContext setCurrentContext:_eaglContext];
+
     if (_bufferNeedReset) {
         [self destroyBuffers];
         [self createBuffers];
         _bufferNeedReset = NO;
     }
+
+    [EAGLContext setCurrentContext:previousContext];
 }
 
 - (void)layoutSubviews
@@ -729,6 +735,7 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 {
     assert([[NSThread currentThread] isMainThread]);
 
+    EAGLContext *previousContext = [EAGLContext currentContext];
     [EAGLContext setCurrentContext:_eaglContext];
 
     CGSize viewSize = [self bounds].size;
@@ -752,6 +759,7 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 
     // x / y are top left corner, but we need the lower left one
     glViewport(place.x, place.y, place.width, place.height);
+    [EAGLContext setCurrentContext:previousContext];
 }
 
 - (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
@@ -797,6 +805,10 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 
 - (void)displayPixelBuffer:(CVPixelBufferRef)pixelBuffer
 {
+    /* the currently current context may not be ours, so cache it and restore it later */
+    EAGLContext *previousContext = [EAGLContext currentContext];
+    [EAGLContext setCurrentContext:_eaglContext];
+
     CVReturn err;
     if (pixelBuffer != NULL) {
         int frameWidth = (int)CVPixelBufferGetWidth(pixelBuffer);
@@ -805,7 +817,7 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
         if (!_videoTextureCache) {
             if (_voutDisplay)
                 msg_Err(_voutDisplay, "No video texture cache");
-            return;
+            goto done;
         }
 
         [self cleanUpTextures];
@@ -934,10 +946,17 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 
     glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
     [_eaglContext presentRenderbuffer:GL_RENDERBUFFER];
+
+    glFlush();
+
+done:
+    /* restore previous eagl context which we cached on entry */
+    [EAGLContext setCurrentContext:previousContext];
 }
 
 - (void)setupZeroCopyGL
 {
+    EAGLContext *previousContext = [EAGLContext currentContext];
     [EAGLContext setCurrentContext:_eaglContext];
     [self createBuffers];
     [self loadShaders];
@@ -959,9 +978,9 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
         if (err != noErr) {
             if (_voutDisplay)
                 msg_Err(_voutDisplay, "Error at CVOpenGLESTextureCacheCreate %d", err);
-            return;
         }
     }
+    [EAGLContext setCurrentContext:previousContext];
 }
 
 - (void)cleanUpTextures
