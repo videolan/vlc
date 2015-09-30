@@ -171,18 +171,23 @@ export PLATFORM=$PLATFORM
 export SDK_VERSION=$SDK_VERSION
 export VLCSDKROOT=$SDKROOT
 
-export CFLAGS="-isysroot ${SDKROOT} -arch ${ACTUAL_ARCH} ${OPTIM}"
+CFLAGS="-isysroot ${SDKROOT} -arch ${ACTUAL_ARCH} ${OPTIM}"
 
 if [ "$PLATFORM" = "OS" ]; then
 if [ "$ARCH" != "aarch64" ]; then
-export CFLAGS="${CFLAGS} -mcpu=cortex-a8 -${OSVERSIONMINCFLAG}=${SDK_MIN}"
+CFLAGS+=" -mcpu=cortex-a8 -${OSVERSIONMINCFLAG}=${SDK_MIN}"
 else
-export CFLAGS="${CFLAGS} -${OSVERSIONMINCFLAG}=${SIXTYFOURBIT_SDK_MIN}"
+CFLAGS+=" -${OSVERSIONMINCFLAG}=${SIXTYFOURBIT_SDK_MIN}"
 fi
 else
-export CFLAGS="${CFLAGS} -${OSVERSIONMINCFLAG}=${SIXTYFOURBIT_SDK_MIN}"
+CFLAGS+=" -${OSVERSIONMINCFLAG}=${SIXTYFOURBIT_SDK_MIN}"
 fi
 
+if [ "$TVOS" = "yes" ]; then
+CFLAGS+=" -fembed-bitcode"
+fi
+
+export CFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
 export CPPFLAGS="${CFLAGS}"
 
