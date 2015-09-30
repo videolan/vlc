@@ -26,6 +26,7 @@ $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
+	$(APPLY) $(SRC)/vorbis/vorbis-bitcode.patch
 	$(MOVE)
 
 DEPS_vorbis = ogg $(DEPS_ogg)
