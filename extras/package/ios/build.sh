@@ -100,8 +100,6 @@ if [ "$VERBOSE" = "yes" ]; then
    out="/dev/stdout"
 fi
 
-info "Building libvlc for iOS"
-
 TARGET="${ARCH}-apple-darwin11"
 
 # apple doesn't call AArch64 that way, but arm64 (a contrario to all libraries)
@@ -123,6 +121,8 @@ if [ "$TVOS" = "yes" ]; then
 	export BUILDFORTVOS="yes"
 fi
 export BUILDFORIOS="yes"
+
+info "Building libvlc for Apple embedded OS style '${OSSTYLE}'"
 
 info "Using ${ARCH} with SDK version ${SDK_VERSION}"
 
@@ -287,9 +287,8 @@ fi
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
 echo "EXTRA_LDFLAGS += ${EXTRA_LDFLAGS}" >> config.mak
-# make fetch
-make V=1
-# make -j$MAKE_JOBS > ${out}
+make fetch
+make -j$MAKE_JOBS > ${out}
 spopd
 
 info "Bootstraping vlc"
@@ -326,6 +325,12 @@ else
 	SCARYFLAG="--disable-dca --disable-dvbpsi --disable-avcodec --disable-avformat --disable-zvbi --enable-vpx"
 fi
 
+if [ "$TVOS" = "yes" ]; then
+	TVOSOPTIONS="--disable-neon"
+else
+	TVOSOPTIONS="--enable-neon"
+fi
+
 # Run configure only upon changes.
 if [ "${VLCROOT}/configure" -nt config.log -o \
      "${THIS_SCRIPT_PATH}" -nt config.log ]; then
@@ -336,6 +341,7 @@ ${VLCROOT}/configure \
     --enable-static \
     ${DEBUGFLAG} \
     ${SCARYFLAG} \
+    ${TVOSOPTIONS} \
     --disable-macosx \
     --disable-macosx-dialog-provider \
     --disable-macosx-qtkit \
@@ -358,7 +364,6 @@ ${VLCROOT}/configure \
     --disable-httpd \
     --disable-nls \
     --disable-sse \
-    --enable-neon \
     --disable-notify \
     --enable-live555 \
     --enable-realrtsp \
@@ -388,7 +393,7 @@ ${VLCROOT}/configure \
     --enable-taglib \
     --disable-mmx \
     --disable-addonmanagermodules \
-    --disable-mad > ${out} # MMX and SSE support requires llvm which is broken on Simulator
+    --disable-mad > ${out}
 fi
 
 info "Building libvlc"
