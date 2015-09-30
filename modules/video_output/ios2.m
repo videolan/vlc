@@ -139,6 +139,7 @@ static void OpenglESSwap(vlc_gl_t *);
 
 static picture_pool_t *ZeroCopyPicturePool(vout_display_t *, unsigned);
 static void DestroyZeroCopyPoolPicture(picture_t *);
+static void ZeroCopyClean(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static void ZeroCopyDisplay(vout_display_t *, picture_t *, subpicture_t *);
 
 /**
@@ -183,6 +184,8 @@ vlc_module_end ()
 - (void)createBuffers;
 - (void)destroyBuffers;
 - (void)resetBuffers;
+
+- (void)reshape;
 
 - (void)setupZeroCopyGL;
 - (void)displayPixelBuffer:(CVPixelBufferRef)pixelBuffer;
@@ -303,7 +306,7 @@ static int Open(vlc_object_t *this)
 
         if (sys->zero_copy) {
             vd->pool = ZeroCopyPicturePool;
-            vd->prepare = NULL;
+            vd->prepare = ZeroCopyClean;
             vd->display = ZeroCopyDisplay;
         } else {
             vd->pool = PicturePool;
@@ -328,9 +331,7 @@ static int Open(vlc_object_t *this)
                                                  selector:@selector(applicationStateChanged:)
                                                      name:UIApplicationDidBecomeActiveNotification
                                                    object:nil];
-        [sys->glESView performSelectorOnMainThread:@selector(reshape)
-                                        withObject:nil
-                                     waitUntilDone:YES];
+        [sys->glESView reshape];
         return VLC_SUCCESS;
         
     bailout:
@@ -565,6 +566,13 @@ static void DestroyZeroCopyPoolPicture(picture_t *picture)
     free(picture);
 }
 
+static void ZeroCopyClean(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+{
+    vout_display_sys_t *sys = vd->sys;
+    if (likely([sys->glESView isAppActive]))
+        [sys->glESView resetBuffers];
+}
+
 static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -609,32 +617,26 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
     if (unlikely(!_appActive))
         return nil;
 
-    CAEAGLLayer * layer = (CAEAGLLayer *)self.layer;
-    layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
-    layer.opaque = YES;
-
-    /* a client app may have already created a rendering context,
-     * so re-use it if it is valid */
-    EAGLContext *existingContext = [EAGLContext currentContext];
-    if (existingContext != nil)
-        _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup: existingContext.sharegroup];
-    else
-        _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
     if (unlikely(!_eaglContext))
         return nil;
     if (unlikely(![EAGLContext setCurrentContext:_eaglContext]))
         return nil;
 
+    CAEAGLLayer *layer = (CAEAGLLayer *)self.layer;
+    layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
+    layer.opaque = YES;
+
     _voutDisplay = vd;
 
+    [self createBuffers];
     if (zero_copy) {
         _preferredConversion = kColorConversion709;
         [self setupZeroCopyGL];
-    } else
-        [self performSelectorOnMainThread:@selector(createBuffers) withObject:nil waitUntilDone:YES];
+    }
 
-    [self performSelectorOnMainThread:@selector(reshape) withObject:nil waitUntilDone:NO];
+    [self reshape];
     [self setAutoresizingMask: UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
 
     _zeroCopy = zero_copy;
@@ -705,36 +707,27 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 
 - (void)resetBuffers
 {
-    EAGLContext *previousContext = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_eaglContext];
+    if (unlikely(_bufferNeedReset)) {
+        EAGLContext *previousContext = [EAGLContext currentContext];
+        [EAGLContext setCurrentContext:_eaglContext];
 
-    if (_bufferNeedReset) {
         [self destroyBuffers];
         [self createBuffers];
         _bufferNeedReset = NO;
-    }
 
-    [EAGLContext setCurrentContext:previousContext];
+        [EAGLContext setCurrentContext:previousContext];
+    }
 }
 
 - (void)layoutSubviews
 {
     [self reshape];
-    if (_zeroCopy) {
-        /* we don't have a clean event for 0-copy, so destory and re-create right here */
-        [self destroyBuffers];
-        [self createBuffers];
-    } else {
-        /* this method is called as soon as we are resized.
-         * so set a variable to re-create our buffers on the next clean event */
-        _bufferNeedReset = YES;
-    }
+
+    _bufferNeedReset = YES;
 }
 
 - (void)reshape
 {
-    assert([[NSThread currentThread] isMainThread]);
-
     EAGLContext *previousContext = [EAGLContext currentContext];
     [EAGLContext setCurrentContext:_eaglContext];
 
@@ -958,7 +951,6 @@ done:
 {
     EAGLContext *previousContext = [EAGLContext currentContext];
     [EAGLContext setCurrentContext:_eaglContext];
-    [self createBuffers];
     [self loadShaders];
 
     glUseProgram(self.shaderProgram);
