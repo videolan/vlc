@@ -90,7 +90,7 @@ struct sout_access_out_t
 enum access_out_query_e
 {
     ACCESS_OUT_CONTROLS_PACE, /* arg1=bool *, can fail (assume true) */
-    ACCESS_OUT_CAN_SEEK, /* arg1=bool *, can fail (assume true) */
+    ACCESS_OUT_CAN_SEEK, /* arg1=bool *, can fail (assume false) */
 };
 
 VLC_API sout_access_out_t * sout_AccessOutNew( vlc_object_t *, const char *psz_access, const char *psz_name ) VLC_USED;
