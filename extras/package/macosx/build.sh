@@ -85,15 +85,14 @@ builddir=`pwd`
 
 info "Building in \"$builddir\""
 
+TRIPLET=$ARCH-apple-darwin11
+
 export CC="xcrun clang"
 export CXX="xcrun clang++"
 export OBJC="xcrun clang"
 export OSX_VERSION
 export SDKROOT
-export PATH="${vlcroot}/extras/tools/build/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin"
-
-TRIPLET=$ARCH-apple-darwin11
-
+export PATH="${vlcroot}/extras/tools/build/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:${vlcroot}/contrib/${TRIPLET}/bin:${PATH}"
 
 #
 # vlc/extras/tools
