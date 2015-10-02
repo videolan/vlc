@@ -59,5 +59,5 @@ bool FakeESOutID::isCompatible( const es_format_t *p_fmt ) const
 {
     return es_format_IsSimilar( p_fmt, &fmt ) &&
            p_fmt->i_extra == fmt.i_extra &&
-          !memcmp( p_fmt->p_extra, fmt.p_extra, p_fmt->i_extra );
+           (p_fmt->i_extra == 0 || !memcmp( p_fmt->p_extra, fmt.p_extra, p_fmt->i_extra ));
 }
