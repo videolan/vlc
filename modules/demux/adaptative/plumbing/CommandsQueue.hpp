@@ -32,6 +32,7 @@
 
 namespace adaptative
 {
+    class FakeESOut;
     class FakeESOutID;
 
     class AbstractCommand
@@ -113,6 +114,16 @@ namespace adaptative
             EsOutDestroyCommand();
     };
 
+    class EsOutControlResetPCRCommand : public AbstractCommand
+    {
+        friend class CommandsFactory;
+        public:
+            virtual void Execute( es_out_t *out );
+
+        protected:
+            EsOutControlResetPCRCommand();
+    };
+
     /* Factory so we can alter behaviour and filter on execution */
     class CommandsFactory
     {
@@ -122,6 +133,7 @@ namespace adaptative
             virtual EsOutDelCommand * createEsOutDelCommand( FakeESOutID * );
             virtual EsOutAddCommand * createEsOutAddCommand( FakeESOutID *, const es_format_t * );
             virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int, mtime_t );
+            virtual EsOutControlResetPCRCommand * creatEsOutControlResetPCRCommand();
             virtual EsOutDestroyCommand * createEsOutDestroyCommand();
     };
 

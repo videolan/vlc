@@ -19,6 +19,7 @@
  *****************************************************************************/
 #include "CommandsQueue.hpp"
 #include "FakeESOutID.hpp"
+#include "FakeESOut.hpp"
 #include <vlc_es_out.h>
 #include <vlc_block.h>
 #include <algorithm>
@@ -30,7 +31,8 @@ enum
     ES_OUT_PRIVATE_COMMAND_ADD = ES_OUT_PRIVATE_START,
     ES_OUT_PRIVATE_COMMAND_DEL,
     ES_OUT_PRIVATE_COMMAND_DESTROY,
-    ES_OUT_PRIVATE_COMMAND_SEND
+    ES_OUT_PRIVATE_COMMAND_SEND,
+    ES_OUT_PRIVATE_COMMAND_DISCONTINUITY
 };
 
 AbstractCommand::AbstractCommand( int type_ )
@@ -150,6 +152,16 @@ void EsOutDestroyCommand::Execute( es_out_t *out )
     es_out_Delete( out );
 }
 
+EsOutControlResetPCRCommand::EsOutControlResetPCRCommand() :
+    AbstractCommand( ES_OUT_PRIVATE_COMMAND_DISCONTINUITY )
+{
+}
+
+void EsOutControlResetPCRCommand::Execute( es_out_t * )
+{
+}
+
+
 /*
  * Commands Default Factory
  */
@@ -177,6 +189,11 @@ EsOutControlPCRCommand * CommandsFactory::createEsOutControlPCRCommand( int grou
 EsOutDestroyCommand * CommandsFactory::createEsOutDestroyCommand()
 {
     return new (std::nothrow) EsOutDestroyCommand();
+}
+
+EsOutControlResetPCRCommand * CommandsFactory::creatEsOutControlResetPCRCommand()
+{
+    return new (std::nothrow) EsOutControlResetPCRCommand();
 }
 
 /*
