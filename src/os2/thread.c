@@ -350,18 +350,6 @@ void vlc_cond_signal (vlc_cond_t *p_condvar)
 
         DosWaitEventSem (p_condvar->hevAck, SEM_INDEFINITE_WAIT);
         DosResetEventSem (p_condvar->hevAck, &ulPost);
-
-        while (ulPost-- > 0)
-            __atomic_decrement (&p_condvar->waiters);
-
-        /* Already timed out ? */
-        if (__atomic_cmpxchg32 (&p_condvar->waiters, 0, 0) &&
-            __atomic_cmpxchg32 (&p_condvar->signaled, 1, 1))
-        {
-            /* Clear signaled status */
-            __atomic_xchg (&p_condvar->signaled, 0);
-            DosResetEventSem (p_condvar->hev, &ulPost);
-        }
     }
 }
 
@@ -380,11 +368,11 @@ static int vlc_cond_wait_common (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     ULONG ulPost;
     ULONG rc;
 
-    __atomic_increment (&p_condvar->waiters);
-
     do
     {
         vlc_testcancel();
+
+        __atomic_increment (&p_condvar->waiters);
 
         vlc_mutex_unlock (p_mutex);
 
@@ -395,6 +383,8 @@ static int vlc_cond_wait_common (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
                 DosResetEventSem (p_condvar->hev, &ulPost);
         } while (rc == NO_ERROR &&
                  __atomic_cmpxchg32 (&p_condvar->signaled, 0, 1) == 0);
+
+        __atomic_decrement (&p_condvar->waiters);
 
         DosPostEventSem (p_condvar->hevAck);
 
