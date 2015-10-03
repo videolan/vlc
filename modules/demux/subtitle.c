@@ -758,40 +758,20 @@ static int Demux( demux_t *p_demux )
     return 1;
 }
 
+
+static int subtitle_cmp( const void *first, const void *second )
+{
+    return ((subtitle_t *)(first))->i_start - ((subtitle_t *)(second))->i_start;
+}
 /*****************************************************************************
  * Fix: fix time stamp and order of subtitle
  *****************************************************************************/
 static void Fix( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    bool b_done;
 
     /* *** fix order (to be sure...) *** */
-    /* We suppose that there are near in order and this durty bubble sort
-     * would not take too much time
-     */
-    do
-    {
-        b_done = true;
-        for( int i_index = 1; i_index < p_sys->i_subtitles; i_index++ )
-        {
-            if( p_sys->subtitle[i_index].i_start <
-                p_sys->subtitle[i_index - 1].i_start )
-            {
-                subtitle_t sub_xch;
-                memcpy( &sub_xch,
-                        p_sys->subtitle + i_index - 1,
-                        sizeof( subtitle_t ) );
-                memcpy( p_sys->subtitle + i_index - 1,
-                        p_sys->subtitle + i_index,
-                        sizeof( subtitle_t ) );
-                memcpy( p_sys->subtitle + i_index,
-                        &sub_xch,
-                        sizeof( subtitle_t ) );
-                b_done = false;
-            }
-        }
-    } while( !b_done );
+    qsort( p_sys->subtitle, p_sys->i_subtitles, sizeof( p_sys->subtitle[0] ), subtitle_cmp);
 }
 
 static int TextLoad( text_t *txt, stream_t *s )
