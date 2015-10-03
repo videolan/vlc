@@ -77,6 +77,9 @@ struct decoder_sys_t
 
     /* VA API */
     vlc_va_t *p_va;
+    enum PixelFormat pix_fmt;
+    int profile;
+    int level;
 
     vlc_sem_t sem_mt;
 };
@@ -283,6 +286,9 @@ static int OpenVideoCodec( decoder_t *p_dec )
     else if (p_sys->p_context->height != p_dec->fmt_in.video.i_height)
         p_sys->p_context->coded_height = p_dec->fmt_in.video.i_height;
     p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+    p_sys->pix_fmt = AV_PIX_FMT_NONE;
+    p_sys->profile = -1;
+    p_sys->level = -1;
 
     post_mt( p_sys );
     ret = ffmpeg_OpenCodec( p_dec );
@@ -1096,12 +1102,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
 {
     decoder_t *p_dec = p_context->opaque;
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if (p_sys->p_va != NULL)
-    {
-        vlc_va_Delete(p_sys->p_va, p_context);
-        p_sys->p_va = NULL;
-    }
+    video_format_t fmt;
 
     /* Enumerate available formats */
     enum PixelFormat swfmt = avcodec_default_get_format(p_context, pi_fmt);
@@ -1119,6 +1120,35 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         if (hwaccel)
             can_hwaccel = true;
     }
+
+    /* If the format did not actually change (e.g. seeking), try to reuse the
+     * existing output format, and if present, hardware acceleration back-end.
+     * This avoids resetting the pipeline downstream. This also avoids
+     * needlessly probing for hardware acceleration support. */
+    if (p_sys->pix_fmt != AV_PIX_FMT_NONE
+     && lavc_GetVideoFormat(p_dec, &fmt, p_context, p_sys->pix_fmt, swfmt) == 0
+     && fmt.i_width == p_dec->fmt_out.video.i_width
+     && fmt.i_height == p_dec->fmt_out.video.i_height
+     && p_context->profile == p_sys->profile
+     && p_context->level <= p_sys->level)
+    {
+        for (size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++)
+            if (pi_fmt[i] == p_sys->pix_fmt)
+            {
+                msg_Dbg(p_dec, "reusing decoder output format %d", pi_fmt[i]);
+                return p_sys->pix_fmt;
+            }
+    }
+
+    if (p_sys->p_va != NULL)
+    {
+        msg_Err(p_dec, "existing hardware acceleration cannot be reused");
+        vlc_va_Delete(p_sys->p_va, p_context);
+        p_sys->p_va = NULL;
+    }
+
+    p_sys->profile = p_context->profile;
+    p_sys->level = p_context->level;
 
     if (!can_hwaccel)
         return swfmt;
@@ -1158,11 +1188,13 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
             msg_Info(p_dec, "Using %s for hardware decoding", va->description);
 
         p_sys->p_va = va;
+        p_sys->pix_fmt = hwfmt;
         p_context->draw_horiz_band = NULL;
         return pi_fmt[i];
     }
 
     post_mt(p_sys);
     /* Fallback to default behaviour */
+    p_sys->pix_fmt = swfmt;
     return swfmt;
 }
