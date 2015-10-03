@@ -455,17 +455,42 @@ static int Open( vlc_object_t* p_this )
     if ( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_sys->p_xml = xml_Create( p_demux );
-    if ( !p_sys->p_xml )
+    uint8_t *p_peek;
+    ssize_t i_peek = stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 2048 );
+
+    if( unlikely( i_peek <= 0 ) )
     {
         Close( p_demux );
         return VLC_EGENERIC;
     }
 
+    stream_t *p_probestream = stream_MemoryNew( p_demux->s, p_peek, i_peek, true );
+    if( unlikely( !p_probestream ) )
+    {
+        Close( p_demux );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->p_xml = xml_Create( p_demux );
+    if ( !p_sys->p_xml )
+    {
+        Close( p_demux );
+        stream_Delete( p_probestream );
+        return VLC_EGENERIC;
+    }
     p_sys->p_reader = xml_ReaderCreate( p_sys->p_xml, p_demux->s );
     if ( !p_sys->p_reader )
     {
         Close( p_demux );
+        stream_Delete( p_probestream );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->p_reader = xml_ReaderReset( p_sys->p_reader, p_probestream );
+    if ( !p_sys->p_reader )
+    {
+        Close( p_demux );
+        stream_Delete( p_probestream );
         return VLC_EGENERIC;
     }
 
@@ -474,8 +499,19 @@ static int Open( vlc_object_t* p_this )
     if ( i_type != XML_READER_STARTELEM || ( strcmp( psz_name, "tt" ) && strcmp( psz_name, "tt:tt" ) ) )
     {
         Close( p_demux );
+        stream_Delete( p_probestream );
         return VLC_EGENERIC;
     }
+    p_sys->p_reader = xml_ReaderReset( p_sys->p_reader, p_demux->s );
+    if ( !p_sys->p_reader )
+    {
+        Close( p_demux );
+        stream_Delete( p_probestream );
+        return VLC_EGENERIC;
+    }
+    stream_Delete( p_probestream );
+
+
     if ( ReadTTML( p_demux ) != VLC_SUCCESS )
     {
         Close( p_demux );
