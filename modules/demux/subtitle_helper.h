@@ -23,7 +23,7 @@ inline static char * peek_Readline( stream_t *p_demuxstream, uint64_t *pi_offset
     uint8_t *p_peek;
     ssize_t i_peek = stream_Peek( p_demuxstream, (const uint8_t **) &p_peek,
                                   *pi_offset + 2048 );
-    if( i_peek <= 0 )
+    if( i_peek < 0 || (uint64_t) i_peek < *pi_offset )
         return NULL;
 
     const uint64_t i_bufsize = (uint64_t) i_peek - *pi_offset;
