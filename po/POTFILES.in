@@ -324,7 +324,7 @@ modules/audio_output/alsa.c
 modules/audio_output/amem.c
 modules/audio_output/audioqueue.c
 modules/audio_output/audiotrack.c
-modules/audio_output/audiounit_ios.c
+modules/audio_output/audiounit_ios.m
 modules/audio_output/auhal.c
 modules/audio_output/directsound.c
 modules/audio_output/file.c

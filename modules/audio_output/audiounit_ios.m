@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audiounit_ios.c: AudioUnit output plugin for iOS
+ * audiounit_ios.m: AudioUnit output plugin for iOS
  *****************************************************************************
  * Copyright (C) 2012 - 2015 VLC authors and VideoLAN
  * $Id$
@@ -33,12 +33,12 @@
 
 #import <AudioUnit/AudioUnit.h>
 #import <CoreAudio/CoreAudioTypes.h>
+#import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <mach/mach_time.h>
 
 #import "TPCircularBuffer.h"
-
-#import <TargetConditionals.h>
 
 #pragma mark -
 #pragma mark private declarations
@@ -86,6 +86,7 @@ static void     Stop                    (audio_output_t *);
 
 static void     Play                    (audio_output_t *, block_t *);
 static void     Pause                   (audio_output_t *, bool, mtime_t);
+static int      MuteSet                 (audio_output_t *aout, bool mute);
 static void     Flush                   (audio_output_t *, bool);
 static int      TimeGet                 (audio_output_t *, mtime_t *);
 static OSStatus RenderCallback    (vlc_object_t *, AudioUnitRenderActionFlags *, const AudioTimeStamp *,
@@ -148,8 +149,10 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         msg_Dbg(p_aout, "analog AudioUnit output successfully opened");
         p_aout->play = Play;
         p_aout->flush = Flush;
+        p_aout->mute_set  = MuteSet;
         p_aout->time_get = TimeGet;
         p_aout->pause = Pause;
+
         return VLC_SUCCESS;
     }
 
@@ -254,28 +257,24 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         return false;
     }
 
-    /* setup circular buffer */
-    TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate * fmt->i_bytes_per_frame);
-
-#if !TARGET_OS_TV
-    /* start audio session so playback continues if mute switch is on */
-    AudioSessionInitialize (NULL,
-                            kCFRunLoopCommonModes,
-                            NULL,
-                            NULL);
-
-    /* Set audio session to mediaplayback */
-    UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
-    AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
-    AudioSessionSetActive(true);
-#endif
-
     /* AU init */
     status = AudioUnitInitialize(p_sys->au_unit);
     if (status != noErr) {
         msg_Err(p_aout, "failed to init AudioUnit (%i)", (int)status);
         return false;
     }
+
+    /* setup circular buffer */
+    TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate * fmt->i_bytes_per_frame);
+
+    /* start audio session so playback continues if mute switch is on */
+    AVAudioSession *instance = [AVAudioSession sharedInstance];
+
+    /* Set audio session to mediaplayback */
+    NSError *error = nil;
+    [instance setCategory:AVAudioSessionCategoryPlayback error:&error];
+    [instance setMode:AVAudioSessionModeMoviePlayback error:&error];
+    [instance setActive:YES error:&error];
 
     /* start the unit */
     status = AudioOutputUnitStart(p_sys->au_unit);
@@ -289,9 +288,7 @@ static void Stop(audio_output_t *p_aout)
     struct aout_sys_t   *p_sys = p_aout->sys;
     OSStatus status;
 
-#if !TARGET_OS_TV
-    AudioSessionSetActive(false);
-#endif
+    [[AVAudioSession sharedInstance] setActive:NO error:nil];
 
     if (p_sys->au_unit) {
         status = AudioOutputUnitStop(p_sys->au_unit);
@@ -340,6 +337,10 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
     p_sys->b_paused = pause;
     vlc_mutex_unlock(&p_sys->lock);
 
+    if (p_sys->au_unit == NULL) {
+        return;
+    }
+
     /* we need to start / stop the audio unit here because otherwise
      * the OS won't believe us that we stopped the audio output
      * so in case of an interruption, our unit would be permanently
@@ -348,17 +349,26 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
      * show a playing state despite we are paused, same for lock screen */
     if (pause) {
         AudioOutputUnitStop(p_sys->au_unit);
-#if !TARGET_OS_TV
-        AudioSessionSetActive(false);
-#endif
     } else {
-#if !TARGET_OS_TV
-        UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
-        AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
-        AudioSessionSetActive(true);
-#endif
         AudioOutputUnitStart(p_sys->au_unit);
+
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+        [[AVAudioSession sharedInstance] setMode:AVAudioSessionModeMoviePlayback error:nil];
     }
+
+    [[AVAudioSession sharedInstance] setActive:!pause error:nil];
+}
+
+static int MuteSet(audio_output_t *p_aout, bool mute)
+{
+    struct aout_sys_t * p_sys = p_aout->sys;
+
+    if (p_sys != NULL && p_sys->au_unit != NULL) {
+        msg_Dbg(p_aout, "audio output mute set to %d", mute?1:0);
+        Pause(p_aout, mute, 0);
+    }
+
+    return VLC_SUCCESS;
 }
 
 static void Flush(audio_output_t *p_aout, bool wait)
@@ -447,4 +457,3 @@ static OSStatus RenderCallback(vlc_object_t *p_obj,
 
     return noErr;
 }
-
