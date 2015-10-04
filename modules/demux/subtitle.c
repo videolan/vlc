@@ -761,7 +761,10 @@ static int Demux( demux_t *p_demux )
 
 static int subtitle_cmp( const void *first, const void *second )
 {
-    return ((subtitle_t *)(first))->i_start - ((subtitle_t *)(second))->i_start;
+    int64_t result = ((subtitle_t *)(first))->i_start - ((subtitle_t *)(second))->i_start;
+    /* Return -1, 0 ,1, and not directly substraction
+     * as result can be > INT_MAX */
+    return result == 0 ? 0 : result > 0 ? 1 : -1;
 }
 /*****************************************************************************
  * Fix: fix time stamp and order of subtitle
