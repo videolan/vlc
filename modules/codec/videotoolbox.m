@@ -42,6 +42,10 @@
 #import <sys/sysctl.h>
 #import <mach/machine.h>
 
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#endif
+
 #pragma mark - module descriptor
 
 static int OpenDecoder(vlc_object_t *);
@@ -629,9 +633,16 @@ static void StopVideoToolbox(decoder_t *p_dec)
 static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
-    CMVideoCodecType codec;
+
+#if TARGET_OS_IPHONE
+    if (unlikely([[UIDevice currentDevice].systemVersion floatValue] < 8.0)) {
+        msg_Warn(p_dec, "decoder skipped as OS is too old");
+        return VLC_EGENERIC;
+    }
+#endif
 
     /* check quickly if we can digest the offered data */
+    CMVideoCodecType codec;
     codec = CodecPrecheck(p_dec);
     if (codec == -1)
         return VLC_EGENERIC;
