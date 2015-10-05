@@ -92,6 +92,7 @@ void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRe
             }
 
             if( gcry_cipher_open(&ctx, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_CBC, 0) ||
+                encryption.key.size() != 16 ||
                 gcry_cipher_setkey(ctx, &encryption.key[0], 16) ||
                 gcry_cipher_setiv(ctx, &encryption.iv[0], 16) )
             {
