@@ -266,8 +266,14 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                     encryption.method = SegmentEncryption::AES_128;
                     encryption.key.clear();
                     uint8_t *p_data;
-                    const uint64_t read = Retrieve::HTTP(p_obj, keytag->getAttributeByName("URI")->quotedString(),
-                                                         (void **) &p_data);
+
+                    Url keyurl(keytag->getAttributeByName("URI")->quotedString());
+                    if(!keyurl.hasScheme())
+                    {
+                        keyurl.prepend(Helper::getDirectoryPath(rep->getPlaylistUrl().toString()).append("/"));
+                    }
+
+                    const uint64_t read = Retrieve::HTTP(p_obj, keyurl.toString(), (void **) &p_data);
                     if(p_data)
                     {
                         if(read == 16)
