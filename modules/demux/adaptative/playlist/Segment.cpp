@@ -49,6 +49,7 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     chunksuse.Set(0);
     sequence = SEQUENCE_INVALID;
     templated = false;
+    discontinuity = false;
 }
 
 ISegment::~ISegment()

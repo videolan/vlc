@@ -42,6 +42,7 @@ namespace adaptative
             void setRepresentation(BaseRepresentation *);
             virtual void onDownload(block_t **); // reimpl
             StreamFormat getStreamFormat() const;
+            bool discontinuity;
 
         protected:
             ISegment *segment;

@@ -68,6 +68,7 @@ namespace adaptative
                 Property<stime_t>       startTime;
                 Property<stime_t>       duration;
                 Property<unsigned>      chunksuse;
+                bool                    discontinuity;
 
                 static const int CLASSID_ISEGMENT = 0;
                 /* callbacks */

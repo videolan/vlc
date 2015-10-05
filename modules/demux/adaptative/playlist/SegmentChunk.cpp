@@ -31,6 +31,7 @@ SegmentChunk::SegmentChunk(ISegment *segment_, const std::string &url) :
     segment = segment_;
     segment->chunksuse.Set(segment->chunksuse.Get() + 1);
     rep = NULL;
+    discontinuity = segment_->discontinuity;
 }
 
 SegmentChunk::~SegmentChunk()
