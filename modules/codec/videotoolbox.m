@@ -261,6 +261,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     CFDictionarySetValue(decoderConfiguration,
                          kCVImageBufferChromaLocationTopFieldKey,
                          kCVImageBufferChromaLocation_Left);
+    p_sys->b_zero_copy = var_InheritBool(p_dec, "videotoolbox-zero-copy");
 
     /* fetch extradata */
     CFMutableDictionaryRef extradata_info = NULL;
@@ -476,19 +477,16 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         return VLC_EGENERIC;
     }
 
-    p_sys->b_zero_copy = var_InheritBool(p_dec, "videotoolbox-zero-copy");
-
     /* destination pixel buffer attributes */
     CFMutableDictionaryRef dpba = CFDictionaryCreateMutable(kCFAllocatorDefault,
                                                             2,
                                                             &kCFTypeDictionaryKeyCallBacks,
                                                             &kCFTypeDictionaryValueCallBacks);
-    /* we need to change the following keys for convienence
-     * conversations as soon as we have a 0-copy pipeline */
+
 #if !TARGET_OS_IPHONE
     CFDictionarySetValue(dpba,
                          kCVPixelBufferOpenGLCompatibilityKey,
-                         kCFBooleanFalse);
+                         kCFBooleanTrue);
 #else
     CFDictionarySetValue(dpba,
                          kCVPixelBufferOpenGLESCompatibilityKey,
