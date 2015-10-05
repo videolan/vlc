@@ -1829,7 +1829,7 @@ static int blurayDemux(demux_t *p_demux)
 
     block_t *p_block = block_Alloc(NB_TS_PACKETS * (int64_t)BD_TS_PACKET_SIZE);
     if (!p_block)
-        return -1;
+        return VLC_DEMUXER_EGENERIC;
 
     int nread;
 
@@ -1900,8 +1900,8 @@ static int blurayDemux(demux_t *p_demux)
     if (nread <= 0) {
         block_Release(p_block);
         if (nread < 0)
-            return -1;
-        return 1;
+            return VLC_DEMUXER_EGENERIC;
+        return VLC_DEMUXER_SUCCESS;
     }
 
     p_block->i_buffer = nread;
@@ -1912,5 +1912,5 @@ static int blurayDemux(demux_t *p_demux)
 
     p_sys->b_flushed = false;
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
