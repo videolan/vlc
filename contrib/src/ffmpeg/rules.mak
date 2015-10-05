@@ -34,6 +34,10 @@ ifdef USE_FFMPEG
 FFMPEGCONF += \
 	--disable-swresample \
 	--disable-iconv
+ifdef HAVE_DARWIN_OS
+FFMPEGCONF += \
+	--disable-videotoolbox
+endif
 endif
 
 DEPS_ffmpeg = zlib gsm openjpeg
