@@ -319,6 +319,9 @@ libavcodec_plugin_la_SOURCES += demux/avformat/mux.c
 endif
 libavcodec_plugin_la_CFLAGS += -DMERGE_FFMPEG
 endif
+if HAVE_DARWIN
+libavcodec_plugin_la_LDFLAGS += -Wl,-framework,Foundation -Wl,-framework,Security,-framework,CoreFoundation
+endif
 if HAVE_AVCODEC
 codec_LTLIBRARIES += libavcodec_plugin.la
 endif
