@@ -26,7 +26,7 @@ StreamFormat::operator unsigned() const
     return formatid;
 }
 
-StreamFormat::StreamFormat( int formatid_ )
+StreamFormat::StreamFormat( unsigned formatid_ )
 {
     formatid = formatid_;
 }

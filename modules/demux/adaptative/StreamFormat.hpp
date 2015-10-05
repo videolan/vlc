@@ -28,7 +28,7 @@ namespace adaptative
         public:
             static const unsigned UNSUPPORTED = 0;
 
-            StreamFormat( int = UNSUPPORTED );
+            StreamFormat( unsigned = UNSUPPORTED );
             ~StreamFormat();
             operator unsigned() const;
             bool operator==(const StreamFormat &) const;
