@@ -364,7 +364,8 @@ static void startBackground(demux_t *p_demux)
       return;
     }
 
-    block_t *p_block = block_Alloc(1920 * 1080 * 3 / 2);
+    block_t *p_block = block_Alloc(fmt.video.i_width * fmt.video.i_height *
+                                   fmt.video.i_bits_per_pixel / 8);
     if (!p_block) {
         msg_Err(p_demux, "Error allocating block for background video");
         return;
@@ -374,9 +375,9 @@ static void startBackground(demux_t *p_demux)
     p_block->i_dts = p_block->i_pts = mdate() + CLOCK_FREQ/25;
 
     uint8_t *p = p_block->p_buffer;
-    memset(p, 0, 1920 * 1080);
-    p += 1920*1080;
-    memset(p, 0x80, 1920 * 1080 / 4);
+    memset(p, 0, fmt.video.i_width * fmt.video.i_height);
+    p += fmt.video.i_width * fmt.video.i_height;
+    memset(p, 0x80, fmt.video.i_width * fmt.video.i_height / 2);
 
     es_out_Send(p_demux->out, p_sys->p_dummy_video, p_block);
 }
