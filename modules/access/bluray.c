@@ -142,6 +142,7 @@ struct  demux_sys_t
 
     /* Menus */
     bluray_overlay_t    *p_overlays[MAX_OVERLAY];
+    bool                b_fatal_error;
     bool                b_menu;
     bool                b_menu_open;
     bool                b_popup_available;
@@ -1772,6 +1773,22 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         break;
 
     /*
+     * Errors
+     */
+    case BD_EVENT_ERROR:
+        /* fatal error (with menus) */
+        dialog_Fatal(p_demux, _("Blu-ray error"), "Playback with BluRay menus failed");
+        p_sys->b_fatal_error = true;
+        break;
+    case BD_EVENT_ENCRYPTED:
+        dialog_Fatal(p_demux, _("Blu-ray error"), "This disc seems to be encrypted");
+        p_sys->b_fatal_error = true;
+        break;
+    case BD_EVENT_READ_ERROR:
+        msg_Err(p_demux, "bluray: read error\n");
+        break;
+
+    /*
      * stream selection events
      */
     case BD_EVENT_AUDIO_STREAM:
@@ -1899,8 +1916,10 @@ static int blurayDemux(demux_t *p_demux)
 
     if (nread <= 0) {
         block_Release(p_block);
-        if (nread < 0)
+        if (p_sys->b_fatal_error || nread < 0) {
+            msg_Err(p_demux, "bluray: stopping playback after fatal error\n");
             return VLC_DEMUXER_EGENERIC;
+        }
         return VLC_DEMUXER_SUCCESS;
     }
 
