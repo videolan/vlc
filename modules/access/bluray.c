@@ -1258,7 +1258,11 @@ static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
 
     assert(p_ov != NULL);
     assert(p_ov->i_channel == -1);
-    assert(p_ov->p_updater == NULL);
+
+    if (p_ov->p_updater) {
+        unref_subpicture_updater(p_ov->p_updater);
+        p_ov->p_updater = NULL;
+    }
 
     subpicture_t *p_pic = bluraySubpictureCreate(p_ov);
     if (!p_pic) {
