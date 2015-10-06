@@ -107,7 +107,7 @@ void Demuxer::drain()
     while(p_demux && demux_Demux(p_demux) == VLC_DEMUXER_SUCCESS);
 }
 
-int Demuxer::demux()
+int Demuxer::demux(mtime_t)
 {
     if(b_eof)
         return VLC_DEMUXER_EOF;

@@ -37,7 +37,7 @@ namespace adaptative
         public:
             AbstractDemuxer();
             virtual ~AbstractDemuxer();
-            virtual int demux() = 0;
+            virtual int demux(mtime_t) = 0;
             virtual void drain() = 0;
             virtual bool create() = 0;
             virtual bool restart(CommandsQueue &) = 0;
@@ -54,7 +54,7 @@ namespace adaptative
         public:
             Demuxer(demux_t *, const std::string &, es_out_t *, AbstractSourceStream *);
             virtual ~Demuxer();
-            virtual int demux(); /* impl */
+            virtual int demux(mtime_t); /* impl */
             virtual void drain(); /* impl */
             virtual bool create(); /* impl */
             virtual bool restart(CommandsQueue &); /* impl */
