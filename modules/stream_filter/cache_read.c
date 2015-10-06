@@ -401,7 +401,8 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
             while (i_skip > 0)
             {
                 const int i_read_max = __MIN(10 * STREAM_READ_ATONCE, i_skip);
-                if (AStreamReadNoSeekStream(s, NULL, i_read_max) != i_read_max)
+                int i_read = 0;
+                if ((i_read = AStreamReadNoSeekStream(s, NULL, i_read_max)) <= 0)
                     return VLC_EGENERIC;
                 i_skip -= i_read_max;
             }
