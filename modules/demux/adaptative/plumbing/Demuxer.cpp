@@ -62,9 +62,6 @@ Demuxer::Demuxer(demux_t *p_realdemux_, const std::string &name_, es_out_t *out,
     {
         b_startsfromzero = true;
     }
-
-    if(!create())
-        throw VLC_EGENERIC;
 }
 
 Demuxer::~Demuxer()

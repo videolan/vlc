@@ -67,6 +67,13 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
         case StreamFormat::UNSUPPORTED:
             break;
     }
+
+    if(ret && !ret->create())
+    {
+        delete ret;
+        ret = NULL;
+    }
+
     return ret;
 }
 
