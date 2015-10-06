@@ -503,6 +503,8 @@ static int ReadNSVs( demux_t *p_demux )
         es_format_Init( &p_sys->fmt_video, VIDEO_ES, fcc );
         p_sys->fmt_video.video.i_width = GetWLE( &header[12] );
         p_sys->fmt_video.video.i_height = GetWLE( &header[14] );
+        p_sys->fmt_video.video.i_visible_width = p_sys->fmt_video.video.i_width;
+        p_sys->fmt_video.video.i_visible_height = p_sys->fmt_video.video.i_height;
         if( p_sys->p_video )
         {
             es_out_Del( p_demux->out, p_sys->p_video );

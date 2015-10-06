@@ -1768,6 +1768,10 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                             GetDWLE((oggpacket.packet+176));
                         p_stream->fmt.video.i_height =
                             GetDWLE((oggpacket.packet+180));
+                        p_stream->fmt.video.i_visible_width =
+                            p_stream->fmt.video.i_width;
+                        p_stream->fmt.video.i_visible_height =
+                            p_stream->fmt.video.i_height;
 
                         msg_Dbg( p_demux,
                                  "fps: %f, width:%i; height:%i, bitcount:%i",
@@ -1890,6 +1894,10 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_stream->fmt.video.i_bits_per_pixel = st->bits_per_sample;
                         p_stream->fmt.video.i_width = st->sh.video.width;
                         p_stream->fmt.video.i_height = st->sh.video.height;
+                        p_stream->fmt.video.i_visible_width =
+                            p_stream->fmt.video.i_width;
+                        p_stream->fmt.video.i_visible_height =
+                            p_stream->fmt.video.i_height;
 
                         msg_Dbg( p_demux,
                                  "fps: %f, width:%i; height:%i, bitcount:%i",
@@ -2848,6 +2856,8 @@ static bool Ogg_ReadVP8Header( demux_t *p_demux, logical_stream_t *p_stream,
         p_stream->i_granule_shift = 32;
         p_stream->fmt.video.i_width = GetWBE( &p_oggpacket->packet[8] );
         p_stream->fmt.video.i_height = GetWBE( &p_oggpacket->packet[10] );
+        p_stream->fmt.video.i_visible_width = p_stream->fmt.video.i_width;
+        p_stream->fmt.video.i_visible_height = p_stream->fmt.video.i_height;
         p_stream->fmt.video.i_sar_num = GetDWBE( &p_oggpacket->packet[12 - 1] ) & 0x0FFF;
         p_stream->fmt.video.i_sar_den = GetDWBE( &p_oggpacket->packet[15 - 1] ) & 0x0FFF;
         p_stream->fmt.video.i_frame_rate = GetDWBE( &p_oggpacket->packet[18] );

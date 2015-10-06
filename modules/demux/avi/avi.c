@@ -590,6 +590,8 @@ static int Open( vlc_object_t * p_this )
 
                 fmt.video.i_width  = p_vids->p_bih->biWidth;
                 fmt.video.i_height = p_vids->p_bih->biHeight;
+                fmt.video.i_visible_width = fmt.video.i_width;
+                fmt.video.i_visible_height = fmt.video.i_height;
                 fmt.video.i_bits_per_pixel = p_vids->p_bih->biBitCount;
                 fmt.video.i_frame_rate = tk->i_rate;
                 fmt.video.i_frame_rate_base = tk->i_scale;
@@ -668,6 +670,8 @@ static int Open( vlc_object_t * p_this )
                 es_format_Init( &fmt, VIDEO_ES, p_strh->i_handler );
                 fmt.video.i_width  = p_avih->i_width;
                 fmt.video.i_height = p_avih->i_height;
+                fmt.video.i_visible_width = fmt.video.i_width;
+                fmt.video.i_visible_height = fmt.video.i_height;
                 break;
 
             case( AVIFOURCC_mids):

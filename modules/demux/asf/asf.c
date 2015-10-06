@@ -933,6 +933,8 @@ static int DemuxInit( demux_t *p_demux )
                                                      UINT_MAX, uint32_t );
             GET_CHECKED( fmt.video.i_height,     GetDWLE( p_data + 8 ),
                                                      UINT_MAX, uint32_t );
+            fmt.video.i_visible_width = fmt.video.i_width;
+            fmt.video.i_visible_height = fmt.video.i_height;
 
             if( p_esp && p_esp->i_average_time_per_frame > 0 )
             {

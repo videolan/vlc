@@ -98,6 +98,8 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_CODEC_CDG );
     p_sys->fmt.video.i_width  = 300-2*6;
     p_sys->fmt.video.i_height = 216-2*12 ;
+    p_sys->fmt.video.i_visible_width = p_sys->fmt.video.i_width;
+    p_sys->fmt.video.i_visible_height = p_sys->fmt.video.i_height;
 
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
 

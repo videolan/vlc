@@ -403,6 +403,8 @@ int OpenDemux( vlc_object_t *p_this )
 
             fmt.video.i_width = cc->width;
             fmt.video.i_height = cc->height;
+            fmt.video.i_visible_width = fmt.video.i_width;
+            fmt.video.i_visible_height = fmt.video.i_height;
 
             get_rotation(&fmt, s);
 

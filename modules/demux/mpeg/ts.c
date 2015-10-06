@@ -4739,6 +4739,8 @@ static void PMTSetupEs0xA0( demux_t *p_demux, ts_pes_es_t *p_es,
                                  p_dr->p_data[2], p_dr->p_data[3] );
     p_fmt->video.i_width = GetWBE( &p_dr->p_data[4] );
     p_fmt->video.i_height = GetWBE( &p_dr->p_data[6] );
+    p_fmt->video.i_visible_width = p_fmt->video.i_width;
+    p_fmt->video.i_visible_height = p_fmt->video.i_height;
     p_fmt->i_extra = GetWBE( &p_dr->p_data[8] );
 
     if( p_fmt->i_extra > 0 )

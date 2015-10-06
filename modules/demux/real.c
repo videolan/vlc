@@ -1375,6 +1375,8 @@ static int CodecVideoParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
                     VLC_FOURCC( p_data[8], p_data[9], p_data[10], p_data[11] ) );
     fmt.video.i_width = GetWBE( &p_data[12] );
     fmt.video.i_height= GetWBE( &p_data[14] );
+    fmt.video.i_visible_width = fmt.video.i_width;
+    fmt.video.i_visible_height = fmt.video.i_height;
     fmt.video.i_frame_rate = (GetWBE( &p_data[22] ) << 16) | GetWBE( &p_data[24] );
     fmt.video.i_frame_rate_base = 1 << 16;
 

@@ -301,6 +301,8 @@ static int Open( vlc_object_t * p_this )
         es_format_Init( &fmt, VIDEO_ES, p_sys->exh.i_video_fcc );
         fmt.video.i_width = p_sys->hdr.i_width;
         fmt.video.i_height = p_sys->hdr.i_height;
+        fmt.video.i_visible_width = fmt.video.i_width;
+        fmt.video.i_visible_height = fmt.video.i_height;
         fmt.i_extra = p_sys->i_extra_f;
         fmt.p_extra = p_sys->p_extra_f;
         fmt.video.i_sar_num = p_sys->hdr.d_aspect * fmt.video.i_height;
