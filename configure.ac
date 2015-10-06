@@ -1741,7 +1741,7 @@ AS_IF([test "${enable_dvdnav}" != "no"], [
 dnl
 dnl  Blu-ray Disc Support with libbluray
 dnl
-PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray >= 0.5.0], (libbluray for Blu-ray disc support ) )
+PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray >= 0.6.2], (libbluray for Blu-ray disc support ) )
 
 dnl
 dnl  OpenCV wrapper and example filters
