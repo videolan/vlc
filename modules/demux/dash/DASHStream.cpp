@@ -55,6 +55,7 @@ AbstractDemuxer * DASHStream::createDemux(const StreamFormat &format)
         delete ret;
         ret = NULL;
     }
+    else fakeesout->commandsqueue.Commit();
 
     return ret;
 }

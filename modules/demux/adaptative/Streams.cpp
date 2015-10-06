@@ -233,6 +233,7 @@ bool AbstractStream::restartDemux()
         /* Restart with ignoring pushes to queue */
         return demuxer->restart(fakeesout->commandsqueue);
     }
+    fakeesout->commandsqueue.Commit();
     return true;
 }
 
