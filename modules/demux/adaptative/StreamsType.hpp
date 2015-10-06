@@ -28,6 +28,7 @@ namespace adaptative
         UNKNOWN = 0,
         VIDEO,
         AUDIO,
+        SUBTITLE,
         APPLICATION
     };
 

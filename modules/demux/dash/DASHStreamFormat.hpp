@@ -32,6 +32,7 @@ namespace dash
         public:
             static const unsigned MPEG2TS = StreamFormat::UNSUPPORTED + 1;
             static const unsigned MP4    = StreamFormat::UNSUPPORTED + 2;
+            static const unsigned WEBVTT = StreamFormat::UNSUPPORTED + 3;
 
             static StreamFormat mimeToFormat(const std::string &mime)
             {
@@ -43,6 +44,8 @@ namespace dash
                         return StreamFormat(DASHStreamFormat::MP4);
                     else if (tail == "mp2t")
                         return StreamFormat(DASHStreamFormat::MPEG2TS);
+                    else if (tail == "vtt")
+                        return StreamFormat(DASHStreamFormat::WEBVTT);
                 }
                 return StreamFormat();
             }

@@ -89,6 +89,8 @@ StreamType AbstractStream::mimeToType(const std::string &mime)
         mimetype = AUDIO;
     else if (!mime.compare(0, 12, "application/"))
         mimetype = APPLICATION;
+    else if (!mime.compare(0, 5, "text/"))
+        mimetype = SUBTITLE;
     else /* unknown of unsupported */
         mimetype = UNKNOWN;
     return mimetype;
