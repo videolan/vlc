@@ -1443,6 +1443,12 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
     else
         es->fmt.i_codec = vlc_fourcc_GetCodec( es->fmt.i_cat,
                                                es->fmt.i_codec );
+    if( es->fmt.i_cat == VIDEO_ES
+     && (!es->fmt.video.i_visible_width || !es->fmt.video.i_visible_height))
+    {
+        es->fmt.video.i_visible_width = es->fmt.video.i_width;
+        es->fmt.video.i_visible_height = es->fmt.video.i_height;
+    }
 
     es->i_id = es->fmt.i_id;
     es->i_meta_id = out->p_sys->i_id;
