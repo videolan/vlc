@@ -545,10 +545,9 @@ static int MP4_ReadBox_mvhd(  stream_t *p_stream, MP4_Box_t *p_box )
     MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mvhd->i_creation_time, false );
     MP4_ConvertDate2Str( s_modification_time,
                          p_box->data.p_mvhd->i_modification_time, false );
-    if( p_box->data.p_mvhd->i_rate )
+    if( p_box->data.p_mvhd->i_rate && p_box->data.p_mvhd->i_timescale )
     {
-        MP4_ConvertDate2Str( s_duration,
-                 p_box->data.p_mvhd->i_duration / p_box->data.p_mvhd->i_rate, true );
+        MP4_ConvertDate2Str( s_duration, p_box->data.p_mvhd->i_duration / p_box->data.p_mvhd->i_timescale, true );
     }
     else
     {
