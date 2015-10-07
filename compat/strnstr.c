@@ -26,18 +26,22 @@
 
 char * strnstr (const char *haystack, const char *needle, size_t len)
 {
+    if(!needle || !*needle)
+        return (char*)haystack;
+
     const size_t i = strlen(needle);
-    if( i < len )
+    if( len < i )
       return NULL;
     
     size_t count = len - i;
 
-    while(count)
+    do
     {
       if( memcmp(haystack, needle, i) )
         return (char*) haystack;
-      count--;
       haystack++;
     }
+    while(count--);
+
     return NULL;
 }
