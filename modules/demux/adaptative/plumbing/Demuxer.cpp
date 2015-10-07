@@ -113,3 +113,40 @@ int Demuxer::demux(mtime_t)
         b_eof = true;
     return i_ret;
 }
+
+SlaveDemuxer::SlaveDemuxer(demux_t *p_realdemux, const std::string &name, es_out_t *out, AbstractSourceStream *source)
+    : Demuxer(p_realdemux, name, out, source)
+{
+    length = VLC_TS_INVALID;
+    b_reinitsonseek = false;
+    b_startsfromzero = false;
+}
+
+SlaveDemuxer::~SlaveDemuxer()
+{
+
+}
+
+bool SlaveDemuxer::create()
+{
+    if(Demuxer::create())
+    {
+        length = VLC_TS_INVALID;
+        if(demux_Control(p_demux, DEMUX_GET_LENGTH, &length) != VLC_SUCCESS)
+            b_eof = true;
+        return true;
+    }
+    return false;
+}
+
+int SlaveDemuxer::demux(mtime_t nz_deadline)
+{
+    if( demux_Control(p_demux, DEMUX_SET_NEXT_DEMUX_TIME, VLC_TS_0 + nz_deadline) != VLC_SUCCESS )
+    {
+        b_eof = true;
+        return VLC_DEMUXER_EOF;
+    }
+    int ret = Demuxer::demux(nz_deadline);
+    es_out_Control(p_es_out, ES_OUT_SET_GROUP_PCR, 0, VLC_TS_0 + nz_deadline);
+    return ret;
+}

@@ -59,13 +59,25 @@ namespace adaptative
             virtual bool create(); /* impl */
             virtual bool restart(CommandsQueue &); /* impl */
 
-        private:
+        protected:
             AbstractSourceStream *sourcestream;
             demux_t *p_realdemux;
             demux_t *p_demux;
             std::string name;
             es_out_t *p_es_out;
             bool b_eof;
+    };
+
+    class SlaveDemuxer : public Demuxer
+    {
+        public:
+            SlaveDemuxer(demux_t *, const std::string &, es_out_t *, AbstractSourceStream *);
+            virtual ~SlaveDemuxer();
+            virtual bool create(); /* reimpl */
+            virtual int demux(mtime_t); /* reimpl */
+
+        private:
+            mtime_t length;
     };
 
 }
