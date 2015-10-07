@@ -29,7 +29,6 @@
 #include "BaseAdaptationSet.h"
 #include "SegmentInformation.hpp"
 #include "../tools/Properties.hpp"
-#include "../StreamsType.hpp"
 
 namespace adaptative
 {
@@ -42,9 +41,7 @@ namespace adaptative
                 virtual ~BasePeriod ();
 
                 const std::vector<BaseAdaptationSet *>& getAdaptationSets   () const;
-                const std::vector<BaseAdaptationSet *>  getAdaptationSets   (StreamType) const;
                 BaseAdaptationSet *                 getAdaptationSetByID(const ID &);
-                BaseAdaptationSet *                 getAdaptationSet    (StreamType) const;
                 void                                addAdaptationSet    (BaseAdaptationSet *AdaptationSet);
                 void                                debug               (vlc_object_t *,int = 0) const;
 

@@ -25,7 +25,6 @@
 #endif
 
 #include <vlc_common.h>
-#include "StreamsType.hpp"
 #include "StreamFormat.hpp"
 #include "ChunksSource.hpp"
 
@@ -64,8 +63,6 @@ namespace adaptative
     public:
         AbstractStream(demux_t *, const StreamFormat &);
         virtual ~AbstractStream();
-        bool operator==(const AbstractStream &) const;
-        static StreamType mimeToType(const std::string &mime);
         void bind(AbstractAdaptationLogic *, SegmentTracker *,
                   HTTPConnectionManager *);
 
@@ -106,7 +103,6 @@ namespace adaptative
         Demuxer *syncdemux;
 
         demux_t *p_realdemux;
-        StreamType type;
         StreamFormat format;
 
         AbstractAdaptationLogic *adaptationLogic;

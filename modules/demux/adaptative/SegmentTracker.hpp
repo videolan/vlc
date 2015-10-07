@@ -24,7 +24,6 @@
 # include "config.h"
 #endif
 
-#include "StreamsType.hpp"
 #include <vlc_common.h>
 #include <list>
 

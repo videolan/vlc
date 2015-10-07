@@ -35,7 +35,6 @@ using namespace adaptative::logic;
 AbstractStream::AbstractStream(demux_t * demux_, const StreamFormat &format_)
 {
     p_realdemux = demux_;
-    type = UNKNOWN;
     format = format_;
     adaptationLogic = NULL;
     currentChunk = NULL;
@@ -80,21 +79,6 @@ AbstractStream::~AbstractStream()
     delete fakeesout;
 }
 
-StreamType AbstractStream::mimeToType(const std::string &mime)
-{
-    StreamType mimetype;
-    if (!mime.compare(0, 6, "video/"))
-        mimetype = VIDEO;
-    else if (!mime.compare(0, 6, "audio/"))
-        mimetype = AUDIO;
-    else if (!mime.compare(0, 12, "application/"))
-        mimetype = APPLICATION;
-    else if (!mime.compare(0, 5, "text/"))
-        mimetype = SUBTITLE;
-    else /* unknown of unsupported */
-        mimetype = UNKNOWN;
-    return mimetype;
-}
 
 void AbstractStream::bind(AbstractAdaptationLogic *logic, SegmentTracker *tracker,
                     HTTPConnectionManager *conn)
@@ -155,11 +139,6 @@ mtime_t AbstractStream::getFirstDTS() const
 int AbstractStream::esCount() const
 {
     return fakeesout->esCount();
-}
-
-bool AbstractStream::operator ==(const AbstractStream &stream) const
-{
-    return stream.type == type;
 }
 
 SegmentChunk * AbstractStream::getChunk()
