@@ -41,6 +41,7 @@
 #include "DASHSegment.h"
 #include "../xml/DOMHelper.h"
 #include "../adaptative/tools/Helper.h"
+#include "../adaptative/tools/Debug.hpp"
 #include <vlc_strings.h>
 #include <vlc_stream.h>
 #include <cstdio>
@@ -256,6 +257,10 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
             if(uri == "urn:mpeg:dash:role:2011")
                 adaptationSet->description.Set(role->getAttributeValue("value"));
         }
+#ifdef ADAPTATIVE_ADVANCED_DEBUG
+        if(adaptationSet->description.Get().empty())
+            adaptationSet->description.Set(adaptationSet->getMimeType());
+#endif
 
         parseSegmentInformation(*it, adaptationSet, &nextid);
 
