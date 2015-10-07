@@ -1,6 +1,6 @@
 diff -ru libtool/libltdl/config/ltmain.m4sh libtool-fixed/libltdl/config/ltmain.m4sh
 --- libtool/libltdl/config/ltmain.m4sh	2011-10-17 12:17:05.000000000 +0200
-+++ libtool-fixed/libltdl/config/ltmain.m4sh	2015-09-30 22:03:22.000000000 +0200
++++ libtool-fixed/libltdl/config/ltmain.m4sh.new	2015-09-30 22:03:22.000000000 +0200
 @@ -7928,16 +7928,6 @@
  
        case $host in
@@ -20,7 +20,7 @@ diff -ru libtool/libltdl/config/ltmain.m4sh libtool-fixed/libltdl/config/ltmain.
  	finalize_deplibs=`$ECHO " $finalize_deplibs" | $SED 's% \([^ $]*\).ltframework% -framework \1%g'`
 diff -ru libtool/libltdl/config/ltmain.sh libtool-fixed/libltdl/config/ltmain.sh
 --- libtool/libltdl/config/ltmain.sh	2011-10-17 12:19:35.000000000 +0200
-+++ libtool-fixed/libltdl/config/ltmain.sh	2015-09-30 22:03:44.000000000 +0200
++++ libtool-fixed/libltdl/config/ltmain.sh.new	2015-09-30 22:03:44.000000000 +0200
 @@ -8715,16 +8715,6 @@
  
        case $host in
