@@ -209,6 +209,8 @@ static int ReadTTML( demux_t* p_demux )
     do
     {
         i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
+        if( i_type <= XML_READER_NONE )
+            break;
 
         if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_name, "head" ) || !strcasecmp( psz_name, "tt:head" ) ) )
         {
@@ -271,7 +273,9 @@ static int ReadTTML( demux_t* p_demux )
 
                 i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
 
-                while ( i_type != XML_READER_ENDELEM || ( strcmp( psz_name, "p" ) && strcmp( psz_name, "tt:p" ) ) )
+                while ( i_type > XML_READER_NONE && ( i_type != XML_READER_ENDELEM
+                        || ( strcmp( psz_name, "p" ) && strcmp( psz_name, "tt:p" ) ) )
+                      )
                 {
                     if ( i_type == XML_READER_TEXT && psz_name != NULL )
                     {
