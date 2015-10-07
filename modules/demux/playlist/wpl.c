@@ -27,6 +27,7 @@
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_xml.h>
+#include <vlc_fixups.h>
 
 #include "playlist.h"
 
@@ -178,6 +179,12 @@ int Import_WPL( vlc_object_t* p_this )
     DEMUX_INIT_COMMON();
 
     demux_sys_t* p_sys = p_demux->p_sys;
+
+    uint8_t *p_peek;
+    ssize_t i_peek = stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 128 );
+    if( i_peek < 32 || memcmp( p_peek, "<?wpl", 5 ) ||
+        !strnstr( (const char *) p_peek, "<smil>", i_peek ) )
+        return VLC_EGENERIC;
 
     p_sys->p_reader = xml_ReaderCreate( p_this, p_demux->s );
     if ( !p_sys->p_reader )
