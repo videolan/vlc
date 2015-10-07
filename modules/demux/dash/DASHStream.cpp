@@ -49,6 +49,10 @@ AbstractDemuxer * DASHStream::createDemux(const StreamFormat &format)
             ret = new SlaveDemuxer(p_realdemux, "subtitle", fakeesout->getEsOut(), demuxersource);
             break;
 
+        case DASHStreamFormat::TTML:
+            ret = new SlaveDemuxer(p_realdemux, "ttml", fakeesout->getEsOut(), demuxersource);
+            break;
+
         default:
         case StreamFormat::UNSUPPORTED:
             break;
