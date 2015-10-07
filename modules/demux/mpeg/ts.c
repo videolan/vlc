@@ -427,7 +427,7 @@ struct demux_sys_t
     {
         mtime_t i_first_dts;     /* first dts encountered for the stream */
         int     i_timesourcepid; /* which pid we saved the dts from */
-        bool    b_pat_deadline;  /* set if we haven't seen PAT within MIN_PAT_INTERVAL */
+        enum { PAT_WAITING = 0, PAT_MISSING, PAT_FIXTRIED } status; /* set if we haven't seen PAT within MIN_PAT_INTERVAL */
     } patfix;
 
     vdr_info_t  vdr;
@@ -826,10 +826,10 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
         p_sys->patfix.i_timesourcepid = pid->i_pid;
     }
     else if( p_sys->patfix.i_timesourcepid == pid->i_pid && i_dts > -1 &&
-             !p_sys->patfix.b_pat_deadline )
+             p_sys->patfix.status == PAT_WAITING )
     {
         if( i_dts - p_sys->patfix.i_first_dts > TO_SCALE(MIN_PAT_INTERVAL) )
-            p_sys->patfix.b_pat_deadline = true;
+            p_sys->patfix.status = PAT_MISSING;
     }
 
 }
@@ -1009,6 +1009,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_ts_read = 50;
     p_sys->csa = NULL;
     p_sys->b_start_record = false;
+
+    p_sys->patfix.i_first_dts = -1;
+    p_sys->patfix.i_timesourcepid = 0;
+    p_sys->patfix.status = PAT_WAITING;
 
 # define VLC_DVBPSI_DEMUX_TABLE_INIT(table,obj) \
     do { \
@@ -1237,8 +1241,11 @@ static int Demux( demux_t *p_demux )
     bool b_wait_es = p_sys->i_pmt_es <= 0;
 
     /* If we had no PAT within MIN_PAT_INTERVAL, create PAT/PMT from probed streams */
-    if( p_sys->i_pmt_es == 0 && !SEEN(GetPID(p_sys, 0)) && p_sys->patfix.b_pat_deadline )
+    if( p_sys->i_pmt_es == 0 && !SEEN(GetPID(p_sys, 0)) && p_sys->patfix.status == PAT_MISSING )
+    {
         MissingPATPMTFixup( p_demux );
+        p_sys->patfix.status = PAT_FIXTRIED;
+    }
 
     /* We read at most 100 TS packet or until a frame is completed */
     for( unsigned i_pkt = 0; i_pkt < p_sys->i_ts_read; i_pkt++ )
