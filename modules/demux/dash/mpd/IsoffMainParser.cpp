@@ -350,6 +350,14 @@ size_t IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformat
 
     parseInitSegment(DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization"), base, info);
 
+    if(!base->initialisationSegment.Get() && base->indexSegment.Get() && base->indexSegment.Get()->getOffset())
+    {
+        Segment *initSeg = new InitSegment( info );
+        initSeg->setSourceUrl(base->getUrlSegment().toString());
+        initSeg->setByteRange(0, base->indexSegment.Get()->getOffset() - 1);
+        base->initialisationSegment.Set(initSeg);
+    }
+
     info->setSegmentBase(base);
 
     return 1;
