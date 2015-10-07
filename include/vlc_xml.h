@@ -107,6 +107,7 @@ static inline int xml_ReaderIsEmptyElement( xml_reader_t *reader )
 }
 
 enum {
+    XML_READER_ERROR=-1,
     XML_READER_NONE=0,
     XML_READER_STARTELEM,
     XML_READER_ENDELEM,
