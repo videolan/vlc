@@ -49,7 +49,7 @@ ASS_CONF=--disable-enca
 ifneq ($(WITH_FONTCONFIG), 0)
 DEPS_ass += fontconfig $(DEPS_fontconfig)
 else
-ASS_CONF += --disable-fontconfig
+ASS_CONF += --disable-fontconfig --disable-require-system-font-provider
 endif
 
 ifneq ($(WITH_HARFBUZZ), 0)
