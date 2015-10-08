@@ -40,12 +40,6 @@
  *****************************************************************************/
 @interface AboutWindowController ()
 {
-    NSTimer *o_scroll_timer;
-    float f_current;
-    CGFloat f_end;
-    NSTimeInterval i_start;
-    BOOL b_restart;
-
     NSString *o_authors;
 }
 @end
@@ -77,7 +71,6 @@
     [self window];
 
     /* Show the window */
-    b_restart = YES;
     [o_credits_scrollview setHidden:YES];
     [o_credits_textview setHidden:YES];
     [o_joinus_txt setHidden:NO];
@@ -182,46 +175,12 @@
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
 {
-    o_scroll_timer = [NSTimer scheduledTimerWithTimeInterval: 1/6
-                                                      target:self
-                                                    selector:@selector(scrollCredits:)
-                                                    userInfo:nil
-                                                     repeats:YES];
+    [(VLCScrollingClipView *)[o_credits_scrollview contentView] startScrolling];
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
 {
-    [o_scroll_timer invalidate];
-}
-
-- (void)scrollCredits:(NSTimer *)timer
-{
-    if (b_restart) {
-        /* Reset the starttime */
-        i_start = [NSDate timeIntervalSinceReferenceDate] + 4.0;
-        f_current = 0;
-        f_end = [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height;
-        b_restart = NO;
-    }
-
-    if ([NSDate timeIntervalSinceReferenceDate] >= i_start) {
-        /* Increment the scroll position */
-        f_current += 0.005;
-
-        /* Scroll to the position */
-        [o_credits_textview scrollPoint:NSMakePoint(0, f_current)];
-
-        /* If at end, restart at the top */
-        if (f_current >= f_end) {
-            /* f_end may be wrong on first run, so don't trust it too much */
-            if (f_end == [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height) {
-                sleep(2);
-                b_restart = YES;
-                [o_credits_textview scrollPoint:NSMakePoint(0, 0)];
-            } else
-                f_end = [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height;
-        }
-    }
+    [(VLCScrollingClipView *)[o_credits_scrollview contentView] stopScrolling];
 }
 
 - (IBAction)buttonAction:(id)sender
@@ -240,8 +199,8 @@
     else
         [o_credits_textview setString:toNSStr(psz_license)];
 
-    [o_credits_textview scrollPoint:NSMakePoint(0, 0)];
-    b_restart = YES;
+    [(VLCScrollingClipView *)[o_credits_scrollview contentView] resetScrolling];
+    [(VLCScrollingClipView *)[o_credits_scrollview contentView] startScrolling];
 }
 
 /*****************************************************************************

@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import <WebKit/WebKit.h> //we need to be here, because we're using a WebView object below
+#import "VLCScrollingClipView.h"
 
 /*****************************************************************************
  * VLAboutBox interface

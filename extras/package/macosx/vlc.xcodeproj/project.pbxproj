@@ -460,6 +460,7 @@
 		1CE5ED2519DD6AB700FCEFD3 /* lion-window-fullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED1F19DD6AB700FCEFD3 /* lion-window-fullscreen.png */; };
 		1CE5ED2619DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED2019DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png */; };
 		633121D01B5112C300E636DA /* ResumeDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 633121CE1B5112C300E636DA /* ResumeDialog.xib */; };
+		6B13E2A81BC67678001AD24A /* VLCScrollingClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */; settings = {ASSET_TAGS = (); }; };
 		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
@@ -1241,6 +1242,8 @@
 		633121CA1B51122700E636DA /* ResumeDialogController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResumeDialogController.h; path = ../../../modules/gui/macosx/ResumeDialogController.h; sourceTree = "<group>"; };
 		633121CB1B51122700E636DA /* ResumeDialogController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ResumeDialogController.m; path = ../../../modules/gui/macosx/ResumeDialogController.m; sourceTree = "<group>"; };
 		633121CF1B5112C300E636DA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ResumeDialog.xib; sourceTree = "<group>"; };
+		6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCScrollingClipView.h; path = ../../../modules/gui/macosx/VLCScrollingClipView.h; sourceTree = "<group>"; };
+		6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCScrollingClipView.m; path = ../../../modules/gui/macosx/VLCScrollingClipView.m; sourceTree = "<group>"; };
 		7D3F6524188051F2005776C4 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/BWQuincyMain.xib; sourceTree = "<group>"; };
 		7D3F652618805297005776C4 /* BWQuincyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BWQuincyManager.h; path = ../../../modules/gui/macosx/BWQuincyManager.h; sourceTree = SOURCE_ROOT; };
 		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyManager.m; path = ../../../modules/gui/macosx/BWQuincyManager.m; sourceTree = SOURCE_ROOT; };
@@ -1821,6 +1824,8 @@
 				7D871D391B5E684D000B56C0 /* helpers.h */,
 				8EE1AF9F044465080059A3A7 /* about.h */,
 				8EE1AFA0044465080059A3A7 /* about.m */,
+				6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */,
+				6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */,
 				7DF0435E1972E26A0022B534 /* AddonListDataSource.h */,
 				7DF0435F1972E26A0022B534 /* AddonListDataSource.m */,
 				7DB65D5218ABD6380053B874 /* AddonsWindowController.h */,
@@ -3884,6 +3889,7 @@
 				1CCB5F701A62A724004C3E90 /* fspanel.h in Sources */,
 				1CCB5F711A62A724004C3E90 /* fspanel.m in Sources */,
 				1CCB5F721A62A724004C3E90 /* intf.h in Sources */,
+				6B13E2A81BC67678001AD24A /* VLCScrollingClipView.m in Sources */,
 				1CD3667B1B7A242E0054E39F /* VLCTimeSelectionPanelController.m in Sources */,
 				1CCB5F731A62A724004C3E90 /* intf.m in Sources */,
 				1CCB5F741A62A724004C3E90 /* macosx.m in Sources */,

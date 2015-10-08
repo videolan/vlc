@@ -73,5 +73,6 @@ libmacosx_plugin_la_SOURCES = \
 	VideoView.h VideoView.m \
 	VLCTimeSelectionPanelController.h VLCTimeSelectionPanelController.m \
 	VLCUIWidgets.h VLCUIWidgets.m \
+	VLCScrollingClipView.h VLCScrollingClipView.m \
 	VLCVoutWindowController.h VLCVoutWindowController.m \
 	Windows.h Windows.m
