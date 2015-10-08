@@ -31,6 +31,7 @@ namespace adaptative
     class ChunksSource
     {
         public:
+            virtual ~ChunksSource() {}
             virtual block_t *readNextBlock(size_t) = 0;
     };
 }
