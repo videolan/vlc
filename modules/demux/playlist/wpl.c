@@ -27,7 +27,6 @@
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_xml.h>
-#include <vlc_fixups.h>
 
 #include "playlist.h"
 
@@ -179,18 +178,27 @@ int Import_WPL( vlc_object_t* p_this )
     DEMUX_INIT_COMMON();
 
     demux_sys_t* p_sys = p_demux->p_sys;
-
     uint8_t *p_peek;
-    ssize_t i_peek = stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 128 );
-    if( i_peek < 32 || memcmp( p_peek, "<?wpl", 5 ) ||
-        !strnstr( (const char *) p_peek, "<smil>", i_peek ) )
+    ssize_t i_peek = stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 2048 );
+    if( unlikely( i_peek <= 0 ) )
+    {
+        Close_WPL( p_this );
         return VLC_EGENERIC;
+    }
 
-    p_sys->p_reader = xml_ReaderCreate( p_this, p_demux->s );
+    stream_t *p_probestream = stream_MemoryNew( p_demux->s, p_peek, i_peek, true );
+    if( unlikely( !p_probestream ) )
+    {
+        Close_WPL( p_this );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->p_reader = xml_ReaderCreate( p_this, p_probestream );
     if ( !p_sys->p_reader )
     {
         msg_Err( p_demux, "Failed to create an XML reader" );
         Close_WPL( p_this );
+        stream_Delete( p_probestream );
         return VLC_EGENERIC;
     }
 
@@ -200,8 +208,12 @@ int Import_WPL( vlc_object_t* p_this )
     {
         msg_Err( p_demux, "Invalid WPL playlist. Root element should have been <smil>" );
         Close_WPL( p_this );
+        stream_Delete( p_probestream );
         return VLC_EGENERIC;
     }
+
+    p_sys->p_reader = xml_ReaderReset( p_sys->p_reader, p_demux->s );
+    stream_Delete( p_probestream );
 
     msg_Dbg( p_demux, "Found valid WPL playlist" );
 
