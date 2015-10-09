@@ -1,0 +1,50 @@
+--- tablib_orig/taglib/toolkit/trefcounter.h	2015-10-09 14:09:14.162193621 +0200
++++ taglib/taglib/toolkit/trefcounter.h	2015-10-09 14:39:37.009992159 +0200
+@@ -29,21 +29,13 @@
+ #include "taglib_export.h"
+ #include "taglib.h"
+ 
+-#ifdef __APPLE__
++#if defined(HAVE_MAC_ATOMIC)
+ #  include <libkern/OSAtomic.h>
+-#  define TAGLIB_ATOMIC_MAC
+-#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
++#elif defined(HAVE_WIN_ATOMIC)
+ #  define NOMINMAX
+ #  include <windows.h>
+-#  define TAGLIB_ATOMIC_WIN
+-#elif defined (__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 401)    \
+-      && (defined(__i386__) || defined(__i486__) || defined(__i586__) || \
+-          defined(__i686__) || defined(__x86_64) || defined(__ia64)) \
+-      && !defined(__INTEL_COMPILER)
+-#  define TAGLIB_ATOMIC_GCC
+-#elif defined(__ia64) && defined(__INTEL_COMPILER)
++#elif defined(HAVE_IA64_ATOMIC)
+ #  include <ia64intrin.h>
+-#  define TAGLIB_ATOMIC_GCC
+ #endif
+ 
+ #ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
+@@ -77,19 +69,19 @@
+   public:
+     RefCounterOld() : refCount(1) {}
+ 
+-#ifdef TAGLIB_ATOMIC_MAC
++#if defined(HAVE_MAC_ATOMIC)
+     void ref() { OSAtomicIncrement32Barrier(const_cast<int32_t*>(&refCount)); }
+     bool deref() { return ! OSAtomicDecrement32Barrier(const_cast<int32_t*>(&refCount)); }
+     int32_t count() { return refCount; }
+   private:
+     volatile int32_t refCount;
+-#elif defined(TAGLIB_ATOMIC_WIN)
++#elif defined(HAVE_WIN_ATOMIC)
+     void ref() { InterlockedIncrement(&refCount); }
+     bool deref() { return ! InterlockedDecrement(&refCount); }
+     long count() { return refCount; }
+   private:
+     volatile long refCount;
+-#elif defined(TAGLIB_ATOMIC_GCC)
++#elif defined(HAVE_GCC_ATOMIC)
+     void ref() { __sync_add_and_fetch(&refCount, 1); }
+     bool deref() { return ! __sync_sub_and_fetch(&refCount, 1); }
+     int count() { return refCount; }
