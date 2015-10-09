@@ -572,6 +572,7 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
     if (!pic_sys->displayed || !sys->opaque) {
         buffer->cmd = 0;
         buffer->length = sys->input->buffer_size;
+        buffer->user_data = picture;
 
         status = mmal_port_send_buffer(sys->input, buffer);
         if (status == MMAL_SUCCESS)

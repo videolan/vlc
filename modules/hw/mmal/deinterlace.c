@@ -305,6 +305,7 @@ static int send_output_buffer(filter_t *filter)
     picture->format.i_frame_rate_base = filter->fmt_out.video.i_frame_rate_base;
 
     buffer = picture->p_sys->buffer;
+    buffer->user_data = picture;
     buffer->cmd = 0;
 
     mmal_picture_lock(picture);
