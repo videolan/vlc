@@ -68,9 +68,24 @@ const es_format_t *FakeESOutID::getFmt() const
 
 bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
 {
-    return es_format_IsSimilar( &p_other->fmt, &fmt ) &&
-           p_other->fmt.i_extra == fmt.i_extra &&
-           (p_other->fmt.i_extra == 0 || !memcmp( p_other->fmt.p_extra, fmt.p_extra, fmt.i_extra ));
+    switch(fmt.i_codec)
+    {
+        case VLC_CODEC_H264:
+        case VLC_CODEC_HEVC:
+        case VLC_CODEC_VC1:
+            return true;
+
+        default:
+            if(fmt.i_cat == AUDIO_ES)
+            {
+                /* Reject audio streams with different or unknown rates */
+                if(fmt.audio.i_rate != p_other->fmt.audio.i_rate || !fmt.audio.i_rate)
+                    return false;
+            }
+
+            return es_format_IsSimilar( &p_other->fmt, &fmt ) &&
+                   !p_other->fmt.i_extra && !fmt.i_extra;
+    }
 }
 
 void FakeESOutID::setScheduledForDeletion()
