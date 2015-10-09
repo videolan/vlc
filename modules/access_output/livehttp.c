@@ -188,6 +188,7 @@ struct sout_access_out_sys_t
     size_t  i_seglen;
     float   f_seglen;
     block_t *block_buffer;
+    block_t **last_block_buffer;
     int i_handle;
     unsigned i_numsegs;
     unsigned i_initial_segment;
@@ -234,6 +235,7 @@ static int Open( vlc_object_t *p_this )
     /* Try to get within asked segment length */
     p_sys->i_seglenm = CLOCK_FREQ * p_sys->i_seglen;
     p_sys->block_buffer = NULL;
+    p_sys->last_block_buffer = &p_sys->block_buffer;
 
     p_sys->i_numsegs = var_GetInteger( p_access, SOUT_CFG_PREFIX "numsegs" );
     p_sys->i_initial_segment = var_GetInteger( p_access, SOUT_CFG_PREFIX "initial-segment-number" );
@@ -761,6 +763,7 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     block_t *output_block = p_sys->block_buffer;
     p_sys->block_buffer = NULL;
+    p_sys->last_block_buffer = &p_sys->block_buffer;
 
     while( output_block )
     {
@@ -795,6 +798,7 @@ static void Close( vlc_object_t * p_this )
     {
         block_ChainRelease( p_sys->block_buffer );
         p_sys->block_buffer = NULL;
+        p_sys->last_block_buffer = &p_sys->block_buffer;
     }
 
     closeCurrentSegment( p_access, p_sys, true );
@@ -949,8 +953,9 @@ static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer )
 static ssize_t writeSegment( sout_access_out_t *p_access )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    block_t *output = p_sys->block_buffer ? block_ChainGather( p_sys->block_buffer ) : NULL;
+    block_t *output = p_sys->block_buffer;
     p_sys->block_buffer = NULL;
+    p_sys->last_block_buffer = &p_sys->block_buffer;
     ssize_t i_write=0;
     bool crypted = false;
     while( output )
@@ -1045,7 +1050,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
         p_temp = p_buffer->p_next;
         p_buffer->p_next = NULL;
-        block_ChainAppend( &p_sys->block_buffer, p_buffer );
+        block_ChainLastAppend( &p_sys->last_block_buffer, p_buffer );
         p_buffer = p_temp;
     }
 
