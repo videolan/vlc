@@ -118,7 +118,7 @@ spopd
 
 info "Building contribs"
 spushd "${vlcroot}/contrib"
-mkdir -p build && cd build
+mkdir -p contrib-$TRIPLET && cd contrib-$TRIPLET
 ../bootstrap --build=$TRIPLET --host=$TRIPLET > $out
 if [ "$REBUILD" = "yes" ]; then
     make clean
