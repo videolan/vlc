@@ -321,7 +321,7 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
     {
         rep->getPlaylist()->duration.Set(0);
     }
-    else if(totalduration * CLOCK_FREQ / rep->timescale.Get() > rep->getPlaylist()->duration.Get())
+    else if(totalduration * CLOCK_FREQ / rep->timescale.Get() > (uint64_t) rep->getPlaylist()->duration.Get())
     {
         rep->getPlaylist()->duration.Set(totalduration * CLOCK_FREQ / rep->timescale.Get());
     }
