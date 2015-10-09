@@ -23,7 +23,7 @@
 
 #import "ConvertAndSave.h"
 #import "intf.h"
-#import "playlist.h"
+#import "VLCPlaylist.h"
 #import "misc.h"
 #import "SharedDialogs.h"
 

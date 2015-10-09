@@ -24,7 +24,7 @@
 #import "CoreInteraction.h"
 #import "intf.h"
 #import "open.h"
-#import "playlist.h"
+#import "VLCPlaylist.h"
 #import <math.h>
 #import <vlc_playlist.h>
 #import <vlc_input.h>

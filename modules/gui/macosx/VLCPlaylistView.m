@@ -1,5 +1,5 @@
 /*****************************************************************************
- * playlistview.m: MacOS X interface module
+ * VLCPlaylistView.m: MacOS X interface module
  *****************************************************************************
 * Copyright (C) 2003-2015 VLC authors and VideoLAN
  * $Id$
@@ -24,8 +24,8 @@
  *****************************************************************************/
 
 #import "intf.h"
-#import "playlistview.h"
-#import "playlist.h"
+#import "VLCPlaylistView.h"
+#import "VLCPlaylist.h"
 
 @implementation VLCPlaylistView
 

@@ -27,8 +27,8 @@
 #import "intf.h"
 #import "MainMenu.h"
 #import "MainWindow.h"
-#import "playlist.h"
-#import "playlistinfo.h"
+#import "VLCPlaylist.h"
+#import "VLCPlaylistInfo.h"
 #import "TrackSynchronization.h"
 #import "VideoView.h"
 

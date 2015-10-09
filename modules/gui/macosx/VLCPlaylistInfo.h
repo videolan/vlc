@@ -1,5 +1,5 @@
 /*****************************************************************************
- * playlistinfo.h: MacOS X interface module
+ * VLCPlaylistInfo.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$

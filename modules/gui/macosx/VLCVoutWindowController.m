@@ -32,11 +32,11 @@
 
 #import "VideoEffects.h"
 #import "AudioEffects.h"
-#import "playlistinfo.h"
+#import "VLCPlaylistInfo.h"
 #import "bookmarks.h"
 #import "TrackSynchronization.h"
 #import "ResumeDialogController.h"
-#import "playlist.h"
+#import "VLCPlaylist.h"
 
 static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
 

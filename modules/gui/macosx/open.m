@@ -36,7 +36,7 @@
 #import <QTKit/QTKit.h>
 
 #import "intf.h"
-#import "playlist.h"
+#import "VLCPlaylist.h"
 #import "open.h"
 #import "output.h"
 #import "eyetv.h"

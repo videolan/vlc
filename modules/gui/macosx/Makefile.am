@@ -51,9 +51,9 @@ libmacosx_plugin_la_SOURCES = \
 	misc.h misc.m \
 	open.h open.m \
 	output.h output.m \
-	playlistview.h playlistview.m \
-	playlist.h playlist.m \
-	playlistinfo.h playlistinfo.m \
+	VLCPlaylistView.h VLCPlaylistView.m \
+	VLCPlaylist.h VLCPlaylist.m \
+	VLCPlaylistInfo.h VLCPlaylistInfo.m \
 	PLItem.h PLItem.m \
 	PLModel.h PLModel.m \
 	prefs.h prefs.m \

@@ -27,7 +27,7 @@
 #import "CoreInteraction.h"
 #import "MainMenu.h"
 #import "fspanel.h"
-#import "playlist.h"
+#import "VLCPlaylist.h"
 #import "CompatibilityFixes.h"
 
 /*****************************************************************************

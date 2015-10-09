@@ -406,10 +406,10 @@
 		1CCB5F7A1A62A724004C3E90 /* open.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28203E2EB1C0059A3A7 /* open.m */; };
 		1CCB5F7B1A62A724004C3E90 /* output.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E55FB7F0459B0FD00FB3317 /* output.h */; };
 		1CCB5F7C1A62A724004C3E90 /* output.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E55FB800459B0FD00FB3317 /* output.m */; };
-		1CCB5F7D1A62A724004C3E90 /* playlist.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28303E2EB1C0059A3A7 /* playlist.h */; };
-		1CCB5F7E1A62A724004C3E90 /* playlist.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28403E2EB1C0059A3A7 /* playlist.m */; };
-		1CCB5F7F1A62A724004C3E90 /* playlistinfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E49720006417F6800370C9F /* playlistinfo.h */; };
-		1CCB5F801A62A724004C3E90 /* playlistinfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E49720106417F6800370C9F /* playlistinfo.m */; };
+		1CCB5F7D1A62A724004C3E90 /* VLCPlaylist.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28303E2EB1C0059A3A7 /* VLCPlaylist.h */; };
+		1CCB5F7E1A62A724004C3E90 /* VLCPlaylist.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28403E2EB1C0059A3A7 /* VLCPlaylist.m */; };
+		1CCB5F7F1A62A724004C3E90 /* VLCPlaylistInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E49720006417F6800370C9F /* VLCPlaylistInfo.h */; };
+		1CCB5F801A62A724004C3E90 /* VLCPlaylistInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E49720106417F6800370C9F /* VLCPlaylistInfo.m */; };
 		1CCB5F811A62A724004C3E90 /* prefs_widgets.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */; };
 		1CCB5F821A62A724004C3E90 /* prefs_widgets.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */; };
 		1CCB5F831A62A724004C3E90 /* prefs.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28503E2EB1C0059A3A7 /* prefs.h */; };
@@ -1257,8 +1257,8 @@
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
 		7D8BB0B91830367200FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistMenu.xib; sourceTree = "<group>"; };
 		7D8BB0BF1830393300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MainWindow.xib; sourceTree = "<group>"; };
-		7DA481221B5FC13700917FD7 /* playlistview.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = playlistview.h; path = ../../../modules/gui/macosx/playlistview.h; sourceTree = "<group>"; };
-		7DA481231B5FC13700917FD7 /* playlistview.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = playlistview.m; path = ../../../modules/gui/macosx/playlistview.m; sourceTree = "<group>"; };
+		7DA481221B5FC13700917FD7 /* VLCPlaylistView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCPlaylistView.h; path = ../../../modules/gui/macosx/VLCPlaylistView.h; sourceTree = "<group>"; };
+		7DA481231B5FC13700917FD7 /* VLCPlaylistView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCPlaylistView.m; path = ../../../modules/gui/macosx/VLCPlaylistView.m; sourceTree = "<group>"; };
 		7DB65D5218ABD6380053B874 /* AddonsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonsWindowController.h; path = ../../../modules/gui/macosx/AddonsWindowController.h; sourceTree = SOURCE_ROOT; };
 		7DB65D5318ABD6380053B874 /* AddonsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonsWindowController.m; path = ../../../modules/gui/macosx/AddonsWindowController.m; sourceTree = SOURCE_ROOT; };
 		7DB65D5518ABD6490053B874 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AddonManager.xib; sourceTree = "<group>"; };
@@ -1277,8 +1277,8 @@
 		7DF812F41B5599E40052293C /* PLModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PLModel.m; path = ../../../modules/gui/macosx/PLModel.m; sourceTree = "<group>"; };
 		7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark.png"; sourceTree = "<group>"; };
 		7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark@2x.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark@2x.png"; sourceTree = "<group>"; };
-		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
-		8E49720106417F6800370C9F /* playlistinfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = playlistinfo.m; path = ../../../modules/gui/macosx/playlistinfo.m; sourceTree = SOURCE_ROOT; };
+		8E49720006417F6800370C9F /* VLCPlaylistInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCPlaylistInfo.h; path = ../../../modules/gui/macosx/VLCPlaylistInfo.h; sourceTree = SOURCE_ROOT; };
+		8E49720106417F6800370C9F /* VLCPlaylistInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCPlaylistInfo.m; path = ../../../modules/gui/macosx/VLCPlaylistInfo.m; sourceTree = SOURCE_ROOT; };
 		8E55FB7F0459B0FD00FB3317 /* output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = output.h; path = ../../../modules/gui/macosx/output.h; sourceTree = SOURCE_ROOT; };
 		8E55FB800459B0FD00FB3317 /* output.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = output.m; path = ../../../modules/gui/macosx/output.m; sourceTree = SOURCE_ROOT; };
 		8E6BC6F6041643860059A3A7 /* applescript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = applescript.h; path = ../../../modules/gui/macosx/applescript.h; sourceTree = SOURCE_ROOT; };
@@ -1294,8 +1294,8 @@
 		8ED6C28003E2EB1C0059A3A7 /* misc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = misc.m; path = ../../../modules/gui/macosx/misc.m; sourceTree = SOURCE_ROOT; };
 		8ED6C28103E2EB1C0059A3A7 /* open.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = open.h; path = ../../../modules/gui/macosx/open.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28203E2EB1C0059A3A7 /* open.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = open.m; path = ../../../modules/gui/macosx/open.m; sourceTree = SOURCE_ROOT; };
-		8ED6C28303E2EB1C0059A3A7 /* playlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playlist.h; path = ../../../modules/gui/macosx/playlist.h; sourceTree = SOURCE_ROOT; };
-		8ED6C28403E2EB1C0059A3A7 /* playlist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = playlist.m; path = ../../../modules/gui/macosx/playlist.m; sourceTree = SOURCE_ROOT; };
+		8ED6C28303E2EB1C0059A3A7 /* VLCPlaylist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCPlaylist.h; path = ../../../modules/gui/macosx/VLCPlaylist.h; sourceTree = SOURCE_ROOT; };
+		8ED6C28403E2EB1C0059A3A7 /* VLCPlaylist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCPlaylist.m; path = ../../../modules/gui/macosx/VLCPlaylist.m; sourceTree = SOURCE_ROOT; };
 		8ED6C28503E2EB1C0059A3A7 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prefs.h; path = ../../../modules/gui/macosx/prefs.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28603E2EB1C0059A3A7 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs.m; path = ../../../modules/gui/macosx/prefs.m; sourceTree = SOURCE_ROOT; };
 		8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = README.MacOSX.rtf; sourceTree = SOURCE_ROOT; };
@@ -1872,12 +1872,12 @@
 				8ED6C28203E2EB1C0059A3A7 /* open.m */,
 				8E55FB7F0459B0FD00FB3317 /* output.h */,
 				8E55FB800459B0FD00FB3317 /* output.m */,
-				8ED6C28303E2EB1C0059A3A7 /* playlist.h */,
-				8ED6C28403E2EB1C0059A3A7 /* playlist.m */,
-				7DA481221B5FC13700917FD7 /* playlistview.h */,
-				7DA481231B5FC13700917FD7 /* playlistview.m */,
-				8E49720006417F6800370C9F /* playlistinfo.h */,
-				8E49720106417F6800370C9F /* playlistinfo.m */,
+				8ED6C28303E2EB1C0059A3A7 /* VLCPlaylist.h */,
+				8ED6C28403E2EB1C0059A3A7 /* VLCPlaylist.m */,
+				7DA481221B5FC13700917FD7 /* VLCPlaylistView.h */,
+				7DA481231B5FC13700917FD7 /* VLCPlaylistView.m */,
+				8E49720006417F6800370C9F /* VLCPlaylistInfo.h */,
+				8E49720106417F6800370C9F /* VLCPlaylistInfo.m */,
 				7DF812F11B5599E40052293C /* PLItem.h */,
 				7DF812F21B5599E40052293C /* PLItem.m */,
 				7DF812F31B5599E40052293C /* PLModel.h */,
@@ -3902,10 +3902,10 @@
 				1CCB5F7B1A62A724004C3E90 /* output.h in Sources */,
 				1CC25CA81B2C585D0003F994 /* darwinvlc.m in Sources */,
 				1CCB5F7C1A62A724004C3E90 /* output.m in Sources */,
-				1CCB5F7D1A62A724004C3E90 /* playlist.h in Sources */,
-				1CCB5F7E1A62A724004C3E90 /* playlist.m in Sources */,
-				1CCB5F7F1A62A724004C3E90 /* playlistinfo.h in Sources */,
-				1CCB5F801A62A724004C3E90 /* playlistinfo.m in Sources */,
+				1CCB5F7D1A62A724004C3E90 /* VLCPlaylist.h in Sources */,
+				1CCB5F7E1A62A724004C3E90 /* VLCPlaylist.m in Sources */,
+				1CCB5F7F1A62A724004C3E90 /* VLCPlaylistInfo.h in Sources */,
+				1CCB5F801A62A724004C3E90 /* VLCPlaylistInfo.m in Sources */,
 				1CCB5F811A62A724004C3E90 /* prefs_widgets.h in Sources */,
 				1CCB5F821A62A724004C3E90 /* prefs_widgets.m in Sources */,
 				1CCB5F831A62A724004C3E90 /* prefs.h in Sources */,

@@ -23,12 +23,12 @@
 
 #import "misc.h"    /* VLCByteCountFormatter */
 
-#import "playlist.h"
+#import "VLCPlaylist.h"
 #import "StringUtility.h"
 #import "intf.h"
 #import "ControlsBar.h"
 #import "MainMenu.h"
-#import "playlistinfo.h"
+#import "VLCPlaylistInfo.h"
 #import "MainWindow.h"
 
 #ifdef HAVE_CONFIG_H

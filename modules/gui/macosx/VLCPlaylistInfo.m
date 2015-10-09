@@ -1,5 +1,5 @@
 /*****************************************************************************
- * playlistinfo.m: MacOS X interface module
+ * VLCPlaylistInfo.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
@@ -24,8 +24,8 @@
 
 #import "CompatibilityFixes.h"
 #import "intf.h"
-#import "playlistinfo.h"
-#import "playlist.h"
+#import "VLCPlaylistInfo.h"
+#import "VLCPlaylist.h"
 #import <vlc_url.h>
 
 @interface VLCInfo () <NSOutlineViewDataSource, NSOutlineViewDelegate>
@@ -529,4 +529,3 @@ error:
 }
 
 @end
-

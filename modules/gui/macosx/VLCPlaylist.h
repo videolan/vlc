@@ -1,5 +1,5 @@
 /*****************************************************************************
- * playlist.h: MacOS X interface module
+ * VLCPlaylist.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
@@ -25,7 +25,7 @@
 
 #import "PXSourceList.h"
 #import "PLModel.h"
-#import "playlistview.h"
+#import "VLCPlaylistView.h"
 
 @interface VLCPlaylist : NSObject<NSOutlineViewDelegate>
 

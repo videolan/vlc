@@ -1,5 +1,5 @@
 /*****************************************************************************
- * playlist.m: MacOS X interface module
+ * VLCPlaylist.m: MacOS X interface module
  *****************************************************************************
 * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
@@ -42,9 +42,9 @@
 #import "CompatibilityFixes.h"
 
 #import "intf.h"
-#import "playlist.h"
+#import "VLCPlaylist.h"
 #import "MainMenu.h"
-#import "playlistinfo.h"
+#import "VLCPlaylistInfo.h"
 #import "ResumeDialogController.h"
 
 #include <vlc_keys.h>

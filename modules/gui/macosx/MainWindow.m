@@ -32,7 +32,7 @@
 #import "AudioEffects.h"
 #import "MainMenu.h"
 #import "open.h"
-#import "playlist.h"
+#import "VLCPlaylist.h"
 #import "SideBarItem.h"
 #import <math.h>
 #import <vlc_playlist.h>
