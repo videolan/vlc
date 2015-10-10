@@ -139,7 +139,7 @@
                                  "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
                                  "underline; color:#0057ae;\">Help and join us!</span></a>"));
     NSString *fontfamily;
-    if (OSX_YOSEMITE)
+    if (OSX_YOSEMITE || OSX_EL_CAPITAN)
         fontfamily = @"Helvetica Neue";
     else
         fontfamily = @"Lucida Grande";
