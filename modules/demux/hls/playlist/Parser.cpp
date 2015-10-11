@@ -29,6 +29,7 @@
 #include "../adaptative/playlist/SegmentList.h"
 #include "../adaptative/tools/Retrieve.hpp"
 #include "../adaptative/tools/Helper.h"
+#include "../HLSStreamFormat.hpp"
 #include "M3U8.hpp"
 #include "Tags.hpp"
 
@@ -37,6 +38,8 @@
 #include <cstdio>
 #include <sstream>
 #include <map>
+#include <cctype>
+#include <algorithm>
 
 using namespace adaptative;
 using namespace adaptative::playlist;
@@ -68,6 +71,55 @@ static void releaseTagsList(std::list<Tag *> &list)
     for(it = list.begin(); it != list.end(); ++it)
         delete *it;
     list.clear();
+}
+
+void M3U8Parser::setFormatFromCodecs(Representation *rep, const std::string codecsstring)
+{
+    std::list<std::string> codecs;
+    std::list<std::string> tokens = Helper::tokenize(codecsstring, ',');
+    std::list<std::string>::const_iterator it;
+    for(it=tokens.begin(); it!=tokens.end(); ++it)
+    {
+        /* Truncate init data */
+        std::size_t pos = (*it).find_first_of('.', 0);
+        if(pos != std::string::npos)
+            codecs.push_back((*it).substr(0, pos));
+        else
+            codecs.push_back(*it);
+    }
+
+    if(!codecs.empty())
+    {
+        if(codecs.size() == 1)
+        {
+            std::string codec = codecs.front();
+            transform(codec.begin(), codec.end(), codec.begin(), (int (*)(int))std::tolower);
+            if(codec == "mp4a")
+                rep->streamFormat = StreamFormat(HLSStreamFormat::PACKEDAAC);
+        }
+        else
+        {
+            rep->streamFormat = StreamFormat(HLSStreamFormat::MPEG2TS);
+        }
+    }
+}
+
+void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &filename)
+{
+    std::size_t pos = filename.find_last_of('.');
+    if(pos != std::string::npos)
+    {
+        std::string extension = filename.substr(pos + 1);
+        transform(extension.begin(), extension.end(), extension.begin(), (int (*)(int))std::tolower);
+        if(extension == "aac")
+        {
+            rep->streamFormat = StreamFormat(HLSStreamFormat::PACKEDAAC);
+        }
+        else if(extension == "ts" || extension == "mp2t" || extension == "mpeg")
+        {
+            rep->streamFormat = StreamFormat(HLSStreamFormat::MPEG2TS);
+        }
+    }
 }
 
 Representation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag)
@@ -105,22 +157,7 @@ Representation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, c
             rep->setBandwidth(bwAttr->decimal());
 
         if(codecsAttr)
-        {
-            std::list<std::string> list = Helper::tokenize(codecsAttr->quotedString(), ',');
-            std::list<std::string>::const_iterator it;
-            for(it=list.begin(); it!=list.end(); ++it)
-            {
-                std::size_t pos = (*it).find_first_of('.', 0);
-                if(pos != std::string::npos)
-                    rep->addCodec((*it).substr(0, pos));
-                else
-                    rep->addCodec(*it);
-            }
-        }
-
-        /* if more than 1 codec, don't probe, can't be packed audio */
-        if(rep->getCodecs().size() > 1)
-            rep->setMimeType("video/mp2t");
+            setFormatFromCodecs(rep, codecsAttr->quotedString());
 
         if(resAttr)
         {
@@ -219,6 +256,8 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                     break;
 
                 segment->setSourceUrl(uritag->getValue().value);
+                if((unsigned)rep->getStreamFormat() == HLSStreamFormat::UNKNOWN)
+                    setFormatFromExtension(rep, uritag->getValue().value);
 
                 if(ctx_extinf)
                 {
@@ -417,7 +456,7 @@ M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
                 if(pair.second->getAttributeByName("TYPE")->value != "AUDIO" &&
                    pair.second->getAttributeByName("TYPE")->value != "VIDEO")
                 {
-                    rep->setMimeType("application/binary");
+                    rep->streamFormat = StreamFormat(HLSStreamFormat::UNSUPPORTED);
                 }
 
                 if(pair.second->getAttributeByName("LANGUAGE"))

@@ -31,24 +31,8 @@ namespace hls
     {
         public:
             static const unsigned UNKNOWN   = StreamFormat::UNSUPPORTED + 1; /* will probe */
-            static const unsigned MPEG2TS   = StreamFormat::UNSUPPORTED + 1;
-            static const unsigned PACKEDAAC = StreamFormat::UNSUPPORTED + 2;
-
-            static StreamFormat mimeToFormat(const std::string &mime)
-            {
-                std::string::size_type pos = mime.find("/");
-                if(pos != std::string::npos)
-                {
-                    std::string tail = mime.substr(pos + 1);
-                    if(tail == "aac")
-                        return StreamFormat(HLSStreamFormat::PACKEDAAC);
-                    else if (tail == "mp2t")
-                        return StreamFormat(HLSStreamFormat::MPEG2TS);
-                    else if (tail == "binary")
-                        return StreamFormat(HLSStreamFormat::UNSUPPORTED);
-                }
-                return StreamFormat();
-            }
+            static const unsigned MPEG2TS   = StreamFormat::UNSUPPORTED + 2;
+            static const unsigned PACKEDAAC = StreamFormat::UNSUPPORTED + 3;
     };
 
 }

@@ -43,6 +43,7 @@ Representation::Representation  ( BaseAdaptationSet *set ) :
     b_loaded = false;
     switchpolicy = SegmentInformation::SWITCH_SEGMENT_ALIGNED; /* FIXME: based on streamformat */
     nextPlaylistupdate = 0;
+    streamFormat = HLSStreamFormat::UNKNOWN;
 }
 
 Representation::~Representation ()
@@ -51,10 +52,7 @@ Representation::~Representation ()
 
 StreamFormat Representation::getStreamFormat() const
 {
-    if(getMimeType().empty())
-        return StreamFormat(HLSStreamFormat::UNKNOWN);
-    else
-        return HLSStreamFormat::mimeToFormat(getMimeType());
+    return streamFormat;
 }
 
 bool Representation::isLive() const

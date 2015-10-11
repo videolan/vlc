@@ -61,7 +61,6 @@ namespace hls
 
             protected:
                 virtual void onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *); /* reimpl */
-                void checkFormat(block_t *, SegmentChunk *, BaseRepresentation *);
 
                 SegmentEncryption encryption;
 #ifdef HAVE_GCRYPT

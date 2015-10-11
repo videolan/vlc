@@ -23,6 +23,7 @@
 
 #include "../adaptative/playlist/BaseRepresentation.h"
 #include "../adaptative/tools/Properties.hpp"
+#include "../HLSStreamFormat.hpp"
 
 namespace hls
 {
@@ -52,6 +53,7 @@ namespace hls
                 virtual void getDurationsRange(mtime_t *, mtime_t *) const; /* reimpl */
 
             private:
+                StreamFormat streamFormat;
                 bool b_live;
                 bool b_loaded;
                 mtime_t nextPlaylistupdate;

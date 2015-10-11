@@ -52,26 +52,9 @@ HLSSegment::~HLSSegment()
 #endif
 }
 
-void HLSSegment::checkFormat(block_t *p_block, SegmentChunk *, BaseRepresentation *rep)
-{
-    if(rep->getStreamFormat() == StreamFormat(HLSStreamFormat::UNKNOWN))
-    {
-        if(p_block->i_buffer > 3 && !memcmp(p_block->p_buffer, "ID3", 3))
-        {
-            rep->setMimeType("audio/aac");
-        }
-        else
-        {
-            rep->setMimeType("video/mp2t");
-        }
-    }
-}
-
-void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRepresentation *rep)
+void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRepresentation *)
 {
     block_t *p_block = *pp_block;
-
-    checkFormat(p_block, chunk, rep);
 
 #ifdef HAVE_GCRYPT
     if(encryption.method == SegmentEncryption::AES_128)
