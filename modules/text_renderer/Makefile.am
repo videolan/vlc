@@ -42,6 +42,12 @@ libnsspeechsynthesizer_plugin_la_LDFLAGS = -Wl,-framework,Cocoa
 text_LTLIBRARIES += libnsspeechsynthesizer_plugin.la
 endif
 
+libsapi_plugin_la_SOURCES = text_renderer/sapi.cpp
+libsapi_plugin_la_LIBADD = -lole32
+if HAVE_WIN32
+text_LTLIBRARIES += libsapi_plugin.la
+endif
+
 libsvg_plugin_la_SOURCES = text_renderer/svg.c
 libsvg_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SVG_CFLAGS)
 libsvg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(textdir)'

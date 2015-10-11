@@ -163,6 +163,7 @@ Misc
  * remove ZPL playlist format
  * Update libVLC doxygen modules
  * Add a text-to-speech renderer for subtitles on OS X/iOS
+ * Add a text-to-speech renderer for subtitles on Windows
 
 Removed modules
  * Atmo video filter
