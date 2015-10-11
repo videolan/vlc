@@ -70,7 +70,7 @@ struct filter_sys_t
 /* MTA functions */
 static int TryEnterMTA(vlc_object_t *obj)
 {
-    HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (unlikely(FAILED(hr)))
     {
         msg_Err (obj, "cannot initialize COM (error 0x%lx)", hr);
@@ -82,7 +82,7 @@ static int TryEnterMTA(vlc_object_t *obj)
 
 static void EnterMTA(void)
 {
-    HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (unlikely(FAILED(hr)))
         abort();
 }
@@ -105,16 +105,16 @@ static int Create (vlc_object_t *p_this)
     if (!p_sys)
         goto error;
 
-    p_sys->cpVoice = nullptr;
-    p_sys->lastString = nullptr;
+    p_sys->cpVoice = NULL;
+    p_sys->lastString = NULL;
 
-    hr = CoCreateInstance(CLSID_SpVoice, nullptr, CLSCTX_INPROC_SERVER, IID_ISpVoice, (void**) &p_sys->cpVoice);
+    hr = CoCreateInstance(CLSID_SpVoice, NULL, CLSCTX_INPROC_SERVER, IID_ISpVoice, (void**) &p_sys->cpVoice);
     if (SUCCEEDED(hr)) {
-        ISpObjectToken*        cpVoiceToken = nullptr;
-        IEnumSpObjectTokens*   cpEnum = nullptr;
+        ISpObjectToken*        cpVoiceToken = NULL;
+        IEnumSpObjectTokens*   cpEnum = NULL;
         ULONG ulCount = 0;
 
-        hr = SpEnumTokens(SPCAT_VOICES, nullptr, nullptr, &cpEnum);
+        hr = SpEnumTokens(SPCAT_VOICES, NULL, NULL, &cpEnum);
         if (SUCCEEDED(hr))
         {
             // Get the number of voices.
@@ -135,7 +135,7 @@ static int Create (vlc_object_t *p_this)
                                 msg_Err(p_this, "Failed to set voice %d", voiceIndex);
                             }
                             cpVoiceToken->Release();
-                            cpVoiceToken = nullptr;
+                            cpVoiceToken = NULL;
                         }
                     }
                     else
@@ -143,10 +143,9 @@ static int Create (vlc_object_t *p_this)
                 }
             }
             cpEnum->Release();
-            cpEnum = nullptr;
 
             /* Set Output */
-            hr = p_sys->cpVoice->SetOutput(nullptr, TRUE);
+            hr = p_sys->cpVoice->SetOutput(NULL, TRUE);
         }
     }
     else
@@ -172,63 +171,53 @@ static void Destroy(vlc_object_t *p_this)
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if (p_sys->cpVoice) {
+    if (p_sys->cpVoice)
         p_sys->cpVoice->Release();
-        p_sys->cpVoice = nullptr;
-    }
 
-    if (p_sys->lastString) {
-        free(p_sys->lastString);
-        p_sys->lastString = nullptr;
-    }
-
+    free(p_sys->lastString);
     free(p_sys);
 }
 
 static int RenderText(filter_t *p_filter,
-        subpicture_region_t *p_region_out,
+        subpicture_region_t *,
         subpicture_region_t *p_region_in,
-        const vlc_fourcc_t *p_chroma_list)
+        const vlc_fourcc_t *)
 {
-    VLC_UNUSED(p_region_out);
-    VLC_UNUSED(p_chroma_list);
-
     filter_sys_t *p_sys = p_filter->p_sys;
     text_segment_t *p_segment = p_region_in->p_text;
 
     if (!p_segment)
         return VLC_EGENERIC;
 
-    for (const text_segment_t *s = p_segment; s != nullptr; s = s->p_next ) {
-        if (!s->psz_text )
+    for (const text_segment_t *s = p_segment; s != NULL; s = s->p_next ) {
+        if (!s->psz_text)
             continue;
 
         if (strlen(s->psz_text) == 0)
             continue;
 
-        try {
-            if (p_sys->lastString && !strcmp(p_sys->lastString, s->psz_text))
-                continue;
+        if (p_sys->lastString && !strcmp(p_sys->lastString, s->psz_text))
+            continue;
 
-            if (!strcmp(s->psz_text, "\n"))
-                continue;
+        if (!strcmp(s->psz_text, "\n"))
+            continue;
 
-            p_sys->lastString = strdup(s->psz_text);
-            if (p_sys->lastString) {
-                msg_Dbg(p_filter, "Speaking '%s'", s->psz_text);
+        /* */
+        free(p_sys->lastString);
+        p_sys->lastString = strdup(s->psz_text);
 
-                EnterMTA();
-                wchar_t* wideText = ToWide(s->psz_text);
-                HRESULT hr = p_sys->cpVoice->Speak(wideText, SPF_ASYNC, nullptr);
-                free(wideText);
-                if (!SUCCEEDED(hr)) {
-                    msg_Err(p_filter, "Speak() error");
-                }
-                LeaveMTA();
+        /* */
+        if (p_sys->lastString) {
+            msg_Dbg(p_filter, "Speaking '%s'", s->psz_text);
+
+            EnterMTA();
+            wchar_t* wideText = ToWide(s->psz_text);
+            HRESULT hr = p_sys->cpVoice->Speak(wideText, SPF_ASYNC, NULL);
+            free(wideText);
+            if (!SUCCEEDED(hr)) {
+                msg_Err(p_filter, "Speak() error");
             }
-        }
-        catch (...) {
-            msg_Err(p_filter, "Caught an exception!");
+            LeaveMTA();
         }
     }
 
