@@ -172,7 +172,7 @@ int HTTPConnection::parseReply()
     if (replycode != 200 && replycode != 206)
         return VLC_ENOOBJ;
 
-    readLine();
+    line = readLine();
 
     while(!line.empty() && line.compare("\r\n"))
     {
