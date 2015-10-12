@@ -26,6 +26,9 @@
 #include <vlc_es.h>
 #include <vlc_codecs.h>
 
+/* Use alias for scaled time */
+typedef int64_t stime_t;
+
 #define BLOCK16x16 (1<<16)
 
 #define MAJOR_3gp4 VLC_FOURCC( '3', 'g', 'p', '4' )
