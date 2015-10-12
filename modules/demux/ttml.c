@@ -204,7 +204,7 @@ static int ReadTTML( demux_t* p_demux )
     const char* psz_name;
     int i_max_sub = 0;
     int i_type;
-    
+
     do
     {
         i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
@@ -215,12 +215,12 @@ static int ReadTTML( demux_t* p_demux )
         {
             p_sys->b_has_head = true;
         }
-        else if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_name, "p" ) || !strcasecmp( psz_name, "tt:p" ) ) ) 
+        else if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_name, "p" ) || !strcasecmp( psz_name, "tt:p" ) ) )
         {
             char* psz_text = NULL;
             char* psz_begin = NULL;
             char* psz_end = NULL;
-            
+
             if( asprintf ( &psz_text, "<%s", psz_name ) < 0 )
                 return VLC_ENOMEM;
             const char* psz_attr_value = NULL;
@@ -264,7 +264,7 @@ static int ReadTTML( demux_t* p_demux )
                     }
                 }
                 subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
-                
+
                 Convert_time( &p_subtitle->i_start, psz_begin );
                 Convert_time( &p_subtitle->i_stop, psz_end );
                 free( psz_begin );
@@ -289,7 +289,7 @@ static int ReadTTML( demux_t* p_demux )
                             return VLC_ENOMEM;
                         psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
                         while ( psz_attr_name && psz_attr_value )
-                        {   
+                        {
                             psz_text = Append( psz_text, " %s=\"%s\"", psz_attr_name, psz_attr_value );
                             if ( unlikely( psz_text == NULL ) )
                                 return VLC_ENOMEM;
@@ -301,7 +301,7 @@ static int ReadTTML( demux_t* p_demux )
                             if ( unlikely( psz_text == NULL ) )
                                 return VLC_ENOMEM;
                         }
-                        else 
+                        else
                         {
                             psz_text = Append( psz_text, ">" );
                             if ( unlikely( psz_text == NULL ) )
@@ -338,7 +338,7 @@ static int Demux( demux_t* p_demux )
     demux_sys_t* p_sys = p_demux->p_sys;
     if( p_sys->i_subtitle >= p_sys->i_subtitles )
         return 0;
-    
+
     while ( p_sys->i_subtitle < p_sys->i_subtitles &&
             p_sys->subtitle[p_sys->i_subtitle].i_start < p_sys->i_next_demux_time )
     {
