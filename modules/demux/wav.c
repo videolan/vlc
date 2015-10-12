@@ -272,7 +272,7 @@ static int Open( vlc_object_t * p_this )
         }
     }
     else if( GetWLE( &p_wf->wFormatTag ) == WAVE_FORMAT_PCM &&
-             p_sys->fmt.audio.i_channels > 2 && p_sys->fmt.audio.i_channels <= 9 )
+             p_sys->fmt.audio.i_channels > 2 && p_sys->fmt.audio.i_channels <= AOUT_CHAN_MAX )
     {
         for( int i = 0; i < p_sys->fmt.audio.i_channels; i++ )
             p_sys->i_channel_mask |= pi_channels_aout[i];
