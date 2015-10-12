@@ -23,13 +23,16 @@
 #endif
 
 #include <string.h>
+#include <assert.h>
 
 char * strnstr (const char *haystack, const char *needle, size_t len)
 {
-    if(!needle || !*needle)
-        return (char*)haystack;
+    assert(needle != NULL);
 
     const size_t i = strlen(needle);
+    if (i == 0) /* corner case (if haystack is NULL, memcmp not allowed) */
+        return (char *)haystack;
+
     if( len < i )
       return NULL;
     
