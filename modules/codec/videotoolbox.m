@@ -561,14 +561,14 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             case -12210:
                 msg_Err(p_dec, "Insufficient authorization to create decoder");
                 break;
+            case -8973:
+                msg_Err(p_dec, "Could not select and open decoder instance");
+                break;
 
             default:
                 msg_Err(p_dec, "Decompression session creation failed (%i)", status);
                 break;
         }
-        /* an invalid session is an inrecoverable failure */
-        p_dec->b_error = true;
-
         return VLC_EGENERIC;
     }
 
