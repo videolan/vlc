@@ -577,13 +577,6 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     p_dec->fmt_out.video.i_sar_den = i_sar_den;
     p_dec->fmt_out.video.i_sar_num = i_sar_num;
 
-    /* fix the demuxer's findings are NULL, we assume that video dimensions
-     * and visible video dimensions are the same */
-    if (!p_dec->fmt_in.video.i_visible_width)
-        p_dec->fmt_in.video.i_visible_width = i_video_width;
-    if (!p_dec->fmt_in.video.i_visible_height)
-        p_dec->fmt_in.video.i_visible_height = i_video_height;
-
     if (p_block) {
         /* this is a mid stream change so we need to tell the core about it */
         decoder_UpdateVideoFormat(p_dec);
@@ -664,7 +657,9 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
 
     /* return our proper VLC internal state */
-    p_dec->fmt_out.i_cat = VIDEO_ES;
+    p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
+    p_dec->fmt_out.video = p_dec->fmt_in.video;
+    p_dec->fmt_out.audio = p_dec->fmt_in.audio;
     if (p_sys->b_zero_copy) {
         msg_Dbg(p_dec, "zero-copy rendering pipeline enabled");
         p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_OPAQUE;
