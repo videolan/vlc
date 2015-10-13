@@ -261,7 +261,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->b_delayed_open )
         goto end;
 
-    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+    if( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) )
     {
         avcodec_flush_buffers( ctx );
         date_Set( &p_sys->end_date, VLC_TS_INVALID );
@@ -272,9 +272,9 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 
         goto end;
     }
-
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
     {
+        avcodec_flush_buffers( ctx );
         date_Set( &p_sys->end_date, VLC_TS_INVALID );
     }
 

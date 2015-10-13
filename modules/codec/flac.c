@@ -500,15 +500,10 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( !pp_block || !*pp_block )
         return NULL;
-    if( (*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
+    if( (*pp_block)->i_flags&(BLOCK_FLAG_CORRUPTED) )
     {
-        date_Set( &p_sys->end_date, 0 );
-        if( (*pp_block)->i_flags & BLOCK_FLAG_CORRUPTED )
-        {
-            block_Release( *pp_block );
-            *pp_block = NULL;
-            return NULL;
-        }
+        block_Release( *pp_block );
+        return NULL;
     }
 
     if( !p_sys->b_stream_info )

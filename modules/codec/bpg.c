@@ -96,13 +96,18 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     BPGImageInfo img_info;
 
     if( !pp_block || !*pp_block )
+    {
         return NULL;
+    }
 
     p_block = *pp_block;
-    *pp_block = NULL;
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-        goto error;
+    {
+        block_Release(p_block);
+        *pp_block = NULL;
+        return NULL;
+    }
 
     /* Decode picture */
 
@@ -158,10 +163,15 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_pic->date = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
 
     block_Release( p_block );
+    *pp_block = NULL;
+
     return p_pic;
 
 error:
+
     block_Release( p_block );
+    *pp_block = NULL;
+
     return NULL;
 }
 

@@ -200,19 +200,18 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     block_t *p_block = pp_block ? *pp_block : NULL;
 
-    if (p_block)
-    {
-        if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    if (p_block) {
+        if( p_block->i_flags&(BLOCK_FLAG_CORRUPTED) )
+        {
+            p_sys->i_state = STATE_NOSYNC;
+            block_BytestreamEmpty( &p_sys->bytestream );
+            date_Set( &p_sys->end_date, 0 );
+            block_Release( p_block );
+            return NULL;
+        }
+        if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         {
             date_Set( &p_sys->end_date, 0 );
-            if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-            {
-                p_sys->i_state = STATE_NOSYNC;
-                block_BytestreamEmpty( &p_sys->bytestream );
-                block_Release( p_block );
-                *pp_block = NULL;
-                return NULL;
-            }
             p_sys->b_discontinuity = true;
         }
 
