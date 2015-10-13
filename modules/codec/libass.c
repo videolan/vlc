@@ -226,7 +226,7 @@ static int Create( vlc_object_t *p_this )
                                _( "Please wait while your font cache is rebuilt.\n"
                                   "This should take less than a minute." ), NULL );
 #endif
-    ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 1 );  // setup default font/family
+    ass_set_fonts( p_renderer, psz_font, psz_family, 1, NULL, 1 );  // setup default font/family
 #if defined(_WIN32) || defined(__APPLE__)
     if( p_dialog )
     {
@@ -236,7 +236,7 @@ static int Create( vlc_object_t *p_this )
 #endif
 #else
     /* FIXME you HAVE to give him a font if no fontconfig */
-    ass_set_fonts( p_renderer, psz_font, psz_family, false, NULL, 1 );
+    ass_set_fonts( p_renderer, psz_font, psz_family, 1, NULL, 1 );
 #endif
 
     /* Add a track */
