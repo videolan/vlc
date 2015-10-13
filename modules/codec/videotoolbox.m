@@ -632,6 +632,9 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
 #endif
 
+    if (p_dec->fmt_in.i_cat != VIDEO_ES)
+        return VLC_EGENERIC;
+
     /* check quickly if we can digest the offered data */
     CMVideoCodecType codec;
     codec = CodecPrecheck(p_dec);
