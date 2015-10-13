@@ -93,7 +93,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         goto error;
     }
 
-    if( p_block->i_flags & ( BLOCK_FLAG_CORRUPTED ) )
+    if( p_block->i_flags & ( BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED ) )
     {
         date_Set( &p_sys->end_date, 0 );
         goto error;

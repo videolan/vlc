@@ -199,7 +199,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 
     p_block = *pp_block;
 
-    if (p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+    if (p_block->i_flags & BLOCK_FLAG_DISCONTINUITY)
     {
         block_Release(p_block);
         *pp_block = NULL;

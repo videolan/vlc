@@ -130,7 +130,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( stream != NULL
      && p_block->i_buffer > 0
-     && !(p_block->i_flags & (BLOCK_FLAG_CORRUPTED)) )
+     && !(p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) )
     {
         fwrite( p_block->p_buffer, 1, p_block->i_buffer, stream );
         msg_Dbg( p_dec, "dumped %zu bytes", p_block->i_buffer );
