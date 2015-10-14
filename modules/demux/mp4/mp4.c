@@ -670,6 +670,13 @@ static int Open( vlc_object_t * p_this )
 
             if ( p_sys->b_fragmented && !p_sys->i_overall_duration )
                 ProbeFragments( p_demux, true );
+
+            MP4_Box_t *p_mdat = MP4_BoxGet( p_sys->p_root, "mdat" );
+            if ( p_mdat )
+            {
+                stream_Seek( p_demux->s, p_mdat->i_pos );
+                msg_Dbg( p_demux, "rewinding to mdat %"PRId64, p_mdat->i_pos );
+            }
         }
         else
             p_sys->b_fragmented = true;
@@ -4457,13 +4464,6 @@ static int ProbeFragments( demux_t *p_demux, bool b_force )
         if ( p_moof->i_type == ATOM_moof )
             AddFragment( p_demux, p_moof );
         p_moof = p_moof->p_next;
-    }
-
-    MP4_Box_t *p_mdat = MP4_BoxGet( p_sys->p_root, "mdat" );
-    if ( p_mdat )
-    {
-        stream_Seek( p_demux->s, p_mdat->i_pos );
-        msg_Dbg( p_demux, "rewinding to mdat %"PRId64, p_mdat->i_pos );
     }
 
     return VLC_SUCCESS;
