@@ -84,7 +84,6 @@ struct demux_sys_t
     bool         b_fastseekable;
     bool         b_seekmode;
     bool         b_smooth;       /* Is it Smooth Streaming? */
-    bool         b_dash;
 
     bool            b_index_probed;
     bool            b_fragments_probed;
@@ -636,7 +635,6 @@ static int Open( vlc_object_t * p_this )
                 break;
             case MAJOR_dash:
                 msg_Dbg( p_demux, "DASH Stream file" );
-                p_sys->b_dash = true;
                 break;
             default:
                 msg_Dbg( p_demux,
@@ -650,7 +648,6 @@ static int Open( vlc_object_t * p_this )
             if (BOXDATA(p_ftyp)->i_compatible_brands[i] == MAJOR_dash)
             {
                 msg_Dbg( p_demux, "DASH Stream file" );
-                p_sys->b_dash = true;
             }
         }
     }
