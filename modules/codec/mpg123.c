@@ -188,7 +188,9 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     i_err = mpg123_decode_frame( p_sys->p_handle, NULL, NULL, NULL );
     if( i_err != MPG123_OK )
     {
-        if( i_err != MPG123_NEW_FORMAT )
+        if( i_err == MPG123_NEED_MORE )
+            msg_Dbg( p_dec, "mpg123_decode_frame: %s", mpg123_plain_strerror( i_err ) );
+        else if( i_err != MPG123_NEW_FORMAT )
             msg_Err( p_dec, "mpg123_decode_frame error: %s", mpg123_plain_strerror( i_err ) );
         block_Release( p_out );
         goto error;
