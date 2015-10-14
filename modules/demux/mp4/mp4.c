@@ -661,7 +661,7 @@ static int Open( vlc_object_t * p_this )
 
     if( MP4_BoxCount( p_sys->p_root, "/moov/mvex" ) > 0 )
     {
-        if ( p_sys->b_seekable && !p_sys->b_smooth && !p_sys->b_dash )
+        if ( p_sys->b_seekable && !p_sys->b_smooth )
         {
             /* Probe remaining to check if there's really fragments
                or if that file is just ready to append fragments */
