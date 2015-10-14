@@ -87,6 +87,7 @@ struct MediaServerDesc
     std::string friendlyName;
     std::string location;
     input_item_t* inputItem;
+    bool isSatIp;
 };
 
 

@@ -42,6 +42,19 @@
 */
 const char* MEDIA_SERVER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:1";
 const char* CONTENT_DIRECTORY_SERVICE_TYPE = "urn:schemas-upnp-org:service:ContentDirectory:1";
+const char* SATIP_SERVER_DEVICE_TYPE = "urn:ses-com:device:SatIPServer:1";
+
+#define SATIP_SATELLITE N_("SAT>IP satellite")
+#define SATIP_SATELLITE_LONG N_( "VLC will download the channel list for SAT>IP " \
+"playback based on the chosen satellite.")
+static const char *const ppsz_satip_satellites[] = {
+    "ASTRA_19_2E", "ASTRA_28_2E", "ASTRA_23_5E", "eutelsat_13_0E", "eutelsat_09_0E",
+    "eutelsat_05_0W", "hispasat_30_0W"
+};
+static const char *const ppsz_readible_satip_satellites[] = {
+    "Astra 19.2°E", "Astra 28.2°E", "Astra 23.5°E", "Eutelsat 13.0°E", "Eutelsat 09.0°E",
+    "Eutelsat 05.0°W", "Hispasat 30.0°W"
+};
 
 /*
  * VLC handle
@@ -88,6 +101,12 @@ vlc_module_begin()
     set_subcategory( SUBCAT_PLAYLIST_SD );
     set_capability( "services_discovery", 0 );
     set_callbacks( SD::Open, SD::Close );
+
+    set_description( N_("SAT>IP") )
+    add_string( "satip-satellite", "ASTRA_19_2E", SATIP_SATELLITE,
+                SATIP_SATELLITE_LONG, false )
+    change_string_list( ppsz_satip_satellites, ppsz_readible_satip_satellites )
+    change_safe ()
 
     add_submodule()
         set_category( CAT_INPUT )
@@ -213,6 +232,16 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    /* Search for Sat Ip servers*/
+    i_res = UpnpSearchAsync( p_sys->p_upnp->handle(), 5,
+            SATIP_SERVER_DEVICE_TYPE, p_sys->p_upnp );
+    if( i_res != UPNP_E_SUCCESS )
+    {
+        msg_Err( p_sd, "Error sending search request: %s", UpnpGetErrorMessage( i_res ) );
+        Close( p_this );
+        return VLC_EGENERIC;
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -235,6 +264,7 @@ MediaServerDesc::MediaServerDesc(const std::string& udn, const std::string& fNam
     , friendlyName( fName )
     , location( loc )
     , inputItem( NULL )
+    , isSatIp( false )
 {
 }
 
@@ -268,19 +298,27 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
 
     msg_Dbg( p_sd_, "Adding server '%s' with uuid '%s'", desc->friendlyName.c_str(), desc->UDN.c_str() );
 
-    char* psz_mrl;
-    if( asprintf(&psz_mrl, "upnp://%s?ObjectID=0", desc->location.c_str() ) < 0 )
-        return false;
+    if ( desc->isSatIp )
+    {
+        p_input_item = input_item_NewWithTypeExt( desc->location.c_str(), desc->friendlyName.c_str(), 0,
+                                                  NULL, 0, -1, ITEM_TYPE_NODE, 1);
+    } else {
+        char* psz_mrl;
+        if( asprintf(&psz_mrl, "upnp://%s?ObjectID=0", desc->location.c_str() ) < 0 )
+            return false;
 
-    p_input_item = input_item_NewWithTypeExt( psz_mrl, desc->friendlyName.c_str(), 0,
-                                              NULL, 0, -1, ITEM_TYPE_NODE, 1);
-    free( psz_mrl );
+        p_input_item = input_item_NewWithTypeExt( psz_mrl, desc->friendlyName.c_str(), 0,
+                                                  NULL, 0, -1, ITEM_TYPE_NODE, 1);
+        free( psz_mrl );
+    }
     if ( !p_input_item )
         return false;
+
     desc->inputItem = p_input_item;
     input_item_SetDescription( p_input_item, desc->UDN.c_str() );
     services_discovery_AddItem( p_sd_, p_input_item, NULL );
     list_.push_back( desc );
+
     return true;
 }
 
@@ -349,7 +387,9 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
         }
 
         if ( strncmp( MEDIA_SERVER_DEVICE_TYPE, psz_device_type,
-                strlen( MEDIA_SERVER_DEVICE_TYPE ) - 1 ) )
+                strlen( MEDIA_SERVER_DEVICE_TYPE ) - 1 )
+                && strncmp( SATIP_SERVER_DEVICE_TYPE, psz_device_type,
+                        strlen( SATIP_SERVER_DEVICE_TYPE ) - 1 ) )
             continue;
 
         const char* psz_udn = xml_getChildElementValue( p_device_element,
@@ -379,6 +419,65 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
 
         // We now have basic info, we need to get the content browsing url
         // so the access module can browse without fetching the manifest again
+
+        if ( !strncmp( SATIP_SERVER_DEVICE_TYPE, psz_device_type,
+                strlen( SATIP_SERVER_DEVICE_TYPE ) - 1 ) )
+        {
+            /* Check for SAT>IP m3u list, which is provided by some off-standard devices */
+            const char* psz_m3u_url = xml_getChildElementValue( p_device_element, "satip:X_SATIPM3U" );
+            SD::MediaServerDesc* p_server = NULL;
+            if ( psz_m3u_url ) {
+
+                if ( strncmp( "http://", psz_m3u_url, 7) && strncmp( "https://", psz_m3u_url, 8) )
+                {
+                    char* psz_url = NULL;
+                    if ( UpnpResolveURL2( psz_base_url, psz_m3u_url, &psz_url ) == UPNP_E_SUCCESS )
+                    {
+                        p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_url );
+                        free(psz_url);
+                    }
+                } else
+                    p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_m3u_url );
+
+                if ( unlikely( !p_server ) )
+                    break;
+
+                p_server->isSatIp = true;
+                if ( !addServer( p_server ) )
+                    delete p_server;
+            } else {
+                /* if no playlist is found, add a playlist from the web based on the chosen
+                 * satellite, which will be processed by a lua script a bit later */
+                char *psz_satellite = config_GetPsz(p_sd_, "satip-satellite");
+                if( !psz_satellite ) {
+                    break;
+                }
+                char *psz_url;
+                vlc_url_t url;
+                vlc_UrlParse( &url, psz_base_url );
+
+                if (asprintf( &psz_url, "http/lua://www.satip.info/Playlists/%s.m3u?device=%s",
+                             psz_satellite,
+                             url.psz_host ) < 0 ) {
+                    vlc_UrlClean( &url );
+                    free( psz_satellite );
+                    continue;
+                }
+                free( psz_satellite );
+                vlc_UrlClean( &url );
+
+                p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn,
+                                                                  psz_friendly_name, psz_url );
+
+                p_server->isSatIp = true;
+                if( !addServer( p_server ) ) {
+                    delete p_server;
+                }
+                free( psz_url );
+            }
+
+            continue;
+        }
 
         /* Check for ContentDirectory service. */
         IXML_NodeList* p_service_list = ixmlElement_getElementsByTagName( p_device_element, "service" );
