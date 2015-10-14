@@ -1262,7 +1262,7 @@ static int LeafSeekIntoFragment( demux_t *p_demux, mp4_fragment_t *p_fragment )
 static int LeafSeekToTime( demux_t *p_demux, mtime_t i_nztime )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    mp4_fragment_t *p_fragment;
+    mp4_fragment_t *p_fragment = NULL;
     uint64_t i64 = 0;
     if ( !p_sys->i_timescale || !p_sys->i_overall_duration || !p_sys->b_seekable )
          return VLC_EGENERIC;
