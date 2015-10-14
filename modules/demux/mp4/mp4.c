@@ -152,29 +152,17 @@ static void MP4ASF_ResetFrames( demux_sys_t *p_sys );
 
 static uint32_t stream_ReadU32( stream_t *s, void *p_read, uint32_t i_toread )
 {
-    uint32_t i_return = 0;
+    ssize_t i_return = 0;
     if ( i_toread > INT32_MAX )
     {
-        i_return = stream_Read( s, p_read, INT32_MAX );
+        i_return = stream_Read( s, p_read, (size_t) INT32_MAX );
         if ( i_return < INT32_MAX )
             return i_return;
         else
             i_toread -= INT32_MAX;
     }
-    i_return += stream_Read( s, (uint8_t *)p_read + i_return, (int32_t) i_toread );
+    i_return += stream_Read( s, (uint8_t *)p_read + i_return, (size_t) i_toread );
     return i_return;
-}
-
-static bool MP4_stream_Tell( stream_t *s, uint64_t *pi_pos )
-{
-    int64_t i_pos = stream_Tell( s );
-    if ( i_pos < 0 )
-        return false;
-    else
-    {
-        *pi_pos = (uint64_t) i_pos;
-        return true;
-    }
 }
 
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id )
@@ -1007,8 +995,7 @@ static int Demux( demux_t *p_demux )
         uint64_t i_current_pos;
 
         /* go,go go ! */
-        if ( !MP4_stream_Tell( p_demux->s, &i_current_pos ) )
-            goto end;
+        i_current_pos = stream_Tell( p_demux->s );
 
         if( i_current_pos != i_candidate_pos )
         {
@@ -4053,9 +4040,9 @@ static int ProbeIndex( demux_t *p_demux )
         return VLC_SUCCESS;
 
     i_stream_size = stream_Size( p_demux->s );
+    i_backup_pos = stream_Tell( p_demux->s );
     if ( ( i_stream_size >> 62 ) ||
          ( i_stream_size < MP4_MFRO_BOXSIZE ) ||
-         ( !MP4_stream_Tell( p_demux->s, &i_backup_pos ) ) ||
          ( stream_Seek( p_demux->s, i_stream_size - MP4_MFRO_BOXSIZE ) != VLC_SUCCESS )
        )
     {
@@ -4084,10 +4071,9 @@ static int ProbeIndex( demux_t *p_demux )
 static int ProbeFragments( demux_t *p_demux, bool b_force )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    uint64_t i_current_pos;
+    uint64_t i_current_pos = stream_Tell( p_demux->s );
 
-    if ( MP4_stream_Tell( p_demux->s, &i_current_pos ) )
-        msg_Dbg( p_demux, "probing fragments from %"PRId64, i_current_pos );
+    msg_Dbg( p_demux, "probing fragments from %"PRId64, i_current_pos );
 
     assert( p_sys->p_root );
 
@@ -4341,9 +4327,7 @@ static int LeafParseMDATwithMOOV( demux_t *p_demux )
     assert( p_sys->context.i_current_box_type == ATOM_mdat );
     assert( p_sys->context.p_fragment->p_moox->i_type == ATOM_moov );
 
-    uint64_t i_current_pos;
-    if ( !MP4_stream_Tell( p_demux->s, &i_current_pos ) )
-        return VLC_EGENERIC;
+    uint64_t i_current_pos = stream_Tell( p_demux->s );
 
     if ( p_sys->context.i_mdatbytesleft == 0 ) /* Start parsing new mdat */
     {
@@ -4354,9 +4338,8 @@ static int LeafParseMDATwithMOOV( demux_t *p_demux )
         if ( i_read < 8 || p_sys->context.i_mdatbytesleft < 8 ||
              VLC_FOURCC( mdat[4], mdat[5], mdat[6], mdat[7] ) != ATOM_mdat )
         {
-            uint64_t i_pos;
-            if ( !MP4_stream_Tell( p_demux->s, &i_pos ) )
-                msg_Err( p_demux, "No mdat atom at %"PRIu64, i_pos - __MAX( 0, i_read ) );
+            uint64_t i_pos = stream_Tell( p_demux->s );
+            msg_Err( p_demux, "No mdat atom at %"PRIu64, i_pos - __MAX( 0, i_read ) );
             return VLC_EGENERIC;
         }
         i_current_pos += 8;
@@ -4416,12 +4399,9 @@ static int LeafParseMDATwithMOOV( demux_t *p_demux )
 
                 if( !(p_block = MP4_Block_Read( p_demux, p_track, i_samplessize )) )
                 {
-                    uint64_t i_pos;
-                    if ( MP4_stream_Tell( p_demux->s, &i_pos ) )
-                    {
-                        p_sys->context.i_mdatbytesleft -= ( i_pos - i_current_pos );
-                        msg_Err( p_demux, "stream block error %"PRId64" %"PRId64, i_pos, i_pos - i_current_pos );
-                    }
+                    uint64_t i_pos = stream_Tell( p_demux->s );
+                    p_sys->context.i_mdatbytesleft -= ( i_pos - i_current_pos );
+                    msg_Err( p_demux, "stream block error %"PRId64" %"PRId64, i_pos, i_pos - i_current_pos );
                     goto error;
                 }
 
@@ -4671,16 +4651,14 @@ static int LeafParseMDATwithMOOF( demux_t *p_demux, MP4_Box_t *p_moof )
         if ( i_read < 8 || p_sys->context.i_mdatbytesleft < 8 ||
              VLC_FOURCC( mdat[4], mdat[5], mdat[6], mdat[7] ) != ATOM_mdat )
         {
-            if ( MP4_stream_Tell( p_demux->s, &i_pos ) )
-                msg_Err(p_demux, "No mdat atom at %"PRIu64, i_pos - i_read );
+            i_pos = stream_Tell( p_demux->s );
+            msg_Err(p_demux, "No mdat atom at %"PRIu64, i_pos - i_read );
             return VLC_EGENERIC;
         }
         p_sys->context.i_mdatbytesleft -= 8;
     }
 
-    if ( !MP4_stream_Tell( p_demux->s, &i_pos ) )
-        return VLC_EGENERIC;
-
+    i_pos = stream_Tell( p_demux->s );
     mp4_track_t *p_track = LeafGetTrackByTrunPos( p_demux, i_pos, p_moof->i_pos, p_moof->i_size );
     if( p_track )
     {
