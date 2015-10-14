@@ -612,14 +612,14 @@ static int Open( vlc_object_t * p_this )
         {
             case MAJOR_isom:
                 msg_Dbg( p_demux,
-                         "ISO Media file (isom) version %d.",
+                         "ISO Media (isom) version %d.",
                          BOXDATA(p_ftyp)->i_minor_version );
                 break;
             case MAJOR_3gp4:
             case MAJOR_3gp5:
             case MAJOR_3gp6:
             case MAJOR_3gp7:
-                msg_Dbg( p_demux, "3GPP Media file Release: %c",
+                msg_Dbg( p_demux, "3GPP Media Release: %c",
 #ifdef WORDS_BIGENDIAN
                         BOXDATA(p_ftyp)->i_major_brand
 #else
@@ -628,17 +628,17 @@ static int Open( vlc_object_t * p_this )
                         );
                 break;
             case MAJOR_qt__:
-                msg_Dbg( p_demux, "Apple QuickTime file" );
+                msg_Dbg( p_demux, "Apple QuickTime media" );
                 break;
             case MAJOR_isml:
-                msg_Dbg( p_demux, "PIFF (= isml = fMP4) file" );
+                msg_Dbg( p_demux, "PIFF (= isml = fMP4) media" );
                 break;
             case MAJOR_dash:
-                msg_Dbg( p_demux, "DASH Stream file" );
+                msg_Dbg( p_demux, "DASH Stream" );
                 break;
             default:
                 msg_Dbg( p_demux,
-                         "unrecognized major file specification (%4.4s).",
+                         "unrecognized major media specification (%4.4s).",
                           (char*)&BOXDATA(p_ftyp)->i_major_brand );
                 break;
         }
@@ -647,13 +647,13 @@ static int Open( vlc_object_t * p_this )
         {
             if (BOXDATA(p_ftyp)->i_compatible_brands[i] == MAJOR_dash)
             {
-                msg_Dbg( p_demux, "DASH Stream file" );
+                msg_Dbg( p_demux, "DASH Stream" );
             }
         }
     }
     else
     {
-        msg_Dbg( p_demux, "file type box missing (assuming ISO Media file)" );
+        msg_Dbg( p_demux, "file type box missing (assuming ISO Media)" );
     }
 
     if( MP4_BoxCount( p_sys->p_root, "/moov/mvex" ) > 0 )
