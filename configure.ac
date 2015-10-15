@@ -339,15 +339,12 @@ AM_CONDITIONAL(HAVE_ANDROID, test "${HAVE_ANDROID}" = "1")
 dnl Tizen (minimum SDK version: 2.3)
 AS_IF([test "$SYS" = linux],[
     AC_MSG_CHECKING([for Tizen])
-    AC_TRY_COMPILE([#include <tizen.h>
-#if !defined(TIZEN_SDK_MAJOR) && !defined(TIZEN_SDK_MINOR)
-# error Not Tizen
-#endif
-#if TIZEN_SDK_MAJOR < 2 || (TIZEN_SDK_MAJOR == 2 && TIZEN_SDK_MINOR < 3)
-# error Tizen SDK too old
-#endif
-    ],[],[
+    AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
+        [[#include <tizen.h>
+        ]],[[;]])
+    ],[
       HAVE_TIZEN="1"
+      AC_DEFINE([HAVE_TIZEN_SDK], [1], [Define to 1 if vlc is built against Tizen SDK])
       AC_MSG_RESULT([yes])
     ],[
       AC_MSG_RESULT([no])
