@@ -466,6 +466,7 @@ static char *DxDescribe(directx_sys_t *dx_sys)
         { 0x1106, "VIA" },
         { 0x8086, "Intel" },
         { 0x5333, "S3 Graphics" },
+        { 0x4D4F4351, "Qualcomm" },
         { 0, "" }
     };
 
