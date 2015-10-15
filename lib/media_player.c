@@ -1051,7 +1051,11 @@ void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
     var_SetString (p_mi, "window", "");
     var_SetAddress (p_mi, "drawable-nsobject", drawable);
 #else
-    (void) p_mi; (void)drawable;
+    (void)drawable;
+    libvlc_printerr ("can't set nsobject: APPLE build required");
+    assert(false);
+    var_SetString (p_mi, "vout", "none");
+    var_SetString (p_mi, "window", "none");
 #endif
 }
 
@@ -1075,7 +1079,11 @@ void * libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
 void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
                                   uint32_t drawable )
 {
-    (void) p_mi; (void)drawable;
+    (void)drawable;
+    libvlc_printerr ("can't set agl: use libvlc_media_player_set_nsobject instead");
+    assert(false);
+    var_SetString (p_mi, "vout", "none");
+    var_SetString (p_mi, "window", "none");
 }
 
 /**************************************************************************
@@ -1123,7 +1131,11 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
                    (drawable != NULL) ? "embed-hwnd,any" : "");
     var_SetInteger (p_mi, "drawable-hwnd", (uintptr_t)drawable);
 #else
-    (void) p_mi; (void) drawable;
+    (void) drawable;
+    libvlc_printerr ("can't set nsobject: WIN32 build required");
+    assert(false);
+    var_SetString (p_mi, "vout", "none");
+    var_SetString (p_mi, "window", "none");
 #endif
 }
 
@@ -1153,7 +1165,11 @@ void libvlc_media_player_set_android_context( libvlc_media_player_t *p_mi,
     var_SetAddress (p_mi, "android-jvm", p_jvm);
     var_SetAddress (p_mi, "drawable-androidwindow", p_awindow_handler);
 #else
-    (void) p_mi; (void) p_jvm; (void) p_awindow_handler;
+    (void) p_jvm; (void) p_awindow_handler;
+    libvlc_printerr ("can't set android context: ANDROID build required");
+    assert(false);
+    var_SetString (p_mi, "vout", "none");
+    var_SetString (p_mi, "window", "none");
 #endif
 }
 
