@@ -1010,7 +1010,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                                                            &i_formatSupport)) &&
                     ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
             {
-                msg_Dbg(vd, "Using pixel format %s", output_format->name );
+                msg_Dbg(vd, "Using pixel format %s with chroma %4.4s for source %4.4s", output_format->name, &output_format->fourcc, &i_src_chroma );
                 fmt->i_chroma = output_format->fourcc;
                 sys->picQuadConfig.textureFormat      = output_format->formatTexture;
                 sys->picQuadConfig.resourceFormatYRGB = output_format->formatY;
@@ -1031,7 +1031,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                                                            &i_formatSupport)) &&
                     ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
             {
-                msg_Dbg(vd, "Using pixel format %s", output_format->name );
+                msg_Dbg(vd, "Using pixel format %s for chroma %4.4s", output_format->name, &output_format->fourcc );
                 fmt->i_chroma = output_format->fourcc;
                 sys->picQuadConfig.textureFormat      = output_format->formatTexture;
                 sys->picQuadConfig.resourceFormatYRGB = output_format->formatY;
