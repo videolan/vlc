@@ -116,9 +116,8 @@ static int AStreamRefillStream(stream_t *s)
     int i_toread =
         __MIN(sys->i_used, STREAM_CACHE_TRACK_SIZE -
                (tk->i_end - tk->i_start - sys->i_offset));
-    bool b_read = false;
 
-    if (i_toread <= 0) return VLC_EGENERIC; /* EOF */
+    if (i_toread <= 0) return VLC_SUCCESS; /* EOF */
 
 #ifdef STREAM_DEBUG
     msg_Dbg(s, "AStreamRefillStream: used=%d toread=%d",
@@ -143,12 +142,7 @@ static int AStreamRefillStream(stream_t *s)
             continue;
         }
         else if (i_read == 0)
-        {
-            if (!b_read)
-                return VLC_EGENERIC;
             return VLC_SUCCESS;
-        }
-        b_read = true;
 
         /* Update end */
         tk->i_end += i_read;
@@ -443,7 +437,7 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
         if (sys->i_used < STREAM_READ_ATONCE / 2)
             sys->i_used = STREAM_READ_ATONCE / 2;
 
-        if (AStreamRefillStream(s) && i_pos >= tk->i_end)
+        if (AStreamRefillStream(s))
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
