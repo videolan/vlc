@@ -139,5 +139,6 @@ void directx_va_Close(vlc_va_t *, directx_sys_t *);
 int directx_va_Setup(vlc_va_t *, directx_sys_t *, AVCodecContext *avctx);
 int directx_va_Get(vlc_va_t *, directx_sys_t *, picture_t *pic, uint8_t **data);
 void directx_va_Release(void *opaque, uint8_t *data);
+char *directx_va_GetDecoderName(const GUID *guid);
 
 #endif /* AVCODEC_DIRECTX_VA_H */

@@ -638,16 +638,18 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input)
     processorInput[idx++] = DXGI_FORMAT_NV12;
     processorInput[idx++] = DXGI_FORMAT_UNKNOWN;
 
+    char *psz_decoder_name = directx_va_GetDecoderName(input);
+
     /* */
     for (idx = 0; processorInput[idx] != DXGI_FORMAT_UNKNOWN; ++idx)
     {
         BOOL is_supported = false;
         hr = ID3D11VideoDevice_CheckVideoDecoderFormat((ID3D11VideoDevice*) dx_sys->d3ddec, input, processorInput[idx], &is_supported);
         if (SUCCEEDED(hr) && is_supported)
-            msg_Dbg(va, "%s is supported for output", DxgiFormatToStr(processorInput[idx]));
+            msg_Dbg(va, "%s output is supported for decoder %s.", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
         else
         {
-            msg_Dbg(va, "Can't get a decoder for output format %s.", DxgiFormatToStr(processorInput[idx]));
+            msg_Dbg(va, "Can't get a decoder output format %s for decoder %s.", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
             continue;
         }
 
@@ -664,10 +666,13 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input)
 
         if ( !b_needsProcessor )
         {
+            msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
             va->sys->render = processorInput[idx];
+            free(psz_decoder_name);
             return VLC_SUCCESS;
         }
     }
+    free(psz_decoder_name);
 
     msg_Dbg(va, "Output format from picture source not supported.");
     return VLC_EGENERIC;

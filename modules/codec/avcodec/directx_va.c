@@ -242,13 +242,17 @@ static void DestroyVideoService(vlc_va_t *, directx_sys_t *);
 static void DestroyDeviceManager(vlc_va_t *, directx_sys_t *);
 static void DestroyDevice(vlc_va_t *, directx_sys_t *);
 
-static const directx_va_mode_t *FindDxvaMode(const GUID *guid)
+char *directx_va_GetDecoderName(const GUID *guid)
 {
     for (unsigned i = 0; DXVA_MODES[i].name; i++) {
         if (IsEqualGUID(DXVA_MODES[i].guid, guid))
-            return &DXVA_MODES[i];
+            return strdup(DXVA_MODES[i].name);
     }
-    return NULL;
+
+    char *psz_name = malloc(36);
+    if (likely(psz_name))
+        asprintf(&psz_name, "Unknown decoder " GUID_FMT, GUID_PRINT(*guid));
+    return psz_name;
 }
 
 /* */
@@ -517,12 +521,9 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys, const
     /* Retreive supported modes from the decoder service */
     for (unsigned i = 0; i < p_list.count; i++) {
         const GUID *g = &p_list.list[i];
-        const directx_va_mode_t *mode = FindDxvaMode(g);
-        if (mode) {
-            msg_Dbg(va, "- '%s' is supported by hardware", mode->name);
-        } else {
-            msg_Warn(va, "- Unknown GUID = " GUID_FMT, GUID_PRINT( *g ) );
-        }
+        char *psz_decoder_name = directx_va_GetDecoderName(g);
+        msg_Dbg(va, "- '%s' is supported by hardware", psz_decoder_name);
+        free(psz_decoder_name);
     }
 
     /* Try all supported mode by our priority */
