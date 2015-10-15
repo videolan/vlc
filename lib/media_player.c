@@ -263,7 +263,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
                      void * p_userdata )
 {
-    VLC_UNUSED(oldval);
+    VLC_UNUSED(oldval); VLC_UNUSED(psz_cmd);
     input_thread_t * p_input = (input_thread_t *)p_this;
     libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t event;
@@ -1064,6 +1064,7 @@ void * libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
 #ifdef __APPLE__
     return var_GetAddress (p_mi, "drawable-nsobject");
 #else
+    (void) p_mi;
     return NULL;
 #endif
 }
@@ -1135,6 +1136,7 @@ void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
 #if defined (_WIN32) || defined (__OS2__)
     return (void *)(uintptr_t)var_GetInteger (p_mi, "drawable-hwnd");
 #else
+    (void) p_mi;
     return NULL;
 #endif
 }
