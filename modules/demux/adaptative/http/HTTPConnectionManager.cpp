@@ -32,8 +32,6 @@
 
 using namespace adaptative::http;
 
-const uint64_t  HTTPConnectionManager::CHUNKDEFAULTBITRATE    = 1;
-
 HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *stream) :
                        stream                   (stream)
 {
@@ -97,9 +95,6 @@ bool HTTPConnectionManager::connectChunk(Chunk *chunk)
     }
 
     conn->bindChunk(chunk);
-
-    if(chunk->getBitrate() <= 0)
-        chunk->setBitrate(HTTPConnectionManager::CHUNKDEFAULTBITRATE);
 
     return true;
 }

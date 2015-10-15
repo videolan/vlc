@@ -94,7 +94,6 @@ namespace adaptative
                 ~Segment();
                 virtual void setSourceUrl( const std::string &url );
                 virtual Url getUrlSegment() const; /* impl */
-                virtual SegmentChunk* toChunk(size_t, BaseRepresentation * = NULL);
                 virtual std::vector<ISegment*> subSegments();
                 virtual void debug(vlc_object_t *,int = 0) const;
                 virtual void addSubSegment(SubSegment *);

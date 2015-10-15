@@ -35,7 +35,6 @@ using namespace adaptative::http;
 Chunk::Chunk        (const std::string& url) :
        startByte    (0),
        endByte      (0),
-       bitrate      (1),
        port         (0),
        length       (0),
        bytesRead    (0),
@@ -98,22 +97,10 @@ void                Chunk::setStartByte         (size_t startByte)
     if (endByte > startByte)
         bytesToRead = endByte - startByte;
 }
-void                Chunk::addOptionalUrl       (const std::string& url)
-{
-    this->optionalUrls.push_back(url);
-}
+
 bool                Chunk::usesByteRange        () const
 {
     return (startByte != endByte);
-}
-
-void                Chunk::setBitrate           (uint64_t bitrate)
-{
-    this->bitrate = bitrate;
-}
-int                 Chunk::getBitrate           ()
-{
-    return this->bitrate;
 }
 
 const std::string&  Chunk::getScheme            () const
@@ -133,10 +120,7 @@ int                 Chunk::getPort              () const
 {
     return this->port;
 }
-uint64_t            Chunk::getLength            () const
-{
-    return this->length;
-}
+
 void                Chunk::setLength            (uint64_t length)
 {
     this->length = length;
@@ -160,10 +144,6 @@ uint64_t            Chunk::getBytesToRead       () const
         return length - bytesRead;
 }
 
-size_t              Chunk::getPercentDownloaded () const
-{
-    return (size_t)(((float)this->bytesRead / this->length) * 100);
-}
 HTTPConnection*     Chunk::getConnection           () const
 {
     return this->connection;

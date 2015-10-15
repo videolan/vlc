@@ -54,8 +54,6 @@ namespace adaptative
                 std::vector<HTTPConnection *>                       connectionPool;
                 vlc_object_t                                       *stream;
 
-                static const uint64_t   CHUNKDEFAULTBITRATE;
-
                 HTTPConnection * getConnectionForHost    (const std::string &hostname);
         };
     }

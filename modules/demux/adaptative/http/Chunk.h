@@ -50,10 +50,8 @@ namespace adaptative
                 const std::string&  getHostname             () const;
                 const std::string&  getPath                 () const;
                 int                 getPort                 () const;
-                uint64_t            getLength               () const;
                 uint64_t            getBytesRead            () const;
                 uint64_t            getBytesToRead          () const;
-                size_t              getPercentDownloaded    () const;
                 HTTPConnection*     getConnection           () const;
 
                 void                setConnection   (HTTPConnection *connection);
@@ -62,10 +60,7 @@ namespace adaptative
                 void                setLength       (uint64_t length);
                 void                setEndByte      (size_t endByte);
                 void                setStartByte    (size_t startByte);
-                void                addOptionalUrl  (const std::string& url);
                 bool                usesByteRange   () const;
-                void                setBitrate      (uint64_t bitrate);
-                int                 getBitrate      ();
 
                 virtual void        onDownload      (block_t **) {}
 
@@ -74,10 +69,8 @@ namespace adaptative
                 std::string                 scheme;
                 std::string                 path;
                 std::string                 hostname;
-                std::vector<std::string>    optionalUrls;
                 size_t                      startByte;
                 size_t                      endByte;
-                int                         bitrate;
                 int                         port;
                 uint64_t                    length;
                 uint64_t                    bytesRead;

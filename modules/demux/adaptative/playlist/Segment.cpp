@@ -225,14 +225,6 @@ Url Segment::getUrlSegment() const
     }
 }
 
-SegmentChunk* Segment::toChunk(size_t index, BaseRepresentation *ctxrep)
-{
-    SegmentChunk *chunk = ISegment::toChunk(index, ctxrep);
-    if (chunk && ctxrep)
-        chunk->setBitrate(ctxrep->getBandwidth());
-    return chunk;
-}
-
 std::vector<ISegment*> Segment::subSegments()
 {
     std::vector<ISegment*> list;
