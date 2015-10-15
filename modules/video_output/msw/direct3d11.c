@@ -575,6 +575,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 
 error:
     if (vd->sys->pool ==NULL && pictures) {
+        msg_Dbg(vd, "Failed to create the picture d3d11 pool");
         for (unsigned i=0;i<picture_count; ++i)
             DestroyDisplayPoolPicture(pictures[i]);
         free(pictures);
