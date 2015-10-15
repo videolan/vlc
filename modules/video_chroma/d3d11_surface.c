@@ -33,6 +33,7 @@
 #include <vlc_filter.h>
 
 #include "copy.h"
+#include "dxgi_fmt.h"
 
 static int  OpenConverter( vlc_object_t * );
 static void CloseConverter( vlc_object_t * );
@@ -90,7 +91,7 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
     hr = ID3D11Device_CreateTexture2D( p_device, &texDesc, NULL, &sys->staging);
     ID3D11Device_Release(p_device);
     if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to create a staging texture to extract surface pixels (hr=0x%0lx)", hr );
+        msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%0lx)", DxgiFormatToStr(texDesc.Format), hr );
         return VLC_EGENERIC;
     }
 ok:
