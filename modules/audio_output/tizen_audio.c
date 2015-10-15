@@ -35,10 +35,6 @@
 #include "audio_io.h"
 #include "sound_manager.h"
 
-#if TIZEN_SDK_MAJOR >= 3 || (TIZEN_SDK_MAJOR >= 2 && TIZEN_SDK_MINOR >= 4)
-#define AUDIO_IO_HAS_FLUSH
-#endif
-
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -53,6 +49,9 @@ struct aout_sys_t {
     unsigned int        i_rate;
     audio_sample_type_e i_sample_type;
     audio_channel_e     i_channel;
+
+    int (*pf_audio_out_drain)( audio_out_h output );
+    int (*pf_audio_out_flush)( audio_out_h output );
 };
 
 /* Soft volume helper */
@@ -276,19 +275,22 @@ Flush( audio_output_t *p_aout, bool b_wait )
     if( !p_sys->out )
         return;
 
-#ifdef AUDIO_IO_HAS_FLUSH
-    if( b_wait )
-        VLCRET( audio_out_drain( p_aout ) );
+    if( p_sys->pf_audio_out_drain || p_sys->pf_audio_out_flush )
+    {
+        if( b_wait )
+            VLCRET( p_sys->pf_audio_out_drain( p_sys->out ) );
+        else
+            VLCRET( p_sys->pf_audio_out_flush( p_sys->out ) );
+    }
     else
-        VLCRET( audio_out_flush( p_aout ) );
-#else
-    (void) b_wait;
-    if( AudioIO_Unprepare( p_aout ) )
-        return;
-    audio_out_destroy( p_sys->out );
-    p_sys->out = NULL;
-    AudioIO_Start( p_aout );
-#endif
+    {
+        (void) b_wait;
+        if( AudioIO_Unprepare( p_aout ) )
+            return;
+        audio_out_destroy( p_sys->out );
+        p_sys->out = NULL;
+        AudioIO_Start( p_aout );
+    }
 }
 
 static int
@@ -308,6 +310,10 @@ Open( vlc_object_t *obj )
     p_aout->pause = Pause;
     p_aout->flush = Flush;
     /* p_aout->time_get = TimeGet; FIXME */
+
+    /* Available only on 2.4 */
+    p_sys->pf_audio_out_drain = dlsym( RTLD_DEFAULT, "audio_out_drain" );
+    p_sys->pf_audio_out_flush = dlsym( RTLD_DEFAULT, "audio_out_flush" );
 
     aout_SoftVolumeInit( p_aout );
 
