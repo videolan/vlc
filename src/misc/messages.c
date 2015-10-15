@@ -178,7 +178,7 @@ static void Win32DebugOutputMsg (void* d, int type, const vlc_log_t *p_item,
     int msg_len = vsnprintf(NULL, 0, format, dol2);
     va_end (dol2);
 
-    if(msg_len <= 0)
+    if (msg_len <= 0)
         return;
 
     char *msg = malloc(msg_len + 1 + 1);
@@ -187,12 +187,12 @@ static void Win32DebugOutputMsg (void* d, int type, const vlc_log_t *p_item,
 
     msg_len = vsnprintf(msg, msg_len+1, format, dol);
     if (msg_len > 0){
-        if(msg[msg_len-1] != '\n'){
+        if (msg[msg_len-1] != '\n') {
             msg[msg_len] = '\n';
             msg[msg_len + 1] = '\0';
         }
         char* psz_msg = NULL;
-        if(asprintf(&psz_msg, "%s %s%s: %s", p_item->psz_module,
+        if (asprintf(&psz_msg, "%s %s%s: %s", p_item->psz_module,
                     p_item->psz_object_type, msg_type[type], msg) > 0) {
             wchar_t* wmsg = ToWide(psz_msg);
             OutputDebugStringW(wmsg);
