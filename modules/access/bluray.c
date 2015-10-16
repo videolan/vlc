@@ -1836,34 +1836,9 @@ static bool blurayIsBdjTitle(demux_t *p_demux)
     return false;
 }
 
-#define BD_TS_PACKET_SIZE (192)
-#define NB_TS_PACKETS (200)
-
-static int blurayDemux(demux_t *p_demux)
+static void blurayHandleOverlays(demux_t *p_demux, int nread)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    BD_EVENT e;
-
-    block_t *p_block = block_Alloc(NB_TS_PACKETS * (int64_t)BD_TS_PACKET_SIZE);
-    if (!p_block)
-        return VLC_DEMUXER_EGENERIC;
-
-    int nread;
-
-    if (p_sys->b_menu == false) {
-        while (bd_get_event(p_sys->bluray, &e))
-            blurayHandleEvent(p_demux, &e);
-
-        nread = bd_read(p_sys->bluray, p_block->p_buffer,
-                        NB_TS_PACKETS * BD_TS_PACKET_SIZE);
-    } else {
-        nread = bd_read_ext(p_sys->bluray, p_block->p_buffer,
-                            NB_TS_PACKETS * BD_TS_PACKET_SIZE, &e);
-        while (e.event != BD_EVENT_NONE) {
-            blurayHandleEvent(p_demux, &e);
-            bd_get_event(p_sys->bluray, &e);
-        }
-    }
 
     vlc_mutex_lock(&p_sys->bdj_overlay_lock);
 
@@ -1913,6 +1888,38 @@ static int blurayDemux(demux_t *p_demux)
     }
 
     vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
+}
+
+#define BD_TS_PACKET_SIZE (192)
+#define NB_TS_PACKETS (200)
+
+static int blurayDemux(demux_t *p_demux)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    BD_EVENT e;
+
+    block_t *p_block = block_Alloc(NB_TS_PACKETS * (int64_t)BD_TS_PACKET_SIZE);
+    if (!p_block)
+        return VLC_DEMUXER_EGENERIC;
+
+    int nread;
+
+    if (p_sys->b_menu == false) {
+        while (bd_get_event(p_sys->bluray, &e))
+            blurayHandleEvent(p_demux, &e);
+
+        nread = bd_read(p_sys->bluray, p_block->p_buffer,
+                        NB_TS_PACKETS * BD_TS_PACKET_SIZE);
+    } else {
+        nread = bd_read_ext(p_sys->bluray, p_block->p_buffer,
+                            NB_TS_PACKETS * BD_TS_PACKET_SIZE, &e);
+        while (e.event != BD_EVENT_NONE) {
+            blurayHandleEvent(p_demux, &e);
+            bd_get_event(p_sys->bluray, &e);
+        }
+    }
+
+    blurayHandleOverlays(p_demux, nread);
 
     if (nread <= 0) {
         block_Release(p_block);
