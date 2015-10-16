@@ -1,0 +1,14 @@
+diff -ru growl/Framework/Source/GrowlApplicationBridge.m growl-patched/Framework/Source/GrowlApplicationBridge.m
+--- growl/Framework/Source/GrowlApplicationBridge.m	2011-05-25 04:10:27.000000000 +0200
++++ growl-patched/Framework/Source/GrowlApplicationBridge.m	2015-10-15 15:26:27.000000000 +0200
+@@ -398,8 +398,8 @@
+ 	NSDictionary *registrationDictionary = [self registrationDictionaryFromDelegate];
+ 	if (!registrationDictionary) {
+ 		registrationDictionary = [self registrationDictionaryFromBundle:nil];
+-		if (!registrationDictionary)
+-			NSLog(@"GrowlApplicationBridge: The Growl delegate did not supply a registration dictionary, and the app bundle at %@ does not have one. Please tell this application's developer.", [[NSBundle mainBundle] bundlePath]);
++		//if (!registrationDictionary)
++			//NSLog(@"GrowlApplicationBridge: The Growl delegate did not supply a registration dictionary, and the app bundle at %@ does not have one. Please tell this application's developer.", [[NSBundle mainBundle] bundlePath]);
+ 	}
+ 
+ 	return [self registrationDictionaryByFillingInDictionary:registrationDictionary];
