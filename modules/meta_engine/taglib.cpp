@@ -114,7 +114,7 @@ vlc_module_end ()
 
 using namespace TagLib;
 
-static void ExtractTrackNumberValues( vlc_meta_t* p_meta, const char *psz_value,
+static void ExtractCoupleNumberValues( vlc_meta_t* p_meta, const char *psz_value,
         vlc_meta_type_t first, vlc_meta_type_t second)
 {
     unsigned int i_trknum, i_trktot;
@@ -215,7 +215,7 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
     iter = fields.find( "TRACK" );
     if( iter != fields.end() && !iter->second.isEmpty() )
     {
-        ExtractTrackNumberValues( p_meta, iter->second.toString().toCString( true ),
+        ExtractCoupleNumberValues( p_meta, iter->second.toString().toCString( true ),
                 vlc_meta_TrackNumber, vlc_meta_TrackTotal );
         fields.erase( iter );
     }
@@ -385,7 +385,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
     list = tag->frameListMap()["TRCK"];
     if( !list.isEmpty() )
     {
-        ExtractTrackNumberValues( p_meta, (*list.begin())->toString().toCString( true ),
+        ExtractCoupleNumberValues( p_meta, (*list.begin())->toString().toCString( true ),
                 vlc_meta_TrackNumber, vlc_meta_TrackTotal );
     }
 
