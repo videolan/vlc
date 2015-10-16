@@ -383,7 +383,6 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
     SET( "TLAN", Language );
     SET( "TPUB", Publisher );
     SET( "TPE2", AlbumArtist );
-    SET( "TPOS", DiscNumber );
 
 #undef SET
 
@@ -393,6 +392,14 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
     {
         ExtractCoupleNumberValues( p_meta, (*list.begin())->toString().toCString( true ),
                 vlc_meta_TrackNumber, vlc_meta_TrackTotal );
+    }
+
+    /* */
+    list = tag->frameListMap()["TPOS"];
+    if( !list.isEmpty() )
+    {
+        ExtractCoupleNumberValues( p_meta, (*list.begin())->toString().toCString( true ),
+                vlc_meta_DiscNumber, vlc_meta_DiscTotal );
     }
 
     /* Preferred type of image
