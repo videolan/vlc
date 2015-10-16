@@ -33,8 +33,6 @@
 using namespace adaptative::http;
 
 Chunk::Chunk        (const std::string& url) :
-       startByte    (0),
-       endByte      (0),
        port         (0),
        length       (0),
        bytesRead    (0),
@@ -78,34 +76,21 @@ Chunk::~Chunk()
         connection->setUsed(false);
 }
 
-size_t              Chunk::getEndByte           () const
+const BytesRange & Chunk::getBytesRange() const
 {
-    return endByte;
+    return bytesRange;
 }
-size_t              Chunk::getStartByte         () const
-{
-    return startByte;
-}
+
 const std::string&  Chunk::getUrl               () const
 {
     return url;
 }
-void                Chunk::setEndByte           (size_t endByte)
-{
-    this->endByte = endByte;
-    if (endByte > startByte)
-        length = endByte - startByte;
-}
-void                Chunk::setStartByte         (size_t startByte)
-{
-    this->startByte = startByte;
-    if (endByte > startByte)
-        length = endByte - startByte;
-}
 
-bool                Chunk::usesByteRange        () const
+void Chunk::setBytesRange(const BytesRange &range)
 {
-    return (startByte != endByte);
+    bytesRange = range;
+    if(bytesRange.isValid() && bytesRange.getEndByte())
+        length = bytesRange.getEndByte() - bytesRange.getStartByte();
 }
 
 const std::string&  Chunk::getScheme            () const

@@ -332,11 +332,7 @@ block_t * AbstractStream::readNextBlock(size_t)
     /* New chunk, do query */
     if(chunk->getBytesRead() == 0)
     {
-        BytesRange bytesRange;
-        if(chunk->usesByteRange())
-            bytesRange = BytesRange(chunk->getStartByte(), chunk->getEndByte());
-
-        if(chunk->getConnection()->query(chunk->getPath(), bytesRange) != VLC_SUCCESS)
+        if(chunk->getConnection()->query(chunk->getPath(), chunk->getBytesRange()) != VLC_SUCCESS)
         {
             currentChunk = NULL;
             delete chunk;

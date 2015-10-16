@@ -74,7 +74,7 @@ bool HTTPConnectionManager::connectChunk(Chunk *chunk)
         return true;
 
     msg_Dbg(stream, "Retrieving %s @%zu", chunk->getUrl().c_str(),
-            chunk->getStartByte());
+            chunk->getBytesRange().isValid() ? chunk->getBytesRange().getStartByte() : 0);
 
     const int sockettype = (chunk->getScheme() == "https") ? TLSSocket::TLS : Socket::REGULAR;
     HTTPConnection *conn = getConnection(chunk->getHostname(), chunk->getPort(), sockettype);

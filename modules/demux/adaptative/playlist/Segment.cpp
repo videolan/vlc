@@ -29,6 +29,7 @@
 #include "Segment.h"
 #include "BaseRepresentation.h"
 #include "SegmentChunk.hpp"
+#include "../http/BytesRange.hpp"
 #include <cassert>
 
 using namespace adaptative::http;
@@ -82,10 +83,7 @@ SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep)
     }
 
     if(startByte != endByte)
-    {
-        chunk->setStartByte(startByte);
-        chunk->setEndByte(endByte);
-    }
+        chunk->setBytesRange(BytesRange(startByte, endByte));
 
     chunk->setRepresentation(ctxrep);
 

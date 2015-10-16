@@ -25,6 +25,7 @@
 #ifndef CHUNK_H_
 #define CHUNK_H_
 
+#include "BytesRange.hpp"
 #include <vector>
 #include <string>
 #include <stdint.h>
@@ -43,8 +44,7 @@ namespace adaptative
                 Chunk           (const std::string &url);
                 virtual ~Chunk  ();
 
-                size_t              getEndByte              () const;
-                size_t              getStartByte            () const;
+                const BytesRange &  getBytesRange           () const;
                 const std::string&  getUrl                  () const;
                 const std::string&  getScheme               () const;
                 const std::string&  getHostname             () const;
@@ -57,9 +57,7 @@ namespace adaptative
                 void                setConnection   (HTTPConnection *connection);
                 void                setBytesRead    (size_t bytes);
                 void                setLength       (size_t length);
-                void                setEndByte      (size_t endByte);
-                void                setStartByte    (size_t startByte);
-                bool                usesByteRange   () const;
+                void                setBytesRange   (const BytesRange &);
 
                 virtual void        onDownload      (block_t **) {}
 
@@ -68,13 +66,13 @@ namespace adaptative
                 std::string                 scheme;
                 std::string                 path;
                 std::string                 hostname;
-                size_t                      startByte;
-                size_t                      endByte;
                 int                         port;
+                BytesRange                  bytesRange;
                 size_t                      length;
                 size_t                      bytesRead;
                 HTTPConnection             *connection;
         };
+
     }
 }
 
