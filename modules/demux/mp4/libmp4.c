@@ -238,6 +238,7 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
     *p_box = peekbox;
 
     const uint64_t i_next = p_box->i_pos + p_box->i_size;
+    p_box->p_father = p_father;
     if( MP4_Box_Read_Specific( p_stream, p_box, p_father ) != VLC_SUCCESS )
     {
         msg_Warn( p_stream, "Failed reading box %4.4s", (char*) &peekbox.i_type );
