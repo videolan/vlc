@@ -1013,7 +1013,7 @@ int download_signature( vlc_object_t *p_this, signature_packet_t *p_sig,
     if( stream_GetSize( p_stream, &i_size ) || i_size > INT_MAX )
     {
         stream_Delete( p_stream );
-        return NULL;
+        return VLC_EGENERIC;
     }
 
     msg_Dbg( p_this, "Downloading signature (%"PRIu64" bytes)", i_size );
