@@ -137,6 +137,11 @@ struct  demux_sys_t
     BLURAY_TITLE_INFO      *p_pl_info;
     const BLURAY_CLIP_INFO *p_clip_info;
 
+    /* Attachments */
+    int                 i_attachments;
+    input_attachment_t  **attachments;
+    int                 i_cover_idx;
+
     /* Meta information */
     const META_DL       *p_meta;
 
@@ -419,6 +424,38 @@ static void setTitleInfo(demux_sys_t *p_sys, BLURAY_TITLE_INFO *info)
 }
 
 /*****************************************************************************
+ * create input attachment for thumbnail
+ *****************************************************************************/
+
+static void attachThumbnail(demux_t *p_demux)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if (!p_sys->p_meta)
+        return;
+
+#if BLURAY_VERSION >= BLURAY_VERSION_CODE(0,9,0)
+    if (p_sys->p_meta->thumb_count > 0 && p_sys->p_meta->thumbnails) {
+        int64_t size;
+        void *data;
+        if (bd_get_meta_file(p_sys->bluray, p_sys->p_meta->thumbnails[0].path, &data, &size) > 0) {
+            char psz_name[64];
+            input_attachment_t *p_attachment;
+
+            snprintf(psz_name, sizeof(psz_name), "picture%d_%s", p_sys->i_attachments, p_sys->p_meta->thumbnails[0].path);
+
+            p_attachment = vlc_input_attachment_New(psz_name, NULL, "Album art", data, size);
+            if (p_attachment) {
+                p_sys->i_cover_idx = p_sys->i_attachments;
+                TAB_APPEND(p_sys->i_attachments, p_sys->attachments, p_attachment);
+            }
+        }
+        free(data);
+    }
+#endif
+}
+
+/*****************************************************************************
  * blurayOpen: module init function
  *****************************************************************************/
 static int blurayOpen(vlc_object_t *object)
@@ -450,6 +487,7 @@ static int blurayOpen(vlc_object_t *object)
     p_demux->info.i_seekpoint = 0;
 
     TAB_INIT(p_sys->i_title, p_sys->pp_title);
+    TAB_INIT(p_sys->i_attachments, p_sys->attachments);
 
     /* store current bd path */
     if (p_demux->psz_file)
@@ -536,6 +574,9 @@ static int blurayOpen(vlc_object_t *object)
     p_sys->p_meta = bd_get_meta(p_sys->bluray);
     if (!p_sys->p_meta)
         msg_Warn(p_demux, "Failed to get meta info.");
+
+    p_sys->i_cover_idx = -1;
+    attachThumbnail(p_demux);
 
     p_sys->b_menu = var_InheritBool(p_demux, "bluray-menu");
 
@@ -627,6 +668,10 @@ static void blurayClose(vlc_object_t *object)
     for (unsigned int i = 0; i < p_sys->i_title; i++)
         vlc_input_title_Delete(p_sys->pp_title[i]);
     TAB_CLEAN(p_sys->i_title, p_sys->pp_title);
+
+    for (int i = 0; i < p_sys->i_attachments; i++)
+      vlc_input_attachment_Delete(p_sys->attachments[i]);
+    TAB_CLEAN(p_sys->i_attachments, p_sys->attachments);
 
     vlc_mutex_destroy(&p_sys->pl_info_lock);
     vlc_mutex_destroy(&p_sys->bdj_overlay_lock);
@@ -1510,7 +1555,13 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         // if (meta->di_set_number > 0) vlc_meta_SetTrackNum(p_meta, meta->di_set_number);
         // if (meta->di_num_sets > 0) vlc_meta_AddExtra(p_meta, "Discs numbers in Set", meta->di_num_sets);
 
-        if (meta->thumb_count > 0 && meta->thumbnails) {
+        if (p_sys->i_cover_idx >= 0 && p_sys->i_cover_idx < p_sys->i_attachments) {
+            char psz_url[128];
+            snprintf( psz_url, sizeof(psz_url), "attachment://%s",
+                      p_sys->attachments[p_sys->i_cover_idx]->psz_name );
+            vlc_meta_Set( p_meta, vlc_meta_ArtworkURL, psz_url );
+        }
+        else if (meta->thumb_count > 0 && meta->thumbnails) {
             char *psz_thumbpath;
             if (asprintf(&psz_thumbpath, "%s" DIR_SEP "BDMV" DIR_SEP "META" DIR_SEP "DL" DIR_SEP "%s",
                           p_sys->psz_bd_path, meta->thumbnails[0].path) > 0) {
@@ -1526,6 +1577,22 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
             free(psz_thumbpath);
         }
 
+        return VLC_SUCCESS;
+    }
+
+    case DEMUX_GET_ATTACHMENTS:
+    {
+        input_attachment_t ***ppp_attach =
+            (input_attachment_t ***)va_arg(args, input_attachment_t ***);
+        int *pi_int = (int *)va_arg(args, int *);
+
+        if (p_sys->i_attachments <= 0)
+            return VLC_EGENERIC;
+
+        *pi_int = p_sys->i_attachments;
+        *ppp_attach = xmalloc(sizeof(input_attachment_t *) * p_sys->i_attachments);
+        for (int i = 0; i < p_sys->i_attachments; i++)
+            (*ppp_attach)[i] = vlc_input_attachment_Duplicate(p_sys->attachments[i]);
         return VLC_SUCCESS;
     }
 
@@ -1547,7 +1614,6 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_GET_FPS:
     case DEMUX_SET_GROUP:
     case DEMUX_HAS_UNSUPPORTED_META:
-    case DEMUX_GET_ATTACHMENTS:
         return VLC_EGENERIC;
     default:
         msg_Warn(p_demux, "unimplemented query (%d) in control", query);
