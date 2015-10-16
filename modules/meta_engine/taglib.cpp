@@ -114,18 +114,24 @@ vlc_module_end ()
 
 using namespace TagLib;
 
-static void ExtractCoupleNumberValues( vlc_meta_t* p_meta, const char *psz_value,
+static int ExtractCoupleNumberValues( vlc_meta_t* p_meta, const char *psz_value,
         vlc_meta_type_t first, vlc_meta_type_t second)
 {
     unsigned int i_trknum, i_trktot;
-    if( sscanf( psz_value, "%u/%u", &i_trknum, &i_trktot ) == 2 )
+
+    int i_ret = sscanf( psz_value, "%u/%u", &i_trknum, &i_trktot );
+    char psz_trck[11];
+    if( i_ret >= 1 )
     {
-        char psz_trck[11];
         snprintf( psz_trck, sizeof( psz_trck ), "%u", i_trknum );
         vlc_meta_Set( p_meta, first, psz_trck );
+    }
+    if( i_ret == 2)
+    {
         snprintf( psz_trck, sizeof( psz_trck ), "%u", i_trktot );
         vlc_meta_Set( p_meta, second, psz_trck );
     }
+    return i_ret;
 }
 
 /**
