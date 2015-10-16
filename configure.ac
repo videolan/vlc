@@ -3250,6 +3250,14 @@ AM_CONDITIONAL([HAVE_FONTCONFIG], [test "${have_fontconfig}" = "yes"])
 AM_CONDITIONAL([HAVE_FRIBIDI], [test "${have_fribidi}" = "yes"])
 AM_CONDITIONAL([HAVE_HARFBUZZ], [test "${have_harfbuzz}" = "yes"])
 
+dnl
+dnl SAPI (text to Speech renderer for Windows)
+dnl
+AC_CHECK_HEADERS(sapi.h, [
+              have_sapi="yes"
+            ],[AC_MSG_WARN([sapi.h not found. Text to Speech renderer for Windows disabled])])
+
+AM_CONDITIONAL([HAVE_SAPI], [test "${have_sapi}" = "yes"])
 
 dnl
 dnl  QuartzText vout module (iOS/Mac OS)

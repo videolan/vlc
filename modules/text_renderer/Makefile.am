@@ -42,10 +42,12 @@ libnsspeechsynthesizer_plugin_la_LDFLAGS = -Wl,-framework,Cocoa
 text_LTLIBRARIES += libnsspeechsynthesizer_plugin.la
 endif
 
+if HAVE_SAPI
 libsapi_plugin_la_SOURCES = text_renderer/sapi.cpp
 libsapi_plugin_la_LIBADD = -lole32
 if HAVE_WIN32
 text_LTLIBRARIES += libsapi_plugin.la
+endif
 endif
 
 libsvg_plugin_la_SOURCES = text_renderer/svg.c
