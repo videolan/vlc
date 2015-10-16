@@ -43,9 +43,13 @@ namespace adaptative
                 virtual ssize_t read        (vlc_object_t *, void *p_buffer, size_t len);
                 virtual std::string readline(vlc_object_t *);
                 virtual void    disconnect  ();
+                int     getType() const;
+                static const int REGULAR = 0;
 
             protected:
+                Socket( int );
                 int netfd;
+                int type;
         };
 
         class TLSSocket : public Socket
@@ -59,6 +63,7 @@ namespace adaptative
                 virtual ssize_t read        (vlc_object_t *, void *p_buffer, size_t len);
                 virtual std::string readline(vlc_object_t *);
                 virtual void    disconnect  ();
+                static const int TLS = REGULAR + 1;
 
             private:
                 vlc_tls_creds_t *creds;

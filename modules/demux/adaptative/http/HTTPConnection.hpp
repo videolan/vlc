@@ -45,7 +45,8 @@ namespace adaptative
                 HTTPConnection(vlc_object_t *stream, Socket *, Chunk * = NULL, bool = false);
                 virtual ~HTTPConnection();
 
-                virtual bool    connect     (const std::string& hostname, int port = 80);
+                virtual bool    compare     (const std::string &, uint16_t, int) const;
+                virtual bool    connect     (const std::string& hostname, uint16_t port = 80);
                 virtual bool    connected   () const;
                 virtual int     query       (const std::string& path);
                 virtual bool    send        (const void *buf, size_t size);
@@ -68,6 +69,7 @@ namespace adaptative
                 int parseReply();
                 std::string readLine();
                 std::string hostname;
+                uint16_t port;
                 char * psz_useragent;
                 vlc_object_t *stream;
                 size_t toRead;

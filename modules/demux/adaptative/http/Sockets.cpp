@@ -27,6 +27,13 @@ using namespace adaptative::http;
 Socket::Socket()
 {
     netfd = -1;
+    type = REGULAR;
+}
+
+Socket::Socket( int type_ )
+{
+    netfd = -1;
+    type = type_;
 }
 
 Socket::~Socket()
@@ -42,6 +49,11 @@ bool Socket::connect(vlc_object_t *stream, const std::string &hostname, int port
         return false;
 
     return true;
+}
+
+int Socket::getType() const
+{
+    return type;
 }
 
 bool Socket::connected() const
@@ -89,7 +101,7 @@ bool Socket::send(vlc_object_t *stream, const void *buf, size_t size)
     return net_Write(stream, netfd, buf, size) == (ssize_t)size;
 }
 
-TLSSocket::TLSSocket() : Socket()
+TLSSocket::TLSSocket() : Socket( TLS )
 {
     creds = NULL;
     tls = NULL;

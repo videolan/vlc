@@ -54,13 +54,14 @@ void HTTPConnectionManager::releaseAllConnections()
         (*it)->releaseChunk();
 }
 
-HTTPConnection * HTTPConnectionManager::getConnectionForHost(const std::string &hostname)
+HTTPConnection * HTTPConnectionManager::getConnection(const std::string &hostname, uint16_t port, int sockettype)
 {
     std::vector<HTTPConnection *>::const_iterator it;
     for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
     {
-        if(!(*it)->getHostname().compare(hostname) && (*it)->isAvailable())
-            return *it;
+        HTTPConnection *conn = *it;
+        if(conn->isAvailable() && conn->compare(hostname, port, sockettype))
+            return conn;
     }
     return NULL;
 }
@@ -75,15 +76,16 @@ bool HTTPConnectionManager::connectChunk(Chunk *chunk)
     msg_Dbg(stream, "Retrieving %s @%zu", chunk->getUrl().c_str(),
             chunk->getStartByte());
 
-    HTTPConnection *conn = getConnectionForHost(chunk->getHostname());
+    const int sockettype = (chunk->getScheme() == "https") ? TLSSocket::TLS : Socket::REGULAR;
+    HTTPConnection *conn = getConnection(chunk->getHostname(), chunk->getPort(), sockettype);
     if(!conn)
     {
-        const bool tls = (chunk->getScheme() == "https");
-        Socket *socket = tls ? new (std::nothrow) TLSSocket(): new (std::nothrow) Socket();
+        Socket *socket = (sockettype == TLSSocket::TLS) ? new (std::nothrow) TLSSocket()
+                                                        : new (std::nothrow) Socket();
         if(!socket)
             return false;
         /* disable pipelined tls until we have ticket/resume session support */
-        conn = new (std::nothrow) HTTPConnection(stream, socket, chunk, !tls);
+        conn = new (std::nothrow) HTTPConnection(stream, socket, chunk, sockettype != TLSSocket::TLS);
         if(!conn)
         {
             delete socket;

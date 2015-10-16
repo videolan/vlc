@@ -54,7 +54,7 @@ namespace adaptative
                 std::vector<HTTPConnection *>                       connectionPool;
                 vlc_object_t                                       *stream;
 
-                HTTPConnection * getConnectionForHost    (const std::string &hostname);
+                HTTPConnection * getConnection(const std::string &hostname, uint16_t port, int);
         };
     }
 }

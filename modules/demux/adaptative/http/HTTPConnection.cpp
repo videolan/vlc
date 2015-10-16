@@ -38,6 +38,7 @@ HTTPConnection::HTTPConnection(vlc_object_t *stream_, Socket *socket_,
     queryOk = false;
     retries = 0;
     connectionClose = !persistent;
+    port = 80;
     bindChunk(chunk_);
 }
 
@@ -47,12 +48,20 @@ HTTPConnection::~HTTPConnection()
     delete socket;
 }
 
-bool HTTPConnection::connect(const std::string &hostname, int port)
+bool HTTPConnection::compare(const std::string &hostname, uint16_t port, int type) const
+{
+    return ( hostname == this->hostname &&
+            (socket && socket->getType() == type) &&
+             port == this->port );
+}
+
+bool HTTPConnection::connect(const std::string &hostname, uint16_t port)
 {
     if(!socket->connect(stream, hostname.c_str(), port))
         return false;
 
     this->hostname = hostname;
+    this->port = port;
 
     return true;
 }
