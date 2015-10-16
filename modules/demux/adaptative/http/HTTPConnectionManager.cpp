@@ -51,7 +51,7 @@ void HTTPConnectionManager::releaseAllConnections()
 {
     std::vector<HTTPConnection *>::iterator it;
     for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
-        (*it)->releaseChunk();
+        (*it)->setUsed(false);
 }
 
 HTTPConnection * HTTPConnectionManager::getConnection(const std::string &hostname, uint16_t port, int sockettype)
@@ -85,18 +85,23 @@ bool HTTPConnectionManager::connectChunk(Chunk *chunk)
         if(!socket)
             return false;
         /* disable pipelined tls until we have ticket/resume session support */
-        conn = new (std::nothrow) HTTPConnection(stream, socket, chunk, sockettype != TLSSocket::TLS);
+        conn = new (std::nothrow) HTTPConnection(stream, socket, sockettype != TLSSocket::TLS);
         if(!conn)
         {
             delete socket;
             return false;
         }
+
         connectionPool.push_back(conn);
-        if (!chunk->getConnection()->connect(chunk->getHostname(), chunk->getPort()))
+
+        if (!conn->connect(chunk->getHostname(), chunk->getPort()))
+        {
             return false;
+        }
     }
 
-    conn->bindChunk(chunk);
+    conn->setUsed(true);
+    chunk->setConnection(conn);
 
     return true;
 }

@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 
+#include "BytesRange.hpp"
 #include <vlc_common.h>
 #include <string>
 
@@ -37,27 +38,25 @@ namespace adaptative
     namespace http
     {
         class Socket;
-        class Chunk;
 
         class HTTPConnection
         {
             public:
-                HTTPConnection(vlc_object_t *stream, Socket *, Chunk * = NULL, bool = false);
+                HTTPConnection(vlc_object_t *stream, Socket *, bool = false);
                 virtual ~HTTPConnection();
 
                 virtual bool    compare     (const std::string &, uint16_t, int) const;
                 virtual bool    connect     (const std::string& hostname, uint16_t port = 80);
                 virtual bool    connected   () const;
-                virtual int     query       (const std::string& path);
+                virtual int     query       (const std::string& path, const BytesRange & = BytesRange());
                 virtual bool    send        (const void *buf, size_t size);
                 virtual ssize_t read        (void *p_buffer, size_t len);
                 virtual void    disconnect  ();
                 virtual bool    send        (const std::string &data);
 
-                const std::string&  getHostname () const;
-                virtual void    bindChunk   (Chunk *chunk);
-                virtual bool    isAvailable () const;
-                virtual void    releaseChunk();
+                size_t getContentLength() const;
+                bool isAvailable () const;
+                void setUsed( bool );
 
             protected:
 
@@ -72,8 +71,10 @@ namespace adaptative
                 uint16_t port;
                 char * psz_useragent;
                 vlc_object_t *stream;
-                size_t toRead;
-                Chunk *chunk;
+                size_t bytesRead;
+                size_t contentLength;
+                BytesRange bytesRange;
+                bool available;
 
                 bool                connectionClose;
                 bool                queryOk;

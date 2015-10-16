@@ -41,7 +41,7 @@ namespace adaptative
         {
             public:
                 Chunk           (const std::string &url);
-                virtual ~Chunk  () {}
+                virtual ~Chunk  ();
 
                 size_t              getEndByte              () const;
                 size_t              getStartByte            () const;
@@ -50,14 +50,13 @@ namespace adaptative
                 const std::string&  getHostname             () const;
                 const std::string&  getPath                 () const;
                 int                 getPort                 () const;
-                uint64_t            getBytesRead            () const;
-                uint64_t            getBytesToRead          () const;
+                size_t              getBytesRead            () const;
+                size_t              getBytesToRead          () const;
                 HTTPConnection*     getConnection           () const;
 
                 void                setConnection   (HTTPConnection *connection);
-                void                setBytesRead    (uint64_t bytes);
-                void                setBytesToRead  (uint64_t bytes);
-                void                setLength       (uint64_t length);
+                void                setBytesRead    (size_t bytes);
+                void                setLength       (size_t length);
                 void                setEndByte      (size_t endByte);
                 void                setStartByte    (size_t startByte);
                 bool                usesByteRange   () const;
@@ -72,9 +71,8 @@ namespace adaptative
                 size_t                      startByte;
                 size_t                      endByte;
                 int                         port;
-                uint64_t                    length;
-                uint64_t                    bytesRead;
-                uint64_t                    bytesToRead;
+                size_t                      length;
+                size_t                      bytesRead;
                 HTTPConnection             *connection;
         };
     }

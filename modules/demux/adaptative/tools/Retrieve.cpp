@@ -37,12 +37,19 @@ uint64_t Retrieve::HTTP(vlc_object_t *obj, const std::string &uri, void **pp_dat
         *pp_data = NULL;
         return 0;
     }
-
-    if(!connManager.connectChunk(datachunk) ||
-        datachunk->getConnection()->query(datachunk->getPath()) != VLC_SUCCESS ||
-        datachunk->getBytesToRead() == 0 )
+;
+    if(!connManager.connectChunk(datachunk))
     {
-        datachunk->getConnection()->releaseChunk();
+        delete datachunk;
+        *pp_data = NULL;
+        return 0;
+    }
+
+    if( datachunk->getConnection()->query(datachunk->getPath()) == VLC_SUCCESS )
+        datachunk->setLength(datachunk->getConnection()->getContentLength());
+
+    if( datachunk->getBytesToRead() == 0 )
+    {
         delete datachunk;
         *pp_data = NULL;
         return 0;
@@ -61,10 +68,10 @@ uint64_t Retrieve::HTTP(vlc_object_t *obj, const std::string &uri, void **pp_dat
         }
         else
         {
+            datachunk->setBytesRead(datachunk->getBytesRead() + ret);
             i_data = ret;
         }
     }
-    datachunk->getConnection()->releaseChunk();
     delete datachunk;
     return i_data;
 }

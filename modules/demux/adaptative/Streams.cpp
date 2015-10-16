@@ -332,13 +332,17 @@ block_t * AbstractStream::readNextBlock(size_t)
     /* New chunk, do query */
     if(chunk->getBytesRead() == 0)
     {
-        if(chunk->getConnection()->query(chunk->getPath()) != VLC_SUCCESS)
+        BytesRange bytesRange;
+        if(chunk->usesByteRange())
+            bytesRange = BytesRange(chunk->getStartByte(), chunk->getEndByte());
+
+        if(chunk->getConnection()->query(chunk->getPath(), bytesRange) != VLC_SUCCESS)
         {
-            chunk->getConnection()->releaseChunk();
             currentChunk = NULL;
             delete chunk;
             return NULL;
         }
+        chunk->setLength(chunk->getConnection()->getContentLength());
         b_segment_head_chunk = true;
     }
 
@@ -359,13 +363,13 @@ block_t * AbstractStream::readNextBlock(size_t)
     if(ret < 0)
     {
         block_Release(block);
-        chunk->getConnection()->releaseChunk();
         currentChunk = NULL;
         delete chunk;
         return NULL;
     }
     else
     {
+        chunk->setBytesRead(chunk->getBytesRead() + ret);
         block->i_buffer = (size_t)ret;
 
         adaptationLogic->updateDownloadRate(block->i_buffer, time);
@@ -373,7 +377,6 @@ block_t * AbstractStream::readNextBlock(size_t)
 
         if (chunk->getBytesToRead() == 0)
         {
-            chunk->getConnection()->releaseChunk();
             currentChunk = NULL;
             delete chunk;
         }
@@ -395,10 +398,7 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
         if(demuxer->reinitsOnSeek())
         {
             if(currentChunk)
-            {
-                currentChunk->getConnection()->releaseChunk();
                 delete currentChunk;
-            }
             currentChunk = NULL;
 
             restartDemux();

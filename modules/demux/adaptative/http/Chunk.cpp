@@ -38,7 +38,6 @@ Chunk::Chunk        (const std::string& url) :
        port         (0),
        length       (0),
        bytesRead    (0),
-       bytesToRead  (0),
        connection   (NULL)
 {
     this->url = url;
@@ -73,6 +72,12 @@ Chunk::Chunk        (const std::string& url) :
         throw VLC_EGENERIC;
 }
 
+Chunk::~Chunk()
+{
+    if(connection)
+        connection->setUsed(false);
+}
+
 size_t              Chunk::getEndByte           () const
 {
     return endByte;
@@ -89,13 +94,13 @@ void                Chunk::setEndByte           (size_t endByte)
 {
     this->endByte = endByte;
     if (endByte > startByte)
-        bytesToRead = endByte - startByte;
+        length = endByte - startByte;
 }
 void                Chunk::setStartByte         (size_t startByte)
 {
     this->startByte = startByte;
     if (endByte > startByte)
-        bytesToRead = endByte - startByte;
+        length = endByte - startByte;
 }
 
 bool                Chunk::usesByteRange        () const
@@ -121,25 +126,20 @@ int                 Chunk::getPort              () const
     return this->port;
 }
 
-void                Chunk::setLength            (uint64_t length)
+void                Chunk::setLength            (size_t length)
 {
     this->length = length;
 }
-uint64_t            Chunk::getBytesRead         () const
+size_t            Chunk::getBytesRead         () const
 {
     return this->bytesRead;
 }
-void                Chunk::setBytesRead         (uint64_t bytes)
+void                Chunk::setBytesRead         (size_t bytes)
 {
     this->bytesRead = bytes;
 }
 
-void                Chunk::setBytesToRead         (uint64_t bytes)
-{
-    bytesToRead = bytes;
-}
-
-uint64_t            Chunk::getBytesToRead       () const
+size_t            Chunk::getBytesToRead       () const
 {
         return length - bytesRead;
 }
