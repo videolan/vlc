@@ -72,7 +72,8 @@ typedef enum libvlc_meta_t {
     libvlc_meta_ShowName,
     libvlc_meta_Actors,
     libvlc_meta_AlbumArtist,
-    libvlc_meta_DiscNumber
+    libvlc_meta_DiscNumber,
+    libvlc_meta_DiscTotal
     /* Add new meta types HERE */
 } libvlc_meta_t;
 

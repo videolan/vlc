@@ -71,7 +71,8 @@ static const vlc_meta_type_t libvlc_to_vlc_meta[] =
     [libvlc_meta_ShowName]     = vlc_meta_ShowName,
     [libvlc_meta_Actors]       = vlc_meta_Actors,
     [libvlc_meta_AlbumArtist]  = vlc_meta_AlbumArtist,
-    [libvlc_meta_DiscNumber]   = vlc_meta_DiscNumber
+    [libvlc_meta_DiscNumber]   = vlc_meta_DiscNumber,
+    [libvlc_meta_DiscTotal]    = vlc_meta_DiscTotal
 };
 
 static const libvlc_meta_t vlc_to_libvlc_meta[] =
@@ -101,7 +102,8 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
     [vlc_meta_ShowName]     = libvlc_meta_ShowName,
     [vlc_meta_Actors]       = libvlc_meta_Actors,
     [vlc_meta_AlbumArtist]  = libvlc_meta_AlbumArtist,
-    [vlc_meta_DiscNumber]   = libvlc_meta_DiscNumber
+    [vlc_meta_DiscNumber]   = libvlc_meta_DiscNumber,
+    [vlc_meta_DiscTotal]    = libvlc_meta_DiscTotal
 };
 
 static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md,
