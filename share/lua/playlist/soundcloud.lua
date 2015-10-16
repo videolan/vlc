@@ -1,9 +1,10 @@
 --[[
  $Id$
 
- Copyright © 2012 the VideoLAN team
+ Copyright © 2012, 2015 the VideoLAN team
 
  Authors: Cheng Sun <chengsun9atgmail.com>
+          Pierre Ynard
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -26,30 +27,75 @@ function probe()
         and string.match( vlc.path, "soundcloud%.com/.+/.+" )
 end
 
+function fix_quotes( value )
+    if string.match( value, "^\"" ) then
+        return "" -- field was really empty string
+    end
+
+    -- TODO: handle escaped backslashes and others
+    return string.gsub( value, "\\\"", "\"" )
+end
+
 -- Parse function.
 function parse()
-    if string.match ( vlc.path, "soundcloud%.com" ) then
-        arturl = nil
-        while true do
-            line = vlc.readline()
-            if not line then break end
-            if string.match( line, "window%.SC%.bufferTracks%.push" ) then
-                -- all the data is nicely stored on this one line
-                _,_,uid,token,name = string.find (line,
-                        "window%.SC%.bufferTracks%.push.*" ..
-                        "\"uid\":\"([^\"]*)\".*" ..
-                        "\"token\":\"([^\"]*)\".*" ..
-                        "\"title\":\"([^\"]*)\"")
-                -- we only want the first one of these lines
-                break
-            end
-            -- try to get the art url
-            if string.match( line, "artwork--download--link" ) then
-                _,_,arturl = string.find( line, " href=\"(.*)\" " )
+    while true do
+        line = vlc.readline()
+        if not line then break end
+
+        if not path then
+            local track = string.match( line, "soundcloud:tracks:(%d+)" )
+            if track then
+                -- API magic
+                local client_id = "02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea"
+                -- app_version is not required by the API but we send it
+                -- anyway to remain unconspicuous
+                local app_version = "a089efd"
+
+                local api = vlc.stream( "https://api.soundcloud.com/i1/tracks/"..track.."/streams?client_id="..client_id.."&app_version="..app_version )
+                if not api then
+                    break
+                end
+
+                local streams = api:readline() -- data is on one line only
+                -- For now only quality available is 128 kbps (http_mp3_128_url)
+                path = string.match( streams, "[\"']http_mp3_%d+_url[\"'] *: *[\"'](.-)[\"']" )
+                if path then
+                    -- FIXME: do this properly
+                    path = string.gsub( path, "\\u0026", "&" )
+                end
             end
         end
-        path = "http://media.soundcloud.com/stream/"..uid.."?stream_token="..token
-        return { { path = path; name = name; arturl = arturl } }
+
+        if not name then
+            name = string.match( line, "[\"']title[\"'] *: *\"(.-[^\\])\"" )
+            if name then
+                name = fix_quotes( name )
+            end
+        end
+
+        if not description then
+            description = string.match( line, "[\"']artwork_url[\"'] *:.-[\"']description[\"'] *: *\"(.-[^\\])\"" )
+            if description then
+                description = fix_quotes( description )
+            end
+        end
+
+        if not artist then
+            artist = string.match( line, "[\"']username[\"'] *: *\"(.-[^\\])\"" )
+            if artist then
+                artist = fix_quotes( artist )
+            end
+        end
+
+        if not arturl then
+            arturl = string.match( line, "[\"']artwork_url[\"'] *: *[\"'](.-)[\"']" )
+        end
     end
-    return {}
+
+    if not path then
+        vlc.msg.err( "Couldn't extract soundcloud audio URL, please check for updates to this script" )
+        return { }
+    end
+
+    return { { path = path, name = name, description = description, artist = artist, arturl = arturl } }
 end
