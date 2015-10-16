@@ -168,7 +168,7 @@ nobase_doc_DATA = \
 	lua/meta/reader/README.txt \
 	lua/meta/reader/filename.lua \
 	lua/playlist/README.txt \
-	lua/playlist/soundcloud.lua \
+	lua/playlist/liveleak.lua \
 	lua/playlist/youtube.lua \
 	lua/sd/README.txt \
 	lua/sd/icecast.lua \
