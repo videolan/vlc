@@ -54,7 +54,7 @@ void SegmentTracker::resetCounter()
     prevRepresentation = NULL;
 }
 
-SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
+SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionManager *connManager)
 {
     BaseRepresentation *rep;
     ISegment *segment;
@@ -92,7 +92,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
         init_sent = true;
         segment = rep->getSegment(BaseRepresentation::INFOTYPE_INIT);
         if(segment)
-            return segment->toChunk(count, rep);
+            return segment->toChunk(count, rep, connManager);
     }
 
     if(!index_sent)
@@ -100,7 +100,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
         index_sent = true;
         segment = rep->getSegment(BaseRepresentation::INFOTYPE_INDEX);
         if(segment)
-            return segment->toChunk(count, rep);
+            return segment->toChunk(count, rep, connManager);
     }
 
     bool b_gap = false;
@@ -120,7 +120,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
     /* stop initializing after 1st chunk */
     initializing = false;
 
-    SegmentChunk *chunk = segment->toChunk(count, rep);
+    SegmentChunk *chunk = segment->toChunk(count, rep, connManager);
     if(chunk)
         count++;
 

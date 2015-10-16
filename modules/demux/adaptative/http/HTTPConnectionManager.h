@@ -38,7 +38,6 @@ namespace adaptative
     namespace http
     {
         class HTTPConnection;
-        class Chunk;
 
         class HTTPConnectionManager
         {
@@ -48,7 +47,9 @@ namespace adaptative
 
                 void    closeAllConnections ();
                 void    releaseAllConnections ();
-                bool    connectChunk        (Chunk *chunk);
+                HTTPConnection * getConnection(const std::string &scheme,
+                                               const std::string &hostname,
+                                               uint16_t port);
 
             private:
                 std::vector<HTTPConnection *>                       connectionPool;

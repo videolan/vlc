@@ -28,6 +28,7 @@
 
 #include "Segment.h"
 #include "BaseRepresentation.h"
+#include "AbstractPlaylist.hpp"
 #include "SegmentChunk.hpp"
 #include "../http/BytesRange.hpp"
 #include <cassert>
@@ -58,9 +59,10 @@ ISegment::~ISegment()
     assert(chunksuse.Get() == 0);
 }
 
-SegmentChunk * ISegment::getChunk(const std::string &url)
+SegmentChunk * ISegment::getChunk(const std::string &url, HTTPConnectionManager *connManager)
 {
-    return new (std::nothrow) SegmentChunk(this, url);
+    HTTPChunkSource *source = new HTTPChunkSource(url, connManager);
+    return new (std::nothrow) SegmentChunk(this, source);
 }
 
 void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
@@ -68,12 +70,12 @@ void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
 
 }
 
-SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep)
+SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep, HTTPConnectionManager *connManager)
 {
     SegmentChunk *chunk;
     try
     {
-        chunk = getChunk(getUrlSegment().toString(index, ctxrep));
+        chunk = getChunk(getUrlSegment().toString(index, ctxrep), connManager);
         if (!chunk)
             return NULL;
     }

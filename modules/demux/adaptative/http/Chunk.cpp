@@ -26,17 +26,111 @@
 #endif
 
 #include "Chunk.h"
+#include "HTTPConnection.hpp"
+#include "HTTPConnectionManager.h"
 
 #include <vlc_common.h>
 #include <vlc_url.h>
+#include <vlc_block.h>
 
 using namespace adaptative::http;
 
-Chunk::Chunk        (const std::string& url) :
-       port         (0),
-       length       (0),
-       bytesRead    (0),
-       connection   (NULL)
+AbstractChunkSource::AbstractChunkSource()
+{
+    parentChunk = NULL;
+}
+
+AbstractChunkSource::~AbstractChunkSource()
+{
+
+}
+
+void AbstractChunkSource::setParentChunk(AbstractChunk *parent)
+{
+    parentChunk = parent;
+}
+
+
+AbstractChunk::AbstractChunk(AbstractChunkSource *source_)
+{
+    length = 0;
+    bytesRead = 0;
+    source = source_;
+    source->setParentChunk(this);
+}
+
+AbstractChunk::~AbstractChunk()
+{
+    delete source;
+}
+
+void AbstractChunk::setLength(size_t length)
+{
+    this->length = length;
+}
+
+size_t AbstractChunk::getBytesRead() const
+{
+    return this->bytesRead;
+}
+
+void AbstractChunk::setBytesRead(size_t bytes)
+{
+    this->bytesRead = bytes;
+}
+
+size_t AbstractChunk::getBytesToRead() const
+{
+    return length - bytesRead;
+}
+
+void AbstractChunk::setBytesRange(const BytesRange &range)
+{
+    bytesRange = range;
+    if(bytesRange.isValid() && bytesRange.getEndByte())
+        setLength(bytesRange.getEndByte() - bytesRange.getStartByte());
+}
+
+const BytesRange & AbstractChunk::getBytesRange() const
+{
+    return bytesRange;
+}
+
+block_t * AbstractChunk::read(size_t sizehint, mtime_t *time)
+{
+    if(!source)
+        return NULL;
+
+    *time = mdate();
+    block_t *block = source->read(sizehint);
+    *time = mdate() - *time;
+
+    if(block)
+    {
+        setBytesRead(getBytesRead() + block->i_buffer);
+        onDownload(&block);
+    }
+
+    return block;
+}
+
+HTTPChunkSource::HTTPChunkSource(const std::string& url, HTTPConnectionManager *manager) :
+    AbstractChunkSource(),
+    port         (0),
+    connection   (NULL),
+    connManager  (manager)
+{
+    if(!init(url))
+        throw VLC_EGENERIC;
+}
+
+HTTPChunkSource::~HTTPChunkSource()
+{
+    if(connection)
+        connection->setUsed(false);
+}
+
+bool HTTPChunkSource::init(const std::string &url)
 {
     this->url = url;
 
@@ -47,7 +141,7 @@ Chunk::Chunk        (const std::string& url) :
     }
 
     if(scheme != "http" && scheme != "https")
-        throw VLC_EGENERIC;
+        return false;
 
     vlc_url_t url_components;
     vlc_UrlParse(&url_components, url.c_str());
@@ -67,73 +161,63 @@ Chunk::Chunk        (const std::string& url) :
     vlc_UrlClean(&url_components);
 
     if(path.empty() || hostname.empty())
-        throw VLC_EGENERIC;
+        return false;
+
+    return true;
 }
 
-Chunk::~Chunk()
+block_t * HTTPChunkSource::read(size_t maxread)
 {
-    if(connection)
-        connection->setUsed(false);
+    if(!connManager || !parentChunk)
+        return NULL;
+
+    if(!connection)
+    {
+        connection = connManager->getConnection(scheme, hostname, port);
+        if(!connection)
+            return NULL;
+    }
+
+    if(parentChunk->getBytesRead() == 0)
+    {
+        if( connection->query(path, parentChunk->getBytesRange()) != VLC_SUCCESS )
+            return NULL;
+        parentChunk->setLength(connection->getContentLength());
+    }
+
+    if( parentChunk->getBytesToRead() == 0 )
+        return NULL;
+
+    /* Because we don't know Chunk size at start, we need to get size
+       from content length */
+    size_t readsize = parentChunk->getBytesToRead();
+    if (readsize > maxread)
+        readsize = maxread;
+
+    block_t *block = block_Alloc(readsize);
+    if(!block)
+        return NULL;
+
+    ssize_t ret = connection->read(block->p_buffer, readsize);
+    if(ret < 0)
+    {
+        block_Release(block);
+        return NULL;
+    }
+
+    block->i_buffer = (size_t)ret;
+
+    return block;
 }
 
-const BytesRange & Chunk::getBytesRange() const
+
+HTTPChunk::HTTPChunk(const std::string &url, HTTPConnectionManager *manager):
+    AbstractChunk(new HTTPChunkSource(url, manager))
 {
-    return bytesRange;
+
 }
 
-const std::string&  Chunk::getUrl               () const
+HTTPChunk::~HTTPChunk()
 {
-    return url;
-}
 
-void Chunk::setBytesRange(const BytesRange &range)
-{
-    bytesRange = range;
-    if(bytesRange.isValid() && bytesRange.getEndByte())
-        length = bytesRange.getEndByte() - bytesRange.getStartByte();
-}
-
-const std::string&  Chunk::getScheme            () const
-{
-    return scheme;
-}
-
-const std::string&  Chunk::getHostname          () const
-{
-    return hostname;
-}
-const std::string&  Chunk::getPath              () const
-{
-    return this->path;
-}
-int                 Chunk::getPort              () const
-{
-    return this->port;
-}
-
-void                Chunk::setLength            (size_t length)
-{
-    this->length = length;
-}
-size_t            Chunk::getBytesRead         () const
-{
-    return this->bytesRead;
-}
-void                Chunk::setBytesRead         (size_t bytes)
-{
-    this->bytesRead = bytes;
-}
-
-size_t            Chunk::getBytesToRead       () const
-{
-        return length - bytesRead;
-}
-
-HTTPConnection*     Chunk::getConnection           () const
-{
-    return this->connection;
-}
-void                Chunk::setConnection   (HTTPConnection *connection)
-{
-    this->connection = connection;
 }

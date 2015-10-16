@@ -150,7 +150,7 @@ SegmentChunk * AbstractStream::getChunk()
             disabled = true;
             return NULL;
         }
-        currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting());
+        currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
         if (currentChunk == NULL)
             eof = true;
     }
@@ -294,7 +294,7 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
     return AbstractStream::status_demuxed;
 }
 
-block_t * AbstractStream::readNextBlock(size_t)
+block_t * AbstractStream::readNextBlock(size_t toread)
 {
     SegmentChunk *chunk = getChunk();
     if(!chunk)
@@ -320,62 +320,22 @@ block_t * AbstractStream::readNextBlock(size_t)
         return NULL;
     }
 
-    if(!chunk->getConnection())
+    const bool b_segment_head_chunk = (chunk->getBytesRead() == 0);
+
+    mtime_t time;
+    block_t *block = chunk->read(toread, &time);
+    if(block == NULL)
     {
-       if(!connManager->connectChunk(chunk))
-        return NULL;
-    }
-
-    size_t readsize = 0;
-    bool b_segment_head_chunk = false;
-
-    /* New chunk, do query */
-    if(chunk->getBytesRead() == 0)
-    {
-        if(chunk->getConnection()->query(chunk->getPath(), chunk->getBytesRange()) != VLC_SUCCESS)
-        {
-            currentChunk = NULL;
-            delete chunk;
-            return NULL;
-        }
-        chunk->setLength(chunk->getConnection()->getContentLength());
-        b_segment_head_chunk = true;
-    }
-
-    /* Because we don't know Chunk size at start, we need to get size
-       from content length */
-    readsize = chunk->getBytesToRead();
-    if (readsize > 32768)
-        readsize = 32768;
-
-    block_t *block = block_Alloc(readsize);
-    if(!block)
-        return NULL;
-
-    mtime_t time = mdate();
-    ssize_t ret = chunk->getConnection()->read(block->p_buffer, readsize);
-    time = mdate() - time;
-
-    if(ret < 0)
-    {
-        block_Release(block);
         currentChunk = NULL;
         delete chunk;
         return NULL;
     }
-    else
+
+    adaptationLogic->updateDownloadRate(block->i_buffer, time);
+    if (chunk->getBytesToRead() == 0)
     {
-        chunk->setBytesRead(chunk->getBytesRead() + ret);
-        block->i_buffer = (size_t)ret;
-
-        adaptationLogic->updateDownloadRate(block->i_buffer, time);
-        chunk->onDownload(&block);
-
-        if (chunk->getBytesToRead() == 0)
-        {
-            currentChunk = NULL;
-            delete chunk;
-        }
+        currentChunk = NULL;
+        delete chunk;
     }
 
     block = checkBlock(block, b_segment_head_chunk);

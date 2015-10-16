@@ -26,52 +26,19 @@
 using namespace adaptative;
 using namespace adaptative::http;
 
-uint64_t Retrieve::HTTP(vlc_object_t *obj, const std::string &uri, void **pp_data)
+block_t * Retrieve::HTTP(vlc_object_t *obj, const std::string &uri)
 {
     HTTPConnectionManager connManager(obj);
-    Chunk *datachunk;
+    HTTPChunk *datachunk;
     try
     {
-        datachunk = new Chunk(uri);
+        datachunk = new HTTPChunk(uri, &connManager);
     } catch (int) {
-        *pp_data = NULL;
-        return 0;
-    }
-;
-    if(!connManager.connectChunk(datachunk))
-    {
-        delete datachunk;
-        *pp_data = NULL;
-        return 0;
+        return NULL;
     }
 
-    if( datachunk->getConnection()->query(datachunk->getPath()) == VLC_SUCCESS )
-        datachunk->setLength(datachunk->getConnection()->getContentLength());
-
-    if( datachunk->getBytesToRead() == 0 )
-    {
-        delete datachunk;
-        *pp_data = NULL;
-        return 0;
-    }
-
-    size_t i_data = datachunk->getBytesToRead();
-    *pp_data = malloc(i_data);
-    if(*pp_data)
-    {
-        ssize_t ret = datachunk->getConnection()->read(*pp_data, i_data);
-        if(ret < 0)
-        {
-            free(*pp_data);
-            *pp_data = NULL;
-            i_data = 0;
-        }
-        else
-        {
-            datachunk->setBytesRead(datachunk->getBytesRead() + ret);
-            i_data = ret;
-        }
-    }
+    mtime_t time;
+    block_t *block = datachunk->read(1<<21, &time);
     delete datachunk;
-    return i_data;
+    return block;
 }

@@ -27,8 +27,8 @@
 
 #include "HTTPConnectionManager.h"
 #include "HTTPConnection.hpp"
-#include "Chunk.h"
 #include "Sockets.hpp"
+#include <vlc_url.h>
 
 using namespace adaptative::http;
 
@@ -66,42 +66,37 @@ HTTPConnection * HTTPConnectionManager::getConnection(const std::string &hostnam
     return NULL;
 }
 
-bool HTTPConnectionManager::connectChunk(Chunk *chunk)
+HTTPConnection * HTTPConnectionManager::getConnection(const std::string &scheme,
+                                                      const std::string &hostname,
+                                                      uint16_t port)
 {
-    if(chunk == NULL)
-        return false;
-    if(chunk->getConnection())
-        return true;
+    if((scheme != "http" && scheme != "https") || hostname.empty())
+        return NULL;
 
-    msg_Dbg(stream, "Retrieving %s @%zu", chunk->getUrl().c_str(),
-            chunk->getBytesRange().isValid() ? chunk->getBytesRange().getStartByte() : 0);
-
-    const int sockettype = (chunk->getScheme() == "https") ? TLSSocket::TLS : Socket::REGULAR;
-    HTTPConnection *conn = getConnection(chunk->getHostname(), chunk->getPort(), sockettype);
+    const int sockettype = (scheme == "https") ? TLSSocket::TLS : Socket::REGULAR;
+    HTTPConnection *conn = getConnection(hostname, port, sockettype);
     if(!conn)
     {
         Socket *socket = (sockettype == TLSSocket::TLS) ? new (std::nothrow) TLSSocket()
                                                         : new (std::nothrow) Socket();
         if(!socket)
-            return false;
+            return NULL;
         /* disable pipelined tls until we have ticket/resume session support */
         conn = new (std::nothrow) HTTPConnection(stream, socket, sockettype != TLSSocket::TLS);
         if(!conn)
         {
             delete socket;
-            return false;
+            return NULL;
         }
 
         connectionPool.push_back(conn);
 
-        if (!conn->connect(chunk->getHostname(), chunk->getPort()))
+        if (!conn->connect(hostname, port))
         {
-            return false;
+            return NULL;
         }
     }
 
     conn->setUsed(true);
-    chunk->setConnection(conn);
-
-    return true;
+    return conn;
 }

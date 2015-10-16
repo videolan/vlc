@@ -37,6 +37,7 @@
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 #include <vlc_meta.h>
+#include <vlc_block.h>
 #include "../adaptative/tools/Retrieve.hpp"
 
 #include <algorithm>
@@ -73,15 +74,14 @@ bool DASHManager::updatePlaylist()
         url.append("://");
         url.append(p_demux->psz_location);
 
-        uint8_t *p_data = NULL;
-        size_t i_data = Retrieve::HTTP(VLC_OBJECT(p_demux->s), url, (void**) &p_data);
-        if(!p_data)
+        block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux->s), url);
+        if(!p_block)
             return false;
 
-        stream_t *mpdstream = stream_MemoryNew(p_demux->s, p_data, i_data, false);
+        stream_t *mpdstream = stream_MemoryNew(p_demux->s, p_block->p_buffer, p_block->i_buffer, true);
         if(!mpdstream)
         {
-            free(p_data);
+            block_Release(p_block);
             nextPlaylistupdate = now + playlist->minUpdatePeriod.Get() / CLOCK_FREQ;
             return false;
         }
@@ -90,6 +90,7 @@ bool DASHManager::updatePlaylist()
         if(!parser.parse())
         {
             stream_Delete(mpdstream);
+            block_Release(p_block);
             nextPlaylistupdate = now + playlist->minUpdatePeriod.Get() / CLOCK_FREQ;
             return false;
         }
@@ -111,6 +112,7 @@ bool DASHManager::updatePlaylist()
             delete newmpd;
         }
         stream_Delete(mpdstream);
+        block_Release(p_block);
     }
 
     /* Compute new MPD update time */

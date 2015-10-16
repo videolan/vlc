@@ -187,11 +187,10 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
 
 bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representation *rep)
 {
-    void *p_data;
-    const size_t i_data = Retrieve::HTTP(p_obj, rep->getPlaylistUrl().toString(), &p_data);
-    if(p_data)
+    block_t *p_block = Retrieve::HTTP(p_obj, rep->getPlaylistUrl().toString());
+    if(p_block)
     {
-        stream_t *substream = stream_MemoryNew(p_obj, (uint8_t *)p_data, i_data, false);
+        stream_t *substream = stream_MemoryNew(p_obj, p_block->p_buffer, p_block->i_buffer, true);
         if(substream)
         {
             std::list<Tag *> tagslist = parseEntries(substream);
@@ -202,6 +201,7 @@ bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representati
             releaseTagsList(tagslist);
             return true;
         }
+        block_Release(p_block);
     }
     return false;
 }
@@ -311,7 +311,6 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                 {
                     encryption.method = SegmentEncryption::AES_128;
                     encryption.key.clear();
-                    uint8_t *p_data;
 
                     Url keyurl(keytag->getAttributeByName("URI")->quotedString());
                     if(!keyurl.hasScheme())
@@ -319,15 +318,15 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                         keyurl.prepend(Helper::getDirectoryPath(rep->getPlaylistUrl().toString()).append("/"));
                     }
 
-                    const uint64_t read = Retrieve::HTTP(p_obj, keyurl.toString(), (void **) &p_data);
-                    if(p_data)
+                    block_t *p_block = Retrieve::HTTP(p_obj, keyurl.toString());
+                    if(p_block)
                     {
-                        if(read == 16)
+                        if(p_block->i_buffer == 16)
                         {
                             encryption.key.resize(16);
-                            memcpy(&encryption.key[0], p_data, 16);
+                            memcpy(&encryption.key[0], p_block->p_buffer, 16);
                         }
-                        free(p_data);
+                        block_Release(p_block);
                     }
 
                     if(keytag->getAttributeByName("IV"))

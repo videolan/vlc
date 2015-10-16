@@ -70,7 +70,8 @@ ssize_t ChunksSourceStream::Read(uint8_t *buf, size_t size)
 
     while(i_toread && !b_eof)
     {
-        if(!p_block && !(p_block = source->readNextBlock(i_toread)))
+        const size_t i_blocksize = __MIN(i_toread, 32768);
+        if(!p_block && !(p_block = source->readNextBlock(i_blocksize)))
         {
             b_eof = true;
             break;

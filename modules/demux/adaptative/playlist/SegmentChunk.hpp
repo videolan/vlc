@@ -27,6 +27,7 @@
 
 namespace adaptative
 {
+
     namespace playlist
     {
         using namespace http;
@@ -34,10 +35,10 @@ namespace adaptative
         class BaseRepresentation;
         class ISegment;
 
-        class SegmentChunk : public Chunk
+        class SegmentChunk : public AbstractChunk
         {
         public:
-            SegmentChunk(ISegment *segment, const std::string &url);
+            SegmentChunk(ISegment *segment, AbstractChunkSource *);
             virtual ~SegmentChunk();
             void setRepresentation(BaseRepresentation *);
             virtual void onDownload(block_t **); // reimpl

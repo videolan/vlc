@@ -82,6 +82,9 @@ int HTTPConnection::query(const std::string &path, const BytesRange &range)
 {
     queryOk = false;
 
+    msg_Dbg(stream, "Retrieving ://%s:%u%s @%zu", hostname.c_str(), port, path.c_str(),
+            range.isValid() ? range.getStartByte() : 0);
+
     if(!connected() && ( hostname.empty() || !connect(hostname, port) ))
         return VLC_EGENERIC;
 

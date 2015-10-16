@@ -25,8 +25,8 @@
 using namespace adaptative::playlist;
 using namespace adaptative;
 
-SegmentChunk::SegmentChunk(ISegment *segment_, const std::string &url) :
-    Chunk(url)
+SegmentChunk::SegmentChunk(ISegment *segment_, AbstractChunkSource *source) :
+    AbstractChunk(source)
 {
     segment = segment_;
     segment->chunksuse.Set(segment->chunksuse.Get() + 1);
@@ -57,3 +57,4 @@ StreamFormat SegmentChunk::getStreamFormat() const
     else
         return StreamFormat();
 }
+

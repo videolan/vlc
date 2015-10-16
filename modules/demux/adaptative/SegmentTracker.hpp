@@ -29,6 +29,11 @@
 
 namespace adaptative
 {
+    namespace http
+    {
+        class HTTPConnectionManager;
+    }
+
     namespace logic
     {
         class AbstractAdaptationLogic;
@@ -44,6 +49,7 @@ namespace adaptative
 
     using namespace playlist;
     using namespace logic;
+    using namespace http;
 
     class SegmentTrackerListenerInterface
     {
@@ -63,7 +69,7 @@ namespace adaptative
 
             void setAdaptationLogic(AbstractAdaptationLogic *);
             void resetCounter();
-            SegmentChunk* getNextChunk(bool);
+            SegmentChunk* getNextChunk(bool, HTTPConnectionManager *);
             bool setPositionByTime(mtime_t, bool, bool);
             void setPositionByNumber(uint64_t, bool);
             mtime_t getSegmentStart() const;

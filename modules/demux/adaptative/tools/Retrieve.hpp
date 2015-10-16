@@ -24,7 +24,6 @@
 # include "config.h"
 #endif
 
-//#include <inttypes.h>
 #include <vlc_common.h>
 #include <string>
 
@@ -33,7 +32,7 @@ namespace adaptative
     class Retrieve
     {
         public:
-            static uint64_t HTTP(vlc_object_t *, const std::string &uri, void **pp_data);
+            static block_t * HTTP(vlc_object_t *, const std::string &uri);
     };
 }
 

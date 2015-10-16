@@ -29,6 +29,7 @@
 
 namespace adaptative
 {
+
     namespace playlist
     {
         class BasePeriod;
@@ -73,6 +74,7 @@ namespace adaptative
                 std::vector<std::string>            baseUrls;
                 std::string                         playlistUrl;
                 std::string                         type;
+
         };
     }
 }
