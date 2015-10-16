@@ -482,7 +482,7 @@ static char *size_str( uint64_t l_size )
     else if( l_size >> 10 )
         i_retval = asprintf( &psz_tmp, _("%.1f KiB"), (float)l_size/(1<<10) );
     else
-        i_retval = asprintf( &psz_tmp, _("%ld B"), l_size );
+        i_retval = asprintf( &psz_tmp, _("%"PRIu64" B"), l_size );
 
     return i_retval == -1 ? NULL : psz_tmp;
 }
