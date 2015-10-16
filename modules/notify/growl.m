@@ -3,11 +3,12 @@
  *****************************************************************************
  * VLC specific code:
  *
- * Copyright © 2008,2011,2012 the VideoLAN team
+ * Copyright © 2008,2011,2012,2015 the VideoLAN team
  * $Id$
  *
  * Authors: Rafaël Carré <funman@videolanorg>
  *          Felix Paul Kühne <fkuehne@videolan.org
+ *          Marvin Scholz <epirat07@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +53,7 @@
 #endif
 
 #import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 #import <Growl/Growl.h>
 
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
@@ -63,20 +65,25 @@
 #include <vlc_interface.h>
 #include <vlc_url.h>
 
-
 /*****************************************************************************
  * intf_sys_t, VLCGrowlDelegate
  *****************************************************************************/
 @interface VLCGrowlDelegate : NSObject <GrowlApplicationBridgeDelegate>
 {
-    NSString *o_applicationName;
-    NSString *o_notificationType;
-    NSMutableDictionary *o_registrationDictionary;
+    NSString *applicationName;
+    NSString *notificationType;
+    NSMutableDictionary *registrationDictionary;
+    id lastNotification;
+    BOOL isInForeground;
+    intf_thread_t *interfaceThread;
 }
 
+- (id)initWithInterfaceThread:(intf_thread_t *)thread;
 - (void)registerToGrowl;
-- (void)notifyWithDescription: (const char *)psz_desc
-                       artUrl: (const char *)psz_arturl;
+- (void)notifyWithTitle:(const char *)title
+                 artist:(const char *)artist
+                  album:(const char *)album
+              andArtUrl:(const char *)url;
 @end
 
 struct intf_sys_t
@@ -121,7 +128,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->o_growl_delegate = [[VLCGrowlDelegate alloc] init];
+    p_sys->o_growl_delegate = [[VLCGrowlDelegate alloc] initWithInterfaceThread:p_intf];
     if( !p_sys->o_growl_delegate )
       return VLC_ENOMEM;
 
@@ -145,6 +152,7 @@ static void Close( vlc_object_t *p_this )
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_DelCallback( p_playlist, "input-current", ItemChange, p_intf );
 
+    [GrowlApplicationBridge setGrowlDelegate:nil];
     [p_sys->o_growl_delegate release];
     free( p_sys );
 }
@@ -241,7 +249,10 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         psz_arturl = psz;
     }
 
-    [p_intf->p_sys->o_growl_delegate notifyWithDescription: psz_tmp artUrl: psz_arturl];
+    [p_intf->p_sys->o_growl_delegate notifyWithTitle:psz_title
+                                              artist:psz_artist
+                                               album:psz_album
+                                           andArtUrl:psz_arturl];
 
     free( psz_title );
     free( psz_artist );
@@ -257,58 +268,157 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
  *****************************************************************************/
 @implementation VLCGrowlDelegate
 
-- (id)init
-{
+- (id)initWithInterfaceThread:(intf_thread_t *)thread {
     if( !( self = [super init] ) )
         return nil;
 
-    o_applicationName = nil;
-    o_notificationType = nil;
-    o_registrationDictionary = nil;
+    applicationName = nil;
+    notificationType = nil;
+    registrationDictionary = nil;
+    interfaceThread = thread;
 
+    // Assume we start in foreground
+    isInForeground = YES;
+
+    // Subscribe to notifications to determine if VLC is in foreground or not
+    @autoreleasepool {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationActiveChange:)
+                                                     name:NSApplicationDidBecomeActiveNotification
+                                                   object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationActiveChange:)
+                                                     name:NSApplicationDidResignActiveNotification
+                                                   object:nil];
+    }
     return self;
 }
 
 - (void)dealloc
 {
-    [o_applicationName release];
-    [o_notificationType release];
-    [o_registrationDictionary release];
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
+    // Clear the remaining lastNotification in Notification Center, if any
+    @autoreleasepool {
+        if (lastNotification) {
+            [NSUserNotificationCenter.defaultUserNotificationCenter
+             removeDeliveredNotification:(NSUserNotification *)lastNotification];
+            [lastNotification release];
+        }
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+    }
+#endif
+
+    // Release everything
+    [applicationName release];
+    [notificationType release];
+    [registrationDictionary release];
     [super dealloc];
 }
 
 - (void)registerToGrowl
 {
     @autoreleasepool {
-        o_applicationName = [[NSString alloc] initWithUTF8String: _( "VLC media player" )];
-        o_notificationType = [[NSString alloc] initWithUTF8String: _( "New input playing" )];
+        applicationName = [[NSString alloc] initWithUTF8String:_( "VLC media player" )];
+        notificationType = [[NSString alloc] initWithUTF8String:_( "New input playing" )];
 
-        NSArray *o_defaultAndAllNotifications = [NSArray arrayWithObject: o_notificationType];
-        o_registrationDictionary = [[NSMutableDictionary alloc] init];
-        [o_registrationDictionary setObject: o_defaultAndAllNotifications
-                                     forKey: GROWL_NOTIFICATIONS_ALL];
-        [o_registrationDictionary setObject: o_defaultAndAllNotifications
-                                     forKey: GROWL_NOTIFICATIONS_DEFAULT];
+        NSArray *defaultAndAllNotifications = [NSArray arrayWithObject: notificationType];
+        registrationDictionary = [[NSMutableDictionary alloc] init];
+        [registrationDictionary setObject:defaultAndAllNotifications
+                                   forKey:GROWL_NOTIFICATIONS_ALL];
+        [registrationDictionary setObject:defaultAndAllNotifications
+                                   forKey: GROWL_NOTIFICATIONS_DEFAULT];
 
-        [GrowlApplicationBridge setGrowlDelegate: self];
+        [GrowlApplicationBridge setGrowlDelegate:self];
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
+        [[NSUserNotificationCenter defaultUserNotificationCenter]
+         setDelegate:(id<NSUserNotificationCenterDelegate>)self];
+#endif
     }
 }
 
-- (void)notifyWithDescription: (const char *)psz_desc artUrl: (const char *)psz_arturl
+- (void)notifyWithTitle:(const char *)title
+                 artist:(const char *)artist
+                  album:(const char *)album
+              andArtUrl:(const char *)url
 {
     @autoreleasepool {
-        NSData *o_art = nil;
+        // Init Cover
+        NSData *coverImageData = nil;
+        NSImage *coverImage = nil;
 
-        if( psz_arturl )
-            o_art = [NSData dataWithContentsOfFile: [NSString stringWithUTF8String: psz_arturl]];
+        if (url) {
+            coverImageData = [NSData dataWithContentsOfFile:[NSString stringWithUTF8String:url]];
+            coverImage = [[NSImage alloc] initWithData:coverImageData];
+        }
 
-        [GrowlApplicationBridge notifyWithTitle: [NSString stringWithUTF8String: _( "Now playing" )]
-                                    description: [NSString stringWithUTF8String: psz_desc]
-                               notificationName: o_notificationType
-                                       iconData: o_art
-                                       priority: 0
-                                       isSticky: NO
-                                   clickContext: nil];
+        // Init Track info
+        NSString *titleStr = nil;
+        NSString *artistStr = nil;
+        NSString *albumStr = nil;
+
+        if (title) {
+            titleStr = [NSString stringWithUTF8String:title];
+        } else {
+            // Without title, notification makes no sense, so return here
+            // title should never be empty, but better check than crash.
+            return;
+        }
+        if (artist)
+            artistStr = [NSString stringWithUTF8String:artist];
+        if (album)
+            albumStr = [NSString stringWithUTF8String:album];
+
+        // Notification stuff
+        if ([GrowlApplicationBridge isGrowlRunning]) {
+            // Make the Growl notification string
+            NSString *desc = nil;
+
+            if (artistStr && albumStr) {
+                desc = [NSString stringWithFormat:@"%@\n%@ [%@]", titleStr, artistStr, albumStr];
+            } else if (artistStr) {
+                desc = [NSString stringWithFormat:@"%@\n%@", titleStr, artistStr];
+            } else {
+                desc = titleStr;
+            }
+
+            // Send notification
+            [GrowlApplicationBridge notifyWithTitle:[NSString stringWithUTF8String:_("Now playing")]
+                                        description:desc
+                                   notificationName:notificationType
+                                           iconData:coverImageData
+                                           priority:0
+                                           isSticky:NO
+                                       clickContext:nil];
+        } else {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
+            // Make the OS X notification and string
+            NSUserNotification *notification = [NSUserNotification new];
+            NSString *desc = nil;
+
+            if (artistStr && albumStr) {
+                desc = [NSString stringWithFormat:@"%@ – %@", artistStr, albumStr];
+            } else if (artistStr) {
+                desc = artistStr;
+            }
+
+            notification.title              = titleStr;
+            notification.subtitle           = desc;
+            notification.hasActionButton    = YES;
+            notification.actionButtonTitle  = [NSString stringWithUTF8String:_("Skip")];
+
+            // Private APIs to set cover image, see rdar://23148801
+            // and show action button, see rdar://23148733
+            [notification setValue:coverImage forKey:@"_identityImage"];
+            [notification setValue:@(YES) forKey:@"_showsButtons"];
+            [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
+            [notification release];
+#endif
+        }
+
+        // Release stuff
+        [coverImage release];
     }
 }
 
@@ -317,11 +427,47 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
  *****************************************************************************/
 - (NSDictionary *)registrationDictionaryForGrowl
 {
-    return o_registrationDictionary;
+    return registrationDictionary;
 }
 
 - (NSString *)applicationNameForGrowl
 {
-    return o_applicationName;
+    return applicationName;
 }
+
+- (void)applicationActiveChange:(NSNotification *)n {
+    if (n.name == NSApplicationDidBecomeActiveNotification)
+        isInForeground = YES;
+    else if (n.name == NSApplicationDidResignActiveNotification)
+        isInForeground = NO;
+}
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
+- (void)userNotificationCenter:(NSUserNotificationCenter *)center
+       didActivateNotification:(NSUserNotification *)notification
+{
+    if (notification.activationType == NSUserNotificationActivationTypeActionButtonClicked) {
+        playlist_Next(pl_Get(interfaceThread));
+    }
+}
+
+- (void)userNotificationCenter:(NSUserNotificationCenter *)center
+        didDeliverNotification:(NSUserNotification *)notification
+{
+    // Only keep the most recent notification in the Notification Center
+    if (lastNotification) {
+        [center removeDeliveredNotification: (NSUserNotification *)lastNotification];
+        [lastNotification release];
+    }
+    [notification retain];
+    lastNotification = notification;
+}
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
+     shouldPresentNotification:(NSUserNotification *)notification
+{
+    // Show notifications regardless if App in foreground or background
+    return YES;
+}
+#endif
 @end

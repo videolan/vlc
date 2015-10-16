@@ -2,7 +2,7 @@ notifydir = $(pluginsdir)/notify
 
 libgrowl_plugin_la_SOURCES = notify/growl.m
 libgrowl_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) $(OBJCFLAGS_growl)
-libgrowl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(notifydir)'
+libgrowl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(notifydir)' -Wl,-framework,AppKit
 libgrowl_plugin_la_LIBADD = $(LIBS_growl)
 libgrowl_plugin_la_LIBTOOLFLAGS = --tag=CC
 
