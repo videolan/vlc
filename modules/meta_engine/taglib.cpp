@@ -548,21 +548,9 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     list = tag->fieldListMap()["TRACKNUMBER"];
     if( !list.isEmpty() )
     {
-        const char *psz_value;
-        unsigned short u_track;
-        unsigned short u_total;
-        psz_value = (*list.begin()).toCString( true );
-        if( sscanf( psz_value, "%hu/%hu", &u_track, &u_total ) == 2)
-        {
-            char str[6];
-            snprintf(str, 6, "%u", u_track);
-            vlc_meta_SetTrackNum( p_meta, str);
-            snprintf(str, 6, "%u", u_total);
-            vlc_meta_SetTrackTotal( p_meta, str);
-            hasTrackTotal = true;
-        }
-        else
-            vlc_meta_SetTrackNum( p_meta, psz_value);
+        int i_values = ExtractCoupleNumberValues( p_meta, (*list.begin()).toCString( true ),
+                 vlc_meta_TrackNumber, vlc_meta_TrackTotal );
+        hasTrackTotal = i_values == 2;
     }
     if( !hasTrackTotal )
     {
