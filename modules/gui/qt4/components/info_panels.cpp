@@ -422,6 +422,15 @@ void ExtraMetaPanel::update( input_item_t *p_item )
         return;
     }
 
+    const char *psz_disc_number = vlc_meta_Get( p_meta, vlc_meta_DiscNumber);
+    if( psz_disc_number )
+    {
+        QStringList tempItem;
+        tempItem.append( VLC_META_DISCNUMBER );
+        tempItem.append( qfu( psz_disc_number ) );
+        items.append( new QTreeWidgetItem ( extraMetaTree, tempItem ) );
+    }
+
     char ** ppsz_allkey = vlc_meta_CopyExtraNames( p_meta);
 
     for( int i = 0; ppsz_allkey[i] ; i++ )
