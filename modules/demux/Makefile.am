@@ -292,6 +292,8 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/logic/RateBasedAdaptationLogic.cpp \
     demux/adaptative/logic/Representationselectors.hpp \
     demux/adaptative/logic/Representationselectors.cpp \
+    demux/adaptative/http/BytesRange.cpp \
+    demux/adaptative/http/BytesRange.hpp \
     demux/adaptative/http/Chunk.cpp \
     demux/adaptative/http/Chunk.h \
     demux/adaptative/http/HTTPConnection.cpp \
