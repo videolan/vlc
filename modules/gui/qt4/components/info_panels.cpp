@@ -584,7 +584,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
                            "0", input, "kb/s" );
     CREATE_AND_ADD_TO_CAT( corrupted_stat, qtr("Discarded (corrupted)"),
                            "0", input, "" );
-    CREATE_AND_ADD_TO_CAT( discontinuity_stat, qtr("Timeline changed"),
+    CREATE_AND_ADD_TO_CAT( discontinuity_stat, qtr("Dropped (discontinued)"),
                            "0", input, "" );
 
     CREATE_AND_ADD_TO_CAT( vdecoded_stat, qtr("Decoded"),
