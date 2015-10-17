@@ -72,7 +72,7 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
     if (!block)
         return NULL;
 
-    if (block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+    if (block->i_flags & (BLOCK_FLAG_CORRUPTED)) {
         block_Release(block);
         return NULL;
     }

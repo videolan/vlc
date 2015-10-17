@@ -480,9 +480,12 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             vlc_mutex_unlock( &p_sys->lock );
         }
 #endif
-        p_sys->i_max_stop = VLC_TS_INVALID;
-        block_Release( p_block );
-        return NULL;
+        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        {
+            p_sys->i_max_stop = VLC_TS_INVALID;
+            block_Release( p_block );
+            return NULL;
+        }
     }
 
     /* Block to Kate packet */

@@ -282,7 +282,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
 
-    if( ( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) ||
+    if( ( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) ) ||
           p_block->i_buffer < sizeof(uint16_t) )
     {
         block_Release( p_block );

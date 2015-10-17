@@ -416,7 +416,7 @@ static subpicture_t *Decode(decoder_t *dec, block_t **block)
     subpicture_t *sub_first = NULL;
     subpicture_t **sub_last = &sub_first;
 
-    if (b->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
+    if (b->i_flags & (BLOCK_FLAG_CORRUPTED))
         goto exit;
 
     while (b->i_buffer > 3) {

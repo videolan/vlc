@@ -201,17 +201,18 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     block_t *p_block = pp_block ? *pp_block : NULL;
 
     if (p_block) {
-        if( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+        if( p_block->i_flags&(BLOCK_FLAG_CORRUPTED) )
         {
-            if( p_block->i_flags&BLOCK_FLAG_CORRUPTED )
-            {
-                p_sys->i_state = STATE_NOSYNC;
-                block_BytestreamEmpty( &p_sys->bytestream );
-            }
+            p_sys->i_state = STATE_NOSYNC;
+            block_BytestreamEmpty( &p_sys->bytestream );
             date_Set( &p_sys->end_date, 0 );
             block_Release( p_block );
-            p_sys->b_discontinuity = true;
             return NULL;
+        }
+        if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        {
+            date_Set( &p_sys->end_date, 0 );
+            p_sys->b_discontinuity = true;
         }
 
         if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
@@ -292,7 +293,6 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 msg_Dbg( p_dec, "emulated startcode" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
-                p_sys->b_discontinuity = true;
                 break;
             }
 
@@ -367,7 +367,6 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     msg_Dbg( p_dec, "emulated startcode on next frame" );
                     block_SkipByte( &p_sys->bytestream );
                     p_sys->i_state = STATE_NOSYNC;
-                    p_sys->b_discontinuity = true;
                     break;
                 }
 

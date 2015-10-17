@@ -234,7 +234,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
     uint16_t i_expected_image;
     uint8_t  i_packet, i_expected_packet;
 
-    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    if( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) )
     {
         block_Release( p_block );
         return NULL;

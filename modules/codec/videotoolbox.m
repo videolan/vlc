@@ -929,7 +929,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     p_block = *pp_block;
 
     if (likely(p_block != NULL)) {
-        if (unlikely(p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))) {
+        if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED))) {
             if (likely(p_sys->b_started)) {
                 @synchronized(p_sys->outputTimeStamps) {
                     [p_sys->outputTimeStamps removeAllObjects];
