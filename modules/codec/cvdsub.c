@@ -169,6 +169,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
 
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+
     if( !(p_spu = Reassemble( p_dec, p_block )) ) return NULL;
 
     /* Parse and decode */

@@ -143,7 +143,7 @@ static picture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     p_block = *pp_block;
 
-    if( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) )
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         p_sys->i_packet = 0;
         goto exit;
@@ -170,7 +170,8 @@ static picture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
 
 exit:
-    block_Release( p_block ); *pp_block = NULL;
+    block_Release( p_block );
+    *pp_block = NULL;
     return p_pic;
 }
 

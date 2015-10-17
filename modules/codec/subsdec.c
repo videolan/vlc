@@ -329,7 +329,9 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
 
     p_block = *pp_block;
-    if( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) )
+    *pp_block = NULL;
+
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         block_Release( p_block );
         return NULL;
@@ -338,8 +340,6 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu = ParseText( p_dec, p_block );
 
     block_Release( p_block );
-    *pp_block = NULL;
-
     return p_spu;
 }
 
@@ -365,6 +365,9 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
     char *psz_subtitle = NULL;
+
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        return NULL;
 
     /* We cannot display a subpicture with no date */
     if( p_block->i_pts <= VLC_TS_INVALID )

@@ -531,12 +531,13 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
 
             p_sys->i_late_frames = 0;
-
+#if 0
+            /* NOTE: data is good only the timeline changed so do not flush decoder */
             post_mt( p_sys );
             if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
                 avcodec_flush_buffers( p_context );
             wait_mt( p_sys );
-
+#endif
             if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
             {
                 block_Release( p_block );

@@ -497,6 +497,9 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     subpicture_t *p_spu = NULL;
     char *psz_subtitle = NULL;
 
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        return NULL;
+
     /* We cannot display a subpicture with no date */
     if( p_block->i_pts <= VLC_TS_INVALID )
     {

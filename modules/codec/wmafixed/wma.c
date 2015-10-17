@@ -201,12 +201,15 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
 
-    if( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        date_Set( &p_sys->end_date, 0 );
-        block_Release( p_block );
-        *pp_block = NULL;
-        return NULL;
+        date_Set( &p_sys->end_date, VLC_TS_INVALID );
+        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED)
+        {
+            block_Release( p_block );
+            *pp_block = NULL;
+            return NULL;
+        }
     }
 
     if( p_block->i_buffer <= 0 )

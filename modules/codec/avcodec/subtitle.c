@@ -124,13 +124,13 @@ static subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
 
     block_t *block = *block_ptr;
 
-    if (block->i_flags & (BLOCK_FLAG_CORRUPTED)) {
-        block_Release(block);
-        avcodec_flush_buffers(sys->p_context);
-        return NULL;
+    if (block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED)) {
+        if (block->i_flags & BLOCK_FLAG_CORRUPTED) {
+            avcodec_flush_buffers(sys->p_context);
+            block_Release(block);
+            return NULL;
+        }
     }
-    if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
-        avcodec_flush_buffers(sys->p_context);
 
     if (block->i_buffer <= 0) {
         block_Release(block);
