@@ -64,7 +64,8 @@ Profile MPD::getProfile() const
 
 void MPD::debug()
 {
-    msg_Dbg(stream, "MPD profile=%s mediaPresentationDuration=%ld minBufferTime=%ld",
+    msg_Dbg(stream, "MPD profile=%s mediaPresentationDuration=%" PRId64
+            " minBufferTime=%" PRId64,
             static_cast<std::string>(getProfile()).c_str(),
             duration.Get() / CLOCK_FREQ,
             minBufferTime.Get());
