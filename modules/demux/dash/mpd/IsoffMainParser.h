@@ -33,7 +33,6 @@
 #include "Profile.hpp"
 
 #include <cstdlib>
-#include <sstream>
 
 #include <vlc_common.h>
 
@@ -89,49 +88,6 @@ namespace dash
                 MPD             *mpd;
                 stream_t        *p_stream;
                 std::string      playlisturl;
-        };
-
-        class IsoTime
-        {
-            public:
-                IsoTime(const std::string&);
-                operator time_t() const;
-
-            private:
-                time_t time;
-        };
-
-        class UTCTime
-        {
-            public:
-                UTCTime(const std::string&);
-                operator time_t() const;
-
-            private:
-                time_t time;
-        };
-
-        template<typename T> class Integer
-        {
-            public:
-                Integer(const std::string &str)
-                {
-                    try
-                    {
-                        std::istringstream in(str);
-                        in >> value;
-                    } catch (int) {
-                        value = 0;
-                    }
-                }
-
-                operator T() const
-                {
-                    return value;
-                }
-
-            private:
-                T value;
         };
     }
 }
