@@ -389,8 +389,32 @@ libadaptative_hls_SOURCES = \
     demux/hls/HLSStreams.hpp \
     demux/hls/HLSStreams.cpp
 
+libadaptative_smooth_SOURCES = \
+    demux/smooth/mp4/IndexReader.cpp \
+    demux/smooth/mp4/IndexReader.hpp \
+    demux/smooth/playlist/ForgedInitSegment.hpp \
+    demux/smooth/playlist/ForgedInitSegment.cpp \
+    demux/smooth/playlist/Manifest.hpp \
+    demux/smooth/playlist/Manifest.cpp \
+    demux/smooth/playlist/MemoryChunk.hpp \
+    demux/smooth/playlist/MemoryChunk.cpp \
+    demux/smooth/playlist/Parser.hpp \
+    demux/smooth/playlist/Parser.cpp \
+    demux/smooth/playlist/Representation.hpp \
+    demux/smooth/playlist/Representation.cpp \
+    demux/smooth/playlist/SmoothSegment.hpp \
+    demux/smooth/playlist/SmoothSegment.cpp \
+    demux/smooth/SmoothManager.hpp \
+    demux/smooth/SmoothManager.cpp \
+    demux/smooth/SmoothStreamFormat.hpp \
+    demux/smooth/SmoothStream.hpp \
+    demux/smooth/SmoothStream.cpp
+libadaptative_smooth_SOURCES += mux/mp4/libmp4mux.c mux/mp4/libmp4mux.h \
+				packetizer/h264_nal.c packetizer/h264_nal.h
+
 libadaptative_plugin_la_SOURCES += $(libadaptative_hls_SOURCES)
 libadaptative_plugin_la_SOURCES += $(libadaptative_dash_SOURCES)
+libadaptative_plugin_la_SOURCES += $(libadaptative_smooth_SOURCES)
 libadaptative_plugin_la_SOURCES += demux/adaptative/adaptative.cpp
 libadaptative_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
 libadaptative_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/demux/adaptative

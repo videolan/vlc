@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Inheritables.hpp Nodes inheritables properties
+ * SmoothSegment.hpp:
  *****************************************************************************
- * Copyright (C) 1998-2015 VLC authors and VideoLAN
+ * Copyright (C) 2015 - VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -17,51 +17,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef INHERITABLES_H
-#define INHERITABLES_H
+#ifndef SMOOTHSEGMENT_HPP
+#define SMOOTHSEGMENT_HPP
 
-#include "../tools/Properties.hpp"
-#include <string>
-#include <stdint.h>
-#include "ID.hpp"
+#include "../adaptative/playlist/SegmentTemplate.h"
 
-namespace adaptative
+namespace smooth
 {
     namespace playlist
     {
-        class SegmentTimeline;
+        using namespace adaptative::playlist;
 
-        class Timelineable
+        class SmoothSegment : public MediaSegmentTemplate
         {
             public:
-                Timelineable();
-                ~Timelineable();
-                Property<SegmentTimeline *> segmentTimeline;
-        };
-
-        class TimescaleAble
-        {
-            public:
-                TimescaleAble( TimescaleAble * = NULL );
-                ~TimescaleAble();
-                void setParentTimescale( TimescaleAble * );
-                uint64_t inheritTimescale() const;
-                Property<uint64_t> timescale;
+                SmoothSegment(SegmentInformation * = NULL);
 
             protected:
-                TimescaleAble *parentTimescale;
-        };
-
-        class Unique
-        {
-            public:
-                const ID & getID() const;
-                void       setID(const ID &);
-
-            protected:
-                ID id;
+                virtual void onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *); //reimpl
         };
     }
 }
-
-#endif // INHERITABLES_H
+#endif // SMOOTHSEGMENT_HPP

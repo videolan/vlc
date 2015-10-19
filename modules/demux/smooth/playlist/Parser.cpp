@@ -1,0 +1,271 @@
+/*
+ * Parser.cpp
+ *****************************************************************************
+ * Copyright © 2015 - VideoLAN and VLC Authors
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+#include "Parser.hpp"
+
+#include "Manifest.hpp"
+#include "Representation.hpp"
+#include "ForgedInitSegment.hpp"
+#include "SmoothSegment.hpp"
+#include "../adaptative/playlist/BasePeriod.h"
+#include "../adaptative/playlist/BaseAdaptationSet.h"
+#include "../adaptative/playlist/SegmentTimeline.h"
+#include "../adaptative/playlist/SegmentList.h"
+#include "../adaptative/xml/DOMHelper.h"
+#include "../adaptative/xml/Node.h"
+#include "../adaptative/tools/Helper.h"
+#include "../adaptative/tools/Conversions.hpp"
+
+using namespace smooth::playlist;
+using namespace adaptative::xml;
+
+ManifestParser::ManifestParser(Node *root_, stream_t *stream, const std::string & streambaseurl_)
+{
+    root = root_;
+    p_stream = stream;
+    playlisturl = streambaseurl_;
+}
+
+ManifestParser::~ManifestParser()
+{
+}
+
+static SegmentTimeline *createTimeline(Node *streamIndexNode, uint64_t timescale)
+{
+    SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(timescale);
+    if(timeline)
+    {
+        std::vector<Node *> chunks = DOMHelper::getElementByTagName(streamIndexNode, "c", true);
+        std::vector<Node *>::const_iterator it;
+
+        struct
+        {
+            uint64_t number;
+            uint64_t duration;
+            uint64_t time;
+            uint64_t repeat;
+        } cur = {0,0,0,0}, prev = {0,0,0,0};
+
+        for(it = chunks.begin(); it != chunks.end(); ++it)
+        {
+            const Node *chunk = *it;
+             /* Detect repeats, as r attribute only has been added in late smooth */
+            bool b_cur_is_repeat = true; /* If our current chunk has repeated previous content */
+
+            if(chunk->hasAttribute("n"))
+            {
+                cur.number = Integer<uint64_t>(chunk->getAttributeValue("n"));
+                b_cur_is_repeat &= (cur.number == prev.number + 1 + prev.repeat);
+            }
+            else
+            {
+                cur.number = prev.number + prev.repeat + 1;
+            }
+
+            if(chunk->hasAttribute("d"))
+            {
+                cur.duration = Integer<uint64_t>(chunk->getAttributeValue("d"));
+                b_cur_is_repeat &= (cur.duration == prev.duration);
+            }
+            else
+            {
+                cur.duration = prev.duration;
+            }
+
+            if(chunk->hasAttribute("t"))
+            {
+                cur.time = Integer<uint64_t>(chunk->getAttributeValue("t"));
+                b_cur_is_repeat &= (cur.time == prev.time + (prev.duration * (prev.repeat + 1)));
+            }
+            else
+            {
+                cur.time = prev.time + (prev.duration * (prev.repeat + 1));
+            }
+
+            uint64_t explicit_repeat_count = 0;
+            if(chunk->hasAttribute("r"))
+            {
+                explicit_repeat_count = Integer<uint64_t>(chunk->getAttributeValue("r"));
+                /* #segments = repeat count ! as MS has a really broken notion of repetition */
+                if(explicit_repeat_count > 0)
+                    explicit_repeat_count -= 1;
+            }
+
+            if(it == chunks.begin())
+            {
+                prev = cur;
+                prev.repeat = explicit_repeat_count;
+            }
+            else if(b_cur_is_repeat)
+            {
+                prev.repeat += (1 + explicit_repeat_count);
+            }
+            else
+            {
+                timeline->addElement(prev.number, prev.duration, prev.repeat, prev.time);
+                cur.repeat = explicit_repeat_count;
+                prev = cur;
+                cur.repeat = cur.number = 0;
+            }
+        }
+
+        if(chunks.size() > 0)
+            timeline->addElement(prev.number, prev.duration, prev.repeat, prev.time);
+    }
+    return timeline;
+}
+
+static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const std::string &type, unsigned id, unsigned trackid)
+{
+    Representation *rep = new (std::nothrow) Representation(adaptSet);
+    if(rep)
+    {
+        rep->setID(ID(id));
+        SegmentList *segmentList = new (std::nothrow) SegmentList(rep);
+        if(segmentList)
+        {
+            if(qualNode->hasAttribute("Bitrate"))
+                rep->setBandwidth(Integer<uint64_t>(qualNode->getAttributeValue("Bitrate")));
+
+            if(qualNode->hasAttribute("Width"))
+                rep->setWidth(Integer<uint64_t>(qualNode->getAttributeValue("Width")));
+
+            if(qualNode->hasAttribute("Height"))
+                rep->setHeight(Integer<uint64_t>(qualNode->getAttributeValue("Height")));
+
+            ForgedInitSegment *initSegment = new (std::nothrow)
+                    ForgedInitSegment(segmentList, type,
+                                      adaptSet->inheritTimescale(),
+                                      adaptSet->getPlaylist()->duration.Get());
+            if(initSegment)
+            {
+                initSegment->setTrackID(trackid);
+
+                if(rep->getWidth() > 0 && rep->getHeight() > 0)
+                    initSegment->setVideoSize(rep->getWidth(), rep->getHeight());
+
+                if(qualNode->hasAttribute("FourCC"))
+                    initSegment->setFourCC(qualNode->getAttributeValue("FourCC"));
+
+                if(qualNode->hasAttribute("PacketSize"))
+                    initSegment->setPacketSize(Integer<uint16_t>(qualNode->getAttributeValue("PacketSize")));
+
+                if(qualNode->hasAttribute("Channels"))
+                    initSegment->setChannels(Integer<uint16_t>(qualNode->getAttributeValue("Channels")));
+
+                if(qualNode->hasAttribute("SamplingRate"))
+                    initSegment->setSamplingRate(Integer<uint32_t>(qualNode->getAttributeValue("SamplingRate")));
+
+                if(qualNode->hasAttribute("BitsPerSample"))
+                    initSegment->setBitsPerSample(Integer<uint32_t>(qualNode->getAttributeValue("BitsPerSample")));
+
+                if(qualNode->hasAttribute("CodecPrivateData"))
+                    initSegment->setCodecPrivateData(qualNode->getAttributeValue("CodecPrivateData"));
+
+                if(qualNode->hasAttribute("AudioTag"))
+                    initSegment->setAudioTag(Integer<uint16_t>(qualNode->getAttributeValue("AudioTag")));
+
+                if(qualNode->hasAttribute("WaveFormatEx"))
+                    initSegment->setWaveFormatEx(qualNode->getAttributeValue("WaveFormatEx"));
+
+                initSegment->setSourceUrl("forged://");
+                segmentList->initialisationSegment.Set(initSegment);
+            }
+            rep->setSegmentList(segmentList);
+
+            adaptSet->addRepresentation(rep);
+        }
+    }
+}
+
+static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned id)
+{
+    BaseAdaptationSet *adaptSet = new (std::nothrow) BaseAdaptationSet(period);
+    if(adaptSet)
+    {
+        adaptSet->setID(ID(id));
+        const std::string url = streamIndexNode->getAttributeValue("Url");
+        if(!url.empty())
+        {
+            /* SmoothSegment is a template holder */
+            SmoothSegment *templ = new SmoothSegment(adaptSet);
+            if(templ)
+            {
+                templ->setSourceUrl(url);
+                SegmentTimeline *timeline = createTimeline(streamIndexNode, period->inheritTimescale());
+                templ->segmentTimeline.Set(timeline);
+                adaptSet->setSegmentTemplate(templ);
+            }
+
+            unsigned nextid = 1;
+            const std::string type = streamIndexNode->getAttributeValue("Type");
+            std::vector<Node *> qualLevels = DOMHelper::getElementByTagName(streamIndexNode, "QualityLevel", true);
+            std::vector<Node *>::const_iterator it;
+            for(it = qualLevels.begin(); it != qualLevels.end(); ++it)
+                ParseQualityLevel(adaptSet, *it, type, nextid++, id);
+        }
+        period->addAdaptationSet(adaptSet);
+    }
+}
+
+Manifest * ManifestParser::parse()
+{
+    Manifest *manifest = new (std::nothrow) Manifest(p_stream);
+    if(!manifest)
+        return NULL;
+
+    manifest->setPlaylistUrl(Helper::getDirectoryPath(playlisturl).append("/"));
+
+    if(root->hasAttribute("TimeScale"))
+        manifest->timescale.Set(Integer<uint64_t>(root->getAttributeValue("TimeScale")));
+
+    if(root->hasAttribute("Duration"))
+    {
+        mtime_t time = Integer<mtime_t>(root->getAttributeValue("Duration"));
+        if(manifest->timescale.Get() > CLOCK_FREQ)
+            time /= (manifest->timescale.Get() / CLOCK_FREQ);
+        else
+            time = time * CLOCK_FREQ / manifest->timescale.Get();
+        manifest->duration.Set(time);
+    }
+
+    if(root->hasAttribute("IsLive") && root->getAttributeValue("IsLive") == "TRUE")
+        manifest->b_live = true;
+
+    /* Need a default Period */
+    BasePeriod *period = new (std::nothrow) BasePeriod(manifest);
+    if(period)
+    {
+        period->timescale.Set(manifest->timescale.Get());
+        period->duration.Set(manifest->duration.Get());
+        unsigned nextid = 1;
+        std::vector<Node *> streamIndexes = DOMHelper::getElementByTagName(root, "StreamIndex", true);
+        std::vector<Node *>::const_iterator it;
+        for(it = streamIndexes.begin(); it != streamIndexes.end(); ++it)
+            ParseStreamIndex(period, *it, nextid++);
+        manifest->addPeriod(period);
+    }
+
+    return manifest;
+}
+
+Manifest *parse(stream_t *, const std::string &)
+{
+    return NULL;
+}

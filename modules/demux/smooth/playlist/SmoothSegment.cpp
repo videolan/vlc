@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Inheritables.cpp
+ * SmoothSegment.cpp:
  *****************************************************************************
- * Copyright (C) 1998-2015 VLC authors and VideoLAN
+ * Copyright (C) 2015 - VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -18,56 +18,27 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include "SmoothSegment.hpp"
 
-#include "Inheritables.hpp"
-#include "SegmentTimeline.h"
+#include "../adaptative/playlist/BaseRepresentation.h"
+#include "../adaptative/playlist/AbstractPlaylist.hpp"
+#include "../mp4/IndexReader.hpp"
 
-using namespace adaptative::playlist;
+using namespace smooth::playlist;
+using namespace smooth::mp4;
 
-Timelineable::Timelineable()
+SmoothSegment::SmoothSegment(SegmentInformation *parent) :
+    MediaSegmentTemplate( parent )
 {
-    segmentTimeline.Set(NULL);
+
 }
 
-Timelineable::~Timelineable()
+void SmoothSegment::onChunkDownload(block_t **pp_block, SegmentChunk *, BaseRepresentation *rep)
 {
-    delete segmentTimeline.Get();
-}
+    if(!rep || ((*pp_block)->i_flags & BLOCK_FLAG_HEADER) == 0 ||
+       !rep->getPlaylist()->isLive())
+        return;
 
-TimescaleAble::TimescaleAble(TimescaleAble *parent)
-{
-    timescale.Set(0);
-    parentTimescale = parent;
-}
-
-TimescaleAble::~TimescaleAble()
-{
-}
-
-void TimescaleAble::setParentTimescale(TimescaleAble *parent)
-{
-    parentTimescale = parent;
-}
-
-uint64_t TimescaleAble::inheritTimescale() const
-{
-    if(timescale.Get())
-        return timescale.Get();
-    else if(parentTimescale)
-        return parentTimescale->inheritTimescale();
-    else
-        return 1;
-}
-
-const ID & Unique::getID() const
-{
-    return id;
-}
-
-void Unique::setID(const ID &id_)
-{
-    id = id_;
+    IndexReader br(rep->getPlaylist()->getVLCObject());
+    br.parseIndex(*pp_block, rep);
 }

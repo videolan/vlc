@@ -43,7 +43,9 @@
 #include "../hls/HLSStreams.hpp"
 #include "../hls/playlist/Parser.hpp"
 #include "../hls/playlist/M3U8.hpp"
-
+#include "../smooth/SmoothManager.hpp"
+#include "../smooth/SmoothStream.hpp"
+#include "../smooth/playlist/Parser.hpp"
 
 using namespace adaptative::logic;
 using namespace adaptative::playlist;
@@ -52,6 +54,8 @@ using namespace dash::mpd;
 using namespace dash;
 using namespace hls;
 using namespace hls::playlist;
+using namespace smooth;
+using namespace smooth::playlist;
 
 /*****************************************************************************
  * Module descriptor
@@ -155,6 +159,29 @@ static int Open(vlc_object_t *p_obj)
                 new (std::nothrow) HLSManager(p_demux, p_playlist,
                                               new (std::nothrow) HLSStreamFactory,
                                               static_cast<AbstractAdaptationLogic::LogicType>(logic));
+    }
+    else if(SmoothManager::isSmoothStreaming(p_demux->s))
+    {
+        //Build a XML tree
+        DOMParser parser(p_demux->s);
+        if( !parser.parse() )
+        {
+            msg_Err( p_demux, "Could not parse Manifest" );
+            return VLC_EGENERIC;
+        }
+
+        ManifestParser *mparser = new ManifestParser(parser.getRootNode(), p_demux->s, playlisturl);
+        smooth::playlist::Manifest *p_playlist = mparser->parse();
+        delete mparser;
+        if(p_playlist == NULL)
+        {
+            msg_Err( p_demux, "Cannot create Manifest");
+            return VLC_EGENERIC;
+        }
+
+        p_manager = new SmoothManager( p_demux, p_playlist,
+                                     new (std::nothrow) SmoothStreamFactory,
+                                     static_cast<AbstractAdaptationLogic::LogicType>(logic) );
     }
 
     if(!p_manager || !p_manager->start())
