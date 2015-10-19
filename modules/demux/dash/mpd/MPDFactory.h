@@ -27,20 +27,24 @@
 #include "MPD.h"
 #include "Profile.hpp"
 
-namespace dash
+namespace adaptative
 {
     namespace xml
     {
         class Node;
     }
+}
 
+namespace dash
+{
     namespace mpd
     {
+        using namespace adaptative;
+
         class MPDFactory
         {
             public:
-                static MPD* create(xml::Node *root, stream_t *p_stream,
-                                   std::string &, Profile profile);
+                static MPD* create(xml::Node *root, stream_t *p_stream, std::string &);
         };
     }
 }

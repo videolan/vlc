@@ -1,5 +1,5 @@
 /*
- * DOMParser.h
+ * DOMHelper.h
  *****************************************************************************
  * Copyright (C) 2010 - 2011 Klagenfurt University
  *
@@ -22,45 +22,29 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef DOMPARSER_H_
-#define DOMPARSER_H_
+#ifndef DOMHELPER_H_
+#define DOMHELPER_H_
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include <vlc_common.h>
-#include <vlc_stream.h>
+#include <vector>
+#include <string>
 
 #include "Node.h"
-#include "../mpd/Profile.hpp"
 
-namespace dash
+namespace adaptative
 {
     namespace xml
     {
-        class DOMParser
+        class DOMHelper
         {
             public:
-                DOMParser           (stream_t *stream);
-                virtual ~DOMParser  ();
-
-                bool                parse       ();
-                Node*               getRootNode ();
-                void                print       ();
-                mpd::Profile        getProfile  () const;
+                static std::vector<Node *> getElementByTagName      (Node *root, const std::string& name, bool selfContain);
+                static std::vector<Node *> getChildElementByTagName (Node *root, const std::string& name);
+                static Node*               getFirstChildElementByName( Node *root, const std::string& name );
 
             private:
-                Node                *root;
-                stream_t            *stream;
-
-                xml_reader_t        *vlc_reader;
-
-                Node*   processNode             ();
-                void    addAttributesToNode     (Node *node);
-                void    print                   (Node *node, int offset);
+                static void getElementsByTagName(Node *root, const std::string& name, std::vector<Node *> *elements, bool selfContain);
         };
     }
 }
 
-#endif /* DOMPARSER_H_ */
+#endif /* DOMHELPER_H_ */

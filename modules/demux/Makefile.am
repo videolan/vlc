@@ -325,7 +325,13 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/tools/Helper.h \
     demux/adaptative/tools/Properties.hpp \
     demux/adaptative/tools/Retrieve.cpp \
-    demux/adaptative/tools/Retrieve.hpp
+    demux/adaptative/tools/Retrieve.hpp \
+    demux/adaptative/xml/DOMHelper.cpp \
+    demux/adaptative/xml/DOMHelper.h \
+    demux/adaptative/xml/DOMParser.cpp \
+    demux/adaptative/xml/DOMParser.h \
+    demux/adaptative/xml/Node.cpp \
+    demux/adaptative/xml/Node.h
 
 libadaptative_dash_SOURCES = \
     demux/dash/mpd/AdaptationSet.cpp \
@@ -354,12 +360,6 @@ libadaptative_dash_SOURCES = \
     demux/dash/mpd/TrickModeType.h \
     demux/dash/mp4/AtomsReader.cpp \
     demux/dash/mp4/AtomsReader.hpp \
-    demux/dash/xml/DOMHelper.cpp \
-    demux/dash/xml/DOMHelper.h \
-    demux/dash/xml/DOMParser.cpp \
-    demux/dash/xml/DOMParser.h \
-    demux/dash/xml/Node.cpp \
-    demux/dash/xml/Node.h \
     demux/dash/DASHManager.cpp \
     demux/dash/DASHManager.h \
     demux/dash/DASHStream.cpp \

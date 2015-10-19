@@ -29,28 +29,18 @@
 #include "MPDFactory.h"
 #include "IsoffMainParser.h"
 
-using namespace dash::xml;
 using namespace dash::mpd;
+using namespace adaptative::xml;
 
-MPD* MPDFactory::create(Node *root, stream_t *p_stream,
-                        std::string & playlisturl, Profile profile)
+MPD* MPDFactory::create(Node *root, stream_t *p_stream, std::string & playlisturl)
 {
-    IsoffMainParser *parser = NULL;
-
-    switch( profile )
-    {
-        case Profile::Unknown:
-            break;
-        default:
-            parser = new (std::nothrow) IsoffMainParser(root, p_stream, playlisturl);
-            break;
-    }
-
+    IsoffMainParser *parser = new (std::nothrow) IsoffMainParser(root, p_stream, playlisturl);
     if(!parser)
         return NULL;
 
     MPD* mpd = NULL;
-    if(parser->parse(profile))
+    Profile profile = parser->getProfile();
+    if(!(profile == Profile::Unknown) && parser->parse(profile))
         mpd = parser->getMPD();
 
     delete parser;

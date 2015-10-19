@@ -33,8 +33,8 @@
 #include <vlc_demux.h>
 
 #include "playlist/BasePeriod.h"
+#include "xml/DOMParser.h"
 
-#include "../dash/xml/DOMParser.h"
 #include "../dash/mpd/MPDFactory.h"
 #include "../dash/DASHManager.h"
 #include "../dash/DASHStream.hpp"
@@ -47,8 +47,8 @@
 
 using namespace adaptative::logic;
 using namespace adaptative::playlist;
+using namespace adaptative::xml;
 using namespace dash::mpd;
-using namespace dash::xml;
 using namespace dash;
 using namespace hls;
 using namespace hls::playlist;
@@ -130,8 +130,7 @@ static int Open(vlc_object_t *p_obj)
         }
 
         //Begin the actual MPD parsing:
-        MPD *p_playlist = MPDFactory::create(parser.getRootNode(), p_demux->s,
-                                             playlisturl, parser.getProfile());
+        MPD *p_playlist = MPDFactory::create(parser.getRootNode(), p_demux->s, playlisturl);
         if(p_playlist == NULL)
         {
             msg_Err( p_demux, "Cannot create/unknown MPD for profile");

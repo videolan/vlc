@@ -44,15 +44,14 @@ namespace adaptative
         class SegmentInformation;
         class MediaSegmentTemplate;
     }
-}
-
-namespace dash
-{
     namespace xml
     {
         class Node;
     }
+}
 
+namespace dash
+{
     namespace mpd
     {
         class Period;
@@ -60,6 +59,7 @@ namespace dash
         class MPD;
 
         using namespace adaptative::playlist;
+        using namespace adaptative;
 
         class IsoffMainParser
         {
@@ -70,6 +70,7 @@ namespace dash
                 bool            parse  (Profile profile);
                 virtual MPD*    getMPD ();
                 virtual void    setMPDBaseUrl(xml::Node *root);
+                mpd::Profile    getProfile() const;
 
             private:
                 void    setMPDAttributes    ();

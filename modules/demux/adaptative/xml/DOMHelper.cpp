@@ -27,7 +27,7 @@
 
 #include "DOMHelper.h"
 
-using namespace dash::xml;
+using namespace adaptative::xml;
 
 std::vector<Node *> DOMHelper::getElementByTagName      (Node *root, const std::string& name, bool selfContain)
 {

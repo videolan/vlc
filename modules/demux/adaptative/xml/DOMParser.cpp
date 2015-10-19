@@ -31,8 +31,7 @@
 #include <stack>
 #include <vlc_xml.h>
 
-using namespace dash::xml;
-using namespace dash::mpd;
+using namespace adaptative::xml;
 
 DOMParser::DOMParser    (stream_t *stream) :
     root( NULL ),
@@ -165,26 +164,4 @@ void    DOMParser::print                    ()
     this->print(this->root, 0);
 }
 
-Profile DOMParser::getProfile() const
-{
-    Profile res(Profile::Unknown);
-    if(this->root == NULL)
-        return res;
 
-    std::string urn = this->root->getAttributeValue("profiles");
-    if ( urn.length() == 0 )
-        urn = this->root->getAttributeValue("profile"); //The standard spells it the both ways...
-
-
-    size_t pos;
-    size_t nextpos = -1;
-    do
-    {
-        pos = nextpos + 1;
-        nextpos = urn.find_first_of(",", pos);
-        res = Profile(urn.substr(pos, nextpos - pos));
-    }
-    while (nextpos != std::string::npos && res == Profile::Unknown);
-
-    return res;
-}

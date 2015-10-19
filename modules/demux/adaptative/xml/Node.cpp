@@ -31,7 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_xml.h>
 
-using namespace dash::xml;
+using namespace adaptative::xml;
 
 const std::string   Node::EmptyString = "";
 

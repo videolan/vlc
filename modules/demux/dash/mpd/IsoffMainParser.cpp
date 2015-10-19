@@ -39,7 +39,7 @@
 #include "AdaptationSet.h"
 #include "ProgramInformation.h"
 #include "DASHSegment.h"
-#include "../xml/DOMHelper.h"
+#include "../adaptative/xml/DOMHelper.h"
 #include "../adaptative/tools/Helper.h"
 #include "../adaptative/tools/Debug.hpp"
 #include <vlc_strings.h>
@@ -47,7 +47,7 @@
 #include <cstdio>
 
 using namespace dash::mpd;
-using namespace dash::xml;
+using namespace adaptative::xml;
 using namespace adaptative::playlist;
 
 IsoffMainParser::IsoffMainParser    (Node *root_, stream_t *stream, std::string & streambaseurl_)
@@ -501,6 +501,29 @@ void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)
 
         mpd->programInfo.Set(info);
     }
+}
+
+Profile IsoffMainParser::getProfile() const
+{
+    Profile res(Profile::Unknown);
+    if(this->root == NULL)
+        return res;
+
+    std::string urn = root->getAttributeValue("profiles");
+    if ( urn.length() == 0 )
+        urn = root->getAttributeValue("profile"); //The standard spells it the both ways...
+
+    size_t pos;
+    size_t nextpos = -1;
+    do
+    {
+        pos = nextpos + 1;
+        nextpos = urn.find_first_of(",", pos);
+        res = Profile(urn.substr(pos, nextpos - pos));
+    }
+    while (nextpos != std::string::npos && res == Profile::Unknown);
+
+    return res;
 }
 
 IsoTime::IsoTime(const std::string &str)
