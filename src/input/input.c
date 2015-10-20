@@ -1532,19 +1532,13 @@ static void ControlRelease( int i_type, vlc_value_t val )
 /* Pause input */
 static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
 {
-    int i_ret = VLC_SUCCESS;
     int i_state = PAUSE_S;
 
     if( p_input->p->b_can_pause )
     {
         demux_t *p_demux = p_input->p->input.p_demux;
 
-        if( p_demux->s != NULL )
-            i_ret = stream_Control( p_demux->s, STREAM_SET_PAUSE_STATE, true );
-        else
-            i_ret = demux_Control( p_demux, DEMUX_SET_PAUSE_STATE, true );
-
-        if( i_ret )
+        if( demux_Control( p_demux, DEMUX_SET_PAUSE_STATE, true ) )
         {
             msg_Warn( p_input, "cannot set pause state" );
             return;
@@ -1552,10 +1546,8 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
     }
 
     /* */
-    i_ret = es_out_SetPauseState( p_input->p->p_es_out,
-                                  p_input->p->b_can_pause, true,
-                                  i_control_date );
-    if( i_ret )
+    if( es_out_SetPauseState( p_input->p->p_es_out, p_input->p->b_can_pause,
+                              true, i_control_date ) )
     {
         msg_Warn( p_input, "cannot set pause state at es_out level" );
         return;
@@ -1570,13 +1562,8 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
     if( p_input->p->b_can_pause )
     {
         demux_t *p_demux = p_input->p->input.p_demux;
-        int ret;
 
-        if( p_demux->s != NULL )
-            ret = stream_Control( p_demux->s, STREAM_SET_PAUSE_STATE, false );
-        else
-            ret = demux_Control( p_demux, DEMUX_SET_PAUSE_STATE, false );
-        if( ret != VLC_SUCCESS )
+        if( demux_Control( p_demux, DEMUX_SET_PAUSE_STATE, false ) )
         {
             msg_Err( p_input, "cannot resume" );
             input_ChangeState( p_input, ERROR_S );
