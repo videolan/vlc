@@ -2179,44 +2179,8 @@ static int InputSourceInit( input_thread_t *p_input,
         msg_Dbg( p_input, "trying to pre-parse %s",  psz_path );
     }
 
-    mtime_t i_pts_delay;
-
     if( in->p_demux )
     {
-        /* Get infos from access_demux */
-        in->b_title_demux = true;
-        if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
-                            &in->title, &in->i_title,
-                            &in->i_title_offset, &in->i_seekpoint_offset ) )
-        {
-            TAB_INIT( in->i_title, in->title );
-        }
-        if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
-                            &in->b_can_pace_control ) )
-            in->b_can_pace_control = false;
-
-        assert( in->p_demux->pf_demux != NULL || !in->b_can_pace_control );
-
-        if( !in->b_can_pace_control )
-        {
-            if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_RATE,
-                                &in->b_can_rate_control, &in->b_rescale_ts ) )
-            {
-                in->b_can_rate_control = false;
-                in->b_rescale_ts = true; /* not used */
-            }
-        }
-        else
-        {
-            in->b_can_rate_control = true;
-            in->b_rescale_ts = true;
-        }
-        if( demux_Control( in->p_demux, DEMUX_CAN_PAUSE,
-                            &in->b_can_pause ) )
-            in->b_can_pause = false;
-        var_SetBool( p_input, "can-pause", in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
-        var_SetBool( p_input, "can-rate", !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
-        var_SetBool( p_input, "can-rewind", !in->b_rescale_ts && !in->b_can_pace_control && in->b_can_rate_control );
     }
     else
     {   /* Now try a real access */
@@ -2305,26 +2269,6 @@ static int InputSourceInit( input_thread_t *p_input,
         if( var_GetBool( p_input, "input-record-native" ) )
             p_stream = stream_FilterChainNew( p_stream, "record" );
 
-        if( !p_input->b_preparsing )
-        {
-            stream_Control( p_stream, STREAM_CAN_CONTROL_PACE,
-                            &in->b_can_pace_control );
-            in->b_can_rate_control = in->b_can_pace_control;
-            in->b_rescale_ts = true;
-
-            stream_Control( p_stream, STREAM_CAN_PAUSE, &in->b_can_pause );
-            var_SetBool( p_input, "can-pause",
-                         in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
-            var_SetBool( p_input, "can-rate",
-                         !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
-            var_SetBool( p_input, "can-rewind",
-                         !in->b_rescale_ts && !in->b_can_pace_control );
-
-            in->b_title_demux = false;
-
-            stream_Control( p_stream, STREAM_GET_PTS_DELAY, &i_pts_delay );
-        }
-
         if( p_stream->psz_url != NULL )
             /* Take access/stream redirections into account: */
             psz_path = strstr( p_stream->psz_url, "://" );
@@ -2349,30 +2293,51 @@ static int InputSourceInit( input_thread_t *p_input,
             goto error;
         }
         assert( in->p_demux->pf_demux != NULL );
-
-        /* Get title from demux */
-        if( !p_input->b_preparsing && in->i_title <= 0 )
-        {
-            if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
-                                &in->title, &in->i_title,
-                                &in->i_title_offset, &in->i_seekpoint_offset ))
-            {
-                TAB_INIT( in->i_title, in->title );
-            }
-            else
-            {
-                in->b_title_demux = true;
-            }
-        }
     }
 
     free( psz_var_demux );
     free( psz_dup );
 
+    /* Get infos from (access_)demux */
     bool b_can_seek;
     if( demux_Control( in->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
         b_can_seek = false;
     var_SetBool( p_input, "can-seek", b_can_seek );
+
+    if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
+                       &in->b_can_pace_control ) )
+        in->b_can_pace_control = false;
+
+    assert( in->p_demux->pf_demux != NULL || !in->b_can_pace_control );
+
+    if( in->p_demux->s != NULL )
+    {
+        if( !in->b_can_pace_control )
+        {
+            if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_RATE,
+                                &in->b_can_rate_control, &in->b_rescale_ts ) )
+            {
+                in->b_can_rate_control = false;
+                in->b_rescale_ts = true; /* not used */
+            }
+        }
+        else
+        {
+            in->b_can_rate_control = true;
+            in->b_rescale_ts = true;
+        }
+    }
+    else
+    {
+        in->b_can_rate_control = in->b_can_pace_control;
+        in->b_rescale_ts = true;
+    }
+
+    demux_Control( in->p_demux, DEMUX_CAN_PAUSE, &in->b_can_pause );
+
+    var_SetBool( p_input, "can-pause", in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
+    var_SetBool( p_input, "can-rate", !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
+    var_SetBool( p_input, "can-rewind", !in->b_rescale_ts && !in->b_can_pace_control && in->b_can_rate_control );
 
     /* Set record capabilities */
     if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
@@ -2389,6 +2354,17 @@ static int InputSourceInit( input_thread_t *p_input,
      * FIXME improve for b_preparsing: move it after GET_META and check psz_arturl */
     if( !p_input->b_preparsing )
     {
+        if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
+                           &in->title, &in->i_title,
+                           &in->i_title_offset, &in->i_seekpoint_offset ))
+        {
+            TAB_INIT( in->i_title, in->title );
+        }
+        else
+        {
+            in->b_title_demux = true;
+        }
+
         int i_attachment;
         input_attachment_t **attachment;
         if( !demux_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
@@ -2400,12 +2376,7 @@ static int InputSourceInit( input_thread_t *p_input,
             vlc_mutex_unlock( &p_input->p->p_item->lock );
         }
 
-        /* PTS delay: request from demux first. This is required for
-         * access_demux and some special cases like SDP demux. Otherwise,
-         * fallback to access */
-        if( demux_Control( in->p_demux, DEMUX_GET_PTS_DELAY,
-                           &in->i_pts_delay ) )
-            in->i_pts_delay = i_pts_delay;
+        demux_Control( in->p_demux, DEMUX_GET_PTS_DELAY, &in->i_pts_delay );
         if( in->i_pts_delay > INPUT_PTS_DELAY_MAX )
             in->i_pts_delay = INPUT_PTS_DELAY_MAX;
         else if( in->i_pts_delay < 0 )
