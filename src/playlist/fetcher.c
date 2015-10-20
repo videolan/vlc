@@ -169,6 +169,14 @@ void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
     vlc_cond_destroy( &p_fetcher->wait );
     vlc_mutex_destroy( &p_fetcher->lock );
 
+    playlist_album_t album;
+    FOREACH_ARRAY( album, p_fetcher->albums )
+        free( album.psz_album );
+        free( album.psz_artist );
+        free( album.psz_arturl );
+    FOREACH_END()
+    ARRAY_RESET( p_fetcher->albums );
+
     free( p_fetcher );
 }
 
