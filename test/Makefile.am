@@ -21,7 +21,8 @@ check_PROGRAMS = \
 	test_src_config_chain \
 	test_src_misc_variables \
 	test_src_crypto_update \
-        $(NULL)
+	test_src_input_stream \
+	$(NULL)
 
 check_SCRIPTS = \
 	modules/lua/telnet.sh \
@@ -32,6 +33,7 @@ check_SCRIPTS = \
 EXTRA_PROGRAMS = \
 	test_libvlc_meta \
 	test_libvlc_media_list_player \
+	test_src_input_stream_net \
 	$(NULL)
 
 #check_DATA = samples/test.sample samples/meta.sample
@@ -79,6 +81,11 @@ test_src_config_chain_SOURCES = src/config/chain.c
 test_src_config_chain_LDADD = $(LIBVLCCORE)
 test_src_crypto_update_SOURCES = src/crypto/update.c
 test_src_crypto_update_LDADD = $(LIBVLCCORE) $(GCRYPT_LIBS)
+test_src_input_stream_SOURCES = src/input/stream.c
+test_src_input_stream_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_input_stream_net_SOURCES = src/input/stream.c
+test_src_input_stream_net_CFLAGS = $(AM_CFLAGS) -DTEST_NET
+test_src_input_stream_net_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
