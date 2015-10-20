@@ -2217,11 +2217,6 @@ static int InputSourceInit( input_thread_t *p_input,
         var_SetBool( p_input, "can-pause", in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
         var_SetBool( p_input, "can-rate", !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
         var_SetBool( p_input, "can-rewind", !in->b_rescale_ts && !in->b_can_pace_control && in->b_can_rate_control );
-
-        bool b_can_seek;
-        if( demux_Control( in->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
-            b_can_seek = false;
-        var_SetBool( p_input, "can-seek", b_can_seek );
     }
     else
     {   /* Now try a real access */
@@ -2312,8 +2307,6 @@ static int InputSourceInit( input_thread_t *p_input,
 
         if( !p_input->b_preparsing )
         {
-            bool b;
-
             stream_Control( p_stream, STREAM_CAN_CONTROL_PACE,
                             &in->b_can_pace_control );
             in->b_can_rate_control = in->b_can_pace_control;
@@ -2326,9 +2319,6 @@ static int InputSourceInit( input_thread_t *p_input,
                          !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
             var_SetBool( p_input, "can-rewind",
                          !in->b_rescale_ts && !in->b_can_pace_control );
-
-            stream_Control( p_stream, STREAM_CAN_SEEK, &b );
-            var_SetBool( p_input, "can-seek", b );
 
             in->b_title_demux = false;
 
@@ -2378,6 +2368,11 @@ static int InputSourceInit( input_thread_t *p_input,
 
     free( psz_var_demux );
     free( psz_dup );
+
+    bool b_can_seek;
+    if( demux_Control( in->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
+        b_can_seek = false;
+    var_SetBool( p_input, "can-seek", b_can_seek );
 
     /* Set record capabilities */
     if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
