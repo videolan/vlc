@@ -1007,6 +1007,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
+        case DEMUX_CAN_SEEK:
+            *va_arg( args, bool * ) = true;
+            return VLC_SUCCESS;
+
         case DEMUX_GET_LENGTH:
             pi64 = ( int64_t* )va_arg( args, int64_t * );
             *pi64 = CLOCK_FREQ * ( i_num_samples / p_sys->fmt.audio.i_rate );

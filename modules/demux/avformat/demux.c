@@ -900,6 +900,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
+        case DEMUX_CAN_SEEK:
+            *va_arg( args, bool * ) = true;
+            return VLC_SUCCESS;
+
         case DEMUX_GET_POSITION:
             pf = (double*) va_arg( args, double* ); *pf = 0.0;
             i64 = stream_Size( p_demux->s );

@@ -746,6 +746,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
+        case DEMUX_CAN_SEEK:
+            return stream_vaControl( p_demux->s, i_query, args );
+
         case DEMUX_GET_META:
             p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
             if( p_sys->p_meta )

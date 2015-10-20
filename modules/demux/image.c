@@ -220,6 +220,9 @@ static int Control(demux_t *demux, int query, va_list args)
     demux_sys_t *sys = demux->p_sys;
 
     switch (query) {
+    case DEMUX_CAN_SEEK:
+        *va_arg(args, bool *) = sys->duration >= 0 && !sys->is_realtime;
+        return VLC_SUCCESS;
     case DEMUX_GET_POSITION: {
         double *position = va_arg(args, double *);
         if (sys->duration > 0)

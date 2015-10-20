@@ -240,6 +240,10 @@ static int Control (demux_t *demux, int query, va_list args)
 
     switch (query)
     {
+        case DEMUX_CAN_SEEK:
+            *va_arg (args, bool *) = true;
+            return VLC_SUCCESS;
+
         case DEMUX_GET_POSITION:
         {
             double *pos = va_arg (args, double *);

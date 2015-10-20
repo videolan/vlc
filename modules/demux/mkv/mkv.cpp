@@ -295,6 +295,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
+        case DEMUX_CAN_SEEK:
+            return stream_vaControl( p_demux->s, i_query, args );
+
         case DEMUX_GET_ATTACHMENTS:
             ppp_attach = (input_attachment_t***)va_arg( args, input_attachment_t*** );
             pi_int = (int*)va_arg( args, int * );

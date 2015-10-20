@@ -290,6 +290,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int64_t i64;
     switch( i_query )
     {
+        case DEMUX_CAN_SEEK:
+            return stream_vaControl( p_demux->s, i_query, args );
+
         case DEMUX_GET_POSITION:
             if( ( i64 = stream_Size( p_demux->s ) ) > 0 )
             {

@@ -304,6 +304,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
+    case DEMUX_CAN_SEEK:
+        *va_arg( args, bool * ) = true;
+        return VLC_SUCCESS;
+
     case DEMUX_GET_POSITION:
         pf = (double*) va_arg( args, double* );
         if( p_sys->i_length > 0 )

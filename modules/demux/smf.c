@@ -497,6 +497,9 @@ static int Control (demux_t *demux, int i_query, va_list args)
 
     switch (i_query)
     {
+        case DEMUX_CAN_SEEK:
+            *va_arg (args, bool *) = true;
+            break;
         case DEMUX_GET_POSITION:
             if (!sys->duration)
                 return VLC_EGENERIC;

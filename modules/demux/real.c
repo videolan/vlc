@@ -371,6 +371,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
+        case DEMUX_CAN_SEEK:
+        {
+            bool *b = va_arg( args, bool * );
+
+            if( stream_Size( p_demux->s ) == 0 )
+                *b = true; /* FIXME: kludge for Real-dialectal RTSP */
+            else
+            if( p_sys->p_index == NULL )
+                *b = false;
+            else
+            if( stream_Control( p_demux->s, STREAM_CAN_SEEK, &b ) )
+                *b = false;
+
+            return VLC_SUCCESS;
+        }
+
         case DEMUX_GET_POSITION:
             pf = (double*) va_arg( args, double* );
 

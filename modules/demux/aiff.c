@@ -278,6 +278,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
+        case DEMUX_CAN_SEEK:
+            return stream_vaControl( p_demux->s, i_query, args );
+
         case DEMUX_GET_POSITION:
         {
             int64_t i_start = p_sys->i_ssnd_start;

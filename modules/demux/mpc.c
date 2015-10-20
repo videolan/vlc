@@ -317,6 +317,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
+        case DEMUX_CAN_SEEK:
+            return stream_vaControl( p_demux->s, i_query, args );
+
         case DEMUX_HAS_UNSUPPORTED_META:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = true;
