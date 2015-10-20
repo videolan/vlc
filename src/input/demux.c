@@ -262,6 +262,11 @@ void demux_Delete( demux_t *p_demux )
 #define static_control_match(foo) \
     static_assert((unsigned) DEMUX_##foo == STREAM_##foo, "Mismatch")
 
+int demux_vaControl( demux_t *demux, int query, va_list args )
+{
+    return demux->pf_control( demux, query, args );
+}
+
 /*****************************************************************************
  * demux_vaControlHelper:
  *****************************************************************************/

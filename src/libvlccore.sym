@@ -92,6 +92,7 @@ demux_Delete
 demux_PacketizerDestroy
 demux_PacketizerNew
 demux_New
+demux_vaControl
 demux_vaControlHelper
 dialog_ExtensionUpdate
 dialog_Login

@@ -292,10 +292,7 @@ VLC_USED static inline int demux_Demux( demux_t *p_demux )
     return p_demux->pf_demux( p_demux );
 }
 
-static inline int demux_vaControl( demux_t *p_demux, int i_query, va_list args )
-{
-    return p_demux->pf_control( p_demux, i_query, args );
-}
+VLC_API int demux_vaControl( demux_t *p_demux, int i_query, va_list args );
 
 static inline int demux_Control( demux_t *p_demux, int i_query, ... )
 {
