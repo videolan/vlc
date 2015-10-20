@@ -39,6 +39,8 @@ typedef int64_t stime_t;
 #define MAJOR_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
 #define MAJOR_qt__ VLC_FOURCC( 'q', 't', ' ', ' ' )
 #define MAJOR_dash VLC_FOURCC( 'd', 'a', 's', 'h' )
+#define MAJOR_mp41 VLC_FOURCC( 'm', 'p', '4', '1' )
+#define MAJOR_avc1 VLC_FOURCC( 'a', 'v', 'c', '1' )
 
 #define ATOM_root VLC_FOURCC( 'r', 'o', 'o', 't' )
 #define ATOM_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )

@@ -1,0 +1,1741 @@
+/*****************************************************************************
+ * libmp4mux.c: mp4/mov muxer
+ *****************************************************************************
+ * Copyright (C) 2001, 2002, 2003, 2006, 20115 VLC authors and VideoLAN
+ *
+ * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Gildas Bazin <gbazin at videolan dot org>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+#include "libmp4mux.h"
+#include "../demux/mp4/libmp4.h" /* flags */
+#include "../demux/mpeg/mpeg_parser_helpers.h" /* nal rbsp */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_es.h>
+#include <vlc_iso_lang.h>
+#include <assert.h>
+
+bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream)
+{
+    p_stream->i_track_id = 1;
+
+    es_format_Init(&p_stream->fmt, 0, 0);
+
+    p_stream->i_entry_count = 0;
+    p_stream->i_entry_max   = 1000;
+    p_stream->entry         = calloc(p_stream->i_entry_max, sizeof(mp4mux_entry_t));
+    if(!p_stream->entry)
+    {
+        es_format_Clean(&p_stream->fmt);
+        return false;
+    }
+
+    p_stream->a52_frame       = NULL;
+
+    p_stream->i_read_duration = 0;
+    p_stream->i_timescale     = CLOCK_FREQ;
+    p_stream->i_starttime     = 0;
+    p_stream->b_hasbframes    = false;
+
+    p_stream->i_stco_pos = 0;
+
+    p_stream->i_trex_default_length = 0;
+    p_stream->i_trex_default_size = 0;
+    return true;
+}
+
+void mp4mux_trackinfo_Clear(mp4mux_trackinfo_t *p_stream)
+{
+    es_format_Clean(&p_stream->fmt);
+    if (p_stream->a52_frame)
+        block_Release(p_stream->a52_frame);
+    free(p_stream->entry);
+}
+
+
+bo_t *box_new(const char *fcc)
+{
+    bo_t *box = malloc(sizeof(*box));
+    if (!box)
+        return NULL;
+
+    bo_init(box, 1024);
+
+    bo_add_32be  (box, 0);
+    bo_add_fourcc(box, fcc);
+
+    return box;
+}
+
+bo_t *box_full_new(const char *fcc, uint8_t v, uint32_t f)
+{
+    bo_t *box = box_new(fcc);
+    if (!box)
+        return NULL;
+
+    bo_add_8     (box, v);
+    bo_add_24be  (box, f);
+
+    return box;
+}
+
+void box_fix(bo_t *box, uint32_t i_size)
+{
+    bo_set_32be(box, 0, i_size);
+}
+
+void box_gather (bo_t *box, bo_t *box2)
+{
+    if(box2 && box2->b && box && box->b)
+    {
+        box_fix(box2, box2->b->i_buffer);
+        size_t i_offset = box->b->i_buffer;
+        box->b = block_Realloc(box->b, 0, box->b->i_buffer + box2->b->i_buffer);
+        memcpy(&box->b->p_buffer[i_offset], box2->b->p_buffer, box2->b->i_buffer);
+    }
+    bo_free(box2);
+}
+
+static inline void bo_add_mp4_tag_descr(bo_t *box, uint8_t tag, uint32_t size)
+{
+    bo_add_8(box, tag);
+    for (int i = 3; i>0; i--)
+        bo_add_8(box, (size>>(7*i)) | 0x80);
+    bo_add_8(box, size & 0x7F);
+}
+
+static int64_t get_timestamp(void)
+{
+    int64_t i_timestamp = time(NULL);
+
+    i_timestamp += 2082844800; // MOV/MP4 start date is 1/1/1904
+    // 208284480 is (((1970 - 1904) * 365) + 17) * 24 * 60 * 60
+
+    return i_timestamp;
+}
+
+/****************************************************************************/
+
+static void matrix_apply_rotation(es_format_t *fmt, uint32_t mvhd_matrix[9])
+{
+    enum video_orientation_t orientation = ORIENT_NORMAL;
+    if (fmt->i_cat == VIDEO_ES)
+        orientation = fmt->video.orientation;
+
+#define ATAN(a, b) do { mvhd_matrix[1] = (a) << 16; \
+    mvhd_matrix[0] = (b) << 16; \
+    } while(0)
+
+    switch (orientation) {
+    case ORIENT_ROTATED_90:  ATAN( 1,  0); break;
+    case ORIENT_ROTATED_180: ATAN( 0, -1); break;
+    case ORIENT_ROTATED_270: ATAN( -1, 0); break;
+    default:                 ATAN( 0,  1); break;
+    }
+
+    mvhd_matrix[3] = mvhd_matrix[0] ? 0 : 0x10000;
+    mvhd_matrix[4] = mvhd_matrix[1] ? 0 : 0x10000;
+}
+
+static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
+{
+    bo_t *esds;
+
+    /* */
+    int i_decoder_specific_info_size = (p_track->fmt.i_extra > 0) ? 5 + p_track->fmt.i_extra : 0;
+
+    esds = box_full_new("esds", 0, 0);
+    if(!esds)
+        return NULL;
+
+    /* Compute Max bitrate */
+    int64_t i_bitrate_avg = 0;
+    int64_t i_bitrate_max = 0;
+    /* Compute avg/max bitrate */
+    for (unsigned i = 0; i < p_track->i_entry_count; i++) {
+        i_bitrate_avg += p_track->entry[i].i_size;
+        if (p_track->entry[i].i_length > 0) {
+            int64_t i_bitrate = INT64_C(8000000) * p_track->entry[i].i_size / p_track->entry[i].i_length;
+            if (i_bitrate > i_bitrate_max)
+                i_bitrate_max = i_bitrate;
+        }
+    }
+
+    if (p_track->i_read_duration > 0)
+        i_bitrate_avg = INT64_C(8000000) * i_bitrate_avg / p_track->i_read_duration;
+    else
+        i_bitrate_avg = 0;
+    if (i_bitrate_max <= 1)
+        i_bitrate_max = 0x7fffffff;
+
+    /* ES_Descr */
+    bo_add_mp4_tag_descr(esds, 0x03, 3 + 5 + 13 + i_decoder_specific_info_size + 5 + 1);
+    bo_add_16be(esds, p_track->i_track_id);
+    bo_add_8   (esds, 0x1f);      // flags=0|streamPriority=0x1f
+
+    /* DecoderConfigDescr */
+    bo_add_mp4_tag_descr(esds, 0x04, 13 + i_decoder_specific_info_size);
+
+    int  i_object_type_indication;
+    switch(p_track->fmt.i_codec)
+    {
+    case VLC_CODEC_MP4V:
+        i_object_type_indication = 0x20;
+        break;
+    case VLC_CODEC_MPGV:
+        if(p_track->fmt.i_original_fourcc == VLC_CODEC_MP1V)
+        {
+            i_object_type_indication = 0x6b;
+            break;
+        }
+    case VLC_CODEC_MP2V:
+        /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
+        i_object_type_indication = 0x65;
+        break;
+    case VLC_CODEC_MP1V:
+        /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
+        i_object_type_indication = 0x6b;
+        break;
+    case VLC_CODEC_MP4A:
+        /* FIXME for mpeg2-aac == 0x66->0x68 */
+        i_object_type_indication = 0x40;
+        break;
+    case VLC_CODEC_MPGA:
+        i_object_type_indication =
+            p_track->fmt.audio.i_rate < 32000 ? 0x69 : 0x6b;
+        break;
+    case VLC_CODEC_DTS:
+        i_object_type_indication = 0xa9;
+        break;
+    default:
+        i_object_type_indication = 0x00;
+        break;
+    }
+    int i_stream_type = p_track->fmt.i_cat == VIDEO_ES ? 0x04 : 0x05;
+
+    bo_add_8   (esds, i_object_type_indication);
+    bo_add_8   (esds, (i_stream_type << 2) | 1);
+    bo_add_24be(esds, 1024 * 1024);       // bufferSizeDB
+    bo_add_32be(esds, i_bitrate_max);     // maxBitrate
+    bo_add_32be(esds, i_bitrate_avg);     // avgBitrate
+
+    if (p_track->fmt.i_extra > 0) {
+        /* DecoderSpecificInfo */
+        bo_add_mp4_tag_descr(esds, 0x05, p_track->fmt.i_extra);
+
+        for (int i = 0; i < p_track->fmt.i_extra; i++)
+            bo_add_8(esds, ((uint8_t*)p_track->fmt.p_extra)[i]);
+    }
+
+    /* SL_Descr mandatory */
+    bo_add_mp4_tag_descr(esds, 0x06, 1);
+    bo_add_8    (esds, 0x02);  // sl_predefined
+
+    return esds;
+}
+
+static bo_t *GetWaveTag(mp4mux_trackinfo_t *p_track)
+{
+    bo_t *wave;
+    bo_t *box;
+
+    wave = box_new("wave");
+    if(wave)
+    {
+        box = box_new("frma");
+        if(box)
+        {
+            bo_add_fourcc(box, "mp4a");
+            box_gather(wave, box);
+        }
+
+        box = box_new("mp4a");
+        if(box)
+        {
+            bo_add_32be(box, 0);
+            box_gather(wave, box);
+        }
+
+        box = GetESDS(p_track);
+        box_gather(wave, box);
+
+        box = box_new("srcq");
+        if(box)
+        {
+            bo_add_32be(box, 0x40);
+            box_gather(wave, box);
+        }
+
+        /* wazza ? */
+        bo_add_32be(wave, 8); /* new empty box */
+        bo_add_32be(wave, 0); /* box label */
+    }
+    return wave;
+}
+
+static bo_t *GetDec3Tag(es_format_t *p_fmt, block_t *a52_frame)
+{
+    if (!a52_frame)
+        return NULL;
+
+    bs_t s;
+    bs_init(&s, a52_frame->p_buffer, sizeof(a52_frame->i_buffer));
+    bs_skip(&s, 16); // syncword
+
+    uint8_t fscod, bsid, bsmod, acmod, lfeon, strmtyp;
+
+    bsmod = 0;
+
+    strmtyp = bs_read(&s, 2);
+
+    if (strmtyp & 0x1) // dependant or reserved stream
+        return NULL;
+
+    if (bs_read(&s, 3) != 0x0) // substreamid: we don't support more than 1 stream
+        return NULL;
+
+    int numblkscod;
+    bs_skip(&s, 11); // frmsizecod
+    fscod = bs_read(&s, 2);
+    if (fscod == 0x03) {
+        bs_skip(&s, 2); // fscod2
+        numblkscod = 3;
+    } else {
+        numblkscod = bs_read(&s, 2);
+    }
+
+    acmod = bs_read(&s, 3);
+    lfeon = bs_read1(&s);
+
+    bsid = bs_read(&s, 5);
+
+    bs_skip(&s, 5); // dialnorm
+    if (bs_read1(&s)) // compre
+        bs_skip(&s, 5); // compr
+
+    if (acmod == 0) {
+        bs_skip(&s, 5); // dialnorm2
+        if (bs_read1(&s)) // compr2e
+            bs_skip(&s, 8); // compr2
+    }
+
+    if (strmtyp == 0x1) // dependant stream XXX: unsupported
+        if (bs_read1(&s)) // chanmape
+            bs_skip(&s, 16); // chanmap
+
+    /* we have to skip mixing info to read bsmod */
+    if (bs_read1(&s)) { // mixmdate
+        if (acmod > 0x2) // 2+ channels
+            bs_skip(&s, 2); // dmixmod
+        if ((acmod & 0x1) && (acmod > 0x2)) // 3 front channels
+            bs_skip(&s, 3 + 3); // ltrtcmixlev + lorocmixlev
+        if (acmod & 0x4) // surround channel
+            bs_skip(&s, 3 + 3); // ltrsurmixlev + lorosurmixlev
+        if (lfeon)
+            if (bs_read1(&s))
+                bs_skip(&s, 5); // lfemixlevcod
+        if (strmtyp == 0) { // independant stream
+            if (bs_read1(&s)) // pgmscle
+                bs_skip(&s, 6); // pgmscl
+            if (acmod == 0x0) // dual mono
+                if (bs_read1(&s)) // pgmscl2e
+                    bs_skip(&s, 6); // pgmscl2
+            if (bs_read1(&s)) // extpgmscle
+                bs_skip(&s, 6); // extpgmscl
+            uint8_t mixdef = bs_read(&s, 2);
+            if (mixdef == 0x1)
+                bs_skip(&s, 5);
+            else if (mixdef == 0x2)
+                bs_skip(&s, 12);
+            else if (mixdef == 0x3) {
+                uint8_t mixdeflen = bs_read(&s, 5);
+                bs_skip(&s, 8 * (mixdeflen + 2));
+            }
+            if (acmod < 0x2) { // mono or dual mono
+                if (bs_read1(&s)) // paninfoe
+                    bs_skip(&s, 14); // paninfo
+                if (acmod == 0) // dual mono
+                    if (bs_read1(&s)) // paninfo2e
+                        bs_skip(&s, 14); // paninfo2
+            }
+            if (bs_read1(&s)) { // frmmixcfginfoe
+                static const int blocks[4] = { 1, 2, 3, 6 };
+                int number_of_blocks = blocks[numblkscod];
+                if (number_of_blocks == 1)
+                    bs_skip(&s, 5); // blkmixcfginfo[0]
+                else for (int i = 0; i < number_of_blocks; i++)
+                    if (bs_read1(&s)) // blkmixcfginfoe
+                        bs_skip(&s, 5); // blkmixcfginfo[i]
+            }
+        }
+    }
+
+    if (bs_read1(&s)) // infomdate
+        bsmod = bs_read(&s, 3);
+
+    uint8_t mp4_eac3_header[5] = {0};
+    bs_init(&s, mp4_eac3_header, sizeof(mp4_eac3_header));
+
+    int data_rate = p_fmt->i_bitrate / 1000;
+    bs_write(&s, 13, data_rate);
+    bs_write(&s, 3, 0); // num_ind_sub - 1
+    bs_write(&s, 2, fscod);
+    bs_write(&s, 5, bsid);
+    bs_write(&s, 5, bsmod);
+    bs_write(&s, 3, acmod);
+    bs_write(&s, 1, lfeon);
+    bs_write(&s, 3, 0); // reserved
+    bs_write(&s, 4, 0); // num_dep_sub
+    bs_write(&s, 1, 0); // reserved
+
+    bo_t *dec3 = box_new("dec3");
+    if(dec3)
+        bo_add_mem(dec3, sizeof(mp4_eac3_header), mp4_eac3_header);
+
+    return dec3;
+}
+
+static bo_t *GetDac3Tag(block_t *a52_frame)
+{
+    if (!a52_frame)
+        return NULL;
+
+    bo_t *dac3 = box_new("dac3");
+    if(!dac3)
+        return NULL;
+
+    bs_t s;
+    bs_init(&s, a52_frame->p_buffer, sizeof(a52_frame->i_buffer));
+
+    uint8_t fscod, bsid, bsmod, acmod, lfeon, frmsizecod;
+
+    bs_skip(&s, 16 + 16); // syncword + crc
+
+    fscod = bs_read(&s, 2);
+    frmsizecod = bs_read(&s, 6);
+    bsid = bs_read(&s, 5);
+    bsmod = bs_read(&s, 3);
+    acmod = bs_read(&s, 3);
+    if (acmod == 2)
+        bs_skip(&s, 2); // dsurmod
+    else {
+        if ((acmod & 1) && acmod != 1)
+            bs_skip(&s, 2); // cmixlev
+        if (acmod & 4)
+            bs_skip(&s, 2); // surmixlev
+    }
+
+    lfeon = bs_read1(&s);
+
+    uint8_t mp4_a52_header[3];
+    bs_init(&s, mp4_a52_header, sizeof(mp4_a52_header));
+
+    bs_write(&s, 2, fscod);
+    bs_write(&s, 5, bsid);
+    bs_write(&s, 3, bsmod);
+    bs_write(&s, 3, acmod);
+    bs_write(&s, 1, lfeon);
+    bs_write(&s, 5, frmsizecod >> 1); // bit_rate_code
+    bs_write(&s, 5, 0); // reserved
+
+    bo_add_mem(dac3, sizeof(mp4_a52_header), mp4_a52_header);
+
+    return dac3;
+}
+
+static bo_t *GetDamrTag(es_format_t *p_fmt)
+{
+    bo_t *damr = box_new("damr");
+    if(!damr)
+        return NULL;
+
+    bo_add_fourcc(damr, "REFC");
+    bo_add_8(damr, 0);
+
+    if (p_fmt->i_codec == VLC_CODEC_AMR_NB)
+        bo_add_16be(damr, 0x81ff); /* Mode set (all modes for AMR_NB) */
+    else
+        bo_add_16be(damr, 0x83ff); /* Mode set (all modes for AMR_WB) */
+    bo_add_16be(damr, 0x1); /* Mode change period (no restriction) */
+
+    return damr;
+}
+
+static bo_t *GetD263Tag(void)
+{
+    bo_t *d263 = box_new("d263");
+    if(!d263)
+        return NULL;
+
+    bo_add_fourcc(d263, "VLC ");
+    bo_add_16be(d263, 0xa);
+    bo_add_8(d263, 0);
+
+    return d263;
+}
+
+static const char avc1_short_start_code[3] = { 0, 0, 1 };
+static const char avc1_start_code[4] = { 0, 0, 0, 1 };
+
+static void hevcParseVPS(uint8_t * p_buffer, size_t i_buffer, uint8_t *general,
+                         uint8_t * numTemporalLayer, bool * temporalIdNested)
+{
+    const size_t i_decoded_nal_size = 512;
+    uint8_t p_dec_nal[i_decoded_nal_size];
+    size_t i_size = (i_buffer < i_decoded_nal_size)?i_buffer:i_decoded_nal_size;
+    nal_to_rbsp(p_buffer, p_dec_nal, i_size);
+
+    /* first two bytes are the NAL header, 3rd and 4th are:
+        vps_video_parameter_set_id(4)
+        vps_reserved_3_2bis(2)
+        vps_max_layers_minus1(6)
+        vps_max_sub_layers_minus1(3)
+        vps_temporal_id_nesting_flags
+    */
+    *numTemporalLayer =  ((p_dec_nal[3] & 0x0E) >> 1) + 1;
+    *temporalIdNested = (bool)(p_dec_nal[3] & 0x01);
+
+    /* 5th & 6th are reserved 0xffff */
+    /* copy the first 12 bytes of profile tier */
+    memcpy(general, &p_dec_nal[6], 12);
+}
+
+static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_idc,
+                         uint8_t *bit_depth_luma_minus8, uint8_t *bit_depth_chroma_minus8)
+{
+    const size_t i_decoded_nal_size = 512;
+    uint8_t p_dec_nal[i_decoded_nal_size];
+    size_t i_size = (i_buffer < i_decoded_nal_size)?i_buffer-2:i_decoded_nal_size;
+    nal_to_rbsp(p_buffer+2, p_dec_nal, i_size);
+    bs_t bs;
+    bs_init(&bs, p_dec_nal, i_size);
+
+    /* skip vps id */
+    bs_skip(&bs, 4);
+    uint32_t sps_max_sublayer_minus1 = bs_read(&bs, 3);
+
+    /* skip nesting flag */
+    bs_skip(&bs, 1);
+
+    hevc_skip_profile_tiers_level(&bs, sps_max_sublayer_minus1);
+
+    /* skip sps id */
+    (void) bs_read_ue( &bs );
+
+    *chroma_idc = bs_read_ue(&bs);
+    if (*chroma_idc == 3)
+        bs_skip(&bs, 1);
+
+    /* skip width and heigh */
+    (void) bs_read_ue( &bs );
+    (void) bs_read_ue( &bs );
+
+    uint32_t conformance_window_flag = bs_read1(&bs);
+    if (conformance_window_flag) {
+        /* skip offsets*/
+        (void) bs_read_ue(&bs);
+        (void) bs_read_ue(&bs);
+        (void) bs_read_ue(&bs);
+        (void) bs_read_ue(&bs);
+    }
+    *bit_depth_luma_minus8 = bs_read_ue(&bs);
+    *bit_depth_chroma_minus8 = bs_read_ue(&bs);
+}
+
+static bo_t *GetHvcCTag(es_format_t *p_fmt)
+{
+    /* Generate hvcC box matching iso/iec 14496-15 3rd edition */
+    bo_t *hvcC = box_new("hvcC");
+    if(!hvcC || !p_fmt->i_extra)
+        return hvcC;
+
+    struct nal {
+        size_t i_buffer;
+        uint8_t * p_buffer;
+    };
+
+    /* According to the specification HEVC stream can have
+     * 16 vps id and an "unlimited" number of sps and pps id using ue(v) id*/
+    struct nal p_vps[16], *p_sps = NULL, *p_pps = NULL, *p_sei = NULL,
+               *p_nal = NULL;
+    size_t i_vps = 0, i_sps = 0, i_pps = 0, i_sei = 0;
+    uint8_t i_num_arrays = 0;
+
+    uint8_t * p_buffer = p_fmt->p_extra;
+    size_t i_buffer = p_fmt->i_extra;
+
+    uint8_t general_configuration[12] = {0};
+    uint8_t i_numTemporalLayer = 0;
+    uint8_t i_chroma_idc = 1;
+    uint8_t i_bit_depth_luma_minus8 = 0;
+    uint8_t i_bit_depth_chroma_minus8 = 0;
+    bool b_temporalIdNested = false;
+
+    uint32_t cmp = 0xFFFFFFFF;
+    while (i_buffer) {
+        /* look for start code 0X0000001 */
+        while (i_buffer) {
+            cmp = (cmp << 8) | *p_buffer;
+            if((cmp ^ UINT32_C(0x100)) <= UINT32_C(0xFF))
+                break;
+            p_buffer++;
+            i_buffer--;
+        }
+        if (p_nal)
+            p_nal->i_buffer = p_buffer - p_nal->p_buffer - ((i_buffer)?3:0);
+
+        switch (*p_buffer & 0x72) {
+            /* VPS */
+        case 0x40:
+            p_nal = &p_vps[i_vps++];
+            p_nal->p_buffer = p_buffer;
+            /* Only keep the general profile from the first VPS
+             * if there are several (this shouldn't happen so soon) */
+            if (i_vps == 1) {
+                hevcParseVPS(p_buffer, i_buffer, general_configuration,
+                             &i_numTemporalLayer, &b_temporalIdNested);
+                i_num_arrays++;
+            }
+            break;
+            /* SPS */
+        case 0x42: {
+            struct nal * p_tmp =  realloc(p_sps, sizeof(struct nal) * (i_sps + 1));
+            if (!p_tmp)
+                break;
+            p_sps = p_tmp;
+            p_nal = &p_sps[i_sps++];
+            p_nal->p_buffer = p_buffer;
+            if (i_sps == 1 && i_buffer > 15) {
+                /* Get Chroma_idc and bitdepths */
+                hevcParseSPS(p_buffer, i_buffer, &i_chroma_idc,
+                             &i_bit_depth_luma_minus8, &i_bit_depth_chroma_minus8);
+                i_num_arrays++;
+            }
+            break;
+            }
+        /* PPS */
+        case 0x44: {
+            struct nal * p_tmp =  realloc(p_pps, sizeof(struct nal) * (i_pps + 1));
+            if (!p_tmp)
+                break;
+            p_pps = p_tmp;
+            p_nal = &p_pps[i_pps++];
+            p_nal->p_buffer = p_buffer;
+            if (i_pps == 1)
+                i_num_arrays++;
+            break;
+            }
+        /* SEI */
+        case 0x4E:
+        case 0x50: {
+            struct nal * p_tmp =  realloc(p_sei, sizeof(struct nal) * (i_sei + 1));
+            if (!p_tmp)
+                break;
+            p_sei = p_tmp;
+            p_nal = &p_sei[i_sei++];
+            p_nal->p_buffer = p_buffer;
+            if(i_sei == 1)
+                i_num_arrays++;
+            break;
+        }
+        default:
+            p_nal = NULL;
+            break;
+        }
+    }
+    bo_add_8(hvcC, 0x01);
+    bo_add_mem(hvcC, 12, general_configuration);
+    /* Don't set min spatial segmentation */
+    bo_add_16be(hvcC, 0xF000);
+    /* Don't set parallelism type since segmentation isn't set */
+    bo_add_8(hvcC, 0xFC);
+    bo_add_8(hvcC, (0xFC | (i_chroma_idc & 0x03)));
+    bo_add_8(hvcC, (0xF8 | (i_bit_depth_luma_minus8 & 0x07)));
+    bo_add_8(hvcC, (0xF8 | (i_bit_depth_chroma_minus8 & 0x07)));
+
+    /* Don't set framerate */
+    bo_add_16be(hvcC, 0x0000);
+    /* Force NAL size of 4 bytes that replace the startcode */
+    bo_add_8(hvcC, (((i_numTemporalLayer & 0x07) << 3) |
+                    (b_temporalIdNested << 2) | 0x03));
+    bo_add_8(hvcC, i_num_arrays);
+
+    if (i_vps)
+    {
+        /* Write VPS without forcing array_completeness */
+        bo_add_8(hvcC, 32);
+        bo_add_16be(hvcC, i_vps);
+        for (size_t i = 0; i < i_vps; i++) {
+            p_nal = &p_vps[i];
+            bo_add_16be(hvcC, p_nal->i_buffer);
+            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
+        }
+    }
+
+    if (i_sps) {
+        /* Write SPS without forcing array_completeness */
+        bo_add_8(hvcC, 33);
+        bo_add_16be(hvcC, i_sps);
+        for (size_t i = 0; i < i_sps; i++) {
+            p_nal = &p_sps[i];
+            bo_add_16be(hvcC, p_nal->i_buffer);
+            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
+        }
+    }
+
+    if (i_pps) {
+        /* Write PPS without forcing array_completeness */
+        bo_add_8(hvcC, 34);
+        bo_add_16be(hvcC, i_pps);
+        for (size_t i = 0; i < i_pps; i++) {
+            p_nal = &p_pps[i];
+            bo_add_16be(hvcC, p_nal->i_buffer);
+            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
+        }
+    }
+
+    if (i_sei) {
+        /* Write SEI without forcing array_completeness */
+        bo_add_8(hvcC, 39);
+        bo_add_16be(hvcC, i_sei);
+        for (size_t i = 0; i < i_sei; i++) {
+            p_nal = &p_sei[i];
+            bo_add_16be(hvcC, p_nal->i_buffer);
+            bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
+        }
+    }
+    return hvcC;
+}
+
+static bo_t *GetAvcCTag(es_format_t *p_fmt)
+{
+    bo_t    *avcC = box_new("avcC");/* FIXME use better value */
+    if(!avcC)
+        return NULL;
+    uint8_t *p_sps = NULL;
+    uint8_t *p_pps = NULL;
+    int     i_sps_size = 0;
+    int     i_pps_size = 0;
+
+    if (p_fmt->i_extra > 0) {
+        /* FIXME: take into account multiple sps/pps */
+        uint8_t *p_buffer = p_fmt->p_extra;
+        int     i_buffer = p_fmt->i_extra;
+
+        while (i_buffer > 3) {
+            while (memcmp(p_buffer, &avc1_start_code[1], 3)) {
+                 i_buffer--;
+                 p_buffer++;
+            }
+            const int i_nal_type = p_buffer[3]&0x1f;
+            int i_startcode = 0;
+
+            for (int i_offset = 1; i_offset+2 < i_buffer ; i_offset++)
+                if (!memcmp(&p_buffer[i_offset], &avc1_start_code[1], 3)) {
+                    /* we found another startcode */
+                    i_startcode = i_offset;
+                    while (p_buffer[i_startcode-1] == 0 && i_startcode > 0)
+                        i_startcode--;
+                    break;
+                }
+
+            int i_size = i_startcode ? i_startcode : i_buffer;
+
+            if (i_nal_type == 7) {
+                p_sps = &p_buffer[3];
+                i_sps_size = i_size - 3;
+            }
+            if (i_nal_type == 8) {
+                p_pps = &p_buffer[3];
+                i_pps_size = i_size - 3;
+            }
+            i_buffer -= i_size;
+            p_buffer += i_size;
+        }
+    }
+
+    bo_add_8(avcC, 1);      /* configuration version */
+    bo_add_8(avcC, i_sps_size ? p_sps[1] : 77);
+    bo_add_8(avcC, i_sps_size ? p_sps[2] : 64);
+    bo_add_8(avcC, i_sps_size ? p_sps[3] : 30);       /* level, 5.1 */
+    bo_add_8(avcC, 0xff);   /* 0b11111100 | lengthsize = 0x11 */
+
+    bo_add_8(avcC, 0xe0 | (i_sps_size > 0 ? 1 : 0));   /* 0b11100000 | sps_count */
+    if (i_sps_size > 0) {
+        bo_add_16be(avcC, i_sps_size);
+        bo_add_mem(avcC, i_sps_size, p_sps);
+    }
+
+    bo_add_8(avcC, (i_pps_size > 0 ? 1 : 0));   /* pps_count */
+    if (i_pps_size > 0) {
+        bo_add_16be(avcC, i_pps_size);
+        bo_add_mem(avcC, i_pps_size, p_pps);
+    }
+
+    return avcC;
+}
+
+/* TODO: No idea about these values */
+static bo_t *GetSVQ3Tag(es_format_t *p_fmt)
+{
+    bo_t *smi = box_new("SMI ");
+    if(!smi)
+        return NULL;
+
+    if (p_fmt->i_extra > 0x4e) {
+        uint8_t *p_end = &((uint8_t*)p_fmt->p_extra)[p_fmt->i_extra];
+        uint8_t *p     = &((uint8_t*)p_fmt->p_extra)[0x46];
+
+        while (p + 8 < p_end) {
+            int i_size = GetDWBE(p);
+            if (i_size <= 1) /* FIXME handle 1 as long size */
+                break;
+            if (!strncmp((const char *)&p[4], "SMI ", 4)) {
+                bo_add_mem(smi, p_end - p - 8, &p[8]);
+                return smi;
+            }
+            p += i_size;
+        }
+    }
+
+    /* Create a dummy one in fallback */
+    bo_add_fourcc(smi, "SEQH");
+    bo_add_32be(smi, 0x5);
+    bo_add_32be(smi, 0xe2c0211d);
+    bo_add_8(smi, 0xc0);
+
+    return smi;
+}
+
+static bo_t *GetUdtaTag(mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks)
+{
+    bo_t *udta = box_new("udta");
+    if (!udta)
+        return NULL;
+
+    /* Requirements */
+    for (unsigned int i = 0; i < i_tracks; i++) {
+        mp4mux_trackinfo_t *p_stream = pp_tracks[i];
+        vlc_fourcc_t codec = p_stream->fmt.i_codec;
+
+        if (codec == VLC_CODEC_MP4V || codec == VLC_CODEC_MP4A) {
+            bo_t *box = box_new("\251req");
+            if(!box)
+                break;
+            /* String length */
+            bo_add_16be(box, sizeof("QuickTime 6.0 or greater") - 1);
+            bo_add_16be(box, 0);
+            bo_add_mem(box, sizeof("QuickTime 6.0 or greater") - 1,
+                        (uint8_t *)"QuickTime 6.0 or greater");
+            box_gather(udta, box);
+            break;
+        }
+    }
+
+    /* Encoder */
+    {
+        bo_t *box = box_new("\251enc");
+        if(box)
+        {
+            /* String length */
+            bo_add_16be(box, sizeof(PACKAGE_STRING " stream output") - 1);
+            bo_add_16be(box, 0);
+            bo_add_mem(box, sizeof(PACKAGE_STRING " stream output") - 1,
+                        (uint8_t*)PACKAGE_STRING " stream output");
+            box_gather(udta, box);
+        }
+    }
+#if 0
+    /* Misc atoms */
+    vlc_meta_t *p_meta = p_mux->p_sout->p_meta;
+    if (p_meta) {
+#define ADD_META_BOX(type, box_string) { \
+        bo_t *box = NULL;  \
+        if (vlc_meta_Get(p_meta, vlc_meta_##type)) \
+            box = box_new("\251" box_string); \
+        if (box) { \
+            bo_add_16be(box, strlen(vlc_meta_Get(p_meta, vlc_meta_##type))); \
+            bo_add_16be(box, 0); \
+            bo_add_mem(box, strlen(vlc_meta_Get(p_meta, vlc_meta_##type)), \
+                        (uint8_t*)(vlc_meta_Get(p_meta, vlc_meta_##type))); \
+            box_gather(udta, box); \
+        } }
+
+        ADD_META_BOX(Title, "nam");
+        ADD_META_BOX(Artist, "ART");
+        ADD_META_BOX(Genre, "gen");
+        ADD_META_BOX(Copyright, "cpy");
+        ADD_META_BOX(Description, "des");
+        ADD_META_BOX(Date, "day");
+        ADD_META_BOX(URL, "url");
+#undef ADD_META_BOX
+    }
+#endif
+    return udta;
+}
+
+static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov)
+{
+    VLC_UNUSED(p_obj);
+
+    bool b_descr = true;
+    vlc_fourcc_t codec = p_track->fmt.i_codec;
+    char fcc[4];
+
+    if (codec == VLC_CODEC_MPGA) {
+        if (b_mov) {
+            b_descr = false;
+            memcpy(fcc, ".mp3", 4);
+        } else
+            memcpy(fcc, "mp4a", 4);
+    } else if (codec == VLC_CODEC_A52) {
+        memcpy(fcc, "ac-3", 4);
+    } else if (codec == VLC_CODEC_EAC3) {
+        memcpy(fcc, "ec-3", 4);
+    } else if (codec == VLC_CODEC_DTS) {
+        memcpy(fcc, "DTS ", 4);
+    } else
+        vlc_fourcc_to_char(codec, fcc);
+
+    bo_t *soun = box_new(fcc);
+    if(!soun)
+        return NULL;
+    for (int i = 0; i < 6; i++)
+        bo_add_8(soun, 0);        // reserved;
+    bo_add_16be(soun, 1);         // data-reference-index
+
+    /* SoundDescription */
+    if (b_mov && codec == VLC_CODEC_MP4A)
+        bo_add_16be(soun, 1);     // version 1;
+    else
+        bo_add_16be(soun, 0);     // version 0;
+    bo_add_16be(soun, 0);         // revision level (0)
+    bo_add_32be(soun, 0);         // vendor
+    // channel-count
+    bo_add_16be(soun, p_track->fmt.audio.i_channels);
+    // sample size
+    bo_add_16be(soun, p_track->fmt.audio.i_bitspersample ?
+                 p_track->fmt.audio.i_bitspersample : 16);
+    bo_add_16be(soun, -2);        // compression id
+    bo_add_16be(soun, 0);         // packet size (0)
+    bo_add_16be(soun, p_track->fmt.audio.i_rate); // sampleratehi
+    bo_add_16be(soun, 0);                             // sampleratelo
+
+    /* Extended data for SoundDescription V1 */
+    if (b_mov && p_track->fmt.i_codec == VLC_CODEC_MP4A) {
+        /* samples per packet */
+        bo_add_32be(soun, p_track->fmt.audio.i_frame_length);
+        bo_add_32be(soun, 1536); /* bytes per packet */
+        bo_add_32be(soun, 2);    /* bytes per frame */
+        /* bytes per sample */
+        bo_add_32be(soun, 2 /*p_fmt->audio.i_bitspersample/8 */);
+    }
+
+    /* Add an ES Descriptor */
+    if (b_descr) {
+        bo_t *box;
+
+        if (b_mov && codec == VLC_CODEC_MP4A)
+            box = GetWaveTag(p_track);
+        else if (codec == VLC_CODEC_AMR_NB)
+            box = GetDamrTag(&p_track->fmt);
+        else if (codec == VLC_CODEC_A52)
+            box = GetDac3Tag(p_track->a52_frame);
+        else if (codec == VLC_CODEC_EAC3)
+            box = GetDec3Tag(&p_track->fmt, p_track->a52_frame);
+        else
+            box = GetESDS(p_track);
+
+        if (box)
+            box_gather(soun, box);
+    }
+
+    return soun;
+}
+
+static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov)
+{
+    VLC_UNUSED(p_obj);
+    VLC_UNUSED(b_mov);
+
+    char fcc[4];
+
+    switch(p_track->fmt.i_codec)
+    {
+    case VLC_CODEC_MP4V:
+    case VLC_CODEC_MPGV: memcpy(fcc, "mp4v", 4); break;
+    case VLC_CODEC_MJPG: memcpy(fcc, "mjpa", 4); break;
+    case VLC_CODEC_SVQ1: memcpy(fcc, "SVQ1", 4); break;
+    case VLC_CODEC_SVQ3: memcpy(fcc, "SVQ3", 4); break;
+    case VLC_CODEC_H263: memcpy(fcc, "s263", 4); break;
+    case VLC_CODEC_H264: memcpy(fcc, "avc1", 4); break;
+    case VLC_CODEC_HEVC: memcpy(fcc, "hvc1", 4); break;
+    case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); break;
+    case VLC_CODEC_YUYV: memcpy(fcc, "yuy2", 4); break;
+    default:
+        vlc_fourcc_to_char(p_track->fmt.i_codec, fcc);
+        break;
+    }
+
+    bo_t *vide = box_new(fcc);
+    if(!vide)
+        return NULL;
+    for (int i = 0; i < 6; i++)
+        bo_add_8(vide, 0);        // reserved;
+    bo_add_16be(vide, 1);         // data-reference-index
+
+    bo_add_16be(vide, 0);         // predefined;
+    bo_add_16be(vide, 0);         // reserved;
+    for (int i = 0; i < 3; i++)
+        bo_add_32be(vide, 0);     // predefined;
+
+    bo_add_16be(vide, p_track->fmt.video.i_width);  // i_width
+    bo_add_16be(vide, p_track->fmt.video.i_height); // i_height
+
+    bo_add_32be(vide, 0x00480000);                // h 72dpi
+    bo_add_32be(vide, 0x00480000);                // v 72dpi
+
+    bo_add_32be(vide, 0);         // data size, always 0
+    bo_add_16be(vide, 1);         // frames count per sample
+
+    // compressor name;
+    for (int i = 0; i < 32; i++)
+        bo_add_8(vide, 0);
+
+    bo_add_16be(vide, 0x18);      // depth
+    bo_add_16be(vide, 0xffff);    // predefined
+
+    /* add an ES Descriptor */
+    switch(p_track->fmt.i_codec)
+    {
+    case VLC_CODEC_MP4V:
+    case VLC_CODEC_MPGV:
+        box_gather(vide, GetESDS(p_track));
+        break;
+
+    case VLC_CODEC_H263:
+        box_gather(vide, GetD263Tag());
+        break;
+
+    case VLC_CODEC_SVQ3:
+        box_gather(vide, GetSVQ3Tag(&p_track->fmt));
+        break;
+
+    case VLC_CODEC_H264:
+        box_gather(vide, GetAvcCTag(&p_track->fmt));
+        break;
+
+    case VLC_CODEC_HEVC:
+        box_gather(vide, GetHvcCTag(&p_track->fmt));
+        break;
+    }
+
+    return vide;
+}
+
+static bo_t *GetTextBox(void)
+{
+    bo_t *text = box_new("text");
+    if(!text)
+        return NULL;
+
+    for (int i = 0; i < 6; i++)
+        bo_add_8(text, 0);        // reserved;
+    bo_add_16be(text, 1);         // data-reference-index
+
+    bo_add_32be(text, 0);         // display flags
+    bo_add_32be(text, 0);         // justification
+    for (int i = 0; i < 3; i++)
+        bo_add_16be(text, 0);     // back ground color
+
+    bo_add_16be(text, 0);         // box text
+    bo_add_16be(text, 0);         // box text
+    bo_add_16be(text, 0);         // box text
+    bo_add_16be(text, 0);         // box text
+
+    bo_add_64be(text, 0);         // reserved
+    for (int i = 0; i < 3; i++)
+        bo_add_16be(text, 0xff);  // foreground color
+
+    bo_add_8 (text, 9);
+    bo_add_mem(text, 9, (uint8_t*)"Helvetica");
+
+    return text;
+}
+
+static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov, bool b_stco64)
+{
+    /* sample description */
+    bo_t *stsd = box_full_new("stsd", 0, 0);
+    if(!stsd)
+        return NULL;
+    bo_add_32be(stsd, 1);
+    if (p_track->fmt.i_cat == AUDIO_ES)
+        box_gather(stsd, GetSounBox(p_obj, p_track, b_mov));
+    else if (p_track->fmt.i_cat == VIDEO_ES)
+        box_gather(stsd, GetVideBox(p_obj, p_track, b_mov));
+    else if (p_track->fmt.i_cat == SPU_ES)
+        box_gather(stsd, GetTextBox());
+
+    /* chunk offset table */
+    bo_t *stco;
+
+    if (b_stco64) {
+        /* 64 bits version */
+        stco = box_full_new("co64", 0, 0);
+    } else {
+        /* 32 bits version */
+        stco = box_full_new("stco", 0, 0);
+    }
+    if(!stco)
+    {
+        bo_free(stsd);
+        return NULL;
+    }
+    bo_add_32be(stco, 0);     // entry-count (fixed latter)
+
+    /* sample to chunk table */
+    bo_t *stsc = box_full_new("stsc", 0, 0);
+    bo_add_32be(stsc, 0);     // entry-count (fixed latter)
+
+    unsigned i_chunk = 0;
+    unsigned i_stsc_last_val = 0, i_stsc_entries = 0;
+    for (unsigned i = 0; i < p_track->i_entry_count; i_chunk++) {
+        mp4mux_entry_t *entry = p_track->entry;
+        int i_first = i;
+
+        if (b_stco64)
+            bo_add_64be(stco, entry[i].i_pos);
+        else
+            bo_add_32be(stco, entry[i].i_pos);
+
+        for (; i < p_track->i_entry_count; i++)
+            if (i >= p_track->i_entry_count - 1 ||
+                    entry[i].i_pos + entry[i].i_size != entry[i+1].i_pos) {
+                i++;
+                break;
+            }
+
+        /* Add entry to the stsc table */
+        if (i_stsc_last_val != i - i_first) {
+            bo_add_32be(stsc, 1 + i_chunk);   // first-chunk
+            bo_add_32be(stsc, i - i_first) ;  // samples-per-chunk
+            bo_add_32be(stsc, 1);             // sample-descr-index
+            i_stsc_last_val = i - i_first;
+            i_stsc_entries++;
+        }
+    }
+
+    /* Fix stco entry count */
+    bo_swap_32be(stco, 12, i_chunk);
+    if(p_obj)
+        msg_Dbg(p_obj, "created %d chunks (stco)", i_chunk);
+
+    /* Fix stsc entry count */
+    bo_swap_32be(stsc, 12, i_stsc_entries );
+
+    /* add stts */
+    bo_t *stts = box_full_new("stts", 0, 0);
+    if(!stts)
+    {
+        bo_free(stsd);
+        bo_free(stco);
+        return NULL;
+    }
+    bo_add_32be(stts, 0);     // entry-count (fixed latter)
+
+    unsigned i_index = 0;
+    for (unsigned i = 0; i < p_track->i_entry_count; i_index++) {
+        int     i_first = i;
+        mtime_t i_delta = p_track->entry[i].i_length;
+
+        for (; i < p_track->i_entry_count; ++i)
+            if (i == p_track->i_entry_count || p_track->entry[i].i_length != i_delta)
+                break;
+
+        bo_add_32be(stts, i - i_first); // sample-count
+        bo_add_32be(stts, (uint64_t)i_delta  * p_track->i_timescale / CLOCK_FREQ); // sample-delta
+    }
+    bo_swap_32be(stts, 12, i_index);
+
+    /* composition time handling */
+    bo_t *ctts = NULL;
+    if ( p_track->b_hasbframes && (ctts = box_full_new("ctts", 0, 0)) )
+    {
+        bo_add_32be(ctts, 0);
+        i_index = 0;
+        for (unsigned i = 0; i < p_track->i_entry_count; i_index++)
+        {
+            int     i_first = i;
+            mtime_t i_offset = p_track->entry[i].i_pts_dts;
+
+            for (; i < p_track->i_entry_count; ++i)
+                if (i == p_track->i_entry_count || p_track->entry[i].i_pts_dts != i_offset)
+                    break;
+
+            bo_add_32be(ctts, i - i_first); // sample-count
+            bo_add_32be(ctts, i_offset * p_track->i_timescale / CLOCK_FREQ ); // sample-offset
+        }
+        bo_swap_32be(ctts, 12, i_index);
+    }
+
+    bo_t *stsz = box_full_new("stsz", 0, 0);
+    if(!stsz)
+    {
+        bo_free(stsd);
+        bo_free(stco);
+        bo_free(stts);
+        return NULL;
+    }
+    int i_size = 0;
+    for (unsigned i = 0; i < p_track->i_entry_count; i++)
+    {
+        if ( i == 0 )
+            i_size = p_track->entry[i].i_size;
+        else if ( p_track->entry[i].i_size != i_size )
+        {
+            i_size = 0;
+            break;
+        }
+    }
+    bo_add_32be(stsz, i_size);                         // sample-size
+    bo_add_32be(stsz, p_track->i_entry_count);       // sample-count
+    if ( i_size == 0 ) // all samples have different size
+    {
+        for (unsigned i = 0; i < p_track->i_entry_count; i++)
+            bo_add_32be(stsz, p_track->entry[i].i_size); // sample-size
+    }
+
+    /* create stss table */
+    bo_t *stss = NULL;
+    i_index = 0;
+    if ( p_track->fmt.i_cat == VIDEO_ES || p_track->fmt.i_cat == AUDIO_ES )
+    {
+        mtime_t i_interval = -1;
+        for (unsigned i = 0; i < p_track->i_entry_count; i++)
+        {
+            if ( i_interval != -1 )
+            {
+                i_interval += p_track->entry[i].i_length + p_track->entry[i].i_pts_dts;
+                if ( i_interval < CLOCK_FREQ * 2 )
+                    continue;
+            }
+
+            if (p_track->entry[i].i_flags & BLOCK_FLAG_TYPE_I) {
+                if (stss == NULL) {
+                    stss = box_full_new("stss", 0, 0);
+                    if(!stss)
+                        break;
+                    bo_add_32be(stss, 0); /* fixed later */
+                }
+                bo_add_32be(stss, 1 + i);
+                i_index++;
+                i_interval = 0;
+            }
+        }
+    }
+
+    if (stss)
+        bo_swap_32be(stss, 12, i_index);
+
+    /* Now gather all boxes into stbl */
+    bo_t *stbl = box_new("stbl");
+    if(!stbl)
+    {
+        bo_free(stsd);
+        bo_free(stco);
+        bo_free(stts);
+        bo_free(stsz);
+        bo_free(stss);
+        return NULL;
+    }
+    box_gather(stbl, stsd);
+    box_gather(stbl, stts);
+    if (stss)
+        box_gather(stbl, stss);
+    if (ctts)
+        box_gather(stbl, ctts);
+    box_gather(stbl, stsc);
+    box_gather(stbl, stsz);
+    p_track->i_stco_pos = stbl->b->i_buffer + 16;
+    box_gather(stbl, stco);
+
+    return stbl;
+}
+
+bo_t * GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
+                  bool b_fragmented, bool b_mov, bool b_64_ext, bool b_stco64)
+{
+    bo_t            *moov, *mvhd;
+
+    uint32_t        i_movie_timescale = 90000;
+    int64_t         i_movie_duration  = 0;
+    int64_t         i_timestamp = get_timestamp();
+
+    moov = box_new("moov");
+    if(!moov)
+        return NULL;
+    /* Create general info */
+    if ( !b_fragmented )
+    {
+        for (unsigned int i = 0; i < i_tracks; i++) {
+            mp4mux_trackinfo_t *p_stream = pp_tracks[i];
+            i_movie_duration = __MAX(i_movie_duration, p_stream->i_read_duration);
+        }
+        if(p_obj)
+            msg_Dbg(p_obj, "movie duration %"PRId64"s", i_movie_duration / CLOCK_FREQ);
+
+        i_movie_duration = i_movie_duration * i_movie_timescale / CLOCK_FREQ;
+    }
+    else
+        i_movie_duration = 0;
+
+    /* *** add /moov/mvhd *** */
+    if (!b_64_ext) {
+        mvhd = box_full_new("mvhd", 0, 0);
+        if(!mvhd)
+        {
+            bo_free(moov);
+            return NULL;
+        }
+        bo_add_32be(mvhd, i_timestamp);   // creation time
+        bo_add_32be(mvhd, i_timestamp);   // modification time
+        bo_add_32be(mvhd, i_movie_timescale);  // timescale
+        bo_add_32be(mvhd, i_movie_duration);  // duration
+    } else {
+        mvhd = box_full_new("mvhd", 1, 0);
+        if(!mvhd)
+        {
+            bo_free(moov);
+            return NULL;
+        }
+        bo_add_64be(mvhd, i_timestamp);   // creation time
+        bo_add_64be(mvhd, i_timestamp);   // modification time
+        bo_add_32be(mvhd, i_movie_timescale);  // timescale
+        bo_add_64be(mvhd, i_movie_duration);  // duration
+    }
+    bo_add_32be(mvhd, 0x10000);           // rate
+    bo_add_16be(mvhd, 0x100);             // volume
+    bo_add_16be(mvhd, 0);                 // reserved
+    for (int i = 0; i < 2; i++)
+        bo_add_32be(mvhd, 0);             // reserved
+
+    uint32_t mvhd_matrix[9] = { 0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000 };
+
+    for (int i = 0; i < 9; i++)
+        bo_add_32be(mvhd, mvhd_matrix[i]);// matrix
+    for (int i = 0; i < 6; i++)
+        bo_add_32be(mvhd, 0);             // pre-defined
+
+    /* Next available track id */
+    bo_add_32be(mvhd, (i_tracks) ? pp_tracks[i_tracks -1]->i_track_id + 1: 1); // next-track-id
+
+    box_gather(moov, mvhd);
+
+    for (unsigned int i_trak = 0; i_trak < i_tracks; i_trak++) {
+        mp4mux_trackinfo_t *p_stream = pp_tracks[i_trak];
+
+        mtime_t i_stream_duration;
+        if ( !b_fragmented )
+            i_stream_duration = p_stream->i_read_duration * i_movie_timescale / CLOCK_FREQ;
+        else
+            i_stream_duration = 0;
+
+        /* *** add /moov/trak *** */
+        bo_t *trak = box_new("trak");
+        if(!trak)
+            continue;
+
+        /* *** add /moov/trak/tkhd *** */
+        bo_t *tkhd;
+        if (!b_64_ext) {
+            if (b_mov)
+                tkhd = box_full_new("tkhd", 0, 0x0f);
+            else
+                tkhd = box_full_new("tkhd", 0, 1);
+            if(!tkhd)
+            {
+                bo_free(trak);
+                continue;
+            }
+            bo_add_32be(tkhd, i_timestamp);       // creation time
+            bo_add_32be(tkhd, i_timestamp);       // modification time
+            bo_add_32be(tkhd, p_stream->i_track_id);
+            bo_add_32be(tkhd, 0);                     // reserved 0
+            bo_add_32be(tkhd, i_stream_duration); // duration
+        } else {
+            if (b_mov)
+                tkhd = box_full_new("tkhd", 1, 0x0f);
+            else
+                tkhd = box_full_new("tkhd", 1, 1);
+            if(!tkhd)
+            {
+                bo_free(trak);
+                continue;
+            }
+            bo_add_64be(tkhd, i_timestamp);       // creation time
+            bo_add_64be(tkhd, i_timestamp);       // modification time
+            bo_add_32be(tkhd, p_stream->i_track_id);
+            bo_add_32be(tkhd, 0);                     // reserved 0
+            bo_add_64be(tkhd, i_stream_duration); // duration
+        }
+
+        for (int i = 0; i < 2; i++)
+            bo_add_32be(tkhd, 0);                 // reserved
+        bo_add_16be(tkhd, 0);                     // layer
+        bo_add_16be(tkhd, 0);                     // pre-defined
+        // volume
+        bo_add_16be(tkhd, p_stream->fmt.i_cat == AUDIO_ES ? 0x100 : 0);
+        bo_add_16be(tkhd, 0);                     // reserved
+        matrix_apply_rotation(&p_stream->fmt, mvhd_matrix);
+        for (int i = 0; i < 9; i++)
+            bo_add_32be(tkhd, mvhd_matrix[i]);    // matrix
+        if (p_stream->fmt.i_cat == AUDIO_ES) {
+            bo_add_32be(tkhd, 0);                 // width (presentation)
+            bo_add_32be(tkhd, 0);                 // height(presentation)
+        } else if (p_stream->fmt.i_cat == VIDEO_ES) {
+            int i_width = p_stream->fmt.video.i_width << 16;
+            if (p_stream->fmt.video.i_sar_num > 0 && p_stream->fmt.video.i_sar_den > 0) {
+                i_width = (int64_t)p_stream->fmt.video.i_sar_num *
+                          ((int64_t)p_stream->fmt.video.i_width << 16) /
+                          p_stream->fmt.video.i_sar_den;
+            }
+            // width (presentation)
+            bo_add_32be(tkhd, i_width);
+            // height(presentation)
+            bo_add_32be(tkhd, p_stream->fmt.video.i_height << 16);
+        } else {
+            int i_width = 320 << 16;
+            int i_height = 200;
+            for (unsigned int i = 0; i < i_tracks; i++) {
+                mp4mux_trackinfo_t *tk = pp_tracks[i];
+                if (tk->fmt.i_cat == VIDEO_ES) {
+                    if (tk->fmt.video.i_sar_num > 0 &&
+                        tk->fmt.video.i_sar_den > 0)
+                        i_width = (int64_t)tk->fmt.video.i_sar_num *
+                                  ((int64_t)tk->fmt.video.i_width << 16) /
+                                  tk->fmt.video.i_sar_den;
+                    else
+                        i_width = tk->fmt.video.i_width << 16;
+                    i_height = tk->fmt.video.i_height;
+                    break;
+                }
+            }
+            bo_add_32be(tkhd, i_width);     // width (presentation)
+            bo_add_32be(tkhd, i_height << 16);    // height(presentation)
+        }
+
+        box_gather(trak, tkhd);
+
+        /* *** add /moov/trak/edts and elst */
+        if ( !b_fragmented )
+        {
+            bo_t *elst = box_full_new("elst", b_64_ext ? 1 : 0, 0);
+            if(elst)
+            {
+                if (p_stream->i_starttime > 0) {
+                    bo_add_32be(elst, 2);
+
+                    if (b_64_ext) {
+                        bo_add_64be(elst, p_stream->i_starttime *
+                                    i_movie_timescale / CLOCK_FREQ);
+                        bo_add_64be(elst, -1);
+                    } else {
+                        bo_add_32be(elst, p_stream->i_starttime *
+                                    i_movie_timescale / CLOCK_FREQ);
+                        bo_add_32be(elst, -1);
+                    }
+                    bo_add_16be(elst, 1);
+                    bo_add_16be(elst, 0);
+                } else {
+                    bo_add_32be(elst, 1);
+                }
+                if (b_64_ext) {
+                    bo_add_64be(elst, p_stream->i_read_duration *
+                                i_movie_timescale / CLOCK_FREQ);
+                    bo_add_64be(elst, 0);
+                } else {
+                    bo_add_32be(elst, p_stream->i_read_duration *
+                                i_movie_timescale / CLOCK_FREQ);
+                    bo_add_32be(elst, 0);
+                }
+                bo_add_16be(elst, 1);
+                bo_add_16be(elst, 0);
+
+                bo_t *edts = box_new("edts");
+                if(edts)
+                {
+                    box_gather(edts, elst);
+                    box_gather(trak, edts);
+                }
+                else bo_free(elst);
+            }
+        }
+
+        /* *** add /moov/trak/mdia *** */
+        bo_t *mdia = box_new("mdia");
+        if(!mdia)
+        {
+            bo_free(trak);
+            continue;
+        }
+
+        /* media header */
+        bo_t *mdhd;
+        if (!b_64_ext) {
+            mdhd = box_full_new("mdhd", 0, 0);
+            if(!mdhd)
+            {
+                bo_free(mdia);
+                bo_free(trak);
+                continue;
+            }
+            bo_add_32be(mdhd, i_timestamp);   // creation time
+            bo_add_32be(mdhd, i_timestamp);   // modification time
+            bo_add_32be(mdhd, p_stream->i_timescale); // timescale
+            bo_add_32be(mdhd, i_stream_duration * p_stream->i_timescale / i_movie_timescale);  // duration
+        } else {
+            mdhd = box_full_new("mdhd", 1, 0);
+            if(!mdhd)
+            {
+                bo_free(mdia);
+                bo_free(trak);
+                continue;
+            }
+            bo_add_64be(mdhd, i_timestamp);   // creation time
+            bo_add_64be(mdhd, i_timestamp);   // modification time
+            bo_add_32be(mdhd, p_stream->i_timescale); // timescale
+            bo_add_64be(mdhd, i_stream_duration * p_stream->i_timescale / i_movie_timescale);  // duration
+        }
+
+        if (p_stream->fmt.psz_language) {
+            char *psz = p_stream->fmt.psz_language;
+            const iso639_lang_t *pl = NULL;
+            uint16_t lang = 0x0;
+
+            if (strlen(psz) == 2)
+                pl = GetLang_1(psz);
+            else if (strlen(psz) == 3) {
+                pl = GetLang_2B(psz);
+                if (!strcmp(pl->psz_iso639_1, "??"))
+                    pl = GetLang_2T(psz);
+            }
+
+            if (pl && strcmp(pl->psz_iso639_1, "??"))
+                lang = ((pl->psz_iso639_2T[0] - 0x60) << 10) |
+                       ((pl->psz_iso639_2T[1] - 0x60) <<  5) |
+                       ((pl->psz_iso639_2T[2] - 0x60));
+            bo_add_16be(mdhd, lang);          // language
+        } else
+            bo_add_16be(mdhd, 0   );          // language
+        bo_add_16be(mdhd, 0   );              // predefined
+        box_gather(mdia, mdhd);
+
+        /* handler reference */
+        bo_t *hdlr = box_full_new("hdlr", 0, 0);
+        if(!hdlr)
+        {
+            bo_free(mdia);
+            bo_free(trak);
+            continue;
+        }
+
+        if (b_mov)
+            bo_add_fourcc(hdlr, "mhlr");         // media handler
+        else
+            bo_add_32be(hdlr, 0);
+
+        if (p_stream->fmt.i_cat == AUDIO_ES)
+            bo_add_fourcc(hdlr, "soun");
+        else if (p_stream->fmt.i_cat == VIDEO_ES)
+            bo_add_fourcc(hdlr, "vide");
+        else if (p_stream->fmt.i_cat == SPU_ES)
+            bo_add_fourcc(hdlr, "text");
+
+        bo_add_32be(hdlr, 0);         // reserved
+        bo_add_32be(hdlr, 0);         // reserved
+        bo_add_32be(hdlr, 0);         // reserved
+
+        if (b_mov)
+            bo_add_8(hdlr, 12);   /* Pascal string for .mov */
+
+        if (p_stream->fmt.i_cat == AUDIO_ES)
+            bo_add_mem(hdlr, 12, (uint8_t*)"SoundHandler");
+        else if (p_stream->fmt.i_cat == VIDEO_ES)
+            bo_add_mem(hdlr, 12, (uint8_t*)"VideoHandler");
+        else
+            bo_add_mem(hdlr, 12, (uint8_t*)"Text Handler");
+
+        if (!b_mov)
+            bo_add_8(hdlr, 0);   /* asciiz string for .mp4, yes that's BRAIN DAMAGED F**K MP4 */
+
+        box_gather(mdia, hdlr);
+
+        /* minf*/
+        bo_t *minf = box_new("minf");
+        if(!minf)
+        {
+            bo_free(mdia);
+            bo_free(trak);
+            continue;
+        }
+
+        /* add smhd|vmhd */
+        if (p_stream->fmt.i_cat == AUDIO_ES) {
+            bo_t *smhd = box_full_new("smhd", 0, 0);
+            if(smhd)
+            {
+                bo_add_16be(smhd, 0);     // balance
+                bo_add_16be(smhd, 0);     // reserved
+
+                box_gather(minf, smhd);
+            }
+        } else if (p_stream->fmt.i_cat == VIDEO_ES) {
+            bo_t *vmhd = box_full_new("vmhd", 0, 1);
+            if(vmhd)
+            {
+                bo_add_16be(vmhd, 0);     // graphicsmode
+                for (int i = 0; i < 3; i++)
+                    bo_add_16be(vmhd, 0); // opcolor
+                box_gather(minf, vmhd);
+            }
+        } else if (p_stream->fmt.i_cat == SPU_ES) {
+            bo_t *gmin = box_full_new("gmin", 0, 1);
+            if(gmin)
+            {
+                bo_add_16be(gmin, 0);     // graphicsmode
+                for (int i = 0; i < 3; i++)
+                    bo_add_16be(gmin, 0); // opcolor
+                bo_add_16be(gmin, 0);     // balance
+                bo_add_16be(gmin, 0);     // reserved
+
+                bo_t *gmhd = box_new("gmhd");
+                if(gmhd)
+                {
+                    box_gather(gmhd, gmin);
+                    box_gather(minf, gmhd);
+                }
+                else bo_free(gmin);
+            }
+        }
+
+        /* dinf */
+        bo_t *dref = box_full_new("dref", 0, 0);
+        if(dref)
+        {
+            bo_add_32be(dref, 1);
+
+            bo_t *url = box_full_new("url ", 0, 0x01);
+            if(url)
+                box_gather(dref, url);
+
+            bo_t *dinf = box_new("dinf");
+            if(dinf)
+            {
+                box_gather(dinf, dref);
+
+                /* append dinf to mdia */
+                box_gather(minf, dinf);
+            }
+            else bo_free(dinf);
+        }
+
+        /* add stbl */
+        bo_t *stbl;
+        if ( b_fragmented )
+        {
+            uint32_t i_backup = p_stream->i_entry_count;
+            p_stream->i_entry_count = 0;
+            stbl = GetStblBox(p_obj, p_stream, b_mov, b_stco64);
+            p_stream->i_entry_count = i_backup;
+        }
+        else
+            stbl = GetStblBox(p_obj, p_stream, b_mov, b_stco64);
+
+        /* append stbl to minf */
+        p_stream->i_stco_pos += minf->b->i_buffer;
+        box_gather(minf, stbl);
+
+        /* append minf to mdia */
+        p_stream->i_stco_pos += mdia->b->i_buffer;
+        box_gather(mdia, minf);
+
+        /* append mdia to trak */
+        p_stream->i_stco_pos += trak->b->i_buffer;
+        box_gather(trak, mdia);
+
+        /* append trak to moov */
+        p_stream->i_stco_pos += moov->b->i_buffer;
+        box_gather(moov, trak);
+    }
+
+    /* Add user data tags */
+    box_gather(moov, GetUdtaTag(pp_tracks, i_tracks));
+
+    if ( b_fragmented )
+    {
+        bo_t *mvex = box_new("mvex");
+        for (unsigned int i_trak = 0; mvex && i_trak < i_tracks; i_trak++)
+        {
+            mp4mux_trackinfo_t *p_stream = pp_tracks[i_trak];
+
+            /* Try to find some defaults */
+            if ( p_stream->i_entry_count )
+            {
+                // FIXME: find highest occurence
+                p_stream->i_trex_default_length = p_stream->entry[0].i_length;
+                p_stream->i_trex_default_size = p_stream->entry[0].i_size;
+            }
+
+            /* *** add /mvex/trex *** */
+            bo_t *trex = box_full_new("trex", 0, 0);
+            bo_add_32be(trex, p_stream->i_track_id);
+            bo_add_32be(trex, 1); // sample desc index
+            bo_add_32be(trex, (uint64_t)p_stream->i_trex_default_length * p_stream->i_timescale / CLOCK_FREQ); // sample duration
+            bo_add_32be(trex, p_stream->i_trex_default_size); // sample size
+            bo_add_32be(trex, 0); // sample flags
+            box_gather(mvex, trex);
+        }
+        box_gather(moov, mvex);
+    }
+
+    if(moov->b)
+        box_fix(moov, moov->b->i_buffer);
+    return moov;
+}
+
+bo_t *GetFtyp(vlc_fourcc_t major, uint32_t minor, vlc_fourcc_t extra[], size_t i_fourcc)
+{
+    bo_t *box = box_new("ftyp");
+    if(box)
+    {
+        bo_add_fourcc(box, &major);
+        bo_add_32be  (box, minor);
+        for(size_t i=0; i<i_fourcc; i++)
+            bo_add_fourcc(box, &extra[i]);
+        if(!box->b)
+        {
+            free(box);
+            return NULL;
+        }
+        box_fix(box, box->b->i_buffer);
+    }
+    return box;
+}
