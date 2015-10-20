@@ -964,9 +964,9 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
         dbg_print( INPUT_DBG_EVENT, "get meta info" );
         if( p_vcdplayer->p_meta )
         {
-            vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg(args,vlc_meta_t**);
+            vlc_meta_t *p_meta = va_arg(args,vlc_meta_t *);
 
-            *pp_meta = vlc_meta_Duplicate( p_vcdplayer->p_meta );
+            vlc_meta_Merge( p_meta, p_vcdplayer->p_meta );
             dbg_print( INPUT_DBG_META, "%s", "Meta copied" );
         }
         else

@@ -324,8 +324,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             return Seek( p_access, p_sys->offsets[i] );
 
         case ACCESS_GET_META:
-            if( !p_sys->p_meta )
-                return VLC_EGENERIC;
             p_meta = va_arg( args, vlc_meta_t* );
             vlc_meta_Merge( p_meta, p_sys->p_meta );
             break;

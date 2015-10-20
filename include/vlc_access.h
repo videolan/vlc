@@ -52,7 +52,7 @@ enum access_query_e
     ACCESS_GET_SEEKPOINT,   /* arg1=unsigned * res=can fail */
 
     /* Meta data */
-    ACCESS_GET_META,        /* arg1= vlc_meta_t ** res=can fail */
+    ACCESS_GET_META,        /* arg1= vlc_meta_t * res=can fail */
     ACCESS_GET_CONTENT_TYPE,/* arg1=char **ppsz_content_type res=can fail */
 
     ACCESS_GET_SIGNAL,      /* arg1=double *pf_quality, arg2=double *pf_strength   res=can fail */
