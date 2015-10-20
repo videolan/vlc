@@ -25,6 +25,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include "demux.h"
 #include <libvlc.h>
 #include <vlc_codec.h>
@@ -257,6 +259,9 @@ void demux_Delete( demux_t *p_demux )
         stream_Delete( s );
 }
 
+#define static_control_match(foo) \
+    static_assert((unsigned) DEMUX_##foo == STREAM_##foo, "Mismatch")
+
 /*****************************************************************************
  * demux_vaControlHelper:
  *****************************************************************************/
@@ -274,8 +279,33 @@ int demux_vaControlHelper( stream_t *s,
     if( i_align <= 0 ) i_align = 1;
     i_tell = stream_Tell( s );
 
+    static_control_match(CAN_PAUSE);
+    static_control_match(CAN_CONTROL_PACE);
+    static_control_match(GET_PTS_DELAY);
+    static_control_match(GET_META);
+    static_control_match(GET_SIGNAL);
+    static_control_match(SET_PAUSE_STATE);
+
     switch( i_query )
     {
+        case DEMUX_CAN_SEEK:
+        {
+            bool *b = va_arg( args, bool * );
+
+            if( (i_bitrate <= 0 && i_start >= i_end)
+             || stream_Control( s, STREAM_CAN_SEEK, b ) )
+                *b = false;
+            break;
+        }
+
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_CAN_CONTROL_PACE:
+        case DEMUX_GET_PTS_DELAY:
+        case DEMUX_GET_META:
+        case DEMUX_GET_SIGNAL:
+        case DEMUX_SET_PAUSE_STATE:
+            return stream_vaControl( s, i_query, args );
+
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( i_bitrate > 0 && i_end > i_start )
@@ -332,14 +362,10 @@ int demux_vaControlHelper( stream_t *s,
             }
             return VLC_EGENERIC;
 
-        case DEMUX_GET_META:
-            return stream_vaControl( s, STREAM_GET_META, args );
-
         case DEMUX_IS_PLAYLIST:
             *va_arg( args, bool * ) = false;
             return VLC_SUCCESS;
 
-        case DEMUX_GET_PTS_DELAY:
         case DEMUX_GET_FPS:
         case DEMUX_HAS_UNSUPPORTED_META:
         case DEMUX_SET_NEXT_DEMUX_TIME:
@@ -348,14 +374,17 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_SET_ES:
         case DEMUX_GET_ATTACHMENTS:
         case DEMUX_CAN_RECORD:
-        case DEMUX_SET_RECORD_STATE:
-        case DEMUX_GET_SIGNAL:
             return VLC_EGENERIC;
 
+        case DEMUX_SET_TITLE:
+        case DEMUX_SET_SEEKPOINT:
+        case DEMUX_SET_RECORD_STATE:
+            assert(0);
         default:
             msg_Err( s, "unknown query in demux_vaControlDefault" );
             return VLC_EGENERIC;
     }
+    return VLC_SUCCESS;
 }
 
 /****************************************************************************
