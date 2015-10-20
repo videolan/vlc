@@ -99,11 +99,94 @@ typedef struct demux_meta_t
     input_attachment_t **attachments;    /**< array of attachments */
 } demux_meta_t;
 
+/**
+ * Control query identifiers for use with demux_t.pf_control
+ *
+ * In the individual identifier description, the input stream refers to
+ * demux_t.s if non-NULL, and the output refers to demux_t.out.
+ *
+ * A demuxer is synchronous if it only accesses its input stream and the
+ * output from within its demux_t callbacks, i.e. demux.pf_demux and
+ * demux_t.pf_control.
+ *
+ * A demuxer is threaded if it accesses either or both input and output
+ * asynchronously.
+ *
+ * An access-demuxer is a demuxer without input, i.e. demux_t.s == NULL).
+ */
 enum demux_query_e
 {
+    /** Checks whether the stream supports seeking.
+     * Can fail if seeking is not supported (same as returning false).
+     * \bug Failing should not be allowed.
+     *
+     * arg1 = bool * */
+    DEMUX_CAN_SEEK,
+
+    /** Checks whether (long) pause then stream resumption is supported.
+     * Can fail only if synchronous and <b>not</b> an access-demuxer. The
+     * underlying input stream then determines if pause is supported.
+     * \bug Failing should not be allowed.
+     *
+     * arg1= bool * */
+    DEMUX_CAN_PAUSE = 0x002,
+
+    /** Whether the stream can be read at an arbitrary pace.
+     * Cannot fail.
+     *
+     * arg1= bool * */
+    DEMUX_CAN_CONTROL_PACE,
+
+    /** Retrieves the PTS delay (roughly the default buffer duration).
+     * Can fail only if synchronous and <b>not</b> an access-demuxer. The
+     * underlying input stream then determines the PTS delay.
+     *
+     * arg1= int64_t * */
+    DEMUX_GET_PTS_DELAY = 0x101,
+
+    /** Retrieves stream meta-data.
+     * Should fail if no meta-data were retrieved.
+     *
+     * arg1= vlc_meta_t * */
+    DEMUX_GET_META = 0x105,
+
+    /** Retrieves an estimate of signal quality and strength.
+     * Can fail.
+     *
+     * arg1=double *quality, arg2=double *strength */
+    DEMUX_GET_SIGNAL = 0x107,
+
+    /** Sets the paused or playing/resumed state.
+     *
+     * Streams are initially in playing state. The control always specifies a
+     * change from paused to playing (false) or from playing to paused (true)
+     * and streams are initially playing; a no-op cannot be requested.
+     *
+     * The control is never used if DEMUX_CAN_PAUSE fails.
+     * Can fail.
+     *
+     * arg1= bool */
+    DEMUX_SET_PAUSE_STATE = 0x200,
+
+    /** Seeks to the beginning of a title.
+     *
+     * The control is never used if DEMUX_GET_TITLE_INFO fails.
+     * Can fail.
+     *
+     * arg1= int */
+    DEMUX_SET_TITLE,
+
+    /** Seeks to the beginning of a chapter of the current title.
+     *
+     * The control is never used if DEMUX_GET_TITLE_INFO fails.
+     * Can fail.
+     *
+     * arg1= int */
+    DEMUX_SET_SEEKPOINT,        /* arg1= int            can fail */
+
     /* I. Common queries to access_demux and demux */
     /* POSITION double between 0.0 and 1.0 */
-    DEMUX_GET_POSITION,         /* arg1= double *       res=    */
+    DEMUX_GET_POSITION = 0x300, /* arg1= double *       res=    */
     DEMUX_SET_POSITION,         /* arg1= double arg2= bool b_precise    res=can fail    */
 
     /* LENGTH/TIME in microsecond, 0 if unknown */
@@ -111,12 +194,16 @@ enum demux_query_e
     DEMUX_GET_TIME,             /* arg1= int64_t *      res=    */
     DEMUX_SET_TIME,             /* arg1= int64_t arg2= bool b_precise   res=can fail    */
 
-    /* TITLE_INFO only if more than 1 title or 1 chapter */
-    DEMUX_GET_TITLE_INFO,       /* arg1=input_title_t*** arg2=int*
-                                   arg3=int*pi_title_offset(0), arg4=int*pi_seekpoint_offset(0) can fail */
-    /* TITLE/SEEKPOINT, only when TITLE_INFO succeed */
-    DEMUX_SET_TITLE,            /* arg1= int            can fail */
-    DEMUX_SET_SEEKPOINT,        /* arg1= int            can fail */
+    /**
+     * \todo Document
+     *
+     * \warning The prototype is different from STREAM_GET_TITLE_INFO
+     *
+     * Can fail, meaning there is only one title and one chapter.
+     *
+     * arg1= input_title_t ***, arg2=int *, arg3=int *pi_title_offset(0),
+     * arg4= int *pi_seekpoint_offset(0) */
+    DEMUX_GET_TITLE_INFO,
 
     /* DEMUX_SET_GROUP/SET_ES only a hint for demuxer (mainly DVB) to allow not
      * reading everything (you should not use this to call es_out_Control)
@@ -135,7 +222,6 @@ enum demux_query_e
     DEMUX_GET_FPS,              /* arg1= double *       res=can fail    */
 
     /* Meta data */
-    DEMUX_GET_META,             /* arg1= vlc_meta_t **  res=can fail    */
     DEMUX_HAS_UNSUPPORTED_META, /* arg1= bool *   res can fail    */
 
     /* Attachments */
@@ -145,21 +231,18 @@ enum demux_query_e
      * you should accept it only if the stream can be recorded without
      * any modification or header addition. */
     DEMUX_CAN_RECORD,           /* arg1=bool*   res=can fail(assume false) */
-    DEMUX_SET_RECORD_STATE,     /* arg1=bool    res=can fail */
-
-    DEMUX_GET_SIGNAL, /* arg1=double *pf_quality, arg2=double *pf_strength
-                         res=can fail */
+    /**
+     * \todo Document
+     *
+     * \warning The prototype is different from STREAM_SET_RECORD_STATE
+     *
+     * The control is never used if DEMUX_CAN_RECORD fails or returns false.
+     * Can fail.
+     *
+     * arg1= bool */
+    DEMUX_SET_RECORD_STATE,
 
     /* II. Specific access_demux queries */
-    /* PAUSE you are ensured that it is never called twice with the same state */
-    DEMUX_CAN_PAUSE = 0x1000,   /* arg1= bool*    can fail (assume false)*/
-    DEMUX_SET_PAUSE_STATE,      /* arg1= bool     can fail */
-
-    DEMUX_GET_PTS_DELAY,        /* arg1= int64_t*       cannot fail */
-
-    /* DEMUX_CAN_CONTROL_PACE returns true (*pb_pace) if we can read the
-     * data at our pace */
-    DEMUX_CAN_CONTROL_PACE,     /* arg1= bool*pb_pace    can fail (assume false) */
 
     /* DEMUX_CAN_CONTROL_RATE is called only if DEMUX_CAN_CONTROL_PACE has returned false.
      * *pb_rate should be true when the rate can be changed (using DEMUX_SET_RATE)
@@ -169,11 +252,15 @@ enum demux_query_e
      * It should return the value really used in *pi_rate */
     DEMUX_SET_RATE,             /* arg1= int*pi_rate                                        can fail */
 
-    DEMUX_CAN_SEEK,            /* arg1= bool*    can fail (assume false)*/
-
-    /* DEMUX_IS_PLAYLIST returns true if the demux is a playlist
-     * (an archive, a directory or a network share is also a playlist) */
-    DEMUX_IS_PLAYLIST,  /* arg1= bool*    can fail (assume false)*/
+    /** Checks whether the stream is actually a playlist, rather than a real
+     * stream.
+     *
+     * \warning The prototype is different from STREAM_IS_DIRECTORY.
+     *
+     * Can fail if the stream is not a playlist (same as returning false).
+     *
+     * arg1= bool * */
+    DEMUX_IS_PLAYLIST,
 
     /* Navigation */
     DEMUX_NAV_ACTIVATE,        /* res=can fail */
