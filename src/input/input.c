@@ -33,7 +33,6 @@
 
 #include <limits.h>
 #include <assert.h>
-#include <errno.h>
 #include <math.h>
 #include <sys/stat.h>
 
@@ -42,7 +41,6 @@
 #include "es_out.h"
 #include "es_out_timeshift.h"
 #include "demux.h"
-#include "stream.h"
 #include "item.h"
 #include "resource.h"
 
@@ -2123,167 +2121,93 @@ static int InputSourceInit( input_thread_t *p_input,
                             const char *psz_forced_demux, bool b_in_can_fail )
 {
     const char *psz_access, *psz_demux, *psz_path, *psz_anchor = NULL;
-    char *psz_var_demux = NULL;
     double f_fps;
 
     assert( psz_mrl );
     char *psz_dup = strdup( psz_mrl );
 
     if( psz_dup == NULL )
-        goto error;
+        return VLC_ENOMEM;
 
     /* Split uri */
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, &psz_anchor, psz_dup );
 
+    if( psz_forced_demux != NULL )
+        psz_demux = psz_forced_demux;
+
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
-    if( !p_input->b_preparsing )
-    {
-        /* Find optional titles and seekpoints */
-        MRLSections( psz_anchor, &in->i_title_start, &in->i_title_end,
-                     &in->i_seekpoint_start, &in->i_seekpoint_end );
-        if( psz_forced_demux && *psz_forced_demux )
-        {
-            psz_demux = psz_forced_demux;
-        }
-        else if( *psz_demux == '\0' )
-        {
-            /* special hack for forcing a demuxer with --demux=module
-             * (and do nothing with a list) */
-            psz_var_demux = var_GetNonEmptyString( p_input, "demux" );
-            psz_demux = (psz_var_demux != NULL) ? psz_var_demux : "any";
-            msg_Dbg( p_input, "specified demux `%s'", psz_demux );
-        }
 
-        /* Try access_demux first */
-        in->p_demux = demux_NewAdvanced( p_input, p_input, psz_access, psz_demux,
-                                         psz_path, NULL, p_input->p->p_es_out, false );
-    }
-    else
-    {
-        if( *psz_demux )
-            goto error;
-        msg_Dbg( p_input, "trying to pre-parse %s",  psz_path );
-    }
+    /* Find optional titles and seekpoints */
+    MRLSections( psz_anchor, &in->i_title_start, &in->i_title_end,
+                 &in->i_seekpoint_start, &in->i_seekpoint_end );
 
-    if( in->p_demux )
-    {
-    }
-    else
-    {   /* Now try a real access */
-        if( &p_input->p->input == in )
-        {   /* On master stream only, use input-list */
-            char *str = var_InheritString( p_input, "input-list" );
-            if( str != NULL )
+    if( &p_input->p->input == in )
+    {   /* On master stream only, use input-list */
+        char *str = var_InheritString( p_input, "input-list" );
+        if( str != NULL )
+        {
+            char *list;
+
+            var_Create( p_input, "concat-list", VLC_VAR_STRING );
+            if( likely(asprintf( &list, "%s://%s,%s", psz_access, psz_path,
+                                 str ) >= 0) )
             {
-                char *list;
-
-                var_Create( p_input, "concat-list", VLC_VAR_STRING );
-                if( likely(asprintf( &list, "%s://%s,%s", psz_access, psz_path,
-                                     str ) >= 0) )
-                {
-                     var_SetString( p_input, "concat-list", list );
-                     free( list );
-                }
-                free( str );
-                psz_access = "concat";
+                 var_SetString( p_input, "concat-list", list );
+                 free( list );
             }
+            free( str );
+            psz_access = "concat";
         }
-
-        if( strcasecmp( psz_access, "concat" ) )
-        {   /* Autodetect extra files if none specified */
-            int count;
-            char **tab;
-
-            TAB_INIT( count, tab );
-            InputGetExtraFiles( p_input, &count, &tab, psz_access, psz_path );
-            if( count > 0 )
-            {
-                char *list = NULL;
-
-                for( int i = 0; i < count; i++ )
-                {
-                    char *str;
-                    if( asprintf( &str, "%s,%s", list ? list : psz_mrl,
-                                  tab[i] ) < 0 )
-                        break;
-
-                    free( tab[i] );
-                    free( list );
-                    list = str;
-                }
-
-                var_Create( p_input, "concat-list", VLC_VAR_STRING );
-                if( likely(list != NULL) )
-                {
-                    var_SetString( p_input, "concat-list", list );
-                    free( list );
-                }
-                psz_access = "concat";
-            }
-            TAB_CLEAN( count, tab );
-        }
-
-        /* Create the stream_t */
-        stream_t *p_stream = NULL;
-        char *url;
-
-        if( likely(asprintf( &url, "%s://%s", psz_access, psz_path) >= 0) )
-        {
-            p_stream = stream_AccessNew( VLC_OBJECT(p_input), p_input, url );
-            free( url );
-        }
-        if( p_stream == NULL )
-        {
-            msg_Err( p_input, "open of `%s' failed", psz_mrl );
-            if( !b_in_can_fail && !input_Stopped( p_input ) )
-                dialog_Fatal( p_input, _("Your input can't be opened"),
-                              _("VLC is unable to open the MRL '%s'."
-                                " Check the log for details."), psz_mrl );
-            goto error;
-        }
-
-        /* Add stream filters */
-        p_stream = stream_FilterAutoNew( p_stream );
-
-        char *filters = var_GetNonEmptyString( p_input, "stream-filter" );
-        if( filters != NULL )
-        {
-            p_stream = stream_FilterChainNew( p_stream, filters );
-            free( filters );
-        }
-
-        if( var_GetBool( p_input, "input-record-native" ) )
-            p_stream = stream_FilterChainNew( p_stream, "record" );
-
-        if( p_stream->psz_url != NULL )
-            /* Take access/stream redirections into account: */
-            psz_path = strstr( p_stream->psz_url, "://" );
-        if( psz_path == NULL )
-            psz_path = "";
-
-        in->p_demux = demux_NewAdvanced( p_input, p_input, psz_access, psz_demux,
-                                         psz_path, p_stream, p_input->p->p_es_out,
-                                         p_input->b_preparsing );
-
-        if( in->p_demux == NULL )
-        {
-            msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
-                     psz_access, psz_demux, psz_path );
-            if( !b_in_can_fail && !input_Stopped( p_input ) )
-                dialog_Fatal( VLC_OBJECT( p_input ),
-                              _("VLC can't recognize the input's format"),
-                              _("The format of '%s' cannot be detected. "
-                                "Have a look at the log for details."),
-                              psz_mrl );
-            stream_Delete( p_stream );
-            goto error;
-        }
-        assert( in->p_demux->pf_demux != NULL );
     }
 
-    free( psz_var_demux );
+    if( strcasecmp( psz_access, "concat" ) )
+    {   /* Autodetect extra files if none specified */
+        int count;
+        char **tab;
+
+        TAB_INIT( count, tab );
+        InputGetExtraFiles( p_input, &count, &tab, psz_access, psz_path );
+        if( count > 0 )
+        {
+            char *list = NULL;
+
+            for( int i = 0; i < count; i++ )
+            {
+                char *str;
+                if( asprintf( &str, "%s,%s", list ? list : psz_mrl,
+                              tab[i] ) < 0 )
+                    break;
+
+                free( tab[i] );
+                free( list );
+                list = str;
+            }
+
+            var_Create( p_input, "concat-list", VLC_VAR_STRING );
+            if( likely(list != NULL) )
+            {
+                var_SetString( p_input, "concat-list", list );
+                free( list );
+            }
+            psz_access = "concat";
+        }
+        TAB_CLEAN( count, tab );
+    }
+
+    in->p_demux = input_DemuxNew( VLC_OBJECT(p_input), psz_access, psz_demux,
+                                  psz_path, p_input->p->p_es_out,
+                                  p_input->b_preparsing, p_input );
     free( psz_dup );
+
+    if( in->p_demux == NULL )
+    {
+        if( !b_in_can_fail && !input_Stopped( p_input ) )
+            dialog_Fatal( p_input, _("Your input can't be opened"),
+                          _("VLC is unable to open the MRL '%s'."
+                            " Check the log for details."), psz_mrl );
+        return VLC_EGENERIC;
+    }
 
     /* Get infos from (access_)demux */
     bool b_can_seek;
@@ -2381,15 +2305,6 @@ static int InputSourceInit( input_thread_t *p_input,
         in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );
 
     return VLC_SUCCESS;
-
-error:
-    if( in->p_demux )
-        demux_Delete( in->p_demux );
-
-    free( psz_var_demux );
-    free( psz_dup );
-
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
