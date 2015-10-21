@@ -472,8 +472,6 @@ static ssize_t AStreamReadStream(stream_t *s, void *p_read, size_t i_read)
  ****************************************************************************/
 static int AStreamControl(stream_t *s, int i_query, va_list args)
 {
-    stream_sys_t *sys = s->p_sys;
-
     switch(i_query)
     {
         case STREAM_CAN_SEEK:
