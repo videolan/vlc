@@ -1556,7 +1556,7 @@ void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_ao
             action->setChecked( true );
         actionGroup->addAction( action );
         current->addAction( action );
-        CONNECT(action, changed(), THEMIM->menusAudioMapper, map());
+        CONNECT(action, triggered(), THEMIM->menusAudioMapper, map());
         THEMIM->menusAudioMapper->setMapping(action, ids[i]);
         free( ids[i] );
         free( names[i] );
