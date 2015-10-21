@@ -66,6 +66,13 @@ void MediaSegmentTemplate::setSourceUrl(const std::string &url)
     sourceUrl = Url(Url::Component(url, this));
 }
 
+void MediaSegmentTemplate::debug(vlc_object_t *obj, int indent) const
+{
+    Segment::debug(obj, indent);
+    if(segmentTimeline.Get())
+        segmentTimeline.Get()->debug(obj, indent + 1);
+}
+
 InitSegmentTemplate::InitSegmentTemplate( ICanonicalUrl *parent ) :
     BaseSegmentTemplate(parent)
 {

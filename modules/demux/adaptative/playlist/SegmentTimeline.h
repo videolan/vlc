@@ -51,6 +51,7 @@ namespace adaptative
                 void mergeWith(SegmentTimeline &);
                 mtime_t start() const;
                 mtime_t end() const;
+                void debug(vlc_object_t *, int = 0) const;
 
             private:
                 std::list<Element *> elements;
@@ -59,6 +60,7 @@ namespace adaptative
                 {
                     public:
                         Element(uint64_t, stime_t, uint64_t, stime_t);
+                        void debug(vlc_object_t *, int = 0) const;
                         stime_t  t;
                         stime_t  d;
                         uint64_t r;
