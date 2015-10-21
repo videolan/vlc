@@ -81,7 +81,6 @@ struct vout_thread_sys_t
         char           *title;
         vout_display_t *vd;
         bool           use_dr;
-        picture_t      *filtered;
     } display;
 
     struct {

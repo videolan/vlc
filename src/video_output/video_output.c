@@ -964,8 +964,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (sys->display.use_dr) {
         vout_display_Prepare(vd, todisplay, subpic);
     } else {
-        sys->display.filtered = vout_FilterDisplay(vd, todisplay);
-        if (!sys->display.filtered)
+        todisplay = vout_FilterDisplay(vd, todisplay);
+        if (todisplay == NULL)
         {
             if (subpic != NULL)
                 subpicture_Delete(subpic);
@@ -973,16 +973,14 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         }
 
         if (!do_dr_spu && !do_early_spu && vout->p->spu_blend && subpic)
-            picture_BlendSubpicture(sys->display.filtered, vout->p->spu_blend, subpic);
-        vout_display_Prepare(vd, sys->display.filtered, do_dr_spu ? subpic : NULL);
+            picture_BlendSubpicture(todisplay, vout->p->spu_blend, subpic);
+        vout_display_Prepare(vd, todisplay, do_dr_spu ? subpic : NULL);
 
         if (!do_dr_spu && subpic)
         {
             subpicture_Delete(subpic);
             subpic = NULL;
         }
-
-        todisplay = sys->display.filtered;
     }
 
     vout_chrono_Stop(&vout->p->render);
@@ -1007,7 +1005,6 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     /* Display the direct buffer returned by vout_RenderPicture */
     vout->p->displayed.date = mdate();
     vout_display_Display(vd, todisplay, subpic);
-    sys->display.filtered = NULL;
 
     vout_statistic_AddDisplayed(&vout->p->statistic, 1);
 
