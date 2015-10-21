@@ -709,6 +709,7 @@ static int EnumDevices(vlc_object_t *obj, char const *varname,
 
     char **ids = NULL, **names = NULL;
     unsigned n = 0;
+    bool hinted_default = false;
 
     for (size_t i = 0; hints[i] != NULL; i++)
     {
@@ -729,9 +730,22 @@ static int EnumDevices(vlc_object_t *obj, char const *varname,
         ids[n] = name;
         names[n] = desc;
         n++;
+
+        if (!strcmp(name, "default"))
+            hinted_default = true;
     }
 
     snd_device_name_free_hint(hints);
+
+    if (!hinted_default)
+    {
+        ids = xrealloc (ids, (n + 1) * sizeof (*ids));
+        names = xrealloc (names, (n + 1) * sizeof (*names));
+        ids[n] = xstrdup ("default");
+        names[n] = _("Default");
+        n++;
+    }
+
     *idp = ids;
     *namep = names;
     (void) varname;
