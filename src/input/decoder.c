@@ -265,11 +265,10 @@ static int aout_update_format( decoder_t *p_dec )
 
         /* Parameters changed, restart the aout */
         vlc_mutex_lock( &p_owner->lock );
-
-        aout_DecDelete( p_owner->p_aout );
         p_owner->p_aout = NULL;
-
         vlc_mutex_unlock( &p_owner->lock );
+        aout_DecDelete( p_owner->p_aout );
+
         input_resource_PutAout( p_owner->p_resource, p_aout );
     }
 
@@ -316,7 +315,6 @@ static int aout_update_format( decoder_t *p_dec )
         }
 
         vlc_mutex_lock( &p_owner->lock );
-
         p_owner->p_aout = p_aout;
 
         DecoderUpdateFormatLocked( p_dec );
@@ -1104,6 +1102,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
 
     DecoderWaitDate( p_dec, &b_reject,
                      p_audio->i_pts - AOUT_MAX_PREPARE_TIME );
+    vlc_mutex_unlock( &p_owner->lock );
 
     audio_output_t *p_aout = p_owner->p_aout;
     if( p_aout == NULL )
@@ -1121,7 +1120,6 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
         *pi_lost_sum += 1;
         block_Release( p_audio );
     }
-    vlc_mutex_unlock( &p_owner->lock );
 }
 
 static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
@@ -1484,7 +1482,6 @@ static void *DecoderThread( void *p_data )
         int canc = vlc_savecancel();
         DecoderProcess( p_dec, p_block );
 
-        vlc_mutex_lock( &p_owner->lock );
         if( p_block == NULL )
         {   /* Draining: the decoder is drained and all decoded buffers are
              * queued to the output at this point. Now drain the output. */
@@ -1493,6 +1490,7 @@ static void *DecoderThread( void *p_data )
         }
         vlc_restorecancel( canc );
 
+        vlc_mutex_lock( &p_owner->lock );
         p_owner->b_drained = (p_block == NULL);
         vlc_fifo_Lock( p_owner->p_fifo );
         vlc_cond_signal( &p_owner->wait_acknowledge );
