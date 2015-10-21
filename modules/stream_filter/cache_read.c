@@ -259,7 +259,7 @@ static ssize_t AStreamReadNoSeekStream(stream_t *s, void *buf, size_t len)
 
 #ifdef STREAM_DEBUG
     msg_Dbg(s, "AStreamReadStream: %zd pos=%"PRId64" tk=%d start=%"PRId64
-            " offset=%d end=%"PRId64, len, sys->i_pos, p_sys->i_tk,
+            " offset=%d end=%"PRId64, len, sys->i_pos, sys->i_tk,
             tk->i_start, sys->i_offset, tk->i_end);
 #endif
 
@@ -393,7 +393,10 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
              * TODO it is stupid to seek now, it would be better to delay it
              */
             if (stream_Seek(s->p_source, tk->i_end))
+            {
+                msg_Err(s, "AStreamSeekStream: hard seek failed");
                 return VLC_EGENERIC;
+            }
         }
         else if (i_pos > tk->i_end)
         {
@@ -403,7 +406,10 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
                 const int i_read_max = __MIN(10 * STREAM_READ_ATONCE, i_skip);
                 int i_read = 0;
                 if ((i_read = AStreamReadNoSeekStream(s, NULL, i_read_max)) <= 0)
+                {
+                    msg_Err(s, "AStreamSeekStream: skip failed");
                     return VLC_EGENERIC;
+                }
                 i_skip -= i_read_max;
             }
         }
@@ -415,7 +421,10 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
 #endif
         /* Nothing good, seek and choose oldest segment */
         if (stream_Seek(s->p_source, i_pos))
+        {
+            msg_Err(s, "AStreamSeekStream: hard seek failed");
             return VLC_EGENERIC;
+        }
 
         tk->i_start = i_pos;
         tk->i_end   = i_pos;
