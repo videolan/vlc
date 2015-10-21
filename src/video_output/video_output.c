@@ -965,21 +965,21 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         vout_display_Prepare(vd, todisplay, subpic);
     } else {
         sys->display.filtered = vout_FilterDisplay(vd, todisplay);
-        if (sys->display.filtered) {
-            if (!do_dr_spu && !do_early_spu && vout->p->spu_blend && subpic)
-                picture_BlendSubpicture(sys->display.filtered, vout->p->spu_blend, subpic);
-            vout_display_Prepare(vd, sys->display.filtered, do_dr_spu ? subpic : NULL);
-        }
-        if (!do_dr_spu && subpic)
-        {
-            subpicture_Delete(subpic);
-            subpic = NULL;
-        }
         if (!sys->display.filtered)
         {
             if (subpic != NULL)
                 subpicture_Delete(subpic);
             return VLC_EGENERIC;
+        }
+
+        if (!do_dr_spu && !do_early_spu && vout->p->spu_blend && subpic)
+            picture_BlendSubpicture(sys->display.filtered, vout->p->spu_blend, subpic);
+        vout_display_Prepare(vd, sys->display.filtered, do_dr_spu ? subpic : NULL);
+
+        if (!do_dr_spu && subpic)
+        {
+            subpicture_Delete(subpic);
+            subpic = NULL;
         }
 
         todisplay = sys->display.filtered;
