@@ -399,11 +399,12 @@ static int AStreamSeekStream(stream_t *s, uint64_t i_pos)
             {
                 const int i_read_max = __MIN(10 * STREAM_READ_ATONCE, i_skip);
                 int i_read = 0;
-                if ((i_read = AStreamReadNoSeekStream(s, NULL, i_read_max)) <= 0)
+                if ((i_read = AStreamReadNoSeekStream(s, NULL, i_read_max)) < 0)
                 {
                     msg_Err(s, "AStreamSeekStream: skip failed");
                     return VLC_EGENERIC;
-                }
+                } else if (i_read == 0)
+                    return VLC_SUCCESS; /* EOF */
                 i_skip -= i_read_max;
             }
         }
