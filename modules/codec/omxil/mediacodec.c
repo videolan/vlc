@@ -1193,7 +1193,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block,
                      * indefinitely and abort after 2seconds (100 * 2 * 10ms)
                      * without any data.  Indeed, MediaCodec can fail without
                      * throwing any exception or error returns... */
-                    msg_Err(p_dec, "No output/input for %lld ms, abort",
+                    msg_Err(p_dec, "No output/input for %lld us, abort",
                                     i_attempts * timeout);
                     b_error = true;
                     break;
