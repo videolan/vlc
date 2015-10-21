@@ -4818,6 +4818,7 @@ error:
         msg_Err( p_demux, "mdat had still %"PRIu32" bytes unparsed as samples",
                  p_sys->context.i_mdatbytesleft );
         stream_ReadU32( p_demux->s, NULL, p_sys->context.i_mdatbytesleft );
+        p_sys->context.i_mdatbytesleft = 0;
     }
     p_sys->context.i_current_box_type = 0;
 
@@ -5052,6 +5053,7 @@ end:
     {
         msg_Warn( p_demux, "mdat had still %"PRIu32" bytes unparsed as samples", p_sys->context.i_mdatbytesleft - 8 );
         stream_ReadU32( p_demux->s, NULL, p_sys->context.i_mdatbytesleft );
+        p_sys->context.i_mdatbytesleft = 0;
     }
 
     p_sys->context.i_current_box_type = 0;
