@@ -1,0 +1,36 @@
+From e572a26d29ddff883880ef7b1c295acaa62a8a2f Mon Sep 17 00:00:00 2001
+From: wm4 <wm4@nowhere>
+Date: Tue, 13 Oct 2015 22:18:30 +0200
+Subject: [PATCH] configure: include -liconv if that is found
+
+---
+ configure.ac | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d6fbe34..6bd96b6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -22,8 +22,9 @@ AC_CHECK_HEADERS([stdint.h iconv.h])
+ AC_CHECK_FUNCS([strdup strndup])
+ 
+ # Checks for libraries.
+-AC_SEARCH_LIBS([libiconv_open], [iconv], AC_DEFINE(CONFIG_ICONV, 1, [use iconv]))
+-AC_SEARCH_LIBS([iconv_open], [iconv], AC_DEFINE(CONFIG_ICONV, 1, [use iconv]))
++use_libiconv=false
++AC_SEARCH_LIBS([libiconv_open], [iconv], use_libiconv=true)
++AC_SEARCH_LIBS([iconv_open], [iconv], use_libiconv=true)
+ AC_CHECK_LIB([m], [fabs])
+ 
+ # Check for libraries via pkg-config
+@@ -220,6 +221,10 @@ AM_CONDITIONAL([ENABLE_PROFILE], [test x$enable_profile = xyes])
+ 
+ # add libraries/packages to pkg-config for static linking
+ pkg_libs="-lm"
++if test "$use_libiconv" = true; then
++    AC_DEFINE(CONFIG_ICONV, 1, [use iconv])
++    pkg_libs="${pkg_libs} -liconv"
++fi
+ pkg_requires="freetype2 >= 9.10.3"
+ pkg_requires="fribidi >= 0.19.0, ${pkg_requires}"
+ if test x$fontconfig = xtrue; then
