@@ -377,7 +377,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_intf_artCheckbox setTitle: _NS("Allow metadata network access")];
     [_intf_updateCheckbox setTitle: _NS("Automatically check for updates")];
     [_intf_last_updateLabel setStringValue: @""];
-    [_intf_enableGrowlCheckbox setTitle: _NS("Enable Growl notifications (on playlist item change)")];
+    [_intf_enableNotificationsCheckbox setTitle: _NS("Enable notifications on playlist item change")];
     [_intf_autoresizeCheckbox setTitle: _NS("Resize interface to the native video size")];
     [_intf_pauseminimizedCheckbox setTitle: _NS("Pause the video playback when minimized")];
     [_intf_luahttpBox setTitle:_NS("Lua HTTP")];
@@ -590,10 +590,10 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
     psz_tmp = config_GetPsz(p_intf, "control");
     if (psz_tmp) {
-        [_intf_enableGrowlCheckbox setState: (NSInteger)strstr(psz_tmp, "growl")];
+        [_intf_enableNotificationsCheckbox setState: (NSInteger)strstr(psz_tmp, "growl")];
         free(psz_tmp);
     } else
-        [_intf_enableGrowlCheckbox setState: NSOffState];
+        [_intf_enableNotificationsCheckbox setState: NSOffState];
     if (config_GetInt(p_intf, "macosx-interfacestyle")) {
         [_intf_style_darkButtonCell setState: YES];
         [_intf_style_brightButtonCell setState: NO];
@@ -929,7 +929,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutInt(p_intf, "macosx-nativefullscreenmode", [_intf_nativefullscreenCheckbox state]);
         config_PutInt(p_intf, "macosx-pause-minimized", [_intf_pauseminimizedCheckbox state]);
         config_PutInt(p_intf, "macosx-video-autoresize", [_intf_autoresizeCheckbox state]);
-        if ([_intf_enableGrowlCheckbox state] == NSOnState) {
+        if ([_intf_enableNotificationsCheckbox state] == NSOnState) {
             tmpString = getString("control");
             tmpRange = [tmpString rangeOfString:@"growl"];
             if ([tmpString length] > 0 && tmpRange.location == NSNotFound)

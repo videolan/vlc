@@ -72,7 +72,7 @@
                 <outlet property="intf_continueplaybackLabel" destination="3919" id="ZJO-qY-UCq"/>
                 <outlet property="intf_continueplaybackPopup" destination="3920" id="dZ3-SI-SCp"/>
                 <outlet property="intf_embeddedCheckbox" destination="2445" id="eGx-n3-YeT"/>
-                <outlet property="intf_enableGrowlCheckbox" destination="3564" id="ntp-Ut-7XL"/>
+                <outlet property="intf_enableNotificationsCheckbox" destination="3564" id="IIA-ce-g61"/>
                 <outlet property="intf_fspanelCheckbox" destination="2327" id="cnD-cL-uNI"/>
                 <outlet property="intf_languageLabel" destination="3892" id="klM-r2-XKf"/>
                 <outlet property="intf_languagePopup" destination="3900" id="USp-A1-Aut"/>
@@ -262,7 +262,7 @@ Gw
                     <rect key="frame" x="18" y="281" width="534" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <animations/>
-                    <buttonCell key="cell" type="check" title="Enable Growl notifications (on playlist item change)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3565">
+                    <buttonCell key="cell" type="check" title="Enable notifications on playlist item change" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3565">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -1774,7 +1774,7 @@ Gw
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveName="sprefs_hotkeys_view" headerView="3541" id="2670">
-                                <rect key="frame" x="0.0" y="0.0" width="528" height="286"/>
+                                <rect key="frame" x="0.0" y="0.0" width="528" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <animations/>
                                 <size key="intercellSpacing" width="3" height="2"/>

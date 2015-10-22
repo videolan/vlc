@@ -18,7 +18,7 @@ OPTIONS="
         --prefix=`pwd`/vlc_install_dir
         --enable-macosx
         --enable-merge-ffmpeg
-        --enable-growl
+        --enable-osx-notifications
         --enable-faad
         --enable-flac
         --enable-theora

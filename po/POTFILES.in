@@ -1005,7 +1005,7 @@ modules/mux/mpeg/ts.c
 modules/mux/mpjpeg.c
 modules/mux/ogg.c
 modules/mux/wav.c
-modules/notify/growl.m
+modules/notify/osx_notifications.m
 modules/notify/notify.c
 modules/packetizer/avparser.h
 modules/packetizer/copy.c

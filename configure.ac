@@ -4060,17 +4060,17 @@ then
 fi
 
 dnl
-dnl Growl notification plugin
+dnl OS X notification plugin
 dnl
-AC_ARG_ENABLE(growl,
-  [  --enable-growl          growl notification plugin (default disabled)],,
-  [enable_growl=no])
-AS_IF([test "${enable_growl}" != "no"], [
+AC_ARG_ENABLE(osx_notifications,
+  [  --enable-osx-notifications          osx notification plugin (default disabled)],,
+  [enable_osx_notifications=no])
+AS_IF([test "${enable_osx_notifications}" != "no"], [
     AC_CHECK_HEADERS(${CONTRIB_DIR}/Growl.framework/Versions/A/Headers/Growl.h, [
-      VLC_ADD_PLUGIN([growl])
-      VLC_ADD_LIBS([growl], [-F${CONTRIB_DIR} -Wl,-framework,Growl,-framework,Foundation])
-      VLC_ADD_OBJCFLAGS([growl], [-F${CONTRIB_DIR}])
-      VLC_ADD_OBJCFLAGS([growl], [-fobjc-exceptions] )
+      VLC_ADD_PLUGIN([osx_notifications])
+      VLC_ADD_LIBS([osx_notifications], [-F${CONTRIB_DIR} -Wl,-framework,Growl,-framework,Foundation])
+      VLC_ADD_OBJCFLAGS([osx_notifications], [-F${CONTRIB_DIR}])
+      VLC_ADD_OBJCFLAGS([osx_notifications], [-fobjc-exceptions] )
     ])
   ]
 )

@@ -99,7 +99,7 @@
 @property (readwrite, weak) IBOutlet NSView *intfView;
 @property (readwrite, weak) IBOutlet NSButton *intf_updateCheckbox;
 @property (readwrite, weak) IBOutlet NSTextField *intf_last_updateLabel;
-@property (readwrite, weak) IBOutlet NSButton *intf_enableGrowlCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *intf_enableNotificationsCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_nativefullscreenCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_autoresizeCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_pauseminimizedCheckbox;
