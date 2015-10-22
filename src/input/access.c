@@ -65,10 +65,13 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
         return NULL;
 
     access_t *access = vlc_custom_create(parent, sizeof (*access), "access");
+    if (unlikely(access == NULL))
+        return NULL;
+
     char *scheme = strndup(mrl, p - mrl);
     char *url = strdup(mrl);
 
-    if (unlikely(access == NULL || scheme == NULL || url == NULL))
+    if (unlikely(scheme == NULL || url == NULL))
     {
         free(url);
         free(scheme);
