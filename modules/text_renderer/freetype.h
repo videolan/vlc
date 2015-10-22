@@ -29,14 +29,14 @@
 #define VLC_FREETYPE_H
 
 #include <vlc_text_style.h>                                   /* text_style_t*/
+#include <vlc_arrays.h>
 
-typedef struct faces_cache_t
-{
-    FT_Face        *p_faces;
-    text_style_t   *p_styles;
-    int            i_faces_count;
-    int            i_cache_size;
-} faces_cache_t;
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+#include FT_STROKER_H
+
+#include "platform_fonts.h"
 
 /*****************************************************************************
  * filter_sys_t: freetype local data
@@ -61,13 +61,48 @@ struct filter_sys_t
     input_attachment_t **pp_font_attachments;
     int                  i_font_attachments;
 
-    /* Font faces cache */
-    faces_cache_t  faces_cache;
+    /*
+     * This is the master family list. It owns the lists of vlc_font_t's
+     * and should be freed using FreeFamiliesAndFonts()
+     */
+    vlc_family_t      *p_families;
+
+    /*
+     * This maps a family name to a vlc_family_t within the master list
+     */
+    vlc_dictionary_t  family_map;
+
+    /*
+     * This maps a family name to a fallback list of vlc_family_t's.
+     * Fallback lists only reference the lists of vlc_font_t's within the
+     * master list, so they should be freed using FreeFamilies()
+     */
+    vlc_dictionary_t  fallback_map;
+
+    /* Font face cache */
+    vlc_dictionary_t  face_map;
+
+    int               i_fallback_counter;
+    int               i_scale;
 
     char * (*pf_select) (filter_t *, const char* family,
-                               bool bold, bool italic, int size,
-                               int *index);
+                         bool bold, bool italic,
+                         int *index, uni_char_t codepoint);
 
+    /*
+     * Get a pointer to the vlc_family_t in the master list that matches psz_family.
+     * Add this family to the list if it hasn't been added yet.
+     */
+    const vlc_family_t * (*pf_get_family) ( filter_t *p_filter, const char *psz_family );
+
+    /*
+     * Get the fallback list for psz_family from the system and cache
+     * it in fallback_map.
+     * On Windows fallback lists are populated progressively as required
+     * using Uniscribe, so we need the codepoint here.
+     */
+    vlc_family_t * (*pf_get_fallbacks) ( filter_t *p_filter, const char *psz_family,
+                                         uni_char_t codepoint );
 };
 
 #define FT_FLOOR(X)     ((X & -64) >> 6)
@@ -76,23 +111,12 @@ struct filter_sys_t
  #define FT_MulFix(v, s) (((v)*(s))>>16)
 #endif
 
-#ifdef __OS2__
-typedef uint16_t uni_char_t;
-# define FREETYPE_TO_UCS    "UCS-2LE"
-#else
-typedef uint32_t uni_char_t;
-# if defined(WORDS_BIGENDIAN)
-#  define FREETYPE_TO_UCS   "UCS-4BE"
-# else
-#  define FREETYPE_TO_UCS   "UCS-4LE"
-# endif
-#endif
+FT_Face LoadFace( filter_t *p_filter, const char *psz_fontfile, int i_idx,
+                  const text_style_t *p_style );
 
+FT_Face SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style,
+                           uni_char_t codepoint );
 
-FT_Face LoadFace( filter_t *p_filter, const text_style_t *p_style, int );
 int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
-
-bool FaceStyleEquals( const text_style_t *p_style1,
-                      const text_style_t *p_style2 );
 
 #endif

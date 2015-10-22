@@ -9,6 +9,7 @@
  *          Bernie Purcell <bitmap@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
  *          Felix Paul Kühne <fkuehne@videolan.org>
+ *          Salah-Eddin Shaban <salshaaban@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -29,8 +30,26 @@
  * Preamble
  *****************************************************************************/
 
+#ifndef PLATFORM_FONTS_H
+#define PLATFORM_FONTS_H
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
+#endif
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#ifdef __OS2__
+typedef uint16_t uni_char_t;
+# define FREETYPE_TO_UCS    "UCS-2LE"
+#else
+typedef uint32_t uni_char_t;
+# if defined(WORDS_BIGENDIAN)
+#  define FREETYPE_TO_UCS   "UCS-4BE"
+# else
+#  define FREETYPE_TO_UCS   "UCS-4LE"
+# endif
 #endif
 
 /* Default fonts */
@@ -77,28 +96,100 @@
 #define DEFAULT_MONOSPACE_FAMILY SYSTEM_DEFAULT_MONOSPACE_FAMILY
 #endif
 
+typedef struct vlc_font_t vlc_font_t;
+struct vlc_font_t
+{
+    vlc_font_t *p_next;
+    char       *psz_fontfile;
+    int         i_index;
+    bool        b_bold;
+    bool        b_italic;
+    FT_Face     p_face;
+};
+
+typedef struct vlc_family_t vlc_family_t;
+struct vlc_family_t
+{
+    vlc_family_t *p_next;
+    char         *psz_name;
+    vlc_font_t   *p_fonts;
+};
+
+#define FB_LIST_ATTACHMENTS "attachments"
+#define FB_LIST_DEFAULT     "default"
+#define FB_NAME             "fallback"
 
 #ifdef HAVE_FONTCONFIG
 char* FontConfig_Select( filter_t *p_filter, const char* family,
-                          bool b_bold, bool b_italic, int i_size, int *i_idx );
+                         bool b_bold, bool b_italic,
+                         int *i_idx, uni_char_t codepoint );
 void FontConfig_BuildCache( filter_t *p_filter );
 #endif
 
 
 #if defined( _WIN32 ) && !VLC_WINSTORE_APP
 char* Win32_Select( filter_t *p_filter, const char* family,
-                           bool b_bold, bool b_italic, int i_size, int *i_idx );
+                    bool b_bold, bool b_italic,
+                    int *i_idx, uni_char_t codepoint );
 
 #endif /* _WIN32 */
 
 #ifdef __APPLE__
 #if !TARGET_OS_IPHONE
 char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
-                          bool b_bold, bool b_italic, int i_size, int *i_idx );
+                        bool b_bold, bool b_italic,
+                        int *i_idx, uni_char_t codepoint );
 #endif
 #endif
 
 char* Dummy_Select( filter_t *p_filter, const char* family,
-                    bool b_bold, bool b_italic, int i_size, int *i_idx );
+                    bool b_bold, bool b_italic,
+                    int *i_idx, uni_char_t codepoint );
 
-#define File_Select(a) Dummy_Select(NULL, a, 0, 0, 0, NULL)
+#define File_Select(a) Dummy_Select(NULL, a, 0, 0, NULL, 0)
+
+char* Generic_Select( filter_t *p_filter, const char* family,
+                      bool b_bold, bool b_italic,
+                      int *i_idx, uni_char_t codepoint );
+
+static inline void AppendFont( vlc_font_t **pp_list, vlc_font_t *p_font )
+{
+    while( *pp_list )
+        pp_list = &( *pp_list )->p_next;
+
+    *pp_list = p_font;
+}
+
+static inline void AppendFamily( vlc_family_t **pp_list, vlc_family_t *p_family )
+{
+    while( *pp_list )
+        pp_list = &( *pp_list )->p_next;
+
+    *pp_list = p_family;
+}
+
+vlc_family_t *NewFamily( filter_t *p_filter, const char *psz_family,
+                         vlc_family_t **pp_list, vlc_dictionary_t *p_dict,
+                         const char *psz_key );
+
+/* This function takes ownership of psz_fontfile */
+vlc_font_t *NewFont( char *psz_fontfile, int i_index,
+                     bool b_bold, bool b_italic,
+                     vlc_family_t *p_parent );
+
+void FreeFamiliesAndFonts( vlc_family_t *p_family );
+void FreeFamilies( void *p_families, void *p_obj );
+
+
+vlc_family_t *InitDefaultList( filter_t *p_filter, const char *const *ppsz_default,
+                               int i_size );
+
+void DumpFamily( filter_t *p_filter, const vlc_family_t *p_family,
+                 bool b_dump_fonts, int i_max_families );
+
+void DumpDictionary( filter_t *p_filter, const vlc_dictionary_t *p_dict,
+                     bool b_dump_fonts, int i_max_families );
+
+char* ToLower( const char *psz_src );
+
+#endif //PLATFORM_FONTS_H

@@ -34,7 +34,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_charset.h>
 #include <vlc_filter.h>
 #include <vlc_text_style.h>
 
@@ -105,6 +104,7 @@ typedef struct paragraph_t
     uni_char_t *p_code_points;            //Unicode code points
     int *pi_glyph_indices;                //Glyph index values within the run's font face
     text_style_t **pp_styles;
+    FT_Face *pp_faces;
     int *pi_run_ids;                      //The run to which each glyph belongs
     glyph_bitmaps_t *p_glyph_bitmaps;
     uint8_t *pi_karaoke_bar;
@@ -225,6 +225,8 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
             malloc( i_size * sizeof( *p_paragraph->pi_glyph_indices ) );
     p_paragraph->pp_styles =
             malloc( i_size * sizeof( *p_paragraph->pp_styles ) );
+    p_paragraph->pp_faces =
+            calloc( i_size, sizeof( *p_paragraph->pp_faces ) );
     p_paragraph->pi_run_ids =
             calloc( i_size, sizeof( *p_paragraph->pi_run_ids ) );
     p_paragraph->p_glyph_bitmaps =
@@ -237,9 +239,9 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
     p_paragraph->i_runs_count = 0;
 
     if( !p_paragraph->p_code_points || !p_paragraph->pi_glyph_indices
-     || !p_paragraph->pp_styles || !p_paragraph->pi_run_ids
-     || !p_paragraph->p_glyph_bitmaps || !p_paragraph->pi_karaoke_bar
-     || !p_paragraph->p_runs )
+     || !p_paragraph->pp_styles || !p_paragraph->pp_faces
+     || !p_paragraph->pi_run_ids|| !p_paragraph->p_glyph_bitmaps
+     || !p_paragraph->pi_karaoke_bar || !p_paragraph->p_runs )
         goto error;
 
     if( p_code_points )
@@ -288,6 +290,7 @@ error:
     if( p_paragraph->p_code_points ) free( p_paragraph->p_code_points );
     if( p_paragraph->pi_glyph_indices ) free( p_paragraph->pi_glyph_indices );
     if( p_paragraph->pp_styles ) free( p_paragraph->pp_styles );
+    if( p_paragraph->pp_faces ) free( p_paragraph->pp_faces );
     if( p_paragraph->pi_run_ids ) free( p_paragraph->pi_run_ids );
     if( p_paragraph->p_glyph_bitmaps ) free( p_paragraph->p_glyph_bitmaps );
     if (p_paragraph->pi_karaoke_bar ) free( p_paragraph->pi_karaoke_bar );
@@ -312,6 +315,7 @@ static void FreeParagraph( paragraph_t *p_paragraph )
     free( p_paragraph->p_glyph_bitmaps );
     free( p_paragraph->pi_karaoke_bar );
     free( p_paragraph->pi_run_ids );
+    free( p_paragraph->pp_faces );
     free( p_paragraph->pp_styles );
     free( p_paragraph->p_code_points );
 
@@ -385,7 +389,8 @@ static int AddRun( filter_t *p_filter,
                    paragraph_t *p_paragraph,
                    int i_start_offset,
                    int i_end_offset,
-                   FT_Face p_face )
+                   FT_Face p_face,
+                   const text_style_t *p_style )
 {
     if( i_start_offset >= i_end_offset
      || i_start_offset < 0 || i_start_offset >= p_paragraph->i_size
@@ -417,8 +422,12 @@ static int AddRun( filter_t *p_filter,
     run_desc_t *p_run = p_paragraph->p_runs + p_paragraph->i_runs_count++;
     p_run->i_start_offset = i_start_offset;
     p_run->i_end_offset = i_end_offset;
-    p_run->p_style = p_paragraph->pp_styles[ i_start_offset ];
     p_run->p_face = p_face;
+
+    if( p_style )
+        p_run->p_style = p_style;
+    else
+        p_run->p_style = p_paragraph->pp_styles[ i_start_offset ];
 
 #ifdef HAVE_HARFBUZZ
     p_run->script = p_paragraph->p_scripts[ i_start_offset ];
@@ -430,6 +439,109 @@ static int AddRun( filter_t *p_filter,
         p_paragraph->pi_run_ids[ i ] = i_run_id;
 
     return VLC_SUCCESS;
+}
+
+/*
+ * Add a run with font fallback, possibly breaking the run further
+ * into runs of glyphs that end up having the same font face.
+ */
+#ifdef HAVE_FONT_FALLBACK
+static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
+                               int i_start_offset, int i_end_offset )
+{
+    if( i_start_offset >= i_end_offset
+     || i_start_offset < 0 || i_start_offset >= p_paragraph->i_size
+     || i_end_offset <= 0  || i_end_offset > p_paragraph->i_size )
+    {
+        msg_Err( p_filter,
+                 "AddRunWithFallback() invalid parameters. Paragraph size: %d, "
+                 "Start offset: %d, End offset: %d",
+                 p_paragraph->i_size, i_start_offset, i_end_offset );
+        return VLC_EGENERIC;
+    }
+
+    const text_style_t *p_style = p_paragraph->pp_styles[ i_start_offset ];
+
+    /* Maximum number of faces to try for each run */
+    #define MAX_FACES 5
+    FT_Face pp_faces[ MAX_FACES ] = {0};
+
+    pp_faces[ 0 ] = SelectAndLoadFace( p_filter, p_style, 0 );
+
+    for( int i = i_start_offset; i < i_end_offset; ++i )
+    {
+        int i_index = 0;
+        int i_glyph_index = 0;
+        FT_Face p_face = NULL;
+        do {
+            p_face = pp_faces[ i_index ];
+            if( !p_face )
+                p_face = pp_faces[ i_index ] =
+                     SelectAndLoadFace( p_filter, p_style,
+                                        p_paragraph->p_code_points[ i ] );
+            if( !p_face )
+                continue;
+            i_glyph_index = FT_Get_Char_Index( p_face,
+                                               p_paragraph->p_code_points[ i ] );
+            if( i_glyph_index )
+            {
+                p_paragraph->pp_faces[ i ] = p_face;
+
+                /*
+                 * Move p_face to the beginning of the array. Otherwise strikethrough
+                 * lines can appear segmented, being rendered at a certain height
+                 * through spaces and at a different height through words
+                 */
+                if( i_index > 0 )
+                {
+                    pp_faces[ i_index ] = pp_faces[ 0 ];
+                    pp_faces[ 0 ] = p_face;
+                }
+            }
+
+        } while( i_glyph_index == 0 && ++i_index < MAX_FACES );
+    }
+
+    int i_run_start = i_start_offset;
+    for( int i = i_start_offset; i <= i_end_offset; ++i )
+    {
+        if( i == i_end_offset
+         || p_paragraph->pp_faces[ i_run_start ] != p_paragraph->pp_faces[ i ] )
+        {
+            if( AddRun( p_filter, p_paragraph, i_run_start, i,
+                        p_paragraph->pp_faces[ i_run_start ], NULL ) )
+                return VLC_EGENERIC;
+
+            i_run_start = i;
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+#endif
+
+static bool FaceStyleEquals( filter_t *p_filter, const text_style_t *p_style1,
+                             const text_style_t *p_style2 )
+{
+    if( !p_style1 || !p_style2 )
+        return false;
+    if( p_style1 == p_style2 )
+        return true;
+
+    const int i_style_mask = STYLE_BOLD | STYLE_ITALIC | STYLE_HALFWIDTH;
+
+    const char *psz_fontname1 = p_style1->i_style_flags & STYLE_MONOSPACED
+                              ? p_style1->psz_monofontname : p_style1->psz_fontname;
+
+    const char *psz_fontname2 = p_style2->i_style_flags & STYLE_MONOSPACED
+                              ? p_style2->psz_monofontname : p_style2->psz_fontname;
+
+    const int i_size1 = ConvertToLiveSize( p_filter, p_style1 );
+    const int i_size2 = ConvertToLiveSize( p_filter, p_style2 );
+
+    return (p_style1->i_style_flags & i_style_mask) == (p_style2->i_style_flags & i_style_mask)
+         && i_size1 == i_size2
+         && !strcasecmp( psz_fontname1, psz_fontname2 );
 }
 
 /*
@@ -460,16 +572,14 @@ static int ItemizeParagraph( filter_t *p_filter, paragraph_t *p_paragraph )
             || last_script != p_paragraph->p_scripts[ i ]
             || last_level != p_paragraph->p_levels[ i ]
 #endif
-            || ( p_paragraph->pp_styles[ i ] != NULL && (
-                p_last_style->i_font_size != p_paragraph->pp_styles[ i ]->i_font_size
-                || ( ( p_last_style->i_style_flags
-                     ^ p_paragraph->pp_styles[ i ]->i_style_flags )
-                     & STYLE_HALFWIDTH )
-                ||!FaceStyleEquals( p_last_style, p_paragraph->pp_styles[ i ] ) )
-            )
-        )
+            || !FaceStyleEquals( p_filter, p_last_style, p_paragraph->pp_styles[ i ] ) )
         {
-            int i_ret = AddRun( p_filter, p_paragraph, i_last_run_start, i, 0 );
+            int i_ret;
+#ifdef HAVE_FONT_FALLBACK
+            i_ret = AddRunWithFallback( p_filter, p_paragraph, i_last_run_start, i );
+#else
+            i_ret = AddRun( p_filter, p_paragraph, i_last_run_start, i, NULL, NULL );
+#endif
             if( i_ret )
                 return i_ret;
 
@@ -516,17 +626,20 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
     {
         run_desc_t *p_run = p_paragraph->p_runs + i;
         const text_style_t *p_style = p_run->p_style;
-        const int i_live_size = ConvertToLiveSize( p_filter, p_style );
 
         /*
-         * When using HarfBuzz, this is where font faces are loaded.
-         * In the other two paths (shaping with FriBidi or no
-         * shaping at all), faces are loaded in LoadGlyphs()
+         * With HarfBuzz and no font fallback, this is where font faces
+         * are loaded. In the other two paths (shaping with FriBidi or no
+         * shaping at all), faces are loaded in LoadGlyphs().
+         *
+         * If we have font fallback, font faces in all paths will be
+         * loaded in AddRunWithFallback(), except for runs of codepoints
+         * for which no font could be found.
          */
         FT_Face p_face = 0;
         if( !p_run->p_face )
         {
-            p_face = LoadFace( p_filter, p_style, i_live_size );
+            p_face = SelectAndLoadFace( p_filter, p_style, 0 );
             if( !p_face )
             {
                 p_face = p_sys->p_face;
@@ -637,7 +750,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
             ++i_index;
         }
         if( AddRun( p_filter, p_new_paragraph, i_index - p_run->i_glyph_count,
-                    i_index, p_run->p_face ) )
+                    i_index, p_run->p_face, p_run->p_style ) )
             goto error;
     }
 
@@ -785,7 +898,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
         FT_Face p_face = 0;
         if( !p_run->p_face )
         {
-            p_face = LoadFace( p_filter, p_style, i_live_size );
+            p_face = SelectAndLoadFace( p_filter, p_style, 0 );
             if( !p_face )
             {
                 /* Uses the default font and style */
