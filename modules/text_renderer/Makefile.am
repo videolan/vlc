@@ -62,7 +62,7 @@ libwin32text_plugin_la_LIBADD = -lgdi32
 if HAVE_WIN32
 libfreetype_plugin_la_LIBADD += -liconv -lz
 if !HAVE_WINSTORE
-libfreetype_plugin_la_LIBADD += -lgdi32
+libfreetype_plugin_la_LIBADD += -lgdi32 -lusp10
 text_LTLIBRARIES += libwin32text_plugin.la
 endif
 endif

@@ -127,10 +127,10 @@ void FontConfig_BuildCache( filter_t *p_filter );
 #endif
 
 #if defined( _WIN32 ) && !VLC_WINSTORE_APP
-char* Win32_Select( filter_t *p_filter, const char* family,
-                    bool b_bold, bool b_italic,
-                    int *i_idx, uni_char_t codepoint );
+vlc_family_t *Win32_GetFallbacks( filter_t *p_filter, const char *psz_family,
+                                  uni_char_t codepoint );
 
+const vlc_family_t *Win32_GetFamily( filter_t *p_filter, const char *psz_family );
 #endif /* _WIN32 */
 
 #ifdef __APPLE__

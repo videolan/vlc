@@ -1273,7 +1273,13 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_select = MacLegacy_Select;
 #endif
 #elif defined( _WIN32 ) && defined( HAVE_GET_FONT_BY_FAMILY_NAME )
-    p_sys->pf_select = Win32_Select;
+    const char *const ppsz_win32_default[] =
+        { "Tahoma", "FangSong", "SimHei", "KaiTi" };
+    p_sys->pf_get_family = Win32_GetFamily;
+    p_sys->pf_get_fallbacks = Win32_GetFallbacks;
+    p_sys->pf_select = Generic_Select;
+    InitDefaultList( p_filter, ppsz_win32_default,
+                     sizeof( ppsz_win32_default ) / sizeof( *ppsz_win32_default ) );
 #elif defined( __ANDROID__ )
     p_sys->pf_get_family = Android_GetFamily;
     p_sys->pf_get_fallbacks = Android_GetFallbacks;

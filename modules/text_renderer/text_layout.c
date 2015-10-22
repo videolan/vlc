@@ -58,6 +58,14 @@
 #include "text_layout.h"
 #include "freetype.h"
 
+/* Win32 */
+#ifdef _WIN32
+# undef HAVE_FONTCONFIG
+# if !VLC_WINSTORE_APP
+#  define HAVE_FONT_FALLBACK
+# endif
+#endif
+
 /* FontConfig */
 #ifdef HAVE_FONTCONFIG
 # define HAVE_FONT_FALLBACK
