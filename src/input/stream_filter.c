@@ -48,7 +48,7 @@ stream_t *stream_FilterNew( stream_t *p_source,
 
     s->p_input = p_source->p_input;
 
-    if( s->psz_url != NULL )
+    if( p_source->psz_url != NULL )
     {
         s->psz_url = strdup( p_source->psz_url );
         if( unlikely(s->psz_url == NULL) )
