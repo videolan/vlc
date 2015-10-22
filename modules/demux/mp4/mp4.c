@@ -4005,7 +4005,8 @@ int DemuxFrg( demux_t *p_demux )
             continue;
 
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
-        msg_Dbg( p_demux, "track %u %s!", tk->i_track_ID, b ? "enabled" : "disabled" );
+        if( tk->b_selected != b )
+            msg_Dbg( p_demux, "track %u %s!", tk->i_track_ID, b ? "enabled" : "disabled" );
 
         if( tk->b_selected && !b )
         {
@@ -5090,7 +5091,9 @@ static int DemuxAsLeaf( demux_t *p_demux )
             continue;
 
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
-        msg_Dbg( p_demux, "track %u %s!", tk->i_track_ID, b ? "enabled" : "disabled" );
+
+        if(tk->b_selected != b)
+            msg_Dbg( p_demux, "track %u %s!", tk->i_track_ID, b ? "enabled" : "disabled" );
 
         if( tk->b_selected && !b )
             MP4_TrackUnselect( p_demux, tk );
