@@ -1235,7 +1235,7 @@ typedef struct
 {
     uint8_t i_profile_level;
 
-    int i_vc1;
+    uint32_t i_vc1;
     uint8_t *p_vc1;
 
 } MP4_Box_data_dvc1_t;
