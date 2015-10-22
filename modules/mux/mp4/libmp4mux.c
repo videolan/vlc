@@ -724,6 +724,15 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
     return hvcC;
 }
 
+static bo_t *GetxxxxTag(es_format_t *p_fmt, const char *tag)
+{
+    bo_t *box = box_new(tag);
+    if(!box)
+        return NULL;
+    bo_add_mem(box, p_fmt->i_extra, p_fmt->p_extra);
+    return box;
+}
+
 static bo_t *GetAvcCTag(es_format_t *p_fmt)
 {
     bo_t    *avcC = box_new("avcC");/* FIXME use better value */
@@ -986,6 +995,7 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     case VLC_CODEC_SVQ3: memcpy(fcc, "SVQ3", 4); break;
     case VLC_CODEC_H263: memcpy(fcc, "s263", 4); break;
     case VLC_CODEC_H264: memcpy(fcc, "avc1", 4); break;
+    case VLC_CODEC_VC1 : memcpy(fcc, "vc-1", 4); break;
     case VLC_CODEC_HEVC: memcpy(fcc, "hvc1", 4); break;
     case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); break;
     case VLC_CODEC_YUYV: memcpy(fcc, "yuy2", 4); break;
@@ -1041,6 +1051,10 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     case VLC_CODEC_H264:
         box_gather(vide, GetAvcCTag(&p_track->fmt));
         break;
+
+    case VLC_CODEC_VC1:
+        box_gather(vide, GetxxxxTag(&p_track->fmt, "dvc1"));
+            break;
 
     case VLC_CODEC_HEVC:
         box_gather(vide, GetHvcCTag(&p_track->fmt));
