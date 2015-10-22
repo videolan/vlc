@@ -114,6 +114,15 @@ struct access_t
 };
 
 /**
+ * Special redirection error code.
+ *
+ * In case of redirection, the access open function should clean up (as in
+ * normal failure case), store the heap-allocated redirection URL in
+ * access_t.psz_url, and return this value.
+ */
+#define VLC_ACCESS_REDIRECT VLC_ETIMEOUT
+
+/**
  * Opens a new read-only byte stream.
  *
  * This function might block.

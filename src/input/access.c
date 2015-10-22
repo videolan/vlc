@@ -54,59 +54,89 @@ char *get_path(const char *location)
     return path;
 }
 
+#define MAX_REDIR 5
+
 /*****************************************************************************
  * access_New:
  *****************************************************************************/
 static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
                             const char *mrl)
 {
-    const char *p = strstr(mrl, "://");
-    if (p == NULL)
-        return NULL;
+    char *redirv[MAX_REDIR];
+    unsigned redirc = 0;
 
     access_t *access = vlc_custom_create(parent, sizeof (*access), "access");
     if (unlikely(access == NULL))
         return NULL;
 
-    char *scheme = strndup(mrl, p - mrl);
-    char *url = strdup(mrl);
-
-    if (unlikely(scheme == NULL || url == NULL))
-    {
-        free(url);
-        free(scheme);
-        vlc_object_release(access);
-        return NULL;
-    }
-
     access->p_input = input;
-    access->psz_access = scheme;
-    access->psz_url = url;
-    access->psz_location = url + (p + 3 - mrl);
-    access->psz_filepath = get_path(access->psz_location);
-    access->pf_read    = NULL;
-    access->pf_block   = NULL;
+    access->psz_access = NULL;
+    access->psz_url = strdup(mrl);
+    access->psz_filepath = NULL;
+    access->pf_read = NULL;
+    access->pf_block = NULL;
     access->pf_readdir = NULL;
-    access->pf_seek    = NULL;
+    access->pf_seek = NULL;
     access->pf_control = NULL;
-    access->p_sys      = NULL;
+    access->p_sys = NULL;
     access_InitFields(access);
 
-    msg_Dbg(access, "creating access '%s' location='%s', path='%s'", scheme,
-            access->psz_location,
-            access->psz_filepath ? access->psz_filepath : "(null)");
+    if (unlikely(access->psz_url == NULL))
+        goto error;
 
-    access->p_module = module_need(access, "access", scheme, true);
-    if (access->p_module == NULL)
+    while (redirc < MAX_REDIR)
     {
-        free(access->psz_filepath);
-        free(access->psz_url);
-        free(access->psz_access);
-        vlc_object_release(access);
-        access = NULL;
+        char *url = access->psz_url;
+        msg_Dbg(access, "creating access: %s", url);
+
+        const char *p = strstr(url, "://");
+        if (p == NULL)
+            goto error;
+
+        access->psz_access = strndup(url, p - url);
+        if (unlikely(access->psz_access == NULL))
+            goto error;
+
+        access->psz_location = p + 3;
+        access->psz_filepath = get_path(access->psz_location);
+        if (access->psz_filepath != NULL)
+            msg_Dbg(access, " (path: %s)", access->psz_filepath);
+
+        access->p_module = module_need(access, "access", access->psz_access,
+                                       true);
+        if (access->p_module != NULL) /* success */
+        {
+            while (redirc > 0)
+                free(redirv[--redirc]);
+
+            assert(access->pf_control != NULL);
+            return access;
+        }
+
+        if (access->psz_url == url) /* failure (no redirection) */
+            goto error;
+
+        /* redirection */
+        msg_Dbg(access, "redirecting to: %s", access->psz_url);
+        redirv[redirc++] = url;
+
+        for (unsigned j = 0; j < redirc; j++)
+            if (!strcmp(redirv[j], access->psz_url))
+            {
+                msg_Err(access, "redirection loop");
+                goto error;
+            }
     }
-    assert(access == NULL || access->pf_control != NULL);
-    return access;
+
+    msg_Err(access, "too many redirections");
+error:
+    while (redirc > 0)
+        free(redirv[--redirc]);
+    free(access->psz_filepath);
+    free(access->psz_url);
+    free(access->psz_access);
+    vlc_object_release(access);
+    return NULL;
 }
 
 access_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
@@ -351,11 +381,8 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     if (unlikely(s == NULL))
         return NULL;
 
-    s->p_input = input;
-    s->psz_url = strdup(url);
-
     stream_sys_t *sys = malloc(sizeof (*sys));
-    if (unlikely(s->psz_url == NULL || sys == NULL))
+    if (unlikely(sys == NULL))
         goto error;
 
     sys->access = access_New(VLC_OBJECT(s), input, url);
@@ -363,6 +390,8 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
         goto error;
 
     sys->block = NULL;
+    s->p_input = input;
+    s->psz_url = strdup(sys->access->psz_url);
 
     const char *cachename;
 
