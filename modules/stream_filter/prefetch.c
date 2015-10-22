@@ -374,6 +374,8 @@ static int Control(stream_t *stream, int query, va_list args)
         case STREAM_IS_DIRECTORY:
             return VLC_EGENERIC;
         case STREAM_GET_SIZE:
+            if (sys->size == (uint64_t)-1)
+                return VLC_EGENERIC;
             *va_arg(args, uint64_t *) = sys->size;
             break;
         case STREAM_GET_PTS_DELAY:
@@ -446,7 +448,8 @@ static int Open(vlc_object_t *obj)
     stream_Control(stream->p_source, STREAM_CAN_SEEK, &sys->can_seek);
     stream_Control(stream->p_source, STREAM_CAN_PAUSE, &sys->can_pause);
     stream_Control(stream->p_source, STREAM_CAN_CONTROL_PACE, &sys->can_pace);
-    stream_Control(stream->p_source, STREAM_GET_SIZE, &sys->size);
+    if (stream_Control(stream->p_source, STREAM_GET_SIZE, &sys->size))
+        sys->size = -1;
     stream_Control(stream->p_source, STREAM_GET_PTS_DELAY, &sys->pts_delay);
     if (stream_Control(stream->p_source, STREAM_GET_CONTENT_TYPE,
                        &sys->content_type))
