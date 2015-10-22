@@ -189,10 +189,6 @@ struct access_sys_t
 };
 
 /* */
-static int OpenRedirected( vlc_object_t *p_this, const char *psz_url,
-                           unsigned i_redirect );
-
-/* */
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static ssize_t ReadCompressed( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, uint64_t );
@@ -216,21 +212,8 @@ static vlc_http_cookie_jar_t *GetCookieJar( vlc_object_t *p_this );
 static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
-
-    return OpenRedirected( p_this, p_access->psz_url, 5 );
-}
-
-/**
- * Open the given url with limited redirects
- * @param p_this: the vlc object
- * @i_redirect: number of redirections remaining
- * @return vlc error codes
- */
-static int OpenRedirected( vlc_object_t *p_this, const char *psz_url,
-                           unsigned i_redirect )
-{
-    access_t     *p_access = (access_t*)p_this;
-    char         *psz;
+    const char *psz_url = p_access->psz_url;
+    char *psz;
 
     access_sys_t *p_sys = malloc( sizeof(*p_sys) );
     if( unlikely(p_sys == NULL) )
@@ -459,22 +442,7 @@ connect:
           p_sys->i_code == 303 || p_sys->i_code == 307 ) &&
         p_sys->psz_location && *p_sys->psz_location )
     {
-        msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
-
-        /* Check the number of redirection already done */
-        if( i_redirect == 0 )
-        {
-            msg_Err( p_access, "Too many redirection: break potential infinite"
-                     "loop" );
-            goto error;
-        }
-
-        if( strncmp( p_sys->psz_location, "http://", 7 )
-         && strncmp( p_sys->psz_location, "https://", 8 ) )
-        {   /* Do not accept redirection outside of HTTP */
-            msg_Err( p_access, "unsupported redirection ignored" );
-            goto error;
-        }
+        p_access->psz_url = p_sys->psz_location;
 
         /* Clean up current Open() run */
         vlc_UrlClean( &p_sys->url );
@@ -493,13 +461,8 @@ connect:
 #ifdef HAVE_ZLIB_H
         inflateEnd( &p_sys->inflate.stream );
 #endif
-        char *psz_location = p_sys->psz_location;
         free( p_sys );
-
-        /* Do new Open() run with new data */
-        int ret = OpenRedirected( p_this, psz_location, i_redirect - 1 );
-        free( psz_location );
-        return ret;
+        return VLC_ACCESS_REDIRECT;
     }
 
     if( p_sys->b_mms )
