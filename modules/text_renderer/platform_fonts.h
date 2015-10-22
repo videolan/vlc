@@ -70,9 +70,9 @@ typedef uint32_t uni_char_t;
 # define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Monotype Sans Duospace WT K"
 #elif defined( __ANDROID__ )
 # define SYSTEM_DEFAULT_FONT_FILE "/system/fonts/DroidSans-Bold.ttf"
-# define SYSTEM_DEFAULT_FAMILY "Droid Sans Bold"
+# define SYSTEM_DEFAULT_FAMILY "Droid Sans"
 # define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "/system/fonts/DroidSansMono.ttf"
-# define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Droid Sans Mono"
+# define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Monospace"
 #else
 # define SYSTEM_DEFAULT_FONT_FILE "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
 # define SYSTEM_DEFAULT_FAMILY "Serif Bold"
@@ -139,6 +139,18 @@ char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
                         bool b_bold, bool b_italic,
                         int *i_idx, uni_char_t codepoint );
 #endif
+#endif
+
+#ifdef __ANDROID__
+#define ANDROID_SYSTEM_FONTS "file:///system/etc/system_fonts.xml"
+#define ANDROID_FALLBACK_FONTS "file:///system/etc/fallback_fonts.xml"
+#define ANDROID_VENDOR_FONTS "file:///vendor/etc/fallback_fonts.xml"
+#define ANDROID_FONT_PATH "/system/fonts"
+
+int Android_ParseSystemFonts( filter_t *p_filter, const char *psz_path );
+const vlc_family_t *Android_GetFamily( filter_t *p_filter, const char *psz_family );
+vlc_family_t *Android_GetFallbacks( filter_t *p_filter, const char *psz_family,
+                                    uni_char_t codepoint );
 #endif
 
 char* Dummy_Select( filter_t *p_filter, const char* family,

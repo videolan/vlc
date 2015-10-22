@@ -64,6 +64,11 @@
 # define HAVE_GET_FONT_BY_FAMILY_NAME
 #endif
 
+/* Android */
+#ifdef __ANDROID__
+# define HAVE_GET_FONT_BY_FAMILY_NAME
+#endif
+
 #include <assert.h>
 
 #include "platform_fonts.h"
@@ -1269,6 +1274,17 @@ static int Create( vlc_object_t *p_this )
 #endif
 #elif defined( _WIN32 ) && defined( HAVE_GET_FONT_BY_FAMILY_NAME )
     p_sys->pf_select = Win32_Select;
+#elif defined( __ANDROID__ )
+    p_sys->pf_get_family = Android_GetFamily;
+    p_sys->pf_get_fallbacks = Android_GetFallbacks;
+    p_sys->pf_select = Generic_Select;
+
+    if( Android_ParseSystemFonts( p_filter, ANDROID_SYSTEM_FONTS ) == VLC_ENOMEM )
+        goto error;
+    if( Android_ParseSystemFonts( p_filter, ANDROID_FALLBACK_FONTS ) == VLC_ENOMEM )
+        goto error;
+    if( Android_ParseSystemFonts( p_filter, ANDROID_VENDOR_FONTS ) == VLC_ENOMEM )
+        goto error;
 #else
     p_sys->pf_select = Dummy_Select;
 #endif
