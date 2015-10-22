@@ -390,7 +390,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                                            iconData:coverImageData
                                            priority:0
                                            isSticky:NO
-                                       clickContext:nil];
+                                       clickContext:nil
+                                         identifier:@"VLCNowPlayingNotification"];
         } else {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
             // Make the OS X notification and string
