@@ -34,6 +34,9 @@
 
 #include <Evas.h>
 #include <Ecore.h>
+#ifdef HAVE_TIZEN_SDK
+# include <tbm_surface.h>
+#endif
 
 #if defined(EVAS_VERSION_MAJOR) && defined(EVAS_VERSION_MINOR)
 # if EVAS_VERSION_MAJOR > 1 || ( EVAS_VERSION_MAJOR == 1 && EVAS_VERSION_MINOR >= 10 )
@@ -65,7 +68,11 @@ vlc_module_end()
  * Local prototypes
  *****************************************************************************/
 
-static int EvasImageSetup( vout_display_t *vd );
+static int EvasImageSetup( vout_display_t * );
+#ifdef HAVE_TIZEN_SDK
+static bool EvasIsOpenGLSupported( vout_display_t * );
+static int TbmSurfaceSetup( vout_display_t * );
+#endif
 
 /* Buffer and Event Fifo */
 
@@ -86,6 +93,9 @@ struct buffer
     struct fifo_item fifo_item;
     uint8_t *p[PICTURE_PLANE_MAX];
     bool b_locked;
+#ifdef HAVE_TIZEN_SDK
+    tbm_surface_h p_tbm_surface;
+#endif
 };
 
 struct event
@@ -146,6 +156,13 @@ struct vout_display_sys_t
             Evas_Colorspace     i_colorspace;
             bool                b_yuv;
         } evas;
+#ifdef HAVE_TIZEN_SDK
+        struct {
+            tbm_format          i_format;
+            int                 i_angle;
+            double              f_ratio;
+        } tbm;
+#endif
     } u;
 
     /* Specific callbacks for EvasImage or TBMSurface */
@@ -442,6 +459,9 @@ EvasInitMainloopCb( vout_display_t *vd )
 {
     vout_display_sys_t *sys = vd->sys;
 
+#ifdef HAVE_TIZEN_SDK
+    if( !EvasIsOpenGLSupported( vd ) || TbmSurfaceSetup( vd ) )
+#endif
     if( EvasImageSetup( vd ) )
         return -1;
 
@@ -1071,3 +1091,295 @@ EvasImageSetup( vout_display_t *vd )
     msg_Dbg( vd, "using evas_image" );
     return 0;
 }
+
+#ifdef HAVE_TIZEN_SDK
+
+struct tbm_format_to_vlc
+{
+   tbm_format  i_tbm_format;
+   vlc_fourcc_t i_vlc_chroma;
+};
+
+struct tbm_format_to_vlc tbm_format_to_vlc_list[] = {
+   { TBM_FORMAT_NV12, VLC_CODEC_NV12 },
+   { TBM_FORMAT_YUV420, VLC_CODEC_I420 },
+   { TBM_FORMAT_BGRA8888, VLC_CODEC_RGB32 },
+};
+#define TBM_FORMAT_TO_VLC_LIST_COUNT \
+  ( sizeof(tbm_format_to_vlc_list) / sizeof(struct tbm_format_to_vlc) )
+
+static bool
+EvasIsOpenGLSupported( vout_display_t *vd )
+{
+    vout_display_sys_t *sys = vd->sys;
+    Evas *p_canvas = evas_object_evas_get(sys->p_evas);
+    Eina_List *p_engine_list, *p_l;
+    int i_render_id;
+    char *psz_render_name;
+    bool b_is_gl = false;
+
+    if( !p_canvas )
+        return false;
+    i_render_id = evas_output_method_get( p_canvas );
+
+    p_engine_list = evas_render_method_list();
+    if( !p_engine_list )
+        return false;
+
+    EINA_LIST_FOREACH( p_engine_list, p_l, psz_render_name )
+    {
+        if( evas_render_method_lookup( psz_render_name ) == i_render_id )
+        {
+            b_is_gl = strncmp( psz_render_name, "gl", 2 ) == 0;
+            break;
+        }
+    }
+
+    evas_render_method_list_free( p_engine_list );
+    return b_is_gl;
+}
+
+static int
+TbmSurfaceBufferLock( struct buffer *p_buffer )
+{
+    tbm_surface_info_s tbm_surface_info;
+    if( tbm_surface_map( p_buffer->p_tbm_surface, TBM_SURF_OPTION_WRITE,
+                         &tbm_surface_info ) )
+        return -1;
+
+    for( unsigned i = 0; i < tbm_surface_info.num_planes; ++i )
+        p_buffer->p[i] = tbm_surface_info.planes[i].ptr;
+    return 0;
+}
+
+static int
+TbmSurfaceBufferUnlock( struct buffer *p_buffer )
+{
+    tbm_surface_unmap( p_buffer->p_tbm_surface );
+    p_buffer->p[0] = NULL;
+    return 0;
+}
+
+static int
+TbmSurfaceSetData( vout_display_t *vd )
+{
+    vout_display_sys_t *sys = vd->sys;
+    Evas_Native_Surface surf;
+
+    TbmSurfaceBufferUnlock( sys->p_new_buffer );
+
+    surf.version = EVAS_NATIVE_SURFACE_VERSION;
+    surf.type = EVAS_NATIVE_SURFACE_TBM;
+    surf.data.tizen.buffer = sys->p_new_buffer->p_tbm_surface;
+    surf.data.tizen.rot = sys->u.tbm.i_angle;
+    surf.data.tizen.ratio = sys->u.tbm.f_ratio;
+    surf.data.tizen.flip = 0;
+    evas_object_image_native_surface_set( sys->p_evas, &surf );
+
+    if( sys->p_current_buffer )
+        TbmSurfaceBufferLock( sys->p_current_buffer );
+    return 0;
+}
+
+static void
+TbmSurfaceBuffersFree( vout_display_t *vd )
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    for( unsigned int i = 0; i < sys->i_nb_buffers; i++ )
+    {
+        if( sys->p_buffers[i].p[0] )
+            tbm_surface_unmap( sys->p_buffers[i].p_tbm_surface );
+        tbm_surface_destroy( sys->p_buffers[i].p_tbm_surface );
+    }
+    free( sys->p_buffers );
+    sys->p_buffers = NULL;
+    sys->i_nb_buffers = 0;
+    sys->i_nb_planes = 0;
+}
+
+static int
+TbmSurfaceBuffersAllocMainloopCb( vout_display_t *vd )
+{
+    vout_display_sys_t *sys = vd->sys;
+    tbm_surface_info_s tbm_surface_info;
+
+    sys->i_nb_buffers = 2;
+
+    if( !( sys->p_buffers = calloc( sys->i_nb_buffers, sizeof(struct buffer) ) ) )
+        return -1;
+
+    for( unsigned i = 0; i < sys->i_nb_buffers; ++i )
+    {
+        struct buffer *p_buffer = &sys->p_buffers[i];
+        tbm_surface_h p_tbm_surface = tbm_surface_create( sys->i_width,
+                                                          sys->i_height,
+                                                          sys->u.tbm.i_format );
+        if( !p_tbm_surface
+         || tbm_surface_get_info( p_tbm_surface, &tbm_surface_info ) )
+        {
+            tbm_surface_destroy( p_tbm_surface );
+            p_tbm_surface = NULL;
+        }
+
+        if( !p_tbm_surface )
+        {
+            sys->i_nb_buffers = i;
+            break;
+        }
+        p_buffer->p_tbm_surface = p_tbm_surface;
+        TbmSurfaceBufferLock( p_buffer );
+    }
+
+    sys->i_nb_planes = tbm_surface_info.num_planes;
+    for( unsigned i = 0; i < tbm_surface_info.num_planes; ++i )
+    {
+        sys->p_planes[i].i_lines = tbm_surface_info.planes[i].size
+                                 / tbm_surface_info.planes[i].stride;
+        sys->p_planes[i].i_visible_lines = sys->p_planes[i].i_lines;
+        sys->p_planes[i].i_pitch = tbm_surface_info.planes[i].stride;
+        sys->p_planes[i].i_visible_pitch = sys->p_planes[i].i_pitch;
+    }
+
+    return 0;
+}
+
+static int
+TbmSurfaceBuffersAlloc( vout_display_t *vd, video_format_t *p_fmt )
+{
+    (void) p_fmt;
+    return EcoreMainLoopCallSync( vd, TbmSurfaceBuffersAllocMainloopCb );
+}
+
+static void
+TbmSurfaceUpdateRatio( vout_display_t *vd, double f_ratio )
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    sys->u.tbm.f_ratio = f_ratio;
+}
+
+static int
+TbmSurfaceSetup( vout_display_t *vd )
+{
+    vout_display_sys_t *sys = vd->sys;
+    tbm_format i_tbm_format = 0;
+    bool b_found = false;
+    bool b_can_change_ratio = false;
+    uint32_t *p_formats;
+    uint32_t i_format_num;
+
+    for( unsigned int i = 0; i < TBM_FORMAT_TO_VLC_LIST_COUNT; ++i )
+    {
+        if( tbm_format_to_vlc_list[i].i_vlc_chroma == vd->fmt.i_chroma )
+        {
+            i_tbm_format = tbm_format_to_vlc_list[i].i_tbm_format;
+            break;
+        }
+     }
+     if( !i_tbm_format )
+     {
+        msg_Err( vd, "no tbm format found" );
+        return -1;
+     }
+
+    if( tbm_surface_query_formats( &p_formats, &i_format_num ) )
+    {
+        msg_Warn( vd, "tbm_surface_query_formats failed" );
+        return -1;
+    }
+
+    for( unsigned int i = 0; i < i_format_num; i++ )
+    {
+        if( p_formats[i] == i_tbm_format )
+        {
+            b_found = true;
+            break;
+        }
+    }
+    if( !b_found )
+    {
+        if( i_tbm_format != TBM_FORMAT_YUV420 )
+        {
+            msg_Warn( vd, "vlc format not matching any tbm format: trying with I420");
+            i_tbm_format = TBM_FORMAT_YUV420;
+            for( uint32_t i = 0; i < i_format_num; i++ )
+            {
+                if( p_formats[i] == i_tbm_format )
+                {
+                    vd->fmt.i_chroma = VLC_CODEC_I420;
+                    b_found = true;
+                    break;
+                }
+            }
+        }
+    }
+    free( p_formats );
+
+    if( !b_found )
+    {
+        msg_Warn( vd, "can't find any compatible tbm format" );
+        return -1;
+    }
+    sys->u.tbm.i_format = i_tbm_format;
+
+    switch( vd->fmt.orientation )
+    {
+        case ORIENT_ROTATED_90:
+            sys->u.tbm.i_angle = 270;
+            break;
+        case ORIENT_ROTATED_180:
+            sys->u.tbm.i_angle = 180;
+            break;
+        case ORIENT_ROTATED_270:
+            sys->u.tbm.i_angle = 90;
+            break;
+        default:
+            sys->u.tbm.i_angle = 0;
+    }
+
+    sys->b_apply_rotation = false;
+
+    /* Ratio update from EVAS_NATIVE_SURFACE_TBM only works with the Z3 that is
+     * based on evas.1.13 */
+    b_can_change_ratio = evas_version->major > 1 || ( evas_version->major == 1
+                         && evas_version->minor >= 13 );
+
+    msg_Dbg( vd, "TbmSurface: can_change_ratio: %d", b_can_change_ratio );
+
+    if( !b_can_change_ratio )
+    {
+        FmtUpdate( vd );
+
+        /* No aspect ratio support with this version of TbmSurface*/
+        vd->info.has_pictures_invalid = true;
+        TbmSurfaceUpdateRatio( vd, 1.0f );
+        sys->pf_update_ratio = NULL;
+    }
+    else
+    {
+        /* Newer version of TbmSurfarce: ratio can be updated from
+         * Evas_Native_Surface */
+        vout_display_place_t place;
+        video_format_t fmt;
+
+        video_format_ApplyRotation( &fmt, &vd->source );
+        vout_display_PlacePicture( &place, &fmt, vd->cfg, false );
+
+        vd->info.has_pictures_invalid = false;
+        TbmSurfaceUpdateRatio( vd, place.width / (double) place.height );
+        sys->pf_update_ratio = TbmSurfaceUpdateRatio;
+    }
+
+    sys->i_width  = vd->fmt.i_visible_width;
+    sys->i_height = vd->fmt.i_visible_height;
+
+    sys->pf_set_data = TbmSurfaceSetData;
+    sys->pf_buffers_alloc = TbmSurfaceBuffersAlloc;
+    sys->pf_buffers_free = TbmSurfaceBuffersFree;
+
+    msg_Dbg( vd, "using tbm_surface" );
+
+    return 0;
+}
+#endif
