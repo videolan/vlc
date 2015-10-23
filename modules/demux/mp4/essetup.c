@@ -389,6 +389,27 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     return 1;
 }
 
+static bool SetupAudioFromWaveFormatEx( es_format_t *p_fmt, const MP4_Box_t *p_WMA2 )
+{
+    if( p_WMA2 && BOXDATA(p_WMA2) )
+    {
+        wf_tag_to_fourcc(BOXDATA(p_WMA2)->Format.wFormatTag, &p_fmt->i_codec, NULL);
+        p_fmt->audio.i_channels = BOXDATA(p_WMA2)->Format.nChannels;
+        p_fmt->audio.i_rate = BOXDATA(p_WMA2)->Format.nSamplesPerSec;
+        p_fmt->i_bitrate = BOXDATA(p_WMA2)->Format.nAvgBytesPerSec * 8;
+        p_fmt->audio.i_blockalign = BOXDATA(p_WMA2)->Format.nBlockAlign;
+        p_fmt->audio.i_bitspersample = BOXDATA(p_WMA2)->Format.wBitsPerSample;
+        p_fmt->i_extra = BOXDATA(p_WMA2)->i_extra;
+        if( p_fmt->i_extra > 0 )
+        {
+            p_fmt->p_extra = malloc( BOXDATA(p_WMA2)->i_extra );
+            memcpy( p_fmt->p_extra, BOXDATA(p_WMA2)->p_extra, p_fmt->i_extra );
+        }
+        return true;
+    }
+    return false;
+}
+
 int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 {
     MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
@@ -714,21 +735,9 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         }
         case ATOM_WMA2:
         {
-            MP4_Box_t *p_WMA2 = MP4_BoxGet( p_sample, "wave/WMA2" );
-            if( p_WMA2 && BOXDATA(p_WMA2) )
+            if( SetupAudioFromWaveFormatEx( &p_track->fmt,
+                                            MP4_BoxGet( p_sample, "wave/WMA2" ) ) )
             {
-                p_track->fmt.audio.i_channels = BOXDATA(p_WMA2)->Format.nChannels;
-                p_track->fmt.audio.i_rate = BOXDATA(p_WMA2)->Format.nSamplesPerSec;
-                p_track->fmt.i_bitrate = BOXDATA(p_WMA2)->Format.nAvgBytesPerSec * 8;
-                p_track->fmt.audio.i_blockalign = BOXDATA(p_WMA2)->Format.nBlockAlign;
-                p_track->fmt.audio.i_bitspersample = BOXDATA(p_WMA2)->Format.wBitsPerSample;
-                p_track->fmt.i_extra = BOXDATA(p_WMA2)->i_extra;
-                if( p_track->fmt.i_extra > 0 )
-                {
-                    p_track->fmt.p_extra = malloc( BOXDATA(p_WMA2)->i_extra );
-                    memcpy( p_track->fmt.p_extra, BOXDATA(p_WMA2)->p_extra,
-                            p_track->fmt.i_extra );
-                }
                 p_track->p_asf = MP4_BoxGet( p_sample, "wave/ASF " );
             }
             else
@@ -736,6 +745,11 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                 msg_Err( p_demux, "missing WMA2 %4.4s", (char*) &p_sample->p_father->i_type );
             }
             break;
+        }
+        case ATOM_wma: /* isml wmapro */
+        {
+            if( !SetupAudioFromWaveFormatEx( &p_track->fmt, MP4_BoxGet( p_sample, "wfex" ) ) )
+                msg_Err( p_demux, "missing wfex for wma" );
         }
 
         default:

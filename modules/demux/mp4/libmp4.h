@@ -163,6 +163,7 @@ typedef int64_t stime_t;
 #define ATOM_dec3 VLC_FOURCC( 'd', 'e', 'c', '3' )
 #define ATOM_dvc1 VLC_FOURCC( 'd', 'v', 'c', '1' )
 #define ATOM_WMA2 VLC_FOURCC( 'W', 'M', 'A', '2' )
+#define ATOM_wma  VLC_FOURCC( 'w', 'm', 'a', ' ' )
 #define ATOM_enda VLC_FOURCC( 'e', 'n', 'd', 'a' )
 #define ATOM_gnre VLC_FOURCC( 'g', 'n', 'r', 'e' )
 #define ATOM_trkn VLC_FOURCC( 't', 'r', 'k', 'n' )
@@ -216,6 +217,7 @@ typedef int64_t stime_t;
 #define ATOM_dv5p VLC_FOURCC( 'd', 'v', '5', 'p' )
 #define ATOM_raw  VLC_FOURCC( 'r', 'a', 'w', ' ' )
 #define ATOM_dOps VLC_FOURCC( 'd', 'O', 'p', 's' )
+#define ATOM_wfex VLC_FOURCC( 'w', 'f', 'e', 'x' )
 
 #define ATOM_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
 

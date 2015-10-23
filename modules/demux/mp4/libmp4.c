@@ -3779,11 +3779,13 @@ static const struct
     { ATOM_OggS,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_alac,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_WMA2,    MP4_ReadBox_sample_soun,  ATOM_stsd }, /* flip4mac */
+    { ATOM_wma,     MP4_ReadBox_sample_soun,  ATOM_stsd }, /* ismv wmapro */
     { ATOM_Opus,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     /* Sound extensions */
     { ATOM_chan,    MP4_ReadBox_stsdext_chan, 0 },
     { ATOM_WMA2,    MP4_ReadBox_WMA2,         ATOM_wave }, /* flip4mac */
     { ATOM_dOps,    MP4_ReadBox_Binary,       ATOM_Opus },
+    { ATOM_wfex,    MP4_ReadBox_WMA2,         ATOM_wma  }, /* ismv formatex */
 
     { ATOM_drmi,    MP4_ReadBox_sample_vide,  ATOM_stsd },
     { ATOM_vide,    MP4_ReadBox_sample_vide,  ATOM_stsd },
