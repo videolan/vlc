@@ -3856,10 +3856,12 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
 
         if( ret->p_sample_offset_pts )
         {
-            if ( p_trun_data->i_version == 0 )
+            if ( p_trun_data->i_version == 1 )
                 ret->p_sample_offset_pts[i] = (int32_t) p_trun_data->p_samples[i].i_composition_time_offset;
-            else
-                ret->p_sample_offset_pts[i] = __MIN( INT32_MAX, p_trun_data->p_samples[i].i_composition_time_offset );
+            else if( p_trun_data->p_samples[i].i_composition_time_offset < 0xFF000000 )
+                ret->p_sample_offset_pts[i] = p_trun_data->p_samples[i].i_composition_time_offset;
+            else /* version 0 with negative */
+                ret->p_sample_offset_pts[i] = (int32_t) p_trun_data->p_samples[i].i_composition_time_offset;
         }
 
         if( p_trun_data->i_flags & MP4_TRUN_SAMPLE_SIZE )
@@ -4521,8 +4523,10 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
         {
             if ( p_trun->i_version == 1 )
                 i_nzpts += CLOCK_FREQ * (int32_t) p_trun->p_samples[i].i_composition_time_offset / p_track->i_timescale;
-            else
+            else if( p_trun->p_samples[i].i_composition_time_offset < 0xFF000000 )
                 i_nzpts += CLOCK_FREQ * p_trun->p_samples[i].i_composition_time_offset / p_track->i_timescale;
+            else /* version 0 with negative */
+                i_nzpts += CLOCK_FREQ * (int32_t) p_trun->p_samples[i].i_composition_time_offset / p_track->i_timescale;
         }
 
         if( p_trun->i_flags & MP4_TRUN_SAMPLE_SIZE )
