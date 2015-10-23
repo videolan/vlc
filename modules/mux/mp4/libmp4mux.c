@@ -724,6 +724,27 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
     return hvcC;
 }
 
+static bo_t *GetWaveFormatExTag(es_format_t *p_fmt, const char *tag)
+{
+    bo_t *box = box_new(tag);
+    if(!box)
+        return NULL;
+
+    uint16_t wFormatTag;
+    fourcc_to_wf_tag(p_fmt->i_codec, &wFormatTag);
+    bo_add_16le(box, wFormatTag); //wFormatTag
+    bo_add_16le(box, p_fmt->audio.i_channels); //nChannels
+    bo_add_32le(box, p_fmt->audio.i_rate); //nSamplesPerSec
+    bo_add_32le(box, p_fmt->i_bitrate / 8); //nAvgBytesPerSec
+    bo_add_16le(box, p_fmt->audio.i_blockalign); //nBlockAlign
+    bo_add_16le(box, p_fmt->audio.i_bitspersample);  //wBitsPerSample
+    bo_add_16le(box, p_fmt->i_extra); //cbSize
+
+    bo_add_mem(box, p_fmt->i_extra, p_fmt->p_extra);
+
+    return box;
+}
+
 static bo_t *GetxxxxTag(es_format_t *p_fmt, const char *tag)
 {
     bo_t *box = box_new(tag);
@@ -920,6 +941,8 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         memcpy(fcc, "ec-3", 4);
     } else if (codec == VLC_CODEC_DTS) {
         memcpy(fcc, "DTS ", 4);
+    } else if (codec == VLC_CODEC_WMAP) {
+        memcpy(fcc, "wma ", 4);
     } else
         vlc_fourcc_to_char(codec, fcc);
 
@@ -969,6 +992,8 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
             box = GetDac3Tag(p_track->a52_frame);
         else if (codec == VLC_CODEC_EAC3)
             box = GetDec3Tag(&p_track->fmt, p_track->a52_frame);
+        else if (codec == VLC_CODEC_WMAP)
+            box = GetWaveFormatExTag(&p_track->fmt, "wfex");
         else
             box = GetESDS(p_track);
 
