@@ -86,6 +86,7 @@
     NSString *notificationType;
     NSMutableDictionary *registrationDictionary;
     id lastNotification;
+    bool isInForeground;
     intf_thread_t *interfaceThread;
 }
 
@@ -283,6 +284,21 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( !( self = [super init] ) )
         return nil;
 
+    @autoreleasepool {
+        // Subscribe to notifications to determine if VLC is in foreground or not
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationActiveChange:)
+                                                     name:NSApplicationDidBecomeActiveNotification
+                                                   object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationActiveChange:)
+                                                     name:NSApplicationDidResignActiveNotification
+                                                   object:nil];
+    }
+    // Start in background
+    isInForeground = NO;
+
     applicationName = nil;
     notificationType = nil;
     registrationDictionary = nil;
@@ -301,6 +317,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
              removeDeliveredNotification:(NSUserNotification *)lastNotification];
             [lastNotification release];
         }
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
 #endif
 
@@ -340,7 +357,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 {
     @autoreleasepool {
         // Do not notify if in foreground
-        if ([NSApplication sharedApplication].active)
+        if (isInForeground)
             return;
 
         // Init Cover
@@ -434,6 +451,13 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 - (NSString *)applicationNameForGrowl
 {
     return applicationName;
+}
+
+- (void)applicationActiveChange:(NSNotification *)n {
+    if (n.name == NSApplicationDidBecomeActiveNotification)
+        isInForeground = YES;
+    else if (n.name == NSApplicationDidResignActiveNotification)
+        isInForeground = NO;
 }
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
