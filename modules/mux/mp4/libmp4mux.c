@@ -23,6 +23,7 @@
 #include "libmp4mux.h"
 #include "../demux/mp4/libmp4.h" /* flags */
 #include "../demux/mpeg/mpeg_parser_helpers.h" /* nal rbsp */
+#include "../packetizer/h264_nal.h" /* h264_get_spspps */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -491,9 +492,6 @@ static bo_t *GetD263Tag(void)
     return d263;
 }
 
-static const char avc1_short_start_code[3] = { 0, 0, 1 };
-static const char avc1_start_code[4] = { 0, 0, 0, 1 };
-
 static void hevcParseVPS(uint8_t * p_buffer, size_t i_buffer, uint8_t *general,
                          uint8_t * numTemporalLayer, bool * temporalIdNested)
 {
@@ -761,44 +759,14 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
         return NULL;
     uint8_t *p_sps = NULL;
     uint8_t *p_pps = NULL;
-    int     i_sps_size = 0;
-    int     i_pps_size = 0;
+    size_t   i_sps_size = 0;
+    size_t   i_pps_size = 0;
 
-    if (p_fmt->i_extra > 0) {
-        /* FIXME: take into account multiple sps/pps */
-        uint8_t *p_buffer = p_fmt->p_extra;
-        int     i_buffer = p_fmt->i_extra;
-
-        while (i_buffer > 3) {
-            while (memcmp(p_buffer, &avc1_start_code[1], 3)) {
-                 i_buffer--;
-                 p_buffer++;
-            }
-            const int i_nal_type = p_buffer[3]&0x1f;
-            int i_startcode = 0;
-
-            for (int i_offset = 1; i_offset+2 < i_buffer ; i_offset++)
-                if (!memcmp(&p_buffer[i_offset], &avc1_start_code[1], 3)) {
-                    /* we found another startcode */
-                    i_startcode = i_offset;
-                    while (p_buffer[i_startcode-1] == 0 && i_startcode > 0)
-                        i_startcode--;
-                    break;
-                }
-
-            int i_size = i_startcode ? i_startcode : i_buffer;
-
-            if (i_nal_type == 7) {
-                p_sps = &p_buffer[3];
-                i_sps_size = i_size - 3;
-            }
-            if (i_nal_type == 8) {
-                p_pps = &p_buffer[3];
-                i_pps_size = i_size - 3;
-            }
-            i_buffer -= i_size;
-            p_buffer += i_size;
-        }
+    if( h264_get_spspps(p_fmt->p_extra, p_fmt->i_extra,
+                        &p_sps, &i_sps_size, &p_pps, &i_pps_size) != 0 || !p_sps || !p_pps )
+    {
+        bo_free(avcC);
+        return NULL;
     }
 
     bo_add_8(avcC, 1);      /* configuration version */
