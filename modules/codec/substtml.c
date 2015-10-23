@@ -309,8 +309,8 @@ static void ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader )
     }
     if ( p_ttml_style->psz_styleid == NULL )
     {
-        free( p_ttml_style );
         free( p_ttml_style->font_style->psz_fontname );
+        free( p_ttml_style );
         return ;
     }
 
