@@ -230,6 +230,15 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
     if( mediaSegmentTemplate )
     {
         const uint64_t timescale = mediaSegmentTemplate->inheritTimescale();
+
+        SegmentTimeline *timeline = mediaSegmentTemplate->segmentTimeline.Get();
+        if(timeline)
+        {
+            time = time * timescale / CLOCK_FREQ;
+            *ret = timeline->getElementNumberByScaledPlaybackTime(time);
+            return true;
+        }
+
         const mtime_t duration = mediaSegmentTemplate->duration.Get();
         *ret = mediaSegmentTemplate->startNumber.Get();
         if(duration)
