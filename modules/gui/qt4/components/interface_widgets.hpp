@@ -81,7 +81,7 @@ signals:
     void sizeChanged( int, int );
 
 public slots:
-    void SetSizing( unsigned int, unsigned int );
+    void setSize( unsigned int, unsigned int );
 };
 
 /******************** Background Widget ****************/

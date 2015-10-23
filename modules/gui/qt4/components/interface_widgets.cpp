@@ -160,7 +160,7 @@ WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
 /* Set the Widget to the correct Size */
 /* Function has to be called by the parent
    Parent has to care about resizing itself */
-void VideoWidget::SetSizing( unsigned int w, unsigned int h )
+void VideoWidget::setSize( unsigned int w, unsigned int h )
 {
     resize( w, h );
     emit sizeChanged( w, h );

@@ -734,7 +734,7 @@ void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
 
         /* Ask videoWidget to resize correctly, if we are in normal mode */
         if( !isFullScreen() && !isMaximized() && b_autoresize )
-            videoWidget->SetSizing( *pi_width, *pi_height );
+            videoWidget->setSize( *pi_width, *pi_height );
     }
 }
 
@@ -772,7 +772,7 @@ void MainInterface::releaseVideoSlot( void )
 void MainInterface::setVideoSize( unsigned int w, unsigned int h )
 {
     if( !isFullScreen() && !isMaximized() )
-        videoWidget->SetSizing( w, h );
+        videoWidget->setSize( w, h );
 }
 
 void MainInterface::videoSizeChanged( int w, int h )
