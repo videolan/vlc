@@ -245,8 +245,8 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
 # ifdef __unix__
         if (snum == XDefaultScreen(sys->x11))
             sys->display = eglGetDisplay(sys->x11);
-    }
 # endif
+    }
 
 #elif defined (USE_PLATFORM_WAYLAND)
     sys->window = NULL;
