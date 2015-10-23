@@ -83,7 +83,8 @@ struct demux_sys_t
     bool         b_seekable;
     bool         b_fastseekable;
     bool         b_seekmode;
-    bool         b_smooth;       /* Is it Smooth Streaming? */
+    bool         b_smooth;       /* Is it Smooth Streaming? (streamfilter) */
+    bool         b_ismv;
 
     bool            b_index_probed;
     bool            b_fragments_probed;
@@ -648,6 +649,11 @@ static int Open( vlc_object_t * p_this )
             if (BOXDATA(p_ftyp)->i_compatible_brands[i] == MAJOR_dash)
             {
                 msg_Dbg( p_demux, "DASH Stream" );
+            }
+            else if (BOXDATA(p_ftyp)->i_compatible_brands[i] == VLC_FOURCC('s', 'm', 'o', 'o') )
+            {
+                msg_Dbg( p_demux, "Handling VLC Smooth Stream" );
+                p_sys->b_ismv = true;
             }
         }
     }
@@ -4250,6 +4256,18 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
             i_track_defaultsamplesize = 1;
             i_track_defaultsampleduration = 1;
         }
+        else if( p_sys->b_ismv && p_sys->i_tracks == 1 )
+        {
+            const MP4_Box_t *p_trex = MP4_BoxGet( p_moovfragment->p_moox, "mvex/trex" );
+            if ( p_trex )
+            {
+               i_track_defaultsamplesize = BOXDATA(p_trex)->i_default_sample_size;
+               i_track_defaultsampleduration = BOXDATA(p_trex)->i_default_sample_duration;
+            }
+            const MP4_Box_t *p_mdhd = MP4_BoxGet( p_moovfragment->p_moox, "trak/mdia/mdhd" );
+            if ( p_mdhd )
+                i_track_timescale = BOXDATA(p_mdhd)->i_timescale;
+        }
         else
         {
             /* set trex for defaults */
@@ -5139,6 +5157,14 @@ static int DemuxAsLeaf( demux_t *p_demux )
                     MP4_BoxFree( p_vroot );
                     msg_Err(p_demux, "no moof or moov in current chunk");
                     return 1;
+                }
+
+                /* Hotfix for adaptive/smooth streaming as we don't know track # when creating moov */
+                if( p_fragbox->i_type == ATOM_moof && p_sys->b_ismv && p_sys->i_tracks == 1 )
+                {
+                    MP4_Box_t *p_tfhd = MP4_BoxGet( p_fragbox, "traf/tfhd" );
+                    if(p_tfhd && BOXDATA(p_tfhd))
+                        p_sys->track[0].i_track_ID = BOXDATA(p_tfhd)->i_track_ID;
                 }
 
                 MP4_Box_t *p_mfhd = MP4_BoxGet( p_fragbox, "mfhd" );
