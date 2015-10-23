@@ -1620,7 +1620,7 @@ QMenu *VLCMenuBar::PPMenu( intf_thread_t *p_intf )
 {
     int i_q = ExtVideo::getPostprocessing( p_intf );
 
-    QMenu *submenu = new QMenu( "&Post processing" );
+    QMenu *submenu = new QMenu( qtr("&Post processing") );
 
     QActionGroup *actionGroup = new QActionGroup(submenu);
     QAction *action;
