@@ -115,6 +115,13 @@ uint64_t SegmentTimeline::maxElementNumber() const
     return e->number + e->r;
 }
 
+uint64_t SegmentTimeline::minElementNumber() const
+{
+    if(elements.empty())
+        return 0;
+    return elements.front()->number;
+}
+
 size_t SegmentTimeline::prune(mtime_t time)
 {
     stime_t scaled = time * inheritTimescale() / CLOCK_FREQ;

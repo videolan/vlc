@@ -174,10 +174,19 @@ ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_p
             {
                 /* Check if we don't exceed timeline */
                 MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate*>(retSegments[0]);
-                if(templ && templ->segmentTimeline.Get() &&
-                   templ->segmentTimeline.Get()->maxElementNumber() < i_pos)
-                    return NULL;
-                *pi_newpos = std::max(seg->getSequenceNumber(), i_pos);
+                SegmentTimeline *timeline = (templ) ? templ->segmentTimeline.Get() : NULL;
+                if(timeline)
+                {
+                    *pi_newpos = std::max(timeline->minElementNumber(), i_pos);
+                    if(timeline->maxElementNumber() < i_pos)
+                        return NULL;
+                }
+                else
+                {
+                    *pi_newpos = i_pos;
+                    /* start number */
+                    *pi_newpos = std::max(templ->startNumber.Get(), i_pos);
+                }
                 return seg;
             }
             else if(seg->getSequenceNumber() >= i_pos)
