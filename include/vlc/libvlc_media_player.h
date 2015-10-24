@@ -859,9 +859,16 @@ LIBVLC_API libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *
 /**
  * Get movie fps rate
  *
+ * This function is provided for backward compatibility. It cannot deal with
+ * multiple video tracks. In LibVLC versions prior to 3.0, it would also fail
+ * if the file format did not convey the frame rate explicitly.
+ *
+ * \deprecated Consider using libvlc_media_tracks_get() instead.
+ *
  * \param p_mi the Media Player
  * \return frames per second (fps) for this playing movie, or 0 if unspecified
  */
+LIBVLC_DEPRECATED
 LIBVLC_API float libvlc_media_player_get_fps( libvlc_media_player_t *p_mi );
 
 /** end bug */
