@@ -4569,7 +4569,10 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
             if ( p_track->p_es )
             {
                 p_block->i_dts = VLC_TS_0 + i_nzdts;
-                p_block->i_pts = VLC_TS_0 + i_nzpts;
+                if( p_track->fmt.i_cat == VIDEO_ES && !( p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET ) )
+                    p_block->i_pts = VLC_TS_INVALID;
+                else
+                    p_block->i_pts = VLC_TS_0 + i_nzpts;
                 p_block->i_length = CLOCK_FREQ * dur / p_track->i_timescale;
                 MP4_Block_Send( p_demux, p_track, p_block );
             }
