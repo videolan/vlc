@@ -75,11 +75,10 @@ static void UpdateTitleListfromDemux( input_thread_t * );
 
 static void MRLSections( const char *, int *, int *, int *, int *);
 
-static input_source_t *InputSourceNew( input_thread_t *);
-static int  InputSourceInit( input_thread_t *, input_source_t *,
-                             const char *, const char *psz_forced_demux,
-                             bool b_in_can_fail );
-static void InputSourceClean( input_source_t * );
+static input_source_t *InputSourceNew( input_thread_t *, const char *,
+                                       const char *psz_forced_demux,
+                                       bool b_in_can_fail );
+static void InputSourceDestroy( input_source_t * );
 static void InputSourceMeta( input_thread_t *, input_source_t *, vlc_meta_t * );
 
 /* TODO */
@@ -257,8 +256,6 @@ static void input_Destructor( vlc_object_t *obj )
     free( psz_name );
 #endif
 
-    free( p_input->p->master );
-
     if( p_input->p->p_es_out_display )
         es_out_Delete( p_input->p->p_es_out_display );
 
@@ -359,17 +356,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->p_item = p_item;
 
     /* Init Input fields */
-    p_input->p->master = InputSourceNew( p_input );
-    if( unlikely(p_input->p->master == NULL) )
-    {
-        free( p_input->psz_header );
-        free( p_input->p );
-        vlc_object_release( p_input );
-        return NULL;
-    }
-    p_input->p->master->b_can_pace_control = true;
-    p_input->p->master->b_can_rate_control = true;
-    p_input->p->master->b_rescale_ts = true;
+    p_input->p->master = NULL;
     vlc_mutex_lock( &p_item->lock );
 
     if( !p_item->p_stats )
@@ -1043,11 +1030,9 @@ static void LoadSlaves( input_thread_t *p_input )
             continue;
         msg_Dbg( p_input, "adding slave input '%s'", uri );
 
-        input_source_t *p_slave = InputSourceNew( p_input );
-        if( p_slave && !InputSourceInit( p_input, p_slave, uri, NULL, false ) )
+        input_source_t *p_slave = InputSourceNew( p_input, uri, NULL, false );
+        if( p_slave )
             TAB_APPEND( p_input->p->i_slave, p_input->p->slave, p_slave );
-        else
-            free( p_slave );
         free( uri );
     }
     free( psz_org );
@@ -1141,6 +1126,8 @@ static void InitPrograms( input_thread_t * p_input )
 
 static int Init( input_thread_t * p_input )
 {
+    input_source_t *master;
+
     for( int i = 0; i < p_input->p->p_item->i_options; i++ )
     {
         if( !strncmp( p_input->p->p_item->ppsz_options[i], "meta-file", 9 ) )
@@ -1169,19 +1156,18 @@ static int Init( input_thread_t * p_input )
     input_SendEventCache( p_input, 0.0 );
 
     /* */
-    if( InputSourceInit( p_input, p_input->p->master,
-                         p_input->p->p_item->psz_uri, NULL, false ) )
-    {
+    master = InputSourceNew( p_input, p_input->p->p_item->psz_uri, NULL,
+                             false );
+    if( master == NULL )
         goto error;
-    }
+    p_input->p->master = master;
 
     InitTitle( p_input );
 
     /* Load master infos */
     /* Init length */
     mtime_t i_length;
-    if( demux_Control( p_input->p->master->p_demux, DEMUX_GET_LENGTH,
-                         &i_length ) )
+    if( demux_Control( master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
         i_length = 0;
     if( i_length <= 0 )
         i_length = input_item_GetDuration( p_input->p->p_item );
@@ -1226,7 +1212,7 @@ static int Init( input_thread_t * p_input )
         InputMetaUser( p_input, p_meta );
 
         /* Get meta data from master input */
-        InputSourceMeta( p_input, p_input->p->master, p_meta );
+        InputSourceMeta( p_input, master, p_meta );
 
         /* And from slave */
         for( int i = 0; i < p_input->p->i_slave; i++ )
@@ -1290,7 +1276,6 @@ error:
     }
 
     /* Mark them deleted */
-    p_input->p->master->p_demux = NULL;
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout = NULL;
 
@@ -1302,8 +1287,6 @@ error:
  *****************************************************************************/
 static void End( input_thread_t * p_input )
 {
-    int i;
-
     /* We are at the end */
     input_ChangeState( p_input, END_S );
 
@@ -1313,16 +1296,13 @@ static void End( input_thread_t * p_input )
     /* Stop es out activity */
     es_out_SetMode( p_input->p->p_es_out, ES_OUT_MODE_NONE );
 
-    /* Clean up master */
-    InputSourceClean( p_input->p->master );
-
     /* Delete slave */
-    for( i = 0; i < p_input->p->i_slave; i++ )
-    {
-        InputSourceClean( p_input->p->slave[i] );
-        free( p_input->p->slave[i] );
-    }
+    for( int i = 0; i < p_input->p->i_slave; i++ )
+        InputSourceDestroy( p_input->p->slave[i] );
     free( p_input->p->slave );
+
+    /* Clean up master */
+    InputSourceDestroy( p_input->p->master );
 
     /* Unload all modules */
     if( p_input->p->p_es_out )
@@ -1365,7 +1345,7 @@ static void End( input_thread_t * p_input )
     vlc_mutex_lock( &p_input->p->p_item->lock );
     if( p_input->p->i_attachment > 0 )
     {
-        for( i = 0; i < p_input->p->i_attachment; i++ )
+        for( int i = 0; i < p_input->p->i_attachment; i++ )
             vlc_input_attachment_Delete( p_input->p->attachment[i] );
         TAB_CLEAN( p_input->p->i_attachment, p_input->p->attachment );
         free( p_input->p->attachment_demux);
@@ -1886,43 +1866,40 @@ static bool Control( input_thread_t *p_input,
             if( val.psz_string )
             {
                 const char *uri = val.psz_string;
-                input_source_t *slave = InputSourceNew( p_input );
-
-                if( slave && !InputSourceInit( p_input, slave, uri, NULL, false ) )
+                input_source_t *slave = InputSourceNew( p_input, uri, NULL,
+                                                        false );
+                if( slave == NULL )
                 {
-                    int64_t i_time;
-
-                    /* Add the slave */
-                    msg_Dbg( p_input, "adding %s as slave on the fly", uri );
-
-                    /* Set position */
-                    if( demux_Control( p_input->p->master->p_demux,
-                                        DEMUX_GET_TIME, &i_time ) )
-                    {
-                        msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
-                        InputSourceClean( slave );
-                        free( slave );
-                        break;
-                    }
-                    if( demux_Control( slave->p_demux,
-                                       DEMUX_SET_TIME, i_time, true ) )
-                    {
-                        msg_Err( p_input, "seek failed for new slave" );
-                        InputSourceClean( slave );
-                        free( slave );
-                        break;
-                    }
-
-                    /* Get meta (access and demux) */
-                    InputUpdateMeta( p_input, slave->p_demux );
-
-                    TAB_APPEND( p_input->p->i_slave, p_input->p->slave, slave );
-                }
-                else
-                {
-                    free( slave );
                     msg_Warn( p_input, "failed to add %s as slave", uri );
+                    break;
                 }
+
+                int64_t i_time;
+
+                /* Add the slave */
+                msg_Dbg( p_input, "adding %s as slave on the fly", uri );
+
+                /* Set position */
+                if( demux_Control( p_input->p->master->p_demux,
+                                   DEMUX_GET_TIME, &i_time ) )
+                {
+                    msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
+                    InputSourceDestroy( slave );
+                    break;
+                }
+
+                if( demux_Control( slave->p_demux,
+                                   DEMUX_SET_TIME, i_time, true ) )
+                {
+                    msg_Err( p_input, "seek failed for new slave" );
+                    InputSourceDestroy( slave );
+                    break;
+                }
+
+                /* Get meta (access and demux) */
+                InputUpdateMeta( p_input, slave->p_demux );
+
+                TAB_APPEND( p_input->p->i_slave, p_input->p->slave, slave );
             }
             break;
 
@@ -2107,20 +2084,15 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
 /*****************************************************************************
  * InputSourceNew:
  *****************************************************************************/
-static input_source_t *InputSourceNew( input_thread_t *p_input )
+static input_source_t *InputSourceNew( input_thread_t *p_input,
+                                       const char *psz_mrl,
+                                       const char *psz_forced_demux,
+                                       bool b_in_can_fail )
 {
-    VLC_UNUSED(p_input);
+    input_source_t *in = calloc( 1,  sizeof( *in ) );
+    if( unlikely(in == NULL) )
+        return NULL;
 
-    return calloc( 1,  sizeof( input_source_t ) );
-}
-
-/*****************************************************************************
- * InputSourceInit:
- *****************************************************************************/
-static int InputSourceInit( input_thread_t *p_input,
-                            input_source_t *in, const char *psz_mrl,
-                            const char *psz_forced_demux, bool b_in_can_fail )
-{
     const char *psz_access, *psz_demux, *psz_path, *psz_anchor = NULL;
     double f_fps;
 
@@ -2128,7 +2100,10 @@ static int InputSourceInit( input_thread_t *p_input,
     char *psz_dup = strdup( psz_mrl );
 
     if( psz_dup == NULL )
-        return VLC_ENOMEM;
+    {
+        free( in );
+        return NULL;
+    }
 
     /* Split uri */
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, &psz_anchor, psz_dup );
@@ -2143,7 +2118,7 @@ static int InputSourceInit( input_thread_t *p_input,
     MRLSections( psz_anchor, &in->i_title_start, &in->i_title_end,
                  &in->i_seekpoint_start, &in->i_seekpoint_end );
 
-    if( p_input->p->master == in )
+    if( p_input->p->master == NULL /* XXX ugly */)
     {   /* On master stream only, use input-list */
         char *str = var_InheritString( p_input, "input-list" );
         if( str != NULL )
@@ -2207,7 +2182,8 @@ static int InputSourceInit( input_thread_t *p_input,
             dialog_Fatal( p_input, _("Your input can't be opened"),
                           _("VLC is unable to open the MRL '%s'."
                             " Check the log for details."), psz_mrl );
-        return VLC_EGENERIC;
+        free( in );
+        return NULL;
     }
 
     /* Get infos from (access_)demux */
@@ -2305,13 +2281,13 @@ static int InputSourceInit( input_thread_t *p_input,
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
         in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );
 
-    return VLC_SUCCESS;
+    return in;
 }
 
 /*****************************************************************************
- * InputSourceClean:
+ * InputSourceDestroy:
  *****************************************************************************/
-static void InputSourceClean( input_source_t *in )
+static void InputSourceDestroy( input_source_t *in )
 {
     int i;
 
@@ -2324,6 +2300,8 @@ static void InputSourceClean( input_source_t *in )
             vlc_input_title_Delete( in->title[i] );
         TAB_CLEAN( in->i_title, in->title );
     }
+
+    free( in );
 }
 
 /*****************************************************************************
@@ -2794,20 +2772,15 @@ static void MRLSections( const char *p,
 static void input_SubtitleAdd( input_thread_t *p_input,
                                const char *url, unsigned i_flags )
 {
-    input_source_t *sub = InputSourceNew( p_input );
-    if( sub == NULL )
-        return;
-
     vlc_value_t count;
 
     var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
 
-    if( InputSourceInit( p_input, sub, url, "subtitle",
-                         (i_flags & SUB_CANFAIL) ) )
-    {
-        free( sub );
+    input_source_t *sub = InputSourceNew( p_input, url, "subtitle",
+                                          (i_flags & SUB_CANFAIL) );
+    if( sub == NULL )
         return;
-    }
+
     TAB_APPEND( p_input->p->i_slave, p_input->p->slave, sub );
 
     if( !(i_flags & SUB_FORCED) )
