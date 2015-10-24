@@ -143,6 +143,22 @@ static vlc_family_t *SearchFallbacks( filter_t *p_filter, vlc_family_t *p_fallba
     return p_family;
 }
 
+static inline void AppendFont( vlc_font_t **pp_list, vlc_font_t *p_font )
+{
+    while( *pp_list )
+        pp_list = &( *pp_list )->p_next;
+
+    *pp_list = p_font;
+}
+
+static inline void AppendFamily( vlc_family_t **pp_list, vlc_family_t *p_family )
+{
+    while( *pp_list )
+        pp_list = &( *pp_list )->p_next;
+
+    *pp_list = p_family;
+}
+
 vlc_family_t *NewFamily( filter_t *p_filter, const char *psz_family,
                          vlc_family_t **pp_list, vlc_dictionary_t *p_dict,
                          const char *psz_key )

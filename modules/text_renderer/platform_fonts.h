@@ -33,6 +33,14 @@
 #ifndef PLATFORM_FONTS_H
 #define PLATFORM_FONTS_H
 
+/** \defgroup freetype_fonts Freetype Fonts management 
+ * \ingroup freetype
+ * Freetype text rendering cross platform
+ * @{
+ * \file
+ * Freetype module
+ */
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -81,44 +89,53 @@ typedef uint32_t uni_char_t;
 #endif
 
 #ifndef DEFAULT_FONT_FILE
-#define DEFAULT_FONT_FILE SYSTEM_DEFAULT_FONT_FILE
+# define DEFAULT_FONT_FILE SYSTEM_DEFAULT_FONT_FILE
 #endif
 
 #ifndef DEFAULT_FAMILY
-#define DEFAULT_FAMILY SYSTEM_DEFAULT_FAMILY
+# define DEFAULT_FAMILY SYSTEM_DEFAULT_FAMILY
 #endif
 
 #ifndef DEFAULT_MONOSPACE_FONT_FILE
-#define DEFAULT_MONOSPACE_FONT_FILE SYSTEM_DEFAULT_MONOSPACE_FONT_FILE
+# define DEFAULT_MONOSPACE_FONT_FILE SYSTEM_DEFAULT_MONOSPACE_FONT_FILE
 #endif
 
 #ifndef DEFAULT_MONOSPACE_FAMILY
-#define DEFAULT_MONOSPACE_FAMILY SYSTEM_DEFAULT_MONOSPACE_FAMILY
+# define DEFAULT_MONOSPACE_FAMILY SYSTEM_DEFAULT_MONOSPACE_FAMILY
 #endif
 
+/**
+ * Representation of the fonts (linked-list)
+ */
 typedef struct vlc_font_t vlc_font_t;
 struct vlc_font_t
 {
-    vlc_font_t *p_next;
-    char       *psz_fontfile;
-    int         i_index;
-    bool        b_bold;
-    bool        b_italic;
-    FT_Face     p_face;
+    vlc_font_t *p_next; /**< next font in the chain */
+    char       *psz_fontfile; /**< path to the file on the disk */
+    int         i_index; /**< index of the font in the font file, starts at 0 */
+    bool        b_bold; /**< if the font is a bold version */
+    bool        b_italic; /**< if the font is an italic version */
+    FT_Face     p_face; /**< the freetype structure for the font */
 };
 
+/**
+ * Representation of font families (linked-list)
+ */
 typedef struct vlc_family_t vlc_family_t;
 struct vlc_family_t
 {
-    vlc_family_t *p_next;
-    char         *psz_name;
-    vlc_font_t   *p_fonts;
+    vlc_family_t *p_next; /**< next family in the chain */
+    char         *psz_name; /**< Human-reable name, usually requested */
+    vlc_font_t   *p_fonts; /**< fonts matching this family */
 };
 
 #define FB_LIST_ATTACHMENTS "attachments"
 #define FB_LIST_DEFAULT     "default"
 #define FB_NAME             "fallback"
 
+/***
+ * PLATFORM SPECIFIC SELECTORS
+ **/
 #ifdef HAVE_FONTCONFIG
 const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_family );
 vlc_family_t *FontConfig_GetFallbacks( filter_t *p_filter, const char *psz_family,
@@ -142,10 +159,10 @@ char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
 #endif
 
 #ifdef __ANDROID__
-#define ANDROID_SYSTEM_FONTS "file:///system/etc/system_fonts.xml"
-#define ANDROID_FALLBACK_FONTS "file:///system/etc/fallback_fonts.xml"
-#define ANDROID_VENDOR_FONTS "file:///vendor/etc/fallback_fonts.xml"
-#define ANDROID_FONT_PATH "/system/fonts"
+# define ANDROID_SYSTEM_FONTS    "file:///system/etc/system_fonts.xml"
+# define ANDROID_FALLBACK_FONTS  "file:///system/etc/fallback_fonts.xml"
+# define ANDROID_VENDOR_FONTS    "file:///vendor/etc/fallback_fonts.xml"
+# define ANDROID_FONT_PATH       "/system/fonts"
 
 int Android_ParseSystemFonts( filter_t *p_filter, const char *psz_path );
 const vlc_family_t *Android_GetFamily( filter_t *p_filter, const char *psz_family );
@@ -163,44 +180,81 @@ char* Generic_Select( filter_t *p_filter, const char* family,
                       bool b_bold, bool b_italic,
                       int *i_idx, uni_char_t codepoint );
 
-static inline void AppendFont( vlc_font_t **pp_list, vlc_font_t *p_font )
-{
-    while( *pp_list )
-        pp_list = &( *pp_list )->p_next;
 
-    *pp_list = p_font;
-}
+/* ******************
+ * Family and fonts *
+ ********************/
 
-static inline void AppendFamily( vlc_family_t **pp_list, vlc_family_t *p_family )
-{
-    while( *pp_list )
-        pp_list = &( *pp_list )->p_next;
-
-    *pp_list = p_family;
-}
-
+/**
+ * Creates a new family.
+ *
+ * \param psz_family the usual font family name, human-readable;
+ *                   if NULL, will use "fallback-xx"[IN]
+ * \param pp_list the family list where to append the font;
+ *                can be NULL if not in a list [IN]
+ * \param p_dict dictionnary where to insert this family; can be NULL [IN]
+ * \param psz_key specific key for the dictionnary [IN]
+ *
+ * \return the new family representation
+ */
 vlc_family_t *NewFamily( filter_t *p_filter, const char *psz_family,
                          vlc_family_t **pp_list, vlc_dictionary_t *p_dict,
                          const char *psz_key );
 
-/* This function takes ownership of psz_fontfile */
+/**
+ * Creates a new font.
+ *
+ * \param psz_fontfile font file [IN]
+ * \param i_index index of the font in the font file [IN]
+ * \param b_bold is a bold font or not [IN]
+ * \param b_bold is an italic or not [IN]
+ * \param p_parent parent family.
+ *                 If not NULL, the font will be associated to this family, and
+ *                 appended to the font list in that family [IN]
+ *
+ * \remark This function takes ownership of psz_fontfile
+ * \return the new font
+ */
 vlc_font_t *NewFont( char *psz_fontfile, int i_index,
                      bool b_bold, bool b_italic,
                      vlc_family_t *p_parent );
 
+/**
+ * Free families and fonts associated.
+ *
+ * \param p_family the family to free [IN]
+ */
 void FreeFamiliesAndFonts( vlc_family_t *p_family );
+/**
+ * Free families, but not the fonts associated.
+ *
+ * \param p_families the families to free [IN]
+ */
 void FreeFamilies( void *p_families, void *p_obj );
 
 
+/**
+ * Construct the default family list
+ *
+ * In some platforms, you might want multiple fonts as default
+ *
+ * \param p_filter the freetype module object [IN]
+ * \param ppsz_default the table default fonts [IN]
+ * \param i_size the size of the supplied table [IN]
+ *
+ * return the default family font
+ */
 vlc_family_t *InitDefaultList( filter_t *p_filter, const char *const *ppsz_default,
                                int i_size );
 
+/* Debug Helpers */
 void DumpFamily( filter_t *p_filter, const vlc_family_t *p_family,
                  bool b_dump_fonts, int i_max_families );
 
 void DumpDictionary( filter_t *p_filter, const vlc_dictionary_t *p_dict,
                      bool b_dump_fonts, int i_max_families );
 
+/* String helpers */
 char* ToLower( const char *psz_src );
 
 #endif //PLATFORM_FONTS_H

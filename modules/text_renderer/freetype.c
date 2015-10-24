@@ -306,7 +306,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
         {
             p_sys->pp_font_attachments[ p_sys->i_font_attachments++ ] = p_attach;
 
-            int                 i_font_idx = 0;
+            int i_font_idx = 0;
 
             while( 0 == FT_New_Memory_Face( p_sys->p_library,
                                             p_attach->p_data,
@@ -354,7 +354,6 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
 
                 i_font_idx++;
             }
-
         }
         else
         {
