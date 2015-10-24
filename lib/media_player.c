@@ -1608,16 +1608,25 @@ void libvlc_media_player_previous_chapter( libvlc_media_player_t *p_mi )
 
 float libvlc_media_player_get_fps( libvlc_media_player_t *p_mi )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
-    double f_fps = 0.0;
+    libvlc_media_t *media = libvlc_media_player_get_media( p_mi );
+    if( media == NULL )
+        return 0.f;
 
-    if( p_input_thread )
+    input_item_t *item = p_mi->p_md->p_input_item;
+    float fps = 0.f;
+
+    vlc_mutex_lock( &item->lock );
+    for( int i = 0; i < item->i_es; i++ )
     {
-        if( input_Control( p_input_thread, INPUT_GET_VIDEO_FPS, &f_fps ) )
-            f_fps = 0.0;
-        vlc_object_release( p_input_thread );
+        const es_format_t *fmt = item->es[i];
+
+        if( fmt->i_cat == VIDEO_ES && fmt->video.i_frame_rate_base > 0 )
+            fps = (float)fmt->video.i_frame_rate
+                  / (float)fmt->video.i_frame_rate_base;
     }
-    return f_fps;
+    vlc_mutex_unlock( &item->lock );
+
+    return fps;
 }
 
 int libvlc_media_player_will_play( libvlc_media_player_t *p_mi )
