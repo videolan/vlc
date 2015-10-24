@@ -2089,7 +2089,8 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
                                        const char *psz_forced_demux,
                                        bool b_in_can_fail )
 {
-    input_source_t *in = calloc( 1,  sizeof( *in ) );
+    input_source_t *in = vlc_custom_create( p_input, sizeof( *in ),
+                                            "input source" );
     if( unlikely(in == NULL) )
         return NULL;
 
@@ -2171,7 +2172,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         TAB_CLEAN( count, tab );
     }
 
-    in->p_demux = input_DemuxNew( VLC_OBJECT(p_input), psz_access, psz_demux,
+    in->p_demux = input_DemuxNew( VLC_OBJECT(in), psz_access, psz_demux,
                                   psz_path, p_input->p->p_es_out,
                                   p_input->b_preparsing, p_input );
     free( psz_dup );
@@ -2182,7 +2183,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
             dialog_Fatal( p_input, _("Your input can't be opened"),
                           _("VLC is unable to open the MRL '%s'."
                             " Check the log for details."), psz_mrl );
-        free( in );
+        vlc_object_release( in );
         return NULL;
     }
 
@@ -2301,7 +2302,7 @@ static void InputSourceDestroy( input_source_t *in )
         TAB_CLEAN( in->i_title, in->title );
     }
 
-    free( in );
+    vlc_object_release( in );
 }
 
 /*****************************************************************************
@@ -2331,7 +2332,7 @@ static void InputSourceMeta( input_thread_t *p_input,
         return;
 
     demux_meta_t *p_demux_meta =
-        vlc_custom_create( p_input, sizeof( *p_demux_meta ), "demux meta" );
+        vlc_custom_create( p_source, sizeof( *p_demux_meta ), "demux meta" );
     if( unlikely(p_demux_meta == NULL) )
         return;
     p_demux_meta->p_item = p_input->p->p_item;
