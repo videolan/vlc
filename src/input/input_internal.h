@@ -127,7 +127,7 @@ struct input_thread_private_t
     input_item_t   *p_item;
 
     /* Main source */
-    input_source_t input;
+    input_source_t *master;
     /* Slave sources (subs, and others) */
     int            i_slave;
     input_source_t **slave;

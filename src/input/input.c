@@ -173,7 +173,7 @@ int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
         bool b_is_playlist = false;
 
         if ( input_item_ShouldPreparseSubItems( p_item )
-          && demux_Control( p_input->p->input.p_demux,
+          && demux_Control( p_input->p->master->p_demux,
                             DEMUX_IS_PLAYLIST,
                             &b_is_playlist ) )
             b_is_playlist = false;
@@ -256,6 +256,8 @@ static void input_Destructor( vlc_object_t *obj )
     msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
     free( psz_name );
 #endif
+
+    free( p_input->p->master );
 
     if( p_input->p->p_es_out_display )
         es_out_Delete( p_input->p->p_es_out_display );
@@ -357,16 +359,17 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->p_item = p_item;
 
     /* Init Input fields */
-    p_input->p->input.p_demux  = NULL;
-    p_input->p->input.b_title_demux = false;
-    p_input->p->input.i_title  = 0;
-    p_input->p->input.title    = NULL;
-    p_input->p->input.i_title_offset = p_input->p->input.i_seekpoint_offset = 0;
-    p_input->p->input.b_can_pace_control = true;
-    p_input->p->input.b_can_rate_control = true;
-    p_input->p->input.b_rescale_ts = true;
-    p_input->p->input.b_eof = false;
-
+    p_input->p->master = InputSourceNew( p_input );
+    if( unlikely(p_input->p->master == NULL) )
+    {
+        free( p_input->psz_header );
+        free( p_input->p );
+        vlc_object_release( p_input );
+        return NULL;
+    }
+    p_input->p->master->b_can_pace_control = true;
+    p_input->p->master->b_can_rate_control = true;
+    p_input->p->master->b_rescale_ts = true;
     vlc_mutex_lock( &p_item->lock );
 
     if( !p_item->p_stats )
@@ -547,18 +550,18 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t i_
         ( p_input->p->i_run > 0 && i_start_mdate+p_input->p->i_run < mdate() ) )
         i_ret = 0; /* EOF */
     else
-        i_ret = demux_Demux( p_input->p->input.p_demux );
+        i_ret = demux_Demux( p_input->p->master->p_demux );
 
     if( i_ret > 0 )
     {
-        if( p_input->p->input.p_demux->info.i_update )
+        if( p_input->p->master->p_demux->info.i_update )
         {
-            if( p_input->p->input.p_demux->info.i_update & INPUT_UPDATE_TITLE_LIST )
+            if( p_input->p->master->p_demux->info.i_update & INPUT_UPDATE_TITLE_LIST )
             {
                 UpdateTitleListfromDemux( p_input );
-                p_input->p->input.p_demux->info.i_update &= ~INPUT_UPDATE_TITLE_LIST;
+                p_input->p->master->p_demux->info.i_update &= ~INPUT_UPDATE_TITLE_LIST;
             }
-            if( p_input->p->input.b_title_demux )
+            if( p_input->p->master->b_title_demux )
             {
                 i_ret = UpdateTitleSeekpointFromDemux( p_input );
                 *pb_changed = true;
@@ -570,7 +573,7 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t i_
     if( i_ret == 0 )    /* EOF */
     {
         msg_Dbg( p_input, "EOF reached" );
-        p_input->p->input.b_eof = true;
+        p_input->p->master->b_eof = true;
         es_out_Eos(p_input->p->p_es_out);
     }
     else if( i_ret < 0 )
@@ -598,15 +601,15 @@ static int MainLoopTryRepeat( input_thread_t *p_input, mtime_t *pi_start_mdate )
     }
 
     /* Seek to start title/seekpoint */
-    val.i_int = p_input->p->input.i_title_start -
-        p_input->p->input.i_title_offset;
-    if( val.i_int < 0 || val.i_int >= p_input->p->input.i_title )
+    val.i_int = p_input->p->master->i_title_start -
+        p_input->p->master->i_title_offset;
+    if( val.i_int < 0 || val.i_int >= p_input->p->master->i_title )
         val.i_int = 0;
     input_ControlPush( p_input,
                        INPUT_CONTROL_SET_TITLE, &val );
 
-    val.i_int = p_input->p->input.i_seekpoint_start -
-        p_input->p->input.i_seekpoint_offset;
+    val.i_int = p_input->p->master->i_seekpoint_start -
+        p_input->p->master->i_seekpoint_offset;
     if( val.i_int > 0 /* TODO: check upper boundary */ )
         input_ControlPush( p_input,
                            INPUT_CONTROL_SET_SEEKPOINT, &val );
@@ -638,16 +641,16 @@ static void MainLoopStatistics( input_thread_t *p_input )
     mtime_t i_length = 0;
 
     /* update input status variables */
-    if( demux_Control( p_input->p->input.p_demux,
+    if( demux_Control( p_input->p->master->p_demux,
                        DEMUX_GET_POSITION, &f_position ) )
         f_position = 0.0;
 
-    if( demux_Control( p_input->p->input.p_demux,
+    if( demux_Control( p_input->p->master->p_demux,
                        DEMUX_GET_TIME, &i_time ) )
         i_time = 0;
     p_input->p->i_time = i_time;
 
-    if( demux_Control( p_input->p->input.p_demux,
+    if( demux_Control( p_input->p->master->p_demux,
                        DEMUX_GET_LENGTH, &i_length ) )
         i_length = 0;
 
@@ -686,11 +689,12 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
          * is paused -> this may cause problem with some of them
          * The same problem can be seen when seeking while paused */
         if( b_paused )
-            b_paused = !es_out_GetBuffering( p_input->p->p_es_out ) || p_input->p->input.b_eof;
+            b_paused = !es_out_GetBuffering( p_input->p->p_es_out )
+                    || p_input->p->master->b_eof;
 
         if( !b_paused )
         {
-            if( !p_input->p->input.b_eof )
+            if( !p_input->p->master->b_eof )
             {
                 bool b_force_update = false;
 
@@ -739,7 +743,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             /* Postpone seeking until ES buffering is complete or at most
              * 125 ms. */
             bool b_postpone = es_out_GetBuffering( p_input->p->p_es_out )
-                            && !p_input->p->input.b_eof;
+                            && !p_input->p->master->b_eof;
             if( b_postpone )
             {
                 mtime_t now = mdate();
@@ -846,7 +850,7 @@ static int InitSout( input_thread_t * p_input )
 
 static void InitTitle( input_thread_t * p_input )
 {
-    input_source_t *p_master = &p_input->p->input;
+    input_source_t *p_master = p_input->p->master;
 
     if( p_input->b_preparsing )
         return;
@@ -876,13 +880,13 @@ static void StartTitle( input_thread_t * p_input )
     vlc_value_t val;
 
     /* Start title/chapter */
-    val.i_int = p_input->p->input.i_title_start -
-                p_input->p->input.i_title_offset;
-    if( val.i_int > 0 && val.i_int < p_input->p->input.i_title )
+    val.i_int = p_input->p->master->i_title_start -
+                p_input->p->master->i_title_offset;
+    if( val.i_int > 0 && val.i_int < p_input->p->master->i_title )
         input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &val );
 
-    val.i_int = p_input->p->input.i_seekpoint_start -
-                p_input->p->input.i_seekpoint_offset;
+    val.i_int = p_input->p->master->i_seekpoint_start -
+                p_input->p->master->i_seekpoint_offset;
     if( val.i_int > 0 /* TODO: check upper boundary */ )
         input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 
@@ -1054,7 +1058,7 @@ static void UpdatePtsDelay( input_thread_t *p_input )
     input_thread_private_t *p_sys = p_input->p;
 
     /* Get max pts delay from input source */
-    mtime_t i_pts_delay = p_sys->input.i_pts_delay;
+    mtime_t i_pts_delay = p_sys->master->i_pts_delay;
     for( int i = 0; i < p_sys->i_slave; i++ )
         i_pts_delay = __MAX( i_pts_delay, p_sys->slave[i]->i_pts_delay );
 
@@ -1120,17 +1124,17 @@ static void InitPrograms( input_thread_t * p_input )
     /* Inform the demuxer about waited group (needed only for DVB) */
     if( i_es_out_mode == ES_OUT_MODE_ALL )
     {
-        demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1, NULL );
+        demux_Control( p_input->p->master->p_demux, DEMUX_SET_GROUP, -1, NULL );
     }
     else if( i_es_out_mode == ES_OUT_MODE_PARTIAL )
     {
-        demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1,
+        demux_Control( p_input->p->master->p_demux, DEMUX_SET_GROUP, -1,
                        &list );
         TAB_CLEAN( list.i_count, list.p_values );
     }
     else
     {
-        demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP,
+        demux_Control( p_input->p->master->p_demux, DEMUX_SET_GROUP,
                        es_out_GetGroupForced( p_input->p->p_es_out ), NULL );
     }
 }
@@ -1165,7 +1169,7 @@ static int Init( input_thread_t * p_input )
     input_SendEventCache( p_input, 0.0 );
 
     /* */
-    if( InputSourceInit( p_input, &p_input->p->input,
+    if( InputSourceInit( p_input, p_input->p->master,
                          p_input->p->p_item->psz_uri, NULL, false ) )
     {
         goto error;
@@ -1176,7 +1180,7 @@ static int Init( input_thread_t * p_input )
     /* Load master infos */
     /* Init length */
     mtime_t i_length;
-    if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_LENGTH,
+    if( demux_Control( p_input->p->master->p_demux, DEMUX_GET_LENGTH,
                          &i_length ) )
         i_length = 0;
     if( i_length <= 0 )
@@ -1222,7 +1226,7 @@ static int Init( input_thread_t * p_input )
         InputMetaUser( p_input, p_meta );
 
         /* Get meta data from master input */
-        InputSourceMeta( p_input, &p_input->p->input, p_meta );
+        InputSourceMeta( p_input, p_input->p->master, p_meta );
 
         /* And from slave */
         for( int i = 0; i < p_input->p->i_slave; i++ )
@@ -1286,7 +1290,7 @@ error:
     }
 
     /* Mark them deleted */
-    p_input->p->input.p_demux = NULL;
+    p_input->p->master->p_demux = NULL;
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout = NULL;
 
@@ -1310,7 +1314,7 @@ static void End( input_thread_t * p_input )
     es_out_SetMode( p_input->p->p_es_out, ES_OUT_MODE_NONE );
 
     /* Clean up master */
-    InputSourceClean( &p_input->p->input );
+    InputSourceClean( p_input->p->master );
 
     /* Delete slave */
     for( i = 0; i < p_input->p->i_slave; i++ )
@@ -1534,7 +1538,7 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
 
     if( p_input->p->b_can_pause )
     {
-        demux_t *p_demux = p_input->p->input.p_demux;
+        demux_t *p_demux = p_input->p->master->p_demux;
 
         if( demux_Control( p_demux, DEMUX_SET_PAUSE_STATE, true ) )
         {
@@ -1559,7 +1563,7 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 {
     if( p_input->p->b_can_pause )
     {
-        demux_t *p_demux = p_input->p->input.p_demux;
+        demux_t *p_demux = p_input->p->master->p_demux;
 
         if( demux_Control( p_demux, DEMUX_SET_PAUSE_STATE, false ) )
         {
@@ -1601,7 +1605,7 @@ static bool Control( input_thread_t *p_input,
                 f_pos = 1.f;
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_SetTime( p_input->p->p_es_out, -1 );
-            if( demux_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
+            if( demux_Control( p_input->p->master->p_demux, DEMUX_SET_POSITION,
                                (double) f_pos, !p_input->p->b_fast_seek ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) "
@@ -1611,7 +1615,7 @@ static bool Control( input_thread_t *p_input,
             {
                 if( p_input->p->i_slave > 0 )
                     SlaveSeek( p_input );
-                p_input->p->input.b_eof = false;
+                p_input->p->master->b_eof = false;
 
                 b_force_update = true;
             }
@@ -1636,7 +1640,7 @@ static bool Control( input_thread_t *p_input,
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_SetTime( p_input->p->p_es_out, -1 );
 
-            i_ret = demux_Control( p_input->p->input.p_demux,
+            i_ret = demux_Control( p_input->p->master->p_demux,
                                    DEMUX_SET_TIME, i_time,
                                    !p_input->p->b_fast_seek );
             if( i_ret )
@@ -1644,11 +1648,11 @@ static bool Control( input_thread_t *p_input,
                 int64_t i_length;
 
                 /* Emulate it with a SET_POS */
-                if( !demux_Control( p_input->p->input.p_demux,
+                if( !demux_Control( p_input->p->master->p_demux,
                                     DEMUX_GET_LENGTH, &i_length ) && i_length > 0 )
                 {
                     double f_pos = (double)i_time / (double)i_length;
-                    i_ret = demux_Control( p_input->p->input.p_demux,
+                    i_ret = demux_Control( p_input->p->master->p_demux,
                                             DEMUX_SET_POSITION, f_pos,
                                             !p_input->p->b_fast_seek );
                 }
@@ -1662,7 +1666,7 @@ static bool Control( input_thread_t *p_input,
             {
                 if( p_input->p->i_slave > 0 )
                     SlaveSeek( p_input );
-                p_input->p->input.b_eof = false;
+                p_input->p->master->b_eof = false;
 
                 b_force_update = true;
             }
@@ -1712,7 +1716,7 @@ static bool Control( input_thread_t *p_input,
             /* Apply direction */
             if( i_rate_sign < 0 )
             {
-                if( p_input->p->input.b_rescale_ts )
+                if( p_input->p->master->b_rescale_ts )
                 {
                     msg_Dbg( p_input, "cannot set negative rate" );
                     i_rate = p_input->p->i_rate;
@@ -1725,7 +1729,7 @@ static bool Control( input_thread_t *p_input,
             }
 
             if( i_rate != INPUT_RATE_DEFAULT &&
-                ( ( !p_input->p->b_can_rate_control && !p_input->p->input.b_rescale_ts ) ||
+                ( ( !p_input->p->b_can_rate_control && !p_input->p->master->b_rescale_ts ) ||
                   ( p_input->p->p_sout && !p_input->p->b_out_pace_control ) ) )
             {
                 msg_Dbg( p_input, "cannot change rate" );
@@ -1734,16 +1738,16 @@ static bool Control( input_thread_t *p_input,
             if( i_rate != p_input->p->i_rate &&
                 !p_input->p->b_can_pace_control && p_input->p->b_can_rate_control )
             {
-                demux_t *p_demux = p_input->p->input.p_demux;
+                demux_t *p_demux = p_input->p->master->p_demux;
                 int i_ret = VLC_EGENERIC;
 
                 if( p_demux->s == NULL )
                 {
-                    if( !p_input->p->input.b_rescale_ts )
+                    if( !p_input->p->master->b_rescale_ts )
                         es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
 
-                    i_ret = demux_Control( p_input->p->input.p_demux,
-                                            DEMUX_SET_RATE, &i_rate );
+                    i_ret = demux_Control( p_input->p->master->p_demux,
+                                           DEMUX_SET_RATE, &i_rate );
                 }
                 if( i_ret )
                 {
@@ -1758,7 +1762,7 @@ static bool Control( input_thread_t *p_input,
                 p_input->p->i_rate = i_rate;
                 input_SendEventRate( p_input, i_rate );
 
-                if( p_input->p->input.b_rescale_ts )
+                if( p_input->p->master->b_rescale_ts )
                 {
                     const int i_rate_source = (p_input->p->b_can_pace_control || p_input->p->b_can_rate_control ) ? i_rate : INPUT_RATE_DEFAULT;
                     es_out_SetRate( p_input->p->p_es_out, i_rate_source, i_rate );
@@ -1774,7 +1778,7 @@ static bool Control( input_thread_t *p_input,
             es_out_Control( p_input->p->p_es_out,
                             ES_OUT_SET_GROUP, val.i_int );
 
-            demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, val.i_int,
+            demux_Control( p_input->p->master->p_demux, DEMUX_SET_GROUP, val.i_int,
                             NULL );
             break;
 
@@ -1783,7 +1787,7 @@ static bool Control( input_thread_t *p_input,
             es_out_Control( p_input->p->p_es_out_display,
                             ES_OUT_SET_ES_BY_ID, (int)val.i_int );
 
-            demux_Control( p_input->p->input.p_demux, DEMUX_SET_ES, (int)val.i_int );
+            demux_Control( p_input->p->master->p_demux, DEMUX_SET_ES, (int)val.i_int );
             break;
 
         case INPUT_CONTROL_RESTART_ES:
@@ -1810,21 +1814,21 @@ static bool Control( input_thread_t *p_input,
                 msg_Err( p_input, "INPUT_CONTROL_SET_TITLE(*) ignored while recording" );
                 break;
             }
-            if( p_input->p->input.i_title <= 0 )
+            if( p_input->p->master->i_title <= 0 )
                 break;
 
-            int i_title = p_input->p->input.p_demux->info.i_title;
+            int i_title = p_input->p->master->p_demux->info.i_title;
             if( i_type == INPUT_CONTROL_SET_TITLE_PREV )
                 i_title--;
             else if( i_type == INPUT_CONTROL_SET_TITLE_NEXT )
                 i_title++;
             else
                 i_title = val.i_int;
-            if( i_title < 0 || i_title >= p_input->p->input.i_title )
+            if( i_title < 0 || i_title >= p_input->p->master->i_title )
                 break;
 
             es_out_SetTime( p_input->p->p_es_out, -1 );
-            demux_Control( p_input->p->input.p_demux,
+            demux_Control( p_input->p->master->p_demux,
                            DEMUX_SET_TITLE, i_title );
             input_SendEventTitle( p_input, i_title );
             break;
@@ -1838,17 +1842,17 @@ static bool Control( input_thread_t *p_input,
                 msg_Err( p_input, "INPUT_CONTROL_SET_SEEKPOINT(*) ignored while recording" );
                 break;
             }
-            if( p_input->p->input.i_title <= 0 )
+            if( p_input->p->master->i_title <= 0 )
                 break;
 
-            demux_t *p_demux = p_input->p->input.p_demux;
+            demux_t *p_demux = p_input->p->master->p_demux;
 
             int i_title = p_demux->info.i_title;
             int i_seekpoint = p_demux->info.i_seekpoint;
 
             if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
             {
-                int64_t i_seekpoint_time = p_input->p->input.title[i_title]->seekpoint[i_seekpoint]->i_time_offset;
+                int64_t i_seekpoint_time = p_input->p->master->title[i_title]->seekpoint[i_seekpoint]->i_time_offset;
                 int64_t i_input_time = var_GetInteger( p_input, "time" );
                 if( i_seekpoint_time >= 0 && i_input_time >= 0 )
                 {
@@ -1863,11 +1867,11 @@ static bool Control( input_thread_t *p_input,
             else
                 i_seekpoint = val.i_int;
             if( i_seekpoint < 0
-             || i_seekpoint >= p_input->p->input.title[i_title]->i_seekpoint )
+             || i_seekpoint >= p_input->p->master->title[i_title]->i_seekpoint )
                 break;
 
             es_out_SetTime( p_input->p->p_es_out, -1 );
-            demux_Control( p_input->p->input.p_demux,
+            demux_Control( p_input->p->master->p_demux,
                            DEMUX_SET_SEEKPOINT, i_seekpoint );
             input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
             break;
@@ -1892,7 +1896,7 @@ static bool Control( input_thread_t *p_input,
                     msg_Dbg( p_input, "adding %s as slave on the fly", uri );
 
                     /* Set position */
-                    if( demux_Control( p_input->p->input.p_demux,
+                    if( demux_Control( p_input->p->master->p_demux,
                                         DEMUX_GET_TIME, &i_time ) )
                     {
                         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
@@ -1925,9 +1929,9 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_SET_RECORD_STATE:
             if( !!p_input->p->b_recording != !!val.b_bool )
             {
-                if( p_input->p->input.b_can_stream_record )
+                if( p_input->p->master->b_can_stream_record )
                 {
-                    if( demux_Control( p_input->p->input.p_demux,
+                    if( demux_Control( p_input->p->master->p_demux,
                                        DEMUX_SET_RECORD_STATE, val.b_bool ) )
                         val.b_bool = false;
                 }
@@ -1988,7 +1992,7 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_NAV_DOWN:
         case INPUT_CONTROL_NAV_LEFT:
         case INPUT_CONTROL_NAV_RIGHT:
-            demux_Control( p_input->p->input.p_demux, i_type
+            demux_Control( p_input->p->master->p_demux, i_type
                            - INPUT_CONTROL_NAV_ACTIVATE + DEMUX_NAV_ACTIVATE );
             break;
 
@@ -2007,10 +2011,10 @@ static bool Control( input_thread_t *p_input,
 static int UpdateTitleSeekpoint( input_thread_t *p_input,
                                  int i_title, int i_seekpoint )
 {
-    int i_title_end = p_input->p->input.i_title_end -
-                        p_input->p->input.i_title_offset;
-    int i_seekpoint_end = p_input->p->input.i_seekpoint_end -
-                            p_input->p->input.i_seekpoint_offset;
+    int i_title_end = p_input->p->master->i_title_end -
+                        p_input->p->master->i_title_offset;
+    int i_seekpoint_end = p_input->p->master->i_seekpoint_end -
+                            p_input->p->master->i_seekpoint_offset;
 
     if( i_title_end >= 0 && i_seekpoint_end >= 0 )
     {
@@ -2035,7 +2039,7 @@ static int UpdateTitleSeekpoint( input_thread_t *p_input,
  *****************************************************************************/
 static int UpdateTitleSeekpointFromDemux( input_thread_t *p_input )
 {
-    demux_t *p_demux = p_input->p->input.p_demux;
+    demux_t *p_demux = p_input->p->master->p_demux;
 
     /* TODO event-like */
     if( p_demux->info.i_update & INPUT_UPDATE_TITLE )
@@ -2059,7 +2063,7 @@ static int UpdateTitleSeekpointFromDemux( input_thread_t *p_input )
 
 static void UpdateGenericFromDemux( input_thread_t *p_input )
 {
-    demux_t *p_demux = p_input->p->input.p_demux;
+    demux_t *p_demux = p_input->p->master->p_demux;
 
     if( p_demux->info.i_update & INPUT_UPDATE_META )
     {
@@ -2077,7 +2081,7 @@ static void UpdateGenericFromDemux( input_thread_t *p_input )
 
 static void UpdateTitleListfromDemux( input_thread_t *p_input )
 {
-    input_source_t *in = &p_input->p->input;
+    input_source_t *in = p_input->p->master;
 
     /* Delete the preexisting titles */
     if( in->i_title > 0 )
@@ -2139,7 +2143,7 @@ static int InputSourceInit( input_thread_t *p_input,
     MRLSections( psz_anchor, &in->i_title_start, &in->i_title_end,
                  &in->i_seekpoint_start, &in->i_seekpoint_end );
 
-    if( &p_input->p->input == in )
+    if( p_input->p->master == in )
     {   /* On master stream only, use input-list */
         char *str = var_InheritString( p_input, "input-list" );
         if( str != NULL )
@@ -2381,7 +2385,7 @@ static void SlaveDemux( input_thread_t *p_input )
     int64_t i_time;
     int i;
 
-    if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_TIME, &i_time ) )
+    if( demux_Control( p_input->p->master->p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
         return;
@@ -2437,7 +2441,7 @@ static void SlaveSeek( input_thread_t *p_input )
     int64_t i_time;
     int i;
 
-    if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_TIME, &i_time ) )
+    if( demux_Control( p_input->p->master->p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
         return;
