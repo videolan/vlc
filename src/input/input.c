@@ -2273,11 +2273,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     }
 
     if( !demux_Control( in->p_demux, DEMUX_GET_FPS, &f_fps ) && f_fps > 0.0 )
-    {
-        vlc_mutex_lock( &p_input->p->p_item->lock );
         p_input->p->f_fps = f_fps;
-        vlc_mutex_unlock( &p_input->p->p_item->lock );
-    }
 
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
         in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );
