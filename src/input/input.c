@@ -912,7 +912,7 @@ static void LoadSubtitles( input_thread_t *p_input )
 {
     /* Load subtitles */
     /* Get fps and set it if not already set */
-    const float f_fps = p_input->p->f_fps;
+    const float f_fps = p_input->p->master->f_fps;
     if( f_fps > 1.f )
     {
         var_Create( p_input, "sub-original-fps", VLC_VAR_FLOAT );
@@ -2095,7 +2095,6 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         return NULL;
 
     const char *psz_access, *psz_demux, *psz_path, *psz_anchor = NULL;
-    double f_fps;
 
     assert( psz_mrl );
     char *psz_dup = strdup( psz_mrl );
@@ -2272,8 +2271,8 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
             in->i_pts_delay = 0;
     }
 
-    if( !demux_Control( in->p_demux, DEMUX_GET_FPS, &f_fps ) && f_fps > 0.0 )
-        p_input->p->f_fps = f_fps;
+    if( demux_Control( in->p_demux, DEMUX_GET_FPS, &in->f_fps ) )
+        in->f_fps = 0.f;
 
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
         in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );

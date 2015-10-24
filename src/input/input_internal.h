@@ -63,6 +63,7 @@ typedef struct
     bool b_can_rate_control;
     bool b_can_stream_record;
     bool b_rescale_ts;
+    double f_fps;
 
     /* */
     int64_t i_pts_delay;
@@ -81,7 +82,6 @@ typedef struct
 struct input_thread_private_t
 {
     /* Global properties */
-    double      f_fps;
     bool        b_can_pause;
     bool        b_can_rate_control;
     bool        b_can_pace_control;
