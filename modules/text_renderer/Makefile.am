@@ -11,6 +11,9 @@ libfreetype_plugin_la_SOURCES = \
 if HAVE_WIN32
 libfreetype_plugin_la_SOURCES += text_renderer/fonts/win32.c
 endif
+if HAVE_FONTCONFIG
+libfreetype_plugin_la_SOURCES += text_renderer/fonts/fontconfig.c
+endif
 
 libfreetype_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(FREETYPE_CFLAGS)
 libfreetype_plugin_la_LIBADD = $(LIBM) $(FREETYPE_LIBS)
