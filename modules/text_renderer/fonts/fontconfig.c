@@ -36,6 +36,7 @@
 
 #include <vlc_common.h>
 #include <vlc_filter.h>                                      /* filter_sys_t */
+#include <vlc_dialog.h>                        /* FcCache dialog */
 
 #include <fontconfig/fontconfig.h>
 
