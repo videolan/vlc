@@ -1405,18 +1405,6 @@ static int Android_ParseFamily( filter_t *p_filter, xml_reader_t *p_xml )
     return VLC_EGENERIC;
 }
 
-int Android_Prepare( filter_t *p_filter )
-{
-    if( Android_ParseSystemFonts( p_filter, ANDROID_SYSTEM_FONTS ) == VLC_ENOMEM )
-        return VLC_EGENERIC;
-    if( Android_ParseSystemFonts( p_filter, ANDROID_FALLBACK_FONTS ) == VLC_ENOMEM )
-        return VLC_EGENERIC;
-    if( Android_ParseSystemFonts( p_filter, ANDROID_VENDOR_FONTS ) == VLC_ENOMEM )
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
-}
-
 static int Android_ParseSystemFonts( filter_t *p_filter, const char *psz_path )
 {
     int i_ret = VLC_SUCCESS;
@@ -1447,6 +1435,18 @@ static int Android_ParseSystemFonts( filter_t *p_filter, const char *psz_path )
     xml_ReaderDelete( p_xml );
     stream_Delete( p_stream );
     return i_ret;
+}
+
+int Android_Prepare( filter_t *p_filter )
+{
+    if( Android_ParseSystemFonts( p_filter, ANDROID_SYSTEM_FONTS ) == VLC_ENOMEM )
+        return VLC_EGENERIC;
+    if( Android_ParseSystemFonts( p_filter, ANDROID_FALLBACK_FONTS ) == VLC_ENOMEM )
+        return VLC_EGENERIC;
+    if( Android_ParseSystemFonts( p_filter, ANDROID_VENDOR_FONTS ) == VLC_ENOMEM )
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
 }
 
 const vlc_family_t *Android_GetFamily( filter_t *p_filter, const char *psz_family )
