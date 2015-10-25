@@ -45,6 +45,7 @@ namespace adaptative
                 virtual ~DOMParser  ();
 
                 bool                parse       ();
+                bool                reset       (stream_t *);
                 Node*               getRootNode ();
                 void                print       ();
 

@@ -65,6 +65,15 @@ bool    DOMParser::parse                    ()
     return true;
 }
 
+bool DOMParser::reset(stream_t *s)
+{
+    delete root;
+    root = NULL;
+    stream = s;
+    vlc_reader = xml_ReaderReset(vlc_reader, s);
+    return !!vlc_reader;
+}
+
 Node* DOMParser::processNode()
 {
     const char *data;
