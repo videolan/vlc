@@ -37,8 +37,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_stream.h>                        /* stream_MemoryNew */
-#include <vlc_input.h>                         /* vlc_input_attachment_* */
+#include <vlc_input.h>                             /* vlc_input_attachment_* */
 #include <vlc_filter.h>                                      /* filter_sys_t */
 #include <vlc_text_style.h>                                   /* text_style_t*/
 #include <vlc_charset.h>
