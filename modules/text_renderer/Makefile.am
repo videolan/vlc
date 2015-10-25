@@ -8,6 +8,10 @@ libfreetype_plugin_la_SOURCES = \
 	text_renderer/freetype.c text_renderer/freetype.h \
 	text_renderer/text_layout.c text_renderer/text_layout.h
 
+if HAVE_WIN32
+libfreetype_plugin_la_SOURCES += text_renderer/fonts/win32.c
+endif
+
 libfreetype_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(FREETYPE_CFLAGS)
 libfreetype_plugin_la_LIBADD = $(LIBM) $(FREETYPE_LIBS)
 if HAVE_FREETYPE
