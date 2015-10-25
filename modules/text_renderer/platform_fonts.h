@@ -45,20 +45,7 @@
 # include "config.h"
 #endif
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-#ifdef __OS2__
-typedef uint16_t uni_char_t;
-# define FREETYPE_TO_UCS    "UCS-2LE"
-#else
-typedef uint32_t uni_char_t;
-# if defined(WORDS_BIGENDIAN)
-#  define FREETYPE_TO_UCS   "UCS-4BE"
-# else
-#  define FREETYPE_TO_UCS   "UCS-4LE"
-# endif
-#endif
+#include "freetype.h"
 
 /* Default fonts */
 #ifdef __APPLE__
@@ -121,7 +108,6 @@ struct vlc_font_t
 /**
  * Representation of font families (linked-list)
  */
-typedef struct vlc_family_t vlc_family_t;
 struct vlc_family_t
 {
     vlc_family_t *p_next; /**< next family in the chain */

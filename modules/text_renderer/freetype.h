@@ -28,15 +28,36 @@
 #ifndef VLC_FREETYPE_H
 #define VLC_FREETYPE_H
 
-#include <vlc_text_style.h>                                   /* text_style_t*/
-#include <vlc_arrays.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_text_style.h>                             /* text_style_t */
+#include <vlc_arrays.h>                                 /* vlc_dictionary_t */
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_STROKER_H
 
-#include "platform_fonts.h"
+/* Consistency between Freetype versions and platforms */
+#define FT_FLOOR(X)     ((X & -64) >> 6)
+#define FT_CEIL(X)      (((X + 63) & -64) >> 6)
+#ifndef FT_MulFix
+# define FT_MulFix(v, s) (((v)*(s))>>16)
+#endif
+
+#ifdef __OS2__
+typedef uint16_t uni_char_t;
+# define FREETYPE_TO_UCS    "UCS-2LE"
+#else
+typedef uint32_t uni_char_t;
+# if defined(WORDS_BIGENDIAN)
+#  define FREETYPE_TO_UCS   "UCS-4BE"
+# else
+#  define FREETYPE_TO_UCS   "UCS-4LE"
+# endif
+#endif
 
 /*****************************************************************************
  * filter_sys_t: freetype local data
@@ -44,6 +65,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the freetype specific properties of an output thread.
  *****************************************************************************/
+typedef struct vlc_family_t vlc_family_t;
 struct filter_sys_t
 {
     FT_Library     p_library;   /* handle to library     */
@@ -51,7 +73,7 @@ struct filter_sys_t
     FT_Stroker     p_stroker;   /* handle to path stroker object */
 
     text_style_t  *p_default_style;
-    text_style_t  *p_forced_style;/* Renderer overridings */
+    text_style_t  *p_forced_style;  /* Renderer overridings */
 
     /* More styles... */
     float          f_shadow_vector_x;
@@ -85,17 +107,20 @@ struct filter_sys_t
     int               i_fallback_counter;
     int               i_scale;
 
+    /**
+     * Select a font, based on the family, the styles and the codepoint
+     */
     char * (*pf_select) (filter_t *, const char* family,
                          bool bold, bool italic,
                          int *index, uni_char_t codepoint);
 
-    /*
+    /**
      * Get a pointer to the vlc_family_t in the master list that matches psz_family.
      * Add this family to the list if it hasn't been added yet.
      */
     const vlc_family_t * (*pf_get_family) ( filter_t *p_filter, const char *psz_family );
 
-    /*
+    /**
      * Get the fallback list for psz_family from the system and cache
      * it in fallback_map.
      * On Windows fallback lists are populated progressively as required
@@ -104,12 +129,6 @@ struct filter_sys_t
     vlc_family_t * (*pf_get_fallbacks) ( filter_t *p_filter, const char *psz_family,
                                          uni_char_t codepoint );
 };
-
-#define FT_FLOOR(X)     ((X & -64) >> 6)
-#define FT_CEIL(X)      (((X + 63) & -64) >> 6)
-#ifndef FT_MulFix
- #define FT_MulFix(v, s) (((v)*(s))>>16)
-#endif
 
 FT_Face LoadFace( filter_t *p_filter, const char *psz_fontfile, int i_idx,
                   const text_style_t *p_style );
