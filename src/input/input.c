@@ -686,8 +686,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 bool b_force_update = false;
 
                 MainLoopDemux( p_input, &b_force_update, i_start_mdate );
-                i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
 
+                if( p_input->p->master->p_demux->pf_demux != NULL )
+                    i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
                 if( b_force_update )
                     i_intf_update = 0;
             }
