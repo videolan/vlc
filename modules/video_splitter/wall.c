@@ -69,7 +69,7 @@ vlc_module_begin()
     set_shortname( N_("Image wall" ))
     set_capability( "video splitter", 0 )
     set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_subcategory( SUBCAT_VIDEO_SPLITTER )
 
     add_integer( CFG_PREFIX "cols", 3, COLS_TEXT, COLS_LONGTEXT, false )
     change_integer_range( 1, COL_MAX )

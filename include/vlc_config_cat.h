@@ -82,6 +82,10 @@
 #define SUBPIC_TITLE N_( "Subtitles / OSD")
 #define SUBPIC_HELP N_( "Settings related to On-Screen-Display,"\
         " subtitles and \"overlay subpictures\"")
+
+#define SPLITTER_TITLE N_("Splitters")
+#define SPLITTER_HELP N_("Video splitters separate the stream into multiple videos.")
+
 /*
 #define TEXT_HELP N_( \
     "Use the settings of the \"freetype\" module to choose the font you " \
@@ -202,6 +206,7 @@ static const struct config_category_t categories_array[] =
     { SUBCAT_VIDEO_VOUT, _VOUT_TITLE, VOUT_HELP },
     { SUBCAT_VIDEO_VFILTER, VFILTER_TITLE, VFILTER_HELP },
     { SUBCAT_VIDEO_SUBPIC, SUBPIC_TITLE, SUBPIC_HELP },
+    { SUBCAT_VIDEO_SPLITTER, SPLITTER_TITLE, SPLITTER_HELP },
 
     { CAT_INPUT, INPUT_TITLE, INPUT_HELP },
     { SUBCAT_INPUT_GENERAL, INPUT_TITLE, INPUT_HELP },
