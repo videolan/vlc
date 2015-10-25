@@ -580,6 +580,18 @@ static int blurayOpen(vlc_object_t *object)
 
     p_sys->b_menu = var_InheritBool(p_demux, "bluray-menu");
 
+    /* Check BD-J capability */
+    if (p_sys->b_menu && disc_info->bdj_detected && !disc_info->bdj_handled) {
+        msg_Err(p_demux, "BD-J menus not supported. Playing without menus. "
+                "BD-J support: %d, JVM found: %d, JVM usable: %d",
+                disc_info->bdj_supported, disc_info->libjvm_detected, disc_info->bdj_handled);
+        dialog_Fatal(p_demux, _("Java required"),
+                     _("This Blu-ray disc needs Java for menus.%s\nDisc is played without menus."),
+                     !disc_info->libjvm_detected ? _(" Java was not found from your system.") : "");
+        p_sys->b_menu = false;
+    }
+
+    /* Get titles and chapters */
     blurayInitTitles(p_demux, disc_info->num_hdmv_titles + disc_info->num_bdj_titles + 1/*Top Menu*/ + 1/*First Play*/);
 
     /*
