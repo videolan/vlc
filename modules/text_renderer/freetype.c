@@ -1185,6 +1185,7 @@ static int Create( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
+    /* Init Freetype and its stroker */
     if( FT_Init_FreeType( &p_sys->p_library ) )
     {
         msg_Err( p_filter, "Failed to initialize FreeType" );
@@ -1198,15 +1199,11 @@ static int Create( vlc_object_t *p_this )
         p_sys->p_stroker = NULL;
     }
 
-    p_sys->pp_font_attachments = NULL;
-    p_sys->i_font_attachments = 0;
-    p_sys->p_families = NULL;
-
+    /* Dictionnaries for fonts and families */
     vlc_dictionary_init( &p_sys->face_map, 50 );
     vlc_dictionary_init( &p_sys->family_map, 50 );
     vlc_dictionary_init( &p_sys->fallback_map, 20 );
 
-    p_sys->i_fallback_counter = 0;
     p_sys->i_scale = 100;
 
     /* default style to apply to uncomplete segmeents styles */
@@ -1230,12 +1227,12 @@ static int Create( vlc_object_t *p_this )
      */
 
     double f_outline_thickness = var_InheritInteger( p_filter, "freetype-outline-thickness" ) / 100.0;
-    f_outline_thickness = VLC_CLIP( f_outline_thickness, 0.0, 0.5 );
-    float f_shadow_angle = var_InheritFloat( p_filter, "freetype-shadow-angle" );
-    float f_shadow_distance = var_InheritFloat( p_filter, "freetype-shadow-distance" );
-    f_shadow_distance = VLC_CLIP( f_shadow_distance, 0, 1 );
-    p_sys->f_shadow_vector_x = f_shadow_distance * cosf((float)(2. * M_PI) * f_shadow_angle / 360);
-    p_sys->f_shadow_vector_y = f_shadow_distance * sinf((float)(2. * M_PI) * f_shadow_angle / 360);
+    f_outline_thickness        = VLC_CLIP( f_outline_thickness, 0.0, 0.5 );
+    float f_shadow_angle       = var_InheritFloat( p_filter, "freetype-shadow-angle" );
+    float f_shadow_distance    = var_InheritFloat( p_filter, "freetype-shadow-distance" );
+    f_shadow_distance          = VLC_CLIP( f_shadow_distance, 0, 1 );
+    p_sys->f_shadow_vector_x   = f_shadow_distance * cosf((float)(2. * M_PI) * f_shadow_angle / 360);
+    p_sys->f_shadow_vector_y   = f_shadow_distance * sinf((float)(2. * M_PI) * f_shadow_angle / 360);
 
     /* Set default psz_fontname */
     if( !p_sys->p_default_style->psz_fontname || !*p_sys->p_default_style->psz_fontname )
@@ -1306,29 +1303,7 @@ static int Create( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-    text_style_Delete( p_sys->p_default_style );
-    text_style_Delete( p_sys->p_forced_style );
-
-    vlc_dictionary_clear( &p_sys->fallback_map, FreeFamilies, p_filter );
-    vlc_dictionary_clear( &p_sys->face_map, FreeFace, p_filter );
-    vlc_dictionary_clear( &p_sys->family_map, NULL, NULL );
-    if( p_sys->p_families )
-        FreeFamiliesAndFonts( p_sys->p_families );
-
-    if( p_sys->pp_font_attachments )
-    {
-        for( int k = 0; k < p_sys->i_font_attachments; k++ )
-            vlc_input_attachment_Delete( p_sys->pp_font_attachments[k] );
-
-        free( p_sys->pp_font_attachments );
-    }
-
-    if( p_sys->p_stroker )
-        FT_Stroker_Done( p_sys->p_stroker );
-
-    FT_Done_FreeType( p_sys->p_library );
-
-    free( p_sys );
+    Destroy( VLC_OBJECT(p_filter) );
     return VLC_EGENERIC;
 }
 
@@ -1357,12 +1332,7 @@ static void Destroy( vlc_object_t *p_this )
     DumpDictionary( p_filter, &p_sys->fallback_map, true, -1 );
 #endif
 
-    vlc_dictionary_clear( &p_sys->fallback_map, FreeFamilies, p_filter );
-    vlc_dictionary_clear( &p_sys->face_map, FreeFace, p_filter );
-    vlc_dictionary_clear( &p_sys->family_map, NULL, NULL );
-    if( p_sys->p_families )
-        FreeFamiliesAndFonts( p_sys->p_families );
-
+    /* Attachments */
     if( p_sys->pp_font_attachments )
     {
         for( int k = 0; k < p_sys->i_font_attachments; k++ )
@@ -1371,9 +1341,18 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->pp_font_attachments );
     }
 
+    /* Text styles */
     text_style_Delete( p_sys->p_default_style );
     text_style_Delete( p_sys->p_forced_style );
 
+    /* Fonts dicts */
+    vlc_dictionary_clear( &p_sys->fallback_map, FreeFamilies, p_filter );
+    vlc_dictionary_clear( &p_sys->face_map, FreeFace, p_filter );
+    vlc_dictionary_clear( &p_sys->family_map, NULL, NULL );
+    if( p_sys->p_families )
+        FreeFamiliesAndFonts( p_sys->p_families );
+
+    /* Freetype */
     if( p_sys->p_stroker )
         FT_Stroker_Done( p_sys->p_stroker );
 
