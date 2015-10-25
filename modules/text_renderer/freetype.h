@@ -130,12 +130,14 @@ struct filter_sys_t
                                          uni_char_t codepoint );
 };
 
-FT_Face LoadFace( filter_t *p_filter, const char *psz_fontfile, int i_idx,
-                  const text_style_t *p_style );
-
+/**
+ * Selects and loads the right font
+ *
+ * \param p_filter the Freetype module [IN]
+ * \param p_style the requested style (fonts can be different for italic or bold) [IN]
+ * \param codepoint the codepoint needed [IN]
+ */
 FT_Face SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style,
                            uni_char_t codepoint );
-
-int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
 
 #endif

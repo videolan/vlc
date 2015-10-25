@@ -243,4 +243,7 @@ void DumpDictionary( filter_t *p_filter, const vlc_dictionary_t *p_dict,
 /* String helpers */
 char* ToLower( const char *psz_src );
 
+int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
+
+
 #endif //PLATFORM_FONTS_H

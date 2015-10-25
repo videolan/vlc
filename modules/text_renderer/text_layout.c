@@ -55,8 +55,9 @@
 # include <hb-ft.h>
 #endif
 
-#include "text_layout.h"
 #include "freetype.h"
+#include "text_layout.h"
+#include "platform_fonts.h"
 
 /* Win32 */
 #ifdef _WIN32
