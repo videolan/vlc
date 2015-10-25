@@ -123,10 +123,10 @@ struct vlc_family_t
  * PLATFORM SPECIFIC SELECTORS
  **/
 #ifdef HAVE_FONTCONFIG
-const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_family );
 vlc_family_t *FontConfig_GetFallbacks( filter_t *p_filter, const char *psz_family,
                                        uni_char_t codepoint );
-void FontConfig_BuildCache( filter_t *p_filter );
+const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_family );
+int FontConfig_Prepare( filter_t *p_filter );
 #endif
 
 #if defined( _WIN32 ) && !VLC_WINSTORE_APP
@@ -211,13 +211,13 @@ vlc_font_t *NewFont( char *psz_fontfile, int i_index,
  * \param p_family the family to free [IN]
  */
 void FreeFamiliesAndFonts( vlc_family_t *p_family );
+
 /**
  * Free families, but not the fonts associated.
  *
  * \param p_families the families to free [IN]
  */
 void FreeFamilies( void *p_families, void *p_obj );
-
 
 /**
  * Construct the default family list
@@ -244,6 +244,5 @@ void DumpDictionary( filter_t *p_filter, const vlc_dictionary_t *p_dict,
 char* ToLower( const char *psz_src );
 
 int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
-
 
 #endif //PLATFORM_FONTS_H

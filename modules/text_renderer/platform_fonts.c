@@ -569,7 +569,7 @@ char* Generic_Select( filter_t *p_filter, const char* psz_family,
 }
 
 #ifdef HAVE_FONTCONFIG
-void FontConfig_BuildCache( filter_t *p_filter )
+int FontConfig_Prepare( filter_t *p_filter )
 {
     /* */
     msg_Dbg( p_filter, "Building font databases.");
@@ -592,7 +592,9 @@ void FontConfig_BuildCache( filter_t *p_filter )
 /*    if( p_dialog )
         dialog_ProgressSet( p_dialog, NULL, 0.5 ); */
 
-    FcConfigBuildFonts( fcConfig );
+    if( FcConfigBuildFonts( fcConfig ) == FcFalse )
+        return VLC_ENOMEM;
+
 #if defined( __APPLE__ )
     // By default, scan only the directory /System/Library/Fonts.
     // So build the set of available fonts under another directories,
@@ -611,6 +613,7 @@ void FontConfig_BuildCache( filter_t *p_filter )
 #endif
     t2 = mdate();
     msg_Dbg( p_filter, "Took %ld microseconds", (long)((t2 - t1)) );
+    return VLC_SUCCESS;
 }
 
 const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_family )

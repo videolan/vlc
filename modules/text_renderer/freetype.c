@@ -1263,7 +1263,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_select = Generic_Select;
     p_sys->pf_get_family = FontConfig_GetFamily;
     p_sys->pf_get_fallbacks = FontConfig_GetFallbacks;
-    FontConfig_BuildCache( p_filter );
+    FontConfig_Prepare( p_filter );
 #elif defined( __APPLE__ )
 #if !TARGET_OS_IPHONE
     p_sys->pf_select = MacLegacy_Select;
