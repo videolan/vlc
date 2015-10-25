@@ -41,7 +41,6 @@
 # include <vlc_stream.h>
 
 #include "../platform_fonts.h"
-#include "freetype.h"
 
 #define ANDROID_SYSTEM_FONTS    "file:///system/etc/system_fonts.xml"
 #define ANDROID_FALLBACK_FONTS  "file:///system/etc/fallback_fonts.xml"

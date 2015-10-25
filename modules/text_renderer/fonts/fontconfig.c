@@ -41,7 +41,6 @@
 #include <fontconfig/fontconfig.h>
 
 #include "../platform_fonts.h"
-#include "freetype.h"
 
 int FontConfig_Prepare( filter_t *p_filter )
 {

@@ -44,7 +44,6 @@
 #include <sys/param.h>                         /* for MAXPATHLEN */
 
 #include "../platform_fonts.h"
-#include "freetype.h"
 
 #if !TARGET_OS_IPHONE
 char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
