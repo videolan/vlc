@@ -127,7 +127,7 @@ vlc_family_t *FontConfig_GetFallbacks( filter_t *p_filter, const char *psz_famil
                                        uni_char_t codepoint );
 const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_family );
 int FontConfig_Prepare( filter_t *p_filter );
-#endif
+#endif /* FONTCONFIG */
 
 #if defined( _WIN32 ) && !VLC_WINSTORE_APP
 vlc_family_t *Win32_GetFallbacks( filter_t *p_filter, const char *psz_family,
@@ -142,14 +142,14 @@ char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
                         bool b_bold, bool b_italic,
                         int *i_idx, uni_char_t codepoint );
 #endif
-#endif
+#endif /* __APPLE__ */
 
 #ifdef __ANDROID__
 const vlc_family_t *Android_GetFamily( filter_t *p_filter, const char *psz_family );
 vlc_family_t *Android_GetFallbacks( filter_t *p_filter, const char *psz_family,
                                     uni_char_t codepoint );
 int Android_Prepare( filter_t *p_filter );
-#endif
+#endif /* __ANDROID__ */
 
 char* Dummy_Select( filter_t *p_filter, const char* family,
                     bool b_bold, bool b_italic,
@@ -238,6 +238,7 @@ void DumpDictionary( filter_t *p_filter, const vlc_dictionary_t *p_dict,
 /* String helpers */
 char* ToLower( const char *psz_src );
 
+/* Size helper, depending on the scaling factor */
 int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
 
 #endif //PLATFORM_FONTS_H

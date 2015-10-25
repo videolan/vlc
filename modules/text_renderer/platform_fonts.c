@@ -36,18 +36,18 @@
 
 #include <vlc_common.h>
 #include <vlc_filter.h>                                      /* filter_sys_t */
-#include <vlc_text_style.h>                                   /* text_style_t*/
-#include <vlc_input.h>                         /* vlc_input_attachment_* */
+#include <vlc_text_style.h>                                  /* text_style_t */
+#include <vlc_input.h>                             /* vlc_input_attachment_* */
 #include <ctype.h>
 
 /* apple stuff */
 #ifdef __APPLE__
-#include <TargetConditionals.h>
-#if !TARGET_OS_IPHONE
-#include <Carbon/Carbon.h>
-#endif
-#include <sys/param.h>                         /* for MAXPATHLEN */
-#undef HAVE_FONTCONFIG
+# include <TargetConditionals.h>
+# if !TARGET_OS_IPHONE
+#  include <Carbon/Carbon.h>
+# endif
+# include <sys/param.h>                         /* for MAXPATHLEN */
+# undef HAVE_FONTCONFIG
 #endif
 
 /* Win32 GDI */
@@ -56,16 +56,18 @@
 # include <shlobj.h>
 # include <usp10.h>
 # include <vlc_charset.h>                                     /* FromT */
+# undef HAVE_FONTCONFIG
+#endif
+
+#ifdef __ANDROID__
+# include <vlc_xml.h>
+# include <vlc_stream.h>
+# undef HAVE_FONTCONFIG
 #endif
 
 /* FontConfig */
 #ifdef HAVE_FONTCONFIG
 # include <fontconfig/fontconfig.h>
-#endif
-
-#ifdef __ANDROID__
-#include <vlc_xml.h>
-#include <vlc_stream.h>
 #endif
 
 #include "platform_fonts.h"
