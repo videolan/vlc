@@ -321,8 +321,8 @@ void SegmentInformation::getDurationsRange(mtime_t *min, mtime_t *max) const
 
     if(mediaSegmentTemplate && mediaSegmentTemplate->segmentTimeline.Get())
     {
-        const mtime_t duration = mediaSegmentTemplate->segmentTimeline.Get()->start() -
-                                 mediaSegmentTemplate->segmentTimeline.Get()->end();
+        const mtime_t duration = mediaSegmentTemplate->segmentTimeline.Get()->end() -
+                                 mediaSegmentTemplate->segmentTimeline.Get()->start();
 
         if (!*min || duration < *min)
             *min = duration;
