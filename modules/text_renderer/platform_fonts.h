@@ -145,15 +145,10 @@ char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
 #endif
 
 #ifdef __ANDROID__
-# define ANDROID_SYSTEM_FONTS    "file:///system/etc/system_fonts.xml"
-# define ANDROID_FALLBACK_FONTS  "file:///system/etc/fallback_fonts.xml"
-# define ANDROID_VENDOR_FONTS    "file:///vendor/etc/fallback_fonts.xml"
-# define ANDROID_FONT_PATH       "/system/fonts"
-
-int Android_ParseSystemFonts( filter_t *p_filter, const char *psz_path );
 const vlc_family_t *Android_GetFamily( filter_t *p_filter, const char *psz_family );
 vlc_family_t *Android_GetFallbacks( filter_t *p_filter, const char *psz_family,
                                     uni_char_t codepoint );
+int Android_Prepare( filter_t *p_filter );
 #endif
 
 char* Dummy_Select( filter_t *p_filter, const char* family,

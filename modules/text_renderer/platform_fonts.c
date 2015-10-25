@@ -1250,6 +1250,12 @@ char* Dummy_Select( filter_t *p_filter, const char* psz_font,
 }
 
 #ifdef __ANDROID__
+
+# define ANDROID_SYSTEM_FONTS    "file:///system/etc/system_fonts.xml"
+# define ANDROID_FALLBACK_FONTS  "file:///system/etc/fallback_fonts.xml"
+# define ANDROID_VENDOR_FONTS    "file:///vendor/etc/fallback_fonts.xml"
+# define ANDROID_FONT_PATH       "/system/fonts"
+
 static int Android_ParseFamily( filter_t *p_filter, xml_reader_t *p_xml )
 {
     filter_sys_t     *p_sys       = p_filter->p_sys;
@@ -1397,7 +1403,19 @@ static int Android_ParseFamily( filter_t *p_filter, xml_reader_t *p_xml )
     return VLC_EGENERIC;
 }
 
-int Android_ParseSystemFonts( filter_t *p_filter, const char *psz_path )
+int Android_Prepare( filter_t *p_filter )
+{
+    if( Android_ParseSystemFonts( p_filter, ANDROID_SYSTEM_FONTS ) == VLC_ENOMEM )
+        return VLC_EGENERIC;
+    if( Android_ParseSystemFonts( p_filter, ANDROID_FALLBACK_FONTS ) == VLC_ENOMEM )
+        return VLC_EGENERIC;
+    if( Android_ParseSystemFonts( p_filter, ANDROID_VENDOR_FONTS ) == VLC_ENOMEM )
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
+static int Android_ParseSystemFonts( filter_t *p_filter, const char *psz_path )
 {
     int i_ret = VLC_SUCCESS;
     stream_t *p_stream = stream_UrlNew( p_filter, psz_path );

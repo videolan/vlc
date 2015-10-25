@@ -1281,12 +1281,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_get_fallbacks = Android_GetFallbacks;
     p_sys->pf_select = Generic_Select;
 
-    if( Android_ParseSystemFonts( p_filter, ANDROID_SYSTEM_FONTS ) == VLC_ENOMEM )
-        goto error;
-    if( Android_ParseSystemFonts( p_filter, ANDROID_FALLBACK_FONTS ) == VLC_ENOMEM )
-        goto error;
-    if( Android_ParseSystemFonts( p_filter, ANDROID_VENDOR_FONTS ) == VLC_ENOMEM )
-        goto error;
+    Android_Prepare( p_filter );
 #else
     p_sys->pf_select = Dummy_Select;
 #endif
