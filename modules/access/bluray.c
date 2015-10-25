@@ -570,7 +570,7 @@ static int blurayOpen(vlc_object_t *object)
     psz_code = DemuxGetLanguageCode( p_demux, "menu-language" );
     bd_set_player_setting_str(p_sys->bluray, BLURAY_PLAYER_SETTING_MENU_LANG,  psz_code);
 
-    /* Get titles and chapters */
+    /* Get disc metadata */
     p_sys->p_meta = bd_get_meta(p_sys->bluray);
     if (!p_sys->p_meta)
         msg_Warn(p_demux, "Failed to get meta info.");
