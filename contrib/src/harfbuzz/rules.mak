@@ -1,6 +1,6 @@
 # HARFBUZZ
 
-HARFBUZZ_VERSION := 0.9.17
+HARFBUZZ_VERSION := 1.0.6
 HARFBUZZ_URL := http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-$(HARFBUZZ_VERSION).tar.bz2
 PKGS += harfbuzz
 ifeq ($(call need_pkg,"harfbuzz"),)
@@ -17,7 +17,6 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-aarch64.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-clang.patch
-	$(APPLY) $(SRC)/harfbuzz/disable-backends.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
