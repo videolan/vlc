@@ -17,7 +17,9 @@ endif
 if HAVE_ANDROID
 libfreetype_plugin_la_SOURCES += text_renderer/fonts/android.c
 endif
-
+if HAVE_DARWIN
+libfreetype_plugin_la_SOURCES += text_renderer/fonts/darwin.c
+endif
 
 libfreetype_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(FREETYPE_CFLAGS)
 libfreetype_plugin_la_LIBADD = $(LIBM) $(FREETYPE_LIBS)
