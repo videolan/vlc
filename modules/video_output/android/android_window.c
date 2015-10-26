@@ -928,7 +928,7 @@ static void SubtitleGetDirtyBounds(vout_display_t *vd,
     if (!sys->p_sub_buffer_bounds
      || sys->p_sub_buffer_bounds[i].p_pixels == NULL) {
         buffer_bounds *p_bb = realloc(sys->p_sub_buffer_bounds,
-                                      (i + 2) * sizeof(buffer_bounds)); 
+                                      (i + 2) * sizeof(buffer_bounds));
         if (p_bb) {
             sys->p_sub_buffer_bounds = p_bb;
             sys->p_sub_buffer_bounds[i].p_pixels = sys->p_sub_pic->p[0].p_pixels;
