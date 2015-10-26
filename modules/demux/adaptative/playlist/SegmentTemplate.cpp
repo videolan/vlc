@@ -48,12 +48,25 @@ MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
 
 void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, mtime_t prunebarrier)
 {
-    if(segmentTimeline.Get() && updated->segmentTimeline.Get())
+    SegmentTimeline *timeline = segmentTimeline.Get();
+    if(timeline && updated->segmentTimeline.Get())
     {
-        segmentTimeline.Get()->mergeWith(*updated->segmentTimeline.Get());
+        timeline->mergeWith(*updated->segmentTimeline.Get());
         if(prunebarrier)
-            segmentTimeline.Get()->prune(prunebarrier);
+        {
+            const uint64_t timescale = timeline->inheritTimescale();
+            const uint64_t number =
+                    timeline->getElementNumberByScaledPlaybackTime(prunebarrier * timescale / CLOCK_FREQ);
+            timeline->pruneBySequenceNumber(number);
+        }
     }
+}
+
+size_t MediaSegmentTemplate::pruneBySequenceNumber(uint64_t number)
+{
+    if(segmentTimeline.Get())
+        return segmentTimeline.Get()->pruneBySequenceNumber(number);
+    return 0;
 }
 
 uint64_t MediaSegmentTemplate::getSequenceNumber() const

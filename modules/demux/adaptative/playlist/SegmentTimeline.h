@@ -49,7 +49,7 @@ namespace adaptative
                 stime_t getScaledPlaybackTimeByElementNumber(uint64_t) const;
                 uint64_t maxElementNumber() const;
                 uint64_t minElementNumber() const;
-                size_t prune(mtime_t);
+                size_t pruneBySequenceNumber(uint64_t);
                 void mergeWith(SegmentTimeline &);
                 mtime_t start() const;
                 mtime_t end() const;
@@ -63,6 +63,7 @@ namespace adaptative
                     public:
                         Element(uint64_t, stime_t, uint64_t, stime_t);
                         void debug(vlc_object_t *, int = 0) const;
+                        bool contains(stime_t) const;
                         stime_t  t;
                         stime_t  d;
                         uint64_t r;
