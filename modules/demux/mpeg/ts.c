@@ -5279,7 +5279,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
         ARRAY_APPEND( p_pmt->e_streams, pespid );
 
-        PIDFillFormat( &p_pes->es.fmt, p_dvbpsies->i_type, &p_pes->data_type );
+        ts_es_data_type_t type_change = TS_ES_DATA_PES;
+        PIDFillFormat( &p_pes->es.fmt, p_dvbpsies->i_type, &type_change );
 
         p_pes->i_stream_type = p_dvbpsies->i_type;
         pespid->i_flags |= SEEN(GetPID(p_sys, p_dvbpsies->i_pid));
@@ -5303,6 +5304,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
         if ( !b_registration_applied )
         {
+            p_pes->data_type = type_change; /* Only change type if registration has not changed meaning */
+
             switch( p_dvbpsies->i_type )
             {
             case 0x06:
