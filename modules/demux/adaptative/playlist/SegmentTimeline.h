@@ -41,7 +41,8 @@ namespace adaptative
             class Element;
 
             public:
-                SegmentTimeline(TimescaleAble * = NULL);
+                SegmentTimeline(TimescaleAble *);
+                SegmentTimeline(uint64_t);
                 virtual ~SegmentTimeline();
                 void addElement(uint64_t, stime_t d, uint64_t r = 0, stime_t t = 0);
                 uint64_t getElementNumberByScaledPlaybackTime(stime_t) const;

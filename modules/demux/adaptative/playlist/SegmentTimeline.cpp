@@ -32,6 +32,12 @@ SegmentTimeline::SegmentTimeline(TimescaleAble *parent)
 {
 }
 
+SegmentTimeline::SegmentTimeline(uint64_t scale)
+    :TimescaleAble(NULL)
+{
+    timescale.Set(scale);
+}
+
 SegmentTimeline::~SegmentTimeline()
 {
     std::list<Element *>::iterator it;
