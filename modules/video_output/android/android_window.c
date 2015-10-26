@@ -123,6 +123,7 @@ struct vout_display_sys_t
     buffer_bounds *p_sub_buffer_bounds;
     bool b_sub_pic_locked;
     int64_t i_sub_last_order;
+    ARect sub_last_region;
 
     bool b_has_subpictures;
 
@@ -946,11 +947,16 @@ static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture)
     vout_display_sys_t *sys = vd->sys;
     ARect memset_bounds;
 
+    SubtitleRegionToBounds(subpicture, &memset_bounds);
+
     if( subpicture )
     {
-        if( subpicture->i_order == sys->i_sub_last_order )
+        if( subpicture->i_order == sys->i_sub_last_order
+         && memcmp( &memset_bounds, &sys->sub_last_region, sizeof(ARect) ) == 0 )
             return;
+
         sys->i_sub_last_order = subpicture->i_order;
+        sys->sub_last_region = memset_bounds;
     }
 
     if (AndroidWindow_LockPicture(sys, sys->p_sub_window, sys->p_sub_pic) != 0)
