@@ -1,0 +1,44 @@
+From f968a37cf7667ae3b11aa3150f7747e29ad00acc Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Fri, 30 Oct 2015 14:26:17 +0100
+Subject: [PATCH 1/2] FindSIMD: add arm neon detection
+
+---
+ cmake/Modules/FindSIMD.cmake | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/cmake/Modules/FindSIMD.cmake b/cmake/Modules/FindSIMD.cmake
+index 6ac51cb..a23cbcc 100644
+--- a/cmake/Modules/FindSIMD.cmake
++++ b/cmake/Modules/FindSIMD.cmake
+@@ -53,10 +53,13 @@ set (SIMD_C_FLAG_CANDIDATES
+   "-msse -mfpmath=sse ${GCC_WIN32_SIMD_OPTS}"
+   # Gcc x86 (old versions)
+   "-msse -mfpmath=sse"
++  # Gcc arm neon
++  "-mfloat-abi=softfp -mfpu=neon -DTEST_ARM"
+ )
+ 
+ set (SIMD_C_TEST_SOURCE
+ "
++#ifndef TEST_ARM
+ #include <xmmintrin.h>
+ int main()
+ {
+@@ -68,6 +71,13 @@ int main()
+   _mm_storeu_ps (vals,b);
+   return 0;
+ }
++#else
++int main()
++{
++  __asm__ volatile(\"vadd.i16 q0, q0, q0\");
++  return 0;
++}
++#endif
+ ")
+ 
+ if (DEFINED SIMD_C_FLAGS)
+-- 
+2.1.4
+

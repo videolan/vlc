@@ -1,0 +1,35 @@
+From c42df14b14f828e86066a58b0c812a5662366436 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Fri, 30 Oct 2015 14:27:29 +0100
+Subject: [PATCH 2/2] cpu_has_simd: detect neon via av_get_cpu_flags
+
+---
+ src/soxr.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/soxr.c b/src/soxr.c
+index dc61ad9..c1a29ec 100644
+--- a/src/soxr.c
++++ b/src/soxr.c
+@@ -10,6 +10,9 @@
+ #include "data-io.h"
+ #include "internal.h"
+ 
++#if HAVE_SIMD && HAVE_AVFFT
++#include <libavutil/cpu.h>
++#endif
+ 
+ 
+ char const * soxr_version(void)
+@@ -190,6 +193,8 @@ static bool cpu_has_simd(void)
+     mov     d, edx
+   }
+   return !!(d & 0x06000000);
++#elif HAVE_AVFFT && defined __arm__
++  return av_get_cpu_flags() & AV_CPU_FLAG_NEON;
+ #endif
+   return false;
+ }
+-- 
+2.1.4
+
