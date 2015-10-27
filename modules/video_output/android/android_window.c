@@ -50,6 +50,7 @@
 #define CFG_PREFIX "androidwindow-"
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
+static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture);
 
 vlc_module_begin()
     set_category(CAT_VIDEO)
@@ -758,6 +759,15 @@ static void Close(vlc_object_t *p_this)
 
     if (!sys)
         return;
+
+    /* Check if SPU regions have been properly cleared, and clear them if they
+     * were not. */
+    if (sys->b_has_subpictures)
+    {
+        SubpicturePrepare(vd, NULL);
+        if (sys->b_sub_pic_locked)
+            AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic, true);
+    }
 
     if (sys->pool)
         picture_pool_Release(sys->pool);
