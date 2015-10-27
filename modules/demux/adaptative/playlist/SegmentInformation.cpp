@@ -26,6 +26,8 @@
 #include "SegmentTimeline.h"
 #include "AbstractPlaylist.hpp"
 
+#include <algorithm>
+
 using namespace adaptative::playlist;
 
 SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
