@@ -489,6 +489,16 @@ AddonsTab::~AddonsTab()
     delete spinnerAnimation;
 }
 
+// Do not close on ESC or ENTER
+void AddonsTab::keyPressEvent( QKeyEvent *keyEvent )
+{
+    if( keyEvent->key() == Qt::Key_Return ||
+        keyEvent->key() == Qt::Key_Enter )
+        keyEvent->accept();
+    else
+        keyEvent->ignore();
+}
+
 bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
 {
     if ( obj != addonsView->viewport() )

@@ -130,6 +130,9 @@ class AddonsTab : public QVLCFrame
     Q_OBJECT
     friend class PluginDialog;
 
+protected:
+    void keyPressEvent( QKeyEvent *keyEvent ) Q_DECL_OVERRIDE;
+
 private slots:
     void moreInformation();
     void installChecked( int );
