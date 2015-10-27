@@ -742,7 +742,7 @@ static int EnumDevices(vlc_object_t *obj, char const *varname,
         ids = xrealloc (ids, (n + 1) * sizeof (*ids));
         names = xrealloc (names, (n + 1) * sizeof (*names));
         ids[n] = xstrdup ("default");
-        names[n] = _("Default");
+        names[n] = xstrdup (_("Default"));
         n++;
     }
 
