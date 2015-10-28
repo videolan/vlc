@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <string>
+#include <sstream>
 
 class IsoTime
 {
