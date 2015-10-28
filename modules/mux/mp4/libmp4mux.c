@@ -32,6 +32,7 @@
 #include <vlc_es.h>
 #include <vlc_iso_lang.h>
 #include <assert.h>
+#include <time.h>
 
 bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream)
 {
