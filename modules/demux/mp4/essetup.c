@@ -30,6 +30,18 @@
 #include <vlc_aout.h>
 #include <assert.h>
 
+static void SetupGlobalExtensions( mp4_track_t *p_track, MP4_Box_t *p_sample )
+{
+    if( !p_track->fmt.i_bitrate )
+    {
+        const MP4_Box_t *p_btrt = MP4_BoxGet( p_sample, "btrt" );
+        if( p_btrt && BOXDATA(p_btrt) )
+        {
+            p_track->fmt.i_bitrate = BOXDATA(p_btrt)->i_avg_bitrate;
+        }
+    }
+}
+
 static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descriptor_decoder_config_t *p_decconfig )
 {
     /* First update information based on i_objectTypeIndication */
@@ -228,6 +240,8 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     {
         p_track->i_block_flags = BOXDATA(p_fiel)->i_flags;
     }
+
+    SetupGlobalExtensions( p_track, p_sample );
 
     /* now see if esds is present and if so create a data packet
         with decoder_specific_info  */
@@ -689,6 +703,8 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 
     }
 
+    SetupGlobalExtensions( p_track, p_sample );
+
     /* now see if esds is present and if so create a data packet
         with decoder_specific_info  */
     MP4_Box_t *p_esds = MP4_BoxGet( p_sample, "esds" );
@@ -836,6 +852,8 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             p_track->fmt.i_codec = p_sample->i_type;
             break;
     }
+
+    SetupGlobalExtensions( p_track, p_sample );
 
     /* now see if esds is present and if so create a data packet
         with decoder_specific_info  */
