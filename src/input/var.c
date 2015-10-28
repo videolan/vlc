@@ -212,11 +212,8 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "bit-rate", VLC_VAR_INTEGER );
     var_Create( p_input, "sample-rate", VLC_VAR_INTEGER );
 
-    if( !p_input->b_preparsing )
-    {
-        /* Special "intf-event" variable. */
-        var_Create( p_input, "intf-event", VLC_VAR_INTEGER );
-    }
+    /* Special "intf-event" variable. */
+    var_Create( p_input, "intf-event", VLC_VAR_INTEGER );
 
     /* Add all callbacks
      * XXX we put callback only in non preparsing mode. We need to create the variable
