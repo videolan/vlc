@@ -1,0 +1,12 @@
+language: c
+dist: trusty
+before_script:
+# with `gcc` 4.6 (of distribution "precise") `make` fails with `/usr/include/c++/4.6/bits/c++0x_warning.h:32:2: error: #error This file requires compiler and library support for the upcoming ISO C++ standard, C++0x. This support is currently experimental, and must be enabled with the -std=c++0x or -std=gnu++0x compiler options.` -> use `gcc` 4.7
+#- sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test # for gcc 4.7
+- sudo apt-get update
+- sudo apt-get build-dep --yes vlc
+# an up-to-date version of `libav` is required for distribution "precise"
+# `wget https://libav.org/releases/libav-11.4.tar.xz` fails with `Issued certificate has expired.` if `--no-check-certificate` isn't specified
+#- sudo apt-get install --yes gcc-4.7 g++-4.7 && export CC=gcc-4.7 CXX=g++-4.7 && 
+- sudo apt-get build-dep --yes libav && wget --no-check-certificate https://libav.org/releases/libav-11.4.tar.xz && tar xf libav-11.4.tar.xz && cd libav-11.4 && ./configure && make -j16 && sudo make install && cd ..
+script: ./bootstrap && ./configure && make -j16 && make -j16 check && sudo make install
