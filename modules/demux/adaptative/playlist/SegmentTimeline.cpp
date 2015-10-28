@@ -140,7 +140,7 @@ size_t SegmentTimeline::pruneBySequenceNumber(uint64_t number)
         }
         else if(el->number + el->r >= number)
         {
-            uint64_t count = el->number + el->r + 1 - number;
+            uint64_t count = number - el->number;
             el->number += count;
             el->t += count * el->d;
             el->r -= count;
