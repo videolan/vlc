@@ -325,6 +325,12 @@ typedef int64_t stime_t;
 #define ATOM_rtng VLC_FOURCC( 'r', 't', 'n', 'g' )
 #define ATOM_tsel VLC_FOURCC( 't', 's', 'e', 'l' )
 #define ATOM_xid_ VLC_FOURCC( 'x', 'i', 'd', ' ' )
+#define ATOM_gshh VLC_FOURCC( 'g', 's', 'h', 'h' )
+#define ATOM_gspm VLC_FOURCC( 'g', 's', 'p', 'm' )
+#define ATOM_gspu VLC_FOURCC( 'g', 's', 'p', 'u' )
+#define ATOM_gssd VLC_FOURCC( 'g', 's', 's', 'd' )
+#define ATOM_gsst VLC_FOURCC( 'g', 's', 's', 't' )
+#define ATOM_gstd VLC_FOURCC( 'g', 's', 't', 'd' )
 
 #define ATOM_0x40PRM VLC_FOURCC( '@', 'P', 'R', 'M' )
 #define ATOM_0x40PRQ VLC_FOURCC( '@', 'P', 'R', 'Q' )

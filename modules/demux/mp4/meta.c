@@ -95,6 +95,12 @@ static const struct
     { ATOM_flvr,    N_("Encoding Params") },
     { ATOM_vndr,    N_("Vendor") },
     { ATOM_xid_,    N_("Catalog Number") },
+    { ATOM_gshh,    N_("YouTube Host") },
+    { ATOM_gspm,    N_("YouTube Ping Message") },
+    { ATOM_gspu,    N_("YouTube Ping Url") },
+    { ATOM_gssd,    N_("YouTube Source Data") },
+    { ATOM_gsst,    N_("YouTube Start Time") },
+    { ATOM_gstd,    N_("YouTube Track Duration") },
     { 0, "" },
 };
 

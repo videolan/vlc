@@ -3892,6 +3892,12 @@ static const struct
     { ATOM_rtng,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_trkn,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_xid_,    MP4_ReadBox_Metadata,    ATOM_ilst },
+    { ATOM_gshh,    MP4_ReadBox_Metadata,    ATOM_ilst }, /* YouTube gs?? */
+    { ATOM_gspm,    MP4_ReadBox_Metadata,    ATOM_ilst },
+    { ATOM_gspu,    MP4_ReadBox_Metadata,    ATOM_ilst },
+    { ATOM_gssd,    MP4_ReadBox_Metadata,    ATOM_ilst },
+    { ATOM_gsst,    MP4_ReadBox_Metadata,    ATOM_ilst },
+    { ATOM_gstd,    MP4_ReadBox_Metadata,    ATOM_ilst },
 
     /* udta */
     { ATOM_0x40PRM, MP4_ReadBox_String,    ATOM_udta },
