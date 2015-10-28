@@ -3325,6 +3325,20 @@ static int MP4_ReadBox_iods( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_btrt( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_btrt_t, NULL );
+
+    if(i_read != 12)
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GET4BYTES( p_box->data.p_btrt->i_buffer_size );
+    MP4_GET4BYTES( p_box->data.p_btrt->i_max_bitrate );
+    MP4_GET4BYTES( p_box->data.p_btrt->i_avg_bitrate );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_pasp( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_pasp_t, NULL );
@@ -3731,6 +3745,7 @@ static const struct
     { ATOM_enda,    MP4_ReadBox_enda,         0 },
     { ATOM_iods,    MP4_ReadBox_iods,         0 },
     { ATOM_pasp,    MP4_ReadBox_pasp,         0 },
+    { ATOM_btrt,    MP4_ReadBox_btrt,         0 }, /* codecs bitrate stsd/????/btrt */
     { ATOM_keys,    MP4_ReadBox_keys,         ATOM_meta },
 
     /* Quicktime preview atoms, all at root */

@@ -132,6 +132,7 @@ typedef int64_t stime_t;
 #define ATOM_mpod VLC_FOURCC( 'm', 'p', 'o', 'd' )
 #define ATOM_hnti VLC_FOURCC( 'h', 'n', 't', 'i' )
 #define ATOM_rtp  VLC_FOURCC( 'r', 't', 'p', ' ' )
+#define ATOM_btrt VLC_FOURCC( 'b', 't', 'r', 't' )
 
 #define ATOM_esds VLC_FOURCC( 'e', 's', 'd', 's' )
 
@@ -1285,6 +1286,13 @@ typedef struct
 
 typedef struct
 {
+    uint32_t i_buffer_size;
+    uint32_t i_max_bitrate;
+    uint32_t i_avg_bitrate;
+} MP4_Box_data_btrt_t;
+
+typedef struct
+{
     uint32_t i_horizontal_spacing;
     uint32_t i_vertical_spacing;
 } MP4_Box_data_pasp_t;
@@ -1443,6 +1451,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_enda_t *p_enda;
     MP4_Box_data_keys_t *p_keys;
     MP4_Box_data_iods_t *p_iods;
+    MP4_Box_data_btrt_t *p_btrt;
     MP4_Box_data_pasp_t *p_pasp;
     MP4_Box_data_trex_t *p_trex;
     MP4_Box_data_mehd_t *p_mehd;
