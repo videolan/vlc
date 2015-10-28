@@ -55,6 +55,14 @@ function escape(s)
     return (string.gsub(s,"([%^%$%%%.%[%]%*%+%-%?])","%%%1"))
 end
 
+function my_vlc_load(code, filename)
+    if _VERSION == "Lua 5.1" then
+        return loadstring(code, filename)
+    else
+        return load(code, filename)
+    end
+end
+
 function process_raw(filename)
     local input = io.open(filename):read("*a")
     -- find the longest [===[ or ]=====] type sequence and make sure that
@@ -77,7 +85,7 @@ function process_raw(filename)
     io.write("\n")
     end
     --]]
-    return assert(loadstring(code,filename))
+    return assert(my_vlc_load(code,filename))
 end
 
 function process(filename)

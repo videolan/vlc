@@ -34,7 +34,6 @@ local sandbox_blacklist = {
     getmetatable = true,
     load = true, -- Can be protected I guess
     loadfile = true, -- Can be protected I guess
-    loadstring = true, -- Can be protected I guess
     rawequal = true,
     rawget = true,
     rawset = true,
@@ -45,6 +44,10 @@ local sandbox_blacklist = {
     package = true,
     debug = true,
 }
+
+if _VERSION == "Lua 5.1" then
+    sandbox_blacklist["loadstring"] = true
+end
 
 function readonly_table_proxy(name,src,blacklist)
     if type(src)=="nil" then return end
