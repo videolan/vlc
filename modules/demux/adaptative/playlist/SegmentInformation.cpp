@@ -187,7 +187,7 @@ ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_p
                 {
                     *pi_newpos = i_pos;
                     /* start number */
-                    *pi_newpos = std::max(templ->startNumber.Get(), i_pos);
+                    *pi_newpos = std::max((uint64_t)templ->startNumber.Get(), i_pos);
                 }
                 return seg;
             }
