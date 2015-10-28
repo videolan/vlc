@@ -49,6 +49,7 @@ struct playlist_preparser_t
 
     vlc_mutex_t     lock;
     vlc_cond_t      wait;
+    vlc_sem_t       item_done;
     bool            b_live;
     preparser_entry_t  **pp_waiting;
     int             i_waiting;
@@ -72,6 +73,7 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
 
     vlc_mutex_init( &p_preparser->lock );
     vlc_cond_init( &p_preparser->wait );
+    vlc_sem_init( &p_preparser->item_done, 0 );
     p_preparser->b_live = false;
     p_preparser->i_waiting = 0;
     p_preparser->pp_waiting = NULL;
@@ -123,11 +125,14 @@ void playlist_preparser_Delete( playlist_preparser_t *p_preparser )
         REMOVE_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting, 0 );
     }
 
+    vlc_sem_post( &p_preparser->item_done );
+
     while( p_preparser->b_live )
         vlc_cond_wait( &p_preparser->wait, &p_preparser->lock );
     vlc_mutex_unlock( &p_preparser->lock );
 
     /* Destroy the item preparser */
+    vlc_sem_destroy( &p_preparser->item_done );
     vlc_cond_destroy( &p_preparser->wait );
     vlc_mutex_destroy( &p_preparser->lock );
 
@@ -183,16 +188,16 @@ static void Preparse( playlist_preparser_t *preparser, input_item_t *p_item,
         if( input == NULL )
             return;
 
-        vlc_sem_t done;
-
-        vlc_sem_init( &done, 0 );
-        var_AddCallback( input, "intf-event", InputEvent, &done );
-
+        var_AddCallback( input, "intf-event", InputEvent,
+                         &preparser->item_done );
         if( input_Start( input ) == VLC_SUCCESS )
-            vlc_sem_wait( &done );
-
-        var_DelCallback( input, "intf-event", InputEvent, &done );
-        vlc_sem_destroy( &done );
+            vlc_sem_wait( &preparser->item_done );
+        var_DelCallback( input, "intf-event", InputEvent,
+                         &preparser->item_done );
+        /* Normally, the input is already stopped since we waited for it. But
+         * if the playlist preparser is being deleted, then the input might
+         * still be running. Force it to stop. */
+        input_Stop( input );
         input_Close( input );
 
         var_SetAddress( preparser->object, "item-change", p_item );
