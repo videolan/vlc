@@ -50,8 +50,6 @@ void input_item_SetEpgOffline( input_item_t * );
 input_thread_t *input_CreatePreparser(vlc_object_t *obj, input_item_t *item)
 VLC_USED;
 
-int input_Preparse( vlc_object_t *, input_item_t * );
-
 /* misc/stats.c
  * FIXME it should NOT be defined here or not coded in misc/stats.c */
 input_stats_t *stats_NewInputStats( input_thread_t *p_input );

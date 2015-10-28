@@ -157,29 +157,6 @@ input_thread_t *input_CreatePreparser( vlc_object_t *parent,
 }
 
 /**
- * Initialize an input and initialize it to preparse the item
- * This function is blocking. It will only accept parsing regular files.
- *
- * \param p_parent a vlc_object_t
- * \param p_item an input item
- * \return VLC_SUCCESS or an error
- */
-int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
-{
-    input_thread_t *p_input;
-    int ret;
-
-    /* Allocate descriptor */
-    p_input = input_CreatePreparser( p_parent, p_item );
-    if( !p_input )
-        return VLC_EGENERIC;
-
-    ret = input_Start( p_input );
-    input_Close( p_input );
-    return ret;
-}
-
-/**
  * Start a input_thread_t created by input_Create.
  *
  * You must not start an already running input_thread_t.
