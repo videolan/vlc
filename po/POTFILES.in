@@ -994,7 +994,9 @@ modules/misc/xml/libxml.c
 modules/mux/asf.c
 modules/mux/avi.c
 modules/mux/dummy.c
-modules/mux/mp4.c
+modules/mux/mp4/libmp4mux.c
+modules/mux/mp4/libmp4mux.h
+modules/mux/mp4/mp4.c
 modules/mux/mpeg/bits.h
 modules/mux/mpeg/csa.c
 modules/mux/mpeg/csa.h
