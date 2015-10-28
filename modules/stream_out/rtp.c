@@ -1747,6 +1747,7 @@ static ssize_t AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
             /* allocate a new packet */
             p_sys->packet = block_Alloc( id->i_mtu );
             rtp_packetize_common( id, p_sys->packet, 1, i_dts );
+            p_sys->packet->i_buffer = 12;
             p_sys->packet->i_dts = i_dts;
             p_sys->packet->i_length = p_buffer->i_length / i_packet;
             i_dts += p_sys->packet->i_length;
