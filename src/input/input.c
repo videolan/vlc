@@ -55,7 +55,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static  void *Run            ( void * );
+static  void *Run( void * );
+static  void *Preparse( void * );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
                                   const char *, bool, input_resource_t * );
@@ -149,6 +150,12 @@ int input_Read( vlc_object_t *p_parent, input_item_t *p_item )
     return VLC_SUCCESS;
 }
 
+input_thread_t *input_CreatePreparser( vlc_object_t *parent,
+                                       input_item_t *item )
+{
+    return Create( parent, item, NULL, true, NULL );
+}
+
 /**
  * Initialize an input and initialize it to preparse the item
  * This function is blocking. It will only accept parsing regular files.
@@ -160,30 +167,16 @@ int input_Read( vlc_object_t *p_parent, input_item_t *p_item )
 int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 {
     input_thread_t *p_input;
+    int ret;
 
     /* Allocate descriptor */
-    p_input = Create( p_parent, p_item, NULL, true, NULL );
+    p_input = input_CreatePreparser( p_parent, p_item );
     if( !p_input )
         return VLC_EGENERIC;
 
-    if( !Init( p_input ) ) {
-        /* if the demux is a playlist, call Mainloop that will call
-         * demux_Demux in order to fetch sub items */
-        bool b_is_playlist = false;
-
-        if ( input_item_ShouldPreparseSubItems( p_item )
-          && demux_Control( p_input->p->master->p_demux,
-                            DEMUX_IS_PLAYLIST,
-                            &b_is_playlist ) )
-            b_is_playlist = false;
-        if( b_is_playlist )
-            MainLoop( p_input, false );
-        End( p_input );
-    }
-
-    vlc_object_release( p_input );
-
-    return VLC_SUCCESS;
+    ret = input_Start( p_input );
+    input_Close( p_input );
+    return ret;
 }
 
 /**
@@ -195,10 +188,15 @@ int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
  */
 int input_Start( input_thread_t *p_input )
 {
+    void *(*func)(void *) = Run;
+
+    if( p_input->b_preparsing )
+        func = Preparse;
+
     assert( !p_input->p->is_running );
     /* Create thread and wait for its readiness. */
-    p_input->p->is_running = !vlc_clone( &p_input->p->thread,
-                                         Run, p_input, VLC_THREAD_PRIORITY_INPUT );
+    p_input->p->is_running = !vlc_clone( &p_input->p->thread, func, p_input,
+                                         VLC_THREAD_PRIORITY_INPUT );
     if( !p_input->p->is_running )
     {
         input_ChangeState( p_input, ERROR_S );
@@ -501,6 +499,31 @@ static void *Run( void *obj )
         MainLoop( p_input, true ); /* FIXME it can be wrong (like with VLM) */
 
         /* Clean up */
+        End( p_input );
+    }
+
+    input_SendEventDead( p_input );
+    return NULL;
+}
+
+static void *Preparse( void *obj )
+{
+    input_thread_t *p_input = (input_thread_t *)obj;
+
+    vlc_interrupt_set(&p_input->p->interrupt);
+
+    if( !Init( p_input ) )
+    {   /* if the demux is a playlist, call Mainloop that will call
+         * demux_Demux in order to fetch sub items */
+        bool b_is_playlist = false;
+
+        if ( input_item_ShouldPreparseSubItems( p_input->p->p_item )
+          && demux_Control( p_input->p->master->p_demux,
+                            DEMUX_IS_PLAYLIST,
+                            &b_is_playlist ) )
+            b_is_playlist = false;
+        if( b_is_playlist )
+            MainLoop( p_input, false );
         End( p_input );
     }
 
