@@ -380,6 +380,9 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
     if(segmentList)
         segmentList->pruneBySegmentNumber(num);
 
+    if(mediaSegmentTemplate && mediaSegmentTemplate->segmentTimeline.Get())
+         mediaSegmentTemplate->segmentTimeline.Get()->pruneBySequenceNumber(num);
+
     for(size_t i=0; i<childs.size(); i++)
         childs.at(i)->pruneBySegmentNumber(num);
 }
