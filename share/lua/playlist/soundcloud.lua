@@ -86,7 +86,7 @@ function parse()
         -- to remain unconspicuous
         local app_version = "a089efd"
 
-        local api = vlc.stream( "https://api.soundcloud.com/i1/tracks/"..track.."/streams?client_id="..client_id.."&app_version="..app_version..( secret and "&secret_token="..secret or "" ) )
+        local api = vlc.stream( vlc.access.."://api.soundcloud.com/i1/tracks/"..track.."/streams?client_id="..client_id.."&app_version="..app_version..( secret and "&secret_token="..secret or "" ) )
 
         if api then
             local streams = api:readline() -- data is on one line only
