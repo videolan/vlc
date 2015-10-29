@@ -532,7 +532,7 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
         if( p_mux->i_add_stream_start < 0 )
             p_mux->i_add_stream_start = i_dts;
 
-        /* Wait until we have enought data before muxing */
+        /* Wait until we have enough data before muxing */
         if( p_mux->i_add_stream_start < 0 ||
             i_dts < p_mux->i_add_stream_start + i_caching )
             return VLC_SUCCESS;
