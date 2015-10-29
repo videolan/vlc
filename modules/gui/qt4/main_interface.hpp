@@ -70,7 +70,7 @@ public:
 
     /* Video requests from core */
     WId  getVideo( struct vout_window_t *,
-                   unsigned int *pi_width, unsigned int *pi_height );
+                   unsigned int *pi_width, unsigned int *pi_height, bool );
     void releaseVideo( void );
     int  controlVideo( int i_query, va_list args );
 
@@ -210,7 +210,7 @@ public slots:
 
     /* Manage the Video Functions from the vout threads */
     void getVideoSlot( WId *p_id, struct vout_window_t *,
-                       unsigned *pi_width, unsigned *pi_height );
+                       unsigned *pi_width, unsigned *pi_height, bool );
     void releaseVideoSlot( void );
 
     void emitBoss();
@@ -262,7 +262,8 @@ private slots:
     void resumePlayback();
 
 signals:
-    void askGetVideo( WId *, struct vout_window_t *, unsigned *, unsigned * );
+    void askGetVideo( WId *, struct vout_window_t *, unsigned *, unsigned *,
+                      bool );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );

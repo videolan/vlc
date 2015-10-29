@@ -689,7 +689,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     unsigned i_width = cfg->width;
     unsigned i_height = cfg->height;
 
-    WId wid = p_mi->getVideo( p_wnd, &i_width, &i_height );
+    WId wid = p_mi->getVideo( p_wnd, &i_width, &i_height, cfg->is_fullscreen );
     if( !wid )
         return VLC_EGENERIC;
 
@@ -713,7 +713,6 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t*)p_mi;
-    emit p_mi->askVideoSetFullScreen( cfg->is_fullscreen );
     return VLC_SUCCESS;
 }
 

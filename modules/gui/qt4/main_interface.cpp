@@ -203,8 +203,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* VideoWidget connects for asynchronous calls */
     b_videoFullScreen = false;
-    connect( this, SIGNAL(askGetVideo(WId*,struct vout_window_t*,unsigned*,unsigned *)),
-             this, SLOT(getVideoSlot(WId*,struct vout_window_t*,unsigned*,unsigned*)),
+    connect( this, SIGNAL(askGetVideo(WId*,struct vout_window_t*,unsigned*,unsigned *, bool)),
+             this, SLOT(getVideoSlot(WId*,struct vout_window_t*,unsigned*,unsigned*, bool)),
              Qt::BlockingQueuedConnection );
     connect( this, SIGNAL(askReleaseVideo( void )),
              this, SLOT(releaseVideoSlot( void )),
@@ -705,7 +705,8 @@ void MainInterface::toggleFSC()
  * That's why we have all those emit statements...
  */
 WId MainInterface::getVideo( struct vout_window_t *p_wnd,
-                             unsigned int *pi_width, unsigned int *pi_height )
+                             unsigned int *pi_width, unsigned int *pi_height,
+                             bool fullscreen )
 {
     if( !videoWidget )
         return 0;
@@ -713,12 +714,13 @@ WId MainInterface::getVideo( struct vout_window_t *p_wnd,
     /* This is a blocking call signal. Results are returned through pointers.
      * Beware of deadlocks! */
     WId id;
-    emit askGetVideo( &id, p_wnd, pi_width, pi_height );
+    emit askGetVideo( &id, p_wnd, pi_width, pi_height, fullscreen );
     return id;
 }
 
 void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
-                                  unsigned *pi_width, unsigned *pi_height )
+                                  unsigned *pi_width, unsigned *pi_height,
+                                  bool fullscreen )
 {
     /* Hidden or minimized, activate */
     if( isHidden() || isMinimized() )
@@ -729,6 +731,8 @@ void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
     *p_id = ret;
     if( ret ) /* The videoWidget is available */
     {
+        setVideoFullScreen( fullscreen );
+
         /* Consider the video active now */
         showVideo();
 
