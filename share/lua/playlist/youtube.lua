@@ -33,7 +33,7 @@ function get_arturl()
     if not video_id then
         return nil
     end
-    return "http://img.youtube.com/vi/"..video_id.."/default.jpg"
+    return vlc.access.."://img.youtube.com/vi/"..video_id.."/default.jpg"
 end
 
 function get_prefres()
@@ -301,7 +301,7 @@ function parse()
                 -- Without "el=detailpage", /get_video_info fails for many
                 -- music videos with errors about copyrighted content being
                 -- "restricted from playback on certain sites"
-                path = "http://www.youtube.com/get_video_info?video_id="..video_id..format.."&el=detailpage"
+                path = vlc.access.."://www.youtube.com/get_video_info?video_id="..video_id..format.."&el=detailpage"
                 vlc.msg.warn( "Couldn't extract video URL, falling back to alternate youtube API" )
             end
         end
@@ -385,6 +385,6 @@ function parse()
         else
             format = ""
         end
-        return { { path = "http://www.youtube.com/watch?v="..video_id..format } }
+        return { { path = vlc.access.."://www.youtube.com/watch?v="..video_id..format } }
     end
 end
