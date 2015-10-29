@@ -62,6 +62,8 @@ ISegment::~ISegment()
 SegmentChunk * ISegment::getChunk(const std::string &url, HTTPConnectionManager *connManager)
 {
     HTTPChunkSource *source = new HTTPChunkSource(url, connManager);
+    if(startByte != endByte)
+        source->setBytesRange(BytesRange(startByte, endByte));
     return new (std::nothrow) SegmentChunk(this, source);
 }
 
@@ -82,10 +84,7 @@ SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep, HTTPCo
     catch (int)
     {
         return NULL;
-    }
-
-    if(startByte != endByte)
-        chunk->setBytesRange(BytesRange(startByte, endByte));
+    };
 
     chunk->setRepresentation(ctxrep);
 

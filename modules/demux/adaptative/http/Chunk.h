@@ -45,11 +45,16 @@ namespace adaptative
             public:
                 AbstractChunkSource();
                 virtual ~AbstractChunkSource();
-                virtual block_t * read(size_t) = 0;
-                void setParentChunk(AbstractChunk *);
+                virtual block_t *   read(size_t) = 0;
+                void                setParentChunk  (AbstractChunk *);
+                void                setBytesRange   (const BytesRange &);
+                const BytesRange &  getBytesRange   () const;
+                size_t              getContentLength() const;
 
             protected:
                 AbstractChunk      *parentChunk;
+                size_t              contentLength;
+                BytesRange          bytesRange;
         };
 
         class AbstractChunk
@@ -59,11 +64,6 @@ namespace adaptative
 
                 size_t              getBytesRead            () const;
                 size_t              getBytesToRead          () const;
-                const BytesRange &  getBytesRange           () const;
-
-                void                setBytesRead    (size_t bytes);
-                void                setLength       (size_t length);
-                void                setBytesRange   (const BytesRange &);
 
                 virtual block_t *   read            (size_t, mtime_t *);
                 virtual void        onDownload      (block_t **) = 0;
@@ -73,9 +73,7 @@ namespace adaptative
                 AbstractChunkSource *source;
 
             private:
-                size_t              length;
                 size_t              bytesRead;
-                BytesRange          bytesRange;
         };
 
         class HTTPChunkSource : public AbstractChunkSource
@@ -86,6 +84,12 @@ namespace adaptative
 
                 virtual block_t * read(size_t); /* impl */
 
+            protected:
+                virtual block_t * consume(size_t);
+                HTTPConnection     *connection;
+                HTTPConnectionManager *connManager;
+                size_t              consumed; /* read pointer */
+
             private:
                 bool init(const std::string &);
                 std::string         url;
@@ -93,8 +97,21 @@ namespace adaptative
                 std::string         path;
                 std::string         hostname;
                 uint16_t            port;
-                HTTPConnection     *connection;
-                HTTPConnectionManager *connManager;
+        };
+
+        class HTTPChunkBufferedSource : public HTTPChunkSource
+        {
+            public:
+                HTTPChunkBufferedSource(const std::string &url, HTTPConnectionManager *);
+                virtual ~HTTPChunkBufferedSource();
+
+            protected:
+                virtual block_t *  consume(size_t);
+
+            private:
+                void               bufferize(size_t);
+                block_t            *p_buffer; /* read cache buffer */
+                size_t              buffered; /* read cache size */
         };
 
         class HTTPChunk : public AbstractChunk
