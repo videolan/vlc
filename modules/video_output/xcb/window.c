@@ -40,56 +40,6 @@ typedef xcb_atom_t Atom;
 
 #include "events.h"
 
-#define DISPLAY_TEXT N_("X11 display")
-#define DISPLAY_LONGTEXT N_( \
-    "Video will be rendered with this X11 display. " \
-    "If empty, the default display will be used.")
-
-#define XID_TEXT N_("X11 window ID")
-#define XID_LONGTEXT N_( \
-    "Video will be embedded in this pre-existing window. " \
-    "If zero, a new window will be created.")
-
-static int  Open (vout_window_t *, const vout_window_cfg_t *);
-static void Close (vout_window_t *);
-static int  EmOpen (vout_window_t *, const vout_window_cfg_t *);
-static void EmClose (vout_window_t *);
-
-/*
- * Module descriptor
- */
-vlc_module_begin ()
-    set_shortname (N_("X window"))
-    set_description (N_("X11 video window (XCB)"))
-    set_category (CAT_VIDEO)
-    set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window", 10)
-    set_callbacks (Open, Close)
-
-    /* Obsolete since 1.1.0: */
-    add_obsolete_bool ("x11-altfullscreen")
-    add_obsolete_bool ("xvideo-altfullscreen")
-    add_obsolete_bool ("xvmc-altfullscreen")
-    add_obsolete_bool ("glx-altfullscreen")
-
-    add_submodule ()
-    set_shortname (N_("Drawable"))
-    set_description (N_("Embedded window video"))
-    set_category (CAT_VIDEO)
-    set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window", 70)
-    set_callbacks (EmOpen, EmClose)
-    add_shortcut ("embed-xid")
-
-    add_string ("x11-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
-    add_integer ("drawable-xid", 0, XID_TEXT, XID_LONGTEXT, true)
-        change_volatile ()
-
-vlc_module_end ()
-
-static int Control (vout_window_t *, int, va_list ap);
-static void *Thread (void *);
-
 struct vout_window_sys_t
 {
     xcb_connection_t *conn;
@@ -104,6 +54,144 @@ struct vout_window_sys_t
 
     bool embedded;
 };
+
+static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
+{
+    vout_window_sys_t *sys = wnd->sys;
+
+    if (sys->keys != NULL && XCB_keyHandler_Process (sys->keys, ev) == 0)
+        return;
+
+    switch (ev->response_type & 0x7f)
+    {
+        case XCB_CONFIGURE_NOTIFY:
+        {
+            xcb_configure_notify_event_t *cne = (void *)ev;
+            vout_window_ReportSize (wnd, cne->width, cne->height);
+            break;
+        }
+        case XCB_DESTROY_NOTIFY:
+            vout_window_ReportClose (wnd);
+            break;
+
+        case XCB_MAPPING_NOTIFY:
+            break;
+
+        default:
+            msg_Dbg (wnd, "unhandled event %"PRIu8, ev->response_type);
+    }
+
+    free (ev);
+}
+
+/** Background thread for X11 events handling */
+static void *Thread (void *data)
+{
+    vout_window_t *wnd = data;
+    vout_window_sys_t *p_sys = wnd->sys;
+    xcb_connection_t *conn = p_sys->conn;
+
+    int fd = xcb_get_file_descriptor (conn);
+    if (fd == -1)
+        return NULL;
+
+    for (;;)
+    {
+        xcb_generic_event_t *ev;
+        struct pollfd ufd = { .fd = fd, .events = POLLIN, };
+
+        poll (&ufd, 1, -1);
+
+        int canc = vlc_savecancel ();
+        while ((ev = xcb_poll_for_event (conn)) != NULL)
+            ProcessEvent(wnd, ev);
+        vlc_restorecancel (canc);
+
+        if (xcb_connection_has_error (conn))
+        {
+            msg_Err (wnd, "X server failure");
+            break;
+        }
+    }
+    return NULL;
+}
+
+#define NET_WM_STATE_REMOVE 0
+#define NET_WM_STATE_ADD    1
+#define NET_WM_STATE_TOGGLE 2
+
+/** Changes the EWMH state of the window */
+static void set_wm_state (vout_window_t *wnd, bool on, xcb_atom_t state)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    /* From EWMH "_WM_STATE" */
+    xcb_client_message_event_t ev = {
+         .response_type = XCB_CLIENT_MESSAGE,
+         .format = 32,
+         .window = wnd->handle.xid,
+         .type = sys->wm_state,
+    };
+
+    ev.data.data32[0] = on ? NET_WM_STATE_ADD : NET_WM_STATE_REMOVE;
+    ev.data.data32[1] = state;
+    ev.data.data32[2] = 0;
+    ev.data.data32[3] = 1;
+
+    /* From ICCCM "Changing Window State" */
+    xcb_send_event (sys->conn, 0, sys->root,
+                    XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
+                    XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                    (const char *)&ev);
+}
+
+
+static int Control (vout_window_t *wnd, int cmd, va_list ap)
+{
+    vout_window_sys_t *p_sys = wnd->sys;
+    xcb_connection_t *conn = p_sys->conn;
+
+    switch (cmd)
+    {
+        case VOUT_WINDOW_SET_SIZE:
+        {
+            if (p_sys->embedded)
+                return VLC_EGENERIC;
+
+            unsigned width = va_arg (ap, unsigned);
+            unsigned height = va_arg (ap, unsigned);
+            const uint32_t values[] = { width, height, };
+
+            xcb_configure_window (conn, wnd->handle.xid,
+                                  XCB_CONFIG_WINDOW_WIDTH |
+                                  XCB_CONFIG_WINDOW_HEIGHT, values);
+            break;
+        }
+
+        case VOUT_WINDOW_SET_STATE:
+        {
+            unsigned state = va_arg (ap, unsigned);
+            bool above = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
+            bool below = (state & VOUT_WINDOW_STATE_BELOW) != 0;
+
+            set_wm_state (wnd, above, p_sys->wm_state_above);
+            set_wm_state (wnd, below, p_sys->wm_state_below);
+            break;
+        }
+
+        case VOUT_WINDOW_SET_FULLSCREEN:
+        {
+            bool fs = va_arg (ap, int);
+            set_wm_state (wnd, fs, p_sys->wm_state_fullscreen);
+            break;
+        }
+
+        default:
+            msg_Err (wnd, "request %d not implemented", cmd);
+            return VLC_EGENERIC;
+    }
+    xcb_flush (p_sys->conn);
+    return VLC_SUCCESS;
+}
 
 /** Set an X window property from a nul-terminated string */
 static inline
@@ -175,10 +263,6 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
     free (reply);
     return atom;
 }
-
-#define NET_WM_STATE_REMOVE 0
-#define NET_WM_STATE_ADD    1
-#define NET_WM_STATE_TOGGLE 2
 
 static void CacheAtoms (vout_window_sys_t *p_sys)
 {
@@ -376,140 +460,6 @@ static void Close (vout_window_t *wnd)
     free (p_sys);
 }
 
-static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
-{
-    vout_window_sys_t *sys = wnd->sys;
-
-    if (sys->keys != NULL && XCB_keyHandler_Process (sys->keys, ev) == 0)
-        return;
-
-    switch (ev->response_type & 0x7f)
-    {
-        case XCB_CONFIGURE_NOTIFY:
-        {
-            xcb_configure_notify_event_t *cne = (void *)ev;
-            vout_window_ReportSize (wnd, cne->width, cne->height);
-            break;
-        }
-        case XCB_DESTROY_NOTIFY:
-            vout_window_ReportClose (wnd);
-            break;
-
-        case XCB_MAPPING_NOTIFY:
-            break;
-
-        default:
-            msg_Dbg (wnd, "unhandled event %"PRIu8, ev->response_type);
-    }
-
-    free (ev);
-}
-
-/** Background thread for X11 events handling */
-static void *Thread (void *data)
-{
-    vout_window_t *wnd = data;
-    vout_window_sys_t *p_sys = wnd->sys;
-    xcb_connection_t *conn = p_sys->conn;
-
-    int fd = xcb_get_file_descriptor (conn);
-    if (fd == -1)
-        return NULL;
-
-    for (;;)
-    {
-        xcb_generic_event_t *ev;
-        struct pollfd ufd = { .fd = fd, .events = POLLIN, };
-
-        poll (&ufd, 1, -1);
-
-        int canc = vlc_savecancel ();
-        while ((ev = xcb_poll_for_event (conn)) != NULL)
-            ProcessEvent(wnd, ev);
-        vlc_restorecancel (canc);
-
-        if (xcb_connection_has_error (conn))
-        {
-            msg_Err (wnd, "X server failure");
-            break;
-        }
-    }
-    return NULL;
-}
-
-/** Changes the EWMH state of the window */
-static void set_wm_state (vout_window_t *wnd, bool on, xcb_atom_t state)
-{
-    vout_window_sys_t *sys = wnd->sys;
-    /* From EWMH "_WM_STATE" */
-    xcb_client_message_event_t ev = {
-         .response_type = XCB_CLIENT_MESSAGE,
-         .format = 32,
-         .window = wnd->handle.xid,
-         .type = sys->wm_state,
-    };
-
-    ev.data.data32[0] = on ? NET_WM_STATE_ADD : NET_WM_STATE_REMOVE;
-    ev.data.data32[1] = state;
-    ev.data.data32[2] = 0;
-    ev.data.data32[3] = 1;
-
-    /* From ICCCM "Changing Window State" */
-    xcb_send_event (sys->conn, 0, sys->root,
-                    XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
-                    XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
-                    (const char *)&ev);
-}
-
-
-static int Control (vout_window_t *wnd, int cmd, va_list ap)
-{
-    vout_window_sys_t *p_sys = wnd->sys;
-    xcb_connection_t *conn = p_sys->conn;
-
-    switch (cmd)
-    {
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            if (p_sys->embedded)
-                return VLC_EGENERIC;
-
-            unsigned width = va_arg (ap, unsigned);
-            unsigned height = va_arg (ap, unsigned);
-            const uint32_t values[] = { width, height, };
-
-            xcb_configure_window (conn, wnd->handle.xid,
-                                  XCB_CONFIG_WINDOW_WIDTH |
-                                  XCB_CONFIG_WINDOW_HEIGHT, values);
-            break;
-        }
-
-        case VOUT_WINDOW_SET_STATE:
-        {
-            unsigned state = va_arg (ap, unsigned);
-            bool above = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
-            bool below = (state & VOUT_WINDOW_STATE_BELOW) != 0;
-
-            set_wm_state (wnd, above, p_sys->wm_state_above);
-            set_wm_state (wnd, below, p_sys->wm_state_below);
-            break;
-        }
-
-        case VOUT_WINDOW_SET_FULLSCREEN:
-        {
-            bool fs = va_arg (ap, int);
-            set_wm_state (wnd, fs, p_sys->wm_state_fullscreen);
-            break;
-        }
-
-        default:
-            msg_Err (wnd, "request %d not implemented", cmd);
-            return VLC_EGENERIC;
-    }
-    xcb_flush (p_sys->conn);
-    return VLC_SUCCESS;
-}
-
 /*** Embedded drawable support ***/
 
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
@@ -670,3 +620,44 @@ static void EmClose (vout_window_t *wnd)
     Close (wnd);
     ReleaseDrawable (VLC_OBJECT(wnd), window);
 }
+
+#define DISPLAY_TEXT N_("X11 display")
+#define DISPLAY_LONGTEXT N_( \
+    "Video will be rendered with this X11 display. " \
+    "If empty, the default display will be used.")
+
+#define XID_TEXT N_("X11 window ID")
+#define XID_LONGTEXT N_( \
+    "Video will be embedded in this pre-existing window. " \
+    "If zero, a new window will be created.")
+
+/*
+ * Module descriptor
+ */
+vlc_module_begin ()
+    set_shortname (N_("X window"))
+    set_description (N_("X11 video window (XCB)"))
+    set_category (CAT_VIDEO)
+    set_subcategory (SUBCAT_VIDEO_VOUT)
+    set_capability ("vout window", 10)
+    set_callbacks (Open, Close)
+
+    /* Obsolete since 1.1.0: */
+    add_obsolete_bool ("x11-altfullscreen")
+    add_obsolete_bool ("xvideo-altfullscreen")
+    add_obsolete_bool ("xvmc-altfullscreen")
+    add_obsolete_bool ("glx-altfullscreen")
+
+    add_submodule ()
+    set_shortname (N_("Drawable"))
+    set_description (N_("Embedded window video"))
+    set_category (CAT_VIDEO)
+    set_subcategory (SUBCAT_VIDEO_VOUT)
+    set_capability ("vout window", 70)
+    set_callbacks (EmOpen, EmClose)
+    add_shortcut ("embed-xid")
+
+    add_string ("x11-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
+    add_integer ("drawable-xid", 0, XID_TEXT, XID_LONGTEXT, true)
+        change_volatile ()
+vlc_module_end ()
