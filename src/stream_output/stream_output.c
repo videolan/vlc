@@ -617,7 +617,7 @@ static int mrl_Parse( mrl_t *p_mrl, const char *psz_mrl )
     {
         /* msg_Warn( p_sout, "drive letter %c: found in source string",
                           *psz_dup ) ; */
-        psz_parser = "";
+        *psz_parser = '\0';
     }
 #endif
 
