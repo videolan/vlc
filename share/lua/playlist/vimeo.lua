@@ -22,17 +22,6 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
-function get_prefres()
-    local prefres = -1
-    if vlc.var and vlc.var.inherit then
-        prefres = vlc.var.inherit(nil, "preferred-resolution")
-        if prefres == nil then
-            prefres = -1
-        end
-    end
-    return prefres
-end
-
 -- Probe function.
 function probe()
     return ( vlc.access == "http" or vlc.access == "https" )
@@ -60,7 +49,7 @@ function parse()
 
     else -- API URL
 
-        local prefres = get_prefres()
+        local prefres = vlc.var.inherit(nil, "preferred-resolution")
         local line = vlc.readline() -- data is on one line only
 
         for stream in string.gmatch( line, "{([^}]*\"profile\":[^}]*)}" ) do

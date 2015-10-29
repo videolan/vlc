@@ -20,17 +20,6 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
-function get_prefres()
-    local prefres = -1
-    if vlc.var and vlc.var.inherit then
-        prefres = vlc.var.inherit(nil, "preferred-resolution")
-        if prefres == nil then
-            prefres = -1
-        end
-    end
-    return prefres
-end
-
 -- Probe function.
 function probe()
     return vlc.access == "http"
@@ -58,7 +47,7 @@ function parse()
     end
 
     if string.match ( vlc.path, "zapiks.fr/view/." ) then
-        prefres = get_prefres()
+        prefres = vlc.var.inherit(nil, "preferred-resolution")
         while true do
             line = vlc.readline()
             if not line then break end

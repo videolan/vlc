@@ -36,20 +36,9 @@ function get_arturl()
     return vlc.access.."://img.youtube.com/vi/"..video_id.."/default.jpg"
 end
 
-function get_prefres()
-    local prefres = -1
-    if vlc.var and vlc.var.inherit then
-        prefres = vlc.var.inherit(nil, "preferred-resolution")
-        if prefres == nil then
-            prefres = -1
-        end
-    end
-    return prefres
-end
-
 -- Pick the most suited format available
 function get_fmt( fmt_list )
-    local prefres = get_prefres()
+    local prefres = vlc.var.inherit(nil, "preferred-resolution")
     if prefres < 0 then
         return nil
     end
