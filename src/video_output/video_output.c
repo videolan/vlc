@@ -164,6 +164,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     if (vout->p->splitter_name == NULL) {
         vout_window_cfg_t wcfg = {
             .is_standalone = !var_InheritBool(vout, "embedded-video"),
+            .is_fullscreen = var_GetBool(vout, "fullscreen"),
             .type = VOUT_WINDOW_TYPE_INVALID,
             // TODO: take pixel A/R, crop and zoom into account
 #ifdef __APPLE__
@@ -177,8 +178,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         vout_window_t *window = vout_display_window_New(vout, &wcfg);
         if (window != NULL)
         {
-            if (var_InheritBool(vout, "fullscreen"))
-                vout_window_SetFullScreen(window, true);
             if (var_InheritBool(vout, "video-wallpaper"))
                 vout_window_SetState(window, VOUT_WINDOW_STATE_BELOW);
             else if (var_InheritBool(vout, "video-on-top"))
