@@ -713,6 +713,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t*)p_mi;
+    emit p_mi->askVideoSetFullScreen( cfg->is_fullscreen );
     return VLC_SUCCESS;
 }
 

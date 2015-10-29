@@ -348,6 +348,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     }
 
     xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
+    vout_window_SetFullScreen (wnd, cfg->is_fullscreen);
     return VLC_SUCCESS;
 
 error:

@@ -87,9 +87,9 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
         p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
         p_wnd->control = WindowControl;
-
-        return VLC_SUCCESS;
     }
+    vout_window_SetFullScreen(p_wnd, cfg->is_fullscreen);
+    return VLC_SUCCESS;
 }
 
 static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)

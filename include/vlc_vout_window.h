@@ -65,11 +65,12 @@ enum {
 };
 
 typedef struct vout_window_cfg_t {
-    /* If true, a standalone window is requested */
-    bool is_standalone;
-
     /* Window handle type */
     unsigned type;
+
+    /* If true, a standalone window is requested */
+    bool is_standalone;
+    bool is_fullscreen;
 
 #ifdef __APPLE__
     /* Window position hint */
