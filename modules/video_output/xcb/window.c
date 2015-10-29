@@ -116,12 +116,26 @@ static void *Thread (void *data)
     return NULL;
 }
 
+/** Sets the EWMH state of the (unmapped) window */
+static void set_wm_state (vout_window_t *wnd, const vout_window_cfg_t *cfg)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    xcb_atom_t data[1];
+    uint32_t len = 0;
+
+    if (cfg->is_fullscreen)
+        data[len++] = sys->wm_state_fullscreen;
+
+    xcb_change_property (sys->conn, XCB_PROP_MODE_REPLACE, wnd->handle.xid,
+                         sys->wm_state, XA_ATOM, 32, len, data);
+}
+
 #define NET_WM_STATE_REMOVE 0
 #define NET_WM_STATE_ADD    1
 #define NET_WM_STATE_TOGGLE 2
 
-/** Changes the EWMH state of the window */
-static void set_wm_state (vout_window_t *wnd, bool on, xcb_atom_t state)
+/** Changes the EWMH state of the (mapped) window */
+static void change_wm_state (vout_window_t *wnd, bool on, xcb_atom_t state)
 {
     vout_window_sys_t *sys = wnd->sys;
     /* From EWMH "_WM_STATE" */
@@ -143,7 +157,6 @@ static void set_wm_state (vout_window_t *wnd, bool on, xcb_atom_t state)
                     XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
                     (const char *)&ev);
 }
-
 
 static int Control (vout_window_t *wnd, int cmd, va_list ap)
 {
@@ -173,15 +186,15 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
             bool above = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
             bool below = (state & VOUT_WINDOW_STATE_BELOW) != 0;
 
-            set_wm_state (wnd, above, p_sys->wm_state_above);
-            set_wm_state (wnd, below, p_sys->wm_state_below);
+            change_wm_state (wnd, above, p_sys->wm_state_above);
+            change_wm_state (wnd, below, p_sys->wm_state_below);
             break;
         }
 
         case VOUT_WINDOW_SET_FULLSCREEN:
         {
             bool fs = va_arg (ap, int);
-            set_wm_state (wnd, fs, p_sys->wm_state_fullscreen);
+            change_wm_state (wnd, fs, p_sys->wm_state_fullscreen);
             break;
         }
 
@@ -410,6 +423,9 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     /* Cache any EWMH atom we may need later */
     CacheAtoms (p_sys);
 
+    /* Set initial window state */
+    set_wm_state (wnd, cfg);
+
     /* Make the window visible */
     xcb_map_window (conn, window);
 
@@ -432,7 +448,6 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     }
 
     xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
-    vout_window_SetFullScreen (wnd, cfg->is_fullscreen);
     return VLC_SUCCESS;
 
 error:
