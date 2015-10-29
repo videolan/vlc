@@ -320,7 +320,7 @@ void sout_StreamChainDelete (sout_stream_t *p_first, sout_stream_t *p_last)
     vlc_assert_unreachable ();
 }
 
-sout_stream_t *sout_StreamChainNew (sout_instance_t *p_sout, char *psz_chain,
+sout_stream_t *sout_StreamChainNew (sout_instance_t *p_sout, const char *psz_chain,
                                     sout_stream_t *p_next,
                                     sout_stream_t **pp_last)
 {

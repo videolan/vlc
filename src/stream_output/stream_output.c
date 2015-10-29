@@ -810,7 +810,7 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
  *
  *  Returns a pointer to the first module.
  */
-sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout, char *psz_chain,
+sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout, const char *psz_chain,
                                 sout_stream_t *p_next, sout_stream_t **pp_last)
 {
     if(!psz_chain || !*psz_chain)
@@ -832,9 +832,9 @@ sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout, char *psz_chain,
     {
         config_chain_t *p_cfg;
         char *psz_name;
-        psz_chain = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
+        char *psz_rest_chain = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
         free( psz_parser );
-        psz_parser = psz_chain;
+        psz_parser = psz_rest_chain;
 
         vlc_array_append(&cfg, p_cfg);
         vlc_array_append(&name, psz_name);
