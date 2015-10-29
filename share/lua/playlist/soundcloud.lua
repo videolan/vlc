@@ -42,30 +42,17 @@ function parse()
         line = vlc.readline()
         if not line then break end
 
-        if not path then
-            local track = string.match( line, "soundcloud:tracks:(%d+)" )
-            if track then
-                -- API magic
-                local client_id = "02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea"
-                -- app_version is not required by the API but we send it
-                -- anyway to remain unconspicuous
-                local app_version = "a089efd"
-
-                local api = vlc.stream( "https://api.soundcloud.com/i1/tracks/"..track.."/streams?client_id="..client_id.."&app_version="..app_version )
-                if not api then
-                    break
-                end
-
-                local streams = api:readline() -- data is on one line only
-                -- For now only quality available is 128 kbps (http_mp3_128_url)
-                path = string.match( streams, "[\"']http_mp3_%d+_url[\"'] *: *[\"'](.-)[\"']" )
-                if path then
-                    -- FIXME: do this properly
-                    path = string.gsub( path, "\\u0026", "&" )
-                end
-            end
+        -- Parameters for API call
+        if not track then
+            track = string.match( line, "soundcloud:tracks:(%d+)" )
         end
 
+        -- For private tracks
+        if not secret then
+            secret = string.match( line, "[\"']secret_token[\"'] *: *[\"'](.-)[\"']" )
+        end
+
+        -- Metadata
         if not name then
             name = string.match( line, "[\"']title[\"'] *: *\"(.-[^\\])\"" )
             if name then
@@ -89,6 +76,26 @@ function parse()
 
         if not arturl then
             arturl = string.match( line, "[\"']artwork_url[\"'] *: *[\"'](.-)[\"']" )
+        end
+    end
+
+    if track then
+        -- API magic
+        local client_id = "02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea"
+        -- app_version is not required by the API but we send it anyway
+        -- to remain unconspicuous
+        local app_version = "a089efd"
+
+        local api = vlc.stream( "https://api.soundcloud.com/i1/tracks/"..track.."/streams?client_id="..client_id.."&app_version="..app_version..( secret and "&secret_token="..secret or "" ) )
+
+        if api then
+            local streams = api:readline() -- data is on one line only
+            -- For now only quality available is 128 kbps (http_mp3_128_url)
+            path = string.match( streams, "[\"']http_mp3_%d+_url[\"'] *: *[\"'](.-)[\"']" )
+            if path then
+                -- FIXME: do this properly
+                path = string.gsub( path, "\\u0026", "&" )
+            end
         end
     end
 
