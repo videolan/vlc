@@ -83,6 +83,9 @@ Audio output:
    It now supports HDMI/SPDIF passthrough for AC3, 5.1/7.1 and float output.
  * Added Tizen audio module.
 
+Audio filters and output:
+ * Add SoX Resampler library audio filter module (converter and resampler)
+
 Video ouput:
  * Linux/BSD default video output is now OpenGL, instead of Xvideo
  * Wayland shell surface window provider
