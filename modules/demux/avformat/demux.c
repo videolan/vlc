@@ -1069,7 +1069,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i64 = p_sys->p_title->seekpoint[i_seekpoint]->i_time_offset *
                   AV_TIME_BASE / 1000000 + i_start_time;
 
-            msg_Warn( p_demux, "DEMUX_SET_TIME: %"PRId64, i64 );
+            msg_Warn( p_demux, "DEMUX_SET_SEEKPOINT: %"PRId64, i64 );
 
             if( av_seek_frame( p_sys->ic, -1, i64, AVSEEK_FLAG_BACKWARD ) < 0 )
             {
