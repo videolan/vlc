@@ -1,7 +1,7 @@
 /*
- * AtomsReader.hpp
+ * IndexReader.hpp
  *****************************************************************************
- * Copyright (C) 2014 - VideoLAN and VLC authors
+ * Copyright (C) 2015 - VideoLAN and VLC authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,18 +17,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef ATOMSREADER_HPP
-#define ATOMSREADER_HPP
+#ifndef INDEXREADER_HPP
+#define INDEXREADER_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include <vlc_common.h>
-#include <vlc_stream.h>
-extern "C" {
-#include "../../demux/mp4/libmp4.h"
-}
+#include "../adaptative/mp4/AtomsReader.hpp"
 
 namespace adaptative
 {
@@ -42,18 +34,16 @@ namespace dash
 {
     namespace mp4
     {
-        class AtomsReader
+        using namespace adaptative::mp4;
+        using namespace adaptative::playlist;
+
+        class IndexReader : public AtomsReader
         {
             public:
-                AtomsReader(vlc_object_t *);
-                ~AtomsReader();
-                bool parseBlock(block_t *, adaptative::playlist::BaseRepresentation *);
-
-            protected:
-                vlc_object_t *object;
-                MP4_Box_t *rootbox;
+                IndexReader(vlc_object_t *);
+                bool parseIndex(block_t *, BaseRepresentation *);
         };
     }
 }
 
-#endif // ATOMSREADER_HPP
+#endif // INDEXREADER_HPP

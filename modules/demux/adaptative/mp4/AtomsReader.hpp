@@ -1,11 +1,7 @@
 /*
- * Segment.cpp
+ * AtomsReader.hpp
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
- *
- * Created on: Aug 10, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2014 - VideoLAN and VLC authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,31 +17,36 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef ATOMSREADER_HPP
+#define ATOMSREADER_HPP
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "DASHSegment.h"
-#include "../adaptative/playlist/BaseRepresentation.h"
-#include "../mp4/IndexReader.hpp"
-#include "../adaptative/playlist/AbstractPlaylist.hpp"
-#include "../adaptative/playlist/SegmentChunk.hpp"
-
-using namespace adaptative::playlist;
-using namespace dash::mpd;
-using namespace dash::mp4;
-
-DashIndexSegment::DashIndexSegment(ICanonicalUrl *parent) :
-    IndexSegment(parent)
-{
+#include <vlc_common.h>
+#include <vlc_stream.h>
+extern "C" {
+#include "../../demux/mp4/libmp4.h"
 }
 
-void DashIndexSegment::onChunkDownload(block_t **pp_block, SegmentChunk *, BaseRepresentation *rep)
+namespace adaptative
 {
-    if(!rep)
-        return;
+    namespace mp4
+    {
+        class AtomsReader
+        {
+            public:
+                AtomsReader(vlc_object_t *);
+                ~AtomsReader();
+                void clean();
+                bool parseBlock(block_t *);
 
-    IndexReader br(rep->getPlaylist()->getVLCObject());
-    br.parseIndex(*pp_block, rep);
+            protected:
+                vlc_object_t *object;
+                MP4_Box_t *rootbox;
+        };
+    }
 }
+
+#endif // ATOMSREADER_HPP

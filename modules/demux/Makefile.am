@@ -292,6 +292,8 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/logic/RateBasedAdaptationLogic.cpp \
     demux/adaptative/logic/Representationselectors.hpp \
     demux/adaptative/logic/Representationselectors.cpp \
+    demux/adaptative/mp4/AtomsReader.cpp \
+    demux/adaptative/mp4/AtomsReader.hpp \
     demux/adaptative/http/BytesRange.cpp \
     demux/adaptative/http/BytesRange.hpp \
     demux/adaptative/http/Chunk.cpp \
@@ -362,8 +364,8 @@ libadaptative_dash_SOURCES = \
     demux/dash/mpd/Representation.h \
     demux/dash/mpd/TrickModeType.cpp \
     demux/dash/mpd/TrickModeType.h \
-    demux/dash/mp4/AtomsReader.cpp \
-    demux/dash/mp4/AtomsReader.hpp \
+    demux/dash/mp4/IndexReader.cpp \
+    demux/dash/mp4/IndexReader.hpp \
     demux/dash/DASHManager.cpp \
     demux/dash/DASHManager.h \
     demux/dash/DASHStream.cpp \
