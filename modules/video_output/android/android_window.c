@@ -399,6 +399,8 @@ static android_window *AndroidWindow_New(vout_display_t *vd,
     {
         if (id == AWindow_Video)
             msg_Err(vd, "can't get Video Surface");
+        else if (id == AWindow_Subtitles)
+            msg_Err(vd, "can't get Subtitles Surface");
         goto error;
     }
 
