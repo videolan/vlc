@@ -375,6 +375,17 @@ void SegmentInformation::mergeWith(SegmentInformation *updated, mtime_t prunetim
     /* FIXME: handle difference */
 }
 
+void SegmentInformation::mergeWithTimeline(SegmentTimeline *updated)
+{
+    MediaSegmentTemplate *templ = inheritSegmentTemplate();
+    if(templ)
+    {
+        SegmentTimeline *timeline = templ->segmentTimeline.Get();
+        if(timeline)
+            timeline->mergeWith(*updated);
+    }
+}
+
 void SegmentInformation::pruneBySegmentNumber(uint64_t num)
 {
     if(segmentList)

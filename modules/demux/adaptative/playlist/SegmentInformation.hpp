@@ -84,6 +84,7 @@ namespace adaptative
                 mtime_t getPlaybackTimeBySegmentNumber(uint64_t) const;
                 virtual void getDurationsRange(mtime_t *, mtime_t *) const;
                 virtual void mergeWith(SegmentInformation *, mtime_t);
+                virtual void mergeWithTimeline(SegmentTimeline *); /* ! don't use with global merge */
                 virtual void pruneBySegmentNumber(uint64_t);
                 virtual void runLocalUpdates(mtime_t, uint64_t);
 
