@@ -107,8 +107,11 @@ block_t * AbstractChunk::read(size_t sizehint, mtime_t *time)
 
     if(block)
     {
+	if(getBytesRead() == 0)
+            block->i_flags |= BLOCK_FLAG_HEADER;
         setBytesRead(getBytesRead() + block->i_buffer);
         onDownload(&block);
+        block->i_flags ^= BLOCK_FLAG_HEADER;
     }
 
     return block;

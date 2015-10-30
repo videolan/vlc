@@ -43,7 +43,7 @@ DashIndexSegment::DashIndexSegment(ICanonicalUrl *parent) :
 
 void DashIndexSegment::onChunkDownload(block_t **pp_block, SegmentChunk *, BaseRepresentation *rep)
 {
-    if(!rep)
+    if(!rep || ((*pp_block)->i_flags & BLOCK_FLAG_HEADER) == 0 )
         return;
 
     IndexReader br(rep->getPlaylist()->getVLCObject());
