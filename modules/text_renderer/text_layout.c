@@ -46,7 +46,7 @@
 
 /* RTL */
 #if defined(HAVE_FRIBIDI)
-# include <fribidi/fribidi.h>
+# include <fribidi.h>
 #endif
 
 /* Complex Scripts */
