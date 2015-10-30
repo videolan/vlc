@@ -1422,16 +1422,19 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
     demux_sys_t *p_sys = p_demux->p_sys;
 
     if (p_sys->b_menu) {
+        int result;
         if (i_title <= 0) {
             msg_Dbg(p_demux, "Playing TopMenu Title");
+            result = bd_menu_call(p_sys->bluray, -1);
         } else if (i_title >= (int)p_sys->i_title - 1) {
             msg_Dbg(p_demux, "Playing FirstPlay Title");
-            i_title = BLURAY_TITLE_FIRST_PLAY;
+            result = bd_play_title(p_sys->bluray, BLURAY_TITLE_FIRST_PLAY);
         } else {
             msg_Dbg(p_demux, "Playing Title %i", i_title);
+            result = bd_play_title(p_sys->bluray, i_title);
         }
 
-        if (bd_play_title(p_sys->bluray, i_title) == 0) {
+        if (result == 0) {
             msg_Err(p_demux, "cannot play bd title '%d'", i_title);
             return VLC_EGENERIC;
         }
