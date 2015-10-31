@@ -1935,7 +1935,8 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
                 /* track vout changes */
                 vout_thread_t *p_vout = input_GetVout(p_demux->p_input);
                 if (p_vout != p_sys->p_vout) {
-                    msg_Info(p_demux, "vout changed %p -> %p\n", p_sys->p_vout, p_vout);
+                    msg_Info(p_demux, "vout changed %p -> %p\n",
+                             (void *)p_sys->p_vout, (void *)p_vout);
                     blurayReleaseVout(p_demux);
                     p_sys->p_vout = p_vout;
                 } else {

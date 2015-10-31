@@ -437,7 +437,8 @@ static void flush(filter_t *filter)
 
     while ((buffer = mmal_queue_get(sys->filtered_pictures))) {
         picture_t *pic = (picture_t *)buffer->user_data;
-        msg_Dbg(filter, "flush: release already filtered pic %p", pic);
+        msg_Dbg(filter, "flush: release already filtered pic %p",
+                (void *)pic);
         picture_Release(pic);
     }
     msg_Dbg(filter, "flush: done");

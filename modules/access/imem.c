@@ -275,7 +275,8 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
     sys->source.cookie = var_InheritString(object, "imem-cookie");
 
     msg_Dbg(object, "Using get(%p), release(%p), data(%p), cookie(%s)",
-            sys->source.get, sys->source.release, sys->source.data,
+            (void *)sys->source.get, (void *)sys->source.release,
+            sys->source.data,
             sys->source.cookie ? sys->source.cookie : "(null)");
 
     /* */

@@ -239,7 +239,7 @@ filter_t *filter_chain_AppendFilter( filter_chain_t *chain, const char *name,
 
     msg_Dbg( parent, "Filter '%s' (%p) appended to chain",
              (name != NULL) ? name : module_get_name(filter->p_module, false),
-             filter );
+             (void *)filter );
     return filter;
 
 error:
@@ -281,7 +281,7 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
 
     module_unneed( filter, filter->p_module );
 
-    msg_Dbg( obj, "Filter %p removed from chain", filter );
+    msg_Dbg( obj, "Filter %p removed from chain", (void *)filter );
     FilterDeletePictures( chained->pending );
 
     free( chained->mouse );

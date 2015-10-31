@@ -76,7 +76,7 @@ stream_t *stream_FilterAutoNew( stream_t *p_source )
         if( p_filter == NULL )
             break;
 
-        msg_Dbg( p_filter, "stream filter added to %p", p_source );
+        msg_Dbg( p_filter, "stream filter added to %p", (void *)p_source );
         p_source = p_filter;
     }
     return p_source;

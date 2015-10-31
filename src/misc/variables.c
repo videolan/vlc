@@ -905,8 +905,8 @@ static int AddCallback( vlc_object_t *p_this, const char *psz_name,
     if( p_var == NULL )
     {
         vlc_mutex_unlock( &p_priv->var_lock );
-        msg_Err( p_this, "cannot add callback %p to nonexistent "
-                         "variable '%s'", entry.u.p_callback, psz_name );
+        msg_Err( p_this, "cannot add callback %p to nonexistent variable '%s'",
+                 (void *)entry.u.p_callback, psz_name );
         return VLC_ENOVAR;
     }
 

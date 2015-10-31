@@ -506,10 +506,10 @@ static void PrintObject( vlc_object_internals_t *priv,
     /* FIXME: need structure lock!!! */
     if( vlc_externals(priv)->p_parent )
         snprintf( psz_parent, 19, ", parent %p",
-                  vlc_externals(priv)->p_parent );
+                  (void *)vlc_externals(priv)->p_parent );
 
     printf( " %so %p %s%s%s%s\n", psz_prefix,
-            vlc_externals(priv), vlc_externals(priv)->psz_object_type,
+            (void *)vlc_externals(priv), vlc_externals(priv)->psz_object_type,
             psz_name, psz_refcount, psz_parent );
     vlc_restorecancel (canc);
 }

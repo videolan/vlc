@@ -1551,7 +1551,8 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &cropSource, destination, NULL, D3DTEXF_LINEAR);
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed IDirect3DDevice9_StretchRect: source 0x%p 0x%0lx", source, hr);
+        msg_Dbg(vd, "Failed IDirect3DDevice9_StretchRect: source 0x%p 0x%0lx",
+                (LPVOID)source, hr);
         return VLC_EGENERIC;
     }
 

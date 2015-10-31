@@ -74,7 +74,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
     decoder_t *p_dec = (decoder_t*)p_this;
     char psz_file[10 + 3 * sizeof (p_dec)];
 
-    snprintf( psz_file, sizeof( psz_file), "stream.%p", p_dec );
+    snprintf( psz_file, sizeof( psz_file), "stream.%p", (void *)p_dec );
 
     if( !b_force_dump )
         b_force_dump = var_InheritBool( p_dec, "dummy-save-es" );

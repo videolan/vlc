@@ -449,7 +449,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
     if( !getIntf()->p_sys->p_input )
     {
-        msg_Dbg( getIntf(), "new input %p detected", pInput );
+        msg_Dbg( getIntf(), "new input %p detected", (void *)pInput );
 
         getIntf()->p_sys->p_input = pInput;
         vlc_object_hold( pInput );
@@ -544,7 +544,8 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             break;
 
         case INPUT_EVENT_DEAD:
-            msg_Dbg( getIntf(), "end of input detected for %p", pInput );
+            msg_Dbg( getIntf(), "end of input detected for %p",
+                     (void *)pInput );
 
             var_DelCallback( pInput, "intf-event", onGenericCallback2, this );
             var_DelCallback( pInput, "bit-rate", onGenericCallback, this );

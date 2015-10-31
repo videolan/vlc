@@ -221,7 +221,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
 #ifndef NDEBUG
         /*msg_Dbg(vd, "Bitmap dbg: target = %p, pitch = %d, bitmap = %p",
-                sys->d2_render_target, pitch, sys->d2_bitmap);*/
+                (void *)sys->d2_render_target, pitch, (void *)sys->d2_bitmap);*/
 #endif
     }
     VLC_UNUSED(subpicture);
@@ -372,7 +372,7 @@ static int D2D_CreateRenderTarget(vout_display_t *vd)
 
 #ifndef NDEBUG
     msg_Dbg(vd, "Render trgt dbg: dpi = %f, render_target = %p, bitmap = %p",
-            dpi_x, sys->d2_render_target, sys->d2_bitmap);
+            dpi_x, (void *)sys->d2_render_target, (void *)sys->d2_bitmap);
 #endif
 
     return VLC_SUCCESS;

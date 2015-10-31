@@ -477,9 +477,9 @@ event_thread_t *EventThreadCreate( vout_display_t *vd)
     vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, false);
 
     _sntprintf( p_event->class_main, sizeof(p_event->class_main)/sizeof(*p_event->class_main),
-               _T("VLC video main %p"), p_event );
+               _T("VLC video main %p"), (void *)p_event );
     _sntprintf( p_event->class_video, sizeof(p_event->class_video)/sizeof(*p_event->class_video),
-               _T("VLC video output %p"), p_event );
+               _T("VLC video output %p"), (void *)p_event );
     return p_event;
 }
 

@@ -305,7 +305,7 @@ static block_t *Block( access_t *p_access )
 
     vlc_mutex_lock( &p_sys->lock );
     p_block = p_sys->p_frame;
-    //msg_Dbg( p_access, "sending frame %p",p_block );
+    //msg_Dbg( p_access, "sending frame %p", (void *)p_block );
     p_sys->p_frame = NULL;
     vlc_mutex_unlock( &p_sys->lock );
 

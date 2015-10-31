@@ -108,7 +108,8 @@ static OMX_ERRORTYPE OmxEmptyBufferDone(OMX_HANDLETYPE omx_handle,
     (void)omx_handle;
 
 #ifndef NDEBUG
-    msg_Dbg(vd, "OmxEmptyBufferDone %p, %p", omx_header, omx_header->pBuffer);
+    msg_Dbg(vd, "OmxEmptyBufferDone %p, %p", (void *)omx_header,
+            (void *)omx_header->pBuffer);
 #endif
 
     OMX_FIFO_PUT(&p_sys->port.fifo, omx_header);

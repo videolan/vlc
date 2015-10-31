@@ -464,7 +464,8 @@ static OMX_ERRORTYPE AllocateBuffers(decoder_t *p_dec, OmxPort *p_port)
                                p_port->definition.nBufferSize,
                                p_port->p_hwbuf->pp_handles[i] );
             OMX_DBG( "OMX_UseBuffer(%d) %p, %p", def->eDir,
-                     p_port->pp_buffers[i], p_port->p_hwbuf->pp_handles[i] );
+                     (void *)p_port->pp_buffers[i],
+                     p_port->p_hwbuf->pp_handles[i] );
         }
         else if( p_port->b_direct )
         {
@@ -473,8 +474,8 @@ static OMX_ERRORTYPE AllocateBuffers(decoder_t *p_dec, OmxPort *p_port)
                                p_port->i_port_index, 0,
                                p_port->definition.nBufferSize, (void*)1);
             OMX_DBG( "OMX_UseBuffer(%d) %p, %p", def->eDir,
-                     p_port->pp_buffers[i], p_port->pp_buffers[i] ?
-                     p_port->pp_buffers[i]->pBuffer : NULL );
+                     (void *)p_port->pp_buffers[i], p_port->pp_buffers[i] ?
+                     (void *)p_port->pp_buffers[i]->pBuffer : NULL );
         }
         else
         {
@@ -483,8 +484,8 @@ static OMX_ERRORTYPE AllocateBuffers(decoder_t *p_dec, OmxPort *p_port)
                                     p_port->i_port_index, 0,
                                     p_port->definition.nBufferSize);
             OMX_DBG( "OMX_AllocateBuffer(%d) %p, %p", def->eDir,
-                     p_port->pp_buffers[i], p_port->pp_buffers[i] ? 
-                     p_port->pp_buffers[i]->pBuffer : NULL );
+                     (void *)p_port->pp_buffers[i], p_port->pp_buffers[i] ?
+                     (void *)p_port->pp_buffers[i]->pBuffer : NULL );
         }
 
         if(omx_error != OMX_ErrorNone)
@@ -551,7 +552,7 @@ static OMX_ERRORTYPE FreeBuffers(decoder_t *p_dec, OmxPort *p_port)
             omx_error = OMX_FreeBuffer( p_port->omx_handle,
                                         p_port->i_port_index, p_buffer );
             OMX_DBG( "OMX_FreeBuffer(%d) %p, %p", def->eDir,
-                     p_buffer, p_buffer->pBuffer );
+                     (void *)p_buffer, (void *)p_buffer->pBuffer );
 
             if(omx_error != OMX_ErrorNone) break;
         }
@@ -800,7 +801,8 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
                 free(p_buffer);
                 continue;
             }
-            msg_Warn( p_dec, "Stray buffer left in fifo, %p", p_buffer );
+            msg_Warn( p_dec, "Stray buffer left in fifo, %p",
+                      (void *)p_buffer );
         }
         HwBuffer_Destroy( p_dec, p_port );
     }
@@ -1234,8 +1236,9 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
 
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_CODECCONFIG | OMX_BUFFERFLAG_ENDOFFRAME;
-        msg_Dbg(p_dec, "sending codec config data %p, %p, %i", p_header,
-                p_header->pBuffer, (int)p_header->nFilledLen);
+        msg_Dbg(p_dec, "sending codec config data %p, %p, %u",
+                (void *)p_header, (void *)p_header->pBuffer,
+                (unsigned)p_header->nFilledLen);
         OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
     }
 
@@ -1425,7 +1428,8 @@ static int DecodeVideoOutput( decoder_t *p_dec, OmxPort *p_port, picture_t **pp_
         {
             OMX_FIFO_GET(&p_port->fifo, p_header);
         }
-        OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
+        OMX_DBG( "FillThisBuffer %p, %p", (void *)p_header,
+                 (void *)p_header->pBuffer );
         OMX_FillThisBuffer(p_port->omx_handle, p_header);
     }
 
@@ -1496,8 +1500,9 @@ static int DecodeVideoInput( decoder_t *p_dec, OmxPort *p_port, block_t **pp_blo
          * than H.264 */
         convert_h264_to_annexb( p_header->pBuffer, p_header->nFilledLen,
                                 p_sys->i_nal_size_length);
-        OMX_DBG( "EmptyThisBuffer %p, %p, %i, %"PRId64, p_header, p_header->pBuffer,
-                 (int)p_header->nFilledLen, FromOmxTicks(p_header->nTimeStamp) );
+        OMX_DBG( "EmptyThisBuffer %p, %p, %u, %"PRId64, (void *)p_header,
+                 (void *)p_header->pBuffer, (unsigned)p_header->nFilledLen,
+                 FromOmxTicks(p_header->nTimeStamp) );
         OMX_EmptyThisBuffer(p_port->omx_handle, p_header);
         p_port->b_flushed = false;
         if (decode_more)
@@ -1705,7 +1710,8 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
                 p_buffer->i_pts;
         }
 
-        OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
+        OMX_DBG( "FillThisBuffer %p, %p", (void *)p_header,
+                 (void *)p_header->pBuffer );
         OMX_FIFO_GET(&p_sys->out.fifo, p_header);
         OMX_FillThisBuffer(p_sys->omx_handle, p_header);
     }
@@ -1738,16 +1744,17 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         {
             if(p_header->nFilledLen > p_header->nAllocLen)
             {
-                msg_Dbg(p_dec, "buffer too small (%i,%i)",
-                        (int)p_header->nFilledLen, (int)p_header->nAllocLen);
+                msg_Dbg(p_dec, "buffer too small (%u,%u)",
+                        (unsigned)p_header->nFilledLen,
+                        (unsigned)p_header->nAllocLen);
                 p_header->nFilledLen = p_header->nAllocLen;
             }
             memcpy(p_header->pBuffer, p_block->p_buffer, p_header->nFilledLen );
             block_Release(p_block);
         }
 
-        OMX_DBG( "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
-                 (int)p_header->nFilledLen );
+        OMX_DBG( "EmptyThisBuffer %p, %p, %u", (void *)p_header,
+                 (void *)p_header->pBuffer, (unsigned)p_header->nFilledLen );
         OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
         p_sys->in.b_flushed = false;
         *pp_block = NULL; /* Avoid being fed the same packet again */
@@ -1812,8 +1819,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
         p_header->nOffset = 0;
         p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
         p_header->nTimeStamp = ToOmxTicks(p_pic->date);
-        OMX_DBG( "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
-                 (int)p_header->nFilledLen );
+        OMX_DBG( "EmptyThisBuffer %p, %p, %u", (void *)p_header,
+                 (void *)p_header->pBuffer, (unsigned)p_header->nFilledLen );
         OMX_EmptyThisBuffer(p_sys->omx_handle, p_header);
         p_sys->in.b_flushed = false;
     }
@@ -1856,7 +1863,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
             p_header->pAppPrivate = 0;
         }
 
-        OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
+        OMX_DBG( "FillThisBuffer %p, %p", (void *)p_header,
+                 (void *)p_header->pBuffer );
         OMX_FillThisBuffer(p_sys->omx_handle, p_header);
     }
 
@@ -1950,7 +1958,8 @@ static OMX_ERRORTYPE OmxEmptyBufferDone( OMX_HANDLETYPE omx_handle,
     decoder_sys_t *p_sys = p_dec->p_sys;
     (void)omx_handle;
 
-    OMX_DBG( "OmxEmptyBufferDone %p, %p", omx_header, omx_header->pBuffer );
+    OMX_DBG( "OmxEmptyBufferDone %p, %p", (void *)omx_header,
+             (void *)omx_header->pBuffer );
 
     if(omx_header->pAppPrivate || omx_header->pOutputPortPrivate)
     {
@@ -1971,8 +1980,9 @@ static OMX_ERRORTYPE OmxFillBufferDone( OMX_HANDLETYPE omx_handle,
     decoder_sys_t *p_sys = p_dec->p_sys;
     (void)omx_handle;
 
-    OMX_DBG( "OmxFillBufferDone %p, %p, %i, %"PRId64, omx_header, omx_header->pBuffer,
-             (int)omx_header->nFilledLen, FromOmxTicks(omx_header->nTimeStamp) );
+    OMX_DBG( "OmxFillBufferDone %p, %p, %u, %"PRId64, (void *)omx_header,
+             (void *)omx_header->pBuffer, (unsigned)omx_header->nFilledLen,
+             FromOmxTicks(omx_header->nTimeStamp) );
 
     if(omx_header->pInputPortPrivate)
     {
@@ -2333,7 +2343,8 @@ static int HwBuffer_Start( decoder_t *p_dec, OmxPort *p_port )
                 HWBUFFER_UNLOCK( p_port );
                 return -1;
             }
-            OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
+            OMX_DBG( "FillThisBuffer %p, %p", (void *)p_header,
+                     (void *)p_header->pBuffer );
             OMX_FillThisBuffer( p_port->omx_handle, p_header );
         }
     }
@@ -2528,7 +2539,8 @@ static void *DequeueThread( void *data )
 
         HwBuffer_ChangeState( p_dec, p_port, i_index, BUF_STATE_OWNED );
 
-        OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
+        OMX_DBG( "FillThisBuffer %p, %p", (void *)p_header,
+                 (void *)p_header->pBuffer );
         OMX_FillThisBuffer( p_sys->omx_handle, p_header );
 
         HWBUFFER_BROADCAST( p_port );

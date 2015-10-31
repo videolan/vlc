@@ -166,7 +166,8 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
     p_input->p_sout = p_sout;
     p_input->p_fmt  = p_fmt;
 
-    msg_Dbg( p_sout, "adding a new sout input (sout_input:%p)", p_input );
+    msg_Dbg( p_sout, "adding a new sout input (sout_input: %p)",
+             (void *)p_input );
 
     if( p_fmt->i_codec == VLC_CODEC_NULL )
     {
@@ -195,7 +196,8 @@ int sout_InputDelete( sout_packetizer_input_t *p_input )
 {
     sout_instance_t     *p_sout = p_input->p_sout;
 
-    msg_Dbg( p_sout, "removing a sout input (sout_input:%p)", p_input );
+    msg_Dbg( p_sout, "removing a sout input (sout_input: %p)",
+             (void *)p_input );
 
     if( p_input->p_fmt->i_codec != VLC_CODEC_NULL )
     {

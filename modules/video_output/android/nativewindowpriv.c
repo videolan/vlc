@@ -148,7 +148,7 @@ int ANativeWindowPriv_setUsage( native_window_priv *priv,  bool is_hw, int hw_us
 {
     status_t err;
 
-    LOGD( "setUsage: %p, %d %X\n", priv->anw, is_hw, hw_usage );
+    LOGD( "setUsage: %p, %d %X\n", (void *)priv->anw, is_hw, hw_usage );
 
     if( is_hw )
     {
@@ -170,7 +170,7 @@ int ANativeWindowPriv_setBuffersGeometry( native_window_priv *priv, int w, int h
 {
     status_t err;
 
-    LOGD( "setBuffersGeometry: %p, %d, %d", priv->anw, w, h );
+    LOGD( "setBuffersGeometry: %p, %d, %d", (void *)priv->anw, w, h );
 
 #if ANDROID_ICS_OR_LATER
     err = native_window_set_buffers_format( priv->anw, hal_format );
@@ -205,7 +205,7 @@ int ANativeWindowPriv_getMinUndequeued( native_window_priv *priv, unsigned int *
     if( *min_undequeued == 0 )
         *min_undequeued = 1;
 
-    LOGD( "getMinUndequeued: %p %u", priv->anw, *min_undequeued );
+    LOGD( "getMinUndequeued: %p %u", (void *)priv->anw, *min_undequeued );
 
     return 0;
 }
@@ -224,7 +224,7 @@ int ANativeWindowPriv_setBufferCount(native_window_priv *priv, unsigned int coun
 {
     status_t err;
 
-    LOGD( "setBufferCount: %p %u", priv->anw, count );
+    LOGD( "setBufferCount: %p %u", (void *)priv->anw, count );
 
     err = native_window_set_buffer_count( priv->anw, count );
     CHECK_ERR();

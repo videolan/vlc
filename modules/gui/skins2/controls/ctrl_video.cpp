@@ -119,7 +119,7 @@ void CtrlVideo::setLayout( GenericLayout *pLayout,
     VoutManager::instance( getIntf() )->registerCtrlVideo( this );
 
     msg_Dbg( getIntf(),"New VideoControl detected(%p), useability=%s",
-                           this, isUseable() ? "true" : "false" );
+                           (void *)this, isUseable() ? "true" : "false" );
 }
 
 
@@ -169,23 +169,23 @@ void CtrlVideo::onUpdate( Subject<VarBool> &rVariable, void *arg  )
     if( &rVariable == m_pVisible )
     {
         msg_Dbg( getIntf(), "VideoCtrl(%p) : control visibility changed (%i)",
-                      this, isVisible() );
+                      (void *)this, isVisible() );
         notifyLayout();
     }
     else if( &rVariable == &m_pLayout->getActiveVar() )
     {
         msg_Dbg( getIntf(), "VideoCtrl(%p) : Active Layout changed (%i)",
-                      this, m_pLayout->getActiveVar().get() );
+                      (void *)this, m_pLayout->getActiveVar().get() );
     }
     else if( &rVariable == &getWindow()->getVisibleVar() )
     {
         msg_Dbg( getIntf(), "VideoCtrl(%p) : Window visibility changed (%i)",
-                      this, getWindow()->getVisibleVar().get() );
+                      (void *)this, getWindow()->getVisibleVar().get() );
     }
     else if( &rVariable == &rFullscreen )
     {
         msg_Dbg( getIntf(), "VideoCtrl(%p) : fullscreen toggled (%i)",
-                      this, rFullscreen.get() );
+                      (void *)this, rFullscreen.get() );
     }
 
     if( isUseable() && !isUsed() )
