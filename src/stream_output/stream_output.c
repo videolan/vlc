@@ -557,9 +557,10 @@ int sout_MuxGetStream( sout_mux_t *p_mux, unsigned i_blocks, mtime_t *pi_dts )
         sout_input_t *p_input = p_mux->pp_inputs[i];
         block_t *p_data;
 
-        if( (!p_mux->b_add_stream_any_time) && block_FifoCount( p_input->p_fifo ) < i_blocks )
+        if( block_FifoCount( p_input->p_fifo ) < i_blocks )
         {
-            if( p_input->p_fmt->i_cat != SPU_ES )
+            if( (!p_mux->b_add_stream_any_time) &&
+                (p_input->p_fmt->i_cat != SPU_ES ) )
             {
                 return -1;
             }
