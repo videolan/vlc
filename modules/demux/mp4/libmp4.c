@@ -3739,7 +3739,7 @@ static const struct
     { ATOM_hvcC,    MP4_ReadBox_Binary,       0 },
     { ATOM_dac3,    MP4_ReadBox_dac3,         0 },
     { ATOM_dec3,    MP4_ReadBox_dec3,         0 },
-    { ATOM_dvc1,    MP4_ReadBox_dvc1,         0 },
+    { ATOM_dvc1,    MP4_ReadBox_dvc1,         ATOM_vc1  },
     { ATOM_fiel,    MP4_ReadBox_fiel,         0 },
     { ATOM_glbl,    MP4_ReadBox_Binary,       ATOM_FFV1 },
     { ATOM_enda,    MP4_ReadBox_enda,         0 },
@@ -3841,6 +3841,7 @@ static const struct
     { ATOM_h264,    MP4_ReadBox_sample_vide,  ATOM_stsd },
 
     { ATOM_jpeg,    MP4_ReadBox_sample_vide,  ATOM_stsd },
+    { ATOM_vc1,     MP4_ReadBox_sample_vide,  ATOM_stsd },
     { ATOM_avc1,    MP4_ReadBox_sample_vide,  ATOM_stsd },
     { ATOM_avc3,    MP4_ReadBox_sample_vide,  ATOM_stsd },
 
