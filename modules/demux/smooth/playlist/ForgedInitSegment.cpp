@@ -27,6 +27,8 @@
 
 #include <vlc_common.h>
 
+#include <cstdlib>
+
 extern "C"
 {
     #include "../../mux/mp4/libmp4mux.h"
