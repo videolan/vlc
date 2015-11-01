@@ -110,9 +110,8 @@ bool OpenUrlDialog::shouldEnqueue() const
  * showEvent can happen not only on exec() but I think it's cool to
  * actualize the URL on showEvent (eg. change virtual desktop...)
  **/
-void OpenUrlDialog::showEvent( QShowEvent *ev )
+void OpenUrlDialog::showEvent( QShowEvent* )
 {
-    (void) ev;
     bShouldEnqueue = false;
     edit->setFocus( Qt::OtherFocusReason );
     if( !lastUrl.isEmpty() && edit->text().isEmpty() )
