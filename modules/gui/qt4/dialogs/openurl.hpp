@@ -53,7 +53,7 @@ public:
 
     QString url() const;
     bool shouldEnqueue() const;
-    void showEvent( QShowEvent *ev );
+    virtual void showEvent( QShowEvent *ev ) Q_DECL_OVERRIDE;
 
 public slots:
     void close() Q_DECL_OVERRIDE { play(); };

@@ -49,10 +49,10 @@ private:
     PlaylistDialog( intf_thread_t * );
     virtual ~PlaylistDialog();
 
-    void dropEvent( QDropEvent *);
-    void dragEnterEvent( QDragEnterEvent * );
-    void dragMoveEvent( QDragMoveEvent * );
-    void dragLeaveEvent( QDragLeaveEvent * );
+    virtual void dropEvent( QDropEvent *) Q_DECL_OVERRIDE;
+    virtual void dragEnterEvent( QDragEnterEvent * ) Q_DECL_OVERRIDE;
+    virtual void dragMoveEvent( QDragMoveEvent * ) Q_DECL_OVERRIDE;
+    virtual void dragLeaveEvent( QDragLeaveEvent * ) Q_DECL_OVERRIDE;
 
     friend class    Singleton<PlaylistDialog>;
 

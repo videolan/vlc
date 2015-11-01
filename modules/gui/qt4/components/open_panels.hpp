@@ -113,7 +113,7 @@ public:
     void clear() Q_DECL_OVERRIDE;
     virtual void accept() ;
 protected:
-    bool eventFilter(QObject *, QEvent *event)
+    bool eventFilter(QObject *, QEvent *event) Q_DECL_OVERRIDE
     {
         if( event->type() == QEvent::Hide ||
             event->type() == QEvent::HideToParent )

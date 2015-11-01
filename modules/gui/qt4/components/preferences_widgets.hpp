@@ -116,8 +116,8 @@ class VIntConfigControl : public ConfigControl
 Q_OBJECT
 public:
     virtual int getValue() const = 0;
-    int getType() const Q_DECL_OVERRIDE;
-    virtual void doApply();
+    virtual int getType() const Q_DECL_OVERRIDE;
+    virtual void doApply() Q_DECL_OVERRIDE;
 protected:
     VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {}

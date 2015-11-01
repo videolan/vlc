@@ -82,36 +82,36 @@ public:
     /* Drag and Drop */
     Qt::DropActions supportedDropActions() const Q_DECL_OVERRIDE;
     QMimeData* mimeData( const QModelIndexList &indexes ) const Q_DECL_OVERRIDE;
-    bool dropMimeData( const QMimeData *data, Qt::DropAction action,
-              int row, int column, const QModelIndex &target );
+    virtual bool dropMimeData( const QMimeData *data, Qt::DropAction action,
+              int row, int column, const QModelIndex &target ) Q_DECL_OVERRIDE;
     QStringList mimeTypes() const Q_DECL_OVERRIDE;
 
     /* Sort */
     void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder ) Q_DECL_OVERRIDE;
 
     /*** VLCModelSubInterface subclassing ***/
-    void rebuild( playlist_item_t * p = NULL ) Q_DECL_OVERRIDE;
-    void doDelete( QModelIndexList selected ) Q_DECL_OVERRIDE;
-    void createNode( QModelIndex index, QString name ) Q_DECL_OVERRIDE;
-    void renameNode( QModelIndex index, QString name ) Q_DECL_OVERRIDE;
-    void removeAll();
+    virtual void rebuild( playlist_item_t * p = NULL ) Q_DECL_OVERRIDE;
+    virtual void doDelete( QModelIndexList selected ) Q_DECL_OVERRIDE;
+    virtual void createNode( QModelIndex index, QString name ) Q_DECL_OVERRIDE;
+    virtual void renameNode( QModelIndex index, QString name ) Q_DECL_OVERRIDE;
+    virtual void removeAll() Q_DECL_OVERRIDE;
 
     /* Lookups */
-    QModelIndex rootIndex() const Q_DECL_OVERRIDE;
-    void filter( const QString& search_text, const QModelIndex & root, bool b_recursive ) Q_DECL_OVERRIDE;
-    QModelIndex currentIndex() const Q_DECL_OVERRIDE;
-    QModelIndex indexByPLID( const int i_plid, const int c ) const Q_DECL_OVERRIDE;
-    QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const Q_DECL_OVERRIDE;
-    bool isTree() const Q_DECL_OVERRIDE;
-    bool canEdit() const Q_DECL_OVERRIDE;
-    bool action( QAction *action, const QModelIndexList &indexes ) Q_DECL_OVERRIDE;
-    bool isSupportedAction( actions action, const QModelIndex & ) const Q_DECL_OVERRIDE;
+    virtual QModelIndex rootIndex() const Q_DECL_OVERRIDE;
+    virtual void filter( const QString& search_text, const QModelIndex & root, bool b_recursive ) Q_DECL_OVERRIDE;
+    virtual QModelIndex currentIndex() const Q_DECL_OVERRIDE;
+    virtual QModelIndex indexByPLID( const int i_plid, const int c ) const Q_DECL_OVERRIDE;
+    virtual QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const Q_DECL_OVERRIDE;
+    virtual bool isTree() const Q_DECL_OVERRIDE;
+    virtual bool canEdit() const Q_DECL_OVERRIDE;
+    virtual bool action( QAction *action, const QModelIndexList &indexes ) Q_DECL_OVERRIDE;
+    virtual bool isSupportedAction( actions action, const QModelIndex & ) const Q_DECL_OVERRIDE;
 
 protected:
     /* VLCModel subclassing */
-    bool isParent( const QModelIndex &index, const QModelIndex &current) const;
-    bool isLeaf( const QModelIndex &index ) const;
-    PLItem *getItem( const QModelIndex & index ) const;
+    virtual bool isParent( const QModelIndex &index, const QModelIndex &current) const Q_DECL_OVERRIDE;
+    virtual bool isLeaf( const QModelIndex &index ) const Q_DECL_OVERRIDE;
+    virtual PLItem *getItem( const QModelIndex & index ) const Q_DECL_OVERRIDE;
 
 private:
     /* General */
@@ -162,7 +162,7 @@ private slots:
     void processItemRemoval( int i_pl_itemid );
     void processItemAppend( int i_pl_itemid, int i_pl_itemidparent );
     void activateItem( playlist_item_t *p_item );
-    void activateItem( const QModelIndex &index );
+    virtual void activateItem( const QModelIndex &index ) Q_DECL_OVERRIDE;
 };
 
 class PlMimeData : public QMimeData

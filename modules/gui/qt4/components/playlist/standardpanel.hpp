@@ -100,7 +100,7 @@ private:
     void createListView();
     void createCoverView();
     void updateZoom( int i_zoom );
-    bool eventFilter ( QObject * watched, QEvent * event );
+    virtual bool eventFilter ( QObject * watched, QEvent * event ) Q_DECL_OVERRIDE;
 
     /* Wait spinner */
     PixmapAnimator *spinnerAnimation;

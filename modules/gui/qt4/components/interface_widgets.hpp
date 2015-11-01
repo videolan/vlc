@@ -69,7 +69,7 @@ protected:
         return NULL;
     }
 
-    virtual void resizeEvent(QResizeEvent *);
+    virtual void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
 
 private:
     intf_thread_t *p_intf;
