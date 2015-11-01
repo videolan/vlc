@@ -34,6 +34,12 @@ struct stream_sys_t
     uint8_t buffer[ARCHIVE_READ_SIZE];
 };
 
+static ssize_t NoRead(stream_t *p_stream, void *buf, size_t len)
+{
+    (void) p_stream; (void) buf; (void) len;
+    return -1;
+}
+
 static int Control(stream_t *p_stream, int i_query, va_list args)
 {
     switch( i_query )
@@ -190,7 +196,7 @@ int StreamOpen(vlc_object_t *p_object)
         return VLC_EGENERIC;
     }
 
-    p_stream->pf_read = NULL;
+    p_stream->pf_read = NoRead;
     p_stream->pf_seek = NULL;
     p_stream->pf_control = Control;
     p_stream->pf_readdir = Browse;
