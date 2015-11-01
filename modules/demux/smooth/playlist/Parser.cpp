@@ -85,7 +85,13 @@ static SegmentTimeline *createTimeline(Node *streamIndexNode, uint64_t timescale
             }
             else
             {
-                cur.duration = prev.duration;
+                if(it != chunks.end())
+                {
+                    const Node *nextchunk = *(it + 1);
+                    cur.duration = Integer<uint64_t>(nextchunk->getAttributeValue("t"))
+                                 - Integer<uint64_t>(chunk->getAttributeValue("t"));
+                    b_cur_is_repeat &= (cur.duration == prev.duration);
+                }
             }
 
             if(chunk->hasAttribute("t"))
