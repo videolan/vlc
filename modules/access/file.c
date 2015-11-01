@@ -138,7 +138,7 @@ static int FileControl (access_t *, int, va_list);
  *****************************************************************************/
 int FileOpen( vlc_object_t *p_this )
 {
-    access_t     *p_access = (access_t*)p_this;
+    access_t *p_access = (access_t*)p_this;
 
     /* Open file */
     int fd = -1;
@@ -163,23 +163,24 @@ int FileOpen( vlc_object_t *p_this )
     }
     else
     {
-        const char *path = p_access->psz_filepath;
-
-        if (unlikely(path == NULL))
+        if (unlikely(p_access->psz_filepath == NULL))
             return VLC_EGENERIC;
-        msg_Dbg (p_access, "opening file `%s'", path);
-        fd = vlc_open (path, O_RDONLY | O_NONBLOCK);
-        if (fd == -1)
-        {
-            msg_Err (p_access, "cannot open file %s (%s)", path,
-                     vlc_strerror_c(errno));
-            dialog_Fatal (p_access, _("File reading failed"),
-                          _("VLC could not open the file \"%s\" (%s)."), path,
-                          vlc_strerror(errno));
-        }
+        fd = vlc_open (p_access->psz_filepath, O_RDONLY | O_NONBLOCK);
     }
+
     if (fd == -1)
+    {
+        msg_Err (p_access, "cannot open file %s (%s)",
+                 p_access->psz_filepath ? p_access->psz_filepath
+                                        : p_access->psz_location,
+                 vlc_strerror_c(errno));
+        dialog_Fatal (p_access, _("File reading failed"),
+                      _("VLC could not open the file \"%s\" (%s)."),
+                      p_access->psz_filepath ? p_access->psz_filepath
+                                             : p_access->psz_location,
+                      vlc_strerror(errno));
         return VLC_EGENERIC;
+    }
 
     struct stat st;
     if (fstat (fd, &st))
