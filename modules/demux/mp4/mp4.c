@@ -4312,9 +4312,21 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
 
             /* Get data offset */
             if ( p_trundata->i_flags & MP4_TRUN_DATA_OFFSET )
-                i_trun_data_offset += __MAX( p_trundata->i_data_offset, 0 );
+            {
+                /* Fix for broken Trun data offset relative to tfhd instead of moof, as seen in smooth */
+                if( (BOXDATA(p_tfhd)->i_flags & MP4_TFHD_BASE_DATA_OFFSET) == 0 &&
+                    i_traf == 0 &&
+                    i_traf_base_data_offset + p_trundata->i_data_offset < p_new->p_moox->i_pos + p_new->p_moox->i_size + 8 )
+                {
+                    i_trun_data_offset += p_new->p_moox->i_size + 8;
+                }
+                else
+                    i_trun_data_offset += __MAX( p_trundata->i_data_offset, 0 );
+            }
             else
+            {
                 i_trun_data_offset += i_trun_size;
+            }
 
             i_trun_size = 0;
 
@@ -4837,7 +4849,7 @@ error:
     return VLC_SUCCESS;
 }
 
-static mp4_track_t * LeafGetTrackByTrunPos( demux_t *p_demux, const uint64_t i_pos, const uint64_t i_moofpos )
+static mp4_track_t * LeafGetTrackByTrunPos( demux_t *p_demux, const uint64_t i_pos, const uint64_t i_moofpos, const uint64_t i_moofsize )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -4858,7 +4870,13 @@ static mp4_track_t * LeafGetTrackByTrunPos( demux_t *p_demux, const uint64_t i_p
           //  i_offset += i_moofpos;
 
         if (p_trun_data->i_flags & MP4_TRUN_DATA_OFFSET)
-            i_offset += p_trun_data->i_data_offset;
+        {
+            /* Fix for broken Trun data offset relative to tfhd instead of moof, as seen in smooth */
+            if(i_offset + p_trun_data->i_data_offset < i_moofpos + i_moofsize + 8)
+                i_offset = i_moofpos + i_moofsize + 8;
+            else
+                i_offset += p_trun_data->i_data_offset;
+        }
         else
             return p_track;
 
@@ -5028,7 +5046,7 @@ static int LeafParseMDATwithMOOF( demux_t *p_demux, MP4_Box_t *p_moof )
         return VLC_EGENERIC;
     if ( p_sys->b_smooth )
         i_pos -= p_moof->i_pos;
-    mp4_track_t *p_track = LeafGetTrackByTrunPos( p_demux, i_pos, p_moof->i_pos );
+    mp4_track_t *p_track = LeafGetTrackByTrunPos( p_demux, i_pos, p_moof->i_pos, p_moof->i_size );
     if( p_track )
     {
         uint32_t i_trun_sample_default_duration = 0;
