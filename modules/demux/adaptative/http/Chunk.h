@@ -65,7 +65,7 @@ namespace adaptative
                 size_t              getBytesRead            () const;
                 size_t              getBytesToRead          () const;
 
-                virtual block_t *   read            (size_t, mtime_t *);
+                virtual block_t *   read            (size_t);
                 virtual void        onDownload      (block_t **) = 0;
 
             protected:

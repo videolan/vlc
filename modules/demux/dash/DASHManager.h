@@ -42,7 +42,8 @@ namespace dash
             virtual ~DASHManager    ();
 
             virtual bool updatePlaylist(); //reimpl
-            virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType); //reimpl
+            virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType,
+                                                         HTTPConnectionManager *); //reimpl
 
             static bool isDASH(stream_t *);
 

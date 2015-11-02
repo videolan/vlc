@@ -43,18 +43,12 @@ namespace adaptative
         class HTTPConnectionManager;
     }
 
-    namespace logic
-    {
-        class AbstractAdaptationLogic;
-    }
-
     namespace playlist
     {
         class SegmentChunk;
     }
 
     using namespace http;
-    using namespace logic;
     using namespace playlist;
 
     class AbstractStream : public ChunksSource,
@@ -63,8 +57,7 @@ namespace adaptative
     public:
         AbstractStream(demux_t *, const StreamFormat &);
         virtual ~AbstractStream();
-        void bind(AbstractAdaptationLogic *, SegmentTracker *,
-                  HTTPConnectionManager *);
+        void bind(SegmentTracker *, HTTPConnectionManager *);
 
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
@@ -105,7 +98,6 @@ namespace adaptative
         demux_t *p_realdemux;
         StreamFormat format;
 
-        AbstractAdaptationLogic *adaptationLogic;
         HTTPConnectionManager *connManager; /* not owned */
         SegmentTracker *segmentTracker;
 
@@ -128,8 +120,7 @@ namespace adaptative
         public:
             virtual ~AbstractStreamFactory() {}
             virtual AbstractStream *create(demux_t*, const StreamFormat &,
-                                   AbstractAdaptationLogic *, SegmentTracker *,
-                                   HTTPConnectionManager *) const = 0;
+                                   SegmentTracker *, HTTPConnectionManager *) const = 0;
     };
 }
 #endif // STREAMS_HPP

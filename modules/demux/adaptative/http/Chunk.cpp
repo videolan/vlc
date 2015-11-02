@@ -90,15 +90,12 @@ size_t AbstractChunk::getBytesToRead() const
     return source->getContentLength() - bytesRead;
 }
 
-block_t * AbstractChunk::read(size_t size, mtime_t *time)
+block_t * AbstractChunk::read(size_t size)
 {
     if(!source)
         return NULL;
 
-    *time = mdate();
     block_t *block = source->read(size);
-    *time = mdate() - *time;
-
     if(block)
     {
 	if(bytesRead == 0)
@@ -173,7 +170,9 @@ block_t * HTTPChunkSource::consume(size_t readsize)
     if(!p_block)
         return NULL;
 
+    mtime_t time = mdate();
     ssize_t ret = connection->read(p_block->p_buffer, readsize);
+    time = mdate() - time;
     if(ret < 0)
     {
         block_Release(p_block);
@@ -183,6 +182,7 @@ block_t * HTTPChunkSource::consume(size_t readsize)
     {
         p_block->i_buffer = (size_t) ret;
         consumed += p_block->i_buffer;
+        connManager->updateDownloadRate(p_block->i_buffer, time);
     }
 
     return p_block;
@@ -240,7 +240,9 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
     if(!p_block)
         return;
 
+    mtime_t time = mdate();
     ssize_t ret = connection->read(p_block->p_buffer, readsize);
+    time = mdate() - time;
     if(ret < 0)
     {
         block_Release(p_block);
@@ -250,6 +252,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
         p_block->i_buffer = (size_t) ret;
         buffered += p_block->i_buffer;
         block_ChainAppend(&p_buffer, p_block);
+        connManager->updateDownloadRate(p_block->i_buffer, time);
     }
 }
 

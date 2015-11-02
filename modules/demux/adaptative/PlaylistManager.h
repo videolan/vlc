@@ -74,10 +74,12 @@ namespace adaptative
             bool setupPeriod();
             void unsetPeriod();
             /* local factories */
-            virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType);
+            virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType,
+                                                         HTTPConnectionManager *);
 
             HTTPConnectionManager              *conManager;
             AbstractAdaptationLogic::LogicType  logicType;
+            AbstractAdaptationLogic             *logic;
             AbstractPlaylist                    *playlist;
             AbstractStreamFactory               *streamFactory;
             demux_t                             *p_demux;

@@ -186,7 +186,8 @@ bool SmoothManager::isSmoothStreaming(stream_t *stream)
     return ret;
 }
 
-AbstractAdaptationLogic *SmoothManager::createLogic(AbstractAdaptationLogic::LogicType type)
+AbstractAdaptationLogic *SmoothManager::createLogic(AbstractAdaptationLogic::LogicType type,
+                                                    HTTPConnectionManager *conn)
 {
     switch(type)
     {
@@ -203,6 +204,6 @@ AbstractAdaptationLogic *SmoothManager::createLogic(AbstractAdaptationLogic::Log
             return new (std::nothrow) RateBasedAdaptationLogic(width, height);
         }
         default:
-            return PlaylistManager::createLogic(type);
+            return PlaylistManager::createLogic(type, conn);
     }
 }

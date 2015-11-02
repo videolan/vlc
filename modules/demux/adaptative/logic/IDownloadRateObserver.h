@@ -33,15 +33,12 @@
 
 namespace adaptative
 {
-    namespace logic
+    class IDownloadRateObserver
     {
-        class IDownloadRateObserver
-        {
-            public:
-                virtual void updateDownloadRate(size_t, mtime_t) = 0;
-                virtual ~IDownloadRateObserver(){}
-        };
-    }
+        public:
+            virtual void updateDownloadRate(size_t, mtime_t) = 0;
+            virtual ~IDownloadRateObserver(){}
+    };
 }
 
 #endif /* IDOWNLOADRATEOBSERVER_H_ */

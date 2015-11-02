@@ -33,7 +33,8 @@
 using namespace adaptative::http;
 
 HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *stream) :
-                       stream                   (stream)
+                       stream                   (stream),
+                       rateObserver             (NULL)
 {
 }
 HTTPConnectionManager::~HTTPConnectionManager   ()
@@ -99,4 +100,15 @@ HTTPConnection * HTTPConnectionManager::getConnection(const std::string &scheme,
 
     conn->setUsed(true);
     return conn;
+}
+
+void HTTPConnectionManager::updateDownloadRate(size_t size, mtime_t time)
+{
+    if(rateObserver)
+        rateObserver->updateDownloadRate(size, time);
+}
+
+void HTTPConnectionManager::setDownloadRateObserver(IDownloadRateObserver *obs)
+{
+    rateObserver = obs;
 }

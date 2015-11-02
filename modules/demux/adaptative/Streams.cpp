@@ -20,7 +20,6 @@
 #include "Streams.hpp"
 #include "http/HTTPConnection.hpp"
 #include "http/HTTPConnectionManager.h"
-#include "logic/AbstractAdaptationLogic.h"
 #include "playlist/SegmentChunk.hpp"
 #include "SegmentTracker.hpp"
 #include "plumbing/SourceStream.hpp"
@@ -30,13 +29,11 @@
 
 using namespace adaptative;
 using namespace adaptative::http;
-using namespace adaptative::logic;
 
 AbstractStream::AbstractStream(demux_t * demux_, const StreamFormat &format_)
 {
     p_realdemux = demux_;
     format = format_;
-    adaptationLogic = NULL;
     currentChunk = NULL;
     eof = false;
     dead = false;
@@ -71,7 +68,6 @@ AbstractStream::AbstractStream(demux_t * demux_, const StreamFormat &format_)
 AbstractStream::~AbstractStream()
 {
     delete currentChunk;
-    delete adaptationLogic;
     delete segmentTracker;
 
     delete demuxer;
@@ -80,10 +76,8 @@ AbstractStream::~AbstractStream()
 }
 
 
-void AbstractStream::bind(AbstractAdaptationLogic *logic, SegmentTracker *tracker,
-                    HTTPConnectionManager *conn)
+void AbstractStream::bind(SegmentTracker *tracker, HTTPConnectionManager *conn)
 {
-    adaptationLogic = logic;
     segmentTracker = tracker;
     connManager = conn;
 }
@@ -226,7 +220,7 @@ bool AbstractStream::isDisabled() const
 AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
 {
     /* Ensure it is configured */
-    if(!adaptationLogic || !segmentTracker || !connManager || dead)
+    if(!segmentTracker || !connManager || dead)
         return AbstractStream::status_eof;
 
     if(flushing)
@@ -322,8 +316,7 @@ block_t * AbstractStream::readNextBlock(size_t toread)
 
     const bool b_segment_head_chunk = (chunk->getBytesRead() == 0);
 
-    mtime_t time;
-    block_t *block = chunk->read(toread, &time);
+    block_t *block = chunk->read(toread);
     if(block == NULL)
     {
         currentChunk = NULL;
@@ -331,7 +324,6 @@ block_t * AbstractStream::readNextBlock(size_t toread)
         return NULL;
     }
 
-    adaptationLogic->updateDownloadRate(block->i_buffer, time);
     if (chunk->getBytesToRead() == 0)
     {
         currentChunk = NULL;

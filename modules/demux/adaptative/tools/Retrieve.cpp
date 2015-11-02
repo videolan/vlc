@@ -37,8 +37,7 @@ block_t * Retrieve::HTTP(vlc_object_t *obj, const std::string &uri)
         return NULL;
     }
 
-    mtime_t time;
-    block_t *block = datachunk->read(1<<21, &time);
+    block_t *block = datachunk->read(1<<21);
     delete datachunk;
     return block;
 }

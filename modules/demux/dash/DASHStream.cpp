@@ -69,8 +69,7 @@ AbstractDemuxer * DASHStream::createDemux(const StreamFormat &format)
 }
 
 AbstractStream * DASHStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
-                                   AbstractAdaptationLogic *logic, SegmentTracker *tracker,
-                                   HTTPConnectionManager *manager) const
+                                   SegmentTracker *tracker, HTTPConnectionManager *manager) const
 {
     AbstractStream *stream;
     try
@@ -79,6 +78,6 @@ AbstractStream * DASHStreamFactory::create(demux_t *realdemux, const StreamForma
     } catch (int) {
         return NULL;
     }
-    stream->bind(logic, tracker, manager);
+    stream->bind(tracker, manager);
     return stream;
 }

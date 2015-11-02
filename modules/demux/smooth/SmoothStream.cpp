@@ -58,8 +58,7 @@ block_t * SmoothStream::checkBlock(block_t *p_block, bool)
 }
 
 AbstractStream * SmoothStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
-                               AbstractAdaptationLogic *logic, SegmentTracker *tracker,
-                               HTTPConnectionManager *manager) const
+                                             SegmentTracker *tracker, HTTPConnectionManager *manager) const
 {
     SmoothStream *stream;
     try
@@ -68,6 +67,6 @@ AbstractStream * SmoothStreamFactory::create(demux_t *realdemux, const StreamFor
     } catch (int) {
         return NULL;
     }
-    stream->bind(logic, tracker, manager);
+    stream->bind(tracker, manager);
     return stream;
 }

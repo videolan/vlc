@@ -121,8 +121,7 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 }
 
 AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
-                               AbstractAdaptationLogic *logic, SegmentTracker *tracker,
-                               HTTPConnectionManager *manager) const
+                               SegmentTracker *tracker, HTTPConnectionManager *manager) const
 {
     HLSStream *stream;
     try
@@ -131,6 +130,6 @@ AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat
     } catch (int) {
         return NULL;
     }
-    stream->bind(logic, tracker, manager);
+    stream->bind(tracker, manager);
     return stream;
 }

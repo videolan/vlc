@@ -34,6 +34,7 @@
 #include "xml/DOMParser.h"
 #include "../adaptative/logic/RateBasedAdaptationLogic.h"
 #include "../adaptative/tools/Helper.h"
+#include "../adaptative/http/HTTPConnectionManager.h"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 #include <vlc_meta.h>
@@ -200,7 +201,8 @@ bool DASHManager::isDASH(stream_t *stream)
     return false;
 }
 
-AbstractAdaptationLogic *DASHManager::createLogic(AbstractAdaptationLogic::LogicType type)
+AbstractAdaptationLogic *DASHManager::createLogic(AbstractAdaptationLogic::LogicType type,
+                                                  HTTPConnectionManager *conn)
 {
     switch(type)
     {
@@ -214,9 +216,11 @@ AbstractAdaptationLogic *DASHManager::createLogic(AbstractAdaptationLogic::Logic
         {
             int width = var_InheritInteger(p_demux, "adaptative-width");
             int height = var_InheritInteger(p_demux, "adaptative-height");
-            return new (std::nothrow) RateBasedAdaptationLogic(width, height);
+            RateBasedAdaptationLogic *logic = new (std::nothrow) RateBasedAdaptationLogic(width, height);
+            conn->setDownloadRateObserver(logic);
+            return logic;
         }
         default:
-            return PlaylistManager::createLogic(type);
+            return PlaylistManager::createLogic(type, conn);
     }
 }

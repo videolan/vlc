@@ -52,8 +52,7 @@ namespace hls
     {
         public:
             virtual AbstractStream *create(demux_t*, const StreamFormat &,
-                                   AbstractAdaptationLogic *, SegmentTracker *,
-                                   HTTPConnectionManager *) const;
+                                   SegmentTracker *, HTTPConnectionManager *) const;
     };
 
 }
