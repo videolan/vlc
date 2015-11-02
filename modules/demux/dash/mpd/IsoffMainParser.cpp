@@ -53,7 +53,6 @@ using namespace adaptative::playlist;
 IsoffMainParser::IsoffMainParser    (Node *root_, stream_t *stream, std::string & streambaseurl_)
 {
     root = root_;
-    mpd = NULL;
     p_stream = stream;
     playlisturl = streambaseurl_;
 }
@@ -62,7 +61,7 @@ IsoffMainParser::~IsoffMainParser   ()
 {
 }
 
-void IsoffMainParser::setMPDBaseUrl(Node *root)
+void IsoffMainParser::parseMPDBaseUrl(MPD *mpd, Node *root)
 {
     std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(root, "BaseURL");
 
@@ -74,30 +73,31 @@ void IsoffMainParser::setMPDBaseUrl(Node *root)
 
 MPD * IsoffMainParser::parse()
 {
-    mpd = new MPD(p_stream, getProfile());
-    setMPDAttributes();
-    parseProgramInformation(DOMHelper::getFirstChildElementByName(root, "ProgramInformation"), mpd);
-    setMPDBaseUrl(root);
-    parsePeriods(root);
-
+    MPD *mpd = new (std::nothrow) MPD(p_stream, getProfile());
     if(mpd)
+    {
+        parseMPDAttributes(mpd, root);
+        parseProgramInformation(DOMHelper::getFirstChildElementByName(root, "ProgramInformation"), mpd);
+        parseMPDBaseUrl(mpd, root);
+        parsePeriods(mpd, root);
         mpd->debug();
+    }
     return mpd;
 }
 
-void    IsoffMainParser::setMPDAttributes   ()
+void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 {
-    const std::map<std::string, std::string> attr = this->root->getAttributes();
+    const std::map<std::string, std::string> attr = node->getAttributes();
 
     std::map<std::string, std::string>::const_iterator it;
 
     it = attr.find("mediaPresentationDuration");
     if(it != attr.end())
-        this->mpd->duration.Set(IsoTime(it->second) * CLOCK_FREQ);
+        mpd->duration.Set(IsoTime(it->second) * CLOCK_FREQ);
 
     it = attr.find("minBufferTime");
     if(it != attr.end())
-        this->mpd->minBufferTime.Set(IsoTime(it->second) * CLOCK_FREQ);
+        mpd->minBufferTime.Set(IsoTime(it->second) * CLOCK_FREQ);
 
     it = attr.find("minimumUpdatePeriod");
     if(it != attr.end())
@@ -124,7 +124,7 @@ void    IsoffMainParser::setMPDAttributes   ()
             mpd->timeShiftBufferDepth.Set(IsoTime(it->second) * CLOCK_FREQ);
 }
 
-void IsoffMainParser::parsePeriods(Node *root)
+void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
 {
     std::vector<Node *> periods = DOMHelper::getElementByTagName(root, "Period", false);
     std::vector<Node *>::const_iterator it;
@@ -144,7 +144,7 @@ void IsoffMainParser::parsePeriods(Node *root)
         if(!baseUrls.empty())
             period->baseUrl.Set( new Url( baseUrls.front()->getText() ) );
 
-        setAdaptationSets(*it, period);
+        parseAdaptationSets(*it, period);
         mpd->addPeriod(period);
     }
 }
@@ -217,7 +217,7 @@ size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *
     return total;
 }
 
-void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
+void    IsoffMainParser::parseAdaptationSets  (Node *periodNode, Period *period)
 {
     std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", false);
     std::vector<Node *>::const_iterator it;
@@ -259,11 +259,11 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
 
         parseSegmentInformation(*it, adaptationSet, &nextid);
 
-        setRepresentations((*it), adaptationSet);
+        parseRepresentations((*it), adaptationSet);
         period->addAdaptationSet(adaptationSet);
     }
 }
-void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, AdaptationSet *adaptationSet)
+void    IsoffMainParser::parseRepresentations (Node *adaptationSetNode, AdaptationSet *adaptationSet)
 {
     std::vector<Node *> representations = DOMHelper::getElementByTagName(adaptationSetNode, "Representation", false);
     uint64_t nextid = 0;

@@ -69,13 +69,13 @@ namespace dash
 
             private:
                 mpd::Profile getProfile     () const;
-                void    setMPDBaseUrl       (xml::Node *root);
-                void    setMPDAttributes    ();
-                void    setAdaptationSets   (xml::Node *periodNode, Period *period);
-                void    setRepresentations  (xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
+                void    parseMPDBaseUrl     (MPD *, xml::Node *);
+                void    parseMPDAttributes  (MPD *, xml::Node *);
+                void    parseAdaptationSets (xml::Node *periodNode, Period *period);
+                void    parseRepresentations(xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
                 void    parseInitSegment    (xml::Node *, Initializable<Segment> *, SegmentInformation *);
                 void    parseTimeline       (xml::Node *, MediaSegmentTemplate *);
-                void    parsePeriods        (xml::Node *);
+                void    parsePeriods        (MPD *, xml::Node *);
                 size_t  parseSegmentInformation(xml::Node *, SegmentInformation *, uint64_t *);
                 size_t  parseSegmentBase    (xml::Node *, SegmentInformation *);
                 size_t  parseSegmentList    (xml::Node *, SegmentInformation *);
@@ -83,7 +83,6 @@ namespace dash
                 void    parseProgramInformation(xml::Node *, MPD *);
 
                 xml::Node       *root;
-                MPD             *mpd;
                 stream_t        *p_stream;
                 std::string      playlisturl;
         };
