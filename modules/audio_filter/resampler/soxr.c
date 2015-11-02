@@ -82,7 +82,6 @@ struct filter_sys_t
 {
     soxr_t  soxr;
     double  f_fixed_ratio;
-    block_t *p_last_in;
 };
 
 static block_t *Resample( filter_t *, block_t * );
@@ -206,9 +205,6 @@ Close( vlc_object_t *p_obj )
 
     soxr_delete( p_sys->soxr );
 
-    if( unlikely( p_sys->p_last_in ) )
-        block_Release( p_sys->p_last_in );
-
     free( p_sys );
 }
 
@@ -224,20 +220,6 @@ static block_t *
 Resample( filter_t *p_filter, block_t *p_in )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    /* Prepend last remaining input buffer to the current one */
-    if( unlikely( p_sys->p_last_in ) )
-    {
-        p_in = block_Realloc( p_in, p_sys->p_last_in->i_buffer, p_in->i_buffer );
-        if( unlikely( p_in == NULL ) )
-            return NULL;
-
-        memcpy( p_in->p_buffer, p_sys->p_last_in->p_buffer,
-                p_sys->p_last_in->i_buffer );
-        p_in->i_nb_samples += p_sys->p_last_in->i_nb_samples;
-        block_Release( p_sys->p_last_in );
-        p_sys->p_last_in = NULL;
-    }
 
     const size_t i_oframesize = p_filter->fmt_out.audio.i_bytes_per_frame;
     const size_t i_ilen = p_in->i_nb_samples;
@@ -276,20 +258,8 @@ Resample( filter_t *p_filter, block_t *p_in )
     }
 
     if( unlikely( i_idone < i_ilen ) )
-    {
-        msg_Warn( p_filter, "processed input len < input len, "
-                  "keeping buffer for next Resample call" );
-        const size_t i_done_size = i_idone
-                                 * p_filter->fmt_out.audio.i_bytes_per_frame;
-
-        /* Realloc since p_in can be used as p_out */
-        p_sys->p_last_in = block_Alloc( p_in->i_buffer - i_done_size );
-        if( unlikely( p_sys->p_last_in == NULL ) )
-            goto error;
-        memcpy( p_sys->p_last_in->p_buffer,
-                p_in->p_buffer + i_done_size, p_in->i_buffer - i_done_size );
-        p_sys->p_last_in->i_nb_samples = p_in->i_nb_samples - i_idone;
-    }
+        msg_Err( p_filter, "lost %zd of %zd input frames",
+                 i_ilen - i_idone, i_idone);
 
     p_out->i_buffer = i_odone * i_oframesize;
     p_out->i_nb_samples = i_odone;
