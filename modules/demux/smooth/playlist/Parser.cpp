@@ -270,8 +270,3 @@ Manifest * ManifestParser::parse()
 
     return manifest;
 }
-
-Manifest *parse(stream_t *, const std::string &)
-{
-    return NULL;
-}

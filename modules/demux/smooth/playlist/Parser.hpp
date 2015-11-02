@@ -63,8 +63,6 @@ namespace smooth
 
                 Manifest * parse();
 
-                Manifest *parse(stream_t *p_stream, const std::string &);
-
             private:
                 xml::Node       *root;
                 Manifest        *manifest;
