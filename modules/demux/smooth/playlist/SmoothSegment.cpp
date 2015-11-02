@@ -35,8 +35,7 @@ SmoothSegment::SmoothSegment(SegmentInformation *parent) :
 
 void SmoothSegment::onChunkDownload(block_t **pp_block, SegmentChunk *, BaseRepresentation *rep)
 {
-    if(!rep || ((*pp_block)->i_flags & BLOCK_FLAG_HEADER) == 0 ||
-       !rep->getPlaylist()->isLive())
+    if(!rep || ((*pp_block)->i_flags & BLOCK_FLAG_HEADER) == 0)
         return;
 
     IndexReader br(rep->getPlaylist()->getVLCObject());

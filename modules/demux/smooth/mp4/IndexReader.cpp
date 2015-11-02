@@ -42,6 +42,9 @@ bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep)
     if ( tfhd_box )
         SetDWBE( &p_block->p_buffer[tfhd_box->i_pos + 8 + 4], 0x01 );
 
+    if(!rep->getPlaylist()->isLive())
+        return true;
+
     const MP4_Box_t *uuid_box = MP4_BoxGet( rootbox, "moof/traf/uuid" );
     while( uuid_box && uuid_box->i_type == ATOM_uuid )
     {
