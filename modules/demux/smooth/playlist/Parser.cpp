@@ -149,10 +149,14 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
             if(qualNode->hasAttribute("Bitrate"))
                 rep->setBandwidth(Integer<uint64_t>(qualNode->getAttributeValue("Bitrate")));
 
-            if(qualNode->hasAttribute("Width"))
+            if(qualNode->hasAttribute("MaxWidth"))
+                rep->setWidth(Integer<uint64_t>(qualNode->getAttributeValue("MaxWidth")));
+            else if(qualNode->hasAttribute("Width"))
                 rep->setWidth(Integer<uint64_t>(qualNode->getAttributeValue("Width")));
 
-            if(qualNode->hasAttribute("Height"))
+            if(qualNode->hasAttribute("MaxHeight"))
+                rep->setHeight(Integer<uint64_t>(qualNode->getAttributeValue("MaxHeight")));
+            else if(qualNode->hasAttribute("Height"))
                 rep->setHeight(Integer<uint64_t>(qualNode->getAttributeValue("Height")));
 
             ForgedInitSegment *initSegment = new (std::nothrow)
