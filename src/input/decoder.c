@@ -267,7 +267,7 @@ static int aout_update_format( decoder_t *p_dec )
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_aout = NULL;
         vlc_mutex_unlock( &p_owner->lock );
-        aout_DecDelete( p_owner->p_aout );
+        aout_DecDelete( p_aout );
 
         input_resource_PutAout( p_owner->p_resource, p_aout );
     }
