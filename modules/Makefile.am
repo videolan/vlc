@@ -68,7 +68,6 @@ module.rc.lo: module.rc
 		--include-dir $(top_srcdir)/share \
 		--include-dir $(top_srcdir)/extras/package/win32 \
 		-i $< -o $@
-	echo HELLO
 endif
 
 # Wayland
