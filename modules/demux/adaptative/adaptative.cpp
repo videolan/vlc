@@ -35,9 +35,9 @@
 #include "playlist/BasePeriod.h"
 #include "xml/DOMParser.h"
 
-#include "../dash/mpd/MPDFactory.h"
 #include "../dash/DASHManager.h"
 #include "../dash/DASHStream.hpp"
+#include "../dash/mpd/IsoffMainParser.h"
 
 #include "../hls/HLSManager.hpp"
 #include "../hls/HLSStreams.hpp"
@@ -133,8 +133,8 @@ static int Open(vlc_object_t *p_obj)
             return VLC_EGENERIC;
         }
 
-        //Begin the actual MPD parsing:
-        MPD *p_playlist = MPDFactory::create(parser.getRootNode(), p_demux->s, playlisturl);
+        IsoffMainParser mpdparser(parser.getRootNode(), p_demux->s, playlisturl);
+        MPD *p_playlist = mpdparser.parse();
         if(p_playlist == NULL)
         {
             msg_Err( p_demux, "Cannot create/unknown MPD for profile");

@@ -29,8 +29,8 @@
 #include <inttypes.h>
 
 #include "DASHManager.h"
-#include "mpd/MPDFactory.h"
 #include "mpd/ProgramInformation.h"
+#include "mpd/IsoffMainParser.h"
 #include "xml/DOMParser.h"
 #include "../adaptative/tools/Helper.h"
 #include "../adaptative/http/HTTPConnectionManager.h"
@@ -104,8 +104,9 @@ bool DASHManager::updatePlaylist()
                 minsegmentTime = segmentTime;
         }
 
-        MPD *newmpd = MPDFactory::create(parser.getRootNode(), mpdstream,
-                                         Helper::getDirectoryPath(url).append("/"));
+        IsoffMainParser mpdparser(parser.getRootNode(), mpdstream,
+                                Helper::getDirectoryPath(url).append("/"));
+        MPD *newmpd = mpdparser.parse();
         if(newmpd)
         {
             playlist->mergeWith(newmpd, minsegmentTime);

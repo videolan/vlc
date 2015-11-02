@@ -72,14 +72,9 @@ void IsoffMainParser::setMPDBaseUrl(Node *root)
     mpd->setPlaylistUrl( Helper::getDirectoryPath(playlisturl).append("/") );
 }
 
-MPD* IsoffMainParser::getMPD()
+MPD * IsoffMainParser::parse()
 {
-    return mpd;
-}
-
-bool    IsoffMainParser::parse              (Profile profile)
-{
-    mpd = new MPD(p_stream, profile);
+    mpd = new MPD(p_stream, getProfile());
     setMPDAttributes();
     parseProgramInformation(DOMHelper::getFirstChildElementByName(root, "ProgramInformation"), mpd);
     setMPDBaseUrl(root);
@@ -87,7 +82,7 @@ bool    IsoffMainParser::parse              (Profile profile)
 
     if(mpd)
         mpd->debug();
-    return true;
+    return mpd;
 }
 
 void    IsoffMainParser::setMPDAttributes   ()

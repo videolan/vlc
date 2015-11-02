@@ -65,13 +65,11 @@ namespace dash
             public:
                 IsoffMainParser             (xml::Node *root, stream_t *p_stream, std::string &);
                 virtual ~IsoffMainParser    ();
-
-                bool            parse  (Profile profile);
-                virtual MPD*    getMPD ();
-                virtual void    setMPDBaseUrl(xml::Node *root);
-                mpd::Profile    getProfile() const;
+                MPD *   parse();
 
             private:
+                mpd::Profile getProfile     () const;
+                void    setMPDBaseUrl       (xml::Node *root);
                 void    setMPDAttributes    ();
                 void    setAdaptationSets   (xml::Node *periodNode, Period *period);
                 void    setRepresentations  (xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);

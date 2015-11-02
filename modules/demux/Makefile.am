@@ -352,8 +352,6 @@ libadaptative_dash_SOURCES = \
     demux/dash/mpd/IsoffMainParser.h \
     demux/dash/mpd/MPD.cpp \
     demux/dash/mpd/MPD.h \
-    demux/dash/mpd/MPDFactory.cpp \
-    demux/dash/mpd/MPDFactory.h \
     demux/dash/mpd/Period.cpp \
     demux/dash/mpd/Period.h \
     demux/dash/mpd/Profile.cpp \
