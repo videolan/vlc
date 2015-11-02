@@ -37,9 +37,6 @@ namespace smooth
             virtual ~SmoothManager();
 
             virtual bool updatePlaylist(); //reimpl
-            virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType,
-                                                         HTTPConnectionManager *);
-
             static bool isSmoothStreaming(stream_t *);
 
         private:

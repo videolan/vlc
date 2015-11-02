@@ -23,7 +23,6 @@
 # include "config.h"
 #endif
 
-#include "../adaptative/logic/RateBasedAdaptationLogic.h"
 #include "../adaptative/tools/Retrieve.hpp"
 #include "playlist/Parser.hpp"
 #include "../adaptative/xml/DOMParser.h"
@@ -184,26 +183,4 @@ bool SmoothManager::isSmoothStreaming(stream_t *stream)
     bool ret = strstr( str, "<SmoothStreamingMedia" ) != NULL;
     free( str );
     return ret;
-}
-
-AbstractAdaptationLogic *SmoothManager::createLogic(AbstractAdaptationLogic::LogicType type,
-                                                    HTTPConnectionManager *conn)
-{
-    switch(type)
-    {
-        case AbstractAdaptationLogic::FixedRate:
-        {
-            size_t bps = var_InheritInteger(p_demux, "adaptative-bw") * 8192;
-            return new (std::nothrow) FixedRateAdaptationLogic(bps);
-        }
-        case AbstractAdaptationLogic::Default:
-        case AbstractAdaptationLogic::RateBased:
-        {
-            int width = var_InheritInteger(p_demux, "adaptative-width");
-            int height = var_InheritInteger(p_demux, "adaptative-height");
-            return new (std::nothrow) RateBasedAdaptationLogic(width, height);
-        }
-        default:
-            return PlaylistManager::createLogic(type, conn);
-    }
 }

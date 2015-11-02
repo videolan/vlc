@@ -395,15 +395,21 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
 {
     switch(type)
     {
-        case AbstractAdaptationLogic::AlwaysBest:
-            return new (std::nothrow) AlwaysBestAdaptationLogic();
         case AbstractAdaptationLogic::FixedRate:
+        {
+            size_t bps = var_InheritInteger(p_demux, "adaptative-bw") * 8192;
+            return new (std::nothrow) FixedRateAdaptationLogic(bps);
+        }
         case AbstractAdaptationLogic::AlwaysLowest:
             return new (std::nothrow) AlwaysLowestAdaptationLogic();
+        case AbstractAdaptationLogic::AlwaysBest:
+            return new (std::nothrow) AlwaysBestAdaptationLogic();
         case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::RateBased:
         {
-            RateBasedAdaptationLogic *logic = new (std::nothrow) RateBasedAdaptationLogic(0, 0);
+            int width = var_InheritInteger(p_demux, "adaptative-width");
+            int height = var_InheritInteger(p_demux, "adaptative-height");
+            RateBasedAdaptationLogic *logic = new (std::nothrow) RateBasedAdaptationLogic(width, height);
             conn->setDownloadRateObserver(logic);
             return logic;
         }

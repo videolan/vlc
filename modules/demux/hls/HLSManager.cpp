@@ -23,7 +23,6 @@
 #endif
 
 #include "HLSManager.hpp"
-#include "../adaptative/logic/RateBasedAdaptationLogic.h"
 #include "../adaptative/tools/Retrieve.hpp"
 #include "../adaptative/http/HTTPConnectionManager.h"
 #include "playlist/Parser.hpp"
@@ -103,26 +102,3 @@ bool HLSManager::isHTTPLiveStreaming(stream_t *s)
     return false;
 }
 
-AbstractAdaptationLogic *HLSManager::createLogic(AbstractAdaptationLogic::LogicType type,
-                                                 HTTPConnectionManager *conn)
-{
-    switch(type)
-    {
-        case AbstractAdaptationLogic::FixedRate:
-        {
-            size_t bps = var_InheritInteger(p_demux, "adaptative-bw") * 8192;
-            return new (std::nothrow) FixedRateAdaptationLogic(bps);
-        }
-        case AbstractAdaptationLogic::Default:
-        case AbstractAdaptationLogic::RateBased:
-        {
-            int width = var_InheritInteger(p_demux, "adaptative-width");
-            int height = var_InheritInteger(p_demux, "adaptative-height");
-            RateBasedAdaptationLogic *logic = new (std::nothrow) RateBasedAdaptationLogic(width, height);
-            conn->setDownloadRateObserver(logic);
-            return logic;
-        }
-        default:
-            return PlaylistManager::createLogic(type, conn);
-    }
-}
