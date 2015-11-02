@@ -212,6 +212,14 @@ Close( vlc_object_t *p_obj )
     free( p_sys );
 }
 
+static size_t
+SoXR_GetOutLen( size_t i_ilen, double f_ratio )
+{
+    /* Processed output len might be a little bigger than expected. Indeed SoXR
+     * can hold a few samples to meet the need of the resampling filter. */
+    return lrint( ( i_ilen + 2 ) * f_ratio * 11. / 10. );
+}
+
 static block_t *
 Resample( filter_t *p_filter, block_t *p_in )
 {
@@ -244,13 +252,12 @@ Resample( filter_t *p_filter, block_t *p_in )
         if( f_ratio == 1.0f )
             return p_in;
 
-        /* processed output len might be a little bigger than expected */
-        i_olen = lrint( ( i_ilen + 2 ) * f_ratio * 11. / 10. );
+        i_olen = SoXR_GetOutLen( i_ilen, f_ratio );
 
         soxr_set_io_ratio( p_sys->soxr, 1 / f_ratio, i_olen );
     }
     else
-        i_olen = lrint( i_ilen * p_sys->f_fixed_ratio );
+        i_olen = SoXR_GetOutLen( i_ilen, p_sys->f_fixed_ratio );
 
     /* Use input buffer as output if there is enough room */
     block_t *p_out = i_ilen >= i_olen ? p_in
