@@ -65,7 +65,7 @@ Manifest * SmoothManager::fetchManifest()
     }
 
     xml::DOMParser parser(memorystream);
-    if(!parser.parse())
+    if(!parser.parse(true))
     {
         stream_Delete(memorystream);
         block_Release(p_block);
@@ -148,39 +148,12 @@ bool SmoothManager::updatePlaylist()
     return true;
 }
 
-bool SmoothManager::isSmoothStreaming(stream_t *stream)
+bool SmoothManager::isSmoothStreaming(xml::Node *root)
 {
-    const uint8_t *peek;
-    int i_size = stream_Peek( stream, &peek, 512 );
-    if( i_size < 512 )
-        return false;
+    return root->getName() == "SmoothStreamingMedia";
+}
 
-    char *peeked = (char*) malloc( 512 );
-    if( unlikely( peeked == NULL ) )
-        return false;
-
-    memcpy( peeked, peek, 512 );
-    peeked[511] = peeked[510] = '\0';
-
-    char *str;
-
-    if( !memcmp( peeked, "\xFF\xFE", 2 ) )
-    {
-        str = FromCharset( "UTF-16LE", peeked, 512 );
-        free( peeked );
-    }
-    else if( !memcmp( peeked, "\xFE\xFF", 2 ) )
-    {
-        str = FromCharset( "UTF-16BE", peeked, 512 );
-        free( peeked );
-    }
-    else
-        str = peeked;
-
-    if( str == NULL )
-        return false;
-
-    bool ret = strstr( str, "<SmoothStreamingMedia" ) != NULL;
-    free( str );
-    return ret;
+bool SmoothManager::mimeMatched(const std::string &mime)
+{
+    return (mime == "application/vnd.ms-sstr+xml");
 }

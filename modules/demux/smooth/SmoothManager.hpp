@@ -24,6 +24,14 @@
 #include "../adaptative/logic/AbstractAdaptationLogic.h"
 #include "playlist/Manifest.hpp"
 
+namespace adaptative
+{
+    namespace xml
+    {
+        class Node;
+    }
+}
+
 namespace smooth
 {
     using namespace adaptative;
@@ -37,7 +45,8 @@ namespace smooth
             virtual ~SmoothManager();
 
             virtual bool updatePlaylist(); //reimpl
-            static bool isSmoothStreaming(stream_t *);
+            static bool isSmoothStreaming(xml::Node *);
+            static bool mimeMatched(const std::string &);
 
         private:
             playlist::Manifest * fetchManifest();

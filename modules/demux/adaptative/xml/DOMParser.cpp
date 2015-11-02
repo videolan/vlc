@@ -33,6 +33,13 @@
 
 using namespace adaptative::xml;
 
+DOMParser::DOMParser() :
+    root( NULL ),
+    stream( NULL ),
+    vlc_reader( NULL )
+{
+}
+
 DOMParser::DOMParser    (stream_t *stream) :
     root( NULL ),
     stream( stream ),
@@ -51,14 +58,15 @@ Node*   DOMParser::getRootNode              ()
 {
     return this->root;
 }
-bool    DOMParser::parse                    ()
+bool    DOMParser::parse                    (bool b)
 {
-    this->vlc_reader = xml_ReaderCreate(this->stream, this->stream);
-
-    if(!this->vlc_reader)
+    if(!stream)
         return false;
 
-    root = processNode();
+    if(!vlc_reader && !(vlc_reader = xml_ReaderCreate(stream, stream)))
+        return false;
+
+    root = processNode(b);
     if ( root == NULL )
         return false;
 
@@ -67,14 +75,16 @@ bool    DOMParser::parse                    ()
 
 bool DOMParser::reset(stream_t *s)
 {
+    stream = s;
+    if(!vlc_reader)
+        return true;
     delete root;
     root = NULL;
-    stream = s;
     vlc_reader = xml_ReaderReset(vlc_reader, s);
     return !!vlc_reader;
 }
 
-Node* DOMParser::processNode()
+Node* DOMParser::processNode(bool b_strict)
 {
     const char *data;
     int type;
@@ -129,10 +139,15 @@ Node* DOMParser::processNode()
     while( lifo.size() > 1 )
         lifo.pop();
 
-    if(!lifo.empty())
-        delete lifo.top();
+    Node *node = (!lifo.empty()) ? lifo.top() : NULL;
 
-    return NULL;
+    if(b_strict && node)
+    {
+        delete node;
+        return NULL;
+    }
+
+    return node;
 }
 
 void    DOMParser::addAttributesToNode      (Node *node)

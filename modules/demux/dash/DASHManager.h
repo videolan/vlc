@@ -29,6 +29,14 @@
 #include "../adaptative/logic/AbstractAdaptationLogic.h"
 #include "mpd/MPD.h"
 
+namespace adaptative
+{
+    namespace xml
+    {
+        class Node;
+    }
+}
+
 namespace dash
 {
     using namespace adaptative;
@@ -42,7 +50,8 @@ namespace dash
             virtual ~DASHManager    ();
 
             virtual bool updatePlaylist(); //reimpl
-            static bool isDASH(stream_t *);
+            static bool isDASH(xml::Node *);
+            static bool mimeMatched(const std::string &);
 
         protected:
             virtual int doControl(int, va_list); /* reimpl */

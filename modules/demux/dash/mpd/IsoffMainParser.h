@@ -63,7 +63,7 @@ namespace dash
         class IsoffMainParser
         {
             public:
-                IsoffMainParser             (xml::Node *root, stream_t *p_stream, std::string &);
+                IsoffMainParser             (xml::Node *root, stream_t *p_stream, const std::string &);
                 virtual ~IsoffMainParser    ();
                 MPD *   parse();
 

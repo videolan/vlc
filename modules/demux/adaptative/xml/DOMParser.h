@@ -41,10 +41,11 @@ namespace adaptative
         class DOMParser
         {
             public:
+                DOMParser           ();
                 DOMParser           (stream_t *stream);
                 virtual ~DOMParser  ();
 
-                bool                parse       ();
+                bool                parse       (bool);
                 bool                reset       (stream_t *);
                 Node*               getRootNode ();
                 void                print       ();
@@ -55,7 +56,7 @@ namespace adaptative
 
                 xml_reader_t        *vlc_reader;
 
-                Node*   processNode             ();
+                Node*   processNode             (bool);
                 void    addAttributesToNode     (Node *node);
                 void    print                   (Node *node, int offset);
         };

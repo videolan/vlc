@@ -50,7 +50,7 @@ using namespace dash::mpd;
 using namespace adaptative::xml;
 using namespace adaptative::playlist;
 
-IsoffMainParser::IsoffMainParser    (Node *root_, stream_t *stream, std::string & streambaseurl_)
+IsoffMainParser::IsoffMainParser    (Node *root_, stream_t *stream, const std::string & streambaseurl_)
 {
     root = root_;
     p_stream = stream;
