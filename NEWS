@@ -142,8 +142,8 @@ libVLC:
  * Add libvlc_media_new_callbacks for custom input byte streams
  * Add libvlc_audio_output_device_enum to enumerate devices of current aout
  * Split of libvlc_media_discoverer_new_from_name into libvlc_media_discoverer_new,
-   libvlc_media_discoverer_new and libvlc_media_discoverer_start.
-   This allows to attach media events between create and start.
+   libvlc_media_discoverer_start and libvlc_media_discoverer_stop
+   This allows to attach media events between create and start
  * Add libvlc_media_get_codec_description to get a human readable description of a codec
  * Add libvlc_MediaListEndReached Event to get notified when a media list reached the end
  * Add libvlc_media_list_player_get_media_player to get the media player instance of a list player
@@ -152,7 +152,9 @@ libVLC:
    identifier (if there is one available)
  * Add libvlc_media_get_type to get the type of the media
  * Add libvlc_media_player_get_full_title_descriptions to get full title info of the media
+   and +libvlc_title_descriptions_release to match it
  * Add libvlc_media_player_get_full_chapter_descriptions to get full chapter info of the media
+   and libvlc_chapter_descriptions_release to match it
  * Deprecate libvlc_video_get_title_description, libvlc_video_get_chapter_description,
    libvlc_media_player_get_agl, libvlc_media_player_set_agl
  * Add libvlc_media_player_set_android_context to integrate in an Android surface
