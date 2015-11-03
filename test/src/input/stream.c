@@ -24,6 +24,7 @@
 #include <vlc_md5.h>
 #include <vlc_stream.h>
 
+#include <inttypes.h>
 #include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -232,8 +233,8 @@ read_at( struct reader **pp_readers, unsigned int i_readers,
         const uint8_t *p_peek = NULL;
         struct reader *p_reader = pp_readers[i];
 
-        log( "%s: %s %zu @ %lu\n", p_reader->psz_name, p_buf ? "read" : "peek",
-              i_read, i_offset );
+        log( "%s: %s %zu @ %"PRIu64"\n", p_reader->psz_name,
+              p_buf ? "read" : "peek", i_read, i_offset );
         assert( p_reader->pf_seek( p_reader, i_offset ) != -1 );
 
         i_last_pos = p_reader->pf_tell( p_reader );
@@ -297,7 +298,7 @@ test( struct reader **pp_readers, unsigned int i_readers, const char *psz_md5 )
 
     /* Compare size between each readers */
     i_size = pp_readers[0]->pf_getsize( pp_readers[0] );
-    log( "stream size: %lu\n", i_size );
+    log( "stream size: %"PRIu64"\n", i_size );
     for( unsigned int i = 1; i < i_readers; ++i )
         assert( pp_readers[i]->pf_getsize( pp_readers[i] ) == i_size );
 
