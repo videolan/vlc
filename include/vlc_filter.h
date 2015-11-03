@@ -107,8 +107,12 @@ struct filter_t
         struct
         {
             block_t *   (*pf_filter) ( filter_t *, block_t * );
+            void        (*pf_flush) ( filter_t * );
+            block_t *   (*pf_drain) ( filter_t * );
         } audio;
 #define pf_audio_filter     u.audio.pf_filter
+#define pf_audio_flush      u.audio.pf_flush
+#define pf_audio_drain      u.audio.pf_drain
 
         struct
         {
@@ -176,6 +180,26 @@ static inline void filter_FlushPictures( filter_t *p_filter )
 {
     if( p_filter->pf_video_flush )
         p_filter->pf_video_flush( p_filter );
+}
+
+/**
+ * This function will flush the state of an audio filter.
+ */
+static inline void filter_FlushAudio( filter_t *p_filter )
+{
+    if( p_filter->pf_audio_flush )
+        p_filter->pf_audio_flush( p_filter );
+}
+
+/**
+ * This function will drain, then flush an audio filter.
+ */
+static inline block_t *filter_DrainAudio( filter_t *p_filter )
+{
+    if( p_filter->pf_audio_drain )
+        return p_filter->pf_audio_drain( p_filter );
+    else
+        return NULL;
 }
 
 /**
