@@ -3659,7 +3659,7 @@ PKG_ENABLE_MODULES_VLC([SAMPLERATE], [], [samplerate], [Resampler with libsample
 dnl
 dnl  soxr module
 dnl
-PKG_ENABLE_MODULES_VLC([SOXR], [], [soxr >= 0.1], [SoX Resampler library], [auto])
+PKG_ENABLE_MODULES_VLC([SOXR], [], [soxr >= 0.1.2], [SoX Resampler library], [auto])
 
 dnl
 dnl  OS/2 KAI plugin
