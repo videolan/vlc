@@ -72,6 +72,7 @@ Demuxers:
  * Directory Demux can now sort items, ignore extensions and hidden files
  * Replaced httplive stream filter with new HLS demuxer, replaced smooth 
    stream filter with new Smooth demuxer, both using unified adaptive module
+ * Improved smooth streaming compatibility
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
@@ -115,6 +116,7 @@ Encoder:
 
 Muxers:
  * Added fragmented/streamable MP4 muxer
+ * Added support for muxing VC1 and WMAPro in MP4
  * Opus in MPEG Transport Stream
  * Daala in Ogg
 
