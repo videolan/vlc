@@ -33,6 +33,7 @@
 #include <vlc_filter.h>
 #include <vlc_plugin.h>
 
+#include <assert.h>
 #include <math.h>
 #include <soxr.h>
 
@@ -81,7 +82,11 @@ vlc_module_end ()
 struct filter_sys_t
 {
     soxr_t  soxr;
+    soxr_t  vr_soxr;
+    soxr_t  last_soxr;
     double  f_fixed_ratio;
+    size_t  i_last_olen;
+    mtime_t i_last_pts;
 };
 
 static block_t *Resample( filter_t *, block_t * );
@@ -140,15 +145,13 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
     const unsigned i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     const double f_ratio = p_filter->fmt_out.audio.i_rate
                            / (double) p_filter->fmt_in.audio.i_rate;
-    /* XXX: Performances are worse with Variable-Rate */
-    const unsigned long i_flags = b_change_ratio ? SOXR_VR : 0;
 
-    p_sys->f_fixed_ratio = b_change_ratio ? 0.0f : f_ratio;
+    p_sys->f_fixed_ratio = f_ratio;
     soxr_error_t error;
     /* IO spec */
     soxr_io_spec_t io_spec = soxr_io_spec( i_itype, i_otype );
     /* Quality spec */
-    soxr_quality_spec_t q_spec = soxr_quality_spec( i_recipe, i_flags );
+    soxr_quality_spec_t q_spec = soxr_quality_spec( i_recipe, 0 );
     /* Create SoXR */
     p_sys->soxr = soxr_create( 1, f_ratio, i_channels,
                                &error, &io_spec, &q_spec, NULL );
@@ -158,8 +161,24 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
         free( p_sys );
         return VLC_EGENERIC;
     }
+
+    /* Create a 'variable-rate' SoXR if needed: it is slower than the fixed
+     * one, but it will be only used when the input rate is changing (to catch
+     * up a delay).  */
     if( b_change_ratio )
-        soxr_set_io_ratio( p_sys->soxr, 1 / f_ratio, 0 );
+    {
+        soxr_quality_spec_t q_spec = soxr_quality_spec( SOXR_LQ, SOXR_VR );
+        p_sys->vr_soxr = soxr_create( 1, f_ratio, i_channels,
+                                      &error, &io_spec, &q_spec, NULL );
+        if( error )
+        {
+            msg_Err( p_filter, "soxr_create failed: %s", soxr_strerror( error ) );
+            soxr_delete( p_sys->soxr );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+        soxr_set_io_ratio( p_sys->vr_soxr, 1 / f_ratio, 0 );
+    }
 
     msg_Dbg( p_filter, "Using SoX Resampler with '%s' engine and '%s' quality "
              "to convert %4.4s/%dHz to %4.4s/%dHz.",
@@ -204,8 +223,57 @@ Close( vlc_object_t *p_obj )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     soxr_delete( p_sys->soxr );
+    if( p_sys->vr_soxr )
+        soxr_delete( p_sys->vr_soxr );
 
     free( p_sys );
+}
+
+static block_t *
+SoXR_Resample( filter_t *p_filter, soxr_t soxr, block_t *p_in, size_t i_olen )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    size_t i_idone, i_odone;
+    const size_t i_oframesize = p_filter->fmt_out.audio.i_bytes_per_frame;
+    const size_t i_ilen = p_in ? p_in->i_nb_samples : 0;
+
+    block_t *p_out = i_ilen >= i_olen ? p_in
+                   : block_Alloc( i_olen * i_oframesize );
+
+    soxr_error_t error = soxr_process( soxr, p_in ? p_in->p_buffer : NULL,
+                                       i_ilen, &i_idone, p_out->p_buffer,
+                                       i_olen, &i_odone );
+    if( error )
+    {
+        msg_Err( p_filter, "soxr_process failed: %s", soxr_strerror( error ) );
+        block_Release( p_out );
+        goto error;
+    }
+    if( unlikely( i_idone < i_ilen ) )
+        msg_Err( p_filter, "lost %zd of %zd input frames",
+                 i_ilen - i_idone, i_idone);
+
+    p_out->i_buffer = i_odone * i_oframesize;
+    p_out->i_nb_samples = i_odone;
+    p_out->i_length = i_odone * CLOCK_FREQ / p_filter->fmt_out.audio.i_rate;
+
+    if( p_in )
+    {
+        p_sys->i_last_olen = i_olen;
+        p_sys->last_soxr = soxr;
+    }
+    else
+    {
+        soxr_clear( soxr );
+        p_sys->i_last_olen = 0;
+        p_sys->last_soxr = NULL;
+    }
+
+error:
+    if( p_in && p_out != p_in )
+        block_Release( p_in );
+
+    return p_out;
 }
 
 static size_t
@@ -220,60 +288,79 @@ static block_t *
 Resample( filter_t *p_filter, block_t *p_in )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+    const mtime_t i_pts = p_in->i_pts;
 
-    const size_t i_oframesize = p_filter->fmt_out.audio.i_bytes_per_frame;
-    const size_t i_ilen = p_in->i_nb_samples;
-    size_t i_olen, i_idone, i_odone;
-
-    if( p_sys->f_fixed_ratio == 0.0f )
+    if( p_sys->vr_soxr )
     {
-        /* "audio resampler" with variable ratio */
+        /* "audio resampler" with variable ratio: use the fixed resampler when
+         * the ratio is the same than the fixed one, otherwise use the variable
+         * resampler. */
 
+        soxr_t soxr;
+        block_t *p_flushed_out = NULL, *p_out = NULL;
         const double f_ratio = p_filter->fmt_out.audio.i_rate
                              / (double) p_filter->fmt_in.audio.i_rate;
-        if( f_ratio == 1.0f )
-            return p_in;
+        const size_t i_olen = SoXR_GetOutLen( p_in->i_nb_samples, f_ratio );
 
-        i_olen = SoXR_GetOutLen( i_ilen, f_ratio );
+        if( f_ratio != p_sys->f_fixed_ratio )
+        {
+            /* using variable resampler */
+            soxr_set_io_ratio( p_sys->vr_soxr, 1 / f_ratio, i_olen );
+            soxr = p_sys->vr_soxr;
+        }
+        else if( f_ratio == 1.0f )
+        {
+            /* not using any resampler */
+            soxr = NULL;
+            p_out = p_in;
+        }
+        else
+        {
+            /* using fixed resampler */
+            soxr = p_sys->soxr;
+        }
 
-        soxr_set_io_ratio( p_sys->soxr, 1 / f_ratio, i_olen );
+        /* If the new soxr is different than the last one, flush it */
+        if( p_sys->last_soxr && soxr != p_sys->last_soxr && p_sys->i_last_olen )
+        {
+            p_flushed_out = SoXR_Resample( p_filter, p_sys->last_soxr,
+                                           NULL, p_sys->i_last_olen );
+            if( soxr )
+                msg_Dbg( p_filter, "Using '%s' engine", soxr_engine( soxr ) );
+        }
+
+        if( soxr )
+        {
+            assert( !p_out );
+            p_out = SoXR_Resample( p_filter, soxr, p_in, i_olen );
+            if( !p_out )
+                return NULL;
+        }
+
+        if( p_flushed_out )
+        {
+            /* Prepend the flushed output data to p_out */
+            const unsigned i_nb_samples = p_flushed_out->i_nb_samples
+                                        + p_out->i_nb_samples;
+
+            block_ChainAppend( &p_flushed_out, p_out );
+            p_out = block_ChainGather( p_flushed_out );
+            if( !p_out )
+                return NULL;
+            p_out->i_nb_samples = i_nb_samples;
+        }
+        p_out->i_pts = i_pts;
+        return p_out;
     }
     else
-        i_olen = SoXR_GetOutLen( i_ilen, p_sys->f_fixed_ratio );
-
-    /* Use input buffer as output if there is enough room */
-    block_t *p_out = i_ilen >= i_olen ? p_in
-                   : block_Alloc( i_olen * i_oframesize );
-    if( unlikely( p_out == NULL ) )
-        goto error;
-
-    /* Process SoXR */
-    soxr_error_t error = soxr_process( p_sys->soxr,
-                                       p_in->p_buffer, i_ilen, &i_idone,
-                                       p_out->p_buffer, i_olen, &i_odone );
-    if( error )
     {
-        msg_Err( p_filter, "soxr_process failed: %s", soxr_strerror( error ) );
-        goto error;
+        /* "audio converter" with fixed ratio */
+
+        const size_t i_olen = SoXR_GetOutLen( p_in->i_nb_samples,
+                                              p_sys->f_fixed_ratio );
+        block_t *p_out = SoXR_Resample( p_filter, p_sys->soxr, p_in, i_olen );
+        if( p_out )
+            p_out->i_pts = i_pts;
+        return p_out;
     }
-
-    if( unlikely( i_idone < i_ilen ) )
-        msg_Err( p_filter, "lost %zd of %zd input frames",
-                 i_ilen - i_idone, i_idone);
-
-    p_out->i_buffer = i_odone * i_oframesize;
-    p_out->i_nb_samples = i_odone;
-    p_out->i_pts = p_in->i_pts;
-    p_out->i_length = i_odone * CLOCK_FREQ / p_filter->fmt_out.audio.i_rate;
-
-    if( p_out != p_in )
-        block_Release( p_in );
-    return p_out;
-
-error:
-
-    if( p_out && p_out != p_in )
-        block_Release( p_out );
-    block_Release( p_in );
-    return NULL;
 }
