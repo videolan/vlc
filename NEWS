@@ -70,8 +70,8 @@ Demuxers:
  * Support for Creative ADPCM/alaw/ulaw/S16L in VOC files
  * Support for Creative ADPCM in AVI
  * Directory Demux can now sort items, ignore extensions and hidden files
- * Replaced httplive stream filter with new HLS demuxer, using the same core
-   as the DASH module
+ * Replaced httplive stream filter with new HLS demuxer, replaced smooth 
+   stream filter with new Smooth demuxer, both using unified adaptive module
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
@@ -177,6 +177,7 @@ Removed modules
  * Atmo video filter
  * QTCapture access module (use AVCapture instead)
  * httplive (use adaptive instead)
+ * smooth (use adaptive instead)
  * Gnome-VFS access module (i.e. Gnome 2.x)
 
 

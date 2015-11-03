@@ -20,19 +20,6 @@ libprefetch_plugin_la_SOURCES = stream_filter/prefetch.c
 libprefetch_plugin_la_LIBADD = $(LIBPTHREAD)
 stream_filter_LTLIBRARIES += libprefetch_plugin.la
 
-libsmooth_plugin_la_SOURCES = \
-    stream_filter/smooth/smooth.c \
-    stream_filter/smooth/utils.c \
-    stream_filter/smooth/downloader.c \
-    stream_filter/smooth/smooth.h \
-    demux/mp4/libmp4.c demux/mp4/libmp4.h
-libsmooth_plugin_la_CFLAGS = $(AM_CFLAGS)
-libsmooth_plugin_la_LIBADD = $(LIBM)
-if HAVE_ZLIB
-libsmooth_plugin_la_LIBADD += -lz
-endif
-stream_filter_LTLIBRARIES += libsmooth_plugin.la
-
 libhds_plugin_la_SOURCES = \
     stream_filter/hds/hds.c
 
