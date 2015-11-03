@@ -425,6 +425,16 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
     aout_OutputLock (aout);
     owner->sync.end = VLC_TS_INVALID;
     if (owner->mixer_format.i_format)
+    {
+        if (wait)
+        {
+            block_t *block = aout_FiltersDrain (owner->filters);
+            if (block)
+                aout_OutputPlay (aout, block);
+        }
+        else
+            aout_FiltersFlush (owner->filters);
         aout_OutputFlush (aout, wait);
+    }
     aout_OutputUnlock (aout);
 }
