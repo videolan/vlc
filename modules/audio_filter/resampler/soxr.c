@@ -90,6 +90,8 @@ struct filter_sys_t
 };
 
 static block_t *Resample( filter_t *, block_t * );
+static block_t *Drain( filter_t * );
+static void     Flush( filter_t * );
 
 static bool
 SoXR_GetFormat( vlc_fourcc_t i_format, soxr_datatype_t *p_type )
@@ -190,6 +192,8 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
 
     p_filter->p_sys = p_sys;
     p_filter->pf_audio_filter = Resample;
+    p_filter->pf_audio_flush = Flush;
+    p_filter->pf_audio_drain = Drain;
     return VLC_SUCCESS;
 }
 
@@ -362,5 +366,30 @@ Resample( filter_t *p_filter, block_t *p_in )
         if( p_out )
             p_out->i_pts = i_pts;
         return p_out;
+    }
+}
+
+static block_t *
+Drain( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( p_sys->last_soxr && p_sys->i_last_olen )
+        return SoXR_Resample( p_filter, p_sys->last_soxr, NULL,
+                              p_sys->i_last_olen );
+    else
+        return NULL;
+}
+
+static void
+Flush( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( p_sys->last_soxr )
+    {
+        soxr_clear( p_sys->last_soxr );
+        p_sys->i_last_olen = 0;
+        p_sys->last_soxr = NULL;
     }
 }
