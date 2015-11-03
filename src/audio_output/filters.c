@@ -269,6 +269,49 @@ static block_t *aout_FiltersPipelinePlay(filter_t *const *filters,
     return block;
 }
 
+
+/**
+ * Drain the chain of filters.
+ */
+static block_t *aout_FiltersPipelineDrain(filter_t *const *filters,
+                                          unsigned count)
+{
+    block_t *chain = NULL;
+
+    for (unsigned i = 0; i < count; i++)
+    {
+        filter_t *filter = filters[i];
+
+        block_t *block = filter_DrainAudio (filter);
+        if (block)
+        {
+            /* If there is a drained block, filter it through the following
+             * chain of filters  */
+            if (i + 1 < count)
+                block = aout_FiltersPipelinePlay (&filters[i + 1],
+                                                  count - i - 1, block);
+            if (block)
+                block_ChainAppend (&chain, block);
+        }
+    }
+
+    if (chain)
+        return block_ChainGather(chain);
+    else
+        return NULL;
+}
+
+/**
+ * Flush the chain of filters.
+ */
+static void aout_FiltersPipelineFlush(filter_t *const *filters,
+                                      unsigned count)
+{
+    for (unsigned i = 0; i < count; i++)
+        filter_FlushAudio (filters[i]);
+}
+
+
 #define AOUT_MAX_FILTERS 10
 
 struct aout_filters
@@ -548,4 +591,44 @@ block_t *aout_FiltersPlay (aout_filters_t *filters, block_t *block, int rate)
 drop:
     block_Release (block);
     return NULL;
+}
+
+block_t *aout_FiltersDrain (aout_filters_t *filters)
+{
+    /* Drain the filters pipeline */
+    block_t *block = aout_FiltersPipelineDrain (filters->tab, filters->count);
+
+    if (filters->resampler != NULL)
+    {
+        block_t *chain = NULL;
+
+        filters->resampler->fmt_in.audio.i_rate += filters->resampling;
+
+        if (block)
+        {
+            /* Resample the drained block from the filters pipeline */
+            block = aout_FiltersPipelinePlay (&filters->resampler, 1, block);
+            if (block)
+                block_ChainAppend (&chain, block);
+        }
+
+        /* Drain the resampler filter */
+        block = aout_FiltersPipelineDrain (&filters->resampler, 1);
+        if (block)
+            block_ChainAppend (&chain, block);
+
+        filters->resampler->fmt_in.audio.i_rate -= filters->resampling;
+
+        return chain ? block_ChainGather (chain) : NULL;
+    }
+    else
+        return block;
+}
+
+void aout_FiltersFlush (aout_filters_t *filters)
+{
+    aout_FiltersPipelineFlush (filters->tab, filters->count);
+
+    if (filters->resampler != NULL)
+        aout_FiltersPipelineFlush (&filters->resampler, 1);
 }

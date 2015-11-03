@@ -22,6 +22,8 @@ aout_DeviceSet
 aout_DevicesList
 aout_FiltersNew
 aout_FiltersDelete
+aout_FiltersDrain
+aout_FiltersFlush
 aout_FiltersPlay
 aout_FiltersAdjustResampling
 block_Alloc
