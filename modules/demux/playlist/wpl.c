@@ -202,8 +202,11 @@ int Import_WPL( vlc_object_t* p_this )
         return VLC_EGENERIC;
     }
 
+    const int i_flags = p_sys->p_reader->i_flags;
+    p_sys->p_reader->i_flags |= OBJECT_FLAGS_QUIET;
     const char* psz_name;
     int type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
+    p_sys->p_reader->i_flags = i_flags;
     if ( type != XML_READER_STARTELEM || strcasecmp( psz_name, "smil" ) )
     {
         msg_Err( p_demux, "Invalid WPL playlist. Root element should have been <smil>" );

@@ -493,8 +493,11 @@ static int Open( vlc_object_t* p_this )
         return VLC_EGENERIC;
     }
 
+    const int i_flags = p_sys->p_reader->i_flags;
+    p_sys->p_reader->i_flags |= OBJECT_FLAGS_QUIET;
     const char* psz_name;
     int i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
+    p_sys->p_reader->i_flags = i_flags;
     if ( i_type != XML_READER_STARTELEM || ( strcmp( psz_name, "tt" ) && strcmp( psz_name, "tt:tt" ) ) )
     {
         Close( p_demux );
