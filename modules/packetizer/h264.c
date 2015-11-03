@@ -1058,12 +1058,23 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
                 0x00, 0x31, /* US provider code */
                 0x47, 0x41, 0x39, 0x34 /* user identifier */
             };
+
+            static const uint8_t p_DIRECTV_data_start_code[] = {
+                0xb5, /* United States */
+                0x00, 0x2f, /* US provider code */
+                0x03  /* Captions */
+            };
+
             const unsigned i_t35 = i_size;
             const uint8_t *p_t35 = &pb_dec[i_used];
 
             /* Check for we have DVB1_data() */
             if( i_t35 >= sizeof(p_DVB1_data_start_code) &&
                 !memcmp( p_t35, p_DVB1_data_start_code, sizeof(p_DVB1_data_start_code) ) )
+            {
+                cc_Extract( &p_sys->cc_next, true, &p_t35[3], i_t35 - 3 );
+            } else if( i_t35 >= sizeof(p_DIRECTV_data_start_code) &&
+                !memcmp( p_t35, p_DIRECTV_data_start_code, sizeof(p_DIRECTV_data_start_code) ) )
             {
                 cc_Extract( &p_sys->cc_next, true, &p_t35[3], i_t35 - 3 );
             }
