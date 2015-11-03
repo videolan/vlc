@@ -219,7 +219,7 @@ static int Create( vlc_object_t *p_this )
 #endif
 
 #ifdef HAVE_FONTCONFIG
-#if defined(_WIN32) || defined(__APPLE__)
+#if defined(_WIN32)
     dialog_progress_bar_t *p_dialog =
         dialog_ProgressCreate( p_dec,
                                _("Building font cache"),
@@ -227,7 +227,7 @@ static int Create( vlc_object_t *p_this )
                                   "This should take less than a minute." ), NULL );
 #endif
     ass_set_fonts( p_renderer, psz_font, psz_family, 1, NULL, 1 );  // setup default font/family
-#if defined(_WIN32) || defined(__APPLE__)
+#if defined(_WIN32)
     if( p_dialog )
     {
         dialog_ProgressSet( p_dialog, NULL, 1.0 );
@@ -235,7 +235,6 @@ static int Create( vlc_object_t *p_this )
     }
 #endif
 #else
-    /* FIXME you HAVE to give him a font if no fontconfig */
     ass_set_fonts( p_renderer, psz_font, psz_family, 1, NULL, 1 );
 #endif
 
