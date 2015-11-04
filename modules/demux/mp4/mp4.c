@@ -3774,25 +3774,6 @@ int DemuxFrg( demux_t *p_demux )
     return 1;
 }
 
-static MP4_Box_t * LoadNextChunk( demux_t *p_demux )
-{
-    /* Read Next Chunk */
-    MP4_Box_t *p_chunk = MP4_BoxGetNextChunk( p_demux->s );
-    if( !p_chunk )
-    {
-        msg_Warn( p_demux, "no next chunk" );
-        return NULL;
-    }
-
-    if( !p_chunk->p_first )
-    {
-        msg_Warn( p_demux, "no next chunk child" );
-        return NULL;
-    }
-
-    return p_chunk;
-}
-
 static bool BoxExistsInRootTree( MP4_Box_t *p_root, uint32_t i_type, uint64_t i_pos )
 {
     while ( p_root )
@@ -4804,7 +4785,9 @@ static int DemuxAsLeaf( demux_t *p_demux )
             const int i_tell = stream_Tell( p_demux->s );
             if ( i_tell >= 0 && ! BoxExistsInRootTree( p_sys->p_root, p_sys->context.i_current_box_type, (uint64_t)i_tell ) )
             {// only if !b_probed ??
-                MP4_Box_t *p_vroot = LoadNextChunk( p_demux );
+                MP4_Box_t *p_vroot = MP4_BoxGetNextChunk( p_demux->s );
+                if(!p_vroot)
+                    return 1;
 
                 MP4_Box_t *p_fragbox = MP4_BoxGet( p_vroot, "moof" );
                 if( !p_fragbox )
@@ -4816,7 +4799,7 @@ static int DemuxAsLeaf( demux_t *p_demux )
                 if(!p_fragbox)
                 {
                     MP4_BoxFree( p_vroot );
-                    msg_Err(p_demux, "no moof or moov in current chunk");
+                    msg_Info(p_demux, "no moof or moov in current chunk");
                     return 1;
                 }
 
