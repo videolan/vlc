@@ -1628,15 +1628,6 @@ static inline int CmpUUID( const UUID_t *u1, const UUID_t *u2 )
     return memcmp( u1, u2, 16 );
 }
 
-static inline void CreateUUID( UUID_t *p_uuid, uint32_t i_fourcc )
-{
-    /* made by 0xXXXXXXXX-0011-0010-8000-00aa00389b71
-            where XXXXXXXX is the fourcc */
-    /* FIXME implement this */
-    (void)p_uuid;
-    (void)i_fourcc;
-}
-
 static const UUID_t TfrfBoxUUID = {
                 { 0xd4, 0x80, 0x7e, 0xf2, 0xca, 0x39, 0x46, 0x95,
                   0x8e, 0x54, 0x26, 0xcb, 0x9e, 0x46, 0xa7, 0x9f } };

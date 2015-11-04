@@ -159,10 +159,7 @@ int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
         /* get extented type on 16 bytes */
         GetUUID( &p_box->i_uuid, p_peek );
     }
-    else
-    {
-        CreateUUID( &p_box->i_uuid, p_box->i_type );
-    }
+
 #ifdef MP4_ULTRA_VERBOSE
     if( p_box->i_size )
     {
@@ -4107,9 +4104,6 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
     int64_t i_size = stream_Size( p_stream );
     if( i_size > 0 )
         p_vroot->i_size = i_size;
-
-    /* could be a DASH stream for exemple, 0 means unknown or infinite size */
-    CreateUUID( &p_vroot->i_uuid, p_vroot->i_type );
 
     /* First get the moov */
     const uint32_t stoplist[] = { ATOM_moov, ATOM_mdat, 0 };
