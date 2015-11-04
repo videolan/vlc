@@ -28,6 +28,13 @@
 #ifndef VLC_FREETYPE_H
 #define VLC_FREETYPE_H
 
+/** \defgroup freetype Freetype text renderer
+ * Freetype text rendering cross platform
+ * @{
+ * \file
+ * Freetype module
+ */
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -83,25 +90,25 @@ struct filter_sys_t
     input_attachment_t **pp_font_attachments;
     int                  i_font_attachments;
 
-    /*
+    /**
      * This is the master family list. It owns the lists of vlc_font_t's
      * and should be freed using FreeFamiliesAndFonts()
      */
     vlc_family_t      *p_families;
 
-    /*
+    /**
      * This maps a family name to a vlc_family_t within the master list
      */
     vlc_dictionary_t  family_map;
 
-    /*
+    /**
      * This maps a family name to a fallback list of vlc_family_t's.
      * Fallback lists only reference the lists of vlc_font_t's within the
      * master list, so they should be freed using FreeFamilies()
      */
     vlc_dictionary_t  fallback_map;
 
-    /* Font face cache */
+    /** Font face cache */
     vlc_dictionary_t  face_map;
 
     int               i_fallback_counter;
@@ -115,14 +122,14 @@ struct filter_sys_t
                          int *index, uni_char_t codepoint);
 
     /**
-     * Get a pointer to the vlc_family_t in the master list that matches psz_family.
+     * Get a pointer to the vlc_family_t in the master list that matches \p psz_family.
      * Add this family to the list if it hasn't been added yet.
      */
     const vlc_family_t * (*pf_get_family) ( filter_t *p_filter, const char *psz_family );
 
     /**
-     * Get the fallback list for psz_family from the system and cache
-     * it in fallback_map.
+     * Get the fallback list for \p psz_family from the system and cache
+     * it in \ref fallback_map.
      * On Windows fallback lists are populated progressively as required
      * using Uniscribe, so we need the codepoint here.
      */

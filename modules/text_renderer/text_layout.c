@@ -29,6 +29,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/** \ingroup freetype
+ * @{
+ * \file
+ * Text shaping and layout
+ */
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -77,31 +83,31 @@
 # define HAVE_FONT_FALLBACK
 #endif
 
-/*
+/**
  * Within a paragraph, run_desc_t represents a run of characters
  * having the same font face, size, and style, Unicode script
  * and text direction
  */
 typedef struct run_desc_t
 {
-    int i_start_offset;
-    int i_end_offset;
-    FT_Face p_face;
-    const text_style_t *p_style;
+    int                         i_start_offset;
+    int                         i_end_offset;
+    FT_Face                     p_face;
+    const text_style_t         *p_style;
 
 #ifdef HAVE_HARFBUZZ
-    hb_script_t script;
-    hb_direction_t direction;
-    hb_font_t *p_hb_font;
-    hb_buffer_t *p_buffer;
-    hb_glyph_info_t *p_glyph_infos;
-    hb_glyph_position_t *p_glyph_positions;
-    unsigned int i_glyph_count;
+    hb_script_t                 script;
+    hb_direction_t              direction;
+    hb_font_t                  *p_hb_font;
+    hb_buffer_t                *p_buffer;
+    hb_glyph_info_t            *p_glyph_infos;
+    hb_glyph_position_t        *p_glyph_positions;
+    unsigned int                i_glyph_count;
 #endif
 
 } run_desc_t;
 
-/*
+/**
  * Glyph bitmaps. Advance and offset are 26.6 values
  */
 typedef struct glyph_bitmaps_t
@@ -120,27 +126,27 @@ typedef struct glyph_bitmaps_t
 
 typedef struct paragraph_t
 {
-    uni_char_t *p_code_points;            //Unicode code points
-    int *pi_glyph_indices;                //Glyph index values within the run's font face
-    text_style_t **pp_styles;
-    FT_Face *pp_faces;
-    int *pi_run_ids;                      //The run to which each glyph belongs
-    glyph_bitmaps_t *p_glyph_bitmaps;
-    uint8_t *pi_karaoke_bar;
-    int i_size;
-    run_desc_t *p_runs;
-    int i_runs_count;
-    int i_runs_size;
+    uni_char_t          *p_code_points;    /**< Unicode code points */
+    int                 *pi_glyph_indices; /**< Glyph index values within the run's font face */
+    text_style_t       **pp_styles;
+    FT_Face             *pp_faces;         /**< Used to determine run boundaries when performing font fallback */
+    int                 *pi_run_ids;       /**< The run to which each glyph belongs */
+    glyph_bitmaps_t     *p_glyph_bitmaps;
+    uint8_t             *pi_karaoke_bar;
+    int                  i_size;
+    run_desc_t          *p_runs;
+    int                  i_runs_count;
+    int                  i_runs_size;
 
 #ifdef HAVE_HARFBUZZ
-    hb_script_t *p_scripts;
+    hb_script_t         *p_scripts;
 #endif
 
 #ifdef HAVE_FRIBIDI
-    FriBidiCharType *p_types;
-    FriBidiLevel *p_levels;
-    FriBidiStrIndex *pi_reordered_indices;
-    FriBidiParType paragraph_type;
+    FriBidiCharType     *p_types;
+    FriBidiLevel        *p_levels;
+    FriBidiStrIndex     *pi_reordered_indices;
+    FriBidiParType       paragraph_type;
 #endif
 
 } paragraph_t;
@@ -460,11 +466,11 @@ static int AddRun( filter_t *p_filter,
     return VLC_SUCCESS;
 }
 
-/*
+#ifdef HAVE_FONT_FALLBACK
+/**
  * Add a run with font fallback, possibly breaking the run further
  * into runs of glyphs that end up having the same font face.
  */
-#ifdef HAVE_FONT_FALLBACK
 static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
                                int i_start_offset, int i_end_offset )
 {
@@ -563,7 +569,7 @@ static bool FaceStyleEquals( filter_t *p_filter, const text_style_t *p_style1,
          && !strcasecmp( psz_fontname1, psz_fontname2 );
 }
 
-/*
+/**
  * Segment a paragraph into runs
  */
 static int ItemizeParagraph( filter_t *p_filter, paragraph_t *p_paragraph )
@@ -616,14 +622,14 @@ static int ItemizeParagraph( filter_t *p_filter, paragraph_t *p_paragraph )
     return VLC_SUCCESS;
 }
 
-/*
+#ifdef HAVE_HARFBUZZ
+/**
  * Shape an itemized paragraph using HarfBuzz.
  * This is where the glyphs of complex scripts get their positions
  * (offsets and advance values) and final forms.
  * Glyph substitutions of base glyphs and diacritics may take place,
  * so the paragraph size may change.
  */
-#ifdef HAVE_HARFBUZZ
 static int ShapeParagraphHarfBuzz( filter_t *p_filter,
                                    paragraph_t **p_old_paragraph )
 {
@@ -799,13 +805,13 @@ error:
 }
 #endif
 
-/*
+#ifdef HAVE_FRIBIDI
+#ifndef HAVE_HARFBUZZ
+/**
  * Shape a paragraph with FriBidi.
  * Shaping with FriBidi is currently limited to mirroring and simple
  * Arabic shaping.
  */
-#ifdef HAVE_FRIBIDI
-#ifndef HAVE_HARFBUZZ
 static int ShapeParagraphFriBidi( filter_t *p_filter, paragraph_t *p_paragraph )
 {
 
@@ -837,7 +843,7 @@ static int ShapeParagraphFriBidi( filter_t *p_filter, paragraph_t *p_paragraph )
     return VLC_SUCCESS;
 }
 
-/*
+/**
  * Zero-width invisible characters include Unicode control characters and
  * zero-width spaces among other things. If not removed they can show up in the
  * text as squares or other glyphs depending on the font. Zero-width spaces are
@@ -871,7 +877,7 @@ static int RemoveZeroWidthCharacters( paragraph_t *p_paragraph )
     return VLC_SUCCESS;
 }
 
-/*
+/**
  * Set advance values of non-spacing marks to zero. Diacritics are
  * not positioned correctly but the text is more readable.
  * For full shaping HarfBuzz is required.
@@ -889,7 +895,7 @@ static int ZeroNsmAdvance( paragraph_t *p_paragraph )
 #endif
 #endif
 
-/*
+/**
  * Load the glyphs of a paragraph. When shaping with HarfBuzz the glyph indices
  * have already been determined at this point, as well as the advance values.
  */

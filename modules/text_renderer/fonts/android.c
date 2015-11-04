@@ -111,8 +111,8 @@ static int Android_ParseFamily( filter_t *p_filter, xml_reader_t *p_xml )
             /*
              * If p_family has not been set by the time we encounter the first file,
              * it means this family has no name, and should be used only as a fallback.
-             * We create a new family for it in the master list and later add it to
-             * the "default" fallback list.
+             * We create a new family for it in the master list with the name "fallback-xx"
+             * and later add it to the "default" fallback list.
              */
             else if( !strcasecmp( "file", p_node ) )
             {
@@ -172,6 +172,10 @@ static int Android_ParseFamily( filter_t *p_filter, xml_reader_t *p_xml )
                     return VLC_EGENERIC;
                 }
 
+                /*
+                 * If the family name has "fallback" in it, add it to the
+                 * "default" fallback list.
+                 */
                 if( strcasestr( p_family->psz_name, FB_NAME ) )
                 {
                     vlc_family_t *p_fallback =

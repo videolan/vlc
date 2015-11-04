@@ -177,6 +177,11 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     bool b_bold = ( lpelfe->elfLogFont.lfWeight == FW_BOLD );
     bool b_italic = ( lpelfe->elfLogFont.lfItalic != 0 );
 
+    /*
+     * This function will be called by Windows as many times for each font
+     * of the family as the number of scripts the font supports.
+     * Check to avoid duplicates.
+     */
     for( vlc_font_t *p_font = p_family->p_fonts; p_font; p_font = p_font->p_next )
         if( !!p_font->b_bold == !!b_bold && !!p_font->b_italic == !!b_italic )
             return 1;
@@ -355,6 +360,12 @@ vlc_family_t *Win32_GetFallbacks( filter_t *p_filter, const char *psz_family,
     if( p_fallbacks )
         p_family = SearchFallbacks( p_filter, p_fallbacks, codepoint );
 
+    /*
+     * If the fallback list of psz_family has no family which contains the requested
+     * codepoint, try UniscribeFallback(). If it returns a valid family which does
+     * contain that codepoint, add the new family to the fallback list to speed up
+     * later searches.
+     */
     if( !p_family )
     {
         psz_uniscribe = UniscribeFallback( psz_lc, codepoint );

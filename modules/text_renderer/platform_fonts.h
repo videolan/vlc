@@ -98,7 +98,11 @@ typedef struct vlc_font_t vlc_font_t;
 struct vlc_font_t
 {
     vlc_font_t *p_next; /**< next font in the chain */
-    char       *psz_fontfile; /**< path to the file on the disk */
+    /**
+     * path to the font file on disk, or ":/x" for font attachments, where x
+     * is the attachment index within \ref filter_sys_t::pp_font_attachments
+     */
+    char       *psz_fontfile;
     int         i_index; /**< index of the font in the font file, starts at 0 */
     bool        b_bold; /**< if the font is a bold version */
     bool        b_italic; /**< if the font is an italic version */
@@ -111,7 +115,17 @@ struct vlc_font_t
 struct vlc_family_t
 {
     vlc_family_t *p_next; /**< next family in the chain */
-    char         *psz_name; /**< Human-reable name, usually requested */
+    /**
+     * Human-readable name, usually requested.
+     * Can be fallback-xx for font attachments with no family name, and for fallback
+     * fonts in Android.
+     * This field is used only for loading the family fonts, and for debugging.
+     * Apart from that, families are accessed either through the
+     * \ref filter_sys_t::family_map dictionary, or as a member of some fallback list
+     * in \ref filter_sys_t::fallback_map. And this field plays no role in either of
+     * the two cases.
+     */
+    char         *psz_name;
     vlc_font_t   *p_fonts; /**< fonts matching this family */
 };
 
@@ -171,10 +185,16 @@ char* Generic_Select( filter_t *p_filter, const char* family,
  *
  * \param psz_family the usual font family name, human-readable;
  *                   if NULL, will use "fallback-xx"[IN]
- * \param pp_list the family list where to append the font;
- *                can be NULL if not in a list [IN]
- * \param p_dict dictionnary where to insert this family; can be NULL [IN]
- * \param psz_key specific key for the dictionnary [IN]
+ * \param pp_list the family list where to append the new family;
+ *        can be NULL if not in a list, or if the family is to be appended to a fallback list
+ *        within \ref filter_sys_t::fallback_map [IN]
+ * \param p_dict dictionary where to insert this family; can be NULL.
+ *        If the dictionary already has an entry for \p psz_key, which is often the case when adding
+ *        a new fallback to a fallback list within \ref filter_sys_t::fallback_map, the new family will be
+ *        appended there [IN]
+ * \param psz_key specific key for the dictionary.
+ *        If NULL will use whatever is used for the family name, whether it is the specified \p psz_family
+ *        or "fallback-xx" [IN]
  *
  * \return the new family representation
  */
@@ -185,7 +205,8 @@ vlc_family_t *NewFamily( filter_t *p_filter, const char *psz_family,
 /**
  * Creates a new font.
  *
- * \param psz_fontfile font file [IN]
+ * \param psz_fontfile font file, or ":/x" for font attachments, where x is the attachment index
+ *        within \ref filter_sys_t::pp_font_attachments [IN]
  * \param i_index index of the font in the font file [IN]
  * \param b_bold is a bold font or not [IN]
  * \param b_bold is an italic or not [IN]
@@ -193,7 +214,7 @@ vlc_family_t *NewFamily( filter_t *p_filter, const char *psz_family,
  *                 If not NULL, the font will be associated to this family, and
  *                 appended to the font list in that family [IN]
  *
- * \remark This function takes ownership of psz_fontfile
+ * \remark This function takes ownership of \p psz_fontfile
  * \return the new font
  */
 vlc_font_t *NewFont( char *psz_fontfile, int i_index,
@@ -215,15 +236,25 @@ void FreeFamiliesAndFonts( vlc_family_t *p_family );
 void FreeFamilies( void *p_families, void *p_obj );
 
 /**
- * Construct the default family list
+ * Construct the default fallback list
  *
- * In some platforms, you might want multiple fonts as default
+ * The default fallback list will be searched when all else fails.
+ * It should contain at least one font for each Unicode script.
+ *
+ * No default list is required with FontConfig because FontConfig returns
+ * comprehensive fallback lists. On Windows a default list is used because
+ * Uniscribe seems less reliable than FontConfig in this regard.
+ *
+ * On Android, all fallback families reside within the default fallback list,
+ * which is populated in Android_ParseFamily(), in the XML_READER_ENDELEM section
+ * of that function, where each family is added to the default list if
+ * its name has "fallback" in it. So InitDefaultList() is not called on Android.
  *
  * \param p_filter the freetype module object [IN]
  * \param ppsz_default the table default fonts [IN]
  * \param i_size the size of the supplied table [IN]
  *
- * return the default family font
+ * \return the default fallback list
  */
 vlc_family_t *InitDefaultList( filter_t *p_filter, const char *const *ppsz_default,
                                int i_size );

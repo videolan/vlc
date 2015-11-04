@@ -30,6 +30,12 @@
  * Preamble
  *****************************************************************************/
 
+/** \ingroup freetype_fonts
+ * @{
+ * \file
+ * Platform-independent font management
+ */
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -128,6 +134,16 @@ FT_Face GetFace( filter_t *p_filter, vlc_font_t *p_font )
     return p_font->p_face;
 }
 
+/**
+ * Select the best font from the list of vlc_font_t's of the given family.
+ * If a family does not have the exact requested style, the nearest one will be returned.
+ * Like when an italic font is requested from a family which has only a regular font. In this
+ * case the regular font will be returned and FreeType will do synthetic styling on it.
+ *
+ * Not all fonts of a family support the same scripts. As an example, when an italic font
+ * containing an Arabic codepoint is requested from the Arial family, the regular font will
+ * be returned, because the italic font of Arial has no Arabic support.
+ */
 static vlc_font_t *GetBestFont( filter_t *p_filter, const vlc_family_t *p_family,
                                 bool b_bold, bool b_italic, uni_char_t codepoint )
 {

@@ -25,6 +25,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/** \ingroup freetype
+ * @{
+ * \file
+ * Text shaping and layout
+ */
+
 #include "freetype.h"
 
 typedef struct
@@ -56,7 +62,20 @@ struct line_desc_t
 void FreeLines( line_desc_t *p_lines );
 line_desc_t *NewLine( int i_count );
 
+/**
+ * Layout the text with shaping, bidirectional support, and font fallback if available.
+ *
+ * \param p_filter the FreeType module object [IN]
+ * \param pp_lines the list of line_desc_t's with rendered glyphs [OUT]
+ * \param p_bbox the bounding box of all the lines [OUT]
+ * \param pi_max_face_height maximum line height [OUT]
+ * \param psz_text array of size \p i_len containing character codepoints [IN]
+ * \param pp_styles array of size \p i_len containing character styles [IN]
+ * \param pi_k_dates array of size \p i_len containing karaoke timestamps for characters [IN]
+ * \param i_len length of the arrays \p psz_text, \p pp_styles, and \p pi_k_dates [IN]
+ * \param b_grid true for grid-mode text [IN]
+ */
 int LayoutText(filter_t *p_filter, line_desc_t **pp_lines,
                 FT_BBox *p_bbox, int *pi_max_face_height,
                 const uni_char_t *psz_text, text_style_t **pp_styles,
-                uint32_t *pi_k_dates, int i_len, bool );
+                uint32_t *pi_k_dates, int i_len, bool b_grid );
