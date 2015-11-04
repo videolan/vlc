@@ -23,12 +23,26 @@
 
 #include "test.h"
 
+#include <vlc_common.h>
+#include <vlc_threads.h>
+
+struct test_media_preparsed_sys
+{
+    vlc_mutex_t lock;
+    vlc_cond_t wait;
+    bool preparsed;
+};
+
 static void preparsed_changed(const libvlc_event_t *event, void *user_data)
 {
     (void)event;
 
-    int *received = user_data;
-    *received = true;
+    struct test_media_preparsed_sys *sys = user_data;
+
+    vlc_mutex_lock (&sys->lock);
+    sys->preparsed = true;
+    vlc_cond_signal (&sys->wait);
+    vlc_mutex_unlock (&sys->lock);
 }
 
 static void test_media_preparsed(const char** argv, int argc)
@@ -44,30 +58,33 @@ static void test_media_preparsed(const char** argv, int argc)
     libvlc_media_t *media = libvlc_media_new_path (vlc, file);
     assert (media != NULL);
 
-    volatile int received = false;
+    struct test_media_preparsed_sys preparsed_sys, *sys = &preparsed_sys;
+    sys->preparsed = false;
+    vlc_mutex_init (&sys->lock);
+    vlc_cond_init (&sys->wait);
 
     // Check to see if we are properly receiving the event.
     libvlc_event_manager_t *em = libvlc_media_event_manager (media);
-    libvlc_event_attach (em, libvlc_MediaParsedChanged, preparsed_changed, (void*)&received);
+    libvlc_event_attach (em, libvlc_MediaParsedChanged, preparsed_changed, sys);
 
     // Parse the media. This is synchronous.
-    libvlc_media_parse(media);
+    libvlc_media_parse_async(media);
 
-    // Wait to see if we properly receive preparsed.
-    while (!received);
+    // Wait for preparsed event
+    vlc_mutex_lock (&sys->lock);
+    while (!sys->preparsed)
+        vlc_cond_wait (&sys->wait, &sys->lock);
+    vlc_mutex_unlock (&sys->lock);
 
     // We are good, now check Elementary Stream info.
-    libvlc_media_track_info_t *tracks = NULL;
-    int num = libvlc_media_get_tracks_info(media, &tracks);
+    libvlc_media_track_t **tracks;
+    unsigned nb_tracks = libvlc_media_tracks_get (media, &tracks);
+    assert (nb_tracks == 1);
+    assert (tracks[0]->i_type == libvlc_track_video);
+    libvlc_media_tracks_release (tracks, nb_tracks);
 
-#warning libvlc_media_get_tracks_info is a broken function.
-    // This is broken.
-    // assert(num == 1);
-    if (num != 1)
-        printf("WARNING: libvlc_media_get_tracks_info is not working.");
-
-    if (num > 0)
-        free(tracks);
+    vlc_mutex_destroy (&sys->lock);
+    vlc_cond_destroy (&sys->wait);
 
     libvlc_media_release (media);
     libvlc_release (vlc);
