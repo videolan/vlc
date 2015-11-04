@@ -24,10 +24,6 @@
  * Preamble
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "mp4.h"
 
 #include <vlc_plugin.h>
