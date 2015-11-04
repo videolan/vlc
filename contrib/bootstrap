@@ -253,7 +253,7 @@ test -z "$WITH_OPTIMIZATION" || add_make_enabled "WITH_OPTIMIZATION"
 #
 OS="${HOST#*-}" # strip architecture
 case "${OS}" in
-	apple-darwin*)
+	*-darwin*)
 		if test -z "$BUILDFORIOS"
 		then
 			check_macosx_sdk
