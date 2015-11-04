@@ -31,6 +31,8 @@
 # include "config.h"
 #endif
 
+#include <sys/stat.h>
+
 #include <vlc_common.h>
 #include "fs.h"
 #include <vlc_access.h>
@@ -118,6 +120,28 @@ input_item_t* DirRead (access_t *p_access)
 
     while ((entry = vlc_readdir (p_sys->p_dir)) != NULL)
     {
+        int type;
+#ifdef HAVE_OPENAT
+        struct stat st;
+
+        if (fstatat (dirfd (p_sys->p_dir), entry, &st, 0))
+            continue;
+
+        switch (st.st_mode & S_IFMT)
+        {
+            case S_IFBLK: type = ITEM_TYPE_DISC;      break;
+            case S_IFCHR: type = ITEM_TYPE_CARD;      break;
+            case S_IFIFO: type = ITEM_TYPE_STREAM;    break;
+            case S_IFREG: type = ITEM_TYPE_FILE;      break;
+            case S_IFDIR: type = ITEM_TYPE_DIRECTORY; break;
+            /* S_IFLNK cannot occur while following symbolic links */
+            /* S_IFSOCK cannot be opened with open()/openat() */
+            default:      continue; /* ignore */
+        }
+#else
+        type = ITEM_TYPE_FILE;
+#endif
+
         /* Create an input item for the current entry */
         char *encoded_entry = encode_URI_component (entry);
         if (unlikely(entry == NULL))
@@ -132,7 +156,7 @@ input_item_t* DirRead (access_t *p_access)
             return NULL;
 
         input_item_t *item = input_item_NewWithType (uri, entry, 0, NULL, 0, 0,
-                                                     ITEM_TYPE_FILE);
+                                                     type);
         free (uri);
         if (likely(item != NULL))
             return item;
