@@ -169,7 +169,7 @@ static int vlclua_playlist_move( lua_State * L )
     if( p_target->i_children != -1 )
         i_ret = playlist_TreeMove( p_playlist, p_item, p_target, 0 );
     else
-    	i_ret = playlist_TreeMove( p_playlist, p_item, p_target->p_parent, p_target->i_id - p_target->p_parent->pp_children[0]->i_id + 1 );
+        i_ret = playlist_TreeMove( p_playlist, p_item, p_target->p_parent, p_target->i_id - p_target->p_parent->pp_children[0]->i_id + 1 );
     PL_UNLOCK;
     return vlclua_push_ret( L, i_ret );
 }

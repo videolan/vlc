@@ -657,7 +657,7 @@ static void GetVideoSize( decoder_t *p_dec, int *w, int *h )
         *w = p_sys->ki.original_canvas_width;
         *h = p_sys->ki.original_canvas_height;
         msg_Dbg( p_dec, "original canvas %zu %zu",
-	         p_sys->ki.original_canvas_width, p_sys->ki.original_canvas_height );
+                 p_sys->ki.original_canvas_width, p_sys->ki.original_canvas_height );
     }
     else
     {

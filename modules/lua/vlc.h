@@ -43,10 +43,11 @@
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
 #include <lualib.h>     /* Lua libs */
+
 #if LUA_VERSION_NUM >= 502
-#define lua_equal(L,idx1,idx2)		lua_compare(L,(idx1),(idx2),LUA_OPEQ)
-#define lua_objlen(L,idx)			lua_rawlen(L,idx)
-#define lua_strlen(L,idx)			lua_rawlen(L,idx)
+# define lua_equal(L,idx1,idx2)    lua_compare(L,(idx1),(idx2),LUA_OPEQ)
+# define lua_objlen(L,idx)         lua_rawlen(L,idx)
+# define lua_strlen(L,idx)         lua_rawlen(L,idx)
 #endif
 
 /*****************************************************************************

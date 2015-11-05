@@ -1024,7 +1024,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if ( !strcmp( psz_cmd, "frame" ) )
     {
-	var_TriggerCallback( p_input, "frame-next" );
+        var_TriggerCallback( p_input, "frame-next" );
         i_error = VLC_SUCCESS;
     }
     else if( !strcmp( psz_cmd, "chapter" ) ||

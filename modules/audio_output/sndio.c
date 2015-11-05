@@ -77,26 +77,26 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sio_initpar (&par);
     switch (fmt->i_format) {
     case VLC_CODEC_U8:
-	par.bits = 8;
-	par.sig = 0;
-	break;
+        par.bits = 8;
+        par.sig = 0;
+        break;
     case VLC_CODEC_S16N:
-	par.bits = 16;
-	par.sig = 1;
-	par.le = SIO_LE_NATIVE;
-	break;
+        par.bits = 16;
+        par.sig = 1;
+        par.le = SIO_LE_NATIVE;
+        break;
     case VLC_CODEC_S32N:
     case VLC_CODEC_FL32:
     case VLC_CODEC_FL64:
-	par.bits = 32;
-	par.sig = 1;
-	par.le = SIO_LE_NATIVE;
-	break;
+        par.bits = 32;
+        par.sig = 1;
+        par.le = SIO_LE_NATIVE;
+        break;
     default:
-	/* use a common audio format */
-	par.bits = 16;
-	par.sig = 1;
-	par.le = SIO_LE_NATIVE;
+        /* use a common audio format */
+        par.bits = 16;
+        par.sig = 1;
+        par.le = SIO_LE_NATIVE;
     }
     par.pchan = aout_FormatNbChannels (fmt);
     par.rate = fmt->i_rate;
@@ -124,7 +124,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (par.bps > 1 && par.le != SIO_LE_NATIVE)
     {
         msg_Err (aout, "unsupported audio sample format (%s endian)",
-		 par.le ? "little" : "big");
+                 par.le ? "little" : "big");
         goto error;
     }
     switch (par.bits)
@@ -221,7 +221,7 @@ static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
     aout_sys_t *sys = aout->sys;
 
     if (!sys->started)
-	return -1;
+        return -1;
     *delay = (mtime_t)sys->delay * CLOCK_FREQ / sys->rate;
     return 0;
 }
@@ -263,9 +263,9 @@ static int VolumeSet (audio_output_t *aout, float fvol)
     unsigned volume;
 
     if (fvol < 0)
-	fvol = 0;
+        fvol = 0;
     if (fvol > 1)
-	fvol = 1;
+        fvol = 1;
     volume = lroundf (fvol * SIO_MAXVOL);
     if (!sys->mute && !sio_setvol (sys->hdl, volume))
         return -1;

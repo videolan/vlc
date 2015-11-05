@@ -47,8 +47,8 @@ static int  OpenClient  (vlc_tls_creds_t *);
 static void CloseClient (vlc_tls_creds_t *);
 
 #if !TARGET_OS_IPHONE
-	static int  OpenServer  (vlc_tls_creds_t *crd, const char *cert, const char *key);
-	static void CloseServer (vlc_tls_creds_t *);
+    static int  OpenServer  (vlc_tls_creds_t *crd, const char *cert, const char *key);
+    static void CloseServer (vlc_tls_creds_t *);
 #endif
 
 vlc_module_begin ()

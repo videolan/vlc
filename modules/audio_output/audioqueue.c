@@ -165,10 +165,10 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                             NULL,
                             NULL);
 
-	// Set audio session to mediaplayback
-	UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
-	AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
-	AudioSessionSetActive(true);
+    // Set audio session to mediaplayback
+    UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
+    AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
+    AudioSessionSetActive(true);
 #endif
 
     p_aout->sys->b_started = true;

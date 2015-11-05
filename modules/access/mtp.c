@@ -165,7 +165,7 @@ static void Close( vlc_object_t * p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     close ( p_sys->fd );
-    if(	vlc_unlink( p_access->psz_filepath ) != 0 )
+    if( vlc_unlink( p_access->psz_filepath ) != 0 )
         msg_Err( p_access, "Error deleting file %s, %s",
                  p_access->psz_filepath, vlc_strerror_c(errno) );
     free( p_sys );
