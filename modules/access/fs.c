@@ -50,4 +50,6 @@ vlc_module_begin ()
 #endif
     set_callbacks( DirOpen, DirClose )
 
+    add_bool("list-special-files", false, N_("List special files"),
+             N_("Include devices and pipes when listing directories"), true)
 vlc_module_end ()

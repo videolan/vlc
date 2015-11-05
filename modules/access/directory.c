@@ -45,6 +45,7 @@ struct access_sys_t
 {
     char *base_uri;
     DIR *dir;
+    bool special_files;
 };
 
 /*****************************************************************************
@@ -68,6 +69,7 @@ int DirInit (access_t *access, DIR *dir)
         goto error;
 
     sys->dir = dir;
+    sys->special_files = var_InheritBool(access, "list-special-files");
 
     access->p_sys = sys;
     access->pf_readdir = DirRead;
@@ -126,14 +128,31 @@ input_item_t *DirRead(access_t *access)
 
         switch (st.st_mode & S_IFMT)
         {
-            case S_IFBLK: type = ITEM_TYPE_DISC;      break;
-            case S_IFCHR: type = ITEM_TYPE_CARD;      break;
-            case S_IFIFO: type = ITEM_TYPE_STREAM;    break;
-            case S_IFREG: type = ITEM_TYPE_FILE;      break;
-            case S_IFDIR: type = ITEM_TYPE_DIRECTORY; break;
+            case S_IFBLK:
+                if (!sys->special_files)
+                    continue;
+                type = ITEM_TYPE_DISC;
+                break;
+            case S_IFCHR:
+                if (!sys->special_files)
+                    continue;
+                type = ITEM_TYPE_CARD;
+                break;
+            case S_IFIFO:
+                if (!sys->special_files)
+                    continue;
+                type = ITEM_TYPE_STREAM;
+                break;
+            case S_IFREG:
+                type = ITEM_TYPE_FILE;
+                break;
+            case S_IFDIR:
+                type = ITEM_TYPE_DIRECTORY;
+                break;
             /* S_IFLNK cannot occur while following symbolic links */
             /* S_IFSOCK cannot be opened with open()/openat() */
-            default:      continue; /* ignore */
+            default:
+                continue; /* ignore */
         }
 #else
         type = ITEM_TYPE_FILE;
