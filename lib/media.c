@@ -507,10 +507,11 @@ void libvlc_media_release( libvlc_media_t *p_md )
     if( p_md->i_refcount > 0 )
         return;
 
+    uninstall_input_item_observer( p_md );
+
     if( p_md->p_subitems )
         libvlc_media_list_release( p_md->p_subitems );
 
-    uninstall_input_item_observer( p_md );
     vlc_gc_decref( p_md->p_input_item );
 
     vlc_cond_destroy( &p_md->parsed_cond );
