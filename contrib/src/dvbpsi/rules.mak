@@ -1,6 +1,6 @@
 # dvbpsi
 
-DVBPSI_VERSION := 1.2.0
+DVBPSI_VERSION := 1.3.0
 DVBPSI_URL := $(VIDEOLAN)/libdvbpsi/$(DVBPSI_VERSION)/libdvbpsi-$(DVBPSI_VERSION).tar.bz2
 
 PKGS += dvbpsi
