@@ -49,4 +49,5 @@ vlc_module_begin ()
     add_shortcut( "directory", "dir" )
 #endif
     set_callbacks( DirOpen, DirClose )
+
 vlc_module_end ()

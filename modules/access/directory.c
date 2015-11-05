@@ -43,88 +43,85 @@
 
 struct access_sys_t
 {
-    char *psz_base_uri;
-    DIR *p_dir;
+    char *base_uri;
+    DIR *dir;
 };
 
 /*****************************************************************************
  * DirInit: Init the directory access with a directory stream
  *****************************************************************************/
-int DirInit (access_t *p_access, DIR *p_dir)
+int DirInit (access_t *access, DIR *dir)
 {
-    char *psz_base_uri;
+    access_sys_t *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        goto error;
 
-    if (!strcmp (p_access->psz_access, "fd"))
+    if (!strcmp(access->psz_access, "fd"))
     {
-        if (asprintf (&psz_base_uri, "fd://%s", p_access->psz_location) == -1)
-            psz_base_uri = NULL;
+        if (unlikely(asprintf(&sys->base_uri, "fd://%s",
+                              access->psz_location) == -1))
+            sys->base_uri = NULL;
     }
     else
-        psz_base_uri = vlc_path2uri (p_access->psz_filepath, "file");
-    if (unlikely (psz_base_uri == NULL))
-    {
-        closedir (p_dir);
-        return VLC_ENOMEM;
-    }
+        sys->base_uri = vlc_path2uri(access->psz_filepath, "file");
+    if (unlikely(sys->base_uri == NULL))
+        goto error;
 
-    p_access->p_sys = calloc (1, sizeof(access_sys_t));
-    if (!p_access->p_sys)
-    {
-        closedir(p_dir);
-        free( psz_base_uri );
-        return VLC_ENOMEM;
-    }
-    p_access->p_sys->p_dir = p_dir;
-    p_access->p_sys->psz_base_uri = psz_base_uri;
-    p_access->pf_readdir = DirRead;
-    p_access->pf_control = access_vaDirectoryControlHelper;
+    sys->dir = dir;
 
+    access->p_sys = sys;
+    access->pf_readdir = DirRead;
+    access->pf_control = access_vaDirectoryControlHelper;
     return VLC_SUCCESS;
+
+error:
+    closedir(dir);
+    free(sys);
+    return VLC_ENOMEM;
 }
 
 /*****************************************************************************
  * DirOpen: Open the directory access
  *****************************************************************************/
-int DirOpen (vlc_object_t *p_this)
+int DirOpen (vlc_object_t *obj)
 {
-    access_t *access = (access_t *)p_this;
+    access_t *access = (access_t *)obj;
 
     if (access->psz_filepath == NULL)
         return VLC_EGENERIC;
 
-    DIR *dir = vlc_opendir (access->psz_filepath);
+    DIR *dir = vlc_opendir(access->psz_filepath);
     if (dir == NULL)
         return VLC_EGENERIC;
 
-    return DirInit (access, dir);
+    return DirInit(access, dir);
 }
 
 /*****************************************************************************
  * Close: close the target
  *****************************************************************************/
-void DirClose( vlc_object_t * p_this )
+void DirClose(vlc_object_t *obj)
 {
-    access_t *p_access = (access_t*)p_this;
-    access_sys_t *p_sys = p_access->p_sys;
+    access_t *access = (access_t *)obj;
+    access_sys_t *sys = access->p_sys;
 
-    free (p_sys->psz_base_uri);
-    closedir (p_sys->p_dir);
-
-    free (p_sys);
+    free(sys->base_uri);
+    closedir(sys->dir);
+    free(sys);
 }
 
-input_item_t* DirRead (access_t *p_access)
+input_item_t *DirRead(access_t *access)
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    access_sys_t *sys = access->p_sys;
     const char *entry;
 
-    while ((entry = vlc_readdir (p_sys->p_dir)) != NULL)
+    while ((entry = vlc_readdir(sys->dir)) != NULL)
     {
         int type;
 #ifdef HAVE_OPENAT
         struct stat st;
 
-        if (fstatat (dirfd (p_sys->p_dir), entry, &st, 0))
+        if (fstatat(dirfd(sys->dir), entry, &st, 0))
             continue;
 
         switch (st.st_mode & S_IFMT)
@@ -143,21 +140,20 @@ input_item_t* DirRead (access_t *p_access)
 #endif
 
         /* Create an input item for the current entry */
-        char *encoded_entry = encode_URI_component (entry);
+        char *encoded= encode_URI_component(entry);
         if (unlikely(entry == NULL))
-            return NULL;
+            continue;
 
         char *uri;
-        if (unlikely(asprintf (&uri, "%s/%s", p_sys->psz_base_uri,
-                               encoded_entry) == -1))
+        if (unlikely(asprintf(&uri, "%s/%s", sys->base_uri, encoded) == -1))
             uri = NULL;
-        free (encoded_entry);
+        free(encoded);
         if (unlikely(uri == NULL))
-            return NULL;
+            continue;
 
-        input_item_t *item = input_item_NewWithType (uri, entry, 0, NULL, 0, 0,
-                                                     type);
-        free (uri);
+        input_item_t *item = input_item_NewWithType(uri, entry, 0, NULL, 0, 0,
+                                                    type);
+        free(uri);
         if (likely(item != NULL))
             return item;
     }
