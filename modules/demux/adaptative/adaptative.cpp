@@ -161,22 +161,25 @@ static int Open(vlc_object_t *p_obj)
         {
             /* We need to probe content */
             const uint8_t *p_peek;
-            const size_t i_peek = stream_Peek(p_demux->s, &p_peek, 2048);
-            stream_t *peekstream = stream_MemoryNew(p_demux, const_cast<uint8_t *>(p_peek), i_peek, true);
-            if(peekstream)
+            const ssize_t i_peek = stream_Peek(p_demux->s, &p_peek, 2048);
+            if(i_peek > 0)
             {
-                if(xmlParser.reset(peekstream) && xmlParser.parse(false))
+                stream_t *peekstream = stream_MemoryNew(p_demux, const_cast<uint8_t *>(p_peek), (size_t)i_peek, true);
+                if(peekstream)
                 {
-                    if(DASHManager::isDASH(xmlParser.getRootNode()))
+                    if(xmlParser.reset(peekstream) && xmlParser.parse(false))
                     {
-                        p_manager = HandleDash(p_demux, xmlParser, playlisturl, logic);
+                        if(DASHManager::isDASH(xmlParser.getRootNode()))
+                        {
+                            p_manager = HandleDash(p_demux, xmlParser, playlisturl, logic);
+                        }
+                        else if(SmoothManager::isSmoothStreaming(xmlParser.getRootNode()))
+                        {
+                            p_manager = HandleSmooth(p_demux, xmlParser, playlisturl, logic);
+                        }
                     }
-                    else if(SmoothManager::isSmoothStreaming(xmlParser.getRootNode()))
-                    {
-                        p_manager = HandleSmooth(p_demux, xmlParser, playlisturl, logic);
-                    }
+                    stream_Delete(peekstream);
                 }
-                stream_Delete(peekstream);
             }
         }
     }
