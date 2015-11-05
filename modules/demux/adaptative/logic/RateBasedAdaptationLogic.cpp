@@ -63,7 +63,7 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
     if(unlikely(time == 0))
         return;
 
-    size_t current = bpsRemainder + size * 8000 / time;
+    size_t current = bpsRemainder + CLOCK_FREQ * size * 8 / time;
 
     if (current >= bpsAvg)
     {
