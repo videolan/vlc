@@ -52,6 +52,7 @@
 
 /* RTL */
 #if defined(HAVE_FRIBIDI)
+# define FRIBIDI_NO_DEPRECATED 1
 # include <fribidi.h>
 #endif
 
