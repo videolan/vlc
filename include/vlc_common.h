@@ -400,6 +400,11 @@ typedef enum
 #   include <windows.h>
 #endif
 
+#ifdef __APPLE__
+#include <sys/syslimits.h>
+#include <AvailabilityMacros.h>
+#endif
+
 #ifdef __OS2__
 #   define OS2EMX_PLAIN_CHAR
 #   define INCL_BASE
@@ -813,9 +818,6 @@ static inline void SetQWLE (void *p, uint64_t qw)
 VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t );
 
 /* Aligned memory allocator */
-#ifdef __APPLE__
-#include <AvailabilityMacros.h>
-#endif
 
 #ifdef __MINGW32__
 # define vlc_memalign(align, size) (__mingw_aligned_malloc(size, align))
