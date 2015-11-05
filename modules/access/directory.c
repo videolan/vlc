@@ -119,13 +119,19 @@ input_item_t *DirRead(access_t *access)
 
     while ((entry = vlc_readdir(sys->dir)) != NULL)
     {
-        int type;
-#ifdef HAVE_OPENAT
         struct stat st;
+        int type;
 
+#ifdef HAVE_OPENAT
         if (fstatat(dirfd(sys->dir), entry, &st, 0))
             continue;
+#else
+        char path[PATH_MAX];
 
+        if (snprintf(path, PATH_MAX, "%s"DIR_SEP"%s", access->psz_filepath,
+                     entry) >= PATH_MAX || vlc_stat(path, &st))
+            continue;
+#endif
         switch (st.st_mode & S_IFMT)
         {
             case S_IFBLK:
@@ -154,9 +160,6 @@ input_item_t *DirRead(access_t *access)
             default:
                 continue; /* ignore */
         }
-#else
-        type = ITEM_TYPE_FILE;
-#endif
 
         /* Create an input item for the current entry */
         char *encoded= encode_URI_component(entry);
