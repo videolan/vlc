@@ -17,6 +17,7 @@ soxr: soxr-$(SOXR_VERSION)-Source.tar.xz .sum-soxr
 	$(UNPACK)
 	$(APPLY) $(SRC)/soxr/0001-FindSIMD-add-arm-neon-detection.patch
 	$(APPLY) $(SRC)/soxr/0002-cpu_has_simd-detect-neon-via-av_get_cpu_flags.patch
+	$(APPLY) $(SRC)/soxr/0003-config-use-stdint.h-and-stdbool.h.patch
 	$(MOVE)
 
 .soxr: soxr toolchain.cmake
