@@ -88,9 +88,9 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
     if (fd != -1)
         fcntl (fd, F_SETFD, FD_CLOEXEC);
 #else
-	VLC_UNUSED (dir);
-	VLC_UNUSED (filename);
-	VLC_UNUSED (mode);
+    VLC_UNUSED (dir);
+    VLC_UNUSED (filename);
+    VLC_UNUSED (mode);
 
     int fd = -1;
     errno = ENOSYS;

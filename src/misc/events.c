@@ -223,7 +223,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
         if( listeners_group->b_sublistener_removed )
         {
             /* If a callback was removed inside one of our callback, this gets
-	     * called */
+             * called */
             bool valid_listener;
             vlc_mutex_lock( &p_em->object_lock );
             valid_listener = group_contains_listener( listeners_group, cached_listener );

@@ -213,7 +213,7 @@ struct es_out_id_t
 struct es_out_sys_t
 {
     input_thread_t *p_input;
-	es_out_t       *p_out;
+    es_out_t       *p_out;
 
     /* Configuration */
     int64_t        i_tmp_size_max;    /* Maximal temporary file size in byte */
