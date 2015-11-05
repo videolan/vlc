@@ -26,23 +26,11 @@
 #include <vlc_common.h>
 #include <vlc_threads.h>
 
-struct test_media_preparsed_sys
-{
-    vlc_mutex_t lock;
-    vlc_cond_t wait;
-    bool preparsed;
-};
-
 static void preparsed_changed(const libvlc_event_t *event, void *user_data)
 {
     (void)event;
-
-    struct test_media_preparsed_sys *sys = user_data;
-
-    vlc_mutex_lock (&sys->lock);
-    sys->preparsed = true;
-    vlc_cond_signal (&sys->wait);
-    vlc_mutex_unlock (&sys->lock);
+    vlc_sem_t *sem = user_data;
+    vlc_sem_post (sem);
 }
 
 static void test_media_preparsed(const char** argv, int argc)
@@ -58,23 +46,19 @@ static void test_media_preparsed(const char** argv, int argc)
     libvlc_media_t *media = libvlc_media_new_path (vlc, file);
     assert (media != NULL);
 
-    struct test_media_preparsed_sys preparsed_sys, *sys = &preparsed_sys;
-    sys->preparsed = false;
-    vlc_mutex_init (&sys->lock);
-    vlc_cond_init (&sys->wait);
+    vlc_sem_t sem;
+    vlc_sem_init (&sem, 0);
 
     // Check to see if we are properly receiving the event.
     libvlc_event_manager_t *em = libvlc_media_event_manager (media);
-    libvlc_event_attach (em, libvlc_MediaParsedChanged, preparsed_changed, sys);
+    libvlc_event_attach (em, libvlc_MediaParsedChanged, preparsed_changed, &sem);
 
     // Parse the media. This is synchronous.
     libvlc_media_parse_async(media);
 
     // Wait for preparsed event
-    vlc_mutex_lock (&sys->lock);
-    while (!sys->preparsed)
-        vlc_cond_wait (&sys->wait, &sys->lock);
-    vlc_mutex_unlock (&sys->lock);
+    vlc_sem_wait (&sem);
+    vlc_sem_destroy (&sem);
 
     // We are good, now check Elementary Stream info.
     libvlc_media_track_t **tracks;
@@ -82,9 +66,6 @@ static void test_media_preparsed(const char** argv, int argc)
     assert (nb_tracks == 1);
     assert (tracks[0]->i_type == libvlc_track_video);
     libvlc_media_tracks_release (tracks, nb_tracks);
-
-    vlc_mutex_destroy (&sys->lock);
-    vlc_cond_destroy (&sys->wait);
 
     libvlc_media_release (media);
     libvlc_release (vlc);
