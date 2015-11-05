@@ -199,6 +199,11 @@ void ForgedInitSegment::setFourCC(const std::string &fcc)
     }
 }
 
+void ForgedInitSegment::setLanguage(const std::string &lang)
+{
+    language = lang;
+}
+
 block_t * ForgedInitSegment::buildMoovBox()
 {
     mp4mux_trackinfo_t trackinfo;
@@ -263,6 +268,9 @@ block_t * ForgedInitSegment::buildMoovBox()
         default:
             break;
     }
+
+    if(!language.empty())
+        trackinfo.fmt.psz_language = strdup(language.c_str());
 
     mp4mux_trackinfo_t *p_tracks = &trackinfo;
     bo_t *box = GetMoovBox(NULL, &p_tracks, 1, true, false, false, false);

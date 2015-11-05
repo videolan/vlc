@@ -53,6 +53,7 @@ namespace smooth
                 void setFourCC(const std::string &);
                 void setAudioTag(uint16_t);
                 void setTrackID(unsigned);
+                void setLanguage(const std::string &);
 
             protected:
                 virtual SegmentChunk * getChunk(const std::string &, HTTPConnectionManager *); /* reimpl */
@@ -63,6 +64,7 @@ namespace smooth
                 block_t * buildMoovBox();
                 std::string data;
                 std::string type;
+                std::string language;
                 uint8_t *extradata;
                 size_t   i_extradata;
                 WAVEFORMATEX formatex;
