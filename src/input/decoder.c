@@ -906,13 +906,10 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     vlc_mutex_unlock( &p_owner->lock );
 
     /* FIXME: The *input* FIFO should not be locked here. This will not work
-     * properly if/when pictures are queued asynchronously (c.f. assert()). */
+     * properly if/when pictures are queued asynchronously. */
     vlc_fifo_Lock( p_owner->p_fifo );
-    if( p_owner->paused )
-    {
-       assert( p_owner->frames_countdown > 0 );
-       p_owner->frames_countdown--;
-    }
+    if( unlikely(p_owner->paused) && likely(p_owner->frames_countdown > 0) )
+        p_owner->frames_countdown--;
     vlc_fifo_Unlock( p_owner->p_fifo );
 
     /* */
