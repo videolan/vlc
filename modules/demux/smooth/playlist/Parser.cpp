@@ -215,6 +215,10 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
         adaptSet->setID(ID(id));
         if(streamIndexNode->hasAttribute("Language"))
             adaptSet->addLang(streamIndexNode->getAttributeValue("Language"));
+
+        if(streamIndexNode->hasAttribute("TimeScale"))
+            adaptSet->timescale.Set(Integer<uint64_t>(streamIndexNode->getAttributeValue("TimeScale")));
+
         const std::string url = streamIndexNode->getAttributeValue("Url");
         if(!url.empty())
         {
