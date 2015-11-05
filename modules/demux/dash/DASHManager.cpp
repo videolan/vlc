@@ -134,7 +134,7 @@ bool DASHManager::updatePlaylist()
     nextPlaylistupdate = now + (mininterval + (maxinterval - mininterval) / 2) / CLOCK_FREQ;
 
     msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s (%" PRId64 "..%" PRId64 ")",
-            nextPlaylistupdate - now, mininterval/ CLOCK_FREQ, maxinterval/ CLOCK_FREQ );
+            (mtime_t) nextPlaylistupdate - now, mininterval/ CLOCK_FREQ, maxinterval/ CLOCK_FREQ );
 
     return true;
 }

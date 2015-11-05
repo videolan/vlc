@@ -131,7 +131,7 @@ void Representation::runLocalUpdates(mtime_t /*currentplaybacktime*/, uint64_t n
         nextPlaylistupdate = now + (mininterval + (maxinterval - mininterval) / 2) / CLOCK_FREQ;
 
         msg_Dbg(playlist->getVLCObject(), "Updated playlist ID %s, next update in %" PRId64 "s",
-                getID().str().c_str(), nextPlaylistupdate - now);
+                getID().str().c_str(), (mtime_t) nextPlaylistupdate - now);
 
         debug(playlist->getVLCObject(), 0);
     }

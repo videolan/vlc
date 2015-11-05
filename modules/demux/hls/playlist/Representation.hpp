@@ -56,7 +56,7 @@ namespace hls
                 StreamFormat streamFormat;
                 bool b_live;
                 bool b_loaded;
-                mtime_t nextPlaylistupdate;
+                time_t nextPlaylistupdate;
                 Url playlistUrl;
                 Property<std::string> audio;
                 Property<std::string> video;
