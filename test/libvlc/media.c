@@ -198,6 +198,8 @@ static void test_media_subitems(const char** argv, int argc)
     }
     free (subitems_realpath);
 
+#ifdef HAVE_OPENAT
+    /* listing directory via a fd works only if HAVE_OPENAT is defined */
     int fd = open (subitems_path, O_RDONLY);
     log ("Testing media_subitems: fd: '%d'\n", fd);
     assert (fd >= 0);
@@ -206,7 +208,9 @@ static void test_media_subitems(const char** argv, int argc)
     test_media_subitems_media (media, true);
     libvlc_media_release (media);
     close (fd);
-
+#else
+#warning not testing subitems list via a fd location
+#endif
 
     libvlc_release (vlc);
 }
