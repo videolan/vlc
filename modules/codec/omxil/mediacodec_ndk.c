@@ -297,17 +297,17 @@ static int Stop(mc_api *api)
 /*****************************************************************************
  * Start
  *****************************************************************************/
-static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
-                 union mc_api_args *p_args)
+static int Start(mc_api *api, union mc_api_args *p_args)
 {
     mc_api_sys *p_sys = api->p_sys;
     int i_ret = MC_API_ERROR;
     ANativeWindow *p_anw = NULL;
 
-    p_sys->p_codec = syms.AMediaCodec.createCodecByName(psz_name);
+    p_sys->p_codec = syms.AMediaCodec.createCodecByName(api->psz_name);
     if (!p_sys->p_codec)
     {
-        msg_Err(api->p_obj, "AMediaCodec.createCodecByName for %s failed", psz_name);
+        msg_Err(api->p_obj, "AMediaCodec.createCodecByName for %s failed",
+                api->psz_name);
         goto error;
     }
 
@@ -319,7 +319,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
     }
 
     syms.AMediaFormat.setInt32(p_sys->p_format, "encoder", 0);
-    syms.AMediaFormat.setString(p_sys->p_format, "mime", psz_mime);
+    syms.AMediaFormat.setString(p_sys->p_format, "mime", api->psz_mime);
     /* No limits for input size */
     syms.AMediaFormat.setInt32(p_sys->p_format, "max-input-size", 0);
     if (api->b_video)

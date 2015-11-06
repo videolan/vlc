@@ -467,8 +467,7 @@ static int Stop(mc_api *api)
 /*****************************************************************************
  * Start
  *****************************************************************************/
-static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
-                 union mc_api_args *p_args)
+static int Start(mc_api *api, union mc_api_args *p_args)
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv* env = NULL;
@@ -487,8 +486,8 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
 
     GET_ENV();
 
-    jmime = (*env)->NewStringUTF(env, psz_mime);
-    jcodec_name = (*env)->NewStringUTF(env, psz_name);
+    jmime = (*env)->NewStringUTF(env, api->psz_mime);
+    jcodec_name = (*env)->NewStringUTF(env, api->psz_name);
     if (!jmime || !jcodec_name)
         goto error;
 

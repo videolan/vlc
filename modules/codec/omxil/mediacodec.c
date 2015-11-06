@@ -82,9 +82,6 @@ typedef int (*dec_process_output_cb)(decoder_t *, mc_api_out *, picture_t **, bl
 struct decoder_sys_t
 {
     mc_api *api;
-    char *psz_name;
-
-    const char *mime;
 
     /* Codec Specific Data buffer: sent in PutInput after a start or a flush
      * with the BUFFER_FLAG_CODEC_CONFIG flag.*/
@@ -401,11 +398,11 @@ static int StartMediaCodec(decoder_t *p_dec)
                                    &p_sys->u.video.i_h264_profile, NULL, NULL);
             if (p_sys->u.video.i_h264_profile)
             {
-                free(p_sys->psz_name);
-                p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec),
-                                                     p_sys->mime,
-                                                     p_sys->u.video.i_h264_profile);
-                if (!p_sys->psz_name)
+                free(p_sys->api->psz_name);
+                p_sys->api->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec),
+                                                          p_sys->api->psz_mime,
+                                                          p_sys->u.video.i_h264_profile);
+                if (!p_sys->api->psz_name)
                     return VLC_EGENERIC;
             }
         }
@@ -442,7 +439,7 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.audio.i_channel_count  = p_dec->p_sys->u.audio.i_channels;
     }
 
-    return p_sys->api->start(p_sys->api, p_sys->psz_name, p_sys->mime, &args);
+    return p_sys->api->start(p_sys->api, &args);
 }
 
 /*****************************************************************************
@@ -560,8 +557,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
     p_dec->fmt_out.video = p_dec->fmt_in.video;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
-    p_sys->mime = mime;
     p_sys->b_new_block = true;
+    p_sys->api->psz_mime = mime;
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
@@ -581,15 +578,16 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             h264_get_profile_level(&p_dec->fmt_in,
                                    &p_sys->u.video.i_h264_profile, NULL, NULL);
 
-        p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime,
-                                              p_sys->u.video.i_h264_profile);
-        if (!p_sys->psz_name)
+        p_sys->api->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec),
+                                                  p_sys->api->psz_mime,
+                                                  p_sys->u.video.i_h264_profile);
+        if (!p_sys->api->psz_name)
             goto bailout;
 
-        p_sys->i_quirks = OMXCodec_GetQuirks( VIDEO_ES,
-                                              p_dec->fmt_in.i_codec,
-                                              p_sys->psz_name,
-                                              strlen(p_sys->psz_name) );
+        p_sys->i_quirks = OMXCodec_GetQuirks(VIDEO_ES,
+                                             p_dec->fmt_in.i_codec,
+                                             p_sys->api->psz_name,
+                                             strlen(p_sys->api->psz_name));
 
         if ((p_sys->i_quirks & OMXCODEC_VIDEO_QUIRKS_NEED_SIZE)
          && (!p_sys->u.video.i_width || !p_sys->u.video.i_height))
@@ -606,14 +604,15 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         p_sys->pf_process_output = Audio_ProcessOutput;
         p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
 
-        p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, 0);
-        if (!p_sys->psz_name)
+        p_sys->api->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec),
+                                                  p_sys->api->psz_mime, 0);
+        if (!p_sys->api->psz_name)
             goto bailout;
 
-        p_sys->i_quirks = OMXCodec_GetQuirks( AUDIO_ES,
-                                              p_dec->fmt_in.i_codec,
-                                              p_sys->psz_name,
-                                              strlen(p_sys->psz_name) );
+        p_sys->i_quirks = OMXCodec_GetQuirks(AUDIO_ES,
+                                             p_dec->fmt_in.i_codec,
+                                             p_sys->api->psz_name,
+                                             strlen(p_sys->api->psz_name));
         if ((p_sys->i_quirks & OMXCODEC_AUDIO_QUIRKS_NEED_CHANNELS)
          && !p_sys->u.audio.i_channels)
         {
@@ -678,8 +677,8 @@ static void CloseDecoder(vlc_object_t *p_this)
         if (p_sys->u.video.p_awh)
             AWindowHandler_destroy(p_sys->u.video.p_awh);
     }
+    free(p_sys->api->psz_name);
     free(p_sys->api);
-    free(p_sys->psz_name);
     free(p_sys);
 }
 
