@@ -1452,7 +1452,9 @@ static void *DecoderThread( void *p_data )
 
         if( p_owner->paused && p_owner->frames_countdown == 0 )
         {   /* Wait for resumption from pause */
+            p_owner->b_idle = true;
             vlc_fifo_Wait( p_owner->p_fifo );
+            p_owner->b_idle = false;
             continue;
         }
 
@@ -2110,9 +2112,10 @@ void input_DecoderWait( decoder_t *p_dec )
     while( !p_owner->b_has_data )
     {
         vlc_fifo_Lock( p_owner->p_fifo );
-        if( p_owner->b_idle && vlc_fifo_IsEmpty( p_owner->p_fifo ) )
+        if( p_owner->b_idle
+         && (vlc_fifo_IsEmpty( p_owner->p_fifo ) || p_owner->paused) )
         {
-            msg_Warn( p_dec, "can't wait without data to decode" );
+            msg_Err( p_dec, "buffer deadlock prevented" );
             vlc_fifo_Unlock( p_owner->p_fifo );
             break;
         }
