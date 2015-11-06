@@ -17,12 +17,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include "Manifest.hpp"
-#include "../adaptative/playlist/BasePeriod.h"
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include "Manifest.hpp"
+#include "../adaptative/playlist/BasePeriod.h"
 
 #include <vlc_common.h>
 #include <vlc_stream.h>
