@@ -1829,9 +1829,8 @@ void input_DecoderDelete( decoder_t *p_dec )
 
     vlc_cancel( p_owner->thread );
 
-    /* Make sure we aren't paused/waiting/decoding anymore */
+    /* Make sure we aren't waiting/decoding anymore */
     vlc_mutex_lock( &p_owner->lock );
-    p_owner->paused = false;
     p_owner->b_waiting = false;
     p_owner->b_flushing = true;
     vlc_cond_signal( &p_owner->wait_request );
