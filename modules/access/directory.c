@@ -31,6 +31,7 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
 #include <sys/stat.h>
 
 #include <vlc_common.h>
