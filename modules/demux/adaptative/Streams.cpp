@@ -142,6 +142,7 @@ SegmentChunk * AbstractStream::getChunk()
         if(esCount() && !isSelected())
         {
             disabled = true;
+            segmentTracker->reset();
             return NULL;
         }
         currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);

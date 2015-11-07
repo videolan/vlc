@@ -28,6 +28,19 @@ using namespace adaptative;
 using namespace adaptative::logic;
 using namespace adaptative::playlist;
 
+SegmentTrackerEvent::SegmentTrackerEvent(ISegment *s)
+{
+    type = DISCONTINUITY;
+    u.discontinuity.s = s;
+}
+
+SegmentTrackerEvent::SegmentTrackerEvent(BaseRepresentation *prev, BaseRepresentation *next)
+{
+    type = SWITCHING;
+    u.switching.prev = prev;
+    u.switching.next = next;
+}
+
 SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
 {
     count = 0;
@@ -41,7 +54,7 @@ SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSe
 
 SegmentTracker::~SegmentTracker()
 {
-
+    reset();
 }
 
 void SegmentTracker::setAdaptationLogic(AbstractAdaptationLogic *logic_)
@@ -49,14 +62,18 @@ void SegmentTracker::setAdaptationLogic(AbstractAdaptationLogic *logic_)
     logic = logic_;
 }
 
-void SegmentTracker::resetCounter()
+void SegmentTracker::reset()
 {
+    notify(SegmentTrackerEvent(prevRepresentation, NULL));
     prevRepresentation = NULL;
+    init_sent = false;
+    index_sent = false;
+    initializing = true;
 }
 
 SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionManager *connManager)
 {
-    BaseRepresentation *rep;
+    BaseRepresentation *rep = NULL;
     ISegment *segment;
 
     if(!adaptationSet)
@@ -70,13 +87,14 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
        (prevRepresentation && prevRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE) )
         rep = prevRepresentation;
     else
-        rep = logic->getCurrentRepresentation(adaptationSet);
+        rep = logic->getNextRepresentation(adaptationSet, prevRepresentation);
 
     if ( rep == NULL )
             return NULL;
 
     if(rep != prevRepresentation)
     {
+        notify(SegmentTrackerEvent(prevRepresentation, rep));
         prevRepresentation = rep;
         init_sent = false;
         index_sent = false;
@@ -107,13 +125,12 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
     segment = rep->getNextSegment(BaseRepresentation::INFOTYPE_MEDIA, count, &count, &b_gap);
     if(b_gap && count)
     {
-        notify(SegmentTrackerListenerInterface::notifications::NOTIFICATION_DISCONTINUITY,
-               segment);
+        notify(SegmentTrackerEvent(segment));
     }
 
     if(!segment)
     {
-        resetCounter();
+        reset();
         return NULL;
     }
 
@@ -177,9 +194,9 @@ void SegmentTracker::updateSelected()
         prevRepresentation->runLocalUpdates(getSegmentStart(), count);
 }
 
-void SegmentTracker::notify(SegmentTrackerListenerInterface::notifications type, ISegment *segment)
+void SegmentTracker::notify(const SegmentTrackerEvent &event)
 {
     std::list<SegmentTrackerListenerInterface *>::const_iterator it;
     for(it=listeners.begin();it != listeners.end(); ++it)
-        (*it)->trackerNotification(type, segment);
+        (*it)->trackerEvent(event);
 }

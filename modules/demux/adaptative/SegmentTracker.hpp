@@ -51,14 +51,34 @@ namespace adaptative
     using namespace logic;
     using namespace http;
 
+    class SegmentTrackerEvent
+    {
+        public:
+            SegmentTrackerEvent(ISegment *);
+            SegmentTrackerEvent(BaseRepresentation *, BaseRepresentation *);
+            enum
+            {
+                DISCONTINUITY,
+                SWITCHING,
+            } type;
+            union
+            {
+               struct
+               {
+                    ISegment *s;
+               } discontinuity;
+               struct
+               {
+                    BaseRepresentation *prev;
+                    BaseRepresentation *next;
+               } switching;
+            } u;
+    };
+
     class SegmentTrackerListenerInterface
     {
         public:
-            enum notifications
-            {
-                NOTIFICATION_DISCONTINUITY = 0
-            };
-            virtual void trackerNotification(notifications, ISegment *) = 0;
+            virtual void trackerEvent(const SegmentTrackerEvent &) = 0;
     };
 
     class SegmentTracker
@@ -68,7 +88,7 @@ namespace adaptative
             ~SegmentTracker();
 
             void setAdaptationLogic(AbstractAdaptationLogic *);
-            void resetCounter();
+            void reset();
             SegmentChunk* getNextChunk(bool, HTTPConnectionManager *);
             bool setPositionByTime(mtime_t, bool, bool);
             void setPositionByNumber(uint64_t, bool);
@@ -78,7 +98,7 @@ namespace adaptative
             void updateSelected();
 
         private:
-            void notify(SegmentTrackerListenerInterface::notifications, ISegment *);
+            void notify(const SegmentTrackerEvent &);
             bool initializing;
             bool index_sent;
             bool init_sent;
