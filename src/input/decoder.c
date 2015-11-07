@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 
+#include <vlc_atomic.h>
 #include <vlc_block.h>
 #include <vlc_vout.h>
 #include <vlc_aout.h>
@@ -112,7 +113,7 @@ struct decoder_owner_sys_t
     bool flushed;
     bool b_flushing;
     bool b_draining;
-    bool b_drained;
+    atomic_bool drained;
     bool b_idle;
 
     /* CC */
@@ -1521,8 +1522,11 @@ static void *DecoderThread( void *p_data )
         }
         vlc_restorecancel( canc );
 
+        /* Given that the drained flag is only polled, an atomic variable is
+         * sufficient. TODO? Wait for draining instead of polling. */
+        atomic_store( &p_owner->drained, (p_block == NULL) );
+
         vlc_mutex_lock( &p_owner->lock );
-        p_owner->b_drained = (p_block == NULL);
         vlc_fifo_Lock( p_owner->p_fifo );
         vlc_cond_signal( &p_owner->wait_acknowledge );
         vlc_mutex_unlock( &p_owner->lock );
@@ -1588,7 +1592,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->flushed = true;
     p_owner->b_flushing = false;
     p_owner->b_draining = false;
-    p_owner->b_drained = false;
+    atomic_init( &p_owner->drained, false );
     p_owner->b_idle = false;
 
     es_format_Init( &p_owner->fmt, UNKNOWN_ES, 0 );
@@ -1939,7 +1943,7 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
     if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
         b_empty = vout_IsEmpty( p_owner->p_vout );
     else if( p_owner->fmt.i_cat == AUDIO_ES )
-        b_empty = p_owner->b_drained;
+        b_empty = atomic_load( &p_owner->drained );
     else
         b_empty = true; /* TODO subtitles support */
     vlc_mutex_unlock( &p_owner->lock );
