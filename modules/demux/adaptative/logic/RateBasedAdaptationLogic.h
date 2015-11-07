@@ -39,8 +39,9 @@ namespace adaptative
             public:
                 RateBasedAdaptationLogic            (int, int);
 
-                BaseRepresentation *getCurrentRepresentation(BaseAdaptationSet *) const;
-                virtual void updateDownloadRate(size_t, mtime_t);
+                BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const;
+                virtual void updateDownloadRate(size_t, mtime_t); /* reimpl */
+                virtual void trackerEvent(const SegmentTrackerEvent &); /* reimpl */
 
             private:
                 int                     width;
@@ -49,6 +50,7 @@ namespace adaptative
                 size_t                  bpsRemainder;
                 size_t                  bpsSamplecount;
                 size_t                  currentBps;
+                size_t                  usedBps;
         };
 
         class FixedRateAdaptationLogic : public AbstractAdaptationLogic
@@ -56,7 +58,7 @@ namespace adaptative
             public:
                 FixedRateAdaptationLogic(size_t);
 
-                BaseRepresentation *getCurrentRepresentation(BaseAdaptationSet *) const;
+                BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const;
 
             private:
                 size_t                  currentBps;

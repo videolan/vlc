@@ -60,6 +60,7 @@ SegmentTracker::~SegmentTracker()
 void SegmentTracker::setAdaptationLogic(AbstractAdaptationLogic *logic_)
 {
     logic = logic_;
+    registerListener(logic);
 }
 
 void SegmentTracker::reset()

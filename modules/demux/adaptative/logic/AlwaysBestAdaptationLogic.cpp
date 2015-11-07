@@ -36,7 +36,7 @@ AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    () :
 {
 }
 
-BaseRepresentation *AlwaysBestAdaptationLogic::getCurrentRepresentation(BaseAdaptationSet *adaptSet) const
+BaseRepresentation *AlwaysBestAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *) const
 {
     RepresentationSelector selector;
     return selector.select(adaptSet);

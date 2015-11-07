@@ -40,15 +40,22 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (int w, int h) :
 {
     width  = w;
     height = h;
+    usedBps = 0;
 }
 
-BaseRepresentation *RateBasedAdaptationLogic::getCurrentRepresentation(BaseAdaptationSet *adaptSet) const
+BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *currep) const
 {
     if(adaptSet == NULL)
         return NULL;
 
+    size_t availBps = currentBps + ((currep) ? currep->getBandwidth() : 0);
+    if(availBps > usedBps)
+        availBps -= usedBps;
+    else
+        availBps = 0;
+
     RepresentationSelector selector;
-    BaseRepresentation *rep = selector.select(adaptSet, currentBps, width, height);
+    BaseRepresentation *rep = selector.select(adaptSet, availBps, width, height);
     if ( rep == NULL )
     {
         rep = selector.select(adaptSet);
@@ -79,13 +86,24 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
     currentBps = bpsAvg * 3/4;
 }
 
+void RateBasedAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
+{
+    if(event.type == SegmentTrackerEvent::SWITCHING)
+    {
+        if(event.u.switching.prev)
+            usedBps -= event.u.switching.prev->getBandwidth();
+        if(event.u.switching.next)
+            usedBps += event.u.switching.next->getBandwidth();
+    }
+}
+
 FixedRateAdaptationLogic::FixedRateAdaptationLogic(size_t bps) :
     AbstractAdaptationLogic()
 {
     currentBps = bps;
 }
 
-BaseRepresentation *FixedRateAdaptationLogic::getCurrentRepresentation(BaseAdaptationSet *adaptSet) const
+BaseRepresentation *FixedRateAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *) const
 {
     if(adaptSet == NULL)
         return NULL;
