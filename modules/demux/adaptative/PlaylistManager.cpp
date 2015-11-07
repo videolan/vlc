@@ -65,6 +65,7 @@ PlaylistManager::~PlaylistManager   ()
     unsetPeriod();
     delete playlist;
     delete conManager;
+    delete logic;
 }
 
 void PlaylistManager::unsetPeriod()
@@ -92,17 +93,13 @@ bool PlaylistManager::setupPeriod()
         {
             SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, set);
             if(!tracker)
-            {
-                delete logic;
                 continue;
-            }
 
             AbstractStream *st = streamFactory->create(p_demux, set->getStreamFormat(),
                                                        tracker, conManager);
             if(!st)
             {
                 delete tracker;
-                delete logic;
                 continue;
             }
 
