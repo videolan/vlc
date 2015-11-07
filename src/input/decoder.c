@@ -108,6 +108,8 @@ struct decoder_owner_sys_t
     bool b_has_data;
 
     /* Flushing */
+    bool flushing;
+    bool flushed;
     bool b_flushing;
     bool b_draining;
     bool b_drained;
@@ -1430,6 +1432,36 @@ static void *DecoderThread( void *p_data )
 
     for( ;; )
     {
+        if( p_owner->flushing )
+        {   /* Flush before/regardless of pause. We do not want to resume just
+             * for the sake of flushing (glitches could otherwise happen). */
+            int canc = vlc_savecancel();
+
+            /* TODO: add a flush callback to decoder, do not depend on an
+             * allocated block */
+            block_t *dummy = DecoderBlockFlushNew();
+            if( unlikely(dummy == NULL) )
+                msg_Err( p_dec, "cannot flush" );
+
+            /* Owner is buggy if it queues data while flushing */
+            assert( vlc_fifo_IsEmpty( p_owner->p_fifo ) );
+            p_owner->flushing = false;
+            vlc_fifo_Unlock( p_owner->p_fifo );
+
+            /* Flush the decoder (and the output) */
+            DecoderProcess( p_dec, dummy );
+
+            vlc_fifo_Lock( p_owner->p_fifo );
+            vlc_restorecancel( canc );
+
+            /* Owner is supposed to wait for flush to complete.
+             * TODO: It might be possible to remove this restriction. */
+            assert( vlc_fifo_IsEmpty( p_owner->p_fifo ) );
+            p_owner->flushed = true;
+            vlc_cond_signal( &p_owner->wait_fifo );
+            continue;
+        }
+
         if( paused != p_owner->paused )
         {   /* Update playing/paused status of the output */
             int canc = vlc_savecancel();
@@ -1552,6 +1584,8 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->b_first = true;
     p_owner->b_has_data = false;
 
+    p_owner->flushing = false;
+    p_owner->flushed = true;
     p_owner->b_flushing = false;
     p_owner->b_draining = false;
     p_owner->b_drained = false;
@@ -1885,6 +1919,7 @@ void input_DecoderDecode( decoder_t *p_dec, block_t *p_block, bool b_do_pace )
             vlc_fifo_WaitCond( p_owner->p_fifo, &p_owner->wait_fifo );
     }
 
+    p_owner->flushed = false;
     vlc_fifo_QueueUnlocked( p_owner->p_fifo, p_block );
     vlc_fifo_Unlock( p_owner->p_fifo );
 }
@@ -1930,33 +1965,6 @@ void input_DecoderDrain( decoder_t *p_dec )
     vlc_fifo_Unlock( p_owner->p_fifo );
 }
 
-static void DecoderFlush( decoder_t *p_dec )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    vlc_assert_locked( &p_owner->lock );
-
-    vlc_fifo_Lock( p_owner->p_fifo );
-    /* Empty the fifo */
-    block_ChainRelease( vlc_fifo_DequeueAllUnlocked( p_owner->p_fifo ) );
-    p_owner->b_draining = false; /* flush supersedes drain */
-    vlc_fifo_Unlock( p_owner->p_fifo );
-
-    /* Monitor for flush end */
-    p_owner->b_flushing = true;
-    vlc_cond_signal( &p_owner->wait_request );
-
-    /* Send a special block */
-    block_t *p_null = DecoderBlockFlushNew();
-    if( !p_null )
-        return;
-    input_DecoderDecode( p_dec, p_null, false );
-
-    /* */
-    while( p_owner->b_flushing )
-        vlc_cond_wait( &p_owner->wait_acknowledge, &p_owner->lock );
-}
-
 /**
  * Requests that the decoder immediately discard all pending buffers.
  * This is useful when seeking or when deselecting a stream.
@@ -1965,9 +1973,18 @@ void input_DecoderFlush( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    vlc_mutex_lock( &p_owner->lock );
-    DecoderFlush( p_dec );
-    vlc_mutex_unlock( &p_owner->lock );
+    vlc_fifo_Lock( p_owner->p_fifo );
+    /* Empty the fifo */
+    block_ChainRelease( vlc_fifo_DequeueAllUnlocked( p_owner->p_fifo ) );
+    p_owner->flushing = true;
+
+    vlc_fifo_Signal( p_owner->p_fifo );
+
+    /* Monitor for flush end */
+    while( !p_owner->flushed )
+        vlc_fifo_WaitCond( p_owner->p_fifo, &p_owner->wait_fifo );
+
+    vlc_fifo_Unlock( p_owner->p_fifo );
 }
 
 void input_DecoderIsCcPresent( decoder_t *p_dec, bool pb_present[4] )
@@ -2147,7 +2164,7 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
     {
         /* TODO subtitle should not be flushed */
         p_owner->b_waiting = false;
-        DecoderFlush( p_dec );
+        input_DecoderFlush( p_dec );
     }
     vlc_mutex_unlock( &p_owner->lock );
 }
