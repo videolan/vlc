@@ -84,69 +84,58 @@ struct filter_t
 
     union
     {
-        struct
-        {
-            picture_t * (*pf_filter) ( filter_t *, picture_t * );
-            void        (*pf_flush)( filter_t * );
-            /* Filter mouse state.
-             *
-             * If non-NULL, you must convert from output to input formats:
-             * - If VLC_SUCCESS is returned, the mouse state is propagated.
-             * - Otherwise, the mouse change is not propagated.
-             * If NULL, the mouse state is considered unchanged and will be
-             * propagated.
-             */
-            int         (*pf_mouse)( filter_t *, vlc_mouse_t *,
-                                     const vlc_mouse_t *p_old,
-                                     const vlc_mouse_t *p_new );
-        } video;
-#define pf_video_filter     u.video.pf_filter
-#define pf_video_flush      u.video.pf_flush
-#define pf_video_mouse      u.video.pf_mouse
+        /** Filter a picture (video filter) */
+        picture_t * (*pf_video_filter)( filter_t *, picture_t * );
 
-        struct
-        {
-            block_t *   (*pf_filter) ( filter_t *, block_t * );
-            void        (*pf_flush) ( filter_t * );
-            block_t *   (*pf_drain) ( filter_t * );
-        } audio;
-#define pf_audio_filter     u.audio.pf_filter
-#define pf_audio_flush      u.audio.pf_flush
-#define pf_audio_drain      u.audio.pf_drain
+        /** Filter an audio block (audio filter) */
+        block_t * (*pf_audio_filter)( filter_t *, block_t * );
 
-        struct
-        {
-            void        (*pf_blend) ( filter_t *,  picture_t *,
-                                      const picture_t *, int, int, int );
-        } blend;
-#define pf_video_blend     u.blend.pf_blend
+        /** Blend a subpicture onto a picture (blend) */
+        void (*pf_video_blend)( filter_t *,  picture_t *, const picture_t *,
+                                 int, int, int );
 
-        struct
-        {
-            subpicture_t * (*pf_source)    ( filter_t *, mtime_t );
-            int            (*pf_mouse)     ( filter_t *,
-                                             const vlc_mouse_t *p_old,
-                                             const vlc_mouse_t *p_new,
+        /** Generate a subpicture (sub source) */
+        subpicture_t *(*pf_sub_source)( filter_t *, mtime_t );
+
+        /** Filter a subpicture (sub filter) */
+        subpicture_t *(*pf_sub_filter)( filter_t *, subpicture_t * );
+
+        /** Render text (text render) */
+        int (*pf_render)( filter_t *, subpicture_region_t *,
+                          subpicture_region_t *, const vlc_fourcc_t * );
+    };
+
+    union
+    {
+        /* TODO: video filter drain */
+        /** Drain (audio filter) */
+        block_t *(*pf_audio_drain) ( filter_t * );
+    };
+
+    /** Flush
+     *
+     * Flush (i.e. discard) any internal buffer in a video or audio filter.
+     */
+    void (*pf_flush)( filter_t * );
+#define pf_video_flush pf_flush
+#define pf_audio_flush pf_flush
+
+    union
+    {
+        /** Filter mouse state (video filter).
+         *
+         * If non-NULL, you must convert from output to input formats:
+         * - If VLC_SUCCESS is returned, the mouse state is propagated.
+         * - Otherwise, the mouse change is not propagated.
+         * If NULL, the mouse state is considered unchanged and will be
+         * propagated. */
+        int (*pf_video_mouse)( filter_t *, vlc_mouse_t *,
+                               const vlc_mouse_t *p_old,
+                               const vlc_mouse_t *p_new );
+        int (*pf_sub_mouse)( filter_t *, const vlc_mouse_t *p_old,
+                              const vlc_mouse_t *p_new,
                                              const video_format_t * );
-        } sub;
-#define pf_sub_source      u.sub.pf_source
-#define pf_sub_mouse       u.sub.pf_mouse
-
-        struct
-        {
-            subpicture_t * (*pf_filter) ( filter_t *, subpicture_t * );
-        } subf;
-#define pf_sub_filter      u.subf.pf_filter
-
-        struct
-        {
-            int         (*pf_render) ( filter_t *, subpicture_region_t *,
-                                     subpicture_region_t *,
-                                     const vlc_fourcc_t * );
-        } render;
-#define pf_render     u.render.pf_render
-
-    } u;
+    };
 
     /* Input attachments
      * XXX use filter_GetInputAttachments */
