@@ -197,7 +197,7 @@ int Open( vlc_object_t *p_this );
  * Resets the filter state, including resetting all algorithm-specific state
  * and discarding all histories, but does not stop the filter.
  *
- * Open() sets this up as the flush method (pf_video_flush)
+ * Open() sets this up as the flush method (pf_flush)
  * in the filter structure.
  *
  * @param p_filter The filter instance.

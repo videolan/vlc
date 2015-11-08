@@ -192,7 +192,7 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
 
     p_filter->p_sys = p_sys;
     p_filter->pf_audio_filter = Resample;
-    p_filter->pf_audio_flush = Flush;
+    p_filter->pf_flush = Flush;
     p_filter->pf_audio_drain = Drain;
     return VLC_SUCCESS;
 }

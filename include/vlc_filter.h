@@ -117,8 +117,6 @@ struct filter_t
      * Flush (i.e. discard) any internal buffer in a video or audio filter.
      */
     void (*pf_flush)( filter_t * );
-#define pf_video_flush pf_flush
-#define pf_audio_flush pf_flush
 
     union
     {
@@ -163,21 +161,14 @@ static inline picture_t *filter_NewPicture( filter_t *p_filter )
 }
 
 /**
- * This function will flush the state of a video filter.
+ * Flush a filter
+ *
+ * This function will flush the state of a filter (audio or video).
  */
-static inline void filter_FlushPictures( filter_t *p_filter )
+static inline void filter_Flush( filter_t *p_filter )
 {
-    if( p_filter->pf_video_flush )
-        p_filter->pf_video_flush( p_filter );
-}
-
-/**
- * This function will flush the state of an audio filter.
- */
-static inline void filter_FlushAudio( filter_t *p_filter )
-{
-    if( p_filter->pf_audio_flush )
-        p_filter->pf_audio_flush( p_filter );
+    if( p_filter->pf_flush != NULL )
+        p_filter->pf_flush( p_filter );
 }
 
 /**

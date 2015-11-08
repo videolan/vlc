@@ -308,7 +308,7 @@ static void aout_FiltersPipelineFlush(filter_t *const *filters,
                                       unsigned count)
 {
     for (unsigned i = 0; i < count; i++)
-        filter_FlushAudio (filters[i]);
+        filter_Flush (filters[i]);
 }
 
 

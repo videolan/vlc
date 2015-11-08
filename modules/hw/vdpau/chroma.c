@@ -764,7 +764,7 @@ static int OutputOpen(vlc_object_t *obj)
     sys->procamp.hue = 0.f;
 
     filter->pf_video_filter = video_filter;
-    filter->pf_video_flush = Flush;
+    filter->pf_flush = Flush;
     return VLC_SUCCESS;
 error:
     free(sys);

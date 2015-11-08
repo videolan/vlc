@@ -757,7 +757,7 @@ notsupp:
     p_filter->fmt_out.video = fmt;
     p_filter->fmt_out.i_codec = fmt.i_chroma;
     p_filter->pf_video_filter = Deinterlace;
-    p_filter->pf_video_flush  = Flush;
+    p_filter->pf_flush = Flush;
     p_filter->pf_video_mouse  = Mouse;
 
     msg_Dbg( p_filter, "deinterlacing" );
