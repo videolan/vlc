@@ -84,6 +84,8 @@ struct decoder_sys_t
      * Common properties
      */
     mtime_t i_pts;
+    mtime_t i_firstpts;
+    mtime_t i_firstframepts;
     mtime_t i_duration;
 
     int i_frame_length;
@@ -490,11 +492,18 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
 
     if( pi_pts )
     {
+        /* Compute from frame absolute time */
         *pi_pts = VLC_TS_0;
         if ( (p_buf[1] & 0x01) == 0  ) /* Fixed blocksize stream / Frames */
             *pi_pts += CLOCK_FREQ * blocksize * i_fsnumber / samplerate;
         else /* Variable blocksize stream / Samples */
             *pi_pts += CLOCK_FREQ * i_fsnumber / samplerate;
+
+        if( p_sys->i_firstframepts == VLC_TS_INVALID )
+            p_sys->i_firstframepts = *pi_pts;
+
+        if( p_sys->i_firstpts > VLC_TS_INVALID )
+            *pi_pts += (p_sys->i_firstpts - p_sys->i_firstframepts);
     }
 
     if ( pi_duration )
@@ -546,6 +555,10 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             return NULL;
         }
         p_sys->i_rate = p_dec->fmt_out.audio.i_rate;
+    }
+    else if( in && p_sys->i_firstpts == VLC_TS_INVALID )
+    {
+         p_sys->i_firstpts = in->i_pts;
     }
 
     if ( in )
@@ -756,6 +769,8 @@ static int Open(vlc_object_t *p_this)
 
     p_sys->i_state       = STATE_NOSYNC;
     p_sys->b_stream_info = false;
+    p_sys->i_firstpts    = VLC_TS_INVALID;
+    p_sys->i_firstframepts   = VLC_TS_INVALID;
     p_sys->i_pts         = VLC_TS_INVALID;
     p_sys->i_buf         = 0;
     p_sys->p_buf         = NULL;
