@@ -25,6 +25,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <math.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -768,6 +769,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (fmt->i_physical_channels & AOUT_CHAN_LFE)
         map.map[map.channels++] = PA_CHANNEL_POSITION_LFE;
     fmt->i_original_channels = fmt->i_physical_channels;
+
+    static_assert(AOUT_CHAN_MAX == 9, "Missing channels");
 
     for (unsigned i = 0; map.channels < ss.channels; i++) {
         map.map[map.channels++] = PA_CHANNEL_POSITION_AUX0 + i;

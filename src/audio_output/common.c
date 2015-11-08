@@ -248,6 +248,8 @@ unsigned aout_CheckChannelReorder( const uint32_t *chans_in,
                                    const uint32_t *chans_out,
                                    uint32_t mask, uint8_t *restrict table )
 {
+    static_assert(AOUT_CHAN_MAX <= (sizeof (mask) * CHAR_BIT), "Missing bits");
+
     unsigned channels = 0;
 
     if( chans_in == NULL )
@@ -454,6 +456,9 @@ bool aout_CheckChannelExtraction( int *pi_selection,
                                   const uint32_t pi_order_dst[AOUT_CHAN_MAX],
                                   const uint32_t *pi_order_src, int i_channels )
 {
+    static_assert(AOUT_CHAN_MAX <= (sizeof (*pi_order_dst) * CHAR_BIT),
+                  "Missing bits");
+
     const uint32_t pi_order_dual_mono[] = { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT };
     uint32_t i_layout = 0;
     int i_out = 0;
