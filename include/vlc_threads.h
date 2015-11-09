@@ -29,9 +29,11 @@
 #define VLC_THREADS_H_
 
 /**
+ * \ingroup os
+ * \defgroup thread Threads and synchronization primitives
+ * @{
  * \file
- * This file defines structures and functions for handling threads in vlc
- *
+ * Thread primitive declarations
  */
 
 /**
@@ -934,5 +936,7 @@ VLC_API void vlc_global_mutex(unsigned, bool);
  * Releases a global mutex.
  */
 #define vlc_global_unlock( n ) vlc_global_mutex(n, false)
+
+/** @} */
 
 #endif /* !_VLC_THREADS_H */
