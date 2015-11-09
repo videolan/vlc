@@ -28,8 +28,11 @@
 # define VLC_NETWORK_H
 
 /**
+ * \ingroup file
+ * \defgroup sockets Internet sockets
+ * @{
  * \file
- * This file defines interface to communicate with network plug-ins
+ * Definitions for sockets and low-level networking
  */
 
 #if defined( _WIN32 )
@@ -360,5 +363,7 @@ VLC_API char *vlc_getProxyUrl(const char *);
 # ifdef __cplusplus
 }
 # endif
+
+/** @} */
 
 #endif
