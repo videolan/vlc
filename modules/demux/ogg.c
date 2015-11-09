@@ -1266,20 +1266,18 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         /* Backup the ogg packet (likely an header packet) */
         if( !b_xiph )
         {
-            void *p_org = p_stream->p_headers;
-            p_stream->i_headers += p_oggpacket->bytes;
-            p_stream->p_headers = realloc( p_stream->p_headers, p_stream->i_headers );
-            if( p_stream->p_headers )
+            uint8_t *p_realloc = realloc( p_stream->p_headers, p_stream->i_headers + p_oggpacket->bytes );
+            if( p_realloc )
             {
-                memcpy( (unsigned char *)p_stream->p_headers + p_stream->i_headers - p_oggpacket->bytes,
-                        p_oggpacket->packet, p_oggpacket->bytes );
+                memcpy( &p_realloc[p_stream->i_headers], p_oggpacket->packet, p_oggpacket->bytes );
+                p_stream->i_headers += p_oggpacket->bytes;
+                p_stream->p_headers = p_realloc;
             }
             else
             {
-#warning Memory leak
+                free( p_stream->p_headers );
                 p_stream->i_headers = 0;
                 p_stream->p_headers = NULL;
-                free( p_org );
             }
         }
         else if( xiph_AppendHeaders( &p_stream->i_headers, &p_stream->p_headers,
