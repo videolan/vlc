@@ -76,7 +76,7 @@ ssize_t Socket::read(vlc_object_t *stream, void *p_buffer, size_t len)
     do
     {
         size = net_Read(stream, netfd, p_buffer, len);
-    } while (size < 0 && (errno == EINTR || errno==EAGAIN) );
+    } while (size < 0 && errno==EAGAIN );
     return size;
 }
 
