@@ -1877,6 +1877,12 @@ void input_DecoderFlush( decoder_t *p_dec )
     block_ChainRelease( vlc_fifo_DequeueAllUnlocked( p_owner->p_fifo ) );
     p_owner->flushing = true;
 
+    /* Flushing video decoder when paused: increment frames_countdown in order
+     * to display one frame */
+    if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->paused
+     && p_owner->frames_countdown == 0 )
+        p_owner->frames_countdown++;
+
     vlc_fifo_Signal( p_owner->p_fifo );
 
     /* Monitor for flush end */
