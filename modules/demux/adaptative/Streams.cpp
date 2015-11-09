@@ -139,12 +139,6 @@ SegmentChunk * AbstractStream::getChunk()
 {
     if (currentChunk == NULL && !eof)
     {
-        if(esCount() && !isSelected())
-        {
-            disabled = true;
-            segmentTracker->reset();
-            return NULL;
-        }
         currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
         if (currentChunk == NULL)
             eof = true;
@@ -285,6 +279,13 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
 
     if(send)
         pcr = fakeesout->commandsqueue.Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
+
+    /* Disable streams that are not selected (alternate streams) */
+    if(esCount() && !isSelected() && !fakeesout->restarting())
+    {
+        disabled = true;
+        segmentTracker->reset();
+    }
 
     return AbstractStream::status_demuxed;
 }
