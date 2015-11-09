@@ -87,12 +87,6 @@ struct intf_sys_t
     /* submission of played songs */
     vlc_url_t               p_submit_url;       /**< where to submit data   */
 
-    /* submission of playing song */
-#if 0 //NOT USED
-    char                    *psz_nowp_host;     /**< where to submit data   */
-    int                     i_nowp_port;        /**< port to which submit   */
-    char                    *psz_nowp_file;     /**< file to which submit   */
-#endif
     char                    psz_auth_token[33]; /**< Authentication token */
 
     /* data about song currently playing */
@@ -449,10 +443,6 @@ static void Close(vlc_object_t *p_this)
     for (i = 0; i < p_sys->i_songs; i++)
         DeleteSong(&p_sys->p_queue[i]);
     vlc_UrlClean(&p_sys->p_submit_url);
-#if 0 //NOT USED
-    free(p_sys->psz_nowp_host);
-    free(p_sys->psz_nowp_file);
-#endif
     vlc_cond_destroy(&p_sys->wait);
     vlc_mutex_destroy(&p_sys->lock);
     free(p_sys);
@@ -616,23 +606,6 @@ static int Handshake(intf_thread_t *p_this)
 
     /* We need to read the nowplaying url */
     p_buffer_pos += 7; /* we skip "http://" */
-#if 0 //NOT USED
-    psz_url = strndup(p_buffer_pos, strcspn(p_buffer_pos, "\n"));
-    if (!psz_url)
-        goto oom;
-
-    switch(ParseURL(psz_url, &p_sys->psz_nowp_host,
-                &p_sys->psz_nowp_file, &p_sys->i_nowp_port))
-    {
-        case VLC_ENOMEM:
-            goto oom;
-        case VLC_EGENERIC:
-            goto proto;
-        case VLC_SUCCESS:
-        default:
-            break;
-    }
-#endif
     p_buffer_pos = strstr(p_buffer_pos, "http://");
     if (!p_buffer_pos || strlen(p_buffer_pos) == 7)
         goto proto;
