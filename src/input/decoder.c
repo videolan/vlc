@@ -1873,6 +1873,14 @@ void input_DecoderFlush( decoder_t *p_dec )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     vlc_fifo_Lock( p_owner->p_fifo );
+
+    /* Don't flush if already flushed */
+    if( p_owner->flushed )
+    {
+        vlc_fifo_Unlock( p_owner->p_fifo );
+        return;
+    }
+
     /* Empty the fifo */
     block_ChainRelease( vlc_fifo_DequeueAllUnlocked( p_owner->p_fifo ) );
     p_owner->flushing = true;
