@@ -2635,6 +2635,7 @@ static bool Ogg_ReadDaalaHeader( logical_stream_t *p_stream,
     }
 
     i_version = i_major * 1000000 + i_minor * 1000 + i_subminor;
+    VLC_UNUSED(i_version);
     p_stream->i_keyframe_offset = 0;
     p_stream->f_rate = ((double)i_timebase_numerator) / i_timebase_denominator;
     if ( p_stream->f_rate == 0 ) return false;
