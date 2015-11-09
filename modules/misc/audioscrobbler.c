@@ -617,6 +617,12 @@ static int Handshake(intf_thread_t *p_this)
 
     vlc_UrlParse(&p_sys->p_nowp_url, psz_url);
     free(psz_url);
+    if (p_sys->p_nowp_url.psz_host == NULL ||
+        p_sys->p_nowp_url.i_port == 0)
+    {
+        vlc_UrlClean(&p_sys->p_nowp_url);
+        goto proto;
+    }
 
     p_buffer_pos = strstr(p_buffer_pos, "http://");
     if (!p_buffer_pos || strlen(p_buffer_pos) == 7)
@@ -631,6 +637,13 @@ static int Handshake(intf_thread_t *p_this)
     /* parse the submission url */
     vlc_UrlParse(&p_sys->p_submit_url, psz_url);
     free(psz_url);
+    if (p_sys->p_submit_url.psz_host == NULL ||
+        p_sys->p_submit_url.i_port == 0)
+    {
+        vlc_UrlClean(&p_sys->p_nowp_url);
+        vlc_UrlClean(&p_sys->p_submit_url);
+        goto proto;
+    }
 
     return VLC_SUCCESS;
 
