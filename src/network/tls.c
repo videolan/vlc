@@ -73,16 +73,6 @@ static void tls_unload(void *func, va_list ap)
     deactivate (crd);
 }
 
-/**
- * Allocates a whole server's TLS credentials.
- *
- * @param cert_path required (Unicode) path to an x509 certificate,
- *                  if NULL, anonymous key exchange will be used.
- * @param key_path (UTF-8) path to the PKCS private key for the certificate,
- *                 if NULL; cert_path will be used.
- *
- * @return NULL on error.
- */
 vlc_tls_creds_t *
 vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
                       const char *key_path)
@@ -107,12 +97,6 @@ vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
     return srv;
 }
 
-/**
- * Allocates TLS credentials for a client.
- * Credentials can be cached and reused across multiple TLS sessions.
- *
- * @return TLS credentials object, or NULL on error.
- **/
 vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *obj)
 {
     vlc_tls_creds_t *crd = vlc_custom_create (obj, sizeof (*crd),
@@ -132,11 +116,6 @@ vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *obj)
     return crd;
 }
 
-/**
- * Releases data allocated with vlc_tls_ClientCreate() or
- * vlc_tls_ServerCreate().
- * @param srv TLS server object to be destroyed, or NULL
- */
 void vlc_tls_Delete (vlc_tls_creds_t *crd)
 {
     if (crd == NULL)
@@ -180,22 +159,6 @@ void vlc_tls_SessionDelete (vlc_tls_t *session)
     vlc_object_release (session);
 }
 
-/**
- * Performs client side of TLS handshake through a connected socket, and
- * establishes a secure channel. This is a blocking network operation.
- *
- * @param fd socket through which to establish the secure channel
- * @param hostname expected server name, used both as Server Name Indication
- *                 and as expected Common Name of the peer certificate
- * @param service unique identifier for the service to connect to
- *                (only used locally for certificates database)
- * @param alpn NULL-terminated list of Application Layer Protocols
- *             to negotiate, or NULL to not negotiate protocols
- * @param alp storage space for the negotiated Application Layer
- *            Protocol or NULL if negotiation was not performed[OUT]
- *
- * @return NULL on error.
- **/
 vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
                                         const char *host, const char *service,
                                         const char *const *alpn, char **alp)
