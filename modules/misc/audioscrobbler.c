@@ -22,11 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* audioscrobbler protocol version: 1.2
- * http://www.audioscrobbler.net/development/protocol/
+/* Last.fm Submissions protocol version: 1.2
+ * http://www.last.fm/api/submissions
  *
  * TODO:    "Now Playing" feature (not mandatory)
- *          Update to new API? http://www.lastfm.fr/api
+ *          Update to new API? http://www.last.fm/api/scrobbling
  */
 /*****************************************************************************
  * Preamble
