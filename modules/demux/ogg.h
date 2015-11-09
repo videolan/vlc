@@ -149,6 +149,10 @@ typedef struct logical_stream_s
             int32_t i_framesize;
             int32_t i_framesperpacket;
         } speex;
+        struct
+        {
+            bool b_old;
+        } flac;
     } special;
 
 } logical_stream_t;
