@@ -50,7 +50,8 @@ struct vlc_tls
  * Initiates a client TLS session.
  *
  * Performs client side of TLS handshake through a connected socket, and
- * establishes a secure channel. This is a blocking network operation.
+ * establishes a secure channel. This is a blocking network operation and may
+ * be a thread cancellation point.
  *
  * @param fd socket through which to establish the secure channel
  * @param hostname expected server name, used both as Server Name Indication
