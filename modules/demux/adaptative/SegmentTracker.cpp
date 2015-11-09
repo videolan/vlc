@@ -148,8 +148,12 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
 bool SegmentTracker::setPositionByTime(mtime_t time, bool restarted, bool tryonly)
 {
     uint64_t segnumber;
-    if(prevRepresentation &&
-       prevRepresentation->getSegmentNumberByTime(time, &segnumber))
+    BaseRepresentation *rep = prevRepresentation;
+    if(!rep)
+        rep = logic->getNextRepresentation(adaptationSet, NULL);
+
+    if(rep &&
+       rep->getSegmentNumberByTime(time, &segnumber))
     {
         if(!tryonly)
             setPositionByNumber(segnumber, restarted);
