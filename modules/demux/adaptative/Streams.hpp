@@ -68,7 +68,7 @@ namespace adaptative
         int esCount() const;
         bool seekAble() const;
         bool isSelected() const;
-        bool reactivate(mtime_t);
+        virtual bool reactivate(mtime_t);
         bool isDisabled() const;
         typedef enum {status_eof, status_eop, status_dis, status_buffering, status_demuxed} status;
         status demux(mtime_t, bool);

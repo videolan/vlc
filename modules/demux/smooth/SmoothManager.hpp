@@ -48,7 +48,11 @@ namespace smooth
             static bool isSmoothStreaming(xml::Node *);
             static bool mimeMatched(const std::string &);
 
+        protected:
+            virtual bool reactivateStream(AbstractStream *); /* reimpl */
+
         private:
+            bool updatePlaylist(bool);
             playlist::Manifest * fetchManifest();
     };
 

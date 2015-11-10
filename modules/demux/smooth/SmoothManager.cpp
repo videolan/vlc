@@ -89,6 +89,11 @@ Manifest * SmoothManager::fetchManifest()
 
 bool SmoothManager::updatePlaylist()
 {
+    return updatePlaylist(false);
+}
+
+bool SmoothManager::updatePlaylist(bool forcemanifest)
+{
     /* FIXME: do update from manifest after resuming from pause */
     if(!playlist->isLive() || !playlist->minUpdatePeriod.Get())
         return true;
@@ -107,8 +112,8 @@ bool SmoothManager::updatePlaylist()
 
     /* Timelines updates should be inlined in tfrf atoms.
        We'll just care about pruning live timeline then. */
-#if 0
-    if(nextPlaylistupdate)
+
+    if(forcemanifest && nextPlaylistupdate)
     {
         Manifest *newManifest = fetchManifest();
         if(newManifest)
@@ -125,7 +130,6 @@ bool SmoothManager::updatePlaylist()
 #endif
         }
     }
-#endif
 
     /* Compute new Manifest update time */
     if(!mininterval && !maxinterval)
@@ -146,6 +150,13 @@ bool SmoothManager::updatePlaylist()
 //           (mtime_t) nextPlaylistupdate - now, mininterval/ CLOCK_FREQ, maxinterval/ CLOCK_FREQ );
 
     return true;
+}
+
+bool SmoothManager::reactivateStream(AbstractStream *stream)
+{
+    if(playlist->isLive())
+        updatePlaylist(true);
+    return PlaylistManager::reactivateStream(stream);
 }
 
 bool SmoothManager::isSmoothStreaming(xml::Node *root)
