@@ -1493,6 +1493,39 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
     return VLC_SUCCESS;
 }
 
+#if BLURAY_VERSION < BLURAY_VERSION_CODE(0,9,2)
+#  define BLURAY_AUDIO_STREAM 0
+#endif
+
+static void blurayStreamSelected(demux_sys_t *p_sys, int i_pid)
+{
+    vlc_mutex_lock(&p_sys->pl_info_lock);
+
+    if (p_sys->p_clip_info) {
+        if ((i_pid & 0xff00) == 0x1100) {
+            // audio
+            for (int i_id = 0; i_id < p_sys->p_clip_info->audio_stream_count; i_id++) {
+                if (i_pid == p_sys->p_clip_info->audio_streams[i_id].pid) {
+                    p_sys->i_audio_stream_idx = i_id;
+                    bd_select_stream(p_sys->bluray, BLURAY_AUDIO_STREAM, i_id + 1, 1);
+                    break;
+                }
+            }
+        } else if ((i_pid & 0xff00) == 0x1400 || i_pid == 0x1800) {
+            // subtitle
+            for (int i_id = 0; i_id < p_sys->p_clip_info->pg_stream_count; i_id++) {
+                if (i_pid == p_sys->p_clip_info->pg_streams[i_id].pid) {
+                    p_sys->i_spu_stream_idx = i_id;
+                    bd_select_stream(p_sys->bluray, BLURAY_PG_TEXTST_STREAM, i_id + 1, 1);
+                    break;
+                }
+            }
+        }
+    }
+
+    vlc_mutex_unlock(&p_sys->pl_info_lock);
+}
+
 /*****************************************************************************
  * blurayControl: handle the controls
  *****************************************************************************/
@@ -1518,6 +1551,12 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_SET_PAUSE_STATE:
         /* Nothing to do */
         break;
+    case DEMUX_SET_ES:
+    {
+        int i_id = (int)va_arg(args, int);
+        blurayStreamSelected(p_sys, i_id);
+        break;
+    }
     case DEMUX_SET_TITLE:
     {
         int i_title = (int)va_arg(args, int);
