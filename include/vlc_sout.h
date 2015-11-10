@@ -147,7 +147,7 @@ struct  sout_mux_t
      *  for stream then we refuse all stream and start muxing */
     bool  b_add_stream_any_time;
     bool  b_waiting_stream;
-    /* we wait one second after first stream added */
+    /* we wait 1.5 second after first stream added */
     mtime_t     i_add_stream_start;
 };
 
