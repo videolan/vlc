@@ -2030,9 +2030,12 @@ void input_DecoderWait( decoder_t *p_dec )
     vlc_mutex_lock( &p_owner->lock );
     while( !p_owner->b_has_data )
     {
+        /* Don't need to lock p_owner->paused since it's only modified by the
+         * owner */
+        if( p_owner->paused )
+            break;
         vlc_fifo_Lock( p_owner->p_fifo );
-        if( p_owner->b_idle
-         && (vlc_fifo_IsEmpty( p_owner->p_fifo ) || p_owner->paused) )
+        if( p_owner->b_idle && vlc_fifo_IsEmpty( p_owner->p_fifo ) )
         {
             msg_Err( p_dec, "buffer deadlock prevented" );
             vlc_fifo_Unlock( p_owner->p_fifo );
