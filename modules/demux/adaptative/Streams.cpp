@@ -351,7 +351,8 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
                 delete currentChunk;
             currentChunk = NULL;
 
-            restartDemux();
+            if( !restartDemux() )
+                dead = true;
 
             /* Check if we need to set an offset as the demuxer
              * will start from zero from seek point */
