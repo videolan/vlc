@@ -230,8 +230,8 @@ HTTPChunkBufferedSource::~HTTPChunkBufferedSource()
 
 void HTTPChunkBufferedSource::bufferize(size_t readsize)
 {
-    if(readsize < 32768)
-        readsize = 32768;
+    if(readsize < HTTPChunkSource::CHUNK_SIZE)
+        readsize = HTTPChunkSource::CHUNK_SIZE;
 
     if(contentLength && readsize > contentLength - consumed)
         readsize = contentLength - consumed;

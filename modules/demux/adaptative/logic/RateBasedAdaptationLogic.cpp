@@ -30,6 +30,7 @@
 
 #include "../playlist/BaseRepresentation.h"
 #include "../playlist/BasePeriod.h"
+#include "../http/Chunk.h"
 
 using namespace adaptative::logic;
 
@@ -62,12 +63,13 @@ BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptati
         if ( rep == NULL )
             return NULL;
     }
+
     return rep;
 }
 
 void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
 {
-    if(unlikely(time == 0))
+    if(unlikely(time == 0) || size < (HTTPChunkSource::CHUNK_SIZE>>1) )
         return;
 
     size_t current = bpsRemainder + CLOCK_FREQ * size * 8 / time;

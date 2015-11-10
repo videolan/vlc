@@ -84,6 +84,8 @@ namespace adaptative
 
                 virtual block_t * read(size_t); /* impl */
 
+                static const size_t CHUNK_SIZE = 32768;
+
             protected:
                 virtual block_t * consume(size_t);
                 HTTPConnection     *connection;
