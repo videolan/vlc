@@ -45,11 +45,21 @@ namespace adaptative
                 int                     width;
                 int                     height;
                 size_t                  bpsAvg;
-                size_t                  bpsRemainder;
-                size_t                  bpsSamplecount;
                 size_t                  currentBps;
                 size_t                  usedBps;
                 vlc_object_t *          p_obj;
+
+                static const unsigned   TOTALOBS = 10;
+                struct
+                {
+                    size_t bw;
+                    size_t diff;
+                } window[TOTALOBS];
+                unsigned                window_idx;
+                size_t                  prevbps;
+
+                size_t                  dlsize;
+                mtime_t                 dllength;
         };
 
         class FixedRateAdaptationLogic : public AbstractAdaptationLogic
