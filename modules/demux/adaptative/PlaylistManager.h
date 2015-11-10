@@ -71,6 +71,7 @@ namespace adaptative
             virtual int doControl(int, va_list);
             virtual int doDemux(int64_t);
 
+            virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();
             void unsetPeriod();
             /* local factories */

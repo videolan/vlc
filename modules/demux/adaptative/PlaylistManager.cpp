@@ -152,7 +152,7 @@ AbstractStream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
         if (st->isDisabled())
         {
             if(st->isSelected() && !st->isEOF())
-                st->reactivate(getPCR());
+                reactivateStream(st);
             else
                 continue;
         }
@@ -269,6 +269,11 @@ bool PlaylistManager::updatePlaylist()
         (*it)->runUpdates();
 
     return true;
+}
+
+bool PlaylistManager::reactivateStream(AbstractStream *stream)
+{
+    return stream->reactivate(getPCR());
 }
 
 #define DEMUX_INCREMENT (CLOCK_FREQ / 20)
