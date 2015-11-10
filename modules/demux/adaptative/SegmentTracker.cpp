@@ -81,8 +81,13 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
         return NULL;
 
     /* Ensure we don't keep chaining init/index without data */
-    if( initializing && prevRepresentation )
-        switch_allowed = false;
+    if( initializing )
+    {
+        if( prevRepresentation )
+            switch_allowed = false;
+        else
+            switch_allowed = true;
+    }
 
     if( !switch_allowed ||
        (prevRepresentation && prevRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE) )
