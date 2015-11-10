@@ -256,15 +256,19 @@ void input_ControlVarNavigation( input_thread_t *p_input )
     /* Create more command variables */
     if( p_input->p->i_title > 1 )
     {
-        var_Create( p_input, "next-title", VLC_VAR_VOID );
-        text.psz_string = _("Next title");
-        var_Change( p_input, "next-title", VLC_VAR_SETTEXT, &text, NULL );
-        var_AddCallback( p_input, "next-title", TitleCallback, NULL );
+        if( var_Type( p_input, "next-title" ) == 0 ) {
+            var_Create( p_input, "next-title", VLC_VAR_VOID );
+            text.psz_string = _("Next title");
+            var_Change( p_input, "next-title", VLC_VAR_SETTEXT, &text, NULL );
+            var_AddCallback( p_input, "next-title", TitleCallback, NULL );
+        }
 
-        var_Create( p_input, "prev-title", VLC_VAR_VOID );
-        text.psz_string = _("Previous title");
-        var_Change( p_input, "prev-title", VLC_VAR_SETTEXT, &text, NULL );
-        var_AddCallback( p_input, "prev-title", TitleCallback, NULL );
+        if( var_Type( p_input, "prev-title" ) == 0 ) {
+            var_Create( p_input, "prev-title", VLC_VAR_VOID );
+            text.psz_string = _("Previous title");
+            var_Change( p_input, "prev-title", VLC_VAR_SETTEXT, &text, NULL );
+            var_AddCallback( p_input, "prev-title", TitleCallback, NULL );
+        }
     }
 
     /* Create titles and chapters */
