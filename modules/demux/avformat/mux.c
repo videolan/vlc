@@ -173,7 +173,7 @@ void CloseMux( vlc_object_t *p_this )
 static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    es_format_t *fmt = p_input->p_fmt;
+    es_format_t *fmt = &p_input->fmt;
     AVCodecContext *codec;
     AVStream *stream;
     unsigned i_codec_id;
