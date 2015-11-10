@@ -411,7 +411,8 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
         {
             int width = var_InheritInteger(p_demux, "adaptative-width");
             int height = var_InheritInteger(p_demux, "adaptative-height");
-            RateBasedAdaptationLogic *logic = new (std::nothrow) RateBasedAdaptationLogic(width, height);
+            RateBasedAdaptationLogic *logic =
+                    new (std::nothrow) RateBasedAdaptationLogic(VLC_OBJECT(p_demux), width, height);
             conn->setDownloadRateObserver(logic);
             return logic;
         }

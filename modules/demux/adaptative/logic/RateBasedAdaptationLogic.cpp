@@ -31,10 +31,11 @@
 #include "../playlist/BaseRepresentation.h"
 #include "../playlist/BasePeriod.h"
 #include "../http/Chunk.h"
+#include "../tools/Debug.hpp"
 
 using namespace adaptative::logic;
 
-RateBasedAdaptationLogic::RateBasedAdaptationLogic  (int w, int h) :
+RateBasedAdaptationLogic::RateBasedAdaptationLogic  (vlc_object_t *p_obj_, int w, int h) :
                           AbstractAdaptationLogic   (),
                           bpsAvg(0), bpsRemainder(0), bpsSamplecount(0),
                           currentBps(0)
@@ -42,6 +43,7 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (int w, int h) :
     width  = w;
     height = h;
     usedBps = 0;
+    p_obj = p_obj_;
 }
 
 BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *currep) const
@@ -86,6 +88,9 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
     }
 
     currentBps = bpsAvg * 3/4;
+
+    BwDebug(msg_Info(p_obj, "Current bandwidth %zu KiB/s using %u%%",
+                    (bpsAvg / 8192), (bpsAvg) ? (unsigned)(usedBps * 100.0 / bpsAvg) : 0 ));
 }
 
 void RateBasedAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
@@ -96,6 +101,9 @@ void RateBasedAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
             usedBps -= event.u.switching.prev->getBandwidth();
         if(event.u.switching.next)
             usedBps += event.u.switching.next->getBandwidth();
+
+        BwDebug(msg_Info(p_obj, "New bandwidth usage %zu KiB/s %u%%",
+                        (usedBps / 8192), (bpsAvg) ? (unsigned)(usedBps * 100.0 / bpsAvg) : 0 ));
     }
 }
 

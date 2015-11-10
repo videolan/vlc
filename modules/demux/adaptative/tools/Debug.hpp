@@ -21,11 +21,18 @@
 #define DEBUG_HPP
 
 //#define ADAPTATIVE_ADVANCED_DEBUG 0
+//#define ADAPTATIVE_BW_DEBUG 0
 
 #ifdef ADAPTATIVE_ADVANCED_DEBUG
   #define AdvDebug(code) code
 #else
   #define AdvDebug(code)
+#endif
+
+#ifdef ADAPTATIVE_BW_DEBUG
+  #define BwDebug(code) code
+#else
+  #define BwDebug(code)
 #endif
 
 #endif // DEBUG_HPP
