@@ -516,12 +516,23 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
                 /*
                  * Move p_face to the beginning of the array. Otherwise strikethrough
                  * lines can appear segmented, being rendered at a certain height
-                 * through spaces and at a different height through words
+                 * through spaces and at a different height through words.
+                 * Skip this step for the specified special characters. See #15840.
                  */
                 if( i_index > 0 )
                 {
-                    pp_faces[ i_index ] = pp_faces[ 0 ];
-                    pp_faces[ 0 ] = p_face;
+                    uni_char_t codepoint = p_paragraph->p_code_points[ i ];
+                    if( codepoint != 0x0009 && codepoint != 0x00A0
+                     && codepoint != 0x1680 && codepoint != 0x061C
+                     && codepoint != 0x202F && codepoint != 0x205F
+                     && codepoint != 0x3000 && codepoint != 0xFEFF
+                     && !( codepoint >= 0x2000 && codepoint <= 0x200F )
+                     && !( codepoint >= 0x202A && codepoint <= 0x202E )
+                     && !( codepoint >= 0x2060 && codepoint <= 0x2069 ) )
+                    {
+                        pp_faces[ i_index ] = pp_faces[ 0 ];
+                        pp_faces[ 0 ] = p_face;
+                    }
                 }
             }
 
@@ -957,6 +968,28 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
             else
                 i_glyph_index =
                     FT_Get_Char_Index( p_face, p_paragraph->p_code_points[ j ] );
+
+            /*
+             * If the font has no support for special space characters, use regular
+             * space glyphs instead of the .notdef glyph.
+             */
+            if( !i_glyph_index )
+            {
+                uni_char_t codepoint = p_paragraph->p_code_points[ j ];
+                if( codepoint == 0x0009 || codepoint == 0x00A0
+                 || codepoint == 0x1680 || codepoint == 0x3000
+                 || codepoint == 0x202F || codepoint == 0x205F
+                 || ( codepoint >= 0x2000 && codepoint <= 0x200A )
+#ifdef HAVE_FRIBIDI
+                 || p_paragraph->p_types[ j ] == FRIBIDI_TYPE_WS
+                 || p_paragraph->p_types[ j ] == FRIBIDI_TYPE_CS
+                 || p_paragraph->p_types[ j ] == FRIBIDI_TYPE_SS
+#endif
+                 )
+                {
+                    i_glyph_index = 3;
+                }
+            }
 
             glyph_bitmaps_t *p_bitmaps = p_paragraph->p_glyph_bitmaps + j;
 
