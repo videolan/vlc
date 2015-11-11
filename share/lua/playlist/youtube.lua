@@ -70,24 +70,33 @@ function buf_iter( s )
     return line
 end
 
+-- Helper to search and extract code from javascript stream
+function js_extract( js, pattern )
+    js.i = 0 -- Reset to beginning
+    for line in buf_iter, js do
+        local ex = string.match( line, pattern )
+        if ex then
+            return ex
+        end
+    end
+    vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+    return nil
+end
+
 -- Descramble the URL signature using the javascript code that does that
 -- in the web page
 function js_descramble( sig, js_url )
     -- Fetch javascript code
     local js = { stream = vlc.stream( js_url ), lines = {}, i = 0 }
     if not js.stream then
+        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
         return sig
     end
 
     -- Look for the descrambler function's name
-    local descrambler = nil
-    for line in buf_iter, js do
-        -- c&&a.set("signature",br(c));
-        descrambler = string.match( line, "%.set%(\"signature\",(.-)%(" )
-        if descrambler then break end
-    end
+    -- c&&a.set("signature",br(c));
+    local descrambler = js_extract( js, "%.set%(\"signature\",(.-)%(" )
     if not descrambler then
-        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
         return sig
     end
 
@@ -95,15 +104,9 @@ function js_descramble( sig, js_url )
     -- conveniently preceded by the definition of a helper object
     -- that it uses. Example:
     -- var Fo={TR:function(a){a.reverse()},TU:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c},sH:function(a,b){a.splice(0,b)}};function Go(a){a=a.split("");Fo.sH(a,2);Fo.TU(a,28);Fo.TU(a,44);Fo.TU(a,26);Fo.TU(a,40);Fo.TU(a,64);Fo.TR(a,26);Fo.sH(a,1);return a.join("")};
-    local transformations = nil
-    local rules = nil
-    js.i = 0 -- Reset to beginning
-    for line in buf_iter, js do
-        transformations, rules = string.match( line, "var ..={(.-)};function "..descrambler.."%([^)]*%){(.-)}" )
-        if transformations or rules then break end
-    end
+    local rules = js_extract( js, "function "..descrambler.."%([^)]*%){(.-)}" )
+    local transformations = js_extract( js, "var ..={(.-)};function "..descrambler.."%(" )
     if not transformations or not rules then
-        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
         return sig
     end
 
