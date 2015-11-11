@@ -71,10 +71,13 @@ function buf_iter( s )
 end
 
 -- Helper to search and extract code from javascript stream
-function js_extract( js, pattern )
+function js_extract( js, pattern, alt )
     js.i = 0 -- Reset to beginning
     for line in buf_iter, js do
         local ex = string.match( line, pattern )
+        if not ex and alt then
+            ex = string.match( line, alt )
+        end
         if ex then
             return ex
         end
@@ -95,18 +98,31 @@ function js_descramble( sig, js_url )
 
     -- Look for the descrambler function's name
     -- c&&a.set("signature",br(c));
-    local descrambler = js_extract( js, "%.set%(\"signature\",(.-)%(" )
+    local descrambler = js_extract( js, "%.set%(\"signature\",(.-)%(", nil )
     if not descrambler then
         return sig
     end
 
-    -- Fetch the code of the descrambler function. The function is
-    -- conveniently preceded by the definition of a helper object
-    -- that it uses. Example:
-    -- var Fo={TR:function(a){a.reverse()},TU:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c},sH:function(a,b){a.splice(0,b)}};function Go(a){a=a.split("");Fo.sH(a,2);Fo.TU(a,28);Fo.TU(a,44);Fo.TU(a,26);Fo.TU(a,40);Fo.TU(a,64);Fo.TR(a,26);Fo.sH(a,1);return a.join("")};
-    local rules = js_extract( js, "function "..descrambler.."%([^)]*%){(.-)}" )
-    local transformations = js_extract( js, "var ..={(.-)};function "..descrambler.."%(" )
-    if not transformations or not rules then
+    -- Fetch the code of the descrambler function
+    -- var Go=function(a){a=a.split("");Fo.sH(a,2);Fo.TU(a,28);Fo.TU(a,44);Fo.TU(a,26);Fo.TU(a,40);Fo.TU(a,64);Fo.TR(a,26);Fo.sH(a,1);return a.join("")};
+    local rules = js_extract( js, "var "..descrambler.."=function%([^)]*%){(.-)};",
+                                  -- Legacy/alternate format
+                                  "function "..descrambler.."%([^)]*%){(.-)}" )
+    if not rules then
+        return sig
+    end
+
+    -- Get the name of the helper object providing transformation definitions
+    local helper = string.match( rules, ";(..)%...%(" )
+    if not helper then
+        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+        return sig
+    end
+
+    -- Fetch the helper object code
+    -- var Fo={TR:function(a){a.reverse()},TU:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c},sH:function(a,b){a.splice(0,b)}};
+    local transformations = js_extract( js, "var "..helper.."={(.-)};", nil )
+    if not transformations then
         return sig
     end
 
