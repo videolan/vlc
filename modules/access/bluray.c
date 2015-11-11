@@ -1424,6 +1424,12 @@ static void blurayInitTitles(demux_t *p_demux, int menu_titles)
             t->psz_name = strdup(_("Top Menu"));
         } else if (i == i_title - 1) {
             t->psz_name = strdup(_("First Play"));
+        } else {
+            /* add possible title name from disc metadata */
+            const BLURAY_DISC_INFO *di = bd_get_disc_info(p_sys->bluray);
+            if (di && di->titles && i < di->num_titles && di->titles[i]->name) {
+                t->psz_name = strdup(di->titles[i]->name);
+            }
         }
 
         TAB_APPEND(p_sys->i_title, p_sys->pp_title, t);
