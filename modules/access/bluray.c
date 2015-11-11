@@ -1850,6 +1850,8 @@ static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
     BLURAY_TITLE_INFO *p_title_info = bd_get_playlist_info(p_sys->bluray, i_playlist, 0);
     if (p_title_info) {
         blurayUpdateTitleInfo(p_sys->pp_title[p_demux->info.i_title], p_title_info);
+        if (p_sys->b_menu)
+            p_demux->info.i_update |= INPUT_UPDATE_TITLE_LIST;
     }
     setTitleInfo(p_sys, p_title_info);
 
