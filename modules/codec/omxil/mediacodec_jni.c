@@ -192,6 +192,18 @@ static inline int get_integer(JNIEnv *env, jobject obj, const char *psz_name)
 }
 #define GET_INTEGER(obj, name) get_integer(env, obj, name)
 
+static inline void set_integer(JNIEnv *env, jobject jobj, const char *psz_name,
+                               int i_value)
+{
+    jstring jname = JNI_NEW_STRING(psz_name);
+    if (jname)
+    {
+        (*env)->CallVoidMethod(env, jobj, jfields.set_integer, jname, i_value);
+        (*env)->DeleteLocalRef(env, jname);
+    }
+}
+#define SET_INTEGER(obj, name, value) set_integer(env, obj, name, value)
+
 /* Initialize all jni fields.
  * Done only one time during the first initialisation */
 static bool
@@ -532,15 +544,7 @@ static int Start(mc_api *api, union mc_api_args *p_args)
             b_direct_rendering = false;
 
         if (b_direct_rendering && p_args->video.i_angle != 0)
-        {
-            jstring jrotation_string = JNI_NEW_STRING("rotation-degrees");
-            if (jrotation_string)
-            {
-                (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
-                                       jrotation_string, p_args->video.i_angle);
-                (*env)->DeleteLocalRef(env, jrotation_string);
-            }
-        }
+            SET_INTEGER(jformat, "rotation-degrees", p_args->video.i_angle);
     }
     else
     {
@@ -552,13 +556,7 @@ static int Start(mc_api *api, union mc_api_args *p_args)
                                                  p_args->audio.i_channel_count);
     }
     /* No limits for input size */
-    jstring jmaxinputsize_string = JNI_NEW_STRING("max-input-size");
-    if (jmaxinputsize_string)
-    {
-        (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
-                               jmaxinputsize_string, 0);
-        (*env)->DeleteLocalRef(env, jmaxinputsize_string);
-    }
+    SET_INTEGER(jformat, "max-input-size", 0);
 
     if (b_direct_rendering)
     {
