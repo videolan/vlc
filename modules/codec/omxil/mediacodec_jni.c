@@ -156,7 +156,7 @@ static int jstrcmp(JNIEnv* env, jobject str, const char* str2)
 
 static inline bool check_exception(JNIEnv *env)
 {
-    if ((*env)->ExceptionOccurred(env))
+    if ((*env)->ExceptionCheck(env))
     {
         (*env)->ExceptionClear(env);
         return true;
