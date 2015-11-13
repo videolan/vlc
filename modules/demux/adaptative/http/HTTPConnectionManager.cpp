@@ -28,6 +28,7 @@
 #include "HTTPConnectionManager.h"
 #include "HTTPConnection.hpp"
 #include "Sockets.hpp"
+#include "Downloader.hpp"
 #include <vlc_url.h>
 
 using namespace adaptative::http;
@@ -36,16 +37,23 @@ HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *stream) :
                        stream                   (stream),
                        rateObserver             (NULL)
 {
+    vlc_mutex_init(&lock);
+    downloader = new (std::nothrow) Downloader();
+    downloader->start();
 }
 HTTPConnectionManager::~HTTPConnectionManager   ()
 {
+    delete downloader;
     this->closeAllConnections();
+    vlc_mutex_destroy(&lock);
 }
 
 void HTTPConnectionManager::closeAllConnections      ()
 {
+    vlc_mutex_lock(&lock);
     releaseAllConnections();
     vlc_delete_all(this->connectionPool);
+    vlc_mutex_unlock(&lock);
 }
 
 void HTTPConnectionManager::releaseAllConnections()
@@ -75,18 +83,23 @@ HTTPConnection * HTTPConnectionManager::getConnection(const std::string &scheme,
         return NULL;
 
     const int sockettype = (scheme == "https") ? TLSSocket::TLS : Socket::REGULAR;
+    vlc_mutex_lock(&lock);
     HTTPConnection *conn = getConnection(hostname, port, sockettype);
     if(!conn)
     {
         Socket *socket = (sockettype == TLSSocket::TLS) ? new (std::nothrow) TLSSocket()
                                                         : new (std::nothrow) Socket();
         if(!socket)
+        {
+            vlc_mutex_unlock(&lock);
             return NULL;
+        }
         /* disable pipelined tls until we have ticket/resume session support */
         conn = new (std::nothrow) HTTPConnection(stream, socket, sockettype != TLSSocket::TLS);
         if(!conn)
         {
             delete socket;
+            vlc_mutex_unlock(&lock);
             return NULL;
         }
 
@@ -94,11 +107,13 @@ HTTPConnection * HTTPConnectionManager::getConnection(const std::string &scheme,
 
         if (!conn->connect(hostname, port))
         {
+            vlc_mutex_unlock(&lock);
             return NULL;
         }
     }
 
     conn->setUsed(true);
+    vlc_mutex_unlock(&lock);
     return conn;
 }
 

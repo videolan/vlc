@@ -92,7 +92,6 @@ namespace adaptative
 
             protected:
                 virtual bool      prepare();
-                virtual block_t * consume(size_t);
                 HTTPConnection     *connection;
                 HTTPConnectionManager *connManager;
                 size_t              consumed; /* read pointer */
@@ -109,17 +108,27 @@ namespace adaptative
 
         class HTTPChunkBufferedSource : public HTTPChunkSource
         {
+            friend class Downloader;
+
             public:
                 HTTPChunkBufferedSource(const std::string &url, HTTPConnectionManager *);
                 virtual ~HTTPChunkBufferedSource();
+                virtual block_t *  readBlock       (); /* reimpl */
+                virtual block_t *  read            (size_t); /* reimpl */
 
             protected:
-                virtual block_t *  consume(size_t);
+                virtual bool       prepare(); /* reimpl */
+                void               bufferize(size_t);
+                bool               isDone() const;
 
             private:
-                void               bufferize(size_t);
-                block_t            *p_buffer; /* read cache buffer */
+                block_t            *p_head; /* read cache buffer */
+                block_t           **pp_tail;
                 size_t              buffered; /* read cache size */
+                bool                done;
+                mtime_t             downloadstart;
+                vlc_mutex_t         lock;
+                vlc_cond_t          avail;
         };
 
         class HTTPChunk : public AbstractChunk

@@ -49,6 +49,12 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (vlc_object_t *p_obj_, int w
     window_idx = 0;
     prevbps = 0;
     dlsize = 0;
+    vlc_mutex_init(&lock);
+}
+
+RateBasedAdaptationLogic::~RateBasedAdaptationLogic()
+{
+    vlc_mutex_destroy(&lock);
 }
 
 BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *currep) const
@@ -56,7 +62,9 @@ BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptati
     if(adaptSet == NULL)
         return NULL;
 
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     size_t availBps = currentBps + ((currep) ? currep->getBandwidth() : 0);
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     if(availBps > usedBps)
         availBps -= usedBps;
     else
@@ -119,6 +127,8 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
      * and then defines how fast we adapt to current bandwidth */
     const size_t deltamax = omax - omin;
     double alpha = (diffsum) ? 0.33 * ((double)deltamax / diffsum) : 0.5;
+
+    vlc_mutex_lock(&lock);
     bpsAvg = alpha * bpsAvg + (1.0 - alpha) * bps;
 
     BwDebug(msg_Dbg(p_obj, "alpha1 %lf alpha0 %lf dmax %ld ds %ld", alpha,
@@ -132,12 +142,14 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
 
     BwDebug(msg_Info(p_obj, "Current bandwidth %zu KiB/s using %u%%",
                     (bpsAvg / 8192), (bpsAvg) ? (unsigned)(usedBps * 100.0 / bpsAvg) : 0));
+    vlc_mutex_unlock(&lock);
 }
 
 void RateBasedAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
 {
     if(event.type == SegmentTrackerEvent::SWITCHING)
     {
+        vlc_mutex_lock(&lock);
         if(event.u.switching.prev)
             usedBps -= event.u.switching.prev->getBandwidth();
         if(event.u.switching.next)
@@ -145,6 +157,7 @@ void RateBasedAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
 
         BwDebug(msg_Info(p_obj, "New bandwidth usage %zu KiB/s %u%%",
                         (usedBps / 8192), (bpsAvg) ? (unsigned)(usedBps * 100.0 / bpsAvg) : 0 ));
+        vlc_mutex_unlock(&lock);
     }
 }
 
