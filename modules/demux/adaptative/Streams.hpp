@@ -91,7 +91,6 @@ namespace adaptative
 
         bool restarting_output;
         bool discontinuity;
-        SegmentChunk *getChunk();
 
         Demuxer *syncdemux;
 

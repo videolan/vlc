@@ -135,17 +135,6 @@ int AbstractStream::esCount() const
     return fakeesout->esCount();
 }
 
-SegmentChunk * AbstractStream::getChunk()
-{
-    if (currentChunk == NULL && !eof)
-    {
-        currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
-        if (currentChunk == NULL)
-            eof = true;
-    }
-    return currentChunk;
-}
-
 bool AbstractStream::seekAble() const
 {
     return (demuxer &&
@@ -292,44 +281,52 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
 
 block_t * AbstractStream::readNextBlock(size_t toread)
 {
-    SegmentChunk *chunk = getChunk();
-    if(!chunk)
-        return NULL;
+    if (currentChunk == NULL)
+    {
+        if(!eof)
+            currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
 
-    if(format != chunk->getStreamFormat())
+        if (currentChunk == NULL)
+        {
+            eof = true;
+            return NULL;
+        }
+    }
+
+    if(format != currentChunk->getStreamFormat())
     {
         /* Force stream to end for this call */
         msg_Info(p_realdemux, "Changing stream format %u->%u",
-                 (unsigned)format, (unsigned)chunk->getStreamFormat());
+                 (unsigned)format, (unsigned)currentChunk->getStreamFormat());
 
         restarting_output = true;
-        format = chunk->getStreamFormat();
+        format = currentChunk->getStreamFormat();
         /* Next stream will use current unused chunk */
         return NULL;
     }
 
-    if(chunk->discontinuity)
+    if(currentChunk->discontinuity)
     {
         discontinuity = true;
-        chunk->discontinuity = false;
+        currentChunk->discontinuity = false;
         msg_Info(p_realdemux, "Encountered discontinuity");
         return NULL;
     }
 
-    const bool b_segment_head_chunk = (chunk->getBytesRead() == 0);
+    const bool b_segment_head_chunk = (currentChunk->getBytesRead() == 0);
 
-    block_t *block = chunk->read(toread);
+    block_t *block = currentChunk->read(toread);
     if(block == NULL)
     {
+        delete currentChunk;
         currentChunk = NULL;
-        delete chunk;
         return NULL;
     }
 
-    if (chunk->getBytesToRead() == 0)
+    if (currentChunk->getBytesToRead() == 0)
     {
+        delete currentChunk;
         currentChunk = NULL;
-        delete chunk;
     }
 
     block = checkBlock(block, b_segment_head_chunk);
