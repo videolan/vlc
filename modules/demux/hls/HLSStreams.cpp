@@ -120,13 +120,13 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
     return p_block;
 }
 
-AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
+AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &,
                                SegmentTracker *tracker, HTTPConnectionManager *manager) const
 {
     HLSStream *stream;
     try
     {
-        stream = new HLSStream(realdemux, format);
+        stream = new HLSStream(realdemux, StreamFormat(StreamFormat::UNKNOWN));
     } catch (int) {
         return NULL;
     }

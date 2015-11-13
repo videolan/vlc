@@ -22,16 +22,17 @@
 #include "playlist/BaseRepresentation.h"
 #include "playlist/BaseAdaptationSet.h"
 #include "playlist/Segment.h"
+#include "playlist/SegmentChunk.hpp"
 #include "logic/AbstractAdaptationLogic.h"
 
 using namespace adaptative;
 using namespace adaptative::logic;
 using namespace adaptative::playlist;
 
-SegmentTrackerEvent::SegmentTrackerEvent(ISegment *s)
+SegmentTrackerEvent::SegmentTrackerEvent(SegmentChunk *s)
 {
     type = DISCONTINUITY;
-    u.discontinuity.s = s;
+    u.discontinuity.sc = s;
 }
 
 SegmentTrackerEvent::SegmentTrackerEvent(BaseRepresentation *prev, BaseRepresentation *next)
@@ -39,6 +40,12 @@ SegmentTrackerEvent::SegmentTrackerEvent(BaseRepresentation *prev, BaseRepresent
     type = SWITCHING;
     u.switching.prev = prev;
     u.switching.next = next;
+}
+
+SegmentTrackerEvent::SegmentTrackerEvent(const StreamFormat *fmt)
+{
+    type = FORMATCHANGE;
+    u.format.f = fmt;
 }
 
 SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
@@ -50,6 +57,7 @@ SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSe
     prevRepresentation = NULL;
     setAdaptationLogic(logic_);
     adaptationSet = adaptSet;
+    format = StreamFormat::UNSUPPORTED;
 }
 
 SegmentTracker::~SegmentTracker()
@@ -70,6 +78,7 @@ void SegmentTracker::reset()
     init_sent = false;
     index_sent = false;
     initializing = true;
+    format = StreamFormat::UNSUPPORTED;
 }
 
 SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionManager *connManager)
@@ -97,6 +106,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
 
     if ( rep == NULL )
             return NULL;
+
 
     if(rep != prevRepresentation)
     {
@@ -129,11 +139,6 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
 
     bool b_gap = false;
     segment = rep->getNextSegment(BaseRepresentation::INFOTYPE_MEDIA, count, &count, &b_gap);
-    if(b_gap && count)
-    {
-        notify(SegmentTrackerEvent(segment));
-    }
-
     if(!segment)
     {
         reset();
@@ -146,6 +151,19 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
     SegmentChunk *chunk = segment->toChunk(count, rep, connManager);
     if(chunk)
         count++;
+
+    /* We need to check segment/chunk format changes, as we can't rely on representation's (HLS)*/
+    if(format != chunk->getStreamFormat())
+    {
+        format = chunk->getStreamFormat();
+        notify(SegmentTrackerEvent(&format));
+    }
+
+    /* Handle both implicit and explicit discontinuities */
+    if( (b_gap && count) || (chunk && chunk->discontinuity) )
+    {
+        notify(SegmentTrackerEvent(chunk));
+    }
 
     return chunk;
 }

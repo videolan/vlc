@@ -27,6 +27,7 @@
 #include <vlc_common.h>
 #include "StreamFormat.hpp"
 #include "ChunksSource.hpp"
+#include "SegmentTracker.hpp"
 
 #include "plumbing/Demuxer.hpp"
 #include "plumbing/SourceStream.hpp"
@@ -52,7 +53,8 @@ namespace adaptative
     using namespace playlist;
 
     class AbstractStream : public ChunksSource,
-                           public ExtraFMTInfoInterface
+                           public ExtraFMTInfoInterface,
+                           public SegmentTrackerListenerInterface
     {
     public:
         AbstractStream(demux_t *, const StreamFormat &);
@@ -80,6 +82,7 @@ namespace adaptative
         virtual block_t *readNextBlock(size_t); /* impl */
 
         virtual void fillExtraFMTInfo( es_format_t * ) const; /* impl */
+        virtual void trackerEvent(const SegmentTrackerEvent &); /* impl */
 
     protected:
         virtual block_t *checkBlock(block_t *, bool) = 0;
@@ -89,7 +92,6 @@ namespace adaptative
 
         virtual void prepareFormatChange();
 
-        bool restarting_output;
         bool discontinuity;
 
         Demuxer *syncdemux;

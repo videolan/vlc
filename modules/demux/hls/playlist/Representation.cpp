@@ -91,7 +91,8 @@ void Representation::debug(vlc_object_t *obj, int indent) const
     if(!b_loaded)
     {
         std::string text(indent + 1, ' ');
-        text.append(" (not loaded)");
+        text.append(" (not loaded) ");
+        text.append(getStreamFormat().str());
         msg_Dbg(obj, "%s", text.c_str());
     }
 }
