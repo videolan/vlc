@@ -208,6 +208,7 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     es_format_Clean(&dec->fmt_out);
     es_format_Init(&dec->fmt_out, VIDEO_ES, fmt_out.i_chroma);
     dec->fmt_out.video = fmt_out;
+    dec->fmt_out.video.orientation = dec->fmt_in.video.orientation;;
     return decoder_UpdateVideoFormat(dec);
 }
 
