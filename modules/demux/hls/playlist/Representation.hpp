@@ -23,7 +23,7 @@
 
 #include "../adaptative/playlist/BaseRepresentation.h"
 #include "../adaptative/tools/Properties.hpp"
-#include "../HLSStreamFormat.hpp"
+#include "../adaptative/StreamFormat.hpp"
 
 namespace hls
 {

@@ -367,8 +367,7 @@ libadaptative_dash_SOURCES = \
     demux/dash/DASHManager.cpp \
     demux/dash/DASHManager.h \
     demux/dash/DASHStream.cpp \
-    demux/dash/DASHStream.hpp \
-    demux/dash/DASHStreamFormat.hpp
+    demux/dash/DASHStream.hpp
 
 libadaptative_hls_SOURCES = \
     demux/hls/playlist/M3U8.hpp \
@@ -383,7 +382,6 @@ libadaptative_hls_SOURCES = \
     demux/hls/playlist/Tags.cpp \
     demux/hls/HLSManager.hpp \
     demux/hls/HLSManager.cpp \
-    demux/hls/HLSStreamFormat.hpp \
     demux/hls/HLSStreams.hpp \
     demux/hls/HLSStreams.cpp
 
@@ -404,7 +402,6 @@ libadaptative_smooth_SOURCES = \
     demux/smooth/playlist/SmoothSegment.cpp \
     demux/smooth/SmoothManager.hpp \
     demux/smooth/SmoothManager.cpp \
-    demux/smooth/SmoothStreamFormat.hpp \
     demux/smooth/SmoothStream.hpp \
     demux/smooth/SmoothStream.cpp
 libadaptative_smooth_SOURCES += mux/mp4/libmp4mux.c mux/mp4/libmp4mux.h \

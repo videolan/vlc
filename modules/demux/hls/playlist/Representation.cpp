@@ -29,7 +29,6 @@
 #include "../adaptative/playlist/BasePeriod.h"
 #include "../adaptative/playlist/BaseAdaptationSet.h"
 #include "../adaptative/playlist/SegmentList.h"
-#include "../HLSStreamFormat.hpp"
 
 #include <ctime>
 
@@ -43,7 +42,7 @@ Representation::Representation  ( BaseAdaptationSet *set ) :
     b_loaded = false;
     switchpolicy = SegmentInformation::SWITCH_SEGMENT_ALIGNED; /* FIXME: based on streamformat */
     nextPlaylistupdate = 0;
-    streamFormat = HLSStreamFormat::UNKNOWN;
+    streamFormat = StreamFormat::UNKNOWN;
 }
 
 Representation::~Representation ()

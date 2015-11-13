@@ -18,7 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "DASHStream.hpp"
-#include "DASHStreamFormat.hpp"
 
 using namespace dash;
 
@@ -37,19 +36,19 @@ AbstractDemuxer * DASHStream::createDemux(const StreamFormat &format)
     AbstractDemuxer *ret = NULL;
     switch((unsigned)format)
     {
-        case DASHStreamFormat::MP4:
+        case StreamFormat::MP4:
             ret = new Demuxer(p_realdemux, "mp4", fakeesout->getEsOut(), demuxersource);
             break;
 
-        case DASHStreamFormat::MPEG2TS:
+        case StreamFormat::MPEG2TS:
             ret = new Demuxer(p_realdemux, "ts", fakeesout->getEsOut(), demuxersource);
             break;
 
-        case DASHStreamFormat::WEBVTT:
+        case StreamFormat::WEBVTT:
             ret = new SlaveDemuxer(p_realdemux, "subtitle", fakeesout->getEsOut(), demuxersource);
             break;
 
-        case DASHStreamFormat::TTML:
+        case StreamFormat::TTML:
             ret = new SlaveDemuxer(p_realdemux, "ttml", fakeesout->getEsOut(), demuxersource);
             break;
 

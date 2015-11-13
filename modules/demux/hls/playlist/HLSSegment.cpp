@@ -20,7 +20,6 @@
 #include "HLSSegment.hpp"
 #include "../adaptative/playlist/SegmentChunk.hpp"
 #include "../adaptative/playlist/BaseRepresentation.h"
-#include "../HLSStreamFormat.hpp"
 
 #include <vlc_common.h>
 #include <vlc_block.h>

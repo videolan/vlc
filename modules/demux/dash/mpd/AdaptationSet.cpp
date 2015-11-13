@@ -25,7 +25,7 @@
 #include "AdaptationSet.h"
 #include "Representation.h"
 #include "Period.h"
-#include "../DASHStreamFormat.hpp"
+#include "MPD.h"
 
 using namespace dash::mpd;
 
@@ -43,7 +43,7 @@ AdaptationSet::~AdaptationSet()
 StreamFormat AdaptationSet::getStreamFormat() const
 {
     if(!getMimeType().empty())
-        return DASHStreamFormat::mimeToFormat(getMimeType());
+        return MPD::mimeToFormat(getMimeType());
     else
         return BaseAdaptationSet::getStreamFormat();
 }

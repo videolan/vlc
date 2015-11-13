@@ -29,7 +29,6 @@
 #include "../adaptative/playlist/SegmentList.h"
 #include "../adaptative/tools/Retrieve.hpp"
 #include "../adaptative/tools/Helper.h"
-#include "../HLSStreamFormat.hpp"
 #include "M3U8.hpp"
 #include "Tags.hpp"
 
@@ -95,11 +94,11 @@ void M3U8Parser::setFormatFromCodecs(Representation *rep, const std::string code
             std::string codec = codecs.front();
             transform(codec.begin(), codec.end(), codec.begin(), (int (*)(int))std::tolower);
             if(codec == "mp4a")
-                rep->streamFormat = StreamFormat(HLSStreamFormat::PACKEDAAC);
+                rep->streamFormat = StreamFormat(StreamFormat::PACKEDAAC);
         }
         else
         {
-            rep->streamFormat = StreamFormat(HLSStreamFormat::MPEG2TS);
+            rep->streamFormat = StreamFormat(StreamFormat::MPEG2TS);
         }
     }
 }
@@ -113,11 +112,11 @@ void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &
         transform(extension.begin(), extension.end(), extension.begin(), (int (*)(int))std::tolower);
         if(extension == "aac")
         {
-            rep->streamFormat = StreamFormat(HLSStreamFormat::PACKEDAAC);
+            rep->streamFormat = StreamFormat(StreamFormat::PACKEDAAC);
         }
         else if(extension == "ts" || extension == "mp2t" || extension == "mpeg")
         {
-            rep->streamFormat = StreamFormat(HLSStreamFormat::MPEG2TS);
+            rep->streamFormat = StreamFormat(StreamFormat::MPEG2TS);
         }
     }
 }
@@ -256,7 +255,7 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                     break;
 
                 segment->setSourceUrl(uritag->getValue().value);
-                if((unsigned)rep->getStreamFormat() == HLSStreamFormat::UNKNOWN)
+                if((unsigned)rep->getStreamFormat() == StreamFormat::UNKNOWN)
                     setFormatFromExtension(rep, uritag->getValue().value);
 
                 if(ctx_extinf)
@@ -455,7 +454,7 @@ M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
                 if(pair.second->getAttributeByName("TYPE")->value != "AUDIO" &&
                    pair.second->getAttributeByName("TYPE")->value != "VIDEO")
                 {
-                    rep->streamFormat = StreamFormat(HLSStreamFormat::UNSUPPORTED);
+                    rep->streamFormat = StreamFormat(StreamFormat::UNSUPPORTED);
                 }
 
                 if(pair.second->getAttributeByName("LANGUAGE"))

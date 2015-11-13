@@ -26,6 +26,26 @@ StreamFormat::operator unsigned() const
     return formatid;
 }
 
+std::string StreamFormat::str() const
+{
+    switch(formatid)
+    {
+        case MPEG2TS:
+            return "TS";
+        case MP4:
+            return "MP4";
+        case WEBVTT:
+            return "WebVTT";
+        case TTML:
+            return "Timed Text";
+        case PACKEDAAC:
+            return "Packed AAC";
+        default:
+        case UNKNOWN:
+            return "Unknown";
+    }
+}
+
 StreamFormat::StreamFormat( unsigned formatid_ )
 {
     formatid = formatid_;

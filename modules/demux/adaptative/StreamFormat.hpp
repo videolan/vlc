@@ -20,6 +20,8 @@
 #ifndef STREAMFORMAT_HPP
 #define STREAMFORMAT_HPP
 
+#include <string>
+
 namespace adaptative
 {
 
@@ -27,10 +29,17 @@ namespace adaptative
     {
         public:
             static const unsigned UNSUPPORTED = 0;
+            static const unsigned MPEG2TS     = 1;
+            static const unsigned MP4         = 2;
+            static const unsigned WEBVTT      = 3;
+            static const unsigned TTML        = 4;
+            static const unsigned PACKEDAAC   = 5;
+            static const unsigned UNKNOWN     = 0xFF; /* will probe */
 
             StreamFormat( unsigned = UNSUPPORTED );
             ~StreamFormat();
             operator unsigned() const;
+            std::string str() const;
             bool operator==(const StreamFormat &) const;
             bool operator!=(const StreamFormat &) const;
 

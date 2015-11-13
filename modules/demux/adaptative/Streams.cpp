@@ -381,8 +381,8 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
             if(*event.u.format.f != format)
             {
                 /* Format has changed between segments, we need to drain and change demux */
-                msg_Info(p_realdemux, "Changing stream format %u->%u",
-                         (unsigned)format, (unsigned)*event.u.format.f);
+                msg_Info(p_realdemux, "Changing stream format %s -> %s",
+                         format.str().c_str(), event.u.format.f->str().c_str());
                 format = *event.u.format.f;
 
                 /* This is an implict discontinuity */
