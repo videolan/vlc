@@ -1402,7 +1402,7 @@ openSub = {
         file.path = vlc.strings.decode_uri(file.path)
         file.dir, file.completeName = string.match(
           file.path,
-          '^(.+/)([^/]*)$')
+          '^(.*/)([^/]*)$')
         
         local file_stat = vlc.net.stat(file.path)
         if file_stat 
