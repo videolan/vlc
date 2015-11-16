@@ -87,10 +87,12 @@ namespace adaptative
                 static const size_t CHUNK_SIZE = 32768;
 
             protected:
+                virtual bool      prepare();
                 virtual block_t * consume(size_t);
                 HTTPConnection     *connection;
                 HTTPConnectionManager *connManager;
                 size_t              consumed; /* read pointer */
+                bool                prepared;
 
             private:
                 bool init(const std::string &);

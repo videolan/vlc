@@ -115,6 +115,7 @@ HTTPChunkSource::HTTPChunkSource(const std::string& url, HTTPConnectionManager *
     consumed     (0),
     port         (0)
 {
+    prepared = false;
     if(!init(url))
         throw VLC_EGENERIC;
 }
@@ -188,26 +189,35 @@ block_t * HTTPChunkSource::consume(size_t readsize)
     return p_block;
 }
 
-block_t * HTTPChunkSource::read(size_t readsize)
+bool HTTPChunkSource::prepare()
 {
+    if(prepared)
+        return true;
+
     if(!connManager || !parentChunk)
-        return NULL;
+        return false;
 
     if(!connection)
     {
         connection = connManager->getConnection(scheme, hostname, port);
         if(!connection)
-            return NULL;
+            return false;
     }
 
-    if(consumed == 0)
-    {
-        if( connection->query(path, bytesRange) != VLC_SUCCESS )
-            return NULL;
-        /* Because we don't know Chunk size at start, we need to get size
+    if( connection->query(path, bytesRange) != VLC_SUCCESS )
+        return false;
+    /* Because we don't know Chunk size at start, we need to get size
            from content length */
-        contentLength = connection->getContentLength();
-    }
+    contentLength = connection->getContentLength();
+    prepared = true;
+
+    return true;
+}
+
+block_t * HTTPChunkSource::read(size_t readsize)
+{
+    if(!prepare())
+        return NULL;
 
     if(consumed == contentLength && consumed > 0)
         return NULL;
