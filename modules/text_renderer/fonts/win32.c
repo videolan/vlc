@@ -30,12 +30,21 @@
  * Preamble
  *****************************************************************************/
 
+/** \ingroup freetype_fonts
+ * @{
+ * \file
+ * Win32 font management
+ */
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <vlc_common.h>
 #include <vlc_filter.h>
+
+#include <ft2build.h>
+#include FT_SFNT_NAMES_H
 
 /* Win32 GDI */
 #ifdef _WIN32
@@ -166,6 +175,166 @@ static char* GetWindowsFontPath()
     return FromWide( wdir );
 }
 
+/**
+ * Get an SFNT name entry from an SFNT name table.
+ *
+ * \param p_name_data the start position of the name entry within the table [IN]
+ * \param p_storage_start the start position of the string storage area in the table [IN]
+ * \param p_table_end the position after the last byte of the table [IN]
+ * \param p_sfnt_name pointer to a \ref FT_SfntName to fill [OUT]
+ *
+ * \return \ref VLC_SUCCESS or \ref VLC_EGENERIC
+ */
+static int GetSfntNameEntry( FT_Byte *p_name_data, FT_Byte *p_storage_start,
+                             FT_Byte *p_table_end, FT_SfntName *p_sfnt_name )
+{
+    uint16_t i_string_len      = U16_AT( p_name_data + 8 );
+    uint16_t i_string_offset   = U16_AT( p_name_data + 10 );
+    if( i_string_len == 0
+     || p_storage_start + i_string_offset + i_string_len > p_table_end )
+        return VLC_EGENERIC;
+
+    p_sfnt_name->platform_id = U16_AT( p_name_data + 0 );
+    p_sfnt_name->encoding_id = U16_AT( p_name_data + 2 );
+    p_sfnt_name->language_id = U16_AT( p_name_data + 4 );
+    p_sfnt_name->name_id     = U16_AT( p_name_data + 6 );
+    p_sfnt_name->string_len  = i_string_len;
+    p_sfnt_name->string      = p_storage_start + i_string_offset;
+
+    return VLC_SUCCESS;
+}
+
+/**
+ * Get the SFNT name string matching the specified platform, encoding, name, and language IDs.
+ *
+ *\param p_table the SFNT table [IN]
+ *\param i_size table size in bytes [IN]
+ *\param i_platform_id platform ID as specified in the TrueType spec [IN]
+ *\param i_encoding_id encoding ID as specified in the TrueType spec [IN]
+ *\param i_name_id name ID as specified in the TrueType spec [IN]
+ *\param i_language_id language ID as specified in the TrueType spec [IN]
+ *\param pp_name the requested name.
+ *       This is not null terminated. And can have different encodings
+ *       based on the specified platform/encoding IDs [OUT]
+ *\param i_name_length the length in bytes of the returned name [OUT]
+ *
+ *\return \ref VLC_SUCCESS or \ref VLC_EGENERIC
+ */
+static int GetSfntNameString( FT_Byte *p_table, FT_UInt i_size, FT_UShort i_platform_id,
+                              FT_UShort i_encoding_id, FT_UShort i_name_id, FT_UShort i_language_id,
+                              FT_Byte **pp_name, FT_UInt *i_name_length )
+{
+    uint16_t i_name_count     = U16_AT( p_table + 2 );
+    uint16_t i_storage_offset = U16_AT( p_table + 4 );
+    FT_Byte *p_storage        = p_table + i_storage_offset;
+    FT_Byte *p_names          = p_table + 6;
+
+    const int i_entry_size = 12;
+
+    for(int i = 0; i < i_name_count; ++i)
+    {
+        FT_SfntName sfnt_name;
+
+        if( GetSfntNameEntry( p_names + i * i_entry_size, p_storage, p_table + i_size, &sfnt_name ) )
+            return VLC_EGENERIC;
+
+        if( sfnt_name.platform_id == i_platform_id && sfnt_name.encoding_id == i_encoding_id
+         && sfnt_name.name_id == i_name_id && sfnt_name.language_id == i_language_id )
+        {
+            *i_name_length = sfnt_name.string_len;
+            *pp_name = sfnt_name.string;
+
+            return VLC_SUCCESS;
+        }
+    }
+
+    return VLC_EGENERIC;
+}
+
+/**
+ * Get the font's full English name.
+ *
+ * If the font has a family name or style name that matches the
+ * system's locale, EnumFontCallback() will be called with a \ref ENUMLOGFONTEX
+ * that has the localized name.
+ *
+ * We have to get the English name because that's what the Windows registry uses
+ * for name to file mapping.
+ */
+static TCHAR *GetFullEnglishName( const ENUMLOGFONTEX *lpelfe )
+{
+
+    HFONT    hFont      = NULL;
+    HDC      hDc        = NULL;
+    FT_Byte *p_table    = NULL;
+    TCHAR   *psz_result = NULL;
+
+    hFont = CreateFontIndirect( &lpelfe->elfLogFont );
+
+    if( !hFont )
+        return NULL;
+
+    hDc = CreateCompatibleDC( NULL );
+
+    if( !hDc )
+    {
+        DeleteObject( hFont );
+        return NULL;
+    }
+
+    HFONT hOriginalFont = ( HFONT ) SelectObject( hDc, hFont );
+
+    const uint32_t i_name_tag = ntoh32( ( uint32_t ) 'n' << 24
+                                      | ( uint32_t ) 'a' << 16
+                                      | ( uint32_t ) 'm' << 8
+                                      | ( uint32_t ) 'e' << 0 );
+
+    int i_size = GetFontData( hDc, i_name_tag, 0, 0, 0 );
+
+    if( i_size <= 0 )
+        goto done;
+
+    p_table = malloc( i_size );
+
+    if( !p_table )
+        goto done;
+
+    if( GetFontData( hDc, i_name_tag, 0, p_table, i_size ) <= 0 )
+        goto done;
+
+    FT_Byte *p_name = NULL;
+    FT_UInt  i_name_length = 0;
+
+    /* FIXME: Try other combinations of platform/encoding/language IDs if necessary */
+    if( GetSfntNameString( p_table, i_size, 3, 1, 4, 0x409, &p_name, &i_name_length) )
+        goto done;
+
+    int i_length_in_wchars = i_name_length / 2;
+    wchar_t *psz_name = malloc( ( i_length_in_wchars + 1 ) * sizeof( *psz_name ) );
+
+    if( !psz_name )
+        goto done;
+
+    for( int i = 0; i < i_length_in_wchars; ++i )
+        psz_name[ i ] = U16_AT( p_name + i * 2 );
+    psz_name[ i_length_in_wchars ] = 0;
+
+#ifdef UNICODE
+    psz_result = psz_name;
+#else
+    psz_result = FromWide( psz_name );
+    free( psz_name );
+#endif
+
+done:
+    free( p_table );
+    SelectObject( hDc, hOriginalFont );
+    DeleteObject( hFont );
+    DeleteDC( hDc );
+
+    return psz_result;
+}
+
 static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTMETRICEX *metric,
                                      DWORD type, LPARAM lParam)
 {
@@ -191,7 +360,20 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     int   i_index      = 0;
 
     if( GetFileFontByName( (LPCTSTR)lpelfe->elfFullName, &psz_filename, &i_index ) )
-        return 1;
+    {
+        TCHAR *psz_english_name = GetFullEnglishName( lpelfe );
+
+        if( !psz_english_name )
+            return 1;
+
+        if( GetFileFontByName( psz_english_name, &psz_filename, &i_index ) )
+        {
+            free( psz_english_name );
+            return 1;
+        }
+
+        free( psz_english_name );
+    }
 
     if( strchr( psz_filename, DIR_SEP_CHAR ) )
         psz_fontfile = psz_filename;
@@ -269,7 +451,7 @@ static int CALLBACK MetaFileEnumProc( HDC hdc, HANDLETABLE* table,
     return 1;
 }
 
-/*
+/**
  * This is a hack used by Chrome and WebKit to expose the fallback font used
  * by Uniscribe for some given text for use with custom shapers / font engines.
  */
