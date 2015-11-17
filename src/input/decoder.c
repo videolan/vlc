@@ -1889,9 +1889,10 @@ void input_DecoderFlush( decoder_t *p_dec )
      * to display one frame */
     if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->paused
      && p_owner->frames_countdown == 0 )
+    {
         p_owner->frames_countdown++;
-
-    vlc_fifo_Signal( p_owner->p_fifo );
+        vlc_fifo_Signal( p_owner->p_fifo );
+    }
 
     /* Monitor for flush end */
     while( !p_owner->flushed )
