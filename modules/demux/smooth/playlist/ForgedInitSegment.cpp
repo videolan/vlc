@@ -71,7 +71,7 @@ ForgedInitSegment::~ForgedInitSegment()
 static uint8_t *HexDecode(const std::string &s, size_t *decoded_size)
 {
     *decoded_size = s.size() / 2;
-    uint8_t *data = new (std::nothrow) uint8_t[*decoded_size];
+    uint8_t *data = (uint8_t *) malloc(*decoded_size);
     if(data)
     {
         for(size_t i=0; i<*decoded_size; i++)
