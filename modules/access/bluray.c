@@ -165,6 +165,7 @@ struct  demux_sys_t
     vlc_array_t         es;
     int                 i_audio_stream_idx; /* Selected audio stream. -1 if default */
     int                 i_spu_stream_idx;   /* Selected subtitle stream. -1 if default */
+    bool                b_spu_enable;       /* enabled / disabled */
     int                 i_video_stream;
     stream_t            *p_parser;
     bool                b_flushed;
@@ -776,8 +777,10 @@ static int blurayEsPid(demux_sys_t *p_sys, int es_type, int i_es_idx)
 
 static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 {
-    demux_sys_t *p_sys = p_out->p_sys->p_demux->p_sys;
+    demux_t *p_demux = p_out->p_sys->p_demux;
+    demux_sys_t *p_sys = p_demux->p_sys;
     es_format_t fmt;
+    bool b_select = false;
 
     es_format_Copy(&fmt, p_fmt);
 
@@ -787,18 +790,24 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         break ;
     case AUDIO_ES:
-        if (p_sys->i_audio_stream_idx != -1 && blurayEsPid(p_sys, AUDIO_ES, p_sys->i_audio_stream_idx) != p_fmt->i_id)
+        if (p_sys->i_audio_stream_idx != -1) {
+            if (blurayEsPid(p_sys, AUDIO_ES, p_sys->i_audio_stream_idx) == p_fmt->i_id)
+                b_select = true;
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
+        }
         setStreamLang(p_sys, &fmt);
         break ;
     case SPU_ES:
-        if (p_sys->i_spu_stream_idx != -1 && blurayEsPid(p_sys, SPU_ES, p_sys->i_spu_stream_idx) != p_fmt->i_id)
+        if (p_sys->i_spu_stream_idx != -1) {
+            if (blurayEsPid(p_sys, SPU_ES, p_sys->i_spu_stream_idx) == p_fmt->i_id)
+                b_select = true;
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
+        }
         setStreamLang(p_sys, &fmt);
         break ;
     }
 
-    es_out_id_t *p_es = es_out_Add(p_out->p_sys->p_demux->out, &fmt);
+    es_out_id_t *p_es = es_out_Add(p_demux->out, &fmt);
     if (p_fmt->i_id >= 0) {
         /* Ensure we are not overriding anything */
         int idx = findEsPairIndex(p_sys, p_fmt->i_id);
@@ -807,8 +816,16 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             if (likely(p_pair != NULL)) {
                 p_pair->i_id = p_fmt->i_id;
                 p_pair->p_es = p_es;
-                msg_Info(p_out->p_sys->p_demux, "Adding ES %d", p_fmt->i_id);
+                msg_Info(p_demux, "Adding ES %d", p_fmt->i_id);
                 vlc_array_append(&p_sys->es, p_pair);
+
+                if (b_select) {
+                    if (fmt.i_cat == AUDIO_ES) {
+                        var_SetInteger( p_demux->p_input, "audio-es", p_fmt->i_id );
+                    } else if (fmt.i_cat == SPU_ES) {
+                        var_SetInteger( p_demux->p_input, "spu-es", p_sys->b_spu_enable ? p_fmt->i_id : -1 );
+                    }
+                }
             }
         }
     }
@@ -1835,8 +1852,11 @@ static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
     if (i_pid > 0) {
         int i_idx = findEsPairIndex(p_sys, i_pid);
         if (i_idx >= 0) {
-            es_out_id_t *p_es = vlc_array_item_at_index(&p_sys->es, i_idx);
-            es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
+            if (i_type == BD_EVENT_AUDIO_STREAM) {
+                var_SetInteger( p_demux->p_input, "audio-es", i_pid );
+            } else if (i_type == BD_EVENT_PG_TEXTST_STREAM) {
+                var_SetInteger( p_demux->p_input, "spu-es", p_sys->b_spu_enable ? i_pid : -1 );
+            }
         }
     }
 }
@@ -1944,6 +1964,9 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     /*
      * stream selection events
      */
+    case BD_EVENT_PG_TEXTST:
+        p_sys->b_spu_enable = e->param;
+        break;
     case BD_EVENT_AUDIO_STREAM:
     case BD_EVENT_PG_TEXTST_STREAM:
         blurayStreamSelect(p_demux, e->event, e->param);
