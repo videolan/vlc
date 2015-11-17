@@ -179,6 +179,8 @@ static void RemoveInflightPictures(decoder_t *);
 #define MEDIACODEC_AUDIO_TEXT "Use MediaCodec for audio decoding"
 #define MEDIACODEC_AUDIO_LONGTEXT "Still experimental."
 
+#define MEDIACODEC_TUNNELEDPLAYBACK_TEXT "Use a tunneled surface for playback"
+
 #define CFG_PREFIX "mediacodec-"
 
 vlc_module_begin ()
@@ -191,6 +193,8 @@ vlc_module_begin ()
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
     add_bool(CFG_PREFIX "audio", false,
              MEDIACODEC_AUDIO_TEXT, MEDIACODEC_AUDIO_LONGTEXT, true)
+    add_bool(CFG_PREFIX "tunneled-playback", false,
+             MEDIACODEC_TUNNELEDPLAYBACK_TEXT, NULL, true)
     set_callbacks( OpenDecoderNdk, CloseDecoder )
     add_shortcut( "mediacodec_ndk" )
     add_submodule ()
@@ -469,6 +473,8 @@ static int StartMediaCodec(decoder_t *p_dec)
             }
         }
         args.video.p_awh = p_sys->u.video.p_awh;
+        args.video.b_tunneled_playback = args.video.p_awh ?
+                var_InheritBool(p_dec, CFG_PREFIX "tunneled-playback") : false;
     }
     else
     {

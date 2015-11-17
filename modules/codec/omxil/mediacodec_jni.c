@@ -545,6 +545,11 @@ static int Start(mc_api *api, union mc_api_args *p_args)
 
         if (b_direct_rendering && p_args->video.i_angle != 0)
             SET_INTEGER(jformat, "rotation-degrees", p_args->video.i_angle);
+
+        /* feature-tunneled-playback available since API 21 */
+        if (b_direct_rendering && jfields.get_input_buffer)
+            SET_INTEGER(jformat, "feature-tunneled-playback",
+                        p_args->video.b_tunneled_playback);
     }
     else
     {

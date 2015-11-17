@@ -86,6 +86,7 @@ union mc_api_args
         int i_width;
         int i_height;
         int i_angle;
+        bool b_tunneled_playback;
     } video;
     struct
     {
