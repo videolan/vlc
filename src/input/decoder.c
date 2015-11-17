@@ -110,7 +110,6 @@ struct decoder_owner_sys_t
 
     /* Flushing */
     bool flushing;
-    bool flushed;
     bool b_draining;
     atomic_bool drained;
     bool b_idle;
@@ -1341,9 +1340,6 @@ static void *DecoderThread( void *p_data )
             if( unlikely(dummy == NULL) )
                 msg_Err( p_dec, "cannot flush" );
 
-            /* Owner is buggy if it queues data while flushing */
-            assert( vlc_fifo_IsEmpty( p_owner->p_fifo ) );
-            p_owner->flushing = false;
             vlc_fifo_Unlock( p_owner->p_fifo );
 
             /* Flush the decoder (and the output) */
@@ -1352,11 +1348,11 @@ static void *DecoderThread( void *p_data )
             vlc_fifo_Lock( p_owner->p_fifo );
             vlc_restorecancel( canc );
 
-            /* Owner is supposed to wait for flush to complete.
-             * TODO: It might be possible to remove this restriction. */
-            assert( vlc_fifo_IsEmpty( p_owner->p_fifo ) );
-            p_owner->flushed = true;
-            vlc_cond_signal( &p_owner->wait_fifo );
+            /* Reset flushing after DecoderProcess in case input_DecoderFlush
+             * is called again. This will avoid a second useless flush (but
+             * harmless). */
+            p_owner->flushing = false;
+
             continue;
         }
 
@@ -1486,7 +1482,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->b_has_data = false;
 
     p_owner->flushing = false;
-    p_owner->flushed = true;
     p_owner->b_draining = false;
     atomic_init( &p_owner->drained, false );
     p_owner->b_idle = false;
@@ -1818,7 +1813,6 @@ void input_DecoderDecode( decoder_t *p_dec, block_t *p_block, bool b_do_pace )
             vlc_fifo_WaitCond( p_owner->p_fifo, &p_owner->wait_fifo );
     }
 
-    p_owner->flushed = false;
     vlc_fifo_QueueUnlocked( p_owner->p_fifo, p_block );
     vlc_fifo_Unlock( p_owner->p_fifo );
 }
@@ -1874,15 +1868,13 @@ void input_DecoderFlush( decoder_t *p_dec )
 
     vlc_fifo_Lock( p_owner->p_fifo );
 
-    /* Don't flush if already flushed */
-    if( p_owner->flushed )
-    {
-        vlc_fifo_Unlock( p_owner->p_fifo );
-        return;
-    }
-
     /* Empty the fifo */
     block_ChainRelease( vlc_fifo_DequeueAllUnlocked( p_owner->p_fifo ) );
+
+    /* Don't need to wait for the DecoderThread to flush. Indeed, if called a
+     * second time, this function will clear the FIFO again before anything was
+     * dequeued by DecoderThread and there is no need to flush a second time in
+     * a row. */
     p_owner->flushing = true;
 
     /* Flushing video decoder when paused: increment frames_countdown in order
@@ -1893,10 +1885,6 @@ void input_DecoderFlush( decoder_t *p_dec )
         p_owner->frames_countdown++;
         vlc_fifo_Signal( p_owner->p_fifo );
     }
-
-    /* Monitor for flush end */
-    while( !p_owner->flushed )
-        vlc_fifo_WaitCond( p_owner->p_fifo, &p_owner->wait_fifo );
 
     vlc_fifo_Unlock( p_owner->p_fifo );
 }
