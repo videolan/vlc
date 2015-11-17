@@ -158,7 +158,7 @@ static picture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Only display 25 frame per second (there is 75 packets per second) */
-    if( (p_sys->i_packet%3) == 1 )
+    if( (p_sys->i_packet%3) == 1 && p_block->i_pts == p_block->i_dts )
     {
         /* Get a new picture */
         p_pic = decoder_NewPicture( p_dec );

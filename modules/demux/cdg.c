@@ -119,6 +119,10 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_block;
+    mtime_t     i_date;
+    mtime_t     i_delta;
+
+    i_delta = INT64_C(1000000) / CDG_FRAME_RATE;
 
     p_block = stream_Block( p_demux->s, CDG_FRAME_SIZE );
     if( p_block == NULL )
@@ -127,14 +131,21 @@ static int Demux( demux_t *p_demux )
         return 0;
     }
 
-    p_block->i_dts =
-    p_block->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
+    i_date = stream_Tell( p_demux->s ) / CDG_FRAME_SIZE * i_delta;
+    if( i_date >= date_Get( &p_sys->pts ) + i_delta )
+    {
+        p_block->i_dts = p_block->i_pts = i_date;
+        date_Set( &p_sys->pts, i_date );
+    }
+    else
+    {
+        p_block->i_dts = i_date;
+        p_block->i_pts = date_Get( &p_sys->pts );
+    }
 
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
 
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
-
-    date_Increment( &p_sys->pts, 1 );
 
     return 1;
 }
@@ -155,13 +166,20 @@ static void Close ( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
+    uint64_t i_old_offset = stream_Tell( p_demux->s );
     int i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
                                        8*CDG_FRAME_SIZE*CDG_FRAME_RATE, CDG_FRAME_SIZE,
                                        i_query, args );
     if( !i_ret && ( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) )
+    {
         date_Set( &p_demux->p_sys->pts,
                   stream_Tell( p_demux->s ) / CDG_FRAME_SIZE *
                     INT64_C(1000000) / CDG_FRAME_RATE );
+        if ( i_old_offset > stream_Tell( p_demux->s ) )
+            i_ret = stream_Seek( p_demux->s, 0 );
+        else
+            i_ret = stream_Seek( p_demux->s, i_old_offset );
+    }
 
     return i_ret;
 }
