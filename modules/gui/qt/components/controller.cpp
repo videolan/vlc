@@ -372,7 +372,6 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case MENU_BUTTONS:
         widget = discFrame();
-        widget->hide();
         break;
     case TELETEXT_BUTTONS:
         widget = telexFrame();
@@ -539,29 +538,44 @@ QFrame *AbstractController::discFrame()
     QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
     discLayout->setSpacing( 0 ); discLayout->setMargin( 0 );
 
-    QToolButton *prevSectionButton = new QToolButton( discFrame );
+
+    QFrame *chapFrame = new QFrame( discFrame );
+    QHBoxLayout *chapLayout = new QHBoxLayout( chapFrame );
+    chapLayout->setSpacing( 0 ); chapLayout->setMargin( 0 );
+
+    QToolButton *prevSectionButton = new QToolButton( chapFrame );
     setupButton( prevSectionButton );
     BUTTON_SET_BAR2( prevSectionButton, toolbar/dvd_prev,
             qtr("Previous Chapter/Title" ) );
-    discLayout->addWidget( prevSectionButton );
+    chapLayout->addWidget( prevSectionButton );
 
-    QToolButton *menuButton = new QToolButton( discFrame );
-    setupButton( menuButton );
-    discLayout->addWidget( menuButton );
-    BUTTON_SET_BAR2( menuButton, toolbar/dvd_menu, qtr( "Menu" ) );
-
-    QToolButton *nextSectionButton = new QToolButton( discFrame );
+    QToolButton *nextSectionButton = new QToolButton( chapFrame );
     setupButton( nextSectionButton );
-    discLayout->addWidget( nextSectionButton );
     BUTTON_SET_BAR2( nextSectionButton, toolbar/dvd_next,
             qtr("Next Chapter/Title" ) );
+    chapLayout->addWidget( nextSectionButton );
+
+    discLayout->addWidget( chapFrame );
+    chapFrame->hide();
+
+    QFrame *menuFrame = new QFrame( discFrame );
+    QHBoxLayout *menuLayout = new QHBoxLayout( menuFrame );
+    menuLayout->setSpacing( 0 ); menuLayout->setMargin( 0 );
+
+    QToolButton *menuButton = new QToolButton( menuFrame );
+    setupButton( menuButton );
+    menuLayout->addWidget( menuButton );
+    BUTTON_SET_BAR2( menuButton, toolbar/dvd_menu, qtr( "Menu" ) );
+
+    discLayout->addWidget( menuFrame );
+    menuFrame->hide();
 
     /* Change the navigation button display when the IM
        navigation changes */
     CONNECT( THEMIM->getIM(), chapterChanged( bool ),
-            discFrame, setVisible( bool ) );
+            chapFrame, setVisible( bool ) );
     CONNECT( THEMIM->getIM(), titleChanged( bool ),
-            menuButton, setVisible( bool ) );
+            menuFrame, setVisible( bool ) );
     /* Changes the IM navigation when triggered on the nav buttons */
     CONNECT( prevSectionButton, clicked(), THEMIM->getIM(),
             sectionPrev() );
