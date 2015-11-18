@@ -1932,8 +1932,11 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         blurayUpdateCurrentClip(p_demux, e->param);
         break;
     case BD_EVENT_CHAPTER:
+        if (e->param && e->param < 0xffff)
+          p_demux->info.i_seekpoint = e->param - 1;
+        else
+          p_demux->info.i_seekpoint = 0;
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-        p_demux->info.i_seekpoint = e->param;
         break;
     case BD_EVENT_ANGLE:
         break;
