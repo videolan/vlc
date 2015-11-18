@@ -158,6 +158,15 @@ VLC_API void picture_pool_Enum( picture_pool_t *,
 unsigned picture_pool_Reset( picture_pool_t * );
 
 /**
+ * Cancel the picture pool.
+ *
+ * It won't return any pictures via picture_pool_Get or picture_pool_Wait after
+ * this call. This function will also unblock picture_pool_Wait. Call
+ * picture_pool_Reset to reset the cancel state.
+ */
+void picture_pool_Cancel( picture_pool_t * );
+
+/**
  * Reserves pictures from a pool and creates a new pool with those.
  *
  * When the new pool is released, pictures are returned to the master pool.
