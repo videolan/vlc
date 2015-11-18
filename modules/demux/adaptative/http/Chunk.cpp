@@ -90,15 +90,15 @@ size_t AbstractChunk::getBytesToRead() const
     return source->getContentLength() - bytesRead;
 }
 
-block_t * AbstractChunk::read(size_t size)
+block_t * AbstractChunk::doRead(size_t size, bool b_block)
 {
     if(!source)
         return NULL;
 
-    block_t *block = source->read(size);
+    block_t *block = (b_block) ? source->readBlock() : source->read(size);
     if(block)
     {
-	if(bytesRead == 0)
+        if(bytesRead == 0)
             block->i_flags |= BLOCK_FLAG_HEADER;
         bytesRead += block->i_buffer;
         onDownload(&block);
@@ -106,6 +106,16 @@ block_t * AbstractChunk::read(size_t size)
     }
 
     return block;
+}
+
+block_t * AbstractChunk::readBlock()
+{
+    return doRead(0, true);
+}
+
+block_t * AbstractChunk::read(size_t size)
+{
+    return doRead(size, false);
 }
 
 HTTPChunkSource::HTTPChunkSource(const std::string& url, HTTPConnectionManager *manager) :
@@ -212,6 +222,11 @@ bool HTTPChunkSource::prepare()
     prepared = true;
 
     return true;
+}
+
+block_t * HTTPChunkSource::readBlock()
+{
+    return read(HTTPChunkSource::CHUNK_SIZE);
 }
 
 block_t * HTTPChunkSource::read(size_t readsize)

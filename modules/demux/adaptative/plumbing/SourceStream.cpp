@@ -71,8 +71,7 @@ ssize_t ChunksSourceStream::Read(uint8_t *buf, size_t size)
 
     while(i_toread && !b_eof)
     {
-        const size_t i_blocksize = __MAX(i_toread, http::HTTPChunkSource::CHUNK_SIZE);
-        if(!p_block && !(p_block = source->readNextBlock(i_blocksize)))
+        if(!p_block && !(p_block = source->readNextBlock()))
         {
             b_eof = true;
             break;

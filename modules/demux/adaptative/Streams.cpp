@@ -276,7 +276,7 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
     return AbstractStream::status_demuxed;
 }
 
-block_t * AbstractStream::readNextBlock(size_t toread)
+block_t * AbstractStream::readNextBlock()
 {
     if (currentChunk == NULL && !eof)
         currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
@@ -296,7 +296,7 @@ block_t * AbstractStream::readNextBlock(size_t toread)
 
     const bool b_segment_head_chunk = (currentChunk->getBytesRead() == 0);
 
-    block_t *block = currentChunk->read(toread);
+    block_t *block = currentChunk->readBlock();
     if(block == NULL)
     {
         delete currentChunk;

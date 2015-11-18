@@ -79,7 +79,7 @@ namespace adaptative
         void prune();
         void runUpdates();
 
-        virtual block_t *readNextBlock(size_t); /* impl */
+        virtual block_t *readNextBlock(); /* impl */
 
         virtual void fillExtraFMTInfo( es_format_t * ) const; /* impl */
         virtual void trackerEvent(const SegmentTrackerEvent &); /* impl */
