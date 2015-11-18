@@ -61,13 +61,18 @@
 
 @end
 
+#ifndef TARGET_OS_TV
 @interface VLCBlockingAlertView : UIAlertView <UIAlertViewDelegate>
 
 @property (copy, nonatomic) void (^completion)(BOOL, NSInteger);
 
-- (id)initWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle otherButtonTitles:(NSArray *)otherButtonTitles;
+- (id)initWithTitle:(NSString *)title
+            message:(NSString *)message
+  cancelButtonTitle:(NSString *)cancelButtonTitle
+  otherButtonTitles:(NSArray *)otherButtonTitles;
 
 @end
+#endif
 
 static int  OpenIntf(vlc_object_t *);
 static void CloseIntf(vlc_object_t *);
@@ -220,10 +225,10 @@ static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t prev
         intf_sys_t *sys = p_intf->p_sys;
         NSDictionary *dict = [sys->displayer displayLogin:DictFromDialogLogin(dialog)];
         if (dict) {
-            NSString *username = [dict objectForKey:@"username"];
+            NSString *username = dict[@"username"];
             if (username != NULL && username.length > 0)
                 *dialog->username = strdup([username UTF8String]);
-            NSString *password = [dict objectForKey:@"password"];
+            NSString *password = dict[@"password"];
             if (password != NULL && password.length > 0)
                 *dialog->password = strdup([password UTF8String]);
         }
@@ -311,35 +316,134 @@ bool checkProgressPanel (void *priv)
 {
     VLCAssertIsMainThread();
 
-    VLCBlockingAlertView *alert = [[VLCBlockingAlertView alloc] initWithTitle:[dialog objectForKey:@"title"] message:[dialog objectForKey:@"message"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+#if TARGET_OS_TV
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:dialog[@"title"]
+                                                                             message:dialog[@"message"]
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK"
+                                                     style:UIAlertActionStyleDestructive
+                                                   handler:^(UIAlertAction * _Nonnull action) {
+                                                       [action release];
+                                                       [alertController release];
+                                                       [dialog release];
+                                                   }];
+    [alertController addAction:action];
+    [alertController setPreferredAction:action];
+
+    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
+#else
+    VLCBlockingAlertView *alert = [[VLCBlockingAlertView alloc] initWithTitle:dialog[@"title"]
+                                                                      message:dialog[@"message"]
+                                                                     delegate:nil
+                                                            cancelButtonTitle:@"OK"
+                                                            otherButtonTitles:nil];
     alert.completion = ^(BOOL cancelled, NSInteger buttonIndex) {
         [alert release];
         [dialog release];
     };
     [alert show];
+#endif
 }
 
 - (void)displayCritical:(NSDictionary *)dialog
 {
     VLCAssertIsMainThread();
 
-    VLCBlockingAlertView *alert = [[VLCBlockingAlertView alloc] initWithTitle:[dialog objectForKey:@"title"] message:[dialog objectForKey:@"message"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+#if TARGET_OS_TV
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:dialog[@"title"]
+                                                                             message:dialog[@"message"]
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK"
+                                                     style:UIAlertActionStyleDestructive
+                                                   handler:^(UIAlertAction * _Nonnull action) {
+                                                       [action release];
+                                                       [alertController release];
+                                                       [dialog release];
+                                                   }];
+    [alertController addAction:action];
+    [alertController setPreferredAction:action];
+
+    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
+#else
+    VLCBlockingAlertView *alert = [[VLCBlockingAlertView alloc] initWithTitle:dialog[@"title"]
+                                                                      message:dialog[@"message"]
+                                                                     delegate:nil
+                                                            cancelButtonTitle:@"OK"
+                                                            otherButtonTitles:nil];
     alert.completion = ^(BOOL cancelled, NSInteger buttonIndex) {
         [alert release];
         [dialog release];
     };
     [alert show];
+#endif
 }
 
 - (NSNumber *)displayQuestion:(NSDictionary *)dialog
 {
+#if TARGET_OS_TV
+    __block int ret = 0;
+    __block UIAlertController *alertController;
+    __block UIAlertAction *yesAction;
+    __block UIAlertAction *noAction;
+    __block UIAlertAction *cancelAction;
+
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        alertController = [UIAlertController alertControllerWithTitle:dialog[@"title"]
+                                                                                 message:dialog[@"message"]
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+
+        cancelAction = [UIAlertAction actionWithTitle:dialog[@"cancel"]
+                                                               style:UIAlertActionStyleDestructive
+                                                             handler:^(UIAlertAction * _Nonnull action) {
+                                                                 ret = 3;
+                                                                 dispatch_semaphore_signal(sema);
+                                                             }];
+        [alertController addAction:cancelAction];
+
+        yesAction = [UIAlertAction actionWithTitle:dialog[@"yes"]
+                                             style:UIAlertActionStyleDestructive
+                                           handler:^(UIAlertAction * _Nonnull action) {
+                                               ret = 0;
+                                               dispatch_semaphore_signal(sema);
+                                           }];
+        [alertController addAction:yesAction];
+        [alertController setPreferredAction:yesAction];
+
+        noAction = [UIAlertAction actionWithTitle:dialog[@"yes"]
+                                            style:UIAlertActionStyleDestructive
+                                          handler:^(UIAlertAction * _Nonnull action) {
+                                              ret = 1;
+                                              dispatch_semaphore_signal(sema);
+                                          }];
+        [alertController addAction:noAction];
+
+        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
+    });
+
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+    [cancelAction release];
+    [yesAction release];
+    [noAction release];
+    [alertController release];
+    [dialog release];
+
+    return @(ret);
+#else
     __block int ret = 0;
     __block VLCBlockingAlertView *alert;
 
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        alert = [[VLCBlockingAlertView alloc] initWithTitle:[dialog objectForKey:@"title"] message:[dialog objectForKey:@"message"] delegate:nil cancelButtonTitle:[dialog objectForKey:@"cancel"] otherButtonTitles:[dialog objectForKey:@"yes"], [dialog objectForKey:@"no"], nil];
+        alert = [[VLCBlockingAlertView alloc] initWithTitle:dialog[@"title"] message:dialog[@"message"]
+                                                   delegate:nil
+                                          cancelButtonTitle:dialog[@"cancel"]
+                                          otherButtonTitles:dialog[@"yes"], dialog[@"no"], nil];
         alert.completion = ^(BOOL cancelled, NSInteger buttonIndex) {
             if (cancelled)
                 ret = 3;
@@ -357,17 +461,68 @@ bool checkProgressPanel (void *priv)
     [dialog release];
 
     return @(ret);
+#endif
 }
 
 - (NSDictionary *)displayLogin:(NSDictionary *)dialog
 {
+#if TARGET_OS_TV
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    __block UIAlertController *alertController;
+    __block NSDictionary *dict;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        alertController = [UIAlertController alertControllerWithTitle:dialog[@"title"]
+                                                                                 message:dialog[@"message"]
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+
+        __block UITextField *usernameField = nil;
+        __block UITextField *passwordField = nil;
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            usernameField = textField;
+        }];
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.secureTextEntry = YES;
+            passwordField = textField;
+        }];
+        [alertController addAction:[[UIAlertAction actionWithTitle:@"Login"
+                                                             style:UIAlertActionStyleDefault
+                                                           handler:^(UIAlertAction * _Nonnull action) {
+                                                               NSString *user = usernameField.text;
+                                                               NSString *pass = passwordField.text;
+                                                               dict = [[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                        user ? user : @"", @"username",
+                                                                        pass ? pass : @"", @"password",
+                                                                        nil] retain];
+                                                               dispatch_semaphore_signal(sema);
+                                                           }] autorelease]];
+
+        [alertController addAction:[[UIAlertAction actionWithTitle:@"Cancel"
+                                                             style:UIAlertActionStyleCancel
+                                                           handler:^(UIAlertAction * _Nonnull action) {
+                                                               dispatch_semaphore_signal(sema);
+                                                           }] autorelease]];
+
+        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
+    });
+
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+    [alertController release];
+    [dialog release];
+    return dict;
+#else
     __block NSDictionary *dict;
     __block VLCBlockingAlertView *alert;
 
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        alert = [[VLCBlockingAlertView alloc] initWithTitle:[dialog objectForKey:@"title"] message:[dialog objectForKey:@"message"] delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"Login", nil];
+        alert = [[VLCBlockingAlertView alloc] initWithTitle:dialog[@"title"]
+                                                    message:dialog[@"message"]
+                                                   delegate:nil
+                                          cancelButtonTitle:@"Cancel"
+                                          otherButtonTitles:@"Login", nil];
         alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
         alert.completion = ^(BOOL cancelled, NSInteger buttonIndex) {
             if (!cancelled) {
@@ -390,6 +545,7 @@ bool checkProgressPanel (void *priv)
     [alert release];
     [dialog release];
     return dict;
+#endif
 }
 
 - (void)displayProgressBar:(NSDictionary *)dialog
@@ -428,9 +584,9 @@ bool checkProgressPanel (void *priv)
  */
 - (void)execute:(NSDictionary *)dict
 {
-    SEL sel = [[dict objectForKey:@"sel"] pointerValue];
-    id *result = [[dict objectForKey:@"result"] pointerValue];
-    id object = [dict objectForKey:@"object"];
+    SEL sel = [dict[@"sel"] pointerValue];
+    id *result = [dict[@"result"] pointerValue];
+    id object = dict[@"object"];
 
     NSAssert(sel, @"Try to execute a NULL selector");
 
@@ -452,11 +608,19 @@ bool checkProgressPanel (void *priv)
 
 @end
 
+#ifndef TARGET_OS_TV
 @implementation VLCBlockingAlertView
 
-- (id)initWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle otherButtonTitles:(NSArray *)otherButtonTitles
+- (id)initWithTitle:(NSString *)title
+            message:(NSString *)message
+  cancelButtonTitle:(NSString *)cancelButtonTitle
+  otherButtonTitles:(NSArray *)otherButtonTitles
 {
-    self = [self initWithTitle:title message:message delegate:self cancelButtonTitle:cancelButtonTitle otherButtonTitles:nil];
+    self = [self initWithTitle:title
+                       message:message
+                      delegate:self
+             cancelButtonTitle:cancelButtonTitle
+             otherButtonTitles:nil];
 
     if (self) {
         for (NSString *buttonTitle in otherButtonTitles)
@@ -472,5 +636,6 @@ bool checkProgressPanel (void *priv)
         self.completion = nil;
     }
 }
-
 @end
+
+#endif

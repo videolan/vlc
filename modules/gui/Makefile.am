@@ -51,3 +51,6 @@ libios_dialog_provider_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,UIKit
 if HAVE_IOS
 gui_LTLIBRARIES += libios_dialog_provider_plugin.la
 endif
+if HAVE_TVOS
+gui_LTLIBRARIES += libios_dialog_provider_plugin.la
+endif
