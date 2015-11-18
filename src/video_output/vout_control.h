@@ -52,6 +52,11 @@ void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
  */
 void vout_Reset( vout_thread_t *p_vout );
 
+/*
+ * Cancel the vout, it won't return any pictures after this call.
+ */
+void vout_Cancel( vout_thread_t *p_vout );
+
 /**
  * This function will force to display the next picture while paused
  */
