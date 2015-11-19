@@ -61,7 +61,7 @@
 
 @end
 
-#ifndef TARGET_OS_TV
+#if !TARGET_OS_TV
 @interface VLCBlockingAlertView : UIAlertView <UIAlertViewDelegate>
 
 @property (copy, nonatomic) void (^completion)(BOOL, NSInteger);
@@ -608,7 +608,7 @@ bool checkProgressPanel (void *priv)
 
 @end
 
-#ifndef TARGET_OS_TV
+#if !TARGET_OS_TV
 @implementation VLCBlockingAlertView
 
 - (id)initWithTitle:(NSString *)title
