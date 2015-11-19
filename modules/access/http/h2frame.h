@@ -27,6 +27,8 @@ struct vlc_h2_frame
     uint8_t data[];
 };
 
+size_t vlc_h2_frame_size(const struct vlc_h2_frame *);
+
 struct vlc_h2_frame *
 vlc_h2_frame_headers(uint_fast32_t stream_id, uint_fast32_t mtu, bool eos,
                      unsigned count, const char *const headers[][2]);
@@ -43,6 +45,12 @@ struct vlc_h2_frame *
 vlc_h2_frame_goaway(uint_fast32_t last_stream_id, uint_fast32_t error_code);
 struct vlc_h2_frame *
 vlc_h2_frame_window_update(uint_fast32_t stream_id, uint_fast32_t credit);
+
+struct vlc_object_t;
+
+void vlc_h2_frame_dump(struct vlc_object_t *, const struct vlc_h2_frame *,
+                       const char *);
+#define vlc_h2_frame_dump(o, f, m) vlc_h2_frame_dump(VLC_OBJECT(o), f, m)
 
 enum vlc_h2_error {
     VLC_H2_NO_ERROR,
@@ -85,3 +93,37 @@ const char *vlc_h2_setting_name(uint_fast16_t);
 #define VLC_H2_DEFAULT_MAX_HEADER_TABLE  4096
 #define VLC_H2_DEFAULT_INIT_WINDOW      65535
 #define VLC_H2_DEFAULT_MAX_FRAME        16384
+
+struct vlc_h2_parser;
+struct vlc_h2_parser_cbs
+{
+    void (*setting)(void *ctx, uint_fast16_t id, uint_fast32_t value);
+    int  (*settings_done)(void *ctx);
+    int  (*ping)(void *ctx, uint_fast64_t opaque);
+    void (*error)(void *ctx, uint_fast32_t code);
+    int  (*reset)(void *ctx, uint_fast32_t last_seq, uint_fast32_t code);
+    void (*window_status)(void *ctx, uint32_t *rcwd);
+
+    void *(*stream_lookup)(void *ctx, uint_fast32_t id);
+    int  (*stream_error)(void *ctx, uint_fast32_t id, uint_fast32_t code);
+    void (*stream_headers)(void *ctx, unsigned count, char *headers[][2]);
+    int  (*stream_data)(void *ctx, struct vlc_h2_frame *f);
+    void (*stream_end)(void *ctx);
+    int  (*stream_reset)(void *ctx, uint_fast32_t code);
+};
+
+struct vlc_h2_parser *vlc_h2_parse_init(void *ctx,
+                                        const struct vlc_h2_parser_cbs *cbs);
+int vlc_h2_parse(struct vlc_h2_parser *, struct vlc_h2_frame *);
+void vlc_h2_parse_destroy(struct vlc_h2_parser *);
+
+#define VLC_H2_MAX_HEADERS 255
+
+const uint8_t *vlc_h2_frame_data_get(const struct vlc_h2_frame *f,
+                                     size_t *restrict len);
+#if (__STDC_VERSION__ >= 201112L)
+#define vlc_h2_frame_data_get(f, l) \
+    _Generic((f), \
+        const struct vlc_h2_frame *: (vlc_h2_frame_data_get)(f, l), \
+        struct vlc_h2_frame *: (uint8_t *)(vlc_h2_frame_data_get)(f, l))
+#endif

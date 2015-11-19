@@ -62,6 +62,32 @@ vlc_h2_frame_alloc(uint_fast8_t type, uint_fast8_t flags,
 
 #define vlc_h2_frame_payload(f) ((f)->data + 9)
 
+static uint_fast32_t vlc_h2_frame_length(const struct vlc_h2_frame *f)
+{
+    const uint8_t *buf = f->data;
+    return (buf[0] << 16) | (buf[1] << 8) | buf[2];
+}
+
+size_t vlc_h2_frame_size(const struct vlc_h2_frame *f)
+{
+    return 9 + vlc_h2_frame_length(f);
+}
+
+static uint_fast8_t vlc_h2_frame_type(const struct vlc_h2_frame *f)
+{
+    return f->data[3];
+}
+
+static uint_fast8_t vlc_h2_frame_flags(const struct vlc_h2_frame *f)
+{
+    return f->data[4];
+}
+
+static uint_fast32_t vlc_h2_frame_id(const struct vlc_h2_frame *f)
+{
+    return GetDWBE(f->data + 5) & 0x7FFFFFFF;
+}
+
 enum {
     VLC_H2_FRAME_DATA,
     VLC_H2_FRAME_HEADERS,
@@ -74,6 +100,26 @@ enum {
     VLC_H2_FRAME_WINDOW_UPDATE,
     VLC_H2_FRAME_CONTINUATION,
 };
+
+static const char *vlc_h2_type_name(uint_fast8_t type)
+{
+    static const char names[][14] = {
+        [VLC_H2_FRAME_DATA]          = "DATA",
+        [VLC_H2_FRAME_HEADERS]       = "HEADERS",
+        [VLC_H2_FRAME_PRIORITY]      = "PRIORITY",
+        [VLC_H2_FRAME_RST_STREAM]    = "RST_STREAM",
+        [VLC_H2_FRAME_SETTINGS]      = "SETTINGS",
+        [VLC_H2_FRAME_PUSH_PROMISE]  = "PUSH_PROMISE",
+        [VLC_H2_FRAME_PING]          = "PING",
+        [VLC_H2_FRAME_GOAWAY]        = "GOAWAY",
+        [VLC_H2_FRAME_WINDOW_UPDATE] = "WINDOW_UPDATE",
+        [VLC_H2_FRAME_CONTINUATION]  = "CONTINUATION",
+    };
+
+    if (type >= (sizeof (names) / sizeof (names[0])) || names[type][0] == '\0')
+        return "<unknown>";
+    return names[type];
+}
 
 enum {
     VLC_H2_DATA_END_STREAM = 0x01,
@@ -346,4 +392,627 @@ const char *vlc_h2_strerror(uint_fast32_t code)
     if (code >= sizeof (names) / sizeof (names[0]) || names[code][0] == '\0')
         return "Unknown error";
     return names[code];
+}
+
+void (vlc_h2_frame_dump)(vlc_object_t *obj, const struct vlc_h2_frame *f,
+                         const char *msg)
+{
+    size_t len = vlc_h2_frame_length(f);
+    uint_fast8_t type = vlc_h2_frame_type(f);
+    uint_fast8_t flags = vlc_h2_frame_flags(f);
+    uint_fast32_t sid = vlc_h2_frame_id(f);
+
+    if (sid != 0)
+        msg_Dbg(obj, "%s %s (0x%02"PRIxFAST8") frame of %"PRIuFAST32" bytes, "
+                "flags 0x%02"PRIxFAST8", stream %"PRIuFAST32, msg,
+                vlc_h2_type_name(type), type, len,  flags, sid);
+    else
+        msg_Dbg(obj, "%s %s (0x%02"PRIxFAST8") frame of %"PRIuFAST32" bytes, "
+                "flags 0x%02"PRIxFAST8", global", msg,
+                vlc_h2_type_name(type), type, len,  flags);
+}
+
+const uint8_t *(vlc_h2_frame_data_get)(const struct vlc_h2_frame *f,
+                                       size_t *restrict lenp)
+{
+    assert(vlc_h2_frame_type(f) == VLC_H2_FRAME_DATA);
+
+    size_t len = vlc_h2_frame_length(f);
+    uint_fast8_t flags = vlc_h2_frame_flags(f);
+    const uint8_t *ptr = vlc_h2_frame_payload(f);
+
+    /* At this point, the frame has already been validated by the parser. */
+    if (flags & VLC_H2_DATA_PADDED)
+    {
+        assert(len >= 1u && len >= 1u + ptr[0]);
+        len -= 1u + *(ptr++);
+    }
+
+    *lenp = len;
+    return ptr;
+}
+
+typedef int (*vlc_h2_parser)(struct vlc_h2_parser *, struct vlc_h2_frame *,
+                             size_t, uint_fast32_t);
+
+/** HTTP/2 incoming frames parser */
+struct vlc_h2_parser
+{
+    void *opaque;
+    const struct vlc_h2_parser_cbs *cbs;
+
+    vlc_h2_parser parser; /*< Parser state / callback for next frame */
+
+    struct
+    {
+        uint32_t sid; /*< Ongoing stream identifier */
+        bool eos; /*< End of stream after headers block */
+        size_t len; /*< Compressed headers buffer length */
+        uint8_t *buf; /*< Compressed headers buffer base address */
+        struct hpack_decoder *decoder; /*< HPACK decompressor state */
+    } headers; /*< Compressed headers reception state */
+
+    uint32_t rcwd_size; /*< Receive congestion window (bytes) */
+};
+
+static int vlc_h2_parse_generic(struct vlc_h2_parser *, struct vlc_h2_frame *,
+                                size_t, uint_fast32_t);
+static int vlc_h2_parse_headers_block(struct vlc_h2_parser *,
+                                      struct vlc_h2_frame *, size_t,
+                                      uint_fast32_t);
+
+static int vlc_h2_parse_error(struct vlc_h2_parser *p, uint_fast32_t code)
+{
+    p->cbs->error(p->opaque, code);
+    return -1;
+}
+
+static int vlc_h2_stream_error(struct vlc_h2_parser *p, uint_fast32_t id,
+                               uint_fast32_t code)
+{
+    return p->cbs->stream_error(p->opaque, id, code);
+}
+
+static void *vlc_h2_stream_lookup(struct vlc_h2_parser *p, uint_fast32_t id)
+{
+    return p->cbs->stream_lookup(p->opaque, id);
+}
+
+static void vlc_h2_parse_headers_start(struct vlc_h2_parser *p,
+                                       uint_fast32_t sid, bool eos)
+{
+    assert(sid != 0);
+    assert(p->headers.sid == 0);
+
+    p->parser = vlc_h2_parse_headers_block;
+    p->headers.sid = sid;
+    p->headers.eos = eos;
+    p->headers.len = 0;
+}
+
+static int vlc_h2_parse_headers_append(struct vlc_h2_parser *p,
+                                       const uint8_t *data, size_t len)
+{
+    assert(p->headers.sid != 0);
+
+    if (p->headers.len + len > 65536)
+        return vlc_h2_parse_error(p, VLC_H2_INTERNAL_ERROR);
+
+    uint8_t *buf = realloc(p->headers.buf, p->headers.len + len);
+    if (unlikely(buf == NULL))
+        return vlc_h2_parse_error(p, VLC_H2_INTERNAL_ERROR);
+
+    p->headers.buf = buf;
+    memcpy(p->headers.buf + p->headers.len, data, len);
+    p->headers.len += len;
+    return 0;
+}
+
+static int vlc_h2_parse_headers_end(struct vlc_h2_parser *p)
+{
+    char *headers[VLC_H2_MAX_HEADERS][2];
+
+    /* TODO: limit total decompressed size of the headers list */
+    int val = hpack_decode(p->headers.decoder, p->headers.buf, p->headers.len,
+                           headers, VLC_H2_MAX_HEADERS);
+    if (val > VLC_H2_MAX_HEADERS)
+    {
+        for (unsigned i = 0; i < VLC_H2_MAX_HEADERS; i++)
+        {
+            free(headers[i][1]);
+            free(headers[i][0]);
+        }
+        val = -1;
+    }
+    if (val < 0)
+        return vlc_h2_parse_error(p, VLC_H2_COMPRESSION_ERROR);
+
+    void *s = vlc_h2_stream_lookup(p, p->headers.sid);
+    if (s != NULL)
+    {
+        p->cbs->stream_headers(s, val, headers);
+        val = 0;
+    }
+    else
+        /* NOTE: The specification implies that the error should also be sent
+         * for non-last header/continuation frames, but this does not make much
+         * sense. */
+        val = vlc_h2_stream_error(p, p->headers.sid, VLC_H2_REFUSED_STREAM);
+
+    if (p->headers.eos && s != NULL)
+        p->cbs->stream_end(s);
+
+    p->parser = vlc_h2_parse_generic;
+    p->headers.sid = 0;
+    return val;
+}
+
+/** Parses an HTTP/2 DATA frame */
+static int vlc_h2_parse_frame_data(struct vlc_h2_parser *p,
+                                   struct vlc_h2_frame *f, size_t len,
+                                   uint_fast32_t id)
+{
+    uint_fast8_t flags = vlc_h2_frame_flags(f);
+    const uint8_t *ptr = vlc_h2_frame_payload(f);
+
+    if (id == 0)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    if (len > VLC_H2_MAX_FRAME)
+    {
+        free(f);
+        return vlc_h2_stream_error(p, id, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    if (flags & VLC_H2_DATA_PADDED)
+    {
+        if (len < 1 || len < (1u + ptr[0]))
+        {
+            free(f);
+            return vlc_h2_stream_error(p, id, VLC_H2_FRAME_SIZE_ERROR);
+        }
+        len -= 1 + ptr[0];
+    }
+
+    if (len > p->rcwd_size)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_FLOW_CONTROL_ERROR);
+    }
+
+    p->rcwd_size -= len;
+    p->cbs->window_status(p->opaque, &p->rcwd_size);
+
+    void *s = vlc_h2_stream_lookup(p, id);
+    if (s == NULL)
+    {
+        free(f);
+        return vlc_h2_stream_error(p, id, VLC_H2_STREAM_CLOSED);
+    }
+
+    int ret = p->cbs->stream_data(s, f);
+    /* Frame gets consumed here ^^ */
+
+    if (flags & VLC_H2_DATA_END_STREAM)
+        p->cbs->stream_end(s);
+    return ret;
+}
+
+/** Parses an HTTP/2 HEADERS frame */
+static int vlc_h2_parse_frame_headers(struct vlc_h2_parser *p,
+                                      struct vlc_h2_frame *f, size_t len,
+                                      uint_fast32_t id)
+{
+    uint_fast8_t flags = vlc_h2_frame_flags(f);
+    const uint8_t *ptr = vlc_h2_frame_payload(f);
+
+    if (id == 0)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    if (len > VLC_H2_MAX_FRAME)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    if (flags & VLC_H2_HEADERS_PADDED)
+    {
+        if (len < 1 || len < (1u + ptr[0]))
+        {
+            free(f);
+            return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+        }
+        len -= 1 + ptr[0];
+        ptr++;
+    }
+
+    if (flags & VLC_H2_HEADERS_PRIORITY)
+    {   /* Ignore priorities for now as we do not upload anything. */
+        if (len < 5)
+        {
+            free(f);
+            return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+        }
+        ptr += 5;
+        len -= 5;
+    }
+
+    vlc_h2_parse_headers_start(p, id, flags & VLC_H2_HEADERS_END_STREAM);
+
+    int ret = vlc_h2_parse_headers_append(p, ptr, len);
+
+    if (ret == 0 && (flags & VLC_H2_HEADERS_END_HEADERS))
+        ret = vlc_h2_parse_headers_end(p);
+
+    free(f);
+    return ret;
+}
+
+/** Parses an HTTP/2 PRIORITY frame */
+static int vlc_h2_parse_frame_priority(struct vlc_h2_parser *p,
+                                       struct vlc_h2_frame *f, size_t len,
+                                       uint_fast32_t id)
+{
+    free(f);
+
+    if (id == 0)
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+
+    if (len != 5)
+        return vlc_h2_stream_error(p, id, VLC_H2_FRAME_SIZE_ERROR);
+
+    /* Ignore priorities for now as we do not upload much. */
+    return 0;
+}
+
+/** Parses an HTTP/2 RST_STREAM frame */
+static int vlc_h2_parse_frame_rst_stream(struct vlc_h2_parser *p,
+                                         struct vlc_h2_frame *f, size_t len,
+                                         uint_fast32_t id)
+{
+    if (id == 0)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    if (len != 4)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    void *s = vlc_h2_stream_lookup(p, id);
+    uint_fast32_t code = GetDWBE(vlc_h2_frame_payload(f));
+
+    free(f);
+
+    if (s == NULL)
+        return 0;
+    return p->cbs->stream_reset(s, code);
+}
+
+/** Parses an HTTP/2 SETTINGS frame */
+static int vlc_h2_parse_frame_settings(struct vlc_h2_parser *p,
+                                       struct vlc_h2_frame *f, size_t len,
+                                       uint_fast32_t id)
+{
+    const uint8_t *ptr = vlc_h2_frame_payload(f);
+
+    if (id != 0)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    if (len % 6 || len > VLC_H2_MAX_FRAME)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    if (vlc_h2_frame_flags(f) & VLC_H2_SETTINGS_ACK)
+    {
+        free(f);
+        if (len != 0)
+            return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+        /* Ignore ACKs for now as we never change settings. */
+        return 0;
+    }
+
+    for (const uint8_t *end = ptr + len; ptr < end; ptr += 6)
+        p->cbs->setting(p->opaque, GetWBE(ptr), GetDWBE(ptr + 2));
+
+    free(f);
+    return p->cbs->settings_done(p->opaque);
+}
+
+/** Parses an HTTP/2 PUSH_PROMISE frame */
+static int vlc_h2_parse_frame_push_promise(struct vlc_h2_parser *p,
+                                           struct vlc_h2_frame *f, size_t len,
+                                           uint_fast32_t id)
+{
+    uint8_t flags = vlc_h2_frame_flags(f);
+    const uint8_t *ptr = vlc_h2_frame_payload(f);
+
+    if (id == 0)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    if (len > VLC_H2_MAX_FRAME)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    if (flags & VLC_H2_PUSH_PROMISE_PADDED)
+    {
+        if (len < 1 || len < (1u + ptr[0]))
+        {
+            free(f);
+            return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+        }
+        len -= 1 + ptr[0];
+        ptr++;
+    }
+
+    /* Not permitted by our settings. */
+    free(f);
+    return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+}
+
+/** Parses an HTTP/2 PING frame */
+static int vlc_h2_parse_frame_ping(struct vlc_h2_parser *p,
+                                   struct vlc_h2_frame *f, size_t len,
+                                   uint_fast32_t id)
+{
+    uint64_t opaque;
+
+    if (id != 0)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    if (len != 8)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    if (vlc_h2_frame_flags(f) & VLC_H2_PING_ACK)
+    {
+        free(f);
+        return 0;
+    }
+
+    memcpy(&opaque, vlc_h2_frame_payload(f), 8);
+    free(f);
+
+    return p->cbs->ping(p->opaque, opaque);
+}
+
+/** Parses an HTTP/2 GOAWAY frame */
+static int vlc_h2_parse_frame_goaway(struct vlc_h2_parser *p,
+                                     struct vlc_h2_frame *f, size_t len,
+                                     uint_fast32_t id)
+{
+    const uint8_t *ptr = vlc_h2_frame_payload(f);
+
+    if (id != 0)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    if (len < 8 || len > VLC_H2_MAX_FRAME)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    uint_fast32_t last_id = GetDWBE(ptr) & 0x7FFFFFFF;
+    uint_fast32_t code = GetDWBE(ptr + 4);
+
+    free(f);
+    return p->cbs->reset(p->opaque, last_id, code);
+}
+
+/** Parses an HTTP/2 WINDOW_UPDATE frame */
+static int vlc_h2_parse_frame_window_update(struct vlc_h2_parser *p,
+                                            struct vlc_h2_frame *f, size_t len,
+                                            uint_fast32_t id)
+{
+    free(f);
+
+    if (len != 4)
+    {
+        if (id == 0)
+            return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+        return vlc_h2_stream_error(p, id, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    /* Nothing to do as we do not send data for the time being. */
+    return 0;
+}
+
+/** Parses an HTTP/2 CONTINUATION frame */
+static int vlc_h2_parse_frame_continuation(struct vlc_h2_parser *p,
+                                           struct vlc_h2_frame *f, size_t len,
+                                           uint_fast32_t id)
+{
+    const uint8_t *ptr = vlc_h2_frame_payload(f);
+
+    /* Stream ID must match with the previous frame. */
+    if (id == 0 || id != p->headers.sid)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    if (len > VLC_H2_MAX_FRAME)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    int ret = vlc_h2_parse_headers_append(p, ptr, len);
+
+    if (ret == 0 && (vlc_h2_frame_flags(f) & VLC_H2_CONTINUATION_END_HEADERS))
+        ret = vlc_h2_parse_headers_end(p);
+
+    free(f);
+    return 0;
+}
+
+/** Parses an HTTP/2 frame of unknown type */
+static int vlc_h2_parse_frame_unknown(struct vlc_h2_parser *p,
+                                      struct vlc_h2_frame *f, size_t len,
+                                      uint_fast32_t id)
+{
+    free(f);
+
+    if (len > VLC_H2_MAX_FRAME)
+    {
+        if (id == 0)
+            return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
+        return vlc_h2_stream_error(p, id, VLC_H2_FRAME_SIZE_ERROR);
+    }
+
+    /* Ignore frames of unknown type as specified. */
+    return 0;
+}
+
+static const vlc_h2_parser vlc_h2_parsers[] = {
+    [VLC_H2_FRAME_DATA]          = vlc_h2_parse_frame_data,
+    [VLC_H2_FRAME_HEADERS]       = vlc_h2_parse_frame_headers,
+    [VLC_H2_FRAME_PRIORITY]      = vlc_h2_parse_frame_priority,
+    [VLC_H2_FRAME_RST_STREAM]    = vlc_h2_parse_frame_rst_stream,
+    [VLC_H2_FRAME_SETTINGS]      = vlc_h2_parse_frame_settings,
+    [VLC_H2_FRAME_PUSH_PROMISE]  = vlc_h2_parse_frame_push_promise,
+    [VLC_H2_FRAME_PING]          = vlc_h2_parse_frame_ping,
+    [VLC_H2_FRAME_GOAWAY]        = vlc_h2_parse_frame_goaway,
+    [VLC_H2_FRAME_WINDOW_UPDATE] = vlc_h2_parse_frame_window_update,
+    [VLC_H2_FRAME_CONTINUATION]  = vlc_h2_parse_frame_continuation,
+};
+
+/** Parses the HTTP/2 connection preface. */
+static int vlc_h2_parse_preface(struct vlc_h2_parser *p,
+                                struct vlc_h2_frame *f, size_t len,
+                                uint_fast32_t id)
+{
+    /* The length must be within the specification default limits. */
+    if (len > VLC_H2_DEFAULT_MAX_FRAME
+    /* The type must SETTINGS. */
+     || vlc_h2_frame_type(f) != VLC_H2_FRAME_SETTINGS
+    /* The SETTINGS ACK flag must be clear. */
+     || (vlc_h2_frame_flags(f) & VLC_H2_SETTINGS_ACK))
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    p->parser = vlc_h2_parse_generic;
+
+    return vlc_h2_parse_frame_settings(p, f, len, id);
+}
+
+/** Parses any HTTP/2 frame. */
+static int vlc_h2_parse_generic(struct vlc_h2_parser *p,
+                                struct vlc_h2_frame *f, size_t len,
+                                uint_fast32_t id)
+{
+    uint_fast8_t type = vlc_h2_frame_type(f);
+    vlc_h2_parser func = vlc_h2_parse_frame_unknown;
+
+    assert(p->headers.sid == 0);
+
+    if (type < sizeof (vlc_h2_parsers) / sizeof (vlc_h2_parsers[0])
+     && vlc_h2_parsers[type] != NULL)
+        func = vlc_h2_parsers[type];
+
+    return func(p, f, len, id);
+}
+
+static int vlc_h2_parse_headers_block(struct vlc_h2_parser *p,
+                                      struct vlc_h2_frame *f, size_t len,
+                                      uint_fast32_t id)
+{
+    assert(p->headers.sid != 0);
+
+    /* After a HEADER, PUSH_PROMISE of CONTINUATION frame without the
+     * END_HEADERS flag, must come a CONTINUATION frame. */
+    if (vlc_h2_frame_type(f) != VLC_H2_FRAME_CONTINUATION)
+    {
+        free(f);
+        return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+    }
+
+    return vlc_h2_parse_frame_continuation(p, f, len, id);
+}
+
+static int vlc_h2_parse_failed(struct vlc_h2_parser *p, struct vlc_h2_frame *f,
+                               size_t len, uint_fast32_t id)
+{
+    free(f);
+    (void) p; (void) len; (void) id;
+    return -1;
+}
+
+int vlc_h2_parse(struct vlc_h2_parser *p, struct vlc_h2_frame *f)
+{
+    int ret = 0;
+
+    while (f != NULL)
+    {
+        struct vlc_h2_frame *next = f->next;
+        size_t len = vlc_h2_frame_length(f);
+        uint_fast32_t id = vlc_h2_frame_id(f);
+
+        f->next = NULL;
+        ret = p->parser(p, f, len, id);
+        if (ret)
+            p->parser = vlc_h2_parse_failed;
+        f = next;
+    }
+
+    return ret;
+}
+
+struct vlc_h2_parser *vlc_h2_parse_init(void *ctx,
+                                        const struct vlc_h2_parser_cbs *cbs)
+{
+    struct vlc_h2_parser *p = malloc(sizeof (*p));
+    if (unlikely(p == NULL))
+        return NULL;
+
+    p->opaque = ctx;
+    p->cbs = cbs;
+    p->parser = vlc_h2_parse_preface;
+    p->headers.sid = 0;
+    p->headers.buf = NULL;
+    p->headers.len = 0;
+    p->headers.decoder = hpack_decode_init(VLC_H2_MAX_HEADER_TABLE);
+    if (unlikely(p->headers.decoder == NULL))
+    {
+        free(p);
+        return NULL;
+    }
+    p->rcwd_size = 65535; /* initial per-connection value */
+    return p;
+}
+
+void vlc_h2_parse_destroy(struct vlc_h2_parser *p)
+{
+    hpack_decode_destroy(p->headers.decoder);
+    free(p->headers.buf);
+    free(p);
 }
