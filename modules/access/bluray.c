@@ -1721,6 +1721,8 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         return sendKeyEvent(p_sys, BD_VK_LEFT);
     case DEMUX_NAV_RIGHT:
         return sendKeyEvent(p_sys, BD_VK_RIGHT);
+    case DEMUX_NAV_POPUP:
+        return sendKeyEvent(p_sys, BD_VK_POPUP);
 
     case DEMUX_CAN_RECORD:
     case DEMUX_GET_FPS:
