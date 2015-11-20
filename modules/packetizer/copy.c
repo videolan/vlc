@@ -61,6 +61,7 @@ struct decoder_sys_t
 
 static block_t *Packetize   ( decoder_t *, block_t ** );
 static block_t *PacketizeSub( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 static void ParseWMV3( decoder_t *, block_t * );
 
@@ -87,6 +88,7 @@ static int Open( vlc_object_t *p_this )
         p_dec->pf_packetize = PacketizeSub;
     else
         p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush = Flush;
 
     /* Create the output format */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -132,6 +134,16 @@ static void Close( vlc_object_t *p_this )
 
     es_format_Clean( &p_dec->fmt_out );
     free( p_dec->p_sys );
+}
+
+static void Flush( decoder_t *p_dec )
+{
+    block_t *p_ret = p_dec->p_sys->p_block;
+    if ( p_ret )
+    {
+        block_Release( p_ret );
+        p_dec->p_sys->p_block = NULL;
+    }
 }
 
 /*****************************************************************************
