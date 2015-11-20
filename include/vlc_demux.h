@@ -268,6 +268,7 @@ enum demux_query_e
     DEMUX_NAV_DOWN,            /* res=can fail */
     DEMUX_NAV_LEFT,            /* res=can fail */
     DEMUX_NAV_RIGHT,           /* res=can fail */
+    DEMUX_NAV_POPUP,           /* res=can fail */
 };
 
 /*************************************************************************

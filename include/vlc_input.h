@@ -432,6 +432,7 @@ enum input_query_e
     INPUT_NAV_DOWN,
     INPUT_NAV_LEFT,
     INPUT_NAV_RIGHT,
+    INPUT_NAV_POPUP,
 
     /* Meta datas */
     INPUT_ADD_INFO,   /* arg1= char* arg2= char* arg3=...     res=can fail */
