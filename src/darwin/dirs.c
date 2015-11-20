@@ -74,6 +74,14 @@ char *config_GetLibDir (void)
         /* Do we end by "VLC-Plugin"? oh, we must be the NPAPI plugin */
         if (len >= 10 && !strcmp( psz_img_name + len - 10, "VLC-Plugin"))
             return strdup( dirname(psz_img_name) );
+
+        /* Do we end by "VLC for iOS"? so we are the iOS app */
+        if (len >= 11 && !strcmp( psz_img_name + len - 11, "VLC for iOS"))
+            return strdup( dirname(psz_img_name) );
+
+        /* Do we end by "VLC-TV"? so we are the tvOS app */
+        if (len >= 6 && !strcmp( psz_img_name + len - 6, "VLC-TV"))
+            return strdup( dirname(psz_img_name) );
     }
 
     /* we are not part of any Mac-style package but were installed
