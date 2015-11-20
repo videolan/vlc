@@ -111,7 +111,6 @@ struct intf_sys_t
  *****************************************************************************/
 
 vlc_module_begin()
-    /* Minimal interface. see intf.m */
     set_shortname("iOS Dialogs")
     add_shortcut("ios_dialog_provider", "miosx")
     set_description("iOS Dialog Provider")
@@ -321,22 +320,20 @@ bool checkProgressPanel (void *priv)
                                                                              message:dialog[@"message"]
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK"
+    UIAlertAction *action = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
                                                      style:UIAlertActionStyleDestructive
                                                    handler:^(UIAlertAction * _Nonnull action) {
-                                                       [action release];
-                                                       [alertController release];
                                                        [dialog release];
                                                    }];
     [alertController addAction:action];
     [alertController setPreferredAction:action];
 
-    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
+    [[[[UIApplication sharedApplication].delegate.window rootViewController] presentedViewController] presentViewController:alertController animated:YES completion:nil];
 #else
     VLCBlockingAlertView *alert = [[VLCBlockingAlertView alloc] initWithTitle:dialog[@"title"]
                                                                       message:dialog[@"message"]
                                                                      delegate:nil
-                                                            cancelButtonTitle:@"OK"
+                                                            cancelButtonTitle:NSLocalizedString(@"OK", nil)
                                                             otherButtonTitles:nil];
     alert.completion = ^(BOOL cancelled, NSInteger buttonIndex) {
         [alert release];
@@ -355,22 +352,20 @@ bool checkProgressPanel (void *priv)
                                                                              message:dialog[@"message"]
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK"
+    UIAlertAction *action = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
                                                      style:UIAlertActionStyleDestructive
                                                    handler:^(UIAlertAction * _Nonnull action) {
-                                                       [action release];
-                                                       [alertController release];
                                                        [dialog release];
                                                    }];
     [alertController addAction:action];
     [alertController setPreferredAction:action];
 
-    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
+    [[[[UIApplication sharedApplication].delegate.window rootViewController] presentedViewController] presentViewController:alertController animated:YES completion:nil];
 #else
     VLCBlockingAlertView *alert = [[VLCBlockingAlertView alloc] initWithTitle:dialog[@"title"]
                                                                       message:dialog[@"message"]
                                                                      delegate:nil
-                                                            cancelButtonTitle:@"OK"
+                                                            cancelButtonTitle:NSLocalizedString(@"OK", nil)
                                                             otherButtonTitles:nil];
     alert.completion = ^(BOOL cancelled, NSInteger buttonIndex) {
         [alert release];
@@ -384,52 +379,42 @@ bool checkProgressPanel (void *priv)
 {
 #if TARGET_OS_TV
     __block int ret = 0;
-    __block UIAlertController *alertController;
-    __block UIAlertAction *yesAction;
-    __block UIAlertAction *noAction;
-    __block UIAlertAction *cancelAction;
 
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        alertController = [UIAlertController alertControllerWithTitle:dialog[@"title"]
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:dialog[@"title"]
                                                                                  message:dialog[@"message"]
                                                                           preferredStyle:UIAlertControllerStyleAlert];
 
-        cancelAction = [UIAlertAction actionWithTitle:dialog[@"cancel"]
-                                                               style:UIAlertActionStyleDestructive
-                                                             handler:^(UIAlertAction * _Nonnull action) {
-                                                                 ret = 3;
-                                                                 dispatch_semaphore_signal(sema);
-                                                             }];
-        [alertController addAction:cancelAction];
+        [alertController addAction:[UIAlertAction actionWithTitle:dialog[@"cancel"]
+                                                            style:UIAlertActionStyleDestructive
+                                                          handler:^(UIAlertAction * _Nonnull action) {
+                                                              ret = 3;
+                                                              dispatch_semaphore_signal(sema);
+                                                          }]];
 
-        yesAction = [UIAlertAction actionWithTitle:dialog[@"yes"]
-                                             style:UIAlertActionStyleDestructive
-                                           handler:^(UIAlertAction * _Nonnull action) {
-                                               ret = 0;
-                                               dispatch_semaphore_signal(sema);
-                                           }];
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:dialog[@"yes"]
+                                                            style:UIAlertActionStyleDestructive
+                                                          handler:^(UIAlertAction * _Nonnull action) {
+                                                              ret = 0;
+                                                              dispatch_semaphore_signal(sema);
+                                                          }];
         [alertController addAction:yesAction];
         [alertController setPreferredAction:yesAction];
 
-        noAction = [UIAlertAction actionWithTitle:dialog[@"yes"]
-                                            style:UIAlertActionStyleDestructive
-                                          handler:^(UIAlertAction * _Nonnull action) {
-                                              ret = 1;
-                                              dispatch_semaphore_signal(sema);
-                                          }];
-        [alertController addAction:noAction];
+        [alertController addAction:[UIAlertAction actionWithTitle:dialog[@"yes"]
+                                                            style:UIAlertActionStyleDestructive
+                                                          handler:^(UIAlertAction * _Nonnull action) {
+                                                              ret = 1;
+                                                              dispatch_semaphore_signal(sema);
+                                                          }]];
 
-        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
+        [[[[UIApplication sharedApplication].delegate.window rootViewController] presentedViewController] presentViewController:alertController animated:YES completion:nil];
     });
 
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
-    [cancelAction release];
-    [yesAction release];
-    [noAction release];
-    [alertController release];
     [dialog release];
 
     return @(ret);
@@ -468,11 +453,10 @@ bool checkProgressPanel (void *priv)
 {
 #if TARGET_OS_TV
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    __block UIAlertController *alertController;
-    __block NSDictionary *dict;
+    __block NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        alertController = [UIAlertController alertControllerWithTitle:dialog[@"title"]
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:dialog[@"title"]
                                                                                  message:dialog[@"message"]
                                                                           preferredStyle:UIAlertControllerStyleAlert];
 
@@ -480,37 +464,36 @@ bool checkProgressPanel (void *priv)
         __block UITextField *passwordField = nil;
         [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
             usernameField = textField;
+            textField.placeholder = NSLocalizedString(@"User", nil);
         }];
         [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
             textField.secureTextEntry = YES;
+            textField.placeholder = NSLocalizedString(@"Password", nil);
             passwordField = textField;
         }];
-        [alertController addAction:[[UIAlertAction actionWithTitle:@"Login"
-                                                             style:UIAlertActionStyleDefault
-                                                           handler:^(UIAlertAction * _Nonnull action) {
-                                                               NSString *user = usernameField.text;
-                                                               NSString *pass = passwordField.text;
-                                                               dict = [[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                        user ? user : @"", @"username",
-                                                                        pass ? pass : @"", @"password",
-                                                                        nil] retain];
-                                                               dispatch_semaphore_signal(sema);
-                                                           }] autorelease]];
 
-        [alertController addAction:[[UIAlertAction actionWithTitle:@"Cancel"
-                                                             style:UIAlertActionStyleCancel
-                                                           handler:^(UIAlertAction * _Nonnull action) {
-                                                               dispatch_semaphore_signal(sema);
-                                                           }] autorelease]];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Login", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * _Nonnull action) {
+                                                              NSString *user = usernameField.text;
+                                                              NSString *pass = passwordField.text;
+                                                              [dict setObject:user ? user : @"" forKey:@"username"];
+                                                              [dict setObject:pass ? pass : @"" forKey:@"password"];
+                                                              dispatch_semaphore_signal(sema);
+                                                          }]];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                            style:UIAlertActionStyleCancel
+                                                          handler:^(UIAlertAction * _Nonnull action) {
+                                                              dispatch_semaphore_signal(sema);
+                                                          }]];
 
-        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alertController animated:YES completion:nil];
+        [[[[UIApplication sharedApplication].delegate.window rootViewController] presentedViewController] presentViewController:alertController animated:YES completion:nil];
     });
 
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
-    [alertController release];
     [dialog release];
-    return dict;
+    return [dict copy];
 #else
     __block NSDictionary *dict;
     __block VLCBlockingAlertView *alert;
@@ -521,8 +504,8 @@ bool checkProgressPanel (void *priv)
         alert = [[VLCBlockingAlertView alloc] initWithTitle:dialog[@"title"]
                                                     message:dialog[@"message"]
                                                    delegate:nil
-                                          cancelButtonTitle:@"Cancel"
-                                          otherButtonTitles:@"Login", nil];
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+                                          otherButtonTitles:NSLocalizedString(@"Login", nil), nil];
         alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
         alert.completion = ^(BOOL cancelled, NSInteger buttonIndex) {
             if (!cancelled) {
