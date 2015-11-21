@@ -260,6 +260,23 @@ struct vlc_h2_frame *vlc_h2_frame_settings_ack(void)
                               0);
 }
 
+const char *vlc_h2_setting_name(uint_fast16_t id)
+{
+    static const char names[][20] = {
+        [0]                                     = "Unknown setting",
+        [VLC_H2_SETTING_HEADER_TABLE_SIZE]      = "Header table size",
+        [VLC_H2_SETTING_ENABLE_PUSH]            = "Enable push",
+        [VLC_H2_SETTING_MAX_CONCURRENT_STREAMS] = "Concurrent streams",
+        [VLC_H2_SETTING_INITIAL_WINDOW_SIZE]    = "Initial window size",
+        [VLC_H2_SETTING_MAX_FRAME_SIZE]         = "Frame size",
+        [VLC_H2_SETTING_MAX_HEADER_LIST_SIZE]   = "Header list size",
+    };
+
+    if (id >= sizeof (names) / sizeof (names[0]) || names[id][0] == '\0')
+        id = 0;
+    return names[id];
+}
+
 struct vlc_h2_frame *vlc_h2_frame_ping(uint64_t opaque)
 {
     struct vlc_h2_frame *f = vlc_h2_frame_alloc(VLC_H2_FRAME_PING, 0, 0, 8);
@@ -305,4 +322,28 @@ vlc_h2_frame_window_update(uint_fast32_t stream_id, uint_fast32_t credit)
         SetDWBE(p, credit);
     }
     return f;
+}
+
+const char *vlc_h2_strerror(uint_fast32_t code)
+{
+    static const char names[][20] = {
+        [VLC_H2_NO_ERROR]            = "No error",
+        [VLC_H2_PROTOCOL_ERROR]      = "Protocol error",
+        [VLC_H2_INTERNAL_ERROR]      = "Internal error",
+        [VLC_H2_FLOW_CONTROL_ERROR]  = "Flow control error",
+        [VLC_H2_SETTINGS_TIMEOUT]    = "Settings time-out",
+        [VLC_H2_STREAM_CLOSED]       = "Stream closed",
+        [VLC_H2_FRAME_SIZE_ERROR]    = "Frame size error",
+        [VLC_H2_REFUSED_STREAM]      = "Refused stream",
+        [VLC_H2_CANCEL]              = "Cancellation",
+        [VLC_H2_COMPRESSION_ERROR]   = "Compression error",
+        [VLC_H2_CONNECT_ERROR]       = "CONNECT error",
+        [VLC_H2_ENHANCE_YOUR_CALM]   = "Excessive load",
+        [VLC_H2_INADEQUATE_SECURITY] = "Inadequate security",
+        [VLC_H2_HTTP_1_1_REQUIRED]   = "Required HTTP/1.1",
+    };
+
+    if (code >= sizeof (names) / sizeof (names[0]) || names[code][0] == '\0')
+        return "Unknown error";
+    return names[code];
 }

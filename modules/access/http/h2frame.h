@@ -61,6 +61,8 @@ enum vlc_h2_error {
     VLC_H2_HTTP_1_1_REQUIRED,
 };
 
+const char *vlc_h2_strerror(uint_fast32_t);
+
 enum vlc_h2_setting {
     VLC_H2_SETTING_HEADER_TABLE_SIZE = 0x0001,
     VLC_H2_SETTING_ENABLE_PUSH,
@@ -69,6 +71,8 @@ enum vlc_h2_setting {
     VLC_H2_SETTING_MAX_FRAME_SIZE,
     VLC_H2_SETTING_MAX_HEADER_LIST_SIZE,
 };
+
+const char *vlc_h2_setting_name(uint_fast16_t);
 
 /* Our settings */
 #define VLC_H2_MAX_HEADER_TABLE   4096 /* Header (compression) table size */
