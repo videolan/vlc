@@ -145,6 +145,20 @@ static seekpoint_t * getChapterEntry( unsigned int i_index, chapters_array_t *p_
     return p_array->pp_chapters[i_index];
 }
 
+#define XIPHMETA_Title        (1 << 0)
+#define XIPHMETA_Artist       (1 << 1)
+#define XIPHMETA_Genre        (1 << 2)
+#define XIPHMETA_Copyright    (1 << 3)
+#define XIPHMETA_Album        (1 << 4)
+#define XIPHMETA_TrackNum     (1 << 5)
+#define XIPHMETA_Description  (1 << 6)
+#define XIPHMETA_Rating       (1 << 7)
+#define XIPHMETA_Date         (1 << 8)
+#define XIPHMETA_Language     (1 << 9)
+#define XIPHMETA_Publisher    (1 << 10)
+#define XIPHMETA_EncodedBy    (1 << 11)
+#define XIPHMETA_TrackTotal   (1 << 12)
+
 void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         const uint8_t *p_data, int i_data,
         int *i_attachments, input_attachment_t ***attachments,
@@ -187,19 +201,7 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         return;
 
     /* */
-    bool hasTitle        = false;
-    bool hasArtist       = false;
-    bool hasGenre        = false;
-    bool hasCopyright    = false;
-    bool hasAlbum        = false;
-    bool hasTrackNum     = false;
-    bool hasDescription  = false;
-    bool hasRating       = false;
-    bool hasDate         = false;
-    bool hasLanguage     = false;
-    bool hasPublisher    = false;
-    bool hasEncodedBy    = false;
-    bool hasTrackTotal   = false;
+    unsigned hasMetaFlags = 0;
 
     chapters_array_t chapters_array = { 0, NULL };
 
@@ -223,7 +225,7 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
     if( !strncasecmp(psz_comment, txt, strlen(txt)) ) \
     { \
         const char *oldval = vlc_meta_Get( p_meta, vlc_meta_ ## var ); \
-        if( oldval && has##var) \
+        if( oldval && (hasMetaFlags & XIPHMETA_##var)) \
         { \
             char * newval; \
             if( asprintf( &newval, "%s,%s", oldval, &psz_comment[strlen(txt)] ) == -1 ) \
@@ -233,14 +235,14 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         } \
         else \
             vlc_meta_Set( p_meta, vlc_meta_ ## var, &psz_comment[strlen(txt)] ); \
-        has##var = true; \
+        hasMetaFlags |= XIPHMETA_##var; \
     }
 
 #define IF_EXTRACT_ONCE(txt,var) \
-    if( !strncasecmp(psz_comment, txt, strlen(txt)) && !has##var ) \
+    if( !strncasecmp(psz_comment, txt, strlen(txt)) && !(hasMetaFlags & XIPHMETA_##var) ) \
     { \
         vlc_meta_Set( p_meta, vlc_meta_ ## var, &psz_comment[strlen(txt)] ); \
-        has##var = true; \
+        hasMetaFlags |= XIPHMETA_##var; \
     }
 
 #define IF_EXTRACT_FMT(txt,var,fmt,target) \
@@ -256,7 +258,7 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         else IF_EXTRACT("GENRE=", Genre )
         else IF_EXTRACT("COPYRIGHT=", Copyright )
         else IF_EXTRACT("ALBUM=", Album )
-        else if( !hasTrackNum && !strncasecmp(psz_comment, "TRACKNUMBER=", strlen("TRACKNUMBER=" ) ) )
+        else if( !(hasMetaFlags & XIPHMETA_TrackNum) && !strncasecmp(psz_comment, "TRACKNUMBER=", strlen("TRACKNUMBER=" ) ) )
         {
             /* Yeah yeah, such a clever idea, let's put xx/xx inside TRACKNUMBER
              * Oh, and let's not use TRACKTOTAL or TOTALTRACKS... */
@@ -266,15 +268,15 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
                 char str[6];
                 snprintf(str, 6, "%u", u_track);
                 vlc_meta_Set( p_meta, vlc_meta_TrackNumber, str );
-                hasTrackNum = true;
+                hasMetaFlags |= XIPHMETA_TrackNum;
                 snprintf(str, 6, "%u", u_total);
                 vlc_meta_Set( p_meta, vlc_meta_TrackTotal, str );
-                hasTrackTotal = true;
+                hasMetaFlags |= XIPHMETA_TrackTotal;
             }
             else
             {
                 vlc_meta_Set( p_meta, vlc_meta_TrackNumber, &psz_comment[strlen("TRACKNUMBER=")] );
-                hasTrackNum = true;
+                hasMetaFlags |= XIPHMETA_TrackNum;
             }
         }
         else IF_EXTRACT_ONCE("TRACKTOTAL=", TrackTotal )
