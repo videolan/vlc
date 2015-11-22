@@ -40,6 +40,7 @@
 #include "../platform_fonts.h"
 
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor);
+void addNewFonttofamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *family);
 
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 {
@@ -53,6 +54,28 @@ char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
     CFRelease(path);
     CFRelease(url);
     return retPath;
+}
+
+void addNewFonttofamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family)
+{
+    bool b_bold = false;
+    bool b_italic = false;
+    CFDictionaryRef fontTraits = CTFontDescriptorCopyAttribute(iter, kCTFontTraitsAttribute);
+    CFNumberRef trait = CFDictionaryGetValue(fontTraits, kCTFontWeightTrait);
+    float traitValue = 0.;
+    CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
+    b_bold = traitValue > 0.23;
+    trait = CFDictionaryGetValue(fontTraits, kCTFontSlantTrait);
+    traitValue = 0.;
+    CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
+    b_italic = traitValue > 0.03;
+
+//#ifndef NDEBUG
+    msg_Dbg(p_filter, "New font: bold %i italic %i path '%s'", b_bold, b_italic, path);
+//#endif
+    NewFont(path, 0, b_bold, b_italic, p_family);
+
+    CFRelease(fontTraits);
 }
 
 const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_family)
@@ -113,8 +136,6 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
     CFIndex numberOfFoundFontDescriptions = CFArrayGetCount(matchedFontDescriptions);
 
     char *path = NULL;
-    bool b_bold = false;
-    bool b_italic = false;
 
     for (CFIndex i = 0; i < numberOfFoundFontDescriptions; i++) {
         CTFontDescriptorRef iter = CFArrayGetValueAtIndex(matchedFontDescriptions, i);
@@ -128,22 +149,7 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
             }
         }
 
-        CFDictionaryRef fontTraits = CTFontDescriptorCopyAttribute(iter, kCTFontTraitsAttribute);
-        CFNumberRef trait = CFDictionaryGetValue(fontTraits, kCTFontWeightTrait);
-        float traitValue = 0.;
-        CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
-        b_bold = traitValue > 0.23;
-        trait = CFDictionaryGetValue(fontTraits, kCTFontSlantTrait);
-        traitValue = 0.;
-        CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
-        b_italic = traitValue > 0.03;
-
-#ifndef NDEBUG
-        msg_Dbg(p_filter, "New font for family '%s' bold %i italic %i path '%s'", psz_family, b_bold, b_italic, path);
-#endif
-        NewFont(path, 0, b_bold, b_italic, p_family);
-
-        CFRelease(fontTraits);
+        addNewFonttofamily(p_filter, iter, path, p_family);
     }
 
     CFRelease(matchedFontDescriptions);
@@ -162,8 +168,72 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
 
 vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, uni_char_t codepoint)
 {
-    VLC_UNUSED(p_filter);
-    VLC_UNUSED(psz_family);
-    VLC_UNUSED(codepoint);
-    return NULL;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    if (unlikely(psz_family == NULL)) {
+        return NULL;
+    }
+
+    vlc_family_t *p_family = NULL;
+    CFStringRef postScriptFallbackFontname = NULL;
+    CTFontDescriptorRef fallbackFontDescriptor = NULL;
+    char *psz_lc_fallback = NULL;
+    char *psz_fontPath = NULL;
+
+    CFStringRef familyName = CFStringCreateWithCString(kCFAllocatorDefault,
+                                                       psz_family,
+                                                       kCFStringEncodingUTF8);
+    CTFontRef font = CTFontCreateWithName(familyName, 0, NULL);
+    CFStringRef codepointString = CFStringCreateWithBytes(kCFAllocatorDefault, (const UInt8 *)&codepoint, sizeof(codepoint), kCFStringEncodingUTF32LE, false);
+    CTFontRef fallbackFont = CTFontCreateForString(font, codepointString, CFRangeMake(0,1));
+    CFStringRef fallbackFontFamilyName = CTFontCopyFamilyName(fallbackFont);
+
+    /* create a new family object */
+    const char *psz_fallbackFamilyName = CFStringGetCStringPtr(fallbackFontFamilyName, kCFStringEncodingUTF8);
+    if (psz_fallbackFamilyName == NULL) {
+        goto done;
+    }
+#ifndef NDEBUG
+    msg_Dbg(p_filter, "Will deploy fallback font '%s'", psz_fallbackFamilyName);
+#endif
+
+    psz_lc_fallback = ToLower(strdup(psz_fallbackFamilyName));
+
+    p_family = vlc_dictionary_value_for_key(&p_sys->family_map, psz_lc_fallback);
+    if (p_family) {
+        goto done;
+    }
+
+    p_family = NewFamily(p_filter, psz_lc_fallback, &p_sys->p_families, &p_sys->family_map, psz_lc_fallback);
+    if (unlikely(!p_family)) {
+        goto done;
+    }
+
+    postScriptFallbackFontname = CTFontCopyPostScriptName(fallbackFont);
+    fallbackFontDescriptor = CTFontDescriptorCreateWithNameAndSize(postScriptFallbackFontname, 0.);
+    psz_fontPath = getPathForFontDescription(fallbackFontDescriptor);
+
+    /* check if the path is empty, which can happen in rare circumstances */
+    if (psz_fontPath != NULL) {
+        if (strcmp("", psz_fontPath) == 0) {
+            goto done;
+        }
+    } else {
+        goto done;
+    }
+
+    addNewFonttofamily(p_filter, fallbackFontDescriptor, strdup(psz_fontPath), p_family);
+
+done:
+    CFRelease(familyName);
+    CFRelease(font);
+    CFRelease(codepointString);
+    CFRelease(fallbackFont);
+    CFRelease(fallbackFontFamilyName);
+    free(psz_lc_fallback);
+    free(psz_fontPath);
+    if (postScriptFallbackFontname != NULL)
+        CFRelease(postScriptFallbackFontname);
+    if (fallbackFontDescriptor != NULL)
+        CFRelease(fallbackFontDescriptor);
+    return p_family;
 }
