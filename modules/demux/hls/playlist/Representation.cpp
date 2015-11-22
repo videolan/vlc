@@ -26,6 +26,7 @@
 #include "Representation.hpp"
 #include "M3U8.hpp"
 #include "Parser.hpp"
+#include "HLSSegment.hpp"
 #include "../adaptative/playlist/BasePeriod.h"
 #include "../adaptative/playlist/BaseAdaptationSet.h"
 #include "../adaptative/playlist/SegmentList.h"
@@ -101,7 +102,7 @@ bool Representation::needsUpdate() const
     return true;
 }
 
-void Representation::runLocalUpdates(mtime_t /*currentplaybacktime*/, uint64_t number)
+void Representation::runLocalUpdates(mtime_t, uint64_t number, bool prune)
 {
     const time_t now = time(NULL);
     const AbstractPlaylist *playlist = getPlaylist();
@@ -111,7 +112,8 @@ void Representation::runLocalUpdates(mtime_t /*currentplaybacktime*/, uint64_t n
         parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this);
         b_loaded = true;
 
-        pruneBySegmentNumber(number);
+        if(prune)
+            pruneBySegmentNumber(number);
 
         /* Compute new update time */
         mtime_t mininterval = 0;
@@ -142,4 +144,32 @@ void Representation::getDurationsRange(mtime_t *min, mtime_t *max) const
     if(!b_loaded)
         return;
     BaseRepresentation::getDurationsRange(min, max);
+}
+
+uint64_t Representation::translateSegmentNumber(uint64_t num, const SegmentInformation *from) const
+{
+    if(consistentSegmentNumber())
+        return num;
+    ISegment *fromSeg = from->getSegment(SegmentInfoType::INFOTYPE_MEDIA, num);
+    HLSSegment *fromHlsSeg = dynamic_cast<HLSSegment *>(fromSeg);
+    if(!fromHlsSeg)
+        return 1;
+    const mtime_t utcTime = fromHlsSeg->getUTCTime();
+
+    std::vector<ISegment *> list;
+    std::vector<ISegment *>::const_iterator it;
+    getSegments(SegmentInfoType::INFOTYPE_MEDIA, list);
+    for(it=list.begin(); it != list.end(); ++it)
+    {
+        const HLSSegment *hlsSeg = dynamic_cast<HLSSegment *>(*it);
+        if(hlsSeg)
+        {
+            if (hlsSeg->getUTCTime() <= utcTime)
+                num = hlsSeg->getSequenceNumber();
+            else
+                return num;
+        }
+    }
+
+    return 1;
 }

@@ -29,6 +29,7 @@
 #include "../adaptative/playlist/SegmentList.h"
 #include "../adaptative/tools/Retrieve.hpp"
 #include "../adaptative/tools/Helper.h"
+#include "../adaptative/tools/Conversions.hpp"
 #include "M3U8.hpp"
 #include "Tags.hpp"
 
@@ -214,6 +215,7 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
 
     mtime_t totalduration = 0;
     mtime_t nzStartTime = 0;
+    mtime_t absReferenceTime = VLC_TS_INVALID;
     uint64_t sequenceNumber = 0;
     bool discontinuity = false;
     std::size_t prevbyterangeoffset = 0;
@@ -267,6 +269,12 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                         segment->startTime.Set(nzStartTime * rep->timescale.Get() / CLOCK_FREQ);
                         nzStartTime += nzDuration;
                         totalduration += nzDuration;
+
+                        if(absReferenceTime > VLC_TS_INVALID)
+                        {
+                            segment->utcTime = absReferenceTime;
+                            absReferenceTime += nzDuration;
+                        }
                     }
                     ctx_extinf = NULL;
                 }
@@ -300,6 +308,12 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
 
             case SingleValueTag::EXTXBYTERANGE:
                 ctx_byterange = static_cast<const SingleValueTag *>(tag);
+                break;
+
+            case SingleValueTag::EXTXPROGRAMDATETIME:
+                rep->b_consistent = false;
+                absReferenceTime = VLC_TS_0 +
+                        UTCTime(static_cast<const SingleValueTag *>(tag)->getValue().value).mtime();
                 break;
 
             case AttributesTag::EXTXKEY:

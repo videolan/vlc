@@ -113,7 +113,7 @@ namespace adaptative
             StreamFormat format;
             AbstractAdaptationLogic *logic;
             BaseAdaptationSet *adaptationSet;
-            BaseRepresentation *prevRepresentation;
+            BaseRepresentation *curRepresentation;
             std::list<SegmentTrackerListenerInterface *> listeners;
     };
 }

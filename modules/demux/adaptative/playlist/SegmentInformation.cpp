@@ -398,7 +398,14 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
         childs.at(i)->pruneBySegmentNumber(num);
 }
 
-void SegmentInformation::runLocalUpdates(mtime_t, uint64_t)
+uint64_t SegmentInformation::translateSegmentNumber(uint64_t num, const SegmentInformation *from) const
+{
+    mtime_t time = from->getPlaybackTimeBySegmentNumber(num);
+    getSegmentNumberByTime(time, &num);
+    return num;
+}
+
+void SegmentInformation::runLocalUpdates(mtime_t, uint64_t, bool)
 {
 
 }

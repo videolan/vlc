@@ -54,7 +54,7 @@ SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSe
     initializing = true;
     index_sent = false;
     init_sent = false;
-    prevRepresentation = NULL;
+    curRepresentation = NULL;
     setAdaptationLogic(logic_);
     adaptationSet = adaptSet;
     format = StreamFormat::UNSUPPORTED;
@@ -73,8 +73,8 @@ void SegmentTracker::setAdaptationLogic(AbstractAdaptationLogic *logic_)
 
 void SegmentTracker::reset()
 {
-    notify(SegmentTrackerEvent(prevRepresentation, NULL));
-    prevRepresentation = NULL;
+    notify(SegmentTrackerEvent(curRepresentation, NULL));
+    curRepresentation = NULL;
     init_sent = false;
     index_sent = false;
     initializing = true;
@@ -83,7 +83,7 @@ void SegmentTracker::reset()
 
 SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionManager *connManager)
 {
-    BaseRepresentation *rep = NULL;
+    BaseRepresentation *rep = NULL, *prevRep = NULL;
     ISegment *segment;
 
     if(!adaptationSet)
@@ -92,26 +92,27 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
     /* Ensure we don't keep chaining init/index without data */
     if( initializing )
     {
-        if( prevRepresentation )
+        if( curRepresentation )
             switch_allowed = false;
         else
             switch_allowed = true;
     }
 
     if( !switch_allowed ||
-       (prevRepresentation && prevRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE) )
-        rep = prevRepresentation;
+       (curRepresentation && curRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE) )
+        rep = curRepresentation;
     else
-        rep = logic->getNextRepresentation(adaptationSet, prevRepresentation);
+        rep = logic->getNextRepresentation(adaptationSet, curRepresentation);
 
     if ( rep == NULL )
             return NULL;
 
 
-    if(rep != prevRepresentation)
+    if(rep != curRepresentation)
     {
-        notify(SegmentTrackerEvent(prevRepresentation, rep));
-        prevRepresentation = rep;
+        notify(SegmentTrackerEvent(curRepresentation, rep));
+        prevRep = curRepresentation;
+        curRepresentation = rep;
         init_sent = false;
         index_sent = false;
         initializing = true;
@@ -119,7 +120,16 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
 
     /* Ensure ephemere content is updated/loaded */
     if(rep->needsUpdate())
-        updateSelected();
+        rep->runLocalUpdates(getSegmentStart(), count, false);
+
+    if(prevRep && !rep->consistentSegmentNumber())
+    {
+        /* Convert our segment number */
+        count = rep->translateSegmentNumber(count, prevRep);
+    }
+
+    if(!rep->consistentSegmentNumber())
+        curRepresentation->pruneBySegmentNumber(count);
 
     if(!init_sent)
     {
@@ -171,7 +181,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
 bool SegmentTracker::setPositionByTime(mtime_t time, bool restarted, bool tryonly)
 {
     uint64_t segnumber;
-    BaseRepresentation *rep = prevRepresentation;
+    BaseRepresentation *rep = curRepresentation;
     if(!rep)
         rep = logic->getNextRepresentation(adaptationSet, NULL);
 
@@ -198,8 +208,8 @@ void SegmentTracker::setPositionByNumber(uint64_t segnumber, bool restarted)
 
 mtime_t SegmentTracker::getSegmentStart() const
 {
-    if(prevRepresentation)
-        return prevRepresentation->getPlaybackTimeBySegmentNumber(count);
+    if(curRepresentation)
+        return curRepresentation->getPlaybackTimeBySegmentNumber(count);
     else
         return 0;
 }
@@ -218,8 +228,8 @@ void SegmentTracker::pruneFromCurrent()
 
 void SegmentTracker::updateSelected()
 {
-    if(prevRepresentation)
-        prevRepresentation->runLocalUpdates(getSegmentStart(), count);
+    if(curRepresentation)
+        curRepresentation->runLocalUpdates(getSegmentStart(), count, true);
 }
 
 void SegmentTracker::notify(const SegmentTrackerEvent &event)

@@ -40,6 +40,7 @@ BaseRepresentation::BaseRepresentation( BaseAdaptationSet *set ) :
                 adaptationSet   ( set ),
                 bandwidth       (0)
 {
+    b_consistent = true;
 }
 
 BaseRepresentation::~BaseRepresentation ()
@@ -74,6 +75,11 @@ void BaseRepresentation::addCodec(const std::string &codec)
 bool BaseRepresentation::needsUpdate() const
 {
     return false;
+}
+
+bool BaseRepresentation::consistentSegmentNumber() const
+{
+    return b_consistent;
 }
 
 void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
