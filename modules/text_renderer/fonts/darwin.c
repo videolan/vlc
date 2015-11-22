@@ -55,18 +55,33 @@ char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
     return retPath;
 }
 
-char* CoreText_Select( filter_t *p_filter, const char* psz_fontname,
-                       bool b_bold, bool b_italic,
-                       int *i_idx, uni_char_t codepoint )
+const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_family)
 {
-    VLC_UNUSED( i_idx );
-    VLC_UNUSED( b_bold );
-    VLC_UNUSED( b_italic );
-    VLC_UNUSED( codepoint );
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( psz_fontname == NULL )
+    if (unlikely(psz_family == NULL)) {
         return NULL;
+    }
 
+    char *psz_lc = ToLower(psz_family);
+    if (unlikely(!psz_lc)) {
+        return NULL;
+    }
+
+    /* let's double check if we have parsed this family already */
+    vlc_family_t *p_family = vlc_dictionary_value_for_key(&p_sys->family_map, psz_lc);
+    if (p_family) {
+        free(psz_lc);
+        return p_family;
+    }
+
+    /* create a new family object */
+    p_family = NewFamily(p_filter, psz_lc, &p_sys->p_families, &p_sys->family_map, psz_lc);
+    if (unlikely(!p_family)) {
+        return NULL;
+    }
+
+    /* we search for family name, display name and name to find them all */
     const size_t numberOfAttributes = 3;
     CTFontDescriptorRef coreTextFontDescriptors[numberOfAttributes];
     CFMutableDictionaryRef coreTextAttributes[numberOfAttributes];
@@ -76,12 +91,16 @@ char* CoreText_Select( filter_t *p_filter, const char* psz_fontname,
         kCTFontNameAttribute,
     };
 
-    CFStringRef fontName = CFStringCreateWithCString(kCFAllocatorDefault,
-                                                     psz_fontname,
-                                                     kCFStringEncodingUTF8);
+#ifndef NDEBUG
+    msg_Dbg(p_filter, "Creating new family for '%s'", psz_family);
+#endif
+
+    CFStringRef familyName = CFStringCreateWithCString(kCFAllocatorDefault,
+                                                       psz_family,
+                                                       kCFStringEncodingUTF8);
     for (size_t x = 0; x < numberOfAttributes; x++) {
         coreTextAttributes[x] = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
-        CFDictionaryAddValue(coreTextAttributes[x], attributeNames[x], fontName);
+        CFDictionaryAddValue(coreTextAttributes[x], attributeNames[x], familyName);
         coreTextFontDescriptors[x] = CTFontDescriptorCreateWithAttributes(coreTextAttributes[x]);
     }
 
@@ -94,6 +113,8 @@ char* CoreText_Select( filter_t *p_filter, const char* psz_fontname,
     CFIndex numberOfFoundFontDescriptions = CFArrayGetCount(matchedFontDescriptions);
 
     char *path = NULL;
+    bool b_bold = false;
+    bool b_italic = false;
 
     for (CFIndex i = 0; i < numberOfFoundFontDescriptions; i++) {
         CTFontDescriptorRef iter = CFArrayGetValueAtIndex(matchedFontDescriptions, i);
@@ -107,10 +128,23 @@ char* CoreText_Select( filter_t *p_filter, const char* psz_fontname,
             }
         }
 
-        break;
-    }
+        CFDictionaryRef fontTraits = CTFontDescriptorCopyAttribute(iter, kCTFontTraitsAttribute);
+        CFNumberRef trait = CFDictionaryGetValue(fontTraits, kCTFontWeightTrait);
+        float traitValue = 0.;
+        CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
+        b_bold = traitValue > 0.23;
+        trait = CFDictionaryGetValue(fontTraits, kCTFontSlantTrait);
+        traitValue = 0.;
+        CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
+        b_italic = traitValue > 0.03;
 
-    msg_Dbg( p_filter, "found '%s'", path );
+#ifndef NDEBUG
+        msg_Dbg(p_filter, "New font for family '%s' bold %i italic %i path '%s'", psz_family, b_bold, b_italic, path);
+#endif
+        NewFont(path, 0, b_bold, b_italic, p_family);
+
+        CFRelease(fontTraits);
+    }
 
     CFRelease(matchedFontDescriptions);
     CFRelease(coreTextFontCollection);
@@ -121,7 +155,15 @@ char* CoreText_Select( filter_t *p_filter, const char* psz_fontname,
     }
 
     CFRelease(coreTextFontDescriptorsArray);
-    CFRelease(fontName);
+    CFRelease(familyName);
 
-    return path;
+    return p_family;
+}
+
+vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, uni_char_t codepoint)
+{
+    VLC_UNUSED(p_filter);
+    VLC_UNUSED(psz_family);
+    VLC_UNUSED(codepoint);
+    return NULL;
 }

@@ -49,8 +49,8 @@
 
 /* Default fonts */
 #ifdef __APPLE__
-# define SYSTEM_DEFAULT_FONT_FILE "/Library/Fonts/Arial Unicode.ttf"
-# define SYSTEM_DEFAULT_FAMILY "Arial Unicode MS"
+# define SYSTEM_DEFAULT_FONT_FILE "/System/Library/Fonts/HelveticaNeue.dfont"
+# define SYSTEM_DEFAULT_FAMILY "Helvetica Neue"
 # define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "/System/Library/Fonts/Monaco.dfont"
 # define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Monaco"
 #elif defined( _WIN32 )
@@ -151,9 +151,8 @@ const vlc_family_t *Win32_GetFamily( filter_t *p_filter, const char *psz_family 
 #endif /* _WIN32 */
 
 #ifdef __APPLE__
-char* CoreText_Select( filter_t *p_filter, const char* psz_fontname,
-                       bool b_bold, bool b_italic,
-                       int *i_idx, uni_char_t codepoint );
+vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, uni_char_t codepoint);
+const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_family);
 #endif /* __APPLE__ */
 
 #ifdef __ANDROID__

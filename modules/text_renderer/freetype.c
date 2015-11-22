@@ -1263,7 +1263,13 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_get_fallbacks = FontConfig_GetFallbacks;
     FontConfig_Prepare( p_filter );
 #elif defined( __APPLE__ )
-    p_sys->pf_select = CoreText_Select;
+    const char *const ppsz_darwin_default[] =
+    { "Helvetica Neue", "Arial", "GungSeo", "Arial Unicode MS", "PingFang SC", "MalayalamMN" };
+    p_sys->pf_select = Generic_Select;
+    p_sys->pf_get_family = CoreText_GetFamily;
+    p_sys->pf_get_fallbacks = CoreText_GetFallbacks;
+    InitDefaultList( p_filter, ppsz_darwin_default,
+                    sizeof( ppsz_darwin_default ) / sizeof( *ppsz_darwin_default ) );
 #elif defined( _WIN32 ) && defined( HAVE_GET_FONT_BY_FAMILY_NAME )
     const char *const ppsz_win32_default[] =
         { "Tahoma", "FangSong", "SimHei", "KaiTi" };
