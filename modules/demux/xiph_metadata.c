@@ -159,6 +159,149 @@ static seekpoint_t * getChapterEntry( unsigned int i_index, chapters_array_t *p_
 #define XIPHMETA_EncodedBy    (1 << 11)
 #define XIPHMETA_TrackTotal   (1 << 12)
 
+static char * xiph_ExtractCueSheetMeta( const char *psz_line,
+                                        const char *psz_tag, int i_tag,
+                                        bool b_quoted )
+{
+    if( !strncasecmp( psz_line, psz_tag, i_tag ) )
+    {
+        if( !b_quoted )
+            return strdup( &psz_line[i_tag] );
+
+        /* Unquote string value */
+        char *psz_value = malloc( strlen( psz_line ) - i_tag + 1 );
+        if( psz_value )
+        {
+            char *psz_out = psz_value;
+            psz_line += i_tag;
+            bool b_escaped = false;
+            while( *psz_line )
+            {
+                switch( *psz_line )
+                {
+                    case '\\':
+                        if( b_escaped )
+                        {
+                            b_escaped = false;
+                            *(psz_out++) = *psz_line;
+                        }
+                        else
+                        {
+                            b_escaped = true;
+                        }
+                        break;
+                    case '"':
+                        if( b_escaped )
+                        {
+                            b_escaped = false;
+                            *(psz_out++) = *psz_line;
+                        }
+                        break;
+                    default:
+                        *(psz_out++) = *psz_line;
+                        break;
+                }
+                psz_line++;
+            }
+            *psz_out = 0;
+            return psz_value;
+        }
+    }
+    return NULL;
+}
+
+static void xiph_ParseCueSheetMeta( unsigned *pi_flags, vlc_meta_t *p_meta,
+                                    const char *psz_line,
+                                    int *pi_seekpoint, seekpoint_t ***ppp_seekpoint,
+                                    seekpoint_t **pp_tmppoint, bool *pb_valid )
+{
+    VLC_UNUSED(pi_seekpoint);
+    VLC_UNUSED(ppp_seekpoint);
+
+    seekpoint_t *p_seekpoint = *pp_tmppoint;
+    char *psz_string;
+
+#define TRY_EXTRACT_CUEMETA(var, string, quoted) \
+    if( !(*pi_flags & XIPHMETA_##var) &&\
+         ( psz_string = xiph_ExtractCueSheetMeta( psz_line, string, sizeof(string) - 1, quoted ) ) )\
+    {\
+        vlc_meta_Set( p_meta, vlc_meta_##var, psz_string );\
+        free( psz_string );\
+        *pi_flags |= XIPHMETA_##var;\
+    }
+
+    TRY_EXTRACT_CUEMETA(Title, "TITLE \"", true)
+    else TRY_EXTRACT_CUEMETA(Genre, "REM GENRE ", false)
+    else TRY_EXTRACT_CUEMETA(Date, "REM DATE ", false)
+    else TRY_EXTRACT_CUEMETA(Artist, "PERFORMER \"", true)
+    else if( !strncasecmp( psz_line, "  TRACK ", 8 ) )
+    {
+        if( p_seekpoint )
+        {
+            if( *pb_valid )
+                TAB_APPEND( *pi_seekpoint, *ppp_seekpoint, p_seekpoint );
+            else
+                vlc_seekpoint_Delete( p_seekpoint );
+            *pb_valid = false;
+        }
+        *pp_tmppoint = p_seekpoint = vlc_seekpoint_New();
+    }
+    else if( p_seekpoint && !strncasecmp( psz_line, "    INDEX 01 ", 13 ) )
+    {
+        unsigned m, s, f;
+        if( sscanf( &psz_line[13], "%u:%u:%u", &m, &s, &f ) == 3 )
+        {
+            p_seekpoint->i_time_offset = CLOCK_FREQ * (m * 60 + s) + f * CLOCK_FREQ/75;
+            *pb_valid = true;
+        }
+    }
+    else if( p_seekpoint && !p_seekpoint->psz_name )
+    {
+        p_seekpoint->psz_name = xiph_ExtractCueSheetMeta( psz_line, "    TITLE \"", 11, true );
+    }
+}
+
+static void xiph_ParseCueSheet( unsigned *pi_flags, vlc_meta_t *p_meta,
+                                const char *p_data, int i_data,
+                                int *pi_seekpoint, seekpoint_t ***ppp_seekpoint )
+{
+    seekpoint_t *p_seekpoint = NULL;
+    bool b_valid = false;
+
+    const char *p_head = p_data;
+    const char *p_tail = p_head;
+    while( p_tail < p_data + i_data )
+    {
+        if( *p_tail == 0x0D )
+        {
+            char *psz = strndup( p_head, p_tail - p_head );
+            if( psz )
+            {
+                xiph_ParseCueSheetMeta( pi_flags, p_meta, psz,
+                                        pi_seekpoint, ppp_seekpoint,
+                                        &p_seekpoint, &b_valid );
+                free( psz );
+            }
+            if( *(++p_tail) == 0x0A )
+                p_tail++;
+            p_head = p_tail;
+        }
+        else
+        {
+            p_tail++;
+        }
+    }
+
+
+    if( p_seekpoint )
+    {
+        if( b_valid )
+            TAB_APPEND( *pi_seekpoint, *ppp_seekpoint, p_seekpoint );
+        else
+            vlc_seekpoint_Delete( p_seekpoint );
+    }
+}
+
 void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         const uint8_t *p_data, int i_data,
         int *i_attachments, input_attachment_t ***attachments,
@@ -356,6 +499,11 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
                       (((int64_t)h * 3600 + (int64_t)m * 60 + (int64_t)s) * 1000 + ms) * 1000;
                 }
             }
+        }
+        else if( !strncasecmp(psz_comment, "cuesheet=", 9) )
+        {
+            xiph_ParseCueSheet( &hasMetaFlags, p_meta, &psz_comment[9], n - 9,
+                                i_seekpoint, ppp_seekpoint );
         }
         else if( strchr( psz_comment, '=' ) )
         {
