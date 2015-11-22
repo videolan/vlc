@@ -40,7 +40,7 @@
 #include "../platform_fonts.h"
 
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor);
-void addNewFonttofamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *family);
+void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *family);
 
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 {
@@ -56,7 +56,7 @@ char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
     return retPath;
 }
 
-void addNewFonttofamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family)
+void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family)
 {
     bool b_bold = false;
     bool b_italic = false;
@@ -127,7 +127,9 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
         coreTextFontDescriptors[x] = CTFontDescriptorCreateWithAttributes(coreTextAttributes[x]);
     }
 
-    CFArrayRef coreTextFontDescriptorsArray = CFArrayCreate(kCFAllocatorDefault, (const void **)&coreTextFontDescriptors, numberOfAttributes, NULL);
+    CFArrayRef coreTextFontDescriptorsArray = CFArrayCreate(kCFAllocatorDefault,
+                                                            (const void **)&coreTextFontDescriptors,
+                                                            numberOfAttributes, NULL);
 
     CTFontCollectionRef coreTextFontCollection = CTFontCollectionCreateWithFontDescriptors(coreTextFontDescriptorsArray, 0);
 
@@ -149,7 +151,7 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
             }
         }
 
-        addNewFonttofamily(p_filter, iter, path, p_family);
+        addNewFontToFamily(p_filter, iter, path, p_family);
     }
 
     CFRelease(matchedFontDescriptions);
@@ -183,7 +185,12 @@ vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, 
                                                        psz_family,
                                                        kCFStringEncodingUTF8);
     CTFontRef font = CTFontCreateWithName(familyName, 0, NULL);
-    CFStringRef codepointString = CFStringCreateWithBytes(kCFAllocatorDefault, (const UInt8 *)&codepoint, sizeof(codepoint), kCFStringEncodingUTF32LE, false);
+    uint32_t littleEndianCodePoint = OSSwapHostToLittleInt32(codepoint);
+    CFStringRef codepointString = CFStringCreateWithBytes(kCFAllocatorDefault,
+                                                          (const UInt8 *)&littleEndianCodePoint,
+                                                          sizeof(littleEndianCodePoint),
+                                                          kCFStringEncodingUTF32LE,
+                                                          false);
     CTFontRef fallbackFont = CTFontCreateForString(font, codepointString, CFRangeMake(0,1));
     CFStringRef fallbackFontFamilyName = CTFontCopyFamilyName(fallbackFont);
 
@@ -221,7 +228,7 @@ vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, 
         goto done;
     }
 
-    addNewFonttofamily(p_filter, fallbackFontDescriptor, strdup(psz_fontPath), p_family);
+    addNewFontToFamily(p_filter, fallbackFontDescriptor, strdup(psz_fontPath), p_family);
 
 done:
     CFRelease(familyName);
