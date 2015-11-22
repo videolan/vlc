@@ -1263,9 +1263,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_get_fallbacks = FontConfig_GetFallbacks;
     FontConfig_Prepare( p_filter );
 #elif defined( __APPLE__ )
-#if !TARGET_OS_IPHONE
-    p_sys->pf_select = MacLegacy_Select;
-#endif
+    p_sys->pf_select = CoreText_Select;
 #elif defined( _WIN32 ) && defined( HAVE_GET_FONT_BY_FAMILY_NAME )
     const char *const ppsz_win32_default[] =
         { "Tahoma", "FangSong", "SimHei", "KaiTi" };

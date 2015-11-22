@@ -28,7 +28,7 @@ libfreetype_plugin_la_SOURCES += text_renderer/fonts/android.c
 endif
 if HAVE_DARWIN
 libfreetype_plugin_la_SOURCES += text_renderer/fonts/darwin.c
-libfreetype_plugin_la_LDFLAGS += -Wl,-framework,Carbon
+libfreetype_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation -Wl,-framework,CoreText
 endif
 if HAVE_FRIBIDI
 libfreetype_plugin_la_CPPFLAGS += $(FRIBIDI_CFLAGS) -DHAVE_FRIBIDI
