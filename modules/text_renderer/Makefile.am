@@ -50,13 +50,6 @@ libsvg_plugin_la_LIBADD = $(SVG_LIBS)
 EXTRA_LTLIBRARIES += libsvg_plugin.la
 text_LTLIBRARIES += $(LTLIBsvg)
 
-# QuartzText
-libquartztext_plugin_la_SOURCES = text_renderer/quartztext.c
-libquartztext_plugin_la_LDFLAGS = $(AM_LDLFAGS) -rpath '$(textdir)' \
-	-Wl,-framework,ApplicationServices
-EXTRA_LTLIBRARIES += libquartztext_plugin.la
-text_LTLIBRARIES += $(LTLIBquartztext)
-
 # OS X TTS
 libnsspeechsynthesizer_plugin_la_SOURCES = text_renderer/nsspeechsynthesizer.m
 libnsspeechsynthesizer_plugin_la_LDFLAGS = -Wl,-framework,Cocoa
