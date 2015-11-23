@@ -8,6 +8,8 @@ Core:
  * Support network browsing for distant file system (SMB, FTP, SFTP, ...)
    and rewrite the parsing of those files
  * VLC now assumes vlcrc config file is in UTF-8
+ * Add a keystore API: fetch and store password for common protocols (HTTP,
+ * SMB, SFTP, FTP, ...)
 
 Access:
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)

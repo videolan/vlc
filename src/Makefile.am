@@ -59,6 +59,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_input_item.h \
 	../include/vlc_interface.h \
 	../include/vlc_keys.h \
+	../include/vlc_keystore.h \
 	../include/vlc_main.h \
 	../include/vlc_md5.h \
 	../include/vlc_messages.h \
@@ -442,6 +443,7 @@ SOURCES_libvlc_common = \
 	misc/picture_pool.c \
 	misc/interrupt.h \
 	misc/interrupt.c \
+	misc/keystore.c \
 	modules/modules.h \
 	modules/modules.c \
 	modules/bank.c \
