@@ -85,8 +85,10 @@ static inline char *ToCodePage (unsigned cp, const char *utf8)
         return NULL;
 
     size_t len = WideCharToMultiByte (cp, 0, wide, -1, NULL, 0, NULL, NULL);
-    if (len == 0)
+    if (len == 0) {
+        free(wide);
         return NULL;
+    }
 
     char *out = (char *)malloc (len);
     if (likely(out != NULL))
