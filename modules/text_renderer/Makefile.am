@@ -63,10 +63,3 @@ libsapi_plugin_la_LIBADD = -lole32
 if HAVE_SAPI
 text_LTLIBRARIES += libsapi_plugin.la
 endif
-
-# Simple GDI renderer
-libwin32text_plugin_la_SOURCES = text_renderer/win32text.c
-libwin32text_plugin_la_LIBADD = -lgdi32
-if HAVE_WIN32
-text_LTLIBRARIES += libwin32text_plugin.la
-endif

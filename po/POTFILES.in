@@ -1066,7 +1066,6 @@ modules/text_renderer/nsspeechsynthesizer.m
 modules/text_renderer/sapi.cpp
 modules/text_renderer/svg.c
 modules/text_renderer/tdummy.c
-modules/text_renderer/win32text.c
 modules/video_chroma/chain.c
 modules/video_chroma/cvpx_i420.c
 modules/video_chroma/d3d11_surface.c
