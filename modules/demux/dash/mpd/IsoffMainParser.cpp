@@ -117,7 +117,7 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
     it = attr.find("availabilityStartTime");
     if(it != attr.end())
-        mpd->availabilityStartTime.Set(UTCTime(it->second));
+        mpd->availabilityStartTime.Set(UTCTime(it->second).time());
 
     it = attr.find("timeShiftBufferDepth");
         if(it != attr.end())

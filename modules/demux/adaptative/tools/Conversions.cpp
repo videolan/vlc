@@ -57,8 +57,8 @@ static int64_t vlc_timegm( int i_year, int i_month, int i_mday, int i_hour, int 
 
 UTCTime::UTCTime(const std::string &str)
 {
-    enum { YEAR = 0, MON, DAY, HOUR, MIN, SEC, TZ };
-    int values[7] = {0};
+    enum { YEAR = 0, MON, DAY, HOUR, MIN, SEC, MSEC, TZ };
+    int values[8] = {0};
     std::istringstream in(str);
 
     try
@@ -79,28 +79,50 @@ UTCTime::UTCTime(const std::string &str)
                 in >> values[i];
             }
         }
-        /* Timezone */
-        if (!in.eof() && in.peek() == 'Z')
+        if(!in.eof() && in.peek() == '.')
         {
             in.ignore(1);
-            while(!in.eof())
+            in >> values[MSEC];
+        }
+        /* Timezone */
+        if(!in.eof() && in.peek() == 'Z')
+        {
+            in.ignore(1);
+        }
+        else if (!in.eof() && (in.peek() == '+' || in.peek() == '-'))
+        {
+            int i, tz = (in.peek() == '+') ? -60 : +60;
+            in.ignore(1);
+            if(!in.eof())
             {
-                if(in.peek() == '+')
-                    continue;
-                in >> values[TZ];
-                break;
+                in >> i;
+                tz *= i;
+                in.ignore(1);
+                if(!in.eof())
+                {
+                    in >> i;
+                    tz += i;
+                }
+                values[TZ] = tz;
             }
         }
 
-        time = vlc_timegm( values[YEAR] - 1900, values[MON] - 1, values[DAY],
-                           values[HOUR], values[MIN], values[SEC] );
-        time += values[TZ] * 3600;
+        t = vlc_timegm( values[YEAR] - 1900, values[MON] - 1, values[DAY],
+                        values[HOUR], values[MIN], values[SEC] );
+        t += values[TZ] * 60;
+        t *= CLOCK_FREQ;
+        t += values[MSEC] * 1000;
     } catch(int) {
-        time = 0;
+        t = 0;
     }
 }
 
-UTCTime::operator time_t () const
+time_t UTCTime::time() const
 {
-    return time;
+    return t / CLOCK_FREQ;
+}
+
+mtime_t UTCTime::mtime() const
+{
+    return t;
 }
