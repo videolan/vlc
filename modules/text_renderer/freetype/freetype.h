@@ -75,9 +75,9 @@ typedef uint32_t uni_char_t;
 typedef struct vlc_family_t vlc_family_t;
 struct filter_sys_t
 {
-    FT_Library     p_library;   /* handle to library     */
-    FT_Face        p_face;      /* handle to face object */
-    FT_Stroker     p_stroker;   /* handle to path stroker object */
+    FT_Library     p_library;       /* handle to library     */
+    FT_Face        p_face;          /* handle to face object */
+    FT_Stroker     p_stroker;       /* handle to path stroker object */
 
     text_style_t  *p_default_style;
     text_style_t  *p_forced_style;  /* Renderer overridings */
@@ -112,6 +112,8 @@ struct filter_sys_t
     vlc_dictionary_t  face_map;
 
     int               i_fallback_counter;
+
+    /* Current scaling of the text, default is 100 (%) */
     int               i_scale;
 
     /**

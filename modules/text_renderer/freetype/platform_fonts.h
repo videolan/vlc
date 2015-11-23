@@ -97,16 +97,16 @@
 typedef struct vlc_font_t vlc_font_t;
 struct vlc_font_t
 {
-    vlc_font_t *p_next; /**< next font in the chain */
+    vlc_font_t *p_next;   /**< next font in the chain */
     /**
      * path to the font file on disk, or ":/x" for font attachments, where x
      * is the attachment index within \ref filter_sys_t::pp_font_attachments
      */
     char       *psz_fontfile;
-    int         i_index; /**< index of the font in the font file, starts at 0 */
-    bool        b_bold; /**< if the font is a bold version */
-    bool        b_italic; /**< if the font is an italic version */
-    FT_Face     p_face; /**< the freetype structure for the font */
+    int         i_index;   /**< index of the font in the font file, starts at 0 */
+    bool        b_bold;    /**< if the font is a bold version */
+    bool        b_italic;  /**< if the font is an italic version */
+    FT_Face     p_face;    /**< the freetype structure for the font */
 };
 
 /**
