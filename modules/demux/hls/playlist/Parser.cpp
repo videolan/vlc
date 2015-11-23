@@ -212,8 +212,8 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
     rep->timescale.Set(100);
     rep->b_loaded = true;
 
-    stime_t totalduration = 0;
-    stime_t nzStartTime = 0;
+    mtime_t totalduration = 0;
+    mtime_t nzStartTime = 0;
     uint64_t sequenceNumber = 0;
     bool discontinuity = false;
     std::size_t prevbyterangeoffset = 0;
@@ -262,10 +262,11 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                 {
                     if(ctx_extinf->getAttributeByName("DURATION"))
                     {
+                        const mtime_t nzDuration = CLOCK_FREQ * ctx_extinf->getAttributeByName("DURATION")->floatingPoint();
                         segment->duration.Set(ctx_extinf->getAttributeByName("DURATION")->floatingPoint() * rep->timescale.Get());
-                        segment->startTime.Set(nzStartTime);
-                        nzStartTime += segment->duration.Get();
-                        totalduration += segment->duration.Get();
+                        segment->startTime.Set(nzStartTime * rep->timescale.Get() / CLOCK_FREQ);
+                        nzStartTime += nzDuration;
+                        totalduration += nzDuration;
                     }
                     ctx_extinf = NULL;
                 }
@@ -358,9 +359,9 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
     {
         rep->getPlaylist()->duration.Set(0);
     }
-    else if(totalduration * CLOCK_FREQ / rep->timescale.Get() > (uint64_t) rep->getPlaylist()->duration.Get())
+    else if(totalduration > rep->getPlaylist()->duration.Get())
     {
-        rep->getPlaylist()->duration.Set(totalduration * CLOCK_FREQ / rep->timescale.Get());
+        rep->getPlaylist()->duration.Set(totalduration);
     }
 
     rep->setSegmentList(segmentList);
