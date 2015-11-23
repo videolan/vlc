@@ -70,9 +70,9 @@ void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path
     CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
     b_italic = traitValue > 0.03;
 
-//#ifndef NDEBUG
+#ifndef NDEBUG
     msg_Dbg(p_filter, "New font: bold %i italic %i path '%s'", b_bold, b_italic, path);
-//#endif
+#endif
     NewFont(path, 0, b_bold, b_italic, p_family);
 
     CFRelease(fontTraits);
