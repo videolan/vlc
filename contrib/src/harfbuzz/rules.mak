@@ -9,9 +9,9 @@ endif
 
 HARFBUZZCONF = --with-icu=no --with-glib=no --with-fontconfig=no
 
-#ifdef HAVE_DARWIN_OS
+ifdef HAVE_DARWIN_OS
 HARFBUZZCONF += --with-coretext=yes
-#endif
+endif
 
 $(TARBALLS)/harfbuzz-$(HARFBUZZ_VERSION).tar.bz2:
 	$(call download,$(HARFBUZZ_URL))
