@@ -114,25 +114,18 @@ static int vlclua_input_metas_internal( lua_State *L, input_item_t *p_item )
     }
 
     lua_newtable( L );
-    char *psz_name = NULL;
-    const char *psz_meta = NULL;
-    char *psz_meta_worker = NULL;
+    char *psz_name;
+    const char *psz_meta;
 
     psz_name = input_item_GetName( p_item );
-    if( psz_name != NULL )
-        psz_name = convert_xml_special_chars( psz_name );
     lua_pushstring( L, psz_name );
     lua_setfield( L, -2, "filename" );
     free( psz_name );
 
 #define PUSH_META( n, m ) \
     psz_meta = vlc_meta_Get( p_item->p_meta, vlc_meta_ ## n ); \
-    if( psz_meta != NULL ) { \
-        psz_meta_worker = convert_xml_special_chars( psz_meta ); \
-    } \
-    lua_pushstring( L, psz_meta_worker ); \
-    lua_setfield( L, -2, m ); \
-    FREENULL( psz_meta_worker )
+    lua_pushstring( L, psz_meta ); \
+    lua_setfield( L, -2, m )
 
     vlc_mutex_lock(&p_item->lock);
 
