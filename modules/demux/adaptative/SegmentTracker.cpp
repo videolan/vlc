@@ -155,12 +155,14 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
         return NULL;
     }
 
-    /* stop initializing after 1st chunk */
-    initializing = false;
+    if(initializing)
+    {
+        b_gap = false;
+        /* stop initializing after 1st chunk */
+        initializing = false;
+    }
 
     SegmentChunk *chunk = segment->toChunk(count, rep, connManager);
-    if(chunk)
-        count++;
 
     /* We need to check segment/chunk format changes, as we can't rely on representation's (HLS)*/
     if(format != chunk->getStreamFormat())
@@ -174,6 +176,9 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
     {
         notify(SegmentTrackerEvent(chunk));
     }
+
+    if(chunk)
+        count++;
 
     return chunk;
 }
