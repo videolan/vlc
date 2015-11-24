@@ -165,7 +165,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
     SegmentChunk *chunk = segment->toChunk(count, rep, connManager);
 
     /* We need to check segment/chunk format changes, as we can't rely on representation's (HLS)*/
-    if(format != chunk->getStreamFormat())
+    if(chunk && format != chunk->getStreamFormat())
     {
         format = chunk->getStreamFormat();
         notify(SegmentTrackerEvent(&format));
