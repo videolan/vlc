@@ -106,6 +106,7 @@ namespace adaptative
 
         private:
             void notify(const SegmentTrackerEvent &);
+            bool first;
             bool initializing;
             bool index_sent;
             bool init_sent;

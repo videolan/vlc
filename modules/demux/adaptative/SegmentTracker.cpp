@@ -50,6 +50,7 @@ SegmentTrackerEvent::SegmentTrackerEvent(const StreamFormat *fmt)
 
 SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
 {
+    first = true;
     count = 0;
     initializing = true;
     index_sent = false;
@@ -126,6 +127,11 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
     {
         /* Convert our segment number */
         count = rep->translateSegmentNumber(count, prevRep);
+    }
+    else if(first && rep->getPlaylist()->isLive())
+    {
+        count = rep->getLiveStartSegmentNumber(count);
+        first = false;
     }
 
     if(!rep->consistentSegmentNumber())

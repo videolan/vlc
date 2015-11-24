@@ -155,6 +155,49 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
     return retSegments.size();
 }
 
+uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
+{
+    if( mediaSegmentTemplate )
+    {
+        SegmentTimeline *timeline = mediaSegmentTemplate->segmentTimeline.Get();
+        if(timeline)
+        {
+            const uint64_t start = timeline->minElementNumber();
+            const uint64_t end = timeline->maxElementNumber();
+            if(end > 2 && (end - start >= 2))
+                return end - 2;
+            else
+                return start;
+        }
+        return mediaSegmentTemplate->startNumber.Get();
+    }
+    else if ( segmentList && !segmentList->getSegments().empty() )
+    {
+        const std::vector<ISegment *> list = segmentList->getSegments();
+        if(list.size() > 3)
+            return list.at(list.size() - 3)->getSequenceNumber();
+        else if(!list.empty())
+            return list.front()->getSequenceNumber();
+        else
+            return segmentList->getStartIndex();
+    }
+    else if( segmentBase )
+    {
+        const std::vector<ISegment *> list = segmentBase->subSegments();
+        if(list.size() > 3)
+            return list.at(list.size() - 3)->getSequenceNumber();
+        else if(!list.empty())
+            return list.front()->getSequenceNumber();
+        else
+            return segmentBase->getSequenceNumber();
+    }
+
+    if(parent)
+        return parent->getLiveStartSegmentNumber(def);
+    else
+        return def;
+}
+
 /* Returns wanted segment, or next in sequence if not found */
 ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_pos,
                                               uint64_t *pi_newpos, bool *pb_gap) const
