@@ -164,7 +164,7 @@ uint64_t Representation::translateSegmentNumber(uint64_t num, const SegmentInfor
         const HLSSegment *hlsSeg = dynamic_cast<HLSSegment *>(*it);
         if(hlsSeg)
         {
-            if (hlsSeg->getUTCTime() <= utcTime)
+            if (hlsSeg->getUTCTime() <= utcTime || it == list.begin())
                 num = hlsSeg->getSequenceNumber();
             else
                 return num;
