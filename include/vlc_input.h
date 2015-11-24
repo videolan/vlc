@@ -347,7 +347,7 @@ typedef enum input_event_type_e
     INPUT_EVENT_LENGTH,
 
     /* A title has been added or removed or selected.
-     * It imply that chapter has changed (not chapter event is sent) */
+     * It implies that the chapter has changed (no chapter event is sent) */
     INPUT_EVENT_TITLE,
     /* A chapter has been added or removed or selected. */
     INPUT_EVENT_CHAPTER,

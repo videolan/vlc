@@ -215,7 +215,7 @@ void resolve_xml_special_chars( char *psz_value )
                 {
                     psz_value = psz_end + 1;
                     if( cp == 0 )
-                        (void)0; /* skip nuls */
+                        (void)0; /* skip nulls */
                     else
                     if( cp <= 0x7F )
                     {
@@ -287,7 +287,7 @@ void resolve_xml_special_chars( char *psz_value )
 
 /**
  * XML-encode an UTF-8 string
- * \param str nul-terminated UTF-8 byte sequence to XML-encode
+ * \param str null-terminated UTF-8 byte sequence to XML-encode
  * \return XML encoded string or NULL on error
  * (errno is set to ENOMEM or EILSEQ as appropriate)
  */
