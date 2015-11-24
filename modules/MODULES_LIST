@@ -202,6 +202,7 @@ $Id$
  * karaoke: simple karaoke audio filter
  * kate: kate text bitstream decoder
  * keystore_plaintext: store secrets in a plaintext file (insecure)
+ * keystore_secret: store secrets via Gnome libsecret
  * kva: OS/2 video output
  * libass: Subtitle renderers using libass
  * libbluray: Library to access Blu-Ray drives

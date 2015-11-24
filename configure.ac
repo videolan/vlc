@@ -4083,6 +4083,11 @@ AS_IF([test "${enable_taglib}" != "no"], [
 ])
 
 dnl
+dnl  libsecret
+dnl
+PKG_ENABLE_MODULES_VLC([SECRET], [], [libsecret-1], [use libsecret for keystore], [auto])
+
+dnl
 dnl  Developers helper modules (should be hidden from configure help)
 dnl
 AC_ARG_ENABLE(devtools, [], [], [enable_devtools="no"])
