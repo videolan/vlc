@@ -1418,6 +1418,7 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
 static void blurayInitTitles(demux_t *p_demux, int menu_titles)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    const BLURAY_DISC_INFO *di = bd_get_disc_info(p_sys->bluray);
 
     /* get and set the titles */
     unsigned i_title = menu_titles;
@@ -1439,13 +1440,19 @@ static void blurayInitTitles(demux_t *p_demux, int menu_titles)
 
         } else if (i == 0) {
             t->psz_name = strdup(_("Top Menu"));
+            t->b_menu = true;
         } else if (i == i_title - 1) {
             t->psz_name = strdup(_("First Play"));
+            if (di && di->first_play) {
+                t->b_menu = di->first_play->interactive;
+            }
         } else {
             /* add possible title name from disc metadata */
-            const BLURAY_DISC_INFO *di = bd_get_disc_info(p_sys->bluray);
-            if (di && di->titles && i < di->num_titles && di->titles[i]->name) {
-                t->psz_name = strdup(di->titles[i]->name);
+            if (di && di->titles && i < di->num_titles) {
+                if (di->titles[i]->name) {
+                    t->psz_name = strdup(di->titles[i]->name);
+                }
+                t->b_menu = di->titles[i]->interactive;
             }
         }
 
