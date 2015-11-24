@@ -72,6 +72,8 @@ void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path
 
 #ifndef NDEBUG
     msg_Dbg(p_filter, "New font: bold %i italic %i path '%s'", b_bold, b_italic, path);
+#else
+    VLC_UNUSED(p_filter);
 #endif
     NewFont(path, 0, b_bold, b_italic, p_family);
 
@@ -98,11 +100,8 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
         return p_family;
     }
 
-    /* create a new family object */
-    p_family = NewFamily(p_filter, psz_lc, &p_sys->p_families, &p_sys->family_map, psz_lc);
-    if (unlikely(!p_family)) {
-        return NULL;
-    }
+    CTFontCollectionRef coreTextFontCollection = NULL;
+    CFArrayRef matchedFontDescriptions = NULL;
 
     /* we search for family name, display name and name to find them all */
     const size_t numberOfAttributes = 3;
@@ -131,13 +130,25 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
                                                             (const void **)&coreTextFontDescriptors,
                                                             numberOfAttributes, NULL);
 
-    CTFontCollectionRef coreTextFontCollection = CTFontCollectionCreateWithFontDescriptors(coreTextFontDescriptorsArray, 0);
+    coreTextFontCollection = CTFontCollectionCreateWithFontDescriptors(coreTextFontDescriptorsArray, 0);
+    if (coreTextFontCollection == NULL) {
+        goto end;
+    }
 
-    CFArrayRef matchedFontDescriptions = CTFontCollectionCreateMatchingFontDescriptors(coreTextFontCollection);
+    matchedFontDescriptions = CTFontCollectionCreateMatchingFontDescriptors(coreTextFontCollection);
+    if (matchedFontDescriptions == NULL) {
+        goto end;
+    }
 
     CFIndex numberOfFoundFontDescriptions = CFArrayGetCount(matchedFontDescriptions);
 
     char *path = NULL;
+
+    /* create a new family object */
+    p_family = NewFamily(p_filter, psz_lc, &p_sys->p_families, &p_sys->family_map, psz_lc);
+    if (unlikely(!p_family)) {
+        goto end;
+    }
 
     for (CFIndex i = 0; i < numberOfFoundFontDescriptions; i++) {
         CTFontDescriptorRef iter = CFArrayGetValueAtIndex(matchedFontDescriptions, i);
@@ -154,8 +165,13 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
         addNewFontToFamily(p_filter, iter, path, p_family);
     }
 
-    CFRelease(matchedFontDescriptions);
-    CFRelease(coreTextFontCollection);
+end:
+    if (matchedFontDescriptions != NULL) {
+        CFRelease(matchedFontDescriptions);
+    }
+    if (coreTextFontCollection != NULL) {
+        CFRelease(coreTextFontCollection);
+    }
 
     for (size_t x = 0; x < numberOfAttributes; x++) {
         CFRelease(coreTextAttributes[x]);
