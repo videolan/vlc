@@ -66,8 +66,6 @@ static vlc_object_t * FindName ( vlc_object_internals_t *, const char * );
 static void PrintObject( vlc_object_internals_t *, const char * );
 static void DumpStructure( vlc_object_internals_t *, unsigned, char * );
 
-static vlc_list_t   * NewList       ( int );
-
 static void vlc_object_destroy( vlc_object_t *p_this );
 
 /*****************************************************************************
@@ -384,21 +382,35 @@ void vlc_object_release( vlc_object_t *p_this )
  */
 vlc_list_t *vlc_list_children( vlc_object_t *obj )
 {
-    vlc_list_t *l;
+    vlc_list_t *l = malloc (sizeof (*l));
+    if (unlikely(l == NULL))
+        return NULL;
+
+    l->i_count = 0;
+    l->p_values = NULL;
+
     vlc_object_internals_t *priv;
     unsigned count = 0;
 
     libvlc_lock (obj->p_libvlc);
     for (priv = vlc_internals (obj)->first; priv; priv = priv->next)
          count++;
-    l = NewList (count);
-    if (likely(l != NULL))
-    {
-        unsigned i = 0;
 
-        for (priv = vlc_internals (obj)->first; priv; priv = priv->next)
-            l->p_values[i++].p_address = vlc_object_hold (vlc_externals (priv));
+    if (count > 0)
+    {
+        l->p_values = malloc (count * sizeof (vlc_value_t));
+        if (unlikely(l->p_values == NULL))
+        {
+            libvlc_unlock (obj->p_libvlc);
+            free (l);
+            return NULL;
+        }
     }
+
+    unsigned i = 0;
+
+    for (priv = vlc_internals (obj)->first; priv; priv = priv->next)
+        l->p_values[i++].p_address = vlc_object_hold (vlc_externals (priv));
     libvlc_unlock (obj->p_libvlc);
     return l;
 }
@@ -548,28 +560,4 @@ static void DumpStructure (vlc_object_internals_t *priv, unsigned i_level,
 
         DumpStructure (priv, i_level + 2, psz_foo);
     }
-}
-
-static vlc_list_t * NewList( int i_count )
-{
-    vlc_list_t * p_list = malloc( sizeof( vlc_list_t ) );
-    if( p_list == NULL )
-        return NULL;
-
-    p_list->i_count = i_count;
-
-    if( i_count == 0 )
-    {
-        p_list->p_values = NULL;
-        return p_list;
-    }
-
-    p_list->p_values = malloc( i_count * sizeof( vlc_value_t ) );
-    if( p_list->p_values == NULL )
-    {
-        p_list->i_count = 0;
-        return p_list;
-    }
-
-    return p_list;
 }
