@@ -82,6 +82,34 @@ bool BaseRepresentation::consistentSegmentNumber() const
     return b_consistent;
 }
 
+mtime_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
+{
+    std::vector<ISegment *> seglist;
+    getSegments(INFOTYPE_MEDIA, seglist);
+
+    if(seglist.size() == 1 && seglist.front()->isTemplate())
+    {
+        const MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate *>(seglist.front());
+        const SegmentTimeline *timeline;
+        if(templ && (timeline = templ->segmentTimeline.Get()))
+        {
+            const uint64_t timescale = templ->inheritTimescale();
+            return timeline->getMinAheadScaledTime(curnum) * CLOCK_FREQ / timescale;
+        }
+    }
+
+    mtime_t minTime = 0;
+    std::vector<ISegment *>::const_iterator it;
+    for(it = seglist.begin(); it != seglist.end(); ++it)
+    {
+        const ISegment *seg = *it;
+        if(seg->getSequenceNumber() > curnum)
+            minTime += seg->duration.Get() * CLOCK_FREQ / inheritTimescale();
+    }
+
+    return minTime;
+}
+
 void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
 {
     std::string text(indent, ' ');

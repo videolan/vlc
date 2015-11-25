@@ -120,6 +120,13 @@ mtime_t AbstractStream::getPCR() const
     return pcr;
 }
 
+mtime_t AbstractStream::getMinAheadTime() const
+{
+    if(!segmentTracker)
+        return 0;
+    return segmentTracker->getMinAheadTime();
+}
+
 mtime_t AbstractStream::getBufferingLevel() const
 {
     return fakeesout->commandsqueue.getBufferingLevel();

@@ -61,6 +61,8 @@ namespace adaptative
                 virtual bool        needsUpdate()           const;
                 bool                consistentSegmentNumber () const;
 
+                virtual mtime_t     getMinAheadTime         (uint64_t) const;
+
                 virtual void        debug                   (vlc_object_t *,int = 0) const;
 
                 /* for segment templates */

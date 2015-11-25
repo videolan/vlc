@@ -100,6 +100,7 @@ namespace adaptative
             bool setPositionByTime(mtime_t, bool, bool);
             void setPositionByNumber(uint64_t, bool);
             mtime_t getSegmentStart() const;
+            mtime_t getMinAheadTime() const;
             void registerListener(SegmentTrackerListenerInterface *);
             void pruneFromCurrent();
             void updateSelected();

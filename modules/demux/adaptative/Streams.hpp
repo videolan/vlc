@@ -66,6 +66,7 @@ namespace adaptative
         bool isEOF() const;
         mtime_t getPCR() const;
         mtime_t getBufferingLevel() const;
+        mtime_t getMinAheadTime() const;
         mtime_t getFirstDTS() const;
         int esCount() const;
         bool seekAble() const;

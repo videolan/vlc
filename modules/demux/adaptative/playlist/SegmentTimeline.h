@@ -47,6 +47,7 @@ namespace adaptative
                 void addElement(uint64_t, stime_t d, uint64_t r = 0, stime_t t = 0);
                 uint64_t getElementNumberByScaledPlaybackTime(stime_t) const;
                 stime_t getScaledPlaybackTimeByElementNumber(uint64_t) const;
+                stime_t getMinAheadScaledTime(uint64_t) const;
                 uint64_t maxElementNumber() const;
                 uint64_t minElementNumber() const;
                 size_t pruneBySequenceNumber(uint64_t);

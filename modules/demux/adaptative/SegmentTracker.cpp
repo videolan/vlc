@@ -225,6 +225,16 @@ mtime_t SegmentTracker::getSegmentStart() const
         return 0;
 }
 
+mtime_t SegmentTracker::getMinAheadTime() const
+{
+    BaseRepresentation *rep = curRepresentation;
+    if(!rep)
+        rep = logic->getNextRepresentation(adaptationSet, NULL);
+    if(rep)
+        return rep->getMinAheadTime(count);
+    return 0;
+}
+
 void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)
 {
     listeners.push_back(listener);
