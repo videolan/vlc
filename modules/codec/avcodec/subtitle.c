@@ -80,6 +80,10 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     context->extradata_size = 0;
     context->extradata = NULL;
 
+#if LIBAVFORMAT_VERSION_MICRO >= 100
+    av_codec_set_pkt_timebase(context, AV_TIME_BASE_Q);
+#endif
+
     /* */
     int ret;
     char *psz_opts = var_InheritString(dec, "avcodec-options");
@@ -154,6 +158,7 @@ static subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
     av_init_packet(&pkt);
     pkt.data = block->p_buffer;
     pkt.size = block->i_buffer;
+    pkt.pts  = block->i_pts;
 
     int has_subtitle = 0;
     int used = avcodec_decode_subtitle2(sys->p_context,
@@ -176,7 +181,7 @@ static subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
     subpicture_t *spu = NULL;
     if (has_subtitle)
         spu = ConvertSubtitle(dec, &subtitle,
-                              block->i_pts > 0 ? block->i_pts : block->i_dts,
+                              subtitle.pts,
                               sys->p_context);
 
     /* */
