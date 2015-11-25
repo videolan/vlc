@@ -139,16 +139,43 @@ static int TreeCommand (vlc_object_t *obj, char const *cmd,
     return VLC_SUCCESS;
 }
 
+static bool ObjectExists (vlc_object_t *root, void *obj)
+{
+    if (root == obj)
+        return true;
+
+    vlc_object_internals_t *priv = vlc_internals(root);
+
+    for (priv = priv->first; priv != NULL; priv = priv->next)
+        if (ObjectExists (vlc_externals (priv), obj))
+            return true;
+
+    return false;
+}
+
 static int VarsCommand (vlc_object_t *obj, char const *cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *data)
 {
+    void *p;
+
     (void) cmd; (void) oldval; (void) data;
 
-    if (newval.psz_string[0] != '\0')
-    {   /* try using the object's name to find it */
-        obj = vlc_object_find_name (obj, newval.psz_string);
-        if (obj == NULL)
+    if (sscanf (newval.psz_string, "%p", &p) == 1)
+    {
+        libvlc_lock ((libvlc_int_t *)obj);
+        if (ObjectExists (obj, p))
+            vlc_object_hold ((vlc_object_t *)p);
+        else
+            p = NULL;
+        libvlc_unlock ((libvlc_int_t *)obj);
+
+        if (p == NULL)
+        {
+            msg_Err (obj, "no such object: %s", newval.psz_string);
             return VLC_ENOOBJ;
+        }
+
+        obj = p;
     }
     else
         vlc_object_hold (obj);
