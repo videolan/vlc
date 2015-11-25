@@ -155,9 +155,6 @@ typedef struct libvlc_priv_t
     struct playlist_preparser_t *parser; ///< Input item meta data handler
     struct vlc_actions *actions; ///< Hotkeys handler
 
-    /* Objects tree */
-    vlc_mutex_t        structure_lock;
-
     /* Exit callback */
     vlc_exit_t       exit;
 } libvlc_priv_t;

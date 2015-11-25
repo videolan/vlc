@@ -47,6 +47,7 @@ struct vlc_object_internals
     vlc_object_internals_t *next;  /* next sibling */
     vlc_object_internals_t *prev;  /* previous sibling */
     vlc_object_internals_t *first; /* first child */
+    vlc_mutex_t tree_lock;
 };
 
 # define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
