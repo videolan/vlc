@@ -62,7 +62,14 @@ function buf_iter( s )
     s.i = s.i + 1
     local line = s.lines[s.i]
     if not line then
-        line = s.stream:readline()
+        -- Put back together statements split across several lines,
+        -- otherwise we won't be able to parse them
+        repeat
+            local l = s.stream:readline()
+            if not l then break end
+            line = line and line..l or l -- Ternary operator
+        until string.match( line, "};$" )
+
         if line then
             s.lines[s.i] = line
         end
