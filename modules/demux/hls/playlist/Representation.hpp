@@ -47,9 +47,10 @@ namespace hls
                 Url getPlaylistUrl() const;
                 bool isLive() const;
                 bool initialized() const;
+                virtual void scheduleNextUpdate(uint64_t); /* reimpl */
                 virtual bool needsUpdate() const;  /* reimpl */
                 virtual void debug(vlc_object_t *, int) const;  /* reimpl */
-                virtual void runLocalUpdates(mtime_t, uint64_t, bool); /* reimpl */
+                virtual bool runLocalUpdates(mtime_t, uint64_t, bool); /* reimpl */
                 virtual void getDurationsRange(mtime_t *, mtime_t *) const; /* reimpl */
                 virtual uint64_t translateSegmentNumber(uint64_t, const SegmentInformation *) const; /* reimpl */
 
@@ -57,7 +58,8 @@ namespace hls
                 StreamFormat streamFormat;
                 bool b_live;
                 bool b_loaded;
-                time_t nextPlaylistupdate;
+                time_t nextUpdateTime;
+                time_t targetDuration;
                 Url playlistUrl;
                 Property<std::string> audio;
                 Property<std::string> video;

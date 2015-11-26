@@ -44,7 +44,10 @@ namespace smooth
                         logic::AbstractAdaptationLogic::LogicType type );
             virtual ~SmoothManager();
 
-            virtual bool updatePlaylist(); //reimpl
+            virtual bool needsUpdate() const; /* reimpl */
+            virtual void scheduleNextUpdate(); /* reimpl */
+            virtual bool updatePlaylist(); /* reimpl */
+
             static bool isSmoothStreaming(xml::Node *);
             static bool mimeMatched(const std::string &);
 

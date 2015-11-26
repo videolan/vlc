@@ -42,7 +42,8 @@ Representation::Representation  ( BaseAdaptationSet *set ) :
     b_live = true;
     b_loaded = false;
     switchpolicy = SegmentInformation::SWITCH_SEGMENT_ALIGNED; /* FIXME: based on streamformat */
-    nextPlaylistupdate = 0;
+    nextUpdateTime = 0;
+    targetDuration = 0;
     streamFormat = StreamFormat::UNKNOWN;
 }
 
@@ -97,16 +98,48 @@ void Representation::debug(vlc_object_t *obj, int indent) const
     }
 }
 
-bool Representation::needsUpdate() const
+void Representation::scheduleNextUpdate(uint64_t number)
 {
-    return true;
+    const AbstractPlaylist *playlist = getPlaylist();
+    const time_t now = time(NULL);
+
+    /* Compute new update time */
+    mtime_t minbuffer = getMinAheadTime(number);
+
+    /* Update frequency must always be at least targetDuration (if any)*/
+    if(targetDuration)
+    {
+        if(minbuffer >= 3 * CLOCK_FREQ * targetDuration)
+            minbuffer -= 2 * CLOCK_FREQ * targetDuration;
+    }
+    else
+    {
+        minbuffer /= 2;
+        if(targetDuration > minbuffer / CLOCK_FREQ)
+            minbuffer = targetDuration * CLOCK_FREQ;
+    }
+
+    if(minbuffer < CLOCK_FREQ)
+        minbuffer = CLOCK_FREQ;
+
+    nextUpdateTime = now + minbuffer / CLOCK_FREQ;
+
+    msg_Dbg(playlist->getVLCObject(), "Updated playlist ID %s, next update in %" PRId64 "s",
+            getID().str().c_str(), (mtime_t) nextUpdateTime - now);
+
+    debug(playlist->getVLCObject(), 0);
 }
 
-void Representation::runLocalUpdates(mtime_t, uint64_t number, bool prune)
+bool Representation::needsUpdate() const
+{
+    return !b_loaded || (isLive() && nextUpdateTime < time(NULL));
+}
+
+bool Representation::runLocalUpdates(mtime_t, uint64_t number, bool prune)
 {
     const time_t now = time(NULL);
     const AbstractPlaylist *playlist = getPlaylist();
-    if(!b_loaded || (isLive() && nextPlaylistupdate < now))
+    if(!b_loaded || (isLive() && nextUpdateTime < now))
     {
         M3U8Parser parser;
         parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this);
@@ -115,28 +148,10 @@ void Representation::runLocalUpdates(mtime_t, uint64_t number, bool prune)
         if(prune)
             pruneBySegmentNumber(number);
 
-        /* Compute new update time */
-        mtime_t mininterval = 0;
-        mtime_t maxinterval = 0;
-
-        getDurationsRange( &mininterval, &maxinterval );
-
-        if(playlist->minUpdatePeriod.Get() > mininterval)
-            mininterval = playlist->minUpdatePeriod.Get();
-
-        if(mininterval < 5 * CLOCK_FREQ)
-            mininterval = 5 * CLOCK_FREQ;
-
-        if(maxinterval < mininterval)
-            maxinterval = mininterval;
-
-        nextPlaylistupdate = now + (mininterval + (maxinterval - mininterval) / 2) / CLOCK_FREQ;
-
-        msg_Dbg(playlist->getVLCObject(), "Updated playlist ID %s, next update in %" PRId64 "s",
-                getID().str().c_str(), (mtime_t) nextPlaylistupdate - now);
-
-        debug(playlist->getVLCObject(), 0);
+        return true;
     }
+
+    return true;
 }
 
 void Representation::getDurationsRange(mtime_t *min, mtime_t *max) const

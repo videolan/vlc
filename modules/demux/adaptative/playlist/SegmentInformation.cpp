@@ -448,11 +448,6 @@ uint64_t SegmentInformation::translateSegmentNumber(uint64_t num, const SegmentI
     return num;
 }
 
-void SegmentInformation::runLocalUpdates(mtime_t, uint64_t, bool)
-{
-
-}
-
 SegmentInformation::SwitchPolicy SegmentInformation::getSwitchPolicy() const
 {
     if(switchpolicy == SWITCH_UNKNOWN)

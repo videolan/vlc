@@ -302,6 +302,10 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
             }
             break;
 
+            case SingleValueTag::EXTXTARGETDURATION:
+                rep->targetDuration = static_cast<const SingleValueTag *>(tag)->getValue().decimal();
+                break;
+
             case SingleValueTag::EXTXPLAYLISTTYPE:
                 rep->b_live = (static_cast<const SingleValueTag *>(tag)->getValue().value != "VOD");
                 break;

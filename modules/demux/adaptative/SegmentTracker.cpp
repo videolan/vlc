@@ -119,9 +119,10 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
         initializing = true;
     }
 
+    bool b_updated = false;
     /* Ensure ephemere content is updated/loaded */
     if(rep->needsUpdate())
-        rep->runLocalUpdates(getSegmentStart(), count, false);
+        b_updated = rep->runLocalUpdates(getSegmentStart(), count, false);
 
     if(prevRep && !rep->consistentSegmentNumber())
     {
@@ -134,8 +135,12 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
         first = false;
     }
 
-    if(!rep->consistentSegmentNumber())
-        curRepresentation->pruneBySegmentNumber(count);
+    if(b_updated)
+    {
+        if(!rep->consistentSegmentNumber())
+            curRepresentation->pruneBySegmentNumber(count);
+        curRepresentation->scheduleNextUpdate(count);
+    }
 
     if(!init_sent)
     {
@@ -249,8 +254,11 @@ void SegmentTracker::pruneFromCurrent()
 
 void SegmentTracker::updateSelected()
 {
-    if(curRepresentation)
+    if(curRepresentation && curRepresentation->needsUpdate())
+    {
         curRepresentation->runLocalUpdates(getSegmentStart(), count, true);
+        curRepresentation->scheduleNextUpdate(count);
+    }
 }
 
 void SegmentTracker::notify(const SegmentTrackerEvent &event)

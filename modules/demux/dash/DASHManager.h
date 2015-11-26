@@ -49,7 +49,9 @@ namespace dash
                          logic::AbstractAdaptationLogic::LogicType type);
             virtual ~DASHManager    ();
 
-            virtual bool updatePlaylist(); //reimpl
+            virtual bool needsUpdate() const; /* reimpl */
+            virtual bool updatePlaylist(); /* reimpl */
+            virtual void scheduleNextUpdate();/* reimpl */
             static bool isDASH(xml::Node *);
             static bool mimeMatched(const std::string &);
 

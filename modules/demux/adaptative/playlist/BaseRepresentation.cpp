@@ -30,6 +30,7 @@
 #include "BaseRepresentation.h"
 #include "BaseAdaptationSet.h"
 #include "SegmentTemplate.h"
+#include "SegmentTimeline.h"
 #include "ID.hpp"
 
 using namespace adaptative;
@@ -75,6 +76,16 @@ void BaseRepresentation::addCodec(const std::string &codec)
 bool BaseRepresentation::needsUpdate() const
 {
     return false;
+}
+
+bool BaseRepresentation::runLocalUpdates(mtime_t, uint64_t, bool)
+{
+    return false;
+}
+
+void BaseRepresentation::scheduleNextUpdate(uint64_t)
+{
+
 }
 
 bool BaseRepresentation::consistentSegmentNumber() const

@@ -57,6 +57,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
              i_nzpcr        ( 0 )
 {
     currentPeriod = playlist->getFirstPeriod();
+    failedupdates = 0;
 }
 
 PlaylistManager::~PlaylistManager   ()
@@ -248,6 +249,11 @@ bool PlaylistManager::setPosition(mtime_t time)
     return ret;
 }
 
+bool PlaylistManager::needsUpdate() const
+{
+    return playlist->isLive() && (failedupdates < 3);
+}
+
 bool PlaylistManager::seekAble() const
 {
     if(playlist->isLive())
@@ -260,6 +266,11 @@ bool PlaylistManager::seekAble() const
             return false;
     }
     return true;
+}
+
+void PlaylistManager::scheduleNextUpdate()
+{
+
 }
 
 bool PlaylistManager::updatePlaylist()
@@ -318,7 +329,13 @@ int PlaylistManager::doDemux(int64_t increment)
         break;
     }
 
-    updatePlaylist();
+    if(needsUpdate())
+    {
+        if(updatePlaylist())
+            scheduleNextUpdate();
+        else
+            failedupdates++;
+    }
 
     return VLC_DEMUXER_SUCCESS;
 }
