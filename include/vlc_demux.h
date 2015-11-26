@@ -262,13 +262,19 @@ enum demux_query_e
      * arg1= bool * */
     DEMUX_IS_PLAYLIST,
 
-    /* Navigation */
-    DEMUX_NAV_ACTIVATE,        /* res=can fail */
-    DEMUX_NAV_UP,              /* res=can fail */
-    DEMUX_NAV_DOWN,            /* res=can fail */
-    DEMUX_NAV_LEFT,            /* res=can fail */
-    DEMUX_NAV_RIGHT,           /* res=can fail */
-    DEMUX_NAV_POPUP,           /* res=can fail */
+    /* Menu (VCD/DVD/BD) Navigation */
+    /** Activate the navigation item selected. Can fail */
+    DEMUX_NAV_ACTIVATE,
+    /** Use the up arrow to select a navigation item above. Can fail */
+    DEMUX_NAV_UP,
+    /** Use the down arrow to select a navigation item under. Can fail */
+    DEMUX_NAV_DOWN,
+    /** Use the left arrow to select a navigation item on the left. Can fail */
+    DEMUX_NAV_LEFT,
+    /** Use the right arrow to select a navigation item on the right. Can fail */
+    DEMUX_NAV_RIGHT,
+    /** Activate the popup Menu (for BD). Can fail */
+    DEMUX_NAV_POPUP,
 };
 
 /*************************************************************************

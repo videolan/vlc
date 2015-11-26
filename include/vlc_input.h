@@ -425,12 +425,18 @@ enum input_query_e
     INPUT_GET_SPU_DELAY,        /* arg1 = int* res=can fail */
     INPUT_SET_SPU_DELAY,        /* arg1 = int  res=can fail */
 
-    /* Menu navigation */
+    /* Menu (VCD/DVD/BD) Navigation */
+    /** Activate the navigation item selected. res=can fail */
     INPUT_NAV_ACTIVATE,
+    /** Use the up arrow to select a navigation item above. res=can fail */
     INPUT_NAV_UP,
+    /** Use the down arrow to select a navigation item under. res=can fail */
     INPUT_NAV_DOWN,
+    /** Use the left arrow to select a navigation item on the left. res=can fail */
     INPUT_NAV_LEFT,
+    /** Use the right arrow to select a navigation item on the right. res=can fail */
     INPUT_NAV_RIGHT,
+    /** Activate the popup Menu (for BD). res=can fail */
     INPUT_NAV_POPUP,
 
     /* Meta datas */
