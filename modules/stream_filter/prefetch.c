@@ -28,22 +28,24 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+
 #ifdef HAVE_MMAP
-#include <sys/mman.h>
-#ifndef MAP_ANONYMOUS
-# define MAP_ANONYMOUS MAP_ANON
-#endif
+# include <sys/mman.h>
+# ifndef MAP_ANONYMOUS
+#  define MAP_ANONYMOUS MAP_ANON
+# endif
 #elif !defined(__OS2__)
-#include <errno.h>
-#define MAP_FAILED ((void *)-1)
-#define mmap(a,l,p,f,d,o) \
-    ((void)(a), (void)(l), (void)(d), (void)(o), errno = ENOMEM, MAP_FAILED)
-#define munmap(a,l) \
-    ((void)(a), (void)(l), errno = EINVAL, -1)
-#define sysconf(a) 1
+# include <errno.h>
+# define MAP_FAILED ((void *)-1)
+# define mmap(a,l,p,f,d,o) \
+     ((void)(a), (void)(l), (void)(d), (void)(o), errno = ENOMEM, MAP_FAILED)
+# define munmap(a,l) \
+     ((void)(a), (void)(l), errno = EINVAL, -1)
+# define sysconf(a) 1
 #endif
+
 #if defined (_WIN32)
-#include <windows.h>
+# include <windows.h>
 #endif
 
 #include <vlc_common.h>
