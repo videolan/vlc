@@ -525,6 +525,7 @@ vlc_list_t *vlc_list_children( vlc_object_t *obj )
             free (l);
             return NULL;
         }
+        l->i_count = count;
     }
 
     unsigned i = 0;
