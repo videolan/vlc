@@ -1237,7 +1237,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
         DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
 
 #ifdef ENABLE_SOUT
-    if( p_owner->b_packetizer )
+    if( p_owner->p_sout != NULL )
     {
         DecoderProcessSout( p_dec, p_block );
     }
@@ -1437,7 +1437,7 @@ static void *DecoderThread( void *p_data )
  */
 static decoder_t * CreateDecoder( vlc_object_t *p_parent,
                                   input_thread_t *p_input,
-                                  const es_format_t *fmt, bool b_packetizer,
+                                  const es_format_t *fmt,
                                   input_resource_t *p_resource,
                                   sout_instance_t *p_sout )
 {
@@ -1467,7 +1467,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->p_sout = p_sout;
     p_owner->p_sout_input = NULL;
     p_owner->p_packetizer = NULL;
-    p_owner->b_packetizer = b_packetizer;
 
     p_owner->b_fmt_description = false;
     p_owner->p_description = NULL;
@@ -1512,7 +1511,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_get_display_rate = DecoderGetDisplayRate;
 
     /* Load a packetizer module if the input is not already packetized */
-    if( !b_packetizer && !fmt->b_packetized )
+    if( p_sout == NULL && !fmt->b_packetized )
     {
         p_owner->p_packetizer =
             vlc_custom_create( p_parent, sizeof( decoder_t ), "packetizer" );
@@ -1532,7 +1531,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     }
 
     /* Find a suitable decoder/packetizer module */
-    if( LoadDecoder( p_dec, b_packetizer, fmt ) )
+    if( LoadDecoder( p_dec, p_sout != NULL, fmt ) )
         return p_dec;
 
     /* Copy ourself the input replay gain */
@@ -1555,7 +1554,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
 
     /* */
     p_owner->cc.b_supported = false;
-    if( !b_packetizer )
+    if( p_sout == NULL )
     {
         if( p_owner->p_packetizer && p_owner->p_packetizer->pf_get_cc )
             p_owner->cc.b_supported = true;
@@ -1682,8 +1681,7 @@ static decoder_t *decoder_New( vlc_object_t *p_parent, input_thread_t *p_input,
     int i_priority;
 
     /* Create the decoder configuration structure */
-    p_dec = CreateDecoder( p_parent, p_input, fmt,
-                           p_sout != NULL, p_resource, p_sout );
+    p_dec = CreateDecoder( p_parent, p_input, fmt, p_resource, p_sout );
     if( p_dec == NULL )
     {
         msg_Err( p_parent, "could not create %s", psz_type );
