@@ -1264,9 +1264,21 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
     }
 }
 
-static void DecoderFlush( decoder_t *p_dec )
+static void DecoderProcessFlush( decoder_t *p_dec )
 {
-    if ( p_dec->pf_flush )
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    decoder_t *p_packetizer = p_owner->p_packetizer;
+
+    if( p_dec->b_error )
+        return;
+
+    if ( p_owner->i_preroll_end == INT64_MAX )
+        return;
+
+    if( p_packetizer != NULL && p_packetizer->pf_flush != NULL )
+        p_packetizer->pf_flush( p_packetizer );
+
+    if ( p_dec->pf_flush != NULL )
         p_dec->pf_flush( p_dec );
     else
     {
@@ -1279,21 +1291,6 @@ static void DecoderFlush( decoder_t *p_dec )
         }
         DecoderProcess( p_dec, p_flush );
     }
-}
-
-static void DecoderProcessFlush( decoder_t *p_dec )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    if( p_dec->b_error )
-        return;
-
-    if ( p_owner->i_preroll_end == INT64_MAX )
-        return;
-
-    if ( p_owner->p_packetizer )
-        DecoderFlush( p_owner->p_packetizer );
-    DecoderFlush( p_dec );
 
     if( p_dec->fmt_out.i_cat == AUDIO_ES )
     {
