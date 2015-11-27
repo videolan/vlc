@@ -196,18 +196,11 @@ static void ReadMetaData(intf_thread_t *p_this, input_thread_t *p_input)
     p_sys->b_submit_nowp = true;
 
     ALLOC_ITEM_META(p_sys->p_current_song.psz_b, Album);
-    if (!p_sys->p_current_song.psz_b)
-        p_sys->p_current_song.psz_b = calloc(1, 1);
-
     ALLOC_ITEM_META(p_sys->p_current_song.psz_m, TrackID);
-    if (!p_sys->p_current_song.psz_m)
-        p_sys->p_current_song.psz_m = calloc(1, 1);
+    ALLOC_ITEM_META(p_sys->p_current_song.psz_n, TrackNum);
 
     p_sys->p_current_song.i_l = input_item_GetDuration(p_item) / 1000000;
 
-    ALLOC_ITEM_META(p_sys->p_current_song.psz_n, TrackNum);
-    if (!p_sys->p_current_song.psz_n)
-        p_sys->p_current_song.psz_n = calloc(1, 1);
 #undef ALLOC_ITEM_META
 
     msg_Dbg(p_this, "Meta data registered");
@@ -770,10 +763,10 @@ static void *Run(void *data)
                 "&m=%s",
                 p_sys->p_current_song.psz_a,
                 p_sys->p_current_song.psz_t,
-                p_sys->p_current_song.psz_b,
+                p_sys->p_current_song.psz_b ? p_sys->p_current_song.psz_b : "",
                 p_sys->p_current_song.i_l,
-                p_sys->p_current_song.psz_n,
-                p_sys->p_current_song.psz_m
+                p_sys->p_current_song.psz_n ? p_sys->p_current_song.psz_n : "",
+                p_sys->p_current_song.psz_m ? p_sys->p_current_song.psz_m : ""
                 ) == -1)
             {   /* Out of memory */
                 vlc_mutex_unlock(&p_sys->lock);
@@ -804,9 +797,9 @@ static void *Run(void *data)
                         i_song,
                         i_song,
                         i_song, p_song->i_l,
-                        i_song, p_song->psz_b,
-                        i_song, p_song->psz_n,
-                        i_song, p_song->psz_m
+                        i_song, p_song->psz_b ? p_song->psz_b : "",
+                        i_song, p_song->psz_n ? p_song->psz_n : "",
+                        i_song, p_song->psz_m ? p_song->psz_m : ""
                        ) == -1)
                 {   /* Out of memory */
                         vlc_mutex_unlock(&p_sys->lock);
