@@ -59,6 +59,7 @@ namespace adaptative
                 const std::list<std::string> & getCodecs    () const;
                 void                addCodec                (const std::string &);
                 bool                consistentSegmentNumber () const;
+                virtual void        pruneByPlaybackTime     (mtime_t);
 
                 virtual mtime_t     getMinAheadTime         (uint64_t) const;
                 virtual bool        needsUpdate             () const;

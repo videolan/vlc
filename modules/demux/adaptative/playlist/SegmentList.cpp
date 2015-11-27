@@ -83,6 +83,14 @@ void SegmentList::mergeWith(SegmentList *updated)
     updated->segments.clear();
 }
 
+void SegmentList::pruneByPlaybackTime(mtime_t time)
+{
+    uint64_t num;
+    const uint64_t timescale = inheritTimescale();
+    if(getSegmentNumberByScaledTime(time * timescale / CLOCK_FREQ, &num))
+        pruneBySegmentNumber(num);
+}
+
 void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
 {
     std::vector<ISegment *>::iterator it = segments.begin();

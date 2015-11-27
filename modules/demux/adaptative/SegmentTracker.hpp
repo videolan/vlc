@@ -99,10 +99,9 @@ namespace adaptative
             SegmentChunk* getNextChunk(bool, HTTPConnectionManager *);
             bool setPositionByTime(mtime_t, bool, bool);
             void setPositionByNumber(uint64_t, bool);
-            mtime_t getSegmentStart() const;
+            mtime_t getPlaybackTime() const; /* Current segment start time if selected */
             mtime_t getMinAheadTime() const;
             void registerListener(SegmentTrackerListenerInterface *);
-            void pruneFromCurrent();
             void updateSelected();
 
         private:

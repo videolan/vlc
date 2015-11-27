@@ -351,14 +351,9 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
     return ret;
 }
 
-mtime_t AbstractStream::getPosition() const
+mtime_t AbstractStream::getPlaybackTime() const
 {
-    return segmentTracker->getSegmentStart();
-}
-
-void AbstractStream::prune()
-{
-    segmentTracker->pruneFromCurrent();
+    return segmentTracker->getPlaybackTime();
 }
 
 void AbstractStream::runUpdates()

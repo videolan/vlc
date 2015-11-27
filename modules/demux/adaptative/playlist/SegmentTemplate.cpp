@@ -62,6 +62,12 @@ void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, mtime_t prun
     }
 }
 
+void MediaSegmentTemplate::pruneByPlaybackTime(mtime_t time)
+{
+    if(segmentTimeline.Get())
+        return segmentTimeline.Get()->pruneByPlaybackTime(time);
+}
+
 size_t MediaSegmentTemplate::pruneBySequenceNumber(uint64_t number)
 {
     if(segmentTimeline.Get())

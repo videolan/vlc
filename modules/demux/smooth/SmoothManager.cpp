@@ -131,10 +131,6 @@ bool SmoothManager::updatePlaylist(bool forcemanifest)
 {
     /* FIXME: do update from manifest after resuming from pause */
 
-    std::vector<AbstractStream *>::iterator it;
-    for(it=streams.begin(); it!=streams.end(); it++)
-        (*it)->prune();
-
     /* Timelines updates should be inlined in tfrf atoms.
        We'll just care about pruning live timeline then. */
 
@@ -146,15 +142,14 @@ bool SmoothManager::updatePlaylist(bool forcemanifest)
             playlist->mergeWith(newManifest, 0);
             delete newManifest;
 
-            std::vector<AbstractStream *>::iterator it;
-            for(it=streams.begin(); it!=streams.end(); it++)
-                (*it)->prune();
 #ifdef NDEBUG
             playlist->debug();
 #endif
         }
         else return false;
     }
+
+    pruneLiveStream();
 
     return true;
 }

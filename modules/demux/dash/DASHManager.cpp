@@ -125,7 +125,7 @@ bool DASHManager::updatePlaylist()
         std::vector<AbstractStream *>::iterator it;
         for(it=streams.begin(); it!=streams.end(); it++)
         {
-            mtime_t segmentTime = (*it)->getPosition();
+            mtime_t segmentTime = (*it)->getPlaybackTime();
             if(!minsegmentTime || segmentTime < minsegmentTime)
                 minsegmentTime = segmentTime;
         }

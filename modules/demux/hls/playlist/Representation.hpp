@@ -51,7 +51,6 @@ namespace hls
                 virtual bool needsUpdate() const;  /* reimpl */
                 virtual void debug(vlc_object_t *, int) const;  /* reimpl */
                 virtual bool runLocalUpdates(mtime_t, uint64_t, bool); /* reimpl */
-                virtual void getDurationsRange(mtime_t *, mtime_t *) const; /* reimpl */
                 virtual uint64_t translateSegmentNumber(uint64_t, const SegmentInformation *) const; /* reimpl */
 
             private:

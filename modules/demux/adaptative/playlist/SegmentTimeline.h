@@ -50,6 +50,7 @@ namespace adaptative
                 stime_t getMinAheadScaledTime(uint64_t) const;
                 uint64_t maxElementNumber() const;
                 uint64_t minElementNumber() const;
+                void pruneByPlaybackTime(mtime_t);
                 size_t pruneBySequenceNumber(uint64_t);
                 void mergeWith(SegmentTimeline &);
                 mtime_t start() const;

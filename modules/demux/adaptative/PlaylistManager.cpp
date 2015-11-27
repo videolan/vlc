@@ -282,6 +282,24 @@ bool PlaylistManager::updatePlaylist()
     return true;
 }
 
+void PlaylistManager::pruneLiveStream()
+{
+    mtime_t minValidPos = 0;
+    std::vector<AbstractStream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); it++)
+    {
+        const AbstractStream *st = *it;
+        if(st->isDisabled() || !st->isSelected() || st->isEOF())
+            continue;
+        const mtime_t t = st->getPlaybackTime();
+        if(minValidPos == 0 || t < minValidPos)
+            minValidPos = t;
+    }
+
+    if(minValidPos)
+        playlist->pruneByPlaybackTime(minValidPos);
+}
+
 bool PlaylistManager::reactivateStream(AbstractStream *stream)
 {
     return stream->reactivate(getPCR());

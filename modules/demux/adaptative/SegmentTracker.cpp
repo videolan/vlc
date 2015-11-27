@@ -122,7 +122,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
     bool b_updated = false;
     /* Ensure ephemere content is updated/loaded */
     if(rep->needsUpdate())
-        b_updated = rep->runLocalUpdates(getSegmentStart(), count, false);
+        b_updated = rep->runLocalUpdates(getPlaybackTime(), count, false);
 
     if(prevRep && !rep->consistentSegmentNumber())
     {
@@ -222,7 +222,7 @@ void SegmentTracker::setPositionByNumber(uint64_t segnumber, bool restarted)
     count = segnumber;
 }
 
-mtime_t SegmentTracker::getSegmentStart() const
+mtime_t SegmentTracker::getPlaybackTime() const
 {
     if(curRepresentation)
         return curRepresentation->getPlaybackTimeBySegmentNumber(count);
@@ -245,18 +245,11 @@ void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)
     listeners.push_back(listener);
 }
 
-void SegmentTracker::pruneFromCurrent()
-{
-    AbstractPlaylist *playlist = adaptationSet->getPlaylist();
-    if(playlist->isLive())
-        playlist->pruneBySegmentNumber(count);
-}
-
 void SegmentTracker::updateSelected()
 {
     if(curRepresentation && curRepresentation->needsUpdate())
     {
-        curRepresentation->runLocalUpdates(getSegmentStart(), count, true);
+        curRepresentation->runLocalUpdates(getPlaybackTime(), count, true);
         curRepresentation->scheduleNextUpdate(count);
     }
 }

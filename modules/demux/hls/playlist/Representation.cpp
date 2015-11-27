@@ -154,13 +154,6 @@ bool Representation::runLocalUpdates(mtime_t, uint64_t number, bool prune)
     return true;
 }
 
-void Representation::getDurationsRange(mtime_t *min, mtime_t *max) const
-{
-    if(!b_loaded)
-        return;
-    BaseRepresentation::getDurationsRange(min, max);
-}
-
 uint64_t Representation::translateSegmentNumber(uint64_t num, const SegmentInformation *from) const
 {
     if(consistentSegmentNumber())

@@ -76,8 +76,7 @@ namespace adaptative
         typedef enum {status_eof, status_eop, status_dis, status_buffering, status_demuxed} status;
         status demux(mtime_t, bool);
         virtual bool setPosition(mtime_t, bool);
-        mtime_t getPosition() const;
-        void prune();
+        mtime_t getPlaybackTime() const;
         void runUpdates();
 
         virtual block_t *readNextBlock(); /* impl */

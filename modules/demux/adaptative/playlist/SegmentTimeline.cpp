@@ -155,6 +155,13 @@ uint64_t SegmentTimeline::minElementNumber() const
     return elements.front()->number;
 }
 
+void SegmentTimeline::pruneByPlaybackTime(mtime_t time)
+{
+    const uint64_t timescale = inheritTimescale();
+    uint64_t num = getElementNumberByScaledPlaybackTime(time * timescale / CLOCK_FREQ);
+    pruneBySequenceNumber(num);
+}
+
 size_t SegmentTimeline::pruneBySequenceNumber(uint64_t number)
 {
     size_t prunednow = 0;

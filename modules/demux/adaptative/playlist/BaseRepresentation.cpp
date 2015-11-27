@@ -93,6 +93,13 @@ bool BaseRepresentation::consistentSegmentNumber() const
     return b_consistent;
 }
 
+void BaseRepresentation::pruneByPlaybackTime(mtime_t time)
+{
+    uint64_t num;
+    if(getSegmentNumberByTime(time, &num))
+        pruneBySegmentNumber(num);
+}
+
 mtime_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
 {
     std::vector<ISegment *> seglist;
