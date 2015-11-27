@@ -90,6 +90,9 @@ uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) c
     for(it = elements.begin(); it != elements.end(); ++it)
     {
         const Element *el = *it;
+        if(it == elements.begin())
+            scaled -= el->t;
+
         for(uint64_t repeat = 1 + el->r; repeat; repeat--)
         {
             if(el->d >= scaled)
