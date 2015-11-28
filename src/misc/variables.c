@@ -49,7 +49,7 @@ typedef struct callback_entry_t
         vlc_callback_t       pf_value_callback;
         vlc_list_callback_t  pf_list_callback;
         void *               p_callback;
-    } u;
+    };
     void *         p_data;
 } callback_entry_t;
 
@@ -270,8 +270,8 @@ static void TriggerCallback(vlc_object_t *obj, variable_t *var,
     vlc_mutex_unlock(&priv->var_lock);
 
     for (size_t i = 0; i < count; i++)
-        entries[i].u.pf_value_callback(obj, name, prev, var->val,
-                                       entries[i].p_data);
+        entries[i].pf_value_callback(obj, name, prev, var->val,
+                                     entries[i].p_data);
 
     vlc_mutex_lock(&priv->var_lock);
     var->b_incallback = false;
@@ -295,7 +295,7 @@ static void TriggerListCallback(vlc_object_t *obj, variable_t *var,
     vlc_mutex_unlock(&priv->var_lock);
 
     for (size_t i = 0; i < count; i++)
-        entries[i].u.pf_list_callback(obj, name, action, val,
+        entries[i].pf_list_callback(obj, name, action, val,
                                       entries[i].p_data);
 
     vlc_mutex_lock(&priv->var_lock);
@@ -906,7 +906,7 @@ static int AddCallback( vlc_object_t *p_this, const char *psz_name,
     {
         vlc_mutex_unlock( &p_priv->var_lock );
         msg_Err( p_this, "cannot add callback %p to nonexistent variable '%s'",
-                 (void *)entry.u.p_callback, psz_name );
+                 entry.p_callback, psz_name );
         return VLC_ENOVAR;
     }
 
@@ -948,7 +948,7 @@ int var_AddCallback( vlc_object_t *p_this, const char *psz_name,
                      vlc_callback_t pf_callback, void *p_data )
 {
     callback_entry_t entry;
-    entry.u.pf_value_callback = pf_callback;
+    entry.pf_value_callback = pf_callback;
     entry.p_data = p_data;
 
     return AddCallback(p_this, psz_name, entry, vlc_value_callback);
@@ -984,13 +984,13 @@ static int DelCallback( vlc_object_t *p_this, const char *psz_name,
 
     for( i_entry = p_table->i_entries ; i_entry-- ; )
     {
-        if( p_table->p_entries[i_entry].u.p_callback == entry.u.p_callback
+        if( p_table->p_entries[i_entry].p_callback == entry.p_callback
             && p_table->p_entries[i_entry].p_data == entry.p_data )
         {
             break;
         }
 #ifndef NDEBUG
-        else if( p_table->p_entries[i_entry].u.p_callback == entry.u.p_callback )
+        else if( p_table->p_entries[i_entry].p_callback == entry.p_callback )
             b_found_similar = true;
 #endif
     }
@@ -1025,7 +1025,7 @@ int var_DelCallback( vlc_object_t *p_this, const char *psz_name,
                      vlc_callback_t pf_callback, void *p_data )
 {
     callback_entry_t entry;
-    entry.u.pf_value_callback = pf_callback;
+    entry.pf_value_callback = pf_callback;
     entry.p_data = p_data;
 
     return DelCallback(p_this, psz_name, entry, vlc_value_callback);
@@ -1066,7 +1066,7 @@ int var_AddListCallback( vlc_object_t *p_this, const char *psz_name,
                          vlc_list_callback_t pf_callback, void *p_data )
 {
     callback_entry_t entry;
-    entry.u.pf_list_callback = pf_callback;
+    entry.pf_list_callback = pf_callback;
     entry.p_data = p_data;
 
     return AddCallback(p_this, psz_name, entry, vlc_list_callback);
@@ -1082,7 +1082,7 @@ int var_DelListCallback( vlc_object_t *p_this, const char *psz_name,
                          vlc_list_callback_t pf_callback, void *p_data )
 {
     callback_entry_t entry;
-    entry.u.pf_list_callback = pf_callback;
+    entry.pf_list_callback = pf_callback;
     entry.p_data = p_data;
 
     return DelCallback(p_this, psz_name, entry, vlc_list_callback);
