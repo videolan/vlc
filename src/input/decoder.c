@@ -2061,12 +2061,6 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
         if( p_owner->p_vout )
             vout_NextPicture( p_owner->p_vout, pi_duration );
     }
-    else
-    {
-        /* TODO subtitle should not be flushed */
-        p_owner->b_waiting = false;
-        input_DecoderFlush( p_dec );
-    }
     vlc_mutex_unlock( &p_owner->lock );
 }
 
