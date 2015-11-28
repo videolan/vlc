@@ -1038,29 +1038,19 @@ int var_DelCallback( vlc_object_t *p_this, const char *psz_name,
  * \param p_this The object that hold the variable
  * \param psz_name The name of the variable
  */
-int var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
+void var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
 {
-    variable_t *p_var;
-
-    assert( p_this );
-
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    p_var = Lookup( p_this, psz_name );
-    if( p_var == NULL )
+    variable_t *p_var = Lookup( p_this, psz_name );
+    if( p_var != NULL )
     {
-        vlc_mutex_unlock( &p_priv->var_lock );
-        return VLC_ENOVAR;
+        WaitUnused( p_this, p_var );
+
+        /* Deal with callbacks. Tell we're in a callback, release the lock,
+         * call stored functions, retake the lock. */
+        TriggerCallback( p_this, p_var, psz_name, p_var->val );
     }
-
-    WaitUnused( p_this, p_var );
-
-    /* Deal with callbacks. Tell we're in a callback, release the lock,
-     * call stored functions, retake the lock. */
-    TriggerCallback( p_this, p_var, psz_name, p_var->val );
-
     vlc_mutex_unlock( &p_priv->var_lock );
-    return VLC_SUCCESS;
 }
 
 #undef var_AddListCallback

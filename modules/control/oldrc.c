@@ -605,10 +605,10 @@ static void *Run( void *data )
         /* If the user typed a registered local command, try it */
         if( var_Type( p_intf, psz_cmd ) & VLC_VAR_ISCOMMAND )
         {
-            int i_ret;
+            int i_ret = VLC_SUCCESS;
 
             if ((var_Type( p_intf, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
-                i_ret = var_TriggerCallback( p_intf, psz_cmd );
+                var_TriggerCallback( p_intf, psz_cmd );
             else
                 i_ret = var_SetString( p_intf, psz_cmd, psz_arg );
             msg_rc( "%s: returned %i (%s)",
@@ -617,12 +617,12 @@ static void *Run( void *data )
         /* Or maybe it's a global command */
         else if( var_Type( p_intf->p_libvlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
         {
-            int i_ret;
+            int i_ret = VLC_SUCCESS;
 
             /* FIXME: it's a global command, but we should pass the
              * local object as an argument, not p_intf->p_libvlc. */
             if ((var_Type( p_intf->p_libvlc, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
-                i_ret = var_TriggerCallback( p_intf, psz_cmd );
+                var_TriggerCallback( p_intf, psz_cmd );
             else
                 i_ret = var_SetString( p_intf->p_libvlc, psz_cmd, psz_arg );
             if( i_ret != 0 )
