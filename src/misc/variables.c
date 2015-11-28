@@ -892,7 +892,7 @@ int var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
     return var_GetChecked( p_this, psz_name, 0, p_val );
 }
 
-static int AddCallback( vlc_object_t *p_this, const char *psz_name,
+static void AddCallback( vlc_object_t *p_this, const char *psz_name,
                         callback_entry_t entry, vlc_callback_type_t i_type )
 {
     variable_t *p_var;
@@ -907,7 +907,7 @@ static int AddCallback( vlc_object_t *p_this, const char *psz_name,
         vlc_mutex_unlock( &p_priv->var_lock );
         msg_Err( p_this, "cannot add callback %p to nonexistent variable '%s'",
                  entry.p_callback, psz_name );
-        return VLC_ENOVAR;
+        return;
     }
 
     WaitUnused( p_this, p_var );
@@ -923,8 +923,6 @@ static int AddCallback( vlc_object_t *p_this, const char *psz_name,
                  entry);
 
     vlc_mutex_unlock( &p_priv->var_lock );
-
-    return VLC_SUCCESS;
 }
 
 #undef var_AddCallback
@@ -944,14 +942,14 @@ static int AddCallback( vlc_object_t *p_this, const char *psz_name,
  *          the variable. Use proper locking. This thread may not have much
  *          time to spare, so keep callback functions short.
  */
-int var_AddCallback( vlc_object_t *p_this, const char *psz_name,
-                     vlc_callback_t pf_callback, void *p_data )
+void var_AddCallback( vlc_object_t *p_this, const char *psz_name,
+                      vlc_callback_t pf_callback, void *p_data )
 {
     callback_entry_t entry;
     entry.pf_value_callback = pf_callback;
     entry.p_data = p_data;
 
-    return AddCallback(p_this, psz_name, entry, vlc_value_callback);
+    AddCallback(p_this, psz_name, entry, vlc_value_callback);
 }
 
 static void DelCallback( vlc_object_t *p_this, const char *psz_name,
@@ -1062,14 +1060,14 @@ void var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
  *
  * See var_AddCallback().
  */
-int var_AddListCallback( vlc_object_t *p_this, const char *psz_name,
-                         vlc_list_callback_t pf_callback, void *p_data )
+void var_AddListCallback( vlc_object_t *p_this, const char *psz_name,
+                          vlc_list_callback_t pf_callback, void *p_data )
 {
     callback_entry_t entry;
     entry.pf_list_callback = pf_callback;
     entry.p_data = p_data;
 
-    return AddCallback(p_this, psz_name, entry, vlc_list_callback);
+    AddCallback(p_this, psz_name, entry, vlc_list_callback);
 }
 
 #undef var_DelListCallback
