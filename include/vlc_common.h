@@ -383,12 +383,6 @@ typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's objec
                                         vlc_value_t *,      /* new/deleted value  */
                                         void *);                 /* callback data */
 
-typedef enum
-{
-    vlc_value_callback,
-    vlc_list_callback
-} vlc_callback_type_t;
-
 /*****************************************************************************
  * OS-specific headers and thread types
  *****************************************************************************/

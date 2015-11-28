@@ -892,6 +892,12 @@ int var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
     return var_GetChecked( p_this, psz_name, 0, p_val );
 }
 
+typedef enum
+{
+    vlc_value_callback,
+    vlc_list_callback
+} vlc_callback_type_t;
+
 static void AddCallback( vlc_object_t *p_this, const char *psz_name,
                         callback_entry_t entry, vlc_callback_type_t i_type )
 {
