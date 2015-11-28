@@ -1761,6 +1761,14 @@ void input_DecoderDelete( decoder_t *p_dec )
     vlc_mutex_lock( &p_owner->lock );
     p_owner->b_waiting = false;
     vlc_cond_signal( &p_owner->wait_request );
+
+    /* If the video output is paused or too slow, the decoded picture FIFO may
+     * contain so many picture buffers that the decoder gets stuck waiting for
+     * free buffers. Force all pending pictures in the decoder output FIFO
+     * released to enable decoder forward progress - up to the thread
+     * cancellation. */
+    if( p_owner->p_vout != NULL )
+        vout_Flush( p_owner->p_vout, VLC_TS_INVALID + 1 );
     vlc_mutex_unlock( &p_owner->lock );
 
     vlc_join( p_owner->thread, NULL );
