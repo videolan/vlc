@@ -104,7 +104,7 @@ struct node {
 inline static node* new_node( char *name )
 {
     node *n = (node*) calloc( 1, sizeof(node) );
-    n->name = convert_xml_special_chars( name );
+    n->name = vlc_xml_encode( name );
     return n;
 }
 
@@ -537,7 +537,7 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
                       const char *psz_zippath )
 {
     char *psz_zip = strrchr( psz_zippath, DIR_SEP_CHAR );
-    psz_zip = convert_xml_special_chars( psz_zip ? (psz_zip+1) : psz_zippath );
+    psz_zip = vlc_xml_encode( psz_zip ? (psz_zip+1) : psz_zippath );
 
     if( asprintf( pp_buffer, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         "<playlist version=\"1\" xmlns=\"http://xspf.org/ns/0/\" "
@@ -575,8 +575,7 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
         {
             /* Extract file name */
             char *psz_file = strrchr( psz_name, '/' );
-            psz_file = convert_xml_special_chars( psz_file ?
-                    (psz_file+1) : psz_name );
+            psz_file = vlc_xml_encode( psz_file ? (psz_file+1) : psz_name );
 
             /* Build full MRL */
             char *psz_path = strdup( psz_pathtozip );

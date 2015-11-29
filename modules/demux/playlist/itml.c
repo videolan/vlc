@@ -388,7 +388,7 @@ static bool save_data( track_elem_t *p_track, const char *psz_name,
         return false;
 
     /* re-convert xml special characters inside psz_value */
-    resolve_xml_special_chars( psz_value );
+    vlc_xml_decode( psz_value );
 
 #define SAVE_INFO( name, value ) \
     if( !strcmp( psz_name, name ) ) { p_track->value = strdup( psz_value ); }

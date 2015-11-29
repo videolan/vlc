@@ -112,7 +112,7 @@ static int vlclua_resolve_xml_special_chars( lua_State *L )
         lua_remove( L, 1 ); /* remove elements to prevent being limited by
                              * the stack's size (this function will work with
                              * up to (stack size - 1) arguments */
-        resolve_xml_special_chars( psz_string );
+        vlc_xml_decode( psz_string );
         lua_pushstring( L, psz_string );
         free( psz_string );
     }
@@ -125,7 +125,7 @@ static int vlclua_convert_xml_special_chars( lua_State *L )
     int i;
     for( i = 1; i <= i_top; i++ )
     {
-        char *psz_string = convert_xml_special_chars( luaL_checkstring(L,1) );
+        char *psz_string = vlc_xml_encode( luaL_checkstring(L,1) );
         lua_remove( L, 1 );
         lua_pushstring( L, psz_string );
         free( psz_string );

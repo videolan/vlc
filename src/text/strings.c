@@ -189,11 +189,7 @@ static int cmp_entity (const void *key, const void *elem)
     return strncmp (name, ent->psz_entity, strlen (ent->psz_entity));
 }
 
-/**
- * Converts "&lt;", "&gt;" and "&amp;" to "<", ">" and "&"
- * \param string to convert
- */
-void resolve_xml_special_chars( char *psz_value )
+void vlc_xml_decode( char *psz_value )
 {
     char *p_pos = psz_value;
 
@@ -285,13 +281,7 @@ void resolve_xml_special_chars( char *psz_value )
     *p_pos = '\0';
 }
 
-/**
- * XML-encode an UTF-8 string
- * \param str null-terminated UTF-8 byte sequence to XML-encode
- * \return XML encoded string or NULL on error
- * (errno is set to ENOMEM or EILSEQ as appropriate)
- */
-char *convert_xml_special_chars (const char *str)
+char *vlc_xml_encode (const char *str)
 {
     assert (str != NULL);
 

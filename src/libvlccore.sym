@@ -66,7 +66,6 @@ config_ResetAll
 config_SaveConfigFile
 config_StringEscape
 config_StringUnescape
-convert_xml_special_chars
 date_Change
 date_Decrement
 date_Get
@@ -363,7 +362,6 @@ playlist_VolumeSet
 playlist_VolumeUp
 playlist_MuteSet
 playlist_MuteGet
-resolve_xml_special_chars
 sdp_AddAttribute
 sdp_AddMedia
 secstotimestr
@@ -692,6 +690,8 @@ xml_Delete
 xml_ReaderCreate
 xml_ReaderDelete
 xml_ReaderReset
+vlc_xml_decode
+vlc_xml_encode
 vlc_keycode2str
 vlc_str2keycode
 fingerprinter_Create
