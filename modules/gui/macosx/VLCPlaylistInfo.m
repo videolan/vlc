@@ -218,7 +218,7 @@
                 libvlc_MetaRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
 
             /* fill uri info */
-            char *psz_url = decode_URI(input_item_GetURI(p_item));
+            char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
             [_uriTextField setStringValue:toNSStr(psz_url)];
             free(psz_url);
 

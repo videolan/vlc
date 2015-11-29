@@ -152,7 +152,7 @@ int FileOpen( vlc_object_t *p_this )
             fd = vlc_dup (oldfd);
         else if (*end == '/' && end > p_access->psz_location)
         {
-            char *name = decode_URI_duplicate (end - 1);
+            char *name = vlc_uri_decode_duplicate (end - 1);
             if (name != NULL)
             {
                 name[0] = '.';

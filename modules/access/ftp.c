@@ -612,7 +612,7 @@ static int parseURL( vlc_url_t *url, const char *path, enum tls_mode_e mode )
         if( strchr( "iI", type[6] ) == NULL )
             return VLC_EGENERIC; /* ASCII and directory not supported */
     }
-    decode_URI( url->psz_path );
+    vlc_uri_decode( url->psz_path );
     return VLC_SUCCESS;
 }
 

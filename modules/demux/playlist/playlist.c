@@ -261,7 +261,7 @@ char *ProcessMRL( const char *psz_mrl, const char *psz_prefix )
 
     /* This a relative path, prepend the prefix */
     char *ret;
-    char *postfix = encode_URI_component( psz_mrl );
+    char *postfix = vlc_uri_encode( psz_mrl );
     /* FIXME: postfix may not be encoded correctly (esp. slashes) */
     if( postfix == NULL
      || asprintf( &ret, "%s%s", psz_prefix, postfix ) == -1 )

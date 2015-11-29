@@ -546,7 +546,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         free(psz_value);
 
     } else if ([o_identifier isEqualToString:URI_COLUMN]) {
-        psz_value = decode_URI(input_item_GetURI(p_input));
+        psz_value = vlc_uri_decode(input_item_GetURI(p_input));
         o_value = toNSStr(psz_value);
         free(psz_value);
 

@@ -330,7 +330,7 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
         /* Make the name more readable */
         if( p_i->psz_name )
         {
-            decode_URI( p_i->psz_name );
+            vlc_uri_decode( p_i->psz_name );
             EnsureUTF8( p_i->psz_name );
         }
     }

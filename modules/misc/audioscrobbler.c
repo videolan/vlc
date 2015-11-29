@@ -168,7 +168,7 @@ static void ReadMetaData(intf_thread_t *p_this, input_thread_t *p_input)
 #define ALLOC_ITEM_META(a, b) do { \
         char *psz_meta = input_item_Get##b(p_item); \
         if (psz_meta && *psz_meta) \
-            a = encode_URI_component(psz_meta); \
+            a = vlc_uri_encode(psz_meta); \
         free(psz_meta); \
     } while (0)
 

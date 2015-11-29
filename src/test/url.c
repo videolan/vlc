@@ -60,7 +60,7 @@ static void test (conv_t f, const char *in, const char *out)
 
 static inline void test_decode (const char *in, const char *out)
 {
-    test (decode_URI_duplicate, in, out);
+    test (vlc_uri_decode_duplicate, in, out);
 }
 
 static inline void test_b64 (const char *in, const char *out)

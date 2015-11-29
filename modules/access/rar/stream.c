@@ -113,7 +113,7 @@ int RarStreamOpen(vlc_object_t *object)
      * (becareful about '\' and '/'.
      */
     char *base;
-    char *encoded = encode_URI_component(s->psz_url);
+    char *encoded = vlc_uri_encode(s->psz_url);
     if (!encoded || asprintf(&base, "rar://%s", encoded) < 0)
         base = NULL;
     free(encoded);

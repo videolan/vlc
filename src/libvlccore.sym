@@ -87,8 +87,6 @@ decoder_SynchroNewPicture
 decoder_SynchroRelease
 decoder_SynchroReset
 decoder_SynchroTrash
-decode_URI
-decode_URI_duplicate
 demux_Delete
 demux_PacketizerDestroy
 demux_PacketizerNew
@@ -105,7 +103,6 @@ dialog_Question
 dialog_Register
 dialog_Unregister
 dialog_VFatal
-encode_URI_component
 EndMD5
 es_format_Clean
 es_format_Copy
@@ -246,6 +243,9 @@ vlc_UrlParse
 vlc_UrlClean
 vlc_path2uri
 vlc_uri2path
+vlc_uri_decode
+vlc_uri_decode_duplicate
+vlc_uri_encode
 mdate
 module_config_free
 module_config_get

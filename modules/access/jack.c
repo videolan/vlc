@@ -514,7 +514,7 @@ static void Port_finder( demux_t *p_demux )
     for( token = strtok_r( psz_expr, ",", &state ); token;
             token = strtok_r( NULL, ",", &state ) )
     {
-        psz_uri = decode_URI_duplicate( token );
+        psz_uri = vlc_uri_decode_duplicate( token );
         /* get the ports which match the regexp */
         pp_jack_port_output = jack_get_ports( p_sys->p_jack_client,
            psz_uri, NULL, JackPortIsOutput );
