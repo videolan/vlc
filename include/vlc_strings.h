@@ -134,7 +134,7 @@ static inline char *str_format( input_thread_t *input, const char *fmt )
     return s2;
 }
 
- VLC_API void filename_sanitize( char * );
+void filename_sanitize(char *);
 VLC_API void path_sanitize( char * );
 
 /**

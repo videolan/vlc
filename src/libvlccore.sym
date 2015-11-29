@@ -109,7 +109,6 @@ es_format_Copy
 es_format_Init
 es_format_InitFromVideo
 es_format_IsSimilar
-filename_sanitize
 filter_Blend
 filter_chain_AppendFilter
 filter_chain_AppendFromString
