@@ -110,15 +110,6 @@ int utf8_fprintf( FILE *stream, const char *fmt, ... )
     return res;
 }
 
-
-/**
- * Converts the first character from a UTF-8 sequence into a code point.
- *
- * @param str an UTF-8 bytes sequence
- * @return 0 if str points to an empty string, i.e. the first character is NUL;
- * number of bytes that the first character occupies (from 1 to 4) otherwise;
- * -1 if the byte sequence was not a valid UTF-8 sequence.
- */
 size_t vlc_towc (const char *str, uint32_t *restrict pwc)
 {
     uint8_t *ptr = (uint8_t *)str, c;

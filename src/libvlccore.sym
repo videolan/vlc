@@ -628,6 +628,7 @@ vlc_timer_create
 vlc_timer_destroy
 vlc_timer_getoverrun
 vlc_timer_schedule
+vlc_towc
 vlc_ureduce
 vlc_epg_Init
 vlc_epg_Clean

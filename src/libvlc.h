@@ -34,8 +34,6 @@ struct vlc_actions;
 struct vlc_actions *vlc_InitActions (libvlc_int_t *);
 extern void vlc_DeinitActions (libvlc_int_t *, struct vlc_actions *);
 
-size_t vlc_towc (const char *str, uint32_t *restrict pwc);
-
 /*
  * OS-specific initialization
  */

@@ -27,8 +27,28 @@
 
 /**
  * \file
- * This files handles locale conversions in vlc
+ * Characters sets handling
+ *
+ * \ingroup strings
+ * @{
  */
+
+/**
+ * Decodes a code point from UTF-8.
+ *
+ * Converts the first character in a UTF-8 sequence into a Unicode code point.
+ *
+ * \param str an UTF-8 bytes sequence [IN]
+ * \param pwc address of a location to store the code point [OUT]
+ *
+ * \return the number of bytes occupied by the decoded code point
+ *
+ * \retval (size_t)-1 not a valid UTF-8 sequence
+ * \retval 0 null character (i.e. str points to an empty string)
+ * \retval 1 (non-null) ASCII character
+ * \retval 2-4 non-ASCII character
+ */
+VLC_API size_t vlc_towc(const char *str, uint32_t *restrict pwc);
 
 /* iconv wrappers (defined in src/extras/libc.c) */
 typedef void *vlc_iconv_t;
@@ -203,6 +223,8 @@ static inline char *FromLatin1 (const char *latin)
     utf8 = (char *)realloc (str, utf8 - str);
     return utf8 ? utf8 : str;
 }
+
+/** @} */
 
 VLC_API double us_strtod( const char *, char ** ) VLC_USED;
 VLC_API float us_strtof( const char *, char ** ) VLC_USED;
