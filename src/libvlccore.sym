@@ -245,7 +245,7 @@ libvlc_ArtRequest
 vlc_UrlParse
 vlc_UrlClean
 vlc_path2uri
-make_path
+vlc_uri2path
 mdate
 module_config_free
 module_config_get

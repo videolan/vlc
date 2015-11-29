@@ -32,7 +32,7 @@
 #include <vlc_demux.h>              /* demux_meta_t */
 #include <vlc_strings.h>            /* vlc_b64_decode_binary */
 #include <vlc_input.h>              /* for attachment_new */
-#include <vlc_url.h>                /* make_path */
+#include <vlc_url.h>                /* vlc_uri2path */
 #include <vlc_mime.h>               /* mime type */
 #include <vlc_fs.h>
 
@@ -689,7 +689,7 @@ static int ReadMeta( vlc_object_t* p_this)
     if( unlikely(psz_uri == NULL) )
         return VLC_ENOMEM;
 
-    char *psz_path = make_path( psz_uri );
+    char *psz_path = vlc_uri2path( psz_uri );
     free( psz_uri );
     if( psz_path == NULL )
         return VLC_EGENERIC;
@@ -916,7 +916,7 @@ static void WriteMetaToId3v2( ID3v2::Tag* tag, input_item_t* p_item )
     if( psz_url == NULL )
         return;
 
-    char *psz_path = make_path( psz_url );
+    char *psz_path = vlc_uri2path( psz_url );
     free( psz_url );
     if( psz_path == NULL )
         return;

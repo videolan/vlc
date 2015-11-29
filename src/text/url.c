@@ -143,13 +143,6 @@ char *encode_URI_component (const char *str)
     return ret;
 }
 
-/**
- * Builds a URL representation from a local file path.
- * @param path path to convert (or URI to copy)
- * @param scheme URI scheme to use (default is auto: "file", "fd" or "smb")
- * @return a nul-terminated URI string (use free() to release it),
- * or NULL in case of error (errno will be set accordingly)
- */
 char *vlc_path2uri (const char *path, const char *scheme)
 {
     if (path == NULL)
@@ -252,13 +245,7 @@ char *vlc_path2uri (const char *path, const char *scheme)
     return buf;
 }
 
-/**
- * Tries to convert a URI to a local (UTF-8-encoded) file path.
- * @param url URI to convert
- * @return NULL on error, a nul-terminated string otherwise
- * (use free() to release it)
- */
-char *make_path (const char *url)
+char *vlc_uri2path (const char *url)
 {
     char *ret = NULL;
     char *end;

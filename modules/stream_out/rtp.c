@@ -758,7 +758,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
             msg_Err( p_stream, "you can use sdp=file:// only once" );
             goto out;
         }
-        p_sys->psz_sdp_file = make_path( psz_url );
+        p_sys->psz_sdp_file = vlc_uri2path( psz_url );
         if( p_sys->psz_sdp_file == NULL )
             goto out;
         FileSetup( p_stream );

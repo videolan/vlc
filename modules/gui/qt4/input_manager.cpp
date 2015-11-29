@@ -718,7 +718,7 @@ const QString InputManager::decodeArtURL( input_item_t *p_item )
     char *psz_art = input_item_GetArtURL( p_item );
     if( psz_art )
     {
-        char *psz = make_path( psz_art );
+        char *psz = vlc_uri2path( psz_art );
         free( psz_art );
         psz_art = psz;
     }

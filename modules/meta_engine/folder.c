@@ -92,7 +92,7 @@ static int FindMeta( vlc_object_t *p_this )
             free( psz_uri );
             return VLC_EGENERIC;
         }
-        char *psz_basedir = make_path( psz_path );
+        char *psz_basedir = vlc_uri2path( psz_path );
         FREENULL( psz_path );
         if( psz_basedir == NULL )
         {
@@ -107,7 +107,7 @@ static int FindMeta( vlc_object_t *p_this )
 
     if ( psz_path == NULL )
     {
-        char *psz_basedir = make_path( psz_uri );
+        char *psz_basedir = vlc_uri2path( psz_uri );
         if( psz_basedir == NULL )
         {
             free( psz_uri );

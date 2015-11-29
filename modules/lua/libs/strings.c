@@ -95,7 +95,7 @@ static int vlclua_make_uri( lua_State *L )
 static int vlclua_make_path( lua_State *L )
 {
     const char *psz_input = luaL_checkstring( L, 1 );
-    char *psz_path = make_path( psz_input);
+    char *psz_path = vlc_uri2path( psz_input);
     lua_pushstring( L, psz_path );
     free( psz_path );
     return 1;

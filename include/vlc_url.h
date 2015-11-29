@@ -28,9 +28,34 @@
 /**
  * \file
  * This file defines functions for manipulating URL in vlc
+ *
+ * \ingroup strings
+ * @{
  */
 
-VLC_API char *vlc_path2uri (const char *path, const char *scheme) VLC_MALLOC;
+/**
+ * Converts local path to URL.
+ *
+ * Builds a URL representation from a local UTF-8 null-terminated file path.
+ *
+ * @param path file path
+ * @param scheme URI scheme to use (default is auto: "file", "fd" or "smb")
+ * @return a heap-allocated URI string on success
+ * or NULL in case of error (errno will be set accordingly)
+ */
+VLC_API char *vlc_path2uri(const char *path, const char *scheme) VLC_MALLOC;
+
+/**
+ * Converts a URI to a local path.
+ *
+ * Builds a local path (UTF-8-encoded null-terminated string) from a URI if
+ * the URI scheme allows.
+ *
+ * @param url URI
+ * @return a heap-allocated string or success
+ * or NULL on error
+ */
+VLC_API char *vlc_uri2path(const char *url) VLC_MALLOC;
 
 struct vlc_url_t
 {
@@ -48,8 +73,10 @@ struct vlc_url_t
 VLC_API char * decode_URI_duplicate( const char *psz ) VLC_MALLOC;
 VLC_API char * decode_URI( char *psz );
 VLC_API char * encode_URI_component( const char *psz ) VLC_MALLOC;
-VLC_API char * make_path( const char *url ) VLC_MALLOC;
+
+/** @} */
 
 VLC_API void vlc_UrlParse (vlc_url_t *, const char *);
 VLC_API void vlc_UrlClean (vlc_url_t *);
+
 #endif

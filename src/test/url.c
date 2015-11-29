@@ -169,7 +169,7 @@ int main (void)
     assert (val != -1);*/
 
     /* URI to path tests */
-#define test( a, b ) test (make_path, a, b)
+#define test( a, b ) test (vlc_uri2path, a, b)
     test ("mailto:john@example.com", NULL);
     test ("http://www.example.com/file.html#ref", NULL);
     test ("file://", NULL);

@@ -259,7 +259,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     if( !psz_name_org )
         return NULL;
 
-    char *psz_fname = make_path( psz_name_org );
+    char *psz_fname = vlc_uri2path( psz_name_org );
     if( !psz_fname )
         return NULL;
 
