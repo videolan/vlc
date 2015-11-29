@@ -229,51 +229,6 @@ char *vlc_strcasestr (const char *haystack, const char *needle)
 }
 
 /**
- * Replaces invalid/overlong UTF-8 sequences with question marks.
- * Note that it is not possible to convert from Latin-1 to UTF-8 on the fly,
- * so we don't try that, even though it would be less disruptive.
- *
- * @return str if it was valid UTF-8, NULL if not.
- */
-char *EnsureUTF8( char *str )
-{
-    char *ret = str;
-    size_t n;
-    uint32_t cp;
-
-    while ((n = vlc_towc (str, &cp)) != 0)
-        if (likely(n != (size_t)-1))
-            str += n;
-        else
-        {
-            *str++ = '?';
-            ret = NULL;
-        }
-    return ret;
-}
-
-
-/**
- * Checks whether a string is a valid UTF-8 byte sequence.
- *
- * @param str nul-terminated string to be checked
- *
- * @return str if it was valid UTF-8, NULL if not.
- */
-const char *IsUTF8( const char *str )
-{
-    size_t n;
-    uint32_t cp;
-
-    while ((n = vlc_towc (str, &cp)) != 0)
-        if (likely(n != (size_t)-1))
-            str += n;
-        else
-            return NULL;
-    return str;
-}
-
-/**
  * Converts a string from the given character encoding to utf-8.
  *
  * @return a nul-terminated utf-8 string, or null in case of error.

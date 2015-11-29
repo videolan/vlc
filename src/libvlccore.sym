@@ -107,7 +107,6 @@ dialog_Unregister
 dialog_VFatal
 encode_URI_component
 EndMD5
-EnsureUTF8
 es_format_Clean
 es_format_Copy
 es_format_Init
@@ -233,7 +232,6 @@ input_Stop
 input_vaControl
 input_Close
 intf_Create
-IsUTF8
 libvlc_InternalAddIntf
 libvlc_InternalPlay
 libvlc_InternalCleanup
