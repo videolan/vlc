@@ -193,6 +193,8 @@
     [_streamSAPCheckbox setState:NSOffState];
     [_streamSDPMatrix setEnabled:NO];
     [_streamSDPFileBrowseButton setStringValue:_NS("Browse...")];
+    [_streamChannelLabel setStringValue:_NS("Channel Name")];
+    [_streamSDPLabel setStringValue:_NS("SDP URL")];
 
     /* there is no way to hide single cells, so replace the existing ones with empty cells.. */
     id blankCell = [[NSCell alloc] init];

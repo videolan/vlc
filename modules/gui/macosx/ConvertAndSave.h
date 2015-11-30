@@ -120,9 +120,11 @@
 @property (weak) IBOutlet NSTextField *streamPortField;
 @property (weak) IBOutlet NSTextField *streamAnnouncementLabel;
 @property (weak) IBOutlet NSButton *streamSAPCheckbox;
+@property (weak) IBOutlet NSTextField *streamChannelLabel;
 @property (weak) IBOutlet NSTextField *streamChannelField;
 @property (weak) IBOutlet NSMatrix *streamSDPMatrix;
 @property (weak) IBOutlet NSButton *streamSDPFileBrowseButton;
+@property (weak) IBOutlet NSTextField *streamSDPLabel;
 @property (weak) IBOutlet NSTextField *streamSDPField;
 @property (weak) IBOutlet NSButton *streamCancelButton;
 @property (weak) IBOutlet NSButton *streamOkButton;
