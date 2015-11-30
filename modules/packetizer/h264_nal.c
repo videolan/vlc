@@ -429,7 +429,10 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
         i_profile_idc == PROFILE_H264_SVC_BASELINE ||
         i_profile_idc == PROFILE_H264_SVC_HIGH ||
         i_profile_idc == PROFILE_H264_MVC_MULTIVIEW_HIGH ||
-        i_profile_idc == PROFILE_H264_MVC_STEREO_HIGH )
+        i_profile_idc == PROFILE_H264_MVC_STEREO_HIGH ||
+        i_profile_idc == PROFILE_H264_MVC_MULTIVIEW_DEPTH_HIGH ||
+        i_profile_idc == PROFILE_H264_MVC_ENHANCED_MULTIVIEW_DEPTH_HIGH ||
+        i_profile_idc == PROFILE_H264_MFC_HIGH )
     {
         /* chroma_format_idc */
         const int i_chroma_format_idc = bs_read_ue( &s );
