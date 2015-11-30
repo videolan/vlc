@@ -598,10 +598,7 @@ char* Dummy_Select( filter_t *p_filter, const char* psz_font,
     /* Get Windows Font folder */
     char *psz_win_fonts_path = GetWindowsFontPath();
     if( asprintf( &psz_fontname, "%s\\%s", psz_win_fonts_path, psz_font ) == -1 )
-    {
         psz_fontname = NULL;
-        return NULL;
-    }
     free(psz_win_fonts_path);
 
     return psz_fontname;
