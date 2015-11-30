@@ -556,7 +556,7 @@ char* Generic_Select( filter_t *p_filter, const char* psz_family,
     return File_Select( SYSTEM_DEFAULT_FONT_FILE );
 }
 
-#ifndef _WIN32
+#if !defined(_WIN32) || defined(VLC_WINSTORE_APP)
 char* Dummy_Select( filter_t *p_filter, const char* psz_font,
                     bool b_bold, bool b_italic,
                     int *i_idx, uni_char_t codepoint )
