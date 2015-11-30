@@ -244,13 +244,14 @@ picture_t *picture_pool_Wait(picture_pool_t *pool)
     vlc_mutex_lock(&pool->lock);
     assert(pool->refs > 0);
 
-    while (pool->available == 0 && !pool->canceled)
-        vlc_cond_wait(&pool->wait, &pool->lock);
-
-    if (pool->canceled)
+    while (pool->available == 0)
     {
-        vlc_mutex_unlock(&pool->lock);
-        return NULL;
+        if (pool->canceled)
+        {
+            vlc_mutex_unlock(&pool->lock);
+            return NULL;
+        }
+        vlc_cond_wait(&pool->wait, &pool->lock);
     }
 
     i = ffsll(pool->available);
