@@ -475,7 +475,7 @@ static input_item_t* DirRead( access_t *p_access )
 
         char *psz_full_uri, *psz_uri;
 
-        psz_uri = encode_URI_component( psz_file );
+        psz_uri = vlc_uri_encode( psz_file );
         if( psz_uri == NULL )
             continue;
 

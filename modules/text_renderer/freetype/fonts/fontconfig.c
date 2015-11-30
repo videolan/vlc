@@ -35,8 +35,8 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_filter.h>                                      /* filter_sys_t */
-#include <vlc_dialog.h>                        /* FcCache dialog */
+#include <vlc_filter.h>                     /* filter_sys_t */
+#include <vlc_dialog.h>                     /* FcCache dialog */
 
 #include <fontconfig/fontconfig.h>
 
@@ -53,7 +53,7 @@ int FontConfig_Prepare( filter_t *p_filter )
     FcInit();
 #endif
 
-#if defined( _WIN32 ) || defined( __APPLE__ )
+#if defined( _WIN32 )
     dialog_progress_bar_t *p_dialog = NULL;
     FcConfig *fcConfig = FcInitLoadConfig();
 
@@ -68,15 +68,6 @@ int FontConfig_Prepare( filter_t *p_filter )
     if( FcConfigBuildFonts( fcConfig ) == FcFalse )
         return VLC_ENOMEM;
 
-#if defined( __APPLE__ )
-    // By default, scan only the directory /System/Library/Fonts.
-    // So build the set of available fonts under another directories,
-    // and add the set to the current configuration.
-    FcConfigAppFontAddDir( NULL, "~/Library/Fonts" );
-    FcConfigAppFontAddDir( NULL, "/Library/Fonts" );
-    FcConfigAppFontAddDir( NULL, "/Network/Library/Fonts" );
-    //FcConfigAppFontAddDir( NULL, "/System/Library/Fonts" );
-#endif
     if( p_dialog )
     {
 //        dialog_ProgressSet( p_dialog, NULL, 1.0 );

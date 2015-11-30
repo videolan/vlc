@@ -526,7 +526,7 @@ static int Install( addons_storage_t *p_storage, addon_entry_t *p_entry )
 #define WRITE_WITH_ENTITIES( formatstring, varname ) \
 if ( varname ) \
 {\
-    psz_tempstring = convert_xml_special_chars( varname );\
+    psz_tempstring = vlc_xml_encode( varname );\
     fprintf( p_catalog, formatstring, psz_tempstring );\
     free( psz_tempstring );\
 }\
@@ -598,7 +598,7 @@ static int WriteCatalog( addons_storage_t *p_storage,
         }
 
         if ( p_entry->psz_source_module )
-            psz_tempstring = convert_xml_special_chars( p_entry->psz_source_module );
+            psz_tempstring = vlc_xml_encode( p_entry->psz_source_module );
 
         char *psz_uuid = addons_uuid_to_psz( ( const addon_uuid_t * ) & p_entry->uuid );
         fprintf( p_catalog, "\t\t<addon source=\"%s\" type=\"%s\" id=\"%s\" "
@@ -635,7 +635,7 @@ static int WriteCatalog( addons_storage_t *p_storage,
         fprintf( p_catalog, "\t\t\t</authorship>\n" );
 
         FOREACH_ARRAY( addon_file_t *p_file, p_entry->files )
-            psz_tempstring = convert_xml_special_chars( p_file->psz_filename );
+            psz_tempstring = vlc_xml_encode( p_file->psz_filename );
             fprintf( p_catalog, "\t\t\t<resource type=\"%s\">%s</resource>\n",
                      getTypePsz( p_file->e_filetype ), psz_tempstring );
             free( psz_tempstring );

@@ -183,6 +183,8 @@ Removed modules
  * httplive (use adaptive instead)
  * smooth (use adaptive instead)
  * Gnome-VFS access module (i.e. Gnome 2.x)
+ * QuartText text renderer module (use Freetype instead)
+ * Win32 GDI text renderer module (use Freetype instead)
 
 
 Changes between 2.2.0 and 2.2.1:

@@ -59,6 +59,30 @@ void SegmentTimeline::addElement(uint64_t number, stime_t d, uint64_t r, stime_t
     }
 }
 
+mtime_t SegmentTimeline::getMinAheadScaledTime(uint64_t number) const
+{
+    stime_t totalscaledtime = 0;
+
+    std::list<Element *>::const_reverse_iterator it;
+    for(it = elements.rbegin(); it != elements.rend(); ++it)
+    {
+        const Element *el = *it;
+
+        if(number < el->number)
+        {
+            totalscaledtime += (el->d * (el->r + 1));
+            break;
+        }
+        else if(number <= el->number + el->r)
+        {
+            totalscaledtime += el->d * (el->number + el->r - number);
+        }
+        else break;
+    }
+
+    return totalscaledtime;
+}
+
 uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) const
 {
     uint64_t prevnumber = 0;
@@ -66,6 +90,9 @@ uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) c
     for(it = elements.begin(); it != elements.end(); ++it)
     {
         const Element *el = *it;
+        if(it == elements.begin())
+            scaled -= el->t;
+
         for(uint64_t repeat = 1 + el->r; repeat; repeat--)
         {
             if(el->d >= scaled)
@@ -126,6 +153,13 @@ uint64_t SegmentTimeline::minElementNumber() const
     if(elements.empty())
         return 0;
     return elements.front()->number;
+}
+
+void SegmentTimeline::pruneByPlaybackTime(mtime_t time)
+{
+    const uint64_t timescale = inheritTimescale();
+    uint64_t num = getElementNumberByScaledPlaybackTime(time * timescale / CLOCK_FREQ);
+    pruneBySequenceNumber(num);
 }
 
 size_t SegmentTimeline::pruneBySequenceNumber(uint64_t number)

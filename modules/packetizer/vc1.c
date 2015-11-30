@@ -120,6 +120,7 @@ typedef enum
 } idu_type_t;
 
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block );
+static void Flush( decoder_t * );
 
 static void PacketizeReset( void *p_private, bool b_broken );
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
@@ -144,6 +145,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush = Flush;
     p_dec->pf_get_cc = GetCc;
 
     /* Create the output format */
@@ -255,6 +257,13 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         p_sys->b_check_startcode = p_dec->fmt_in.b_packetized;
 
     return p_au;
+}
+
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    packetizer_Flush( &p_sys->packetizer );
 }
 
 static void PacketizeReset( void *p_private, bool b_broken )

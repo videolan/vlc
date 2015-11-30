@@ -42,10 +42,11 @@ class UTCTime
 {
     public:
         UTCTime(const std::string&);
-        operator time_t() const;
+        time_t  time() const;
+        mtime_t mtime() const;
 
     private:
-        time_t time;
+        mtime_t t;
 };
 
 template<typename T> class Integer

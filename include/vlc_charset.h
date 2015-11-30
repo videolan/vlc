@@ -27,8 +27,86 @@
 
 /**
  * \file
- * This files handles locale conversions in vlc
+ * Characters sets handling
+ *
+ * \ingroup strings
+ * @{
  */
+
+/**
+ * Decodes a code point from UTF-8.
+ *
+ * Converts the first character in a UTF-8 sequence into a Unicode code point.
+ *
+ * \param str an UTF-8 bytes sequence [IN]
+ * \param pwc address of a location to store the code point [OUT]
+ *
+ * \return the number of bytes occupied by the decoded code point
+ *
+ * \retval (size_t)-1 not a valid UTF-8 sequence
+ * \retval 0 null character (i.e. str points to an empty string)
+ * \retval 1 (non-null) ASCII character
+ * \retval 2-4 non-ASCII character
+ */
+VLC_API size_t vlc_towc(const char *str, uint32_t *restrict pwc);
+
+/**
+ * Checks UTF-8 validity.
+ *
+ * Checks whether a null-terminated string is a valid UTF-8 bytes sequence.
+ *
+ * \param str string to check
+ *
+ * \retval str the string is a valid null-terminated UTF-8 sequence
+ * \retval NULL the string is not an UTF-8 sequence
+ */
+VLC_USED static inline const char *IsUTF8(const char *str)
+{
+    size_t n;
+    uint32_t cp;
+
+    while ((n = vlc_towc(str, &cp)) != 0)
+        if (likely(n != (size_t)-1))
+            str += n;
+        else
+            return NULL;
+    return str;
+}
+
+/**
+ * Removes non-UTF-8 sequences.
+ *
+ * Replaces invalid or <i>over-long</i> UTF-8 bytes sequences within a
+ * null-terminated string with question marks. This is so that the string can
+ * be printed at least partially.
+ *
+ * \warning Do not use this were correctness is critical. use IsUTF8() and
+ * handle the error case instead. This function is mainly for display or debug.
+ *
+ * \note Converting from Latin-1 to UTF-8 in place is not possible (the string
+ * size would be increased). So it is not attempted even if it would otherwise
+ * be less disruptive.
+ *
+ * \retval str the string is a valid null-terminated UTF-8 sequence
+ *             (i.e. no changes were made)
+ * \retval NULL the string is not an UTF-8 sequence
+ */
+static inline char *EnsureUTF8(char *str)
+{
+    char *ret = str;
+    size_t n;
+    uint32_t cp;
+
+    while ((n = vlc_towc(str, &cp)) != 0)
+        if (likely(n != (size_t)-1))
+            str += n;
+        else
+        {
+            *str++ = '?';
+            ret = NULL;
+        }
+    return ret;
+}
 
 /* iconv wrappers (defined in src/extras/libc.c) */
 typedef void *vlc_iconv_t;
@@ -41,9 +119,6 @@ VLC_API int vlc_iconv_close( vlc_iconv_t );
 VLC_API int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap );
 VLC_API int utf8_fprintf( FILE *, const char *, ... ) VLC_FORMAT( 2, 3 );
 VLC_API char * vlc_strcasestr(const char *, const char *) VLC_USED;
-
-VLC_API char * EnsureUTF8( char * );
-VLC_API const char * IsUTF8( const char * ) VLC_USED;
 
 VLC_API char * FromCharset( const char *charset, const void *data, size_t data_size ) VLC_USED;
 VLC_API void * ToCharset( const char *charset, const char *in, size_t *outsize ) VLC_USED;
@@ -85,8 +160,10 @@ static inline char *ToCodePage (unsigned cp, const char *utf8)
         return NULL;
 
     size_t len = WideCharToMultiByte (cp, 0, wide, -1, NULL, 0, NULL, NULL);
-    if (len == 0)
+    if (len == 0) {
+        free(wide);
         return NULL;
+    }
 
     char *out = (char *)malloc (len);
     if (likely(out != NULL))
@@ -201,6 +278,8 @@ static inline char *FromLatin1 (const char *latin)
     utf8 = (char *)realloc (str, utf8 - str);
     return utf8 ? utf8 : str;
 }
+
+/** @} */
 
 VLC_API double us_strtod( const char *, char ** ) VLC_USED;
 VLC_API float us_strtof( const char *, char ** ) VLC_USED;

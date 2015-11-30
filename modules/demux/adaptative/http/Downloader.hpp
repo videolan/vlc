@@ -1,5 +1,5 @@
 /*
- * MemoryChunk.hpp
+ * Downloader.hpp
  *****************************************************************************
  * Copyright (C) 2015 - VideoLAN Authors
  *
@@ -17,32 +17,47 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef MEMORYCHUNK_HPP
-#define MEMORYCHUNK_HPP
+#ifndef DOWNLOADER_HPP
+#define DOWNLOADER_HPP
 
-#include "../adaptative/http/Chunk.h"
+#include "Chunk.h"
 
-namespace smooth
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_common.h>
+#include <list>
+
+namespace adaptative
 {
+
     namespace http
     {
-        using namespace adaptative::http;
 
-        class MemoryChunkSource : public AbstractChunkSource
+        class Downloader
         {
             public:
-                MemoryChunkSource(block_t *);
-                virtual ~MemoryChunkSource();
-
-                virtual block_t * readBlock(); /* impl */
-                virtual block_t * read(size_t); /* impl */
+                Downloader();
+                ~Downloader();
+                bool start();
+                void schedule(HTTPChunkBufferedSource *);
+                void cancel(HTTPChunkBufferedSource *);
 
             private:
-                block_t *data;
-                size_t   i_read;
+                static void * downloaderThread(void *);
+                void Run();
+                void DownloadSource(HTTPChunkBufferedSource *);
+                vlc_thread_t thread_handle;
+                vlc_mutex_t  lock;
+                vlc_cond_t   waitcond;
+                vlc_mutex_t  processlock;
+                bool         killed;
+                std::list<HTTPChunkBufferedSource *> chunks;
         };
 
     }
+
 }
 
-#endif // MEMORYCHUNK_HPP
+#endif // DOWNLOADER_HPP

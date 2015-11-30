@@ -31,7 +31,7 @@
 #include "recents.hpp"
 
 #include <vlc_keys.h>           /* ACTION_ID */
-#include <vlc_url.h>            /* decode_URI */
+#include <vlc_url.h>            /* vlc_uri_decode */
 #include <vlc_strings.h>        /* str_format_meta */
 #include <vlc_aout.h>           /* audio_output_t */
 
@@ -525,7 +525,7 @@ void InputManager::UpdateName()
         char *file = uri ? strrchr( uri, '/' ) : NULL;
         if( file != NULL )
         {
-            decode_URI( ++file );
+            vlc_uri_decode( ++file );
             name = qfu(file);
         }
         else
@@ -718,7 +718,7 @@ const QString InputManager::decodeArtURL( input_item_t *p_item )
     char *psz_art = input_item_GetArtURL( p_item );
     if( psz_art )
     {
-        char *psz = make_path( psz_art );
+        char *psz = vlc_uri2path( psz_art );
         free( psz_art );
         psz_art = psz;
     }

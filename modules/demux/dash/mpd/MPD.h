@@ -26,6 +26,7 @@
 #define MPD_H_
 
 #include "../adaptative/playlist/AbstractPlaylist.hpp"
+#include "../adaptative/StreamFormat.hpp"
 #include "Profile.hpp"
 
 namespace dash
@@ -33,6 +34,7 @@ namespace dash
     namespace mpd
     {
         using namespace adaptative::playlist;
+        using namespace adaptative;
 
         class ProgramInformation;
 
@@ -45,6 +47,8 @@ namespace dash
                 Profile                         getProfile() const;
                 virtual bool                    isLive() const;
                 virtual void                    debug();
+
+                static StreamFormat             mimeToFormat(const std::string &);
 
                 Property<ProgramInformation *>      programInfo;
 

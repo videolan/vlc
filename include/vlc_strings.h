@@ -88,8 +88,33 @@ static inline int vlc_ascii_strncasecmp( const char *psz1, const char *psz2, siz
         return d;
 }
 
-VLC_API void resolve_xml_special_chars( char *psz_value );
-VLC_API char * convert_xml_special_chars( const char *psz_content );
+/**
+ * Decodes XML entities.
+ *
+ * Decodes a null-terminated UTF-8 string of XML character data into a regular
+ * nul-terminated UTF-8 string. In other words, replaces XML entities and
+ * numerical character references with the corresponding characters.
+ *
+ * This function operates in place (the output is always of smaller or equal
+ * length than the input) and always succeeds.
+ *
+ * \param str null-terminated string [IN/OUT]
+ */
+VLC_API void vlc_xml_decode(char *st);
+
+/**
+ * Encodes XML entites.
+ *
+ * Substitutes unsafe characters in a null-terminated UTF-8 strings with an
+ * XML entity or numerical character reference.
+ *
+ * \param str null terminated UTF-8 string
+ * \return On success, a heap-allocated null-terminated string is returned.
+ * If the input string was not a valid UTF-8 sequence, NULL is returned and
+ * errno is set to EILSEQ.
+ * If there was not enough memory, NULL is returned and errno is to ENOMEM.
+ */
+VLC_API char *vlc_xml_encode(const char *str) VLC_MALLOC;
 
 VLC_API char * vlc_b64_encode_binary( const uint8_t *, size_t );
 VLC_API char * vlc_b64_encode( const char * );
@@ -109,10 +134,38 @@ static inline char *str_format( input_thread_t *input, const char *fmt )
     return s2;
 }
 
-VLC_API void filename_sanitize( char * );
-VLC_API void path_sanitize( char * );
+void filename_sanitize(char *);
 
-VLC_API time_t str_duration( const char * );
+/**
+ * Remove forbidden characters from full paths (leaves slashes)
+ */
+static inline void path_sanitize(char *str)
+{
+#if defined( _WIN32 ) || defined( __OS2__ )
+    /* check drive prefix if path is absolute */
+    if ((((unsigned char)(str[0] - 'A') < 26)
+      || ((unsigned char)(str[0] - 'a') < 26)) && (str[1] == ':'))
+        str += 2;
+
+    while (*str != '\0')
+    {
+        if (strchr("*\"?:|<>", *str) != NULL)
+            *str = '_';
+        if (*str == '/')
+            *str = DIR_SEP_CHAR;
+        str++;
+    }
+#elif defined( __APPLE__ )
+    while (*str != '\0')
+    {
+        if (*str == ':')
+            *str = '_';
+        str++;
+    }
+#else
+    (void) str;
+#endif
+}
 
 /**
  * @}

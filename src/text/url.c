@@ -36,14 +36,10 @@
 #include <vlc_fs.h>
 #include <ctype.h>
 
-/**
- * Decodes an encoded URI component. See also decode_URI().
- * \return decoded string allocated on the heap, or NULL on error.
- */
-char *decode_URI_duplicate (const char *str)
+char *vlc_uri_decode_duplicate (const char *str)
 {
     char *buf = strdup (str);
-    if (decode_URI (buf) == NULL)
+    if (vlc_uri_decode (buf) == NULL)
     {
         free (buf);
         buf = NULL;
@@ -51,20 +47,7 @@ char *decode_URI_duplicate (const char *str)
     return buf;
 }
 
-/**
- * Decodes an encoded URI component in place.
- * <b>This function does NOT decode entire URIs.</b> Instead, it decodes one
- * component at a time (e.g. host name, directory, file name).
- * Decoded URIs do not exist in the real world (see RFC3986 §2.4).
- * Complete URIs are always "encoded" (or they are syntaxically invalid).
- *
- * Note that URI encoding is different from Javascript escaping. Especially,
- * white spaces and Unicode non-ASCII code points are encoded differently.
- *
- * \param str nul-terminated URI component to decode
- * \return str on success, NULL if it was not properly encoded
- */
-char *decode_URI (char *str)
+char *vlc_uri_decode (char *str)
 {
     char *in = str, *out = str;
     if (in == NULL)
@@ -127,14 +110,7 @@ static char *encode_URI_bytes (const char *str, size_t *restrict lenp)
     return likely(out != NULL) ? out : buf;
 }
 
-/**
- * Encodes a URI component (RFC3986 §2).
- *
- * @param str nul-terminated UTF-8 representation of the component.
- * @note Obviously, a URI containing nul bytes cannot be passed.
- * @return encoded string (must be free()'d), or NULL for ENOMEM.
- */
-char *encode_URI_component (const char *str)
+char *vlc_uri_encode (const char *str)
 {
     size_t len = strlen (str);
     char *ret = encode_URI_bytes (str, &len);
@@ -143,13 +119,6 @@ char *encode_URI_component (const char *str)
     return ret;
 }
 
-/**
- * Builds a URL representation from a local file path.
- * @param path path to convert (or URI to copy)
- * @param scheme URI scheme to use (default is auto: "file", "fd" or "smb")
- * @return a nul-terminated URI string (use free() to release it),
- * or NULL in case of error (errno will be set accordingly)
- */
 char *vlc_path2uri (const char *path, const char *scheme)
 {
     if (path == NULL)
@@ -252,13 +221,7 @@ char *vlc_path2uri (const char *path, const char *scheme)
     return buf;
 }
 
-/**
- * Tries to convert a URI to a local (UTF-8-encoded) file path.
- * @param url URI to convert
- * @return NULL on error, a nul-terminated string otherwise
- * (use free() to release it)
- */
-char *make_path (const char *url)
+char *vlc_uri2path (const char *url)
 {
     char *ret = NULL;
     char *end;
@@ -278,7 +241,7 @@ char *make_path (const char *url)
         return NULL; /* boom! */
 
     /* Decode path */
-    decode_URI (path);
+    vlc_uri_decode (path);
 
     if (schemelen == 4 && !strncasecmp (url, "file", 4))
     {
@@ -425,9 +388,9 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
         {
             *(next++) = '\0';
             url->psz_password = next;
-            decode_URI (url->psz_password);
+            vlc_uri_decode (url->psz_password);
         }
-        decode_URI (url->psz_username);
+        vlc_uri_decode (url->psz_username);
     }
 
     /* Host name */

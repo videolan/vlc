@@ -71,8 +71,11 @@ static inline void vlc_seekpoint_Delete( seekpoint_t *point )
 static inline seekpoint_t *vlc_seekpoint_Duplicate( const seekpoint_t *src )
 {
     seekpoint_t *point = vlc_seekpoint_New();
-    if( src->psz_name ) point->psz_name = strdup( src->psz_name );
-    point->i_time_offset = src->i_time_offset;
+    if( likely(point) )
+    {
+        if( src->psz_name ) point->psz_name = strdup( src->psz_name );
+        point->i_time_offset = src->i_time_offset;
+    }
     return point;
 }
 
@@ -115,10 +118,7 @@ static inline void vlc_input_title_Delete( input_title_t *t )
 
     free( t->psz_name );
     for( i = 0; i < t->i_seekpoint; i++ )
-    {
-        free( t->seekpoint[i]->psz_name );
-        free( t->seekpoint[i] );
-    }
+        vlc_seekpoint_Delete( t->seekpoint[i] );
     free( t->seekpoint );
     free( t );
 }
@@ -131,15 +131,14 @@ static inline input_title_t *vlc_input_title_Duplicate( const input_title_t *t )
     if( t->psz_name ) dup->psz_name = strdup( t->psz_name );
     dup->b_menu      = t->b_menu;
     dup->i_length    = t->i_length;
-    dup->i_seekpoint = t->i_seekpoint;
     if( t->i_seekpoint > 0 )
     {
-        dup->seekpoint = (seekpoint_t**)calloc( t->i_seekpoint,
-                                                sizeof(seekpoint_t*) );
-
-        for( i = 0; i < t->i_seekpoint; i++ )
+        dup->seekpoint = (seekpoint_t**)malloc( t->i_seekpoint * sizeof(seekpoint_t*) );
+        if( likely(dup->seekpoint) )
         {
-            dup->seekpoint[i] = vlc_seekpoint_Duplicate( t->seekpoint[i] );
+            for( i = 0; i < t->i_seekpoint; i++ )
+                dup->seekpoint[i] = vlc_seekpoint_Duplicate( t->seekpoint[i] );
+            dup->i_seekpoint = t->i_seekpoint;
         }
     }
 
@@ -348,7 +347,7 @@ typedef enum input_event_type_e
     INPUT_EVENT_LENGTH,
 
     /* A title has been added or removed or selected.
-     * It imply that chapter has changed (not chapter event is sent) */
+     * It implies that the chapter has changed (no chapter event is sent) */
     INPUT_EVENT_TITLE,
     /* A chapter has been added or removed or selected. */
     INPUT_EVENT_CHAPTER,
@@ -426,12 +425,19 @@ enum input_query_e
     INPUT_GET_SPU_DELAY,        /* arg1 = int* res=can fail */
     INPUT_SET_SPU_DELAY,        /* arg1 = int  res=can fail */
 
-    /* Menu navigation */
+    /* Menu (VCD/DVD/BD) Navigation */
+    /** Activate the navigation item selected. res=can fail */
     INPUT_NAV_ACTIVATE,
+    /** Use the up arrow to select a navigation item above. res=can fail */
     INPUT_NAV_UP,
+    /** Use the down arrow to select a navigation item under. res=can fail */
     INPUT_NAV_DOWN,
+    /** Use the left arrow to select a navigation item on the left. res=can fail */
     INPUT_NAV_LEFT,
+    /** Use the right arrow to select a navigation item on the right. res=can fail */
     INPUT_NAV_RIGHT,
+    /** Activate the popup Menu (for BD). res=can fail */
+    INPUT_NAV_POPUP,
 
     /* Meta datas */
     INPUT_ADD_INFO,   /* arg1= char* arg2= char* arg3=...     res=can fail */

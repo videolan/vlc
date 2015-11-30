@@ -57,6 +57,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
              i_nzpcr        ( 0 )
 {
     currentPeriod = playlist->getFirstPeriod();
+    failedupdates = 0;
 }
 
 PlaylistManager::~PlaylistManager   ()
@@ -248,6 +249,11 @@ bool PlaylistManager::setPosition(mtime_t time)
     return ret;
 }
 
+bool PlaylistManager::needsUpdate() const
+{
+    return playlist->isLive() && (failedupdates < 3);
+}
+
 bool PlaylistManager::seekAble() const
 {
     if(playlist->isLive())
@@ -262,6 +268,11 @@ bool PlaylistManager::seekAble() const
     return true;
 }
 
+void PlaylistManager::scheduleNextUpdate()
+{
+
+}
+
 bool PlaylistManager::updatePlaylist()
 {
     std::vector<AbstractStream *>::const_iterator it;
@@ -269,6 +280,24 @@ bool PlaylistManager::updatePlaylist()
         (*it)->runUpdates();
 
     return true;
+}
+
+void PlaylistManager::pruneLiveStream()
+{
+    mtime_t minValidPos = 0;
+    std::vector<AbstractStream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); it++)
+    {
+        const AbstractStream *st = *it;
+        if(st->isDisabled() || !st->isSelected() || st->isEOF())
+            continue;
+        const mtime_t t = st->getPlaybackTime();
+        if(minValidPos == 0 || t < minValidPos)
+            minValidPos = t;
+    }
+
+    if(minValidPos)
+        playlist->pruneByPlaybackTime(minValidPos);
 }
 
 bool PlaylistManager::reactivateStream(AbstractStream *stream)
@@ -318,7 +347,13 @@ int PlaylistManager::doDemux(int64_t increment)
         break;
     }
 
-    updatePlaylist();
+    if(needsUpdate())
+    {
+        if(updatePlaylist())
+            scheduleNextUpdate();
+        else
+            failedupdates++;
+    }
 
     return VLC_DEMUXER_SUCCESS;
 }
@@ -411,7 +446,8 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
         {
             int width = var_InheritInteger(p_demux, "adaptative-width");
             int height = var_InheritInteger(p_demux, "adaptative-height");
-            RateBasedAdaptationLogic *logic = new (std::nothrow) RateBasedAdaptationLogic(width, height);
+            RateBasedAdaptationLogic *logic =
+                    new (std::nothrow) RateBasedAdaptationLogic(VLC_OBJECT(p_demux), width, height);
             conn->setDownloadRateObserver(logic);
             return logic;
         }

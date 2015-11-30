@@ -754,7 +754,7 @@ void VlcProc::update_current_input()
 
         // Update local path (if possible) or full uri
         char *psz_uri = input_item_GetURI( pItem );
-        char *psz_path = make_path( psz_uri );
+        char *psz_path = vlc_uri2path( psz_uri );
         char *psz_save = psz_path ? psz_path : psz_uri;
         SET_TEXT( m_cVarStreamURI, UString( getIntf(), psz_save ) );
         free( psz_path );

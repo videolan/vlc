@@ -50,6 +50,7 @@ namespace adaptative
                 void                    addSegment(ISegment *seg);
                 void                    mergeWith(SegmentList *);
                 void                    pruneBySegmentNumber(uint64_t);
+                void                    pruneByPlaybackTime(mtime_t);
                 bool                    getSegmentNumberByScaledTime(stime_t, uint64_t *) const;
                 mtime_t                 getPlaybackTimeBySegmentNumber(uint64_t);
 

@@ -1180,12 +1180,10 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
      * Compute a subpicture_region_t.
      * It will be copied and sent to the vout later.
      */
-    if (!ov->img)
-        return;
-
     vlc_mutex_lock(&p_sys->p_overlays[ov->plane]->lock);
 
     /* Find a region to update */
+    subpicture_region_t **pp_reg = &p_sys->p_overlays[ov->plane]->p_regions;
     subpicture_region_t *p_reg = p_sys->p_overlays[ov->plane]->p_regions;
     subpicture_region_t *p_last = NULL;
     while (p_reg != NULL) {
@@ -1193,7 +1191,18 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
         if (p_reg->i_x == ov->x && p_reg->i_y == ov->y &&
                 p_reg->fmt.i_width == ov->w && p_reg->fmt.i_height == ov->h)
             break;
+        pp_reg = &p_reg->p_next;
         p_reg = p_reg->p_next;
+    }
+
+    if (!ov->img) {
+        if (p_reg) {
+            /* drop region */
+            *pp_reg = p_reg->p_next;
+            subpicture_region_Delete(p_reg);
+        }
+        vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
+        return;
     }
 
     /* If there is no region to update, create a new one. */
@@ -1267,6 +1276,7 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
         blurayActivateOverlay(p_demux, overlay->plane);
         break;
     case BD_OVERLAY_DRAW:
+    case BD_OVERLAY_WIPE:
         blurayDrawOverlay(p_demux, overlay);
         break;
     default:
@@ -1418,6 +1428,7 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
 static void blurayInitTitles(demux_t *p_demux, int menu_titles)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    const BLURAY_DISC_INFO *di = bd_get_disc_info(p_sys->bluray);
 
     /* get and set the titles */
     unsigned i_title = menu_titles;
@@ -1439,13 +1450,19 @@ static void blurayInitTitles(demux_t *p_demux, int menu_titles)
 
         } else if (i == 0) {
             t->psz_name = strdup(_("Top Menu"));
+            t->b_menu = true;
         } else if (i == i_title - 1) {
             t->psz_name = strdup(_("First Play"));
+            if (di && di->first_play) {
+                t->b_menu = di->first_play->interactive;
+            }
         } else {
             /* add possible title name from disc metadata */
-            const BLURAY_DISC_INFO *di = bd_get_disc_info(p_sys->bluray);
-            if (di && di->titles && i < di->num_titles && di->titles[i]->name) {
-                t->psz_name = strdup(di->titles[i]->name);
+            if (di && di->titles && i < di->num_titles) {
+                if (di->titles[i]->name) {
+                    t->psz_name = strdup(di->titles[i]->name);
+                }
+                t->b_menu = di->titles[i]->interactive;
             }
         }
 
@@ -1721,6 +1738,8 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         return sendKeyEvent(p_sys, BD_VK_LEFT);
     case DEMUX_NAV_RIGHT:
         return sendKeyEvent(p_sys, BD_VK_RIGHT);
+    case DEMUX_NAV_POPUP:
+        return sendKeyEvent(p_sys, BD_VK_POPUP);
 
     case DEMUX_CAN_RECORD:
     case DEMUX_GET_FPS:
@@ -1932,8 +1951,11 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         blurayUpdateCurrentClip(p_demux, e->param);
         break;
     case BD_EVENT_CHAPTER:
+        if (e->param && e->param < 0xffff)
+          p_demux->info.i_seekpoint = e->param - 1;
+        else
+          p_demux->info.i_seekpoint = 0;
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-        p_demux->info.i_seekpoint = e->param;
         break;
     case BD_EVENT_ANGLE:
         break;

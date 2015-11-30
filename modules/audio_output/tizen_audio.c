@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_atomic.h>
 
 #include "audio_io.h"
 #include "sound_manager.h"
@@ -45,6 +46,8 @@ struct aout_sys_t {
 
     audio_out_h         out;
     bool                b_prepared;
+    bool                b_error;
+    atomic_bool         interrupted_completed;
 
     unsigned int        i_rate;
     audio_sample_type_e i_sample_type;
@@ -107,8 +110,9 @@ AudioIO_VlcRet( audio_output_t *p_aout, const char *p_func, int i_ret )
 
         msg_Err( p_aout, "%s failed: 0x%X, %s", p_func,
                  i_ret, AudioIO_Err2Str( i_ret ) );
-        audio_out_destroy( p_sys->out );
-        p_sys->out = NULL;
+
+        /* Error could be recoverable if audio_out was interrupted. */
+        p_sys->b_error = true;
         return VLC_EGENERIC;
     }
     else
@@ -120,6 +124,13 @@ static int
 AudioIO_Prepare( audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
+
+    /* if no more interrupted, cancel error and try again */
+    if( atomic_exchange( &p_sys->interrupted_completed, false ) )
+        p_sys->b_error = false;
+
+    if( p_sys->b_error )
+        return VLC_EGENERIC;
 
     if( !p_sys->b_prepared )
     {
@@ -146,15 +157,38 @@ AudioIO_Unprepare( audio_output_t *p_aout )
     return VLC_SUCCESS;
 }
 
+static void
+AudioIO_InterruptedCb(audio_io_interrupted_code_e code, void *p_user_data)
+{
+    audio_output_t *p_aout = p_user_data;
+    aout_sys_t *p_sys = p_aout->sys;
+
+    if( code == AUDIO_IO_INTERRUPTED_COMPLETED
+     || code ==  AUDIO_IO_INTERRUPTED_BY_EARJACK_UNPLUG )
+    {
+        msg_Warn( p_aout, "audio_out interrupted completed by %d", code);
+        atomic_store( &p_sys->interrupted_completed, true );
+    }
+    else
+    {
+        msg_Warn( p_aout, "audio_out interrupted by %d", code);
+        atomic_store( &p_sys->interrupted_completed, false );
+    }
+}
+
 static int
 AudioIO_Start( audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
     /* Out create */
-    return VLCRET( audio_out_create( p_sys->i_rate, p_sys->i_channel,
-                                     p_sys->i_sample_type, SOUND_TYPE_MEDIA,
-                                     &p_sys->out ) );
+    if( VLCRET( audio_out_create( p_sys->i_rate, p_sys->i_channel,
+                                  p_sys->i_sample_type, SOUND_TYPE_MEDIA,
+                                  &p_sys->out ) ) )
+        return VLC_EGENERIC;
+    return VLCRET( audio_out_set_interrupted_cb( p_sys->out,
+                                                 AudioIO_InterruptedCb,
+                                                 p_aout ) );
 }
 
 static int
@@ -212,9 +246,12 @@ Stop( audio_output_t *p_aout )
     if( p_sys->out)
     {
         AudioIO_Unprepare( p_aout );
+        audio_out_unset_interrupted_cb( p_sys->out );
         audio_out_destroy( p_sys->out );
         p_sys->out = NULL;
     }
+    p_sys->b_error = false;
+    atomic_store( &p_sys->interrupted_completed, false );
 
     p_sys->i_rate = 0;
     p_sys->i_channel = 0;
@@ -287,6 +324,7 @@ Flush( audio_output_t *p_aout, bool b_wait )
         (void) b_wait;
         if( AudioIO_Unprepare( p_aout ) )
             return;
+        audio_out_unset_interrupted_cb( p_sys->out );
         audio_out_destroy( p_sys->out );
         p_sys->out = NULL;
         AudioIO_Start( p_aout );
@@ -316,6 +354,8 @@ Open( vlc_object_t *obj )
     p_sys->pf_audio_out_flush = dlsym( RTLD_DEFAULT, "audio_out_flush" );
 
     aout_SoftVolumeInit( p_aout );
+
+    atomic_init( &p_sys->interrupted_completed, false );
 
     return VLC_SUCCESS;
 }

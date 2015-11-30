@@ -1070,7 +1070,7 @@ static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
         char *path, *uri;
 
         uri = input_item_GetURI(input_GetItem(p_input));
-        path = make_path(uri);
+        path = vlc_uri2path(uri);
 
         mvnprintw(y++, 0, COLS, _(" Source   : %s"), path?path:uri);
         free(uri);

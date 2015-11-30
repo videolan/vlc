@@ -84,6 +84,15 @@
 # define HAVE_FONT_FALLBACK
 #endif
 
+/* Darwin */
+#ifdef __APPLE__
+# define HAVE_FONT_FALLBACK
+#endif
+
+#ifndef HAVE_FONT_FALLBACK
+# warning YOU ARE MISSING FONTS FALLBACK. TEXT WILL BE INCORRECT
+#endif
+
 /**
  * Within a paragraph, run_desc_t represents a run of characters
  * having the same font face, size, and style, Unicode script

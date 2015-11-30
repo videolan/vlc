@@ -64,9 +64,6 @@
  *****************************************************************************/
 struct demux_sys_t
 {
-    int             io_buffer_size;
-    uint8_t        *io_buffer;
-
     AVInputFormat  *fmt;
     AVFormatContext *ic;
 
@@ -83,6 +80,8 @@ struct demux_sys_t
     /* Only one title with seekpoints possible atm. */
     input_title_t *p_title;
 };
+
+#define AVFORMAT_IOBUFFER_SIZE 32768  /* FIXME */
 
 /*****************************************************************************
  * Local prototypes
@@ -285,12 +284,33 @@ int OpenDemux( vlc_object_t *p_this )
     p_sys->p_title = NULL;
 
     /* Create I/O wrapper */
-    p_sys->io_buffer_size = 32768;  /* FIXME */
-    p_sys->io_buffer = xmalloc( p_sys->io_buffer_size );
+    unsigned char * p_io_buffer = malloc( AVFORMAT_IOBUFFER_SIZE );
+    if( !p_io_buffer )
+    {
+        free( psz_url );
+        CloseDemux( p_this );
+        return VLC_ENOMEM;
+    }
 
     p_sys->ic = avformat_alloc_context();
-    AVIOContext *pb = p_sys->ic->pb = avio_alloc_context( p_sys->io_buffer,
-        p_sys->io_buffer_size, 0, p_demux, IORead, NULL, IOSeek );
+    if( !p_sys->ic )
+    {
+        free( p_io_buffer );
+        free( psz_url );
+        CloseDemux( p_this );
+        return VLC_ENOMEM;
+    }
+
+    AVIOContext *pb = p_sys->ic->pb = avio_alloc_context( p_io_buffer,
+        AVFORMAT_IOBUFFER_SIZE, 0, p_demux, IORead, NULL, IOSeek );
+    if( !pb )
+    {
+        free( p_io_buffer );
+        free( psz_url );
+        CloseDemux( p_this );
+        return VLC_ENOMEM;
+    }
+
     p_sys->ic->pb->seekable = b_can_seek ? AVIO_SEEKABLE_NORMAL : 0;
     error = avformat_open_input(&p_sys->ic, psz_url, p_sys->fmt, NULL);
 
@@ -663,7 +683,11 @@ void CloseDemux( vlc_object_t *p_this )
 
     if( p_sys->ic )
     {
-        av_free( p_sys->ic->pb );
+        if( p_sys->ic->pb )
+        {
+            av_free( p_sys->ic->pb->buffer );
+            av_free( p_sys->ic->pb );
+        }
 #if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
         avformat_close_input( &p_sys->ic );
 #else
@@ -678,7 +702,6 @@ void CloseDemux( vlc_object_t *p_this )
     if( p_sys->p_title )
         vlc_input_title_Delete( p_sys->p_title );
 
-    free( p_sys->io_buffer );
     free( p_sys );
 }
 

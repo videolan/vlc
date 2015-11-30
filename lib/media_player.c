@@ -366,6 +366,18 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         event.u.media_player_vout.new_count = i_vout;
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
+    else if ( newval.i_int == INPUT_EVENT_TITLE )
+    {
+        event.type = libvlc_MediaPlayerTitleChanged;
+        event.u.media_player_title_changed.new_title = var_GetInteger( p_input, "title" );
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
+    else if ( newval.i_int == INPUT_EVENT_CHAPTER )
+    {
+        event.type = libvlc_MediaPlayerChapterChanged;
+        event.u.media_player_chapter_changed.new_chapter = var_GetInteger( p_input, "chapter" );
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
 
     return VLC_SUCCESS;
 }

@@ -29,7 +29,7 @@
 #include "../adaptative/playlist/SegmentList.h"
 #include "../adaptative/tools/Retrieve.hpp"
 #include "../adaptative/tools/Helper.h"
-#include "../HLSStreamFormat.hpp"
+#include "../adaptative/tools/Conversions.hpp"
 #include "M3U8.hpp"
 #include "Tags.hpp"
 
@@ -95,11 +95,11 @@ void M3U8Parser::setFormatFromCodecs(Representation *rep, const std::string code
             std::string codec = codecs.front();
             transform(codec.begin(), codec.end(), codec.begin(), (int (*)(int))std::tolower);
             if(codec == "mp4a")
-                rep->streamFormat = StreamFormat(HLSStreamFormat::PACKEDAAC);
+                rep->streamFormat = StreamFormat(StreamFormat::PACKEDAAC);
         }
         else
         {
-            rep->streamFormat = StreamFormat(HLSStreamFormat::MPEG2TS);
+            rep->streamFormat = StreamFormat(StreamFormat::MPEG2TS);
         }
     }
 }
@@ -113,11 +113,11 @@ void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &
         transform(extension.begin(), extension.end(), extension.begin(), (int (*)(int))std::tolower);
         if(extension == "aac")
         {
-            rep->streamFormat = StreamFormat(HLSStreamFormat::PACKEDAAC);
+            rep->streamFormat = StreamFormat(StreamFormat::PACKEDAAC);
         }
         else if(extension == "ts" || extension == "mp2t" || extension == "mpeg")
         {
-            rep->streamFormat = StreamFormat(HLSStreamFormat::MPEG2TS);
+            rep->streamFormat = StreamFormat(StreamFormat::MPEG2TS);
         }
     }
 }
@@ -213,8 +213,9 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
     rep->timescale.Set(100);
     rep->b_loaded = true;
 
-    stime_t totalduration = 0;
-    stime_t nzStartTime = 0;
+    mtime_t totalduration = 0;
+    mtime_t nzStartTime = 0;
+    mtime_t absReferenceTime = VLC_TS_INVALID;
     uint64_t sequenceNumber = 0;
     bool discontinuity = false;
     std::size_t prevbyterangeoffset = 0;
@@ -256,17 +257,24 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                     break;
 
                 segment->setSourceUrl(uritag->getValue().value);
-                if((unsigned)rep->getStreamFormat() == HLSStreamFormat::UNKNOWN)
+                if((unsigned)rep->getStreamFormat() == StreamFormat::UNKNOWN)
                     setFormatFromExtension(rep, uritag->getValue().value);
 
                 if(ctx_extinf)
                 {
                     if(ctx_extinf->getAttributeByName("DURATION"))
                     {
+                        const mtime_t nzDuration = CLOCK_FREQ * ctx_extinf->getAttributeByName("DURATION")->floatingPoint();
                         segment->duration.Set(ctx_extinf->getAttributeByName("DURATION")->floatingPoint() * rep->timescale.Get());
-                        segment->startTime.Set(nzStartTime);
-                        nzStartTime += segment->duration.Get();
-                        totalduration += segment->duration.Get();
+                        segment->startTime.Set(nzStartTime * rep->timescale.Get() / CLOCK_FREQ);
+                        nzStartTime += nzDuration;
+                        totalduration += nzDuration;
+
+                        if(absReferenceTime > VLC_TS_INVALID)
+                        {
+                            segment->utcTime = absReferenceTime;
+                            absReferenceTime += nzDuration;
+                        }
                     }
                     ctx_extinf = NULL;
                 }
@@ -294,12 +302,22 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
             }
             break;
 
+            case SingleValueTag::EXTXTARGETDURATION:
+                rep->targetDuration = static_cast<const SingleValueTag *>(tag)->getValue().decimal();
+                break;
+
             case SingleValueTag::EXTXPLAYLISTTYPE:
                 rep->b_live = (static_cast<const SingleValueTag *>(tag)->getValue().value != "VOD");
                 break;
 
             case SingleValueTag::EXTXBYTERANGE:
                 ctx_byterange = static_cast<const SingleValueTag *>(tag);
+                break;
+
+            case SingleValueTag::EXTXPROGRAMDATETIME:
+                rep->b_consistent = false;
+                absReferenceTime = VLC_TS_0 +
+                        UTCTime(static_cast<const SingleValueTag *>(tag)->getValue().value).mtime();
                 break;
 
             case AttributesTag::EXTXKEY:
@@ -359,9 +377,9 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
     {
         rep->getPlaylist()->duration.Set(0);
     }
-    else if(totalduration * CLOCK_FREQ / rep->timescale.Get() > (uint64_t) rep->getPlaylist()->duration.Get())
+    else if(totalduration > rep->getPlaylist()->duration.Get())
     {
-        rep->getPlaylist()->duration.Set(totalduration * CLOCK_FREQ / rep->timescale.Get());
+        rep->getPlaylist()->duration.Set(totalduration);
     }
 
     rep->setSegmentList(segmentList);
@@ -455,7 +473,7 @@ M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
                 if(pair.second->getAttributeByName("TYPE")->value != "AUDIO" &&
                    pair.second->getAttributeByName("TYPE")->value != "VIDEO")
                 {
-                    rep->streamFormat = StreamFormat(HLSStreamFormat::UNSUPPORTED);
+                    rep->streamFormat = StreamFormat(StreamFormat::UNSUPPORTED);
                 }
 
                 if(pair.second->getAttributeByName("LANGUAGE"))

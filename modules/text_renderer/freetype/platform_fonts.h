@@ -49,8 +49,8 @@
 
 /* Default fonts */
 #ifdef __APPLE__
-# define SYSTEM_DEFAULT_FONT_FILE "/Library/Fonts/Arial Unicode.ttf"
-# define SYSTEM_DEFAULT_FAMILY "Arial Unicode MS"
+# define SYSTEM_DEFAULT_FONT_FILE "/System/Library/Fonts/HelveticaNeue.dfont"
+# define SYSTEM_DEFAULT_FAMILY "Helvetica Neue"
 # define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "/System/Library/Fonts/Monaco.dfont"
 # define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Monaco"
 #elif defined( _WIN32 )
@@ -97,16 +97,16 @@
 typedef struct vlc_font_t vlc_font_t;
 struct vlc_font_t
 {
-    vlc_font_t *p_next; /**< next font in the chain */
+    vlc_font_t *p_next;   /**< next font in the chain */
     /**
      * path to the font file on disk, or ":/x" for font attachments, where x
      * is the attachment index within \ref filter_sys_t::pp_font_attachments
      */
     char       *psz_fontfile;
-    int         i_index; /**< index of the font in the font file, starts at 0 */
-    bool        b_bold; /**< if the font is a bold version */
-    bool        b_italic; /**< if the font is an italic version */
-    FT_Face     p_face; /**< the freetype structure for the font */
+    int         i_index;   /**< index of the font in the font file, starts at 0 */
+    bool        b_bold;    /**< if the font is a bold version */
+    bool        b_italic;  /**< if the font is an italic version */
+    FT_Face     p_face;    /**< the freetype structure for the font */
 };
 
 /**
@@ -151,11 +151,8 @@ const vlc_family_t *Win32_GetFamily( filter_t *p_filter, const char *psz_family 
 #endif /* _WIN32 */
 
 #ifdef __APPLE__
-#if !TARGET_OS_IPHONE
-char* MacLegacy_Select( filter_t *p_filter, const char* psz_fontname,
-                        bool b_bold, bool b_italic,
-                        int *i_idx, uni_char_t codepoint );
-#endif
+vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, uni_char_t codepoint);
+const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_family);
 #endif /* __APPLE__ */
 
 #ifdef __ANDROID__

@@ -20,7 +20,6 @@
 #include "HLSSegment.hpp"
 #include "../adaptative/playlist/SegmentChunk.hpp"
 #include "../adaptative/playlist/BaseRepresentation.h"
-#include "../HLSStreamFormat.hpp"
 
 #include <vlc_common.h>
 #include <vlc_block.h>
@@ -39,6 +38,7 @@ HLSSegment::HLSSegment( ICanonicalUrl *parent, uint64_t seq ) :
     Segment( parent )
 {
     setSequenceNumber(seq);
+    utcTime = 0;
 #ifdef HAVE_GCRYPT
     ctx = NULL;
 #endif
@@ -121,6 +121,11 @@ void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRe
     {
         p_block->i_buffer = 0;
     }
+}
+
+mtime_t HLSSegment::getUTCTime() const
+{
+    return utcTime;
 }
 
 void HLSSegment::setEncryption(SegmentEncryption &enc)

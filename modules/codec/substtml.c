@@ -459,7 +459,7 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
             else if ( p_current_segment->psz_text == NULL )
             {
                 p_current_segment->psz_text = strdup( node );
-                resolve_xml_special_chars( p_current_segment->psz_text );
+                vlc_xml_decode( p_current_segment->psz_text );
             }
             else
             {
@@ -470,7 +470,7 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
                     free( p_current_segment->psz_text );
                     p_current_segment->psz_text = psz_text;
                     // Don't process text multiple time, just check for the appended section
-                    resolve_xml_special_chars( p_current_segment->psz_text + i_previous_len );
+                    vlc_xml_decode( p_current_segment->psz_text + i_previous_len );
                 }
             }
         }

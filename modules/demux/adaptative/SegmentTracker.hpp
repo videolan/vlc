@@ -20,6 +20,8 @@
 #ifndef SEGMENTTRACKER_HPP
 #define SEGMENTTRACKER_HPP
 
+#include <StreamFormat.hpp>
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -44,7 +46,6 @@ namespace adaptative
         class BaseAdaptationSet;
         class BaseRepresentation;
         class SegmentChunk;
-        class ISegment;
     }
 
     using namespace playlist;
@@ -54,24 +55,30 @@ namespace adaptative
     class SegmentTrackerEvent
     {
         public:
-            SegmentTrackerEvent(ISegment *);
+            SegmentTrackerEvent(SegmentChunk *);
             SegmentTrackerEvent(BaseRepresentation *, BaseRepresentation *);
+            SegmentTrackerEvent(const StreamFormat *);
             enum
             {
                 DISCONTINUITY,
                 SWITCHING,
+                FORMATCHANGE,
             } type;
             union
             {
                struct
                {
-                    ISegment *s;
+                    SegmentChunk *sc;
                } discontinuity;
                struct
                {
                     BaseRepresentation *prev;
                     BaseRepresentation *next;
                } switching;
+               struct
+               {
+                    const StreamFormat *f;
+               } format;
             } u;
     };
 
@@ -92,20 +99,22 @@ namespace adaptative
             SegmentChunk* getNextChunk(bool, HTTPConnectionManager *);
             bool setPositionByTime(mtime_t, bool, bool);
             void setPositionByNumber(uint64_t, bool);
-            mtime_t getSegmentStart() const;
+            mtime_t getPlaybackTime() const; /* Current segment start time if selected */
+            mtime_t getMinAheadTime() const;
             void registerListener(SegmentTrackerListenerInterface *);
-            void pruneFromCurrent();
             void updateSelected();
 
         private:
             void notify(const SegmentTrackerEvent &);
+            bool first;
             bool initializing;
             bool index_sent;
             bool init_sent;
             uint64_t count;
+            StreamFormat format;
             AbstractAdaptationLogic *logic;
             BaseAdaptationSet *adaptationSet;
-            BaseRepresentation *prevRepresentation;
+            BaseRepresentation *curRepresentation;
             std::list<SegmentTrackerListenerInterface *> listeners;
     };
 }

@@ -171,12 +171,12 @@ VLC_API void var_FreeList( vlc_value_t *, vlc_value_t * );
  *                 vlc_value_t newvalue,
  *                 void *p_data);
  *****************************************************************************/
-VLC_API int var_AddCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
-VLC_API int var_DelCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
-VLC_API int var_TriggerCallback( vlc_object_t *, const char * );
+VLC_API void var_AddCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
+VLC_API void var_DelCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
+VLC_API void var_TriggerCallback( vlc_object_t *, const char * );
 
-VLC_API int var_AddListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
-VLC_API int var_DelListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
+VLC_API void var_AddListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
+VLC_API void var_DelListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
 
 #define var_AddCallback(a,b,c,d) var_AddCallback( VLC_OBJECT(a), b, c, d )
 #define var_DelCallback(a,b,c,d) var_DelCallback( VLC_OBJECT(a), b, c, d )

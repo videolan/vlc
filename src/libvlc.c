@@ -340,7 +340,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         }
         /* we unreference the connection when we've finished with it */
         dbus_connection_unref( conn );
-        exit( 1 );
+        exit( 0 );
     }
 #undef MPRIS_APPEND
 #undef MPRIS_BUS_NAME

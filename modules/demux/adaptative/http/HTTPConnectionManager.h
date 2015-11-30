@@ -40,6 +40,7 @@ namespace adaptative
     namespace http
     {
         class HTTPConnection;
+        class Downloader;
 
         class HTTPConnectionManager : public IDownloadRateObserver
         {
@@ -48,19 +49,20 @@ namespace adaptative
                 virtual ~HTTPConnectionManager  ();
 
                 void    closeAllConnections ();
-                void    releaseAllConnections ();
                 HTTPConnection * getConnection(const std::string &scheme,
                                                const std::string &hostname,
                                                uint16_t port);
 
                 virtual void updateDownloadRate(size_t, mtime_t); /* reimpl */
                 void setDownloadRateObserver(IDownloadRateObserver *);
+                Downloader *downloader;
 
             private:
+                void    releaseAllConnections ();
+                vlc_mutex_t                                         lock;
                 std::vector<HTTPConnection *>                       connectionPool;
                 vlc_object_t                                       *stream;
                 IDownloadRateObserver                              *rateObserver;
-
                 HTTPConnection * getConnection(const std::string &hostname, uint16_t port, int);
         };
     }

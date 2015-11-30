@@ -288,8 +288,6 @@ static void Stop(audio_output_t *p_aout)
     struct aout_sys_t   *p_sys = p_aout->sys;
     OSStatus status;
 
-    [[AVAudioSession sharedInstance] setActive:NO error:nil];
-
     if (p_sys->au_unit) {
         status = AudioOutputUnitStop(p_sys->au_unit);
         if (status != noErr)
@@ -304,6 +302,8 @@ static void Stop(audio_output_t *p_aout)
             msg_Warn(p_aout, "failed to dispose Audio Component instance (%i)", (int)status);
     }
     p_sys->i_bytes_per_sample = 0;
+
+    [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
 
     /* clean-up circular buffer */
     TPCircularBufferCleanup(&p_sys->circular_buffer);

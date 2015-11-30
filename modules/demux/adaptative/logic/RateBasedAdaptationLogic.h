@@ -27,8 +27,6 @@
 
 #include "AbstractAdaptationLogic.h"
 
-#define MINBUFFER 30
-
 namespace adaptative
 {
     namespace logic
@@ -37,7 +35,8 @@ namespace adaptative
         class RateBasedAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                RateBasedAdaptationLogic            (int, int);
+                RateBasedAdaptationLogic            (vlc_object_t *, int, int);
+                virtual ~RateBasedAdaptationLogic   ();
 
                 BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const;
                 virtual void updateDownloadRate(size_t, mtime_t); /* reimpl */
@@ -47,10 +46,23 @@ namespace adaptative
                 int                     width;
                 int                     height;
                 size_t                  bpsAvg;
-                size_t                  bpsRemainder;
-                size_t                  bpsSamplecount;
                 size_t                  currentBps;
                 size_t                  usedBps;
+                vlc_object_t *          p_obj;
+
+                static const unsigned   TOTALOBS = 10;
+                struct
+                {
+                    size_t bw;
+                    size_t diff;
+                } window[TOTALOBS];
+                unsigned                window_idx;
+                size_t                  prevbps;
+
+                size_t                  dlsize;
+                mtime_t                 dllength;
+
+                vlc_mutex_t             lock;
         };
 
         class FixedRateAdaptationLogic : public AbstractAdaptationLogic

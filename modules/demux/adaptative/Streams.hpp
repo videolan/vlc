@@ -27,6 +27,7 @@
 #include <vlc_common.h>
 #include "StreamFormat.hpp"
 #include "ChunksSource.hpp"
+#include "SegmentTracker.hpp"
 
 #include "plumbing/Demuxer.hpp"
 #include "plumbing/SourceStream.hpp"
@@ -52,7 +53,8 @@ namespace adaptative
     using namespace playlist;
 
     class AbstractStream : public ChunksSource,
-                           public ExtraFMTInfoInterface
+                           public ExtraFMTInfoInterface,
+                           public SegmentTrackerListenerInterface
     {
     public:
         AbstractStream(demux_t *, const StreamFormat &);
@@ -64,6 +66,7 @@ namespace adaptative
         bool isEOF() const;
         mtime_t getPCR() const;
         mtime_t getBufferingLevel() const;
+        mtime_t getMinAheadTime() const;
         mtime_t getFirstDTS() const;
         int esCount() const;
         bool seekAble() const;
@@ -73,13 +76,13 @@ namespace adaptative
         typedef enum {status_eof, status_eop, status_dis, status_buffering, status_demuxed} status;
         status demux(mtime_t, bool);
         virtual bool setPosition(mtime_t, bool);
-        mtime_t getPosition() const;
-        void prune();
+        mtime_t getPlaybackTime() const;
         void runUpdates();
 
-        virtual block_t *readNextBlock(size_t); /* impl */
+        virtual block_t *readNextBlock(); /* impl */
 
         virtual void fillExtraFMTInfo( es_format_t * ) const; /* impl */
+        virtual void trackerEvent(const SegmentTrackerEvent &); /* impl */
 
     protected:
         virtual block_t *checkBlock(block_t *, bool) = 0;
@@ -89,9 +92,7 @@ namespace adaptative
 
         virtual void prepareFormatChange();
 
-        bool restarting_output;
         bool discontinuity;
-        SegmentChunk *getChunk();
 
         Demuxer *syncdemux;
 

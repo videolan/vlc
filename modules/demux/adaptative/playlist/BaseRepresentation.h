@@ -58,7 +58,13 @@ namespace adaptative
                 void                setBandwidth            ( uint64_t bandwidth );
                 const std::list<std::string> & getCodecs    () const;
                 void                addCodec                (const std::string &);
-                virtual bool        needsUpdate()           const;
+                bool                consistentSegmentNumber () const;
+                virtual void        pruneByPlaybackTime     (mtime_t);
+
+                virtual mtime_t     getMinAheadTime         (uint64_t) const;
+                virtual bool        needsUpdate             () const;
+                virtual bool        runLocalUpdates         (mtime_t, uint64_t, bool);
+                virtual void        scheduleNextUpdate      (uint64_t);
 
                 virtual void        debug                   (vlc_object_t *,int = 0) const;
 
@@ -71,6 +77,7 @@ namespace adaptative
                 BaseAdaptationSet                  *adaptationSet;
                 uint64_t                            bandwidth;
                 std::list<std::string>              codecs;
+                bool                                b_consistent;
         };
     }
 }

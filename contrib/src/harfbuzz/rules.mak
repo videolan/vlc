@@ -7,6 +7,12 @@ ifeq ($(call need_pkg,"harfbuzz"),)
 PKGS_FOUND += harfbuzz
 endif
 
+HARFBUZZCONF = --with-icu=no --with-glib=no --with-fontconfig=no
+
+ifdef HAVE_DARWIN_OS
+HARFBUZZCONF += --with-coretext=yes
+endif
+
 $(TARBALLS)/harfbuzz-$(HARFBUZZ_VERSION).tar.bz2:
 	$(call download,$(HARFBUZZ_URL))
 
@@ -23,6 +29,6 @@ DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
 
 .harfbuzz: harfbuzz
 	cd $< && env NOCONFIGURE=1 sh autogen.sh
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS)" ./configure $(HOSTCONF) --with-icu=no --with-glib=no --with-fontconfig=no
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS)" ./configure $(HOSTCONF) $(HARFBUZZCONF)
 	cd $< && $(MAKE) install
 	touch $@

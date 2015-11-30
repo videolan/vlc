@@ -35,7 +35,7 @@ static void decode (const char *in, const char *out)
 
     printf ("\"%s\" -> \"%s\" ?\n", in, out);
     strcpy (buf, in);
-    resolve_xml_special_chars (buf);
+    vlc_xml_decode (buf);
 
     if (strcmp (buf, out))
     {
@@ -49,7 +49,7 @@ static void encode (const char *in, const char *out)
     char *buf;
 
     printf ("\"%s\" -> \"%s\" ?\n", in, out);
-    buf = convert_xml_special_chars (in);
+    buf = vlc_xml_encode (in);
 
     if (strcmp (buf, out))
     {

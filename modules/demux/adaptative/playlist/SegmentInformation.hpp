@@ -82,11 +82,12 @@ namespace adaptative
                 ISegment * getNextSegment(SegmentInfoType, uint64_t, uint64_t *, bool *) const;
                 bool getSegmentNumberByTime(mtime_t, uint64_t *) const;
                 mtime_t getPlaybackTimeBySegmentNumber(uint64_t) const;
-                virtual void getDurationsRange(mtime_t *, mtime_t *) const;
+                uint64_t getLiveStartSegmentNumber(uint64_t) const;
                 virtual void mergeWith(SegmentInformation *, mtime_t);
                 virtual void mergeWithTimeline(SegmentTimeline *); /* ! don't use with global merge */
                 virtual void pruneBySegmentNumber(uint64_t);
-                virtual void runLocalUpdates(mtime_t, uint64_t);
+                virtual void pruneByPlaybackTime(mtime_t);
+                virtual uint64_t translateSegmentNumber(uint64_t, const SegmentInformation *) const;
 
             protected:
                 std::size_t getAllSegments(std::vector<ISegment *> &) const;

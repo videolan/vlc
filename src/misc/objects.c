@@ -55,32 +55,121 @@
 #include <limits.h>
 #include <assert.h>
 
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  DumpCommand( vlc_object_t *, char const *,
-                         vlc_value_t, vlc_value_t, void * );
-
-static vlc_object_t * FindName ( vlc_object_internals_t *, const char * );
-static void PrintObject( vlc_object_internals_t *, const char * );
-static void DumpStructure( vlc_object_internals_t *, unsigned, char * );
-
-static vlc_list_t   * NewList       ( int );
-
-static void vlc_object_destroy( vlc_object_t *p_this );
-
-/*****************************************************************************
- * Local structure lock
- *****************************************************************************/
-static void libvlc_lock (libvlc_int_t *p_libvlc)
+static void PrintObject (vlc_object_t *obj, const char *prefix)
 {
-    vlc_mutex_lock (&(libvlc_priv (p_libvlc)->structure_lock));
+    vlc_object_internals_t *priv = vlc_internals(obj);
+
+    int canc = vlc_savecancel ();
+    printf (" %so %p %s, %u refs, parent %p\n", prefix, (void *)obj,
+            obj->psz_object_type, atomic_load(&priv->refs),
+            (void *)obj->p_parent);
+    vlc_restorecancel (canc);
 }
 
-static void libvlc_unlock (libvlc_int_t *p_libvlc)
+static void DumpStructure (vlc_object_t *obj, unsigned level, char *psz_foo)
 {
-    vlc_mutex_unlock (&(libvlc_priv (p_libvlc)->structure_lock));
+    char back = psz_foo[level];
+
+    psz_foo[level] = '\0';
+    PrintObject (obj, psz_foo);
+    psz_foo[level] = back;
+
+    if (level / 2 >= MAX_DUMPSTRUCTURE_DEPTH)
+    {
+        msg_Warn (obj, "structure tree is too deep");
+        return;
+    }
+
+    vlc_object_internals_t *priv = vlc_internals(obj);
+
+    /* NOTE: nested locking here (due to recursive call) */
+    vlc_mutex_lock (&vlc_internals(obj)->tree_lock);
+    for (priv = priv->first; priv != NULL; priv = priv->next)
+    {
+        if (level > 0)
+        {
+            assert(level >= 2);
+            psz_foo[level - 1] = ' ';
+
+            if (psz_foo[level - 2] == '`')
+                psz_foo[level - 2] = ' ';
+        }
+
+        psz_foo[level] = priv->next ? '|' : '`';
+        psz_foo[level + 1] = '-';
+        psz_foo[level + 2] = '\0';
+
+        DumpStructure (vlc_externals(priv), level + 2, psz_foo);
+    }
+    vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);
+}
+
+/**
+ * Prints the VLC object tree
+ *
+ * This function prints either an ASCII tree showing the connections between
+ * vlc objects, and additional information such as their refcount, thread ID,
+ * etc. (command "tree"), or the same data as a simple list (command "list").
+ */
+static int TreeCommand (vlc_object_t *obj, char const *cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    (void) cmd; (void) oldval; (void) newval; (void) data;
+
+    if (cmd[0] == 't')
+    {
+        char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
+
+        psz_foo[0] = '|';
+        DumpStructure (obj, 0, psz_foo);
+    }
+
+    return VLC_SUCCESS;
+}
+
+static vlc_object_t *ObjectExists (vlc_object_t *root, void *obj)
+{
+    if (root == obj)
+        return vlc_object_hold (root);
+
+    vlc_object_internals_t *priv = vlc_internals(root);
+    vlc_object_t *ret = NULL;
+
+    /* NOTE: nested locking here (due to recursive call) */
+    vlc_mutex_lock (&vlc_internals(root)->tree_lock);
+
+    for (priv = priv->first; priv != NULL && ret == NULL; priv = priv->next)
+        ret = ObjectExists (vlc_externals (priv), obj);
+
+    vlc_mutex_unlock (&vlc_internals(root)->tree_lock);
+    return ret;
+}
+
+static int VarsCommand (vlc_object_t *obj, char const *cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    void *p;
+
+    (void) cmd; (void) oldval; (void) data;
+
+    if (sscanf (newval.psz_string, "%p", &p) == 1)
+    {
+        p = ObjectExists (obj, p);
+        if (p == NULL)
+        {
+            msg_Err (obj, "no such object: %s", newval.psz_string);
+            return VLC_ENOOBJ;
+        }
+        obj = p;
+    }
+    else
+        vlc_object_hold (obj);
+
+    PrintObject (obj, "");
+    DumpVariables (obj);
+    vlc_object_release (obj);
+
+    return VLC_SUCCESS;
 }
 
 #undef vlc_custom_create
@@ -109,6 +198,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     priv->pf_destructor = NULL;
     priv->prev = NULL;
     priv->first = NULL;
+    vlc_mutex_init (&priv->tree_lock);
 
     vlc_object_t *obj = (vlc_object_t *)(priv + 1);
     obj->psz_object_type = typename;
@@ -127,12 +217,12 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         obj->p_parent = vlc_object_hold (parent);
 
         /* Attach the parent to its child (structure lock needed) */
-        libvlc_lock (obj->p_libvlc);
+        vlc_mutex_lock (&papriv->tree_lock);
         priv->next = papriv->first;
         if (priv->next != NULL)
             priv->next->prev = priv;
         papriv->first = priv;
-        libvlc_unlock (obj->p_libvlc);
+        vlc_mutex_unlock (&papriv->tree_lock);
     }
     else
     {
@@ -142,14 +232,13 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         obj->p_libvlc = self;
         obj->p_parent = NULL;
         priv->next = NULL;
-        vlc_mutex_init (&(libvlc_priv (self)->structure_lock));
 
         /* TODO: should be in src/libvlc.c */
         int canc = vlc_savecancel ();
         var_Create (obj, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
-        var_AddCallback (obj, "tree", DumpCommand, obj);
+        var_AddCallback (obj, "tree", TreeCommand, NULL);
         var_Create (obj, "vars", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
-        var_AddCallback (obj, "vars", DumpCommand, obj);
+        var_AddCallback (obj, "vars", VarsCommand, NULL);
         vlc_restorecancel (canc);
     }
 
@@ -233,26 +322,39 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     if (unlikely(p_this == VLC_OBJECT(p_this->p_libvlc)))
     {
         /* TODO: should be in src/libvlc.c */
-        var_DelCallback (p_this, "tree", DumpCommand, p_this);
-        var_DelCallback (p_this, "vars", DumpCommand, p_this);
+        var_DelCallback (p_this, "vars", VarsCommand, NULL);
+        var_DelCallback (p_this, "tree", TreeCommand, NULL);
     }
 
     /* Destroy the associated variables. */
     var_DestroyAll( p_this );
 
+    vlc_mutex_destroy (&p_priv->tree_lock);
     vlc_cond_destroy( &p_priv->var_wait );
     vlc_mutex_destroy( &p_priv->var_lock );
-
     free( p_this->psz_header );
-
     free( p_priv->psz_name );
-
-    if( VLC_OBJECT(p_this->p_libvlc) == p_this )
-        vlc_mutex_destroy (&(libvlc_priv ((libvlc_int_t *)p_this)->structure_lock));
-
     free( p_priv );
 }
 
+static vlc_object_t *FindName (vlc_object_t *obj, const char *name)
+{
+    vlc_object_internals_t *priv = vlc_internals(obj);
+
+    if (priv->psz_name != NULL && !strcmp (priv->psz_name, name))
+        return vlc_object_hold (obj);
+
+    vlc_object_t *found = NULL;
+    /* NOTE: nested locking here (due to recursive call) */
+    vlc_mutex_lock (&vlc_internals(obj)->tree_lock);
+
+    for (priv = priv->first; priv != NULL && found == NULL; priv = priv->next)
+        found = FindName (vlc_externals(priv), name);
+
+    /* NOTE: nested locking here (due to recursive call) */
+    vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);
+    return found;
+}
 
 #undef vlc_object_find_name
 /**
@@ -294,11 +396,9 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
     msg_Err( p_this, "looking for object \"%s\"... FIXME XXX", psz_name );
 #endif
 
-    libvlc_lock (p_this->p_libvlc);
     vlc_mutex_lock (&name_lock);
-    p_found = FindName (vlc_internals (p_this), psz_name);
+    p_found = FindName (p_this, psz_name);
     vlc_mutex_unlock (&name_lock);
-    libvlc_unlock (p_this->p_libvlc);
     return p_found;
 }
 
@@ -323,56 +423,74 @@ void * vlc_object_hold( vlc_object_t *p_this )
  * Drops a reference to an object (decrements the reference count).
  * If the count reaches zero, the object is destroyed.
  */
-void vlc_object_release( vlc_object_t *p_this )
+void vlc_object_release (vlc_object_t *obj)
 {
-    vlc_object_internals_t *internals = vlc_internals( p_this );
-    vlc_object_t *parent = NULL;
-    unsigned refs = atomic_load (&internals->refs);
+    vlc_object_internals_t *priv = vlc_internals(obj);
+    unsigned refs = atomic_load (&priv->refs);
 
     /* Fast path */
     while (refs > 1)
     {
-        if (atomic_compare_exchange_weak (&internals->refs, &refs, refs - 1))
+        if (atomic_compare_exchange_weak (&priv->refs, &refs, refs - 1))
             return; /* There are still other references to the object */
 
         assert (refs > 0);
     }
 
+    vlc_object_t *parent = obj->p_parent;
+
+    if (unlikely(parent == NULL))
+    {   /* Destroying the root object */
+        refs = atomic_fetch_sub (&priv->refs, 1);
+        assert (refs == 1); /* nobody to race against in this case */
+
+        assert (priv->first == NULL); /* no children can be left */
+
+        int canc = vlc_savecancel ();
+        vlc_object_destroy (obj);
+        vlc_restorecancel (canc);
+        return;
+    }
+
     /* Slow path */
-    libvlc_lock (p_this->p_libvlc);
-    refs = atomic_fetch_sub (&internals->refs, 1);
+    vlc_object_internals_t *papriv = vlc_internals (parent);
+
+    vlc_mutex_lock (&papriv->tree_lock);
+    refs = atomic_fetch_sub (&priv->refs, 1);
     assert (refs > 0);
 
     if (likely(refs == 1))
-    {
-        /* Detach from parent to protect against vlc_object_find_name() */
-        parent = p_this->p_parent;
-        if (likely(parent))
+    {   /* Detach from parent to protect against vlc_object_find_name() */
+        vlc_object_internals_t *prev = priv->prev;
+        vlc_object_internals_t *next = priv->next;
+
+        if (prev != NULL)
         {
-           /* Unlink */
-           vlc_object_internals_t *prev = internals->prev;
-           vlc_object_internals_t *next = internals->next;
-
-           if (prev != NULL)
-               prev->next = next;
-           else
-               vlc_internals (parent)->first = next;
-           if (next != NULL)
-               next->prev = prev;
+            assert (prev->next == priv);
+            prev->next = next;
         }
-
-        /* We have no children */
-        assert (internals->first == NULL);
+        else
+        {
+            assert (papriv->first == priv);
+            papriv->first = next;
+        }
+        if (next != NULL)
+        {
+            assert (next->prev == priv);
+            next->prev = prev;
+        }
     }
-    libvlc_unlock (p_this->p_libvlc);
+    vlc_mutex_unlock (&papriv->tree_lock);
 
     if (likely(refs == 1))
     {
+        assert (priv->first == NULL); /* no children can be left */
+
         int canc = vlc_savecancel ();
-        vlc_object_destroy( p_this );
+        vlc_object_destroy (obj);
         vlc_restorecancel (canc);
-        if (parent)
-            vlc_object_release (parent);
+
+        vlc_object_release (parent);
     }
 }
 
@@ -384,72 +502,38 @@ void vlc_object_release( vlc_object_t *p_this )
  */
 vlc_list_t *vlc_list_children( vlc_object_t *obj )
 {
-    vlc_list_t *l;
+    vlc_list_t *l = malloc (sizeof (*l));
+    if (unlikely(l == NULL))
+        return NULL;
+
+    l->i_count = 0;
+    l->p_values = NULL;
+
     vlc_object_internals_t *priv;
     unsigned count = 0;
 
-    libvlc_lock (obj->p_libvlc);
+    vlc_mutex_lock (&vlc_internals(obj)->tree_lock);
     for (priv = vlc_internals (obj)->first; priv; priv = priv->next)
          count++;
-    l = NewList (count);
-    if (likely(l != NULL))
-    {
-        unsigned i = 0;
 
-        for (priv = vlc_internals (obj)->first; priv; priv = priv->next)
-            l->p_values[i++].p_address = vlc_object_hold (vlc_externals (priv));
+    if (count > 0)
+    {
+        l->p_values = malloc (count * sizeof (vlc_value_t));
+        if (unlikely(l->p_values == NULL))
+        {
+            vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);
+            free (l);
+            return NULL;
+        }
+        l->i_count = count;
     }
-    libvlc_unlock (obj->p_libvlc);
+
+    unsigned i = 0;
+
+    for (priv = vlc_internals (obj)->first; priv; priv = priv->next)
+        l->p_values[i++].p_address = vlc_object_hold (vlc_externals (priv));
+    vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);
     return l;
-}
-
-/*****************************************************************************
- * DumpCommand: print the current vlc structure
- *****************************************************************************
- * This function prints either an ASCII tree showing the connections between
- * vlc objects, and additional information such as their refcount, thread ID,
- * etc. (command "tree"), or the same data as a simple list (command "list").
- *****************************************************************************/
-static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
-                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    (void)oldval;
-    vlc_object_t *p_object = NULL;
-
-    if( *newval.psz_string )
-    {
-        /* try using the object's name to find it */
-        p_object = vlc_object_find_name( p_data, newval.psz_string );
-        if( !p_object )
-            return VLC_ENOOBJ;
-    }
-
-    libvlc_lock (p_this->p_libvlc);
-    if( *psz_cmd == 't' )
-    {
-        char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
-
-        if( !p_object )
-            p_object = VLC_OBJECT(p_this->p_libvlc);
-
-        psz_foo[0] = '|';
-        DumpStructure( vlc_internals(p_object), 0, psz_foo );
-    }
-    else if( *psz_cmd == 'v' )
-    {
-        if( !p_object )
-            p_object = p_this->p_libvlc ? VLC_OBJECT(p_this->p_libvlc) : p_this;
-
-        PrintObject( vlc_internals(p_object), "" );
-        DumpVariables(p_object);
-    }
-    libvlc_unlock (p_this->p_libvlc);
-
-    if( *newval.psz_string )
-    {
-        vlc_object_release( p_object );
-    }
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -465,111 +549,4 @@ void vlc_list_release( vlc_list_t *p_list )
 
     free( p_list->p_values );
     free( p_list );
-}
-
-/* Following functions are local */
-
-static vlc_object_t *FindName (vlc_object_internals_t *priv, const char *name)
-{
-    if (priv->psz_name != NULL && !strcmp (priv->psz_name, name))
-        return vlc_object_hold (vlc_externals (priv));
-
-    for (priv = priv->first; priv != NULL; priv = priv->next)
-    {
-        vlc_object_t *found = FindName (priv, name);
-        if (found != NULL)
-            return found;
-    }
-    return NULL;
-}
-
-static void PrintObject( vlc_object_internals_t *priv,
-                         const char *psz_prefix )
-{
-    char psz_refcount[20], psz_name[50], psz_parent[20];
-
-    int canc = vlc_savecancel ();
-    memset( &psz_name, 0, sizeof(psz_name) );
-
-    vlc_mutex_lock (&name_lock);
-    if (priv->psz_name != NULL)
-    {
-        snprintf( psz_name, 49, " \"%s\"", priv->psz_name );
-        if( psz_name[48] )
-            psz_name[48] = '\"';
-    }
-    vlc_mutex_unlock (&name_lock);
-
-    snprintf( psz_refcount, 19, ", %u refs", atomic_load( &priv->refs ) );
-
-    psz_parent[0] = '\0';
-    /* FIXME: need structure lock!!! */
-    if( vlc_externals(priv)->p_parent )
-        snprintf( psz_parent, 19, ", parent %p",
-                  (void *)vlc_externals(priv)->p_parent );
-
-    printf( " %so %p %s%s%s%s\n", psz_prefix,
-            (void *)vlc_externals(priv), vlc_externals(priv)->psz_object_type,
-            psz_name, psz_refcount, psz_parent );
-    vlc_restorecancel (canc);
-}
-
-static void DumpStructure (vlc_object_internals_t *priv, unsigned i_level,
-                           char *psz_foo)
-{
-    char i_back = psz_foo[i_level];
-    psz_foo[i_level] = '\0';
-
-    PrintObject (priv, psz_foo);
-
-    psz_foo[i_level] = i_back;
-
-    if( i_level / 2 >= MAX_DUMPSTRUCTURE_DEPTH )
-    {
-        msg_Warn( vlc_externals(priv), "structure tree is too deep" );
-        return;
-    }
-
-    for (priv = priv->first; priv != NULL; priv = priv->next)
-    {
-        if( i_level )
-        {
-            psz_foo[i_level-1] = ' ';
-
-            if( psz_foo[i_level-2] == '`' )
-            {
-                psz_foo[i_level-2] = ' ';
-            }
-        }
-
-        psz_foo[i_level] = priv->next ? '|' : '`';
-        psz_foo[i_level+1] = '-';
-        psz_foo[i_level+2] = '\0';
-
-        DumpStructure (priv, i_level + 2, psz_foo);
-    }
-}
-
-static vlc_list_t * NewList( int i_count )
-{
-    vlc_list_t * p_list = malloc( sizeof( vlc_list_t ) );
-    if( p_list == NULL )
-        return NULL;
-
-    p_list->i_count = i_count;
-
-    if( i_count == 0 )
-    {
-        p_list->p_values = NULL;
-        return p_list;
-    }
-
-    p_list->p_values = malloc( i_count * sizeof( vlc_value_t ) );
-    if( p_list->p_values == NULL )
-    {
-        p_list->i_count = 0;
-        return p_list;
-    }
-
-    return p_list;
 }

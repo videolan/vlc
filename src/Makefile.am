@@ -536,7 +536,7 @@ check_PROGRAMS = \
 	test_xmlent \
 	test_headers
 
-TESTS = $(check_PROGRAMS)
+TESTS = $(check_PROGRAMS) check_symbols
 
 test_block_SOURCES = test/block_test.c
 test_block_LDADD = $(LDADD) $(LIBS_libvlccore)
@@ -592,7 +592,7 @@ stamp-revision:
 # Unit/regression test
 ###############################################################################
 
-dist_check_SCRIPTS = check_headers
+dist_check_SCRIPTS = check_headers check_symbols
 
 check-local:
 	for h in `echo $(pkginclude_HEADERS) | sed -e s,\.\./include/,,g`; \

@@ -581,11 +581,8 @@ void PLModel::processInputItemUpdate( )
     input_thread_t *p_input = THEMIM->getInput();
     if( !p_input ) return;
 
-    if( p_input )
-    {
-        PLItem *item = findByInputId( rootItem, input_GetItem( p_input )->i_id );
-        if( item ) emit currentIndexChanged( index( item, 0 ) );
-    }
+    PLItem *item = findByInputId( rootItem, input_GetItem( p_input )->i_id );
+    if( item ) emit currentIndexChanged( index( item, 0 ) );
 
     processInputItemUpdate( input_GetItem( p_input ) );
 }

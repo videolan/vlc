@@ -245,7 +245,7 @@ static int Demux( demux_t *p_demux )
         vlc_gc_decref( p_input );
         if( psz_qtnext )
         {
-            resolve_xml_special_chars( psz_qtnext );
+            vlc_xml_decode( psz_qtnext );
             p_input = input_item_New( psz_qtnext, NULL );
             input_item_node_AppendItem( p_subitems, p_input );
             vlc_gc_decref( p_input );

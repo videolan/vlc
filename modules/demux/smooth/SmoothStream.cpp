@@ -18,7 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "SmoothStream.hpp"
-#include "SmoothStreamFormat.hpp"
 #include <vlc_demux.h>
 
 using namespace smooth;
@@ -33,7 +32,7 @@ AbstractDemuxer * SmoothStream::createDemux(const StreamFormat &format)
     AbstractDemuxer *ret = NULL;
     switch((unsigned)format)
     {
-        case SmoothStreamFormat::MP4:
+        case StreamFormat::MP4:
             ret = new Demuxer(p_realdemux, "mp4", fakeesout->getEsOut(), demuxersource);
             break;
 

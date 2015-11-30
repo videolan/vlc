@@ -70,6 +70,7 @@ struct decoder_t
     block_t *           ( * pf_decode_audio )( decoder_t *, block_t ** );
     subpicture_t *      ( * pf_decode_sub)   ( decoder_t *, block_t ** );
     block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
+    void                ( * pf_flush ) ( decoder_t * );
 
     /* Closed Caption (CEA 608/708) extraction.
      * If set, it *may* be called after pf_decode_video/pf_packetize

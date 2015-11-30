@@ -158,6 +158,7 @@ local options = {
     
     mess_success = 'Success',
     mess_error = 'Error',
+    mess_warn = 'Warning',
     mess_no_response = 'Server not responding',
     mess_unauthorized = 'Request unauthorized',
     mess_expired = 'Session expired, retrying',
@@ -168,6 +169,7 @@ local options = {
     mess_not_found2 = 'File not found (illegal character?)',
     mess_no_selection = 'No subtitles selected',
     mess_save_fail = 'Unable to save subtitles',
+    mess_save_warn = 'Unable to save subtitles in file folder, using config folder',
     mess_click_link = 'Click here to open the file',
     mess_complete = 'Research complete',
     mess_no_res = 'No result',
@@ -1402,7 +1404,7 @@ openSub = {
         file.path = vlc.strings.decode_uri(file.path)
         file.dir, file.completeName = string.match(
           file.path,
-          '^(.+/)([^/]*)$')
+          '^(.*/)([^/]*)$')
         
         local file_stat = vlc.net.stat(file.path)
         if file_stat 
@@ -1696,7 +1698,7 @@ function download_subtitles()
   elseif openSub.conf.dirPath then
     tmp_dir = openSub.conf.dirPath
     
-    message = "<br>"..error_tag(lang["mess_save_fail"].." &nbsp;"..
+    message = "<br>"..warn_tag(lang["mess_save_warn"].." &nbsp;"..
     "<a href='"..vlc.strings.make_uri(openSub.conf.dirPath).."'>"..
     lang["mess_click_link"].."</a>")
   else
@@ -1721,7 +1723,7 @@ function download_subtitles()
     if openSub.conf.dirPath then
       target =  openSub.conf.dirPath..slash..subfileName
       message = "<br>"..
-        error_tag(lang["mess_save_fail"].." &nbsp;"..
+        warn_tag(lang["mess_save_warn"].." &nbsp;"..
         "<a href='"..vlc.strings.make_uri(
           openSub.conf.dirPath).."'>"..
           lang["mess_click_link"].."</a>")
@@ -1833,6 +1835,11 @@ end
 function error_tag(str)
   return "<span style='color:#B23'><b>"..
   lang["mess_error"]..":</b></span> "..str..""
+end
+
+function warn_tag(str)
+  return "<span style='color:#CF0'><b>"..
+  lang["mess_warn"]..":</b></span> "..str..""
 end
 
             --[[ Network utils]]--

@@ -1585,7 +1585,7 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
             for( int i = 0; i < __MIN( l.count(), 10) ; ++i )
             {
                 QString mrl = l.at( i );
-                char *psz = decode_URI_duplicate( qtu( mrl ) );
+                char *psz = vlc_uri_decode_duplicate( qtu( mrl ) );
                 QString text = qfu( psz );
 
                 text.replace("&", "&&");

@@ -1379,7 +1379,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
             if( !p_sys->psz_icy_name )
                 free( psz_tmp );
             else
-                resolve_xml_special_chars( p_sys->psz_icy_name );
+                vlc_xml_decode( p_sys->psz_icy_name );
             msg_Dbg( p_access, "Icy-Name: %s", p_sys->psz_icy_name );
             input_thread_t *p_input = p_access->p_input;
             if ( p_input )
@@ -1401,7 +1401,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
             if( !p_sys->psz_icy_genre )
                 free( psz_tmp );
             else
-                resolve_xml_special_chars( p_sys->psz_icy_genre );
+                vlc_xml_decode( p_sys->psz_icy_genre );
             msg_Dbg( p_access, "Icy-Genre: %s", p_sys->psz_icy_genre );
             input_thread_t *p_input = p_access->p_input;
             if( p_input )

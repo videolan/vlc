@@ -117,14 +117,6 @@ BasePeriod* AbstractPlaylist::getNextPeriod(BasePeriod *period)
     return NULL;
 }
 
-
-void AbstractPlaylist::getPlaylistDurationsRange(mtime_t *min, mtime_t *max) const
-{
-    *min = *max = 0;
-    for(size_t i = 0; i < periods.size(); i++)
-        periods.at(i)->getDurationsRange(min, max);
-}
-
 void AbstractPlaylist::mergeWith(AbstractPlaylist *updatedAbstractPlaylist, mtime_t prunebarrier)
 {
     availabilityEndTime.Set(updatedAbstractPlaylist->availabilityEndTime.Get());
@@ -133,9 +125,9 @@ void AbstractPlaylist::mergeWith(AbstractPlaylist *updatedAbstractPlaylist, mtim
         periods.at(i)->mergeWith(updatedAbstractPlaylist->periods.at(i), prunebarrier);
 }
 
-void AbstractPlaylist::pruneBySegmentNumber(uint64_t num)
+void AbstractPlaylist::pruneByPlaybackTime(mtime_t time)
 {
     for(size_t i = 0; i < periods.size(); i++)
-        periods.at(i)->pruneBySegmentNumber(num);
+        periods.at(i)->pruneByPlaybackTime(time);
 }
 

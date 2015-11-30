@@ -281,7 +281,7 @@ void MetaPanel::update( input_item_t *p_item )
     char *psz_art = input_item_GetArtURL( p_item );
     if( psz_art )
     {
-        char *psz = make_path( psz_art );
+        char *psz = vlc_uri2path( psz_art );
         free( psz_art );
         file = qfu( psz );
         free( psz );

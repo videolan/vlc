@@ -60,7 +60,9 @@ namespace adaptative
             int     esCount() const;
             bool    setPosition(mtime_t);
             bool    seekAble() const;
+            virtual bool needsUpdate() const;
             virtual bool updatePlaylist();
+            virtual void scheduleNextUpdate();
 
             /* static callbacks */
             static int control_callback(demux_t *, int, va_list);
@@ -71,6 +73,7 @@ namespace adaptative
             virtual int doControl(int, va_list);
             virtual int doDemux(int64_t);
 
+            void pruneLiveStream();
             virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();
             void unsetPeriod();
@@ -88,6 +91,7 @@ namespace adaptative
             time_t                               nextPlaylistupdate;
             mtime_t                              i_nzpcr;
             BasePeriod                          *currentPeriod;
+            int                                  failedupdates;
     };
 
 }

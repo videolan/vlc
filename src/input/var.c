@@ -112,6 +112,7 @@ static const vlc_input_callback_t p_input_navigation_callbacks[] =
 {
     CALLBACK( "next-title", TitleCallback ),
     CALLBACK( "prev-title", TitleCallback ),
+    CALLBACK( "menu-popup", TitleCallback ),
 
     CALLBACK( NULL, NULL )
 };
@@ -268,6 +269,13 @@ void input_ControlVarNavigation( input_thread_t *p_input )
             text.psz_string = _("Previous title");
             var_Change( p_input, "prev-title", VLC_VAR_SETTEXT, &text, NULL );
             var_AddCallback( p_input, "prev-title", TitleCallback, NULL );
+        }
+
+        if( var_Type( p_input, "menu-popup" ) == 0 ) {
+            var_Create( p_input, "menu-popup", VLC_VAR_VOID );
+            text.psz_string = _("Menu popup");
+            var_Change( p_input, "menu-popup", VLC_VAR_SETTEXT, &text, NULL );
+            var_AddCallback( p_input, "menu-popup", TitleCallback, NULL );
         }
     }
 
@@ -671,6 +679,10 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
         val.i_int = var_GetInteger( p_input, "title" ) - 1;
         if( val.i_int >= 0 )
             var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+    }
+    else if( !strcmp( psz_cmd, "menu-popup" ) )
+    {
+        input_ControlPush( p_input, INPUT_CONTROL_NAV_POPUP, NULL );
     }
     else
     {

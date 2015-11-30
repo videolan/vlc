@@ -60,7 +60,7 @@ static void test (conv_t f, const char *in, const char *out)
 
 static inline void test_decode (const char *in, const char *out)
 {
-    test (decode_URI_duplicate, in, out);
+    test (vlc_uri_decode_duplicate, in, out);
 }
 
 static inline void test_b64 (const char *in, const char *out)
@@ -169,7 +169,7 @@ int main (void)
     assert (val != -1);*/
 
     /* URI to path tests */
-#define test( a, b ) test (make_path, a, b)
+#define test( a, b ) test (vlc_uri2path, a, b)
     test ("mailto:john@example.com", NULL);
     test ("http://www.example.com/file.html#ref", NULL);
     test ("file://", NULL);

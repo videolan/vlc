@@ -1,0 +1,28 @@
+#! /bin/sh
+# Copyright © 2015 Rémi Denis-Courmont
+
+cd "$(dirname "$0")" || exit $?
+test -f libvlccore.sym || exit 1
+
+# DO NOT add new entries here.
+# Do make existing ones more specific.
+# Do remove existing ones (especially near the end).
+
+echo "Looking for unprefixed exported symbols..."
+cat libvlccore.sym | grep -v \
+	-e '^vlc_' -e '^vlm_' -e '^libvlc_[A-Z]' -e '^VLC_' \
+	-e '^input_' -e '^access_' -e '^stream_' -e '^demux_' -e '^decoder_' \
+	-e '^image_' -e '^block_' -e '^picture_' -e '^subpicture_' \
+	-e '^es_format' -e '^[asv]out_' -e '^spu_' -e '^filter_' -e '^video_' \
+	-e '^playlist_' -e '^services_discovery_' -e '^intf_' \
+	-e '^dialog_' -e '^update_' -e '^addons\?_' -e '^fingerprinter_' \
+	-e '^text_style_' -e '^text_segment_' \
+	-e '^net_' -e '^httpd_' -e '^http_auth_' \
+	-e '^config_' -e '^module_' -e '^var_' \
+	-e '^date_' -e '^sdp_' -e '^plane_' \
+	-e '^us_' -e '^utf8_' -e '^xml_' -e '^str_format_' -e '^GetLang_' \
+	-e '^m[a-z]*$' -e '^[A-Z][a-z]*Charset$' -e 'MD5$' \
+	-e '^NTPtime64$' -e '^secstotimestr$' \
+		&& exit 1
+
+echo "None found."

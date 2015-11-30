@@ -83,6 +83,7 @@ enum libvlc_event_e {
     libvlc_MediaPlayerUnmuted,
     libvlc_MediaPlayerAudioVolume,
     libvlc_MediaPlayerAudioDevice,
+    libvlc_MediaPlayerChapterChanged,
 
     libvlc_MediaListItemAdded=0x200,
     libvlc_MediaListWillAddItem,
@@ -159,6 +160,10 @@ typedef struct libvlc_event_t
         {
             float new_cache;
         } media_player_buffering;
+        struct
+        {
+            int new_chapter;
+        } media_player_chapter_changed;
         struct
         {
             float new_position;

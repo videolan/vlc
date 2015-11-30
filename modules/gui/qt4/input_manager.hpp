@@ -56,8 +56,8 @@ public:
         ItemEsChanged,
         ItemTeletextChanged,
         InterfaceVoutUpdate,
-        StatisticsUpdate, /*10*/
-        InterfaceAoutUpdate,
+        StatisticsUpdate,
+        InterfaceAoutUpdate, /* 10 */
         MetaChanged,
         NameChanged,
         InfoChanged,
@@ -67,11 +67,11 @@ public:
         RecordingEvent,
         ProgramChanged,
         RandomChanged,
-        LoopOrRepeatChanged,
+        LoopOrRepeatChanged, /* 20 */
         EPGEvent,
     /*    SignalChanged, */
 
-        FullscreenControlToggle = QEvent::User + IMEventTypeOffset + 20,
+        FullscreenControlToggle = QEvent::User + IMEventTypeOffset + 50,
         FullscreenControlShow,
         FullscreenControlHide,
         FullscreenControlPlanHide,

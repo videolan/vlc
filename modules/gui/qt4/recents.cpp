@@ -88,7 +88,7 @@ void RecentsMRL::addRecent( const QString &mrl )
 
 #ifdef _WIN32
     /* Add to the Windows 7 default list in taskbar */
-    char* path = make_path( qtu( mrl ) );
+    char* path = vlc_uri2path( qtu( mrl ) );
     if( path )
     {
         wchar_t *wmrl = ToWide( path );

@@ -52,6 +52,7 @@ namespace adaptative
                 virtual void setSourceUrl( const std::string &url ); /* reimpl */
                 void mergeWith( MediaSegmentTemplate *, mtime_t );
                 virtual uint64_t getSequenceNumber() const; /* reimpl */
+                void pruneByPlaybackTime(mtime_t);
                 size_t pruneBySequenceNumber(uint64_t);
                 virtual void debug(vlc_object_t *, int = 0) const; /* reimpl */
                 Property<size_t>        startNumber;
