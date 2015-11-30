@@ -142,7 +142,7 @@
     [_fileDestinationFileName setHidden: YES];
     [_fileDestinationBrowseButton setTitle:_NS("Browse...")];
     [_streamDestinationButton setTitle:_NS("Setup Streaming...")];
-    [_streamDestinationURLLabel setStringValue:_NS(@"Select Streaming Method")];
+    [_streamDestinationURLLabel setStringValue:_NS("Select Streaming Method")];
     [_destinationFileButton setTitle:_NS("Save as File")];
     [_destinationStreamButton setTitle:_NS("Stream")];
     [_destinationCancelBtn setHidden:YES];
