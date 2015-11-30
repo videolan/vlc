@@ -47,14 +47,22 @@ typedef struct bs_s
     uint8_t *p_end;
 
     ssize_t  i_left;    /* i_count number of available bits */
+    bool     b_read_only;
 } bs_t;
 
-static inline void bs_init( bs_t *s, const void *p_data, size_t i_data )
+static inline void bs_write_init( bs_t *s, void *p_data, size_t i_data )
 {
     s->p_start = (uint8_t *)p_data;
     s->p       = s->p_start;
     s->p_end   = s->p_start + i_data;
     s->i_left  = 8;
+    s->b_read_only = false;
+}
+
+static inline void bs_init( bs_t *s, const void *p_data, size_t i_data )
+{
+    bs_write_init( s, (void*) p_data, i_data );
+    s->b_read_only = true;
 }
 
 static inline int bs_pos( const bs_t *s )
@@ -154,6 +162,9 @@ static inline void bs_skip( bs_t *s, ssize_t i_count )
 
 static inline void bs_write( bs_t *s, int i_count, uint32_t i_bits )
 {
+    if( s->b_read_only )
+        return;
+
     while( i_count > 0 )
     {
         if( s->p >= s->p_end )
@@ -199,7 +210,7 @@ static inline void bs_align_0( bs_t *s )
 
 static inline void bs_align_1( bs_t *s )
 {
-    while( s->i_left != 8 )
+    while( !s->b_read_only && s->i_left != 8 )
     {
         bs_write( s, 1, 1 );
     }

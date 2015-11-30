@@ -298,7 +298,7 @@ static bo_t *GetDec3Tag(es_format_t *p_fmt, block_t *a52_frame)
         return NULL;
 
     bs_t s;
-    bs_init(&s, a52_frame->p_buffer, sizeof(a52_frame->i_buffer));
+    bs_write_init(&s, a52_frame->p_buffer, sizeof(a52_frame->i_buffer));
     bs_skip(&s, 16); // syncword
 
     uint8_t fscod, bsid, bsmod, acmod, lfeon, strmtyp;
