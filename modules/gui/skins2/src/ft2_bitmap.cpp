@@ -50,10 +50,10 @@ void FT2Bitmap::draw( const FT_Bitmap &rBitmap, int left, int top,
     uint8_t green = (color >> 8) & 0xff;
     uint8_t red = (color >> 16) & 0xff;
 
-    for( int y = top; y < top + rBitmap.rows && y < m_height; y++ )
+    for( unsigned y = top; y < top + rBitmap.rows && y < m_height; y++ )
     {
         uint8_t *pData = m_pData + 4 * (m_width * y + left);
-        for( int x = left; x < left + rBitmap.width && x < m_width; x++ )
+        for( unsigned x = left; x < left + rBitmap.width && x < m_width; x++ )
         {
             // The buffer in FT_Bitmap contains alpha values
             uint8_t val = *(pBuf++);

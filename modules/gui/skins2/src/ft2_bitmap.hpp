@@ -56,7 +56,7 @@ public:
 
 private:
     /// Bitmap size
-    int m_width, m_height;
+    unsigned int m_width, m_height;
     /// Image data buffer
     uint8_t *m_pData;
 };
