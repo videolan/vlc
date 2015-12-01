@@ -1412,7 +1412,10 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
 {
     t->i_length = FROM_TICKS(title_info->duration);
 
-    if (!t->i_seekpoint) {
+    for (int i = 0; i < t->i_seekpoint; i++)
+        vlc_seekpoint_Delete( t->seekpoint[i] );
+    TAB_CLEAN(t->i_seekpoint, t->seekpoint);
+
         for (unsigned int j = 0; j < title_info->chapter_count; j++) {
             seekpoint_t *s = vlc_seekpoint_New();
             if (!s) {
@@ -1422,7 +1425,6 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
 
             TAB_APPEND(t->i_seekpoint, t->seekpoint, s);
         }
-    }
 }
 
 static void blurayInitTitles(demux_t *p_demux, int menu_titles)
