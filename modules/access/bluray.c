@@ -169,6 +169,7 @@ struct  demux_sys_t
     int                 i_video_stream;
     stream_t            *p_parser;
     bool                b_flushed;
+    bool                b_pl_playing;       /* true when playing playlist */
 
     /* Used to store bluray disc path */
     char                *psz_bd_path;
@@ -1948,6 +1949,13 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_PLAYLIST:
         /* Start of playlist playback (?????.mpls) */
         blurayUpdatePlaylist(p_demux, e->param);
+        if (p_sys->b_pl_playing) {
+            /* previous playlist was stopped in middle. flush to avoid delay */
+            msg_Info(p_demux, "Stopping playlist playback");
+            blurayResetParser(p_demux);
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+        }
+        p_sys->b_pl_playing = true;
         break;
     case BD_EVENT_PLAYITEM:
         blurayUpdateCurrentClip(p_demux, e->param);
@@ -2007,6 +2015,9 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_DISCONTINUITY:
         /* reset demuxer (partially decoded PES packets must be dropped) */
         blurayResetParser(p_demux);
+        break;
+    case BD_EVENT_END_OF_TITLE:
+        p_sys->b_pl_playing = false;
         break;
     case BD_EVENT_IDLE:
         /* nothing to do (ex. BD-J is preparing menus, waiting user input or running animation) */
