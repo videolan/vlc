@@ -940,7 +940,9 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     assert(vout_IsDisplayFiltered(vd) == !sys->display.use_dr);
     if (sys->display.use_dr && !is_direct) {
-        picture_t *direct = picture_pool_Get(vout->p->display_pool);
+        picture_t *direct = NULL;
+        if (likely(vout->p->display_pool != NULL))
+            direct = picture_pool_Get(vout->p->display_pool);
         if (!direct) {
             picture_Release(todisplay);
             if (subpic)
