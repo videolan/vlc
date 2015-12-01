@@ -2139,6 +2139,9 @@ static int blurayDemux(demux_t *p_demux)
             msg_Err(p_demux, "bluray: stopping playback after fatal error\n");
             return VLC_DEMUXER_EGENERIC;
         }
+        if (!p_sys->b_menu) {
+            return VLC_DEMUXER_EOF;
+        }
         return VLC_DEMUXER_SUCCESS;
     }
 
