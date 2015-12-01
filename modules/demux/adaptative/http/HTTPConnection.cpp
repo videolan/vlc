@@ -89,6 +89,8 @@ int HTTPConnection::query(const std::string &path, const BytesRange &range)
         return VLC_EGENERIC;
 
     bytesRange = range;
+    if(range.isValid() && range.getEndByte() > 0)
+        contentLength = range.getEndByte() - range.getStartByte() + 1;
 
     std::string header = buildRequestHeader(path);
     if(connectionClose)
