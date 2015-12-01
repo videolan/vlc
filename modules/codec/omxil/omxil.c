@@ -2561,7 +2561,6 @@ static void ReleasePicture( decoder_t *p_dec, unsigned int i_index,
     OmxPort *p_port = &p_sys->out;
     void *p_handle;
 
-    HWBUFFER_LOCK( p_port );
     p_handle = p_port->pp_buffers[i_index]->pBuffer;
 
     OMX_DBG( "DisplayBuffer: %s %p",
@@ -2570,7 +2569,7 @@ static void ReleasePicture( decoder_t *p_dec, unsigned int i_index,
     if( !p_handle )
     {
         msg_Err( p_dec, "DisplayBuffer: buffer handle invalid" );
-        goto end;
+        return;
     }
 
     if( b_render )
@@ -2580,10 +2579,6 @@ static void ReleasePicture( decoder_t *p_dec, unsigned int i_index,
 
     HwBuffer_ChangeState( p_dec, p_port, i_index, BUF_STATE_NOT_OWNED );
     HWBUFFER_BROADCAST( p_port );
-
-end:
-
-    HWBUFFER_UNLOCK( p_port );
 }
 
 #endif // USE_IOMX
