@@ -236,42 +236,44 @@ static int Open(vlc_object_t *this)
         if (unlikely(viewContainer == nil))
             goto bailout;
 
-        if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)]))
-            goto bailout;
+        @synchronized(viewContainer) {
+            if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)]))
+                goto bailout;
 
-        if (![viewContainer isKindOfClass:[UIView class]])
-            goto bailout;
+            if (![viewContainer isKindOfClass:[UIView class]])
+                goto bailout;
 
-        /* This will be released in Close(), on
-         * main thread, after we are done using it. */
-        sys->viewContainer = [viewContainer retain];
+            /* This will be released in Close(), on
+             * main thread, after we are done using it. */
+            sys->viewContainer = [viewContainer retain];
 
-        if (vd->fmt.i_chroma == VLC_CODEC_CVPX_OPAQUE) {
-            msg_Dbg(vd, "will use zero-copy rendering");
-            sys->zero_copy = true;
-        }
-
-        /* setup the actual OpenGL ES view */
-        sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:[viewContainer bounds] zeroCopy:sys->zero_copy voutDisplay:vd];
-        sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
-        if (!sys->glESView)
-            goto bailout;
-
-        [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
-                                             withObject:sys->glESView
-                                          waitUntilDone:YES];
-
-        /* add tap gesture recognizer for DVD menus and stuff */
-        sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:sys->glESView
-                                                                     action:@selector(tapRecognized:)];
-        if (sys->viewContainer.window) {
-            if (sys->viewContainer.window.rootViewController) {
-                if (sys->viewContainer.window.rootViewController.view)
-                    [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
+            if (vd->fmt.i_chroma == VLC_CODEC_CVPX_OPAQUE) {
+                msg_Dbg(vd, "will use zero-copy rendering");
+                sys->zero_copy = true;
             }
+
+            /* setup the actual OpenGL ES view */
+            sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:[viewContainer bounds] zeroCopy:sys->zero_copy voutDisplay:vd];
+            sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+            if (!sys->glESView)
+                goto bailout;
+
+            [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
+                                                 withObject:sys->glESView
+                                              waitUntilDone:YES];
+
+            /* add tap gesture recognizer for DVD menus and stuff */
+            sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:sys->glESView
+                                                                         action:@selector(tapRecognized:)];
+            if (sys->viewContainer.window) {
+                if (sys->viewContainer.window.rootViewController) {
+                    if (sys->viewContainer.window.rootViewController.view)
+                        [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
+                }
+            }
+            sys->tapRecognizer.cancelsTouchesInView = NO;
         }
-        sys->tapRecognizer.cancelsTouchesInView = NO;
 
         const vlc_fourcc_t *subpicture_chromas;
         video_format_t fmt = vd->fmt;
@@ -317,8 +319,12 @@ static int Open(vlc_object_t *this)
         vd->manage = NULL;
 
         /* forward our dimensions to the vout core */
-        CGFloat scaleFactor = sys->viewContainer.contentScaleFactor;
-        CGSize viewSize = sys->viewContainer.bounds.size;
+        CGFloat scaleFactor;
+        CGSize viewSize;
+        @synchronized(sys->viewContainer) {
+            scaleFactor = sys->viewContainer.contentScaleFactor;
+            viewSize = sys->viewContainer.bounds.size;
+        }
         vout_display_SendEventFullscreen(vd, false);
         vout_display_SendEventDisplaySize(vd, viewSize.width * scaleFactor, viewSize.height * scaleFactor);
 
@@ -354,8 +360,11 @@ void Close (vlc_object_t *this)
         [sys->glESView setVoutDisplay:nil];
 
         var_Destroy (vd, "drawable-nsobject");
-        [sys->viewContainer performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
-        [sys->glESView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
+        @synchronized(sys->viewContainer) {
+            [sys->glESView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
+            [sys->viewContainer performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
+        }
+        sys->viewContainer = nil;
 
         if (sys->gl.sys != NULL) {
             @synchronized (sys->glESView) {
