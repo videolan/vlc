@@ -854,6 +854,7 @@ static void *Run(void *data)
             /* If connection fails, we assume we must handshake again */
             HandleInterval(&next_exchange, &i_interval);
             b_handshaked = false;
+            net_Close(i_post_socket);
             continue;
         }
 
@@ -867,6 +868,7 @@ static void *Run(void *data)
         if (i_net_ret <= 0)
         {
             /* if we get no answer, something went wrong : try again */
+            net_Close(i_post_socket);
             continue;
         }
 
