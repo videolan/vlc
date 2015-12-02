@@ -1476,7 +1476,7 @@ int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi
 
         /* we want to return milliseconds to match the rest of the API */
         title->i_duration = p_input_title[i]->i_length / 1000;
-        title->b_menu = p_input_title[i]->b_menu;
+        title->b_menu = p_input_title[i]->i_flags & INPUT_TITLE_MENU;
         if( p_input_title[i]->psz_name )
             title->psz_name = strdup( p_input_title[i]->psz_name );
         else

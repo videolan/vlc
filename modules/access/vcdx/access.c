@@ -482,7 +482,7 @@ VCDLIDs( access_t * p_access )
 
     /* Set up LIDs Navigation Menu */
     t = vlc_input_title_New();
-    t->b_menu = true;
+    t->i_flags = INPUT_TITLE_MENU;
     t->psz_name = strdup( "LIDs" );
 
     for( i_lid =  1 ; i_lid <=  p_vcdplayer->i_lids ; i_lid++ )
