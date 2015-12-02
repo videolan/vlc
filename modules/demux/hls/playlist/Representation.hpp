@@ -60,11 +60,6 @@ namespace hls
                 time_t nextUpdateTime;
                 time_t targetDuration;
                 Url playlistUrl;
-                Property<std::string> audio;
-                Property<std::string> video;
-                Property<std::string> subtitles;
-                Property<std::string> closedcaptions;
-
         };
     }
 }
