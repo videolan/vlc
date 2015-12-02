@@ -38,18 +38,12 @@ using namespace adaptative::http;
 
 AbstractChunkSource::AbstractChunkSource()
 {
-    parentChunk = NULL;
     contentLength = 0;
 }
 
 AbstractChunkSource::~AbstractChunkSource()
 {
 
-}
-
-void AbstractChunkSource::setParentChunk(AbstractChunk *parent)
-{
-    parentChunk = parent;
 }
 
 void AbstractChunkSource::setBytesRange(const BytesRange &range)
@@ -68,7 +62,6 @@ AbstractChunk::AbstractChunk(AbstractChunkSource *source_)
 {
     bytesRead = 0;
     source = source_;
-    source->setParentChunk(this);
 }
 
 AbstractChunk::~AbstractChunk()
@@ -228,7 +221,7 @@ bool HTTPChunkSource::prepare()
     if(prepared)
         return true;
 
-    if(!connManager || !parentChunk)
+    if(!connManager)
         return false;
 
     if(!connection)

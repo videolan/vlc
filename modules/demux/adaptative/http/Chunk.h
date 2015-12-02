@@ -48,12 +48,10 @@ namespace adaptative
                 virtual block_t *   readBlock       () = 0;
                 virtual block_t *   read            (size_t) = 0;
                 virtual bool        hasMoreData     () const = 0;
-                void                setParentChunk  (AbstractChunk *);
                 void                setBytesRange   (const BytesRange &);
                 const BytesRange &  getBytesRange   () const;
 
             protected:
-                AbstractChunk      *parentChunk;
                 size_t              contentLength;
                 BytesRange          bytesRange;
         };
