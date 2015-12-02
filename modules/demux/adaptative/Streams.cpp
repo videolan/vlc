@@ -311,7 +311,7 @@ block_t * AbstractStream::readNextBlock()
         return NULL;
     }
 
-    if (currentChunk->getBytesToRead() == 0)
+    if (currentChunk->isEmpty())
     {
         delete currentChunk;
         currentChunk = NULL;

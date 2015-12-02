@@ -96,7 +96,7 @@ void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRe
             else
             {
                 /* last bytes */
-                if(chunk->getBytesToRead() == 0)
+                if(chunk->isEmpty())
                 {
                     /* remove the PKCS#7 padding from the buffer */
                     const uint8_t pad = p_block->p_buffer[p_block->i_buffer - 1];
