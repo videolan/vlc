@@ -57,11 +57,17 @@ typedef struct libvlc_track_description_t
 /**
  * Description for titles
  */
+enum
+{
+    libvlc_title_menu          = 0x01,
+    libvlc_title_interactive   = 0x02
+};
+
 typedef struct libvlc_title_description_t
 {
     int64_t i_duration; /**< duration in milliseconds */
     char *psz_name; /**< title name */
-    bool b_menu; /**< info if item was recognized as a menu by the demuxer */
+    unsigned i_flags; /**< info if item was recognized as a menu, interactive or plain content by the demuxer */
 } libvlc_title_description_t;
 
 /**
