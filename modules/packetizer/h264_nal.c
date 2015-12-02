@@ -20,6 +20,7 @@
 
 #include "h264_nal.h"
 
+#include <vlc_boxes.h>
 #include <limits.h>
 
 /*

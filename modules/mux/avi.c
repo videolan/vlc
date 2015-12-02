@@ -36,7 +36,7 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_codecs.h>
-#include <vlc_bits.h>
+#include <vlc_boxes.h>
 
 /*****************************************************************************
  * Module descriptor

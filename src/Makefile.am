@@ -32,6 +32,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_bits.h \
 	../include/vlc_block.h \
 	../include/vlc_block_helper.h \
+	../include/vlc_boxes.h \
 	../include/vlc_charset.h \
 	../include/vlc_codec.h \
 	../include/vlc_common.h \
