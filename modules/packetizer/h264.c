@@ -43,7 +43,6 @@
 #include "../codec/cc.h"
 #include "h264_nal.h"
 #include "packetizer_helper.h"
-#include "../demux/mpeg/mpeg_parser_helpers.h"
 
 /*****************************************************************************
  * Module descriptor

@@ -51,25 +51,6 @@ static inline void hevc_skip_profile_tiers_level( bs_t * bs, int32_t max_sub_lay
     }
 }
 
-/* Read unsigned Exp-Golomb code */
-static inline uint32_t bs_read_ue( bs_t * bs )
-{
-    int32_t i = 0;
-
-    while( bs_read1( bs ) == 0 && bs->p < bs->p_end && i < 32 )
-        i++;
-
-    return (1 << i) - 1 + bs_read( bs, i );
-}
-
-/* Read signed Exp-Golomb code */
-static inline int32_t bs_read_se( bs_t *s )
-{
-    int val = bs_read_ue( s );
-
-    return val&0x01 ? (val+1)/2 : -(val/2);
-}
-
 /* Discards emulation prevention three bytes */
 static inline size_t nal_to_rbsp(const uint8_t * p_src, uint8_t * p_dst, size_t i_size)
 {
