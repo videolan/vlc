@@ -348,7 +348,7 @@ static int ItemChange(vlc_object_t *p_this, const char *psz_var,
     intf_sys_t     *p_sys   = p_intf->p_sys;
     input_thread_t *p_input = newval.p_address;
 
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
+    VLC_UNUSED(psz_var);
     VLC_UNUSED(oldval);
 
     p_sys->b_meta_read      = false;
