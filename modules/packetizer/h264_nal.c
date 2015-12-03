@@ -30,6 +30,27 @@
 
 static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x01 };
 
+static inline bool strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_data )
+{
+    const uint8_t *p_data = *pp_data;
+    if(*pi_data < 4)
+    {
+        return false;
+    }
+    else if( p_data[0] == !!memcmp(&p_data[1], annexb_startcode, 3) )
+    {
+        *pp_data += 4;
+        *pi_data -= 4;
+    }
+    else if( !memcmp(p_data, annexb_startcode, 3) )
+    {
+        *pp_data += 3;
+        *pi_data -= 3;
+    }
+    else return false;
+    return true;
+}
+
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,
                      uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
@@ -682,48 +703,47 @@ int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
     return 0;
 }
 
-block_t *h264_create_avcdec_config_record( size_t i_nal_length_size,
-                                           struct nal_sps *p_sps,
+block_t *h264_create_avcdec_config_record( uint8_t i_nal_length_size,
                                            const uint8_t *p_sps_buf,
                                            size_t i_sps_size,
                                            const uint8_t *p_pps_buf,
                                            size_t i_pps_size )
 {
-    bo_t bo;
+    if( i_pps_size > UINT16_MAX || i_sps_size > UINT16_MAX )
+        return NULL;
+
+    if( !strip_AnnexB_startcode( &p_sps_buf, &i_sps_size ) ||
+        !strip_AnnexB_startcode( &p_pps_buf, &i_pps_size ) )
+        return NULL;
 
     /* The length of the NAL size is encoded using 1, 2 or 4 bytes */
     if( i_nal_length_size != 1 && i_nal_length_size != 2
      && i_nal_length_size != 4 )
         return NULL;
 
-    /* 6 * int(8), i_sps_size - 4, 1 * int(8), i_pps_size - 4 */
-    if( bo_init( &bo, 7 + i_sps_size + i_pps_size - 8 ) != true )
+    bo_t bo;
+    /* 6 * int(8), i_sps_size, 1 * int(8), i_pps_size */
+    if( bo_init( &bo, 7 + i_sps_size + i_pps_size ) != true )
         return NULL;
 
     bo_add_8( &bo, 1 ); /* configuration version */
-    bo_add_8( &bo, p_sps->i_profile );
-    bo_add_8( &bo, p_sps->i_profile_compatibility );
-    bo_add_8( &bo, p_sps->i_level );
+    bo_add_mem( &bo, 3, &p_sps_buf[1] ); /* i_profile/profile_compatibility/level */
     bo_add_8( &bo, 0xfc | (i_nal_length_size - 1) ); /* 0b11111100 | lengthsize - 1*/
 
     bo_add_8( &bo, 0xe0 | (i_sps_size > 0 ? 1 : 0) ); /* 0b11100000 | sps_count */
-
-    if( i_sps_size > 4 )
+    if( i_sps_size )
     {
-        /* the SPS data we have got includes 4 leading
-         * bytes which we need to remove */
-        bo_add_16be( &bo, i_sps_size - 4 );
-        bo_add_mem( &bo, i_sps_size - 4, p_sps_buf + 4 );
+        bo_add_16be( &bo, i_sps_size );
+        bo_add_mem( &bo, i_sps_size, p_sps_buf );
     }
 
     bo_add_8( &bo, (i_pps_size > 0 ? 1 : 0) ); /* pps_count */
-    if( i_pps_size > 4 )
+    if( i_pps_size )
     {
-        /* the PPS data we have got includes 4 leading
-         * bytes which we need to remove */
-        bo_add_16be( &bo, i_pps_size - 4 );
-        bo_add_mem( &bo, i_pps_size - 4, p_pps_buf + 4 );
+        bo_add_16be( &bo, i_pps_size );
+        bo_add_mem( &bo, i_pps_size, p_pps_buf );
     }
+
     return bo.b;
 }
 

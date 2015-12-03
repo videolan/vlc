@@ -152,8 +152,7 @@ int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
 
 /* Create a AVCDecoderConfigurationRecord from SPS/PPS
  * Returns a valid block_t on success, must be freed with block_Release */
-block_t *h264_create_avcdec_config_record( size_t i_nal_length_size,
-                                           struct nal_sps *p_sps,
+block_t *h264_create_avcdec_config_record( uint8_t i_nal_length_size,
                                            const uint8_t *p_sps_buf,
                                            size_t i_sps_size,
                                            const uint8_t *p_pps_buf,

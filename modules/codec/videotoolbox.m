@@ -387,7 +387,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         /* create avvC atom to forward to the HW decoder */
         block_t *p_block = h264_create_avcdec_config_record(
                                 p_sys->i_nal_length_size,
-                                &sps_data, p_sps_buf, i_sps_size,
+                                p_sps_buf, i_sps_size,
                                 p_pps_buf, i_pps_size);
         free(p_alloc_buf);
         if (!p_block) {
