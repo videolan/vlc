@@ -317,7 +317,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 
             /* we need to convert the SPS and PPS units we received from the
              * demuxer's avvC atom so we can process them further */
-            i_ret = convert_sps_pps(p_dec,
+            i_ret = h264_avcC_to_AnnexB_NAL(p_dec,
                                     p_dec->fmt_in.p_extra,
                                     p_dec->fmt_in.i_extra,
                                     p_buf,
@@ -385,7 +385,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         p_sys->codec_level = sps_data.i_level;
 
         /* create avvC atom to forward to the HW decoder */
-        block_t *p_block = h264_create_avcdec_config_record(
+        block_t *p_block = h264_AnnexB_NAL_to_avcC(
                                 p_sys->i_nal_length_size,
                                 p_sps_buf, i_sps_size,
                                 p_pps_buf, i_pps_size);
@@ -869,7 +869,7 @@ static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    return convert_annexb_to_h264(p_block, p_sys->i_nal_length_size);
+    return h264_AnnexB_to_AVC(p_block, p_sys->i_nal_length_size);
 }
 
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,

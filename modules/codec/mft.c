@@ -575,7 +575,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
     {
         /* in-place NAL to annex B conversion. */
-        convert_h264_to_annexb(buffer_start, p_block->i_buffer, p_sys->nal_length_size);
+        h264_AVC_to_AnnexB(buffer_start, p_block->i_buffer, p_sys->nal_length_size);
     }
 
     hr = IMFMediaBuffer_Unlock(input_media_buffer);
@@ -994,7 +994,7 @@ static int InitializeMFT(decoder_t *p_dec)
             uint8_t *buf = malloc(buf_size);
             if (((uint8_t*)p_dec->fmt_in.p_extra)[0] == 1)
             {
-                convert_sps_pps(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
+                h264_avcC_to_AnnexB_NAL(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
                                 buf, buf_size,
                                 &size, &p_sys->nal_length_size);
             }

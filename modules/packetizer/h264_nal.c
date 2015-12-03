@@ -51,24 +51,22 @@ static inline bool strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_d
     return true;
 }
 
-int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
+int h264_avcC_to_AnnexB_NAL( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,
                      uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
                      uint8_t *pi_nal_length_size)
 {
-    int i_profile;
     uint32_t i_data_size = i_buf_size, i_nal_size, i_sps_pps_size = 0;
     unsigned int i_loop_end;
 
     /* */
     if( i_data_size < 7 )
     {
-        msg_Err( p_dec, "Input Metadata too small" );
+        msg_Err( p_dec, "avcC too small" );
         return VLC_ENOMEM;
     }
 
     /* Read infos in first 6 bytes */
-    i_profile = (p_buf[1] << 16) | (p_buf[2] << 8) | p_buf[3];
     if (pi_nal_length_size)
         *pi_nal_length_size  = (p_buf[4] & 0x03) + 1;
     p_buf       += 5;
@@ -128,7 +126,7 @@ int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
     return VLC_SUCCESS;
 }
 
-void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
+void h264_AVC_to_AnnexB( uint8_t *p_buf, uint32_t i_len,
                              uint8_t i_nal_length_size )
 {
     uint32_t nal_len = 0;
@@ -256,7 +254,7 @@ static int h264_replace_startcode( uint8_t *p_buf,
     return 0;
 }
 
-block_t *convert_annexb_to_h264( block_t *p_block, uint8_t i_nal_length_size )
+block_t *h264_AnnexB_to_AVC( block_t *p_block, uint8_t i_nal_length_size )
 {
     size_t i_startcode_ofs = 0;
     size_t i_startcode_size = 0;
@@ -704,7 +702,7 @@ int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
     return 0;
 }
 
-block_t *h264_create_avcdec_config_record( uint8_t i_nal_length_size,
+block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
                                            const uint8_t *p_sps_buf,
                                            size_t i_sps_size,
                                            const uint8_t *p_pps_buf,

@@ -615,7 +615,7 @@ static int crystal_insert_sps_pps( decoder_t *p_dec,
     if( !p_sys->p_sps_pps_buf )
         return VLC_ENOMEM;
 
-    ret = convert_sps_pps( p_dec, p_buf, i_buf_size, p_sys->p_sps_pps_buf,
+    ret = h264_avcC_to_AnnexB_NAL( p_dec, p_buf, i_buf_size, p_sys->p_sps_pps_buf,
                            p_dec->fmt_in.i_extra * 2, &p_sys->i_sps_pps_size,
                            &p_sys->i_nal_size );
     if( !ret )

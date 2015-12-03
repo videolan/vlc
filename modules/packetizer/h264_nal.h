@@ -118,21 +118,21 @@ static inline void CreateRbspFromNAL( uint8_t **pp_ret, int *pi_ret,
         *pi_ret = nal_to_rbsp(src, dst, i_src);
 }
 
-/* Parse the SPS/PPS Metadata and convert it to annex b format */
-int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
-                     uint32_t i_buf_size, uint8_t *p_out_buf,
-                     uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
-                     uint8_t *p_nal_length_size);
+/*
+    AnnexB : [\x00] \x00 \x00 \x01 Prefixed NAL
+    AVC Sample format : NalLengthSize encoded size prefixed NAL
+    avcC: AVCDecoderConfigurationRecord combining SPS & PPS in AVC Sample Format
+*/
 
-/* Convert avcC format to Annex B in-place */
-void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
-                             uint8_t i_nal_length_size );
+/* Convert AVC Sample format to Annex B in-place */
+void h264_AVC_to_AnnexB( uint8_t *p_buf, uint32_t i_len,
+                         uint8_t i_nal_length_size );
 
-/* Convert Annex B to avcC format in-place
+/* Convert Annex B to AVC Sample format in-place
  * Returns the same p_block or a new p_block if there is not enough room to put
  * the NAL size. In case of error, NULL is returned and p_block is released.
  * */
-block_t *convert_annexb_to_h264( block_t *p_block, uint8_t i_nal_length_size );
+block_t *h264_AnnexB_to_AVC( block_t *p_block, uint8_t i_nal_length_size );
 
 /* Get the SPS/PPS pointers from an Annex B buffer
  * Returns 0 if a SPS and/or a PPS is found */
@@ -152,11 +152,17 @@ int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
 
 /* Create a AVCDecoderConfigurationRecord from SPS/PPS
  * Returns a valid block_t on success, must be freed with block_Release */
-block_t *h264_create_avcdec_config_record( uint8_t i_nal_length_size,
-                                           const uint8_t *p_sps_buf,
-                                           size_t i_sps_size,
-                                           const uint8_t *p_pps_buf,
-                                           size_t i_pps_size );
+block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
+                                  const uint8_t *p_sps_buf,
+                                  size_t i_sps_size,
+                                  const uint8_t *p_pps_buf,
+                                  size_t i_pps_size );
+
+/* Convert AVCDecoderConfigurationRecord SPS/PPS to Annex B format */
+int h264_avcC_to_AnnexB_NAL( decoder_t *p_dec, const uint8_t *p_buf,
+                             uint32_t i_buf_size, uint8_t *p_out_buf,
+                             uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
+                             uint8_t *p_nal_length_size);
 
 /* Get level and Profile */
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,

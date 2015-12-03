@@ -313,7 +313,7 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         {
             if (p_extra[0] == 1
-             && convert_sps_pps(p_dec, p_extra, i_extra,
+             && h264_avcC_to_AnnexB_NAL(p_dec, p_extra, i_extra,
                                 p_buf, buf_size, &size,
                                 &p_sys->u.video.i_nal_length_size) == VLC_SUCCESS)
                 H264SetCSD(p_dec, p_buf, size, NULL);
@@ -981,7 +981,7 @@ static void H264ProcessBlock(decoder_t *p_dec, block_t *p_block,
 
     if (p_sys->u.video.i_nal_length_size)
     {
-        convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
+        h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
                                p_sys->u.video.i_nal_length_size);
     } else if (H264SetCSD(p_dec, p_block->p_buffer, p_block->i_buffer,
                           p_size_changed) == VLC_SUCCESS)
@@ -999,7 +999,7 @@ static void HEVCProcessBlock(decoder_t *p_dec, block_t *p_block,
 
     if (p_sys->u.video.i_nal_length_size)
     {
-        convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
+        h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
                                p_sys->u.video.i_nal_length_size);
     }
 
