@@ -665,7 +665,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                              crc = flac_crc16_undo(crc,        crc_bytes[0]);
                     if (stream_crc != crc)
                     {
-                        if(i_ret > 0)
+                        if(i_ret > 0 || (p_sys->b_stream_info &&
+                           p_sys->stream_info.max_blocksize == p_sys->i_frame_size) )
                         {
                             msg_Warn(p_dec, "Bad CRC for frame size %zu: 0x%x != 0x%x",
                                 p_sys->i_frame_size, crc, stream_crc);
