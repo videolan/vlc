@@ -37,6 +37,7 @@
 #include <upnp/upnptools.h>
 
 #include <vlc_common.h>
+#include <vlc_url.h>
 
 namespace SD
 {
@@ -136,7 +137,8 @@ private:
             const char*, const char*, const char* );
 
 private:
-    const std::string url_;
+    char* psz_root_;
+    char* psz_objectId_;
     access_t* access_;
     IXML_Document* xmlDocument_;
     IXML_NodeList* containerNodeList_;

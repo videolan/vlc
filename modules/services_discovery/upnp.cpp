@@ -31,7 +31,6 @@
 #include <vlc_access.h>
 #include <vlc_plugin.h>
 #include <vlc_services_discovery.h>
-#include <vlc_url.h>
 
 #include <assert.h>
 #include <limits.h>
@@ -622,7 +621,8 @@ namespace Access
 {
 
 MediaServer::MediaServer( access_t *p_access )
-    : url_( p_access->psz_url )
+    : psz_root_( NULL )
+    , psz_objectId_( NULL )
     , access_( p_access )
     , xmlDocument_( NULL )
     , containerNodeList_( NULL )
@@ -630,6 +630,15 @@ MediaServer::MediaServer( access_t *p_access )
     , itemNodeList_( NULL )
     , itemNodeIndex_( 0 )
 {
+    vlc_url_t url;
+    vlc_UrlParse( &url, p_access->psz_location );
+    if ( asprintf( &psz_root_, "%s://%s:%u%s", url.psz_protocol,
+                  url.psz_host, url.i_port ? url.i_port : 80, url.psz_path ) < 0 )
+        psz_root_ = NULL;
+
+    if ( url.psz_option && !strncmp( url.psz_option, "ObjectID=", strlen( "ObjectID=" ) ) )
+        psz_objectId_ = strdup( &url.psz_option[strlen( "ObjectID=" )] );
+    vlc_UrlClean( &url );
 }
 
 MediaServer::~MediaServer()
@@ -637,21 +646,16 @@ MediaServer::~MediaServer()
     ixmlNodeList_free( containerNodeList_ );
     ixmlNodeList_free( itemNodeList_ );
     ixmlDocument_free( xmlDocument_ );
+    free( psz_objectId_ );
+    free( psz_root_ );
 }
 
-input_item_t* MediaServer::newItem(const char *objectID, const char *title )
+input_item_t* MediaServer::newItem( const char *objectID, const char *title )
 {
-    vlc_url_t url;
-    vlc_UrlParse( &url, url_.c_str() );
     char* psz_url;
 
-    if (asprintf( &psz_url, "upnp://%s://%s:%u%s?ObjectID=%s", url.psz_protocol,
-                  url.psz_host, url.i_port ? url.i_port : 80, url.psz_path, objectID ) < 0 )
-    {
-        vlc_UrlClean( &url );
+    if( asprintf( &psz_url, "upnp://%s?ObjectID=%s", psz_root_, objectID ) < 0 )
         return NULL;
-    }
-    vlc_UrlClean( &url );
 
     input_item_t* p_item = input_item_NewWithTypeExt( psz_url, title, 0, NULL,
                                                       0, -1, ITEM_TYPE_DIRECTORY, 1 );
@@ -675,13 +679,6 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 {
     IXML_Document* p_action = NULL;
     IXML_Document* p_response = NULL;
-    const char* psz_url = url_.c_str();
-
-    if ( url_.empty() )
-    {
-        msg_Dbg( access_, "No subscription url set!" );
-        return NULL;
-    }
 
     int i_res;
 
@@ -745,7 +742,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     }
 
     i_res = UpnpSendAction( access_->p_sys->p_upnp->handle(),
-              psz_url,
+              psz_root_,
               CONTENT_DIRECTORY_SERVICE_TYPE,
               NULL, /* ignored in SDK, must be NULL */
               p_action,
@@ -754,7 +751,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     if ( i_res != UPNP_E_SUCCESS )
     {
         msg_Err( access_, "%s when trying the send() action with URL: %s",
-                UpnpGetErrorMessage( i_res ), psz_url );
+                UpnpGetErrorMessage( i_res ), access_->psz_location );
 
         ixmlDocument_free( p_response );
         p_response = NULL;
@@ -770,16 +767,7 @@ browseActionCleanup:
  */
 void MediaServer::fetchContents()
 {
-    const char* objectID = "";
-    vlc_url_t url;
-    vlc_UrlParse( &url, access_->psz_location );
-
-    if ( url.psz_option && !strncmp( url.psz_option, "ObjectID=", strlen( "ObjectID=" ) ) )
-    {
-        objectID = &url.psz_option[strlen( "ObjectID=" )];
-    }
-
-    IXML_Document* p_response = _browseAction( objectID,
+    IXML_Document* p_response = _browseAction( psz_objectId_,
                                       "BrowseDirectChildren",
                                       "id,dc:title,res," /* Filter */
                                       "sec:CaptionInfo,sec:CaptionInfoEx,"
@@ -787,7 +775,6 @@ void MediaServer::fetchContents()
                                       "0", /* RequestedCount */
                                       "" /* SortCriteria */
                                       );
-    vlc_UrlClean( &url );
     if ( !p_response )
     {
         msg_Err( access_, "No response from browse() action" );
