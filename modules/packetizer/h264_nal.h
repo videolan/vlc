@@ -107,7 +107,7 @@ struct nal_pps
     int i_pic_order_present_flag;
 };
 
-static inline void CreateRbspFromNAL( uint8_t **pp_ret, int *pi_ret,
+static inline void CreateRbspFromNAL( uint8_t **pp_ret, size_t *pi_ret,
                                      const uint8_t *src, int i_src )
 {
     uint8_t *dst = malloc( i_src );

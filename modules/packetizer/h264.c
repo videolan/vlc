@@ -896,7 +896,7 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *pb_dec;
-    int i_dec;
+    size_t i_dec = 0;
     int i_slice_type;
     slice_t slice;
     bs_t s;
@@ -1005,7 +1005,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *pb_dec;
-    int i_dec;
+    size_t i_dec = 0;
 
     /* */
     CreateRbspFromNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
@@ -1013,7 +1013,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
         return;
 
     /* The +1 is for rbsp trailing bits */
-    for( int i_used = 0; i_used+1 < i_dec; )
+    for( size_t i_used = 0; i_used+1 < i_dec; )
     {
         /* Read type */
         int i_type = 0;
