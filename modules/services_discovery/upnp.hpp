@@ -120,7 +120,7 @@ namespace Access
 class MediaServer
 {
 public:
-    MediaServer( const char* psz_url, access_t* p_access );
+    MediaServer( access_t* p_access );
     ~MediaServer();
     input_item_t* getNextItem();
 

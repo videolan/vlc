@@ -621,8 +621,8 @@ int MediaServerList::Callback( Upnp_EventType event_type, void* p_event, void* p
 namespace Access
 {
 
-MediaServer::MediaServer(const char *psz_url, access_t *p_access)
-    : url_( psz_url )
+MediaServer::MediaServer( access_t *p_access )
+    : url_( p_access->psz_url )
     , access_( p_access )
     , xmlDocument_( NULL )
     , containerNodeList_( NULL )
@@ -935,8 +935,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_access->p_sys = p_sys;
-    p_sys->p_server = new(std::nothrow) MediaServer( p_access->psz_location,
-                                                     p_access );
+    p_sys->p_server = new(std::nothrow) MediaServer( p_access );
     if ( !p_sys->p_server )
     {
         delete p_sys;
