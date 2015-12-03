@@ -148,4 +148,59 @@ static inline bool AVCi_lookup(uint16_t i_res, bool b_i,
 #undef AVCI_ENTRY
 #undef AVCI_ENTRIES
 
+#if 0
+static uint8_t * AVCi_create_avcC( uint16_t i_res, bool b_interlaced, int *pi_avcC )
+{
+    const uint8_t *p_pps, *p_sps;
+    uint8_t i_sps, i_pps;
+    uint8_t *p_data = NULL;
+    if( AVCi_lookup( i_res, b_interlaced,
+                     &p_sps, &i_sps, &p_pps, &i_pps ) )
+    {
+        int i_size = 5 + i_pps + i_sps + 2 + 2 * 3;
+        if( (p_data = (uint8_t *) malloc(i_size)) )
+        {
+            *pi_avcC = i_size;
+            /* Merge everything into avc decoder config record s4,1s,1p */
+            p_data[0] = 0x01;
+            memcpy(&p_data[1], p_sps, 3);
+            p_data[4] = 0xff;
+            p_data[5] = 0xe1; /* 1 sps */
+            p_data[6] = 0x00; p_data[7] = i_sps + 1; /* sps NAL size */
+            p_data[8] = 0x67; /* SPS_NAL Header */
+            memcpy(&p_data[9], p_sps, i_sps);
+            p_data[9 + i_sps] = 0x01; /* 1 sps */
+            p_data[10 + i_sps] = 0x00; p_data[11 + i_sps] = i_pps + 1; /* pps NAL size */
+            p_data[12 + i_sps] = 0x68; /* PPS_NAL Header */
+            memcpy(&p_data[13 + i_sps], p_pps, i_pps);
+        }
+    }
+    return p_data;
+}
+#endif
+
+static uint8_t * AVCi_create_AnnexB( uint16_t i_res, bool b_interlaced, int *pi_avcC )
+{
+    const uint8_t *p_pps, *p_sps;
+    uint8_t i_sps, i_pps;
+    uint8_t *p_data = NULL;
+    const uint8_t rgi_startcode[] = {0,0,0,1};
+    if( AVCi_lookup( i_res, b_interlaced,
+                     &p_sps, &i_sps, &p_pps, &i_pps ) )
+    {
+        int i_size = i_pps + i_sps + 2 * 5;
+        if( (p_data = (uint8_t *) malloc(i_size)) )
+        {
+            *pi_avcC = i_size;
+            memcpy(p_data, rgi_startcode, 4);
+            p_data[4] = 0x67; /* SPS_NAL Header */
+            memcpy(&p_data[5], p_sps, i_sps);
+            memcpy(&p_data[5 + i_sps], rgi_startcode, 4);
+            p_data[9 + i_sps] = 0x68; /* PPS_NAL Header */
+            memcpy(&p_data[10 + i_sps], p_pps, i_pps);
+        }
+    }
+    return p_data;
+}
+
 #endif
