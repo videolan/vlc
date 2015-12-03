@@ -987,6 +987,9 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
                 p_packetized_block = p_next;
             }
         }
+        /* Drain the decoder after the packetizer is drained */
+        if( !p_block )
+            DecoderDecodeVideo( p_dec, NULL );
     }
     else
     {
@@ -1127,6 +1130,9 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block )
                 p_packetized_block = p_next;
             }
         }
+        /* Drain the decoder after the packetizer is drained */
+        if( !p_block )
+            DecoderDecodeAudio( p_dec, NULL );
     }
     else
     {
