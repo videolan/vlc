@@ -110,7 +110,7 @@ struct decoder_sys_t
     uint8_t *p_sps_pps_buf;  /* SPS/PPS buffer */
     uint32_t i_sps_pps_size; /* SPS/PPS size */
 
-    uint32_t i_nal_size;     /* NAL header size */
+    uint8_t i_nal_size;     /* NAL header size */
 
     /* Callback */
     picture_t       *p_pic;

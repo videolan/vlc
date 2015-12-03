@@ -108,7 +108,7 @@ struct decoder_sys_t
     CMVideoCodecType            codec;
     size_t                      codec_profile;
     size_t                      codec_level;
-    uint32_t                    i_nal_length_size;
+    uint8_t                     i_nal_length_size;
 
     bool                        b_started;
     bool                        b_is_avcc;

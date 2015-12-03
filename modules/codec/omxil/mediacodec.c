@@ -109,7 +109,7 @@ struct decoder_sys_t
         {
             AWindowHandler *p_awh;
             int i_pixel_format, i_stride, i_slice_height, i_width, i_height;
-            uint32_t i_nal_length_size;
+            uint8_t i_nal_length_size;
             size_t i_h264_profile;
             ArchitectureSpecificCopyData ascd;
             /* stores the inflight picture for each output buffer or NULL */

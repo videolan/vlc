@@ -100,7 +100,7 @@ struct decoder_sys_t
     IMFMediaType *output_type;
 
     /* H264 only. */
-    uint32_t nal_length_size;
+    uint8_t nal_length_size;
 };
 
 static const int pi_channels_maps[9] =

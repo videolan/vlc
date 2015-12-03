@@ -54,7 +54,7 @@ static inline bool strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_d
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,
                      uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
-                     uint32_t *p_nal_length_size)
+                     uint8_t *pi_nal_length_size)
 {
     int i_profile;
     uint32_t i_data_size = i_buf_size, i_nal_size, i_sps_pps_size = 0;
@@ -69,8 +69,8 @@ int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
 
     /* Read infos in first 6 bytes */
     i_profile = (p_buf[1] << 16) | (p_buf[2] << 8) | p_buf[3];
-    if (p_nal_length_size)
-        *p_nal_length_size  = (p_buf[4] & 0x03) + 1;
+    if (pi_nal_length_size)
+        *pi_nal_length_size  = (p_buf[4] & 0x03) + 1;
     p_buf       += 5;
     i_data_size -= 5;
 
@@ -129,9 +129,10 @@ int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
 }
 
 void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
-                             size_t i_nal_length_size )
+                             uint8_t i_nal_length_size )
 {
-    uint32_t nal_len = 0, nal_pos = 0;
+    uint32_t nal_len = 0;
+    uint8_t nal_pos = 0;
 
     if( i_nal_length_size != 4 )
         return;
@@ -234,7 +235,7 @@ static block_t *h264_increase_startcode_size( block_t *p_block,
 }
 
 static int h264_replace_startcode( uint8_t *p_buf,
-                                   size_t i_nal_length_size,
+                                   uint8_t i_nal_length_size,
                                    size_t i_startcode_ofs,
                                    size_t i_nal_size )
 {
@@ -255,7 +256,7 @@ static int h264_replace_startcode( uint8_t *p_buf,
     return 0;
 }
 
-block_t *convert_annexb_to_h264( block_t *p_block, size_t i_nal_length_size )
+block_t *convert_annexb_to_h264( block_t *p_block, uint8_t i_nal_length_size )
 {
     size_t i_startcode_ofs = 0;
     size_t i_startcode_size = 0;
@@ -748,7 +749,7 @@ block_t *h264_create_avcdec_config_record( uint8_t i_nal_length_size,
 }
 
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
-                            size_t *p_level, size_t *p_nal_length_size)
+                            size_t *p_level, uint8_t *pi_nal_length_size)
 {
     uint8_t *p = (uint8_t*)p_fmt->p_extra;
     if(!p || !p_fmt->p_extra) return false;
@@ -757,7 +758,7 @@ bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
     if (p_fmt->i_original_fourcc == VLC_FOURCC('a','v','c','1') && p[0] == 1)
     {
         if (p_fmt->i_extra < 12) return false;
-        if (p_nal_length_size) *p_nal_length_size = 1 + (p[4]&0x03);
+        if (pi_nal_length_size) *pi_nal_length_size = 1 + (p[4]&0x03);
         if (!(p[5]&0x1f)) return false;
         p += 8;
     }

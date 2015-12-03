@@ -135,7 +135,7 @@ struct decoder_sys_t
 
     date_t end_date;
 
-    size_t i_nal_size_length; /* Length of the NAL size field for H264 */
+    uint8_t i_nal_size_length; /* Length of the NAL size field for H264 */
     int b_use_pts;
 
 };
