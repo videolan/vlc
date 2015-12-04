@@ -60,6 +60,7 @@ static struct vlc_http_msg *vlc_http_tunnel_open(struct vlc_http_conn *conn,
     if (unlikely(req == NULL))
         return NULL;
 
+    vlc_http_msg_add_header(req, "ALPN", "h2, http%%2F1.1");
     vlc_http_msg_add_agent(req, PACKAGE_NAME "/" PACKAGE_VERSION);
 
     struct vlc_http_stream *stream = vlc_http_stream_open(conn, req);
