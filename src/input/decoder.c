@@ -56,8 +56,6 @@
 
 struct decoder_owner_sys_t
 {
-    int64_t         i_preroll_end;
-
     input_thread_t  *p_input;
     input_resource_t*p_resource;
     input_clock_t   *p_clock;
@@ -99,6 +97,8 @@ struct decoder_owner_sys_t
     vout_thread_t   *p_vout;
 
     /* -- Theses variables need locking on read *and* write -- */
+    /* Preroll */
+    int64_t i_preroll_end;
     /* Pause */
     mtime_t pause_date;
     unsigned frames_countdown;
@@ -908,8 +908,10 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         i_decoded++;
 
+        vlc_mutex_lock( &p_owner->lock );
         if( p_owner->i_preroll_end > VLC_TS_INVALID && p_pic->date < p_owner->i_preroll_end )
         {
+            vlc_mutex_unlock( &p_owner->lock );
             picture_Release( p_pic );
             continue;
         }
@@ -917,11 +919,14 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
         if( p_owner->i_preroll_end > VLC_TS_INVALID )
         {
             msg_Dbg( p_dec, "End of video preroll" );
+            p_owner->i_preroll_end = VLC_TS_INVALID;
+            vlc_mutex_unlock( &p_owner->lock );
+            /* */
             if( p_vout )
                 vout_Flush( p_vout, VLC_TS_INVALID+1 );
-            /* */
-            p_owner->i_preroll_end = VLC_TS_INVALID;
         }
+        else
+            vlc_mutex_unlock( &p_owner->lock );
 
         if( p_dec->pf_get_cc &&
             ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
@@ -1058,9 +1063,11 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     {
         i_decoded++;
 
+        vlc_mutex_lock( &p_owner->lock );
         if( p_owner->i_preroll_end > VLC_TS_INVALID &&
             p_aout_buf->i_pts < p_owner->i_preroll_end )
         {
+            vlc_mutex_unlock( &p_owner->lock );
             block_Release( p_aout_buf );
             continue;
         }
@@ -1068,11 +1075,15 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         if( p_owner->i_preroll_end > VLC_TS_INVALID )
         {
             msg_Dbg( p_dec, "End of audio preroll" );
+            p_owner->i_preroll_end = VLC_TS_INVALID;
+            vlc_mutex_unlock( &p_owner->lock );
+            /* */
             if( p_owner->p_aout )
                 aout_DecFlush( p_owner->p_aout, false );
-            /* */
-            p_owner->i_preroll_end = VLC_TS_INVALID;
         }
+        else
+            vlc_mutex_unlock( &p_owner->lock );
+
 
         DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
     }
@@ -1200,14 +1211,17 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block )
         if( p_vout && p_owner->p_spu_vout == p_vout )
         {
             /* Preroll does not work very well with subtitle */
+            vlc_mutex_lock( &p_owner->lock );
             if( p_spu->i_start > VLC_TS_INVALID &&
                 p_spu->i_start < p_owner->i_preroll_end &&
                 ( p_spu->i_stop <= VLC_TS_INVALID || p_spu->i_stop < p_owner->i_preroll_end ) )
             {
+                vlc_mutex_unlock( &p_owner->lock );
                 subpicture_Delete( p_spu );
             }
             else
             {
+                vlc_mutex_unlock( &p_owner->lock );
                 DecoderPlaySpu( p_dec, p_spu );
             }
         }
@@ -1245,7 +1259,11 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
     }
 
     if( p_block )
+    {
+        vlc_mutex_lock( &p_owner->lock );
         DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
+        vlc_mutex_unlock( &p_owner->lock );
+    }
 
 #ifdef ENABLE_SOUT
     if( p_owner->p_sout != NULL )
@@ -1283,8 +1301,13 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     if( p_dec->b_error )
         return;
 
+    vlc_mutex_lock( &p_owner->lock );
     if ( p_owner->i_preroll_end == INT64_MAX )
+    {
+        vlc_mutex_unlock( &p_owner->lock );
         return;
+    }
+    vlc_mutex_unlock( &p_owner->lock );
 
     if( p_packetizer != NULL && p_packetizer->pf_flush != NULL )
         p_packetizer->pf_flush( p_packetizer );
