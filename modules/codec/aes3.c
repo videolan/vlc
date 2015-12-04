@@ -218,6 +218,16 @@ exit:
 }
 
 /*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->end_date, 0 );
+}
+
+/*****************************************************************************
  * Packetize: packetizes an aes3 frame.
  ****************************************************************************
  * Beware, this function must be fed with complete frames (PES packet).
@@ -279,6 +289,7 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
         p_dec->pf_decode_audio = Decode;
         p_dec->pf_packetize    = NULL;
     }
+    p_dec->pf_flush            = Flush;
     return VLC_SUCCESS;
 }
 
@@ -317,7 +328,7 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
     }
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        date_Set( &p_sys->end_date, 0 );
+        Flush( p_dec );
 
     /* Date management */
     if( p_block->i_pts > VLC_TS_INVALID &&

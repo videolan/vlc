@@ -107,6 +107,7 @@ static int lavc_GetFrame(struct AVCodecContext *, AVFrame *, int);
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
                                           const enum PixelFormat * );
 static picture_t *DecodeVideo( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
@@ -490,8 +491,25 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
 
     p_dec->pf_decode_video = DecodeVideo;
+    p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
+    p_sys->i_late_frames = 0;
+#if 0
+    post_mt( p_sys );
+    avcodec_flush_buffers( p_context );
+    wait_mt( p_sys );
+#endif
 }
 
 /*****************************************************************************
@@ -532,13 +550,6 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
 
             p_sys->i_late_frames = 0;
-#if 0
-            /* NOTE: data is good only the timeline changed so do not flush decoder */
-            post_mt( p_sys );
-            if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-                avcodec_flush_buffers( p_context );
-            wait_mt( p_sys );
-#endif
             if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
             {
                 block_Release( p_block );

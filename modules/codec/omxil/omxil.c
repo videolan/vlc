@@ -80,6 +80,7 @@ static void CloseGeneric( vlc_object_t * );
 static picture_t *DecodeVideo( decoder_t *, block_t ** );
 static block_t *DecodeAudio ( decoder_t *, block_t ** );
 static block_t *EncodeVideo( encoder_t *, picture_t * );
+static void Flush( decoder_t * );
 
 static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE, OMX_PTR, OMX_EVENTTYPE,
                                       OMX_U32, OMX_U32, OMX_PTR );
@@ -1020,6 +1021,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_dec->pf_decode_video = DecodeVideo;
     p_dec->pf_decode_audio = DecodeAudio;
+    p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
 }
@@ -1516,6 +1518,21 @@ static int DecodeVideoInput( decoder_t *p_dec, OmxPort *p_port, block_t **pp_blo
 }
 
 /*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if(!p_sys->in.b_flushed)
+    {
+        msg_Dbg(p_dec, "flushing");
+        OMX_SendCommand( p_sys->omx_handle, OMX_CommandFlush,
+                         p_sys->in.definition.nPortIndex, 0 );
+    }
+    p_sys->in.b_flushed = true;
+}
+/*****************************************************************************
  * DecodeVideo: Called to decode one frame
  *****************************************************************************/
 static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
@@ -1542,13 +1559,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         block_Release( p_block );
-        if(!p_sys->in.b_flushed)
-        {
-            msg_Dbg(p_dec, "flushing");
-            OMX_SendCommand( p_sys->omx_handle, OMX_CommandFlush,
-                             p_sys->in.definition.nPortIndex, 0 );
-        }
-        p_sys->in.b_flushed = true;
+        Flush( p_dec );
         return NULL;
     }
 

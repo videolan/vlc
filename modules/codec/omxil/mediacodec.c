@@ -144,6 +144,7 @@ static int Audio_OnNewBlock(decoder_t *, block_t *, int *);
 static void Audio_OnFlush(decoder_t *);
 static int Audio_ProcessOutput(decoder_t *, mc_api_out *, picture_t **, block_t **);
 static block_t *DecodeAudio(decoder_t *, block_t **);
+static void Flush( decoder_t * );
 
 static void InvalidateAllPictures(decoder_t *);
 static void RemoveInflightPictures(decoder_t *);
@@ -553,6 +554,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
     p_dec->pf_decode_video = DecodeVideo;
     p_dec->pf_decode_audio = DecodeAudio;
+    p_dec->pf_flush        = Flush;
 
     p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
     p_dec->fmt_out.video = p_dec->fmt_in.video;
@@ -1026,6 +1028,18 @@ static int DecodeFlush(decoder_t *p_dec)
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (DecodeFlush(p_dec) != VLC_SUCCESS)
+        p_sys->error_state = true;
+    /* TODO: inline with DecodeFlush when async */
+}
+
 static int GetAndProcessOutput(decoder_t *p_dec, picture_t **pp_out_pic,
                                block_t **pp_out_block, mtime_t i_timeout)
 {
@@ -1080,7 +1094,8 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block,
         {
             if (DecodeFlush(p_dec) != VLC_SUCCESS)
                 b_error = true;
-            goto endclean;
+            if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+                goto endclean;
         }
 
         i_ret = p_sys->pf_on_new_block(p_dec, p_block, &i_flags);

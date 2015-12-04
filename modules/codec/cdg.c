@@ -76,6 +76,7 @@ static void Close( vlc_object_t * );
 static picture_t *Decode( decoder_t *, block_t ** );
 
 static int DecodePacket( decoder_sys_t *p_cdg, uint8_t *p_buffer, int i_buffer );
+static void Flush( decoder_t * );
 static int Render( decoder_sys_t *p_cdg, picture_t *p_picture );
 
 /*****************************************************************************
@@ -124,8 +125,19 @@ static int Open( vlc_object_t *p_this )
 
     /* Set callbacks */
     p_dec->pf_decode_video = Decode;
+    p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->i_packet = 0;
 }
 
 /****************************************************************************
@@ -145,7 +157,7 @@ static picture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
-        p_sys->i_packet = 0;
+        Flush( p_dec );
         goto exit;
     }
 

@@ -60,6 +60,7 @@ vlc_module_end ()
  * Local prototypes
  ****************************************************************************/
 static block_t *DecodeBlock( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 static void DoReordering( uint32_t *, uint32_t *, int, int, uint32_t * );
 
 #define MAX_CHANNEL_POSITIONS 9
@@ -195,7 +196,18 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_sbr = p_sys->b_ps = false;
 
     p_dec->pf_decode_audio = DecodeBlock;
+    p_dec->pf_flush        = Flush;
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->date, 0 );
 }
 
 /*****************************************************************************
@@ -213,7 +225,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
     {
-        date_Set( &p_sys->date, 0 );
+        Flush( p_dec );
         if( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) )
         {
             block_Release( p_block );

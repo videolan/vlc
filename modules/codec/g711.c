@@ -35,6 +35,7 @@
 static int  DecoderOpen ( vlc_object_t * );
 static void DecoderClose( vlc_object_t * );
 static block_t *DecodeBlock( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 #ifdef ENABLE_SOUT
 static int  EncoderOpen ( vlc_object_t * );
@@ -184,6 +185,7 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->pf_decode_audio = DecodeBlock;
+    p_dec->pf_flush        = Flush;
     p_dec->p_sys = p_sys;
 
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -212,6 +214,13 @@ static int DecoderOpen( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->end_date, 0 );
+}
+
 static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -230,7 +239,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        date_Set( &p_sys->end_date, 0 );
+        Flush( p_dec );
 
     if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )

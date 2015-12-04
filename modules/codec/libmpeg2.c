@@ -241,6 +241,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->p_info = mpeg2_info( p_sys->p_mpeg2dec );
 
     p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_flush        = Reset;
     p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = 0;
 

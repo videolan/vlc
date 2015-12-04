@@ -523,6 +523,14 @@ static int SyncInfo(decoder_t *p_dec, uint8_t *p_buf,
     return b_guessing ? -1 : 1;
 }
 
+static void Flush(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->i_state = STATE_NOSYNC;
+    block_BytestreamEmpty(&p_sys->bytestream);
+}
+
 /* */
 static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 {
@@ -535,8 +543,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         in = *pp_block;
 
         if (in->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-            p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty(&p_sys->bytestream);
+            Flush(p_dec);
             if (in->i_flags&BLOCK_FLAG_CORRUPTED) {
                 block_Release(*pp_block);
                 return NULL;
@@ -795,6 +802,7 @@ static int Open(vlc_object_t *p_this)
     /* */
     p_dec->pf_decode_audio = NULL;
     p_dec->pf_packetize    = Packetize;
+    p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
 }

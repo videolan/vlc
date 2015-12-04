@@ -90,6 +90,7 @@ vlc_module_end()
 
 static CFDataRef ESDSCreate(decoder_t *, uint8_t *, uint32_t);
 static picture_t *DecodeBlock(decoder_t *, block_t **);
+static void Flush(decoder_t *);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
 void VTDictionarySetInt32(CFMutableDictionaryRef, CFStringRef, int);
@@ -695,6 +696,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
 
     p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_flush        = Flush;
 
     msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'", (char *)&p_dec->fmt_in.i_codec);
 
@@ -961,6 +963,20 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
 
 #pragma mark - actual decoding
 
+static void Flush(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (likely(p_sys->b_started)) {
+        @synchronized(p_sys->outputTimeStamps) {
+            [p_sys->outputTimeStamps removeAllObjects];
+        }
+        @synchronized(p_sys->outputFrames) {
+            [p_sys->outputFrames removeAllObjects];
+        }
+    }
+}
+
 static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -977,14 +993,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 
     if (likely(p_block != NULL)) {
         if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED))) {
-            if (likely(p_sys->b_started)) {
-                @synchronized(p_sys->outputTimeStamps) {
-                    [p_sys->outputTimeStamps removeAllObjects];
-                }
-                @synchronized(p_sys->outputFrames) {
-                    [p_sys->outputFrames removeAllObjects];
-                }
-            }
+            Flush(p_dec);
             block_Release(p_block);
             goto skip;
         }

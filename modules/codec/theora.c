@@ -85,6 +85,7 @@ static void CloseDecoder  ( vlc_object_t * );
 static void *DecodeBlock  ( decoder_t *, block_t ** );
 static int  ProcessHeaders( decoder_t * );
 static void *ProcessPacket ( decoder_t *, ogg_packet *, block_t ** );
+static void Flush( decoder_t * );
 
 static picture_t *DecodePacket( decoder_t *, ogg_packet * );
 
@@ -172,6 +173,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         DecodeBlock;
     p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
         DecodeBlock;
+    p_dec->pf_flush        = Flush;
 
     /* Init supporting Theora structures needed in header parsing */
     th_comment_init( &p_sys->tc );
@@ -412,6 +414,16 @@ error:
     /* Clean up the decoder setup info... we're done with it */
     th_setup_free( ts );
     return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->i_pts = VLC_TS_INVALID;
 }
 
 /*****************************************************************************

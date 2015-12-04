@@ -91,6 +91,7 @@ static void fill_output_port(decoder_t *dec);
 
 /* VLC decoder callback */
 static picture_t *decode(decoder_t *dec, block_t **block);
+static void flush_decoder(decoder_t *dec);
 
 /* MMAL callbacks */
 static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
@@ -236,6 +237,7 @@ static int OpenDecoder(decoder_t *dec)
 
     dec->fmt_out.i_cat = VIDEO_ES;
     dec->pf_decode_video = decode;
+    dec->pf_flush        = flush_decoder;
 
     vlc_mutex_init_recursive(&sys->mutex);
     vlc_sem_init(&sys->sem, 0);
@@ -534,12 +536,11 @@ static void fill_output_port(decoder_t *dec)
             break;
 }
 
-static int flush_decoder(decoder_t *dec)
+static void flush_decoder(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
     MMAL_BUFFER_HEADER_T *buffer;
     MMAL_STATUS_T status;
-    int ret = 0;
 
     msg_Dbg(dec, "Flushing decoder ports...");
     mmal_port_disable(sys->output);
@@ -589,8 +590,6 @@ static int flush_decoder(decoder_t *dec)
         }
     }
     msg_Dbg(dec, "Ports flushed, returning to normal operation");
-
-    return ret;
 }
 
 static picture_t *decode(decoder_t *dec, block_t **pblock)

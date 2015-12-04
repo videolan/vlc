@@ -108,6 +108,7 @@ static const char *const ppsz_pos_descriptions[] =
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 static subpicture_t *Decode( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 #ifdef ENABLE_SOUT
 static int OpenEncoder  ( vlc_object_t * );
@@ -334,6 +335,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_dec->pf_decode_sub = Decode;
+    p_dec->pf_flush      = Flush;
     p_sys = p_dec->p_sys = calloc( 1, sizeof(decoder_sys_t) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -390,6 +392,16 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->i_pts = VLC_TS_INVALID;
+}
+
+/*****************************************************************************
  * Decode:
  *****************************************************************************/
 static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
@@ -404,7 +416,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
     {
-        p_sys->i_pts = VLC_TS_INVALID;
+        Flush( p_dec );
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
             block_Release( p_block );

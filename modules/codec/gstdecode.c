@@ -65,6 +65,7 @@ typedef struct
 static int  OpenDecoder( vlc_object_t* );
 static void CloseDecoder( vlc_object_t* );
 static picture_t *DecodeBlock( decoder_t*, block_t** );
+static void Flush( decoder_t * );
 
 #define MODULE_DESCRIPTION N_( "Uses GStreamer framework's plugins " \
         "to decode the media codecs" )
@@ -626,6 +627,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
 
@@ -638,6 +640,28 @@ fail:
         gst_plugin_feature_list_free( p_list );
     CloseDecoder( ( vlc_object_t* )p_dec );
     return i_rval;
+}
+
+/* Flush */
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    GstBuffer *p_buffer;
+    gboolean b_ret;
+
+    /* Send a new segment event. Seeking position is
+     * irrelevant in this case, as the main motive for a
+     * seek here, is to tell the elements to start flushing
+     * and start accepting buffers from a new time segment */
+    b_ret = gst_element_seek_simple( p_sys->p_decoder,
+            GST_FORMAT_BYTES, GST_SEEK_FLAG_FLUSH, 0 );
+    msg_Dbg( p_dec, "new segment event : %d", b_ret );
+
+    /* flush the output buffers from the queue */
+    while( ( p_buffer = gst_atomic_queue_pop( p_sys->p_que ) ) )
+        gst_buffer_unref( p_buffer );
+
+    p_sys->b_prerolled = false;
 }
 
 /* Decode */
@@ -662,22 +686,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     BLOCK_FLAG_CORRUPTED ) ) )
     {
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        {
-            GstBuffer *p_buffer;
-            /* Send a new segment event. Seeking position is
-             * irrelevant in this case, as the main motive for a
-             * seek here, is to tell the elements to start flushing
-             * and start accepting buffers from a new time segment */
-            b_ret = gst_element_seek_simple( p_sys->p_decoder,
-                    GST_FORMAT_BYTES, GST_SEEK_FLAG_FLUSH, 0 );
-            msg_Dbg( p_dec, "new segment event : %d", b_ret );
-
-            /* flush the output buffers from the queue */
-            while( ( p_buffer = gst_atomic_queue_pop( p_sys->p_que ) ) )
-                gst_buffer_unref( p_buffer );
-
-            p_sys->b_prerolled = false;
-        }
+            Flush( p_dec );
 
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {

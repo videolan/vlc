@@ -226,6 +226,7 @@ struct decoder_sys_t
 };
 
 static subpicture_t *Decode( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 /*****************************************************************************
  * Open: probe the decoder and return score
@@ -260,6 +261,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_dec->pf_decode_sub = Decode;
+    p_dec->pf_flush      = Flush;
 
     /* Allocate the memory needed to store the decoder's structure */
     p_dec->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
@@ -277,6 +279,17 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = VLC_CODEC_TEXT;
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    Eia608Init( &p_sys->eia608 );
+    p_sys->i_display_time = VLC_TS_INVALID;
 }
 
 /****************************************************************************
@@ -307,8 +320,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         if( p_sys->p_block &&
            (p_sys->p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED)) )
         {
-            Eia608Init( &p_sys->eia608 );
-            p_sys->i_display_time = VLC_TS_INVALID;
+            Flush( p_dec );
             /* clear flags, as we might process it more than once */
             p_sys->p_block->i_flags ^= (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED);
             continue;

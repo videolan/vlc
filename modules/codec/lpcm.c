@@ -179,6 +179,7 @@ typedef struct
  * Local prototypes
  *****************************************************************************/
 static block_t *DecodeFrame  ( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 /* */
 static int VobHeader( unsigned *pi_rate,
@@ -298,6 +299,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     /* Set callback */
     p_dec->pf_decode_audio = DecodeFrame;
     p_dec->pf_packetize    = DecodeFrame;
+    p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
 }
@@ -308,6 +310,16 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int OpenPacketizer( vlc_object_t *p_this )
 {
     return OpenCommon( p_this, true );
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->end_date, 0 );
 }
 
 /*****************************************************************************
@@ -328,7 +340,7 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     *pp_block = NULL; /* So the packet doesn't get re-sent */
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        date_Set( &p_sys->end_date, 0 );
+        Flush( p_dec );
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
