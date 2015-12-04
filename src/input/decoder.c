@@ -1247,50 +1247,56 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
     vout_PutSubpicture( p_vout, p_subpic );
 }
 
+static int DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
+{
+    assert( p_spu );
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    input_thread_t *p_input = p_owner->p_input;
+
+    if( p_input != NULL )
+    {
+        vlc_mutex_lock( &p_input->p->counters.counters_lock );
+        stats_Update( p_input->p->counters.p_decoded_sub, 1, NULL );
+        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+    }
+
+    int i_ret = -1;
+    vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
+    if( p_vout && p_owner->p_spu_vout == p_vout )
+    {
+        /* Preroll does not work very well with subtitle */
+        vlc_mutex_lock( &p_owner->lock );
+        if( p_spu->i_start > VLC_TS_INVALID &&
+            p_spu->i_start < p_owner->i_preroll_end &&
+            ( p_spu->i_stop <= VLC_TS_INVALID || p_spu->i_stop < p_owner->i_preroll_end ) )
+        {
+            vlc_mutex_unlock( &p_owner->lock );
+            subpicture_Delete( p_spu );
+        }
+        else
+        {
+            vlc_mutex_unlock( &p_owner->lock );
+            DecoderPlaySpu( p_dec, p_spu );
+            i_ret = 0;
+        }
+    }
+    else
+    {
+        subpicture_Delete( p_spu );
+    }
+    if( p_vout )
+        vlc_object_release( p_vout );
+    return i_ret;
+}
+
 /* This function process a subtitle block
  */
 static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block )
 {
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    input_thread_t *p_input = p_owner->p_input;
-    vout_thread_t *p_vout;
     subpicture_t *p_spu;
 
     while( (p_spu = p_dec->pf_decode_sub( p_dec, p_block ? &p_block : NULL ) ) )
-    {
-        if( p_input != NULL )
-        {
-            vlc_mutex_lock( &p_input->p->counters.counters_lock );
-            stats_Update( p_input->p->counters.p_decoded_sub, 1, NULL );
-            vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-        }
-
-        p_vout = input_resource_HoldVout( p_owner->p_resource );
-        if( p_vout && p_owner->p_spu_vout == p_vout )
-        {
-            /* Preroll does not work very well with subtitle */
-            vlc_mutex_lock( &p_owner->lock );
-            if( p_spu->i_start > VLC_TS_INVALID &&
-                p_spu->i_start < p_owner->i_preroll_end &&
-                ( p_spu->i_stop <= VLC_TS_INVALID || p_spu->i_stop < p_owner->i_preroll_end ) )
-            {
-                vlc_mutex_unlock( &p_owner->lock );
-                subpicture_Delete( p_spu );
-            }
-            else
-            {
-                vlc_mutex_unlock( &p_owner->lock );
-                DecoderPlaySpu( p_dec, p_spu );
-            }
-        }
-        else
-        {
-            subpicture_Delete( p_spu );
-        }
-        if( p_vout )
-            vlc_object_release( p_vout );
-    }
+        DecoderQueueSpu( p_dec, p_spu );
 }
 
 /**
@@ -1594,6 +1600,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_get_display_rate = DecoderGetDisplayRate;
     p_dec->pf_queue_video = DecoderQueueVideo;
     p_dec->pf_queue_audio = DecoderQueueAudio;
+    p_dec->pf_queue_sub = DecoderQueueSpu;
 
     /* Load a packetizer module if the input is not already packetized */
     if( p_sout == NULL && !fmt->b_packetized )

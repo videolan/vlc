@@ -125,6 +125,8 @@ struct decoder_t
     int             (*pf_queue_video)( decoder_t *, picture_t * );
     /* XXX use decoder_QueueAudio */
     int             (*pf_queue_audio)( decoder_t *, block_t * );
+    /* XXX use decoder_QueueSub */
+    int             (*pf_queue_sub)( decoder_t *, subpicture_t *);
 
     /* Private structure for the owner of the decoder */
     decoder_owner_sys_t *p_owner;
@@ -280,6 +282,25 @@ static inline int decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
         return -1;
     }
     return dec->pf_queue_audio( dec, p_aout_buf );
+}
+
+/**
+ * This function queues a subtitle to the video output.
+ *
+ * \note
+ * The caller doesn't own the subtitle anymore after this call (even in case of
+ * error).
+ *
+ * \return 0 if the subtitle is queued, -1 on error
+ */
+static inline int decoder_QueueSub( decoder_t *dec, subpicture_t *p_spu )
+{
+    if( !dec->pf_queue_sub )
+    {
+        subpicture_Delete( p_spu );
+        return -1;
+    }
+    return dec->pf_queue_sub( dec, p_spu );
 }
 
 /**
