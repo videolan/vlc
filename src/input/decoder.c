@@ -1080,9 +1080,68 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
     *pi_lost_sum += aout_DecGetResetLost( p_aout );
 }
 
-static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
+static int DecoderPreparePlayAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_owner->i_preroll_end > VLC_TS_INVALID &&
+        p_aout_buf->i_pts < p_owner->i_preroll_end )
+    {
+        vlc_mutex_unlock( &p_owner->lock );
+        block_Release( p_aout_buf );
+        return -1;
+    }
+
+    if( p_owner->i_preroll_end > VLC_TS_INVALID )
+    {
+        msg_Dbg( p_dec, "End of audio preroll" );
+        p_owner->i_preroll_end = VLC_TS_INVALID;
+        vlc_mutex_unlock( &p_owner->lock );
+        /* */
+        if( p_owner->p_aout )
+            aout_DecFlush( p_owner->p_aout, false );
+    }
+    else
+        vlc_mutex_unlock( &p_owner->lock );
+
+    return 0;
+}
+
+static void DecoderUpdateStatAudio( decoder_t *p_dec, int i_decoded,
+                                    int i_lost, int i_played )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    input_thread_t *p_input = p_owner->p_input;
+
+    /* Update ugly stat */
+    if( p_input != NULL && (i_decoded > 0 || i_lost > 0 || i_played > 0) )
+    {
+        vlc_mutex_lock( &p_input->p->counters.counters_lock);
+        stats_Update( p_input->p->counters.p_lost_abuffers, i_lost, NULL );
+        stats_Update( p_input->p->counters.p_played_abuffers, i_played, NULL );
+        stats_Update( p_input->p->counters.p_decoded_audio, i_decoded, NULL );
+        vlc_mutex_unlock( &p_input->p->counters.counters_lock);
+    }
+}
+
+static int DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
+{
+    assert( p_aout_buf );
+    int i_lost = 0;
+    int i_played = 0;
+    int i_ret;
+
+    if( ( i_ret = DecoderPreparePlayAudio( p_dec, p_aout_buf ) ) == 0 )
+        DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
+
+    DecoderUpdateStatAudio( p_dec, 1, i_lost, i_played );
+
+    return i_ret;
+}
+
+static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
+{
     block_t *p_aout_buf;
     int i_decoded = 0;
     int i_lost = 0;
@@ -1092,42 +1151,13 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     {
         i_decoded++;
 
-        vlc_mutex_lock( &p_owner->lock );
-        if( p_owner->i_preroll_end > VLC_TS_INVALID &&
-            p_aout_buf->i_pts < p_owner->i_preroll_end )
-        {
-            vlc_mutex_unlock( &p_owner->lock );
-            block_Release( p_aout_buf );
+        if( DecoderPreparePlayAudio( p_dec, p_aout_buf ) != 0 )
             continue;
-        }
-
-        if( p_owner->i_preroll_end > VLC_TS_INVALID )
-        {
-            msg_Dbg( p_dec, "End of audio preroll" );
-            p_owner->i_preroll_end = VLC_TS_INVALID;
-            vlc_mutex_unlock( &p_owner->lock );
-            /* */
-            if( p_owner->p_aout )
-                aout_DecFlush( p_owner->p_aout, false );
-        }
-        else
-            vlc_mutex_unlock( &p_owner->lock );
-
 
         DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
     }
 
-    /* Update ugly stat */
-    input_thread_t  *p_input = p_owner->p_input;
-
-    if( p_input != NULL && (i_decoded > 0 || i_lost > 0 || i_played > 0) )
-    {
-        vlc_mutex_lock( &p_input->p->counters.counters_lock);
-        stats_Update( p_input->p->counters.p_lost_abuffers, i_lost, NULL );
-        stats_Update( p_input->p->counters.p_played_abuffers, i_played, NULL );
-        stats_Update( p_input->p->counters.p_decoded_audio, i_decoded, NULL );
-        vlc_mutex_unlock( &p_input->p->counters.counters_lock);
-    }
+    DecoderUpdateStatAudio( p_dec, i_decoded, i_lost, i_played );
 }
 
 /* This function process a audio block
@@ -1563,6 +1593,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_get_display_date = DecoderGetDisplayDate;
     p_dec->pf_get_display_rate = DecoderGetDisplayRate;
     p_dec->pf_queue_video = DecoderQueueVideo;
+    p_dec->pf_queue_audio = DecoderQueueAudio;
 
     /* Load a packetizer module if the input is not already packetized */
     if( p_sout == NULL && !fmt->b_packetized )

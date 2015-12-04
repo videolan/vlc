@@ -123,6 +123,8 @@ struct decoder_t
 
     /* XXX use decoder_QueueVideo */
     int             (*pf_queue_video)( decoder_t *, picture_t * );
+    /* XXX use decoder_QueueAudio */
+    int             (*pf_queue_audio)( decoder_t *, block_t * );
 
     /* Private structure for the owner of the decoder */
     decoder_owner_sys_t *p_owner;
@@ -259,6 +261,25 @@ static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
         return -1;
     }
     return dec->pf_queue_video( dec, p_pic );
+}
+
+/**
+ * This function queues an audio block to the audio output.
+ *
+ * \note
+ * The caller doesn't own the audio block anymore after this call (even in case
+ * of error).
+ *
+ * \return 0 if the block is queued, -1 on error
+ */
+static inline int decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
+{
+    if( !dec->pf_queue_audio )
+    {
+        block_Release( p_aout_buf );
+        return -1;
+    }
+    return dec->pf_queue_audio( dec, p_aout_buf );
 }
 
 /**
