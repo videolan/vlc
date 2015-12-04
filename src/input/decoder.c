@@ -894,50 +894,45 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     *pi_lost_sum += i_tmp_lost;
 }
 
-static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
+static int DecoderPreparePlayVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    picture_t      *p_pic;
-    int i_lost = 0;
-    int i_decoded = 0;
-    int i_displayed = 0;
+    vout_thread_t  *p_vout = p_owner->p_vout;
 
-    while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_owner->i_preroll_end > VLC_TS_INVALID && p_pic->date < p_owner->i_preroll_end )
     {
-        vout_thread_t  *p_vout = p_owner->p_vout;
-
-        i_decoded++;
-
-        vlc_mutex_lock( &p_owner->lock );
-        if( p_owner->i_preroll_end > VLC_TS_INVALID && p_pic->date < p_owner->i_preroll_end )
-        {
-            vlc_mutex_unlock( &p_owner->lock );
-            picture_Release( p_pic );
-            continue;
-        }
-
-        if( p_owner->i_preroll_end > VLC_TS_INVALID )
-        {
-            msg_Dbg( p_dec, "End of video preroll" );
-            p_owner->i_preroll_end = VLC_TS_INVALID;
-            vlc_mutex_unlock( &p_owner->lock );
-            /* */
-            if( p_vout )
-                vout_Flush( p_vout, VLC_TS_INVALID+1 );
-        }
-        else
-            vlc_mutex_unlock( &p_owner->lock );
-
-        if( p_dec->pf_get_cc &&
-            ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
-            DecoderGetCc( p_dec, p_dec );
-
-        DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
+        vlc_mutex_unlock( &p_owner->lock );
+        picture_Release( p_pic );
+        return -1;
     }
 
-    /* Update ugly stat */
+    if( p_owner->i_preroll_end > VLC_TS_INVALID )
+    {
+        msg_Dbg( p_dec, "End of video preroll" );
+        p_owner->i_preroll_end = VLC_TS_INVALID;
+        vlc_mutex_unlock( &p_owner->lock );
+        /* */
+        if( p_vout )
+            vout_Flush( p_vout, VLC_TS_INVALID+1 );
+    }
+    else
+        vlc_mutex_unlock( &p_owner->lock );
+
+    if( p_dec->pf_get_cc &&
+        ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
+        DecoderGetCc( p_dec, p_dec );
+
+    return 0;
+}
+
+static void DecoderUpdateStatVideo( decoder_t *p_dec, int i_decoded,
+                                    int i_lost, int i_displayed )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_thread_t *p_input = p_owner->p_input;
 
+    /* Update ugly stat */
     if( p_input != NULL && (i_decoded > 0 || i_lost > 0 || i_displayed > 0) )
     {
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
@@ -947,6 +942,40 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
                       i_displayed, NULL);
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
     }
+}
+
+static int DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
+{
+    assert( p_pic );
+    int i_lost = 0;
+    int i_displayed = 0;
+    int i_ret;
+
+    if( ( i_ret = DecoderPreparePlayVideo( p_dec, p_pic ) ) == 0 )
+        DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
+
+    DecoderUpdateStatVideo( p_dec, 1, i_lost, i_displayed );
+    return i_ret;
+}
+
+static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
+{
+    picture_t      *p_pic;
+    int i_lost = 0;
+    int i_decoded = 0;
+    int i_displayed = 0;
+
+    while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
+    {
+        i_decoded++;
+
+        if( DecoderPreparePlayVideo( p_dec, p_pic ) != 0 )
+            continue;
+
+        DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
+    }
+
+    DecoderUpdateStatVideo( p_dec, i_decoded, i_lost, i_displayed );
 }
 
 /* This function process a video block
@@ -1533,6 +1562,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_get_attachments  = DecoderGetInputAttachments;
     p_dec->pf_get_display_date = DecoderGetDisplayDate;
     p_dec->pf_get_display_rate = DecoderGetDisplayRate;
+    p_dec->pf_queue_video = DecoderQueueVideo;
 
     /* Load a packetizer module if the input is not already packetized */
     if( p_sout == NULL && !fmt->b_packetized )

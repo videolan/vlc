@@ -121,6 +121,9 @@ struct decoder_t
      * XXX use decoder_GetDisplayRate */
     int             (*pf_get_display_rate)( decoder_t * );
 
+    /* XXX use decoder_QueueVideo */
+    int             (*pf_queue_video)( decoder_t *, picture_t * );
+
     /* Private structure for the owner of the decoder */
     decoder_owner_sys_t *p_owner;
 
@@ -236,6 +239,26 @@ static inline picture_t *decoder_NewPicture( decoder_t *dec )
     if( decoder_UpdateVideoFormat(dec) )
         return NULL;
     return decoder_GetPicture( dec );
+}
+
+/**
+ * This function queues a picture to the video output.
+ *
+ * \note
+ * The caller doesn't own the picture anymore after this call (even in case of
+ * error).
+ * FIXME: input_DecoderFrameNext won't work if a module use this function.
+ *
+ * \return 0 if the picture is queued, -1 on error
+ */
+static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
+{
+    if( !dec->pf_queue_video )
+    {
+        picture_Release( p_pic );
+        return -1;
+    }
+    return dec->pf_queue_video( dec, p_pic );
 }
 
 /**
