@@ -59,7 +59,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     rebuild( p_root );
     DCONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
               this, processInputItemUpdate( input_item_t *) );
-    DCONNECT( THEMIM, inputChanged( input_thread_t * ),
+    DCONNECT( THEMIM, inputChanged( bool ),
               this, processInputItemUpdate( ) );
     CONNECT( THEMIM, playlistItemAppended( int, int ),
              this, processItemAppend( int, int ) );

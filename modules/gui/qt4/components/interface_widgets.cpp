@@ -514,7 +514,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
     /* Change the SpeedRate in the Label */
     CONNECT( THEMIM->getIM(), rateChanged( float ), this, setRate( float ) );
 
-    DCONNECT( THEMIM, inputChanged( input_thread_t * ),
+    DCONNECT( THEMIM, inputChanged( bool ),
               speedControl, activateOnState() );
 
     setContentsMargins(4, 0, 4, 0);

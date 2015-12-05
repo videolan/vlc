@@ -153,7 +153,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     hideHandleTimer->setSingleShot( true );
     hideHandleTimer->setInterval( FADEOUTDELAY );
 
-    CONNECT( MainInputManager::getInstance(), inputChanged( input_thread_t * ), this , inputUpdated( input_thread_t * ) );
+    CONNECT( MainInputManager::getInstance(), inputChanged( bool ), this , inputUpdated( bool ) );
     CONNECT( this, sliderMoved( int ), this, startSeekTimer() );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
     CONNECT( hideHandleTimer, timeout(), this, hideHandle() );
@@ -229,9 +229,9 @@ void SeekSlider::updateBuffering( float f_buffering_ )
     repaint();
 }
 
-void SeekSlider::inputUpdated( input_thread_t *p_input )
+void SeekSlider::inputUpdated( bool b_has_input )
 {
-    if ( p_input == NULL ) {
+    if ( b_has_input == false ) {
         animLoading->stop();
         mLoading = 0.0;
         repaint();

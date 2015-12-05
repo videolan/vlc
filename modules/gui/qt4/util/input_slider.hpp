@@ -120,7 +120,7 @@ public slots:
 private slots:
     void startSeekTimer();
     void updatePos();
-    void inputUpdated( input_thread_t *p_input );
+    void inputUpdated( bool );
 
 signals:
     void sliderDragged( float );
