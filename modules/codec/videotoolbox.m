@@ -32,6 +32,7 @@
 #import "../packetizer/h264_nal.h"
 #import "../video_chroma/copy.h"
 #import <vlc_bits.h>
+#import <vlc_boxes.h>
 
 #import <VideoToolbox/VideoToolbox.h>
 
