@@ -443,8 +443,7 @@ void InputManager::UpdateNavigation()
     vlc_value_t val; val.i_int = 0;
     vlc_value_t val2; val2.i_int = 0;
 
-    if( hasInput() )
-        var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
 
     if( val.i_int > 0 )
     {
@@ -488,8 +487,6 @@ void InputManager::UpdateRate()
 
 void InputManager::UpdateName()
 {
-    assert( p_input );
-
     /* Update text, name and nowplaying */
     QString name;
 
@@ -568,99 +565,82 @@ bool InputManager::hasVisualisation()
 
 void InputManager::UpdateTeletext()
 {
-    if( hasInput() )
+    const bool b_enabled = var_CountChoices( p_input, "teletext-es" ) > 0;
+    const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
+
+    /* Teletext is possible. Show the buttons */
+    emit teletextPossible( b_enabled );
+
+    /* If Teletext is selected */
+    if( b_enabled && i_teletext_es >= 0 )
     {
-        const bool b_enabled = var_CountChoices( p_input, "teletext-es" ) > 0;
-        const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
+        /* Then, find the current page */
+        int i_page = 100;
+        bool b_transparent = false;
 
-        /* Teletext is possible. Show the buttons */
-        emit teletextPossible( b_enabled );
-
-        /* If Teletext is selected */
-        if( b_enabled && i_teletext_es >= 0 )
+        if( p_input_vbi )
         {
-            /* Then, find the current page */
-            int i_page = 100;
-            bool b_transparent = false;
-
-            if( p_input_vbi )
-            {
-                var_DelCallback( p_input_vbi, "vbi-page", VbiEvent, this );
-                vlc_object_release( p_input_vbi );
-            }
-
-            if( input_GetEsObjects( p_input, i_teletext_es, &p_input_vbi, NULL, NULL ) )
-                p_input_vbi = NULL;
-
-            if( p_input_vbi )
-            {
-                /* This callback is not remove explicitly, but interfaces
-                 * are guaranted to outlive input */
-                var_AddCallback( p_input_vbi, "vbi-page", VbiEvent, this );
-
-                i_page = var_GetInteger( p_input_vbi, "vbi-page" );
-                b_transparent = !var_GetBool( p_input_vbi, "vbi-opaque" );
-            }
-            emit newTelexPageSet( i_page );
-            emit teletextTransparencyActivated( b_transparent );
-
+            var_DelCallback( p_input_vbi, "vbi-page", VbiEvent, this );
+            vlc_object_release( p_input_vbi );
         }
-        emit teletextActivated( b_enabled && i_teletext_es >= 0 );
+
+        if( input_GetEsObjects( p_input, i_teletext_es, &p_input_vbi, NULL, NULL ) )
+            p_input_vbi = NULL;
+
+        if( p_input_vbi )
+        {
+            /* This callback is not remove explicitly, but interfaces
+             * are guaranted to outlive input */
+            var_AddCallback( p_input_vbi, "vbi-page", VbiEvent, this );
+
+            i_page = var_GetInteger( p_input_vbi, "vbi-page" );
+            b_transparent = !var_GetBool( p_input_vbi, "vbi-opaque" );
+        }
+        emit newTelexPageSet( i_page );
+        emit teletextTransparencyActivated( b_transparent );
+
     }
-    else
-    {
-        emit teletextActivated( false );
-        emit teletextPossible( false );
-    }
+    emit teletextActivated( b_enabled && i_teletext_es >= 0 );
 }
 
 void InputManager::UpdateEPG()
 {
-    if( hasInput() )
-    {
-       emit epgChanged();
-    }
+    emit epgChanged();
 }
 
 void InputManager::UpdateVout()
 {
-    if( hasInput() )
+    /* Get current vout lists from input */
+    size_t i_vout;
+    vout_thread_t **pp_vout;
+    if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
     {
-        /* Get current vout lists from input */
-        size_t i_vout;
-        vout_thread_t **pp_vout;
-        if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
-        {
-            i_vout = 0;
-            pp_vout = NULL;
-        }
-
-        /* */
-        emit voutListChanged( pp_vout, i_vout );
-
-        /* */
-        bool b_old_video = b_video;
-        b_video = i_vout > 0;
-        if( !!b_old_video != !!b_video )
-            emit voutChanged( b_video );
-
-        /* Release the vout list */
-        for( size_t i = 0; i < i_vout; i++ )
-            vlc_object_release( (vlc_object_t*)pp_vout[i] );
-        free( pp_vout );
+        i_vout = 0;
+        pp_vout = NULL;
     }
+
+    /* */
+    emit voutListChanged( pp_vout, i_vout );
+
+    /* */
+    bool b_old_video = b_video;
+    b_video = i_vout > 0;
+    if( !!b_old_video != !!b_video )
+        emit voutChanged( b_video );
+
+    /* Release the vout list */
+    for( size_t i = 0; i < i_vout; i++ )
+        vlc_object_release( (vlc_object_t*)pp_vout[i] );
+    free( pp_vout );
 }
+
 void InputManager::UpdateAout()
 {
-    if( hasInput() )
-    {
-        /* TODO */
-    }
+    /* TODO */
 }
+
 void InputManager::UpdateCaching()
 {
-    if(!hasInput()) return;
-
     float f_newCache = var_GetFloat ( p_input, "cache" );
     if( f_newCache != f_cache )
     {
@@ -724,10 +704,7 @@ const QString InputManager::decodeArtURL( input_item_t *p_item )
 
 void InputManager::UpdateArt()
 {
-    QString url;
-
-    if( hasInput() )
-        url = decodeArtURL( input_GetItem( p_input ) );
+    QString url = decodeArtURL( input_GetItem( p_input ) );
 
     /* the art hasn't changed, no need to update */
     if(artUrl == url)
@@ -758,7 +735,6 @@ void InputManager::setArt( input_item_t *p_item, QString fileUrl )
 
 inline void InputManager::UpdateStats()
 {
-    assert( p_input );
     emit statisticsUpdated( input_GetItem( p_input ) );
 }
 
@@ -770,7 +746,6 @@ inline void InputManager::UpdateMeta( input_item_t *p_item_ )
 
 inline void InputManager::UpdateMeta()
 {
-    assert( p_input );
     emit currentMetaChanged( input_GetItem( p_input ) );
 }
 
@@ -782,19 +757,13 @@ inline void InputManager::UpdateInfo()
 
 void InputManager::UpdateRecord()
 {
-    if( hasInput() )
-    {
-        emit recordingStateChanged( var_GetBool( p_input, "record" ) );
-    }
+    emit recordingStateChanged( var_GetBool( p_input, "record" ) );
 }
 
 void InputManager::UpdateProgramEvent()
 {
-    if( hasInput() )
-    {
-        bool b_scrambled = var_GetBool( p_input, "program-scrambled" );
-        emit encryptionChanged( b_scrambled );
-    }
+    bool b_scrambled = var_GetBool( p_input, "program-scrambled" );
+    emit encryptionChanged( b_scrambled );
 }
 
 /* User update of the slider */
