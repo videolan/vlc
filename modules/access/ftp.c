@@ -861,29 +861,28 @@ static input_item_t* DirRead( access_t *p_access )
     assert( p_sys->data.fd != -1 );
     assert( !p_sys->out );
 
-    for( ;;)
-    {
-        char *psz_line;
-        if( p_sys->data.p_tls != NULL )
-            psz_line = vlc_tls_GetLine( p_sys->data.p_tls );
-        else
-            psz_line = net_Gets( p_access, p_sys->data.fd );
+    char *psz_line;
+    if( p_sys->data.p_tls != NULL )
+        psz_line = vlc_tls_GetLine( p_sys->data.p_tls );
+    else
+        psz_line = net_Gets( p_access, p_sys->data.fd );
+    if( psz_line == NULL )
+        return NULL;
 
-        char *psz_uri;
-        if( asprintf( &psz_uri, "%s://%s:%d%s%s/%s",
-                      ( p_sys->tlsmode == NONE ) ? "ftp" :
-                      ( ( p_sys->tlsmode == IMPLICIT ) ? "ftps" : "ftpes" ),
-                      p_sys->url.psz_host, p_sys->url.i_port,
-                      p_sys->url.psz_path ? "/" : "",
-                      p_sys->url.psz_path ? p_sys->url.psz_path : "",
-                      psz_line ) != -1 )
-        {
-            p_item = input_item_NewWithTypeExt( psz_uri, psz_line, 0, NULL,
-                                                0, -1, ITEM_TYPE_UNKNOWN, 1 );
-            free( psz_uri );
-        }
-        free( psz_line );
+    char *psz_uri;
+    if( asprintf( &psz_uri, "%s://%s:%d%s%s/%s",
+                  ( p_sys->tlsmode == NONE ) ? "ftp" :
+                  ( ( p_sys->tlsmode == IMPLICIT ) ? "ftps" : "ftpes" ),
+                  p_sys->url.psz_host, p_sys->url.i_port,
+                  p_sys->url.psz_path ? "/" : "",
+                  p_sys->url.psz_path ? p_sys->url.psz_path : "",
+                  psz_line ) != -1 )
+    {
+        p_item = input_item_NewWithTypeExt( psz_uri, psz_line, 0, NULL,
+                                            0, -1, ITEM_TYPE_UNKNOWN, 1 );
+        free( psz_uri );
     }
+    free( psz_line );
     return p_item;
 }
 
