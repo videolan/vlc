@@ -308,7 +308,6 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 
         if (p_block == NULL) {
             int buf_size = p_dec->fmt_in.i_extra + 20;
-            uint32_t i_nal_size = 0;
             size = p_dec->fmt_in.i_extra;
 
             p_alloc_buf = p_buf = malloc(buf_size);
