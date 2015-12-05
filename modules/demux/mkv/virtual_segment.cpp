@@ -423,6 +423,8 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                         ( p_current_chapter && p_current_chapter->p_segment != p_cur_chapter->p_segment ) ||
                         ( p_current_chapter->p_chapter->i_end_time != p_cur_chapter->p_chapter->i_start_time ))
                     {
+                        /* Forcing reset pcr */
+                        es_out_Control( demux.out, ES_OUT_RESET_PCR);
                         Seek( demux, p_cur_chapter->i_mk_virtual_start_time, p_cur_chapter, -1 );
                         return true;
                     }
@@ -488,7 +490,6 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
         if( p_current_chapter->p_segment != p_chapter->p_segment )
             ChangeSegment( p_current_chapter->p_segment, p_chapter->p_segment, i_mk_date );
         p_current_chapter = p_chapter;
-
         p_chapter->p_segment->Seek( i_mk_date, i_mk_time_offset, i_global_position );
     }
 }

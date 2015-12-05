@@ -933,7 +933,6 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
     /* Don't try complex seek if we seek to 0 */
     if( i_mk_date == 0 && i_mk_time_offset == 0 )
     {
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, VLC_TS_0 );
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                         INT64_C(0) );
         es.I_O().setFilePointer( i_start_pos );
@@ -943,8 +942,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
                              var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
         cluster = NULL;
         sys.i_start_pts = VLC_TS_0;
-        sys.i_pts = VLC_TS_INVALID;
-        sys.i_pcr = VLC_TS_0;
+        sys.i_pcr = sys.i_pts = VLC_TS_INVALID;
         return;
     }
 
@@ -1024,7 +1022,6 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
     /*Neither video nor audio track... no seek further*/
     if( unlikely( !p_first ) )
     {
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, i_mk_date + VLC_TS_0 );
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_date );
         return;
     }
@@ -1101,8 +1098,8 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
         if( p_last->i_mk_date < p_min->i_mk_date )
             p_min = p_last;
 
-    sys.i_pcr = sys.i_pts = p_min->i_mk_date + VLC_TS_0;
-    es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, sys.i_pcr );
+    sys.i_pts = p_min->i_mk_date + VLC_TS_0;
+    sys.i_pcr = VLC_TS_INVALID;
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_date );
     cluster = (KaxCluster *) ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos );
 
