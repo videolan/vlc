@@ -111,6 +111,15 @@ void vlc_fifo_WaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar)
 }
 
 /**
+ * Atomically unlocks the FIFO and waits until one thread signals the FIFO up
+ * to a certain date, then locks the FIFO again. See vlc_fifo_Wait().
+ */
+int vlc_fifo_TimedWaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar, mtime_t deadline)
+{
+    return vlc_cond_timedwait(condvar, &fifo->lock, deadline);
+}
+
+/**
  * Checks how many blocks are queued in a locked FIFO.
  *
  * @note This function is not cancellation point.

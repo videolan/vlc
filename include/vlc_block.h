@@ -326,6 +326,7 @@ VLC_API void vlc_fifo_Unlock(vlc_fifo_t *);
 VLC_API void vlc_fifo_Signal(vlc_fifo_t *);
 VLC_API void vlc_fifo_Wait(vlc_fifo_t *);
 VLC_API void vlc_fifo_WaitCond(vlc_fifo_t *, vlc_cond_t *);
+int vlc_fifo_TimedWaitCond(vlc_fifo_t *, vlc_cond_t *, mtime_t);
 VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *, block_t *);
 VLC_API block_t *vlc_fifo_DequeueUnlocked(vlc_fifo_t *) VLC_USED;
 VLC_API block_t *vlc_fifo_DequeueAllUnlocked(vlc_fifo_t *) VLC_USED;
