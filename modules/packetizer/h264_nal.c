@@ -417,7 +417,7 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
                     struct nal_sps *p_sps )
 {
     uint8_t *pb_dec = NULL;
-    int     i_dec = 0;
+    size_t     i_dec = 0;
     bs_t s;
     int i_tmp;
 
