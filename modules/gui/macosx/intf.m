@@ -96,6 +96,7 @@ int OpenIntf (vlc_object_t *p_this)
         [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
         [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
 
+        msg_Dbg(p_intf, "Finished loading macosx interface");
         return VLC_SUCCESS;
     }
 }
