@@ -308,13 +308,6 @@ static VLCMain *sharedInstance = nil;
     [[self mainWindow] updateTimeSlider];
     [[self mainWindow] updateVolumeSlider];
 
-    /* Hack: Playlist is started before the interface.
-     * Thus, call additional updaters as we might miss these events if posted before
-     * the callbacks are registered.
-     */
-    [_input_manager inputThreadChanged];
-    [_playlist playbackModeUpdated];
-
     // respect playlist-autostart
     // note that PLAYLIST_PLAY will not stop any playback if already started
     playlist_t * p_playlist = pl_Get(VLCIntf);
