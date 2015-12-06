@@ -57,8 +57,13 @@ libtrivial_channel_mixer_plugin_la_SOURCES = \
 libsimple_channel_mixer_plugin_la_SOURCES = \
 	audio_filter/channel_mixer/simple.c
 libsimple_channel_mixer_plugin_la_CFLAGS =
+libsimple_channel_mixer_plugin_la_LIBADD =
+
 if HAVE_NEON
-libsimple_channel_mixer_plugin_la_SOURCES += arm_neon/simple_channel_mixer.S
+EXTRA_LTLIBRARIES += libsimple_channel_mixer_plugin_arm_neon.la
+libsimple_channel_mixer_plugin_arm_neon_la_SOURCES = arm_neon/simple_channel_mixer.S
+
+libsimple_channel_mixer_plugin_la_LIBADD += libsimple_channel_mixer_plugin_arm_neon.la
 libsimple_channel_mixer_plugin_la_CFLAGS += -DCAN_COMPILE_ARM
 endif
 
