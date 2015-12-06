@@ -510,7 +510,8 @@
     [[o_shuffle_btn cell] accessibilitySetOverrideValue:[o_shuffle_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
     [[o_shuffle_btn cell] accessibilitySetOverrideValue:_NS("Click to enable or disable random playback.") forAttribute:NSAccessibilityDescriptionAttribute];
 
-    [o_volume_sld setToolTip: _NS("Volume")];
+    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), 100];
+    [o_volume_sld setToolTip: volumeTooltip];
     [[o_volume_sld cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change the volume.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[o_volume_sld cell] accessibilitySetOverrideValue:[o_volume_sld toolTip] forAttribute:NSAccessibilityTitleAttribute];
     [o_volume_down_btn setToolTip: _NS("Mute")];
@@ -1115,10 +1116,14 @@ else \
     int i_volume = [[VLCCoreInteraction sharedInstance] volume];
     BOOL b_muted = [[VLCCoreInteraction sharedInstance] mute];
 
-    if (!b_muted)
-        [o_volume_sld setIntValue: i_volume];
-    else
-        [o_volume_sld setIntValue: 0];
+    if (b_muted)
+        i_volume = 0;
+
+    [o_volume_sld setIntValue: i_volume];
+
+    i_volume = (i_volume * 200) / AOUT_VOLUME_MAX;
+    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), i_volume];
+    [o_volume_sld setToolTip:volumeTooltip];
 
     [o_volume_sld setEnabled: !b_muted];
     [o_volume_up_btn setEnabled: !b_muted];
