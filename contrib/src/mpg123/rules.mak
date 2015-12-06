@@ -7,6 +7,14 @@ ifeq ($(call need_pkg,"mpg123"),)
 PKGS_FOUND += mpg123
 endif
 
+MPG123CONF = $(HOSTCONF)
+
+ifdef HAVE_ANDROID
+ifeq ($(ANDROID_ABI), x86)
+MPG123CONF += --with-cpu=generic_fpu
+endif
+endif
+
 $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 	$(call download,$(MPG123_URL))
 
@@ -22,6 +30,6 @@ endif
 
 .mpg123: mpg123
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(MPG123CONF)
 	cd $< && $(MAKE) install
 	touch $@

@@ -10,6 +10,9 @@ endif
 ifdef HAVE_ANDROID
 WITH_FONTCONFIG = 0
 WITH_HARFBUZZ = 0
+ifeq ($(ANDROID_ABI), x86)
+WITH_ASS_ASM = 0
+endif
 else
 ifdef HAVE_TIZEN
 WITH_FONTCONFIG = 0
@@ -57,6 +60,10 @@ ifneq ($(WITH_HARFBUZZ), 0)
 DEPS_ass += harfbuzz $(DEPS_harfbuzz)
 else
 ASS_CONF += --disable-harfbuzz
+endif
+
+ifeq ($(WITH_ASS_ASM), 0)
+ASS_CONF += --disable-asm
 endif
 
 ifdef WITH_OPTIMIZATION

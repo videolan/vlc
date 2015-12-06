@@ -138,6 +138,12 @@ FFMPEGCONF += --target-os=linux --enable-pic
 
 endif
 
+ifdef HAVE_ANDROID
+ifeq ($(ANDROID_ABI), x86)
+FFMPEGCONF +=  --disable-mmx --disable-mmxext
+endif
+endif
+
 # Windows
 ifdef HAVE_WIN32
 ifndef HAVE_MINGW_W64
