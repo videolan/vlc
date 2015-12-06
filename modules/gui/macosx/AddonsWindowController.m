@@ -278,7 +278,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
 
     // update ui
     [_addonsTable reloadData];
-    [self tableViewSelectionDidChange:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:NSTableViewSelectionDidChangeNotification object:_addonsTable];
 }
 
 - (void)_findNewAddons
