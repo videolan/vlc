@@ -427,6 +427,8 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
     memset( p_sps, 0, sizeof(struct nal_sps) );
     CreateRbspFromNAL( &pb_dec, &i_dec, &p_sps_buf[5],
                       i_sps_size - 5 );
+    if( !pb_dec )
+        return -1;
 
     bs_init( &s, pb_dec, i_dec );
     int i_profile_idc = bs_read( &s, 8 );
@@ -435,7 +437,7 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
     p_sps->i_level = bs_read( &s, 8 );
     /* sps id */
     p_sps->i_id = bs_read_ue( &s );
-    if( p_sps->i_id >= SPS_MAX || p_sps->i_id < 0 )
+    if( p_sps->i_id >= SPS_MAX )
     {
         free( pb_dec );
         return -1;
