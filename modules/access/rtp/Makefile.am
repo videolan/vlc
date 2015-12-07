@@ -32,18 +32,3 @@ librtp_plugin_la_CFLAGS += $(GCRYPT_CFLAGS)
 librtp_plugin_la_LIBADD += libvlc_srtp.la $(GCRYPT_LIBS)
 librtp_plugin_la_DEPENDENCIES += libvlc_srtp.la
 endif
-
-#lcov-run:
-#	rm -Rf *.gcda lcov
-#	$(MAKE) $(AM_MAKEFLAGS) check
-#
-#lcov-pre.out:
-#	lcov -c -d . -o lcov.tmp
-#
-#lcov.out: lcov-pre.out
-#	lcov -r lcov.tmp '*test*' > lcov.out
-#
-#lcov: lcov.out
-#	genhtml lcov.out -o lcov
-#
-#.PHONY: lcov-run

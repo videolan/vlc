@@ -984,6 +984,28 @@ uninstall-hook:
 	rm -f -- "$(DESTDIR)$(vlclibdir)/plugins/plugins.dat"
 
 ###############################################################################
+# Test coverage
+###############################################################################
+
+lcov-raw.out:
+	$(MAKE) $(AM_MAKEFLAGS) all
+	lcov -z -d .
+	$(MAKE) $(AM_MAKEFLAGS) check
+	lcov -c -d . -o lcov-raw.out
+
+lcov.out: lcov-raw.out
+	lcov -r lcov-raw.out -o lcov.out \
+		'*test*' 'contrib/*' '/usr/include/*'
+
+lcov: lcov.out
+	rm -Rf lcov lcov.tmp
+	genhtml lcov.out -o lcov.tmp
+	mv lcov.tmp lcov
+
+.PHONY: lcov-raw.out
+
+
+###############################################################################
 # PO translation files update
 ###############################################################################
 .PHONY: update-po
