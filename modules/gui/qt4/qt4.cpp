@@ -479,6 +479,10 @@ static void *Thread( void *obj )
     /* Start the QApplication here */
     QVLCApp app( argc, argv );
 
+    /* Set application direction to locale direction,
+     * necessary for  RTL locales */
+    app.setLayoutDirection(QLocale().textDirection());
+
     p_intf->p_sys->p_app = &app;
 
 
