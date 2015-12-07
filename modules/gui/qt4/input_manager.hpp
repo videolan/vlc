@@ -288,6 +288,18 @@ private:
     QVLCFloat volume;
     QVLCBool mute;
 
+private:
+    static int ItemChanged( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+    static int LeafToParent( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+    static int PLItemChanged( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+    static int PLItemAppended( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+    static int PLItemRemoved( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+
 public slots:
     void togglePlayPause();
     void play();

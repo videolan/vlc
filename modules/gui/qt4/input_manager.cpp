@@ -43,17 +43,6 @@
 
 #include <assert.h>
 
-static int ItemChanged( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-static int LeafToParent( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-static int PLItemChanged( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-static int PLItemAppended( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-static int PLItemRemoved( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-
 static int InputEvent( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
 static int VbiEvent( vlc_object_t *, const char *,
@@ -321,7 +310,7 @@ inline void InputManager::delCallbacks()
 }
 
 /* Static callbacks for IM */
-static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
+int MainInputManager::ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
@@ -1021,11 +1010,11 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     CONNECT( menusAudioMapper, mapped(QString), this, menusUpdateAudio( QString ) );
 
     /* Core Callbacks */
-    var_AddCallback( THEPL, "item-change", ItemChanged, im );
-    var_AddCallback( THEPL, "input-current", PLItemChanged, this );
-    var_AddCallback( THEPL, "leaf-to-parent", LeafToParent, this );
-    var_AddCallback( THEPL, "playlist-item-append", PLItemAppended, this );
-    var_AddCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
+    var_AddCallback( THEPL, "item-change", MainInputManager::ItemChanged, im );
+    var_AddCallback( THEPL, "input-current", MainInputManager::PLItemChanged, this );
+    var_AddCallback( THEPL, "leaf-to-parent", MainInputManager::LeafToParent, this );
+    var_AddCallback( THEPL, "playlist-item-append", MainInputManager::PLItemAppended, this );
+    var_AddCallback( THEPL, "playlist-item-deleted", MainInputManager::PLItemRemoved, this );
 
     /* Core Callbacks to widget */
     random.addCallback( this, SLOT(notifyRandom(bool)) );
@@ -1048,12 +1037,12 @@ MainInputManager::~MainInputManager()
        emit inputChanged( false );
     }
 
-    var_DelCallback( THEPL, "input-current", PLItemChanged, this );
-    var_DelCallback( THEPL, "item-change", ItemChanged, im );
-    var_DelCallback( THEPL, "leaf-to-parent", LeafToParent, this );
+    var_DelCallback( THEPL, "input-current", MainInputManager::PLItemChanged, this );
+    var_DelCallback( THEPL, "item-change", MainInputManager::ItemChanged, im );
+    var_DelCallback( THEPL, "leaf-to-parent", MainInputManager::LeafToParent, this );
 
-    var_DelCallback( THEPL, "playlist-item-append", PLItemAppended, this );
-    var_DelCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
+    var_DelCallback( THEPL, "playlist-item-append", MainInputManager::PLItemAppended, this );
+    var_DelCallback( THEPL, "playlist-item-deleted", MainInputManager::PLItemRemoved, this );
 
     delete menusAudioMapper;
 }
@@ -1211,7 +1200,7 @@ bool MainInputManager::hasEmptyPlaylist()
 /****************************
  * Static callbacks for MIM *
  ****************************/
-static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
+int MainInputManager::PLItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t val, void *param )
 {
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
@@ -1224,7 +1213,7 @@ static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-static int LeafToParent( vlc_object_t *p_this, const char *psz_var,
+int MainInputManager::LeafToParent( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
@@ -1257,7 +1246,7 @@ void MainInputManager::menusUpdateAudio( const QString& data )
     }
 }
 
-static int PLItemAppended
+int MainInputManager::PLItemAppended
 ( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
 {
     VLC_UNUSED( obj ); VLC_UNUSED( var ); VLC_UNUSED( old );
@@ -1271,7 +1260,7 @@ static int PLItemAppended
     return VLC_SUCCESS;
 }
 
-static int PLItemRemoved
+int MainInputManager::PLItemRemoved
 ( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
 {
     VLC_UNUSED( var ); VLC_UNUSED( old );
