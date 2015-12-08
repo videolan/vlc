@@ -335,7 +335,7 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
 {
     uint8_t *p_sps = NULL, *p_pps = NULL;
     size_t i_sps_size = 0, i_pps_size = 0;
-    int i_nal_type = NAL_UNKNOWN;
+    int i_nal_type = H264_NAL_UNKNOWN;
     bool b_first_nal = true;
     bool b_has_zero_byte = false;
 
@@ -346,12 +346,12 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
         /* cf B.1.1: a NAL unit starts and ends with 0x000001 or 0x00000001 */
         if( i_buf > 3 && !memcmp( p_buf, annexb_startcode, 3 ) )
         {
-            if( i_nal_type != NAL_UNKNOWN )
+            if( i_nal_type != H264_NAL_UNKNOWN )
             {
                 /* update SPS/PPS size */
-                if( i_nal_type == NAL_SPS )
+                if( i_nal_type == H264_NAL_SPS )
                     i_sps_size = p_buf - p_sps - (b_has_zero_byte ? 1 : 0);
-                if( i_nal_type == NAL_PPS )
+                if( i_nal_type == H264_NAL_PPS )
                     i_pps_size = p_buf - p_pps - (b_has_zero_byte ? 1 : 0);
 
                 if( i_sps_size && i_pps_size )
@@ -364,16 +364,16 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
 
             /* The start prefix is always 0x00000001 (annexb_startcode + a
              * leading zero byte) for SPS, PPS or the first NAL */
-            if( !b_has_zero_byte && ( b_first_nal || i_nal_type == NAL_SPS
-             || i_nal_type == NAL_PPS ) )
+            if( !b_has_zero_byte && ( b_first_nal || i_nal_type == H264_NAL_SPS
+             || i_nal_type == H264_NAL_PPS ) )
                 return -1;
             b_first_nal = false;
 
             /* Pointer to the beginning of the SPS/PPS starting with the
              * leading zero byte */
-            if( i_nal_type == NAL_SPS && !p_sps )
+            if( i_nal_type == H264_NAL_SPS && !p_sps )
                 p_sps = p_buf - 1;
-            if( i_nal_type == NAL_PPS && !p_pps )
+            if( i_nal_type == H264_NAL_PPS && !p_pps )
                 p_pps = p_buf - 1;
 
             /* cf. 7.4.1.2.3 */
@@ -381,7 +381,7 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
                 return -1;
 
             /* SPS/PPS are before the slices */
-            if ( i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
+            if ( i_nal_type >= H264_NAL_SLICE && i_nal_type <= H264_NAL_SLICE_IDR )
                 break;
             i_move = 4;
         }
@@ -398,9 +398,9 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
     if( i_buf == 0 )
     {
         /* update SPS/PPS size if we reach the end of the bytestream */
-        if( !i_sps_size && i_nal_type == NAL_SPS )
+        if( !i_sps_size && i_nal_type == H264_NAL_SPS )
             i_sps_size = p_buf - p_sps;
-        if( !i_pps_size && i_nal_type == NAL_PPS )
+        if( !i_pps_size && i_nal_type == H264_NAL_PPS )
             i_pps_size = p_buf - p_pps;
     }
     if( ( !p_sps || !i_sps_size ) && ( !p_pps || !i_pps_size ) )
@@ -414,17 +414,17 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
 }
 
 int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
-                    struct nal_sps *p_sps )
+                    struct h264_nal_sps *p_sps )
 {
     uint8_t *pb_dec = NULL;
     size_t     i_dec = 0;
     bs_t s;
     int i_tmp;
 
-    if (i_sps_size < 5 || (p_sps_buf[4] & 0x1f) != NAL_SPS)
+    if (i_sps_size < 5 || (p_sps_buf[4] & 0x1f) != H264_NAL_SPS)
         return -1;
 
-    memset( p_sps, 0, sizeof(struct nal_sps) );
+    memset( p_sps, 0, sizeof(struct h264_nal_sps) );
     CreateRbspFromNAL( &pb_dec, &i_dec, &p_sps_buf[5],
                       i_sps_size - 5 );
     if( !pb_dec )
@@ -437,7 +437,7 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
     p_sps->i_level = bs_read( &s, 8 );
     /* sps id */
     p_sps->i_id = bs_read_ue( &s );
-    if( p_sps->i_id >= SPS_MAX )
+    if( p_sps->i_id >= H264_SPS_MAX )
     {
         free( pb_dec );
         return -1;
@@ -682,18 +682,18 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
 }
 
 int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
-                    struct nal_pps *p_pps )
+                    struct h264_nal_pps *p_pps )
 {
     bs_t s;
 
-    if (i_pps_size < 5 || (p_pps_buf[4] & 0x1f) != NAL_PPS)
+    if (i_pps_size < 5 || (p_pps_buf[4] & 0x1f) != H264_NAL_PPS)
         return -1;
 
-    memset( p_pps, 0, sizeof(struct nal_pps) );
+    memset( p_pps, 0, sizeof(struct h264_nal_pps) );
     bs_init( &s, &p_pps_buf[5], i_pps_size - 5 );
     p_pps->i_id = bs_read_ue( &s ); // pps id
     p_pps->i_sps_id = bs_read_ue( &s ); // sps id
-    if( p_pps->i_id >= PPS_MAX || p_pps->i_sps_id >= SPS_MAX )
+    if( p_pps->i_id >= H264_PPS_MAX || p_pps->i_sps_id >= H264_SPS_MAX )
     {
         return -1;
     }

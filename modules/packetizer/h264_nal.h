@@ -49,33 +49,33 @@
 #define PROFILE_H264_MVC_MULTIVIEW_DEPTH_HIGH          138
 #define PROFILE_H264_MVC_ENHANCED_MULTIVIEW_DEPTH_HIGH 139
 
-#define SPS_MAX (32)
-#define PPS_MAX (256)
+#define H264_SPS_MAX (32)
+#define H264_PPS_MAX (256)
 
-enum nal_unit_type_e
+enum h264_nal_unit_type_e
 {
-    NAL_UNKNOWN = 0,
-    NAL_SLICE   = 1,
-    NAL_SLICE_DPA   = 2,
-    NAL_SLICE_DPB   = 3,
-    NAL_SLICE_DPC   = 4,
-    NAL_SLICE_IDR   = 5,    /* ref_idc != 0 */
-    NAL_SEI         = 6,    /* ref_idc == 0 */
-    NAL_SPS         = 7,
-    NAL_PPS         = 8,
-    NAL_AU_DELIMITER= 9
+    H264_NAL_UNKNOWN = 0,
+    H264_NAL_SLICE   = 1,
+    H264_NAL_SLICE_DPA   = 2,
+    H264_NAL_SLICE_DPB   = 3,
+    H264_NAL_SLICE_DPC   = 4,
+    H264_NAL_SLICE_IDR   = 5,    /* ref_idc != 0 */
+    H264_NAL_SEI         = 6,    /* ref_idc == 0 */
+    H264_NAL_SPS         = 7,
+    H264_NAL_PPS         = 8,
+    H264_NAL_AU_DELIMITER= 9
     /* ref_idc == 0 for 6,9,10,11,12 */
 };
 
 /* Defined in H.264 annex D */
-enum sei_type_e
+enum h264_sei_type_e
 {
-    SEI_PIC_TIMING = 1,
-    SEI_USER_DATA_REGISTERED_ITU_T_T35 = 4,
-    SEI_RECOVERY_POINT = 6
+    H264_SEI_PIC_TIMING = 1,
+    H264_SEI_USER_DATA_REGISTERED_ITU_T_T35 = 4,
+    H264_SEI_RECOVERY_POINT = 6
 };
 
-struct nal_sps
+struct h264_nal_sps
 {
     int i_id;
     int i_profile, i_profile_compatibility, i_level;
@@ -100,7 +100,7 @@ struct nal_sps
     } vui;
 };
 
-struct nal_pps
+struct h264_nal_pps
 {
     int i_id;
     int i_sps_id;
@@ -143,12 +143,12 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
 /* Parse a SPS into the struct nal_sps
  * Returns 0 in case of success */
 int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
-                    struct nal_sps *p_sps );
+                    struct h264_nal_sps *p_sps );
 
 /* Parse a PPS into the struct nal_pps
  * Returns 0 in case of success */
 int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
-                    struct nal_pps *p_pps );
+                    struct h264_nal_pps *p_pps );
 
 /* Create a AVCDecoderConfigurationRecord from SPS/PPS
  * Returns a valid block_t on success, must be freed with block_Release */
