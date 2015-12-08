@@ -782,7 +782,7 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
     }
 
     bo_add_8(avcC, 1);      /* configuration version */
-    bo_add_8(avcC, i_sps_size ? p_sps[1] : 77);
+    bo_add_8(avcC, i_sps_size ? p_sps[1] : PROFILE_H264_MAIN);
     bo_add_8(avcC, i_sps_size ? p_sps[2] : 64);
     bo_add_8(avcC, i_sps_size ? p_sps[3] : 30);       /* level, 5.1 */
     bo_add_8(avcC, 0xff);   /* 0b11111100 | lengthsize = 0x11 */
