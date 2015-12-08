@@ -58,7 +58,7 @@
 #define FADEOUTDELAY 2000
 
 SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
-          : QSlider( q, _parent ), b_classic( _static )
+          : QSlider( q, _parent ), b_classic( _static ), animLoading( NULL )
 {
     isSliding = false;
     isJumping = false;
@@ -199,7 +199,15 @@ void SeekSlider::setPosition( float pos, int64_t time, int length )
         setEnabled( b_seekable );
 
     if( !isSliding )
+    {
         setValue( (int)( pos * 1000.0 ) );
+        if ( animLoading != NULL && pos >= 0.0f && animLoading->state() != QAbstractAnimation::Stopped )
+        {
+            animLoading->stop();
+            mLoading = 0.0f;
+        }
+
+    }
 
     inputLength = length;
 }
