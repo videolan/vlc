@@ -42,6 +42,7 @@
 #include <vlc_bits.h>
 #include "../codec/cc.h"
 #include "h264_nal.h"
+#include "hxxx_nal.h"
 #include "packetizer_helper.h"
 
 /*****************************************************************************
@@ -161,7 +162,7 @@ static block_t *CreateAnnexbNAL( decoder_t *, const uint8_t *p, int );
 static block_t *OutputPicture( decoder_t *p_dec );
 static void PutSPS( decoder_t *p_dec, block_t *p_frag );
 static void PutPPS( decoder_t *p_dec, block_t *p_frag );
-static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,
+static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,
                         int i_nal_ref_idc, int i_nal_type, const block_t *p_frag );
 static void ParseSei( decoder_t *, block_t * );
 
@@ -601,15 +602,16 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         slice_t slice;
         bool  b_new_picture;
 
-        ParseSlice( p_dec, &b_new_picture, &slice, i_nal_ref_idc, i_nal_type, p_frag );
+        if(ParseSlice( p_dec, &b_new_picture, &slice, i_nal_ref_idc, i_nal_type, p_frag ))
+        {
+            /* */
+            if( b_new_picture && p_sys->b_slice )
+                p_pic = OutputPicture( p_dec );
 
-        /* */
-        if( b_new_picture && p_sys->b_slice )
-            p_pic = OutputPicture( p_dec );
-
-        /* */
-        p_sys->slice = slice;
-        p_sys->b_slice = true;
+            /* */
+            p_sys->slice = slice;
+            p_sys->b_slice = true;
+        }
     }
     else if( i_nal_type == H264_NAL_SPS )
     {
@@ -891,7 +893,7 @@ static void PutPPS( decoder_t *p_dec, block_t *p_frag )
     p_sys->pp_pps[pps.i_id] = p_frag;
 }
 
-static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,
+static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,
                         int i_nal_ref_idc, int i_nal_type, const block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -901,9 +903,14 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     slice_t slice;
     bs_t s;
 
+    if(p_frag->i_buffer < 6)
+        return false;
+
     /* do not convert the whole frame */
-    CreateRbspFromNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5],
-                     __MIN( p_frag->i_buffer - 5, 60 ) );
+    pb_dec = hxxx_ep3b_to_rbsp(&p_frag->p_buffer[5], __MIN( p_frag->i_buffer - 5, 60 ), &i_dec);
+    if(!pb_dec)
+        return false;
+
     bs_init( &s, pb_dec, i_dec );
 
     /* first_mb_in_slice */
@@ -999,6 +1006,8 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     /* */
     *pb_new_picture = b_pic;
     *p_slice = slice;
+
+    return true;
 }
 
 static void ParseSei( decoder_t *p_dec, block_t *p_frag )
@@ -1007,8 +1016,11 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
     uint8_t *pb_dec;
     size_t i_dec = 0;
 
+    if( p_frag->i_buffer < 6 )
+        return;
+
     /* */
-    CreateRbspFromNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
+    pb_dec = hxxx_ep3b_to_rbsp( &p_frag->p_buffer[5], p_frag->i_buffer - 5, &i_dec );
     if( !pb_dec )
         return;
 

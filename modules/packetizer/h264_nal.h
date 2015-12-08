@@ -107,17 +107,6 @@ struct h264_nal_pps
     int i_pic_order_present_flag;
 };
 
-static inline void CreateRbspFromNAL( uint8_t **pp_ret, size_t *pi_ret,
-                                     const uint8_t *src, int i_src )
-{
-    uint8_t *dst = malloc( i_src );
-
-    *pp_ret = dst;
-
-    if( dst )
-        *pi_ret = nal_to_rbsp(src, dst, i_src);
-}
-
 /*
     AnnexB : [\x00] \x00 \x00 \x01 Prefixed NAL
     AVC Sample format : NalLengthSize encoded size prefixed NAL

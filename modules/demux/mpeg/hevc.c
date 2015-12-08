@@ -36,6 +36,7 @@
 #include <vlc_bits.h>
 
 #include "mpeg_parser_helpers.h"
+#include "../packetizer/hxxx_nal.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -223,32 +224,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                   0, 1, i_query, args );
 }
 
-
-static uint8_t * CreateDecodedNAL( int *pi_ret,
-                              const uint8_t *src, int i_src )
-{
-    uint8_t *dst = malloc( i_src );
-    if( !dst )
-        return NULL;
-
-    *pi_ret = nal_to_rbsp( src, dst, i_src );
-    return dst;
-}
-
 static int32_t getFPS( demux_t *p_demux, block_t * p_block )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
     bs_t bs;
     uint8_t * p_decoded_nal;
-    int i_decoded_nal;
+    size_t i_decoded_nal;
 
     if( p_block->i_buffer < 5 )
         return -1;
 
-    p_decoded_nal = CreateDecodedNAL(&i_decoded_nal,
-                                     p_block->p_buffer+4, p_block->i_buffer-4);
-
+    p_decoded_nal = hxxx_ep3b_to_rbsp(p_block->p_buffer+4, p_block->i_buffer-4,
+                                      &i_decoded_nal);
     if( !p_decoded_nal )
         return -1;
 

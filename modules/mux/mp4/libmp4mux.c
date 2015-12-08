@@ -22,8 +22,8 @@
  *****************************************************************************/
 #include "libmp4mux.h"
 #include "../demux/mp4/libmp4.h" /* flags */
-#include "../demux/mpeg/mpeg_parser_helpers.h" /* nal rbsp */
 #include "../packetizer/h264_nal.h" /* h264_get_spspps */
+#include "../packetizer/hxxx_nal.h"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -496,10 +496,13 @@ static bo_t *GetD263Tag(void)
 static void hevcParseVPS(uint8_t * p_buffer, size_t i_buffer, uint8_t *general,
                          uint8_t * numTemporalLayer, bool * temporalIdNested)
 {
-    const size_t i_decoded_nal_size = 512;
-    uint8_t p_dec_nal[i_decoded_nal_size];
-    size_t i_size = (i_buffer < i_decoded_nal_size)?i_buffer:i_decoded_nal_size;
-    nal_to_rbsp(p_buffer, p_dec_nal, i_size);
+    size_t i_decoded_nal_size;
+    uint8_t *p_dec_nal = hxxx_ep3b_to_rbsp(p_buffer, i_buffer, &i_decoded_nal_size);
+    if(!p_dec_nal || i_decoded_nal_size < 19)
+    {
+        free(p_dec_nal);
+        return;
+    }
 
     /* first two bytes are the NAL header, 3rd and 4th are:
         vps_video_parameter_set_id(4)
@@ -514,17 +517,22 @@ static void hevcParseVPS(uint8_t * p_buffer, size_t i_buffer, uint8_t *general,
     /* 5th & 6th are reserved 0xffff */
     /* copy the first 12 bytes of profile tier */
     memcpy(general, &p_dec_nal[6], 12);
+    free(p_dec_nal);
 }
 
 static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_idc,
                          uint8_t *bit_depth_luma_minus8, uint8_t *bit_depth_chroma_minus8)
 {
-    const size_t i_decoded_nal_size = 512;
-    uint8_t p_dec_nal[i_decoded_nal_size];
-    size_t i_size = (i_buffer < i_decoded_nal_size)?i_buffer-2:i_decoded_nal_size;
-    nal_to_rbsp(p_buffer+2, p_dec_nal, i_size);
+    if(i_buffer < 2)
+        return;
+
+    size_t i_decoded_nal_size;
+    uint8_t *p_dec_nal = hxxx_ep3b_to_rbsp(p_buffer + 2, i_buffer - 2, &i_decoded_nal_size);
+    if(!p_dec_nal)
+        return;
+
     bs_t bs;
-    bs_init(&bs, p_dec_nal, i_size);
+    bs_init(&bs, p_dec_nal, i_decoded_nal_size);
 
     /* skip vps id */
     bs_skip(&bs, 4);
@@ -556,6 +564,8 @@ static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_i
     }
     *bit_depth_luma_minus8 = bs_read_ue(&bs);
     *bit_depth_chroma_minus8 = bs_read_ue(&bs);
+
+    free(p_dec_nal);
 }
 
 static bo_t *GetHvcCTag(es_format_t *p_fmt)

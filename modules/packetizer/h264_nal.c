@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "h264_nal.h"
+#include "hxxx_nal.h"
 
 #include <vlc_boxes.h>
 #include <limits.h>
@@ -425,8 +426,7 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
         return -1;
 
     memset( p_sps, 0, sizeof(struct h264_nal_sps) );
-    CreateRbspFromNAL( &pb_dec, &i_dec, &p_sps_buf[5],
-                      i_sps_size - 5 );
+    pb_dec = hxxx_ep3b_to_rbsp( &p_sps_buf[5], i_sps_size - 5, &i_dec );
     if( !pb_dec )
         return -1;
 
