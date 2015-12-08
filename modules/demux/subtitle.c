@@ -2190,18 +2190,18 @@ static int ParseCommonVTTSBV( demux_t *p_demux, subtitle_t *p_subtitle, int i_id
         if( p_sys->i_type == SUB_TYPE_VTT )
         {
             b_matched =
-            ( sscanf( s,"%d:%d:%d.%d --> %d:%d:%d.%d",
-                        &h1, &m1, &s1, &d1,
-                        &h2, &m2, &s2, &d2 ) == 8 ||
-                sscanf( s,"%d:%d:%d.%d --> %d:%d.%d",
-                        &h1, &m1, &s1, &d1,
-                             &m2, &s2, &d2 ) == 7 ||
+            ( sscanf( s,"%d:%d.%d --> %d:%d.%d",
+                             &m1, &s1, &d1,
+                             &m2, &s2, &d2 ) == 6 ||
                 sscanf( s,"%d:%d.%d --> %d:%d:%d.%d",
                              &m1, &s1, &d1,
                         &h2, &m2, &s2, &d2 ) == 7 ||
-                sscanf( s,"%d:%d.%d --> %d:%d.%d",
-                             &m1, &s1, &d1,
-                             &m2, &s2, &d2 ) == 6 );
+                sscanf( s,"%d:%d:%d.%d --> %d:%d.%d",
+                        &h1, &m1, &s1, &d1,
+                             &m2, &s2, &d2 ) == 7 ||
+                sscanf( s,"%d:%d:%d.%d --> %d:%d:%d.%d",
+                        &h1, &m1, &s1, &d1,
+                        &h2, &m2, &s2, &d2 ) == 8 );
         }
         else if( p_sys->i_type == SUB_TYPE_SBV )
         {
