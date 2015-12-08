@@ -1183,7 +1183,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         else if( p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && !p_sys->in.b_direct )
         {
             p_header->nFilledLen = 0;
-            convert_hevc_nal_units( p_dec, p_dec->fmt_in.p_extra,
+            hevc_hvcC_to_AnnexB_NAL( p_dec, p_dec->fmt_in.p_extra,
                                     p_dec->fmt_in.i_extra,
                                     p_header->pBuffer, p_header->nAllocLen,
                                     (uint32_t*) &p_header->nFilledLen,

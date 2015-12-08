@@ -63,8 +63,8 @@ enum hevc_nal_unit_type_e
     HEVC_NAL_UNKNOWN
 };
 
-/* Parse the hvcC Metadata and convert it to annex b format */
-int convert_hevc_nal_units( decoder_t *p_dec, const uint8_t *p_buf,
+/* Converts HEVCDecoderConfigurationRecord to Annex B format */
+int hevc_hvcC_to_AnnexB_NAL( decoder_t *p_dec, const uint8_t *p_buf,
                             uint32_t i_buf_size, uint8_t *p_out_buf,
                             uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
                             uint8_t *p_nal_size);

@@ -23,7 +23,7 @@
 #include <limits.h>
 
 /* Inspired by libavcodec/hevc.c */
-int convert_hevc_nal_units(decoder_t *p_dec, const uint8_t *p_buf,
+int hevc_hvcC_to_AnnexB_NAL(decoder_t *p_dec, const uint8_t *p_buf,
                            uint32_t i_buf_size, uint8_t *p_out_buf,
                            uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
                            uint8_t *p_nal_size)
