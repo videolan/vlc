@@ -38,6 +38,7 @@
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
 #include "hevc_nal.h"
+#include "hxxx_common.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -57,10 +58,12 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static block_t *Packetize(decoder_t *, block_t **);
+static block_t *PacketizeAnnexB(decoder_t *, block_t **);
+static block_t *PacketizeHVC1(decoder_t *, block_t **);
 static void PacketizeFlush( decoder_t * );
 static void PacketizeReset(void *p_private, bool b_broken);
 static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *);
+static block_t *ParseNALBlock(decoder_t *, bool *pb_ts_used, block_t *);
 static int PacketizeValidate(void *p_private, block_t *);
 
 struct decoder_sys_t
@@ -71,6 +74,7 @@ struct decoder_sys_t
     bool     b_vcl;
     block_t *p_frame;
 
+    uint8_t  i_nal_length_size;
 };
 
 static const uint8_t p_hevc_startcode[3] = {0x00, 0x00, 0x01};
@@ -81,11 +85,12 @@ static const uint8_t p_hevc_startcode[3] = {0x00, 0x00, 0x01};
 static int Open(vlc_object_t *p_this)
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys;
 
     if (p_dec->fmt_in.i_codec != VLC_CODEC_HEVC)
         return VLC_EGENERIC;
 
-    p_dec->p_sys = calloc(1, sizeof(decoder_sys_t));
+    p_dec->p_sys = p_sys = calloc(1, sizeof(decoder_sys_t));
     if (!p_dec->p_sys)
         return VLC_ENOMEM;
 
@@ -97,12 +102,44 @@ static int Open(vlc_object_t *p_this)
     /* Copy properties */
     es_format_Copy(&p_dec->fmt_out, &p_dec->fmt_in);
 
-    /* Set callback */
-    p_dec->pf_packetize = Packetize;
+    /* Set callbacks */
+    const uint8_t *p_extra = p_dec->fmt_in.p_extra;
+    const size_t i_extra = p_dec->fmt_in.i_extra;
+    /* Check if we have hvcC as extradata */
+    if(hevc_ishvcC(p_extra, i_extra))
+    {
+        p_sys->i_nal_length_size = 1 + (p_extra[21] & 0x03);
+        p_dec->pf_packetize = PacketizeHVC1;
+
+        /* Clear hvcC/HVC1 extra, to be replaced with AnnexB */
+        free(p_dec->fmt_out.p_extra);
+        p_dec->fmt_out.i_extra = 0;
+
+        size_t i_new_extra = i_extra + 40 * (4 - p_sys->i_nal_length_size);
+        uint8_t *p_new_extra = malloc(i_new_extra);
+        if(p_new_extra)
+        {
+            uint32_t i_total = 0;
+            if( hevc_hvcC_to_AnnexB_NAL( p_dec, p_extra, i_extra,
+                                        p_new_extra, i_new_extra,
+                                        &i_total, NULL ) == VLC_SUCCESS )
+            {
+                p_dec->fmt_out.p_extra = p_new_extra;
+                p_dec->fmt_out.i_extra = i_total;
+            }
+            else
+            {
+                free(p_new_extra);
+            }
+        }
+    }
+    else
+    {
+        p_dec->pf_packetize = PacketizeAnnexB;
+    }
     p_dec->pf_flush = PacketizeFlush;
 
     return VLC_SUCCESS;
-
 }
 
 /*****************************************************************************
@@ -120,7 +157,15 @@ static void Close(vlc_object_t *p_this)
 /****************************************************************************
  * Packetize
  ****************************************************************************/
-static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
+static block_t *PacketizeHVC1(decoder_t *p_dec, block_t **pp_block)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    return PacketizeXXC1( p_dec, p_sys->i_nal_length_size,
+                          pp_block, ParseNALBlock );
+}
+
+static block_t *PacketizeAnnexB(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -149,18 +194,18 @@ static void PacketizeReset(void *p_private, bool b_broken)
     p_sys->b_vcl = false;
 }
 
-static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *p_block)
+/*****************************************************************************
+ * ParseNALBlock: parses annexB type NALs
+ * All p_frag blocks are required to start with 0 0 0 1 4-byte startcode
+ *****************************************************************************/
+static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag)
 {
-    decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     block_t * p_nal = NULL;
 
-    while (p_block->i_buffer > 5 && p_block->p_buffer[p_block->i_buffer-1] == 0x00 )
-        p_block->i_buffer--;
-
     bs_t bs;
-    bs_init(&bs, p_block->p_buffer+4, p_block->i_buffer-4);
+    bs_init(&bs, p_frag->p_buffer+4, p_frag->i_buffer-4);
 
     /* Get NALU type */
     uint32_t forbidden_zero_bit = bs_read1(&bs);
@@ -188,23 +233,34 @@ static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *p_blo
             p_sys->p_frame = NULL;
         }
 
-        block_ChainAppend(&p_sys->p_frame, p_block);
+        block_ChainAppend(&p_sys->p_frame, p_frag);
     }
     else
     {
         if (p_sys->b_vcl)
         {
             p_nal = block_ChainGather(p_sys->p_frame);
-            p_nal->p_next = p_block;
+            p_nal->p_next = p_frag;
             p_sys->p_frame = NULL;
             p_sys->b_vcl =false;
         }
         else
-            p_nal = p_block;
+            p_nal = p_frag;
     }
 
     *pb_ts_used = false;
     return p_nal;
+}
+
+static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *p_block)
+{
+    decoder_t *p_dec = p_private;
+
+    /* Remove trailing 0 bytes */
+    while (p_block->i_buffer > 5 && p_block->p_buffer[p_block->i_buffer-1] == 0x00 )
+        p_block->i_buffer--;
+
+    return ParseNALBlock( p_dec, pb_ts_used, p_block );
 }
 
 static int PacketizeValidate( void *p_private, block_t *p_au )
