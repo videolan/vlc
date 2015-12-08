@@ -22,6 +22,7 @@
  *****************************************************************************/
 #include "libmp4mux.h"
 #include "../demux/mp4/libmp4.h" /* flags */
+#include "../packetizer/hevc_nal.h"
 #include "../packetizer/h264_nal.h" /* h264_get_spspps */
 #include "../packetizer/hxxx_nal.h"
 
@@ -610,9 +611,9 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
         if (p_nal)
             p_nal->i_buffer = p_buffer - p_nal->p_buffer - ((i_buffer)?3:0);
 
-        switch (*p_buffer & 0x72) {
-            /* VPS */
-        case 0x40:
+        switch ((*p_buffer & 0x7E) >> 1) {
+
+        case HEVC_NAL_VPS:
             p_nal = &p_vps[i_vps++];
             p_nal->p_buffer = p_buffer;
             /* Only keep the general profile from the first VPS
@@ -623,8 +624,8 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
                 i_num_arrays++;
             }
             break;
-            /* SPS */
-        case 0x42: {
+
+        case HEVC_NAL_SPS: {
             struct nal * p_tmp =  realloc(p_sps, sizeof(struct nal) * (i_sps + 1));
             if (!p_tmp)
                 break;
@@ -639,8 +640,8 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
             }
             break;
             }
-        /* PPS */
-        case 0x44: {
+
+        case HEVC_NAL_PPS: {
             struct nal * p_tmp =  realloc(p_pps, sizeof(struct nal) * (i_pps + 1));
             if (!p_tmp)
                 break;
@@ -651,9 +652,9 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
                 i_num_arrays++;
             break;
             }
-        /* SEI */
-        case 0x4E:
-        case 0x50: {
+
+        case HEVC_NAL_PREF_SEI:
+        case HEVC_NAL_SUFF_SEI: {
             struct nal * p_tmp =  realloc(p_sei, sizeof(struct nal) * (i_sei + 1));
             if (!p_tmp)
                 break;
@@ -689,7 +690,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
     if (i_vps)
     {
         /* Write VPS without forcing array_completeness */
-        bo_add_8(hvcC, 32);
+        bo_add_8(hvcC, HEVC_NAL_VPS);
         bo_add_16be(hvcC, i_vps);
         for (size_t i = 0; i < i_vps; i++) {
             p_nal = &p_vps[i];
@@ -700,7 +701,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
 
     if (i_sps) {
         /* Write SPS without forcing array_completeness */
-        bo_add_8(hvcC, 33);
+        bo_add_8(hvcC, HEVC_NAL_SPS);
         bo_add_16be(hvcC, i_sps);
         for (size_t i = 0; i < i_sps; i++) {
             p_nal = &p_sps[i];
@@ -711,7 +712,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
 
     if (i_pps) {
         /* Write PPS without forcing array_completeness */
-        bo_add_8(hvcC, 34);
+        bo_add_8(hvcC, HEVC_NAL_PPS);
         bo_add_16be(hvcC, i_pps);
         for (size_t i = 0; i < i_pps; i++) {
             p_nal = &p_pps[i];
@@ -722,7 +723,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
 
     if (i_sei) {
         /* Write SEI without forcing array_completeness */
-        bo_add_8(hvcC, 39);
+        bo_add_8(hvcC, HEVC_NAL_PREF_SEI);
         bo_add_16be(hvcC, i_sei);
         for (size_t i = 0; i < i_sei; i++) {
             p_nal = &p_sei[i];
