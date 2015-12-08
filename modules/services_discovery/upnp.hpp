@@ -118,6 +118,22 @@ private:
 namespace Access
 {
 
+class Upnp_i11e_cb
+{
+public:
+    Upnp_i11e_cb( Upnp_FunPtr callback, void *cookie );
+    ~Upnp_i11e_cb();
+    void waitAndRelease( void );
+    static int run( Upnp_EventType, void *, void *);
+
+private:
+    sem_t           sem_;
+    vlc_mutex_t     lock_;
+    int             refCount_;
+    Upnp_FunPtr     callback_;
+    void*           cookie_;
+};
+
 class MediaServer
 {
 public:
@@ -135,6 +151,7 @@ private:
 
     IXML_Document* _browseAction(const char*, const char*,
             const char*, const char*, const char* );
+    static int sendActionCb( Upnp_EventType, void *, void *);
 
 private:
     char* psz_root_;
