@@ -37,6 +37,7 @@
 #include <vlc_bits.h>
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
+#include "hevc_nal.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -70,41 +71,6 @@ struct decoder_sys_t
     bool     b_vcl;
     block_t *p_frame;
 
-};
-
-/* NAL types from https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-H.265-201304-I!!PDF-E&type=items */
-enum nal_unit_type_e
-{
-    TRAIL_N    = 0,
-    TRAIL_R    = 1,
-    TSA_N      = 2,
-    TSA_R      = 3,
-    STSA_N     = 4,
-    STSA_R     = 5,
-    RADL_N     = 6,
-    RADL_R     = 7,
-    RASL_N     = 8,
-    RASL_R     = 9,
-    /* 10 to 15 reserved */
-    /* Key frames */
-    BLA_W_LP   = 16,
-    BLA_W_RADL = 17,
-    BLA_N_LP   = 18,
-    IDR_W_RADL = 19,
-    IDR_N_LP   = 20,
-    CRA        = 21,
-    /* 22 to 31 reserved */
-    /* Non VCL NAL*/
-    VPS        = 32,
-    SPS        = 33,
-    PPS        = 34,
-    AUD        = 35, /* Access unit delimiter */
-    EOS        = 36, /* End of sequence */
-    EOB        = 37, /* End of bitstream */
-    FD         = 38, /* Filler data*/
-    PREF_SEI   = 39, /* Prefix SEI */
-    SUFF_SEI   = 40, /* Suffix SEI */
-    UNKNOWN_NAL
 };
 
 static const uint8_t p_hevc_startcode[3] = {0x00, 0x00, 0x01};
@@ -209,7 +175,7 @@ static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *p_blo
     uint32_t nalu_type = bs_read(&bs,6);
     bs_skip(&bs, 9);
 
-    if (nalu_type < VPS)
+    if (nalu_type < HEVC_NAL_VPS)
     {
         /* NAL is a VCL NAL */
         p_sys->b_vcl = true;

@@ -11,7 +11,8 @@ libpacketizer_vc1_plugin_la_SOURCES = packetizer/vc1.c
 libpacketizer_mlp_plugin_la_SOURCES = packetizer/mlp.c
 libpacketizer_dirac_plugin_la_SOURCES = packetizer/dirac.c
 libpacketizer_flac_plugin_la_SOURCES = packetizer/flac.c
-libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c
+libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c \
+        packetizer/hevc_nal.h
 
 libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
 	packetizer/avparser.h \
