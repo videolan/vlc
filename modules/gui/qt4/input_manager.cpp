@@ -128,10 +128,17 @@ void InputManager::setInput( input_thread_t *_p_input )
             }
         }
 
-        // Save the latest URI to avoid asking to restore the
-        // position on the same input file.
-        lastURI = qfu( uri );
-        RecentsMRL::getInstance( p_intf )->addRecent( lastURI );
+        playlist_Lock( THEPL );
+        // Add root items only
+        playlist_item_t* p_node = playlist_CurrentPlayingItem( THEPL );
+        if ( p_node != NULL && p_node->p_parent == NULL )
+        {
+            // Save the latest URI to avoid asking to restore the
+            // position on the same input file.
+            lastURI = qfu( uri );
+            RecentsMRL::getInstance( p_intf )->addRecent( lastURI );
+        }
+        playlist_Unlock( THEPL );
         free( uri );
     }
     else
