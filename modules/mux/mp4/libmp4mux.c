@@ -592,7 +592,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
     size_t i_buffer = p_fmt->i_extra;
 
     /* Extradata is already an HEVCDecoderConfigurationRecord */
-    if(i_buffer > 16 && p_buffer[0] == 0x01)
+    if(hevc_ishvcC(p_buffer, i_buffer))
     {
         (void) bo_add_mem(hvcC, i_buffer, p_buffer);
         return hvcC;
