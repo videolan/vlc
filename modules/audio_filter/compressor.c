@@ -182,7 +182,7 @@ vlc_module_begin()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
-    add_float( "compressor-rms-peak", 0.0, RMS_PEAK_TEXT,
+    add_float( "compressor-rms-peak", 0.2, RMS_PEAK_TEXT,
                RMS_PEAK_LONGTEXT, false )
     add_float( "compressor-attack", 25.0, ATTACK_TEXT,
                ATTACK_LONGTEXT, false )
@@ -190,9 +190,9 @@ vlc_module_begin()
                RELEASE_LONGTEXT, false )
     add_float( "compressor-threshold", -11.0, THRESHOLD_TEXT,
                THRESHOLD_LONGTEXT, false )
-    add_float( "compressor-ratio", 8.0, RATIO_TEXT,
+    add_float( "compressor-ratio", 4.0, RATIO_TEXT,
                RATIO_LONGTEXT, false )
-    add_float( "compressor-knee", 2.5, KNEE_TEXT,
+    add_float( "compressor-knee", 5.0, KNEE_TEXT,
                KNEE_LONGTEXT, false )
     add_float( "compressor-makeup-gain", 7.0, MAKEUP_GAIN_TEXT,
                MAKEUP_GAIN_LONGTEXT, false )
