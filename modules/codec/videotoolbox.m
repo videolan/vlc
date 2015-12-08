@@ -363,7 +363,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             return VLC_EGENERIC;
         }
 
-        struct nal_sps sps_data;
+        struct h264_nal_sps sps_data;
         i_ret = h264_parse_sps(p_sps_buf,
                                i_sps_size,
                                &sps_data);
@@ -833,7 +833,7 @@ static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
                             &i_pps_size);
 
     if (i_ret == VLC_SUCCESS) {
-        struct nal_sps sps_data;
+        struct h264_nal_sps sps_data;
         i_ret = h264_parse_sps(p_sps_buf,
                                i_sps_size,
                                &sps_data);
