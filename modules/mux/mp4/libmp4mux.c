@@ -591,6 +591,13 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
     uint8_t * p_buffer = p_fmt->p_extra;
     size_t i_buffer = p_fmt->i_extra;
 
+    /* Extradata is already an HEVCDecoderConfigurationRecord */
+    if(i_buffer > 16 && p_buffer[0] == 0x01)
+    {
+        (void) bo_add_mem(hvcC, i_buffer, p_buffer);
+        return hvcC;
+    }
+
     uint8_t general_configuration[12] = {0};
     uint8_t i_numTemporalLayer = 0;
     uint8_t i_chroma_idc = 1;
