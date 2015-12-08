@@ -6,7 +6,8 @@ libpacketizer_mpeg4video_plugin_la_SOURCES = packetizer/mpeg4video.c
 libpacketizer_mpeg4audio_plugin_la_SOURCES = packetizer/mpeg4audio.c
 libpacketizer_h264_plugin_la_SOURCES = \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
-	packetizer/h264.c packetizer/hxxx_nal.h
+	packetizer/h264.c packetizer/hxxx_nal.h \
+        packetizer/hxxx_common.c packetizer/hxxx_common.h
 libpacketizer_vc1_plugin_la_SOURCES = packetizer/vc1.c
 libpacketizer_mlp_plugin_la_SOURCES = packetizer/mlp.c
 libpacketizer_dirac_plugin_la_SOURCES = packetizer/dirac.c

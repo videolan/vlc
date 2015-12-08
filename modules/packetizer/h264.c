@@ -43,6 +43,7 @@
 #include "../codec/cc.h"
 #include "h264_nal.h"
 #include "hxxx_nal.h"
+#include "hxxx_common.h"
 #include "packetizer_helper.h"
 
 /*****************************************************************************
@@ -157,7 +158,6 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
 static int PacketizeValidate( void *p_private, block_t * );
 
 static block_t *ParseNALBlock( decoder_t *, bool *pb_ts_used, block_t * );
-static block_t *CreateAnnexbNAL( decoder_t *, const uint8_t *p, int );
 
 static block_t *OutputPicture( decoder_t *p_dec );
 static void PutSPS( decoder_t *p_dec, block_t *p_frag );
@@ -262,7 +262,7 @@ static int Open( vlc_object_t *p_this )
             {
                 return VLC_EGENERIC;
             }
-            block_t *p_sps = CreateAnnexbNAL( p_dec, p, i_length );
+            block_t *p_sps = CreateAnnexbNAL( p, i_length );
             if( !p_sps )
                 return VLC_EGENERIC;
             ParseNALBlock( p_dec, &b_dummy, p_sps );
@@ -278,7 +278,7 @@ static int Open( vlc_object_t *p_this )
             {
                 return VLC_EGENERIC;
             }
-            block_t *p_pps = CreateAnnexbNAL( p_dec, p, i_length );
+            block_t *p_pps = CreateAnnexbNAL( p, i_length );
             if( !p_pps )
                 return VLC_EGENERIC;
             ParseNALBlock( p_dec, &b_dummy, p_pps );
@@ -423,57 +423,9 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_block;
-    block_t       *p_ret = NULL;
-    uint8_t       *p;
 
-    if( !pp_block || !*pp_block )
-        return NULL;
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_CORRUPTED) )
-    {
-        block_Release( *pp_block );
-        return NULL;
-    }
-
-    p_block = *pp_block;
-    *pp_block = NULL;
-
-    for( p = p_block->p_buffer; p < &p_block->p_buffer[p_block->i_buffer]; )
-    {
-        block_t *p_pic;
-        bool b_dummy;
-        int i_size = 0;
-        int i;
-
-        for( i = 0; i < p_sys->i_avcC_length_size; i++ )
-        {
-            i_size = (i_size << 8) | (*p++);
-        }
-
-        if( i_size <= 0 ||
-            i_size > ( p_block->p_buffer + p_block->i_buffer - p ) )
-        {
-            msg_Err( p_dec, "Broken frame : size %d is too big", i_size );
-            break;
-        }
-
-        block_t *p_part = CreateAnnexbNAL( p_dec, p, i_size );
-        if( !p_part )
-            break;
-
-        p_part->i_dts = p_block->i_dts;
-        p_part->i_pts = p_block->i_pts;
-
-        /* Parse the NAL */
-        if( ( p_pic = ParseNALBlock( p_dec, &b_dummy, p_part ) ) )
-        {
-            block_ChainAppend( &p_ret, p_pic );
-        }
-        p += i_size;
-    }
-    block_Release( p_block );
-
-    return p_ret;
+    return PacketizeXXC1( p_dec, p_sys->i_avcC_length_size,
+                          pp_block, ParseNALBlock );
 }
 
 /*****************************************************************************
@@ -541,26 +493,6 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
     VLC_UNUSED(p_private);
     VLC_UNUSED(p_au);
     return VLC_SUCCESS;
-}
-
-static block_t *CreateAnnexbNAL( decoder_t *p_dec, const uint8_t *p, int i_size )
-{
-    block_t *p_nal;
-
-    p_nal = block_Alloc( 4 + i_size );
-    if( !p_nal ) return NULL;
-
-    /* Add start code */
-    p_nal->p_buffer[0] = 0x00;
-    p_nal->p_buffer[1] = 0x00;
-    p_nal->p_buffer[2] = 0x00;
-    p_nal->p_buffer[3] = 0x01;
-
-    /* Copy nalu */
-    memcpy( &p_nal->p_buffer[4], p, i_size );
-
-    VLC_UNUSED(p_dec);
-    return p_nal;
 }
 
 /*****************************************************************************
