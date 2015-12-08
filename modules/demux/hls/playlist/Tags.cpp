@@ -45,7 +45,7 @@ uint64_t Attribute::decimal() const
 double Attribute::floatingPoint() const
 {
     std::istringstream is(value);
-    is.imbue(std::locale(""));
+    is.imbue(std::locale("C"));
     double ret;
     is >> ret;
     return ret;
