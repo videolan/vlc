@@ -9,3 +9,12 @@ CLEANFILES = dummy.c
 dummy.c:
 	$(AM_V_at)rm -f dummy.c
 	$(AM_V_GEN)echo '/* Automatically generated */' > dummy.c
+
+
+check_PROGRAMS = \
+	test_strnstr
+
+TESTS = $(check_PROGRAMS)
+
+test_strnstr_SOURCES = test/strnstr.c
+test_strnstr_LDADD = libcompat.la
