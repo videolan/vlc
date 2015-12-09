@@ -127,7 +127,7 @@ public:
     static int run( Upnp_EventType, void *, void *);
 
 private:
-    sem_t           sem_;
+    vlc_sem_t       sem_;
     vlc_mutex_t     lock_;
     int             refCount_;
     Upnp_FunPtr     callback_;
