@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_codecs.h>
+#include <vlc_codec.h>
 
 #define COBJMACROS
 
