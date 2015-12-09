@@ -34,7 +34,6 @@
 #include <vlc_codec.h>
 #include <vlc_block.h>
 
-#include <vlc_bits.h>
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
 #include "hevc_nal.h"
@@ -192,35 +191,37 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
 
     block_t * p_nal = NULL;
 
-    bs_t bs;
-    bs_init(&bs, p_frag->p_buffer+4, p_frag->i_buffer-4);
-
-    /* Get NALU type */
-    uint32_t forbidden_zero_bit = bs_read1(&bs);
-
-    if (forbidden_zero_bit)
+    if(unlikely(p_frag->i_buffer < 5))
     {
-        msg_Err(p_dec,"Forbidden zero bit not null, corrupted NAL");
+        msg_Warn(p_dec,"NAL too small");
+        block_Release(p_frag);
+        return NULL;
+    }
+
+    if(p_frag->p_buffer[4] & 0x80)
+    {
+        msg_Warn(p_dec,"Forbidden zero bit not null, corrupted NAL");
         p_sys->p_frame = NULL;
         p_sys->b_vcl = false;
         return NULL;
     }
-    uint32_t nalu_type = bs_read(&bs,6);
-    bs_skip(&bs, 9);
 
+    /* Get NALU type */
+    uint8_t nalu_type = ((p_frag->p_buffer[4] & 0x7E) >> 1);
     if (nalu_type < HEVC_NAL_VPS)
     {
         /* NAL is a VCL NAL */
         p_sys->b_vcl = true;
 
-        uint32_t first_slice_in_pic = bs_read1(&bs);
-
-        if (first_slice_in_pic && p_sys->p_frame)
+        if(likely(p_frag->i_buffer > 6))
         {
-            p_nal = block_ChainGather(p_sys->p_frame);
-            p_sys->p_frame = NULL;
+            bool first_slice_in_pic = p_frag->p_buffer[6] & 0x80;
+            if (first_slice_in_pic && p_sys->p_frame)
+            {
+                p_nal = block_ChainGather(p_sys->p_frame);
+                p_sys->p_frame = NULL;
+            }
         }
-
         block_ChainAppend(&p_sys->p_frame, p_frag);
     }
     else
