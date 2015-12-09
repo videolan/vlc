@@ -41,30 +41,28 @@ enum hevc_general_profile_idc_e
     HEVC_PROFILE_REXT               = 4, /* range extensions */
 };
 
-enum hevc_format_range_extension_profile_e
-{
-    /* Values built from 9 bits mapping of the A-2 bitstream indications for conformance */
-    HEVC_EXT_PROFILE_MONOCHROME                 = 0b111111001,
-    HEVC_EXT_PROFILE_MONOCHROME_12              = 0b100111001,
-    HEVC_EXT_PROFILE_MONOCHROME_16              = 0b000111001,
-    HEVC_EXT_PROFILE_MAIN_12                    = 0b100110001,
-    HEVC_EXT_PROFILE_MAIN_422_10                = 0b110100001,
-    HEVC_EXT_PROFILE_MAIN_422_12                = 0b100100001,
-    HEVC_EXT_PROFILE_MAIN_444                   = 0b111000001,
-    HEVC_EXT_PROFILE_MAIN_444_10                = 0b110000001,
-    HEVC_EXT_PROFILE_MAIN_444_12                = 0b100000001,
-    HEVC_EXT_PROFILE_MAIN_INTRA                 = 0b111110100, /* From this one, lowest bit is insignifiant */
-    HEVC_EXT_PROFILE_MAIN_10_INTRA              = 0b110110100,
-    HEVC_EXT_PROFILE_MAIN_12_INTRA              = 0b100110100,
-    HEVC_EXT_PROFILE_MAIN_422_10_INTRA          = 0b110100100,
-    HEVC_EXT_PROFILE_MAIN_422_12_INTRA          = 0b100100100,
-    HEVC_EXT_PROFILE_MAIN_444_INTRA             = 0b111000100,
-    HEVC_EXT_PROFILE_MAIN_444_10_INTRA          = 0b110000100,
-    HEVC_EXT_PROFILE_MAIN_444_12_INTRA          = 0b100000100,
-    HEVC_EXT_PROFILE_MAIN_444_16_INTRA          = 0b000000100,
-    HEVC_EXT_PROFILE_MAIN_444_STILL_PICTURE     = 0b111000110,
-    HEVC_EXT_PROFILE_MAIN_444_16_STILL_PICTURE  = 0b000000110,
-};
+
+/* Values built from 9 bits mapping of the A-2 bitstream indications for conformance */
+#define HEVC_EXT_PROFILE_MONOCHROME                 0x1F9
+#define HEVC_EXT_PROFILE_MONOCHROME_12              0x139
+#define HEVC_EXT_PROFILE_MONOCHROME_16              0x039
+#define HEVC_EXT_PROFILE_MAIN_12                    0x131
+#define HEVC_EXT_PROFILE_MAIN_422_10                0x1A1
+#define HEVC_EXT_PROFILE_MAIN_422_12                0x121
+#define HEVC_EXT_PROFILE_MAIN_444                   0x1C1
+#define HEVC_EXT_PROFILE_MAIN_444_10                0x181
+#define HEVC_EXT_PROFILE_MAIN_444_12                0x101
+#define HEVC_EXT_PROFILE_MAIN_INTRA                 0x1F4 /* From this one, lowest bit is insignifiant */
+#define HEVC_EXT_PROFILE_MAIN_10_INTRA              0x1B4
+#define HEVC_EXT_PROFILE_MAIN_12_INTRA              0x134
+#define HEVC_EXT_PROFILE_MAIN_422_10_INTRA          0x1A4
+#define HEVC_EXT_PROFILE_MAIN_422_12_INTRA          0x124
+#define HEVC_EXT_PROFILE_MAIN_444_INTRA             0x1C4
+#define HEVC_EXT_PROFILE_MAIN_444_10_INTRA          0x184
+#define HEVC_EXT_PROFILE_MAIN_444_12_INTRA          0x104
+#define HEVC_EXT_PROFILE_MAIN_444_16_INTRA          0x004
+#define HEVC_EXT_PROFILE_MAIN_444_STILL_PICTURE     0x1C6
+#define HEVC_EXT_PROFILE_MAIN_444_16_STILL_PICTURE  0x006
 
 /* NAL types from https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-H.265-201304-I!!PDF-E&type=items */
 enum hevc_nal_unit_type_e
