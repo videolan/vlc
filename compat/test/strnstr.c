@@ -23,14 +23,13 @@
 #include "config.h"
 
 #include <stdbool.h>
+#undef NDEBUG
 #include <assert.h>
 #include <string.h>
 
 const char* haystack = "Lorem ipsum dolor sit amet";
 
-void test( const char* haystack, const char* needle, size_t len, bool res );
-
-void test( const char* haystack, const char* needle, size_t len, bool res )
+static void test( const char* haystack, const char* needle, size_t len, bool res )
 {
     if ( len == 0 )
         len = strlen( haystack );
