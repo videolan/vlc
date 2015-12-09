@@ -198,6 +198,11 @@ struct tm *gmtime_r (const time_t *, struct tm *);
 struct tm *localtime_r (const time_t *, struct tm *);
 #endif
 
+#ifndef HAVE_TIMESPEC_GET
+#define TIME_UTC 1
+int timespec_get(struct timespec *, int);
+#endif
+
 /* unistd.h */
 #ifndef HAVE_GETPID
 pid_t getpid (void) VLC_NOTHROW;
