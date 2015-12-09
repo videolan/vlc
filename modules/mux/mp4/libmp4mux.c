@@ -581,12 +581,10 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
         uint8_t * p_buffer;
     };
 
-    /* According to the specification HEVC stream can have
-     * 16 vps id and an "unlimited" number of sps and pps id using ue(v) id*/
-    struct nal p_vps[16], *p_sps = NULL, *p_pps = NULL, *p_sei = NULL,
-               *p_nal = NULL;
-    size_t i_vps = 0, i_sps = 0, i_pps = 0, i_sei = 0;
-    uint8_t i_num_arrays = 0;
+    struct nal rg_vps[HEVC_VPS_MAX], rg_sps[HEVC_SPS_MAX],
+               rg_pps[HEVC_VPS_MAX], *p_sei = NULL, *p_nal = NULL;
+    uint8_t i_vps = 0, i_sps = 0, i_pps = 0, i_num_arrays = 0;
+    size_t i_sei = 0;
 
     uint8_t * p_buffer = p_fmt->p_extra;
     size_t i_buffer = p_fmt->i_extra;
@@ -621,7 +619,9 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
         switch ((*p_buffer & 0x7E) >> 1) {
 
         case HEVC_NAL_VPS:
-            p_nal = &p_vps[i_vps++];
+            if(i_vps == HEVC_VPS_MAX)
+                break;
+            p_nal = &rg_vps[i_vps++];
             p_nal->p_buffer = p_buffer;
             /* Only keep the general profile from the first VPS
              * if there are several (this shouldn't happen so soon) */
@@ -633,11 +633,9 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
             break;
 
         case HEVC_NAL_SPS: {
-            struct nal * p_tmp =  realloc(p_sps, sizeof(struct nal) * (i_sps + 1));
-            if (!p_tmp)
+            if(i_sps == HEVC_SPS_MAX)
                 break;
-            p_sps = p_tmp;
-            p_nal = &p_sps[i_sps++];
+            p_nal = &rg_sps[i_sps++];
             p_nal->p_buffer = p_buffer;
             if (i_sps == 1 && i_buffer > 15) {
                 /* Get Chroma_idc and bitdepths */
@@ -649,11 +647,9 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
             }
 
         case HEVC_NAL_PPS: {
-            struct nal * p_tmp =  realloc(p_pps, sizeof(struct nal) * (i_pps + 1));
-            if (!p_tmp)
+            if(i_pps == HEVC_PPS_MAX)
                 break;
-            p_pps = p_tmp;
-            p_nal = &p_pps[i_pps++];
+            p_nal = &rg_pps[i_pps++];
             p_nal->p_buffer = p_buffer;
             if (i_pps == 1)
                 i_num_arrays++;
@@ -699,8 +695,8 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
         /* Write VPS without forcing array_completeness */
         bo_add_8(hvcC, HEVC_NAL_VPS);
         bo_add_16be(hvcC, i_vps);
-        for (size_t i = 0; i < i_vps; i++) {
-            p_nal = &p_vps[i];
+        for (uint8_t i = 0; i < i_vps; i++) {
+            p_nal = &rg_vps[i];
             bo_add_16be(hvcC, p_nal->i_buffer);
             bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
         }
@@ -710,8 +706,8 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
         /* Write SPS without forcing array_completeness */
         bo_add_8(hvcC, HEVC_NAL_SPS);
         bo_add_16be(hvcC, i_sps);
-        for (size_t i = 0; i < i_sps; i++) {
-            p_nal = &p_sps[i];
+        for (uint8_t i = 0; i < i_sps; i++) {
+            p_nal = &rg_sps[i];
             bo_add_16be(hvcC, p_nal->i_buffer);
             bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
         }
@@ -721,8 +717,8 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
         /* Write PPS without forcing array_completeness */
         bo_add_8(hvcC, HEVC_NAL_PPS);
         bo_add_16be(hvcC, i_pps);
-        for (size_t i = 0; i < i_pps; i++) {
-            p_nal = &p_pps[i];
+        for (uint8_t i = 0; i < i_pps; i++) {
+            p_nal = &rg_pps[i];
             bo_add_16be(hvcC, p_nal->i_buffer);
             bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
         }

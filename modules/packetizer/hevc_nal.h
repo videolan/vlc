@@ -28,6 +28,10 @@
 # include <vlc_common.h>
 # include <vlc_codec.h>
 
+#define HEVC_VPS_MAX 16
+#define HEVC_SPS_MAX 16
+#define HEVC_PPS_MAX 64
+
 /* NAL types from https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-H.265-201304-I!!PDF-E&type=items */
 enum hevc_nal_unit_type_e
 {
