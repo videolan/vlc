@@ -19,89 +19,85 @@
  *****************************************************************************/
 
 #include "hevc_nal.h"
+#include "hxxx_nal.h"
 
 #include <limits.h>
 
-/* Inspired by libavcodec/hevc.c */
-int hevc_hvcC_to_AnnexB_NAL(decoder_t *p_dec, const uint8_t *p_buf,
-                           uint32_t i_buf_size, uint8_t *p_out_buf,
-                           uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
-                           uint8_t *p_nal_size)
+/* Computes size and does check the whole struct integrity */
+static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
 {
-    int i, num_arrays;
-    const uint8_t *p_end = p_buf + i_buf_size;
-    uint32_t i_sps_pps_size = 0;
+    size_t i_total = 0;
 
-    if( i_buf_size <= 3 || ( !p_buf[0] && !p_buf[1] && p_buf[2] <= 1 ) )
-        return VLC_EGENERIC;
+    if( i_buf < HEVC_MIN_HVCC_SIZE )
+        return 0;
 
-    if( p_end - p_buf < 23 )
+    const uint8_t i_nal_length_size = (p_buf[21] & 0x03) + 1;
+    if(i_nal_length_size == 3)
+        return 0;
+
+    const uint8_t i_num_array = p_buf[22];
+    p_buf += 23; i_buf -= 23;
+
+    for( uint8_t i = 0; i < i_num_array; i++ )
     {
-        msg_Err( p_dec, "Input Metadata too small" );
-        return VLC_ENOMEM;
-    }
+        if(i_buf < 3)
+            return 0;
 
-    p_buf += 21;
+        const uint16_t i_num_nalu = p_buf[1] << 8 | p_buf[2];
+        p_buf += 3; i_buf -= 3;
 
-    if( p_nal_size )
-        *p_nal_size = (*p_buf & 0x03) + 1;
-    p_buf++;
-
-    num_arrays = *p_buf++;
-
-    for( i = 0; i < num_arrays; i++ )
-    {
-        int type, cnt, j;
-
-        if( p_end - p_buf < 3 )
+        for( uint16_t j = 0; j < i_num_nalu; j++ )
         {
-            msg_Err( p_dec, "Input Metadata too small" );
-            return VLC_ENOMEM;
-        }
-        type = *(p_buf++) & 0x3f;
-        VLC_UNUSED(type);
+            if(i_buf < 2)
+                return 0;
 
-        cnt = p_buf[0] << 8 | p_buf[1];
-        p_buf += 2;
+            const uint16_t i_nalu_length = p_buf[0] << 8 | p_buf[1];
+            if(i_buf < i_nalu_length)
+                return 0;
 
-        for( j = 0; j < cnt; j++ )
-        {
-            int i_nal_size;
-
-            if( p_end - p_buf < 2 )
-            {
-                msg_Err( p_dec, "Input Metadata too small" );
-                return VLC_ENOMEM;
-            }
-            
-            i_nal_size = p_buf[0] << 8 | p_buf[1];
-            p_buf += 2;
-
-            if( i_nal_size < 0 || p_end - p_buf < i_nal_size )
-            {
-                msg_Err( p_dec, "NAL unit size does not match Input Metadata size" );
-                return VLC_ENOMEM;
-            }
-
-            if( i_sps_pps_size + 4 + i_nal_size > i_out_buf_size )
-            {
-                msg_Err( p_dec, "Output buffer too small" );
-                return VLC_ENOMEM;
-            }
-
-            p_out_buf[i_sps_pps_size++] = 0;
-            p_out_buf[i_sps_pps_size++] = 0;
-            p_out_buf[i_sps_pps_size++] = 0;
-            p_out_buf[i_sps_pps_size++] = 1;
-
-            memcpy(p_out_buf + i_sps_pps_size, p_buf, i_nal_size);
-            p_buf += i_nal_size;
-
-            i_sps_pps_size += i_nal_size;
+            i_total += i_nalu_length + i_nal_length_size;
+            p_buf += i_nalu_length + 2;
+            i_buf -= i_nalu_length + 2;
         }
     }
 
-    *p_sps_pps_size = i_sps_pps_size;
+    return i_total;
+}
 
-    return VLC_SUCCESS;
+uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
+                                   size_t *pi_result, uint8_t *pi_nal_length_size )
+{
+    *pi_result = get_hvcC_to_AnnexB_NAL_size( p_buf, i_buf ); /* Does all checks */
+    if( *pi_result == 0 )
+        return NULL;
+
+    if( pi_nal_length_size )
+        *pi_nal_length_size = (p_buf[21] & 0x03) + 1;
+
+    uint8_t *p_ret;
+    uint8_t *p_out_buf = p_ret = malloc( *pi_result );
+    if( !p_out_buf )
+        return NULL;
+
+    const uint8_t i_num_array = p_buf[22];
+    p_buf += 23;
+
+    for( uint8_t i = 0; i < i_num_array; i++ )
+    {
+        const uint16_t i_num_nalu = p_buf[1] << 8 | p_buf[2];
+        p_buf += 3;
+
+        for( uint16_t j = 0; j < i_num_nalu; j++ )
+        {
+            const uint16_t i_nalu_length = p_buf[0] << 8 | p_buf[1];
+
+            memcpy( p_out_buf, annexb_startcode4, 4 );
+            memcpy( &p_out_buf[4], &p_buf[2], i_nalu_length );
+
+            p_out_buf += 4 + i_nalu_length;
+            p_buf += 2 + i_nalu_length;
+        }
+    }
+
+    return p_ret;
 }

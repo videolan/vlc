@@ -317,29 +317,20 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
             else
                 H264SetCSD(p_dec, p_extra, i_extra, NULL);
         }
-        else
+        else  /* FIXME and refactor: CSDDup vs CSDless SetCSD */
         {
-            int buf_size = i_extra + 20;
-            uint32_t size = i_extra;
-            void *p_buf = malloc(buf_size);
-            if (!p_buf)
-            {
-                msg_Warn(p_dec, "extra buffer allocation failed");
-                return VLC_EGENERIC;
-            }
-
-            if ( hevc_ishvcC(p_extra, i_extra) &&
-                    hevc_hvcC_to_AnnexB_NAL(p_dec, p_extra, i_extra,
-                                       p_buf, buf_size, &size,
-                                       &p_sys->u.video.i_nal_length_size) == VLC_SUCCESS)
+            if (hevc_ishvcC(p_extra, i_extra))
             {
                 struct csd csd;
-
-                csd.p_buf = p_buf;
-                csd.i_size = size;
-                CSDDup(p_dec, &csd, 1);
+                csd.p_buf = hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra, &csd.i_size,
+                                                    &p_sys->u.video.i_nal_length_size);
+                if(csd.p_buf)
+                {
+                    CSDDup(p_dec, &csd, 1);
+                    free(csd.p_buf);
+                }
             }
-            free(p_buf);
+            /* FIXME: what to do with AnnexB ? */
         }
     }
     return VLC_SUCCESS;

@@ -1184,12 +1184,11 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         }
         else if( p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && !p_sys->in.b_direct )
         {
-            p_header->nFilledLen = 0;
-            hevc_hvcC_to_AnnexB_NAL( p_dec, p_dec->fmt_in.p_extra,
-                                    p_dec->fmt_in.i_extra,
-                                    p_header->pBuffer, p_header->nAllocLen,
-                                    (uint32_t*) &p_header->nFilledLen,
-                                    &p_sys->i_nal_size_length );
+            size_t i_filled_len = 0;
+            p_header->pBuffer = hevc_hvcC_to_AnnexB_NAL(
+                        p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
+                        &i_filled_len, &p_sys->i_nal_size_length );
+            p_header->nFilledLen = i_filled_len;
         }
         else if(p_sys->in.b_direct)
         {

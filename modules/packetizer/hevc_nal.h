@@ -99,7 +99,7 @@ enum hevc_nal_unit_type_e
     HEVC_NAL_UNKNOWN
 };
 
-#define HEVC_MIN_HVCC_SIZE 22
+#define HEVC_MIN_HVCC_SIZE 23
 
 /* checks if data is an HEVCDecoderConfigurationRecord */
 static inline bool hevc_ishvcC( const uint8_t *p_buf, size_t i_buf )
@@ -116,10 +116,8 @@ static inline bool hevc_ishvcC( const uint8_t *p_buf, size_t i_buf )
 }
 
 /* Converts HEVCDecoderConfigurationRecord to Annex B format */
-int hevc_hvcC_to_AnnexB_NAL( decoder_t *p_dec, const uint8_t *p_buf,
-                            uint32_t i_buf_size, uint8_t *p_out_buf,
-                            uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
-                            uint8_t *p_nal_size);
+uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
+                                   size_t *pi_res, uint8_t *pi_nal_length_size );
 
 
 #endif /* HEVC_NAL_H */

@@ -108,30 +108,18 @@ static int Open(vlc_object_t *p_this)
     /* Check if we have hvcC as extradata */
     if(hevc_ishvcC(p_extra, i_extra))
     {
-        p_sys->i_nal_length_size = 1 + (p_extra[21] & 0x03);
         p_dec->pf_packetize = PacketizeHVC1;
 
         /* Clear hvcC/HVC1 extra, to be replaced with AnnexB */
         free(p_dec->fmt_out.p_extra);
         p_dec->fmt_out.i_extra = 0;
 
-        size_t i_new_extra = i_extra + 40 * (4 - p_sys->i_nal_length_size);
-        uint8_t *p_new_extra = malloc(i_new_extra);
-        if(p_new_extra)
-        {
-            uint32_t i_total = 0;
-            if( hevc_hvcC_to_AnnexB_NAL( p_dec, p_extra, i_extra,
-                                        p_new_extra, i_new_extra,
-                                        &i_total, NULL ) == VLC_SUCCESS )
-            {
-                p_dec->fmt_out.p_extra = p_new_extra;
-                p_dec->fmt_out.i_extra = i_total;
-            }
-            else
-            {
-                free(p_new_extra);
-            }
-        }
+        size_t i_new_extra = 0;
+        p_dec->fmt_out.p_extra =
+                hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra,
+                                        &i_new_extra, &p_sys->i_nal_length_size);
+        if(p_dec->fmt_out.p_extra)
+            p_dec->fmt_out.i_extra = i_new_extra;
     }
     else
     {
