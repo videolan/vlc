@@ -5,6 +5,7 @@ libcompat_la_LDFLAGS = -no-undefined -static
 
 BUILT_SOURCES = dummy.c
 CLEANFILES = dummy.c
+AUTOMAKE_OPTIONS = subdir-objects
 
 dummy.c:
 	$(AM_V_at)rm -f dummy.c
