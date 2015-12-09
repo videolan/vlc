@@ -32,6 +32,40 @@
 #define HEVC_SPS_MAX 16
 #define HEVC_PPS_MAX 64
 
+enum hevc_general_profile_idc_e
+{
+    HEVC_PROFILE_NONE               = 0,
+    HEVC_PROFILE_MAIN               = 1,
+    HEVC_PROFILE_MAIN_10            = 2,
+    HEVC_PROFILE_MAIN_STILL_PICTURE = 3,
+    HEVC_PROFILE_REXT               = 4, /* range extensions */
+};
+
+enum hevc_format_range_extension_profile_e
+{
+    /* Values built from 9 bits mapping of the A-2 bitstream indications for conformance */
+    HEVC_EXT_PROFILE_MONOCHROME                 = 0b111111001,
+    HEVC_EXT_PROFILE_MONOCHROME_12              = 0b100111001,
+    HEVC_EXT_PROFILE_MONOCHROME_16              = 0b000111001,
+    HEVC_EXT_PROFILE_MAIN_12                    = 0b100110001,
+    HEVC_EXT_PROFILE_MAIN_422_10                = 0b110100001,
+    HEVC_EXT_PROFILE_MAIN_422_12                = 0b100100001,
+    HEVC_EXT_PROFILE_MAIN_444                   = 0b111000001,
+    HEVC_EXT_PROFILE_MAIN_444_10                = 0b110000001,
+    HEVC_EXT_PROFILE_MAIN_444_12                = 0b100000001,
+    HEVC_EXT_PROFILE_MAIN_INTRA                 = 0b111110100, /* From this one, lowest bit is insignifiant */
+    HEVC_EXT_PROFILE_MAIN_10_INTRA              = 0b110110100,
+    HEVC_EXT_PROFILE_MAIN_12_INTRA              = 0b100110100,
+    HEVC_EXT_PROFILE_MAIN_422_10_INTRA          = 0b110100100,
+    HEVC_EXT_PROFILE_MAIN_422_12_INTRA          = 0b100100100,
+    HEVC_EXT_PROFILE_MAIN_444_INTRA             = 0b111000100,
+    HEVC_EXT_PROFILE_MAIN_444_10_INTRA          = 0b110000100,
+    HEVC_EXT_PROFILE_MAIN_444_12_INTRA          = 0b100000100,
+    HEVC_EXT_PROFILE_MAIN_444_16_INTRA          = 0b000000100,
+    HEVC_EXT_PROFILE_MAIN_444_STILL_PICTURE     = 0b111000110,
+    HEVC_EXT_PROFILE_MAIN_444_16_STILL_PICTURE  = 0b000000110,
+};
+
 /* NAL types from https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-H.265-201304-I!!PDF-E&type=items */
 enum hevc_nal_unit_type_e
 {
