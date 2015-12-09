@@ -40,7 +40,7 @@ char * strnstr (const char *haystack, const char *needle, size_t len)
 
     do
     {
-      if( memcmp(haystack, needle, i) )
+      if( memcmp(haystack, needle, i) == 0 )
         return (char*) haystack;
       haystack++;
     }
