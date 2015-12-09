@@ -26,7 +26,6 @@
 # endif
 
 # include <vlc_common.h>
-# include <vlc_codec.h>
 
 # include "../demux/mpeg/mpeg_parser_helpers.h"
 

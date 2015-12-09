@@ -26,7 +26,6 @@
 # endif
 
 # include <vlc_common.h>
-# include <vlc_codec.h>
 
 #define HEVC_VPS_MAX 16
 #define HEVC_SPS_MAX 16
