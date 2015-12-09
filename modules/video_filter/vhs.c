@@ -37,10 +37,6 @@
 
 #include "filter_picture.h"
 
-#ifndef TIME_UNIT_PER_S
-#   define TIME_UNIT_PER_S ( ((int64_t) 1) << 32 )
-#endif
-
 static inline int64_t MOD(int64_t a, int64_t b) {
     return ( ( a % b ) + b ) % b; }
 
@@ -50,7 +46,7 @@ typedef struct {
     int32_t  i_offset;
     uint16_t i_intensity;
     bool     b_blue_red;
-    uint64_t i_stop_trigger;
+    mtime_t  i_stop_trigger;
 } blue_red_line_t;
 
 struct filter_sys_t {
@@ -61,9 +57,9 @@ struct filter_sys_t {
     int32_t *i_height; /* note: each plane may have different dimensions */
     int32_t *i_width;
     int32_t *i_visible_pitch;
-    uint64_t i_start_time;
-    uint64_t i_last_time;
-    uint64_t i_cur_time;
+    mtime_t  i_start_time;
+    mtime_t  i_last_time;
+    mtime_t  i_cur_time;
 
     /* sliding & offset effect */
     int32_t  i_phase_speed;
@@ -71,13 +67,13 @@ struct filter_sys_t {
     int32_t  i_offset_ofs;
     int32_t  i_sliding_ofs;
     int32_t  i_sliding_speed;
-    uint64_t i_offset_trigger;
-    uint64_t i_sliding_trigger;
-    uint64_t i_sliding_stop_trig;
+    mtime_t  i_offset_trigger;
+    mtime_t  i_sliding_trigger;
+    mtime_t  i_sliding_stop_trig;
     bool     i_sliding_type_duplicate;
 
     /* blue red lines effect */
-    uint64_t i_BR_line_trigger;
+    mtime_t  i_BR_line_trigger;
     blue_red_line_t *p_BR_lines[MAX_BLUE_RED_LINES];
 
 };
@@ -147,7 +143,7 @@ static int Open( vlc_object_t *p_this )
 
     /* init data */
     p_filter->pf_video_filter = Filter;
-    p_sys->i_start_time = p_sys->i_cur_time = p_sys->i_last_time = NTPtime64();
+    p_sys->i_start_time = p_sys->i_cur_time = p_sys->i_last_time = mdate();
 
     return VLC_SUCCESS;
 }
@@ -183,7 +179,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
     * manage time
     */
     p_sys->i_last_time = p_sys->i_cur_time;
-    p_sys->i_cur_time = NTPtime64();
+    p_sys->i_cur_time = mdate();
 
    /*
     * allocate data
@@ -265,8 +261,8 @@ static void vhs_free_allocated_data( filter_t *p_filter ) {
 static int vhs_blue_red_line_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-#define BR_LINES_GENERATOR_PERIOD ( TIME_UNIT_PER_S * 50 )
-#define BR_LINES_DURATION         ( TIME_UNIT_PER_S * 1/50 )
+#define BR_LINES_GENERATOR_PERIOD ( CLOCK_FREQ * 50 )
+#define BR_LINES_DURATION         ( CLOCK_FREQ * 1/50 )
 
     /* generate new blue or red lines */
     if ( p_sys->i_BR_line_trigger <= p_sys->i_cur_time ) {
@@ -396,7 +392,7 @@ static int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     * one shot offset section
     */
 
-#define OFFSET_AVERAGE_PERIOD   (10 * TIME_UNIT_PER_S)
+#define OFFSET_AVERAGE_PERIOD   (10 * CLOCK_FREQ)
 
     /* start trigger to be (re)initialized */
     if ( p_sys->i_offset_trigger == 0
@@ -434,8 +430,8 @@ static int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     * sliding section
     */
 
-#define SLIDING_AVERAGE_PERIOD   (20 * TIME_UNIT_PER_S)
-#define SLIDING_AVERAGE_DURATION ( 3 * TIME_UNIT_PER_S)
+#define SLIDING_AVERAGE_PERIOD   (20 * CLOCK_FREQ)
+#define SLIDING_AVERAGE_DURATION ( 3 * CLOCK_FREQ)
 
     /* start trigger to be (re)initialized */
     if ( ( p_sys->i_sliding_stop_trig  == 0 ) &&
@@ -475,7 +471,7 @@ static int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
         /* check if offset is close to 0 and then ready to stop */
         if ( abs( p_sys->i_sliding_ofs ) < abs( p_sys->i_sliding_speed
              * p_sys->i_height[Y_PLANE]
-             * ( p_sys->i_cur_time - p_sys->i_last_time ) / TIME_UNIT_PER_S )
+             * ( p_sys->i_cur_time - p_sys->i_last_time ) / CLOCK_FREQ )
              || abs( p_sys->i_sliding_ofs ) < p_sys->i_height[Y_PLANE] * 100 / 20 ) {
 
             /* reset sliding parameters */
@@ -489,7 +485,7 @@ static int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     p_sys->i_sliding_ofs = MOD( p_sys->i_sliding_ofs
                                 + p_sys->i_sliding_speed * p_sys->i_height[Y_PLANE]
                                 * ( p_sys->i_cur_time - p_sys->i_last_time)
-                                / TIME_UNIT_PER_S,
+                                / CLOCK_FREQ,
                                 p_sys->i_height[Y_PLANE] * 100 );
 
     return vhs_sliding_effect_apply( p_filter, p_pic_out );
