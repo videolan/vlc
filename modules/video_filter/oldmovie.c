@@ -39,10 +39,6 @@
 
 #include "filter_picture.h"
 
-#ifndef TIME_UNIT_PER_S
-#   define TIME_UNIT_PER_S ( ((int64_t) 1) << 32 )
-#endif
-
 static inline int64_t MOD(int64_t a, int64_t b) {
     return ( ( a % b ) + b ) % b; }
 
@@ -92,7 +88,7 @@ typedef struct {
     int32_t  i_offset;
     int32_t  i_width;
     uint16_t i_intensity;
-    uint64_t i_stop_trigger;
+    mtime_t  i_stop_trigger;
 } scratch_t;
 
 typedef struct {
@@ -102,14 +98,14 @@ typedef struct {
     int32_t  i_length;
     int32_t  i_curve;
     uint16_t i_intensity;
-    uint64_t i_stop_trigger;
+    mtime_t  i_stop_trigger;
 } hair_t;
 
 typedef struct {
     int32_t  i_x, i_y;
     int32_t  i_width;
     uint16_t i_intensity;
-    uint64_t i_stop_trigger;
+    mtime_t  i_stop_trigger;
 } dust_t;
 
 struct filter_sys_t {
@@ -120,31 +116,31 @@ struct filter_sys_t {
     int32_t *i_height;
     int32_t *i_width;
     int32_t *i_visible_pitch;
-    uint64_t i_start_time;
-    uint64_t i_last_time;
-    uint64_t i_cur_time;
+    mtime_t i_start_time;
+    mtime_t i_last_time;
+    mtime_t i_cur_time;
 
     /* sliding & offset effect */
-    uint64_t i_offset_trigger;
-    uint64_t i_sliding_trigger;
-    uint64_t i_sliding_stop_trig;
+    mtime_t  i_offset_trigger;
+    mtime_t  i_sliding_trigger;
+    mtime_t  i_sliding_stop_trig;
     int32_t  i_offset_ofs;
     int32_t  i_sliding_ofs;
     int32_t  i_sliding_speed;
 
     /* scratch on film */
-    uint64_t   i_scratch_trigger;
+    mtime_t    i_scratch_trigger;
     scratch_t *p_scratch[MAX_SCRATCH];
 
     /* hair on lens */
-    uint64_t   i_hair_trigger;
+    mtime_t    i_hair_trigger;
     hair_t    *p_hair[MAX_HAIR];
 
     /* blotch on film */
-    uint64_t   i_blotch_trigger;
+    mtime_t    i_blotch_trigger;
 
     /* dust on lens */
-    uint64_t   i_dust_trigger;
+    mtime_t    i_dust_trigger;
     dust_t    *p_dust[MAX_DUST];
 };
 
@@ -220,7 +216,7 @@ static int Open( vlc_object_t *p_this ) {
 
     /* init data */
     p_filter->pf_video_filter = Filter;
-    p_sys->i_start_time = p_sys->i_cur_time = p_sys->i_last_time = NTPtime64();
+    p_sys->i_start_time = p_sys->i_cur_time = p_sys->i_last_time = mdate();
 
     return VLC_SUCCESS;
 }
@@ -256,7 +252,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
     * manage time
     */
     p_sys->i_last_time = p_sys->i_cur_time;
-    p_sys->i_cur_time  = NTPtime64();
+    p_sys->i_cur_time  = mdate();
 
    /*
     * allocate data
@@ -365,19 +361,19 @@ static void oldmovie_shutter_effect( filter_t *p_filter, picture_t *p_pic_out ) 
 
 #define SHUTTER_INTENSITY 50
 
-#define SUB_FRAME (p_sys->i_cur_time % (TIME_UNIT_PER_S / SHUTTER_FREQ))
+#define SUB_FRAME (p_sys->i_cur_time % (CLOCK_FREQ / SHUTTER_FREQ))
 
    /*
     * depending on current time: define shutter location on picture
     */
     int32_t i_shutter_sup = VLC_CLIP((int64_t)SUB_FRAME
                                       * p_pic_out->p[Y_PLANE].i_visible_lines
-                                      * SHUTTER_SPEED / TIME_UNIT_PER_S,
+                                      * SHUTTER_SPEED / CLOCK_FREQ,
                                       0, p_pic_out->p[Y_PLANE].i_visible_lines);
 
     int32_t i_shutter_inf = VLC_CLIP((int64_t)SUB_FRAME
                                       * p_pic_out->p[Y_PLANE].i_visible_lines
-                                      * SHUTTER_SPEED / TIME_UNIT_PER_S
+                                      * SHUTTER_SPEED / CLOCK_FREQ
                                       - SHUTTER_HEIGHT * p_pic_out->p[Y_PLANE].i_visible_lines,
                                       0, p_pic_out->p[Y_PLANE].i_visible_lines);
 
@@ -403,7 +399,7 @@ static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_
     * one shot offset section
     */
 
-#define OFFSET_AVERAGE_PERIOD   (10 * TIME_UNIT_PER_S)
+#define OFFSET_AVERAGE_PERIOD   (10 * CLOCK_FREQ)
 
     /* start trigger to be (re)initialized */
     if ( p_sys->i_offset_trigger == 0
@@ -426,8 +422,8 @@ static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_
     * sliding section
     */
 
-#define SLIDING_AVERAGE_PERIOD   (20 * TIME_UNIT_PER_S)
-#define SLIDING_AVERAGE_DURATION ( 3 * TIME_UNIT_PER_S)
+#define SLIDING_AVERAGE_PERIOD   (20 * CLOCK_FREQ)
+#define SLIDING_AVERAGE_DURATION ( 3 * CLOCK_FREQ)
 
     /* start trigger to be (re)initialized */
     if (    ( p_sys->i_sliding_stop_trig  == 0 )
@@ -462,7 +458,7 @@ static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_
         /* check if offset is close to 0 and then ready to stop */
         if ( abs( p_sys->i_sliding_ofs ) < abs( p_sys->i_sliding_speed
              * p_sys->i_height[Y_PLANE]
-             * ( p_sys->i_cur_time - p_sys->i_last_time ) / TIME_UNIT_PER_S )
+             * ( p_sys->i_cur_time - p_sys->i_last_time ) / CLOCK_FREQ )
              ||  abs( p_sys->i_sliding_ofs ) < p_sys->i_height[Y_PLANE] * 100 / 20 ) {
 
             /* reset sliding parameters */
@@ -474,7 +470,7 @@ static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_
     /* update offset */
     p_sys->i_sliding_ofs += p_sys->i_sliding_speed * p_sys->i_height[Y_PLANE]
                          * ( p_sys->i_cur_time - p_sys->i_last_time )
-                         / TIME_UNIT_PER_S;
+                         / CLOCK_FREQ;
 
     p_sys->i_sliding_ofs = MOD( p_sys->i_sliding_ofs,
                                 p_sys->i_height[Y_PLANE] * 100 );
@@ -577,8 +573,8 @@ static int oldmovie_film_scratch_effect( filter_t *p_filter, picture_t *p_pic_ou
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-#define SCRATCH_GENERATOR_PERIOD ( TIME_UNIT_PER_S * 2 )
-#define SCRATCH_DURATION         ( TIME_UNIT_PER_S * 1 / 2)
+#define SCRATCH_GENERATOR_PERIOD ( CLOCK_FREQ * 2 )
+#define SCRATCH_DURATION         ( CLOCK_FREQ * 1 / 2)
 
     /* generate new scratch */
     if ( p_sys->i_scratch_trigger <= p_sys->i_cur_time ) {
@@ -638,7 +634,7 @@ static void oldmovie_film_blotch_effect( filter_t *p_filter, picture_t *p_pic_ou
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-#define BLOTCH_GENERATOR_PERIOD ( TIME_UNIT_PER_S * 5 )
+#define BLOTCH_GENERATOR_PERIOD ( CLOCK_FREQ * 5 )
 
     /* generate blotch */
     if ( p_sys->i_blotch_trigger <= p_sys->i_cur_time ) {
@@ -695,10 +691,10 @@ static void oldmovie_film_dust_effect( filter_t *p_filter, picture_t *p_pic_out 
  * Hair and dust on projector lens
  *
  */
-#define HAIR_GENERATOR_PERIOD ( TIME_UNIT_PER_S * 50  )
-#define HAIR_DURATION         ( TIME_UNIT_PER_S * 50  )
-#define DUST_GENERATOR_PERIOD ( TIME_UNIT_PER_S * 100 )
-#define DUST_DURATION         ( TIME_UNIT_PER_S * 4   )
+#define HAIR_GENERATOR_PERIOD ( CLOCK_FREQ * 50  )
+#define HAIR_DURATION         ( CLOCK_FREQ * 50  )
+#define DUST_GENERATOR_PERIOD ( CLOCK_FREQ * 100 )
+#define DUST_DURATION         ( CLOCK_FREQ * 4   )
 
 /**
  * Define hair location on the lens and timeout
