@@ -743,24 +743,21 @@ AS_IF([test "${SYS}" != "mingw32"], [
     ])
   ])
   VLC_RESTORE_FLAGS
-
-  AC_CHECK_LIB(rt, clock_nanosleep, [
-    VLC_ADD_LIBS([libvlccore],[-lrt])
-  ], [
-    AC_CHECK_FUNC(nanosleep,,[
-      AC_CHECK_LIB(rt,nanosleep, [
-        VLC_ADD_LIBS([libvlccore],[-lrt])
-      ], [
-        AC_CHECK_LIB(posix4,nanosleep, [
-          VLC_ADD_LIBS([libvlccore],[-lposix4])
-        ])
-      ])
-    ])
-    dnl HP/UX port
-    AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LIBS([libvlccore],[-lrt])])
-  ])
 ])
 AC_SUBST(LIBPTHREAD)
+
+AC_SEARCH_LIBS([clock_nanosleep], [rt pthread], [
+  AS_IF([test "$ac_cv_search_clock_nanosleep" != "none required"], [
+    LIBRT="$ac_cv_search_clock_nanosleep"
+  ])
+], [
+  AC_SEARCH_LIBS([nanosleep], [rt pthread posix4], [
+    AS_IF([test "$ac_cv_search_nanosleep" != "none required"], [
+      LIBRT="$ac_cv_search_nanosleep"
+    ])
+  ])
+])
+AC_SUBST(LIBRT)
 
 dnl
 dnl Check for headers
