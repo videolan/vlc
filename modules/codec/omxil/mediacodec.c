@@ -320,7 +320,8 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
                 H264SetCSD(p_dec, p_buf, size, NULL);
         } else
         {
-            if (hevc_hvcC_to_AnnexB_NAL(p_dec, p_extra, i_extra,
+            if ( hevc_ishvcC(p_extra, i_extra) &&
+                    hevc_hvcC_to_AnnexB_NAL(p_dec, p_extra, i_extra,
                                        p_buf, buf_size, &size,
                                        &p_sys->u.video.i_nal_length_size) == VLC_SUCCESS)
             {
