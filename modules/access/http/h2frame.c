@@ -159,6 +159,18 @@ vlc_h2_frame_headers(uint_fast32_t stream_id, uint_fast32_t mtu, bool eos,
 
     size_t len = hpack_encode(NULL, 0, headers, count);
 
+    if (likely(len <= mtu))
+    {   /* Most common case: single frame - with zero copy */
+        flags |= VLC_H2_HEADERS_END_HEADERS;
+
+        f = vlc_h2_frame_alloc(VLC_H2_FRAME_HEADERS, flags, stream_id, len);
+        if (unlikely(f == NULL))
+            return NULL;
+
+        hpack_encode(vlc_h2_frame_payload(f), len, headers, count);
+        return f;
+    }
+
     /* Edge case: HEADERS frame then CONTINUATION frame(s) */
     uint8_t *payload = malloc(len);
     if (unlikely(payload == NULL))
@@ -187,9 +199,6 @@ vlc_h2_frame_headers(uint_fast32_t stream_id, uint_fast32_t mtu, bool eos,
         offset += mtu;
         len -= mtu;
     }
-
-static_assert(VLC_H2_CONTINUATION_END_HEADERS == VLC_H2_HEADERS_END_HEADERS,
-              "Oops");
 
     flags |= VLC_H2_CONTINUATION_END_HEADERS;
 
