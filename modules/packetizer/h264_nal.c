@@ -31,6 +31,15 @@
 
 static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x01 };
 
+bool h264_isavcC( const uint8_t *p_buf, size_t i_buf )
+{
+    return ( i_buf > H264_MIN_AVCC_SIZE &&
+             p_buf[0] == 0x01 &&
+            (p_buf[4] & 0xFC) == 0xFC &&
+            (p_buf[4] & 0x03) != 0x02 &&
+            (p_buf[5] & 0xE0) == 0xE0 );
+}
+
 static inline bool strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_data )
 {
     const uint8_t *p_data = *pp_data;

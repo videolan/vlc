@@ -992,7 +992,7 @@ static int InitializeMFT(decoder_t *p_dec)
             int buf_size = p_dec->fmt_in.i_extra + 20;
             uint32_t size = p_dec->fmt_in.i_extra;
             uint8_t *buf = malloc(buf_size);
-            if (((uint8_t*)p_dec->fmt_in.p_extra)[0] == 1)
+            if (h264_isavcC((uint8_t*)p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
             {
                 h264_avcC_to_AnnexB_NAL(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
                                 buf, buf_size,

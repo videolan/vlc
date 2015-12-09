@@ -113,6 +113,10 @@ struct h264_nal_pps
     avcC: AVCDecoderConfigurationRecord combining SPS & PPS in AVC Sample Format
 */
 
+#define H264_MIN_AVCC_SIZE 7
+
+bool h264_isavcC( const uint8_t *, size_t );
+
 /* Convert AVC Sample format to Annex B in-place */
 void h264_AVC_to_AnnexB( uint8_t *p_buf, uint32_t i_len,
                          uint8_t i_nal_length_size );

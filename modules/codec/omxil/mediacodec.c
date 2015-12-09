@@ -313,7 +313,7 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         {
-            if (p_extra[0] == 1
+            if ( h264_isavcC(p_extra, i_extra)
              && h264_avcC_to_AnnexB_NAL(p_dec, p_extra, i_extra,
                                 p_buf, buf_size, &size,
                                 &p_sys->u.video.i_nal_length_size) == VLC_SUCCESS)
