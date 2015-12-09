@@ -152,10 +152,8 @@ block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
                                   size_t i_pps_size );
 
 /* Convert AVCDecoderConfigurationRecord SPS/PPS to Annex B format */
-int h264_avcC_to_AnnexB_NAL( decoder_t *p_dec, const uint8_t *p_buf,
-                             uint32_t i_buf_size, uint8_t *p_out_buf,
-                             uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
-                             uint8_t *p_nal_length_size);
+uint8_t * h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
+                                   size_t *pi_result, uint8_t *pi_nal_length_size );
 
 /* Get level and Profile */
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,

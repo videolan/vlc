@@ -301,25 +301,33 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
      || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
     {
-        int buf_size = i_extra + 20;
-        uint32_t size = i_extra;
-        void *p_buf = malloc(buf_size);
-
-        if (!p_buf)
-        {
-            msg_Warn(p_dec, "extra buffer allocation failed");
-            return VLC_EGENERIC;
-        }
-
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         {
-            if ( h264_isavcC(p_extra, i_extra)
-             && h264_avcC_to_AnnexB_NAL(p_dec, p_extra, i_extra,
-                                p_buf, buf_size, &size,
-                                &p_sys->u.video.i_nal_length_size) == VLC_SUCCESS)
-                H264SetCSD(p_dec, p_buf, size, NULL);
-        } else
+            if (h264_isavcC(p_extra, i_extra))
+            {
+                size_t i_size = 0;
+                uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(p_extra, i_extra, &i_size,
+                                                         &p_sys->u.video.i_nal_length_size);
+                if(p_buf)
+                {
+                    H264SetCSD(p_dec, p_buf, i_size, NULL);
+                    free(p_buf);
+                }
+            }
+            else
+                H264SetCSD(p_dec, p_extra, i_extra, NULL);
+        }
+        else
         {
+            int buf_size = i_extra + 20;
+            uint32_t size = i_extra;
+            void *p_buf = malloc(buf_size);
+            if (!p_buf)
+            {
+                msg_Warn(p_dec, "extra buffer allocation failed");
+                return VLC_EGENERIC;
+            }
+
             if ( hevc_ishvcC(p_extra, i_extra) &&
                     hevc_hvcC_to_AnnexB_NAL(p_dec, p_extra, i_extra,
                                        p_buf, buf_size, &size,
@@ -331,8 +339,8 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
                 csd.i_size = size;
                 CSDDup(p_dec, &csd, 1);
             }
+            free(p_buf);
         }
-        free(p_buf);
     }
     return VLC_SUCCESS;
 }

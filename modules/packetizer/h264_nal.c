@@ -29,8 +29,6 @@
  * For Annex B specification, see ISO/IEC 14496-10
  */
 
-static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x01 };
-
 bool h264_isavcC( const uint8_t *p_buf, size_t i_buf )
 {
     return ( i_buf > H264_MIN_AVCC_SIZE &&
@@ -47,12 +45,12 @@ static inline bool strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_d
     {
         return false;
     }
-    else if( p_data[0] == !!memcmp(&p_data[1], annexb_startcode, 3) )
+    else if( p_data[0] == !!memcmp(&p_data[1], annexb_startcode3, 3) )
     {
         *pp_data += 4;
         *pi_data -= 4;
     }
-    else if( !memcmp(p_data, annexb_startcode, 3) )
+    else if( !memcmp(p_data, annexb_startcode4, 3) )
     {
         *pp_data += 3;
         *pi_data -= 3;
@@ -61,79 +59,72 @@ static inline bool strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_d
     return true;
 }
 
-int h264_avcC_to_AnnexB_NAL( decoder_t *p_dec, const uint8_t *p_buf,
-                     uint32_t i_buf_size, uint8_t *p_out_buf,
-                     uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
-                     uint8_t *pi_nal_length_size)
+static size_t get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
 {
-    uint32_t i_data_size = i_buf_size, i_nal_size, i_sps_pps_size = 0;
-    unsigned int i_loop_end;
+    size_t i_total = 0;
 
-    /* */
-    if( i_data_size < 7 )
-    {
-        msg_Err( p_dec, "avcC too small" );
-        return VLC_ENOMEM;
-    }
+    p_buf += 5;
+    i_buf -= 5;
 
-    /* Read infos in first 6 bytes */
-    if (pi_nal_length_size)
-        *pi_nal_length_size  = (p_buf[4] & 0x03) + 1;
-    p_buf       += 5;
-    i_data_size -= 5;
+    if( i_buf < H264_MIN_AVCC_SIZE )
+        return 0;
 
     for ( unsigned int j = 0; j < 2; j++ )
     {
         /* First time is SPS, Second is PPS */
-        if( i_data_size < 1 )
+        const unsigned int i_loop_end = p_buf[0] & (j == 0 ? 0x1f : 0xff);
+        p_buf++; i_buf--;
+
+        for ( unsigned int i = 0; i < i_loop_end; i++ )
         {
-            msg_Err( p_dec, "PPS too small after processing SPS/PPS %u",
-                    i_data_size );
-            return VLC_ENOMEM;
+            uint16_t i_nal_size = (p_buf[0] << 8) | p_buf[1];
+            if(i_nal_size > i_buf - 2)
+                return 0;
+            i_total += i_nal_size + 4;
+            i_buf -= i_nal_size + 2;
         }
-        i_loop_end = p_buf[0] & (j == 0 ? 0x1f : 0xff);
-        p_buf++; i_data_size--;
+    }
+    return i_total;
+}
+
+uint8_t *h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
+                                  size_t *pi_result, uint8_t *pi_nal_length_size )
+{
+    *pi_result = get_avcC_to_AnnexB_NAL_size( p_buf, i_buf ); /* Does check min size */
+    if( *pi_result == 0 )
+        return NULL;
+
+    /* Read infos in first 6 bytes */
+    if ( pi_nal_length_size )
+        *pi_nal_length_size = (p_buf[4] & 0x03) + 1;
+
+    uint8_t *p_ret;
+    uint8_t *p_out_buf = p_ret = malloc( *pi_result );
+    if( !p_out_buf )
+        return NULL;
+
+    p_buf += 5;
+
+    for ( unsigned int j = 0; j < 2; j++ )
+    {
+        const unsigned int i_loop_end = p_buf[0] & (j == 0 ? 0x1f : 0xff);
+        p_buf++;
 
         for ( unsigned int i = 0; i < i_loop_end; i++)
         {
-            if( i_data_size < 2 )
-            {
-                msg_Err( p_dec, "SPS is too small %u", i_data_size );
-                return VLC_ENOMEM;
-            }
-
-            i_nal_size = (p_buf[0] << 8) | p_buf[1];
+            uint16_t i_nal_size = (p_buf[0] << 8) | p_buf[1];
             p_buf += 2;
-            i_data_size -= 2;
 
-            if( i_data_size < i_nal_size )
-            {
-                msg_Err( p_dec, "SPS size does not match NAL specified size %u",
-                        i_data_size );
-                return VLC_ENOMEM;
-            }
-            if( i_sps_pps_size + 4 + i_nal_size > i_out_buf_size )
-            {
-                msg_Err( p_dec, "Output SPS/PPS buffer too small" );
-                return VLC_ENOMEM;
-            }
+            memcpy( p_out_buf, annexb_startcode4, 4 );
+            p_out_buf += 4;
 
-            p_out_buf[i_sps_pps_size++] = 0;
-            p_out_buf[i_sps_pps_size++] = 0;
-            p_out_buf[i_sps_pps_size++] = 0;
-            p_out_buf[i_sps_pps_size++] = 1;
-
-            memcpy( p_out_buf + i_sps_pps_size, p_buf, i_nal_size );
-            i_sps_pps_size += i_nal_size;
-
+            memcpy( p_out_buf, p_buf, i_nal_size );
+            p_out_buf += i_nal_size;
             p_buf += i_nal_size;
-            i_data_size -= i_nal_size;
         }
     }
 
-    *p_sps_pps_size = i_sps_pps_size;
-
-    return VLC_SUCCESS;
+    return p_ret;
 }
 
 void h264_AVC_to_AnnexB( uint8_t *p_buf, uint32_t i_len,
@@ -192,7 +183,7 @@ static block_t *h264_increase_startcode_size( block_t *p_block,
     /* Search all startcode of size 3 */
     while( i_buf > 0 )
     {
-        if( i_buf > 3 && memcmp( &p_buf[i_ofs], annexb_startcode, 3 ) == 0 )
+        if( i_buf > 3 && memcmp( &p_buf[i_ofs], annexb_startcode3, 3 ) == 0 )
         {
             if( i_ofs == 0 || p_buf[i_ofs - 1] != 0 )
                 i_grow++;
@@ -224,7 +215,7 @@ static block_t *h264_increase_startcode_size( block_t *p_block,
     /* Copy the rest of the buffer and append a 0 before each 000001 */
     while( i_buf > 0 )
     {
-        if( i_buf > 3 && memcmp( &p_buf[i_ofs], annexb_startcode, 3 ) == 0 )
+        if( i_buf > 3 && memcmp( &p_buf[i_ofs], annexb_startcode3, 3 ) == 0 )
         {
             if( i_ofs == 0 || p_buf[i_ofs - 1] != 0 )
                 p_new_buf[i_new_ofs++] = 0;
@@ -280,7 +271,7 @@ block_t *h264_AnnexB_to_AVC( block_t *p_block, uint8_t i_nal_length_size )
     /* Replace the Annex B start code with the size of the NAL. */
     while( i_buf > 0 )
     {
-        if( i_buf > 3 && memcmp( &p_buf[i_ofs], annexb_startcode, 3 ) == 0 )
+        if( i_buf > 3 && memcmp( &p_buf[i_ofs], annexb_startcode3, 3 ) == 0 )
         {
             if( i_startcode_size )
             {
@@ -354,7 +345,7 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
         unsigned int i_move = 1;
 
         /* cf B.1.1: a NAL unit starts and ends with 0x000001 or 0x00000001 */
-        if( i_buf > 3 && !memcmp( p_buf, annexb_startcode, 3 ) )
+        if( i_buf > 3 && !memcmp( p_buf, annexb_startcode3, 3 ) )
         {
             if( i_nal_type != H264_NAL_UNKNOWN )
             {

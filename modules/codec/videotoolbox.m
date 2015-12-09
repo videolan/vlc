@@ -302,57 +302,43 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             return VLC_SUCCESS;
         }
 
-        uint32_t size;
-        void *p_buf, *p_alloc_buf = NULL;
+        size_t i_buf;
+        const uint8_t *p_buf = NULL;
+        uint8_t *p_alloc_buf = NULL;
         int i_ret = 0;
 
         if (p_block == NULL) {
-            int buf_size = p_dec->fmt_in.i_extra + 20;
-            size = p_dec->fmt_in.i_extra;
-
-            p_alloc_buf = p_buf = malloc(buf_size);
-            if (!p_buf) {
-                msg_Warn(p_dec, "extra buffer allocation failed");
-                return VLC_ENOMEM;
-            }
-
             /* we need to convert the SPS and PPS units we received from the
-             * demuxer's avvC atom so we can process them further */
-            i_ret = h264_avcC_to_AnnexB_NAL(p_dec,
-                                    p_dec->fmt_in.p_extra,
-                                    p_dec->fmt_in.i_extra,
-                                    p_buf,
-                                    buf_size,
-                                    &size,
-                                    &p_sys->i_nal_length_size);
-            p_sys->b_is_avcc = i_ret == VLC_SUCCESS;
+            * demuxer's avvC atom so we can process them further */
+            if(h264_isavcC(p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
+            {
+                p_alloc_buf = h264_avcC_to_AnnexB_NAL(p_dec->fmt_in.p_extra,
+                                                      p_dec->fmt_in.i_extra,
+                                                      &i_buf,
+                                                      &p_sys->i_nal_length_size);
+                buf = p_alloc_buf;
+                p_sys->b_is_avcc = !!p_buf;
+            }
         } else {
             /* we are mid-stream, let's have the h264_get helper see if it
              * can find a NAL unit */
-            size = p_block->i_buffer;
+            i_buf = p_block->i_buffer;
             p_buf = p_block->p_buffer;
             p_sys->i_nal_length_size = 4; /* default to 4 bytes */
             i_ret = VLC_SUCCESS;
         }
 
-        if (i_ret != VLC_SUCCESS) {
-            free(p_alloc_buf);
-            msg_Warn(p_dec, "extra buffer allocation failed");
-            return VLC_EGENERIC;
-        }
-
         uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
         size_t i_sps_size = 0, i_pps_size = 0;
         if (!p_buf) {
-            free(p_alloc_buf);
-            msg_Warn(p_dec, "extra buffer allocation failed");
+            msg_Warn(p_dec, "no valid extradata or conversion failed");
             return VLC_EGENERIC;
         }
 
         /* get the SPS and PPS units from the NAL unit which is either
          * part of the demuxer's avvC atom or the mid stream data block */
         i_ret = h264_get_spspps(p_buf,
-                                size,
+                                i_buf,
                                 &p_sps_buf,
                                 &i_sps_size,
                                 &p_pps_buf,
@@ -385,6 +371,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         p_sys->codec_profile = sps_data.i_profile;
         p_sys->codec_level = sps_data.i_level;
 
+        /* FIXME: Reuse p_extra avcC is p_sys->b_is_avcc */
         /* create avvC atom to forward to the HW decoder */
         block_t *p_block = h264_AnnexB_NAL_to_avcC(
                                 p_sys->i_nal_length_size,

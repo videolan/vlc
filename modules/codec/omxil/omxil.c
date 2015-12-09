@@ -1173,12 +1173,14 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         p_header->nFilledLen = p_dec->fmt_in.i_extra;
 
         /* Convert H.264 NAL format to annex b */
-        if( p_sys->i_nal_size_length && !p_sys->in.b_direct )
+        if( p_sys->i_nal_size_length && !p_sys->in.b_direct &&
+            h264_isavcC(p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra) )
         {
-            p_header->nFilledLen = 0;
-            h264_avcC_to_AnnexB_NAL( p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
-                             p_header->pBuffer, p_header->nAllocLen,
-                             (uint32_t*) &p_header->nFilledLen, NULL );
+            size_t i_filled_len = 0;
+            p_header->pBuffer = h264_avcC_to_AnnexB_NAL(
+                        p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
+                        &i_filled_len, NULL );
+            p_header->nFilledLen = i_filled_len;
         }
         else if( p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && !p_sys->in.b_direct )
         {

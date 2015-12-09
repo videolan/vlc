@@ -26,6 +26,9 @@
 
 #include <vlc_common.h>
 
+static const uint8_t  annexb_startcode4[] = { 0x00, 0x00, 0x00, 0x01 };
+#define annexb_startcode3 (&annexb_startcode4[1])
+
 /* Discards emulation prevention three bytes */
 static inline uint8_t * hxxx_ep3b_to_rbsp(const uint8_t *p_src, size_t i_src, size_t *pi_ret)
 {
