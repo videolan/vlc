@@ -898,26 +898,27 @@ static int DecoderPreparePlayVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     vout_thread_t  *p_vout = p_owner->p_vout;
+    bool prerolled;
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->i_preroll_end > VLC_TS_INVALID && p_pic->date < p_owner->i_preroll_end )
+    if( p_owner->i_preroll_end > p_pic->date )
     {
         vlc_mutex_unlock( &p_owner->lock );
         picture_Release( p_pic );
         return -1;
     }
 
-    if( p_owner->i_preroll_end > VLC_TS_INVALID )
+    prerolled = p_owner->i_preroll_end > INT64_MIN;
+    p_owner->i_preroll_end = INT64_MIN;
+    vlc_mutex_unlock( &p_owner->lock );
+
+    if( unlikely(prerolled) )
     {
-        msg_Dbg( p_dec, "End of video preroll" );
-        p_owner->i_preroll_end = VLC_TS_INVALID;
-        vlc_mutex_unlock( &p_owner->lock );
-        /* */
+        msg_Dbg( p_dec, "end of video preroll" );
+
         if( p_vout )
             vout_Flush( p_vout, VLC_TS_INVALID+1 );
     }
-    else
-        vlc_mutex_unlock( &p_owner->lock );
 
     if( p_dec->pf_get_cc &&
         ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
@@ -1083,27 +1084,27 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
 static int DecoderPreparePlayAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    bool prerolled;
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->i_preroll_end > VLC_TS_INVALID &&
-        p_aout_buf->i_pts < p_owner->i_preroll_end )
+    if( p_owner->i_preroll_end > p_aout_buf->i_pts )
     {
         vlc_mutex_unlock( &p_owner->lock );
         block_Release( p_aout_buf );
         return -1;
     }
 
-    if( p_owner->i_preroll_end > VLC_TS_INVALID )
+    prerolled = p_owner->i_preroll_end > INT64_MIN;
+    p_owner->i_preroll_end = INT64_MIN;
+    vlc_mutex_unlock( &p_owner->lock );
+
+    if( unlikely(prerolled) )
     {
-        msg_Dbg( p_dec, "End of audio preroll" );
-        p_owner->i_preroll_end = VLC_TS_INVALID;
-        vlc_mutex_unlock( &p_owner->lock );
-        /* */
+        msg_Dbg( p_dec, "end of audio preroll" );
+
         if( p_owner->p_aout )
             aout_DecFlush( p_owner->p_aout, false );
     }
-    else
-        vlc_mutex_unlock( &p_owner->lock );
 
     return 0;
 }
@@ -1535,7 +1536,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
         vlc_object_release( p_dec );
         return NULL;
     }
-    p_owner->i_preroll_end = VLC_TS_INVALID;
+    p_owner->i_preroll_end = INT64_MIN;
     p_owner->i_last_rate = INPUT_RATE_DEFAULT;
     p_owner->p_input = p_input;
     p_owner->p_resource = p_resource;
