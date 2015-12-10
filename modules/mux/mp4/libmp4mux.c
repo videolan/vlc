@@ -569,7 +569,7 @@ static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_i
     free(p_dec_nal);
 }
 
-static bo_t *GetHvcCTag(es_format_t *p_fmt)
+static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
 {
     /* Generate hvcC box matching iso/iec 14496-15 3rd edition */
     bo_t *hvcC = box_new("hvcC");
@@ -692,8 +692,8 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
 
     if (i_vps)
     {
-        /* Write VPS without forcing array_completeness */
-        bo_add_8(hvcC, HEVC_NAL_VPS);
+        /* Write VPS */
+        bo_add_8(hvcC, HEVC_NAL_VPS | (b_completeness ? 0x80 : 0));
         bo_add_16be(hvcC, i_vps);
         for (uint8_t i = 0; i < i_vps; i++) {
             p_nal = &rg_vps[i];
@@ -703,8 +703,8 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
     }
 
     if (i_sps) {
-        /* Write SPS without forcing array_completeness */
-        bo_add_8(hvcC, HEVC_NAL_SPS);
+        /* Write SPS */
+        bo_add_8(hvcC, HEVC_NAL_SPS | (b_completeness ? 0x80 : 0));
         bo_add_16be(hvcC, i_sps);
         for (uint8_t i = 0; i < i_sps; i++) {
             p_nal = &rg_sps[i];
@@ -714,8 +714,8 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
     }
 
     if (i_pps) {
-        /* Write PPS without forcing array_completeness */
-        bo_add_8(hvcC, HEVC_NAL_PPS);
+        /* Write PPS */
+        bo_add_8(hvcC, HEVC_NAL_PPS | (b_completeness ? 0x80 : 0));
         bo_add_16be(hvcC, i_pps);
         for (uint8_t i = 0; i < i_pps; i++) {
             p_nal = &rg_pps[i];
@@ -725,8 +725,8 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt)
     }
 
     if (i_sei) {
-        /* Write SEI without forcing array_completeness */
-        bo_add_8(hvcC, HEVC_NAL_PREF_SEI);
+        /* Write SEI */
+        bo_add_8(hvcC, HEVC_NAL_PREF_SEI | (b_completeness ? 0x80 : 0));
         bo_add_16be(hvcC, i_sei);
         for (size_t i = 0; i < i_sei; i++) {
             p_nal = &p_sei[i];
@@ -1004,7 +1004,9 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     case VLC_CODEC_H263: memcpy(fcc, "s263", 4); break;
     case VLC_CODEC_H264: memcpy(fcc, "avc1", 4); break;
     case VLC_CODEC_VC1 : memcpy(fcc, "vc-1", 4); break;
-    case VLC_CODEC_HEVC: memcpy(fcc, "hvc1", 4); break;
+    /* FIXME: find a way to know if no non-VCL units are in the stream (->hvc1)
+     * see 14496-15 8.4.1.1.1 */
+    case VLC_CODEC_HEVC: memcpy(fcc, "hev1", 4); break;
     case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); break;
     case VLC_CODEC_YUYV: memcpy(fcc, "yuy2", 4); break;
     default:
@@ -1065,7 +1067,8 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
             break;
 
     case VLC_CODEC_HEVC:
-        box_gather(vide, GetHvcCTag(&p_track->fmt));
+        /* Write HvcC without forcing VPS/SPS/PPS/SEI array_completeness */
+        box_gather(vide, GetHvcCTag(&p_track->fmt, false));
         break;
     }
 
