@@ -240,13 +240,13 @@ char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp)
 
     if (m->status < 0)
     {
-        len = sizeof ("  HTTP/1.1\r\nHost: \r\nConnection: close\r\n\r\n");
+        len = sizeof ("  HTTP/1.1\r\nHost: \r\n\r\n");
         len += strlen(m->method);
         len += strlen(m->path ? m->path : m->authority);
         len += strlen(m->authority);
     }
     else
-        len = sizeof ("HTTP/1.1 123 .\r\nConnection: close\r\n\r\n");
+        len = sizeof ("HTTP/1.1 123 .\r\n\r\n");
 
     for (unsigned i = 0; i < m->count; i++)
         len += 4 + strlen(m->headers[i][0]) + strlen(m->headers[i][1]);
@@ -267,7 +267,7 @@ char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp)
         len += sprintf(buf + len, "%s: %s\r\n",
                        m->headers[i][0], m->headers[i][1]);
 
-    len += sprintf(buf + len, "Connection: close\r\n\r\n");
+    len += sprintf(buf + len, "\r\n");
     if (lenp != NULL)
         *lenp = len;
     return buf;

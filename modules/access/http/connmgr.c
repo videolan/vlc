@@ -27,6 +27,7 @@
 #include <vlc_tls.h>
 #include <vlc_interrupt.h>
 #include "transport.h"
+#include "h1conn.h"
 #include "h2conn.h"
 #include "connmgr.h"
 #include "message.h"
@@ -133,8 +134,7 @@ struct vlc_http_msg *vlc_https_request_reuse(struct vlc_http_mgr *mgr,
     struct vlc_h1_conn *conn1 = vlc_h1_conn_find(mgr, host, port);
     if (conn1 != NULL)
     {
-#if 0
-        struct vlc_http_stream *s = vlc_h1_stream_open(conn2, req);
+        struct vlc_http_stream *s = vlc_h1_stream_open(conn1, req);
         if (s != NULL)
         {
             struct vlc_http_msg *m = vlc_http_stream_read_headers(s);
@@ -144,22 +144,9 @@ struct vlc_http_msg *vlc_https_request_reuse(struct vlc_http_mgr *mgr,
             vlc_http_stream_close(s, false);
         }
         vlc_h1_conn_release(conn1);
-#endif
         mgr->conn1 = NULL;
     }
     return NULL;
-}
-
-static struct vlc_h1_conn *vlc_h1_conn_create(vlc_tls_t *tls)
-{
-    msg_Err(tls, "HTTP/2 not supported, HTTP/1 not implemented");
-    return NULL;
-}
-
-static void vlc_h1_conn_release(struct vlc_h1_conn *conn)
-{
-    (void) conn;
-    vlc_assert_unreachable();
 }
 
 struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,

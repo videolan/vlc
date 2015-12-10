@@ -18,8 +18,16 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+struct vlc_h1_conn;
+struct vlc_http_msg;
 struct vlc_http_stream;
 struct vlc_tls;
+
+struct vlc_h1_conn *vlc_h1_conn_create(struct vlc_tls *);
+void vlc_h1_conn_release(struct vlc_h1_conn *);
+
+struct vlc_http_stream *vlc_h1_stream_open(struct vlc_h1_conn *conn,
+                                           const struct vlc_http_msg *req);
 
 struct vlc_http_stream *vlc_chunked_open(struct vlc_http_stream *,
                                          struct vlc_tls *);
