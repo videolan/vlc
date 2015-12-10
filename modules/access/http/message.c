@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <vlc_common.h>
 #include <vlc_strings.h>
@@ -580,6 +581,99 @@ const char *vlc_http_msg_get_agent(const struct vlc_http_msg *m)
     const char *str = vlc_http_msg_get_header(m, hname);
 
     return (str != NULL && vlc_http_is_agent(str)) ? str : NULL;
+}
+
+static const char vlc_http_days[7][4] = {
+    "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+};
+static const char vlc_http_months[12][4] = {
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
+
+static int vlc_http_msg_add_time(struct vlc_http_msg *m, const char *hname,
+                                 const struct tm *restrict tm)
+{
+    return vlc_http_msg_add_header(m, hname,
+                                   "%s, %02d %s %04d %02d:%02d:%02d GMT",
+                                   vlc_http_days[tm->tm_wday], tm->tm_mday,
+                                   vlc_http_months[tm->tm_mon], tm->tm_year,
+                                   tm->tm_hour, tm->tm_min, tm->tm_sec);
+}
+
+int vlc_http_msg_add_atime(struct vlc_http_msg *m)
+{
+    struct tm tm;
+    time_t now;
+
+    time(&now);
+    if (gmtime_r(&now, &tm) == NULL)
+        return -1;
+
+    return vlc_http_msg_add_time(m, "Date", &tm);
+}
+
+static time_t vlc_http_mktime(const char *str)
+{   /* IETF RFC7231 §7.1.1.1 */
+    struct tm tm;
+    char mon[4];
+
+    /* Internet Message Format date */
+    if (sscanf(str, "%*c%*c%*c, %2d %3s %4d %2d:%2d:%2d", &tm.tm_mday, mon,
+               &tm.tm_year, &tm.tm_hour, &tm.tm_min, &tm.tm_sec) == 6
+    /* ANSI C format */
+     || sscanf(str, "%*3s %3s %2d %2d:%2d:%2d %4d", mon, &tm.tm_mday,
+               &tm.tm_hour, &tm.tm_min, &tm.tm_sec, &tm.tm_year) == 6)
+        tm.tm_year -= 1900;
+    /* RFC850 date */
+    else if (sscanf(str, "%*[^,], %2d-%3s-%2d %2d:%2d:%2d", &tm.tm_mday, mon,
+                    &tm.tm_year, &tm.tm_hour, &tm.tm_min, &tm.tm_sec) == 6)
+    {
+        if (tm.tm_year <= 75)
+            tm.tm_year += 100; /* Y2K compat, sort of */
+    }
+    else /* Unknown format */
+        goto error;
+
+    for (tm.tm_mon = 0; tm.tm_mon < 12; tm.tm_mon++)
+        if (!strcmp(mon, vlc_http_months[tm.tm_mon])) /* found month */
+            return timegm(&tm);
+error:
+    errno = EINVAL;
+    return -1; /* invalid month */
+}
+
+time_t vlc_http_msg_get_atime(const struct vlc_http_msg *m)
+{
+    const char *str = vlc_http_msg_get_header(m, "Date");
+    return (str != NULL) ? vlc_http_mktime(str) : -1;
+}
+
+time_t vlc_http_msg_get_mtime(const struct vlc_http_msg *m)
+{
+    const char *str = vlc_http_msg_get_header(m, "Last-Modified");
+    return (str != NULL) ? vlc_http_mktime(str) : -1;
+}
+
+unsigned vlc_http_msg_get_retry_after(const struct vlc_http_msg *m)
+{
+    const char *str = vlc_http_msg_get_header(m, "Retry-After");
+    char *end;
+
+    unsigned long delay = strtoul(str, &end, 10);
+    if (end != str && *end == '\0')
+        return delay;
+
+    time_t t = vlc_http_mktime(str);
+    if (t != (time_t)-1)
+    {
+        time_t now;
+
+        time(&now);
+        if (t >= now)
+            return t - now;
+    }
+    return 0;
 }
 
 uintmax_t vlc_http_msg_get_size(const struct vlc_http_msg *m)

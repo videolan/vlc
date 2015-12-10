@@ -75,6 +75,41 @@ int vlc_http_msg_add_agent(struct vlc_http_msg *m, const char *str);
 const char *vlc_http_msg_get_agent(const struct vlc_http_msg *m);
 
 /**
+ * Adds a Date header.
+ */
+int vlc_http_msg_add_atime(struct vlc_http_msg *m);
+
+/**
+ * Gets message date.
+ *
+ * Extracts the original date of the message from the HTTP Date header.
+ *
+ * @return a time value on success, -1 on error.
+ */
+time_t vlc_http_msg_get_atime(const struct vlc_http_msg *m);
+
+/**
+ * Gets resource date.
+ *
+ * Extracts the last modification date of the message content from the HTTP
+ * Last-Modified header.
+ *
+ * @return a time value on success, -1 on error.
+ */
+time_t vlc_http_msg_get_mtime(const struct vlc_http_msg *m);
+
+/**
+ * Gets retry timeout.
+ *
+ * Exrtacts the time (in seconds) until the expiration of the "retry-after"
+ * time-out in the HTTP message. If the header value is an absolute date, it
+ * is converted relative to the current time.
+ *
+ * @return the time in seconds, zero if the date is overdue or on error.
+ */
+unsigned vlc_http_msg_get_retry_after(const struct vlc_http_msg *m);
+
+/**
  * Looks up an HTTP header.
  *
  * Finds an HTTP header by (case-insensitive) name inside an HTTP message.
