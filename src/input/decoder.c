@@ -1396,6 +1396,10 @@ static void DecoderProcessFlush( decoder_t *p_dec )
                 vlc_object_release( p_vout );
         }
     }
+
+    vlc_mutex_lock( &p_owner->lock );
+    p_owner->i_preroll_end = INT64_MIN;
+    vlc_mutex_unlock( &p_owner->lock );
 }
 
 /**
