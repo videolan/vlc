@@ -82,6 +82,7 @@ static size_t get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
             if(i_nal_size > i_buf - 2)
                 return 0;
             i_total += i_nal_size + 4;
+            p_buf += i_nal_size + 2;
             i_buf -= i_nal_size + 2;
         }
     }
