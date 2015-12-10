@@ -316,7 +316,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                                       p_dec->fmt_in.i_extra,
                                                       &i_buf,
                                                       &p_sys->i_nal_length_size);
-                buf = p_alloc_buf;
+                p_buf = p_alloc_buf;
                 p_sys->b_is_avcc = !!p_buf;
             }
         } else {
