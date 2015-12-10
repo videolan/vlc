@@ -34,22 +34,20 @@ class       Singleton
 public:
     static T*      getInstance( intf_thread_t *p_intf = NULL )
     {
-        vlc_mutex_lock( &m_mutex );
+        vlc_mutex_locker lock( &m_mutex );
         if ( m_instance == NULL )
             m_instance = new T( p_intf );
-        vlc_mutex_unlock( &m_mutex );
         return m_instance;
     }
 
     static void    killInstance()
     {
-        vlc_mutex_lock( &m_mutex );
+        vlc_mutex_locker lock( &m_mutex );
         if ( m_instance != NULL )
         {
             delete m_instance;
             m_instance = NULL;
         }
-        vlc_mutex_unlock( &m_mutex );
     }
 protected:
     Singleton(){}
