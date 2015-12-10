@@ -271,6 +271,9 @@ public:
     bool hasEmptyPlaylist();
 
     void requestVoutUpdate() { return im->UpdateVout(); }
+    // Probe for initial input. Doing this from the constructor would cause
+    // the getInstance to call itself recursively from the inputChangedHandler
+    void probeCurrentInput();
 
 protected:
     QSignalMapper *menusAudioMapper;

@@ -1061,7 +1061,11 @@ void MainInputManager::customEvent( QEvent *event )
     default:
         if( type != IMEvent::ItemChanged ) return;
     }
+    probeCurrentInput();
+}
 
+void MainInputManager::probeCurrentInput()
+{
     if( p_input != NULL )
         vlc_object_release( p_input );
     p_input = playlist_CurrentInput( THEPL );

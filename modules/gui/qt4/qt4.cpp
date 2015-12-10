@@ -514,11 +514,8 @@ static void *Thread( void *obj )
 
     /* Initialize the Dialog Provider and the Main Input Manager */
     DialogsProvider::getInstance( p_intf );
-    MainInputManager *mim = MainInputManager::getInstance( p_intf );
-    /* initialize p_input (an input can already be running) */
-    input_thread_t *p_input = playlist_CurrentInput( THEPL );
-    if( p_input )
-        mim->getIM()->inputChangedHandler();
+    MainInputManager* mim = MainInputManager::getInstance( p_intf );
+    mim->probeCurrentInput();
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
