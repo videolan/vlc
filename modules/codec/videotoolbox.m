@@ -1034,17 +1034,11 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                         msg_Err(p_dec, "decoder failure: invalid argument");
                         p_dec->b_error = true;
                     } else if (status == -8969 || status == -12909) {
-                        msg_Err(p_dec, "decoder failure: bad data");
+                        msg_Err(p_dec, "decoder failure: bad data (%i)", status);
                         StopVideoToolbox(p_dec);
-                        if (likely(sampleBuffer != nil))
-                            CFRelease(sampleBuffer);
-                        sampleBuffer = nil;
-                        block_Release(p_block);
-                        *pp_block = NULL;
-                        return NULL;
-                    } else if (status == -12911 || status == -8960) {
-                        msg_Err(p_dec, "decoder failure: internal malfunction");
-                        p_dec->b_error = true;
+                    } else if (status == -8960 || status == -12911) {
+                        msg_Err(p_dec, "decoder failure: internal malfunction (%i)", status);
+                        StopVideoToolbox(p_dec);
                     } else
                         msg_Dbg(p_dec, "decoding frame failed (%i)", status);
                 }
