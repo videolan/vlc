@@ -91,29 +91,6 @@ IsoTime::operator time_t () const
     return time;
 }
 
-/* i_year: year - 1900  i_month: 0-11  i_mday: 1-31 i_hour: 0-23 i_minute: 0-59 i_second: 0-59 */
-static int64_t vlc_timegm( int i_year, int i_month, int i_mday, int i_hour, int i_minute, int i_second )
-{
-    static const int pn_day[12+1] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-    int64_t i_day;
-
-    if( i_year < 70 ||
-        i_month < 0 || i_month > 11 || i_mday < 1 || i_mday > 31 ||
-        i_hour < 0 || i_hour > 23 || i_minute < 0 || i_minute > 59 || i_second < 0 || i_second > 59 )
-        return -1;
-
-    /* Count the number of days */
-    i_day = (int64_t)365 * (i_year-70) + pn_day[i_month] + i_mday - 1;
-#define LEAP(y) ( ((y)%4) == 0 && (((y)%100) != 0 || ((y)%400) == 0) ? 1 : 0)
-    for( int i = 70; i < i_year; i++ )
-        i_day += LEAP(1900+i);
-    if( i_month > 1 )
-        i_day += LEAP(1900+i_year);
-#undef LEAP
-    /**/
-    return ((24*i_day + i_hour)*60 + i_minute)*60 + i_second;
-}
-
 UTCTime::UTCTime(const std::string &str)
 {
     enum { YEAR = 0, MON, DAY, HOUR, MIN, SEC, MSEC, TZ };
@@ -166,11 +143,21 @@ UTCTime::UTCTime(const std::string &str)
             }
         }
 
-        t = vlc_timegm( values[YEAR] - 1900, values[MON] - 1, values[DAY],
-                        values[HOUR], values[MIN], values[SEC] );
+        struct tm tm;
+
+        tm.tm_year = values[YEAR] - 1900;
+        tm.tm_mon = values[MON] - 1;
+        tm.tm_mday = values[DAY];
+        tm.tm_hour = values[HOUR];
+        tm.tm_min = values[MIN];
+        tm.tm_sec = values[SEC];
+        tm.tm_isdst = 0;
+
+        t = timegm( &tm );
         t += values[TZ] * 60;
-        t *= CLOCK_FREQ;
-        t += values[MSEC] * 1000;
+        t *= 1000;
+        t += values[MSEC];
+        t *= CLOCK_FREQ / 1000;
     } catch(int) {
         t = 0;
     }
