@@ -24,6 +24,8 @@
 #define _SINGLETON_HPP_
 
 #include <stdlib.h>
+#include <vlc_threads.h>
+
 #include "qt4.hpp"
 
 template <typename T>
@@ -32,18 +34,22 @@ class       Singleton
 public:
     static T*      getInstance( intf_thread_t *p_intf = NULL )
     {
+        vlc_mutex_lock( &m_mutex );
         if ( m_instance == NULL )
             m_instance = new T( p_intf );
+        vlc_mutex_unlock( &m_mutex );
         return m_instance;
     }
 
     static void    killInstance()
     {
+        vlc_mutex_lock( &m_mutex );
         if ( m_instance != NULL )
         {
             delete m_instance;
             m_instance = NULL;
         }
+        vlc_mutex_unlock( &m_mutex );
     }
 protected:
     Singleton(){}
@@ -55,9 +61,13 @@ protected:
 
 private:
     static T*      m_instance;
+    static vlc_mutex_t m_mutex;
 };
 
 template <typename T>
 T*  Singleton<T>::m_instance = NULL;
+
+template <typename T>
+vlc_mutex_t Singleton<T>::m_mutex = VLC_STATIC_MUTEX;
 
 #endif // _SINGLETON_HPP_
