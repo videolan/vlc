@@ -244,7 +244,7 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
                       bool *p_size_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    struct nal_sps sps;
+    struct h264_nal_sps sps;
     uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
     size_t i_sps_size = 0, i_pps_size = 0;
 
