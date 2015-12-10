@@ -4,7 +4,7 @@
  *****************************************************************************
  * Copyright © 2011 VideoLAN
  *
- * Authors: Hugo Beauzée-Luyssen <beauze.h@gmail.com>
+ * Authors: Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
