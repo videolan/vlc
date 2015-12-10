@@ -1366,14 +1366,6 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     if( p_dec->b_error )
         return;
 
-    vlc_mutex_lock( &p_owner->lock );
-    if ( p_owner->i_preroll_end == INT64_MAX )
-    {
-        vlc_mutex_unlock( &p_owner->lock );
-        return;
-    }
-    vlc_mutex_unlock( &p_owner->lock );
-
     if( p_packetizer != NULL && p_packetizer->pf_flush != NULL )
         p_packetizer->pf_flush( p_packetizer );
 
