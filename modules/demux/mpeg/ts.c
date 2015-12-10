@@ -3656,29 +3656,6 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
     dvbpsi_sdt_delete( p_sdt );
 }
 
-/* i_year: year - 1900  i_month: 0-11  i_mday: 1-31 i_hour: 0-23 i_minute: 0-59 i_second: 0-59 */
-static int64_t vlc_timegm( int i_year, int i_month, int i_mday, int i_hour, int i_minute, int i_second )
-{
-    static const int pn_day[12+1] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-    int64_t i_day;
-
-    if( i_year < 70 ||
-        i_month < 0 || i_month > 11 || i_mday < 1 || i_mday > 31 ||
-        i_hour < 0 || i_hour > 23 || i_minute < 0 || i_minute > 59 || i_second < 0 || i_second > 59 )
-        return -1;
-
-    /* Count the number of days */
-    i_day = 365 * (i_year-70) + pn_day[i_month] + i_mday - 1;
-#define LEAP(y) ( ((y)%4) == 0 && (((y)%100) != 0 || ((y)%400) == 0) ? 1 : 0)
-    for( int i = 70; i < i_year; i++ )
-        i_day += LEAP(1900+i);
-    if( i_month > 1 )
-        i_day += LEAP(1900+i_year);
-#undef LEAP
-    /**/
-    return ((24*i_day + i_hour)*60 + i_minute)*60 + i_second;
-}
-
 static void EITDecodeMjd( int i_mjd, int *p_y, int *p_m, int *p_d )
 {
     const int yp = (int)( ( (double)i_mjd - 15078.2)/365.25 );
@@ -3693,19 +3670,22 @@ static void EITDecodeMjd( int i_mjd, int *p_y, int *p_m, int *p_d )
 static int64_t EITConvertStartTime( uint64_t i_date )
 {
     const int i_mjd = i_date >> 24;
-    const int i_hour   = CVT_FROM_BCD(i_date >> 16);
-    const int i_minute = CVT_FROM_BCD(i_date >>  8);
-    const int i_second = CVT_FROM_BCD(i_date      );
-    int i_year;
-    int i_month;
-    int i_day;
+    struct tm tm;
+
+    tm.tm_hour = CVT_FROM_BCD(i_date >> 16);
+    tm.tm_min  = CVT_FROM_BCD(i_date >>  8);
+    tm.tm_sec  = CVT_FROM_BCD(i_date      );
 
     /* if all 40 bits are 1, the start is unknown */
     if( i_date == UINT64_C(0xffffffffff) )
         return -1;
 
-    EITDecodeMjd( i_mjd, &i_year, &i_month, &i_day );
-    return vlc_timegm( i_year - 1900, i_month - 1, i_day, i_hour, i_minute, i_second );
+    EITDecodeMjd( i_mjd, &tm.tm_year, &tm.tm_mon, &tm.tm_mday );
+    tm.tm_year -= 1900;
+    tm.tm_mon--;
+    tm.tm_isdst = 0;
+
+    return timegm( &tm );
 }
 static int EITConvertDuration( uint32_t i_duration )
 {
