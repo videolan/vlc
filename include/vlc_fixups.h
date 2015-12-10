@@ -200,6 +200,7 @@ struct tm *localtime_r (const time_t *, struct tm *);
 
 #ifndef HAVE_TIMESPEC_GET
 #define TIME_UTC 1
+#include <time.h>
 int timespec_get(struct timespec *, int);
 #endif
 
