@@ -40,7 +40,8 @@
 # endif
 #endif
 
-#if !defined (HAVE_GMTIME_R) || !defined (HAVE_LOCALTIME_R)
+#if !defined (HAVE_GMTIME_R) || !defined (HAVE_LOCALTIME_R) \
+ || !defined (HAVE_TIMEGM)
 # include <time.h> /* time_t */
 #endif
 
@@ -196,6 +197,10 @@ struct tm *gmtime_r (const time_t *, struct tm *);
 
 #ifndef HAVE_LOCALTIME_R
 struct tm *localtime_r (const time_t *, struct tm *);
+#endif
+
+#ifndef HAVE_TIMEGM
+time_t timegm(const struct tm *);
 #endif
 
 #ifndef HAVE_TIMESPEC_GET
