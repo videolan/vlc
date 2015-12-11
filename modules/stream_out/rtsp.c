@@ -91,7 +91,6 @@ rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
 
     if( rtsp == NULL )
     {
-        free( rtsp );
         return NULL;
     }
 
