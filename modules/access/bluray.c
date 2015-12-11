@@ -2085,18 +2085,6 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
         if (display) {
             if (p_sys->p_vout == NULL)
                 p_sys->p_vout = input_GetVout(p_demux->p_input);
-            else {
-                /* track vout changes */
-                vout_thread_t *p_vout = input_GetVout(p_demux->p_input);
-                if (p_vout != p_sys->p_vout) {
-                    msg_Info(p_demux, "vout changed %p -> %p\n",
-                             (void *)p_sys->p_vout, (void *)p_vout);
-                    blurayReleaseVout(p_demux);
-                    p_sys->p_vout = p_vout;
-                } else {
-                    vlc_object_release(p_vout);
-                }
-            }
 
             /* NOTE: we might want to enable background video always when there's no video stream playing.
                Now, with some discs, there are perioids (even seconds) during which the video window
@@ -2128,8 +2116,16 @@ static int onIntfEvent( vlc_object_t *p_input, char const *psz_var,
 {
     (void)p_input; (void) psz_var; (void) oldval;
     demux_t *p_demux = p_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     if (val.i_int == INPUT_EVENT_VOUT) {
+
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
+        if( p_sys->p_vout != NULL ) {
+            blurayReleaseVout(p_demux);
+        }
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
+
         blurayHandleOverlays(p_demux, 1);
     }
 
