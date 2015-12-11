@@ -39,6 +39,7 @@
 #include <vlc_cpu.h>
 #include <vlc_memory.h>
 #include <vlc_timestamp_helper.h>
+#include <vlc_threads.h>
 
 #include "mediacodec.h"
 #include "../../packetizer/h264_nal.h"
@@ -107,7 +108,6 @@ struct decoder_sys_t
     /* Cond used to signal the decoder thread */
     vlc_cond_t      dec_cond;
     /* Set to true by pf_flush to signal the output thread to flush */
-    bool            b_out_thread_running;
     bool            b_flush_out;
     /* If true, the output thread will start to dequeue output pictures */
     bool            b_output_ready;
@@ -657,25 +657,19 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         b_late_opening = true;
     }
 
-    vlc_mutex_lock(&p_sys->lock);
-
     if (!b_late_opening && StartMediaCodec(p_dec) != VLC_SUCCESS)
     {
         msg_Err(p_dec, "StartMediaCodec failed");
-        vlc_mutex_unlock(&p_sys->lock);
         goto bailout;
     }
 
-    p_sys->b_out_thread_running = true;
     if (vlc_clone(&p_sys->out_thread, OutThread, p_dec,
                   VLC_THREAD_PRIORITY_LOW))
     {
         msg_Err(p_dec, "vlc_clone failed");
-        p_sys->b_out_thread_running = false;
         vlc_mutex_unlock(&p_sys->lock);
         goto bailout;
     }
-    vlc_mutex_unlock(&p_sys->lock);
 
     return VLC_SUCCESS;
 
@@ -692,6 +686,17 @@ static int OpenDecoderNdk(vlc_object_t *p_this)
 static int OpenDecoderJni(vlc_object_t *p_this)
 {
     return OpenDecoder(p_this, MediaCodecJni_Init);
+}
+
+static void AbortDecoderLocked(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (!p_sys->b_error)
+    {
+        p_sys->b_error = true;
+        vlc_cancel(p_sys->out_thread);
+    }
 }
 
 static void CleanDecoder(decoder_t *p_dec)
@@ -730,10 +735,12 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_out_thread_running = false;
+    /* Unblock output thread waiting in dequeue_out */
     DecodeFlushLocked(p_dec);
-    vlc_cond_broadcast(&p_sys->cond);
+    /* Cancel the output thread */
+    AbortDecoderLocked(p_dec);
     vlc_mutex_unlock(&p_sys->lock);
+
     vlc_join(p_sys->out_thread, NULL);
 
     CleanDecoder(p_dec);
@@ -1081,7 +1088,7 @@ static void DecodeFlushLocked(decoder_t *p_dec)
 
     if (b_had_input && p_sys->api->flush(p_sys->api) != VLC_SUCCESS)
     {
-        p_sys->b_error = true;
+        AbortDecoderLocked(p_dec);
         return;
     }
 
@@ -1105,15 +1112,14 @@ static void *OutThread(void *data)
     decoder_t *p_dec = data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    vlc_mutex_lock(&p_sys->lock);
+    mutex_cleanup_push(&p_sys->lock);
     for (;;)
     {
         int i_index;
 
-        vlc_mutex_lock(&p_sys->lock);
-
         /* Wait for output ready */
-        while (!p_sys->b_error && p_sys->b_out_thread_running
-            && !p_sys->b_flush_out && !p_sys->b_output_ready)
+        while (!p_sys->b_flush_out && !p_sys->b_output_ready)
             vlc_cond_wait(&p_sys->cond, &p_sys->lock);
 
         if (p_sys->b_flush_out)
@@ -1121,17 +1127,17 @@ static void *OutThread(void *data)
             /* Acknowledge flushed state */
             p_sys->b_flush_out = false;
             vlc_cond_broadcast(&p_sys->dec_cond);
-            goto next;
+            continue;
         }
 
-        /* Check if thread is not stopped */
-        if (!p_sys->b_out_thread_running || p_sys->b_error)
-            goto end;
+        int canc = vlc_savecancel();
 
         vlc_mutex_unlock(&p_sys->lock);
+
         /* Wait for an output buffer. This function returns when a new output
          * is available or if output is flushed. */
         i_index = p_sys->api->dequeue_out(p_sys->api, -1);
+
         vlc_mutex_lock(&p_sys->lock);
 
         /* Ignore dequeue_out errors caused by flush */
@@ -1145,7 +1151,10 @@ static void *OutThread(void *data)
             /* Parse output format/buffers even when we are flushing */
             if (i_index != MC_API_INFO_OUTPUT_FORMAT_CHANGED
              && i_index != MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
-                goto next;
+            {
+                vlc_restorecancel(canc);
+                continue;
+            }
         }
 
         /* Process output returned by dequeue_out */
@@ -1164,7 +1173,8 @@ static void *OutThread(void *data)
                                              &p_block) == -1)
                 {
                     msg_Err(p_dec, "pf_process_output failed");
-                    goto end;
+                    vlc_restorecancel(canc);
+                    break;
                 }
                 if (p_pic)
                     decoder_QueueVideo(p_dec, p_pic);
@@ -1173,24 +1183,26 @@ static void *OutThread(void *data)
             } else if (i_ret != 0)
             {
                 msg_Err(p_dec, "get_out failed");
-                goto end;
+                vlc_restorecancel(canc);
+                break;
             }
         }
         else
         {
             msg_Err(p_dec, "dequeue_out failed");
-            goto end;
+            vlc_restorecancel(canc);
+            break;
         }
-next:
-        vlc_mutex_unlock(&p_sys->lock);
-        continue;
-end:
-        msg_Warn(p_dec, "OutThread stopped");
-        p_sys->b_error = true;
-        vlc_cond_signal(&p_sys->dec_cond);
-        vlc_mutex_unlock(&p_sys->lock);
-        break;
+        vlc_restorecancel(canc);
     }
+    msg_Warn(p_dec, "OutThread stopped");
+
+    /* Signal DecoderFlush that the output thread aborted */
+    p_sys->b_error = true;
+    vlc_cond_signal(&p_sys->dec_cond);
+
+    vlc_cleanup_pop();
+    vlc_mutex_unlock(&p_sys->lock);
 
     return NULL;
 }
@@ -1253,7 +1265,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
                 if (StartMediaCodec(p_dec) != VLC_SUCCESS)
                 {
                     msg_Err(p_dec, "StartMediaCodec failed");
-                    p_sys->b_error = true;
+                    AbortDecoderLocked(p_dec);
                     goto end;
                 }
             }
@@ -1263,7 +1275,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
     {
         if (i_ret != 0)
         {
-            p_sys->b_error = true;
+            AbortDecoderLocked(p_dec);
             msg_Err(p_dec, "pf_on_new_block failed");
         }
         goto end;
@@ -1324,7 +1336,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
             } else
             {
                 msg_Err(p_dec, "queue_in failed");
-                p_sys->b_error = true;
+                AbortDecoderLocked(p_dec);
                 goto end;
             }
         }
@@ -1347,14 +1359,14 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
             else
             {
                 msg_Err(p_dec, "dequeue_in timeout: no input available for 2secs");
-                p_sys->b_error = true;
+                AbortDecoderLocked(p_dec);
                 goto end;
             }
         }
         else
         {
             msg_Err(p_dec, "dequeue_in failed");
-            p_sys->b_error = true;
+            AbortDecoderLocked(p_dec);
             goto end;
         }
     }
