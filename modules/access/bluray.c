@@ -2083,8 +2083,13 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
         bool display = ov->status == ToDisplay;
         vlc_mutex_unlock(&ov->lock);
         if (display) {
-            if (p_sys->p_vout == NULL)
+            if (p_sys->p_vout == NULL) {
                 p_sys->p_vout = input_GetVout(p_demux->p_input);
+                if (p_sys->p_vout != NULL) {
+                    var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
+                    var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
+                }
+            }
 
             /* NOTE: we might want to enable background video always when there's no video stream playing.
                Now, with some discs, there are perioids (even seconds) during which the video window
@@ -2101,8 +2106,6 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
             }
 
             if (p_sys->p_vout != NULL) {
-                var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
-                var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
                 bluraySendOverlayToVout(p_demux, ov);
             }
         }
