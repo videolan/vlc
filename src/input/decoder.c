@@ -593,6 +593,16 @@ int decoder_GetDisplayRate( decoder_t *p_dec )
     return p_dec->pf_get_display_rate( p_dec );
 }
 
+void decoder_AbortPictures( decoder_t *p_dec, bool b_abort )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_owner->p_vout != NULL )
+        vout_Cancel( p_owner->p_vout, b_abort );
+    vlc_mutex_unlock( &p_owner->lock );
+}
+
 static void DecoderWaitUnblock( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;

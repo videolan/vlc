@@ -246,6 +246,16 @@ static inline picture_t *decoder_NewPicture( decoder_t *dec )
 }
 
 /**
+ * Abort any calls of decoder_NewPicture / decoder_GetPicture
+ *
+ * If b_abort is true, all pending and futures calls of decoder_NewPicture /
+ * decoder_GetPicture will be aborted. This function can be used by
+ * asynchronous video decoders to unblock a thread that is waiting for a
+ * picture.
+ */
+VLC_API void decoder_AbortPictures( decoder_t *dec, bool b_abort );
+
+/**
  * This function queues a picture to the video output.
  *
  * \note

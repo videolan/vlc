@@ -73,6 +73,7 @@ date_Increment
 date_Init
 date_Move
 date_Set
+decoder_AbortPictures
 decoder_GetDisplayDate
 decoder_GetDisplayRate
 decoder_GetInputAttachments
