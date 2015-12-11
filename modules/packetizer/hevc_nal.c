@@ -21,6 +21,7 @@
 #include "hevc_nal.h"
 #include "hxxx_nal.h"
 
+#include <vlc_common.h>
 #include <vlc_bits.h>
 
 #include <limits.h>
@@ -75,7 +76,7 @@ typedef struct
     nal_u8_t sub_layer_level_idc[HEVC_MAX_SUBLAYERS];
 } hevc_profile_tier_level_t;
 
-typedef struct
+struct hevc_sequence_parameter_set_t
 {
     nal_u4_t sps_video_parameter_set_id;
     nal_u3_t sps_max_sub_layers_minus1;
@@ -117,7 +118,7 @@ typedef struct
     nal_ue_t log2_diff_max_min_luma_transform_block_size;
 
     /* incomplete */
-} hevc_sequence_parameter_set_t;
+};
 
 /* Computes size and does check the whole struct integrity */
 static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
@@ -291,4 +292,87 @@ static bool hevc_parse_profile_tier_level_rbsp( bs_t *p_bs, bool profile_present
     }
 
     return true;
+}
+
+static bool hevc_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
+                                                    hevc_sequence_parameter_set_t *p_sps )
+{
+    p_sps->sps_video_parameter_set_id = bs_read( p_bs, 4 );
+    p_sps->sps_max_sub_layers_minus1 = bs_read( p_bs, 3 );
+    p_sps->sps_temporal_id_nesting_flag = bs_read1( p_bs );
+    if( !hevc_parse_profile_tier_level_rbsp( p_bs, true, p_sps->sps_max_sub_layers_minus1,
+                                            &p_sps->profile_tier_level ) )
+        return false;
+
+    if( bs_remain( p_bs ) < 1 )
+        return false;
+
+    p_sps->sps_seq_parameter_set_id = bs_read_ue( p_bs );
+    if( p_sps->sps_seq_parameter_set_id >= HEVC_SPS_MAX )
+        return false;
+
+    p_sps->chroma_format_idc = bs_read_ue( p_bs );
+    if( p_sps->chroma_format_idc == 3 )
+        p_sps->separate_colour_plane_flag = bs_read1( p_bs );
+    p_sps->pic_width_in_luma_samples = bs_read_ue( p_bs );
+    p_sps->pic_height_in_luma_samples = bs_read_ue( p_bs );
+    if( !p_sps->pic_width_in_luma_samples || !p_sps->pic_height_in_luma_samples )
+        return false;
+
+    p_sps->conformance_window_flag = bs_read1( p_bs );
+    if( p_sps->conformance_window_flag )
+    {
+        p_sps->conf_win.left_offset = bs_read_ue( p_bs );
+        p_sps->conf_win.right_offset = bs_read_ue( p_bs );
+        p_sps->conf_win.top_offset = bs_read_ue( p_bs );
+        p_sps->conf_win.bottom_offset = bs_read_ue( p_bs );
+    }
+
+    p_sps->bit_depth_luma_minus8 = bs_read_ue( p_bs );
+    p_sps->bit_depth_chroma_minus8 = bs_read_ue( p_bs );
+    p_sps->log2_max_pic_order_cnt_lsb_minus4 = bs_read_ue( p_bs );
+
+    p_sps->sps_sub_layer_ordering_info_present_flag = bs_read1( p_bs );
+    for( uint8_t i=(p_sps->sps_sub_layer_ordering_info_present_flag ? 0 : p_sps->sps_max_sub_layers_minus1);
+         i <= p_sps->sps_max_sub_layers_minus1; i++ )
+    {
+        p_sps->sps_max[i].dec_pic_buffering_minus1 = bs_read_ue( p_bs );
+        p_sps->sps_max[i].num_reorder_pics = bs_read_ue( p_bs );
+        p_sps->sps_max[i].latency_increase_plus1 = bs_read_ue( p_bs );
+    }
+
+    if( bs_remain( p_bs ) < 4 )
+        return false;
+
+    p_sps->log2_min_luma_coding_block_size_minus3 = bs_read_ue( p_bs );
+    p_sps->log2_diff_max_min_luma_coding_block_size = bs_read_ue( p_bs );
+    p_sps->log2_min_luma_transform_block_size_minus2 = bs_read_ue( p_bs );
+    if( bs_remain( p_bs ) < 1 ) /* last late fail check */
+        return false;
+    p_sps->log2_diff_max_min_luma_transform_block_size = bs_read_ue( p_bs );
+
+    /* parsing incomplete */
+    return true;
+}
+
+void hevc_rbsp_release_sps( hevc_sequence_parameter_set_t *p_sps )
+{
+    free( p_sps );
+}
+
+hevc_sequence_parameter_set_t * hevc_rbsp_decode_sps( const uint8_t *p_buf, size_t i_buf )
+{
+    hevc_sequence_parameter_set_t *p_sps = calloc(1, sizeof(hevc_sequence_parameter_set_t));
+    if(likely(p_sps))
+    {
+        bs_t bs;
+        bs_init( &bs, p_buf, i_buf );
+        bs_skip( &bs, 16 ); /* Skip nal_unit_header */
+        if( !hevc_parse_sequence_parameter_set_rbsp( &bs, p_sps ) )
+        {
+            hevc_rbsp_release_sps( p_sps );
+            p_sps = NULL;
+        }
+    }
+    return p_sps;
 }
