@@ -147,6 +147,7 @@ struct decoder_sys_t
  *****************************************************************************/
 static int  OpenDecoderJni(vlc_object_t *);
 static int  OpenDecoderNdk(vlc_object_t *);
+static void CleanDecoder(decoder_t *);
 static void CloseDecoder(vlc_object_t *);
 
 static int Video_OnNewBlock(decoder_t *, block_t *, int *);
@@ -679,7 +680,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     return VLC_SUCCESS;
 
 bailout:
-    CloseDecoder(p_this);
+    CleanDecoder(p_dec);
     return VLC_EGENERIC;
 }
 
@@ -693,27 +694,9 @@ static int OpenDecoderJni(vlc_object_t *p_this)
     return OpenDecoder(p_this, MediaCodecJni_Init);
 }
 
-/*****************************************************************************
- * CloseDecoder: Close the decoder instance
- *****************************************************************************/
-static void CloseDecoder(vlc_object_t *p_this)
+static void CleanDecoder(decoder_t *p_dec)
 {
-    decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if (!p_sys)
-        return;
-    vlc_mutex_lock(&p_sys->lock);
-    if (p_sys->b_out_thread_running)
-    {
-        p_sys->b_out_thread_running = false;
-        DecodeFlushLocked(p_dec);
-        vlc_cond_broadcast(&p_sys->cond);
-        vlc_mutex_unlock(&p_sys->lock);
-        vlc_join(p_sys->out_thread, NULL);
-    }
-    else
-        vlc_mutex_unlock(&p_sys->lock);
 
     vlc_mutex_destroy(&p_sys->lock);
     vlc_cond_destroy(&p_sys->cond);
@@ -736,6 +719,24 @@ static void CloseDecoder(vlc_object_t *p_this)
     free(p_sys->api->psz_name);
     free(p_sys->api);
     free(p_sys);
+}
+
+/*****************************************************************************
+ * CloseDecoder: Close the decoder instance
+ *****************************************************************************/
+static void CloseDecoder(vlc_object_t *p_this)
+{
+    decoder_t *p_dec = (decoder_t *)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    vlc_mutex_lock(&p_sys->lock);
+    p_sys->b_out_thread_running = false;
+    DecodeFlushLocked(p_dec);
+    vlc_cond_broadcast(&p_sys->cond);
+    vlc_mutex_unlock(&p_sys->lock);
+    vlc_join(p_sys->out_thread, NULL);
+
+    CleanDecoder(p_dec);
 }
 
 /*****************************************************************************
