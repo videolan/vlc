@@ -101,15 +101,21 @@ struct decoder_sys_t
     dec_process_output_cb   pf_process_output;
 
     vlc_mutex_t     lock;
-    vlc_cond_t      cond;
-    vlc_cond_t      dec_cond;
     vlc_thread_t    out_thread;
+    /* Cond used to signal the output thread */
+    vlc_cond_t      cond;
+    /* Cond used to signal the decoder thread */
+    vlc_cond_t      dec_cond;
+    /* Set to true by pf_flush to signal the output thread to flush */
     bool            b_out_thread_running;
     bool            b_flush_out;
+    /* If true, the output thread will start to dequeue output pictures */
     bool            b_output_ready;
-    bool            b_mc_running;
+    /* If true, the first input block was successfully dequeued */
+    bool            b_input_dequeued;
     bool            b_error;
-    bool            b_error_signaled; // TODO remove
+    /* TODO: remove. See jni_EventHardwareAccelerationError */
+    bool            b_error_signaled;
 
     union
     {
@@ -1061,9 +1067,9 @@ static void HEVCProcessBlock(decoder_t *p_dec, block_t *p_block,
 static void DecodeFlushLocked(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    bool b_was_running = p_sys->b_mc_running;
+    bool b_had_input = p_sys->b_input_dequeued;
 
-    p_sys->b_mc_running = false;
+    p_sys->b_input_dequeued = false;
     p_sys->b_flush_out = true;
     p_sys->i_preroll_end = 0;
     p_sys->b_output_ready = false;
@@ -1072,7 +1078,7 @@ static void DecodeFlushLocked(decoder_t *p_dec)
 
     p_sys->pf_on_flush(p_dec);
 
-    if (b_was_running && p_sys->api->flush(p_sys->api) != VLC_SUCCESS)
+    if (b_had_input && p_sys->api->flush(p_sys->api) != VLC_SUCCESS)
     {
         p_sys->b_error = true;
         return;
@@ -1141,6 +1147,7 @@ static void *OutThread(void *data)
                 goto next;
         }
 
+        /* Process output returned by dequeue_out */
         if (i_index >= 0 || i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED
          || i_index == MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
         {
@@ -1285,7 +1292,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
         {
             bool b_config = p_block && (p_block->i_flags & BLOCK_FLAG_CSD);
             mtime_t i_ts = 0;
-            p_sys->b_mc_running = true;
+            p_sys->b_input_dequeued = true;
 
             if (!b_config)
             {
@@ -1303,7 +1310,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
                     if (p_block->i_flags & BLOCK_FLAG_PREROLL )
                         p_sys->i_preroll_end = i_ts;
 
-                    /* One input buffer is queued, unblock OutThread that will
+                    /* One input buffer is queued, signal OutThread that will
                      * fetch output buffers */
                     p_sys->b_output_ready = true;
                     vlc_cond_broadcast(&p_sys->cond);
@@ -1360,7 +1367,8 @@ end:
     if (p_sys->b_error)
     {
         if (!p_sys->b_error_signaled) {
-            /* Signal the error to the Java. */
+            /* Signal the error to the Java.
+             * TODO: remove this when there is a decoder fallback */
             jni_EventHardwareAccelerationError();
             p_sys->b_error_signaled = true;
             vlc_cond_broadcast(&p_sys->cond);
