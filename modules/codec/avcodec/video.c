@@ -1097,7 +1097,7 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
 
     pic = decoder_GetPicture(dec);
     if (pic == NULL)
-        return -1;
+        return -ENOMEM;
 
     if (sys->p_va != NULL)
         return lavc_va_GetFrame(ctx, frame, pic);
