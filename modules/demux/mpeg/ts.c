@@ -2977,7 +2977,8 @@ static int ProbeStart( demux_t *p_demux, int i_program )
         i_probe_count += PROBE_CHUNK_COUNT;
     } while( i_pos > 0 && (i_pcr == -1 || !b_found) && i_probe_count < (2 * PROBE_CHUNK_COUNT) );
 
-    stream_Seek( p_sys->stream, i_initial_pos );
+    if( stream_Seek( p_sys->stream, i_initial_pos ) )
+        return VLC_EGENERIC;
 
     return (b_found) ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -3007,7 +3008,8 @@ static int ProbeEnd( demux_t *p_demux, int i_program )
         i_probe_count += PROBE_CHUNK_COUNT;
     } while( i_pos > 0 && (i_pcr == -1 || !b_found) && i_probe_count < (6 * PROBE_CHUNK_COUNT) );
 
-    stream_Seek( p_sys->stream, i_initial_pos );
+    if( stream_Seek( p_sys->stream, i_initial_pos ) )
+        return VLC_EGENERIC;
 
     return (b_found) ? VLC_SUCCESS : VLC_EGENERIC;
 }
