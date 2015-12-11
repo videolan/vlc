@@ -507,9 +507,17 @@ static void Flush( decoder_t *p_dec )
     p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
     p_sys->i_late_frames = 0;
 
+    /* Abort pictures in order to unblock all avcodec workers threads waiting
+     * for a picture. This will avoid a deadlock between avcodec_flush_buffers
+     * and workers threads */
+    decoder_AbortPictures( p_dec, true );
+
     post_mt( p_sys );
     avcodec_flush_buffers( p_context );
     wait_mt( p_sys );
+
+    /* Reset cancel state to false */
+    decoder_AbortPictures( p_dec, false );
 }
 
 /*****************************************************************************
