@@ -253,6 +253,8 @@ static void  blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY * const over
 
 static int   onMouseEvent(vlc_object_t *p_vout, const char *psz_var,
                           vlc_value_t old, vlc_value_t val, void *p_data);
+static int   onIntfEvent(vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void *);
 
 static void  blurayResetParser(demux_t *p_demux);
 
@@ -631,6 +633,8 @@ static int blurayOpen(vlc_object_t *object)
     if (unlikely(p_sys->p_out == NULL))
         goto error;
 
+    var_AddCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
+
     blurayResetParser(p_demux);
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
@@ -658,6 +662,8 @@ static void blurayClose(vlc_object_t *object)
 {
     demux_t *p_demux = (demux_t*)object;
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    var_DelCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
 
     setTitleInfo(p_sys, NULL);
 
@@ -1264,11 +1270,15 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
     switch (overlay->cmd) {
     case BD_OVERLAY_INIT:
         msg_Info(p_demux, "Initializing overlay");
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
         blurayInitOverlay(p_demux, overlay->plane, overlay->w, overlay->h);
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
         break;
     case BD_OVERLAY_CLOSE:
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
         blurayClearOverlay(p_demux, overlay->plane);
         blurayCloseOverlay(p_demux, overlay->plane);
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
         break;
     case BD_OVERLAY_CLEAR:
         blurayClearOverlay(p_demux, overlay->plane);
@@ -2111,6 +2121,19 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
     }
 
     vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
+}
+
+static int onIntfEvent( vlc_object_t *p_input, char const *psz_var,
+                        vlc_value_t oldval, vlc_value_t val, void *p_data )
+{
+    (void)p_input; (void) psz_var; (void) oldval;
+    demux_t *p_demux = p_data;
+
+    if (val.i_int == INPUT_EVENT_VOUT) {
+        blurayHandleOverlays(p_demux, 1);
+    }
+
+    return VLC_SUCCESS;
 }
 
 #define BD_TS_PACKET_SIZE (192)
