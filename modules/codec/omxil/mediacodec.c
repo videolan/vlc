@@ -576,7 +576,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     vlc_mutex_init(&p_sys->lock);
     vlc_cond_init(&p_sys->cond);
     vlc_cond_init(&p_sys->dec_cond);
-    vlc_cond_init(&p_sys->dec_cond);
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
