@@ -3062,6 +3062,42 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
     }
 }
 
+static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
+{
+    for( int i=0; i<p_pmt->e_streams.i_size; i++ )
+    {
+        ts_pid_t *p_pid = p_pmt->e_streams.p_elems[i];
+
+        if( p_pid->type != TYPE_PES || SCRAMBLED(*p_pid) )
+            continue;
+
+        if( p_pid->u.p_pes->p_data == NULL )
+            continue;
+        if( p_pid->u.p_pes->i_data_size != 0 )
+            continue;
+
+        uint8_t header[34];
+        const int i_max = block_ChainExtract( p_pid->u.p_pes->p_data, header, 34 );
+
+        if( i_max < 6 || header[0] != 0 || header[1] != 0 || header[2] != 1 )
+            continue;
+
+        unsigned i_skip = 0;
+        mtime_t i_dts = -1;
+        mtime_t i_pts = -1;
+        uint8_t i_stream_id;
+
+        if( ParsePESHeader( VLC_OBJECT(p_demux), (uint8_t*)&header, i_max, &i_skip,
+                            &i_dts, &i_pts, &i_stream_id ) == VLC_EGENERIC )
+            continue;
+
+        if ((i_dts > 0 && i_dts <= i_pcr) || (i_pts > 0 && i_pts <= i_pcr)) {
+            msg_Err( p_demux, "send queued data for pid %d: DTS %"PRId64" >= PCR %"PRId64"\n", p_pid->i_pid, i_dts, i_pcr);
+            ParseData( p_demux, p_pid );
+        }
+    }
+}
+
 static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
     demux_sys_t   *p_sys = p_demux->p_sys;
@@ -3099,6 +3135,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             if( p_pmt->i_pid_pcr == pid->i_pid ) /* If that program references current pid as PCR */
             {
                 /* We've found a target group for update */
+                PCRCheckDTS( p_demux, p_pmt, i_pcr );
                 ProgramSetPCR( p_demux, p_pmt, i_program_pcr );
             }
         }
