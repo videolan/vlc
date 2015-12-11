@@ -1969,7 +1969,11 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
           p_demux->info.i_seekpoint = 0;
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
         break;
+    case BD_EVENT_PLAYMARK:
     case BD_EVENT_ANGLE:
+        break;
+    case BD_EVENT_UO_MASK_CHANGED:
+        /* This event could be used to grey out unselectable items in title menu */
         break;
     case BD_EVENT_MENU:
         p_sys->b_menu_open = e->param;
@@ -2006,6 +2010,11 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         blurayStreamSelect(p_demux, e->event, e->param);
         break;
     case BD_EVENT_IG_STREAM:
+    case BD_EVENT_SECONDARY_AUDIO:
+    case BD_EVENT_SECONDARY_AUDIO_STREAM:
+    case BD_EVENT_SECONDARY_VIDEO:
+    case BD_EVENT_SECONDARY_VIDEO_STREAM:
+    case BD_EVENT_SECONDARY_VIDEO_SIZE:
         break;
 
     /*
