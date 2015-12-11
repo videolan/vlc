@@ -39,27 +39,6 @@ bool h264_isavcC( const uint8_t *p_buf, size_t i_buf )
             (p_buf[5] & 0xE0) == 0xE0 );
 }
 
-static inline bool strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_data )
-{
-    const uint8_t *p_data = *pp_data;
-    if(*pi_data < 4)
-    {
-        return false;
-    }
-    else if( p_data[0] == !!memcmp(&p_data[1], annexb_startcode3, 3) )
-    {
-        *pp_data += 4;
-        *pi_data -= 4;
-    }
-    else if( !memcmp(p_data, annexb_startcode4, 3) )
-    {
-        *pp_data += 3;
-        *pi_data -= 3;
-    }
-    else return false;
-    return true;
-}
-
 static size_t get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
 {
     size_t i_total = 0;
@@ -715,8 +694,8 @@ block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
     if( i_pps_size > UINT16_MAX || i_sps_size > UINT16_MAX )
         return NULL;
 
-    if( !strip_AnnexB_startcode( &p_sps_buf, &i_sps_size ) ||
-        !strip_AnnexB_startcode( &p_pps_buf, &i_pps_size ) )
+    if( !hxxx_strip_AnnexB_startcode( &p_sps_buf, &i_sps_size ) ||
+        !hxxx_strip_AnnexB_startcode( &p_pps_buf, &i_pps_size ) )
         return NULL;
 
     /* The length of the NAL size is encoded using 1, 2 or 4 bytes */

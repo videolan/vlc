@@ -29,6 +29,29 @@
 static const uint8_t  annexb_startcode4[] = { 0x00, 0x00, 0x00, 0x01 };
 #define annexb_startcode3 (&annexb_startcode4[1])
 
+static inline bool hxxx_strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_data )
+{
+    const uint8_t *p_data = *pp_data;
+    if(*pi_data < 4 || p_data[0])
+        return false;
+
+    /* Skip 4 bytes startcode */
+    if( !memcmp(&p_data[1], &annexb_startcode4[1], 3) )
+    {
+        *pp_data += 4;
+        *pi_data -= 4;
+    }
+    /* Skip 3 bytes startcode */
+    else if( !memcmp(&p_data[1], &annexb_startcode4[2], 2) )
+    {
+        *pp_data += 3;
+        *pi_data -= 3;
+    }
+    else
+        return false;
+    return true;
+}
+
 /* Discards emulation prevention three bytes */
 static inline uint8_t * hxxx_ep3b_to_rbsp(const uint8_t *p_src, size_t i_src, size_t *pi_ret)
 {
