@@ -1457,7 +1457,7 @@ static int ThreadReinit(vout_thread_t *vout,
 
 static void ThreadCancel(vout_thread_t *vout)
 {
-    picture_pool_Cancel(vout->p->decoder_pool);
+    picture_pool_Cancel(vout->p->decoder_pool, true);
 }
 
 static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)

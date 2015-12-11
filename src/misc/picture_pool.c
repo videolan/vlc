@@ -277,13 +277,14 @@ picture_t *picture_pool_Wait(picture_pool_t *pool)
     return clone;
 }
 
-void picture_pool_Cancel(picture_pool_t *pool)
+void picture_pool_Cancel(picture_pool_t *pool, bool canceled)
 {
     vlc_mutex_lock(&pool->lock);
     assert(pool->refs > 0);
 
-    pool->canceled = true;
-    vlc_cond_broadcast(&pool->wait);
+    pool->canceled = canceled;
+    if (canceled)
+        vlc_cond_broadcast(&pool->wait);
     vlc_mutex_unlock(&pool->lock);
 }
 

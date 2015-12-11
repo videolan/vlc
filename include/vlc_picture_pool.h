@@ -160,11 +160,11 @@ unsigned picture_pool_Reset( picture_pool_t * );
 /**
  * Cancel the picture pool.
  *
- * It won't return any pictures via picture_pool_Get or picture_pool_Wait after
- * this call. This function will also unblock picture_pool_Wait. Call
- * picture_pool_Reset to reset the cancel state.
+ * It won't return any pictures via picture_pool_Get or picture_pool_Wait if
+ * canceled is true. This function will also unblock picture_pool_Wait.
+ * picture_pool_Reset will also reset the cancel state to false.
  */
-void picture_pool_Cancel( picture_pool_t * );
+void picture_pool_Cancel( picture_pool_t *, bool canceled );
 
 /**
  * Reserves pictures from a pool and creates a new pool with those.
