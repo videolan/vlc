@@ -1866,7 +1866,7 @@ void input_DecoderDelete( decoder_t *p_dec )
      * This unblocks the thread, allowing the decoder module to join all its
      * worker threads (if any) and the decoder thread to terminate. */
     if( p_owner->p_vout != NULL )
-        vout_Cancel( p_owner->p_vout );
+        vout_Cancel( p_owner->p_vout, true );
     vlc_mutex_unlock( &p_owner->lock );
 
     vlc_join( p_owner->thread, NULL );
