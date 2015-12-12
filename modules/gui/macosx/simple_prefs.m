@@ -918,13 +918,11 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         config_PutInt(p_intf, "metadata-network-access", [_intf_artCheckbox state]);
 
-        config_PutInt(p_intf, "embedded-video", [_video_embeddedCheckbox state]);
 
         config_PutInt(p_intf, "macosx-appleremote", [_intf_appleremoteCheckbox state]);
         config_PutInt(p_intf, "macosx-appleremote-sysvol", [_intf_appleremote_sysvolCheckbox state]);
         config_PutInt(p_intf, "macosx-mediakeys", [_intf_mediakeysCheckbox state]);
         config_PutInt(p_intf, "macosx-interfacestyle", [_intf_style_darkButtonCell state]);
-        config_PutInt(p_intf, "macosx-nativefullscreenmode", [_video_nativeFullscreenCheckbox state]);
 
         if ([_intf_enableNotificationsCheckbox state] == NSOnState) {
             tmpString = getString("control");
@@ -1004,6 +1002,8 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         config_PutInt(p_intf, "macosx-pause-minimized", [_video_pauseWhenMinimizedCheckbox state]);
 
+        config_PutInt(p_intf, "embedded-video", [_video_embeddedCheckbox state]);
+        config_PutInt(p_intf, "macosx-nativefullscreenmode", [_video_nativeFullscreenCheckbox state]);
         config_PutInt(p_intf, "macosx-vdev", [[_video_devicePopup selectedItem] tag]);
 
         config_PutPsz(p_intf, "snapshot-path", [[_video_snap_folderTextField stringValue] UTF8String]);
@@ -1203,14 +1203,13 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [_selectFolderPanel setCanCreateDirectories: YES];
         [_selectFolderPanel setPrompt: _NS("Choose")];
         [_selectFolderPanel beginSheetModalForWindow:self.window completionHandler: ^(NSInteger returnCode) {
-            if (returnCode == NSOKButton)
-            {
+            if (returnCode == NSOKButton) {
                 [_video_snap_folderTextField setStringValue: [[_selectFolderPanel URL] path]];
-                _videoSettingChanged = YES;
             }
         }];
-    } else
-        _videoSettingChanged = YES;
+    }
+
+    _videoSettingChanged = YES;
 }
 
 - (void)showVideoSettings
