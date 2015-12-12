@@ -37,7 +37,7 @@ static bool is_leap_year(unsigned y)
     return true;
 }
 
-time_t timegm(const struct tm *tm)
+time_t timegm(struct tm *tm)
 {
     static const unsigned ydays[12 + 1] = {
         0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334

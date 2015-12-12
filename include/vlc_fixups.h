@@ -200,7 +200,7 @@ struct tm *localtime_r (const time_t *, struct tm *);
 #endif
 
 #ifndef HAVE_TIMEGM
-time_t timegm(const struct tm *);
+time_t timegm(struct tm *);
 #endif
 
 #ifndef HAVE_TIMESPEC_GET
