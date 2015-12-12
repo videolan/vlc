@@ -104,7 +104,7 @@ struct decoder_sys_t
     int    i_recovery_frames;  /* -1 = no recovery */
 
     /* avcC data */
-    int i_avcC_length_size;
+    uint8_t i_avcC_length_size;
 
     /* Useful values of the Sequence Parameter Set */
     int i_log2_max_frame_num;
@@ -180,10 +180,11 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     int i;
 
+    const bool b_avc = (p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'a', 'v', 'c', '1' ));
+
     if( p_dec->fmt_in.i_codec != VLC_CODEC_H264 )
         return VLC_EGENERIC;
-    if( p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'a', 'v', 'c', '1') &&
-        p_dec->fmt_in.i_extra < 7 )
+    if( b_avc && p_dec->fmt_in.i_extra < 7 )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -238,101 +239,33 @@ static int Open( vlc_object_t *p_this )
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_CODEC_H264;
 
-    if( p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'a', 'v', 'c', '1' ) )
+    if( b_avc )
     {
         /* This type of stream is produced by mp4 and matroska
          * when we want to store it in another streamformat, you need to convert
          * The fmt_in.p_extra should ALWAYS contain the avcC
          * The fmt_out.p_extra should contain all the SPS and PPS with 4 byte startcodes */
-        uint8_t *p = &((uint8_t*)p_dec->fmt_in.p_extra)[4];
-        int i_sps, i_pps;
-        bool b_dummy;
-        int i;
-
-        /* Parse avcC */
-        p_sys->i_avcC_length_size = 1 + ((*p++)&0x03);
-
-        /* Read SPS */
-        i_sps = (*p++)&0x1f;
-        for( i = 0; i < i_sps; i++ )
+        if( h264_isavcC( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra ) )
         {
-            uint16_t i_length = GetWBE( p ); p += 2;
-            if( i_length >
-                (uint8_t*)p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra - p )
-            {
-                return VLC_EGENERIC;
-            }
-            block_t *p_sps = CreateAnnexbNAL( p, i_length );
-            if( !p_sps )
-                return VLC_EGENERIC;
-            ParseNALBlock( p_dec, &b_dummy, p_sps );
-            p += i_length;
-        }
-        /* Read PPS */
-        i_pps = *p++;
-        for( i = 0; i < i_pps; i++ )
-        {
-            uint16_t i_length = GetWBE( p ); p += 2;
-            if( i_length >
-                (uint8_t*)p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra - p )
-            {
-                return VLC_EGENERIC;
-            }
-            block_t *p_pps = CreateAnnexbNAL( p, i_length );
-            if( !p_pps )
-                return VLC_EGENERIC;
-            ParseNALBlock( p_dec, &b_dummy, p_pps );
-            p += i_length;
-        }
-        msg_Dbg( p_dec, "avcC length size=%d, sps=%d, pps=%d",
-                 p_sys->i_avcC_length_size, i_sps, i_pps );
-
-        if( !p_sys->b_sps || !p_sys->b_pps )
-            return VLC_EGENERIC;
-
-        /* FIXME: FFMPEG isn't happy at all if you leave this */
-        if( p_dec->fmt_out.i_extra > 0 )
             free( p_dec->fmt_out.p_extra );
-        p_dec->fmt_out.i_extra = 0;
-        p_dec->fmt_out.p_extra = NULL;
+            size_t i_size;
+            p_dec->fmt_out.p_extra = h264_avcC_to_AnnexB_NAL( p_dec->fmt_in.p_extra,
+                                                              p_dec->fmt_in.i_extra,
+                                                             &i_size,
+                                                             &p_sys->i_avcC_length_size );
+            p_dec->fmt_out.i_extra = i_size;
+            p_sys->b_header = !!p_dec->fmt_out.i_extra;
 
-        /* Set the new extradata */
-        for( i = 0; i < H264_SPS_MAX; i++ )
-        {
-            if( p_sys->pp_sps[i] )
-                p_dec->fmt_out.i_extra += p_sys->pp_sps[i]->i_buffer;
-        }
-        for( i = 0; i < H264_PPS_MAX; i++ )
-        {
-            if( p_sys->pp_pps[i] )
-                p_dec->fmt_out.i_extra += p_sys->pp_pps[i]->i_buffer;
-        }
-        p_dec->fmt_out.p_extra = malloc( p_dec->fmt_out.i_extra );
-        if( p_dec->fmt_out.p_extra )
-        {
-            uint8_t *p_dst = p_dec->fmt_out.p_extra;
-
-            for( i = 0; i < H264_SPS_MAX; i++ )
+            if(!p_dec->fmt_out.p_extra)
             {
-                if( p_sys->pp_sps[i] )
-                {
-                    memcpy( p_dst, p_sys->pp_sps[i]->p_buffer, p_sys->pp_sps[i]->i_buffer );
-                    p_dst += p_sys->pp_sps[i]->i_buffer;
-                }
+                msg_Err( p_dec, "Invalid AVC extradata");
+                return VLC_EGENERIC;
             }
-            for( i = 0; i < H264_PPS_MAX; i++ )
-            {
-                if( p_sys->pp_pps[i] )
-                {
-                    memcpy( p_dst, p_sys->pp_pps[i]->p_buffer, p_sys->pp_pps[i]->i_buffer );
-                    p_dst += p_sys->pp_pps[i]->i_buffer;
-                }
-            }
-            p_sys->b_header = true;
         }
         else
         {
-            p_dec->fmt_out.i_extra = 0;
+            msg_Err( p_dec, "Invalid or missing AVC extradata");
+            return VLC_EGENERIC;
         }
 
         /* Set callback */
@@ -346,11 +279,26 @@ static int Open( vlc_object_t *p_this )
 
         /* Set callback */
         p_dec->pf_packetize = Packetize;
+    }
 
-        /* */
-        if( p_dec->fmt_in.i_extra > 0 )
-            packetizer_Header( &p_sys->packetizer,
-                               p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
+    /* */
+    if( p_dec->fmt_out.i_extra > 0 )
+    {
+        packetizer_Header( &p_sys->packetizer,
+                           p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+    }
+
+    if( b_avc )
+    {
+        if( !p_sys->b_sps || !p_sys->b_pps )
+        {
+            msg_Err( p_dec, "Invalid or missing SPS %d or PPS %d in AVC extradata",
+                     p_sys->b_sps, p_sys->b_pps );
+            return VLC_EGENERIC;
+        }
+
+        msg_Dbg( p_dec, "Packetizer fed with AVC, nal length size=%d",
+                         p_sys->i_avcC_length_size );
     }
 
     /* CC are the same for H264/AVC in T35 sections (ETSI TS 101 154)  */
