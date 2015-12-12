@@ -1128,6 +1128,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 {
     [_video_videodecoCheckbox setEnabled: !_value];
     [_video_blackScreenCheckbox setEnabled: !_value];
+    [_video_devicePopup setEnabled: !_value];
 
     if (_value) {
         [_video_videodecoCheckbox setState: NSOnState];
@@ -1136,9 +1137,13 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         NSString *tooltipText = _NS("This setting cannot be changed because the native fullscreen mode is enabled.");
         [_video_videodecoCheckbox setToolTip:tooltipText];
         [_video_blackScreenCheckbox setToolTip:tooltipText];
+        [_video_devicePopup setToolTip:tooltipText];
+
     } else {
         [self setupButton:_video_videodecoCheckbox forBoolValue: "video-deco"];
         [self setupButton:_video_blackScreenCheckbox forBoolValue: "macosx-black"];
+
+        [_video_devicePopup setToolTip:@""];
     }
 }
 
