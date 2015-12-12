@@ -77,7 +77,10 @@ uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
     uint8_t *p_ret;
     uint8_t *p_out_buf = p_ret = malloc( *pi_result );
     if( !p_out_buf )
+    {
+        *pi_result = 0;
         return NULL;
+    }
 
     const uint8_t i_num_array = p_buf[22];
     p_buf += 23;

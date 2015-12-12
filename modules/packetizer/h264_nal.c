@@ -82,7 +82,10 @@ uint8_t *h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
     uint8_t *p_ret;
     uint8_t *p_out_buf = p_ret = malloc( *pi_result );
     if( !p_out_buf )
+    {
+        *pi_result = 0;
         return NULL;
+    }
 
     p_buf += 5;
 
