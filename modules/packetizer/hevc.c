@@ -201,6 +201,8 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     if(p_frag->p_buffer[4] & 0x80)
     {
         msg_Warn(p_dec,"Forbidden zero bit not null, corrupted NAL");
+        block_ChainRelease(p_sys->p_frame);
+        block_Release(p_frag);
         p_sys->p_frame = NULL;
         p_sys->b_vcl = false;
         return NULL;
