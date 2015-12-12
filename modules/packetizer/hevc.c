@@ -70,7 +70,6 @@ struct decoder_sys_t
     /* */
     packetizer_t packetizer;
 
-    bool     b_vcl;
     block_t *p_frame;
 
     uint8_t  i_nal_length_size;
@@ -204,7 +203,6 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
         block_ChainRelease(p_sys->p_frame);
         block_Release(p_frag);
         p_sys->p_frame = NULL;
-        p_sys->b_vcl = false;
         return NULL;
     }
 
@@ -213,8 +211,6 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     if (nalu_type < HEVC_NAL_VPS)
     {
         /* NAL is a VCL NAL */
-        p_sys->b_vcl = true;
-
         if(likely(p_frag->i_buffer > 6))
         {
             bool first_slice_in_pic = p_frag->p_buffer[6] & 0x80;
@@ -228,12 +224,11 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     }
     else
     {
-        if (p_sys->b_vcl)
+        if (p_sys->p_frame)
         {
             p_nal = block_ChainGather(p_sys->p_frame);
             p_nal->p_next = p_frag;
             p_sys->p_frame = NULL;
-            p_sys->b_vcl =false;
         }
         else
             p_nal = p_frag;
