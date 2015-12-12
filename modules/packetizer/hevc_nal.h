@@ -130,10 +130,13 @@ static inline bool hevc_ishvcC( const uint8_t *p_buf, size_t i_buf )
 
 /* NAL decoding */
 typedef struct hevc_sequence_parameter_set_t hevc_sequence_parameter_set_t;
+typedef struct hevc_picture_parameter_set_t hevc_picture_parameter_set_t;
 
 hevc_sequence_parameter_set_t * hevc_rbsp_decode_sps( const uint8_t *, size_t ) VLC_USED;
+hevc_picture_parameter_set_t *  hevc_rbsp_decode_pps( const uint8_t *, size_t ) VLC_USED;
 
 void hevc_rbsp_release_sps( hevc_sequence_parameter_set_t * );
+void hevc_rbsp_release_pps( hevc_picture_parameter_set_t * );
 
 /* Converts HEVCDecoderConfigurationRecord to Annex B format */
 uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,

@@ -120,6 +120,64 @@ struct hevc_sequence_parameter_set_t
     /* incomplete */
 };
 
+struct hevc_picture_parameter_set_t
+{
+    nal_ue_t pps_pic_parameter_set_id;
+    nal_ue_t pps_seq_parameter_set_id;
+    nal_u1_t dependent_slice_segments_enabled_flag;
+    nal_u1_t output_flag_present_flag;
+    nal_u3_t num_extra_slice_header_bits;
+    nal_u1_t sign_data_hiding_enabled_flag;
+    nal_u1_t cabac_init_present_flag;
+    nal_ue_t num_ref_idx_l0_default_active_minus1;
+    nal_ue_t num_ref_idx_l1_default_active_minus1;
+    nal_se_t init_qp_minus26;
+    nal_u1_t constrained_intra_pred_flag;
+    nal_u1_t transform_skip_enabled_flag;
+
+    nal_u1_t cu_qp_delta_enabled_flag;
+    nal_ue_t diff_cu_qp_delta_depth;
+
+    nal_se_t pps_cb_qp_offset;
+    nal_se_t pps_cr_qp_offset;
+    nal_u1_t pic_slice_level_chroma_qp_offsets_present_flag;
+    nal_u1_t weighted_pred_flag;
+    nal_u1_t weighted_bipred_flag;
+    nal_u1_t transquant_bypass_enable_flag;
+
+    nal_u1_t tiles_enabled_flag;
+    nal_u1_t entropy_coding_sync_enabled_flag;
+    nal_ue_t num_tile_columns_minus1;
+    nal_ue_t num_tile_rows_minus1;
+    nal_u1_t uniform_spacing_flag;
+    // nal_ue_t *p_column_width_minus1; read but discarded
+    // nal_ue_t *p_row_height_minus1; read but discarded
+    nal_u1_t loop_filter_across_tiles_enabled_flag;
+
+    nal_u1_t pps_loop_filter_across_slices_enabled_flag;
+
+    nal_u1_t deblocking_filter_control_present_flag;
+    nal_u1_t deblocking_filter_override_enabled_flag;
+    nal_u1_t pps_deblocking_filter_disabled_flag;
+    nal_se_t pps_beta_offset_div2;
+    nal_se_t pps_tc_offset_div2;
+
+    nal_u1_t scaling_list_data_present_flag;
+    // scaling_list_data; read but discarded
+
+    nal_u1_t lists_modification_present_flag;
+    nal_ue_t log2_parallel_merge_level_minus2;
+    nal_u1_t slice_header_extension_present_flag;
+
+    nal_u1_t pps_extension_present_flag;
+    nal_u1_t pps_range_extension_flag;
+    nal_u1_t pps_multilayer_extension_flag;
+    nal_u1_t pps_3d_extension_flag;
+    nal_u5_t pps_extension_5bits;
+    /* incomplete */
+
+};
+
 /* Computes size and does check the whole struct integrity */
 static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
 {
@@ -200,6 +258,36 @@ uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
     }
 
     return p_ret;
+}
+
+static bool hevc_parse_scaling_list_rbsp( bs_t *p_bs )
+{
+    if( bs_remain( p_bs ) < 16 )
+        return false;
+
+    for( int i=0; i<4; i++ )
+    {
+        for( int j=0; j<6; j += (i == 3) ? 3 : 1 )
+        {
+            if( bs_read1( p_bs ) == 0 )
+                bs_read_ue( p_bs );
+            else
+            {
+                unsigned nextCoef = 8;
+                unsigned coefNum = __MIN( 64, (1 << (4 + (i << 1))));
+                if( i > 1 )
+                {
+                    nextCoef = bs_read_se( p_bs ) + 8;
+                }
+                for( unsigned k=0; k<coefNum; k++ )
+                {
+                    nextCoef = ( nextCoef + bs_read_se( p_bs ) + 256 ) % 256;
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 static bool hevc_parse_inner_profile_tier_level_rbsp( bs_t *p_bs,
@@ -375,4 +463,118 @@ hevc_sequence_parameter_set_t * hevc_rbsp_decode_sps( const uint8_t *p_buf, size
         }
     }
     return p_sps;
+}
+
+static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
+                                               hevc_picture_parameter_set_t *p_pps )
+{
+    if( bs_remain( p_bs ) < 1 )
+        return false;
+    p_pps->pps_pic_parameter_set_id = bs_read_ue( p_bs );
+    if( p_pps->pps_pic_parameter_set_id >= HEVC_PPS_MAX || bs_remain( p_bs ) < 1 )
+        return false;
+    p_pps->pps_seq_parameter_set_id = bs_read_ue( p_bs );
+    if( p_pps->pps_seq_parameter_set_id >= HEVC_SPS_MAX )
+        return false;
+    p_pps->dependent_slice_segments_enabled_flag = bs_read1( p_bs );
+    p_pps->output_flag_present_flag = bs_read1( p_bs );
+    p_pps->num_extra_slice_header_bits = bs_read( p_bs, 3 );
+    p_pps->sign_data_hiding_enabled_flag = bs_read1( p_bs );
+    p_pps->cabac_init_present_flag = bs_read1( p_bs );
+
+    p_pps->num_ref_idx_l0_default_active_minus1 = bs_read_ue( p_bs );
+    p_pps->num_ref_idx_l1_default_active_minus1 = bs_read_ue( p_bs );
+
+    p_pps->init_qp_minus26 = bs_read_se( p_bs );
+    p_pps->constrained_intra_pred_flag = bs_read1( p_bs );
+    p_pps->transform_skip_enabled_flag = bs_read1( p_bs );
+    p_pps->cu_qp_delta_enabled_flag = bs_read1( p_bs );
+    if( p_pps->cu_qp_delta_enabled_flag )
+        p_pps->diff_cu_qp_delta_depth = bs_read_ue( p_bs );
+
+    if( bs_remain( p_bs ) < 1 )
+        return false;
+
+    p_pps->pps_cb_qp_offset = bs_read_se( p_bs );
+    p_pps->pps_cr_qp_offset = bs_read_se( p_bs );
+    p_pps->pic_slice_level_chroma_qp_offsets_present_flag = bs_read1( p_bs );
+    p_pps->weighted_pred_flag = bs_read1( p_bs );
+    p_pps->weighted_bipred_flag = bs_read1( p_bs );
+    p_pps->transquant_bypass_enable_flag = bs_read1( p_bs );
+    p_pps->tiles_enabled_flag = bs_read1( p_bs );
+    p_pps->entropy_coding_sync_enabled_flag = bs_read1( p_bs );
+
+    if( p_pps->tiles_enabled_flag )
+    {
+        p_pps->num_tile_columns_minus1 = bs_read_ue( p_bs ); /* TODO: validate max col/row values */
+        p_pps->num_tile_rows_minus1 = bs_read_ue( p_bs );    /*       against sps PicWidthInCtbsY */
+        p_pps->uniform_spacing_flag = bs_read1( p_bs );
+        if( !p_pps->uniform_spacing_flag )
+        {
+            for( unsigned i=0; i< p_pps->num_tile_columns_minus1; i++ )
+                (void) bs_read_ue( p_bs );
+            for( unsigned i=0; i< p_pps->num_tile_rows_minus1; i++ )
+                (void) bs_read_ue( p_bs );
+        }
+        p_pps->loop_filter_across_tiles_enabled_flag = bs_read1( p_bs );
+    }
+
+    p_pps->pps_loop_filter_across_slices_enabled_flag = bs_read1( p_bs );
+    p_pps->deblocking_filter_control_present_flag = bs_read1( p_bs );
+    if( p_pps->deblocking_filter_control_present_flag )
+    {
+        p_pps->deblocking_filter_override_enabled_flag = bs_read1( p_bs );
+        p_pps->pps_deblocking_filter_disabled_flag = bs_read1( p_bs );
+        if( !p_pps->pps_deblocking_filter_disabled_flag )
+        {
+            p_pps->pps_beta_offset_div2 = bs_read_se( p_bs );
+            p_pps->pps_tc_offset_div2 = bs_read_se( p_bs );
+        }
+    }
+
+    p_pps->scaling_list_data_present_flag = bs_read1( p_bs );
+    if( p_pps->scaling_list_data_present_flag && !hevc_parse_scaling_list_rbsp( p_bs ) )
+        return false;
+
+    p_pps->lists_modification_present_flag = bs_read1( p_bs );
+    p_pps->log2_parallel_merge_level_minus2 = bs_read_ue( p_bs );
+    p_pps->slice_header_extension_present_flag = bs_read1( p_bs );
+
+    if( bs_remain( p_bs ) < 1 )
+        return false;
+
+    p_pps->pps_extension_present_flag = bs_read1( p_bs );
+    if( p_pps->pps_extension_present_flag )
+    {
+        p_pps->pps_range_extension_flag = bs_read1( p_bs );
+        p_pps->pps_multilayer_extension_flag = bs_read1( p_bs );
+        p_pps->pps_3d_extension_flag = bs_read1( p_bs );
+        if( bs_remain( p_bs ) < 5 )
+            return false;
+        p_pps->pps_extension_5bits = bs_read( p_bs, 5 );
+    }
+
+    return true;
+}
+
+void hevc_rbsp_release_pps( hevc_picture_parameter_set_t *p_pps )
+{
+    free( p_pps );
+}
+
+hevc_picture_parameter_set_t * hevc_rbsp_decode_pps( const uint8_t *p_buf, size_t i_buf )
+{
+    hevc_picture_parameter_set_t *p_pps = calloc(1, sizeof(hevc_picture_parameter_set_t));
+    if(likely(p_pps))
+    {
+        bs_t bs;
+        bs_init( &bs, p_buf, i_buf );
+        bs_skip( &bs, 16 ); /* Skip nal_unit_header */
+        if( !hevc_parse_pic_parameter_set_rbsp( &bs, p_pps ) )
+        {
+            hevc_rbsp_release_pps( p_pps );
+            p_pps = NULL;
+        }
+    }
+    return p_pps;
 }
