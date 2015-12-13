@@ -37,7 +37,7 @@ static const char url[] = "https://www.example.com:8443/dir/file.ext?a=b";
 static const char ua[] = PACKAGE_NAME "/" PACKAGE_VERSION " (test suite)";
 
 static const char *replies[2] = { NULL, NULL };
-static uint64_t offset = 0;
+static uintmax_t offset = 0;
 
 int main(void)
 {
@@ -50,7 +50,7 @@ int main(void)
     vlc_http_file_seek(f, 0);
     assert(vlc_http_file_get_status(f) < 0);
     assert(vlc_http_file_get_redirect(f) == NULL);
-    assert(vlc_http_file_get_size(f) == UINT64_MAX);
+    assert(vlc_http_file_get_size(f) == (uintmax_t)-1);
     assert(!vlc_http_file_can_seek(f));
     assert(vlc_http_file_get_type(f) == NULL);
     assert(vlc_http_file_read(f) == NULL);
@@ -67,7 +67,7 @@ int main(void)
     assert(f != NULL);
     assert(vlc_http_file_get_status(f) == 200);
     assert(!vlc_http_file_can_seek(f));
-    assert(vlc_http_file_get_size(f) == UINT64_MAX);
+    assert(vlc_http_file_get_size(f) == (uintmax_t)-1);
     str = vlc_http_file_get_type(f);
     assert(str != NULL && !strcmp(str, "video/mpeg"));
     free(str);
@@ -119,7 +119,7 @@ int main(void)
     f = vlc_http_file_create(NULL, url, ua, NULL);
     assert(f != NULL);
     assert(!vlc_http_file_can_seek(f));
-    assert(vlc_http_file_get_size(f) == UINT64_MAX);
+    assert(vlc_http_file_get_size(f) == (uintmax_t)-1);
     str = vlc_http_file_get_redirect(f);
     assert(str != NULL
         && !strcmp(str, "https://www.example.com:8443/somewhere/else/"));

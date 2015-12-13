@@ -35,5 +35,5 @@ char *vlc_http_file_get_redirect(struct vlc_http_file *file);
 uintmax_t vlc_http_file_get_size(struct vlc_http_file *file);
 bool vlc_http_file_can_seek(struct vlc_http_file *file);
 char *vlc_http_file_get_type(struct vlc_http_file *file);
-int vlc_http_file_seek(struct vlc_http_file *file, uint64_t offset);
+int vlc_http_file_seek(struct vlc_http_file *file, uintmax_t offset);
 struct block_t *vlc_http_file_read(struct vlc_http_file *file);
