@@ -53,6 +53,7 @@ VLC_API void vlc_testcancel(void);
 # endif
 
 typedef struct vlc_thread *vlc_thread_t;
+#define VLC_THREAD_CANCELED NULL
 typedef struct
 {
     bool dynamic;
@@ -102,6 +103,7 @@ static inline int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout)
 # include <errno.h>
 
 typedef struct vlc_thread *vlc_thread_t;
+#define VLC_THREAD_CANCELED NULL
 typedef struct
 {
     bool dynamic;
@@ -170,6 +172,7 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 # define LIBVLC_NEED_RWLOCK
 
 typedef struct vlc_thread *vlc_thread_t;
+#define VLC_THREAD_CANCELED NULL
 typedef pthread_mutex_t vlc_mutex_t;
 
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
@@ -221,6 +224,7 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
 
 typedef pthread_t       vlc_thread_t;
+#define VLC_THREAD_CANCELED PTHREAD_CANCELED
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
 typedef struct
@@ -261,6 +265,11 @@ typedef struct vlc_timer *vlc_timer_t;
  * Thread handle.
  */
 typedef pthread_t       vlc_thread_t;
+
+/**
+ * Return value of a canceled thread.
+ */
+#define VLC_THREAD_CANCELED PTHREAD_CANCELED
 
 /**
  * Mutex.
