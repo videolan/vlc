@@ -299,11 +299,8 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
             *region_next = region;
             region_next = &region->p_next;
         }
-        /* Free AVSubtitleRect */
-        avpicture_free(&rec->pict);
-        av_free(rec);
     }
-    av_free(ffsub->rects);
+    avsubtitle_free(ffsub);
 
     return spu;
 }
