@@ -597,7 +597,8 @@ static int vlc_http_msg_add_time(struct vlc_http_msg *m, const char *hname,
     return vlc_http_msg_add_header(m, hname,
                                    "%s, %02d %s %04d %02d:%02d:%02d GMT",
                                    vlc_http_days[tm->tm_wday], tm->tm_mday,
-                                   vlc_http_months[tm->tm_mon], tm->tm_year,
+                                   vlc_http_months[tm->tm_mon],
+                                   1900 + tm->tm_year,
                                    tm->tm_hour, tm->tm_min, tm->tm_sec);
 }
 
