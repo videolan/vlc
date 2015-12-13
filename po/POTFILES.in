@@ -201,6 +201,7 @@ modules/access/eyetv.m
 modules/access/file.c
 modules/access/fs.c
 modules/access/ftp.c
+modules/access/http/access.c
 modules/access/http.c
 modules/access/idummy.c
 modules/access/imem.c
