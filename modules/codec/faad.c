@@ -516,6 +516,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                      p_sys->i_buffer );
         }
 
+        block_Release( p_block );
         return p_out;
     }
     else
