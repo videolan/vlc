@@ -63,28 +63,33 @@ enum hevc_general_profile_idc_e
 #define HEVC_EXT_PROFILE_MAIN_444_STILL_PICTURE     0x1C6
 #define HEVC_EXT_PROFILE_MAIN_444_16_STILL_PICTURE  0x006
 
-/* NAL types from https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-H.265-201304-I!!PDF-E&type=items */
+/* NAL types from https://www.itu.int/rec/T-REC-H.265-201504-I */
 enum hevc_nal_unit_type_e
 {
-    HEVC_NAL_TRAIL_N    = 0,
-    HEVC_NAL_TRAIL_R    = 1,
-    HEVC_NAL_TSA_N      = 2,
-    HEVC_NAL_TSA_R      = 3,
-    HEVC_NAL_STSA_N     = 4,
-    HEVC_NAL_STSA_R     = 5,
-    HEVC_NAL_RADL_N     = 6,
-    HEVC_NAL_RADL_R     = 7,
-    HEVC_NAL_RASL_N     = 8,
-    HEVC_NAL_RASL_R     = 9,
+    HEVC_NAL_TRAIL_N    = 0, /* Trailing */
+    HEVC_NAL_TRAIL_R    = 1, /* Trailing Reference */
+    HEVC_NAL_TSA_N      = 2, /* Temporal Sublayer Access */
+    HEVC_NAL_TSA_R      = 3, /* Temporal Sublayer Access Reference */
+    HEVC_NAL_STSA_N     = 4, /* Stepwise Temporal Sublayer Access */
+    HEVC_NAL_STSA_R     = 5, /* Stepwise Temporal Sublayer Access Reference */
+    HEVC_NAL_RADL_N     = 6, /* Random Access Decodable Leading (display order) */
+    HEVC_NAL_RADL_R     = 7, /* Random Access Decodable Leading (display order) Reference */
+    HEVC_NAL_RASL_N     = 8, /* Random Access Skipped Leading (display order) */
+    HEVC_NAL_RASL_R     = 9, /* Random Access Skipped Leading (display order) Reference */
     /* 10 to 15 reserved */
+    HEVC_NAL_RSV_VCL_N10= 10,
+    HEVC_NAL_RSV_VCL_N12= 12,
+    HEVC_NAL_RSV_VCL_N14= 14,
     /* Key frames */
-    HEVC_NAL_BLA_W_LP   = 16,
-    HEVC_NAL_BLA_W_RADL = 17,
-    HEVC_NAL_BLA_N_LP   = 18,
-    HEVC_NAL_IDR_W_RADL = 19,
-    HEVC_NAL_IDR_N_LP   = 20,
-    HEVC_NAL_CRA        = 21,
+    HEVC_NAL_BLA_W_LP   = 16, /* Broken Link Access with Associated RASL */
+    HEVC_NAL_BLA_W_RADL = 17, /* Broken Link Access with Associated RADL */
+    HEVC_NAL_BLA_N_LP   = 18, /* Broken Link Access */
+    HEVC_NAL_IDR_W_RADL = 19, /* Instantaneous Decoder Refresh with Associated RADL */
+    HEVC_NAL_IDR_N_LP   = 20, /* Instantaneous Decoder Refresh */
+    HEVC_NAL_CRA        = 21, /* Clean Random Access */
     /* 22 to 31 reserved */
+    HEVC_NAL_IRAP_VCL22 = 22, /* Intra Random Access Point */
+    HEVC_NAL_IRAP_VCL23 = 23,
     /* Non VCL NAL*/
     HEVC_NAL_VPS        = 32,
     HEVC_NAL_SPS        = 33,
@@ -95,6 +100,15 @@ enum hevc_nal_unit_type_e
     HEVC_NAL_FD         = 38, /* Filler data*/
     HEVC_NAL_PREF_SEI   = 39, /* Prefix SEI */
     HEVC_NAL_SUFF_SEI   = 40, /* Suffix SEI */
+    /* 41 to 47 reserved */
+    HEVC_NAL_RSV_NVCL41 = 41, /* Reserved Non VCL */
+    HEVC_NAL_RSV_NVCL44 = 44,
+    HEVC_NAL_RSV_NVCL45 = 45,
+    HEVC_NAL_RSV_NVCL47 = 47,
+    HEVC_NAL_UNSPEC48   = 48, /* Unspecified (custom) */
+    HEVC_NAL_UNSPEC55   = 55,
+    HEVC_NAL_UNSPEC56   = 56,
+    HEVC_NAL_UNSPEC63   = 63,
     HEVC_NAL_UNKNOWN
 };
 

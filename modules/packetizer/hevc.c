@@ -177,7 +177,6 @@ static void PacketizeReset(void *p_private, bool b_broken)
     block_ChainRelease(p_sys->p_frame);
 
     p_sys->p_frame = NULL;
-    p_sys->b_vcl = false;
 }
 
 /*****************************************************************************
