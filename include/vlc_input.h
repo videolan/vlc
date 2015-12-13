@@ -190,7 +190,7 @@ static inline input_attachment_t *vlc_input_attachment_New( const char *psz_name
     a->psz_description = strdup( psz_description ? psz_description : "" );
     a->i_data = i_data;
     a->p_data = malloc( i_data );
-    if( i_data > 0 && likely(p_data != NULL) )
+    if( i_data > 0 && likely(a->p_data != NULL) )
         memcpy( a->p_data, p_data, i_data );
 
     if( unlikely(a->psz_name == NULL || a->psz_mime == NULL
