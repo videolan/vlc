@@ -117,6 +117,8 @@ vlc_module_begin ()
         change_safe()
     add_bool( "http-forward-cookies", true, FORWARD_COOKIES_TEXT,
               FORWARD_COOKIES_LONGTEXT, true )
+    add_bool( "http2", false, N_("HTTP 2.0"),
+              N_("Negotiate HTTP version 2.0"), true )
     /* 'itpc' = iTunes Podcast */
     add_shortcut( "http", "https", "unsv", "itpc", "icyx" )
     set_callbacks( Open, Close )
@@ -992,18 +994,19 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     /* Initialize TLS/SSL session */
     if( p_sys->p_creds != NULL )
     {
+        bool http2 = var_InheritBool( p_access, "http2" );
+
+        if( (p_sys->b_proxy || http2) && p_sys->i_version == 0 )
+        {   /* ALPN and CONNECT are not compatible with HTTP/1.0 */
+            Disconnect( p_access );
+            return -1;
+        }
+
         /* CONNECT to establish TLS tunnel through HTTP proxy */
         if( p_sys->b_proxy )
         {
             char *psz;
             unsigned i_status;
-
-            if( p_sys->i_version == 0 )
-            {
-                /* CONNECT is not in HTTP/1.0 */
-                Disconnect( p_access );
-                return -1;
-            }
 
             WriteHeaders( p_access,
                           "CONNECT %s:%d HTTP/1.1\r\nHost: %s:%d\r\n\r\n",
@@ -1054,14 +1057,25 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         }
 
         /* TLS/SSL handshake */
-        const char *alpn[] = { "http/1.1", NULL };
+        const char *alpn[3] = { "h2", "http/1.1", NULL };
+        char *alp;
 
         p_sys->p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds, p_sys->fd,
                 p_sys->url.psz_host, "https",
-                p_sys->i_version ? alpn : NULL, NULL );
+                p_sys->i_version ? (alpn + !http2) : NULL, &alp );
         if( p_sys->p_tls == NULL )
         {
             msg_Err( p_access, "cannot establish HTTP/TLS session" );
+            Disconnect( p_access );
+            return -1;
+        }
+
+        http2 = alp != NULL && !strcmp("h2", alp);
+        free( alp );
+
+        if( http2 )
+        {
+            msg_Dbg( p_access, "handing off to HTTP2 plugin" );
             Disconnect( p_access );
             return -1;
         }
