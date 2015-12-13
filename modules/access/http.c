@@ -996,7 +996,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         if( p_sys->b_proxy )
         {
             char *psz;
-            unsigned i_status = 0;
+            unsigned i_status;
 
             if( p_sys->i_version == 0 )
             {
@@ -1018,7 +1018,8 @@ static int Connect( access_t *p_access, uint64_t i_tell )
                 return -1;
             }
 
-            sscanf( psz, "HTTP/%*u.%*u %3u", &i_status );
+            if( sscanf( psz, "HTTP/1.%*u %3u", &i_status ) != 1 )
+                i_status = 0;
             free( psz );
 
             if( ( i_status / 100 ) != 2 )
