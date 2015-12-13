@@ -148,11 +148,11 @@ struct access_sys_t
     /* */
     int        i_code;
     const char *psz_protocol;
-    int        i_version;
 
     char       *psz_mime;
     char       *psz_pragma;
     char       *psz_location;
+    bool i_version;
     bool b_mms;
     bool b_icecast;
 #ifdef HAVE_ZLIB_H
