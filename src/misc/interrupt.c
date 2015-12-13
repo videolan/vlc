@@ -203,6 +203,19 @@ static int vlc_interrupt_finish(vlc_interrupt_t *ctx)
     return ret;
 }
 
+void vlc_interrupt_register(void (*cb)(void *), void *opaque)
+{
+    vlc_interrupt_t *ctx = vlc_threadvar_get(vlc_interrupt_var);
+    if (ctx != NULL)
+        vlc_interrupt_prepare(ctx, cb, opaque);
+}
+
+int vlc_interrupt_unregister(void)
+{
+    vlc_interrupt_t *ctx = vlc_threadvar_get(vlc_interrupt_var);
+    return (ctx != NULL) ? vlc_interrupt_finish(ctx) : 0;
+}
+
 static void vlc_interrupt_cleanup(void *opaque)
 {
     vlc_interrupt_finish(opaque);

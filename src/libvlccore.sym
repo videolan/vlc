@@ -566,6 +566,8 @@ vlc_interrupt_raise
 vlc_interrupt_kill
 vlc_interrupt_forward_start
 vlc_interrupt_forward_stop
+vlc_interrupt_register
+vlc_interrupt_unregister
 vlc_killed
 vlc_join
 vlc_list_children
