@@ -1,5 +1,5 @@
 /*****************************************************************************
- * hpack.c: HPACK Header Compression for HTTP/2 encoder
+ * hpackenc.c: HPACK Header Compression for HTTP/2 encoder
  *****************************************************************************
  * Copyright (C) 2015 Rémi Denis-Courmont
  *

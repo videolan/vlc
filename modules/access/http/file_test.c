@@ -1,5 +1,5 @@
 /*****************************************************************************
- * message.c: HTTP request/response
+ * message_test.c: HTTP request/response
  *****************************************************************************
  * Copyright (C) 2015 Rémi Denis-Courmont
  *
