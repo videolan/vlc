@@ -1006,9 +1006,8 @@ static int Connect( access_t *p_access, uint64_t i_tell )
             }
 
             WriteHeaders( p_access,
-                          "CONNECT %s:%d HTTP/1.%d\r\nHost: %s:%d\r\n\r\n",
+                          "CONNECT %s:%d HTTP/1.1\r\nHost: %s:%d\r\n\r\n",
                           p_sys->url.psz_host, p_sys->url.i_port,
-                          p_sys->i_version,
                           p_sys->url.psz_host, p_sys->url.i_port);
 
             psz = net_Gets( p_access, p_sys->fd );
