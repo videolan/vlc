@@ -186,8 +186,9 @@ static void vlc_h2_stream_end(void *ctx)
 static int vlc_h2_stream_error(void *ctx, uint_fast32_t id, uint_fast32_t code)
 {
     assert(ctx == CTX);
-    assert(id == STREAM_ID);
-    assert(code == VLC_H2_PROTOCOL_ERROR);
+
+    assert(id == STREAM_ID + 2);
+    assert(code == VLC_H2_REFUSED_STREAM);
     return 0;
 }
 
@@ -313,9 +314,8 @@ int main(void)
     ret = test_seq(CTX, NULL);
     assert(ret == 0);
 
-    ret = test_seq(CTX, ping(), vlc_h2_frame_pong(42), ping(),
-                   vlc_h2_frame_window_update(0, 0x1000), NULL);
-    assert(ret == 4);
+    ret = test_seq(CTX, ping(), vlc_h2_frame_pong(42), ping(), NULL);
+    assert(ret == 3);
     assert(pings == 2);
     assert(stream_header_tables == 0);
     assert(stream_blocks == 0);
@@ -330,15 +330,21 @@ int main(void)
 
     ret = test_seq(CTX, response(false), data(true), ping(),
                         response(false), data(false), data(true),
-                        response(false), data(false), NULL);
+                        response(false), data(false),
+                        NULL);
     assert(ret == 8);
     assert(pings == 1);
     assert(stream_header_tables == 3);
     assert(stream_blocks == 4);
     assert(stream_ends == 2);
 
-    ret = test_seq(CTX, rst_stream(), NULL);
-    assert(ret == 1);
+    ret = test_seq(CTX, rst_stream(),
+                        vlc_h2_frame_window_update(0, 0x1000),
+                        vlc_h2_frame_headers(STREAM_ID + 2,
+                                             VLC_H2_DEFAULT_MAX_FRAME, true,
+                                             resp_hdrc, resp_hdrv),
+                        NULL);
+    assert(ret == 3);
     assert(pings == 0);
     assert(stream_header_tables == 0);
     assert(stream_blocks == 0);
