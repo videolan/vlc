@@ -174,6 +174,9 @@ struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
     bool http2;
     vlc_tls_t *tls = vlc_https_connect_i11e(mgr->creds, host, port, &http2);
 
+    if (tls == NULL)
+        return NULL;
+
     if (http2)
     {
         struct vlc_h2_conn *conn2 = vlc_h2_conn_create(tls);
