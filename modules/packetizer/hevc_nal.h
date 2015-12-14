@@ -142,5 +142,6 @@ void hevc_rbsp_release_pps( hevc_picture_parameter_set_t * );
 uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
                                    size_t *pi_res, uint8_t *pi_nal_length_size );
 
+bool hevc_get_xps_id(const uint8_t *p_buf, size_t i_buf, uint8_t *pi_id);
 
 #endif /* HEVC_NAL_H */
