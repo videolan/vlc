@@ -47,9 +47,17 @@ struct vlc_http_msg
     struct vlc_http_stream *payload;
 };
 
+static bool vlc_http_is_token(const char *);
+
 static int vlc_http_msg_vadd_header(struct vlc_http_msg *m, const char *name,
                                     const char *fmt, va_list ap)
 {
+    if (!vlc_http_is_token(name))
+    {   /* Not a valid field name, i.e. not an HTTP token */
+        errno = EINVAL;
+        return -1;
+    }
+
     char *(*h)[2] = realloc(m->headers, sizeof (char *[2]) * (m->count + 1));
     if (unlikely(h == NULL))
         return -1;
@@ -493,6 +501,12 @@ static size_t vlc_http_token_length(const char *str)
     while (vlc_http_istoken(str[i]))
         i++;
     return i;
+}
+
+static bool vlc_http_is_token(const char *str)
+{
+    size_t len = vlc_http_token_length(str);
+    return len > 0 && str[len] == '\0';
 }
 
 static size_t vlc_http_comment_length(const char *str)
