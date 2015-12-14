@@ -160,5 +160,8 @@ uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
 bool hevc_get_xps_id(const uint8_t *p_buf, size_t i_buf, uint8_t *pi_id);
 bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *, unsigned *p_w, unsigned *p_h,
                             unsigned *p_vw, unsigned *p_vh );
+bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *,
+                          const hevc_video_parameter_set_t ** /* HEVC_MAX_VPS || NULL */,
+                          unsigned *pi_num, unsigned *pi_den );
 
 #endif /* HEVC_NAL_H */
