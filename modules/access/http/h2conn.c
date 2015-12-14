@@ -564,12 +564,6 @@ static void *vlc_h2_recv_thread(void *data)
     if (unlikely(parser == NULL))
         goto fail;
 
-    if (vlc_h2_output_send(conn->out, vlc_h2_frame_settings()))
-    {
-        vlc_h2_parse_destroy(parser);
-        goto fail;
-    }
-
     vlc_cleanup_push(cleanup_parser, parser);
     do
     {
@@ -616,7 +610,8 @@ struct vlc_h2_conn *vlc_h2_conn_create(struct vlc_tls *tls)
 
     vlc_mutex_init(&conn->lock);
 
-    if (vlc_clone(&conn->thread, vlc_h2_recv_thread, conn,
+    if (vlc_h2_output_send(conn->out, vlc_h2_frame_settings())
+     || vlc_clone(&conn->thread, vlc_h2_recv_thread, conn,
                   VLC_THREAD_PRIORITY_INPUT))
     {
         vlc_mutex_destroy(&conn->lock);
