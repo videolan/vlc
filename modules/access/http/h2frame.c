@@ -412,11 +412,11 @@ void (vlc_h2_frame_dump)(vlc_object_t *obj, const struct vlc_h2_frame *f,
     uint_fast32_t sid = vlc_h2_frame_id(f);
 
     if (sid != 0)
-        msg_Dbg(obj, "%s %s (0x%02"PRIxFAST8") frame of %"PRIuFAST32" bytes, "
+        msg_Dbg(obj, "%s %s (0x%02"PRIxFAST8") frame of %zu bytes, "
                 "flags 0x%02"PRIxFAST8", stream %"PRIuFAST32, msg,
                 vlc_h2_type_name(type), type, len,  flags, sid);
     else
-        msg_Dbg(obj, "%s %s (0x%02"PRIxFAST8") frame of %"PRIuFAST32" bytes, "
+        msg_Dbg(obj, "%s %s (0x%02"PRIxFAST8") frame of %zu bytes, "
                 "flags 0x%02"PRIxFAST8", global", msg,
                 vlc_h2_type_name(type), type, len,  flags);
 }
