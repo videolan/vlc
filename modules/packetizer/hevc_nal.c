@@ -76,6 +76,36 @@ typedef struct
     nal_u8_t sub_layer_level_idc[HEVC_MAX_SUBLAYERS];
 } hevc_profile_tier_level_t;
 
+struct hevc_video_parameter_set_t
+{
+    nal_u4_t vps_video_parameter_set_id;
+    nal_u1_t vps_base_layer_internal_flag;
+    nal_u1_t vps_base_layer_available_flag;
+    nal_u6_t vps_max_layers_minus1;
+    nal_u3_t vps_max_sub_layers_minus1;
+    nal_u1_t vps_temporal_id_nesting_flag;
+
+    hevc_profile_tier_level_t profile_tier_level;
+
+    nal_u1_t vps_sub_layer_ordering_info_present_flag;
+    struct
+    {
+        nal_ue_t dec_pic_buffering_minus1;
+        nal_ue_t num_reorder_pics;
+        nal_ue_t max_latency_increase_plus1;
+    } vps_max[1 + HEVC_MAX_SUBLAYERS];
+
+    nal_u6_t vps_max_layer_id;
+    nal_ue_t vps_num_layer_set_minus1;
+    // layer_id_included_flag; read but discarded
+
+    nal_u1_t vps_timing_info_present_flag;
+    uint32_t vps_num_units_in_tick;
+    uint32_t vps_time_scale;
+
+    /* incomplete */
+};
+
 struct hevc_sequence_parameter_set_t
 {
     nal_u4_t sps_video_parameter_set_id;
@@ -410,6 +440,79 @@ static bool hevc_parse_profile_tier_level_rbsp( bs_t *p_bs, bool profile_present
     }
 
     return true;
+}
+
+static bool hevc_parse_video_parameter_set_rbsp( bs_t *p_bs,
+                                                 hevc_video_parameter_set_t *p_vps )
+{
+    if( bs_remain( p_bs ) < 134 )
+        return false;
+
+    p_vps->vps_video_parameter_set_id = bs_read( p_bs, 4 );
+    p_vps->vps_base_layer_internal_flag = bs_read1( p_bs );
+    p_vps->vps_base_layer_available_flag = bs_read1( p_bs );
+    p_vps->vps_max_layers_minus1 = bs_read( p_bs, 6 );
+    p_vps->vps_max_sub_layers_minus1 = bs_read( p_bs, 3 );
+    p_vps->vps_temporal_id_nesting_flag = bs_read1( p_bs );
+    bs_skip( p_bs, 16 );
+
+    if( !hevc_parse_profile_tier_level_rbsp( p_bs, true, p_vps->vps_max_sub_layers_minus1,
+                                            &p_vps->profile_tier_level ) )
+        return false;
+
+    p_vps->vps_sub_layer_ordering_info_present_flag = bs_read1( p_bs );
+    for( unsigned i= (p_vps->vps_sub_layer_ordering_info_present_flag ?
+                      0 : p_vps->vps_max_sub_layers_minus1);
+         i<= p_vps->vps_max_sub_layers_minus1; i++ )
+    {
+        (void) bs_read_ue( p_bs ); //nal_ue_t dec_pic_buffering_minus1;
+        (void) bs_read_ue( p_bs ); //nal_ue_t num_reorder_pics;
+        (void) bs_read_ue( p_bs ); //nal_ue_t max_latency_increase_plus1;
+    }
+    if( bs_remain( p_bs ) < 10 )
+        return false;
+
+    p_vps->vps_max_layer_id = bs_read( p_bs, 6 );
+    p_vps->vps_num_layer_set_minus1 = bs_read_ue( p_bs );
+    // layer_id_included_flag; read but discarded
+    bs_skip( p_bs, p_vps->vps_num_layer_set_minus1 * (p_vps->vps_max_layer_id + 1) );
+    if( bs_remain( p_bs ) < 2 )
+        return false;
+
+    p_vps->vps_timing_info_present_flag = bs_read1( p_bs );
+    if( p_vps->vps_timing_info_present_flag )
+    {
+        p_vps->vps_num_units_in_tick = bs_read( p_bs, 32 );
+        p_vps->vps_time_scale = bs_read( p_bs, 32 );
+    }
+    /* parsing incomplete */
+
+    if( bs_remain( p_bs ) < 1 )
+        return false;
+
+    return true;
+}
+
+void hevc_rbsp_release_vps( hevc_video_parameter_set_t *p_vps )
+{
+    free( p_vps );
+}
+
+hevc_video_parameter_set_t * hevc_rbsp_decode_vps( const uint8_t *p_buf, size_t i_buf )
+{
+    hevc_video_parameter_set_t *p_vps = calloc(1, sizeof(hevc_video_parameter_set_t));
+    if(likely(p_vps))
+    {
+        bs_t bs;
+        bs_init( &bs, p_buf, i_buf );
+        bs_skip( &bs, 16 ); /* Skip nal_unit_header */
+        if( !hevc_parse_video_parameter_set_rbsp( &bs, p_vps ) )
+        {
+            hevc_rbsp_release_vps( p_vps );
+            p_vps = NULL;
+        }
+    }
+    return p_vps;
 }
 
 static bool hevc_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
