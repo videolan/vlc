@@ -112,6 +112,13 @@ enum hevc_nal_unit_type_e
     HEVC_NAL_UNKNOWN
 };
 
+enum hevc_slice_type_e
+{
+    HEVC_SLICE_TYPE_B = 0,
+    HEVC_SLICE_TYPE_P,
+    HEVC_SLICE_TYPE_I
+};
+
 #define HEVC_MIN_HVCC_SIZE 23
 
 /* checks if data is an HEVCDecoderConfigurationRecord */
@@ -131,12 +138,17 @@ static inline bool hevc_ishvcC( const uint8_t *p_buf, size_t i_buf )
 /* NAL decoding */
 typedef struct hevc_sequence_parameter_set_t hevc_sequence_parameter_set_t;
 typedef struct hevc_picture_parameter_set_t hevc_picture_parameter_set_t;
+typedef struct hevc_slice_segment_header_t hevc_slice_segment_header_t;
 
 hevc_sequence_parameter_set_t * hevc_rbsp_decode_sps( const uint8_t *, size_t ) VLC_USED;
 hevc_picture_parameter_set_t *  hevc_rbsp_decode_pps( const uint8_t *, size_t ) VLC_USED;
+hevc_slice_segment_header_t *   hevc_rbsp_decode_slice_header( const uint8_t *, size_t,
+                const hevc_sequence_parameter_set_t **pp_sps/* HEVC_MAX_SPS */,
+                const hevc_picture_parameter_set_t **pp_pps /* HEVC_MAX_PPS */) VLC_USED;
 
 void hevc_rbsp_release_sps( hevc_sequence_parameter_set_t * );
 void hevc_rbsp_release_pps( hevc_picture_parameter_set_t * );
+void hevc_rbsp_release_slice_header( hevc_slice_segment_header_t * );
 
 /* Converts HEVCDecoderConfigurationRecord to Annex B format */
 uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,

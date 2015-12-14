@@ -178,6 +178,19 @@ struct hevc_picture_parameter_set_t
 
 };
 
+struct hevc_slice_segment_header_t
+{
+    nal_u1_t first_slice_segment_in_pic_flag;
+    nal_u1_t no_output_of_prior_pics_flag;
+    nal_ue_t slice_pic_parameter_set_id;
+    nal_u1_t dependent_slice_segment_flag;
+    // slice_segment_address; read but discarded
+    nal_ue_t slice_type;
+    nal_u1_t pic_output_flag;
+    /* incomplete */
+
+};
+
 /* Computes size and does check the whole struct integrity */
 static size_t get_hvcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
 {
@@ -594,4 +607,96 @@ hevc_picture_parameter_set_t * hevc_rbsp_decode_pps( const uint8_t *p_buf, size_
         }
     }
     return p_pps;
+}
+
+static bool hevc_get_picture_CtbsYsize( const hevc_sequence_parameter_set_t *p_sps, unsigned *p_w, unsigned *p_h )
+{
+    const unsigned int MinCbLog2SizeY = p_sps->log2_min_luma_coding_block_size_minus3 + 3;
+    const unsigned int CtbLog2SizeY = MinCbLog2SizeY + p_sps->log2_diff_max_min_luma_coding_block_size;
+    if( CtbLog2SizeY > 32 )
+        return false;
+    const unsigned int CtbSizeY = 1 << CtbLog2SizeY;
+    *p_w = (p_sps->pic_width_in_luma_samples - 1) / CtbSizeY + 1;
+    *p_h = (p_sps->pic_height_in_luma_samples - 1) / CtbSizeY + 1;
+    return true;
+}
+
+static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
+                                                  const hevc_sequence_parameter_set_t **pp_sps,
+                                                  const hevc_picture_parameter_set_t **pp_pps,
+                                                  hevc_slice_segment_header_t *p_sl )
+{
+    if( bs_remain( p_bs ) < 3 )
+        return false;
+
+    p_sl->first_slice_segment_in_pic_flag = bs_read1( p_bs );
+    p_sl->no_output_of_prior_pics_flag = bs_read1( p_bs );
+    p_sl->slice_pic_parameter_set_id = bs_read_ue( p_bs );
+    if( p_sl->slice_pic_parameter_set_id >= HEVC_PPS_MAX || bs_remain( p_bs ) < 1 )
+        return false;
+
+    const hevc_picture_parameter_set_t *p_pps = pp_pps[p_sl->slice_pic_parameter_set_id];
+    if(!p_pps)
+        return false;
+
+    if( !p_sl->first_slice_segment_in_pic_flag )
+    {
+        if( p_pps->dependent_slice_segments_enabled_flag )
+            p_sl->dependent_slice_segment_flag = bs_read1( p_bs );
+
+        const hevc_sequence_parameter_set_t *p_sps = pp_sps[p_pps->pps_seq_parameter_set_id];
+        if( p_sps )
+            return false;
+
+        unsigned w, h;
+        if( !hevc_get_picture_CtbsYsize( p_sps, &w, &h ) )
+            return false;
+
+        (void) bs_read( p_bs, vlc_ceil_log2( w * h ) ); /* slice_segment_address */
+    }
+
+    if( !p_sl->dependent_slice_segment_flag )
+    {
+        if( p_pps->num_extra_slice_header_bits )
+           (void) bs_read( p_bs, p_pps->num_extra_slice_header_bits );
+
+        p_sl->slice_type = bs_read_ue( p_bs );
+        if( p_sl->slice_type > HEVC_SLICE_TYPE_I )
+            return false;
+
+        if( p_pps->output_flag_present_flag )
+            p_sl->pic_output_flag = bs_read1( p_bs );
+    }
+
+    if( bs_remain( p_bs ) < 1 )
+        return false;
+
+    return true;
+}
+
+void hevc_rbsp_release_slice_header( hevc_slice_segment_header_t *p_sh )
+{
+    free( p_sh );
+}
+
+hevc_slice_segment_header_t * hevc_rbsp_decode_slice_header( const uint8_t *p_buf, size_t i_buf,
+                                                             const hevc_sequence_parameter_set_t **pp_sps,
+                                                             const hevc_picture_parameter_set_t **pp_pps )
+{
+    if(!pp_sps || !pp_pps)
+        return NULL;
+
+    hevc_slice_segment_header_t *p_sh = calloc(1, sizeof(hevc_slice_segment_header_t));
+    if(likely(p_sh))
+    {
+        bs_t bs;
+        bs_init( &bs, p_buf, i_buf );
+        bs_skip( &bs, 16 ); /* Skip nal_unit_header */
+        if( !hevc_parse_slice_segment_header_rbsp( &bs, pp_sps, pp_pps, p_sh ) )
+        {
+            hevc_rbsp_release_slice_header( p_sh );
+            p_sh = NULL;
+        }
+    }
+    return p_sh;
 }
