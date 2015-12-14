@@ -114,7 +114,7 @@ struct decoder_sys_t
     bool            b_output_ready;
     /* If true, the first input block was successfully dequeued */
     bool            b_input_dequeued;
-    bool            b_error;
+    bool            b_aborted;
     /* TODO: remove. See jni_EventHardwareAccelerationError */
     bool            b_error_signaled;
 
@@ -718,9 +718,9 @@ static void AbortDecoderLocked(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (!p_sys->b_error)
+    if (!p_sys->b_aborted)
     {
-        p_sys->b_error = true;
+        p_sys->b_aborted = true;
         vlc_cancel(p_sys->out_thread);
     }
 }
@@ -1134,7 +1134,7 @@ static void DecodeFlushLocked(decoder_t *p_dec)
 
     vlc_cond_broadcast(&p_sys->cond);
 
-    while (!p_sys->b_error && p_sys->b_flush_out)
+    while (!p_sys->b_aborted && p_sys->b_flush_out)
         vlc_cond_wait(&p_sys->dec_cond, &p_sys->lock);
 }
 
@@ -1245,7 +1245,7 @@ static void *OutThread(void *data)
     msg_Warn(p_dec, "OutThread stopped");
 
     /* Signal DecoderFlush that the output thread aborted */
-    p_sys->b_error = true;
+    p_sys->b_aborted = true;
     vlc_cond_signal(&p_sys->dec_cond);
 
     vlc_cleanup_pop();
@@ -1279,7 +1279,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
 
     vlc_mutex_lock(&p_sys->lock);
 
-    if (p_sys->b_error)
+    if (p_sys->b_aborted)
         goto end;
 
     if (pp_block != NULL)
@@ -1289,7 +1289,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
         if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
         {
             DecodeFlushLocked(p_dec);
-            if (p_sys->b_error)
+            if (p_sys->b_aborted)
                 goto end;
             if (p_block->i_flags & BLOCK_FLAG_CORRUPTED)
                 goto end;
@@ -1304,7 +1304,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
 
                 /* Flush before restart to unblock OutThread */
                 DecodeFlushLocked(p_dec);
-                if (p_sys->b_error)
+                if (p_sys->b_aborted)
                     goto end;
 
                 if (i_flags & NEWBLOCK_FLAG_RESTART)
@@ -1361,7 +1361,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
                                          INT64_C(1000000) : -1);
         vlc_mutex_lock(&p_sys->lock);
 
-        if (p_sys->b_error)
+        if (p_sys->b_aborted)
             goto end;
 
         bool b_config = false;
@@ -1452,10 +1452,10 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
          * frames. Use a timeout here since we can't know if all decoders will
          * behave correctly. */
         mtime_t deadline = mdate() + INT64_C(1000000);
-        while (!p_sys->b_error
+        while (!p_sys->b_aborted
             && vlc_cond_timedwait(&p_sys->dec_cond, &p_sys->lock, deadline) == 0);
 
-        if (!p_sys->b_error)
+        if (!p_sys->b_aborted)
             msg_Err(p_dec, "OutThread timed out");
 
         /* In case pf_decode is called again (it shouldn't happen) */
@@ -1471,7 +1471,7 @@ end:
         block_Release(*pp_block);
         *pp_block = NULL;
     }
-    if (p_sys->b_error)
+    if (p_sys->b_aborted)
     {
         if (!p_sys->b_error_signaled) {
             /* Signal the error to the Java.
