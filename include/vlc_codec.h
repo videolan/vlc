@@ -65,11 +65,38 @@ struct decoder_t
     /* Tell the decoder if it is allowed to drop frames */
     bool                b_frame_drop_allowed;
 
+    /* All pf_decode_* and pf_packetize functions have the same behavior.
+     *
+     * These functions are called in a loop with the same pp_block argument
+     * until they return NULL. This allows a module implementation to return
+     * more than one frames/samples for one input block.
+     *
+     * pp_block or *pp_block can be NULL.
+     *
+     * If pp_block and *pp_block are not NULL, the module implementation will
+     * own the input block (*pp_block) and should process and release it. The
+     * module can also process a part of the block. In that case, it should
+     * modify (*pp_block)->p_buffer/i_buffer accordingly and return a valid
+     * frame/samples. The module can also set *pp_block to NULL when the input
+     * block is consumed.
+     *
+     * If pp_block is not NULL but *pp_block is NULL, a previous call of the pf
+     * function has set the *pp_block to NULL. Here, the module can return new
+     * frames/samples for the same, already processed, input block (the pf
+     * function will be called as long as the module return a frame/samples).
+     *
+     * When the pf function returns NULL, the next call to this function will
+     * have a new a valid pp_block (if the decoder is not drained).
+     *
+     * If pp_block is NULL, the decoder asks the module to drain itself. In
+     * that case, the module has to return all frames/samples available (the pf
+     * function will be called as long as the module return a frame/samples).
+     */
+    picture_t *         ( * pf_decode_video )( decoder_t *, block_t **pp_block );
+    block_t *           ( * pf_decode_audio )( decoder_t *, block_t **pp_block );
+    subpicture_t *      ( * pf_decode_sub)   ( decoder_t *, block_t **pp_block );
+    block_t *           ( * pf_packetize )   ( decoder_t *, block_t **pp_block );
     /* */
-    picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
-    block_t *           ( * pf_decode_audio )( decoder_t *, block_t ** );
-    subpicture_t *      ( * pf_decode_sub)   ( decoder_t *, block_t ** );
-    block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
     void                ( * pf_flush ) ( decoder_t * );
 
     /* Closed Caption (CEA 608/708) extraction.
