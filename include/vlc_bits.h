@@ -62,6 +62,14 @@ static inline int bs_pos( const bs_t *s )
     return( 8 * ( s->p - s->p_start ) + 8 - s->i_left );
 }
 
+static inline int bs_remain( const bs_t *s )
+{
+    if( s->p >= s->p_end )
+        return 0;
+    else
+    return( 8 * ( s->p_end - s->p ) - 8 + s->i_left );
+}
+
 static inline int bs_eof( const bs_t *s )
 {
     return( s->p >= s->p_end ? 1: 0 );

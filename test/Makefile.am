@@ -22,6 +22,7 @@ check_PROGRAMS = \
 	test_src_misc_variables \
 	test_src_crypto_update \
 	test_src_input_stream \
+	test_src_misc_bits \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -86,6 +87,8 @@ test_src_input_stream_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_input_stream_net_SOURCES = src/input/stream.c
 test_src_input_stream_net_CFLAGS = $(AM_CFLAGS) -DTEST_NET
 test_src_input_stream_net_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_misc_bits_SOURCES = src/misc/bits.c
+test_src_misc_bits_LDADD = $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
