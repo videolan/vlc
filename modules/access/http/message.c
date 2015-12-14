@@ -699,7 +699,11 @@ uintmax_t vlc_http_msg_get_size(const struct vlc_http_msg *m)
      || m->status == 304 /* Not Modified */)
         return 0;
 
-    const char *str = vlc_http_msg_get_header(m, "Content-Length");
+    const char *str = vlc_http_msg_get_header(m, "Transfer-Encoding");
+    if (str != NULL) /* Transfer-Encoding preempts Content-Length */
+        return -1;
+
+    str = vlc_http_msg_get_header(m, "Content-Length");
     if (str == NULL)
     {
         if (m->status < 0)
