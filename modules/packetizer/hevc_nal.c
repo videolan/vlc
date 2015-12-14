@@ -609,6 +609,27 @@ hevc_picture_parameter_set_t * hevc_rbsp_decode_pps( const uint8_t *p_buf, size_
     return p_pps;
 }
 
+bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *p_sps,
+                            unsigned *p_w, unsigned *p_h, unsigned *p_vw, unsigned *p_vh )
+{
+    *p_w = *p_vw = p_sps->pic_width_in_luma_samples;
+    *p_h = *p_vh = p_sps->pic_height_in_luma_samples;
+    if( p_sps->conformance_window_flag )
+    {
+        *p_vh -= p_sps->conf_win.bottom_offset + p_sps->conf_win.top_offset;
+        *p_vh -= p_sps->conf_win.left_offset +  p_sps->conf_win.right_offset;
+    }
+    return true;
+}
+
+static inline uint8_t vlc_ceil_log2( uint32_t val )
+{
+    uint8_t n = 31 - clz(val);
+    if (((unsigned)1 << n) != val)
+        n++;
+    return n;
+}
+
 static bool hevc_get_picture_CtbsYsize( const hevc_sequence_parameter_set_t *p_sps, unsigned *p_w, unsigned *p_h )
 {
     const unsigned int MinCbLog2SizeY = p_sps->log2_min_luma_coding_block_size_minus3 + 3;
