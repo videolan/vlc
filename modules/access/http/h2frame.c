@@ -528,8 +528,8 @@ static int vlc_h2_parse_headers_end(struct vlc_h2_parser *p)
     {
         for (unsigned i = 0; i < VLC_H2_MAX_HEADERS; i++)
         {
-            free(headers[i][1]);
             free(headers[i][0]);
+            free(headers[i][1]);
         }
         val = -1;
     }
@@ -543,10 +543,17 @@ static int vlc_h2_parse_headers_end(struct vlc_h2_parser *p)
         val = 0;
     }
     else
+    {
+        for (int i = 0; i < val; i++)
+        {
+            free(headers[i][0]);
+            free(headers[i][1]);
+        }
         /* NOTE: The specification implies that the error should also be sent
          * for non-last header/continuation frames, but this does not make much
          * sense. */
         val = vlc_h2_stream_error(p, p->headers.sid, VLC_H2_REFUSED_STREAM);
+    }
 
     if (p->headers.eos && s != NULL)
         p->cbs->stream_end(s);
