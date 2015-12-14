@@ -408,7 +408,8 @@ static int QueueInput(mc_api *api, int i_index, const void *p_buf,
     mc_api_sys *p_sys = api->p_sys;
     uint8_t *p_mc_buf;
     size_t i_mc_size;
-    int i_flags = b_config ? AMEDIACODEC_FLAG_CODEC_CONFIG : 0;
+    int i_flags = (b_config ? AMEDIACODEC_FLAG_CODEC_CONFIG : 0)
+                | (p_buf == NULL ? AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM : 0);
 
     assert(i_index >= 0);
 
@@ -477,6 +478,7 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
         p_out->u.buf.i_index = i_index;
 
         p_out->u.buf.i_ts = p_sys->info.presentationTimeUs;
+        p_out->b_eos = p_sys->info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM;
 
         if (api->b_direct_rendering)
         {
@@ -489,7 +491,8 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
             uint8_t *p_mc_buf = syms.AMediaCodec.getOutputBuffer(p_sys->p_codec,
                                                                  i_index,
                                                                  &i_mc_size);
-            if (!p_mc_buf)
+            /* p_mc_buf can be NULL in case of EOS */
+            if (!p_mc_buf && !p_out->b_eos)
             {
                 msg_Err(api->p_obj, "AMediaCodec.getOutputBuffer failed");
                 return MC_API_ERROR;
@@ -504,6 +507,7 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
         AMediaFormat *format = syms.AMediaCodec.getOutputFormat(p_sys->p_codec);
 
         p_out->type = MC_OUT_TYPE_CONF;
+        p_out->b_eos = false;
         if (api->b_video)
         {
             p_out->u.conf.video.width         = GetFormatInteger(format, "width");

@@ -40,6 +40,7 @@
 #define THREAD_NAME "mediacodec_jni"
 
 #define BUFFER_FLAG_CODEC_CONFIG  2
+#define BUFFER_FLAG_END_OF_STREAM 4
 #define INFO_OUTPUT_BUFFERS_CHANGED -3
 #define INFO_OUTPUT_FORMAT_CHANGED  -2
 #define INFO_TRY_AGAIN_LATER        -1
@@ -65,7 +66,7 @@ struct jfields
     jmethodID create_video_format, create_audio_format;
     jmethodID set_integer, set_bytebuffer, get_integer;
     jmethodID buffer_info_ctor;
-    jfieldID size_field, offset_field, pts_field;
+    jfieldID size_field, offset_field, pts_field, flags_field;
 };
 static struct jfields jfields;
 
@@ -140,6 +141,7 @@ static const struct member members[] = {
     { "size", "I", "android/media/MediaCodec$BufferInfo", OFF(size_field), FIELD, true },
     { "offset", "I", "android/media/MediaCodec$BufferInfo", OFF(offset_field), FIELD, true },
     { "presentationTimeUs", "J", "android/media/MediaCodec$BufferInfo", OFF(pts_field), FIELD, true },
+    { "flags", "I", "android/media/MediaCodec$BufferInfo", OFF(flags_field), FIELD, true },
     { NULL, NULL, NULL, 0, 0, false },
 };
 
@@ -699,7 +701,8 @@ static int QueueInput(mc_api *api, int i_index, const void *p_buf,
     uint8_t *p_mc_buf;
     jobject j_mc_buf;
     jsize j_mc_size;
-    jint jflags = b_config ? BUFFER_FLAG_CODEC_CONFIG : 0;
+    jint jflags = (b_config ? BUFFER_FLAG_CODEC_CONFIG : 0)
+                | (p_buf == NULL ? BUFFER_FLAG_END_OF_STREAM : 0);
 
     assert(i_index >= 0);
 
@@ -787,6 +790,10 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
         p_out->u.buf.i_ts = (*env)->GetLongField(env, p_sys->buffer_info,
                                                  jfields.pts_field);
 
+        int flags = (*env)->GetIntField(env, p_sys->buffer_info,
+                                        jfields.flags_field);
+        p_out->b_eos = flags & BUFFER_FLAG_END_OF_STREAM;
+
         if (api->b_direct_rendering)
         {
             p_out->u.buf.p_ptr = NULL;
@@ -795,8 +802,8 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
         else
         {
             jobject buf;
-            uint8_t *ptr;
-            int offset;
+            uint8_t *ptr = NULL;
+            int offset = 0;
 
             if (jfields.get_output_buffers)
                 buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers,
@@ -813,10 +820,14 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
                 }
             }
             //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
-            ptr = (*env)->GetDirectBufferAddress(env, buf);
+            /* buf can be NULL in case of EOS */
+            if (buf)
+            {
+                ptr = (*env)->GetDirectBufferAddress(env, buf);
 
-            offset = (*env)->GetIntField(env, p_sys->buffer_info,
-                                         jfields.offset_field);
+                offset = (*env)->GetIntField(env, p_sys->buffer_info,
+                                             jfields.offset_field);
+            }
             p_out->u.buf.p_ptr = ptr + offset;
             p_out->u.buf.i_size = (*env)->GetIntField(env, p_sys->buffer_info,
                                                        jfields.size_field);
@@ -847,6 +858,7 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
         (*env)->ReleaseStringUTFChars(env, format_string, format_ptr);
 
         p_out->type = MC_OUT_TYPE_CONF;
+        p_out->b_eos = false;
         if (api->b_video)
         {
             p_out->u.conf.video.width         = GET_INTEGER(format, "width");

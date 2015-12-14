@@ -46,6 +46,7 @@ struct mc_api_out
         MC_OUT_TYPE_BUF,
         MC_OUT_TYPE_CONF,
     } type;
+    bool b_eos;
     union
     {
         struct
