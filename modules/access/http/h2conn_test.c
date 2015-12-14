@@ -30,6 +30,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#ifndef SOCK_CLOEXEC
+# define SOCK_CLOEXEC 0
+#endif
 
 #include <vlc_common.h>
 #include <vlc_block.h>
