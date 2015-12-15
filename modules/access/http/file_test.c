@@ -191,9 +191,10 @@ static struct block_t *stream_read(struct vlc_http_stream *s)
     return NULL;
 }
 
-static void stream_close(struct vlc_http_stream *s)
+static void stream_close(struct vlc_http_stream *s, bool abort)
 {
     assert(s == &stream);
+    assert(!abort);
 }
 
 static const struct vlc_http_stream_cbs stream_callbacks =

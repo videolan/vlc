@@ -139,7 +139,7 @@ const char *vlc_http_msg_get_path(const struct vlc_http_msg *m)
 void vlc_http_msg_destroy(struct vlc_http_msg *m)
 {
     if (m->payload != NULL)
-        vlc_http_stream_close(m->payload);
+        vlc_http_stream_close(m->payload, false);
 
     for (unsigned i = 0; i < m->count; i++)
     {

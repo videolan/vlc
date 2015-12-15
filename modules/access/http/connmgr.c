@@ -120,7 +120,7 @@ struct vlc_http_msg *vlc_https_request_reuse(struct vlc_http_mgr *mgr,
             if (m != NULL)
                 return m;
 
-            vlc_http_stream_close(s);
+            vlc_http_stream_close(s, false);
             /* NOTE: If the request were not idempotent, NULL should be
              * returned here. POST is not used/supported so far, and CONNECT is
              * treated as if it were idempotent (which turns out OK here). */
@@ -141,7 +141,7 @@ struct vlc_http_msg *vlc_https_request_reuse(struct vlc_http_mgr *mgr,
             if (m != NULL)
                 return m;
 
-            vlc_http_stream_close(s);
+            vlc_http_stream_close(s, false);
         }
         vlc_h1_conn_release(conn1);
 #endif

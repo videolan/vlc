@@ -200,7 +200,7 @@ struct vlc_http_stream_cbs
 {
     struct vlc_http_msg *(*read_headers)(struct vlc_http_stream *);
     struct block_t *(*read)(struct vlc_http_stream *);
-    void (*close)(struct vlc_http_stream *);
+    void (*close)(struct vlc_http_stream *, bool abort);
 };
 
 struct vlc_http_stream
@@ -219,9 +219,9 @@ static inline struct block_t *vlc_http_stream_read(struct vlc_http_stream *s)
     return s->cbs->read(s);
 }
 
-static inline void vlc_http_stream_close(struct vlc_http_stream *s)
+static inline void vlc_http_stream_close(struct vlc_http_stream *s, bool abort)
 {
-    s->cbs->close(s);
+    s->cbs->close(s, abort);
 }
 
 char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *) VLC_USED;

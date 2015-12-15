@@ -156,7 +156,7 @@ int main(void)
     assert(m == NULL);
     b = vlc_http_stream_read(s);
     assert(b == NULL);
-    vlc_http_stream_close(s);
+    vlc_http_stream_close(s, false);
 
     /* Test accepted stream */
     sid += 2;
@@ -245,7 +245,7 @@ int main(void)
 
     /* Test releasing connection before stream */
     conn_destroy();
-    vlc_http_stream_close(s);
+    vlc_http_stream_close(s, false);
 
     return 0;
 }

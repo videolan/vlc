@@ -304,7 +304,7 @@ static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
  * Sends an HTTP/2 stream reset, removes the stream from the HTTP/2 connection
  * and deletes any stream resource.
  */
-static void vlc_h2_stream_close(struct vlc_http_stream *stream)
+static void vlc_h2_stream_close(struct vlc_http_stream *stream, bool abort)
 {
     struct vlc_h2_stream *s = (struct vlc_h2_stream *)stream;
     struct vlc_h2_conn *conn = s->conn;
@@ -323,7 +323,7 @@ static void vlc_h2_stream_close(struct vlc_http_stream *stream)
     }
     vlc_mutex_unlock(&conn->lock);
 
-    vlc_h2_stream_error(conn, s->id, VLC_H2_NO_ERROR);
+    vlc_h2_stream_error(conn, s->id, abort ? VLC_H2_CANCEL : VLC_H2_NO_ERROR);
 
     if (s->recv_hdr != NULL)
         vlc_http_msg_destroy(s->recv_hdr);
