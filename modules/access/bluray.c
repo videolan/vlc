@@ -258,8 +258,8 @@ static int   onIntfEvent(vlc_object_t *, char const *,
 
 static void  blurayResetParser(demux_t *p_demux);
 
-#define FROM_TICKS(a) (a*CLOCK_FREQ / INT64_C(90000))
-#define TO_TICKS(a)   (a*INT64_C(90000)/CLOCK_FREQ)
+#define FROM_TICKS(a) ((a)*CLOCK_FREQ / INT64_C(90000))
+#define TO_TICKS(a)   ((a)*INT64_C(90000)/CLOCK_FREQ)
 #define CUR_LENGTH    p_sys->pp_title[p_demux->info.i_title]->i_length
 
 /* */
