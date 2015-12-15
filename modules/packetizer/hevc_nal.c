@@ -213,6 +213,35 @@ struct hevc_sequence_parameter_set_t
     nal_ue_t log2_diff_max_min_luma_transform_block_size;
 
     /* incomplete */
+    nal_ue_t max_transform_hierarchy_depth_inter;
+    nal_ue_t max_transform_hierarchy_depth_intra;
+    nal_u1_t scaling_list_enabled;
+    nal_u1_t sps_scaling_list_data_present_flag;
+    // scaling_list_data; read but discarded
+
+    nal_u1_t amp_enabled_flag;
+    nal_u1_t sample_adaptive_offset_enabled_flag;
+
+    nal_u1_t pcm_enabled_flag;
+    nal_u4_t pcm_sample_bit_depth_luma_minus1;
+    nal_u4_t pcm_sample_bit_depth_chroma_minus1;
+    nal_ue_t log2_min_pcm_luma_coding_block_size_minus3;
+    nal_ue_t log2_diff_max_min_pcm_luma_coding_block_size;
+    nal_u1_t pcm_loop_filter_disabled_flag;
+
+    nal_ue_t num_short_term_ref_pic_sets;
+    // st_ref_pic_set
+
+    nal_u1_t long_term_ref_pics_present_flag;
+    nal_ue_t num_long_term_ref_pics_sps;
+    //
+
+    nal_u1_t sps_temporal_mvp_enabled_flag;
+    nal_u1_t strong_intra_smoothing_enabled_flag;
+
+    nal_u1_t vui_parameters_present_flag;
+    hevc_vui_parameters_t vui;
+    /* incomplete */
 };
 
 struct hevc_picture_parameter_set_t
@@ -758,6 +787,73 @@ static bool hevc_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     p_sps->log2_diff_max_min_luma_transform_block_size = bs_read_ue( p_bs );
 
     /* parsing incomplete */
+
+    p_sps->max_transform_hierarchy_depth_inter = bs_read_ue( p_bs );
+    p_sps->max_transform_hierarchy_depth_intra = bs_read_ue( p_bs );
+    p_sps->scaling_list_enabled = bs_read1( p_bs );
+    if( p_sps->scaling_list_enabled )
+    {
+        p_sps->sps_scaling_list_data_present_flag = bs_read1( p_bs );
+        if( p_sps->sps_scaling_list_data_present_flag &&
+            ! hevc_parse_scaling_list_rbsp( p_bs ) )
+        {
+            return false;
+        }
+    }
+
+    p_sps->amp_enabled_flag = bs_read1( p_bs );
+    p_sps->sample_adaptive_offset_enabled_flag = bs_read1( p_bs );
+
+    p_sps->pcm_enabled_flag = bs_read1( p_bs );
+    if( p_sps->pcm_enabled_flag )
+    {
+        p_sps->pcm_sample_bit_depth_luma_minus1 = bs_read( p_bs, 4 );
+        p_sps->pcm_sample_bit_depth_chroma_minus1 = bs_read( p_bs, 4 );
+        p_sps->log2_min_pcm_luma_coding_block_size_minus3 = bs_read_ue( p_bs );
+        p_sps->log2_diff_max_min_pcm_luma_coding_block_size = bs_read_ue( p_bs );
+        p_sps->pcm_loop_filter_disabled_flag = bs_read1( p_bs );
+    }
+
+    p_sps->num_short_term_ref_pic_sets = bs_read_ue( p_bs );
+    if( p_sps->num_short_term_ref_pic_sets > HEVC_MAX_SHORT_TERM_REF_PIC_SET )
+        return false;
+
+    hevc_short_term_ref_pic_set_t sets[HEVC_MAX_SHORT_TERM_REF_PIC_SET];
+    memset(&sets, 0, sizeof(hevc_short_term_ref_pic_set_t) * HEVC_MAX_SHORT_TERM_REF_PIC_SET);
+    for( unsigned int i=0; i<p_sps->num_short_term_ref_pic_sets; i++ )
+    {
+        if( !hevc_parse_st_ref_pic_set( p_bs, i, p_sps->num_short_term_ref_pic_sets, sets ) )
+            return false;
+    }
+
+    p_sps->long_term_ref_pics_present_flag = bs_read1( p_bs );
+    if( p_sps->long_term_ref_pics_present_flag )
+    {
+        p_sps->num_long_term_ref_pics_sps = bs_read_ue( p_bs );
+        if( p_sps->num_long_term_ref_pics_sps > HEVC_MAX_LONG_TERM_REF_PIC_SET )
+            return false;
+        for( unsigned int i=0; i< p_sps->num_long_term_ref_pics_sps; i++ )
+        {
+             /* lt_ref_pic_poc_lsb_sps */
+            bs_skip( p_bs, p_sps->log2_max_pic_order_cnt_lsb_minus4 + 4 );
+             /* used_by_curr_pic_lt_sps_flag */
+            bs_skip( p_bs, 1 );
+        }
+    }
+
+    p_sps->sps_temporal_mvp_enabled_flag = bs_read1( p_bs );
+    p_sps->strong_intra_smoothing_enabled_flag = bs_read1( p_bs );
+
+    if( bs_remain( p_bs ) < 1 ) /* late fail */
+        return false;
+
+    p_sps->vui_parameters_present_flag = bs_read1( p_bs );
+    if( p_sps->vui_parameters_present_flag &&
+        !hevc_parse_vui_parameters_rbsp( p_bs, &p_sps->vui ) )
+        return false;
+
+    /* incomplete */
+
     return true;
 }
 
