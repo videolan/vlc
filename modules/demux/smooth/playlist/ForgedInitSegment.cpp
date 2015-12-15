@@ -71,7 +71,7 @@ ForgedInitSegment::~ForgedInitSegment()
 static uint8_t *HexDecode(const std::string &s, size_t *decoded_size)
 {
     *decoded_size = s.size() / 2;
-    uint8_t *data = new (std::nothrow) uint8_t[*decoded_size];
+    uint8_t *data = (uint8_t *) malloc(*decoded_size);
     if(data)
     {
         for(size_t i=0; i<*decoded_size; i++)
@@ -199,6 +199,11 @@ void ForgedInitSegment::setFourCC(const std::string &fcc)
     }
 }
 
+void ForgedInitSegment::setLanguage(const std::string &lang)
+{
+    language = lang;
+}
+
 block_t * ForgedInitSegment::buildMoovBox()
 {
     mp4mux_trackinfo_t trackinfo;
@@ -263,6 +268,9 @@ block_t * ForgedInitSegment::buildMoovBox()
         default:
             break;
     }
+
+    if(!language.empty())
+        trackinfo.fmt.psz_language = strdup(language.c_str());
 
     mp4mux_trackinfo_t *p_tracks = &trackinfo;
     bo_t *box = GetMoovBox(NULL, &p_tracks, 1, true, false, false, false);

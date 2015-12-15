@@ -526,7 +526,7 @@ static bool set_item_info SIMPLE_INTERFACE
         return false;
 
     /* re-convert xml special characters inside psz_value */
-    resolve_xml_special_chars(psz_value);
+    vlc_xml_decode(psz_value);
 
     /* handle each info element in a separate "if" clause */
     if (!strcmp(psz_name, "title"))
@@ -561,7 +561,7 @@ static bool set_option SIMPLE_INTERFACE
         return false;
 
     /* re-convert xml special characters inside psz_value */
-    resolve_xml_special_chars(psz_value);
+    vlc_xml_decode(psz_value);
 
     input_item_AddOption(p_input, psz_value, 0);
 
@@ -599,7 +599,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
             free(psz_title);
             psz_title = strdup(value);
             if (likely(psz_title != NULL))
-                resolve_xml_special_chars(psz_title);
+                vlc_xml_decode(psz_title);
         }
         /* extension attribute: application */
         else if (!strcmp(name, "application"))

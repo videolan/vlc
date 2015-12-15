@@ -157,6 +157,7 @@ static int OpenPacketizer( vlc_object_t *p_this );
 #endif
 
 static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block );
+static void Flush( decoder_t * );
 static int ProcessHeaders( decoder_t *p_dec );
 static subpicture_t *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
                             block_t **pp_block );
@@ -354,6 +355,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         DecodeBlock;
     p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
         DecodeBlock;
+    p_dec->pf_flush        = Flush;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
@@ -452,6 +454,22 @@ static int OpenPacketizer( vlc_object_t *p_this )
     return i_ret;
 }
 #endif
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+#ifdef HAVE_TIGER
+    /* Hmm, should we wait before flushing the renderer ? I think not, but not certain... */
+    vlc_mutex_lock( &p_sys->lock );
+    tiger_renderer_seek( p_sys->p_tr, 0 );
+    vlc_mutex_unlock( &p_sys->lock );
+#endif
+    p_sys->i_max_stop = VLC_TS_INVALID;
+}
 
 /****************************************************************************
  * DecodeBlock: the whole thing

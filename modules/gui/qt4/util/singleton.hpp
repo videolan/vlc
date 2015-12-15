@@ -3,7 +3,7 @@
  ****************************************************************************
  * Copyright (C) 2009 VideoLAN
  *
- * Authors: Hugo Beauzee-Luyssen <beauze.h # gmail - com>
+ * Authors: Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 #define _SINGLETON_HPP_
 
 #include <stdlib.h>
+#include <vlc_threads.h>
+
 #include "qt4.hpp"
 
 template <typename T>
@@ -32,6 +34,7 @@ class       Singleton
 public:
     static T*      getInstance( intf_thread_t *p_intf = NULL )
     {
+        vlc_mutex_locker lock( &m_mutex );
         if ( m_instance == NULL )
             m_instance = new T( p_intf );
         return m_instance;
@@ -39,6 +42,7 @@ public:
 
     static void    killInstance()
     {
+        vlc_mutex_locker lock( &m_mutex );
         if ( m_instance != NULL )
         {
             delete m_instance;
@@ -55,9 +59,13 @@ protected:
 
 private:
     static T*      m_instance;
+    static vlc_mutex_t m_mutex;
 };
 
 template <typename T>
 T*  Singleton<T>::m_instance = NULL;
+
+template <typename T>
+vlc_mutex_t Singleton<T>::m_mutex = VLC_STATIC_MUTEX;
 
 #endif // _SINGLETON_HPP_

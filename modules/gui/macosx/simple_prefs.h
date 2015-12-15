@@ -27,6 +27,7 @@
 
 @interface VLCSimplePrefs : NSWindowController
 
+// Audio pane
 @property (readwrite, weak) IBOutlet NSPopUpButton *audio_dolbyPopup;
 @property (readwrite, weak) IBOutlet NSTextField *audio_dolbyLabel;
 @property (readwrite, weak) IBOutlet NSBox *audio_effectsBox;
@@ -50,6 +51,7 @@
 @property (readwrite, weak) IBOutlet NSButtonCell *audio_autosavevol_yesButtonCell;
 @property (readwrite, weak) IBOutlet NSButtonCell *audio_autosavevol_noButtonCell;
 
+// hotkeys pane
 @property (readwrite, weak) IBOutlet NSButton *hotkeys_changeButton;
 @property (readwrite, weak) IBOutlet NSTextField *hotkeys_changeLabel;
 @property (readwrite, weak) IBOutlet NSTextField *hotkeys_change_keysLabel;
@@ -62,6 +64,7 @@
 @property (readwrite, weak) IBOutlet NSTableView *hotkeys_listbox;
 @property (readwrite, weak) IBOutlet NSView *hotkeysView;
 
+// input pane
 @property (readwrite, weak) IBOutlet NSBox *input_recordBox;
 @property (readwrite, weak) IBOutlet NSTextField *input_recordTextField;
 @property (readwrite, weak) IBOutlet NSButton *input_recordButton;
@@ -77,40 +80,47 @@
 @property (readwrite, weak) IBOutlet NSPopUpButton *input_avcodec_hwPopup;
 @property (readwrite, weak) IBOutlet NSTextField *input_postprocTextField;
 @property (readwrite, weak) IBOutlet NSTextField *input_postprocLabel;
-@property (readwrite, weak) IBOutlet NSButton *input_rtspCheckbox;
 @property (readwrite, weak) IBOutlet NSTextField *input_skipLoopLabel;
 @property (readwrite, weak) IBOutlet NSPopUpButton *input_skipLoopPopup;
-@property (readwrite, weak) IBOutlet NSButton *input_mkv_preload_dirCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *input_urlhandlerButton;
+@property (readwrite, weak) IBOutlet NSButton *input_skipFramesCheckbox;
 @property (readwrite, weak) IBOutlet NSView *inputView;
 
+// intf pane - general box
+@property (readwrite, weak) IBOutlet NSBox *intf_generalSettingsBox;
 @property (readwrite, weak) IBOutlet NSPopUpButton *intf_languagePopup;
 @property (readwrite, weak) IBOutlet NSTextField *intf_languageLabel;
 @property (readwrite, weak) IBOutlet NSTextField *intf_styleLabel;
 @property (readwrite, weak) IBOutlet NSButtonCell *intf_style_darkButtonCell;
 @property (readwrite, weak) IBOutlet NSButtonCell *intf_style_brightButtonCell;
-@property (readwrite, weak) IBOutlet NSButton *intf_artCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *intf_embeddedCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *intf_fspanelCheckbox;
+
+// intf pane - control box
+@property (readwrite, weak) IBOutlet NSBox *intf_playbackControlBox;
+@property (readwrite, weak) IBOutlet NSTextField *intf_continueplaybackLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *intf_continueplaybackPopup;
 @property (readwrite, weak) IBOutlet NSButton *intf_appleremoteCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *intf_appleremote_sysvolCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_mediakeysCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *intf_appleremote_sysvolCheckbox;
+
+// intf pane - behaviour box
+@property (readwrite, weak) IBOutlet NSBox *intf_playbackBehaviourBox;
+@property (readwrite, weak) IBOutlet NSButton *intf_enableNotificationsCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *intf_pauseitunesLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *intf_pauseitunesPopup;
+
+// intf pane - network box
 @property (readwrite, weak) IBOutlet NSBox *intf_networkBox;
-@property (readwrite, weak) IBOutlet NSView *intfView;
+@property (readwrite, weak) IBOutlet NSButton *intf_artCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_updateCheckbox;
 @property (readwrite, weak) IBOutlet NSTextField *intf_last_updateLabel;
-@property (readwrite, weak) IBOutlet NSButton *intf_enableNotificationsCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *intf_nativefullscreenCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *intf_autoresizeCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *intf_pauseminimizedCheckbox;
+
+// intf pane - http interface box
 @property (readwrite, weak) IBOutlet NSBox *intf_luahttpBox;
 @property (readwrite, weak) IBOutlet NSTextField *intf_luahttppwdLabel;
 @property (readwrite, weak) IBOutlet NSTextField *intf_luahttppwdTextField;
-@property (readwrite, weak) IBOutlet NSTextField *intf_pauseitunesLabel;
-@property (readwrite, weak) IBOutlet NSPopUpButton *intf_pauseitunesPopup;
-@property (readwrite, weak) IBOutlet NSTextField *intf_continueplaybackLabel;
-@property (readwrite, weak) IBOutlet NSPopUpButton *intf_continueplaybackPopup;
+@property (readwrite, weak) IBOutlet NSView *intfView;
 
+// osd pane
 @property (readwrite, weak) IBOutlet NSPopUpButton *osd_encodingPopup;
 @property (readwrite, weak) IBOutlet NSTextField *osd_encodingLabel;
 @property (readwrite, weak) IBOutlet NSBox *osd_fontBox;
@@ -142,15 +152,31 @@
 @property (readwrite, weak) IBOutlet NSButton *resetButton;
 @property (readwrite, weak) IBOutlet NSButton *saveButton;
 
-@property (readwrite, weak) IBOutlet NSButton *video_blackCheckbox;
-@property (readwrite, weak) IBOutlet NSPopUpButton *video_devicePopup;
-@property (readwrite, weak) IBOutlet NSTextField *video_deviceLabel;
-@property (readwrite, weak) IBOutlet NSBox *video_displayBox;
+// video pane
 @property (readwrite, weak) IBOutlet NSButton *video_enableCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *video_fullscreenCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *video_videodecoCheckbox;
+// video pane - display box
+@property (readwrite, weak) IBOutlet NSBox *video_displayBox;
+@property (readwrite, weak) IBOutlet NSButton *video_embeddedCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *video_pauseWhenMinimizedCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *video_onTopCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *video_skipFramesCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *video_videodecoCheckbox;
+
+// video pane - fullscreen box
+@property (readwrite, weak) IBOutlet NSBox *video_fullscreenBox;
+@property (readwrite, weak) IBOutlet NSButton *video_startInFullscreenCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *video_blackScreenCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *video_nativeFullscreenCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *video_deviceLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *video_devicePopup;
+
+// video pane - video box
+@property (readwrite, weak) IBOutlet NSBox *video_videoBox;
+@property (readwrite, weak) IBOutlet NSTextField *video_deinterlaceLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *video_deinterlacePopup;
+@property (readwrite, weak) IBOutlet NSTextField *video_deinterlace_modeLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *video_deinterlace_modePopup;
+
+// video pane - snapshot box
 @property (readwrite, weak) IBOutlet NSBox *video_snapBox;
 @property (readwrite, weak) IBOutlet NSButton *video_snap_folderButton;
 @property (readwrite, weak) IBOutlet NSTextField *video_snap_folderTextField;
@@ -160,11 +186,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *video_snap_prefixTextField;
 @property (readwrite, weak) IBOutlet NSTextField *video_snap_prefixLabel;
 @property (readwrite, weak) IBOutlet NSButton *video_snap_seqnumCheckbox;
-@property (readwrite, weak) IBOutlet NSTextField *video_deinterlaceLabel;
-@property (readwrite, weak) IBOutlet NSPopUpButton *video_deinterlacePopup;
-@property (readwrite, weak) IBOutlet NSTextField *video_deinterlace_modeLabel;
-@property (readwrite, weak) IBOutlet NSPopUpButton *video_deinterlace_modePopup;
-@property (readwrite, weak) IBOutlet NSBox *video_videoBox;
+
 @property (readwrite, weak) IBOutlet NSView *videoView;
 
 @property (readwrite, weak) IBOutlet NSTextField *urlhandler_titleLabel;

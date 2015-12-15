@@ -117,6 +117,8 @@ vlc_module_begin ()
         change_safe()
     add_bool( "http-forward-cookies", true, FORWARD_COOKIES_TEXT,
               FORWARD_COOKIES_LONGTEXT, true )
+    add_bool( "http2", false, N_("HTTP 2.0"),
+              N_("Negotiate HTTP version 2.0"), true )
     /* 'itpc' = iTunes Podcast */
     add_shortcut( "http", "https", "unsv", "itpc", "icyx" )
     set_callbacks( Open, Close )
@@ -148,11 +150,11 @@ struct access_sys_t
     /* */
     int        i_code;
     const char *psz_protocol;
-    int        i_version;
 
     char       *psz_mime;
     char       *psz_pragma;
     char       *psz_location;
+    bool i_version;
     bool b_mms;
     bool b_icecast;
 #ifdef HAVE_ZLIB_H
@@ -992,23 +994,23 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     /* Initialize TLS/SSL session */
     if( p_sys->p_creds != NULL )
     {
+        bool http2 = var_InheritBool( p_access, "http2" );
+
+        if( (p_sys->b_proxy || http2) && p_sys->i_version == 0 )
+        {   /* ALPN and CONNECT are not compatible with HTTP/1.0 */
+            Disconnect( p_access );
+            return -1;
+        }
+
         /* CONNECT to establish TLS tunnel through HTTP proxy */
         if( p_sys->b_proxy )
         {
             char *psz;
-            unsigned i_status = 0;
-
-            if( p_sys->i_version == 0 )
-            {
-                /* CONNECT is not in HTTP/1.0 */
-                Disconnect( p_access );
-                return -1;
-            }
+            unsigned i_status;
 
             WriteHeaders( p_access,
-                          "CONNECT %s:%d HTTP/1.%d\r\nHost: %s:%d\r\n\r\n",
+                          "CONNECT %s:%d HTTP/1.1\r\nHost: %s:%d\r\n\r\n",
                           p_sys->url.psz_host, p_sys->url.i_port,
-                          p_sys->i_version,
                           p_sys->url.psz_host, p_sys->url.i_port);
 
             psz = net_Gets( p_access, p_sys->fd );
@@ -1019,7 +1021,8 @@ static int Connect( access_t *p_access, uint64_t i_tell )
                 return -1;
             }
 
-            sscanf( psz, "HTTP/%*u.%*u %3u", &i_status );
+            if( sscanf( psz, "HTTP/1.%*u %3u", &i_status ) != 1 )
+                i_status = 0;
             free( psz );
 
             if( ( i_status / 100 ) != 2 )
@@ -1054,14 +1057,25 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         }
 
         /* TLS/SSL handshake */
-        const char *alpn[] = { "http/1.1", NULL };
+        const char *alpn[3] = { "h2", "http/1.1", NULL };
+        char *alp;
 
         p_sys->p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds, p_sys->fd,
                 p_sys->url.psz_host, "https",
-                p_sys->i_version ? alpn : NULL, NULL );
+                p_sys->i_version ? (alpn + !http2) : NULL, &alp );
         if( p_sys->p_tls == NULL )
         {
             msg_Err( p_access, "cannot establish HTTP/TLS session" );
+            Disconnect( p_access );
+            return -1;
+        }
+
+        http2 = alp != NULL && !strcmp("h2", alp);
+        free( alp );
+
+        if( http2 )
+        {
+            msg_Dbg( p_access, "handing off to HTTP2 plugin" );
             Disconnect( p_access );
             return -1;
         }
@@ -1379,7 +1393,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
             if( !p_sys->psz_icy_name )
                 free( psz_tmp );
             else
-                resolve_xml_special_chars( p_sys->psz_icy_name );
+                vlc_xml_decode( p_sys->psz_icy_name );
             msg_Dbg( p_access, "Icy-Name: %s", p_sys->psz_icy_name );
             input_thread_t *p_input = p_access->p_input;
             if ( p_input )
@@ -1401,7 +1415,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
             if( !p_sys->psz_icy_genre )
                 free( psz_tmp );
             else
-                resolve_xml_special_chars( p_sys->psz_icy_genre );
+                vlc_xml_decode( p_sys->psz_icy_genre );
             msg_Dbg( p_access, "Icy-Genre: %s", p_sys->psz_icy_genre );
             input_thread_t *p_input = p_access->p_input;
             if( p_input )

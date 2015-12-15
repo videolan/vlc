@@ -32,6 +32,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_bits.h \
 	../include/vlc_block.h \
 	../include/vlc_block_helper.h \
+	../include/vlc_boxes.h \
 	../include/vlc_charset.h \
 	../include/vlc_codec.h \
 	../include/vlc_common.h \
@@ -187,7 +188,7 @@ libvlccore_la_LDFLAGS = \
 libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 	../compat/libcompat.la \
 	$(LTLIBINTL) $(LTLIBICONV) \
-	$(IDN_LIBS) $(LIBPTHREAD) $(SOCKET_LIBS) $(LIBDL) $(LIBM)
+	$(IDN_LIBS) $(LIBPTHREAD) $(SOCKET_LIBS) $(LIBRT) $(LIBDL) $(LIBM)
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
@@ -536,7 +537,7 @@ check_PROGRAMS = \
 	test_xmlent \
 	test_headers
 
-TESTS = $(check_PROGRAMS)
+TESTS = $(check_PROGRAMS) check_symbols
 
 test_block_SOURCES = test/block_test.c
 test_block_LDADD = $(LDADD) $(LIBS_libvlccore)
@@ -592,7 +593,7 @@ stamp-revision:
 # Unit/regression test
 ###############################################################################
 
-dist_check_SCRIPTS = check_headers
+dist_check_SCRIPTS = check_headers check_symbols
 
 check-local:
 	for h in `echo $(pkginclude_HEADERS) | sed -e s,\.\./include/,,g`; \

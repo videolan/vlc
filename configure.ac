@@ -564,7 +564,7 @@ need_libc=false
 dnl Check for usual libc functions
 AC_CHECK_DECLS([nanosleep],,,[#include <time.h>])
 AC_CHECK_FUNCS([daemon fcntl fstatvfs fork getenv getpwuid_r isatty lstat memalign mkostemp mmap open_memstream openat pread posix_fadvise posix_madvise setlocale stricmp strnicmp strptime uselocale pthread_cond_timedwait_monotonic_np pthread_condattr_setclock])
-AC_REPLACE_FUNCS([atof atoll dirfd fdopendir ffsll flockfile fsync getdelim getpid lldiv nrand48 poll posix_memalign rewind setenv strcasecmp strcasestr strdup strlcpy strndup strnlen strnstr strsep strtof strtok_r strtoll swab tdestroy strverscmp])
+AC_REPLACE_FUNCS([atof atoll dirfd fdopendir ffsll flockfile fsync getdelim getpid lldiv nrand48 poll posix_memalign rewind setenv strcasecmp strcasestr strdup strlcpy strndup strnlen strnstr strsep strtof strtok_r strtoll swab tdestroy timegm timespec_get strverscmp])
 AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
@@ -743,24 +743,21 @@ AS_IF([test "${SYS}" != "mingw32"], [
     ])
   ])
   VLC_RESTORE_FLAGS
-
-  AC_CHECK_LIB(rt, clock_nanosleep, [
-    VLC_ADD_LIBS([libvlccore],[-lrt])
-  ], [
-    AC_CHECK_FUNC(nanosleep,,[
-      AC_CHECK_LIB(rt,nanosleep, [
-        VLC_ADD_LIBS([libvlccore],[-lrt])
-      ], [
-        AC_CHECK_LIB(posix4,nanosleep, [
-          VLC_ADD_LIBS([libvlccore],[-lposix4])
-        ])
-      ])
-    ])
-    dnl HP/UX port
-    AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LIBS([libvlccore],[-lrt])])
-  ])
 ])
 AC_SUBST(LIBPTHREAD)
+
+AC_SEARCH_LIBS([clock_nanosleep], [rt pthread], [
+  AS_IF([test "$ac_cv_search_clock_nanosleep" != "none required"], [
+    LIBRT="$ac_cv_search_clock_nanosleep"
+  ])
+], [
+  AC_SEARCH_LIBS([nanosleep], [rt pthread posix4], [
+    AS_IF([test "$ac_cv_search_nanosleep" != "none required"], [
+      LIBRT="$ac_cv_search_nanosleep"
+    ])
+  ])
+])
+AC_SUBST(LIBRT)
 
 dnl
 dnl Check for headers
@@ -1755,7 +1752,7 @@ AS_IF([test "${SYS}" = "mingw32"], [ VLC_ADD_PLUGIN([smb]) ])
 dnl
 dnl  liBDSM access module
 dnl
-PKG_ENABLE_MODULES_VLC([DSM], [dsm], [libdsm >= 0.0.4], [libdsm SMB/CIFS access/sd module], [auto])
+PKG_ENABLE_MODULES_VLC([DSM], [dsm], [libdsm >= 0.0.7], [libdsm SMB/CIFS access/sd module], [auto])
 
 dnl
 dnl sftp access support

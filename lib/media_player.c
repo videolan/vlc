@@ -366,6 +366,18 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         event.u.media_player_vout.new_count = i_vout;
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
+    else if ( newval.i_int == INPUT_EVENT_TITLE )
+    {
+        event.type = libvlc_MediaPlayerTitleChanged;
+        event.u.media_player_title_changed.new_title = var_GetInteger( p_input, "title" );
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
+    else if ( newval.i_int == INPUT_EVENT_CHAPTER )
+    {
+        event.type = libvlc_MediaPlayerChapterChanged;
+        event.u.media_player_chapter_changed.new_chapter = var_GetInteger( p_input, "chapter" );
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
 
     return VLC_SUCCESS;
 }
@@ -1464,7 +1476,7 @@ int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi
 
         /* we want to return milliseconds to match the rest of the API */
         title->i_duration = p_input_title[i]->i_length / 1000;
-        title->b_menu = p_input_title[i]->b_menu;
+        title->b_menu = p_input_title[i]->i_flags & INPUT_TITLE_MENU;
         if( p_input_title[i]->psz_name )
             title->psz_name = strdup( p_input_title[i]->psz_name );
         else

@@ -91,6 +91,7 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
     std::list<FakeESOutID *>::iterator it;
     es_out_id_t *realid = NULL;
 
+    bool b_select = false;
     for( it=recycle_candidates.begin(); it!=recycle_candidates.end(); ++it )
     {
         FakeESOutID *cand = *it;
@@ -102,10 +103,21 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
             recycle_candidates.erase( it );
             break;
         }
+        else if( cand->getFmt()->i_cat == es_id->getFmt()->i_cat )
+        {
+            /* We need to enforce same selection when not reused
+               Otherwise the es will select any other compatible track
+               and will end this in a activate/select loop when reactivating a track */
+            es_out_Control( real_es_out, ES_OUT_GET_ES_STATE, cand->realESID(), &b_select );
+        }
     }
 
     if( !realid )
+    {
         realid = es_out_Add( real_es_out, es_id->getFmt() );
+        if( b_select )
+            es_out_Control( real_es_out, ES_OUT_SET_ES_STATE, realid, b_select );
+    }
 
     es_id->setRealESID( realid );
 }

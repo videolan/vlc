@@ -194,6 +194,7 @@ static block_t *DecodeRtpSpeexPacket( decoder_t *, block_t **);
 static int  ProcessHeaders( decoder_t * );
 static int  ProcessInitialHeader ( decoder_t *, ogg_packet * );
 static void *ProcessPacket( decoder_t *, ogg_packet *, block_t ** );
+static void Flush( decoder_t * );
 
 static block_t *DecodePacket( decoder_t *, ogg_packet * );
 static block_t *SendPacket( decoder_t *, block_t * );
@@ -242,6 +243,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_dec->pf_decode_audio = DecodeBlock;
     }
     p_dec->pf_packetize    = DecodeBlock;
+    p_dec->pf_flush        = Flush;
 
     p_sys->p_state = NULL;
     p_sys->p_header = NULL;
@@ -526,6 +528,16 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 }
 
 /*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->end_date, 0 );
+}
+
+/*****************************************************************************
  * ProcessPacket: processes a Speex packet.
  *****************************************************************************/
 static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
@@ -535,7 +547,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     block_t *p_block = *pp_block;
 
     if( p_block && p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        date_Set( &p_sys->end_date, 0 );
+        Flush( p_dec );
 
     /* Date management */
     if( p_block && p_block->i_pts > VLC_TS_INVALID &&

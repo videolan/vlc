@@ -18,7 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "HLSStreams.hpp"
-#include "HLSStreamFormat.hpp"
 #include <vlc_demux.h>
 
 using namespace hls;
@@ -55,15 +54,15 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
     AbstractDemuxer *ret = NULL;
     switch((unsigned)format)
     {
-        case HLSStreamFormat::UNKNOWN:
+        case StreamFormat::UNKNOWN:
             ret = new Demuxer(p_realdemux, "any", fakeesout->getEsOut(), demuxersource);
             break;
 
-        case HLSStreamFormat::PACKEDAAC:
+        case StreamFormat::PACKEDAAC:
             ret = new Demuxer(p_realdemux, "avformat", fakeesout->getEsOut(), demuxersource);
             break;
 
-        case HLSStreamFormat::MPEG2TS:
+        case StreamFormat::MPEG2TS:
             ret = new Demuxer(p_realdemux, "ts", fakeesout->getEsOut(), demuxersource);
             break;
 
@@ -85,7 +84,7 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
 void HLSStream::prepareFormatChange()
 {
     AbstractStream::prepareFormatChange();
-    if((unsigned)format == HLSStreamFormat::PACKEDAAC)
+    if((unsigned)format == StreamFormat::PACKEDAAC)
     {
         fakeesout->setTimestampOffset( i_aac_offset );
     }
@@ -120,13 +119,13 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
     return p_block;
 }
 
-AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
+AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &,
                                SegmentTracker *tracker, HTTPConnectionManager *manager) const
 {
     HLSStream *stream;
     try
     {
-        stream = new HLSStream(realdemux, format);
+        stream = new HLSStream(realdemux, StreamFormat(StreamFormat::UNKNOWN));
     } catch (int) {
         return NULL;
     }

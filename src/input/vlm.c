@@ -37,7 +37,7 @@
 #include <time.h>                                                 /* ctime() */
 #include <limits.h>
 #include <assert.h>
-#include <sys/time.h>                                      /* gettimeofday() */
+#include <time.h>
 
 #include <vlc_vlm.h>
 #include <vlc_modules.h>
@@ -259,10 +259,10 @@ int vlm_ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
 
 int64_t vlm_Date(void)
 {
-    struct timeval tv;
+    struct timespec ts;
 
-    (void)gettimeofday( &tv, NULL );
-    return tv.tv_sec * INT64_C(1000000) + tv.tv_usec;
+    (void)timespec_get( &ts, TIME_UTC );
+    return ts.tv_sec * INT64_C(1000000) + (ts.tv_nsec / 1000);
 }
 
 

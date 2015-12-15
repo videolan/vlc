@@ -103,7 +103,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 - (IBAction)updateMessagesPanel:(id)sender
 {
-    [self windowDidBecomeKey:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:NSWindowDidBecomeKeyNotification object:self.window];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification

@@ -41,7 +41,6 @@
 #include <vlc_iso_lang.h>
 #include <vlc_meta.h>
 
-//#include "../demux/mpeg/mpeg_parser_helpers.h"
 #include "../demux/mp4/libmp4.h"
 #include "libmp4mux.h"
 

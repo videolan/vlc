@@ -70,6 +70,7 @@ struct decoder_t
     block_t *           ( * pf_decode_audio )( decoder_t *, block_t ** );
     subpicture_t *      ( * pf_decode_sub)   ( decoder_t *, block_t ** );
     block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
+    void                ( * pf_flush ) ( decoder_t * );
 
     /* Closed Caption (CEA 608/708) extraction.
      * If set, it *may* be called after pf_decode_video/pf_packetize
@@ -119,6 +120,13 @@ struct decoder_t
     /* Display rate
      * XXX use decoder_GetDisplayRate */
     int             (*pf_get_display_rate)( decoder_t * );
+
+    /* XXX use decoder_QueueVideo */
+    int             (*pf_queue_video)( decoder_t *, picture_t * );
+    /* XXX use decoder_QueueAudio */
+    int             (*pf_queue_audio)( decoder_t *, block_t * );
+    /* XXX use decoder_QueueSub */
+    int             (*pf_queue_sub)( decoder_t *, subpicture_t *);
 
     /* Private structure for the owner of the decoder */
     decoder_owner_sys_t *p_owner;
@@ -235,6 +243,64 @@ static inline picture_t *decoder_NewPicture( decoder_t *dec )
     if( decoder_UpdateVideoFormat(dec) )
         return NULL;
     return decoder_GetPicture( dec );
+}
+
+/**
+ * This function queues a picture to the video output.
+ *
+ * \note
+ * The caller doesn't own the picture anymore after this call (even in case of
+ * error).
+ * FIXME: input_DecoderFrameNext won't work if a module use this function.
+ *
+ * \return 0 if the picture is queued, -1 on error
+ */
+static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
+{
+    if( !dec->pf_queue_video )
+    {
+        picture_Release( p_pic );
+        return -1;
+    }
+    return dec->pf_queue_video( dec, p_pic );
+}
+
+/**
+ * This function queues an audio block to the audio output.
+ *
+ * \note
+ * The caller doesn't own the audio block anymore after this call (even in case
+ * of error).
+ *
+ * \return 0 if the block is queued, -1 on error
+ */
+static inline int decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
+{
+    if( !dec->pf_queue_audio )
+    {
+        block_Release( p_aout_buf );
+        return -1;
+    }
+    return dec->pf_queue_audio( dec, p_aout_buf );
+}
+
+/**
+ * This function queues a subtitle to the video output.
+ *
+ * \note
+ * The caller doesn't own the subtitle anymore after this call (even in case of
+ * error).
+ *
+ * \return 0 if the subtitle is queued, -1 on error
+ */
+static inline int decoder_QueueSub( decoder_t *dec, subpicture_t *p_spu )
+{
+    if( !dec->pf_queue_sub )
+    {
+        subpicture_Delete( p_spu );
+        return -1;
+    }
+    return dec->pf_queue_sub( dec, p_spu );
 }
 
 /**

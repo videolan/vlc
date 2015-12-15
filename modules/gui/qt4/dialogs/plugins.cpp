@@ -94,6 +94,9 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
 PluginDialog::~PluginDialog()
 {
+    delete pluginTab;
+    delete extensionTab;
+    delete addonsTab;
     saveWidgetPosition( "PluginsDialog" );
 }
 
@@ -348,7 +351,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     leftPane->layout()->addItem( new QSpacerItem( 0, 10 ) );
 
     QToolButton * button;
-    QSignalMapper *mapper = new QSignalMapper();
+    signalMapper = new QSignalMapper();
     QImage icon( ":/addons/default" );
     QColor vlcorange( 0xEC, 0x83, 0x00 );
 #define ADD_CATEGORY( label, ltooltip, numb ) \
@@ -365,8 +368,8 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     button->setCheckable( true );\
     if ( numb == -1 ) button->setChecked( true );\
     button->setAutoExclusive( true );\
-    CONNECT( button, clicked(), mapper, map() );\
-    mapper->setMapping( button, numb );\
+    CONNECT( button, clicked(), signalMapper, map() );\
+    signalMapper->setMapping( button, numb );\
     leftPane->layout()->addWidget( button );
 
     ADD_CATEGORY( qtr("All"), qtr("Interface Settings"),
@@ -451,7 +454,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
 
     // Model
     AddonsListModel *model = new AddonsListModel( AM, addonsView );
-    addonsModel = new AddonsSortFilterProxyModel();
+    addonsModel = new AddonsSortFilterProxyModel( addonsView );
     addonsModel->setDynamicSortFilter( true );
     addonsModel->setFilterCaseSensitivity( Qt::CaseInsensitive );
     addonsModel->setSortRole( Qt::DisplayRole );
@@ -460,7 +463,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     addonsModel->setFilterRole( Qt::DisplayRole );
     addonsView->setModel( addonsModel );
 
-    CONNECT( mapper, mapped(int), addonsModel, setTypeFilter(int) );
+    CONNECT( signalMapper, mapped(int), addonsModel, setTypeFilter(int) );
 
     CONNECT( searchInput, textChanged( const QString &),
              addonsModel, setFilterFixedString( QString ) );
@@ -487,6 +490,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
 AddonsTab::~AddonsTab()
 {
     delete spinnerAnimation;
+    delete signalMapper;
 }
 
 // Do not close on ESC or ENTER

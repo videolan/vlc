@@ -89,6 +89,8 @@ int HTTPConnection::query(const std::string &path, const BytesRange &range)
         return VLC_EGENERIC;
 
     bytesRange = range;
+    if(range.isValid() && range.getEndByte() > 0)
+        contentLength = range.getEndByte() - range.getStartByte() + 1;
 
     std::string header = buildRequestHeader(path);
     if(connectionClose)
@@ -136,8 +138,7 @@ ssize_t HTTPConnection::read(void *p_buffer, size_t len)
 
     queryOk = false;
 
-    const size_t toRead = contentLength - bytesRead;
-
+    const size_t toRead = (contentLength) ? contentLength - bytesRead : len;
     if (toRead == 0)
         return VLC_SUCCESS;
 
@@ -151,7 +152,7 @@ ssize_t HTTPConnection::read(void *p_buffer, size_t len)
     if(ret < 0 || (size_t)ret < len) /* set EOF */
     {
         socket->disconnect();
-        return VLC_EGENERIC;
+        return ret;
     }
 
     return ret;

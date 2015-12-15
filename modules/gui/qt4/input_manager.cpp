@@ -31,7 +31,7 @@
 #include "recents.hpp"
 
 #include <vlc_keys.h>           /* ACTION_ID */
-#include <vlc_url.h>            /* decode_URI */
+#include <vlc_url.h>            /* vlc_uri_decode */
 #include <vlc_strings.h>        /* str_format_meta */
 #include <vlc_aout.h>           /* audio_output_t */
 
@@ -42,17 +42,6 @@
 #include <QMessageBox>
 
 #include <assert.h>
-
-static int ItemChanged( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-static int LeafToParent( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-static int PLItemChanged( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-static int PLItemAppended( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
-static int PLItemRemoved( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
 
 static int InputEvent( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
@@ -139,10 +128,17 @@ void InputManager::setInput( input_thread_t *_p_input )
             }
         }
 
-        // Save the latest URI to avoid asking to restore the
-        // position on the same input file.
-        lastURI = qfu( uri );
-        RecentsMRL::getInstance( p_intf )->addRecent( lastURI );
+        playlist_Lock( THEPL );
+        // Add root items only
+        playlist_item_t* p_node = playlist_CurrentPlayingItem( THEPL );
+        if ( p_node != NULL && p_node->p_parent == NULL )
+        {
+            // Save the latest URI to avoid asking to restore the
+            // position on the same input file.
+            lastURI = qfu( uri );
+            RecentsMRL::getInstance( p_intf )->addRecent( lastURI );
+        }
+        playlist_Unlock( THEPL );
         free( uri );
     }
     else
@@ -321,7 +317,7 @@ inline void InputManager::delCallbacks()
 }
 
 /* Static callbacks for IM */
-static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
+int MainInputManager::ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
@@ -454,8 +450,7 @@ void InputManager::UpdateNavigation()
     vlc_value_t val; val.i_int = 0;
     vlc_value_t val2; val2.i_int = 0;
 
-    if( hasInput() )
-        var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
 
     if( val.i_int > 0 )
     {
@@ -499,8 +494,6 @@ void InputManager::UpdateRate()
 
 void InputManager::UpdateName()
 {
-    assert( p_input );
-
     /* Update text, name and nowplaying */
     QString name;
 
@@ -525,7 +518,7 @@ void InputManager::UpdateName()
         char *file = uri ? strrchr( uri, '/' ) : NULL;
         if( file != NULL )
         {
-            decode_URI( ++file );
+            vlc_uri_decode( ++file );
             name = qfu(file);
         }
         else
@@ -579,99 +572,82 @@ bool InputManager::hasVisualisation()
 
 void InputManager::UpdateTeletext()
 {
-    if( hasInput() )
+    const bool b_enabled = var_CountChoices( p_input, "teletext-es" ) > 0;
+    const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
+
+    /* Teletext is possible. Show the buttons */
+    emit teletextPossible( b_enabled );
+
+    /* If Teletext is selected */
+    if( b_enabled && i_teletext_es >= 0 )
     {
-        const bool b_enabled = var_CountChoices( p_input, "teletext-es" ) > 0;
-        const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
+        /* Then, find the current page */
+        int i_page = 100;
+        bool b_transparent = false;
 
-        /* Teletext is possible. Show the buttons */
-        emit teletextPossible( b_enabled );
-
-        /* If Teletext is selected */
-        if( b_enabled && i_teletext_es >= 0 )
+        if( p_input_vbi )
         {
-            /* Then, find the current page */
-            int i_page = 100;
-            bool b_transparent = false;
-
-            if( p_input_vbi )
-            {
-                var_DelCallback( p_input_vbi, "vbi-page", VbiEvent, this );
-                vlc_object_release( p_input_vbi );
-            }
-
-            if( input_GetEsObjects( p_input, i_teletext_es, &p_input_vbi, NULL, NULL ) )
-                p_input_vbi = NULL;
-
-            if( p_input_vbi )
-            {
-                /* This callback is not remove explicitly, but interfaces
-                 * are guaranted to outlive input */
-                var_AddCallback( p_input_vbi, "vbi-page", VbiEvent, this );
-
-                i_page = var_GetInteger( p_input_vbi, "vbi-page" );
-                b_transparent = !var_GetBool( p_input_vbi, "vbi-opaque" );
-            }
-            emit newTelexPageSet( i_page );
-            emit teletextTransparencyActivated( b_transparent );
-
+            var_DelCallback( p_input_vbi, "vbi-page", VbiEvent, this );
+            vlc_object_release( p_input_vbi );
         }
-        emit teletextActivated( b_enabled && i_teletext_es >= 0 );
+
+        if( input_GetEsObjects( p_input, i_teletext_es, &p_input_vbi, NULL, NULL ) )
+            p_input_vbi = NULL;
+
+        if( p_input_vbi )
+        {
+            /* This callback is not remove explicitly, but interfaces
+             * are guaranted to outlive input */
+            var_AddCallback( p_input_vbi, "vbi-page", VbiEvent, this );
+
+            i_page = var_GetInteger( p_input_vbi, "vbi-page" );
+            b_transparent = !var_GetBool( p_input_vbi, "vbi-opaque" );
+        }
+        emit newTelexPageSet( i_page );
+        emit teletextTransparencyActivated( b_transparent );
+
     }
-    else
-    {
-        emit teletextActivated( false );
-        emit teletextPossible( false );
-    }
+    emit teletextActivated( b_enabled && i_teletext_es >= 0 );
 }
 
 void InputManager::UpdateEPG()
 {
-    if( hasInput() )
-    {
-       emit epgChanged();
-    }
+    emit epgChanged();
 }
 
 void InputManager::UpdateVout()
 {
-    if( hasInput() )
+    /* Get current vout lists from input */
+    size_t i_vout;
+    vout_thread_t **pp_vout;
+    if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
     {
-        /* Get current vout lists from input */
-        size_t i_vout;
-        vout_thread_t **pp_vout;
-        if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
-        {
-            i_vout = 0;
-            pp_vout = NULL;
-        }
-
-        /* */
-        emit voutListChanged( pp_vout, i_vout );
-
-        /* */
-        bool b_old_video = b_video;
-        b_video = i_vout > 0;
-        if( !!b_old_video != !!b_video )
-            emit voutChanged( b_video );
-
-        /* Release the vout list */
-        for( size_t i = 0; i < i_vout; i++ )
-            vlc_object_release( (vlc_object_t*)pp_vout[i] );
-        free( pp_vout );
+        i_vout = 0;
+        pp_vout = NULL;
     }
+
+    /* */
+    emit voutListChanged( pp_vout, i_vout );
+
+    /* */
+    bool b_old_video = b_video;
+    b_video = i_vout > 0;
+    if( !!b_old_video != !!b_video )
+        emit voutChanged( b_video );
+
+    /* Release the vout list */
+    for( size_t i = 0; i < i_vout; i++ )
+        vlc_object_release( (vlc_object_t*)pp_vout[i] );
+    free( pp_vout );
 }
+
 void InputManager::UpdateAout()
 {
-    if( hasInput() )
-    {
-        /* TODO */
-    }
+    /* TODO */
 }
+
 void InputManager::UpdateCaching()
 {
-    if(!hasInput()) return;
-
     float f_newCache = var_GetFloat ( p_input, "cache" );
     if( f_newCache != f_cache )
     {
@@ -718,7 +694,7 @@ const QString InputManager::decodeArtURL( input_item_t *p_item )
     char *psz_art = input_item_GetArtURL( p_item );
     if( psz_art )
     {
-        char *psz = make_path( psz_art );
+        char *psz = vlc_uri2path( psz_art );
         free( psz_art );
         psz_art = psz;
     }
@@ -735,10 +711,7 @@ const QString InputManager::decodeArtURL( input_item_t *p_item )
 
 void InputManager::UpdateArt()
 {
-    QString url;
-
-    if( hasInput() )
-        url = decodeArtURL( input_GetItem( p_input ) );
+    QString url = decodeArtURL( input_GetItem( p_input ) );
 
     /* the art hasn't changed, no need to update */
     if(artUrl == url)
@@ -769,7 +742,6 @@ void InputManager::setArt( input_item_t *p_item, QString fileUrl )
 
 inline void InputManager::UpdateStats()
 {
-    assert( p_input );
     emit statisticsUpdated( input_GetItem( p_input ) );
 }
 
@@ -781,7 +753,6 @@ inline void InputManager::UpdateMeta( input_item_t *p_item_ )
 
 inline void InputManager::UpdateMeta()
 {
-    assert( p_input );
     emit currentMetaChanged( input_GetItem( p_input ) );
 }
 
@@ -793,19 +764,13 @@ inline void InputManager::UpdateInfo()
 
 void InputManager::UpdateRecord()
 {
-    if( hasInput() )
-    {
-        emit recordingStateChanged( var_GetBool( p_input, "record" ) );
-    }
+    emit recordingStateChanged( var_GetBool( p_input, "record" ) );
 }
 
 void InputManager::UpdateProgramEvent()
 {
-    if( hasInput() )
-    {
-        bool b_scrambled = var_GetBool( p_input, "program-scrambled" );
-        emit encryptionChanged( b_scrambled );
-    }
+    bool b_scrambled = var_GetBool( p_input, "program-scrambled" );
+    emit encryptionChanged( b_scrambled );
 }
 
 /* User update of the slider */
@@ -1021,11 +986,11 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     CONNECT( menusAudioMapper, mapped(QString), this, menusUpdateAudio( QString ) );
 
     /* Core Callbacks */
-    var_AddCallback( THEPL, "item-change", ItemChanged, im );
-    var_AddCallback( THEPL, "input-current", PLItemChanged, this );
-    var_AddCallback( THEPL, "leaf-to-parent", LeafToParent, this );
-    var_AddCallback( THEPL, "playlist-item-append", PLItemAppended, this );
-    var_AddCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
+    var_AddCallback( THEPL, "item-change", MainInputManager::ItemChanged, im );
+    var_AddCallback( THEPL, "input-current", MainInputManager::PLItemChanged, this );
+    var_AddCallback( THEPL, "leaf-to-parent", MainInputManager::LeafToParent, this );
+    var_AddCallback( THEPL, "playlist-item-append", MainInputManager::PLItemAppended, this );
+    var_AddCallback( THEPL, "playlist-item-deleted", MainInputManager::PLItemRemoved, this );
 
     /* Core Callbacks to widget */
     random.addCallback( this, SLOT(notifyRandom(bool)) );
@@ -1035,7 +1000,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     mute.addCallback(   this, SLOT(notifyMute(bool)) );
 
     /* Warn our embedded IM about input changes */
-    DCONNECT( this, inputChanged( input_thread_t * ),
+    DCONNECT( this, inputChanged( bool ),
               im, inputChangedHandler() );
 }
 
@@ -1045,15 +1010,15 @@ MainInputManager::~MainInputManager()
     {
        vlc_object_release( p_input );
        p_input = NULL;
-       emit inputChanged( NULL );
+       emit inputChanged( false );
     }
 
-    var_DelCallback( THEPL, "input-current", PLItemChanged, this );
-    var_DelCallback( THEPL, "item-change", ItemChanged, im );
-    var_DelCallback( THEPL, "leaf-to-parent", LeafToParent, this );
+    var_DelCallback( THEPL, "input-current", MainInputManager::PLItemChanged, this );
+    var_DelCallback( THEPL, "item-change", MainInputManager::ItemChanged, im );
+    var_DelCallback( THEPL, "leaf-to-parent", MainInputManager::LeafToParent, this );
 
-    var_DelCallback( THEPL, "playlist-item-append", PLItemAppended, this );
-    var_DelCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
+    var_DelCallback( THEPL, "playlist-item-append", MainInputManager::PLItemAppended, this );
+    var_DelCallback( THEPL, "playlist-item-deleted", MainInputManager::PLItemRemoved, this );
 
     delete menusAudioMapper;
 }
@@ -1096,11 +1061,15 @@ void MainInputManager::customEvent( QEvent *event )
     default:
         if( type != IMEvent::ItemChanged ) return;
     }
+    probeCurrentInput();
+}
 
+void MainInputManager::probeCurrentInput()
+{
     if( p_input != NULL )
         vlc_object_release( p_input );
     p_input = playlist_CurrentInput( THEPL );
-    emit inputChanged( p_input );
+    emit inputChanged( p_input != NULL );
 }
 
 /* Playlist Control functions */
@@ -1211,7 +1180,7 @@ bool MainInputManager::hasEmptyPlaylist()
 /****************************
  * Static callbacks for MIM *
  ****************************/
-static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
+int MainInputManager::PLItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t val, void *param )
 {
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
@@ -1224,7 +1193,7 @@ static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-static int LeafToParent( vlc_object_t *p_this, const char *psz_var,
+int MainInputManager::LeafToParent( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
@@ -1257,7 +1226,7 @@ void MainInputManager::menusUpdateAudio( const QString& data )
     }
 }
 
-static int PLItemAppended
+int MainInputManager::PLItemAppended
 ( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
 {
     VLC_UNUSED( obj ); VLC_UNUSED( var ); VLC_UNUSED( old );
@@ -1271,7 +1240,7 @@ static int PLItemAppended
     return VLC_SUCCESS;
 }
 
-static int PLItemRemoved
+int MainInputManager::PLItemRemoved
 ( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
 {
     VLC_UNUSED( var ); VLC_UNUSED( old );

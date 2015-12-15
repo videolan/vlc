@@ -104,7 +104,7 @@ struct vdp_s
     union
     {
         vdp_vtable_t vt;
-        void *funcs[1];
+        void *funcs[sizeof (vdp_vtable_t) / sizeof (void *)];
     }; /**< VDPAU function pointers table */
     void *handle; /**< Shared library handle */
 };

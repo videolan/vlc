@@ -137,6 +137,20 @@ ssize_t vlc_send_i11e(int fd, const void *buf, size_t len, int flags)
 VLC_API int vlc_accept_i11e(int fd, struct sockaddr *, socklen_t *, bool);
 
 /**
+ * Registers a custom interrupt handler.
+ *
+ * Registers a custom callback as interrupt handler for the calling thread.
+ * The callback must be unregistered with vlc_interrupt_unregister() before
+ * thread termination and before any further callback registration.
+ *
+ * If the calling thread has no interruption context, this function has no
+ * effects.
+ */
+VLC_API void vlc_interrupt_register(void (*cb)(void *), void *opaque);
+
+VLC_API int vlc_interrupt_unregister(void);
+
+/**
  * @}
  * @defgroup interrupt_context Interrupt context signaling and manipulation
  * @{

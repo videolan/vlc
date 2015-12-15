@@ -317,7 +317,7 @@ int AccessOpen(vlc_object_t *p_object)
     char *psz_name = psz_base + (sep - p_access->psz_location);
     *(psz_name++) = '\0';
 
-    if (decode_URI(psz_base) == NULL)
+    if (vlc_uri_decode(psz_base) == NULL)
     {
         free(psz_base);
         return VLC_EGENERIC;

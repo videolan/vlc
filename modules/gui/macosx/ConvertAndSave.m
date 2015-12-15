@@ -142,7 +142,7 @@
     [_fileDestinationFileName setHidden: YES];
     [_fileDestinationBrowseButton setTitle:_NS("Browse...")];
     [_streamDestinationButton setTitle:_NS("Setup Streaming...")];
-    [_streamDestinationURLLabel setStringValue:@"Select Streaming Method"];
+    [_streamDestinationURLLabel setStringValue:_NS("Select Streaming Method")];
     [_destinationFileButton setTitle:_NS("Save as File")];
     [_destinationStreamButton setTitle:_NS("Stream")];
     [_destinationCancelBtn setHidden:YES];
@@ -192,6 +192,9 @@
     [[_streamSDPMatrix cellWithTag:3] setTitle:_NS("Export SDP as file")];
     [_streamSAPCheckbox setState:NSOffState];
     [_streamSDPMatrix setEnabled:NO];
+    [_streamSDPFileBrowseButton setStringValue:_NS("Browse...")];
+    [_streamChannelLabel setStringValue:_NS("Channel Name")];
+    [_streamSDPLabel setStringValue:_NS("SDP URL")];
 
     /* there is no way to hide single cells, so replace the existing ones with empty cells.. */
     id blankCell = [[NSCell alloc] init];

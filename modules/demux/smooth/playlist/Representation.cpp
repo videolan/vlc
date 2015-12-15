@@ -22,7 +22,6 @@
 #include "../adaptative/playlist/SegmentTemplate.h"
 #include "../adaptative/playlist/SegmentTimeline.h"
 #include "../adaptative/playlist/BaseAdaptationSet.h"
-#include "../SmoothStreamFormat.hpp"
 
 using namespace smooth::playlist;
 
@@ -38,7 +37,7 @@ Representation::~Representation ()
 
 StreamFormat Representation::getStreamFormat() const
 {
-    return StreamFormat(SmoothStreamFormat::MP4);
+    return StreamFormat(StreamFormat::MP4);
 }
 
 std::string Representation::contextualize(size_t number, const std::string &component,

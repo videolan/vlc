@@ -26,6 +26,7 @@
 #define ABSTRACTADAPTATIONLOGIC_H_
 
 #include "IDownloadRateObserver.h"
+#include "../SegmentTracker.hpp"
 
 namespace adaptative
 {
@@ -39,14 +40,16 @@ namespace adaptative
     {
         using namespace playlist;
 
-        class AbstractAdaptationLogic : public IDownloadRateObserver
+        class AbstractAdaptationLogic : public IDownloadRateObserver,
+                                        public SegmentTrackerListenerInterface
         {
             public:
                 AbstractAdaptationLogic             ();
                 virtual ~AbstractAdaptationLogic    ();
 
-                virtual BaseRepresentation* getCurrentRepresentation(BaseAdaptationSet *) const = 0;
+                virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const = 0;
                 virtual void                updateDownloadRate     (size_t, mtime_t);
+                virtual void                trackerEvent           (const SegmentTrackerEvent &) {}
 
                 enum LogicType
                 {

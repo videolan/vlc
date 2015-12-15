@@ -34,8 +34,6 @@ struct vlc_actions;
 struct vlc_actions *vlc_InitActions (libvlc_int_t *);
 extern void vlc_DeinitActions (libvlc_int_t *, struct vlc_actions *);
 
-size_t vlc_towc (const char *str, uint32_t *restrict pwc);
-
 /*
  * OS-specific initialization
  */
@@ -154,9 +152,6 @@ typedef struct libvlc_priv_t
     struct playlist_t *playlist; ///< Playlist for interfaces
     struct playlist_preparser_t *parser; ///< Input item meta data handler
     struct vlc_actions *actions; ///< Hotkeys handler
-
-    /* Objects tree */
-    vlc_mutex_t        structure_lock;
 
     /* Exit callback */
     vlc_exit_t       exit;

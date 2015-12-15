@@ -777,7 +777,7 @@
     if (![self isValidResumeItem:p_item])
         return;
 
-    char *psz_url = decode_URI(input_item_GetURI(p_item));
+    char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
     if (!psz_url)
         return;
     NSString *url = toNSStr(psz_url);
@@ -827,7 +827,7 @@
     if (![self isValidResumeItem:p_item])
         return;
 
-    char *psz_url = decode_URI(input_item_GetURI(p_item));
+    char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
     if (!psz_url)
         return;
     NSString *url = toNSStr(psz_url);

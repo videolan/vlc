@@ -1376,10 +1376,13 @@
 			<key>CFBundleURLIconFile</key>
 			<string>generic</string>
 			<key>CFBundleURLName</key>
-			<string>http url</string>
+			<string>http(s) url</string>
+			<key>LSHandlerRank</key>
+			<string>None</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>http</string>
+				<string>https</string>
 			</array>
 		</dict>
 		<dict>

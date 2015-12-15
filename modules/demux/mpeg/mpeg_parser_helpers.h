@@ -51,40 +51,4 @@ static inline void hevc_skip_profile_tiers_level( bs_t * bs, int32_t max_sub_lay
     }
 }
 
-/* Read unsigned Exp-Golomb code */
-static inline uint32_t bs_read_ue( bs_t * bs )
-{
-    int32_t i = 0;
-
-    while( bs_read1( bs ) == 0 && bs->p < bs->p_end && i < 32 )
-        i++;
-
-    return (1 << i) - 1 + bs_read( bs, i );
-}
-
-/* Read signed Exp-Golomb code */
-static inline int32_t bs_read_se( bs_t *s )
-{
-    int val = bs_read_ue( s );
-
-    return val&0x01 ? (val+1)/2 : -(val/2);
-}
-
-/* Discards emulation prevention three bytes */
-static inline size_t nal_to_rbsp(const uint8_t * p_src, uint8_t * p_dst, size_t i_size)
-{
-    size_t j = 0;
-    for (size_t i = 0; i < i_size; i++) {
-        if (i < i_size - 3 &&
-            p_src[i] == 0 && p_src[i+1] == 0 && p_src[i+2] == 3) {
-            p_dst[j++] = 0;
-            p_dst[j++] = 0;
-            i += 2;
-            continue;
-        }
-        p_dst[j++] = p_src[i];
-    }
-    return j;
-}
-
 #endif /*MPEG_PARSER_HELPERS_H*/

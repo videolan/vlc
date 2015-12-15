@@ -417,7 +417,7 @@ void filter_chain_VideoFlush( filter_chain_t *p_chain )
         FilterDeletePictures( f->pending );
         f->pending = NULL;
 
-        filter_FlushPictures( p_filter );
+        filter_Flush( p_filter );
     }
 }
 

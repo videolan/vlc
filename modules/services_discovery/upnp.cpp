@@ -30,8 +30,8 @@
 
 #include <vlc_access.h>
 #include <vlc_plugin.h>
+#include <vlc_interrupt.h>
 #include <vlc_services_discovery.h>
-#include <vlc_url.h>
 
 #include <assert.h>
 #include <limits.h>
@@ -621,8 +621,63 @@ int MediaServerList::Callback( Upnp_EventType event_type, void* p_event, void* p
 namespace Access
 {
 
-MediaServer::MediaServer(const char *psz_url, access_t *p_access)
-    : url_( psz_url )
+Upnp_i11e_cb::Upnp_i11e_cb( Upnp_FunPtr callback, void *cookie )
+    : refCount_( 2 ) /* 2: owned by the caller, and the Upnp Async function */
+    , callback_( callback )
+    , cookie_( cookie )
+
+{
+    vlc_mutex_init( &lock_ );
+    vlc_sem_init( &sem_, 0 );
+}
+
+Upnp_i11e_cb::~Upnp_i11e_cb()
+{
+    vlc_mutex_destroy( &lock_ );
+    vlc_sem_destroy( &sem_ );
+}
+
+void Upnp_i11e_cb::waitAndRelease( void )
+{
+    vlc_sem_wait_i11e( &sem_ );
+
+    vlc_mutex_lock( &lock_ );
+    if ( --refCount_ == 0 )
+    {
+        /* The run callback is processed, we can destroy this object */
+        vlc_mutex_unlock( &lock_ );
+        delete this;
+    } else
+    {
+        /* Interrupted, let the run callback destroy this object */
+        vlc_mutex_unlock( &lock_ );
+    }
+}
+
+int Upnp_i11e_cb::run( Upnp_EventType eventType, void *p_event, void *p_cookie )
+{
+    Upnp_i11e_cb *self = static_cast<Upnp_i11e_cb*>( p_cookie );
+
+    vlc_mutex_lock( &self->lock_ );
+    if ( --self->refCount_ == 0 )
+    {
+        /* Interrupted, we can destroy self */
+        vlc_mutex_unlock( &self->lock_ );
+        delete self;
+        return 0;
+    }
+    /* Process the user callback_ */
+    self->callback_( eventType, p_event, self->cookie_);
+    vlc_mutex_unlock( &self->lock_ );
+
+    /* Signal that the callback is processed */
+    vlc_sem_post( &self->sem_ );
+    return 0;
+}
+
+MediaServer::MediaServer( access_t *p_access )
+    : psz_root_( NULL )
+    , psz_objectId_( NULL )
     , access_( p_access )
     , xmlDocument_( NULL )
     , containerNodeList_( NULL )
@@ -630,6 +685,15 @@ MediaServer::MediaServer(const char *psz_url, access_t *p_access)
     , itemNodeList_( NULL )
     , itemNodeIndex_( 0 )
 {
+    vlc_url_t url;
+    vlc_UrlParse( &url, p_access->psz_location );
+    if ( asprintf( &psz_root_, "%s://%s:%u%s", url.psz_protocol,
+                  url.psz_host, url.i_port ? url.i_port : 80, url.psz_path ) < 0 )
+        psz_root_ = NULL;
+
+    if ( url.psz_option && !strncmp( url.psz_option, "ObjectID=", strlen( "ObjectID=" ) ) )
+        psz_objectId_ = strdup( &url.psz_option[strlen( "ObjectID=" )] );
+    vlc_UrlClean( &url );
 }
 
 MediaServer::~MediaServer()
@@ -637,21 +701,16 @@ MediaServer::~MediaServer()
     ixmlNodeList_free( containerNodeList_ );
     ixmlNodeList_free( itemNodeList_ );
     ixmlDocument_free( xmlDocument_ );
+    free( psz_objectId_ );
+    free( psz_root_ );
 }
 
-input_item_t* MediaServer::newItem(const char *objectID, const char *title )
+input_item_t* MediaServer::newItem( const char *objectID, const char *title )
 {
-    vlc_url_t url;
-    vlc_UrlParse( &url, url_.c_str() );
     char* psz_url;
 
-    if (asprintf( &psz_url, "upnp://%s://%s:%u%s?ObjectID=%s", url.psz_protocol,
-                  url.psz_host, url.i_port ? url.i_port : 80, url.psz_path, objectID ) < 0 )
-    {
-        vlc_UrlClean( &url );
+    if( asprintf( &psz_url, "upnp://%s?ObjectID=%s", psz_root_, objectID ) < 0 )
         return NULL;
-    }
-    vlc_UrlClean( &url );
 
     input_item_t* p_item = input_item_NewWithTypeExt( psz_url, title, 0, NULL,
                                                       0, -1, ITEM_TYPE_DIRECTORY, 1 );
@@ -666,6 +725,24 @@ input_item_t* MediaServer::newItem(const char* title, const char*, const char*,
                                       duration, ITEM_TYPE_FILE, 1 );
 }
 
+int MediaServer::sendActionCb( Upnp_EventType eventType,
+                               void *p_event, void *p_cookie )
+{
+    if( eventType != UPNP_CONTROL_ACTION_COMPLETE )
+        return 0;
+    IXML_Document** pp_sendActionResult = (IXML_Document** )p_cookie;
+    Upnp_Action_Complete *p_result = (Upnp_Action_Complete *)p_event;
+
+    /* The only way to dup the result is to print it and parse it again */
+    DOMString tmpStr = ixmlPrintNode( ( IXML_Node * ) p_result->ActionResult );
+    if (tmpStr == NULL)
+        return 0;
+
+    *pp_sendActionResult = ixmlParseBuffer( tmpStr );
+    ixmlFreeDOMString( tmpStr );
+    return 0;
+}
+
 /* Access part */
 IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
                                            const char* psz_browser_flag_,
@@ -675,15 +752,12 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 {
     IXML_Document* p_action = NULL;
     IXML_Document* p_response = NULL;
-    const char* psz_url = url_.c_str();
-
-    if ( url_.empty() )
-    {
-        msg_Dbg( access_, "No subscription url set!" );
-        return NULL;
-    }
+    Upnp_i11e_cb *i11eCb = NULL;
 
     int i_res;
+
+    if ( vlc_killed() )
+        return NULL;
 
     i_res = UpnpAddToAction( &p_action, "Browse",
             CONTENT_DIRECTORY_SERVICE_TYPE, "ObjectID", psz_object_id_ );
@@ -744,21 +818,23 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
         goto browseActionCleanup;
     }
 
-    i_res = UpnpSendAction( access_->p_sys->p_upnp->handle(),
-              psz_url,
+    /* Setup an interruptible callback that will call sendActionCb if not
+     * interrupted by vlc_interrupt_kill */
+    i11eCb = new Upnp_i11e_cb( sendActionCb, &p_response );
+    i_res = UpnpSendActionAsync( access_->p_sys->p_upnp->handle(),
+              psz_root_,
               CONTENT_DIRECTORY_SERVICE_TYPE,
               NULL, /* ignored in SDK, must be NULL */
               p_action,
-              &p_response );
+              Upnp_i11e_cb::run, i11eCb );
 
     if ( i_res != UPNP_E_SUCCESS )
     {
         msg_Err( access_, "%s when trying the send() action with URL: %s",
-                UpnpGetErrorMessage( i_res ), psz_url );
-
-        ixmlDocument_free( p_response );
-        p_response = NULL;
+                UpnpGetErrorMessage( i_res ), access_->psz_location );
     }
+    /* Wait for the callback to fill p_response or wait for an interrupt */
+    i11eCb->waitAndRelease();
 
 browseActionCleanup:
     ixmlDocument_free( p_action );
@@ -770,16 +846,7 @@ browseActionCleanup:
  */
 void MediaServer::fetchContents()
 {
-    const char* objectID = "";
-    vlc_url_t url;
-    vlc_UrlParse( &url, access_->psz_location );
-
-    if ( url.psz_option && !strncmp( url.psz_option, "ObjectID=", strlen( "ObjectID=" ) ) )
-    {
-        objectID = &url.psz_option[strlen( "ObjectID=" )];
-    }
-
-    IXML_Document* p_response = _browseAction( objectID,
+    IXML_Document* p_response = _browseAction( psz_objectId_,
                                       "BrowseDirectChildren",
                                       "id,dc:title,res," /* Filter */
                                       "sec:CaptionInfo,sec:CaptionInfoEx,"
@@ -787,7 +854,6 @@ void MediaServer::fetchContents()
                                       "0", /* RequestedCount */
                                       "" /* SortCriteria */
                                       );
-    vlc_UrlClean( &url );
     if ( !p_response )
     {
         msg_Err( access_, "No response from browse() action" );
@@ -935,8 +1001,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_access->p_sys = p_sys;
-    p_sys->p_server = new(std::nothrow) MediaServer( p_access->psz_location,
-                                                     p_access );
+    p_sys->p_server = new(std::nothrow) MediaServer( p_access );
     if ( !p_sys->p_server )
     {
         delete p_sys;

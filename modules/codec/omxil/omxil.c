@@ -80,6 +80,7 @@ static void CloseGeneric( vlc_object_t * );
 static picture_t *DecodeVideo( decoder_t *, block_t ** );
 static block_t *DecodeAudio ( decoder_t *, block_t ** );
 static block_t *EncodeVideo( encoder_t *, picture_t * );
+static void Flush( decoder_t * );
 
 static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE, OMX_PTR, OMX_EVENTTYPE,
                                       OMX_U32, OMX_U32, OMX_PTR );
@@ -1020,6 +1021,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_dec->pf_decode_video = DecodeVideo;
     p_dec->pf_decode_audio = DecodeAudio;
+    p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
 }
@@ -1171,21 +1173,22 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         p_header->nFilledLen = p_dec->fmt_in.i_extra;
 
         /* Convert H.264 NAL format to annex b */
-        if( p_sys->i_nal_size_length && !p_sys->in.b_direct )
+        if( p_sys->i_nal_size_length && !p_sys->in.b_direct &&
+            h264_isavcC(p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra) )
         {
-            p_header->nFilledLen = 0;
-            convert_sps_pps( p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
-                             p_header->pBuffer, p_header->nAllocLen,
-                             (uint32_t*) &p_header->nFilledLen, NULL );
+            size_t i_filled_len = 0;
+            p_header->pBuffer = h264_avcC_to_AnnexB_NAL(
+                        p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
+                        &i_filled_len, NULL );
+            p_header->nFilledLen = i_filled_len;
         }
         else if( p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && !p_sys->in.b_direct )
         {
-            p_header->nFilledLen = 0;
-            convert_hevc_nal_units( p_dec, p_dec->fmt_in.p_extra,
-                                    p_dec->fmt_in.i_extra,
-                                    p_header->pBuffer, p_header->nAllocLen,
-                                    (uint32_t*) &p_header->nFilledLen,
-                                    &p_sys->i_nal_size_length );
+            size_t i_filled_len = 0;
+            p_header->pBuffer = hevc_hvcC_to_AnnexB_NAL(
+                        p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
+                        &i_filled_len, &p_sys->i_nal_size_length );
+            p_header->nFilledLen = i_filled_len;
         }
         else if(p_sys->in.b_direct)
         {
@@ -1498,7 +1501,7 @@ static int DecodeVideoInput( decoder_t *p_dec, OmxPort *p_port, block_t **pp_blo
         /* Convert H.264 NAL format to annex b. Doesn't do anything if
          * i_nal_size_length == 0, which is the case for codecs other
          * than H.264 */
-        convert_h264_to_annexb( p_header->pBuffer, p_header->nFilledLen,
+        h264_AVC_to_AnnexB( p_header->pBuffer, p_header->nFilledLen,
                                 p_sys->i_nal_size_length);
         OMX_DBG( "EmptyThisBuffer %p, %p, %u, %"PRId64, (void *)p_header,
                  (void *)p_header->pBuffer, (unsigned)p_header->nFilledLen,
@@ -1515,6 +1518,21 @@ static int DecodeVideoInput( decoder_t *p_dec, OmxPort *p_port, block_t **pp_blo
     return 0;
 }
 
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if(!p_sys->in.b_flushed)
+    {
+        msg_Dbg(p_dec, "flushing");
+        OMX_SendCommand( p_sys->omx_handle, OMX_CommandFlush,
+                         p_sys->in.definition.nPortIndex, 0 );
+    }
+    p_sys->in.b_flushed = true;
+}
 /*****************************************************************************
  * DecodeVideo: Called to decode one frame
  *****************************************************************************/
@@ -1542,13 +1560,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         block_Release( p_block );
-        if(!p_sys->in.b_flushed)
-        {
-            msg_Dbg(p_dec, "flushing");
-            OMX_SendCommand( p_sys->omx_handle, OMX_CommandFlush,
-                             p_sys->in.definition.nPortIndex, 0 );
-        }
-        p_sys->in.b_flushed = true;
+        Flush( p_dec );
         return NULL;
     }
 
@@ -2561,7 +2573,6 @@ static void ReleasePicture( decoder_t *p_dec, unsigned int i_index,
     OmxPort *p_port = &p_sys->out;
     void *p_handle;
 
-    HWBUFFER_LOCK( p_port );
     p_handle = p_port->pp_buffers[i_index]->pBuffer;
 
     OMX_DBG( "DisplayBuffer: %s %p",
@@ -2570,7 +2581,7 @@ static void ReleasePicture( decoder_t *p_dec, unsigned int i_index,
     if( !p_handle )
     {
         msg_Err( p_dec, "DisplayBuffer: buffer handle invalid" );
-        goto end;
+        return;
     }
 
     if( b_render )
@@ -2580,10 +2591,6 @@ static void ReleasePicture( decoder_t *p_dec, unsigned int i_index,
 
     HwBuffer_ChangeState( p_dec, p_port, i_index, BUF_STATE_NOT_OWNED );
     HWBUFFER_BROADCAST( p_port );
-
-end:
-
-    HWBUFFER_UNLOCK( p_port );
 }
 
 #endif // USE_IOMX

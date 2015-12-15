@@ -110,15 +110,6 @@ int utf8_fprintf( FILE *stream, const char *fmt, ... )
     return res;
 }
 
-
-/**
- * Converts the first character from a UTF-8 sequence into a code point.
- *
- * @param str an UTF-8 bytes sequence
- * @return 0 if str points to an empty string, i.e. the first character is NUL;
- * number of bytes that the first character occupies (from 1 to 4) otherwise;
- * -1 if the byte sequence was not a valid UTF-8 sequence.
- */
 size_t vlc_towc (const char *str, uint32_t *restrict pwc)
 {
     uint8_t *ptr = (uint8_t *)str, c;
@@ -235,51 +226,6 @@ char *vlc_strcasestr (const char *haystack, const char *needle)
     while (s > 0);
 
     return NULL;
-}
-
-/**
- * Replaces invalid/overlong UTF-8 sequences with question marks.
- * Note that it is not possible to convert from Latin-1 to UTF-8 on the fly,
- * so we don't try that, even though it would be less disruptive.
- *
- * @return str if it was valid UTF-8, NULL if not.
- */
-char *EnsureUTF8( char *str )
-{
-    char *ret = str;
-    size_t n;
-    uint32_t cp;
-
-    while ((n = vlc_towc (str, &cp)) != 0)
-        if (likely(n != (size_t)-1))
-            str += n;
-        else
-        {
-            *str++ = '?';
-            ret = NULL;
-        }
-    return ret;
-}
-
-
-/**
- * Checks whether a string is a valid UTF-8 byte sequence.
- *
- * @param str nul-terminated string to be checked
- *
- * @return str if it was valid UTF-8, NULL if not.
- */
-const char *IsUTF8( const char *str )
-{
-    size_t n;
-    uint32_t cp;
-
-    while ((n = vlc_towc (str, &cp)) != 0)
-        if (likely(n != (size_t)-1))
-            str += n;
-        else
-            return NULL;
-    return str;
 }
 
 /**

@@ -1,0 +1,25 @@
+diff -ruN libshout/configure.ac libshout-new/configure.ac
+--- libshout/configure.ac	2015-11-20 20:48:32.000000000 +0100
++++ libshout-new/configure.ac	2015-11-30 18:05:57.123213048 +0100
+@@ -74,7 +74,7 @@
+ dnl Checks for header files.
+ AC_HEADER_STDC
+ AC_HEADER_TIME
+-AC_CHECK_HEADERS([strings.h sys/timeb.h])
++AC_CHECK_HEADERS([strings.h sys/timeb.h arpa/inet.h])
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+diff -ruN libshout/src/proto_roaraudio.c libshout-new/src/proto_roaraudio.c
+--- libshout/src/proto_roaraudio.c	2015-11-20 17:22:27.000000000 +0100
++++ libshout-new/src/proto_roaraudio.c	2015-11-30 18:06:41.823051979 +0100
+@@ -28,7 +28,9 @@
+ #endif
+ 
+ /* for htonl(). */
++#ifdef HAVE_ARPA_INET_H
+ #include <arpa/inet.h>
++#endif
+ 
+ #include <stdio.h>
+ #include <stdlib.h>

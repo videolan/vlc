@@ -2514,7 +2514,8 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     /* Get a new TS packet */
     if( !( p_pkt = stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
     {
-        if( stream_Tell( p_sys->stream ) == stream_Size( p_sys->stream ) )
+        int64_t size = stream_Size( p_sys->stream );
+        if( size >= 0 && (uint64_t)size == stream_Tell( p_sys->stream ) )
             msg_Dbg( p_demux, "EOF at %"PRId64, stream_Tell( p_sys->stream ) );
         else
             msg_Dbg( p_demux, "Can't read TS packet at %"PRId64, stream_Tell(p_sys->stream) );
@@ -2977,7 +2978,8 @@ static int ProbeStart( demux_t *p_demux, int i_program )
         i_probe_count += PROBE_CHUNK_COUNT;
     } while( i_pos > 0 && (i_pcr == -1 || !b_found) && i_probe_count < (2 * PROBE_CHUNK_COUNT) );
 
-    stream_Seek( p_sys->stream, i_initial_pos );
+    if( stream_Seek( p_sys->stream, i_initial_pos ) )
+        return VLC_EGENERIC;
 
     return (b_found) ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -3007,7 +3009,8 @@ static int ProbeEnd( demux_t *p_demux, int i_program )
         i_probe_count += PROBE_CHUNK_COUNT;
     } while( i_pos > 0 && (i_pcr == -1 || !b_found) && i_probe_count < (6 * PROBE_CHUNK_COUNT) );
 
-    stream_Seek( p_sys->stream, i_initial_pos );
+    if( stream_Seek( p_sys->stream, i_initial_pos ) )
+        return VLC_EGENERIC;
 
     return (b_found) ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -3059,6 +3062,42 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
     }
 }
 
+static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
+{
+    for( int i=0; i<p_pmt->e_streams.i_size; i++ )
+    {
+        ts_pid_t *p_pid = p_pmt->e_streams.p_elems[i];
+
+        if( p_pid->type != TYPE_PES || SCRAMBLED(*p_pid) )
+            continue;
+
+        if( p_pid->u.p_pes->p_data == NULL )
+            continue;
+        if( p_pid->u.p_pes->i_data_size != 0 )
+            continue;
+
+        uint8_t header[34];
+        const int i_max = block_ChainExtract( p_pid->u.p_pes->p_data, header, 34 );
+
+        if( i_max < 6 || header[0] != 0 || header[1] != 0 || header[2] != 1 )
+            continue;
+
+        unsigned i_skip = 0;
+        mtime_t i_dts = -1;
+        mtime_t i_pts = -1;
+        uint8_t i_stream_id;
+
+        if( ParsePESHeader( VLC_OBJECT(p_demux), (uint8_t*)&header, i_max, &i_skip,
+                            &i_dts, &i_pts, &i_stream_id ) == VLC_EGENERIC )
+            continue;
+
+        if ((i_dts > 0 && i_dts <= i_pcr) || (i_pts > 0 && i_pts <= i_pcr)) {
+            msg_Err( p_demux, "send queued data for pid %d: DTS %"PRId64" >= PCR %"PRId64"\n", p_pid->i_pid, i_dts, i_pcr);
+            ParseData( p_demux, p_pid );
+        }
+    }
+}
+
 static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
     demux_sys_t   *p_sys = p_demux->p_sys;
@@ -3096,6 +3135,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             if( p_pmt->i_pid_pcr == pid->i_pid ) /* If that program references current pid as PCR */
             {
                 /* We've found a target group for update */
+                PCRCheckDTS( p_demux, p_pmt, i_pcr );
                 ProgramSetPCR( p_demux, p_pmt, i_program_pcr );
             }
         }
@@ -3656,29 +3696,6 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
     dvbpsi_sdt_delete( p_sdt );
 }
 
-/* i_year: year - 1900  i_month: 0-11  i_mday: 1-31 i_hour: 0-23 i_minute: 0-59 i_second: 0-59 */
-static int64_t vlc_timegm( int i_year, int i_month, int i_mday, int i_hour, int i_minute, int i_second )
-{
-    static const int pn_day[12+1] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-    int64_t i_day;
-
-    if( i_year < 70 ||
-        i_month < 0 || i_month > 11 || i_mday < 1 || i_mday > 31 ||
-        i_hour < 0 || i_hour > 23 || i_minute < 0 || i_minute > 59 || i_second < 0 || i_second > 59 )
-        return -1;
-
-    /* Count the number of days */
-    i_day = 365 * (i_year-70) + pn_day[i_month] + i_mday - 1;
-#define LEAP(y) ( ((y)%4) == 0 && (((y)%100) != 0 || ((y)%400) == 0) ? 1 : 0)
-    for( int i = 70; i < i_year; i++ )
-        i_day += LEAP(1900+i);
-    if( i_month > 1 )
-        i_day += LEAP(1900+i_year);
-#undef LEAP
-    /**/
-    return ((24*i_day + i_hour)*60 + i_minute)*60 + i_second;
-}
-
 static void EITDecodeMjd( int i_mjd, int *p_y, int *p_m, int *p_d )
 {
     const int yp = (int)( ( (double)i_mjd - 15078.2)/365.25 );
@@ -3693,19 +3710,22 @@ static void EITDecodeMjd( int i_mjd, int *p_y, int *p_m, int *p_d )
 static int64_t EITConvertStartTime( uint64_t i_date )
 {
     const int i_mjd = i_date >> 24;
-    const int i_hour   = CVT_FROM_BCD(i_date >> 16);
-    const int i_minute = CVT_FROM_BCD(i_date >>  8);
-    const int i_second = CVT_FROM_BCD(i_date      );
-    int i_year;
-    int i_month;
-    int i_day;
+    struct tm tm;
+
+    tm.tm_hour = CVT_FROM_BCD(i_date >> 16);
+    tm.tm_min  = CVT_FROM_BCD(i_date >>  8);
+    tm.tm_sec  = CVT_FROM_BCD(i_date      );
 
     /* if all 40 bits are 1, the start is unknown */
     if( i_date == UINT64_C(0xffffffffff) )
         return -1;
 
-    EITDecodeMjd( i_mjd, &i_year, &i_month, &i_day );
-    return vlc_timegm( i_year - 1900, i_month - 1, i_day, i_hour, i_minute, i_second );
+    EITDecodeMjd( i_mjd, &tm.tm_year, &tm.tm_mon, &tm.tm_mday );
+    tm.tm_year -= 1900;
+    tm.tm_mon--;
+    tm.tm_isdst = 0;
+
+    return timegm( &tm );
 }
 static int EITConvertDuration( uint32_t i_duration )
 {

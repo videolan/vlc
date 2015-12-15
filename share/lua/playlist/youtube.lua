@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2007-2013 the VideoLAN team
+ Copyright © 2007-2015 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -56,49 +56,81 @@ function get_fmt( fmt_list )
     return fmt
 end
 
+-- Buffering iterator to parse through the HTTP stream several times
+-- without making several HTTP requests
+function buf_iter( s )
+    s.i = s.i + 1
+    local line = s.lines[s.i]
+    if not line then
+        -- Put back together statements split across several lines,
+        -- otherwise we won't be able to parse them
+        repeat
+            local l = s.stream:readline()
+            if not l then break end
+            line = line and line..l or l -- Ternary operator
+        until string.match( line, "};$" )
+
+        if line then
+            s.lines[s.i] = line
+        end
+    end
+    return line
+end
+
+-- Helper to search and extract code from javascript stream
+function js_extract( js, pattern, alt )
+    js.i = 0 -- Reset to beginning
+    for line in buf_iter, js do
+        local ex = string.match( line, pattern )
+        if not ex and alt then
+            ex = string.match( line, alt )
+        end
+        if ex then
+            return ex
+        end
+    end
+    vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+    return nil
+end
+
 -- Descramble the URL signature using the javascript code that does that
 -- in the web page
 function js_descramble( sig, js_url )
     -- Fetch javascript code
-    local js = vlc.stream( js_url )
-    if not js then
+    local js = { stream = vlc.stream( js_url ), lines = {}, i = 0 }
+    if not js.stream then
+        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
         return sig
     end
-    local lines = {}
 
     -- Look for the descrambler function's name
-    local descrambler = nil
-    while not descrambler do
-        local line = js:readline()
-        if not line then
-            vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
-            return sig
-        end
-        -- Buffer lines for later, so we don't have to make a second
-        -- HTTP request later
-        table.insert( lines, line )
-        -- c&&a.set("signature",br(c));
-        descrambler = string.match( line, "%.set%(\"signature\",(.-)%(" )
+    -- c&&a.set("signature",br(c));
+    local descrambler = js_extract( js, "%.set%(\"signature\",(.-)%(", nil )
+    if not descrambler then
+        return sig
     end
 
-    -- Fetch the code of the descrambler function. The function is
-    -- conveniently preceded by the definition of a helper object
-    -- that it uses. Example:
-    -- var Fo={TR:function(a){a.reverse()},TU:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c},sH:function(a,b){a.splice(0,b)}};function Go(a){a=a.split("");Fo.sH(a,2);Fo.TU(a,28);Fo.TU(a,44);Fo.TU(a,26);Fo.TU(a,40);Fo.TU(a,64);Fo.TR(a,26);Fo.sH(a,1);return a.join("")};
-    local transformations = nil
-    local rules = nil
-    while not transformations and not rules do
-        local line
-        if #lines > 0 then
-            line = table.remove( lines )
-        else
-            line = js:readline()
-            if not line then
-                vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
-                return sig
-            end
-        end
-        transformations, rules = string.match( line, "var ..={(.-)};function "..descrambler.."%([^)]*%){(.-)}" )
+    -- Fetch the code of the descrambler function
+    -- var Go=function(a){a=a.split("");Fo.sH(a,2);Fo.TU(a,28);Fo.TU(a,44);Fo.TU(a,26);Fo.TU(a,40);Fo.TU(a,64);Fo.TR(a,26);Fo.sH(a,1);return a.join("")};
+    local rules = js_extract( js, "var "..descrambler.."=function%([^)]*%){(.-)};",
+                                  -- Legacy/alternate format
+                                  "function "..descrambler.."%([^)]*%){(.-)}" )
+    if not rules then
+        return sig
+    end
+
+    -- Get the name of the helper object providing transformation definitions
+    local helper = string.match( rules, ";(..)%...%(" )
+    if not helper then
+        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+        return sig
+    end
+
+    -- Fetch the helper object code
+    -- var Fo={TR:function(a){a.reverse()},TU:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c},sH:function(a,b){a.splice(0,b)}};
+    local transformations = js_extract( js, "var "..helper.."={(.-)};", nil )
+    if not transformations then
+        return sig
     end
 
     -- Parse the helper object to map available transformations

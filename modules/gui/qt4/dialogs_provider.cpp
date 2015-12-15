@@ -781,7 +781,7 @@ void DialogsProvider::loadSubtitlesFile()
     char *path2 = NULL;
     if( path )
     {
-        path2 = make_path( path );
+        path2 = vlc_uri2path( path );
         free( path );
         if( path2 )
         {

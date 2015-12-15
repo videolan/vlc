@@ -31,6 +31,8 @@
 #include "AbstractPlaylist.hpp"
 #include "SegmentChunk.hpp"
 #include "../http/BytesRange.hpp"
+#include "../http/HTTPConnectionManager.h"
+#include "../http/Downloader.hpp"
 #include <cassert>
 
 using namespace adaptative::http;
@@ -61,9 +63,10 @@ ISegment::~ISegment()
 
 SegmentChunk * ISegment::getChunk(const std::string &url, HTTPConnectionManager *connManager)
 {
-    HTTPChunkSource *source = new HTTPChunkSource(url, connManager);
+    HTTPChunkBufferedSource *source = new HTTPChunkBufferedSource(url, connManager);
     if(startByte != endByte)
         source->setBytesRange(BytesRange(startByte, endByte));
+    connManager->downloader->schedule(source);
     return new (std::nothrow) SegmentChunk(this, source);
 }
 

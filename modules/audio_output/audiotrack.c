@@ -263,7 +263,7 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
         goto end;
 
 #define CHECK_EXCEPTION( what, critical ) do { \
-    if( (*env)->ExceptionOccurred( env ) ) \
+    if( (*env)->ExceptionCheck( env ) ) \
     { \
         msg_Err( p_aout, "%s failed", what ); \
         (*env)->ExceptionClear( env ); \
@@ -422,7 +422,7 @@ static inline bool
 check_exception( JNIEnv *env, audio_output_t *p_aout,
                  const char *method )
 {
-    if( (*env)->ExceptionOccurred( env ) )
+    if( (*env)->ExceptionCheck( env ) )
     {
         aout_sys_t *p_sys = p_aout->sys;
 
@@ -1298,7 +1298,7 @@ AudioTrack_PlayByteBuffer( JNIEnv *env, audio_output_t *p_aout,
                                             p_sys->circular.i_size );
         if( !p_sys->circular.u.bytebuffer.p_obj )
         {
-            if( (*env)->ExceptionOccurred( env ) )
+            if( (*env)->ExceptionCheck( env ) )
                 (*env)->ExceptionClear( env );
             return jfields.AudioTrack.ERROR;
         }

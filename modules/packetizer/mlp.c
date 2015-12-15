@@ -100,6 +100,7 @@ static const uint8_t pu_start_code[3] = { 0xf8, 0x72, 0x6f };
  * Local prototypes
  ****************************************************************************/
 static block_t *Packetize( decoder_t *, block_t **pp_block );
+static void Flush( decoder_t * );
 static int SyncInfo( const uint8_t *p_hdr, bool *pb_mlp, mlp_header_t *p_mlp );
 static int SyncInfoDolby( const uint8_t *p_buf );
 
@@ -134,7 +135,21 @@ static int Open( vlc_object_t *p_this )
 
     /* Set callback */
     p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush     = Flush;
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->b_mlp = false;
+    p_sys->i_state = STATE_NOSYNC;
+    block_BytestreamEmpty( &p_sys->bytestream );
+    date_Set( &p_sys->end_date, 0 );
 }
 
 /****************************************************************************
@@ -153,10 +168,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     /* */
     if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        p_sys->b_mlp = false;
-        p_sys->i_state = STATE_NOSYNC;
-        block_BytestreamEmpty( &p_sys->bytestream );
-        date_Set( &p_sys->end_date, 0 );
+        Flush( p_dec );
         if( (*pp_block)->i_flags&(BLOCK_FLAG_CORRUPTED) )
         {
             block_Release( *pp_block );

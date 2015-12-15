@@ -141,6 +141,8 @@ void Close_Extension( vlc_object_t *p_this )
     p_mgr->p_sys->b_killed = true;
     vlc_mutex_unlock( &p_mgr->lock );
 
+    var_DelCallback( p_this, "dialog-event",
+                     vlclua_extension_dialog_callback, NULL );
     var_Destroy( p_mgr, "dialog-event" );
 
     extension_t *p_ext = NULL;
@@ -188,9 +190,6 @@ void Close_Extension( vlc_object_t *p_this )
     FOREACH_END()
 
     ARRAY_RESET( p_mgr->extensions );
-
-    var_DelCallback( p_this, "dialog-event",
-                     vlclua_extension_dialog_callback, NULL );
 }
 
 /**

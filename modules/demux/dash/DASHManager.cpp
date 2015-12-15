@@ -59,15 +59,42 @@ DASHManager::~DASHManager   ()
 {
 }
 
+void DASHManager::scheduleNextUpdate()
+{
+    time_t now = time(NULL);
+
+    mtime_t minbuffer = 0;
+    std::vector<AbstractStream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
+    {
+        const AbstractStream *st = *it;
+        const mtime_t m = st->getMinAheadTime();
+        if(m > 0 && (m < minbuffer || minbuffer == 0))
+            minbuffer = m;
+    }
+    minbuffer /= 2;
+
+    if(playlist->minUpdatePeriod.Get() > minbuffer)
+        minbuffer = playlist->minUpdatePeriod.Get();
+
+    if(minbuffer < 5 * CLOCK_FREQ)
+        minbuffer = 5 * CLOCK_FREQ;
+
+    nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
+
+    msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s", (mtime_t) nextPlaylistupdate - now );
+}
+
+bool DASHManager::needsUpdate() const
+{
+    if(nextPlaylistupdate && time(NULL) < nextPlaylistupdate)
+        return false;
+
+    return PlaylistManager::needsUpdate();
+}
+
 bool DASHManager::updatePlaylist()
 {
-    if(!playlist->isLive() || !playlist->minUpdatePeriod.Get())
-        return true;
-
-    time_t now = time(NULL);
-    if(nextPlaylistupdate && now < nextPlaylistupdate)
-        return true;
-
     /* do update */
     if(nextPlaylistupdate)
     {
@@ -83,7 +110,6 @@ bool DASHManager::updatePlaylist()
         if(!mpdstream)
         {
             block_Release(p_block);
-            nextPlaylistupdate = now + playlist->minUpdatePeriod.Get() / CLOCK_FREQ;
             return false;
         }
 
@@ -92,7 +118,6 @@ bool DASHManager::updatePlaylist()
         {
             stream_Delete(mpdstream);
             block_Release(p_block);
-            nextPlaylistupdate = now + playlist->minUpdatePeriod.Get() / CLOCK_FREQ;
             return false;
         }
 
@@ -100,7 +125,7 @@ bool DASHManager::updatePlaylist()
         std::vector<AbstractStream *>::iterator it;
         for(it=streams.begin(); it!=streams.end(); it++)
         {
-            mtime_t segmentTime = (*it)->getPosition();
+            mtime_t segmentTime = (*it)->getPlaybackTime();
             if(!minsegmentTime || segmentTime < minsegmentTime)
                 minsegmentTime = segmentTime;
         }
@@ -116,25 +141,6 @@ bool DASHManager::updatePlaylist()
         stream_Delete(mpdstream);
         block_Release(p_block);
     }
-
-    /* Compute new MPD update time */
-    mtime_t mininterval = 0;
-    mtime_t maxinterval = 0;
-    playlist->getPlaylistDurationsRange(&mininterval, &maxinterval);
-
-    if(playlist->minUpdatePeriod.Get() > mininterval)
-        mininterval = playlist->minUpdatePeriod.Get();
-
-    if(mininterval < 5 * CLOCK_FREQ)
-        mininterval = 5 * CLOCK_FREQ;
-
-    if(maxinterval < mininterval)
-        maxinterval = mininterval;
-
-    nextPlaylistupdate = now + (mininterval + (maxinterval - mininterval) / 2) / CLOCK_FREQ;
-
-    msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s (%" PRId64 "..%" PRId64 ")",
-            (mtime_t) nextPlaylistupdate - now, mininterval/ CLOCK_FREQ, maxinterval/ CLOCK_FREQ );
 
     return true;
 }

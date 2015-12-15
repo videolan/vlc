@@ -67,6 +67,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static block_t *DecodeBlock( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 struct decoder_sys_t
 {
@@ -246,8 +247,8 @@ static int DecoderOpen( vlc_object_t *p_this )
     if( p_dec->fmt_in.audio.i_channels <= 0 ||
         p_dec->fmt_in.audio.i_channels > AOUT_CHAN_MAX )
     {
-        msg_Err( p_dec, "bad channels count (1-9): %i",
-                 p_dec->fmt_in.audio.i_channels );
+        msg_Err( p_dec, "bad channels count (1-%i): %i",
+                 AOUT_CHAN_MAX, p_dec->fmt_in.audio.i_channels );
         return VLC_EGENERIC;
     }
 
@@ -293,9 +294,20 @@ static int DecoderOpen( vlc_object_t *p_this )
     date_Set( &p_sys->end_date, 0 );
 
     p_dec->pf_decode_audio = DecodeBlock;
+    p_dec->pf_flush        = Flush;
     p_dec->p_sys = p_sys;
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->end_date, 0 );
 }
 
 /****************************************************************************
@@ -318,7 +330,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         goto skip;
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        date_Set( &p_sys->end_date, 0 );
+        Flush( p_dec );
 
     if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )

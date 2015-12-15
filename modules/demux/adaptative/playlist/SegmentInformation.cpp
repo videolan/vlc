@@ -25,8 +25,10 @@
 #include "SegmentTemplate.h"
 #include "SegmentTimeline.h"
 #include "AbstractPlaylist.hpp"
+#include "BaseRepresentation.h"
 
 #include <algorithm>
+#include <cassert>
 
 using namespace adaptative::playlist;
 
@@ -153,6 +155,49 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
             retSegments.insert( retSegments.end(), segs.begin(), segs.end() );
     }
     return retSegments.size();
+}
+
+uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
+{
+    if( mediaSegmentTemplate )
+    {
+        SegmentTimeline *timeline = mediaSegmentTemplate->segmentTimeline.Get();
+        if(timeline)
+        {
+            const uint64_t start = timeline->minElementNumber();
+            const uint64_t end = timeline->maxElementNumber();
+            if(end > 2 && (end - start >= 2))
+                return end - 2;
+            else
+                return start;
+        }
+        return mediaSegmentTemplate->startNumber.Get();
+    }
+    else if ( segmentList && !segmentList->getSegments().empty() )
+    {
+        const std::vector<ISegment *> list = segmentList->getSegments();
+        if(list.size() > 3)
+            return list.at(list.size() - 3)->getSequenceNumber();
+        else if(!list.empty())
+            return list.front()->getSequenceNumber();
+        else
+            return segmentList->getStartIndex();
+    }
+    else if( segmentBase )
+    {
+        const std::vector<ISegment *> list = segmentBase->subSegments();
+        if(list.size() > 3)
+            return list.at(list.size() - 3)->getSequenceNumber();
+        else if(!list.empty())
+            return list.front()->getSequenceNumber();
+        else
+            return segmentBase->getSequenceNumber();
+    }
+
+    if(parent)
+        return parent->getLiveStartSegmentNumber(def);
+    else
+        return def;
 }
 
 /* Returns wanted segment, or next in sequence if not found */
@@ -306,44 +351,6 @@ mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) cons
     return time;
 }
 
-
-
-void SegmentInformation::getDurationsRange(mtime_t *min, mtime_t *max) const
-{
-    /* FIXME: cache stuff in segment holders */
-    std::vector<ISegment *> seglist;
-    getSegments(INFOTYPE_MEDIA, seglist);
-    std::vector<ISegment *>::const_iterator it;
-    mtime_t total = 0;
-    for(it = seglist.begin(); it != seglist.end(); ++it)
-    {
-        const mtime_t duration = (*it)->duration.Get() * CLOCK_FREQ / inheritTimescale();
-        if(duration)
-        {
-            total += duration;
-
-            if (!*min || duration < *min)
-                *min = duration;
-        }
-    }
-
-    if(total > *max)
-        *max = total;
-
-    if(mediaSegmentTemplate && mediaSegmentTemplate->segmentTimeline.Get())
-    {
-        const mtime_t duration = mediaSegmentTemplate->segmentTimeline.Get()->end() -
-                                 mediaSegmentTemplate->segmentTimeline.Get()->start();
-        *min = 0; /* fixme: get minimum ? */
-
-        if(duration > *max)
-            *max = duration;
-    }
-
-    for(size_t i=0; i<childs.size(); i++)
-        childs.at(i)->getDurationsRange(min, max);
-}
-
 SegmentInformation * SegmentInformation::getChildByID(const ID &id)
 {
     std::vector<SegmentInformation *>::const_iterator it;
@@ -386,21 +393,35 @@ void SegmentInformation::mergeWithTimeline(SegmentTimeline *updated)
     }
 }
 
+void SegmentInformation::pruneByPlaybackTime(mtime_t time)
+{
+    if(segmentList)
+        segmentList->pruneByPlaybackTime(time);
+
+    if(mediaSegmentTemplate)
+        mediaSegmentTemplate->pruneByPlaybackTime(time);
+
+    std::vector<SegmentInformation *>::const_iterator it;
+    for(it=childs.begin(); it!=childs.end(); ++it)
+        (*it)->pruneByPlaybackTime(time);
+}
+
 void SegmentInformation::pruneBySegmentNumber(uint64_t num)
 {
+    assert(dynamic_cast<BaseRepresentation *>(this));
+
     if(segmentList)
         segmentList->pruneBySegmentNumber(num);
 
-    if(mediaSegmentTemplate && mediaSegmentTemplate->segmentTimeline.Get())
-         mediaSegmentTemplate->segmentTimeline.Get()->pruneBySequenceNumber(num);
-
-    for(size_t i=0; i<childs.size(); i++)
-        childs.at(i)->pruneBySegmentNumber(num);
+    if(mediaSegmentTemplate)
+         mediaSegmentTemplate->pruneBySequenceNumber(num);
 }
 
-void SegmentInformation::runLocalUpdates(mtime_t, uint64_t)
+uint64_t SegmentInformation::translateSegmentNumber(uint64_t num, const SegmentInformation *from) const
 {
-
+    mtime_t time = from->getPlaybackTimeBySegmentNumber(num);
+    getSegmentNumberByTime(time, &num);
+    return num;
 }
 
 SegmentInformation::SwitchPolicy SegmentInformation::getSwitchPolicy() const

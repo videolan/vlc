@@ -286,7 +286,8 @@ static int vlclua_trigger_callback( lua_State *L )
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
 
-    return vlclua_push_ret( L, var_TriggerCallback( *pp_obj, psz_var ) );
+    var_TriggerCallback( *pp_obj, psz_var );
+    return vlclua_push_ret( L, 0 );
 }
 
 static int vlclua_inc_integer( lua_State *L )

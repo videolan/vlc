@@ -615,8 +615,8 @@ void DiscOpenPanel::updateMRL()
     }
     else if ( ui.bdRadioButton->isChecked() )
     {
-        if ( ui.dvdsimple->isChecked() == false )
-            opts += " :bluray-menu";
+        if ( ui.dvdsimple->isChecked() != true )
+            opts += " :no-bluray-menu";
     }
     emit mrlUpdated( fileList, opts );
 }

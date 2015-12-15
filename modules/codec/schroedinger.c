@@ -525,6 +525,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static picture_t *DecodeBlock  ( decoder_t *p_dec, block_t **pp_block );
+static void Flush( decoder_t * );
 
 struct picture_free_t
 {
@@ -588,6 +589,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
 }
@@ -738,6 +740,17 @@ static void CloseDecoder( vlc_object_t *p_this )
     free( p_sys );
 }
 
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    schro_decoder_reset( p_sys->p_schro );
+    p_sys->i_lastpts = VLC_TS_INVALID;
+}
+
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************
@@ -761,9 +774,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* reset the decoder when seeking as the decode in progress is invalid */
         /* discard the block as it is just a null magic block */
         if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) ) {
-            schro_decoder_reset( p_sys->p_schro );
+            Flush( p_dec );
 
-            p_sys->i_lastpts = VLC_TS_INVALID;
             block_Release( p_block );
             *pp_block = NULL;
             return NULL;

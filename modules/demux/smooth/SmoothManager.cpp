@@ -89,63 +89,76 @@ Manifest * SmoothManager::fetchManifest()
 
 bool SmoothManager::updatePlaylist()
 {
-    /* FIXME: do update from manifest after resuming from pause */
-    if(!playlist->isLive() || !playlist->minUpdatePeriod.Get())
-        return true;
+    return updatePlaylist(false);
+}
 
+void SmoothManager::scheduleNextUpdate()
+{
     time_t now = time(NULL);
 
-    if(nextPlaylistupdate && now < nextPlaylistupdate)
-        return true;
+    mtime_t minbuffer = 0;
+    std::vector<AbstractStream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
+    {
+        const AbstractStream *st = *it;
+        const mtime_t m = st->getMinAheadTime();
+        if(m > 0 && (m < minbuffer || minbuffer == 0))
+            minbuffer = m;
+    }
 
-    mtime_t mininterval = 0;
-    mtime_t maxinterval = 0;
+    minbuffer /= 2;
 
-    std::vector<AbstractStream *>::iterator it;
-    for(it=streams.begin(); it!=streams.end(); it++)
-        (*it)->prune();
+    if(playlist->minUpdatePeriod.Get() > minbuffer)
+        minbuffer = playlist->minUpdatePeriod.Get();
+
+    if(minbuffer < 5 * CLOCK_FREQ)
+        minbuffer = 5 * CLOCK_FREQ;
+
+    nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
+
+    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s", (mtime_t) nextPlaylistupdate - now );
+}
+
+bool SmoothManager::needsUpdate() const
+{
+    if(nextPlaylistupdate && time(NULL) < nextPlaylistupdate)
+        return false;
+
+    return PlaylistManager::needsUpdate();
+}
+
+bool SmoothManager::updatePlaylist(bool forcemanifest)
+{
+    /* FIXME: do update from manifest after resuming from pause */
 
     /* Timelines updates should be inlined in tfrf atoms.
        We'll just care about pruning live timeline then. */
-#if 0
-    if(nextPlaylistupdate)
+
+    if(forcemanifest && nextPlaylistupdate)
     {
         Manifest *newManifest = fetchManifest();
         if(newManifest)
         {
-            newManifest->getPlaylistDurationsRange(&mininterval, &maxinterval);
             playlist->mergeWith(newManifest, 0);
             delete newManifest;
 
-            std::vector<AbstractStream *>::iterator it;
-            for(it=streams.begin(); it!=streams.end(); it++)
-                (*it)->prune();
 #ifdef NDEBUG
             playlist->debug();
 #endif
         }
+        else return false;
     }
-#endif
 
-    /* Compute new Manifest update time */
-    if(!mininterval && !maxinterval)
-        playlist->getPlaylistDurationsRange(&mininterval, &maxinterval);
-
-    if(playlist->minUpdatePeriod.Get() > mininterval)
-        mininterval = playlist->minUpdatePeriod.Get();
-
-    if(mininterval < 5 * CLOCK_FREQ)
-        mininterval = 5 * CLOCK_FREQ;
-
-    if(maxinterval < mininterval)
-        maxinterval = mininterval;
-
-    nextPlaylistupdate = now + (mininterval + (maxinterval - mininterval) / 2) / CLOCK_FREQ;
-
-//    msg_Dbg(p_demux, "Updated Manifest, next update in %" PRId64 "s (%" PRId64 "..%" PRId64 ")",
-//           (mtime_t) nextPlaylistupdate - now, mininterval/ CLOCK_FREQ, maxinterval/ CLOCK_FREQ );
+    pruneLiveStream();
 
     return true;
+}
+
+bool SmoothManager::reactivateStream(AbstractStream *stream)
+{
+    if(playlist->isLive())
+        updatePlaylist(true);
+    return PlaylistManager::reactivateStream(stream);
 }
 
 bool SmoothManager::isSmoothStreaming(xml::Node *root)

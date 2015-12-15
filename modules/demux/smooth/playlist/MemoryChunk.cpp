@@ -36,6 +36,22 @@ MemoryChunkSource::~MemoryChunkSource()
         block_Release(data);
 }
 
+bool MemoryChunkSource::hasMoreData() const
+{
+    return i_read > contentLength;
+}
+
+block_t * MemoryChunkSource::readBlock()
+{
+    block_t *p_block = NULL;
+    if(data)
+    {
+        p_block = data;
+        data = NULL;
+    }
+    return p_block;
+}
+
 block_t * MemoryChunkSource::read(size_t toread)
 {
     if(!data)

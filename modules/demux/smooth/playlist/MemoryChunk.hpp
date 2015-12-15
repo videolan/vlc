@@ -34,7 +34,9 @@ namespace smooth
                 MemoryChunkSource(block_t *);
                 virtual ~MemoryChunkSource();
 
+                virtual block_t * readBlock(); /* impl */
                 virtual block_t * read(size_t); /* impl */
+                virtual bool      hasMoreData() const; /* impl */
 
             private:
                 block_t *data;

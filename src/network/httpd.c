@@ -265,7 +265,7 @@ static size_t httpd_HtmlError (char **body, int code, const char *url)
     const char *errname = httpd_ReasonFromCode (code);
     assert (errname);
 
-    char *url_Encoded = convert_xml_special_chars (url ? url : "");
+    char *url_Encoded = vlc_xml_encode (url ? url : "");
 
     int res = asprintf (body,
         "<?xml version=\"1.0\" encoding=\"ascii\" ?>\n"

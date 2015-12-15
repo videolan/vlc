@@ -158,6 +158,7 @@ static const uint16_t vlc_chans[] = {
     [SND_CHMAP_SR]   = AOUT_CHAN_MIDDLERIGHT,
     [SND_CHMAP_RC]   = AOUT_CHAN_REARCENTER,
 };
+static_assert(AOUT_CHAN_MAX == 9, "Missing channel entries");
 
 static int Map2Mask (vlc_object_t *obj, const snd_pcm_chmap_t *restrict map)
 {

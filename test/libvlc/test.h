@@ -49,12 +49,6 @@
 
 static const char * test_defaults_args[] = {
     "-v",
-    "--ignore-config",
-    "-I",
-    "dummy",
-    "--no-media-library",
-    "--vout=dummy",
-    "--aout=dummy"
 };
 
 static const int test_defaults_nargs =

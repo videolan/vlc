@@ -87,22 +87,13 @@ static void RtspTimeOut( void *data );
 rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
                           const char *path )
 {
-    rtsp_stream_t *rtsp = malloc( sizeof( *rtsp ) );
+    rtsp_stream_t *rtsp = calloc( 1, sizeof( *rtsp ) );
 
-    if( rtsp == NULL )
-    {
-        free( rtsp );
+    if( unlikely(rtsp == NULL) )
         return NULL;
-    }
 
     rtsp->owner = owner;
     rtsp->vod_media = media;
-    rtsp->sessionc = 0;
-    rtsp->sessionv = NULL;
-    rtsp->host = NULL;
-    rtsp->url = NULL;
-    rtsp->psz_path = NULL;
-    rtsp->track_id = 0;
     vlc_mutex_init( &rtsp->lock );
 
     rtsp->timeout = var_InheritInteger(owner, "rtsp-timeout");

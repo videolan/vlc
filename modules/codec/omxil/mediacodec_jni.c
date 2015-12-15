@@ -156,7 +156,7 @@ static int jstrcmp(JNIEnv* env, jobject str, const char* str2)
 
 static inline bool check_exception(JNIEnv *env)
 {
-    if ((*env)->ExceptionOccurred(env))
+    if ((*env)->ExceptionCheck(env))
     {
         (*env)->ExceptionClear(env);
         return true;
@@ -167,10 +167,17 @@ static inline bool check_exception(JNIEnv *env)
 #define CHECK_EXCEPTION() check_exception( env )
 #define GET_ENV() if (!(env = android_getEnv(api->p_obj, THREAD_NAME))) return MC_API_ERROR;
 
+static inline jstring jni_new_string(JNIEnv *env, const char *psz_string)
+{
+    jstring jstring = (*env)->NewStringUTF(env, psz_string);
+    return !CHECK_EXCEPTION() ? jstring : NULL;
+}
+#define JNI_NEW_STRING(psz_string) jni_new_string(env, psz_string)
+
 static inline int get_integer(JNIEnv *env, jobject obj, const char *psz_name)
 {
-    jstring jname = (*env)->NewStringUTF(env, psz_name);
-    if (!CHECK_EXCEPTION() && jname)
+    jstring jname = JNI_NEW_STRING(psz_name);
+    if (jname)
     {
         int i_ret = (*env)->CallIntMethod(env, obj, jfields.get_integer, jname);
         (*env)->DeleteLocalRef(env, jname);
@@ -184,6 +191,18 @@ static inline int get_integer(JNIEnv *env, jobject obj, const char *psz_name)
         return 0;
 }
 #define GET_INTEGER(obj, name) get_integer(env, obj, name)
+
+static inline void set_integer(JNIEnv *env, jobject jobj, const char *psz_name,
+                               int i_value)
+{
+    jstring jname = JNI_NEW_STRING(psz_name);
+    if (jname)
+    {
+        (*env)->CallVoidMethod(env, jobj, jfields.set_integer, jname, i_value);
+        (*env)->DeleteLocalRef(env, jname);
+    }
+}
+#define SET_INTEGER(obj, name, value) set_integer(env, obj, name, value)
 
 /* Initialize all jni fields.
  * Done only one time during the first initialisation */
@@ -298,7 +317,7 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
     if (!InitJNIFields(p_obj, env))
         return NULL;
 
-    jmime = (*env)->NewStringUTF(env, psz_mime);
+    jmime = JNI_NEW_STRING(psz_mime);
     if (!jmime)
         return NULL;
 
@@ -467,8 +486,7 @@ static int Stop(mc_api *api)
 /*****************************************************************************
  * Start
  *****************************************************************************/
-static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
-                 union mc_api_args *p_args)
+static int Start(mc_api *api, union mc_api_args *p_args)
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv* env = NULL;
@@ -478,8 +496,6 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
     jstring jcodec_name = NULL;
     jobject jcodec = NULL;
     jobject jformat = NULL;
-    jstring jrotation_string = NULL;
-    jstring jmaxinputsize_string = NULL;
     jobject jinput_buffers = NULL;
     jobject joutput_buffers = NULL;
     jobject jbuffer_info = NULL;
@@ -487,8 +503,8 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
 
     GET_ENV();
 
-    jmime = (*env)->NewStringUTF(env, psz_mime);
-    jcodec_name = (*env)->NewStringUTF(env, psz_name);
+    jmime = JNI_NEW_STRING(api->psz_mime);
+    jcodec_name = JNI_NEW_STRING(api->psz_name);
     if (!jmime || !jcodec_name)
         goto error;
 
@@ -528,11 +544,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
             b_direct_rendering = false;
 
         if (b_direct_rendering && p_args->video.i_angle != 0)
-        {
-            jrotation_string = (*env)->NewStringUTF(env, "rotation-degrees");
-            (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
-                                   jrotation_string, p_args->video.i_angle);
-        }
+            SET_INTEGER(jformat, "rotation-degrees", p_args->video.i_angle);
     }
     else
     {
@@ -544,9 +556,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
                                                  p_args->audio.i_channel_count);
     }
     /* No limits for input size */
-    jmaxinputsize_string = (*env)->NewStringUTF(env, "max-input-size");
-    (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
-                           jmaxinputsize_string, 0);
+    SET_INTEGER(jformat, "max-input-size", 0);
 
     if (b_direct_rendering)
     {
@@ -617,10 +627,6 @@ error:
         (*env)->DeleteLocalRef(env, jcodec);
     if (jformat)
         (*env)->DeleteLocalRef(env, jformat);
-    if (jrotation_string)
-        (*env)->DeleteLocalRef(env, jrotation_string);
-    if (jmaxinputsize_string)
-        (*env)->DeleteLocalRef(env, jmaxinputsize_string);
     if (jinput_buffers)
         (*env)->DeleteLocalRef(env, jinput_buffers);
     if (joutput_buffers)

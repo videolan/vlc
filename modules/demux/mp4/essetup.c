@@ -25,6 +25,7 @@
 #endif
 
 #include "mp4.h"
+#include "avci.h"
 
 #include <vlc_demux.h>
 #include <vlc_aout.h>
@@ -354,7 +355,7 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         {
             MP4_Box_t *p_hvcC = MP4_BoxGet( p_sample, "hvcC" );
 
-            if( p_hvcC && p_hvcC->data.p_binary )
+            if( p_hvcC && p_hvcC->data.p_binary && p_hvcC->data.p_binary->i_blob )
             {
                 p_track->fmt.p_extra = malloc( p_hvcC->data.p_binary->i_blob );
                 if( p_track->fmt.p_extra )
@@ -391,6 +392,32 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                             p_track->fmt.i_extra );
                 }
                 p_track->p_asf = MP4_BoxGet( p_sample, "ASF " );
+            }
+            break;
+        }
+
+        case VLC_FOURCC( 'a', 'i', '5', 'p' ):
+        case VLC_FOURCC( 'a', 'i', '5', 'q' ):
+        case VLC_FOURCC( 'a', 'i', '5', '2' ):
+        case VLC_FOURCC( 'a', 'i', '5', '3' ):
+        case VLC_FOURCC( 'a', 'i', '5', '5' ):
+        case VLC_FOURCC( 'a', 'i', '5', '6' ):
+        case VLC_FOURCC( 'a', 'i', '1', 'p' ):
+        case VLC_FOURCC( 'a', 'i', '1', 'q' ):
+        case VLC_FOURCC( 'a', 'i', '1', '2' ):
+        case VLC_FOURCC( 'a', 'i', '1', '3' ):
+        case VLC_FOURCC( 'a', 'i', '1', '5' ):
+        case VLC_FOURCC( 'a', 'i', '1', '6' ):
+        {
+            if( !p_track->fmt.i_extra && p_track->fmt.video.i_width < UINT16_MAX )
+            {
+                const MP4_Box_t *p_fiel = MP4_BoxGet( p_sample, "fiel" );
+                if( p_fiel && BOXDATA(p_fiel) )
+                {
+                    p_track->fmt.p_extra =
+                            AVCi_create_AnnexB( p_track->fmt.video.i_width,
+                                              !!BOXDATA(p_fiel)->i_flags, &p_track->fmt.i_extra );
+                }
             }
             break;
         }

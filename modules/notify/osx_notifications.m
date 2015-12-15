@@ -257,7 +257,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_arturl = input_item_GetArtURL( p_item );
     if( psz_arturl )
     {
-        char *psz = make_path( psz_arturl );
+        char *psz = vlc_uri2path( psz_arturl );
         free( psz_arturl );
         psz_arturl = psz;
     }

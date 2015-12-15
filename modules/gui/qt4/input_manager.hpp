@@ -56,8 +56,8 @@ public:
         ItemEsChanged,
         ItemTeletextChanged,
         InterfaceVoutUpdate,
-        StatisticsUpdate, /*10*/
-        InterfaceAoutUpdate,
+        StatisticsUpdate,
+        InterfaceAoutUpdate, /* 10 */
         MetaChanged,
         NameChanged,
         InfoChanged,
@@ -67,11 +67,11 @@ public:
         RecordingEvent,
         ProgramChanged,
         RandomChanged,
-        LoopOrRepeatChanged,
+        LoopOrRepeatChanged, /* 20 */
         EPGEvent,
     /*    SignalChanged, */
 
-        FullscreenControlToggle = QEvent::User + IMEventTypeOffset + 20,
+        FullscreenControlToggle = QEvent::User + IMEventTypeOffset + 50,
         FullscreenControlShow,
         FullscreenControlHide,
         FullscreenControlPlanHide,
@@ -271,6 +271,9 @@ public:
     bool hasEmptyPlaylist();
 
     void requestVoutUpdate() { return im->UpdateVout(); }
+    // Probe for initial input. Doing this from the constructor would cause
+    // the getInstance to call itself recursively from the inputChangedHandler
+    void probeCurrentInput();
 
 protected:
     QSignalMapper *menusAudioMapper;
@@ -287,6 +290,18 @@ private:
     QVLCBool random, repeat, loop;
     QVLCFloat volume;
     QVLCBool mute;
+
+private:
+    static int ItemChanged( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+    static int LeafToParent( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+    static int PLItemChanged( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+    static int PLItemAppended( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+    static int PLItemRemoved( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
 
 public slots:
     void togglePlayPause();
@@ -309,7 +324,7 @@ private slots:
     void menusUpdateAudio( const QString& );
 
 signals:
-    void inputChanged( input_thread_t * );
+    void inputChanged( bool );
     void volumeChanged( float );
     void soundMuteChanged( bool );
     void playlistItemAppended( int itemId, int parentId );

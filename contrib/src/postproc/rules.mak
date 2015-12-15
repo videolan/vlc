@@ -73,6 +73,12 @@ ifdef HAVE_LINUX
 POSTPROCCONF += --target-os=linux --enable-pic
 endif
 
+ifdef HAVE_ANDROID
+ifeq ($(ANDROID_ABI), x86)
+POSTPROCCONF +=  --disable-mmx --disable-mmxext
+endif
+endif
+
 # Windows
 ifdef HAVE_WIN32
 POSTPROCCONF += --target-os=mingw32

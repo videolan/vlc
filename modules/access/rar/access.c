@@ -153,7 +153,7 @@ int RarAccessOpen(vlc_object_t *object)
         return VLC_ENOMEM;
 
     name++;
-    decode_URI(base);
+    vlc_uri_decode(base);
 
     stream_t *s = stream_UrlNew(access, base);
     if (!s || RarProbe(s))

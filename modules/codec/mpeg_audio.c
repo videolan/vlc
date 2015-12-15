@@ -91,6 +91,7 @@ static block_t *GetAoutBuffer( decoder_t * );
 #endif
 static int  Open( vlc_object_t * );
 static block_t *DecodeBlock  ( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 static uint8_t *GetOutBuffer ( decoder_t *, block_t ** );
 static block_t *GetSoutBuffer( decoder_t * );
 static void Close(  vlc_object_t * );
@@ -160,6 +161,7 @@ static int Open( vlc_object_t *p_this )
     /* Set callback */
     p_dec->pf_decode_audio = DecodeBlock;
     p_dec->pf_packetize    = DecodeBlock;
+    p_dec->pf_flush        = Flush;
 
     /* Start with the minimum size for a free bitrate frame */
     p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
@@ -185,6 +187,19 @@ static int OpenDecoder( vlc_object_t *p_this )
 }
 #endif
 
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->end_date, 0 );
+    p_sys->i_state = STATE_NOSYNC;
+    block_BytestreamEmpty( &p_sys->bytestream );
+    p_sys->b_discontinuity = true;
+}
+
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************
@@ -204,15 +219,15 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
         {
-            date_Set( &p_sys->end_date, 0 );
             if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
             {
-                p_sys->i_state = STATE_NOSYNC;
-                block_BytestreamEmpty( &p_sys->bytestream );
+                Flush( p_dec );
                 block_Release( p_block );
                 *pp_block = NULL;
                 return NULL;
             }
+            else /* BLOCK_FLAG_DISCONTINUITY */
+                date_Set( &p_sys->end_date, 0 );
             p_sys->b_discontinuity = true;
         }
 

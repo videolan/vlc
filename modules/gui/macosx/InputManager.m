@@ -155,6 +155,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 {
     self = [super init];
     if(self) {
+        msg_Dbg(VLCIntf, "Initializing input manager");
+
         o_main = o_mainObj;
         var_AddCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, (__bridge void *)self);
 

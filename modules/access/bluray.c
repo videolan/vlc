@@ -89,7 +89,7 @@ vlc_module_begin ()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
     set_capability("access_demux", 200)
-    add_bool("bluray-menu", false, BD_MENU_TEXT, BD_MENU_LONGTEXT, false)
+    add_bool("bluray-menu", true, BD_MENU_TEXT, BD_MENU_LONGTEXT, false)
     add_string("bluray-region", ppsz_region_code[REGION_DEFAULT], BD_REGION_TEXT, BD_REGION_LONGTEXT, false)
         change_string_list(ppsz_region_code, ppsz_region_code_text)
 
@@ -163,11 +163,13 @@ struct  demux_sys_t
     /* TS stream */
     es_out_t            *p_out;
     vlc_array_t         es;
-    int                 i_audio_stream; /* Selected audio stream. -1 if default */
-    int                 i_spu_stream;   /* Selected subtitle stream. -1 if default */
+    int                 i_audio_stream_idx; /* Selected audio stream. -1 if default */
+    int                 i_spu_stream_idx;   /* Selected subtitle stream. -1 if default */
+    bool                b_spu_enable;       /* enabled / disabled */
     int                 i_video_stream;
     stream_t            *p_parser;
     bool                b_flushed;
+    bool                b_pl_playing;       /* true when playing playlist */
 
     /* Used to store bluray disc path */
     char                *psz_bd_path;
@@ -251,6 +253,8 @@ static void  blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY * const over
 
 static int   onMouseEvent(vlc_object_t *p_vout, const char *psz_var,
                           vlc_value_t old, vlc_value_t val, void *p_data);
+static int   onIntfEvent(vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void *);
 
 static void  blurayResetParser(demux_t *p_demux);
 
@@ -476,8 +480,8 @@ static int blurayOpen(vlc_object_t *object)
     if (unlikely(!p_sys))
         return VLC_ENOMEM;
 
-    p_sys->i_audio_stream = -1;
-    p_sys->i_spu_stream = -1;
+    p_sys->i_audio_stream_idx = -1;
+    p_sys->i_spu_stream_idx = -1;
     p_sys->i_video_stream = -1;
     p_sys->i_still_end_time = 0;
 
@@ -629,6 +633,8 @@ static int blurayOpen(vlc_object_t *object)
     if (unlikely(p_sys->p_out == NULL))
         goto error;
 
+    var_AddCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
+
     blurayResetParser(p_demux);
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
@@ -656,6 +662,8 @@ static void blurayClose(vlc_object_t *object)
 {
     demux_t *p_demux = (demux_t*)object;
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    var_DelCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
 
     setTitleInfo(p_sys, NULL);
 
@@ -723,26 +731,65 @@ static int  findEsPairIndexByEs(demux_sys_t *p_sys, es_out_id_t *p_es)
     return -1;
 }
 
-static void setStreamLang(es_format_t *p_fmt,
-                          const BLURAY_STREAM_INFO *p_streams, int i_stream_count)
+static void setStreamLang(demux_sys_t *p_sys, es_format_t *p_fmt)
 {
+    const BLURAY_STREAM_INFO *p_streams;
+    int i_stream_count = 0;
+
+    vlc_mutex_lock(&p_sys->pl_info_lock);
+
+    if (p_sys->p_clip_info) {
+        if (p_fmt->i_cat == AUDIO_ES) {
+            p_streams      = p_sys->p_clip_info->audio_streams;
+            i_stream_count = p_sys->p_clip_info->audio_stream_count;
+        } else if (p_fmt->i_cat == SPU_ES) {
+            p_streams      = p_sys->p_clip_info->pg_streams;
+            i_stream_count = p_sys->p_clip_info->pg_stream_count;
+        }
+    }
+
     for (int i = 0; i < i_stream_count; i++) {
         if (p_fmt->i_id == p_streams[i].pid) {
             free(p_fmt->psz_language);
             p_fmt->psz_language = strndup((const char *)p_streams[i].lang, 3);
-            return;
+            break;
         }
     }
+
+    vlc_mutex_unlock(&p_sys->pl_info_lock);
+}
+
+static int blurayEsPid(demux_sys_t *p_sys, int es_type, int i_es_idx)
+{
+    int i_pid = -1;
+
+    vlc_mutex_lock(&p_sys->pl_info_lock);
+
+    if (p_sys->p_clip_info) {
+        if (es_type == AUDIO_ES) {
+            if (i_es_idx >= 0 && i_es_idx < p_sys->p_clip_info->pg_stream_count) {
+                i_pid = p_sys->p_clip_info->audio_streams[i_es_idx].pid;
+            }
+        } else if (es_type == SPU_ES) {
+            if (i_es_idx >= 0 && i_es_idx < p_sys->p_clip_info->pg_stream_count) {
+                i_pid = p_sys->p_clip_info->pg_streams[i_es_idx].pid;
+            }
+        }
+    }
+
+    vlc_mutex_unlock(&p_sys->pl_info_lock);
+
+    return i_pid;
 }
 
 static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 {
-    demux_sys_t *p_sys = p_out->p_sys->p_demux->p_sys;
+    demux_t *p_demux = p_out->p_sys->p_demux;
+    demux_sys_t *p_sys = p_demux->p_sys;
     es_format_t fmt;
+    bool b_select = false;
 
     es_format_Copy(&fmt, p_fmt);
-
-    vlc_mutex_lock(&p_sys->pl_info_lock);
 
     switch (fmt.i_cat) {
     case VIDEO_ES:
@@ -750,22 +797,24 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         break ;
     case AUDIO_ES:
-        if (p_sys->i_audio_stream != -1 && p_sys->i_audio_stream != p_fmt->i_id)
+        if (p_sys->i_audio_stream_idx != -1) {
+            if (blurayEsPid(p_sys, AUDIO_ES, p_sys->i_audio_stream_idx) == p_fmt->i_id)
+                b_select = true;
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
-        if (p_sys->p_clip_info)
-            setStreamLang(&fmt, p_sys->p_clip_info->audio_streams, p_sys->p_clip_info->audio_stream_count);
+        }
+        setStreamLang(p_sys, &fmt);
         break ;
     case SPU_ES:
-        if (p_sys->i_spu_stream != -1 && p_sys->i_spu_stream != p_fmt->i_id)
+        if (p_sys->i_spu_stream_idx != -1) {
+            if (blurayEsPid(p_sys, SPU_ES, p_sys->i_spu_stream_idx) == p_fmt->i_id)
+                b_select = true;
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
-        if (p_sys->p_clip_info)
-            setStreamLang(&fmt, p_sys->p_clip_info->pg_streams, p_sys->p_clip_info->pg_stream_count);
+        }
+        setStreamLang(p_sys, &fmt);
         break ;
     }
 
-    vlc_mutex_unlock(&p_sys->pl_info_lock);
-
-    es_out_id_t *p_es = es_out_Add(p_out->p_sys->p_demux->out, &fmt);
+    es_out_id_t *p_es = es_out_Add(p_demux->out, &fmt);
     if (p_fmt->i_id >= 0) {
         /* Ensure we are not overriding anything */
         int idx = findEsPairIndex(p_sys, p_fmt->i_id);
@@ -774,8 +823,16 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             if (likely(p_pair != NULL)) {
                 p_pair->i_id = p_fmt->i_id;
                 p_pair->p_es = p_es;
-                msg_Info(p_out->p_sys->p_demux, "Adding ES %d", p_fmt->i_id);
+                msg_Info(p_demux, "Adding ES %d", p_fmt->i_id);
                 vlc_array_append(&p_sys->es, p_pair);
+
+                if (b_select) {
+                    if (fmt.i_cat == AUDIO_ES) {
+                        var_SetInteger( p_demux->p_input, "audio-es", p_fmt->i_id );
+                    } else if (fmt.i_cat == SPU_ES) {
+                        var_SetInteger( p_demux->p_input, "spu-es", p_sys->b_spu_enable ? p_fmt->i_id : -1 );
+                    }
+                }
             }
         }
     }
@@ -1130,12 +1187,10 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
      * Compute a subpicture_region_t.
      * It will be copied and sent to the vout later.
      */
-    if (!ov->img)
-        return;
-
     vlc_mutex_lock(&p_sys->p_overlays[ov->plane]->lock);
 
     /* Find a region to update */
+    subpicture_region_t **pp_reg = &p_sys->p_overlays[ov->plane]->p_regions;
     subpicture_region_t *p_reg = p_sys->p_overlays[ov->plane]->p_regions;
     subpicture_region_t *p_last = NULL;
     while (p_reg != NULL) {
@@ -1143,7 +1198,18 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
         if (p_reg->i_x == ov->x && p_reg->i_y == ov->y &&
                 p_reg->fmt.i_width == ov->w && p_reg->fmt.i_height == ov->h)
             break;
+        pp_reg = &p_reg->p_next;
         p_reg = p_reg->p_next;
+    }
+
+    if (!ov->img) {
+        if (p_reg) {
+            /* drop region */
+            *pp_reg = p_reg->p_next;
+            subpicture_region_Delete(p_reg);
+        }
+        vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
+        return;
     }
 
     /* If there is no region to update, create a new one. */
@@ -1204,11 +1270,15 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
     switch (overlay->cmd) {
     case BD_OVERLAY_INIT:
         msg_Info(p_demux, "Initializing overlay");
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
         blurayInitOverlay(p_demux, overlay->plane, overlay->w, overlay->h);
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
         break;
     case BD_OVERLAY_CLOSE:
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
         blurayClearOverlay(p_demux, overlay->plane);
         blurayCloseOverlay(p_demux, overlay->plane);
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
         break;
     case BD_OVERLAY_CLEAR:
         blurayClearOverlay(p_demux, overlay->plane);
@@ -1217,6 +1287,7 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
         blurayActivateOverlay(p_demux, overlay->plane);
         break;
     case BD_OVERLAY_DRAW:
+    case BD_OVERLAY_WIPE:
         blurayDrawOverlay(p_demux, overlay);
         break;
     default:
@@ -1352,7 +1423,10 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
 {
     t->i_length = FROM_TICKS(title_info->duration);
 
-    if (!t->i_seekpoint) {
+    for (int i = 0; i < t->i_seekpoint; i++)
+        vlc_seekpoint_Delete( t->seekpoint[i] );
+    TAB_CLEAN(t->i_seekpoint, t->seekpoint);
+
         for (unsigned int j = 0; j < title_info->chapter_count; j++) {
             seekpoint_t *s = vlc_seekpoint_New();
             if (!s) {
@@ -1362,12 +1436,12 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
 
             TAB_APPEND(t->i_seekpoint, t->seekpoint, s);
         }
-    }
 }
 
 static void blurayInitTitles(demux_t *p_demux, int menu_titles)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    const BLURAY_DISC_INFO *di = bd_get_disc_info(p_sys->bluray);
 
     /* get and set the titles */
     unsigned i_title = menu_titles;
@@ -1389,8 +1463,22 @@ static void blurayInitTitles(demux_t *p_demux, int menu_titles)
 
         } else if (i == 0) {
             t->psz_name = strdup(_("Top Menu"));
+            t->i_flags = INPUT_TITLE_MENU | INPUT_TITLE_INTERACTIVE;
         } else if (i == i_title - 1) {
             t->psz_name = strdup(_("First Play"));
+            if (di && di->first_play && di->first_play->interactive) {
+                t->i_flags = INPUT_TITLE_INTERACTIVE;
+            }
+        } else {
+            /* add possible title name from disc metadata */
+            if (di && di->titles && i < di->num_titles) {
+                if (di->titles[i]->name) {
+                    t->psz_name = strdup(di->titles[i]->name);
+                }
+                if (di->titles[i]->interactive) {
+                    t->i_flags = INPUT_TITLE_INTERACTIVE;
+                }
+            }
         }
 
         TAB_APPEND(p_sys->i_title, p_sys->pp_title, t);
@@ -1460,6 +1548,39 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
     return VLC_SUCCESS;
 }
 
+#if BLURAY_VERSION < BLURAY_VERSION_CODE(0,9,2)
+#  define BLURAY_AUDIO_STREAM 0
+#endif
+
+static void blurayStreamSelected(demux_sys_t *p_sys, int i_pid)
+{
+    vlc_mutex_lock(&p_sys->pl_info_lock);
+
+    if (p_sys->p_clip_info) {
+        if ((i_pid & 0xff00) == 0x1100) {
+            // audio
+            for (int i_id = 0; i_id < p_sys->p_clip_info->audio_stream_count; i_id++) {
+                if (i_pid == p_sys->p_clip_info->audio_streams[i_id].pid) {
+                    p_sys->i_audio_stream_idx = i_id;
+                    bd_select_stream(p_sys->bluray, BLURAY_AUDIO_STREAM, i_id + 1, 1);
+                    break;
+                }
+            }
+        } else if ((i_pid & 0xff00) == 0x1400 || i_pid == 0x1800) {
+            // subtitle
+            for (int i_id = 0; i_id < p_sys->p_clip_info->pg_stream_count; i_id++) {
+                if (i_pid == p_sys->p_clip_info->pg_streams[i_id].pid) {
+                    p_sys->i_spu_stream_idx = i_id;
+                    bd_select_stream(p_sys->bluray, BLURAY_PG_TEXTST_STREAM, i_id + 1, 1);
+                    break;
+                }
+            }
+        }
+    }
+
+    vlc_mutex_unlock(&p_sys->pl_info_lock);
+}
+
 /*****************************************************************************
  * blurayControl: handle the controls
  *****************************************************************************/
@@ -1485,12 +1606,20 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_SET_PAUSE_STATE:
         /* Nothing to do */
         break;
-
+    case DEMUX_SET_ES:
+    {
+        int i_id = (int)va_arg(args, int);
+        blurayStreamSelected(p_sys, i_id);
+        break;
+    }
     case DEMUX_SET_TITLE:
     {
         int i_title = (int)va_arg(args, int);
-        if (bluraySetTitle(p_demux, i_title) != VLC_SUCCESS)
+        if (bluraySetTitle(p_demux, i_title) != VLC_SUCCESS) {
+            /* make sure GUI restores the old setting in title menu ... */
+            p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             return VLC_EGENERIC;
+        }
         break;
     }
     case DEMUX_SET_SEEKPOINT:
@@ -1624,6 +1753,8 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         return sendKeyEvent(p_sys, BD_VK_LEFT);
     case DEMUX_NAV_RIGHT:
         return sendKeyEvent(p_sys, BD_VK_RIGHT);
+    case DEMUX_NAV_POPUP:
+        return sendKeyEvent(p_sys, BD_VK_POPUP);
 
     case DEMUX_CAN_RECORD:
     case DEMUX_GET_FPS:
@@ -1741,32 +1872,25 @@ static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_pid = -1;
 
-    vlc_mutex_lock(&p_sys->pl_info_lock);
+    /* The param we get is the real stream id, not an index, ie. it starts from 1 */
+    i_id--;
 
-    if (p_sys->p_clip_info) {
-
-        /* The param we get is the real stream id, not an index, ie. it starts from 1 */
-        i_id--;
-        if (i_type == BD_EVENT_AUDIO_STREAM) {
-            if (i_id < p_sys->p_clip_info->audio_stream_count) {
-                i_pid = p_sys->p_clip_info->audio_streams[i_id].pid;
-                p_sys->i_audio_stream = i_pid;
-            }
-        } else if (i_type == BD_EVENT_PG_TEXTST_STREAM) {
-            if (i_id < p_sys->p_clip_info->pg_stream_count) {
-                i_pid = p_sys->p_clip_info->pg_streams[i_id].pid;
-                p_sys->i_spu_stream = i_pid;
-            }
-        }
+    if (i_type == BD_EVENT_AUDIO_STREAM) {
+        p_sys->i_audio_stream_idx = i_id;
+        i_pid = blurayEsPid(p_sys, AUDIO_ES, i_id);
+    } else if (i_type == BD_EVENT_PG_TEXTST_STREAM) {
+        p_sys->i_spu_stream_idx = i_id;
+        i_pid = blurayEsPid(p_sys, SPU_ES, i_id);
     }
-
-    vlc_mutex_unlock(&p_sys->pl_info_lock);
 
     if (i_pid > 0) {
         int i_idx = findEsPairIndex(p_sys, i_pid);
         if (i_idx >= 0) {
-            es_out_id_t *p_es = vlc_array_item_at_index(&p_sys->es, i_idx);
-            es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
+            if (i_type == BD_EVENT_AUDIO_STREAM) {
+                var_SetInteger( p_demux->p_input, "audio-es", i_pid );
+            } else if (i_type == BD_EVENT_PG_TEXTST_STREAM) {
+                var_SetInteger( p_demux->p_input, "spu-es", p_sys->b_spu_enable ? i_pid : -1 );
+            }
         }
     }
 }
@@ -1786,6 +1910,8 @@ static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
     BLURAY_TITLE_INFO *p_title_info = bd_get_playlist_info(p_sys->bluray, i_playlist, 0);
     if (p_title_info) {
         blurayUpdateTitleInfo(p_sys->pp_title[p_demux->info.i_title], p_title_info);
+        if (p_sys->b_menu)
+            p_demux->info.i_update |= INPUT_UPDATE_TITLE_LIST;
     }
     setTitleInfo(p_sys, p_title_info);
 
@@ -1835,15 +1961,29 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_PLAYLIST:
         /* Start of playlist playback (?????.mpls) */
         blurayUpdatePlaylist(p_demux, e->param);
+        if (p_sys->b_pl_playing) {
+            /* previous playlist was stopped in middle. flush to avoid delay */
+            msg_Info(p_demux, "Stopping playlist playback");
+            blurayResetParser(p_demux);
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+        }
+        p_sys->b_pl_playing = true;
         break;
     case BD_EVENT_PLAYITEM:
         blurayUpdateCurrentClip(p_demux, e->param);
         break;
     case BD_EVENT_CHAPTER:
+        if (e->param && e->param < 0xffff)
+          p_demux->info.i_seekpoint = e->param - 1;
+        else
+          p_demux->info.i_seekpoint = 0;
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-        p_demux->info.i_seekpoint = e->param;
         break;
+    case BD_EVENT_PLAYMARK:
     case BD_EVENT_ANGLE:
+        break;
+    case BD_EVENT_UO_MASK_CHANGED:
+        /* This event could be used to grey out unselectable items in title menu */
         break;
     case BD_EVENT_MENU:
         p_sys->b_menu_open = e->param;
@@ -1872,11 +2012,19 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     /*
      * stream selection events
      */
+    case BD_EVENT_PG_TEXTST:
+        p_sys->b_spu_enable = e->param;
+        break;
     case BD_EVENT_AUDIO_STREAM:
     case BD_EVENT_PG_TEXTST_STREAM:
         blurayStreamSelect(p_demux, e->event, e->param);
         break;
     case BD_EVENT_IG_STREAM:
+    case BD_EVENT_SECONDARY_AUDIO:
+    case BD_EVENT_SECONDARY_AUDIO_STREAM:
+    case BD_EVENT_SECONDARY_VIDEO:
+    case BD_EVENT_SECONDARY_VIDEO_STREAM:
+    case BD_EVENT_SECONDARY_VIDEO_SIZE:
         break;
 
     /*
@@ -1888,6 +2036,9 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_DISCONTINUITY:
         /* reset demuxer (partially decoded PES packets must be dropped) */
         blurayResetParser(p_demux);
+        break;
+    case BD_EVENT_END_OF_TITLE:
+        p_sys->b_pl_playing = false;
         break;
     case BD_EVENT_IDLE:
         /* nothing to do (ex. BD-J is preparing menus, waiting user input or running animation) */
@@ -1932,18 +2083,11 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
         bool display = ov->status == ToDisplay;
         vlc_mutex_unlock(&ov->lock);
         if (display) {
-            if (p_sys->p_vout == NULL)
+            if (p_sys->p_vout == NULL) {
                 p_sys->p_vout = input_GetVout(p_demux->p_input);
-            else {
-                /* track vout changes */
-                vout_thread_t *p_vout = input_GetVout(p_demux->p_input);
-                if (p_vout != p_sys->p_vout) {
-                    msg_Info(p_demux, "vout changed %p -> %p\n",
-                             (void *)p_sys->p_vout, (void *)p_vout);
-                    blurayReleaseVout(p_demux);
-                    p_sys->p_vout = p_vout;
-                } else {
-                    vlc_object_release(p_vout);
+                if (p_sys->p_vout != NULL) {
+                    var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
+                    var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
                 }
             }
 
@@ -1962,14 +2106,33 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
             }
 
             if (p_sys->p_vout != NULL) {
-                var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
-                var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
                 bluraySendOverlayToVout(p_demux, ov);
             }
         }
     }
 
     vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
+}
+
+static int onIntfEvent( vlc_object_t *p_input, char const *psz_var,
+                        vlc_value_t oldval, vlc_value_t val, void *p_data )
+{
+    (void)p_input; (void) psz_var; (void) oldval;
+    demux_t *p_demux = p_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if (val.i_int == INPUT_EVENT_VOUT) {
+
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
+        if( p_sys->p_vout != NULL ) {
+            blurayReleaseVout(p_demux);
+        }
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
+
+        blurayHandleOverlays(p_demux, 1);
+    }
+
+    return VLC_SUCCESS;
 }
 
 #define BD_TS_PACKET_SIZE (192)
@@ -2008,6 +2171,9 @@ static int blurayDemux(demux_t *p_demux)
         if (p_sys->b_fatal_error || nread < 0) {
             msg_Err(p_demux, "bluray: stopping playback after fatal error\n");
             return VLC_DEMUXER_EGENERIC;
+        }
+        if (!p_sys->b_menu) {
+            return VLC_DEMUXER_EOF;
         }
         return VLC_DEMUXER_SUCCESS;
     }

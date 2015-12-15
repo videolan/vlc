@@ -28,7 +28,7 @@ AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic():
 {
 }
 
-BaseRepresentation *AlwaysLowestAdaptationLogic::getCurrentRepresentation(BaseAdaptationSet *adaptSet) const
+BaseRepresentation *AlwaysLowestAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *) const
 {
     RepresentationSelector selector;
     return selector.select(adaptSet, 0);

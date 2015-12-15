@@ -38,7 +38,7 @@ libvdpau_display_plugin_la_LIBADD = libvlc_vdpau.la libvlc_xcb_events.la \
 	$(AM_LIBADD) $(X_LIBS) $(X_PRE_LIBS) -lX11 $(XCB_LIBS)
 
 if HAVE_VDPAU
-pkglib_LTLIBRARIES = libvlc_vdpau.la
+pkglib_LTLIBRARIES += libvlc_vdpau.la
 vdpau_LTLIBRARIES = libvdpau_deinterlace_plugin.la libvdpau_adjust_plugin.la \
 	libvdpau_sharpen_plugin.la libvdpau_chroma_plugin.la
 if HAVE_XCB

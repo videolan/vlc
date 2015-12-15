@@ -108,9 +108,9 @@ struct decoder_sys_t
     HANDLE bcm_handle;       /* Device Handle */
 
     uint8_t *p_sps_pps_buf;  /* SPS/PPS buffer */
-    uint32_t i_sps_pps_size; /* SPS/PPS size */
+    size_t   i_sps_pps_size; /* SPS/PPS size */
 
-    uint32_t i_nal_size;     /* NAL header size */
+    uint8_t i_nal_size;     /* NAL header size */
 
     /* Callback */
     picture_t       *p_pic;
@@ -607,22 +607,11 @@ static int crystal_insert_sps_pps( decoder_t *p_dec,
                                    uint32_t i_buf_size)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int ret;
 
     p_sys->i_sps_pps_size = 0;
+    p_sys->p_sps_pps_buf = h264_avcC_to_AnnexB_NAL( p_buf, i_buf_size,
+                           &p_sys->i_sps_pps_size, &p_sys->i_nal_size );
 
-    p_sys->p_sps_pps_buf = malloc( p_dec->fmt_in.i_extra * 2 );
-    if( !p_sys->p_sps_pps_buf )
-        return VLC_ENOMEM;
-
-    ret = convert_sps_pps( p_dec, p_buf, i_buf_size, p_sys->p_sps_pps_buf,
-                           p_dec->fmt_in.i_extra * 2, &p_sys->i_sps_pps_size,
-                           &p_sys->i_nal_size );
-    if( !ret )
-        return ret;
-
-    free( p_sys->p_sps_pps_buf );
-    p_sys->p_sps_pps_buf = NULL;
-    return ret;
+    return (p_sys->p_sps_pps_buf) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 

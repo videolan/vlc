@@ -166,7 +166,8 @@ demux_LTLIBRARIES += libes_plugin.la
 libh264_plugin_la_SOURCES = demux/mpeg/h264.c
 demux_LTLIBRARIES += libh264_plugin.la
 
-libhevc_plugin_la_SOURCES = demux/mpeg/hevc.c demux/mpeg/mpeg_parser_helpers.h
+libhevc_plugin_la_SOURCES = demux/mpeg/hevc.c demux/mpeg/mpeg_parser_helpers.h \
+                            packetizer/hxxx_nal.h
 demux_LTLIBRARIES += libhevc_plugin.la
 
 libmkv_plugin_la_SOURCES = \
@@ -197,6 +198,7 @@ libmp4_plugin_la_SOURCES = demux/mp4/mp4.c demux/mp4/mp4.h \
                            demux/mp4/libmp4.c demux/mp4/libmp4.h \
                            demux/mp4/id3genres.h demux/mp4/languages.h \
                            demux/asf/asfpacket.c demux/asf/asfpacket.h \
+                           demux/mp4/avci.h \
                            demux/mp4/essetup.c demux/mp4/meta.c
 libmp4_plugin_la_LIBADD = $(LIBM)
 libmp4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
@@ -298,6 +300,8 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/http/BytesRange.hpp \
     demux/adaptative/http/Chunk.cpp \
     demux/adaptative/http/Chunk.h \
+    demux/adaptative/http/Downloader.cpp \
+    demux/adaptative/http/Downloader.hpp \
     demux/adaptative/http/HTTPConnection.cpp \
     demux/adaptative/http/HTTPConnection.hpp \
     demux/adaptative/http/HTTPConnectionManager.cpp \
@@ -367,8 +371,7 @@ libadaptative_dash_SOURCES = \
     demux/dash/DASHManager.cpp \
     demux/dash/DASHManager.h \
     demux/dash/DASHStream.cpp \
-    demux/dash/DASHStream.hpp \
-    demux/dash/DASHStreamFormat.hpp
+    demux/dash/DASHStream.hpp
 
 libadaptative_hls_SOURCES = \
     demux/hls/playlist/M3U8.hpp \
@@ -383,7 +386,6 @@ libadaptative_hls_SOURCES = \
     demux/hls/playlist/Tags.cpp \
     demux/hls/HLSManager.hpp \
     demux/hls/HLSManager.cpp \
-    demux/hls/HLSStreamFormat.hpp \
     demux/hls/HLSStreams.hpp \
     demux/hls/HLSStreams.cpp
 
@@ -404,7 +406,6 @@ libadaptative_smooth_SOURCES = \
     demux/smooth/playlist/SmoothSegment.cpp \
     demux/smooth/SmoothManager.hpp \
     demux/smooth/SmoothManager.cpp \
-    demux/smooth/SmoothStreamFormat.hpp \
     demux/smooth/SmoothStream.hpp \
     demux/smooth/SmoothStream.cpp
 libadaptative_smooth_SOURCES += mux/mp4/libmp4mux.c mux/mp4/libmp4mux.h \

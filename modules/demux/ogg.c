@@ -146,7 +146,7 @@ static bool Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadOpusHeader( logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
-static bool Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
+static bool Ogg_ReadFlacStreamInfo( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadVP8Header( demux_t *, logical_stream_t *, ogg_packet * );
@@ -1234,15 +1234,17 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             break;
 
         case VLC_CODEC_FLAC:
-            if( !p_stream->fmt.audio.i_rate && p_stream->i_packets_backup == 2 )
+            if( p_stream->i_packets_backup == 1 + p_stream->i_extra_headers_packets )
             {
-                Ogg_ReadFlacHeader( p_demux, p_stream, p_oggpacket );
                 p_stream->b_force_backup = false;
             }
-            else if( p_stream->fmt.audio.i_rate )
+            if( p_stream->special.flac.b_old )
             {
-                p_stream->b_force_backup = false;
-                if( p_oggpacket->bytes >= 9 )
+                Ogg_ReadFlacStreamInfo( p_demux, p_stream, p_oggpacket );
+            }
+            else if( p_stream->i_packets_backup == 1 )
+            {
+                if( p_oggpacket->bytes >= 9 ) /* Point to Flac for extradata */
                 {
                     p_oggpacket->packet += 9;
                     p_oggpacket->bytes -= 9;
@@ -1266,20 +1268,18 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         /* Backup the ogg packet (likely an header packet) */
         if( !b_xiph )
         {
-            void *p_org = p_stream->p_headers;
-            p_stream->i_headers += p_oggpacket->bytes;
-            p_stream->p_headers = realloc( p_stream->p_headers, p_stream->i_headers );
-            if( p_stream->p_headers )
+            uint8_t *p_realloc = realloc( p_stream->p_headers, p_stream->i_headers + p_oggpacket->bytes );
+            if( p_realloc )
             {
-                memcpy( (unsigned char *)p_stream->p_headers + p_stream->i_headers - p_oggpacket->bytes,
-                        p_oggpacket->packet, p_oggpacket->bytes );
+                memcpy( &p_realloc[p_stream->i_headers], p_oggpacket->packet, p_oggpacket->bytes );
+                p_stream->i_headers += p_oggpacket->bytes;
+                p_stream->p_headers = p_realloc;
             }
             else
             {
-#warning Memory leak
+                free( p_stream->p_headers );
                 p_stream->i_headers = 0;
                 p_stream->p_headers = NULL;
-                free( p_org );
             }
         }
         else if( xiph_AppendHeaders( &p_stream->i_headers, &p_stream->p_headers,
@@ -1582,7 +1582,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                              (int)p_stream->i_pre_skip);
                     p_stream->i_skip_frames = p_stream->i_pre_skip;
                 }
-                /* Check for Flac header (< version 1.1.1) */
+                /* Check for OLD Flac header */
                 else if( oggpacket.bytes >= 4 &&
                     ! memcmp( oggpacket.packet, "fLaC", 4 ) )
                 {
@@ -1592,10 +1592,12 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                      * important info in the second header packet!!!
                      * (STREAMINFO metadata is in the following packet) */
                     p_stream->b_force_backup = true;
+                    p_stream->i_extra_headers_packets = 1;
+                    p_stream->special.flac.b_old = true;
                     p_stream->fmt.i_cat = AUDIO_ES;
                     p_stream->fmt.i_codec = VLC_CODEC_FLAC;
                 }
-                /* Check for Flac header (>= version 1.1.1) */
+                /* Check for Flac header (>= version 1.0.0) */
                 else if( oggpacket.bytes >= 13 && oggpacket.packet[0] ==0x7F &&
                     ! memcmp( &oggpacket.packet[1], "FLAC", 4 ) &&
                     ! memcmp( &oggpacket.packet[9], "fLaC", 4 ) )
@@ -1606,13 +1608,16 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                              "(%i header packets)",
                              oggpacket.packet[5], oggpacket.packet[6],
                              i_packets );
-
+                    /* STREAMINFO is in current packet, and then
+                       followed by 0 or more metadata, blockheader prefixed, and first being a vorbis comment */
                     p_stream->b_force_backup = true;
+                    p_stream->i_extra_headers_packets = i_packets;
+                    p_stream->special.flac.b_old = false;
 
                     p_stream->fmt.i_cat = AUDIO_ES;
                     p_stream->fmt.i_codec = VLC_CODEC_FLAC;
-                    oggpacket.packet += 13; oggpacket.bytes -= 13;
-                    if ( !Ogg_ReadFlacHeader( p_demux, p_stream, &oggpacket ) )
+                    oggpacket.packet += 13; oggpacket.bytes -= 13; /* Point to the streaminfo */
+                    if ( !Ogg_ReadFlacStreamInfo( p_demux, p_stream, &oggpacket ) )
                     {
                         msg_Dbg( p_demux, "found invalid Flac header" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
@@ -2422,6 +2427,30 @@ static void Ogg_ExtractComments( demux_t *p_demux, es_format_t *p_fmt,
     }
 }
 
+static inline uint32_t GetDW24BE( const uint8_t *p )
+{
+    uint32_t i = ( p[0] << 16 ) + ( p[1] << 8 ) + ( p[2] );
+#ifdef WORDS_BIGENDIAN
+    i = bswap32(i);
+#endif
+    return i;
+}
+
+static void Ogg_ExtractFlacComments( demux_t *p_demux, es_format_t *p_fmt,
+                                     const uint8_t *p_headers, unsigned i_headers )
+{
+    /* Skip Streaminfo 42 bytes / 1st page */
+    if(i_headers <= 46)
+        return;
+    p_headers += 42; i_headers -= 42;
+    /* Block Header 1 + 3 bytes */
+    uint32_t blocksize = GetDW24BE(&p_headers[1]);
+    if(p_headers[0] == 0x84 && blocksize <= i_headers - 4)
+    {
+        Ogg_ExtractComments( p_demux, p_fmt, &p_headers[4], i_headers - 4 );
+    }
+}
+
 static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
                                  const void *p_headers, unsigned i_headers, unsigned i_skip )
 {
@@ -2467,7 +2496,7 @@ static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t
 
     /* TODO */
     case VLC_CODEC_FLAC:
-        msg_Warn( p_demux, "Ogg_ExtractMeta does not support %4.4s", (const char*)&p_fmt->i_codec );
+        Ogg_ExtractFlacComments( p_demux, p_fmt, p_headers, i_headers );
         break;
 
     /* No meta data */
@@ -2606,6 +2635,7 @@ static bool Ogg_ReadDaalaHeader( logical_stream_t *p_stream,
     }
 
     i_version = i_major * 1000000 + i_minor * 1000 + i_subminor;
+    VLC_UNUSED(i_version);
     p_stream->i_keyframe_offset = 0;
     p_stream->f_rate = ((double)i_timebase_numerator) / i_timebase_denominator;
     if ( p_stream->f_rate == 0 ) return false;
@@ -2742,7 +2772,7 @@ static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
     p_stream->i_pre_skip = __MAX( 80*48, p_stream->i_pre_skip );
 }
 
-static bool Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
+static bool Ogg_ReadFlacStreamInfo( demux_t *p_demux, logical_stream_t *p_stream,
                                 ogg_packet *p_oggpacket )
 {
     /* Parse the STREAMINFO metadata */

@@ -195,7 +195,7 @@ void MediaInfoDialog::updateURI( const QString& uri )
     QString location;
 
     /* If URI points to a local file, show the path instead of the URI */
-    char *path = make_path( qtu( uri ) );
+    char *path = vlc_uri2path( qtu( uri ) );
     if( path != NULL )
     {
         location = qfu( path );

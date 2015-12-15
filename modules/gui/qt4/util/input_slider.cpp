@@ -58,7 +58,7 @@
 #define FADEOUTDELAY 2000
 
 SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
-          : QSlider( q, _parent ), b_classic( _static )
+          : QSlider( q, _parent ), b_classic( _static ), animLoading( NULL )
 {
     isSliding = false;
     isJumping = false;
@@ -153,10 +153,15 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     hideHandleTimer->setSingleShot( true );
     hideHandleTimer->setInterval( FADEOUTDELAY );
 
-    CONNECT( MainInputManager::getInstance(), inputChanged( input_thread_t * ), this , inputUpdated( input_thread_t * ) );
+    startAnimLoadingTimer = new QTimer( this );
+    startAnimLoadingTimer->setSingleShot( true );
+    startAnimLoadingTimer->setInterval( 500 );
+
+    CONNECT( MainInputManager::getInstance(), inputChanged( bool ), this , inputUpdated( bool ) );
     CONNECT( this, sliderMoved( int ), this, startSeekTimer() );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
     CONNECT( hideHandleTimer, timeout(), this, hideHandle() );
+    CONNECT( startAnimLoadingTimer, timeout(), this, startAnimLoading() );
     mTimeTooltip->installEventFilter( this );
 }
 
@@ -199,7 +204,15 @@ void SeekSlider::setPosition( float pos, int64_t time, int length )
         setEnabled( b_seekable );
 
     if( !isSliding )
+    {
         setValue( (int)( pos * 1000.0 ) );
+        if ( animLoading != NULL && pos >= 0.0f && animLoading->state() != QAbstractAnimation::Stopped )
+        {
+            animLoading->stop();
+            mLoading = 0.0f;
+        }
+
+    }
 
     inputLength = length;
 }
@@ -224,20 +237,22 @@ void SeekSlider::updateBuffering( float f_buffering_ )
     f_buffering = f_buffering_;
     if ( f_buffering > 0.0 || isEnabled() ) {
         animLoading->stop();
+        startAnimLoadingTimer->stop();
         mLoading = 0.0;
     }
     repaint();
 }
 
-void SeekSlider::inputUpdated( input_thread_t *p_input )
+void SeekSlider::inputUpdated( bool b_has_input )
 {
-    if ( p_input == NULL ) {
+    if ( b_has_input == false ) {
         animLoading->stop();
+        startAnimLoadingTimer->stop();
         mLoading = 0.0;
         repaint();
     }
     else if ( f_buffering == 0.0 && !isEnabled() )
-        animLoading->start();
+        startAnimLoadingTimer->start();
 }
 
 void SeekSlider::processReleasedButton()
@@ -522,6 +537,10 @@ void SeekSlider::hideHandle()
     animHandle->start();
 }
 
+void SeekSlider::startAnimLoading()
+{
+    animLoading->start();
+}
 
 /* This work is derived from Amarok's work under GPLv2+
     - Mark Kretschmann

@@ -189,11 +189,7 @@ static int cmp_entity (const void *key, const void *elem)
     return strncmp (name, ent->psz_entity, strlen (ent->psz_entity));
 }
 
-/**
- * Converts "&lt;", "&gt;" and "&amp;" to "<", ">" and "&"
- * \param string to convert
- */
-void resolve_xml_special_chars( char *psz_value )
+void vlc_xml_decode( char *psz_value )
 {
     char *p_pos = psz_value;
 
@@ -215,7 +211,7 @@ void resolve_xml_special_chars( char *psz_value )
                 {
                     psz_value = psz_end + 1;
                     if( cp == 0 )
-                        (void)0; /* skip nuls */
+                        (void)0; /* skip nulls */
                     else
                     if( cp <= 0x7F )
                     {
@@ -285,13 +281,7 @@ void resolve_xml_special_chars( char *psz_value )
     *p_pos = '\0';
 }
 
-/**
- * XML-encode an UTF-8 string
- * \param str nul-terminated UTF-8 byte sequence to XML-encode
- * \return XML encoded string or NULL on error
- * (errno is set to ENOMEM or EILSEQ as appropriate)
- */
-char *convert_xml_special_chars (const char *str)
+char *vlc_xml_encode (const char *str)
 {
     assert (str != NULL);
 
@@ -896,89 +886,4 @@ void filename_sanitize( char *str )
             break;
         *str = '_';
     }
-}
-
-/**
- * Remove forbidden characters from full paths (leaves slashes)
- */
-void path_sanitize( char *str )
-{
-#if defined( _WIN32 ) || defined( __OS2__ )
-    /* check drive prefix if path is absolute */
-    if( (((unsigned char)(str[0] - 'A') < 26)
-      || ((unsigned char)(str[0] - 'a') < 26)) && (':' == str[1]) )
-        str += 2;
-#endif
-    while( *str )
-    {
-#if defined( __APPLE__ )
-        if( *str == ':' )
-            *str = '_';
-#elif defined( _WIN32 ) || defined( __OS2__ )
-        if( strchr( "*\"?:|<>", *str ) )
-            *str = '_';
-        if( *str == '/' )
-            *str = DIR_SEP_CHAR;
-#endif
-        str++;
-    }
-}
-
-/*
-  Decodes a duration as defined by ISO 8601
-  http://en.wikipedia.org/wiki/ISO_8601#Durations
-  @param str A null-terminated string to convert
-  @return: The duration in seconds. -1 if an error occurred.
-
-  Exemple input string: "PT0H9M56.46S"
- */
-time_t str_duration( const char *psz_duration )
-{
-    bool        timeDesignatorReached = false;
-    time_t      res = 0;
-    char*       end_ptr;
-
-    if ( psz_duration == NULL )
-        return -1;
-    if ( ( *(psz_duration++) ) != 'P' )
-        return -1;
-    do
-    {
-        double number = us_strtod( psz_duration, &end_ptr );
-        double      mul = 0;
-        if ( psz_duration != end_ptr )
-            psz_duration = end_ptr;
-        switch( *psz_duration )
-        {
-            case 'M':
-            {
-                //M can mean month or minutes, if the 'T' flag has been reached.
-                //We don't handle months though.
-                if ( timeDesignatorReached == true )
-                    mul = 60.0;
-                break ;
-            }
-            case 'Y':
-            case 'W':
-                break ; //Don't handle this duration.
-            case 'D':
-                mul = 86400.0;
-                break ;
-            case 'T':
-                timeDesignatorReached = true;
-                break ;
-            case 'H':
-                mul = 3600.0;
-                break ;
-            case 'S':
-                mul = 1.0;
-                break ;
-            default:
-                break ;
-        }
-        res += (time_t)(mul * number);
-        if ( *psz_duration )
-            psz_duration++;
-    } while ( *psz_duration );
-    return res;
 }

@@ -88,6 +88,10 @@ struct demux_sys_t
     int         i_seekpoint;
     flac_seekpoint_t **seekpoint;
 
+    /* title/chapters seekpoints */
+    int           i_title_seekpoints;
+    seekpoint_t **pp_title_seekpoints;
+
     /* */
     int                i_attachments;
     input_attachment_t **attachments;
@@ -145,6 +149,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es = NULL;
     TAB_INIT( p_sys->i_seekpoint, p_sys->seekpoint );
     TAB_INIT( p_sys->i_attachments, p_sys->attachments);
+    TAB_INIT( p_sys->i_title_seekpoints, p_sys->pp_title_seekpoints );
     p_sys->i_cover_idx = 0;
     p_sys->i_cover_score = 0;
 
@@ -195,6 +200,10 @@ static void Close( vlc_object_t * p_this )
     for( int i = 0; i < p_sys->i_attachments; i++ )
         vlc_input_attachment_Delete( p_sys->attachments[i] );
     TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
+
+    for( int i = 0; i < p_sys->i_title_seekpoints; i++ )
+        vlc_seekpoint_Delete( p_sys->pp_title_seekpoints[i] );
+    TAB_CLEAN( p_sys->i_title_seekpoints, p_sys->pp_title_seekpoints );
 
     /* Delete the decoder */
     demux_PacketizerDestroy( p_sys->p_packetizer );
@@ -415,6 +424,59 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
         return VLC_SUCCESS;
     }
+    else if( i_query == DEMUX_GET_TITLE_INFO )
+    {
+        input_title_t ***ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
+        int *pi_int    = (int*)va_arg( args, int* );
+        int *pi_title_offset = (int*)va_arg( args, int* );
+        int *pi_seekpoint_offset = (int*)va_arg( args, int* );
+
+        if( !p_sys->i_title_seekpoints )
+            return VLC_EGENERIC;
+
+        *pi_int = 1;
+        *ppp_title = malloc( sizeof(input_title_t*) );
+        if(!*ppp_title)
+            return VLC_EGENERIC;
+
+        input_title_t *p_title = (*ppp_title)[0] = vlc_input_title_New();
+        if(!p_title)
+        {
+            free(*ppp_title);
+            return VLC_EGENERIC;
+        }
+
+        p_title->seekpoint = malloc( p_sys->i_title_seekpoints * sizeof(seekpoint_t*) );
+        if(!p_title->seekpoint)
+        {
+            vlc_input_title_Delete(p_title);
+            free(*ppp_title);
+            return VLC_EGENERIC;
+        }
+
+        p_title->i_seekpoint = p_sys->i_title_seekpoints;
+        for( int i = 0; i < p_title->i_seekpoint; i++ )
+            p_title->seekpoint[i] = vlc_seekpoint_Duplicate( p_sys->pp_title_seekpoints[i] );
+
+        *pi_title_offset = 0;
+        *pi_seekpoint_offset = 0;
+
+        return VLC_SUCCESS;
+    }
+    else if( i_query == DEMUX_SET_TITLE )
+    {
+        const int i_title = (int)va_arg( args, int );
+        if( i_title != 0 )
+            return VLC_EGENERIC;
+        return VLC_SUCCESS;
+    }
+    else if( i_query == DEMUX_SET_SEEKPOINT )
+    {
+        const int i_seekpoint = (int)va_arg( args, int );
+        if( !p_sys->i_title_seekpoints || i_seekpoint >= p_sys->i_title_seekpoints )
+            return VLC_EGENERIC;
+        return ControlSetTime( p_demux, p_sys->pp_title_seekpoints[i_seekpoint]->i_time_offset );
+    }
 
     return demux_vaControlHelper( p_demux->s, p_sys->i_data_pos, -1,
                                    8*0, 1, i_query, args );
@@ -594,7 +656,8 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
 
     vorbis_ParseComment( NULL, &p_sys->p_meta, &p_data[4], i_data - 4,
         &p_sys->i_attachments, &p_sys->attachments,
-        &p_sys->i_cover_score, &p_sys->i_cover_idx, NULL, NULL, NULL, NULL );
+        &p_sys->i_cover_score, &p_sys->i_cover_idx,
+        &p_sys->i_title_seekpoints, &p_sys->pp_title_seekpoints, NULL, NULL );
 }
 
 static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )

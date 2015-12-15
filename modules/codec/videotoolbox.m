@@ -32,6 +32,7 @@
 #import "../packetizer/h264_nal.h"
 #import "../video_chroma/copy.h"
 #import <vlc_bits.h>
+#import <vlc_boxes.h>
 
 #import <VideoToolbox/VideoToolbox.h>
 
@@ -44,6 +45,12 @@
 
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
+
+/* support iOS SDKs < v9.1 */
+#ifndef CPUFAMILY_ARM_TWISTER
+#define CPUFAMILY_ARM_TWISTER 0x92fb37c8
+#endif
+
 #endif
 
 #pragma mark - module descriptor
@@ -83,12 +90,14 @@ vlc_module_end()
 
 static CFDataRef ESDSCreate(decoder_t *, uint8_t *, uint32_t);
 static picture_t *DecodeBlock(decoder_t *, block_t **);
+static void Flush(decoder_t *);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
 void VTDictionarySetInt32(CFMutableDictionaryRef, CFStringRef, int);
 static void copy420YpCbCr8Planar(picture_t *, CVPixelBufferRef buffer,
                                  unsigned i_width, unsigned i_height);
 static BOOL deviceSupportsAdvancedProfiles();
+static BOOL deviceSupportsAdvancedLevels();
 
 struct picture_sys_t {
     CFTypeRef pixelBuffer;
@@ -101,7 +110,7 @@ struct decoder_sys_t
     CMVideoCodecType            codec;
     size_t                      codec_profile;
     size_t                      codec_level;
-    uint32_t                    i_nal_length_size;
+    uint8_t                     i_nal_length_size;
 
     bool                        b_started;
     bool                        b_is_avcc;
@@ -158,12 +167,19 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 #if !TARGET_OS_IPHONE
             /* a level higher than 5.2 was not tested, so don't dare to
              * try to decode it*/
-            if (i_level > 52)
+            if (i_level > 52) {
+                msg_Dbg(p_dec, "unsupported H264 level %zu", i_level);
                 return -1;
+            }
 #else
             /* on SoC A8, 4.2 is the highest specified profile */
-            if (i_level > 42)
-                return -1;
+            if (i_level > 42) {
+                /* on Twister, we can do up to 5.2 */
+                if (!deviceSupportsAdvancedLevels() || i_level > 52) {
+                    msg_Dbg(p_dec, "unsupported H264 level %zu", i_level);
+                    return -1;
+                }
+            }
 #endif
 
             break;
@@ -286,73 +302,61 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             return VLC_SUCCESS;
         }
 
-        uint32_t size;
-        void *p_buf, *p_alloc_buf = NULL;
+        size_t i_buf;
+        const uint8_t *p_buf = NULL;
+        uint8_t *p_alloc_buf = NULL;
         int i_ret = 0;
 
         if (p_block == NULL) {
-            int buf_size = p_dec->fmt_in.i_extra + 20;
-            uint32_t i_nal_size = 0;
-            size = p_dec->fmt_in.i_extra;
-
-            p_alloc_buf = p_buf = malloc(buf_size);
-            if (!p_buf) {
-                msg_Warn(p_dec, "extra buffer allocation failed");
-                return VLC_ENOMEM;
-            }
-
             /* we need to convert the SPS and PPS units we received from the
-             * demuxer's avvC atom so we can process them further */
-            i_ret = convert_sps_pps(p_dec,
-                                    p_dec->fmt_in.p_extra,
-                                    p_dec->fmt_in.i_extra,
-                                    p_buf,
-                                    buf_size,
-                                    &size,
-                                    &p_sys->i_nal_length_size);
-            p_sys->b_is_avcc = i_ret == VLC_SUCCESS;
+            * demuxer's avvC atom so we can process them further */
+            if(h264_isavcC(p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
+            {
+                p_alloc_buf = h264_avcC_to_AnnexB_NAL(p_dec->fmt_in.p_extra,
+                                                      p_dec->fmt_in.i_extra,
+                                                      &i_buf,
+                                                      &p_sys->i_nal_length_size);
+                p_buf = p_alloc_buf;
+                p_sys->b_is_avcc = !!p_buf;
+            }
         } else {
             /* we are mid-stream, let's have the h264_get helper see if it
              * can find a NAL unit */
-            size = p_block->i_buffer;
+            i_buf = p_block->i_buffer;
             p_buf = p_block->p_buffer;
             p_sys->i_nal_length_size = 4; /* default to 4 bytes */
             i_ret = VLC_SUCCESS;
         }
 
-        if (i_ret != VLC_SUCCESS) {
-            free(p_alloc_buf);
-            return VLC_EGENERIC;
-        }
-
         uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
         size_t i_sps_size = 0, i_pps_size = 0;
         if (!p_buf) {
-            free(p_alloc_buf);
+            msg_Warn(p_dec, "no valid extradata or conversion failed");
             return VLC_EGENERIC;
         }
 
         /* get the SPS and PPS units from the NAL unit which is either
          * part of the demuxer's avvC atom or the mid stream data block */
         i_ret = h264_get_spspps(p_buf,
-                                size,
+                                i_buf,
                                 &p_sps_buf,
                                 &i_sps_size,
                                 &p_pps_buf,
                                 &i_pps_size);
         if (i_ret != VLC_SUCCESS) {
-            msg_Warn(p_dec, "sps pps parsing failed");
+            msg_Warn(p_dec, "sps pps detection failed");
             free(p_alloc_buf);
             return VLC_EGENERIC;
         }
 
-        struct nal_sps sps_data;
+        struct h264_nal_sps sps_data;
         i_ret = h264_parse_sps(p_sps_buf,
                                i_sps_size,
                                &sps_data);
 
         if (i_ret != VLC_SUCCESS) {
             free(p_alloc_buf);
+            msg_Warn(p_dec, "sps pps parsing failed");
             return VLC_EGENERIC;
         }
         /* this data is more trust-worthy than what we receive
@@ -367,14 +371,17 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         p_sys->codec_profile = sps_data.i_profile;
         p_sys->codec_level = sps_data.i_level;
 
+        /* FIXME: Reuse p_extra avcC is p_sys->b_is_avcc */
         /* create avvC atom to forward to the HW decoder */
-        block_t *p_block = h264_create_avcdec_config_record(
+        block_t *p_block = h264_AnnexB_NAL_to_avcC(
                                 p_sys->i_nal_length_size,
-                                &sps_data, p_sps_buf, i_sps_size,
+                                p_sps_buf, i_sps_size,
                                 p_pps_buf, i_pps_size);
         free(p_alloc_buf);
-        if (!p_block)
+        if (!p_block) {
+            msg_Warn(p_dec, "buffer creation failed");
             return VLC_EGENERIC;
+        }
 
         extradata = CFDataCreate(kCFAllocatorDefault,
                                  p_block->p_buffer,
@@ -585,8 +592,10 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     /* setup storage */
     p_sys->outputTimeStamps = [[NSMutableArray alloc] init];
     p_sys->outputFrames = [[NSMutableDictionary alloc] init];
-    if (!p_sys->outputFrames)
+    if (!p_sys->outputFrames) {
+        msg_Warn(p_dec, "buffer management structure allocation failed");
         return VLC_ENOMEM;
+    }
 
     p_sys->b_started = YES;
 
@@ -638,8 +647,9 @@ static int OpenDecoder(vlc_object_t *p_this)
     /* check quickly if we can digest the offered data */
     CMVideoCodecType codec;
     codec = CodecPrecheck(p_dec);
-    if (codec == -1)
+    if (codec == -1) {
         return VLC_EGENERIC;
+    }
 
     /* now that we see a chance to decode anything, allocate the
      * internals and start the decoding session */
@@ -672,6 +682,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
 
     p_dec->pf_decode_video = DecodeBlock;
+    p_dec->pf_flush        = Flush;
 
     msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'", (char *)&p_dec->fmt_in.i_codec);
 
@@ -712,6 +723,30 @@ static BOOL deviceSupportsAdvancedProfiles()
     return NO;
 #else
     return NO;
+#endif
+}
+
+static BOOL deviceSupportsAdvancedLevels()
+{
+#if TARGET_IPHONE_SIMULATOR
+    return YES;
+#endif
+#if TARGET_OS_IPHONE
+    size_t size;
+    int32_t cpufamily;
+
+    size = sizeof(cpufamily);
+    sysctlbyname("hw.cpufamily", &cpufamily, &size, NULL, 0);
+
+    /* Proper 4K decoding requires a Twister SoC
+     * Everything below will kill the decoder daemon */
+    if (cpufamily == CPUFAMILY_ARM_TWISTER) {
+        return YES;
+    }
+
+    return NO;
+#else
+    return YES;
 #endif
 }
 
@@ -785,7 +820,7 @@ static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
                             &i_pps_size);
 
     if (i_ret == VLC_SUCCESS) {
-        struct nal_sps sps_data;
+        struct h264_nal_sps sps_data;
         i_ret = h264_parse_sps(p_sps_buf,
                                i_sps_size,
                                &sps_data);
@@ -823,7 +858,7 @@ static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    return convert_annexb_to_h264(p_block, p_sys->i_nal_length_size);
+    return h264_AnnexB_to_AVC(p_block, p_sys->i_nal_length_size);
 }
 
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
@@ -914,6 +949,20 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
 
 #pragma mark - actual decoding
 
+static void Flush(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (likely(p_sys->b_started)) {
+        @synchronized(p_sys->outputTimeStamps) {
+            [p_sys->outputTimeStamps removeAllObjects];
+        }
+        @synchronized(p_sys->outputFrames) {
+            [p_sys->outputFrames removeAllObjects];
+        }
+    }
+}
+
 static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -930,14 +979,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 
     if (likely(p_block != NULL)) {
         if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED))) {
-            if (likely(p_sys->b_started)) {
-                @synchronized(p_sys->outputTimeStamps) {
-                    [p_sys->outputTimeStamps removeAllObjects];
-                }
-                @synchronized(p_sys->outputFrames) {
-                    [p_sys->outputFrames removeAllObjects];
-                }
-            }
+            Flush(p_dec);
             block_Release(p_block);
             goto skip;
         }
@@ -992,17 +1034,11 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                         msg_Err(p_dec, "decoder failure: invalid argument");
                         p_dec->b_error = true;
                     } else if (status == -8969 || status == -12909) {
-                        msg_Err(p_dec, "decoder failure: bad data");
+                        msg_Err(p_dec, "decoder failure: bad data (%i)", status);
                         StopVideoToolbox(p_dec);
-                        if (likely(sampleBuffer != nil))
-                            CFRelease(sampleBuffer);
-                        sampleBuffer = nil;
-                        block_Release(p_block);
-                        *pp_block = NULL;
-                        return NULL;
-                    } else if (status == -12911 || status == -8960) {
-                        msg_Err(p_dec, "decoder failure: internal malfunction");
-                        p_dec->b_error = true;
+                    } else if (status == -8960 || status == -12911) {
+                        msg_Err(p_dec, "decoder failure: internal malfunction (%i)", status);
+                        StopVideoToolbox(p_dec);
                     } else
                         msg_Dbg(p_dec, "decoding frame failed (%i)", status);
                 }

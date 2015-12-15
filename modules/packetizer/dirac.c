@@ -1208,6 +1208,26 @@ static void dirac_ReorderDequeueAndReleaseBlock( decoder_t *p_dec, block_t *p_bl
 }
 
 /*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* pre-emptively insert an EOS at a discontinuity, protects
+     * any decoders from any sudden changes */
+    block_t *p_block = dirac_EmitEOS( p_dec, 0 );
+    if( p_block )
+    {
+        p_block->p_next = dirac_EmitEOS( p_dec, 13 );
+        /* need two EOS to ensure it gets detected by synchro
+         * duplicates get discarded in forming encapsulation unit */
+
+        block_BytestreamPush( &p_sys->bytestream, p_block );
+    }
+}
+
+/*****************************************************************************
  * Packetize: form dated encapsulation units from anything
  *****************************************************************************/
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
@@ -1223,16 +1243,9 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         {
-            /* pre-emptively insert an EOS at a discontinuity, protects
-             * any decoders from any sudden changes */
             block_Release( p_block );
-            p_block = dirac_EmitEOS( p_dec, 0 );
-            if( p_block )
-            {
-                p_block->p_next = dirac_EmitEOS( p_dec, 13 );
-                /* need two EOS to ensure it gets detected by synchro
-                 * duplicates get discarded in forming encapsulation unit */
-            }
+            p_block = NULL;
+            Flush( p_dec );
         }
         else if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
@@ -1359,6 +1372,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush     = Flush;
 
     /* Create the output format */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );

@@ -532,7 +532,7 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
         if( p_mux->i_add_stream_start < 0 )
             p_mux->i_add_stream_start = i_dts;
 
-        /* Wait until we have enought data before muxing */
+        /* Wait until we have enough data before muxing */
         if( p_mux->i_add_stream_start < 0 ||
             i_dts < p_mux->i_add_stream_start + i_caching )
             return VLC_SUCCESS;
@@ -617,7 +617,7 @@ static int mrl_Parse( mrl_t *p_mrl, const char *psz_mrl )
     {
         /* msg_Warn( p_sout, "drive letter %c: found in source string",
                           *psz_dup ) ; */
-        psz_parser = "";
+        *psz_parser = '\0';
     }
 #endif
 
@@ -810,7 +810,7 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
  *
  *  Returns a pointer to the first module.
  */
-sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout, char *psz_chain,
+sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout, const char *psz_chain,
                                 sout_stream_t *p_next, sout_stream_t **pp_last)
 {
     if(!psz_chain || !*psz_chain)
@@ -832,9 +832,9 @@ sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout, char *psz_chain,
     {
         config_chain_t *p_cfg;
         char *psz_name;
-        psz_chain = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
+        char *psz_rest_chain = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
         free( psz_parser );
-        psz_parser = psz_chain;
+        psz_parser = psz_rest_chain;
 
         vlc_array_append(&cfg, p_cfg);
         vlc_array_append(&name, psz_name);

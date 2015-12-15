@@ -1,6 +1,6 @@
 # shout
 
-SHOUT_VERSION := 2.3.1
+SHOUT_VERSION := 2.4.1
 SHOUT_URL := http://downloads.us.xiph.org/releases/libshout/libshout-$(SHOUT_VERSION).tar.gz
 
 ifdef BUILD_ENCODERS
@@ -20,8 +20,9 @@ $(TARBALLS)/libshout-$(SHOUT_VERSION).tar.gz:
 # TODO: fix socket stuff on POSIX and Linux
 libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(UNPACK)
-	$(APPLY) $(SRC)/shout/libshout-win32.patch
 	$(APPLY) $(SRC)/shout/bsd.patch
+	$(APPLY) $(SRC)/shout/libshout-arpa.patch
+	$(APPLY) $(SRC)/shout/fix-xiph_openssl.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
@@ -35,6 +36,7 @@ SHOUT_CONF += "--disable-thread"
 endif
 
 .shout: libshout
-	cd $< && $(HOSTVARS) ./configure $(SHOUT_CONF) $(HOSTCONF)
+	$(RECONF)
+	cd $< && $(HOSTVARS) ./configure --without-openssl $(SHOUT_CONF) $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@

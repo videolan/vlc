@@ -28,9 +28,79 @@
 /**
  * \file
  * This file defines functions for manipulating URL in vlc
+ *
+ * \ingroup strings
+ * @{
  */
 
-VLC_API char *vlc_path2uri (const char *path, const char *scheme) VLC_MALLOC;
+/**
+ * Converts local path to URL.
+ *
+ * Builds a URL representation from a local UTF-8 null-terminated file path.
+ *
+ * @param path file path
+ * @param scheme URI scheme to use (default is auto: "file", "fd" or "smb")
+ * @return a heap-allocated URI string on success
+ * or NULL in case of error (errno will be set accordingly)
+ */
+VLC_API char *vlc_path2uri(const char *path, const char *scheme) VLC_MALLOC;
+
+/**
+ * Converts a URI to a local path.
+ *
+ * Builds a local path (UTF-8-encoded null-terminated string) from a URI if
+ * the URI scheme allows.
+ *
+ * @param url URI
+ * @return a heap-allocated string or success
+ * or NULL on error
+ */
+VLC_API char *vlc_uri2path(const char *url) VLC_MALLOC;
+
+/**
+ * Decodes an URI component in place.
+ *
+ * Decodes one null-terminated UTF-8 URI component to aa null-terminated UTF-8
+ * string in place.
+ *
+ * See also vlc_uri_decode_duplicate() for the not-in-place variant.
+ *
+ * \warning <b>This function does NOT decode entire URIs.</b>
+ * URI can only be decoded (and encoded) one component at a time
+ * (e.g. the host name, one directory, the file name).
+ * Complete URIs are always "encoded" (or they are syntaxically invalid).
+ * See IETF RFC3986, especially §2.4 for details.
+ *
+ * \note URI encoding is <b>different</b> from Javascript escaping. Especially,
+ * white spaces and Unicode non-ASCII code points are encoded differently.
+ *
+ * \param str null-terminated component
+ * \return str is returned on success. NULL if str was not properly encoded.
+ */
+VLC_API char *vlc_uri_decode(char *str);
+
+/**
+ * Decodes an URI component.
+ *
+ * See also vlc_uri_decode() for the in-place variant.
+ *
+ * \return a heap-allocated string on success or NULL on error.
+ */
+VLC_API char *vlc_uri_decode_duplicate(const char *str) VLC_MALLOC;
+
+/**
+ * Encodes a URI component.
+ *
+ * Substitutes URI-unsafe, URI delimiters and non-ASCII characters into their
+ * URI-encoded URI-safe representation. See also IETF RFC3986 §2.
+ *
+ * @param str nul-terminated UTF-8 representation of the component.
+ * @note Obviously, a URI containing nul bytes cannot be passed.
+ * @return heap-allocated string, or NULL if out of memory.
+ */
+VLC_API char *vlc_uri_encode(const char *str) VLC_MALLOC;
+
+/** @} */
 
 struct vlc_url_t
 {
@@ -45,11 +115,7 @@ struct vlc_url_t
     char *psz_buffer; /* to be freed */
 };
 
-VLC_API char * decode_URI_duplicate( const char *psz ) VLC_MALLOC;
-VLC_API char * decode_URI( char *psz );
-VLC_API char * encode_URI_component( const char *psz ) VLC_MALLOC;
-VLC_API char * make_path( const char *url ) VLC_MALLOC;
-
 VLC_API void vlc_UrlParse (vlc_url_t *, const char *);
 VLC_API void vlc_UrlClean (vlc_url_t *);
+
 #endif

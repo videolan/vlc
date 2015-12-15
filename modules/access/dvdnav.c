@@ -1115,7 +1115,7 @@ static void DemuxTitles( demux_t *p_demux )
 
     /* Menu */
     t = vlc_input_title_New();
-    t->b_menu = true;
+    t->i_flags = INPUT_TITLE_MENU | INPUT_TITLE_INTERACTIVE;
     t->psz_name = strdup( "DVD Menu" );
 
     s = vlc_seekpoint_New();

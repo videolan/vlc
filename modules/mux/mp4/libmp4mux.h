@@ -26,7 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_es.h>
-#include <vlc_bits.h>
+#include <vlc_boxes.h>
 
 typedef struct
 {

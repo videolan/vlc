@@ -32,7 +32,7 @@ namespace adaptative
     {
         public:
             virtual ~ChunksSource() {}
-            virtual block_t *readNextBlock(size_t) = 0;
+            virtual block_t *readNextBlock() = 0;
     };
 }
 

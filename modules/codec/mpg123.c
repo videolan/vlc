@@ -42,6 +42,7 @@
 static int      OpenDecoder( vlc_object_t * );
 static void     CloseDecoder( vlc_object_t * );
 static block_t *DecodeBlock( decoder_t *, block_t ** );
+static void     Flush( decoder_t * );
 static int      InitMPG123( void );
 static void     ExitMPG123( void );
 
@@ -71,6 +72,16 @@ vlc_module_begin ()
     set_callbacks( OpenDecoder, CloseDecoder )
 vlc_module_end ()
 
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->end_date, 0 );
+}
+
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************/
@@ -95,7 +106,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
     {
-        date_Set( &p_sys->end_date, 0 );
+        Flush( p_dec );
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
             goto error;
     }
@@ -260,6 +271,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
     p_dec->pf_decode_audio = DecodeBlock;
+    p_dec->pf_flush        = Flush;
 
     msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
              (char *)&p_dec->fmt_in.i_codec,

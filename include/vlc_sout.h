@@ -147,7 +147,7 @@ struct  sout_mux_t
      *  for stream then we refuse all stream and start muxing */
     bool  b_add_stream_any_time;
     bool  b_waiting_stream;
-    /* we wait one second after first stream added */
+    /* we wait 1.5 second after first stream added */
     mtime_t     i_add_stream_start;
 };
 
@@ -212,7 +212,7 @@ struct sout_stream_t
 
 VLC_API void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last );
 VLC_API sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout,
-        char *psz_chain, sout_stream_t *p_next, sout_stream_t **p_last) VLC_USED;
+        const char *psz_chain, sout_stream_t *p_next, sout_stream_t **p_last) VLC_USED;
 
 static inline sout_stream_id_sys_t *sout_StreamIdAdd( sout_stream_t *s,
                                                       const es_format_t *fmt )

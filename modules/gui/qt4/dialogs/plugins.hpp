@@ -42,6 +42,7 @@ class QTabWidget;
 class QComboBox;
 class QTreeWidget;
 class QLineEdit;
+class QSignalMapper;
 //class QTextBrowser;
 class QListView;
 class QStyleOptionViewItem;
@@ -153,6 +154,7 @@ private:
     /* Wait spinner */
     PixmapAnimator *spinnerAnimation;
     bool b_localdone;
+    QSignalMapper *signalMapper;
 };
 
 class PluginTreeItem : public QTreeWidgetItem

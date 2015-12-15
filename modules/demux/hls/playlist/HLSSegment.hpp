@@ -52,14 +52,18 @@ namespace hls
 
         class HLSSegment : public Segment
         {
+            friend class M3U8Parser;
+
             public:
                 HLSSegment( ICanonicalUrl *parent, uint64_t sequence );
                 virtual ~HLSSegment();
                 void setEncryption(SegmentEncryption &);
+                mtime_t getUTCTime() const;
                 void debug(vlc_object_t *, int) const; /* reimpl */
                 virtual int compare(ISegment *) const; /* reimpl */
 
             protected:
+                mtime_t utcTime;
                 virtual void onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *); /* reimpl */
 
                 SegmentEncryption encryption;

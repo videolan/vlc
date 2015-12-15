@@ -160,7 +160,6 @@ struct vout_display_sys_t
         struct {
             tbm_format          i_format;
             int                 i_angle;
-            double              f_ratio;
         } tbm;
 #endif
     } u;
@@ -169,7 +168,6 @@ struct vout_display_sys_t
     int     (*pf_set_data)( vout_display_t * );
     int     (*pf_buffers_alloc)( vout_display_t *, video_format_t * );
     void    (*pf_buffers_free)( vout_display_t * );
-    void    (*pf_update_ratio)( vout_display_t *, double );
 };
 
 struct picture_sys_t
@@ -760,8 +758,6 @@ Control( vout_display_t *vd, int i_query, va_list ap )
                 msg_Warn( vd, "ratio changed: invalidate pictures" );
                 vout_display_SendEventPicturesInvalid( vd );
             }
-            else if( sys->pf_update_ratio )
-                sys->pf_update_ratio( vd, place.width / (double) place.height );
             else
                 return VLC_EGENERIC;
         }
@@ -1086,7 +1082,6 @@ EvasImageSetup( vout_display_t *vd )
     sys->pf_set_data = EvasImageSetData;
     sys->pf_buffers_alloc = EvasImageBuffersAlloc;
     sys->pf_buffers_free = EvasImageBuffersFree;
-    sys->pf_update_ratio = NULL;
 
     msg_Dbg( vd, "using evas_image" );
     return 0;
@@ -1172,7 +1167,7 @@ TbmSurfaceSetData( vout_display_t *vd )
     surf.type = EVAS_NATIVE_SURFACE_TBM;
     surf.data.tizen.buffer = sys->p_new_buffer->p_tbm_surface;
     surf.data.tizen.rot = sys->u.tbm.i_angle;
-    surf.data.tizen.ratio = sys->u.tbm.f_ratio;
+    surf.data.tizen.ratio = 0;
     surf.data.tizen.flip = 0;
     evas_object_image_native_surface_set( sys->p_evas, &surf );
 
@@ -1251,21 +1246,12 @@ TbmSurfaceBuffersAlloc( vout_display_t *vd, video_format_t *p_fmt )
     return EcoreMainLoopCallSync( vd, TbmSurfaceBuffersAllocMainloopCb );
 }
 
-static void
-TbmSurfaceUpdateRatio( vout_display_t *vd, double f_ratio )
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    sys->u.tbm.f_ratio = f_ratio;
-}
-
 static int
 TbmSurfaceSetup( vout_display_t *vd )
 {
     vout_display_sys_t *sys = vd->sys;
     tbm_format i_tbm_format = 0;
     bool b_found = false;
-    bool b_can_change_ratio = false;
     uint32_t *p_formats;
     uint32_t i_format_num;
 
@@ -1340,39 +1326,9 @@ TbmSurfaceSetup( vout_display_t *vd )
 
     sys->b_apply_rotation = false;
 
-    /* Ratio update from EVAS_NATIVE_SURFACE_TBM only works with the Z3 that is
-     * based on evas.1.13 */
-    b_can_change_ratio = evas_version->major > 1 || ( evas_version->major == 1
-                         && evas_version->minor >= 13 );
+    FmtUpdate( vd );
 
-    msg_Dbg( vd, "TbmSurface: can_change_ratio: %d", b_can_change_ratio );
-
-    if( !b_can_change_ratio )
-    {
-        FmtUpdate( vd );
-
-        /* No aspect ratio support with this version of TbmSurface*/
-        vd->info.has_pictures_invalid = true;
-        TbmSurfaceUpdateRatio( vd, 1.0f );
-        sys->pf_update_ratio = NULL;
-    }
-    else
-    {
-        /* Newer version of TbmSurfarce: ratio can be updated from
-         * Evas_Native_Surface */
-        vout_display_place_t place;
-        video_format_t fmt;
-
-        video_format_ApplyRotation( &fmt, &vd->source );
-        vout_display_PlacePicture( &place, &fmt, vd->cfg, false );
-
-        vd->info.has_pictures_invalid = false;
-        TbmSurfaceUpdateRatio( vd, place.width / (double) place.height );
-        sys->pf_update_ratio = TbmSurfaceUpdateRatio;
-    }
-
-    sys->i_width  = vd->fmt.i_visible_width;
-    sys->i_height = vd->fmt.i_visible_height;
+    vd->info.has_pictures_invalid = true;
 
     sys->pf_set_data = TbmSurfaceSetData;
     sys->pf_buffers_alloc = TbmSurfaceBuffersAlloc;

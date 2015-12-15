@@ -54,6 +54,13 @@ struct decoder_sys_t
     uint16_t shuffle[2000];
 };
 
+static void Flush(decoder_t *dec)
+{
+    decoder_sys_t *sys = dec->p_sys;
+
+    date_Set(&sys->end_date, 0);
+}
+
 static block_t *Decode(decoder_t *dec, block_t **block_ptr)
 {
     decoder_sys_t *sys  = dec->p_sys;
@@ -63,7 +70,7 @@ static block_t *Decode(decoder_t *dec, block_t **block_ptr)
 
     block_t *block = *block_ptr;
     if (block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        date_Set(&sys->end_date, 0);
+        Flush(dec);
         if (block->i_flags & BLOCK_FLAG_CORRUPTED) {
             block_Release(block);
             *block_ptr = NULL;
@@ -151,6 +158,7 @@ static int Open(vlc_object_t *object)
     dec->fmt_out.audio.i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
 
     dec->pf_decode_audio = Decode;
+    dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
 }

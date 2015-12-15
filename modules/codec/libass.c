@@ -65,6 +65,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 /* */
 struct decoder_sys_t
@@ -132,6 +133,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     p_dec->pf_decode_sub = DecodeBlock;
+    p_dec->pf_flush      = Flush;
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     if( !p_sys )
@@ -213,6 +215,9 @@ static int Create( vlc_object_t *p_this )
 #if defined( __ANDROID__ )
     const char *psz_font = "/system/fonts/DroidSans-Bold.ttf";
     const char *psz_family = "Droid Sans Bold";
+#elif defined( __APPLE__ )
+    const char *psz_font = NULL; /* We don't ship a default font with VLC */
+    const char *psz_family = "Helvetica Neue"; /* Use HN if we can't find anything more suitable - Arial is not on all Apple platforms */
 #else
     const char *psz_font = NULL; /* We don't ship a default font with VLC */
     const char *psz_family = "Arial"; /* Use Arial if we can't find anything more suitable */
@@ -292,6 +297,16 @@ static void DecSysRelease( decoder_sys_t *p_sys )
     free( p_sys );
 }
 
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->i_max_stop = VLC_TS_INVALID;
+}
+
 /****************************************************************************
  * DecodeBlock:
  ****************************************************************************/
@@ -310,7 +325,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
-        p_sys->i_max_stop = VLC_TS_INVALID;
+        Flush( p_dec );
         block_Release( p_block );
         return NULL;
     }

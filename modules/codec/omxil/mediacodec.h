@@ -100,14 +100,16 @@ struct mc_api
 
     mc_api_sys *p_sys;
 
+    char *psz_name;
+    const char *psz_mime;
+
     bool b_started;
     bool b_video;
     bool b_direct_rendering;
     bool b_support_interlaced;
 
     void (*clean)(mc_api *);
-    int (*start)(mc_api *, const char *psz_name, const char *psz_mime,
-                 union mc_api_args *p_args);
+    int (*start)(mc_api *, union mc_api_args *p_args);
     int (*stop)(mc_api *);
     int (*flush)(mc_api *);
 

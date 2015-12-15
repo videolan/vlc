@@ -351,10 +351,9 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_input_netBox setTitle: _NS("Network")];
     [_input_avcodec_hwLabel setStringValue: _NS("Hardware Acceleration")];
     [_input_postprocLabel setStringValue: _NS("Post-Processing Quality")];
-    [_input_rtspCheckbox setTitle: _NS("Use RTP over RTSP (TCP)")];
     [_input_skipLoopLabel setStringValue: _NS("Skip the loop filter for H.264 decoding")];
-    [_input_mkv_preload_dirCheckbox setTitle: _NS("Preload MKV files in the same directory")];
     [_input_urlhandlerButton setTitle: _NS("Edit default application settings for network protocols")];
+    [_input_skipFramesCheckbox setTitle: _NS("Skip frames")];
 
     /* url handler */
     [_urlhandler_titleLabel setStringValue: _NS("Open network streams using the following protocols")];
@@ -363,27 +362,29 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_urlhandler_cancelButton setTitle: _NS("Cancel")];
 
     /* interface */
+    [_intf_generalSettingsBox setTitle:_NS("General settings")];
     [_intf_languageLabel setStringValue: _NS("Language")];
     [_intf_styleLabel setStringValue: _NS("Interface style")];
     [_intf_style_darkButtonCell setTitle: _NS("Dark")];
     [_intf_style_brightButtonCell setTitle: _NS("Bright")];
-    [_intf_embeddedCheckbox setTitle: _NS("Show video within the main window")];
-    [_intf_nativefullscreenCheckbox setTitle: _NS("Use the native fullscreen mode")];
-    [_intf_fspanelCheckbox setTitle: _NS("Show Fullscreen Controller")];
-    [_intf_networkBox setTitle: _NS("Privacy / Network Interaction")];
+
+    [_intf_playbackControlBox setTitle:_NS("Playback control")];
+    [_intf_continueplaybackLabel setStringValue:_NS("Continue playback")];
     [_intf_appleremoteCheckbox setTitle: _NS("Control playback with the Apple Remote")];
-    [_intf_appleremote_sysvolCheckbox setTitle: _NS("Control system volume with the Apple Remote")];
     [_intf_mediakeysCheckbox setTitle: _NS("Control playback with media keys")];
+    [_intf_appleremote_sysvolCheckbox setTitle: _NS("Control system volume with the Apple Remote")];
+
+    [_intf_playbackBehaviourBox setTitle:_NS("Playback behaviour")];
+    [_intf_enableNotificationsCheckbox setTitle: _NS("Enable notifications on playlist item change")];
+    [_intf_pauseitunesLabel setStringValue:_NS("Control external music players")];
+
+    [_intf_networkBox setTitle: _NS("Privacy / Network Interaction")];
     [_intf_artCheckbox setTitle: _NS("Allow metadata network access")];
     [_intf_updateCheckbox setTitle: _NS("Automatically check for updates")];
     [_intf_last_updateLabel setStringValue: @""];
-    [_intf_enableNotificationsCheckbox setTitle: _NS("Enable notifications on playlist item change")];
-    [_intf_autoresizeCheckbox setTitle: _NS("Resize interface to the native video size")];
-    [_intf_pauseminimizedCheckbox setTitle: _NS("Pause the video playback when minimized")];
-    [_intf_luahttpBox setTitle:_NS("Lua HTTP")];
+
+    [_intf_luahttpBox setTitle:_NS("HTTP web interface")];
     [_intf_luahttppwdLabel setStringValue:_NS("Password")];
-    [_intf_pauseitunesLabel setStringValue:_NS("Control external music players")];
-    [_intf_continueplaybackLabel setStringValue:_NS("Continue playback")];
 
     /* Subtitles and OSD */
     [_osd_encodingLabel setStringValue: _NS("Default Encoding")];
@@ -402,14 +403,19 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_osd_outline_thicknessLabel setStringValue: _NS("Outline thickness")];
 
     /* video */
-    [_video_blackCheckbox setTitle: _NS("Black screens in Fullscreen mode")];
-    [_video_deviceLabel setStringValue: _NS("Fullscreen Video Device")];
-    [_video_displayBox setTitle: _NS("Display")];
     [_video_enableCheckbox setTitle: _NS("Enable video")];
-    [_video_fullscreenCheckbox setTitle: _NS("Fullscreen")];
-    [_video_videodecoCheckbox setTitle: _NS("Window decorations")];
+    [_video_displayBox setTitle: _NS("Display")];
+    [_video_embeddedCheckbox setTitle: _NS("Show video within the main window")];
+    [_video_pauseWhenMinimizedCheckbox setTitle:_NS("Pause the video playback when minimized")];
     [_video_onTopCheckbox setTitle: _NS("Float on Top")];
-    [_video_skipFramesCheckbox setTitle: _NS("Skip frames")];
+    [_video_videodecoCheckbox setTitle: _NS("Window decorations")];
+
+    [_video_fullscreenBox setTitle:_NS("Fullscreen settings")];
+    [_video_startInFullscreenCheckbox setTitle:_NS("Start in fullscreen")];
+    [_video_blackScreenCheckbox setTitle: _NS("Black screens in Fullscreen mode")];
+    [_video_nativeFullscreenCheckbox setTitle: _NS("Use the native fullscreen mode")];
+    [_video_deviceLabel setStringValue: _NS("Fullscreen Video Device")];
+
     [_video_snapBox setTitle: _NS("Video snapshots")];
     [_video_snap_folderButton setTitle: _NS("Browse...")];
     [_video_snap_folderLabel setStringValue: _NS("Folder")];
@@ -568,18 +574,18 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     }
     [_intf_languagePopup selectItemAtIndex:sel];
 
-    [self setupButton:_intf_artCheckbox forBoolValue: "metadata-network-access"];
-
-    [self setupButton:_intf_fspanelCheckbox forBoolValue: "macosx-fspanel"];
-
-    [self setupButton:_intf_nativefullscreenCheckbox forBoolValue: "macosx-nativefullscreenmode"];
-
-    [self setupButton:_intf_embeddedCheckbox forBoolValue: "embedded-video"];
-
+    [self setupButton:_intf_continueplaybackPopup forIntList: "macosx-continue-playback"];
     [self setupButton:_intf_appleremoteCheckbox forBoolValue: "macosx-appleremote"];
     [self setupButton:_intf_appleremote_sysvolCheckbox forBoolValue: "macosx-appleremote-sysvol"];
-
     [self setupButton:_intf_mediakeysCheckbox forBoolValue: "macosx-mediakeys"];
+
+    [self setupButton:_video_nativeFullscreenCheckbox forBoolValue: "macosx-nativefullscreenmode"];
+    [self setupButton:_video_embeddedCheckbox forBoolValue: "embedded-video"];
+
+    [self setupButton:_intf_pauseitunesPopup forIntList: "macosx-control-itunes"];
+
+    [self setupButton:_intf_artCheckbox forBoolValue: "metadata-network-access"];
+
 
 #ifdef HAVE_SPARKLE
     if ([[SUUpdater sharedUpdater] lastUpdateCheckDate] != NULL)
@@ -601,11 +607,8 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
         [_intf_style_darkButtonCell setState: NO];
         [_intf_style_brightButtonCell setState: YES];
     }
-    [self setupButton:_intf_autoresizeCheckbox forBoolValue: "macosx-video-autoresize"];
-    [self setupButton:_intf_pauseminimizedCheckbox forBoolValue: "macosx-pause-minimized"];
+
     [self setupField:_intf_luahttppwdTextField forOption: "http-password"];
-    [self setupButton:_intf_pauseitunesPopup forIntList: "macosx-control-itunes"];
-    [self setupButton:_intf_continueplaybackPopup forIntList: "macosx-continue-playback"];
 
     /******************
      * audio settings *
@@ -660,11 +663,11 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
      * video settings *
      ******************/
     [self setupButton:_video_enableCheckbox forBoolValue: "video"];
-    [self setupButton:_video_fullscreenCheckbox forBoolValue: "fullscreen"];
+    [self setupButton:_video_startInFullscreenCheckbox forBoolValue: "fullscreen"];
     [self setupButton:_video_onTopCheckbox forBoolValue: "video-on-top"];
-    [self setupButton:_video_skipFramesCheckbox forBoolValue: "skip-frames"];
-    [self setupButton:_video_blackCheckbox forBoolValue: "macosx-black"];
+    [self setupButton:_video_blackScreenCheckbox forBoolValue: "macosx-black"];
     [self setupButton:_video_videodecoCheckbox forBoolValue: "video-deco"];
+    [self setupButton:_video_pauseWhenMinimizedCheckbox forBoolValue: "macosx-pause-minimized"];
 
     [_video_devicePopup removeAllItems];
     i = 0;
@@ -690,7 +693,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [self setupButton:_video_deinterlace_modePopup forStringList: "deinterlace-mode"];
 
     // set lion fullscreen mode restrictions
-    [self enableLionFullscreenMode: [_intf_nativefullscreenCheckbox state]];
+    [self enableLionFullscreenMode: [_video_nativeFullscreenCheckbox state]];
 
     /***************************
      * input & codecs settings *
@@ -699,13 +702,9 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [_input_postprocTextField setIntValue: config_GetInt(p_intf, "postproc-q")];
     [_input_postprocTextField setToolTip: _NS(config_GetLabel(p_intf, "postproc-q"))];
     [self setupButton:_input_avcodec_hwPopup forModuleList: "avcodec-hw"];
-
+    [self setupButton:_input_skipFramesCheckbox forBoolValue: "skip-frames"];
     [self setupButton:_input_aviPopup forIntList: "avi-index"];
-
-    [self setupButton:_input_rtspCheckbox forBoolValue: "rtsp-tcp"];
     [self setupButton:_input_skipLoopPopup forIntList: "avcodec-skiploopfilter"];
-
-    [self setupButton:_input_mkv_preload_dirCheckbox forBoolValue: "mkv-preload-local-dir"];
 
     [_input_cachelevelPopup removeAllItems];
     NSMenuItem *item = [[_input_cachelevelPopup menu] addItemWithTitle:_NS("Custom") action:nil keyEquivalent:@""];
@@ -919,16 +918,12 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         config_PutInt(p_intf, "metadata-network-access", [_intf_artCheckbox state]);
 
-        config_PutInt(p_intf, "macosx-fspanel", [_intf_fspanelCheckbox state]);
-        config_PutInt(p_intf, "embedded-video", [_intf_embeddedCheckbox state]);
 
         config_PutInt(p_intf, "macosx-appleremote", [_intf_appleremoteCheckbox state]);
         config_PutInt(p_intf, "macosx-appleremote-sysvol", [_intf_appleremote_sysvolCheckbox state]);
         config_PutInt(p_intf, "macosx-mediakeys", [_intf_mediakeysCheckbox state]);
         config_PutInt(p_intf, "macosx-interfacestyle", [_intf_style_darkButtonCell state]);
-        config_PutInt(p_intf, "macosx-nativefullscreenmode", [_intf_nativefullscreenCheckbox state]);
-        config_PutInt(p_intf, "macosx-pause-minimized", [_intf_pauseminimizedCheckbox state]);
-        config_PutInt(p_intf, "macosx-video-autoresize", [_intf_autoresizeCheckbox state]);
+
         if ([_intf_enableNotificationsCheckbox state] == NSOnState) {
             tmpString = getString("control");
             tmpRange = [tmpString rangeOfString:@"growl"];
@@ -1000,12 +995,15 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
      ******************/
     if (_videoSettingChanged) {
         config_PutInt(p_intf, "video", [_video_enableCheckbox state]);
-        config_PutInt(p_intf, "fullscreen", [_video_fullscreenCheckbox state]);
+        config_PutInt(p_intf, "fullscreen", [_video_startInFullscreenCheckbox state]);
         config_PutInt(p_intf, "video-deco", [_video_videodecoCheckbox state]);
         config_PutInt(p_intf, "video-on-top", [_video_onTopCheckbox state]);
-        config_PutInt(p_intf, "skip-frames", [_video_skipFramesCheckbox state]);
-        config_PutInt(p_intf, "macosx-black", [_video_blackCheckbox state]);
+        config_PutInt(p_intf, "macosx-black", [_video_blackScreenCheckbox state]);
 
+        config_PutInt(p_intf, "macosx-pause-minimized", [_video_pauseWhenMinimizedCheckbox state]);
+
+        config_PutInt(p_intf, "embedded-video", [_video_embeddedCheckbox state]);
+        config_PutInt(p_intf, "macosx-nativefullscreenmode", [_video_nativeFullscreenCheckbox state]);
         config_PutInt(p_intf, "macosx-vdev", [[_video_devicePopup selectedItem] tag]);
 
         config_PutPsz(p_intf, "snapshot-path", [[_video_snap_folderTextField stringValue] UTF8String]);
@@ -1023,14 +1021,12 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     if (_inputSettingChanged) {
         config_PutPsz(p_intf, "input-record-path", [[_input_recordTextField stringValue] UTF8String]);
         config_PutInt(p_intf, "postproc-q", [_input_postprocTextField intValue]);
+        config_PutInt(p_intf, "skip-frames", [_input_skipFramesCheckbox state]);
 
         SaveIntList(_input_aviPopup, "avi-index");
 
-        config_PutInt(p_intf, "rtsp-tcp", [_input_rtspCheckbox state]);
         SaveModuleList(_input_avcodec_hwPopup, "avcodec-hw");
         SaveIntList(_input_skipLoopPopup, "avcodec-skiploopfilter");
-
-        config_PutInt(p_intf, "mkv-preload-local-dir", [_input_mkv_preload_dirCheckbox state]);
 
         #define CaC(name, factor) config_PutInt(p_intf, name, [[_input_cachelevelPopup selectedItem] tag] * factor)
         if ([[_input_cachelevelPopup selectedItem] tag] == 0) {
@@ -1131,26 +1127,28 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 - (void)enableLionFullscreenMode: (BOOL)_value
 {
     [_video_videodecoCheckbox setEnabled: !_value];
-    [_video_blackCheckbox setEnabled: !_value];
+    [_video_blackScreenCheckbox setEnabled: !_value];
+    [_video_devicePopup setEnabled: !_value];
 
     if (_value) {
         [_video_videodecoCheckbox setState: NSOnState];
-        [_video_blackCheckbox setState: NSOffState];
+        [_video_blackScreenCheckbox setState: NSOffState];
 
         NSString *tooltipText = _NS("This setting cannot be changed because the native fullscreen mode is enabled.");
         [_video_videodecoCheckbox setToolTip:tooltipText];
-        [_video_blackCheckbox setToolTip:tooltipText];
+        [_video_blackScreenCheckbox setToolTip:tooltipText];
+        [_video_devicePopup setToolTip:tooltipText];
+
     } else {
         [self setupButton:_video_videodecoCheckbox forBoolValue: "video-deco"];
-        [self setupButton:_video_blackCheckbox forBoolValue: "macosx-black"];
+        [self setupButton:_video_blackScreenCheckbox forBoolValue: "macosx-black"];
+
+        [_video_devicePopup setToolTip:@""];
     }
 }
 
 - (IBAction)interfaceSettingChanged:(id)sender
 {
-    if (sender == _intf_nativefullscreenCheckbox)
-        [self enableLionFullscreenMode:[sender state]];
-
     _intfSettingChanged = YES;
 }
 
@@ -1193,7 +1191,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (IBAction)videoSettingChanged:(id)sender
 {
-    if (sender == _video_snap_folderButton) {
+    if (sender == _video_nativeFullscreenCheckbox)
+        [self enableLionFullscreenMode:[sender state]];
+    else if (sender == _video_snap_folderButton) {
         _selectFolderPanel = [[NSOpenPanel alloc] init];
         [_selectFolderPanel setCanChooseDirectories: YES];
         [_selectFolderPanel setCanChooseFiles: NO];
@@ -1203,14 +1203,13 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [_selectFolderPanel setCanCreateDirectories: YES];
         [_selectFolderPanel setPrompt: _NS("Choose")];
         [_selectFolderPanel beginSheetModalForWindow:self.window completionHandler: ^(NSInteger returnCode) {
-            if (returnCode == NSOKButton)
-            {
+            if (returnCode == NSOKButton) {
                 [_video_snap_folderTextField setStringValue: [[_selectFolderPanel URL] path]];
-                _videoSettingChanged = YES;
             }
         }];
-    } else
-        _videoSettingChanged = YES;
+    }
+
+    _videoSettingChanged = YES;
 }
 
 - (void)showVideoSettings

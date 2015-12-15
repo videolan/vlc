@@ -110,6 +110,7 @@ private:
     QPropertyAnimation *animHandle;
     QSequentialAnimationGroup *animLoading;
     QTimer *hideHandleTimer;
+    QTimer *startAnimLoadingTimer;
 
 public slots:
     void setPosition( float, int64_t, int );
@@ -120,7 +121,8 @@ public slots:
 private slots:
     void startSeekTimer();
     void updatePos();
-    void inputUpdated( input_thread_t *p_input );
+    void inputUpdated( bool );
+    void startAnimLoading();
 
 signals:
     void sliderDragged( float );

@@ -1,0 +1,21 @@
+--- mpg123/configure.ac	2015-08-12 07:38:31.000000000 +0200
++++ mpg123.old/configure.ac	2015-12-02 14:26:55.303304758 +0100
+@@ -1007,6 +1007,7 @@
+ AC_CHECK_SIZEOF(size_t,4)
+ AC_CHECK_SIZEOF(ssize_t,4)
+ AC_CHECK_SIZEOF(off_t,4)
++AC_CHECK_SIZEOF(off64_t,8)
+ AC_CHECK_SIZEOF(int32_t)
+ AC_CHECK_SIZEOF(long,4)
+ 
+@@ -1017,8 +1018,8 @@
+   lfs_alias_type=long
+   lfs_alias_size=$ac_cv_sizeof_long
+ else
+-  lfs_alias_type=off_t
+-  lfs_alias_size=$ac_cv_sizeof_off_t
++  lfs_alias_type=off64_t
++  lfs_alias_size=$ac_cv_sizeof_off64_t
+ fi
+ 
+ if test "x$lfs_alias_size" = "x"; then 

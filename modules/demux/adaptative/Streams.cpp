@@ -20,8 +20,8 @@
 #include "Streams.hpp"
 #include "http/HTTPConnection.hpp"
 #include "http/HTTPConnectionManager.h"
+#include "playlist/BaseRepresentation.h"
 #include "playlist/SegmentChunk.hpp"
-#include "SegmentTracker.hpp"
 #include "plumbing/SourceStream.hpp"
 #include "plumbing/CommandsQueue.hpp"
 #include "tools/Debug.hpp"
@@ -39,7 +39,6 @@ AbstractStream::AbstractStream(demux_t * demux_, const StreamFormat &format_)
     dead = false;
     disabled = false;
     flushing = false;
-    restarting_output = false;
     discontinuity = false;
     segmentTracker = NULL;
     pcr = VLC_TS_INVALID;
@@ -79,6 +78,7 @@ AbstractStream::~AbstractStream()
 void AbstractStream::bind(SegmentTracker *tracker, HTTPConnectionManager *conn)
 {
     segmentTracker = tracker;
+    segmentTracker->registerListener(this);
     connManager = conn;
 }
 
@@ -120,6 +120,13 @@ mtime_t AbstractStream::getPCR() const
     return pcr;
 }
 
+mtime_t AbstractStream::getMinAheadTime() const
+{
+    if(!segmentTracker)
+        return 0;
+    return segmentTracker->getMinAheadTime();
+}
+
 mtime_t AbstractStream::getBufferingLevel() const
 {
     return fakeesout->commandsqueue.getBufferingLevel();
@@ -135,27 +142,10 @@ int AbstractStream::esCount() const
     return fakeesout->esCount();
 }
 
-SegmentChunk * AbstractStream::getChunk()
-{
-    if (currentChunk == NULL && !eof)
-    {
-        if(esCount() && !isSelected())
-        {
-            disabled = true;
-            return NULL;
-        }
-        currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
-        if (currentChunk == NULL)
-            eof = true;
-    }
-    return currentChunk;
-}
-
 bool AbstractStream::seekAble() const
 {
     return (demuxer &&
             !fakeesout->restarting() &&
-            !restarting_output &&
             !discontinuity &&
             !flushing );
 }
@@ -241,11 +231,10 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
     if(!demuxer && !startDemux())
     {
         /* If demux fails because of probing failure / wrong format*/
-        if(restarting_output)
+        if(discontinuity)
         {
             msg_Dbg( p_realdemux, "Flushing on format change" );
             prepareFormatChange();
-            restarting_output = false;
             discontinuity = false;
             flushing = true;
             return AbstractStream::status_buffering;
@@ -259,11 +248,10 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
         /* need to read, demuxer still buffering, ... */
         if(demuxer->demux(nz_deadline) != VLC_DEMUXER_SUCCESS)
         {
-            if(restarting_output || discontinuity)
+            if(discontinuity)
             {
                 msg_Dbg( p_realdemux, "Flushing on discontinuity" );
                 prepareFormatChange();
-                restarting_output = false;
                 discontinuity = false;
                 flushing = true;
                 return AbstractStream::status_buffering;
@@ -285,49 +273,48 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
     if(send)
         pcr = fakeesout->commandsqueue.Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
 
+    /* Disable streams that are not selected (alternate streams) */
+    if(esCount() && !isSelected() && !fakeesout->restarting())
+    {
+        disabled = true;
+        segmentTracker->reset();
+    }
+
     return AbstractStream::status_demuxed;
 }
 
-block_t * AbstractStream::readNextBlock(size_t toread)
+block_t * AbstractStream::readNextBlock()
 {
-    SegmentChunk *chunk = getChunk();
-    if(!chunk)
-        return NULL;
+    if (currentChunk == NULL && !eof)
+        currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
 
-    if(format != chunk->getStreamFormat())
+    if(discontinuity)
     {
-        /* Force stream to end for this call */
-        msg_Info(p_realdemux, "Changing stream format %u->%u",
-                 (unsigned)format, (unsigned)chunk->getStreamFormat());
-
-        restarting_output = true;
-        format = chunk->getStreamFormat();
-        /* Next stream will use current unused chunk */
-        return NULL;
-    }
-
-    if(chunk->discontinuity)
-    {
-        discontinuity = true;
-        chunk->discontinuity = false;
         msg_Info(p_realdemux, "Encountered discontinuity");
+        /* Force stream/demuxer to end for this call */
         return NULL;
     }
 
-    const bool b_segment_head_chunk = (chunk->getBytesRead() == 0);
+    if(currentChunk == NULL)
+    {
+        eof = true;
+        return NULL;
+    }
 
-    block_t *block = chunk->read(toread);
+    const bool b_segment_head_chunk = (currentChunk->getBytesRead() == 0);
+
+    block_t *block = currentChunk->readBlock();
     if(block == NULL)
     {
+        delete currentChunk;
         currentChunk = NULL;
-        delete chunk;
         return NULL;
     }
 
-    if (chunk->getBytesToRead() == 0)
+    if (currentChunk->isEmpty())
     {
+        delete currentChunk;
         currentChunk = NULL;
-        delete chunk;
     }
 
     block = checkBlock(block, b_segment_head_chunk);
@@ -349,7 +336,8 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
                 delete currentChunk;
             currentChunk = NULL;
 
-            restartDemux();
+            if( !restartDemux() )
+                dead = true;
 
             /* Check if we need to set an offset as the demuxer
              * will start from zero from seek point */
@@ -363,14 +351,9 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
     return ret;
 }
 
-mtime_t AbstractStream::getPosition() const
+mtime_t AbstractStream::getPlaybackTime() const
 {
-    return segmentTracker->getSegmentStart();
-}
-
-void AbstractStream::prune()
-{
-    segmentTracker->pruneFromCurrent();
+    return segmentTracker->getPlaybackTime();
 }
 
 void AbstractStream::runUpdates()
@@ -387,3 +370,30 @@ void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
         p_fmt->psz_description = strdup(description.c_str());
 }
 
+void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
+{
+    switch(event.type)
+    {
+        case SegmentTrackerEvent::DISCONTINUITY:
+            discontinuity = true;
+            break;
+
+        case SegmentTrackerEvent::FORMATCHANGE:
+            /* Check if our current demux is still valid */
+            if(*event.u.format.f != format)
+            {
+                /* Format has changed between segments, we need to drain and change demux */
+                msg_Info(p_realdemux, "Changing stream format %s -> %s",
+                         format.str().c_str(), event.u.format.f->str().c_str());
+                format = *event.u.format.f;
+
+                /* This is an implict discontinuity */
+                discontinuity = true;
+            }
+            break;
+
+        case SegmentTrackerEvent::SWITCHING:
+        default:
+            break;
+    }
+}

@@ -40,7 +40,8 @@
 # endif
 #endif
 
-#if !defined (HAVE_GMTIME_R) || !defined (HAVE_LOCALTIME_R)
+#if !defined (HAVE_GMTIME_R) || !defined (HAVE_LOCALTIME_R) \
+ || !defined (HAVE_TIMEGM)
 # include <time.h> /* time_t */
 #endif
 
@@ -198,6 +199,16 @@ struct tm *gmtime_r (const time_t *, struct tm *);
 struct tm *localtime_r (const time_t *, struct tm *);
 #endif
 
+#ifndef HAVE_TIMEGM
+time_t timegm(struct tm *);
+#endif
+
+#ifndef HAVE_TIMESPEC_GET
+#define TIME_UTC 1
+struct timespec;
+int timespec_get(struct timespec *, int);
+#endif
+
 /* unistd.h */
 #ifndef HAVE_GETPID
 pid_t getpid (void) VLC_NOTHROW;
@@ -262,7 +273,9 @@ static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 #endif
 
 #if !defined (HAVE_STATIC_ASSERT) && !defined(__cpp_static_assert)
-# define _Static_assert(x, s) ((void) sizeof (struct { unsigned:-!(x); }))
+# define STATIC_ASSERT_CONCAT_(a, b) a##b
+# define STATIC_ASSERT_CONCAT(a, b) STATIC_ASSERT_CONCAT_(a, b)
+# define _Static_assert(x, s) extern char STATIC_ASSERT_CONCAT(static_assert_, __LINE__)[sizeof(struct { unsigned:-!(x); })]
 # define static_assert _Static_assert
 #endif
 

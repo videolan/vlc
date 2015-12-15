@@ -231,7 +231,7 @@ static int Open(filter_t *filter)
     sys->filtered_pictures = mmal_queue_create();
 
     filter->pf_video_filter = deinterlace;
-    filter->pf_video_flush = flush;
+    filter->pf_flush = flush;
     vlc_mutex_init_recursive(&sys->mutex);
     vlc_mutex_init(&sys->buffer_cond_mutex);
     vlc_cond_init(&sys->buffer_cond);

@@ -121,7 +121,7 @@ NativeSurface_getHandle(JNIEnv *p_env, jobject jsurf)
     intptr_t p_surface_handle = NULL;
 
     clz = (*p_env)->GetObjectClass(p_env, jsurf);
-    if ((*p_env)->ExceptionOccurred(p_env))
+    if ((*p_env)->ExceptionCheck(p_env))
     {
         (*p_env)->ExceptionClear(p_env);
         return NULL;
@@ -129,21 +129,13 @@ NativeSurface_getHandle(JNIEnv *p_env, jobject jsurf)
     fid = (*p_env)->GetFieldID(p_env, clz, "mSurface", "I");
     if (fid == NULL)
     {
-        jthrowable exp = (*p_env)->ExceptionOccurred(p_env);
-        if (exp)
-        {
-            (*p_env)->DeleteLocalRef(p_env, exp);
+        if ((*p_env)->ExceptionCheck(p_env))
             (*p_env)->ExceptionClear(p_env);
-        }
         fid = (*p_env)->GetFieldID(p_env, clz, "mNativeSurface", "I");
         if (fid == NULL)
         {
-            jthrowable exp = (*p_env)->ExceptionOccurred(p_env);
-            if (exp)
-            {
-                (*p_env)->DeleteLocalRef(p_env, exp);
+            if ((*p_env)->ExceptionCheck(p_env))
                 (*p_env)->ExceptionClear(p_env);
-            }
         }
     }
     if (fid != NULL)
@@ -420,7 +412,7 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, AWindowHandler *p_awh)
         goto end;
 
 #define CHECK_EXCEPTION(what) do { \
-    if( (*env)->ExceptionOccurred(env) ) \
+    if( (*env)->ExceptionCheck(env) ) \
     { \
         msg_Err(p_obj, "%s failed", what); \
         (*env)->ExceptionClear(env); \

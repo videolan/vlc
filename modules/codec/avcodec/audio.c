@@ -71,6 +71,7 @@ struct decoder_sys_t
 
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust );
 static block_t *DecodeAudio( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
 {
@@ -235,7 +236,24 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
 
     p_dec->pf_decode_audio = DecodeAudio;
+    p_dec->pf_flush        = Flush;
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    AVCodecContext *ctx = p_sys->p_context;
+
+    avcodec_flush_buffers( ctx );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+
+    if( ctx->codec_id == AV_CODEC_ID_MP2 ||
+        ctx->codec_id == AV_CODEC_ID_MP3 )
+        p_sys->i_reject_count = 3;
 }
 
 /*****************************************************************************
@@ -263,13 +281,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
-        avcodec_flush_buffers( ctx );
-        date_Set( &p_sys->end_date, VLC_TS_INVALID );
-
-        if( ctx->codec_id == AV_CODEC_ID_MP2 ||
-            ctx->codec_id == AV_CODEC_ID_MP3 )
-            p_sys->i_reject_count = 3;
-
+        Flush( p_dec );
         goto end;
     }
 

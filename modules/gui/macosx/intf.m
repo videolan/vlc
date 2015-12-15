@@ -96,6 +96,7 @@ int OpenIntf (vlc_object_t *p_this)
         [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
         [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
 
+        msg_Dbg(p_intf, "Finished loading macosx interface");
         return VLC_SUCCESS;
     }
 }
@@ -306,13 +307,6 @@ static VLCMain *sharedInstance = nil;
     [[self mainWindow] updateWindow];
     [[self mainWindow] updateTimeSlider];
     [[self mainWindow] updateVolumeSlider];
-
-    /* Hack: Playlist is started before the interface.
-     * Thus, call additional updaters as we might miss these events if posted before
-     * the callbacks are registered.
-     */
-    [_input_manager inputThreadChanged];
-    [_playlist playbackModeUpdated];
 
     // respect playlist-autostart
     // note that PLAYLIST_PLAY will not stop any playback if already started

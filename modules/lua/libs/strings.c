@@ -51,11 +51,10 @@ static int vlclua_decode_uri( lua_State *L )
     for( i = 1; i <= i_top; i++ )
     {
         const char *psz_cstring = luaL_checkstring( L, 1 );
-        char *psz_string = strdup( psz_cstring );
+        char *psz_string = vlc_uri_decode_duplicate( psz_cstring );
         lua_remove( L, 1 ); /* remove elements to prevent being limited by
                              * the stack's size (this function will work with
                              * up to (stack size - 1) arguments */
-        decode_URI( psz_string );
         lua_pushstring( L, psz_string );
         free( psz_string );
     }
@@ -69,7 +68,7 @@ static int vlclua_encode_uri_component( lua_State *L )
     for( i = 1; i <= i_top; i++ )
     {
         const char *psz_cstring = luaL_checkstring( L, 1 );
-        char *psz_string = encode_URI_component( psz_cstring );
+        char *psz_string = vlc_uri_encode( psz_cstring );
         lua_remove( L,1 );
         lua_pushstring( L, psz_string );
         free( psz_string );
@@ -95,7 +94,7 @@ static int vlclua_make_uri( lua_State *L )
 static int vlclua_make_path( lua_State *L )
 {
     const char *psz_input = luaL_checkstring( L, 1 );
-    char *psz_path = make_path( psz_input);
+    char *psz_path = vlc_uri2path( psz_input);
     lua_pushstring( L, psz_path );
     free( psz_path );
     return 1;
@@ -112,7 +111,7 @@ static int vlclua_resolve_xml_special_chars( lua_State *L )
         lua_remove( L, 1 ); /* remove elements to prevent being limited by
                              * the stack's size (this function will work with
                              * up to (stack size - 1) arguments */
-        resolve_xml_special_chars( psz_string );
+        vlc_xml_decode( psz_string );
         lua_pushstring( L, psz_string );
         free( psz_string );
     }
@@ -125,7 +124,7 @@ static int vlclua_convert_xml_special_chars( lua_State *L )
     int i;
     for( i = 1; i <= i_top; i++ )
     {
-        char *psz_string = convert_xml_special_chars( luaL_checkstring(L,1) );
+        char *psz_string = vlc_xml_encode( luaL_checkstring(L,1) );
         lua_remove( L, 1 );
         lua_pushstring( L, psz_string );
         free( psz_string );

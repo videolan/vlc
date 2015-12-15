@@ -4,7 +4,7 @@
  * Copyright © 2011-2012 VideoLAN
  *
  * Authors: Dominique Martinet <asmadeus@codewreck.org>
- *          Hugo Beauzée-Luyssen <beauze.h@gmail.com>
+ *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *          Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify it

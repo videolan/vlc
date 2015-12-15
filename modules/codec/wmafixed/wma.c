@@ -72,6 +72,7 @@ static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
 static block_t *DecodeFrame( decoder_t *, block_t ** );
+static void Flush( decoder_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -184,8 +185,19 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set callback */
     p_dec->pf_decode_audio = DecodeFrame;
+    p_dec->pf_flush        = Flush;
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Flush:
+ *****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 }
 
 /*****************************************************************************
@@ -203,7 +215,7 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        date_Set( &p_sys->end_date, VLC_TS_INVALID );
+        Flush( p_dec );
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED)
         {
             block_Release( p_block );

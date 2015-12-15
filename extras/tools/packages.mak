@@ -41,7 +41,7 @@ RAGEL_URL=http://www.colm.net/files/ragel/ragel-$(RAGEL_VERSION).tar.gz
 SED_VERSION=4.2.2
 SED_URL=$(GNU)/sed/sed-$(SED_VERSION).tar.bz2
 
-ANT_VERSION=1.9.5
+ANT_VERSION=1.9.6
 ANT_URL=$(APACHE)/ant/binaries/apache-ant-$(ANT_VERSION)-bin.tar.bz2
 
 PROTOBUF_VERSION := 2.6.1

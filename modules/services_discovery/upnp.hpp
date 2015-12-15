@@ -37,6 +37,7 @@
 #include <upnp/upnptools.h>
 
 #include <vlc_common.h>
+#include <vlc_url.h>
 
 namespace SD
 {
@@ -117,10 +118,26 @@ private:
 namespace Access
 {
 
+class Upnp_i11e_cb
+{
+public:
+    Upnp_i11e_cb( Upnp_FunPtr callback, void *cookie );
+    ~Upnp_i11e_cb();
+    void waitAndRelease( void );
+    static int run( Upnp_EventType, void *, void *);
+
+private:
+    vlc_sem_t       sem_;
+    vlc_mutex_t     lock_;
+    int             refCount_;
+    Upnp_FunPtr     callback_;
+    void*           cookie_;
+};
+
 class MediaServer
 {
 public:
-    MediaServer( const char* psz_url, access_t* p_access );
+    MediaServer( access_t* p_access );
     ~MediaServer();
     input_item_t* getNextItem();
 
@@ -134,9 +151,11 @@ private:
 
     IXML_Document* _browseAction(const char*, const char*,
             const char*, const char*, const char* );
+    static int sendActionCb( Upnp_EventType, void *, void *);
 
 private:
-    const std::string url_;
+    char* psz_root_;
+    char* psz_objectId_;
     access_t* access_;
     IXML_Document* xmlDocument_;
     IXML_NodeList* containerNodeList_;
