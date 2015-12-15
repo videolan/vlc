@@ -1047,6 +1047,7 @@ bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *p_sps,
 }
 
 static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
+                                                  uint8_t i_nal_type,
                                                   const hevc_sequence_parameter_set_t **pp_sps,
                                                   const hevc_picture_parameter_set_t **pp_pps,
                                                   hevc_slice_segment_header_t *p_sl )
@@ -1055,7 +1056,8 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
         return false;
 
     p_sl->first_slice_segment_in_pic_flag = bs_read1( p_bs );
-    p_sl->no_output_of_prior_pics_flag = bs_read1( p_bs );
+    if( i_nal_type >= HEVC_NAL_BLA_W_LP && i_nal_type <= HEVC_NAL_IRAP_VCL23 )
+        p_sl->no_output_of_prior_pics_flag = bs_read1( p_bs );
     p_sl->slice_pic_parameter_set_id = bs_read_ue( p_bs );
     if( p_sl->slice_pic_parameter_set_id >= HEVC_PPS_MAX || bs_remain( p_bs ) < 1 )
         return false;
@@ -1070,7 +1072,7 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
             p_sl->dependent_slice_segment_flag = bs_read1( p_bs );
 
         const hevc_sequence_parameter_set_t *p_sps = pp_sps[p_pps->pps_seq_parameter_set_id];
-        if( p_sps )
+        if( !p_sps )
             return false;
 
         unsigned w, h;
@@ -1082,8 +1084,21 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
 
     if( !p_sl->dependent_slice_segment_flag )
     {
-        if( p_pps->num_extra_slice_header_bits )
-           (void) bs_read( p_bs, p_pps->num_extra_slice_header_bits );
+        unsigned i=0;
+        if( p_pps->num_extra_slice_header_bits > i )
+        {
+            i++;
+            bs_skip( p_bs, 1 ); /* discardable_flag */
+        }
+
+        if( p_pps->num_extra_slice_header_bits > i )
+        {
+            i++;
+            bs_skip( p_bs, 1 ); /* cross_layer_bla_flag */
+        }
+
+        if( i < p_pps->num_extra_slice_header_bits )
+           bs_skip( p_bs, p_pps->num_extra_slice_header_bits - i );
 
         p_sl->slice_type = bs_read_ue( p_bs );
         if( p_sl->slice_type > HEVC_SLICE_TYPE_I )
@@ -1114,10 +1129,11 @@ hevc_slice_segment_header_t * hevc_rbsp_decode_slice_header( const uint8_t *p_bu
     hevc_slice_segment_header_t *p_sh = calloc(1, sizeof(hevc_slice_segment_header_t));
     if(likely(p_sh))
     {
+        uint8_t i_nal_type = ((p_buf[0] & 0x7E) >> 1);
         bs_t bs;
         bs_init( &bs, p_buf, i_buf );
         bs_skip( &bs, 16 ); /* Skip nal_unit_header */
-        if( !hevc_parse_slice_segment_header_rbsp( &bs, pp_sps, pp_pps, p_sh ) )
+        if( !hevc_parse_slice_segment_header_rbsp( &bs, i_nal_type, pp_sps, pp_pps, p_sh ) )
         {
             hevc_rbsp_release_slice_header( p_sh );
             p_sh = NULL;
