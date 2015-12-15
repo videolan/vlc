@@ -84,6 +84,63 @@ typedef struct
     unsigned num_delta_pocs;
 } hevc_short_term_ref_pic_set_t;
 
+typedef struct
+{
+    nal_u1_t aspect_ratio_info_present_flag;
+    struct
+    {
+        nal_u8_t aspect_ratio_idc;
+        uint16_t sar_width;
+        uint16_t sar_height;
+    } ar;
+    nal_u1_t overscan_info_present_flag;
+    nal_u1_t overscan_appropriate_flag;
+
+    nal_u1_t video_signal_type_present_flag;
+    struct
+    {
+        nal_u3_t video_format;
+        nal_u1_t video_full_range_flag;
+        nal_u1_t colour_description_present_flag;
+        struct
+        {
+            nal_u8_t colour_primaries;
+            nal_u8_t transfer_characteristics;
+            nal_u8_t matrix_coeffs;
+        } colour;
+    } vs;
+
+    nal_u1_t chroma_loc_info_present_flag;
+    struct
+    {
+        nal_ue_t sample_loc_type_top_field;
+        nal_ue_t sample_loc_type_bottom_field;
+    } chroma;
+
+    nal_u1_t neutral_chroma_indication_flag;
+    nal_u1_t field_seq_flag;
+    nal_u1_t frame_field_info_present_flag;
+
+    nal_u1_t default_display_window_flag;
+    struct
+    {
+        nal_ue_t win_left_offset;
+        nal_ue_t win_right_offset;
+        nal_ue_t win_top_offset;
+        nal_ue_t win_bottom_offset;
+    } def_disp;
+
+    nal_u1_t vui_timing_info_present_flag;
+    struct
+    {
+        uint32_t vui_num_units_in_tick;
+        uint32_t vui_time_scale;
+        /* incomplete */
+    } timing;
+
+    /* incomplete */
+} hevc_vui_parameters_t;
+
 struct hevc_video_parameter_set_t
 {
     nal_u4_t vps_video_parameter_set_id;
@@ -337,6 +394,77 @@ static bool hevc_parse_scaling_list_rbsp( bs_t *p_bs )
             }
         }
     }
+
+    return true;
+}
+
+static bool hevc_parse_vui_parameters_rbsp( bs_t *p_bs, hevc_vui_parameters_t *p_vui )
+{
+    if( bs_remain( p_bs ) < 10 )
+        return false;
+
+    p_vui->aspect_ratio_info_present_flag = bs_read1( p_bs );
+    if( p_vui->aspect_ratio_info_present_flag )
+    {
+        p_vui->ar.aspect_ratio_idc = bs_read( p_bs, 8 );
+        if( p_vui->ar.aspect_ratio_idc == 0xFF ) //HEVC_SAR__IDC_EXTENDED_SAR )
+        {
+            p_vui->ar.sar_width = bs_read( p_bs, 16 );
+            p_vui->ar.sar_height = bs_read( p_bs, 16 );
+        }
+    }
+
+    p_vui->overscan_info_present_flag = bs_read1( p_bs );
+    if( p_vui->overscan_info_present_flag )
+        p_vui->overscan_appropriate_flag = bs_read1( p_bs );
+
+    p_vui->video_signal_type_present_flag = bs_read1( p_bs );
+    if( p_vui->video_signal_type_present_flag )
+    {
+        p_vui->vs.video_format = bs_read( p_bs, 3 );
+        p_vui->vs.video_full_range_flag = bs_read1( p_bs );
+        p_vui->vs.colour_description_present_flag = bs_read1( p_bs );
+        if( p_vui->vs.colour_description_present_flag )
+        {
+            p_vui->vs.colour.colour_primaries = bs_read( p_bs, 8 );
+            p_vui->vs.colour.transfer_characteristics = bs_read( p_bs, 8 );
+            p_vui->vs.colour.matrix_coeffs = bs_read( p_bs, 8 );
+        }
+    }
+
+    p_vui->chroma_loc_info_present_flag = bs_read1( p_bs );
+    if( p_vui->chroma_loc_info_present_flag )
+    {
+        p_vui->chroma.sample_loc_type_top_field = bs_read_ue( p_bs );
+        p_vui->chroma.sample_loc_type_bottom_field = bs_read_ue( p_bs );
+    }
+
+    p_vui->neutral_chroma_indication_flag = bs_read1( p_bs );
+    p_vui->field_seq_flag = bs_read1( p_bs );
+    p_vui->frame_field_info_present_flag = bs_read1( p_bs );
+
+    p_vui->default_display_window_flag = bs_read1( p_bs );
+    if( p_vui->default_display_window_flag )
+    {
+        p_vui->def_disp.win_left_offset = bs_read_ue( p_bs );
+        p_vui->def_disp.win_right_offset = bs_read_ue( p_bs );
+        p_vui->def_disp.win_top_offset = bs_read_ue( p_bs );
+        p_vui->def_disp.win_bottom_offset = bs_read_ue( p_bs );
+    }
+
+    p_vui->vui_timing_info_present_flag = bs_read1( p_bs );
+    if( p_vui->vui_timing_info_present_flag )
+    {
+        p_vui->timing.vui_num_units_in_tick =  bs_read( p_bs, 32 );
+        p_vui->timing.vui_time_scale =  bs_read( p_bs, 32 );
+
+        if( bs_remain( p_bs ) < 3 )
+            return false;
+    }
+    /* incomplete */
+
+    if( bs_remain( p_bs ) < 1 ) /* late fail */
+        return false;
 
     return true;
 }
