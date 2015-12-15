@@ -1141,3 +1141,13 @@ hevc_slice_segment_header_t * hevc_rbsp_decode_slice_header( const uint8_t *p_bu
     }
     return p_sh;
 }
+
+bool hevc_get_slice_type( const hevc_slice_segment_header_t *p_sli, enum hevc_slice_type_e *pi_type )
+{
+    if( !p_sli->dependent_slice_segment_flag )
+    {
+        *pi_type = p_sli->slice_type;
+        return true;
+    }
+    return false;
+}

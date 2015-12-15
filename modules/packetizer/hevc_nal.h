@@ -163,5 +163,6 @@ bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *, unsigned *p_w
 bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *,
                           const hevc_video_parameter_set_t ** /* HEVC_MAX_VPS || NULL */,
                           unsigned *pi_num, unsigned *pi_den );
+bool hevc_get_slice_type( const hevc_slice_segment_header_t *, enum hevc_slice_type_e * );
 
 #endif /* HEVC_NAL_H */
