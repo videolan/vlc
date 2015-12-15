@@ -40,6 +40,10 @@ typedef struct bs_s
 
     ssize_t  i_left;    /* i_count number of available bits */
     bool     b_read_only;
+
+     /* forward read modifier (p_start, p_end, p_fwpriv, count) */
+    uint8_t *(*pf_forward)(uint8_t *, uint8_t *, void *, size_t);
+    void    *p_fwpriv;
 } bs_t;
 
 static inline void bs_write_init( bs_t *s, void *p_data, size_t i_data )
@@ -49,6 +53,7 @@ static inline void bs_write_init( bs_t *s, void *p_data, size_t i_data )
     s->p_end   = s->p_start + i_data;
     s->i_left  = 8;
     s->b_read_only = false;
+    s->pf_forward = s->p_fwpriv = NULL;
 }
 
 static inline void bs_init( bs_t *s, const void *p_data, size_t i_data )
@@ -74,6 +79,9 @@ static inline int bs_eof( const bs_t *s )
 {
     return( s->p >= s->p_end ? 1: 0 );
 }
+
+#define bs_forward( s, i ) \
+    s->p = s->pf_forward ? s->pf_forward( s->p, s->p_end, s->p_fwpriv, i ) : s->p + i
 
 static inline uint32_t bs_read( bs_t *s, int i_count )
 {
@@ -104,7 +112,7 @@ static inline uint32_t bs_read( bs_t *s, int i_count )
             s->i_left -= i_count;
             if( s->i_left == 0 )
             {
-                s->p++;
+                bs_forward( s, 1 );
                 s->i_left = 8;
             }
             return( i_result );
@@ -114,7 +122,7 @@ static inline uint32_t bs_read( bs_t *s, int i_count )
             /* less in the buffer than requested */
            i_result |= (*s->p&i_mask[s->i_left]) << -i_shr;
            i_count  -= s->i_left;
-           s->p++;
+           bs_forward( s, 1);
            s->i_left = 8;
         }
     }
@@ -132,7 +140,7 @@ static inline uint32_t bs_read1( bs_t *s )
         i_result = ( *s->p >> s->i_left )&0x01;
         if( s->i_left == 0 )
         {
-            s->p++;
+            bs_forward( s, 1 );
             s->i_left = 8;
         }
         return i_result;
@@ -155,7 +163,7 @@ static inline void bs_skip( bs_t *s, ssize_t i_count )
     {
         const int i_bytes = ( -s->i_left + 8 ) / 8;
 
-        s->p += i_bytes;
+        bs_forward( s, i_bytes );
         s->i_left += 8 * i_bytes;
     }
 }
@@ -185,7 +193,7 @@ static inline void bs_write( bs_t *s, int i_count, uint32_t i_bits )
         s->i_left--;
         if( s->i_left == 0 )
         {
-            s->p++;
+            bs_forward( s, 1 );
             s->i_left = 8;
         }
     }
@@ -234,5 +242,7 @@ static inline int32_t bs_read_se( bs_t *s )
 
     return val&0x01 ? (val+1)/2 : -(val/2);
 }
+
+#undef bs_forward
 
 #endif
