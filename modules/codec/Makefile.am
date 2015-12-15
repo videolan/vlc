@@ -274,7 +274,7 @@ codec_LTLIBRARIES += $(LTLIBdaala)
 libtremor_plugin_la_SOURCES = codec/vorbis.c
 libtremor_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_tremor
 libtremor_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libtremor_plugin_la_LIBADD = -lvorbisdec -logg
+libtremor_plugin_la_LIBADD = -lvorbisidec -logg
 EXTRA_LTLIBRARIES += libtremor_plugin.la
 codec_LTLIBRARIES += $(LTLIBtremor)
 
