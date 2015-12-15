@@ -76,6 +76,14 @@ typedef struct
     nal_u8_t sub_layer_level_idc[HEVC_MAX_SUBLAYERS];
 } hevc_profile_tier_level_t;
 
+#define HEVC_MAX_SHORT_TERM_REF_PIC_SET 65
+#define HEVC_MAX_LONG_TERM_REF_PIC_SET 33
+
+typedef struct
+{
+    unsigned num_delta_pocs;
+} hevc_short_term_ref_pic_set_t;
+
 struct hevc_video_parameter_set_t
 {
     nal_u4_t vps_video_parameter_set_id;
@@ -513,6 +521,55 @@ hevc_video_parameter_set_t * hevc_rbsp_decode_vps( const uint8_t *p_buf, size_t 
         }
     }
     return p_vps;
+}
+
+static bool hevc_parse_st_ref_pic_set( bs_t *p_bs, unsigned idx,
+                                       unsigned num_short_term_ref_pic_sets,
+                                       hevc_short_term_ref_pic_set_t *p_sets )
+{
+    if( idx && bs_read1( p_bs ) ) /* Interref pic set prediction flag */
+    {
+        nal_ue_t delta_idx_minus_1 = 0;
+        if( idx == num_short_term_ref_pic_sets )
+        {
+            delta_idx_minus_1 = bs_read_ue( p_bs );
+            if( delta_idx_minus_1 >= idx )
+                return false;
+        }
+        if(delta_idx_minus_1 == idx)
+            return false;
+
+        nal_u1_t delta_rps_sign = bs_read1( p_bs );
+        nal_ue_t abs_delta_rps_minus1 = bs_read_ue( p_bs );
+        unsigned RefRpsIdx = idx - delta_idx_minus_1 - 1;
+        int deltaRps = ( 1 - ( delta_rps_sign << 1 ) ) * ( abs_delta_rps_minus1 + 1 );
+        VLC_UNUSED(deltaRps);
+
+        unsigned numDeltaPocs = p_sets[RefRpsIdx].num_delta_pocs;
+        for( unsigned j=0; j<= numDeltaPocs; j++ )
+        {
+            if( !bs_read1( p_bs ) ) /* used_by_curr_pic_flag */
+                (void) bs_read1( p_bs ); /* use_delta_flag */
+        }
+    }
+    else
+    {
+        nal_ue_t num_negative_pics = bs_read_ue( p_bs );
+        nal_ue_t num_positive_pics = bs_read_ue( p_bs );
+        for(unsigned int i=0; i<num_negative_pics; i++)
+        {
+            (void) bs_read_ue( p_bs ); /* delta_poc_s0_minus1 */
+            (void) bs_read1( p_bs ); /* used_by_current_pic_s0_flag */
+        }
+        for(unsigned int i=0; i<num_positive_pics; i++)
+        {
+            (void) bs_read_ue( p_bs ); /* delta_poc_s1_minus1 */
+            (void) bs_read1( p_bs ); /* used_by_current_pic_s1_flag */
+        }
+        p_sets[idx].num_delta_pocs = num_positive_pics + num_negative_pics;
+    }
+
+    return true;
 }
 
 static bool hevc_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
