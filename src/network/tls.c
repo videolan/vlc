@@ -131,22 +131,26 @@ void vlc_tls_Delete (vlc_tls_creds_t *crd)
 vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
                                   const char *host, const char *const *alpn)
 {
-    vlc_tls_t *session = vlc_custom_create (crd->p_parent, sizeof (*session),
-                                            "tls session");
+    vlc_tls_t *session = malloc(sizeof (*session));
+    if (unlikely(session == NULL))
+        return NULL;
+
+    session->obj = crd->p_parent;
+    session->fd = fd;
+
     int val = crd->open (crd, session, fd, host, alpn);
     if (val != VLC_SUCCESS)
     {
-        vlc_object_release (session);
-        return NULL;
+        free(session);
+        session= NULL;
     }
-    session->fd = fd;
     return session;
 }
 
 void vlc_tls_SessionDelete (vlc_tls_t *session)
 {
     session->close (session);
-    vlc_object_release (session);
+    free(session);
 }
 
 static void cleanup_tls(void *data)
@@ -182,7 +186,7 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
     {
         if (val < 0)
         {
-            msg_Err (session, "TLS client session handshake error");
+            msg_Err(crd, "TLS session handshake error");
 error:
             vlc_tls_SessionDelete (session);
             session = NULL;
@@ -201,7 +205,7 @@ error:
         canc = vlc_savecancel();
         if (val == 0)
         {
-            msg_Err (session, "TLS client session handshake timeout");
+            msg_Err(crd, "TLS session handshake timeout");
             goto error;
         }
     }

@@ -98,7 +98,7 @@ static void gnutls_Deinit (void)
 }
 #endif
 
-static int gnutls_Error (vlc_object_t *obj, int val)
+static int gnutls_Error(vlc_tls_t *tls, int val)
 {
     switch (val)
     {
@@ -117,10 +117,10 @@ static int gnutls_Error (vlc_object_t *obj, int val)
             break;
 
         default:
-            msg_Err (obj, "%s", gnutls_strerror (val));
+            msg_Err(tls->obj, "%s", gnutls_strerror (val));
 #ifndef NDEBUG
             if (!gnutls_error_is_fatal (val))
-                msg_Err (obj, "Error above should be handled");
+                msg_Err(tls->obj, "Error above should be handled");
 #endif
 #ifdef _WIN32
             WSASetLastError (WSAECONNRESET);
@@ -129,7 +129,6 @@ static int gnutls_Error (vlc_object_t *obj, int val)
     }
     return -1;
 }
-#define gnutls_Error(o, val) gnutls_Error(VLC_OBJECT(o), val)
 
 #ifdef IOV_MAX
 static ssize_t vlc_gnutls_writev (gnutls_transport_ptr_t ptr,
@@ -197,9 +196,9 @@ static void gnutls_Close (vlc_tls_t *tls)
     gnutls_deinit (session);
 }
 
-static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
-                               gnutls_certificate_credentials_t x509, int fd,
-                               const char *const *alpn)
+static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
+                              gnutls_certificate_credentials_t x509, int fd,
+                              const char *const *alpn)
 {
     gnutls_session_t session;
     const char *errp;
@@ -208,19 +207,19 @@ static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
     val = gnutls_init (&session, type);
     if (val != 0)
     {
-        msg_Err (tls, "cannot initialize TLS session: %s",
-                 gnutls_strerror (val));
+        msg_Err(creds, "cannot initialize TLS session: %s",
+                gnutls_strerror(val));
         return VLC_EGENERIC;
     }
 
-    char *priorities = var_InheritString (tls, "gnutls-priorities");
+    char *priorities = var_InheritString(creds, "gnutls-priorities");
     if (unlikely(priorities == NULL))
         goto error;
 
     val = gnutls_priority_set_direct (session, priorities, &errp);
     if (val < 0)
-        msg_Err (tls, "cannot set TLS priorities \"%s\": %s", errp,
-                 gnutls_strerror (val));
+        msg_Err(creds, "cannot set TLS priorities \"%s\": %s", errp,
+                gnutls_strerror(val));
     free (priorities);
     if (val < 0)
         goto error;
@@ -228,8 +227,8 @@ static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
     val = gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509);
     if (val < 0)
     {
-        msg_Err (tls, "cannot set TLS session credentials: %s",
-                 gnutls_strerror (val));
+        msg_Err(creds, "cannot set TLS session credentials: %s",
+                gnutls_strerror(val));
         goto error;
     }
 
@@ -280,7 +279,8 @@ error:
  * 1 if more would-be blocking recv is needed,
  * 2 if more would-be blocking send is required.
  */
-static int gnutls_ContinueHandshake (vlc_tls_t *tls, char **restrict alp)
+static int gnutls_ContinueHandshake(vlc_tls_creds_t *crd, vlc_tls_t *tls,
+                                    char **restrict alp)
 {
     gnutls_session_t session = tls->sys;
     int val;
@@ -291,7 +291,7 @@ static int gnutls_ContinueHandshake (vlc_tls_t *tls, char **restrict alp)
     do
     {
         val = gnutls_handshake (session);
-        msg_Dbg (tls, "TLS handshake: %s", gnutls_strerror (val));
+        msg_Dbg(crd, "TLS handshake: %s", gnutls_strerror (val));
 
         switch (val)
         {
@@ -306,9 +306,9 @@ static int gnutls_ContinueHandshake (vlc_tls_t *tls, char **restrict alp)
     while (!gnutls_error_is_fatal (val));
 
 #ifdef _WIN32
-    msg_Dbg (tls, "Winsock error %d", WSAGetLastError ());
+    msg_Dbg(crd, "Winsock error %d", WSAGetLastError ());
 #endif
-    msg_Err (tls, "TLS handshake error: %s", gnutls_strerror (val));
+    msg_Err(crd, "TLS handshake error: %s", gnutls_strerror (val));
     return -1;
 
 done:
@@ -336,7 +336,7 @@ static int gnutls_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
                                      int fd, const char *hostname,
                                      const char *const *alpn)
 {
-    int val = gnutls_SessionOpen (tls, GNUTLS_CLIENT, crd->sys, fd, alpn);
+    int val = gnutls_SessionOpen(crd, tls, GNUTLS_CLIENT, crd->sys, fd, alpn);
     if (val != VLC_SUCCESS)
         return val;
 
@@ -357,7 +357,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
                                   const char *host, const char *service,
                                   char **restrict alp)
 {
-    int val = gnutls_ContinueHandshake (tls, alp);
+    int val = gnutls_ContinueHandshake(creds, tls, alp);
     if (val)
         return val;
 
@@ -368,8 +368,8 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
     val = gnutls_certificate_verify_peers3 (session, host, &status);
     if (val)
     {
-        msg_Err (tls, "Certificate verification error: %s",
-                 gnutls_strerror (val));
+        msg_Err(creds, "Certificate verification error: %s",
+                gnutls_strerror(val));
         return -1;
     }
 
@@ -382,7 +382,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
     if (gnutls_certificate_verification_status_print(status,
                          gnutls_certificate_type_get (session), &desc, 0) == 0)
     {
-        msg_Err (tls, "Certificate verification failure: %s", desc.data);
+        msg_Err(creds, "Certificate verification failure: %s", desc.data);
         gnutls_free (desc.data);
     }
 
@@ -400,44 +400,44 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
     datum = gnutls_certificate_get_peers (session, &count);
     if (datum == NULL || count == 0)
     {
-        msg_Err (tls, "Peer certificate not available");
+        msg_Err(creds, "Peer certificate not available");
         return -1;
     }
 
-    msg_Dbg (tls, "%u certificate(s) in the list", count);
+    msg_Dbg(creds, "%u certificate(s) in the list", count);
     val = gnutls_verify_stored_pubkey (NULL, NULL, host, service,
                                        GNUTLS_CRT_X509, datum, 0);
     const char *msg;
     switch (val)
     {
         case 0:
-            msg_Dbg (tls, "certificate key match for %s", host);
+            msg_Dbg(creds, "certificate key match for %s", host);
             return 0;
         case GNUTLS_E_NO_CERTIFICATE_FOUND:
-            msg_Dbg (tls, "no known certificates for %s", host);
+            msg_Dbg(creds, "no known certificates for %s", host);
             msg = N_("However the security certificate presented by the "
                 "server is unknown and could not be authenticated by any "
                 "trusted Certificate Authority.");
             break;
         case GNUTLS_E_CERTIFICATE_KEY_MISMATCH:
-            msg_Dbg (tls, "certificate keys mismatch for %s", host);
+            msg_Dbg(creds, "certificate keys mismatch for %s", host);
             msg = N_("However the security certificate presented by the "
                 "server changed since the previous visit and was not "
                 "authenticated by any trusted Certificate Authority. ");
             break;
         default:
-            msg_Err (tls, "certificate key match error for %s: %s", host,
-                     gnutls_strerror (val));
+            msg_Err(creds, "certificate key match error for %s: %s", host,
+                    gnutls_strerror(val));
             return -1;
     }
 
-    if (dialog_Question (tls, _("Insecure site"),
+    if (dialog_Question(creds, _("Insecure site"),
         _("You attempted to reach %s. %s\n"
           "This problem may be stem from an attempt to breach your security, "
           "compromise your privacy, or a configuration error.\n\n"
           "If in doubt, abort now.\n"),
-                         _("Abort"), _("View certificate"), NULL,
-                         vlc_gettext (msg), host) != 2)
+                        _("Abort"), _("View certificate"), NULL,
+                        vlc_gettext(msg), host) != 2)
         return -1;
 
     gnutls_x509_crt_t cert;
@@ -452,11 +452,11 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
     }
     gnutls_x509_crt_deinit (cert);
 
-    val = dialog_Question (tls, _("Insecure site"),
+    val = dialog_Question(creds, _("Insecure site"),
          _("This is the certificate presented by %s:\n%s\n\n"
            "If in doubt, abort now.\n"),
-                           _("Abort"), _("Accept 24 hours"),
-                           _("Accept permanently"), host, desc.data);
+                          _("Abort"), _("Accept 24 hours"),
+                          _("Accept permanently"), host, desc.data);
     gnutls_free (desc.data);
 
     time_t expiry = 0;
@@ -469,7 +469,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
             val = gnutls_store_pubkey (NULL, NULL, host, service,
                                        GNUTLS_CRT_X509, datum, expiry, 0);
             if (val)
-                msg_Err (tls, "cannot store X.509 certificate: %s",
+                msg_Err(creds, "cannot store X.509 certificate: %s",
                          gnutls_strerror (val));
             return 0;
     }
@@ -540,7 +540,8 @@ static int gnutls_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
     vlc_tls_creds_sys_t *sys = crd->sys;
 
     assert (hostname == NULL);
-    return gnutls_SessionOpen (tls, GNUTLS_SERVER, sys->x509_cred, fd, alpn);
+    return gnutls_SessionOpen(crd, tls, GNUTLS_SERVER, sys->x509_cred, fd,
+                              alpn);
 }
 
 static int gnutls_ServerHandshake(vlc_tls_creds_t *crd, vlc_tls_t *tls,
@@ -548,7 +549,7 @@ static int gnutls_ServerHandshake(vlc_tls_creds_t *crd, vlc_tls_t *tls,
                                   char **restrict alp)
 {
     (void) host; (void) service;
-    return gnutls_ContinueHandshake (tls, alp);
+    return gnutls_ContinueHandshake(crd, tls, alp);
 }
 
 /**

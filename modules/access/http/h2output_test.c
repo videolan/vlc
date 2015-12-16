@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <vlc_common.h>
+#include <vlc_tls.h>
 #include "h2frame.h"
 #include "h2output.h"
 #include "transport.h"
@@ -40,12 +41,14 @@ static bool send_failure = false;
 static bool expect_hello = true;
 static vlc_sem_t rx;
 
+static vlc_tls_t fake_tls;
+
 /* Callback for sent frames */
 ssize_t vlc_https_send(struct vlc_tls *tls, const void *buf, size_t len)
 {
     const uint8_t *p = buf;
 
-    assert(tls == NULL);
+    assert(tls == &fake_tls);
 
     if (expect_hello)
     {
@@ -99,19 +102,19 @@ int main(void)
     struct vlc_h2_output *out;
 
     /* Dummy */
-    out = vlc_h2_output_create(NULL, false);
+    out = vlc_h2_output_create(&fake_tls, false);
     assert(out != NULL);
     vlc_h2_output_destroy(out);
 
     vlc_sem_init(&rx, 0);
-    out = vlc_h2_output_create(NULL, expect_hello = true);
+    out = vlc_h2_output_create(&fake_tls, expect_hello = true);
     assert(out != NULL);
     vlc_h2_output_destroy(out);
     vlc_sem_destroy(&rx);
 
     /* Success */
     vlc_sem_init(&rx, 0);
-    out = vlc_h2_output_create(NULL, false);
+    out = vlc_h2_output_create(&fake_tls, false);
     assert(out != NULL);
     assert(vlc_h2_output_send_prio(out, NULL) == -1);
     assert(vlc_h2_output_send_prio(out, frame(0)) == 0);
@@ -136,7 +139,7 @@ int main(void)
 
     vlc_sem_init(&rx, 0);
     counter = 10;
-    out = vlc_h2_output_create(NULL, false);
+    out = vlc_h2_output_create(&fake_tls, false);
     assert(out != NULL);
 
     assert(vlc_h2_output_send(out, frame(10)) == 0);
@@ -150,7 +153,7 @@ int main(void)
     /* Failure during hello */
     vlc_sem_init(&rx, 0);
     counter = 0;
-    out = vlc_h2_output_create(NULL, expect_hello = true);
+    out = vlc_h2_output_create(&fake_tls, expect_hello = true);
     assert(out != NULL);
     vlc_sem_wait(&rx);
 

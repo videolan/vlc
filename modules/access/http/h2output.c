@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <vlc_common.h>
+#include <vlc_tls.h>
 #include "h2frame.h"
 #include "h2output.h"
 #include "transport.h"
@@ -205,7 +206,7 @@ static void *vlc_h2_output_thread(void *data)
     do
     {
         frame = vlc_h2_output_dequeue(out);
-        vlc_h2_frame_dump((vlc_object_t *)(out->tls), frame, "out");
+        vlc_h2_frame_dump(out->tls->obj, frame, "out");
     }
     while (vlc_h2_frame_send(out->tls, frame) == 0);
 

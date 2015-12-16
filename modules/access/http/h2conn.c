@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include <vlc_interrupt.h>
+#include <vlc_tls.h>
 
 #include "h2frame.h"
 #include "h2output.h"
@@ -35,7 +36,7 @@
 #include "transport.h"
 #include "message.h"
 
-#define CO(c) ((vlc_object_t *)((c)->tls))
+#define CO(c) ((c)->tls->obj)
 #define SO(s) CO((s)->conn)
 
 /** HTTP/2 connection */

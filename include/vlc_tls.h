@@ -38,8 +38,7 @@ typedef struct vlc_tls_creds vlc_tls_creds_t;
 /** TLS session */
 struct vlc_tls
 {
-    VLC_COMMON_MEMBERS
-
+    vlc_object_t *obj;
     void *sys;
     int fd;
 

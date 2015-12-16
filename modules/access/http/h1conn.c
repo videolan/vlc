@@ -117,13 +117,13 @@ struct vlc_h1_conn
     bool released;
 };
 
-#define CO(conn) ((vlc_object_t *)((conn)->tls))
+#define CO(conn) ((conn)->tls->obj)
 
 static void vlc_h1_conn_destroy(struct vlc_h1_conn *conn);
 
 static void *vlc_h1_stream_fatal(struct vlc_h1_conn *conn)
 {
-    msg_Dbg(conn->tls, "connection failed");
+    msg_Dbg(CO(conn), "connection failed");
     vlc_https_disconnect(conn->tls);
     conn->tls = NULL;
     return NULL;

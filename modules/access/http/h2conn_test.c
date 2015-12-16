@@ -36,6 +36,7 @@
 
 #include <vlc_common.h>
 #include <vlc_block.h>
+#include <vlc_tls.h>
 #include "h2frame.h"
 #include "h2conn.h"
 #include "message.h"
@@ -44,22 +45,24 @@
 /* I/O callbacks */
 static int internal_fd = -1;
 
+static vlc_tls_t fake_tls;
+
 ssize_t vlc_https_send(struct vlc_tls *tls, const void *buf, size_t len)
 {
-    assert(tls == NULL);
+    assert(tls == &fake_tls);
     (void) buf;
     return len;
 }
 
 ssize_t vlc_https_recv(struct vlc_tls *tls, void *buf, size_t size)
 {
-    assert(tls == NULL);
+    assert(tls == &fake_tls);
     return read(internal_fd, buf, size);
 }
 
 void vlc_https_disconnect(struct vlc_tls *tls)
 {
-    assert(tls == NULL);
+    assert(tls == &fake_tls);
     if (close(internal_fd))
         assert(!"close");
 }
@@ -87,7 +90,7 @@ static void conn_create(void)
     external_fd = fds[0];
     internal_fd = fds[1];
 
-    conn = vlc_h2_conn_create(NULL);
+    conn = vlc_h2_conn_create(&fake_tls);
     assert(conn != NULL);
     conn_send(vlc_h2_frame_settings());
 }
