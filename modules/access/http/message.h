@@ -75,6 +75,24 @@ int vlc_http_msg_add_agent(struct vlc_http_msg *m, const char *str);
 const char *vlc_http_msg_get_agent(const struct vlc_http_msg *m);
 
 /**
+ * Parses a timestamp header.
+ *
+ * @param name header field name
+ * @return a timestamp value, or -1 on error.
+ */
+time_t vlc_http_msg_get_time(const struct vlc_http_msg *m, const char *name);
+
+/**
+ * Adds a timestamp header.
+ *
+ * @param name header field name
+ * @param t pointer to timestamp
+ * @return 0 on success, -1 on error (errno is set accordingly)
+ */
+int vlc_http_msg_add_time(struct vlc_http_msg *m, const char *name,
+                          const time_t *t);
+
+/**
  * Adds a Date header.
  */
 int vlc_http_msg_add_atime(struct vlc_http_msg *m);

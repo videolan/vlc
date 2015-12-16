@@ -210,6 +210,8 @@ int main(void)
     assert(vlc_http_msg_add_atime(m) == 0);
     time_t t = vlc_http_msg_get_atime(m);
     assert(t != (time_t)-1);
+    assert(vlc_http_msg_add_time(m, "Last-Modified", &t) == 0);
+    assert(t == vlc_http_msg_get_mtime(m));
 
     vlc_http_msg_add_header(m, "Content-Length", "1234");
     assert(vlc_http_msg_get_size(m) == 1234);

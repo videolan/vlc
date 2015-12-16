@@ -605,27 +605,27 @@ static const char vlc_http_months[12][4] = {
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
-static int vlc_http_msg_add_time(struct vlc_http_msg *m, const char *hname,
-                                 const struct tm *restrict tm)
+int vlc_http_msg_add_time(struct vlc_http_msg *m, const char *hname,
+                          const time_t *t)
 {
+    struct tm tm;
+
+    if (gmtime_r(t, &tm) == NULL)
+        return -1;
     return vlc_http_msg_add_header(m, hname,
                                    "%s, %02d %s %04d %02d:%02d:%02d GMT",
-                                   vlc_http_days[tm->tm_wday], tm->tm_mday,
-                                   vlc_http_months[tm->tm_mon],
-                                   1900 + tm->tm_year,
-                                   tm->tm_hour, tm->tm_min, tm->tm_sec);
+                                   vlc_http_days[tm.tm_wday], tm.tm_mday,
+                                   vlc_http_months[tm.tm_mon],
+                                   1900 + tm.tm_year,
+                                   tm.tm_hour, tm.tm_min, tm.tm_sec);
 }
 
 int vlc_http_msg_add_atime(struct vlc_http_msg *m)
 {
-    struct tm tm;
     time_t now;
 
     time(&now);
-    if (gmtime_r(&now, &tm) == NULL)
-        return -1;
-
-    return vlc_http_msg_add_time(m, "Date", &tm);
+    return vlc_http_msg_add_time(m, "Date", &now);
 }
 
 static time_t vlc_http_mktime(const char *str)
@@ -658,16 +658,22 @@ error:
     return -1; /* invalid month */
 }
 
+time_t vlc_http_msg_get_time(const struct vlc_http_msg *m, const char *name)
+{
+    const char *str = vlc_http_msg_get_header(m, name);
+    if (str == NULL)
+        return -1;
+    return vlc_http_mktime(str);
+}
+
 time_t vlc_http_msg_get_atime(const struct vlc_http_msg *m)
 {
-    const char *str = vlc_http_msg_get_header(m, "Date");
-    return (str != NULL) ? vlc_http_mktime(str) : -1;
+    return vlc_http_msg_get_time(m, "Date");
 }
 
 time_t vlc_http_msg_get_mtime(const struct vlc_http_msg *m)
 {
-    const char *str = vlc_http_msg_get_header(m, "Last-Modified");
-    return (str != NULL) ? vlc_http_mktime(str) : -1;
+    return vlc_http_msg_get_time(m, "Last-Modified");
 }
 
 unsigned vlc_http_msg_get_retry_after(const struct vlc_http_msg *m)
