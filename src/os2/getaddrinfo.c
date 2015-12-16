@@ -32,42 +32,6 @@
 
 #include <arpa/inet.h>
 
-static const struct
-{
-    int        code;
-    const char msg[41];
-} gai_errlist[] =
-{
-    { 0,              "Error 0" },
-    { EAI_BADFLAGS,   "Invalid flag used" },
-    { EAI_NONAME,     "Host or service not found" },
-    { EAI_AGAIN,      "Temporary name service failure" },
-    { EAI_FAIL,       "Non-recoverable name service failure" },
-    { EAI_NODATA,     "No data for host name" },
-    { EAI_FAMILY,     "Unsupported address family" },
-    { EAI_SOCKTYPE,   "Unsupported socket type" },
-    { EAI_SERVICE,    "Incompatible service for socket type" },
-    { EAI_ADDRFAMILY, "Unavailable address family for host name" },
-    { EAI_MEMORY,     "Memory allocation failure" },
-    { EAI_OVERFLOW,   "Buffer overflow" },
-    { EAI_SYSTEM,     "System error" },
-    { 0,              "" },
-};
-
-static const char gai_unknownerr[] = "Unrecognized error number";
-
-/****************************************************************************
- * Converts an EAI_* error code into human readable english text.
- ****************************************************************************/
-const char *gai_strerror (int errnum)
-{
-    for (unsigned i = 0; *gai_errlist[i].msg; i++)
-        if (errnum == gai_errlist[i].code)
-            return gai_errlist[i].msg;
-
-    return gai_unknownerr;
-}
-
 #define _NI_MASK (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
                   NI_DGRAM)
 /*

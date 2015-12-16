@@ -290,6 +290,7 @@ case "${host_os}" in
     SYS=os2
     LDFLAGS="${LDFLAGS} -Zomf -Zbin-files -Zargs-wild -Zhigh-mem"
     AC_LIBOBJ([freeaddrinfo])
+    AC_LIBOBJ([gai_strerror])
     ;;
   *)
     SYS="${host_os}"
