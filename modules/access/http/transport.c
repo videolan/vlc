@@ -36,13 +36,6 @@
 
 #include "transport.h"
 
-/**
- * Receives TLS data.
- *
- * Receives bytes from the peer through a TLS session.
- * @note This may be a cancellation point.
- * The caller is responsible for serializing reads on a given connection.
- */
 ssize_t vlc_https_recv(vlc_tls_t *tls, void *buf, size_t len)
 {
     struct pollfd ufd;
@@ -99,11 +92,6 @@ ssize_t vlc_http_recv(int fd, void *buf, size_t len)
     return count;
 }
 
-/**
- * Sends bytes to a connection.
- * @note This may be a cancellation point.
- * The caller is responsible for serializing writes on a given connection.
- */
 ssize_t vlc_https_send(vlc_tls_t *tls, const void *buf, size_t len)
 {
     struct pollfd ufd;
