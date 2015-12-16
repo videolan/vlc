@@ -183,6 +183,20 @@ static ssize_t gnutls_Recv (vlc_tls_t *tls, void *buf, size_t length)
     return (val < 0) ? gnutls_Error (tls, val) : val;
 }
 
+/**
+ * Terminates a TLS session.
+ *
+ * This terminates a TLS session and releases session data.
+ * The underlying socket must be closed separately.
+ */
+static void gnutls_Close (vlc_tls_t *tls)
+{
+    gnutls_session_t session = tls->sys;
+
+    gnutls_bye (session, GNUTLS_SHUT_RDWR);
+    gnutls_deinit (session);
+}
+
 static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
                                gnutls_certificate_credentials_t x509, int fd,
                                const char *const *alpn)
@@ -251,6 +265,7 @@ static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
     tls->sys = session;
     tls->send = gnutls_Send;
     tls->recv = gnutls_Recv;
+    tls->close = gnutls_Close;
     return VLC_SUCCESS;
 
 error:
@@ -315,18 +330,6 @@ done:
             *alp = NULL;
     }
     return 0;
-}
-
-/**
- * Terminates TLS session and releases session data.
- * You still have to close the socket yourself.
- */
-static void gnutls_SessionClose (vlc_tls_t *tls)
-{
-    gnutls_session_t session = tls->sys;
-
-    gnutls_bye (session, GNUTLS_SHUT_RDWR);
-    gnutls_deinit (session);
 }
 
 static int gnutls_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
@@ -504,7 +507,6 @@ static int OpenClient (vlc_tls_creds_t *crd)
     crd->sys = x509;
     crd->open = gnutls_ClientSessionOpen;
     crd->handshake = gnutls_ClientHandshake;
-    crd->close = gnutls_SessionClose;
 
     return VLC_SUCCESS;
 }
@@ -638,7 +640,6 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
     crd->sys = sys;
     crd->open = gnutls_ServerSessionOpen;
     crd->handshake = gnutls_ServerHandshake;
-    crd->close = gnutls_SessionClose;
 
     return VLC_SUCCESS;
 

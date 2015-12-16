@@ -542,6 +542,7 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
     session->sys = sys;
     session->send = st_Send;
     session->recv = st_Recv;
+    session->close = st_SessionClose;
     crd->handshake = st_Handshake;
 
     SSLContextRef p_context = NULL;
@@ -635,7 +636,6 @@ static int OpenClient (vlc_tls_creds_t *crd) {
 
     crd->sys = sys;
     crd->open = st_ClientSessionOpen;
-    crd->close = st_SessionClose;
 
     return VLC_SUCCESS;
 }
@@ -792,7 +792,6 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key) 
 
     crd->sys = sys;
     crd->open = st_ServerSessionOpen;
-    crd->close = st_SessionClose;
 
 out:
     if (policy)

@@ -45,6 +45,7 @@ struct vlc_tls
 
     ssize_t (*recv)(struct vlc_tls *, void *, size_t);
     ssize_t (*send)(struct vlc_tls *, const void *, size_t);
+    void (*close)(vlc_tls_t *);
 };
 
 /**
@@ -95,7 +96,6 @@ struct vlc_tls_creds
                  const char *const *alpn);
     int  (*handshake) (vlc_tls_t *, const char *host, const char *service,
                        char ** /*restrict*/ alp);
-    void (*close) (vlc_tls_t *);
 };
 
 /**

@@ -153,9 +153,7 @@ int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host,
 
 void vlc_tls_SessionDelete (vlc_tls_t *session)
 {
-    vlc_tls_creds_t *crd = (vlc_tls_creds_t *)(session->p_parent);
-
-    crd->close (session);
+    session->close (session);
     vlc_object_release (session);
 }
 
