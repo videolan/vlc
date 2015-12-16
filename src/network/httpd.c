@@ -1665,9 +1665,9 @@ static void httpd_ClientSend(httpd_client_t *cl)
     }
 }
 
-static void httpd_ClientTlsHandshake(httpd_client_t *cl)
+static void httpd_ClientTlsHandshake(httpd_host_t *host, httpd_client_t *cl)
 {
-    switch (vlc_tls_SessionHandshake(cl->p_tls, NULL, NULL, NULL))
+    switch (vlc_tls_SessionHandshake(host->p_tls, cl->p_tls))
     {
         case -1: cl->i_state = HTTPD_CLIENT_DEAD;       break;
         case 0:  cl->i_state = HTTPD_CLIENT_RECEIVING;  break;
@@ -2021,7 +2021,9 @@ static void httpdLoop(httpd_host_t *host)
             case HTTPD_CLIENT_RECEIVING: httpd_ClientRecv(cl); break;
             case HTTPD_CLIENT_SENDING:   httpd_ClientSend(cl); break;
             case HTTPD_CLIENT_TLS_HS_IN:
-            case HTTPD_CLIENT_TLS_HS_OUT: httpd_ClientTlsHandshake(cl); break;
+            case HTTPD_CLIENT_TLS_HS_OUT:
+                httpd_ClientTlsHandshake(host, cl);
+                break;
         }
     }
 

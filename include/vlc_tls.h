@@ -73,8 +73,6 @@ VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *, int fd,
 
 vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *, int fd, const char *host,
                                   const char *const *alpn);
-int vlc_tls_SessionHandshake (vlc_tls_t *, const char *host, const char *serv,
-                              char ** /*restrict*/ alp);
 VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
 VLC_API int vlc_tls_Read(vlc_tls_t *, void *buf, size_t len, bool waitall);
@@ -118,6 +116,12 @@ VLC_API vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *);
  */
 vlc_tls_creds_t *vlc_tls_ServerCreate (vlc_object_t *,
                                        const char *cert, const char *key);
+
+static inline int vlc_tls_SessionHandshake (vlc_tls_creds_t *crd,
+                                            vlc_tls_t *tls)
+{
+    return crd->handshake (tls, NULL, NULL, NULL);
+}
 
 /**
  * Releases TLS credentials.
