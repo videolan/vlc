@@ -158,6 +158,9 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    if( p_sys->p_es )
+        es_out_Del( p_demux->out, p_sys->p_es );
+
     demux_PacketizerDestroy( p_sys->p_packetizer );
 
     for( unsigned i=0; i<HEVC_VPS_MAX; i++ )
