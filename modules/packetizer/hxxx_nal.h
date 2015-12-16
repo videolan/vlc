@@ -29,27 +29,30 @@
 static const uint8_t  annexb_startcode4[] = { 0x00, 0x00, 0x00, 0x01 };
 #define annexb_startcode3 (&annexb_startcode4[1])
 
+/* strips any AnnexB startcode [0] 0 0 1 */
 static inline bool hxxx_strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_data )
 {
+    unsigned bitflow = 0;
     const uint8_t *p_data = *pp_data;
-    if(*pi_data < 4 || p_data[0])
-        return false;
+    size_t i_data = *pi_data;
 
-    /* Skip 4 bytes startcode */
-    if( !memcmp(&p_data[1], &annexb_startcode4[1], 3) )
+    while( i_data && p_data[0] <= 1 )
     {
-        *pp_data += 4;
-        *pi_data -= 4;
+        bitflow = (bitflow << 1) | (!p_data[0]);
+        p_data++;
+        i_data--;
+        if( !(bitflow & 0x01) )
+        {
+            if( (bitflow & 0x06) == 0x06 ) /* there was at least 2 leading zeros */
+            {
+                *pi_data = i_data;
+                *pp_data = p_data;
+                return true;
+            }
+            return false;
+        }
     }
-    /* Skip 3 bytes startcode */
-    else if( !memcmp(&p_data[1], &annexb_startcode4[2], 2) )
-    {
-        *pp_data += 3;
-        *pi_data -= 3;
-    }
-    else
-        return false;
-    return true;
+    return false;
 }
 
 /* Discards emulation prevention three bytes */
