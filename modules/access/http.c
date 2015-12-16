@@ -653,19 +653,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
     if( i_read == 0 )
     {
-        /*
-         * I very much doubt that this will work.
-         * If i_read == 0, the connection *IS* dead, so the only
-         * sensible thing to do is Disconnect() and then retry.
-         * Otherwise, I got recv() completely wrong. -- Courmisch
-         */
-        if( p_sys->b_continuous )
-        {
-            Request( p_access, 0 );
-            p_sys->b_continuous = false;
-            i_read = Read( p_access, p_buffer, i_len );
-            p_sys->b_continuous = true;
-        }
         Disconnect( p_access );
         if( p_sys->b_reconnect )
         {
