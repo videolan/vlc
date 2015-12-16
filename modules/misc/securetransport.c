@@ -378,8 +378,9 @@ out:
  * 1 if more would-be blocking recv is needed,
  * 2 if more would-be blocking send is required.
  */
-static int st_Handshake (vlc_tls_t *session, const char *host,
-                                        const char *service, char **restrict alp) {
+static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
+                         const char *host, const char *service,
+                         char **restrict alp) {
     VLC_UNUSED(service);
 
     vlc_tls_sys_t *sys = session->sys;

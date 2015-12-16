@@ -178,7 +178,7 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
     ufd[0].fd = fd;
 
     vlc_cleanup_push (cleanup_tls, session);
-    while ((val = crd->handshake (session, host, service, alp)) != 0)
+    while ((val = crd->handshake(crd, session, host, service, alp)) != 0)
     {
         if (val < 0)
         {

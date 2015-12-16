@@ -353,8 +353,9 @@ static int gnutls_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
     return VLC_SUCCESS;
 }
 
-static int gnutls_ClientHandshake (vlc_tls_t *tls, const char *host,
-                                   const char *service, char **restrict alp)
+static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
+                                  const char *host, const char *service,
+                                  char **restrict alp)
 {
     int val = gnutls_ContinueHandshake (tls, alp);
     if (val)
@@ -542,8 +543,9 @@ static int gnutls_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
     return gnutls_SessionOpen (tls, GNUTLS_SERVER, sys->x509_cred, fd, alpn);
 }
 
-static int gnutls_ServerHandshake (vlc_tls_t *tls, const char *host,
-                                   const char *service, char **restrict alp)
+static int gnutls_ServerHandshake(vlc_tls_creds_t *crd, vlc_tls_t *tls,
+                                  const char *host, const char *service,
+                                  char **restrict alp)
 {
     (void) host; (void) service;
     return gnutls_ContinueHandshake (tls, alp);

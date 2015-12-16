@@ -92,8 +92,8 @@ struct vlc_tls_creds
 
     int (*open) (vlc_tls_creds_t *, vlc_tls_t *, int fd, const char *host,
                  const char *const *alpn);
-    int  (*handshake) (vlc_tls_t *, const char *host, const char *service,
-                       char ** /*restrict*/ alp);
+    int  (*handshake)(vlc_tls_creds_t *, vlc_tls_t *, const char *host,
+                      const char *service, char ** /*restrict*/ alp);
 };
 
 /**
@@ -120,7 +120,7 @@ vlc_tls_creds_t *vlc_tls_ServerCreate (vlc_object_t *,
 static inline int vlc_tls_SessionHandshake (vlc_tls_creds_t *crd,
                                             vlc_tls_t *tls)
 {
-    return crd->handshake (tls, NULL, NULL, NULL);
+    return crd->handshake(crd, tls, NULL, NULL, NULL);
 }
 
 /**
