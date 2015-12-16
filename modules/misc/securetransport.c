@@ -422,9 +422,8 @@ static int st_Handshake (vlc_tls_t *session, const char *host,
 /**
  * Sends data through a TLS session.
  */
-static int st_Send (void *opaque, const void *buf, size_t length)
+static ssize_t st_Send (vlc_tls_t *session, const void *buf, size_t length)
 {
-    vlc_tls_t *session = opaque;
     vlc_tls_sys_t *sys = session->sys;
     OSStatus ret = noErr;
 
@@ -476,9 +475,8 @@ static int st_Send (void *opaque, const void *buf, size_t length)
 /**
  * Receives data through a TLS session.
  */
-static int st_Recv (void *opaque, void *buf, size_t length)
+static ssize_t st_Recv (vlc_tls_t *session, void *buf, size_t length)
 {
-    vlc_tls_t *session = opaque;
     vlc_tls_sys_t *sys = session->sys;
 
     size_t actualSize;
@@ -542,9 +540,8 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
     sys->p_context = NULL;
 
     session->sys = sys;
-    session->sock.p_sys = session;
-    session->sock.pf_send = st_Send;
-    session->sock.pf_recv = st_Recv;
+    session->send = st_Send;
+    session->recv = st_Recv;
     crd->handshake = st_Handshake;
 
     SSLContextRef p_context = NULL;

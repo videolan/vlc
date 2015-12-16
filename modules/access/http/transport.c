@@ -54,7 +54,7 @@ ssize_t vlc_https_recv(vlc_tls_t *tls, void *buf, size_t len)
     while (count < len)
     {
         int canc = vlc_savecancel();
-        ssize_t val = tls->sock.pf_recv(tls, (char *)buf + count, len - count);
+        ssize_t val = tls->recv(tls, (char *)buf + count, len - count);
 
         vlc_restorecancel(canc);
 
@@ -115,7 +115,7 @@ ssize_t vlc_https_send(vlc_tls_t *tls, const void *buf, size_t len)
     while (count < len)
     {
         int canc = vlc_savecancel();
-        ssize_t val = tls->sock.pf_send(tls, (char *)buf + count, len - count);
+        ssize_t val = tls->send(tls, (char *)buf + count, len - count);
 
         vlc_restorecancel(canc);
 

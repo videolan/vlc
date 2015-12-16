@@ -235,7 +235,7 @@ int vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
             return -1;
         }
 
-        ssize_t val = session->sock.pf_recv(session, buf, len);
+        ssize_t val = session->recv(session, buf, len);
         if (val > 0)
         {
             if (!waitall)
@@ -268,7 +268,7 @@ int vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
             return -1;
         }
 
-        ssize_t val = session->sock.pf_send(session, buf, len);
+        ssize_t val = session->send(session, buf, len);
         if (val > 0)
         {
             buf = ((const char *)buf) + val;

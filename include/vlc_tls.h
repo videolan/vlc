@@ -43,7 +43,8 @@ struct vlc_tls
     void *sys;
     int fd;
 
-    struct virtual_socket_t sock;
+    ssize_t (*recv)(struct vlc_tls *, void *, size_t);
+    ssize_t (*send)(struct vlc_tls *, const void *, size_t);
 };
 
 /**

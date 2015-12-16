@@ -132,14 +132,6 @@ int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
 
 VLC_API int net_SetCSCov( int fd, int sendcov, int recvcov );
 
-/* Functions to read from or write to the networking layer */
-struct virtual_socket_t
-{
-    void *p_sys;
-    int (*pf_recv) ( void *, void *, size_t );
-    int (*pf_send) ( void *, const void *, size_t );
-};
-
 VLC_API ssize_t net_Read( vlc_object_t *p_this, int fd, void *p_data, size_t i_data );
 #define net_Read(a,b,c,d) net_Read(VLC_OBJECT(a),b,c,d)
 VLC_API ssize_t net_Write( vlc_object_t *p_this, int fd, const void *p_data, size_t i_data );
