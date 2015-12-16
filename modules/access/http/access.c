@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_access.h>
 #include <vlc_plugin.h>
+#include <vlc_network.h> /* FIXME: only for vlc_getProxyUrl() */
 
 #include "connmgr.h"
 #include "file.h"
@@ -109,6 +110,17 @@ static int Control(access_t *access, int query, va_list args)
 static int Open(vlc_object_t *obj)
 {
     access_t *access = (access_t *)obj;
+
+    if (var_InheritBool(obj, "http-continuous"))
+        return VLC_EGENERIC; /* FIXME not implemented yet */
+    if (var_InheritBool(obj, "http-forward-cookies"))
+        return VLC_EGENERIC; /* FIXME not implemented yet */
+
+    char *proxy = vlc_getProxyUrl(access->psz_url);
+    free(proxy);
+    if (proxy != NULL)
+        return VLC_EGENERIC; /* FIXME not implemented yet */
+
     access_sys_t *sys = malloc(sizeof (*sys));
     int ret = VLC_ENOMEM;
 
@@ -147,6 +159,8 @@ static int Open(vlc_object_t *obj)
         msg_Err(access, "HTTP connection failure");
         goto error;
     }
+    if (status == 401) /* authentication */
+        goto error; /* FIXME not implemented yet */
     if (status >= 300)
     {
         msg_Err(access, "HTTP %d error", status);
@@ -185,7 +199,11 @@ vlc_module_begin()
     set_shortname(N_("HTTPS"))
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
-    set_capability("access", 0)
+    set_capability("access", 2)
     add_shortcut("https")
     set_callbacks(Open, Close)
+
+    // TODO: force HTTP/2 over TCP
+    //add_bool("http2", false, N_("HTTP 2.0"),
+    //         N_("Negotiate HTTP version 2.0"), true)
 vlc_module_end()
