@@ -84,17 +84,22 @@ static struct vlc_http_msg *vlc_http_file_req(const struct vlc_http_file *file,
     if (file->referrer != NULL) /* TODO: validate URL */
         vlc_http_msg_add_header(req, "Referer", "%s", file->referrer);
 
-    if (file->resp != NULL
-     && (str = vlc_http_msg_get_header(file->resp, "ETag")))
+    if (file->resp != NULL)
     {
-        if (!memcmp(str, "W/", 2))
-            str += 2; /* skip weak mark */
-        vlc_http_msg_add_header(req, "If-Match", "%s", str);
+        str = vlc_http_msg_get_header(file->resp, "ETag");
+        if (str != NULL)
+        {
+            if (!memcmp(str, "W/", 2))
+                str += 2; /* skip weak mark */
+            vlc_http_msg_add_header(req, "If-Match", "%s", str);
+        }
+        else
+        {
+            time_t mtime = vlc_http_msg_get_mtime(file->resp);
+            if (mtime != -1)
+                vlc_http_msg_add_time(req, "If-Unmodified-Since", &mtime);
+        }
     }
-
-    if (file->resp != NULL
-     && (str = vlc_http_msg_get_header(file->resp, "Date")))
-        vlc_http_msg_add_header(req, "If-Unmodified-Since", "%s", str);
 
     if (vlc_http_msg_add_header(req, "Range", "bytes=%ju-", offset)
      && offset != 0)
