@@ -99,6 +99,7 @@ static int Open(vlc_object_t *p_this)
 
     /* Copy properties */
     es_format_Copy(&p_dec->fmt_out, &p_dec->fmt_in);
+    p_dec->fmt_out.b_packetized = true;
 
     /* Set callbacks */
     const uint8_t *p_extra = p_dec->fmt_in.p_extra;

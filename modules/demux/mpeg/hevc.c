@@ -137,9 +137,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->p_packetizer->fmt_out.b_packetized = true;
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
-
     if( !p_sys->p_es )
     {
         demux_PacketizerDestroy( p_sys->p_packetizer );

@@ -238,6 +238,7 @@ static int Open( vlc_object_t *p_this )
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_CODEC_H264;
+    p_dec->fmt_out.b_packetized = true;
 
     if( b_avc )
     {
