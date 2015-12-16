@@ -648,7 +648,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( ReadData( p_access, &i_read, p_buffer, i_len ) )
         goto fatal;
 
-    if( i_read <= 0 )
+    if( i_read < 0 )
+        return -1; /* EINTR / EAGAIN */
+
+    if( i_read == 0 )
     {
         /*
          * I very much doubt that this will work.
