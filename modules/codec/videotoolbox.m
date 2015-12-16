@@ -343,9 +343,10 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                 &i_sps_size,
                                 &p_pps_buf,
                                 &i_pps_size);
+        if(p_alloc_buf)
+            free(p_alloc_buf);
         if (i_ret != VLC_SUCCESS) {
             msg_Warn(p_dec, "sps pps detection failed");
-            free(p_alloc_buf);
             return VLC_EGENERIC;
         }
 
@@ -355,7 +356,6 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                &sps_data);
 
         if (i_ret != VLC_SUCCESS) {
-            free(p_alloc_buf);
             msg_Warn(p_dec, "sps pps parsing failed");
             return VLC_EGENERIC;
         }
@@ -371,22 +371,28 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         p_sys->codec_profile = sps_data.i_profile;
         p_sys->codec_level = sps_data.i_level;
 
-        /* FIXME: Reuse p_extra avcC is p_sys->b_is_avcc */
-        /* create avvC atom to forward to the HW decoder */
-        block_t *p_block = h264_AnnexB_NAL_to_avcC(
-                                p_sys->i_nal_length_size,
-                                p_sps_buf, i_sps_size,
-                                p_pps_buf, i_pps_size);
-        free(p_alloc_buf);
-        if (!p_block) {
-            msg_Warn(p_dec, "buffer creation failed");
-            return VLC_EGENERIC;
-        }
+        if(!p_sys->b_is_avcc)
+        {
+            block_t *p_avcC = h264_AnnexB_NAL_to_avcC(
+                                    p_sys->i_nal_length_size,
+                                    p_sps_buf, i_sps_size,
+                                    p_pps_buf, i_pps_size);
+            if (!p_avcC) {
+                msg_Warn(p_dec, "buffer creation failed");
+                return VLC_EGENERIC;
+            }
 
-        extradata = CFDataCreate(kCFAllocatorDefault,
-                                 p_block->p_buffer,
-                                 p_block->i_buffer);
-        block_Release(p_block);
+            extradata = CFDataCreate(kCFAllocatorDefault,
+                                     p_avcC->p_buffer,
+                                     p_avcC->i_buffer);
+            block_Release(p_avcC);
+        }
+        else /* already avcC extradata */
+        {
+            extradata = CFDataCreate(kCFAllocatorDefault,
+                                     p_dec->fmt_in.p_extra,
+                                     p_dec->fmt_in.i_extra);
+        }
 
         if (extradata)
             CFDictionarySetValue(extradata_info, CFSTR("avcC"), extradata);
