@@ -21,6 +21,7 @@
 #include "h264_nal.h"
 #include "hxxx_nal.h"
 
+#include <vlc_bits.h>
 #include <vlc_boxes.h>
 #include <vlc_es.h>
 #include <limits.h>

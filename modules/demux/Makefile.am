@@ -166,8 +166,8 @@ demux_LTLIBRARIES += libes_plugin.la
 libh264_plugin_la_SOURCES = demux/mpeg/h264.c
 demux_LTLIBRARIES += libh264_plugin.la
 
-libhevc_plugin_la_SOURCES = demux/mpeg/hevc.c demux/mpeg/mpeg_parser_helpers.h \
-                            packetizer/hxxx_nal.h
+libhevc_plugin_la_SOURCES = demux/mpeg/hevc.c packetizer/hevc_nal.h \
+                            packetizer/hevc_nal.c packetizer/hxxx_nal.h
 demux_LTLIBRARIES += libhevc_plugin.la
 
 libmkv_plugin_la_SOURCES = \

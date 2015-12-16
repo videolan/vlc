@@ -22,6 +22,7 @@
  *****************************************************************************/
 #include "libmp4mux.h"
 #include "../demux/mp4/libmp4.h" /* flags */
+#include "../demux/mpeg/mpeg_parser_helpers.h"
 #include "../packetizer/hevc_nal.h"
 #include "../packetizer/h264_nal.h" /* h264_get_spspps */
 #include "../packetizer/hxxx_nal.h"

@@ -27,8 +27,6 @@
 
 # include <vlc_common.h>
 
-# include "../demux/mpeg/mpeg_parser_helpers.h"
-
 #define PROFILE_H264_BASELINE             66
 #define PROFILE_H264_MAIN                 77
 #define PROFILE_H264_EXTENDED             88
