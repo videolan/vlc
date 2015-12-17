@@ -101,21 +101,4 @@ static inline uint8_t * hxxx_ep3b_to_rbsp(const uint8_t *p_src, size_t i_src, si
     return p_dst;
 }
 
-static inline uint8_t * hxxx_AnnexB_NAL_to_rbsp(const uint8_t *p_src, size_t i_src, size_t *pi_ret)
-{
-    if(!hxxx_strip_AnnexB_startcode(&p_src, &i_src))
-        return NULL;
-    return hxxx_ep3b_to_rbsp(p_src, i_src, pi_ret);
-}
-
-static inline uint8_t * hxxx_xvc1_NAL_to_rbsp(const uint8_t *p_src, size_t i_src,
-                                              uint8_t i_nal_length_size, size_t *pi_ret)
-{
-    if(i_src < i_nal_length_size)
-        return NULL;
-    p_src += i_nal_length_size;
-    i_src -= i_nal_length_size;
-    return hxxx_ep3b_to_rbsp(p_src, i_src, pi_ret);
-}
-
 #endif // HXXX_NAL_H
