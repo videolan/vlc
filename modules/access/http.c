@@ -654,17 +654,9 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         {
             msg_Dbg( p_access, "got disconnected, trying to reconnect" );
             if( Connect( p_access, p_sys->offset ) )
-            {
                 msg_Dbg( p_access, "reconnection failed" );
-            }
             else
-            {
-                p_sys->b_reconnect = false;
-                i_read = Read( p_access, p_buffer, i_len );
-                p_sys->b_reconnect = true;
-
-                return i_read;
-            }
+                return -1;
         }
 
         if( i_read <= 0 )
