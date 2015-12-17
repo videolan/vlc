@@ -184,7 +184,6 @@ struct access_sys_t
     bool b_reconnect;
     bool b_continuous;
     bool b_pace_control;
-    bool b_persist;
     bool b_has_size;
 };
 
@@ -252,7 +251,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
     p_sys->i_remaining = 0;
-    p_sys->b_persist = false;
     p_sys->b_has_size = false;
     p_sys->offset = 0;
     p_sys->size = 0;
@@ -963,7 +961,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
     p_sys->i_remaining = 0;
-    p_sys->b_persist = false;
     p_sys->b_has_size = false;
     p_sys->offset = i_tell;
     p_sys->size = 0;
@@ -1065,7 +1062,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
 {
     access_sys_t   *p_sys = p_access->p_sys;
     char           *psz ;
-    p_sys->b_persist = false;
 
     p_sys->i_remaining = 0;
 
@@ -1094,10 +1090,10 @@ static int Request( access_t *p_access, uint64_t i_tell )
     if (p_sys->psz_referrer)
         WriteHeaders( p_access, "Referer: %s\r\n", p_sys->psz_referrer );
     /* Offset */
-    if( p_sys->i_version == 1 && ! p_sys->b_continuous )
+    if( p_sys->i_version == 1 )
     {
-        p_sys->b_persist = true;
-        WriteHeaders( p_access, "Range: bytes=%"PRIu64"-\r\n", i_tell );
+        if( !p_sys->b_continuous )
+            WriteHeaders( p_access, "Range: bytes=%"PRIu64"-\r\n", i_tell );
         WriteHeaders( p_access, "Connection: close\r\n" );
     }
 
@@ -1257,14 +1253,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
                 }
                 msg_Dbg( p_access, "stream size=%"PRIu64",pos=%"PRIu64",remaining=%"PRIu64,
                          i_nsize, i_ntell, p_sys->i_remaining);
-            }
-        }
-        else if( !strcasecmp( psz, "Connection" ) ) {
-            msg_Dbg( p_access, "Connection: %s",p );
-            int i = -1;
-            sscanf(p, "close%n",&i);
-            if( i >= 0 ) {
-                p_sys->b_persist = false;
             }
         }
         else if( !strcasecmp( psz, "Location" ) )
@@ -1454,12 +1442,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
         }
 
         free( psz );
-    }
-    /* We close the stream for zero length data, unless of course the
-     * server has already promised to do this for us.
-     */
-    if( p_sys->b_has_size && p_sys->i_remaining == 0 && p_sys->b_persist ) {
-        Disconnect( p_access );
     }
     return VLC_SUCCESS;
 
