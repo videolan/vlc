@@ -55,6 +55,30 @@ static inline bool hxxx_strip_AnnexB_startcode( const uint8_t **pp_data, size_t 
     return false;
 }
 
+/* vlc_bits's bs_t forward callback for stripping emulation prevention three bytes */
+static inline uint8_t *hxxx_bsfw_ep3b_to_rbsp( uint8_t *p, uint8_t *end, void *priv, size_t i_count )
+{
+    unsigned *pi_prev = (unsigned *) priv;
+    for( size_t i=0; i<i_count; i++ )
+    {
+        if( ++p >= end )
+            return p;
+
+        *pi_prev = (*pi_prev << 1) | (!*p);
+
+        if( *p == 0x03 &&
+           ( p + 1 ) != end ) /* Never escape sequence if no next byte */
+        {
+            if( (*pi_prev & 0x06) == 0x06 )
+            {
+                ++p;
+                *pi_prev = ((*pi_prev >> 1) << 1) | (!*p);
+            }
+        }
+    }
+    return p;
+}
+
 /* Discards emulation prevention three bytes */
 static inline uint8_t * hxxx_ep3b_to_rbsp(const uint8_t *p_src, size_t i_src, size_t *pi_ret)
 {
