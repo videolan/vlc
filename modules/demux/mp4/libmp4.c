@@ -3728,7 +3728,6 @@ static const struct
     { ATOM_dvi,     MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_alaw,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_ulaw,    MP4_ReadBox_sample_soun,  ATOM_stsd },
-    { ATOM_raw,     MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_MAC3,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_MAC6,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_Qclp,    MP4_ReadBox_sample_soun,  ATOM_stsd },
@@ -3744,6 +3743,9 @@ static const struct
     { ATOM_WMA2,    MP4_ReadBox_WMA2,         ATOM_wave }, /* flip4mac */
     { ATOM_dOps,    MP4_ReadBox_Binary,       ATOM_Opus },
     { ATOM_wfex,    MP4_ReadBox_WMA2,         ATOM_wma  }, /* ismv formatex */
+
+    /* Both uncompressed sound and video */
+    { ATOM_raw,     MP4_ReadBox_default,      ATOM_stsd },
 
     { ATOM_drmi,    MP4_ReadBox_sample_vide,  ATOM_stsd },
     { ATOM_vide,    MP4_ReadBox_sample_vide,  ATOM_stsd },

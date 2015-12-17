@@ -218,6 +218,27 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         case VLC_FOURCC('y','u','v','2'):
             p_track->fmt.i_codec = VLC_FOURCC('Y','U','Y','2');
             break;
+        case VLC_FOURCC('r','a','w',' '):
+            switch( p_vide->i_depth ) {
+                case 16:
+                    p_track->fmt.i_codec = VLC_CODEC_RGB15;
+                    break;
+                case 24:
+                    p_track->fmt.i_codec = VLC_CODEC_RGB24;
+                    break;
+                case 32:
+                    p_track->fmt.i_codec = VLC_CODEC_ARGB;
+                    break;
+                case 32 + 8:
+                    p_track->fmt.i_codec = VLC_CODEC_GREY;
+                    break;
+                default:
+                    msg_Dbg( p_demux, "Unrecognized raw video format (depth = %d)",
+                             p_vide->i_depth );
+                    p_track->fmt.i_codec = p_sample->i_type;
+                    break;
+            }
+            break;
 
         default:
             p_track->fmt.i_codec = p_sample->i_type;
