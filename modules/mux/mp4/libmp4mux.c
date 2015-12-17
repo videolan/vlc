@@ -498,13 +498,14 @@ static bo_t *GetD263Tag(void)
 static void hevcParseVPS(uint8_t * p_buffer, size_t i_buffer, uint8_t *general,
                          uint8_t * numTemporalLayer, bool * temporalIdNested)
 {
-    size_t i_decoded_nal_size;
-    uint8_t *p_dec_nal = hxxx_ep3b_to_rbsp(p_buffer, i_buffer, &i_decoded_nal_size);
-    if(!p_dec_nal || i_decoded_nal_size < 19)
-    {
-        free(p_dec_nal);
+    if(i_buffer < 19)
         return;
-    }
+
+    bs_t bs;
+    bs_init(&bs, p_buffer, i_buffer);
+    unsigned i_bitflow = 0;
+    bs.p_fwpriv = &i_bitflow;
+    bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
 
     /* first two bytes are the NAL header, 3rd and 4th are:
         vps_video_parameter_set_id(4)
@@ -513,13 +514,15 @@ static void hevcParseVPS(uint8_t * p_buffer, size_t i_buffer, uint8_t *general,
         vps_max_sub_layers_minus1(3)
         vps_temporal_id_nesting_flags
     */
-    *numTemporalLayer =  ((p_dec_nal[3] & 0x0E) >> 1) + 1;
-    *temporalIdNested = (bool)(p_dec_nal[3] & 0x01);
+    bs_skip( &bs, 16 + 4 + 2 + 6 );
+    *numTemporalLayer = bs_read( &bs, 3 ) + 1;
+    *temporalIdNested = bs_read1( &bs );
 
     /* 5th & 6th are reserved 0xffff */
+    bs_skip( &bs, 16 );
     /* copy the first 12 bytes of profile tier */
-    memcpy(general, &p_dec_nal[6], 12);
-    free(p_dec_nal);
+    for(unsigned i=0; i<12; i++)
+        general[i] = bs_read( &bs, 8 );
 }
 
 static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_idc,
@@ -528,13 +531,11 @@ static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_i
     if(i_buffer < 2)
         return;
 
-    size_t i_decoded_nal_size;
-    uint8_t *p_dec_nal = hxxx_ep3b_to_rbsp(p_buffer + 2, i_buffer - 2, &i_decoded_nal_size);
-    if(!p_dec_nal)
-        return;
-
     bs_t bs;
-    bs_init(&bs, p_dec_nal, i_decoded_nal_size);
+    bs_init(&bs, p_buffer + 2, i_buffer - 2);
+    unsigned i_bitflow = 0;
+    bs.p_fwpriv = &i_bitflow;
+    bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
 
     /* skip vps id */
     bs_skip(&bs, 4);
@@ -566,8 +567,6 @@ static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_i
     }
     *bit_depth_luma_minus8 = bs_read_ue(&bs);
     *bit_depth_chroma_minus8 = bs_read_ue(&bs);
-
-    free(p_dec_nal);
 }
 
 static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
