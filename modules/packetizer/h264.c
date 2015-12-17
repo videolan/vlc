@@ -778,8 +778,6 @@ static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
                         int i_nal_ref_idc, int i_nal_type, const block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *pb_dec;
-    size_t i_dec = 0;
     int i_slice_type;
     slice_t slice;
     bs_t s;
@@ -787,12 +785,10 @@ static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     if(p_frag->i_buffer < 6)
         return false;
 
-    /* do not convert the whole frame */
-    pb_dec = hxxx_ep3b_to_rbsp(&p_frag->p_buffer[5], __MIN( p_frag->i_buffer - 5, 60 ), &i_dec);
-    if(!pb_dec)
-        return false;
-
-    bs_init( &s, pb_dec, i_dec );
+    bs_init( &s, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
+    unsigned i_bitflow = 0;
+    s.p_fwpriv = &i_bitflow;
+    s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
 
     /* first_mb_in_slice */
     /* int i_first_mb = */ bs_read_ue( &s );
@@ -858,7 +854,6 @@ static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
         if( p_sys->i_pic_order_present_flag && !slice.i_field_pic_flag )
             slice.i_delta_pic_order_cnt1 = bs_read_se( &s );
     }
-    free( pb_dec );
 
     /* Detection of the first VCL NAL unit of a primary coded picture
      * (cf. 7.4.1.2.4) */

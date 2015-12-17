@@ -402,8 +402,6 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
 int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
                     struct h264_nal_sps *p_sps )
 {
-    uint8_t *pb_dec = NULL;
-    size_t     i_dec = 0;
     bs_t s;
     int i_tmp;
 
@@ -411,11 +409,12 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
         return -1;
 
     memset( p_sps, 0, sizeof(struct h264_nal_sps) );
-    pb_dec = hxxx_ep3b_to_rbsp( &p_sps_buf[5], i_sps_size - 5, &i_dec );
-    if( !pb_dec )
-        return -1;
 
-    bs_init( &s, pb_dec, i_dec );
+    bs_init( &s, &p_sps_buf[5], i_sps_size - 5 );
+    unsigned i_bitflow = 0;
+    s.p_fwpriv = &i_bitflow;
+    s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+
     int i_profile_idc = bs_read( &s, 8 );
     p_sps->i_profile = i_profile_idc;
     p_sps->i_profile_compatibility = bs_read( &s, 8 );
@@ -423,10 +422,7 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
     /* sps id */
     p_sps->i_id = bs_read_ue( &s );
     if( p_sps->i_id >= H264_SPS_MAX )
-    {
-        free( pb_dec );
         return -1;
-    }
 
     if( i_profile_idc == PROFILE_H264_HIGH ||
         i_profile_idc == PROFILE_H264_HIGH_10 ||
@@ -660,8 +656,6 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
 
         /* + unparsed remains */
     }
-
-    free( pb_dec );
 
     return 0;
 }
