@@ -3091,6 +3091,11 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
                             &i_dts, &i_pts, &i_stream_id ) == VLC_EGENERIC )
             continue;
 
+        if (p_pmt->pcr.i_pcroffset > 0) {
+            i_dts += p_pmt->pcr.i_pcroffset;
+            i_pts += p_pmt->pcr.i_pcroffset;
+        }
+
         if ((i_dts > 0 && i_dts <= i_pcr) || (i_pts > 0 && i_pts <= i_pcr)) {
             msg_Err( p_demux, "send queued data for pid %d: DTS %"PRId64" >= PCR %"PRId64"\n", p_pid->i_pid, i_dts, i_pcr);
             ParseData( p_demux, p_pid );
