@@ -256,15 +256,14 @@ static int32_t getFPS(demux_t *p_demux, uint8_t i_nal_type, block_t *p_block)
     if( p_sys->rgp_vps[i_id] && i_nal_type == HEVC_NAL_VPS )
         return -1;
 
-    size_t i_rbsp;
-    uint8_t *p_rbsp = hxxx_AnnexB_NAL_to_rbsp( p_block->p_buffer, p_block->i_buffer, &i_rbsp );
-    if( p_rbsp )
+    const uint8_t *p_nald = p_block->p_buffer;
+    size_t i_nald = p_block->i_buffer;
+    if( hxxx_strip_AnnexB_startcode( &p_nald, &i_nald ) )
     {
         if( i_nal_type == HEVC_NAL_VPS )
-            p_sys->rgp_vps[i_id] = hevc_rbsp_decode_vps( p_rbsp, i_rbsp );
+            p_sys->rgp_vps[i_id] = hevc_decode_vps( p_nald, i_nald, true );
         else
-            p_sps = hevc_rbsp_decode_sps( p_rbsp, i_rbsp );
-        free( p_rbsp );
+            p_sps = hevc_decode_sps( p_nald, i_nald, true );
     }
 
     if( p_sps )

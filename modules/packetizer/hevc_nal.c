@@ -663,22 +663,33 @@ void hevc_rbsp_release_vps( hevc_video_parameter_set_t *p_vps )
     free( p_vps );
 }
 
-hevc_video_parameter_set_t * hevc_rbsp_decode_vps( const uint8_t *p_buf, size_t i_buf )
-{
-    hevc_video_parameter_set_t *p_vps = calloc(1, sizeof(hevc_video_parameter_set_t));
-    if(likely(p_vps))
-    {
-        bs_t bs;
-        bs_init( &bs, p_buf, i_buf );
-        bs_skip( &bs, 16 ); /* Skip nal_unit_header */
-        if( !hevc_parse_video_parameter_set_rbsp( &bs, p_vps ) )
-        {
-            hevc_rbsp_release_vps( p_vps );
-            p_vps = NULL;
-        }
+#define IMPL_hevc_generic_decode( name, hevctype, decode, release ) \
+    hevctype * name( const uint8_t *p_buf, size_t i_buf, bool b_escaped ) \
+    { \
+        hevctype *p_hevctype = calloc(1, sizeof(hevctype)); \
+        if(likely(p_hevctype)) \
+        { \
+            bs_t bs; \
+            bs_init( &bs, p_buf, i_buf ); \
+            unsigned i_bitflow = 0; \
+            if( b_escaped ) \
+            { \
+                bs.p_fwpriv = &i_bitflow; \
+                bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */ \
+            } \
+            else (void) i_bitflow;\
+            bs_skip( &bs, 16 ); /* Skip nal_unit_header */ \
+            if( !decode( &bs, p_hevctype ) ) \
+            { \
+                release( p_hevctype ); \
+                p_hevctype = NULL; \
+            } \
+        } \
+        return p_hevctype; \
     }
-    return p_vps;
-}
+
+IMPL_hevc_generic_decode( hevc_decode_vps, hevc_video_parameter_set_t,
+                          hevc_parse_video_parameter_set_rbsp, hevc_rbsp_release_vps )
 
 static bool hevc_parse_st_ref_pic_set( bs_t *p_bs, unsigned idx,
                                        unsigned num_short_term_ref_pic_sets,
@@ -862,22 +873,8 @@ void hevc_rbsp_release_sps( hevc_sequence_parameter_set_t *p_sps )
     free( p_sps );
 }
 
-hevc_sequence_parameter_set_t * hevc_rbsp_decode_sps( const uint8_t *p_buf, size_t i_buf )
-{
-    hevc_sequence_parameter_set_t *p_sps = calloc(1, sizeof(hevc_sequence_parameter_set_t));
-    if(likely(p_sps))
-    {
-        bs_t bs;
-        bs_init( &bs, p_buf, i_buf );
-        bs_skip( &bs, 16 ); /* Skip nal_unit_header */
-        if( !hevc_parse_sequence_parameter_set_rbsp( &bs, p_sps ) )
-        {
-            hevc_rbsp_release_sps( p_sps );
-            p_sps = NULL;
-        }
-    }
-    return p_sps;
-}
+IMPL_hevc_generic_decode( hevc_decode_sps, hevc_sequence_parameter_set_t,
+                          hevc_parse_sequence_parameter_set_rbsp, hevc_rbsp_release_sps )
 
 static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
                                                hevc_picture_parameter_set_t *p_pps )
@@ -976,22 +973,8 @@ void hevc_rbsp_release_pps( hevc_picture_parameter_set_t *p_pps )
     free( p_pps );
 }
 
-hevc_picture_parameter_set_t * hevc_rbsp_decode_pps( const uint8_t *p_buf, size_t i_buf )
-{
-    hevc_picture_parameter_set_t *p_pps = calloc(1, sizeof(hevc_picture_parameter_set_t));
-    if(likely(p_pps))
-    {
-        bs_t bs;
-        bs_init( &bs, p_buf, i_buf );
-        bs_skip( &bs, 16 ); /* Skip nal_unit_header */
-        if( !hevc_parse_pic_parameter_set_rbsp( &bs, p_pps ) )
-        {
-            hevc_rbsp_release_pps( p_pps );
-            p_pps = NULL;
-        }
-    }
-    return p_pps;
-}
+IMPL_hevc_generic_decode( hevc_decode_pps, hevc_picture_parameter_set_t,
+                          hevc_parse_pic_parameter_set_rbsp, hevc_rbsp_release_pps )
 
 bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *p_sps,
                             unsigned *p_w, unsigned *p_h, unsigned *p_vw, unsigned *p_vh )
@@ -1048,8 +1031,8 @@ bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *p_sps,
 
 static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
                                                   uint8_t i_nal_type,
-                                                  const hevc_sequence_parameter_set_t **pp_sps,
-                                                  const hevc_picture_parameter_set_t **pp_pps,
+                                                  hevc_sequence_parameter_set_t **pp_sps,
+                                                  hevc_picture_parameter_set_t **pp_pps,
                                                   hevc_slice_segment_header_t *p_sl )
 {
     if( bs_remain( p_bs ) < 3 )
@@ -1119,9 +1102,9 @@ void hevc_rbsp_release_slice_header( hevc_slice_segment_header_t *p_sh )
     free( p_sh );
 }
 
-hevc_slice_segment_header_t * hevc_rbsp_decode_slice_header( const uint8_t *p_buf, size_t i_buf,
-                                                             const hevc_sequence_parameter_set_t **pp_sps,
-                                                             const hevc_picture_parameter_set_t **pp_pps )
+hevc_slice_segment_header_t * hevc_decode_slice_header( const uint8_t *p_buf, size_t i_buf, bool b_escaped,
+                                                        hevc_sequence_parameter_set_t **pp_sps,
+                                                        hevc_picture_parameter_set_t **pp_pps )
 {
     if(!pp_sps || !pp_pps)
         return NULL;
@@ -1132,6 +1115,13 @@ hevc_slice_segment_header_t * hevc_rbsp_decode_slice_header( const uint8_t *p_bu
         uint8_t i_nal_type = ((p_buf[0] & 0x7E) >> 1);
         bs_t bs;
         bs_init( &bs, p_buf, i_buf );
+        unsigned i_bitflow = 0;
+        if( b_escaped )
+        {
+            bs.p_fwpriv = &i_bitflow;
+            bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+        }
+        else (void) i_bitflow;
         bs_skip( &bs, 16 ); /* Skip nal_unit_header */
         if( !hevc_parse_slice_segment_header_rbsp( &bs, i_nal_type, pp_sps, pp_pps, p_sh ) )
         {
