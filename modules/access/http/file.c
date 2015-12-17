@@ -22,6 +22,8 @@
 # include <config.h>
 #endif
 
+#include <assert.h>
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -129,11 +131,32 @@ static struct vlc_http_msg *vlc_http_file_open(struct vlc_http_file *file,
 
     int status = vlc_http_msg_get_status(resp);
     if (status < 200 || status >= 599)
+        goto fail;
+
+    if (status == 206)
     {
-        vlc_http_msg_destroy(resp);
-        resp = NULL;
+        const char *str = vlc_http_msg_get_header(resp, "Content-Range");
+        if (str == NULL)
+        {   /* A multipart/byteranges response. This is not what we asked for
+             * and we do not support it. */
+            errno = EINVAL;
+            goto fail;
+        }
+
+        uintmax_t start, end;
+        if (sscanf(str, "bytes %ju-%ju", &start, &end) != 2
+         || start != offset || start > end)
+        {   /* A single range response is what we asked for, but not at that
+             * start offset. */
+            errno = EINVAL;
+            goto fail;
+        }
     }
+
     return resp;
+fail:
+    vlc_http_msg_destroy(resp);
+    return NULL;
 }
 
 void vlc_http_file_destroy(struct vlc_http_file *file)
@@ -273,8 +296,7 @@ uintmax_t vlc_http_file_get_size(struct vlc_http_file *file)
 
     if (status == 206 /* Partial Content */)
     {   /* IETF RFC7233 §4.1 */
-        if (range == NULL)
-            return -1; /* invalid response */
+        assert(range != NULL); /* checked by vlc_http_file_open() */
 
         uintmax_t end, total;
 
@@ -287,7 +309,7 @@ uintmax_t vlc_http_file_get_size(struct vlc_http_file *file)
             case 2:
                 return total;
         }
-        return -1;
+        vlc_assert_unreachable(); /* checked by vlc_http_file_open() */
     }
 
     if (status == 416 /* Range Not Satisfiable */)
