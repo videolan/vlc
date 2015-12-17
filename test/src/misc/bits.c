@@ -19,7 +19,9 @@
  *****************************************************************************/
 
 #include "../../libvlc/test.h"
-
+#ifdef NDEBUG
+ #undef NDEBUG
+#endif
 #include <vlc_bits.h>
 #include <assert.h>
 
@@ -84,6 +86,25 @@ int main( void )
     assert( bs_remain(&bs) == 3 );
     assert( bs_read_se(&bs) == -1 );
     assert( bs_eof(&bs) );
+
+    const uint8_t abc[6] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
+    bs_init( &bs, &abc, 6 );
+    bs_skip( &bs, 24 );
+    assert( bs_read( &bs, 8 ) == 0xDD );
+    assert( bs_read( &bs, 4 ) == 0x0E );
+    assert( bs_read( &bs, 8 ) == 0xEF );
+    assert( bs_remain( &bs ) == 4 );
+
+    bs_init( &bs, &abc, 6 );
+    bs_skip( &bs, 40 );
+    assert( bs_read( &bs, 8 ) == 0xFF );
+
+    bs_init( &bs, &abc, 6 );
+    bs_skip( &bs, 20 );
+    assert( bs_read( &bs, 8 ) == 0xCD );
+    assert( bs_read( &bs, 4 ) == 0x0D );
+    assert( bs_read( &bs, 8 ) == 0xEE );
+    assert( bs_remain( &bs ) == 8 );
 
     return 0;
 }
