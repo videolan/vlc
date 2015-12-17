@@ -399,30 +399,24 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
     return 0;
 }
 
-int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
-                    struct h264_nal_sps *p_sps )
+void h264_release_sps( h264_sequence_parameter_set_t *p_sps )
 {
-    bs_t s;
+    free( p_sps );
+}
+
+static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
+                                                    h264_sequence_parameter_set_t *p_sps )
+{
     int i_tmp;
 
-    if (i_sps_size < 5 || (p_sps_buf[4] & 0x1f) != H264_NAL_SPS)
-        return -1;
-
-    memset( p_sps, 0, sizeof(struct h264_nal_sps) );
-
-    bs_init( &s, &p_sps_buf[5], i_sps_size - 5 );
-    unsigned i_bitflow = 0;
-    s.p_fwpriv = &i_bitflow;
-    s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
-
-    int i_profile_idc = bs_read( &s, 8 );
+    int i_profile_idc = bs_read( p_bs, 8 );
     p_sps->i_profile = i_profile_idc;
-    p_sps->i_profile_compatibility = bs_read( &s, 8 );
-    p_sps->i_level = bs_read( &s, 8 );
+    p_sps->i_profile_compatibility = bs_read( p_bs, 8 );
+    p_sps->i_level = bs_read( p_bs, 8 );
     /* sps id */
-    p_sps->i_id = bs_read_ue( &s );
+    p_sps->i_id = bs_read_ue( p_bs );
     if( p_sps->i_id >= H264_SPS_MAX )
-        return -1;
+        return false;
 
     if( i_profile_idc == PROFILE_H264_HIGH ||
         i_profile_idc == PROFILE_H264_HIGH_10 ||
@@ -439,23 +433,23 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
         i_profile_idc == PROFILE_H264_MFC_HIGH )
     {
         /* chroma_format_idc */
-        const int i_chroma_format_idc = bs_read_ue( &s );
+        const int i_chroma_format_idc = bs_read_ue( p_bs );
         if( i_chroma_format_idc == 3 )
-            bs_skip( &s, 1 ); /* separate_colour_plane_flag */
+            bs_skip( p_bs, 1 ); /* separate_colour_plane_flag */
         /* bit_depth_luma_minus8 */
-        bs_read_ue( &s );
+        bs_read_ue( p_bs );
         /* bit_depth_chroma_minus8 */
-        bs_read_ue( &s );
+        bs_read_ue( p_bs );
         /* qpprime_y_zero_transform_bypass_flag */
-        bs_skip( &s, 1 );
+        bs_skip( p_bs, 1 );
         /* seq_scaling_matrix_present_flag */
-        i_tmp = bs_read( &s, 1 );
+        i_tmp = bs_read( p_bs, 1 );
         if( i_tmp )
         {
             for( int i = 0; i < ((3 != i_chroma_format_idc) ? 8 : 12); i++ )
             {
                 /* seq_scaling_list_present_flag[i] */
-                i_tmp = bs_read( &s, 1 );
+                i_tmp = bs_read( p_bs, 1 );
                 if( !i_tmp )
                     continue;
                 const int i_size_of_scaling_list = (i < 6 ) ? 16 : 64;
@@ -467,7 +461,7 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
                     if( i_nextscale != 0 )
                     {
                         /* delta_scale */
-                        i_tmp = bs_read_se( &s );
+                        i_tmp = bs_read_se( p_bs );
                         i_nextscale = ( i_lastscale + i_tmp + 256 ) % 256;
                         /* useDefaultScalingMatrixFlag = ... */
                     }
@@ -479,15 +473,15 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
     }
 
     /* Skip i_log2_max_frame_num */
-    p_sps->i_log2_max_frame_num = bs_read_ue( &s );
+    p_sps->i_log2_max_frame_num = bs_read_ue( p_bs );
     if( p_sps->i_log2_max_frame_num > 12)
         p_sps->i_log2_max_frame_num = 12;
     /* Read poc_type */
-    p_sps->i_pic_order_cnt_type = bs_read_ue( &s );
+    p_sps->i_pic_order_cnt_type = bs_read_ue( p_bs );
     if( p_sps->i_pic_order_cnt_type == 0 )
     {
         /* skip i_log2_max_poc_lsb */
-        p_sps->i_log2_max_pic_order_cnt_lsb = bs_read_ue( &s );
+        p_sps->i_log2_max_pic_order_cnt_lsb = bs_read_ue( p_bs );
         if( p_sps->i_log2_max_pic_order_cnt_lsb > 12 )
             p_sps->i_log2_max_pic_order_cnt_lsb = 12;
     }
@@ -495,61 +489,61 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
     {
         int i_cycle;
         /* skip b_delta_pic_order_always_zero */
-        p_sps->i_delta_pic_order_always_zero_flag = bs_read( &s, 1 );
+        p_sps->i_delta_pic_order_always_zero_flag = bs_read( p_bs, 1 );
         /* skip i_offset_for_non_ref_pic */
-        bs_read_se( &s );
+        bs_read_se( p_bs );
         /* skip i_offset_for_top_to_bottom_field */
-        bs_read_se( &s );
+        bs_read_se( p_bs );
         /* read i_num_ref_frames_in_poc_cycle */
-        i_cycle = bs_read_ue( &s );
+        i_cycle = bs_read_ue( p_bs );
         if( i_cycle > 256 ) i_cycle = 256;
         while( i_cycle > 0 )
         {
             /* skip i_offset_for_ref_frame */
-            bs_read_se(&s );
+            bs_read_se(p_bs );
             i_cycle--;
         }
     }
     /* i_num_ref_frames */
-    bs_read_ue( &s );
+    bs_read_ue( p_bs );
     /* b_gaps_in_frame_num_value_allowed */
-    bs_skip( &s, 1 );
+    bs_skip( p_bs, 1 );
 
     /* Read size */
-    p_sps->i_width  = 16 * ( bs_read_ue( &s ) + 1 );
-    p_sps->i_height = 16 * ( bs_read_ue( &s ) + 1 );
+    p_sps->i_width  = 16 * ( bs_read_ue( p_bs ) + 1 );
+    p_sps->i_height = 16 * ( bs_read_ue( p_bs ) + 1 );
 
     /* b_frame_mbs_only */
-    p_sps->b_frame_mbs_only = bs_read( &s, 1 );
+    p_sps->b_frame_mbs_only = bs_read( p_bs, 1 );
     p_sps->i_height *=  ( 2 - p_sps->b_frame_mbs_only );
     if( p_sps->b_frame_mbs_only == 0 )
     {
-        bs_skip( &s, 1 );
+        bs_skip( p_bs, 1 );
     }
     /* b_direct8x8_inference */
-    bs_skip( &s, 1 );
+    bs_skip( p_bs, 1 );
 
     /* crop */
-    i_tmp = bs_read( &s, 1 );
+    i_tmp = bs_read( p_bs, 1 );
     if( i_tmp )
     {
         /* left */
-        bs_read_ue( &s );
+        bs_read_ue( p_bs );
         /* right */
-        bs_read_ue( &s );
+        bs_read_ue( p_bs );
         /* top */
-        bs_read_ue( &s );
+        bs_read_ue( p_bs );
         /* bottom */
-        bs_read_ue( &s );
+        bs_read_ue( p_bs );
     }
 
     /* vui */
-    i_tmp = bs_read( &s, 1 );
+    i_tmp = bs_read( p_bs, 1 );
     if( i_tmp )
     {
         p_sps->vui.b_valid = true;
         /* read the aspect ratio part if any */
-        i_tmp = bs_read( &s, 1 );
+        i_tmp = bs_read( p_bs, 1 );
         if( i_tmp )
         {
             static const struct { int w, h; } sar[17] =
@@ -560,7 +554,7 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
                 { 64, 33 }, { 160,99 }, {  4,  3 }, {  3,  2 },
                 {  2,  1 },
             };
-            int i_sar = bs_read( &s, 8 );
+            int i_sar = bs_read( p_bs, 8 );
             int w, h;
 
             if( i_sar < 17 )
@@ -570,8 +564,8 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
             }
             else if( i_sar == 255 )
             {
-                w = bs_read( &s, 16 );
-                h = bs_read( &s, 16 );
+                w = bs_read( p_bs, 16 );
+                h = bs_read( p_bs, 16 );
             }
             else
             {
@@ -592,96 +586,124 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
         }
 
         /* overscan */
-        i_tmp = bs_read( &s, 1 );
+        i_tmp = bs_read( p_bs, 1 );
         if ( i_tmp )
-            bs_read( &s, 1 );
+            bs_read( p_bs, 1 );
 
         /* video signal type */
-        i_tmp = bs_read( &s, 1 );
+        i_tmp = bs_read( p_bs, 1 );
         if( i_tmp )
         {
-            bs_read( &s, 4 );
+            bs_read( p_bs, 4 );
             /* colour desc */
-            bs_read( &s, 1 );
+            bs_read( p_bs, 1 );
             if ( i_tmp )
-                bs_read( &s, 24 );
+                bs_read( p_bs, 24 );
         }
 
         /* chroma loc info */
-        i_tmp = bs_read( &s, 1 );
+        i_tmp = bs_read( p_bs, 1 );
         if( i_tmp )
         {
-            bs_read_ue( &s );
-            bs_read_ue( &s );
+            bs_read_ue( p_bs );
+            bs_read_ue( p_bs );
         }
 
         /* timing info */
-        p_sps->vui.b_timing_info_present_flag = bs_read( &s, 1 );
+        p_sps->vui.b_timing_info_present_flag = bs_read( p_bs, 1 );
         if( p_sps->vui.b_timing_info_present_flag )
         {
-            p_sps->vui.i_num_units_in_tick = bs_read( &s, 32 );
-            p_sps->vui.i_time_scale = bs_read( &s, 32 );
-            p_sps->vui.b_fixed_frame_rate = bs_read( &s, 1 );
+            p_sps->vui.i_num_units_in_tick = bs_read( p_bs, 32 );
+            p_sps->vui.i_time_scale = bs_read( p_bs, 32 );
+            p_sps->vui.b_fixed_frame_rate = bs_read( p_bs, 1 );
         }
 
         /* Nal hrd & VC1 hrd parameters */
         p_sps->vui.b_cpb_dpb_delays_present_flag = false;
         for ( int i=0; i<2; i++ )
         {
-            i_tmp = bs_read( &s, 1 );
+            i_tmp = bs_read( p_bs, 1 );
             if( i_tmp )
             {
                 p_sps->vui.b_cpb_dpb_delays_present_flag = true;
-                uint32_t count = bs_read_ue( &s ) + 1;
-                bs_read( &s, 4 );
-                bs_read( &s, 4 );
+                uint32_t count = bs_read_ue( p_bs ) + 1;
+                bs_read( p_bs, 4 );
+                bs_read( p_bs, 4 );
                 for( uint32_t i=0; i<count; i++ )
                 {
-                    bs_read_ue( &s );
-                    bs_read_ue( &s );
-                    bs_read( &s, 1 );
+                    bs_read_ue( p_bs );
+                    bs_read_ue( p_bs );
+                    bs_read( p_bs, 1 );
                 }
-                bs_read( &s, 5 );
-                p_sps->vui.i_cpb_removal_delay_length_minus1 = bs_read( &s, 5 );
-                p_sps->vui.i_dpb_output_delay_length_minus1 = bs_read( &s, 5 );
-                bs_read( &s, 5 );
+                bs_read( p_bs, 5 );
+                p_sps->vui.i_cpb_removal_delay_length_minus1 = bs_read( p_bs, 5 );
+                p_sps->vui.i_dpb_output_delay_length_minus1 = bs_read( p_bs, 5 );
+                bs_read( p_bs, 5 );
             }
         }
 
         if( p_sps->vui.b_cpb_dpb_delays_present_flag )
-            bs_read( &s, 1 );
+            bs_read( p_bs, 1 );
 
         /* pic struct info */
-        p_sps->vui.b_pic_struct_present_flag = bs_read( &s, 1 );
+        p_sps->vui.b_pic_struct_present_flag = bs_read( p_bs, 1 );
 
         /* + unparsed remains */
     }
 
-    return 0;
+    return true;
 }
 
-int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
-                    struct h264_nal_pps *p_pps )
+void h264_release_pps( h264_picture_parameter_set_t *p_pps )
 {
-    bs_t s;
+    free( p_pps );
+}
 
-    if (i_pps_size < 5 || (p_pps_buf[4] & 0x1f) != H264_NAL_PPS)
-        return -1;
-
-    memset( p_pps, 0, sizeof(struct h264_nal_pps) );
-    bs_init( &s, &p_pps_buf[5], i_pps_size - 5 );
-    p_pps->i_id = bs_read_ue( &s ); // pps id
-    p_pps->i_sps_id = bs_read_ue( &s ); // sps id
+static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
+                                                   h264_picture_parameter_set_t *p_pps )
+{
+    p_pps->i_id = bs_read_ue( p_bs ); // pps id
+    p_pps->i_sps_id = bs_read_ue( p_bs ); // sps id
     if( p_pps->i_id >= H264_PPS_MAX || p_pps->i_sps_id >= H264_SPS_MAX )
-    {
-        return -1;
-    }
-    bs_skip( &s, 1 ); // entropy coding mode flag
-    p_pps->i_pic_order_present_flag = bs_read( &s, 1 );
+        return false;
+
+    bs_skip( p_bs, 1 ); // entropy coding mode flag
+    p_pps->i_pic_order_present_flag = bs_read( p_bs, 1 );
     /* TODO */
 
-    return 0;
+    return true;
 }
+
+#define IMPL_h264_generic_decode( name, h264type, decode, release ) \
+    h264type * name( const uint8_t *p_buf, size_t i_buf, bool b_escaped ) \
+    { \
+        h264type *p_h264type = calloc(1, sizeof(h264type)); \
+        if(likely(p_h264type)) \
+        { \
+            bs_t bs; \
+            bs_init( &bs, p_buf, i_buf ); \
+            unsigned i_bitflow = 0; \
+            if( b_escaped ) \
+            { \
+                bs.p_fwpriv = &i_bitflow; \
+                bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */ \
+            } \
+            else (void) i_bitflow;\
+            bs_skip( &bs, 8 ); /* Skip nal_unit_header */ \
+            if( !decode( &bs, p_h264type ) ) \
+            { \
+                release( p_h264type ); \
+                p_h264type = NULL; \
+            } \
+        } \
+        return p_h264type; \
+    }
+
+IMPL_h264_generic_decode( h264_decode_sps, h264_sequence_parameter_set_t,
+                          h264_parse_sequence_parameter_set_rbsp, h264_release_sps )
+
+IMPL_h264_generic_decode( h264_decode_pps, h264_picture_parameter_set_t,
+                          h264_parse_picture_parameter_set_rbsp, h264_release_pps )
 
 block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
                                            const uint8_t *p_sps_buf,

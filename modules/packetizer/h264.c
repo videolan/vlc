@@ -704,74 +704,89 @@ static block_t *OutputPicture( decoder_t *p_dec )
 static void PutSPS( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    struct h264_nal_sps sps;
 
-    if( h264_parse_sps( p_frag->p_buffer, p_frag->i_buffer, &sps ) != 0 )
+    const uint8_t *p_buffer = p_frag->p_buffer;
+    size_t i_buffer = p_frag->i_buffer;
+
+    if( !hxxx_strip_AnnexB_startcode( &p_buffer, &i_buffer ) )
+        return;
+
+    h264_sequence_parameter_set_t *p_sps = h264_decode_sps( p_buffer, i_buffer, true );
+    if( !p_sps )
     {
-        msg_Warn( p_dec, "invalid SPS (sps_id=%d)", sps.i_id );
+        msg_Warn( p_dec, "invalid SPS (sps_id=%d)", p_sps->i_id );
         block_Release( p_frag );
         return;
     }
 
-    p_dec->fmt_out.i_profile = sps.i_profile;
-    p_dec->fmt_out.i_level = sps.i_level;
-    p_dec->fmt_out.video.i_width  = sps.i_width;
-    p_dec->fmt_out.video.i_height = sps.i_height;
-    if( sps.vui.i_sar_num != 0 && sps.vui.i_sar_den != 0 )
+    p_dec->fmt_out.i_profile = p_sps->i_profile;
+    p_dec->fmt_out.i_level = p_sps->i_level;
+    p_dec->fmt_out.video.i_width  = p_sps->i_width;
+    p_dec->fmt_out.video.i_height = p_sps->i_height;
+    if( p_sps->vui.i_sar_num != 0 && p_sps->vui.i_sar_den != 0 )
     {
-        p_dec->fmt_out.video.i_sar_num = sps.vui.i_sar_num;
-        p_dec->fmt_out.video.i_sar_den = sps.vui.i_sar_den;
+        p_dec->fmt_out.video.i_sar_num = p_sps->vui.i_sar_num;
+        p_dec->fmt_out.video.i_sar_den = p_sps->vui.i_sar_den;
     }
 
-    p_sys->i_log2_max_frame_num = sps.i_log2_max_frame_num;
-    p_sys->b_frame_mbs_only = sps.b_frame_mbs_only;
-    p_sys->i_pic_order_cnt_type = sps.i_pic_order_cnt_type;
-    p_sys->i_delta_pic_order_always_zero_flag = sps.i_delta_pic_order_always_zero_flag;
-    p_sys->i_log2_max_pic_order_cnt_lsb = sps.i_log2_max_pic_order_cnt_lsb;
+    p_sys->i_log2_max_frame_num = p_sps->i_log2_max_frame_num;
+    p_sys->b_frame_mbs_only = p_sps->b_frame_mbs_only;
+    p_sys->i_pic_order_cnt_type = p_sps->i_pic_order_cnt_type;
+    p_sys->i_delta_pic_order_always_zero_flag = p_sps->i_delta_pic_order_always_zero_flag;
+    p_sys->i_log2_max_pic_order_cnt_lsb = p_sps->i_log2_max_pic_order_cnt_lsb;
 
-    if( sps.vui.b_valid )
+    if( p_sps->vui.b_valid )
     {
-        p_sys->b_timing_info_present_flag = sps.vui.b_timing_info_present_flag;
-        p_sys->i_num_units_in_tick =  sps.vui.i_num_units_in_tick;
-        p_sys->i_time_scale = sps.vui.i_time_scale;
-        p_sys->b_fixed_frame_rate = sps.vui.b_fixed_frame_rate;
-        p_sys->b_pic_struct_present_flag = sps.vui.b_pic_struct_present_flag;
-        p_sys->b_cpb_dpb_delays_present_flag = sps.vui.b_cpb_dpb_delays_present_flag;
-        p_sys->i_cpb_removal_delay_length_minus1 = sps.vui.i_cpb_removal_delay_length_minus1;
-        p_sys->i_dpb_output_delay_length_minus1 = sps.vui.i_dpb_output_delay_length_minus1;
+        p_sys->b_timing_info_present_flag = p_sps->vui.b_timing_info_present_flag;
+        p_sys->i_num_units_in_tick =  p_sps->vui.i_num_units_in_tick;
+        p_sys->i_time_scale = p_sps->vui.i_time_scale;
+        p_sys->b_fixed_frame_rate = p_sps->vui.b_fixed_frame_rate;
+        p_sys->b_pic_struct_present_flag = p_sps->vui.b_pic_struct_present_flag;
+        p_sys->b_cpb_dpb_delays_present_flag = p_sps->vui.b_cpb_dpb_delays_present_flag;
+        p_sys->i_cpb_removal_delay_length_minus1 = p_sps->vui.i_cpb_removal_delay_length_minus1;
+        p_sys->i_dpb_output_delay_length_minus1 = p_sps->vui.i_dpb_output_delay_length_minus1;
     }
 
     /* We have a new SPS */
     if( !p_sys->b_sps )
-        msg_Dbg( p_dec, "found NAL_SPS (sps_id=%d)", sps.i_id );
+        msg_Dbg( p_dec, "found NAL_SPS (sps_id=%d)", p_sps->i_id );
     p_sys->b_sps = true;
 
-    if( p_sys->pp_sps[sps.i_id] )
-        block_Release( p_sys->pp_sps[sps.i_id] );
-    p_sys->pp_sps[sps.i_id] = p_frag;
+    if( p_sys->pp_sps[p_sps->i_id] )
+        block_Release( p_sys->pp_sps[p_sps->i_id] );
+    p_sys->pp_sps[p_sps->i_id] = p_frag;
+
+    h264_release_sps( p_sps );
 }
 
 static void PutPPS( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    struct h264_nal_pps pps;
+    const uint8_t *p_buffer = p_frag->p_buffer;
+    size_t i_buffer = p_frag->i_buffer;
 
-    if( h264_parse_pps( p_frag->p_buffer, p_frag->i_buffer, &pps ) != 0 )
+    if( !hxxx_strip_AnnexB_startcode( &p_buffer, &i_buffer ) )
+        return;
+
+    h264_picture_parameter_set_t *p_pps = h264_decode_pps( p_buffer, i_buffer, true );
+    if( !p_pps )
     {
-        msg_Warn( p_dec, "invalid PPS (pps_id=%d sps_id=%d)", pps.i_id, pps.i_sps_id );
+        msg_Warn( p_dec, "invalid PPS (pps_id=%d sps_id=%d)", p_pps->i_id, p_pps->i_sps_id );
         block_Release( p_frag );
         return;
     }
-    p_sys->i_pic_order_present_flag = pps.i_pic_order_present_flag;
+    p_sys->i_pic_order_present_flag = p_pps->i_pic_order_present_flag;
 
     /* We have a new PPS */
     if( !p_sys->b_pps )
-        msg_Dbg( p_dec, "found NAL_PPS (pps_id=%d sps_id=%d)", pps.i_id, pps.i_sps_id );
+        msg_Dbg( p_dec, "found NAL_PPS (pps_id=%d sps_id=%d)", p_pps->i_id, p_pps->i_sps_id );
     p_sys->b_pps = true;
 
-    if( p_sys->pp_pps[pps.i_id] )
-        block_Release( p_sys->pp_pps[pps.i_id] );
-    p_sys->pp_pps[pps.i_id] = p_frag;
+    if( p_sys->pp_pps[p_pps->i_id] )
+        block_Release( p_sys->pp_pps[p_pps->i_id] );
+    p_sys->pp_pps[p_pps->i_id] = p_frag;
+
+    h264_release_pps( p_pps );
 }
 
 static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,

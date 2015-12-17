@@ -72,7 +72,16 @@ enum h264_sei_type_e
     H264_SEI_RECOVERY_POINT = 6
 };
 
-struct h264_nal_sps
+typedef struct h264_sequence_parameter_set_t h264_sequence_parameter_set_t;
+typedef struct h264_picture_parameter_set_t h264_picture_parameter_set_t;
+
+h264_sequence_parameter_set_t * h264_decode_sps( const uint8_t *, size_t, bool );
+h264_picture_parameter_set_t *  h264_decode_pps( const uint8_t *, size_t, bool );
+
+void h264_release_sps( h264_sequence_parameter_set_t * );
+void h264_release_pps( h264_picture_parameter_set_t * );
+
+struct h264_sequence_parameter_set_t
 {
     int i_id;
     int i_profile, i_profile_compatibility, i_level;
@@ -97,7 +106,7 @@ struct h264_nal_sps
     } vui;
 };
 
-struct h264_nal_pps
+struct h264_picture_parameter_set_t
 {
     int i_id;
     int i_sps_id;
@@ -129,16 +138,6 @@ block_t *h264_AnnexB_to_AVC( block_t *p_block, uint8_t i_nal_length_size );
 int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
                      uint8_t **pp_sps, size_t *p_sps_size,
                      uint8_t **pp_pps, size_t *p_pps_size );
-
-/* Parse a SPS into the struct nal_sps
- * Returns 0 in case of success */
-int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
-                    struct h264_nal_sps *p_sps );
-
-/* Parse a PPS into the struct nal_pps
- * Returns 0 in case of success */
-int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
-                    struct h264_nal_pps *p_pps );
 
 /* Create a AVCDecoderConfigurationRecord from SPS/PPS
  * Returns a valid block_t on success, must be freed with block_Release */
