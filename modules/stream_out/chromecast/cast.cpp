@@ -180,6 +180,19 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     return sout_StreamIdSend(p_sys->p_out, id, p_buffer);
 }
 
+static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    sout_StreamFlush( p_sys->p_out, id );
+}
+
+static int Control(sout_stream_t *p_stream, int i_query, va_list args)
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    return p_sys->p_out->pf_control( p_sys->p_out, i_query, args );
+}
 
 /*****************************************************************************
  * Open: connect to the Chromecast and initialize the sout
@@ -286,9 +299,11 @@ static int Open(vlc_object_t *p_this)
     msleep(2 * CLOCK_FREQ);
 
     // Set the sout callbacks.
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
+    p_stream->pf_add     = Add;
+    p_stream->pf_del     = Del;
+    p_stream->pf_send    = Send;
+    p_stream->pf_flush   = Flush;
+    p_stream->pf_control = Control;
 
     return VLC_SUCCESS;
 }
