@@ -194,7 +194,7 @@ static const char *httpd_ReasonFromCode(unsigned i_code)
           { 202, "Accepted" },
           { 203, "Non-authoritative information" },
           { 204, "No content" },
-          { 205, "Reset content" },
+          { 205, "Reset content" },
           { 206, "Partial content" },
           { 250, "Low on storage space" },
           { 300, "Multiple choices" },*/
