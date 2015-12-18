@@ -431,6 +431,7 @@ vlc_tls_SessionDelete
 vlc_tls_Read
 vlc_tls_Write
 vlc_tls_GetLine
+vlc_tls_DummyCreate
 ToCharset
 update_Check
 update_Delete

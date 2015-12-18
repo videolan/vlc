@@ -308,3 +308,32 @@ error:
     free(line);
     return NULL;
 }
+
+static ssize_t vlc_tls_DummyReceive(vlc_tls_t *tls, void *buf, size_t len)
+{
+    return recv(tls->fd, buf, len, 0);
+}
+
+static ssize_t vlc_tls_DummySend(vlc_tls_t *tls, const void *buf, size_t len)
+{
+    return send(tls->fd, buf, len, 0);
+}
+
+static void vlc_tls_DummyClose(vlc_tls_t *tls)
+{
+    (void) tls;
+}
+
+vlc_tls_t *vlc_tls_DummyCreate(vlc_object_t *obj, int fd)
+{
+    vlc_tls_t *session = malloc(sizeof (*session));
+    if (unlikely(session == NULL))
+        return NULL;
+
+    session->obj = obj;
+    session->fd = fd;
+    session->recv = vlc_tls_DummyReceive;
+    session->send = vlc_tls_DummySend;
+    session->close = vlc_tls_DummyClose;
+    return session;
+}
