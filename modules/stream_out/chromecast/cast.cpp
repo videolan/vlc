@@ -159,7 +159,8 @@ vlc_module_end ()
 static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_fmt)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    return p_sys->p_out->pf_add(p_sys->p_out, p_fmt);
+
+    return sout_StreamIdAdd(p_sys->p_out, p_fmt);
 }
 
 
@@ -167,7 +168,7 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    p_sys->p_out->pf_del(p_sys->p_out, id);
+    sout_StreamIdDel(p_sys->p_out, id);
 }
 
 
@@ -176,7 +177,7 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    return p_sys->p_out->pf_send(p_sys->p_out, id, p_buffer);
+    return sout_StreamIdSend(p_sys->p_out, id, p_buffer);
 }
 
 
