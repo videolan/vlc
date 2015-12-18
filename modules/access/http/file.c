@@ -46,6 +46,7 @@ struct vlc_http_file
     struct vlc_http_msg *resp;
     char *host;
     unsigned port;
+    bool secure;
     char *authority;
     char *path;
     char *agent;
@@ -60,7 +61,8 @@ static struct vlc_http_msg *vlc_http_file_req(const struct vlc_http_file *file,
     struct vlc_http_msg *req;
     const char *str;
 
-    req = vlc_http_req_create("GET", "https", file->authority, file->path);
+    req = vlc_http_req_create("GET", file->secure ? "https" : "http",
+                              file->authority, file->path);
     if (unlikely(req == NULL))
         return NULL;
 
@@ -121,8 +123,8 @@ static struct vlc_http_msg *vlc_http_file_open(struct vlc_http_file *file,
     if (unlikely(req == NULL))
         return NULL;
 
-    struct vlc_http_msg *resp = vlc_http_mgr_request(file->manager, true,
-                                                  file->host, file->port, req);
+    struct vlc_http_msg *resp = vlc_http_mgr_request(file->manager,
+                                    file->secure, file->host, file->port, req);
     vlc_http_msg_destroy(req);
 
     resp = vlc_http_msg_get_final(resp);
@@ -189,23 +191,24 @@ struct vlc_http_file *vlc_http_file_create(struct vlc_http_mgr *mgr,
                                            const char *ref)
 {
     vlc_url_t url;
+    bool secure;
 
     vlc_UrlParse(&url, uri);
-    if (url.psz_protocol == NULL
-     || vlc_ascii_strcasecmp(url.psz_protocol, "https")
-     || url.psz_host == NULL)
-    {
-        vlc_UrlClean(&url);
-        return NULL;
-    }
+    if (url.psz_protocol == NULL || url.psz_host == NULL)
+        goto error;
+
+    if (!vlc_ascii_strcasecmp(url.psz_protocol, "https"))
+        secure = true;
+    else if (!vlc_ascii_strcasecmp(url.psz_protocol, "http"))
+        secure = false;
+    else
+        goto error;
 
     struct vlc_http_file *file = malloc(sizeof (*file));
     if (unlikely(file == NULL))
-    {
-        vlc_UrlClean(&url);
-        return NULL;
-    }
+        goto error;
 
+    file->secure = secure;
     file->host = strdup(url.psz_host);
     file->port = url.i_port;
     file->authority = vlc_http_authority(url.psz_host, url.i_port);
@@ -236,6 +239,9 @@ struct vlc_http_file *vlc_http_file_create(struct vlc_http_mgr *mgr,
         file = NULL;
     }
     return file;
+error:
+    vlc_UrlClean(&url);
+    return NULL;
 }
 
 int vlc_http_file_get_status(struct vlc_http_file *file)
@@ -278,7 +284,8 @@ char *vlc_http_file_get_redirect(struct vlc_http_file *file)
     {
         char *url;
 
-        if (unlikely(asprintf(&url, "https://%s%.*s", file->authority,
+        if (unlikely(asprintf(&url, "%s://%s%.*s",
+                              file->secure ? "https" : "http", file->authority,
                               (int)len, location)) < 0)
             return NULL;
         return url;

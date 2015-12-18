@@ -195,12 +195,12 @@ static void Close(vlc_object_t *obj)
 }
 
 vlc_module_begin()
-    set_description(N_("HTTP/TLS input"))
+    set_description(N_("HTTPS input"))
     set_shortname(N_("HTTPS"))
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
     set_capability("access", 2)
-    add_shortcut("https")
+    add_shortcut("https", "http")
     set_callbacks(Open, Close)
 
     add_bool("http2", false, N_("Force HTTP/2"),
