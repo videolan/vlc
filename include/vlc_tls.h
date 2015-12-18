@@ -91,6 +91,20 @@ VLC_API int vlc_tls_Write(vlc_tls_t *, const void *buf, size_t len);
 # define tls_Recv(a,b,c) vlc_tls_Read(a,b,c,false)
 # define tls_Send(a,b,c) vlc_tls_Write(a,b,c)
 
+/**
+ * Closes a TLS session and underlying connection.
+ *
+ * This function is non-blocking and is a cancellation point.
+ */
+static inline void vlc_tls_Close(vlc_tls_t *session)
+{
+    int fd = session->fd;
+
+    vlc_tls_SessionDelete(session);
+    shutdown(fd, SHUT_RDWR);
+    net_Close(fd);
+}
+
 /** TLS credentials (certificate, private and trust settings) */
 struct vlc_tls_creds
 {
