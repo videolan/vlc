@@ -282,11 +282,9 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
         if( !p_sps )
             return VLC_EGENERIC;
 
-        if( !p_sps->i_width || !p_sps->i_height )
-        {
-            h264_release_sps( p_sps );
-            return VLC_EGENERIC;
-        }
+        unsigned vsize[4];
+        (void) h264_get_picture_size( p_sps, &vsize[0], &vsize[1], &vsize[2], &vsize[3] );
+        /* FIXME: what to do with visible width/height ? */
 
         if (i_sps_size)
         {
@@ -304,8 +302,8 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
         /* Compare the SPS PPS with the old one */
         if (!CSDCmp(p_dec, csd, i_csd_count))
         {
-            msg_Warn(p_dec, "New SPS/PPS found, id: %d size: %dx%d sps: %d pps: %d",
-                     p_sps->i_id, p_sps->i_width, p_sps->i_height,
+            msg_Warn(p_dec, "New SPS/PPS found, id: %d size: %ux%u sps: %d pps: %d",
+                     p_sps->i_id, vsize[0], vsize[1],
                      i_sps_size, i_pps_size);
 
             /* In most use cases, p_sys->p_csd[0] contains a SPS, and
@@ -317,11 +315,11 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
             }
 
             if (p_size_changed)
-                *p_size_changed = (p_sps->i_width != p_sys->u.video.i_width
-                                || p_sps->i_height != p_sys->u.video.i_height);
+                *p_size_changed = (vsize[0] != p_sys->u.video.i_width
+                                || vsize[1] != p_sys->u.video.i_height);
 
-            p_sys->u.video.i_width = p_sps->i_width;
-            p_sys->u.video.i_height = p_sps->i_height;
+            p_sys->u.video.i_width = vsize[0];
+            p_sys->u.video.i_height = vsize[1];
 
             h264_release_sps( p_sps );
 

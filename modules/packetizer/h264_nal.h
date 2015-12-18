@@ -85,9 +85,17 @@ struct h264_sequence_parameter_set_t
 {
     int i_id;
     int i_profile, i_profile_compatibility, i_level;
-    int i_width, i_height;
+    uint32_t pic_width_in_mbs_minus1;
+    uint32_t pic_height_in_map_units_minus1;
+    struct
+    {
+        uint32_t left_offset;
+        uint32_t right_offset;
+        uint32_t top_offset;
+        uint32_t bottom_offset;
+    } frame_crop;
+    uint8_t frame_mbs_only_flag;
     int i_log2_max_frame_num;
-    int b_frame_mbs_only;
     int i_pic_order_cnt_type;
     int i_delta_pic_order_always_zero_flag;
     int i_log2_max_pic_order_cnt_lsb;
@@ -151,6 +159,8 @@ block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
 uint8_t * h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
                                    size_t *pi_result, uint8_t *pi_nal_length_size );
 
+bool h264_get_picture_size( const h264_sequence_parameter_set_t *, unsigned *p_w, unsigned *p_h,
+                            unsigned *p_vw, unsigned *p_vh );
 /* Get level and Profile */
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
                             size_t *p_level, uint8_t *p_nal_length_size);

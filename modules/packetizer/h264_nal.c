@@ -510,31 +510,24 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     bs_skip( p_bs, 1 );
 
     /* Read size */
-    p_sps->i_width  = 16 * ( bs_read_ue( p_bs ) + 1 );
-    p_sps->i_height = 16 * ( bs_read_ue( p_bs ) + 1 );
+    p_sps->pic_width_in_mbs_minus1 = bs_read_ue( p_bs );
+    p_sps->pic_height_in_map_units_minus1 = bs_read_ue( p_bs );
 
     /* b_frame_mbs_only */
-    p_sps->b_frame_mbs_only = bs_read( p_bs, 1 );
-    p_sps->i_height *=  ( 2 - p_sps->b_frame_mbs_only );
-    if( p_sps->b_frame_mbs_only == 0 )
-    {
+    p_sps->frame_mbs_only_flag = bs_read( p_bs, 1 );
+    if( !p_sps->frame_mbs_only_flag )
         bs_skip( p_bs, 1 );
-    }
+
     /* b_direct8x8_inference */
     bs_skip( p_bs, 1 );
 
     /* crop */
-    i_tmp = bs_read( p_bs, 1 );
-    if( i_tmp )
+    if( bs_read1( p_bs ) ) /* frame_cropping_flag */
     {
-        /* left */
-        bs_read_ue( p_bs );
-        /* right */
-        bs_read_ue( p_bs );
-        /* top */
-        bs_read_ue( p_bs );
-        /* bottom */
-        bs_read_ue( p_bs );
+        p_sps->frame_crop.left_offset = bs_read_ue( p_bs );
+        p_sps->frame_crop.right_offset = bs_read_ue( p_bs );
+        p_sps->frame_crop.right_offset = bs_read_ue( p_bs );
+        p_sps->frame_crop.bottom_offset = bs_read_ue( p_bs );
     }
 
     /* vui */
@@ -747,6 +740,19 @@ block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
     }
 
     return bo.b;
+}
+
+bool h264_get_picture_size( const h264_sequence_parameter_set_t *p_sps, unsigned *p_w, unsigned *p_h,
+                            unsigned *p_vw, unsigned *p_vh )
+{
+    *p_w = 16 * p_sps->pic_width_in_mbs_minus1 + 16;
+    *p_h = 16 * p_sps->pic_height_in_map_units_minus1 + 16;
+    *p_h *= ( 2 - p_sps->frame_mbs_only_flag );
+
+    *p_vw = *p_w - p_sps->frame_crop.left_offset - p_sps->frame_crop.right_offset;
+    *p_vh = *p_h - p_sps->frame_crop.bottom_offset - p_sps->frame_crop.top_offset;
+
+    return true;
 }
 
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,

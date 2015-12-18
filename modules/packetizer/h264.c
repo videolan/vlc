@@ -721,8 +721,12 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
 
     p_dec->fmt_out.i_profile = p_sps->i_profile;
     p_dec->fmt_out.i_level = p_sps->i_level;
-    p_dec->fmt_out.video.i_width  = p_sps->i_width;
-    p_dec->fmt_out.video.i_height = p_sps->i_height;
+
+    (void) h264_get_picture_size( p_sps, &p_dec->fmt_out.video.i_width,
+                                         &p_dec->fmt_out.video.i_height,
+                                         &p_dec->fmt_out.video.i_visible_width,
+                                         &p_dec->fmt_out.video.i_visible_height );
+
     if( p_sps->vui.i_sar_num != 0 && p_sps->vui.i_sar_den != 0 )
     {
         p_dec->fmt_out.video.i_sar_num = p_sps->vui.i_sar_num;
@@ -730,7 +734,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
     }
 
     p_sys->i_log2_max_frame_num = p_sps->i_log2_max_frame_num;
-    p_sys->b_frame_mbs_only = p_sps->b_frame_mbs_only;
+    p_sys->b_frame_mbs_only = p_sps->frame_mbs_only_flag;
     p_sys->i_pic_order_cnt_type = p_sps->i_pic_order_cnt_type;
     p_sys->i_delta_pic_order_always_zero_flag = p_sps->i_delta_pic_order_always_zero_flag;
     p_sys->i_log2_max_pic_order_cnt_lsb = p_sps->i_log2_max_pic_order_cnt_lsb;
