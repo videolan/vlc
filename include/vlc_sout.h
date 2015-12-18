@@ -210,6 +210,7 @@ struct sout_stream_t
     /* manage a packet */
     int               (*pf_send)( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
     int               (*pf_control)( sout_stream_t *, int, va_list );
+    void              (*pf_flush)( sout_stream_t *, sout_stream_id_sys_t * );
 
     sout_stream_sys_t *p_sys;
     bool pace_nocontrol;
@@ -235,6 +236,13 @@ static inline int sout_StreamIdSend( sout_stream_t *s,
                                      sout_stream_id_sys_t *id, block_t *b )
 {
     return s->pf_send( s, id, b );
+}
+
+static inline void sout_StreamFlush( sout_stream_t *s,
+                                     sout_stream_id_sys_t *id )
+{
+    if (s->pf_flush)
+        s->pf_flush( s, id );
 }
 
 static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )

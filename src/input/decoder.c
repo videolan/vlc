@@ -1389,6 +1389,12 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     if ( p_dec->pf_flush != NULL )
         p_dec->pf_flush( p_dec );
 
+#ifdef ENABLE_SOUT
+    if ( p_owner->p_sout_input != NULL )
+    {
+        sout_InputFlush( p_owner->p_sout_input );
+    }
+#endif
     if( p_dec->fmt_out.i_cat == AUDIO_ES )
     {
         if( p_owner->p_aout )

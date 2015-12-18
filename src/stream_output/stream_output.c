@@ -223,6 +223,15 @@ bool sout_InputIsEmpty( sout_packetizer_input_t *p_input )
     return b;
 }
 
+void sout_InputFlush( sout_packetizer_input_t *p_input )
+{
+    sout_instance_t     *p_sout = p_input->p_sout;
+
+    vlc_mutex_lock( &p_sout->lock );
+    sout_StreamFlush( p_sout->p_stream, p_input->id );
+    vlc_mutex_unlock( &p_sout->lock );
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -789,6 +798,7 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
     p_stream->psz_name = psz_name;
     p_stream->p_cfg    = p_cfg;
     p_stream->p_next   = p_next;
+    p_stream->pf_flush = NULL;
     p_stream->pf_control = NULL;
     p_stream->pace_nocontrol = false;
     p_stream->p_sys = NULL;
