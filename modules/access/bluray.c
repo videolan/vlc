@@ -1982,9 +1982,11 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_PLAYMARK:
     case BD_EVENT_ANGLE:
         break;
+#if BLURAY_VERSION >= BLURAY_VERSION_CODE(0,8,1)
     case BD_EVENT_UO_MASK_CHANGED:
         /* This event could be used to grey out unselectable items in title menu */
         break;
+#endif
     case BD_EVENT_MENU:
         p_sys->b_menu_open = e->param;
         break;
