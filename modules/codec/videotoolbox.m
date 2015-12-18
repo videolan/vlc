@@ -303,7 +303,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         }
 
         size_t i_buf;
-        const uint8_t *p_buf = NULL;
+        uint8_t *p_buf = NULL;
         uint8_t *p_alloc_buf = NULL;
         int i_ret = 0;
 
@@ -563,7 +563,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                 msg_Err(p_dec, "unsupported data");
                 break;
             case -12913:
-                msg_Err(p_dec, "VT is not available to sandboxed apps on this OS release");
+                msg_Err(p_dec, "VT is not available to sandboxed apps on this OS release or maximum number of decoders reached");
                 break;
             case -12917:
                 msg_Err(p_dec, "Insufficient source color data");
