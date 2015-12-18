@@ -384,6 +384,7 @@ sout_MuxDeleteStream
 sout_MuxGetStream
 sout_MuxNew
 sout_MuxSendBuffer
+sout_MuxFlush
 sout_StreamChainDelete
 sout_StreamChainNew
 spu_Create

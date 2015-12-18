@@ -562,6 +562,11 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
     return p_mux->pf_mux( p_mux );
 }
 
+void sout_MuxFlush( sout_mux_t *p_mux, sout_input_t *p_input )
+{
+    VLC_UNUSED(p_mux);
+    block_FifoEmpty( p_input->p_fifo );
+}
 
 /*****************************************************************************
  * sout_MuxGetStream: find stream to be muxed

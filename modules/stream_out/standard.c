@@ -143,6 +143,12 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 {
     return sout_MuxSendBuffer( p_stream->p_sys->p_mux, (sout_input_t*)id, p_buffer );
 }
+
+static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+{
+    sout_MuxFlush( p_stream->p_sys->p_mux, (sout_input_t*)id );
+}
+
 static void create_SDP(sout_stream_t *p_stream, sout_access_out_t *p_access)
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
@@ -405,6 +411,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
+    p_stream->pf_flush  = Flush;
     if( !sout_AccessOutCanControlPace( p_access ) )
         p_stream->pace_nocontrol = true;
 
