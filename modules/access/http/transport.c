@@ -92,62 +92,6 @@ ssize_t vlc_http_recv(int fd, void *buf, size_t len)
     return count;
 }
 
-ssize_t vlc_https_send(vlc_tls_t *tls, const void *buf, size_t len)
-{
-    struct pollfd ufd;
-    size_t count = 0;
-
-    ufd.fd = tls->fd;
-    ufd.events = POLLOUT;
-
-    while (count < len)
-    {
-        int canc = vlc_savecancel();
-        ssize_t val = tls->send(tls, (char *)buf + count, len - count);
-
-        vlc_restorecancel(canc);
-
-        if (val > 0)
-        {
-            count += val;
-            continue;
-        }
-
-        if (val == 0)
-            break;
-
-        if (errno != EINTR && errno != EAGAIN)
-            return -1;
-
-        poll(&ufd, 1, -1);
-    }
-
-    return count;
-}
-
-ssize_t vlc_http_send(int fd, const void *buf, size_t len)
-{
-    size_t count = 0;
-
-    while (count < len)
-    {
-        ssize_t val = send(fd, buf, len, MSG_NOSIGNAL);
-        if (val > 0)
-        {
-            count += val;
-            continue;
-        }
-
-        if (val == 0)
-            break;
-
-        if (errno != EINTR)
-            return -1;
-    }
-
-    return count;
-}
-
 static void cleanup_addrinfo(void *data)
 {
     freeaddrinfo(data);

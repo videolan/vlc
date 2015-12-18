@@ -23,7 +23,11 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
 #include <vlc_common.h>
 #include <vlc_tls.h>
 #include "h2frame.h"
@@ -170,6 +174,44 @@ static void vlc_h2_output_flush_unlocked(struct vlc_h2_output *out)
         n = f->next;
         free(f);
     }
+}
+
+/**
+ * Sends bytes to a connection.
+ * @note This may be a cancellation point.
+ * The caller is responsible for serializing writes on a given connection.
+ */
+static ssize_t vlc_https_send(vlc_tls_t *tls, const void *buf, size_t len)
+{
+    struct pollfd ufd;
+    size_t count = 0;
+
+    ufd.fd = tls->fd;
+    ufd.events = POLLOUT;
+
+    while (count < len)
+    {
+        int canc = vlc_savecancel();
+        ssize_t val = tls->send(tls, (char *)buf + count, len - count);
+
+        vlc_restorecancel(canc);
+
+        if (val > 0)
+        {
+            count += val;
+            continue;
+        }
+
+        if (val == 0)
+            break;
+
+        if (errno != EINTR && errno != EAGAIN)
+            return count ? (ssize_t)count : -1;
+
+        poll(&ufd, 1, -1);
+    }
+
+    return count;
 }
 
 /**
