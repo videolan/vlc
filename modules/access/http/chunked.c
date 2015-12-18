@@ -119,7 +119,7 @@ static block_t *vlc_chunked_read(struct vlc_http_stream *stream)
     {
         char crlf[2];
 
-        if (vlc_https_recv(s->tls, crlf, 2) < 2 || memcmp(crlf, "\r\n", 2))
+        if (vlc_tls_Read(s->tls, crlf, 2, true) < 2 || memcmp(crlf, "\r\n", 2))
             vlc_chunked_fatal(s);
     }
     return block;
