@@ -149,7 +149,10 @@ vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
 
 void vlc_tls_SessionDelete (vlc_tls_t *session)
 {
-    session->close (session);
+    int canc = vlc_savecancel();
+    session->close(session);
+    vlc_restorecancel(canc);
+
     free(session);
 }
 

@@ -72,6 +72,16 @@ VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *, int fd,
 
 vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *, int fd, const char *host,
                                   const char *const *alpn);
+
+/**
+ * Shuts a TLS session down.
+ *
+ * Shuts a TLS session down (if it was succesfully established) and releases
+ * all resources. The underlying connection is preserved. Use vlc_tls_Close()
+ * instead to shut it down at the same.
+ *
+ * This function is non-blocking and is not a cancellation point.
+ */
 VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
 VLC_API int vlc_tls_Read(vlc_tls_t *, void *buf, size_t len, bool waitall);
