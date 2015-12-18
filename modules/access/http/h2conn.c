@@ -23,8 +23,12 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <stdlib.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include <vlc_interrupt.h>
@@ -503,6 +507,46 @@ static const struct vlc_h2_parser_cbs vlc_h2_conn_callbacks =
     vlc_h2_stream_end,
     vlc_h2_stream_reset,
 };
+
+/**
+ * Receives TLS data.
+ *
+ * Receives bytes from the peer through a TLS session.
+ * @note This may be a cancellation point.
+ * The caller is responsible for serializing reads on a given connection.
+ */
+static ssize_t vlc_https_recv(vlc_tls_t *tls, void *buf, size_t len)
+{
+    struct pollfd ufd;
+    size_t count = 0;
+
+    ufd.fd = tls->fd;
+    ufd.events = POLLIN;
+
+    while (count < len)
+    {
+        int canc = vlc_savecancel();
+        ssize_t val = tls->recv(tls, (char *)buf + count, len - count);
+
+        vlc_restorecancel(canc);
+
+        if (val == 0)
+            break;
+
+        if (val >= 0)
+        {
+            count += val;
+            continue;
+        }
+
+        if (errno != EINTR && errno != EAGAIN)
+            return count ? (ssize_t)count : -1;
+
+        poll(&ufd, 1, -1);
+    }
+
+    return count;
+}
 
 /**
  * Receives an HTTP/2 frame through TLS.

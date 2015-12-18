@@ -36,62 +36,6 @@
 
 #include "transport.h"
 
-ssize_t vlc_https_recv(vlc_tls_t *tls, void *buf, size_t len)
-{
-    struct pollfd ufd;
-    size_t count = 0;
-
-    ufd.fd = tls->fd;
-    ufd.events = POLLIN;
-
-    while (count < len)
-    {
-        int canc = vlc_savecancel();
-        ssize_t val = tls->recv(tls, (char *)buf + count, len - count);
-
-        vlc_restorecancel(canc);
-
-        if (val == 0)
-            break;
-
-        if (val >= 0)
-        {
-            count += val;
-            continue;
-        }
-
-        if (errno != EINTR && errno != EAGAIN)
-            return -1;
-
-        poll(&ufd, 1, -1);
-    }
-
-    return count;
-}
-
-ssize_t vlc_http_recv(int fd, void *buf, size_t len)
-{
-    unsigned count = 0;
-
-    while (count < len)
-    {
-        ssize_t val = recv(fd, (char *)buf + count, len - count, MSG_WAITALL);
-        if (val == 0)
-            break;
-
-        if (val >= 0)
-        {
-            count += val;
-            continue;
-        }
-
-        if (errno != EINTR)
-            return -1;
-    }
-
-    return count;
-}
-
 static void cleanup_addrinfo(void *data)
 {
     freeaddrinfo(data);
