@@ -30,13 +30,8 @@ h2frame_test_SOURCES = access/http/h2frame_test.c \
 	access/http/h2frame.c access/http/h2frame.h
 h2output_test_SOURCES = access/http/h2output_test.c
 h2output_test_LDADD = libvlc_http.la $(LIBPTHREAD)
-h2conn_test_SOURCES = access/http/h2conn_test.c \
-	access/http/message.c access/http/message.h \
-	access/http/hpack.c access/http/hpack.h access/http/hpackenc.c \
-	access/http/h2frame.c access/http/h2frame.h \
-	access/http/h2conn.c access/http/h2conn.h \
-	access/http/h2output.c access/http/h2output.h
-h2conn_test_LDADD = $(LIBPTHREAD)
+h2conn_test_SOURCES = access/http/h2conn_test.c
+h2conn_test_LDADD = libvlc_http.la $(LIBPTHREAD)
 http_msg_test_SOURCES = access/http/message_test.c \
 	access/http/message.c access/http/message.h
 http_file_test_SOURCES = access/http/file_test.c \
