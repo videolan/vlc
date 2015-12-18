@@ -131,19 +131,3 @@ vlc_tls_t *vlc_https_connect(vlc_tls_creds_t *creds, const char *name,
     free(alp);
     return tls;
 }
-
-void vlc_http_disconnect(int fd)
-{
-    shutdown(fd, SHUT_RDWR);
-    net_Close(fd);
-}
-
-void vlc_https_disconnect(vlc_tls_t *tls)
-{
-    int canc = vlc_savecancel();
-    int fd = tls->fd;
-
-    vlc_tls_SessionDelete(tls);
-    vlc_http_disconnect(fd);
-    vlc_restorecancel(canc);
-}

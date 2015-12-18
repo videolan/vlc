@@ -170,7 +170,7 @@ struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
         if (likely(conn2 != NULL))
             mgr->conn2 = conn2;
         else
-            vlc_https_disconnect(tls);
+            vlc_tls_Close(tls);
     }
     else /* TODO: HTTP/1.x support */
     {
@@ -178,7 +178,7 @@ struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
         if (likely(conn1 != NULL))
             mgr->conn1 = conn1;
         else
-            vlc_https_disconnect(tls);
+            vlc_tls_Close(tls);
     }
 
     return vlc_https_request_reuse(mgr, host, port, req);

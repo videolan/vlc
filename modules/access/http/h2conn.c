@@ -686,7 +686,7 @@ static void vlc_h2_conn_destroy(struct vlc_h2_conn *conn)
     vlc_mutex_destroy(&conn->lock);
 
     vlc_h2_output_destroy(conn->out);
-    vlc_https_disconnect(conn->tls);
+    vlc_tls_Close(conn->tls);
     free(conn);
 }
 

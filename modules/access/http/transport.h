@@ -30,7 +30,5 @@ struct vlc_tls_creds;
 struct vlc_tls *vlc_https_connect(struct vlc_tls_creds *creds,
                                   const char *name, unsigned port,
                                   bool *restrict two);
-void vlc_http_disconnect(int fd);
-void vlc_https_disconnect(struct vlc_tls *tls);
 
 #endif

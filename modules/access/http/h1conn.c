@@ -124,7 +124,7 @@ static void vlc_h1_conn_destroy(struct vlc_h1_conn *conn);
 static void *vlc_h1_stream_fatal(struct vlc_h1_conn *conn)
 {
     msg_Dbg(CO(conn), "connection failed");
-    vlc_https_disconnect(conn->tls);
+    vlc_tls_Close(conn->tls);
     conn->tls = NULL;
     return NULL;
 }
@@ -242,7 +242,7 @@ static void vlc_h1_stream_close(struct vlc_http_stream *stream, bool abort)
 
     if (abort)
     {
-        vlc_https_disconnect(conn->tls);
+        vlc_tls_Close(conn->tls);
         conn->tls = NULL;
     }
 
@@ -277,7 +277,7 @@ static void vlc_h1_conn_destroy(struct vlc_h1_conn *conn)
     assert(conn->released);
 
     if (conn->tls != NULL)
-        vlc_https_disconnect(conn->tls);
+        vlc_tls_Close(conn->tls);
     free(conn);
 }
 
