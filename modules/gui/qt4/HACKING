@@ -2,7 +2,7 @@ Small Hacking file for the Qt Interface
 
 If you ever code for Qt interface, please read this before.
 
-** Code Convetions **
+** Code Conventions **
 
 Please respect VLC code conventions here:
  - NO trailing spaces

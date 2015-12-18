@@ -612,7 +612,7 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t *p_input = (input_thread_t*)p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    /* Update "position" for better intf behavour */
+    /* Update "position" for better intf behaviour */
     const int64_t i_length = var_GetInteger( p_input, "length" );
     if( i_length > 0 && newval.i_int >= 0 && newval.i_int <= i_length )
     {
