@@ -29,12 +29,12 @@
 # include "config.h"
 #endif
 
+#include "chromecast.h"
+
 #ifdef HAVE_POLL
 # include <poll.h>
 #endif
 
-#include <vlc_common.h>
-#include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_tls.h>
 #include <vlc_url.h>
@@ -47,20 +47,8 @@
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/coded_stream.h>
-#include "cast_channel.pb.h"
 
 #include "../../misc/webservices/json.h"
-
-// Status
-enum
-{
-    CHROMECAST_DISCONNECTED,
-    CHROMECAST_TLS_CONNECTED,
-    CHROMECAST_AUTHENTICATED,
-    CHROMECAST_APP_STARTED,
-    CHROMECAST_MEDIA_LOAD_SENT,
-    CHROMECAST_CONNECTION_DEAD,
-};
 
 #define PACKET_MAX_LEN 10 * 1024
 #define PACKET_HEADER_LEN 4
