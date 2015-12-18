@@ -3795,6 +3795,14 @@ AS_IF([test "${enable_qt}" != "no"], [
 AM_CONDITIONAL(ENABLE_QT4, [test "$enable_qt" != "no"])
 
 dnl
+dnl detect kde4-config patch (used for kde solids and kwallet).
+dnl
+AC_ARG_VAR([KDE4_CONFIG], [kde4-config utility])
+AS_IF([test "x$KDE4_CONFIG" = "x"], [
+  KDE4_CONFIG="kde4-config"
+])
+
+dnl
 dnl Simple test for skins2 dependency
 dnl
 AS_IF([test "$enable_qt" = "no"], [
@@ -4146,11 +4154,6 @@ AC_SUBST(DEFS_BIGENDIAN)
 dnl
 dnl Where to install KDE solid .desktop
 dnl
-AC_ARG_VAR([KDE4_CONFIG], [kde4-config utility])
-AS_IF([test "x$KDE4_CONFIG" = "x"], [
-  KDE4_CONFIG="kde4-config"
-])
-
 AC_ARG_WITH(kde-solid,
   AS_HELP_STRING([--with-kde-solid=PATH],
                  [KDE Solid actions directory (auto)]),, [
