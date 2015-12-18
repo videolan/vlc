@@ -834,19 +834,17 @@ static void *Run(void *data)
 
         /* we transmit the data */
         int i_net_ret = net_Printf(p_intf, i_post_socket,
-            "POST %s HTTP/1.1\n"
-            "Accept-Encoding: identity\n"
-            "Content-length: %zu\n"
-            "Connection: close\n"
-            "Content-type: application/x-www-form-urlencoded\n"
-            "Host: %s\n"
-            "User-agent: VLC media player/"VERSION"\r\n"
+            "POST %s HTTP/1.1\r\n"
+            "Host: %s\r\n"
+            "User-Agent: "PACKAGE_NAME"/"PACKAGE_VERSION"\r\n"
+            "Connection: close\r\n"
+            "Accept-Encoding: identity\r\n"
+            "Content-Type: application/x-www-form-urlencoded\r\n"
+            "Content-Length: %zu\r\n"
             "\r\n"
             "%s\r\n"
             "\r\n",
-            url->psz_path, strlen(psz_submit),
-            url->psz_host, psz_submit
-       );
+            url->psz_path, url->psz_host, strlen(psz_submit), psz_submit);
 
         free(psz_submit);
         if (i_net_ret == -1)
