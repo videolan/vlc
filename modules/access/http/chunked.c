@@ -50,7 +50,6 @@ static_assert(offsetof(struct vlc_chunked_stream, stream) == 0, "Cast error");
 
 static void *vlc_chunked_fatal(struct vlc_chunked_stream *s)
 {
-    assert(!s->error);
     s->error = true;
     return NULL;
 }
