@@ -189,6 +189,10 @@ static inline int sout_MuxControl( sout_mux_t *p_mux, int i_query, ... )
 
 /** @} */
 
+enum sout_stream_query_e {
+    SOUT_STREAM_EMPTY,    /* arg1=bool *,       res=can fail (assume true) */
+};
+
 struct sout_stream_t
 {
     VLC_COMMON_MEMBERS
@@ -205,6 +209,7 @@ struct sout_stream_t
     void              (*pf_del)( sout_stream_t *, sout_stream_id_sys_t * );
     /* manage a packet */
     int               (*pf_send)( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
+    int               (*pf_control)( sout_stream_t *, int, va_list );
 
     sout_stream_sys_t *p_sys;
     bool pace_nocontrol;
@@ -230,6 +235,20 @@ static inline int sout_StreamIdSend( sout_stream_t *s,
                                      sout_stream_id_sys_t *id, block_t *b )
 {
     return s->pf_send( s, id, b );
+}
+
+static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )
+{
+    va_list args;
+    int     i_result;
+
+    va_start( args, i_query );
+    if ( !s->pf_control )
+        i_result = VLC_EGENERIC;
+    else
+        i_result = s->pf_control( s, i_query, args );
+    va_end( args );
+    return i_result;
 }
 
 /****************************************************************************

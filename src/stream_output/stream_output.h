@@ -49,5 +49,6 @@ void sout_DeleteInstance( sout_instance_t * );
 sout_packetizer_input_t *sout_InputNew( sout_instance_t *, es_format_t * );
 int sout_InputDelete( sout_packetizer_input_t * );
 int sout_InputSendBuffer( sout_packetizer_input_t *, block_t* );
+bool sout_InputIsEmpty(sout_packetizer_input_t *);
 
 #endif
