@@ -41,14 +41,11 @@ static bool send_failure = false;
 static bool expect_hello = true;
 static vlc_sem_t rx;
 
-static vlc_tls_t fake_tls;
-
-/* Callback for sent frames */
-ssize_t vlc_https_send(struct vlc_tls *tls, const void *buf, size_t len)
+static ssize_t send_callback(vlc_tls_t *tls, const void *buf, size_t len)
 {
     const uint8_t *p = buf;
 
-    assert(tls == &fake_tls);
+    assert(tls->send == send_callback);
 
     if (expect_hello)
     {
@@ -72,6 +69,11 @@ ssize_t vlc_https_send(struct vlc_tls *tls, const void *buf, size_t len)
     vlc_sem_post(&rx);
     return send_failure ? -1 : (ssize_t)len;
 }
+
+static vlc_tls_t fake_tls =
+{
+    .send = send_callback,
+};
 
 static struct vlc_h2_frame *frame(unsigned char c)
 {

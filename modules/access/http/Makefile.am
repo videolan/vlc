@@ -28,11 +28,8 @@ hpackenc_test_CFLAGS = -DENC_TEST
 h2frame_test_SOURCES = access/http/h2frame_test.c \
 	access/http/hpack.c access/http/hpack.h access/http/hpackenc.c \
 	access/http/h2frame.c access/http/h2frame.h
-h2output_test_SOURCES = access/http/h2output_test.c \
-	access/http/hpack.c access/http/hpack.h access/http/hpackenc.c \
-	access/http/h2frame.c access/http/h2frame.h \
-	access/http/h2output.c access/http/h2output.h
-h2output_test_LDADD = $(LIBPTHREAD)
+h2output_test_SOURCES = access/http/h2output_test.c
+h2output_test_LDADD = libvlc_http.la $(LIBPTHREAD)
 h2conn_test_SOURCES = access/http/h2conn_test.c \
 	access/http/message.c access/http/message.h \
 	access/http/hpack.c access/http/hpack.h access/http/hpackenc.c \
