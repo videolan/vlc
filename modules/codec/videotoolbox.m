@@ -30,6 +30,7 @@
 #import <vlc_plugin.h>
 #import <vlc_codec.h>
 #import "../packetizer/h264_nal.h"
+#import "../packetizer/hxxx_nal.h"
 #import "../video_chroma/copy.h"
 #import <vlc_bits.h>
 #import <vlc_boxes.h>
@@ -350,26 +351,31 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             return VLC_EGENERIC;
         }
 
-        struct h264_nal_sps sps_data;
-        i_ret = h264_parse_sps(p_sps_buf,
-                               i_sps_size,
-                               &sps_data);
-
-        if (i_ret != VLC_SUCCESS) {
+        /* Decode Sequence Parameter Set */
+        const uint8_t *p_stp_sps_buf = p_sps_buf;
+        size_t i_stp_sps_nal = i_sps_size;
+        h264_sequence_parameter_set_t *p_sps_data;
+        if( !hxxx_strip_AnnexB_startcode( &p_stp_sps_buf, &i_stp_sps_nal ) ||
+            !( p_sps_data = h264_decode_sps(p_stp_sps_buf, i_stp_sps_nal, true) ) )
+        {
             msg_Warn(p_dec, "sps pps parsing failed");
             return VLC_EGENERIC;
         }
+
         /* this data is more trust-worthy than what we receive
          * from the demuxer, so we will use it to over-write
          * the current values */
-        i_video_width = sps_data.i_width;
-        i_video_height = sps_data.i_height;
-        i_sar_den = sps_data.vui.i_sar_den;
-        i_sar_num = sps_data.vui.i_sar_num;
+        i_video_width = p_sps_data->i_width;
+        i_video_height = p_sps_data->i_height;
+        i_sar_den = p_sps_data->vui.i_sar_den;
+        i_sar_num = p_sps_data->vui.i_sar_num;
 
         /* no evaluation here as this is done in the precheck */
-        p_sys->codec_profile = sps_data.i_profile;
-        p_sys->codec_level = sps_data.i_level;
+        p_sys->codec_profile = p_sps_data->i_profile;
+        p_sys->codec_level = p_sps_data->i_level;
+
+        h264_release_sps( p_sps_data );
+        /* !Decode Sequence Parameter Set */
 
         if(!p_sys->b_is_avcc)
         {
@@ -811,7 +817,7 @@ static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->b_is_avcc)
+    if (p_sys->b_is_avcc) /* FIXME: no change checks done for AVC ? */
         return p_block;
 
     uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
@@ -826,45 +832,47 @@ static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
                             &i_pps_size);
 
     if (i_ret == VLC_SUCCESS) {
-        struct h264_nal_sps sps_data;
-        i_ret = h264_parse_sps(p_sps_buf,
-                               i_sps_size,
-                               &sps_data);
-
-        if (i_ret == VLC_SUCCESS) {
+        /* Decode Sequence Parameter Set */
+        const uint8_t *p_stp_sps_buf = p_sps_buf;
+        size_t i_stp_sps_nal = i_sps_size;
+        h264_sequence_parameter_set_t *p_sps_data;
+        if( hxxx_strip_AnnexB_startcode( &p_stp_sps_buf, &i_stp_sps_nal ) &&
+          ( p_sps_data = h264_decode_sps(p_stp_sps_buf, i_stp_sps_nal, true) ) )
+        {
             bool b_something_changed = false;
-
-            if (p_sys->codec_profile != sps_data.i_profile) {
+            if (p_sys->codec_profile != p_sps_data->i_profile) {
                 msg_Warn(p_dec, "mid stream profile change found, restarting decoder");
                 b_something_changed = true;
-            } else if (p_sys->codec_level != sps_data.i_level) {
+            } else if (p_sys->codec_level != p_sps_data->i_level) {
                 msg_Warn(p_dec, "mid stream level change found, restarting decoder");
                 b_something_changed = true;
-            } else if (p_dec->fmt_out.video.i_width != sps_data.i_width) {
+            } else if (p_dec->fmt_out.video.i_width != p_sps_data->i_width) {
                 msg_Warn(p_dec, "mid stream width change found, restarting decoder");
                 b_something_changed = true;
-            } else if (p_dec->fmt_out.video.i_height != sps_data.i_height) {
+            } else if (p_dec->fmt_out.video.i_height != p_sps_data->i_height) {
                 msg_Warn(p_dec, "mid stream height change found, restarting decoder");
                 b_something_changed = true;
-            } else if (p_dec->fmt_out.video.i_sar_den != sps_data.vui.i_sar_den) {
+            } else if (p_dec->fmt_out.video.i_sar_den != p_sps_data->vui.i_sar_den) {
                 msg_Warn(p_dec, "mid stream SAR DEN change found, restarting decoder");
                 b_something_changed = true;
-            } else if (p_dec->fmt_out.video.i_sar_num != sps_data.vui.i_sar_num) {
+            } else if (p_dec->fmt_out.video.i_sar_num != p_sps_data->vui.i_sar_num) {
                 msg_Warn(p_dec, "mid stream SAR NUM change found, restarting decoder");
                 b_something_changed = true;
             }
 
-            if (b_something_changed) {
-                p_sys->codec_profile = sps_data.i_profile;
-                p_sys->codec_level = sps_data.i_level;
+            if (b_something_changed)
+            {
+                p_sys->codec_profile = p_sps_data->i_profile;
+                p_sys->codec_level = p_sps_data->i_level;
                 StopVideoToolbox(p_dec);
                 block_Release(p_block);
-                return NULL;
+                p_block = NULL;
             }
+            h264_release_sps( p_sps_data );
         }
     }
 
-    return h264_AnnexB_to_AVC(p_block, p_sys->i_nal_length_size);
+    return (p_block) ? h264_AnnexB_to_AVC(p_block, p_sys->i_nal_length_size) : NULL;
 }
 
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
