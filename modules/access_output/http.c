@@ -105,7 +105,7 @@ struct sout_access_out_sys_t
     int                 i_header_allocated;
     int                 i_header_size;
     uint8_t             *p_header;
-    bool          b_header_complete;
+    bool                b_header_complete;
     bool                b_metacube;
     bool                b_has_keyframes;
 };
