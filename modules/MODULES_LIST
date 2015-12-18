@@ -201,6 +201,7 @@ $Id$
  * kai: OS/2 audio output
  * karaoke: simple karaoke audio filter
  * kate: kate text bitstream decoder
+ * keystore_kwallet: store secrets via KDE Kwallet
  * keystore_plaintext: store secrets in a plaintext file (insecure)
  * keystore_secret: store secrets via Gnome libsecret
  * kva: OS/2 video output
