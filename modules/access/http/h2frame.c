@@ -541,6 +541,9 @@ static int vlc_h2_parse_headers_end(struct vlc_h2_parser *p)
     {
         p->cbs->stream_headers(s, val, headers);
         val = 0;
+
+        if (p->headers.eos)
+            p->cbs->stream_end(s);
     }
     else
     {
@@ -549,14 +552,12 @@ static int vlc_h2_parse_headers_end(struct vlc_h2_parser *p)
             free(headers[i][0]);
             free(headers[i][1]);
         }
-        /* NOTE: The specification implies that the error should also be sent
-         * for non-last header/continuation frames, but this does not make much
-         * sense. */
+        /* NOTE: The specification implies that the error should be sent for
+         * the first header frame. But we actually want to receive the whole
+         * fragmented headers block, to preserve the HPACK decoder state.
+         * So we send the error at the last header frame instead. */
         val = vlc_h2_stream_error(p, p->headers.sid, VLC_H2_REFUSED_STREAM);
     }
-
-    if (p->headers.eos && s != NULL)
-        p->cbs->stream_end(s);
 
     p->parser = vlc_h2_parse_generic;
     p->headers.sid = 0;
