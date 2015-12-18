@@ -197,7 +197,7 @@ struct sout_stream_t
     sout_instance_t   *p_sout;
 
     char              *psz_name;
-    config_chain_t        *p_cfg;
+    config_chain_t    *p_cfg;
     sout_stream_t     *p_next;
 
     /* add, remove a stream */
