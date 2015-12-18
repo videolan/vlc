@@ -45,7 +45,7 @@ fi
 
 # process [dir] [filemask] [text only]
 process() {
-    for file in `find $1 -maxdepth 1 -type f -name "$2"`
+    for file in `find $1 \( ! -name \`basename $1\` -o -type f \) -prune -type f -name "$2"`
     do
         if [ -n "$3" ]
         then
