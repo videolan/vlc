@@ -265,6 +265,7 @@ function parse()
 
             if string.match( line, "<meta property=\"og:image\"" ) then
                 _,_,arturl = string.find( line, "content=\"(.-)\"" )
+                arturl = vlc.strings.resolve_xml_special_chars( arturl )
             end
 
             if string.match(line, "\"author\":\"(.-)\",")    then
