@@ -96,7 +96,28 @@ static int vlc_tcp_connect(vlc_object_t *obj, const char *name, unsigned port)
 
     vlc_cleanup_pop();
     freeaddrinfo(res);
+
+#ifndef _WIN32
+    fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
+#else
+    ioctlsocket(fd, FIONBIO, &(unsigned long){ 1 });
+#endif
     return fd;
+}
+
+vlc_tls_t *vlc_http_connect(vlc_object_t *obj, const char *name, unsigned port)
+{
+    if (port == 0)
+        port = 80;
+
+    int fd = vlc_tcp_connect(obj, name, port);
+    if (fd == -1)
+        return NULL;
+
+    vlc_tls_t *tls = vlc_tls_DummyCreate(obj, fd);
+    if (tls == NULL)
+        net_Close(fd);
+    return tls;
 }
 
 vlc_tls_t *vlc_https_connect(vlc_tls_creds_t *creds, const char *name,
@@ -105,15 +126,9 @@ vlc_tls_t *vlc_https_connect(vlc_tls_creds_t *creds, const char *name,
     if (port == 0)
         port = 443;
 
-    int fd = vlc_tcp_connect(VLC_OBJECT(creds), name, port);
+    int fd = vlc_tcp_connect(creds->p_parent, name, port);
     if (fd == -1)
         return NULL;
-
-#ifndef _WIN32
-    fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
-#else
-    ioctlsocket(fd, FIONBIO, &(unsigned long){ 1 });
-#endif
 
     /* TLS with ALPN */
     const char *alpn[] = { "h2", "http/1.1", NULL };

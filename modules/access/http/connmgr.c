@@ -84,6 +84,52 @@ static vlc_tls_t *vlc_https_connect_i11e(vlc_tls_creds_t *creds,
     return res;
 }
 
+struct vlc_http_connecting
+{
+    vlc_object_t *obj;
+    const char *host;
+    unsigned port;
+    vlc_sem_t done;
+};
+
+static void *vlc_http_connect_thread(void *data)
+{
+    struct vlc_http_connecting *c = data;
+    vlc_tls_t *tls;
+
+    tls = vlc_http_connect(c->obj, c->host, c->port);
+    vlc_sem_post(&c->done);
+    return tls;
+}
+
+/** Interruptible vlc_http_connect() */
+static vlc_tls_t *vlc_http_connect_i11e(vlc_object_t *obj,
+                                        const char *host, unsigned port)
+{
+    struct vlc_http_connecting c;
+    vlc_thread_t th;
+
+    c.obj = obj;
+    c.host = host;
+    c.port = port;
+    vlc_sem_init(&c.done, 0);
+
+    if (vlc_clone(&th, vlc_http_connect_thread, &c, VLC_THREAD_PRIORITY_INPUT))
+        return NULL;
+
+    void *res;
+
+    if (vlc_sem_wait_i11e(&c.done))
+        vlc_cancel(th);
+    vlc_join(th, &res);
+    vlc_sem_destroy(&c.done);
+
+    if (res == VLC_THREAD_CANCELED)
+        res = NULL;
+    return res;
+}
+
+
 struct vlc_http_mgr
 {
     vlc_object_t *obj;
