@@ -26,8 +26,6 @@
 
 #include <vlc_common.h>
 
-block_t *CreateAnnexbNAL( const uint8_t *p, size_t );
-
 typedef block_t * (*pf_annexb_nal_packetizer)(decoder_t *, bool *, block_t *);
 block_t *PacketizeXXC1( decoder_t *, uint8_t, block_t **, pf_annexb_nal_packetizer );
 
