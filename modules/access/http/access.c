@@ -113,8 +113,6 @@ static int Open(vlc_object_t *obj)
 
     if (var_InheritBool(obj, "http-continuous"))
         return VLC_EGENERIC; /* FIXME not implemented yet */
-    if (var_InheritBool(obj, "http-forward-cookies"))
-        return VLC_EGENERIC; /* FIXME not implemented yet */
 
     char *proxy = vlc_getProxyUrl(access->psz_url);
     free(proxy);
@@ -130,7 +128,13 @@ static int Open(vlc_object_t *obj)
     sys->manager = NULL;
     sys->file = NULL;
 
-    sys->manager = vlc_http_mgr_create(obj, var_InheritBool(obj, "http2"));
+    void *jar = NULL;
+    if (var_InheritBool(obj, "http-forward-cookies"))
+        jar = var_InheritAddress(obj, "http-cookies");
+
+    bool h2c = var_InheritBool(obj, "http2");
+
+    sys->manager = vlc_http_mgr_create(obj, jar, h2c);
     if (sys->manager == NULL)
         goto error;
 

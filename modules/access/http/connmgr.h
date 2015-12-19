@@ -20,10 +20,19 @@
 
 struct vlc_http_mgr;
 struct vlc_http_msg;
+struct vlc_http_cookie_jar_t;
 
 struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
                                           const char *host, unsigned port,
                                           const struct vlc_http_msg *req);
+int vlc_http_mgr_send_cookies(struct vlc_http_mgr *mgr, bool https,
+                              const char *host, const char *path,
+                              struct vlc_http_msg *req);
+void vlc_http_mgr_recv_cookies(struct vlc_http_mgr *mgr, bool https,
+                               const char *host, const char *path,
+                               const struct vlc_http_msg *resp);
 
-struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj, bool try_h2c);
+struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj,
+                                         struct vlc_http_cookie_jar_t *jar,
+                                         bool h2c);
 void vlc_http_mgr_destroy(struct vlc_http_mgr *mgr);

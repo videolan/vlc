@@ -284,3 +284,26 @@ struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
 
     return vlc_http_stream_read_headers(&stream);
 }
+
+int vlc_http_mgr_send_cookies(struct vlc_http_mgr *mgr, bool https,
+                              const char *host, const char *path,
+                              struct vlc_http_msg *req)
+{
+    assert(https);
+    assert(!strcmp(host, "www.example.com"));
+    assert(!strcmp(path, "/dir/file.ext?a=b"));
+    assert(mgr == NULL);
+    (void) req;
+    return 0;
+}
+
+void vlc_http_mgr_recv_cookies(struct vlc_http_mgr *mgr, bool https,
+                               const char *host, const char *path,
+                               const struct vlc_http_msg *resp)
+{
+    assert(https);
+    assert(!strcmp(host, "www.example.com"));
+    assert(!strcmp(path, "/dir/file.ext?a=b"));
+    assert(mgr == NULL);
+    (void) resp;
+}

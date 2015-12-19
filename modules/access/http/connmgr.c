@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <vlc_common.h>
 #include <vlc_tls.h>
+#include <vlc_http.h>
 #include <vlc_interrupt.h>
 #include "transport.h"
 #include "conn.h"
@@ -134,6 +135,7 @@ struct vlc_http_mgr
 {
     vlc_object_t *obj;
     vlc_tls_creds_t *creds;
+    vlc_http_cookie_jar_t *jar;
     struct vlc_http_conn *conn;
     bool use_h2c;
 };
@@ -270,7 +272,40 @@ struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
     return (https ? vlc_https_request : vlc_http_request)(mgr, host, port, m);
 }
 
-struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj, bool h2c)
+int vlc_http_mgr_send_cookies(struct vlc_http_mgr *mgr, bool https,
+                              const char *host, const char *path,
+                              struct vlc_http_msg *req)
+{
+    int ret = 0;
+
+    if (mgr->jar != NULL)
+    {
+        char *cookies = vlc_http_cookies_fetch(mgr->jar, https, host, path);
+        if (cookies != NULL)
+        {
+            msg_Dbg(mgr->obj, "retrieved cookies: %s", cookies);
+            ret = vlc_http_msg_add_header(req, "Cookie", "%s", cookies);
+            free(cookies);
+        }
+    }
+    return ret;
+}
+
+void vlc_http_mgr_recv_cookies(struct vlc_http_mgr *mgr, bool https,
+                               const char *host, const char *path,
+                               const struct vlc_http_msg *resp)
+{
+    if (mgr->jar != NULL)
+    {   /* FIXME: fold multiple Set-Cookies headers with ';' */
+        const char *cookies = vlc_http_msg_get_header(resp, "Set-Cookie");
+        if (cookies != NULL
+         && vlc_http_cookies_store(mgr->jar, cookies, https, host, path))
+            msg_Dbg(mgr->obj, "stored cookie: %s", cookies);
+    }
+}
+
+struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj,
+                                         vlc_http_cookie_jar_t *jar, bool h2c)
 {
     struct vlc_http_mgr *mgr = malloc(sizeof (*mgr));
     if (unlikely(mgr == NULL))
@@ -278,6 +313,7 @@ struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj, bool h2c)
 
     mgr->obj = obj;
     mgr->creds = NULL;
+    mgr->jar = jar;
     mgr->conn = NULL;
     mgr->use_h2c = h2c;
     return mgr;
