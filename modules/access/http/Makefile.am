@@ -32,6 +32,8 @@ h2output_test_SOURCES = access/http/h2output_test.c
 h2output_test_LDADD = libvlc_http.la $(LIBPTHREAD)
 h2conn_test_SOURCES = access/http/h2conn_test.c
 h2conn_test_LDADD = libvlc_http.la $(LIBPTHREAD)
+h1conn_test_SOURCES = access/http/h1conn_test.c
+h1conn_test_LDADD = libvlc_http.la
 h1chunked_test_SOURCES = access/http/chunked_test.c
 h1chunked_test_LDADD = libvlc_http.la
 http_msg_test_SOURCES = access/http/message_test.c \
@@ -40,8 +42,8 @@ http_file_test_SOURCES = access/http/file_test.c \
 	access/http/message.c access/http/message.h \
 	access/http/file.c access/http/file.h
 check_PROGRAMS += hpack_test hpackenc_test \
-	h2frame_test h2output_test h2conn_test h1chunked_test \
+	h2frame_test h2output_test h2conn_test h1conn_test h1chunked_test \
 	http_msg_test http_file_test
 TESTS += hpack_test hpackenc_test \
-	h2frame_test h2output_test h2conn_test h1chunked_test \
+	h2frame_test h2output_test h2conn_test h1conn_test h1chunked_test \
 	http_msg_test http_file_test
