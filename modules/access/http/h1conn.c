@@ -122,9 +122,12 @@ static void vlc_h1_conn_destroy(struct vlc_h1_conn *conn);
 
 static void *vlc_h1_stream_fatal(struct vlc_h1_conn *conn)
 {
-    msg_Dbg(CO(conn), "connection failed");
-    vlc_tls_Close(conn->conn.tls);
-    conn->conn.tls = NULL;
+    if (conn->conn.tls != NULL)
+    {
+        msg_Dbg(CO(conn), "connection failed");
+        vlc_tls_Close(conn->conn.tls);
+        conn->conn.tls = NULL;
+    }
     return NULL;
 }
 
@@ -169,6 +172,11 @@ static struct vlc_http_msg *vlc_h1_stream_wait(struct vlc_http_stream *stream)
     size_t len;
     int minor;
 
+    assert(conn->active);
+
+    if (conn->conn.tls == NULL)
+        return NULL;
+
     char *payload = vlc_https_headers_recv(conn->conn.tls, &len);
     if (payload == NULL)
         return vlc_h1_stream_fatal(conn);
@@ -180,7 +188,7 @@ static struct vlc_http_msg *vlc_h1_stream_wait(struct vlc_http_stream *stream)
     free(payload);
 
     if (resp == NULL)
-        return NULL;
+        return vlc_h1_stream_fatal(conn);
 
     assert(minor >= 0);
 
@@ -195,7 +203,7 @@ static struct vlc_http_msg *vlc_h1_stream_wait(struct vlc_http_stream *stream)
 
         /* FIXME: tokenize, check if chunked is _last_ */
         str = vlc_http_msg_get_header(resp, "Transfer-Encoding");
-        if ((str != NULL) && strcasestr(str, "chunked"))
+        if (str != NULL && strcasestr(str, "chunked"))
         {
             assert(conn->content_length == UINTMAX_MAX);
             stream = vlc_chunked_open(stream, conn->conn.tls);
@@ -214,6 +222,11 @@ static block_t *vlc_h1_stream_read(struct vlc_http_stream *stream)
 {
     struct vlc_h1_conn *conn = vlc_h1_stream_conn(stream);
     size_t size = 2048;
+
+    assert(conn->active);
+
+    if (conn->conn.tls == NULL)
+        return NULL;
 
     if (size > conn->content_length)
         size = conn->content_length;
@@ -243,13 +256,11 @@ static void vlc_h1_stream_close(struct vlc_http_stream *stream, bool abort)
     struct vlc_h1_conn *conn = vlc_h1_stream_conn(stream);
 
     assert(conn->active);
-    conn->active = false;
 
     if (abort)
-    {
-        vlc_tls_Close(conn->conn.tls);
-        conn->conn.tls = NULL;
-    }
+        vlc_h1_stream_fatal(conn);
+
+    conn->active = false;
 
     if (conn->released)
         vlc_h1_conn_destroy(conn);
