@@ -800,14 +800,18 @@ static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     int i_slice_type;
     slice_t slice;
     bs_t s;
+    unsigned i_bitflow = 0;
 
-    if(p_frag->i_buffer < 6)
+    const uint8_t *p_stripped = p_frag->p_buffer;
+    size_t i_stripped = p_frag->i_buffer;
+
+    if( !hxxx_strip_AnnexB_startcode( &p_stripped, &i_stripped ) || i_stripped < 2 )
         return false;
 
-    bs_init( &s, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
-    unsigned i_bitflow = 0;
+    bs_init( &s, p_stripped, i_stripped );
     s.p_fwpriv = &i_bitflow;
     s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+    bs_skip( &s, 8 ); /* nal unit header */
 
     /* first_mb_in_slice */
     /* int i_first_mb = */ bs_read_ue( &s );
