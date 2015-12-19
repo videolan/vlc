@@ -332,7 +332,7 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
              "This problem may be caused by a configuration error "
              "or an attempt to breach your security or your privacy.\n\n"
              "If in doubt, abort now.\n");
-    int answer = dialog_Question(session, _("Insecure site"), vlc_gettext (msg),
+    int answer = dialog_Question(session->obj, _("Insecure site"), vlc_gettext (msg),
                                   _("Abort"), _("Accept certificate temporarily"), NULL, hostname);
 
     if (answer == 2) {
@@ -402,7 +402,7 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
             return 0;
 
         case errSSLServerAuthCompleted:
-            return st_Handshake(session, host, service, alp);
+            return st_Handshake(crd, session, host, service, alp);
 
         case errSSLConnectionRefused:
             msg_Err(crd, "connection was refused");
@@ -507,7 +507,7 @@ static void st_SessionClose (vlc_tls_t *session) {
         if (sys->b_handshaked) {
             OSStatus ret = SSLClose(sys->p_context);
             if (ret != noErr) {
-                msg_Warn(session, "Cannot close ssl context");
+                msg_Warn(session->obj, "Cannot close ssl context");
             }
         }
 
@@ -515,7 +515,7 @@ static void st_SessionClose (vlc_tls_t *session) {
         CFRelease(sys->p_context);
 #else
         if (SSLDisposeContext(sys->p_context) != noErr) {
-            msg_Err(session, "error deleting context");
+            msg_Err(session->obj, "error deleting context");
         }
 #endif
     }
