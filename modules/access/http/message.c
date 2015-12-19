@@ -428,86 +428,93 @@ struct vlc_h2_frame *vlc_http_msg_h2_frame(const struct vlc_http_msg *m,
     return f;
 }
 
-static int vlc_h2_header_special(const char *name)
-{
-    /* NOTE: HPACK always returns lower-case names, so strcmp() is fine. */
-    static const char special_names[5][16] = {
-        ":status", ":method", ":scheme", ":authority", ":path"
-    };
-
-    for (unsigned i = 0; i < 5; i++)
-        if (!strcmp(special_names[i], name))
-            return i;
-    return -1;
-}
-
 struct vlc_http_msg *vlc_http_msg_h2_headers(unsigned n, char *hdrs[][2])
 {
     struct vlc_http_msg *m = vlc_http_resp_create(0);
     if (unlikely(m == NULL))
         return NULL;
 
-    m->headers = malloc(n * sizeof (char *[2]));
-    if (unlikely(m->headers == NULL))
-        goto error;
-
-    char *special_caption[5] = { NULL, NULL, NULL, NULL, NULL };
-    char *special[5] = { NULL, NULL, NULL, NULL, NULL };
-
     for (unsigned i = 0; i < n; i++)
     {
-        char *name = hdrs[i][0];
-        char *value = hdrs[i][1];
-        int idx = vlc_h2_header_special(name);
+        const char *name = hdrs[i][0];
+        const char *value = hdrs[i][1];
 
-        if (idx >= 0)
+        /* NOTE: HPACK always returns lower-case names, so strcmp() is fine. */
+        if (!strcmp(name, ":status"))
         {
-            if (special[idx] != NULL)
-                goto error; /* Duplicate special header! */
+            char *end;
+            unsigned long status = strtoul(value, &end, 10);
 
-            special_caption[idx] = name;
-            special[idx] = value;
+            if (m->status != 0 || status > 999 || *end != '\0')
+                goto error; /* Not a three decimal digits status! */
+
+            m->status = status;
             continue;
         }
 
-        m->headers[m->count][0] = name;
-        m->headers[m->count][1] = value;
-        m->count++;
+        if (!strcmp(name, ":method"))
+        {
+            if (m->method != NULL)
+                goto error;
+
+            m->method = strdup(value);
+            if (unlikely(m->method == NULL))
+                goto error;
+
+            m->status = -1; /* this is a request */
+            continue;
+        }
+
+        if (!strcmp(name, ":scheme"))
+        {
+            if (m->scheme != NULL)
+                goto error;
+
+            m->scheme = strdup(value);
+            if (unlikely(m->scheme == NULL))
+                goto error;
+            continue;
+        }
+
+        if (!strcmp(name, ":authority"))
+        {
+            if (m->authority != NULL)
+                goto error;
+
+            m->authority = strdup(value);
+            if (unlikely(m->authority == NULL))
+                goto error;
+            continue;
+        }
+
+        if (!strcmp(name, ":path"))
+        {
+            if (m->path != NULL)
+                goto error;
+
+            m->path = strdup(value);
+            if (unlikely(m->path == NULL))
+                goto error;
+            continue;
+        }
+
+        if (vlc_http_msg_add_header(m, name, "%s", value))
+            goto error;
     }
 
-    if (special[0] != NULL)
-    {   /* HTTP response */
-        char *end;
-        unsigned long status = strtoul(special[0], &end, 10);
-
-        if (status > 999 || *end != '\0')
-            goto error; /* Not a three decimal digits status! */
-
-        free(special[0]);
-        m->status = status;
-    }
-    else
-        m->status = -1; /* HTTP request */
-
-    m->method = special[1];
-    m->scheme = special[2];
-    m->authority = special[3];
-    m->path = special[4];
-
-    for (unsigned i = 0; i < 5; i++)
-        free(special_caption[i]);
-
-    return m;
-
+    if ((m->status < 0) == (m->method == NULL))
+    {   /* Must be either a request or response. Not both, not neither. */
 error:
-    free(m->headers);
-    free(m);
+        vlc_http_msg_destroy(m);
+        m = NULL;
+    }
+
     for (unsigned i = 0; i < n; i++)
     {
         free(hdrs[i][0]);
         free(hdrs[i][1]);
     }
-    return NULL;
+    return m;
 }
 
 /* Header helpers */
