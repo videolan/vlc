@@ -112,7 +112,7 @@ function js_descramble( sig, js_url )
 
     -- Fetch the code of the descrambler function
     -- var Go=function(a){a=a.split("");Fo.sH(a,2);Fo.TU(a,28);Fo.TU(a,44);Fo.TU(a,26);Fo.TU(a,40);Fo.TU(a,64);Fo.TR(a,26);Fo.sH(a,1);return a.join("")};
-    local rules = js_extract( js, "var "..descrambler.."=function%([^)]*%){(.-)};",
+    local rules = js_extract( js, "[ ,]"..descrambler.."=function%([^)]*%){(.-)};",
                                   -- Legacy/alternate format
                                   "function "..descrambler.."%([^)]*%){(.-)}" )
     if not rules then
@@ -128,7 +128,7 @@ function js_descramble( sig, js_url )
 
     -- Fetch the helper object code
     -- var Fo={TR:function(a){a.reverse()},TU:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c},sH:function(a,b){a.splice(0,b)}};
-    local transformations = js_extract( js, "var "..helper.."={(.-)};", nil )
+    local transformations = js_extract( js, "[ ,]"..helper.."={(.-)};", nil )
     if not transformations then
         return sig
     end
