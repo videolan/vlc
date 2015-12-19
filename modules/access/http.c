@@ -150,7 +150,6 @@ struct access_sys_t
     const char *psz_protocol;
 
     char       *psz_mime;
-    char       *psz_pragma;
     char       *psz_location;
     bool i_version;
     bool b_mms;
@@ -225,7 +224,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_version = 1;
     p_sys->b_seekable = true;
     p_sys->psz_mime = NULL;
-    p_sys->psz_pragma = NULL;
     p_sys->b_mms = false;
     p_sys->b_icecast = false;
     p_sys->psz_location = NULL;
@@ -450,7 +448,6 @@ connect:
         free( p_sys->psz_proxy_passbuf );
         http_auth_Reset( &p_sys->proxy_auth );
         free( p_sys->psz_mime );
-        free( p_sys->psz_pragma );
         free( p_sys->psz_user_agent );
         free( p_sys->psz_referrer );
 
@@ -488,7 +485,6 @@ error:
         vlc_UrlClean( &p_sys->proxy );
     free( p_sys->psz_proxy_passbuf );
     free( p_sys->psz_mime );
-    free( p_sys->psz_pragma );
     free( p_sys->psz_location );
     free( p_sys->psz_user_agent );
     free( p_sys->psz_referrer );
@@ -518,7 +514,6 @@ static void Close( vlc_object_t *p_this )
     http_auth_Reset( &p_sys->proxy_auth );
 
     free( p_sys->psz_mime );
-    free( p_sys->psz_pragma );
     free( p_sys->psz_location );
 
     free( p_sys->psz_icy_name );
@@ -934,7 +929,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     /* Clean info */
     free( p_sys->psz_location );
     free( p_sys->psz_mime );
-    free( p_sys->psz_pragma );
 
     free( p_sys->psz_icy_genre );
     free( p_sys->psz_icy_name );
@@ -943,7 +937,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
 
     p_sys->psz_location = NULL;
     p_sys->psz_mime = NULL;
-    p_sys->psz_pragma = NULL;
     p_sys->b_mms = false;
     p_sys->b_chunked = false;
     p_sys->i_chunk = 0;
@@ -1300,9 +1293,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
         {
             if( !strcasecmp( psz, "Pragma: features" ) )
                 p_sys->b_mms = true;
-            free( p_sys->psz_pragma );
-            p_sys->psz_pragma = strdup( p );
-            msg_Dbg( p_access, "Pragma: %s", p_sys->psz_pragma );
+            msg_Dbg( p_access, "Pragma: %s", p );
         }
         else if( !strcasecmp( psz, "Server" ) )
         {
