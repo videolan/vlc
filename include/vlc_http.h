@@ -78,10 +78,13 @@ VLC_API void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar );
  * Parse a value of an incoming Set-Cookie header and append the
  * cookie to the cookie jar if appropriate.
  *
- * @param p_jar cookie jar object
- * @param psz_cookie_header value of Set-Cookie
+ * @param jar cookie jar object
+ * @param cookie header field value of Set-Cookie
  * @return true, if the cookie was added, false otherwise
  */
+VLC_API bool vlc_http_cookies_store( vlc_http_cookie_jar_t *jar,
+    const char *cookie, bool secure, const char *host, const char *path );
+
 VLC_API bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_cookie_header, const vlc_url_t * p_url );
 
 /**
@@ -91,6 +94,9 @@ VLC_API bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char 
  * @param p_url the URL for which the cookies are returned
  * @return A string consisting of semicolon-separated cookie NAME=VALUE pairs.
  */
+VLC_API char *vlc_http_cookies_fetch( vlc_http_cookie_jar_t *jar, bool secure,
+                                      const char *host, const char *path );
+
 VLC_API char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t * p_url );
 
 #endif /* VLC_HTTP_H */

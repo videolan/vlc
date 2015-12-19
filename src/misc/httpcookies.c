@@ -51,14 +51,14 @@ struct vlc_http_cookie_jar_t
     vlc_mutex_t lock;
 };
 
-static http_cookie_t * cookie_parse( const char * cookie_header, const vlc_url_t * url );
+static http_cookie_t * cookie_parse( const char *, const char *, const char * );
 static void cookie_destroy( http_cookie_t * p_cookie );
 static char * cookie_get_content( const char * cookie );
 static char * cookie_get_domain( const char * cookie );
 static char * cookie_get_attribute_value( const char * cookie, const char *attr );
 static bool cookie_has_attribute( const char * cookie, const char *attr );
-static bool cookie_should_be_sent( const http_cookie_t * cookie, const vlc_url_t * url );
-static bool cookie_is_valid( const http_cookie_t * cookie, const char *host );
+static bool cookie_should_be_sent(const http_cookie_t *, bool, const char *, const char *);
+static bool cookie_is_valid(const http_cookie_t *, bool, const char *, const char *);
 static bool cookie_domain_matches( const http_cookie_t * cookie, const char *host );
 static bool cookie_path_matches( const http_cookie_t * cookie, const char *path );
 static bool cookie_domain_is_public_suffix( const char *domain );
@@ -91,14 +91,20 @@ void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
     free( p_jar );
 }
 
-bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_cookie_header, const vlc_url_t *p_url )
+bool vlc_http_cookies_store(vlc_http_cookie_jar_t *p_jar, const char *cookies,
+                            bool secure, const char *host, const char *path)
 {
+    assert(host != NULL);
+    assert(path != NULL);
+
     int i;
 
-    http_cookie_t *cookie = cookie_parse( psz_cookie_header, p_url );
-    if( !cookie || !cookie_is_valid( cookie, p_url->psz_host ) )
+    http_cookie_t *cookie = cookie_parse(cookies, host, path);
+    if (cookie == NULL)
+        return false;
+    if (!cookie_is_valid(cookie, secure, host, path))
     {
-        cookie_destroy( cookie );
+        cookie_destroy(cookie);
         return false;
     }
 
@@ -131,7 +137,25 @@ bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_co
     return true;
 }
 
-char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t * p_url )
+bool vlc_http_cookies_append(vlc_http_cookie_jar_t *jar,
+                             const char *cookies, const vlc_url_t *url)
+{
+    bool secure;
+
+    if (url->psz_protocol == NULL || url->psz_host == NULL
+     || url->psz_path == NULL)
+        return false;
+    else if (!vlc_ascii_strcasecmp(url->psz_protocol, "https"))
+        secure = true;
+    else
+        secure = false;
+
+    return vlc_http_cookies_store(jar, cookies, secure, url->psz_host,
+                                  url->psz_path);
+}
+
+char *vlc_http_cookies_fetch(vlc_http_cookie_jar_t *p_jar, bool secure,
+                             const char *host, const char *path)
 {
     int i;
     char *psz_cookiebuf = NULL;
@@ -141,7 +165,7 @@ char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t *
     for( i = 0; i < vlc_array_count( &p_jar->cookies ); i++ )
     {
         const http_cookie_t * cookie = vlc_array_item_at_index( &p_jar->cookies, i );
-        if ( cookie_should_be_sent( cookie, p_url ) )
+        if (cookie_should_be_sent(cookie, secure, host, path))
         {
             char *psz_updated_buf = NULL;
             if ( asprintf(&psz_updated_buf, "%s%s%s=%s",
@@ -165,13 +189,31 @@ char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t *
     return psz_cookiebuf;
 }
 
-static http_cookie_t * cookie_parse( const char * cookie_header, const vlc_url_t * url )
+char *vlc_http_cookies_for_url(vlc_http_cookie_jar_t *jar,
+                               const vlc_url_t *url)
+{
+    bool secure;
+
+    if (url->psz_protocol == NULL || url->psz_host == NULL
+     || url->psz_path == NULL)
+        return NULL;
+    else if (!vlc_ascii_strcasecmp(url->psz_protocol, "https"))
+        secure = true;
+    else
+        secure = false;
+
+    return vlc_http_cookies_fetch(jar, secure, url->psz_host, url->psz_path);
+}
+
+
+static http_cookie_t *cookie_parse(const char *value,
+                                   const char *host, const char *path)
 {
     http_cookie_t *cookie = calloc( 1, sizeof( http_cookie_t ) );
     if ( unlikely( !cookie ) )
         return NULL;
 
-    char *content = cookie_get_content( cookie_header );
+    char *content = cookie_get_content(value);
     if ( !content )
     {
         cookie_destroy( cookie );
@@ -190,24 +232,24 @@ static http_cookie_t * cookie_parse( const char * cookie_header, const vlc_url_t
         cookie->psz_value = NULL;
     }
 
-    cookie->psz_domain = cookie_get_domain( cookie_header );
+    cookie->psz_domain = cookie_get_domain(value);
     if ( !cookie->psz_domain || strlen(cookie->psz_domain) == 0 )
     {
         free(cookie->psz_domain);
-        cookie->psz_domain = strdup( url->psz_host );
+        cookie->psz_domain = strdup(host);
         cookie->b_host_only = true;
     }
     else
         cookie->b_host_only = false;
 
-    cookie->psz_path = cookie_get_attribute_value( cookie_header, "path" );
+    cookie->psz_path = cookie_get_attribute_value(value, "path" );
     if ( !cookie->psz_path || strlen(cookie->psz_path) == 0 )
     {
         free(cookie->psz_path);
-        cookie->psz_path = cookie_default_path( url->psz_path );
+        cookie->psz_path = cookie_default_path(path);
     }
 
-    cookie->b_secure = cookie_has_attribute( cookie_header, "secure" );
+    cookie->b_secure = cookie_has_attribute(value, "secure" );
 
     FREENULL( content );
 
@@ -299,17 +341,18 @@ static bool cookie_has_attribute( const char * cookie, const char *attr )
     return false;
 }
 
-static bool cookie_should_be_sent( const http_cookie_t * cookie, const vlc_url_t * url )
+static bool cookie_should_be_sent(const http_cookie_t *cookie, bool secure,
+                                  const char *host, const char *path)
 {
-    bool protocol_ok = !cookie->b_secure ||
-        ( url->psz_protocol && strcasecmp(url->psz_protocol, "https") == 0 );
-    bool domain_ok = cookie_domain_matches( cookie, url->psz_host );
-    bool path_ok = cookie_path_matches( cookie, url->psz_path );
+    bool protocol_ok = secure || !cookie->b_secure;
+    bool domain_ok = cookie_domain_matches(cookie, host);
+    bool path_ok = cookie_path_matches(cookie, path);
     return protocol_ok && domain_ok && path_ok;
 }
 
 /* Check if a cookie from host should be added to the cookie jar */
-static bool cookie_is_valid( const http_cookie_t * cookie, const char *host )
+static bool cookie_is_valid(const http_cookie_t * cookie, bool secure,
+                            const char *host, const char *path)
 {
     return cookie && cookie->psz_name && strlen(cookie->psz_name) > 0 &&
         cookie->psz_domain &&
