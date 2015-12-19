@@ -199,6 +199,78 @@ static int vlc_h2_stream_reset(void *ctx, uint_fast32_t code)
     return 0;
 }
 
+/* Frame formatting */
+static struct vlc_h2_frame *resize(struct vlc_h2_frame *f, size_t size)
+{   /* NOTE: increasing size would require realloc() */
+    f->data[0] = size >> 16;
+    f->data[1] = size >> 8;
+    f->data[2] = size;
+    return f;
+}
+
+static struct vlc_h2_frame *retype(struct vlc_h2_frame *f, unsigned char type)
+{
+    f->data[3] = type;
+    return f;
+}
+
+static struct vlc_h2_frame *reflag(struct vlc_h2_frame *f, unsigned char flags)
+{
+    f->data[4] = flags;
+    return f;
+}
+
+static struct vlc_h2_frame *globalize(struct vlc_h2_frame *f)
+{
+    memset(f->data + 5, 0, 4);
+    return f;
+}
+
+static struct vlc_h2_frame *localize(struct vlc_h2_frame *f)
+{
+    f->data[5] = (STREAM_ID >> 24) & 0xff;
+    f->data[6] = (STREAM_ID >> 16) & 0xff;
+    f->data[7] = (STREAM_ID >>  8) & 0xff;
+    f->data[8] =  STREAM_ID        & 0xff;
+    return f;
+}
+
+static struct vlc_h2_frame *response(bool eos)
+{
+    /* Use ridiculously small MTU to test headers fragmentation */
+    return vlc_h2_frame_headers(STREAM_ID, 16, eos, resp_hdrc, resp_hdrv);
+}
+
+static struct vlc_h2_frame *data(bool eos)
+{
+    return vlc_h2_frame_data(STREAM_ID, MESSAGE, sizeof (MESSAGE), eos);
+}
+
+static struct vlc_h2_frame *priority(void)
+{
+    return localize(resize(retype(data(false), 0x2), 5));
+}
+
+static struct vlc_h2_frame *rst_stream(void)
+{
+    return vlc_h2_frame_rst_stream(STREAM_ID, VLC_H2_CANCEL);
+}
+
+static struct vlc_h2_frame *ping(void)
+{
+    return vlc_h2_frame_ping(PING_VALUE);
+}
+
+static struct vlc_h2_frame *goaway(void)
+{
+    return vlc_h2_frame_goaway(0, VLC_H2_NO_ERROR);
+}
+
+static struct vlc_h2_frame *unknown(void)
+{
+    return retype(ping(), 200);
+}
+
 /* Test harness */
 static unsigned test_raw_seqv(struct vlc_h2_parser *p, va_list ap)
 {
@@ -266,33 +338,34 @@ static unsigned test_seq(void *ctx, ...)
     i = test_raw_seqv(p, ap);
     va_end(ap);
 
-    assert(test_raw_seq(p, vlc_h2_frame_goaway(0, VLC_H2_NO_ERROR),
-                        NULL) == 1);
+    assert(test_raw_seq(p, goaway(), NULL) == 1);
     assert(remote_error == VLC_H2_NO_ERROR);
 
     vlc_h2_parse_destroy(p);
     return i;
 }
 
-static struct vlc_h2_frame *ping(void)
+static unsigned test_bad_seq(void *ctx, ...)
 {
-    return vlc_h2_frame_ping(PING_VALUE);
-}
+    struct vlc_h2_parser *p;
+    va_list ap;
+    unsigned i;
 
-static struct vlc_h2_frame *response(bool eos)
-{
-    /* Use ridiculously small MTU to test headers fragmentation */
-    return vlc_h2_frame_headers(STREAM_ID, 16, eos, resp_hdrc, resp_hdrv);
-}
+    p = vlc_h2_parse_init(ctx, &vlc_h2_frame_test_callbacks);
+    assert(p != NULL);
 
-static struct vlc_h2_frame *data(bool eos)
-{
-    return vlc_h2_frame_data(STREAM_ID, MESSAGE, sizeof (MESSAGE), eos);
-}
+    i = test_raw_seq(p, vlc_h2_frame_settings(), vlc_h2_frame_settings_ack(),
+                     NULL);
+    assert(i == 2);
 
-static struct vlc_h2_frame *rst_stream(void)
-{
-    return vlc_h2_frame_rst_stream(STREAM_ID, VLC_H2_CANCEL);
+    va_start(ap, ctx);
+    i = test_raw_seqv(p, ap);
+    va_end(ap);
+
+    i = test_raw_seq(p, goaway(), NULL);
+    assert(i == 0); /* in failed state */
+    vlc_h2_parse_destroy(p);
+    return i;
 }
 
 static void test_preface_fail(void)
@@ -305,6 +378,18 @@ static void test_preface_fail(void)
     assert(test_raw_seq(p, ping(), ping(), NULL) == 0);
 
     vlc_h2_parse_destroy(p);
+}
+
+static void test_header_block_fail(void)
+{
+    struct vlc_h2_frame *hf = response(true);
+    struct vlc_h2_frame *pf = ping();
+
+    /* Check what happens if non-CONTINUATION frame after HEADERS */
+    assert(hf != NULL && hf->next != NULL && pf != NULL);
+    pf->next = hf->next;
+    hf->next = pf;
+    assert(test_bad_seq(CTX, hf, NULL) == 0);
 }
 
 int main(void)
@@ -330,9 +415,9 @@ int main(void)
 
     ret = test_seq(CTX, response(false), data(true), ping(),
                         response(false), data(false), data(true),
-                        response(false), data(false),
+                        response(false), data(false), priority(), unknown(),
                         NULL);
-    assert(ret == 8);
+    assert(ret == 10);
     assert(pings == 1);
     assert(stream_header_tables == 3);
     assert(stream_blocks == 4);
@@ -351,6 +436,22 @@ int main(void)
     assert(stream_ends == 0);
 
     test_preface_fail();
+    test_header_block_fail();
+
+    test_bad_seq(CTX, globalize(response(true)), NULL);
+    test_bad_seq(CTX, resize(reflag(response(true), 0x08), 0), NULL);
+    test_bad_seq(CTX, resize(reflag(response(true), 0x20), 4), NULL);
+    test_bad_seq(CTX, globalize(data(true)), NULL);
+    test_bad_seq(CTX, globalize(priority()), NULL);
+    test_bad_seq(CTX, globalize(rst_stream()), NULL);
+    test_bad_seq(CTX, localize(vlc_h2_frame_settings()), NULL);
+    test_bad_seq(CTX, resize(vlc_h2_frame_settings(), 5), NULL);
+    test_bad_seq(CTX, resize(ping(), 7), NULL);
+    test_bad_seq(CTX, localize(ping()), NULL);
+    test_bad_seq(CTX, localize(goaway()), NULL);
+    test_bad_seq(CTX, resize(goaway(), 7), NULL);
+
+    /* TODO: PUSH_PROMISE, PRIORITY, padding, unknown, invalid stuff... */
 
     /* Dummy API test */
     assert(vlc_h2_frame_data(1, NULL, 1 << 28, false) == NULL);

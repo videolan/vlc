@@ -253,6 +253,9 @@ int main(void)
     conn_expect(RST_STREAM);
     conn_expect(RST_STREAM);
 
+    /* Test nonexistent stream reset */
+    conn_send(vlc_h2_frame_rst_stream(sid + 100, VLC_H2_REFUSED_STREAM));
+
     /* Test multiple streams in non-LIFO order */
     sid += 2;
     s = stream_open();
