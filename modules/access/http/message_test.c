@@ -47,6 +47,7 @@ static void check_req(const struct vlc_http_msg *m)
     assert(str != NULL && !strcmp(str, "www.example.com"));
     str = vlc_http_msg_get_path(m);
     assert(str != NULL && !strcmp(str, "/"));
+    assert(vlc_http_msg_get_size(m) == 0);
 
     str = vlc_http_msg_get_header(m, "Cache-Control");
     assert(str != NULL && !strcmp(str, "no-cache"));
@@ -160,6 +161,7 @@ static time_t parse_date(const char *str)
 int main(void)
 {
     struct vlc_http_msg *m;
+    const char *str;
     int ret;
 
     /* Formatting and parsing */
@@ -216,7 +218,25 @@ int main(void)
     vlc_http_msg_add_header(m, "Content-Length", "1234");
     assert(vlc_http_msg_get_size(m) == 1234);
 
+    /* Folding */
+    vlc_http_msg_add_header(m, "X-Folded", "Hello\n\tworld!");
+    str = vlc_http_msg_get_header(m, "x-folded");
+    assert(str != NULL && !strcmp(str, "Hello \tworld!"));
+
+    vlc_http_msg_add_header(m, "TE", "gzip");
+    vlc_http_msg_add_header(m, "TE", "deflate");
+    str = vlc_http_msg_get_header(m, "TE");
+    assert(str != NULL && !strcmp(str, "gzip, deflate"));
+
+    vlc_http_msg_add_header(m, "Cookie", "a=1");
+    vlc_http_msg_add_header(m, "Cookie", "b=2");
+    str = vlc_http_msg_get_header(m, "Cookie");
+    assert(str != NULL && !strcmp(str, "a=1; b=2"));
+
     /* Error cases */
+    assert(vlc_http_msg_add_header(m, "/naughty", "header") == -1);
+    assert(vlc_http_msg_add_header(m, "", "void") == -1);
+
     assert(vlc_http_msg_add_agent(m, "") != 0);
     assert(vlc_http_msg_add_agent(m, "/1.0") != 0);
     assert(vlc_http_msg_add_agent(m, "Bad/1.0\"") != 0);
@@ -235,6 +255,16 @@ int main(void)
 
     m = vlc_http_msg_h2_headers(3, bad1);
     assert(m == NULL);
+
+    /* HTTP 1.x parser error cases */
+    assert(vlc_http_msg_headers("") == NULL);
+    assert(vlc_http_msg_headers("\r\n") == NULL);
+    assert(vlc_http_msg_headers("HTTP/1.1 200 OK") == NULL);
+    assert(vlc_http_msg_headers("HTTP/1.1 200 OK\r\nH: V\r\n") == NULL);
+    assert(vlc_http_msg_headers("HTTP/1.1 200 OK\r\n"
+                                ":status: 200\r\n\r\n") == NULL);
+    assert(vlc_http_msg_headers("HTTP/1.1 200 OK\r\n"
+                                "/naughty: invalid\r\n\r\n") == NULL);
 
     return 0;
 }
