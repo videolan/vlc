@@ -32,14 +32,19 @@
 
 #include "connmgr.h"
 #include "file.h"
+#include "live.h"
 
 struct access_sys_t
 {
     struct vlc_http_mgr *manager;
-    struct vlc_http_file *file;
+    union
+    {
+        struct vlc_http_file *file;
+        struct vlc_http_live *live;
+    };
 };
 
-static block_t *Read(access_t *access)
+static block_t *FileRead(access_t *access)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -49,7 +54,7 @@ static block_t *Read(access_t *access)
     return b;
 }
 
-static int Seek(access_t *access, uint64_t pos)
+static int FileSeek(access_t *access, uint64_t pos)
 {
     access_sys_t *sys = access->p_sys;
     access->info.b_eof = false;
@@ -59,7 +64,7 @@ static int Seek(access_t *access, uint64_t pos)
     return VLC_SUCCESS;
 }
 
-static int Control(access_t *access, int query, va_list args)
+static int FileControl(access_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -102,7 +107,51 @@ static int Control(access_t *access, int query, va_list args)
 
         default:
             return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
 
+static block_t *LiveRead(access_t *access)
+{
+    access_sys_t *sys = access->p_sys;
+
+    block_t *b = vlc_http_live_read(sys->live);
+    if (b == NULL) /* TODO: loop instead of EOF, see vlc_http_live_read() */
+        access->info.b_eof = true;
+    return b;
+}
+
+static int NoSeek(access_t *access, uint64_t pos)
+{
+    (void) access;
+    (void) pos;
+    return VLC_EGENERIC;
+}
+
+static int LiveControl(access_t *access, int query, va_list args)
+{
+    access_sys_t *sys = access->p_sys;
+
+    switch (query)
+    {
+        case ACCESS_CAN_SEEK:
+        case ACCESS_CAN_FASTSEEK:
+        case ACCESS_CAN_PAUSE:
+        case ACCESS_CAN_CONTROL_PACE:
+            *va_arg(args, bool *) = false;
+            break;
+
+        case ACCESS_GET_PTS_DELAY:
+            *va_arg(args, int64_t *) = var_InheritInteger(access,
+                                                          "network-caching");
+            break;
+
+        case ACCESS_GET_CONTENT_TYPE:
+            *va_arg(args, char **) = vlc_http_live_get_type(sys->live);
+            break;
+
+        default:
+            return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
 }
@@ -110,9 +159,6 @@ static int Control(access_t *access, int query, va_list args)
 static int Open(vlc_object_t *obj)
 {
     access_t *access = (access_t *)obj;
-
-    if (var_InheritBool(obj, "http-continuous"))
-        return VLC_EGENERIC; /* FIXME not implemented yet */
 
     char *proxy = vlc_getProxyUrl(access->psz_url);
     free(proxy);
@@ -139,15 +185,35 @@ static int Open(vlc_object_t *obj)
         goto error;
 
     char *ua = var_InheritString(obj, "http-user-agent");
-    char *ref = var_InheritString(obj, "http-referrer");
+    char *referer = var_InheritString(obj, "http-referrer");
+    bool live = var_InheritBool(obj, "http-continuous");
 
-    sys->file = vlc_http_file_create(sys->manager, access->psz_url, ua, ref);
-    free(ref);
+    if (live)
+        sys->live = vlc_http_live_create(sys->manager, access->psz_url, ua,
+                                         referer);
+    else
+        sys->file = vlc_http_file_create(sys->manager, access->psz_url, ua,
+                                         referer);
+    free(referer);
     free(ua);
-    if (sys->file == NULL)
-        goto error;
 
-    char *redir = vlc_http_file_get_redirect(sys->file);
+    char *redir;
+
+    if (live)
+    {
+        if (sys->live == NULL)
+            goto error;
+
+        redir = vlc_http_live_get_redirect(sys->live);
+    }
+    else
+    {
+        if (sys->file == NULL)
+            goto error;
+
+        redir = vlc_http_file_get_redirect(sys->file);
+    }
+
     if (redir != NULL)
     {
         access->psz_url = redir;
@@ -157,7 +223,8 @@ static int Open(vlc_object_t *obj)
 
     ret = VLC_EGENERIC;
 
-    int status = vlc_http_file_get_status(sys->file);
+    int status = live ? vlc_http_live_get_status(sys->live)
+                      : vlc_http_file_get_status(sys->file);
     if (status < 0)
     {
         msg_Err(access, "HTTP connection failure");
@@ -173,9 +240,18 @@ static int Open(vlc_object_t *obj)
 
     access->info.b_eof = false;
     access->pf_read = NULL;
-    access->pf_block = Read;
-    access->pf_seek = Seek;
-    access->pf_control = Control;
+    if (live)
+    {
+        access->pf_block = LiveRead;
+        access->pf_seek = NoSeek;
+        access->pf_control = LiveControl;
+    }
+    else
+    {
+        access->pf_block = FileRead;
+        access->pf_seek = FileSeek;
+        access->pf_control = FileControl;
+    }
     access->p_sys = sys;
     return VLC_SUCCESS;
 
@@ -193,7 +269,10 @@ static void Close(vlc_object_t *obj)
     access_t *access = (access_t *)obj;
     access_sys_t *sys = access->p_sys;
 
-    vlc_http_file_destroy(sys->file);
+    if (access->pf_block == LiveRead)
+        vlc_http_live_destroy(sys->live);
+    else
+        vlc_http_file_destroy(sys->file);
     vlc_http_mgr_destroy(sys->manager);
     free(sys);
 }
