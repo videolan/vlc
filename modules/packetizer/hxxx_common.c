@@ -51,6 +51,9 @@ block_t *PacketizeXXC1( decoder_t *p_dec, uint8_t i_nal_length_size,
         int i_size = 0;
         int i;
 
+        if( &p_block->p_buffer[p_block->i_buffer] - p < i_nal_length_size )
+            break;
+
         for( i = 0; i < i_nal_length_size; i++ )
         {
             i_size = (i_size << 8) | (*p++);
