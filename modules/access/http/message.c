@@ -49,6 +49,15 @@ struct vlc_http_msg
 
 static bool vlc_http_is_token(const char *);
 
+static ssize_t vlc_http_msg_find_header(const struct vlc_http_msg *m,
+                                        const char *name)
+{
+    for (unsigned i = 0; i < m->count; i++)
+        if (!vlc_ascii_strcasecmp(m->headers[i][0], name))
+            return i;
+    return -1;
+}
+
 static int vlc_http_msg_vadd_header(struct vlc_http_msg *m, const char *name,
                                     const char *fmt, va_list ap)
 {
@@ -58,28 +67,51 @@ static int vlc_http_msg_vadd_header(struct vlc_http_msg *m, const char *name,
         return -1;
     }
 
+    char *value;
+    if (unlikely(vasprintf(&value, fmt, ap) < 0))
+        return -1;
+
+    /* IETF RFC7230 §3.2.4 */
+    for (char *p = value; *p; p++)
+        if (*p == '\r' || *p == '\n')
+            *p = ' ';
+
+    /* Fold identically named header field values. This is unfortunately not
+     * possible for Set-Cookie, while Cookie requires a special separator. */
+    ssize_t idx = vlc_http_msg_find_header(m, name);
+    if (idx >= 0 && vlc_ascii_strcasecmp(name, "Set-Cookie"))
+    {
+        char *merged;
+        char sep = vlc_ascii_strcasecmp(name, "Cookie") ? ',' : ';';
+
+        int val = asprintf(&merged, "%s%c %s", m->headers[idx][1], sep, value);
+
+        free(value);
+
+        if (unlikely(val == -1))
+            return -1;
+
+        free(m->headers[idx][1]);
+        m->headers[idx][1] = merged;
+        return 0;
+    }
+
     char *(*h)[2] = realloc(m->headers, sizeof (char *[2]) * (m->count + 1));
     if (unlikely(h == NULL))
+    {
+        free(value);
         return -1;
+    }
 
     m->headers = h;
     h += m->count;
 
     h[0][0] = strdup(name);
     if (unlikely(h[0][0] == NULL))
-        return -1;
-
-    char *value;
-    if (unlikely(vasprintf(&value, fmt, ap) < 0))
     {
-        free(h[0][0]);
+        free(value);
         return -1;
     }
-
-    /* IETF RFC7230 §3.2.4 */
-    for (char *p = value; *p; p++)
-        if (*p == '\r' || *p == '\n')
-            *p = ' ';
 
     h[0][1] = value;
     m->count++;
@@ -103,12 +135,13 @@ int vlc_http_msg_add_header(struct vlc_http_msg *m, const char *name,
 const char *vlc_http_msg_get_header(const struct vlc_http_msg *m,
                                     const char *name)
 {
-    for (unsigned i = 0; i < m->count; i++)
-        if (!vlc_ascii_strcasecmp(m->headers[i][0], name))
-            return m->headers[i][1];
-
-    errno = ENOENT;
-    return NULL;
+    ssize_t idx = vlc_http_msg_find_header(m, name);
+    if (idx < 0)
+    {
+        errno = ENOENT;
+        return NULL;
+    }
+    return m->headers[idx][1];
 }
 
 int vlc_http_msg_get_status(const struct vlc_http_msg *m)
