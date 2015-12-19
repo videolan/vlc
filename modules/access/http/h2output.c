@@ -32,7 +32,6 @@
 #include <vlc_tls.h>
 #include "h2frame.h"
 #include "h2output.h"
-#include "transport.h"
 
 #define VLC_H2_MAX_QUEUE (1u << 24)
 

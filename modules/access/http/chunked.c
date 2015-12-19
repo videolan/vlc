@@ -30,11 +30,10 @@
 #include <string.h>
 #include <vlc_common.h>
 #include <vlc_block.h>
-#include <vlc_tls.h> /* FIXME: remove this and test */
+#include <vlc_tls.h> /* TODO: remove this */
 
 #include "message.h"
-#include "transport.h"
-#include "h1conn.h"
+#include "conn.h"
 
 struct vlc_chunked_stream
 {

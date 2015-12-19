@@ -25,14 +25,13 @@
 #undef NDEBUG
 
 #include <assert.h>
-//#include <inttypes.h>
-//#include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 #include <vlc_common.h>
 #include <vlc_tls.h>
 #include <vlc_block.h>
-#include "h1conn.h"
+#include "conn.h"
 #include "message.h"
 
 /* I/O callbacks */

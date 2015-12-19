@@ -36,17 +36,16 @@
 
 #include "h2frame.h"
 #include "h2output.h"
-#include "h2conn.h"
-#include "transport.h"
+#include "conn.h"
 #include "message.h"
 
-#define CO(c) ((c)->tls->obj)
+#define CO(c) ((c)->conn.tls->obj)
 #define SO(s) CO((s)->conn)
 
 /** HTTP/2 connection */
 struct vlc_h2_conn
 {
-    struct vlc_tls *tls; /**< Underlying TLS session */
+    struct vlc_http_conn conn;
     struct vlc_h2_output *out; /**< Send thread */
 
     struct vlc_h2_stream *streams; /**< List of open streams */
@@ -56,6 +55,8 @@ struct vlc_h2_conn
     vlc_mutex_t lock; /**< State machine lock */
     vlc_thread_t thread; /**< Receive thread */
 };
+
+static_assert(offsetof(struct vlc_h2_conn, conn) == 0, "Cast error");
 
 static void vlc_h2_conn_destroy(struct vlc_h2_conn *conn);
 
@@ -370,9 +371,10 @@ static const struct vlc_http_stream_cbs vlc_h2_stream_callbacks =
  * \param msg HTTP message headers (including response status or request)
  * \return an HTTP stream, or NULL on error
  */
-struct vlc_http_stream *vlc_h2_stream_open(struct vlc_h2_conn *conn,
-                                           const struct vlc_http_msg *msg)
+static struct vlc_http_stream *vlc_h2_stream_open(struct vlc_http_conn *c,
+                                                const struct vlc_http_msg *msg)
 {
+    struct vlc_h2_conn *conn = (struct vlc_h2_conn *)c;
     struct vlc_h2_stream *s = malloc(sizeof (*s));
     if (unlikely(s == NULL))
         return NULL;
@@ -497,7 +499,7 @@ static void vlc_h2_window_status(void *ctx, uint32_t *restrict rcwd)
 }
 
 /** HTTP/2 frames parser callbacks table */
-static const struct vlc_h2_parser_cbs vlc_h2_conn_callbacks =
+static const struct vlc_h2_parser_cbs vlc_h2_parser_callbacks =
 {
     vlc_h2_setting,
     vlc_h2_settings_done,
@@ -610,7 +612,7 @@ static void *vlc_h2_recv_thread(void *data)
     int canc, val;
 
     canc = vlc_savecancel();
-    parser = vlc_h2_parse_init(conn, &vlc_h2_conn_callbacks);
+    parser = vlc_h2_parse_init(conn, &vlc_h2_parser_callbacks);
     if (unlikely(parser == NULL))
         goto fail;
 
@@ -618,7 +620,7 @@ static void *vlc_h2_recv_thread(void *data)
     do
     {
         vlc_restorecancel(canc);
-        frame = vlc_h2_frame_recv(conn->tls);
+        frame = vlc_h2_frame_recv(conn->conn.tls);
         canc = vlc_savecancel();
 
         if (frame == NULL)
@@ -643,13 +645,52 @@ fail:
     return NULL;
 }
 
-struct vlc_h2_conn *vlc_h2_conn_create(struct vlc_tls *tls)
+static void vlc_h2_conn_destroy(struct vlc_h2_conn *conn)
+{
+    assert(conn->streams == NULL);
+
+    /* TODO: properly try to drain pending data in output */
+    vlc_h2_error(conn, VLC_H2_NO_ERROR);
+
+    vlc_cancel(conn->thread);
+    vlc_join(conn->thread, NULL);
+    vlc_mutex_destroy(&conn->lock);
+
+    vlc_h2_output_destroy(conn->out);
+    vlc_tls_Close(conn->conn.tls);
+    free(conn);
+}
+
+static void vlc_h2_conn_release(struct vlc_http_conn *c)
+{
+    struct vlc_h2_conn *conn = (struct vlc_h2_conn *)c;
+    bool destroy;
+
+    vlc_mutex_lock(&conn->lock);
+    assert(!conn->released);
+
+    conn->released = true;
+    destroy = (conn->streams == NULL);
+    vlc_mutex_unlock(&conn->lock);
+
+    if (destroy)
+        vlc_h2_conn_destroy(conn);
+}
+
+static const struct vlc_http_conn_cbs vlc_h2_conn_callbacks =
+{
+    vlc_h2_stream_open,
+    vlc_h2_conn_release,
+};
+
+struct vlc_http_conn *vlc_h2_conn_create(struct vlc_tls *tls)
 {
     struct vlc_h2_conn *conn = malloc(sizeof (*conn));
     if (unlikely(conn == NULL))
         return NULL;
 
-    conn->tls = tls;
+    conn->conn.cbs = &vlc_h2_conn_callbacks;
+    conn->conn.tls = tls;
     conn->out = vlc_h2_output_create(tls, true);
     conn->streams = NULL;
     conn->next_id = 1; /* TODO: server side */
@@ -668,39 +709,8 @@ struct vlc_h2_conn *vlc_h2_conn_create(struct vlc_tls *tls)
         vlc_h2_output_destroy(conn->out);
         goto error;
     }
-    return conn;
+    return &conn->conn;
 error:
     free(conn);
     return NULL;
-}
-
-static void vlc_h2_conn_destroy(struct vlc_h2_conn *conn)
-{
-    assert(conn->streams == NULL);
-
-    /* TODO: properly try to drain pending data in output */
-    vlc_h2_error(conn, VLC_H2_NO_ERROR);
-
-    vlc_cancel(conn->thread);
-    vlc_join(conn->thread, NULL);
-    vlc_mutex_destroy(&conn->lock);
-
-    vlc_h2_output_destroy(conn->out);
-    vlc_tls_Close(conn->tls);
-    free(conn);
-}
-
-void vlc_h2_conn_release(struct vlc_h2_conn *conn)
-{
-    bool destroy;
-
-    vlc_mutex_lock(&conn->lock);
-    assert(!conn->released);
-
-    conn->released = true;
-    destroy = (conn->streams == NULL);
-    vlc_mutex_unlock(&conn->lock);
-
-    if (destroy)
-        vlc_h2_conn_destroy(conn);
 }

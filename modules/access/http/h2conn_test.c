@@ -38,11 +38,10 @@
 #include <vlc_block.h>
 #include <vlc_tls.h>
 #include "h2frame.h"
-#include "h2conn.h"
+#include "conn.h"
 #include "message.h"
-#include "transport.h"
 
-static struct vlc_h2_conn *conn;
+static struct vlc_http_conn *conn;
 static int external_fd;
 
 static void conn_send(struct vlc_h2_frame *f)
@@ -116,7 +115,7 @@ static void conn_create(void)
 static void conn_destroy(void)
 {
     shutdown(external_fd, SHUT_WR);
-    vlc_h2_conn_release(conn);
+    vlc_http_conn_release(conn);
     close(external_fd);
 }
 
@@ -126,7 +125,7 @@ static struct vlc_http_stream *stream_open(void)
                                                  "www.example.com", "/");
     assert(m != NULL);
 
-    struct vlc_http_stream *s = vlc_h2_stream_open(conn, m);
+    struct vlc_http_stream *s = vlc_http_stream_open(conn, m);
     vlc_http_msg_destroy(m);
     return s;
 }
