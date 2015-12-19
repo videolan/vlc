@@ -5,6 +5,7 @@ access_LTLIBRARIES += libhttps_plugin.la
 libvlc_http_la_SOURCES = \
 	access/http/transport.c access/http/transport.h \
 	access/http/message.c access/http/message.h \
+	access/http/resource.c access/http/resource.h \
 	access/http/file.c access/http/file.h \
 	access/http/hpack.c access/http/hpack.h access/http/hpackenc.c \
 	access/http/h2frame.c access/http/h2frame.h \
@@ -40,6 +41,7 @@ http_msg_test_SOURCES = access/http/message_test.c \
 	access/http/message.c access/http/message.h
 http_file_test_SOURCES = access/http/file_test.c \
 	access/http/message.c access/http/message.h \
+	access/http/resource.c access/http/resource.h \
 	access/http/file.c access/http/file.h
 check_PROGRAMS += hpack_test hpackenc_test \
 	h2frame_test h2output_test h2conn_test h1conn_test h1chunked_test \
