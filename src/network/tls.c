@@ -319,7 +319,7 @@ static ssize_t vlc_tls_DummyReceive(vlc_tls_t *tls, void *buf, size_t len)
 
 static ssize_t vlc_tls_DummySend(vlc_tls_t *tls, const void *buf, size_t len)
 {
-    return send(tls->fd, buf, len, 0);
+    return send(tls->fd, buf, len, MSG_NOSIGNAL);
 }
 
 static void vlc_tls_DummyClose(vlc_tls_t *tls)
