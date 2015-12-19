@@ -86,6 +86,7 @@ static vlc_tls_t *vlc_https_connect_i11e(vlc_tls_creds_t *creds,
 
 struct vlc_http_mgr
 {
+    vlc_object_t *obj;
     vlc_tls_creds_t *creds;
     struct vlc_http_conn *conn;
 };
@@ -123,9 +124,10 @@ struct vlc_http_msg *vlc_http_mgr_reuse(struct vlc_http_mgr *mgr,
             return m;
 
         vlc_http_stream_close(stream, false);
-        /* NOTE: If the request were not idempotent, we do not know if it was
-         * process by the other end. So POST is not used/supported so far, and
-         * CONNECT is treated as if it were idempotent (which is OK here). */
+        /* NOTE: If the request were not idempotent, we would not know if it
+         * was processed by the other end. Thus POST is not used/supported so
+         * far, and CONNECT is treated as if it were idempotent (which works
+         * fine here). */
     }
     /* Get rid of closing or reset connection */
     vlc_http_mgr_release(mgr, conn);
@@ -136,10 +138,17 @@ struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
                                        const char *host, unsigned port,
                                        const struct vlc_http_msg *req)
 {
+    if (mgr->creds == NULL)
+    {   /* First TLS connection: load x509 credentials */
+        mgr->creds = vlc_tls_ClientCreate(mgr->obj);
+        if (mgr->creds == NULL)
+            return NULL;
+    }
+
     /* TODO? non-idempotent request support */
     struct vlc_http_msg *resp = vlc_http_mgr_reuse(mgr, host, port, req);
     if (resp != NULL)
-        return resp;
+        return resp; /* existing connection reused */
 
     bool http2;
     vlc_tls_t *tls = vlc_https_connect_i11e(mgr->creds, host, port, &http2);
@@ -148,6 +157,13 @@ struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
 
     struct vlc_http_conn *conn;
 
+    /* For HTTPS, TLS-ALPN determines whether HTTP version 2.0 ("h2") or 1.1
+     * ("http/1.1") is used.
+     * NOTE: If the negotiated protocol is explicitly "http/1.1", HTTP 1.0
+     * should not be used. HTTP 1.0 should only be used if ALPN is not
+     * supported by the server.
+     * NOTE: We do not enforce TLS version 1.2 for HTTP 2.0 explicitly.
+     */
     if (http2)
         conn = vlc_h2_conn_create(tls);
     else
@@ -170,13 +186,8 @@ struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj)
     if (unlikely(mgr == NULL))
         return NULL;
 
-    mgr->creds = vlc_tls_ClientCreate(obj);
-    if (mgr->creds == NULL)
-    {
-        free(mgr);
-        return NULL;
-    }
-
+    mgr->obj = obj;
+    mgr->creds = NULL;
     mgr->conn = NULL;
     return mgr;
 }
@@ -185,6 +196,7 @@ void vlc_http_mgr_destroy(struct vlc_http_mgr *mgr)
 {
     if (mgr->conn != NULL)
         vlc_http_mgr_release(mgr, mgr->conn);
-    vlc_tls_Delete(mgr->creds);
+    if (mgr->creds != NULL)
+        vlc_tls_Delete(mgr->creds);
     free(mgr);
 }
