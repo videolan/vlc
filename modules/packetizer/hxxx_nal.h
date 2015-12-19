@@ -79,6 +79,7 @@ static inline uint8_t *hxxx_bsfw_ep3b_to_rbsp( uint8_t *p, uint8_t *end, void *p
     return p;
 }
 
+#if 0
 /* Discards emulation prevention three bytes */
 static inline uint8_t * hxxx_ep3b_to_rbsp(const uint8_t *p_src, size_t i_src, size_t *pi_ret)
 {
@@ -100,5 +101,6 @@ static inline uint8_t * hxxx_ep3b_to_rbsp(const uint8_t *p_src, size_t i_src, si
     *pi_ret = j;
     return p_dst;
 }
+#endif
 
 #endif // HXXX_NAL_H

@@ -908,116 +908,125 @@ static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
 static void ParseSei( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *pb_dec;
-    size_t i_dec = 0;
+    bs_t s;
+    unsigned i_bitflow = 0;
 
-    if( p_frag->i_buffer < 6 )
+    const uint8_t *p_stripped = p_frag->p_buffer;
+    size_t i_stripped = p_frag->i_buffer;
+
+    if( !hxxx_strip_AnnexB_startcode( &p_stripped, &i_stripped ) || i_stripped < 2 )
         return;
 
-    /* */
-    pb_dec = hxxx_ep3b_to_rbsp( &p_frag->p_buffer[5], p_frag->i_buffer - 5, &i_dec );
-    if( !pb_dec )
-        return;
+    bs_init( &s, p_stripped, i_stripped );
+    s.p_fwpriv = &i_bitflow;
+    s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+    bs_skip( &s, 8 ); /* nal unit header */
 
-    /* The +1 is for rbsp trailing bits */
-    for( size_t i_used = 0; i_used+1 < i_dec; )
+    while( bs_remain( &s ) >= 8 && bs_aligned( &s ) )
     {
         /* Read type */
-        int i_type = 0;
-        while( i_used+1 < i_dec )
+        unsigned i_type = 0;
+        while( bs_remain( &s ) >= 8 )
         {
-            const int i_byte = pb_dec[i_used++];
+            const uint8_t i_byte = bs_read( &s, 8 );
             i_type += i_byte;
             if( i_byte != 0xff )
                 break;
         }
+
         /* Read size */
-        int i_size = 0;
-        while( i_used+1 < i_dec )
+        unsigned i_size = 0;
+        while( bs_remain( &s ) >= 8 )
         {
-            const int i_byte = pb_dec[i_used++];
+            const uint8_t i_byte = bs_read( &s, 8 );
             i_size += i_byte;
             if( i_byte != 0xff )
                 break;
         }
+
         /* Check room */
-        if( i_used + i_size + 1 > i_dec )
+        if( bs_remain( &s ) < 8 )
             break;
 
-        /* Look for pic timing */
-        if( i_type == H264_SEI_PIC_TIMING )
+        /* Save start offset */
+        const unsigned i_start_bit_pos = bs_pos( &s );
+
+        switch( i_type )
         {
-            bs_t s;
-            const int      i_tim = i_size;
-            const uint8_t *p_tim = &pb_dec[i_used];
-
-            bs_init( &s, p_tim, i_tim );
-
-            if( p_sys->b_cpb_dpb_delays_present_flag )
+            /* Look for pic timing */
+            case H264_SEI_PIC_TIMING:
             {
-                bs_read( &s, p_sys->i_cpb_removal_delay_length_minus1 + 1 );
-                bs_read( &s, p_sys->i_dpb_output_delay_length_minus1 + 1 );
-            }
+                if( p_sys->b_cpb_dpb_delays_present_flag )
+                {
+                    bs_read( &s, p_sys->i_cpb_removal_delay_length_minus1 + 1 );
+                    bs_read( &s, p_sys->i_dpb_output_delay_length_minus1 + 1 );
+                }
 
-            if( p_sys->b_pic_struct_present_flag )
-                p_sys->i_pic_struct = bs_read( &s, 4 );
-            /* + unparsed remains */
+                if( p_sys->b_pic_struct_present_flag )
+                    p_sys->i_pic_struct = bs_read( &s, 4 );
+                /* + unparsed remains */
+            } break;
+
+            /* Look for user_data_registered_itu_t_t35 */
+            case H264_SEI_USER_DATA_REGISTERED_ITU_T_T35:
+            {
+                /* TS 101 154 Auxiliary Data and H264/AVC video */
+                static const uint8_t p_DVB1_data_start_code[] = {
+                    0xb5, /* United States */
+                    0x00, 0x31, /* US provider code */
+                    0x47, 0x41, 0x39, 0x34 /* user identifier */
+                };
+
+                static const uint8_t p_DIRECTV_data_start_code[] = {
+                    0xb5, /* United States */
+                    0x00, 0x2f, /* US provider code */
+                    0x03  /* Captions */
+                };
+
+                const unsigned i_t35 = i_size;
+                uint8_t *p_t35 = malloc( i_t35 );
+                if( !p_t35 )
+                    break;
+                for( unsigned i=0; i<i_t35; i++ )
+                    p_t35[i] = bs_read( &s, 8 );
+
+                /* Check for we have DVB1_data() */
+                if( i_t35 >= sizeof(p_DVB1_data_start_code) &&
+                        !memcmp( p_t35, p_DVB1_data_start_code, sizeof(p_DVB1_data_start_code) ) )
+                {
+                    cc_Extract( &p_sys->cc_next, true, &p_t35[3], i_t35 - 3 );
+                } else if( i_t35 >= sizeof(p_DIRECTV_data_start_code) &&
+                           !memcmp( p_t35, p_DIRECTV_data_start_code, sizeof(p_DIRECTV_data_start_code) ) )
+                {
+                    cc_Extract( &p_sys->cc_next, true, &p_t35[3], i_t35 - 3 );
+                }
+
+                free( p_t35 );
+            } break;
+
+            /* Look for SEI recovery point */
+            case H264_SEI_RECOVERY_POINT:
+            {
+                int i_recovery_frames = bs_read_ue( &s );
+                //bool b_exact_match = bs_read( &s, 1 );
+                //bool b_broken_link = bs_read( &s, 1 );
+                //int i_changing_slice_group = bs_read( &s, 2 );
+                if( !p_sys->b_header )
+                {
+                    msg_Dbg( p_dec, "Seen SEI recovery point, %d recovery frames", i_recovery_frames );
+                    if ( p_sys->i_recovery_frames == -1 || i_recovery_frames < p_sys->i_recovery_frames )
+                        p_sys->i_recovery_frames = i_recovery_frames;
+                }
+            } break;
+
+            default:
+                /* Will skip */
+                break;
         }
 
-        /* Look for user_data_registered_itu_t_t35 */
-        if( i_type == H264_SEI_USER_DATA_REGISTERED_ITU_T_T35 )
-        {
-            /* TS 101 154 Auxiliary Data and H264/AVC video */
-            static const uint8_t p_DVB1_data_start_code[] = {
-                0xb5, /* United States */
-                0x00, 0x31, /* US provider code */
-                0x47, 0x41, 0x39, 0x34 /* user identifier */
-            };
-
-            static const uint8_t p_DIRECTV_data_start_code[] = {
-                0xb5, /* United States */
-                0x00, 0x2f, /* US provider code */
-                0x03  /* Captions */
-            };
-
-            const unsigned i_t35 = i_size;
-            const uint8_t *p_t35 = &pb_dec[i_used];
-
-            /* Check for we have DVB1_data() */
-            if( i_t35 >= sizeof(p_DVB1_data_start_code) &&
-                !memcmp( p_t35, p_DVB1_data_start_code, sizeof(p_DVB1_data_start_code) ) )
-            {
-                cc_Extract( &p_sys->cc_next, true, &p_t35[3], i_t35 - 3 );
-            } else if( i_t35 >= sizeof(p_DIRECTV_data_start_code) &&
-                !memcmp( p_t35, p_DIRECTV_data_start_code, sizeof(p_DIRECTV_data_start_code) ) )
-            {
-                cc_Extract( &p_sys->cc_next, true, &p_t35[3], i_t35 - 3 );
-            }
-        }
-
-        /* Look for SEI recovery point */
-        if( i_type == H264_SEI_RECOVERY_POINT )
-        {
-            bs_t s;
-            const int      i_rec = i_size;
-            const uint8_t *p_rec = &pb_dec[i_used];
-
-            bs_init( &s, p_rec, i_rec );
-            int i_recovery_frames = bs_read_ue( &s );
-            //bool b_exact_match = bs_read( &s, 1 );
-            //bool b_broken_link = bs_read( &s, 1 );
-            //int i_changing_slice_group = bs_read( &s, 2 );
-            if( !p_sys->b_header )
-            {
-                msg_Dbg( p_dec, "Seen SEI recovery point, %d recovery frames", i_recovery_frames );
-                if ( p_sys->i_recovery_frames == -1 || i_recovery_frames < p_sys->i_recovery_frames )
-                    p_sys->i_recovery_frames = i_recovery_frames;
-            }
-        }
-
-        i_used += i_size;
+        /* Skip unsparsed content */
+        bs_skip( &s, i_size * 8 - i_start_bit_pos );
     }
 
-    free( pb_dec );
 }
 
