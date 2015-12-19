@@ -121,8 +121,8 @@ static struct vlc_http_msg *vlc_http_file_open(struct vlc_http_file *file,
     if (unlikely(req == NULL))
         return NULL;
 
-    struct vlc_http_msg *resp = vlc_https_request(file->manager, file->host,
-                                                  file->port, req);
+    struct vlc_http_msg *resp = vlc_http_mgr_request(file->manager, true,
+                                                  file->host, file->port, req);
     vlc_http_msg_destroy(req);
 
     resp = vlc_http_msg_get_final(resp);

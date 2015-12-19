@@ -135,6 +135,7 @@ struct vlc_http_mgr
     vlc_object_t *obj;
     vlc_tls_creds_t *creds;
     struct vlc_http_conn *conn;
+    bool use_h2c;
 };
 
 static struct vlc_http_conn *vlc_http_mgr_find(struct vlc_http_mgr *mgr,
@@ -180,10 +181,13 @@ struct vlc_http_msg *vlc_http_mgr_reuse(struct vlc_http_mgr *mgr,
     return NULL;
 }
 
-struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
-                                       const char *host, unsigned port,
-                                       const struct vlc_http_msg *req)
+static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
+                                              const char *host, unsigned port,
+                                              const struct vlc_http_msg *req)
 {
+    if (mgr->creds == NULL && mgr->conn != NULL)
+        return NULL; /* switch from HTTP to HTTPS not implemented */
+
     if (mgr->creds == NULL)
     {   /* First TLS connection: load x509 credentials */
         mgr->creds = vlc_tls_ClientCreate(mgr->obj);
@@ -226,7 +230,47 @@ struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
     return vlc_http_mgr_reuse(mgr, host, port, req);
 }
 
-struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj)
+static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
+                                             const char *host, unsigned port,
+                                             const struct vlc_http_msg *req)
+{
+    if (mgr->creds != NULL && mgr->conn != NULL)
+        return NULL; /* switch from HTTPS to HTTP not implemented */
+
+    struct vlc_http_msg *resp = vlc_http_mgr_reuse(mgr, host, port, req);
+    if (resp != NULL)
+        return resp;
+
+    vlc_tls_t *tls = vlc_http_connect_i11e(mgr->obj, host, port);
+    if (tls == NULL)
+        return NULL;
+
+    struct vlc_http_conn *conn;
+
+    if (mgr->use_h2c)
+        conn = vlc_h2_conn_create(tls);
+    else
+        conn = vlc_h1_conn_create(tls);
+
+    if (unlikely(conn == NULL))
+    {
+        vlc_tls_Close(tls);
+        return NULL;
+    }
+
+    mgr->conn = conn;
+
+    return vlc_http_mgr_reuse(mgr, host, port, req);
+}
+
+struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
+                                          const char *host, unsigned port,
+                                          const struct vlc_http_msg *m)
+{
+    return (https ? vlc_https_request : vlc_http_request)(mgr, host, port, m);
+}
+
+struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj, bool h2c)
 {
     struct vlc_http_mgr *mgr = malloc(sizeof (*mgr));
     if (unlikely(mgr == NULL))
@@ -235,6 +279,7 @@ struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj)
     mgr->obj = obj;
     mgr->creds = NULL;
     mgr->conn = NULL;
+    mgr->use_h2c = h2c;
     return mgr;
 }
 

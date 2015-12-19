@@ -232,13 +232,14 @@ static const struct vlc_http_stream_cbs stream_callbacks =
 
 static struct vlc_http_stream stream = { &stream_callbacks };
 
-struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
-                                       const char *host, unsigned port,
-                                       const struct vlc_http_msg *req)
+struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
+                                          const char *host, unsigned port,
+                                          const struct vlc_http_msg *req)
 {
     const char *str;
     char *end;
 
+    assert(https);
     assert(mgr == NULL);
     assert(!strcmp(host, "www.example.com"));
     assert(port == 8443);

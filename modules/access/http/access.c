@@ -130,7 +130,7 @@ static int Open(vlc_object_t *obj)
     sys->manager = NULL;
     sys->file = NULL;
 
-    sys->manager = vlc_http_mgr_create(obj);
+    sys->manager = vlc_http_mgr_create(obj, var_InheritBool(obj, "http2"));
     if (sys->manager == NULL)
         goto error;
 
@@ -203,7 +203,6 @@ vlc_module_begin()
     add_shortcut("https")
     set_callbacks(Open, Close)
 
-    // TODO: force HTTP/2 over TCP
-    //add_bool("http2", false, N_("HTTP 2.0"),
-    //         N_("Negotiate HTTP version 2.0"), true)
+    add_bool("http2", false, N_("Force HTTP/2"),
+             N_("Force HTTP version 2.0 over TCP."), true)
 vlc_module_end()
