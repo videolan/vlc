@@ -165,10 +165,45 @@ int main(void)
     assert(vlc_http_file_seek(f, offset = 1234) == 0);
     vlc_http_file_destroy(f);
 
+    /* Invalid responses */
+    replies[0] = "HTTP/1.1 206 Partial Content\r\n"
+                 "Content-Type: multipart/byteranges\r\n"
+                 "\r\n";
+    offset = 0;
+
+    f = vlc_http_file_create(NULL, url, ua, NULL);
+    assert(f != NULL);
+    assert(vlc_http_file_get_size(f) == (uintmax_t)-1);
+
+    replies[0] = "HTTP/1.1 206 Partial Content\r\n"
+                 "Content-Range: seconds 60-120/180\r\n"
+                 "\r\n";
+    assert(vlc_http_file_seek(f, 0) == -1);
+
+    /* Incomplete range */
+    replies[0] = "HTTP/1.1 206 Partial Content\r\n"
+                 "Content-Range: bytes 0-1233/*\r\n"
+                 "\r\n";
+    assert(vlc_http_file_seek(f, 0) == 0);
+    assert(vlc_http_file_get_size(f) == 1234);
+
+    /* Extraneous range */
+    replies[0] = "HTTP/1.1 200 OK\r\n"
+                 "Content-Range: bytes 0-1233/1234\r\n"
+                 "\r\n";
+    assert(vlc_http_file_seek(f, 0) == 0);
+    assert(vlc_http_file_get_size(f) == (uintmax_t)-1);
+
+    vlc_http_file_destroy(f);
 
     /* Dummy API calls */
     f = vlc_http_file_create(NULL, "ftp://localhost/foo", NULL, NULL);
     assert(f == NULL);
+    f = vlc_http_file_create(NULL, "/foo", NULL, NULL);
+    assert(f == NULL);
+    f = vlc_http_file_create(NULL, "http://www.example.com", NULL, NULL);
+    assert(f != NULL);
+    vlc_http_file_destroy(f);
 
     return 0;
 }
