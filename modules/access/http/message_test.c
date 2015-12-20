@@ -227,6 +227,14 @@ int main(void)
     vlc_http_msg_add_header(m, "TE", "deflate");
     str = vlc_http_msg_get_header(m, "TE");
     assert(str != NULL && !strcmp(str, "gzip, deflate"));
+    str = vlc_http_msg_get_token(m, "TE", "gzip");
+    assert(str != NULL && !strncmp(str, "gzip", 4));
+    str = vlc_http_msg_get_token(m, "TE", "deflate");
+    assert(str != NULL && !strncmp(str, "deflate", 7));
+    str = vlc_http_msg_get_token(m, "TE", "compress");
+    assert(str == NULL);
+    str = vlc_http_msg_get_token(m, "Accept-Encoding", "gzip");
+    assert(str == NULL);
 
     vlc_http_msg_add_header(m, "Cookie", "a=1");
     vlc_http_msg_add_header(m, "Cookie", "b=2");
