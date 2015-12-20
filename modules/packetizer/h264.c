@@ -518,7 +518,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     }
     else if( i_nal_type == H264_NAL_AU_DELIMITER ||
              i_nal_type == H264_NAL_SEI ||
-             ( i_nal_type >= 13 && i_nal_type <= 18 ) )
+             ( i_nal_type >= H264_NAL_SPS_EXT && i_nal_type <= H264_NAL_RESERVED_18 ) )
     {
         if( p_sys->b_slice )
             p_pic = OutputPicture( p_dec );

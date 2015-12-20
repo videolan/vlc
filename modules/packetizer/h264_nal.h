@@ -60,8 +60,22 @@ enum h264_nal_unit_type_e
     H264_NAL_SEI         = 6,    /* ref_idc == 0 */
     H264_NAL_SPS         = 7,
     H264_NAL_PPS         = 8,
-    H264_NAL_AU_DELIMITER= 9
+    H264_NAL_AU_DELIMITER= 9,
     /* ref_idc == 0 for 6,9,10,11,12 */
+    H264_NAL_END_OF_SEQ  = 10,
+    H264_NAL_END_OF_STREAM = 11,
+    H264_NAL_FILLER_DATA = 12,
+    H264_NAL_SPS_EXT     = 13,
+    H264_NAL_PREFIX      = 14,
+    H264_NAL_SUBSET_SPS  = 15,
+    H264_NAL_DEPTH_PS    = 16,
+    H264_NAL_RESERVED_17 = 17,
+    H264_NAL_RESERVED_18 = 18,
+    H264_NAL_SLICE_WP    = 19,
+    H264_NAL_SLICE_EXT   = 20,
+    H264_NAL_SLICE_3D_EXT= 21,
+    H264_NAL_RESERVED_22 = 22,
+    H264_NAL_RESERVED_23 = 23,
 };
 
 /* Defined in H.264 annex D */
