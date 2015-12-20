@@ -84,8 +84,15 @@ static int Demux(demux_t *);
  */
 int Import_xspf(vlc_object_t *p_this)
 {
-    DEMUX_BY_EXTENSION_OR_MIMETYPE(".xspf", "application/xspf+xml",
-                                      "using XSPF playlist reader");
+    demux_t *p_demux = (demux_t *)p_this;
+
+    CHECK_FILE();
+
+    if( !demux_IsPathExtension( p_demux, ".xspf" )
+     && !demux_IsContentType( p_demux, "application/xspf+xml" ) )
+        return VLC_EGENERIC;
+
+    STANDARD_DEMUX_INIT_MSG("using XSPF playlist reader");
 
     return VLC_SUCCESS;
 }
