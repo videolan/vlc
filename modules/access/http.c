@@ -460,7 +460,7 @@ connect:
         return VLC_ACCESS_REDIRECT;
     }
 
-    if( p_sys->b_mms )
+    if( p_sys->p_creds == NULL && p_sys->b_mms )
     {
         msg_Dbg( p_access, "this is actually a live mms server, BAIL" );
         goto error;
