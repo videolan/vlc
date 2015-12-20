@@ -31,7 +31,6 @@
 #include <time.h>
 
 #include <vlc_common.h>
-#include <vlc_strings.h>
 #include "message.h"
 #include "h2frame.h"
 
@@ -53,7 +52,7 @@ static ssize_t vlc_http_msg_find_header(const struct vlc_http_msg *m,
                                         const char *name)
 {
     for (unsigned i = 0; i < m->count; i++)
-        if (!vlc_ascii_strcasecmp(m->headers[i][0], name))
+        if (!strcasecmp(m->headers[i][0], name))
             return i;
     return -1;
 }
@@ -79,10 +78,10 @@ static int vlc_http_msg_vadd_header(struct vlc_http_msg *m, const char *name,
     /* Fold identically named header field values. This is unfortunately not
      * possible for Set-Cookie, while Cookie requires a special separator. */
     ssize_t idx = vlc_http_msg_find_header(m, name);
-    if (idx >= 0 && vlc_ascii_strcasecmp(name, "Set-Cookie"))
+    if (idx >= 0 && strcasecmp(name, "Set-Cookie"))
     {
         char *merged;
-        char sep = vlc_ascii_strcasecmp(name, "Cookie") ? ',' : ';';
+        char sep = strcasecmp(name, "Cookie") ? ',' : ';';
 
         int val = asprintf(&merged, "%s%c %s", m->headers[idx][1], sep, value);
 
@@ -547,6 +546,41 @@ static bool vlc_http_is_token(const char *str)
 {
     size_t len = vlc_http_token_length(str);
     return len > 0 && str[len] == '\0';
+}
+
+const char *vlc_http_first_token(const char *value)
+{
+    return value + strspn(value, "\t ");
+}
+
+const char *vlc_http_next_token(const char *value)
+{
+    value = strchr(value, ',');
+    if (value == NULL)
+        return NULL;
+
+    return value + strspn(value, "\t ,");
+}
+
+const char *vlc_http_msg_get_token(const struct vlc_http_msg *msg,
+                                   const char *field, const char *token)
+{
+    const char *value = vlc_http_msg_get_header(msg, field);
+    if (value == NULL)
+        return NULL;
+
+    const size_t length = strlen(token);
+
+    for (value = vlc_http_first_token(value);
+         value != NULL;
+         value = vlc_http_next_token(value))
+    {
+        if (vlc_http_token_length(value) == length
+         && !strncasecmp(token, value, length))
+            return value;
+    }
+
+    return NULL;
 }
 
 static size_t vlc_http_comment_length(const char *str)

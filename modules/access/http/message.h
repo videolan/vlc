@@ -147,6 +147,32 @@ const char *vlc_http_msg_get_authority(const struct vlc_http_msg *m);
 const char *vlc_http_msg_get_path(const struct vlc_http_msg *m);
 
 /**
+ * Looks up a token in a header field.
+ *
+ * Finds the first occurence of a token within a HTTP field header.
+ *
+ * @param field HTTP header field name
+ * @param token HTTP token name
+ * @return the first byte of the token if found, NULL if not found.
+ */
+const char *vlc_http_msg_get_token(const struct vlc_http_msg *,
+                                   const char *field, const char *token);
+
+/**
+ * Finds first token.
+ *
+ * Finds the first token in a HTTP field value.
+ */
+const char *vlc_http_first_token(const char *);
+
+/**
+ * Finds next token.
+ *
+ * Finds the following token in a HTTP field value.
+ */
+const char *vlc_http_next_token(const char *);
+
+/**
  * Gets HTTP payload length.
  *
  * @return byte length, or (uintmax_t)-1 if unknown.
