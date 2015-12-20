@@ -217,7 +217,7 @@ error:
     return session;
 }
 
-int vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
+ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
 {
     struct pollfd ufd;
 
@@ -250,7 +250,7 @@ int vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
     }
 }
 
-int vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
+ssize_t vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
 {
     struct pollfd ufd;
 

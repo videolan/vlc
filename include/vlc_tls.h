@@ -91,13 +91,13 @@ VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 /**
  * Receives data through a TLS session.
  */
-VLC_API int vlc_tls_Read(vlc_tls_t *, void *buf, size_t len, bool waitall);
+VLC_API ssize_t vlc_tls_Read(vlc_tls_t *, void *buf, size_t len, bool waitall);
 VLC_API char *vlc_tls_GetLine(vlc_tls_t *);
 
 /**
  * Sends data through a TLS session.
  */
-VLC_API int vlc_tls_Write(vlc_tls_t *, const void *buf, size_t len);
+VLC_API ssize_t vlc_tls_Write(vlc_tls_t *, const void *buf, size_t len);
 
 /**
  * Terminates a TLS session.
