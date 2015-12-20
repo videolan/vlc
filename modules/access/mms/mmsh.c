@@ -54,7 +54,6 @@ int  MMSHOpen  ( access_t * );
 void MMSHClose ( access_t * );
 
 static block_t *Block( access_t *p_access );
-static ssize_t ReadRedirect( access_t *, uint8_t *, size_t );
 static int  Seek( access_t *, uint64_t );
 static int  Control( access_t *, int, va_list );
 
@@ -151,32 +150,16 @@ int MMSHOpen( access_t *p_access )
         goto error;
 
     /* Handle redirection */
-    if( psz_location && *psz_location )
+    if( psz_location != NULL )
     {
         msg_Dbg( p_access, "redirection to %s", psz_location );
+        p_access->psz_url = psz_location;
 
-        input_thread_t * p_input = p_access->p_input;
-        input_item_t * p_new_loc;
-
-        if( !p_input )
-        {
-            free( psz_location );
-            goto error;
-        }
-        /** \bug we do not autodelete here */
-        p_new_loc = input_item_New( psz_location, psz_location );
-        input_item_t *p_item = input_GetItem( p_input );
-        input_item_PostSubItem( p_item, p_new_loc );
-
-        vlc_gc_decref( p_new_loc );
-
-        free( psz_location );
-
-        p_access->pf_block = NULL;
-        p_access->pf_read = ReadRedirect;
-        return VLC_SUCCESS;
+        vlc_UrlClean( &p_sys->url );
+        vlc_UrlClean( &p_sys->proxy );
+        free( p_sys );
+        return VLC_ACCESS_REDIRECT;
     }
-    free( psz_location );
 
     /* Start playing */
     if( Start( p_access, 0 ) )
@@ -350,15 +333,6 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     p_sys->i_packet_used += i_offset;
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * ReadRedirect:
- *****************************************************************************/
-static ssize_t ReadRedirect( access_t *p_access, uint8_t *p, size_t i_len )
-{
-    VLC_UNUSED(p_access); VLC_UNUSED(p); VLC_UNUSED(i_len);
-    return 0;
 }
 
 /*****************************************************************************
