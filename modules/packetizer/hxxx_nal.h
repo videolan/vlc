@@ -103,4 +103,9 @@ static inline uint8_t * hxxx_ep3b_to_rbsp(const uint8_t *p_src, size_t i_src, si
 }
 #endif
 
+/* Declarations */
+
+/* Takes any AnnexB NAL buffer and converts it to prefixed size (AVC/HEVC) */
+block_t *hxxx_AnnexB_to_xVC( block_t *p_block, uint8_t i_nal_length_size );
+
 #endif // HXXX_NAL_H

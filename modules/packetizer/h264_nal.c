@@ -166,30 +166,34 @@ static block_t *h264_increase_startcode_size( block_t *p_block,
     size_t i_new_ofs;
 
     /* Search all startcode of size 3 */
-    while( i_buf > 0 )
+    unsigned i_bitflow = 0;
+    unsigned i_nalcount = 0;
+    while( i_buf-- )
     {
-        if( i_buf > 3 && memcmp( &p_buf[i_ofs], annexb_startcode3, 3 ) == 0 )
+        i_bitflow <<= 1;
+        if( *(p_buf++) != 0x01 )
         {
-            if( i_ofs == 0 || p_buf[i_ofs - 1] != 0 )
-                i_grow++;
-            i_buf -= 3;
-            i_ofs += 3;
+            i_bitflow |= 1;
         }
-        else
+        else if( (i_bitflow & 0x06) == 0x06 ) /* two zero prefixed 1 */
         {
-            i_buf--;
-            i_ofs++;
+            i_nalcount++;
+            if( !(i_bitflow & 0x08) ) /* max two zero prefixed 1 */
+                i_grow++;
         }
    }
 
     if( i_grow == 0 )
         return p_block;
 
+
+
     /* Alloc a bigger buffer */
     p_new = block_Alloc( p_block->i_buffer + i_grow );
     if( !p_new )
         return NULL;
     i_buf = p_block->i_buffer - i_start_ofs;
+    p_buf = p_block->p_buffer;
     p_new_buf = p_new->p_buffer;
     i_new_ofs = i_ofs = i_start_ofs;
 
