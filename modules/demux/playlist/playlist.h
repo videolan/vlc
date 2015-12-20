@@ -108,17 +108,6 @@ do { \
         return VLC_EGENERIC; \
     STANDARD_DEMUX_INIT_MSG( msg );
 
-#define DEMUX_BY_EXTENSION_OR_MIMETYPE( ext, mime, msg ) \
-    demux_t *p_demux = (demux_t *)p_this; \
-    CHECK_FILE(); \
-    char* demux_mimetype = stream_ContentType( p_demux->s ); \
-    if(!( demux_IsPathExtension( p_demux, ext ) || (demux_mimetype && !strcasecmp( mime, demux_mimetype )) )) { \
-        free( demux_mimetype ); \
-        return VLC_EGENERIC; \
-    } \
-    free( demux_mimetype ); \
-    STANDARD_DEMUX_INIT_MSG( msg );
-
 #define CHECK_PEEK( zepeek, size ) do { \
     if( stream_Peek( p_demux->s , &zepeek, size ) < size ){ \
         msg_Dbg( p_demux, "not enough data" ); return VLC_EGENERIC; } } while(0)
