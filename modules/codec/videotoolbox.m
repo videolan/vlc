@@ -850,16 +850,20 @@ static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
           ( p_sps_data = h264_decode_sps(p_stp_sps_buf, i_stp_sps_nal, true) ) )
         {
             bool b_something_changed = false;
+            unsigned v[4];
+            if(! h264_get_picture_size( p_sps_data, &v[0], &v[1], &v[2], &v[3] ) )
+                v[0] = v[1] = 0;
+
             if (p_sys->codec_profile != p_sps_data->i_profile) {
                 msg_Warn(p_dec, "mid stream profile change found, restarting decoder");
                 b_something_changed = true;
             } else if (p_sys->codec_level != p_sps_data->i_level) {
                 msg_Warn(p_dec, "mid stream level change found, restarting decoder");
                 b_something_changed = true;
-            } else if (p_dec->fmt_out.video.i_width != p_sps_data->i_width) {
+            } else if (p_dec->fmt_out.video.i_width != v[0]) {
                 msg_Warn(p_dec, "mid stream width change found, restarting decoder");
                 b_something_changed = true;
-            } else if (p_dec->fmt_out.video.i_height != p_sps_data->i_height) {
+            } else if (p_dec->fmt_out.video.i_height != v[1]) {
                 msg_Warn(p_dec, "mid stream height change found, restarting decoder");
                 b_something_changed = true;
             } else if (p_dec->fmt_out.video.i_sar_den != p_sps_data->vui.i_sar_den) {
