@@ -257,4 +257,5 @@ struct vlc_h2_frame;
 
 struct vlc_h2_frame *vlc_http_msg_h2_frame(const struct vlc_http_msg *m,
                                            uint_fast32_t stream_id, bool eos);
-struct vlc_http_msg *vlc_http_msg_h2_headers(unsigned n, char *hdrs[][2]);
+struct vlc_http_msg *vlc_http_msg_h2_headers(unsigned count,
+                                             const char *const headers[][2]);

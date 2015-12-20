@@ -255,10 +255,10 @@ int main(void)
 
     vlc_http_msg_destroy(m);
 
-    char *bad1[][2] = {
-        { strdup(":status"), strdup("200") },
-        { strdup(":status"), strdup("200") },
-        { strdup("Server"),  strdup("BigBad/1.0") },
+    const char *bad1[][2] = {
+        { ":status", "200" },
+        { ":status", "200" },
+        { "Server",  "BigBad/1.0" },
     };
 
     m = vlc_http_msg_h2_headers(3, bad1);
@@ -288,12 +288,12 @@ vlc_h2_frame_headers(uint_fast32_t id, uint_fast32_t mtu, bool eos,
     assert(mtu == VLC_H2_DEFAULT_MAX_FRAME);
     assert(eos);
 
-    char *headers[VLC_H2_MAX_HEADERS][2];
+    const char *headers[VLC_H2_MAX_HEADERS][2];
 
     for (unsigned i = 0; i < count; i++)
     {
-        headers[i][0] = strdup(tab[i][0]);
-        headers[i][1] = strdup(tab[i][1]);
+        headers[i][0] = tab[i][0];
+        headers[i][1] = tab[i][1];
     }
 
     m = vlc_http_msg_h2_headers(count, headers);

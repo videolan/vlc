@@ -427,7 +427,8 @@ struct vlc_h2_frame *vlc_http_msg_h2_frame(const struct vlc_http_msg *m,
     return f;
 }
 
-struct vlc_http_msg *vlc_http_msg_h2_headers(unsigned n, char *hdrs[][2])
+struct vlc_http_msg *vlc_http_msg_h2_headers(unsigned n,
+                                             const char *const hdrs[][2])
 {
     struct vlc_http_msg *m = vlc_http_resp_create(0);
     if (unlikely(m == NULL))
@@ -506,12 +507,6 @@ struct vlc_http_msg *vlc_http_msg_h2_headers(unsigned n, char *hdrs[][2])
 error:
         vlc_http_msg_destroy(m);
         m = NULL;
-    }
-
-    for (unsigned i = 0; i < n; i++)
-    {
-        free(hdrs[i][0]);
-        free(hdrs[i][1]);
     }
     return m;
 }

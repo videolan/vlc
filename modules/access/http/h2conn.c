@@ -113,7 +113,8 @@ static int vlc_h2_stream_fatal(struct vlc_h2_stream *s, uint_fast32_t code)
 }
 
 /** Reports received stream headers */
-static void vlc_h2_stream_headers(void *ctx, unsigned count, char *hdrs[][2])
+static void vlc_h2_stream_headers(void *ctx, unsigned count,
+                                  const char *const hdrs[][2])
 {
     struct vlc_h2_stream *s = ctx;
 

@@ -522,41 +522,46 @@ static int vlc_h2_parse_headers_end(struct vlc_h2_parser *p)
     char *headers[VLC_H2_MAX_HEADERS][2];
 
     /* TODO: limit total decompressed size of the headers list */
-    int val = hpack_decode(p->headers.decoder, p->headers.buf, p->headers.len,
-                           headers, VLC_H2_MAX_HEADERS);
-    if (val > VLC_H2_MAX_HEADERS)
+    int n = hpack_decode(p->headers.decoder, p->headers.buf, p->headers.len,
+                         headers, VLC_H2_MAX_HEADERS);
+    if (n > VLC_H2_MAX_HEADERS)
     {
         for (unsigned i = 0; i < VLC_H2_MAX_HEADERS; i++)
         {
             free(headers[i][0]);
             free(headers[i][1]);
         }
-        val = -1;
+        n = -1;
     }
-    if (val < 0)
+    if (n < 0)
         return vlc_h2_parse_error(p, VLC_H2_COMPRESSION_ERROR);
 
     void *s = vlc_h2_stream_lookup(p, p->headers.sid);
+    int val = 0;
+
     if (s != NULL)
     {
-        p->cbs->stream_headers(s, val, headers);
-        val = 0;
+        const char *ch[n ? n : 1][2];
+
+        for (int i = 0; i < n; i++)
+            ch[i][0] = headers[i][0], ch[i][1] = headers[i][1];
+
+        p->cbs->stream_headers(s, n, ch);
 
         if (p->headers.eos)
             p->cbs->stream_end(s);
     }
     else
-    {
-        for (int i = 0; i < val; i++)
-        {
-            free(headers[i][0]);
-            free(headers[i][1]);
-        }
         /* NOTE: The specification implies that the error should be sent for
          * the first header frame. But we actually want to receive the whole
          * fragmented headers block, to preserve the HPACK decoder state.
          * So we send the error at the last header frame instead. */
         val = vlc_h2_stream_error(p, p->headers.sid, VLC_H2_REFUSED_STREAM);
+
+    for (int i = 0; i < n; i++)
+    {
+        free(headers[i][0]);
+        free(headers[i][1]);
     }
 
     p->parser = vlc_h2_parse_generic;

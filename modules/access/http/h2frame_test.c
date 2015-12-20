@@ -142,7 +142,8 @@ static const unsigned resp_hdrc = sizeof (resp_hdrv) / sizeof (resp_hdrv[0]);
 
 static unsigned stream_header_tables;
 
-static void vlc_h2_stream_headers(void *ctx, unsigned count, char *hdrs[][2])
+static void vlc_h2_stream_headers(void *ctx, unsigned count,
+                                  const char *const hdrs[][2])
 {
     assert(ctx == &stream_cookie);
     assert(count == resp_hdrc);
@@ -151,8 +152,6 @@ static void vlc_h2_stream_headers(void *ctx, unsigned count, char *hdrs[][2])
     {
         assert(!strcmp(hdrs[i][0], resp_hdrv[i][0]));
         assert(!strcmp(hdrs[i][1], resp_hdrv[i][1]));
-        free(hdrs[i][1]);
-        free(hdrs[i][0]);
     }
 
     stream_header_tables++;
