@@ -125,6 +125,7 @@ static void *vlc_h1_stream_fatal(struct vlc_h1_conn *conn)
     if (conn->conn.tls != NULL)
     {
         msg_Dbg(CO(conn), "connection failed");
+        vlc_tls_Shutdown(conn->conn.tls, true);
         vlc_tls_Close(conn->conn.tls);
         conn->conn.tls = NULL;
     }
@@ -281,7 +282,10 @@ static void vlc_h1_conn_destroy(struct vlc_h1_conn *conn)
     assert(conn->released);
 
     if (conn->conn.tls != NULL)
+    {
+        vlc_tls_Shutdown(conn->conn.tls, true);
         vlc_tls_Close(conn->conn.tls);
+    }
     free(conn);
 }
 

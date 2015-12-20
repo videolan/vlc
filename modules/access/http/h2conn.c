@@ -657,6 +657,8 @@ static void vlc_h2_conn_destroy(struct vlc_h2_conn *conn)
     vlc_mutex_destroy(&conn->lock);
 
     vlc_h2_output_destroy(conn->out);
+    vlc_tls_Shutdown(conn->conn.tls, true);
+
     vlc_tls_Close(conn->conn.tls);
     free(conn);
 }
