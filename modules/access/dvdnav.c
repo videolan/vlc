@@ -403,6 +403,19 @@ bailout:
  *****************************************************************************/
 static int StreamProbeDVD( stream_t *s )
 {
+    /* first sector should be filled with zeros */
+    size_t i_peek;
+    const uint8_t *p_peek;
+    i_peek = stream_Peek( s, &p_peek, 2048 );
+    if( i_peek < 512 ) {
+        return VLC_EGENERIC;
+    }
+    while (i_peek > 0) {
+        if (p_peek[ --i_peek ]) {
+            return VLC_EGENERIC;
+        }
+    }
+
     /* ISO 9660 volume descriptor */
     char iso_dsc[6];
     if( stream_Seek( s, 0x8000 + 1 ) != VLC_SUCCESS
