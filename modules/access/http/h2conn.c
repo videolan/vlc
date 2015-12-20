@@ -650,7 +650,6 @@ static void vlc_h2_conn_destroy(struct vlc_h2_conn *conn)
 {
     assert(conn->streams == NULL);
 
-    /* TODO: properly try to drain pending data in output */
     vlc_h2_error(conn, VLC_H2_NO_ERROR);
 
     vlc_cancel(conn->thread);
