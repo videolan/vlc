@@ -169,6 +169,7 @@ static struct vlc_http_msg *vlc_h1_stream_wait(struct vlc_http_stream *stream)
 {
     struct vlc_h1_conn *conn = vlc_h1_stream_conn(stream);
     struct vlc_http_msg *resp;
+    const char *str;
     size_t len;
     int minor;
 
@@ -197,18 +198,19 @@ static struct vlc_http_msg *vlc_h1_stream_wait(struct vlc_http_stream *stream)
 
     if (minor >= 1)
     {
-        const char *str = vlc_http_msg_get_header(resp, "Connection");
-        if (str != NULL && strcasestr(str, "close")) /* FIXME: tokenize */
+        if (vlc_http_msg_get_token(resp, "Connection", "close") != NULL)
             conn->connection_close = true;
 
-        /* FIXME: tokenize, check if chunked is _last_ */
-        str = vlc_http_msg_get_header(resp, "Transfer-Encoding");
-        if (str != NULL && strcasestr(str, "chunked"))
+        str = vlc_http_msg_get_token(resp, "Transfer-Encoding", "chunked");
+        if (str != NULL)
         {
+            if (vlc_http_next_token(str) != NULL)
+                return vlc_h1_stream_fatal(conn); /* unsupported TE */
+
             assert(conn->content_length == UINTMAX_MAX);
             stream = vlc_chunked_open(stream, conn->conn.tls);
             if (unlikely(stream == NULL))
-                return NULL;
+                return vlc_h1_stream_fatal(conn);
         }
     }
     else

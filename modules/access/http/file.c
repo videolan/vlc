@@ -206,12 +206,8 @@ bool vlc_http_file_can_seek(struct vlc_http_file *file)
     if (status == 206 || status == 416)
         return true; /* Partial Content */
 
-    const char *str = vlc_http_msg_get_header(file->resp, "Accept-Ranges");
-    /* FIXME: tokenize */
-    if (str != NULL && !vlc_ascii_strcasecmp(str, "bytes"))
-        return true;
-
-    return false;
+    return vlc_http_msg_get_token(file->resp, "Accept-Ranges",
+                                  "bytes") != NULL;
 }
 
 char *vlc_http_file_get_type(struct vlc_http_file *file)
