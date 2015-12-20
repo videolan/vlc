@@ -199,6 +199,11 @@ static inline void bs_write( bs_t *s, int i_count, uint32_t i_bits )
     }
 }
 
+static inline bool bs_aligned( bs_t *s )
+{
+    return s->i_left % 8 == 0;
+}
+
 static inline void bs_align( bs_t *s )
 {
     if( s->i_left != 8 )
