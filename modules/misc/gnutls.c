@@ -182,6 +182,14 @@ static ssize_t gnutls_Recv (vlc_tls_t *tls, void *buf, size_t length)
     return (val < 0) ? gnutls_Error (tls, val) : val;
 }
 
+static int gnutls_Shutdown(vlc_tls_t *tls, bool duplex)
+{
+    gnutls_session_t session = tls->sys;
+    int val = gnutls_bye(session, duplex ? GNUTLS_SHUT_RDWR : GNUTLS_SHUT_WR);
+
+    return (val < 0) ? gnutls_Error(tls, val) : 0;
+}
+
 /**
  * Terminates a TLS session.
  *
@@ -192,7 +200,6 @@ static void gnutls_Close (vlc_tls_t *tls)
 {
     gnutls_session_t session = tls->sys;
 
-    gnutls_bye (session, GNUTLS_SHUT_RDWR);
     gnutls_deinit (session);
 }
 
@@ -264,6 +271,7 @@ static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
     tls->sys = session;
     tls->send = gnutls_Send;
     tls->recv = gnutls_Recv;
+    tls->shutdown = gnutls_Shutdown;
     tls->close = gnutls_Close;
     return VLC_SUCCESS;
 

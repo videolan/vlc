@@ -44,6 +44,7 @@ struct vlc_tls
 
     ssize_t (*recv)(struct vlc_tls *, void *, size_t);
     ssize_t (*send)(struct vlc_tls *, const void *, size_t);
+    int (*shutdown)(struct vlc_tls *, bool duplex);
     void (*close)(vlc_tls_t *);
 };
 
@@ -87,6 +88,25 @@ VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 VLC_API int vlc_tls_Read(vlc_tls_t *, void *buf, size_t len, bool waitall);
 VLC_API char *vlc_tls_GetLine(vlc_tls_t *);
 VLC_API int vlc_tls_Write(vlc_tls_t *, const void *buf, size_t len);
+
+/**
+ * Terminates a TLS session.
+ *
+ * This sends the TLS session close notification to the other end, securely
+ * indicating that no further data will be sent. Data can still be received
+ * until a close notification is received from the other end.
+ *
+ * @param duplex whether to stop receiving data as well
+ * @retval 0 the session was terminated securely and cleanly
+ *           (the underlying socket can be reused for other purposes)
+ * @return -1 the session was terminated locally, but either a notification
+ *            could not be sent or received (the underlying socket cannot be
+ *            reused and must be closed)
+ */
+static inline int vlc_tls_Shutdown(vlc_tls_t *tls, bool duplex)
+{
+    return tls->shutdown(tls, duplex);
+}
 
 # define tls_Recv(a,b,c) vlc_tls_Read(a,b,c,false)
 # define tls_Send(a,b,c) vlc_tls_Write(a,b,c)
