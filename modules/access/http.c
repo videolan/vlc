@@ -212,6 +212,7 @@ static int Open( vlc_object_t *p_this )
     access_t *p_access = (access_t*)p_this;
     const char *psz_url = p_access->psz_url;
     char *psz;
+    int ret = VLC_EGENERIC;
 
     access_sys_t *p_sys = malloc( sizeof(*p_sys) );
     if( unlikely(p_sys == NULL) )
@@ -436,33 +437,22 @@ connect:
 
     if( ( p_sys->i_code == 301 || p_sys->i_code == 302 ||
           p_sys->i_code == 303 || p_sys->i_code == 307 ) &&
-        p_sys->psz_location && *p_sys->psz_location )
+        p_sys->psz_location != NULL )
     {
         p_access->psz_url = p_sys->psz_location;
-
-        /* Clean up current Open() run */
-        vlc_UrlClean( &p_sys->url );
-        http_auth_Reset( &p_sys->auth );
-        if( p_sys->b_proxy )
-            vlc_UrlClean( &p_sys->proxy );
-        free( p_sys->psz_proxy_passbuf );
-        http_auth_Reset( &p_sys->proxy_auth );
-        free( p_sys->psz_mime );
-        free( p_sys->psz_user_agent );
-        free( p_sys->psz_referrer );
-
-        Disconnect( p_access );
-        vlc_tls_Delete( p_sys->p_creds );
-#ifdef HAVE_ZLIB_H
-        inflateEnd( &p_sys->inflate.stream );
-#endif
-        free( p_sys );
-        return VLC_ACCESS_REDIRECT;
+        p_sys->psz_location = NULL;
+        ret = VLC_ACCESS_REDIRECT;
+        goto error;
     }
 
     if( p_sys->p_creds == NULL && p_sys->b_mms )
     {
-        msg_Dbg( p_access, "this is actually a live mms server, BAIL" );
+        msg_Dbg( p_access, "redirecting to MMS plug-in" );
+
+        if( unlikely(asprintf( &p_access->psz_url, "mmsh://%s",
+                               p_access->psz_location ) == -1) )
+            p_access->psz_url = NULL;
+        ret = VLC_ACCESS_REDIRECT;
         goto error;
     }
 
@@ -496,7 +486,7 @@ error:
     inflateEnd( &p_sys->inflate.stream );
 #endif
     free( p_sys );
-    return VLC_EGENERIC;
+    return ret;
 }
 
 /*****************************************************************************
