@@ -151,7 +151,6 @@ struct access_sys_t
 
     char       *psz_mime;
     char       *psz_location;
-    bool i_version;
     bool b_mms;
     bool b_icecast;
 #ifdef HAVE_ZLIB_H
@@ -222,7 +221,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_error = false;
     p_sys->b_proxy = false;
     p_sys->psz_proxy_passbuf = NULL;
-    p_sys->i_version = 1;
     p_sys->b_seekable = true;
     p_sys->psz_mime = NULL;
     p_sys->b_mms = false;
@@ -377,26 +375,8 @@ static int Open( vlc_object_t *p_this )
     p_access->p_sys = p_sys;
 connect:
     /* Connect */
-    switch( Connect( p_access, 0 ) )
-    {
-        case -1:
-            goto error;
-
-        case -2:
-            /* Retry with http 1.0 */
-            msg_Dbg( p_access, "switching to HTTP version 1.0" );
-            p_sys->i_version = 0;
-            p_sys->b_seekable = false;
-
-            if( Connect( p_access, 0 ) )
-                goto error;
-
-        case 0:
-            break;
-
-        default:
-            vlc_assert_unreachable();
-    }
+    if( Connect( p_access, 0 ) )
+        goto error;
 
     if( p_sys->i_code == 401 )
     {
@@ -960,13 +940,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
             char *psz;
             unsigned i_status;
 
-            if( p_sys->i_version == 0 )
-            {
-                /* CONNECT is not in HTTP/1.0 */
-                Disconnect( p_access );
-                return -1;
-            }
-
             WriteHeaders( p_access,
                           "CONNECT %s:%d HTTP/1.1\r\nHost: %s:%d\r\n\r\n",
                           p_sys->url.psz_host, p_sys->url.i_port,
@@ -1019,8 +992,8 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         const char *alpn[] = { "http/1.1", NULL };
 
         p_sys->p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds, p_sys->fd,
-                p_sys->url.psz_host, "https",
-                p_sys->i_version ? alpn : NULL, NULL );
+                                                    p_sys->url.psz_host,
+                                                    "https", alpn, NULL );
         if( p_sys->p_tls == NULL )
         {
             msg_Err( p_access, "cannot establish HTTP/TLS session" );
@@ -1044,16 +1017,14 @@ static int Request( access_t *p_access, uint64_t i_tell )
     if( !psz_path || !*psz_path )
         psz_path = "/";
     if( p_sys->b_proxy && p_sys->p_tls == NULL )
-        WriteHeaders( p_access, "GET http://%s:%d%s%s%s HTTP/1.%d\r\n",
+        WriteHeaders( p_access, "GET http://%s:%d%s%s%s HTTP/1.1\r\n",
                       p_sys->url.psz_host, p_sys->url.i_port,
                       psz_path, p_sys->url.psz_option ? "?" : "",
-                      p_sys->url.psz_option ? p_sys->url.psz_option : "",
-                      p_sys->i_version );
+                      p_sys->url.psz_option ? p_sys->url.psz_option : "" );
     else
-        WriteHeaders( p_access, "GET %s%s%s HTTP/1.%d\r\n",
+        WriteHeaders( p_access, "GET %s%s%s HTTP/1.1\r\n",
                       psz_path, p_sys->url.psz_option ? "?" : "",
-                      p_sys->url.psz_option ? p_sys->url.psz_option : "",
-                      p_sys->i_version );
+                      p_sys->url.psz_option ? p_sys->url.psz_option : "" );
     if( p_sys->url.i_port != (p_sys->p_tls ? 443 : 80) )
         WriteHeaders( p_access, "Host: %s:%d\r\n",
                       p_sys->url.psz_host, p_sys->url.i_port );
@@ -1065,12 +1036,9 @@ static int Request( access_t *p_access, uint64_t i_tell )
     if (p_sys->psz_referrer)
         WriteHeaders( p_access, "Referer: %s\r\n", p_sys->psz_referrer );
     /* Offset */
-    if( p_sys->i_version == 1 )
-    {
-        if( !p_sys->b_continuous )
-            WriteHeaders( p_access, "Range: bytes=%"PRIu64"-\r\n", i_tell );
-        WriteHeaders( p_access, "Connection: close\r\n" );
-    }
+    if( !p_sys->b_continuous )
+        WriteHeaders( p_access, "Range: bytes=%"PRIu64"-\r\n", i_tell );
+    WriteHeaders( p_access, "Connection: close\r\n" );
 
     /* Cookies */
     if( p_sys->cookies )
