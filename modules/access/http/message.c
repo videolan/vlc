@@ -144,8 +144,6 @@ int vlc_http_msg_add_header(struct vlc_http_msg *m, const char *name,
     return ret;
 }
 
-/* TODO: merge identically named headers (not really needed yet) */
-
 const char *vlc_http_msg_get_header(const struct vlc_http_msg *m,
                                     const char *name)
 {
@@ -325,7 +323,6 @@ struct vlc_http_msg *vlc_http_msg_headers(const char *msg)
     struct vlc_http_msg *m;
     unsigned short code;
 
-    /* TODO: handle HTTP/1.0 differently */
     if (sscanf(msg, "HTTP/1.%*1u %3hu %*s", &code) == 1)
     {
         m = vlc_http_resp_create(code);
