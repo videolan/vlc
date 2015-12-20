@@ -24,6 +24,9 @@
 #ifndef VLC_DEMUX_H
 #define VLC_DEMUX_H 1
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <vlc_es.h>
 #include <vlc_stream.h>
 #include <vlc_es_out.h>
@@ -345,6 +348,21 @@ static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_exte
     if( !psz_ext || strcasecmp( psz_ext, psz_extension ) )
         return false;
     return true;
+}
+
+VLC_USED
+static inline bool demux_IsContentType(demux_t *demux, const char *type)
+{
+    char *mime = stream_ContentType(demux->s);
+    if (mime == NULL)
+        return false;
+
+    size_t len = strlen(type);
+    bool ok = strncasecmp(mime, type, len) == 0
+           && memchr("\t ;", (unsigned char)mime[len], 4) != NULL;
+
+    free(mime);
+    return ok;
 }
 
 VLC_USED
