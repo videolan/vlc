@@ -159,9 +159,6 @@ static ssize_t vlc_gnutls_writev (gnutls_transport_ptr_t ptr,
 }
 #endif
 
-/**
- * Sends data through a TLS session.
- */
 static ssize_t gnutls_Send (vlc_tls_t *tls, const void *buf, size_t length)
 {
     gnutls_session_t session = tls->sys;
@@ -170,10 +167,6 @@ static ssize_t gnutls_Send (vlc_tls_t *tls, const void *buf, size_t length)
     return (val < 0) ? gnutls_Error (tls, val) : val;
 }
 
-
-/**
- * Receives data through a TLS session.
- */
 static ssize_t gnutls_Recv (vlc_tls_t *tls, void *buf, size_t length)
 {
     gnutls_session_t session = tls->sys;
@@ -190,12 +183,6 @@ static int gnutls_Shutdown(vlc_tls_t *tls, bool duplex)
     return (val < 0) ? gnutls_Error(tls, val) : 0;
 }
 
-/**
- * Terminates a TLS session.
- *
- * This terminates a TLS session and releases session data.
- * The underlying socket must be closed separately.
- */
 static void gnutls_Close (vlc_tls_t *tls)
 {
     gnutls_session_t session = tls->sys;
