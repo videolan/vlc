@@ -328,7 +328,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
 
                 (*pi_count)++;
 
-                p_transponders = realloc(p_transponders, ( *pi_count + 1 ) * sizeof( scan_dvbs_transponder_t ) );
+                p_transponders = xrealloc(p_transponders, ( *pi_count + 1 ) * sizeof( scan_dvbs_transponder_t ) );
             } while (res != EOF);
 
             msg_Dbg( p_scan->p_obj, "parsed %d transponders from config", *pi_count);
