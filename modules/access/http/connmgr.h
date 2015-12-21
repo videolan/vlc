@@ -25,9 +25,7 @@ struct vlc_http_cookie_jar_t;
 struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
                                           const char *host, unsigned port,
                                           const struct vlc_http_msg *req);
-int vlc_http_mgr_send_cookies(struct vlc_http_mgr *mgr, bool https,
-                              const char *host, const char *path,
-                              struct vlc_http_msg *req);
+int vlc_http_mgr_send_cookies(struct vlc_http_mgr *, struct vlc_http_msg *);
 void vlc_http_mgr_recv_cookies(struct vlc_http_mgr *mgr, bool https,
                                const char *host, const char *path,
                                const struct vlc_http_msg *resp);

@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include <vlc_common.h>
+#include <vlc_http.h>
 #include "file.h"
 #include "message.h"
 
@@ -40,10 +41,14 @@ static const char *replies[2] = { NULL, NULL };
 static uintmax_t offset = 0;
 static bool etags = false;
 
+static vlc_http_cookie_jar_t *jar;
+
 int main(void)
 {
     struct vlc_http_file *f;
     char *str;
+
+    jar = vlc_http_cookies_new();
 
     /* Request failure test */
     f = vlc_http_file_create(NULL, url, ua, NULL);
@@ -205,6 +210,7 @@ int main(void)
     assert(f != NULL);
     vlc_http_file_destroy(f);
 
+    vlc_http_cookies_destroy(jar);
     return 0;
 }
 
@@ -320,25 +326,20 @@ struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
     return vlc_http_stream_read_headers(&stream);
 }
 
-int vlc_http_mgr_send_cookies(struct vlc_http_mgr *mgr, bool https,
-                              const char *host, const char *path,
+int vlc_http_mgr_send_cookies(struct vlc_http_mgr *mgr,
                               struct vlc_http_msg *req)
 {
-    assert(https);
-    assert(!strcmp(host, "www.example.com"));
-    assert(!strcmp(path, "/dir/file.ext?a=b"));
     assert(mgr == NULL);
-    (void) req;
-    return 0;
+    return vlc_http_msg_add_cookies(req, jar);
 }
 
 void vlc_http_mgr_recv_cookies(struct vlc_http_mgr *mgr, bool https,
                                const char *host, const char *path,
                                const struct vlc_http_msg *resp)
 {
+    assert(mgr == NULL);
     assert(https);
     assert(!strcmp(host, "www.example.com"));
     assert(!strcmp(path, "/dir/file.ext?a=b"));
-    assert(mgr == NULL);
-    (void) resp;
+    vlc_http_msg_get_cookies(resp, jar, https, host, path);
 }

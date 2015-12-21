@@ -22,6 +22,7 @@
 
 struct vlc_http_msg;
 struct block_t;
+struct vlc_http_cookie_jar_t;
 
 /**
  * Creates an HTTP request.
@@ -126,6 +127,12 @@ time_t vlc_http_msg_get_mtime(const struct vlc_http_msg *m);
  * @return the time in seconds, zero if the date is overdue or on error.
  */
 unsigned vlc_http_msg_get_retry_after(const struct vlc_http_msg *m);
+
+void vlc_http_msg_get_cookies(const struct vlc_http_msg *,
+                              struct vlc_http_cookie_jar_t *, bool secure,
+                              const char *host, const char *path);
+int vlc_http_msg_add_cookies(struct vlc_http_msg *,
+                             struct vlc_http_cookie_jar_t *);
 
 /**
  * Looks up an HTTP header.

@@ -31,6 +31,7 @@
 #include <time.h>
 
 #include <vlc_common.h>
+#include <vlc_http.h>
 #include "message.h"
 #include "h2frame.h"
 
@@ -793,4 +794,51 @@ uintmax_t vlc_http_msg_get_size(const struct vlc_http_msg *m)
 
     errno = EINVAL;
     return -1;
+}
+
+void vlc_http_msg_get_cookies(const struct vlc_http_msg *m,
+                              vlc_http_cookie_jar_t *jar, bool secure,
+                              const char *host, const char *path)
+{
+    for (unsigned i = 0; i < m->count; i++)
+        if (!strcasecmp(m->headers[i][0], "Set-Cookie"))
+            vlc_http_cookies_store(jar, m->headers[i][1], secure, host, path);
+}
+
+int vlc_http_msg_add_cookies(struct vlc_http_msg *m,
+                             vlc_http_cookie_jar_t *jar)
+{
+    char *host, *cookies;
+    int val = 0;
+    bool secure;
+
+    if (m->scheme == NULL || m->authority == NULL || m->path == NULL)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (!strcasecmp(m->scheme, "https"))
+        secure = true;
+    else if (!strcasecmp(m->scheme, "http"))
+        secure = false;
+    else
+        return 0;
+
+    if (m->authority[0] == '[')
+        host = strndup(m->authority + 1, strcspn(m->authority + 1, "]"));
+    else
+        host = strndup(m->authority, strcspn(m->authority, ":"));
+    if (unlikely(host == NULL))
+        return -1;
+
+    cookies = vlc_http_cookies_fetch(jar, secure, host, m->path);
+    free(host);
+
+    if (cookies != NULL)
+    {
+        val = vlc_http_msg_add_header(m, "Cookie", cookies);
+        free(cookies);
+    }
+    return val;
 }

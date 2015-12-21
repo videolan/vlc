@@ -64,8 +64,7 @@ vlc_http_res_req(const struct vlc_http_resource *res)
     if (res->referrer != NULL) /* TODO: validate URL */
         vlc_http_msg_add_header(req, "Referer", "%s", res->referrer);
 
-    vlc_http_mgr_send_cookies(res->manager, res->secure, res->host,
-                              res->path, req);
+    vlc_http_mgr_send_cookies(res->manager, req);
 
     /* TODO: vlc_http_msg_add_header(req, "TE", "gzip, deflate"); */
 
