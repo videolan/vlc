@@ -886,7 +886,7 @@ static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    return (p_block) ? h264_AnnexB_to_AVC(p_block, p_sys->i_nal_length_size) : NULL;
+    return (p_block) ? hxxx_AnnexB_to_xVC(p_block, p_sys->i_nal_length_size) : NULL;
 }
 
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,

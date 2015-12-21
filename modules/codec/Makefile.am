@@ -285,7 +285,9 @@ libvorbis_plugin_la_LIBADD = $(VORBIS_LIBS)
 EXTRA_LTLIBRARIES += libvorbis_plugin.la
 codec_LTLIBRARIES += $(LTLIBvorbis)
 
-libvideotoolbox_plugin_la_SOURCES = video_chroma/copy.c video_chroma/copy.h packetizer/h264_nal.c packetizer/h264_nal.h codec/videotoolbox.m
+libvideotoolbox_plugin_la_SOURCES = video_chroma/copy.c video_chroma/copy.h codec/videotoolbox.m \
+                                    packetizer/h264_nal.c packetizer/h264_nal.h \
+                                    packetizer/hxxx_nal.c packetizer/hxxx_nal.h
 libvideotoolbox_plugin_la_CFLAGS = $(AM_CFLAGS) -fobjc-arc
 libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 EXTRA_LTLIBRARIES += libvideotoolbox_plugin.la

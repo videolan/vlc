@@ -38,7 +38,7 @@ static inline void hxxx_WritePrefix( uint8_t i_nal_length_size, uint8_t *p_dest,
         *p_dest = i_payload;
 }
 
-static block_t *hxxx_AnnexB_to_xVC( block_t *p_block, uint8_t i_nal_length_size )
+block_t *hxxx_AnnexB_to_xVC( block_t *p_block, uint8_t i_nal_length_size )
 {
     unsigned i_nalcount = 0;
     unsigned i_list = 16;

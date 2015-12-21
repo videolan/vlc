@@ -149,12 +149,6 @@ bool h264_isavcC( const uint8_t *, size_t );
 void h264_AVC_to_AnnexB( uint8_t *p_buf, uint32_t i_len,
                          uint8_t i_nal_length_size );
 
-/* Convert Annex B to AVC Sample format in-place
- * Returns the same p_block or a new p_block if there is not enough room to put
- * the NAL size. In case of error, NULL is returned and p_block is released.
- * */
-block_t *h264_AnnexB_to_AVC( block_t *p_block, uint8_t i_nal_length_size );
-
 /* Get the SPS/PPS pointers from an Annex B buffer
  * Returns 0 if a SPS and/or a PPS is found */
 int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
