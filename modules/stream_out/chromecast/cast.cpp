@@ -186,7 +186,7 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
  *****************************************************************************/
 static int Open(vlc_object_t *p_this)
 {
-    sout_stream_t *p_stream = (sout_stream_t*)p_this;
+    sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
     sout_stream_sys_t *p_sys;
     p_sys = new(std::nothrow) sout_stream_sys_t;
     if (p_sys == NULL)
@@ -299,7 +299,7 @@ static int Open(vlc_object_t *p_this)
  *****************************************************************************/
 static void Close(vlc_object_t *p_this)
 {
-    sout_stream_t *p_stream = (sout_stream_t *)p_this;
+    sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     vlc_cancel(p_sys->chromecastThread);
@@ -896,7 +896,7 @@ static void* chromecastThread(void* p_data)
 {
     int canc = vlc_savecancel();
     // Not cancellation-safe part.
-    sout_stream_t* p_stream = (sout_stream_t*)p_data;
+    sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_data);
     sout_stream_sys_t* p_sys = p_stream->p_sys;
 
     unsigned i_received = 0;
