@@ -829,8 +829,6 @@ static inline void *vlc_memalign(size_t align, size_t size)
 # define vlc_free(base) free(base)
 #endif
 
-VLC_API void vlc_tdestroy( void *, void (*)(void *) );
-
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
