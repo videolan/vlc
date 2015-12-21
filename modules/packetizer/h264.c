@@ -1028,8 +1028,11 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
                 break;
         }
 
+        const unsigned i_end_bit_pos = bs_pos( &s );
         /* Skip unsparsed content */
-        bs_skip( &s, i_size * 8 - i_start_bit_pos );
+        if( i_end_bit_pos - i_start_bit_pos > i_size * 8 ) /* Something went wrong with _ue reads */
+            break;
+        bs_skip( &s, i_size * 8 - ( i_end_bit_pos - i_start_bit_pos ) );
     }
 
 }
