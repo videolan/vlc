@@ -726,7 +726,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
             return VLC_EGENERIC;
         }
 
-        decomp = realloc (decomp, newsize + 1);
+        decomp = xrealloc (decomp, newsize + 1);
         decomp[newsize] = '\0';
         psz_sdp = (const char *)decomp;
         len = newsize;
@@ -1496,7 +1496,7 @@ static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i
     do
     {
         n++;
-        psz_dst = (unsigned char *)realloc( psz_dst, n * 1000 );
+        psz_dst = xrealloc( psz_dst, n * 1000 );
         d_stream.next_out = (Bytef *)&psz_dst[(n - 1) * 1000];
         d_stream.avail_out = 1000;
 
@@ -1514,7 +1514,7 @@ static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i
     i_dstsize = d_stream.total_out;
     inflateEnd( &d_stream );
 
-    *_dst = (unsigned char *)realloc( psz_dst, i_dstsize );
+    *_dst = xrealloc( psz_dst, i_dstsize );
 
     return i_dstsize;
 #else
