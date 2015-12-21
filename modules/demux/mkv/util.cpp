@@ -57,16 +57,19 @@ int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t * tk )
     do
     {
         n++;
-        p_new_extra = (uint8_t *) realloc(p_new_extra, n*1024);
-        if( !p_new_extra )
+        void *alloc = realloc(p_new_extra, n*1024);
+        if( alloc == NULL )
         {
             msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %d",
                       tk->i_number );
+            free(p_new_extra);
             inflateEnd( &d_stream );
             free(tk->p_extra_data);
             delete tk;
             return 1;
         }
+
+        p_new_extra = (uint8_t *)alloc;
         d_stream.next_out = &p_new_extra[(n - 1) * 1024];
         d_stream.avail_out = 1024;
         result = inflate(&d_stream, Z_NO_FLUSH);
