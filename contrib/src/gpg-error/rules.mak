@@ -18,7 +18,7 @@ endif
 	cp $@/src/syscfg/lock-obj-pub.arm-unknown-linux-androideabi.h $@/src/syscfg/lock-obj-pub.linux-android.h
 ifdef HAVE_TIZEN
 ifeq ($(TIZEN_ABI), x86)
-	cp $@/src/syscfg/lock-obj-pub.i586-pc-linux-gnu.h $@/src/syscfg/lock-obj-pub.linux-gnueabi.h
+	cp $@/src/syscfg/lock-obj-pub.i686-pc-linux-gnu.h $@/src/syscfg/lock-obj-pub.linux-gnueabi.h
 endif
 endif
 ifdef HAVE_IOS
