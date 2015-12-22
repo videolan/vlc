@@ -225,6 +225,11 @@ int main(void)
 
     vlc_http_msg_add_header(m, "TE", "gzip");
     vlc_http_msg_add_header(m, "TE", "deflate");
+    vlc_http_msg_add_header(m, "Pragma", " features=\"broadcast,playlist\"");
+    vlc_http_msg_add_header(m, "Pragma", " client-id=123456789 ");
+    vlc_http_msg_add_header(m, "Pragma", "evulz=\"foo \\\"\\ bar\"");
+    vlc_http_msg_add_header(m, "Pragma", "no-cache ");
+
     str = vlc_http_msg_get_header(m, "TE");
     assert(str != NULL && !strcmp(str, "gzip, deflate"));
     str = vlc_http_msg_get_token(m, "TE", "gzip");
@@ -233,8 +238,24 @@ int main(void)
     assert(str != NULL && !strncmp(str, "deflate", 7));
     str = vlc_http_msg_get_token(m, "TE", "compress");
     assert(str == NULL);
+    str = vlc_http_msg_get_token(m, "TE", "zip");
+    assert(str == NULL);
+    str = vlc_http_msg_get_token(m, "TE", "late");
+    assert(str == NULL);
     str = vlc_http_msg_get_token(m, "Accept-Encoding", "gzip");
     assert(str == NULL);
+    str = vlc_http_msg_get_token(m, "Pragma", "features");
+    assert(str != NULL && !strncmp(str, "features=\"", 10));
+    str = vlc_http_msg_get_token(m, "Pragma", "broadcast");
+    assert(str == NULL);
+    str = vlc_http_msg_get_token(m, "Pragma", "playlist");
+    assert(str == NULL);
+    str = vlc_http_msg_get_token(m, "Pragma", "client-id");
+    assert(str != NULL && !strncmp(str, "client-id=", 10));
+    str = vlc_http_msg_get_token(m, "Pragma", "123456789");
+    assert(str == NULL);
+    str = vlc_http_msg_get_token(m, "Pragma", "no-cache");
+    assert(str != NULL && !strcmp(str, "no-cache"));
 
     vlc_http_msg_add_header(m, "Cookie", "a=1");
     vlc_http_msg_add_header(m, "Cookie", "b=2");
