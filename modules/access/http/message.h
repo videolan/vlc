@@ -166,13 +166,6 @@ const char *vlc_http_msg_get_token(const struct vlc_http_msg *,
                                    const char *field, const char *token);
 
 /**
- * Finds first token.
- *
- * Finds the first token in a HTTP field value.
- */
-const char *vlc_http_first_token(const char *);
-
-/**
  * Finds next token.
  *
  * Finds the following token in a HTTP field value.
