@@ -678,8 +678,10 @@ void hevc_rbsp_release_vps( hevc_video_parameter_set_t *p_vps )
                 bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */ \
             } \
             else (void) i_bitflow;\
-            bs_skip( &bs, 16 ); /* Skip nal_unit_header */ \
-            if( !decode( &bs, p_hevctype ) ) \
+            bs_skip( &bs, 7 ); /* nal_unit_header */ \
+            uint8_t i_nuh_layer_id = bs_read( &bs, 6 ); \
+            bs_skip( &bs, 3 ); /* !nal_unit_header */ \
+            if( i_nuh_layer_id > 62 || !decode( &bs, p_hevctype ) ) \
             { \
                 release( p_hevctype ); \
                 p_hevctype = NULL; \
@@ -1122,8 +1124,11 @@ hevc_slice_segment_header_t * hevc_decode_slice_header( const uint8_t *p_buf, si
             bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
         }
         else (void) i_bitflow;
-        bs_skip( &bs, 16 ); /* Skip nal_unit_header */
-        if( !hevc_parse_slice_segment_header_rbsp( &bs, i_nal_type, pp_sps, pp_pps, p_sh ) )
+        bs_skip( &bs, 7 ); /* nal_unit_header */
+        uint8_t i_nuh_layer_id = bs_read( &bs, 6 );
+        bs_skip( &bs, 3 ); /* !nal_unit_header */
+        if( i_nuh_layer_id > 62 ||
+           !hevc_parse_slice_segment_header_rbsp( &bs, i_nal_type, pp_sps, pp_pps, p_sh ) )
         {
             hevc_rbsp_release_slice_header( p_sh );
             p_sh = NULL;
