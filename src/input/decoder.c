@@ -1954,9 +1954,12 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
     bool b_empty;
 
     vlc_mutex_lock( &p_owner->lock );
+#ifdef ENABLE_SOUT
     if( p_owner->p_sout_input != NULL )
         b_empty = sout_InputIsEmpty( p_owner->p_sout_input );
-    else if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
+    else
+#endif
+    if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
         b_empty = vout_IsEmpty( p_owner->p_vout );
     else if( p_owner->fmt.i_cat == AUDIO_ES )
         b_empty = atomic_load( &p_owner->drained );
