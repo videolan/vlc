@@ -201,6 +201,7 @@ static int Demux( demux_t *p_demux)
             p_block_out->i_pts = VLC_TS_INVALID;
 
             uint8_t nal_type = (p_block_out->p_buffer[4] & 0x7E) >> 1;
+            uint8_t nal_layer = hevc_getNALLayer(&p_block_out->p_buffer[4]);
 
             /*Get fps from vps if available and not already forced*/
             if( p_sys->frame_rate_den == 0 &&
@@ -219,7 +220,8 @@ static int Demux( demux_t *p_demux)
             }
 
             /* Update DTS only on VCL NAL*/
-            if( nal_type < HEVC_NAL_VPS && p_sys->frame_rate_den )
+            if( nal_type < HEVC_NAL_VPS && p_sys->frame_rate_den &&
+                nal_layer == 0 )  /* Only on base layer */
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
                 date_Increment( &p_sys->dts, 1 );

@@ -135,6 +135,11 @@ static inline bool hevc_ishvcC( const uint8_t *p_buf, size_t i_buf )
            );
 }
 
+static inline uint8_t hevc_getNALLayer( const uint8_t *p_buf )
+{
+    return ((p_buf[0] & 0x01) << 6) | (p_buf[1] >> 3);
+}
+
 /* NAL decoding */
 typedef struct hevc_video_parameter_set_t hevc_video_parameter_set_t;
 typedef struct hevc_sequence_parameter_set_t hevc_sequence_parameter_set_t;
