@@ -68,13 +68,27 @@ static int vlc_http_msg_vadd_header(struct vlc_http_msg *m, const char *name,
     }
 
     char *value;
-    if (unlikely(vasprintf(&value, fmt, ap) < 0))
+    int len = vasprintf(&value, fmt, ap);
+    if (unlikely(len < 0))
         return -1;
 
     /* IETF RFC7230 §3.2.4 */
     for (char *p = value; *p; p++)
         if (*p == '\r' || *p == '\n')
             *p = ' ';
+
+    /* Discard leading OWS */
+    size_t crop = strspn(value, "\t ");
+    if (crop > 0)
+    {
+        assert((unsigned)len >= crop);
+        memmove(value, value + crop, len - crop + 1);
+        len -= crop;
+    }
+
+    /* Discard trailing OWS */
+    while (len > 0 && (value[len - 1] == '\t' || value[len - 1] == ' '))
+        value[--len] = '\0';
 
     /* Fold identically named header field values. This is unfortunately not
      * possible for Set-Cookie, while Cookie requires a special separator. */
