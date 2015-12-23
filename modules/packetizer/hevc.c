@@ -278,6 +278,8 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
     pp_xps[i_id] = block_Duplicate(p_nalb);
     if(pp_xps[i_id])
     {
+        pp_xps[i_id]->i_dts = VLC_TS_INVALID;
+        pp_xps[i_id]->i_pts = VLC_TS_INVALID;
         const uint8_t *p_buffer = p_nalb->p_buffer;
         size_t i_buffer = p_nalb->i_buffer;
         if( hxxx_strip_AnnexB_startcode( &p_buffer, &i_buffer ) )
