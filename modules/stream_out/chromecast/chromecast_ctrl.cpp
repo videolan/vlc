@@ -173,8 +173,7 @@ extern "C" int recvPacket(sout_stream_t *p_stream, bool &b_msgReceived,
     // We receive the payload.
 
     // Get the size of the payload
-    memcpy(&i_payloadSize, p_data, PACKET_HEADER_LEN);
-    i_payloadSize = hton32(i_payloadSize);
+    i_payloadSize = U32_AT( p_data );
     const uint32_t i_maxPayloadSize = PACKET_MAX_LEN - PACKET_HEADER_LEN;
 
     if (i_payloadSize > i_maxPayloadSize)
