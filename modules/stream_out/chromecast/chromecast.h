@@ -114,9 +114,10 @@ struct intf_sys_t
 private:
     int sendMessage(castchannel::CastMessage &msg);
 
-    castchannel::CastMessage buildMessage(std::string namespace_,
-                                         castchannel::CastMessage_PayloadType payloadType,
-                                         std::string payload, std::string destinationId = DEFAULT_CHOMECAST_RECEIVER);
+    castchannel::CastMessage buildMessage(const std::string & namespace_,
+                                          castchannel::CastMessage_PayloadType payloadType,
+                                          const std::string & payload,
+                                          const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER);
 
     enum connection_status conn_status;
 

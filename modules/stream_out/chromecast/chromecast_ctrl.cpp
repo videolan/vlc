@@ -52,9 +52,10 @@
  * @param destinationId the destination idenifier
  * @return the generated CastMessage
  */
-castchannel::CastMessage intf_sys_t::buildMessage(std::string namespace_,
-                                                 castchannel::CastMessage_PayloadType payloadType,
-                                                 std::string payload, std::string destinationId)
+castchannel::CastMessage intf_sys_t::buildMessage(const std::string & namespace_,
+                                                  castchannel::CastMessage_PayloadType payloadType,
+                                                  const std::string & payload,
+                                                  const std::string & destinationId)
 {
     castchannel::CastMessage msg;
 
@@ -348,7 +349,7 @@ void intf_sys_t::msgPlayerLoad()
 
     free(psz_mime);
 
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.media",
+    castchannel::CastMessage msg = buildMessage(NAMESPACE_MEDIA,
         castchannel::CastMessage_PayloadType_STRING, ss.str(), appTransportId);
 
     messagesToSend.push(msg);
