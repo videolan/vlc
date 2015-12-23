@@ -93,6 +93,7 @@ struct decoder_sys_t
     /* */
     bool    b_slice;
     block_t *p_frame;
+    block_t **pp_frame_last;
     bool    b_frame_sps;
     bool    b_frame_pps;
 
@@ -200,6 +201,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_slice = false;
     p_sys->p_frame = NULL;
+    p_sys->pp_frame_last = &p_sys->p_frame;
     p_sys->b_frame_sps = false;
     p_sys->b_frame_pps = false;
 
@@ -416,6 +418,7 @@ static void PacketizeReset( void *p_private, bool b_broken )
         if( p_sys->p_frame )
             block_ChainRelease( p_sys->p_frame );
         p_sys->p_frame = NULL;
+        p_sys->pp_frame_last = &p_sys->p_frame;
         p_sys->b_frame_sps = false;
         p_sys->b_frame_pps = false;
         p_sys->slice.i_frame_type = 0;
@@ -466,6 +469,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         /* Reset context */
         p_sys->slice.i_frame_type = 0;
         p_sys->p_frame = NULL;
+        p_sys->pp_frame_last = &p_sys->p_frame;
         p_sys->b_frame_sps = false;
         p_sys->b_frame_pps = false;
         p_sys->b_slice = false;
@@ -544,7 +548,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
 
     /* Append the block */
     if( p_frag )
-        block_ChainAppend( &p_sys->p_frame, p_frag );
+        block_ChainLastAppend( &p_sys->pp_frame_last, p_frag );
 
     *pb_ts_used = false;
     if( p_sys->i_frame_dts <= VLC_TS_INVALID &&
@@ -586,6 +590,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
         {
             p_head = p_sys->p_frame;
             p_sys->p_frame = p_sys->p_frame->p_next;
+            if( p_sys->p_frame == NULL )
+                p_sys->pp_frame_last = &p_sys->p_frame;
         }
 
         block_t *p_list = NULL;
@@ -688,6 +694,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
 
     p_sys->slice.i_frame_type = 0;
     p_sys->p_frame = NULL;
+    p_sys->pp_frame_last = &p_sys->p_frame;
     p_sys->b_frame_sps = false;
     p_sys->b_frame_pps = false;
     p_sys->b_slice = false;
