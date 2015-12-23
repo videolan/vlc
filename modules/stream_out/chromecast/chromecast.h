@@ -32,6 +32,8 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
+#include <queue>
+
 #include "cast_channel.pb.h"
 
 // Status
@@ -43,6 +45,28 @@ enum
     CHROMECAST_APP_STARTED,
     CHROMECAST_MEDIA_LOAD_SENT,
     CHROMECAST_CONNECTION_DEAD,
+};
+
+struct intf_sys_t
+{
+    intf_sys_t(sout_stream_t * const p_stream);
+    ~intf_sys_t();
+
+    sout_stream_t  * const p_stream;
+    std::string    serverIP;
+    std::string appTransportId;
+
+    void msgAuth();
+    void msgClose(std::string destinationId);
+    void msgPing();
+    void msgPong();
+    void msgConnect(std::string destinationId);
+    void msgLaunch();
+    void msgLoad();
+    void msgStatus();
+
+    std::queue<castchannel::CastMessage> messagesToSend;
+    unsigned i_requestId;
 };
 
 #endif /* VLC_CHROMECAST_H */

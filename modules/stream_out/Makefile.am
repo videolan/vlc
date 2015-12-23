@@ -81,6 +81,7 @@ SUFFIXES += .proto .pb.cc
 	$(PROTOC) --cpp_out=. -I$(srcdir) $<
 
 libstream_out_chromecast_plugin_la_SOURCES = stream_out/chromecast/cast_channel.proto stream_out/chromecast/cast.cpp \
+                                stream_out/chromecast/chromecast_ctrl.cpp \
                                 misc/webservices/json.h misc/webservices/json.c
 nodist_libstream_out_chromecast_plugin_la_SOURCES = stream_out/chromecast/cast_channel.pb.cc
 libstream_out_chromecast_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Istream_out/chromecast $(CHROMECAST_CFLAGS)

@@ -42,9 +42,6 @@
 
 #include <cerrno>
 
-#include <sstream>
-#include <queue>
-
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/coded_stream.h>
 
@@ -55,13 +52,12 @@
 
 struct sout_stream_sys_t
 {
-    sout_stream_sys_t()
-        : p_tls(NULL), i_requestId(0),
+    sout_stream_sys_t(intf_sys_t *intf)
+        : p_tls(NULL),
           i_status(CHROMECAST_DISCONNECTED), p_out(NULL)
+        ,p_intf(intf)
     {
     }
-
-    std::string serverIP;
 
     int i_sock_fd;
     vlc_tls_creds_t *p_creds;
@@ -69,16 +65,12 @@ struct sout_stream_sys_t
 
     vlc_thread_t chromecastThread;
 
-    unsigned i_requestId;
-    std::string appTransportId;
-
-    std::queue<castchannel::CastMessage> messagesToSend;
-
     int i_status;
     vlc_mutex_t lock;
     vlc_cond_t loadCommandCond;
 
     sout_stream_t *p_out;
+    intf_sys_t * const p_intf;
 };
 
 // Media player Chromecast app id
@@ -105,15 +97,6 @@ static void Clean(sout_stream_t *p_stream);
 static int connectChromecast(sout_stream_t *p_stream, char *psz_ipChromecast);
 static void disconnectChromecast(sout_stream_t *p_stream);
 static int sendMessages(sout_stream_t *p_stream);
-
-static void msgAuth(sout_stream_t *p_stream);
-static void msgPing(sout_stream_t *p_stream);
-static void msgPong(sout_stream_t *p_stream);
-static void msgConnect(sout_stream_t *p_stream, std::string destinationId);
-static void msgClose(sout_stream_t *p_stream, std::string destinationId);
-static void msgLaunch(sout_stream_t *p_stream);
-static void msgLoad(sout_stream_t *p_stream);
-static void msgStatus(sout_stream_t *p_stream);
 
 static void *chromecastThread(void *data);
 
@@ -201,9 +184,15 @@ static int Open(vlc_object_t *p_this)
 {
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
     sout_stream_sys_t *p_sys;
-    p_sys = new(std::nothrow) sout_stream_sys_t;
-    if (p_sys == NULL)
+    intf_sys_t *p_intf = new(std::nothrow) intf_sys_t(p_stream);
+    if (p_intf == NULL)
         return VLC_ENOMEM;
+    p_sys = new(std::nothrow) sout_stream_sys_t(p_intf);
+    if (p_sys == NULL)
+    {
+        delete p_intf;
+        return VLC_ENOMEM;
+    }
     p_stream->p_sys = p_sys;
 
     config_ChainParse(p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg);
@@ -233,7 +222,7 @@ static int Open(vlc_object_t *p_this)
         Clean(p_stream);
         return VLC_EGENERIC;
     }
-    p_sys->serverIP = psz_localIP;
+    p_intf->serverIP = psz_localIP;
 
     char *psz_mux = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mux");
     if (psz_mux == NULL)
@@ -325,10 +314,10 @@ static void Close(vlc_object_t *p_this)
     case CHROMECAST_MEDIA_LOAD_SENT:
     case CHROMECAST_APP_STARTED:
         // Generate the close messages.
-        msgClose(p_stream, p_sys->appTransportId);
+        p_sys->p_intf->msgClose(p_sys->p_intf->appTransportId);
         // ft
     case CHROMECAST_AUTHENTICATED:
-        msgClose(p_stream, "receiver-0");
+        p_sys->p_intf->msgClose("receiver-0");
         // Send the just added close messages.
         sendMessages(p_stream);
         // ft
@@ -447,13 +436,13 @@ static int sendMessages(sout_stream_t *p_stream)
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     int i_ret = 0;
-    while (!p_sys->messagesToSend.empty())
+    while (!p_sys->p_intf->messagesToSend.empty())
     {
-        unsigned i_retSend = sendMessage(p_stream, p_sys->messagesToSend.front());
+        unsigned i_retSend = sendMessage(p_stream, p_sys->p_intf->messagesToSend.front());
         if (i_retSend <= 0)
             return i_retSend;
 
-        p_sys->messagesToSend.pop();
+        p_sys->p_intf->messagesToSend.pop();
         i_ret += i_retSend;
     }
 
@@ -607,8 +596,8 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
         {
             vlc_mutex_locker locker(&p_sys->lock);
             p_sys->i_status = CHROMECAST_AUTHENTICATED;
-            msgConnect(p_stream, "receiver-0");
-            msgLaunch(p_stream);
+            p_sys->p_intf->msgConnect("receiver-0");
+            p_sys->p_intf->msgLaunch();
         }
     }
     else if (namespace_ == "urn:x-cast:com.google.cast.tp.heartbeat")
@@ -619,7 +608,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
         if (type == "PING")
         {
             msg_Dbg(p_stream, "PING received from the Chromecast");
-            msgPong(p_stream);
+            p_sys->p_intf->msgPong();
         }
         else if (type == "PONG")
         {
@@ -649,8 +638,8 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
                 {
                     p_app = &applications[i];
                     vlc_mutex_lock(&p_sys->lock);
-                    if (p_sys->appTransportId.empty())
-                        p_sys->appTransportId = std::string(applications[i]["transportId"]);
+                    if (p_sys->p_intf->appTransportId.empty())
+                        p_sys->p_intf->appTransportId = std::string(applications[i]["transportId"]);
                     vlc_mutex_unlock(&p_sys->lock);
                     break;
                 }
@@ -659,12 +648,12 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
             vlc_mutex_lock(&p_sys->lock);
             if ( p_app )
             {
-                if (!p_sys->appTransportId.empty()
+                if (!p_sys->p_intf->appTransportId.empty()
                         && p_sys->i_status == CHROMECAST_AUTHENTICATED)
                 {
                     p_sys->i_status = CHROMECAST_APP_STARTED;
-                    msgConnect(p_stream, p_sys->appTransportId);
-                    msgLoad(p_stream);
+                    p_sys->p_intf->msgConnect(p_sys->p_intf->appTransportId);
+                    p_sys->p_intf->msgLoad();
                     p_sys->i_status = CHROMECAST_MEDIA_LOAD_SENT;
                     vlc_cond_signal(&p_sys->loadCommandCond);
                 }
@@ -677,7 +666,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
                 case CHROMECAST_APP_STARTED:
                 case CHROMECAST_MEDIA_LOAD_SENT:
                     msg_Warn(p_stream, "app is no longer present. closing");
-                    msgClose(p_stream, p_sys->appTransportId);
+                    p_sys->p_intf->msgClose(p_sys->p_intf->appTransportId);
                     p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
                     // ft
                 default:
@@ -710,7 +699,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
         else if (type == "LOAD_FAILED")
         {
             msg_Err(p_stream, "Media load failed");
-            msgClose(p_stream, p_sys->appTransportId);
+            p_sys->p_intf->msgClose(p_sys->p_intf->appTransportId);
             vlc_mutex_lock(&p_sys->lock);
             p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
             vlc_mutex_unlock(&p_sys->lock);
@@ -754,155 +743,6 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
 }
 
 
-/**
- * @brief Build a CastMessage to send to the Chromecast
- * @param namespace_ the message namespace
- * @param payloadType the payload type (CastMessage_PayloadType_STRING or
- * CastMessage_PayloadType_BINARY
- * @param payload the payload
- * @param destinationId the destination idenifier
- * @return the generated CastMessage
- */
-static castchannel::CastMessage buildMessage(std::string namespace_,
-                                castchannel::CastMessage_PayloadType payloadType,
-                                std::string payload, std::string destinationId = "receiver-0")
-{
-    castchannel::CastMessage msg;
-
-    msg.set_protocol_version(castchannel::CastMessage_ProtocolVersion_CASTV2_1_0);
-    msg.set_namespace_(namespace_);
-    msg.set_payload_type(payloadType);
-    msg.set_source_id("sender-vlc");
-    msg.set_destination_id(destinationId);
-    if (payloadType == castchannel::CastMessage_PayloadType_STRING)
-        msg.set_payload_utf8(payload);
-    else // CastMessage_PayloadType_BINARY
-        msg.set_payload_binary(payload);
-
-    return msg;
-}
-
-
-/*****************************************************************************
- * Message preparation
- *****************************************************************************/
-static void msgAuth(sout_stream_t *p_stream)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    castchannel::DeviceAuthMessage authMessage;
-    authMessage.mutable_challenge();
-    std::string authMessageString;
-    authMessage.SerializeToString(&authMessageString);
-
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.deviceauth",
-        castchannel::CastMessage_PayloadType_BINARY, authMessageString);
-
-    p_sys->messagesToSend.push(msg);
-}
-
-
-static void msgPing(sout_stream_t *p_stream)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    std::string s("{\"type\":\"PING\"}");
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.heartbeat",
-        castchannel::CastMessage_PayloadType_STRING, s);
-
-    p_sys->messagesToSend.push(msg);
-}
-
-
-static void msgPong(sout_stream_t *p_stream)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    std::string s("{\"type\":\"PONG\"}");
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.heartbeat",
-        castchannel::CastMessage_PayloadType_STRING, s);
-
-    p_sys->messagesToSend.push(msg);
-}
-
-
-static void msgConnect(sout_stream_t *p_stream, std::string destinationId)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    std::string s("{\"type\":\"CONNECT\"}");
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.connection",
-        castchannel::CastMessage_PayloadType_STRING, s, destinationId);
-
-    p_sys->messagesToSend.push(msg);
-}
-
-
-static void msgClose(sout_stream_t *p_stream, std::string destinationId)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    std::string s("{\"type\":\"CLOSE\"}");
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.connection",
-        castchannel::CastMessage_PayloadType_STRING, s, destinationId);
-
-    p_sys->messagesToSend.push(msg);
-}
-
-static void msgStatus(sout_stream_t *p_stream)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    std::stringstream ss;
-    ss << "{\"type\":\"GET_STATUS\"}";
-
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.receiver",
-        castchannel::CastMessage_PayloadType_STRING, ss.str());
-
-    p_sys->messagesToSend.push(msg);
-}
-
-static void msgLaunch(sout_stream_t *p_stream)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    std::stringstream ss;
-    ss << "{\"type\":\"LAUNCH\","
-       <<  "\"appId\":\"" << APP_ID << "\","
-       <<  "\"requestId\":" << p_stream->p_sys->i_requestId++ << "}";
-
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.receiver",
-        castchannel::CastMessage_PayloadType_STRING, ss.str());
-
-    p_sys->messagesToSend.push(msg);
-}
-
-
-static void msgLoad(sout_stream_t *p_stream)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    char *psz_mime = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mime");
-    if (psz_mime == NULL)
-        return;
-
-    std::stringstream ss;
-    ss << "{\"type\":\"LOAD\","
-       <<  "\"media\":{\"contentId\":\"http://" << p_sys->serverIP << ":"
-           << var_InheritInteger(p_stream, SOUT_CFG_PREFIX"http-port")
-           << "/stream\","
-       <<             "\"streamType\":\"LIVE\","
-       <<             "\"contentType\":\"" << std::string(psz_mime) << "\"},"
-       <<  "\"requestId\":" << p_stream->p_sys->i_requestId++ << "}";
-
-    free(psz_mime);
-
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.media",
-        castchannel::CastMessage_PayloadType_STRING, ss.str(), p_sys->appTransportId);
-
-    p_sys->messagesToSend.push(msg);
-}
-
 
 /*****************************************************************************
  * Chromecast thread
@@ -921,7 +761,7 @@ static void* chromecastThread(void* p_data)
     int i_waitdelay = PING_WAIT_TIME;
     int i_retries = PING_WAIT_RETRIES;
 
-    msgAuth(p_stream);
+    p_sys->p_intf->msgAuth();
     sendMessages(p_stream);
     vlc_restorecancel(canc);
 
@@ -950,8 +790,8 @@ static void* chromecastThread(void* p_data)
 
         if (b_pingTimeout)
         {
-            msgPing(p_stream);
-            msgStatus(p_stream);
+            p_sys->p_intf->msgPing();
+            p_sys->p_intf->msgStatus();
         }
 
         if (b_msgReceived)
@@ -962,7 +802,7 @@ static void* chromecastThread(void* p_data)
         }
 
         // Send the answer messages if there is any.
-        if (!p_sys->messagesToSend.empty())
+        if (!p_sys->p_intf->messagesToSend.empty())
         {
             i_ret = sendMessages(p_stream);
 #if defined(_WIN32)
