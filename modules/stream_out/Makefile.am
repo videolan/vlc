@@ -88,7 +88,9 @@ libstream_out_chromecast_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Istream_out/chrome
 libstream_out_chromecast_plugin_la_LIBADD = $(CHROMECAST_LIBS) $(SOCKET_LIBS)
 CLEANFILES += $(nodist_libstream_out_chromecast_plugin_la_SOURCES)
 
+if ENABLE_SOUT
 if BUILD_CHROMECAST
 BUILT_SOURCES += stream_out/chromecast/cast_channel.pb.h
 sout_LTLIBRARIES += libstream_out_chromecast_plugin.la
+endif
 endif
