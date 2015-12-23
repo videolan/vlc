@@ -530,7 +530,7 @@ void intf_sys_t::handleMessages()
     if ((i_ret < 0 && errno != EAGAIN) || i_ret == 0)
 #endif
     {
-        msg_Err(p_stream, "The connection to the Chromecast died.");
+        msg_Err(p_stream, "The connection to the Chromecast died (receiving).");
         vlc_mutex_locker locker(&lock);
         setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
         vlc_restorecancel(canc);
@@ -560,7 +560,7 @@ void intf_sys_t::handleMessages()
         if ((i_ret < 0 && errno != EAGAIN) || i_ret == 0)
 #endif
         {
-            msg_Err(p_stream, "The connection to the Chromecast died.");
+            msg_Err(p_stream, "The connection to the Chromecast died (sending).");
             vlc_mutex_locker locker(&lock);
             setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
         }
