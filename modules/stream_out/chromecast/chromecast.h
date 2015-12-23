@@ -36,6 +36,16 @@
 
 #include "cast_channel.pb.h"
 
+// Media player Chromecast app id
+static const std::string DEFAULT_CHOMECAST_RECEIVER = "receiver-0";
+static const std::string NAMESPACE_DEVICEAUTH       = "urn:x-cast:com.google.cast.tp.deviceauth";
+static const std::string NAMESPACE_CONNECTION       = "urn:x-cast:com.google.cast.tp.connection";
+static const std::string NAMESPACE_HEARTBEAT        = "urn:x-cast:com.google.cast.tp.heartbeat";
+static const std::string NAMESPACE_RECEIVER         = "urn:x-cast:com.google.cast.receiver";
+/* see https://developers.google.com/cast/docs/reference/messages */
+static const std::string NAMESPACE_MEDIA            = "urn:x-cast:com.google.cast.media";
+
+
 // Status
 enum
 {

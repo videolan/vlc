@@ -317,7 +317,7 @@ static void Close(vlc_object_t *p_this)
         p_sys->p_intf->msgReceiverClose(p_sys->p_intf->appTransportId);
         // ft
     case CHROMECAST_AUTHENTICATED:
-        p_sys->p_intf->msgReceiverClose("receiver-0");
+        p_sys->p_intf->msgReceiverClose(DEFAULT_CHOMECAST_RECEIVER);
         // Send the just added close messages.
         sendMessages(p_stream);
         // ft
@@ -577,7 +577,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     std::string namespace_ = msg.namespace_();
 
-    if (namespace_ == "urn:x-cast:com.google.cast.tp.deviceauth")
+    if (namespace_ == NAMESPACE_DEVICEAUTH)
     {
         castchannel::DeviceAuthMessage authMessage;
         authMessage.ParseFromString(msg.payload_binary());
@@ -596,11 +596,11 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
         {
             vlc_mutex_locker locker(&p_sys->lock);
             p_sys->i_status = CHROMECAST_AUTHENTICATED;
-            p_sys->p_intf->msgConnect("receiver-0");
+            p_sys->p_intf->msgConnect(DEFAULT_CHOMECAST_RECEIVER);
             p_sys->p_intf->msgReceiverLaunchApp();
         }
     }
-    else if (namespace_ == "urn:x-cast:com.google.cast.tp.heartbeat")
+    else if (namespace_ == NAMESPACE_HEARTBEAT)
     {
         json_value *p_data = json_parse(msg.payload_utf8().c_str());
         std::string type((*p_data)["type"]);
@@ -622,7 +622,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
 
         json_value_free(p_data);
     }
-    else if (namespace_ == "urn:x-cast:com.google.cast.receiver")
+    else if (namespace_ == NAMESPACE_RECEIVER)
     {
         json_value *p_data = json_parse(msg.payload_utf8().c_str());
         std::string type((*p_data)["type"]);
@@ -685,7 +685,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
 
         json_value_free(p_data);
     }
-    else if (namespace_ == "urn:x-cast:com.google.cast.media")
+    else if (namespace_ == NAMESPACE_MEDIA)
     {
         json_value *p_data = json_parse(msg.payload_utf8().c_str());
         std::string type((*p_data)["type"]);
@@ -713,7 +713,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
 
         json_value_free(p_data);
     }
-    else if (namespace_ == "urn:x-cast:com.google.cast.tp.connection")
+    else if (namespace_ == NAMESPACE_CONNECTION)
     {
         json_value *p_data = json_parse(msg.payload_utf8().c_str());
         std::string type((*p_data)["type"]);

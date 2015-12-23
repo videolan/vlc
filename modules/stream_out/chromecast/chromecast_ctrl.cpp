@@ -89,7 +89,7 @@ void intf_sys_t::msgAuth()
     std::string authMessageString;
     authMessage.SerializeToString(&authMessageString);
 
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.deviceauth",
+    castchannel::CastMessage msg = buildMessage(NAMESPACE_DEVICEAUTH,
         castchannel::CastMessage_PayloadType_BINARY, authMessageString);
 
     messagesToSend.push(msg);
@@ -99,7 +99,7 @@ void intf_sys_t::msgAuth()
 void intf_sys_t::msgPing()
 {
     std::string s("{\"type\":\"PING\"}");
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.heartbeat",
+    castchannel::CastMessage msg = buildMessage(NAMESPACE_HEARTBEAT,
         castchannel::CastMessage_PayloadType_STRING, s);
 
     messagesToSend.push(msg);
@@ -109,7 +109,7 @@ void intf_sys_t::msgPing()
 void intf_sys_t::msgPong()
 {
     std::string s("{\"type\":\"PONG\"}");
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.heartbeat",
+    castchannel::CastMessage msg = buildMessage(NAMESPACE_HEARTBEAT,
         castchannel::CastMessage_PayloadType_STRING, s);
 
     messagesToSend.push(msg);
@@ -119,7 +119,7 @@ void intf_sys_t::msgPong()
 void intf_sys_t::msgConnect(std::string destinationId)
 {
     std::string s("{\"type\":\"CONNECT\"}");
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.connection",
+    castchannel::CastMessage msg = buildMessage(NAMESPACE_CONNECTION,
         castchannel::CastMessage_PayloadType_STRING, s, destinationId);
 
     messagesToSend.push(msg);
@@ -129,7 +129,7 @@ void intf_sys_t::msgConnect(std::string destinationId)
 void intf_sys_t::msgReceiverClose(std::string destinationId)
 {
     std::string s("{\"type\":\"CLOSE\"}");
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.connection",
+    castchannel::CastMessage msg = buildMessage(NAMESPACE_CONNECTION,
         castchannel::CastMessage_PayloadType_STRING, s, destinationId);
 
     messagesToSend.push(msg);
@@ -140,7 +140,7 @@ void intf_sys_t::msgReceiverGetStatus()
     std::stringstream ss;
     ss << "{\"type\":\"GET_STATUS\"}";
 
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.receiver",
+    castchannel::CastMessage msg = buildMessage(NAMESPACE_RECEIVER,
         castchannel::CastMessage_PayloadType_STRING, ss.str());
 
     messagesToSend.push(msg);
@@ -153,7 +153,7 @@ void intf_sys_t::msgReceiverLaunchApp()
        <<  "\"appId\":\"" << APP_ID << "\","
        <<  "\"requestId\":" << i_requestId++ << "}";
 
-    castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.receiver",
+    castchannel::CastMessage msg = buildMessage(NAMESPACE_RECEIVER,
         castchannel::CastMessage_PayloadType_STRING, ss.str());
 
     messagesToSend.push(msg);
