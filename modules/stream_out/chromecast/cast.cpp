@@ -212,7 +212,7 @@ static int Open(vlc_object_t *p_this)
         Clean(p_stream);
         return VLC_EGENERIC;
     }
-    p_sys->p_intf->i_status = CHROMECAST_TLS_CONNECTED;
+    p_sys->p_intf->conn_status = CHROMECAST_TLS_CONNECTED;
 
     char psz_localIP[NI_MAXNUMERICHOST];
     if (net_GetSockAddress(p_sys->i_sock_fd, psz_localIP, NULL))
@@ -265,7 +265,7 @@ static int Open(vlc_object_t *p_this)
     int i_ret = 0;
     const mtime_t deadline = mdate() + 6 * CLOCK_FREQ;
     vlc_mutex_lock(&p_intf->lock);
-    while (p_sys->p_intf->i_status != CHROMECAST_MEDIA_LOAD_SENT)
+    while (p_sys->p_intf->conn_status != CHROMECAST_MEDIA_LOAD_SENT)
     {
         i_ret = vlc_cond_timedwait(&p_sys->p_intf->loadCommandCond, &p_intf->lock, deadline);
         if (i_ret == ETIMEDOUT)
@@ -305,7 +305,7 @@ static void Close(vlc_object_t *p_this)
     vlc_cancel(p_sys->chromecastThread);
     vlc_join(p_sys->chromecastThread, NULL);
 
-    switch (p_sys->p_intf->i_status)
+    switch (p_sys->p_intf->conn_status)
     {
     case CHROMECAST_MEDIA_LOAD_SENT:
     case CHROMECAST_APP_STARTED:
@@ -387,7 +387,7 @@ static void disconnectChromecast(sout_stream_t *p_stream)
         vlc_tls_SessionDelete(p_sys->p_tls);
         vlc_tls_Delete(p_sys->p_creds);
         p_sys->p_tls = NULL;
-        p_sys->p_intf->i_status = CHROMECAST_DISCONNECTED;
+        p_sys->p_intf->conn_status = CHROMECAST_DISCONNECTED;
     }
 }
 
@@ -599,7 +599,7 @@ static void* chromecastThread(void* p_data)
         {
             msg_Err(p_stream, "The connection to the Chromecast died.");
             vlc_mutex_locker locker(&p_sys->p_intf->lock);
-            p_sys->p_intf->i_status = CHROMECAST_CONNECTION_DEAD;
+            p_sys->p_intf->conn_status = CHROMECAST_CONNECTION_DEAD;
             break;
         }
 
@@ -628,12 +628,12 @@ static void* chromecastThread(void* p_data)
             {
                 msg_Err(p_stream, "The connection to the Chromecast died.");
                 vlc_mutex_locker locker(&p_sys->p_intf->lock);
-                p_sys->p_intf->i_status = CHROMECAST_CONNECTION_DEAD;
+                p_sys->p_intf->conn_status = CHROMECAST_CONNECTION_DEAD;
             }
         }
 
         vlc_mutex_lock(&p_sys->p_intf->lock);
-        if ( p_sys->p_intf->i_status == CHROMECAST_CONNECTION_DEAD )
+        if ( p_sys->p_intf->conn_status == CHROMECAST_CONNECTION_DEAD )
         {
             vlc_mutex_unlock(&p_sys->p_intf->lock);
             break;

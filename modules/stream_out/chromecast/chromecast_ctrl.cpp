@@ -73,7 +73,7 @@ static castchannel::CastMessage buildMessage(std::string namespace_,
 
 intf_sys_t::intf_sys_t(sout_stream_t * const p_this)
  : p_stream(p_this)
- , i_status(CHROMECAST_DISCONNECTED)
+ , conn_status(CHROMECAST_DISCONNECTED)
  , i_requestId(0)
 {
     vlc_mutex_init(&lock);
@@ -111,7 +111,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         else
         {
             vlc_mutex_locker locker(&lock);
-            i_status = CHROMECAST_AUTHENTICATED;
+            conn_status = CHROMECAST_AUTHENTICATED;
             msgConnect(DEFAULT_CHOMECAST_RECEIVER);
             msgReceiverLaunchApp();
         }
@@ -164,25 +164,25 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
             if ( p_app )
             {
                 if (!appTransportId.empty()
-                        && i_status == CHROMECAST_AUTHENTICATED)
+                        && conn_status == CHROMECAST_AUTHENTICATED)
                 {
-                    i_status = CHROMECAST_APP_STARTED;
+                    conn_status = CHROMECAST_APP_STARTED;
                     msgConnect(appTransportId);
                     msgPlayerLoad();
-                    i_status = CHROMECAST_MEDIA_LOAD_SENT;
+                    conn_status = CHROMECAST_MEDIA_LOAD_SENT;
                     vlc_cond_signal(&loadCommandCond);
                 }
             }
             else
             {
-                switch(i_status)
+                switch(conn_status)
                 {
                 /* If the app is no longer present */
                 case CHROMECAST_APP_STARTED:
                 case CHROMECAST_MEDIA_LOAD_SENT:
                     msg_Warn(p_stream, "app is no longer present. closing");
                     msgReceiverClose(appTransportId);
-                    i_status = CHROMECAST_CONNECTION_DEAD;
+                    conn_status = CHROMECAST_CONNECTION_DEAD;
                 default:
                     break;
                 }
@@ -214,7 +214,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
             msg_Err(p_stream, "Media load failed");
             msgReceiverClose(appTransportId);
             vlc_mutex_lock(&lock);
-            i_status = CHROMECAST_CONNECTION_DEAD;
+            conn_status = CHROMECAST_CONNECTION_DEAD;
             vlc_mutex_unlock(&lock);
         }
         else
@@ -235,7 +235,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         {
             msg_Warn(p_stream, "received close message");
             vlc_mutex_lock(&lock);
-            i_status = CHROMECAST_CONNECTION_DEAD;
+            conn_status = CHROMECAST_CONNECTION_DEAD;
             vlc_mutex_unlock(&lock);
         }
         else

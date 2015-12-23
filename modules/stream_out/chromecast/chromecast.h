@@ -47,7 +47,7 @@ static const std::string NAMESPACE_MEDIA            = "urn:x-cast:com.google.cas
 
 
 // Status
-enum
+enum connection_status
 {
     CHROMECAST_DISCONNECTED,
     CHROMECAST_TLS_CONNECTED,
@@ -80,7 +80,7 @@ struct intf_sys_t
 
     void msgPlayerLoad();
 
-    int i_status;
+    enum connection_status conn_status;
 
     std::queue<castchannel::CastMessage> messagesToSend;
     unsigned i_requestId;
