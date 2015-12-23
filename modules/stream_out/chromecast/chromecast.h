@@ -67,6 +67,7 @@ struct intf_sys_t
     std::string appTransportId;
 
     int i_sock_fd;
+    vlc_tls_creds_t *p_creds;
     vlc_tls_t *p_tls;
 
     vlc_mutex_t  lock;
@@ -94,6 +95,9 @@ struct intf_sys_t
             vlc_cond_broadcast(&loadCommandCond);
         }
     }
+
+    int connectChromecast(char *psz_ipChromecast);
+    void disconnectChromecast();
 
     void msgPing();
     void msgPong();

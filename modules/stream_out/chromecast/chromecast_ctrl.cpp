@@ -46,6 +46,8 @@
 // Media player Chromecast app id
 #define APP_ID "CC1AD845" // Default media player aka DEFAULT_MEDIA_RECEIVER_APPLICATION_ID
 
+#define CHROMECAST_CONTROL_PORT 8009
+
 /* deadline regarding pings sent from receiver */
 #define PING_WAIT_TIME 6000
 #define PING_WAIT_RETRIES 0
@@ -105,6 +107,52 @@ intf_sys_t::~intf_sys_t()
     vlc_cond_destroy(&loadCommandCond);
     vlc_mutex_destroy(&lock);
 }
+
+/**
+ * @brief Connect to the Chromecast
+ * @param p_stream the sout_stream_t structure
+ * @return the opened socket file descriptor or -1 on error
+ */
+int intf_sys_t::connectChromecast(char *psz_ipChromecast)
+{
+    int fd = net_ConnectTCP(p_stream, psz_ipChromecast, CHROMECAST_CONTROL_PORT);
+    if (fd < 0)
+        return -1;
+
+    p_creds = vlc_tls_ClientCreate(VLC_OBJECT(p_stream));
+    if (p_creds == NULL)
+    {
+        net_Close(fd);
+        return -1;
+    }
+
+    p_tls = vlc_tls_ClientSessionCreate(p_creds, fd, psz_ipChromecast,
+                                               "tcps", NULL, NULL);
+
+    if (p_tls == NULL)
+    {
+        vlc_tls_Delete(p_creds);
+        return -1;
+    }
+
+    return fd;
+}
+
+
+/**
+ * @brief Disconnect from the Chromecast
+ */
+void intf_sys_t::disconnectChromecast()
+{
+    if (p_tls)
+    {
+        vlc_tls_SessionDelete(p_tls);
+        vlc_tls_Delete(p_creds);
+        p_tls = NULL;
+        setConnectionStatus(CHROMECAST_DISCONNECTED);
+    }
+}
+
 
 /**
  * @brief Receive a data packet from the Chromecast

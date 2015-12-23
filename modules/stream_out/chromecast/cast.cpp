@@ -57,18 +57,12 @@ struct sout_stream_sys_t
         delete p_intf;
     }
 
-    vlc_tls_creds_t *p_creds;
-
     vlc_thread_t chromecastThread;
 
     sout_stream_t *p_out;
     intf_sys_t * const p_intf;
 };
 
-// Media player Chromecast app id
-#define APP_ID "CC1AD845" // Default media player
-
-#define CHROMECAST_CONTROL_PORT 8009
 #define HTTP_PORT               8010
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
@@ -79,8 +73,6 @@ struct sout_stream_sys_t
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 static void Clean(sout_stream_t *p_stream);
-static int connectChromecast(sout_stream_t *p_stream, char *psz_ipChromecast);
-static void disconnectChromecast(sout_stream_t *p_stream);
 
 static void *chromecastThread(void *data);
 
@@ -189,18 +181,18 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    p_sys->p_intf->i_sock_fd = connectChromecast(p_stream, psz_ipChromecast);
+    p_intf->i_sock_fd = p_intf->connectChromecast(psz_ipChromecast);
     free(psz_ipChromecast);
-    if (p_sys->p_intf->i_sock_fd < 0)
+    if (p_intf->i_sock_fd < 0)
     {
         msg_Err(p_stream, "Could not connect the Chromecast");
         Clean(p_stream);
         return VLC_EGENERIC;
     }
-    p_sys->p_intf->setConnectionStatus(CHROMECAST_TLS_CONNECTED);
+    p_intf->setConnectionStatus(CHROMECAST_TLS_CONNECTED);
 
     char psz_localIP[NI_MAXNUMERICHOST];
-    if (net_GetSockAddress(p_sys->p_intf->i_sock_fd, psz_localIP, NULL))
+    if (net_GetSockAddress(p_intf->i_sock_fd, psz_localIP, NULL))
     {
         msg_Err(p_this, "Cannot get local IP address");
         Clean(p_stream);
@@ -250,9 +242,9 @@ static int Open(vlc_object_t *p_this)
     int i_ret = 0;
     const mtime_t deadline = mdate() + 6 * CLOCK_FREQ;
     vlc_mutex_lock(&p_intf->lock);
-    while (p_sys->p_intf->getConnectionStatus() != CHROMECAST_MEDIA_LOAD_SENT)
+    while (p_intf->getConnectionStatus() != CHROMECAST_MEDIA_LOAD_SENT)
     {
-        i_ret = vlc_cond_timedwait(&p_sys->p_intf->loadCommandCond, &p_intf->lock, deadline);
+        i_ret = vlc_cond_timedwait(&p_intf->loadCommandCond, &p_intf->lock, deadline);
         if (i_ret == ETIMEDOUT)
         {
             msg_Err(p_stream, "Timeout reached before sending the media loading command");
@@ -322,58 +314,9 @@ static void Clean(sout_stream_t *p_stream)
         sout_StreamChainDelete(p_sys->p_out, p_sys->p_out);
     }
 
-    disconnectChromecast(p_stream);
+    p_sys->p_intf->disconnectChromecast();
 
     delete p_sys;
-}
-
-
-/**
- * @brief Connect to the Chromecast
- * @param p_stream the sout_stream_t structure
- * @return the opened socket file descriptor or -1 on error
- */
-static int connectChromecast(sout_stream_t *p_stream, char *psz_ipChromecast)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-    int fd = net_ConnectTCP(p_stream, psz_ipChromecast, CHROMECAST_CONTROL_PORT);
-    if (fd < 0)
-        return -1;
-
-    p_sys->p_creds = vlc_tls_ClientCreate(VLC_OBJECT(p_stream));
-    if (p_sys->p_creds == NULL)
-    {
-        net_Close(fd);
-        return -1;
-    }
-
-    p_sys->p_intf->p_tls = vlc_tls_ClientSessionCreate(p_sys->p_creds, fd, psz_ipChromecast,
-                                               "tcps", NULL, NULL);
-
-    if (p_sys->p_intf->p_tls == NULL)
-    {
-        vlc_tls_Delete(p_sys->p_creds);
-        return -1;
-    }
-
-    return fd;
-}
-
-
-/**
- * @brief Disconnect from the Chromecast
- */
-static void disconnectChromecast(sout_stream_t *p_stream)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    if (p_sys->p_intf->p_tls)
-    {
-        vlc_tls_SessionDelete(p_sys->p_intf->p_tls);
-        vlc_tls_Delete(p_sys->p_creds);
-        p_sys->p_intf->p_tls = NULL;
-        p_sys->p_intf->setConnectionStatus(CHROMECAST_DISCONNECTED);
-    }
 }
 
 
