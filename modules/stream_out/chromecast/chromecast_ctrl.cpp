@@ -276,21 +276,23 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         {
             json_value applications = (*p_data)["status"]["applications"];
             const json_value *p_app = NULL;
+
+            vlc_mutex_locker locker(&lock);
             for (unsigned i = 0; i < applications.u.array.length; ++i)
             {
                 std::string appId(applications[i]["appId"]);
                 if (appId == APP_ID)
                 {
-                    p_app = &applications[i];
-                    vlc_mutex_lock(&lock);
-                    if (appTransportId.empty())
-                        appTransportId = std::string(applications[i]["transportId"]);
-                    vlc_mutex_unlock(&lock);
+                    const char *pz_transportId = applications[i]["transportId"];
+                    if (pz_transportId != NULL)
+                    {
+                        appTransportId = std::string(pz_transportId);
+                        p_app = &applications[i];
+                    }
                     break;
                 }
             }
 
-            vlc_mutex_lock(&lock);
             if ( p_app )
             {
                 if (!appTransportId.empty()
@@ -318,7 +320,6 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                 }
 
             }
-            vlc_mutex_unlock(&lock);
         }
         else
         {
