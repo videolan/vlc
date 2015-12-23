@@ -39,7 +39,7 @@
 #include "../../misc/webservices/json.h"
 
 // Media player Chromecast app id
-#define APP_ID "CC1AD845" // Default media player
+#define APP_ID "CC1AD845" // Default media player aka DEFAULT_MEDIA_RECEIVER_APPLICATION_ID
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
 
@@ -81,6 +81,7 @@ intf_sys_t::intf_sys_t(sout_stream_t * const p_this)
  : p_stream(p_this)
  , p_tls(NULL)
  , conn_status(CHROMECAST_DISCONNECTED)
+ , i_receiver_requestId(0)
  , i_requestId(0)
 {
     vlc_mutex_init(&lock);
@@ -299,7 +300,8 @@ void intf_sys_t::msgReceiverClose(std::string destinationId)
 void intf_sys_t::msgReceiverGetStatus()
 {
     std::stringstream ss;
-    ss << "{\"type\":\"GET_STATUS\"}";
+    ss << "{\"type\":\"GET_STATUS\","
+       <<  "\"requestId\":" << i_receiver_requestId++ << "}";
 
     buildMessage(NAMESPACE_RECEIVER, ss.str());
 }
@@ -309,7 +311,7 @@ void intf_sys_t::msgReceiverLaunchApp()
     std::stringstream ss;
     ss << "{\"type\":\"LAUNCH\","
        <<  "\"appId\":\"" << APP_ID << "\","
-       <<  "\"requestId\":" << i_requestId++ << "}";
+       <<  "\"requestId\":" << i_receiver_requestId++ << "}";
 
     buildMessage(NAMESPACE_RECEIVER, ss.str());
 }

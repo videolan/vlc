@@ -117,6 +117,7 @@ private:
 
     enum connection_status conn_status;
 
+    unsigned i_receiver_requestId;
     unsigned i_requestId;
 };
 
