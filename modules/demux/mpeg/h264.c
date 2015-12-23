@@ -60,10 +60,12 @@ vlc_module_end ()
  *****************************************************************************/
 struct demux_sys_t
 {
-    mtime_t     i_dts;
     es_out_id_t *p_es;
 
-    float       f_fps;
+    date_t      dts;
+    unsigned    frame_rate_num;
+    unsigned    frame_rate_den;
+
     decoder_t *p_packetizer;
 };
 
@@ -107,11 +109,18 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control= Control;
     p_demux->p_sys     = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es        = NULL;
-    p_sys->i_dts       = 0;
-    p_sys->f_fps       = var_CreateGetFloat( p_demux, "h264-fps" );
-    if( p_sys->f_fps < 0.001f )
-        p_sys->f_fps = 0.001f;
-    msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->f_fps );
+    p_sys->frame_rate_num = 25000;
+    p_sys->frame_rate_den = 1000;
+    float f_fps        = var_CreateGetFloat( p_demux, "h264-fps" );
+    if( f_fps )
+    {
+        if ( f_fps < 0.001f ) f_fps = 0.001f;
+        p_sys->frame_rate_den = 1000;
+        p_sys->frame_rate_num = 1000 * f_fps;
+    }
+    msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->frame_rate_num / p_sys->frame_rate_den );
+    date_Init( &p_sys->dts, p_sys->frame_rate_num, p_sys->frame_rate_den );
+    date_Set( &p_sys->dts, VLC_TS_0 );
 
     /* Load the mpegvideo packetizer */
     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_H264 );
@@ -152,9 +161,8 @@ static int Demux( demux_t *p_demux)
         return 0;
     }
 
-    /* m4v demuxer doesn't set pts/dts at all */
-    p_block_in->i_dts = VLC_TS_0;
-    p_block_in->i_pts = VLC_TS_0;
+    p_block_in->i_dts = date_Get( &p_sys->dts );
+    p_block_in->i_pts = VLC_TS_INVALID;
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in )) )
     {
@@ -170,15 +178,16 @@ static int Demux( demux_t *p_demux)
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
 
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_dts );
-            p_block_out->i_dts = VLC_TS_0 + p_sys->i_dts;
-            p_block_out->i_pts = VLC_TS_0 + p_sys->i_dts;
+            /* h264 packetizer does merge multiple NAL into AU, but slice flag persists */
+            if( p_block_out->i_flags & BLOCK_FLAG_TYPE_MASK )
+            {
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
+                date_Increment( &p_sys->dts, 1 );
+            }
 
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
             p_block_out = p_next;
-
-            p_sys->i_dts += (int64_t)((float)CLOCK_FREQ / p_sys->f_fps);
         }
     }
     return 1;
