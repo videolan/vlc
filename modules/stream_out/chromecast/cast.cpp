@@ -36,7 +36,6 @@
 #endif
 
 #include <vlc_sout.h>
-#include <vlc_tls.h>
 #include <vlc_url.h>
 #include <vlc_threads.h>
 
@@ -46,13 +45,11 @@
 #include <google/protobuf/io/coded_stream.h>
 
 #define PACKET_MAX_LEN 10 * 1024
-#define PACKET_HEADER_LEN 4
 
 struct sout_stream_sys_t
 {
     sout_stream_sys_t(intf_sys_t *intf)
-        : p_tls(NULL)
-        , p_out(NULL)
+        : p_out(NULL)
         , p_intf(intf)
     {
     }
@@ -64,7 +61,6 @@ struct sout_stream_sys_t
 
     int i_sock_fd;
     vlc_tls_creds_t *p_creds;
-    vlc_tls_t *p_tls;
 
     vlc_thread_t chromecastThread;
 
@@ -95,7 +91,6 @@ static void Close(vlc_object_t *);
 static void Clean(sout_stream_t *p_stream);
 static int connectChromecast(sout_stream_t *p_stream, char *psz_ipChromecast);
 static void disconnectChromecast(sout_stream_t *p_stream);
-static int sendMessages(sout_stream_t *p_stream);
 
 static void *chromecastThread(void *data);
 
@@ -315,7 +310,7 @@ static void Close(vlc_object_t *p_this)
     case CHROMECAST_AUTHENTICATED:
         p_sys->p_intf->msgReceiverClose(DEFAULT_CHOMECAST_RECEIVER);
         // Send the just added close messages.
-        sendMessages(p_stream);
+        p_sys->p_intf->sendMessages();
         // ft
     default:
         break;
@@ -362,10 +357,10 @@ static int connectChromecast(sout_stream_t *p_stream, char *psz_ipChromecast)
         return -1;
     }
 
-    p_sys->p_tls = vlc_tls_ClientSessionCreate(p_sys->p_creds, fd, psz_ipChromecast,
+    p_sys->p_intf->p_tls = vlc_tls_ClientSessionCreate(p_sys->p_creds, fd, psz_ipChromecast,
                                                "tcps", NULL, NULL);
 
-    if (p_sys->p_tls == NULL)
+    if (p_sys->p_intf->p_tls == NULL)
     {
         vlc_tls_Delete(p_sys->p_creds);
         return -1;
@@ -382,67 +377,14 @@ static void disconnectChromecast(sout_stream_t *p_stream)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    if (p_sys->p_tls)
+    if (p_sys->p_intf->p_tls)
     {
-        vlc_tls_SessionDelete(p_sys->p_tls);
+        vlc_tls_SessionDelete(p_sys->p_intf->p_tls);
         vlc_tls_Delete(p_sys->p_creds);
-        p_sys->p_tls = NULL;
+        p_sys->p_intf->p_tls = NULL;
         p_sys->p_intf->setConnectionStatus(CHROMECAST_DISCONNECTED);
     }
 }
-
-
-/**
- * @brief Send a message to the Chromecast
- * @param p_stream the sout_stream_t structure
- * @param msg the CastMessage to send
- * @return the number of bytes sent or -1 on error
- */
-static int sendMessage(sout_stream_t *p_stream, castchannel::CastMessage &msg)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    uint32_t i_size = msg.ByteSize();
-    uint32_t i_sizeNetwork = hton32(i_size);
-
-    char *p_data = new(std::nothrow) char[PACKET_HEADER_LEN + i_size];
-    if (p_data == NULL)
-        return -1;
-
-    memcpy(p_data, &i_sizeNetwork, PACKET_HEADER_LEN);
-    msg.SerializeWithCachedSizesToArray((uint8_t *)(p_data + PACKET_HEADER_LEN));
-
-    int i_ret = tls_Send(p_sys->p_tls, p_data, PACKET_HEADER_LEN + i_size);
-    delete[] p_data;
-
-    return i_ret;
-}
-
-
-/**
- * @brief Send all the messages in the pending queue to the Chromecast
- * @param p_stream the sout_stream_t structure
- * @param msg the CastMessage to send
- * @return the number of bytes sent or -1 on error
- */
-static int sendMessages(sout_stream_t *p_stream)
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    int i_ret = 0;
-    while (!p_sys->p_intf->messagesToSend.empty())
-    {
-        unsigned i_retSend = sendMessage(p_stream, p_sys->p_intf->messagesToSend.front());
-        if (i_retSend <= 0)
-            return i_retSend;
-
-        p_sys->p_intf->messagesToSend.pop();
-        i_ret += i_retSend;
-    }
-
-    return i_ret;
-}
-
 
 
 
@@ -577,7 +519,7 @@ static void* chromecastThread(void* p_data)
     int i_retries = PING_WAIT_RETRIES;
 
     p_sys->p_intf->msgAuth();
-    sendMessages(p_stream);
+    p_sys->p_intf->sendMessages();
     vlc_restorecancel(canc);
 
     while (1)
@@ -585,7 +527,7 @@ static void* chromecastThread(void* p_data)
         bool b_msgReceived = false;
         uint32_t i_payloadSize = 0;
         int i_ret = recvPacket(p_stream, b_msgReceived, i_payloadSize, p_sys->i_sock_fd,
-                               p_sys->p_tls, &i_received, p_packet, &b_pingTimeout,
+                               p_sys->p_intf->p_tls, &i_received, p_packet, &b_pingTimeout,
                                &i_waitdelay, &i_retries);
 
         canc = vlc_savecancel();
@@ -616,21 +558,7 @@ static void* chromecastThread(void* p_data)
             p_sys->p_intf->processMessage(msg);
         }
 
-        // Send the answer messages if there is any.
-        if (!p_sys->p_intf->messagesToSend.empty())
-        {
-            i_ret = sendMessages(p_stream);
-#if defined(_WIN32)
-            if ((i_ret < 0 && WSAGetLastError() != WSAEWOULDBLOCK) || (i_ret == 0))
-#else
-            if ((i_ret < 0 && errno != EAGAIN) || i_ret == 0)
-#endif
-            {
-                msg_Err(p_stream, "The connection to the Chromecast died.");
-                vlc_mutex_locker locker(&p_sys->p_intf->lock);
-                p_sys->p_intf->setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
-            }
-        }
+        p_sys->p_intf->handleMessages();
 
         vlc_mutex_lock(&p_sys->p_intf->lock);
         if ( p_sys->p_intf->getConnectionStatus() == CHROMECAST_CONNECTION_DEAD )

@@ -32,10 +32,13 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
+#include <vlc_tls.h>
 
 #include <queue>
 
 #include "cast_channel.pb.h"
+
+#define PACKET_HEADER_LEN 4
 
 // Media player Chromecast app id
 static const std::string DEFAULT_CHOMECAST_RECEIVER = "receiver-0";
@@ -67,11 +70,16 @@ struct intf_sys_t
     std::string    serverIP;
     std::string appTransportId;
 
+    vlc_tls_t *p_tls;
+
     vlc_mutex_t  lock;
     vlc_cond_t   loadCommandCond;
 
     void msgAuth();
     void msgReceiverClose(std::string destinationId);
+
+    void handleMessages();
+    int sendMessages();
 
     connection_status getConnectionStatus() const
     {
@@ -104,6 +112,8 @@ struct intf_sys_t
     void processMessage(const castchannel::CastMessage &msg);
 
 private:
+    int sendMessage(castchannel::CastMessage &msg);
+
     enum connection_status conn_status;
 
     unsigned i_requestId;

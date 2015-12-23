@@ -73,6 +73,7 @@ static castchannel::CastMessage buildMessage(std::string namespace_,
 
 intf_sys_t::intf_sys_t(sout_stream_t * const p_this)
  : p_stream(p_this)
+ , p_tls(NULL)
  , conn_status(CHROMECAST_DISCONNECTED)
  , i_requestId(0)
 {
@@ -353,3 +354,67 @@ void intf_sys_t::msgPlayerLoad()
     messagesToSend.push(msg);
 }
 
+/**
+ * @brief Send a message to the Chromecast
+ * @param msg the CastMessage to send
+ * @return the number of bytes sent or -1 on error
+ */
+int intf_sys_t::sendMessage(castchannel::CastMessage &msg)
+{
+    uint32_t i_size = msg.ByteSize();
+    uint32_t i_sizeNetwork = hton32(i_size);
+
+    char *p_data = new(std::nothrow) char[PACKET_HEADER_LEN + i_size];
+    if (p_data == NULL)
+        return -1;
+
+    memcpy(p_data, &i_sizeNetwork, PACKET_HEADER_LEN);
+    msg.SerializeWithCachedSizesToArray((uint8_t *)(p_data + PACKET_HEADER_LEN));
+
+    int i_ret = tls_Send(p_tls, p_data, PACKET_HEADER_LEN + i_size);
+    delete[] p_data;
+
+    return i_ret;
+}
+
+
+/**
+ * @brief Send all the messages in the pending queue to the Chromecast
+ * @param msg the CastMessage to send
+ * @return the number of bytes sent or -1 on error
+ */
+int intf_sys_t::sendMessages()
+{
+    int i_ret = 0;
+    while (!messagesToSend.empty())
+    {
+        unsigned i_retSend = sendMessage(messagesToSend.front());
+        if (i_retSend <= 0)
+            return i_retSend;
+
+        messagesToSend.pop();
+        i_ret += i_retSend;
+    }
+
+    return i_ret;
+}
+
+void intf_sys_t::handleMessages()
+{
+    int i_ret;
+    // Send the answer messages if there is any.
+    if (!messagesToSend.empty())
+    {
+        i_ret = sendMessages();
+#if defined(_WIN32)
+        if ((i_ret < 0 && WSAGetLastError() != WSAEWOULDBLOCK) || (i_ret == 0))
+#else
+        if ((i_ret < 0 && errno != EAGAIN) || i_ret == 0)
+#endif
+        {
+            msg_Err(p_stream, "The connection to the Chromecast died.");
+            vlc_mutex_locker locker(&lock);
+            setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
+        }
+    }
+}
