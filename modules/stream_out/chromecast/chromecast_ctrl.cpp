@@ -52,9 +52,9 @@
  * @param destinationId the destination idenifier
  * @return the generated CastMessage
  */
-static castchannel::CastMessage buildMessage(std::string namespace_,
-                                castchannel::CastMessage_PayloadType payloadType,
-                                std::string payload, std::string destinationId = DEFAULT_CHOMECAST_RECEIVER)
+castchannel::CastMessage intf_sys_t::buildMessage(std::string namespace_,
+                                                 castchannel::CastMessage_PayloadType payloadType,
+                                                 std::string payload, std::string destinationId)
 {
     castchannel::CastMessage msg;
 
