@@ -70,7 +70,7 @@ struct intf_sys_t
     void msgReceiverClose(std::string destinationId);
     void msgPing();
     void msgPong();
-    void msgConnect(std::string destinationId);
+    void msgConnect(const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER);
 
     void msgReceiverLaunchApp();
     void msgReceiverGetStatus();

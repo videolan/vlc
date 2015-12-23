@@ -115,8 +115,7 @@ void intf_sys_t::msgPong()
     messagesToSend.push(msg);
 }
 
-
-void intf_sys_t::msgConnect(std::string destinationId)
+void intf_sys_t::msgConnect(const std::string & destinationId)
 {
     std::string s("{\"type\":\"CONNECT\"}");
     castchannel::CastMessage msg = buildMessage(NAMESPACE_CONNECTION,
