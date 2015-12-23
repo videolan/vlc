@@ -66,6 +66,7 @@ struct intf_sys_t
     std::string    serverIP;
     std::string appTransportId;
 
+    int i_sock_fd;
     vlc_tls_t *p_tls;
 
     vlc_mutex_t  lock;
