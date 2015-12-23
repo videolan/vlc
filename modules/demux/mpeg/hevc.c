@@ -35,9 +35,6 @@
 #include <vlc_codec.h>
 #include <vlc_mtime.h>
 
-#include "../packetizer/hevc_nal.h"
-#include "../packetizer/hxxx_nal.h"
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -65,7 +62,6 @@ vlc_module_end ()
 
 static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
-static int32_t getFPS( demux_t *, uint8_t, block_t * );
 
 struct demux_sys_t
 {
@@ -75,9 +71,6 @@ struct demux_sys_t
     unsigned    frame_rate_num;
     unsigned    frame_rate_den;
     decoder_t *p_packetizer;
-
-    /* Only for probing fps */
-    hevc_video_parameter_set_t    *rgp_vps[HEVC_VPS_MAX];
 };
 #define HEVC_BLOCK_SIZE 2048
 
@@ -121,12 +114,10 @@ static int Open( vlc_object_t * p_this )
         p_sys->frame_rate_den = 1000;
         p_sys->frame_rate_num = 1000 * f_force_fps;
         date_Init( &p_sys->dts, p_sys->frame_rate_num, p_sys->frame_rate_den );
-        msg_Dbg( p_demux, "using %.2f fps", (double) f_force_fps );
     }
     else
         date_Init( &p_sys->dts, 25000, 1000 ); /* Will be overwritten */
     date_Set( &p_sys->dts, VLC_TS_0 );
-    memset(p_sys->rgp_vps, 0, sizeof(p_sys->rgp_vps[0]) * HEVC_VPS_MAX);
 
     /* Load the hevc packetizer */
     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_HEVC );
@@ -137,13 +128,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
-    if( !p_sys->p_es )
-    {
-        demux_PacketizerDestroy( p_sys->p_packetizer );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
+    p_sys->p_es = NULL;
     p_demux->pf_demux  = Demux;
     p_demux->pf_control= Control;
 
@@ -163,12 +148,6 @@ static void Close( vlc_object_t * p_this )
 
     demux_PacketizerDestroy( p_sys->p_packetizer );
 
-    for( unsigned i=0; i<HEVC_VPS_MAX; i++ )
-    {
-        if( p_sys->rgp_vps[i] )
-            hevc_rbsp_release_vps( p_sys->rgp_vps[i] );
-    }
-
     free( p_sys );
 }
 
@@ -187,9 +166,6 @@ static int Demux( demux_t *p_demux)
         return 0;
     }
 
-    p_block_in->i_dts = VLC_TS_INVALID;
-    p_block_in->i_pts = VLC_TS_INVALID;
-
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in )) )
     {
         while( p_block_out )
@@ -197,37 +173,44 @@ static int Demux( demux_t *p_demux)
             block_t *p_next = p_block_out->p_next;
             p_block_out->p_next = NULL;
 
-            p_block_out->i_dts = date_Get( &p_sys->dts );
-            p_block_out->i_pts = VLC_TS_INVALID;
+            /* As we'll receive the pts of the head of the packetizer helper blockstream
+             * the dts/pts will always be late until next frame. */
+            p_block_in->i_dts = date_Get( &p_sys->dts );
+            p_block_in->i_pts = VLC_TS_INVALID;
 
-            uint8_t nal_type = (p_block_out->p_buffer[4] & 0x7E) >> 1;
-            uint8_t nal_layer = hevc_getNALLayer(&p_block_out->p_buffer[4]);
-
-            /*Get fps from vps if available and not already forced*/
-            if( p_sys->frame_rate_den == 0 &&
-               (nal_type == HEVC_NAL_VPS || nal_type == HEVC_NAL_SPS) )
+            if( p_sys->p_es == NULL )
             {
-                if( getFPS( p_demux, nal_type, p_block_out) )
+                p_sys->p_packetizer->fmt_out.b_packetized = true;
+                p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
+                if( !p_sys->p_es )
+                    return VLC_DEMUXER_EOF;
+            }
+
+            bool frame = p_block_out->i_flags & BLOCK_FLAG_TYPE_MASK;
+            es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
+            if( frame )
+            {
+                if( !p_sys->frame_rate_den )
                 {
-                    msg_Err(p_demux,"getFPS failed");
-                    return 0;
-                }
-                else if( p_sys->frame_rate_den )
-                {
+                    /* Use packetizer's one */
+                    if( p_sys->p_packetizer->fmt_out.video.i_frame_rate_base )
+                    {
+                        p_sys->frame_rate_num = p_sys->p_packetizer->fmt_out.video.i_frame_rate;
+                        p_sys->frame_rate_den = p_sys->p_packetizer->fmt_out.video.i_frame_rate_base;
+                    }
+                    else
+                    {
+                        p_sys->frame_rate_num = 25000;
+                        p_sys->frame_rate_den = 1000;
+                    }
                     date_Init( &p_sys->dts, p_sys->frame_rate_num, p_sys->frame_rate_den );
                     date_Set( &p_sys->dts, VLC_TS_0 );
+                    msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->frame_rate_num / p_sys->frame_rate_den );
                 }
-            }
 
-            /* Update DTS only on VCL NAL*/
-            if( nal_type < HEVC_NAL_VPS && p_sys->frame_rate_den &&
-                nal_layer == 0 )  /* Only on base layer */
-            {
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, date_Get( &p_sys->dts ) );
                 date_Increment( &p_sys->dts, 1 );
             }
-
-            es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
             p_block_out = p_next;
 
@@ -246,52 +229,3 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                   0, 1, i_query, args );
 }
 
-static int32_t getFPS(demux_t *p_demux, uint8_t i_nal_type, block_t *p_block)
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    hevc_sequence_parameter_set_t *p_sps = NULL;
-    uint8_t i_id;
-
-    if( !hevc_get_xps_id( p_block->p_buffer, p_block->i_buffer, &i_id ) )
-        return -1;
-
-    if( p_sys->rgp_vps[i_id] && i_nal_type == HEVC_NAL_VPS )
-        return -1;
-
-    const uint8_t *p_nald = p_block->p_buffer;
-    size_t i_nald = p_block->i_buffer;
-    if( hxxx_strip_AnnexB_startcode( &p_nald, &i_nald ) )
-    {
-        if( i_nal_type == HEVC_NAL_VPS )
-            p_sys->rgp_vps[i_id] = hevc_decode_vps( p_nald, i_nald, true );
-        else
-            p_sps = hevc_decode_sps( p_nald, i_nald, true );
-    }
-
-    if( p_sps )
-    {
-        if( !hevc_get_frame_rate( p_sps, p_sys->rgp_vps,
-                                  &p_sys->frame_rate_num, &p_sys->frame_rate_den ) )
-        {
-            p_sys->frame_rate_num = 25;
-            p_sys->frame_rate_den = 1;
-            msg_Warn( p_demux, "No timing info in VPS defaulting to 25 fps");
-        }
-        else
-        {
-            msg_Dbg( p_demux,"Using framerate %2.f fps from VPS",
-                     (float) p_sys->frame_rate_num / (float) p_sys->frame_rate_den );
-            for( unsigned i=0; i<HEVC_VPS_MAX; i++ )
-            {
-                if( p_sys->rgp_vps[i] )
-                {
-                    hevc_rbsp_release_vps( p_sys->rgp_vps[i] );
-                    p_sys->rgp_vps[i] = NULL;
-                }
-            }
-        }
-        hevc_rbsp_release_sps( p_sps );
-    }
-
-    return 0;
-}
