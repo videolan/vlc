@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_sout.h>
 
 #include <queue>
 
@@ -71,6 +72,24 @@ struct intf_sys_t
 
     void msgAuth();
     void msgReceiverClose(std::string destinationId);
+
+    connection_status getConnectionStatus() const
+    {
+        return conn_status;
+    }
+
+    void setConnectionStatus(connection_status status)
+    {
+        if (conn_status != status)
+        {
+#ifndef NDEBUG
+            msg_Dbg(p_stream, "change Chromecast connection status from %d to %d", conn_status, status);
+#endif
+            conn_status = status;
+            vlc_cond_broadcast(&loadCommandCond);
+        }
+    }
+
     void msgPing();
     void msgPong();
     void msgConnect(const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER);
@@ -80,12 +99,14 @@ struct intf_sys_t
 
     void msgPlayerLoad();
 
-    enum connection_status conn_status;
-
     std::queue<castchannel::CastMessage> messagesToSend;
-    unsigned i_requestId;
 
     void processMessage(const castchannel::CastMessage &msg);
+
+private:
+    enum connection_status conn_status;
+
+    unsigned i_requestId;
 };
 
 #endif /* VLC_CHROMECAST_H */
