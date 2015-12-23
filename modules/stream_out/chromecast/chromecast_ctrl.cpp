@@ -43,6 +43,11 @@
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
 
+static const std::string NAMESPACE_DEVICEAUTH       = "urn:x-cast:com.google.cast.tp.deviceauth";
+static const std::string NAMESPACE_CONNECTION       = "urn:x-cast:com.google.cast.tp.connection";
+static const std::string NAMESPACE_HEARTBEAT        = "urn:x-cast:com.google.cast.tp.heartbeat";
+static const std::string NAMESPACE_RECEIVER         = "urn:x-cast:com.google.cast.receiver";
+
 /**
  * @brief Build a CastMessage to send to the Chromecast
  * @param namespace_ the message namespace
