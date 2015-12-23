@@ -140,6 +140,7 @@ Muxers:
 
 Service Discovery:
  * New NetBios service discovery using libdsm
+ * New mDNS services discovery using libmicrodns
  * Rewrite of the UPnP service discovery
 
 Mac OS X Interface

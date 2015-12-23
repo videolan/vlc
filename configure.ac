@@ -4028,6 +4028,12 @@ dnl UPnP Plugin (Intel SDK)
 dnl
 PKG_ENABLE_MODULES_VLC([UPNP], [upnp], [libupnp], [Intel UPNP SDK],[auto])
 
+dnl
+dnl mDNS using libmicrodns
+dnl
+PKG_ENABLE_MODULES_VLC([MICRODNS], [], [microdns], [mDNS services discovery], [auto])
+
+
 EXTEND_HELP_STRING([Misc options:])
 
 dnl
