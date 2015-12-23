@@ -595,23 +595,22 @@ static block_t *OutputPicture( decoder_t *p_dec )
         }
 
         block_t *p_list = NULL;
+        block_t **pp_list_tail = &p_list;
         for( int i = 0; i < H264_SPS_MAX && (b_sps_pps_i || p_sys->b_frame_sps); i++ )
         {
             if( p_sys->pp_sps[i] )
-                block_ChainAppend( &p_list, block_Duplicate( p_sys->pp_sps[i] ) );
+                block_ChainLastAppend( &pp_list_tail, block_Duplicate( p_sys->pp_sps[i] ) );
         }
         for( int i = 0; i < H264_PPS_MAX && (b_sps_pps_i || p_sys->b_frame_pps); i++ )
         {
             if( p_sys->pp_pps[i] )
-                block_ChainAppend( &p_list, block_Duplicate( p_sys->pp_pps[i] ) );
+                block_ChainLastAppend( &pp_list_tail, block_Duplicate( p_sys->pp_pps[i] ) );
         }
         if( b_sps_pps_i && p_list )
             p_sys->b_header = true;
 
-        if( p_head )
-            p_head->p_next = p_list;
-        else
-            p_head = p_list;
+        if( p_list )
+            block_ChainAppend( &p_head, p_list );
 
         if( p_sys->p_frame )
             block_ChainAppend( &p_head, p_sys->p_frame );
