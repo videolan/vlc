@@ -387,9 +387,8 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         if (type == "CLOSE")
         {
             msg_Warn(p_stream, "received close message");
-            vlc_mutex_lock(&lock);
+            vlc_mutex_locker locker(&lock);
             setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
-            vlc_mutex_unlock(&lock);
         }
         else
         {
