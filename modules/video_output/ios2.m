@@ -236,6 +236,8 @@ static int Open(vlc_object_t *this)
         if (unlikely(viewContainer == nil))
             goto bailout;
 
+        [viewContainer retain];
+
         @synchronized(viewContainer) {
             if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)]))
                 goto bailout;
@@ -245,7 +247,7 @@ static int Open(vlc_object_t *this)
 
             /* This will be released in Close(), on
              * main thread, after we are done using it. */
-            sys->viewContainer = [viewContainer retain];
+            sys->viewContainer = viewContainer;
 
             if (vd->fmt.i_chroma == VLC_CODEC_CVPX_OPAQUE) {
                 msg_Dbg(vd, "will use zero-copy rendering");
