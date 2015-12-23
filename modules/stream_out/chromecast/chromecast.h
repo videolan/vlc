@@ -66,6 +66,9 @@ struct intf_sys_t
     std::string    serverIP;
     std::string appTransportId;
 
+    vlc_mutex_t  lock;
+    vlc_cond_t   loadCommandCond;
+
     void msgAuth();
     void msgReceiverClose(std::string destinationId);
     void msgPing();
@@ -77,8 +80,12 @@ struct intf_sys_t
 
     void msgPlayerLoad();
 
+    int i_status;
+
     std::queue<castchannel::CastMessage> messagesToSend;
     unsigned i_requestId;
+
+    int processMessage(const castchannel::CastMessage &msg);
 };
 
 #endif /* VLC_CHROMECAST_H */

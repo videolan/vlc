@@ -45,18 +45,21 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/coded_stream.h>
 
-#include "../../misc/webservices/json.h"
-
 #define PACKET_MAX_LEN 10 * 1024
 #define PACKET_HEADER_LEN 4
 
 struct sout_stream_sys_t
 {
     sout_stream_sys_t(intf_sys_t *intf)
-        : p_tls(NULL),
-          i_status(CHROMECAST_DISCONNECTED), p_out(NULL)
-        ,p_intf(intf)
+        : p_tls(NULL)
+        , p_out(NULL)
+        , p_intf(intf)
     {
+    }
+    
+    ~sout_stream_sys_t()
+    {
+        delete p_intf;
     }
 
     int i_sock_fd;
@@ -64,10 +67,6 @@ struct sout_stream_sys_t
     vlc_tls_t *p_tls;
 
     vlc_thread_t chromecastThread;
-
-    int i_status;
-    vlc_mutex_t lock;
-    vlc_cond_t loadCommandCond;
 
     sout_stream_t *p_out;
     intf_sys_t * const p_intf;
@@ -213,7 +212,7 @@ static int Open(vlc_object_t *p_this)
         Clean(p_stream);
         return VLC_EGENERIC;
     }
-    p_sys->i_status = CHROMECAST_TLS_CONNECTED;
+    p_sys->p_intf->i_status = CHROMECAST_TLS_CONNECTED;
 
     char psz_localIP[NI_MAXNUMERICHOST];
     if (net_GetSockAddress(p_sys->i_sock_fd, psz_localIP, NULL))
@@ -249,9 +248,6 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_init(&p_sys->lock);
-    vlc_cond_init(&p_sys->loadCommandCond);
-
     // Start the Chromecast event thread.
     if (vlc_clone(&p_sys->chromecastThread, chromecastThread, p_stream,
                   VLC_THREAD_PRIORITY_LOW))
@@ -268,20 +264,20 @@ static int Open(vlc_object_t *p_this)
     // Lock the sout thread until we have sent the media loading command to the Chromecast.
     int i_ret = 0;
     const mtime_t deadline = mdate() + 6 * CLOCK_FREQ;
-    vlc_mutex_lock(&p_sys->lock);
-    while (p_sys->i_status != CHROMECAST_MEDIA_LOAD_SENT)
+    vlc_mutex_lock(&p_intf->lock);
+    while (p_sys->p_intf->i_status != CHROMECAST_MEDIA_LOAD_SENT)
     {
-        i_ret = vlc_cond_timedwait(&p_sys->loadCommandCond, &p_sys->lock, deadline);
+        i_ret = vlc_cond_timedwait(&p_sys->p_intf->loadCommandCond, &p_intf->lock, deadline);
         if (i_ret == ETIMEDOUT)
         {
             msg_Err(p_stream, "Timeout reached before sending the media loading command");
-            vlc_mutex_unlock(&p_sys->lock);
+            vlc_mutex_unlock(&p_intf->lock);
             vlc_cancel(p_sys->chromecastThread);
             Clean(p_stream);
             return VLC_EGENERIC;
         }
     }
-    vlc_mutex_unlock(&p_sys->lock);
+    vlc_mutex_unlock(&p_intf->lock);
 
     /* Even uglier: sleep more to let to the Chromecast initiate the connection
      * to the http server. */
@@ -309,7 +305,7 @@ static void Close(vlc_object_t *p_this)
     vlc_cancel(p_sys->chromecastThread);
     vlc_join(p_sys->chromecastThread, NULL);
 
-    switch (p_sys->i_status)
+    switch (p_sys->p_intf->i_status)
     {
     case CHROMECAST_MEDIA_LOAD_SENT:
     case CHROMECAST_APP_STARTED:
@@ -338,8 +334,6 @@ static void Clean(sout_stream_t *p_stream)
 
     if (p_sys->p_out)
     {
-        vlc_mutex_destroy(&p_sys->lock);
-        vlc_cond_destroy(&p_sys->loadCommandCond);
         sout_StreamChainDelete(p_sys->p_out, p_sys->p_out);
     }
 
@@ -393,7 +387,7 @@ static void disconnectChromecast(sout_stream_t *p_stream)
         vlc_tls_SessionDelete(p_sys->p_tls);
         vlc_tls_Delete(p_sys->p_creds);
         p_sys->p_tls = NULL;
-        p_sys->i_status = CHROMECAST_DISCONNECTED;
+        p_sys->p_intf->i_status = CHROMECAST_DISCONNECTED;
     }
 }
 
@@ -565,185 +559,6 @@ extern "C" int recvPacket(sout_stream_t *p_stream, bool &b_msgReceived,
 }
 
 
-/**
- * @brief Process a message received from the Chromecast
- * @param p_stream the sout_stream_t structure
- * @param msg the CastMessage to process
- * @return 0 if the message has been successfuly processed else -1
- */
-static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessage &msg)
-{
-    int i_ret = 0;
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-    std::string namespace_ = msg.namespace_();
-
-    if (namespace_ == NAMESPACE_DEVICEAUTH)
-    {
-        castchannel::DeviceAuthMessage authMessage;
-        authMessage.ParseFromString(msg.payload_binary());
-
-        if (authMessage.has_error())
-        {
-            msg_Err(p_stream, "Authentification error: %d", authMessage.error().error_type());
-            i_ret = -1;
-        }
-        else if (!authMessage.has_response())
-        {
-            msg_Err(p_stream, "Authentification message has no response field");
-            i_ret = -1;
-        }
-        else
-        {
-            vlc_mutex_locker locker(&p_sys->lock);
-            p_sys->i_status = CHROMECAST_AUTHENTICATED;
-            p_sys->p_intf->msgConnect(DEFAULT_CHOMECAST_RECEIVER);
-            p_sys->p_intf->msgReceiverLaunchApp();
-        }
-    }
-    else if (namespace_ == NAMESPACE_HEARTBEAT)
-    {
-        json_value *p_data = json_parse(msg.payload_utf8().c_str());
-        std::string type((*p_data)["type"]);
-
-        if (type == "PING")
-        {
-            msg_Dbg(p_stream, "PING received from the Chromecast");
-            p_sys->p_intf->msgPong();
-        }
-        else if (type == "PONG")
-        {
-            msg_Dbg(p_stream, "PONG received from the Chromecast");
-        }
-        else
-        {
-            msg_Err(p_stream, "Heartbeat command not supported: %s", type.c_str());
-            i_ret = -1;
-        }
-
-        json_value_free(p_data);
-    }
-    else if (namespace_ == NAMESPACE_RECEIVER)
-    {
-        json_value *p_data = json_parse(msg.payload_utf8().c_str());
-        std::string type((*p_data)["type"]);
-
-        if (type == "RECEIVER_STATUS")
-        {
-            json_value applications = (*p_data)["status"]["applications"];
-            const json_value *p_app = NULL;
-            for (unsigned i = 0; i < applications.u.array.length; ++i)
-            {
-                std::string appId(applications[i]["appId"]);
-                if (appId == APP_ID)
-                {
-                    p_app = &applications[i];
-                    vlc_mutex_lock(&p_sys->lock);
-                    if (p_sys->p_intf->appTransportId.empty())
-                        p_sys->p_intf->appTransportId = std::string(applications[i]["transportId"]);
-                    vlc_mutex_unlock(&p_sys->lock);
-                    break;
-                }
-            }
-
-            vlc_mutex_lock(&p_sys->lock);
-            if ( p_app )
-            {
-                if (!p_sys->p_intf->appTransportId.empty()
-                        && p_sys->i_status == CHROMECAST_AUTHENTICATED)
-                {
-                    p_sys->i_status = CHROMECAST_APP_STARTED;
-                    p_sys->p_intf->msgConnect(p_sys->p_intf->appTransportId);
-                    p_sys->p_intf->msgPlayerLoad();
-                    p_sys->i_status = CHROMECAST_MEDIA_LOAD_SENT;
-                    vlc_cond_signal(&p_sys->loadCommandCond);
-                }
-            }
-            else
-            {
-                switch(p_sys->i_status)
-                {
-                /* If the app is no longer present */
-                case CHROMECAST_APP_STARTED:
-                case CHROMECAST_MEDIA_LOAD_SENT:
-                    msg_Warn(p_stream, "app is no longer present. closing");
-                    p_sys->p_intf->msgReceiverClose(p_sys->p_intf->appTransportId);
-                    p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
-                    // ft
-                default:
-                    break;
-                }
-
-            }
-            vlc_mutex_unlock(&p_sys->lock);
-        }
-        else
-        {
-            msg_Err(p_stream, "Receiver command not supported: %s",
-                    msg.payload_utf8().c_str());
-            i_ret = -1;
-        }
-
-        json_value_free(p_data);
-    }
-    else if (namespace_ == NAMESPACE_MEDIA)
-    {
-        json_value *p_data = json_parse(msg.payload_utf8().c_str());
-        std::string type((*p_data)["type"]);
-
-        if (type == "MEDIA_STATUS")
-        {
-            json_value status = (*p_data)["status"];
-            msg_Dbg(p_stream, "Player state: %s",
-                    status[0]["playerState"].operator const char *());
-        }
-        else if (type == "LOAD_FAILED")
-        {
-            msg_Err(p_stream, "Media load failed");
-            p_sys->p_intf->msgReceiverClose(p_sys->p_intf->appTransportId);
-            vlc_mutex_lock(&p_sys->lock);
-            p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
-            vlc_mutex_unlock(&p_sys->lock);
-        }
-        else
-        {
-            msg_Err(p_stream, "Media command not supported: %s",
-                    msg.payload_utf8().c_str());
-            i_ret = -1;
-        }
-
-        json_value_free(p_data);
-    }
-    else if (namespace_ == NAMESPACE_CONNECTION)
-    {
-        json_value *p_data = json_parse(msg.payload_utf8().c_str());
-        std::string type((*p_data)["type"]);
-        json_value_free(p_data);
-
-        if (type == "CLOSE")
-        {
-            msg_Warn(p_stream, "received close message");
-            vlc_mutex_lock(&p_sys->lock);
-            p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
-            vlc_mutex_unlock(&p_sys->lock);
-        }
-        else
-        {
-            msg_Err(p_stream, "Connection command not supported: %s",
-                    type.c_str());
-            i_ret = -1;
-        }
-    }
-    else
-    {
-        msg_Err(p_stream, "Unknown namespace: %s", msg.namespace_().c_str());
-        i_ret = -1;
-    }
-
-    return i_ret;
-}
-
-
-
 /*****************************************************************************
  * Chromecast thread
  *****************************************************************************/
@@ -783,8 +598,8 @@ static void* chromecastThread(void* p_data)
 #endif
         {
             msg_Err(p_stream, "The connection to the Chromecast died.");
-            vlc_mutex_locker locker(&p_sys->lock);
-            p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
+            vlc_mutex_locker locker(&p_sys->p_intf->lock);
+            p_sys->p_intf->i_status = CHROMECAST_CONNECTION_DEAD;
             break;
         }
 
@@ -798,7 +613,7 @@ static void* chromecastThread(void* p_data)
         {
             castchannel::CastMessage msg;
             msg.ParseFromArray(p_packet + PACKET_HEADER_LEN, i_payloadSize);
-            processMessage(p_stream, msg);
+            p_sys->p_intf->processMessage(msg);
         }
 
         // Send the answer messages if there is any.
@@ -812,18 +627,18 @@ static void* chromecastThread(void* p_data)
 #endif
             {
                 msg_Err(p_stream, "The connection to the Chromecast died.");
-                vlc_mutex_locker locker(&p_sys->lock);
-                p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
+                vlc_mutex_locker locker(&p_sys->p_intf->lock);
+                p_sys->p_intf->i_status = CHROMECAST_CONNECTION_DEAD;
             }
         }
 
-        vlc_mutex_lock(&p_sys->lock);
-        if ( p_sys->i_status == CHROMECAST_CONNECTION_DEAD )
+        vlc_mutex_lock(&p_sys->p_intf->lock);
+        if ( p_sys->p_intf->i_status == CHROMECAST_CONNECTION_DEAD )
         {
-            vlc_mutex_unlock(&p_sys->lock);
+            vlc_mutex_unlock(&p_sys->p_intf->lock);
             break;
         }
-        vlc_mutex_unlock(&p_sys->lock);
+        vlc_mutex_unlock(&p_sys->p_intf->lock);
 
         vlc_restorecancel(canc);
     }

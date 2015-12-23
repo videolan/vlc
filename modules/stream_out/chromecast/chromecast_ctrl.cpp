@@ -36,6 +36,8 @@
 
 #include <sstream>
 
+#include "../../misc/webservices/json.h"
+
 // Media player Chromecast app id
 #define APP_ID "CC1AD845" // Default media player
 
@@ -52,7 +54,7 @@
  */
 static castchannel::CastMessage buildMessage(std::string namespace_,
                                 castchannel::CastMessage_PayloadType payloadType,
-                                std::string payload, std::string destinationId = "receiver-0")
+                                std::string payload, std::string destinationId = DEFAULT_CHOMECAST_RECEIVER)
 {
     castchannel::CastMessage msg;
 
@@ -70,13 +72,192 @@ static castchannel::CastMessage buildMessage(std::string namespace_,
 }
 
 intf_sys_t::intf_sys_t(sout_stream_t * const p_this)
- :p_stream(p_this)
- ,i_requestId(0)
+ : p_stream(p_this)
+ , i_status(CHROMECAST_DISCONNECTED)
+ , i_requestId(0)
 {
+    vlc_mutex_init(&lock);
+    vlc_cond_init(&loadCommandCond);
 }
 
 intf_sys_t::~intf_sys_t()
 {
+    vlc_cond_destroy(&loadCommandCond);
+    vlc_mutex_destroy(&lock);
+}
+
+/**
+ * @brief Process a message received from the Chromecast
+ * @param msg the CastMessage to process
+ * @return 0 if the message has been successfuly processed else -1
+ */
+int intf_sys_t::processMessage(const castchannel::CastMessage &msg)
+{
+    int i_ret = 0;
+    std::string namespace_ = msg.namespace_();
+
+    if (namespace_ == NAMESPACE_DEVICEAUTH)
+    {
+        castchannel::DeviceAuthMessage authMessage;
+        authMessage.ParseFromString(msg.payload_binary());
+
+        if (authMessage.has_error())
+        {
+            msg_Err(p_stream, "Authentification error: %d", authMessage.error().error_type());
+            i_ret = -1;
+        }
+        else if (!authMessage.has_response())
+        {
+            msg_Err(p_stream, "Authentification message has no response field");
+            i_ret = -1;
+        }
+        else
+        {
+            vlc_mutex_locker locker(&lock);
+            i_status = CHROMECAST_AUTHENTICATED;
+            msgConnect(DEFAULT_CHOMECAST_RECEIVER);
+            msgReceiverLaunchApp();
+        }
+    }
+    else if (namespace_ == NAMESPACE_HEARTBEAT)
+    {
+        json_value *p_data = json_parse(msg.payload_utf8().c_str());
+        std::string type((*p_data)["type"]);
+
+        if (type == "PING")
+        {
+            msg_Dbg(p_stream, "PING received from the Chromecast");
+            msgPong();
+        }
+        else if (type == "PONG")
+        {
+            msg_Dbg(p_stream, "PONG received from the Chromecast");
+        }
+        else
+        {
+            msg_Err(p_stream, "Heartbeat command not supported: %s", type.c_str());
+            i_ret = -1;
+        }
+
+        json_value_free(p_data);
+    }
+    else if (namespace_ == NAMESPACE_RECEIVER)
+    {
+        json_value *p_data = json_parse(msg.payload_utf8().c_str());
+        std::string type((*p_data)["type"]);
+
+        if (type == "RECEIVER_STATUS")
+        {
+            json_value applications = (*p_data)["status"]["applications"];
+            const json_value *p_app = NULL;
+            for (unsigned i = 0; i < applications.u.array.length; ++i)
+            {
+                std::string appId(applications[i]["appId"]);
+                if (appId == APP_ID)
+                {
+                    p_app = &applications[i];
+                    vlc_mutex_lock(&lock);
+                    if (appTransportId.empty())
+                        appTransportId = std::string(applications[i]["transportId"]);
+                    vlc_mutex_unlock(&lock);
+                    break;
+                }
+            }
+
+            vlc_mutex_lock(&lock);
+            if ( p_app )
+            {
+                if (!appTransportId.empty()
+                        && i_status == CHROMECAST_AUTHENTICATED)
+                {
+                    i_status = CHROMECAST_APP_STARTED;
+                    msgConnect(appTransportId);
+                    msgPlayerLoad();
+                    i_status = CHROMECAST_MEDIA_LOAD_SENT;
+                    vlc_cond_signal(&loadCommandCond);
+                }
+            }
+            else
+            {
+                switch(i_status)
+                {
+                /* If the app is no longer present */
+                case CHROMECAST_APP_STARTED:
+                case CHROMECAST_MEDIA_LOAD_SENT:
+                    msg_Warn(p_stream, "app is no longer present. closing");
+                    msgReceiverClose(appTransportId);
+                    i_status = CHROMECAST_CONNECTION_DEAD;
+                default:
+                    break;
+                }
+
+            }
+            vlc_mutex_unlock(&lock);
+        }
+        else
+        {
+            msg_Err(p_stream, "Receiver command not supported: %s",
+                    msg.payload_utf8().c_str());
+            i_ret = -1;
+        }
+
+        json_value_free(p_data);
+    }
+    else if (namespace_ == NAMESPACE_MEDIA)
+    {
+        json_value *p_data = json_parse(msg.payload_utf8().c_str());
+        std::string type((*p_data)["type"]);
+
+        if (type == "MEDIA_STATUS")
+        {
+            json_value status = (*p_data)["status"];
+            msg_Dbg(p_stream, "Player state: %s",
+                    status[0]["playerState"].operator const char *());
+        }
+        else if (type == "LOAD_FAILED")
+        {
+            msg_Err(p_stream, "Media load failed");
+            msgReceiverClose(appTransportId);
+            vlc_mutex_lock(&lock);
+            i_status = CHROMECAST_CONNECTION_DEAD;
+            vlc_mutex_unlock(&lock);
+        }
+        else
+        {
+            msg_Err(p_stream, "Media command not supported: %s",
+                    msg.payload_utf8().c_str());
+            i_ret = -1;
+        }
+
+        json_value_free(p_data);
+    }
+    else if (namespace_ == NAMESPACE_CONNECTION)
+    {
+        json_value *p_data = json_parse(msg.payload_utf8().c_str());
+        std::string type((*p_data)["type"]);
+        json_value_free(p_data);
+
+        if (type == "CLOSE")
+        {
+            msg_Warn(p_stream, "received close message");
+            vlc_mutex_lock(&lock);
+            i_status = CHROMECAST_CONNECTION_DEAD;
+            vlc_mutex_unlock(&lock);
+        }
+        else
+        {
+            msg_Err(p_stream, "Connection command not supported: %s",
+                    type.c_str());
+            i_ret = -1;
+        }
+    }
+    else
+    {
+        msg_Err(p_stream, "Unknown namespace: %s", msg.namespace_().c_str());
+        i_ret = -1;
+    }
+
+    return i_ret;
 }
 
 /*****************************************************************************
