@@ -57,13 +57,15 @@ struct intf_sys_t
     std::string appTransportId;
 
     void msgAuth();
-    void msgClose(std::string destinationId);
+    void msgReceiverClose(std::string destinationId);
     void msgPing();
     void msgPong();
     void msgConnect(std::string destinationId);
-    void msgLaunch();
-    void msgLoad();
-    void msgStatus();
+
+    void msgReceiverLaunchApp();
+    void msgReceiverGetStatus();
+
+    void msgPlayerLoad();
 
     std::queue<castchannel::CastMessage> messagesToSend;
     unsigned i_requestId;

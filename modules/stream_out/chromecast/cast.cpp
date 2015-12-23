@@ -314,10 +314,10 @@ static void Close(vlc_object_t *p_this)
     case CHROMECAST_MEDIA_LOAD_SENT:
     case CHROMECAST_APP_STARTED:
         // Generate the close messages.
-        p_sys->p_intf->msgClose(p_sys->p_intf->appTransportId);
+        p_sys->p_intf->msgReceiverClose(p_sys->p_intf->appTransportId);
         // ft
     case CHROMECAST_AUTHENTICATED:
-        p_sys->p_intf->msgClose("receiver-0");
+        p_sys->p_intf->msgReceiverClose("receiver-0");
         // Send the just added close messages.
         sendMessages(p_stream);
         // ft
@@ -597,7 +597,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
             vlc_mutex_locker locker(&p_sys->lock);
             p_sys->i_status = CHROMECAST_AUTHENTICATED;
             p_sys->p_intf->msgConnect("receiver-0");
-            p_sys->p_intf->msgLaunch();
+            p_sys->p_intf->msgReceiverLaunchApp();
         }
     }
     else if (namespace_ == "urn:x-cast:com.google.cast.tp.heartbeat")
@@ -653,7 +653,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
                 {
                     p_sys->i_status = CHROMECAST_APP_STARTED;
                     p_sys->p_intf->msgConnect(p_sys->p_intf->appTransportId);
-                    p_sys->p_intf->msgLoad();
+                    p_sys->p_intf->msgPlayerLoad();
                     p_sys->i_status = CHROMECAST_MEDIA_LOAD_SENT;
                     vlc_cond_signal(&p_sys->loadCommandCond);
                 }
@@ -666,7 +666,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
                 case CHROMECAST_APP_STARTED:
                 case CHROMECAST_MEDIA_LOAD_SENT:
                     msg_Warn(p_stream, "app is no longer present. closing");
-                    p_sys->p_intf->msgClose(p_sys->p_intf->appTransportId);
+                    p_sys->p_intf->msgReceiverClose(p_sys->p_intf->appTransportId);
                     p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
                     // ft
                 default:
@@ -699,7 +699,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
         else if (type == "LOAD_FAILED")
         {
             msg_Err(p_stream, "Media load failed");
-            p_sys->p_intf->msgClose(p_sys->p_intf->appTransportId);
+            p_sys->p_intf->msgReceiverClose(p_sys->p_intf->appTransportId);
             vlc_mutex_lock(&p_sys->lock);
             p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
             vlc_mutex_unlock(&p_sys->lock);
@@ -791,7 +791,7 @@ static void* chromecastThread(void* p_data)
         if (b_pingTimeout)
         {
             p_sys->p_intf->msgPing();
-            p_sys->p_intf->msgStatus();
+            p_sys->p_intf->msgReceiverGetStatus();
         }
 
         if (b_msgReceived)

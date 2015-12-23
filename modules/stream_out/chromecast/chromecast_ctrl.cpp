@@ -126,7 +126,7 @@ void intf_sys_t::msgConnect(std::string destinationId)
 }
 
 
-void intf_sys_t::msgClose(std::string destinationId)
+void intf_sys_t::msgReceiverClose(std::string destinationId)
 {
     std::string s("{\"type\":\"CLOSE\"}");
     castchannel::CastMessage msg = buildMessage("urn:x-cast:com.google.cast.tp.connection",
@@ -135,7 +135,7 @@ void intf_sys_t::msgClose(std::string destinationId)
     messagesToSend.push(msg);
 }
 
-void intf_sys_t::msgStatus()
+void intf_sys_t::msgReceiverGetStatus()
 {
     std::stringstream ss;
     ss << "{\"type\":\"GET_STATUS\"}";
@@ -146,7 +146,7 @@ void intf_sys_t::msgStatus()
     messagesToSend.push(msg);
 }
 
-void intf_sys_t::msgLaunch()
+void intf_sys_t::msgReceiverLaunchApp()
 {
     std::stringstream ss;
     ss << "{\"type\":\"LAUNCH\","
@@ -160,7 +160,7 @@ void intf_sys_t::msgLaunch()
 }
 
 
-void intf_sys_t::msgLoad()
+void intf_sys_t::msgPlayerLoad()
 {
     char *psz_mime = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mime");
     if (psz_mime == NULL)
