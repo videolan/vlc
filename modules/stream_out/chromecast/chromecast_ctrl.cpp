@@ -302,8 +302,8 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                 if (!appTransportId.empty()
                         && getConnectionStatus() == CHROMECAST_AUTHENTICATED)
                 {
-                    setConnectionStatus(CHROMECAST_APP_STARTED);
                     msgConnect(appTransportId);
+                    setConnectionStatus(CHROMECAST_APP_STARTED);
                     msgPlayerLoad();
                     setConnectionStatus(CHROMECAST_MEDIA_LOAD_SENT);
                     vlc_cond_signal(&loadCommandCond);
