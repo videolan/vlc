@@ -1012,7 +1012,7 @@ static bool hevc_get_picture_CtbsYsize( const hevc_sequence_parameter_set_t *p_s
 }
 
 bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *p_sps,
-                          const hevc_video_parameter_set_t **pp_vps,
+                          hevc_video_parameter_set_t **pp_vps,
                           unsigned *pi_num, unsigned *pi_den )
 {
     if( p_sps->vui_parameters_present_flag && p_sps->vui.vui_timing_info_present_flag )

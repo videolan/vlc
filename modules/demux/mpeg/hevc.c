@@ -270,7 +270,7 @@ static int32_t getFPS(demux_t *p_demux, uint8_t i_nal_type, block_t *p_block)
 
     if( p_sps )
     {
-        if( !hevc_get_frame_rate( p_sps, (const hevc_video_parameter_set_t **) p_sys->rgp_vps,
+        if( !hevc_get_frame_rate( p_sps, p_sys->rgp_vps,
                                   &p_sys->frame_rate_num, &p_sys->frame_rate_den ) )
         {
             p_sys->frame_rate_num = 25;
