@@ -606,7 +606,9 @@ static block_t *OutputPicture( decoder_t *p_dec )
             p_head->p_next = p_list;
         else
             p_head = p_list;
-        block_ChainAppend( &p_head, p_sys->p_frame );
+
+        if( p_sys->p_frame )
+            block_ChainAppend( &p_head, p_sys->p_frame );
 
         p_pic = block_ChainGather( p_head );
     }
