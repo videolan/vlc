@@ -978,13 +978,25 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                 i_glyph_index =
                     FT_Get_Char_Index( p_face, p_paragraph->p_code_points[ j ] );
 
-            /*
-             * If the font has no support for special space characters, use regular
-             * space glyphs instead of the .notdef glyph.
-             */
+            glyph_bitmaps_t *p_bitmaps = p_paragraph->p_glyph_bitmaps + j;
+
+#define SKIP_GLYPH( p_bitmaps ) \
+    { \
+        p_bitmaps->p_glyph = 0; \
+        p_bitmaps->p_outline = 0; \
+        p_bitmaps->p_shadow = 0; \
+        p_bitmaps->i_x_advance = 0; \
+        p_bitmaps->i_y_advance = 0; \
+        continue; \
+    }
+
             if( !i_glyph_index )
             {
                 uni_char_t codepoint = p_paragraph->p_code_points[ j ];
+                /*
+                 * If the font has no support for special space characters, use regular
+                 * space glyphs instead of the .notdef glyph.
+                 */
                 if( codepoint == 0x0009 || codepoint == 0x00A0
                  || codepoint == 0x1680 || codepoint == 0x3000
                  || codepoint == 0x202F || codepoint == 0x205F
@@ -998,21 +1010,19 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                 {
                     i_glyph_index = 3;
                 }
+                /* Skip carriage returns */
+                else if( codepoint == 0x0D
+#ifdef HAVE_FRIBIDI
+                 || p_paragraph->p_types[ j ] == FRIBIDI_TYPE_BS
+#endif
+                 )
+                    SKIP_GLYPH( p_bitmaps )
             }
-
-            glyph_bitmaps_t *p_bitmaps = p_paragraph->p_glyph_bitmaps + j;
 
             if( FT_Load_Glyph( p_face, i_glyph_index,
                                FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT )
              && FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_DEFAULT ) )
-            {
-                p_bitmaps->p_glyph = 0;
-                p_bitmaps->p_outline = 0;
-                p_bitmaps->p_shadow = 0;
-                p_bitmaps->i_x_advance = 0;
-                p_bitmaps->i_y_advance = 0;
-                continue;
-            }
+                SKIP_GLYPH( p_bitmaps )
 
             if( ( p_style->i_style_flags & STYLE_BOLD )
                   && !( p_face->style_flags & FT_STYLE_FLAG_BOLD ) )
@@ -1022,14 +1032,9 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                 FT_GlyphSlot_Oblique( p_face->glyph );
 
             if( FT_Get_Glyph( p_face->glyph, &p_bitmaps->p_glyph ) )
-            {
-                p_bitmaps->p_glyph = 0;
-                p_bitmaps->p_outline = 0;
-                p_bitmaps->p_shadow = 0;
-                p_bitmaps->i_x_advance = 0;
-                p_bitmaps->i_y_advance = 0;
-                continue;
-            }
+                SKIP_GLYPH( p_bitmaps )
+
+#undef SKIP_GLYPH
 
             if( p_filter->p_sys->p_stroker && (p_style->i_style_flags & STYLE_OUTLINE) )
             {
