@@ -259,11 +259,9 @@ void intf_sys_t::msgAuth()
 {
     castchannel::DeviceAuthMessage authMessage;
     authMessage.mutable_challenge();
-    std::string authMessageString;
-    authMessage.SerializeToString(&authMessageString);
 
-    buildMessage(NAMESPACE_DEVICEAUTH,
-        authMessageString, DEFAULT_CHOMECAST_RECEIVER, castchannel::CastMessage_PayloadType_BINARY);
+    buildMessage(NAMESPACE_DEVICEAUTH, authMessage.SerializeAsString(),
+                 DEFAULT_CHOMECAST_RECEIVER, castchannel::CastMessage_PayloadType_BINARY);
 }
 
 
