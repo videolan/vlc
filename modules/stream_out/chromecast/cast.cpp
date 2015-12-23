@@ -34,12 +34,15 @@
 #include <vlc_sout.h>
 #include <vlc_threads.h>
 
+#include <cassert>
+
 struct sout_stream_sys_t
 {
     sout_stream_sys_t(intf_sys_t *intf)
         : p_out(NULL)
         , p_intf(intf)
     {
+        assert(p_intf != NULL);
     }
     
     ~sout_stream_sys_t()
