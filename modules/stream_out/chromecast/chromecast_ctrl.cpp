@@ -223,7 +223,7 @@ extern "C" int recvPacket(sout_stream_t *p_stream, bool &b_msgReceived,
  */
 void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 {
-    std::string namespace_ = msg.namespace_();
+    const std::string & namespace_ = msg.namespace_();
 
     if (namespace_ == NAMESPACE_DEVICEAUTH)
     {
