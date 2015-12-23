@@ -78,6 +78,7 @@ struct decoder_sys_t
     block_t *rgi_p_vps[HEVC_VPS_MAX];
     block_t *rgi_p_sps[HEVC_SPS_MAX];
     block_t *rgi_p_pps[HEVC_PPS_MAX];
+    hevc_video_parameter_set_t    *rgi_p_decvps[HEVC_VPS_MAX];
     hevc_sequence_parameter_set_t *rgi_p_decsps[HEVC_SPS_MAX];
     hevc_picture_parameter_set_t  *rgi_p_decpps[HEVC_PPS_MAX];
 };
@@ -171,8 +172,12 @@ static void Close(vlc_object_t *p_this)
     }
 
     for(unsigned i=0;i<HEVC_VPS_MAX; i++)
+    {
         if(p_sys->rgi_p_vps[i])
             block_Release(p_sys->rgi_p_vps[i]);
+        if(p_sys->rgi_p_decvps[i])
+            hevc_rbsp_release_vps(p_sys->rgi_p_decvps[i]);
+    }
 
     free(p_sys);
 }
@@ -217,7 +222,7 @@ static void PacketizeReset(void *p_private, bool b_broken)
     p_sys->pp_frame_last = &p_sys->p_frame;
 }
 
-static void InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
+static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                       block_t *p_nalb)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -238,17 +243,17 @@ static void InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                 pp_xps = p_sys->rgi_p_pps;
             break;
         default: /* That shouln't happen */
-            return;
+            return false;
     }
     if(!pp_xps)
-        return;
+        return false;
 
     if(pp_xps[i_id])
     {
         if( p_nalb->i_buffer != pp_xps[i_id]->i_buffer ||
             !memcmp(pp_xps[i_id]->p_buffer, p_nalb->p_buffer,
              __MIN(pp_xps[i_id]->i_buffer, p_nalb->i_buffer)) )
-            return;
+            return true;
 
         block_Release(pp_xps[i_id]);
 
@@ -263,10 +268,15 @@ static void InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
             hevc_rbsp_release_pps(p_sys->rgi_p_decpps[i_id]);
             p_sys->rgi_p_decpps[i_id] = NULL;
         }
+        else if(i_nal_type == HEVC_NAL_VPS && p_sys->rgi_p_decvps[i_id])
+        {
+            hevc_rbsp_release_vps(p_sys->rgi_p_decvps[i_id]);
+            p_sys->rgi_p_decvps[i_id] = NULL;
+        }
     }
 
     pp_xps[i_id] = block_Duplicate(p_nalb);
-    if(pp_xps[i_id] && i_nal_type != HEVC_NAL_VPS)
+    if(pp_xps[i_id])
     {
         const uint8_t *p_buffer = p_nalb->p_buffer;
         size_t i_buffer = p_nalb->i_buffer;
@@ -277,16 +287,34 @@ static void InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
             {
                 p_sys->rgi_p_decsps[i_id] = hevc_decode_sps(p_buffer, i_buffer, true);
                 if(!p_sys->rgi_p_decsps[i_id])
+                {
                     msg_Err(p_dec, "Failed decoding SPS id %d", i_id);
+                    return false;
+                }
             }
             else if(i_nal_type == HEVC_NAL_PPS)
             {
                 p_sys->rgi_p_decpps[i_id] = hevc_decode_pps(p_buffer, i_buffer, true);
                 if(!p_sys->rgi_p_decpps[i_id])
+                {
                     msg_Err(p_dec, "Failed decoding PPS id %d", i_id);
+                    return false;
+                }
             }
+            else if(i_nal_type == HEVC_NAL_VPS)
+            {
+                p_sys->rgi_p_decvps[i_id] = hevc_decode_vps(p_buffer, i_buffer, true);
+                if(!p_sys->rgi_p_decvps[i_id])
+                {
+                    msg_Err(p_dec, "Failed decoding VPS id %d", i_id);
+                    return false;
+                }
+            }
+            return true;
         }
     }
+
+    return false;
 }
 
 static block_t *CopyXPS(decoder_sys_t *p_sys)
@@ -393,8 +421,19 @@ static block_t *ParseNonVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_nal
         case HEVC_NAL_PPS:
         {
             uint8_t i_id;
-            if( hevc_get_xps_id(p_nalb->p_buffer, p_nalb->i_buffer, &i_id) )
-                InsertXPS(p_dec, i_nal_type, i_id, p_nalb);
+            if( hevc_get_xps_id(p_nalb->p_buffer, p_nalb->i_buffer, &i_id) &&
+                InsertXPS(p_dec, i_nal_type, i_id, p_nalb) )
+            {
+                const hevc_sequence_parameter_set_t *p_sps;
+                if( i_nal_type == HEVC_NAL_SPS &&
+                   !p_dec->fmt_out.video.i_frame_rate_base &&
+                   (p_sps = p_dec->p_sys->rgi_p_decsps[i_id]) )
+                {
+                    (void) hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps,
+                                                &p_dec->fmt_out.video.i_frame_rate,
+                                                &p_dec->fmt_out.video.i_frame_rate_base );
+                }
+            }
             block_Release( p_nalb );
             p_ret = NULL;
         }
