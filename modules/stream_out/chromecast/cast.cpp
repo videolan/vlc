@@ -31,18 +31,8 @@
 
 #include "chromecast.h"
 
-#ifdef HAVE_POLL
-# include <poll.h>
-#endif
-
 #include <vlc_sout.h>
-#include <vlc_url.h>
 #include <vlc_threads.h>
-
-#include <cerrno>
-
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/io/coded_stream.h>
 
 struct sout_stream_sys_t
 {
