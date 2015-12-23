@@ -91,9 +91,8 @@ intf_sys_t::~intf_sys_t()
  * @param msg the CastMessage to process
  * @return 0 if the message has been successfuly processed else -1
  */
-int intf_sys_t::processMessage(const castchannel::CastMessage &msg)
+void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 {
-    int i_ret = 0;
     std::string namespace_ = msg.namespace_();
 
     if (namespace_ == NAMESPACE_DEVICEAUTH)
@@ -104,12 +103,10 @@ int intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         if (authMessage.has_error())
         {
             msg_Err(p_stream, "Authentification error: %d", authMessage.error().error_type());
-            i_ret = -1;
         }
         else if (!authMessage.has_response())
         {
             msg_Err(p_stream, "Authentification message has no response field");
-            i_ret = -1;
         }
         else
         {
@@ -136,7 +133,6 @@ int intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         else
         {
             msg_Err(p_stream, "Heartbeat command not supported: %s", type.c_str());
-            i_ret = -1;
         }
 
         json_value_free(p_data);
@@ -198,7 +194,6 @@ int intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         {
             msg_Err(p_stream, "Receiver command not supported: %s",
                     msg.payload_utf8().c_str());
-            i_ret = -1;
         }
 
         json_value_free(p_data);
@@ -226,7 +221,6 @@ int intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         {
             msg_Err(p_stream, "Media command not supported: %s",
                     msg.payload_utf8().c_str());
-            i_ret = -1;
         }
 
         json_value_free(p_data);
@@ -248,16 +242,12 @@ int intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         {
             msg_Err(p_stream, "Connection command not supported: %s",
                     type.c_str());
-            i_ret = -1;
         }
     }
     else
     {
         msg_Err(p_stream, "Unknown namespace: %s", msg.namespace_().c_str());
-        i_ret = -1;
     }
-
-    return i_ret;
 }
 
 /*****************************************************************************

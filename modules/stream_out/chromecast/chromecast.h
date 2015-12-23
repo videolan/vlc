@@ -85,7 +85,7 @@ struct intf_sys_t
     std::queue<castchannel::CastMessage> messagesToSend;
     unsigned i_requestId;
 
-    int processMessage(const castchannel::CastMessage &msg);
+    void processMessage(const castchannel::CastMessage &msg);
 };
 
 #endif /* VLC_CHROMECAST_H */
