@@ -115,9 +115,9 @@ private:
     int sendMessage(castchannel::CastMessage &msg);
 
     void buildMessage(const std::string & namespace_,
-                      castchannel::CastMessage_PayloadType payloadType,
                       const std::string & payload,
-                      const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER);
+                      const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER,
+                      castchannel::CastMessage_PayloadType payloadType = castchannel::CastMessage_PayloadType_STRING);
 
     enum connection_status conn_status;
 

@@ -53,9 +53,9 @@
  * @return the generated CastMessage
  */
 void intf_sys_t::buildMessage(const std::string & namespace_,
-                              castchannel::CastMessage_PayloadType payloadType,
                               const std::string & payload,
-                              const std::string & destinationId)
+                              const std::string & destinationId,
+                              castchannel::CastMessage_PayloadType payloadType)
 {
     castchannel::CastMessage msg;
 
@@ -263,38 +263,34 @@ void intf_sys_t::msgAuth()
     authMessage.SerializeToString(&authMessageString);
 
     buildMessage(NAMESPACE_DEVICEAUTH,
-        castchannel::CastMessage_PayloadType_BINARY, authMessageString);
+        authMessageString, DEFAULT_CHOMECAST_RECEIVER, castchannel::CastMessage_PayloadType_BINARY);
 }
 
 
 void intf_sys_t::msgPing()
 {
     std::string s("{\"type\":\"PING\"}");
-    buildMessage(NAMESPACE_HEARTBEAT,
-        castchannel::CastMessage_PayloadType_STRING, s);
+    buildMessage(NAMESPACE_HEARTBEAT, s);
 }
 
 
 void intf_sys_t::msgPong()
 {
     std::string s("{\"type\":\"PONG\"}");
-    buildMessage(NAMESPACE_HEARTBEAT,
-        castchannel::CastMessage_PayloadType_STRING, s);
+    buildMessage(NAMESPACE_HEARTBEAT, s);
 }
 
 void intf_sys_t::msgConnect(const std::string & destinationId)
 {
     std::string s("{\"type\":\"CONNECT\"}");
-    buildMessage(NAMESPACE_CONNECTION,
-        castchannel::CastMessage_PayloadType_STRING, s, destinationId);
+    buildMessage(NAMESPACE_CONNECTION, s, destinationId);
 }
 
 
 void intf_sys_t::msgReceiverClose(std::string destinationId)
 {
     std::string s("{\"type\":\"CLOSE\"}");
-    buildMessage(NAMESPACE_CONNECTION,
-        castchannel::CastMessage_PayloadType_STRING, s, destinationId);
+    buildMessage(NAMESPACE_CONNECTION, s, destinationId);
 }
 
 void intf_sys_t::msgReceiverGetStatus()
@@ -302,8 +298,7 @@ void intf_sys_t::msgReceiverGetStatus()
     std::stringstream ss;
     ss << "{\"type\":\"GET_STATUS\"}";
 
-    buildMessage(NAMESPACE_RECEIVER,
-        castchannel::CastMessage_PayloadType_STRING, ss.str());
+    buildMessage(NAMESPACE_RECEIVER, ss.str());
 }
 
 void intf_sys_t::msgReceiverLaunchApp()
@@ -313,8 +308,7 @@ void intf_sys_t::msgReceiverLaunchApp()
        <<  "\"appId\":\"" << APP_ID << "\","
        <<  "\"requestId\":" << i_requestId++ << "}";
 
-    buildMessage(NAMESPACE_RECEIVER,
-        castchannel::CastMessage_PayloadType_STRING, ss.str());
+    buildMessage(NAMESPACE_RECEIVER, ss.str());
 }
 
 
@@ -335,8 +329,7 @@ void intf_sys_t::msgPlayerLoad()
 
     free(psz_mime);
 
-    buildMessage(NAMESPACE_MEDIA,
-        castchannel::CastMessage_PayloadType_STRING, ss.str(), appTransportId);
+    buildMessage(NAMESPACE_MEDIA, ss.str(), appTransportId);
 }
 
 /**
