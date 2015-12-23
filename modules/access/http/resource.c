@@ -200,6 +200,15 @@ char *vlc_http_res_get_redirect(const struct vlc_http_resource *restrict res,
      || status == 306 /* Switch Proxy (former) */)
         return NULL;
 
+    if (!res->secure
+     && vlc_http_msg_get_token(resp, "Pragma", "features") != NULL)
+    {   /* HACK: Seems like an MMS server. Redirect to MMSH scheme. */
+        char *url;
+
+        if (asprintf(&url, "mmsh://%s%s", res->authority, res->path) >= 0)
+            return url;
+    }
+
     const char *location = vlc_http_msg_get_header(resp, "Location");
     if (location == NULL)
         return NULL;
