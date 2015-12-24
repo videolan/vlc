@@ -300,8 +300,11 @@ static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
     const uint8_t *p_buffer = p_frag->p_buffer;
     size_t i_buffer = p_frag->i_buffer;
 
-    if(unlikely(!hxxx_strip_AnnexB_startcode(&p_buffer, &i_buffer) || i_buffer < 7))
+    if(unlikely(!hxxx_strip_AnnexB_startcode(&p_buffer, &i_buffer) || i_buffer < 3))
+    {
+        block_ChainAppend(&p_sys->p_frame, p_frag); /* might corrupt */
         return NULL;
+    }
 
     bool b_first_slice_in_pic = p_buffer[2] & 0x80;
     if (b_first_slice_in_pic)
