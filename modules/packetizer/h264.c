@@ -592,6 +592,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
             p_sys->p_frame = p_sys->p_frame->p_next;
             if( p_sys->p_frame == NULL )
                 p_sys->pp_frame_last = &p_sys->p_frame;
+            p_head->p_next = NULL;
         }
 
         block_t *p_list = NULL;
