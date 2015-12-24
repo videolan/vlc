@@ -344,6 +344,7 @@ static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
                     }
                     hevc_rbsp_release_slice_header( p_sli );
                 }
+                else p_frag->i_flags |= BLOCK_FLAG_TYPE_B;
             }
             break;
         }
