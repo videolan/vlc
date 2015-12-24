@@ -186,6 +186,7 @@ Removed modules
  * Gnome-VFS access module (i.e. Gnome 2.x)
  * QuartText text renderer module (use Freetype instead)
  * Win32 GDI text renderer module (use Freetype instead)
+ * Growl notification (replaced by osx_notifications)
 
 
 Changes between 2.2.0 and 2.2.1:
