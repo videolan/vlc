@@ -171,10 +171,9 @@ $Id$
  * grain: Grain Video filter
  * grey_yuv: grayscale to others conversion module
  * gstdecode: GStreamer based decoder module.
- * h264: H264 decoder
+ * h26x: Raw H264 and HEVC demuxers
  * hds: HTTP Dynamic Streaming, per Adobe's specs
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
- * hevc: HEVC demuxer
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
  * http: HTTP Network access module

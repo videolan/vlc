@@ -163,11 +163,8 @@ endif
 libes_plugin_la_SOURCES  = demux/mpeg/es.c codec/dts_header.c codec/dts_header.h
 demux_LTLIBRARIES += libes_plugin.la
 
-libh264_plugin_la_SOURCES = demux/mpeg/h264.c
-demux_LTLIBRARIES += libh264_plugin.la
-
-libhevc_plugin_la_SOURCES = demux/mpeg/hevc.c
-demux_LTLIBRARIES += libhevc_plugin.la
+libh26x_plugin_la_SOURCES = demux/mpeg/h26x.c
+demux_LTLIBRARIES += libh26x_plugin.la
 
 libmkv_plugin_la_SOURCES = \
 	demux/mkv/util.hpp demux/mkv/util.cpp \
