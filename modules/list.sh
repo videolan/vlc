@@ -62,7 +62,7 @@ echo "-------------------------------"
 echo "Checking for alphabetical order"
 echo "-------------------------------"
 
-grep " \* " $LISTFILE | LC_CTYPE=C sort -c && echo "OK"
+grep " \* " $LISTFILE | LC_COLLATE=C LC_CTYPE=C sort -c && echo "OK"
 
 
 echo ""
