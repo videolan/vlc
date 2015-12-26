@@ -33,6 +33,8 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_codec.h>
+#include "../packetizer/hevc_nal.h" /* definitions, inline helpers */
+#include "../packetizer/h264_nal.h" /* definitions, inline helpers */
 
 /*****************************************************************************
  * Module descriptor
@@ -84,51 +86,233 @@ static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
 
 #define H26X_PACKET_SIZE 2048
+#define H26X_PEEK_CHUNK  (H26X_PACKET_SIZE * 4)
+#define H26X_MIN_PEEK    (4 + 7 + 10)
+#define H26X_MAX_PEEK    (H26X_PEEK_CHUNK * 8) /* max data to check */
+#define H26X_NAL_COUNT   8 /* max # or NAL to check */
 
 /*****************************************************************************
  * Probing
  *****************************************************************************/
-static bool ProbeHEVC( const uint8_t *p_peek, size_t i_peek )
+typedef struct
 {
-    if( i_peek < 5 )
-        return false;
+    bool b_sps;
+    bool b_pps;
+    bool b_vps;
+} hevc_probe_ctx_t;
 
-    if( (p_peek[4]&0xFE) != 0x40 /* VPS & forbidden zero bit*/ )
-        return false;
-    else
-        return true;
+typedef struct
+{
+    bool b_sps;
+    bool b_pps;
+} h264_probe_ctx_t;
+
+static int ProbeHEVC( const uint8_t *p_peek, size_t i_peek, void *p_priv )
+{
+    hevc_probe_ctx_t *p_ctx = (hevc_probe_ctx_t *) p_priv;
+
+    if( i_peek < 2 )
+        return -1;
+
+    if( p_peek[0] & 0x80 )
+        return -1;
+
+    const uint8_t i_type = (p_peek[0] & 0x7E) >> 1;
+    const uint8_t i_layer = hevc_getNALLayer( p_peek );
+
+   if ( i_type == HEVC_NAL_VPS ) /* VPS */
+   {
+       if( i_layer != 0 || i_peek < 6 ||
+           p_peek[4] != 0xFF || p_peek[5] != 0xFF ) /* Check reserved bits */
+           return -1;
+       p_ctx->b_vps = true;
+       return 0;
+   }
+   else if( i_type == HEVC_NAL_SPS )  /* SPS */
+   {
+       if( i_layer != 0 )
+           return -1;
+       p_ctx->b_sps = true;
+       return 0;
+   }
+   else if( i_type == HEVC_NAL_PPS )  /* PPS */
+   {
+       if( i_layer != 0 )
+           return -1;
+       p_ctx->b_pps = true;
+       return 0;
+   }
+   else if( i_type >= HEVC_NAL_BLA_W_LP && i_type <= HEVC_NAL_CRA ) /* Key Frame */
+   {
+        if( p_ctx->b_vps && p_ctx->b_sps && p_ctx->b_pps && i_layer == 0 )
+            return 1;
+   }
+   else if( i_type == HEVC_NAL_AUD ) /* AU */
+   {
+        if( i_peek < H26X_MIN_PEEK ||
+            p_peek[4] != 0 || p_peek[5] != 0 ) /* Must prefix another NAL */
+            return -1;
+   }
+   else if( i_type != HEVC_NAL_PREF_SEI ) /* Prefix SEI */
+   {
+       if( p_peek[2] == 0xFF ) /* empty SEI */
+           return -1;
+   }
+   else
+   {
+       return -1; /* See 7.4.2.4.4 for sequence order */
+   }
+
+    return 0; /* Probe more */
 }
 
-static bool ProbeH264( const uint8_t *p_peek, size_t i_peek )
+static int ProbeH264( const uint8_t *p_peek, size_t i_peek, void *p_priv )
 {
-    if( i_peek < 5 )
-        return false;
-    const uint8_t i_nal_type = p_peek[4] & 0x1F;
-    const uint8_t i_ref_idc = p_peek[4] & 0x60;
-    if( (p_peek[4] & 0x80) || /* reserved 0 */
-        i_nal_type == 0 || i_nal_type > 12 ||
-        ( !i_ref_idc && (i_nal_type < 6 || i_nal_type == 7 || i_nal_type == 8) ) ||
-        (  i_ref_idc && (i_nal_type == 6 || i_nal_type >= 9) )
-    )
-        return false;
-    else
-        return true;
+    h264_probe_ctx_t *p_ctx = (h264_probe_ctx_t *) p_priv;
+
+    if( i_peek < 1 )
+        return -1;
+    const uint8_t i_nal_type = p_peek[0] & 0x1F;
+    const uint8_t i_ref_idc = p_peek[0] & 0x60;
+
+    if( (p_peek[0] & 0x80) ) /* reserved 0 */
+        return -1;
+
+    /* ( !i_ref_idc && (i_nal_type < 6 || i_nal_type == 7 || i_nal_type == 8) ) ||
+       (  i_ref_idc && (i_nal_type == 6 || i_nal_type >= 9) ) */
+
+    if( i_nal_type == H264_NAL_SPS )
+    {
+        if( i_ref_idc == 0 || i_peek < 3 ||
+           (p_peek[2] & 0x03) /* reserved 0 bits */ )
+            return -1;
+        p_ctx->b_sps = true;
+    }
+    else if( i_nal_type == H264_NAL_PPS )
+    {
+        if( i_ref_idc == 0 )
+            return -1;
+        p_ctx->b_pps = true;
+    }
+    else if( i_nal_type == H264_NAL_SLICE_IDR )
+    {
+        if( i_ref_idc == 0 || ! p_ctx->b_pps || ! p_ctx->b_sps )
+            return -1;
+        else
+            return 1;
+    }
+    else if( i_nal_type == H264_NAL_AU_DELIMITER )
+    {
+        if( i_ref_idc || p_ctx->b_pps || p_ctx->b_sps )
+            return -1;
+    }
+    else if ( i_nal_type == H264_NAL_SEI )
+    {
+        if( i_ref_idc )
+            return -1;
+    }
+     /* 7.4.1.1 */
+    else if ( i_nal_type == H264_NAL_SPS_EXT ||
+              i_nal_type == H264_NAL_SUBSET_SPS )
+    {
+        if( i_ref_idc == 0 || !p_ctx->b_sps )
+            return -1;
+    }
+    else if( i_nal_type == H264_NAL_PREFIX )
+    {
+        if( i_ref_idc == 0 || !p_ctx->b_pps || !p_ctx->b_sps )
+            return -1;
+    }
+    else return -1; /* see 7.4.1.2.3 for sequence */
+
+    return 0;
 }
 
 /*****************************************************************************
  * Shared Open code
  *****************************************************************************/
+static inline bool check_Property( demux_t *p_demux, const char **pp_psz,
+                                   bool(*pf_check)(demux_t *, const char *) )
+{
+    while( *pp_psz )
+    {
+        if( pf_check( p_demux, *pp_psz ) )
+            return true;
+        pp_psz++;
+    }
+    return false;
+}
+
 static int GenericOpen( demux_t *p_demux, const char *psz_module,
                         vlc_fourcc_t i_codec,
-                        bool(*pf_probe)(const uint8_t *, size_t) )
+                        int(*pf_probe)(const uint8_t *, size_t, void *),
+                        void *p_ctx,
+                        const char **pp_psz_exts,
+                        const char **pp_psz_mimes )
 {
     demux_sys_t *p_sys;
     const uint8_t *p_peek;
     es_format_t fmt;
+    uint8_t annexb_startcode[] = {0,0,0,1};
+    int i_ret = 0;
 
-    if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
+    /* Restrict by type first */
+    if( !p_demux->b_force &&
+        !check_Property( p_demux, pp_psz_exts, demux_IsPathExtension ) &&
+        !check_Property( p_demux, pp_psz_mimes, demux_IsContentType ) )
+    {
+        return VLC_EGENERIC;
+    }
 
-    if( memcmp( p_peek, "\x00\x00\x00\x01", 4 ) || !pf_probe( p_peek, 5 ) )
+    /* First check for first AnnexB header */
+    if( stream_Peek( p_demux->s, &p_peek, H26X_MIN_PEEK ) == H26X_MIN_PEEK &&
+       !memcmp( p_peek, annexb_startcode, 4 ) )
+    {
+        size_t i_peek = H26X_MIN_PEEK;
+        size_t i_peek_target = H26X_MIN_PEEK;
+        size_t i_probe_offset = 4;
+        const uint8_t *p_probe = p_peek;
+        bool b_synced = true;
+        unsigned i_bitflow = 0;
+
+        for( unsigned i=0; i<H26X_NAL_COUNT; i++ )
+        {
+            while( !b_synced )
+            {
+                if( i_probe_offset + H26X_MIN_PEEK >= i_peek &&
+                    i_peek_target + H26X_PEEK_CHUNK <= H26X_MAX_PEEK )
+                {
+                    i_peek_target += H26X_PEEK_CHUNK;
+                    i_peek = stream_Peek( p_demux->s, &p_peek, i_peek_target );
+                }
+
+                if( i_probe_offset + H26X_MIN_PEEK >= i_peek )
+                    break;
+
+                p_probe = &p_peek[i_probe_offset];
+                i_bitflow = (i_bitflow << 1) | (!p_probe[0]);
+                /* Check for annexB */
+                if( p_probe[0] == 0x01 && ((i_bitflow & 0x06) == 0x06) )
+                    b_synced = true;
+
+                i_probe_offset++;
+            }
+
+            if( b_synced )
+            {
+                p_probe = &p_peek[i_probe_offset];
+                i_ret = pf_probe( p_probe, i_peek - i_probe_offset, p_ctx );
+            }
+
+            if( i_ret != 0 )
+                break;
+
+            i_probe_offset += 4;
+            b_synced = false;
+        }
+    }
+
+    if( i_ret < 1 )
     {
         if( !p_demux->b_force )
         {
@@ -183,12 +367,22 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
  *****************************************************************************/
 static int OpenH264( vlc_object_t * p_this )
 {
-    return GenericOpen( (demux_t*)p_this, "h264", VLC_CODEC_H264, ProbeH264 );
+    h264_probe_ctx_t ctx = { 0, 0 };
+    const char *rgi_psz_ext[] = { ".h264", ".264", ".bin", ".bit", ".raw", NULL };
+    const char *rgi_psz_mime[] = { "video/H264", "video/h264", "video/avc", NULL };
+
+    return GenericOpen( (demux_t*)p_this, "h264", VLC_CODEC_H264, ProbeH264,
+                        &ctx, rgi_psz_ext, rgi_psz_mime );
 }
 
 static int OpenHEVC( vlc_object_t * p_this )
 {
-    return GenericOpen( (demux_t*)p_this, "hevc", VLC_CODEC_HEVC, ProbeHEVC );
+    hevc_probe_ctx_t ctx = { 0, 0, 0 };
+    const char *rgi_psz_ext[] = { ".h265", ".265", ".bin", ".bit", ".raw", NULL };
+    const char *rgi_psz_mime[] = { "video/h265", "video/hevc", "video/HEVC", NULL };
+
+    return GenericOpen( (demux_t*)p_this, "hevc", VLC_CODEC_HEVC, ProbeHEVC,
+                        &ctx, rgi_psz_ext, rgi_psz_mime );
 }
 
 /*****************************************************************************
