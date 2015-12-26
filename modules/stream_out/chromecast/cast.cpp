@@ -31,6 +31,8 @@
 
 #include "chromecast.h"
 
+#include <errno.h>
+
 #include <vlc_sout.h>
 #include <vlc_threads.h>
 
