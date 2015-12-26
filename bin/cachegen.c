@@ -41,7 +41,7 @@ static void version (void)
 static void usage (const char *path)
 {
     printf (
-"Usage: %s [-f] <path>\n"
+"Usage: %s <path>\n"
 "Generate the LibVLC plugins cache for the specified plugins directory.\n",
             path);
 }
@@ -60,7 +60,7 @@ int main (int argc, char *argv[])
 
     int c;
 
-    while ((c = getopt_long (argc, argv, "fhV", opts, NULL)) != -1)
+    while ((c = getopt_long (argc, argv, "hV", opts, NULL)) != -1)
         switch (c)
         {
             case 'h':
