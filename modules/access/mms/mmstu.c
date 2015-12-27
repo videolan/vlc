@@ -1133,11 +1133,18 @@ static int  mms_ParseCommand( access_t *p_access,
     uint32_t    i_id;
 
     free( p_sys->p_cmd );
-    p_sys->i_cmd = i_data;
-    p_sys->p_cmd = xmalloc( i_data );
-    memcpy( p_sys->p_cmd, p_data, i_data );
-
-    *pi_used = i_data; /* by default */
+    if( (p_sys->p_cmd = malloc( i_data )) )
+    {
+        p_sys->i_cmd = i_data;
+        memcpy( p_sys->p_cmd, p_data, i_data );
+        *pi_used = i_data; /* by default */
+    }
+    else
+    {
+        *pi_used = p_sys->i_cmd = 0;
+        p_sys->i_command = 0;
+        return -1;
+    }
 
     if( i_data < MMS_CMD_HEADERSIZE )
     {
