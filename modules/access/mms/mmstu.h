@@ -52,10 +52,10 @@ struct access_sys_t
 
     /* */
     uint8_t     buffer_tcp[MMS_BUFFER_SIZE];
-    int         i_buffer_tcp;
+    size_t      i_buffer_tcp;
 
     uint8_t     buffer_udp[MMS_BUFFER_SIZE];
-    int         i_buffer_udp;
+    size_t      i_buffer_udp;
 
     /* data necessary to send data to server */
     guid_t      guid;

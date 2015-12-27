@@ -1112,8 +1112,8 @@ static int NetFillBuffer( access_t *p_access )
     }
 #endif
 
-    if( i_tcp_read > 0 ) p_sys->i_buffer_tcp += i_tcp_read;
-    if( i_udp_read > 0 ) p_sys->i_buffer_udp += i_udp_read;
+    if( i_tcp_read > 0 ) p_sys->i_buffer_tcp += (size_t) i_tcp_read;
+    if( i_udp_read > 0 ) p_sys->i_buffer_udp += (size_t) i_udp_read;
 
     return i_tcp_read + i_udp_read;
 }
@@ -1121,7 +1121,7 @@ static int NetFillBuffer( access_t *p_access )
 static int  mms_ParseCommand( access_t *p_access,
                               uint8_t *p_data,
                               size_t i_data,
-                              int *pi_used )
+                              size_t *pi_used )
 {
  #define GET32( i_pos ) \
     ( p_sys->p_cmd[i_pos] + ( p_sys->p_cmd[i_pos +1] << 8 ) + \
@@ -1200,7 +1200,7 @@ static int  mms_ParseCommand( access_t *p_access,
 
 static int  mms_ParsePacket( access_t *p_access,
                              uint8_t *p_data, size_t i_data,
-                             int *pi_used )
+                             size_t *pi_used )
 {
     access_sys_t        *p_sys = p_access->p_sys;
     int i_packet_seq_num;
@@ -1316,7 +1316,7 @@ static int mms_ReceivePacket( access_t *p_access )
             if( GetDWLE( p_sys->buffer_tcp + 4 ) == 0xb00bface  )
             {
                 if( GetDWLE( p_sys->buffer_tcp + 8 ) + 16 <=
-                    (uint32_t)p_sys->i_buffer_tcp )
+                    (size_t)p_sys->i_buffer_tcp )
                 {
                     b_refill = false;
                 }
@@ -1343,7 +1343,7 @@ static int mms_ReceivePacket( access_t *p_access )
 
         if( p_sys->i_buffer_tcp > 0 )
         {
-            int i_used;
+            size_t i_used;
 
             if( GetDWLE( p_sys->buffer_tcp + 4 ) == 0xb00bface )
             {
@@ -1367,7 +1367,7 @@ static int mms_ReceivePacket( access_t *p_access )
         }
         else if( p_sys->i_buffer_udp > 0 )
         {
-            int i_used;
+            size_t i_used;
 
             i_packet_udp_type =
                 mms_ParsePacket( p_access, p_sys->buffer_udp,
@@ -1404,7 +1404,7 @@ static int mms_ReceiveCommand( access_t *p_access )
 
     for( ;; )
     {
-        int i_used;
+        size_t i_used;
         int i_status;
 
         if( NetFillBuffer( p_access ) < 0 )
