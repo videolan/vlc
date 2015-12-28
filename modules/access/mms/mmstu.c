@@ -722,7 +722,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
 
     msg_Dbg( p_access,
              "answer 0x06 flags:0x%8.8"PRIx32" media_length:%"PRIu32"s "
-             "packet_length:%zu packet_count:%"PRIu32" max_bit_rate:%d "
+             "packet_length:%zu packet_count:%"PRIu32" max_bit_rate:%"PRIu32
              "header_size:%zu",
              p_sys->i_flags_broadcast,
              p_sys->i_media_length,

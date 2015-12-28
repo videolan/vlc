@@ -90,7 +90,7 @@ struct access_sys_t
     uint32_t    i_media_length;
     size_t      i_packet_length;
     uint32_t    i_packet_count;
-    int         i_max_bit_rate;
+    uint32_t    i_max_bit_rate;
     size_t      i_header_size;
 
     /* misc */
