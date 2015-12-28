@@ -543,7 +543,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
                      buffer.p_data,
                      buffer.i_data );
 
-    if( mms_CommandRead( p_access, 0x01, 0 ) < 0 )
+    if( mms_CommandRead( p_access, 0x01, 0 ) < 0 || p_sys->i_cmd < MMS_CMD_HEADERSIZE + 48 )
     {
         var_buffer_free( &buffer );
         MMSClose( p_access );
@@ -680,6 +680,13 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
         var_buffer_free( &buffer );
         MMSClose( p_access );
         return( -1 );
+    }
+
+    if( p_sys->i_cmd < MMS_CMD_HEADERSIZE + 64 )
+    {
+        var_buffer_free( &buffer );
+        MMSClose( p_access );
+        return VLC_EBADVAR;
     }
 
     /*  1 for file ok, 2 for authen ok */
