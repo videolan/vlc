@@ -961,6 +961,7 @@ static void MMSClose( access_t  *p_access )
     FREENULL( p_sys->p_cmd );
     FREENULL( p_sys->p_media );
     FREENULL( p_sys->p_header );
+    p_sys->i_header = 0;
 
     FREENULL( p_sys->psz_server_version );
     FREENULL( p_sys->psz_tool_version );
@@ -1279,22 +1280,15 @@ static int  mms_ParsePacket( access_t *p_access,
 
     if( i_packet_id == p_sys->i_header_packet_id_type )
     {
-        if( p_sys->p_header )
-        {
-            p_sys->p_header = xrealloc( p_sys->p_header,
-                                      p_sys->i_header + i_packet_length - 8 );
-            memcpy( &p_sys->p_header[p_sys->i_header],
-                    p_data + 8, i_packet_length - 8 );
-            p_sys->i_header += i_packet_length - 8;
+        uint8_t *p_reaced = realloc( p_sys->p_header,
+                                     p_sys->i_header + i_packet_length - 8 );
+        if( !p_reaced )
+            return VLC_ENOMEM;
 
-        }
-        else
-        {
-            uint8_t* p_packet = xmalloc( i_packet_length - 8 ); // don't bother with preheader
-            memcpy( p_packet, p_data + 8, i_packet_length - 8 );
-            p_sys->p_header = p_packet;
-            p_sys->i_header = i_packet_length - 8;
-        }
+        memcpy( &p_reaced[p_sys->i_header], p_data + 8, i_packet_length - 8 );
+        p_sys->p_header = p_reaced;
+        p_sys->i_header += i_packet_length - 8;
+
 /*        msg_Dbg( p_access,
                  "receive header packet (%d bytes)",
                  i_packet_length - 8 ); */
