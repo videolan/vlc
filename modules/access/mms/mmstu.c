@@ -447,11 +447,12 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
 
     var_buffer_t buffer;
     char         *tmp;
-    uint16_t     *p;
-    int          i_server_version;
-    int          i_tool_version;
-    int          i_update_player_url;
-    int          i_encryption_type;
+    const uint16_t *p;
+    const uint8_t  *p_cmdend;
+    uint32_t     i_server_version;
+    uint32_t     i_tool_version;
+    uint32_t     i_update_player_url;
+    uint32_t     i_encryption_type;
     int          i;
     int          i_streams;
     int          i_first;
@@ -554,11 +555,20 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     i_update_player_url = GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 40 );
     i_encryption_type = GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 44 );
     p = (uint16_t*)( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 48 );
+    p_cmdend = &p_sys->p_cmd[p_sys->i_cmd];
+
 #define GETUTF16( psz, size ) \
-    { \
-        int i; \
-        psz = xmalloc( size + 1); \
-        for( i = 0; i < size; i++ ) \
+    if( (UINT32_MAX == size) || \
+        ((uintptr_t) p / sizeof(uint16_t) < size) || \
+       ((UINTPTR_MAX - (uintptr_t) p_cmdend) / sizeof(uint16_t)) < size )\
+    {\
+        var_buffer_free( &buffer );\
+        MMSClose( p_access );\
+        return VLC_EBADVAR;\
+    }\
+    if( (psz = malloc(size + 1)) )\
+    {\
+        for( size_t i = 0; i < size; i++ ) \
         { \
             psz[i] = p[i]; \
         } \
