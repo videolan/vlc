@@ -1297,12 +1297,16 @@ static int  mms_ParsePacket( access_t *p_access,
     }
     else
     {
-        uint8_t* p_packet = xmalloc( i_packet_length - 8 ); // don't bother with preheader
-        memcpy( p_packet, p_data + 8, i_packet_length - 8 );
-        FREENULL( p_sys->p_media );
-        p_sys->p_media = p_packet;
-        p_sys->i_media = i_packet_length - 8;
+        free( p_sys->p_media );
+        p_sys->i_media = 0;
         p_sys->i_media_used = 0;
+
+        p_sys->p_media = malloc( i_packet_length - 8 ); // don't bother with preheader
+        if( !p_sys->p_media )
+            return VLC_ENOMEM;
+
+        p_sys->i_media = i_packet_length - 8;
+        memcpy( p_sys->p_media, p_data + 8, p_sys->i_media );
 /*        msg_Dbg( p_access,
                  "receive media packet (%d bytes)",
                  i_packet_length - 8 ); */
