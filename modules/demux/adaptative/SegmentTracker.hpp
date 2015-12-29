@@ -111,7 +111,8 @@ namespace adaptative
             bool initializing;
             bool index_sent;
             bool init_sent;
-            uint64_t count;
+            uint64_t next;
+            uint64_t curNumber;
             StreamFormat format;
             AbstractAdaptationLogic *logic;
             BaseAdaptationSet *adaptationSet;

@@ -51,7 +51,7 @@ SegmentTrackerEvent::SegmentTrackerEvent(const StreamFormat *fmt)
 SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
 {
     first = true;
-    count = 0;
+    next = 0;
     initializing = true;
     index_sent = false;
     init_sent = false;
@@ -78,7 +78,7 @@ bool SegmentTracker::segmentsListReady() const
     if(!rep)
         rep = logic->getNextRepresentation(adaptationSet, NULL);
     if(rep && rep->getPlaylist()->isLive())
-        return rep->getMinAheadTime((count) ? count -1 : count) > 0;
+        return rep->getMinAheadTime(curNumber) > 0;
     return true;
 }
 
@@ -132,24 +132,24 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
     bool b_updated = false;
     /* Ensure ephemere content is updated/loaded */
     if(rep->needsUpdate())
-        b_updated = rep->runLocalUpdates(getPlaybackTime(), count, false);
+        b_updated = rep->runLocalUpdates(getPlaybackTime(), curNumber, false);
 
     if(prevRep && !rep->consistentSegmentNumber())
     {
         /* Convert our segment number */
-        count = rep->translateSegmentNumber(count, prevRep);
+        next = rep->translateSegmentNumber(next, prevRep);
     }
     else if(first && rep->getPlaylist()->isLive())
     {
-        count = rep->getLiveStartSegmentNumber(count);
+        next = rep->getLiveStartSegmentNumber(next);
         first = false;
     }
 
     if(b_updated)
     {
         if(!rep->consistentSegmentNumber())
-            curRepresentation->pruneBySegmentNumber(count);
-        curRepresentation->scheduleNextUpdate(count);
+            curRepresentation->pruneBySegmentNumber(curNumber);
+        curRepresentation->scheduleNextUpdate(curNumber);
     }
 
     if(!init_sent)
@@ -157,7 +157,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
         init_sent = true;
         segment = rep->getSegment(BaseRepresentation::INFOTYPE_INIT);
         if(segment)
-            return segment->toChunk(count, rep, connManager);
+            return segment->toChunk(next, rep, connManager);
     }
 
     if(!index_sent)
@@ -165,11 +165,11 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
         index_sent = true;
         segment = rep->getSegment(BaseRepresentation::INFOTYPE_INDEX);
         if(segment)
-            return segment->toChunk(count, rep, connManager);
+            return segment->toChunk(next, rep, connManager);
     }
 
     bool b_gap = false;
-    segment = rep->getNextSegment(BaseRepresentation::INFOTYPE_MEDIA, count, &count, &b_gap);
+    segment = rep->getNextSegment(BaseRepresentation::INFOTYPE_MEDIA, next, &next, &b_gap);
     if(!segment)
     {
         reset();
@@ -183,7 +183,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
         initializing = false;
     }
 
-    SegmentChunk *chunk = segment->toChunk(count, rep, connManager);
+    SegmentChunk *chunk = segment->toChunk(next, rep, connManager);
 
     /* We need to check segment/chunk format changes, as we can't rely on representation's (HLS)*/
     if(chunk && format != chunk->getStreamFormat())
@@ -193,13 +193,16 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionM
     }
 
     /* Handle both implicit and explicit discontinuities */
-    if( (b_gap && count) || (chunk && chunk->discontinuity) )
+    if( (b_gap && next) || (chunk && chunk->discontinuity) )
     {
         notify(SegmentTrackerEvent(chunk));
     }
 
     if(chunk)
-        count++;
+    {
+        curNumber = next;
+        next++;
+    }
 
     return chunk;
 }
@@ -229,13 +232,13 @@ void SegmentTracker::setPositionByNumber(uint64_t segnumber, bool restarted)
         index_sent = false;
         init_sent = false;
     }
-    count = segnumber;
+    curNumber = next = segnumber;
 }
 
 mtime_t SegmentTracker::getPlaybackTime() const
 {
     if(curRepresentation)
-        return curRepresentation->getPlaybackTimeBySegmentNumber(count);
+        return curRepresentation->getPlaybackTimeBySegmentNumber(next);
     else
         return 0;
 }
@@ -246,7 +249,7 @@ mtime_t SegmentTracker::getMinAheadTime() const
     if(!rep)
         rep = logic->getNextRepresentation(adaptationSet, NULL);
     if(rep)
-        return rep->getMinAheadTime(count);
+        return rep->getMinAheadTime(curNumber);
     return 0;
 }
 
@@ -259,8 +262,8 @@ void SegmentTracker::updateSelected()
 {
     if(curRepresentation && curRepresentation->needsUpdate())
     {
-        curRepresentation->runLocalUpdates(getPlaybackTime(), count, true);
-        curRepresentation->scheduleNextUpdate(count);
+        curRepresentation->runLocalUpdates(getPlaybackTime(), curNumber, true);
+        curRepresentation->scheduleNextUpdate(curNumber);
     }
 }
 
