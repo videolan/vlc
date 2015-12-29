@@ -26,6 +26,7 @@
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include "../modules/packetizer/hxxx_nal.h"
+#include "../modules/packetizer/hxxx_nal.c"
 
 static void testannexbin( const uint8_t *p_data, size_t i_data,
                           const uint8_t **pp_res, size_t *pi_res )

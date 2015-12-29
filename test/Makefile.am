@@ -90,8 +90,7 @@ test_src_input_stream_net_CFLAGS = $(AM_CFLAGS) -DTEST_NET
 test_src_input_stream_net_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_bits_SOURCES = src/misc/bits.c
 test_src_misc_bits_LDADD = $(LIBVLC)
-test_modules_packetizer_hxxx_SOURCES = modules/packetizer/hxxx.c \
-				       ../modules/packetizer/hxxx_nal.c ../modules/packetizer/hxxx_nal.h
+test_modules_packetizer_hxxx_SOURCES = modules/packetizer/hxxx.c
 test_modules_packetizer_hxxx_LDADD = $(LIBVLC)
 
 checkall:
