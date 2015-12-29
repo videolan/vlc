@@ -95,6 +95,7 @@ namespace adaptative
             ~SegmentTracker();
 
             void setAdaptationLogic(AbstractAdaptationLogic *);
+            bool segmentsListReady() const;
             void reset();
             SegmentChunk* getNextChunk(bool, HTTPConnectionManager *);
             bool setPositionByTime(mtime_t, bool, bool);

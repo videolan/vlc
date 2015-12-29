@@ -73,7 +73,12 @@ namespace adaptative
         bool isSelected() const;
         virtual bool reactivate(mtime_t);
         bool isDisabled() const;
-        typedef enum {status_eof, status_eop, status_dis, status_buffering, status_demuxed} status;
+        typedef enum {status_eof,
+                      status_eop,
+                      status_dis,
+                      status_buffering,
+                      status_buffering_ahead, /* Special case for live waiting new segments */
+                      status_demuxed} status;
         status demux(mtime_t, bool);
         virtual bool setPosition(mtime_t, bool);
         mtime_t getPlaybackTime() const;

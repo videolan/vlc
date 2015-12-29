@@ -72,6 +72,16 @@ void SegmentTracker::setAdaptationLogic(AbstractAdaptationLogic *logic_)
     registerListener(logic);
 }
 
+bool SegmentTracker::segmentsListReady() const
+{
+    BaseRepresentation *rep = curRepresentation;
+    if(!rep)
+        rep = logic->getNextRepresentation(adaptationSet, NULL);
+    if(rep && rep->getPlaylist()->isLive())
+        return rep->getMinAheadTime((count) ? count -1 : count) > 0;
+    return true;
+}
+
 void SegmentTracker::reset()
 {
     notify(SegmentTrackerEvent(curRepresentation, NULL));

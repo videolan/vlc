@@ -159,7 +159,12 @@ AbstractStream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
         }
 
         AbstractStream::status i_ret = st->demux(nzdeadline, send);
-        if(i_ret == AbstractStream::status_buffering)
+        if(i_ret == AbstractStream::status_buffering_ahead ||
+           i_return == AbstractStream::status_buffering_ahead)
+        {
+            i_return = AbstractStream::status_buffering_ahead;
+        }
+        else if(i_ret == AbstractStream::status_buffering)
         {
             i_return = AbstractStream::status_buffering;
         }
@@ -332,6 +337,7 @@ int PlaylistManager::doDemux(int64_t increment)
     case AbstractStream::status_eof:
         return VLC_DEMUXER_EOF;
     case AbstractStream::status_buffering:
+    case AbstractStream::status_buffering_ahead:
         break;
     case AbstractStream::status_dis:
     case AbstractStream::status_eop:
@@ -354,6 +360,10 @@ int PlaylistManager::doDemux(int64_t increment)
         else
             failedupdates++;
     }
+
+    /* Live starved and update still not there ? */
+    if(status == AbstractStream::status_buffering_ahead && needsUpdate())
+        msleep(CLOCK_FREQ / 20); /* Ugly */
 
     return VLC_DEMUXER_SUCCESS;
 }

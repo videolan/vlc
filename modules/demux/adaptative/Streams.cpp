@@ -245,6 +245,9 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
 
     if(nz_deadline + VLC_TS_0 > getBufferingLevel()) /* not already demuxed */
     {
+        if(!segmentTracker->segmentsListReady()) /* Live Streams */
+            return AbstractStream::status_buffering_ahead;
+
         /* need to read, demuxer still buffering, ... */
         if(demuxer->demux(nz_deadline) != VLC_DEMUXER_SUCCESS)
         {
