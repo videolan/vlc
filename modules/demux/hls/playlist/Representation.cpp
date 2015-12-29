@@ -106,21 +106,22 @@ void Representation::scheduleNextUpdate(uint64_t number)
     /* Compute new update time */
     mtime_t minbuffer = getMinAheadTime(number);
 
-    /* Update frequency must always be at least targetDuration (if any)*/
+    /* Update frequency must always be at least targetDuration (if any)
+     * but we need to update before reaching that last segment, thus -1 */
     if(targetDuration)
     {
-        if(minbuffer >= 3 * CLOCK_FREQ * targetDuration)
-            minbuffer -= 2 * CLOCK_FREQ * targetDuration;
+        if(minbuffer > CLOCK_FREQ * ( 2 * targetDuration + 1 ))
+            minbuffer -= CLOCK_FREQ * ( targetDuration + 1 );
+        else
+            minbuffer = CLOCK_FREQ * ( targetDuration - 1 );
     }
     else
     {
-        minbuffer /= 2;
-        if(targetDuration > minbuffer / CLOCK_FREQ)
-            minbuffer = targetDuration * CLOCK_FREQ;
+        if(minbuffer < 10 * CLOCK_FREQ)
+            minbuffer = 4 * CLOCK_FREQ;
+        else
+            minbuffer /= 2;
     }
-
-    if(minbuffer < CLOCK_FREQ)
-        minbuffer = CLOCK_FREQ;
 
     nextUpdateTime = now + minbuffer / CLOCK_FREQ;
 
