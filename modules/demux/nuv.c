@@ -648,7 +648,8 @@ static int HeaderLoad( demux_t *p_demux, header_t *h )
              h->d_fps, h->i_video_blocks, h->i_audio_blocks, h->i_text_blocks,
              h->i_keyframe_distance );
 #endif
-    return VLC_SUCCESS;
+
+    return (h->d_fps) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 /* FrameHeaderLoad:
