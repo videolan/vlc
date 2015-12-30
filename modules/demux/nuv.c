@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
+#include <limits.h>
 
 /* TODO:
  *  - test
@@ -921,9 +922,15 @@ static void demux_IndexAppend( demux_index_t *p_idx,
         }
         else
         {
+            if(INT_MAX - 1000 < p_idx->i_idx_max ||
+               (SIZE_MAX / sizeof(demux_index_entry_t)) - p_idx->i_idx_max < 1000)
+                return;
+            size_t i_realloc = (1000 + p_idx->i_idx_max) * sizeof(demux_index_entry_t);
+            demux_index_entry_t *p_realloc = realloc( p_idx->idx, i_realloc );
+            if( !p_realloc )
+                return;
             p_idx->i_idx_max += 1000;
-            p_idx->idx = xrealloc( p_idx->idx,
-                                p_idx->i_idx_max*sizeof(demux_index_entry_t));
+            p_idx->idx = p_realloc;
         }
     }
 
