@@ -1138,6 +1138,12 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 
     /* sample to chunk table */
     bo_t *stsc = box_full_new("stsc", 0, 0);
+    if(!stsc)
+    {
+        bo_free(stco);
+        bo_free(stsd);
+        return NULL;
+    }
     bo_add_32be(stsc, 0);     // entry-count (fixed latter)
 
     unsigned i_chunk = 0;
