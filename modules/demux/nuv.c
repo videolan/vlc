@@ -336,8 +336,8 @@ static int Open( vlc_object_t * p_this )
 
 error:
     msg_Warn( p_demux, "cannot load Nuv file" );
+    Close( p_this );
     p_demux->p_sys = NULL;
-    free( p_sys );
     return VLC_EGENERIC;
 }
 
