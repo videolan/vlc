@@ -36,7 +36,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
-#include <vlc_dialog.h>
 #include <vlc_meta.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
@@ -46,6 +45,7 @@
 #include <vlc_input.h>
 #include <vlc_http.h>
 #include <vlc_interrupt.h>
+#include <vlc_keystore.h>
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
@@ -213,6 +213,7 @@ static int Open( vlc_object_t *p_this )
     const char *psz_url = p_access->psz_url;
     char *psz;
     int ret = VLC_EGENERIC;
+    vlc_credential credential;
 
     access_sys_t *p_sys = malloc( sizeof(*p_sys) );
     if( unlikely(p_sys == NULL) )
@@ -264,6 +265,7 @@ static int Open( vlc_object_t *p_this )
     http_auth_Init( &p_sys->auth );
     http_auth_Init( &p_sys->proxy_auth );
     vlc_UrlParse( &p_sys->url, psz_url );
+    vlc_credential_init( &credential, &p_sys->url );
 
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
@@ -375,6 +377,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_continuous = var_InheritBool( p_access, "http-continuous" );
 
     p_access->p_sys = p_sys;
+
+    if( vlc_credential_get( &credential, p_access, NULL, NULL, NULL, NULL ) )
+    {
+        p_sys->url.psz_username = (char *) credential.psz_username;
+        p_sys->url.psz_password = (char *) credential.psz_password;
+    }
+
 connect:
     /* Connect */
     if( Connect( p_access, 0 ) )
@@ -400,13 +409,20 @@ connect:
 
         msg_Dbg( p_access, "authentication failed for realm %s",
                  p_sys->auth.psz_realm );
-        dialog_Login( p_access, &p_sys->psz_username, &p_sys->psz_password,
-                      _("HTTP authentication"),
-             _("Please enter a valid login name and a password for realm %s."),
-                      p_sys->auth.psz_realm );
-        if( p_sys->psz_username != NULL && p_sys->psz_password != NULL )
+
+        credential.psz_realm = p_sys->auth.psz_realm;
+        credential.psz_authtype = p_sys->auth.psz_nonce  ? "Digest" : "Basic";
+
+        if( vlc_credential_get( &credential, p_access, NULL, NULL,
+                               _("HTTP authentication"),
+                               _("Please enter a valid login name and a "
+                               "password for realm %s."), p_sys->auth.psz_realm ) )
         {
-            msg_Dbg( p_access, "retrying with user=%s", p_sys->psz_username );
+            p_sys->psz_username = strdup(credential.psz_username);
+            p_sys->psz_password = strdup(credential.psz_password);
+            if (!p_sys->psz_username || !p_sys->psz_password)
+                goto error;
+            msg_Err( p_access, "retrying with user=%s", p_sys->psz_username );
             p_sys->url.psz_username = p_sys->psz_username;
             p_sys->url.psz_password = p_sys->psz_password;
             Disconnect( p_access );
@@ -415,6 +431,8 @@ connect:
         else
             goto error;
     }
+    else
+        vlc_credential_store( &credential );
 
     if( ( p_sys->i_code == 301 || p_sys->i_code == 302 ||
           p_sys->i_code == 303 || p_sys->i_code == 307 ) &&
@@ -448,9 +466,12 @@ connect:
     p_access->pf_control = Control;
     p_access->pf_seek = Seek;
 
+    vlc_credential_clean( &credential );
+
     return VLC_SUCCESS;
 
 error:
+    vlc_credential_clean( &credential );
     vlc_UrlClean( &p_sys->url );
     if( p_sys->b_proxy )
         vlc_UrlClean( &p_sys->proxy );
