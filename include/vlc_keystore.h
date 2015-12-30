@@ -30,9 +30,10 @@
 
 typedef struct vlc_keystore vlc_keystore;
 typedef struct vlc_keystore_entry vlc_keystore_entry;
+typedef struct vlc_credential vlc_credential;
 
 /**
- * @defgroup keystore Keystore API
+ * @defgroup keystore Keystore and credential API
  * @{
  * @defgroup keystore_public Keystore public API
  * @{
@@ -143,6 +144,106 @@ vlc_keystore_remove(vlc_keystore *p_keystore,
  */
 VLC_API void
 vlc_keystore_release_entries(vlc_keystore_entry *p_entries, unsigned int i_count);
+
+/**
+ * @}
+ * @defgroup credential Credential API
+ * @{
+ */
+
+/**
+ * @note init with vlc_credential_init()
+ */
+struct vlc_credential
+{
+    /** url to store or to search */
+    const vlc_url_t *p_url;
+    /** http realm or smb domain */
+    const char *psz_realm;
+    /** http authtype */
+    const char *psz_authtype;
+    /** valid only if vlc_credential_get() returned true */
+    const char *psz_username;
+    /** valid only if vlc_credential_get() returned true */
+    const char *psz_password;
+
+    /* internal */
+    enum {
+        GET_FROM_URL,
+        GET_FROM_OPTION,
+        GET_FROM_KEYSTORE,
+        GET_FROM_DIALOG,
+    } i_get_order;
+
+    vlc_keystore *p_keystore;
+    vlc_keystore_entry *p_entries;
+    unsigned int i_entries_count;
+
+    char *psz_split_realm;
+    char *psz_var_username;
+    char *psz_var_password;
+
+    char *psz_dialog_username;
+    char *psz_dialog_password;
+    bool b_store;
+};
+
+/**
+ * Init a credential struct
+ *
+ * @note to be cleaned with vlc_credential_clean()
+ *
+ * @param psz_url url to store or to search
+ */
+VLC_API void
+vlc_credential_init(vlc_credential *p_credential, const vlc_url_t *p_url);
+
+/**
+ * Clean a credential struct
+ */
+VLC_API void
+vlc_credential_clean(vlc_credential *p_credential);
+
+/**
+ * Get a username/password couple
+ *
+ * This will search for a credential using url, VLC options, the vlc_keystore
+ * or by asking the user via dialog_Login(). This function can be called
+ * indefinitely, it will first return the user/password from the url (if any),
+ * then from VLC options (if any), then from the keystore (if any), and finally
+ * from the dialog (if any). This function will return true as long as the user
+ * fill the dialog texts and will return false when the user cancel it.
+ *
+ * @param p_parent the parent object (for var, keystore and dialog)
+ * @param psz_option_username VLC option name for the username
+ * @param psz_option_password VLC option name for the password
+ * @param psz_dialog_title dialog title, if NULL, this function won't use the
+ * keystore or the dialog
+ * @param psz_dialog_fmt dialog text using format
+ *
+ * @return true if vlc_credential.psz_username and vlc_credential.psz_password
+ * are valid, otherwise this function should not be called again.
+ */
+
+VLC_API bool
+vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
+                   const char *psz_option_username,
+                   const char *psz_option_password,
+                   const char *psz_dialog_title,
+                   const char *psz_dialog_fmt, ...) VLC_FORMAT(6, 7);
+#define vlc_credential_get(a, b, c, d, e, f, ...) \
+    vlc_credential_get(a, VLC_OBJECT(b), c, d, e, f, ##__VA_ARGS__)
+
+/**
+ * Store the last dialog credential returned by vlc_credential_get()
+ *
+ * This function will store the credential only if it comes from the dialog and
+ * if the vlc_keystore object is valid.
+ *
+ * @return true if credential was stored, false otherwise
+ */
+VLC_API bool
+vlc_credential_store(vlc_credential *p_credential);
 
 /**
  * @}

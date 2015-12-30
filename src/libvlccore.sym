@@ -519,6 +519,10 @@ vlc_cond_init_daytime
 vlc_cond_signal
 vlc_cond_timedwait
 vlc_cond_wait
+vlc_credential_init
+vlc_credential_clean
+vlc_credential_get
+vlc_credential_store
 vlc_sem_init
 vlc_sem_destroy
 vlc_sem_post
