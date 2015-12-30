@@ -1253,6 +1253,8 @@ void matroska_segment_c::EnsureDuration()
                              var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
 
         KaxCluster *p_last_cluster = (KaxCluster *) ep->Get();
+        if( p_last_cluster == NULL )
+            return;
         ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA );
 
         // use the last block + duration
