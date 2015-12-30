@@ -70,10 +70,25 @@ SoutInputBox::SoutInputBox( QWidget *_parent, const QString& mrl ) : QGroupBox( 
 void SoutInputBox::setMRL( const QString& mrl )
 {
     QUrl uri = QUrl::fromEncoded( mrl.toLatin1() );
-    sourceLine->setText( uri.toString() );
-    QString type = uri.scheme();
-    if ( type.isEmpty() ) type = qtr( I_FILE_SLASH_DIR );
-    sourceValueLabel->setText( type );
+    if( !uri.isValid() &&
+        !mrl.startsWith("http") &&
+        !mrl.startsWith("ftp") &&
+        !mrl.startsWith("/") )
+    {
+        int pos = mrl.indexOf("://");
+        if( pos != -1 )
+        {
+            sourceValueLabel->setText( mrl.left( pos ) );
+            sourceLine->setText( mrl );
+        }
+    }
+    else
+    {
+        sourceLine->setText( uri.toString() );
+        QString type = uri.scheme();
+        if ( type.isEmpty() ) type = qtr( I_FILE_SLASH_DIR );
+        sourceValueLabel->setText( type );
+    }
 }
 
 #define CT( x ) connect( x, SIGNAL(textChanged(QString)), this, SIGNAL(mrlUpdated()) );
