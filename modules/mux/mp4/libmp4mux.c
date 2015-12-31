@@ -80,7 +80,11 @@ bo_t *box_new(const char *fcc)
     if (!box)
         return NULL;
 
-    bo_init(box, 1024);
+    if(!bo_init(box, 1024))
+    {
+        bo_free(box);
+        return NULL;
+    }
 
     bo_add_32be  (box, 0);
     bo_add_fourcc(box, fcc);
