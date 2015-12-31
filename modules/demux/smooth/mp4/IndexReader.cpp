@@ -53,8 +53,11 @@ bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep)
         uuid_box = uuid_box->p_next;
     }
 
+    if(!uuid_box)
+        return false;
+
     SegmentTimeline *timelineadd = new (std::nothrow) SegmentTimeline(rep->inheritTimescale());
-    if (uuid_box && timelineadd)
+    if (timelineadd)
     {
         const MP4_Box_data_tfrf_t *p_tfrfdata = uuid_box->data.p_tfrf;
         for ( uint8_t i=0; i<p_tfrfdata->i_fragment_count; i++ )
