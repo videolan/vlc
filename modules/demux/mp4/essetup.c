@@ -814,6 +814,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         {
             if( !SetupAudioFromWaveFormatEx( &p_track->fmt, MP4_BoxGet( p_sample, "wfex" ) ) )
                 msg_Err( p_demux, "missing wfex for wma" );
+            break;
         }
 
         default:
