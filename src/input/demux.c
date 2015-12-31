@@ -314,8 +314,12 @@ demux_t *input_DemuxNew( vlc_object_t *obj, const char *access_name,
         if( stream->psz_url != NULL )
         {
             path = strstr( stream->psz_url, "://" );
-            if( path != NULL )
-                path += 3;
+            if( path == NULL )
+            {
+                stream_Delete( stream );
+                goto out;
+            }
+            path += 3;
         }
 
         demux = demux_NewAdvanced( obj, input, access_name, demux_name, path,
