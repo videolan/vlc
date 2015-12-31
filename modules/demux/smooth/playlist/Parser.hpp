@@ -65,7 +65,6 @@ namespace smooth
 
             private:
                 xml::Node       *root;
-                Manifest        *manifest;
                 stream_t        *p_stream;
                 std::string      playlisturl;
         };
