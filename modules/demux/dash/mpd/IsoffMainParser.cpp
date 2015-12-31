@@ -178,15 +178,13 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
         if(!initurl.empty() && (initTemplate = new (std::nothrow) InitSegmentTemplate(info)))
             initTemplate->setSourceUrl(initurl);
     }
-
     mediaTemplate->initialisationSegment.Set(initTemplate);
-    info->setSegmentTemplate(mediaTemplate);
 
     parseTimeline(DOMHelper::getFirstChildElementByName(templateNode, "SegmentTimeline"), mediaTemplate);
 
-    total += ( mediaTemplate != NULL );
+    info->setSegmentTemplate(mediaTemplate);
 
-    return total;
+    return ++total;
 }
 
 size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *info, uint64_t *nextid)
