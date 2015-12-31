@@ -183,8 +183,6 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
                     break;
             }
 
-            if (i_buf < 4)
-                return -1;
             i_nal_type = p_buf[3] & 0x1F;
 
             /* The start prefix is always 0x00000001 (annexb_startcode + a
