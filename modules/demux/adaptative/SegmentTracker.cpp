@@ -51,7 +51,7 @@ SegmentTrackerEvent::SegmentTrackerEvent(const StreamFormat *fmt)
 SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
 {
     first = true;
-    next = 0;
+    curNumber = next = 0;
     initializing = true;
     index_sent = false;
     init_sent = false;
