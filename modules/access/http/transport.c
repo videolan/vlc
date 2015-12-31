@@ -97,10 +97,11 @@ static int vlc_tcp_connect(vlc_object_t *obj, const char *name, unsigned port)
     vlc_cleanup_pop();
     freeaddrinfo(res);
 
+    if (fd != -1)
 #ifndef _WIN32
-    fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
+        fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 #else
-    ioctlsocket(fd, FIONBIO, &(unsigned long){ 1 });
+        ioctlsocket(fd, FIONBIO, &(unsigned long){ 1 });
 #endif
     return fd;
 }
