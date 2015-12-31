@@ -289,7 +289,6 @@ static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
     block_t *block = block_heap_Alloc(f, sizeof (*f) + vlc_h2_frame_size(f));
     if (unlikely(block == NULL))
     {
-        free(f);
         vlc_h2_stream_error(conn, s->id, VLC_H2_INTERNAL_ERROR);
         return NULL;
     }
