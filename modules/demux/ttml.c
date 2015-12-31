@@ -378,7 +378,7 @@ static void ParseHead( demux_t* p_demux )
     char* psz_head = NULL;
     size_t i_head_len = 0; // head tags size, in bytes
     size_t i_size; // allocated buffer size
-    size_t i_read;
+    ssize_t i_read;
 
     // Rewind since the XML parser will have consumed the entire file.
     stream_Seek( p_demux->s, 0 );
