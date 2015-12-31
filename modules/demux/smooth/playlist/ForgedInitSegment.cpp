@@ -283,6 +283,9 @@ block_t * ForgedInitSegment::buildMoovBox()
         free(box);
     }
 
+    if(!moov)
+        return NULL;
+
     vlc_fourcc_t extra[] = {MAJOR_isom, VLC_FOURCC('p','i','f','f'), VLC_FOURCC('i','s','o','2'), VLC_FOURCC('s','m','o','o')};
     box = GetFtyp(VLC_FOURCC('i','s','m','l'), 1, extra, ARRAY_SIZE(extra));
 
