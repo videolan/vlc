@@ -415,7 +415,10 @@ static int hpack_append_hdr(struct hpack_decoder *dec,
     char **newtab = realloc(dec->table,
                             sizeof (dec->table[0]) * (dec->entries + 1));
     if (newtab == NULL)
+    {
+        free(entry);
         return -1;
+    }
 
     dec->table = newtab;
     dec->table[dec->entries] = entry;
