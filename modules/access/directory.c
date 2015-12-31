@@ -163,8 +163,8 @@ input_item_t *DirRead(access_t *access)
         }
 
         /* Create an input item for the current entry */
-        char *encoded= vlc_uri_encode(entry);
-        if (unlikely(entry == NULL))
+        char *encoded = vlc_uri_encode(entry);
+        if (unlikely(encoded == NULL))
             continue;
 
         char *uri;
