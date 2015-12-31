@@ -361,7 +361,6 @@ void X11Factory::rmDir( const std::string &rPath )
 
         if( rmdir( filename.c_str() ) && errno == ENOTDIR )
             unlink( filename.c_str() );
-        }
     }
 
     // Close the directory
