@@ -250,9 +250,6 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
         MP4_Seek( p_stream, i_next );
     }
 
-    if( !p_box )
-        return NULL;
-
     MP4_BoxAddChild( p_father, p_box );
 
     return p_box;
