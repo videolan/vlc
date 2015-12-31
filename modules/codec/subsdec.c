@@ -798,9 +798,13 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                         }
                         else if ( !strcasecmp( psz_attribute_name, "size" ) )
                         {
-                            p_segment->style->i_font_size = atoi( psz_attribute_value );
-                            p_segment->style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE *
-                                    STYLE_DEFAULT_FONT_SIZE / p_segment->style->i_font_size;
+                            int size = atoi( psz_attribute_value );
+                            if( size )
+                            {
+                                p_segment->style->i_font_size = size;
+                                p_segment->style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE *
+                                        STYLE_DEFAULT_FONT_SIZE / p_segment->style->i_font_size;
+                            }
                         }
                         else if ( !strcasecmp( psz_attribute_name, "color" ) )
                         {
