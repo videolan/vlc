@@ -623,13 +623,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             else
                 return -1;
         }
-
-        if( i_read <= 0 )
-        {
-            if( i_read < 0 )
-                p_sys->b_error = true;
-            goto fatal;
-        }
+        goto fatal;
     }
 
     assert( i_read >= 0 );
