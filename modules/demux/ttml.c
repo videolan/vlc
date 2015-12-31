@@ -231,9 +231,9 @@ static int ReadTTML( demux_t* p_demux )
 
             while ( psz_attr_name && psz_attr_value )
             {
-                if ( !strcasecmp( psz_attr_name, "begin" ) )
+                if ( !psz_begin && !strcasecmp( psz_attr_name, "begin" ) )
                     psz_begin = strdup( psz_attr_value );
-                else if ( !strcasecmp( psz_attr_name, "end" ) )
+                else if ( !psz_end && !strcasecmp( psz_attr_name, "end" ) )
                     psz_end = strdup( psz_attr_value );
                 else if ( !strcasecmp( psz_attr_name, psz_attr_name ) )
                 {
