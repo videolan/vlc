@@ -409,6 +409,7 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
 
                     if ( PushStyle( &p_style_stack, p_style ) == false )
                     {
+                        text_segment_Delete( p_segment );
                         goto fail;
                     }
                     p_segment->style = CurrentStyle( p_style_stack );
