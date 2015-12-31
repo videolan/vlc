@@ -226,7 +226,7 @@ char *vlc_http_res_get_redirect(const struct vlc_http_resource *restrict res,
 
         if (unlikely(asprintf(&url, "%s://%s%.*s",
                               res->secure ? "https" : "http", res->authority,
-                              (int)len, location)) < 0)
+                              (int)len, location) < 0))
             return NULL;
         return url;
     }
