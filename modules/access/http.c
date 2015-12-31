@@ -129,7 +129,6 @@ vlc_module_end ()
 struct access_sys_t
 {
     int fd;
-    bool b_error;
     vlc_tls_creds_t *p_creds;
     vlc_tls_t *p_tls;
 
@@ -218,7 +217,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->fd = -1;
-    p_sys->b_error = false;
     p_sys->b_proxy = false;
     p_sys->psz_proxy_passbuf = NULL;
     p_sys->b_seekable = true;
@@ -972,12 +970,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
                     i_status = 0;
 
                 free( psz );
-
-                if( p_sys->b_error )
-                {
-                    Disconnect( p_access );
-                    return -1;
-                }
             }
             while( i_status );
         }
@@ -1128,12 +1120,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
         if( psz == NULL )
         {
             msg_Err( p_access, "failed to read answer" );
-            goto error;
-        }
-
-        if( p_sys->b_error )
-        {
-            free( psz );
             goto error;
         }
 
