@@ -120,6 +120,8 @@ static void deNoise(unsigned char *Frame,        // mpi->planes[x]
 
     if(!FrameAnt){
         (*FrameAntPtr)=FrameAnt=malloc(W*H*sizeof(unsigned short));
+        if(!FrameAnt)
+            return;
         for (long Y = 0; Y < H; Y++){
             unsigned short* dst=&FrameAnt[Y*W];
             unsigned char* src=Frame+Y*sStride;
