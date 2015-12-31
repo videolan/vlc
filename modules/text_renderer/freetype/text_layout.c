@@ -1261,7 +1261,7 @@ static int LayoutLine( filter_t *p_filter,
         pen.y += p_bitmaps->i_y_advance;
 
         /* Get max advance for grid mode */
-        if( b_grid && i_font_max_advance_y == 0 )
+        if( b_grid && i_font_max_advance_y == 0 && p_face )
         {
             i_font_max_advance_y = abs( FT_FLOOR( FT_MulFix( p_face->max_advance_height,
                                       p_face->size->metrics.y_scale ) ) );
