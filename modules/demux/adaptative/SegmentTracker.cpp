@@ -72,6 +72,16 @@ void SegmentTracker::setAdaptationLogic(AbstractAdaptationLogic *logic_)
     registerListener(logic);
 }
 
+StreamFormat SegmentTracker::initialFormat() const
+{
+    BaseRepresentation *rep = curRepresentation;
+    if(!rep)
+        rep = logic->getNextRepresentation(adaptationSet, NULL);
+    if(rep)
+        return rep->getStreamFormat();
+    return StreamFormat();
+}
+
 bool SegmentTracker::segmentsListReady() const
 {
     BaseRepresentation *rep = curRepresentation;

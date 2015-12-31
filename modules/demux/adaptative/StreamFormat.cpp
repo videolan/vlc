@@ -40,6 +40,8 @@ std::string StreamFormat::str() const
             return "Timed Text";
         case PACKEDAAC:
             return "Packed AAC";
+        case UNSUPPORTED:
+            return "Unsupported";
         default:
         case UNKNOWN:
             return "Unknown";

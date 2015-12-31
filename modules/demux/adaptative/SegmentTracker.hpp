@@ -95,6 +95,7 @@ namespace adaptative
             ~SegmentTracker();
 
             void setAdaptationLogic(AbstractAdaptationLogic *);
+            StreamFormat initialFormat() const;
             bool segmentsListReady() const;
             void reset();
             SegmentChunk* getNextChunk(bool, HTTPConnectionManager *);
