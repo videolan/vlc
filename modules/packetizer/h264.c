@@ -723,7 +723,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
     h264_sequence_parameter_set_t *p_sps = h264_decode_sps( p_buffer, i_buffer, true );
     if( !p_sps )
     {
-        msg_Warn( p_dec, "invalid SPS (sps_id=%d)", p_sps->i_id );
+        msg_Warn( p_dec, "invalid SPS" );
         block_Release( p_frag );
         return;
     }
@@ -789,7 +789,7 @@ static void PutPPS( decoder_t *p_dec, block_t *p_frag )
     h264_picture_parameter_set_t *p_pps = h264_decode_pps( p_buffer, i_buffer, true );
     if( !p_pps )
     {
-        msg_Warn( p_dec, "invalid PPS (pps_id=%d sps_id=%d)", p_pps->i_id, p_pps->i_sps_id );
+        msg_Warn( p_dec, "invalid PPS" );
         block_Release( p_frag );
         return;
     }
