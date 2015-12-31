@@ -99,8 +99,6 @@ namespace adaptative
 
         bool discontinuity;
 
-        Demuxer *syncdemux;
-
         demux_t *p_realdemux;
         StreamFormat format;
 
