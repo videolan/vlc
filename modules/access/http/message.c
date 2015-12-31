@@ -871,7 +871,7 @@ int vlc_http_msg_add_cookies(struct vlc_http_msg *m,
 
     if (cookies != NULL)
     {
-        val = vlc_http_msg_add_header(m, "Cookie", cookies);
+        val = vlc_http_msg_add_header(m, "Cookie", "%s", cookies);
         free(cookies);
     }
     return val;
