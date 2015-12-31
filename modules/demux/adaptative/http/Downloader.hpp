@@ -52,6 +52,7 @@ namespace adaptative
                 vlc_mutex_t  lock;
                 vlc_cond_t   waitcond;
                 vlc_mutex_t  processlock;
+                bool         thread_handle_valid;
                 bool         killed;
                 std::list<HTTPChunkBufferedSource *> chunks;
         };

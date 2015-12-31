@@ -29,15 +29,19 @@ Downloader::Downloader()
     vlc_mutex_init(&lock);
     vlc_cond_init(&waitcond);
     killed = false;
+    thread_handle = { 0 };
+    thread_handle_valid = false;
 }
 
 bool Downloader::start()
 {
-    if(vlc_clone(&thread_handle, downloaderThread,
+    if(!thread_handle_valid &&
+       vlc_clone(&thread_handle, downloaderThread,
                  reinterpret_cast<void *>(this), VLC_THREAD_PRIORITY_INPUT))
     {
         return false;
     }
+    thread_handle_valid = true;
     return true;
 }
 
@@ -45,7 +49,8 @@ Downloader::~Downloader()
 {
     killed = true;
     vlc_cond_signal(&waitcond);
-    vlc_join(thread_handle, NULL);
+    if(thread_handle_valid)
+        vlc_join(thread_handle, NULL);
     vlc_mutex_destroy(&lock);
     vlc_cond_destroy(&waitcond);
 }
