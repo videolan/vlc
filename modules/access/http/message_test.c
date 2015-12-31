@@ -150,6 +150,7 @@ static time_t parse_date(const char *str)
     t1 = vlc_http_msg_get_atime(m);
     assert(vlc_http_msg_add_header(m, "Last-Modified", "%s", str) == 0);
     t2 = vlc_http_msg_get_mtime(m);
+    assert(vlc_http_msg_get_retry_after(m) == 0);
     assert(vlc_http_msg_add_header(m, "Retry-After", "%s", str) == 0);
     vlc_http_msg_get_retry_after(m);
     vlc_http_msg_destroy(m);
