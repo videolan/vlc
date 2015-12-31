@@ -467,7 +467,8 @@ void SegmentInformation::setSegmentTemplate(MediaSegmentTemplate *templ)
         mediaSegmentTemplate->mergeWith(templ, 0);
         delete templ;
     }
-    mediaSegmentTemplate = templ;
+    else
+        mediaSegmentTemplate = templ;
 }
 
 static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
