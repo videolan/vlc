@@ -24,9 +24,9 @@
 
 #ifdef X11_SKINS
 
+#include <errno.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <sys/stat.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/Xinerama.h>
 
@@ -349,7 +349,6 @@ void X11Factory::rmDir( const std::string &rPath )
     // Parse the directory and remove everything it contains
     while( (file = readdir( dir )) )
     {
-        struct stat statbuf;
         std::string filename = file->d_name;
 
         // Skip "." and ".."
@@ -360,12 +359,7 @@ void X11Factory::rmDir( const std::string &rPath )
 
         filename = rPath + "/" + filename;
 
-        if( !stat( filename.c_str(), &statbuf ) && statbuf.st_mode & S_IFDIR )
-        {
-            rmDir( filename );
-        }
-        else
-        {
+        if( rmdir( filename.c_str() ) && errno == ENOTDIR )
             unlink( filename.c_str() );
         }
     }
