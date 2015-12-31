@@ -31,6 +31,7 @@
 XMLParser::XMLParser( intf_thread_t *pIntf, const std::string &rFileName )
     : SkinObject( pIntf ), m_pXML( NULL ), m_pReader( NULL ), m_pStream( NULL )
 {
+    m_errors = false;
     m_pXML = xml_Create( pIntf );
     if( !m_pXML )
     {
