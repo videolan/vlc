@@ -183,9 +183,9 @@ size_t SegmentTimeline::pruneBySequenceNumber(uint64_t number)
         }
         else
         {
-            delete el;
-            elements.pop_front();
             prunednow += el->r + 1;
+            elements.pop_front();
+            delete el;
         }
     }
 
