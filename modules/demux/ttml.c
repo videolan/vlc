@@ -239,7 +239,11 @@ static int ReadTTML( demux_t* p_demux )
                 {
                     psz_text = Append( psz_text, " %s = \"%s\"", psz_attr_name, psz_attr_value );
                     if ( unlikely( psz_text == NULL ) )
+                    {
+                        free( psz_begin );
+                        free( psz_end );
                         return VLC_ENOMEM;
+                    }
                 }
                 psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
             }
