@@ -206,12 +206,18 @@ static struct vlc_http_msg *vlc_h1_stream_wait(struct vlc_http_stream *stream)
         if (str != NULL)
         {
             if (vlc_http_next_token(str) != NULL)
+            {
+                vlc_http_msg_destroy(resp);
                 return vlc_h1_stream_fatal(conn); /* unsupported TE */
+            }
 
             assert(conn->content_length == UINTMAX_MAX);
             stream = vlc_chunked_open(stream, conn->conn.tls);
             if (unlikely(stream == NULL))
+            {
+                vlc_http_msg_destroy(resp);
                 return vlc_h1_stream_fatal(conn);
+            }
         }
     }
     else
