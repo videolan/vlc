@@ -463,9 +463,8 @@ void IsoffMainParser::parseTimeline(Node *node, MediaSegmentTemplate *templ)
             else timeline->addElement(number, d, r);
 
             number += (1 + r);
-
-            templ->segmentTimeline.Set(timeline);
         }
+        templ->segmentTimeline.Set(timeline);
     }
 }
 
