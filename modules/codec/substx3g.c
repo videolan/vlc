@@ -148,13 +148,10 @@ static void SegmentDoSplit( tx3g_segment_t *p_segment, uint16_t i_start, uint16_
                             tx3g_segment_t **pp_segment_middle,
                             tx3g_segment_t **pp_segment_right )
 {
-    tx3g_segment_t *p_segment_left = *pp_segment_left;
-    tx3g_segment_t *p_segment_right = *pp_segment_right;
-    tx3g_segment_t *p_segment_middle = *pp_segment_middle;
-    p_segment_left = p_segment_middle = p_segment_right = NULL;
+    tx3g_segment_t *p_segment_left = NULL, *p_segment_right = NULL, *p_segment_middle = NULL;
 
     if ( (p_segment->i_size - i_start < 1) || (p_segment->i_size - i_end < 1) )
-        return;
+        goto error;
 
     if ( i_start > 0 )
     {
@@ -193,12 +190,17 @@ static void SegmentDoSplit( tx3g_segment_t *p_segment, uint16_t i_start, uint16_
     return;
 
 error:
-    text_segment_Delete( p_segment_left->s );
-    free( p_segment_left );
-    text_segment_Delete( p_segment_middle->s );
-    free( p_segment_middle );
-    text_segment_Delete( p_segment_right->s );
-    free( p_segment_right );
+    if( p_segment_middle )
+    {
+        text_segment_Delete( p_segment_middle->s );
+        free( p_segment_middle );
+    }
+    if( p_segment_left )
+    {
+        text_segment_Delete( p_segment_left->s );
+        free( p_segment_left );
+    }
+    *pp_segment_left = *pp_segment_middle = *pp_segment_right = NULL;
 }
 
 static bool SegmentSplit( tx3g_segment_t *p_prev, tx3g_segment_t **pp_segment,
