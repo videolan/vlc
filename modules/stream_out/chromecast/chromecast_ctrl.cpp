@@ -259,9 +259,6 @@ extern "C" int recvPacket(sout_stream_t *p_stream, bool &b_msgReceived,
     *pi_received = 0;
     b_msgReceived = true;
     return i_ret;
-
-
-    return i_ret;
 }
 
 /**
