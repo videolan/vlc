@@ -27,6 +27,7 @@
 
 @interface VLCDebugMessageVisualizer : NSWindowController
 {
+    IBOutlet NSButton *_clearButton;
     IBOutlet NSButton * _msgs_save_btn;
     IBOutlet NSButton * _msgs_refresh_btn;
     IBOutlet id _msgs_table;
@@ -36,5 +37,6 @@
 
 - (IBAction)updateMessagesPanel:(id)sender;
 - (IBAction)saveDebugLog:(id)sender;
+- (IBAction)clearLog:(id)sender;
 
 @end

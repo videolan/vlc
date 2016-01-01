@@ -107,6 +107,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     [self.window setDelegate: self];
     [self.window setTitle: _NS("Messages")];
     [_msgs_save_btn setTitle: _NS("Save this Log...")];
+    [_clearButton setTitle:_NS("Clear")];
     [_msgs_refresh_btn setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
 }
 
@@ -159,6 +160,17 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
                 msg_Warn(VLCIntf, "Error while saving the debug log");
         }
     }];
+}
+
+- (IBAction)clearLog:(id)sender
+{
+    [_msg_arr removeAllObjects];
+
+    // Reregister handler, to write new header to log
+    vlc_LogSet(VLCIntf->p_libvlc, NULL, NULL);
+    vlc_LogSet(VLCIntf->p_libvlc, MsgCallback, (__bridge void*)self);
+
+    [_msgs_table reloadData];
 }
 
 #pragma mark - data handling
