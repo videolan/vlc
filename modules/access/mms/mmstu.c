@@ -676,7 +676,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     }
     else if( p_sys->i_command != 0x02 )
     {
-        msg_Warn( p_access, "received command isn't 0x02 in reponse to 0x02" );
+        msg_Warn( p_access, "received command isn't 0x02 in response to 0x02" );
     }
 
     /* *** send command 5 : media file name/path requested *** */
@@ -698,7 +698,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
                      buffer.p_data,
                      buffer.i_data );
 
-    /* *** wait for reponse *** */
+    /* *** wait for response *** */
     mms_CommandRead( p_access, 0x1a, 0x06 );
 
     /* test if server send 0x1A answer */
@@ -784,7 +784,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     mms_CommandSend( p_access, 0x15, p_sys->i_command_level, 0x00,
                      buffer.p_data, buffer.i_data );
 
-    /* *** wait for reponse *** */
+    /* *** wait for response *** */
     /* Commented out because it fails on some stream (no 0x11 answer) */
 #if 0
     mms_CommandRead( p_access, 0x11, 0 );
