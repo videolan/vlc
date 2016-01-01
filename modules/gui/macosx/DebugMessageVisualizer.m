@@ -144,18 +144,16 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
     [saveFolderPanel setCanSelectHiddenExtension: NO];
     [saveFolderPanel setCanCreateDirectories: YES];
-    [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"rtf"]];
-    [saveFolderPanel setNameFieldStringValue:[NSString stringWithFormat: _NS("VLC Debug Log (%s).rtf"), VERSION_MESSAGE]];
+    [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"txt"]];
+    [saveFolderPanel setNameFieldStringValue:[NSString stringWithFormat: _NS("VLC Debug Log (%s).txt"), VERSION_MESSAGE]];
     [saveFolderPanel beginSheetModalForWindow: self.window completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton) {
             NSUInteger count = [_messageArray count];
-            NSMutableAttributedString * string = [[NSMutableAttributedString alloc] init];
+            NSMutableString *string = [[NSMutableString alloc] init];
             for (NSUInteger i = 0; i < count; i++)
-                [string appendAttributedString: [_messageArray objectAtIndex:i]];
+                [string appendString: [[_messageArray objectAtIndex:i] string]];
 
-            NSData *data = [string RTFFromRange:NSMakeRange(0, [string length])
-                             documentAttributes:[NSDictionary dictionaryWithObject: NSRTFTextDocumentType forKey: NSDocumentTypeDocumentAttribute]];
-
+            NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
             if ([data writeToFile: [[saveFolderPanel URL] path] atomically: YES] == NO)
                 msg_Warn(VLCIntf, "Error while saving the debug log");
         }
