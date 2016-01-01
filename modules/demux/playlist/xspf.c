@@ -266,8 +266,9 @@ static bool parse_playlist_node COMPLEX_INTERFACE
 
     /* simple element content */
     case XML_READER_TEXT:
+        FREE_VALUE();
         psz_value = strdup(name);
-        if (unlikely(!name))
+        if (unlikely(!psz_value))
             goto end;
         break;
 
