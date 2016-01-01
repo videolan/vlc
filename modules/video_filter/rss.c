@@ -704,6 +704,7 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
 #ifdef RSS_DEBUG
             msg_Dbg( p_filter, "element <%s>", node );
 #endif
+            free(psz_eltname);
             psz_eltname = strdup( node );
             if( unlikely(!psz_eltname) )
                 goto end;
