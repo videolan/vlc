@@ -7,10 +7,10 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCDebugMessageVisualizer">
             <connections>
-                <outlet property="_clearButton" destination="RCj-GY-IGn" id="chJ-sn-o6c"/>
-                <outlet property="_msgs_refresh_btn" destination="4" id="17"/>
-                <outlet property="_msgs_save_btn" destination="3" id="19"/>
-                <outlet property="_msgs_table" destination="6" id="20"/>
+                <outlet property="clearButton" destination="RCj-GY-IGn" id="bi1-74-dyp"/>
+                <outlet property="messageTable" destination="6" id="BzW-Qh-PMq"/>
+                <outlet property="refreshButton" destination="4" id="bdj-c0-rau"/>
+                <outlet property="saveButton" destination="3" id="WDG-KN-R01"/>
                 <outlet property="window" destination="1" id="24"/>
             </connections>
         </customObject>

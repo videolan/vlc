@@ -37,7 +37,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 @interface VLCDebugMessageVisualizer () <NSWindowDelegate>
 {
-    NSMutableArray * _msg_arr;
+    NSMutableArray * _messageArray;
 }
 - (void)appendMessage:(NSMutableAttributedString *) message;
 
@@ -91,7 +91,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 {
     self = [super initWithWindowNibName:@"DebugMessageVisualizer"];
     if (self) {
-        _msg_arr = [NSMutableArray arrayWithCapacity:600];
+        _messageArray = [NSMutableArray arrayWithCapacity:600];
     }
     return self;
 }
@@ -106,9 +106,9 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     [self.window setExcludedFromWindowsMenu: YES];
     [self.window setDelegate: self];
     [self.window setTitle: _NS("Messages")];
-    [_msgs_save_btn setTitle: _NS("Save this Log...")];
+    [_saveButton setTitle: _NS("Save this Log...")];
     [_clearButton setTitle:_NS("Clear")];
-    [_msgs_refresh_btn setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
+    [_refreshButton setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
 }
 
 #pragma mark - UI interaction
@@ -128,8 +128,8 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
 {
-    [_msgs_table reloadData];
-    [_msgs_table scrollRowToVisible: [_msg_arr count] - 1];
+    [_messageTable reloadData];
+    [_messageTable scrollRowToVisible: [_messageArray count] - 1];
 }
 
 - (void)windowWillClose:(NSNotification *)notification
@@ -148,10 +148,10 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     [saveFolderPanel setNameFieldStringValue:[NSString stringWithFormat: _NS("VLC Debug Log (%s).rtf"), VERSION_MESSAGE]];
     [saveFolderPanel beginSheetModalForWindow: self.window completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton) {
-            NSUInteger count = [_msg_arr count];
+            NSUInteger count = [_messageArray count];
             NSMutableAttributedString * string = [[NSMutableAttributedString alloc] init];
             for (NSUInteger i = 0; i < count; i++)
-                [string appendAttributedString: [_msg_arr objectAtIndex:i]];
+                [string appendAttributedString: [_messageArray objectAtIndex:i]];
 
             NSData *data = [string RTFFromRange:NSMakeRange(0, [string length])
                              documentAttributes:[NSDictionary dictionaryWithObject: NSRTFTextDocumentType forKey: NSDocumentTypeDocumentAttribute]];
@@ -164,35 +164,35 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 - (IBAction)clearLog:(id)sender
 {
-    [_msg_arr removeAllObjects];
+    [_messageArray removeAllObjects];
 
     // Reregister handler, to write new header to log
     vlc_LogSet(VLCIntf->p_libvlc, NULL, NULL);
     vlc_LogSet(VLCIntf->p_libvlc, MsgCallback, (__bridge void*)self);
 
-    [_msgs_table reloadData];
+    [_messageTable reloadData];
 }
 
 #pragma mark - data handling
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-    return [_msg_arr count];
+    return [_messageArray count];
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-    return [_msg_arr objectAtIndex:rowIndex];
+    return [_messageArray objectAtIndex:rowIndex];
 }
 
 - (void)appendMessage:(NSMutableAttributedString *) message
 {
-    if ([_msg_arr count] > 1000000) {
-        [_msg_arr removeObjectAtIndex: 0];
-        [_msg_arr removeObjectAtIndex: 1];
+    if ([_messageArray count] > 1000000) {
+        [_messageArray removeObjectAtIndex: 0];
+        [_messageArray removeObjectAtIndex: 1];
     }
 
-    [_msg_arr addObject:message];
+    [_messageArray addObject:message];
 }
 
 @end
