@@ -107,8 +107,6 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     playlist_t *p_playlist;
     __weak NSOutlineView *_outlineView;
 
-    // TODO: for transition
-    __weak VLCPlaylist *_playlist;
     NSUInteger _retainedRowSelection;
 }
 @end
@@ -118,13 +116,12 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 #pragma mark -
 #pragma mark Init and Stuff
 
-- (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root playlistObject:(id)plObj;
+- (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root;
 {
     self = [super init];
     if (self) {
         p_playlist = pl;
         _outlineView = outlineView;
-        _playlist = plObj;
 
         msg_Dbg(VLCIntf, "Initializing playlist model");
         var_AddCallback(p_playlist, "item-change", PLItemUpdated, (__bridge void *)self);

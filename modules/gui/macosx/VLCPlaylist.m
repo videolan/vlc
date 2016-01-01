@@ -152,7 +152,7 @@
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
-    _model = [[PLModel alloc] initWithOutlineView:_outlineView playlist:p_playlist rootItem:p_playlist->p_playing playlistObject:self];
+    _model = [[PLModel alloc] initWithOutlineView:_outlineView playlist:p_playlist rootItem:p_playlist->p_playing];
     [_outlineView setDataSource:_model];
     [_outlineView reloadData];
 

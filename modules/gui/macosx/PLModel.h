@@ -41,8 +41,6 @@
 #define URI_COLUMN @"uri"
 #define FILESIZE_COLUMN @"file-size"
 
-@class VLCPlaylist;
-
 typedef enum {
     ROOT_TYPE_PLAYLIST,
     ROOT_TYPE_MEDIALIBRARY,
@@ -54,7 +52,7 @@ typedef enum {
 @property(readonly) PLItem *rootItem;
 @property(readonly, copy) NSArray *draggedItems;
 
-- (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root playlistObject:(id)plObj;
+- (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root;
 
 - (void)changeRootItem:(playlist_item_t *)p_root;
 
