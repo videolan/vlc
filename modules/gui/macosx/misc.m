@@ -388,9 +388,9 @@ static bool b_old_spaces_style = YES;
     BOOL b_returned;
 
     if (_dropHandler && [_dropHandler respondsToSelector:@selector(performDragOperation:)])
-        b_returned = [_dropHandler performDragOperation: sender];
+        b_returned = [_dropHandler performDragOperation:sender];
     else // default
-        b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation: sender];
+        b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation:sender];
 
     [self setNeedsDisplay:YES];
     return b_returned;

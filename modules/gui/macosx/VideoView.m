@@ -122,8 +122,7 @@
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
-    BOOL b_returned;
-    b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation: sender];
+    BOOL b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation:sender];
 
     [self setNeedsDisplay:YES];
     return b_returned;
