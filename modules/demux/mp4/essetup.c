@@ -730,9 +730,8 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             {
                 if ( chan_bitmap_mapping[i].i_bitmap & i_bitmap )
                 {
-                    i_channels++;
                     if ( (chan_bitmap_mapping[i].i_vlc & i_vlc_mapping) ||
-                         i_channels > AOUT_CHAN_MAX )
+                         i_channels >= AOUT_CHAN_MAX )
                     {
                         /* double mapping or unsupported number of channels */
                         i_vlc_mapping = 0;
@@ -740,8 +739,9 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                         break;
                     }
                     i_vlc_mapping |= chan_bitmap_mapping[i].i_vlc;
-                    rgi_chans_sequence[i_channels - 1] = chan_bitmap_mapping[i].i_vlc;
+                    rgi_chans_sequence[i_channels] = chan_bitmap_mapping[i].i_vlc;
                 }
+                i_channels++;
             }
             rgi_chans_sequence[i_channels] = 0;
             p_track->b_chans_reorder = !!
