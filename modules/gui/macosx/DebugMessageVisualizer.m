@@ -38,9 +38,8 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 @interface VLCDebugMessageVisualizer () <NSWindowDelegate>
 {
     NSMutableArray * _msg_arr;
-    NSLock * _msg_lock;
 }
-- (void)processReceivedlibvlcMessage:(const vlc_log_t *) item ofType: (int)i_type withStr: (char *)str;
+- (void)appendMessage:(NSMutableAttributedString *) message;
 
 @end
 
@@ -52,13 +51,34 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
         int canc = vlc_savecancel();
         char *str;
-
         if (vasprintf(&str, format, ap) == -1) {
             vlc_restorecancel(canc);
             return;
         }
 
-        [visualizer processReceivedlibvlcMessage: item ofType: type withStr: str];
+        if (!item->psz_module)
+            return;
+        if (!str)
+            return;
+
+        NSColor *_white = [NSColor whiteColor];
+        NSColor *_red = [NSColor redColor];
+        NSColor *_yellow = [NSColor yellowColor];
+        NSColor *_gray = [NSColor grayColor];
+
+        NSColor * pp_color[4] = { _white, _red, _yellow, _gray };
+        static const char * ppsz_type[4] = { ": ", " error: ", " warning: ", " debug: " };
+
+
+        NSString *firstString = [NSString stringWithFormat:@"%s%s", item->psz_module, ppsz_type[type]];
+        NSString *secondString = [NSString stringWithFormat:@"%@%s\n", firstString, str];
+
+        NSDictionary *colorAttrib = [NSDictionary dictionaryWithObject: pp_color[type]  forKey: NSForegroundColorAttributeName];
+        NSMutableAttributedString *coloredMsg = [[NSMutableAttributedString alloc] initWithString: secondString attributes: colorAttrib];
+        colorAttrib = [NSDictionary dictionaryWithObject: pp_color[3] forKey: NSForegroundColorAttributeName];
+        [coloredMsg setAttributes: colorAttrib range: NSMakeRange(0, [firstString length])];
+
+        [visualizer performSelectorOnMainThread:@selector(appendMessage:) withObject:coloredMsg waitUntilDone:NO];
 
         vlc_restorecancel(canc);
         free(str);
@@ -71,7 +91,6 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 {
     self = [super initWithWindowNibName:@"DebugMessageVisualizer"];
     if (self) {
-        _msg_lock = [[NSLock alloc] init];
         _msg_arr = [NSMutableArray arrayWithCapacity:600];
     }
     return self;
@@ -146,63 +165,22 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-    if (aTableView == _msgs_table)
-        return [_msg_arr count];
-    return 0;
+    return [_msg_arr count];
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-    NSMutableAttributedString *result = NULL;
-
-    [_msg_lock lock];
-    if (rowIndex < [_msg_arr count])
-        result = [_msg_arr objectAtIndex:rowIndex];
-    [_msg_lock unlock];
-
-    if (result != NULL)
-        return result;
-    else
-        return @"";
+    return [_msg_arr objectAtIndex:rowIndex];
 }
 
-- (void)processReceivedlibvlcMessage:(const vlc_log_t *) item ofType: (int)i_type withStr: (char *)str
+- (void)appendMessage:(NSMutableAttributedString *) message
 {
-    if (_msg_arr) {
-        NSColor *_white = [NSColor whiteColor];
-        NSColor *_red = [NSColor redColor];
-        NSColor *_yellow = [NSColor yellowColor];
-        NSColor *_gray = [NSColor grayColor];
-        NSString * firstString, * secondString;
-
-        NSColor * pp_color[4] = { _white, _red, _yellow, _gray };
-        static const char * ppsz_type[4] = { ": ", " error: ", " warning: ", " debug: " };
-
-        NSDictionary *_attr;
-        NSMutableAttributedString *_msg_color;
-
-        [_msg_lock lock];
-
-        if ([_msg_arr count] > 10000) {
-            [_msg_arr removeObjectAtIndex: 0];
-            [_msg_arr removeObjectAtIndex: 1];
-        }
-        if (!item->psz_module)
-            return;
-        if (!str)
-            return;
-
-        firstString = [NSString stringWithFormat:@"%s%s", item->psz_module, ppsz_type[i_type]];
-        secondString = [NSString stringWithFormat:@"%@%s\n", firstString, str];
-
-        _attr = [NSDictionary dictionaryWithObject: pp_color[i_type]  forKey: NSForegroundColorAttributeName];
-        _msg_color = [[NSMutableAttributedString alloc] initWithString: secondString attributes: _attr];
-        _attr = [NSDictionary dictionaryWithObject: pp_color[3] forKey: NSForegroundColorAttributeName];
-        [_msg_color setAttributes: _attr range: NSMakeRange(0, [firstString length])];
-        [_msg_arr addObject:_msg_color];
-
-        [_msg_lock unlock];
+    if ([_msg_arr count] > 1000000) {
+        [_msg_arr removeObjectAtIndex: 0];
+        [_msg_arr removeObjectAtIndex: 1];
     }
+
+    [_msg_arr addObject:message];
 }
 
 @end
