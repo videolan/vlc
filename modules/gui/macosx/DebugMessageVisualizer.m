@@ -136,6 +136,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 {
     /* unsubscribe from LibVLCCore's messages */
     vlc_LogSet( VLCIntf->p_libvlc, NULL, NULL );
+    [_messageArray removeAllObjects];
 }
 
 - (IBAction)saveDebugLog:(id)sender
