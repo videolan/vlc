@@ -1003,7 +1003,7 @@ static bool hevc_get_picture_CtbsYsize( const hevc_sequence_parameter_set_t *p_s
 {
     const unsigned int MinCbLog2SizeY = p_sps->log2_min_luma_coding_block_size_minus3 + 3;
     const unsigned int CtbLog2SizeY = MinCbLog2SizeY + p_sps->log2_diff_max_min_luma_coding_block_size;
-    if( CtbLog2SizeY > 32 )
+    if( CtbLog2SizeY > 31 )
         return false;
     const unsigned int CtbSizeY = 1 << CtbLog2SizeY;
     *p_w = (p_sps->pic_width_in_luma_samples - 1) / CtbSizeY + 1;

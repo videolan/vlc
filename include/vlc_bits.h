@@ -234,7 +234,7 @@ static inline uint32_t bs_read_ue( bs_t * bs )
 {
     int32_t i = 0;
 
-    while( bs_read1( bs ) == 0 && bs->p < bs->p_end && i < 32 )
+    while( bs_read1( bs ) == 0 && bs->p < bs->p_end && i < 31 )
         i++;
 
     return (1 << i) - 1 + bs_read( bs, i );
