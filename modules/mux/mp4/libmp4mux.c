@@ -1192,6 +1192,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     {
         bo_free(stsd);
         bo_free(stco);
+        bo_free(stsc);
         return NULL;
     }
     bo_add_32be(stts, 0);     // entry-count (fixed latter)
@@ -1299,6 +1300,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         bo_free(stts);
         bo_free(stsz);
         bo_free(stss);
+        bo_free(ctts);
         return NULL;
     }
     box_gather(stbl, stsd);
@@ -1689,7 +1691,7 @@ bo_t * GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, unsigned 
                 /* append dinf to mdia */
                 box_gather(minf, dinf);
             }
-            else bo_free(dinf);
+            else bo_free(dref);
         }
 
         /* add stbl */
