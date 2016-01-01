@@ -56,9 +56,9 @@ static void read_head( demux_t* p_demux, input_item_t* p_input )
                 psz_attr = xml_ReaderNextAttr( p_sys->p_reader, &psz_val );
                 if ( !psz_attr || !psz_val )
                     break;
-                if ( !strcasecmp( psz_attr, "name" ) )
+                if ( !strcasecmp( psz_attr, "name" ) && !psz_attribute_name )
                     psz_attribute_name = strdup( psz_val );
-                else if ( !strcasecmp( psz_attr, "content" ) )
+                else if ( !strcasecmp( psz_attr, "content" ) && !psz_attribute_value )
                     psz_attribute_value = strdup( psz_val );
             }
             if ( psz_attribute_name && psz_attribute_value )
