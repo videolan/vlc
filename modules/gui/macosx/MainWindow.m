@@ -1197,28 +1197,7 @@ static const float f_min_window_height = 307.;
     else
         p_node = p_playlist->p_media_library;
 
-    if ([[o_pasteboard types] containsObject: NSFilenamesPboardType]) {
-        NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
-        NSUInteger count = [o_values count];
-        NSMutableArray *o_array = [NSMutableArray arrayWithCapacity:count];
-
-        for(NSUInteger i = 0; i < count; i++) {
-            NSDictionary *o_dic;
-            char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], NULL);
-            if (!psz_uri)
-                continue;
-
-            o_dic = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
-
-            free(psz_uri);
-
-            [o_array addObject: o_dic];
-        }
-
-        [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_array withParentItemId:p_node->i_id atPos:-1 startPlayback:NO];
-        return YES;
-    }
-    else if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"]) {
+    if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"]) {
         NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];
 
         NSUInteger count = [array count];
@@ -1233,7 +1212,17 @@ static const float f_min_window_height = 307.;
 
         return YES;
     }
-    return NO;
+
+    // check if dropped item is a file
+    NSArray *items = [[[VLCMain sharedInstance] playlist] createItemsFromExternalPasteboard:o_pasteboard];
+    if (items.count == 0)
+        return NO;
+
+    [[[VLCMain sharedInstance] playlist] addPlaylistItems:items
+                                         withParentItemId:p_node->i_id
+                                                    atPos:-1
+                                            startPlayback:NO];
+    return YES;
 }
 
 - (id)sourceList:(PXSourceList *)aSourceList persistentObjectForItem:(id)item

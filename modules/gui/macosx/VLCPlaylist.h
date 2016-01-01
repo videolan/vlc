@@ -74,6 +74,14 @@
 - (NSArray *)draggedItems;
 
 /**
+ * Prepares an array of playlist items for all suitable pasteboard types.
+ *
+ * This function checks external pasteboard objects (like files). If suitable,
+ * an array of all objects is prepared.
+ */
+- (NSArray *)createItemsFromExternalPasteboard:(NSPasteboard *)pasteboard;
+
+/**
  * Simplified version to add new items at the end of the current playlist
  */
 - (void)addPlaylistItems:(NSArray*)o_array;

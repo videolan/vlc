@@ -628,48 +628,36 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
 }
 
-#pragma mark - drag and drop support for VLCVoutView, VLCDragDropView and VLCThreePartDropView
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+#pragma mark - Drop support for files into the video, controls bar or drop box
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 {
-    NSPasteboard *o_paste = [sender draggingPasteboard];
-    NSArray *o_types = [NSArray arrayWithObject:NSFilenamesPboardType];
-    NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
-    NSData *o_carried_data = [o_paste dataForType:o_desired_type];
+    NSArray *items = [[[VLCMain sharedInstance] playlist] createItemsFromExternalPasteboard:[sender draggingPasteboard]];
 
-    if (o_carried_data) {
-        if ([o_desired_type isEqualToString:NSFilenamesPboardType]) {
-            NSArray *o_array = [NSArray array];
-            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-            NSUInteger count = [o_values count];
+    if (items.count == 0)
+        return NO;
 
-            input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    // Try to add file as a subtitle
+    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    if (items.count == 1 && p_input) {
+        NSString *url = [[items firstObject] valueForKey:@"ITEM_URL"];
+        char *path = vlc_uri2path([url UTF8String]);
 
-            if (count == 1 && p_input) {
-                int i_result = input_AddSubtitleOSD(p_input, [[o_values firstObject] UTF8String], true, true);
+        if (path) {
+            int i_result = input_AddSubtitleOSD(p_input, path, true, true);
+            free(path);
+            if (i_result == VLC_SUCCESS) {
                 vlc_object_release(p_input);
-                if (i_result == VLC_SUCCESS)
-                    return YES;
+                return YES;
             }
-            else if (p_input)
-                vlc_object_release(p_input);
-
-            for (NSUInteger i = 0; i < count; i++) {
-                NSDictionary *o_dic;
-                char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], NULL);
-                if (!psz_uri)
-                    continue;
-
-                o_dic = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
-                free(psz_uri);
-
-                o_array = [o_array arrayByAddingObject: o_dic];
-            }
-
-            [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_array];
-            return YES;
         }
     }
-    return NO;
+
+    if (p_input)
+        vlc_object_release(p_input);
+
+    [[[VLCMain sharedInstance] playlist] addPlaylistItems:items];
+    return YES;
 }
 
 #pragma mark - video output stuff

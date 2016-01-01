@@ -497,6 +497,30 @@
     return p_input;
 }
 
+- (NSArray *)createItemsFromExternalPasteboard:(NSPasteboard *)pasteboard
+{
+    NSArray *o_array = [NSArray array];
+    if (![[pasteboard types] containsObject: NSFilenamesPboardType])
+        return o_array;
+
+    NSArray *o_values = [[pasteboard propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    NSUInteger count = [o_values count];
+
+    for (NSUInteger i = 0; i < count; i++) {
+        NSDictionary *o_dic;
+        char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], NULL);
+        if (!psz_uri)
+            continue;
+
+        o_dic = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
+        free(psz_uri);
+
+        o_array = [o_array arrayByAddingObject: o_dic];
+    }
+
+    return o_array;
+}
+
 - (void)addPlaylistItems:(NSArray*)array
 {
 

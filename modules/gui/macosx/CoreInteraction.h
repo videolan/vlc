@@ -71,6 +71,7 @@
 - (void)stopListeningWithAppleRemote;
 
 - (void)addSubtitlesToCurrentInput:(NSArray *)paths;
+
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 
 - (void)toggleFullscreen;
