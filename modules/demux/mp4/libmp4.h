@@ -1483,7 +1483,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_binary_t *p_binary;
     MP4_Box_data_data_t *p_data;
 
-    void                *p_payload; /* for unknow type */
+    void                *p_payload; /* for unknown type */
 } MP4_Box_data_t;
 
 #define BOXDATA(type) type->data.type

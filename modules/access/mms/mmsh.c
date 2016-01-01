@@ -656,7 +656,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
                 }
                 else
                 {
-                    msg_Warn( p_access, "unknow stream types (%s)", p );
+                    msg_Warn( p_access, "unknown stream types (%s)", p );
                     p_sys->b_broadcast = false;
                 }
             }

@@ -1314,7 +1314,7 @@ static int HeaderRead( demux_t *p_demux )
             i_ret = HeaderDATA( p_demux, i_size );
             break;
         default:
-            /* unknow header */
+            /* unknown header */
             msg_Dbg( p_demux, "unknown chunk" );
             i_ret = VLC_SUCCESS;
             break;

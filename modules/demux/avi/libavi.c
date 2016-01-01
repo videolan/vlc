@@ -652,7 +652,7 @@ static int AVI_ChunkRead_indx( stream_t *s, avi_chunk_t *p_chk )
     }
     else
     {
-        msg_Warn( (vlc_object_t*)s, "unknow type/subtype index" );
+        msg_Warn( (vlc_object_t*)s, "unknown type/subtype index" );
     }
 
 #ifdef AVI_DEBUG

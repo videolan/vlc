@@ -108,7 +108,7 @@ static const char * GetErrorMessage( const int i_error,
             return p_errors_messages[i].psz_error;
         i++;
     }
-    return "unkown error";
+    return "unknown error";
 }
 
 static size_t RemainRead( stream_t *p_stream, uint8_t *p_data, size_t i_toread )
