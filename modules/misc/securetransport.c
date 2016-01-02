@@ -402,6 +402,7 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
             return 0;
 
         case errSSLServerAuthCompleted:
+            msg_Warn(crd, "handshake completed, retrying");
             return st_Handshake(crd, session, host, service, alp);
 
         case errSSLConnectionRefused:
@@ -480,6 +481,9 @@ static ssize_t st_Recv (vlc_tls_t *session, void *buf, size_t length)
 {
     vlc_tls_sys_t *sys = session->sys;
 
+    if (sys == NULL || buf == NULL)
+        return 0;
+
     size_t actualSize;
     OSStatus ret = SSLRead(sys->p_context, buf, length, &actualSize);
 
@@ -498,19 +502,31 @@ static ssize_t st_Recv (vlc_tls_t *session, void *buf, size_t length)
 /**
  * Closes a TLS session.
  */
+
+static int st_SessionShutdown (vlc_tls_t *session, bool duplex) {
+
+    vlc_tls_sys_t *sys = session->sys;
+    OSStatus ret = noErr;
+    VLC_UNUSED(duplex);
+
+    if (sys->b_handshaked) {
+        ret = SSLClose(sys->p_context);
+    }
+
+    if (ret != noErr || ret != errSSLClosedGraceful) {
+        msg_Warn(session->obj, "Cannot close ssl context (%i)", (int)ret);
+        return ret;
+    }
+
+    return 0;
+}
+
 static void st_SessionClose (vlc_tls_t *session) {
 
     vlc_tls_sys_t *sys = session->sys;
     msg_Dbg(session->obj, "close TLS session");
 
     if (sys->p_context) {
-        if (sys->b_handshaked) {
-            OSStatus ret = SSLClose(sys->p_context);
-            if (ret != noErr) {
-                msg_Warn(session->obj, "Cannot close ssl context");
-            }
-        }
-
 #if TARGET_OS_IPHONE
         CFRelease(sys->p_context);
 #else
@@ -543,6 +559,7 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
     session->sys = sys;
     session->send = st_Send;
     session->recv = st_Recv;
+    session->shutdown = st_SessionShutdown;
     session->close = st_SessionClose;
     crd->handshake = st_Handshake;
 
