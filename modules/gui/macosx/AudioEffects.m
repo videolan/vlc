@@ -194,7 +194,7 @@
 #pragma mark generic code
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (self.window && [self.window isVisible] && [self.window level] != i_level)
+    if (self.isWindowLoaded && [self.window isVisible] && [self.window level] != i_level)
         [self.window setLevel: i_level];
 }
 
