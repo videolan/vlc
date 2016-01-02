@@ -34,7 +34,6 @@
 
     input_item_t *p_item;
 
-    BOOL b_awakeFromNib;
     BOOL b_stats;
 }
 @end
@@ -106,8 +105,6 @@
 
     [self.window setInitialFirstResponder: _uriLabel];
 
-    b_awakeFromNib = YES;
-
     b_stats = var_InheritBool(VLCIntf, "stats");
     if (!b_stats) {
         if ([_tabView numberOfTabViewItems] > 2)
@@ -131,7 +128,7 @@
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (self.window && [self.window isVisible] && [self.window level] != i_level)
+    if (self.isWindowLoaded && [self.window isVisible] && [self.window level] != i_level)
         [self.window setLevel: i_level];
 }
 
@@ -184,6 +181,9 @@
             vlc_gc_incref(_p_item);
         p_item = _p_item;
     }
+
+    if (!self.isWindowLoaded)
+        return;
 
     if (!p_item) {
         /* Erase */
@@ -262,46 +262,47 @@ FREENULL( psz_##foo );
 
 - (void)updateStatistics
 {
-    if (!b_awakeFromNib || !b_stats)
+    if (!self.isWindowLoaded || !b_stats)
         return;
 
-    if ([self.window isVisible]) {
-        if (!p_item || !p_item->p_stats) {
-            [self initMediaPanelStats];
-            return;
-        }
-
-        vlc_mutex_lock(&p_item->p_stats->lock);
-
-        /* input */
-        [_readBytesTextField setStringValue: [NSString stringWithFormat:
-            @"%8.0f KiB", (float)(p_item->p_stats->i_read_bytes)/1024]];
-        [_inputBitrateTextField setStringValue: [NSString stringWithFormat:
-            @"%6.0f kb/s", (float)(p_item->p_stats->f_input_bitrate)*8000]];
-        [_demuxBytesTextField setStringValue: [NSString stringWithFormat:
-            @"%8.0f KiB", (float)(p_item->p_stats->i_demux_read_bytes)/1024]];
-        [_demuxBitrateTextField setStringValue: [NSString stringWithFormat:
-            @"%6.0f kb/s", (float)(p_item->p_stats->f_demux_bitrate)*8000]];
-
-        /* Video */
-        [_videoDecodedTextField setIntValue: p_item->p_stats->i_decoded_video];
-        [_displayedTextField setIntValue: p_item->p_stats->i_displayed_pictures];
-        [_lostFramesTextField setIntValue: p_item->p_stats->i_lost_pictures];
-
-        /* Sout */
-        [_sentPacketsTextField setIntValue: p_item->p_stats->i_sent_packets];
-        [_sentBytesTextField setStringValue: [NSString stringWithFormat: @"%8.0f KiB",
-            (float)(p_item->p_stats->i_sent_bytes)/1024]];
-        [_sentBitrateTextField setStringValue: [NSString stringWithFormat:
-            @"%6.0f kb/s", (float)(p_item->p_stats->f_send_bitrate*8)*1000]];
-
-        /* Audio */
-        [_audioDecodedTextField setIntValue: p_item->p_stats->i_decoded_audio];
-        [_playedAudioBuffersTextField setIntValue: p_item->p_stats->i_played_abuffers];
-        [_lostAudioBuffersTextField setIntValue: p_item->p_stats->i_lost_abuffers];
-
-        vlc_mutex_unlock(&p_item->p_stats->lock);
+    if (!p_item || !p_item->p_stats) {
+        [self initMediaPanelStats];
+        return;
     }
+
+    if (![self.window isVisible])
+        return;
+
+    vlc_mutex_lock(&p_item->p_stats->lock);
+
+    /* input */
+    [_readBytesTextField setStringValue: [NSString stringWithFormat:
+                                          @"%8.0f KiB", (float)(p_item->p_stats->i_read_bytes)/1024]];
+    [_inputBitrateTextField setStringValue: [NSString stringWithFormat:
+                                             @"%6.0f kb/s", (float)(p_item->p_stats->f_input_bitrate)*8000]];
+    [_demuxBytesTextField setStringValue: [NSString stringWithFormat:
+                                           @"%8.0f KiB", (float)(p_item->p_stats->i_demux_read_bytes)/1024]];
+    [_demuxBitrateTextField setStringValue: [NSString stringWithFormat:
+                                             @"%6.0f kb/s", (float)(p_item->p_stats->f_demux_bitrate)*8000]];
+
+    /* Video */
+    [_videoDecodedTextField setIntValue: p_item->p_stats->i_decoded_video];
+    [_displayedTextField setIntValue: p_item->p_stats->i_displayed_pictures];
+    [_lostFramesTextField setIntValue: p_item->p_stats->i_lost_pictures];
+
+    /* Sout */
+    [_sentPacketsTextField setIntValue: p_item->p_stats->i_sent_packets];
+    [_sentBytesTextField setStringValue: [NSString stringWithFormat: @"%8.0f KiB",
+                                          (float)(p_item->p_stats->i_sent_bytes)/1024]];
+    [_sentBitrateTextField setStringValue: [NSString stringWithFormat:
+                                            @"%6.0f kb/s", (float)(p_item->p_stats->f_send_bitrate*8)*1000]];
+
+    /* Audio */
+    [_audioDecodedTextField setIntValue: p_item->p_stats->i_decoded_audio];
+    [_playedAudioBuffersTextField setIntValue: p_item->p_stats->i_played_abuffers];
+    [_lostAudioBuffersTextField setIntValue: p_item->p_stats->i_lost_abuffers];
+
+    vlc_mutex_unlock(&p_item->p_stats->lock);
 }
 
 - (void)updateStreamsList
