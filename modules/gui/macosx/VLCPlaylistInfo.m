@@ -132,11 +132,14 @@
         [self.window setLevel: i_level];
 }
 
-- (void)showPanel
+- (IBAction)toggleWindow:(id)sender
 {
-    NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel];
-    [self.window setLevel: i_level];
-    [self.window makeKeyAndOrderFront:nil];
+    if ([self.window isKeyWindow])
+        [self.window orderOut:sender];
+    else {
+        [self.window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+        [self.window makeKeyAndOrderFront:sender];
+    }
 }
 
 - (void)initMediaPanelStats

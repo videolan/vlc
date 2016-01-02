@@ -95,7 +95,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedTextField;
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
-- (void)showPanel;
+- (IBAction)toggleWindow:(id)sender;
 
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
