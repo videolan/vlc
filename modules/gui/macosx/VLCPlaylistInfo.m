@@ -28,7 +28,7 @@
 #import "VLCPlaylist.h"
 #import <vlc_url.h>
 
-@interface VLCInfo () <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@interface VLCInfo () <NSOutlineViewDataSource>
 {
     VLCInfoTreeItem *rootItem;
 
@@ -59,7 +59,6 @@
     [self.window setTitle: _NS("Media Information")];
 
     _outlineView.dataSource = self;
-    _outlineView.delegate = self;
 
     [_uriLabel setStringValue: _NS("Location")];
     [_titleLabel setStringValue: _NS("Title")];
@@ -191,7 +190,7 @@
         if (!p_item) {
             /* Erase */
         #define SET( foo ) \
-            [self setMeta: "" forLabel: _##foo##TextField];
+            [_##foo##TextField setStringValue:@""];
             SET( uri );
             SET( title );
             SET( author );
@@ -225,7 +224,7 @@
 
         #define SET( foo, bar ) \
             char *psz_##foo = input_item_Get##bar ( p_item ); \
-            [self setMeta: psz_##foo forLabel: _##foo##TextField]; \
+            [_##foo##TextField setStringValue:toNSStr(psz_##foo)]; \
             FREENULL( psz_##foo );
 
             /* fill the other fields */
@@ -262,14 +261,6 @@
         /* update the stats once to display p_item change faster */
         [self updateStatistics];
     }
-}
-
-- (void)setMeta: (char *)psz_meta forLabel: (id)theItem
-{
-    if (psz_meta != NULL && *psz_meta)
-        [theItem setStringValue: toNSStr(psz_meta)];
-    else
-        [theItem setStringValue: @""];
 }
 
 - (void)updateStatistics
@@ -399,26 +390,8 @@ error:
     if (p_item) libvlc_ArtRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
 }
 
-- (input_item_t *)item
-{
-    if (p_item) vlc_gc_incref(p_item);
-    return p_item;
-}
-
 @end
 
-@implementation VLCInfo (NSMenuValidation)
-
-- (BOOL)validateMenuItem:(NSMenuItem *)mi
-{
-    if ([[mi title] isEqualToString: _NS("Information")]) {
-        return ![[[VLCMain sharedInstance] playlist] isSelectionEmpty];
-    }
-
-    return TRUE;
-}
-
-@end
 
 @implementation VLCInfo (NSTableDataSource)
 

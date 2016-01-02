@@ -27,7 +27,7 @@
  *****************************************************************************/
 
 
-@interface VLCInfo : NSWindowController<NSOutlineViewDataSource>
+@interface VLCInfo : NSWindowController
 
 @property (readonly) input_item_t *item;
 
@@ -100,9 +100,9 @@
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
 - (IBAction)downloadCoverArt:(id)sender;
-- (void)initMediaPanelStats;
+
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
-- (void)setMeta:(char *)meta forLabel:(id)theItem;
+
 - (void)updateMetadata;
 - (void)updateStatistics;
 
