@@ -394,7 +394,7 @@
 
 - (IBAction)showInfoPanel:(id)sender
 {
-    [[VLCInfo sharedInstance] initPanel];
+    [[[VLCMain sharedInstance] currentMediaInfoPanel] showPanel];
 }
 
 - (IBAction)deleteItem:(id)sender

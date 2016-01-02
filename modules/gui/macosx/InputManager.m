@@ -74,7 +74,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                 break;
             case INPUT_EVENT_STATISTICS:
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [[VLCInfo sharedInstance] updateStatistics];
+                    [[[VLCMain sharedInstance] currentMediaInfoPanel] updateStatistics];
                 });
                 break;
             case INPUT_EVENT_ES:
@@ -397,14 +397,14 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (void)updateMetaAndInfo
 {
     if (!p_current_input) {
-        [[VLCInfo sharedInstance] updatePanelWithItem:nil];
+        [[[VLCMain sharedInstance] currentMediaInfoPanel] updatePanelWithItem:nil];
         return;
     }
 
     input_item_t *p_input_item = input_GetItem(p_current_input);
 
     [[[o_main playlist] model] updateItem:p_input_item];
-    [[VLCInfo sharedInstance] updatePanelWithItem:p_input_item];
+    [[[VLCMain sharedInstance] currentMediaInfoPanel] updatePanelWithItem:p_input_item];
 }
 
 - (void)updateMainWindow

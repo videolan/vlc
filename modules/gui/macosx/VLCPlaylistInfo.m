@@ -34,7 +34,6 @@
 
     input_item_t *p_item;
 
-    BOOL b_nibLoaded;
     BOOL b_awakeFromNib;
     BOOL b_stats;
 }
@@ -42,24 +41,22 @@
 
 @implementation VLCInfo
 
-+ (VLCInfo *)sharedInstance
+- (id)init
 {
-    static VLCInfo *sharedInstance = nil;
-    static dispatch_once_t pred;
+    self = [super initWithWindowNibName:@"MediaInfo"];
+    if (self) {
 
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCInfo new];
-    });
+    }
 
-    return sharedInstance;
+    return self;
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
-    [_infoPanel setExcludedFromWindowsMenu: YES];
-    [_infoPanel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [self.window setExcludedFromWindowsMenu: YES];
+    [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    [_infoPanel setTitle: _NS("Media Information")];
+    [self.window setTitle: _NS("Media Information")];
 
     _outlineView.dataSource = self;
     _outlineView.delegate = self;
@@ -108,9 +105,18 @@
     [_playedAudioBuffersLabel setStringValue: _NS("Played buffers")];
     [_lostAudioBuffersLabel setStringValue: _NS("Lost buffers")];
 
-    [_infoPanel setInitialFirstResponder: _uriLabel];
+    [self.window setInitialFirstResponder: _uriLabel];
 
     b_awakeFromNib = YES;
+
+    b_stats = var_InheritBool(VLCIntf, "stats");
+    if (!b_stats) {
+        if ([_tabView numberOfTabViewItems] > 2)
+            [_tabView removeTabViewItem: [_tabView tabViewItemAtIndex: 2]];
+    }
+    else
+        [self initMediaPanelStats];
+
 
     /* We may be awoken from nib way after initialisation
      *Update ourselves */
@@ -126,26 +132,15 @@
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (_infoPanel && [_infoPanel isVisible] && [_infoPanel level] != i_level)
-        [_infoPanel setLevel: i_level];
+    if (self.window && [self.window isVisible] && [self.window level] != i_level)
+        [self.window setLevel: i_level];
 }
 
-- (void)initPanel
+- (void)showPanel
 {
-    if (!b_nibLoaded)
-        b_nibLoaded = [NSBundle loadNibNamed:@"MediaInfo" owner: self];
-
-    b_stats = var_InheritBool(VLCIntf, "stats");
-    if (!b_stats) {
-        if ([_tabView numberOfTabViewItems] > 2)
-            [_tabView removeTabViewItem: [_tabView tabViewItemAtIndex: 2]];
-    }
-    else
-        [self initMediaPanelStats];
-
     NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel];
-    [_infoPanel setLevel: i_level];
-    [_infoPanel makeKeyAndOrderFront:nil];
+    [self.window setLevel: i_level];
+    [self.window makeKeyAndOrderFront:nil];
 }
 
 - (void)initMediaPanelStats
@@ -183,7 +178,6 @@
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
 {
     @autoreleasepool {
-        rootItem = [[VLCInfoTreeItem alloc] init];
 
         if (_p_item != p_item) {
             if (p_item)
@@ -193,6 +187,8 @@
                 vlc_gc_incref(_p_item);
             p_item = _p_item;
         }
+
+        rootItem = [[VLCInfoTreeItem alloc] initWithInputItem:p_item];
 
         if (!p_item) {
             /* Erase */
@@ -263,7 +259,7 @@
         }
 
         /* reload the advanced table */
-        [rootItem refresh];
+        [rootItem refreshWithItem:p_item];
         [_outlineView reloadData];
         [_outlineView expandItem:nil expandChildren:YES];
 
@@ -285,7 +281,7 @@
     if (!b_awakeFromNib || !b_stats)
         return;
 
-    if ([_infoPanel isVisible]) {
+    if ([self.window isVisible]) {
         if (!p_item || !p_item->p_stats) {
             [self initMediaPanelStats];
             return;
@@ -434,6 +430,7 @@ error:
              value:(NSString *)item_value
                 ID:(int)i_id
             parent:(VLCInfoTreeItem *)parent_item
+         inputItem:(input_item_t*)inputItem
 {
     self = [super init];
 
@@ -442,20 +439,22 @@ error:
         _value = [item_value copy];
         i_object_id = i_id;
         _parent = parent_item;
-        p_item = [[VLCInfo sharedInstance] item];
+        p_item = inputItem;
+        if (p_item)
+            input_item_Hold(p_item);
     }
     return self;
 }
 
-- (id)init
+- (id)initWithInputItem:(input_item_t *)inputItem
 {
-    return [self initWithName:@"main" value:@"" ID:-1 parent:nil];
+    return [self initWithName:@"main" value:@"" ID:-1 parent:nil inputItem:inputItem];
 }
 
 - (void)dealloc
 {
     if (p_item)
-        vlc_gc_decref(p_item);
+        input_item_Release(p_item);
 }
 
 /* Creates and returns the array of children
@@ -477,7 +476,8 @@ error:
                                       initWithName:name
                                       value:@""
                                       ID:i
-                                      parent:self];
+                                      parent:self
+                                     inputItem:p_item];
             [_children addObject:item];
         }
         vlc_mutex_unlock(&p_item->lock);
@@ -493,7 +493,8 @@ error:
                                      initWithName:name
                                      value:value
                                      ID:i
-                                     parent:self];
+                                     parent:self
+                                     inputItem:p_item];
             [_children addObject:item];
         }
         vlc_mutex_unlock(&p_item->lock);
@@ -503,12 +504,14 @@ error:
         _isALeafNode = YES;
 }
 
-- (void)refresh
+- (void)refreshWithItem:(input_item_t *)inputItem;
 {
     if (p_item)
-        vlc_gc_decref(p_item);
+        input_item_Release(p_item);
 
-    p_item = [[VLCInfo sharedInstance] item];
+    p_item = inputItem;
+    if (p_item)
+        input_item_Hold(p_item);
 
     _children = nil;
 }

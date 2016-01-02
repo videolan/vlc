@@ -1357,7 +1357,7 @@
 
 - (IBAction)showInformationPanel:(id)sender
 {
-    [[VLCInfo sharedInstance] initPanel];
+    [[[VLCMain sharedInstance] currentMediaInfoPanel] showPanel];
 }
 
 #pragma mark - convinience stuff for other objects

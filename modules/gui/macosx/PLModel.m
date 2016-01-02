@@ -299,7 +299,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     VLCMain *instance = [VLCMain sharedInstance];
     [[instance mainWindow] updateName];
 
-    [[VLCInfo sharedInstance] updateMetadata];
+    [[instance currentMediaInfoPanel] updateMetadata];
 }
 
 - (void)addItem:(int)i_item withParentNode:(int)i_node

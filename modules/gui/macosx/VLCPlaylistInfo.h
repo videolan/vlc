@@ -28,11 +28,10 @@
 
 @class VLCInfoTreeItem;
 
-@interface VLCInfo : NSObject
+@interface VLCInfo : NSWindowController
 
 @property (readonly) input_item_t *item;
 
-@property (readwrite, weak) IBOutlet NSPanel *infoPanel;
 @property (readwrite, weak) IBOutlet NSOutlineView *outlineView;
 @property (readwrite, weak) IBOutlet NSTabView *tabView;
 
@@ -97,7 +96,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedTextField;
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
-- (void)initPanel;
+- (void)showPanel;
 
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
@@ -108,7 +107,6 @@
 - (void)updateMetadata;
 - (void)updateStatistics;
 
-+ (VLCInfo *)sharedInstance;
 @end
 
 @interface VLCInfoTreeItem : NSObject
@@ -117,7 +115,9 @@
 @property (readonly) NSString *name;
 @property (readonly) NSString *value;
 
+- (id)initWithInputItem:(input_item_t *)inputItem;
+
 - (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index;
-- (void)refresh;
+- (void)refreshWithItem:(input_item_t *)inputItem;
 
 @end

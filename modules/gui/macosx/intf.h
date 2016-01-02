@@ -74,6 +74,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCVideoEffects;
 @class VLCConvertAndSave;
 @class ExtensionsManager;
+@class VLCInfo;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 
@@ -101,6 +102,9 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (VLCTrackSynchronization *)trackSyncPanel;
 - (VLCAudioEffects *)audioEffectsPanel;
 - (VLCVideoEffects *)videoEffectsPanel;
+
+- (VLCInfo *)currentMediaInfoPanel;
+
 
 - (VLCConvertAndSave *)convertAndSaveWindow;
 
