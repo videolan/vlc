@@ -1069,8 +1069,9 @@ static int SessionsSetup( demux_t *p_demux )
                        {
                          memcpy( ((char*)tk->fmt.p_extra)+i_extra1+i_extra2, p_extra3, i_extra3 );
                        }
+
+                        delete[] p_extra1; delete[] p_extra2; delete[] p_extra3;
                     }
-                    delete[] p_extra1; delete[] p_extra2; delete[] p_extra3;
                 }
 #endif
                 else if( !strcmp( sub->codecName(), "JPEG" ) )
