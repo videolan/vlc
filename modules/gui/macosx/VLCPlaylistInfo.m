@@ -188,8 +188,6 @@
             p_item = _p_item;
         }
 
-        rootItem = [[VLCInfoTreeItem alloc] initWithInputItem:p_item];
-
         if (!p_item) {
             /* Erase */
         #define SET( foo ) \
@@ -258,10 +256,8 @@
             FREENULL(psz_meta);
         }
 
-        /* reload the advanced table */
-        [rootItem refreshWithItem:p_item];
-        [_outlineView reloadData];
-        [_outlineView expandItem:nil expandChildren:YES];
+        /* reload the codec details table */
+        [self updateStreamsList];
 
         /* update the stats once to display p_item change faster */
         [self updateStatistics];
@@ -318,6 +314,43 @@
 
         vlc_mutex_unlock(&p_item->p_stats->lock);
     }
+}
+
+- (void)updateStreamsList
+{
+    rootItem = [[VLCInfoTreeItem alloc] init];
+
+    if (p_item) {
+        vlc_mutex_lock(&p_item->lock);
+        // build list of streams
+        NSMutableArray *streams = [NSMutableArray array];
+
+        for (int i = 0; i < p_item->i_categories; i++) {
+            info_category_t *cat = p_item->pp_categories[i];
+
+            VLCInfoTreeItem *subItem = [[VLCInfoTreeItem alloc] init];
+            subItem.name = toNSStr(cat->psz_name);
+
+            // Build list of codec details
+            NSMutableArray *infos = [NSMutableArray array];
+
+            for (int j = 0; j < cat->i_infos; j++) {
+                VLCInfoTreeItem *infoItem = [[VLCInfoTreeItem alloc] init];
+                infoItem.name = toNSStr(cat->pp_infos[j]->psz_name);
+                infoItem.value = toNSStr(cat->pp_infos[j]->psz_value);
+                [infos addObject:infoItem];
+            }
+
+            subItem.children = [infos copy];
+            [streams addObject:subItem];
+        }
+
+        rootItem.children = [streams copy];
+        vlc_mutex_unlock(&p_item->lock);
+    }
+
+    [_outlineView reloadData];
+    [_outlineView expandItem:nil expandChildren:YES];
 }
 
 - (IBAction)metaFieldChanged:(id)sender
@@ -391,144 +424,32 @@ error:
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
-    return (item == nil) ? [rootItem numberOfChildren] : [item numberOfChildren];
+    return (item == nil) ? [rootItem children].count : [item children].count;
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item {
-    return ([item numberOfChildren] > 0);
+    return ([item children].count > 0);
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-    return (item == nil) ? [rootItem childAtIndex:index] : (id)[item childAtIndex:index];
+    return (item == nil) ? [[rootItem children] objectAtIndex:index] : [[item children]objectAtIndex:index];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
+    if (!item)
+        return @"";
+
     if ([[tableColumn identifier] isEqualToString:@"0"])
-        return (item == nil) ? @"" : (id)[item name];
+        return [item name];
     else
-        return (item == nil) ? @"" : (id)[item value];
+        return [item value];
 }
 
 @end
 
-@interface VLCInfoTreeItem ()
-{
-    int i_object_id;
-    input_item_t *p_item;
-    VLCInfoTreeItem *_parent;
-    NSMutableArray *_children;
-    BOOL _isALeafNode;
-}
-
-@end
 
 @implementation VLCInfoTreeItem
-
-- (id)initWithName:(NSString *)item_name
-             value:(NSString *)item_value
-                ID:(int)i_id
-            parent:(VLCInfoTreeItem *)parent_item
-         inputItem:(input_item_t*)inputItem
-{
-    self = [super init];
-
-    if (self != nil) {
-        _name = [item_name copy];
-        _value = [item_value copy];
-        i_object_id = i_id;
-        _parent = parent_item;
-        p_item = inputItem;
-        if (p_item)
-            input_item_Hold(p_item);
-    }
-    return self;
-}
-
-- (id)initWithInputItem:(input_item_t *)inputItem
-{
-    return [self initWithName:@"main" value:@"" ID:-1 parent:nil inputItem:inputItem];
-}
-
-- (void)dealloc
-{
-    if (p_item)
-        input_item_Release(p_item);
-}
-
-/* Creates and returns the array of children
- *Loads children incrementally */
-- (void)_updateChildren
-{
-    if (!p_item)
-        return;
-
-    if (_children != nil)
-        return;
-
-    _children = [[NSMutableArray alloc] init];
-    if (i_object_id == -1) {
-        vlc_mutex_lock(&p_item->lock);
-        for (int i = 0 ; i < p_item->i_categories ; i++) {
-            NSString *name = toNSStr(p_item->pp_categories[i]->psz_name);
-            VLCInfoTreeItem *item = [[VLCInfoTreeItem alloc]
-                                      initWithName:name
-                                      value:@""
-                                      ID:i
-                                      parent:self
-                                     inputItem:p_item];
-            [_children addObject:item];
-        }
-        vlc_mutex_unlock(&p_item->lock);
-        _isALeafNode = NO;
-    }
-    else if (_parent->i_object_id == -1) {
-        vlc_mutex_lock(&p_item->lock);
-        info_category_t *cat = p_item->pp_categories[i_object_id];
-        for (int i = 0 ; i < cat->i_infos ; i++) {
-            NSString *name = toNSStr(cat->pp_infos[i]->psz_name);
-            NSString *value  = toNSStr(cat->pp_infos[i]->psz_value);
-            VLCInfoTreeItem *item = [[VLCInfoTreeItem alloc]
-                                     initWithName:name
-                                     value:value
-                                     ID:i
-                                     parent:self
-                                     inputItem:p_item];
-            [_children addObject:item];
-        }
-        vlc_mutex_unlock(&p_item->lock);
-        _isALeafNode = NO;
-    }
-    else
-        _isALeafNode = YES;
-}
-
-- (void)refreshWithItem:(input_item_t *)inputItem;
-{
-    if (p_item)
-        input_item_Release(p_item);
-
-    p_item = inputItem;
-    if (p_item)
-        input_item_Hold(p_item);
-
-    _children = nil;
-}
-
-- (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index
-{
-    return [_children objectAtIndex:i_index];
-}
-
-- (int)numberOfChildren
-{
-    [self _updateChildren];
-
-    if (_isALeafNode)
-        return -1;
-
-    return [_children count];
-}
 
 @end

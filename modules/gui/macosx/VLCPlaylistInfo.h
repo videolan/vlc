@@ -26,9 +26,8 @@
  * VLCPlaylistInfo interface
  *****************************************************************************/
 
-@class VLCInfoTreeItem;
 
-@interface VLCInfo : NSWindowController
+@interface VLCInfo : NSWindowController<NSOutlineViewDataSource>
 
 @property (readonly) input_item_t *item;
 
@@ -109,15 +108,14 @@
 
 @end
 
+/**
+ * Holds information for one element in the codec information panel
+ */
 @interface VLCInfoTreeItem : NSObject
 
-@property (readonly) int numberOfChildren;
-@property (readonly) NSString *name;
-@property (readonly) NSString *value;
+@property (readwrite) NSString *name;
+@property (readwrite) NSString *value;
 
-- (id)initWithInputItem:(input_item_t *)inputItem;
-
-- (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index;
-- (void)refreshWithItem:(input_item_t *)inputItem;
+@property (readwrite) NSArray *children;
 
 @end
