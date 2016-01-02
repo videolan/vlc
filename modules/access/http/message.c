@@ -735,7 +735,6 @@ int vlc_http_msg_add_atime(struct vlc_http_msg *m)
 static time_t vlc_http_mktime(const char *str)
 {   /* IETF RFC7231 §7.1.1.1 */
     struct tm tm;
-    tm.tm_isdst = -1;
     char mon[4];
 
     /* Internet Message Format date */
