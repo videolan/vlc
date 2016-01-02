@@ -874,7 +874,7 @@ static void ImportMarks( access_t *p_access )
     }
 
     /* add a chapter at the beginning if missing */
-    if( p_marks->i_seekpoint > 0 && offsetv && offsetv[0] > 0 )
+    if( p_marks->i_seekpoint > 0 && offsetv[0] > 0 )
     {
         seekpoint_t *sp = vlc_seekpoint_New();
         if( sp )
