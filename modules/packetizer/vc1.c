@@ -39,6 +39,7 @@
 #include <vlc_block_helper.h>
 #include "../codec/cc.h"
 #include "packetizer_helper.h"
+#include "startcode_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -155,7 +156,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     packetizer_Init( &p_sys->packetizer,
-                     p_vc1_startcode, sizeof(p_vc1_startcode), NULL,
+                     p_vc1_startcode, sizeof(p_vc1_startcode), startcode_FindAnnexB,
                      NULL, 0, 4,
                      PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 

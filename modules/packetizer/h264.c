@@ -45,6 +45,7 @@
 #include "hxxx_nal.h"
 #include "hxxx_common.h"
 #include "packetizer_helper.h"
+#include "startcode_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -195,7 +196,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     packetizer_Init( &p_sys->packetizer,
-                     p_h264_startcode, sizeof(p_h264_startcode), NULL,
+                     p_h264_startcode, sizeof(p_h264_startcode), startcode_FindAnnexB,
                      p_h264_startcode, 1, 5,
                      PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 

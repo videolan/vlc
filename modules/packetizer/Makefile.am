@@ -26,7 +26,7 @@ libpacketizer_avparser_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AVUTIL_CFLAGS) $(A
 libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM)
 
 
-noinst_HEADERS += packetizer/packetizer_helper.h
+noinst_HEADERS += packetizer/packetizer_helper.h packetizer/startcode_helper.h
 
 packetizer_LTLIBRARIES = \
 	libpacketizer_mpegvideo_plugin.la \

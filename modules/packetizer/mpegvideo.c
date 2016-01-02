@@ -53,6 +53,7 @@
 #include <vlc_block_helper.h>
 #include "../codec/cc.h"
 #include "packetizer_helper.h"
+#include "startcode_helper.h"
 
 #define SYNC_INTRAFRAME_TEXT N_("Sync on Intra Frame")
 #define SYNC_INTRAFRAME_LONGTEXT N_("Normally the packetizer would " \
@@ -168,7 +169,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Misc init */
     packetizer_Init( &p_sys->packetizer,
-                     p_mp2v_startcode, sizeof(p_mp2v_startcode), NULL,
+                     p_mp2v_startcode, sizeof(p_mp2v_startcode), startcode_FindAnnexB,
                      NULL, 0, 4,
                      PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 

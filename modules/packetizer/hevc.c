@@ -36,6 +36,7 @@
 
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
+#include "startcode_helper.h"
 #include "hevc_nal.h"
 #include "hxxx_nal.h"
 #include "hxxx_common.h"
@@ -100,7 +101,7 @@ static int Open(vlc_object_t *p_this)
     p_sys->pp_frame_last = &p_sys->p_frame;
 
     packetizer_Init(&p_dec->p_sys->packetizer,
-                    p_hevc_startcode, sizeof(p_hevc_startcode), NULL,
+                    p_hevc_startcode, sizeof(p_hevc_startcode), startcode_FindAnnexB,
                     p_hevc_startcode, 1, 5,
                     PacketizeReset, PacketizeParse, PacketizeValidate, p_dec);
 

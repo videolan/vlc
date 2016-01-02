@@ -40,6 +40,7 @@
 #include <vlc_bits.h>
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
+#include "startcode_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -142,7 +143,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Misc init */
     packetizer_Init( &p_sys->packetizer,
-                     p_mp4v_startcode, sizeof(p_mp4v_startcode), NULL,
+                     p_mp4v_startcode, sizeof(p_mp4v_startcode), startcode_FindAnnexB,
                      NULL, 0, 4,
                      PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 
