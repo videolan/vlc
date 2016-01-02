@@ -136,12 +136,6 @@ static int Open(vlc_object_t *this)
         sys->w[i] = fmt_in->i_width  * chroma->p[i].w.num / chroma->p[i].w.den;
         if (sys->w[i] > wmax) wmax = sys->w[i];
         sys->h[i] = fmt_out->i_height * chroma->p[i].h.num / chroma->p[i].h.den;
-
-        if(sys->w[i] <= 0 || sys->h[i] <= 0)
-        {
-            free(sys);
-            return VLC_EGENERIC;
-        }
     }
     cfg->Line = malloc(wmax*sizeof(unsigned int));
     if (!cfg->Line) {
