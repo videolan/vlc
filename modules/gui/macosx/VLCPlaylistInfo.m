@@ -176,91 +176,88 @@
 
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
 {
-    @autoreleasepool {
-
-        if (_p_item != p_item) {
-            if (p_item)
-                vlc_gc_decref(p_item);
-            [_saveMetaDataButton setEnabled: NO];
-            if (_p_item)
-                vlc_gc_incref(_p_item);
-            p_item = _p_item;
-        }
-
-        if (!p_item) {
-            /* Erase */
-        #define SET( foo ) \
-            [_##foo##TextField setStringValue:@""];
-            SET( uri );
-            SET( title );
-            SET( author );
-            SET( collection );
-            SET( seqNum );
-            SET( genre );
-            SET( copyright );
-            SET( publisher );
-            SET( nowPlaying );
-            SET( language );
-            SET( date );
-            SET( description );
-            SET( encodedby );
-        #undef SET
-            [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
-        } else {
-            if (!input_item_IsPreparsed(p_item))
-                libvlc_MetaRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
-
-            /* fill uri info */
-            char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
-            [_uriTextField setStringValue:toNSStr(psz_url)];
-            free(psz_url);
-
-            /* fill title info */
-            char *psz_title = input_item_GetTitle(p_item);
-            if (!psz_title)
-                psz_title = input_item_GetName(p_item);
-            [_titleTextField setStringValue:toNSStr(psz_title)];
-            free(psz_title);
-
-        #define SET( foo, bar ) \
-            char *psz_##foo = input_item_Get##bar ( p_item ); \
-            [_##foo##TextField setStringValue:toNSStr(psz_##foo)]; \
-            FREENULL( psz_##foo );
-
-            /* fill the other fields */
-            SET( author, Artist );
-            SET( collection, Album );
-            SET( seqNum, TrackNum );
-            SET( genre, Genre );
-            SET( copyright, Copyright );
-            SET( publisher, Publisher );
-            SET( nowPlaying, NowPlaying );
-            SET( language, Language );
-            SET( date, Date );
-            SET( description, Description );
-            SET( encodedby, EncodedBy );
-
-        #undef SET
-
-            char *psz_meta;
-            NSImage *image;
-            psz_meta = input_item_GetArtURL(p_item);
-
-            /* FIXME Can also be attachment:// */
-            if (psz_meta && strncmp(psz_meta, "attachment://", 13))
-                image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:toNSStr(psz_meta)]];
-            else
-                image = [NSImage imageNamed: @"noart.png"];
-            [_imageWell setImage: image];
-            FREENULL(psz_meta);
-        }
-
-        /* reload the codec details table */
-        [self updateStreamsList];
-
-        /* update the stats once to display p_item change faster */
-        [self updateStatistics];
+    if (_p_item != p_item) {
+        if (p_item)
+            vlc_gc_decref(p_item);
+        [_saveMetaDataButton setEnabled: NO];
+        if (_p_item)
+            vlc_gc_incref(_p_item);
+        p_item = _p_item;
     }
+
+    if (!p_item) {
+        /* Erase */
+#define SET( foo ) \
+[_##foo##TextField setStringValue:@""];
+        SET( uri );
+        SET( title );
+        SET( author );
+        SET( collection );
+        SET( seqNum );
+        SET( genre );
+        SET( copyright );
+        SET( publisher );
+        SET( nowPlaying );
+        SET( language );
+        SET( date );
+        SET( description );
+        SET( encodedby );
+#undef SET
+        [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
+    } else {
+        if (!input_item_IsPreparsed(p_item))
+            libvlc_MetaRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
+
+        /* fill uri info */
+        char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
+        [_uriTextField setStringValue:toNSStr(psz_url)];
+        free(psz_url);
+
+        /* fill title info */
+        char *psz_title = input_item_GetTitle(p_item);
+        if (!psz_title)
+            psz_title = input_item_GetName(p_item);
+        [_titleTextField setStringValue:toNSStr(psz_title)];
+        free(psz_title);
+
+#define SET( foo, bar ) \
+char *psz_##foo = input_item_Get##bar ( p_item ); \
+[_##foo##TextField setStringValue:toNSStr(psz_##foo)]; \
+FREENULL( psz_##foo );
+
+        /* fill the other fields */
+        SET( author, Artist );
+        SET( collection, Album );
+        SET( seqNum, TrackNum );
+        SET( genre, Genre );
+        SET( copyright, Copyright );
+        SET( publisher, Publisher );
+        SET( nowPlaying, NowPlaying );
+        SET( language, Language );
+        SET( date, Date );
+        SET( description, Description );
+        SET( encodedby, EncodedBy );
+
+#undef SET
+
+        char *psz_meta;
+        NSImage *image;
+        psz_meta = input_item_GetArtURL(p_item);
+
+        /* FIXME Can also be attachment:// */
+        if (psz_meta && strncmp(psz_meta, "attachment://", 13))
+            image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:toNSStr(psz_meta)]];
+        else
+            image = [NSImage imageNamed: @"noart.png"];
+        [_imageWell setImage: image];
+        FREENULL(psz_meta);
+    }
+
+    /* reload the codec details table */
+    [self updateStreamsList];
+
+    /* update the stats once to display p_item change faster */
+    [self updateStatistics];
 }
 
 - (void)updateStatistics
