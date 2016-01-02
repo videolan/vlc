@@ -1055,7 +1055,7 @@ static int OnConfigurationChanged( decoder_t *p_dec, const char *psz_var,
 
     TEST_TIGER_VAR( "kate-tiger-default-font-color" )
     {
-        p_sys->i_tiger_default_font_color = (p_sys->i_tiger_default_font_color & 0xff00000000) | newval.i_int;
+        p_sys->i_tiger_default_font_color = (p_sys->i_tiger_default_font_color & 0xff000000U) | newval.i_int;
         UpdateTigerFontColor( p_dec );
     }
 
@@ -1067,7 +1067,7 @@ static int OnConfigurationChanged( decoder_t *p_dec, const char *psz_var,
 
     TEST_TIGER_VAR( "kate-tiger-default-background-color" )
     {
-        p_sys->i_tiger_default_background_color = (p_sys->i_tiger_default_background_color & 0xff00000000) | newval.i_int;
+        p_sys->i_tiger_default_background_color = (p_sys->i_tiger_default_background_color & 0xff000000U) | newval.i_int;
         UpdateTigerBackgroundColor( p_dec );
     }
 
