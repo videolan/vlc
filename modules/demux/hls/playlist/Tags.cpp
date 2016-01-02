@@ -78,8 +78,8 @@ std::pair<std::size_t,std::size_t> Attribute::getByteRange() const
         is >> length;
         if(!is.eof())
         {
-            char c;
-            if(is.get(c) && c == '@')
+            char c = is.get();
+            if(c == '@' && !is.eof())
                 is >> offset;
         }
     }
@@ -97,8 +97,8 @@ std::pair<int, int> Attribute::getResolution() const
         is >> w;
         if(!is.eof())
         {
-            char c;
-            if(is.get(c) && c == 'x')
+            char c = is.get();
+            if(c == 'x' && !is.eof())
                 is >> h;
         }
     }
