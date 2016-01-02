@@ -367,7 +367,7 @@ static int vlclua_net_poll( lua_State *L )
     for( int i = 0; i < i_fds; i++ )
     {
         lua_pushinteger( L, luafds[i] );
-        lua_pushinteger( L, p_fds[i].revents );
+        lua_pushinteger( L, (val >= 0) ? p_fds[i].revents : 0 );
         lua_settable( L, 1 );
     }
     lua_pushinteger( L, val );
