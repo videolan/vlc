@@ -26,7 +26,7 @@
 static void test_media_list (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
-    libvlc_media_t *md1, *md2, *md3, *md4;
+    libvlc_media_t *md, *md1, *md2, *md3, *md4;
     libvlc_media_list_t *ml;
     int ret;
 
@@ -77,9 +77,13 @@ static void test_media_list (const char ** argv, int argc)
     assert( libvlc_media_list_index_of_item (ml, md3) == 2 );
 
     /* test right returning descriptor*/
-    assert ( libvlc_media_list_item_at_index (ml, 0) == md2 );
+    md = libvlc_media_list_item_at_index (ml, 0);
+    assert(md == md2);
+    libvlc_media_release(md);
 
-    assert ( libvlc_media_list_item_at_index (ml, 2) == md3 );
+    md = libvlc_media_list_item_at_index (ml, 2);
+    assert(md == md3);
+    libvlc_media_release(md);
 
     /* test if give errors, when it should */
     /* have 4 items, so index 4 should give error */
