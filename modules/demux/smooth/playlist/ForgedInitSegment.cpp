@@ -123,7 +123,7 @@ void ForgedInitSegment::setWaveFormatEx(const std::string &waveformat)
     size_t i_data;
     uint8_t *p_data = HexDecode(waveformat, &i_data);
     fromWaveFormatEx(p_data, i_data);
-    delete p_data;
+    free(p_data);
 }
 
 void ForgedInitSegment::setCodecPrivateData(const std::string &extra)
