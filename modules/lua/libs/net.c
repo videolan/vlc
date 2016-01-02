@@ -354,10 +354,7 @@ static int vlclua_net_poll( lua_State *L )
     do
     {
         if( vlc_killed() )
-        {
-            ret = luaL_error( L, "Interrupted." );
             break;
-        }
         val = vlc_poll_i11e( p_fds, i_fds, -1 );
     }
     while( val == -1 && errno == EINTR );
@@ -374,6 +371,9 @@ static int vlclua_net_poll( lua_State *L )
 
     free( luafds );
     free( p_fds );
+
+    if( val == -1 )
+        return luaL_error( L, "Interrupted." );
     return ret;
 }
 
