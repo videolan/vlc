@@ -160,6 +160,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/TextfieldPanel.xib \
 	extras/package/macosx/Resources/English.lproj/TimeSelectionPanel.xib \
 	extras/package/macosx/Resources/English.lproj/VideoEffects.xib \
+	extras/package/macosx/Resources/English.lproj/VLCStatusBarIconMainMenu.xib \
 	extras/package/macosx/Resources/fspanel/fs_background.png \
 	extras/package/macosx/Resources/fspanel/fs_background@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen.png \
@@ -855,6 +856,14 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/sidebar-icons_yosemite/ys-sidebar-playlist@2x.png \
 	extras/package/macosx/Resources/sidebar-icons_yosemite/ys-sidebar-podcast.png \
 	extras/package/macosx/Resources/sidebar-icons_yosemite/ys-sidebar-podcast@2x.png \
+	extras/package/macosx/Resources/vlcmenubaricon/pauseIcon.png \
+	extras/package/macosx/Resources/vlcmenubaricon/pauseIcon@2x.png \
+	extras/package/macosx/Resources/vlcmenubaricon/playIcon.png \
+	extras/package/macosx/Resources/vlcmenubaricon/playIcon@2x.png \
+	extras/package/macosx/Resources/vlcmenubaricon/statusBarIcon.png \
+	extras/package/macosx/Resources/vlcmenubaricon/statusBarIcon@2x.png \
+	extras/package/macosx/Resources/vlcmenubaricon/stopIcon.png \
+	extras/package/macosx/Resources/vlcmenubaricon/stopIcon@2x.png \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
 	extras/package/macosx/ub.sh \

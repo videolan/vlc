@@ -373,6 +373,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_intf_appleremoteCheckbox setTitle: _NS("Control playback with the Apple Remote")];
     [_intf_mediakeysCheckbox setTitle: _NS("Control playback with media keys")];
     [_intf_appleremote_sysvolCheckbox setTitle: _NS("Control system volume with the Apple Remote")];
+    [_intf_statusIconCheckbox setTitle: _NS("Display VLC status menu icon")];
 
     [_intf_playbackBehaviourBox setTitle:_NS("Playback behaviour")];
     [_intf_enableNotificationsCheckbox setTitle: _NS("Enable notifications on playlist item change")];
@@ -488,7 +489,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
             if (p_item->value.psz && !strcmp(p_item->value.psz, values[i]))
                 [object selectItem: [object lastItem]];
-            
+
         } else {
             [[object menu] addItem: [NSMenuItem separatorItem]];
         }
@@ -577,6 +578,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [self setupButton:_intf_continueplaybackPopup forIntList: "macosx-continue-playback"];
     [self setupButton:_intf_appleremoteCheckbox forBoolValue: "macosx-appleremote"];
     [self setupButton:_intf_appleremote_sysvolCheckbox forBoolValue: "macosx-appleremote-sysvol"];
+    [self setupButton:_intf_statusIconCheckbox forBoolValue: "macosx-statusicon"];
     [self setupButton:_intf_mediakeysCheckbox forBoolValue: "macosx-mediakeys"];
 
     [self setupButton:_video_nativeFullscreenCheckbox forBoolValue: "macosx-nativefullscreenmode"];
@@ -918,9 +920,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         config_PutInt(p_intf, "metadata-network-access", [_intf_artCheckbox state]);
 
-
         config_PutInt(p_intf, "macosx-appleremote", [_intf_appleremoteCheckbox state]);
         config_PutInt(p_intf, "macosx-appleremote-sysvol", [_intf_appleremote_sysvolCheckbox state]);
+        config_PutInt(p_intf, "macosx-statusicon", [_intf_statusIconCheckbox state]);
         config_PutInt(p_intf, "macosx-mediakeys", [_intf_mediakeysCheckbox state]);
         config_PutInt(p_intf, "macosx-interfacestyle", [_intf_style_darkButtonCell state]);
 

@@ -41,6 +41,7 @@
 #import "misc.h"
 #import "MainWindow.h"
 #import "VLCVoutWindowController.h"
+#import "VLCStatusBarIcon.h"
 #import "StringUtility.h"
 
 /*****************************************************************************
@@ -72,6 +73,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCConvertAndSave;
 @class ExtensionsManager;
 @class VLCInfo;
+@class VLCStatusBarIcon;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 
@@ -93,6 +95,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (ResumeDialogController *)resumeDialog;
 - (VLCInputManager *)inputManager;
 - (ExtensionsManager *)extensionsManager;
+- (VLCStatusBarIcon *)statusBarIcon;
 
 - (VLCDebugMessageVisualizer *)debugMsgPanel;
 

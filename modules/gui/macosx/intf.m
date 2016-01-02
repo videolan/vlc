@@ -95,6 +95,11 @@ int OpenIntf (vlc_object_t *p_this)
         [VLCMain sharedInstance];
 
         [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
+        // if statusbar enabled in preferences
+        if (config_GetInt(p_intf, "macosx-statusicon"))
+        {
+            [NSBundle loadNibNamed:@"VLCStatusBarIconMainMenu" owner:[[VLCMain sharedInstance] statusBarIcon]];
+        }
         [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
 
         msg_Dbg(p_intf, "Finished loading macosx interface");
@@ -173,6 +178,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCInputManager *_input_manager;
     VLCPlaylist *_playlist;
     VLCDebugMessageVisualizer *_messagePanelController;
+    VLCStatusBarIcon *_statusBarIcon;
     VLCTrackSynchronization *_trackSyncPanel;
     VLCAudioEffects *_audioEffectsPanel;
     VLCVideoEffects *_videoEffectsPanel;
@@ -226,6 +232,12 @@ static VLCMain *sharedInstance = nil;
         _coredialogs = [[VLCCoreDialogProvider alloc] init];
 
         _mainmenu = [[VLCMainMenu alloc] init];
+
+        // if statusbar enabled in preferences
+        if (config_GetInt(p_intf, "macosx-statusicon")) {
+            _statusBarIcon = [[VLCStatusBarIcon  alloc] init];
+        }
+
         _voutController = [[VLCVoutWindowController alloc] init];
         _playlist = [[VLCPlaylist alloc] init];
 
@@ -505,6 +517,11 @@ static VLCMain *sharedInstance = nil;
 - (VLCMainMenu *)mainMenu
 {
     return _mainmenu;
+}
+
+- (VLCStatusBarIcon *)statusBarIcon
+{
+    return _statusBarIcon;
 }
 
 - (VLCMainWindow *)mainWindow

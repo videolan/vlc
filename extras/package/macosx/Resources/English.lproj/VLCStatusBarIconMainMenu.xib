@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="14F1509" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCStatusBarIcon">
+                <connections>
+                    <outlet property="vlcStatusBarIconMenu" destination="534" id="O0F-8Q-FgA"/>
+                </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customObject id="420" customClass="NSFontManager"/>
+        <menu id="534" userLabel="vlcStatusBarIconMenu">
+            <items>
+                <menuItem title="Show Main WIndow" toolTip="Restore main window" id="08C-TA-yqu">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="restoreMainWindow:" target="-2" id="2Uq-Pa-toi"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="t2X-zn-Z4x"/>
+                <menuItem title="Play" tag="74747" toolTip="Start/Pause playback" id="9kC-yJ-Gy5">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="statusBarIconTogglePlayPause:" target="-2" id="py3-sd-ST2"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Stop" tag="83838" toolTip="Stop playback" id="4Sh-MJ-bSf">
+                    <connections>
+                        <action selector="statusBarIconStop:" target="-2" id="unT-d5-vlC"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="b5S-aL-b79"/>
+                <menuItem title="Next" toolTip="Next track in playlist" id="GhQ-VQ-jtu">
+                    <connections>
+                        <action selector="statusBarIconNext:" target="-2" id="VZh-xB-5IC"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Previous" toolTip="Previous track in playlist" id="iHu-rd-8KL">
+                    <connections>
+                        <action selector="statusBarIconPrevious:" target="-2" id="rNU-Dq-Sot"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="Dn5-wA-WfF"/>
+                <menuItem title="Random" tag="63636" toolTip="Randomize play order" id="lPi-EL-hoN">
+                    <connections>
+                        <action selector="statusBarIconToggleRandom:" target="-2" id="DyP-Hd-KHG"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="p96-c8-lBM"/>
+                <menuItem title="Quit" toolTip="Quit VLC" id="539">
+                    <connections>
+                        <action selector="quitAction:" target="-2" id="OJL-0Y-e8i"/>
+                    </connections>
+                </menuItem>
+            </items>
+            <point key="canvasLocation" x="328.5" y="267.5"/>
+        </menu>
+    </objects>
+</document>

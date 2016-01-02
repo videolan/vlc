@@ -465,6 +465,16 @@
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
 		7D8BB0C01830393300FAE9B7 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */; };
+		7D9516B71C60B69200D14E1A /* VLCStatusBarIconMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516B51C60B69200D14E1A /* VLCStatusBarIconMainMenu.xib */; };
+		7D9516BA1C60B6AB00D14E1A /* VLCStatusBarIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D9516B91C60B6AB00D14E1A /* VLCStatusBarIcon.m */; };
+		7D9516C41C60B6DB00D14E1A /* pauseIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516BC1C60B6DB00D14E1A /* pauseIcon.png */; };
+		7D9516C51C60B6DB00D14E1A /* pauseIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516BD1C60B6DB00D14E1A /* pauseIcon@2x.png */; };
+		7D9516C61C60B6DB00D14E1A /* playIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516BE1C60B6DB00D14E1A /* playIcon.png */; };
+		7D9516C71C60B6DB00D14E1A /* playIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516BF1C60B6DB00D14E1A /* playIcon@2x.png */; };
+		7D9516C81C60B6DB00D14E1A /* statusBarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C01C60B6DB00D14E1A /* statusBarIcon.png */; };
+		7D9516C91C60B6DB00D14E1A /* statusBarIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C11C60B6DB00D14E1A /* statusBarIcon@2x.png */; };
+		7D9516CA1C60B6DB00D14E1A /* stopIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C21C60B6DB00D14E1A /* stopIcon.png */; };
+		7D9516CB1C60B6DB00D14E1A /* stopIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C31C60B6DB00D14E1A /* stopIcon@2x.png */; };
 		7DB65D5618ABD6490053B874 /* AddonManager.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DB65D5418ABD6490053B874 /* AddonManager.xib */; };
 		7DD6EC101B58136D0047CF5C /* SimplePreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DD6EC0E1B58136D0047CF5C /* SimplePreferences.xib */; };
 		7DE78AC61B5D0A360019454C /* StreamOutput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DE78AC41B5D0A360019454C /* StreamOutput.xib */; };
@@ -1257,6 +1267,17 @@
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
 		7D8BB0B91830367200FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistMenu.xib; sourceTree = "<group>"; };
 		7D8BB0BF1830393300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		7D9516B61C60B69200D14E1A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/VLCStatusBarIconMainMenu.xib; sourceTree = "<group>"; };
+		7D9516B81C60B6AB00D14E1A /* VLCStatusBarIcon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCStatusBarIcon.h; path = ../../../modules/gui/macosx/VLCStatusBarIcon.h; sourceTree = "<group>"; };
+		7D9516B91C60B6AB00D14E1A /* VLCStatusBarIcon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCStatusBarIcon.m; path = ../../../modules/gui/macosx/VLCStatusBarIcon.m; sourceTree = "<group>"; };
+		7D9516BC1C60B6DB00D14E1A /* pauseIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pauseIcon.png; path = Resources/vlcmenubaricon/pauseIcon.png; sourceTree = "<group>"; };
+		7D9516BD1C60B6DB00D14E1A /* pauseIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "pauseIcon@2x.png"; path = "Resources/vlcmenubaricon/pauseIcon@2x.png"; sourceTree = "<group>"; };
+		7D9516BE1C60B6DB00D14E1A /* playIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = playIcon.png; path = Resources/vlcmenubaricon/playIcon.png; sourceTree = "<group>"; };
+		7D9516BF1C60B6DB00D14E1A /* playIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "playIcon@2x.png"; path = "Resources/vlcmenubaricon/playIcon@2x.png"; sourceTree = "<group>"; };
+		7D9516C01C60B6DB00D14E1A /* statusBarIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusBarIcon.png; path = Resources/vlcmenubaricon/statusBarIcon.png; sourceTree = "<group>"; };
+		7D9516C11C60B6DB00D14E1A /* statusBarIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusBarIcon@2x.png"; path = "Resources/vlcmenubaricon/statusBarIcon@2x.png"; sourceTree = "<group>"; };
+		7D9516C21C60B6DB00D14E1A /* stopIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = stopIcon.png; path = Resources/vlcmenubaricon/stopIcon.png; sourceTree = "<group>"; };
+		7D9516C31C60B6DB00D14E1A /* stopIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "stopIcon@2x.png"; path = "Resources/vlcmenubaricon/stopIcon@2x.png"; sourceTree = "<group>"; };
 		7DA481221B5FC13700917FD7 /* VLCPlaylistView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCPlaylistView.h; path = ../../../modules/gui/macosx/VLCPlaylistView.h; sourceTree = "<group>"; };
 		7DA481231B5FC13700917FD7 /* VLCPlaylistView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCPlaylistView.m; path = ../../../modules/gui/macosx/VLCPlaylistView.m; sourceTree = "<group>"; };
 		7DB65D5218ABD6380053B874 /* AddonsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonsWindowController.h; path = ../../../modules/gui/macosx/AddonsWindowController.h; sourceTree = SOURCE_ROOT; };
@@ -1902,6 +1923,8 @@
 				7DA481231B5FC13700917FD7 /* VLCPlaylistView.m */,
 				6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */,
 				6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */,
+				7D9516B81C60B6AB00D14E1A /* VLCStatusBarIcon.h */,
+				7D9516B91C60B6AB00D14E1A /* VLCStatusBarIcon.m */,
 				1CD366791B7A242E0054E39F /* VLCTimeSelectionPanelController.h */,
 				1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */,
 				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
@@ -2343,6 +2366,21 @@
 			name = QuincyKit;
 			sourceTree = "<group>";
 		};
+		7D9516BB1C60B6C700D14E1A /* status bar item */ = {
+			isa = PBXGroup;
+			children = (
+				7D9516BC1C60B6DB00D14E1A /* pauseIcon.png */,
+				7D9516BD1C60B6DB00D14E1A /* pauseIcon@2x.png */,
+				7D9516BE1C60B6DB00D14E1A /* playIcon.png */,
+				7D9516BF1C60B6DB00D14E1A /* playIcon@2x.png */,
+				7D9516C01C60B6DB00D14E1A /* statusBarIcon.png */,
+				7D9516C11C60B6DB00D14E1A /* statusBarIcon@2x.png */,
+				7D9516C21C60B6DB00D14E1A /* stopIcon.png */,
+				7D9516C31C60B6DB00D14E1A /* stopIcon@2x.png */,
+			);
+			name = "status bar item";
+			sourceTree = "<group>";
+		};
 		8E445F86047289E50059A3A7 /* fileicons */ = {
 			isa = PBXGroup;
 			children = (
@@ -2375,6 +2413,7 @@
 		CC0430EE13B2461A00D7D52E /* ui graphics */ = {
 			isa = PBXGroup;
 			children = (
+				7D9516BB1C60B6C700D14E1A /* status bar item */,
 				1C88BC5719DC7CB300645190 /* fspanel-yosemite */,
 				CCCB86BF0ACFDE4A00CF1E10 /* fspanel */,
 				1C88BA9D19DC7C7800645190 /* mainwindow_yosemite */,
@@ -2909,6 +2948,7 @@
 				7D3F6523188051F2005776C4 /* BWQuincyMain.xib */,
 				7DB65D5418ABD6490053B874 /* AddonManager.xib */,
 				7DE78AC41B5D0A360019454C /* StreamOutput.xib */,
+				7D9516B51C60B69200D14E1A /* VLCStatusBarIconMainMenu.xib */,
 			);
 			name = xibs;
 			sourceTree = "<group>";
@@ -3158,6 +3198,7 @@
 				1C88BA7C19DC7B2200645190 /* yosemite-window-zoom-on.png in Resources */,
 				CC04331713B28B2900D7D52E /* fs_play_highlight.png in Resources */,
 				CC04331813B28B2900D7D52E /* fs_play.png in Resources */,
+				7D9516C81C60B6DB00D14E1A /* statusBarIcon.png in Resources */,
 				CC04331913B28B2900D7D52E /* fs_rewind_highlight.png in Resources */,
 				CC04331A13B28B2900D7D52E /* fs_rewind.png in Resources */,
 				CC04331B13B28B2900D7D52E /* fs_skip_next_highlight.png in Resources */,
@@ -3171,6 +3212,7 @@
 				CC04332013B28B2900D7D52E /* fs_stop.png in Resources */,
 				CC04332113B28B2900D7D52E /* fs_time_slider_knob_highlight.png in Resources */,
 				CC04332213B28B2900D7D52E /* fs_time_slider_knob.png in Resources */,
+				7D9516C91C60B6DB00D14E1A /* statusBarIcon@2x.png in Resources */,
 				1C88BC0919DC7C8100645190 /* ys-fullscreen-one-button_dark.png in Resources */,
 				CC04332313B28B2900D7D52E /* fs_time_slider.png in Resources */,
 				1C51BDE51B7A221B0056B9AA /* TimeSelectionPanel.xib in Resources */,
@@ -3357,6 +3399,7 @@
 				CCD83E4A13FEA143004F1652 /* Open.xib in Resources */,
 				CCD83E4B13FEA143004F1652 /* Preferences.xib in Resources */,
 				1C88BA7419DC7B2200645190 /* yosemite-window-minimize-over.png in Resources */,
+				7D9516B71C60B69200D14E1A /* VLCStatusBarIconMainMenu.xib in Resources */,
 				CCD83E4C13FEA143004F1652 /* SyncTracks.xib in Resources */,
 				CCD83E4D13FEA143004F1652 /* VideoEffects.xib in Resources */,
 				1C88BA9519DC7C5D00645190 /* ys-sidebar-music.png in Resources */,
@@ -3472,6 +3515,7 @@
 				1C88BB6319DC7C7800645190 /* ys-shuffle-pressed@2x.png in Resources */,
 				CC9E5D9B15975F5B00D14E83 /* fs_background@2x.png in Resources */,
 				1C88BC3E19DC7C8100645190 /* ys-shuffle-blue-pressed_dark@2x.png in Resources */,
+				7D9516C51C60B6DB00D14E1A /* pauseIcon@2x.png in Resources */,
 				1C88BC2119DC7C8100645190 /* ys-previous-6btns-dark.png in Resources */,
 				CC9E5D9C15975F5B00D14E83 /* fs_exit_fullscreen@2x.png in Resources */,
 				CC9E5D9D15975F5B00D14E83 /* fs_forward_highlight@2x.png in Resources */,
@@ -3494,9 +3538,11 @@
 				1C88BA7519DC7B2200645190 /* yosemite-window-minimize-over@2x.png in Resources */,
 				CC9E5DA815975F5B00D14E83 /* fs_skip_previous@2x.png in Resources */,
 				1C88BC4319DC7C8100645190 /* ys-shuffle_dark.png in Resources */,
+				7D9516C71C60B6DB00D14E1A /* playIcon@2x.png in Resources */,
 				CC9E5DA915975F5B00D14E83 /* fs_stop_highlight@2x.png in Resources */,
 				CC9E5DAA15975F5B00D14E83 /* fs_stop@2x.png in Resources */,
 				CC9E5DAB15975F5B00D14E83 /* fs_time_slider_knob_highlight@2x.png in Resources */,
+				7D9516C41C60B6DB00D14E1A /* pauseIcon.png in Resources */,
 				1CE5ED2619DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png in Resources */,
 				1C88BB3E19DC7C7800645190 /* ys-playlist-btn.png in Resources */,
 				1C88BBEB19DC7C8100645190 /* ys-backward-6btns-dark.png in Resources */,
@@ -3588,6 +3634,7 @@
 				CC9E5E08159760B100D14E83 /* stop@2x.png in Resources */,
 				CC9E5E09159760B100D14E83 /* volume-high@2x.png in Resources */,
 				1C88BCB719DC7CB300645190 /* ys-fs_volume_max@2x.png in Resources */,
+				7D9516CB1C60B6DB00D14E1A /* stopIcon@2x.png in Resources */,
 				1C88BB3019DC7C7800645190 /* ys-pause-pressed.png in Resources */,
 				CC9E5E0A159760B100D14E83 /* volume-low@2x.png in Resources */,
 				1C88BCBD19DC7CB300645190 /* ys-fs_volume_mute_highlight@2x.png in Resources */,
@@ -3720,6 +3767,7 @@
 				1C88BA6019DC7B2200645190 /* yosemite-window-fullscreen-graphite.png in Resources */,
 				CC166FB415F511CC0088201B /* backward-3btns-dark.png in Resources */,
 				CC166FB515F511CC0088201B /* backward-3btns-dark@2x.png in Resources */,
+				7D9516CA1C60B6DB00D14E1A /* stopIcon.png in Resources */,
 				CC166FBA15F511DB0088201B /* backward-3btns-pressed.png in Resources */,
 				1C88BB3C19DC7C7800645190 /* ys-playlist-btn-pressed.png in Resources */,
 				CC166FBB15F511DB0088201B /* backward-3btns-pressed@2x.png in Resources */,
@@ -3756,6 +3804,7 @@
 				CC166FE415F5136B0088201B /* previous-6btns-dark@2x.png in Resources */,
 				1C88BB1E19DC7C7800645190 /* ys-forward-3btns.png in Resources */,
 				CC166FE915F517660088201B /* backward-6btns-pressed.png in Resources */,
+				7D9516C61C60B6DB00D14E1A /* playIcon.png in Resources */,
 				1C88BB6819DC7C7800645190 /* ys-stop.png in Resources */,
 				CC166FEA15F517660088201B /* backward-6btns-pressed@2x.png in Resources */,
 				1C88BBF719DC7C8100645190 /* ys-effects-one-button-pressed-dark.png in Resources */,
@@ -3855,6 +3904,7 @@
 				1CCB5F581A62A724004C3E90 /* applescript.m in Sources */,
 				1CCB5F591A62A724004C3E90 /* AudioEffects.h in Sources */,
 				1CCB5F5A1A62A724004C3E90 /* AudioEffects.m in Sources */,
+				7D9516BA1C60B6AB00D14E1A /* VLCStatusBarIcon.m in Sources */,
 				1CCB5F5B1A62A724004C3E90 /* bookmarks.h in Sources */,
 				1CCB5F5C1A62A724004C3E90 /* bookmarks.m in Sources */,
 				1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */,
@@ -4020,6 +4070,14 @@
 				7D8BB0BF1830393300FAE9B7 /* English */,
 			);
 			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		7D9516B51C60B69200D14E1A /* VLCStatusBarIconMainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7D9516B61C60B69200D14E1A /* English */,
+			);
+			name = VLCStatusBarIconMainMenu.xib;
 			sourceTree = "<group>";
 		};
 		7DB65D5418ABD6490053B874 /* AddonManager.xib */ = {

@@ -79,6 +79,9 @@ void WindowClose  (vout_window_t *);
 #define USE_APPLE_REMOTE_VOLUME_TEXT N_("Control system volume with the Apple Remote")
 #define USE_APPLE_REMOTE_VOLUME_LONGTEXT N_("By default, VLC will control its own volume with the Apple Remote. However, you can choose to control the global system volume instead.")
 
+#define DISPLAY_STATUS_ICONMENU_TEXT N_("Display VLC status menu icon")
+#define DISPLAY_STATUS_ICONMENU_LONGTEXT N_("By default, VLC will show the statusbar icon menu. However, you can choose to disable it (restart required).")
+
 #define USE_APPLE_REMOTE_PREVNEXT_TEXT N_("Control playlist items with the Apple Remote")
 #define USE_APPLE_REMOTE_PREVNEXT_LONGTEXT N_("By default, VLC will allow you to switch to the next or previous item with the Apple Remote. You can disable this behavior with this option.")
 
@@ -156,6 +159,7 @@ vlc_module_begin()
     set_section(N_("Appearance"), 0)
         add_bool("macosx-interfacestyle", false, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT, false)
         add_bool("macosx-nativefullscreenmode", false, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false)
+        add_bool("macosx-statusicon", true, DISPLAY_STATUS_ICONMENU_TEXT, DISPLAY_STATUS_ICONMENU_LONGTEXT, false)
         add_bool("macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true)
         add_bool("macosx-show-playback-buttons", false, JUMPBUTTONS_TEXT, JUMPBUTTONS_LONGTEXT, false)
         add_bool("macosx-show-playmode-buttons", false, PLAYMODEBUTTONS_TEXT, PLAYMODEBUTTONS_LONGTEXT, false)

@@ -74,5 +74,6 @@ libmacosx_plugin_la_SOURCES = \
 	VLCTimeSelectionPanelController.h VLCTimeSelectionPanelController.m \
 	VLCUIWidgets.h VLCUIWidgets.m \
 	VLCScrollingClipView.h VLCScrollingClipView.m \
+	VLCStatusBarIcon.h VLCStatusBarIcon.m \
 	VLCVoutWindowController.h VLCVoutWindowController.m \
 	Windows.h Windows.m

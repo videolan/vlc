@@ -101,6 +101,7 @@
 @property (readwrite, weak) IBOutlet NSButton *intf_appleremoteCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_mediakeysCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_appleremote_sysvolCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *intf_statusIconCheckbox;
 
 // intf pane - behaviour box
 @property (readwrite, weak) IBOutlet NSBox *intf_playbackBehaviourBox;
