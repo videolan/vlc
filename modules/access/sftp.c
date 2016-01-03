@@ -356,7 +356,7 @@ static ssize_t Read( access_t *p_access, uint8_t *buf, size_t len )
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_access->info.b_eof )
-        return NULL;
+        return 0;
 
     ssize_t val = libssh2_sftp_read(  p_sys->file, (char *)buf, len );
     if( val < 0 )
