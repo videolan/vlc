@@ -738,9 +738,10 @@ static int EnumDevices(vlc_object_t *obj, char const *varname,
             continue;
 
         char *desc = snd_device_name_get_hint(hint, "DESC");
-        if (desc != NULL)
-            for (char *lf = strchr(desc, '\n'); lf; lf = strchr(lf, '\n'))
-                 *lf = ' ';
+        if (desc == NULL)
+            desc = xstrdup (name);
+        for (char *lf = strchr(desc, '\n'); lf; lf = strchr(lf, '\n'))
+            *lf = ' ';
         msg_Dbg (obj, "%s (%s)", (desc != NULL) ? desc : name, name);
 
         ids = xrealloc (ids, (n + 1) * sizeof (*ids));
