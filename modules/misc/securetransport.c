@@ -505,6 +505,7 @@ static ssize_t st_Recv (vlc_tls_t *session, void *buf, size_t length)
  */
 
 static int st_SessionShutdown (vlc_tls_t *session, bool duplex) {
+    msg_Dbg(session->obj, "shutdown TLS session");
 
     vlc_tls_sys_t *sys = session->sys;
     OSStatus ret = noErr;
@@ -514,7 +515,7 @@ static int st_SessionShutdown (vlc_tls_t *session, bool duplex) {
         ret = SSLClose(sys->p_context);
     }
 
-    if (ret != noErr || ret != errSSLClosedGraceful) {
+    if (ret != noErr) {
         msg_Warn(session->obj, "Cannot close ssl context (%i)", (int)ret);
         return ret;
     }
