@@ -403,7 +403,7 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
             return 0;
 
         case errSSLServerAuthCompleted:
-            msg_Warn(crd, "handshake completed, retrying");
+            msg_Dbg(crd, "SSLHandshake returned errSSLServerAuthCompleted, continuing handshake");
             return st_Handshake(crd, session, host, service, alp);
 
         case errSSLConnectionRefused:
