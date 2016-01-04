@@ -636,6 +636,7 @@ static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     return VLC_SUCCESS;
 
 error:
+    st_SessionShutdown(session, true);
     st_SessionClose(session);
     return VLC_EGENERIC;
 }
@@ -702,6 +703,7 @@ static int st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     return VLC_SUCCESS;
 
 error:
+    st_SessionShutdown(session, true);
     st_SessionClose(session);
     return VLC_EGENERIC;
 }
