@@ -55,7 +55,7 @@ static void conn_create(void)
 
     external_fd = fds[0];
 
-    conn = vlc_h1_conn_create(tls);
+    conn = vlc_h1_conn_create(tls, false);
     assert(conn != NULL);
 }
 

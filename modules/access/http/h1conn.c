@@ -114,6 +114,7 @@ struct vlc_h1_conn
     bool connection_close;
     bool active;
     bool released;
+    bool proxy;
 };
 
 #define CO(conn) ((conn)->conn.tls->obj)
@@ -149,7 +150,7 @@ static struct vlc_http_stream *vlc_h1_stream_open(struct vlc_http_conn *c,
     if (conn->active || conn->conn.tls == NULL)
         return NULL;
 
-    char *payload = vlc_http_msg_format(req, &len);
+    char *payload = vlc_http_msg_format(req, &len, conn->proxy);
     if (unlikely(payload == NULL))
         return NULL;
 
@@ -312,7 +313,7 @@ static const struct vlc_http_conn_cbs vlc_h1_conn_callbacks =
     vlc_h1_conn_release,
 };
 
-struct vlc_http_conn *vlc_h1_conn_create(vlc_tls_t *tls)
+struct vlc_http_conn *vlc_h1_conn_create(vlc_tls_t *tls, bool proxy)
 {
     struct vlc_h1_conn *conn = malloc(sizeof (*conn));
     if (unlikely(conn == NULL))
@@ -323,6 +324,7 @@ struct vlc_http_conn *vlc_h1_conn_create(vlc_tls_t *tls)
     conn->stream.cbs = &vlc_h1_stream_callbacks;
     conn->active = false;
     conn->released = false;
+    conn->proxy = proxy;
 
     return &conn->conn;
 }

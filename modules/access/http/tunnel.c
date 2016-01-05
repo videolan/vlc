@@ -140,8 +140,8 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
     if (session == NULL)
         return NULL;
 
-    struct vlc_http_conn *conn = (ptwo ? vlc_h2_conn_create
-                                       : vlc_h1_conn_create)(session);
+    struct vlc_http_conn *conn = ptwo ? vlc_h2_conn_create(session)
+                                      : vlc_h1_conn_create(session, false);
     if (unlikely(conn == NULL))
     {
         vlc_tls_Close(session);

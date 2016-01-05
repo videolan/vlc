@@ -252,7 +252,8 @@ static inline void vlc_http_stream_close(struct vlc_http_stream *s, bool abort)
     s->cbs->close(s, abort);
 }
 
-char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *) VLC_USED;
+char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp,
+                          bool proxied) VLC_USED;
 struct vlc_http_msg *vlc_http_msg_headers(const char *msg) VLC_USED;
 
 struct vlc_h2_frame;

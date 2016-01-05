@@ -246,7 +246,7 @@ static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
     if (http2)
         conn = vlc_h2_conn_create(tls);
     else
-        conn = vlc_h1_conn_create(tls);
+        conn = vlc_h1_conn_create(tls, false);
 
     if (unlikely(conn == NULL))
     {
@@ -279,7 +279,7 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
     if (mgr->use_h2c)
         conn = vlc_h2_conn_create(tls);
     else
-        conn = vlc_h1_conn_create(tls);
+        conn = vlc_h1_conn_create(tls, false);
 
     if (unlikely(conn == NULL))
     {

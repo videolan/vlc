@@ -115,7 +115,7 @@ static void check_msg(struct vlc_http_msg *in,
 
     cb(in);
 
-    m1 = vlc_http_msg_format(in, &len);
+    m1 = vlc_http_msg_format(in, &len, false);
     assert(m1 != NULL);
     assert(strlen(m1) == len);
     out = vlc_http_msg_headers(m1);

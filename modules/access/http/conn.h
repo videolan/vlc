@@ -47,7 +47,7 @@ static inline void vlc_http_conn_release(struct vlc_http_conn *conn)
     conn->cbs->release(conn);
 }
 
-struct vlc_http_conn *vlc_h1_conn_create(struct vlc_tls *);
+struct vlc_http_conn *vlc_h1_conn_create(struct vlc_tls *, bool proxy);
 struct vlc_http_conn *vlc_h2_conn_create(struct vlc_tls *);
 
 struct vlc_http_stream *vlc_chunked_open(struct vlc_http_stream *,

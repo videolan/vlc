@@ -287,7 +287,8 @@ block_t *vlc_http_msg_read(struct vlc_http_msg *m)
 
 /* Serialization and deserialization */
 
-char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp)
+char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp,
+                          bool proxied)
 {
     size_t len;
 
@@ -297,6 +298,12 @@ char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp)
         len += strlen(m->method);
         len += strlen(m->path ? m->path : m->authority);
         len += strlen(m->authority);
+
+        if (proxied)
+        {
+            assert(m->scheme != NULL && m->path != NULL);
+            len += strlen(m->scheme) + 3 + strlen(m->authority);
+        }
     }
     else
         len = sizeof ("HTTP/1.1 123 .\r\n\r\n");
@@ -311,8 +318,13 @@ char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp)
     len = 0;
 
     if (m->status < 0)
-        len += sprintf(buf, "%s %s HTTP/1.1\r\nHost: %s\r\n", m->method,
+    {
+        len += sprintf(buf, "%s ", m->method);
+        if (proxied)
+            len += sprintf(buf + len, "%s://%s", m->scheme, m->authority);
+        len += sprintf(buf + len, "%s HTTP/1.1\r\nHost: %s\r\n",
                        m->path ? m->path : m->authority, m->authority);
+    }
     else
         len += sprintf(buf, "HTTP/1.1 %03hd .\r\n", m->status);
 
