@@ -155,7 +155,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     packetizer_Init( &p_sys->packetizer,
-                     p_vc1_startcode, sizeof(p_vc1_startcode),
+                     p_vc1_startcode, sizeof(p_vc1_startcode), NULL,
                      NULL, 0, 4,
                      PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 

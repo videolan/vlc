@@ -100,7 +100,7 @@ static int Open(vlc_object_t *p_this)
     p_sys->pp_frame_last = &p_sys->p_frame;
 
     packetizer_Init(&p_dec->p_sys->packetizer,
-                    p_hevc_startcode, sizeof(p_hevc_startcode),
+                    p_hevc_startcode, sizeof(p_hevc_startcode), NULL,
                     p_hevc_startcode, 1, 5,
                     PacketizeReset, PacketizeParse, PacketizeValidate, p_dec);
 

@@ -168,7 +168,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Misc init */
     packetizer_Init( &p_sys->packetizer,
-                     p_mp2v_startcode, sizeof(p_mp2v_startcode),
+                     p_mp2v_startcode, sizeof(p_mp2v_startcode), NULL,
                      NULL, 0, 4,
                      PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 

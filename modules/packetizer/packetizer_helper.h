@@ -49,6 +49,7 @@ typedef struct
 
     int i_startcode;
     const uint8_t *p_startcode;
+    block_startcode_helper_t pf_startcode_helper;
 
     int i_au_prepend;
     const uint8_t *p_au_prepend;
@@ -64,6 +65,7 @@ typedef struct
 
 static inline void packetizer_Init( packetizer_t *p_pack,
                                     const uint8_t *p_startcode, int i_startcode,
+                                    block_startcode_helper_t pf_start_helper,
                                     const uint8_t *p_au_prepend, int i_au_prepend,
                                     unsigned i_au_min_size,
                                     packetizer_reset_t pf_reset,
@@ -82,6 +84,7 @@ static inline void packetizer_Init( packetizer_t *p_pack,
 
     p_pack->i_startcode = i_startcode;
     p_pack->p_startcode = p_startcode;
+    p_pack->pf_startcode_helper = pf_start_helper;
     p_pack->pf_reset = pf_reset;
     p_pack->pf_parse = pf_parse;
     p_pack->pf_validate = pf_validate;
@@ -132,7 +135,8 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
         case STATE_NOSYNC:
             /* Find a startcode */
             if( !block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
-                                                p_pack->p_startcode, p_pack->i_startcode, NULL ) )
+                                                p_pack->p_startcode, p_pack->i_startcode,
+                                                p_pack->pf_startcode_helper ) )
                 p_pack->i_state = STATE_NEXT_SYNC;
 
             if( p_pack->i_offset )
@@ -150,7 +154,8 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
         case STATE_NEXT_SYNC:
             /* Find the next startcode */
             if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
-                                               p_pack->p_startcode, p_pack->i_startcode, NULL ) )
+                                               p_pack->p_startcode, p_pack->i_startcode,
+                                               p_pack->pf_startcode_helper ) )
             {
                 if( !p_pack->b_flushing || !p_pack->bytestream.p_chain )
                     return NULL; /* Need more data */
