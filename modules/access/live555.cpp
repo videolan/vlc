@@ -42,6 +42,7 @@
 #include <vlc_url.h>
 #include <vlc_strings.h>
 #include <vlc_interrupt.h>
+#include <vlc_keystore.h>
 
 #include <limits.h>
 #include <assert.h>
@@ -557,8 +558,9 @@ static int Connect( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     Authenticator authenticator;
-    char *psz_user    = NULL;
-    char *psz_pwd     = NULL;
+    vlc_credential credential;
+    const char *psz_user = NULL;
+    const char *psz_pwd  = NULL;
     char *psz_url     = NULL;
     int  i_http_port  = 0;
     int  i_ret        = VLC_SUCCESS;
@@ -577,17 +579,21 @@ static int Connect( demux_t *p_demux )
                       p_sys->url.psz_option ? "?" : "",
                       strempty(p_sys->url.psz_option) ) == -1 )
             return VLC_ENOMEM;
-
-        psz_user = strdup( strempty( p_sys->url.psz_username ) );
-        psz_pwd  = strdup( strempty( p_sys->url.psz_password ) );
     }
     else
     {
         if( asprintf( &psz_url, "rtsp://%s", p_sys->psz_path ) == -1 )
             return VLC_ENOMEM;
+    }
 
-        psz_user = var_InheritString( p_demux, "rtsp-user" );
-        psz_pwd  = var_InheritString( p_demux, "rtsp-pwd" );
+    vlc_credential_init( &credential, &p_sys->url );
+
+    /* Credentials can be NULL since they may not be needed */
+    if( vlc_credential_get( &credential, p_demux, "rtsp-user", "rtsp-pwd",
+                            NULL, NULL) )
+    {
+        psz_user = credential.psz_username;
+        psz_pwd = credential.psz_password;
     }
 
 createnew:
@@ -637,13 +643,12 @@ describe:
         {
             msg_Dbg( p_demux, "authentication failed" );
 
-            free( psz_user );
-            free( psz_pwd );
-            dialog_Login( p_demux, &psz_user, &psz_pwd,
-                          _("RTSP authentication"), "%s",
-                        _("Please enter a valid login name and a password.") );
-            if( psz_user != NULL && psz_pwd != NULL )
+            if( vlc_credential_get( &credential, p_demux, "rtsp-user", "rtsp-pwd",
+                                    _("RTSP authentication"),
+                                    _("Please enter a valid login name and a password.") ) )
             {
+                psz_user = credential.psz_username;
+                psz_pwd = credential.psz_password;
                 msg_Dbg( p_demux, "retrying with user=%s", psz_user );
                 goto describe;
             }
@@ -673,12 +678,13 @@ describe:
         }
         i_ret = VLC_EGENERIC;
     }
+    else
+        vlc_credential_store( &credential );
 
 bailout:
     /* malloc-ated copy */
     free( psz_url );
-    free( psz_user );
-    free( psz_pwd );
+    vlc_credential_clean( &credential );
 
     return i_ret;
 }
