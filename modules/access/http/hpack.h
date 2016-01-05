@@ -18,6 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * \defgroup hpack HPACK compression
+ * HTTP/2 header compression (HPACK)
+ * \ingroup h2
+ * @{
+ */
+
 struct hpack_decoder;
 
 struct hpack_decoder *hpack_decode_init(size_t header_table_size);
@@ -30,3 +37,5 @@ size_t hpack_encode_hdr_neverindex(uint8_t *restrict buf, size_t size,
                                    const char *name, const char *value);
 size_t hpack_encode(uint8_t *restrict buf, size_t size,
                     const char *const headers[][2], unsigned count);
+
+/** @} */

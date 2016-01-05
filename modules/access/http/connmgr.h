@@ -18,19 +18,63 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * \defgroup http HTTP
+ * Hyper-Text Transfer Protocol
+ * \defgroup http_connmgr Connection manager
+ * HTTP connection management
+ * \ingroup http
+ * @{
+ * \file connmgr.h
+ */
+
 struct vlc_http_mgr;
 struct vlc_http_msg;
 struct vlc_http_cookie_jar_t;
 
+/**
+ * Sends an HTTP request
+ *
+ * Sends an HTTP request, by either reusing an existing HTTP connection or
+ * establishing a new one. If succesful, the initial HTTP response header is
+ * returned.
+ *
+ * @param mgr HTTP connection manager
+ * @param https whether to use HTTPS (true) or unencrypted HTTP (false)
+ * @param host name of authoritative HTTP server to send the request to
+ * @param port TCP server port number, or 0 for the default port number
+ * @param req HTTP request header to send
+ *
+ * @return The initial HTTP response header, or NULL in case of failure.
+ */
 struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
                                           const char *host, unsigned port,
                                           const struct vlc_http_msg *req);
+
 int vlc_http_mgr_send_cookies(struct vlc_http_mgr *, struct vlc_http_msg *);
 void vlc_http_mgr_recv_cookies(struct vlc_http_mgr *mgr, bool https,
                                const char *host, const char *path,
                                const struct vlc_http_msg *resp);
 
+/**
+ * Creates an HTTP connection manager
+ *
+ * Allocates an HTTP client connections manager.
+ *
+ * @param obj parent VLC object
+ * @param jar HTTP cookies jar (NULL to disable cookies)
+ * @param h2c Favor unencrypted HTTP/2 over HTTP/1.1
+ */
 struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj,
                                          struct vlc_http_cookie_jar_t *jar,
                                          bool h2c);
+
+/**
+ * Destroys an HTTP connection manager
+ *
+ * Deallocates an HTTP client connections manager created by
+ * vlc_http_msg_destroy(). Any remaining connection is closed and destroyed.
+ */
 void vlc_http_mgr_destroy(struct vlc_http_mgr *mgr);
+
+/** @} */

@@ -18,6 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * \defgroup http_live Live streams
+ * Trivial HTTP-based live streams
+ * \ingroup http_res
+ * @{
+ */
+
 struct vlc_http_live;
 struct block_t;
 
@@ -30,3 +37,5 @@ int vlc_http_live_get_status(struct vlc_http_live *live);
 char *vlc_http_live_get_redirect(struct vlc_http_live *live);
 char *vlc_http_live_get_type(struct vlc_http_live *live);
 block_t *vlc_http_live_read(struct vlc_http_live *live);
+
+/** @} */

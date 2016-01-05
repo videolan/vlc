@@ -20,6 +20,14 @@
 
 #include <stdint.h>
 
+/**
+ * \defgroup http_msg Messages
+ * HTTP messages, header formatting and parsing
+ * \ingroup http
+ * @{
+ * \file message.h
+ */
+
 struct vlc_http_msg;
 struct block_t;
 struct vlc_http_cookie_jar_t;
@@ -52,51 +60,57 @@ struct vlc_http_msg *vlc_http_resp_create(unsigned status) VLC_USED;
 /**
  * Destroys an HTTP message.
  */
-void vlc_http_msg_destroy(struct vlc_http_msg *m);
+void vlc_http_msg_destroy(struct vlc_http_msg *);
 
 /**
- * Formats a header.
+ * Formats a header field.
  *
  * Adds an HTTP message header to an HTTP request or response.
  * All headers must be formatted before the message is sent.
  *
- * @param name header name
+ * @param name header field name
+ * @param fmt printf-style format string
  * @return 0 on success, -1 on error (out of memory)
  */
-int vlc_http_msg_add_header(struct vlc_http_msg *m, const char *name,
+int vlc_http_msg_add_header(struct vlc_http_msg *, const char *name,
                             const char *fmt, ...) VLC_FORMAT(3,4);
 
 /**
- * Sets the agent header.
+ * Sets the agent field.
  *
- * Sets the User-Agent or Server header.
+ * Sets the User-Agent or Server header field.
  */
-int vlc_http_msg_add_agent(struct vlc_http_msg *m, const char *str);
-
-const char *vlc_http_msg_get_agent(const struct vlc_http_msg *m);
+int vlc_http_msg_add_agent(struct vlc_http_msg *, const char *);
 
 /**
- * Parses a timestamp header.
+ * Gets the agent field.
+ *
+ * Gets the User-Agent or Server header field.
+ */
+const char *vlc_http_msg_get_agent(const struct vlc_http_msg *);
+
+/**
+ * Parses a timestamp header field.
  *
  * @param name header field name
  * @return a timestamp value, or -1 on error.
  */
-time_t vlc_http_msg_get_time(const struct vlc_http_msg *m, const char *name);
+time_t vlc_http_msg_get_time(const struct vlc_http_msg *, const char *name);
 
 /**
- * Adds a timestamp header.
+ * Adds a timestamp header field.
  *
  * @param name header field name
  * @param t pointer to timestamp
  * @return 0 on success, -1 on error (errno is set accordingly)
  */
-int vlc_http_msg_add_time(struct vlc_http_msg *m, const char *name,
+int vlc_http_msg_add_time(struct vlc_http_msg *, const char *name,
                           const time_t *t);
 
 /**
- * Adds a Date header.
+ * Adds a Date header field.
  */
-int vlc_http_msg_add_atime(struct vlc_http_msg *m);
+int vlc_http_msg_add_atime(struct vlc_http_msg *);
 
 /**
  * Gets message date.
@@ -105,7 +119,7 @@ int vlc_http_msg_add_atime(struct vlc_http_msg *m);
  *
  * @return a time value on success, -1 on error.
  */
-time_t vlc_http_msg_get_atime(const struct vlc_http_msg *m);
+time_t vlc_http_msg_get_atime(const struct vlc_http_msg *);
 
 /**
  * Gets resource date.
@@ -115,7 +129,7 @@ time_t vlc_http_msg_get_atime(const struct vlc_http_msg *m);
  *
  * @return a time value on success, -1 on error.
  */
-time_t vlc_http_msg_get_mtime(const struct vlc_http_msg *m);
+time_t vlc_http_msg_get_mtime(const struct vlc_http_msg *);
 
 /**
  * Gets retry timeout.
@@ -126,7 +140,7 @@ time_t vlc_http_msg_get_mtime(const struct vlc_http_msg *m);
  *
  * @return the time in seconds, zero if the date is overdue or on error.
  */
-unsigned vlc_http_msg_get_retry_after(const struct vlc_http_msg *m);
+unsigned vlc_http_msg_get_retry_after(const struct vlc_http_msg *);
 
 void vlc_http_msg_get_cookies(const struct vlc_http_msg *,
                               struct vlc_http_cookie_jar_t *, bool secure,
@@ -135,23 +149,53 @@ int vlc_http_msg_add_cookies(struct vlc_http_msg *,
                              struct vlc_http_cookie_jar_t *);
 
 /**
- * Looks up an HTTP header.
+ * Looks up an header field.
  *
- * Finds an HTTP header by (case-insensitive) name inside an HTTP message.
- * If the message has more than one matching header, their value are folded
- * (as permitted by specifications).
+ * Finds an HTTP header field by (case-insensitive) name inside an HTTP
+ * message header. If the message has more than one matching field, their value
+ * are folded (as permitted by protocol specifications).
  *
- * @return header value (valid until message is destroyed),
- *         or NULL if no headers matched
+ * @return header field value (valid until message is destroyed),
+ *         or NULL if no fields matched
  */
-const char *vlc_http_msg_get_header(const struct vlc_http_msg *m,
+const char *vlc_http_msg_get_header(const struct vlc_http_msg *,
                                     const char *name);
 
+/**
+ * Gets response status code.
+ *
+ * @return status code (e.g. 404), or negative if request
+ */
 int vlc_http_msg_get_status(const struct vlc_http_msg *m);
-const char *vlc_http_msg_get_method(const struct vlc_http_msg *m);
-const char *vlc_http_msg_get_scheme(const struct vlc_http_msg *m);
-const char *vlc_http_msg_get_authority(const struct vlc_http_msg *m);
-const char *vlc_http_msg_get_path(const struct vlc_http_msg *m);
+
+/**
+ * Gets request method.
+ *
+ * @return request method (e.g. "GET"), or NULL if response
+ */
+const char *vlc_http_msg_get_method(const struct vlc_http_msg *);
+
+/**
+ * Gets request scheme.
+ *
+ * @return request scheme (e.g. "https"), or NULL if absent
+ */
+const char *vlc_http_msg_get_scheme(const struct vlc_http_msg *);
+
+/**
+ * Gets request authority.
+ *
+ * @return request authority (e.g. "www.example.com:8080"),
+ *         or NULL if response
+ */
+const char *vlc_http_msg_get_authority(const struct vlc_http_msg *);
+
+/**
+ * Gets request absolute path.
+ *
+ * @return request absolute path (e.g. "/index.html"), or NULL if absent
+ */
+const char *vlc_http_msg_get_path(const struct vlc_http_msg *);
 
 /**
  * Looks up a token in a header field.
@@ -168,16 +212,22 @@ const char *vlc_http_msg_get_token(const struct vlc_http_msg *,
 /**
  * Finds next token.
  *
- * Finds the following token in a HTTP field value.
+ * Finds the following token in a HTTP header field value.
+ *
+ * @return First character of the following token,
+ *         or NULL if there are no further tokens
  */
 const char *vlc_http_next_token(const char *);
 
 /**
  * Gets HTTP payload length.
  *
+ * Determines the total length (in bytes) of the payload associated with the
+ * HTTP message.
+ *
  * @return byte length, or (uintmax_t)-1 if unknown.
  */
-uintmax_t vlc_http_msg_get_size(const struct vlc_http_msg *m);
+uintmax_t vlc_http_msg_get_size(const struct vlc_http_msg *);
 
 /**
  * Gets next response headers.
@@ -188,9 +238,9 @@ uintmax_t vlc_http_msg_get_size(const struct vlc_http_msg *m);
  *
  * @param m current response headers (destroyed by the call)
  *
- * @return next response headers or NULL on error.
+ * @return next response headers or NULL on error
  */
-struct vlc_http_msg *vlc_http_msg_iterate(struct vlc_http_msg *m) VLC_USED;
+struct vlc_http_msg *vlc_http_msg_iterate(struct vlc_http_msg *) VLC_USED;
 
 /**
  * Gets final response headers.
@@ -202,9 +252,9 @@ struct vlc_http_msg *vlc_http_msg_iterate(struct vlc_http_msg *m) VLC_USED;
  * @param m current response headers or NULL
  *
  * @return the final response headers (m if it was already final),
- *         NULL if the parameter was NULL, or NULL on error.
+ *         NULL if the parameter was NULL, or NULL on error
  */
-struct vlc_http_msg *vlc_http_msg_get_final(struct vlc_http_msg *m) VLC_USED;
+struct vlc_http_msg *vlc_http_msg_get_final(struct vlc_http_msg *) VLC_USED;
 
 /**
  * Receives HTTP data.
@@ -215,15 +265,38 @@ struct vlc_http_msg *vlc_http_msg_get_final(struct vlc_http_msg *m) VLC_USED;
  *
  * @return data block, or NULL on end-of-stream or error
  */
-struct block_t *vlc_http_msg_read(struct vlc_http_msg *m) VLC_USED;
+struct block_t *vlc_http_msg_read(struct vlc_http_msg *) VLC_USED;
 
-/* Interfaces to lower layers */
+/** @} */
+
+/**
+ * \defgroup http_stream Streams
+ * \ingroup http_connmgr
+ *
+ * HTTP request/response streams
+ *
+ * A stream is initiated by a client-side request header. It includes a
+ * final response header, possibly preceded by one or more continuation
+ * response headers. After the response header, a stream usually carries
+ * a response payload.
+ *
+ * A stream may also carry a request payload (this is not supported so far).
+ *
+ * The HTTP stream constitutes the interface between an HTTP connection and
+ * the higher-level HTTP messages layer.
+ * @{
+ */
+
 struct vlc_http_stream;
 
 void vlc_http_msg_attach(struct vlc_http_msg *m, struct vlc_http_stream *s);
 struct vlc_http_msg *vlc_http_msg_get_initial(struct vlc_http_stream *s)
 VLC_USED;
 
+/** HTTP stream callbacks
+ *
+ * Connection-specific callbacks for stream manipulation
+ */
 struct vlc_http_stream_cbs
 {
     struct vlc_http_msg *(*read_headers)(struct vlc_http_stream *);
@@ -231,34 +304,83 @@ struct vlc_http_stream_cbs
     void (*close)(struct vlc_http_stream *, bool abort);
 };
 
+/** HTTP stream */
 struct vlc_http_stream
 {
     const struct vlc_http_stream_cbs *cbs;
 };
 
+/**
+ * Reads one message header.
+ *
+ * Reads the next message header of an HTTP stream from the network.
+ * There is always exactly one request header per stream. There is usually
+ * one response header per stream, except for continuation (1xx) headers.
+ *
+ * @warning The caller is responsible for reading headers at appropriate
+ * times as intended by the protocol. Failure to do so may result in protocol
+ * dead lock, and/or (HTTP 1.x) connection failure.
+ */
 static inline
 struct vlc_http_msg *vlc_http_stream_read_headers(struct vlc_http_stream *s)
 {
     return s->cbs->read_headers(s);
 }
 
+/**
+ * Reads message payload data.
+ *
+ * Reads the next block of data from the message payload of an HTTP stream.
+ */
 static inline struct block_t *vlc_http_stream_read(struct vlc_http_stream *s)
 {
     return s->cbs->read(s);
 }
 
+/**
+ * Closes an HTTP stream.
+ *
+ * Releases all resources associated or held by an HTTP stream. Any unread
+ * header or data is discarded.
+ */
 static inline void vlc_http_stream_close(struct vlc_http_stream *s, bool abort)
 {
     s->cbs->close(s, abort);
 }
 
+/** @} */
+
+/**
+ * Formats an HTTP 1.1 message header.
+ *
+ * Formats an message header in HTTP 1.x format, using HTTP version 1.1.
+ *
+ * @param m message to format/serialize
+ * @param lenp location to write the length of the formatted message in bytes
+ *             [OUT]
+ * @param proxied whether the message is meant for sending to a proxy rather
+ *                than an origin (only relevant for requests)
+ * @return A heap-allocated nul-terminated string or *lenp bytes,
+ *         or NULL on error
+ */
 char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp,
                           bool proxied) VLC_USED;
+
+/**
+ * Parses an HTTP 1.1 message header.
+ */
 struct vlc_http_msg *vlc_http_msg_headers(const char *msg) VLC_USED;
 
 struct vlc_h2_frame;
 
+/**
+ * Formats an HTTP 2.0 HEADER frame.
+ */
 struct vlc_h2_frame *vlc_http_msg_h2_frame(const struct vlc_http_msg *m,
                                            uint_fast32_t stream_id, bool eos);
+
+/**
+ * Parses an HTTP 2.0 header table.
+ */
 struct vlc_http_msg *vlc_http_msg_h2_headers(unsigned count,
                                              const char *const headers[][2]);

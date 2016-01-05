@@ -18,6 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * \defgroup http_conn Connections
+ * HTTP connections
+ * \ingroup http_connmgr
+ * @{
+ */
+
 struct vlc_tls;
 struct vlc_http_conn;
 struct vlc_http_msg;
@@ -47,8 +54,22 @@ static inline void vlc_http_conn_release(struct vlc_http_conn *conn)
     conn->cbs->release(conn);
 }
 
+/**
+ * \defgroup http1 HTTP/1.x
+ * @{
+ */
 struct vlc_http_conn *vlc_h1_conn_create(struct vlc_tls *, bool proxy);
-struct vlc_http_conn *vlc_h2_conn_create(struct vlc_tls *);
-
 struct vlc_http_stream *vlc_chunked_open(struct vlc_http_stream *,
                                          struct vlc_tls *);
+
+/** @} */
+
+/**
+ * \defgroup h2 HTTP/2.0
+ * @{
+ */
+struct vlc_http_conn *vlc_h2_conn_create(struct vlc_tls *);
+
+/** @} */
+
+/** @} */

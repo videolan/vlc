@@ -21,6 +21,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/**
+ * \defgroup h2_frames HTTP/2 frames
+ * \ingroup h2
+ * @{
+ */
+
 struct vlc_h2_frame
 {
     struct vlc_h2_frame *next;
@@ -128,3 +134,5 @@ const uint8_t *vlc_h2_frame_data_get(const struct vlc_h2_frame *f,
         const struct vlc_h2_frame *: (vlc_h2_frame_data_get)(f, l), \
         struct vlc_h2_frame *: (uint8_t *)(vlc_h2_frame_data_get)(f, l))
 #endif
+
+/** @} */

@@ -18,6 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * \defgroup http_res Resources
+ * Remote HTTP resources identified by a URL
+ * \ingroup http
+ * @{
+ */
+
 struct vlc_http_msg;
 struct vlc_http_mgr;
 
@@ -44,3 +51,5 @@ char *vlc_http_res_get_redirect(const struct vlc_http_resource *,
                                 const struct vlc_http_msg *resp);
 char *vlc_http_res_get_type(const struct vlc_http_msg *resp);
 struct block_t *vlc_http_res_read(struct vlc_http_msg *resp);
+
+/** @} */
