@@ -132,7 +132,7 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
         case STATE_NOSYNC:
             /* Find a startcode */
             if( !block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
-                                                p_pack->p_startcode, p_pack->i_startcode ) )
+                                                p_pack->p_startcode, p_pack->i_startcode, NULL ) )
                 p_pack->i_state = STATE_NEXT_SYNC;
 
             if( p_pack->i_offset )
@@ -150,7 +150,7 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
         case STATE_NEXT_SYNC:
             /* Find the next startcode */
             if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
-                                               p_pack->p_startcode, p_pack->i_startcode ) )
+                                               p_pack->p_startcode, p_pack->i_startcode, NULL ) )
             {
                 if( !p_pack->b_flushing || !p_pack->bytestream.p_chain )
                     return NULL; /* Need more data */

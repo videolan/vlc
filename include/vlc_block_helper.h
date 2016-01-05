@@ -438,9 +438,12 @@ static inline int block_PeekOffsetBytes( block_bytestream_t *p_bytestream,
     return VLC_SUCCESS;
 }
 
+typedef const uint8_t * (*block_startcode_helper_t)( const uint8_t *, const uint8_t * );
+
 static inline int block_FindStartcodeFromOffset(
     block_bytestream_t *p_bytestream, size_t *pi_offset,
-    const uint8_t *p_startcode, int i_startcode_length )
+    const uint8_t *p_startcode, int i_startcode_length,
+    block_startcode_helper_t p_startcode_helper )
 {
     block_t *p_block, *p_block_backup = 0;
     int i_size = 0;
@@ -472,6 +475,21 @@ static inline int block_FindStartcodeFromOffset(
     {
         for( i_offset = i_size; i_offset < p_block->i_buffer; i_offset++ )
         {
+            /* Use optimized helper when possible */
+            if( p_startcode_helper && !i_match &&
+               (p_block->i_buffer - i_offset) > ((size_t)i_startcode_length - 1) )
+            {
+                const uint8_t *p_res = p_startcode_helper( &p_block->p_buffer[i_offset],
+                                                           &p_block->p_buffer[p_block->i_buffer] );
+                if( p_res )
+                {
+                    *pi_offset += i_offset + (p_res - &p_block->p_buffer[i_offset]);
+                    return VLC_SUCCESS;
+                }
+                /* Then parsing boundary with legacy code */
+                i_offset = p_block->i_buffer - (i_startcode_length - 1);
+            }
+
             if( p_block->p_buffer[i_offset] == p_startcode[i_match] )
             {
                 if( !i_match )
