@@ -428,6 +428,7 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
 static ssize_t st_Send (vlc_tls_t *session, const void *buf, size_t length)
 {
     vlc_tls_sys_t *sys = session->sys;
+    assert(sys);
     OSStatus ret = noErr;
 
     /*
@@ -481,9 +482,7 @@ static ssize_t st_Send (vlc_tls_t *session, const void *buf, size_t length)
 static ssize_t st_Recv (vlc_tls_t *session, void *buf, size_t length)
 {
     vlc_tls_sys_t *sys = session->sys;
-
-    if (sys == NULL || buf == NULL)
-        return 0;
+    assert(sys);
 
     size_t actualSize;
     OSStatus ret = SSLRead(sys->p_context, buf, length, &actualSize);
