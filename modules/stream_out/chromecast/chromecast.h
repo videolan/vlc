@@ -34,8 +34,6 @@
 #include <vlc_sout.h>
 #include <vlc_tls.h>
 
-#include <queue>
-
 #include "cast_channel.pb.h"
 
 #define PACKET_HEADER_LEN 4
@@ -77,7 +75,6 @@ struct intf_sys_t
     void msgReceiverClose(std::string destinationId);
 
     void handleMessages();
-    int sendMessages();
 
     connection_status getConnectionStatus() const
     {
@@ -108,12 +105,10 @@ struct intf_sys_t
 
     void msgPlayerLoad();
 
-    std::queue<castchannel::CastMessage> messagesToSend;
-
     void processMessage(const castchannel::CastMessage &msg);
 
 private:
-    int sendMessage(castchannel::CastMessage &msg);
+    int sendMessage(const castchannel::CastMessage &msg);
 
     void buildMessage(const std::string & namespace_,
                       const std::string & payload,

@@ -286,8 +286,6 @@ static void Close(vlc_object_t *p_this)
         // ft
     case CHROMECAST_AUTHENTICATED:
         p_sys->p_intf->msgReceiverClose(DEFAULT_CHOMECAST_RECEIVER);
-        // Send the just added close messages.
-        p_sys->p_intf->sendMessages();
         // ft
     default:
         break;
@@ -328,7 +326,6 @@ static void* chromecastThread(void* p_data)
     sout_stream_sys_t* p_sys = p_stream->p_sys;
 
     p_sys->p_intf->msgAuth();
-    p_sys->p_intf->sendMessages();
     vlc_restorecancel(canc);
 
     while (1)

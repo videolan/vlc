@@ -88,7 +88,7 @@ void intf_sys_t::buildMessage(const std::string & namespace_,
     else // CastMessage_PayloadType_BINARY
         msg.set_payload_binary(payload);
 
-    messagesToSend.push(msg);
+    sendMessage(msg);
 }
 
 intf_sys_t::intf_sys_t(sout_stream_t * const p_this)
@@ -529,46 +529,29 @@ void intf_sys_t::msgPlayerLoad()
 /**
  * @brief Send a message to the Chromecast
  * @param msg the CastMessage to send
- * @return the number of bytes sent or -1 on error
+ * @return vlc error code
  */
-int intf_sys_t::sendMessage(castchannel::CastMessage &msg)
+int intf_sys_t::sendMessage(const castchannel::CastMessage &msg)
 {
-    uint32_t i_size = msg.ByteSize();
-    uint32_t i_sizeNetwork = hton32(i_size);
-
-    char *p_data = new(std::nothrow) char[PACKET_HEADER_LEN + i_size];
+    int i_size = msg.ByteSize();
+    uint8_t *p_data = new(std::nothrow) uint8_t[PACKET_HEADER_LEN + i_size];
     if (p_data == NULL)
-        return -1;
+        return VLC_ENOMEM;
 
-    memcpy(p_data, &i_sizeNetwork, PACKET_HEADER_LEN);
-    msg.SerializeWithCachedSizesToArray((uint8_t *)(p_data + PACKET_HEADER_LEN));
+#ifndef NDEBUG
+    msg_Dbg(p_stream, "sendMessage: %s->%s %s", msg.namespace_().c_str(), msg.destination_id().c_str(), msg.payload_utf8().c_str());
+#endif
 
+    SetDWBE(p_data, i_size);
+    msg.SerializeWithCachedSizesToArray(p_data + PACKET_HEADER_LEN);
+
+    vlc_mutex_locker locker(&lock);
     int i_ret = tls_Send(p_tls, p_data, PACKET_HEADER_LEN + i_size);
     delete[] p_data;
+    if (i_ret == PACKET_HEADER_LEN + i_size)
+        return VLC_SUCCESS;
 
-    return i_ret;
-}
-
-
-/**
- * @brief Send all the messages in the pending queue to the Chromecast
- * @param msg the CastMessage to send
- * @return the number of bytes sent or -1 on error
- */
-int intf_sys_t::sendMessages()
-{
-    int i_ret = 0;
-    while (!messagesToSend.empty())
-    {
-        unsigned i_retSend = sendMessage(messagesToSend.front());
-        if (i_retSend <= 0)
-            return i_retSend;
-
-        messagesToSend.pop();
-        i_ret += i_retSend;
-    }
-
-    return i_ret;
+    return VLC_EGENERIC;
 }
 
 void intf_sys_t::handleMessages()
@@ -613,22 +596,6 @@ void intf_sys_t::handleMessages()
         castchannel::CastMessage msg;
         msg.ParseFromArray(p_packet + PACKET_HEADER_LEN, i_payloadSize);
         processMessage(msg);
-    }
-
-    // Send the answer messages if there is any.
-    if (!messagesToSend.empty())
-    {
-        i_ret = sendMessages();
-#if defined(_WIN32)
-        if ((i_ret < 0 && WSAGetLastError() != WSAEWOULDBLOCK) || (i_ret == 0))
-#else
-        if ((i_ret < 0 && errno != EAGAIN) || i_ret == 0)
-#endif
-        {
-            msg_Err(p_stream, "The connection to the Chromecast died (sending).");
-            vlc_mutex_locker locker(&lock);
-            setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
-        }
     }
 
     vlc_restorecancel(canc);
