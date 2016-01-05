@@ -124,7 +124,8 @@ int main(void)
     assert(m == NULL);
     b = vlc_http_stream_read(s);
     assert(b == NULL);
-    vlc_http_stream_close(s, true);
+    m = vlc_http_msg_get_initial(s);
+    assert(m == NULL);
 
     s = stream_open();
     assert(s == NULL);
@@ -149,7 +150,7 @@ int main(void)
     s = stream_open();
     assert(s != NULL);
     conn_send("HTTP/1.0 200 OK\r\n\r\n");
-    m = vlc_http_stream_read_headers(s);
+    m = vlc_http_msg_get_initial(s);
     assert(m != NULL);
 
     conn_send("Hello world!");
@@ -169,7 +170,7 @@ int main(void)
     s = stream_open();
     assert(s != NULL);
     conn_send("HTTP/1.1 200 OK\r\nConnection: close\r\n\r\n");
-    m = vlc_http_stream_read_headers(s);
+    m = vlc_http_msg_get_initial(s);
     assert(m != NULL);
 
     conn_send("Hello again!");
@@ -190,7 +191,7 @@ int main(void)
     assert(s != NULL);
     conn_send("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n"
               "Content-Length: 1000000\r\n\r\n"); /* length must be ignored */
-    m = vlc_http_stream_read_headers(s);
+    m = vlc_http_msg_get_initial(s);
     assert(m != NULL);
 
     conn_send("C\r\nHello there!\r\n0\r\n\r\n");
@@ -209,7 +210,7 @@ int main(void)
     s = stream_open();
     assert(s != NULL);
     conn_send("HTTP/1.1 200 OK\r\nContent-Length: 8\r\n\r\n");
-    m = vlc_http_stream_read_headers(s);
+    m = vlc_http_msg_get_initial(s);
     assert(m != NULL);
 
     conn_send("Bye bye!");

@@ -323,7 +323,7 @@ struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
             assert(mtime == 1382386402);
     }
 
-    return vlc_http_stream_read_headers(&stream);
+    return vlc_http_msg_get_initial(&stream);
 }
 
 int vlc_http_mgr_send_cookies(struct vlc_http_mgr *mgr,

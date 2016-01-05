@@ -221,6 +221,8 @@ struct block_t *vlc_http_msg_read(struct vlc_http_msg *m) VLC_USED;
 struct vlc_http_stream;
 
 void vlc_http_msg_attach(struct vlc_http_msg *m, struct vlc_http_stream *s);
+struct vlc_http_msg *vlc_http_msg_get_initial(struct vlc_http_stream *s)
+VLC_USED;
 
 struct vlc_http_stream_cbs
 {

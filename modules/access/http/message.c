@@ -262,6 +262,14 @@ struct vlc_http_msg *vlc_http_msg_iterate(struct vlc_http_msg *m)
     return next;
 }
 
+struct vlc_http_msg *vlc_http_msg_get_initial(struct vlc_http_stream *s)
+{
+    struct vlc_http_msg *m = vlc_http_stream_read_headers(s);
+    if (m == NULL)
+        vlc_http_stream_close(s, false);
+    return m;
+}
+
 struct vlc_http_msg *vlc_http_msg_get_final(struct vlc_http_msg *m)
 {
     while (m != NULL && (vlc_http_msg_get_status(m) / 100) == 1)

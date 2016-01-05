@@ -188,7 +188,7 @@ int main(void)
     s = stream_open();
     assert(s != NULL);
     stream_reply(sid, false);
-    m = vlc_http_stream_read_headers(s);
+    m = vlc_http_msg_get_initial(s);
     assert(m != NULL);
     vlc_http_msg_destroy(m);
 
@@ -205,7 +205,7 @@ int main(void)
     s = stream_open();
     assert(s != NULL);
     stream_continuation(sid);
-    m = vlc_http_stream_read_headers(s);
+    m = vlc_http_msg_get_initial(s);
     assert(m != NULL);
     assert(vlc_http_msg_get_status(m) == 100);
     stream_reply(sid, false);
@@ -238,10 +238,10 @@ int main(void)
     s2 = stream_open(); /* second stream to enforce test timing/ordering */
     assert(s2 != NULL);
     stream_reply(sid, true);
-    m = vlc_http_stream_read_headers(s2);
+    m = vlc_http_msg_get_initial(s2);
     assert(m != NULL);
     vlc_http_msg_destroy(m);
-    m = vlc_http_stream_read_headers(s);
+    m = vlc_http_msg_get_initial(s);
     assert(m != NULL);
     assert(vlc_http_msg_get_status(m) == 200);
     b = vlc_http_msg_read(m);
@@ -266,10 +266,10 @@ int main(void)
     stream_reply(sid, false);
     stream_reply(sid - 2, true);
     stream_data(sid, "Discarded", false); /* not read data */
-    m = vlc_http_stream_read_headers(s);
+    m = vlc_http_msg_get_initial(s);
     assert(m != NULL);
     vlc_http_msg_destroy(m);
-    m = vlc_http_stream_read_headers(s2);
+    m = vlc_http_msg_get_initial(s2);
     assert(m != NULL);
     vlc_http_msg_destroy(m);
 

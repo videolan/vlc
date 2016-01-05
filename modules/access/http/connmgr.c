@@ -167,11 +167,10 @@ struct vlc_http_msg *vlc_http_mgr_reuse(struct vlc_http_mgr *mgr,
     struct vlc_http_stream *stream = vlc_http_stream_open(conn, req);
     if (stream != NULL)
     {
-        struct vlc_http_msg *m = vlc_http_stream_read_headers(stream);
+        struct vlc_http_msg *m = vlc_http_msg_get_initial(stream);
         if (m != NULL)
             return m;
 
-        vlc_http_stream_close(stream, false);
         /* NOTE: If the request were not idempotent, we would not know if it
          * was processed by the other end. Thus POST is not used/supported so
          * far, and CONNECT is treated as if it were idempotent (which works
