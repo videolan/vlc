@@ -35,10 +35,10 @@
 #include <assert.h>
 
 #include <vlc_access.h>
-#include <vlc_dialog.h>
 #include <vlc_input_item.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
+#include <vlc_keystore.h>
 
 #include <libssh2.h>
 #include <libssh2_sftp.h>
@@ -107,9 +107,9 @@ static int Open( vlc_object_t* p_this )
 {
     access_t*   p_access = (access_t*)p_this;
     access_sys_t* p_sys;
+    vlc_url_t credential_url;
+    vlc_credential credential;
     const char* psz_path;
-    char* psz_username = NULL;
-    char* psz_password = NULL;
     char* psz_remote_home = NULL;
     int i_port;
     int i_ret;
@@ -126,6 +126,9 @@ static int Open( vlc_object_t* p_this )
 
     p_sys->i_socket = -1;
 
+    vlc_UrlParse( &credential_url, p_access->psz_url );
+    vlc_credential_init( &credential, &credential_url );
+
     /* Parse the URL */
     vlc_UrlParse( &url, p_access->psz_location );
 
@@ -134,28 +137,6 @@ static int Open( vlc_object_t* p_this )
     {
         msg_Err( p_access, "You might give a non empty host" );
         goto error;
-    }
-
-    /* get user/password from url or options */
-    if( !EMPTY_STR( url.psz_username ) )
-        psz_username = strdup( url.psz_username );
-    else
-        psz_username = var_InheritString( p_access, "sftp-user" );
-
-    if( url.psz_password )
-        psz_password = strdup( url.psz_password );
-    else
-        psz_password = var_InheritString( p_access, "sftp-pwd" );
-
-    /* If the user name or password is empty, ask the user */
-    if( EMPTY_STR( psz_username ) || !psz_password )
-    {
-        dialog_Login( p_access, &psz_username, &psz_password,
-                      _("SFTP authentication"),
-                      _("Please enter a valid login and password for the sftp "
-                        "connexion to %s"), url.psz_host );
-        if( EMPTY_STR(psz_username) || !psz_password )
-            goto error;
     }
 
     if( url.i_port <= 0 )
@@ -231,11 +212,21 @@ static int Open( vlc_object_t* p_this )
 
     //TODO: ask for the available auth methods
 
-    /* send the login/password */
-    if( libssh2_userauth_password( p_sys->ssh_session, psz_username, psz_password ) )
+    while( vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
+                               _("SFTP authentication"),
+                               _("Please enter a valid login and password for "
+                               "the sftp connexion to %s"), url.psz_host ) )
     {
-        msg_Err( p_access, "Authentication by password failed" );
-        goto error;
+        /* send the login/password */
+        if( libssh2_userauth_password( p_sys->ssh_session,
+                                       credential.psz_username,
+                                       credential.psz_password ) == 0 )
+        {
+            vlc_credential_store( &credential );
+            break;
+        }
+        else
+            msg_Warn( p_access, "sftp auth failed for %s", credential.psz_username );
     }
 
     /* Create the sftp session */
@@ -297,9 +288,9 @@ static int Open( vlc_object_t* p_this )
 
         if( p_sys->file )
         {
-            if( -1 == asprintf( &p_sys->psz_username_opt, "sftp-user=%s", psz_username ) )
+            if( -1 == asprintf( &p_sys->psz_username_opt, "sftp-user=%s", credential.psz_username ) )
                 p_sys->psz_username_opt = NULL;
-            if( -1 == asprintf( &p_sys->psz_password_opt, "sftp-pwd=%s", psz_password ) )
+            if( -1 == asprintf( &p_sys->psz_password_opt, "sftp-pwd=%s", credential.psz_password ) )
                 p_sys->psz_password_opt = NULL;
         }
     }
@@ -310,10 +301,10 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
-    free( psz_password );
-    free( psz_username );
     free( psz_remote_home );
     vlc_UrlClean( &url );
+    vlc_credential_clean( &credential );
+    vlc_UrlClean( &credential_url );
     return VLC_SUCCESS;
 
 error:
@@ -321,10 +312,10 @@ error:
         libssh2_sftp_close_handle( p_sys->file );
     if( p_sys->ssh_session )
         libssh2_session_free( p_sys->ssh_session );
-    free( psz_password );
-    free( psz_username );
     free( psz_remote_home );
     vlc_UrlClean( &url );
+    vlc_credential_clean( &credential );
+    vlc_UrlClean( &credential_url );
     if( p_sys->i_socket >= 0 )
         net_Close( p_sys->i_socket );
     free( p_sys );
