@@ -44,9 +44,11 @@ http_file_test_SOURCES = access/http/file_test.c \
 	access/http/message.c access/http/message.h \
 	access/http/resource.c access/http/resource.h \
 	access/http/file.c access/http/file.h
+http_tunnel_test_SOURCES = access/http/tunnel_test.c
+http_tunnel_test_LDADD = libvlc_http.la
 check_PROGRAMS += hpack_test hpackenc_test \
 	h2frame_test h2output_test h2conn_test h1conn_test h1chunked_test \
-	http_msg_test http_file_test
+	http_msg_test http_file_test http_tunnel_test
 TESTS += hpack_test hpackenc_test \
 	h2frame_test h2output_test h2conn_test h1conn_test h1chunked_test \
-	http_msg_test http_file_test
+	http_msg_test http_file_test http_tunnel_test
