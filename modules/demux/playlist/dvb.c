@@ -87,6 +87,7 @@ static int Demux(demux_t *demux)
     while ((line = stream_ReadLine(demux->s)) != NULL)
     {
         input_item_t *item = ParseLine(line);
+        free(line);
         if (item == NULL)
             continue;
 
