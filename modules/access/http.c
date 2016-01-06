@@ -136,6 +136,8 @@ struct access_sys_t
     vlc_url_t url;
     char    *psz_user_agent;
     char    *psz_referrer;
+    char    *psz_username;
+    char    *psz_password;
     http_auth_t auth;
 
     /* Proxy */
@@ -226,6 +228,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_location = NULL;
     p_sys->psz_user_agent = NULL;
     p_sys->psz_referrer = NULL;
+    p_sys->psz_username = NULL;
+    p_sys->psz_password = NULL;
     p_sys->b_pace_control = true;
 #ifdef HAVE_ZLIB_H
     p_sys->b_compressed = false;
@@ -383,7 +387,6 @@ connect:
             msg_Err( p_access, "authentication failed without realm" );
             goto error;
         }
-        char *psz_login, *psz_password;
         /* FIXME ? */
         if( p_sys->url.psz_username && p_sys->url.psz_password &&
             p_sys->auth.psz_nonce && p_sys->auth.i_nonce == 0 )
@@ -391,26 +394,26 @@ connect:
             Disconnect( p_access );
             goto connect;
         }
+        free( p_sys->psz_username );
+        free( p_sys->psz_password );
+        p_sys->psz_username = p_sys->psz_password = NULL;
+
         msg_Dbg( p_access, "authentication failed for realm %s",
                  p_sys->auth.psz_realm );
-        dialog_Login( p_access, &psz_login, &psz_password,
+        dialog_Login( p_access, &p_sys->psz_username, &p_sys->psz_password,
                       _("HTTP authentication"),
              _("Please enter a valid login name and a password for realm %s."),
                       p_sys->auth.psz_realm );
-        if( psz_login != NULL && psz_password != NULL )
+        if( p_sys->psz_username != NULL && p_sys->psz_password != NULL )
         {
-            msg_Dbg( p_access, "retrying with user=%s", psz_login );
-            p_sys->url.psz_username = psz_login;
-            p_sys->url.psz_password = psz_password;
+            msg_Dbg( p_access, "retrying with user=%s", p_sys->psz_username );
+            p_sys->url.psz_username = p_sys->psz_username;
+            p_sys->url.psz_password = p_sys->psz_password;
             Disconnect( p_access );
             goto connect;
         }
         else
-        {
-            free( psz_login );
-            free( psz_password );
             goto error;
-        }
     }
 
     if( ( p_sys->i_code == 301 || p_sys->i_code == 302 ||
@@ -456,6 +459,8 @@ error:
     free( p_sys->psz_location );
     free( p_sys->psz_user_agent );
     free( p_sys->psz_referrer );
+    free( p_sys->psz_username );
+    free( p_sys->psz_password );
 
     Disconnect( p_access );
     vlc_tls_Delete( p_sys->p_creds );
@@ -490,6 +495,8 @@ static void Close( vlc_object_t *p_this )
 
     free( p_sys->psz_user_agent );
     free( p_sys->psz_referrer );
+    free( p_sys->psz_username );
+    free( p_sys->psz_password );
 
     Disconnect( p_access );
     vlc_tls_Delete( p_sys->p_creds );
