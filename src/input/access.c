@@ -237,7 +237,10 @@ static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
     block->i_buffer -= copy;
 
     if (block->i_buffer == 0)
+    {
         block_Release(block);
+        sys->block = NULL;
+    }
     else
         sys->block = block;
 
