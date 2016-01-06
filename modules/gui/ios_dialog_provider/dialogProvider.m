@@ -387,7 +387,8 @@ bool checkProgressPanel (void *priv)
                                                                                  message:dialog[@"message"]
                                                                           preferredStyle:UIAlertControllerStyleAlert];
 
-        [alertController addAction:[UIAlertAction actionWithTitle:dialog[@"cancel"]
+        NSString *cancelTitle = dialog[@"cancel"];
+        [alertController addAction:[UIAlertAction actionWithTitle:cancelTitle != nil ? cancelTitle : NSLocalizedString(@"Cancel", nil)
                                                             style:UIAlertActionStyleDestructive
                                                           handler:^(UIAlertAction * _Nonnull action) {
                                                               ret = 3;
