@@ -94,7 +94,6 @@
 - (void)addPlaylistItems:(NSArray*)o_array withParentItemId:(int)i_plItemId atPos:(int)i_position startPlayback:(BOOL)b_start;
 
 
-- (void)setColumn: (NSString *)o_column state: (NSInteger)i_state translationDict:(NSDictionary *)o_dict;
 - (void)continuePlaybackWhereYouLeftOff:(input_thread_t *)p_input_thread;
 - (void)storePlaybackPositionForItem:(input_thread_t *)p_input_thread;
 

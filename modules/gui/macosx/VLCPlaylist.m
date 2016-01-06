@@ -76,6 +76,11 @@
     BOOL b_playlistmenu_nib_loaded;
 
     PLModel *_model;
+
+    // information for playlist table columns menu
+
+    NSDictionary *_translationsForPlaylistTableColumns;
+    NSArray *_menuOrderOfPlaylistTableColumns;
 }
 
 - (void)saveTableColumns;
@@ -94,6 +99,26 @@
         _descendingSortingImage = [[NSOutlineView class] _defaultTableHeaderReverseSortImage];
 
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
+
+
+        _translationsForPlaylistTableColumns = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                                _NS("Track Number"),  TRACKNUM_COLUMN,
+                                                _NS("Title"),         TITLE_COLUMN,
+                                                _NS("Author"),        ARTIST_COLUMN,
+                                                _NS("Duration"),      DURATION_COLUMN,
+                                                _NS("Genre"),         GENRE_COLUMN,
+                                                _NS("Album"),         ALBUM_COLUMN,
+                                                _NS("Description"),   DESCRIPTION_COLUMN,
+                                                _NS("Date"),          DATE_COLUMN,
+                                                _NS("Language"),      LANGUAGE_COLUMN,
+                                                _NS("URI"),           URI_COLUMN,
+                                                _NS("File Size"),     FILESIZE_COLUMN,
+                                                nil];
+        // this array also assigns tags (index) to type of menu item
+        _menuOrderOfPlaylistTableColumns = [[NSArray alloc] initWithObjects: TRACKNUM_COLUMN, TITLE_COLUMN,
+                                            ARTIST_COLUMN, DURATION_COLUMN, GENRE_COLUMN, ALBUM_COLUMN,
+                                            DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN,
+                                            FILESIZE_COLUMN,nil];
 
     }
     return self;
@@ -170,8 +195,12 @@
 {
     VLCMainMenu *mainMenu = [[VLCMain sharedInstance] mainMenu];
     _playlistHeaderView = playlistHeaderView;
-    NSMenu *contextMenu = [mainMenu setupPlaylistTableColumnsMenu];
+
+    // Setup playlist table column selection for both context and main menu
+    NSMenu *contextMenu = [[NSMenu alloc] init];
+    [self setupPlaylistTableColumnsForMenu:contextMenu];
     [_playlistHeaderView setMenu: contextMenu];
+    [self setupPlaylistTableColumnsForMenu:[[[VLCMain sharedInstance] mainMenu] playlistTableColumnsMenu]];
 
     NSArray * columnArray = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PlaylistColumnSelection"];
     NSUInteger columnCount = [columnArray count];
@@ -182,7 +211,7 @@
         if ([column isEqualToString:@"status"])
             continue;
 
-        if(![mainMenu setPlaylistColumnTableState: NSOnState forColumn:column])
+        if(![self setPlaylistColumnTableState: NSOnState forColumn:column])
             continue;
 
         [[_outlineView tableColumnWithIdentifier: column] setWidth: [columnArray[i][1] floatValue]];
@@ -403,6 +432,60 @@
 //    [self playlistUpdated];
 }
 
+// Actions for playlist column selections
+
+
+- (void)togglePlaylistColumnTable:(id)sender
+{
+    NSInteger i_new_state = ![sender state];
+    NSInteger i_tag = [sender tag];
+
+    NSString *column = [_menuOrderOfPlaylistTableColumns objectAtIndex:i_tag];
+
+    [self setPlaylistColumnTableState:i_new_state forColumn:column];
+}
+
+- (BOOL)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)columnId
+{
+    NSUInteger i_tag = [_menuOrderOfPlaylistTableColumns indexOfObject: columnId];
+    // prevent setting unknown columns
+    if(i_tag == NSNotFound)
+        return NO;
+
+    // update state of menu items
+    [[[_playlistHeaderView menu] itemWithTag: i_tag] setState: i_state];
+    [[[[[VLCMain sharedInstance] mainMenu] playlistTableColumnsMenu] itemWithTag: i_tag] setState: i_state];
+
+    // Change outline view
+    if (i_state == NSOnState) {
+        NSString *title = [_translationsForPlaylistTableColumns objectForKey:columnId];
+        if (!title)
+            return NO;
+
+        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:columnId];
+        [tableColumn setEditable:NO];
+        [[tableColumn dataCell] setFont:[NSFont controlContentFontOfSize:11.]];
+
+        [[tableColumn headerCell] setStringValue:[_translationsForPlaylistTableColumns objectForKey:columnId]];
+
+        if ([columnId isEqualToString: TRACKNUM_COLUMN]) {
+            [tableColumn setWidth:20.];
+            [tableColumn setResizingMask:NSTableColumnNoResizing];
+            [[tableColumn headerCell] setStringValue:@"#"];
+        }
+
+        [_outlineView addTableColumn:tableColumn];
+        [_outlineView reloadData];
+        [_outlineView setNeedsDisplay: YES];
+    }
+    else
+        [_outlineView removeTableColumn: [_outlineView tableColumnWithIdentifier:columnId]];
+
+    [_outlineView setOutlineTableColumn: [_outlineView tableColumnWithIdentifier:TITLE_COLUMN]];
+
+    return YES;
+}
+
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(revealItemInFinder:)) {
@@ -423,6 +506,43 @@
     }
 
     return YES;
+}
+
+#pragma mark -
+#pragma mark Helper for playlist table columns
+
+- (void)setupPlaylistTableColumnsForMenu:(NSMenu *)menu
+{
+    NSMenuItem *menuItem;
+    NSUInteger count = [_menuOrderOfPlaylistTableColumns count];
+    for (NSUInteger i = 0; i < count; i++) {
+        NSString *columnId = [_menuOrderOfPlaylistTableColumns objectAtIndex:i];
+        NSString *title = [_translationsForPlaylistTableColumns objectForKey:columnId];
+        menuItem = [menu addItemWithTitle:title
+                                   action:@selector(togglePlaylistColumnTable:)
+                            keyEquivalent:@""];
+        [menuItem setTarget:self];
+        [menuItem setTag:i];
+
+        /* don't set a valid action for the title column selector, since we want it to be disabled */
+        if ([columnId isEqualToString: TITLE_COLUMN])
+            [menuItem setAction:nil];
+
+    }
+}
+
+- (void)saveTableColumns
+{
+    NSMutableArray *arrayToSave = [[NSMutableArray alloc] init];
+    NSArray *columns = [[NSArray alloc] initWithArray:[_outlineView tableColumns]];
+    NSUInteger columnCount = [columns count];
+    NSTableColumn *currentColumn;
+    for (NSUInteger i = 0; i < columnCount; i++) {
+        currentColumn = columns[i];
+        [arrayToSave addObject:[NSArray arrayWithObjects:[currentColumn identifier], [NSNumber numberWithFloat:[currentColumn width]], nil]];
+    }
+    [[NSUserDefaults standardUserDefaults] setObject:arrayToSave forKey:@"PlaylistColumnSelection"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 #pragma mark -
@@ -703,49 +823,6 @@
 - (NSArray *)draggedItems
 {
     return [[self model] draggedItems];
-}
-
-- (void)setColumn:(NSString *)columnIdentifier state:(NSInteger)i_state translationDict:(NSDictionary *)translationDict
-{
-    if (i_state == NSOnState) {
-        NSString *title = [translationDict objectForKey:columnIdentifier];
-        if (!title)
-            return;
-
-        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:columnIdentifier];
-        [tableColumn setEditable:NO];
-        [[tableColumn dataCell] setFont:[NSFont controlContentFontOfSize:11.]];
-
-        [[tableColumn headerCell] setStringValue:[translationDict objectForKey:columnIdentifier]];
-
-        if ([columnIdentifier isEqualToString: TRACKNUM_COLUMN]) {
-            [tableColumn setWidth:20.];
-            [tableColumn setResizingMask:NSTableColumnNoResizing];
-            [[tableColumn headerCell] setStringValue:@"#"];
-        }
-
-        [_outlineView addTableColumn:tableColumn];
-        [_outlineView reloadData];
-        [_outlineView setNeedsDisplay: YES];
-    }
-    else
-        [_outlineView removeTableColumn: [_outlineView tableColumnWithIdentifier:columnIdentifier]];
-
-    [_outlineView setOutlineTableColumn: [_outlineView tableColumnWithIdentifier:TITLE_COLUMN]];
-}
-
-- (void)saveTableColumns
-{
-    NSMutableArray *arrayToSave = [[NSMutableArray alloc] init];
-    NSArray *columns = [[NSArray alloc] initWithArray:[_outlineView tableColumns]];
-    NSUInteger columnCount = [columns count];
-    NSTableColumn *currentColumn;
-    for (NSUInteger i = 0; i < columnCount; i++) {
-        currentColumn = columns[i];
-        [arrayToSave addObject:[NSArray arrayWithObjects:[currentColumn identifier], [NSNumber numberWithFloat:[currentColumn width]], nil]];
-    }
-    [[NSUserDefaults standardUserDefaults] setObject:arrayToSave forKey:@"PlaylistColumnSelection"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (BOOL)isValidResumeItem:(input_item_t *)p_item

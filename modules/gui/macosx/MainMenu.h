@@ -226,8 +226,6 @@
 - (IBAction)toggleJumpButtons:(id)sender;
 - (IBAction)togglePlaymodeButtons:(id)sender;
 - (IBAction)toggleSidebar:(id)sender;
-- (BOOL)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column;
-- (NSMenu *)setupPlaylistTableColumnsMenu;
 
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;

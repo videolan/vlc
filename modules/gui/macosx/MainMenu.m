@@ -58,10 +58,6 @@
     HelpWindowController  *_helpWindowController;
     AddonsWindowController *_addonsController;
 
-    // information for playlist table columns menu
-    NSDictionary *_translationsForPlaylistTableColumns;
-    NSArray *_menuOrderOfPlaylistTableColumns;
-
     NSMenu *_playlistTableColumnsContextMenu;
 
     __strong VLCTimeSelectionPanelController *_timeSelectionPanel;
@@ -95,25 +91,6 @@
     }
 
     [self setRateControlsEnabled:NO];
-
-    _translationsForPlaylistTableColumns = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                            _NS("Track Number"),  TRACKNUM_COLUMN,
-                                            _NS("Title"),         TITLE_COLUMN,
-                                            _NS("Author"),        ARTIST_COLUMN,
-                                            _NS("Duration"),      DURATION_COLUMN,
-                                            _NS("Genre"),         GENRE_COLUMN,
-                                            _NS("Album"),         ALBUM_COLUMN,
-                                            _NS("Description"),   DESCRIPTION_COLUMN,
-                                            _NS("Date"),          DATE_COLUMN,
-                                            _NS("Language"),      LANGUAGE_COLUMN,
-                                            _NS("URI"),           URI_COLUMN,
-                                            _NS("File Size"),     FILESIZE_COLUMN,
-                                            nil];
-    // this array also assigns tags (index) to type of menu item
-    _menuOrderOfPlaylistTableColumns = [[NSArray alloc] initWithObjects: TRACKNUM_COLUMN, TITLE_COLUMN,
-                                        ARTIST_COLUMN, DURATION_COLUMN, GENRE_COLUMN, ALBUM_COLUMN,
-                                        DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN,
-                                        FILESIZE_COLUMN,nil];
 
 #ifdef HAVE_SPARKLE
     [_checkForUpdate setAction:@selector(checkForUpdates:)];
@@ -364,7 +341,6 @@
     [_toggleEffectsButton setState: config_GetInt(VLCIntf, "macosx-show-effects-button")];
     [_toggleSidebar setTitle: _NS("Show Sidebar")];
     [_toggleSidebar setState: config_GetInt(VLCIntf, "macosx-show-sidebar")];
-    [self setupPlaylistTableColumnsForMenu:_playlistTableColumnsMenu];
     [_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [_controlsMenu setTitle: _NS("Playback")];
@@ -490,29 +466,6 @@
     [_voutMenumute setTitle: _NS("Mute")];
     [_voutMenufullscreen setTitle: _NS("Fullscreen")];
     [_voutMenusnapshot setTitle: _NS("Snapshot")];
-}
-
-- (NSMenu *)setupPlaylistTableColumnsMenu
-{
-    NSMenu *contextMenu = [[NSMenu alloc] init];
-    [self setupPlaylistTableColumnsForMenu:contextMenu];
-    return contextMenu;
-}
-
-- (void)setupPlaylistTableColumnsForMenu:(NSMenu *)menu
-{
-    NSMenuItem *menuItem;
-    NSUInteger count = [_menuOrderOfPlaylistTableColumns count];
-    for (NSUInteger i = 0; i < count; i++) {
-        NSString *title = [_translationsForPlaylistTableColumns objectForKey:[_menuOrderOfPlaylistTableColumns objectAtIndex:i]];
-        menuItem = [menu addItemWithTitle:title
-                                   action:@selector(togglePlaylistColumnTable:)
-                            keyEquivalent:@""];
-        /* don't set a valid target for the title column selector, since we want it to be disabled */
-        if (![[_menuOrderOfPlaylistTableColumns objectAtIndex:i] isEqualToString: TITLE_COLUMN])
-            [menuItem setTarget:self];
-        [menuItem setTag:i];
-    }
 }
 
 #pragma mark - Termination
@@ -709,31 +662,6 @@
 - (void)updateSidebarMenuItem
 {
     [_toggleSidebar setState: config_GetInt(VLCIntf, "macosx-show-sidebar")];
-}
-
-- (void)togglePlaylistColumnTable:(id)sender
-{
-    NSInteger i_new_state = ![sender state];
-    NSInteger i_tag = [sender tag];
-    [[_playlistTableColumnsMenu itemWithTag: i_tag] setState: i_new_state];
-    [[_playlistTableColumnsContextMenu itemWithTag: i_tag] setState: i_new_state];
-
-    NSString *column = [_menuOrderOfPlaylistTableColumns objectAtIndex:i_tag];
-    [[[VLCMain sharedInstance] playlist] setColumn: column state: i_new_state translationDict: _translationsForPlaylistTableColumns];
-}
-
-- (BOOL)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)column
-{
-    NSUInteger i_tag = [_menuOrderOfPlaylistTableColumns indexOfObject: column];
-    // prevent setting unknown columns
-    if(i_tag == NSNotFound)
-        return NO;
-
-    [[_playlistTableColumnsMenu itemWithTag: i_tag] setState: i_state];
-    [[_playlistTableColumnsContextMenu itemWithTag: i_tag] setState: i_state];
-    [[[VLCMain sharedInstance] playlist] setColumn: column state: i_state translationDict: _translationsForPlaylistTableColumns];
-
-    return YES;
 }
 
 #pragma mark - Playback
