@@ -142,7 +142,7 @@ void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
  * Otherwise *username resp *password will be NULL.
  */
 void dialog_Login (vlc_object_t *obj, char **username, char **password,
-                   const char *title, const char *fmt, ...)
+                   bool *store, const char *title, const char *fmt, ...)
 {
     assert ((username != NULL) && (password != NULL));
 
@@ -160,7 +160,7 @@ void dialog_Login (vlc_object_t *obj, char **username, char **password,
     va_start (ap, fmt);
     if (vasprintf (&text, fmt, ap) != -1)
     {
-        dialog_login_t dialog = { title, text, username, password, };
+        dialog_login_t dialog = { title, text, username, password, store };
         var_SetAddress (provider, "dialog-login", &dialog);
         free (text);
     }
