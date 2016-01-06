@@ -29,6 +29,7 @@
 #include <vlc_dialog.h>
 
 #include <QDialog>
+#include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -118,6 +119,15 @@ void DialogHandler::requestLogin (void *value)
     grid->addWidget (new QLabel (qtr("Password")), 2, 0);
     grid->addWidget (passLine, 2, 1);
 
+    QCheckBox *checkbox = NULL;
+    if (data->store != NULL)
+    {
+        checkbox = new QCheckBox;
+        checkbox->setChecked (getSettings()->value ("store_password", true).toBool ());
+        grid->addWidget (new QLabel (qtr("Store the Password")), 3, 0);
+        grid->addWidget (checkbox, 3, 1);
+    }
+
     panel->setLayout (grid);
     layout->addWidget (panel);
 
@@ -139,9 +149,18 @@ void DialogHandler::requestLogin (void *value)
     {
         *data->username = strdup (qtu(userLine->text ()));
         *data->password = strdup (qtu(passLine->text ()));
+        if (data->store != NULL)
+        {
+            *data->store = checkbox->isChecked ();
+            getSettings()->setValue ("store_password", *data->store);
+        }
     }
     else
+    {
         *data->username = *data->password = NULL;
+        if (data->store != NULL)
+            *data->store = false;
+    }
 
     delete dialog;
 }
