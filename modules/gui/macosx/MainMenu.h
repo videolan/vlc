@@ -221,7 +221,6 @@
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
 - (IBAction)savePlaylist:(id)sender;
-- (IBAction)revealItemInFinder:(id)sender;
 
 - (IBAction)toggleEffectsButton:(id)sender;
 - (IBAction)toggleJumpButtons:(id)sender;

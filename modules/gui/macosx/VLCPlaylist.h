@@ -27,7 +27,7 @@
 #import "PLModel.h"
 #import "VLCPlaylistView.h"
 
-@interface VLCPlaylist : NSObject<NSOutlineViewDelegate>
+@interface VLCPlaylist : NSResponder<NSOutlineViewDelegate>
 
 @property (readwrite, weak) IBOutlet NSMenu *playlistMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *playPlaylistMenuItem;

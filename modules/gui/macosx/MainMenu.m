@@ -1228,11 +1228,6 @@
     }
 }
 
-- (IBAction)revealItemInFinder:(id)sender
-{
-    [[[VLCMain sharedInstance] playlist] revealItemInFinder:sender];
-}
-
 - (IBAction)showConvertAndSave:(id)sender
 {
     [[[VLCMain sharedInstance] convertAndSaveWindow] showWindow:self];

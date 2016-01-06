@@ -166,6 +166,7 @@ static const float f_min_window_height = 307.;
     VLCPlaylist *playlist = [[VLCMain sharedInstance] playlist];
     [playlist setOutlineView:(VLCPlaylistView *)_outlineView];
     [playlist setPlaylistHeaderView:_outlineView.headerView];
+    [self setNextResponder:playlist];
 
     // (Re)load sidebar for the first time and select first item
     [self reloadSidebar];

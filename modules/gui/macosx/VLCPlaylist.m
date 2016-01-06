@@ -291,6 +291,9 @@
     [_outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: itemIndex] byExtendingSelection: NO];
 }
 
+#pragma mark -
+#pragma mark Playlist actions
+
 /* When called retrieves the selected outlineview row and plays that node or item */
 - (IBAction)playItem:(id)sender
 {
@@ -317,23 +320,21 @@
 - (IBAction)revealItemInFinder:(id)sender
 {
     NSIndexSet *selectedRows = [_outlineView selectedRowIndexes];
-    [selectedRows enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+    if (selectedRows.count < 1)
+        return;
 
-        PLItem *o_item = [_outlineView itemAtRow:idx];
+    PLItem *o_item = [_outlineView itemAtRow:selectedRows.firstIndex];
 
-        /* perform some checks whether it is a file and if it is local at all... */
-        char *psz_url = input_item_GetURI([o_item input]);
-        NSURL *url = [NSURL URLWithString:toNSStr(psz_url)];
-        free(psz_url);
-        if (![url isFileURL])
-            return;
-        if (![[NSFileManager defaultManager] fileExistsAtPath:[url path]])
-            return;
+    char *psz_url = input_item_GetURI([o_item input]);
+    if (!psz_url)
+        return;
+    char *psz_path = vlc_uri2path(psz_url);
+    NSString *path = toNSStr(psz_path);
+    free(psz_url);
+    free(psz_path);
 
-        msg_Dbg(VLCIntf, "Reveal url %s in finder", [[url path] UTF8String]);
-        [[NSWorkspace sharedWorkspace] selectFile: [url path] inFileViewerRootedAtPath: [url path]];
-    }];
-
+    msg_Dbg(VLCIntf, "Reveal url %s in finder", [path UTF8String]);
+    [[NSWorkspace sharedWorkspace] selectFile: path inFileViewerRootedAtPath: path];
 }
 
 /* When called retrieves the selected outlineview row and plays that node or item */
@@ -437,6 +438,31 @@
 //    PL_UNLOCK;
 //    [self playlistUpdated];
 }
+
+- (BOOL)validateMenuItem:(NSMenuItem *)item
+{
+    if ([item action] == @selector(revealItemInFinder:)) {
+        NSIndexSet *selectedRows = [_outlineView selectedRowIndexes];
+        if (selectedRows.count != 1)
+            return NO;
+
+        PLItem *o_item = [_outlineView itemAtRow:selectedRows.firstIndex];
+
+        // Check if item exists in file system
+        char *psz_url = input_item_GetURI([o_item input]);
+        NSURL *url = [NSURL URLWithString:toNSStr(psz_url)];
+        free(psz_url);
+        if (![url isFileURL])
+            return NO;
+        if (![[NSFileManager defaultManager] fileExistsAtPath:[url path]])
+            return NO;
+    }
+
+    return YES;
+}
+
+#pragma mark -
+#pragma mark Item helpers
 
 - (input_item_t *)createItem:(NSDictionary *)itemToCreateDict
 {
