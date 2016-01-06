@@ -43,7 +43,7 @@ public:
     virtual ~DialogHandler (void);
 
 private:
-    intf_thread_t *intf;
+    intf_thread_t *p_intf;
     static int error (vlc_object_t *, const char *, vlc_value_t, vlc_value_t,
                       void *);
     QVLCPointer critical;
