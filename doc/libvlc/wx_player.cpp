@@ -247,12 +247,12 @@ class MyApp : public wxApp {
 
 void OnPositionChanged_VLC(const libvlc_event_t *event, void *data) {
     wxCommandEvent evt(vlcEVT_POS, wxID_ANY);
-    mainWindow->AddPendingEvent(evt);
+    mainWindow->GetEventHandler()->AddPendingEvent(evt);
 }
 
 void OnEndReached_VLC(const libvlc_event_t *event, void *data) {
     wxCommandEvent evt(vlcEVT_END, wxID_ANY);
-    mainWindow->AddPendingEvent(evt);
+    mainWindow->GetEventHandler()->AddPendingEvent(evt);
 }
 
 bool MyApp::OnInit() {
