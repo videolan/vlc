@@ -285,7 +285,7 @@ main(void)
         int argc = keystore_args[i].argc;
         const char * const *argv = keystore_args[i].argv;
 
-        if (!module_exists(psz_module))
+        if (module_exists(psz_module))
             test_module(psz_module, argc, argv);
         else
             printf("not testing %s since the plugin is not found\n", psz_module);
