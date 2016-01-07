@@ -4119,10 +4119,10 @@ KWallet::Wallet::LocalWallet();
     ])], [
       have_kwallet="yes"
     ])
+  ])
   AC_LANG_POP([C++])
   VLC_RESTORE_FLAGS
-  ])
-#])
+])
 AS_IF([test "$enable_kwallet" = "yes" -a "$have_kwallet" = "no" ], [
   AC_MSG_ERROR([KWallet headers or so not found])
 ])
