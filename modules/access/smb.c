@@ -49,6 +49,7 @@
 #include <vlc_access.h>
 #include <vlc_input_item.h>
 #include <vlc_url.h>
+#include <vlc_keystore.h>
 
 #include "smb_common.h"
 
@@ -152,58 +153,16 @@ static int Open( vlc_object_t *p_this )
     access_sys_t *p_sys;
     struct stat  filestat;
     vlc_url_t    url;
-    char         *psz_uri = NULL;
-    char         *psz_user = NULL, *psz_pwd = NULL, *psz_domain = NULL;
+    vlc_credential credential;
+    char         *psz_uri = NULL, *psz_var_domain = NULL;
     int          i_ret;
     int          i_smb;
     uint64_t     i_size;
-
-    /* Parse input URI
-     * [[[domain;]user[:password@]]server[/share[/path[/file]]]]
-     * No need to search a user/pwd if there is no '/', indeed, user/pwd are
-     * set for a FILE_SHARE. */
-    vlc_UrlParse( &url, p_access->psz_location );
-    if( url.psz_username )
-    {
-        char *psz_delim = strchr( url.psz_username, ';' );
-        if( psz_delim )
-        {
-            *psz_delim = '\0';
-            psz_user = strdup(psz_delim + 1);
-            psz_domain = strdup(url.psz_username);
-        }
-        else
-            psz_user = strdup(url.psz_username);
-    }
-    psz_pwd = url.psz_password ? strdup(url.psz_password) : NULL;
-
-    if( !psz_user ) psz_user = var_InheritString( p_access, "smb-user" );
-    if( psz_user && !*psz_user ) { free( psz_user ); psz_user = NULL; }
-    if( !psz_pwd ) psz_pwd = var_InheritString( p_access, "smb-pwd" );
-    if( psz_pwd && !*psz_pwd ) { free( psz_pwd ); psz_pwd = NULL; }
-    if( !psz_domain ) psz_domain = var_InheritString( p_access, "smb-domain" );
-    if( psz_domain && !*psz_domain ) { free( psz_domain ); psz_domain = NULL; }
-
-    i_ret = smb_get_uri( p_access, &psz_uri, psz_domain, psz_user, psz_pwd,
-                         url.psz_host, url.psz_path, NULL );
-
-    free( psz_user );
-    free( psz_pwd );
-    free( psz_domain );
-
-    if( i_ret == -1 )
-    {
-        vlc_UrlClean( &url );
-        return VLC_ENOMEM;
-    }
+    bool         b_is_dir = false;
 
 #ifndef _WIN32
     if( smbc_init( smb_auth, 0 ) )
-    {
-        free( psz_uri );
-        vlc_UrlClean( &url );
         return VLC_EGENERIC;
-    }
 #endif
 
 /*
@@ -214,6 +173,43 @@ static int Open( vlc_object_t *p_this )
 #if defined(smbc_open) && defined(open)
 # undef open
 #endif
+
+    vlc_UrlParse( &url, p_access->psz_url );
+    vlc_credential_init( &credential, &url );
+    psz_var_domain = var_InheritString( p_access, "smb-domain" );
+    credential.psz_realm = psz_var_domain;
+    vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
+                        NULL, NULL );
+    for (;;)
+    {
+        if( smb_get_uri( p_access, &psz_uri, credential.psz_realm,
+                         credential.psz_username, credential.psz_password,
+                         url.psz_host, url.psz_path, NULL ) == -1 )
+        {
+            vlc_credential_clean( &credential );
+            free(psz_var_domain);
+            vlc_UrlClean( &url );
+            return VLC_ENOMEM;
+        }
+
+        if( ( i_ret = smbc_stat( psz_uri, &filestat ) ) && errno == EACCES )
+        {
+            errno = 0;
+            if( vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
+                                    SMB_LOGIN_DIALOG_TITLE,
+                                    SMB_LOGIN_DIALOG_TEXT, url.psz_host) )
+                continue;
+        }
+
+        /* smbc_stat fails with servers or shares. Assume they are directory */
+        if( i_ret || S_ISDIR( filestat.st_mode ) )
+            b_is_dir = true;
+        break;
+    }
+
+    vlc_credential_store( &credential );
+    vlc_credential_clean( &credential );
+    free(psz_var_domain);
 
     /* Init p_access */
     access_InitFields( p_access );
@@ -227,10 +223,7 @@ static int Open( vlc_object_t *p_this )
     }
     p_sys->url = url;
 
-    i_ret = smbc_stat( psz_uri, &filestat );
-
-    /* smbc_stat fails with servers or shares. Assume they are directory */
-    if( i_ret || S_ISDIR( filestat.st_mode ) )
+    if( b_is_dir )
     {
 #ifdef _WIN32
         free( p_sys );
