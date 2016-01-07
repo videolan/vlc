@@ -99,11 +99,11 @@ static void *proxy_thread(void *data)
     vlc_assert_unreachable();
 }
 
-int main(void)
+static int server_socket(unsigned *port)
 {
-    int lfd = socket(PF_INET6, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_TCP);
-    if (lfd == -1)
-        return 77;
+    int fd = socket(PF_INET6, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_TCP);
+    if (fd == -1)
+        return -1;
 
     struct sockaddr_in6 addr = {
         .sin6_family = AF_INET6,
@@ -114,27 +114,53 @@ int main(void)
     };
     socklen_t addrlen = sizeof (addr);
 
-    if (bind(lfd, (struct sockaddr *)&addr, addrlen)
-     || listen(lfd, 255))
+    if (bind(fd, (struct sockaddr *)&addr, addrlen)
+     || getsockname(fd, &addr, &addrlen))
+    {
+        close(fd);
+        return -1;
+    }
+
+    *port = ntohs(addr.sin6_port);
+    return fd;
+}
+
+int main(void)
+{
+    char *url;
+    unsigned port;
+    bool two;
+
+    /* Test bad URLs */
+    vlc_https_connect_proxy(NULL, "www.example.com", 0, &two,
+                            "/test");
+    vlc_https_connect_proxy(NULL, "www.example.com", 0, &two,
+                            "ftp://proxy.example.com/");
+
+    int lfd = server_socket(&port);
+    if (lfd == -1)
+        return 77;
+
+    if (asprintf(&url, "http://[::1]:%u", port) < 0)
+        url = NULL;
+
+    assert(url != NULL);
+
+    /* Test connection failure */
+    vlc_https_connect_proxy(NULL, "www.example.com", 0, &two, url);
+
+    if (listen(lfd, 255))
     {
         close(lfd);
         return 77;
     }
 
-    char *url;
-    bool two;
-
-    getsockname(lfd, &addr, &addrlen);
-    if (asprintf(&url, "https://[::1]:%u", ntohs(addr.sin6_port)) < 0)
-        url = NULL;
-    assert(url != NULL);
-
     vlc_thread_t th;
-
     if (vlc_clone(&th, proxy_thread, (void*)(intptr_t)lfd,
                   VLC_THREAD_PRIORITY_LOW))
         assert(!"Thread error");
 
+    /* Test proxy error */
     vlc_https_connect_proxy(NULL, "www.example.com", 0, &two, url);
 
     vlc_cancel(th);

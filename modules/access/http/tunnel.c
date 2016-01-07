@@ -125,11 +125,11 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
     vlc_tls_t *session = NULL;
     bool ptwo = false;
 #if TLS_OVER_TLS
-    if (strcasecmp(url.psz_protocol, "https"))
+    if (!strcasecmp(url.psz_protocol, "https"))
         session = vlc_https_connect(creds, url.psz_host, url.i_port, &ptwo);
     else
 #endif
-    if (strcasecmp(url.psz_protocol, "http"))
+    if (!strcasecmp(url.psz_protocol, "http"))
         session = vlc_http_connect(creds ? creds->p_parent : NULL,
                                    url.psz_host, url.i_port);
     else
