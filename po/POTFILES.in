@@ -268,13 +268,6 @@ modules/access/vcd/cdrom.c
 modules/access/vcd/cdrom.h
 modules/access/vcd/cdrom_internals.h
 modules/access/vcd/vcd.c
-modules/access/vcdx/access.c
-modules/access/vcdx/info.c
-modules/access/vcdx/info.h
-modules/access/vcdx/vcd.c
-modules/access/vcdx/vcd.h
-modules/access/vcdx/vcdplayer.c
-modules/access/vcdx/vcdplayer.h
 modules/access/vdr.c
 modules/access/vnc.c
 modules/access/wasapi.c

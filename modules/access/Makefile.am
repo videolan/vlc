@@ -272,23 +272,6 @@ endif
 EXTRA_LTLIBRARIES += libvcd_plugin.la
 access_LTLIBRARIES += $(LTLIBvcd)
 
-libvcdx_plugin_la_SOURCES = \
-	access/vcdx/access.h access/vcdx/access.c \
-	access/vcdx/vcd.c access/vcdx/vcd.h \
-	access/vcdx/vcdplayer.h access/vcdx/vcdplayer.c \
-	access/vcdx/info.c access/vcdx/info.h
-libvcdx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-libvcdx_plugin_la_LIBADD = $(VCDX_LIBS)
-if HAVE_WIN32
-libvcdx_plugin_la_LIBADD += -lwinmm
-endif
-libvcdx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
-if HAVE_DARWIN
-libvcdx_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
-endif
-EXTRA_LTLIBRARIES += libvcdx_plugin.la
-access_LTLIBRARIES += $(LTLIBvcdx)
-
 libdvdnav_plugin_la_SOURCES = access/dvdnav.c demux/mpeg/ps.h demux/mpeg/pes.h
 libdvdnav_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVDNAV_CFLAGS)
 libdvdnav_plugin_la_LIBADD = $(DVDNAV_LIBS)

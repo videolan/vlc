@@ -46,7 +46,7 @@
 static const char ppsz_supported_uri_schemes[][9] = {
     "file", "http", "https", "rtsp", "realrtsp", "pnm", "ftp", "mtp", "smb",
     "mms", "mmsu", "mmst", "mmsh", "unsv", "itpc", "icyx", "rtmp", "rtp",
-    "dccp", "dvd", "vcd", "vcdx"
+    "dccp", "dvd", "vcd"
 };
 
 static const char ppsz_supported_mime_types[][26] = {

@@ -1804,11 +1804,6 @@ AM_CONDITIONAL(HAVE_DECKLINK, [ test "${have_decklink}" != "no" ])
 
 
 dnl
-dnl  VCDX modules
-dnl
-PKG_ENABLE_MODULES_VLC([VCDX], [vcdx], [libcdio >= 0.78.2 libiso9660 >= 0.72 libvcdinfo >= 0.7.22], [navigate VCD with libvcdinfo], [no])
-
-dnl
 dnl  Built-in CD-DA and VCD module
 dnl
 AC_ARG_ENABLE(vcd,
