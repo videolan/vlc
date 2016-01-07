@@ -408,7 +408,7 @@ libaccess_mms_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_mms_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libaccess_mms_plugin.la
 
-libsmb_plugin_la_SOURCES = access/smb.c
+libsmb_plugin_la_SOURCES = access/smb.c access/smb_common.h
 libsmb_plugin_la_CFLAGS = $(AM_CFLAGS) $(SMBCLIENT_CFLAGS)
 libsmb_plugin_la_LIBADD = $(SMBCLIENT_LIBS)
 if HAVE_WIN32
@@ -418,7 +418,7 @@ libsmb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBsmb)
 EXTRA_LTLIBRARIES += libsmb_plugin.la
 
-libdsm_plugin_la_SOURCES = access/dsm/access.c access/dsm/sd.c
+libdsm_plugin_la_SOURCES = access/dsm/access.c access/dsm/sd.c access/smb_common.h
 libdsm_plugin_la_CFLAGS = $(AM_CFLAGS) $(DSM_CFLAGS)
 libdsm_plugin_la_LIBADD = $(DSM_LIBS)
 libdsm_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
