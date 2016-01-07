@@ -235,6 +235,8 @@ typedef struct
     es_format_t  fmt;
     es_out_id_t *id;
     uint16_t i_sl_es_id;
+    /* J2K stuff */
+    uint8_t  b_interlaced;
 } ts_pes_es_t;
 
 typedef enum
@@ -2078,6 +2080,33 @@ static block_t *Opus_Parse(demux_t *demux, block_t *block)
     return out;
 }
 
+static block_t *J2K_Parse( demux_t *p_demux, block_t *p_block, bool b_interlaced )
+{
+    const uint8_t *p_buf = p_block->p_buffer;
+
+    if( p_block->i_buffer < ((b_interlaced) ? 48 : 38) )
+        goto invalid;
+
+    if( memcmp( p_buf, "elsmfrat", 8 ) )
+        goto invalid;
+
+    uint16_t i_den = GetWBE( &p_buf[8] );
+    uint16_t i_num = GetWBE( &p_buf[10] );
+    if( i_den == 0 )
+        goto invalid;
+    p_block->i_length = CLOCK_FREQ * i_den / i_num;
+
+    p_block->p_buffer += (b_interlaced) ? 48 : 38;
+    p_block->i_buffer -= (b_interlaced) ? 48 : 38;
+
+    return p_block;
+
+invalid:
+    msg_Warn( p_demux, "invalid J2K header, dropping codestream" );
+    block_Release( p_block );
+    return NULL;
+}
+
 /****************************************************************************
  * gathering stuff
  ****************************************************************************/
@@ -2242,6 +2271,17 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
         else if( pid->u.p_pes->es.fmt.i_codec == VLC_CODEC_OPUS)
         {
             p_block = Opus_Parse(p_demux, p_block);
+        }
+        else if( pid->u.p_pes->es.fmt.i_codec == VLC_CODEC_JPEG2000 )
+        {
+            if( unlikely(i_stream_id != 0xBD) )
+            {
+                block_Release( p_block );
+                p_block = NULL;
+            }
+            p_block = J2K_Parse( p_demux, p_block, pid->u.p_pes->es.b_interlaced );
+            if( !p_block )
+                return;
         }
 
         if( !pid->p_parent || pid->p_parent->type != TYPE_PMT )
@@ -4181,6 +4221,30 @@ static void SetupAVCDescriptors( demux_t *p_demux, ts_pes_es_t *p_es, const dvbp
     }
 }
 
+static void SetupJ2KDescriptors( demux_t *p_demux, ts_pes_es_t *p_es, const dvbpsi_pmt_es_t *p_dvbpsies )
+{
+    const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x32 );
+    if( p_dr && p_dr->i_length >= 24 )
+    {
+        es_format_Init( &p_es->fmt, VIDEO_ES, VLC_CODEC_JPEG2000 );
+        p_es->fmt.i_profile = p_dr->p_data[0];
+        p_es->fmt.i_level = p_dr->p_data[1];
+        p_es->fmt.video.i_width = GetDWBE(&p_dr->p_data[2]);
+        p_es->fmt.video.i_height = GetDWBE(&p_dr->p_data[6]);
+        p_es->fmt.video.i_frame_rate_base = GetWBE(&p_dr->p_data[18]);
+        p_es->fmt.video.i_frame_rate = GetWBE(&p_dr->p_data[20]);
+        p_es->b_interlaced = p_dr->p_data[23] & 0x40;
+        if( p_dr->i_length > 24 )
+        {
+            p_es->fmt.p_extra = malloc(p_dr->i_length - 24);
+            if( p_es->fmt.p_extra )
+                p_es->fmt.i_extra = p_dr->i_length - 24;
+        }
+        msg_Dbg( p_demux, "     - found J2K_video_descriptor profile=0x%"PRIx8" level=0x%"PRIx8,
+                 p_es->fmt.i_profile, p_es->fmt.i_level );
+    }
+}
+
 static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_es_t *p_es,
                                       const ts_pmt_t *p_pmt, const dvbpsi_pmt_es_t *p_dvbpsies )
 {
@@ -5356,6 +5420,9 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             case 0x1b:
                 SetupAVCDescriptors( p_demux, &p_pes->es, p_dvbpsies );
                 break;
+            case 0x21:
+                SetupJ2KDescriptors( p_demux, &p_pes->es, p_dvbpsies );
+                break;
             case 0x83:
                 /* LPCM (audio) */
                 PMTSetupEs0x83( p_dvbpsipmt, &p_pes->es, p_dvbpsies->i_pid );
@@ -5700,6 +5767,7 @@ static ts_pes_t *ts_pes_New( demux_t *p_demux )
 
     pes->es.id = NULL;
     pes->es.i_sl_es_id = 0;
+    pes->es.b_interlaced = false;
     es_format_Init( &pes->es.fmt, UNKNOWN_ES, 0 );
     ARRAY_INIT( pes->extra_es );
     pes->i_stream_type = 0;
