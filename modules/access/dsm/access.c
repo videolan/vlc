@@ -139,7 +139,7 @@ struct access_sys_t
 #define BDSM_LOGIN_DIALOG_TITLE N_( "%s: Authentication required" )
 #define BDSM_LOGIN_DIALOG_TEXT N_( "The computer you are trying to connect "   \
     "to requires authentication.\n Please provide a username (and ideally a "  \
-    "domain name using the format DOMAIN\\username)\n and a password." )
+    "domain name using the format DOMAIN;username)\n and a password." )
 
 /*****************************************************************************
  * Open: Initialize module's data structures and libdsm
@@ -255,10 +255,10 @@ static void Close( vlc_object_t *p_this )
  * Local functions
  *****************************************************************************/
 
-/* Split DOMAIN\User if it finds a '\' in psz_login. */
+/* Split DOMAIN;User if it finds a ';' in psz_login. */
 static void split_domain_login( char **psz_login, char **psz_domain )
 {
-    char *user = strchr( *psz_login, '\\' );
+    char *user = strchr( *psz_login, ';' );
 
     if( user != NULL )
     {
@@ -279,7 +279,7 @@ static void get_credentials( access_t *p_access )
     else
         p_sys->creds.password = strdup( p_sys->url.psz_password );
 
-    /* Here we support smb://DOMAIN\User:password@XXX, get user from options
+    /* Here we support smb://DOMAIN;User:password@XXX, get user from options
        or default to "Guest" as last resort */
     if( p_sys->url.psz_username != NULL )
     {
