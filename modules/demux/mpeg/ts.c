@@ -4588,10 +4588,15 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pes_t *p_pes,
     es_format_t *p_fmt = &p_pes->es.fmt;
     dvbpsi_descriptor_t *p_subs_dr = PMTEsFindDescriptor( p_dvbpsies, 0x59 );
     dvbpsi_descriptor_t *desc;
-
-    if( PMTEsHasRegistration( p_demux, p_dvbpsies, "AC-3" ) ||
-        PMTEsFindDescriptor( p_dvbpsies, 0x6a ) ||
-        PMTEsFindDescriptor( p_dvbpsies, 0x81 ) )
+    if( PMTEsFindDescriptor( p_dvbpsies, 0x7a ) )
+    {
+        /* DVB with stream_type 0x06 (ETS EN 300 468) */
+        p_fmt->i_cat = AUDIO_ES;
+        p_fmt->i_codec = VLC_CODEC_EAC3;
+    }
+    else if( PMTEsHasRegistration( p_demux, p_dvbpsies, "AC-3" ) ||
+             PMTEsFindDescriptor( p_dvbpsies, 0x6a ) ||
+             PMTEsFindDescriptor( p_dvbpsies, 0x81 ) ) /* AC-3 channel (also in EAC3) */
     {
         p_fmt->i_cat = AUDIO_ES;
         p_fmt->i_codec = VLC_CODEC_A52;
@@ -4600,12 +4605,6 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pes_t *p_pes,
               PMTEsHasRegistration(p_demux, p_dvbpsies, "Opus"))
     {
         OpusSetup(p_demux, desc->p_data, desc->i_length, p_fmt);
-    }
-    else if( PMTEsFindDescriptor( p_dvbpsies, 0x7a ) )
-    {
-        /* DVB with stream_type 0x06 (ETS EN 300 468) */
-        p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_EAC3;
     }
     else if( PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS1" ) ||
              PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS2" ) ||
