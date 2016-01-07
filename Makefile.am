@@ -999,7 +999,8 @@ lcov.out: lcov-raw.out
 
 lcov: lcov.out
 	rm -Rf lcov lcov.tmp
-	genhtml lcov.out -o lcov.tmp
+	prefix="$$(cd "$(top_srcdir)" && pwd)" ; \
+	genhtml -p "$$prefix" -o lcov.tmp lcov.out >/dev/null
 	mv lcov.tmp lcov
 
 .PHONY: lcov-raw.out
