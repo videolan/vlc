@@ -5211,66 +5211,60 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         }
         ValidateDVBMeta( p_demux, p_dvbpsies->i_pid );
 
-        char const * psz_typedesc = "";
-        switch(p_dvbpsies->i_type)
+        char const * psz_typedesc;
+        const char * const rgpsz_descs[] =
         {
-        case 0x00:
-            psz_typedesc = "ISO/IEC Reserved";
-            break;
-        case 0x01:
-            psz_typedesc = "ISO/IEC 11172 Video";
-            break;
-        case 0x02:
-            psz_typedesc = "ISO/IEC 13818-2 Video or ISO/IEC 11172-2 constrained parameter video stream";
-            break;
-        case 0x03:
-            psz_typedesc = "ISO/IEC 11172 Audio";
-            break;
-        case 0x04:
-            psz_typedesc = "ISO/IEC 13818-3 Audio";
-            break;
-        case 0x05:
-            psz_typedesc = "ISO/IEC 13818-1 private_sections";
-            break;
-        case 0x06:
-            psz_typedesc = "ISO/IEC 13818-1 PES packets containing private data";
-            break;
-        case 0x07:
-            psz_typedesc = "ISO/IEC 13522 MHEG";
-            break;
-        case 0x08:
-            psz_typedesc = "ISO/IEC 13818-1 Annex A DSM CC";
-            break;
-        case 0x09:
-            psz_typedesc = "ITU-T Rec. H.222.1";
-            break;
-        case 0x0A:
-            psz_typedesc = "ISO/IEC 13818-6 type A";
-            break;
-        case 0x0B:
-            psz_typedesc = "ISO/IEC 13818-6 type B";
-            break;
-        case 0x0C:
-            psz_typedesc = "ISO/IEC 13818-6 type C";
-            break;
-        case 0x0D:
-            psz_typedesc = "ISO/IEC 13818-6 type D";
-            break;
-        case 0x0E:
-            psz_typedesc = "ISO/IEC 13818-1 auxiliary";
-            break;
-        case 0x12:
-            psz_typedesc = "ISO/IEC 14496-1 SL-packetized or FlexMux stream carried in PES packets";
-            break;
-        case 0x13:
-            psz_typedesc = "ISO/IEC 14496-1 SL-packetized or FlexMux stream carried in sections";
-            break;
-        default:
-            if (p_dvbpsies->i_type >= 0x0F && p_dvbpsies->i_type <=0x7F)
-                psz_typedesc = "ISO/IEC 13818-1 Reserved";
-            else
-                psz_typedesc = "User Private";
-        }
+            "ISO/IEC Reserved",
+            "ISO/IEC 11172 Video",
+            "ISO/IEC 13818-2 Video or ISO/IEC 11172-2 constrained parameter video stream",
+            "ISO/IEC 11172 Audio",
+            "ISO/IEC 13818-3 Audio",
+            "ISO/IEC 13818-1 private_sections",
+            "ISO/IEC 13818-1 PES packets containing private data",
+            "ISO/IEC 13522 MHEG",
+            "ISO/IEC 13818-1 Annex A DSM CC",
+            /* ^ 0x08 */
+            "ITU-T Rec. H.222.1",
+            "ISO/IEC 13818-6 type A",
+            "ISO/IEC 13818-6 type B",
+            "ISO/IEC 13818-6 type C",
+            "ISO/IEC 13818-6 type D",
+            "ISO/IEC 13818-1 auxiliary",
+            "ISO/IEC 13818-7 Audio with ADTS transport",
+            /* ^ 0x0F */
+            "ISO/IEC 14496-2 Visual",
+            "ISO/IEC 14496-3 Audio with LATM transport",
+            "ISO/IEC 14496-1 SL-packetized or FlexMux stream carried in PES packets",
+            "ISO/IEC 14496-1 SL-packetized or FlexMux stream carried in sections",
+            "ISO/IEC 13818-6 Synchronized download protocol",
+            "Metadata carried in PES packets",
+            "Metadata carried in metadata_sections",
+            "Metadata carried in ISO/IEC 13818-6 Data Carousel",
+            "Metadata carried in ISO/IEC 13818-6 Object Carousel",
+            "Metadata carried in ISO/IEC 13818-6 Synchronized download protocol",
+            /* ^ 0x19 */
+            "MPEG-2 IPMP Stream",
+            "AVC video stream as defined in ITU-T Rec. H.264",
+            "ISO/IEC 14496-3 Audio",
+            "ISO/IEC 14496-17 Text",
+            "ISO/IEC 23002-3 auxiliary video stream",
+            "SVC video sub-stream as defined in ITU-T H.264 Annex G",
+            /* ^ 0x1F */
+            "MVC video sub-stream as defined in ITU-T H.264 Annex H",
+            "Video stream conforming to one or more profiles as defined in ITU-T T.800",
+            "Additional 3D View ITU-T H.262",
+            "Additional 3D View ITU-T H.264",
+            /* ^ 0x23 */
+        };
+
+        if( p_dvbpsies->i_type <= 0x23 )
+            psz_typedesc = rgpsz_descs[p_dvbpsies->i_type];
+        else if (p_dvbpsies->i_type >= 0x0F && p_dvbpsies->i_type < 0x7F)
+            psz_typedesc = "ISO/IEC 13818-1 Reserved";
+        else if( p_dvbpsies->i_type == 0x7F )
+            psz_typedesc = rgpsz_descs[0x1A];
+        else
+            psz_typedesc = "User Private";
 
         msg_Dbg( p_demux, "  * pid=%d type=0x%x %s",
                  p_dvbpsies->i_pid, p_dvbpsies->i_type, psz_typedesc );
