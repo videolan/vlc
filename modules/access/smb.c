@@ -28,6 +28,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <errno.h>
 #ifdef _WIN32
 #   include <fcntl.h>
@@ -47,6 +48,7 @@
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 #include <vlc_input_item.h>
+#include <vlc_url.h>
 
 #include "smb_common.h"
 
@@ -89,10 +91,11 @@ struct access_sys_t
 {
     int i_smb;
     uint64_t size;
+    vlc_url_t url;
 };
 
 #ifdef _WIN32
-static void Win32AddConnection( access_t *, char *, char *, char *, char * );
+static void Win32AddConnection( access_t *, const char *, const char *, const char *, const char *, const char * );
 #else
 static void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
                       char *un, int unlen, char *pw, int pwlen )
@@ -114,24 +117,29 @@ static void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
 static int smb_get_uri( access_t *p_access, char **ppsz_uri,
                         const char *psz_domain,
                         const char *psz_user, const char *psz_pwd,
-                        const char *psz_location, const char *psz_name )
+                        const char *psz_server, const char *psz_share_path,
+                        const char *psz_name )
 {
+    assert(psz_server);
+#define PSZ_SHARE_PATH_OR_NULL psz_share_path ? psz_share_path : ""
 #define PSZ_NAME_OR_NULL psz_name ? "/" : "", psz_name ? psz_name : ""
 #ifdef _WIN32
     if( psz_user )
-        Win32AddConnection( p_access, psz_location, psz_user, psz_pwd, psz_domain);
-    return asprintf( ppsz_uri, "//%s%s%s", psz_location, PSZ_NAME_OR_NULL );
+        Win32AddConnection( p_access, psz_server, psz_share_path,
+                            psz_user, psz_pwd, psz_domain );
+    return asprintf( ppsz_uri, "//%s%s%s%s", psz_server, PSZ_SHARE_PATH_OR_NULL,
+                     PSZ_NAME_OR_NULL );
 #else
     (void) p_access;
     if( psz_user )
-        return asprintf( ppsz_uri, "smb://%s%s%s%s%s@%s%s%s",
+        return asprintf( ppsz_uri, "smb://%s%s%s%s%s@%s%s%s%s",
                          psz_domain ? psz_domain : "", psz_domain ? ";" : "",
                          psz_user, psz_pwd ? ":" : "",
-                         psz_pwd ? psz_pwd : "", psz_location,
-                         PSZ_NAME_OR_NULL );
+                         psz_pwd ? psz_pwd : "", psz_server,
+                         PSZ_SHARE_PATH_OR_NULL, PSZ_NAME_OR_NULL );
     else
-        return asprintf( ppsz_uri, "smb://%s%s%s", psz_location,
-                         PSZ_NAME_OR_NULL );
+        return asprintf( ppsz_uri, "smb://%s%s%s%s", psz_server,
+                         PSZ_SHARE_PATH_OR_NULL, PSZ_NAME_OR_NULL );
 #endif
 }
 
@@ -143,7 +151,8 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     struct stat  filestat;
-    char         *psz_location, *psz_uri = NULL;
+    vlc_url_t    url;
+    char         *psz_uri = NULL;
     char         *psz_user = NULL, *psz_pwd = NULL, *psz_domain = NULL;
     int          i_ret;
     int          i_smb;
@@ -153,67 +162,46 @@ static int Open( vlc_object_t *p_this )
      * [[[domain;]user[:password@]]server[/share[/path[/file]]]]
      * No need to search a user/pwd if there is no '/', indeed, user/pwd are
      * set for a FILE_SHARE. */
-
-    psz_location = strchr( p_access->psz_location, '/' );
-    if( psz_location )
+    vlc_UrlParse( &url, p_access->psz_location );
+    if( url.psz_username )
     {
-        char *psz_tmp = strdup( p_access->psz_location );
-        char *psz_parser;
-
-        psz_tmp[ psz_location - p_access->psz_location ] = 0;
-        psz_location = p_access->psz_location;
-        psz_parser = strchr( psz_tmp, '@' );
-        if( psz_parser )
+        char *psz_delim = strchr( url.psz_username, ';' );
+        if( psz_delim )
         {
-            /* User info is there */
-            *psz_parser = 0;
-            psz_location = p_access->psz_location + (psz_parser - psz_tmp) + 1;
-
-            psz_parser = strchr( psz_tmp, ':' );
-            if( psz_parser )
-            {
-                /* Password found */
-                psz_pwd = strdup( psz_parser+1 );
-                *psz_parser = 0;
-            }
-
-            psz_parser = strchr( psz_tmp, ';' );
-            if( psz_parser )
-            {
-                /* Domain found */
-                *psz_parser = 0; psz_parser++;
-                psz_domain = strdup( psz_tmp );
-            }
-            else psz_parser = psz_tmp;
-
-            psz_user = strdup( psz_parser );
+            *psz_delim = '\0';
+            psz_user = strdup(psz_delim + 1);
+            psz_domain = strdup(url.psz_username);
         }
+        else
+            psz_user = strdup(url.psz_username);
+    }
+    psz_pwd = url.psz_password ? strdup(url.psz_password) : NULL;
 
-        free( psz_tmp );
-
-        if( !psz_user ) psz_user = var_InheritString( p_access, "smb-user" );
-        if( psz_user && !*psz_user ) { free( psz_user ); psz_user = NULL; }
-        if( !psz_pwd ) psz_pwd = var_InheritString( p_access, "smb-pwd" );
-        if( psz_pwd && !*psz_pwd ) { free( psz_pwd ); psz_pwd = NULL; }
-        if( !psz_domain ) psz_domain = var_InheritString( p_access, "smb-domain" );
-        if( psz_domain && !*psz_domain ) { free( psz_domain ); psz_domain = NULL; }
-    } else
-        psz_location = p_access->psz_location;
+    if( !psz_user ) psz_user = var_InheritString( p_access, "smb-user" );
+    if( psz_user && !*psz_user ) { free( psz_user ); psz_user = NULL; }
+    if( !psz_pwd ) psz_pwd = var_InheritString( p_access, "smb-pwd" );
+    if( psz_pwd && !*psz_pwd ) { free( psz_pwd ); psz_pwd = NULL; }
+    if( !psz_domain ) psz_domain = var_InheritString( p_access, "smb-domain" );
+    if( psz_domain && !*psz_domain ) { free( psz_domain ); psz_domain = NULL; }
 
     i_ret = smb_get_uri( p_access, &psz_uri, psz_domain, psz_user, psz_pwd,
-                         psz_location, NULL );
+                         url.psz_host, url.psz_path, NULL );
 
     free( psz_user );
     free( psz_pwd );
     free( psz_domain );
 
     if( i_ret == -1 )
+    {
+        vlc_UrlClean( &url );
         return VLC_ENOMEM;
+    }
 
 #ifndef _WIN32
     if( smbc_init( smb_auth, 0 ) )
     {
         free( psz_uri );
+        vlc_UrlClean( &url );
         return VLC_EGENERIC;
     }
 #endif
@@ -234,8 +222,10 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
     {
         free( psz_uri );
+        vlc_UrlClean( &url );
         return VLC_ENOMEM;
     }
+    p_sys->url = url;
 
     i_ret = smbc_stat( psz_uri, &filestat );
 
@@ -243,6 +233,9 @@ static int Open( vlc_object_t *p_this )
     if( i_ret || S_ISDIR( filestat.st_mode ) )
     {
 #ifdef _WIN32
+        free( p_sys );
+        free( psz_uri );
+        vlc_UrlClean( &p_sys->url );
         return VLC_EGENERIC;
 #else
         p_access->pf_readdir = DirRead;
@@ -264,6 +257,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "open failed for '%s' (%s)",
                  p_access->psz_location, vlc_strerror_c(errno) );
         free( p_sys );
+        vlc_UrlClean( &p_sys->url );
         return VLC_EGENERIC;
     }
 
@@ -280,6 +274,8 @@ static void Close( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
+
+    vlc_UrlClean( &p_sys->url );
 
 #ifndef _WIN32
     if( p_access->pf_readdir )
@@ -350,7 +346,8 @@ static input_item_t* DirRead (access_t *p_access )
     while( !p_item && ( p_entry = smbc_readdir( p_sys->i_smb ) ) )
     {
         char *psz_uri;
-        const char *psz_location = p_access->psz_location;
+        const char *psz_server = p_sys->url.psz_host;
+        const char *psz_path = p_sys->url.psz_path;
         const char *psz_name = p_entry->name;
         int i_type;
 
@@ -358,7 +355,8 @@ static input_item_t* DirRead (access_t *p_access )
         {
         case SMBC_SERVER:
         case SMBC_WORKGROUP:
-            psz_location = p_entry->name;
+            psz_server = p_sys->url.psz_host;
+            psz_path = NULL;
             psz_name = NULL;
         case SMBC_FILE_SHARE:
         case SMBC_DIR:
@@ -376,7 +374,7 @@ static input_item_t* DirRead (access_t *p_access )
         }
 
         if( smb_get_uri( p_access, &psz_uri, NULL, NULL, NULL,
-                         psz_location, psz_name ) < 0 )
+                         psz_server, psz_path, psz_name ) < 0 )
             return NULL;
 
         p_item = input_item_NewWithTypeExt( psz_uri, p_entry->name, 0, NULL,
@@ -441,31 +439,29 @@ static int Control( access_t *p_access, int i_query, va_list args )
 }
 
 #ifdef _WIN32
-static void Win32AddConnection( access_t *p_access, char *psz_path,
-                                char *psz_user, char *psz_pwd,
-                                char *psz_domain )
+static void Win32AddConnection( access_t *p_access, const char *psz_server,
+                                const char *psz_share, const char *psz_user,
+                                const char *psz_pwd, const char *psz_domain )
 {
-    char psz_remote[MAX_PATH], psz_server[MAX_PATH], psz_share[MAX_PATH];
+    char psz_remote[MAX_PATH];
     NETRESOURCE net_resource;
     DWORD i_result;
-    char *psz_parser;
     VLC_UNUSED( psz_domain );
 
     memset( &net_resource, 0, sizeof(net_resource) );
     net_resource.dwType = RESOURCETYPE_DISK;
 
-    /* Find out server and share names */
-    strlcpy( psz_server, psz_path, sizeof( psz_server ) );
-    psz_share[0] = 0;
-    psz_parser = strchr( psz_path, '/' );
-    if( psz_parser )
-    {
-        char *psz_parser2 = strchr( ++psz_parser, '/' );
-        if( psz_parser2 )
-            strlcpy( psz_share, psz_parser, sizeof( psz_share ) );
-   }
+    if (psz_share)
+        psz_share = psz_share + 1; /* skip first '/' */
+    else
+        psz_share = "";
 
     snprintf( psz_remote, sizeof( psz_remote ), "\\\\%s\\%s", psz_server, psz_share );
+    /* remove trailings '/' */
+    char *psz_delim = strchr( psz_remote, '/' );
+    if( psz_delim )
+        *psz_delim = '\0';
+
     net_resource.lpRemoteName = psz_remote;
 
     i_result = WNetAddConnection2( &net_resource, psz_pwd, psz_user, 0 );
