@@ -201,10 +201,8 @@ $Id$
  * kai: OS/2 audio output
  * karaoke: simple karaoke audio filter
  * kate: kate text bitstream decoder
- * keystore_kwallet: store secrets via KDE Kwallet
- * keystore_plaintext: store secrets in a plaintext file (insecure)
- * keystore_secret: store secrets via Gnome libsecret
  * kva: OS/2 video output
+ * kwallet: store secrets via KDE Kwallet
  * libass: Subtitle renderers using libass
  * libbluray: Library to access Blu-Ray drives
  * libmpeg2: Mpeg2 video decoder using libmpeg2
@@ -287,6 +285,7 @@ $Id$
  * packetizer_vc1: VC-1 video packetizer
  * panoramix: image wall panoramic video with edge blending filter
  * param_eq: parametric equalizer
+ * plaintext_keystore: store secrets in a plaintext file (insecure)
  * playlist: playlist import module
  * png: PNG images decoder
  * podcast: podcast feed parser
@@ -333,6 +332,7 @@ $Id$
  * sd_journal: logger output to SystemD journal
  * sdl_image: SDL-based image decoder
  * sdp: SDP fake access
+ * secret: store secrets via Gnome libsecret
  * securetransport: TLS module for OS X and iOS
  * sepia: Sepia video filter
  * sftp: SFTP network access module
