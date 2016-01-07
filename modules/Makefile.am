@@ -32,6 +32,7 @@ include control/Makefile.am
 include demux/Makefile.am
 include gui/Makefile.am
 include hw/vdpau/Makefile.am
+include keystore/Makefile.am
 include logger/Makefile.am
 include lua/Makefile.am
 include meta_engine/Makefile.am

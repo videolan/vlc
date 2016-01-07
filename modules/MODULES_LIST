@@ -201,6 +201,7 @@ $Id$
  * kai: OS/2 audio output
  * karaoke: simple karaoke audio filter
  * kate: kate text bitstream decoder
+ * keystore_plaintext: store secrets in a plaintext file (insecure)
  * kva: OS/2 video output
  * libass: Subtitle renderers using libass
  * libbluray: Library to access Blu-Ray drives
