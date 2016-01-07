@@ -47,10 +47,10 @@
 
 /* How many tracks we have, currently only used for stream mode */
 #ifdef OPTIMIZE_MEMORY
-    /* Max size of our cache 128Ko per track */
+    /* Max size of our cache 128KiB per stream */
 #   define STREAM_CACHE_SIZE  (1024*128)
 #else
-    /* Max size of our cache 4Mo per track */
+    /* Max size of our cache 48MiB per stream */
 #   define STREAM_CACHE_SIZE  (4*12*1024*1024)
 #endif
 
@@ -61,7 +61,7 @@
 
 /* Method: Simple, for pf_block.
  *  We get blocks and put them in the linked list.
- *  We release blocks once the total size is bigger than CACHE_BLOCK_SIZE
+ *  We release blocks once the total size is bigger than STREAM_CACHE_SIZE
  */
 
 struct stream_sys_t
