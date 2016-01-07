@@ -4169,6 +4169,18 @@ static bool SetupISO14496LogicalStream( demux_t *p_demux, const decoder_config_d
     return true;
 }
 
+static void SetupAVCDescriptors( demux_t *p_demux, ts_pes_es_t *p_es, const dvbpsi_pmt_es_t *p_dvbpsies )
+{
+    const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x28 );
+    if( p_dr && p_dr->i_length >= 4 )
+    {
+        p_es->fmt.i_profile = p_dr->p_data[0];
+        p_es->fmt.i_level = p_dr->p_data[2];
+        msg_Dbg( p_demux, "     - found AVC_video_descriptor profile=0x%"PRIx8" level=0x%"PRIx8,
+                 p_es->fmt.i_profile, p_es->fmt.i_level );
+    }
+}
+
 static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_es_t *p_es,
                                       const ts_pmt_t *p_pmt, const dvbpsi_pmt_es_t *p_dvbpsies )
 {
@@ -5340,6 +5352,9 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             case 0x11:
             case 0x12:
                 SetupISO14496Descriptors( p_demux, &p_pes->es, p_pmt, p_dvbpsies );
+                break;
+            case 0x1b:
+                SetupAVCDescriptors( p_demux, &p_pes->es, p_dvbpsies );
                 break;
             case 0x83:
                 /* LPCM (audio) */
