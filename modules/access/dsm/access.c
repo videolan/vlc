@@ -33,7 +33,7 @@
 #include <vlc_url.h>
 #include <vlc_access.h>
 #include <vlc_variables.h>
-#include <vlc_dialog.h>
+#include <vlc_keystore.h>
 
 #include <string.h>
 #include <sys/socket.h>
@@ -102,10 +102,7 @@ static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 static int BrowserInit( access_t *p_access );
 
-static void split_domain_login( char **psz_login, char **psz_domain );
-static void get_credentials( access_t *p_access );
 static int get_address( access_t *p_access );
-static void login_dialog( access_t *p_access );
 static int login( access_t *p_access );
 static void backslash_path( vlc_url_t *p_url );
 static bool get_path( access_t *p_access );
@@ -165,7 +162,6 @@ static int Open( vlc_object_t *p_this )
         goto error;
 
     vlc_UrlParse( &p_sys->url, p_access->psz_location );
-    get_credentials( p_access );
     if( get_address( p_access ) != VLC_SUCCESS )
         goto error;
 
@@ -255,44 +251,6 @@ static void Close( vlc_object_t *p_this )
  * Local functions
  *****************************************************************************/
 
-/* Split DOMAIN;User if it finds a ';' in psz_login. */
-static void split_domain_login( char **psz_login, char **psz_domain )
-{
-    char *user = strchr( *psz_login, ';' );
-
-    if( user != NULL )
-    {
-        *psz_domain = *psz_login;
-        *user = '\0';
-        *psz_login = strdup( user + 1 );
-    }
-}
-
-/* Get credentials from uri or variables. */
-static void get_credentials( access_t *p_access )
-{
-    access_sys_t *p_sys = p_access->p_sys;
-
-    /* Fetch credentials, either from URI or from options if not provided */
-    if( p_sys->url.psz_password == NULL )
-        p_sys->creds.password = var_InheritString( p_access, "smb-pwd" );
-    else
-        p_sys->creds.password = strdup( p_sys->url.psz_password );
-
-    /* Here we support smb://DOMAIN;User:password@XXX, get user from options
-       or default to "Guest" as last resort */
-    if( p_sys->url.psz_username != NULL )
-    {
-        p_sys->creds.login = strdup( p_sys->url.psz_username );
-        split_domain_login( &p_sys->creds.login, &p_sys->creds.domain );
-    }
-    else
-        p_sys->creds.login = var_InheritString( p_access, "smb-user" );
-
-    if( p_sys->creds.domain == NULL )
-        p_sys->creds.domain = var_InheritString( p_access, "smb-domain" );
-}
-
 /* Returns VLC_EGENERIC if it wasn't able to get an ip address to connect to */
 static int get_address( access_t *p_access )
 {
@@ -338,53 +296,13 @@ static int get_address( access_t *p_access )
         p_sys->netbios_name[0] = '\0';
     }
 
-    /* If no domain was explicitly specified, let's use the machine name */
-    if( p_sys->creds.domain == NULL && p_sys->netbios_name[0] )
-        p_sys->creds.domain = strdup( p_sys->netbios_name );
-
     return VLC_SUCCESS;
 }
 
-/* Displays a dialog for the user to enter his/her credentials */
-static void login_dialog( access_t *p_access )
+static int smb_connect( access_t *p_access, const char *psz_login,
+                        const char *psz_password, const char *psz_domain )
 {
     access_sys_t *p_sys = p_access->p_sys;
-
-    char *psz_login = NULL, *psz_pass = NULL, *psz_title;
-    int i_ret;
-
-    i_ret = asprintf( &psz_title, BDSM_LOGIN_DIALOG_TITLE, p_sys->netbios_name );
-    if( i_ret != -1 )
-        dialog_Login( p_access, &psz_login, &psz_pass, psz_title,
-                      BDSM_LOGIN_DIALOG_TEXT );
-    else
-        dialog_Login( p_access, &psz_login, &psz_pass, BDSM_LOGIN_DIALOG_TITLE,
-                      BDSM_LOGIN_DIALOG_TEXT );
-    free( psz_title );
-
-    if( psz_login != NULL )
-    {
-        free( p_sys->creds.login );
-        p_sys->creds.login = psz_login;
-        split_domain_login( &p_sys->creds.login, &p_sys->creds.domain );
-    }
-
-    if( psz_pass != NULL )
-    {
-        free( p_sys->creds.password );
-        p_sys->creds.password = psz_pass;
-    }
-}
-
-static int smb_connect( access_t *p_access )
-{
-    access_sys_t *p_sys = p_access->p_sys;
-    const char *psz_login = p_sys->creds.login ?
-                            p_sys->creds.login : "Guest";
-    const char *psz_password = p_sys->creds.password ?
-                               p_sys->creds.password : "Guest";
-    const char *psz_domain = p_sys->creds.domain ?
-                             p_sys->creds.domain : p_sys->netbios_name;
 
     smb_session_set_creds( p_sys->p_session, psz_domain,
                            psz_login, psz_password );
@@ -407,26 +325,82 @@ static int smb_connect( access_t *p_access )
    failure */
 static int login( access_t *p_access )
 {
+    int i_ret = VLC_EGENERIC;
     access_sys_t *p_sys = p_access->p_sys;
+    vlc_url_t url;
+    vlc_credential credential;
+    char *psz_var_domain;
+    const char *psz_login, *psz_password, *psz_domain;
+
+    vlc_UrlParse( &url, p_access->psz_url );
+    vlc_credential_init( &credential, &url );
+    psz_var_domain = var_InheritString( p_access, "smb-domain" );
+    credential.psz_realm = psz_var_domain ? psz_var_domain : p_sys->netbios_name;
+
+    vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
+                        NULL, NULL );
+
+    if( !credential.psz_username )
+    {
+        psz_login = "Guest";
+        psz_password = "Guest";
+    }
+    else
+    {
+        psz_login = credential.psz_username;
+        psz_password = credential.psz_password;
+    }
+    psz_domain = credential.psz_realm;
 
     /* Try to authenticate on the remote machine */
-    if( smb_connect( p_access ) != VLC_SUCCESS )
+    if( smb_connect( p_access, psz_login, psz_password, psz_domain )
+                     != VLC_SUCCESS )
     {
-        for( int i = 0; i < BDSM_LOGIN_DIALOG_RETRY; i++ )
+        char *psz_title;
+        if ( asprintf( &psz_title, BDSM_LOGIN_DIALOG_TITLE,
+                       p_sys->netbios_name ) == -1 )
+            goto error;
+        while( vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
+                                   psz_title, BDSM_LOGIN_DIALOG_TEXT ) )
         {
-            login_dialog( p_access );
-            if( smb_connect( p_access ) == VLC_SUCCESS )
-                return VLC_SUCCESS;
+            psz_login = credential.psz_username;
+            psz_password = credential.psz_password;
+            psz_domain = credential.psz_realm;
+            if( smb_connect( p_access, psz_login, psz_password, psz_domain )
+                             == VLC_SUCCESS )
+            {
+                free( psz_title );
+                goto success;
+            }
         }
+        free( psz_title );
 
         msg_Err( p_access, "Unable to login with username = %s, domain = %s",
                    p_sys->creds.login, p_sys->creds.domain );
-        return VLC_EGENERIC;
+        goto error;
     }
     else if( smb_session_is_guest( p_sys->p_session )  )
         msg_Warn( p_access, "Login failure but you were logged in as a Guest");
 
-    return VLC_SUCCESS;
+success:
+    p_sys->creds.login = strdup(psz_login);
+    p_sys->creds.password = strdup(psz_password);
+    p_sys->creds.domain = strdup(psz_domain);
+    if (!p_sys->creds.login || !p_sys->creds.password || !p_sys->creds.domain)
+    {
+        free(p_sys->creds.login);
+        free(p_sys->creds.password);
+        free(p_sys->creds.domain);
+        p_sys->creds.login = p_sys->creds.password = p_sys->creds.domain = NULL;
+        goto error;
+    }
+    vlc_credential_store( &credential );
+    i_ret = VLC_SUCCESS;
+error:
+    vlc_credential_clean( &credential );
+    vlc_UrlClean( &url );
+    free( psz_var_domain );
+    return i_ret;
 }
 
 static void backslash_path( vlc_url_t *p_url )
