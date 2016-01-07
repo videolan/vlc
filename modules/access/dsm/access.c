@@ -43,6 +43,7 @@
 #include <netdb.h>
 
 #include <bdsm/bdsm.h>
+#include "../smb_common.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -56,18 +57,6 @@ static void Close( vlc_object_t * );
 
 #define vlc_sd_probe_Open bdsm_sd_probe_Open
 
-#define USER_TEXT N_("Username")
-#define USER_LONGTEXT N_("Username that will be used for the connection, " \
-        "if no username is set in the URL.")
-#define PASS_TEXT N_("Password")
-#define PASS_LONGTEXT N_("Password that will be used for the connection, " \
-        "if no username or password are set in URL.")
-#define DOMAIN_TEXT N_("SMB domain")
-#define DOMAIN_LONGTEXT N_("Domain/Workgroup that " \
-    "will be used for the connection. Domain of uri will also be tried.")
-
-#define BDSM_LOGIN_DIALOG_RETRY 1
-
 #define BDSM_HELP N_("libdsm's SMB (Windows network shares) input and browser")
 
 vlc_module_begin ()
@@ -77,9 +66,9 @@ vlc_module_begin ()
     set_capability( "access", 20 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_string( "smb-user", NULL, USER_TEXT, USER_LONGTEXT, false )
-    add_password( "smb-pwd", NULL, PASS_TEXT, PASS_LONGTEXT, false )
-    add_string( "smb-domain", NULL, DOMAIN_TEXT, DOMAIN_LONGTEXT, false )
+    add_string( "smb-user", NULL, SMB_USER_TEXT, SMB_USER_LONGTEXT, false )
+    add_password( "smb-pwd", NULL, SMB_PASS_TEXT, SMB_PASS_LONGTEXT, false )
+    add_string( "smb-domain", NULL, SMB_DOMAIN_TEXT, SMB_DOMAIN_LONGTEXT, false )
     add_shortcut( "smb", "cifs" )
     set_callbacks( Open, Close )
 
@@ -130,14 +119,6 @@ struct access_sys_t
     smb_share_list      shares;
     smb_stat_list       files;
 };
-
-/*****************************************************************************
- * Dialog strings
- *****************************************************************************/
-#define BDSM_LOGIN_DIALOG_TITLE N_( "%s: Authentication required" )
-#define BDSM_LOGIN_DIALOG_TEXT N_( "The computer you are trying to connect "   \
-    "to requires authentication.\n Please provide a username (and ideally a "  \
-    "domain name using the format DOMAIN;username)\n and a password." )
 
 /*****************************************************************************
  * Open: Initialize module's data structures and libdsm
@@ -358,24 +339,17 @@ static int login( access_t *p_access )
     if( smb_connect( p_access, psz_login, psz_password, psz_domain )
                      != VLC_SUCCESS )
     {
-        char *psz_title;
-        if ( asprintf( &psz_title, BDSM_LOGIN_DIALOG_TITLE,
-                       p_sys->netbios_name ) == -1 )
-            goto error;
         while( vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
-                                   psz_title, BDSM_LOGIN_DIALOG_TEXT ) )
+                                   SMB_LOGIN_DIALOG_TITLE,
+                                   SMB_LOGIN_DIALOG_TEXT, p_sys->netbios_name ) )
         {
             psz_login = credential.psz_username;
             psz_password = credential.psz_password;
             psz_domain = credential.psz_realm;
             if( smb_connect( p_access, psz_login, psz_password, psz_domain )
                              == VLC_SUCCESS )
-            {
-                free( psz_title );
                 goto success;
-            }
         }
-        free( psz_title );
 
         msg_Err( p_access, "Unable to login with username = %s, domain = %s",
                    p_sys->creds.login, p_sys->creds.domain );

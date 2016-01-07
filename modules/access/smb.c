@@ -48,21 +48,13 @@
 #include <vlc_access.h>
 #include <vlc_input_item.h>
 
+#include "smb_common.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
-
-#define USER_TEXT N_("Username")
-#define USER_LONGTEXT N_("Username that will be used for the connection, " \
-        "if no username is set in the URL.")
-#define PASS_TEXT N_("Password")
-#define PASS_LONGTEXT N_("Password that will be used for the connection, " \
-        "if no username or password are set in URL.")
-#define DOMAIN_TEXT N_("SMB domain")
-#define DOMAIN_LONGTEXT N_("Domain/Workgroup that " \
-    "will be used for the connection.")
 
 #define SMB_HELP N_("Samba (Windows network shares) input")
 vlc_module_begin ()
@@ -72,12 +64,12 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_string( "smb-user", NULL, USER_TEXT, USER_LONGTEXT,
+    add_string( "smb-user", NULL, SMB_USER_TEXT, SMB_USER_LONGTEXT,
                 false )
-    add_password( "smb-pwd", NULL, PASS_TEXT,
-                  PASS_LONGTEXT, false )
-    add_string( "smb-domain", NULL, DOMAIN_TEXT,
-                DOMAIN_LONGTEXT, false )
+    add_password( "smb-pwd", NULL, SMB_PASS_TEXT,
+                  SMB_PASS_LONGTEXT, false )
+    add_string( "smb-domain", NULL, SMB_DOMAIN_TEXT,
+                SMB_DOMAIN_LONGTEXT, false )
     add_shortcut( "smb" )
     set_callbacks( Open, Close )
 vlc_module_end ()
