@@ -114,6 +114,8 @@ static int OutSeek( sout_access_out_t *, off_t );
 static ssize_t Write( sout_access_out_t *, block_t * );
 #endif
 
+static int LoginUserPwd( vlc_object_t *, access_sys_t *,
+                         const char *, const char * );
 static void FeaturesCheck( void *, const char * );
 
 typedef struct ftp_features_t
@@ -403,23 +405,46 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
         }
     }
 
-    /* Send credentials over channel */
-    char *psz;
-
+    char *psz_user, *psz_pwd;
     if( p_sys->url.psz_username && *p_sys->url.psz_username )
-        psz = strdup( p_sys->url.psz_username );
+        psz_user = strdup( p_sys->url.psz_username );
     else
-        psz = var_InheritString( p_access, "ftp-user" );
-    if( !psz )
+        psz_user = var_InheritString( p_access, "ftp-user" );
+    if( !psz_user )
         goto error;
 
-    if( ftp_SendCommand( p_access, p_sys, "USER %s", psz ) < 0 ||
-        ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
+    if( p_sys->url.psz_password && *p_sys->url.psz_password )
+        psz_pwd = strdup( p_sys->url.psz_password );
+    else
+        psz_pwd = var_InheritString( p_access, "ftp-pwd" );
+    if( !psz_pwd )
     {
-        free( psz );
+        free( psz_user );
         goto error;
     }
-    free( psz );
+
+    if( LoginUserPwd( p_access, p_sys, psz_user, psz_pwd ) == 0 )
+    {
+        free( psz_user );
+        free( psz_pwd );
+        return 0;
+    }
+    free( psz_user );
+    free( psz_pwd );
+error:
+    clearCmdTLS( p_sys );
+    return -1;
+}
+
+static int LoginUserPwd( vlc_object_t *p_access, access_sys_t *p_sys,
+                         const char *psz_user, const char *psz_pwd)
+{
+    int i_answer;
+
+    /* Send credentials over channel */
+    if( ftp_SendCommand( p_access, p_sys, "USER %s", psz_user ) < 0 ||
+        ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
+        return -1;
 
     switch( i_answer / 100 )
     {
@@ -432,20 +457,10 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
             break;
         case 3:
             msg_Dbg( p_access, "password needed" );
-            if( p_sys->url.psz_password && *p_sys->url.psz_password )
-                psz = strdup( p_sys->url.psz_password );
-            else
-                psz = var_InheritString( p_access, "ftp-pwd" );
-            if( !psz )
-                goto error;
 
-            if( ftp_SendCommand( p_access, p_sys, "PASS %s", psz ) < 0 ||
+            if( ftp_SendCommand( p_access, p_sys, "PASS %s", psz_pwd ) < 0 ||
                 ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
-            {
-                free( psz );
-                goto error;
-            }
-            free( psz );
+                return -1;
 
             switch( i_answer / 100 )
             {
@@ -453,6 +468,8 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                     msg_Dbg( p_access, "password accepted" );
                     break;
                 case 3:
+                {
+                    char *psz;
                     msg_Dbg( p_access, "account needed" );
                     psz = var_InheritString( p_access, "ftp-account" );
                     if( ftp_SendCommand( p_access, p_sys, "ACCT %s",
@@ -460,7 +477,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                         ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
                     {
                         free( psz );
-                        goto error;
+                        return -1;
                     }
                     free( psz );
 
@@ -470,30 +487,27 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                         dialog_Fatal( p_access,
                                       _("Network interaction failed"),
                                       "%s", _("Your account was rejected.") );
-                        goto error;
+                        return -1;
                     }
                     msg_Dbg( p_access, "account accepted" );
                     break;
+                }
 
                 default:
                     msg_Err( p_access, "password rejected" );
                     dialog_Fatal( p_access, _("Network interaction failed"),
                                   "%s",  _("Your password was rejected.") );
-                    goto error;
+                    return -1;
             }
             break;
         default:
             msg_Err( p_access, "user rejected" );
             dialog_Fatal( p_access, _("Network interaction failed"), "%s",
                         _("Your connection attempt to the server was rejected.") );
-            goto error;
+            return -1;
     }
 
     return 0;
-
-error:
-    clearCmdTLS( p_sys );
-    return -1;
 }
 
 static void FeaturesCheck( void *opaque, const char *feature )
