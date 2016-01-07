@@ -35,6 +35,7 @@
 #include <vlc_variables.h>
 #include <vlc_keystore.h>
 
+#include <assert.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -182,7 +183,8 @@ static int Open( vlc_object_t *p_this )
 
     if( login( p_access ) != VLC_SUCCESS )
     {
-        msg_Err( p_access, "Unable to connect to share %s", p_sys->psz_share );
+        msg_Err( p_access, "Unable to open file with path %s (in share %s)",
+                 p_sys->psz_path, p_sys->psz_share );
         goto error;
     }
 
@@ -190,18 +192,10 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->psz_share )
         return BrowserInit( p_access );
 
+    assert(p_sys->i_fd > 0);
+
     msg_Dbg( p_access, "Path: Share name = %s, path = %s", p_sys->psz_share,
              p_sys->psz_path );
-
-    /* Let's finally ask a handle to the file we wanna read ! */
-    p_sys->i_fd = smb_fopen( p_sys->p_session, p_sys->i_tid, p_sys->psz_path,
-                             SMB_MOD_RO );
-    if( !p_sys->i_fd )
-    {
-        msg_Err( p_access, "Unable to open file with path %s (in share %s)",
-                 p_sys->psz_path, p_sys->psz_share );
-        goto error;
-    }
 
     st = smb_stat_fd( p_sys->p_session, p_sys->i_fd );
     if( smb_stat_get( st, SMB_STAT_ISDIR ) )
@@ -314,8 +308,16 @@ static int smb_connect( access_t *p_access, const char *psz_login,
             p_sys->i_tid = smb_tree_connect( p_sys->p_session, p_sys->psz_share );
             if( !p_sys->i_tid )
                 return VLC_EGENERIC;
+
+            /* Let's finally ask a handle to the file we wanna read ! */
+            p_sys->i_fd = smb_fopen( p_sys->p_session, p_sys->i_tid,
+                                     p_sys->psz_path, SMB_MOD_RO );
+            /* TODO: fix smb_fopen to return a specific error code in case of
+             * wrong permissions */
+            return p_sys->i_fd > 0 ? VLC_SUCCESS : VLC_EGENERIC;
         }
-        return VLC_SUCCESS;
+        else
+            return VLC_SUCCESS;
     }
     else
         return VLC_EGENERIC;
