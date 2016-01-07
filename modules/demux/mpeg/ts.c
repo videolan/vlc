@@ -4588,7 +4588,8 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pes_t *p_pes,
     es_format_t *p_fmt = &p_pes->es.fmt;
     dvbpsi_descriptor_t *p_subs_dr = PMTEsFindDescriptor( p_dvbpsies, 0x59 );
     dvbpsi_descriptor_t *desc;
-    if( PMTEsFindDescriptor( p_dvbpsies, 0x7a ) )
+    if( PMTEsHasRegistration( p_demux, p_dvbpsies, "EAC3" ) ||
+        PMTEsFindDescriptor( p_dvbpsies, 0x7a ) )
     {
         /* DVB with stream_type 0x06 (ETS EN 300 468) */
         p_fmt->i_cat = AUDIO_ES;
