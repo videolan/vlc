@@ -31,6 +31,7 @@
 #include <vlc_interrupt.h>
 #include <vlc_keystore.h>
 
+#undef NDEBUG
 #include <assert.h>
 
 static const struct
