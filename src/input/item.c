@@ -1046,6 +1046,7 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "live",   ITEM_TYPE_STREAM, true }, /* livedotcom */
         { "mms",    ITEM_TYPE_STREAM, true },
         { "mtp",    ITEM_TYPE_DISC, false },
+        { "nfs",    ITEM_TYPE_FILE, true },
         { "ofdm",   ITEM_TYPE_CARD, false },
         { "oss",    ITEM_TYPE_CARD, false },
         { "pnm",    ITEM_TYPE_STREAM, true },
