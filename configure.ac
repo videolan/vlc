@@ -1761,6 +1761,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([SFTP], [sftp], [libssh2], (support SFTP file transfer via libssh2), [auto])
 
 dnl
+dnl nfs access support
+dnl
+PKG_ENABLE_MODULES_VLC([NFS], [nfs], [libnfs], (support nfs protocol via libnfs), [auto])
+
+dnl
 dnl  Video4Linux 2
 dnl
 AC_ARG_ENABLE(v4l2, [AS_HELP_STRING([--disable-v4l2],

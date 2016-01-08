@@ -12,6 +12,7 @@ Core:
    SMB, SFTP, FTP, RTSP ...)
 
 Access:
+ * New NFS access module using libnfs
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
  * New SMB access module using libdsm
  * Rewrite MPEG-DASH (Dynamic Adaptive Streaming over HTTP) support, including
