@@ -33,29 +33,17 @@
 
 #include <assert.h>
 
-#define PLAINTEXT_TEST_FILE "/tmp/vlc.test.keystore"
-
-/* If 1, tester will have time to check keystore entries via an external
- * program */
-#define LET_CHECK_VALUES 0
-
 static const struct
 {
     const char *psz_module;
-    int argc;
-    const char * const *argv;
+    bool b_test_default;
 } keystore_args[] =
 {
-    { "plaintext", 2, (const char *[]) {
-        "--keystore=plaintext,none",
-        "--keystore-plaintext-file=" PLAINTEXT_TEST_FILE
-    } },
-    { "secret", 1, (const char *[]) {
-        "--keystore=secret,none"
-    } },
-    { "kwallet", 1, (const char *[]) {
-        "--keystore=kwallet,none"
-    } },
+    { "plaintext", true },
+    /* Following keystores are tested only when asked explicitly by the tester
+     * (with "-a" argv) */
+    { "secret", false },
+    { "kwallet", false }
 };
 
 static void
@@ -109,7 +97,8 @@ ks_store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
 }
 
 static void
-test_module(const char *psz_module, int argc, const char * const *argv)
+test_module(const char *psz_module, bool b_test_all,
+            int argc, const char * const *argv)
 {
 #define VALUES_INSERT(i_key, psz_value) ppsz_values[i_key] = psz_value
 #define VALUES_REINIT() values_reinit(ppsz_values)
@@ -126,10 +115,6 @@ test_module(const char *psz_module, int argc, const char * const *argv)
     printf("creating libvlc\n");
     libvlc_instance_t *p_libvlc = libvlc_new(argc, argv);
     assert(p_libvlc != NULL);
-
-    /* See TODO in kwallet.cpp, VLCKWallet::connect() */
-    if (strcmp(psz_module, "kwallet") == 0)
-        assert(libvlc_InternalAddIntf(p_libvlc->p_libvlc_int, "qt") == VLC_SUCCESS);
 
     vlc_interrupt_t *ctx = vlc_interrupt_create();
     assert(ctx != NULL);
@@ -235,10 +220,11 @@ test_module(const char *psz_module, int argc, const char * const *argv)
     KS_FIND();
     assert(i_entries == 4);
 
-#if LET_CHECK_VALUES
-    printf("\nPress ENTER to remove entries\n");
-    getchar();
-#endif
+    if (b_test_all)
+    {
+        printf("\nPress ENTER to remove entries\n");
+        getchar();
+    }
 
     printf("testing removing entries that match user => user1\n");
     VALUES_REINIT();
@@ -270,27 +256,64 @@ test_module(const char *psz_module, int argc, const char * const *argv)
 }
 
 int
-main(void)
+main(int i_argc, char *ppsz_argv[])
 {
-#if !LET_CHECK_VALUES
-    alarm(10);
-#endif
+    /* If b_test_all is true, this test could pollute the developer´s keystores */
+    bool b_test_all = i_argc > 1 && strcmp(ppsz_argv[1], "-a") == 0;
+
+    if (!b_test_all)
+        alarm(3);
 
     setenv("VLC_PLUGIN_PATH", "../modules", 1);
-    unlink(PLAINTEXT_TEST_FILE);
+
+    /* Create a dummy libvlc to initialize module bank, needed by module_exists */
+    libvlc_instance_t *p_libvlc = libvlc_new(0, NULL);
+    assert(p_libvlc != NULL);
 
     for (unsigned int i = 0; i < sizeof(keystore_args)/sizeof(*keystore_args); ++i)
     {
         const char *psz_module = keystore_args[i].psz_module;
-        int argc = keystore_args[i].argc;
-        const char * const *argv = keystore_args[i].argv;
 
-        if (module_exists(psz_module))
-            test_module(psz_module, argc, argv);
+        if ((b_test_all || keystore_args[i].b_test_default)
+         && module_exists(psz_module))
+        {
+            int i_vlc_argc = 1;
+            char *ppsz_vlc_argv[2] = { 0 };
+            int i_tmp_fd = -1;
+            char psz_tmp_path[] = "/tmp/libvlc_XXXXXX";
+
+            assert(asprintf(&ppsz_vlc_argv[0], "--keystore=%s,none",
+                   psz_module) != -1);
+
+            if (strcmp(psz_module, "plaintext") == 0)
+            {
+                assert((i_tmp_fd = mkstemp(psz_tmp_path)) != -1);
+                printf("plaintext tmp file: '%s'\n", psz_tmp_path);
+                assert(asprintf(&ppsz_vlc_argv[1],
+                       "--keystore-plaintext-file=%s", psz_tmp_path) != -1);
+                i_vlc_argc++;
+            }
+            else if (strcmp(psz_module, "kwallet") == 0)
+            {
+                /* See TODO in kwallet.cpp, VLCKWallet::connect() */
+                assert(libvlc_InternalAddIntf(p_libvlc->p_libvlc_int, "qt") == VLC_SUCCESS);
+            }
+
+            test_module(psz_module, b_test_all, i_vlc_argc,
+                        (const char * const *)ppsz_vlc_argv);
+
+            if (i_tmp_fd != -1)
+            {
+                close(i_tmp_fd);
+                unlink(psz_tmp_path);
+            }
+            free(ppsz_vlc_argv[0]);
+            free(ppsz_vlc_argv[1]);
+        }
         else
-            printf("not testing %s since the plugin is not found\n", psz_module);
+            printf("not testing %s\n", psz_module);
     }
-    unlink(PLAINTEXT_TEST_FILE);
+    libvlc_release(p_libvlc);
 
     return 0;
 }
