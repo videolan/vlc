@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>700</width>
-    <height>640</height>
+    <height>757</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -553,10 +553,17 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QCheckBox" name="MetadataNetworkAccessMode">
         <property name="text">
          <string>Allow metadata network access</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="4">
+       <widget class="QCheckBox" name="continueBox">
+        <property name="text">
+         <string>Continue playback?</string>
         </property>
        </widget>
       </item>
