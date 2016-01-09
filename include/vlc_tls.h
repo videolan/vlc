@@ -71,8 +71,9 @@ VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *, int fd,
                                          const char *host, const char *service,
                                          const char *const *alpn, char **alp);
 
-vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *, int fd, const char *host,
-                                  const char *const *alpn);
+VLC_API vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *, int fd,
+                                          const char *host,
+                                          const char *const *alpn);
 
 /**
  * Destroys a TLS session down.
@@ -160,15 +161,16 @@ VLC_API vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *);
 /**
  * Allocates server TLS credentials.
  *
- * @param cert_path required (Unicode) path to an x509 certificate,
- *                  if NULL, anonymous key exchange will be used.
- * @param key_path (UTF-8) path to the PKCS private key for the certificate,
- *                 if NULL; cert_path will be used.
+ * @param cert required (Unicode) path to an x509 certificate,
+ *             if NULL, anonymous key exchange will be used.
+ * @param key (UTF-8) path to the PKCS private key for the certificate,
+ *            if NULL; cert will be used.
  *
  * @return TLS credentials object, or NULL on error.
  */
-vlc_tls_creds_t *vlc_tls_ServerCreate (vlc_object_t *,
-                                       const char *cert, const char *key);
+VLC_API vlc_tls_creds_t *vlc_tls_ServerCreate (vlc_object_t *,
+                                               const char *cert,
+                                               const char *key);
 
 static inline int vlc_tls_SessionHandshake (vlc_tls_creds_t *crd,
                                             vlc_tls_t *tls)

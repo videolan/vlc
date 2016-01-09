@@ -428,8 +428,10 @@ text_segment_Delete
 text_segment_ChainDelete
 text_segment_Copy
 vlc_tls_ClientCreate
+vlc_tls_ServerCreate
 vlc_tls_Delete
 vlc_tls_ClientSessionCreate
+vlc_tls_SessionCreate
 vlc_tls_SessionDelete
 vlc_tls_Read
 vlc_tls_Write

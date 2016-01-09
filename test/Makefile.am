@@ -25,6 +25,7 @@ check_PROGRAMS = \
 	test_src_misc_bits \
 	test_modules_packetizer_hxxx \
 	test_modules_keystore \
+	test_modules_tls \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -95,6 +96,8 @@ test_modules_packetizer_hxxx_SOURCES = modules/packetizer/hxxx.c
 test_modules_packetizer_hxxx_LDADD = $(LIBVLC)
 test_modules_keystore_SOURCES = modules/keystore/test.c
 test_modules_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_tls_SOURCES = modules/misc/tls.c
+test_modules_tls_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
