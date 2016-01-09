@@ -506,6 +506,13 @@
             return NO;
         if (![[NSFileManager defaultManager] fileExistsAtPath:[url path]])
             return NO;
+
+    } else if ([item action] == @selector(deleteItem:)) {
+        return [_outlineView numberOfSelectedRows] > 0 && _model.editAllowed;
+    } else if ([item action] == @selector(selectAll:)) {
+        return [_outlineView numberOfRows] >= 0;
+    } else if ([item action] == @selector(playItem:)) {
+        return [_outlineView numberOfSelectedRows] > 0;
     }
 
     return YES;
@@ -733,9 +740,7 @@
     playlist_t *p_playlist = pl_Get(getIntf());
     bool b_del_allowed = [[self model] editAllowed];
 
-    [_playPlaylistMenuItem setEnabled: b_item_sel];
-    [_deletePlaylistMenuItem setEnabled: b_item_sel && b_del_allowed];
-    [_selectAllPlaylistMenuItem setEnabled: b_rows];
+    // TODO move other items to menu validation protocol
     [_infoPlaylistMenuItem setEnabled: b_item_sel];
     [_preparsePlaylistMenuItem setEnabled: b_item_sel];
     [_recursiveExpandPlaylistMenuItem setEnabled: b_item_sel];

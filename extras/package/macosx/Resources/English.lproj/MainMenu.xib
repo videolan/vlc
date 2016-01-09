@@ -345,7 +345,7 @@
                             <menuItem title="Delete" id="5084">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="delete:" target="-1" id="5085"/>
+                                    <action selector="deleteItem:" target="-1" id="9EK-NF-Zy9"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Select All" keyEquivalent="a" id="198">

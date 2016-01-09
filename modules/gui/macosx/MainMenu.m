@@ -329,7 +329,7 @@
     [_cutItem setTitle: _NS("Cut")];
     [_mcopyItem setTitle: _NS("Copy")];
     [_pasteItem setTitle: _NS("Paste")];
-    [_clearItem setTitle: _NS("Clear")];
+    [_clearItem setTitle: _NS("Delete")];
     [_select_all setTitle: _NS("Select All")];
 
     [_viewMenu setTitle: _NS("View")];
