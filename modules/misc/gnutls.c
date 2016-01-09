@@ -607,7 +607,6 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
     if (val < 0)
     {
         msg_Err (crd, "cannot load X.509 key: %s", gnutls_strerror (val));
-        gnutls_certificate_free_credentials (sys->x509_cred);
         goto error;
     }
 
