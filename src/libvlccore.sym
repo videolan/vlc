@@ -272,7 +272,6 @@ vlc_vaLog
 vlc_strerror
 vlc_strerror_c
 msleep
-mstrtime
 mwait
 net_Accept
 net_AcceptSingle

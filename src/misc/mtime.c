@@ -47,29 +47,6 @@
 #endif
 
 /**
- * Return a date in a readable format
- *
- * This function converts a mtime date into a string.
- * psz_buffer should be a buffer long enough to store the formatted
- * date.
- * \param date to be converted
- * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
- * \return psz_buffer is returned so this can be used as printf parameter.
- */
-char *mstrtime( char *psz_buffer, mtime_t date )
-{
-    static const mtime_t ll1000 = 1000, ll60 = 60, ll24 = 24;
-
-    snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%02d:%02d:%02d-%03d.%03d",
-             (int) (date / (ll1000 * ll1000 * ll60 * ll60) % ll24),
-             (int) (date / (ll1000 * ll1000 * ll60) % ll60),
-             (int) (date / (ll1000 * ll1000) % ll60),
-             (int) (date / ll1000 % ll1000),
-             (int) (date % ll1000) );
-    return( psz_buffer );
-}
-
-/**
  * Convert seconds to a time in the format h:mm:ss.
  *
  * This function is provided for any interface function which need to print a
