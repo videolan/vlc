@@ -469,9 +469,12 @@
         [[tableColumn headerCell] setStringValue:[_translationsForPlaylistTableColumns objectForKey:columnId]];
 
         if ([columnId isEqualToString: TRACKNUM_COLUMN]) {
-            [tableColumn setWidth:20.];
-            [tableColumn setResizingMask:NSTableColumnNoResizing];
+            [tableColumn setMinWidth:20.];
+            [tableColumn setMaxWidth:70.];
             [[tableColumn headerCell] setStringValue:@"#"];
+
+        } else {
+            [tableColumn setMinWidth:42.];
         }
 
         [_outlineView addTableColumn:tableColumn];
