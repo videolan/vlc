@@ -274,7 +274,7 @@
         }
     }
 
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
 
     input_item_t *p_input = input_item_New([_MRL UTF8String], [[_dropinMediaLabel stringValue] UTF8String]);
     if (!p_input)
@@ -296,7 +296,7 @@
         PL_UNLOCK;
     }
     else
-        msg_Err(VLCIntf, "CAS: playlist add input failed :(");
+        msg_Err(getIntf(), "CAS: playlist add input failed :(");
 
     /* we're done with this input */
     vlc_gc_decref(p_input);
@@ -621,7 +621,7 @@
             NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];
             NSUInteger count = [array count];
             if (count > 0) {
-                playlist_t * p_playlist = pl_Get(VLCIntf);
+                playlist_t * p_playlist = pl_Get(getIntf());
                 playlist_item_t * p_item = NULL;
 
                 PL_LOCK;
@@ -694,7 +694,7 @@
 
     NSArray * components = [profileString componentsSeparatedByString:@";"];
     if ([components count] != 16) {
-        msg_Err(VLCIntf, "CAS: the requested profile '%s' is invalid", [profileString UTF8String]);
+        msg_Err(getIntf(), "CAS: the requested profile '%s' is invalid", [profileString UTF8String]);
         return;
     }
 
@@ -801,7 +801,7 @@
     else if ([format isEqualToString:@"wmv"])
         [_customizeEncapMatrix selectCellWithTag:ASF];
     else
-        msg_Err(VLCIntf, "CAS: unknown encap format requested for customization");
+        msg_Err(getIntf(), "CAS: unknown encap format requested for customization");
 }
 
 - (NSString *)currentEncapsulationFormatAsFileExtension:(BOOL)b_extension

@@ -262,7 +262,7 @@
           && constrainedRect.size.height != screenRect.size.height
           && fabs(screenRect.size.height - constrainedRect.size.height) <= 25.) {
 
-        msg_Dbg(VLCIntf, "Contrain window height %.1f to screen height %.1f",
+        msg_Dbg(getIntf(), "Contrain window height %.1f to screen height %.1f",
                 constrainedRect.size.height, screenRect.size.height);
         constrainedRect.size.height = screenRect.size.height;
     }
@@ -309,7 +309,7 @@
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
-    _darkInterface = config_GetInt(VLCIntf, "macosx-interfacestyle");
+    _darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
 
     if (_darkInterface) {
         styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
@@ -330,7 +330,7 @@
 
 - (void)awakeFromNib
 {
-    BOOL b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
+    BOOL b_nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
     if (b_nativeFullscreenMode) {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
@@ -501,7 +501,7 @@
 
 - (void)setWindowLevel:(NSInteger)i_state
 {
-    if (var_InheritBool(VLCIntf, "video-wallpaper") || [self level] < NSNormalWindowLevel)
+    if (var_InheritBool(getIntf(), "video-wallpaper") || [self level] < NSNormalWindowLevel)
         return;
 
     if (!self.fullscreen && !_inFullscreenTransition)
@@ -568,7 +568,7 @@
 {
     _nativeVideoSize = size;
 
-    if (var_InheritBool(VLCIntf, "macosx-video-autoresize") && !var_InheritBool(VLCIntf, "video-wallpaper"))
+    if (var_InheritBool(getIntf(), "macosx-video-autoresize") && !var_InheritBool(getIntf(), "video-wallpaper"))
         [self resizeWindow];
 }
 
@@ -738,7 +738,7 @@
 
     _inFullscreenTransition = YES;
 
-    var_SetBool(pl_Get(VLCIntf), "fullscreen", true);
+    var_SetBool(pl_Get(getIntf()), "fullscreen", true);
 
     frameBeforeLionFullscreen = [self frame];
 
@@ -802,7 +802,7 @@
     [self setFullscreen: NO];
 
     if ([self hasActiveVideo]) {
-        var_SetBool(pl_Get(VLCIntf), "fullscreen", false);
+        var_SetBool(pl_Get(getIntf()), "fullscreen", false);
 
         vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
@@ -861,16 +861,16 @@
     NSScreen *screen;
     NSRect screen_rect;
     NSRect rect;
-    BOOL blackout_other_displays = var_InheritBool(VLCIntf, "macosx-black");
+    BOOL blackout_other_displays = var_InheritBool(getIntf(), "macosx-black");
 
-    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger(VLCIntf, "macosx-vdev")];
+    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger(getIntf(), "macosx-vdev")];
 
     if (!screen) {
-        msg_Dbg(VLCIntf, "chosen screen isn't present, using current screen for fullscreen mode");
+        msg_Dbg(getIntf(), "chosen screen isn't present, using current screen for fullscreen mode");
         screen = [self screen];
     }
     if (!screen) {
-        msg_Dbg(VLCIntf, "Using deepest screen");
+        msg_Dbg(getIntf(), "Using deepest screen");
         screen = [NSScreen deepestScreen];
     }
 
@@ -1029,7 +1029,7 @@
 {
     NSMutableDictionary *dict1, *dict2;
     NSRect frame;
-    BOOL blackout_other_displays = var_InheritBool(VLCIntf, "macosx-black");
+    BOOL blackout_other_displays = var_InheritBool(getIntf(), "macosx-black");
 
     if (self.controlsBar)
         [self.controlsBar setFullscreenState:NO];
@@ -1149,7 +1149,7 @@
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
 
-    [self setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
+    [self setAlphaValue: config_GetFloat(getIntf(), "macosx-opaqueness")];
 }
 
 - (void)animationDidEnd:(NSAnimation*)animation

@@ -270,7 +270,7 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
 {
     self = [super init];
     if (self) {
-        intf_thread_t *p_intf = VLCIntf;
+        intf_thread_t *p_intf = getIntf();
         var_Create(p_intf, "dialog-extension", VLC_VAR_ADDRESS);
         var_AddCallback(p_intf, "dialog-extension", extensionDialogCallback, (__bridge void *)self);
         // dialog_Register(p_intf) is called by coredialog provider
@@ -280,7 +280,7 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
 
 - (void)dealloc
 {
-    var_DelCallback(VLCIntf, "dialog-extension", extensionDialogCallback, (__bridge void *)self);
+    var_DelCallback(getIntf(), "dialog-extension", extensionDialogCallback, (__bridge void *)self);
 }
 
 - (void)performEventWithObject:(NSValue *)objectValue ofType:(const char*)type
@@ -294,7 +294,7 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
 
     }
     else
-        msg_Err(VLCIntf, "unhandled dialog type: '%s'", type);
+        msg_Err(getIntf(), "unhandled dialog type: '%s'", type);
 }
 
 - (void)triggerClick:(id)sender
@@ -465,7 +465,7 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
 
     VLCDialogWindow *dialogWindow = CFBridgingRelease(p_dialog->p_sys_intf);
     if (!dialogWindow) {
-        msg_Warn(VLCIntf, "dialog window not found");
+        msg_Warn(getIntf(), "dialog window not found");
         return VLC_EGENERIC;
     }
 

@@ -71,7 +71,7 @@ NSString *const kVLCMediaUnknown = @"Unknown";
         stringObject = toNSStr(_(psz));
 
         if (stringObject == NULL) {
-            msg_Err(VLCIntf, "could not translate: %s", psz);
+            msg_Err(getIntf(), "could not translate: %s", psz);
             return @"";
         }
     } else

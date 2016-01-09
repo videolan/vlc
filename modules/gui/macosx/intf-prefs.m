@@ -74,7 +74,7 @@ static const int kCurrentPreferencesVersion = 3;
         if (![[VLCCoreInteraction sharedInstance] fixPreferences])
             return;
         else
-            config_SaveConfigFile(VLCIntf); // we need to do manually, since we won't quit libvlc cleanly
+            config_SaveConfigFile(getIntf()); // we need to do manually, since we won't quit libvlc cleanly
     } else if (version == 2) {
         /* version 2 (used by VLC 2.0.x and early versions of 2.1) can lead to exceptions within 2.1 or later
          * so we reset the OS X specific prefs here - in practice, no user will notice */

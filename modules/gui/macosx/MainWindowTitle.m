@@ -82,7 +82,7 @@
 
 - (void)awakeFromNib
 {
-    b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
+    b_nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
     if (!b_nativeFullscreenMode || OSX_YOSEMITE || OSX_EL_CAPITAN) {
         [o_fullscreen_btn setHidden: YES];
@@ -224,7 +224,7 @@
         [[self window] toggleFullScreen:self];
 
     } else
-        msg_Err(VLCIntf, "unknown button action sender");
+        msg_Err(getIntf(), "unknown button action sender");
 
     [self setWindowButtonOver: NO];
     [self setWindowFullscreenButtonOver: NO];

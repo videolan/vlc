@@ -155,7 +155,7 @@
 - (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on
 {
     audio_output_t *p_aout = getAout();
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     playlist_EnableAudioFilter(pl_Get(p_intf), psz_name, b_on);
 
     if (p_aout) {
@@ -210,7 +210,7 @@
 
 - (NSString *)generateProfileString
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
@@ -257,7 +257,7 @@
 
 - (IBAction)profileSelectorAction:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     [self saveCurrentProfile];
     i_old_profile_index = [_profilePopup indexOfSelectedItem];
 
@@ -522,7 +522,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (void)equalizerUpdated
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     float fPreamp = config_GetFloat(p_intf, "equalizer-preamp");
     bool b_2p = (BOOL)config_GetInt(p_intf, "equalizer-2pass");
     bool bEnabled = GetEqualizerStatus(p_intf, (char *)"equalizer");
@@ -600,13 +600,13 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     }
 
     /* save changed to config */
-    config_PutPsz(VLCIntf, "equalizer-bands", [[self generatePresetString] UTF8String]);
+    config_PutPsz(getIntf(), "equalizer-bands", [[self generatePresetString] UTF8String]);
 
 }
 
 - (IBAction)equalizerChangePreset:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     NSInteger numberOfChosenPreset = [sender indexOfSelectedItem];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
@@ -641,7 +641,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     }
     
     /* save changed to config */
-    config_PutFloat(VLCIntf, "equalizer-preamp", fPreamp);
+    config_PutFloat(getIntf(), "equalizer-preamp", fPreamp);
 }
 
 - (IBAction)equalizerTwoPass:(id)sender
@@ -655,7 +655,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     }
 
     /* save changed to config */
-    config_PutInt(VLCIntf, "equalizer-2pass", (int)b_2p);
+    config_PutInt(getIntf(), "equalizer-2pass", (int)b_2p);
 }
 
 - (IBAction)addPresetAction:(id)sender
@@ -695,7 +695,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
             vlc_object_release(p_aout);
         }
 
-        config_PutPsz(VLCIntf, "equalizer-preset", [[resultingText decomposedStringWithCanonicalMapping] UTF8String]);
+        config_PutPsz(getIntf(), "equalizer-preset", [[resultingText decomposedStringWithCanonicalMapping] UTF8String]);
 
         /* update UI */
         [_self updatePresetSelector];
@@ -741,7 +741,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Compressor
 - (void)resetCompressor
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     BOOL bEnable_compressor = NO;
     char *psz_afilters;
     psz_afilters = config_GetPsz(p_intf, "audio-filter");
@@ -772,7 +772,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)resetCompressorValues:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     config_PutFloat(p_intf, "compressor-rms-peak", 0.000000);
     config_PutFloat(p_intf, "compressor-attack", 25.000000);
     config_PutFloat(p_intf, "compressor-release", 100.000000);
@@ -824,7 +824,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, value, [sender floatValue]);
         vlc_object_release(p_aout);
     }
-    config_PutFloat(VLCIntf, value, [sender floatValue]);
+    config_PutFloat(getIntf(), value, [sender floatValue]);
 
     if (sender == _compressorBand1Slider)
         [_compressorBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
@@ -846,7 +846,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Spatializer
 - (void)resetSpatializer
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     BOOL bEnable_spatializer = NO;
     char *psz_afilters;
     psz_afilters = config_GetPsz(p_intf, "audio-filter");
@@ -874,7 +874,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)resetSpatializerValues:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     config_PutFloat(p_intf, "spatializer-roomsize", .85);
     config_PutFloat(p_intf, "spatializer-width", 1.);
     config_PutFloat(p_intf, "spatializer-wet", .4);
@@ -918,7 +918,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, value, [sender floatValue] / 10.);
         vlc_object_release(p_aout);
     }
-    config_PutFloat(VLCIntf, value, [sender floatValue] / 10.);
+    config_PutFloat(getIntf(), value, [sender floatValue] / 10.);
 
     if (sender == _spatializerBand1Slider)
         [_spatializerBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
@@ -936,7 +936,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Filter
 - (void)resetAudioFilters
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     BOOL bEnable_normvol = NO;
     char *psz_afilters;
     psz_afilters = config_GetPsz(p_intf, "audio-filter");
@@ -978,7 +978,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         vlc_object_release(p_aout);
     }
 
-    config_PutFloat(VLCIntf, "norm-max-level", [_filterNormLevelSlider floatValue]);
+    config_PutFloat(getIntf(), "norm-max-level", [_filterNormLevelSlider floatValue]);
 }
 
 - (IBAction)filterEnableKaraoke:(id)sender

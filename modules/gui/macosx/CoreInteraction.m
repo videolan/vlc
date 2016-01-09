@@ -94,7 +94,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     self = [super init];
     if (self) {
-        intf_thread_t *p_intf = VLCIntf;
+        intf_thread_t *p_intf = getIntf();
 
         /* init media key support */
         b_mediaKeySupport = var_InheritBool(p_intf, "macosx-mediakeys");
@@ -118,7 +118,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)dealloc
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     var_DelCallback(p_intf->p_libvlc, "intf-boss", BossCallback, (__bridge void *)self);
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
@@ -128,8 +128,8 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)playOrPause
 {
-    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
+    playlist_t *p_playlist = pl_Get(getIntf());
 
     if (p_input) {
         playlist_TogglePause(p_playlist);
@@ -146,34 +146,34 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)pause
 {
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
 
     playlist_Pause(p_playlist);
 }
 
 - (void)stop
 {
-    playlist_Stop(pl_Get(VLCIntf));
+    playlist_Stop(pl_Get(getIntf()));
 }
 
 - (void)faster
 {
-    var_TriggerCallback(pl_Get(VLCIntf), "rate-faster");
+    var_TriggerCallback(pl_Get(getIntf()), "rate-faster");
 }
 
 - (void)slower
 {
-    var_TriggerCallback(pl_Get(VLCIntf), "rate-slower");
+    var_TriggerCallback(pl_Get(getIntf()), "rate-slower");
 }
 
 - (void)normalSpeed
 {
-    var_SetFloat(pl_Get(VLCIntf), "rate", 1.);
+    var_SetFloat(pl_Get(getIntf()), "rate", 1.);
 }
 
 - (void)toggleRecord
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -187,7 +187,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)setPlaybackRate:(int)i_value
 {
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
 
     double speed = pow(2, (double)i_value / 17);
     int rate = INPUT_RATE_DEFAULT / speed;
@@ -200,7 +200,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     float f_rate;
 
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return 0;
 
@@ -212,7 +212,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
     else
     {
-        playlist_t * p_playlist = pl_Get(VLCIntf);
+        playlist_t * p_playlist = pl_Get(getIntf());
         f_rate = var_GetFloat(p_playlist, "rate");
     }
 
@@ -230,17 +230,17 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)previous
 {
-    playlist_Prev(pl_Get(VLCIntf));
+    playlist_Prev(pl_Get(getIntf()));
 }
 
 - (void)next
 {
-    playlist_Next(pl_Get(VLCIntf));
+    playlist_Next(pl_Get(getIntf()));
 }
 
 - (int)durationOfCurrentPlaylistItem
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return 0;
 
@@ -257,7 +257,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (NSURL*)URLOfCurrentPlaylistItem
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return nil;
 
@@ -286,7 +286,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (NSString*)nameOfCurrentPlaylistItem
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return nil;
 
@@ -307,7 +307,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
 
     NSString *o_name = @"";
-    char *format = var_InheritString(VLCIntf, "input-title-format");
+    char *format = var_InheritString(getIntf(), "input-title-format");
     if (format) {
         char *formated = str_format_meta(p_input, format);
         free(format);
@@ -342,7 +342,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)jumpWithValue:(char *)p_value forward:(BOOL)b_value
 {
-    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (!p_input)
         return;
 
@@ -398,7 +398,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)shuffle
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -428,7 +428,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)repeatAll
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -448,7 +448,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)repeatOne
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -468,7 +468,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)repeatOff
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -489,13 +489,13 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (void)setAtoB
 {
     if (!timeA) {
-        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+        input_thread_t * p_input = pl_CurrentInput(getIntf());
         if (p_input) {
             timeA = var_GetInteger(p_input, "time");
             vlc_object_release(p_input);
         }
     } else if (!timeB) {
-        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+        input_thread_t * p_input = pl_CurrentInput(getIntf());
         if (p_input) {
             timeB = var_GetInteger(p_input, "time");
             vlc_object_release(p_input);
@@ -513,7 +513,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (void)updateAtoB
 {
     if (timeB) {
-        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+        input_thread_t * p_input = pl_CurrentInput(getIntf());
         if (p_input) {
             mtime_t currentTime = var_GetInteger(p_input, "time");
             if ( currentTime >= timeB || currentTime < timeA)
@@ -525,7 +525,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)volumeUp
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -534,7 +534,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)volumeDown
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -543,7 +543,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)toggleMute
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -552,7 +552,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (BOOL)mute
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return NO;
 
@@ -564,7 +564,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (int)volume
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return 0;
 
@@ -575,7 +575,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)setVolume: (int)i_value
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -590,7 +590,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (float)maxVolume
 {
     if (f_maxVolume == 0.) {
-        f_maxVolume = (float)var_InheritInteger(VLCIntf, "macosx-max-volume") / 100. * AOUT_VOLUME_DEFAULT;
+        f_maxVolume = (float)var_InheritInteger(getIntf(), "macosx-max-volume") / 100. * AOUT_VOLUME_DEFAULT;
     }
 
     return f_maxVolume;
@@ -598,7 +598,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)addSubtitlesToCurrentInput:(NSArray *)paths
 {
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
     if (!p_input)
         return;
 
@@ -606,22 +606,22 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     for (int i = 0; i < count ; i++) {
         const char *path = [[[paths objectAtIndex:i] path] UTF8String];
-        msg_Dbg(VLCIntf, "loading subs from %s", path);
+        msg_Dbg(getIntf(), "loading subs from %s", path);
 
         int i_result = input_AddSubtitleOSD(p_input, path, true, true);
         if (i_result != VLC_SUCCESS)
-            msg_Warn(VLCIntf, "unable to load subtitles from '%s'", path);
+            msg_Warn(getIntf(), "unable to load subtitles from '%s'", path);
     }
     vlc_object_release(p_input);
 }
 
 - (void)showPosition
 {
-    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (p_input != NULL) {
         vout_thread_t *p_vout = input_GetVout(p_input);
         if (p_vout != NULL) {
-            var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_POSITION);
+            var_SetInteger(getIntf()->p_libvlc, "key-action", ACTIONID_POSITION);
             vlc_object_release(p_vout);
         }
         vlc_object_release(p_input);
@@ -638,7 +638,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return NO;
 
     // Try to add file as a subtitle
-    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (items.count == 1 && p_input) {
         NSString *url = [[items firstObject] valueForKey:@"ITEM_URL"];
         char *path = vlc_uri2path([url UTF8String]);
@@ -664,17 +664,17 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)setAspectRatioIsLocked:(BOOL)b_value
 {
-    config_PutInt(VLCIntf, "macosx-lock-aspect-ratio", b_value);
+    config_PutInt(getIntf(), "macosx-lock-aspect-ratio", b_value);
 }
 
 - (BOOL)aspectRatioIsLocked
 {
-    return config_GetInt(VLCIntf, "macosx-lock-aspect-ratio");
+    return config_GetInt(getIntf(), "macosx-lock-aspect-ratio");
 }
 
 - (void)toggleFullscreen
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -699,7 +699,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     BOOL b_needsRestart = NO;
 
     #define fixpref(pref) \
-    o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz(VLCIntf, pref)]; \
+    o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz(getIntf(), pref)]; \
     if ([o_workString length] > 0) \
     { \
         returnedRange = [o_workString rangeOfString:@"macosx" options: NSCaseInsensitiveSearch]; \
@@ -712,7 +712,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             fullRange = NSMakeRange(0, [o_workString length]); \
             [o_workString replaceOccurrencesOfString:@"macosx:" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
             \
-            config_PutPsz(VLCIntf, pref, [o_workString UTF8String]); \
+            config_PutPsz(getIntf(), pref, [o_workString UTF8String]); \
             b_needsRestart = YES; \
         } \
     }
@@ -742,14 +742,14 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     } else if (module_provides(p_obj, "sub filter")) {
         return "sub-filter";
     } else {
-        msg_Err(VLCIntf, "Unknown video filter type.");
+        msg_Err(getIntf(), "Unknown video filter type.");
         return NULL;
     }
 }
 
 - (void)setVideoFilter: (const char *)psz_name on:(BOOL)b_on
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
     char *psz_string, *psz_parser;
@@ -814,7 +814,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (void)restartFilterIfNeeded: (const char *)psz_filter option: (const char *)psz_name
 {
     vout_thread_t *p_vout = getVout();
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -869,7 +869,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -895,7 +895,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -922,7 +922,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     char *psz_new_value = strdup(psz_value);
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -950,7 +950,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -980,7 +980,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -1061,7 +1061,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
  increase/decrease as long as the user holds the left/right, plus/minus button */
 - (void) executeHoldActionForRemoteButton: (NSNumber*) buttonIdentifierNumber
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -1096,7 +1096,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                pressedDown: (BOOL) pressedDown
                 clickCount: (unsigned int) count
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
 
@@ -1114,27 +1114,27 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                 [self playOrPause];
             break;
         case kRemoteButtonVolume_Plus:
-            if (config_GetInt(VLCIntf, "macosx-appleremote-sysvol"))
+            if (config_GetInt(getIntf(), "macosx-appleremote-sysvol"))
                 [NSSound increaseSystemVolume];
             else
                 if (p_intf)
                     var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_UP);
             break;
         case kRemoteButtonVolume_Minus:
-            if (config_GetInt(VLCIntf, "macosx-appleremote-sysvol"))
+            if (config_GetInt(getIntf(), "macosx-appleremote-sysvol"))
                 [NSSound decreaseSystemVolume];
             else
                 if (p_intf)
                     var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN);
             break;
         case kRemoteButtonRight:
-            if (config_GetInt(VLCIntf, "macosx-appleremote-prevnext"))
+            if (config_GetInt(getIntf(), "macosx-appleremote-prevnext"))
                 [self forward];
             else
                 [self next];
             break;
         case kRemoteButtonLeft:
-            if (config_GetInt(VLCIntf, "macosx-appleremote-prevnext"))
+            if (config_GetInt(getIntf(), "macosx-appleremote-prevnext"))
                 [self backward];
             else
                 [self previous];
@@ -1183,7 +1183,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         unichar key = [characters characterAtIndex: 0];
 
         if (key) {
-            input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+            input_thread_t * p_input = pl_CurrentInput(getIntf());
             if (p_input != NULL) {
                 vout_thread_t *p_vout = input_GetVout(p_input);
 
@@ -1206,7 +1206,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return NO;
 

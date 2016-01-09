@@ -161,7 +161,7 @@
         if (key) {
             /* Escape should always get you out of fullscreen */
             if (key == (unichar) 0x1b) {
-                playlist_t * p_playlist = pl_Get(VLCIntf);
+                playlist_t * p_playlist = pl_Get(getIntf());
                  if (var_GetBool(p_playlist, "fullscreen"))
                      [[VLCCoreInteraction sharedInstance] toggleFullscreen];
             }
@@ -173,7 +173,7 @@
                 var_Set(p_vout->p_libvlc, "key-pressed", val);
             }
             else
-                msg_Dbg(VLCIntf, "could not send keyevent to VLC core");
+                msg_Dbg(getIntf(), "could not send keyevent to VLC core");
 
             return;
         }
@@ -234,7 +234,7 @@
 
 - (void)scrollWheel:(NSEvent *)theEvent
 {
-    intf_thread_t * p_intf = VLCIntf;
+    intf_thread_t * p_intf = getIntf();
     CGFloat f_deltaX = [theEvent deltaX];
     CGFloat f_deltaY = [theEvent deltaY];
 

@@ -404,7 +404,7 @@ static AppleRemote* sharedInstance=nil;
             [self handleEventWithCookieString: lastSubCookieString sumOfValues:0];
         }
         if ([cookieString length] > 0) {
-            msg_Warn( VLCIntf, "Unknown AR button for cookiestring %s", [cookieString UTF8String]);
+            msg_Warn( getIntf(), "Unknown AR button for cookiestring %s", [cookieString UTF8String]);
         }
     }
 }
@@ -457,7 +457,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
     ioReturnValue = IOObjectGetClass(hidDevice, className);
 
     if (ioReturnValue != kIOReturnSuccess) {
-        msg_Err( VLCIntf, "Failed to get IOKit class name.");
+        msg_Err( getIntf(), "Failed to get IOKit class name.");
         return NULL;
     }
 
@@ -472,7 +472,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
         plugInResult = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID), (LPVOID) &hidDeviceInterface);
 
         if (plugInResult != S_OK) {
-            msg_Err( VLCIntf, "Couldn't create HID class device interface");
+            msg_Err( getIntf(), "Couldn't create HID class device interface");
         }
         // Release
         if (plugInInterface) (*plugInInterface)->Release(plugInInterface);
@@ -591,13 +591,13 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
                     (*queue)->start(queue);
                     return YES;
                 } else {
-                    msg_Err( VLCIntf, "Error when setting event callout");
+                    msg_Err( getIntf(), "Error when setting event callout");
                 }
             } else {
-                msg_Err( VLCIntf, "Error when creating async event source");
+                msg_Err( getIntf(), "Error when creating async event source");
             }
         } else {
-            msg_Err( VLCIntf, "Error when opening HUD device");
+            msg_Err( getIntf(), "Error when opening HUD device");
         }
     }
     return NO;

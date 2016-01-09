@@ -90,7 +90,7 @@ static const float f_min_window_height = 307.;
     char *key;
     NSString *o_key;
 
-    key = config_GetPsz(VLCIntf, keyString);
+    key = config_GetPsz(getIntf(), keyString);
     o_key = [NSString stringWithFormat:@"%s", key];
     FREENULL(key);
 
@@ -159,7 +159,7 @@ static const float f_min_window_height = 307.;
     [self setAcceptsMouseMovedEvents:YES];
     [self setFrameAutosaveName:@"mainwindow"];
 
-    _nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
+    _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
     b_dropzone_active = YES;
 
     // Playlist setup
@@ -246,7 +246,7 @@ static const float f_min_window_height = 307.;
 
         NSAlert *albumArtAlert = [NSAlert alertWithMessageText:_NS("Check for album art and metadata?") defaultButton:_NS("Enable Metadata Retrieval") alternateButton:_NS("No, Thanks") otherButton:nil informativeTextWithFormat:@"%@",_NS("VLC can check online for album art and metadata to enrich your playback experience, e.g. by providing track information when playing Audio CDs. To provide this functionality, VLC will send information about your contents to trusted services in an anonymized form.")];
         NSInteger returnValue = [albumArtAlert runModal];
-        config_PutInt(VLCIntf, "metadata-network-access", returnValue == NSAlertDefaultReturn);
+        config_PutInt(getIntf(), "metadata-network-access", returnValue == NSAlertDefaultReturn);
     }
 
     if (self.darkInterface) {
@@ -304,13 +304,13 @@ static const float f_min_window_height = 307.;
     }
 
     /* update fs button to reflect state for next startup */
-    if (var_InheritBool(pl_Get(VLCIntf), "fullscreen"))
+    if (var_InheritBool(pl_Get(getIntf()), "fullscreen"))
         [self.controlsBar setFullscreenState:YES];
 
     /* restore split view */
     f_lastLeftSplitViewWidth = 200;
     /* trick NSSplitView implementation, which pretends to know better than us */
-    if (!config_GetInt(VLCIntf, "macosx-show-sidebar"))
+    if (!config_GetInt(getIntf(), "macosx-show-sidebar"))
         [self performSelector:@selector(toggleLeftSubSplitView) withObject:nil afterDelay:0.05];
 }
 
@@ -337,9 +337,9 @@ static const float f_min_window_height = 307.;
     /* SD subnodes, inspired by the Qt4 intf */
     char **ppsz_longnames = NULL;
     int *p_categories = NULL;
-    char **ppsz_names = vlc_sd_GetNames(pl_Get(VLCIntf), &ppsz_longnames, &p_categories);
+    char **ppsz_names = vlc_sd_GetNames(pl_Get(getIntf()), &ppsz_longnames, &p_categories);
     if (!ppsz_names)
-        msg_Err(VLCIntf, "no sd item found"); //TODO
+        msg_Err(getIntf(), "no sd item found"); //TODO
     char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
     int *p_category = p_categories;
     NSMutableArray *internetItems = [[NSMutableArray alloc] init];
@@ -382,7 +382,7 @@ static const float f_min_window_height = 307.;
                 [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
                 break;
             default:
-                msg_Warn(VLCIntf, "unknown SD type found, skipping (%s)", *ppsz_name);
+                msg_Warn(getIntf(), "unknown SD type found, skipping (%s)", *ppsz_name);
                 break;
         }
 
@@ -501,7 +501,7 @@ static const float f_min_window_height = 307.;
 {
     // Beware, this code is really ugly
 
-    msg_Dbg(VLCIntf, "toggle playlist from state: removed splitview %i, minimized view %i. Event %i", b_splitview_removed, b_minimized_view, event);
+    msg_Dbg(getIntf(), "toggle playlist from state: removed splitview %i, minimized view %i. Event %i", b_splitview_removed, b_minimized_view, event);
     if (![self isVisible] && event == psUserMenuEvent) {
         [self makeKeyAndOrderFront: nil];
         return;
@@ -558,7 +558,7 @@ static const float f_min_window_height = 307.;
         }
     }
 
-    msg_Dbg(VLCIntf, "toggle playlist to state: removed splitview %i, minimized view %i", b_splitview_removed, b_minimized_view);
+    msg_Dbg(getIntf(), "toggle playlist to state: removed splitview %i, minimized view %i", b_splitview_removed, b_minimized_view);
 }
 
 - (IBAction)dropzoneButtonAction:(id)sender
@@ -576,7 +576,7 @@ static const float f_min_window_height = 307.;
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    config_PutInt(VLCIntf, "macosx-show-sidebar", ![_splitView isSubviewCollapsed:_splitViewLeft]);
+    config_PutInt(getIntf(), "macosx-show-sidebar", ![_splitView isSubviewCollapsed:_splitViewLeft]);
     [self saveFrameUsingName:[self frameAutosaveName]];
 }
 
@@ -594,7 +594,7 @@ static const float f_min_window_height = 307.;
 
 - (void)someWindowWillMiniaturize:(NSNotification *)notification
 {
-    if (config_GetInt(VLCIntf, "macosx-pause-minimized")) {
+    if (config_GetInt(getIntf(), "macosx-pause-minimized")) {
         id obj = [notification object];
 
         if ([obj class] == [VLCVideoWindowCommon class] || [obj class] == [VLCDetachedVideoWindow class] || ([obj class] == [VLCMainWindow class] && !self.nonembedded)) {
@@ -684,12 +684,12 @@ static const float f_min_window_height = 307.;
 - (void)updateName
 {
     input_thread_t *p_input;
-    p_input = pl_CurrentInput(VLCIntf);
+    p_input = pl_CurrentInput(getIntf());
     if (p_input) {
         NSString *aString = @"";
 
-        if (!config_GetPsz(VLCIntf, "video-title")) {
-            char *format = var_InheritString(VLCIntf, "input-title-format");
+        if (!config_GetPsz(getIntf(), "video-title")) {
+            char *format = var_InheritString(getIntf(), "input-title-format");
             if (format) {
                 char *formated = str_format_meta(p_input, format);
                 free(format);
@@ -697,7 +697,7 @@ static const float f_min_window_height = 307.;
                 free(formated);
             }
         } else
-            aString = toNSStr(config_GetPsz(VLCIntf, "video-title"));
+            aString = toNSStr(config_GetPsz(getIntf(), "video-title"));
 
         char *uri = input_item_GetURI(input_GetItem(p_input));
 
@@ -750,7 +750,7 @@ static const float f_min_window_height = 307.;
 
     bool b_seekable = false;
 
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
     input_thread_t *p_input = playlist_CurrentInput(p_playlist);
     if (p_input) {
         /* seekable streams */
@@ -832,7 +832,7 @@ static const float f_min_window_height = 307.;
         frameBeforePlayback = NSMakeRect(0, 0, 0, 0);
 
         // update fs button to reflect state for next startup
-        if (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen")) {
+        if (var_InheritBool(getIntf(), "fullscreen") || var_GetBool(pl_Get(getIntf()), "fullscreen")) {
             [self.controlsBar setFullscreenState:YES];
         }
 
@@ -927,7 +927,7 @@ static const float f_min_window_height = 307.;
 - (void)mainSplitViewDidResizeSubviews:(id)object
 {
     f_lastLeftSplitViewWidth = [_splitViewLeft frame].size.width;
-    config_PutInt(VLCIntf, "macosx-show-sidebar", ![_splitView isSubviewCollapsed:_splitViewLeft]);
+    config_PutInt(getIntf(), "macosx-show-sidebar", ![_splitView isSubviewCollapsed:_splitViewLeft]);
     [[[VLCMain sharedInstance] mainMenu] updateSidebarMenuItem];
 }
 
@@ -946,7 +946,7 @@ static const float f_min_window_height = 307.;
 - (void)_updatePlaylistTitle
 {
     PLRootType root = [[[[VLCMain sharedInstance] playlist] model] currentRootType];
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
 
     PL_LOCK;
     if (root == ROOT_TYPE_PLAYLIST)
@@ -962,7 +962,7 @@ static const float f_min_window_height = 307.;
     if (!node)
         return @"";
 
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
     PL_ASSERT_LOCKED;
 
     mtime_t mt_duration = playlist_GetNodeDuration( node );
@@ -1035,7 +1035,7 @@ static const float f_min_window_height = 307.;
 
 - (NSInteger)sourceList:(PXSourceList*)aSourceList badgeValueForItem:(id)item
 {
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
     NSInteger i_playlist_size = 0;
 
     if ([[item identifier] isEqualToString: @"playlist"]) {
@@ -1076,7 +1076,7 @@ static const float f_min_window_height = 307.;
             if ([item sdtype] > 0)
             {
                 NSMenu *m = [[NSMenu alloc] init];
-                playlist_t * p_playlist = pl_Get(VLCIntf);
+                playlist_t * p_playlist = pl_Get(getIntf());
                 BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded(p_playlist, [[item identifier] UTF8String]);
                 if (!sd_loaded)
                     [m addItemWithTitle:_NS("Enable") action:@selector(sdmenuhandler:) keyEquivalent:@""];
@@ -1095,7 +1095,7 @@ static const float f_min_window_height = 307.;
 {
     NSString * identifier = [sender representedObject];
     if ([identifier length] > 0 && ![identifier isEqualToString:@"lua{sd='freebox',longname='Freebox TV'}"]) {
-        playlist_t * p_playlist = pl_Get(VLCIntf);
+        playlist_t * p_playlist = pl_Get(getIntf());
         BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded(p_playlist, [identifier UTF8String]);
 
         if (!sd_loaded)
@@ -1118,7 +1118,7 @@ static const float f_min_window_height = 307.;
 
 - (void)sourceListSelectionDidChange:(NSNotification *)notification
 {
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
 
     NSIndexSet *selectedIndexes = [_sidebarView selectedRowIndexes];
     id item = [_sidebarView itemAtRow:[selectedIndexes firstIndex]];
@@ -1190,7 +1190,7 @@ static const float f_min_window_height = 307.;
 {
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
 
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
     playlist_item_t *p_node;
 
     if ([[item identifier] isEqualToString:@"playlist"])
@@ -1265,18 +1265,18 @@ static const float f_min_window_height = 307.;
 
     if (sender == _podcastSubscribeOkButton && [[_podcastSubscribeUrlField stringValue] length] > 0) {
         NSMutableString *podcastConf = [[NSMutableString alloc] init];
-        if (config_GetPsz(VLCIntf, "podcast-urls") != NULL)
-            [podcastConf appendFormat:@"%s|", config_GetPsz(VLCIntf, "podcast-urls")];
+        if (config_GetPsz(getIntf(), "podcast-urls") != NULL)
+            [podcastConf appendFormat:@"%s|", config_GetPsz(getIntf(), "podcast-urls")];
 
         [podcastConf appendString: [_podcastSubscribeUrlField stringValue]];
-        config_PutPsz(VLCIntf, "podcast-urls", [podcastConf UTF8String]);
-        var_SetString(pl_Get(VLCIntf), "podcast-urls", [podcastConf UTF8String]);
+        config_PutPsz(getIntf(), "podcast-urls", [podcastConf UTF8String]);
+        var_SetString(pl_Get(getIntf()), "podcast-urls", [podcastConf UTF8String]);
     }
 }
 
 - (IBAction)removePodcast:(id)sender
 {
-    char *psz_urls = var_InheritString(pl_Get(VLCIntf), "podcast-urls");
+    char *psz_urls = var_InheritString(pl_Get(getIntf()), "podcast-urls");
     if (psz_urls != NULL) {
         [_podcastUnsubscribePopUpButton removeAllItems];
         [_podcastUnsubscribePopUpButton addItemsWithTitles:[toNSStr(psz_urls) componentsSeparatedByString:@"|"]];
@@ -1291,14 +1291,14 @@ static const float f_min_window_height = 307.;
     [NSApp endSheet:_podcastUnsubscribeWindow];
 
     if (sender == _podcastUnsubscribeOkButton) {
-        playlist_t * p_playlist = pl_Get(VLCIntf);
+        playlist_t * p_playlist = pl_Get(getIntf());
         char *psz_urls = var_InheritString(p_playlist, "podcast-urls");
 
-        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[toNSStr(config_GetPsz(VLCIntf, "podcast-urls")) componentsSeparatedByString:@"|"]];
+        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[toNSStr(config_GetPsz(getIntf(), "podcast-urls")) componentsSeparatedByString:@"|"]];
         [urls removeObjectAtIndex: [_podcastUnsubscribePopUpButton indexOfSelectedItem]];
         const char *psz_new_urls = [[urls componentsJoinedByString:@"|"] UTF8String];
-        var_SetString(pl_Get(VLCIntf), "podcast-urls", psz_new_urls);
-        config_PutPsz(VLCIntf, "podcast-urls", psz_new_urls);
+        var_SetString(pl_Get(getIntf()), "podcast-urls", psz_new_urls);
+        config_PutPsz(getIntf(), "podcast-urls", psz_new_urls);
 
         free(psz_urls);
 
@@ -1359,7 +1359,7 @@ static const float f_min_window_height = 307.;
     [super awakeFromNib];
     [self setAcceptsMouseMovedEvents: YES];
 
-    BOOL darkInterface = config_GetInt(VLCIntf, "macosx-interfacestyle");
+    BOOL darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
 
     if (darkInterface) {
         [self setBackgroundColor: [NSColor clearColor]];

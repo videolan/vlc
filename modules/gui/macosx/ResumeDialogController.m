@@ -56,7 +56,7 @@
     NSWindow *w = [self window];
 
     if ([w isVisible]) {
-        msg_Err(VLCIntf, "Resume dialog in use already");
+        msg_Err(getIntf(), "Resume dialog in use already");
         return;
     }
 

@@ -378,7 +378,7 @@
 
 - (void)TTLChanged:(NSNotification *)notification
 {
-    config_PutInt(VLCIntf, "ttl", [self.streamTTLTextField intValue]);
+    config_PutInt(getIntf(), "ttl", [self.streamTTLTextField intValue]);
 }
 
 - (IBAction)outputFileBrowse:(id)sender

@@ -105,7 +105,7 @@
 
     [self.window setInitialFirstResponder: _uriLabel];
 
-    b_stats = var_InheritBool(VLCIntf, "stats");
+    b_stats = var_InheritBool(getIntf(), "stats");
     if (!b_stats) {
         if ([_tabView numberOfTabViewItems] > 2)
             [_tabView removeTabViewItem: [_tabView tabViewItemAtIndex: 2]];
@@ -209,7 +209,7 @@
         [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
     } else {
         if (!input_item_IsPreparsed(p_item))
-            libvlc_MetaRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
+            libvlc_MetaRequest(getIntf()->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
 
         /* fill uri info */
         char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
@@ -370,7 +370,7 @@ FREENULL( psz_##foo );
     input_item_SetDescription( p_item, utf8( _descriptionTextField ) );
     input_item_SetLanguage( p_item, utf8( _languageTextField ) );
 
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
     input_item_WriteMeta(VLC_OBJECT(p_playlist), p_item);
 
     var_SetBool(p_playlist, "intf-change", true);
@@ -387,8 +387,8 @@ error:
 
 - (IBAction)downloadCoverArt:(id)sender
 {
-    playlist_t *p_playlist = pl_Get(VLCIntf);
-    if (p_item) libvlc_ArtRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
+    playlist_t *p_playlist = pl_Get(getIntf());
+    if (p_item) libvlc_ArtRequest(getIntf()->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
 }
 
 @end

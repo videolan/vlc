@@ -155,10 +155,10 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 {
     self = [super init];
     if(self) {
-        msg_Dbg(VLCIntf, "Initializing input manager");
+        msg_Dbg(getIntf(), "Initializing input manager");
 
         o_main = o_mainObj;
-        var_AddCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, (__bridge void *)self);
+        var_AddCallback(pl_Get(getIntf()), "input-current", InputThreadChanged, (__bridge void *)self);
 
         informInputChangedQueue = dispatch_queue_create("org.videolan.vlc.inputChangedQueue", DISPATCH_QUEUE_SERIAL);
 
@@ -168,7 +168,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)dealloc
 {
-    msg_Dbg(VLCIntf, "Deinitializing input manager");
+    msg_Dbg(getIntf(), "Deinitializing input manager");
     if (p_current_input) {
         /* continue playback where you left off */
         [[o_main playlist] storePlaybackPositionForItem:p_current_input];
@@ -178,7 +178,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         p_current_input = NULL;
     }
 
-    var_DelCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, (__bridge void *)self);
+    var_DelCallback(pl_Get(getIntf()), "input-current", InputThreadChanged, (__bridge void *)self);
 
     dispatch_release(informInputChangedQueue);
 }
@@ -199,7 +199,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     input_thread_t *p_input_changed = NULL;
 
     // object is hold here and released then it is dead
-    p_current_input = playlist_CurrentInput(pl_Get(VLCIntf));
+    p_current_input = playlist_CurrentInput(pl_Get(getIntf()));
     if (p_current_input) {
         var_AddCallback(p_current_input, "intf-event", InputEvent, (__bridge void *)self);
         [self playbackStatusUpdated];
@@ -239,7 +239,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)playbackStatusUpdated
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     int state = -1;
     if (p_current_input) {
         state = var_GetInteger(p_current_input, "state");
@@ -300,7 +300,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         /* prevent the system from sleeping */
         if (systemSleepAssertionID > 0) {
-            msg_Dbg(VLCIntf, "releasing old sleep blocker (%i)" , systemSleepAssertionID);
+            msg_Dbg(getIntf(), "releasing old sleep blocker (%i)" , systemSleepAssertionID);
             IOPMAssertionRelease(systemSleepAssertionID);
         }
 
@@ -322,9 +322,9 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         }
 
         if (success == kIOReturnSuccess)
-            msg_Dbg(VLCIntf, "prevented sleep through IOKit (%i)", systemSleepAssertionID);
+            msg_Dbg(getIntf(), "prevented sleep through IOKit (%i)", systemSleepAssertionID);
         else
-            msg_Warn(VLCIntf, "failed to prevent system sleep through IOKit");
+            msg_Warn(getIntf(), "failed to prevent system sleep through IOKit");
 
         [[o_main mainMenu] setPause];
         [[o_main mainWindow] setPause];
@@ -335,7 +335,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         /* allow the system to sleep again */
         if (systemSleepAssertionID > 0) {
-            msg_Dbg(VLCIntf, "releasing sleep blocker (%i)" , systemSleepAssertionID);
+            msg_Dbg(getIntf(), "releasing sleep blocker (%i)" , systemSleepAssertionID);
             IOPMAssertionRelease(systemSleepAssertionID);
         }
 
@@ -364,7 +364,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)resumeItunesPlayback:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (var_InheritInteger(p_intf, "macosx-control-itunes") > 1) {
         if (b_has_itunes_paused) {
             iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];

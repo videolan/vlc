@@ -98,7 +98,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 - (void)dealloc
 {
-    vlc_LogSet( VLCIntf->p_libvlc, NULL, NULL );
+    vlc_LogSet( getIntf()->p_libvlc, NULL, NULL );
 }
 
 - (void)windowDidLoad
@@ -116,7 +116,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 - (void)showWindow:(id)sender
 {
     /* subscribe to LibVLCCore's messages */
-    vlc_LogSet(VLCIntf->p_libvlc, MsgCallback, (__bridge void*)self);
+    vlc_LogSet(getIntf()->p_libvlc, MsgCallback, (__bridge void*)self);
 
     [super showWindow:sender];
 }
@@ -135,7 +135,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 - (void)windowWillClose:(NSNotification *)notification
 {
     /* unsubscribe from LibVLCCore's messages */
-    vlc_LogSet( VLCIntf->p_libvlc, NULL, NULL );
+    vlc_LogSet( getIntf()->p_libvlc, NULL, NULL );
     [_messageArray removeAllObjects];
 }
 
@@ -156,7 +156,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
             NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
             if ([data writeToFile: [[saveFolderPanel URL] path] atomically: YES] == NO)
-                msg_Warn(VLCIntf, "Error while saving the debug log");
+                msg_Warn(getIntf(), "Error while saving the debug log");
         }
     }];
 }
@@ -166,8 +166,8 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     [_messageArray removeAllObjects];
 
     // Reregister handler, to write new header to log
-    vlc_LogSet(VLCIntf->p_libvlc, NULL, NULL);
-    vlc_LogSet(VLCIntf->p_libvlc, MsgCallback, (__bridge void*)self);
+    vlc_LogSet(getIntf()->p_libvlc, NULL, NULL);
+    vlc_LogSet(getIntf()->p_libvlc, MsgCallback, (__bridge void*)self);
 
     [_messageTable reloadData];
 }

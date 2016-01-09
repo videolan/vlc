@@ -76,7 +76,7 @@
 
     /* let the window sit on top of everything else and start out completely transparent */
     [win setLevel:NSModalPanelWindowLevel];
-    i_device = config_GetInt(VLCIntf, "macosx-vdev");
+    i_device = config_GetInt(getIntf(), "macosx-vdev");
     hideAgainTimer = fadeTimer = nil;
     [self setFrameAutosaveName:@"fspanel"];
     [self setNonActive:nil];
@@ -260,7 +260,7 @@
 - (void)mouseExited:(NSEvent *)theEvent
 {
     /* give up our focus, so the vout may show us again without letting the user clicking it */
-    if (o_vout_window && var_GetBool(pl_Get(VLCIntf), "fullscreen"))
+    if (o_vout_window && var_GetBool(pl_Get(getIntf()), "fullscreen"))
         [o_vout_window makeKeyWindow];
 }
 
@@ -273,8 +273,8 @@
 {
     /* in case that the user don't want us to appear, make sure we hide the mouse */
 
-    if (!config_GetInt(VLCIntf, "macosx-fspanel")) {
-        float time = (float)var_CreateGetInteger(VLCIntf, "mouse-hide-timeout") / 1000.;
+    if (!config_GetInt(getIntf(), "macosx-fspanel")) {
+        float time = (float)var_CreateGetInteger(getIntf(), "mouse-hide-timeout") / 1000.;
         [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:time target:self selector:@selector(hideMouse) userInfo:nil repeats:NO]];
         return;
     }
@@ -314,7 +314,7 @@
 
     /* get us a valid timer */
     if (!b_alreadyCounting) {
-        i_timeToKeepVisibleInSec = var_CreateGetInteger(VLCIntf, "mouse-hide-timeout") / 500;
+        i_timeToKeepVisibleInSec = var_CreateGetInteger(getIntf(), "mouse-hide-timeout") / 500;
         if (hideAgainTimer) {
             [hideAgainTimer invalidate];
         }
@@ -535,7 +535,7 @@
 - (void)updatePositionAndTime
 {
     input_thread_t * p_input;
-    p_input = pl_CurrentInput(VLCIntf);
+    p_input = pl_CurrentInput(getIntf());
     if (p_input) {
         
         vlc_value_t pos;
@@ -634,7 +634,7 @@
 - (IBAction)fsTimeSliderUpdate:(id)sender
 {
     input_thread_t * p_input;
-    p_input = pl_CurrentInput(VLCIntf);
+    p_input = pl_CurrentInput(getIntf());
     if (p_input != NULL) {
         vlc_value_t pos;
 

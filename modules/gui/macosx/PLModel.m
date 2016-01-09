@@ -123,7 +123,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         p_playlist = pl;
         _outlineView = outlineView;
 
-        msg_Dbg(VLCIntf, "Initializing playlist model");
+        msg_Dbg(getIntf(), "Initializing playlist model");
         var_AddCallback(p_playlist, "item-change", PLItemUpdated, (__bridge void *)self);
         var_AddCallback(p_playlist, "playlist-item-append", PLItemAppended, (__bridge void *)self);
         var_AddCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, (__bridge void *)self);
@@ -144,7 +144,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
 - (void)dealloc
 {
-    msg_Dbg(VLCIntf, "Deinitializing playlist model");
+    msg_Dbg(getIntf(), "Deinitializing playlist model");
     var_DelCallback(p_playlist, "item-change", PLItemUpdated, (__bridge void *)self);
     var_DelCallback(p_playlist, "playlist-item-append", PLItemAppended, (__bridge void *)self);
     var_DelCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, (__bridge void *)self);

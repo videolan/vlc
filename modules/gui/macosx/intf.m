@@ -127,7 +127,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     @autoreleasepool {
         dispatch_async(dispatch_get_main_queue(), ^{
 
-            intf_thread_t * p_intf = VLCIntf;
+            intf_thread_t * p_intf = getIntf();
             if (p_intf) {
                 playlist_t * p_playlist = pl_Get(p_intf);
                 BOOL b_fullscreen = var_GetBool(p_playlist, "fullscreen");
@@ -262,14 +262,14 @@ static VLCMain *sharedInstance = nil;
 
 - (void)dealloc
 {
-    msg_Dbg(VLCIntf, "Deinitializing VLCMain object");
+    msg_Dbg(getIntf(), "Deinitializing VLCMain object");
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
     _coreinteraction = [VLCCoreInteraction sharedInstance];
 
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
     PL_LOCK;
     items_at_launch = p_playlist->p_local_category->i_children;
     PL_UNLOCK;
@@ -312,7 +312,7 @@ static VLCMain *sharedInstance = nil;
 
     // respect playlist-autostart
     // note that PLAYLIST_PLAY will not stop any playback if already started
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
     PL_LOCK;
     BOOL kidsAround = p_playlist->p_local_category->i_children != 0;
     if (kidsAround && var_GetBool(p_playlist, "playlist-autostart"))
@@ -437,7 +437,7 @@ static VLCMain *sharedInstance = nil;
 
     // try to add file as subtitle
     if ([o_names count] == 1 && psz_uri) {
-        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+        input_thread_t * p_input = pl_CurrentInput(getIntf());
         if (p_input) {
             int i_result = input_AddSubtitleOSD(p_input, [[o_names firstObject] UTF8String], true, true);
             vlc_object_release(p_input);

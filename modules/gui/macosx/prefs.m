@@ -214,7 +214,7 @@
     /* TODO: call savePrefs on Root item */
     [_rootTreeItem applyChanges];
     [[VLCCoreInteraction sharedInstance] fixPreferences];
-    config_SaveConfigFile(VLCIntf);
+    config_SaveConfigFile(getIntf());
     [self.window orderOut:self];
 }
 

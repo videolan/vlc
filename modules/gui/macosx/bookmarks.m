@@ -119,7 +119,7 @@
 - (IBAction)add:(id)sender
 {
     /* add item to list */
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (!p_input)
         return;
@@ -139,7 +139,7 @@
 - (IBAction)clear:(id)sender
 {
     /* clear table */
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (!p_input)
         return;
@@ -156,7 +156,7 @@
     /* put values to the sheet's fields and show sheet */
     /* we take the values from the core and not the table, because we cannot
      * really trust it */
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
     int row;
@@ -208,7 +208,7 @@
     /* save field contents and close sheet */
      seekpoint_t **pp_bookmarks;
     int i_bookmarks, i;
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (!p_input) {
         NSBeginCriticalAlertSheet(_NS("No input"), _NS("OK"), @"", @"", self.window, nil, nil, nil, nil, @"%@",_NS("No input found. A stream must be playing or paused for bookmarks to work."));
@@ -240,12 +240,12 @@
     else if (componentCount == 3)
         pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components firstObject] longLongValue] * 3600 + [[components objectAtIndex:1] longLongValue] * 60 + [[components objectAtIndex:2] longLongValue]);
     else {
-        msg_Err(VLCIntf, "Invalid string format for time");
+        msg_Err(getIntf(), "Invalid string format for time");
         goto clear;
     }
 
     if (input_Control(p_input, INPUT_CHANGE_BOOKMARK, pp_bookmarks[i], i) != VLC_SUCCESS) {
-        msg_Warn(VLCIntf, "Unable to change the bookmark");
+        msg_Warn(getIntf(), "Unable to change the bookmark");
         goto clear;
     }
 
@@ -270,7 +270,7 @@ clear:
         NSBeginAlertSheet(_NS("Invalid selection"), _NS("OK"), @"", @"", self.window, nil, nil, nil, nil, @"%@",_NS("Two bookmarks have to be selected."));
         return;
     }
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
     if (!p_input) {
         NSBeginCriticalAlertSheet(_NS("No input found"), _NS("OK"), @"", @"", self.window, nil, nil, nil, nil, @"%@",_NS("The stream must be playing or paused for bookmarks to work."));
         return;
@@ -295,7 +295,7 @@ clear:
 
     if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS) {
         vlc_object_release(p_input);
-        msg_Err(VLCIntf, "already defined bookmarks couldn't be retrieved");
+        msg_Err(getIntf(), "already defined bookmarks couldn't be retrieved");
         return;
     }
 
@@ -313,7 +313,7 @@ clear:
 
 - (IBAction)goToBookmark:(id)sender
 {
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (!p_input)
         return;
@@ -325,7 +325,7 @@ clear:
 
 - (IBAction)remove:(id)sender
 {
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (!p_input)
         return;
@@ -347,7 +347,7 @@ clear:
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)theDataTable
 {
     /* return the number of bookmarks */
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
 
@@ -370,7 +370,7 @@ clear:
 - (id)tableView:(NSTableView *)theDataTable objectValueForTableColumn: (NSTableColumn *)theTableColumn row: (NSInteger)row
 {
     /* return the corresponding data as NSString */
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
     id ret = @"";

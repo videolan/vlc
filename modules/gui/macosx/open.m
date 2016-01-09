@@ -175,8 +175,8 @@ struct display_info_t
     [[_netModeMatrix cellAtRow:0 column:0] setTitle: _NS("Unicast")];
     [[_netModeMatrix cellAtRow:1 column:0] setTitle: _NS("Multicast")];
 
-    [_netUDPPortTextField setIntValue: config_GetInt(VLCIntf, "server-port")];
-    [_netUDPPortStepper setIntValue: config_GetInt(VLCIntf, "server-port")];
+    [_netUDPPortTextField setIntValue: config_GetInt(getIntf(), "server-port")];
+    [_netUDPPortStepper setIntValue: config_GetInt(getIntf(), "server-port")];
 
     [_eyeTVChannelProgressBar setUsesThreadedAnimation: YES];
 
@@ -210,7 +210,7 @@ struct display_info_t
 
     [self updateQTKVideoDevices];
     [_qtkVideoDevicePopup removeAllItems];
-    msg_Dbg(VLCIntf, "Found %lu video capture devices", _qtkvideoDevices.count);
+    msg_Dbg(getIntf(), "Found %lu video capture devices", _qtkvideoDevices.count);
 
     if (_qtkvideoDevices.count >= 1) {
         if (!_qtkCurrentDeviceUID)
@@ -235,7 +235,7 @@ struct display_info_t
     [_screenqtkAudioPopup removeAllItems];
 
     [self updateQTKAudioDevices];
-    msg_Dbg(VLCIntf, "Found %lu audio capture devices", _qtkaudioDevices.count);
+    msg_Dbg(getIntf(), "Found %lu audio capture devices", _qtkaudioDevices.count);
 
     if (_qtkaudioDevices.count >= 1) {
         if (!_qtkCurrentAudioDeviceUID)
@@ -332,7 +332,7 @@ struct display_info_t
 {
     int i_index;
     module_config_t * p_item;
-    intf_thread_t * p_intf = VLCIntf;
+    intf_thread_t * p_intf = getIntf();
 
     [_fileSubCheckbox setTitle: _NS("Add Subtitle File:")];
     [_fileSubPathLabel setStringValue: _NS("Choose a file")];
@@ -429,7 +429,7 @@ struct display_info_t
             [options addObject: [NSString stringWithFormat:
                                  @"subsdec-align=%li", [_fileSubAlignPopup indexOfSelectedItem]]];
 
-            p_item = config_FindConfig(VLC_OBJECT(VLCIntf),
+            p_item = config_FindConfig(VLC_OBJECT(getIntf()),
                                        "freetype-rel-fontsize");
 
             if (p_item) {
@@ -842,8 +842,8 @@ struct display_info_t
         [self showOpticalMediaView: _discBDView withIcon: image];
         [self setMRL: [NSString stringWithFormat: @"bluray://%@", opticalDevicePath]];
     } else {
-        if (VLCIntf)
-            msg_Warn(VLCIntf, "unknown disk type, no idea what to display");
+        if (getIntf())
+            msg_Warn(getIntf(), "unknown disk type, no idea what to display");
 
         [self showOpticalMediaView: _discNoDiscView withIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
     }
@@ -938,7 +938,7 @@ struct display_info_t
 
         [self discSelectorChanged:nil];
     } else {
-        msg_Dbg(VLCIntf, "no optical media found");
+        msg_Dbg(getIntf(), "no optical media found");
         [_discSelectorPopup setHidden: YES];
         [self showOpticalMediaView: _discNoDiscView withIcon: [NSImage imageNamed: @"NSApplicationIcon"]];
     }
@@ -1038,7 +1038,7 @@ struct display_info_t
         else if ([[sender selectedCell] tag] == 1)
             [self.window makeFirstResponder: _netUDPMAddressTextField];
         else
-            msg_Warn(VLCIntf, "Unknown sender tried to change UDP/RTP mode");
+            msg_Warn(getIntf(), "Unknown sender tried to change UDP/RTP mode");
     }
 
     [self openNetInfoChanged: nil];
@@ -1080,7 +1080,7 @@ struct display_info_t
             else
                 mrlString = @"rtp://";
 
-            if (port != config_GetInt(VLCIntf, "server-port")) {
+            if (port != config_GetInt(getIntf(), "server-port")) {
                 mrlString =
                 [mrlString stringByAppendingFormat: @"@:%i", port];
             }
@@ -1094,7 +1094,7 @@ struct display_info_t
             else
                 mrlString = [NSString stringWithFormat: @"rtp://@%@", oAddress];
 
-            if (iPort != config_GetInt(VLCIntf, "server-port")) {
+            if (iPort != config_GetInt(getIntf(), "server-port")) {
                 mrlString =
                 [mrlString stringByAppendingFormat: @":%i", iPort];
             }
@@ -1129,7 +1129,7 @@ struct display_info_t
             else
                 mrlString = @"rtp://";
 
-            if (port != config_GetInt(VLCIntf, "server-port")) {
+            if (port != config_GetInt(getIntf(), "server-port")) {
                 mrlString =
                 [mrlString stringByAppendingFormat: @"@:%i", port];
             }
@@ -1143,7 +1143,7 @@ struct display_info_t
             else
                 mrlString = [NSString stringWithFormat: @"rtp://@%@", oAddress];
 
-            if (iPort != config_GetInt(VLCIntf, "server-port")) {
+            if (iPort != config_GetInt(getIntf(), "server-port")) {
                 mrlString =
                 [mrlString stringByAppendingFormat: @":%i", iPort];
             }
@@ -1173,7 +1173,7 @@ struct display_info_t
 
 - (IBAction)openCaptureModeChanged:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
+    intf_thread_t * p_intf = getIntf();
 
     if ([[[_captureModePopup selectedItem] title] isEqualToString: @"EyeTV"]) {
         if ([_eyeTVController eyeTVRunning] == YES) {
@@ -1276,7 +1276,7 @@ struct display_info_t
         [_eyeTVController setChannel:chanNum];
         [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
     } else
-        msg_Err(VLCIntf, "eyetvSwitchChannel sent by unknown object");
+        msg_Err(getIntf(), "eyetvSwitchChannel sent by unknown object");
 }
 
 - (IBAction)eyetvLaunch:(id)sender
@@ -1292,21 +1292,21 @@ struct display_info_t
 - (void)eyetvChanged:(NSNotification *)notification
 {
     if ([[notification name] isEqualToString: @"DeviceAdded"]) {
-        msg_Dbg(VLCIntf, "eyetv device was added");
+        msg_Dbg(getIntf(), "eyetv device was added");
         [self showCaptureView: _eyeTVrunningView];
         [self setupChannelInfo];
     } else if ([[notification name] isEqualToString: @"DeviceRemoved"]) {
         /* leave the channel selection like that,
          * switch to our "no device" tab */
-        msg_Dbg(VLCIntf, "eyetv device was removed");
+        msg_Dbg(getIntf(), "eyetv device was removed");
         [self setEyeTVUnconnected];
     } else if ([[notification name] isEqualToString: @"PluginQuit"]) {
         /* switch to the "launch eyetv" tab */
-        msg_Dbg(VLCIntf, "eyetv was terminated");
+        msg_Dbg(getIntf(), "eyetv was terminated");
         [self showCaptureView: _eyeTVnotLaunchedView];
     } else if ([[notification name] isEqualToString: @"PluginInit"]) {
         /* we got no device yet */
-        msg_Dbg(VLCIntf, "eyetv was launched, no device yet");
+        msg_Dbg(getIntf(), "eyetv was launched, no device yet");
         [self setEyeTVUnconnected];
     }
 }

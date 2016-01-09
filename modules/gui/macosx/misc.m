@@ -56,7 +56,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     AudioObjectPropertyAddress deviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyData( kAudioObjectSystemObject, &deviceAddress, 0, NULL, &i_size, &i_device );
     if (err != noErr) {
-        msg_Warn( VLCIntf, "couldn't get main audio output device" );
+        msg_Warn( getIntf(), "couldn't get main audio output device" );
         return .0;
     }
 
@@ -64,7 +64,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     i_size = sizeof( f_volume );
     err = AudioObjectGetPropertyData(i_device, &propertyAddress, 0, NULL, &i_size, &f_volume);
     if (err != noErr) {
-        msg_Warn( VLCIntf, "couldn't get volume value" );
+        msg_Warn( getIntf(), "couldn't get volume value" );
         return .0;
     }
 
@@ -84,7 +84,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     AudioObjectPropertyAddress deviceAddress = { kAudioHardwarePropertyDefaultOutputDevice, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyData( kAudioObjectSystemObject, &deviceAddress, 0, NULL, &i_size, &i_device );
     if (err != noErr) {
-        msg_Warn( VLCIntf, "couldn't get main audio output device" );
+        msg_Warn( getIntf(), "couldn't get main audio output device" );
         return NO;
     }
 
@@ -92,7 +92,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     i_size = sizeof( f_volume );
     err = AudioObjectIsPropertySettable( i_device, &propertyAddress, &b_writeable );
     if (err != noErr || !b_writeable ) {
-        msg_Warn( VLCIntf, "we can't set the main audio devices' volume" );
+        msg_Warn( getIntf(), "we can't set the main audio devices' volume" );
         return NO;
     }
     err = AudioObjectSetPropertyData(i_device, &propertyAddress, 0, NULL, i_size, &f_volume);
@@ -540,7 +540,7 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)awakeFromNib
 {
-    if (config_GetInt( VLCIntf, "macosx-interfacestyle" )) {
+    if (config_GetInt( getIntf(), "macosx-interfacestyle" )) {
         o_knob_img = imageFromRes(@"progression-knob_dark");
         b_dark = YES;
     } else {
@@ -691,7 +691,7 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)awakeFromNib
 {
-    BOOL b_dark = config_GetInt( VLCIntf, "macosx-interfacestyle" );
+    BOOL b_dark = config_GetInt( getIntf(), "macosx-interfacestyle" );
     if (b_dark)
         img = imageFromRes(@"volume-slider-knob_dark");
     else

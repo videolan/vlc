@@ -80,7 +80,7 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         // this method is not supposed to fail
         assert(videoView != nil);
 
-        msg_Dbg(VLCIntf, "returning videoview with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
+        msg_Dbg(getIntf(), "returning videoview with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
         p_wnd->handle.nsobject = (void *)CFBridgingRetain(videoView);
 
         [voutController.lock unlock];
@@ -146,7 +146,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             }
             case VOUT_WINDOW_SET_FULLSCREEN:
             {
-                if (var_InheritBool(VLCIntf, "video-wallpaper")) {
+                if (var_InheritBool(getIntf(), "video-wallpaper")) {
                     msg_Dbg(p_wnd, "Ignore fullscreen event as video-wallpaper is on");
                     goto out;
                 }
@@ -230,7 +230,7 @@ void WindowClose(vout_window_t *p_wnd)
     for (NSValue *key in keys)
         [self removeVoutforDisplay:key];
 
-    if (var_InheritBool(VLCIntf, "macosx-dim-keyboard")) {
+    if (var_InheritBool(getIntf(), "macosx-dim-keyboard")) {
         [o_keyboard_backlight switchLightsInstantly:YES];
     }
 }
@@ -242,8 +242,8 @@ void WindowClose(vout_window_t *p_wnd)
 {
     BOOL b_nonembedded = NO;
     BOOL b_nativeFullscreenMode = [[VLCMain sharedInstance] nativeFullscreenMode];
-    BOOL b_video_deco = var_InheritBool(VLCIntf, "video-deco");
-    BOOL b_video_wallpaper = var_InheritBool(VLCIntf, "video-wallpaper");
+    BOOL b_video_deco = var_InheritBool(getIntf(), "video-deco");
+    BOOL b_video_wallpaper = var_InheritBool(getIntf(), "video-wallpaper");
     BOOL b_multiple_vout_windows = [o_vout_dict count] > 0;
     VLCVoutView *o_vout_view;
     VLCVideoWindowCommon *o_new_video_window;
@@ -259,8 +259,8 @@ void WindowClose(vout_window_t *p_wnd)
     if ((b_video_wallpaper || !b_video_deco) && !b_nativeFullscreenMode) {
         // b_video_wallpaper is priorized over !b_video_deco
 
-        msg_Dbg(VLCIntf, "Creating background / blank window");
-        NSScreen *screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger(VLCIntf, "macosx-vdev")];
+        msg_Dbg(getIntf(), "Creating background / blank window");
+        NSScreen *screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger(getIntf(), "macosx-vdev")];
         if (!screen)
             screen = [[[VLCMain sharedInstance] mainWindow] screen];
 
@@ -310,7 +310,7 @@ void WindowClose(vout_window_t *p_wnd)
 
         b_nonembedded = YES;
     } else {
-        if ((var_InheritBool(VLCIntf, "embedded-video") && !b_mainwindow_has_video)) {
+        if ((var_InheritBool(getIntf(), "embedded-video") && !b_mainwindow_has_video)) {
             // setup embedded video
             o_new_video_window = [[VLCMain sharedInstance] mainWindow] ;
             o_vout_view = [o_new_video_window videoView];
@@ -370,7 +370,7 @@ void WindowClose(vout_window_t *p_wnd)
         [o_new_video_window makeKeyAndOrderFront: self];
     }
 
-    [o_new_video_window setAlphaValue: config_GetFloat(VLCIntf, "macosx-opaqueness")];
+    [o_new_video_window setAlphaValue: config_GetFloat(getIntf(), "macosx-opaqueness")];
 
     [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
     [o_new_video_window setHasActiveVideo: YES];
@@ -391,11 +391,11 @@ void WindowClose(vout_window_t *p_wnd)
 
     // TODO: find a cleaner way for "start in fullscreen"
     // Start in fs, because either prefs settings, or fullscreen button was pressed before
-    char *psz_splitter = var_GetString(pl_Get(VLCIntf), "video-splitter");
+    char *psz_splitter = var_GetString(pl_Get(getIntf()), "video-splitter");
     BOOL b_have_splitter = psz_splitter != NULL && *psz_splitter != '\0';
     free(psz_splitter);
 
-    if (!b_video_wallpaper && !b_have_splitter && (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen"))) {
+    if (!b_video_wallpaper && !b_have_splitter && (var_InheritBool(getIntf(), "fullscreen") || var_GetBool(pl_Get(getIntf()), "fullscreen"))) {
 
         // this is not set when we start in fullscreen because of
         // fullscreen settings in video prefs the second time
@@ -413,7 +413,7 @@ void WindowClose(vout_window_t *p_wnd)
 {
     VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:o_key];
     if (!o_window) {
-        msg_Err(VLCIntf, "Cannot close nonexisting window");
+        msg_Err(getIntf(), "Cannot close nonexisting window");
         return;
     }
 
@@ -465,7 +465,7 @@ void WindowClose(vout_window_t *p_wnd)
 {
     VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
     if (!o_window) {
-        msg_Err(VLCIntf, "Cannot set size for nonexisting window");
+        msg_Err(getIntf(), "Cannot set size for nonexisting window");
         return;
     }
 
@@ -476,7 +476,7 @@ void WindowClose(vout_window_t *p_wnd)
 {
     VLCVideoWindowCommon *o_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
     if (!o_window) {
-        msg_Err(VLCIntf, "Cannot set level for nonexisting window");
+        msg_Err(getIntf(), "Cannot set level for nonexisting window");
         return;
     }
 
@@ -500,7 +500,7 @@ void WindowClose(vout_window_t *p_wnd)
 
 - (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd withAnimation:(BOOL)b_animation
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     BOOL b_nativeFullscreenMode = [[VLCMain sharedInstance] nativeFullscreenMode];
 
     if (!p_intf || (!b_nativeFullscreenMode && !p_wnd))
@@ -576,7 +576,7 @@ void WindowClose(vout_window_t *p_wnd)
 
 - (void)updateWindowLevelForHelperWindows:(NSInteger)i_level
 {
-    if (var_InheritBool(VLCIntf, "video-wallpaper"))
+    if (var_InheritBool(getIntf(), "video-wallpaper"))
         return;
 
     i_currentWindowLevel = i_level;

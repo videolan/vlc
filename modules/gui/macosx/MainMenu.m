@@ -71,7 +71,7 @@
 
 - (void)dealloc
 {
-    msg_Dbg(VLCIntf, "Deinitializing main menu");
+    msg_Dbg(getIntf(), "Deinitializing main menu");
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     [self releaseRepresentedObjects:[NSApp mainMenu]];
@@ -86,7 +86,7 @@
     NSString* preferredLanguage = [languages firstObject];
 
     if ([NSLocale characterDirectionForLanguage:preferredLanguage] == NSLocaleLanguageDirectionRightToLeft) {
-        msg_Dbg(VLCIntf, "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
+        msg_Dbg(getIntf(), "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
         [_rateTextField setAlignment: NSLeftTextAlignment];
     }
 
@@ -106,7 +106,7 @@
     char *key;
 
     /* Get ExtensionsManager */
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
 
     [self initStrings];
 
@@ -269,7 +269,7 @@
     module_config_t *p_item;
 
     [menu removeAllItems];
-    p_item = config_FindConfig(VLC_OBJECT(VLCIntf), psz_name);
+    p_item = config_FindConfig(VLC_OBJECT(getIntf()), psz_name);
 
     /* serious problem, if no item found */
     assert(p_item);
@@ -281,7 +281,7 @@
         else if (p_item->list.i[i])
             mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->list.i[i]] action:NULL keyEquivalent: @""];
         else {
-            msg_Err(VLCIntf, "item %d of pref %s failed to be created", i, psz_name);
+            msg_Err(getIntf(), "item %d of pref %s failed to be created", i, psz_name);
             continue;
         }
 
@@ -334,13 +334,13 @@
 
     [_viewMenu setTitle: _NS("View")];
     [_toggleJumpButtons setTitle: _NS("Show Previous & Next Buttons")];
-    [_toggleJumpButtons setState: config_GetInt(VLCIntf, "macosx-show-playback-buttons")];
+    [_toggleJumpButtons setState: config_GetInt(getIntf(), "macosx-show-playback-buttons")];
     [_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
-    [_togglePlaymodeButtons setState: config_GetInt(VLCIntf, "macosx-show-playmode-buttons")];
+    [_togglePlaymodeButtons setState: config_GetInt(getIntf(), "macosx-show-playmode-buttons")];
     [_toggleEffectsButton setTitle: _NS("Show Audio Effects Button")];
-    [_toggleEffectsButton setState: config_GetInt(VLCIntf, "macosx-show-effects-button")];
+    [_toggleEffectsButton setState: config_GetInt(getIntf(), "macosx-show-effects-button")];
     [_toggleSidebar setTitle: _NS("Show Sidebar")];
-    [_toggleSidebar setState: config_GetInt(VLCIntf, "macosx-show-sidebar")];
+    [_toggleSidebar setState: config_GetInt(getIntf(), "macosx-show-sidebar")];
     [_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [_controlsMenu setTitle: _NS("Playback")];
@@ -487,7 +487,7 @@
 
 - (void)setupMenus
 {
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
     input_thread_t *p_input = playlist_CurrentInput(p_playlist);
     if (p_input != NULL) {
         [self setupVarMenuItem:_program target: (vlc_object_t *)p_input
@@ -570,7 +570,7 @@
         [mitem setEnabled: YES];
         [mitem setTarget: self];
     }
-    [[submenu itemWithTag: var_InheritInteger(VLCIntf, "macosx-vdev")] setState: NSOnState];
+    [[submenu itemWithTag: var_InheritInteger(getIntf(), "macosx-vdev")] setState: NSOnState];
 }
 
 - (void)setSubmenusEnabled:(BOOL)b_enabled
@@ -627,16 +627,16 @@
 
 - (IBAction)toggleEffectsButton:(id)sender
 {
-    BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-effects-button");
-    config_PutInt(VLCIntf, "macosx-show-effects-button", b_value);
+    BOOL b_value = !config_GetInt(getIntf(), "macosx-show-effects-button");
+    config_PutInt(getIntf(), "macosx-show-effects-button", b_value);
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleEffectsButton];
     [_toggleEffectsButton setState: b_value];
 }
 
 - (IBAction)toggleJumpButtons:(id)sender
 {
-    BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-playback-buttons");
-    config_PutInt(VLCIntf, "macosx-show-playback-buttons", b_value);
+    BOOL b_value = !config_GetInt(getIntf(), "macosx-show-playback-buttons");
+    config_PutInt(getIntf(), "macosx-show-playback-buttons", b_value);
 
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleJumpButtons];
     [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *window) {
@@ -648,8 +648,8 @@
 
 - (IBAction)togglePlaymodeButtons:(id)sender
 {
-    BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-playmode-buttons");
-    config_PutInt(VLCIntf, "macosx-show-playmode-buttons", b_value);
+    BOOL b_value = !config_GetInt(getIntf(), "macosx-show-playmode-buttons");
+    config_PutInt(getIntf(), "macosx-show-playmode-buttons", b_value);
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] togglePlaymodeButtons];
     [_togglePlaymodeButtons setState: b_value];
 }
@@ -661,7 +661,7 @@
 
 - (void)updateSidebarMenuItem
 {
-    [_toggleSidebar setState: config_GetInt(VLCIntf, "macosx-show-sidebar")];
+    [_toggleSidebar setState: config_GetInt(getIntf(), "macosx-show-sidebar")];
 }
 
 #pragma mark - Playback
@@ -694,7 +694,7 @@
 - (IBAction)repeat:(id)sender
 {
     vlc_value_t val;
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     playlist_t *p_playlist = pl_Get(p_intf);
 
     var_Get(p_playlist, "repeat", &val);
@@ -707,7 +707,7 @@
 - (IBAction)loop:(id)sender
 {
     vlc_value_t val;
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     playlist_t *p_playlist = pl_Get(p_intf);
 
     var_Get(p_playlist, "loop", &val);
@@ -750,10 +750,10 @@
 
 - (IBAction)quitAfterPlayback:(id)sender
 {
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
     bool b_value = !var_CreateGetBool(p_playlist, "play-and-exit");
     var_SetBool(p_playlist, "play-and-exit", b_value);
-    config_PutInt(VLCIntf, "play-and-exit", b_value);
+    config_PutInt(getIntf(), "play-and-exit", b_value);
 }
 
 - (IBAction)toggleRecord:(id)sender
@@ -789,7 +789,7 @@
 
 - (IBAction)goToSpecificTime:(id)sender
 {
-    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (p_input) {
         /* we can obviously only do that if an input is available */
         int64_t length = var_GetInteger(p_input, "length");
@@ -802,7 +802,7 @@
             if (returnCode != NSOKButton)
                 return;
 
-            input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+            input_thread_t *p_input = pl_CurrentInput(getIntf());
             if (p_input) {
                 input_Control(p_input, INPUT_SET_TIME, (int64_t)(returnTime *1000000));
                 vlc_object_release(p_input);
@@ -871,7 +871,7 @@
         returnValue = aout_DeviceSet(p_aout, NULL);
 
     if (returnValue != 0)
-        msg_Warn(VLCIntf, "failed to set audio device %li", [sender tag]);
+        msg_Warn(getIntf(), "failed to set audio device %li", [sender tag]);
 
     vlc_object_release(p_aout);
     [self refreshAudioDeviceList];
@@ -886,7 +886,7 @@
 
 - (IBAction)resizeVideoWindow:(id)sender
 {
-    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (p_input) {
         vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
@@ -908,12 +908,12 @@
 
 - (IBAction)floatOnTop:(id)sender
 {
-    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (p_input) {
         vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
             BOOL b_fs = var_ToggleBool(p_vout, "video-on-top");
-            var_SetBool(pl_Get(VLCIntf), "video-on-top", b_fs);
+            var_SetBool(pl_Get(getIntf()), "video-on-top", b_fs);
 
             vlc_object_release(p_vout);
         }
@@ -923,7 +923,7 @@
 
 - (IBAction)createVideoSnapshot:(id)sender
 {
-    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (p_input) {
         vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
@@ -964,7 +964,7 @@
 
 - (void)toggleFullscreenDevice:(id)sender
 {
-    config_PutInt(VLCIntf, "macosx-vdev", [sender tag]);
+    config_PutInt(getIntf(), "macosx-vdev", [sender tag]);
     [self refreshVoutDeviceMenu: nil];
 }
 
@@ -973,7 +973,7 @@
 - (IBAction)addSubtitleFile:(id)sender
 {
     NSInteger i_returnValue = 0;
-    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (!p_input)
         return;
 
@@ -1012,7 +1012,7 @@
     int intValue = [sender tag];
     NSString *representedObject = [sender representedObject];
 
-    config_PutInt(VLCIntf, [representedObject UTF8String], intValue);
+    config_PutInt(getIntf(), [representedObject UTF8String], intValue);
 
     NSMenu *menu = [sender menu];
     NSUInteger count = (NSUInteger) [menu numberOfItems];
@@ -1023,13 +1023,13 @@
 
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender
 {
-    config_PutInt(VLCIntf, "freetype-background-opacity", [sender intValue]);
+    config_PutInt(getIntf(), "freetype-background-opacity", [sender intValue]);
 }
 
 - (IBAction)telxTransparent:(id)sender
 {
     vlc_object_t *p_vbi;
-    p_vbi = (vlc_object_t *) vlc_object_find_name(pl_Get(VLCIntf), "zvbi");
+    p_vbi = (vlc_object_t *) vlc_object_find_name(pl_Get(getIntf()), "zvbi");
     if (p_vbi) {
         var_SetBool(p_vbi, "vbi-opaque", [sender state]);
         [sender setState: ![sender state]];
@@ -1054,7 +1054,7 @@
         i_page = 'b' << 16;
     if (i_page == 0) return;
 
-    p_vbi = (vlc_object_t *) vlc_object_find_name(pl_Get(VLCIntf), "zvbi");
+    p_vbi = (vlc_object_t *) vlc_object_find_name(pl_Get(getIntf()), "zvbi");
     if (p_vbi) {
         var_SetInteger(p_vbi, "vbi-page", i_page);
         vlc_object_release(p_vbi);
@@ -1090,7 +1090,7 @@
 
 - (IBAction)savePlaylist:(id)sender
 {
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
 
     NSSavePanel *savePanel = [NSSavePanel savePanel];
     NSString * name = [NSString stringWithFormat: @"%@", _NS("Untitled")];
@@ -1320,7 +1320,7 @@
 - (void)setShuffle
 {
     bool b_value;
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
     b_value = var_GetBool(p_playlist, "random");
 
     [_random setState: b_value];
@@ -1536,7 +1536,7 @@
     NSString *title = [mi title];
     BOOL bEnabled = TRUE;
     vlc_value_t val;
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
     input_thread_t *p_input = playlist_CurrentInput(p_playlist);
 
     if ([title isEqualToString: _NS("Stop")]) {

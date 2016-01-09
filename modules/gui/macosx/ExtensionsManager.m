@@ -77,7 +77,7 @@
         if (b_ret == NO)
             return;
     }
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
 
     vlc_mutex_lock(&p_extensions_manager->lock);
 
@@ -160,7 +160,7 @@
 
 - (BOOL)loadExtensions
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_extensions_manager) {
         p_extensions_manager = (extensions_manager_t*)vlc_object_create(p_intf, sizeof(extensions_manager_t));
         if (!p_extensions_manager) {
@@ -210,7 +210,7 @@
 - (void)triggerMenu:(id)sender
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     uint32_t identifier = [(NSMenuItem *)sender tag];
 
     uint16_t i_ext = MENU_GET_EXTENSION(identifier);
@@ -302,7 +302,7 @@
 
 - (void)dealloc
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     msg_Dbg(p_intf, "Deinitializing extensions manager");
 
     _extensionDialogProvider = nil;

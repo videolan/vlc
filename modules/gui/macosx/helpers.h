@@ -28,7 +28,7 @@
 
 static inline input_thread_t *getInput(void)
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return NULL;
     return pl_CurrentInput(p_intf);
@@ -64,7 +64,7 @@ static inline vout_thread_t *getVoutForActiveWindow(void)
 
 static inline audio_output_t *getAout(void)
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return NULL;
     return playlist_GetAout(pl_Get(p_intf));

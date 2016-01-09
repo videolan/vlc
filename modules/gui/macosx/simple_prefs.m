@@ -209,7 +209,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 {
     self = [super initWithWindowNibName:@"SimplePreferences"];
     if (self) {
-        p_intf = VLCIntf;
+        p_intf = getIntf();
     }
 
     return self;
@@ -471,7 +471,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     assert(p_item);
 
     char **values, **texts;
-    ssize_t count = config_GetPszChoices(VLC_OBJECT(VLCIntf), name,
+    ssize_t count = config_GetPszChoices(VLC_OBJECT(getIntf()), name,
                                          &values, &texts);
     if (count < 0) {
         msg_Err(p_intf, "Cannot get choices for %s", name);
@@ -522,7 +522,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
     int64_t *values;
     char **texts;
-    ssize_t count = config_GetIntChoices(VLC_OBJECT(VLCIntf), name, &values, &texts);
+    ssize_t count = config_GetIntChoices(VLC_OBJECT(getIntf()), name, &values, &texts);
     for (ssize_t i = 0; i < count; i++) {
         NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
         [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];

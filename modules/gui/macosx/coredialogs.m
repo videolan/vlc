@@ -93,10 +93,10 @@ static int DialogCallback(vlc_object_t *p_this, const char *type, vlc_value_t pr
     self = [super init];
 
     if (self) {
-        msg_Dbg(VLCIntf, "Register dialog provider");
+        msg_Dbg(getIntf(), "Register dialog provider");
         [NSBundle loadNibNamed:@"CoreDialogs" owner: self];
 
-        intf_thread_t *p_intf = VLCIntf;
+        intf_thread_t *p_intf = getIntf();
         /* subscribe to various interactive dialogues */
         var_Create(p_intf, "dialog-error", VLC_VAR_ADDRESS);
         var_AddCallback(p_intf, "dialog-error", DialogCallback, (__bridge void *)self);
@@ -116,9 +116,9 @@ static int DialogCallback(vlc_object_t *p_this, const char *type, vlc_value_t pr
 
 - (void)dealloc
 {
-    msg_Dbg(VLCIntf, "Deinitializing dialog provider");
+    msg_Dbg(getIntf(), "Deinitializing dialog provider");
 
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     var_DelCallback(p_intf, "dialog-error", DialogCallback, (__bridge void *)self);
     var_DelCallback(p_intf, "dialog-critical", DialogCallback, (__bridge void *)self);
     var_DelCallback(p_intf, "dialog-login", DialogCallback, (__bridge void *)self);
@@ -153,7 +153,7 @@ static int DialogCallback(vlc_object_t *p_this, const char *type, vlc_value_t pr
     else if ([o_type isEqualToString: @"dialog-progress-bar"])
         [self performSelectorOnMainThread:@selector(showProgressDialogOnMainThread:) withObject: o_value waitUntilDone:YES];
     else
-        msg_Err(VLCIntf, "unhandled dialog type: '%s'", type);
+        msg_Err(getIntf(), "unhandled dialog type: '%s'", type);
 }
 
 -(void)showFatalDialog: (NSValue *)o_value
@@ -242,7 +242,7 @@ static int DialogCallback(vlc_object_t *p_this, const char *type, vlc_value_t pr
 
     [o_prog_description_txt setStringValue: toNSStr(p_dialog->message)];
 
-    if (VLCIntf)
+    if (getIntf())
         [self performSelector:@selector(showProgressDialog:) withObject: o_value afterDelay:3.00];
 }
 

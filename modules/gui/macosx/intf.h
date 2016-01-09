@@ -47,9 +47,6 @@
  * Local prototypes.
  *****************************************************************************/
 
-// deprecated macro
-#define VLCIntf getIntf()
-
 intf_thread_t *getIntf();
 
 static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";

@@ -251,7 +251,7 @@
 
 - (void)resetValues
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     NSString *tmpString;
     char *tmpChar;
     BOOL b_state;
@@ -491,7 +491,7 @@
 
 - (NSString *)generateProfileString
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     return [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli;%lli;%f",
             B64EncAndFree(config_GetPsz(p_intf, "video-filter")),
             B64EncAndFree(config_GetPsz(p_intf, "sub-source")),
@@ -565,7 +565,7 @@
 
 - (IBAction)profileSelectorAction:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     [self saveCurrentProfile];
     i_old_profile_index = [_profilePopup indexOfSelectedItem];
     VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];

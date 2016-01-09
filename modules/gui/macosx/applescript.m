@@ -46,7 +46,7 @@
             if (o_url != nil)
                 [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_url];
 
-            input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+            input_thread_t * p_input = pl_CurrentInput(getIntf());
             BOOL b_returned = NO;
 
             if (p_input) {
@@ -83,7 +83,7 @@
     NSString *o_command = [[self commandDescription] commandName];
     NSString *o_parameter = [self directParameter];
 
-    intf_thread_t * p_intf = VLCIntf;
+    intf_thread_t * p_intf = getIntf();
     playlist_t * p_playlist = pl_Get(p_intf);
 
     if ([o_command isEqualToString:@"play"])
@@ -185,7 +185,7 @@
 }
 
 - (BOOL) playing {
-    intf_thread_t *p_intf = VLCIntf;
+    intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return NO;
 
@@ -209,7 +209,7 @@
 }
 
 - (int) audioDesync {
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
     int i_delay = -1;
 
     if(!p_input)
@@ -222,7 +222,7 @@
 }
 
 - (void) setAudioDesync:(int)i_audioDesync {
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
     if(!p_input)
         return;
 
@@ -231,7 +231,7 @@
 }
 
 - (int) currentTime {
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
     int64_t i_currentTime = -1;
 
     if (!p_input)
@@ -246,7 +246,7 @@
 - (void) setCurrentTime:(int)i_currentTime {
     if (i_currentTime) {
         int64_t i64_value = (int64_t)i_currentTime;
-        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+        input_thread_t * p_input = pl_CurrentInput(getIntf());
 
         if (!p_input)
             return;

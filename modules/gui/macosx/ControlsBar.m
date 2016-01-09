@@ -55,7 +55,7 @@
 
 - (void)awakeFromNib
 {
-    _darkInterface = config_GetInt(VLCIntf, "macosx-interfacestyle");
+    _darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
     _nativeFullscreenMode = NO;
 
     [o_drop_view setDrawBorder: NO];
@@ -120,7 +120,7 @@
     [o_play_btn setAlternateImage: o_play_pressed_img];
 
     NSColor *o_string_color;
-    if (!var_InheritBool(VLCIntf, "macosx-interfacestyle"))
+    if (!var_InheritBool(getIntf(), "macosx-interfacestyle"))
         o_string_color = [NSColor colorWithCalibratedRed:0.229 green:0.229 blue:0.229 alpha:100.0];
     else
         o_string_color = [NSColor colorWithCalibratedRed:0.64 green:0.64 blue:0.64 alpha:100.0];
@@ -166,7 +166,7 @@
         [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
     }
 
-    if (config_GetInt(VLCIntf, "macosx-show-playback-buttons"))
+    if (config_GetInt(getIntf(), "macosx-show-playback-buttons"))
         [self toggleForwardBackwardMode: YES];
 
 }
@@ -300,7 +300,7 @@
         default:
             return;
     }
-    p_input = pl_CurrentInput(VLCIntf);
+    p_input = pl_CurrentInput(getIntf());
     if (p_input != NULL) {
         vlc_value_t pos;
         NSString * o_time;
@@ -326,7 +326,7 @@
 - (void)updateTimeSlider
 {
     input_thread_t * p_input;
-    p_input = pl_CurrentInput(VLCIntf);
+    p_input = pl_CurrentInput(getIntf());
     if (p_input) {
         NSString * o_time;
         vlc_value_t pos;
@@ -393,7 +393,7 @@
     bool b_chapters = false;
     bool b_buffering = false;
 
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
 
     PL_LOCK;
     b_plmul = playlist_CurrentSize(p_playlist) > 1;
@@ -623,15 +623,15 @@ frame.origin.x = f_width + frame.origin.x; \
     }
 
 
-    b_show_jump_buttons = config_GetInt(VLCIntf, "macosx-show-playback-buttons");
+    b_show_jump_buttons = config_GetInt(getIntf(), "macosx-show-playback-buttons");
     if (b_show_jump_buttons)
         [self addJumpButtons:YES];
 
-    b_show_playmode_buttons = config_GetInt(VLCIntf, "macosx-show-playmode-buttons");
+    b_show_playmode_buttons = config_GetInt(getIntf(), "macosx-show-playmode-buttons");
     if (!b_show_playmode_buttons)
         [self removePlaymodeButtons:YES];
 
-    if (!config_GetInt(VLCIntf, "macosx-show-effects-button"))
+    if (!config_GetInt(getIntf(), "macosx-show-effects-button"))
         [self removeEffectsButton:YES];
 
     [[[VLCMain sharedInstance] playlist] playbackModeUpdated];
@@ -644,7 +644,7 @@ frame.origin.x = f_width + frame.origin.x; \
 
 - (void)toggleEffectsButton
 {
-    if (config_GetInt(VLCIntf, "macosx-show-effects-button"))
+    if (config_GetInt(getIntf(), "macosx-show-effects-button"))
         [self addEffectsButton:NO];
     else
         [self removeEffectsButton:NO];
@@ -755,7 +755,7 @@ else \
 
 - (void)toggleJumpButtons
 {
-    b_show_jump_buttons = config_GetInt(VLCIntf, "macosx-show-playback-buttons");
+    b_show_jump_buttons = config_GetInt(getIntf(), "macosx-show-playback-buttons");
 
     if (b_show_jump_buttons)
         [self addJumpButtons:NO];
@@ -937,7 +937,7 @@ else \
 
 - (void)togglePlaymodeButtons
 {
-    b_show_playmode_buttons = config_GetInt(VLCIntf, "macosx-show-playmode-buttons");
+    b_show_playmode_buttons = config_GetInt(getIntf(), "macosx-show-playmode-buttons");
 
     if (b_show_playmode_buttons)
         [self addPlaymodeButtons:NO];
@@ -1045,7 +1045,7 @@ else \
 - (IBAction)repeat:(id)sender
 {
     vlc_value_t looping,repeating;
-    intf_thread_t * p_intf = VLCIntf;
+    intf_thread_t * p_intf = getIntf();
     playlist_t * p_playlist = pl_Get(p_intf);
 
     var_Get(p_playlist, "repeat", &repeating);
@@ -1070,7 +1070,7 @@ else \
 - (void)setShuffle
 {
     bool b_value;
-    playlist_t *p_playlist = pl_Get(VLCIntf);
+    playlist_t *p_playlist = pl_Get(getIntf());
     b_value = var_GetBool(p_playlist, "random");
 
     if (b_value) {
@@ -1139,7 +1139,7 @@ else \
     bool b_control = false;
     bool b_chapters = false;
 
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    playlist_t * p_playlist = pl_Get(getIntf());
 
     PL_LOCK;
     b_plmul = playlist_CurrentSize(p_playlist) > 1;

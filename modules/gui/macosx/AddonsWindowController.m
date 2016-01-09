@@ -117,7 +117,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
     [[[_addonsTable tableColumnWithIdentifier:@"author"] headerCell] setStringValue:_NS("Author")];
     [[[_addonsTable tableColumnWithIdentifier:@"type"] headerCell] setStringValue:_NS("Type")];
 
-    _manager = addons_manager_New((vlc_object_t *)VLCIntf);
+    _manager = addons_manager_New((vlc_object_t *)getIntf());
     if (!_manager)
         return;
 

@@ -59,7 +59,7 @@
     [[_sv_speedTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("fps")]];
     [_sv_durLabel setStringValue: _NS("Subtitle duration factor:")];
 
-    int i_mode = var_InheritInteger(VLCIntf, SUBSDELAY_CFG_MODE);
+    int i_mode = var_InheritInteger(getIntf(), SUBSDELAY_CFG_MODE);
     NSString * o_toolTip, * o_suffix;
 
     switch (i_mode) {
@@ -115,7 +115,7 @@
     [_sv_speedStepper setFloatValue:1.0];
     [_sv_durStepper setFloatValue:0.0];
 
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (p_input) {
         var_SetInteger(p_input, "audio-delay", 0.0);
@@ -128,7 +128,7 @@
 
 - (void)updateValues
 {
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (p_input) {
         [_av_advanceTextField setDoubleValue: var_GetInteger(p_input, "audio-delay") / 1000000.];
@@ -148,7 +148,7 @@
     else
         [_avStepper setDoubleValue: [_av_advanceTextField doubleValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (p_input) {
         var_SetInteger(p_input, "audio-delay", [_av_advanceTextField doubleValue] * 1000000.);
@@ -163,7 +163,7 @@
     else
         [_sv_advanceStepper setDoubleValue: [_sv_advanceTextField doubleValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (p_input) {
         var_SetInteger(p_input, "spu-delay", [_sv_advanceTextField doubleValue] * 1000000.);
@@ -178,7 +178,7 @@
     else
         [_sv_speedStepper setFloatValue: [_sv_speedTextField floatValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (p_input) {
         var_SetFloat(p_input, "sub-fps", [_sv_speedTextField floatValue]);
@@ -193,14 +193,14 @@
     else
         [_sv_durStepper setFloatValue: [_sv_durTextField floatValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+    input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (p_input) {
         float f_factor = [_sv_durTextField floatValue];
-        config_PutFloat(VLCIntf, SUBSDELAY_CFG_FACTOR, f_factor);
+        config_PutFloat(getIntf(), SUBSDELAY_CFG_FACTOR, f_factor);
 
         /* Try to find an instance of subsdelay, and set its factor */
-        vlc_object_t *p_obj = (vlc_object_t *) vlc_object_find_name(VLCIntf->p_libvlc, "subsdelay");
+        vlc_object_t *p_obj = (vlc_object_t *) vlc_object_find_name(getIntf()->p_libvlc, "subsdelay");
         if (p_obj) {
             var_SetFloat(p_obj, SUBSDELAY_CFG_FACTOR, f_factor);
             vlc_object_release(p_obj);
