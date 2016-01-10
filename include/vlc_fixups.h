@@ -346,6 +346,30 @@ struct if_nameindex
 # define if_freenameindex(list) (void)0
 #endif
 
+#ifdef _WIN32
+struct iovec
+{
+    void  *iov_base;
+    size_t iov_len;
+};
+#define IOV_MAX 255
+struct msghdr
+{
+    void         *msg_name;
+    size_t        msg_namelen;
+    struct iovec *msg_iov;
+    size_t        msg_iovlen;
+    void         *msg_control;
+    size_t        msg_controllen;
+    int           msg_flags;
+};
+#endif
+
+#ifndef HAVE_SENDMSG
+struct msghdr;
+ssize_t sendmsg(int, const struct msghdr *, int);
+#endif
+
 /* search.h */
 #ifndef HAVE_SEARCH_H
 typedef struct entry {

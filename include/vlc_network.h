@@ -41,24 +41,6 @@
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   define net_errno (WSAGetLastError())
-
-struct iovec
-{
-    void  *iov_base;
-    size_t iov_len;
-};
-
-struct msghdr
-{
-    void         *msg_name;
-    size_t        msg_namelen;
-    struct iovec *msg_iov;
-    size_t        msg_iovlen;
-    void         *msg_control;
-    size_t        msg_controllen;
-    int           msg_flags;
-};
-
 #   ifndef IPV6_V6ONLY
 #       define IPV6_V6ONLY 27
 #   endif
