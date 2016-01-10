@@ -30,9 +30,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#ifndef SOCK_CLOEXEC
-# define SOCK_CLOEXEC 0
-#endif
 
 #include <vlc_common.h>
 #include <vlc_block.h>
@@ -47,7 +44,7 @@ static void conn_create(void)
 {
     int fds[2];
 
-    if (socketpair(PF_LOCAL, SOCK_STREAM|SOCK_CLOEXEC, 0, fds))
+    if (vlc_socketpair(PF_LOCAL, SOCK_STREAM, 0, fds, false))
         assert(!"socketpair");
 
     struct vlc_tls *tls = vlc_tls_DummyCreate(NULL, fds[1]);

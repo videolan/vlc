@@ -258,7 +258,7 @@ int vlc_dup (int oldfd)
 
 int vlc_pipe (int fds[2])
 {
-    if (socketpair (AF_LOCAL, SOCK_STREAM, 0, fds))
+    if (vlc_socketpair (AF_LOCAL, SOCK_STREAM, 0, fds, false))
         return -1;
 
     shutdown (fds[0], SHUT_WR);
@@ -267,8 +267,6 @@ int vlc_pipe (int fds[2])
     setmode (fds[0], O_BINARY);
     setmode (fds[1], O_BINARY);
 
-    fcntl (fds[0], F_SETFD, FD_CLOEXEC);
-    fcntl (fds[1], F_SETFD, FD_CLOEXEC);
     return 0;
 }
 

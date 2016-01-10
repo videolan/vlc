@@ -30,9 +30,6 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#ifndef SOCK_CLOEXEC
-# define SOCK_CLOEXEC 0
-#endif
 #include <poll.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -47,12 +44,7 @@
 
 static int tlspair(int fds[2])
 {
-    if (socketpair(PF_LOCAL, SOCK_STREAM|SOCK_CLOEXEC, 0, fds))
-        return -1;
-
-    fcntl(fds[0], F_SETFL, O_NONBLOCK | fcntl(fds[0], F_GETFL));
-    fcntl(fds[1], F_SETFL, O_NONBLOCK | fcntl(fds[1], F_GETFL));
-    return 0;
+    return vlc_socketpair(PF_LOCAL, SOCK_STREAM, 0, fds, true);
 }
 
 static int question_callback(vlc_object_t *obj, const char *varname,
