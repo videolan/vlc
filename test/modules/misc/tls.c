@@ -38,7 +38,7 @@
 #include <vlc_modules.h>
 #include <vlc_tls.h>
 #include <vlc_dialog.h>
-#include "../../lib/libvlc_internal.h"
+#include "../../../lib/libvlc_internal.h"
 
 #include <vlc/vlc.h>
 
