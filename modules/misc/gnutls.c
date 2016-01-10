@@ -130,7 +130,6 @@ static int gnutls_Error(vlc_tls_t *tls, int val)
     return -1;
 }
 
-#ifdef IOV_MAX
 static ssize_t vlc_gnutls_writev (gnutls_transport_ptr_t ptr,
                                   const giovec_t *giov, int iovcnt)
 {
@@ -157,7 +156,6 @@ static ssize_t vlc_gnutls_writev (gnutls_transport_ptr_t ptr,
 
     return sendmsg (fd, &msg, MSG_NOSIGNAL);
 }
-#endif
 
 static ssize_t gnutls_Send (vlc_tls_t *tls, const struct iovec *iov,
                             unsigned count)
@@ -278,9 +276,7 @@ static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
     }
 
     gnutls_transport_set_int (session, fd);
-#ifdef IOV_MAX
     gnutls_transport_set_vec_push_function (session, vlc_gnutls_writev);
-#endif
     tls->sys = session;
     tls->writev = gnutls_Send;
     tls->recv = gnutls_Recv;
