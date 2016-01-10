@@ -102,6 +102,8 @@ static char *FromACP( const char *str )
 #define IGNORE_ES NAV_ES
 #define READ_LENGTH (25 * 1000) // 25ms
 
+//#define AVI_DEBUG
+
 typedef struct
 {
     vlc_fourcc_t i_fourcc;
@@ -2389,6 +2391,27 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
             avi_index_Append( &p_index[i_stream], pi_last_offset, &index );
         }
     }
+
+#ifdef AVI_DEBUG
+    for( unsigned i_index = 0; i_index< p_idx1->i_entry_count && i_index < p_sys->i_track; i_index++ )
+    {
+        for( unsigned i = 0; i < p_index[i_index].i_size; i++ )
+        {
+            mtime_t i_length;
+            if( p_sys->track[i_index]->i_samplesize )
+            {
+                i_length = AVI_GetDPTS( p_sys->track[i_index],
+                                        p_index[i_index].p_entry[i].i_lengthtotal );
+            }
+            else
+            {
+                i_length = AVI_GetDPTS( p_sys->track[i_index], i );
+            }
+            msg_Dbg( p_demux, "index stream %d @%ld time %ld", i_index,
+                     p_index[i_index].p_entry[i].i_pos, i_length );
+        }
+    }
+#endif
     return VLC_SUCCESS;
 }
 
