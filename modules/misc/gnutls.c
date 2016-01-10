@@ -159,11 +159,28 @@ static ssize_t vlc_gnutls_writev (gnutls_transport_ptr_t ptr,
 }
 #endif
 
-static ssize_t gnutls_Send (vlc_tls_t *tls, const void *buf, size_t length)
+static ssize_t gnutls_Send (vlc_tls_t *tls, const struct iovec *iov,
+                            unsigned count)
 {
     gnutls_session_t session = tls->sys;
-    ssize_t val = gnutls_record_send (session, buf, length);
+    ssize_t val;
 
+    if (!gnutls_record_check_corked(session))
+    {
+        gnutls_record_cork(session);
+
+        while (count > 0)
+        {
+            val = gnutls_record_send(session, iov->iov_base, iov->iov_len);
+            if (val < (ssize_t)iov->iov_len)
+                break;
+
+            iov++;
+            count--;
+        }
+    }
+
+    val = gnutls_record_uncork(session, 0);
     return (val < 0) ? gnutls_Error (tls, val) : val;
 }
 
@@ -178,9 +195,18 @@ static ssize_t gnutls_Recv (vlc_tls_t *tls, void *buf, size_t length)
 static int gnutls_Shutdown(vlc_tls_t *tls, bool duplex)
 {
     gnutls_session_t session = tls->sys;
-    int val = gnutls_bye(session, duplex ? GNUTLS_SHUT_RDWR : GNUTLS_SHUT_WR);
+    ssize_t val;
 
-    return (val < 0) ? gnutls_Error(tls, val) : 0;
+    /* Flush any pending data */
+    val = gnutls_record_uncork(session, 0);
+    if (val < 0)
+        return gnutls_Error(tls, val);
+
+    val = gnutls_bye(session, duplex ? GNUTLS_SHUT_RDWR : GNUTLS_SHUT_WR);
+    if (val < 0)
+        return gnutls_Error(tls, val);
+
+    return 0;
 }
 
 static void gnutls_Close (vlc_tls_t *tls)
@@ -256,7 +282,7 @@ static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
     gnutls_transport_set_vec_push_function (session, vlc_gnutls_writev);
 #endif
     tls->sys = session;
-    tls->send = gnutls_Send;
+    tls->writev = gnutls_Send;
     tls->recv = gnutls_Recv;
     tls->shutdown = gnutls_Shutdown;
     tls->close = gnutls_Close;

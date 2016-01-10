@@ -190,20 +190,25 @@ static void vlc_h2_output_flush_unlocked(struct vlc_h2_output *out)
 static ssize_t vlc_https_send(vlc_tls_t *tls, const void *buf, size_t len)
 {
     struct pollfd ufd;
+    struct iovec iov;
     size_t count = 0;
 
     ufd.fd = tls->fd;
     ufd.events = POLLOUT;
+    iov.iov_base = (void *)buf;
+    iov.iov_len = len;
 
     while (count < len)
     {
         int canc = vlc_savecancel();
-        ssize_t val = tls->send(tls, (char *)buf + count, len - count);
+        ssize_t val = tls->writev(tls, &iov, 1);
 
         vlc_restorecancel(canc);
 
         if (val > 0)
         {
+            iov.iov_base = (char *)iov.iov_base + val;
+            iov.iov_len -= val;
             count += val;
             continue;
         }

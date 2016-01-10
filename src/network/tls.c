@@ -253,9 +253,12 @@ ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
 ssize_t vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
 {
     struct pollfd ufd;
+    struct iovec iov;
 
     ufd.fd = session->fd;
     ufd.events = POLLOUT;
+    iov.iov_base = (void *)buf;
+    iov.iov_len = len;
 
     for (size_t sent = 0;;)
     {
@@ -265,14 +268,14 @@ ssize_t vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
             return -1;
         }
 
-        ssize_t val = session->send(session, buf, len);
+        ssize_t val = session->writev(session, &iov, 1);
         if (val > 0)
         {
-            buf = ((const char *)buf) + val;
-            len -= val;
+            iov.iov_base = ((char *)iov.iov_base) + val;
+            iov.iov_len -= val;
             sent += val;
         }
-        if (len == 0 || val == 0)
+        if (iov.iov_len == 0 || val == 0)
             return sent;
         if (val == -1 && errno != EINTR && errno != EAGAIN)
             return sent ? (ssize_t)sent : -1;
@@ -317,9 +320,15 @@ static ssize_t vlc_tls_DummyReceive(vlc_tls_t *tls, void *buf, size_t len)
     return recv(tls->fd, buf, len, 0);
 }
 
-static ssize_t vlc_tls_DummySend(vlc_tls_t *tls, const void *buf, size_t len)
+static ssize_t vlc_tls_DummySend(vlc_tls_t *tls, const struct iovec *iov,
+                                 unsigned count)
 {
-    return send(tls->fd, buf, len, MSG_NOSIGNAL);
+    const struct msghdr msg =
+    {
+        .msg_iov = (struct iovec *)iov,
+        .msg_iovlen = count,
+    };
+    return sendmsg(tls->fd, &msg, MSG_NOSIGNAL);
 }
 
 static int vlc_tls_DummyShutdown(vlc_tls_t *tls, bool duplex)
@@ -341,7 +350,7 @@ vlc_tls_t *vlc_tls_DummyCreate(vlc_object_t *obj, int fd)
     session->obj = obj;
     session->fd = fd;
     session->recv = vlc_tls_DummyReceive;
-    session->send = vlc_tls_DummySend;
+    session->writev = vlc_tls_DummySend;
     session->shutdown = vlc_tls_DummyShutdown;
     session->close = vlc_tls_DummyClose;
     return session;

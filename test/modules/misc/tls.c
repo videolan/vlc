@@ -197,6 +197,7 @@ int main(void)
 
     /* Do some I/O */
     char buf[12];
+    struct iovec iov;
 
     val = tls->recv(tls, buf, sizeof (buf));
     assert(val == -1 && errno == EAGAIN);
@@ -228,13 +229,16 @@ int main(void)
     size_t bytes = 0;
     unsigned seed = 0;
 
+    iov.iov_base = data;
+    iov.iov_len = sizeof (data);
+
     do
     {
         for (size_t i = 0; i < sizeof (data); i++)
             data[i] = rand_r(&seed);
         bytes += sizeof (data);
     }
-    while ((val = tls->send(tls, data, sizeof (data))) == sizeof (data));
+    while ((val = tls->writev(tls, &iov, 1)) == sizeof (data));
 
     bytes -= sizeof (data);
     if (val > 0)

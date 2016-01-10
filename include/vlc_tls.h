@@ -43,7 +43,7 @@ struct vlc_tls
     int fd;
 
     ssize_t (*recv)(struct vlc_tls *, void *, size_t);
-    ssize_t (*send)(struct vlc_tls *, const void *, size_t);
+    ssize_t (*writev)(struct vlc_tls *, const struct iovec *, unsigned);
     int (*shutdown)(struct vlc_tls *, bool duplex);
     void (*close)(vlc_tls_t *);
 };
