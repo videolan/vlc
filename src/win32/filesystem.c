@@ -327,6 +327,13 @@ int vlc_socket (int pf, int type, int proto, bool nonblock)
     return fd;
 }
 
+int vlc_socketpair(int pf, int type, int proto, int fds[2], bool nonblock)
+{
+    (void) pf; (void) type; (void) proto; (void) fds; (void) nonblock;
+    errno = ENOSYS;
+    return -1;
+}
+
 int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
 {
     int fd = accept (lfd, addr, alen);

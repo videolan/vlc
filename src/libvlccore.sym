@@ -471,6 +471,7 @@ vlc_pipe
 vlc_write
 vlc_writev
 vlc_socket
+vlc_socketpair
 vlc_accept
 utf8_vfprintf
 var_AddCallback

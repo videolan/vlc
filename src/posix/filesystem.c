@@ -271,6 +271,18 @@ ssize_t vlc_writev(int fd, const struct iovec *iov, int count)
 
 #include <vlc_network.h>
 
+static void vlc_socket_setup(int fd, bool nonblock)
+{
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
+
+    if (nonblock)
+        fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+
+#ifdef SO_NOSIGPIPE
+    setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+#endif
+}
+
 /**
  * Creates a socket file descriptor. The new file descriptor has the
  * close-on-exec flag set.
@@ -288,6 +300,7 @@ int vlc_socket (int pf, int type, int proto, bool nonblock)
     type |= SOCK_CLOEXEC;
     if (nonblock)
         type |= SOCK_NONBLOCK;
+
     fd = socket (pf, type, proto);
     if (fd != -1 || errno != EINVAL)
         return fd;
@@ -296,16 +309,32 @@ int vlc_socket (int pf, int type, int proto, bool nonblock)
 #endif
 
     fd = socket (pf, type, proto);
-    if (fd == -1)
+    if (fd != -1)
+        vlc_socket_setup(fd, nonblock);
+    return fd;
+}
+
+int vlc_socketpair(int pf, int type, int proto, int fds[2], bool nonblock)
+{
+#ifdef SOCK_CLOEXEC
+    type |= SOCK_CLOEXEC;
+    if (nonblock)
+        type |= SOCK_NONBLOCK;
+
+    if (socketpair(pf, type, proto, fds) == 0)
+        return 0;
+    if (errno != EINVAL)
         return -1;
 
-    fcntl (fd, F_SETFD, FD_CLOEXEC);
-    if (nonblock)
-        fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
-#ifdef SO_NOSIGPIPE
-    setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+    type &= ~(SOCK_CLOEXEC|SOCK_NONBLOCK);
 #endif
-    return fd;
+
+    if (socketpair(pf, type, proto, fds))
+        return -1;
+
+    vlc_socket_setup(fds[0], nonblock);
+    vlc_socket_setup(fds[1], nonblock);
+    return 0;
 }
 
 /**

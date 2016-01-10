@@ -302,18 +302,30 @@ ssize_t vlc_writev(int fd, const struct iovec *iov, int count)
     return val;
 }
 
+static void vlc_socket_setup(int fd, bool nonblock)
+{
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
+
+    if (nonblock)
+        fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+}
+
 int vlc_socket (int pf, int type, int proto, bool nonblock)
 {
-    int fd;
+    int fd = socket(pf, type, proto);
+    if (fd != -1)
+        vlc_socket_setup(fd, nonblock);
+    return fd;
+}
 
-    fd = socket (pf, type, proto);
-    if (fd == -1)
+int vlc_socketpair(int pf, int type, int proto, int fds[2], bool nonblock)
+{
+    if (socketpair(pf, type, proto, fds))
         return -1;
 
-    fcntl (fd, F_SETFD, FD_CLOEXEC);
-    if (nonblock)
-        fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
-    return fd;
+    vlc_socket_setup(fds[0], nonblock);
+    vlc_socket_setup(fds[1], nonblock);
+    return 0;
 }
 
 int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)

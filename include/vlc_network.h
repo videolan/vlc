@@ -76,6 +76,7 @@ struct msghdr
 #endif
 
 VLC_API int vlc_socket (int, int, int, bool nonblock) VLC_USED;
+VLC_API int vlc_socketpair (int, int, int, int [2], bool nonblock);
 
 struct sockaddr;
 VLC_API int vlc_accept( int, struct sockaddr *, socklen_t *, bool ) VLC_USED;
