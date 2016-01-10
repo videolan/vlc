@@ -60,7 +60,7 @@ vlc_module_begin ()
 
     /*
      * The server module currently uses an OSX only API, to be compatible with 10.6.
-     * If the module is needed on iOS, then the "modern" keychain lookup API need to be
+      If the module is needed on iOS, then the "modern" keychain lookup API need to be
      * implemented.
      */
 #if !TARGET_OS_IPHONE
@@ -486,13 +486,17 @@ static ssize_t st_Send (vlc_tls_t *session, const struct iovec *iov,
 /**
  * Receives data through a TLS session.
  */
-static ssize_t st_Recv (vlc_tls_t *session, void *buf, size_t length)
+static ssize_t st_Recv (vlc_tls_t *session, struct iovec *iov, unsigned count)
 {
     vlc_tls_sys_t *sys = session->sys;
     assert(sys);
 
+    if (unlikely(count == 0))
+        return 0;
+
     size_t actualSize;
-    OSStatus ret = SSLRead(sys->p_context, buf, length, &actualSize);
+    OSStatus ret = SSLRead(sys->p_context, iov->iov_base, iov->iov_len,
+                           &actualSize);
 
     if (ret == errSSLWouldBlock && actualSize)
         return actualSize;
@@ -565,8 +569,8 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
     sys->p_context = NULL;
 
     session->sys = sys;
+    session->readv = st_Recv;
     session->writev = st_Send;
-    session->recv = st_Recv;
     session->shutdown = st_SessionShutdown;
     session->close = st_SessionClose;
     crd->handshake = st_Handshake;

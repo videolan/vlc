@@ -199,7 +199,9 @@ int main(void)
     char buf[12];
     struct iovec iov;
 
-    val = tls->recv(tls, buf, sizeof (buf));
+    iov.iov_base = buf;
+    iov.iov_len = sizeof (buf);
+    val = tls->readv(tls, &iov, 1);
     assert(val == -1 && errno == EAGAIN);
 
     val = vlc_tls_Write(tls, "Hello ", 6);

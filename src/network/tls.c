@@ -220,9 +220,12 @@ error:
 ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
 {
     struct pollfd ufd;
+    struct iovec iov;
 
     ufd.fd = session->fd;
     ufd.events = POLLIN;
+    iov.iov_base = buf;
+    iov.iov_len = len;
 
     for (size_t rcvd = 0;;)
     {
@@ -232,16 +235,16 @@ ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
             return -1;
         }
 
-        ssize_t val = session->recv(session, buf, len);
+        ssize_t val = session->readv(session, &iov, 1);
         if (val > 0)
         {
             if (!waitall)
                 return val;
-            buf = ((char *)buf) + val;
-            len -= val;
+            iov.iov_base = (char *)iov.iov_base + val;
+            iov.iov_len -= val;
             rcvd += val;
         }
-        if (len == 0 || val == 0)
+        if (iov.iov_len == 0 || val == 0)
             return rcvd;
         if (val == -1 && errno != EINTR && errno != EAGAIN)
             return rcvd ? (ssize_t)rcvd : -1;
@@ -315,9 +318,15 @@ error:
     return NULL;
 }
 
-static ssize_t vlc_tls_DummyReceive(vlc_tls_t *tls, void *buf, size_t len)
+static ssize_t vlc_tls_DummyReceive(vlc_tls_t *tls, struct iovec *iov,
+                                    unsigned count)
 {
-    return recv(tls->fd, buf, len, 0);
+    struct msghdr msg =
+    {
+        .msg_iov = iov,
+        .msg_iovlen = count,
+    };
+    return recvmsg(tls->fd, &msg, 0);
 }
 
 static ssize_t vlc_tls_DummySend(vlc_tls_t *tls, const struct iovec *iov,
@@ -349,7 +358,7 @@ vlc_tls_t *vlc_tls_DummyCreate(vlc_object_t *obj, int fd)
 
     session->obj = obj;
     session->fd = fd;
-    session->recv = vlc_tls_DummyReceive;
+    session->readv = vlc_tls_DummyReceive;
     session->writev = vlc_tls_DummySend;
     session->shutdown = vlc_tls_DummyShutdown;
     session->close = vlc_tls_DummyClose;

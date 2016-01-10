@@ -157,6 +157,29 @@ static ssize_t vlc_gnutls_writev (gnutls_transport_ptr_t ptr,
     return sendmsg (fd, &msg, MSG_NOSIGNAL);
 }
 
+static ssize_t gnutls_Recv(vlc_tls_t *tls, struct iovec *iov, unsigned count)
+{
+    gnutls_session_t session = tls->sys;
+    size_t rcvd = 0;
+
+    while (count > 0)
+    {
+        ssize_t val = gnutls_record_recv(session, iov->iov_base, iov->iov_len);
+        if (val < 0)
+            return rcvd ? (ssize_t)rcvd : gnutls_Error(tls, val);
+
+        rcvd += val;
+
+        if ((size_t)val < iov->iov_len)
+            break;
+
+        iov++;
+        count--;
+    }
+
+    return rcvd;
+}
+
 static ssize_t gnutls_Send (vlc_tls_t *tls, const struct iovec *iov,
                             unsigned count)
 {
@@ -179,14 +202,6 @@ static ssize_t gnutls_Send (vlc_tls_t *tls, const struct iovec *iov,
     }
 
     val = gnutls_record_uncork(session, 0);
-    return (val < 0) ? gnutls_Error (tls, val) : val;
-}
-
-static ssize_t gnutls_Recv (vlc_tls_t *tls, void *buf, size_t length)
-{
-    gnutls_session_t session = tls->sys;
-    ssize_t val = gnutls_record_recv (session, buf, length);
-
     return (val < 0) ? gnutls_Error (tls, val) : val;
 }
 
@@ -278,8 +293,8 @@ static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
     gnutls_transport_set_int (session, fd);
     gnutls_transport_set_vec_push_function (session, vlc_gnutls_writev);
     tls->sys = session;
+    tls->readv = gnutls_Recv;
     tls->writev = gnutls_Send;
-    tls->recv = gnutls_Recv;
     tls->shutdown = gnutls_Shutdown;
     tls->close = gnutls_Close;
     return VLC_SUCCESS;

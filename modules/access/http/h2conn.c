@@ -525,15 +525,18 @@ static const struct vlc_h2_parser_cbs vlc_h2_parser_callbacks =
 static ssize_t vlc_https_recv(vlc_tls_t *tls, void *buf, size_t len)
 {
     struct pollfd ufd;
+    struct iovec iov;
     size_t count = 0;
 
     ufd.fd = tls->fd;
     ufd.events = POLLIN;
+    iov.iov_base = buf;
+    iov.iov_len = len;
 
-    while (count < len)
+    while (iov.iov_len > 0)
     {
         int canc = vlc_savecancel();
-        ssize_t val = tls->recv(tls, (char *)buf + count, len - count);
+        ssize_t val = tls->readv(tls, &iov, 1);
 
         vlc_restorecancel(canc);
 
@@ -542,6 +545,8 @@ static ssize_t vlc_https_recv(vlc_tls_t *tls, void *buf, size_t len)
 
         if (val >= 0)
         {
+            iov.iov_base = (char *)iov.iov_base + val;
+            iov.iov_len -= val;
             count += val;
             continue;
         }
