@@ -365,6 +365,11 @@ struct msghdr
 };
 #endif
 
+#ifndef HAVE_RECVMSG
+struct msghdr;
+ssize_t recvmsg(int, struct msghdr *, int);
+#endif
+
 #ifndef HAVE_SENDMSG
 struct msghdr;
 ssize_t sendmsg(int, const struct msghdr *, int);
