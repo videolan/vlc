@@ -115,7 +115,7 @@ static int server_socket(unsigned *port)
     socklen_t addrlen = sizeof (addr);
 
     if (bind(fd, (struct sockaddr *)&addr, addrlen)
-     || getsockname(fd, &addr, &addrlen))
+     || getsockname(fd, (struct sockaddr *)&addr, &addrlen))
     {
         close(fd);
         return -1;
