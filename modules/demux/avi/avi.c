@@ -1404,7 +1404,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
         {
             /* check for time */
             if( llabs( AVI_GetPTS( p_stream ) -
-                        AVI_GetPTS( p_stream_master ) )< 600*1000 )
+                        AVI_GetPTS( p_stream_master ) )< 2 * CLOCK_FREQ )
             {
                 /* load it and send to decoder */
                 block_t *p_frame = ReadFrame( p_demux, p_stream, 8, avi_pk.i_size + 8 ) ;
