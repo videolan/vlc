@@ -143,7 +143,11 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_session == NULL )
         goto error;
 
-    vlc_UrlParse( &p_sys->url, p_access->psz_location );
+    char *psz_decoded_location = vlc_uri_decode_duplicate( p_access->psz_location );
+    if( psz_decoded_location == NULL )
+        goto error;
+    vlc_UrlParse( &p_sys->url, psz_decoded_location );
+    free( psz_decoded_location );
     if( get_address( p_access ) != VLC_SUCCESS )
         goto error;
 
@@ -529,7 +533,12 @@ static input_item_t *new_item( access_t *p_access, const char *psz_name,
     char         *psz_uri, *psz_option = NULL;
     int           i_ret;
 
-    i_ret = asprintf( &psz_uri, "smb://%s/%s", p_access->psz_location, psz_name );
+    char *psz_encoded_name = vlc_uri_encode( psz_name );
+    if( psz_encoded_name == NULL )
+        return NULL;
+    i_ret = asprintf( &psz_uri, "smb://%s/%s", p_access->psz_location,
+                      psz_encoded_name );
+    free( psz_encoded_name );
     if( i_ret == -1 )
         return NULL;
 
