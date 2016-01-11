@@ -1331,13 +1331,17 @@ static int Demux_UnSeekable( demux_t *p_demux )
             b |= b_extra;
         }
 
-        if( b && tk->i_cat == VIDEO_ES )
+        if( b )
         {
-            p_stream_master = tk;
-        }
-        else if( b )
-        {
-            p_stream_master = tk;
+            if( tk->i_cat == VIDEO_ES )
+            {
+                p_stream_master = tk;
+                break;
+            }
+            else if( !tk )
+            {
+                p_stream_master = tk;
+            }
         }
     }
 
