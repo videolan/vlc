@@ -1064,8 +1064,8 @@ static int Demux_Seekable( demux_t *p_demux )
         for( i = 0, b_done = true, i_pos = -1; i < p_sys->i_track; i++ )
         {
             if( !toread[i].b_ok ||
-                AVI_GetDPTS( p_sys->track[i],
-                             toread[i].i_toread ) <= -READ_LENGTH )
+                ( p_sys->b_fastseekable && p_sys->b_interleaved &&
+                  AVI_GetDPTS( p_sys->track[i], toread[i].i_toread ) <= -READ_LENGTH ) )
             {
                 continue;
             }
