@@ -1347,8 +1347,15 @@ static int Demux_UnSeekable( demux_t *p_demux )
 
     if( !p_stream_master )
     {
-        msg_Warn( p_demux, "no more stream selected" );
-        return( 0 );
+        if( p_sys->i_track )
+        {
+            p_stream_master = p_sys->track[0];
+        }
+        else
+        {
+            msg_Warn( p_demux, "no more stream selected" );
+            return( 0 );
+        }
     }
 
     p_sys->i_time = AVI_GetPTS( p_stream_master );
