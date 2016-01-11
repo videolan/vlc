@@ -1403,7 +1403,8 @@ static int Demux_UnSeekable( demux_t *p_demux )
         else
         {
             /* check for time */
-            if( llabs( AVI_GetPTS( p_stream ) -
+            if( p_stream == p_stream_master ||
+                llabs( AVI_GetPTS( p_stream ) -
                         AVI_GetPTS( p_stream_master ) )< 2 * CLOCK_FREQ )
             {
                 /* load it and send to decoder */
