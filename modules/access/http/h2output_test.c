@@ -40,6 +40,12 @@ static bool send_failure = false;
 static bool expect_hello = true;
 static vlc_sem_t rx;
 
+static int fd_callback(vlc_tls_t *tls)
+{
+    (void) tls;
+    return -1;
+}
+
 static ssize_t send_callback(vlc_tls_t *tls, const struct iovec *iov,
                              unsigned count)
 {
@@ -74,6 +80,7 @@ static ssize_t send_callback(vlc_tls_t *tls, const struct iovec *iov,
 
 static vlc_tls_t fake_tls =
 {
+    .get_fd = fd_callback,
     .writev = send_callback,
 };
 

@@ -157,6 +157,13 @@ static ssize_t vlc_gnutls_writev (gnutls_transport_ptr_t ptr,
     return sendmsg (fd, &msg, MSG_NOSIGNAL);
 }
 
+static int gnutls_GetFD(vlc_tls_t *tls)
+{
+    gnutls_session_t session = tls->sys;
+
+    return gnutls_transport_get_int(session);
+}
+
 static ssize_t gnutls_Recv(vlc_tls_t *tls, struct iovec *iov, unsigned count)
 {
     gnutls_session_t session = tls->sys;
@@ -293,6 +300,7 @@ static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
     gnutls_transport_set_int (session, fd);
     gnutls_transport_set_vec_push_function (session, vlc_gnutls_writev);
     tls->sys = session;
+    tls->get_fd = gnutls_GetFD;
     tls->readv = gnutls_Recv;
     tls->writev = gnutls_Send;
     tls->shutdown = gnutls_Shutdown;

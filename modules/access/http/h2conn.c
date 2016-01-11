@@ -528,7 +528,7 @@ static ssize_t vlc_https_recv(vlc_tls_t *tls, void *buf, size_t len)
     struct iovec iov;
     size_t count = 0;
 
-    ufd.fd = tls->fd;
+    ufd.fd = vlc_tls_GetFD(tls);
     ufd.events = POLLIN;
     iov.iov_base = buf;
     iov.iov_len = len;

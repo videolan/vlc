@@ -424,6 +424,13 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
     }
 }
 
+static int st_GetFD (vlc_tls_t *session)
+{
+    vlc_tls_sys_t *sys = session->sys;
+
+    return sys->i_fd;
+}
+
 /**
  * Sends data through a TLS session.
  */

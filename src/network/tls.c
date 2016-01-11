@@ -136,7 +136,6 @@ vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
         return NULL;
 
     session->obj = crd->p_parent;
-    session->fd = fd;
 
     int val = crd->open (crd, session, fd, host, alpn);
     if (val != VLC_SUCCESS)
@@ -222,7 +221,7 @@ ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
     struct pollfd ufd;
     struct iovec iov;
 
-    ufd.fd = session->fd;
+    ufd.fd = vlc_tls_GetFD(session);
     ufd.events = POLLIN;
     iov.iov_base = buf;
     iov.iov_len = len;
@@ -258,7 +257,7 @@ ssize_t vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
     struct pollfd ufd;
     struct iovec iov;
 
-    ufd.fd = session->fd;
+    ufd.fd = vlc_tls_GetFD(session);
     ufd.events = POLLOUT;
     iov.iov_base = (void *)buf;
     iov.iov_len = len;
@@ -318,31 +317,39 @@ error:
     return NULL;
 }
 
+static int vlc_tls_DummyGetFD(vlc_tls_t *tls)
+{
+    return (intptr_t)tls->sys;
+}
+
 static ssize_t vlc_tls_DummyReceive(vlc_tls_t *tls, struct iovec *iov,
                                     unsigned count)
 {
+    int fd = (intptr_t)tls->sys;
     struct msghdr msg =
     {
         .msg_iov = iov,
         .msg_iovlen = count,
     };
-    return recvmsg(tls->fd, &msg, 0);
+    return recvmsg(fd, &msg, 0);
 }
 
 static ssize_t vlc_tls_DummySend(vlc_tls_t *tls, const struct iovec *iov,
                                  unsigned count)
 {
+    int fd = (intptr_t)tls->sys;
     const struct msghdr msg =
     {
         .msg_iov = (struct iovec *)iov,
         .msg_iovlen = count,
     };
-    return sendmsg(tls->fd, &msg, MSG_NOSIGNAL);
+    return sendmsg(fd, &msg, MSG_NOSIGNAL);
 }
 
 static int vlc_tls_DummyShutdown(vlc_tls_t *tls, bool duplex)
 {
-    return shutdown(tls->fd, duplex ? SHUT_RDWR : SHUT_WR);
+    int fd = (intptr_t)tls->sys;
+    return shutdown(fd, duplex ? SHUT_RDWR : SHUT_WR);
 }
 
 static void vlc_tls_DummyClose(vlc_tls_t *tls)
@@ -357,7 +364,8 @@ vlc_tls_t *vlc_tls_DummyCreate(vlc_object_t *obj, int fd)
         return NULL;
 
     session->obj = obj;
-    session->fd = fd;
+    session->sys = (void *)(intptr_t)fd;
+    session->get_fd = vlc_tls_DummyGetFD;
     session->readv = vlc_tls_DummyReceive;
     session->writev = vlc_tls_DummySend;
     session->shutdown = vlc_tls_DummyShutdown;

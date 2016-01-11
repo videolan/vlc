@@ -193,7 +193,7 @@ static ssize_t vlc_https_send(vlc_tls_t *tls, const void *buf, size_t len)
     struct iovec iov;
     size_t count = 0;
 
-    ufd.fd = tls->fd;
+    ufd.fd = vlc_tls_GetFD(tls);
     ufd.events = POLLOUT;
     iov.iov_base = (void *)buf;
     iov.iov_len = len;

@@ -40,12 +40,12 @@ struct vlc_tls
 {
     vlc_object_t *obj;
     void *sys;
-    int fd;
 
+    int (*get_fd)(struct vlc_tls *);
     ssize_t (*readv)(struct vlc_tls *, struct iovec *, unsigned);
     ssize_t (*writev)(struct vlc_tls *, const struct iovec *, unsigned);
     int (*shutdown)(struct vlc_tls *, bool duplex);
-    void (*close)(vlc_tls_t *);
+    void (*close)(struct vlc_tls *);
 };
 
 /**
@@ -89,6 +89,11 @@ VLC_API vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *, int fd,
  */
 VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
+static inline int vlc_tls_GetFD(vlc_tls_t *tls)
+{
+    return tls->get_fd(tls);
+}
+
 /**
  * Receives data through a TLS session.
  */
@@ -129,7 +134,7 @@ static inline int vlc_tls_Shutdown(vlc_tls_t *tls, bool duplex)
  */
 static inline void vlc_tls_Close(vlc_tls_t *session)
 {
-    int fd = session->fd;
+    int fd = vlc_tls_GetFD(session);
 
     vlc_tls_SessionDelete(session);
     shutdown(fd, SHUT_RDWR);

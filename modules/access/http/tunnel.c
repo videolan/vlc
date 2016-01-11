@@ -162,7 +162,7 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
 # error ENOSYS
     /* TODO: create a vlc_tls_t * from a struct vlc_http_msg *. */
 #else
-    int fd = session->fd;
+    int fd = vlc_tls_GetFD(session);
 
     session->shutdown = vlc_http_tls_shutdown_ignore;
     session->close = vlc_http_tls_close_ignore;

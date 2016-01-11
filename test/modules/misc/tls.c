@@ -73,7 +73,7 @@ static void *tls_echo(void *data)
     ssize_t val;
     char buf[256];
 
-    ufd.fd = tls->fd;
+    ufd.fd = vlc_tls_GetFD(tls);
 
     while ((val = vlc_tls_SessionHandshake(server_creds, tls)) > 0)
     {
