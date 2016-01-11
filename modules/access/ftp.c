@@ -286,7 +286,8 @@ static int ftp_RecvCommand( vlc_object_t *obj, access_sys_t *sys,
 static int ftp_StartStream( vlc_object_t *, access_sys_t *, uint64_t, bool );
 static int ftp_StopStream ( vlc_object_t *, access_sys_t * );
 
-static void readTLSMode( access_sys_t *p_sys, const char * psz_access )
+static int readTLSMode( vlc_object_t *obj, access_sys_t *p_sys,
+                        const char * psz_access )
 {
     if ( !strncmp( psz_access, "ftps", 4 ) )
         p_sys->tlsmode = IMPLICIT;
@@ -294,15 +295,19 @@ static void readTLSMode( access_sys_t *p_sys, const char * psz_access )
     if ( !strncmp( psz_access, "ftpes", 5 ) )
         p_sys->tlsmode = EXPLICIT;
     else
+    {
+        p_sys->p_creds = NULL;
         p_sys->tlsmode = NONE;
+        return 0;
+    }
+
+    p_sys->p_creds = vlc_tls_ClientCreate( obj );
+    return (p_sys->p_creds != NULL) ? 0 : -1;
 }
 
 static int createCmdTLS( vlc_object_t *p_access, access_sys_t *p_sys, int fd,
                          const char *psz_session_name )
 {
-    p_sys->p_creds = vlc_tls_ClientCreate( p_access );
-    if( p_sys->p_creds == NULL ) return -1;
-
     /* TLS/SSL handshake */
     p_sys->cmd.p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds, fd,
                                                     p_sys->url.psz_host,
@@ -320,9 +325,7 @@ static int createCmdTLS( vlc_object_t *p_access, access_sys_t *p_sys, int fd,
 static void clearCmdTLS( access_sys_t *p_sys )
 {
     if ( p_sys->cmd.p_tls ) vlc_tls_SessionDelete( p_sys->cmd.p_tls );
-    if ( p_sys->p_creds ) vlc_tls_Delete( p_sys->p_creds );
     p_sys->cmd.p_tls = NULL;
-    p_sys->p_creds = NULL;
 }
 
 static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
@@ -650,7 +653,9 @@ static int InOpen( vlc_object_t *p_this )
     p_sys->out = false;
     p_sys->offset = 0;
     p_sys->size = UINT64_MAX;
-    readTLSMode( p_sys, p_access->psz_access );
+
+    if( readTLSMode( p_this, p_sys, p_access->psz_access ) )
+        goto exit_error;
 
     if( parseURL( &p_sys->url, p_access->psz_location, p_sys->tlsmode ) )
         goto exit_error;
@@ -707,6 +712,7 @@ error:
 
 exit_error:
     vlc_UrlClean( &p_sys->url );
+    vlc_tls_Delete( p_sys->p_creds );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -724,7 +730,9 @@ static int OutOpen( vlc_object_t *p_this )
     /* Init p_access */
     p_sys->data.fd = -1;
     p_sys->out = true;
-    readTLSMode( p_sys, p_access->psz_access );
+
+    if( readTLSMode( p_this, p_sys, p_access->psz_access ) )
+        goto exit_error;
 
     if( parseURL( &p_sys->url, p_access->psz_path, p_sys->tlsmode ) )
         goto exit_error;
@@ -754,6 +762,7 @@ static int OutOpen( vlc_object_t *p_this )
 
 exit_error:
     vlc_UrlClean( &p_sys->url );
+    vlc_tls_Delete( p_sys->p_creds );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -781,6 +790,7 @@ static void Close( vlc_object_t *p_access, access_sys_t *p_sys )
 
     /* free memory */
     vlc_UrlClean( &p_sys->url );
+    vlc_tls_Delete( p_sys->p_creds );
     free( p_sys );
 }
 
