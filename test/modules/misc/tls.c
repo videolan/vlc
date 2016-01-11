@@ -71,7 +71,7 @@ static void *tls_echo(void *data)
     vlc_tls_t *tls = data;
     struct pollfd ufd;
     ssize_t val;
-    char buf[4096];
+    char buf[256];
 
     ufd.fd = tls->fd;
 
@@ -222,6 +222,37 @@ int main(void)
     answer = 0;
     val = securepair(&th, &tls, alpnv, NULL);
     assert(val == 0);
+
+    /* Do a lot of I/O, test congestion handling */
+    static unsigned char data[16184];
+    size_t bytes = 0;
+    unsigned seed = 0;
+
+    do
+    {
+        for (size_t i = 0; i < sizeof (data); i++)
+            data[i] = rand_r(&seed);
+        bytes += sizeof (data);
+    }
+    while ((val = tls->send(tls, data, sizeof (data))) == sizeof (data));
+
+    bytes -= sizeof (data);
+    if (val > 0)
+        bytes += val;
+
+    fprintf(stderr, "Sent %zu bytes.\n", bytes);
+    seed = 0;
+
+    while (bytes > 0)
+    {
+        unsigned char c = rand_r(&seed);
+
+        val = vlc_tls_Read(tls, buf, 1, false);
+        assert(val == 1);
+        assert(c == (unsigned char)buf[0]);
+        bytes--;
+    }
+
     vlc_tls_Close(tls);
     vlc_join(th, NULL);
 
