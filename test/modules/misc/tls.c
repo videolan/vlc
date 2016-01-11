@@ -148,6 +148,7 @@ int main(void)
         return 77;
     }
 
+    assert(!strncmp(homedir, "/tmp/vlc-test-", 14));
     setenv("HOME", homedir, 1);
     setenv("VLC_PLUGIN_PATH", "../modules", 1);
 
@@ -237,7 +238,7 @@ int main(void)
     vlc_tls_Delete(server_creds);
     libvlc_release(vlc);
 
-    if (!strncmp(homedir, "/tmp/vlc-test-", 14))
+    if (fork() == 0)
         execlp("rm", "rm", "-rf", homedir, (char *)NULL);
-    return 1;
+    return 0;
 }
