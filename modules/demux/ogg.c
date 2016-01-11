@@ -2017,8 +2017,6 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 {
                     msg_Dbg( p_demux, "stream %d is of unknown type",
                              p_ogg->i_streams-1 );
-                    FREENULL( p_stream );
-                    p_ogg->i_streams--;
                 }
 
                 /* we'll need to get all headers */
