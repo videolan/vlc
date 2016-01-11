@@ -705,13 +705,16 @@ aviindex:
         {
             AVI_IndexCreate( p_demux );
         }
+        else if( p_sys->b_seekable )
+        {
+            AVI_IndexLoad( p_demux );
+        }
         else
         {
             msg_Warn( p_demux, "cannot create index (unseekable stream)" );
-            AVI_IndexLoad( p_demux );
         }
     }
-    else
+    else if( p_sys->b_seekable )
     {
         AVI_IndexLoad( p_demux );
     }
@@ -877,11 +880,8 @@ block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
     }
 
     /* skip header */
-    if( tk->i_idxposb == 0 )
-    {
-        p_frame->p_buffer += i_header;
-        p_frame->i_buffer -= i_header;
-    }
+    p_frame->p_buffer += i_header;
+    p_frame->i_buffer -= i_header;
 
     if ( !tk->i_width_bytes )
         return p_frame;
@@ -1181,7 +1181,14 @@ static int Demux_Seekable( demux_t *p_demux )
         }
         else
         {
-            stream_Seek( p_demux->s, i_pos );
+            if( !p_sys->b_fastseekable && (i_pos > stream_Tell( p_demux->s )) )
+            {
+                stream_Read( p_demux->s, NULL, i_pos - stream_Tell( p_demux->s ) );
+            }
+            else
+            {
+                stream_Seek( p_demux->s, i_pos );
+            }
         }
 
         /* Set the track to use */

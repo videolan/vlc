@@ -152,11 +152,10 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     if( p_container->common.i_chunk_fourcc == AVIFOURCC_LIST &&
         p_container->list.i_type == AVIFOURCC_movi )
     {
+        if( !b_seekable )
+            return VLC_SUCCESS;
         msg_Dbg( (vlc_object_t*)s, "skipping movi chunk" );
-        if( b_seekable )
-            return AVI_NextChunk( s, p_container );
-        else
-            return VLC_EGENERIC; /* point at begining of LIST-movi */
+        return AVI_NextChunk( s, p_container ); /* points at begining of LIST-movi if not seekable */
     }
 
     if( stream_Read( s, NULL, 12 ) != 12 )
