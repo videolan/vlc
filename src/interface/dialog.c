@@ -201,6 +201,7 @@ int dialog_Question (vlc_object_t *obj, const char *title, const char *fmt,
         dialog_question_t dialog = { title, text, yes, no, cancel, 0, };
         var_SetAddress (provider, "dialog-question", &dialog);
         answer = dialog.answer;
+        free (text);
     }
     va_end (ap);
     vlc_object_release (provider);
