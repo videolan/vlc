@@ -174,7 +174,11 @@ static int Open( vlc_object_t *p_this )
 # undef open
 #endif
 
-    vlc_UrlParse( &url, p_access->psz_url );
+    char *psz_decoded_url = vlc_uri_decode_duplicate( p_access->psz_url );
+    if( psz_decoded_url == NULL )
+        return VLC_ENOMEM;
+    vlc_UrlParse( &url, psz_decoded_url );
+    free( psz_decoded_url );
     vlc_credential_init( &credential, &url );
     psz_var_domain = var_InheritString( p_access, "smb-domain" );
     credential.psz_realm = psz_var_domain;
@@ -210,6 +214,7 @@ static int Open( vlc_object_t *p_this )
     vlc_credential_store( &credential );
     vlc_credential_clean( &credential );
     free(psz_var_domain);
+    vlc_UrlClean( &url );
 
     /* Init p_access */
     access_InitFields( p_access );
@@ -218,19 +223,17 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
     {
         free( psz_uri );
-        vlc_UrlClean( &url );
         return VLC_ENOMEM;
     }
-    p_sys->url = url;
 
     if( b_is_dir )
     {
 #ifdef _WIN32
         free( p_sys );
         free( psz_uri );
-        vlc_UrlClean( &p_sys->url );
         return VLC_EGENERIC;
 #else
+        vlc_UrlParse( &p_sys->url, p_access->psz_url );
         p_access->pf_readdir = DirRead;
         p_access->pf_control = DirControl;
         i_smb = smbc_opendir( psz_uri );
@@ -366,9 +369,17 @@ static input_item_t* DirRead (access_t *p_access )
             continue;
         }
 
-        if( smb_get_uri( p_access, &psz_uri, NULL, NULL, NULL,
-                         psz_server, psz_path, psz_name ) < 0 )
+        char *psz_encoded_name = NULL;
+        if( psz_name != NULL
+         && ( psz_encoded_name = vlc_uri_encode( psz_name ) ) == NULL )
             return NULL;
+        if( smb_get_uri( p_access, &psz_uri, NULL, NULL, NULL,
+                         psz_server, psz_path, psz_encoded_name ) < 0 )
+        {
+            free(psz_encoded_name);
+            return NULL;
+        }
+        free(psz_encoded_name);
 
         p_item = input_item_NewWithTypeExt( psz_uri, p_entry->name, 0, NULL,
                                             0, -1, i_type, 1 );
