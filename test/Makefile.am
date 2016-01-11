@@ -61,7 +61,7 @@ samples/meta.sample:
 	curl $(SAMPLES_SERVER)/metadata/id3tag/Wesh-Bonneville.mp3 > $@
 
 AM_CFLAGS = -DSRCDIR=\"$(srcdir)\"
-AM_LDFLAGS = -no-install -static
+AM_LDFLAGS = -no-install
 LIBVLCCORE = ../src/libvlccore.la
 LIBVLC = ../lib/libvlc.la
 
@@ -94,6 +94,7 @@ test_src_misc_bits_SOURCES = src/misc/bits.c
 test_src_misc_bits_LDADD = $(LIBVLC)
 test_modules_packetizer_hxxx_SOURCES = modules/packetizer/hxxx.c
 test_modules_packetizer_hxxx_LDADD = $(LIBVLC)
+test_modules_packetizer_hxxx_LDFLAGS = -no-install -static # WTF
 test_modules_keystore_SOURCES = modules/keystore/test.c
 test_modules_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_tls_SOURCES = modules/misc/tls.c
