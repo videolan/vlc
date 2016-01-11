@@ -101,6 +101,7 @@ static char *FromACP( const char *str )
 
 #define IGNORE_ES NAV_ES
 #define READ_LENGTH (25 * 1000) // 25ms
+#define READ_LENGTH_NONINTERLEAVED (CLOCK_FREQ * 3 / 2)
 
 //#define AVI_DEBUG
 
@@ -180,6 +181,7 @@ struct demux_sys_t
     bool  b_seekable;
     bool  b_fastseekable;
     bool  b_indexloaded; /* if we read indexes from end of file before starting */
+    mtime_t i_read_increment;
     uint32_t i_avih_flags;
     avi_chunk_t ck_root;
 
@@ -375,6 +377,12 @@ static int Open( vlc_object_t * p_this )
              p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
 
     p_sys->b_interleaved |= (p_avih->i_flags & AVIF_ISINTERLEAVED);
+
+    if( p_sys->b_interleaved && !p_sys->b_fastseekable )
+        p_sys->i_read_increment = READ_LENGTH;
+    else
+        p_sys->i_read_increment = READ_LENGTH_NONINTERLEAVED;
+    /* non seekable and non interleaved case ? well... */
 
     AVI_MetaLoad( p_demux, p_riff, p_avih );
     p_sys->i_avih_flags = p_avih->i_flags;
@@ -1003,7 +1011,7 @@ static int Demux_Seekable( demux_t *p_demux )
     {
         int64_t i_length = p_sys->i_length * CLOCK_FREQ;
 
-        p_sys->i_time += READ_LENGTH;
+        p_sys->i_time += p_sys->i_read_increment;
         if( i_length > 0 )
         {
             if( p_sys->i_time >= i_length )
@@ -1016,7 +1024,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
     /* wait for the good time */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
-    p_sys->i_time += READ_LENGTH;
+    p_sys->i_time += p_sys->i_read_increment;
 
     /* init toread */
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
@@ -1065,7 +1073,7 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             if( !toread[i].b_ok ||
                 ( p_sys->b_fastseekable && p_sys->b_interleaved &&
-                  AVI_GetDPTS( p_sys->track[i], toread[i].i_toread ) <= -READ_LENGTH ) )
+                  AVI_GetDPTS( p_sys->track[i], toread[i].i_toread ) <= -p_sys->i_read_increment ) )
             {
                 continue;
             }
@@ -1162,7 +1170,7 @@ static int Demux_Seekable( demux_t *p_demux )
                     avi_index_Append( &tk->idx, &p_sys->i_movi_lastchunk_pos, &index );
 
                     /* do we will read this data ? */
-                    if( AVI_GetDPTS( tk, toread[i_track].i_toread ) > -READ_LENGTH )
+                    if( AVI_GetDPTS( tk, toread[i_track].i_toread ) > -p_sys->i_read_increment )
                     {
                         break;
                     }
