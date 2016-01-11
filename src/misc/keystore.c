@@ -454,11 +454,6 @@ vlc_credential_store(vlc_credential *p_credential)
         }
         if (p_slash && psz_path != p_slash)
             *p_slash = '\0';
-        else
-        {
-            free(psz_path);
-            psz_path = NULL;
-        }
     }
 
     const char *ppsz_values[KEY_MAX] = { 0 };
