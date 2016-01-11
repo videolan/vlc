@@ -20,7 +20,7 @@ moc_verbose__0 = $(moc_verbose_0)
 .hpp.moc.cpp:
 	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $<
 
-libkwallet_plugin_la_SOURCES = keystore/kwallet.cpp keystore/kwallet.moc.cpp
+libkwallet_plugin_la_SOURCES = keystore/kwallet.cpp keystore/kwallet.hpp keystore/kwallet.moc.cpp
 libkwallet_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libkwallet_plugin_la_CXXFLAGS = $(KWALLET_CXXFLAGS)
 libkwallet_plugin_la_LIBADD = $(KWALLET_LIBS)
