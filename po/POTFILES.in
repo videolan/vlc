@@ -221,6 +221,7 @@ modules/access/mms/mmsh.h
 modules/access/mms/mmstu.c
 modules/access/mms/mmstu.h
 modules/access/mtp.c
+modules/access/nfs.c
 modules/access/oss.c
 modules/access_output/dummy.c
 modules/access_output/file.c
