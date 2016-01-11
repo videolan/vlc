@@ -365,6 +365,9 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
     {
         msg_Err(creds, "Certificate verification error: %s",
                 gnutls_strerror(val));
+error:
+        if (alp != NULL)
+            free(*alp);
         return -1;
     }
 
@@ -386,7 +389,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
     status &= ~GNUTLS_CERT_UNEXPECTED_OWNER; /* mismatched hostname */
 
     if (status != 0 || host == NULL)
-        return -1; /* Really bad certificate */
+        goto error; /* Really bad certificate */
 
     /* Look up mismatching certificate in store */
     const gnutls_datum_t *datum;
@@ -396,7 +399,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
     if (datum == NULL || count == 0)
     {
         msg_Err(creds, "Peer certificate not available");
-        return -1;
+        goto error;
     }
 
     msg_Dbg(creds, "%u certificate(s) in the list", count);
@@ -423,7 +426,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
         default:
             msg_Err(creds, "certificate key match error for %s: %s", host,
                     gnutls_strerror(val));
-            return -1;
+            goto error;
     }
 
     if (dialog_Question(creds, _("Insecure site"),
@@ -433,17 +436,17 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
           "If in doubt, abort now.\n"),
                         _("Abort"), _("View certificate"), NULL,
                         vlc_gettext(msg), host) != 2)
-        return -1;
+        goto error;
 
     gnutls_x509_crt_t cert;
 
     if (gnutls_x509_crt_init (&cert))
-        return -1;
+        goto error;
     if (gnutls_x509_crt_import (cert, datum, GNUTLS_X509_FMT_DER)
      || gnutls_x509_crt_print (cert, GNUTLS_CRT_PRINT_ONELINE, &desc))
     {
         gnutls_x509_crt_deinit (cert);
-        return -1;
+        goto error;
     }
     gnutls_x509_crt_deinit (cert);
 
@@ -466,9 +469,11 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
             if (val)
                 msg_Err(creds, "cannot store X.509 certificate: %s",
                          gnutls_strerror (val));
-            return 0;
+            break;
+        default:
+            goto error;
     }
-    return -1;
+    return 0;
 }
 
 /**
