@@ -98,8 +98,20 @@ static int AVI_NextChunk( stream_t *s, avi_chunk_t *p_chk )
             return VLC_EGENERIC;
         }
     }
-    return stream_Seek( s, p_chk->common.i_chunk_pos +
-                                 __EVEN( p_chk->common.i_chunk_size ) + 8 );
+
+    bool b_seekable = false;
+    uint64_t i_offset = p_chk->common.i_chunk_pos +
+                        __EVEN( p_chk->common.i_chunk_size ) + 8;
+    if ( !stream_Control(s, STREAM_CAN_SEEK, &b_seekable) && b_seekable )
+    {
+        return stream_Seek( s, i_offset );
+    }
+    else
+    {
+        ssize_t i_read = i_offset - stream_Tell( s );
+        return (i_read >=0 && stream_Read( s, NULL, i_read ) == i_read) ?
+                    VLC_SUCCESS : VLC_EGENERIC;
+    }
 }
 
 /****************************************************************************
