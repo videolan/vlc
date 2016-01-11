@@ -1007,11 +1007,11 @@ static int Demux_Seekable( demux_t *p_demux )
         if( i_length > 0 )
         {
             if( p_sys->i_time >= i_length )
-                return 0;
-            return 1;
+                return VLC_DEMUXER_EOF;
+            return VLC_DEMUXER_SUCCESS;
         }
         msg_Warn( p_demux, "no track selected, exiting..." );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     /* wait for the good time */
@@ -1089,10 +1089,10 @@ static int Demux_Seekable( demux_t *p_demux )
             for( i = 0; i < p_sys->i_track; i++ )
             {
                 if( toread[i].b_ok )
-                    return 1;
+                    return VLC_DEMUXER_SUCCESS;
             }
             msg_Warn( p_demux, "all tracks have failed, exiting..." );
-            return 0;
+            return VLC_DEMUXER_EOF;
         }
 
         if( i_pos == -1 )
@@ -1354,7 +1354,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
         else
         {
             msg_Warn( p_demux, "no more stream selected" );
-            return( 0 );
+            return VLC_DEMUXER_EOF;
         }
     }
 
@@ -1368,7 +1368,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
 
         if( AVI_PacketGetHeader( p_demux, &avi_pk ) )
         {
-            return( 0 );
+            return VLC_DEMUXER_EOF;
         }
 
         if( avi_pk.i_stream >= p_sys->i_track ||
@@ -1389,14 +1389,14 @@ static int Demux_UnSeekable( demux_t *p_demux )
                     {
                         return( !AVI_PacketNext( p_demux ) ? 1 : 0 );
                     }
-                    return( 0 );    /* eof */
+                    return VLC_DEMUXER_EOF;
                 default:
                     msg_Warn( p_demux,
                               "seems to have lost position @%ld, resync", stream_Tell(p_demux->s) );
                     if( AVI_PacketSearch( p_demux ) )
                     {
                         msg_Err( p_demux, "resync failed" );
-                        return( -1 );
+                        return VLC_DEMUXER_EGENERIC;
                     }
             }
         }
@@ -1411,7 +1411,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 block_t *p_frame = ReadFrame( p_demux, p_stream, 8, avi_pk.i_size + 8 ) ;
                 if( p_frame == NULL )
                 {
-                    return( -1 );
+                    return VLC_DEMUXER_EGENERIC;
                 }
                 p_frame->i_pts = VLC_TS_0 + AVI_GetPTS( p_stream );
 
@@ -1431,7 +1431,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
             {
                 if( AVI_PacketNext( p_demux ) )
                 {
-                    return( 0 );
+                    return VLC_DEMUXER_EOF;
                 }
             }
 
@@ -1453,7 +1453,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
 #undef p_stream
     }
 
-    return( 1 );
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
