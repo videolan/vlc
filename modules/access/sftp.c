@@ -212,6 +212,7 @@ static int Open( vlc_object_t* p_this )
 
     //TODO: ask for the available auth methods
 
+    bool b_stored = false;
     while( vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
                                _("SFTP authentication"),
                                _("Please enter a valid login and password for "
@@ -222,7 +223,7 @@ static int Open( vlc_object_t* p_this )
                                        credential.psz_username,
                                        credential.psz_password ) == 0 )
         {
-            vlc_credential_store( &credential );
+            b_stored = vlc_credential_store( &credential );
             break;
         }
         else
@@ -290,7 +291,7 @@ static int Open( vlc_object_t* p_this )
         {
             if( -1 == asprintf( &p_sys->psz_username_opt, "sftp-user=%s", credential.psz_username ) )
                 p_sys->psz_username_opt = NULL;
-            if( -1 == asprintf( &p_sys->psz_password_opt, "sftp-pwd=%s", credential.psz_password ) )
+            if( b_stored || -1 == asprintf( &p_sys->psz_password_opt, "sftp-pwd=%s", credential.psz_password ) )
                 p_sys->psz_password_opt = NULL;
         }
     }
