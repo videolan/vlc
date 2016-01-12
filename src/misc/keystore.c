@@ -274,6 +274,7 @@ credential_find_keystore(vlc_credential *p_credential)
         {
             p_credential->psz_password = (const char *)p_entry->p_secret;
             p_credential->psz_username = p_entry->ppsz_values[KEY_USER];
+            p_credential->b_from_keystore = true;
         }
     }
 }
@@ -323,6 +324,7 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
         return false;
     }
 
+    p_credential->b_from_keystore = false;
     /* Don't set username to NULL, we may want to use the last one set */
     p_credential->psz_password = NULL;
 
@@ -430,8 +432,9 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
 bool
 vlc_credential_store(vlc_credential *p_credential)
 {
-    if (!p_credential->p_keystore || !p_credential->b_store)
-        return false;
+    if (!p_credential->p_keystore || !p_credential->b_store
+     || p_credential->b_from_keystore)
+        return p_credential->b_from_keystore;
 
     const vlc_url_t *p_url = p_credential->p_url;
 

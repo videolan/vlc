@@ -185,6 +185,7 @@ struct vlc_credential
 
     char *psz_dialog_username;
     char *psz_dialog_password;
+    bool b_from_keystore;
     bool b_store;
 };
 
@@ -240,7 +241,8 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
  * This function will store the credential only if it comes from the dialog and
  * if the vlc_keystore object is valid.
  *
- * @return true if credential was stored, false otherwise
+ * @return true if the credential was stored or comes from the keystore, false
+ * otherwise
  */
 VLC_API bool
 vlc_credential_store(vlc_credential *p_credential);
