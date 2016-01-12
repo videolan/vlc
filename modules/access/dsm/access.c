@@ -548,10 +548,6 @@ static input_item_t *new_item( access_t *p_access, const char *psz_name,
     if( p_item == NULL )
         return NULL;
 
-    /* Don't store user/password when browsing share or if we are guest */
-    if( smb_session_is_guest( p_sys->p_session ) || p_sys->psz_share == NULL )
-        return p_item;
-
     /* Here we save on the node the credentials that allowed us to login.
      * That way the user isn't prompted more than once for credentials */
     if( p_sys->creds.login )
