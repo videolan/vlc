@@ -1407,16 +1407,11 @@ static void Disconnect( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_sys->p_tls != NULL)
-    {
-        vlc_tls_SessionDelete( p_sys->p_tls );
-        p_sys->p_tls = NULL;
-    }
-    if( p_sys->fd != -1)
-    {
+        vlc_tls_Close( p_sys->p_tls );
+    else if( p_sys->fd != -1)
         net_Close(p_sys->fd);
-        p_sys->fd = -1;
-    }
-
+    p_sys->p_tls = NULL;
+    p_sys->fd = -1;
 }
 
 /*****************************************************************************
