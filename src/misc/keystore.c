@@ -116,12 +116,7 @@ void
 vlc_keystore_release_entries(vlc_keystore_entry *p_entries, unsigned int i_count)
 {
     for (unsigned int i = 0; i < i_count; ++i)
-    {
-        vlc_keystore_entry *p_entry = &p_entries[i];
-        for (unsigned int j = 0; j < KEY_MAX; ++j)
-            free(p_entry->ppsz_values[j]);
-        free(p_entry->p_secret);
-    }
+        vlc_keystore_release_entry(&p_entries[i]);
     free(p_entries);
 }
 

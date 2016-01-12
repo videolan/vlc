@@ -267,6 +267,18 @@ vlc_keystore_entry_set_secret(vlc_keystore_entry *p_entry,
     return VLC_SUCCESS;
 }
 
+static inline void
+vlc_keystore_release_entry(vlc_keystore_entry *p_entry)
+{
+    for (unsigned int j = 0; j < KEY_MAX; ++j)
+    {
+        free(p_entry->ppsz_values[j]);
+        p_entry->ppsz_values[j] = NULL;
+    }
+    free(p_entry->p_secret);
+    p_entry->p_secret = NULL;
+}
+
 typedef struct vlc_keystore_sys vlc_keystore_sys;
 struct vlc_keystore
 {

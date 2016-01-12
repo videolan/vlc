@@ -360,15 +360,7 @@ Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
     vlc_keystore_entry *p_entry = list_get_entry(p_list, ppsz_values, NULL);
 
     if (p_entry)
-    {
-        free(p_entry->p_secret);
-        p_entry->p_secret = NULL;
-        for (unsigned int i = 0; i < KEY_MAX; ++i)
-        {
-            free(p_entry->ppsz_values[i]);
-            p_entry->ppsz_values[i] = NULL;
-        }
-    }
+        vlc_keystore_release_entry(p_entry);
     else
     {
         p_entry = list_new_entry(p_list);
@@ -441,8 +433,7 @@ Remove(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX])
 
     while ((p_entry = list_get_entry(p_list, ppsz_values, &i_index)))
     {
-        free(p_entry->p_secret);
-        p_entry->p_secret = NULL;
+        vlc_keystore_release_entry(p_entry);
         i_count++;
     }
 
