@@ -279,6 +279,7 @@ static void Close( vlc_object_t *p_this )
     else
 #endif
         smbc_close( p_sys->i_smb );
+    free( p_sys );
 }
 
 /*****************************************************************************
