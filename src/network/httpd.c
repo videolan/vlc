@@ -63,7 +63,7 @@
 #define HTTPD_CL_BUFSIZE 10000
 #endif
 
-static void httpd_ClientClean(httpd_client_t *cl);
+static void httpd_ClientDestroy(httpd_client_t *cl);
 static void httpd_AppendData(httpd_stream_t *stream, uint8_t *p_data, int i_data);
 
 /* each host run in his own thread */
@@ -1033,14 +1033,10 @@ void httpd_HostDelete(httpd_host_t *host)
         msg_Err(host, "url still registered: %s", host->url[i]->psz_url);
 
     for (int i = 0; i < host->i_client; i++) {
-        httpd_client_t *cl = host->client[i];
         msg_Warn(host, "client still connected");
-        httpd_ClientClean(cl);
-        TAB_REMOVE(host->i_client, host->client, cl);
-        free(cl);
-        i--;
-        /* TODO */
+        httpd_ClientDestroy(host->client[i]);
     }
+    TAB_CLEAN(host->i_client, host->client);
 
     vlc_tls_Delete(host->p_tls);
     net_ListenClose(host->fds);
@@ -1118,9 +1114,8 @@ void httpd_UrlDelete(httpd_url_t *url)
 
         /* TODO complete it */
         msg_Warn(host, "force closing connections");
-        httpd_ClientClean(client);
         TAB_REMOVE(host->i_client, host->client, client);
-        free(client);
+        httpd_ClientDestroy(client);
         i--;
     }
     free(url);
@@ -1221,20 +1216,18 @@ char* httpd_ServerIP(const httpd_client_t *cl, char *ip, int *port)
     return net_GetSockAddress(cl->fd, ip, port) ? NULL : ip;
 }
 
-static void httpd_ClientClean(httpd_client_t *cl)
+static void httpd_ClientDestroy(httpd_client_t *cl)
 {
-    if (cl->fd >= 0) {
-        if (cl->p_tls)
-            vlc_tls_SessionDelete(cl->p_tls);
+    if (cl->p_tls != NULL)
+        vlc_tls_Close(cl->p_tls);
+    else
         net_Close(cl->fd);
-        cl->fd = -1;
-    }
 
     httpd_MsgClean(&cl->answer);
     httpd_MsgClean(&cl->query);
 
     free(cl->p_buffer);
-    cl->p_buffer = NULL;
+    free(cl);
 }
 
 static httpd_client_t *httpd_ClientNew(int fd, vlc_tls_t *p_tls, mtime_t now)
@@ -1744,10 +1737,9 @@ static void httpdLoop(httpd_host_t *host)
                     (cl->i_state == HTTPD_CLIENT_DEAD ||
                       (cl->i_activity_timeout > 0 &&
                         cl->i_activity_date+cl->i_activity_timeout < now)))) {
-            httpd_ClientClean(cl);
             TAB_REMOVE(host->i_client, host->client, cl);
-            free(cl);
             i_client--;
+            httpd_ClientDestroy(cl);
             continue;
         }
 
