@@ -131,6 +131,7 @@ int intf_sys_t::connectChromecast(char *psz_ipChromecast)
 
     if (p_tls == NULL)
     {
+        net_Close(fd);
         vlc_tls_Delete(p_creds);
         return -1;
     }
@@ -146,7 +147,7 @@ void intf_sys_t::disconnectChromecast()
 {
     if (p_tls)
     {
-        vlc_tls_SessionDelete(p_tls);
+        vlc_tls_Close(p_tls);
         vlc_tls_Delete(p_creds);
         p_tls = NULL;
         setConnectionStatus(CHROMECAST_DISCONNECTED);
