@@ -130,8 +130,24 @@ static int gnutls_Error(vlc_tls_t *tls, int val)
     return -1;
 }
 
-static ssize_t vlc_gnutls_writev (gnutls_transport_ptr_t ptr,
-                                  const giovec_t *giov, int iovcnt)
+static ssize_t vlc_gnutls_read(gnutls_transport_ptr_t ptr, void *buf,
+                               size_t length)
+{
+    int fd = (intptr_t)ptr;
+    struct iovec iov = {
+        .iov_base = buf,
+        .iov_len = length,
+    };
+    struct msghdr msg = {
+        .msg_iov = &iov,
+        .msg_iovlen = 1,
+    };
+
+    return recvmsg(fd, &msg, 0);
+}
+
+static ssize_t vlc_gnutls_writev(gnutls_transport_ptr_t ptr,
+                                 const giovec_t *giov, int iovcnt)
 {
     if (unlikely((unsigned)iovcnt > IOV_MAX))
     {
@@ -297,8 +313,9 @@ static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
         free (protv);
     }
 
-    gnutls_transport_set_int (session, fd);
-    gnutls_transport_set_vec_push_function (session, vlc_gnutls_writev);
+    gnutls_transport_set_ptr(session, (void *)(intptr_t)fd);
+    gnutls_transport_set_vec_push_function(session, vlc_gnutls_writev);
+    gnutls_transport_set_pull_function(session, vlc_gnutls_read);
     tls->sys = session;
     tls->get_fd = gnutls_GetFD;
     tls->readv = gnutls_Recv;
