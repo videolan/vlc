@@ -131,13 +131,21 @@ void vlc_tls_Delete (vlc_tls_creds_t *crd)
 vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
                                   const char *host, const char *const *alpn)
 {
-    vlc_tls_t *session = malloc(sizeof (*session));
-    if (unlikely(session == NULL))
+    vlc_tls_t *sock = vlc_tls_SocketOpen(VLC_OBJECT(crd), fd);
+    if (unlikely(sock == NULL))
         return NULL;
 
-    session->obj = crd->p_parent;
+    vlc_tls_t *session = malloc(sizeof (*session));
+    if (unlikely(session == NULL))
+    {
+        vlc_tls_SessionDelete(sock);
+        return NULL;
+    }
 
-    int val = crd->open (crd, session, fd, host, alpn);
+    session->obj = crd->p_parent;
+    session->p = sock;
+
+    int val = crd->open(crd, session, sock, host, alpn);
     if (val != VLC_SUCCESS)
     {
         free(session);
@@ -148,11 +156,17 @@ vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
 
 void vlc_tls_SessionDelete (vlc_tls_t *session)
 {
-    int canc = vlc_savecancel();
-    session->close(session);
-    vlc_restorecancel(canc);
+    do
+    {
+        int canc = vlc_savecancel();
+        session->close(session);
+        vlc_restorecancel(canc);
 
-    free(session);
+        vlc_tls_t *sock = session->p;
+        free(session);
+        session = sock;
+    }
+    while (session != NULL);
 }
 
 static void cleanup_tls(void *data)
@@ -376,5 +390,6 @@ vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd)
     session->writev = vlc_tls_SocketWrite;
     session->shutdown = vlc_tls_SocketShutdown;
     session->close = vlc_tls_SocketClose;
+    session->p = NULL;
     return session;
 }

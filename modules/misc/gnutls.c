@@ -133,17 +133,13 @@ static int gnutls_Error(vlc_tls_t *tls, int val)
 static ssize_t vlc_gnutls_read(gnutls_transport_ptr_t ptr, void *buf,
                                size_t length)
 {
-    int fd = (intptr_t)ptr;
+    vlc_tls_t *sock = ptr;
     struct iovec iov = {
         .iov_base = buf,
         .iov_len = length,
     };
-    struct msghdr msg = {
-        .msg_iov = &iov,
-        .msg_iovlen = 1,
-    };
 
-    return recvmsg(fd, &msg, 0);
+    return sock->readv(sock, &iov, 1);
 }
 
 static ssize_t vlc_gnutls_writev(gnutls_transport_ptr_t ptr,
@@ -157,12 +153,8 @@ static ssize_t vlc_gnutls_writev(gnutls_transport_ptr_t ptr,
     if (unlikely(iovcnt == 0))
         return 0;
 
+    vlc_tls_t *sock = ptr;
     struct iovec iov[iovcnt];
-    struct msghdr msg = {
-        .msg_iov = iov,
-        .msg_iovlen = iovcnt,
-    };
-    int fd = (intptr_t)ptr;
 
     for (int i = 0; i < iovcnt; i++)
     {
@@ -170,14 +162,15 @@ static ssize_t vlc_gnutls_writev(gnutls_transport_ptr_t ptr,
         iov[i].iov_len = giov[i].iov_len;
     }
 
-    return sendmsg (fd, &msg, MSG_NOSIGNAL);
+    return sock->writev(sock, iov, iovcnt);
 }
 
 static int gnutls_GetFD(vlc_tls_t *tls)
 {
     gnutls_session_t session = tls->sys;
+    vlc_tls_t *sock = gnutls_transport_get_ptr(session);
 
-    return gnutls_transport_get_int(session);
+    return vlc_tls_GetFD(sock);
 }
 
 static ssize_t gnutls_Recv(vlc_tls_t *tls, struct iovec *iov, unsigned count)
@@ -253,8 +246,8 @@ static void gnutls_Close (vlc_tls_t *tls)
 }
 
 static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
-                              gnutls_certificate_credentials_t x509, int fd,
-                              const char *const *alpn)
+                              gnutls_certificate_credentials_t x509,
+                              vlc_tls_t *sock, const char *const *alpn)
 {
     gnutls_session_t session;
     const char *errp;
@@ -313,7 +306,7 @@ static int gnutls_SessionOpen(vlc_tls_creds_t *creds, vlc_tls_t *tls, int type,
         free (protv);
     }
 
-    gnutls_transport_set_ptr(session, (void *)(intptr_t)fd);
+    gnutls_transport_set_ptr(session, sock);
     gnutls_transport_set_vec_push_function(session, vlc_gnutls_writev);
     gnutls_transport_set_pull_function(session, vlc_gnutls_read);
     tls->sys = session;
@@ -389,11 +382,11 @@ done:
     return 0;
 }
 
-static int gnutls_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
-                                     int fd, const char *hostname,
-                                     const char *const *alpn)
+static int gnutls_ClientSessionOpen(vlc_tls_creds_t *crd, vlc_tls_t *tls,
+                                    vlc_tls_t *sk, const char *hostname,
+                                    const char *const *alpn)
 {
-    int val = gnutls_SessionOpen(crd, tls, GNUTLS_CLIENT, crd->sys, fd, alpn);
+    int val = gnutls_SessionOpen(crd, tls, GNUTLS_CLIENT, crd->sys, sk, alpn);
     if (val != VLC_SUCCESS)
         return val;
 
@@ -595,14 +588,14 @@ typedef struct vlc_tls_creds_sys
 /**
  * Initializes a server-side TLS session.
  */
-static int gnutls_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
-                                     int fd, const char *hostname,
-                                     const char *const *alpn)
+static int gnutls_ServerSessionOpen(vlc_tls_creds_t *crd, vlc_tls_t *tls,
+                                    vlc_tls_t *sock, const char *hostname,
+                                    const char *const *alpn)
 {
     vlc_tls_creds_sys_t *sys = crd->sys;
 
     assert (hostname == NULL);
-    return gnutls_SessionOpen(crd, tls, GNUTLS_SERVER, sys->x509_cred, fd,
+    return gnutls_SessionOpen(crd, tls, GNUTLS_SERVER, sys->x509_cred, sock,
                               alpn);
 }
 

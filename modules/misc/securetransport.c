@@ -89,7 +89,7 @@ typedef struct {
     SSLContextRef p_context;
     vlc_tls_creds_sys_t *p_cred;
     size_t i_send_buffered_bytes;
-    int i_fd;
+    vlc_tls_t *sock;
 
     bool b_blocking_send;
     bool b_handshaked;
@@ -127,15 +127,14 @@ static OSStatus st_SocketReadFunc (SSLConnectionRef connection,
 
     vlc_tls_t *session = (vlc_tls_t *)connection;
     vlc_tls_sys_t *sys = session->sys;
-
-    size_t bytesToGo = *dataLength;
-    size_t initLen = bytesToGo;
-    UInt8 *currData = (UInt8 *)data;
+    struct iovec iov = {
+        .iov_base = data,
+        .iov_len = *dataLength,
+    };
     OSStatus retValue = noErr;
-    ssize_t val;
 
-    for (;;) {
-        val = read(sys->i_fd, currData, bytesToGo);
+    while (iov.iov_len > 0) {
+        ssize_t val = sys->sock->readv(sys->sock, &iov, 1);
         if (val <= 0) {
             if (val == 0) {
                 msg_Dbg(session->obj, "found eof");
@@ -154,25 +153,20 @@ static OSStatus st_SocketReadFunc (SSLConnectionRef connection,
                         sys->b_blocking_send = false;
                         break;
                     default:
-                        msg_Err(session->obj, "try to read %d bytes, got error %d",
-                                (int)bytesToGo, errno);
+                        msg_Err(session->obj, "try to read %zu bytes, "
+                                "got error %d", iov.iov_len, errno);
                         retValue = ioErr;
                         break;
                 }
             }
             break;
-        } else {
-            bytesToGo -= val;
-            currData += val;
         }
 
-        if (bytesToGo == 0) {
-            /* filled buffer with incoming data, done */
-            break;
-        }
+        iov.iov_base = (char *)iov.iov_base + val;
+        iov.iov_len -= val;
     }
-    *dataLength = initLen - bytesToGo;
 
+    *dataLength -= iov.iov_len;
     return retValue;
 }
 
@@ -187,35 +181,39 @@ static OSStatus st_SocketWriteFunc (SSLConnectionRef connection,
 
     vlc_tls_t *session = (vlc_tls_t *)connection;
     vlc_tls_sys_t *sys = session->sys;
-
-    size_t bytesSent = 0;
-    size_t dataLen = *dataLength;
+    struct iovec iov = {
+        .iov_base = (void *)data,
+        .iov_len = *dataLength,
+    };
     OSStatus retValue = noErr;
-    ssize_t val;
 
-    do {
-        val = write(sys->i_fd, (char *)data + bytesSent, dataLen - bytesSent);
-    } while (val >= 0 && (bytesSent += val) < dataLen);
+    while (iov.iov_len > 0) {
+        ssize_t val = sys->sock->writev(sys->sock, &iov, 1);
+        if (val < 0) {
+            switch (errno) {
+                case EAGAIN:
+                    retValue = errSSLWouldBlock;
+                    sys->b_blocking_send = true;
+                    break;
 
-    if (val < 0) {
-        switch(errno) {
-            case EAGAIN:
-                retValue = errSSLWouldBlock;
-                sys->b_blocking_send = true;
-                break;
+                case EPIPE:
+                case ECONNRESET:
+                    retValue = errSSLClosedAbort;
+                    break;
 
-            case EPIPE:
-            case ECONNRESET:
-                retValue = errSSLClosedAbort;
-                break;
-
-            default:
-                msg_Err(session->obj, "error while writing: %d", errno);
-                retValue = ioErr;
+                default:
+                    msg_Err(session->obj, "error while writing: %d", errno);
+                    retValue = ioErr;
+                    break;
+            }
+            break;
         }
+
+        iov.iov_base = (char *)iov.iov_base + val;
+        iov.iov_len -= val;
     }
 
-    *dataLength = bytesSent;
+    *dataLength -= iov.iov_len;
     return retValue;
 }
 

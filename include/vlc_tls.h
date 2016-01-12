@@ -46,6 +46,8 @@ struct vlc_tls
     ssize_t (*writev)(struct vlc_tls *, const struct iovec *, unsigned);
     int (*shutdown)(struct vlc_tls *, bool duplex);
     void (*close)(struct vlc_tls *);
+
+    void *p;
 };
 
 /**
@@ -149,9 +151,9 @@ struct vlc_tls_creds
     module_t  *module;
     void *sys;
 
-    int (*open) (vlc_tls_creds_t *, vlc_tls_t *, int fd, const char *host,
-                 const char *const *alpn);
-    int  (*handshake)(vlc_tls_creds_t *, vlc_tls_t *, const char *host,
+    int (*open)(vlc_tls_creds_t *, vlc_tls_t *session, vlc_tls_t *sock,
+                const char *host, const char *const *alpn);
+    int  (*handshake)(vlc_tls_creds_t *, vlc_tls_t *session, const char *host,
                       const char *service, char ** /*restrict*/ alp);
 };
 
