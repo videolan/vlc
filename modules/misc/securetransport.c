@@ -386,7 +386,9 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
     vlc_tls_sys_t *sys = session->sys;
 
     OSStatus retValue = SSLHandshake(sys->p_context);
-    *alp = NULL;
+    if (alp != NULL) {
+        *alp = NULL;
+    }
 
     if (retValue == errSSLWouldBlock) {
         msg_Dbg(crd, "handshake is blocked, try again later");
