@@ -316,6 +316,7 @@ static int login( access_t *p_access )
     vlc_credential credential;
     char *psz_var_domain;
     const char *psz_login, *psz_password, *psz_domain;
+    bool b_guest = false;
 
     vlc_UrlParse( &url, p_access->psz_url );
     vlc_credential_init( &credential, &url );
@@ -329,6 +330,7 @@ static int login( access_t *p_access )
     {
         psz_login = "Guest";
         psz_password = "Guest";
+        b_guest = true;
     }
     else
     {
@@ -345,6 +347,7 @@ static int login( access_t *p_access )
                                    SMB_LOGIN_DIALOG_TITLE,
                                    SMB_LOGIN_DIALOG_TEXT, p_sys->netbios_name ) )
         {
+            b_guest = false;
             psz_login = credential.psz_username;
             psz_password = credential.psz_password;
             psz_domain = credential.psz_realm;
@@ -358,23 +361,23 @@ static int login( access_t *p_access )
         goto error;
     }
     else if( smb_session_is_guest( p_sys->p_session )  )
+    {
         msg_Warn( p_access, "Login failure but you were logged in as a Guest");
+        b_guest = true;
+    }
 
 success:
-    msg_Dbg( p_access, "Creds: username = '%s', domain = '%s'",
+    msg_Warn( p_access, "Creds: username = '%s', domain = '%s'",
              psz_login, psz_domain );
-    p_sys->creds.login = strdup(psz_login);
-    p_sys->creds.password = strdup(psz_password);
-    p_sys->creds.domain = strdup(psz_domain);
-    if (!p_sys->creds.login || !p_sys->creds.password || !p_sys->creds.domain)
+    if( p_sys->psz_share != NULL && !b_guest )
     {
-        free(p_sys->creds.login);
-        free(p_sys->creds.password);
-        free(p_sys->creds.domain);
-        p_sys->creds.login = p_sys->creds.password = p_sys->creds.domain = NULL;
-        goto error;
+        p_sys->creds.login = strdup(psz_login);
+        p_sys->creds.domain = strdup(psz_domain);
+
+        if( !vlc_credential_store( &credential ) )
+            p_sys->creds.password = strdup(psz_password);
     }
-    vlc_credential_store( &credential );
+
     i_ret = VLC_SUCCESS;
 error:
     vlc_credential_clean( &credential );
