@@ -115,7 +115,7 @@ vlc_tls_t *vlc_http_connect(vlc_object_t *obj, const char *name, unsigned port)
     if (fd == -1)
         return NULL;
 
-    vlc_tls_t *tls = vlc_tls_DummyCreate(obj, fd);
+    vlc_tls_t *tls = vlc_tls_SocketOpen(obj, fd);
     if (tls == NULL)
         net_Close(fd);
     return tls;

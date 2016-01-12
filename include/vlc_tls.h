@@ -194,14 +194,16 @@ static inline int vlc_tls_SessionHandshake (vlc_tls_creds_t *crd,
 VLC_API void vlc_tls_Delete (vlc_tls_creds_t *);
 
 /**
- * Fakes a TLS session.
+ * Creates a transport-layer stream from a socket.
  *
- * Creates a dummy TLS session structure from a socket file descriptor. Data
- * will be sent and received directly through the socket. This can be used
+ * Creates a transport-layer I/O stream from a socket file descriptor.
+ * Data will be sent and received directly through the socket. This can be used
  * either to share common code between non-TLS and TLS cases, or for testing
  * purposes.
+ *
+ * This function is not a cancellation point.
  */
-VLC_API vlc_tls_t *vlc_tls_DummyCreate(vlc_object_t *obj, int fd);
+VLC_API vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd);
 
 /** @} */
 

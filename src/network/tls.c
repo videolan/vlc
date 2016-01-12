@@ -317,13 +317,13 @@ error:
     return NULL;
 }
 
-static int vlc_tls_DummyGetFD(vlc_tls_t *tls)
+static int vlc_tls_SocketGetFD(vlc_tls_t *tls)
 {
     return (intptr_t)tls->sys;
 }
 
-static ssize_t vlc_tls_DummyReceive(vlc_tls_t *tls, struct iovec *iov,
-                                    unsigned count)
+static ssize_t vlc_tls_SocketRead(vlc_tls_t *tls, struct iovec *iov,
+                                  unsigned count)
 {
     int fd = (intptr_t)tls->sys;
     struct msghdr msg =
@@ -334,8 +334,8 @@ static ssize_t vlc_tls_DummyReceive(vlc_tls_t *tls, struct iovec *iov,
     return recvmsg(fd, &msg, 0);
 }
 
-static ssize_t vlc_tls_DummySend(vlc_tls_t *tls, const struct iovec *iov,
-                                 unsigned count)
+static ssize_t vlc_tls_SocketWrite(vlc_tls_t *tls, const struct iovec *iov,
+                                   unsigned count)
 {
     int fd = (intptr_t)tls->sys;
     const struct msghdr msg =
@@ -346,18 +346,24 @@ static ssize_t vlc_tls_DummySend(vlc_tls_t *tls, const struct iovec *iov,
     return sendmsg(fd, &msg, MSG_NOSIGNAL);
 }
 
-static int vlc_tls_DummyShutdown(vlc_tls_t *tls, bool duplex)
+static int vlc_tls_SocketShutdown(vlc_tls_t *tls, bool duplex)
 {
     int fd = (intptr_t)tls->sys;
     return shutdown(fd, duplex ? SHUT_RDWR : SHUT_WR);
 }
 
-static void vlc_tls_DummyClose(vlc_tls_t *tls)
+static void vlc_tls_SocketClose(vlc_tls_t *tls)
 {
+#if 0
+    int fd = (intptr_t)tls->sys;
+
+    net_Close(fd);
+#else
     (void) tls;
+#endif
 }
 
-vlc_tls_t *vlc_tls_DummyCreate(vlc_object_t *obj, int fd)
+vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd)
 {
     vlc_tls_t *session = malloc(sizeof (*session));
     if (unlikely(session == NULL))
@@ -365,10 +371,10 @@ vlc_tls_t *vlc_tls_DummyCreate(vlc_object_t *obj, int fd)
 
     session->obj = obj;
     session->sys = (void *)(intptr_t)fd;
-    session->get_fd = vlc_tls_DummyGetFD;
-    session->readv = vlc_tls_DummyReceive;
-    session->writev = vlc_tls_DummySend;
-    session->shutdown = vlc_tls_DummyShutdown;
-    session->close = vlc_tls_DummyClose;
+    session->get_fd = vlc_tls_SocketGetFD;
+    session->readv = vlc_tls_SocketRead;
+    session->writev = vlc_tls_SocketWrite;
+    session->shutdown = vlc_tls_SocketShutdown;
+    session->close = vlc_tls_SocketClose;
     return session;
 }
