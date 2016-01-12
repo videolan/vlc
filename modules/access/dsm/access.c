@@ -539,8 +539,11 @@ static input_item_t *new_item( access_t *p_access, const char *psz_name,
     char *psz_encoded_name = vlc_uri_encode( psz_name );
     if( psz_encoded_name == NULL )
         return NULL;
-    i_ret = asprintf( &psz_uri, "smb://%s/%s", p_access->psz_location,
-                      psz_encoded_name );
+    const char *psz_sep = p_access->psz_location[0] != '\0'
+        && p_access->psz_location[strlen(p_access->psz_location) -1] != '/'
+        ? "/" : "";
+    i_ret = asprintf( &psz_uri, "smb://%s%s%s", p_access->psz_location,
+                      psz_sep, psz_encoded_name );
     free( psz_encoded_name );
     if( i_ret == -1 )
         return NULL;
