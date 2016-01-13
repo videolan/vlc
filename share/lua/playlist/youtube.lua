@@ -268,8 +268,8 @@ function parse()
                 arturl = vlc.strings.resolve_xml_special_chars( arturl )
             end
 
-            if string.match(line, "\"author\":\"(.-)\",")    then
-                _,_,artist = string.find(line, "\"author\":\"(.-)\",")
+            if string.match(line, "\"author\": *\"(.-)\"")    then
+                _,_,artist = string.find(line, "\"author\": *\"(.-)\"")
             end
 
             -- JSON parameters, also formerly known as "swfConfig",
