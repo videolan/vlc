@@ -251,7 +251,7 @@ function parse()
             -- Try to find the video's title
             line = vlc.readline()
             if not line then break end
-            if string.match( line, "<meta name=\"title\"" ) then
+            if string.match( line, "<meta property=\"og:title\"" ) then
                 _,_,name = string.find( line, "content=\"(.-)\"" )
                 name = vlc.strings.resolve_xml_special_chars( name )
                 name = vlc.strings.resolve_xml_special_chars( name )
