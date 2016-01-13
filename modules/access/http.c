@@ -47,10 +47,6 @@
 #include <vlc_interrupt.h>
 #include <vlc_keystore.h>
 
-#ifdef HAVE_ZLIB_H
-#   include <zlib.h>
-#endif
-
 #include <assert.h>
 #include <limits.h>
 
@@ -153,14 +149,6 @@ struct access_sys_t
     char       *psz_location;
     bool b_mms;
     bool b_icecast;
-#ifdef HAVE_ZLIB_H
-    bool b_compressed;
-    struct
-    {
-        z_stream   stream;
-        uint8_t   *p_buffer;
-    } inflate;
-#endif
 
     bool b_chunked;
     int64_t    i_chunk;
@@ -187,7 +175,6 @@ struct access_sys_t
 
 /* */
 static ssize_t Read( access_t *, uint8_t *, size_t );
-static ssize_t ReadCompressed( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 
@@ -231,17 +218,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_username = NULL;
     p_sys->psz_password = NULL;
     p_sys->b_pace_control = true;
-#ifdef HAVE_ZLIB_H
-    p_sys->b_compressed = false;
-    memset( &p_sys->inflate.stream, 0, sizeof(p_sys->inflate.stream) );
-    /* 15 is the max windowBits, +32 to enable optional gzip decoding */
-    if( inflateInit2( &p_sys->inflate.stream, 32+15 ) != Z_OK )
-        msg_Warn( p_access, "Error during zlib initialisation: %s",
-                  p_sys->inflate.stream.msg );
-    if( zlibCompileFlags() & (1<<17) )
-        msg_Warn( p_access, "Your zlib was compiled without gzip support." );
-    p_sys->inflate.p_buffer = NULL;
-#endif
     p_sys->p_creds = NULL;
     p_sys->p_tls = NULL;
     p_sys->i_icy_meta = 0;
@@ -457,11 +433,7 @@ connect:
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
 
     /* Set up p_access */
-#ifdef HAVE_ZLIB_H
-    p_access->pf_read = ReadCompressed;
-#else
     p_access->pf_read = Read;
-#endif
     p_access->pf_control = Control;
     p_access->pf_seek = Seek;
 
@@ -485,9 +457,6 @@ error:
     Disconnect( p_access );
     vlc_tls_Delete( p_sys->p_creds );
 
-#ifdef HAVE_ZLIB_H
-    inflateEnd( &p_sys->inflate.stream );
-#endif
     free( p_sys );
     return ret;
 }
@@ -520,11 +489,6 @@ static void Close( vlc_object_t *p_this )
 
     Disconnect( p_access );
     vlc_tls_Delete( p_sys->p_creds );
-
-#ifdef HAVE_ZLIB_H
-    inflateEnd( &p_sys->inflate.stream );
-    free( p_sys->inflate.p_buffer );
-#endif
 
     free( p_sys );
 }
@@ -742,43 +706,6 @@ static int ReadICYMeta( access_t *p_access )
 
     return VLC_SUCCESS;
 }
-
-#ifdef HAVE_ZLIB_H
-static ssize_t ReadCompressed( access_t *p_access, uint8_t *p_buffer,
-                               size_t i_len )
-{
-    access_sys_t *p_sys = p_access->p_sys;
-
-    if( p_sys->b_compressed )
-    {
-        int i_ret;
-
-        if( !p_sys->inflate.p_buffer )
-            p_sys->inflate.p_buffer = malloc( 256 * 1024 );
-
-        if( p_sys->inflate.stream.avail_in == 0 )
-        {
-            ssize_t i_read = Read( p_access, p_sys->inflate.p_buffer, 256 * 1024 );
-            if( i_read <= 0 ) return i_read;
-            p_sys->inflate.stream.next_in = p_sys->inflate.p_buffer;
-            p_sys->inflate.stream.avail_in = i_read;
-        }
-
-        p_sys->inflate.stream.avail_out = i_len;
-        p_sys->inflate.stream.next_out = p_buffer;
-
-        i_ret = inflate( &p_sys->inflate.stream, Z_SYNC_FLUSH );
-        if ( i_ret != Z_OK && i_ret != Z_STREAM_END )
-            msg_Warn( p_access, "inflate return value: %d, %s", i_ret, p_sys->inflate.stream.msg );
-
-        return i_len - p_sys->inflate.stream.avail_out;
-    }
-    else
-    {
-        return Read( p_access, p_buffer, i_len );
-    }
-}
-#endif
 
 /*****************************************************************************
  * Seek: close and re-open a connection at the right place
@@ -1240,14 +1167,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
         else if( !strcasecmp( psz, "Content-Encoding" ) )
         {
             msg_Dbg( p_access, "Content-Encoding: %s", p );
-            if( !strcasecmp( p, "identity" ) )
-                ;
-#ifdef HAVE_ZLIB_H
-            else if( !strcasecmp( p, "gzip" ) || !strcasecmp( p, "deflate" ) )
-                p_sys->b_compressed = true;
-#endif
-            else
-                msg_Warn( p_access, "Unknown content coding: %s", p );
         }
         else if( !strcasecmp( psz, "Pragma" ) )
         {

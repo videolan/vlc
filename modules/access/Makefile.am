@@ -367,9 +367,6 @@ access_LTLIBRARIES += libftp_plugin.la
 
 libhttp_plugin_la_SOURCES = access/http.c
 libhttp_plugin_la_LIBADD = $(SOCKET_LIBS)
-if HAVE_ZLIB
-libhttp_plugin_la_LIBADD += -lz
-endif
 access_LTLIBRARIES += libhttp_plugin.la
 
 liblive555_plugin_la_SOURCES = access/live555.cpp access/mms/asf.c access/mms/buffer.c
