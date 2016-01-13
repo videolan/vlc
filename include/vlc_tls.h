@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_tls.h: Transport Layer Security API
  *****************************************************************************
- * Copyright (C) 2004-2011 Rémi Denis-Courmont
+ * Copyright (C) 2004-2016 Rémi Denis-Courmont
  * Copyright (C) 2005-2006 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -53,25 +53,33 @@ struct vlc_tls
 /**
  * Initiates a client TLS session.
  *
- * Performs client side of TLS handshake through a connected socket, and
- * establishes a secure channel. This is a blocking network operation and may
- * be a thread cancellation point.
+ * Initiates a Transport Layer Security (TLS) session as the client side, using
+ * trusted root CAs previously loaded with vlc_tls_ClientCreate().
  *
- * @param fd socket through which to establish the secure channel
+ * This is a blocking network operation and may be a thread cancellation point.
+ *
+ * @param creds X.509 credentials, i.e. set of root certificates of trusted
+ *              certificate authorities
+ * @param sock socket through which to establish the secure channel
  * @param hostname expected server name, used both as Server Name Indication
- *                 and as expected Common Name of the peer certificate
+ *                 and as expected Common Name of the peer certificate [IN]
  * @param service unique identifier for the service to connect to
- *                (only used locally for certificates database)
+ *                (only used locally for certificates database) [IN]
  * @param alpn NULL-terminated list of Application Layer Protocols
- *             to negotiate, or NULL to not negotiate protocols
+ *             to negotiate, or NULL to not negotiate protocols [IN]
  * @param alp storage space for the negotiated Application Layer
- *            Protocol or NULL if negotiation was not performed[OUT]
+ *            Protocol or NULL if negotiation was not performed [OUT]
+ *
+ * @note The credentials must remain valid until the session is finished.
  *
  * @return TLS session, or NULL on error.
  **/
-VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *, int fd,
-                                         const char *host, const char *service,
-                                         const char *const *alpn, char **alp);
+VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *creds,
+                                               vlc_tls_t *sock,
+                                               const char *host,
+                                               const char *service,
+                                               const char *const *alpn,
+                                               char **alp);
 
 /**
  * Creates a TLS server session.
@@ -223,6 +231,23 @@ VLC_API void vlc_tls_Delete (vlc_tls_creds_t *);
  * This function is not a cancellation point.
  */
 VLC_API vlc_tls_t *vlc_tls_SocketOpen(vlc_object_t *obj, int fd);
+
+VLC_DEPRECATED
+static inline vlc_tls_t *
+vlc_tls_ClientSessionCreateFD(vlc_tls_creds_t *crd, int fd, const char *host,
+                              const char *srv, const char *const *lp, char **p)
+{
+    vlc_tls_t *sock = vlc_tls_SocketOpen(VLC_OBJECT(crd), fd);
+    if (unlikely(sock == NULL))
+        return NULL;
+
+    vlc_tls_t *tls = vlc_tls_ClientSessionCreate(crd, sock, host, srv, lp, p);
+    if (unlikely(tls == NULL))
+        vlc_tls_SessionDelete(sock);
+    else
+        tls->p = sock;
+    return tls;
+}
 
 /** @} */
 

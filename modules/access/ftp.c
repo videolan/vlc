@@ -309,10 +309,10 @@ static int createCmdTLS( vlc_object_t *p_access, access_sys_t *p_sys, int fd,
                          const char *psz_session_name )
 {
     /* TLS/SSL handshake */
-    p_sys->cmd.p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds, fd,
-                                                    p_sys->url.psz_host,
-                                                    psz_session_name,
-                                                    NULL, NULL );
+    p_sys->cmd.p_tls = vlc_tls_ClientSessionCreateFD( p_sys->p_creds, fd,
+                                                      p_sys->url.psz_host,
+                                                      psz_session_name,
+                                                      NULL, NULL );
     if( p_sys->cmd.p_tls == NULL )
     {
         msg_Err( p_access, "cannot establish FTP/TLS session on command channel" );
@@ -1118,7 +1118,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     {
         /* FIXME: Do Reuse TLS Session */
         /* TLS/SSL handshake */
-        p_sys->data.p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds,
+        p_sys->data.p_tls = vlc_tls_ClientSessionCreateFD( p_sys->p_creds,
                             p_sys->data.fd, p_sys->url.psz_host,
                             ( p_sys->tlsmode == EXPLICIT ) ? "ftpes-data"
                                                            : "ftps-data",

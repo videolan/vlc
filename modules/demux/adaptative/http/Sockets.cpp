@@ -120,7 +120,7 @@ bool TLSSocket::connect(vlc_object_t *stream, const std::string &hostname, int p
         return false;
     }
 
-    tls = vlc_tls_ClientSessionCreate(creds, netfd, hostname.c_str(), "https", NULL, NULL);
+    tls = vlc_tls_ClientSessionCreateFD(creds, netfd, hostname.c_str(), "https", NULL, NULL);
     if(!tls)
     {
         disconnect();

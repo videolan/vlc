@@ -1,10 +1,8 @@
 /*****************************************************************************
  * tls.c
  *****************************************************************************
- * Copyright © 2004-2007 Rémi Denis-Courmont
+ * Copyright © 2004-2016 Rémi Denis-Courmont
  * $Id$
- *
- * Authors: Rémi Denis-Courmont <rem # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -128,23 +126,17 @@ void vlc_tls_Delete (vlc_tls_creds_t *crd)
 
 /*** TLS  session ***/
 
-static vlc_tls_t *vlc_tls_SessionCreate(vlc_tls_creds_t *crd, int fd,
+static vlc_tls_t *vlc_tls_SessionCreate(vlc_tls_creds_t *crd,
+                                        vlc_tls_t *sock,
                                         const char *host,
                                         const char *const *alpn)
 {
-    vlc_tls_t *sock = vlc_tls_SocketOpen(VLC_OBJECT(crd), fd);
-    if (unlikely(sock == NULL))
-        return NULL;
-
     vlc_tls_t *session = malloc(sizeof (*session));
     if (unlikely(session == NULL))
-    {
-        vlc_tls_SessionDelete(sock);
         return NULL;
-    }
 
     session->obj = crd->p_parent;
-    session->p = sock;
+    session->p = NULL;
 
     int canc = vlc_savecancel();
 
@@ -180,13 +172,14 @@ static void cleanup_tls(void *data)
     vlc_tls_SessionDelete (session);
 }
 
-vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
-                                        const char *host, const char *service,
-                                        const char *const *alpn, char **alp)
+#undef vlc_tls_ClientSessionCreate
+vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *crd, vlc_tls_t *sock,
+                                       const char *host, const char *service,
+                                       const char *const *alpn, char **alp)
 {
     int val;
 
-    vlc_tls_t *session = vlc_tls_SessionCreate(crd, fd, host, alpn);
+    vlc_tls_t *session = vlc_tls_SessionCreate(crd, sock, host, alpn);
     if (session == NULL)
         return NULL;
 
@@ -195,7 +188,7 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
     deadline += var_InheritInteger (crd, "ipv4-timeout") * 1000;
 
     struct pollfd ufd[1];
-    ufd[0].fd = fd;
+    ufd[0].fd = vlc_tls_GetFD(sock);
 
     vlc_cleanup_push (cleanup_tls, session);
     while ((val = crd->handshake(crd, session, host, service, alp)) != 0)
@@ -233,7 +226,16 @@ error:
 vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *crd, int fd,
                                        const char *const *alpn)
 {
-    return vlc_tls_SessionCreate(crd, fd, NULL, alpn);
+    vlc_tls_t *sock = vlc_tls_SocketOpen(VLC_OBJECT(crd), fd);
+    if (unlikely(sock == NULL))
+        return NULL;
+
+    vlc_tls_t *tls = vlc_tls_SessionCreate(crd, sock, NULL, alpn);
+    if (unlikely(tls == NULL))
+        vlc_tls_SessionDelete(sock);
+    else
+        tls->p = sock;
+    return tls;
 }
 
 ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)

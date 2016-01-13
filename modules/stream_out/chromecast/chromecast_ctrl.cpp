@@ -126,7 +126,7 @@ int intf_sys_t::connectChromecast(char *psz_ipChromecast)
         return -1;
     }
 
-    p_tls = vlc_tls_ClientSessionCreate(p_creds, fd, psz_ipChromecast,
+    p_tls = vlc_tls_ClientSessionCreateFD(p_creds, fd, psz_ipChromecast,
                                                "tcps", NULL, NULL);
 
     if (p_tls == NULL)

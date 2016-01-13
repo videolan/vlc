@@ -135,7 +135,7 @@ vlc_tls_t *vlc_https_connect(vlc_tls_creds_t *creds, const char *name,
     const char *alpn[] = { "h2", "http/1.1", NULL };
     char *alp;
 
-    vlc_tls_t *tls = vlc_tls_ClientSessionCreate(creds, fd, name, "https",
+    vlc_tls_t *tls = vlc_tls_ClientSessionCreateFD(creds, fd, name, "https",
                                                  alpn, &alp);
     if (tls == NULL)
     {
