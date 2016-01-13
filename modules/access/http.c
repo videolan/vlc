@@ -148,7 +148,6 @@ struct access_sys_t
 
     /* */
     int        i_code;
-    const char *psz_protocol;
 
     char       *psz_mime;
     char       *psz_location;
@@ -1097,27 +1096,22 @@ static int Request( access_t *p_access, uint64_t i_tell )
     }
     if( !strncmp( psz, "HTTP/1.", 7 ) )
     {
-        p_sys->psz_protocol = "HTTP";
         p_sys->i_code = atoi( &psz[9] );
+        msg_Dbg( p_access, "HTTP answer code %d", p_sys->i_code );
     }
     else if( !strncmp( psz, "ICY", 3 ) )
     {
-        p_sys->psz_protocol = "ICY";
         p_sys->i_code = atoi( &psz[4] );
+        msg_Dbg( p_access, "ICY answer code %d", p_sys->i_code );
         p_sys->b_icecast = true;
         p_sys->b_reconnect = true;
+        p_sys->b_seekable = false;
     }
     else
     {
         msg_Err( p_access, "invalid HTTP reply '%s'", psz );
         free( psz );
         goto error;
-    }
-    msg_Dbg( p_access, "protocol '%s' answer code %d",
-             p_sys->psz_protocol, p_sys->i_code );
-    if( !strcmp( p_sys->psz_protocol, "ICY" ) )
-    {
-        p_sys->b_seekable = false;
     }
     if( p_sys->i_code != 206 && p_sys->i_code != 401 )
     {
