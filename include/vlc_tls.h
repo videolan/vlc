@@ -168,10 +168,9 @@ VLC_API vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *);
 /**
  * Allocates server TLS credentials.
  *
- * @param cert required (Unicode) path to an x509 certificate,
- *             if NULL, anonymous key exchange will be used.
- * @param key (UTF-8) path to the PKCS private key for the certificate,
- *            if NULL; cert will be used.
+ * @param cert path to an x509 certificate (required)
+ * @param key path to the PKCS private key for the certificate,
+ *            or NULL to use cert path
  *
  * @return TLS credentials object, or NULL on error.
  */
