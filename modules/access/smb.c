@@ -252,8 +252,8 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_access, "open failed for '%s' (%s)",
                  p_access->psz_location, vlc_strerror_c(errno) );
-        free( p_sys );
         vlc_UrlClean( &p_sys->url );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
