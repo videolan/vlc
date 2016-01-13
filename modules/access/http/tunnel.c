@@ -82,23 +82,43 @@ static struct vlc_http_msg *vlc_http_tunnel_open(struct vlc_http_conn *conn,
     }
     return resp;
 }
-/* So far, this will only work with HTTP 1.1 over plain TCP as the TLS protocol
- * module can only use a socket file descriptor as I/O back-end. Consequently
- * neither TLS over TLS nor TLS over HTTP/2 framing are possible. */
-#define TLS_OVER_TLS 0
 
-#if !TLS_OVER_TLS
-static int vlc_http_tls_shutdown_ignore(vlc_tls_t *session, bool duplex)
+static int vlc_tls_ProxyGetFD(vlc_tls_t *tls)
 {
-    (void) session; (void) duplex;
-    return 0;
+    struct vlc_tls *sock = tls->sys;
+
+    return vlc_tls_GetFD(sock);
 }
 
-static void vlc_http_tls_close_ignore(vlc_tls_t *session)
+static ssize_t vlc_tls_ProxyRead(vlc_tls_t *tls, struct iovec *iov,
+                                 unsigned count)
 {
-    (void) session;
+    struct vlc_tls *sock = tls->sys;
+
+    return sock->readv(sock, iov, count);
 }
-#endif
+
+static ssize_t vlc_tls_ProxyWrite(vlc_tls_t *tls, const struct iovec *iov,
+                                  unsigned count)
+{
+    struct vlc_tls *sock = tls->sys;
+
+    return sock->writev(sock, iov, count);
+}
+
+static int vlc_tls_ProxyShutdown(vlc_tls_t *tls, bool duplex)
+{
+    struct vlc_tls *sock = tls->sys;
+
+    return vlc_tls_Shutdown(sock, duplex);
+}
+
+static void vlc_tls_ProxyClose(vlc_tls_t *tls)
+{
+    struct vlc_http_msg *msg = tls->p;
+
+    vlc_http_msg_destroy(msg); /* <- sock is destroyed there too */
+}
 
 vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
                                    const char *hostname, unsigned port,
@@ -122,29 +142,29 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
         return NULL;
     }
 
-    vlc_tls_t *session = NULL;
+    vlc_tls_t *sock = NULL;
     bool ptwo = false;
-#if TLS_OVER_TLS
     if (!strcasecmp(url.psz_protocol, "https"))
-        session = vlc_https_connect(creds, url.psz_host, url.i_port, &ptwo);
+        sock = vlc_https_connect(creds, url.psz_host, url.i_port, &ptwo);
     else
-#endif
     if (!strcasecmp(url.psz_protocol, "http"))
-        session = vlc_http_connect(creds ? creds->p_parent : NULL,
-                                   url.psz_host, url.i_port);
+        sock = vlc_http_connect(creds ? creds->p_parent : NULL,
+                                url.psz_host, url.i_port);
     else
-        session = NULL;
+        sock = NULL;
 
     vlc_UrlClean(&url);
 
-    if (session == NULL)
+    if (sock == NULL)
         return NULL;
 
-    struct vlc_http_conn *conn = ptwo ? vlc_h2_conn_create(session)
-                                      : vlc_h1_conn_create(session, false);
+    assert(!ptwo); /* HTTP/2 proxy not supported yet */
+
+    struct vlc_http_conn *conn = /*ptwo ? vlc_h2_conn_create(sock)
+                                      :*/ vlc_h1_conn_create(sock, false);
     if (unlikely(conn == NULL))
     {
-        vlc_tls_Close(session);
+        vlc_tls_Close(sock);
         return NULL;
     }
 
@@ -156,28 +176,35 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
     if (resp == NULL)
         return NULL;
 
+    struct vlc_tls *psock = malloc(sizeof (*proxy));
+    if (unlikely(psock == NULL))
+    {
+        vlc_http_msg_destroy(resp); /* <- sock is destroyed there too */
+        return NULL;
+    }
+
+    psock->obj = VLC_OBJECT(creds);
+    psock->sys = sock;
+    psock->get_fd = vlc_tls_ProxyGetFD;
+    psock->readv = vlc_tls_ProxyRead;
+    psock->writev = vlc_tls_ProxyWrite;
+    psock->shutdown = vlc_tls_ProxyShutdown;
+    psock->close = vlc_tls_ProxyClose;
+    psock->p = resp;
+
+    vlc_tls_t *tls;
     const char *alpn[] = { "h2", "http/1.1", NULL };
     char *alp;
-#if TLS_OVER_TLS
-# error ENOSYS
-    /* TODO: create a vlc_tls_t * from a struct vlc_http_msg *. */
-#else
-    int fd = vlc_tls_GetFD(session);
 
-    session->shutdown = vlc_http_tls_shutdown_ignore;
-    session->close = vlc_http_tls_close_ignore;
-    vlc_http_msg_destroy(resp); /* <- session is destroyed here */
-
-    session = vlc_tls_ClientSessionCreateFD(creds, fd, hostname, "https",
-                                          alpn + !*two, &alp);
-#endif
-    if (session == NULL)
+    tls = vlc_tls_ClientSessionCreate(creds, psock, hostname, "https",
+                                      alpn + !*two, &alp);
+    if (tls == NULL)
     {
-        net_Close(fd);
+        vlc_tls_Close(psock);
         return NULL;
     }
 
     *two = (alp != NULL) && !strcmp(alp, "h2");
     free(alp);
-    return session;
+    return tls;
 }
