@@ -168,8 +168,8 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
     session->close = vlc_http_tls_close_ignore;
     vlc_http_msg_destroy(resp); /* <- session is destroyed here */
 
-    session = vlc_tls_ClientSessionCreateFD(creds, fd, hostname, "https", alpn,
-                                          &alp);
+    session = vlc_tls_ClientSessionCreateFD(creds, fd, hostname, "https",
+                                          alpn + !*two, &alp);
 #endif
     if (session == NULL)
     {

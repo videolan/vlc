@@ -39,7 +39,7 @@ struct vlc_https_connecting
     vlc_tls_creds_t *creds;
     const char *host;
     unsigned port;
-    bool http2;
+    bool *http2;
     vlc_sem_t done;
 };
 
@@ -71,12 +71,12 @@ static void *vlc_https_connect_thread(void *data)
     char *proxy = vlc_https_proxy_find(c->host, c->port);
     if (proxy != NULL)
     {
-        tls = vlc_https_connect_proxy(c->creds, c->host, c->port, &c->http2,
+        tls = vlc_https_connect_proxy(c->creds, c->host, c->port, c->http2,
                                       proxy);
         free(proxy);
     }
     else
-        tls = vlc_https_connect(c->creds, c->host, c->port, &c->http2);
+        tls = vlc_https_connect(c->creds, c->host, c->port, c->http2);
     vlc_sem_post(&c->done);
     return tls;
 }
@@ -92,6 +92,7 @@ static vlc_tls_t *vlc_https_connect_i11e(vlc_tls_creds_t *creds,
     c.creds = creds;
     c.host = host;
     c.port = port;
+    c.http2 = http_two;
     vlc_sem_init(&c.done, 0);
 
     if (vlc_clone(&th, vlc_https_connect_thread, &c,
@@ -108,8 +109,6 @@ static vlc_tls_t *vlc_https_connect_i11e(vlc_tls_creds_t *creds,
 
     if (res == VLC_THREAD_CANCELED)
         res = NULL;
-    if (res != NULL)
-        *http_two = c.http2;
     return res;
 }
 
@@ -229,7 +228,7 @@ static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
     if (resp != NULL)
         return resp; /* existing connection reused */
 
-    bool http2;
+    bool http2 = true;
     vlc_tls_t *tls = vlc_https_connect_i11e(mgr->creds, host, port, &http2);
     if (tls == NULL)
         return NULL;

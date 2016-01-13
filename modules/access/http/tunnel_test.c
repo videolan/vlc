@@ -129,7 +129,7 @@ int main(void)
 {
     char *url;
     unsigned port;
-    bool two;
+    bool two = false;
 
     /* Test bad URLs */
     vlc_https_connect_proxy(NULL, "www.example.com", 0, &two,
