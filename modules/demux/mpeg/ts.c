@@ -2279,7 +2279,10 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 block_Release( p_block );
                 p_block = NULL;
             }
-            p_block = J2K_Parse( p_demux, p_block, pid->u.p_pes->es.b_interlaced );
+            else
+            {
+                p_block = J2K_Parse( p_demux, p_block, pid->u.p_pes->es.b_interlaced );
+            }
             if( !p_block )
                 return;
         }
