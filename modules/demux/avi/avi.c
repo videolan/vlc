@@ -1346,7 +1346,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 p_stream_master = tk;
                 break;
             }
-            else if( !tk )
+            else if( !p_stream_master )
             {
                 p_stream_master = tk;
             }
