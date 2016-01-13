@@ -128,8 +128,9 @@ void vlc_tls_Delete (vlc_tls_creds_t *crd)
 
 /*** TLS  session ***/
 
-vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
-                                  const char *host, const char *const *alpn)
+static vlc_tls_t *vlc_tls_SessionCreate(vlc_tls_creds_t *crd, int fd,
+                                        const char *host,
+                                        const char *const *alpn)
 {
     vlc_tls_t *sock = vlc_tls_SocketOpen(VLC_OBJECT(crd), fd);
     if (unlikely(sock == NULL))
@@ -145,12 +146,15 @@ vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
     session->obj = crd->p_parent;
     session->p = sock;
 
-    int val = crd->open(crd, session, sock, host, alpn);
-    if (val != VLC_SUCCESS)
+    int canc = vlc_savecancel();
+
+    if (crd->open(crd, session, sock, host, alpn) != VLC_SUCCESS)
     {
         free(session);
-        session= NULL;
+        session = NULL;
     }
+
+    vlc_restorecancel(canc);
     return session;
 }
 
@@ -180,17 +184,13 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
                                         const char *host, const char *service,
                                         const char *const *alpn, char **alp)
 {
-    vlc_tls_t *session;
-    int canc, val;
+    int val;
 
-    canc = vlc_savecancel();
-    session = vlc_tls_SessionCreate (crd, fd, host, alpn);
+    vlc_tls_t *session = vlc_tls_SessionCreate(crd, fd, host, alpn);
     if (session == NULL)
-    {
-        vlc_restorecancel(canc);
         return NULL;
-    }
 
+    int canc = vlc_savecancel();
     mtime_t deadline = mdate ();
     deadline += var_InheritInteger (crd, "ipv4-timeout") * 1000;
 
@@ -228,6 +228,12 @@ error:
     vlc_cleanup_pop();
     vlc_restorecancel(canc);
     return session;
+}
+
+vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *crd, int fd,
+                                       const char *const *alpn)
+{
+    return vlc_tls_SessionCreate(crd, fd, NULL, alpn);
 }
 
 ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)

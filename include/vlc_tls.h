@@ -73,9 +73,27 @@ VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *, int fd,
                                          const char *host, const char *service,
                                          const char *const *alpn, char **alp);
 
-VLC_API vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *, int fd,
-                                          const char *host,
-                                          const char *const *alpn);
+/**
+ * Creates a TLS server session.
+ *
+ * Allocates a Transport Layer Security (TLS) session as the server side, using
+ * cryptographic keys pair and X.509 certificates chain already loaded with
+ * vlc_tls_ServerCreate().
+ *
+ * Unlike vlc_tls_ClientSessionCreate(), this function does not perform any
+ * actual network I/O. vlc_tls_SessionHandshake() must be used to perform the
+ * TLS handshake before sending and receiving data through the TLS session.
+ *
+ * This function is non-blocking and is not a cancellation point.
+ *
+ * @param creds server credentials, i.e. keys pair and X.509 certificates chain
+ * @param alpn NULL-terminated list of Application Layer Protocols
+ *             to negotiate, or NULL to not negotiate protocols
+ *
+ * @return TLS session, or NULL on error.
+ */
+VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds, int fd,
+                                               const char *const *alpn);
 
 /**
  * Destroys a TLS session down.
