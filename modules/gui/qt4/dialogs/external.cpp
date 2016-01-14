@@ -111,6 +111,8 @@ void DialogHandler::requestLogin (void *value)
     grid->addWidget (new QLabel (qfu(data->message)), 0, 0, 1, 2);
 
     QLineEdit *userLine = new QLineEdit;
+    if (data->default_username != NULL)
+        userLine->setText(qtr(data->default_username));
     grid->addWidget (new QLabel (qtr("Username")), 1, 0);
     grid->addWidget (userLine, 1, 1);
 
@@ -130,6 +132,10 @@ void DialogHandler::requestLogin (void *value)
 
     panel->setLayout (grid);
     layout->addWidget (panel);
+
+    /* focus on passLine if the username is already set */
+    if (data->default_username != NULL)
+        passLine->setFocus();
 
     /* OK, Cancel buttons */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
