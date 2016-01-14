@@ -454,12 +454,13 @@ CleanUp(vlc_keystore_sys *p_sys)
     {
         if (p_sys->b_error)
         {
-            if (truncate0(p_sys->i_fd))
+            if (p_sys->i_fd != -1 && truncate0(p_sys->i_fd))
                 vlc_unlink(p_sys->psz_file);
         }
 
 #ifdef HAVE_FLOCK
-        flock(p_sys->i_fd, LOCK_UN);
+        if (p_sys->i_fd != -1)
+            flock(p_sys->i_fd, LOCK_UN);
 #endif
         fclose(p_sys->p_file);
     }
@@ -493,14 +494,16 @@ Open(vlc_object_t *p_this)
 
         p_sys->psz_file = psz_file;
         p_sys->p_file = vlc_fopen(p_sys->psz_file, "a+");
+        p_sys->i_fd = -1;
 
         if (!p_sys->p_file)
         {
             CleanUp(p_sys);
             return VLC_EGENERIC;
         }
-        p_sys->i_fd = fileno(p_sys->p_file);
-        if (p_sys->i_fd == -1)
+
+        int i_fd = fileno(p_sys->p_file);
+        if (i_fd == -1)
         {
             CleanUp(p_sys);
             return VLC_EGENERIC;
@@ -510,12 +513,13 @@ Open(vlc_object_t *p_this)
          * If HAVE_FLOCK is not defined, the running OS is most likely Windows
          * and a lock was already acquired when the file was opened. */
 #ifdef HAVE_FLOCK
-        if (flock(p_sys->i_fd, LOCK_EX|LOCK_NB) != 0)
+        if (flock(i_fd, LOCK_EX|LOCK_NB) != 0)
         {
             CleanUp(p_sys);
             return VLC_EGENERIC;
         }
 #endif
+        p_sys->i_fd = i_fd;
 
         if (list_read(p_sys, &p_sys->list) != VLC_SUCCESS)
         {
