@@ -286,7 +286,7 @@ int OpenDemux( vlc_object_t *p_this )
     p_sys->p_title = NULL;
 
     /* Create I/O wrapper */
-    unsigned char * p_io_buffer = malloc( AVFORMAT_IOBUFFER_SIZE );
+    unsigned char * p_io_buffer = av_malloc( AVFORMAT_IOBUFFER_SIZE );
     if( !p_io_buffer )
     {
         free( psz_url );
@@ -297,7 +297,7 @@ int OpenDemux( vlc_object_t *p_this )
     p_sys->ic = avformat_alloc_context();
     if( !p_sys->ic )
     {
-        free( p_io_buffer );
+        av_free( p_io_buffer );
         free( psz_url );
         CloseDemux( p_this );
         return VLC_ENOMEM;
@@ -307,7 +307,7 @@ int OpenDemux( vlc_object_t *p_this )
         AVFORMAT_IOBUFFER_SIZE, 0, p_demux, IORead, NULL, IOSeek );
     if( !pb )
     {
-        free( p_io_buffer );
+        av_free( p_io_buffer );
         free( psz_url );
         CloseDemux( p_this );
         return VLC_ENOMEM;
