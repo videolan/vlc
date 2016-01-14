@@ -23,6 +23,6 @@ endif
 
 .protobuf: protobuf
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-protoc=protoc
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-protoc="$(PROTOC)"
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
