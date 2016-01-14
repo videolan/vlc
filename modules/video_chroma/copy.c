@@ -103,7 +103,7 @@ static void CopyFromUswc(uint8_t *dst, size_t dst_pitch,
                          unsigned width, unsigned height,
                          unsigned cpu)
 {
-#ifndef CAN_COMPILE_SSSE3
+#if defined (__SSE4_1__) || !defined(CAN_COMPILE_SSSE3)
     VLC_UNUSED(cpu);
 #endif
     assert(((intptr_t)dst & 0x0f) == 0 && (dst_pitch & 0x0f) == 0);
@@ -179,7 +179,7 @@ static void SSE_SplitUV(uint8_t *dstu, size_t dstu_pitch,
                         const uint8_t *src, size_t src_pitch,
                         unsigned width, unsigned height, unsigned cpu)
 {
-#ifndef CAN_COMPILE_SSSE3
+#if defined(__SSSE3__) || !defined (CAN_COMPILE_SSSE3)
     VLC_UNUSED(cpu);
 #endif
     const uint8_t shuffle[] = { 0, 2, 4, 6, 8, 10, 12, 14,
