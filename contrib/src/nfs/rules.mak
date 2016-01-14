@@ -23,6 +23,6 @@ nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 
 .nfs: nfs
 	cd $< && ./bootstrap
-	cd $< && $(HOSTVARS) ./configure --disable-examples $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure --disable-examples --disable-utils $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
