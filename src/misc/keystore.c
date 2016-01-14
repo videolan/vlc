@@ -399,7 +399,8 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
                 return false;
             }
             va_end(ap);
-            dialog_Login(p_parent, &p_credential->psz_dialog_username,
+            dialog_Login(p_parent, p_credential->psz_username,
+                         &p_credential->psz_dialog_username,
                          &p_credential->psz_dialog_password,
                          p_credential->p_keystore ? &p_credential->b_store : NULL,
                          psz_dialog_title, psz_dialog_text);

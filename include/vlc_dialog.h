@@ -72,15 +72,16 @@ typedef struct dialog_login_t
 {
     const char *title;
     const char *message;
+    const char *default_username;
     char **username;
     char **password;
     /* if store is NULL, password can't be stored (there is no keystore) */
     bool *store;
 } dialog_login_t;
 
-VLC_API void dialog_Login(vlc_object_t *, char **, char **, bool *, const char *, const char *, ...) VLC_FORMAT (6, 7);
-#define dialog_Login(o, u, p, s, t, ...) \
-        dialog_Login(VLC_OBJECT(o), u, p, s, t, __VA_ARGS__)
+VLC_API void dialog_Login(vlc_object_t *, const char *, char **, char **, bool *, const char *, const char *, ...) VLC_FORMAT (7, 8);
+#define dialog_Login(o, u, p, s, t, v, ...) \
+        dialog_Login(VLC_OBJECT(o), u, p, s, t, v, __VA_ARGS__)
 
 /**
  * A question dialog.

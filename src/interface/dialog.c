@@ -141,7 +141,8 @@ void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
  * into the username resp password pointer. Those must be freed with free().
  * Otherwise *username resp *password will be NULL.
  */
-void dialog_Login (vlc_object_t *obj, char **username, char **password,
+void dialog_Login (vlc_object_t *obj, const char *default_username,
+                   char **username, char **password,
                    bool *store, const char *title, const char *fmt, ...)
 {
     assert ((username != NULL) && (password != NULL));
@@ -160,7 +161,8 @@ void dialog_Login (vlc_object_t *obj, char **username, char **password,
     va_start (ap, fmt);
     if (vasprintf (&text, fmt, ap) != -1)
     {
-        dialog_login_t dialog = { title, text, username, password, store };
+        dialog_login_t dialog = { title, text, default_username, username,
+                                  password, store };
         var_SetAddress (provider, "dialog-login", &dialog);
         free (text);
     }
