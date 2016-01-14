@@ -425,8 +425,9 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
 static int st_GetFD (vlc_tls_t *session)
 {
     vlc_tls_sys_t *sys = session->sys;
+    vlc_tls_t *sock = sys->sock;
 
-    return sys->i_fd;
+    return vlc_tls_GetFD(sock);
 }
 
 /**
@@ -479,7 +480,7 @@ static ssize_t st_Send (vlc_tls_t *session, const struct iovec *iov,
                        &actualSize);
 
         if (ret == errSSLWouldBlock) {
-            sys->i_send_buffered_bytes = length;
+            sys->i_send_buffered_bytes = iov->iov_len;
             errno = againErr;
             return -1;
         }
@@ -559,25 +560,26 @@ static void st_SessionClose (vlc_tls_t *session) {
  * Initializes a client-side TLS session.
  */
 
-static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
-                                 int fd, bool b_server) {
-
+static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *tls,
+                                 vlc_tls_t *sock, bool b_server)
+{
     vlc_tls_sys_t *sys = malloc(sizeof(vlc_tls_sys_t));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
     sys->p_cred = crd->sys;
-    sys->i_fd = fd;
     sys->b_handshaked = false;
     sys->b_blocking_send = false;
     sys->i_send_buffered_bytes = 0;
     sys->p_context = NULL;
+    sys->sock = sock;
 
-    session->sys = sys;
-    session->readv = st_Recv;
-    session->writev = st_Send;
-    session->shutdown = st_SessionShutdown;
-    session->close = st_SessionClose;
+    tls->sys = sys;
+    tls->get_fd = st_GetFD;
+    tls->readv = st_Recv;
+    tls->writev = st_Send;
+    tls->shutdown = st_SessionShutdown;
+    tls->close = st_SessionClose;
     crd->handshake = st_Handshake;
 
     SSLContextRef p_context = NULL;
@@ -602,7 +604,7 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
         return -1;
     }
 
-    ret = SSLSetConnection(p_context, session);
+    ret = SSLSetConnection(p_context, tls);
     if (ret != noErr) {
         msg_Err(crd, "cannot set connection");
         return -1;
@@ -611,17 +613,18 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *session,
     return 0;
 }
 
-static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
-                                     int fd, const char *hostname, const char *const *alpn) {
+static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
+                                 vlc_tls_t *sock, const char *hostname,
+                                 const char *const *alpn) {
     VLC_UNUSED(alpn);
     msg_Dbg(crd, "open TLS session for %s", hostname);
 
-    int ret = st_SessionOpenCommon(crd, session, fd, false);
+    int ret = st_SessionOpenCommon(crd, tls, sock, false);
     if (ret != noErr) {
         goto error;
     }
 
-    vlc_tls_sys_t *sys = session->sys;
+    vlc_tls_sys_t *sys = tls->sys;
     sys->b_server_mode = false;
 
     ret = SSLSetPeerDomainName(sys->p_context, hostname, strlen(hostname));
@@ -651,8 +654,8 @@ static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
     return VLC_SUCCESS;
 
 error:
-    st_SessionShutdown(session, true);
-    st_SessionClose(session);
+    st_SessionShutdown(tls, true);
+    st_SessionClose(tls);
     return VLC_EGENERIC;
 }
 
@@ -693,14 +696,14 @@ static void CloseClient (vlc_tls_creds_t *crd) {
 /**
  * Initializes a server-side TLS session.
  */
-static int st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *session,
-                                 int fd, const char *hostname, const char *const *alpn) {
+static int st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
+                                 vlc_tls_t *sock, const char *hostname, const char *const *alpn) {
 
     VLC_UNUSED(hostname);
     VLC_UNUSED(alpn);
     msg_Dbg(crd, "open TLS server session");
 
-    int ret = st_SessionOpenCommon(crd, session, fd, true);
+    int ret = st_SessionOpenCommon(crd, tls, sock, true);
     if (ret != noErr) {
         goto error;
     }
