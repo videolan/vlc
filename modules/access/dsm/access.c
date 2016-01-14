@@ -102,11 +102,13 @@ struct access_sys_t
 {
     netbios_ns         *p_ns;               /**< Netbios name service */
     smb_session        *p_session;          /**< bdsm SMB Session object */
-    smb_creds           creds;              /**< Credentials used to connect */
 
     vlc_url_t           url;
     char               *psz_share;
     char               *psz_path;
+    char               *psz_user_opt;
+    char               *psz_pwd_opt;
+    char               *psz_domain_opt;
 
     char                netbios_name[16];
     struct in_addr      addr;
@@ -216,9 +218,9 @@ static void Close( vlc_object_t *p_this )
         smb_share_list_destroy( p_sys->shares );
     if( p_sys->files )
         smb_stat_list_destroy( p_sys->files );
-    free( p_sys->creds.login );
-    free( p_sys->creds.password );
-    free( p_sys->creds.domain );
+    free( p_sys->psz_user_opt );
+    free( p_sys->psz_pwd_opt );
+    free( p_sys->psz_domain_opt );
     free( p_sys->psz_share );
     free( p_sys->psz_path );
     free( p_sys );
@@ -371,11 +373,14 @@ success:
              psz_login, psz_domain );
     if( p_sys->psz_share != NULL && !b_guest )
     {
-        p_sys->creds.login = strdup(psz_login);
-        p_sys->creds.domain = strdup(psz_domain);
+        if( asprintf( &p_sys->psz_user_opt, "smb-user=%s", psz_login ) == -1 )
+            p_sys->psz_user_opt = NULL;
+        if( asprintf( &p_sys->psz_domain_opt, "smb-domain=%s", psz_domain ) == -1 )
+            p_sys->psz_domain_opt = NULL;
 
-        if( !vlc_credential_store( &credential ) )
-            p_sys->creds.password = strdup(psz_password);
+        if( !vlc_credential_store( &credential )
+         && asprintf( &p_sys->psz_pwd_opt, "smb-pwd=%s", psz_password ) == -1 )
+            p_sys->psz_pwd_opt = NULL;
     }
 
     i_ret = VLC_SUCCESS;
@@ -533,7 +538,7 @@ static input_item_t *new_item( access_t *p_access, const char *psz_name,
 {
     access_sys_t *p_sys = p_access->p_sys;
     input_item_t *p_item;
-    char         *psz_uri, *psz_option = NULL;
+    char         *psz_uri;
     int           i_ret;
 
     char *psz_encoded_name = vlc_uri_encode( psz_name );
@@ -556,39 +561,17 @@ static input_item_t *new_item( access_t *p_access, const char *psz_name,
 
     /* Here we save on the node the credentials that allowed us to login.
      * That way the user isn't prompted more than once for credentials */
-    if( p_sys->creds.login )
-    {
-        i_ret = asprintf( &psz_option, "smb-user=%s", p_sys->creds.login );
-        if( i_ret == -1 )
-            goto bailout;
-        input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
-        free( psz_option );
-    }
-
-    if( p_sys->creds.password )
-    {
-        i_ret = asprintf( &psz_option, "smb-pwd=%s", p_sys->creds.password );
-        if( i_ret == -1 )
-            goto bailout;
-        input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
-        free( psz_option );
-    }
-
-    if( p_sys->creds.domain )
-    {
-        i_ret = asprintf( &psz_option, "smb-domain=%s", p_sys->creds.domain );
-        if( i_ret == -1 )
-            goto bailout;
-        input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
-        free( psz_option );
-    }
+    if( p_sys->psz_user_opt != NULL )
+        input_item_AddOption( p_item, p_sys->psz_user_opt,
+                              VLC_INPUT_OPTION_TRUSTED );
+    if( p_sys->psz_pwd_opt != NULL )
+        input_item_AddOption( p_item, p_sys->psz_pwd_opt,
+                              VLC_INPUT_OPTION_TRUSTED );
+    if( p_sys->psz_domain_opt != NULL )
+        input_item_AddOption( p_item, p_sys->psz_domain_opt,
+                              VLC_INPUT_OPTION_TRUSTED );
 
     return p_item;
-bailout:
-    if( p_item )
-        input_item_Release( p_item );
-    free( psz_option );
-    return NULL;
 }
 
 static input_item_t* BrowseShare( access_t *p_access )
