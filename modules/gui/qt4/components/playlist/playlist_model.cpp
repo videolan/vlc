@@ -785,7 +785,7 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
     msg_Dbg( p_intf, "Sorting by column %i, order %i", column, order );
 
     int meta = columnToMeta( column );
-    if( meta == COLUMN_END ) return;
+    if( meta == COLUMN_END || meta == COLUMN_COVER ) return;
 
     PLItem *item = ( rootIndex.isValid() ) ? getItem( rootIndex )
                                            : rootItem;
