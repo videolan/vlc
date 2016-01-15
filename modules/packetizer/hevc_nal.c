@@ -364,7 +364,7 @@ uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
         return NULL;
 
     if( pi_nal_length_size )
-        *pi_nal_length_size = (p_buf[21] & 0x03) + 1;
+        *pi_nal_length_size = hevc_getNALLengthSize( p_buf );
 
     uint8_t *p_ret;
     uint8_t *p_out_buf = p_ret = malloc( *pi_result );
@@ -504,7 +504,7 @@ bool hevc_get_xps_id(const uint8_t *p_buf, size_t i_buf, uint8_t *pi_id)
     if(unlikely(!hxxx_strip_AnnexB_startcode(&p_buf, &i_buf) || i_buf < 3))
         return false;
     /* No need to lookup convert from emulation for that data */
-    uint8_t i_nal_type = ((p_buf[0] & 0x7E) >> 1);
+    uint8_t i_nal_type = hevc_getNALType(p_buf);
     bs_t bs;
     bs_init(&bs, &p_buf[2], i_buf - 2);
     if(i_nal_type == HEVC_NAL_PPS)
@@ -1114,7 +1114,7 @@ hevc_slice_segment_header_t * hevc_decode_slice_header( const uint8_t *p_buf, si
     hevc_slice_segment_header_t *p_sh = calloc(1, sizeof(hevc_slice_segment_header_t));
     if(likely(p_sh))
     {
-        uint8_t i_nal_type = ((p_buf[0] & 0x7E) >> 1);
+        uint8_t i_nal_type = hevc_getNALType(p_buf);
         bs_t bs;
         bs_init( &bs, p_buf, i_buf );
         unsigned i_bitflow = 0;

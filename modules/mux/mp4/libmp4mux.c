@@ -620,7 +620,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
         if (p_nal)
             p_nal->i_buffer = p_buffer - p_nal->p_buffer - ((i_buffer)?3:0);
 
-        switch ((*p_buffer & 0x7E) >> 1) {
+        switch (hevc_getNALType(p_buffer)) {
 
         case HEVC_NAL_VPS:
             if(i_vps == HEVC_VPS_MAX)

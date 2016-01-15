@@ -421,7 +421,7 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     }
 
     /* Get NALU type */
-    uint8_t i_nal_type = ((p_frag->p_buffer[4] & 0x7E) >> 1);
+    uint8_t i_nal_type = hevc_getNALType(&p_frag->p_buffer[4]);
     if (i_nal_type < HEVC_NAL_VPS)
     {
         /* NAL is a VCL NAL */

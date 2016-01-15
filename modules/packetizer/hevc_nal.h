@@ -135,6 +135,16 @@ static inline bool hevc_ishvcC( const uint8_t *p_buf, size_t i_buf )
            );
 }
 
+static inline uint8_t hevc_getNALLengthSize( const uint8_t *p_hvcC )
+{
+    return (p_hvcC[21] & 0x03) + 1;
+}
+
+static inline uint8_t hevc_getNALType( const uint8_t *p_buf )
+{
+    return ((p_buf[0] & 0x7E) >> 1);
+}
+
 static inline uint8_t hevc_getNALLayer( const uint8_t *p_buf )
 {
     return ((p_buf[0] & 0x01) << 6) | (p_buf[1] >> 3);

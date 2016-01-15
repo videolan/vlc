@@ -117,7 +117,7 @@ static int ProbeHEVC( const uint8_t *p_peek, size_t i_peek, void *p_priv )
     if( p_peek[0] & 0x80 )
         return -1;
 
-    const uint8_t i_type = (p_peek[0] & 0x7E) >> 1;
+    const uint8_t i_type = hevc_getNALType( p_peek );
     const uint8_t i_layer = hevc_getNALLayer( p_peek );
 
    if ( i_type == HEVC_NAL_VPS ) /* VPS */
