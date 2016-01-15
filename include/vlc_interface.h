@@ -111,7 +111,7 @@ VLC_API void vlc_LogSet(libvlc_int_t *, vlc_log_cb cb, void *data);
 /*@}*/
 
 /* Interface dialog ids for dialog providers */
-typedef enum vlc_dialog {
+typedef enum vlc_intf_dialog {
     INTF_DIALOG_FILE_SIMPLE = 1,
     INTF_DIALOG_FILE,
     INTF_DIALOG_DISC,
@@ -143,7 +143,7 @@ typedef enum vlc_dialog {
     INTF_DIALOG_VLM,
 
     INTF_DIALOG_EXIT = 99
-} vlc_dialog_t;
+} vlc_intf_dialog;
 
 /* Useful text messages shared by interfaces */
 #define INTF_ABOUT_MSG LICENSE_MSG
