@@ -85,6 +85,7 @@ $Id$
  * console_logger: Logger outputting in the terminal
  * croppadd: Crop/Padd image filter
  * crystalhd: crystalhd decoder
+ * ctrl_chromecast: Module to handle communication with Chromecast and redirect input playback
  * cvdsub: CVD subtitles decoder
  * cvpx_i420: filter to copy from OS X accelerated surfaces to CPU in YUV
  * d3d11_surface: Convert D3D11 GPU textures to YUV planes

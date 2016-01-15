@@ -30,9 +30,12 @@
 #define VLC_CHROMECAST_H
 
 #include <vlc_common.h>
+#include <vlc_interface.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_tls.h>
+
+#include <sstream>
 
 #include "cast_channel.pb.h"
 
@@ -43,6 +46,7 @@ static const std::string DEFAULT_CHOMECAST_RECEIVER = "receiver-0";
 /* see https://developers.google.com/cast/docs/reference/messages */
 static const std::string NAMESPACE_MEDIA            = "urn:x-cast:com.google.cast.media";
 
+#define HTTP_PORT               8010
 
 // Status
 enum connection_status
@@ -57,10 +61,10 @@ enum connection_status
 
 struct intf_sys_t
 {
-    intf_sys_t(sout_stream_t * const p_stream);
+    intf_sys_t(intf_thread_t * const intf);
     ~intf_sys_t();
 
-    sout_stream_t  * const p_stream;
+    intf_thread_t  * const p_stream;
     std::string    serverIP;
     std::string appTransportId;
 
@@ -70,6 +74,7 @@ struct intf_sys_t
 
     vlc_mutex_t  lock;
     vlc_cond_t   loadCommandCond;
+    vlc_thread_t chromecastThread;
 
     void msgAuth();
     void msgReceiverClose(std::string destinationId);
