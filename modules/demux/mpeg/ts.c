@@ -4500,7 +4500,7 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pes_t *p_pes,
             }
             else
             {
-                p_subs_es = malloc( sizeof(*p_subs_es) );
+                p_subs_es = calloc( 1, sizeof(*p_subs_es) );
                 if( !p_subs_es )
                     break;
 
