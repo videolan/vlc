@@ -62,6 +62,7 @@ endif
 # The shared DLLs may not necessarily be in the first LIBRARY_PATH, we
 # should check them all.
 	-library_path_list=`$(CXX) -v /dev/null 2>&1 | grep ^LIBRARY_PATH|cut -d= -f2` ;\
+	-cygpath --version >/dev/null 2>/dev/null && library_path_list="`cygpath -p $$library_path_list`" ;\
 	IFS=':' ;\
 	for x in $$library_path_list ;\
 	do \
