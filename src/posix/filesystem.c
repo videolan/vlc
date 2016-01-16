@@ -49,6 +49,13 @@
 #include <vlc_common.h>
 #include <vlc_fs.h>
 
+#ifndef HAVE_ACCEPT4
+static inline void vlc_cloexec(int fd)
+{
+    fcntl(fd, F_SETFD, FD_CLOEXEC | fcntl(fd, F_GETFD));
+}
+#endif
+
 int vlc_open (const char *filename, int flags, ...)
 {
     unsigned int mode = 0;
@@ -60,13 +67,13 @@ int vlc_open (const char *filename, int flags, ...)
     va_end (ap);
 
 #ifdef O_CLOEXEC
-    flags |= O_CLOEXEC;
-#endif
-
-    int fd = open (filename, flags, mode);
+    return open(filename, flags, mode | O_CLOEXEC);
+#else
+    int fd = open(filename, flags, mode);
     if (fd != -1)
-        fcntl (fd, F_SETFD, FD_CLOEXEC);
-    return fd;
+        vlc_cloexec(fd);
+    return -1;
+#endif
 }
 
 int vlc_openat (int dir, const char *filename, int flags, ...)
@@ -79,37 +86,27 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
-#ifdef O_CLOEXEC
-    flags |= O_CLOEXEC;
-#endif
-
 #ifdef HAVE_OPENAT
-    int fd = openat (dir, filename, flags, mode);
-    if (fd != -1)
-        fcntl (fd, F_SETFD, FD_CLOEXEC);
+    return openat(dir, filename, flags, mode | O_CLOEXEC);
 #else
     VLC_UNUSED (dir);
     VLC_UNUSED (filename);
     VLC_UNUSED (mode);
-
-    int fd = -1;
     errno = ENOSYS;
+    return -1;
 #endif
-    return fd;
 }
 
 int vlc_mkstemp (char *template)
 {
-    int fd;
-
-#ifdef HAVE_MKOSTEMP
-    fd = mkostemp (template, O_CLOEXEC);
+#if defined (HAVE_MKOSTEMP) && defined (O_CLOEXEC)
+    return mkostemp(template, O_CLOEXEC);
 #else
-    fd = mkstemp (template);
-#endif
+    int fd = mkstemp(template);
     if (fd != -1)
-        fcntl (fd, F_SETFD, FD_CLOEXEC);
+        vlc_cloexec(fd);
     return fd;
+#endif
 }
 
 int vlc_memfd (void)
@@ -194,35 +191,29 @@ char *vlc_getcwd (void)
 
 int vlc_dup (int oldfd)
 {
-    int newfd;
-
 #ifdef F_DUPFD_CLOEXEC
-    newfd = fcntl (oldfd, F_DUPFD_CLOEXEC, 0);
-    if (unlikely(newfd == -1 && errno == EINVAL))
-#endif
-    {
-        newfd = dup (oldfd);
-        if (likely(newfd != -1))
-            fcntl (newfd, F_SETFD, FD_CLOEXEC);
-    }
+    return fcntl (oldfd, F_DUPFD_CLOEXEC, 0);
+#else
+    int newfd = dup (oldfd);
+    if (newfd != -1)
+        vlc_cloexec(oldfd);
     return newfd;
+#endif
 }
 
 int vlc_pipe (int fds[2])
 {
 #ifdef HAVE_PIPE2
-    if (pipe2 (fds, O_CLOEXEC) == 0)
-        return 0;
-    if (errno != ENOSYS)
-        return -1;
+    return pipe2(fds, O_CLOEXEC);
+#else
+    int ret = pipe(fds);
+    if (ret == 0)
+    {
+        vlc_cloexec(fds[0]);
+        vlc_cloexec(fds[1]);
+    }
+    return ret;
 #endif
-
-    if (pipe (fds))
-        return -1;
-
-    fcntl (fds[0], F_SETFD, FD_CLOEXEC);
-    fcntl (fds[1], F_SETFD, FD_CLOEXEC);
-    return 0;
 }
 
 ssize_t vlc_write(int fd, const void *buf, size_t len)
@@ -271,9 +262,10 @@ ssize_t vlc_writev(int fd, const struct iovec *iov, int count)
 
 #include <vlc_network.h>
 
+#ifndef HAVE_ACCEPT4
 static void vlc_socket_setup(int fd, bool nonblock)
 {
-    fcntl(fd, F_SETFD, FD_CLOEXEC);
+    vlc_cloexec(fd);
 
     if (nonblock)
         fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
@@ -282,6 +274,7 @@ static void vlc_socket_setup(int fd, bool nonblock)
     setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
 #endif
 }
+#endif
 
 /**
  * Creates a socket file descriptor. The new file descriptor has the
@@ -294,47 +287,46 @@ static void vlc_socket_setup(int fd, bool nonblock)
  */
 int vlc_socket (int pf, int type, int proto, bool nonblock)
 {
-    int fd;
-
 #ifdef SOCK_CLOEXEC
-    type |= SOCK_CLOEXEC;
     if (nonblock)
         type |= SOCK_NONBLOCK;
 
-    fd = socket (pf, type, proto);
-    if (fd != -1 || errno != EINVAL)
-        return fd;
-
-    type &= ~(SOCK_CLOEXEC|SOCK_NONBLOCK);
-#endif
-
-    fd = socket (pf, type, proto);
+    int fd = socket(pf, type | SOCK_CLOEXEC, proto);
+# ifdef SO_NOSIGPIPE
+    if (fd != -1)
+        setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+# endif
+#else
+    int fd = socket (pf, type, proto);
     if (fd != -1)
         vlc_socket_setup(fd, nonblock);
+#endif
     return fd;
 }
 
 int vlc_socketpair(int pf, int type, int proto, int fds[2], bool nonblock)
 {
 #ifdef SOCK_CLOEXEC
-    type |= SOCK_CLOEXEC;
     if (nonblock)
         type |= SOCK_NONBLOCK;
 
-    if (socketpair(pf, type, proto, fds) == 0)
-        return 0;
-    if (errno != EINVAL)
-        return -1;
-
-    type &= ~(SOCK_CLOEXEC|SOCK_NONBLOCK);
+    int ret = socketpair(pf, type | SOCK_CLOEXEC, proto, fds);
+# ifdef SO_NOSIGPIPE
+    if (ret == 0)
+    {
+        setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+        setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+    }
+# endif
+#else
+    int ret = socketpair(pf, type, proto, fds);
+    if (ret == 0)
+    {
+        vlc_socket_setup(fds[0], nonblock);
+        vlc_socket_setup(fds[1], nonblock);
+    }
 #endif
-
-    if (socketpair(pf, type, proto, fds))
-        return -1;
-
-    vlc_socket_setup(fds[0], nonblock);
-    vlc_socket_setup(fds[1], nonblock);
-    return 0;
+    return ret;
 }
 
 /**
@@ -348,36 +340,20 @@ int vlc_socketpair(int pf, int type, int proto, int fds[2], bool nonblock)
  */
 int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
 {
-    int fd;
 #ifdef HAVE_ACCEPT4
     int flags = SOCK_CLOEXEC;
     if (nonblock)
         flags |= SOCK_NONBLOCK;
 
-    do
-        fd = accept4 (lfd, addr, alen, flags);
-    while (fd == -1 && errno == EINTR);
-
+    int fd = accept4(lfd, addr, alen, flags);
 # ifdef SO_NOSIGPIPE
     if (fd != -1)
         setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
 # endif
-    if (fd != -1 || errno != ENOSYS)
-        return fd;
-#endif
-
-    do
-        fd = accept (lfd, addr, alen);
-    while (fd == -1 && errno == EINTR);
-
+#else
+    int fd = accept(lfd, addr, alen);
     if (fd != -1)
-    {
-        fcntl (fd, F_SETFD, FD_CLOEXEC);
-        if (nonblock)
-            fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
-#ifdef SO_NOSIGPIPE
-        setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+        vlc_socket_setup(fd, nonblock);
 #endif
-    }
     return fd;
 }
