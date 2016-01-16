@@ -26,6 +26,7 @@ FFMPEGCONF = \
 	--disable-devices \
 	--disable-avfilter \
 	--disable-filters \
+	--disable-protocol=concat \
 	--disable-bsfs \
 	--disable-bzlib \
 	--disable-avresample
