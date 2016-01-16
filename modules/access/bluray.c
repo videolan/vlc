@@ -500,15 +500,14 @@ static int blurayOpen(vlc_object_t *object)
     /* If we're passed a block device, try to convert it to the mount point. */
     FindMountPoint(&p_sys->psz_bd_path);
 
-    p_sys->bluray = bd_open(p_sys->psz_bd_path, NULL);
-    if (!p_sys->bluray) {
-        free(p_sys->psz_bd_path);
-        free(p_sys);
-        return VLC_EGENERIC;
-    }
-
     vlc_mutex_init(&p_sys->pl_info_lock);
     vlc_mutex_init(&p_sys->bdj_overlay_lock);
+    var_AddCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
+
+    p_sys->bluray = bd_open(p_sys->psz_bd_path, NULL);
+    if (!p_sys->bluray) {
+        goto error;
+    }
 
     /* Warning the user about AACS/BD+ */
     const BLURAY_DISC_INFO *disc_info = bd_get_disc_info(p_sys->bluray);
@@ -633,8 +632,6 @@ static int blurayOpen(vlc_object_t *object)
     if (unlikely(p_sys->p_out == NULL))
         goto error;
 
-    var_AddCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
-
     blurayResetParser(p_demux);
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
@@ -672,8 +669,9 @@ static void blurayClose(vlc_object_t *object)
      * This will close all the overlays before we release p_vout
      * bd_close(NULL) can crash
      */
-    assert(p_sys->bluray);
-    bd_close(p_sys->bluray);
+    if (p_sys->bluray) {
+        bd_close(p_sys->bluray);
+    }
 
     blurayReleaseVout(p_demux);
 
