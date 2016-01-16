@@ -412,6 +412,8 @@ static int Demux( demux_t *p_demux )
             /* demux this block */
             DemuxVobSub( p_demux, p_block );
 
+            block_Release( p_block );
+
             tk.i_current_subtitle++;
         }
 #undef tk
