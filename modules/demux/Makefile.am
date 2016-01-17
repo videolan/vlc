@@ -228,7 +228,8 @@ libplaylist_plugin_la_SOURCES = \
 	demux/playlist/playlist.c demux/playlist/playlist.h
 demux_LTLIBRARIES += libplaylist_plugin.la
 
-libts_plugin_la_SOURCES = demux/mpeg/ts.c \
+libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
+        demux/mpeg/sections.c demux/mpeg/sections.h \
         demux/mpeg/mpeg4_iod.c demux/mpeg/mpeg4_iod.h \
         demux/mpeg/pes.h \
 	mux/mpeg/csa.c mux/mpeg/dvbpsi_compat.h \

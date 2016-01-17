@@ -45,6 +45,8 @@
 
 #include "../../mux/mpeg/csa.h"
 
+#include "ts.h"
+
 /* Include dvbpsi headers */
 # include <dvbpsi/dvbpsi.h>
 # include <dvbpsi/demux.h>
@@ -72,6 +74,7 @@
 
 #include "pes.h"
 #include "mpeg4_iod.h"
+#include "sections.h"
 
 #ifdef HAVE_ARIBB24
  #include <aribb24/aribb24.h>
@@ -191,8 +194,6 @@ static const char *const ppsz_teletext_type[] = {
  N_("Teletext: program schedule"),
  N_("Teletext subtitles: hearing impaired")
 };
-
-typedef struct ts_pid_t ts_pid_t;
 
 typedef struct
 {
