@@ -259,6 +259,7 @@ typedef struct
     int         i_data_gathered;
     block_t     *p_data;
     block_t     **pp_last;
+    ts_sections_processor_t *p_sections_proc;
 
     block_t *   p_prepcr_outqueue;
 
@@ -442,7 +443,7 @@ struct demux_sys_t
 static int Demux    ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static void PIDFillFormat( es_format_t *fmt, int i_stream_type, ts_es_data_type_t * );
+static void PIDFillFormat( ts_pes_t *p_pes, int i_stream_type, ts_es_data_type_t * );
 
 static bool PIDSetup( demux_t *p_demux, ts_pid_type_t i_type, ts_pid_t *pid, ts_pid_t *p_parent );
 static void PIDRelease( demux_t *p_demux, ts_pid_t *pid );
@@ -1806,7 +1807,7 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
             else
             {
                 const int i_stream_type = strtol( psz_opt, NULL, 0 );
-                PIDFillFormat( fmt, i_stream_type, &pid->u.p_pes->data_type );
+                PIDFillFormat( pid->u.p_pes, i_stream_type, &pid->u.p_pes->data_type );
             }
 
             fmt->i_group = i_number;
@@ -2410,111 +2411,37 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     }
 }
 
-static void ParseTableSection( demux_t *p_demux, ts_pid_t *pid, block_t *p_data )
+static void SCTE27_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content )
 {
-    block_t *p_content = block_ChainGather( p_data );
-
-    if( p_content->i_buffer <= 9 || pid->type != TYPE_PES )
-    {
-        block_Release( p_content );
-        return;
-    }
-
-    const uint8_t i_table_id = p_content->p_buffer[0];
-    const uint8_t i_version = ( p_content->p_buffer[5] & 0x3F ) >> 1;
+    assert( pid->u.p_pes->es.fmt.i_codec == VLC_CODEC_SCTE_27 );
     ts_pmt_t *p_pmt = pid->p_parent->u.p_pmt;
+    mtime_t i_date = p_pmt->pcr.i_current;
 
-    if ( pid->u.p_pes->i_stream_type == 0x82 && i_table_id == 0xC6 ) /* SCTE_27 */
+    /* We need to extract the truncated pts stored inside the payload */
+    int i_index = 0;
+    size_t i_offset = 4;
+    if( p_content->p_buffer[3] & 0x40 )
     {
-        assert( pid->u.p_pes->es.fmt.i_codec == VLC_CODEC_SCTE_27 );
-        mtime_t i_date = p_pmt->pcr.i_current;
-
-        /* We need to extract the truncated pts stored inside the payload */
-        int i_index = 0;
-        size_t i_offset = 4;
-        if( p_content->p_buffer[3] & 0x40 )
-        {
-            i_index = ((p_content->p_buffer[7] & 0x0f) << 8) |
-                    p_content->p_buffer[8];
-            i_offset = 9;
-        }
-        if( i_index == 0 && p_content->i_buffer > i_offset + 8 )
-        {
-            bool is_immediate = p_content->p_buffer[i_offset + 3] & 0x40;
-            if( !is_immediate )
-            {
-                mtime_t i_display_in = GetDWBE( &p_content->p_buffer[i_offset + 4] );
-                if( i_display_in < i_date )
-                    i_date = i_display_in + (1ll << 32);
-                else
-                    i_date = i_display_in;
-            }
-
-        }
-
-        p_content->i_dts = p_content->i_pts = VLC_TS_0 + i_date * 100 / 9;
-        PCRFixHandle( p_demux, p_pmt, p_content );
+        i_index = ((p_content->p_buffer[7] & 0x0f) << 8) | /* segment number */
+                p_content->p_buffer[8];
+        i_offset += 5;
     }
-    /* Object stream SL in table sections */
-    else if( pid->u.p_pes->i_stream_type == 0x13 && i_table_id == 0x05 &&
-             pid->u.p_pes->es.i_sl_es_id && p_content->i_buffer > 12 )
+    if( i_index == 0 && p_content->i_buffer > i_offset + 8 ) /* message body */
     {
-        const es_mpeg4_descriptor_t *p_mpeg4desc = GetMPEG4DescByEsId( p_pmt, pid->u.p_pes->es.i_sl_es_id );
-        if( p_mpeg4desc && p_mpeg4desc->dec_descr.i_objectTypeIndication == 0x01 &&
-            p_mpeg4desc->dec_descr.i_streamType == 0x01 /* Object */ &&
-            p_pmt->od.i_version != i_version )
+        bool is_immediate = p_content->p_buffer[i_offset + 3] & 0x40;
+        if( !is_immediate )
         {
-            const uint8_t *p_data = p_content->p_buffer;
-            int i_data = p_content->i_buffer;
-
-            /* Forward into section */
-            uint16_t len = ((p_content->p_buffer[1] & 0x0f) << 8) | p_content->p_buffer[2];
-            p_data += 8; i_data -= 8; // SL in table
-            i_data = __MIN(i_data, len - 5);
-            i_data -= 4; // CRC
-
-            od_descriptors_t *p_ods = &p_pmt->od;
-            sl_header_data header = DecodeSLHeader( i_data, p_data, &p_mpeg4desc->sl_descr );
-
-            DecodeODCommand( VLC_OBJECT(p_demux), p_ods, i_data - header.i_size, &p_data[header.i_size] );
-            bool b_changed = false;
-
-            for( int i=0; i<p_ods->objects.i_size; i++ )
-            {
-                od_descriptor_t *p_od = p_ods->objects.p_elems[i];
-                for( int j = 0; j < ES_DESCRIPTOR_COUNT && p_od->es_descr[j].b_ok; j++ )
-                {
-                    p_mpeg4desc = &p_od->es_descr[j];
-                    ts_pes_es_t *p_es = GetPMTESBySLEsId( p_pmt, p_mpeg4desc->i_es_id );
-                    es_format_t fmt;
-                    es_format_Init( &fmt, UNKNOWN_ES, 0 );
-                    fmt.i_id = p_es->fmt.i_id;
-                    fmt.i_group = p_es->fmt.i_group;
-
-                    if ( p_mpeg4desc && p_mpeg4desc->b_ok && p_es &&
-                         SetupISO14496LogicalStream( p_demux, &p_mpeg4desc->dec_descr, &fmt ) &&
-                         !es_format_IsSimilar( &fmt, &p_es->fmt ) )
-                    {
-                        es_format_Clean( &p_es->fmt );
-                        p_es->fmt = fmt;
-
-                        es_out_Del( p_demux->out, p_es->id );
-                        p_es->fmt.b_packetized = true; /* Split by access unit, no sync code */
-                        FREENULL( p_es->fmt.psz_description );
-                        p_es->id = es_out_Add( p_demux->out, &p_es->fmt );
-                        b_changed = true;
-                    }
-                }
-            }
-
-            if( b_changed )
-                UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
-
-            p_ods->i_version = i_version;
+            mtime_t i_display_in = GetDWBE( &p_content->p_buffer[i_offset + 4] );
+            if( i_display_in < i_date )
+                i_date = i_display_in + (1ll << 32);
+            else
+                i_date = i_display_in;
         }
-        block_Release( p_content );
-        return;
+
     }
+
+    p_content->i_dts = p_content->i_pts = VLC_TS_0 + i_date * 100 / 9;
+    PCRFixHandle( p_demux, p_pmt, p_content );
 
     if( pid->u.p_pes->es.id )
         es_out_Send( p_demux->out, pid->u.p_pes->es.id, p_content );
@@ -2522,11 +2449,65 @@ static void ParseTableSection( demux_t *p_demux, ts_pid_t *pid, block_t *p_data 
         block_Release( p_content );
 }
 
+/* Object stream SL in table sections */
+static void SLPackets_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content )
+{
+    ts_pmt_t *p_pmt = pid->p_parent->u.p_pmt;
+
+    const es_mpeg4_descriptor_t *p_mpeg4desc = GetMPEG4DescByEsId( p_pmt, pid->u.p_pes->es.i_sl_es_id );
+    if( p_mpeg4desc && p_mpeg4desc->dec_descr.i_objectTypeIndication == 0x01 &&
+        p_mpeg4desc->dec_descr.i_streamType == 0x01 /* Object */ )
+    {
+        const uint8_t *p_data = p_content->p_buffer;
+        int i_data = p_content->i_buffer;
+
+        od_descriptors_t *p_ods = &p_pmt->od;
+        sl_header_data header = DecodeSLHeader( i_data, p_data, &p_mpeg4desc->sl_descr );
+
+        DecodeODCommand( VLC_OBJECT(p_demux), p_ods, i_data - header.i_size, &p_data[header.i_size] );
+        bool b_changed = false;
+
+        for( int i=0; i<p_ods->objects.i_size; i++ )
+        {
+            od_descriptor_t *p_od = p_ods->objects.p_elems[i];
+            for( int j = 0; j < ES_DESCRIPTOR_COUNT && p_od->es_descr[j].b_ok; j++ )
+            {
+                p_mpeg4desc = &p_od->es_descr[j];
+                ts_pes_es_t *p_es = GetPMTESBySLEsId( p_pmt, p_mpeg4desc->i_es_id );
+                es_format_t fmt;
+                es_format_Init( &fmt, UNKNOWN_ES, 0 );
+                fmt.i_id = p_es->fmt.i_id;
+                fmt.i_group = p_es->fmt.i_group;
+
+                if ( p_mpeg4desc && p_mpeg4desc->b_ok && p_es &&
+                     SetupISO14496LogicalStream( p_demux, &p_mpeg4desc->dec_descr, &fmt ) &&
+                     !es_format_IsSimilar( &fmt, &p_es->fmt ) )
+                {
+                    es_format_Clean( &p_es->fmt );
+                    p_es->fmt = fmt;
+
+                    if( p_es->id )
+                        es_out_Del( p_demux->out, p_es->id );
+                    p_es->fmt.b_packetized = true; /* Split by access unit, no sync code */
+                    FREENULL( p_es->fmt.psz_description );
+                    p_es->id = es_out_Add( p_demux->out, &p_es->fmt );
+                    b_changed = true;
+                }
+            }
+        }
+
+        if( b_changed )
+            UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
+    }
+
+    block_Release( p_content );
+}
+
 static void ParseData( demux_t *p_demux, ts_pid_t *pid )
 {
-    block_t *p_data = pid->u.p_pes->p_data;
-    assert(p_data);
-    if(!p_data)
+    block_t *p_datachain = pid->u.p_pes->p_data;
+    assert(p_datachain);
+    if(!p_datachain)
         return;
 
     /* remove the pes from pid */
@@ -2537,15 +2518,21 @@ static void ParseData( demux_t *p_demux, ts_pid_t *pid )
 
     if( pid->u.p_pes->data_type == TS_ES_DATA_PES )
     {
-        ParsePES( p_demux, pid, p_data );
+        ParsePES( p_demux, pid, p_datachain );
     }
-    else if( pid->u.p_pes->data_type == TS_ES_DATA_TABLE_SECTION )
+    else if( pid->u.p_pes->data_type == TS_ES_DATA_TABLE_SECTION &&
+             pid->u.p_pes->p_sections_proc &&
+             p_datachain->i_buffer > 3 )
     {
-        ParseTableSection( p_demux, pid, p_data );
+        const uint8_t i_table_id = p_datachain->p_buffer[0];
+        ts_sections_processor_Push( pid->u.p_pes->p_sections_proc,
+                                    i_table_id, pid->u.p_pes->i_stream_type,
+                                    p_demux, pid,
+                                    p_datachain );
     }
     else
     {
-        block_ChainRelease( p_data );
+        block_ChainRelease( p_datachain );
     }
 }
 
@@ -2731,6 +2718,8 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
                 block_ChainRelease( pid->u.p_pes->p_prepcr_outqueue );
                 pid->u.p_pes->p_prepcr_outqueue = NULL;
             }
+
+            ts_sections_processor_Reset( pid->u.p_pes->p_sections_proc );
 
             FlushESBuffer( pid->u.p_pes );
         }
@@ -3445,8 +3434,9 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     return i_ret;
 }
 
-static void PIDFillFormat( es_format_t *fmt, int i_stream_type, ts_es_data_type_t *p_datatype )
+static void PIDFillFormat( ts_pes_t *p_pes, int i_stream_type, ts_es_data_type_t *p_datatype )
 {
+    es_format_t *fmt = &p_pes->es.fmt;
     switch( i_stream_type )
     {
     case 0x01:  /* MPEG-1 video */
@@ -3483,6 +3473,8 @@ static void PIDFillFormat( es_format_t *fmt, int i_stream_type, ts_es_data_type_
     case 0x82:  /* SCTE-27 (sub) */
         es_format_Init( fmt, SPU_ES, VLC_CODEC_SCTE_27 );
         *p_datatype = TS_ES_DATA_TABLE_SECTION;
+        ts_sections_processor_Add( &p_pes->p_sections_proc, 0xC6, 0x82,
+                                   true, SCTE27_Section_Handler );
         break;
     case 0x84:  /* SDDS (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_SDDS );
@@ -4249,10 +4241,11 @@ static void SetupJ2KDescriptors( demux_t *p_demux, ts_pes_es_t *p_es, const dvbp
     }
 }
 
-static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_es_t *p_es,
+static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_t *p_pes,
                                       const ts_pmt_t *p_pmt, const dvbpsi_pmt_es_t *p_dvbpsies )
 {
     const dvbpsi_descriptor_t *p_dr = p_dvbpsies->p_first_descriptor;
+    ts_pes_es_t *p_es = &p_pes->es;
 
     while( p_dr )
     {
@@ -4274,6 +4267,8 @@ static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_es_t *p_es,
                 {
                     p_es->i_sl_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
                     msg_Dbg( p_demux, "     - found SL_descriptor mapping es_id=%"PRIu16, p_es->i_sl_es_id );
+                    ts_sections_processor_Add( &p_pes->p_sections_proc, 0x05, 0x13,
+                                               false, SLPackets_Section_Handler );
                 }
                 break;
             default:
@@ -4299,7 +4294,7 @@ static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_es_t *p_es,
         /* non fatal, set by packetizer */
         case 0x0f: /* ADTS */
         case 0x11: /* LOAS */
-            msg_Info( p_demux, "     - SL/FMC descriptor not found/matched" );
+            msg_Dbg( p_demux, "     - SL/FMC descriptor not found/matched" );
             break;
         default:
             msg_Err( p_demux, "      - SL/FMC descriptor not found/matched" );
@@ -5379,7 +5374,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         ARRAY_APPEND( p_pmt->e_streams, pespid );
 
         ts_es_data_type_t type_change = TS_ES_DATA_PES;
-        PIDFillFormat( &p_pes->es.fmt, p_dvbpsies->i_type, &type_change );
+        PIDFillFormat( p_pes, p_dvbpsies->i_type, &type_change );
 
         p_pes->i_stream_type = p_dvbpsies->i_type;
         pespid->i_flags |= SEEN(GetPID(p_sys, p_dvbpsies->i_pid));
@@ -5419,7 +5414,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             case 0x10:
             case 0x11:
             case 0x12:
-                SetupISO14496Descriptors( p_demux, &p_pes->es, p_pmt, p_dvbpsies );
+                SetupISO14496Descriptors( p_demux, p_pes, p_pmt, p_dvbpsies );
                 break;
             case 0x1b:
                 SetupAVCDescriptors( p_demux, &p_pes->es, p_dvbpsies );
@@ -5780,6 +5775,7 @@ static ts_pes_t *ts_pes_New( demux_t *p_demux )
     pes->i_data_gathered = 0;
     pes->p_data = NULL;
     pes->pp_last = &pes->p_data;
+    pes->p_sections_proc = NULL;
     pes->p_prepcr_outqueue = NULL;
     pes->sl.p_data = NULL;
     pes->sl.pp_last = &pes->sl.p_data;
@@ -5799,6 +5795,9 @@ static void ts_pes_Del( demux_t *p_demux, ts_pes_t *pes )
 
     if( pes->p_data )
         block_ChainRelease( pes->p_data );
+
+    if( pes->p_sections_proc )
+        ts_sections_processor_ChainDelete( pes->p_sections_proc );
 
     if( pes->p_prepcr_outqueue )
         block_ChainRelease( pes->p_prepcr_outqueue );
