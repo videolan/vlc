@@ -886,10 +886,10 @@ dnl
 dnl  Compiler warnings
 dnl
 
-RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast write-strings missing-prototypes volatile-register-var error-implicit-function-declaration init-self logical-op])
+RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast write-strings missing-prototypes volatile-register-var error-implicit-function-declaration init-self logical-op format-security])
 RDC_PROG_CC_FLAGS([-pipe])
 AC_LANG_PUSH([C++])
-RDC_PROG_CXX_WFLAGS([all extra sign-compare undef pointer-arith volatile-register-var])
+RDC_PROG_CXX_WFLAGS([all extra sign-compare undef pointer-arith volatile-register-var format-security])
 AC_LANG_POP([C++])
 
 dnl
