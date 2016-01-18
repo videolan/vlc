@@ -20,6 +20,10 @@
 #ifndef TS_SECTIONS_H
 #define TS_SECTIONS_H
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "ts.h"
 #include <vlc_common.h>
 
