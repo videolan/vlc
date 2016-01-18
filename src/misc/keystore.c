@@ -391,20 +391,13 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
 
             /* TODO: save previously saved username and print it in dialog */
             va_list ap;
-            char *psz_dialog_text;
             va_start(ap, psz_dialog_fmt);
-            if (vasprintf(&psz_dialog_text, psz_dialog_fmt, ap) == -1)
-            {
-                va_end(ap);
-                return false;
-            }
+            dialog_vaLogin(p_parent, p_credential->psz_username,
+                           &p_credential->psz_dialog_username,
+                           &p_credential->psz_dialog_password,
+                           p_credential->p_keystore ? &p_credential->b_store : NULL,
+                           psz_dialog_title, psz_dialog_fmt, ap);
             va_end(ap);
-            dialog_Login(p_parent, p_credential->psz_username,
-                         &p_credential->psz_dialog_username,
-                         &p_credential->psz_dialog_password,
-                         p_credential->p_keystore ? &p_credential->b_store : NULL,
-                         psz_dialog_title, psz_dialog_text, NULL);
-            free(psz_dialog_text);
             if (p_credential->psz_dialog_username
              && p_credential->psz_dialog_password)
             {
