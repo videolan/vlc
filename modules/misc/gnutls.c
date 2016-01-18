@@ -28,6 +28,7 @@
 #include <time.h>
 #include <errno.h>
 #include <assert.h>
+#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -145,7 +146,12 @@ static ssize_t vlc_gnutls_read(gnutls_transport_ptr_t ptr, void *buf,
 static ssize_t vlc_gnutls_writev(gnutls_transport_ptr_t ptr,
                                  const giovec_t *giov, int iovcnt)
 {
-    if (unlikely((unsigned)iovcnt > IOV_MAX))
+#ifdef IOV_MAX
+    const long iovmax = IOV_MAX;
+#else
+    const long iovmax = sysconf(_SC_IOV_MAX);
+#endif
+    if (unlikely(iovcnt > iovmax))
     {
         errno = EINVAL;
         return -1;
