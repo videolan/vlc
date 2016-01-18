@@ -128,6 +128,33 @@ void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
     vlc_object_release (provider);
 }
 
+#undef dialog_vaLogin
+void dialog_vaLogin (vlc_object_t *obj, const char *default_username,
+                   char **username, char **password, bool *store,
+                   const char *title, const char *fmt, va_list ap)
+{
+    assert ((username != NULL) && (password != NULL));
+
+    *username = *password = NULL;
+    if (obj->i_flags & OBJECT_FLAGS_NOINTERACT)
+        return;
+
+    vlc_object_t *provider = dialog_GetProvider (obj);
+    if (provider == NULL)
+        return;
+
+    char *text;
+
+    if (vasprintf (&text, fmt, ap) != -1)
+    {
+        dialog_login_t dialog = { title, text, default_username, username,
+                                  password, store };
+        var_SetAddress (provider, "dialog-login", &dialog);
+        free (text);
+    }
+    vlc_object_release (provider);
+}
+
 #undef dialog_Login
 /**
  * Requests a username and password through the user interface.
@@ -145,31 +172,12 @@ void dialog_Login (vlc_object_t *obj, const char *default_username,
                    char **username, char **password,
                    bool *store, const char *title, const char *fmt, ...)
 {
-    assert ((username != NULL) && (password != NULL));
-
-    *username = *password = NULL;
-    if (obj->i_flags & OBJECT_FLAGS_NOINTERACT)
-        return;
-
-    vlc_object_t *provider = dialog_GetProvider (obj);
-    if (provider == NULL)
-        return;
-
-    char *text;
     va_list ap;
-
     va_start (ap, fmt);
-    if (vasprintf (&text, fmt, ap) != -1)
-    {
-        dialog_login_t dialog = { title, text, default_username, username,
-                                  password, store };
-        var_SetAddress (provider, "dialog-login", &dialog);
-        free (text);
-    }
+    dialog_vaLogin (obj, default_username, username, password, store,
+                    title, fmt, ap);
     va_end (ap);
-    vlc_object_release (provider);
 }
-
 
 #undef dialog_Question
 /**

@@ -83,6 +83,11 @@ VLC_API void dialog_Login(vlc_object_t *, const char *, char **, char **, bool *
 #define dialog_Login(o, u, p, s, t, v, w, ...) \
         dialog_Login(VLC_OBJECT(o), u, p, s, t, v, w, __VA_ARGS__)
 
+VLC_API void dialog_vaLogin(vlc_object_t *, const char *, char **, char **, bool *, const char *, const char *, va_list args);
+#define dialog_vaLogin(o, u, p, s, t, v, w, x) \
+        dialog_vaLogin(VLC_OBJECT(o), u, p, s, t, v, w, x)
+
+
 /**
  * A question dialog.
  */

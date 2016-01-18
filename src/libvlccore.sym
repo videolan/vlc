@@ -96,6 +96,7 @@ demux_vaControl
 demux_vaControlHelper
 dialog_ExtensionUpdate
 dialog_Login
+dialog_vaLogin
 dialog_ProgressCancelled
 dialog_ProgressCreate
 dialog_ProgressDestroy
