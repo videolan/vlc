@@ -80,8 +80,8 @@ typedef struct dialog_login_t
 } dialog_login_t;
 
 VLC_API void dialog_Login(vlc_object_t *, const char *, char **, char **, bool *, const char *, const char *, ...) VLC_FORMAT (7, 8);
-#define dialog_Login(o, u, p, s, t, v, ...) \
-        dialog_Login(VLC_OBJECT(o), u, p, s, t, v, __VA_ARGS__)
+#define dialog_Login(o, u, p, s, t, v, w, ...) \
+        dialog_Login(VLC_OBJECT(o), u, p, s, t, v, w, __VA_ARGS__)
 
 /**
  * A question dialog.
