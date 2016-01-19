@@ -56,6 +56,15 @@ static BOOL WINAPI SetThreadErrorModeFallback(DWORD mode, DWORD *oldmode)
     GetErrorModeReal = (void *)GetProcAddress(h, "GetErrorMode");
     if (GetErrorModeReal != NULL)
         curmode = GetErrorModeReal();
+    else
+    {
+        /* We are on XP, 2003, 2003/R2 or some special versions of Vista:
+           No SetThreadErrorMode, no GetErrorMode.
+           We will set the mode for the whole process, which is quite bad,
+           but is our only solution */
+        SetErrorMode( mode );
+        return TRUE;
+    }
 # endif
     /* Extra flags should be OK. Missing flags are NOT OK. */
     if ((mode & curmode) != mode)
