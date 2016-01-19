@@ -708,7 +708,7 @@ static int st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
         goto error;
     }
 
-    vlc_tls_sys_t *sys = session->sys;
+    vlc_tls_sys_t *sys = tls->sys;
     vlc_tls_creds_sys_t *p_cred_sys = crd->sys;
     sys->b_server_mode = true;
 
@@ -721,8 +721,8 @@ static int st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
     return VLC_SUCCESS;
 
 error:
-    st_SessionShutdown(session, true);
-    st_SessionClose(session);
+    st_SessionShutdown(tls, true);
+    st_SessionClose(tls);
     return VLC_EGENERIC;
 }
 
