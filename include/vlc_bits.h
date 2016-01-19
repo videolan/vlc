@@ -53,7 +53,8 @@ static inline void bs_write_init( bs_t *s, void *p_data, size_t i_data )
     s->p_end   = s->p_start + i_data;
     s->i_left  = 8;
     s->b_read_only = false;
-    s->pf_forward = s->p_fwpriv = NULL;
+    s->p_fwpriv = NULL;
+    s->pf_forward = NULL;
 }
 
 static inline void bs_init( bs_t *s, const void *p_data, size_t i_data )
