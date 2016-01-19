@@ -7,6 +7,7 @@ Important changes:
    libVLC support for Windows XP is deprecated.
    You _really_ should upgrade.
  * Linux support requires now a kernel newer than 2.6.26
+ * Mac OS X 10.6 support is now removed. You need OS X 10.7 to run VLC.
 
 Core:
  * Support wayland surface type
