@@ -1,6 +1,12 @@
 Changes between 2.2.x and 3.0.0-git:
 --------------------------------
 
+Important changes:
+ * The Windows XP support for VLC is now on a best-efforts basis:
+   it should work, but not without limitations.
+   libVLC support for Windows XP is deprecated.
+   You _really_ should upgrade.
+
 Core:
  * Support wayland surface type
  * Allow to start the video paused on the first frame
