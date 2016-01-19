@@ -2,10 +2,11 @@ Changes between 2.2.x and 3.0.0-git:
 --------------------------------
 
 Important changes:
- * The Windows XP support for VLC is now on a best-efforts basis:
+ * The Windows XP/2003/2003R2 support for VLC is now on a best-efforts basis:
    it should work, but not without limitations.
    libVLC support for Windows XP is deprecated.
    You _really_ should upgrade.
+ * Windows Vista (all versions) without Platform Upgrade is not supported.
  * Linux support requires now a kernel newer than 2.6.26
  * Mac OS X 10.6 support is now removed. You need OS X 10.7 to run VLC.
 
