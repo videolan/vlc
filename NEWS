@@ -6,6 +6,7 @@ Important changes:
    it should work, but not without limitations.
    libVLC support for Windows XP is deprecated.
    You _really_ should upgrade.
+ * Linux support requires now a kernel newer than 2.6.26
 
 Core:
  * Support wayland surface type
