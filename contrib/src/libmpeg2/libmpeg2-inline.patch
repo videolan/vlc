@@ -1,0 +1,10 @@
+--- libmpeg2/configure.ac	2016-01-20 15:31:37.933547037 +0100
++++ libmpeg2.new/configure.ac	2016-01-20 15:05:40.931231465 +0100
+@@ -149,7 +149,6 @@
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+-AC_C_ALWAYS_INLINE
+ AC_C_RESTRICT
+ AC_C_BUILTIN_EXPECT
+ AC_C_BIGENDIAN
