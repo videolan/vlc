@@ -93,23 +93,23 @@ IsoTime::operator time_t () const
 
 UTCTime::UTCTime(const std::string &str)
 {
-    enum { YEAR = 0, MON, DAY, HOUR, MIN, SEC, MSEC, TZ };
+    enum { UTCTIME_YEAR = 0, UTCTIME_MON, UTCTIME_DAY, UTCTIME_HOUR, UTCTIME_MIN, UTCTIME_SEC, UTCTIME_MSEC, UTCTIME_TZ };
     int values[8] = {0};
     std::istringstream in(str);
 
     try
     {
         /* Date */
-        for(int i=YEAR;i<=DAY && !in.eof();i++)
+        for(int i=UTCTIME_YEAR;i<=UTCTIME_DAY && !in.eof();i++)
         {
-            if(i!=YEAR)
+            if(i!=UTCTIME_YEAR)
                 in.ignore(1);
             in >> values[i];
         }
         /* Time */
         if (!in.eof() && in.peek() == 'T')
         {
-            for(int i=HOUR;i<=SEC && !in.eof();i++)
+            for(int i=UTCTIME_HOUR;i<=UTCTIME_SEC && !in.eof();i++)
             {
                 in.ignore(1);
                 in >> values[i];
@@ -118,7 +118,7 @@ UTCTime::UTCTime(const std::string &str)
         if(!in.eof() && in.peek() == '.')
         {
             in.ignore(1);
-            in >> values[MSEC];
+            in >> values[UTCTIME_MSEC];
         }
         /* Timezone */
         if(!in.eof() && in.peek() == 'Z')
@@ -139,24 +139,24 @@ UTCTime::UTCTime(const std::string &str)
                     in >> i;
                     tz += i;
                 }
-                values[TZ] = tz;
+                values[UTCTIME_TZ] = tz;
             }
         }
 
         struct tm tm;
 
-        tm.tm_year = values[YEAR] - 1900;
-        tm.tm_mon = values[MON] - 1;
-        tm.tm_mday = values[DAY];
-        tm.tm_hour = values[HOUR];
-        tm.tm_min = values[MIN];
-        tm.tm_sec = values[SEC];
+        tm.tm_year = values[UTCTIME_YEAR] - 1900;
+        tm.tm_mon = values[UTCTIME_MON] - 1;
+        tm.tm_mday = values[UTCTIME_DAY];
+        tm.tm_hour = values[UTCTIME_HOUR];
+        tm.tm_min = values[UTCTIME_MIN];
+        tm.tm_sec = values[UTCTIME_SEC];
         tm.tm_isdst = 0;
 
         t = timegm( &tm );
-        t += values[TZ] * 60;
+        t += values[UTCTIME_TZ] * 60;
         t *= 1000;
-        t += values[MSEC];
+        t += values[UTCTIME_MSEC];
         t *= CLOCK_FREQ / 1000;
     } catch(int) {
         t = 0;
