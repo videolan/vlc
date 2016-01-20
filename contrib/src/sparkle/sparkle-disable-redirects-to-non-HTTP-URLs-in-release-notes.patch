@@ -1,0 +1,20 @@
+diff -ru Sparkle-1.6.1/SUUpdateAlert.m Sparkle-1.6.1-fixed/SUUpdateAlert.m
+--- Sparkle-1.6.1/SUUpdateAlert.m	2014-04-26 00:22:59.000000000 +0200
++++ Sparkle-1.6.1-fixed/SUUpdateAlert.m	2016-01-20 11:38:47.000000000 +0100
+@@ -313,6 +313,16 @@
+ 
+ - (void)webView:sender decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:frame decisionListener:listener
+ {
++    NSURL *requestURL = request.URL;
++    NSString *scheme = requestURL.scheme;
++    BOOL whitelistedSafe = [@"http" isEqualToString:scheme] || [@"https" isEqualToString:scheme] || [@"about:blank" isEqualToString:requestURL.absoluteString];
++ 
++    // Do not allow redirects to dangerous protocols such as file://
++    if (!whitelistedSafe) {
++        [listener ignore];
++        return;
++    }
++    
+     if (webViewFinishedLoading) {
+         [[NSWorkspace sharedWorkspace] openURL:[request URL]];
+ 		

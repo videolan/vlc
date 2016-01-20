@@ -1,0 +1,12 @@
+diff -ru Sparkle-1.6.1/SUAppcast.m Sparkle-1.6.1-fixed/SUAppcast.m
+--- Sparkle-1.6.1/SUAppcast.m	2016-01-20 11:39:11.000000000 +0100
++++ Sparkle-1.6.1-fixed/SUAppcast.m	2016-01-20 11:40:53.000000000 +0100
+@@ -92,7 +92,7 @@
+ 	
+ 	if (downloadFilename)
+ 	{
+-        NSUInteger options = NSXMLDocumentTidyXML;
++        NSUInteger options = NSXMLDocumentTidyXML | NSXMLNodeLoadExternalEntitiesNever;
+ 		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] autorelease];
+ 	
+ 		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
