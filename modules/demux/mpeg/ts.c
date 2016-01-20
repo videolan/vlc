@@ -1524,11 +1524,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             int64_t i_time, i_length;
             if( !DVBEventInformation( p_demux, &i_time, &i_length ) &&
-                 i_length > 0 && !SeekToTime( p_demux, p_pmt, TO_SCALE(i_length) * f ) )
+                 i_length > 0 && !SeekToTime( p_demux, p_pmt, (int64_t)(TO_SCALE(i_length) * f) ) )
             {
                 ReadyQueuesPostSeek( p_demux );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                TO_SCALE(i_length) * f );
+                                (int64_t)(TO_SCALE(i_length) * f) );
                 return VLC_SUCCESS;
             }
         }
@@ -1538,14 +1538,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              p_pmt->pcr.i_first > -1 && p_pmt->i_last_dts > VLC_TS_INVALID &&
              p_pmt->pcr.i_current > -1 )
         {
-            double i_length = TimeStampWrapAround( p_pmt,
+            int64_t i_length = TimeStampWrapAround( p_pmt,
                                                    p_pmt->i_last_dts ) - p_pmt->pcr.i_first;
-            if( !SeekToTime( p_demux, p_pmt, p_pmt->pcr.i_first + i_length * f ) )
+            i64 = p_pmt->pcr.i_first + (int64_t)(i_length * f);
+            if( i64 <= p_pmt->i_last_dts )
             {
-                ReadyQueuesPostSeek( p_demux );
-                es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                FROM_SCALE(p_pmt->pcr.i_first + i_length * f) );
-                return VLC_SUCCESS;
+                if( !SeekToTime( p_demux, p_pmt, i64 ) )
+                {
+                    ReadyQueuesPostSeek( p_demux );
+                    es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, FROM_SCALE(i64) );
+                    return VLC_SUCCESS;
+                }
             }
         }
 
