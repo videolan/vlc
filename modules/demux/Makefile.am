@@ -414,7 +414,7 @@ libadaptative_plugin_la_SOURCES += $(libadaptative_dash_SOURCES)
 libadaptative_plugin_la_SOURCES += $(libadaptative_smooth_SOURCES)
 libadaptative_plugin_la_SOURCES += demux/adaptative/adaptative.cpp
 libadaptative_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
-libadaptative_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/demux/adaptative
+libadaptative_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(srcdir)/demux/adaptative
 libadaptative_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
 if HAVE_ZLIB
 libadaptative_plugin_la_LIBADD += -lz
