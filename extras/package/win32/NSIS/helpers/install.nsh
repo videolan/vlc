@@ -29,7 +29,7 @@
 !macroend
 
 !macro InstallFolder FOLDER
-  File /r /x sdk "${FOLDER}"
+  File /r "${FOLDER}\*.*"
   Push "${FOLDER}"
   Call InstallFolderInternal
 !macroend
