@@ -1,0 +1,10 @@
+--- a52dec/configure.in	2002-07-28 05:50:20.000000000 +0200
++++ a52dec.new/configure.in	2016-01-20 15:11:39.816137143 +0100
+@@ -85,7 +85,6 @@
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+-AC_C_ALWAYS_INLINE
+ AC_C_RESTRICT
+ AC_TYPE_SIZE_T
+ AC_C_BIGENDIAN
