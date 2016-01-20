@@ -81,6 +81,10 @@ static const char *const ppsz_region_code_text[] = {
 #define REGION_DEFAULT   1   /* Index to region list. Actual region code is (1<<REGION_DEFAULT) */
 #define LANGUAGE_DEFAULT ("eng")
 
+#if BLURAY_VERSION >= BLURAY_VERSION_CODE(0,8,0)
+# define BLURAY_DEMUX
+#endif
+
 /* Callbacks */
 static int  blurayOpen (vlc_object_t *);
 static void blurayClose(vlc_object_t *);
@@ -100,6 +104,7 @@ vlc_module_begin ()
 
     set_callbacks(blurayOpen, blurayClose)
 
+#ifdef BLURAY_DEMUX
     /* demux module */
     add_submodule()
         set_description( "BluRay demuxer" )
@@ -107,6 +112,7 @@ vlc_module_begin ()
         set_subcategory( SUBCAT_INPUT_DEMUX )
         set_capability( "demux", 5 )
         set_callbacks( blurayOpen, blurayClose )
+#endif
 
 vlc_module_end ()
 
@@ -503,6 +509,7 @@ static int probeStream(demux_t *p_demux)
     return VLC_SUCCESS;
 }
 
+#ifdef BLURAY_DEMUX
 static int blurayReadBlock(void *object, void *buf, int lba, int num_blocks)
 {
     demux_t *p_demux = (demux_t*)object;
@@ -531,6 +538,7 @@ static int blurayReadBlock(void *object, void *buf, int lba, int num_blocks)
 
     return result;
 }
+#endif
 
 /*****************************************************************************
  * probing of local files
@@ -664,6 +672,7 @@ static int blurayOpen(vlc_object_t *object)
     var_AddCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
 
     /* Open BluRay */
+#ifdef BLURAY_DEMUX
     if (p_demux->s) {
         i_init_pos = stream_Tell(p_demux->s);
 
@@ -672,8 +681,9 @@ static int blurayOpen(vlc_object_t *object)
             bd_close(p_sys->bluray);
             p_sys->bluray = NULL;
         }
-    } else {
-
+    } else
+#endif
+    {
         if (!p_demux->psz_file) {
             /* no path provided (bluray://). use default DVD device. */
             p_sys->psz_bd_path = var_InheritString(object, "dvd");
