@@ -282,7 +282,7 @@ static int Open(vlc_object_t *p_this)
                            arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]] retain];
         if ( [myVideoDevices count] == 0 )
         {
-            dialog_FatalWait(p_demux, _("No video devices found"),
+            dialog_Fatal(p_demux, _("No video devices found"),
                              _("Your Mac does not seem to be equipped with a suitable video input device. "
                                "Please check your connectors and drivers."));
             msg_Err(p_demux, "Can't find any suitable video device");
@@ -311,7 +311,7 @@ static int Open(vlc_object_t *p_this)
         }
         if ( !p_sys->device )
         {
-            dialog_FatalWait(p_demux, _("No video devices found"),
+            dialog_Fatal(p_demux, _("No video devices found"),
                              _("Your Mac does not seem to be equipped with a suitable input device. "
                                "Please check your connectors and drivers."));
             msg_Err(p_demux, "Can't find any suitable video device");
