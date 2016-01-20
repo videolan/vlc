@@ -31,6 +31,8 @@
 # include <mntent.h>
 # include <sys/stat.h>
 #endif
+#include <fcntl.h>      /* O_* */
+#include <unistd.h>     /* close() */
 
 #ifdef __APPLE__
 # include <sys/stat.h>
@@ -48,6 +50,7 @@
 #include <vlc_vout.h>                       /* vout_PutSubpicture / subpicture_t */
 #include <vlc_url.h>                        /* vlc_path2uri */
 #include <vlc_iso_lang.h>
+#include <vlc_fs.h>
 
 /* FIXME we should find a better way than including that */
 #include "../../src/text/iso-639_def.h"
@@ -530,6 +533,78 @@ static int blurayReadBlock(void *object, void *buf, int lba, int num_blocks)
 }
 
 /*****************************************************************************
+ * probing of local files
+ *****************************************************************************/
+
+/* Descriptor Tag (ECMA 167, 3/7.2) */
+static int decode_descriptor_tag(const uint8_t *buf)
+{
+    uint16_t id;
+    uint8_t  checksum = 0;
+    int      i;
+
+    id = buf[0] | (buf[1] << 8);
+
+    /* calculate tag checksum */
+    for (i = 0; i < 4; i++) {
+        checksum = (uint8_t)(checksum + buf[i]);
+    }
+    for (i = 5; i < 16; i++) {
+        checksum = (uint8_t)(checksum + buf[i]);
+    }
+
+    if (checksum != buf[4]) {
+        return -1;
+    }
+
+    return id;
+}
+
+static int probeFile(const char *psz_name)
+{
+    struct stat stat_info;
+    uint8_t peek[2048];
+    unsigned i;
+    int ret = VLC_EGENERIC;
+    int fd;
+
+    fd = vlc_open(psz_name, O_RDONLY | O_NONBLOCK);
+    if (fd == -1) {
+        return VLC_EGENERIC;
+    }
+
+    if (fstat(fd, &stat_info) == -1) {
+        goto bailout;
+    }
+    if (!S_ISREG(stat_info.st_mode) && !S_ISBLK(stat_info.st_mode)) {
+        goto bailout;
+    }
+
+    /* first sector should be filled with zeros */
+    if (read(fd, peek, sizeof(peek)) != sizeof(peek)) {
+        goto bailout;
+    }
+    for (i = 0; i < sizeof(peek); i++) {
+        if (peek[ i ]) {
+            goto bailout;
+        }
+    }
+
+    /* Check AVDP tag checksum */
+    if (lseek(fd, 256 * 2048, SEEK_SET) == -1 ||
+        read(fd, peek, 16) != 16 ||
+        decode_descriptor_tag(peek) != 2) {
+        goto bailout;
+    }
+
+    ret = VLC_SUCCESS;
+
+bailout:
+    close(fd);
+    return ret;
+}
+
+/*****************************************************************************
  * blurayOpen: module init function
  *****************************************************************************/
 static int blurayOpen(vlc_object_t *object)
@@ -553,8 +628,15 @@ static int blurayOpen(vlc_object_t *object)
         if (probeStream(p_demux) != VLC_SUCCESS) {
             return VLC_EGENERIC;
         }
+
     } else if (!forced) {
-        return VLC_EGENERIC;
+        if (!p_demux->psz_file) {
+            return VLC_EGENERIC;
+        }
+
+        if (probeFile(p_demux->psz_file) != VLC_SUCCESS) {
+            return VLC_EGENERIC;
+        }
     }
 
     /* */
