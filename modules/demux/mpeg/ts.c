@@ -1531,8 +1531,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i_length += p_pmt->pcr.i_pcroffset;
             double i_pos = TimeStampWrapAround( p_pmt,
                                                 p_pmt->pcr.i_current ) - p_pmt->pcr.i_first;
-            *pf = i_pos / i_length;
-            return VLC_SUCCESS;
+            if( i_length > 0 )
+            {
+                *pf = i_pos / i_length;
+                return VLC_SUCCESS;
+            }
         }
 
         if( (i64 = stream_Size( p_sys->stream) ) > 0 )
