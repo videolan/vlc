@@ -5066,7 +5066,7 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
     dvbpsi_iso639_dr_t *p_decoded = dvbpsi_DecodeISO639Dr( p_dr );
     if( !p_decoded )
     {
-        msg_Err( p_demux, "Failed to decode a ISO 639 descriptor" );
+        msg_Err( p_demux, "      Failed to decode a ISO 639 descriptor" );
         return;
     }
 
@@ -5076,7 +5076,7 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
     {
         memcpy( p_es->fmt.psz_language, p_decoded->code[0].iso_639_code, 3 );
         p_es->fmt.psz_language[3] = 0;
-        msg_Dbg( p_demux, "found language: %s", p_es->fmt.psz_language);
+        msg_Dbg( p_demux, "      found language: %s", p_es->fmt.psz_language);
     }
     int type = p_decoded->code[0].i_audio_type;
     p_es->fmt.psz_description = GetAudioTypeDesc(p_demux, type);
