@@ -7,7 +7,8 @@ else
 IDL_INC_PATH = /`echo $(MSYSTEM) | tr A-Z a-z`/$(BUILD)/include
 endif
 
-D3D11_IDL_URL :=http://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/direct-x/include/d3d11.idl?format=raw
+COMMIT_ID := 477108e5706e73421634436c21cb76e1795b3609
+D3D11_IDL_URL := http://sourceforge.net/p/mingw-w64/mingw-w64/ci/$(COMMIT_ID)/tree/mingw-w64-headers/direct-x/include/d3d11.idl?format=raw
 DST_D3D11_H = $(PREFIX)/include/d3d11.h
 DST_DXGIDEBUG_H = $(PREFIX)/include/dxgidebug.h
 
