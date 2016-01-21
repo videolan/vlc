@@ -42,7 +42,8 @@ package-win-common: package-win-install
 	done
 
 	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)
-	cp -r $(prefix)/lib/vlc/plugins $(win32_destdir)
+	mkdir -p "$(win32_destdir)"/plugins
+	(cd $(prefix)/lib/vlc/plugins/ && find . -type f \( -not -name '*.la' -and -not -name '*.a' \) -exec cp -v --parents "{}" "$(win32_destdir)/plugins/" \;)
 	-cp -r $(prefix)/share/locale $(win32_destdir)
 
 # BD-J JAR
@@ -84,9 +85,6 @@ endif
 
 # Convert to DOS line endings
 	find $(win32_destdir) -type f \( -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*.lua' \) -exec $(U2D) {} \;
-
-# Remove cruft
-	find $(win32_destdir)/plugins/ -type f \( -name '*.a' -or -name '*.la' \) -exec rm -rvf {} \;
 
 package-win-npapi: build-npapi
 	cp "$(top_builddir)/npapi-vlc/activex/axvlc.dll.manifest" "$(win32_destdir)/"
