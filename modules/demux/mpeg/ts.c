@@ -263,6 +263,7 @@ typedef struct
     int         i_data_gathered;
     block_t     *p_data;
     block_t     **pp_last;
+    bool        b_always_receive;
     ts_sections_processor_t *p_sections_proc;
 
     block_t *   p_prepcr_outqueue;
@@ -1447,16 +1448,8 @@ static void UpdatePESFilters( demux_t *p_demux, bool b_all )
                 ts_pes_t *p_pes = espid->u.p_pes;
 
                 bool b_stream_selected = true;
-                if( !b_all )
+                if( !p_pes->b_always_receive && !b_all )
                     HasSelectedES( p_demux->out, p_pes->p_es, p_pmt, &b_stream_selected );
-
-                if( p_pes->p_es->fmt.i_cat == UNKNOWN_ES )
-                {
-                    if( p_pes->i_stream_type == 0x13 ) /* Object channel */
-                        b_stream_selected = true;
-                    else if( !p_sys->b_es_all )
-                        b_stream_selected = false;
-                }
 
                 if( b_stream_selected )
                 {
@@ -4334,6 +4327,7 @@ static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_t *p_pes,
                     msg_Dbg( p_demux, "     - found SL_descriptor mapping es_id=%"PRIu16, p_es->i_sl_es_id );
                     ts_sections_processor_Add( &p_pes->p_sections_proc, 0x05, 0x13,
                                                false, SLPackets_Section_Handler );
+                    p_pes->b_always_receive = true;
                 }
                 break;
             default:
@@ -5965,6 +5959,7 @@ static ts_pes_t *ts_pes_New( demux_t *p_demux, ts_pmt_t *p_program )
     pes->i_data_gathered = 0;
     pes->p_data = NULL;
     pes->pp_last = &pes->p_data;
+    pes->b_always_receive = false;
     pes->p_sections_proc = NULL;
     pes->p_prepcr_outqueue = NULL;
     pes->sl.p_data = NULL;
