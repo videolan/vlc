@@ -5,7 +5,7 @@ EXTRA_DIST += video_output/README
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp
-libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CFLAGS) $(CPPFLAGS_decklinkoutput)
+libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)
 libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL) -lpthread
 vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
