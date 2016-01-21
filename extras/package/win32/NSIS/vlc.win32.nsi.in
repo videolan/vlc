@@ -199,7 +199,7 @@ ${MementoSection} $Name_Section01 SEC01
   !insertmacro InstallFile *.txt
 
   ; Subfolders
-  !insertmacro InstallFolder plugins/*.*
+  !insertmacro InstallFolder plugins
   !insertmacro InstallFolder locale
 @BUILD_SKINS_TRUE@   !insertmacro InstallFolder skins
 @BUILD_LUA_TRUE@     !insertmacro InstallFolder lua
