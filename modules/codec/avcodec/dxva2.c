@@ -116,7 +116,6 @@ struct vlc_va_sys_t
     D3DADAPTER_IDENTIFIER9 d3dai;
 
     /* Device manager */
-    UINT                     token;
     IDirect3DDeviceManager9  *devmng;
     HANDLE                   device;
 
@@ -521,7 +520,6 @@ static int D3dCreateDeviceManager(vlc_va_t *va)
         msg_Err(va, " OurDirect3DCreateDeviceManager9 failed");
         return VLC_EGENERIC;
     }
-    sys->token  = token;
     sys->devmng = devmng;
     msg_Info(va, "obtained IDirect3DDeviceManager9");
 
