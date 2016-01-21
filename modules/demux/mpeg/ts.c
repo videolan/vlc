@@ -2445,13 +2445,17 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                             else
                             {
                                 if( p_es_send->id )
+                                {
                                     es_out_Send( p_demux->out, p_es_send->id, p_block );
-                                else
-                                    block_Release( p_block ); /* Goes nowhere */
+                                    p_block = NULL;
+                                }
                             }
                         }
                         p_es_send = p_es_send->p_next;
                     }
+
+                    if( p_block )
+                        block_Release( p_block );
                 }
             }
             else
