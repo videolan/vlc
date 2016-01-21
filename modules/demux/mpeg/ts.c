@@ -1498,7 +1498,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     for( int i=0; i<p_pat->programs.i_size && !p_pmt; i++ )
     {
-        p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
         if( p_pat->programs.p_elems[i]->u.p_pmt->b_selected )
             p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
     }
