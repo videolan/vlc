@@ -3141,8 +3141,7 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
 
     if ( p_sys->i_pmt_es )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
-                        p_pmt->i_number, VLC_TS_0 + i_pcr * 100 / 9 );
+        es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR, p_pmt->i_number, FROM_SCALE(i_pcr) );
     }
 }
 
