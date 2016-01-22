@@ -69,6 +69,7 @@
 #include "../../mux/mpeg/tables.h"
 
 #include "../../codec/opus_header.h"
+#include "../../codec/scte18.h"
 
 #include "../opus.h"
 
@@ -175,6 +176,8 @@ vlc_module_begin ()
 
     add_integer( "ts-arib", ARIBMODE_AUTO, SUPPORT_ARIB_TEXT, SUPPORT_ARIB_LONGTEXT, false )
         change_integer_list( arib_mode_list, arib_mode_list_text )
+
+    add_bool( "ts-eas", false, SCTE18_DESCRIPTION, NULL, false )
 
     add_obsolete_bool( "ts-silent" );
 
@@ -370,6 +373,7 @@ struct demux_sys_t
 
     bool        b_force_seek_per_percent;
 
+    bool        b_atsc_eas;
     struct
     {
         arib_modes_e e_mode;
@@ -1147,6 +1151,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_canfastseek = false;
     p_sys->b_force_seek_per_percent = var_InheritBool( p_demux, "ts-seek-percent" );
 
+    p_sys->b_atsc_eas = var_InheritBool( p_demux, "ts-eas" );
     p_sys->arib.e_mode = var_InheritInteger( p_demux, "ts-arib" );
 
     stream_Control( p_sys->stream, STREAM_CAN_SEEK, &p_sys->b_canseek );
@@ -2468,6 +2473,27 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     {
         msg_Warn( p_demux, "empty pes" );
     }
+}
+
+static void SCTE18_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content )
+{
+    assert( pid->u.p_pes->p_es->fmt.i_codec == VLC_CODEC_SCTE_18 );
+    ts_pmt_t *p_pmt = pid->u.p_pes->p_es->p_program;
+    mtime_t i_date = TimeStampWrapAround( p_pmt, p_pmt->pcr.i_current );
+
+    int i_priority = scte18_get_EAS_priority( p_content->p_buffer, p_content->i_buffer );
+    msg_Dbg( p_demux, "Received EAS Alert with priority %d", i_priority );
+    /* We need to extract the truncated pts stored inside the payload */
+    ts_pes_es_t *p_es = pid->u.p_pes->p_es;
+    if( p_es->id )
+    {
+        if( i_priority == EAS_PRIORITY_HIGH || i_priority == EAS_PRIORITY_MAX )
+            es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, p_es->id, true );
+        p_content->i_dts = p_content->i_pts = FROM_SCALE( i_date );
+        es_out_Send( p_demux->out, p_es->id, p_content );
+    }
+    else
+        block_Release( p_content );
 }
 
 static void SCTE27_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content )
@@ -5403,6 +5429,10 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     dvbpsi_pmt_es_t *p_dvbpsies;
     for( p_dvbpsies = p_dvbpsipmt->p_first_es; p_dvbpsies != NULL; p_dvbpsies = p_dvbpsies->p_next )
     {
+        /* Do not mix with arbitrary pid if any */
+        if( p_sys->b_atsc_eas && p_dvbpsies->i_pid == SCTE18_SI_BASE_PID )
+            continue;
+
         ts_pid_t *pespid = GetPID(p_sys, p_dvbpsies->i_pid);
         if ( pespid->type != TYPE_PES && pespid->type != TYPE_FREE )
         {
@@ -5610,6 +5640,28 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             if (!p_sys->arib.b25stream)
                 dvbpsi_pmt_delete( p_dvbpsipmt );
         } else dvbpsi_pmt_delete( p_dvbpsipmt );
+    }
+
+     /* Add arbitrary PID from here */
+    if ( p_sys->b_atsc_eas && p_pmt->e_streams.i_size )
+    {
+        ts_pid_t *easpid = GetPID(p_sys, SCTE18_SI_BASE_PID);
+        if ( PIDSetup( p_demux, TYPE_PES, easpid, pmtpid ) )
+        {
+            ARRAY_APPEND( p_pmt->e_streams, easpid );
+            ts_pes_t *p_easpes = easpid->u.p_pes;
+            p_easpes->data_type = TS_ES_DATA_TABLE_SECTION;
+            p_easpes->p_es->fmt.i_codec = VLC_CODEC_SCTE_18;
+            p_easpes->p_es->fmt.i_cat = SPU_ES;
+            p_easpes->p_es->fmt.i_id = SCTE18_SI_BASE_PID;
+            p_easpes->p_es->fmt.i_group = p_pmt->i_number;
+            p_easpes->p_es->fmt.psz_description = strdup(SCTE18_DESCRIPTION);
+            p_easpes->b_always_receive = true;
+            ts_sections_processor_Add( &p_easpes->p_sections_proc,
+                                       SCTE18_TABLE_ID, 0x00,
+                                       false, SCTE18_Section_Handler );
+            msg_Dbg( p_demux, "  * pid=%d listening for EAS events", easpid->i_pid );
+        }
     }
 
     /* Decref or clean now unused es */

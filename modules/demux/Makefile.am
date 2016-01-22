@@ -235,6 +235,7 @@ libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
 	mux/mpeg/csa.c mux/mpeg/dvbpsi_compat.h \
 	mux/mpeg/streams.h mux/mpeg/tables.c mux/mpeg/tables.h \
 	mux/mpeg/tsutil.c mux/mpeg/tsutil.h \
+        codec/scte18.h \
 	demux/dvb-text.h codec/opus_header.c demux/opus.h
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(DVBPSI_LIBS) $(SOCKET_LIBS)
