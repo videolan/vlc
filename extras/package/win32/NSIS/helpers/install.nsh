@@ -30,7 +30,9 @@
 !macroend
 
 !macro InstallFolder FOLDER
-  File /r /x sdk "${FOLDER}"
+  SetOutPath "$INSTDIR\${FOLDER}"
+  File /r "${FOLDER}\*.*"
+  SetOutPath "$INSTDIR"
   Push "${FOLDER}"
   Call InstallFolderInternal
 !macroend
