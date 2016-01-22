@@ -25,6 +25,7 @@
     FindNext $0 $1
     Goto "${Index}-Loop"
   "${Index}-End:"
+  FindClose $0
   !undef Index
 !macroend
 
@@ -57,6 +58,7 @@ Function InstallFolderInternal
     FindNext $0 $1
     Goto "${Index}-Loop"
   "${Index}-End:"
+  FindClose $0
   !undef Index
 FunctionEnd
 ;;; End of Macros
