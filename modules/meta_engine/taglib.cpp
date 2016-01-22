@@ -45,6 +45,9 @@
 # include <unistd.h>
 #endif
 
+#if VLC_WINSTORE_APP
+# include <vlc_access.h>
+#endif
 
 // Taglib headers
 #ifdef _WIN32
@@ -59,6 +62,9 @@
 #include <fileref.h>
 #include <tag.h>
 #include <tbytevector.h>
+#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
+#include <tiostream.h>
+#endif
 
 #include <apefile.h>
 #include <asffile.h>
@@ -149,6 +155,110 @@ vlc_module_begin ()
         set_capability( "meta writer", 50 )
         set_callbacks( WriteMeta, NULL )
 vlc_module_end ()
+
+#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
+class VlcIostream : public IOStream
+{
+public:
+    VlcIostream(access_t* p_demux)
+        : m_demux( p_demux )
+        , m_previousPos( 0 )
+    {
+        vlc_object_hold( m_demux );
+    }
+
+    ~VlcIostream()
+    {
+        vlc_access_Delete( m_demux );
+    }
+
+    FileName name() const
+    {
+        return m_demux->psz_location;
+    }
+
+    ByteVector readBlock(ulong length)
+    {
+        ByteVector res(length, 0);
+        int i_read = vlc_access_Read( m_demux, res.data(), length);
+        if (i_read < 0)
+            return ByteVector::null;;
+        res.resize(i_read);
+        return res;
+    }
+
+    void writeBlock(const ByteVector& data)
+    {
+        // Let's stay Read-Only for now
+        return;
+    }
+
+    void insert(const ByteVector& data, ulong start, ulong replace)
+    {
+        return;
+    }
+
+    void removeBlock(ulong start, ulong length)
+    {
+        return;
+    }
+
+    bool readOnly() const
+    {
+        return true;
+    }
+
+    bool isOpen() const
+    {
+        return true;
+    }
+
+    void seek(long offset, Position p)
+    {
+        uint64_t pos = 0;
+        switch (p)
+        {
+            case Current:
+                pos = m_previousPos;
+                break;
+            case End:
+                pos = length();
+                break;
+            default:
+                break;
+        }
+        vlc_access_Seek( m_demux, pos + offset );
+        m_previousPos = pos + offset;
+    }
+
+    void clear()
+    {
+        return;
+    }
+
+    long tell() const
+    {
+        return m_previousPos;
+    }
+
+    long length()
+    {
+        uint64_t i_size;
+        if (access_GetSize( m_demux, &i_size ) != VLC_SUCCESS)
+            return -1;
+        return i_size;
+    }
+
+    void truncate(long length)
+    {
+        return;
+    }
+
+private:
+    access_t* m_demux;
+    int64_t m_previousPos;
+};
+#endif /* TAGLIB_SYNCDECODE_FIXED_VERSION */
 
 static int ExtractCoupleNumberValues( vlc_meta_t* p_meta, const char *psz_value,
         vlc_meta_type_t first, vlc_meta_type_t second)
@@ -720,6 +830,22 @@ static int ReadMeta( vlc_object_t* p_this)
         return VLC_ENOMEM;
 
     char *psz_path = vlc_uri2path( psz_uri );
+#if VLC_WINSTORE_APP && TAGLIB_VERSION >= TAGLIB_VERSION_1_11
+    if( psz_path == NULL )
+    {
+        free( psz_uri );
+        return VLC_EGENERIC;
+    }
+    free( psz_path );
+
+    access_t *p_access = vlc_access_NewMRL( p_this, psz_uri );
+    free( psz_uri );
+    if( p_access == NULL )
+        return VLC_EGENERIC;
+
+    VlcIostream s( p_access );
+    f = FileRef( &s );
+#else /* VLC_WINSTORE_APP */
     free( psz_uri );
     if( psz_path == NULL )
         return VLC_EGENERIC;
@@ -746,6 +872,7 @@ static int ReadMeta( vlc_object_t* p_this)
     f = FileRef( psz_path );
 #endif
     free( psz_path );
+#endif /* VLC_WINSTORE_APP */
 
     if( f.isNull() )
         return VLC_EGENERIC;
