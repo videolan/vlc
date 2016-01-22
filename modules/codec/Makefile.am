@@ -182,6 +182,10 @@ libaribsub_plugin_la_LIBADD = $(ARIBB24_LIBS)
 EXTRA_LTLIBRARIES += libaribsub_plugin.la
 codec_LTLIBRARIES += $(LTLIBaribsub)
 
+libscte18_plugin_la_SOURCES = codec/scte18.c codec/scte18.h \
+                              codec/atsc_a65.c codec/atsc_a65.h
+codec_LTLIBRARIES += libscte18_plugin.la
+
 libscte27_plugin_la_SOURCES = codec/scte27.c
 codec_LTLIBRARIES += libscte27_plugin.la
 

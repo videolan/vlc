@@ -330,6 +330,7 @@ $Id$
  * scene: scene video filter
  * schroedinger: Schroedinger video decoder
  * screen: a input module that takes screenshots of the primary monitor
+ * scte18: SCTE-18/Emergency Alert Messaging for Cable decoder
  * scte27: SCTE-27/Digicipher subtitles decoder
  * sd_journal: logger output to SystemD journal
  * sdl_image: SDL-based image decoder
