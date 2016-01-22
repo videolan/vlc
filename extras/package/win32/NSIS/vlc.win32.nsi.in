@@ -167,9 +167,9 @@ RequestExecutionLevel admin
 ; Macro and Functions ;
 ;;;;;;;;;;;;;;;;;;;;;;;
 
-!include helpers/extensions.nsh
-!include helpers/install.nsh
-!include helpers/utils.nsh
+!include helpers\extensions.nsh
+!include helpers\install.nsh
+!include helpers\utils.nsh
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ; Installer sections ;
