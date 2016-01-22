@@ -544,7 +544,7 @@ UAC_Success:
 ;  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
 ;  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
   StrCmp $LANGUAGE ${LANG_THAI} Thai 0
-  StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} TradChinese 0
+  StrCmp $LANGUAGE ${LANG_TRADCHINESE} TradChinese 0
   StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
   StrCmp $LANGUAGE ${LANG_UKRAINIAN} Ukrainian 0
   StrCmp $LANGUAGE ${LANG_UZBEK} Uzbek 0
@@ -592,12 +592,12 @@ UAC_Success:
   Japanese:
   !include "languages\japanese.nsh"
   Goto EndLanguageCmp
-  Bengali:
-  !include "languages\bengali.nsh"
-  Goto EndLanguageCmp
-  Punjabi:
-  !include "languages\punjabi.nsh"
-  Goto EndLanguageCmp
+;  Bengali:
+;  !include "languages\bengali.nsh"
+;  Goto EndLanguageCmp
+;  Punjabi:
+;  !include "languages\punjabi.nsh"
+;  Goto EndLanguageCmp
   Slovenian:
   !include "languages\slovenian.nsh"
   Goto EndLanguageCmp
@@ -1069,7 +1069,7 @@ UAC_Success:
 ;  StrCmp $LANGUAGE ${LANG_SCOTTISH_GAELIC} Scottish_Gaelic 0
 ;  StrCmp $LANGUAGE ${LANG_SINHALA} Sinhala 0
   StrCmp $LANGUAGE ${LANG_THAI} Thai 0
-  StrCmp $LANGUAGE ${LANG_TRADITIONAL_CHINESE} TradChinese 0
+  StrCmp $LANGUAGE ${LANG_TRADCHINESE} TradChinese 0
   StrCmp $LANGUAGE ${LANG_TURKISH} Turkish 0
   StrCmp $LANGUAGE ${LANG_UKRAINIAN} Ukrainian 0
   StrCmp $LANGUAGE ${LANG_UZBEK} Uzbek 0
@@ -1117,12 +1117,12 @@ UAC_Success:
   Japanese:
   !include "languages\japanese.nsh"
   Goto EndLanguageCmp
-  Bengali:
-  !include "languages\bengali.nsh"
-  Goto EndLanguageCmp
-  Punjabi:
-  !include "languages\punjabi.nsh"
-  Goto EndLanguageCmp
+;  Bengali:
+;  !include "languages\bengali.nsh"
+;  Goto EndLanguageCmp
+;  Punjabi:
+;  !include "languages\punjabi.nsh"
+;  Goto EndLanguageCmp
   Slovenian:
   !include "languages\slovenian.nsh"
   Goto EndLanguageCmp

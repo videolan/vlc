@@ -223,15 +223,14 @@ Function un.RemoveEmptyDirs
     StrCmp $1 "" "${Index}-End"
     StrCmp $1 "." "${Index}-Next"
     StrCmp $1 ".." "${Index}-Next"
-      Push $0
-      Push $1
-      Push $9
-      Push "$9$1\"
-      Call un.RemoveEmptyDirs
-      Pop $9
-      Pop $1
-      Pop $0
-    "${Index}-Remove:"
+    Push $0
+    Push $1
+    Push $9
+    Push "$9$1\"
+    Call un.RemoveEmptyDirs
+    Pop $9
+    Pop $1
+    Pop $0
     RMDir "$INSTDIR$9$1"
     "${Index}-Next:"
     FindNext $0 $1

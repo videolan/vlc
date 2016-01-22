@@ -48,7 +48,7 @@ StrCpy $Reinstall_HeadlineInstall "Alegeți modul în care doriți să instalaț
 StrCpy $Reinstall_HeadlineMaintenance "Alegeți efectuarea opțiunii de întreținere"
 StrCpy $Reinstall_MessageOlder "O versiune mai veche a VLC este instalat pe sistem. Selectați operația pe care doriți să o efectuați și faceți clic pe Următorul pentru a continua."
 StrCpy $Reinstall_MessageNewer "O versiune mai nouă a VLC este deja instalată! Nu este recomandat să reveniți la o versiune mai veche. Selectați operația pe care doriți să o efectuați și faceți clic pe Următorul pentru a continua."
-StrCpy $Reinstall_MessageSame "VLC $ {VERSION} este deja instalat. Selectați operația pe care doriți să o efectuați și faceți clic pe Următorul pentru a continua."
+StrCpy $Reinstall_MessageSame "VLC ${VERSION} este deja instalat. Selectați operația pe care doriți să o efectuați și faceți clic pe Următorul pentru a continua."
 StrCpy $Reinstall_OptionUpgrade "Actualizare VLC folosind setările anterioare (recomandat)"
 StrCpy $Reinstall_OptionDowngrade "Revenire la versiune anterioare VLC folosind setările anterioare (recomandat)"
 StrCpy $Reinstall_OptionComponents "Adaugă/Elimină/Reinstalează componente"
