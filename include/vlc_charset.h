@@ -109,6 +109,7 @@ static inline char *EnsureUTF8(char *str)
 }
 
 /* iconv wrappers (defined in src/extras/libc.c) */
+#define VLC_ICONV_ERR ((size_t) -1)
 typedef void *vlc_iconv_t;
 VLC_API vlc_iconv_t vlc_iconv_open( const char *, const char * ) VLC_USED;
 VLC_API size_t vlc_iconv( vlc_iconv_t, const char **, size_t *, char **, size_t * ) VLC_USED;
