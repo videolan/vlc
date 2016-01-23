@@ -38,7 +38,6 @@
 #endif
 
 #include <unistd.h>
-#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_modules.h>
