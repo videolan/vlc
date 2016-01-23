@@ -143,7 +143,17 @@ void ts_sections_processor_Add( ts_sections_processor_t **pp_chain,
                                 uint8_t i_table_id, uint8_t i_stream_type, bool b_raw,
                                 ts_section_callback_t pf_callback )
 {
-    ts_sections_processor_t *p_proc = malloc( sizeof(ts_sections_processor_t) );
+    ts_sections_processor_t *p_proc = *pp_chain;
+    for( ; p_proc; p_proc = p_proc->p_next )
+    {
+        /* Avoid duplicates */
+        if ( p_proc->i_stream_type == i_stream_type &&
+             p_proc->i_table_id == i_table_id &&
+             p_proc->pf_callback == pf_callback )
+            return;
+    }
+
+    p_proc = malloc( sizeof(ts_sections_processor_t) );
     if( p_proc )
     {
         ts_sections_assembler_Init( &p_proc->assembler );
