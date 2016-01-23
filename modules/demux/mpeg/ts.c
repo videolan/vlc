@@ -5116,6 +5116,8 @@ static void DoCreateES( demux_t *p_demux, ts_pes_es_t *p_es, const ts_pes_es_t *
     {
         if( !p_es->id )
         {
+            if( !p_es->fmt.i_group )
+                p_es->fmt.i_group = p_es->p_program->i_number;
             p_es->id = es_out_Add( p_demux->out, &p_es->fmt );
             if( p_parent_es ) /* Set Extra ES group and original ID */
             {
@@ -5862,6 +5864,7 @@ static ts_pes_es_t * ts_pes_es_New( ts_pmt_t *p_program )
         p_es->p_next = NULL;
         p_es->b_interlaced = false;
         es_format_Init( &p_es->fmt, UNKNOWN_ES, 0 );
+        p_es->fmt.i_group = p_program->i_number;
     }
     return p_es;
 }
