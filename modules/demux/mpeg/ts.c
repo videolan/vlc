@@ -464,7 +464,7 @@ static void ts_pat_Del( demux_t *, ts_pat_t * );
 static ts_pmt_t *ts_pmt_New( demux_t * );
 static void ts_pmt_Del( demux_t *, ts_pmt_t * );
 static ts_pes_es_t * ts_pes_es_New( ts_pmt_t * );
-static void ts_pes_Add_es( ts_pes_t *, ts_pes_es_t * );
+static void ts_pes_Add_es( ts_pes_t *, ts_pes_es_t *, bool );
 static ts_pes_es_t * ts_pes_Extract_es( ts_pes_t *, const ts_pmt_t * );
 static ts_pes_es_t * ts_pes_Find_es( ts_pes_t *, const ts_pmt_t * );
 static size_t ts_pes_Count_es( const ts_pes_es_t *, bool, const ts_pmt_t * );
@@ -4488,8 +4488,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pes_t *p_pes,
                 free( p_page_es->fmt.psz_description );
                 p_page_es->fmt.psz_language = NULL;
                 p_page_es->fmt.psz_description = NULL;
-
-                ts_pes_Add_es( p_pes, p_page_es );
+                ts_pes_Add_es( p_pes, p_page_es, true );
             }
 
             /* */
@@ -4566,7 +4565,7 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pes_t *p_pes,
                 p_subs_es->fmt.psz_language = NULL;
                 p_subs_es->fmt.psz_description = NULL;
 
-                ts_pes_Add_es( p_pes, p_subs_es );
+                ts_pes_Add_es( p_pes, p_subs_es, true );
             }
 
             /* */
@@ -5577,7 +5576,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                 else
                 {
                     ts_pes_es_t *p_new = ts_pes_Extract_es( p_pes, p_pmt );
-                    ts_pes_Add_es( pespid->u.p_pes, p_new );
+                    ts_pes_Add_es( pespid->u.p_pes, p_new, false );
                     assert(ts_pes_Count_es(p_pes->p_es, false, NULL) == 0);
                     ts_pes_Del( p_demux, p_pes );
                 }
@@ -5587,7 +5586,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                 assert(ts_pes_Count_es(pespid->u.p_pes->p_es, false, NULL)); /* Used by another program */
                 ts_pes_es_t *p_new = ts_pes_Extract_es( p_pes, p_pmt );
                 assert( p_new );
-                ts_pes_Add_es( pespid->u.p_pes, p_new );
+                ts_pes_Add_es( pespid->u.p_pes, p_new, false );
                 ts_pes_Del( p_demux, p_pes );
             }
         }
@@ -5881,16 +5880,19 @@ static void ts_pes_es_Clean( demux_t *p_demux, ts_pes_es_t *p_es )
     es_format_Clean( &p_es->fmt );
 }
 
-static void ts_pes_Add_es( ts_pes_t *p_pes, ts_pes_es_t *p_es )
+static void ts_pes_Add_es( ts_pes_t *p_pes, ts_pes_es_t *p_es, bool b_extra )
 {
-    if( likely(!p_pes->p_es) )
+    ts_pes_es_t **pp_es = (b_extra && p_pes->p_es) ?  /* Ensure extra has main es */
+                           &p_pes->p_es->p_extraes :
+                           &p_pes->p_es;
+    if( likely(!*pp_es) )
     {
-        p_pes->p_es = p_es;
+        *pp_es = p_es;
     }
     else
     {
-        ts_pes_es_t *p_next = p_pes->p_es->p_next;
-        p_pes->p_es->p_next = p_es;
+        ts_pes_es_t *p_next = (*pp_es)->p_next;
+        (*pp_es)->p_next = p_es;
         p_es->p_next = p_next;
     }
 }
