@@ -393,21 +393,25 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
         case GET_FROM_DIALOG:
             if (!psz_dialog_title || !psz_dialog_fmt)
                 return false;
+            char *psz_dialog_username = NULL;
+            char *psz_dialog_password = NULL;
 
-            free(p_credential->psz_dialog_username);
-            free(p_credential->psz_dialog_password);
-            p_credential->psz_dialog_username =
-            p_credential->psz_dialog_password = NULL;
-
-            /* TODO: save previously saved username and print it in dialog */
             va_list ap;
             va_start(ap, psz_dialog_fmt);
             dialog_vaLogin(p_parent, p_credential->psz_username,
-                           &p_credential->psz_dialog_username,
-                           &p_credential->psz_dialog_password,
+                           &psz_dialog_username, &psz_dialog_password,
                            p_credential->p_keystore ? &p_credential->b_store : NULL,
                            psz_dialog_title, psz_dialog_fmt, ap);
             va_end(ap);
+
+            /* Free previous dialog strings after dialog_vaLogin call since
+             * p_credential->psz_username (default username) can be a pointer
+             * to p_credential->psz_dialog_username */
+            free(p_credential->psz_dialog_username);
+            free(p_credential->psz_dialog_password);
+            p_credential->psz_dialog_username = psz_dialog_username;
+            p_credential->psz_dialog_password = psz_dialog_password;
+
             if (p_credential->psz_dialog_username
              && p_credential->psz_dialog_password)
             {
