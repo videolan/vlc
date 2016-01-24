@@ -176,7 +176,7 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
     if (resp == NULL)
         return NULL;
 
-    struct vlc_tls *psock = malloc(sizeof (*proxy));
+    struct vlc_tls *psock = malloc(sizeof (*psock));
     if (unlikely(psock == NULL))
     {
         vlc_http_msg_destroy(resp); /* <- sock is destroyed there too */
