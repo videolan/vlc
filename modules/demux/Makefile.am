@@ -231,7 +231,7 @@ demux_LTLIBRARIES += libplaylist_plugin.la
 libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
         demux/mpeg/sections.c demux/mpeg/sections.h \
         demux/mpeg/mpeg4_iod.c demux/mpeg/mpeg4_iod.h \
-        demux/mpeg/pes.h \
+        demux/mpeg/ts_strings.h demux/mpeg/pes.h \
 	mux/mpeg/csa.c mux/mpeg/dvbpsi_compat.h \
 	mux/mpeg/streams.h mux/mpeg/tables.c mux/mpeg/tables.h \
 	mux/mpeg/tsutil.c mux/mpeg/tsutil.h \
