@@ -292,7 +292,8 @@ typedef enum
 {
     TS_PMT_REGISTRATION_NONE = 0,
     TS_PMT_REGISTRATION_BLURAY,
-    TS_PMT_REGISTRATION_ATSC
+    TS_PMT_REGISTRATION_ATSC,
+    TS_PMT_REGISTRATION_ARIB,
 } ts_pmt_registration_type_t;
 
 typedef enum
@@ -5282,7 +5283,9 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
 static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  *p_firstdr,
                                    ts_pmt_t *p_pmt, ts_pmt_registration_type_t *p_registration_type )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     ts_pmt_registration_type_t registration_type = *p_registration_type;
+    int i_arib_score_flags = 0; /* Descriptors can be repeated */
 
     for( const dvbpsi_descriptor_t *p_dr = p_firstdr; p_dr != NULL; p_dr = p_dr->p_next )
     {
@@ -5320,9 +5323,13 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
             break;
 
             case 0x09:
-                msg_Dbg( p_demux, " * PMT descriptor : CA (0x9) SysID 0x%x",
-                        (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
-                break;
+            {
+                dvbpsi_ca_dr_t *p_cadr = dvbpsi_DecodeCADr( p_dr );
+                msg_Dbg( p_demux, " * PMT descriptor : CA (0x09) SysID 0x%x",
+                                  p_cadr->i_ca_system_id );
+                i_arib_score_flags |= (p_cadr->i_ca_system_id == 0x05);
+            }
+            break;
 
             case 0x0f:
                 msg_Dbg( p_demux, " * PMT descriptor : Private Data (0x0f)" );
@@ -5340,12 +5347,25 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
 
             case 0xC1:
                 msg_Dbg( p_demux, " * PMT descriptor : Digital copy control (0xC1)" );
+                i_arib_score_flags |= 1 << 2;
+                break;
+
+            case 0xF6:
+                i_arib_score_flags |= 1 << 1;
                 break;
 
             default:
                 msg_Dbg( p_demux, " * PMT descriptor : unknown (0x%x)", p_dr->i_tag );
                 break;
         }
+    }
+
+    if ( p_sys->arib.e_mode == ARIBMODE_AUTO &&
+         registration_type == TS_PMT_REGISTRATION_NONE &&
+         i_arib_score_flags == 0x07 ) //0b111
+    {
+        registration_type = TS_PMT_REGISTRATION_ARIB;
+        p_sys->arib.e_mode = ARIBMODE_ENABLED;
     }
 
     *p_registration_type = registration_type;
@@ -5423,36 +5443,6 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
     /* Parse PMT descriptors */
     ts_pmt_registration_type_t registration_type = TS_PMT_REGISTRATION_NONE;
-    dvbpsi_descriptor_t  *p_dr;
-
-    /* First pass for standard detection */
-    if ( p_sys->arib.e_mode == ARIBMODE_AUTO )
-    {
-        int i_arib_flags = 0; /* Descriptors can be repeated */
-        for( p_dr = p_dvbpsipmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
-        {
-            switch(p_dr->i_tag)
-            {
-            case 0x09:
-            {
-                dvbpsi_ca_dr_t *p_cadr = dvbpsi_DecodeCADr( p_dr );
-                i_arib_flags |= (p_cadr->i_ca_system_id == 0x05);
-            }
-                break;
-            case 0xF6:
-                i_arib_flags |= 1 << 1;
-                break;
-            case 0xC1:
-                i_arib_flags |= 1 << 2;
-                break;
-            default:
-                break;
-            }
-        }
-        if ( i_arib_flags == 0x07 ) //0b111
-            p_sys->arib.e_mode = ARIBMODE_ENABLED;
-    }
-
     ParsePMTRegistrations( p_demux, p_dvbpsipmt->p_first_descriptor, p_pmt, &registration_type );
 
     dvbpsi_pmt_es_t *p_dvbpsies;
@@ -5529,10 +5519,10 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         msg_Dbg( p_demux, "  * pid=%d type=0x%x %s",
                  p_dvbpsies->i_pid, p_dvbpsies->i_type, psz_typedesc );
 
-        for( p_dr = p_dvbpsies->p_first_descriptor; p_dr != NULL;
-             p_dr = p_dr->p_next )
+        for( dvbpsi_descriptor_t *p_dr = p_dvbpsies->p_first_descriptor;
+             p_dr != NULL; p_dr = p_dr->p_next )
         {
-            msg_Dbg( p_demux, "    - descriptor tag 0x%x",
+            msg_Dbg( p_demux, "    - ES descriptor tag 0x%x",
                      p_dr->i_tag );
         }
 
@@ -5583,10 +5573,10 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                      p_dvbpsies->i_pid, (char*)&p_pes->p_es->fmt.i_codec );
         }
 
-        p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x09 );
+        dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x09 );
         if( p_dr && p_dr->i_length >= 2 )
         {
-            msg_Dbg( p_demux, "   * PMT descriptor : CA (0x9) SysID 0x%x",
+            msg_Dbg( p_demux, "    - ES descriptor : CA (0x9) SysID 0x%x",
                      (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
         }
 
