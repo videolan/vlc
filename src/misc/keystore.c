@@ -136,7 +136,10 @@ find_closest_path(vlc_keystore_entry *p_entries, unsigned i_count,
         vlc_keystore_entry *p_entry = &p_entries[i];
         const char *psz_entry_path = p_entry->ppsz_values[KEY_PATH];
         if (psz_entry_path == NULL)
+        {
+            p_match_entry = p_entry;
             continue;
+        }
         size_t i_entry_pathlen = strlen(psz_entry_path);
 
         if (strncasecmp(psz_decoded_path, psz_entry_path, i_entry_pathlen) == 0
