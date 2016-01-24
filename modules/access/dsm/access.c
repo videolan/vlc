@@ -371,7 +371,7 @@ static int login( access_t *p_access )
 success:
     msg_Warn( p_access, "Creds: username = '%s', domain = '%s'",
              psz_login, psz_domain );
-    if( p_sys->psz_share != NULL && !b_guest )
+    if( !b_guest )
     {
         if( asprintf( &p_sys->psz_user_opt, "smb-user=%s", psz_login ) == -1 )
             p_sys->psz_user_opt = NULL;
