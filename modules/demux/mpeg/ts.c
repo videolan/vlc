@@ -292,6 +292,7 @@ typedef enum
 {
     TS_PMT_REGISTRATION_NONE = 0,
     TS_PMT_REGISTRATION_BLURAY,
+    TS_PMT_REGISTRATION_ATSC
 } ts_pmt_registration_type_t;
 
 typedef enum
@@ -5303,6 +5304,7 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
                 } regs[] = {
                     { { 'H', 'D', 'M', 'V' }, TS_PMT_REGISTRATION_BLURAY },
                     { { 'H', 'D', 'P', 'R' }, TS_PMT_REGISTRATION_BLURAY },
+                    { { 'G', 'A', '9', '4' }, TS_PMT_REGISTRATION_ATSC },
                 };
 
                 for( unsigned i=0; i<ARRAY_SIZE(regs); i++ )
