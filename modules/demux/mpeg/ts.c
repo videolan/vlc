@@ -5289,7 +5289,7 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
 
     for( const dvbpsi_descriptor_t *p_dr = p_firstdr; p_dr != NULL; p_dr = p_dr->p_next )
     {
-        /* special descriptors handling */
+        /* general descriptors handling < 0x40 and scoring */
         switch(p_dr->i_tag)
         {
             case 0x05: /* Registration Descriptor */
@@ -5340,13 +5340,7 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
                 p_pmt->iod = IODNew( VLC_OBJECT(p_demux), p_dr->i_length, p_dr->p_data );
                 break;
 
-            case 0x88: /* EACEM Simulcast HD Logical channels ordering */
-                msg_Dbg( p_demux, " * PMT descriptor : EACEM Simulcast HD" );
-                /* TODO: apply visibility flags */
-                break;
-
             case 0xC1:
-                msg_Dbg( p_demux, " * PMT descriptor : Digital copy control (0xC1)" );
                 i_arib_score_flags |= 1 << 2;
                 break;
 
@@ -5355,7 +5349,8 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
                 break;
 
             default:
-                msg_Dbg( p_demux, " * PMT descriptor : unknown (0x%x)", p_dr->i_tag );
+                if( p_dr->i_tag < 0x40 )
+                    msg_Dbg( p_demux, " * PMT descriptor : unknown (0x%x)", p_dr->i_tag );
                 break;
         }
     }
@@ -5366,6 +5361,36 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
     {
         registration_type = TS_PMT_REGISTRATION_ARIB;
         p_sys->arib.e_mode = ARIBMODE_ENABLED;
+    }
+
+    /* Now process private descriptors >= 0x40 */
+    for( const dvbpsi_descriptor_t *p_dr = p_firstdr; p_dr != NULL; p_dr = p_dr->p_next )
+    {
+        if( p_dr->i_tag < 0x40 )
+            continue;
+
+        switch(p_dr->i_tag)
+        {
+            case 0x88: /* EACEM Simulcast HD Logical channels ordering */
+                if( registration_type == TS_PMT_REGISTRATION_NONE )
+                    msg_Dbg( p_demux, " * PMT descriptor : EACEM Simulcast HD" );
+                    /* TODO: apply visibility flags */
+                break;
+
+            case 0xC1:
+                if( registration_type == TS_PMT_REGISTRATION_ARIB )
+                    msg_Dbg( p_demux, " * PMT descriptor : Digital copy control (0xC1)" );
+                break;
+
+            case 0xDE:
+                if( registration_type == TS_PMT_REGISTRATION_ARIB )
+                    msg_Dbg( p_demux, " * PMT descriptor : Content availability (0xDE)" );
+                break;
+
+            default:
+                msg_Dbg( p_demux, " * PMT descriptor : unknown (0x%x)", p_dr->i_tag );
+                break;
+        }
     }
 
     *p_registration_type = registration_type;
