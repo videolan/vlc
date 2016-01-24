@@ -5281,6 +5281,8 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
         p_pes->p_es->fmt.i_id = p_dvbpsies->i_pid;
 }
 
+#define PMT_DESC_PREFIX " * PMT descriptor: "
+#define PMT_DESC_INDENT "                 : "
 static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  *p_firstdr,
                                    ts_pmt_t *p_pmt, ts_pmt_registration_type_t *p_registration_type )
 {
@@ -5291,13 +5293,19 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
     for( const dvbpsi_descriptor_t *p_dr = p_firstdr; p_dr != NULL; p_dr = p_dr->p_next )
     {
         /* general descriptors handling < 0x40 and scoring */
+        if( p_dr->i_tag < 0x40 )
+        {
+            msg_Dbg( p_demux, PMT_DESC_PREFIX "%s (0x%x)",
+                     ISO13818_1_Get_Descriptor_Description(p_dr->i_tag), p_dr->i_tag );
+        }
+
         switch(p_dr->i_tag)
         {
             case 0x05: /* Registration Descriptor */
             {
                 if( p_dr->i_length != 4 )
                 {
-                    msg_Warn( p_demux, " * PMT invalid Registration Descriptor" );
+                    msg_Warn( p_demux, PMT_DESC_INDENT "invalid registration descriptor" );
                     break;
                 }
 
@@ -5316,7 +5324,7 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
                     if( !memcmp( regs[i].rgs, p_dr->p_data, 4 ) )
                     {
                         registration_type = regs[i].reg;
-                        msg_Dbg( p_demux, " * PMT descriptor : registration %4.4s", p_dr->p_data );
+                        msg_Dbg( p_demux, PMT_DESC_INDENT "%4.4s registration", p_dr->p_data );
                         break;
                     }
                 }
@@ -5325,19 +5333,13 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
 
             case 0x09:
             {
-                dvbpsi_ca_dr_t *p_cadr = dvbpsi_DecodeCADr( p_dr );
-                msg_Dbg( p_demux, " * PMT descriptor : CA (0x09) SysID 0x%x",
-                                  p_cadr->i_ca_system_id );
+                dvbpsi_ca_dr_t *p_cadr = dvbpsi_DecodeCADr( (dvbpsi_descriptor_t *) p_dr );
+                msg_Dbg( p_demux, PMT_DESC_INDENT "CA System ID 0x%x", p_cadr->i_ca_system_id );
                 i_arib_score_flags |= (p_cadr->i_ca_system_id == 0x05);
             }
             break;
 
-            case 0x0f:
-                msg_Dbg( p_demux, " * PMT descriptor : Private Data (0x0f)" );
-                break;
-
             case 0x1d: /* We have found an IOD descriptor */
-                msg_Dbg( p_demux, " * PMT descriptor : IOD (0x1d)" );
                 p_pmt->iod = IODNew( VLC_OBJECT(p_demux), p_dr->i_length, p_dr->p_data );
                 break;
 
@@ -5350,8 +5352,6 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
                 break;
 
             default:
-                if( p_dr->i_tag < 0x40 )
-                    msg_Dbg( p_demux, " * PMT descriptor : unknown (0x%x)", p_dr->i_tag );
                 break;
         }
     }
@@ -5374,22 +5374,22 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
         {
             case 0x88: /* EACEM Simulcast HD Logical channels ordering */
                 if( registration_type == TS_PMT_REGISTRATION_NONE )
-                    msg_Dbg( p_demux, " * PMT descriptor : EACEM Simulcast HD" );
+                    msg_Dbg( p_demux, PMT_DESC_PREFIX "EACEM Simulcast HD" );
                     /* TODO: apply visibility flags */
                 break;
 
             case 0xC1:
                 if( registration_type == TS_PMT_REGISTRATION_ARIB )
-                    msg_Dbg( p_demux, " * PMT descriptor : Digital copy control (0xC1)" );
+                    msg_Dbg( p_demux, PMT_DESC_PREFIX "Digital copy control (0xC1)" );
                 break;
 
             case 0xDE:
                 if( registration_type == TS_PMT_REGISTRATION_ARIB )
-                    msg_Dbg( p_demux, " * PMT descriptor : Content availability (0xDE)" );
+                    msg_Dbg( p_demux, PMT_DESC_PREFIX "Content availability (0xDE)" );
                 break;
 
             default:
-                msg_Dbg( p_demux, " * PMT descriptor : unknown (0x%x)", p_dr->i_tag );
+                msg_Dbg( p_demux, PMT_DESC_PREFIX "Unknown Private (0x%x)", p_dr->i_tag );
                 break;
         }
     }

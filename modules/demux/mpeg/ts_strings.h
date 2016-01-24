@@ -82,5 +82,78 @@ static const char *ISO13818_1_Get_StreamType_Description(uint8_t i_type)
         return ISO13818_1_other_descs[1];
 }
 
+static const char * const ISO13818_1_descriptors_descs[] =
+{
+    "Reserved",
+    "Forbidden",
+    "Video Stream",
+    "Audio Stream",
+    "Hierarchy",
+    "Registration",
+    "Data Stream Alignment",
+    "Target Background Grid",
+    "Video Window",
+    /* ^ 0x08 */
+    "CA",
+    "ISO 639 Language",
+    "System Clock",
+    "Multiplex Buffer Utilization",
+    "Copyright",
+    "Maximum Bitrate",
+    "Private Data Indicator",
+    /* ^ 0x0F */
+    "Smoothing Buffer",
+    "STD",
+    "IBP",
+    "DSM CC Carousel Identifier",
+    "DSM CC Association Tag",
+    "DSM CC Deferred Association Tag",
+    "DSM CC Reserved",
+    "DSM CC NPT Reference",
+    "DSM CC NPT Endpoint",
+    "DSM CC Stream Mode",
+    /* ^ 0x19 */
+    "DSM CC Stream Event",
+    "MPEG-4 Video",
+    "MPEG-4 Audio",
+    "IOD",
+    "SL",
+    "FMC",
+    /* ^ 0x1F */
+    "External ES ID",
+    "MuxCode",
+    "FmxBufferSize",
+    "MultiplexBuffer",
+    /* ^ 0x23 */
+    "Content Labeling",
+    "Metadata Pointer",
+    "Metadata",
+    "Metadata STD",
+    "AVC Video",
+    "IPMP",
+    "AVC Timing and HRD",
+    "MPEG-2 AAC Audio",
+    "FlexMux Timing",
+    /* ^ 0x2C */
+    "MPEG-4 Text",
+    "MPEG-4 Audio Extension",
+    "Auxiliary Video Stream",
+    "SVC Extension",
+    "MVC Extension",
+    "J2K Video",
+    "MVC Operation Point",
+    "MPEG-2 Stereoscopic Video Format",
+    "Stereoscopic Program Info",
+    "Stereoscopic Video Info",
+    /* ^ 0x36 */
+};
+
+static const char *ISO13818_1_Get_Descriptor_Description(uint8_t i_desc)
+{
+    if( i_desc < 0x36 )
+        return ISO13818_1_descriptors_descs[i_desc];
+    else
+        return ISO13818_1_other_descs[1];
+}
 
 #endif
