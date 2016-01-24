@@ -291,7 +291,7 @@ typedef struct
 typedef enum
 {
     TS_PMT_REGISTRATION_NONE = 0,
-    TS_PMT_REGISTRATION_HDMV
+    TS_PMT_REGISTRATION_BLURAY,
 } ts_pmt_registration_type_t;
 
 typedef enum
@@ -5207,7 +5207,7 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
     bool b_registration_applied = false;
     if ( p_dvbpsies->i_type >= 0x80 ) /* non standard, extensions */
     {
-        if ( registration_type == TS_PMT_REGISTRATION_HDMV )
+        if ( registration_type == TS_PMT_REGISTRATION_BLURAY )
         {
             if (( b_registration_applied = PMTSetupEsHDMV( p_demux, p_pes->p_es, p_dvbpsies ) ))
                 msg_Dbg( p_demux, "    + HDMV registration applied to pid %d type 0x%x",
@@ -5301,8 +5301,8 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
                     const char rgs[4];
                     const ts_pmt_registration_type_t reg;
                 } regs[] = {
-                    { { 'H', 'D', 'M', 'V' }, TS_PMT_REGISTRATION_HDMV }, /* Blu-Ray */
-                    { { 'H', 'D', 'P', 'R' }, TS_PMT_REGISTRATION_HDMV }, /* Blu-Ray */
+                    { { 'H', 'D', 'M', 'V' }, TS_PMT_REGISTRATION_BLURAY },
+                    { { 'H', 'D', 'P', 'R' }, TS_PMT_REGISTRATION_BLURAY },
                 };
 
                 for( unsigned i=0; i<ARRAY_SIZE(regs); i++ )
