@@ -5278,6 +5278,77 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
         p_pes->p_es->fmt.i_id = p_dvbpsies->i_pid;
 }
 
+static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  *p_firstdr,
+                                   ts_pmt_t *p_pmt, ts_pmt_registration_type_t *p_registration_type )
+{
+    ts_pmt_registration_type_t registration_type = *p_registration_type;
+
+    for( const dvbpsi_descriptor_t *p_dr = p_firstdr; p_dr != NULL; p_dr = p_dr->p_next )
+    {
+        /* special descriptors handling */
+        switch(p_dr->i_tag)
+        {
+            case 0x05: /* Registration Descriptor */
+            {
+                if( p_dr->i_length != 4 )
+                {
+                    msg_Warn( p_demux, " * PMT invalid Registration Descriptor" );
+                    break;
+                }
+
+                static const struct
+                {
+                    const char rgs[4];
+                    const ts_pmt_registration_type_t reg;
+                } regs[] = {
+                    { { 'H', 'D', 'M', 'V' }, TS_PMT_REGISTRATION_HDMV }, /* Blu-Ray */
+                    { { 'H', 'D', 'P', 'R' }, TS_PMT_REGISTRATION_HDMV }, /* Blu-Ray */
+                };
+
+                for( unsigned i=0; i<ARRAY_SIZE(regs); i++ )
+                {
+                    if( !memcmp( regs[i].rgs, p_dr->p_data, 4 ) )
+                    {
+                        registration_type = regs[i].reg;
+                        msg_Dbg( p_demux, " * PMT descriptor : registration %4.4s", p_dr->p_data );
+                        break;
+                    }
+                }
+            }
+            break;
+
+            case 0x09:
+                msg_Dbg( p_demux, " * PMT descriptor : CA (0x9) SysID 0x%x",
+                        (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
+                break;
+
+            case 0x0f:
+                msg_Dbg( p_demux, " * PMT descriptor : Private Data (0x0f)" );
+                break;
+
+            case 0x1d: /* We have found an IOD descriptor */
+                msg_Dbg( p_demux, " * PMT descriptor : IOD (0x1d)" );
+                p_pmt->iod = IODNew( VLC_OBJECT(p_demux), p_dr->i_length, p_dr->p_data );
+                break;
+
+            case 0x88: /* EACEM Simulcast HD Logical channels ordering */
+                msg_Dbg( p_demux, " * PMT descriptor : EACEM Simulcast HD" );
+                /* TODO: apply visibility flags */
+                break;
+
+            case 0xC1:
+                msg_Dbg( p_demux, " * PMT descriptor : Digital copy control (0xC1)" );
+                break;
+
+            default:
+                msg_Dbg( p_demux, " * PMT descriptor : unknown (0x%x)", p_dr->i_tag );
+                break;
+        }
+    }
+
+    *p_registration_type = registration_type;
+}
+
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 {
     demux_t      *p_demux = data;
@@ -5380,51 +5451,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             p_sys->arib.e_mode = ARIBMODE_ENABLED;
     }
 
-    for( p_dr = p_dvbpsipmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
-    {
-        /* special descriptors handling */
-        switch(p_dr->i_tag)
-        {
-        case 0x1d: /* We have found an IOD descriptor */
-            msg_Dbg( p_demux, " * PMT descriptor : IOD (0x1d)" );
-            p_pmt->iod = IODNew( VLC_OBJECT(p_demux), p_dr->i_length, p_dr->p_data );
-            break;
-
-        case 0x9:
-            msg_Dbg( p_demux, " * PMT descriptor : CA (0x9) SysID 0x%x",
-                    (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
-            break;
-
-        case 0x5: /* Registration Descriptor */
-            if( p_dr->i_length != 4 )
-            {
-                msg_Warn( p_demux, " * PMT invalid Registration Descriptor" );
-            }
-            else
-            {
-                msg_Dbg( p_demux, " * PMT descriptor : registration %4.4s", p_dr->p_data );
-                if( !memcmp( p_dr->p_data, "HDMV", 4 ) || !memcmp( p_dr->p_data, "HDPR", 4 ) )
-                    registration_type = TS_PMT_REGISTRATION_HDMV; /* Blu-Ray */
-            }
-            break;
-
-        case 0x0f:
-            msg_Dbg( p_demux, " * PMT descriptor : Private Data (0x0f)" );
-            break;
-
-        case 0xC1:
-            msg_Dbg( p_demux, " * PMT descriptor : Digital copy control (0xC1)" );
-            break;
-
-        case 0x88: /* EACEM Simulcast HD Logical channels ordering */
-            msg_Dbg( p_demux, " * descriptor : EACEM Simulcast HD" );
-            /* TODO: apply visibility flags */
-            break;
-
-        default:
-            msg_Dbg( p_demux, " * PMT descriptor : unknown (0x%x)", p_dr->i_tag );
-        }
-    }
+    ParsePMTRegistrations( p_demux, p_dvbpsipmt->p_first_descriptor, p_pmt, &registration_type );
 
     dvbpsi_pmt_es_t *p_dvbpsies;
     for( p_dvbpsies = p_dvbpsipmt->p_first_es; p_dvbpsies != NULL; p_dvbpsies = p_dvbpsies->p_next )
