@@ -99,7 +99,7 @@ static int Create( vlc_object_t *p_this )
     case VLC_CODEC_GREY:
         break;
     default:
-        msg_Err( p_filter, "Unsupported chroma" );
+        msg_Err( p_filter, "Unsupported chroma %4.4s", (char *)&p_filter->fmt_in.i_codec );
         return VLC_EGENERIC;
     }
     if( !es_format_IsSimilar( &p_filter->fmt_in, &p_filter->fmt_out ) )
