@@ -722,21 +722,6 @@ static void DisableScreensaver(vout_display_t *vd)
         SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0,
                              &sys->i_spi_screensaveactive, 0);
 
-        if (LOWORD(GetVersion()) == 0x0005) {
-            /* If this is NT 5.0 (i.e., Win2K), we need to hack around
-             * KB318781 (see http://support.microsoft.com/kb/318781) */
-
-            HKEY hKeyCP = NULL;
-
-            if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER,
-                                              TEXT("Control Panel\\Desktop"),
-                                              0, KEY_QUERY_VALUE, &hKeyCP) &&
-                ERROR_SUCCESS != RegQueryValueEx(hKeyCP, TEXT("SCRNSAVE.EXE"),
-                                                 NULL, NULL, NULL, NULL)) {
-                sys->i_spi_screensaveactive = FALSE;
-            }
-        }
-
         if (FALSE != sys->i_spi_screensaveactive) {
             SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, 0, NULL, 0);
         }
