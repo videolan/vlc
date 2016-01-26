@@ -861,8 +861,7 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     if( p_picture->date <= VLC_TS_INVALID )
     {
         msg_Warn( p_dec, "non-dated video buffer received" );
-        *pi_lost_sum += 1;
-        picture_Release( p_picture );
+        goto discard;
         return 0;
     }
 
@@ -901,6 +900,9 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     vlc_fifo_Unlock( p_owner->p_fifo );
 
     /* */
+    if( p_vout == NULL )
+        goto discard;
+
     if( p_picture->b_force || p_picture->date > VLC_TS_INVALID )
         /* FIXME: VLC_TS_INVALID -- verify video_output */
     {
@@ -918,11 +920,13 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
             msg_Warn( p_dec, "early picture skipped" );
         else
             msg_Warn( p_dec, "non-dated video buffer received" );
-
-        *pi_lost_sum += 1;
-        picture_Release( p_picture );
+        goto discard;
     }
 
+    return 0;
+discard:
+    *pi_lost_sum += 1;
+    picture_Release( p_picture );
     return 0;
 }
 
