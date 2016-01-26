@@ -828,7 +828,7 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
 }
 
 static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
-                             int *pi_lost_sum )
+                             unsigned *restrict pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     vout_thread_t  *p_vout = p_owner->p_vout;
@@ -926,12 +926,12 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     return 0;
 }
 
-static void DecoderUpdateStatVideo( decoder_t *p_dec, int decoded,
-                                    int lost )
+static void DecoderUpdateStatVideo( decoder_t *p_dec, unsigned decoded,
+                                    unsigned lost )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_thread_t *p_input = p_owner->p_input;
-    int displayed = 0;
+    unsigned displayed = 0;
 
     /* Update ugly stat */
     if( p_input == NULL )
@@ -939,7 +939,7 @@ static void DecoderUpdateStatVideo( decoder_t *p_dec, int decoded,
 
     if( p_owner->p_vout != NULL )
     {
-        int vout_lost = 0;
+        unsigned vout_lost = 0;
 
         vout_GetResetStatistic( p_owner->p_vout, &displayed, &vout_lost );
         lost += vout_lost;
@@ -955,7 +955,7 @@ static void DecoderUpdateStatVideo( decoder_t *p_dec, int decoded,
 static int DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     assert( p_pic );
-    int i_lost = 0;
+    unsigned i_lost = 0;
 
     int ret = DecoderPlayVideo( p_dec, p_pic, &i_lost );
 
@@ -967,8 +967,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 {
     picture_t      *p_pic;
     block_t **pp_block = p_block ? &p_block : NULL;
-    int i_lost = 0;
-    int i_decoded = 0;
+    unsigned i_lost = 0, i_decoded = 0;
 
     while( (p_pic = p_dec->pf_decode_video( p_dec, pp_block ) ) )
     {

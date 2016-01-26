@@ -39,7 +39,8 @@ void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration );
 /**
  * This function will return and reset internal statistics.
  */
-void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_lost );
+void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
+                             unsigned *pi_lost );
 
 /**
  * This function will ensure that all ready/displayed pciture have at most

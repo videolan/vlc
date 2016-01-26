@@ -320,7 +320,8 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
     vout_control_WaitEmpty(&vout->p->control);
 }
 
-void vout_GetResetStatistic(vout_thread_t *vout, int *displayed, int *lost)
+void vout_GetResetStatistic(vout_thread_t *vout, unsigned *restrict displayed,
+                            unsigned *restrict lost)
 {
     vout_statistic_GetReset( &vout->p->statistic, displayed, lost );
 }
