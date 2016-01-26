@@ -3266,10 +3266,11 @@ AM_CONDITIONAL([HAVE_HARFBUZZ], [test "${have_harfbuzz}" = "yes"])
 dnl
 dnl SAPI (text to Speech renderer for Windows)
 dnl
-AC_CHECK_HEADERS(sapi.h, [
+AC_CHECK_TYPES([ISpObjectToken],[
               have_sapi="yes"
-            ],[AC_MSG_WARN([sapi.h not found. Text to Speech renderer for Windows disabled])])
-
+            ],[AC_MSG_WARN([sapi.h not found. Text to Speech renderer for Windows disabled])],
+              [#include <windows.h>
+               #include <sapi.h>])
 AM_CONDITIONAL([HAVE_SAPI], [test "${have_sapi}" = "yes"])
 
 dnl
