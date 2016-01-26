@@ -34,6 +34,7 @@
 #include "../tools/Debug.hpp"
 
 using namespace adaptative::logic;
+using namespace adaptative;
 
 RateBasedAdaptationLogic::RateBasedAdaptationLogic  (vlc_object_t *p_obj_, int w, int h) :
                           AbstractAdaptationLogic   (),
