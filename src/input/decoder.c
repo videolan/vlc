@@ -827,18 +827,43 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
         block_Release( p_cc );
 }
 
-static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
-                              int *pi_played_sum, int *pi_lost_sum )
+static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
+                             int *pi_played_sum, int *pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     vout_thread_t  *p_vout = p_owner->p_vout;
+    bool prerolled;
+
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_owner->i_preroll_end > p_picture->date )
+    {
+        vlc_mutex_unlock( &p_owner->lock );
+        picture_Release( p_picture );
+        return -1;
+    }
+
+    prerolled = p_owner->i_preroll_end > INT64_MIN;
+    p_owner->i_preroll_end = INT64_MIN;
+    vlc_mutex_unlock( &p_owner->lock );
+
+    if( unlikely(prerolled) )
+    {
+        msg_Dbg( p_dec, "end of video preroll" );
+
+        if( p_vout )
+            vout_Flush( p_vout, VLC_TS_INVALID+1 );
+    }
+
+    if( p_dec->pf_get_cc &&
+        ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
+        DecoderGetCc( p_dec, p_dec );
 
     if( p_picture->date <= VLC_TS_INVALID )
     {
         msg_Warn( p_dec, "non-dated video buffer received" );
         *pi_lost_sum += 1;
         picture_Release( p_picture );
-        return;
+        return 0;
     }
 
     /* */
@@ -903,38 +928,6 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
 
     *pi_played_sum += i_tmp_display;
     *pi_lost_sum += i_tmp_lost;
-}
-
-static int DecoderPreparePlayVideo( decoder_t *p_dec, picture_t *p_pic )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    vout_thread_t  *p_vout = p_owner->p_vout;
-    bool prerolled;
-
-    vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->i_preroll_end > p_pic->date )
-    {
-        vlc_mutex_unlock( &p_owner->lock );
-        picture_Release( p_pic );
-        return -1;
-    }
-
-    prerolled = p_owner->i_preroll_end > INT64_MIN;
-    p_owner->i_preroll_end = INT64_MIN;
-    vlc_mutex_unlock( &p_owner->lock );
-
-    if( unlikely(prerolled) )
-    {
-        msg_Dbg( p_dec, "end of video preroll" );
-
-        if( p_vout )
-            vout_Flush( p_vout, VLC_TS_INVALID+1 );
-    }
-
-    if( p_dec->pf_get_cc &&
-        ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
-        DecoderGetCc( p_dec, p_dec );
-
     return 0;
 }
 
@@ -961,13 +954,11 @@ static int DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
     assert( p_pic );
     int i_lost = 0;
     int i_displayed = 0;
-    int i_ret;
 
-    if( ( i_ret = DecoderPreparePlayVideo( p_dec, p_pic ) ) == 0 )
-        DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
+    int ret = DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
 
     DecoderUpdateStatVideo( p_dec, 1, i_lost, i_displayed );
-    return i_ret;
+    return ret;
 }
 
 static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
@@ -981,9 +972,6 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
     while( (p_pic = p_dec->pf_decode_video( p_dec, pp_block ) ) )
     {
         i_decoded++;
-
-        if( DecoderPreparePlayVideo( p_dec, p_pic ) != 0 )
-            continue;
 
         DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
     }
