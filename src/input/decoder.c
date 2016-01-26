@@ -1106,7 +1106,6 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
     if( aout_DecPlay( p_aout, p_audio, i_rate ) == 0 )
         *pi_played_sum += 1;
 
-    *pi_lost_sum += aout_DecGetResetLost( p_aout );
     return 0;
 }
 
@@ -1117,14 +1116,17 @@ static void DecoderUpdateStatAudio( decoder_t *p_dec, int i_decoded,
     input_thread_t *p_input = p_owner->p_input;
 
     /* Update ugly stat */
-    if( p_input != NULL && (i_decoded > 0 || i_lost > 0 || i_played > 0) )
-    {
-        vlc_mutex_lock( &p_input->p->counters.counters_lock);
-        stats_Update( p_input->p->counters.p_lost_abuffers, i_lost, NULL );
-        stats_Update( p_input->p->counters.p_played_abuffers, i_played, NULL );
-        stats_Update( p_input->p->counters.p_decoded_audio, i_decoded, NULL );
-        vlc_mutex_unlock( &p_input->p->counters.counters_lock);
-    }
+    if( p_input == NULL )
+        return;
+
+    if( p_owner->p_aout != NULL )
+        i_lost += aout_DecGetResetLost( p_owner->p_aout );
+
+    vlc_mutex_lock( &p_input->p->counters.counters_lock);
+    stats_Update( p_input->p->counters.p_lost_abuffers, i_lost, NULL );
+    stats_Update( p_input->p->counters.p_played_abuffers, i_played, NULL );
+    stats_Update( p_input->p->counters.p_decoded_audio, i_decoded, NULL );
+    vlc_mutex_unlock( &p_input->p->counters.counters_lock);
 }
 
 static int DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
