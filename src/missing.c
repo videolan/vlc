@@ -314,6 +314,12 @@ int sout_MuxSendBuffer (sout_mux_t *mux, sout_input_t *input, block_t *block)
     vlc_assert_unreachable ();
 }
 
+void sout_MuxFlush( sout_mux_t *mux, sout_input_t *input )
+{
+    VLC_UNUSED (mux); VLC_UNUSED (input);
+    vlc_assert_unreachable ();
+}
+
 void sout_StreamChainDelete (sout_stream_t *p_first, sout_stream_t *p_last)
 {
     VLC_UNUSED (p_first); VLC_UNUSED (p_last);
