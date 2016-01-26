@@ -34,6 +34,8 @@
 #include <vlc_url.h>
 #include <vlc_block.h>
 
+#include <algorithm>
+
 using namespace adaptative::http;
 
 AbstractChunkSource::AbstractChunkSource()
