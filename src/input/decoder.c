@@ -1038,7 +1038,8 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
 }
 
 static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
-                             int *pi_played_sum, int *pi_lost_sum )
+                             unsigned *restrict pi_played_sum,
+                             unsigned *restrict pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     bool prerolled;
@@ -1109,8 +1110,8 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
     return 0;
 }
 
-static void DecoderUpdateStatAudio( decoder_t *p_dec, int i_decoded,
-                                    int i_lost, int i_played )
+static void DecoderUpdateStatAudio( decoder_t *p_dec, unsigned decoded,
+                                    unsigned lost, unsigned played )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_thread_t *p_input = p_owner->p_input;
@@ -1120,19 +1121,18 @@ static void DecoderUpdateStatAudio( decoder_t *p_dec, int i_decoded,
         return;
 
     if( p_owner->p_aout != NULL )
-        i_lost += aout_DecGetResetLost( p_owner->p_aout );
+        lost += aout_DecGetResetLost( p_owner->p_aout );
 
     vlc_mutex_lock( &p_input->p->counters.counters_lock);
-    stats_Update( p_input->p->counters.p_lost_abuffers, i_lost, NULL );
-    stats_Update( p_input->p->counters.p_played_abuffers, i_played, NULL );
-    stats_Update( p_input->p->counters.p_decoded_audio, i_decoded, NULL );
+    stats_Update( p_input->p->counters.p_lost_abuffers, lost, NULL );
+    stats_Update( p_input->p->counters.p_played_abuffers, played, NULL );
+    stats_Update( p_input->p->counters.p_decoded_audio, decoded, NULL );
     vlc_mutex_unlock( &p_input->p->counters.counters_lock);
 }
 
 static int DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
-    int i_lost = 0;
-    int i_played = 0;
+    unsigned i_lost = 0, i_played = 0;
 
     int ret = DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
 
@@ -1145,9 +1145,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 {
     block_t *p_aout_buf;
     block_t **pp_block = p_block ? &p_block : NULL;
-    int i_decoded = 0;
-    int i_lost = 0;
-    int i_played = 0;
+    unsigned i_decoded = 0, i_lost = 0, i_played = 0;
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, pp_block ) ) )
     {
