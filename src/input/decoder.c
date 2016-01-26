@@ -1038,7 +1038,6 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
 }
 
 static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
-                             unsigned *restrict pi_played_sum,
                              unsigned *restrict pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -1093,35 +1092,40 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
 
     audio_output_t *p_aout = p_owner->p_aout;
 
-    if( p_aout == NULL || p_audio->i_pts <= VLC_TS_INVALID
-     || i_rate < INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE
-     || i_rate > INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE
-     || DecoderTimedWait( p_dec, p_audio->i_pts - AOUT_MAX_PREPARE_TIME ) )
+    if( p_aout != NULL && p_audio->i_pts > VLC_TS_INVALID
+     && i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE
+     && i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE
+     && !DecoderTimedWait( p_dec, p_audio->i_pts - AOUT_MAX_PREPARE_TIME ) )
+    {
+        aout_DecPlay( p_aout, p_audio, i_rate );
+    }
+    else
     {
         msg_Dbg( p_dec, "discarded audio buffer" );
         *pi_lost_sum += 1;
         block_Release( p_audio );
-        return 0;
     }
-
-    if( aout_DecPlay( p_aout, p_audio, i_rate ) == 0 )
-        *pi_played_sum += 1;
-
     return 0;
 }
 
 static void DecoderUpdateStatAudio( decoder_t *p_dec, unsigned decoded,
-                                    unsigned lost, unsigned played )
+                                    unsigned lost )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_thread_t *p_input = p_owner->p_input;
+    unsigned played = 0;
 
     /* Update ugly stat */
     if( p_input == NULL )
         return;
 
     if( p_owner->p_aout != NULL )
-        lost += aout_DecGetResetLost( p_owner->p_aout );
+    {
+        unsigned aout_lost;
+
+        aout_DecGetResetStats( p_owner->p_aout, &aout_lost, &played );
+        lost += aout_lost;
+    }
 
     vlc_mutex_lock( &p_input->p->counters.counters_lock);
     stats_Update( p_input->p->counters.p_lost_abuffers, lost, NULL );
@@ -1132,11 +1136,11 @@ static void DecoderUpdateStatAudio( decoder_t *p_dec, unsigned decoded,
 
 static int DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
-    unsigned i_lost = 0, i_played = 0;
+    unsigned lost = 0;
 
-    int ret = DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
+    int ret = DecoderPlayAudio( p_dec, p_aout_buf, &lost );
 
-    DecoderUpdateStatAudio( p_dec, 1, i_lost, i_played );
+    DecoderUpdateStatAudio( p_dec, 1, lost );
 
     return ret;
 }
@@ -1145,16 +1149,16 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 {
     block_t *p_aout_buf;
     block_t **pp_block = p_block ? &p_block : NULL;
-    unsigned i_decoded = 0, i_lost = 0, i_played = 0;
+    unsigned decoded = 0, lost = 0;
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, pp_block ) ) )
     {
-        i_decoded++;
+        decoded++;
 
-        DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
+        DecoderPlayAudio( p_dec, p_aout_buf, &lost );
     }
 
-    DecoderUpdateStatAudio( p_dec, i_decoded, i_lost, i_played );
+    DecoderUpdateStatAudio( p_dec, decoded, lost );
 }
 
 /* This function process a audio block

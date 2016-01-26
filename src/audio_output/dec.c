@@ -108,6 +108,7 @@ error:
     aout_OutputUnlock (p_aout);
 
     atomic_init (&owner->buffers_lost, 0);
+    atomic_init (&owner->buffers_played, 0);
     return 0;
 }
 
@@ -338,7 +339,7 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
 /*****************************************************************************
  * aout_DecPlay : filter & mix the decoded buffer
  *****************************************************************************/
-int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
+void aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
 {
     aout_owner_t *owner = aout_owner (aout);
 
@@ -384,9 +385,10 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
     owner->sync.end = block->i_pts + block->i_length + 1;
     owner->sync.discontinuity = false;
     aout_OutputPlay (aout, block);
+    atomic_fetch_add(&owner->buffers_played, 1);
 out:
     aout_OutputUnlock (aout);
-    return 0;
+    return;
 drop:
     owner->sync.discontinuity = true;
     block_Release (block);
@@ -395,10 +397,13 @@ lost:
     goto out;
 }
 
-unsigned aout_DecGetResetLost (audio_output_t *aout)
+void aout_DecGetResetStats(audio_output_t *aout, unsigned *restrict lost,
+                           unsigned *restrict played)
 {
     aout_owner_t *owner = aout_owner (aout);
-    return atomic_exchange(&owner->buffers_lost, 0);
+
+    *lost = atomic_exchange(&owner->buffers_lost, 0);
+    *played = atomic_exchange(&owner->buffers_played, 0);
 }
 
 void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
