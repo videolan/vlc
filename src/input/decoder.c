@@ -1037,10 +1037,33 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
     }
 }
 
-static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
-                              int *pi_played_sum, int *pi_lost_sum )
+static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
+                             int *pi_played_sum, int *pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    bool prerolled;
+
+    assert( p_audio != NULL );
+
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_owner->i_preroll_end > p_audio->i_pts )
+    {
+        vlc_mutex_unlock( &p_owner->lock );
+        block_Release( p_audio );
+        return -1;
+    }
+
+    prerolled = p_owner->i_preroll_end > INT64_MIN;
+    p_owner->i_preroll_end = INT64_MIN;
+    vlc_mutex_unlock( &p_owner->lock );
+
+    if( unlikely(prerolled) )
+    {
+        msg_Dbg( p_dec, "end of audio preroll" );
+
+        if( p_owner->p_aout )
+            aout_DecFlush( p_owner->p_aout, false );
+    }
 
     /* */
     if( p_audio->i_pts <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify audio_output/*
@@ -1048,7 +1071,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
         msg_Warn( p_dec, "non-dated audio buffer received" );
         *pi_lost_sum += 1;
         block_Release( p_audio );
-        return;
+        return 0;
     }
 
     /* */
@@ -1077,40 +1100,13 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
         msg_Dbg( p_dec, "discarded audio buffer" );
         *pi_lost_sum += 1;
         block_Release( p_audio );
-        return;
+        return 0;
     }
 
     if( aout_DecPlay( p_aout, p_audio, i_rate ) == 0 )
         *pi_played_sum += 1;
 
     *pi_lost_sum += aout_DecGetResetLost( p_aout );
-}
-
-static int DecoderPreparePlayAudio( decoder_t *p_dec, block_t *p_aout_buf )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    bool prerolled;
-
-    vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->i_preroll_end > p_aout_buf->i_pts )
-    {
-        vlc_mutex_unlock( &p_owner->lock );
-        block_Release( p_aout_buf );
-        return -1;
-    }
-
-    prerolled = p_owner->i_preroll_end > INT64_MIN;
-    p_owner->i_preroll_end = INT64_MIN;
-    vlc_mutex_unlock( &p_owner->lock );
-
-    if( unlikely(prerolled) )
-    {
-        msg_Dbg( p_dec, "end of audio preroll" );
-
-        if( p_owner->p_aout )
-            aout_DecFlush( p_owner->p_aout, false );
-    }
-
     return 0;
 }
 
@@ -1133,17 +1129,14 @@ static void DecoderUpdateStatAudio( decoder_t *p_dec, int i_decoded,
 
 static int DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
-    assert( p_aout_buf );
     int i_lost = 0;
     int i_played = 0;
-    int i_ret;
 
-    if( ( i_ret = DecoderPreparePlayAudio( p_dec, p_aout_buf ) ) == 0 )
-        DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
+    int ret = DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
 
     DecoderUpdateStatAudio( p_dec, 1, i_lost, i_played );
 
-    return i_ret;
+    return ret;
 }
 
 static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
@@ -1157,9 +1150,6 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, pp_block ) ) )
     {
         i_decoded++;
-
-        if( DecoderPreparePlayAudio( p_dec, p_aout_buf ) != 0 )
-            continue;
 
         DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
     }
