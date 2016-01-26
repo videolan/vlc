@@ -828,7 +828,7 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
 }
 
 static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
-                             int *pi_played_sum, int *pi_lost_sum )
+                             int *pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     vout_thread_t  *p_vout = p_owner->p_vout;
@@ -922,42 +922,44 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         *pi_lost_sum += 1;
         picture_Release( p_picture );
     }
-    int i_tmp_display;
-    int i_tmp_lost;
-    vout_GetResetStatistic( p_vout, &i_tmp_display, &i_tmp_lost );
 
-    *pi_played_sum += i_tmp_display;
-    *pi_lost_sum += i_tmp_lost;
     return 0;
 }
 
-static void DecoderUpdateStatVideo( decoder_t *p_dec, int i_decoded,
-                                    int i_lost, int i_displayed )
+static void DecoderUpdateStatVideo( decoder_t *p_dec, int decoded,
+                                    int lost )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_thread_t *p_input = p_owner->p_input;
+    int displayed = 0;
 
     /* Update ugly stat */
-    if( p_input != NULL && (i_decoded > 0 || i_lost > 0 || i_displayed > 0) )
+    if( p_input == NULL )
+        return;
+
+    if( p_owner->p_vout != NULL )
     {
-        vlc_mutex_lock( &p_input->p->counters.counters_lock );
-        stats_Update( p_input->p->counters.p_decoded_video, i_decoded, NULL );
-        stats_Update( p_input->p->counters.p_lost_pictures, i_lost , NULL);
-        stats_Update( p_input->p->counters.p_displayed_pictures,
-                      i_displayed, NULL);
-        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+        int vout_lost = 0;
+
+        vout_GetResetStatistic( p_owner->p_vout, &displayed, &vout_lost );
+        lost += vout_lost;
     }
+
+    vlc_mutex_lock( &p_input->p->counters.counters_lock );
+    stats_Update( p_input->p->counters.p_decoded_video, decoded, NULL );
+    stats_Update( p_input->p->counters.p_lost_pictures, lost , NULL);
+    stats_Update( p_input->p->counters.p_displayed_pictures, displayed, NULL);
+    vlc_mutex_unlock( &p_input->p->counters.counters_lock );
 }
 
 static int DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     assert( p_pic );
     int i_lost = 0;
-    int i_displayed = 0;
 
-    int ret = DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
+    int ret = DecoderPlayVideo( p_dec, p_pic, &i_lost );
 
-    DecoderUpdateStatVideo( p_dec, 1, i_lost, i_displayed );
+    DecoderUpdateStatVideo( p_dec, 1, i_lost );
     return ret;
 }
 
@@ -967,16 +969,15 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
     block_t **pp_block = p_block ? &p_block : NULL;
     int i_lost = 0;
     int i_decoded = 0;
-    int i_displayed = 0;
 
     while( (p_pic = p_dec->pf_decode_video( p_dec, pp_block ) ) )
     {
         i_decoded++;
 
-        DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
+        DecoderPlayVideo( p_dec, p_pic, &i_lost );
     }
 
-    DecoderUpdateStatVideo( p_dec, i_decoded, i_lost, i_displayed );
+    DecoderUpdateStatVideo( p_dec, i_decoded, i_lost );
 }
 
 /* This function process a video block
