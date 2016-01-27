@@ -729,6 +729,42 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>bik</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>movie.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Bink Video File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>crf</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>movie.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>CRF Video File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>evo</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>movie.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>EVO Video File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>mov</string>
 				<string>moov</string>
 				<string>qt</string>
@@ -979,12 +1015,12 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>3gp</string>
+				<string>m4a</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>movie.icns</string>
+			<string>m4a.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>3GPP File</string>
+			<string>MPEG-4 Audio File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -1639,6 +1675,7 @@
 					<string>rm</string>
 					<string>ram</string>
 					<string>rmvb</string>
+                    <string>rpl</string>
 				</array>
 			</dict>
 		</dict>
