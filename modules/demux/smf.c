@@ -168,6 +168,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
         case 0x06: /* Marker text */
             EnsureUTF8 ((char *)payload);
             msg_Info (p_demux, "Marker    : %s", (char *)payload);
+            break;
 
         case 0x07: /* Cue point (WAVE filename) */
             EnsureUTF8 ((char *)payload);
