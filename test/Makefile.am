@@ -22,6 +22,7 @@ check_PROGRAMS = \
 	test_src_misc_variables \
 	test_src_crypto_update \
 	test_src_input_stream \
+	test_src_interface_dialog \
 	test_src_misc_bits \
 	test_modules_packetizer_hxxx \
 	test_modules_keystore \
@@ -92,6 +93,8 @@ test_src_input_stream_net_CFLAGS = $(AM_CFLAGS) -DTEST_NET
 test_src_input_stream_net_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_bits_SOURCES = src/misc/bits.c
 test_src_misc_bits_LDADD = $(LIBVLC)
+test_src_interface_dialog_SOURCES = src/interface/dialog.c
+test_src_interface_dialog_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_packetizer_hxxx_SOURCES = modules/packetizer/hxxx.c
 test_modules_packetizer_hxxx_LDADD = $(LIBVLC)
 test_modules_packetizer_hxxx_LDFLAGS = -no-install -static # WTF
