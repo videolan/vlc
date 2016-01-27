@@ -490,7 +490,7 @@ error:
             goto error;
     }
 
-    if (vlc_dialog_wait_question(creds, VLC_DIALOG_QUESTION_NORMAL,
+    if (vlc_dialog_wait_question(creds, VLC_DIALOG_QUESTION_WARNING,
             _("Abort"), _("View certificate"), NULL,
             _("Insecure site"), 
             _("You attempted to reach %s. %s\n"
@@ -511,7 +511,7 @@ error:
     }
     gnutls_x509_crt_deinit (cert);
 
-    val = vlc_dialog_wait_question(creds, VLC_DIALOG_QUESTION_NORMAL,
+    val = vlc_dialog_wait_question(creds, VLC_DIALOG_QUESTION_WARNING,
             _("Abort"), _("Accept 24 hours"), _("Accept permanently"),
             _("Insecure site"),
             _("This is the certificate presented by %s:\n%s\n\n"
