@@ -331,7 +331,7 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
              "or an attempt to breach your security or your privacy.\n\n"
              "If in doubt, abort now.\n");
     int answer = vlc_dialog_wait_question(session->obj,
-                                          VLC_DIALOG_QUESTION_NORMAL, _("Abort"),
+                                          VLC_DIALOG_QUESTION_WARNING, _("Abort"),
                                           _("Accept certificate temporarily"),
                                           NULL, _("Insecure site"),
                                           vlc_gettext (msg), hostname);
