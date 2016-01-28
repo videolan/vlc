@@ -135,7 +135,11 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
     if( !p_image->p_dec )
     {
         p_image->p_dec = CreateDecoder( p_image->p_parent, p_fmt_in );
-        if( !p_image->p_dec ) return NULL;
+        if( !p_image->p_dec )
+        {
+            block_Release(p_block);
+            return NULL;
+        }
     }
 
     p_block->i_pts = p_block->i_dts = mdate();
