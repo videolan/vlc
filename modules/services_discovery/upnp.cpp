@@ -848,9 +848,7 @@ void MediaServer::fetchContents()
 {
     IXML_Document* p_response = _browseAction( psz_objectId_,
                                       "BrowseDirectChildren",
-                                      "id,dc:title,res," /* Filter */
-                                      "sec:CaptionInfo,sec:CaptionInfoEx,"
-                                      "pv:subtitlefile",
+                                      "*",
                                       "0", /* RequestedCount */
                                       "" /* SortCriteria */
                                       );
