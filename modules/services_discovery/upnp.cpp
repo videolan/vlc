@@ -945,7 +945,6 @@ input_item_t* MediaServer::getNextItem()
             if ( p_resource_list && ixmlNodeList_length( p_resource_list ) > 0 )
             {
                 mtime_t i_duration = -1;
-                int i_hours, i_minutes, i_seconds;
                 IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, 0 );
                 const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
                 if( !psz_resource_url )
@@ -954,6 +953,7 @@ input_item_t* MediaServer::getNextItem()
 
                 if ( psz_duration )
                 {
+                    int i_hours, i_minutes, i_seconds;
                     if( sscanf( psz_duration, "%d:%02d:%02d",
                         &i_hours, &i_minutes, &i_seconds ) )
                         i_duration = INT64_C(1000000) * ( i_hours*3600 +
