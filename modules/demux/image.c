@@ -647,7 +647,6 @@ static int Open(vlc_object_t *object)
         vlc_fourcc_t chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, string);
         free(string);
 
-        block_Release(data);
         data = Decode(demux, &fmt.video, chroma, data);
         fmt.i_codec = fmt.video.i_chroma;
     }
