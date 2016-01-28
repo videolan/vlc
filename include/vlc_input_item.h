@@ -233,6 +233,7 @@ char *input_item_Get ## name (input_item_t *p_input) \
 
 INPUT_META(Title)
 INPUT_META(Artist)
+INPUT_META(AlbumArtist)
 INPUT_META(Genre)
 INPUT_META(Copyright)
 INPUT_META(Album)
