@@ -953,6 +953,30 @@ input_item_t* MediaServer::getNextItem()
 
                 p_item = newItem( title, objectID, i_duration,
                                   psz_resource_url );
+                if ( p_item != NULL )
+                {
+                    const char* psz_artist = xml_getChildElementValue( itemElement, "upnp:artist" );
+                    if ( psz_artist != NULL )
+                        input_item_SetArtist( p_item, psz_artist );
+                    const char* psz_genre = xml_getChildElementValue( itemElement, "upnp:genre" );
+                    if ( psz_genre != NULL )
+                        input_item_SetGenre( p_item, psz_genre );
+                    const char* psz_album = xml_getChildElementValue( itemElement, "upnp:album" );
+                    if ( psz_album != NULL )
+                        input_item_SetAlbum( p_item, psz_album );
+                    const char* psz_date = xml_getChildElementValue( itemElement, "dc:date" );
+                    if ( psz_date != NULL )
+                        input_item_SetDate( p_item, psz_date );
+                    const char* psz_orig_track_nb = xml_getChildElementValue( itemElement, "upnp:originalTrackNumber" );
+                    if ( psz_orig_track_nb != NULL )
+                        input_item_SetTrackNumber( p_item, psz_orig_track_nb );
+                    const char* psz_album_artist = xml_getChildElementValue( itemElement, "upnp:albumArtist" );
+                    if ( psz_album_artist != NULL )
+                        input_item_SetAlbumArtist( p_item, psz_album_artist );
+                    const char* psz_albumArt = xml_getChildElementValue( itemElement, "upnp:albumArtURI" );
+                    if ( psz_albumArt != NULL )
+                        input_item_SetArtworkURL( p_item, psz_albumArt );
+                }
             }
             ixmlNodeList_free( p_resource_list );
         }
