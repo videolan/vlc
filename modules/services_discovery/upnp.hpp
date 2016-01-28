@@ -147,7 +147,7 @@ private:
 
     void fetchContents();
     input_item_t* newItem(const char* objectID, const char* title);
-    input_item_t* newItem(const char* title, const char* psz_objectID, const char* psz_subtitles, mtime_t duration, const char* psz_url );
+    input_item_t* newItem(const char* title, const char* psz_objectID, mtime_t duration, const char* psz_url );
 
     IXML_Document* _browseAction(const char*, const char*,
             const char*, const char*, const char* );

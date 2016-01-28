@@ -718,7 +718,7 @@ input_item_t* MediaServer::newItem( const char *objectID, const char *title )
     return p_item;
 }
 
-input_item_t* MediaServer::newItem(const char* title, const char*, const char*,
+input_item_t* MediaServer::newItem(const char* title, const char*,
                                    mtime_t duration, const char* psz_url)
 {
     return input_item_NewWithTypeExt( psz_url, title, 0, NULL, 0,
@@ -910,35 +910,26 @@ input_item_t* MediaServer::getNextItem()
 
     if( itemNodeList_ )
     {
-        for ( ; !p_item && itemNodeIndex_ < ixmlNodeList_length( itemNodeList_ )
-              ; itemNodeIndex_++ )
+        for ( ; !p_item && itemNodeIndex_ < ixmlNodeList_length( itemNodeList_ ) ; itemNodeIndex_++ )
         {
-            IXML_Element* itemElement =
-                        ( IXML_Element* )ixmlNodeList_item( itemNodeList_,
-                                                            itemNodeIndex_ );
+            IXML_Element* itemElement = ( IXML_Element* )ixmlNodeList_item( itemNodeList_,
+                                                                            itemNodeIndex_ );
 
-            const char* objectID =
-                        ixmlElement_getAttribute( itemElement, "id" );
-
+            const char* objectID = ixmlElement_getAttribute( itemElement, "id" );
             if ( !objectID )
                 continue;
 
-            const char* title =
-                        xml_getChildElementValue( itemElement, "dc:title" );
-
+            const char* title = xml_getChildElementValue( itemElement, "dc:title" );
             if ( !title )
                 continue;
 
-            const char* psz_subtitles = xml_getChildElementValue( itemElement,
-                    "sec:CaptionInfo" );
+            const char* psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfo" );
 
             if ( !psz_subtitles )
-                psz_subtitles = xml_getChildElementValue( itemElement,
-                        "sec:CaptionInfoEx" );
+                psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfoEx" );
 
             if ( !psz_subtitles )
-                psz_subtitles = xml_getChildElementValue( itemElement,
-                        "pv:subtitlefile" );
+                psz_subtitles = xml_getChildElementValue( itemElement, "pv:subtitlefile" );
 
             /* Try to extract all resources in DIDL */
             IXML_NodeList* p_resource_list = ixmlDocument_getElementsByTagName( (IXML_Document*) itemElement, "res" );
@@ -954,14 +945,13 @@ input_item_t* MediaServer::getNextItem()
                 if ( psz_duration )
                 {
                     int i_hours, i_minutes, i_seconds;
-                    if( sscanf( psz_duration, "%d:%02d:%02d",
-                        &i_hours, &i_minutes, &i_seconds ) )
-                        i_duration = INT64_C(1000000) * ( i_hours*3600 +
-                                                          i_minutes*60 +
+                    if( sscanf( psz_duration, "%d:%02d:%02d", &i_hours, &i_minutes, &i_seconds ) )
+                        i_duration = INT64_C(1000000) * ( i_hours * 3600 +
+                                                          i_minutes * 60 +
                                                           i_seconds );
                 }
 
-                p_item = newItem( title, objectID, psz_subtitles, i_duration,
+                p_item = newItem( title, objectID, i_duration,
                                   psz_resource_url );
             }
             ixmlNodeList_free( p_resource_list );
