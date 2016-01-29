@@ -285,6 +285,8 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
 
                 input_item_node_AppendItem( p_subitems, p_entry );
 
+                input_item_Release( p_entry );
+
                 while( i_options )
                     free( ppsz_options[--i_options] );
                 free( psz_name );
