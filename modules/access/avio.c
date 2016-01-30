@@ -179,7 +179,7 @@ int OpenAvio(vlc_object_t *object)
 #if LIBAVFORMAT_VERSION_MAJOR < 54
     /* We can accept only one active user at any time */
     if (SetupAvioCb(VLC_OBJECT(access))) {
-        msg_Err(access, "Module aready in use");
+        msg_Err(access, "Module already in use");
         avio_close(sys->context);
         goto error;
     }
@@ -260,7 +260,7 @@ int OutOpenAvio(vlc_object_t *object)
 #if LIBAVFORMAT_VERSION_MAJOR < 54
     /* We can accept only one active user at any time */
     if (SetupAvioCb(VLC_OBJECT(access))) {
-        msg_Err(access, "Module aready in use");
+        msg_Err(access, "Module already in use");
         goto error;
     }
 #endif
