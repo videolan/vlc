@@ -334,7 +334,6 @@ static int64_t find_first_page_granule( demux_t *p_demux,
     *i_granulepos = -1;
     int64_t i_bytes_to_read = i_pos2 - i_pos1 + 1;
     int64_t i_bytes_read;
-    int64_t i_pages_checked = 0;
     int64_t i_packets_checked;
 
     demux_sys_t *p_sys  = p_demux->p_sys;
@@ -407,23 +406,22 @@ static int64_t find_first_page_granule( demux_t *p_demux,
             return p_sys->i_input_position;
         }
 
-        if ( ogg_page_granulepos( &p_sys->current_page ) <= 0 )
-        {
-            p_sys->i_input_position += i_result;
-            i_bytes_to_read += OGGSEEK_BYTES_TO_READ;
-            continue;
-        }
-
         // found a page
         if ( ogg_stream_pagein( &p_stream->os, &p_sys->current_page ) != 0 )
         {
             /* page is not for this stream or incomplete */
             p_sys->i_input_position += i_result;
-            if ( ! i_pages_checked ) i_pos1 = p_sys->i_input_position;
             continue;
         }
 
-        i_pages_checked++;
+        if ( ogg_page_granulepos( &p_sys->current_page ) <= 0 )
+        {
+            /* A negative granulepos means that the packet continues on the
+             * next page => read the next page */
+            p_sys->i_input_position += i_result;
+            continue;
+        }
+
         i_packets_checked = 0;
 
         while ( ogg_stream_packetout( &p_stream->os, &op ) > 0 )
@@ -439,6 +437,7 @@ static int64_t find_first_page_granule( demux_t *p_demux,
 
         /*  -> start of next page */
         p_sys->i_input_position += i_result;
+        i_pos1 = p_sys->i_input_position;
     }
 }
 
