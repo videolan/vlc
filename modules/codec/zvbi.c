@@ -191,8 +191,6 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data );
 static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
-static int Position( vlc_object_t *p_this, char const *psz_cmd,
-                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
 static int EventKey( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
@@ -263,10 +261,8 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_dec, "vbi-opaque", Opaque, p_sys );
 
     p_sys->i_align = var_CreateGetInteger( p_dec, "vbi-position" );
-    var_AddCallback( p_dec, "vbi-position", Position, p_sys );
 
     p_sys->b_text = var_CreateGetBool( p_dec, "vbi-text" );
-//    var_AddCallback( p_dec, "vbi-text", Text, p_sys );
 
     p_sys->i_level = var_CreateGetInteger( p_dec, "vbi-level" );
 
@@ -291,7 +287,6 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*) p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    var_DelCallback( p_dec, "vbi-position", Position, p_sys );
     var_DelCallback( p_dec, "vbi-opaque", Opaque, p_sys );
     var_DelCallback( p_dec, "vbi-page", RequestPage, p_sys );
     var_DelCallback( p_dec->p_libvlc, "key-pressed", EventKey, p_dec );
@@ -736,19 +731,6 @@ static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
     vlc_mutex_lock( &p_sys->lock );
     p_sys->b_opaque = newval.b_bool;
     p_sys->b_update = true;
-    vlc_mutex_unlock( &p_sys->lock );
-
-    return VLC_SUCCESS;
-}
-
-static int Position( vlc_object_t *p_this, char const *psz_cmd,
-                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    decoder_sys_t *p_sys = p_data;
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-
-    vlc_mutex_lock( &p_sys->lock );
-    p_sys->i_align = newval.i_int;
     vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
