@@ -7,8 +7,8 @@ YASM_VERSION=1.2.0
 #YASM_URL=$(VIDEOLAN)/yasm-$(YASM_VERSION).tar.gz
 YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
 
-CMAKE_VERSION=3.1.0
-CMAKE_URL=http://www.cmake.org/files/v3.1/cmake-$(CMAKE_VERSION).tar.gz
+CMAKE_VERSION=3.2.3
+CMAKE_URL=http://www.cmake.org/files/v3.2/cmake-$(CMAKE_VERSION).tar.gz
 
 LIBTOOL_VERSION=2.4.2
 LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz
