@@ -1011,6 +1011,7 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
     {
         /* be sure to clear any state or read+pagein() will fail on same # */
         ogg_stream_reset( &p_stream->os );
+        p_sys->i_input_position = i_pagepos;
         seek_byte( p_demux, p_sys->i_input_position );
     }
     /* Insert keyframe position into index */
