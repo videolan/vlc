@@ -51,6 +51,7 @@ int main (int argc, char *argv[])
 #ifdef _WIN32
     SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
+#ifdef HAVE_GETOPT_H
     static const struct option opts[] =
     {
         { "help",       no_argument,       NULL, 'h' },
@@ -73,6 +74,9 @@ int main (int argc, char *argv[])
                 usage (argv[0]);
                 return 1;
         }
+#else
+    int optind = 1;
+#endif
 
     for (int i = optind; i < argc; i++)
     {
