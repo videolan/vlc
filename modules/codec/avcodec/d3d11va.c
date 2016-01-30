@@ -92,6 +92,8 @@ DEFINE_GUID(IID_ID3D10Multithread,   0x9b7e4e00, 0x342c, 0x4106, 0xa1, 0x9f, 0x4
 
 DEFINE_GUID(DXVA_Intel_H264_NoFGT_ClearVideo,       0x604F8E68, 0x4951, 0x4c54, 0x88, 0xFE, 0xAB, 0xD2, 0x5C, 0x15, 0xB3, 0xD6);
 
+DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 0xb9, 0x84, 0x00, 0xc0, 0x4f, 0x2e, 0x73, 0xc5);
+
 struct vlc_va_sys_t
 {
     directx_sys_t                dx_sys;
@@ -780,7 +782,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
             score = 2;
         else
             continue;
-        if (IsEqualGUID(&cfg->guidConfigBitstreamEncryption, &DXVA_NoEncrypt))
+        if (IsEqualGUID(&cfg->guidConfigBitstreamEncryption, &DXVA2_NoEncrypt))
             score += 16;
 
         if (cfg_score < score) {
