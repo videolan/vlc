@@ -160,7 +160,7 @@ static int Open( vlc_object_t *p_this )
     if( vlc_clone( &p_thread->thread,
                    Thread, p_thread, VLC_THREAD_PRIORITY_LOW ) )
     {
-        msg_Err( p_filter, "cannot lauch goom thread" );
+        msg_Err( p_filter, "cannot launch goom thread" );
         vlc_mutex_destroy( &p_thread->lock );
         vlc_cond_destroy( &p_thread->wait );
         aout_filter_RequestVout( p_filter, p_thread->p_vout, NULL );
