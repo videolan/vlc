@@ -100,12 +100,11 @@ const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
                                              int64_t i_pagepos )
 {
     demux_index_entry_t *idx;
-    demux_index_entry_t *oidx;
     demux_index_entry_t *last_idx = NULL;
 
     if ( p_stream == NULL ) return NULL;
 
-    oidx = idx = p_stream->idx;
+    idx = p_stream->idx;
 
     if ( i_timestamp < 1 || i_pagepos < 1 ) return NULL;
 
@@ -137,8 +136,8 @@ const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
     }
     else
     {
-        idx->p_next = oidx;
-        oidx = idx;
+        idx->p_next = p_stream->idx;
+        p_stream->idx = idx;
     }
 
     if ( idx->p_next != NULL )
