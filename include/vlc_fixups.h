@@ -45,6 +45,14 @@
 # include <time.h> /* time_t */
 #endif
 
+#ifndef HAVE_GETTIMEOFDAY
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <sys/time.h>
+#endif
+#endif
+
 #ifndef HAVE_LLDIV
 typedef struct
 {
@@ -207,6 +215,11 @@ time_t timegm(struct tm *);
 #define TIME_UTC 1
 struct timespec;
 int timespec_get(struct timespec *, int);
+#endif
+
+/* sys/time.h */
+#ifndef HAVE_GETTIMEOFDAY
+int gettimeofday(struct timeval *, struct timezone *);
 #endif
 
 /* unistd.h */
