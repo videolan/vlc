@@ -80,7 +80,7 @@ static const int pi_logics[] = {AbstractAdaptationLogic::RateBased,
 static const char *const ppsz_logics[] = { N_("Bandwidth Adaptive"),
                                            N_("Fixed Bandwidth"),
                                            N_("Lowest Bandwidth/Quality"),
-                                           N_("Highest Bandwith/Quality")};
+                                           N_("Highest Bandwidth/Quality")};
 
 vlc_module_begin ()
         set_shortname( N_("Adaptative"))

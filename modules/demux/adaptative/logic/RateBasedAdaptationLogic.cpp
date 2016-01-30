@@ -124,7 +124,7 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
 
     /* Vertical Horizontal Filter / Moving Average
      *
-     * Bandwith stability during observation window alters the alpha parameter
+     * Bandwidth stability during observation window alters the alpha parameter
      * and then defines how fast we adapt to current bandwidth */
     const size_t deltamax = omax - omin;
     double alpha = (diffsum) ? 0.33 * ((double)deltamax / diffsum) : 0.5;
