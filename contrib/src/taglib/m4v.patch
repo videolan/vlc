@@ -1,0 +1,20 @@
+--- taglib/taglib/fileref.cpp   2015-08-10 18:32:56.961588900 +0200
++++ taglib/taglib/fileref.cpp.m4v       2015-08-12 11:00:44.933793600 +0200
+@@ -160,6 +160,7 @@
+   l.append("m4p");
+   l.append("3g2");
+   l.append("mp4");
++  l.append("m4v");
+   l.append("wma");
+   l.append("asf");
+   l.append("aif");
+@@ -266,7 +267,7 @@
+       return new Ogg::Opus::File(fileName, readAudioProperties, audioPropertiesStyle);
+     if(ext == "TTA")
+       return new TrueAudio::File(fileName, readAudioProperties, audioPropertiesStyle);
+-    if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2")
++    if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2" || ext == "M4V")
+       return new MP4::File(fileName, readAudioProperties, audioPropertiesStyle);
+     if(ext == "WMA" || ext == "ASF")
+       return new ASF::File(fileName, readAudioProperties, audioPropertiesStyle);
+

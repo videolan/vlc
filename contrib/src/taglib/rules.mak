@@ -15,6 +15,7 @@ $(TARBALLS)/taglib-$(TAGLIB_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(UNPACK)
+	$(APPLY) $(SRC)/taglib/m4v.patch
 	$(MOVE)
 
 .taglib: taglib toolchain.cmake
