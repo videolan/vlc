@@ -517,6 +517,10 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys, const
     int err = dx_sys->pf_get_input_list(va, &p_list);
     if (err != VLC_SUCCESS)
         return err;
+    if (p_list.count == 0) {
+        msg_Warn( va, "No input format found for HWAccel" );
+        return VLC_EGENERIC;
+    }
 
     err = VLC_EGENERIC;
     /* Retreive supported modes from the decoder service */
