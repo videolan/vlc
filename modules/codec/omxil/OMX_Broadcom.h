@@ -921,7 +921,7 @@ The \code{nByteCount} field is a 64 bit value, that will either use a
 For each port on the clock component, requests for media times may be
 made.  These are typically done one per video frame to allow for
 scheduling the display of that frame at the correct time.  If a
-request is made after the time has occured, then that frame will be
+request is made after the time has occurred, then that frame will be
 displayed late, and the clock component keeps a per-port record of the
 number of times this occurs.  This record can be read using this
 index.

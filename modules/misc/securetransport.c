@@ -413,7 +413,7 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
             msg_Err(crd, "cipher suite negotiation failed");
             return -1;
         case errSSLFatalAlert:
-            msg_Err(crd, "fatal error occured during handshake");
+            msg_Err(crd, "fatal error occurred during handshake");
             return -1;
 
         default:
