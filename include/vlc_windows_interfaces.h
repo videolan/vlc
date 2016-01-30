@@ -26,7 +26,6 @@
 
 #ifdef __MINGW32__
 # include <_mingw.h>
-#endif
 
 #ifdef __MINGW64_VERSION_MAJOR /* mingw.org lacks this header */
 # include <shobjidl.h>
@@ -228,4 +227,5 @@ struct ITaskbarList3Vtbl
 # define THBN_CLICKED        0x1800
 #endif
 
+#endif /* __MINGW32__ */
 #endif //MINGW_WORKAROUNDS_H
