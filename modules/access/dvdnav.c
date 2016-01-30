@@ -156,7 +156,7 @@ struct demux_sys_t
     int           i_title;
     input_title_t **title;
 
-    /* lenght of program group chain */
+    /* length of program group chain */
     mtime_t     i_pgc_length;
     int         i_vobu_index;
     int         i_vobu_flush;
@@ -971,7 +971,7 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - cell_start=%"PRId64, event->cell_start );
         msg_Dbg( p_demux, "     - pg_start=%"PRId64, event->pg_start );
 
-        /* Store the lenght in time of the current PGC */
+        /* Store the length in time of the current PGC */
         p_sys->i_pgc_length = event->pgc_length / 90 * 1000;
         p_sys->i_vobu_index = 0;
         p_sys->i_vobu_flush = 0;

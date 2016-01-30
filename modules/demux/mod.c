@@ -226,7 +226,7 @@ static int Open( vlc_object_t *p_this )
     date_Set( &p_sys->pts, 0 );
     p_sys->i_length = ModPlug_GetLength( p_sys->f ) * INT64_C(1000);
 
-    msg_Dbg( p_demux, "MOD loaded name=%s lenght=%"PRId64"ms",
+    msg_Dbg( p_demux, "MOD loaded name=%s length=%"PRId64"ms",
              ModPlug_GetName( p_sys->f ),
              p_sys->i_length );
 
