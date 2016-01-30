@@ -183,7 +183,7 @@ int Chunk::Parse( xml_reader_t *p_xmlReader, string p_node, int p_type){
                         return -1;
                     }
                     if ( this->i_vol_index != 1 ) {
-                        msg_Err(this->p_demux, "Only one VOLINDEX suported. Patch welcome.");
+                        msg_Err(this->p_demux, "Only one VOLINDEX supported. Patch welcome.");
                         return -1;
                     }
                     /* end of chunk tag parse */

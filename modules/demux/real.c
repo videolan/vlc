@@ -186,7 +186,7 @@ static int Open( vlc_object_t *p_this )
     /* Real Audio */
     if( !memcmp( p_peek, ".ra", 3 ) )
     {
-        msg_Err( p_demux, ".ra files unsuported" );
+        msg_Err( p_demux, ".ra files unsupported" );
         b_real_audio = true;
     }
     /* Real Media Format */
