@@ -383,7 +383,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         s->nb_block_sizes = 1;
     }
 
-    /* init rate dependant parameters */
+    /* init rate dependent parameters */
     s->use_noise_coding = 1;
     high_freq = itofix64(s->sample_rate) >> 1;
 

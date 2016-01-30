@@ -1761,13 +1761,13 @@ static int MP4_ReadBox_dec3( stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream,
-        "read box: \"dec3\" bitrate %dkbps %d independant substreams",
+        "read box: \"dec3\" bitrate %dkbps %d independent substreams",
             p_dec3->i_data_rate, p_dec3->i_num_ind_sub);
 
     for (uint8_t i = 0; i < p_dec3->i_num_ind_sub; i++)
         msg_Dbg( p_stream,
                 "\tstream %d: bsid=0x%x bsmod=0x%x acmod=0x%x lfeon=0x%x "
-                "num dependant subs=%d chan_loc=0x%x",
+                "num dependent subs=%d chan_loc=0x%x",
                 i, p_dec3->stream[i].i_bsid, p_dec3->stream[i].i_bsmod, p_dec3->stream[i].i_acmod,
                 p_dec3->stream[i].i_lfeon, p_dec3->stream[i].i_num_dep_sub, p_dec3->stream[i].i_chan_loc );
 #endif

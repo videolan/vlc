@@ -513,7 +513,7 @@
 #define VLC_CODEC_XYZ12     VLC_FOURCC('X','Y','1','2')
 
 
-/* Special endian dependant values
+/* Special endian dependent values
  * The suffic N means Native
  * The suffix I means Inverted (ie non native) */
 #ifdef WORDS_BIGENDIAN
