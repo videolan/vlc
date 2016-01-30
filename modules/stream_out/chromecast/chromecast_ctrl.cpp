@@ -78,7 +78,7 @@ static void *ChromecastThread(void *data);
  *****************************************************************************/
 
 #define IP_TEXT N_("Chromecast IP address")
-#define IP_LONGTEXT N_("This sets the IP adress of the Chromecast receiver.")
+#define IP_LONGTEXT N_("This sets the IP address of the Chromecast receiver.")
 #define HTTP_PORT_TEXT N_("HTTP port")
 #define HTTP_PORT_LONGTEXT N_("This sets the HTTP port of the server " \
                               "used to stream the media to the Chromecast.")
