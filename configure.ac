@@ -465,6 +465,12 @@ dnl
 dnl checks for mingw
 AS_IF([test "${SYS}" = "mingw32"], [
 
+AC_PREPROC_IFELSE([AC_LANG_SOURCE([
+#if !defined(__MINGW32__)
+# error Not compiling with mingw
+#endif
+    ])], [
+
 dnl Check for broken versions of mingw-runtime compatability library
     AC_MSG_CHECKING(for broken mingw-runtime)
     AC_PREPROC_IFELSE([AC_LANG_SOURCE([
@@ -496,6 +502,9 @@ dnl Check for broken versions of mingw-runtime compatability library
             [VLC_ADD_LIBS([libvlccore],[-lmingwex])])
     )
     VLC_RESTORE_FLAGS
+    ], [
+        AC_MSG_RESULT([Not compiling with mingw])
+    ])
 
     dnl Check for fnative-struct or mms-bitfields support for mingw32
     VLC_SAVE_FLAGS
