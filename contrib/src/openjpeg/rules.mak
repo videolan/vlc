@@ -14,6 +14,7 @@ openjpeg: openjpeg-$(OPENJPEG_VERSION).tar.gz .sum-openjpeg
 ifdef HAVE_VISUALSTUDIO
 	$(APPLY) $(SRC)/openjpeg/msvc.patch
 endif
+	$(APPLY) $(SRC)/openjpeg/restrict.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 

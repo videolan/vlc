@@ -1,0 +1,50 @@
+diff --git a/configure.ac b/configure.ac
+index 71098e5..8843546 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -486,6 +486,8 @@ else
+    OPJ_COMPILER_FLAG([-O3])
+ fi
+ 
++AC_C_RESTRICT
++
+ 
+ ### Checks for linker characteristics
+ 
+diff --git a/libopenjpeg/dwt.c b/libopenjpeg/dwt.c
+index 0fbfc20..26ee0f4 100644
+--- a/libopenjpeg/dwt.c
++++ b/libopenjpeg/dwt.c
+@@ -35,6 +35,7 @@
+ #include <xmmintrin.h>
+ #endif
+ 
++#include "opj_config.h"
+ #include "opj_includes.h"
+ 
+ /** @defgroup DWT DWT - Implementation of a discrete wavelet transform */
+diff --git a/libopenjpeg/mct.c b/libopenjpeg/mct.c
+index 870993b..66c91d8 100644
+--- a/libopenjpeg/mct.c
++++ b/libopenjpeg/mct.c
+@@ -33,6 +33,7 @@
+ #include <xmmintrin.h>
+ #endif
+ 
++#include "opj_config.h"
+ #include "opj_includes.h"
+ 
+ /* <summary> */
+diff --git a/libopenjpeg/t1.c b/libopenjpeg/t1.c
+index ed9cdc3..78f6940 100644
+--- a/libopenjpeg/t1.c
++++ b/libopenjpeg/t1.c
+@@ -30,6 +30,7 @@
+  * POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#include "opj_config.h"
+ #include "opj_includes.h"
+ #include "t1_luts.h"
+ 
+
