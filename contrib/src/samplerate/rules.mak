@@ -21,5 +21,5 @@ samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz .sum-samplerate
 
 .samplerate: samplerate
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	cd $< && $(MAKE) -C src install
 	touch $@
