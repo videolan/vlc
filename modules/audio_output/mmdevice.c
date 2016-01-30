@@ -18,7 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define _WIN32_WINNT 0x600
+#if !defined(_WIN32_WINNT) || _WIN32_WINNT < 0x600
+# undef _WIN32_WINNT
+# define _WIN32_WINNT 0x600
+#endif
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
