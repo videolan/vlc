@@ -439,7 +439,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_instance = freerdp_new();
     if ( !p_sys->p_instance )
     {
-        msg_Err( p_demux, "rdp instanciation error" );
+        msg_Err( p_demux, "rdp instantiation error" );
         free( p_sys );
         return VLC_EGENERIC;
     }
