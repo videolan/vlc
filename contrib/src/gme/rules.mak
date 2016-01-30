@@ -1,7 +1,7 @@
 # Game Music Emu
 
 GME_VERSION := 0.6.0
-GME_URL := http://game-music-emu.googlecode.com/files/game-music-emu-$(GME_VERSION).tar.bz2
+GME_URL := https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-$(GME_VERSION).tar.bz2
 
 PKGS += gme
 
