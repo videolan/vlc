@@ -147,7 +147,11 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 #pragma mark -
 #pragma mark Private
 
-@interface VLCMain () <BWQuincyManagerDelegate>
+@interface VLCMain () <BWQuincyManagerDelegate
+#ifdef HAVE_SPARKLE
+    , SUUpdaterDelegate
+#endif
+>
 {
     intf_thread_t *p_intf;
     BOOL launched;
