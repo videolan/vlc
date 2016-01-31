@@ -219,7 +219,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
 
         picture_t *picture = pool->picture[i - 1];
 
-        if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0) {
+        if (pool->pic_lock != NULL && pool->pic_lock(picture) != VLC_SUCCESS) {
             vlc_mutex_lock(&pool->lock);
             pool->available |= 1ULL << (i - 1);
             continue;
@@ -261,7 +261,7 @@ picture_t *picture_pool_Wait(picture_pool_t *pool)
 
     picture_t *picture = pool->picture[i - 1];
 
-    if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0) {
+    if (pool->pic_lock != NULL && pool->pic_lock(picture) != VLC_SUCCESS) {
         vlc_mutex_lock(&pool->lock);
         pool->available |= 1ULL << (i - 1);
         vlc_cond_signal(&pool->wait);
