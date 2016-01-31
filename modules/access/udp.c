@@ -48,8 +48,6 @@
 #endif
 #include <fcntl.h>
 
-#define MTU 65535
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -80,6 +78,7 @@ struct access_sys_t
 {
     int fd;
     int timeout;
+    size_t mtu;
     size_t fifo_size;
     block_fifo_t *fifo;
     vlc_sem_t semaphore;
@@ -185,6 +184,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
+    sys->mtu = 7 * 188;
     sys->fifo_size = var_InheritInteger( p_access, "udp-buffer");
     vlc_sem_init( &sys->semaphore, 0 );
 
@@ -287,7 +287,7 @@ static void* ThreadRead( void *data )
 
     for(;;)
     {
-        block_t *pkt = block_Alloc(MTU);
+        block_t *pkt = block_Alloc(sys->mtu);
         if (unlikely(pkt == NULL))
         {   /* OOM - dequeue and discard one packet */
             char dummy;
@@ -295,6 +295,17 @@ static void* ThreadRead( void *data )
             continue;
         }
 
+        struct iovec iov = {
+            .iov_base = pkt->p_buffer,
+            .iov_len = sys->mtu,
+        };
+        struct msghdr msg = {
+            .msg_iov = &iov,
+            .msg_iovlen = 1,
+#ifdef __linux__
+            .msg_flags = MSG_TRUNC,
+#endif
+        };
         ssize_t len;
 
         block_cleanup_push(pkt);
@@ -316,12 +327,22 @@ static void* ThreadRead( void *data )
                 len=0;
                 break;
             }
-            len = recv(sys->fd, pkt->p_buffer, MTU, 0);
+            len = recvmsg(sys->fd, &msg, 0);
         }
         while (len == -1);
         vlc_cleanup_pop();
 
-        pkt->i_buffer = len;
+#ifdef MSG_TRUNC
+        if (msg.msg_flags & MSG_TRUNC)
+        {
+            msg_Err(access, "%zd bytes packet truncated (MTU was %zu)",
+                    len, sys->mtu);
+            pkt->i_flags |= BLOCK_FLAG_CORRUPTED;
+            sys->mtu = len;
+        }
+        else
+#endif
+            pkt->i_buffer = len;
 
         vlc_fifo_Lock(sys->fifo);
         /* Discard old buffers on overflow */
