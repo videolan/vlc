@@ -31,6 +31,7 @@
 
 #include <vlc/libvlc_structures.h>
 #include <vlc/libvlc.h>
+#include <vlc/libvlc_dialog.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_events.h>
 
@@ -78,6 +79,11 @@ struct libvlc_instance_t
         void (*cb) (void *, int, const libvlc_log_t *, const char *, va_list);
         void *data;
     } log;
+    struct
+    {
+        libvlc_dialog_cbs cbs;
+        void *data;
+    } dialog;
 };
 
 

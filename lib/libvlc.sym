@@ -46,6 +46,12 @@ libvlc_audio_set_callbacks
 libvlc_audio_set_volume_callback
 libvlc_chapter_descriptions_release
 libvlc_clock
+libvlc_dialog_dismiss
+libvlc_dialog_get_context
+libvlc_dialog_post_action
+libvlc_dialog_post_login
+libvlc_dialog_set_callbacks
+libvlc_dialog_set_context
 libvlc_event_attach
 libvlc_event_detach
 libvlc_event_type_name
