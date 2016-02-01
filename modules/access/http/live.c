@@ -40,11 +40,7 @@ struct vlc_http_live
 static int vlc_http_live_req(struct vlc_http_msg *req,
                              const struct vlc_http_resource *res, void *opaque)
 {
-#if 0 // TODO
     vlc_http_msg_add_header(req, "Accept-Encoding", "gzip, deflate");
-#else
-    (void) req;
-#endif
     (void) res;
     (void) opaque;
     return 0;
