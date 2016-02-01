@@ -1,6 +1,6 @@
 # Tiger
 
-TIGER_VERSION := 0.3.1
+TIGER_VERSION := 0.3.4
 TIGER_URL := http://libtiger.googlecode.com/files/libtiger-$(TIGER_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"pangocairo >= 0.16"),)
