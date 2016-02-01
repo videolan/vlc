@@ -193,6 +193,7 @@ $Id$
  * idummy: dummy input
  * image: Image file video output
  * imem: memory input access module
+ * inflate: zlib decompression stream_filter module
  * integer_mixer: Integer audio mixer
  * invert: inverse video filter
  * iomx: IPC/OpenMaxIL for Android

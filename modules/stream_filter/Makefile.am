@@ -16,6 +16,12 @@ stream_filter_LTLIBRARIES += libdecomp_plugin.la
 endif
 endif
 
+libinflate_plugin_la_SOURCES = stream_filter/inflate.c
+libinflate_plugin_la_LIBADD = -lz
+if HAVE_ZLIB
+stream_filter_LTLIBRARIES += libinflate_plugin.la
+endif
+
 libprefetch_plugin_la_SOURCES = stream_filter/prefetch.c
 libprefetch_plugin_la_LIBADD = $(LIBPTHREAD)
 stream_filter_LTLIBRARIES += libprefetch_plugin.la

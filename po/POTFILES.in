@@ -1033,6 +1033,7 @@ modules/stream_filter/cache_block.c
 modules/stream_filter/cache_read.c
 modules/stream_filter/decomp.c
 modules/stream_filter/hds/hds.c
+modules/stream_filter/inflate.c
 modules/stream_filter/prefetch.c
 modules/stream_filter/record.c
 modules/stream_out/autodel.c

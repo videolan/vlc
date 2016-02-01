@@ -94,6 +94,7 @@ Stream filter:
  * Added ARIB STD-B25 TS streams decoder
  * Added stream prebuffering plugin
  * Removed HTTP Live streaming stream filter
+ * Added zlib (a.k.a. deflate) decompression filter
 
 Audio output:
  * Complete rewrite of the AudioTrack Android module. This is now the default.
