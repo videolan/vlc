@@ -549,7 +549,7 @@ LIBVLC_API void *libvlc_media_player_get_hwnd ( libvlc_media_player_t *p_mi );
  *
  * \param p_mi the media player
  * \param p_jvm the Java VM of the android process.
- * \param awindow_handler org.videolan.libvlc.IAWindowNativeHandler jobject
+ * \param p_awindow_handler org.videolan.libvlc.IAWindowNativeHandler jobject
  *        implemented by the org.videolan.libvlc.MediaPlayer class from the
  *        libvlc-android project.
  */
@@ -1214,7 +1214,7 @@ LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
  * \version LibVLC 3.0.0 and later.
  *
  * \param p_mi the media player
- * \param address to store an allocated array of title descriptions
+ * \param titles address to store an allocated array of title descriptions
  *        descriptions (must be freed with libvlc_title_descriptions_release()
  *        by the caller) [OUT]
  *
@@ -1228,8 +1228,8 @@ LIBVLC_API int libvlc_media_player_get_full_title_descriptions( libvlc_media_pla
  *
  * \version LibVLC 3.0.0 and later
  *
- * \param title description array to release
- * \param number of title descriptions to release
+ * \param p_titles title description array to release
+ * \param i_count number of title descriptions to release
  */
 LIBVLC_API
     void libvlc_title_descriptions_release( libvlc_title_description_t **p_titles,
@@ -1241,8 +1241,8 @@ LIBVLC_API
  * \version LibVLC 3.0.0 and later.
  *
  * \param p_mi the media player
- * \param index of the title to query for chapters (uses current title if set to -1)
- * \param address to store an allocated array of chapter descriptions
+ * \param i_chapters_of_title index of the title to query for chapters (uses current title if set to -1)
+ * \param pp_chapters address to store an allocated array of chapter descriptions
  *        descriptions (must be freed with libvlc_chapter_descriptions_release()
  *        by the caller) [OUT]
  *
@@ -1257,8 +1257,8 @@ LIBVLC_API int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_p
  *
  * \version LibVLC 3.0.0 and later
  *
- * \param chapter description array to release
- * \param number of chapter descriptions to release
+ * \param p_chapters chapter description array to release
+ * \param i_count number of chapter descriptions to release
  */
 LIBVLC_API
 void libvlc_chapter_descriptions_release( libvlc_chapter_description_t **p_chapters,
@@ -1648,7 +1648,7 @@ libvlc_audio_output_device_enum( libvlc_media_player_t *mp );
  * explicit audio device.
  *
  * \param p_instance libvlc instance
- * \param psz_aout audio output name
+ * \param aout audio output name
  *                 (as returned by libvlc_audio_output_list_get())
  * \return A NULL-terminated linked list of potential audio output devices.
  * It must be freed with libvlc_audio_output_device_list_release()
