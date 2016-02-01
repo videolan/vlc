@@ -198,8 +198,10 @@ VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const char *psz_fmt,
 #endif
 
 #ifdef _WIN32
-# undef gai_strerror
-# define gai_strerror gai_strerrorA
+# if !defined(WINAPI_FAMILY) || WINAPI_FAMILY != WINAPI_FAMILY_APP
+#  undef gai_strerror
+#  define gai_strerror gai_strerrorA
+# endif
 #endif
 
 #ifdef __OS2__
