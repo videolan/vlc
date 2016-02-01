@@ -3266,12 +3266,15 @@ AM_CONDITIONAL([HAVE_HARFBUZZ], [test "${have_harfbuzz}" = "yes"])
 dnl
 dnl SAPI (text to Speech renderer for Windows)
 dnl
+AC_LANG_PUSH([C++])
 AC_CHECK_TYPES([ISpObjectToken],[
               have_sapi="yes"
             ],[AC_MSG_WARN([sapi.h not found. Text to Speech renderer for Windows disabled])],
               [#include <windows.h>
-               #include <sapi.h>])
+               #include <sapi.h>
+               #include <sphelper.h>])
 AM_CONDITIONAL([HAVE_SAPI], [test "${have_sapi}" = "yes"])
+AC_LANG_POP([C++])
 
 dnl
 dnl  QuartzText vout module (iOS/Mac OS)
