@@ -1495,6 +1495,13 @@ int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
              * and any extra width caused by visual reordering
              */
             int i_max_width = ( int ) p_filter->fmt_out.video.i_visible_width - i_max_advance_x;
+
+            if( i_max_width <= 0 )
+            {
+                msg_Err( p_filter, "LayoutText(): Invalid max width" );
+                goto error;
+            }
+
             if( LayoutParagraph( p_filter, p_paragraph,
                                  i_max_width, pp_line, b_grid ) )
                 goto error;
