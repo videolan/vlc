@@ -151,10 +151,18 @@ static int Open(vlc_object_t *obj)
 {
     stream_t *stream = (stream_t *)obj;
     const uint8_t *peek;
+    int bits;
 
     /* See IETF RFC6713 */
-    if (stream_Peek(stream->p_source, &peek, 2) < 2
-     || (peek[0] & 0xF) != 8 || (peek[0] >> 4) > 7 || (U16_AT(peek) % 31) != 0)
+    if (stream_Peek(stream->p_source, &peek, 2) < 2)
+        return VLC_EGENERIC;
+
+    if ((peek[0] & 0xF) == 8 && (peek[0] >> 4) < 8 && (U16_AT(peek) % 31) == 0)
+        bits = 15; /* zlib */
+    else
+    if (!memcmp(peek, "\x1F\x08B", 2))
+        bits = 15 + 32; /* gzip */
+    else
         return VLC_EGENERIC;
 
     stream_sys_t *sys = malloc(sizeof (*sys));
@@ -168,7 +176,7 @@ static int Open(vlc_object_t *obj)
     sys->zstream.opaque = Z_NULL;
     sys->eof = false;
 
-    int ret = inflateInit(&sys->zstream);
+    int ret = inflateInit2(&sys->zstream, bits);
     if (ret != Z_OK)
     {
         free(sys);
