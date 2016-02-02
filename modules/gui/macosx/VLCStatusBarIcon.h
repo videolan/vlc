@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCStatusBarIcon.h: Mac OS X module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2016 VLC authors and VideoLAN
+ * Copyright (C) 2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Goran Dokic <vlc at 8hz dot com>
@@ -21,37 +21,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <cocoa/cocoa.h>
-
+#import <Cocoa/Cocoa.h>
 
 @interface VLCStatusBarIcon : NSObject <NSMenuDelegate>
-{
-    NSMenuItem *_vlcStatusBarMenuItem;
-
-    NSString *_nameToDisplay;
-    NSString *_timeToDisplay;
-    NSString *_durationToDisplay;
-    NSString *_urlToDisplay;
-    NSImage *_menuImagePlay;
-    NSImage *_menuImagePause;
-    NSImage *_menuImageStop;
-}
 
 @property NSStatusItem *statusItem;
 @property NSTimer *dataRefreshUpdateTimer;
 @property (readwrite, strong) IBOutlet NSMenu *vlcStatusBarIconMenu;
 
 // get data from VLC and update the little status menu
-- (void) updateMenuItemRandom;
-- (void) updateMenuItemPlayPause;
-- (void) setDataUpdateTimer:(float) interval;
+- (void)updateMenuItemRandom;
+- (void)updateMenuItemPlayPause;
+- (void)setDataUpdateTimer:(float)interval;
 
-- (IBAction) updateMenuItemContent:(id)sender;
-- (IBAction) restoreMainWindow:(id)sender;
-- (IBAction) statusBarIconTogglePlayPause:(id)sender;
-- (IBAction) statusBarIconStop:(id)sender;
-- (IBAction) statusBarIconNext:(id)sender;
-- (IBAction) statusBarIconPrevious:(id)sender;
-- (IBAction) statusBarIconToggleRandom:(id)sender;
+- (IBAction)updateMenuItemContent:(id)sender;
+- (IBAction)restoreMainWindow:(id)sender;
+- (IBAction)statusBarIconTogglePlayPause:(id)sender;
+- (IBAction)statusBarIconStop:(id)sender;
+- (IBAction)statusBarIconNext:(id)sender;
+- (IBAction)statusBarIconPrevious:(id)sender;
+- (IBAction)statusBarIconToggleRandom:(id)sender;
 
 @end

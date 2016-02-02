@@ -489,7 +489,6 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
             if (p_item->value.psz && !strcmp(p_item->value.psz, values[i]))
                 [object selectItem: [object lastItem]];
-
         } else {
             [[object menu] addItem: [NSMenuItem separatorItem]];
         }

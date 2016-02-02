@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCStatusBarIcon.m: Mac OS X module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2016 VLC authors and VideoLAN
+ * Copyright (C) 2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Goran Dokic <vlc at 8hz dot com>
@@ -42,57 +42,36 @@
 #define NSInitialToolTipDelayIn_ms 20
 // #define showURLInToolTip 1
 
+@interface VLCStatusBarIcon ()
+{
+    NSMenuItem *_vlcStatusBarMenuItem;
+
+    NSString *_nameToDisplay;
+    NSString *_timeToDisplay;
+    NSString *_durationToDisplay;
+    NSString *_urlToDisplay;
+    NSImage *_menuImagePlay;
+    NSImage *_menuImagePause;
+    NSImage *_menuImageStop;
+}
+@end
+
 #pragma mark -
 #pragma mark Implementation
 
-//--
-@implementation VLCStatusBarIcon {
-    //
-}
+@implementation VLCStatusBarIcon
 
 #pragma mark -
 #pragma mark Init
 
-//--
-//
-//
-+(id)alloc
+- (void)dealloc
 {
-    return [super alloc];
+    // cleanup
+    [self.dataRefreshUpdateTimer invalidate];
+    self.dataRefreshUpdateTimer = nil;
 }
 
-
-//--
-//
-//
-- (id) init
-{
-    self = [super init];
-    if (self)
-    {
-        // Do some init if needed
-    }
-    return self;
-}
-
-//--
-// Cleanup on isle 6
-//
-- (void) dealloc
-{
-    if (self)
-    {
-        // cleanup
-        [self.dataRefreshUpdateTimer invalidate];
-    }
-    // [super dealloc];
-}
-
-
-// fire it up
-//
-//
-- (void) awakeFromNib
+- (void)awakeFromNib
 {
     [super awakeFromNib];
 
@@ -162,11 +141,8 @@
 // override class method. Called every time before menu is drawn.
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    SEL action = menuItem.action;
-
     // disable the URL/Path options menu if there is no meaningful data
-    if ((action == @selector(updateMenuItemContent:)) && (!_urlToDisplay))
-    {
+    if ((menuItem.action == @selector(updateMenuItemContent:)) && (!_urlToDisplay)) {
         return NO;
     }
     return YES;
@@ -176,7 +152,7 @@
 //---
 // callback for tooltip update timer
 //
-- (void) dataRefreshTimeHandler:(NSTimer *)timer
+- (void)dataRefreshTimeHandler:(NSTimer *)timer
 {
     [self gatherDataToDisplay];
     [self updateToolTipText];
@@ -190,7 +166,7 @@
 //---
 // enables menu icon/status item, sets proporties like image, attach menu
 //
-- (void) enableMenuIcon
+- (void)enableMenuIcon
 {
     _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     [_statusItem setHighlightMode:YES];
@@ -212,7 +188,7 @@
 //---
 // Make sure data is fresh, before displaying
 //
-- (void) gatherDataToDisplay
+- (void)gatherDataToDisplay
 {
     mtime_t pos;
 
@@ -223,14 +199,12 @@
     // If status is 'stopped' there is no useful data
     // Otherwise could have used 'if (_nameToDisplay == nil)'
 
-    if ([self vlcPlayingStatus] == PLAYLIST_STOPPED)
-    {
+    if ([self vlcPlayingStatus] == PLAYLIST_STOPPED) {
         _urlToDisplay = nil;
     } else {
         input_thread_t * p_input;
         p_input = pl_CurrentInput(getIntf());
-        if (p_input)
-        {
+        if (p_input) {
             pos = var_GetInteger(p_input, "time") / CLOCK_FREQ;
             vlc_object_release(p_input); // must release or get segfault on quit
         }
@@ -251,21 +225,20 @@
 //---
 // Call for periodic updates of tooltip text
 //
-- (void) updateToolTipText
+- (void)updateToolTipText
 {
     NSString *toolTipText = nil;
 
     // craft the multiline string, for the tooltip, depending on play status
 
-    if ([self vlcPlayingStatus] == PLAYLIST_STOPPED)
-    {
-         // nothing playing
-         toolTipText = @"VLC media player\nNothing playing";
+    if ([self vlcPlayingStatus] == PLAYLIST_STOPPED) {
+        // nothing playing
+        toolTipText = @"VLC media player\nNothing playing";
     } else {
 #ifdef showURLInToolTip
-    toolTipText = [NSString stringWithFormat:@"VLC media player\nName: %@\nDuration: %@\nTime: %@\nURL/Path: %@", _nameToDisplay, _durationToDisplay, _timeToDisplay, _urlToDisplay];
+        toolTipText = [NSString stringWithFormat:@"VLC media player\nName: %@\nDuration: %@\nTime: %@\nURL/Path: %@", _nameToDisplay, _durationToDisplay, _timeToDisplay, _urlToDisplay];
 #else
-    toolTipText = [NSString stringWithFormat:@"VLC media player\nName: %@\nDuration: %@\nTime: %@", _nameToDisplay, _durationToDisplay, _timeToDisplay];
+        toolTipText = [NSString stringWithFormat:@"VLC media player\nName: %@\nDuration: %@\nTime: %@", _nameToDisplay, _durationToDisplay, _timeToDisplay];
 #endif
     }
 
@@ -277,24 +250,22 @@
 //---
 // Call for updating of dynamic menu item
 //
-- (void) updateDynamicMenuItemText
+- (void)updateDynamicMenuItemText
 {
     NSString *menuString = nil;
 
     // create string for dynamic menu bit (sync?)
-    if ([self vlcPlayingStatus] == PLAYLIST_STOPPED)
-    {
-         // put back our disabled menu item text.
-         menuString =  @"URL/Path Options";
+    if ([self vlcPlayingStatus] == PLAYLIST_STOPPED) {
+        // put back our disabled menu item text.
+        menuString =  @"URL/Path Options";
     } else {
-         if ([_urlToDisplay hasPrefix:@"file://"])
-         {
-              // offer to show 'file://' in finder
-              menuString = [NSString stringWithFormat:@"Select File In Finder"];
-         } else {
-              // offer to copy URL to clipboard
-              menuString = [NSString stringWithFormat:@"Copy URL to clipboard"];
-         }
+        if ([_urlToDisplay hasPrefix:@"file://"]) {
+            // offer to show 'file://' in finder
+            menuString = [NSString stringWithFormat:@"Select File In Finder"];
+        } else {
+            // offer to copy URL to clipboard
+            menuString = [NSString stringWithFormat:@"Copy URL to clipboard"];
+        }
     }
 
     [_vlcStatusBarMenuItem setTitle:menuString];
@@ -304,20 +275,20 @@
 //---
 // set timer for tooltips updates and flee
 //
-- (void) setDataUpdateTimer:(float) interval
+- (void)setDataUpdateTimer:(float)interval
 {
     self.dataRefreshUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-    target:self
-    selector:@selector(dataRefreshTimeHandler:)
-    userInfo:nil
-    repeats:YES];
+                                                                   target:self
+                                                                 selector:@selector(dataRefreshTimeHandler:)
+                                                                 userInfo:nil
+                                                                  repeats:YES];
 }
 
 
 //---
 //
 //
-- (void) updateMenuItemRandom
+- (void)updateMenuItemRandom
 {
     // get current random status
     bool b_value;
@@ -326,8 +297,7 @@
 
     // get menuitem 'Random'
     NSMenuItem* menuItemToChange = [_vlcStatusBarIconMenu itemWithTag:randomMenuItemTag];
-    if (b_value)
-    {
+    if (b_value) {
         [menuItemToChange setState:NSOnState];
     } else {
         [menuItemToChange setState:NSOffState];
@@ -338,12 +308,11 @@
 //---
 //
 //
-- (void) updateMenuItemPlayPause
+- (void)updateMenuItemPlayPause
 {
     NSMenuItem* menuItemToChange = [_vlcStatusBarIconMenu itemWithTag:playPauseMenuItemTag];
 
-    if ([self vlcPlayingStatus] == PLAYLIST_RUNNING)
-    {
+    if ([self vlcPlayingStatus] == PLAYLIST_RUNNING) {
         [menuItemToChange setTitle:@"Pause"];
         [menuItemToChange setImage:_menuImagePause];
     } else {
@@ -359,7 +328,7 @@
 //---
 // Returns VLC playlist status
 // Check for: constants PLAYLIST_RUNNING, PLAYLIST_STOPPED, PLAYLIST_PAUSED.
-- (int) vlcPlayingStatus
+- (int)vlcPlayingStatus
 {
     int res;
     // get the playlist 'playing' status
@@ -376,7 +345,7 @@
 //---
 // Returns true if playing, false in all other cases.
 //
-- (BOOL) isVLCPlaying
+- (BOOL)isVLCPlaying
 {
     bool vlcPlaying = false;
 
@@ -384,15 +353,8 @@
     playlist_t *p_playlist = pl_Get(getIntf());
 
     PL_LOCK;
-    switch( playlist_Status( p_playlist ) )
-    {
-        case PLAYLIST_RUNNING:
-            vlcPlaying = true;
-            break;
-        case PLAYLIST_STOPPED:
-        case PLAYLIST_PAUSED:
-        default:
-            break;
+    if (playlist_Status( p_playlist ) == PLAYLIST_RUNNING) {
+        vlcPlaying = true;
     }
     PL_UNLOCK;
 
@@ -411,19 +373,16 @@
     // Here we offer to copy the url to the clipboard or
     // select/show a local file in the finder..(useful imo ;-)
 
-    if ([self vlcPlayingStatus] == PLAYLIST_STOPPED)
-    {
-        // Don't do anything, as the 'URL/path' is emtpy
-    } else {
-        if ([_urlToDisplay hasPrefix:@"file://"])
-        {
+    if ([self vlcPlayingStatus] != PLAYLIST_STOPPED) {
+        if ([_urlToDisplay hasPrefix:@"file://"]) {
             // show local file in finder
             NSString *path=[_urlToDisplay substringFromIndex:7];
             [[NSWorkspace sharedWorkspace] selectFile:path inFileViewerRootedAtPath:path];
         } else {
             // copy remote URL to clipboard
-            [[NSPasteboard generalPasteboard] clearContents];
-            [[NSPasteboard generalPasteboard] setString:_urlToDisplay  forType:NSStringPboardType];
+            NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+            [pasteboard clearContents];
+            [pasteboard setString:_urlToDisplay forType:NSStringPboardType];
         }
     }
 }
