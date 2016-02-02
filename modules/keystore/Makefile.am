@@ -29,6 +29,14 @@ if HAVE_KWALLET
 keystore_LTLIBRARIES += libkwallet_plugin.la
 endif
 
+libkeychain_plugin_la_SOURCES = keystore/keychain.m
+libkeychain_plugin_la_OBJCFLAGS = $(AM_CFLAGS) -fobjc-arc
+libkeychain_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(keystoredir)' -Wl,-framework,Foundation -Wl,-framework,Security
+
+if HAVE_DARWIN
+keystore_LTLIBRARIES += libkeychain_plugin.la
+endif
+
 keystore_LTLIBRARIES += \
 	$(LTLIBsecret)
 

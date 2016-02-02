@@ -51,7 +51,8 @@ static const struct
     /* Following keystores are tested only when asked explicitly by the tester
      * (with "-a" argv) */
     { "secret", false },
-    { "kwallet", false }
+    { "kwallet", false },
+    { "keychain", false }
 };
 
 static void

@@ -194,6 +194,7 @@ Misc
  * Add Gnome libsecret-based crypto keystore
  * Add KDE Kwallet-based crypto keystore
  * Add a plaintext keystore
+ * Add Keychain based crypto keystore for iOS, Mac OS X and tvOS
 
 Removed modules
  * Atmo video filter

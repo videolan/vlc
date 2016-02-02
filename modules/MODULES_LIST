@@ -203,6 +203,7 @@ $Id$
  * kai: OS/2 audio output
  * karaoke: simple karaoke audio filter
  * kate: kate text bitstream decoder
+ * keychain: Keystore for iOS, Mac OS X and tvOS
  * kva: OS/2 video output
  * kwallet: store secrets via KDE Kwallet
  * libass: Subtitle renderers using libass
