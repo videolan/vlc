@@ -491,17 +491,15 @@ void vlc_http_auth_Init( vlc_http_auth_t *p_auth )
     memset( p_auth, 0, sizeof( *p_auth ) );
 }
 
-void vlc_http_auth_Reset( vlc_http_auth_t *p_auth )
+void vlc_http_auth_Deinit( vlc_http_auth_t *p_auth )
 {
-    p_auth->i_nonce = 0;
-
-    FREENULL( p_auth->psz_realm );
-    FREENULL( p_auth->psz_domain );
-    FREENULL( p_auth->psz_nonce );
-    FREENULL( p_auth->psz_opaque );
-    FREENULL( p_auth->psz_stale );
-    FREENULL( p_auth->psz_algorithm );
-    FREENULL( p_auth->psz_qop );
-    FREENULL( p_auth->psz_cnonce );
-    FREENULL( p_auth->psz_HA1 );
+    free( p_auth->psz_realm );
+    free( p_auth->psz_domain );
+    free( p_auth->psz_nonce );
+    free( p_auth->psz_opaque );
+    free( p_auth->psz_stale );
+    free( p_auth->psz_algorithm );
+    free( p_auth->psz_qop );
+    free( p_auth->psz_cnonce );
+    free( p_auth->psz_HA1 );
 }

@@ -135,7 +135,7 @@ GetLang_1
 GetLang_2B
 GetLang_2T
 vlc_http_auth_Init
-vlc_http_auth_Reset
+vlc_http_auth_Deinit
 vlc_http_auth_ParseWwwAuthenticateHeader
 vlc_http_auth_ParseAuthenticationInfoHeader
 vlc_http_auth_FormatAuthorizationHeader

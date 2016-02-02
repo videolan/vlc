@@ -53,7 +53,7 @@ typedef struct vlc_http_auth_t
 
 
 VLC_API void vlc_http_auth_Init( vlc_http_auth_t * );
-VLC_API void vlc_http_auth_Reset( vlc_http_auth_t * );
+VLC_API void vlc_http_auth_Deinit( vlc_http_auth_t * );
 VLC_API void vlc_http_auth_ParseWwwAuthenticateHeader
             ( vlc_object_t *, vlc_http_auth_t * , const char * );
 VLC_API int vlc_http_auth_ParseAuthenticationInfoHeader

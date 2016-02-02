@@ -470,10 +470,10 @@ static void Close( vlc_object_t *p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     vlc_UrlClean( &p_sys->url );
-    vlc_http_auth_Reset( &p_sys->auth );
+    vlc_http_auth_Deinit( &p_sys->auth );
     if( p_sys->b_proxy )
         vlc_UrlClean( &p_sys->proxy );
-    vlc_http_auth_Reset( &p_sys->proxy_auth );
+    vlc_http_auth_Deinit( &p_sys->proxy_auth );
 
     free( p_sys->psz_mime );
     free( p_sys->psz_location );
