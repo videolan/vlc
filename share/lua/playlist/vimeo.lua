@@ -67,7 +67,7 @@ function parse()
                 -- Apparently the different formats available are listed
                 -- in uncertain order of quality, so compare with what
                 -- we have so far.
-                local height = string.match( stream, "\"height\":(%d+)[,}]" )
+                local height = string.match( stream, "\"height\":(%d+)" )
                 height = tonumber( height )
 
                 -- Better than nothing
