@@ -208,6 +208,7 @@ static void FreeSys( vlc_object_t *p_this, sout_stream_sys_t *p_sys )
     free( p_sys->psz_session );
     free( p_sys->psz_client_instance );
     free( p_sys->psz_last_status_line );
+    vlc_http_auth_Deinit( &p_sys->auth );
     free( p_sys );
 }
 
