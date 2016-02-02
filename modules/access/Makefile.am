@@ -422,7 +422,7 @@ EXTRA_LTLIBRARIES += libsftp_plugin.la
 
 libnfs_plugin_la_SOURCES = access/nfs.c
 libnfs_plugin_la_CFLAGS = $(AM_CFLAGS) $(NFS_CFLAGS)
-libnfs_plugin_la_LIBADD = $(NFS_LIBS)
+libnfs_plugin_la_LIBADD = $(NFS_LIBS) $(SOCKET_LIBS)
 libnfs_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBnfs)
 EXTRA_LTLIBRARIES += libnfs_plugin.la
