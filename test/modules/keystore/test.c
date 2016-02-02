@@ -34,6 +34,13 @@
 #undef NDEBUG
 #include <assert.h>
 
+/*
+ * Build and exec all keystore tests:
+ * $ cd vlc/build-<name>/test
+ * $ make test_modules_keystore
+ * $ ./test_modules_keystore -a
+ */
+
 static const struct
 {
     const char *psz_module;
