@@ -99,7 +99,7 @@ static char *GenerateCnonce()
     return psz_md5_hash( &md5 );
 }
 
-static char *AuthDigest( vlc_object_t *p_this, http_auth_t *p_auth,
+static char *AuthDigest( vlc_object_t *p_this, vlc_http_auth_t *p_auth,
                          const char *psz_method, const char *psz_path,
                          const char *psz_username, const char *psz_password )
 {
@@ -228,8 +228,8 @@ error:
  * acceptable Authorization header is not sent, the server responds with a "401
  * Unauthorized" status code, and a WWW-Authenticate header [...]
  */
-void http_auth_ParseWwwAuthenticateHeader(
-        vlc_object_t *p_this, http_auth_t *p_auth,
+void vlc_http_auth_ParseWwwAuthenticateHeader(
+        vlc_object_t *p_this, vlc_http_auth_t *p_auth,
         const char *psz_header )
 {
     static const char psz_basic_prefix[] = "Basic ";
@@ -306,8 +306,8 @@ void http_auth_ParseWwwAuthenticateHeader(
  * The Authentication-Info header is used by the server to communicate some
  * information regarding the successful authentication in the response.
  */
-int http_auth_ParseAuthenticationInfoHeader(
-        vlc_object_t *p_this, http_auth_t *p_auth,
+int vlc_http_auth_ParseAuthenticationInfoHeader(
+        vlc_object_t *p_this, vlc_http_auth_t *p_auth,
         const char *psz_header, const char *psz_method, const char *psz_path,
         const char *psz_username, const char *psz_password )
 {
@@ -385,8 +385,8 @@ error:
     return i_err;
 }
 
-char *http_auth_FormatAuthorizationHeader(
-        vlc_object_t *p_this, http_auth_t *p_auth,
+char *vlc_http_auth_FormatAuthorizationHeader(
+        vlc_object_t *p_this, vlc_http_auth_t *p_auth,
         const char *psz_method, const char *psz_path,
         const char *psz_username, const char *psz_password )
 {
@@ -486,12 +486,12 @@ error:
     return psz_result;
 }
 
-void http_auth_Init( http_auth_t *p_auth )
+void vlc_http_auth_Init( vlc_http_auth_t *p_auth )
 {
     memset( p_auth, 0, sizeof( *p_auth ) );
 }
 
-void http_auth_Reset( http_auth_t *p_auth )
+void vlc_http_auth_Reset( vlc_http_auth_t *p_auth )
 {
     p_auth->i_nonce = 0;
 

@@ -17,7 +17,7 @@ cat libvlccore.sym | grep -v \
 	-e '^playlist_' -e '^services_discovery_' -e '^intf_' \
 	-e '^dialog_' -e '^update_' -e '^addons\?_' -e '^fingerprinter_' \
 	-e '^text_style_' -e '^text_segment_' \
-	-e '^net_' -e '^httpd_' -e '^http_auth_' \
+	-e '^net_' -e '^httpd_' \
 	-e '^config_' -e '^module_' -e '^var_' \
 	-e '^date_' -e '^sdp_' -e '^plane_' \
 	-e '^us_' -e '^utf8_' -e '^xml_' -e '^str_format_' -e '^GetLang_' \

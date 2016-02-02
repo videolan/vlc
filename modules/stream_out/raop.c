@@ -126,7 +126,7 @@ struct sout_stream_sys_t
     int i_audio_latency;
     int i_jack_type;
 
-    http_auth_t auth;
+    vlc_http_auth_t auth;
 
     /* Send buffer */
     size_t i_sendbuf_len;
@@ -838,7 +838,7 @@ static int ParseAuthenticateHeader( vlc_object_t *p_this,
         goto error;
     }
 
-    http_auth_ParseWwwAuthenticateHeader( p_this, &p_sys->auth, psz_auth );
+    vlc_http_auth_ParseWwwAuthenticateHeader( p_this, &p_sys->auth, psz_auth );
 
 error:
     return i_err;
@@ -873,10 +873,10 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
             FREENULL( psz_authorization );
 
             psz_authorization =
-                http_auth_FormatAuthorizationHeader( p_this, &p_sys->auth,
-                                                     psz_method,
-                                                     p_sys->psz_url, "",
-                                                     p_sys->psz_password );
+                vlc_http_auth_FormatAuthorizationHeader( p_this, &p_sys->auth,
+                                                         psz_method,
+                                                         p_sys->psz_url, "",
+                                                         p_sys->psz_password );
             if ( psz_authorization == NULL )
             {
                 i_err = VLC_EGENERIC;
@@ -1397,7 +1397,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_volume = var_GetInteger( p_stream, SOUT_CFG_PREFIX "volume");
     p_sys->i_jack_type = JACK_TYPE_NONE;
 
-    http_auth_Init( &p_sys->auth );
+    vlc_http_auth_Init( &p_sys->auth );
 
     p_sys->psz_host = var_GetNonEmptyString( p_stream,
                                              SOUT_CFG_PREFIX "host" );

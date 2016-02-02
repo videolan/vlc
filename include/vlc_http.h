@@ -37,7 +37,7 @@
 #include <vlc_arrays.h>
 
 /* RFC 2617: Basic and Digest Access Authentication */
-typedef struct http_auth_t
+typedef struct vlc_http_auth_t
 {
     char *psz_realm;
     char *psz_domain;
@@ -49,21 +49,20 @@ typedef struct http_auth_t
     int i_nonce;
     char *psz_cnonce;
     char *psz_HA1; /* stored H(A1) value if algorithm = "MD5-sess" */
-} http_auth_t;
+} vlc_http_auth_t;
 
 
-VLC_API void http_auth_Init( http_auth_t * );
-VLC_API void http_auth_Reset( http_auth_t * );
-VLC_API void http_auth_ParseWwwAuthenticateHeader
-            ( vlc_object_t *, http_auth_t * ,
-              const char * );
-VLC_API int http_auth_ParseAuthenticationInfoHeader
-            ( vlc_object_t *, http_auth_t *,
+VLC_API void vlc_http_auth_Init( vlc_http_auth_t * );
+VLC_API void vlc_http_auth_Reset( vlc_http_auth_t * );
+VLC_API void vlc_http_auth_ParseWwwAuthenticateHeader
+            ( vlc_object_t *, vlc_http_auth_t * , const char * );
+VLC_API int vlc_http_auth_ParseAuthenticationInfoHeader
+            ( vlc_object_t *, vlc_http_auth_t *,
               const char *, const char *,
               const char *, const char *,
               const char * );
-VLC_API char *http_auth_FormatAuthorizationHeader
-            ( vlc_object_t *, http_auth_t *,
+VLC_API char *vlc_http_auth_FormatAuthorizationHeader
+            ( vlc_object_t *, vlc_http_auth_t *,
               const char *, const char *,
               const char *, const char * ) VLC_USED;
 

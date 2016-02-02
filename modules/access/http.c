@@ -134,12 +134,12 @@ struct access_sys_t
     char    *psz_referrer;
     char    *psz_username;
     char    *psz_password;
-    http_auth_t auth;
+    vlc_http_auth_t auth;
 
     /* Proxy */
     bool b_proxy;
     vlc_url_t  proxy;
-    http_auth_t proxy_auth;
+    vlc_http_auth_t proxy_auth;
     char       *psz_proxy_passbuf;
 
     /* */
@@ -185,9 +185,9 @@ static void Disconnect( access_t * );
 
 
 static void AuthReply( access_t *p_acces, const char *psz_prefix,
-                       vlc_url_t *p_url, http_auth_t *p_auth );
+                       vlc_url_t *p_url, vlc_http_auth_t *p_auth );
 static int AuthCheckReply( access_t *p_access, const char *psz_header,
-                           vlc_url_t *p_url, http_auth_t *p_auth );
+                           vlc_url_t *p_url, vlc_http_auth_t *p_auth );
 static vlc_http_cookie_jar_t *GetCookieJar( vlc_object_t *p_this );
 
 /*****************************************************************************
@@ -237,8 +237,8 @@ static int Open( vlc_object_t *p_this )
     else
         p_sys->cookies = NULL;
 
-    http_auth_Init( &p_sys->auth );
-    http_auth_Init( &p_sys->proxy_auth );
+    vlc_http_auth_Init( &p_sys->auth );
+    vlc_http_auth_Init( &p_sys->proxy_auth );
     vlc_UrlParse( &p_sys->url, psz_url );
     vlc_credential_init( &credential, &p_sys->url );
 
@@ -470,10 +470,10 @@ static void Close( vlc_object_t *p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     vlc_UrlClean( &p_sys->url );
-    http_auth_Reset( &p_sys->auth );
+    vlc_http_auth_Reset( &p_sys->auth );
     if( p_sys->b_proxy )
         vlc_UrlClean( &p_sys->proxy );
-    http_auth_Reset( &p_sys->proxy_auth );
+    vlc_http_auth_Reset( &p_sys->proxy_auth );
 
     free( p_sys->psz_mime );
     free( p_sys->psz_location );
@@ -1276,14 +1276,14 @@ static int Request( access_t *p_access, uint64_t i_tell )
         else if( !strcasecmp( psz, "www-authenticate" ) )
         {
             msg_Dbg( p_access, "Authentication header: %s", p );
-            http_auth_ParseWwwAuthenticateHeader( VLC_OBJECT(p_access),
-                                                  &p_sys->auth, p );
+            vlc_http_auth_ParseWwwAuthenticateHeader( VLC_OBJECT(p_access),
+                                                      &p_sys->auth, p );
         }
         else if( !strcasecmp( psz, "proxy-authenticate" ) )
         {
             msg_Dbg( p_access, "Proxy authentication header: %s", p );
-            http_auth_ParseWwwAuthenticateHeader( VLC_OBJECT(p_access),
-                                                  &p_sys->proxy_auth, p );
+            vlc_http_auth_ParseWwwAuthenticateHeader( VLC_OBJECT(p_access),
+                                                      &p_sys->proxy_auth, p );
         }
         else if( !strcasecmp( psz, "authentication-info" ) )
         {
@@ -1332,15 +1332,15 @@ static void Disconnect( access_t *p_access )
  *****************************************************************************/
 
 static void AuthReply( access_t *p_access, const char *psz_prefix,
-                       vlc_url_t *p_url, http_auth_t *p_auth )
+                       vlc_url_t *p_url, vlc_http_auth_t *p_auth )
 {
     char *psz_value;
 
     psz_value =
-        http_auth_FormatAuthorizationHeader( VLC_OBJECT(p_access), p_auth,
-                                             "GET", p_url->psz_path,
-                                             p_url->psz_username,
-                                             p_url->psz_password );
+        vlc_http_auth_FormatAuthorizationHeader( VLC_OBJECT(p_access), p_auth,
+                                                 "GET", p_url->psz_path,
+                                                 p_url->psz_username,
+                                                 p_url->psz_password );
     if ( psz_value == NULL )
         return;
 
@@ -1349,14 +1349,15 @@ static void AuthReply( access_t *p_access, const char *psz_prefix,
 }
 
 static int AuthCheckReply( access_t *p_access, const char *psz_header,
-                           vlc_url_t *p_url, http_auth_t *p_auth )
+                           vlc_url_t *p_url, vlc_http_auth_t *p_auth )
 {
     return
-        http_auth_ParseAuthenticationInfoHeader( VLC_OBJECT(p_access), p_auth,
-                                                 psz_header, "",
-                                                 p_url->psz_path,
-                                                 p_url->psz_username,
-                                                 p_url->psz_password );
+        vlc_http_auth_ParseAuthenticationInfoHeader( VLC_OBJECT(p_access),
+                                                     p_auth,
+                                                     psz_header, "",
+                                                     p_url->psz_path,
+                                                     p_url->psz_username,
+                                                     p_url->psz_password );
 }
 
 /*****************************************************************************
