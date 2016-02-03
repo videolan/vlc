@@ -3,17 +3,17 @@ BUILT_SOURCES_distclean += \
 	extras/package/win32/msi/config.wxi
 endif
 
-WIXPATH=`winepath -u 'C:\\Program Files (x86)\\Windows Installer XML v3.5\\bin'`
+WIXPATH=`wine winepath -u 'C:\\Program Files (x86)\\Windows Installer XML v3.5\\bin'`
 HEAT=wine "$(WIXPATH)/heat.exe"
 CANDLE=wine "$(WIXPATH)/candle.exe"
 LIGHT=wine "$(WIXPATH)/light.exe"
-VLCDIR=`winepath -s \`winepath -w '$(win32_destdir)'\``
+VLCDIR=`wine winepath -s \`wine winepath -w '$(win32_destdir)'\``
 MSIDIR=$(abs_srcdir)/extras/package/win32/msi
-W_MSIDIR=`winepath -w '$(MSIDIR)'`
+W_MSIDIR=`wine winepath -w '$(MSIDIR)'`
 MSIBUILDDIR=$(abs_top_builddir)/extras/package/win32/msi
-W_MSIBUILDDIR=`winepath -w '$(MSIBUILDDIR)'`
+W_MSIBUILDDIR=`wine winepath -w '$(MSIBUILDDIR)'`
 MSIOUTFILE=vlc-$(VERSION).msi
-WINE_C=`winepath c:`
+WINE_C=`wine winepath c:`
 
 package-msi: heat candle light
 
