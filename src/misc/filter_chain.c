@@ -333,7 +333,7 @@ error:
         ret--;
     }
     free( buf );
-    return -1;
+    return VLC_EGENERIC;
 }
 
 int filter_chain_ForEach( filter_chain_t *chain,
