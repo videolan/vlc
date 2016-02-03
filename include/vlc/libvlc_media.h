@@ -265,6 +265,12 @@ typedef enum libvlc_media_parse_flag_t
      * Fetch meta and covert art using network resources
      */
     libvlc_media_fetch_network  = 0x04,
+    /**
+     * Interact with the user (via libvlc_dialog_cbs) when preparsing this item
+     * (and not its sub items). Set this flag in order to receive a callback
+     * when the input is asking for credentials.
+     */
+    libvlc_media_do_interact    = 0x08,
 } libvlc_media_parse_flag_t;
 
 /**

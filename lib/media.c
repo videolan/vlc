@@ -741,6 +741,8 @@ static int media_parse(libvlc_media_t *media, bool b_async,
 
         if (parse_flag & libvlc_media_parse_network)
             parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
+        if (parse_flag & libvlc_media_do_interact)
+            parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
         ret = libvlc_MetaRequest(libvlc, item, parse_scope);
         if (ret != VLC_SUCCESS)
             return ret;
