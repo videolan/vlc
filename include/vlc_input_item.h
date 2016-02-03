@@ -94,6 +94,9 @@ struct input_item_t
 
     int         i_preparse_depth;    /**< How many level of sub items can be preparsed:
                                           -1: recursive, 0: none, >0: n levels */
+
+    bool        b_preparse_interact; /**< Force interaction with the user when
+                                          preparsing.*/
 };
 
 TYPEDEF_ARRAY(input_item_t*, input_item_array_t)
@@ -320,7 +323,8 @@ typedef enum input_item_meta_request_option_t
     META_REQUEST_OPTION_NONE          = 0x00,
     META_REQUEST_OPTION_SCOPE_LOCAL   = 0x01,
     META_REQUEST_OPTION_SCOPE_NETWORK = 0x02,
-    META_REQUEST_OPTION_SCOPE_ANY     = 0x03
+    META_REQUEST_OPTION_SCOPE_ANY     = 0x03,
+    META_REQUEST_OPTION_DO_INTERACT   = 0x04
 } input_item_meta_request_option_t;
 
 VLC_API int libvlc_MetaRequest(libvlc_int_t *, input_item_t *,

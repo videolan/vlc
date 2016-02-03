@@ -355,6 +355,21 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
             p_item->i_preparse_depth = -1;
     }
 
+    /* */
+    if( p_input->b_preparsing )
+        p_input->i_flags |= OBJECT_FLAGS_QUIET | OBJECT_FLAGS_NOINTERACT;
+
+    /* Make sure the interaction option is honored */
+    if( !var_InheritBool( p_input, "interact" ) )
+        p_input->i_flags |= OBJECT_FLAGS_NOINTERACT;
+    else if( p_item->b_preparse_interact )
+    {
+        /* If true, this item was asked explicitly to interact with the user
+         * (via libvlc_MetaRequest). Sub items created from this input won't
+         * have this flag and won't interact with the user */
+        p_input->i_flags &= ~OBJECT_FLAGS_NOINTERACT;
+    }
+
     vlc_mutex_unlock( &p_item->lock );
 
     /* No slave */
@@ -437,14 +452,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_item_SetNowPlaying( p_item, NULL );
     input_item_SetESNowPlaying( p_item, NULL );
     input_SendEventMeta( p_input );
-
-    /* */
-    if( p_input->b_preparsing )
-        p_input->i_flags |= OBJECT_FLAGS_QUIET | OBJECT_FLAGS_NOINTERACT;
-
-    /* Make sure the interaction option is honored */
-    if( !var_InheritBool( p_input, "interact" ) )
-        p_input->i_flags |= OBJECT_FLAGS_NOINTERACT;
 
     /* */
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
