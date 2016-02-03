@@ -24,6 +24,7 @@
 #include <assert.h>
 #include <vlc_demux.h>
 #include <vlc_memory.h>
+#include "timestamps.h"
 
 /* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */
 #define PS_TK_COUNT (256+256+256+8 - 0xc0)

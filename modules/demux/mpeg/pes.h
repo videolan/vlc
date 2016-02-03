@@ -17,12 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
-#define FROM_SCALE_NZ(x) ((x) * 100 / 9)
-#define TO_SCALE_NZ(x)   ((x) * 9 / 100)
-
-#define FROM_SCALE(x) (VLC_TS_0 + FROM_SCALE_NZ(x))
-#define TO_SCALE(x)   TO_SCALE_NZ((x) - VLC_TS_0)
+#ifndef VLC_MPEG_PES_H
+#define VLC_MPEG_PES_H
 
 static inline mtime_t ExtractPESTimestamp( const uint8_t *p_data )
 {
@@ -44,6 +40,7 @@ static inline mtime_t ExtractMPEG1PESTimestamp( const uint8_t *p_data )
              (mtime_t)(p_data[4] >> 3);
 }
 
+inline
 static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size_t i_header,
                            unsigned *pi_skip, mtime_t *pi_dts, mtime_t *pi_pts,
                            uint8_t *pi_stream_id )
@@ -140,3 +137,5 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
     *pi_skip = i_skip;
     return VLC_SUCCESS;
 }
+
+#endif

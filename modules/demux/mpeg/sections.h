@@ -20,13 +20,6 @@
 #ifndef TS_SECTIONS_H
 #define TS_SECTIONS_H
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include "ts.h"
-#include <vlc_common.h>
-
 typedef void(* ts_section_callback_t)( demux_t *, ts_pid_t *, block_t * );
 typedef struct ts_sections_processor_t ts_sections_processor_t;
 

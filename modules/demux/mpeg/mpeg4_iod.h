@@ -17,6 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef VLC_MPEG4_IOD_H
+#define VLC_MPEG4_IOD_H
 
 #define ES_DESCRIPTOR_COUNT 255
 typedef enum
@@ -61,7 +63,10 @@ typedef struct
     mtime_t i_pts;
 } sl_header_data;
 
-typedef struct
+typedef struct es_mpeg4_descriptor_t es_mpeg4_descriptor_t;
+typedef struct decoder_config_descriptor_t decoder_config_descriptor_t;
+
+struct decoder_config_descriptor_t
 {
     uint8_t                 i_objectTypeIndication;
     uint8_t                 i_streamType;
@@ -69,9 +74,9 @@ typedef struct
     unsigned                i_extra;
     uint8_t                 *p_extra;
 
-} decoder_config_descriptor_t;
+};
 
-typedef struct
+struct es_mpeg4_descriptor_t
 {
     bool                    b_ok;
     uint16_t                i_es_id;
@@ -81,7 +86,7 @@ typedef struct
     decoder_config_descriptor_t    dec_descr;
     sl_config_descriptor_t         sl_descr;
 
-} es_mpeg4_descriptor_t;
+};
 
 typedef struct
 {
@@ -105,3 +110,4 @@ sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
                                const sl_config_descriptor_t *sl );
 void DecodeODCommand( vlc_object_t *p_object, od_descriptors_t *,
                       unsigned i_data, const uint8_t *p_data );
+#endif

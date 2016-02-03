@@ -229,14 +229,27 @@ libplaylist_plugin_la_SOURCES = \
 demux_LTLIBRARIES += libplaylist_plugin.la
 
 libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
+        demux/mpeg/ts_pid.h demux/mpeg/ts_pid.c \
+        demux/mpeg/ts_psi.h demux/mpeg/ts_psi.c \
+        demux/mpeg/ts_psi_eit.h demux/mpeg/ts_psi_eit.c \
+        demux/mpeg/ts_streams.h demux/mpeg/ts_streams.c \
+        demux/mpeg/ts_scte.h demux/mpeg/ts_scte.c \
         demux/mpeg/sections.c demux/mpeg/sections.h \
         demux/mpeg/mpeg4_iod.c demux/mpeg/mpeg4_iod.h \
-        demux/mpeg/ts_strings.h demux/mpeg/pes.h \
-	mux/mpeg/csa.c mux/mpeg/dvbpsi_compat.h \
-	mux/mpeg/streams.h mux/mpeg/tables.c mux/mpeg/tables.h \
+        demux/mpeg/ts_sl.c demux/mpeg/ts_sl.h \
+        demux/mpeg/ts_hotfixes.c demux/mpeg/ts_hotfixes.h \
+        demux/mpeg/ts_strings.h \
+        demux/mpeg/pes.h \
+        demux/mpeg/timestamps.h \
+        demux/dvb-text.h \
+        demux/opus.h \
+	mux/mpeg/csa.c \
+        mux/mpeg/dvbpsi_compat.h \
+	mux/mpeg/streams.h \
+        mux/mpeg/tables.c mux/mpeg/tables.h \
 	mux/mpeg/tsutil.c mux/mpeg/tsutil.h \
         codec/scte18.h \
-	demux/dvb-text.h codec/opus_header.c demux/opus.h
+	codec/opus_header.c
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(DVBPSI_LIBS) $(SOCKET_LIBS)
 if HAVE_ARIBB24

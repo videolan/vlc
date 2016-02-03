@@ -494,6 +494,7 @@ modules/demux/mpeg/mpgv.c
 modules/demux/mpeg/ps.c
 modules/demux/mpeg/ps.h
 modules/demux/mpeg/ts.c
+modules/demux/mpeg/ts_psi.c
 modules/demux/nsc.c
 modules/demux/nsv.c
 modules/demux/nuv.c
