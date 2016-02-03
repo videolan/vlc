@@ -11369,7 +11369,7 @@ msgstr ""
 
 #: modules/codec/fluidsynth.c:53
 msgid "Polyphony"
-msgstr "Poliphonie"
+msgstr "Polyphonie"
 
 #: modules/codec/fluidsynth.c:55
 msgid ""
