@@ -711,6 +711,11 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_HQ_HQA, "Canopus HQ"),
 
+    B(VLC_CODEC_HAP, "Vidvox Hap"),
+        A("Hap1"),
+        E("Hap5", "Vidvox Hap Alpha"),
+        E("HapY", "Vidvox Hap Q"),
+
     /* */
     B(VLC_CODEC_YV12, "Planar 4:2:0 YVU"),
         A("YV12"),
