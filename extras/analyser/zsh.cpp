@@ -221,7 +221,7 @@ static void ParseModule(const module_t *mod)
 
 int main(int argc, const char **argv)
 {
-    libvlc_instance_t *libvlc = libvlc_new(argc, argv);
+    libvlc_instance_t *libvlc = libvlc_new(argc - 1, argv + 1);
     if (!libvlc)
         return 1;
 
