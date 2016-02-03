@@ -230,7 +230,10 @@ int main(int argc, const char **argv)
 
     mod_list = module_list_get(&modules);
     if (!mod_list || modules == 0)
+    {
+        libvlc_release(libvlc);
         return 2;
+    }
 
     module_t **max = &mod_list[modules];
 
