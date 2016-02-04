@@ -38,9 +38,8 @@
  * VLCExtensionsDialogProvider implementation
  *****************************************************************************/
 
-static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variable,
-                                   vlc_value_t old_val, vlc_value_t new_val,
-                                   void *param);
+static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
+                                    void *p_data);
 
 static NSView *createControlFromWidget(extension_widget_t *widget, id self)
 {
@@ -245,22 +244,18 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
 /**
  * Ask the dialogs provider to create a new dialog
  **/
-static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variable,
-                                   vlc_value_t old_val, vlc_value_t new_val,
-                                   void *param)
+
+static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
+                                    void *p_data)
+
 {
     @autoreleasepool {
-        (void) p_this;
-        (void) psz_variable;
-        (void) old_val;
+        ExtensionsDialogProvider *provider = (__bridge ExtensionsDialogProvider *)p_data;
+        if (!provider)
+            return;
 
-        ExtensionsDialogProvider *provider = (__bridge ExtensionsDialogProvider *)param;
-        if (!new_val.p_address)
-            return VLC_EGENERIC;
-
-        extension_dialog_t *p_dialog = (extension_dialog_t*) new_val.p_address;
-        [provider manageDialog:p_dialog];
-        return VLC_SUCCESS;
+        [provider manageDialog:p_ext_dialog];
+        return;
     }
 }
 
@@ -271,16 +266,14 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
     self = [super init];
     if (self) {
         intf_thread_t *p_intf = getIntf();
-        var_Create(p_intf, "dialog-extension", VLC_VAR_ADDRESS);
-        var_AddCallback(p_intf, "dialog-extension", extensionDialogCallback, (__bridge void *)self);
-        // dialog_Register(p_intf) is called by coredialog provider
+        vlc_dialog_provider_set_ext_callback(p_intf, extensionDialogCallback, (__bridge void *)self);
     }
     return self;
 }
 
 - (void)dealloc
 {
-    var_DelCallback(getIntf(), "dialog-extension", extensionDialogCallback, (__bridge void *)self);
+    vlc_dialog_provider_set_ext_callback(getIntf(), NULL, NULL);
 }
 
 - (void)performEventWithObject:(NSValue *)objectValue ofType:(const char*)type
