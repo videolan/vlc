@@ -94,17 +94,6 @@ demux_PacketizerNew
 demux_New
 demux_vaControl
 demux_vaControlHelper
-dialog_ExtensionUpdate
-dialog_Login
-dialog_vaLogin
-dialog_ProgressCancelled
-dialog_ProgressCreate
-dialog_ProgressDestroy
-dialog_ProgressSet
-dialog_Question
-dialog_Register
-dialog_Unregister
-dialog_VFatal
 EndMD5
 es_format_Clean
 es_format_Copy

@@ -311,8 +311,4 @@ struct extension_widget_t
     extension_dialog_t *p_dialog; ///< Parent dialog
 };
 
-VLC_API int dialog_ExtensionUpdate(vlc_object_t*, extension_dialog_t *);
-#define dialog_ExtensionUpdate(o, d) dialog_ExtensionUpdate(VLC_OBJECT(o), d)
-
 #endif /* VLC_EXTENSIONS_H */
-
