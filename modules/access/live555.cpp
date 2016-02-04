@@ -670,8 +670,8 @@ describe:
             {
                 msg_Dbg( p_demux, "connection error %d", i_code );
                 if( i_code == 403 )
-                    dialog_Fatal( p_demux, _("RTSP connection failed"),
-                                  _("Access to the stream is denied by the server configuration.") );
+                    vlc_dialog_display_error( p_demux, _("RTSP connection failed"),
+                        _("Access to the stream is denied by the server configuration.") );
             }
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             p_sys->rtsp = NULL;

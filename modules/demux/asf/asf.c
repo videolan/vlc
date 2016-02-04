@@ -258,8 +258,9 @@ static int Demux( demux_t *p_demux )
                 if( DemuxInit( p_demux ) )
                 {
                     msg_Err( p_demux, "failed to load the new header" );
-                    dialog_Fatal( p_demux, _("Could not demux ASF stream"), "%s",
-                                  _("VLC failed to load the ASF header.") );
+                    vlc_dialog_display_error( p_demux,
+                        _("Could not demux ASF stream"), "%s",
+                        _("VLC failed to load the ASF header.") );
                     return 0;
                 }
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
@@ -789,8 +790,8 @@ static int DemuxInit( demux_t *p_demux )
          || ASF_FindObject( p_sys->p_root->p_hdr,
                          &asf_object_advanced_content_encryption_guid, 0 ) != NULL )
     {
-        dialog_Fatal( p_demux, _("Could not demux ASF stream"), "%s",
-                        _("DRM protected streams are not supported.") );
+        vlc_dialog_display_error( p_demux, _("Could not demux ASF stream"), "%s",
+            ("DRM protected streams are not supported.") );
         goto error;
     }
 

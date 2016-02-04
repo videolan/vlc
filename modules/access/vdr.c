@@ -376,9 +376,9 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     {
         /* abort on read error */
         msg_Err( p_access, "failed to read (%s)", vlc_strerror_c(errno) );
-        dialog_Fatal( p_access, _("File reading failed"),
-                      _("VLC could not read the file (%s)."),
-                      vlc_strerror(errno) );
+        vlc_dialog_display_error( p_access, _("File reading failed"),
+            _("VLC could not read the file (%s)."),
+            vlc_strerror(errno) );
         SwitchFile( p_access, -1 );
         return 0;
     }
@@ -541,7 +541,7 @@ static bool SwitchFile( access_t *p_access, unsigned i_file )
     return true;
 
 error:
-    dialog_Fatal (p_access, _("File reading failed"), _("VLC could not"
+    vlc_dialog_display_error (p_access, _("File reading failed"), _("VLC could not"
         " open the file \"%s\" (%s)."), psz_path, vlc_strerror(errno) );
     if( p_sys->fd != -1 )
     {

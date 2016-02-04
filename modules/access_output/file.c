@@ -318,12 +318,12 @@ static int Open( vlc_object_t *p_this )
                 break;
             flags &= ~O_EXCL;
         }
-        while (dialog_Question (p_access, path,
-                                _("The output file already exists. "
-                                "If recording continues, the file will be "
-                                "overridden and its content will be lost."),
-                                _("Keep existing file"),
-                                _("Overwrite"), NULL) == 2);
+        while (vlc_dialog_wait_question (p_access, VLC_DIALOG_QUESTION_NORMAL,
+                                         _("Keep existing file"),
+                                         _("Overwrite"), NULL, path,
+                                         _("The output file already exists. "
+                                         "If recording continues, the file will be "
+                                         "overridden and its content will be lost.")) == 1);
         free (buf);
         if (fd == -1)
             return VLC_EGENERIC;

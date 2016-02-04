@@ -87,7 +87,7 @@ typedef struct
 struct scan_t
 {
     vlc_object_t *p_obj;
-    struct dialog_progress_bar_t *p_dialog;
+    vlc_dialog_id *p_dialog_id;
     uint64_t i_index;
     scan_parameter_t parameter;
     int64_t i_time_start;
@@ -212,7 +212,7 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
 
     p_scan->p_obj = VLC_OBJECT(p_obj);
     p_scan->i_index = 0;
-    p_scan->p_dialog = NULL;
+    p_scan->p_dialog_id = NULL;
     TAB_INIT( p_scan->i_service, p_scan->pp_service );
     p_scan->parameter = *p_parameter;
     p_scan->i_time_start = mdate();
@@ -222,8 +222,8 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
 
 void scan_Destroy( scan_t *p_scan )
 {
-    if( p_scan->p_dialog != NULL )
-        dialog_ProgressDestroy( p_scan->p_dialog );
+    if( p_scan->p_dialog_id != NULL )
+        vlc_dialog_release( p_scan->p_obj, p_scan->p_dialog_id );
 
     for( int i = 0; i < p_scan->i_service; i++ )
         scan_service_Delete( p_scan->pp_service[i] );
@@ -647,7 +647,6 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
     if( i_ret )
         return i_ret;
 
-    char *psz_text;
     int i_service = 0;
 
     for( int i = 0; i < p_scan->i_service; i++ )
@@ -658,18 +657,28 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
 
     const mtime_t i_eta = f_position > 0.005 ? (mdate() - p_scan->i_time_start) * ( 1.0 / f_position - 1.0 ) : -1;
     char psz_eta[MSTRTIME_MAX_SIZE];
+    const char *psz_fmt = _("%.1f MHz (%d services)\n~%s remaining");
 
-    if( asprintf( &psz_text, _("%.1f MHz (%d services)\n~%s remaining"),
-                  (double)p_cfg->i_frequency / 1000000, i_service, secstotimestr( psz_eta, i_eta/1000000 ) ) >= 0 )
+    if( i_eta >= 0 )
+        msg_Info( p_scan->p_obj, "Scan ETA %s | %f", secstotimestr( psz_eta, i_eta/1000000 ), f_position * 100 );
+
+    if( p_scan->p_dialog_id == NULL )
     {
-        if( i_eta >= 0 )
-            msg_Info( p_scan->p_obj, "Scan ETA %s | %f", secstotimestr( psz_eta, i_eta/1000000 ), f_position * 100 );
-
-        if( p_scan->p_dialog == NULL )
-            p_scan->p_dialog = dialog_ProgressCreate( p_scan->p_obj, _("Scanning DVB"), psz_text, _("Cancel") );
-        if( p_scan->p_dialog != NULL )
-            dialog_ProgressSet( p_scan->p_dialog, psz_text, f_position );
-        free( psz_text );
+        p_scan->p_dialog_id =
+            vlc_dialog_display_progress( p_scan->p_obj, false,
+                                         f_position, _("Cancel"),
+                                         _("Scanning DVB"), psz_fmt,
+                                         (double)p_cfg->i_frequency / 1000000,
+                                         i_service,
+                                         secstotimestr( psz_eta, i_eta/1000000 ) );
+    }
+    else
+    {
+        vlc_dialog_update_progress_text( p_scan->p_obj, p_scan->p_dialog_id,
+                                         f_position, psz_fmt,
+                                         (double)p_cfg->i_frequency / 1000000,
+                                         i_service,
+                                         secstotimestr( psz_eta, i_eta/1000000 ) );
     }
 
     p_scan->i_index++;
@@ -678,7 +687,9 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
 
 bool scan_IsCancelled( scan_t *p_scan )
 {
-    return p_scan->p_dialog && dialog_ProgressCancelled( p_scan->p_dialog );
+    if( p_scan->p_dialog_id == NULL )
+        return false;
+    return vlc_dialog_is_cancelled( p_scan->p_obj, p_scan->p_dialog_id );
 }
 
 static scan_service_t *ScanFindService( scan_t *p_scan, int i_service_start, int i_program )

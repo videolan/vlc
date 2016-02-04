@@ -1758,12 +1758,12 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt )
         if (!desc || !*desc)
             desc = N_("No description for this codec");
         msg_Err( p_dec, "Codec `%4.4s' (%s) is not supported.", (char*)&fmt->i_codec, desc );
-        dialog_Fatal( p_dec, _("Codec not supported"),
-                _("VLC could not decode the format \"%4.4s\" (%s)"),
-                (char*)&fmt->i_codec, desc );
+        vlc_dialog_display_error( p_dec, _("Codec not supported"),
+            _("VLC could not decode the format \"%4.4s\" (%s)"),
+            (char*)&fmt->i_codec, desc );
     } else {
         msg_Err( p_dec, "could not identify codec" );
-        dialog_Fatal( p_dec, _("Unidentified codec"),
+        vlc_dialog_display_error( p_dec, _("Unidentified codec"),
             _("VLC could not identify the audio or video codec" ) );
     }
 }
@@ -1783,9 +1783,8 @@ static decoder_t *decoder_New( vlc_object_t *p_parent, input_thread_t *p_input,
     if( p_dec == NULL )
     {
         msg_Err( p_parent, "could not create %s", psz_type );
-        dialog_Fatal( p_parent, _("Streaming / Transcoding failed"),
-                      _("VLC could not open the %s module."),
-                      vlc_gettext( psz_type ) );
+        vlc_dialog_display_error( p_parent, _("Streaming / Transcoding failed"),
+            _("VLC could not open the %s module."), vlc_gettext( psz_type ) );
         return NULL;
     }
 
@@ -2042,8 +2041,9 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         if( !p_cc )
         {
             msg_Err( p_dec, "could not create decoder" );
-            dialog_Fatal( p_dec, _("Streaming / Transcoding failed"), "%s",
-                          _("VLC could not open the decoder module.") );
+            vlc_dialog_display_error( p_dec,
+                _("Streaming / Transcoding failed"), "%s",
+                _("VLC could not open the decoder module.") );
             return VLC_EGENERIC;
         }
         else if( !p_cc->p_module )

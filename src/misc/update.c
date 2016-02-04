@@ -88,6 +88,10 @@
 # define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status" UPDATE_OS_SUFFIX
 #endif
 
+#define dialog_FatalWait( p_obj, psz_title, psz_fmt, ... ) \
+    vlc_dialog_wait_question( p_obj, VLC_DIALOG_QUESTION_CRITICAL, "OK", NULL, \
+                              NULL, psz_title, psz_fmt, ##__VA_ARGS__ );
+
 /*****************************************************************************
  * Update_t functions
  *****************************************************************************/
@@ -525,11 +529,11 @@ void update_Download( update_t *p_update, const char *psz_destdir )
 static void* update_DownloadReal( void *obj )
 {
     update_download_thread_t *p_udt = (update_download_thread_t *)obj;
-    dialog_progress_bar_t *p_progress = NULL;
+    int i_ret;
+    unsigned int i_dialog_id = 0;
     uint64_t l_size;
     uint64_t l_downloaded = 0;
     float f_progress;
-    char *psz_status;
     char *psz_downloaded = NULL;
     char *psz_size = NULL;
     char *psz_destfile = NULL;
@@ -589,20 +593,21 @@ static void* update_DownloadReal( void *obj )
     msg_Dbg( p_udt, "Downloading Stream '%s'", p_update->release.psz_url );
 
     psz_size = size_str( l_size );
-    if( asprintf( &psz_status, _("%s\nDownloading... %s/%s %.1f%% done"),
-        p_update->release.psz_url, "0.0", psz_size, 0.0 ) == -1 )
-        goto end;
 
-    p_progress = dialog_ProgressCreate( p_udt, _( "Downloading..."),
-                                        psz_status, _("Cancel") );
+    i_ret =
+        vlc_dialog_display_progress( p_udt, false, 0.0, _("Cancel"),
+                                     ( "Downloading..."),
+                                     _("%s\nDownloading... %s/%s %.1f%% done"),
+                                     p_update->release.psz_url, "0.0", psz_size,
+                                     0.0 );
 
-    free( psz_status );
-    if( p_progress == NULL )
+    if( i_ret <= 0 )
         goto end;
+    i_dialog_id = i_ret;
 
     while( !atomic_load( &p_udt->aborted ) &&
            ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
-           !dialog_ProgressCancelled( p_progress ) )
+           !vlc_dialog_cancelled( p_udt, i_dialog_id ) )
     {
         if( fwrite( p_buffer, i_read, 1, p_file ) < 1 )
         {
@@ -614,13 +619,11 @@ static void* update_DownloadReal( void *obj )
         psz_downloaded = size_str( l_downloaded );
         f_progress = (float)l_downloaded/(float)l_size;
 
-        if( asprintf( &psz_status, _( "%s\nDownloading... %s/%s - %.1f%% done" ),
-                      p_update->release.psz_url, psz_downloaded, psz_size,
-                      f_progress*100 ) != -1 )
-        {
-            dialog_ProgressSet( p_progress, psz_status, f_progress );
-            free( psz_status );
-        }
+        vlc_dialog_update_progress_text( p_udt, i_dialog_id, f_pos,
+                                         "%s\nDownloading... %s/%s - %.1f%% done",
+                                         p_update->release.psz_url,
+                                         psz_downloaded, psz_size,
+                                         f_progress*100 );
         free( psz_downloaded );
     }
 
@@ -629,10 +632,10 @@ static void* update_DownloadReal( void *obj )
     p_file = NULL;
 
     if( !atomic_load( &p_udt->aborted ) &&
-        !dialog_ProgressCancelled( p_progress ) )
+        !vlc_dialog_cancelled( p_udt, i_dialog_id ) )
     {
-        dialog_ProgressDestroy( p_progress );
-        p_progress = NULL;
+        vlc_dialog_cancel( p_udt, i_dialog_id );
+        i_dialog_id = 0;
     }
     else
     {
@@ -719,10 +722,13 @@ static void* update_DownloadReal( void *obj )
     free( p_hash );
 
 #ifdef _WIN32
-    int answer = dialog_Question( p_udt, _("Update VLC media player"),
-    _("The new version was successfully downloaded. Do you want to close VLC and install it now?"),
-    _("Install"), _("Cancel"), NULL);
-
+    static const char *psz_msg =
+        _("The new version was successfully downloaded."
+        "Do you want to close VLC and install it now?");
+    int answer = vlc_dialog_wait_question( p_udt, VLC_DIALOG_QUESTION_NORMAL,
+                                           _("Cancel"), _("Install"), NULL,
+                                           _("Update VLC media player"),
+                                           psz_msg );
     if(answer == 1)
     {
         wchar_t psz_wdestfile[MAX_PATH];
@@ -733,8 +739,8 @@ static void* update_DownloadReal( void *obj )
     }
 #endif
 end:
-    if( p_progress )
-        dialog_ProgressDestroy( p_progress );
+    if( i_dialog_id != 0 )
+        vlc_dialog_cancel( p_udt, i_dialog_id );
     if( p_stream )
         stream_Delete( p_stream );
     if( p_file )

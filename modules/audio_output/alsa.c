@@ -387,9 +387,9 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     {
         msg_Err (aout, "cannot open ALSA device \"%s\": %s", device,
                  snd_strerror (val));
-        dialog_Fatal (aout, _("Audio output failed"),
-                      _("The audio device \"%s\" could not be used:\n%s."),
-                      sys->device, snd_strerror (val));
+        vlc_dialog_display_error (aout, _("Audio output failed"),
+            _("The audio device \"%s\" could not be used:\n%s."),
+            sys->device, snd_strerror (val));
         free (devbuf);
         return VLC_EGENERIC;
     }

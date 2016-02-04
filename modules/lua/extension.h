@@ -91,7 +91,7 @@ struct extension_sys_t
     } *command;
 
     // The two following booleans are protected by command_lock
-    dialog_progress_bar_t *progress;
+    vlc_dialog_id *p_progress_id;
     vlc_timer_t timer; ///< This timer makes sure Lua never gets stuck >5s
 
     bool b_exiting;

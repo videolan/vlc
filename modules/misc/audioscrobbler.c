@@ -562,7 +562,7 @@ static int Handshake(intf_thread_t *p_this)
     if (strstr((char*) p_buffer, "BADAUTH"))
     {
         /* authentication failed, bad username/password combination */
-        dialog_Fatal(p_this,
+        vlc_dialog_display_error(p_this,
             _("last.fm: Authentication failed"),
             "%s", _("last.fm username or password is incorrect. "
               "Please verify your settings and relaunch VLC."));
@@ -710,7 +710,7 @@ static void *Run(void *data)
 
                 case VLC_ENOVAR:
                     /* username not set */
-                    dialog_Fatal(p_intf,
+                    vlc_dialog_display_error(p_intf,
                         _("Last.fm username not set"),
                         "%s", _("Please set a username or disable the "
                         "audioscrobbler plugin, and restart VLC.\n"

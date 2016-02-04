@@ -143,7 +143,7 @@ static int Open (vlc_object_t *p_this)
     if (p_sys->soundfont == -1)
     {
         msg_Err (p_this, "sound font file required for synthesis");
-        dialog_Fatal (p_this, _("MIDI synthesis not set up"),
+        vlc_dialog_display_error (p_this, _("MIDI synthesis not set up"),
             _("A sound font file (.SF2) is required for MIDI synthesis.\n"
               "Please install a sound font and configure it "
               "from the VLC preferences "

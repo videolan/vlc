@@ -259,9 +259,9 @@ static int Open(vlc_object_t *p_this)
         myAudioDevices = [[[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeSound]
                            arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]] retain];
         if([myAudioDevices count] == 0) {
-            dialog_Fatal(p_demux, _("No Audio Input device found"),
-                             _("Your Mac does not seem to be equipped with a suitable audio input device."
-                               "Please check your connectors and drivers."));
+            vlc_dialog_display_error(p_demux, _("No Audio Input device found"),
+                _("Your Mac does not seem to be equipped with a suitable audio input device."
+                "Please check your connectors and drivers."));
             msg_Err(p_demux, "Can't find any Audio device");
 
             goto error;
@@ -290,9 +290,9 @@ static int Open(vlc_object_t *p_this)
             p_sys->audiodevice = [QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeSound];
         }
         if(!p_sys->audiodevice) {
-            dialog_Fatal(p_demux, _("No audio input device found"),
-                             _("Your Mac does not seem to be equipped with a suitable audio input device."
-                               "Please check your connectors and drivers."));
+            vlc_dialog_display_error(p_demux, _("No audio input device found"),
+                _("Your Mac does not seem to be equipped with a suitable audio input device."
+                "Please check your connectors and drivers."));
             msg_Err(p_demux, "Can't find any Audio device");
 
             goto error;

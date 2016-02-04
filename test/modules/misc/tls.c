@@ -47,18 +47,26 @@ static int tlspair(int fds[2])
     return vlc_socketpair(PF_LOCAL, SOCK_STREAM, 0, fds, true);
 }
 
-static int question_callback(vlc_object_t *obj, const char *varname,
-                             vlc_value_t old, vlc_value_t cur, void *data)
+static void
+dialog_display_question_cb(vlc_dialog_id *p_id, const char *psz_title,
+                           const char *psz_text, vlc_dialog_question_type i_type,
+                           const char *psz_cancel, const char *psz_action1,
+                           const char *psz_action2, void *p_data)
 {
-    dialog_question_t *q = cur.p_address;
-    int *value = data;
+    (void) psz_title;
+    (void) psz_text;
+    (void) i_type;
+    (void) psz_cancel;
+    (void) psz_action1;
+    (void) psz_action2;
+    int *value = p_data;
+    vlc_dialog_id_post_action(p_id, *value);
+}
 
-    q->answer = *value;
-
-    assert(obj == VLC_OBJECT(obj->p_libvlc));
-    assert(!strcmp(varname, "dialog-question"));
-    (void) old;
-    return VLC_SUCCESS;
+static void dialog_cancel_cb(vlc_dialog_id *id, void *data)
+{
+    (void)data;
+    vlc_dialog_id_dismiss(id);
 }
 
 static libvlc_instance_t *vlc;
@@ -172,9 +180,11 @@ int main(void)
     client_creds = vlc_tls_ClientCreate(obj);
     assert(client_creds != NULL);
 
-    var_Create(obj, "dialog-question", VLC_VAR_ADDRESS);
-    var_AddCallback(obj, "dialog-question", question_callback, &answer);
-    dialog_Register(obj);
+    vlc_dialog_cbs cbs = {
+        .pf_display_question = dialog_display_question_cb,
+        .pf_cancel = dialog_cancel_cb,
+    };
+    vlc_dialog_provider_set_callbacks(obj, &cbs, &answer);
 
     vlc_thread_t th;
     vlc_tls_t *tls;
@@ -188,7 +198,7 @@ int main(void)
     assert(val == -1);
 
     /* Accept unknown certificate */
-    answer = 2;
+    answer = 1;
     val = securepair(&th, &tls, alpnv, &alp);
     assert(val == 0);
     assert(alp != NULL);
@@ -269,8 +279,7 @@ int main(void)
     vlc_tls_Close(tls);
     vlc_join(th, NULL);
 
-    dialog_Unregister(obj);
-    var_DelCallback(obj, "dialog-question", question_callback, &answer);
+    vlc_dialog_provider_set_callbacks(obj, NULL, NULL);
     vlc_tls_Delete(client_creds);
     vlc_tls_Delete(server_creds);
     libvlc_release(vlc);

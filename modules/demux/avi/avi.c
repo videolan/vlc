@@ -753,22 +753,28 @@ aviindex:
             }
             if( i_do_index == 0 )
             {
-                switch( dialog_Question( p_demux, _("Broken or missing AVI Index") ,
-                   _( "Because this AVI file index is broken or missing, "
-                      "seeking will not work correctly.\n"
-                      "VLC won't repair your file but can temporary fix this "
-                      "problem by building an index in memory.\n"
-                      "This step might take a long time on a large file.\n"
-                      "What do you want to do?" ),
-                      _( "Build index then play" ), _( "Play as is" ), _( "Do not play") ) )
+                const char *psz_msg = _(
+                    "Because this AVI file index is broken or missing, "
+                    "seeking will not work correctly.\n"
+                    "VLC won't repair your file but can temporary fix this "
+                    "problem by building an index in memory.\n"
+                    "This step might take a long time on a large file.\n"
+                    "What do you want to do?");
+                switch( vlc_dialog_wait_question( p_demux,
+                                                  VLC_DIALOG_QUESTION_NORMAL,
+                                                  _("Do not play"),
+                                                  _("Build index then play"),
+                                                  _("Play as is"),
+                                                  _("Broken or missing AVI Index"),
+                                                  "%s", psz_msg ) )
                 {
+                    case 0:
+                        b_aborted = true;
+                        goto error;
                     case 1:
                         b_index = true;
                         msg_Dbg( p_demux, "Fixing AVI index" );
                         goto aviindex;
-                    case 3:
-                        b_aborted = true;
-                        goto error;
                 }
             }
             else
@@ -2609,7 +2615,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
     off_t i_movi_end;
 
     mtime_t i_dialog_update;
-    dialog_progress_bar_t *p_dialog = NULL;
+    vlc_dialog_id *p_dialog_id = NULL;
 
     p_riff = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, 0);
     p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0);
@@ -2633,23 +2639,27 @@ static void AVI_IndexCreate( demux_t *p_demux )
     /* Only show dialog if AVI is > 10MB */
     i_dialog_update = mdate();
     if( stream_Size( p_demux->s ) > 10000000 )
-        p_dialog = dialog_ProgressCreate( p_demux, _("Fixing AVI Index..."),
-                                       NULL, _("Cancel") );
+    {
+        p_dialog_id =
+            vlc_dialog_display_progress( p_demux, false, 0.0, _("Cancel"),
+                                         _("Broken or missing AVI Index"),
+                                         _("Fixing AVI Index...") );
+    }
 
     for( ;; )
     {
         avi_packet_t pk;
 
         /* Don't update/check dialog too often */
-        if( p_dialog && mdate() - i_dialog_update > 100000 )
+        if( p_dialog_id != NULL && mdate() - i_dialog_update > 100000 )
         {
-            if( dialog_ProgressCancelled( p_dialog ) )
+            if( vlc_dialog_is_cancelled( p_demux, p_dialog_id ) )
                 break;
 
             double f_current = stream_Tell( p_demux->s );
             double f_size    = stream_Size( p_demux->s );
             double f_pos     = f_current / f_size;
-            dialog_ProgressSet( p_dialog, NULL, f_pos );
+            vlc_dialog_update_progress( p_demux, p_dialog_id, f_pos );
 
             i_dialog_update = mdate();
         }
@@ -2714,8 +2724,8 @@ static void AVI_IndexCreate( demux_t *p_demux )
     }
 
 print_stat:
-    if( p_dialog != NULL )
-        dialog_ProgressDestroy( p_dialog );
+    if( p_dialog_id != NULL )
+        vlc_dialog_release( p_demux, p_dialog_id );
 
     for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {

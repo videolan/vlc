@@ -964,10 +964,10 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
 
     // Reset watch timer and timestamp
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    if( p_ext->p_sys->progress )
+    if( p_ext->p_sys->p_progress_id != NULL )
     {
-        dialog_ProgressDestroy( p_ext->p_sys->progress );
-        p_ext->p_sys->progress = NULL;
+        vlc_dialog_release( p_mgr, p_ext->p_sys->p_progress_id );
+        p_ext->p_sys->p_progress_id = NULL;
     }
     vlc_timer_schedule( p_ext->p_sys->timer, false, 0, 0 );
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
@@ -1021,10 +1021,10 @@ int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
 
     // Reset watch timer and timestamp
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    if( p_ext->p_sys->progress )
+    if( p_ext->p_sys->p_progress_id != NULL )
     {
-        dialog_ProgressDestroy( p_ext->p_sys->progress );
-        p_ext->p_sys->progress = NULL;
+        vlc_dialog_release( p_mgr, p_ext->p_sys->p_progress_id );
+        p_ext->p_sys->p_progress_id = NULL;
     }
     vlc_timer_schedule( p_ext->p_sys->timer, false, 0, 0 );
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
@@ -1106,10 +1106,10 @@ int vlclua_extension_keep_alive( lua_State *L )
     extension_t *p_ext = vlclua_extension_get( L );
 
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    if( p_ext->p_sys->progress )
+    if( p_ext->p_sys->p_progress_id != NULL )
     {
-        dialog_ProgressDestroy( p_ext->p_sys->progress );
-        p_ext->p_sys->progress = NULL;
+        vlc_dialog_release( p_ext->p_sys->p_mgr, p_ext->p_sys->p_progress_id );
+        p_ext->p_sys->p_progress_id = NULL;
     }
     vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD, 0 );
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
@@ -1211,14 +1211,6 @@ static void WatchTimerCallback( void *data )
     extension_t *p_ext = data;
     extensions_manager_t *p_mgr = p_ext->p_sys->p_mgr;
 
-    char *message;
-    if( asprintf( &message, _( "Extension '%s' does not respond.\n"
-                               "Do you want to kill it now? " ),
-                  p_ext->psz_title ) == -1 )
-    {
-        return;
-    }
-
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
 
     for( struct command_t *cmd = p_ext->p_sys->command;
@@ -1226,30 +1218,39 @@ static void WatchTimerCallback( void *data )
          cmd = cmd->next )
         if( cmd->i_command == CMD_DEACTIVATE )
         {   /* We have a pending Deactivate command... */
-            if( p_ext->p_sys->progress )
+            if( p_ext->p_sys->p_progress_id != NULL )
             {
-                dialog_ProgressDestroy( p_ext->p_sys->progress );
-                p_ext->p_sys->progress = NULL;
+                vlc_dialog_release( p_mgr, p_ext->p_sys->p_progress_id );
+                p_ext->p_sys->p_progress_id = NULL;
             }
             vlc_mutex_unlock( &p_ext->p_sys->command_lock );
             KillExtension( p_mgr, p_ext );
             return;
         }
 
-    if( !p_ext->p_sys->progress )
+    if( p_ext->p_sys->p_progress_id == NULL )
     {
-        p_ext->p_sys->progress =
-                dialog_ProgressCreate( p_mgr, _( "Extension not responding!" ),
-                                       message,
-                                       _( "Yes" ) );
+        p_ext->p_sys->p_progress_id =
+            vlc_dialog_display_progress( p_mgr, true, 0.0,
+                                         _( "Yes" ),
+                                         _( "Extension not responding!" ),
+                                         _( "Extension '%s' does not respond.\n"
+                                         "Do you want to kill it now? " ),
+                                         p_ext->psz_title );
+        if( p_ext->p_sys->p_progress_id == NULL )
+        {
+            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+            KillExtension( p_mgr, p_ext );
+            return;
+        }
         vlc_timer_schedule( p_ext->p_sys->timer, false, 100000, 0 );
     }
     else
     {
-        if( dialog_ProgressCancelled( p_ext->p_sys->progress ) )
+        if( vlc_dialog_is_cancelled( p_mgr, p_ext->p_sys->p_progress_id ) )
         {
-            dialog_ProgressDestroy( p_ext->p_sys->progress );
-            p_ext->p_sys->progress = NULL;
+            vlc_dialog_release( p_mgr, p_ext->p_sys->p_progress_id );
+            p_ext->p_sys->p_progress_id = NULL;
             vlc_mutex_unlock( &p_ext->p_sys->command_lock );
             KillExtension( p_mgr, p_ext );
             return;

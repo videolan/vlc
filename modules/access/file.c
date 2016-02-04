@@ -174,11 +174,11 @@ int FileOpen( vlc_object_t *p_this )
                  p_access->psz_filepath ? p_access->psz_filepath
                                         : p_access->psz_location,
                  vlc_strerror_c(errno));
-        dialog_Fatal (p_access, _("File reading failed"),
-                      _("VLC could not open the file \"%s\" (%s)."),
-                      p_access->psz_filepath ? p_access->psz_filepath
-                                             : p_access->psz_location,
-                      vlc_strerror(errno));
+        vlc_dialog_display_error (p_access, _("File reading failed"),
+            _("VLC could not open the file \"%s\" (%s)."),
+            p_access->psz_filepath ? p_access->psz_filepath
+                                   : p_access->psz_location,
+            vlc_strerror(errno));
         return VLC_EGENERIC;
     }
 
@@ -289,9 +289,9 @@ static ssize_t Read (access_t *p_access, uint8_t *p_buffer, size_t i_len)
         }
 
         msg_Err (p_access, "read error: %s", vlc_strerror_c(errno));
-        dialog_Fatal (p_access, _("File reading failed"),
-                      _("VLC could not read the file (%s)."),
-                      vlc_strerror(errno));
+        vlc_dialog_display_error (p_access, _("File reading failed"),
+            _("VLC could not read the file (%s)."),
+            vlc_strerror(errno));
         val = 0;
     }
 

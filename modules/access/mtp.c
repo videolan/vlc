@@ -192,9 +192,9 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
             default:
                 msg_Err( p_access, "read failed: %s", vlc_strerror_c(errno) );
-                dialog_Fatal( p_access, _( "File reading failed" ),
-                              _( "VLC could not read the file: %s" ),
-                              vlc_strerror(errno) );
+                vlc_dialog_display_error( p_access, _( "File reading failed" ),
+                    _( "VLC could not read the file: %s" ),
+                    vlc_strerror(errno) );
                 p_access->info.b_eof = true;
                 return 0;
         }
@@ -281,9 +281,9 @@ static int open_file( access_t *p_access, const char *path )
     {
         msg_Err( p_access, "cannot open file %s: %s", path,
                  vlc_strerror_c(errno) );
-        dialog_Fatal( p_access, _( "File reading failed" ),
-                      _( "VLC could not open the file \"%s\": %s" ), path,
-                      vlc_strerror(errno) );
+        vlc_dialog_display_error( p_access, _( "File reading failed" ),
+            _( "VLC could not open the file \"%s\": %s" ), path,
+            vlc_strerror(errno) );
         return -1;
     }
 #ifdef F_RDAHEAD

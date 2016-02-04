@@ -31,7 +31,7 @@
 
 #import <vlc_common.h>
 #import <vlc_plugin.h>
-#import <vlc_dialog.h>                      // dialog_Fatal
+#import <vlc_dialog.h>                      // vlc_dialog_display_error
 #import <vlc_aout.h>                        // aout_*
 
 #import <AudioUnit/AudioUnit.h>             // AudioUnit
@@ -422,9 +422,9 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     if (p_sys->i_hog_pid != -1 && p_sys->i_hog_pid != getpid()) {
         msg_Err(p_aout, "Selected audio device is exclusively in use by another program.");
-        dialog_Fatal(p_aout, _("Audio output failed"), "%s",
-                        _("The selected audio output device is exclusively in "
-                          "use by another program."));
+        vlc_dialog_display_error(p_aout, _("Audio output failed"), "%s",
+            _("The selected audio output device is exclusively in "
+            "use by another program."));
         goto error;
     }
 
@@ -630,10 +630,11 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
             if (fmt->i_physical_channels == 0) {
                 fmt->i_physical_channels = AOUT_CHANS_STEREO;
                 msg_Err(p_aout, "You should configure your speaker layout with Audio Midi Setup in /Applications/Utilities. VLC will output Stereo only.");
-                dialog_Fatal(p_aout, _("Audio device is not configured"), "%s",
-                                _("You should configure your speaker layout with "
-                                  "\"Audio Midi Setup\" in /Applications/"
-                                  "Utilities. VLC will output Stereo only."));
+                vlc_dialog_display_error(p_aout,
+                    _("Audio device is not configured"), "%s",
+                    _("You should configure your speaker layout with "
+                    "\"Audio Midi Setup\" in /Applications/"
+                    "Utilities. VLC will output Stereo only."));
             }
         }
         free(layout);

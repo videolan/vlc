@@ -473,10 +473,10 @@ static int Open (vlc_object_t *obj)
         if (delsys == NULL || Tune (obj, dev, delsys, freq))
         {
             msg_Err (obj, "tuning to %"PRIu64" Hz failed", freq);
-            dialog_Fatal (obj, N_("Digital broadcasting"),
-                          N_("The selected digital tuner does not support "
-                             "the specified parameters.\n"
-                             "Please check the preferences."));
+            vlc_dialog_display_error (obj, N_("Digital broadcasting"),
+                N_("The selected digital tuner does not support "
+                   "the specified parameters.\n"
+                   "Please check the preferences."));
             goto error;
         }
     }

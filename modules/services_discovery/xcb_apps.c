@@ -148,7 +148,7 @@ static int Open (vlc_object_t *obj)
     r = xcb_intern_atom_reply (conn, ncl, NULL);
     if (r == NULL || r->atom == 0)
     {
-        dialog_Fatal (sd, _("Screen capture"),
+        vlc_dialog_display_error (sd, _("Screen capture"),
             _("Your window manager does not provide a list of applications."));
         msg_Err (sd, "client list not supported (_NET_CLIENT_LIST absent)");
     }

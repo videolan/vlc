@@ -753,7 +753,7 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
 
         msg_Err (demux, "unspecified payload format (type %"PRIu8")", ptype);
         msg_Info (demux, "A valid SDP is needed to parse this RTP stream.");
-        dialog_Fatal (demux, N_("SDP required"),
+        vlc_dialog_display_error (demux, N_("SDP required"),
              N_("A description in SDP format is required to receive the RTP "
                 "stream. Note that rtp:// URIs cannot work with dynamic "
                 "RTP payload format (%"PRIu8")."), ptype);

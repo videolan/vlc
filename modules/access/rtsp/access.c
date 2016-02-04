@@ -84,8 +84,8 @@ static int RtspConnect( void *p_userdata, char *psz_server, int i_port )
     if( p_sys->fd < 0 )
     {
         msg_Err( p_access, "cannot connect to %s:%d", psz_server, i_port );
-        dialog_Fatal( p_access, _("Connection failed"),
-                        _("VLC could not connect to \"%s:%d\"."), psz_server, i_port );
+        vlc_dialog_display_error( p_access, _("Connection failed"),
+            _("VLC could not connect to \"%s:%d\"."), psz_server, i_port );
         return VLC_EGENERIC;
     }
 
@@ -228,8 +228,8 @@ static int Open( vlc_object_t *p_this )
 
 
             msg_Err( p_access, "rtsp session can not be established" );
-            dialog_Fatal( p_access, _("Session failed"), "%s",
-                    _("The requested RTSP session could not be established.") );
+            vlc_dialog_display_error( p_access, _("Session failed"), "%s",
+                _("The requested RTSP session could not be established.") );
             goto error;
         }
 

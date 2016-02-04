@@ -317,16 +317,16 @@ int OpenEncoder( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_cat == VIDEO_ES && i_cat != VIDEO_ES )
     {
         msg_Err( p_enc, "\"%s\" is not a video encoder", psz_namecodec );
-        dialog_Fatal( p_enc, _("Streaming / Transcoding failed"),
-                        _("\"%s\" is no video encoder."), psz_namecodec );
+        vlc_dialog_display_error( p_enc, _("Streaming / Transcoding failed"),
+            _("\"%s\" is no video encoder."), psz_namecodec );
         return VLC_EGENERIC;
     }
 
     if( p_enc->fmt_out.i_cat == AUDIO_ES && i_cat != AUDIO_ES )
     {
         msg_Err( p_enc, "\"%s\" is not an audio encoder", psz_namecodec );
-        dialog_Fatal( p_enc, _("Streaming / Transcoding failed"),
-                        _("\"%s\" is no audio encoder."), psz_namecodec );
+        vlc_dialog_display_error( p_enc, _("Streaming / Transcoding failed"),
+            _("\"%s\" is no audio encoder."), psz_namecodec );
         return VLC_EGENERIC;
     }
 
@@ -359,7 +359,7 @@ int OpenEncoder( vlc_object_t *p_this )
 "*** Please check with your Libav/FFmpeg packager. ***\n"
 "*** This is NOT a VLC media player issue.   ***", psz_namecodec );
 
-        dialog_Fatal( p_enc, _("Streaming / Transcoding failed"), _(
+        vlc_dialog_display_error( p_enc, _("Streaming / Transcoding failed"), _(
 /* I have had enough of all these MPEG-3 transcoding bug reports.
  * Downstream packager, you had better not patch this out, or I will be really
  * annoyed. Think about it - you don't want to fork the VLC translation files,
@@ -876,9 +876,9 @@ errmsg:
             if (likely((unsigned)p_enc->fmt_in.i_cat < sizeof (types) / sizeof (types[0])))
                 type = types[p_enc->fmt_in.i_cat];
             msg_Err( p_enc, "cannot open %4.4s %s encoder", fcc.txt, type );
-            dialog_Fatal( p_enc, _("Streaming / Transcoding failed"),
-                          _("VLC could not open the %4.4s %s encoder."),
-                          fcc.txt, vlc_gettext(type) );
+            vlc_dialog_display_error( p_enc, _("Streaming / Transcoding failed"),
+                _("VLC could not open the %4.4s %s encoder."),
+                fcc.txt, vlc_gettext(type) );
             av_dict_free(&options);
             goto error;
         }

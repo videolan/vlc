@@ -338,8 +338,8 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     if( fd == -1 )
     {
         msg_Err( p_access, "connection failed" );
-        dialog_Fatal( p_access, _("Network interaction failed"), "%s",
-                        _("VLC could not connect with the given server.") );
+        vlc_dialog_display_error( p_access, _("Network interaction failed"), "%s",
+            _("VLC could not connect with the given server.") );
         return -1;
     }
 
@@ -354,8 +354,8 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     if( i_answer / 100 != 2 )
     {
         msg_Err( p_access, "connection rejected" );
-        dialog_Fatal( p_access, _("Network interaction failed"), "%s",
-                        _("VLC's connection to the given server was rejected.") );
+        vlc_dialog_display_error( p_access, _("Network interaction failed"), "%s",
+            _("VLC's connection to the given server was rejected.") );
         return -1;
     }
 
@@ -488,9 +488,9 @@ static int LoginUserPwd( vlc_object_t *p_access, access_sys_t *p_sys,
                     if( i_answer / 100 != 2 )
                     {
                         msg_Err( p_access, "account rejected" );
-                        dialog_Fatal( p_access,
-                                      _("Network interaction failed"),
-                                      "%s", _("Your account was rejected.") );
+                        vlc_dialog_display_error( p_access,
+                          _("Network interaction failed"),
+                          "%s", _("Your account was rejected.") );
                         return -1;
                     }
                     msg_Dbg( p_access, "account accepted" );

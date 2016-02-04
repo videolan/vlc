@@ -42,7 +42,7 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 
-#include <vlc_dialog.h>      /* dialog_Fatal */
+#include <vlc_dialog.h>      /* vlc_dialog_display_error */
 #include <vlc_charset.h>     /* FromWide */
 
 #include <initguid.h>
@@ -520,7 +520,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     if( !b_use_video && !b_use_audio )
     {
-        dialog_Fatal( p_this, _("Capture failed"),
+        vlc_dialog_display_error( p_this, _("Capture failed"),
                         _("No video or audio device selected.") );
         return VLC_EGENERIC ;
     }
@@ -594,7 +594,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
         ( b_use_video && !b_use_audio && b_err_video ) )
     {
         msg_Err( p_this, "FATAL: could not open ANY device" ) ;
-        dialog_Fatal( p_this,  _("Capture failed"),
+        vlc_dialog_display_error( p_this,  _("Capture failed"),
                         _("VLC cannot open ANY capture device. "
                           "Check the error log for details.") );
         return VLC_EGENERIC ;
@@ -1018,7 +1018,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     {
         msg_Err( p_this, "can't use device: %s, unsupported device type",
                  devicename.c_str() );
-        dialog_Fatal( p_this, _("Capture failed"),
+        vlc_dialog_display_error( p_this, _("Capture failed"),
                         _("The device you selected cannot be used, because its "
                           "type is not supported.") );
         return VLC_EGENERIC;
@@ -1071,7 +1071,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     else {
         /* capture device */
         msg_Err( p_this, "capture device '%s' does not support required parameters !", devicename.c_str() );
-        dialog_Fatal( p_this, _("Capture failed"),
+        vlc_dialog_display_error( p_this, _("Capture failed"),
                         _("The capture device \"%s\" does not support the "
                           "required parameters."), devicename.c_str() );
         p_device_filter->Release();

@@ -395,37 +395,38 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
                 return false;
             char *psz_dialog_username = NULL;
             char *psz_dialog_password = NULL;
-
             va_list ap;
             va_start(ap, psz_dialog_fmt);
-            dialog_vaLogin(p_parent, p_credential->psz_username,
-                           &psz_dialog_username, &psz_dialog_password,
-                           p_credential->p_keystore ? &p_credential->b_store : NULL,
-                           psz_dialog_title, psz_dialog_fmt, ap);
+            bool *p_store = p_credential->p_keystore != NULL ?
+                            &p_credential->b_store : NULL;
+            int i_ret =
+                vlc_dialog_wait_login_va(p_parent,
+                                         &psz_dialog_username,
+                                         &psz_dialog_password, p_store,
+                                         p_credential->psz_username,
+                                         psz_dialog_title, psz_dialog_fmt, ap);
             va_end(ap);
 
-            /* Free previous dialog strings after dialog_vaLogin call since
-             * p_credential->psz_username (default username) can be a pointer
-             * to p_credential->psz_dialog_username */
+            /* Free previous dialog strings after vlc_dialog_wait_login_va call
+             * since p_credential->psz_username (default username) can be a
+             * pointer to p_credential->psz_dialog_username */
             free(p_credential->psz_dialog_username);
             free(p_credential->psz_dialog_password);
             p_credential->psz_dialog_username = psz_dialog_username;
             p_credential->psz_dialog_password = psz_dialog_password;
 
-            if (p_credential->psz_dialog_username
-             && p_credential->psz_dialog_password)
-            {
-                p_credential->psz_username = p_credential->psz_dialog_username;
-                p_credential->psz_password = p_credential->psz_dialog_password;
-
-                if (protocol_is_smb(p_url))
-                    smb_split_domain(p_credential);
-            }
-            else
+            if (i_ret != 1)
             {
                 p_credential->psz_username = p_credential->psz_password = NULL;
                 return false;
             }
+
+            p_credential->psz_username = p_credential->psz_dialog_username;
+            p_credential->psz_password = p_credential->psz_dialog_password;
+
+            if (protocol_is_smb(p_url))
+                smb_split_domain(p_credential);
+
             break;
         }
     }

@@ -784,9 +784,9 @@ static int blurayOpen(vlc_object_t *object)
         msg_Err(p_demux, "BD-J menus not supported. Playing without menus. "
                 "BD-J support: %d, JVM found: %d, JVM usable: %d",
                 disc_info->bdj_supported, disc_info->libjvm_detected, disc_info->bdj_handled);
-        dialog_Fatal(p_demux, _("Java required"),
-                     _("This Blu-ray disc needs Java for menus.%s\nDisc is played without menus."),
-                     !disc_info->libjvm_detected ? _(" Java was not found from your system.") : "");
+        vlc_dialog_display_error(p_demux, _("Java required"),
+             _("This Blu-ray disc needs Java for menus.%s\nDisc is played without menus."),
+             !disc_info->libjvm_detected ? _(" Java was not found from your system.") : "");
         p_sys->b_menu = false;
     }
 
@@ -841,7 +841,7 @@ static int blurayOpen(vlc_object_t *object)
 
 error:
     if (error_msg)
-        dialog_Fatal(p_demux, _("Blu-ray error"), "%s", error_msg);
+        vlc_dialog_display_error(p_demux, _("Blu-ray error"), "%s", error_msg);
     blurayClose(object);
 
     if (p_demux->s != NULL) {
@@ -2204,11 +2204,13 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
      */
     case BD_EVENT_ERROR:
         /* fatal error (with menus) */
-        dialog_Fatal(p_demux, _("Blu-ray error"), "Playback with BluRay menus failed");
+        vlc_dialog_display_error(p_demux, _("Blu-ray error"),
+                                 "Playback with BluRay menus failed");
         p_sys->b_fatal_error = true;
         break;
     case BD_EVENT_ENCRYPTED:
-        dialog_Fatal(p_demux, _("Blu-ray error"), "This disc seems to be encrypted");
+        vlc_dialog_display_error(p_demux, _("Blu-ray error"),
+                                 "This disc seems to be encrypted");
         p_sys->b_fatal_error = true;
         break;
     case BD_EVENT_READ_ERROR:

@@ -198,7 +198,7 @@ static int Open( vlc_object_t *p_this )
     if( p_dvdread == NULL )
     {
         msg_Err( p_demux, "DVDRead cannot open source: %s", psz_file );
-        dialog_Fatal( p_demux, _("Playback failure"),
+        vlc_dialog_display_error( p_demux, _("Playback failure"),
                       _("DVDRead could not open the disc \"%s\"."), psz_file );
         free( psz_file );
         return VLC_EGENERIC;
@@ -460,7 +460,7 @@ static int Demux( demux_t *p_demux )
                            1, p_buffer ) != 1 )
         {
             msg_Err( p_demux, "read failed for block %d", p_sys->i_next_vobu );
-            dialog_Fatal( p_demux, _("Playback failure"),
+            vlc_dialog_display_error( p_demux, _("Playback failure"),
                           _("DVDRead could not read block %d."),
                           p_sys->i_next_vobu );
             return -1;
@@ -528,7 +528,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "read failed for %d/%d blocks at 0x%02x",
                  i_read, i_blocks_once, p_sys->i_cur_block );
-        dialog_Fatal( p_demux, _("Playback failure"),
+        vlc_dialog_display_error( p_demux, _("Playback failure"),
                         _("DVDRead could not read %d/%d blocks at 0x%02x."),
                         i_read, i_blocks_once, p_sys->i_cur_block );
         return -1;

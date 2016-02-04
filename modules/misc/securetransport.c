@@ -330,10 +330,12 @@ static int st_validateServerCertificate (vlc_tls_t *session, const char *hostnam
              "This problem may be caused by a configuration error "
              "or an attempt to breach your security or your privacy.\n\n"
              "If in doubt, abort now.\n");
-    int answer = dialog_Question(session->obj, _("Insecure site"), vlc_gettext (msg),
-                                  _("Abort"), _("Accept certificate temporarily"), NULL, hostname);
-
-    if (answer == 2) {
+    int answer = vlc_dialog_wait_question(session->obj,
+                                          VLC_DIALOG_QUESTION_NORMAL, _("Abort"),
+                                          _("Accept certificate temporarily"),
+                                          NULL, _("Insecure site"),
+                                          vlc_gettext (msg), hostname);
+    if (answer == 1) {
         msg_Warn(session->obj, "Proceeding despite of failed certificate validation");
 
         /* save leaf certificate in whitelist */

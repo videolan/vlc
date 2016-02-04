@@ -54,26 +54,24 @@ int FontConfig_Prepare( filter_t *p_filter )
 #endif
 
 #if defined( _WIN32 )
+    int i_ret;
+    unsigned int i_dialog_id = 0;
     dialog_progress_bar_t *p_dialog = NULL;
     FcConfig *fcConfig = FcInitLoadConfig();
 
-    p_dialog = dialog_ProgressCreate( p_filter,
-            _("Building font cache"),
-            _("Please wait while your font cache is rebuilt.\n"
-                "This should take less than a few minutes."), NULL );
+    i_ret =
+        vlc_dialog_display_progress( p_filter, true, 0.0, NULL,
+                                     _("Building font cache"),
+                                     _("Please wait while your font cache is rebuilt.\n"
+                                     "This should take less than a few minutes.") );
 
-/*    if( p_dialog )
-        dialog_ProgressSet( p_dialog, NULL, 0.5 ); */
+    i_dialog_id = i_ret > 0 ? i_ret : 0;
 
     if( FcConfigBuildFonts( fcConfig ) == FcFalse )
         return VLC_ENOMEM;
 
-    if( p_dialog )
-    {
-//        dialog_ProgressSet( p_dialog, NULL, 1.0 );
-        dialog_ProgressDestroy( p_dialog );
-        p_dialog = NULL;
-    }
+    if( i_dialog_id != 0 )
+        vlc_dialog_cancel( p_filter, i_dialog_id );
 #endif
     t2 = mdate();
     msg_Dbg( p_filter, "Took %ld microseconds", (long)((t2 - t1)) );

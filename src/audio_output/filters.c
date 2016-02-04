@@ -244,8 +244,8 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
 
 overflow:
     msg_Err (obj, "maximum of %u conversion filters reached", max);
-    dialog_Fatal (obj, _("Audio filtering failed"),
-                  _("The maximum number of filters (%u) was reached."), max);
+    vlc_dialog_display_error (obj, _("Audio filtering failed"),
+        _("The maximum number of filters (%u) was reached."), max);
 error:
     aout_FiltersPipelineDestroy (filters, n);
     return -1;
