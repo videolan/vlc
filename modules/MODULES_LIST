@@ -197,7 +197,6 @@ $Id$
  * integer_mixer: Integer audio mixer
  * invert: inverse video filter
  * iomx: IPC/OpenMaxIL for Android
- * ios_dialog_provider: Internal Dialog Provider for iOS
  * jack: jack server audio output
  * jpeg: JPEG image decoder
  * kai: OS/2 audio output
