@@ -1,4 +1,4 @@
-List of vlc plugins (414)
+List of vlc plugins (475)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
@@ -128,6 +128,7 @@ $Id$
  * dxa9: Convert D3D9 GPU textures to YUV planes
  * dxva2: DxVA2 hardware-accelerated decoding
  * dynamicoverlay: subpicture filter using shared memory that can be written to by external applications
+ * edgedetection: edge detection video filter
  * edummy: dummy encoder
  * egl_android: Android EGL video output
  * egl_win32: Windows EGL video output

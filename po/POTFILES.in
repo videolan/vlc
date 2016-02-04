@@ -1101,6 +1101,7 @@ modules/video_filter/dynamicoverlay/dynamicoverlay_commands.c
 modules/video_filter/dynamicoverlay/dynamicoverlay.h
 modules/video_filter/dynamicoverlay/dynamicoverlay_list.c
 modules/video_filter/dynamicoverlay/dynamicoverlay_queue.c
+modules/video_filter/edgedetection.c
 modules/video_filter/erase.c
 modules/video_filter/extract.c
 modules/video_filter/filter_event_info.h

@@ -3,6 +3,8 @@ video_filterdir = $(pluginsdir)/video_filter
 noinst_HEADERS += video_filter/filter_picture.h
 
 # video filters
+libedgedetection_plugin_la_SOURCES = video_filter/edgedetection.c
+libedgedetection_plugin_la_LIBADD = $(LIBM)
 libadjust_plugin_la_SOURCES = video_filter/adjust.c video_filter/adjust_sat_hue.c video_filter/adjust_sat_hue.h
 libadjust_plugin_la_LIBADD = $(LIBM)
 libalphamask_plugin_la_SOURCES = video_filter/alphamask.c
@@ -75,6 +77,7 @@ video_filter_LTLIBRARIES = \
 	libcanvas_plugin.la \
 	libcolorthres_plugin.la \
 	libcroppadd_plugin.la \
+	libedgedetection_plugin.la \
 	liberase_plugin.la \
 	libextract_plugin.la \
 	libgradient_plugin.la \
