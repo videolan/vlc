@@ -555,11 +555,6 @@ modules/gui/macosx/coredialogs.h
 modules/gui/macosx/coredialogs.m
 modules/gui/macosx/CoreInteraction.h
 modules/gui/macosx/CoreInteraction.m
-modules/gui/macosx_dialog_provider/dialogProvider.m
-modules/gui/macosx_dialog_provider/VLCLoginPanel.h
-modules/gui/macosx_dialog_provider/VLCLoginPanel.m
-modules/gui/macosx_dialog_provider/VLCProgressPanel.h
-modules/gui/macosx_dialog_provider/VLCProgressPanel.m
 modules/gui/macosx/ExtensionsDialogProvider.h
 modules/gui/macosx/ExtensionsDialogProvider.m
 modules/gui/macosx/ExtensionsManager.h

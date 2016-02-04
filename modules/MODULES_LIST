@@ -218,7 +218,6 @@ $Id$
  * lpcm: LPCM decoder
  * lua: Lua scripting inteface
  * macosx: Video output, and interface module for Mac OS X
- * macosx_dialog_provider: Minimal Dialog Provider for Mac OS X
  * mad: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  * magnify: zoom video filter
  * marq: Overlays a marquee on the video

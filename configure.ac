@@ -3921,17 +3921,6 @@ then
 fi
 
 dnl
-dnl  MacOS X dialog provider
-dnl
-AC_ARG_ENABLE(macosx-dialog-provider,
-  [  --enable-macosx-dialog-provider Mac OS X dialog module (default enabled on Mac OS X)])
-if test "x${enable_macosx_dialog_provider}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_dialog_provider}" = "yes")
-then
-  VLC_ADD_PLUGIN([macosx_dialog_provider])
-fi
-
-dnl
 dnl  VideoToolbox plugins
 AC_CHECK_HEADERS(VideoToolbox/VideoToolbox.h, [
     VLC_ADD_PLUGIN([videotoolbox])

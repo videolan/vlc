@@ -209,6 +209,7 @@ Removed modules
  * Win32 GDI text renderer module (use Freetype instead)
  * Growl notification (replaced by osx_notifications)
  * VCDX "extended" Video CD access module (use the normal VCD module)
+ * Mac OS X Dialog Provider (use VLCKit instead)
 
 
 Changes between 2.2.0 and 2.2.1:
