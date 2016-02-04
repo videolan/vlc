@@ -131,6 +131,7 @@ Stream Output:
 
 Encoder:
  * Support for Daala video in 4:2:0 and 4:4:4
+ * VP8 and VP9 encoder using libvpx
 
 Muxers:
  * Added fragmented/streamable MP4 muxer

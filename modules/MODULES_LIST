@@ -438,7 +438,7 @@ $Id$
  * vout_ios2: iOS video provider using OpenGL ES 2
  * vout_macosx: Mac OS X OpenGL provider
  * vout_sdl: video output module using the SDL library
- * vpx: WebM decoder (VP8/VP9)
+ * vpx: WebM encoder and decoder (VP8/VP9)
  * vsxu: audio visualization using Vovoid VSXu
  * wall: image wall filter
  * wasapi: Wasapi audio output module

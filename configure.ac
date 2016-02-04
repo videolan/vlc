@@ -2627,7 +2627,7 @@ dnl
 dnl libvpx decoder plugin
 dnl
 AC_ARG_ENABLE(vpx,
-    AS_HELP_STRING([--enable-vpx],[libvpx VP8/VP9 decoder (default auto)]))
+    AS_HELP_STRING([--enable-vpx],[libvpx VP8/VP9 encoder and decoder (default auto)]))
 AS_IF([test "${enable_vpx}" != "no"],[
     PKG_CHECK_MODULES([VPX], [vpx] , [
         VLC_ADD_PLUGIN([vpx])
@@ -2638,6 +2638,12 @@ AS_IF([test "${enable_vpx}" != "no"],[
         ], [], [${VPX_LIBS}])
         AC_CHECK_LIB([vpx],[vpx_codec_vp9_dx], [
             VLC_ADD_CPPFLAGS([vpx], [-DENABLE_VP9_DECODER])
+        ], [], [${VPX_LIBS}])
+        AC_CHECK_LIB([vpx],[vpx_codec_vp8_cx], [
+            VLC_ADD_CPPFLAGS([vpx], [-DENABLE_VP8_ENCODER])
+        ], [], [${VPX_LIBS}])
+        AC_CHECK_LIB([vpx],[vpx_codec_vp9_cx], [
+            VLC_ADD_CPPFLAGS([vpx], [-DENABLE_VP9_ENCODER])
         ], [], [${VPX_LIBS}])
     ], [
     AS_IF([test "${enable_vpx}" = "yes"],[
