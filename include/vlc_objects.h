@@ -41,6 +41,8 @@ struct vlc_object_t
     VLC_COMMON_MEMBERS
 };
 
+typedef struct vlc_dialog_provider vlc_dialog_provider;
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
