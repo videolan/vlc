@@ -1,7 +1,7 @@
 /*****************************************************************************
  * coredialogs.h: Mac OS X Core Dialogs
  *****************************************************************************
- * Copyright (C) 2005-2012 VLC authors and VideoLAN
+ * Copyright (C) 2005-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -21,6 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #import <vlc_common.h>
 #import <vlc_dialog.h>
 #import <Cocoa/Cocoa.h>
@@ -29,66 +30,31 @@
  * VLCCoreDialogProvider interface
  *****************************************************************************/
 
-@class ErrorWindowController;
-
 @interface VLCCoreDialogProvider : NSObject
 {
-    /* authentication dialogue */
-    IBOutlet id o_auth_cancel_btn;
-    IBOutlet id o_auth_description_txt;
-    IBOutlet id o_auth_login_fld;
-    IBOutlet id o_auth_login_txt;
-    IBOutlet id o_auth_ok_btn;
-    IBOutlet id o_auth_pw_fld;
-    IBOutlet id o_auth_pw_txt;
-    IBOutlet id o_auth_title_txt;
-    IBOutlet id o_auth_win;
+    /* authentication dialog */
+    IBOutlet id authenticationCancelButton;
+    IBOutlet id authenticationDescriptionLabel;
+    IBOutlet id authenticationLoginTextField;
+    IBOutlet id authenticationLoginLabel;
+    IBOutlet id authenticationOkButton;
+    IBOutlet id authenticationPasswordTextField;
+    IBOutlet id authenticationPasswordLabel;
+    IBOutlet id authenticationTitleLabel;
+    IBOutlet id authenticationWindow;
 
-    /* progress dialogue */
-    IBOutlet NSProgressIndicator * o_prog_bar;
-    IBOutlet id o_prog_cancel_btn;
-    IBOutlet id o_prog_description_txt;
-    IBOutlet id o_prog_title_txt;
-    IBOutlet id o_prog_win;
+    /* progress dialog */
+    IBOutlet NSProgressIndicator * progressIndicator;
+    IBOutlet id progressCancelButton;
+    IBOutlet id progressDescriptionLabel;
+    IBOutlet id progressTitleLabel;
+    IBOutlet id progressWindow;
 }
 
 @property (atomic,readwrite) BOOL progressCancelled;
 
--(void)performEventWithObject: (NSValue *)o_value ofType: (const char*)type;
+- (IBAction)authenticationDialogAction:(id)sender;
 
--(void)showFatalDialog: (NSValue *)o_value;
--(void)showFatalWaitDialog: (NSValue *)o_value;
--(void)showQuestionDialog: (NSValue *)o_value;
-
--(void)showLoginDialog: (NSValue *)o_value;
--(IBAction)loginDialogAction:(id)sender;
-
--(void)showProgressDialogOnMainThread: (NSValue *)o_value;
--(void)showProgressDialog: (NSValue *)o_value;
--(IBAction)progDialogAction:(id)sender;
--(void)updateProgressPanelWithText: (NSString *)string andNumber: (double)d_number;
--(void)destroyProgressPanel;
-
--(id)errorPanel;
-
-@end
-
-
-/*****************************************************************************
- * VLCErrorPanel interface
- *****************************************************************************/
-
-@interface ErrorWindowController : NSWindowController
-{
-    IBOutlet id o_cleanup_button;
-    IBOutlet id o_error_table;
-
-    NSMutableArray *o_errors;
-    NSMutableArray *o_icons;
-}
-
-- (IBAction)cleanupTable:(id)sender;
-
--(void)addError:(NSString *)o_error withMsg:(NSString *)o_msg;
+- (IBAction)progressDialogAction:(id)sender;
 
 @end

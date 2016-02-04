@@ -849,7 +849,6 @@
 		CCD83E4513FEA143004F1652 /* AudioEffects.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3013FEA143004F1652 /* AudioEffects.xib */; };
 		CCD83E4613FEA143004F1652 /* Bookmarks.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3213FEA143004F1652 /* Bookmarks.xib */; };
 		CCD83E4713FEA143004F1652 /* CoreDialogs.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3413FEA143004F1652 /* CoreDialogs.xib */; };
-		CCD83E4813FEA143004F1652 /* ErrorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3613FEA143004F1652 /* ErrorPanel.xib */; };
 		CCD83E4913FEA143004F1652 /* MediaInfo.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3813FEA143004F1652 /* MediaInfo.xib */; };
 		CCD83E4A13FEA143004F1652 /* Open.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3A13FEA143004F1652 /* Open.xib */; };
 		CCD83E4B13FEA143004F1652 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3C13FEA143004F1652 /* Preferences.xib */; };
@@ -1738,7 +1737,6 @@
 		CCD83E3113FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AudioEffects.xib; sourceTree = "<group>"; };
 		CCD83E3313FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Bookmarks.xib; sourceTree = "<group>"; };
 		CCD83E3513FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/CoreDialogs.xib; sourceTree = "<group>"; };
-		CCD83E3713FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ErrorPanel.xib; sourceTree = "<group>"; };
 		CCD83E3913FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MediaInfo.xib; sourceTree = "<group>"; };
 		CCD83E3B13FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Open.xib; sourceTree = "<group>"; };
 		CCD83E3D13FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Preferences.xib; sourceTree = "<group>"; };
@@ -2928,7 +2926,6 @@
 				CCD83E3013FEA143004F1652 /* AudioEffects.xib */,
 				CCD83E3213FEA143004F1652 /* Bookmarks.xib */,
 				CCD83E3413FEA143004F1652 /* CoreDialogs.xib */,
-				CCD83E3613FEA143004F1652 /* ErrorPanel.xib */,
 				CCD83E3813FEA143004F1652 /* MediaInfo.xib */,
 				CCD83E3A13FEA143004F1652 /* Open.xib */,
 				CCD83E3C13FEA143004F1652 /* Preferences.xib */,
@@ -3386,7 +3383,6 @@
 				CCD83E4613FEA143004F1652 /* Bookmarks.xib in Resources */,
 				CCD83E4713FEA143004F1652 /* CoreDialogs.xib in Resources */,
 				1C88BB3619DC7C7800645190 /* ys-play.png in Resources */,
-				CCD83E4813FEA143004F1652 /* ErrorPanel.xib in Resources */,
 				1C88BCA419DC7CB300645190 /* ys-fs_skip_next.png in Resources */,
 				1C88BA7919DC7B2200645190 /* yosemite-window-zoom-graphite@2x.png in Resources */,
 				1C88BC0E19DC7C8100645190 /* ys-next-6btns-dark@2x.png in Resources */,
@@ -4158,14 +4154,6 @@
 				CCD83E3513FEA143004F1652 /* English */,
 			);
 			name = CoreDialogs.xib;
-			sourceTree = "<group>";
-		};
-		CCD83E3613FEA143004F1652 /* ErrorPanel.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CCD83E3713FEA143004F1652 /* English */,
-			);
-			name = ErrorPanel.xib;
 			sourceTree = "<group>";
 		};
 		CCD83E3813FEA143004F1652 /* MediaInfo.xib */ = {

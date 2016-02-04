@@ -35,7 +35,6 @@
 #import "VideoEffects.h"
 #import "bookmarks.h"
 #import "simple_prefs.h"
-#import "coredialogs.h"
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
 #import "VideoView.h"
@@ -1269,13 +1268,6 @@
     NSURL *url = [NSURL URLWithString: @"http://www.videolan.org/contribute.html#paypal"];
 
     [[NSWorkspace sharedWorkspace] openURL: url];
-}
-
-#pragma mark - Errors, warnings and messages
-
-- (IBAction)showErrorsAndWarnings:(id)sender
-{
-    [[[[VLCMain sharedInstance] coreDialogProvider] errorPanel] showWindow:self];
 }
 
 - (IBAction)showInformationPanel:(id)sender

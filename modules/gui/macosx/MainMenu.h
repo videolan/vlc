@@ -278,7 +278,6 @@
 - (IBAction)openWebsite:(id)sender;
 - (IBAction)openForum:(id)sender;
 - (IBAction)openDonate:(id)sender;
-- (IBAction)showErrorsAndWarnings:(id)sender;
 - (IBAction)showMessagesPanel:(id)showMessagesPanel;
 - (IBAction)showMainWindow:(id)sender;
 - (IBAction)showPlaylist:(id)sender;
