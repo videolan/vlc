@@ -20,7 +20,7 @@
                 <outlet property="progressDescriptionLabel" destination="305" id="AfM-cq-dQv"/>
                 <outlet property="progressIndicator" destination="307" id="dmK-h6-H0N"/>
                 <outlet property="progressTitleLabel" destination="304" id="7Y7-WD-AjD"/>
-                <outlet property="progressWindow" destination="302" id="HHe-ZW-AXA"/>
+                <outlet property="progressWindow" destination="301" id="54Y-I4-dwW"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
@@ -30,7 +30,6 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="332" y="446" width="426" height="278"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
-            <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="249">
                 <rect key="frame" x="0.0" y="0.0" width="426" height="278"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -127,6 +126,7 @@ Gw
                     </imageView>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="252" firstAttribute="top" secondItem="253" secondAttribute="bottom" constant="20" id="0dm-8h-d9f"/>
                     <constraint firstItem="257" firstAttribute="top" secondItem="256" secondAttribute="bottom" constant="8" id="3t9-8A-EiP"/>
                     <constraint firstItem="256" firstAttribute="leading" secondItem="314" secondAttribute="trailing" constant="12" id="5oF-jO-DEW"/>
                     <constraint firstItem="314" firstAttribute="leading" secondItem="249" secondAttribute="leading" constant="20" id="7sA-6b-nxP"/>
@@ -150,13 +150,13 @@ Gw
                     <constraint firstItem="250" firstAttribute="width" secondItem="257" secondAttribute="width" id="ykG-m0-lzg"/>
                 </constraints>
             </view>
+            <point key="canvasLocation" x="340" y="410.5"/>
         </window>
         <window title="Progress" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="301" userLabel="Progress">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="319" y="460" width="522" height="182"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
-            <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="302">
                 <rect key="frame" x="0.0" y="0.0" width="522" height="182"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -178,7 +178,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <progressIndicator wantsLayer="YES" verticalHuggingPriority="750" maxValue="1000" bezeled="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="307">
+                    <progressIndicator wantsLayer="YES" verticalHuggingPriority="750" maxValue="1" bezeled="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="307">
                         <rect key="frame" x="91" y="56" width="412" height="20"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="412" id="oXP-5v-5Ir"/>
@@ -211,6 +211,7 @@ Gw
                     <constraint firstItem="305" firstAttribute="width" secondItem="307" secondAttribute="width" id="3Ap-ky-QR8"/>
                     <constraint firstItem="306" firstAttribute="trailing" secondItem="307" secondAttribute="trailing" id="4DS-mF-FwJ"/>
                     <constraint firstItem="307" firstAttribute="leading" secondItem="305" secondAttribute="leading" id="5P8-az-qJ6"/>
+                    <constraint firstAttribute="bottom" secondItem="306" secondAttribute="bottom" constant="19" id="IRD-60-10B"/>
                     <constraint firstAttribute="trailing" secondItem="305" secondAttribute="trailing" constant="19" id="T9U-2t-pHr"/>
                     <constraint firstItem="315" firstAttribute="top" secondItem="302" secondAttribute="top" constant="20" id="bQe-OL-Zzb"/>
                     <constraint firstItem="306" firstAttribute="top" secondItem="307" secondAttribute="bottom" constant="17" id="fTe-RK-a0t"/>
@@ -221,6 +222,7 @@ Gw
                     <constraint firstItem="304" firstAttribute="top" secondItem="315" secondAttribute="top" id="tsZ-ek-pn5"/>
                 </constraints>
             </view>
+            <point key="canvasLocation" x="340.5" y="738.5"/>
         </window>
     </objects>
     <resources>
