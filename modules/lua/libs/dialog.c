@@ -33,6 +33,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_dialog.h>
 #include <vlc_extensions.h>
 
 #include "../vlc.h"
@@ -249,9 +250,9 @@ static int vlclua_dialog_delete( lua_State *L )
     msg_Dbg( p_mgr, "Deleting dialog '%s'", p_dlg->psz_title );
     p_dlg->b_kill = true;
     lua_SetDialogUpdate( L, 0 ); // Reset the update flag
-    dialog_ExtensionUpdate( p_mgr, p_dlg );
+    vlc_ext_dialog_update( p_mgr, p_dlg );
 
-    /* After dialog_ExtensionUpdate, the UI thread must take the lock asap and
+    /* After vlc_ext_dialog_update, the UI thread must take the lock asap and
      * then signal us when it's done deleting the dialog.
      */
     msg_Dbg( p_mgr, "Waiting for the dialog to be deleted..." );
@@ -358,7 +359,7 @@ static int vlclua_dialog_update( lua_State *L )
     extension_dialog_t *p_dlg = *pp_dlg;
 
     // Updating dialog immediately
-    dialog_ExtensionUpdate( p_mgr, p_dlg );
+    vlc_ext_dialog_update( p_mgr, p_dlg );
 
     // Reset update flag
     lua_SetDialogUpdate( L, 0 );
@@ -400,7 +401,7 @@ int lua_DialogFlush( lua_State *L )
     int i_ret = VLC_SUCCESS;
     if( lua_GetDialogUpdate( L ) )
     {
-        i_ret = dialog_ExtensionUpdate( vlclua_get_this( L ), p_dlg );
+        i_ret = vlc_ext_dialog_update( vlclua_get_this( L ), p_dlg );
         lua_SetDialogUpdate( L, 0 );
     }
 
@@ -996,7 +997,7 @@ static int vlclua_dialog_delete_widget( lua_State *L )
     p_widget->b_kill = true;
 
     lua_SetDialogUpdate( L, 0 ); // Reset update flag
-    int i_ret = dialog_ExtensionUpdate( p_mgr, p_dlg );
+    int i_ret = vlc_ext_dialog_update( p_mgr, p_dlg );
 
     if( i_ret != VLC_SUCCESS )
     {
