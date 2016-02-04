@@ -33,22 +33,22 @@
 @interface VLCCoreDialogProvider : NSObject
 {
     /* authentication dialog */
-    IBOutlet id authenticationCancelButton;
-    IBOutlet id authenticationDescriptionLabel;
-    IBOutlet id authenticationLoginTextField;
-    IBOutlet id authenticationLoginLabel;
-    IBOutlet id authenticationOkButton;
-    IBOutlet id authenticationPasswordTextField;
-    IBOutlet id authenticationPasswordLabel;
-    IBOutlet id authenticationTitleLabel;
-    IBOutlet id authenticationWindow;
+    IBOutlet NSButton *authenticationCancelButton;
+    IBOutlet NSTextField *authenticationDescriptionLabel;
+    IBOutlet NSTextField *authenticationLoginTextField;
+    IBOutlet NSTextField *authenticationLoginLabel;
+    IBOutlet NSButton *authenticationOkButton;
+    IBOutlet NSTextField *authenticationPasswordTextField;
+    IBOutlet NSTextField *authenticationPasswordLabel;
+    IBOutlet NSTextField *authenticationTitleLabel;
+    IBOutlet NSWindow *authenticationWindow;
 
     /* progress dialog */
-    IBOutlet NSProgressIndicator * progressIndicator;
-    IBOutlet id progressCancelButton;
-    IBOutlet id progressDescriptionLabel;
-    IBOutlet id progressTitleLabel;
-    IBOutlet id progressWindow;
+    IBOutlet NSProgressIndicator *progressIndicator;
+    IBOutlet NSButton *progressCancelButton;
+    IBOutlet NSTextField *progressDescriptionLabel;
+    IBOutlet NSTextField *progressTitleLabel;
+    IBOutlet NSWindow *progressWindow;
 }
 
 @property (atomic,readwrite) BOOL progressCancelled;
