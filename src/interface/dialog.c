@@ -49,10 +49,10 @@ int dialog_Register (vlc_object_t *obj)
     int ret = VLC_EGENERIC;
 
     vlc_mutex_lock (&provider_lock);
-    if (priv->p_dialog_provider == NULL)
+    if (priv->p_legacy_dialog_provider == NULL)
     {   /* Since the object is responsible for unregistering itself before
          * it terminates, at reference is not needed. */
-        priv->p_dialog_provider = obj;
+        priv->p_legacy_dialog_provider = obj;
         ret = VLC_SUCCESS;
     }
     vlc_mutex_unlock (&provider_lock);
@@ -72,9 +72,9 @@ int dialog_Unregister (vlc_object_t *obj)
     int ret = VLC_EGENERIC;
 
     vlc_mutex_lock (&provider_lock);
-    if (priv->p_dialog_provider == obj)
+    if (priv->p_legacy_dialog_provider == obj)
     {
-        priv->p_dialog_provider = NULL;
+        priv->p_legacy_dialog_provider = NULL;
         ret = VLC_SUCCESS;
     }
     vlc_mutex_unlock (&provider_lock);
@@ -87,7 +87,7 @@ static vlc_object_t *dialog_GetProvider (vlc_object_t *obj)
     vlc_object_t *provider;
 
     vlc_mutex_lock (&provider_lock);
-    if ((provider = priv->p_dialog_provider) != NULL)
+    if ((provider = priv->p_legacy_dialog_provider) != NULL)
         vlc_object_hold (provider);
     vlc_mutex_unlock (&provider_lock);
     return provider;

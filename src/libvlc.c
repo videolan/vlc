@@ -100,7 +100,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     priv = libvlc_priv (p_libvlc);
     priv->playlist = NULL;
-    priv->p_dialog_provider = NULL;
+    priv->p_legacy_dialog_provider = NULL;
     priv->p_vlm = NULL;
 
     vlc_ExitInit( &priv->exit );
