@@ -41,6 +41,7 @@
     IBOutlet NSTextField *authenticationPasswordTextField;
     IBOutlet NSTextField *authenticationPasswordLabel;
     IBOutlet NSTextField *authenticationTitleLabel;
+    IBOutlet NSButton *authenticationStorePasswordCheckbox;
     IBOutlet NSWindow *authenticationWindow;
 
     /* progress dialog */

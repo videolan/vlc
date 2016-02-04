@@ -211,6 +211,7 @@ static void updateProgressCallback(vlc_dialog_id *p_id,
     [authenticationPasswordLabel setStringValue: _NS("Password")];
     [authenticationCancelButton setTitle: _NS("Cancel")];
     [authenticationOkButton setTitle: _NS("OK")];
+    [authenticationStorePasswordCheckbox setTitle:_NS("Remember")];
 
     [progressCancelButton setTitle: _NS("Cancel")];
     [progressIndicator setUsesThreadedAnimation: YES];
@@ -222,14 +223,15 @@ static void updateProgressCallback(vlc_dialog_id *p_id,
                  defaultUserName:(const char *)psz_default_username
                       askToStore:(bool )b_ask_store
 {
-    // FIXME: add support for b_ask_store
-
     [authenticationTitleLabel setStringValue:toNSStr(psz_title)];
     authenticationWindow.title = authenticationTitleLabel.stringValue;
     [authenticationDescriptionLabel setStringValue:toNSStr(psz_text)];
 
     [authenticationLoginTextField setStringValue:toNSStr(psz_default_username)];
     [authenticationPasswordTextField setStringValue:@""];
+
+    authenticationStorePasswordCheckbox.hidden = !b_ask_store;
+    authenticationStorePasswordCheckbox.state = NSOffState;
 
     [authenticationWindow center];
     NSInteger returnValue = [NSApp runModalForWindow:authenticationWindow];
@@ -241,8 +243,7 @@ static void updateProgressCallback(vlc_dialog_id *p_id,
     vlc_dialog_id_post_login(p_id,
                              username ? [username UTF8String] : NULL,
                              password ? [password UTF8String] : NULL,
-                             false);
-
+                             authenticationStorePasswordCheckbox.state == NSOnState);
 }
 
 - (IBAction)authenticationDialogAction:(id)sender

@@ -14,6 +14,7 @@
                 <outlet property="authenticationOkButton" destination="252" id="BgQ-UX-t3S"/>
                 <outlet property="authenticationPasswordLabel" destination="251" id="mgJ-w8-OSO"/>
                 <outlet property="authenticationPasswordTextField" destination="253" id="kg1-Mw-Xxc"/>
+                <outlet property="authenticationStorePasswordCheckbox" destination="7LA-vc-QPm" id="eyU-kP-Qws"/>
                 <outlet property="authenticationTitleLabel" destination="256" id="w85-xG-Aix"/>
                 <outlet property="authenticationWindow" destination="248" id="KUc-xR-bpJ"/>
                 <outlet property="progressCancelButton" destination="306" id="yX8-ag-f4a"/>
@@ -124,6 +125,13 @@ Gw
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="topLeft" imageScaling="proportionallyDown" image="NSApplicationIcon" id="325"/>
                     </imageView>
+                    <button translatesAutoresizingMaskIntoConstraints="NO" id="7LA-vc-QPm">
+                        <rect key="frame" x="94" y="21" width="88" height="18"/>
+                        <buttonCell key="cell" type="check" title="Remember" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5El-9y-n4Y">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="252" firstAttribute="top" secondItem="253" secondAttribute="bottom" constant="20" id="0dm-8h-d9f"/>
@@ -139,7 +147,9 @@ Gw
                     <constraint firstItem="254" firstAttribute="centerY" secondItem="252" secondAttribute="centerY" id="Yd8-Jc-1YW"/>
                     <constraint firstItem="256" firstAttribute="top" secondItem="314" secondAttribute="top" id="dB9-JK-2Lo"/>
                     <constraint firstItem="255" firstAttribute="leading" secondItem="257" secondAttribute="leading" id="de7-8M-oBQ"/>
+                    <constraint firstItem="7LA-vc-QPm" firstAttribute="leading" secondItem="253" secondAttribute="leading" id="e2a-lM-3N0"/>
                     <constraint firstItem="251" firstAttribute="leading" secondItem="250" secondAttribute="leading" id="iEd-dM-6MD"/>
+                    <constraint firstItem="7LA-vc-QPm" firstAttribute="centerY" secondItem="254" secondAttribute="centerY" id="jqQ-3p-fZC"/>
                     <constraint firstItem="257" firstAttribute="trailing" secondItem="252" secondAttribute="trailing" id="keI-Fm-ogw"/>
                     <constraint firstAttribute="bottom" secondItem="252" secondAttribute="bottom" constant="19" id="p5k-jJ-36M"/>
                     <constraint firstItem="253" firstAttribute="top" secondItem="251" secondAttribute="bottom" constant="8" id="qui-cW-NGH"/>
