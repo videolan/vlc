@@ -529,8 +529,6 @@ void update_Download( update_t *p_update, const char *psz_destdir )
 static void* update_DownloadReal( void *obj )
 {
     update_download_thread_t *p_udt = (update_download_thread_t *)obj;
-    int i_ret;
-    unsigned int i_dialog_id = 0;
     uint64_t l_size;
     uint64_t l_downloaded = 0;
     float f_progress;
@@ -545,6 +543,7 @@ static void* update_DownloadReal( void *obj )
     int i_read;
     int canc;
 
+    vlc_dialog_id *p_dialog_id = NULL;
     update_t *p_update = p_udt->p_update;
     char *psz_destdir = p_udt->psz_destdir;
 
@@ -594,20 +593,19 @@ static void* update_DownloadReal( void *obj )
 
     psz_size = size_str( l_size );
 
-    i_ret =
+    p_dialog_id =
         vlc_dialog_display_progress( p_udt, false, 0.0, _("Cancel"),
                                      ( "Downloading..."),
                                      _("%s\nDownloading... %s/%s %.1f%% done"),
                                      p_update->release.psz_url, "0.0", psz_size,
                                      0.0 );
 
-    if( i_ret <= 0 )
+    if( p_dialog_id == NULL )
         goto end;
-    i_dialog_id = i_ret;
 
     while( !atomic_load( &p_udt->aborted ) &&
            ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
-           !vlc_dialog_cancelled( p_udt, i_dialog_id ) )
+           !vlc_dialog_is_cancelled( p_udt, p_dialog_id ) )
     {
         if( fwrite( p_buffer, i_read, 1, p_file ) < 1 )
         {
@@ -619,7 +617,7 @@ static void* update_DownloadReal( void *obj )
         psz_downloaded = size_str( l_downloaded );
         f_progress = (float)l_downloaded/(float)l_size;
 
-        vlc_dialog_update_progress_text( p_udt, i_dialog_id, f_pos,
+        vlc_dialog_update_progress_text( p_udt, p_dialog_id, f_progress,
                                          "%s\nDownloading... %s/%s - %.1f%% done",
                                          p_update->release.psz_url,
                                          psz_downloaded, psz_size,
@@ -632,10 +630,10 @@ static void* update_DownloadReal( void *obj )
     p_file = NULL;
 
     if( !atomic_load( &p_udt->aborted ) &&
-        !vlc_dialog_cancelled( p_udt, i_dialog_id ) )
+        !vlc_dialog_is_cancelled( p_udt, p_dialog_id ) )
     {
-        vlc_dialog_cancel( p_udt, i_dialog_id );
-        i_dialog_id = 0;
+        vlc_dialog_release( p_udt, p_dialog_id );
+        p_dialog_id = NULL;
     }
     else
     {
@@ -722,12 +720,12 @@ static void* update_DownloadReal( void *obj )
     free( p_hash );
 
 #ifdef _WIN32
-    static const char *psz_msg =
+    const char *psz_msg =
         _("The new version was successfully downloaded."
         "Do you want to close VLC and install it now?");
     int answer = vlc_dialog_wait_question( p_udt, VLC_DIALOG_QUESTION_NORMAL,
                                            _("Cancel"), _("Install"), NULL,
-                                           _("Update VLC media player"),
+                                           _("Update VLC media player"), "%s",
                                            psz_msg );
     if(answer == 1)
     {
@@ -739,8 +737,8 @@ static void* update_DownloadReal( void *obj )
     }
 #endif
 end:
-    if( i_dialog_id != 0 )
-        vlc_dialog_cancel( p_udt, i_dialog_id );
+    if( p_dialog_id != NULL )
+        vlc_dialog_release( p_udt, p_dialog_id );
     if( p_stream )
         stream_Delete( p_stream );
     if( p_file )

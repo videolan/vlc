@@ -225,17 +225,16 @@ static int Create( vlc_object_t *p_this )
 
 #ifdef HAVE_FONTCONFIG
 #if defined(_WIN32)
-    int i_ret =
+    vlc_dialog_id *p_dialog_id =
         vlc_dialog_display_progress( p_dec, true, 0.0, NULL,
                                     _("Building font cache"),
                                     _( "Please wait while your font cache is rebuilt.\n"
                                     "This should take less than a minute." ) );
-    unsigned int i_dialog_id = i_ret > 0 ? i_ret : 0;
 #endif
     ass_set_fonts( p_renderer, psz_font, psz_family, 1, NULL, 1 );  // setup default font/family
 #if defined(_WIN32)
-    if( i_dialog_id != 0 )
-        vlc_dialog_cancel( p_dec, i_dialog_id );
+    if( p_dialog_id != 0 )
+        vlc_dialog_release( p_dec, p_dialog_id );
 #endif
 #else
     ass_set_fonts( p_renderer, psz_font, psz_family, 1, NULL, 1 );
