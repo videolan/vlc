@@ -26,65 +26,132 @@
 #endif
 
 #include <QObject>
+#include <QDialog>
+#include <QMap>
 #include <vlc_common.h>
+#include <vlc_dialog.h>
 #include "adapters/variables.hpp"
 
 struct intf_thread_t;
 class QProgressDialog;
+class DialogWrapper;
 
 class DialogHandler : public QObject
 {
     Q_OBJECT
 
-    friend class QVLCProgressDialog;
-
 public:
     DialogHandler (intf_thread_t *, QObject *parent);
-    virtual ~DialogHandler (void);
+    virtual ~DialogHandler();
+    void removeDialogId(vlc_dialog_id *p_id);
+
+signals:
+    void errorDisplayed(const QString &title, const QString &text);
+    void loginDisplayed(vlc_dialog_id *p_id, const QString &title,
+                        const QString &text, const QString &defaultUsername,
+                        bool b_ask_store);
+    void questionDisplayed(vlc_dialog_id *p_id, const QString &title,
+                           const QString &text, int i_type,
+                           const QString &cancel, const QString &action1,
+                           const QString &action2);
+    void progressDisplayed(vlc_dialog_id *p_id, const QString &title,
+                           const QString &text, bool b_indeterminate,
+                           float f_position, const QString &cancel);
+    void cancelled(vlc_dialog_id *p_id);
+    void progressUpdated(vlc_dialog_id *p_id, float f_value, const QString &text);
+
+private slots:
+    void displayError(const QString &title, const QString &text);
+    void displayLogin(vlc_dialog_id *p_id, const QString &title,
+                      const QString &text, const QString &defaultUsername,
+                      bool b_ask_store);
+    void displayQuestion(vlc_dialog_id *p_id, const QString &title,
+                         const QString &text, int i_type,
+                         const QString &cancel, const QString &action1,
+                         const QString &action2);
+    void displayProgress(vlc_dialog_id *p_id, const QString &title,
+                         const QString &text, bool b_indeterminate,
+                         float f_position, const QString &cancel);
+    void cancel(vlc_dialog_id *p_id);
+    void updateProgress(vlc_dialog_id *p_id, float f_value, const QString &text);
 
 private:
     intf_thread_t *p_intf;
-    static int error (vlc_object_t *, const char *, vlc_value_t, vlc_value_t,
-                      void *);
-    QVLCPointer critical;
-    QVLCPointer login;
-    QVLCPointer question;
-    QVLCPointer progressBar;
-signals:
-    void error (const QString&, const QString&);
 
-private slots:
-    void displayError (const QString&, const QString&);
-    void displayCritical (void *);
-    void requestLogin (void *);
-    void requestAnswer (void *);
-    void startProgressBar (void *);
-    void stopProgressBar (QWidget *);
+    static void displayErrorCb(const char *, const char *, void *);
+    static void displayLoginCb(vlc_dialog_id *, const char *, const char *,
+                               const char *, bool, void *);
+    static void displayQuestionCb(vlc_dialog_id *, const char *, const char *,
+                                  vlc_dialog_question_type, const char *, 
+                                  const char *, const char *, void *);
+    static void displayProgressCb(vlc_dialog_id *, const char *, const char *,
+                                  bool, float, const char *, void *);
+    static void cancelCb(vlc_dialog_id *, void *);
+    static void updateProgressCb(vlc_dialog_id *, float, const char *, void *);
 };
 
-/* Put here instead of .cpp because of MOC */
-#include <QProgressDialog>
+class DialogWrapper : public QObject
+{
+    Q_OBJECT
 
-class QVLCProgressDialog : public QProgressDialog
+    friend class DialogHandler;
+public:
+    DialogWrapper(DialogHandler *p_handler, intf_thread_t *p_intf,
+                 vlc_dialog_id *p_id, QDialog *p_dialog);
+    virtual ~DialogWrapper();
+protected slots:
+    virtual void finish(int result = QDialog::Rejected);
+protected:
+    DialogHandler *p_handler;
+    intf_thread_t *p_intf;
+    vlc_dialog_id *p_id;
+    QDialog *p_dialog;
+};
+
+class QLineEdit;
+class QCheckBox;
+class LoginDialogWrapper : public DialogWrapper
 {
     Q_OBJECT
 public:
-    QVLCProgressDialog (DialogHandler *parent,
-                        struct dialog_progress_bar_t *);
-private:
-    DialogHandler *handler;
-    bool cancelled;
-
-    static void update (void *, const char *, float);
-    static bool check (void *);
-    static void destroy (void *);
+    LoginDialogWrapper(DialogHandler *p_handler, intf_thread_t *p_intf,
+                       vlc_dialog_id *p_id, QDialog *p_dialog,
+                       QLineEdit *userLine, QLineEdit *passLine,
+                       QCheckBox *checkbox);
 private slots:
-    void saveCancel (void);
+    virtual void accept();
+private:
+    QLineEdit *userLine;
+    QLineEdit *passLine;
+    QCheckBox *checkbox;
+};
 
-signals:
-    void progressed (int);
-    void described (const QString&);
-    void released (void);
+class QAbstractButton;
+class QMessageBox;
+class QuestionDialogWrapper : public DialogWrapper
+{
+    Q_OBJECT
+public:
+    QuestionDialogWrapper(DialogHandler *p_handler, intf_thread_t *p_intf,
+                          vlc_dialog_id *p_id, QMessageBox *p_box,
+                          QAbstractButton *action1, QAbstractButton *action2);
+private slots:
+    virtual void buttonClicked(QAbstractButton *);
+private:
+    QAbstractButton *action1;
+    QAbstractButton *action2;
+};
+
+class ProgressDialogWrapper : public DialogWrapper
+{
+    Q_OBJECT
+public:
+    ProgressDialogWrapper(DialogHandler *p_handler, intf_thread_t *p_intf,
+                          vlc_dialog_id *p_id, QProgressDialog  *p_progress,
+                          bool b_indeterminate);
+    void updateProgress(float f_position, const QString &text);
+private:
+    bool b_indeterminate;
 };
 
 #endif
