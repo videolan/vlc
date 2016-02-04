@@ -18,11 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/**
- * @file
- * This file declares vlc keystore API
- */
-
 #ifndef VLC_KEYSTORE_H
 # define VLC_KEYSTORE_H
 
@@ -35,6 +30,8 @@ typedef struct vlc_credential vlc_credential;
 /**
  * @defgroup keystore Keystore and credential API
  * @{
+ * @file
+ * This file declares vlc keystore API
  * @defgroup keystore_public Keystore public API
  * @{
  */
