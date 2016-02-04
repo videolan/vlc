@@ -4900,6 +4900,7 @@
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
 				LIBRARY_SEARCH_PATHS = /Volumes/Genitus/vlc/modules/gui/macosx;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -4931,6 +4932,7 @@
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
 				LIBRARY_SEARCH_PATHS = /Volumes/Genitus/vlc/modules/gui/macosx;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -4962,6 +4964,7 @@
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
 				LIBRARY_SEARCH_PATHS = /Volumes/Genitus/vlc/modules/gui/macosx;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
