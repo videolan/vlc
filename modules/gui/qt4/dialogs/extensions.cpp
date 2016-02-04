@@ -43,19 +43,15 @@
 
 ExtensionsDialogProvider *ExtensionsDialogProvider::instance = NULL;
 
-static int DialogCallback( vlc_object_t *p_this, const char *psz_variable,
-                           vlc_value_t old_val, vlc_value_t new_val,
-                           void *param );
+static void DialogCallback( extension_dialog_t *p_ext_dialog,
+                            void *p_data );
 
 
 ExtensionsDialogProvider::ExtensionsDialogProvider( intf_thread_t *_p_intf,
                                                     extensions_manager_t *p_mgr )
         : QObject( NULL ), p_intf( _p_intf ), p_extensions_manager( p_mgr )
 {
-    // At this point, we consider that the Qt interface already called
-    // dialog_Register() in order to be the extension dialog provider
-    var_Create( p_intf, "dialog-extension", VLC_VAR_ADDRESS );
-    var_AddCallback( p_intf, "dialog-extension", DialogCallback, NULL );
+    vlc_dialog_provider_set_ext_callback( p_intf, DialogCallback, NULL );
 
     CONNECT( this, SignalDialog( extension_dialog_t* ),
              this, UpdateExtDialog( extension_dialog_t* ) );
@@ -64,7 +60,7 @@ ExtensionsDialogProvider::ExtensionsDialogProvider( intf_thread_t *_p_intf,
 ExtensionsDialogProvider::~ExtensionsDialogProvider()
 {
     msg_Dbg( p_intf, "ExtensionsDialogProvider is quitting..." );
-    var_DelCallback( p_intf, "dialog-extension", DialogCallback, NULL );
+    vlc_dialog_provider_set_ext_callback( p_intf, NULL, NULL );
 }
 
 /** Create a dialog
@@ -154,24 +150,14 @@ void ExtensionsDialogProvider::ManageDialog( extension_dialog_t *p_dialog )
 /**
  * Ask the dialogs provider to create a new dialog
  **/
-static int DialogCallback( vlc_object_t *p_this, const char *psz_variable,
-                           vlc_value_t old_val, vlc_value_t new_val,
-                           void *param )
+static void DialogCallback( extension_dialog_t *p_ext_dialog,
+                            void *p_data )
 {
-    (void) p_this;
-    (void) psz_variable;
-    (void) old_val;
-    (void) param;
+    (void) p_data;
 
     ExtensionsDialogProvider *p_edp = ExtensionsDialogProvider::getInstance();
-    if( !p_edp )
-        return VLC_EGENERIC;
-    if( !new_val.p_address )
-        return VLC_EGENERIC;
-
-    extension_dialog_t *p_dialog = ( extension_dialog_t* ) new_val.p_address;
-    p_edp->ManageDialog( p_dialog );
-    return VLC_SUCCESS;
+    if( p_edp )
+        p_edp->ManageDialog( p_ext_dialog );
 }
 
 
