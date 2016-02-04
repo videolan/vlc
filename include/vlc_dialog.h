@@ -224,8 +224,8 @@ VLC_API int
 vlc_dialog_update_progress_text(vlc_object_t *p_obj, vlc_dialog_id *p_id,
                                 float f_position, const char *psz_fmt, ...)
                                 VLC_FORMAT(4, 5);
-#define vlc_dialog_display_progress_text(a, b, c, d, ...) \
-    vlc_dialog_display_progress_text(VLC_OBJECT(a), b, c, d, ##__VA_ARGS__)
+#define vlc_dialog_update_progress_text(a, b, c, d, ...) \
+    vlc_dialog_update_progress_text(VLC_OBJECT(a), b, c, d, ##__VA_ARGS__)
 
 /**
  * Update the position and the message of the progress dialog
