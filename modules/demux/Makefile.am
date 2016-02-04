@@ -232,6 +232,9 @@ libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
         demux/mpeg/ts_pid.h demux/mpeg/ts_pid.c \
         demux/mpeg/ts_psi.h demux/mpeg/ts_psi.c \
         demux/mpeg/ts_psi_eit.h demux/mpeg/ts_psi_eit.c \
+        demux/mpeg/ts_psip.h demux/mpeg/ts_psip.c \
+        demux/mpeg/ts_psip_dvbpsi_fixes.h demux/mpeg/ts_psip_dvbpsi_fixes.c \
+        demux/mpeg/ts_decoders.h demux/mpeg/ts_decoders.c \
         demux/mpeg/ts_streams.h demux/mpeg/ts_streams.c \
         demux/mpeg/ts_scte.h demux/mpeg/ts_scte.c \
         demux/mpeg/sections.c demux/mpeg/sections.h \
@@ -249,6 +252,7 @@ libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
         mux/mpeg/tables.c mux/mpeg/tables.h \
 	mux/mpeg/tsutil.c mux/mpeg/tsutil.h \
         codec/scte18.h \
+        codec/atsc_a65.c codec/atsc_a65.h \
 	codec/opus_header.c
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(DVBPSI_LIBS) $(SOCKET_LIBS)

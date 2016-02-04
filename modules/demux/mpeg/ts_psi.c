@@ -49,6 +49,7 @@
 #include "sections.h"
 #include "ts_sl.h"
 #include "ts_scte.h"
+#include "ts_psip.h"
 
 #include <assert.h>
 
@@ -1449,10 +1450,6 @@ void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     dvbpsi_pmt_es_t *p_dvbpsies;
     for( p_dvbpsies = p_dvbpsipmt->p_first_es; p_dvbpsies != NULL; p_dvbpsies = p_dvbpsies->p_next )
     {
-        /* Do not mix with arbitrary pid if any */
-        if( p_sys->b_atsc_eas && p_dvbpsies->i_pid == SCTE18_SI_BASE_PID )
-            continue;
-
         ts_pid_t *pespid = GetPID(p_sys, p_dvbpsies->i_pid);
         if ( pespid->type != TYPE_PES && pespid->type != TYPE_FREE )
         {
@@ -1610,24 +1607,54 @@ void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     }
 
      /* Add arbitrary PID from here */
-    if ( p_sys->b_atsc_eas && p_pmt->e_streams.i_size )
+    if ( registration_type == TS_PMT_REGISTRATION_ATSC || p_sys->b_atsc )
     {
-        ts_pid_t *easpid = GetPID(p_sys, SCTE18_SI_BASE_PID);
-        if ( PIDSetup( p_demux, TYPE_PES, easpid, pmtpid ) )
+        ts_pid_t *atsc_base_pid = GetPID(p_sys, ATSC_BASE_PID);
+        if ( PIDSetup( p_demux, TYPE_PSIP, atsc_base_pid, pmtpid ) )
         {
-            ARRAY_APPEND( p_pmt->e_streams, easpid );
-            ts_pes_t *p_easpes = easpid->u.p_pes;
-            p_easpes->data_type = TS_ES_DATA_TABLE_SECTION;
-            p_easpes->p_es->fmt.i_codec = VLC_CODEC_SCTE_18;
-            p_easpes->p_es->fmt.i_cat = SPU_ES;
-            p_easpes->p_es->fmt.i_id = SCTE18_SI_BASE_PID;
-            p_easpes->p_es->fmt.i_group = p_pmt->i_number;
-            p_easpes->p_es->fmt.psz_description = strdup(SCTE18_DESCRIPTION);
-            p_easpes->b_always_receive = true;
-            ts_sections_processor_Add( &p_easpes->p_sections_proc,
-                                       SCTE18_TABLE_ID, 0x00,
-                                       false, SCTE18_Section_Handler );
-            msg_Dbg( p_demux, "  * pid=%d listening for EAS events", easpid->i_pid );
+            ts_psip_t *p_psip = atsc_base_pid->u.p_psip;
+            if( !ATSC_Attach_Dvbpsi_Base_Decoders( p_psip->handle, atsc_base_pid ) )
+            {
+                msg_Err( p_demux, "dvbpsi_atsc_AttachMGT/STT failed for program %d",
+                         p_pmt->i_number );
+                PIDRelease( p_demux, atsc_base_pid );
+            }
+            else
+            {
+                p_pmt->p_mgt = atsc_base_pid;
+                SetPIDFilter( p_demux->p_sys, atsc_base_pid, true );
+                msg_Dbg( p_demux, "  * pid=%d listening for MGT/STT", atsc_base_pid->i_pid );
+
+                /* Set up EAS spu es */
+                if( p_pmt->e_streams.i_size )
+                {
+                    ts_pes_es_t *p_eas_es = ts_pes_es_New( p_pmt );
+                    if( likely(p_eas_es) )
+                    {
+                        p_eas_es->fmt.i_codec = VLC_CODEC_SCTE_18;
+                        p_eas_es->fmt.i_cat = SPU_ES;
+                        p_eas_es->fmt.i_id = ATSC_BASE_PID;
+                        p_eas_es->fmt.i_group = p_pmt->i_number;
+                        p_eas_es->fmt.psz_description = strdup(SCTE18_DESCRIPTION);
+                        if( p_psip->p_eas_es )
+                        {
+                            ts_pes_es_t *p_next = p_psip->p_eas_es->p_next;
+                            p_psip->p_eas_es->p_next = p_eas_es;
+                            p_eas_es->p_next = p_next;
+                        }
+                        else
+                        {
+                            p_psip->p_eas_es = p_eas_es;
+                        }
+                        msg_Dbg( p_demux, "  * pid=%d listening for EAS events", ATSC_BASE_PID );
+                    }
+                }
+            }
+        }
+        else if( atsc_base_pid->type != TYPE_FREE )
+        {
+            msg_Err( p_demux, "can't attach PSIP table handlers"
+                              "on already in use ATSC base pid %d", ATSC_BASE_PID );
         }
     }
 

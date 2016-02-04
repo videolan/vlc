@@ -21,7 +21,9 @@
 
 #include "../../codec/scte18.h"
 
-void SCTE18_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content );
+void SCTE18_SectionsCallback( dvbpsi_t *p_handle,
+                              const dvbpsi_psi_section_t* p_section,
+                              void *p_cb_data );
 void SCTE27_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content );
 
 #endif

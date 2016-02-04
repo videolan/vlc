@@ -57,7 +57,7 @@ struct demux_sys_t
 
     bool        b_force_seek_per_percent;
 
-    bool        b_atsc_eas;
+    bool        b_atsc;
     struct
     {
         arib_modes_e e_mode;

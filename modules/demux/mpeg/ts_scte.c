@@ -24,6 +24,11 @@
 #include <vlc_demux.h>
 #include <vlc_es.h>
 
+#ifndef _DVBPSI_DVBPSI_H_
+ #include <dvbpsi/dvbpsi.h>
+#endif
+#include <dvbpsi/psi.h>
+
 #include "ts_pid.h"
 #include "ts_scte.h"
 #include "ts_streams_private.h"
@@ -31,25 +36,40 @@
 
 #include <assert.h>
 
-void SCTE18_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content )
+/* EAS Handling */
+void SCTE18_SectionsCallback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t* p_section,
+                              void *p_base_pid )
 {
-    assert( pid->u.p_pes->p_es->fmt.i_codec == VLC_CODEC_SCTE_18 );
-    ts_pmt_t *p_pmt = pid->u.p_pes->p_es->p_program;
-    mtime_t i_date = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
+    demux_t *p_demux = (demux_t *) p_handle->p_sys;
+    ts_pid_t *p_pid = (ts_pid_t *) p_base_pid;
+    ts_psip_t *p_psip = p_pid->u.p_psip;
+    if( p_pid->type != TYPE_PSIP || !p_psip->p_eas_es )
+        return;
 
-    int i_priority = scte18_get_EAS_priority( p_content->p_buffer, p_content->i_buffer );
-    msg_Dbg( p_demux, "Received EAS Alert with priority %d", i_priority );
-    /* We need to extract the truncated pts stored inside the payload */
-    ts_pes_es_t *p_es = pid->u.p_pes->p_es;
-    if( p_es->id )
+    for( ; p_section; p_section = p_section->p_next )
     {
-        if( i_priority == EAS_PRIORITY_HIGH || i_priority == EAS_PRIORITY_MAX )
+        size_t i_payload = p_section->p_payload_end - p_section->p_payload_start;
+        const int i_priority = scte18_get_EAS_priority( p_section->p_payload_start, i_payload );
+        msg_Dbg( p_demux, "Received EAS Alert with priority %d", i_priority );
+
+        if( i_priority != EAS_PRIORITY_HIGH && i_priority != EAS_PRIORITY_MAX )
+            continue;
+
+        for( ts_pes_es_t *p_es = p_psip->p_eas_es; p_es; p_es = p_es->p_next )
+        {
+            if( !p_es->id && !(p_es->id = es_out_Add( p_demux->out, &p_es->fmt )) )
+                continue;
+
+            const ts_pmt_t *p_pmt = p_es->p_program;
+            const mtime_t i_date = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
+            block_t *p_block = block_Alloc( p_section->p_payload_end - p_section->p_payload_start );
+            memcpy( p_block->p_buffer, p_section->p_payload_start, i_payload );
+            p_block->i_dts = p_block->i_pts = FROM_SCALE( i_date );
+
             es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, p_es->id, true );
-        p_content->i_dts = p_content->i_pts = FROM_SCALE( i_date );
-        es_out_Send( p_demux->out, p_es->id, p_content );
+            es_out_Send( p_demux->out, p_es->id, p_block );
+        }
     }
-    else
-        block_Release( p_content );
 }
 
 void SCTE27_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content )

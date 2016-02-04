@@ -24,6 +24,7 @@ typedef struct ts_pat_t ts_pat_t;
 typedef struct ts_pmt_t ts_pmt_t;
 typedef struct ts_pes_t ts_pes_t;
 typedef struct ts_psi_t ts_psi_t;
+typedef struct ts_psip_t ts_psip_t;
 
 /* Structs */
 ts_pat_t *ts_pat_New( demux_t * );
@@ -43,5 +44,8 @@ void ts_pes_Del( demux_t *, ts_pes_t * );
 
 ts_psi_t *ts_psi_New( demux_t * );
 void ts_psi_Del( demux_t *, ts_psi_t * );
+
+ts_psip_t *ts_psip_New( demux_t * );
+void ts_psip_Del( demux_t *, ts_psip_t * );
 
 #endif

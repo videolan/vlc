@@ -117,10 +117,14 @@ struct ts_psi_t
 
 };
 
+typedef struct ts_psip_context_t ts_psip_context_t;
+
 struct ts_psip_t
 {
     dvbpsi_t       *handle;
     int             i_version;
+    ts_pes_es_t    *p_eas_es;
+    ts_psip_context_t *p_ctx;
     DECL_ARRAY(ts_pid_t *) eit;
 
 };

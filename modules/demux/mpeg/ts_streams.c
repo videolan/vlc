@@ -29,7 +29,9 @@
 #ifndef _DVBPSI_DVBPSI_H_
  #include <dvbpsi/dvbpsi.h>
 #endif
-#include <dvbpsi/demux.h>
+#ifndef _DVBPSI_DEMUX_H_
+ #include <dvbpsi/demux.h>
+#endif
 #include <dvbpsi/descriptor.h>
 #include <dvbpsi/pat.h>
 #include <dvbpsi/pmt.h>
@@ -42,6 +44,8 @@
 #include "sections.h"
 #include "ts_pid.h"
 #include "ts.h"
+
+#include "ts_psip.h"
 
 static inline bool handle_Init( demux_t *p_demux, dvbpsi_t **handle )
 {
@@ -302,4 +306,49 @@ void ts_psi_Del( demux_t *p_demux, ts_psi_t *psi )
         dvbpsi_DetachDemux( psi->handle );
     dvbpsi_delete( psi->handle );
     free( psi );
+}
+
+void ts_psip_Del( demux_t *p_demux, ts_psip_t *psip )
+{
+    if( psip->p_ctx )
+        ts_psip_context_Delete( psip->p_ctx );
+
+    ts_pes_ChainDelete_es( p_demux, psip->p_eas_es );
+
+    if( psip->handle )
+    {
+        ATSC_Detach_Dvbpsi_Decoders( psip->handle );
+        dvbpsi_delete( psip->handle );
+    }
+
+    for( int i=0; i<psip->eit.i_size; i++ )
+        PIDRelease( p_demux, psip->eit.p_elems[i] );
+    ARRAY_RESET( psip->eit );
+
+    free( psip );
+}
+
+ts_psip_t *ts_psip_New( demux_t *p_demux )
+{
+    ts_psip_t *psip = malloc( sizeof( ts_psip_t ) );
+    if( !psip )
+        return NULL;
+
+    if( !handle_Init( p_demux, &psip->handle ) )
+    {
+        free( psip );
+        return NULL;
+    }
+
+    ARRAY_INIT( psip->eit );
+    psip->i_version  = -1;
+    psip->p_eas_es = NULL;
+    psip->p_ctx = ts_psip_context_New();
+    if( !psip->p_ctx )
+    {
+        ts_psip_Del( p_demux, psip );
+        psip = NULL;
+    }
+
+    return psip;
 }

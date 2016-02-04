@@ -129,6 +129,8 @@ static const char *const arib_mode_list_text[] =
     "Forces ARIB STD-B24 mode for decoding characters." \
     "This feature affects EPG information and subtitles." )
 
+#define ATSC_MODE_TEXT N_("ATSC")
+
 vlc_module_begin ()
     set_description( N_("MPEG Transport Stream demuxer") )
     set_shortname ( "MPEG-TS" )
@@ -155,7 +157,7 @@ vlc_module_begin ()
     add_integer( "ts-arib", ARIBMODE_AUTO, SUPPORT_ARIB_TEXT, SUPPORT_ARIB_LONGTEXT, false )
         change_integer_list( arib_mode_list, arib_mode_list_text )
 
-    add_bool( "ts-eas", false, SCTE18_DESCRIPTION, NULL, false )
+    add_bool( "ts-atsc", false, ATSC_MODE_TEXT, NULL, false )
 
     add_obsolete_bool( "ts-silent" );
 
@@ -519,7 +521,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_canfastseek = false;
     p_sys->b_force_seek_per_percent = var_InheritBool( p_demux, "ts-seek-percent" );
 
-    p_sys->b_atsc_eas = var_InheritBool( p_demux, "ts-eas" );
+    p_sys->b_atsc = var_InheritBool( p_demux, "ts-atsc" );
+    if( !p_sys->b_atsc )
+    {
+        p_sys->b_atsc = !strcmp( p_demux->psz_access, "atsc" ) ||
+                        !strcmp( p_demux->psz_access, "usdigital" );
+    }
     p_sys->arib.e_mode = var_InheritInteger( p_demux, "ts-arib" );
 
     stream_Control( p_sys->stream, STREAM_CAN_SEEK, &p_sys->b_canseek );
@@ -711,6 +718,12 @@ static int Demux( demux_t *p_demux )
         case TYPE_EIT:
             if( p_sys->b_dvb_meta )
                 dvbpsi_packet_push( p_pid->u.p_psi->handle, p_pkt->p_buffer );
+            block_Release( p_pkt );
+            break;
+
+        case TYPE_PSIP:
+            if( p_pid->u.p_psip->handle->p_decoder )
+                dvbpsi_packet_push( p_pid->u.p_psip->handle, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
 

@@ -35,6 +35,7 @@ typedef enum
     TYPE_SDT,
     TYPE_TDT,
     TYPE_EIT,
+    TYPE_PSIP,
 } ts_pid_type_t;
 
 enum
@@ -65,6 +66,7 @@ struct ts_pid_t
         ts_pmt_t    *p_pmt;
         ts_pes_t    *p_pes;
         ts_psi_t    *p_psi;
+        ts_psip_t   *p_psip;
     } u;
 
     struct
