@@ -542,7 +542,10 @@ libquicktime_plugin_la_LIBADD = $(LIBM)
 EXTRA_LTLIBRARIES += libquicktime_plugin.la
 codec_LTLIBRARIES += $(LTLIBquicktime)
 
-libgstdecode_plugin_la_SOURCES = codec/gstreamer/gstdecode.c
+libgstdecode_plugin_la_SOURCES = codec/gstreamer/gstdecode.c \
+								 codec/gstreamer/gstvlcpictureplaneallocator.c \
+								 codec/gstreamer/gstvlcvideopool.c \
+								 codec/gstreamer/gstvlcvideosink.c
 libgstdecode_plugin_la_CFLAGS = $(AM_CFLAGS) $(GST_VIDEO_CFLAGS) $(GST_APP_CFLAGS)
 libgstdecode_plugin_la_LIBADD = $(GST_VIDEO_LIBS) $(GST_APP_LIBS)
 if HAVE_GST_DECODE

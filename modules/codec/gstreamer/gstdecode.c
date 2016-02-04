@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gstdecode.c: Decoder module making use of gstreamer
  *****************************************************************************
- * Copyright (C) 2014 VLC authors and VideoLAN
+ * Copyright (C) 2014-2016 VLC authors and VideoLAN
  * $Id:
  *
  * Author: Vikram Fugro <vikram.fugro@gmail.com>
@@ -35,8 +35,12 @@
 #include <gst/gst.h>
 #include <gst/video/video.h>
 #include <gst/video/gstvideometa.h>
+
 #include <gst/app/gstappsrc.h>
 #include <gst/gstatomicqueue.h>
+
+#include "gstvlcpictureplaneallocator.h"
+#include "gstvlcvideosink.h"
 
 struct decoder_sys_t
 {
@@ -44,6 +48,8 @@ struct decoder_sys_t
     GstElement *p_decode_src;
     GstElement *p_decode_in;
     GstElement *p_decode_out;
+
+    GstVlcPicturePlaneAllocator *p_allocator;
 
     GstBus *p_bus;
 
@@ -89,18 +95,248 @@ vlc_module_begin( )
     set_capability( "decoder", 50 )
     set_section( N_( "Decoding" ) , NULL )
     set_callbacks( OpenDecoder, CloseDecoder )
-    add_bool( "use-decodebin", false, USEDECODEBIN_TEXT,
+    add_bool( "use-decodebin", true, USEDECODEBIN_TEXT,
         USEDECODEBIN_LONGTEXT, false )
 vlc_module_end( )
 
+void gst_vlc_dec_ensure_empty_queue( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    int i_count = 0;
+
+    msg_Dbg( p_dec, "Ensuring the decoder queue is empty");
+
+    /* Busy wait with sleep; As this is rare case and the
+     * wait might at max go for 3-4 iterations, preferred to not
+     * to throw in a cond/lock here. */
+    while( p_sys->b_running && i_count < 60 &&
+            gst_atomic_queue_length( p_sys->p_que ))
+    {
+        msleep ( 15000 );
+        i_count++;
+    }
+
+    if( p_sys->b_running )
+    {
+        if( !gst_atomic_queue_length( p_sys->p_que ))
+            msg_Dbg( p_dec, "Ensured the decoder queue is empty" );
+        else
+            msg_Warn( p_dec, "Timed out when ensuring an empty queue" );
+    }
+    else
+        msg_Dbg( p_dec, "Ensuring empty decoder queue not required; decoder \
+                not running" );
+}
+
+/* Emitted by appsrc when serving a seek request.
+ * Seek over here is only used for flushing the buffers.
+ * Returns TRUE always, as the 'real' seek will be
+ * done by VLC framework */
+static gboolean seek_data_cb( GstAppSrc *p_src, guint64 l_offset,
+        gpointer p_data )
+{
+    VLC_UNUSED( p_src );
+    decoder_t *p_dec = p_data;
+    msg_Dbg( p_dec, "appsrc seeking to %"G_GUINT64_FORMAT, l_offset );
+    return TRUE;
+}
+
+/* Emitted by decodebin and links decodebin to fakesink.
+ * Since only one elementary codec stream is fed to decodebin,
+ * this signal cannot be emitted more than once. */
+static void pad_added_cb( GstElement *p_ele, GstPad *p_pad, gpointer p_data )
+{
+    VLC_UNUSED( p_ele );
+    decoder_t *p_dec = p_data;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( likely( gst_pad_has_current_caps( p_pad ) ) )
+    {
+        GstPadLinkReturn ret;
+        GstPad *p_sinkpad;
+
+        msg_Dbg( p_dec, "linking the decoder with the vsink");
+
+        p_sinkpad = gst_element_get_static_pad(
+                p_sys->p_decode_out, "sink" );
+        ret = gst_pad_link( p_pad, p_sinkpad );
+        if( ret != GST_PAD_LINK_OK )
+            msg_Warn( p_dec, "failed to link decoder with vsink");
+
+        gst_object_unref( p_sinkpad );
+    }
+    else
+    {
+        msg_Err( p_dec, "decodebin src pad has no caps" );
+        GST_ELEMENT_ERROR( p_sys->p_decoder, STREAM, FAILED,
+                ( "vlc stream error" ), NULL );
+    }
+}
+
+static gboolean caps_handoff_cb( GstElement* p_ele, GstCaps *p_caps,
+        gpointer p_data )
+{
+    VLC_UNUSED( p_ele );
+    decoder_t *p_dec = p_data;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    msg_Info( p_dec, "got new caps %s", gst_caps_to_string( p_caps ));
+
+    if( !gst_video_info_from_caps( &p_sys->vinfo, p_caps ))
+    {
+        msg_Warn( p_dec, "failed to negotiate" );
+        return FALSE;
+    }
+
+    gst_vlc_dec_ensure_empty_queue( p_dec );
+
+    return gst_vlc_set_vout_fmt( &p_sys->vinfo, p_caps, p_dec );
+}
+
+/* Emitted by fakesink for every buffer and sets the
+ * Adds the buffer to the queue */
+static void frame_handoff_cb( GstElement *p_ele, GstBuffer *p_buf,
+        gpointer p_data )
+{
+    VLC_UNUSED( p_ele );
+    decoder_t *p_dec = p_data;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* Push the buffer to the queue */
+    gst_atomic_queue_push( p_sys->p_que, gst_buffer_ref( p_buf ) );
+}
+
+/* Copy the frame data from the GstBuffer (from decoder)
+ * to the picture obtained from downstream in VLC.
+ * This function should be avoided as much
+ * as possible, since it involves a complete frame copy. */
+static void gst_CopyPicture( picture_t *p_pic, GstVideoFrame *p_frame )
+{
+    int i_plane, i_planes, i_line, i_dst_stride, i_src_stride;
+    uint8_t *p_dst, *p_src;
+    int i_w, i_h;
+
+    i_planes = p_pic->i_planes;
+    for( i_plane = 0; i_plane < i_planes; i_plane++ )
+    {
+        p_dst = p_pic->p[i_plane].p_pixels;
+        p_src = GST_VIDEO_FRAME_PLANE_DATA( p_frame, i_plane );
+        i_dst_stride = p_pic->p[i_plane].i_pitch;
+        i_src_stride = GST_VIDEO_FRAME_PLANE_STRIDE( p_frame, i_plane );
+
+        i_w = GST_VIDEO_FRAME_COMP_WIDTH( p_frame,
+                i_plane ) * GST_VIDEO_FRAME_COMP_PSTRIDE( p_frame, i_plane );
+        i_h = GST_VIDEO_FRAME_COMP_HEIGHT( p_frame, i_plane );
+
+        for( i_line = 0;
+                i_line < __MIN( p_pic->p[i_plane].i_lines, i_h );
+                i_line++ )
+        {
+            memcpy( p_dst, p_src, i_w );
+            p_src += i_src_stride;
+            p_dst += i_dst_stride;
+        }
+    }
+}
+
+/* Check if the element can use this caps */
+static gint find_decoder_func( gconstpointer p_p1, gconstpointer p_p2 )
+{
+    GstElementFactory *p_factory;
+    sink_src_caps_t *p_caps;
+
+    p_factory = ( GstElementFactory* )p_p1;
+    p_caps = ( sink_src_caps_t* )p_p2;
+
+    return !( gst_element_factory_can_sink_any_caps( p_factory,
+                p_caps->p_sinkcaps ) &&
+            gst_element_factory_can_src_any_caps( p_factory,
+                p_caps->p_srccaps ));
+}
+
+static bool default_msg_handler( decoder_t *p_dec, GstMessage *p_msg )
+{
+    bool err = false;
+
+    switch( GST_MESSAGE_TYPE( p_msg ) ){
+    case GST_MESSAGE_ERROR:
+        {
+            gchar  *psz_debug;
+            GError *p_error;
+
+            gst_message_parse_error( p_msg, &p_error, &psz_debug );
+            g_free( psz_debug );
+
+            msg_Err( p_dec, "Error from %s: %s",
+                    GST_ELEMENT_NAME( GST_MESSAGE_SRC( p_msg ) ),
+                    p_error->message );
+            g_error_free( p_error );
+            err = true;
+        }
+        break;
+    case GST_MESSAGE_WARNING:
+        {
+            gchar  *psz_debug;
+            GError *p_error;
+
+            gst_message_parse_warning( p_msg, &p_error, &psz_debug );
+            g_free( psz_debug );
+
+            msg_Warn( p_dec, "Warning from %s: %s",
+                    GST_ELEMENT_NAME( GST_MESSAGE_SRC( p_msg ) ),
+                    p_error->message );
+            g_error_free( p_error );
+        }
+        break;
+    case GST_MESSAGE_INFO:
+        {
+            gchar  *psz_debug;
+            GError *p_error;
+
+            gst_message_parse_info( p_msg, &p_error, &psz_debug );
+            g_free( psz_debug );
+
+            msg_Info( p_dec, "Info from %s: %s",
+                    GST_ELEMENT_NAME( GST_MESSAGE_SRC( p_msg ) ),
+                    p_error->message );
+            g_error_free( p_error );
+        }
+        break;
+    default:
+        break;
+    }
+
+    return err;
+}
+
+static gboolean vlc_gst_plugin_init( GstPlugin *p_plugin )
+{
+    if( !gst_element_register( p_plugin, "vlcvideosink", GST_RANK_NONE,
+                GST_TYPE_VLC_VIDEO_SINK ))
+        return FALSE;
+
+    return TRUE;
+}
+
 /* gst_init( ) is not thread-safe, hence a thread-safe wrapper */
-static void vlc_gst_init( void )
+static bool vlc_gst_init( void )
 {
     static vlc_mutex_t init_lock = VLC_STATIC_MUTEX;
+    static bool b_registered = false;
+    bool b_ret = true;
 
     vlc_mutex_lock( &init_lock );
     gst_init( NULL, NULL );
+    if ( !b_registered )
+    {
+        b_ret = gst_plugin_register_static( 1, 0, "videolan",
+                "VLC Gstreamer plugins", vlc_gst_plugin_init,
+                "1.0.0", "LGPL", "NA", "vlc", "NA" );
+        b_registered = b_ret;
+    }
     vlc_mutex_unlock( &init_lock );
+
+    return b_ret;
 }
 
 static GstStructure* vlc_to_gst_fmt( const es_format_t *p_fmt )
@@ -112,6 +348,12 @@ static GstStructure* vlc_to_gst_fmt( const es_format_t *p_fmt )
     case VLC_CODEC_H264:
         p_str = gst_structure_new_empty( "video/x-h264" );
         gst_structure_set( p_str, "alignment", G_TYPE_STRING, "au", NULL );
+        if( p_fmt->i_extra )
+            gst_structure_set( p_str, "stream-format", G_TYPE_STRING, "avc",
+                    NULL );
+        else
+            gst_structure_set( p_str, "stream-format", G_TYPE_STRING,
+                    "byte-stream", NULL );
         break;
     case VLC_CODEC_MP4V:
         p_str = gst_structure_new_empty( "video/mpeg" );
@@ -190,282 +432,6 @@ static GstStructure* vlc_to_gst_fmt( const es_format_t *p_fmt )
     return p_str;
 }
 
-/* Emitted by appsrc when serving a seek request.
- * Seek over here is only used for flushing the buffers.
- * Returns TRUE always, as the 'real' seek will be
- * done by VLC framework */
-static gboolean seek_data_cb( GstAppSrc *p_src, guint64 l_offset,
-        gpointer p_data )
-{
-    VLC_UNUSED( p_src );
-    decoder_t *p_dec = p_data;
-    msg_Dbg( p_dec, "appsrc seeking to %"G_GUINT64_FORMAT, l_offset );
-    return TRUE;
-}
-
-/* Emitted by decodebin when there are no more
- * outputs.This signal is not really necessary
- * to be connected. It is connected here for sanity
- * check only, just in-case something unexpected
- * happens inside decodebin in finding the appropriate
- * decoder, and it fails to emit PAD_ADDED signal */
-static void no_more_pads_cb( GstElement *p_ele, gpointer p_data )
-{
-    VLC_UNUSED( p_ele );
-    decoder_t *p_dec = p_data;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    GstPad *p_pad;
-
-    msg_Dbg( p_dec, "no more pads" );
-
-    p_pad = gst_element_get_static_pad( p_sys->p_decode_out,
-            "sink" );
-    if( !gst_pad_is_linked( p_pad ) )
-    {
-        msg_Err( p_dec, "failed to link decode out pad" );
-        GST_ELEMENT_ERROR( p_sys->p_decoder, STREAM, FAILED,
-                ( "vlc stream error" ), NULL );
-    }
-
-    gst_object_unref( p_pad );
-}
-
-/* Sets the video output format */
-static bool set_vout_format( GstStructure* p_str,
-        const es_format_t *restrict p_infmt, es_format_t *restrict p_outfmt )
-{
-    video_format_t *p_voutfmt = &p_outfmt->video;
-    const video_format_t *p_vinfmt = &p_infmt->video;
-    gboolean b_ret;
-
-    /* We are interested in system memory raw buffers for now,
-     * but support for opaque data formats can also be added.
-     * For eg. when using HW decoders for zero-copy */
-    p_outfmt->i_codec = vlc_fourcc_GetCodecFromString(
-            VIDEO_ES,
-            gst_structure_get_string( p_str, "format" ) );
-    if( !p_outfmt->i_codec )
-        return false;
-
-    gst_structure_get_int( p_str, "width", &p_voutfmt->i_width );
-    gst_structure_get_int( p_str, "height", &p_voutfmt->i_height );
-
-    b_ret = gst_structure_get_fraction( p_str,
-            "pixel-aspect-ratio",
-            &p_voutfmt->i_sar_num,
-            &p_voutfmt->i_sar_den );
-
-    if( !b_ret || !p_voutfmt->i_sar_num ||
-            !p_voutfmt->i_sar_den )
-    {
-        p_voutfmt->i_sar_num = 1;
-        p_voutfmt->i_sar_den = 1;
-    }
-
-    b_ret = gst_structure_get_fraction( p_str, "framerate",
-            &p_voutfmt->i_frame_rate,
-            &p_voutfmt->i_frame_rate_base );
-
-    if( !b_ret || !p_voutfmt->i_frame_rate ||
-            !p_voutfmt->i_frame_rate_base )
-    {
-        p_voutfmt->i_frame_rate = p_vinfmt->i_frame_rate;
-        p_voutfmt->i_frame_rate_base = p_vinfmt->i_frame_rate_base;
-    }
-
-    return true;
-}
-
-static bool set_out_fmt( decoder_t *p_dec, GstPad *p_pad )
-{
-    GstCaps *p_caps = gst_pad_get_current_caps( p_pad );
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    GstStructure *p_str;
-
-    if( !gst_video_info_from_caps( &p_sys->vinfo,
-                p_caps ) )
-    {
-        msg_Err( p_dec, "failed to get video info from caps" );
-        gst_caps_unref( p_caps );
-        GST_ELEMENT_ERROR( p_sys->p_decoder, STREAM, FAILED,
-                ( "vlc stream error" ), NULL );
-        return false;
-    }
-
-    p_str = gst_caps_get_structure( p_caps, 0 );
-
-    if( !set_vout_format( p_str, &p_dec->fmt_in, &p_dec->fmt_out ) )
-    {
-        msg_Err( p_dec, "failed to set out format" );
-        gst_caps_unref( p_caps );
-        GST_ELEMENT_ERROR( p_sys->p_decoder, STREAM, FAILED,
-                ( "vlc stream error" ), NULL );
-        return false;
-    }
-
-    gst_caps_unref( p_caps );
-    return true;
-}
-
-/* Emitted by decodebin and links decodebin to fakesink.
- * Since only one elementary codec stream is fed to decodebin,
- * this signal cannot be emitted more than once. */
-static void pad_added_cb( GstElement *p_ele, GstPad *p_pad, gpointer p_data )
-{
-    VLC_UNUSED( p_ele );
-    decoder_t *p_dec = p_data;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( likely( gst_pad_has_current_caps( p_pad ) ) )
-    {
-        GstPad *p_sinkpad;
-
-        if( !set_out_fmt( p_dec, p_pad ) )
-            return;
-
-        p_sinkpad = gst_element_get_static_pad(
-                p_sys->p_decode_out, "sink" );
-        gst_pad_link( p_pad, p_sinkpad );
-        gst_object_unref( p_sinkpad );
-    }
-    else
-    {
-        msg_Err( p_dec, "decodebin src pad has no caps" );
-        GST_ELEMENT_ERROR( p_sys->p_decoder, STREAM, FAILED,
-                ( "vlc stream error" ), NULL );
-    }
-}
-
-/* Emitted by fakesink for every buffer and sets the
- * output format (if not set). Adds the buffer to the queue */
-static void frame_handoff_cb( GstElement *p_ele, GstBuffer *p_buf,
-        GstPad *p_pad, gpointer p_data )
-{
-    VLC_UNUSED( p_ele );
-    decoder_t *p_dec = p_data;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( unlikely( p_dec->fmt_out.i_codec == 0 ) )
-    {
-        if( !gst_pad_has_current_caps( p_pad ) )
-        {
-            msg_Err( p_dec, "fakesink pad has no caps" );
-            GST_ELEMENT_ERROR( p_sys->p_decoder, STREAM, FAILED,
-                    ( "vlc stream error" ), NULL );
-            return;
-        }
-
-        if( !set_out_fmt( p_dec, p_pad ) )
-            return;
-    }
-
-    /* Push the buffer to the queue */
-    gst_atomic_queue_push( p_sys->p_que, gst_buffer_ref( p_buf ) );
-}
-
-/* Copy the frame data from the GstBuffer (from decoder)
- * to the picture obtained from downstream in VLC.
- * TODO(Zero-Copy): This function should be avoided as much
- * as possible, since it involves a complete frame copy. */
-static void gst_CopyPicture( picture_t *p_pic, GstVideoFrame *p_frame )
-{
-    int i_plane, i_planes, i_line, i_dst_stride, i_src_stride;
-    uint8_t *p_dst, *p_src;
-    int i_w, i_h;
-
-    i_planes = p_pic->i_planes;
-    for( i_plane = 0; i_plane < i_planes; i_plane++ )
-    {
-        p_dst = p_pic->p[i_plane].p_pixels;
-        p_src = GST_VIDEO_FRAME_PLANE_DATA( p_frame, i_plane );
-        i_dst_stride = p_pic->p[i_plane].i_pitch;
-        i_src_stride = GST_VIDEO_FRAME_PLANE_STRIDE( p_frame, i_plane );
-
-        i_w = GST_VIDEO_FRAME_COMP_WIDTH( p_frame,
-                i_plane ) * GST_VIDEO_FRAME_COMP_PSTRIDE( p_frame, i_plane );
-        i_h = GST_VIDEO_FRAME_COMP_HEIGHT( p_frame, i_plane );
-
-        for( i_line = 0;
-                i_line < __MIN( p_pic->p[i_plane].i_lines, i_h );
-                i_line++ )
-        {
-            memcpy( p_dst, p_src, i_w );
-            p_src += i_src_stride;
-            p_dst += i_dst_stride;
-        }
-    }
-}
-
-/* Check if the element can use this caps */
-static gint find_decoder_func( gconstpointer p_p1, gconstpointer p_p2 )
-{
-    GstElementFactory *p_factory;
-    sink_src_caps_t *p_caps;
-
-    p_factory = ( GstElementFactory* )p_p1;
-    p_caps = ( sink_src_caps_t* )p_p2;
-
-    return !( gst_element_factory_can_sink_any_caps( p_factory,
-                p_caps->p_sinkcaps ) &&
-            gst_element_factory_can_src_any_caps( p_factory,
-                p_caps->p_srccaps ) );
-}
-
-static bool default_msg_handler( decoder_t *p_dec, GstMessage *p_msg )
-{
-    bool err = false;
-
-    switch( GST_MESSAGE_TYPE( p_msg ) ){
-    case GST_MESSAGE_ERROR:
-        {
-            gchar  *psz_debug;
-            GError *p_error;
-
-            gst_message_parse_error( p_msg, &p_error, &psz_debug );
-            g_free( psz_debug );
-
-            msg_Err( p_dec, "Error from %s: %s",
-                    GST_ELEMENT_NAME( GST_MESSAGE_SRC( p_msg ) ),
-                    p_error->message );
-            g_error_free( p_error );
-            err = true;
-        }
-        break;
-    case GST_MESSAGE_WARNING:
-        {
-            gchar  *psz_debug;
-            GError *p_error;
-
-            gst_message_parse_warning( p_msg, &p_error, &psz_debug );
-            g_free( psz_debug );
-
-            msg_Warn( p_dec, "Warning from %s: %s",
-                    GST_ELEMENT_NAME( GST_MESSAGE_SRC( p_msg ) ),
-                    p_error->message );
-            g_error_free( p_error );
-        }
-        break;
-    case GST_MESSAGE_INFO:
-        {
-            gchar  *psz_debug;
-            GError *p_error;
-
-            gst_message_parse_info( p_msg, &p_error, &psz_debug );
-            g_free( psz_debug );
-
-            msg_Info( p_dec, "Info from %s: %s",
-                    GST_ELEMENT_NAME( GST_MESSAGE_SRC( p_msg ) ),
-                    p_error->message );
-            g_error_free( p_error );
-        }
-        break;
-    default:
-        break;
-    }
-
-    return err;
-}
-
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
  *****************************************************************************/
@@ -485,7 +451,11 @@ static int OpenDecoder( vlc_object_t *p_this )
 #define VLC_GST_CHECK( r, v, s, t ) \
     { if( r == v ){ msg_Err( p_dec, s ); i_rval = t; goto fail; } }
 
-    vlc_gst_init( );
+    if( !vlc_gst_init( ))
+    {
+        msg_Err( p_dec, "failed to register vlcvideosink" );
+        return VLC_EGENERIC;
+    }
 
     p_str = vlc_to_gst_fmt( &p_dec->fmt_in );
     if( !p_str )
@@ -554,7 +524,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     VLC_GST_CHECK( p_sys->p_decode_src, NULL, "appsrc not found",
             VLC_ENOMOD );
     g_object_set( G_OBJECT( p_sys->p_decode_src ), "caps", caps.p_sinkcaps,
-            "block", FALSE, "emit-signals", TRUE, "format", GST_FORMAT_BYTES,
+            "emit-signals", TRUE, "format", GST_FORMAT_BYTES,
             "stream-type", GST_APP_STREAM_TYPE_SEEKABLE,
             /* Making DecodeBlock() to block on appsrc with max queue size of 1 byte.
              * This will make the push_buffer() tightly coupled with the buffer
@@ -576,21 +546,31 @@ static int OpenDecoder( vlc_object_t *p_this )
                 VLC_ENOMOD );
         //g_object_set( G_OBJECT( p_sys->p_decode_in ),
         //"max-size-buffers", 2, NULL );
+        //g_signal_connect( G_OBJECT( p_sys->p_decode_in ), "no-more-pads",
+                //G_CALLBACK( no_more_pads_cb ), p_dec );
         g_signal_connect( G_OBJECT( p_sys->p_decode_in ), "pad-added",
                 G_CALLBACK( pad_added_cb ), p_dec );
-        g_signal_connect( G_OBJECT( p_sys->p_decode_in ), "no-more-pads",
-                G_CALLBACK( no_more_pads_cb ), p_dec );
+
     }
 
-    /* fakesink: will emit signal for every available buffer */
-    p_sys->p_decode_out = gst_element_factory_make( "fakesink", NULL );
-    VLC_GST_CHECK( p_sys->p_decode_out, NULL, "fakesink not found",
+    /* videosink: will emit signal for every available buffer */
+    p_sys->p_decode_out = gst_element_factory_make( "vlcvideosink", NULL );
+    VLC_GST_CHECK( p_sys->p_decode_out, NULL, "vlcvideosink not found",
             VLC_ENOMOD );
-    /* connect to the signal with the callback */
-    g_object_set( G_OBJECT( p_sys->p_decode_out ), "sync", FALSE,
-            "enable-last-sample", FALSE, "signal-handoffs", TRUE, NULL );
-    g_signal_connect( G_OBJECT( p_sys->p_decode_out ), "handoff",
+    p_sys->p_allocator = gst_vlc_picture_plane_allocator_new(
+            (gpointer) p_dec );
+    g_object_set( G_OBJECT( p_sys->p_decode_out ), "sync", FALSE, "allocator",
+            p_sys->p_allocator, "id", (gpointer) p_dec, NULL );
+    g_signal_connect( G_OBJECT( p_sys->p_decode_out ), "new-buffer",
             G_CALLBACK( frame_handoff_cb ), p_dec );
+
+    //FIXME: caps_signal
+#if 0
+    g_signal_connect( G_OBJECT( p_sys->p_decode_out ), "new-caps",
+            G_CALLBACK( caps_handoff_cb ), p_dec );
+#else
+    GST_VLC_VIDEO_SINK( p_sys->p_decode_out )->new_caps = caps_handoff_cb;
+#endif
 
     p_sys->p_decoder = GST_ELEMENT( gst_bin_new( "decoder" ) );
     VLC_GST_CHECK( p_sys->p_decoder, NULL, "bin not found", VLC_ENOMOD );
@@ -736,7 +716,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
          *     \                        /
          *   ___v____GSTREAMER BIN_____/____
          *  |                               |
-         *  |   appsrc-->decode-->fakesink  |
+         *  |   appsrc-->decode-->vlcsink   |
          *  |_______________________________|
          *
          * * * * * * * * * * * * * * * * * * * * */
@@ -788,33 +768,43 @@ check_messages:
     /* Look for any output buffers in the queue */
     if( gst_atomic_queue_peek( p_sys->p_que ) )
     {
-        GstVideoFrame frame;
+        GstBuffer *p_buf = GST_BUFFER_CAST(
+                gst_atomic_queue_pop( p_sys->p_que ));
+        GstMemory *p_mem;
 
-        /* Get a new picture */
-        p_pic = decoder_NewPicture( p_dec );
-        if( !p_pic )
-            goto done;
+        if(( p_mem = gst_buffer_peek_memory( p_buf, 0 )) &&
+            GST_IS_VLC_PICTURE_PLANE_ALLOCATOR( p_mem->allocator ))
+        {
+            p_pic = picture_Hold(( (GstVlcPicturePlane*) p_mem )->p_pic );
+        }
+        else
+        {
+            GstVideoFrame frame;
 
-        p_buf = GST_BUFFER_CAST(
-                gst_atomic_queue_pop( p_sys->p_que ) );
+            /* Get a new picture */
+            p_pic = decoder_NewPicture( p_dec );
+            if( !p_pic )
+                goto done;
+
+            if( unlikely( !gst_video_frame_map( &frame,
+                            &p_sys->vinfo, p_buf, GST_MAP_READ ) ) )
+            {
+                msg_Err( p_dec, "failed to map gst video frame" );
+                gst_buffer_unref( p_buf );
+                p_dec->b_error = true;
+                goto done;
+            }
+
+            gst_CopyPicture( p_pic, &frame );
+            gst_video_frame_unmap( &frame );
+        }
 
         if( likely( GST_BUFFER_PTS_IS_VALID( p_buf ) ) )
             p_pic->date = gst_util_uint64_scale(
-                    GST_BUFFER_PTS( p_buf ), GST_MSECOND, GST_SECOND );
+                GST_BUFFER_PTS( p_buf ), GST_MSECOND, GST_SECOND );
         else
             msg_Warn( p_dec, "Gst Buffer has no timestamp" );
 
-        if( unlikely( !gst_video_frame_map( &frame,
-                        &p_sys->vinfo, p_buf, GST_MAP_READ ) ) )
-        {
-            msg_Err( p_dec, "failed to map gst video frame" );
-            gst_buffer_unref( p_buf );
-            p_dec->b_error = true;
-            goto done;
-        }
-
-        gst_CopyPicture( p_pic, &frame );
-        gst_video_frame_unmap( &frame );
         gst_buffer_unref( p_buf );
     }
 
@@ -828,15 +818,18 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = ( decoder_t* )p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
+    gboolean b_running = p_sys->b_running;
 
-    if( p_sys->b_running )
+    if( b_running )
     {
         GstMessage *p_msg;
         GstFlowReturn i_ret;
 
+        p_sys->b_running = false;
+
         /* Send EOS to the pipeline */
         i_ret = gst_app_src_end_of_stream(
-                GST_APP_SRC_CAST( p_sys->p_decode_src ) );
+                GST_APP_SRC_CAST( p_sys->p_decode_src ));
         msg_Dbg( p_dec, "app src eos: %s", gst_flow_get_name( i_ret ) );
 
         /* and catch it on the bus with a timeout */
@@ -872,13 +865,14 @@ static void CloseDecoder( vlc_object_t *p_this )
         gst_atomic_queue_unref( p_sys->p_que );
     }
 
-    if( p_sys->b_running &&
-            gst_element_set_state( p_sys->p_decoder, GST_STATE_NULL )
+    if( b_running && gst_element_set_state( p_sys->p_decoder, GST_STATE_NULL )
             != GST_STATE_CHANGE_SUCCESS )
         msg_Warn( p_dec,
                 "failed to change the state to NULL," \
                 "pipeline may not close gracefully" );
 
+    if( p_sys->p_allocator )
+        gst_object_unref( p_sys->p_allocator );
     if( p_sys->p_bus )
         gst_object_unref( p_sys->p_bus );
     if( p_sys->p_decode_src )
