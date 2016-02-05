@@ -39,10 +39,9 @@
 #include <assert.h>
 
 #define COBJMACROS
+#include <shobjidl.h>
 
 #include "common.h"
-
-#include <vlc_windows_interfaces.h>
 
 static void CommonChangeThumbnailClip(vout_display_t *, bool show);
 #if !VLC_WINSTORE_APP

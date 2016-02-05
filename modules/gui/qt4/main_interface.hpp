@@ -29,12 +29,12 @@
 
 #include "util/qvlcframe.hpp"
 
-#ifdef _WIN32
- #include <vlc_windows_interfaces.h>
-#endif
-
 #include <QSystemTrayIcon>
 #include <QStackedWidget>
+
+#ifdef _WIN32
+# include <shobjidl.h>
+#endif
 
 class QSettings;
 class QCloseEvent;

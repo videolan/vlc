@@ -50,8 +50,8 @@
 #define ICON_HEIGHT 48
 
 #ifdef _WIN32
-# include <vlc_windows_interfaces.h>
 # include <vlc_charset.h>
+# include <shobjidl.h>
 #endif
 #include <vlc_modules.h>
 

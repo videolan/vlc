@@ -30,7 +30,6 @@
 #include "components/interface_widgets.hpp"
 
 #include <QBitmap>
-#include <vlc_windows_interfaces.h>
 
 #include <assert.h>
 
