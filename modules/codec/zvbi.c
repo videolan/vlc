@@ -76,10 +76,20 @@ static void Close( vlc_object_t * );
 #define TELX_LONGTEXT N_( "Output teletext subtitles as text " \
   "instead of as RGBA" )
 
+#define LEVEL_TEXT N_("Presentation Level")
+
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
+
+static const int level_values[] = { 0, 1, 2, 3 };
+static const char *const level_descriptions[] =
+{ N_("1"), N_("1.5"), N_("2.5"), N_("3.5") };
+
+/* separate internal and zvbi values, as the latter could change */
+static const int level_zvbi_values[] =
+{ VBI_WST_LEVEL_1, VBI_WST_LEVEL_1p5, VBI_WST_LEVEL_2p5, VBI_WST_LEVEL_3p5 };
 
 vlc_module_begin ()
     set_description( N_("VBI and Teletext decoder") )
@@ -97,6 +107,8 @@ vlc_module_begin ()
         change_integer_list( pi_pos_values, ppsz_pos_descriptions );
     add_bool( "vbi-text", false,
               TELX_TEXT, TELX_LONGTEXT, false )
+    add_integer( "vbi-level", 3, LEVEL_TEXT, NULL, false )
+        change_integer_list( level_values, level_descriptions );
 vlc_module_end ()
 
 /****************************************************************************
@@ -154,6 +166,7 @@ struct decoder_sys_t
     unsigned int      i_wanted_subpage;
     /* */
     bool              b_opaque;
+    unsigned int      i_level;
     struct {
         int pgno, subno;
     }                 nav_link[6];
@@ -254,6 +267,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_text = var_CreateGetBool( p_dec, "vbi-text" );
 //    var_AddCallback( p_dec, "vbi-text", Text, p_sys );
+
+    p_sys->i_level = var_CreateGetInteger( p_dec, "vbi-level" );
 
     /* Listen for keys */
     var_AddCallback( p_dec->p_libvlc, "key-pressed", EventKey, p_dec );
@@ -361,13 +376,14 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     const unsigned int i_wanted_page = p_sys->i_wanted_page;
     const unsigned int i_wanted_subpage = p_sys->i_wanted_subpage;
     const bool b_opaque = p_sys->b_opaque;
+    const unsigned int i_level = p_sys->i_level > 3 ? 3 : p_sys->i_level;
     vlc_mutex_unlock( &p_sys->lock );
 
     /* Try to see if the page we want is in the cache yet */
     memset( &p_page, 0, sizeof(vbi_page) );
     b_cached = vbi_fetch_vt_page( p_sys->p_vbi_dec, &p_page,
                                   vbi_dec2bcd( i_wanted_page ),
-                                  i_wanted_subpage, VBI_WST_LEVEL_3p5,
+                                  i_wanted_subpage, level_zvbi_values[i_level],
                                   25, true );
 
     if( i_wanted_page == p_sys->i_last_page && !p_sys->b_update )
