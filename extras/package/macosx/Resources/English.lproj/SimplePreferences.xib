@@ -234,6 +234,9 @@ Gw
                                 <constraint firstItem="2277" firstAttribute="centerY" secondItem="2275" secondAttribute="centerY" id="p1P-4F-ead"/>
                             </constraints>
                         </view>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="40" id="FeC-YL-hWD"/>
+                        </constraints>
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
@@ -241,7 +244,6 @@ Gw
                 <constraints>
                     <constraint firstItem="2410" firstAttribute="leading" secondItem="2266" secondAttribute="leading" id="5aq-6C-R23"/>
                     <constraint firstAttribute="bottom" secondItem="2410" secondAttribute="bottom" constant="-2" id="9wr-cv-O4F"/>
-                    <constraint firstItem="2410" firstAttribute="top" secondItem="2266" secondAttribute="top" id="Ber-OW-tKE"/>
                     <constraint firstAttribute="trailing" secondItem="2410" secondAttribute="trailing" id="Kpv-q7-teO"/>
                 </constraints>
             </view>
@@ -291,6 +293,7 @@ Gw
                             <constraint firstItem="3928" firstAttribute="leading" secondItem="3556" secondAttribute="leading" id="8Rq-oQ-Kvw"/>
                             <constraint firstItem="3560" firstAttribute="leading" secondItem="3556" secondAttribute="leading" constant="28" id="ANo-21-s8c"/>
                             <constraint firstItem="3556" firstAttribute="top" secondItem="3928" secondAttribute="bottom" constant="14" id="ArR-8i-gEj"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3560" secondAttribute="trailing" constant="28" id="Dhw-Vj-OVM"/>
                             <constraint firstItem="3928" firstAttribute="leading" secondItem="nnH-Tj-ON7" secondAttribute="leading" constant="16" id="KBn-vy-58f"/>
                             <constraint firstItem="3928" firstAttribute="top" secondItem="nnH-Tj-ON7" secondAttribute="top" constant="10" id="QC3-ep-bpv"/>
                         </constraints>
@@ -685,7 +688,7 @@ Gw
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2335">
-                                <rect key="frame" x="250" y="102" width="209" height="21"/>
+                                <rect key="frame" x="250" y="102" width="209" height="20"/>
                                 <sliderCell key="cell" continuous="YES" alignment="left" maxValue="200" doubleValue="100" tickMarkPosition="above" sliderType="linear" id="3459">
                                     <font key="font" size="12" name="Helvetica"/>
                                 </sliderCell>
