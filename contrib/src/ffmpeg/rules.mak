@@ -158,8 +158,10 @@ FFMPEGCONF += --enable-w32threads --enable-dxva2
 
 ifdef HAVE_WIN64
 FFMPEGCONF += --cpu=athlon64 --arch=x86_64
-else # !WIN64
+else
+ifeq ($(ARCH),i386) # 32bits intel
 FFMPEGCONF+= --cpu=i686 --arch=x86
+endif
 endif
 
 else # !Windows
