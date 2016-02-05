@@ -64,7 +64,8 @@ const uint8_t ATSC_A65_MODE_RESERVED_RANGES[12] = {
 struct atsc_a65_handle_t
 {
     char *psz_lang;
-    vlc_iconv_t iconv16;
+    vlc_iconv_t iconv_ucs2;
+    vlc_iconv_t iconv_u16be;
 };
 
 atsc_a65_handle_t *atsc_a65_handle_New( const char *psz_lang )
@@ -77,15 +78,18 @@ atsc_a65_handle_t *atsc_a65_handle_New( const char *psz_lang )
         else
             p_handle->psz_lang = NULL;
 
-        p_handle->iconv16 = NULL;
+        p_handle->iconv_ucs2 = NULL;
+        p_handle->iconv_u16be = NULL;
     }
     return p_handle;
 }
 
 void atsc_a65_handle_Release( atsc_a65_handle_t *p_handle )
 {
-    if( p_handle->iconv16 )
-        vlc_iconv_close( p_handle->iconv16 );
+    if( p_handle->iconv_ucs2 )
+        vlc_iconv_close( p_handle->iconv_ucs2 );
+    if( p_handle->iconv_u16be )
+        vlc_iconv_close( p_handle->iconv_u16be );
     free( p_handle->psz_lang );
     free( p_handle );
 }
@@ -145,12 +149,12 @@ static bool convert_encoding_set( atsc_a65_handle_t *p_handle,
     else if( i_mode > ATSC_A65_MODE_UNICODE_RANGE_START &&  /* 8 range prefix + 8 */
              i_mode <= ATSC_A65_MODE_UNICODE_RANGE_END )
     {
-        if( !p_handle->iconv16 )
+        if( !p_handle->iconv_ucs2 )
         {
-            if ( !(p_handle->iconv16 = vlc_iconv_open("UTF-8", "UCS-2BE")) )
+            if ( !(p_handle->iconv_ucs2 = vlc_iconv_open("UTF-8", "UCS-2BE")) )
                 return false;
         }
-        else if ( VLC_ICONV_ERR == vlc_iconv( p_handle->iconv16, NULL, NULL, NULL, NULL ) ) /* reset */
+        else if ( VLC_ICONV_ERR == vlc_iconv( p_handle->iconv_ucs2, NULL, NULL, NULL, NULL ) ) /* reset */
         {
             return false;
         }
@@ -166,8 +170,8 @@ static bool convert_encoding_set( atsc_a65_handle_t *p_handle,
                 const size_t i_outbuf_size = i_src * 4;
                 size_t i_inbuf_remain = i_src * 2;
                 size_t i_outbuf_remain = i_outbuf_size;
-                b_ret = ( VLC_ICONV_ERR != vlc_iconv( p_handle->iconv16, &p_inbuf, &i_inbuf_remain,
-                                                                         &p_outbuf, &i_outbuf_remain ) );
+                b_ret = ( VLC_ICONV_ERR != vlc_iconv( p_handle->iconv_ucs2, &p_inbuf, &i_inbuf_remain,
+                                                                            &p_outbuf, &i_outbuf_remain ) );
                 psz_dest = psz_realloc;
                 i_mergmin1 += (i_outbuf_size - i_outbuf_remain);
                 psz_dest[i_mergmin1 - 1] = 0;
@@ -246,3 +250,38 @@ error:
 }
 
 #undef BUF_ADVANCE
+
+char * atsc_a65_Decode_simple_UTF16_string( atsc_a65_handle_t *p_handle, const uint8_t *p_buffer, size_t i_buffer )
+{
+    if( i_buffer < 1 )
+        return NULL;
+
+    if( !p_handle->iconv_u16be )
+    {
+        if ( !(p_handle->iconv_u16be = vlc_iconv_open("UTF-8", "UTF-16BE")) )
+            return NULL;
+    }
+    else if ( VLC_ICONV_ERR == vlc_iconv( p_handle->iconv_u16be, NULL, NULL, NULL, NULL ) ) /* reset */
+    {
+        return NULL;
+    }
+
+    const size_t i_target_buffer = i_buffer * 3 / 2;
+    size_t i_target_remaining = i_target_buffer;
+    const char *psz_toconvert = (const char *) p_buffer;
+    char *psz_converted_end;
+    char *psz_converted = psz_converted_end = malloc( i_target_buffer );
+
+    if( unlikely(!psz_converted) )
+        return NULL;
+
+    if( VLC_ICONV_ERR == vlc_iconv( p_handle->iconv_u16be, &psz_toconvert, &i_buffer,
+                                                           &psz_converted_end, &i_target_remaining ) )
+    {
+        free( psz_converted );
+        psz_converted = NULL;
+    }
+
+    psz_converted[ i_target_buffer - i_target_remaining - 1 ] = 0;
+    return psz_converted;
+}
