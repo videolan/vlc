@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10102" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10102"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCDebugMessageVisualizer">
@@ -27,9 +27,8 @@
                 <rect key="frame" x="0.0" y="0.0" width="599" height="368"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button verticalHuggingPriority="750" id="3">
-                        <rect key="frame" x="7" y="7" width="185" height="28"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3">
+                        <rect key="frame" x="7" y="6" width="107" height="28"/>
                         <buttonCell key="cell" type="push" title="Save this Log..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="12">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -38,9 +37,8 @@
                             <action selector="saveDebugLog:" target="-2" id="15"/>
                         </connections>
                     </button>
-                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="5">
+                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5">
                         <rect key="frame" x="-1" y="41" width="601" height="328"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="05u-WN-jV3">
                             <rect key="frame" x="0.0" y="0.0" width="601" height="328"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -83,9 +81,8 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" id="4">
+                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4">
                         <rect key="frame" x="560" y="4" width="32" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="round" bezelStyle="circular" imagePosition="only" alignment="left" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" id="11">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -94,9 +91,8 @@
                             <action selector="updateMessagesPanel:" target="-2" id="18"/>
                         </connections>
                     </button>
-                    <button verticalHuggingPriority="750" id="RCj-GY-IGn">
-                        <rect key="frame" x="190" y="7" width="143" height="28"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RCj-GY-IGn">
+                        <rect key="frame" x="112" y="6" width="54" height="28"/>
                         <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="Q3G-xK-ViK">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -106,6 +102,18 @@
                         </connections>
                     </button>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="3" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="12" id="05f-Xh-tfu"/>
+                    <constraint firstAttribute="bottom" secondItem="4" secondAttribute="bottom" constant="11" id="7zt-QH-rJp"/>
+                    <constraint firstItem="5" firstAttribute="top" secondItem="2" secondAttribute="top" constant="-1" id="Ads-nH-X1f"/>
+                    <constraint firstItem="RCj-GY-IGn" firstAttribute="leading" secondItem="3" secondAttribute="trailing" constant="8" id="aeD-b6-0an"/>
+                    <constraint firstAttribute="trailing" secondItem="4" secondAttribute="trailing" constant="13" id="iHM-MS-G0X"/>
+                    <constraint firstAttribute="bottom" secondItem="5" secondAttribute="bottom" constant="41" id="iuv-rO-dhp"/>
+                    <constraint firstItem="RCj-GY-IGn" firstAttribute="centerY" secondItem="4" secondAttribute="centerY" id="mN8-Nc-5OU"/>
+                    <constraint firstItem="3" firstAttribute="centerY" secondItem="RCj-GY-IGn" secondAttribute="centerY" id="qS9-lu-mTh"/>
+                    <constraint firstItem="5" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="-1" id="u5w-ec-jpB"/>
+                    <constraint firstAttribute="trailing" secondItem="5" secondAttribute="trailing" constant="-1" id="upq-hj-ceP"/>
+                </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="25"/>
