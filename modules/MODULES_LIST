@@ -54,6 +54,7 @@ $Id$
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
  * audiounit_ios: AudioUnit output plugin for iOS
  * auhal: Audio output for Mac OS X based on the AUHAL API
+ * avahi: Zeroconf services discovery
  * avcapture: AVFoundation based video capture module
  * avcodec: libavcodec audio/video decoder
  * avformat: libavformat demuxer
@@ -64,7 +65,6 @@ $Id$
  * blend: a picture filter that blends two pictures
  * blendbench: a picture filter that test performance of blending routines
  * bluescreen: Bluescreen (weather channel like) video filter
- * bonjour: Zeroconf services discovery
  * bpg: BPG image decoder using libbpg
  * caca: color ASCII art video output using libcaca
  * cache_block: block stream caching stream filter

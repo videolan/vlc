@@ -4012,8 +4012,8 @@ AS_IF([test "${enable_vsxu}" != "no"],
 
 EXTEND_HELP_STRING([Service Discovery plugins:])
 dnl
-dnl  Bonjour services discovery
-PKG_ENABLE_MODULES_VLC([BONJOUR], [], [avahi-client >= 0.6], [Bonjour services discovery], [auto])
+dnl  Avahi-Zeroconf services discovery
+PKG_ENABLE_MODULES_VLC([AVAHI], [], [avahi-client >= 0.6], [Zeroconf services discovery], [auto])
 
 dnl
 dnl  libudev services discovery

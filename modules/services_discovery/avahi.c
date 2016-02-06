@@ -1,5 +1,5 @@
 /*****************************************************************************
- * bonjour.c: Bonjour services discovery module
+ * avahi.c: Bonjour services discovery module
  *****************************************************************************
  * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
@@ -46,14 +46,14 @@
  *****************************************************************************/
 
 /* Callbacks */
-    static int  Open ( vlc_object_t * );
-    static void Close( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER("bonjour", "Bonjour services", SD_CAT_LAN)
+VLC_SD_PROBE_HELPER("avahi", "Zeroconf network services", SD_CAT_LAN)
 
 vlc_module_begin ()
-    set_shortname( "Bonjour" )
-    set_description( N_("Bonjour services") )
+    set_shortname( "Avahi" )
+    set_description( N_("Zeroconf services") )
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_SD )
     set_capability( "services_discovery", 0 )
@@ -115,7 +115,7 @@ static void resolve_callback(
 {
     services_discovery_t *p_sd = ( services_discovery_t* )userdata;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
-    
+
     VLC_UNUSED(interface); VLC_UNUSED(host_name);
     VLC_UNUSED(flags);
 
