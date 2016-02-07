@@ -1,0 +1,26 @@
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+This patch with pulled from gmp.
+https://gmplib.org/repo/gmp/rev/4a6d258b467f
+Upstream-Status: Backport
+
+# HG changeset patch
+# User Torbjorn Granlund <tege@gmplib.org>
+# Date 1395835068 -3600
+# Node ID 4a6d258b467f661da0894cc60ecd060f2e3c67c7
+# Parent  301ce2788826a2d4d2725bd5cf01e998638db37a
+Provide default for BMOD_1_TO_MOD_1_THRESHOLD.
+
+diff -r 301ce2788826 -r 4a6d258b467f mpn/powerpc64/mode64/gcd_1.asm
+--- a/mpn/powerpc64/mode64/gcd_1.asm    Tue Mar 25 15:34:52 2014 +0100
++++ b/mpn/powerpc64/mode64/gcd_1.asm    Wed Mar 26 12:57:48 2014 +0100
+@@ -43,6 +43,9 @@
+ define(`n',     `r4')
+ define(`v0',    `r5')
+
++ifdef(`BMOD_1_TO_MOD_1_THRESHOLD',,
++  `define(`BMOD_1_TO_MOD_1_THRESHOLD',30)')
++
+ EXTERN_FUNC(mpn_mod_1)
+ EXTERN_FUNC(mpn_modexact_1c_odd)
