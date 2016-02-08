@@ -74,7 +74,6 @@ struct access_sys_t
 
 UpnpInstanceWrapper* UpnpInstanceWrapper::s_instance;
 vlc_mutex_t UpnpInstanceWrapper::s_lock = VLC_STATIC_MUTEX;
-vlc_cond_t UpnpInstanceWrapper::s_cond = VLC_STATIC_COND;
 
 /*
  * VLC callback prototypes
@@ -1079,12 +1078,6 @@ UpnpInstanceWrapper::~UpnpInstanceWrapper()
 UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, Upnp_FunPtr callback, SD::MediaServerList *opaque)
 {
     vlc_mutex_locker lock( &s_lock );
-
-    /* refcount is 0 but instance is not NULL, UpnpFinish is being called so
-     * wait for it to finish */
-    while ( s_instance != NULL && s_instance->refcount_ == 0 )
-        vlc_cond_wait( &s_cond, &s_lock );
-
     if ( s_instance == NULL )
     {
         UpnpInstanceWrapper* instance = new(std::nothrow) UpnpInstanceWrapper;
@@ -1143,7 +1136,7 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, Upnp_FunPtr c
 
 void UpnpInstanceWrapper::release(bool isSd)
 {
-    vlc_mutex_lock( &s_lock );
+    vlc_mutex_locker lock( &s_lock );
     if ( isSd )
     {
         callback_ = NULL;
@@ -1151,16 +1144,9 @@ void UpnpInstanceWrapper::release(bool isSd)
     }
     if (--s_instance->refcount_ == 0)
     {
-        vlc_mutex_unlock( &s_lock );
-        /* UpnpFinish must be called unlocked since callbacks can still be
-         * called when shuting down upnp threads */
         delete s_instance;
-        vlc_mutex_lock( &s_lock );
-
         s_instance = NULL;
-        vlc_cond_signal( &s_cond );
     }
-    vlc_mutex_unlock( &s_lock );
 }
 
 UpnpClient_Handle UpnpInstanceWrapper::handle() const
