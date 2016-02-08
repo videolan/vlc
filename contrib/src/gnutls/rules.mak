@@ -51,15 +51,17 @@ GNUTLS_CONF := \
 	--disable-tests \
 	$(HOSTCONF)
 
+GNUTLS_ENV := $(HOSTVARS)
+
 DEPS_gnutls = nettle $(DEPS_nettle)
+
+ifdef HAVE_ANDROID
+GNUTLS_ENV += gl_cv_header_working_stdint_h=yes
+endif
 
 .gnutls: gnutls
 	$(RECONF)
-ifdef HAVE_ANDROID
-	cd $< && $(HOSTVARS) gl_cv_header_working_stdint_h=yes ./configure $(GNUTLS_CONF)
-else
-	cd $< && $(HOSTVARS) ./configure $(GNUTLS_CONF)
-endif
+	cd $< && $(GNUTLS_ENV) ./configure $(GNUTLS_CONF)
 	cd $</gl && $(MAKE) install
 	cd $</lib && $(MAKE) install
 	touch $@
