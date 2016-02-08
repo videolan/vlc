@@ -119,6 +119,9 @@ static bool convert_encoding_set( atsc_a65_handle_t *p_handle,
     size_t i_mergmin1 = *pi_mergmin1;
     bool b_ret = true;
 
+    if( i_src == 0 )
+        return NULL;
+
     /* First exclude reserved ranges */
     for( unsigned i=0; i<12; i+=2 )
     {
@@ -160,13 +163,14 @@ static bool convert_encoding_set( atsc_a65_handle_t *p_handle,
             {
                 const char *p_inbuf = psz16;
                 char *p_outbuf = &psz_realloc[i_mergmin1];
-                size_t i_inbuf = i_src * 2;
-                size_t i_outbuf = i_src * 4;
-                b_ret = ( VLC_ICONV_ERR != vlc_iconv( p_handle->iconv16, &p_inbuf, &i_inbuf,
-                                                                         &p_outbuf, &i_outbuf ) );
+                const size_t i_outbuf_size = i_src * 4;
+                size_t i_inbuf_remain = i_src * 2;
+                size_t i_outbuf_remain = i_outbuf_size;
+                b_ret = ( VLC_ICONV_ERR != vlc_iconv( p_handle->iconv16, &p_inbuf, &i_inbuf_remain,
+                                                                         &p_outbuf, &i_outbuf_remain ) );
                 psz_dest = psz_realloc;
-                i_mergmin1 += i_outbuf;
-                psz_dest[i_mergmin1] = 0;
+                i_mergmin1 += (i_outbuf_size - i_outbuf_remain);
+                psz_dest[i_mergmin1 - 1] = 0;
             }
             free( psz16 );
         }
