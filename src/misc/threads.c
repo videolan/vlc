@@ -1,7 +1,7 @@
 /*****************************************************************************
  * threads.c: LibVLC generic thread support
  *****************************************************************************
- * Copyright (C) 2009-2012 Rémi Denis-Courmont
+ * Copyright (C) 2009-2016 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -23,6 +23,7 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 
@@ -47,6 +48,133 @@ void vlc_global_mutex (unsigned n, bool acquire)
     else
         vlc_mutex_unlock (lock);
 }
+
+#ifdef LIBVLC_NEED_CONDVAR
+#include <stdalign.h>
+#include <vlc_atomic.h>
+
+static void vlc_cancel_addr_prepare(void *addr)
+{
+    /* Let thread subsystem on address to broadcast for cancellation */
+    vlc_cancel_addr_set(addr);
+    vlc_cleanup_push(vlc_cancel_addr_clear, addr);
+    /* Check if cancellation was pending before vlc_cancel_addr_set() */
+    vlc_testcancel();
+    vlc_cleanup_pop();
+}
+
+static void vlc_cancel_addr_finish(void *addr)
+{
+    vlc_cancel_addr_clear(addr);
+    /* Act on cancellation as potential wake-up source */
+    vlc_testcancel();
+}
+
+static inline atomic_int *vlc_cond_value(vlc_cond_t *cond)
+{
+    /* XXX: ugly but avoids including vlc_atomic.h in vlc_threads.h */
+    static_assert (sizeof (cond->value) <= sizeof (atomic_int),
+                   "Size mismatch!");
+    static_assert ((alignof (cond->value) % alignof (atomic_int)) == 0,
+                   "Alignment mismatch");
+    return (atomic_int *)&cond->value;
+}
+
+void vlc_cond_init(vlc_cond_t *cond)
+{
+    /* Initial value is irrelevant but set it for happy debuggers */
+    atomic_init(vlc_cond_value(cond), 0);
+}
+
+void vlc_cond_init_daytime(vlc_cond_t *cond)
+{
+    vlc_cond_init(cond);
+}
+
+void vlc_cond_destroy(vlc_cond_t *cond)
+{
+    /* Tempting sanity check but actually incorrect:
+    assert((atomic_load_explicit(vlc_cond_value(cond),
+                                 memory_order_relaxed) & 1) == 0);
+     * Due to timeouts and spurious wake-ups, the futex value can look like
+     * there are waiters, even though there are none. */
+    (void) cond;
+}
+
+void vlc_cond_signal(vlc_cond_t *cond)
+{
+    /* Probably the best documented approach is that of Bionic: increment
+     * the futex here, and simply load the value in cond_wait(). This has a bug
+     * as unlikely as well-known: signals get lost if the futex is incremented
+     * an exact multiple of 2^(CHAR_BIT * sizeof (int)) times.
+     *
+     * Here, we simply clear the low order bit, while cond_wait() sets it.
+     * It makes cond_wait() somewhat slower, but it should be free of bugs,
+     * leaves the other bits free for other uses (e.g. flags).
+     **/
+    atomic_fetch_and_explicit(vlc_cond_value(cond), -2, memory_order_relaxed);
+    /* We have to wake the futex even if the low order bit is cleared, as there
+     * could be more than one thread queued, not all of them already awoken. */
+    vlc_addr_signal(&cond->value);
+}
+
+void vlc_cond_broadcast(vlc_cond_t *cond)
+{
+    atomic_fetch_and_explicit(vlc_cond_value(cond), -2, memory_order_relaxed);
+    vlc_addr_broadcast(&cond->value);
+}
+
+void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
+{
+    int value = atomic_fetch_or_explicit(vlc_cond_value(cond), 1,
+                                         memory_order_relaxed) | 1;
+
+    vlc_cancel_addr_prepare(&cond->value);
+    vlc_mutex_unlock(mutex);
+
+    vlc_addr_wait(&cond->value, value);
+
+    vlc_mutex_lock(mutex);
+    vlc_cancel_addr_finish(&cond->value);
+}
+
+static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
+                               mtime_t delay)
+{
+    int value = atomic_fetch_or_explicit(vlc_cond_value(cond), 1,
+                                         memory_order_relaxed) | 1;
+
+    vlc_cancel_addr_prepare(&cond->value);
+    vlc_mutex_unlock(mutex);
+
+    if (delay > 0)
+        value = vlc_addr_timedwait(&cond->value, value, delay);
+    else
+        value = 0;
+
+    vlc_mutex_lock(mutex);
+    vlc_cancel_addr_finish(&cond->value);
+
+    return value ? 0 : ETIMEDOUT;
+}
+
+int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex, mtime_t deadline)
+{
+    return vlc_cond_wait_delay(cond, mutex, deadline - mdate());
+}
+
+int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
+                               time_t deadline)
+{
+    struct timespec ts;
+
+    timespec_get(&ts, TIME_UTC);
+    deadline -= ts.tv_sec * CLOCK_FREQ;
+    deadline -= ts.tv_nsec / (1000000000 / CLOCK_FREQ);
+
+    return vlc_cond_wait_delay(cond, mutex, deadline);
+}
+#endif
 
 #ifdef LIBVLC_NEED_RWLOCK
 /*** Generic read/write locks ***/

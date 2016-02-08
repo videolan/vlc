@@ -328,6 +328,14 @@ typedef struct vlc_timer *vlc_timer_t;
 
 #endif
 
+#ifdef LIBVLC_NEED_CONDVAR
+typedef struct
+{
+    int value;
+} vlc_cond_t;
+# define VLC_STATIC_COND { 0 }
+#endif
+
 #ifdef LIBVLC_NEED_SEMAPHORE
 typedef struct vlc_sem
 {
@@ -918,6 +926,14 @@ VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t) VLC_USED;
  */
 VLC_API unsigned vlc_GetCPUCount(void);
 
+enum
+{
+    VLC_CLEANUP_PUSH,
+    VLC_CLEANUP_POP,
+    VLC_CANCEL_ADDR_SET,
+    VLC_CANCEL_ADDR_CLEAR,
+};
+
 #if defined (LIBVLC_USE_PTHREAD_CLEANUP)
 /**
  * Registers a thread cancellation handler.
@@ -947,11 +963,6 @@ VLC_API unsigned vlc_GetCPUCount(void);
 # define vlc_cleanup_pop( ) pthread_cleanup_pop (0)
 
 #else
-enum
-{
-    VLC_CLEANUP_PUSH,
-    VLC_CLEANUP_POP,
-};
 typedef struct vlc_cleanup_t vlc_cleanup_t;
 
 struct vlc_cleanup_t
@@ -980,6 +991,16 @@ static inline void vlc_cleanup_lock (void *lock)
     vlc_mutex_unlock ((vlc_mutex_t *)lock);
 }
 #define mutex_cleanup_push( lock ) vlc_cleanup_push (vlc_cleanup_lock, lock)
+
+static inline void vlc_cancel_addr_set(void *addr)
+{
+    vlc_control_cancel(VLC_CANCEL_ADDR_SET, addr);
+}
+
+static inline void vlc_cancel_addr_clear(void *addr)
+{
+    vlc_control_cancel(VLC_CANCEL_ADDR_CLEAR, addr);
+}
 
 #ifdef __cplusplus
 /**
