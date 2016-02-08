@@ -63,6 +63,7 @@ struct services_discovery_sys_t
 {
     UpnpInstanceWrapper* p_upnp;
     SD::MediaServerList* p_server_list;
+    vlc_thread_t         thread;
 };
 
 struct access_sys_t
@@ -198,6 +199,29 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 namespace SD
 {
 
+static void *
+SearchThread( void *p_data )
+{
+    services_discovery_t *p_sd = ( services_discovery_t* )p_data;
+    services_discovery_sys_t *p_sys  = p_sd->p_sys;
+
+    /* Search for media servers */
+    int i_res = UpnpSearchAsync( p_sys->p_upnp->handle(), 5,
+            MEDIA_SERVER_DEVICE_TYPE, p_sys->p_upnp );
+    if( i_res != UPNP_E_SUCCESS )
+    {
+        msg_Err( p_sd, "Error sending search request: %s", UpnpGetErrorMessage( i_res ) );
+        return NULL;
+    }
+
+    /* Search for Sat Ip servers*/
+    i_res = UpnpSearchAsync( p_sys->p_upnp->handle(), 5,
+            SATIP_SERVER_DEVICE_TYPE, p_sys->p_upnp );
+    if( i_res != UPNP_E_SUCCESS )
+        msg_Err( p_sd, "Error sending search request: %s", UpnpGetErrorMessage( i_res ) );
+    return NULL;
+}
+
 /*
  * Initializes UPNP instance.
  */
@@ -220,27 +244,20 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_upnp = UpnpInstanceWrapper::get( p_this, SD::MediaServerList::Callback, p_sys->p_server_list );
     if ( !p_sys->p_upnp )
     {
-        Close( p_this );
+        delete p_sys->p_server_list;
+        free(p_sys);
         return VLC_EGENERIC;
     }
 
-    /* Search for media servers */
-    int i_res = UpnpSearchAsync( p_sys->p_upnp->handle(), 5,
-            MEDIA_SERVER_DEVICE_TYPE, p_sys->p_upnp );
-    if( i_res != UPNP_E_SUCCESS )
+    /* XXX: Contrary to what the libupnp doc states, UpnpSearchAsync is
+     * blocking (select() and send() are called). Therefore, Call
+     * UpnpSearchAsync from an other thread. */
+    if ( vlc_clone( &p_sys->thread, SearchThread, p_this,
+                    VLC_THREAD_PRIORITY_LOW ) )
     {
-        msg_Err( p_sd, "Error sending search request: %s", UpnpGetErrorMessage( i_res ) );
-        Close( p_this );
-        return VLC_EGENERIC;
-    }
-
-    /* Search for Sat Ip servers*/
-    i_res = UpnpSearchAsync( p_sys->p_upnp->handle(), 5,
-            SATIP_SERVER_DEVICE_TYPE, p_sys->p_upnp );
-    if( i_res != UPNP_E_SUCCESS )
-    {
-        msg_Err( p_sd, "Error sending search request: %s", UpnpGetErrorMessage( i_res ) );
-        Close( p_this );
+        p_sys->p_upnp->release( true );
+        delete p_sys->p_server_list;
+        free(p_sys);
         return VLC_EGENERIC;
     }
 
@@ -255,8 +272,8 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    if (p_sys->p_upnp)
-        p_sys->p_upnp->release( true );
+    vlc_join( p_sys->thread, NULL );
+    p_sys->p_upnp->release( true );
     delete p_sys->p_server_list;
     free( p_sys );
 }
