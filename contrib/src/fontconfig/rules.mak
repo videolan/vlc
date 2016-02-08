@@ -1,7 +1,7 @@
 # fontconfig
 
 FONTCONFIG_VERSION := 2.11.1
-FONTCONFIG_URL := http://fontconfig.org/release/fontconfig-$(FONTCONFIG_VERSION).tar.gz
+FONTCONFIG_URL := https://www.freedesktop.org/software/fontconfig/release/fontconfig-$(FONTCONFIG_VERSION).tar.gz
 
 PKGS += fontconfig
 ifeq ($(call need_pkg,"fontconfig"),)
