@@ -82,7 +82,6 @@ vlc_module_end()
  * Local prototypes
  *****************************************************************************/
 struct picture_sys_t {
-    vout_display_sys_t *sys;
     void *id;
 };
 
@@ -280,7 +279,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
             count = i;
             break;
         }
-        picsys->sys = sys;
         picsys->id = NULL;
 
         picture_resource_t rsc = { .p_sys = picsys };
