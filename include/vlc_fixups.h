@@ -359,6 +359,13 @@ struct if_nameindex
 # define if_freenameindex(list) (void)0
 #endif
 
+#ifndef HAVE_STRUCT_TIMESPEC
+struct timespec {
+    time_t  tv_sec;   /* Seconds */
+    long    tv_nsec;  /* Nanoseconds */
+};
+#endif
+
 #ifdef _WIN32
 struct iovec
 {
