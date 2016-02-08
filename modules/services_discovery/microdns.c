@@ -28,6 +28,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_services_discovery.h>
@@ -65,6 +66,7 @@ vlc_module_end ()
 struct services_discovery_sys_t
 {
     vlc_thread_t        thread;
+    atomic_bool         stop;
     struct mdns_ctx *   p_microdns;
     char *              psz_service_names_opt;
     const char **       ppsz_service_names;
@@ -307,9 +309,15 @@ static bool
 stop_cb( void *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    vlc_testcancel();
-    items_timeout( p_sd );
-    return false;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+
+    if( atomic_load( &p_sys->stop ) )
+        return true;
+    else
+    {
+        items_timeout( p_sd );
+        return false;
+    }
 }
 
 static void *
@@ -341,6 +349,7 @@ Open( vlc_object_t *p_obj )
     if( !p_sys )
         return VLC_ENOMEM;
 
+    atomic_init( &p_sys->stop, false );
     vlc_array_init( &p_sys->items );
     config_ChainParse( p_sd, CFG_PREFIX, ppsz_options, p_sd->p_cfg );
 
@@ -433,7 +442,7 @@ Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = (services_discovery_t *) p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    vlc_cancel( p_sys->thread );
+    atomic_store( &p_sys->stop, true );
     vlc_join( p_sys->thread, NULL );
 
     items_clear( p_sd );
