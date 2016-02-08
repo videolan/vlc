@@ -97,7 +97,10 @@ static void *test_thread_cancel(void *data)
 {
     vlc_interrupt_t *ctx = data;
 
+    int canc = vlc_savecancel();
     test_context_simple(ctx);
+    vlc_restorecancel(canc);
+
     /* Test context clearing on cancellation */
     vlc_interrupt_set(ctx);
     for (;;)
