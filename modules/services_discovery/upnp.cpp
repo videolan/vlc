@@ -213,6 +213,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_server_list = new(std::nothrow) SD::MediaServerList( p_sd );
     if ( unlikely( p_sys->p_server_list == NULL ) )
     {
+        free(p_sys);
         return VLC_ENOMEM;
     }
 
