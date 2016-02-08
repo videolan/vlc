@@ -119,9 +119,7 @@ static void Unlock(void *data, picture_t *pic)
     for (int i = 0; i < pic->i_planes; i++)
         planes[i] = pic->p[i].p_pixels;
 
-    if (sys->unlock != NULL)
-        sys->unlock(sys->opaque, picsys->id, planes);
-
+    sys->unlock(sys->opaque, picsys->id, planes);
 }
 
 /*****************************************************************************
@@ -256,7 +254,8 @@ static void Close(vlc_object_t *object)
 
     if (sys->pool)
     {
-        picture_pool_Enum(sys->pool, Unlock, sys);
+        if (sys->unlock != NULL)
+            picture_pool_Enum(sys->pool, Unlock, sys);
         picture_pool_Release(sys->pool);
     }
     free(sys);
