@@ -307,6 +307,8 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     size_t copy;
     bool eof;
 
+    if (buflen == 0)
+        return buflen;
     if (buf == NULL)
     {
         Seek(stream, sys->stream_offset + buflen);
@@ -339,12 +341,9 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     char *p = sys->buffer + (sys->stream_offset % sys->buffer_size);
     if (copy > buflen)
         copy = buflen;
-    if (copy > 0)
-    {
-        memcpy(buf, p, copy);
-        sys->stream_offset += copy;
-        vlc_cond_signal(&sys->wait_space);
-    }
+    memcpy(buf, p, copy);
+    sys->stream_offset += copy;
+    vlc_cond_signal(&sys->wait_space);
     vlc_mutex_unlock(&sys->lock);
     return copy;
 }
