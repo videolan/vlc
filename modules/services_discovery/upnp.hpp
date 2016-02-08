@@ -72,6 +72,7 @@ private:
     static UpnpInstanceWrapper* s_instance;
     static vlc_mutex_t s_lock;
     UpnpClient_Handle handle_;
+    vlc_mutex_t callback_lock_; // protect opaque_ and callback_
     SD::MediaServerList* opaque_;
     Upnp_FunPtr callback_;
     int refcount_;
