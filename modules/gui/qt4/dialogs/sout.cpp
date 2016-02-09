@@ -73,7 +73,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     ui.destBox->addItem( "RTP / MPEG Transport Stream" );
     ui.destBox->addItem( "RTP Audio/Video Profile" );
     ui.destBox->addItem( "UDP (legacy)" );
-    ui.destBox->addItem( "IceCast" );
+    ui.destBox->addItem( "Icecast" );
 
     BUTTONACT( ui.addButton, addDest() );
 
