@@ -51,7 +51,7 @@ static void CloseEncoder(vlc_object_t *);
 static block_t *Encode(encoder_t *p_enc, picture_t *p_pict);
 
 #define QUALITY_MODE_TEXT N_("Quality mode")
-#define QUALITY_MODE_LONGTEXT N_("Quality setting which will determine max encoding time, default 0\n" \
+#define QUALITY_MODE_LONGTEXT N_("Quality setting which will determine max encoding time\n" \
         " - 0: Good quality\n"\
         " - 1: Realtime\n"\
         " - 2: Best quality")
