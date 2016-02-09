@@ -63,7 +63,7 @@ static void vpx_err_msg(vlc_object_t *this, struct vpx_codec_ctx *ctx,
     msg_Err(this, msg, error, detail);
 }
 
-#define VPX_ERR(this, ctx, msg) vpx_err_msg(VLC_OBJECT(this), ctx, msg)
+#define VPX_ERR(this, ctx, msg) vpx_err_msg(VLC_OBJECT(this), ctx, msg ": %s (%s)")
 
 /*****************************************************************************
  * decoder_sys_t: libvpx decoder descriptor
@@ -107,7 +107,7 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
 
     if (err != VPX_CODEC_OK) {
         free(pkt_pts);
-        VPX_ERR(dec, ctx, "Failed to decode frame: %s (%s)");
+        VPX_ERR(dec, ctx, "Failed to decode frame");
         return NULL;
     }
 
@@ -199,7 +199,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         vp_version, vpx_codec_version_str(), vpx_codec_build_config());
 
     if (vpx_codec_dec_init(&sys->ctx, iface, &deccfg, 0) != VPX_CODEC_OK) {
-        VPX_ERR(p_this, &sys->ctx, "Failed to initialize decoder: %s (%s)");
+        VPX_ERR(p_this, &sys->ctx, "Failed to initialize decoder");
         free(sys);
         return VLC_EGENERIC;;
     }
