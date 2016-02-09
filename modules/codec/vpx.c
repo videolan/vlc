@@ -37,8 +37,8 @@
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int OpenDecoder(vlc_object_t *);
+static void CloseDecoder(vlc_object_t *);
 
 /*****************************************************************************
  * Module descriptor
@@ -48,7 +48,7 @@ vlc_module_begin ()
     set_shortname("vpx")
     set_description(N_("WebM video decoder"))
     set_capability("decoder", 60)
-    set_callbacks(Open, Close)
+    set_callbacks(OpenDecoder, CloseDecoder)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
 vlc_module_end ()
@@ -152,9 +152,9 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
 }
 
 /*****************************************************************************
- * Open: probe the decoder
+ * OpenDecoder: probe the decoder
  *****************************************************************************/
-static int Open(vlc_object_t *p_this)
+static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *dec = (decoder_t *)p_this;
     const struct vpx_codec_iface *iface;
@@ -208,9 +208,9 @@ static int Open(vlc_object_t *p_this)
 }
 
 /*****************************************************************************
- * Close: decoder destruction
+ * CloseDecoder: decoder destruction
  *****************************************************************************/
-static void Close(vlc_object_t *p_this)
+static void CloseDecoder(vlc_object_t *p_this)
 {
     decoder_t *dec = (decoder_t *)p_this;
     decoder_sys_t *sys = dec->p_sys;
