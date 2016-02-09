@@ -187,7 +187,7 @@ static int Open(vlc_object_t *p_this)
         .threads = __MIN(vlc_GetCPUCount(), 16)
     };
 
-    msg_Dbg(p_this, "VP%d: using libvpx version %s (build options %s)", 
+    msg_Dbg(p_this, "VP%d: using libvpx version %s (build options %s)",
         vp_version, vpx_codec_version_str(), vpx_codec_build_config());
 
     if (vpx_codec_dec_init(&sys->ctx, iface, &deccfg, 0) != VPX_CODEC_OK) {
