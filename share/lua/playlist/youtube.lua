@@ -234,6 +234,8 @@ function probe()
         end
     end
     return (  string.match( vlc.path, "/watch%?" ) -- the html page
+            or string.match( vlc.path, "/live$" ) -- user live stream html page
+            or string.match( vlc.path, "/live%?" ) -- user live stream html page
             or string.match( vlc.path, "/get_video_info%?" ) -- info API
             or string.match( vlc.path, "/v/" ) -- video in swf player
             or string.match( vlc.path, "/embed/" ) -- embedded player iframe
@@ -243,6 +245,8 @@ end
 -- Parse function.
 function parse()
     if string.match( vlc.path, "/watch%?" )
+        or string.match( vlc.path, "/live$" )
+        or string.match( vlc.path, "/live%?" )
     then -- This is the HTML page's URL
         -- fmt is the format of the video
         -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs)
