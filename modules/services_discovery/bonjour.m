@@ -40,13 +40,15 @@ VLC_SD_PROBE_HELPER( "Bonjour", "Bonjour Network Discovery", SD_CAT_LAN )
  * Module descriptor
  */
 vlc_module_begin()
-set_shortname( "bonjour" )
-set_description( N_( "Bonjour Network Discovery" ) )
-set_category( CAT_PLAYLIST )
-set_subcategory( SUBCAT_PLAYLIST_SD )
-set_capability( "services_discovery", 0 )
-set_callbacks( Open, Close )
-VLC_SD_PROBE_SUBMODULE
+    set_shortname( "Bonjour" )
+    set_description( N_( "Bonjour Network Discovery" ) )
+    set_category( CAT_PLAYLIST )
+    set_subcategory( SUBCAT_PLAYLIST_SD )
+    set_capability( "services_discovery", 0 )
+    set_callbacks( Open, Close )
+    add_shortcut( "mdns", "bonjour" )
+
+    VLC_SD_PROBE_SUBMODULE
 vlc_module_end ()
 
 NSString *const VLCBonjourProtocolName = @"VLCBonjourProtocolName";
