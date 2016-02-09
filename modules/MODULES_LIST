@@ -62,6 +62,7 @@ $Id$
  * avio: Access and Stream output module using libavformat network
  * ball: Augmented reality ball video filter module
  * bandlimited_resampler: Bandlimited interpolation audio resampler
+ * bonjour: mDNS services discovery module based on Bonjour
  * blend: a picture filter that blends two pictures
  * blendbench: a picture filter that test performance of blending routines
  * bluescreen: Bluescreen (weather channel like) video filter
