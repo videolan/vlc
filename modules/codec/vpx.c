@@ -299,7 +299,7 @@ static int OpenEncoder(vlc_object_t *p_this)
         vp_version = 8;
         break;
 #endif
-#ifdef ENABLE_VP9_DECODER
+#ifdef ENABLE_VP9_ENCODER
     case VLC_CODEC_VP9:
         iface = &vpx_codec_vp9_cx_algo;
         vp_version = 9;
