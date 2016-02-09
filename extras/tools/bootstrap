@@ -109,6 +109,7 @@ esac
 
 cat > Makefile << EOF
 MAKEFLAGS += -j$CPUS
+CMAKEFLAGS += --parallel=$CPUS
 $CC
 $CXX
 PREFIX=\$(abspath ./build)
