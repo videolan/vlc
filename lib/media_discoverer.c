@@ -385,3 +385,122 @@ libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis )
 {
     return p_mdis->running;
 }
+
+void
+libvlc_media_discoverer_services_release( libvlc_media_discoverer_service **pp_services,
+                                          unsigned int i_count )
+{
+    if( i_count > 0 )
+    {
+        for( unsigned int i = 0; i < i_count; ++i )
+        {
+            free( pp_services[i]->psz_name );
+            free( pp_services[i]->psz_longname );
+        }
+        free( *pp_services );
+        free( pp_services );
+    }
+}
+
+unsigned int
+libvlc_media_discoverer_services_get( libvlc_instance_t *p_inst,
+                                      libvlc_media_discoverer_category i_cat,
+                                      libvlc_media_discoverer_service ***ppp_services )
+{
+    assert( p_inst != NULL && ppp_services != NULL );
+
+    int i_core_cat;
+    switch( i_cat )
+    {
+    case libvlc_media_discoverer_devices:
+        i_core_cat = SD_CAT_DEVICES;
+        break;
+    case libvlc_media_discoverer_lan:
+        i_core_cat = SD_CAT_LAN;
+        break;
+    case libvlc_media_discoverer_podcasts:
+        i_core_cat = SD_CAT_INTERNET;
+        break;
+    case libvlc_media_discoverer_localdirs:
+        i_core_cat = SD_CAT_MYCOMPUTER;
+        break;
+    default:
+        vlc_assert_unreachable();
+        *ppp_services = NULL;
+        return 0;
+    }
+
+    /* Fetch all sd names, longnames and categories */
+    char **ppsz_names, **ppsz_longnames;
+    int *p_categories;
+    ppsz_names = vlc_sd_GetNames( p_inst->p_libvlc_int, &ppsz_longnames,
+                                  &p_categories );
+
+    if( ppsz_names == NULL )
+    {
+        *ppp_services = NULL;
+        return 0;
+    }
+
+    /* Count the number of sd matching our category (i_cat/i_core_cat) */
+    unsigned int i_nb_services = 0;
+    char **ppsz_name = ppsz_names;
+    int *p_category = p_categories;
+    for( ; *ppsz_name != NULL; ppsz_name++, p_category++ )
+    {
+        if( *p_category == i_core_cat )
+            i_nb_services++;
+    }
+
+    libvlc_media_discoverer_service **pp_services = NULL, *p_services = NULL;
+    if( i_nb_services > 0 )
+    {
+        /* Double alloc here, so that the caller iterates through pointers of
+         * struct instead of structs. This allows us to modify the struct
+         * without breaking the API. */
+
+        pp_services = malloc( i_nb_services
+                              * sizeof(libvlc_media_discoverer_service *) );
+        p_services = malloc( i_nb_services
+                             * sizeof(libvlc_media_discoverer_service) );
+        if( pp_services == NULL || p_services == NULL )
+        {
+            free( pp_services );
+            free( p_services );
+            pp_services = NULL;
+            p_services = NULL;
+            i_nb_services = 0;
+            /* Even if alloc fails, the next loop must be run in order to free
+             * names returned by vlc_sd_GetNames */
+        }
+    }
+
+    /* Fill output pp_services or free unused name, longname */
+    char **ppsz_longname = ppsz_longnames;
+    ppsz_name = ppsz_names;
+    p_category = p_categories;
+    unsigned int i_service_idx = 0;
+    libvlc_media_discoverer_service *p_service = p_services;
+    for( ; *ppsz_name != NULL; ppsz_name++, ppsz_longname++, p_category++,
+            p_service++ )
+    {
+        if( pp_services != NULL && *p_category == i_core_cat )
+        {
+            p_service->psz_name = *ppsz_name;
+            p_service->psz_longname = *ppsz_longname;
+            p_service->i_cat = i_cat;
+            pp_services[i_service_idx++] = p_service;
+        }
+        else
+        {
+            free( *ppsz_name );
+            free( *ppsz_longname );
+        }
+    }
+    free( ppsz_names );
+    free( ppsz_longnames );
+    free( p_categories );
+
+    *ppp_services = pp_services;
+    return i_nb_services;
+}

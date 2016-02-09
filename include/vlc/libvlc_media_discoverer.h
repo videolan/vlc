@@ -30,6 +30,31 @@
 extern "C" {
 # endif
 
+/**
+ * Category of a media discoverer service
+ * \see libvlc_media_discoverer_services_get()
+ */
+typedef enum {
+    /** devices, like portable music player */
+    libvlc_media_discoverer_devices,
+    /** LAN/WAN services, like Upnp, SMB, or SAP */
+    libvlc_media_discoverer_lan,
+    /** Podcasts */
+    libvlc_media_discoverer_podcasts,
+    /** Local directories, like Video, Music or Pictures directories */
+    libvlc_media_discoverer_localdirs,
+} libvlc_media_discoverer_category;
+
+/**
+ * Media discoverer service
+ * \see libvlc_media_discoverer_services_get()
+ */
+typedef struct {
+    char *psz_name;
+    char *psz_longname;
+    libvlc_media_discoverer_category i_cat;
+} libvlc_media_discoverer_service;
+
 /** \defgroup libvlc_media_discoverer LibVLC media discovery
  * \ingroup libvlc
  * LibVLC media discovery finds available media via various means.
@@ -144,6 +169,38 @@ LIBVLC_API libvlc_event_manager_t *
  */
 LIBVLC_API int
         libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
+
+/**
+ * Get media discoverer services by category
+ *
+ * \version LibVLC 3.0.0 and later.
+ *
+ * \param p_inst libvlc instance
+ * \param i_cat category of services to fetch
+ * \param ppp_services address to store an allocated array of media discoverer
+ * services (must be freed with libvlc_media_discoverer_services_release() by
+ * the caller) [OUT]
+ *
+ * \return the number of media discoverer services (zero on error)
+ */
+LIBVLC_API unsigned int
+libvlc_media_discoverer_services_get( libvlc_instance_t *p_inst,
+                                      libvlc_media_discoverer_category i_cat,
+                                      libvlc_media_discoverer_service ***ppp_services );
+
+/**
+ * Release an array of media discoverer services
+ *
+ * \version LibVLC 3.0.0 and later.
+ *
+ * \see libvlc_media_discoverer_services_get()
+ *
+ * \param pp_services array to release
+ * \param i_count number of elements in the array
+ */
+LIBVLC_API void
+libvlc_media_discoverer_services_release( libvlc_media_discoverer_service **pp_services,
+                                          unsigned int i_count );
 
 /**@} */
 
