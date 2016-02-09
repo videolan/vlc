@@ -58,7 +58,7 @@ vlc_module_begin()
     set_subcategory( SUBCAT_PLAYLIST_SD )
     set_capability( "services_discovery", 0 )
     set_callbacks( Open, Close )
-    add_shortcut( "microdns" )
+    add_shortcut( "mdns", "microdns" )
     add_string( CFG_PREFIX "names", NULL, NAMES_TEXT, NAMES_LONGTEXT, false )
     VLC_SD_PROBE_SUBMODULE
 vlc_module_end ()
