@@ -90,7 +90,7 @@ CPUS=
 CC=
 CXX=
 case `uname` in
-    Linux)
+    Linux|MINGW32*|MINGW64*)
         CPUS=`grep -c ^processor /proc/cpuinfo`
      ;;
     Darwin)
