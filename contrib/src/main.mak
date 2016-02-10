@@ -445,7 +445,15 @@ list:
 toolchain.cmake:
 	$(RM) $@
 ifdef HAVE_WIN32
+ifdef HAVE_WINDOWSPHONE
+	echo "set(CMAKE_SYSTEM_NAME WindowsPhone)" >> $@
+else
+ifdef HAVE_WINSTORE
+	echo "set(CMAKE_SYSTEM_NAME WindowsStore)" >> $@
+else
 	echo "set(CMAKE_SYSTEM_NAME Windows)" >> $@
+endif
+endif
 	echo "set(CMAKE_RC_COMPILER $(HOST)-windres)" >> $@
 endif
 ifdef HAVE_DARWIN_OS
