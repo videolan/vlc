@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10102" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10102"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9532"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -28,7 +28,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Synchronization" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="SyncTracks" animationBehavior="default" id="1" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -38,16 +38,14 @@
                 <rect key="frame" x="0.0" y="0.0" width="399" height="224"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <box autoresizesSubviews="NO" title="Audio/Video" borderType="line" titlePosition="noTitle" id="5">
+                    <box autoresizesSubviews="NO" title="Audio/Video" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="5">
                         <rect key="frame" x="13" y="156" width="374" height="47"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="cSz-hU-mVM">
                             <rect key="frame" x="1" y="1" width="372" height="45"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" id="6" customClass="BGHUDLabel">
-                                    <rect key="frame" x="15" y="16" width="239" height="14"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6" customClass="BGHUDLabel">
+                                    <rect key="frame" x="15" y="16" width="154" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio track synchronization:" id="7">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -57,9 +55,11 @@
                                         <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                     </userDefinedRuntimeAttributes>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="8">
-                                    <rect key="frame" x="261" y="14" width="76" height="19"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8">
+                                    <rect key="frame" x="261" y="13" width="76" height="19"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="76" id="inS-O9-M4h"/>
+                                    </constraints>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" usesSingleLineMode="YES" id="9" customClass="BGHUDTextFieldCell">
                                         <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" lenient="YES" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="97"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -76,9 +76,8 @@
                                         <action selector="avValueChanged:" target="-2" id="125"/>
                                     </connections>
                                 </textField>
-                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="10">
-                                    <rect key="frame" x="343" y="12" width="15" height="22"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="10">
+                                    <rect key="frame" x="343" y="11" width="15" height="22"/>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="11" customClass="BGHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
@@ -87,20 +86,30 @@
                                     </connections>
                                 </stepper>
                             </subviews>
+                            <constraints>
+                                <constraint firstItem="6" firstAttribute="centerY" secondItem="cSz-hU-mVM" secondAttribute="centerY" id="5Vp-9w-oUr"/>
+                                <constraint firstItem="6" firstAttribute="leading" secondItem="cSz-hU-mVM" secondAttribute="leading" constant="17" id="aVd-9P-n8Q"/>
+                                <constraint firstItem="10" firstAttribute="leading" secondItem="8" secondAttribute="trailing" constant="8" id="s7s-bB-pDz"/>
+                                <constraint firstItem="10" firstAttribute="centerY" secondItem="cSz-hU-mVM" secondAttribute="centerY" id="vZl-MW-Ozf"/>
+                                <constraint firstItem="8" firstAttribute="centerY" secondItem="10" secondAttribute="centerY" id="zRC-FF-830"/>
+                                <constraint firstAttribute="trailing" secondItem="10" secondAttribute="trailing" constant="16" id="zeF-Id-Fsw"/>
+                            </constraints>
                         </view>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="368" id="I8D-7z-2zb"/>
+                            <constraint firstAttribute="height" constant="41" id="Whk-sM-ECW"/>
+                        </constraints>
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
-                    <box autoresizesSubviews="NO" title="Subtitles/Video" borderType="line" titlePosition="noTitle" id="16">
+                    <box autoresizesSubviews="NO" title="Subtitles/Video" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="16">
                         <rect key="frame" x="13" y="32" width="376" height="109"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="KDu-mg-vUb">
                             <rect key="frame" x="1" y="1" width="374" height="107"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" id="21" customClass="BGHUDLabel">
-                                    <rect key="frame" x="15" y="79" width="241" height="14"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="21" customClass="BGHUDLabel">
+                                    <rect key="frame" x="15" y="79" width="164" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Subtitle track synchronization:" id="22">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -110,9 +119,11 @@
                                         <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                     </userDefinedRuntimeAttributes>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="20">
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20">
                                     <rect key="frame" x="261" y="76" width="76" height="19"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="76" id="tG8-JT-7nv"/>
+                                    </constraints>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" usesSingleLineMode="YES" id="23" customClass="BGHUDTextFieldCell">
                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" numberStyle="decimal" generatesDecimalNumbers="YES" lenient="YES" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" positiveSuffix=" s" negativeSuffix=" s" id="95"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -129,9 +140,8 @@
                                         <action selector="svAdvanceValueChanged:" target="-2" id="127"/>
                                     </connections>
                                 </textField>
-                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="19">
+                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="19">
                                     <rect key="frame" x="343" y="74" width="15" height="22"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="24" customClass="BGHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
@@ -139,9 +149,8 @@
                                         <action selector="svAdvanceValueChanged:" target="-2" id="128"/>
                                     </connections>
                                 </stepper>
-                                <textField verticalHuggingPriority="750" id="27" customClass="BGHUDLabel">
-                                    <rect key="frame" x="15" y="47" width="241" height="14"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="27" customClass="BGHUDLabel">
+                                    <rect key="frame" x="15" y="47" width="84" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Subtitle speed:" id="36">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -151,9 +160,11 @@
                                         <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                     </userDefinedRuntimeAttributes>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="28">
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
                                     <rect key="frame" x="261" y="45" width="76" height="19"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="76" id="RzA-y1-IKH"/>
+                                    </constraints>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" usesSingleLineMode="YES" id="35" customClass="BGHUDTextFieldCell">
                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" numberStyle="decimal" lenient="YES" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" positiveSuffix=" s" negativeSuffix=" s" id="96"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -170,9 +181,17 @@
                                         <action selector="svSpeedValueChanged:" target="-2" id="131"/>
                                     </connections>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="98" customClass="BGHUDLabel">
-                                    <rect key="frame" x="15" y="16" width="241" height="14"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="29">
+                                    <rect key="frame" x="343" y="43" width="15" height="22"/>
+                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="100" doubleValue="1" id="34" customClass="BGHUDStepperCell">
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </stepperCell>
+                                    <connections>
+                                        <action selector="svSpeedValueChanged:" target="-2" id="132"/>
+                                    </connections>
+                                </stepper>
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="98" customClass="BGHUDLabel">
+                                    <rect key="frame" x="15" y="17" width="129" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Subtitle duration factor:" id="102">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -182,9 +201,11 @@
                                         <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                                     </userDefinedRuntimeAttributes>
                                 </textField>
-                                <textField verticalHuggingPriority="750" id="99">
-                                    <rect key="frame" x="261" y="14" width="76" height="19"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="99">
+                                    <rect key="frame" x="261" y="15" width="76" height="19"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="76" id="nde-XV-AvS"/>
+                                    </constraints>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" usesSingleLineMode="YES" id="100" customClass="BGHUDTextFieldCell">
                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" numberStyle="decimal" lenient="YES" minimumIntegerDigits="0" maximumIntegerDigits="2000000000" maximumFractionDigits="3" positiveSuffix=" s" negativeSuffix=" s" id="101"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -201,19 +222,8 @@
                                         <action selector="svDurationValueChanged:" target="-2" id="129"/>
                                     </connections>
                                 </textField>
-                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="29">
-                                    <rect key="frame" x="343" y="43" width="15" height="22"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="100" doubleValue="1" id="34" customClass="BGHUDStepperCell">
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </stepperCell>
-                                    <connections>
-                                        <action selector="svSpeedValueChanged:" target="-2" id="132"/>
-                                    </connections>
-                                </stepper>
-                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="105">
+                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="105">
                                     <rect key="frame" x="343" y="13" width="15" height="22"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="20" id="106" customClass="BGHUDStepperCell">
                                         <font key="font" metaFont="smallSystem"/>
                                     </stepperCell>
@@ -222,13 +232,36 @@
                                     </connections>
                                 </stepper>
                             </subviews>
+                            <constraints>
+                                <constraint firstItem="98" firstAttribute="leading" secondItem="27" secondAttribute="leading" id="46x-ee-a5b"/>
+                                <constraint firstItem="20" firstAttribute="centerY" secondItem="19" secondAttribute="centerY" id="4HX-er-iB1"/>
+                                <constraint firstItem="21" firstAttribute="centerY" secondItem="20" secondAttribute="centerY" id="6VJ-D5-VQ6"/>
+                                <constraint firstItem="19" firstAttribute="leading" secondItem="20" secondAttribute="trailing" constant="8" id="9qQ-wN-2RZ"/>
+                                <constraint firstItem="27" firstAttribute="centerY" secondItem="28" secondAttribute="centerY" id="EHm-VK-wRd"/>
+                                <constraint firstItem="21" firstAttribute="leading" secondItem="KDu-mg-vUb" secondAttribute="leading" constant="17" id="FaN-bF-8S3"/>
+                                <constraint firstItem="29" firstAttribute="centerX" secondItem="19" secondAttribute="centerX" id="Lcf-SW-6Mj"/>
+                                <constraint firstItem="105" firstAttribute="leading" secondItem="99" secondAttribute="trailing" constant="8" id="N3A-1H-ZYe"/>
+                                <constraint firstItem="28" firstAttribute="centerY" secondItem="29" secondAttribute="centerY" id="Sd6-fF-Yg3"/>
+                                <constraint firstItem="105" firstAttribute="top" secondItem="29" secondAttribute="bottom" constant="11" id="TJZ-XO-XKw"/>
+                                <constraint firstItem="99" firstAttribute="centerY" secondItem="98" secondAttribute="centerY" id="XTF-YA-F2e"/>
+                                <constraint firstItem="29" firstAttribute="centerX" secondItem="105" secondAttribute="centerX" id="YYa-Ud-Obr"/>
+                                <constraint firstItem="29" firstAttribute="top" secondItem="19" secondAttribute="bottom" constant="12" id="Zg5-eS-SFV"/>
+                                <constraint firstItem="27" firstAttribute="leading" secondItem="21" secondAttribute="leading" id="onN-xA-vC9"/>
+                                <constraint firstAttribute="trailing" secondItem="19" secondAttribute="trailing" constant="18" id="peZ-90-9eH"/>
+                                <constraint firstItem="19" firstAttribute="top" secondItem="KDu-mg-vUb" secondAttribute="top" constant="12" id="tFi-50-Rg5"/>
+                                <constraint firstItem="29" firstAttribute="leading" secondItem="28" secondAttribute="trailing" constant="8" id="upi-Mf-NNY"/>
+                                <constraint firstItem="105" firstAttribute="centerY" secondItem="99" secondAttribute="centerY" id="yuz-V3-h8W"/>
+                            </constraints>
                         </view>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="103" id="H27-O9-MeO"/>
+                            <constraint firstAttribute="width" constant="370" id="TsA-IL-TxS"/>
+                        </constraints>
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
-                    <textField verticalHuggingPriority="750" id="37" customClass="BGHUDLabel">
-                        <rect key="frame" x="21" y="140" width="366" height="14"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="37" customClass="BGHUDLabel">
+                        <rect key="frame" x="21" y="140" width="85" height="14"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Subtitles/Video" id="38">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -238,9 +271,8 @@
                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                         </userDefinedRuntimeAttributes>
                     </textField>
-                    <textField verticalHuggingPriority="750" id="39" customClass="BGHUDLabel">
-                        <rect key="frame" x="21" y="201" width="366" height="14"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="39" customClass="BGHUDLabel">
+                        <rect key="frame" x="21" y="201" width="68" height="14"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio/Video" id="40">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -250,10 +282,9 @@
                             <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
                         </userDefinedRuntimeAttributes>
                     </textField>
-                    <button verticalHuggingPriority="750" id="41">
-                        <rect key="frame" x="16" y="12" width="73" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="6F72D97B-44EC-40A8-AB40-B66FEC1D3D5B" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="42" customClass="BGHUDButtonCell">
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="41">
+                        <rect key="frame" x="16" y="12" width="39" height="17"/>
+                        <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="92D21617-8D17-4241-AC95-8B9E3346C39B" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="42" customClass="BGHUDButtonCell">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="miniSystem"/>
                             <userDefinedRuntimeAttributes>
@@ -265,11 +296,23 @@
                         </connections>
                     </button>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="cSz-hU-mVM" firstAttribute="top" secondItem="39" secondAttribute="bottom" constant="-1" id="C8I-fd-Lya"/>
+                    <constraint firstItem="KDu-mg-vUb" firstAttribute="top" secondItem="37" secondAttribute="bottom" id="Gkb-7q-NgU"/>
+                    <constraint firstAttribute="bottom" secondItem="41" secondAttribute="bottom" constant="14" id="Kdv-uE-629"/>
+                    <constraint firstItem="16" firstAttribute="top" secondItem="5" secondAttribute="bottom" constant="21" id="NTF-Ew-Xby"/>
+                    <constraint firstItem="5" firstAttribute="top" secondItem="2" secondAttribute="top" constant="23" id="SYP-4K-N8J"/>
+                    <constraint firstItem="5" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="16" id="YNv-ok-Htz"/>
+                    <constraint firstItem="39" firstAttribute="leading" secondItem="cSz-hU-mVM" secondAttribute="leading" constant="9" id="pAV-oI-BqH"/>
+                    <constraint firstItem="41" firstAttribute="leading" secondItem="KDu-mg-vUb" secondAttribute="leading" constant="2" id="rO1-XT-nLK"/>
+                    <constraint firstItem="16" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="16" id="tDL-yc-wDo"/>
+                    <constraint firstItem="37" firstAttribute="leading" secondItem="KDu-mg-vUb" secondAttribute="leading" constant="9" id="vPw-fI-vlD"/>
+                </constraints>
             </view>
         </window>
     </objects>
     <resources>
-        <image name="6F72D97B-44EC-40A8-AB40-B66FEC1D3D5B" width="1" height="1">
+        <image name="92D21617-8D17-4241-AC95-8B9E3346C39B" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
