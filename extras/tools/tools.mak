@@ -298,3 +298,5 @@ distclean: clean
 	rm -fr $(DISTCLEAN_PKG)
 
 .PHONY: all clean distclean
+
+.DELETE_ON_ERROR:
