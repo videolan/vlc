@@ -57,6 +57,7 @@ template<typename T> class Integer
             try
             {
                 std::istringstream in(str);
+                in.imbue(std::locale("C"));
                 in >> value;
             } catch (int) {
                 value = 0;

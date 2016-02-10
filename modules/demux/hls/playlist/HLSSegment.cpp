@@ -136,6 +136,7 @@ void HLSSegment::setEncryption(SegmentEncryption &enc)
 void HLSSegment::debug(vlc_object_t *obj, int indent) const
 {
     std::stringstream ss;
+    ss.imbue(std::locale("C"));
     ss << std::string(indent, ' ') << debugName <<
     " #" << (getSequenceNumber() - Segment::SEQUENCE_FIRST) <<
     " url=" << getUrlSegment().toString();

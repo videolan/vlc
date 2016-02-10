@@ -30,6 +30,7 @@ ID::ID(const std::string &id_)
 ID::ID(uint64_t id_)
 {
     std::stringstream ss;
+    ss.imbue(std::locale("C"));
     ss << "default_id#" << id_;
     id = ss.str();
 }

@@ -96,6 +96,7 @@ UTCTime::UTCTime(const std::string &str)
     enum { UTCTIME_YEAR = 0, UTCTIME_MON, UTCTIME_DAY, UTCTIME_HOUR, UTCTIME_MIN, UTCTIME_SEC, UTCTIME_MSEC, UTCTIME_TZ };
     int values[8] = {0};
     std::istringstream in(str);
+    in.imbue(std::locale("C"));
 
     try
     {

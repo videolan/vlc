@@ -102,6 +102,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
         if(pos != std::string::npos)
         {
             std::stringstream ss;
+            ss.imbue(std::locale("C"));
             ss << getScaledTimeBySegmentNumber(number, templ);
             ret.replace(pos, std::string("$Time$").length(), ss.str());
         }
@@ -110,6 +111,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
         if(pos != std::string::npos)
         {
             std::stringstream ss;
+            ss.imbue(std::locale("C"));
             ss << getLiveTemplateNumberOffset(number, templ);
             ret.replace(pos, std::string("$Number$").length(), ss.str());
         }
@@ -124,6 +126,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
                 if(fmtend != std::string::npos)
                 {
                     std::istringstream iss(ret.substr(fmtstart, fmtend - fmtstart + 1));
+                    iss.imbue(std::locale("C"));
                     try
                     {
                         size_t width;
@@ -131,6 +134,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
                         if (iss.peek() != '$' && iss.peek() != 'd')
                             throw VLC_EGENERIC;
                         std::stringstream oss;
+                        oss.imbue(std::locale("C"));
                         oss.width(width); /* set format string length */
                         oss.fill('0');
                         oss << getLiveTemplateNumberOffset(number, templ);
@@ -145,6 +149,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
     if(pos != std::string::npos)
     {
         std::stringstream ss;
+        ss.imbue(std::locale("C"));
         ss << getBandwidth();
         ret.replace(pos, std::string("$Bandwidth$").length(), ss.str());
     }

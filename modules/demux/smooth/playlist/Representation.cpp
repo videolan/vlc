@@ -56,6 +56,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
         if(pos != std::string::npos)
         {
             std::stringstream ss;
+            ss.imbue(std::locale("C"));
             ss << templ->segmentTimeline.Get()->getScaledPlaybackTimeByElementNumber(number);
             ret.replace(pos, std::string("{start_time}").length(), ss.str());
         }
@@ -67,6 +68,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
     if(pos != std::string::npos)
     {
         std::stringstream ss;
+        ss.imbue(std::locale("C"));
         ss << getBandwidth();
         ret.replace(pos, std::string("{bitrate}").length(), ss.str());
     }

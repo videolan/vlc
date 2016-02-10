@@ -179,6 +179,7 @@ int HTTPConnection::parseReply()
         return VLC_ENOOBJ;
 
     std::istringstream ss(line.substr(9));
+    ss.imbue(std::locale("C"));
     int replycode;
     ss >> replycode;
     if (replycode != 200 && replycode != 206)
@@ -239,6 +240,7 @@ void HTTPConnection::onHeader(const std::string &key,
     if(key == "Content-Length")
     {
         std::istringstream ss(value);
+        ss.imbue(std::locale("C"));
         size_t length;
         ss >> length;
         contentLength = length;
@@ -264,6 +266,7 @@ std::string HTTPConnection::buildRequestHeader(const std::string &path) const
 std::string HTTPConnection::extraRequestHeaders() const
 {
     std::stringstream ss;
+    ss.imbue(std::locale("C"));
     if(bytesRange.isValid())
     {
         ss << "Range: bytes=" << bytesRange.getStartByte() << "-";

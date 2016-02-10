@@ -274,6 +274,7 @@ bool SegmentTimeline::Element::contains(stime_t time) const
 void SegmentTimeline::Element::debug(vlc_object_t *obj, int indent) const
 {
     std::stringstream ss;
+    ss.imbue(std::locale("C"));
     ss << std::string(indent + 1, ' ') << "Element #" << number
        << " d=" << d << " r=" << r << " @t=" << t;
     msg_Dbg(obj, "%s", ss.str().c_str());
