@@ -125,6 +125,9 @@ struct ts_psip_t
     int             i_version;
     ts_pes_es_t    *p_eas_es;
     ts_psip_context_t *p_ctx;
+    /* Used to track list of active pid for eit/ett, to call PIDRelease on them.
+       VCT table could have been used, but PIDSetup can fail, and we can't alter
+       the VCT table accordingly without going ahead of more troubles */
     DECL_ARRAY(ts_pid_t *) eit;
 
 };
