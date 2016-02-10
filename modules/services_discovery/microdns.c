@@ -40,8 +40,6 @@ static void Close( vlc_object_t * );
 
 VLC_SD_PROBE_HELPER( "microdns", "mDNS Network Discovery", SD_CAT_LAN )
 
-#define NAMES_TEXT N_( "Service Names" )
-#define NAMES_LONGTEXT N_( "List of names to look for, separated with ','" )
 
 #define CFG_PREFIX "sd-microdns-"
 
@@ -59,7 +57,6 @@ vlc_module_begin()
     set_capability( "services_discovery", 0 )
     set_callbacks( Open, Close )
     add_shortcut( "mdns", "microdns" )
-    add_string( CFG_PREFIX "names", NULL, NAMES_TEXT, NAMES_LONGTEXT, false )
     VLC_SD_PROBE_SUBMODULE
 vlc_module_end ()
 
@@ -68,7 +65,6 @@ struct services_discovery_sys_t
     vlc_thread_t        thread;
     atomic_bool         stop;
     struct mdns_ctx *   p_microdns;
-    char *              psz_service_names_opt;
     const char **       ppsz_service_names;
     unsigned int        i_nb_service_names;
     vlc_array_t         items;
@@ -103,7 +99,6 @@ static const struct
 #define NB_PROTOCOLS (sizeof(protocols) / sizeof(*protocols))
 
 static const char *const ppsz_options[] = {
-    "names",
     NULL
 };
 
@@ -354,54 +349,18 @@ Open( vlc_object_t *p_obj )
     vlc_array_init( &p_sys->items );
     config_ChainParse( p_sd, CFG_PREFIX, ppsz_options, p_sd->p_cfg );
 
-    p_sys->psz_service_names_opt =
-        var_GetNonEmptyString( p_sd, CFG_PREFIX "names" );
-    if( p_sys->psz_service_names_opt )
+    /* Listen to protocols that are handled by VLC */
+    const unsigned i_count = NB_PROTOCOLS;
+    p_sys->ppsz_service_names = calloc( i_count, sizeof(char*) );
+    if( !p_sys->ppsz_service_names )
+        goto error;
+
+    for( unsigned int i = 0; i < i_count; ++i )
     {
-        /* Listen to protocols from names option */
-        unsigned int i_count = 0;
-        size_t i_size;
-        char *psz = p_sys->psz_service_names_opt;
-        const char *psz_end = psz + strlen(psz);
-        while( psz < psz_end && ( i_size = strcspn(psz, ",") ) > 0 )
-        {
-            i_count++;
-            psz += i_size + 1;
-        }
-        assert( i_count > 0 );
-
-        p_sys->ppsz_service_names = calloc( i_count, sizeof(char*) );
-        if( !p_sys->ppsz_service_names )
-            goto error;
-
-        psz = p_sys->psz_service_names_opt;
-        for( unsigned int i = 0; i < i_count; ++i )
-        {
-            p_sys->ppsz_service_names[i] = psz;
-
-            i_size = strcspn( psz, "," );
-            assert( i_size > 0 );
-
-            psz[i_size] = '\0';
-            psz += i_size + 1;
-        }
-        p_sys->i_nb_service_names = i_count;
-    }
-    else
-    {
-        /* Listen to protocols that are handled by VLC */
-        const unsigned i_count = NB_PROTOCOLS;
-        p_sys->ppsz_service_names = calloc( i_count, sizeof(char*) );
-        if( !p_sys->ppsz_service_names )
-            goto error;
-
-        for( unsigned int i = 0; i < i_count; ++i )
-        {
-            /* Listen to a protocol only if a module can handle it */
-            if( module_exists( protocols[i].psz_protocol ) )
-                p_sys->ppsz_service_names[p_sys->i_nb_service_names++] =
-                    protocols[i].psz_service_name;
-        }
+        /* Listen to a protocol only if a module can handle it */
+        if( module_exists( protocols[i].psz_protocol ) )
+            p_sys->ppsz_service_names[p_sys->i_nb_service_names++] =
+                protocols[i].psz_service_name;
     }
 
     i_ret = VLC_EGENERIC;
@@ -431,7 +390,6 @@ Open( vlc_object_t *p_obj )
 error:
     if( p_sys->p_microdns != NULL )
         mdns_destroy( p_sys->p_microdns );
-    free( p_sys->psz_service_names_opt );
     free( p_sys->ppsz_service_names );
     free( p_sys );
     return i_ret;
@@ -449,7 +407,6 @@ Close( vlc_object_t *p_this )
     items_clear( p_sd );
     mdns_destroy( p_sys->p_microdns );
 
-    free( p_sys->psz_service_names_opt );
     free( p_sys->ppsz_service_names );
     free( p_sys );
 }
