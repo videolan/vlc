@@ -31,8 +31,8 @@ extern "C" {
 # endif
 
 /**
- * Category of a media discoverer service
- * \see libvlc_media_discoverer_services_get()
+ * Category of a media discoverer
+ * \see libvlc_media_discoverer_list_get()
  */
 typedef enum {
     /** devices, like portable music player */
@@ -46,14 +46,14 @@ typedef enum {
 } libvlc_media_discoverer_category;
 
 /**
- * Media discoverer service
- * \see libvlc_media_discoverer_services_get()
+ * Media discoverer description
+ * \see libvlc_media_discoverer_list_get()
  */
 typedef struct {
     char *psz_name;
     char *psz_longname;
     libvlc_media_discoverer_category i_cat;
-} libvlc_media_discoverer_service;
+} libvlc_media_discoverer_description;
 
 /** \defgroup libvlc_media_discoverer LibVLC media discovery
  * \ingroup libvlc
@@ -92,7 +92,8 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
  * \see libvlc_media_discoverer_start
  *
  * \param p_inst libvlc instance
- * \param psz_name service name
+ * \param psz_name service name; use libvlc_media_discoverer_list_get() to get
+ * a list of the discoverer names available in this libVLC instance
  * \return media discover object or NULL in case of error
  * \version LibVLC 3.0.0 or later
  */
@@ -104,7 +105,7 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst,
  * Start media discovery.
  *
  * To stop it, call libvlc_media_discoverer_stop() or
- * libvlc_media_discoverer_release() directly.
+ * libvlc_media_discoverer_list_release() directly.
  *
  * \see libvlc_media_discoverer_stop
  *
@@ -178,29 +179,29 @@ LIBVLC_API int
  * \param p_inst libvlc instance
  * \param i_cat category of services to fetch
  * \param ppp_services address to store an allocated array of media discoverer
- * services (must be freed with libvlc_media_discoverer_services_release() by
+ * services (must be freed with libvlc_media_discoverer_list_release() by
  * the caller) [OUT]
  *
  * \return the number of media discoverer services (zero on error)
  */
 LIBVLC_API unsigned int
-libvlc_media_discoverer_services_get( libvlc_instance_t *p_inst,
-                                      libvlc_media_discoverer_category i_cat,
-                                      libvlc_media_discoverer_service ***ppp_services );
+libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
+                                  libvlc_media_discoverer_category i_cat,
+                                  libvlc_media_discoverer_description ***ppp_services );
 
 /**
  * Release an array of media discoverer services
  *
  * \version LibVLC 3.0.0 and later.
  *
- * \see libvlc_media_discoverer_services_get()
+ * \see libvlc_media_discoverer_list_get()
  *
  * \param pp_services array to release
  * \param i_count number of elements in the array
  */
 LIBVLC_API void
-libvlc_media_discoverer_services_release( libvlc_media_discoverer_service **pp_services,
-                                          unsigned int i_count );
+libvlc_media_discoverer_list_release( libvlc_media_discoverer_description **pp_services,
+                                      unsigned int i_count );
 
 /**@} */
 
