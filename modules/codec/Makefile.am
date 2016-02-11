@@ -544,8 +544,11 @@ codec_LTLIBRARIES += $(LTLIBquicktime)
 
 libgstdecode_plugin_la_SOURCES = codec/gstreamer/gstdecode.c \
 								 codec/gstreamer/gstvlcpictureplaneallocator.c \
+								 codec/gstreamer/gstvlcpictureplaneallocator.h \
 								 codec/gstreamer/gstvlcvideopool.c \
-								 codec/gstreamer/gstvlcvideosink.c
+								 codec/gstreamer/gstvlcvideopool.h \
+								 codec/gstreamer/gstvlcvideosink.c \
+								 codec/gstreamer/gstvlcvideosink.h
 libgstdecode_plugin_la_CFLAGS = $(AM_CFLAGS) $(GST_VIDEO_CFLAGS) $(GST_APP_CFLAGS)
 libgstdecode_plugin_la_LIBADD = $(GST_VIDEO_LIBS) $(GST_APP_LIBS)
 if HAVE_GST_DECODE
