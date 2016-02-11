@@ -36,6 +36,7 @@ void ts_pid_list_Init( ts_pid_list_t *p_list )
 {
     p_list->dummy.i_pid = 8191;
     p_list->dummy.i_flags = FLAG_SEEN;
+    p_list->base_si.i_pid = 0x1FFB;
     p_list->pp_all = NULL;
     p_list->i_all = 0;
     p_list->i_all_alloc = 0;
@@ -63,6 +64,8 @@ ts_pid_t * ts_pid_Get( ts_pid_list_t *p_list, uint16_t i_pid )
     {
         case 0:
             return &p_list->pat;
+        case 0x1FFB:
+            return &p_list->base_si;
         case 0x1FFF:
             return &p_list->dummy;
         default:

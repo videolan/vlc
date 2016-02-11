@@ -82,6 +82,7 @@ typedef struct ts_pid_list_t
 {
     ts_pid_t   pat;
     ts_pid_t   dummy;
+    ts_pid_t   base_si;
     /* all non commons ones, dynamically allocated */
     ts_pid_t **pp_all;
     int        i_all;
