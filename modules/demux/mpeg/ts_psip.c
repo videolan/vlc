@@ -311,20 +311,23 @@ static void ATSC_VCT_Callback( void *p_cb_basepid, dvbpsi_atsc_vct_t* p_vct )
         {
             char *psz_name = NULL;
 
-            for( const dvbpsi_descriptor_t *p_dr = p_channel->p_first_descriptor;
+            for( dvbpsi_descriptor_t *p_dr = p_channel->p_first_descriptor;
                  p_dr; p_dr = p_dr->p_next )
             {
                 switch( p_dr->i_tag )
                 {
                     case ATSC_DESCRIPTOR_EXTENDED_CHANNEL_NAME:
                     {
-                        const dvbpsi_extended_channel_name_dr_t *p_ecndr =
-                                (const dvbpsi_extended_channel_name_dr_t *)p_dr;
-                        if( unlikely(psz_name) )
-                            free( psz_name );
-                        psz_name = atsc_a65_Decode_multiple_string( p_ctx->p_a65,
-                                                                    p_ecndr->i_long_channel_name,
-                                                                    p_ecndr->i_long_channel_name_length );
+                        dvbpsi_extended_channel_name_dr_t *p_ecndr =
+                                                    dvbpsi_ExtendedChannelNameDr( p_dr );
+                        if( p_ecndr )
+                        {
+                            if( unlikely(psz_name) )
+                                free( psz_name );
+                            psz_name = atsc_a65_Decode_multiple_string( p_ctx->p_a65,
+                                                                        p_ecndr->i_long_channel_name,
+                                                                        p_ecndr->i_long_channel_name_length );
+                        }
 
                     } break;
 
