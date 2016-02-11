@@ -185,6 +185,7 @@ libVLC:
  * Add a new libvlc dialog API to forward dialogs requests to the applications:
    libvlc_dialog_set_context, libvlc_dialog_get_context, libvlc_dialog_set_callbacks,
    libvlc_dialog_dismiss, libvlc_dialog_post_action, libvlc_dialog_post_login
+ * Add libvlc_media_discoverer_services_get to return a list of media discoverer services
 
 Logging
  * Support for the SystemD Journal
