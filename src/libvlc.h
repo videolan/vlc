@@ -124,11 +124,6 @@ void vlc_object_set_destructor (vlc_object_t *, vlc_destructor_t);
 #define vlc_object_set_destructor(a,b) \
         vlc_object_set_destructor (VLC_OBJECT(a), b)
 
-/*
- * To be cleaned-up module stuff:
- */
-module_t *module_find_by_shortcut (const char *psz_shortcut);
-
 #define ZOOM_SECTION N_("Zoom")
 #define ZOOM_QUARTER_KEY_TEXT N_("1:4 Quarter")
 #define ZOOM_HALF_KEY_TEXT N_("1:2 Half")
