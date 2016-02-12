@@ -113,25 +113,28 @@ static inline void *realloc_down( void *ptr, size_t size )
   } while(0)
 
 
+#define TAB_ERASE( count, tab, index )      \
+  do {                                      \
+        if( (count) > 1 )                   \
+        {                                   \
+            memmove( ((void**)(tab) + index),    \
+                     ((void**)(tab) + index+1),  \
+                     ( (count) - index - 1 ) * sizeof( *(tab) ) );\
+        }                                   \
+        (count)--;                          \
+        if( (count) == 0 )                  \
+        {                                   \
+            free( tab );                    \
+            (tab) = NULL;                   \
+        }                                   \
+  } while(0)
+
 #define TAB_REMOVE( count, tab, p )             \
   do {                                          \
         int i_index;                            \
         TAB_FIND( count, tab, p, i_index );     \
         if( i_index >= 0 )                      \
-        {                                       \
-            if( (count) > 1 )                   \
-            {                                   \
-                memmove( ((void**)(tab) + i_index),    \
-                         ((void**)(tab) + i_index+1),  \
-                         ( (count) - i_index - 1 ) * sizeof( *(tab) ) );\
-            }                                   \
-            (count)--;                          \
-            if( (count) == 0 )                  \
-            {                                   \
-                free( tab );                    \
-                (tab) = NULL;                   \
-            }                                   \
-        }                                       \
+            TAB_ERASE( count, tab, i_index );   \
   } while(0)
 
 #define TAB_INSERT_CAST( cast, count, tab, p, index ) do { \
