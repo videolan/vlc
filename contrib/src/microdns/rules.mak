@@ -7,12 +7,12 @@ ifeq ($(call need_pkg,"microdns >= 0.0.1"),)
 PKGS_FOUND += libmicrodns
 endif
 
-$(TARBALLS)/libmicrodns-$(LIBMICRODNS_VERSION).tar.gz:
+$(TARBALLS)/microdns-$(LIBMICRODNS_VERSION).tar.gz:
 	$(call download,$(LIBMICRODNS_URL))
 
-.sum-microdns: $(TARBALLS)/libmicrodns-$(LIBMICRODNS_VERSION).tar.gz
+.sum-microdns: $(TARBALLS)/microdns-$(LIBMICRODNS_VERSION).tar.gz
 
-microdns: libmicrodns-$(LIBMICRODNS_VERSION).tar.gz .sum-microdns
+microdns: microdns-$(LIBMICRODNS_VERSION).tar.gz .sum-microdns
 	$(UNPACK)
 	mv microdns-$(LIBMICRODNS_VERSION) microdns
 
