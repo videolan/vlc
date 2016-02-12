@@ -32,6 +32,14 @@
 #include <vlc_common.h>
 #include <vlc_epg.h>
 
+static void vlc_epg_Event_Delete( vlc_epg_event_t *p_evt )
+{
+    free( p_evt->psz_name );
+    free( p_evt->psz_short_description );
+    free( p_evt->psz_description );
+    free( p_evt );
+}
+
 void vlc_epg_Init( vlc_epg_t *p_epg, const char *psz_name )
 {
     p_epg->psz_name = psz_name ? strdup( psz_name ) : NULL;
@@ -43,13 +51,7 @@ void vlc_epg_Clean( vlc_epg_t *p_epg )
 {
     int i;
     for( i = 0; i < p_epg->i_event; i++ )
-    {
-        vlc_epg_event_t *p_evt = p_epg->pp_event[i];
-        free( p_evt->psz_name );
-        free( p_evt->psz_short_description );
-        free( p_evt->psz_description );
-        free( p_evt );
-    }
+        vlc_epg_Event_Delete( p_epg->pp_event[i] );
     TAB_CLEAN( p_epg->i_event, p_epg->pp_event );
     free( p_epg->psz_name );
 }
@@ -144,7 +146,10 @@ void vlc_epg_Merge( vlc_epg_t *p_dst, const vlc_epg_t *p_src )
     if( p_dst->p_current )
     {
         while( p_dst->i_event > 1 && p_dst->pp_event[0] != p_dst->p_current && p_dst->pp_event[1] != p_dst->p_current )
+        {
+            vlc_epg_Event_Delete( p_dst->pp_event[0] );
             TAB_REMOVE( p_dst->i_event, p_dst->pp_event, p_dst->pp_event[0] );
+        }
     }
 }
 
