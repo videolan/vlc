@@ -125,9 +125,10 @@ static int compar_collate( input_item_t *p1, input_item_t *p2 )
         return i_ret;
 
 #ifdef HAVE_STRCOLL
+    /* The program's LOCAL defines if case is ignored */
     return strcoll( p1->psz_name, p2->psz_name );
 #else
-    return strcmp( p1->psz_name, p2->psz_name );
+    return strcasecmp( p1->psz_name, p2->psz_name );
 #endif
 }
 
