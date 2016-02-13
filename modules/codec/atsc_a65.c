@@ -64,7 +64,6 @@ const uint8_t ATSC_A65_MODE_RESERVED_RANGES[12] = {
 struct atsc_a65_handle_t
 {
     char *psz_lang;
-    vlc_iconv_t iconv_ucs2;
     vlc_iconv_t iconv_u16be;
 };
 
@@ -78,7 +77,6 @@ atsc_a65_handle_t *atsc_a65_handle_New( const char *psz_lang )
         else
             p_handle->psz_lang = NULL;
 
-        p_handle->iconv_ucs2 = NULL;
         p_handle->iconv_u16be = NULL;
     }
     return p_handle;
@@ -86,8 +84,6 @@ atsc_a65_handle_t *atsc_a65_handle_New( const char *psz_lang )
 
 void atsc_a65_handle_Release( atsc_a65_handle_t *p_handle )
 {
-    if( p_handle->iconv_ucs2 )
-        vlc_iconv_close( p_handle->iconv_ucs2 );
     if( p_handle->iconv_u16be )
         vlc_iconv_close( p_handle->iconv_u16be );
     free( p_handle->psz_lang );
@@ -149,12 +145,12 @@ static bool convert_encoding_set( atsc_a65_handle_t *p_handle,
     else if( i_mode > ATSC_A65_MODE_UNICODE_RANGE_START &&  /* 8 range prefix + 8 */
              i_mode <= ATSC_A65_MODE_UNICODE_RANGE_END )
     {
-        if( !p_handle->iconv_ucs2 )
+        if( !p_handle->iconv_u16be )
         {
-            if ( !(p_handle->iconv_ucs2 = vlc_iconv_open("UTF-8", "UCS-2BE")) )
+            if ( !(p_handle->iconv_u16be = vlc_iconv_open("UTF-8", "UTF-16BE")) )
                 return false;
         }
-        else if ( VLC_ICONV_ERR == vlc_iconv( p_handle->iconv_ucs2, NULL, NULL, NULL, NULL ) ) /* reset */
+        else if ( VLC_ICONV_ERR == vlc_iconv( p_handle->iconv_u16be, NULL, NULL, NULL, NULL ) ) /* reset */
         {
             return false;
         }
@@ -170,7 +166,7 @@ static bool convert_encoding_set( atsc_a65_handle_t *p_handle,
                 const size_t i_outbuf_size = i_src * 4;
                 size_t i_inbuf_remain = i_src * 2;
                 size_t i_outbuf_remain = i_outbuf_size;
-                b_ret = ( VLC_ICONV_ERR != vlc_iconv( p_handle->iconv_ucs2, &p_inbuf, &i_inbuf_remain,
+                b_ret = ( VLC_ICONV_ERR != vlc_iconv( p_handle->iconv_u16be, &p_inbuf, &i_inbuf_remain,
                                                                             &p_outbuf, &i_outbuf_remain ) );
                 psz_dest = psz_realloc;
                 i_mergmin1 += (i_outbuf_size - i_outbuf_remain);
