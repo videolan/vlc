@@ -1868,7 +1868,7 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_ADD_SUBTITLE:
             if( val.psz_string )
-                input_SubtitleFileAdd( p_input, val.psz_string, true );
+                input_SubtitleFileAdd( p_input, val.psz_string, SUB_FORCED );
             break;
 
         case INPUT_CONTROL_ADD_SLAVE:
