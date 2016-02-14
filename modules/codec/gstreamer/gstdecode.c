@@ -141,7 +141,7 @@ static gboolean seek_data_cb( GstAppSrc *p_src, guint64 l_offset,
     return TRUE;
 }
 
-/* Emitted by decodebin and links decodebin to fakesink.
+/* Emitted by decodebin and links decodebin to vlcvideosink.
  * Since only one elementary codec stream is fed to decodebin,
  * this signal cannot be emitted more than once. */
 static void pad_added_cb( GstElement *p_ele, GstPad *p_pad, gpointer p_data )
@@ -161,7 +161,7 @@ static void pad_added_cb( GstElement *p_ele, GstPad *p_pad, gpointer p_data )
                 p_sys->p_decode_out, "sink" );
         ret = gst_pad_link( p_pad, p_sinkpad );
         if( ret != GST_PAD_LINK_OK )
-            msg_Warn( p_dec, "failed to link decoder with vsink");
+            msg_Err( p_dec, "failed to link decoder with vsink");
 
         gst_object_unref( p_sinkpad );
     }
@@ -184,7 +184,7 @@ static gboolean caps_handoff_cb( GstElement* p_ele, GstCaps *p_caps,
 
     if( !gst_video_info_from_caps( &p_sys->vinfo, p_caps ))
     {
-        msg_Warn( p_dec, "failed to negotiate" );
+        msg_Err( p_dec, "failed to negotiate" );
         return FALSE;
     }
 
@@ -193,7 +193,7 @@ static gboolean caps_handoff_cb( GstElement* p_ele, GstCaps *p_caps,
     return gst_vlc_set_vout_fmt( &p_sys->vinfo, p_caps, p_dec );
 }
 
-/* Emitted by fakesink for every buffer and sets the
+/* Emitted by vlcvideosink for every buffer,
  * Adds the buffer to the queue */
 static void frame_handoff_cb( GstElement *p_ele, GstBuffer *p_buf,
         gpointer p_data )
@@ -845,7 +845,7 @@ static void CloseDecoder( vlc_object_t *p_this )
             default:
                 p_dec->b_error = default_msg_handler( p_dec, p_msg );
                 if( p_dec->b_error )
-                    msg_Warn( p_dec, "pipeline may not close gracefully" );
+                    msg_Err( p_dec, "pipeline may not close gracefully" );
                 break;
             }
 
@@ -867,7 +867,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     if( b_running && gst_element_set_state( p_sys->p_decoder, GST_STATE_NULL )
             != GST_STATE_CHANGE_SUCCESS )
-        msg_Warn( p_dec,
+        msg_Err( p_dec,
                 "failed to change the state to NULL," \
                 "pipeline may not close gracefully" );
 

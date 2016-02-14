@@ -92,6 +92,10 @@ static gboolean gst_vlc_video_pool_set_config( GstBufferPool *p_pool,
     p_vpool->p_caps = gst_caps_ref( p_caps );
     p_vpool->info = info;
 
+    msg_Dbg( p_vpool->p_dec, "setting the following config on the pool: %s, \
+            size: %u, min buffers: %u, max buffers: %u", gst_caps_to_string( p_caps ),
+            info.size, min_buffers, max_buffers );
+
     gst_buffer_pool_config_set_params( p_config, p_caps, info.size,
             min_buffers, max_buffers );
 
@@ -162,6 +166,8 @@ static void gst_vlc_video_pool_free_buffer( GstBufferPool *p_pool,
 
     gst_vlc_picture_plane_allocator_release( p_vpool->p_allocator, p_buffer );
 
+    msg_Dbg( p_vpool->p_dec, "freed buffer %p", p_buffer );
+
     GST_BUFFER_POOL_CLASS( parent_class )->free_buffer( p_pool, p_buffer );
 
     return;
@@ -177,7 +183,10 @@ static GstFlowReturn gst_vlc_video_pool_alloc_buffer( GstBufferPool *p_pool,
 
     if( !gst_vlc_picture_plane_allocator_alloc( p_vpool->p_allocator,
                 *p_buffer ))
+    {
+        msg_Err( p_vpool->p_dec, "buffer allocation failed" );
         return GST_FLOW_EOS;
+    }
 
     if( p_vpool->b_add_metavideo )
     {
@@ -188,6 +197,8 @@ static GstFlowReturn gst_vlc_video_pool_alloc_buffer( GstBufferPool *p_pool,
                 GST_VIDEO_INFO_N_PLANES( p_info ),
                 p_info->offset, p_info->stride );
     }
+
+    msg_Dbg( p_vpool->p_dec, "allocated buffer %p", *p_buffer );
 
     return GST_FLOW_OK;
 }

@@ -140,16 +140,17 @@ void gst_vlc_picture_plane_allocator_release(
     guint i_plane;
 
     if( p_mem->p_pic )
-        picture_Release( p_mem->p_pic );
-    else
-        msg_Warn( p_allocator->p_dec, "pic null inside the plane -> buffer" );
-
-    for( i_plane = 0; i_plane < gst_buffer_n_memory( p_buffer ); i_plane++ )
     {
-        p_mem = (GstVlcPicturePlane*) gst_buffer_peek_memory ( p_buffer,
-                i_plane );
-        p_mem->p_pic = NULL;
-        p_mem->p_plane = NULL;
+        picture_Release( p_mem->p_pic );
+
+        for( i_plane = 0; i_plane < gst_buffer_n_memory( p_buffer );
+                i_plane++ )
+        {
+            p_mem = (GstVlcPicturePlane*) gst_buffer_peek_memory ( p_buffer,
+                    i_plane );
+            p_mem->p_pic = NULL;
+            p_mem->p_plane = NULL;
+        }
     }
 }
 
