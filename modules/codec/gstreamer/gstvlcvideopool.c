@@ -95,7 +95,7 @@ static gboolean gst_vlc_video_pool_set_config( GstBufferPool *p_pool,
     p_vpool->info = info;
 
     msg_Dbg( p_vpool->p_dec, "setting the following config on the pool: %s, \
-            size: %u, min buffers: %u, max buffers: %u", gst_caps_to_string( p_caps ),
+            size: %lu, min buffers: %u, max buffers: %u", gst_caps_to_string( p_caps ),
             info.size, min_buffers, max_buffers );
 
     gst_buffer_pool_config_set_params( p_config, p_caps, info.size,
