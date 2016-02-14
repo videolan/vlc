@@ -534,7 +534,8 @@ static int OpenDecoder( vlc_object_t *p_this )
             "block", TRUE, "max-bytes", ( guint64 )1, NULL );
     gst_caps_unref( caps.p_sinkcaps );
     caps.p_sinkcaps = NULL;
-    cb.enough_data = cb.need_data = NULL;
+    cb.enough_data = NULL;
+    cb.need_data = NULL;
     cb.seek_data = seek_data_cb;
     gst_app_src_set_callbacks( GST_APP_SRC( p_sys->p_decode_src ),
             &cb, p_dec, NULL );
