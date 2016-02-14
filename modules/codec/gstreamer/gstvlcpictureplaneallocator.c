@@ -135,6 +135,8 @@ static GstMemory* gst_vlc_picture_plane_copy(
 void gst_vlc_picture_plane_allocator_release(
     GstVlcPicturePlaneAllocator *p_allocator, GstBuffer *p_buffer )
 {
+    VLC_UNUSED( p_allocator );
+
     GstVlcPicturePlane* p_mem =
         (GstVlcPicturePlane*) gst_buffer_peek_memory( p_buffer, 0 );
     guint i_plane;

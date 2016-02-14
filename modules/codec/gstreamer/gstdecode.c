@@ -651,7 +651,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     picture_t *p_pic = NULL;
     decoder_sys_t *p_sys = p_dec->p_sys;
     GstMessage *p_msg;
-    gboolean b_ret;
     GstBuffer *p_buf;
 
     if( !pp_block )

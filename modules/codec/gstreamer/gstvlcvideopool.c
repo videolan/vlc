@@ -37,6 +37,8 @@ G_DEFINE_TYPE (GstVlcVideoPool, gst_vlc_video_pool,
 
 static const gchar** gst_vlc_video_pool_get_options (GstBufferPool *p_pool)
 {
+    VLC_UNUSED( p_pool );
+
     static const gchar *options[] = { GST_BUFFER_POOL_OPTION_VIDEO_META,
         NULL
     };
@@ -133,7 +135,6 @@ static GstFlowReturn gst_vlc_video_pool_acquire_buffer( GstBufferPool *p_pool,
         GstBuffer **p_buffer, GstBufferPoolAcquireParams *p_params )
 {
     GstVlcVideoPool *p_vpool = GST_VLC_VIDEO_POOL_CAST( p_pool );
-    GstVideoInfo *p_info;
     GstFlowReturn result;
 
     result = GST_BUFFER_POOL_CLASS( parent_class)->acquire_buffer( p_pool,
@@ -176,6 +177,8 @@ static void gst_vlc_video_pool_free_buffer( GstBufferPool *p_pool,
 static GstFlowReturn gst_vlc_video_pool_alloc_buffer( GstBufferPool *p_pool,
         GstBuffer **p_buffer, GstBufferPoolAcquireParams *p_params)
 {
+    VLC_UNUSED( p_params );
+
     GstVlcVideoPool *p_vpool = GST_VLC_VIDEO_POOL_CAST( p_pool );
     GstVideoInfo *p_info = &p_vpool->info;
 
@@ -220,6 +223,7 @@ static void gst_vlc_video_pool_class_init( GstVlcVideoPoolClass *p_klass )
 
 static void gst_vlc_video_pool_init( GstVlcVideoPool *p_pool )
 {
+    VLC_UNUSED( p_pool );
 }
 
 static void gst_vlc_video_pool_finalize( GObject *p_object )
