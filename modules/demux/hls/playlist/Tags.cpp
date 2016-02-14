@@ -61,6 +61,7 @@ std::vector<uint8_t> Attribute::hexSequence() const
         {
             unsigned val;
             std::stringstream ss(value.substr(i, 2));
+            ss.imbue(std::locale("C"));
             ss >> std::hex >> val;
             ret.push_back(val);
         }
