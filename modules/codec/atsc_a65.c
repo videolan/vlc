@@ -277,7 +277,8 @@ char * atsc_a65_Decode_simple_UTF16_string( atsc_a65_handle_t *p_handle, const u
         free( psz_converted );
         psz_converted = NULL;
     }
+    else
+        psz_converted[ i_target_buffer - i_target_remaining - 1 ] = 0;
 
-    psz_converted[ i_target_buffer - i_target_remaining - 1 ] = 0;
     return psz_converted;
 }
