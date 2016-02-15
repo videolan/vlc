@@ -97,6 +97,32 @@
 #include <textidentificationframe.h>
 #include <uniquefileidentifierframe.h>
 
+using namespace TagLib;
+
+#define TAGLIB_SYNCDECODE_FIXED_VERSION VERSION_INT(1,11,0)
+#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
+namespace VLCTagLib
+{
+    class FileAAC : public FileRef::FileTypeResolver
+    {
+        public:
+            virtual File *createFile(FileName, bool, AudioProperties::ReadStyle) const;
+    };
+}
+
+File *VLCTagLib::FileAAC::createFile(FileName fileName, bool, AudioProperties::ReadStyle) const
+{
+    std::string filename = std::string(fileName);
+    std::size_t namesize = filename.size();
+
+    /* Just pass AAC file as MPEG one. Only ID3 headers will be decoded */
+    if (namesize > 4 && filename.substr(namesize - 4, 4) == ".aac")
+        return new MPEG::File(fileName, false, AudioProperties::ReadStyle::Fast);
+
+    return 0;
+}
+#endif
+
 // taglib is not thread safe
 static vlc_mutex_t taglib_lock = VLC_STATIC_MUTEX;
 
@@ -111,8 +137,6 @@ vlc_module_begin ()
         set_capability( "meta writer", 50 )
         set_callbacks( WriteMeta, NULL )
 vlc_module_end ()
-
-using namespace TagLib;
 
 static int ExtractCoupleNumberValues( vlc_meta_t* p_meta, const char *psz_value,
         vlc_meta_type_t first, vlc_meta_type_t second)
@@ -693,6 +717,10 @@ static int ReadMeta( vlc_object_t* p_this)
     free( psz_uri );
     if( psz_path == NULL )
         return VLC_EGENERIC;
+
+#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
+    FileRef::addFileTypeResolver( new VLCTagLib::FileAAC );
+#endif
 
 #if defined(_WIN32)
     wchar_t *wpath = ToWide( psz_path );
