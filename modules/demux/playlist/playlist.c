@@ -199,6 +199,15 @@ int Control(demux_t *demux, int query, va_list args)
             *pb_bool = true;
             return VLC_SUCCESS;
         }
+        case DEMUX_GET_META:
+        {
+            return VLC_SUCCESS;
+        }
+        case DEMUX_HAS_UNSUPPORTED_META:
+        {
+            *(va_arg( args, bool * )) = false;
+            return VLC_SUCCESS;
+        }
     }
     return VLC_EGENERIC;
 }
