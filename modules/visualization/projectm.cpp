@@ -320,6 +320,7 @@ static void *Thread( void *p_data )
     settings.aspectCorrection     = 1;
     settings.easterEgg            = 1;
     settings.shuffleEnabled       = 1;
+    settings.softCutRatingsEnabled= false;
 
     p_projectm = new projectM( settings );
 
