@@ -111,6 +111,7 @@ int Open(vlc_object_t *p_this)
     intf_sys_t *p_sys = new(std::nothrow) intf_sys_t(p_intf);
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
+    p_intf->p_sys = p_sys;
 
     char *psz_ipChromecast = var_InheritString(p_intf, CONTROL_CFG_PREFIX "addr");
     if (psz_ipChromecast == NULL)
@@ -180,8 +181,6 @@ int Open(vlc_object_t *p_this)
     /* Even uglier: sleep more to let to the Chromecast initiate the connection
      * to the http server. */
     msleep(2 * CLOCK_FREQ);
-
-    p_intf->p_sys = p_sys;
 
     return VLC_SUCCESS;
 }
