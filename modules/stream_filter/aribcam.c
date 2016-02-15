@@ -175,8 +175,9 @@ static int DecoderRead( stream_t *p_stream, uint8_t *p_dst, int i_toread )
 
     /* Use data from previous reads */
     size_t i_fromremain = RemainRead( p_stream, p_dst, i_toread );
-    i_toread -= i_fromremain;
     i_total_read += i_fromremain;
+    p_dst += i_fromremain;
+    i_toread -= i_fromremain;
 
     while( i_toread )
     {
