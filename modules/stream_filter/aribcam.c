@@ -94,8 +94,6 @@ struct stream_sys_t
         size_t   i_size;
         block_t *p_list;
     } remain;
-
-    bool   b_unitsizeset;
 };
 
 static const char * GetErrorMessage( const int i_error,
@@ -239,19 +237,6 @@ static int DecoderRead( stream_t *p_stream, uint8_t *p_dst, int i_toread )
 static ssize_t Read( stream_t *p_stream, void *p_buf, size_t i_toread )
 {
     stream_sys_t *p_sys = p_stream->p_sys;
-
-    /* We force unit size from 1st TS packet as the lib wants to auto detect
-       size but requires larger amount of data for that purpose */
-    if ( !p_sys->b_unitsizeset )
-    {
-        if ( i_toread >= 188 && i_toread <= 320 )
-            p_sys->b_unitsizeset = ! p_sys->p_b25->set_unit_size( p_sys->p_b25, i_toread );
-        if ( !p_sys->b_unitsizeset )
-            msg_Warn( p_stream, "Unit size not set." );
-        else
-            msg_Dbg( p_stream, "Set unit size to %u", i_toread );
-    }
-
     int i_read = DecoderRead( p_stream, p_buf, i_toread );
     if ( i_read < 0 )
         return -1;
@@ -301,6 +286,10 @@ static int Open( vlc_object_t *p_object )
 
         if ( p_sys->p_b25->set_emm_proc( p_sys->p_b25, 0 ) < 0 )
             msg_Warn( p_stream, "cannot set B25 emm_proc" );
+
+        /* ARIB STD-B25 scrambled TS's packet size is always 188 bytes */
+        if ( p_sys->p_b25->set_unit_size( p_sys->p_b25, 188 ) < 0)
+            msg_Warn( p_stream, "cannot set B25 TS packet size" );
 
         p_sys->p_bcas = create_b_cas_card();
         if ( p_sys->p_bcas )
