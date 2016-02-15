@@ -1424,6 +1424,11 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
         }
 
         ts_pmt_t *p_pmt = p_es->p_program;
+        if( unlikely(!p_pmt) )
+        {
+            block_ChainRelease( p_block );
+            return;
+        }
 
         while (p_block) {
             block_t *p_next = p_block->p_next;
