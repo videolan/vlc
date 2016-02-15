@@ -256,9 +256,12 @@ static int get_address( access_t *p_access )
                 struct sockaddr_in *in = (struct sockaddr_in *)p_info->ai_addr;
                 p_sys->addr.s_addr = in->sin_addr.s_addr;
             }
-            freeaddrinfo( p_info );
             if( p_info->ai_family != AF_INET )
+            {
+                freeaddrinfo( p_info );
                 return VLC_EGENERIC;
+            }
+            freeaddrinfo( p_info );
         }
         else
             return VLC_EGENERIC;
