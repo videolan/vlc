@@ -278,7 +278,7 @@ static const char * const rgpsz_ATSC_A53_service_types[] =
 
 static const char * ATSC_A53_get_service_type( uint8_t i_type )
 {
-    if( i_type == 0 || i_type > 6 )
+    if( i_type == 0 || i_type > 5 )
         return NULL;
     return rgpsz_ATSC_A53_service_types[i_type - 1];
 }
