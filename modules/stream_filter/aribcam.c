@@ -163,14 +163,14 @@ static void RemainFlush( stream_sys_t *p_sys )
 
 #define ALL_READY (UNIT_SIZE_READY|ECM_READY|PMT_READY)
 
-static int DecoderRead( stream_t *p_stream, uint8_t *p_dst, int i_toread )
+static ssize_t Read( stream_t *p_stream, void *p_buf, size_t i_toread )
 {
     stream_sys_t *p_sys = p_stream->p_sys;
-    ARIB_STD_B25_BUFFER getbuf = { NULL, 0 };
+    uint8_t *p_dst = p_buf;
     int i_total_read = 0;
     int i_ret;
 
-    if ( !p_dst || ! i_toread )
+    if ( !p_dst || !i_toread )
         return -1;
 
     /* Use data from previous reads */
@@ -179,69 +179,52 @@ static int DecoderRead( stream_t *p_stream, uint8_t *p_dst, int i_toread )
     p_dst += i_fromremain;
     i_toread -= i_fromremain;
 
-    while( i_toread )
+    while ( i_toread )
     {
-
-        do
+        /* make use of the existing buffer, overwritten by decoder data later */
+        int i_srcread = stream_Read( p_stream->p_source, p_dst, i_toread );
+        if ( i_srcread > 0 )
         {
-            getbuf.size = 0;
-
-            i_ret = p_sys->p_b25->get( p_sys->p_b25, &getbuf );
+            ARIB_STD_B25_BUFFER putbuf = { p_dst, i_srcread };
+            i_ret = p_sys->p_b25->put( p_sys->p_b25, &putbuf );
             if ( i_ret < 0 )
-                msg_Err( p_stream, "decoder get failed: %s",
-                         GetErrorMessage( i_ret, b25_errors ) );
-
-            /* If the decoders needs buffering or data is not ready, push some */
-            if ( i_ret == 0 && getbuf.size == 0 )
             {
-                /* make use of the existing buffer,
-               overwritten by decoder data later */
-                int i_srcread = stream_Read( p_stream->p_source, p_dst, i_toread );
-                if ( i_srcread > 0 )
-                {
-                    ARIB_STD_B25_BUFFER putbuf = { p_dst, i_srcread };
-                    i_ret = p_sys->p_b25->put( p_sys->p_b25, &putbuf );
-                    if ( i_ret < 0 )
-                        msg_Err( p_stream, "decoder put failed: %s",
-                                 GetErrorMessage( i_ret, b25_errors ) );
-                }
-                else
-                {
-                    if ( i_srcread < 0 )
-                        msg_Err( p_stream, "Can't read %d bytes from source stream: %d", i_toread, i_srcread );
-                    i_ret = -1;
-                }
+                msg_Err( p_stream, "decoder put failed: %s",
+                         GetErrorMessage( i_ret, b25_errors ) );
+                return -1;
             }
         }
-        while ( i_ret == 0 && getbuf.size == 0 );
-
-        if ( i_ret < 0 )
+        else
+        {
+            if ( i_srcread < 0 )
+                msg_Err( p_stream, "Can't read %lu bytes from source stream: %d", i_toread, i_srcread );
             return -1;
+        }
 
-        memcpy( p_dst, getbuf.data, __MIN(getbuf.size, i_toread) );
+        ARIB_STD_B25_BUFFER getbuf;
+        i_ret = p_sys->p_b25->get( p_sys->p_b25, &getbuf );
+        if ( i_ret < 0 )
+        {
+            msg_Err( p_stream, "decoder get failed: %s",
+                     GetErrorMessage( i_ret, b25_errors ) );
+            return -1;
+        }
 
-        if ( getbuf.size > i_toread )
+        if ( (size_t)getbuf.size > i_toread )
         {
             /* Hold remaining data for next call */
             RemainAdd( p_stream, getbuf.data + i_toread, getbuf.size - i_toread );
         }
 
-        i_total_read += __MIN(getbuf.size, i_toread);
-        p_dst += __MIN(getbuf.size, i_toread);
-        i_toread -= __MIN(getbuf.size, i_toread);
+        int consume = __MIN( (size_t)getbuf.size, i_toread );
+        memcpy( p_dst, getbuf.data, consume );
 
+        i_total_read += consume;
+        p_dst += consume;
+        i_toread -= consume;
     }
 
     return i_total_read;
-}
-
-static ssize_t Read( stream_t *p_stream, void *p_buf, size_t i_toread )
-{
-    stream_sys_t *p_sys = p_stream->p_sys;
-    int i_read = DecoderRead( p_stream, p_buf, i_toread );
-    if ( i_read < 0 )
-        return -1;
-    return i_read;
 }
 
 /**
