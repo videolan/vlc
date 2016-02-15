@@ -320,6 +320,7 @@ static int Demux( demux_t *p_demux )
                     }
                     else if( !strcmp( psz_param, "title" ) )
                     {
+                        free( psz_title );
                         psz_title = vlc_uri_decode_duplicate(psz_value);
                         EnsureUTF8( psz_title );
                     }
