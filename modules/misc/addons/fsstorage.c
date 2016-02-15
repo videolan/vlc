@@ -401,8 +401,8 @@ static int InstallFile( addons_storage_t *p_this, const char *psz_downloadlink,
         *++psz_buf = '\0';
         /* ensure directory exists */
         if( !EMPTY_STR( psz_path ) ) recursive_mkdir( VLC_OBJECT(p_this), psz_path );
-        free( psz_path );
     }
+    free( psz_path );
 
     p_destfile = vlc_fopen( psz_dest, "w" );
     if( !p_destfile )
