@@ -113,11 +113,11 @@ void InputManager::setInput( input_thread_t *_p_input )
         p_item = input_GetItem( p_input );
         emit rateChanged( var_GetFloat( p_input, "rate" ) );
 
-        char *uri = input_item_GetURI( p_item );
-
         /* Get Saved Time */
         if( p_item->i_type == ITEM_TYPE_FILE )
         {
+            char *uri = input_item_GetURI( p_item );
+
             int i_time = RecentsMRL::getInstance( p_intf )->time( qfu(uri) );
             if( i_time > 0 && qfu( uri ) != lastURI &&
                     !var_GetFloat( p_input, "run-time" ) &&
@@ -126,20 +126,19 @@ void InputManager::setInput( input_thread_t *_p_input )
             {
                 emit resumePlayback( (int64_t)i_time * 1000 );
             }
+            playlist_Lock( THEPL );
+            // Add root items only
+            playlist_item_t* p_node = playlist_CurrentPlayingItem( THEPL );
+            if ( p_node != NULL && ( p_node->p_parent == NULL || p_node->i_children == -1 ) )
+            {
+                // Save the latest URI to avoid asking to restore the
+                // position on the same input file.
+                lastURI = qfu( uri );
+                RecentsMRL::getInstance( p_intf )->addRecent( lastURI );
+            }
+            playlist_Unlock( THEPL );
+            free( uri );
         }
-
-        playlist_Lock( THEPL );
-        // Add root items only
-        playlist_item_t* p_node = playlist_CurrentPlayingItem( THEPL );
-        if ( p_node != NULL && p_node->p_parent == NULL )
-        {
-            // Save the latest URI to avoid asking to restore the
-            // position on the same input file.
-            lastURI = qfu( uri );
-            RecentsMRL::getInstance( p_intf )->addRecent( lastURI );
-        }
-        playlist_Unlock( THEPL );
-        free( uri );
     }
     else
     {
