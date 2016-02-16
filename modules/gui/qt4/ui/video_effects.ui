@@ -1093,7 +1093,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Transparency</string>
+          <string>Opacity</string>
          </property>
          <property name="buddy">
           <cstring>logoOpacitySlider</cstring>
