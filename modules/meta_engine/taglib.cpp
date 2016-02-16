@@ -1037,10 +1037,10 @@ static int WriteMeta( vlc_object_t *p_this )
     wchar_t *wpath = ToWide( p_export->psz_file );
     if( wpath == NULL )
         return VLC_EGENERIC;
-    f = FileRef( wpath );
+    f = FileRef( wpath, false );
     free( wpath );
 #else
-    f = FileRef( p_export->psz_file );
+    f = FileRef( p_export->psz_file, false );
 #endif
 
     if( f.isNull() || !f.tag() || f.file()->readOnly() )
