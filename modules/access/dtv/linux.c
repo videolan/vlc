@@ -1131,9 +1131,10 @@ int dvb_set_isdbt (dvb_device_t *d, uint32_t freq, uint32_t bandwidth,
 
     if (dvb_find_frontend (d, ISDB_T))
         return -1;
-    if (dvb_set_props (d, 5, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ISDBT,
+    if (dvb_set_props (d, 6, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ISDBT,
                        DTV_FREQUENCY, freq, DTV_BANDWIDTH_HZ, bandwidth,
-                       DTV_GUARD_INTERVAL, guard))
+                       DTV_GUARD_INTERVAL, guard,
+                       DTV_ISDBT_LAYER_ENABLED, 0x7 /* all layers enabled */))
         return -1;
     for (unsigned i = 0; i < 3; i++)
         if (dvb_set_isdbt_layer (d, i, layers + i))
