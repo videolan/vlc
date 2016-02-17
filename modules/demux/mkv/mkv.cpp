@@ -33,6 +33,8 @@
 
 #include "stream_io_callback.hpp"
 
+#include <new>
+
 extern "C" {
 #include "../../modules/codec/dts_header.h"
 }
@@ -111,7 +113,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = new demux_sys_t( *p_demux );
 
     p_io_callback = new vlc_stream_io_callback( p_demux->s, false );
-    p_io_stream = new EbmlStream( *p_io_callback );
+    p_io_stream = new (std::nothrow) EbmlStream( *p_io_callback );
 
     if( p_io_stream == NULL )
     {

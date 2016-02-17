@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "AtomsReader.hpp"
+#include <new>
 
 using namespace adaptative::mp4;
 
@@ -52,7 +53,7 @@ bool AtomsReader::parseBlock(block_t *p_block)
     stream_t *stream = stream_MemoryNew( object, p_block->p_buffer, p_block->i_buffer, true);
     if (stream)
     {
-        rootbox = new MP4_Box_t;
+        rootbox = new (std::nothrow) MP4_Box_t;
         if(!rootbox)
         {
             stream_Delete(stream);

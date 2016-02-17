@@ -26,6 +26,7 @@
 #include "../src/os_factory.hpp"
 #include "../src/os_timer.hpp"
 
+#include <new>
 
 AsyncQueue::AsyncQueue( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_cmdFlush( this )
@@ -54,7 +55,7 @@ AsyncQueue *AsyncQueue::instance( intf_thread_t *pIntf )
     if( ! pIntf->p_sys->p_queue )
     {
         AsyncQueue *pQueue;
-        pQueue = new AsyncQueue( pIntf );
+        pQueue = new (std::nothrow) AsyncQueue( pIntf );
         if( pQueue )
         {
              // Initialization succeeded

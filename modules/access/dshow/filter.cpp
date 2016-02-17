@@ -42,6 +42,9 @@
 #include "vlc_dshow.h"
 
 #include <initguid.h>
+
+#include <new>
+
 DEFINE_GUID(MEDIASUBTYPE_HDYC ,0x43594448 /* CYDH */ , 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 DEFINE_GUID(MEDIASUBTYPE_DIVX ,0x58564944 /* XVID */ , 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 
@@ -561,7 +564,7 @@ STDMETHODIMP CapturePin::EnumMediaTypes( IEnumMediaTypes **ppEnum )
     msg_Dbg( p_input, "CapturePin::EnumMediaTypes" );
 #endif
 
-    *ppEnum = new CaptureEnumMediaTypes( p_input, this, NULL );
+    *ppEnum = new (std::nothrow) CaptureEnumMediaTypes( p_input, this, NULL );
 
     if( *ppEnum == NULL ) return E_OUTOFMEMORY;
 
@@ -849,7 +852,7 @@ STDMETHODIMP CaptureFilter::EnumPins( IEnumPins ** ppEnum )
 #endif
 
     /* Create a new ref counted enumerator */
-    *ppEnum = new CaptureEnumPins( p_input, this, NULL );
+    *ppEnum = new (std::nothrow) CaptureEnumPins( p_input, this, NULL );
     return *ppEnum == NULL ? E_OUTOFMEMORY : NOERROR;
 };
 STDMETHODIMP CaptureFilter::FindPin( LPCWSTR, IPin ** )
@@ -1021,7 +1024,7 @@ STDMETHODIMP CaptureEnumPins::Clone( IEnumPins **ppEnum )
     msg_Dbg( p_input, "CaptureEnumPins::Clone" );
 #endif
 
-    *ppEnum = new CaptureEnumPins( p_input, p_filter, this );
+    *ppEnum = new (std::nothrow) CaptureEnumPins( p_input, p_filter, this );
     if( *ppEnum == NULL ) return E_OUTOFMEMORY;
 
     return NOERROR;
@@ -1181,7 +1184,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Clone( IEnumMediaTypes **ppEnum )
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Clone" );
 #endif
 
-    *ppEnum = new CaptureEnumMediaTypes( p_input, p_pin, this );
+    *ppEnum = new (std::nothrow) CaptureEnumMediaTypes( p_input, p_pin, this );
     if( *ppEnum == NULL ) return E_OUTOFMEMORY;
 
     return NOERROR;

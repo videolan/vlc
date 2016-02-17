@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include "var_manager.hpp"
-
+#include <new>
 
 VarManager::VarManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_pTooltipText( NULL ), m_pHelpText( NULL )
@@ -62,7 +62,7 @@ VarManager *VarManager::instance( intf_thread_t *pIntf )
     if( ! pIntf->p_sys->p_varManager )
     {
         VarManager *pVarManager;
-        pVarManager = new VarManager( pIntf );
+        pVarManager = new (std::nothrow) VarManager( pIntf );
         if( pVarManager )
         {
             pIntf->p_sys->p_varManager = pVarManager;

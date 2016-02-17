@@ -26,6 +26,7 @@
 
 #include <QLabel>
 #include <QListWidgetItem>
+#include <new>
 
 FingerprintDialog::FingerprintDialog(QWidget *parent, intf_thread_t *p_intf,
                                      input_item_t *p_item ) :
@@ -49,7 +50,7 @@ FingerprintDialog::FingerprintDialog(QWidget *parent, intf_thread_t *p_intf,
     CONNECT( ui->buttonBox, rejected(), this, close() );
     CONNECT( ui->buttonsBox, rejected(), this, close() );
 
-    t = new Chromaprint( p_intf );
+    t = new (std::nothrow) Chromaprint( p_intf );
     if ( t )
     {
         CONNECT( t, finished(), this, handleResults() );

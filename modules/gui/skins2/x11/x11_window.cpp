@@ -38,6 +38,8 @@
 #include <assert.h>
 #include <limits.h>
 
+#include <new>
+
 X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                       X11Display &rDisplay, bool dragDrop, bool playOnDrop,
                       X11Window *pParentWindow, GenericWindow::WindowType_t type ):
@@ -201,7 +203,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     long host_name_max = sysconf( _SC_HOST_NAME_MAX );
     if( host_name_max <= 0 )
         host_name_max = _POSIX_HOST_NAME_MAX;
-    hostname = new char[host_name_max];
+    hostname = new (std::nothrow) char[host_name_max];
     if( hostname && gethostname( hostname, host_name_max ) == 0 )
     {
         hostname[host_name_max - 1] = '\0';

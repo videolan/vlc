@@ -23,6 +23,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include <vector>
+#include <new>
 
 #include "demux.hpp"
 
@@ -67,7 +68,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     if ( !p_segment->b_preloaded )
         p_segment->Preload();
 
-    virtual_chapter_c * p_vchap = new virtual_chapter_c( p_segment, p_chap, start, stop );
+    virtual_chapter_c * p_vchap = new (std::nothrow) virtual_chapter_c( p_segment, p_chap, start, stop );
 
     if( !p_vchap )
         return NULL;

@@ -28,6 +28,8 @@
 #include "art_manager.hpp"
 #include <vlc_image.h>
 
+#include <new>
+
 #define MAX_ART_CACHED    2
 
 
@@ -91,7 +93,7 @@ ArtBitmap* ArtManager::getArtBitmap( std::string uriName )
     }
 
     // create and retain a new ArtBitmap since uri is not yet known
-    ArtBitmap* pArt = new ArtBitmap( getIntf(), m_pImageHandler, uriName );
+    ArtBitmap* pArt = new (std::nothrow) ArtBitmap( getIntf(), m_pImageHandler, uriName );
     if( pArt && pArt->getWidth() && pArt->getHeight() )
     {
         if( m_listBitmap.size() == MAX_ART_CACHED )

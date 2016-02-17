@@ -47,6 +47,7 @@
 #include <limits.h>
 #include <assert.h>
 
+#include <new>
 
 #if defined( _WIN32 )
 #   include <winsock2.h>
@@ -608,7 +609,7 @@ createnew:
     if( var_CreateGetBool( p_demux, "rtsp-http" ) )
         i_http_port = var_InheritInteger( p_demux, "rtsp-http-port" );
 
-    p_sys->rtsp = new RTSPClientVlc( *p_sys->env, psz_url,
+    p_sys->rtsp = new (std::nothrow) RTSPClientVlc( *p_sys->env, psz_url,
                                      var_InheritInteger( p_demux, "verbose" ) > 1 ? 1 : 0,
                                      "LibVLC/" VERSION, i_http_port, p_sys );
     if( !p_sys->rtsp )

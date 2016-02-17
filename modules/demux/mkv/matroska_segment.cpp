@@ -28,6 +28,8 @@
 #include "util.hpp"
 #include "Ebml_parser.hpp"
 
+#include <new>
+
 matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream )
     :segment(NULL)
     ,es(estream)
@@ -280,7 +282,7 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
     EbmlElement *el;
     EbmlParser *ep = new EbmlParser( &es, tag, &sys.demuxer,
                                      var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
-    SimpleTag * p_simple = new SimpleTag;
+    SimpleTag * p_simple = new (std::nothrow) SimpleTag;
     size_t max_size = tag->GetSize();
     size_t size = 0;
 
@@ -392,7 +394,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
     {
         if( MKV_IS_ID( el, KaxTag ) )
         {
-            Tag * p_tag = new Tag;
+            Tag * p_tag = new (std::nothrow) Tag;
             if(!p_tag)
             {
                 msg_Err( &sys.demuxer,"Couldn't allocate memory for tag... ignoring it");
@@ -993,7 +995,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
             }
             if( tracks[i_track]->fmt.i_cat == i_cat )
             {
-                spoint * seekpoint = new spoint(i_track, i_mk_seek_time, i_seek_position, i_seek_position);
+                spoint * seekpoint = new (std::nothrow) spoint(i_track, i_mk_seek_time, i_seek_position, i_seek_position);
                 if( unlikely( !seekpoint ) )
                 {
                     for( spoint * sp = p_first; sp; )
