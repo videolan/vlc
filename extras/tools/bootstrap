@@ -94,7 +94,7 @@ case `uname` in
         CPUS=`grep -c ^processor /proc/cpuinfo`
      ;;
     Darwin)
-        CPUS=`sysctl hw.ncpu|cut -d: -f2`
+        CPUS=`sysctl hw.ncpu|cut -d" " -f2`
         gcc-4.2 --version >/dev/null 2>&1 && CC=CC=gcc-4.2
         g++-4.2 --version >/dev/null 2>&1 && CXX=CXX=g++-4.2
     ;;
