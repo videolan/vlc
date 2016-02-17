@@ -90,10 +90,6 @@ struct access_sys_t
     LIBSSH2_SFTP* sftp_session;
     LIBSSH2_SFTP_HANDLE* file;
     uint64_t filesize;
-
-    /* browser */
-    char* psz_username_opt;
-    char* psz_password_opt;
 };
 
 
@@ -212,7 +208,6 @@ static int Open( vlc_object_t* p_this )
 
     //TODO: ask for the available auth methods
 
-    bool b_stored = false;
     while( vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
                                _("SFTP authentication"),
                                _("Please enter a valid login and password for "
@@ -223,7 +218,7 @@ static int Open( vlc_object_t* p_this )
                                        credential.psz_username,
                                        credential.psz_password ) == 0 )
         {
-            b_stored = vlc_credential_store( &credential, p_access );
+            vlc_credential_store( &credential, p_access );
             break;
         }
         else
@@ -286,14 +281,6 @@ static int Open( vlc_object_t* p_this )
 
         p_access->pf_readdir = DirRead;
         p_access->pf_control = DirControl;
-
-        if( p_sys->file )
-        {
-            if( -1 == asprintf( &p_sys->psz_username_opt, "sftp-user=%s", credential.psz_username ) )
-                p_sys->psz_username_opt = NULL;
-            if( b_stored || -1 == asprintf( &p_sys->psz_password_opt, "sftp-pwd=%s", credential.psz_password ) )
-                p_sys->psz_password_opt = NULL;
-        }
     }
 
     if( !p_sys->file )
@@ -335,9 +322,6 @@ static void Close( vlc_object_t* p_this )
 
     libssh2_session_free( p_sys->ssh_session );
     net_Close( p_sys->i_socket );
-
-    free( p_sys->psz_password_opt );
-    free( p_sys->psz_username_opt );
 
     free( p_sys );
 }
@@ -487,13 +471,6 @@ static input_item_t* DirRead( access_t *p_access )
             free( psz_full_uri );
             break;
         }
-
-        /* Here we save on the node the credentials that allowed us to login.
-         * That way the user isn't prompted more than once for credentials */
-        if( p_sys->psz_password_opt )
-            input_item_AddOption( p_item, p_sys->psz_password_opt, VLC_INPUT_OPTION_TRUSTED );
-        if( p_sys->psz_username_opt )
-            input_item_AddOption( p_item, p_sys->psz_username_opt, VLC_INPUT_OPTION_TRUSTED );
 
         free( psz_full_uri );
     }
