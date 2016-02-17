@@ -149,16 +149,21 @@ bool SetupISO14496LogicalStream( demux_t *p_demux, const decoder_config_descript
 }
 
 /* Object stream SL in table sections */
-void SLPackets_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content )
+void SLPackets_Section_Handler( demux_t *p_demux,
+                                const uint8_t *p_sectiondata, size_t i_sectiondata,
+                                const uint8_t *p_payloaddata, size_t i_payloaddata,
+                                void *p_pes_cbdata )
 {
-    ts_pmt_t *p_pmt = pid->u.p_pes->p_es->p_program;
+    VLC_UNUSED(p_sectiondata); VLC_UNUSED(i_sectiondata);
+    ts_pes_t *p_pes = (ts_pes_t *) p_pes_cbdata;
+    ts_pmt_t *p_pmt = p_pes->p_es->p_program;
 
-    const es_mpeg4_descriptor_t *p_mpeg4desc = GetMPEG4DescByEsId( p_pmt, pid->u.p_pes->p_es->i_sl_es_id );
+    const es_mpeg4_descriptor_t *p_mpeg4desc = GetMPEG4DescByEsId( p_pmt, p_pes->p_es->i_sl_es_id );
     if( p_mpeg4desc && p_mpeg4desc->dec_descr.i_objectTypeIndication == 0x01 &&
         p_mpeg4desc->dec_descr.i_streamType == 0x01 /* Object */ )
     {
-        const uint8_t *p_data = p_content->p_buffer;
-        int i_data = p_content->i_buffer;
+        const uint8_t *p_data = p_payloaddata;
+        size_t i_data = i_payloaddata;
 
         od_descriptors_t *p_ods = &p_pmt->od;
         sl_header_data header = DecodeSLHeader( i_data, p_data, &p_mpeg4desc->sl_descr );
@@ -198,7 +203,5 @@ void SLPackets_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_cont
         if( b_changed )
             UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
     }
-
-    block_Release( p_content );
 }
 

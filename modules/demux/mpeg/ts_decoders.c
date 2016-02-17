@@ -81,6 +81,12 @@ static void ts_dvbpsi_RawSubDecoderGatherSections( dvbpsi_t *p_dvbpsi,
     }
 }
 
+static void ts_dvbpsi_RawDecoderGatherSections( dvbpsi_t *p_dvbpsi,
+                                                dvbpsi_psi_section_t * p_section )
+{
+    ts_dvbpsi_RawSubDecoderGatherSections( p_dvbpsi, p_dvbpsi->p_decoder, p_section );
+}
+
 void ts_dvbpsi_DetachRawSubDecoder( dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension )
 {
     dvbpsi_demux_t *p_demux = (dvbpsi_demux_t *) p_dvbpsi->p_decoder;
@@ -127,4 +133,30 @@ bool ts_dvbpsi_AttachRawSubDecoder( dvbpsi_t* p_dvbpsi,
     p_decoder->p_cb_data = p_cb_data;
 
     return true;
+}
+
+bool ts_dvbpsi_AttachRawDecoder( dvbpsi_t* p_dvbpsi,
+                                 ts_dvbpsi_rawsections_callback_t pf_callback,
+                                 void *p_cb_data )
+{
+    if ( p_dvbpsi->p_decoder )
+        return false;
+
+    ts_dvbpsi_rawtable_decoder_t *p_decoder = dvbpsi_decoder_new( NULL, 4096, true, sizeof(*p_decoder) );
+    if ( p_decoder == NULL )
+        return false;
+    p_dvbpsi->p_decoder = DVBPSI_DECODER(p_decoder);
+
+    p_decoder->pf_gather = ts_dvbpsi_RawDecoderGatherSections;
+    p_decoder->pf_callback = pf_callback;
+    p_decoder->p_cb_data = p_cb_data;
+
+    return true;
+}
+
+void ts_dvbpsi_DetachRawDecoder( dvbpsi_t *p_dvbpsi )
+{
+    if( dvbpsi_decoder_present( p_dvbpsi ) )
+        dvbpsi_decoder_delete( p_dvbpsi->p_decoder );
+    p_dvbpsi->p_decoder = NULL;
 }

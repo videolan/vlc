@@ -30,5 +30,10 @@ bool ts_dvbpsi_AttachRawSubDecoder( dvbpsi_t* p_dvbpsi,
 
 void ts_dvbpsi_DetachRawSubDecoder( dvbpsi_t *p_dvbpsi, uint8_t i_table_id, uint16_t i_extension );
 
+bool ts_dvbpsi_AttachRawDecoder( dvbpsi_t* p_dvbpsi,
+                                 ts_dvbpsi_rawsections_callback_t pf_callback,
+                                 void* p_cb_data );
+
+void ts_dvbpsi_DetachRawDecoder( dvbpsi_t *p_dvbpsi );
 
 #endif

@@ -704,7 +704,7 @@ static void ATSC_MGT_Callback( void *p_cb_basepid, dvbpsi_atsc_mgt_t* p_mgt )
 
     if( SCTE18_SI_BASE_PID == ATSC_BASE_PID &&
         ts_dvbpsi_AttachRawSubDecoder( p_mgtpsip->handle, SCTE18_TABLE_ID, 0x00,
-                                       SCTE18_SectionsCallback, p_base_pid ) )
+                                       SCTE18_Section_Callback, p_base_pid ) )
     {
         msg_Dbg( p_demux, "  * pid=%d listening for EAS", p_base_pid->i_pid );
     }

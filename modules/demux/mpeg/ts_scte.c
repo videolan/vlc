@@ -37,7 +37,7 @@
 #include <assert.h>
 
 /* EAS Handling */
-void SCTE18_SectionsCallback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t* p_section,
+void SCTE18_Section_Callback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t* p_section,
                               void *p_base_pid )
 {
     demux_t *p_demux = (demux_t *) p_handle->p_sys;
@@ -72,11 +72,21 @@ void SCTE18_SectionsCallback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t* p_
     }
 }
 
-void SCTE27_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content )
+void SCTE27_Section_Callback( demux_t *p_demux,
+                              const uint8_t *p_sectiondata, size_t i_sectiondata,
+                              const uint8_t *p_payloaddata, size_t i_payloaddata,
+                              void *p_pes_cb_data )
 {
-    assert( pid->u.p_pes->p_es->fmt.i_codec == VLC_CODEC_SCTE_27 );
-    ts_pmt_t *p_pmt = pid->u.p_pes->p_es->p_program;
+    VLC_UNUSED(p_payloaddata); VLC_UNUSED(i_payloaddata);
+    ts_pes_t *p_pes = (ts_pes_t *) p_pes_cb_data;
+    assert( p_pes->p_es->fmt.i_codec == VLC_CODEC_SCTE_27 );
+    ts_pmt_t *p_pmt = p_pes->p_es->p_program;
     mtime_t i_date = p_pmt->pcr.i_current;
+
+    block_t *p_content = block_Alloc( i_sectiondata );
+    if( unlikely(!p_content) || unlikely(!p_pes->p_es->id) )
+        return;
+    memcpy( p_content->p_buffer, p_sectiondata, i_sectiondata );
 
     /* We need to extract the truncated pts stored inside the payload */
     int i_index = 0;
@@ -104,8 +114,8 @@ void SCTE27_Section_Handler( demux_t *p_demux, ts_pid_t *pid, block_t *p_content
     p_content->i_dts = p_content->i_pts = VLC_TS_0 + i_date * 100 / 9;
     //PCRFixHandle( p_demux, p_pmt, p_content );
 
-    if( pid->u.p_pes->p_es->id )
-        es_out_Send( p_demux->out, pid->u.p_pes->p_es->id, p_content );
+    if( p_pes->p_es->id )
+        es_out_Send( p_demux->out, p_pes->p_es->id, p_content );
     else
         block_Release( p_content );
 }

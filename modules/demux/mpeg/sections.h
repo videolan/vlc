@@ -20,20 +20,23 @@
 #ifndef TS_SECTIONS_H
 #define TS_SECTIONS_H
 
-typedef void(* ts_section_callback_t)( demux_t *, ts_pid_t *, block_t * );
+typedef void(* ts_section_processor_callback_t)( demux_t *,
+                                                 const uint8_t *, size_t,
+                                                 const uint8_t *, size_t,
+                                                 void * );
+
 typedef struct ts_sections_processor_t ts_sections_processor_t;
 
-void ts_sections_processor_Add( ts_sections_processor_t **pp_chain,
-                                uint8_t i_table_id, uint8_t i_stream_type, bool,
-                                ts_section_callback_t pf_callback );
+void ts_sections_processor_Add( demux_t *,
+                                ts_sections_processor_t **pp_chain,
+                                uint8_t i_table_id, uint16_t i_extension_id,
+                                ts_section_processor_callback_t pf_callback,
+                                void *p_callback_data );
 
 void ts_sections_processor_ChainDelete( ts_sections_processor_t *p_chain );
 
 void ts_sections_processor_Reset( ts_sections_processor_t *p_chain );
 
 void ts_sections_processor_Push( ts_sections_processor_t *p_chain,
-                                 uint8_t i_table_id, uint8_t i_stream_type,
-                                 demux_t *, ts_pid_t *,
-                                 block_t *p_blockchain );
-
+                                 block_t *p_pkt );
 #endif

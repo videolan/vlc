@@ -53,7 +53,7 @@
 
 #include <assert.h>
 
-static void PIDFillFormat( ts_pes_t *p_pes, int i_stream_type, ts_es_data_type_t * );
+static void PIDFillFormat( demux_t *, ts_pes_t *p_pes, int i_stream_type, ts_es_data_type_t * );
 
 static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
 {
@@ -379,8 +379,9 @@ static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_t *p_pes,
                 {
                     p_es->i_sl_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
                     msg_Dbg( p_demux, "     - found SL_descriptor mapping es_id=%"PRIu16, p_es->i_sl_es_id );
-                    ts_sections_processor_Add( &p_pes->p_sections_proc, 0x05, 0x13,
-                                               false, SLPackets_Section_Handler );
+                    ts_sections_processor_Add( p_demux,
+                                               &p_pes->p_sections_proc, 0x05, 0x00,
+                                               SLPackets_Section_Handler, p_pes );
                     p_pes->b_always_receive = true;
                 }
                 break;
@@ -1206,7 +1207,8 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
 #endif
 }
 
-static void PIDFillFormat( ts_pes_t *p_pes, int i_stream_type, ts_es_data_type_t *p_datatype )
+static void PIDFillFormat( demux_t *p_demux, ts_pes_t *p_pes,
+                           int i_stream_type, ts_es_data_type_t *p_datatype )
 {
     es_format_t *fmt = &p_pes->p_es->fmt;
     switch( i_stream_type )
@@ -1245,8 +1247,8 @@ static void PIDFillFormat( ts_pes_t *p_pes, int i_stream_type, ts_es_data_type_t
     case 0x82:  /* SCTE-27 (sub) */
         es_format_Init( fmt, SPU_ES, VLC_CODEC_SCTE_27 );
         *p_datatype = TS_ES_DATA_TABLE_SECTION;
-        ts_sections_processor_Add( &p_pes->p_sections_proc, 0xC6, 0x82,
-                                   true, SCTE27_Section_Handler );
+        ts_sections_processor_Add( p_demux, &p_pes->p_sections_proc, 0xC6, 0x00,
+                                   SCTE27_Section_Callback, p_pes );
         break;
     case 0x84:  /* SDDS (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_SDDS );
@@ -1293,7 +1295,7 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
                                  ts_pes_t *p_pes )
 {
     ts_es_data_type_t type_change = TS_ES_DATA_PES;
-    PIDFillFormat( p_pes, p_dvbpsies->i_type, &type_change );
+    PIDFillFormat( p_demux, p_pes, p_dvbpsies->i_type, &type_change );
 
     p_pes->i_stream_type = p_dvbpsies->i_type;
 
@@ -1781,7 +1783,7 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
             else
             {
                 const int i_stream_type = strtol( psz_opt, NULL, 0 );
-                PIDFillFormat( pid->u.p_pes, i_stream_type, &pid->u.p_pes->data_type );
+                PIDFillFormat( p_demux, pid->u.p_pes, i_stream_type, &pid->u.p_pes->data_type );
             }
 
             fmt->i_group = i_number;

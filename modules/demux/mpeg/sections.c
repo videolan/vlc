@@ -23,137 +23,74 @@
 
 #include <vlc_common.h>
 #include <vlc_block.h>
+#include <vlc_demux.h>
 
 #include "ts_pid.h"
 #include "sections.h"
 
-typedef struct ts_sections_assembler_t
-{
-    int8_t i_version;
-    int8_t i_prev_version;
-    int8_t i_prev_section;
-    block_t *p_sections;
-    block_t **pp_sections_tail;
-    bool b_raw; /* Pass unstripped section data (SCTE-27 mess) */
-} ts_sections_assembler_t;
+#ifndef _DVBPSI_DVBPSI_H_
+ #include <dvbpsi/dvbpsi.h>
+#endif
+#ifndef _DVBPSI_DEMUX_H_
+ #include <dvbpsi/demux.h>
+#endif
+#include <dvbpsi/psi.h>
+#include "../../mux/mpeg/dvbpsi_compat.h" /* dvbpsi_messages */
+
+#include "ts_decoders.h"
+
+#include <assert.h>
 
 struct ts_sections_processor_t
 {
     uint8_t i_stream_type;
     uint8_t i_table_id;
-    ts_sections_assembler_t assembler;
-    ts_section_callback_t pf_callback;
+    uint16_t i_extension_id;
+    dvbpsi_t *p_dvbpsi;
+    ts_section_processor_callback_t pf_callback;
     ts_sections_processor_t *p_next;
+    void *p_callback_data;
 };
 
-static void ts_sections_assembler_Reset( ts_sections_assembler_t *p_as, bool b_full )
+static void ts_subdecoder_rawsection_Callback( dvbpsi_t *p_dvbpsi,
+                                               const dvbpsi_psi_section_t* p_section,
+                                               void* p_proc_cb_data )
 {
-    if( p_as->p_sections )
-        block_ChainRelease( p_as->p_sections );
-    p_as->i_version = -1;
-    if( b_full )
-        p_as->i_prev_version = -1;
-    p_as->i_prev_section = -1;
-    p_as->p_sections = NULL;
-    p_as->pp_sections_tail = &p_as->p_sections;
-}
-
-static void ts_sections_assembler_Init( ts_sections_assembler_t *p_as )
-{
-    p_as->p_sections = NULL;
-    p_as->b_raw = false;
-    ts_sections_assembler_Reset( p_as, true );
-}
-
-static block_t * ts_sections_assembler_Append( ts_sections_assembler_t *p_as, block_t *p_content )
-{
-    const bool b_short = !( p_content->p_buffer[1] & 0x80 );
-    const uint16_t i_private_length = ((p_content->p_buffer[1] & 0x0f) << 8) | p_content->p_buffer[2];
-    if( b_short )
+    ts_sections_processor_t *p_proc = (ts_sections_processor_t *) p_proc_cb_data;
+    if( likely(p_proc->pf_callback) )
     {
-        /* Short, unsegmented section */
-        if(unlikely(( i_private_length > 0xFFD || i_private_length > p_content->i_buffer - 3 )))
+        for( const dvbpsi_psi_section_t *p_sec = p_section; p_sec; p_sec = p_sec->p_next )
         {
-            block_Release( p_content );
-            return NULL;
-        }
+            size_t i_rawlength = p_sec->p_payload_end - p_sec->p_data;
+            if ( p_sec->b_syntax_indicator )
+                i_rawlength += 4;
 
-        if( !p_as->b_raw )
-        {
-            p_content->p_buffer += 3;
-            p_content->i_buffer = i_private_length;
-        }
-        return p_content;
-    }
-    else
-    {
-        /* Payload can span on multiple sections */
-        if (unlikely( p_content->i_buffer < (size_t)12 + i_private_length))
-        {
-            block_Release( p_content );
-            return NULL;
-        }
-        /* TODO: CRC32 */
-        const uint8_t i_version = ( p_content->p_buffer[5] & 0x3F ) >> 1;
-        const uint8_t i_current = p_content->p_buffer[5] & 0x01;
-        const uint8_t i_section = p_content->p_buffer[6];
-        const uint8_t i_section_last = p_content->p_buffer[7];
+            if( p_proc->i_table_id && p_section->i_table_id != p_proc->i_table_id )
+                continue;
 
-        if( !p_as->b_raw )
-        {
-            p_content->p_buffer += 3 + 5;
-            p_content->i_buffer = i_private_length - 4;
-        }
+            if( p_proc->i_extension_id && p_section->i_extension != p_proc->i_extension_id )
+                continue;
 
-        if( !i_current ||
-           ( p_as->i_version != -1 && i_version != p_as->i_version ) || /* Only merge same version */
-             p_as->i_prev_version == i_version || /* No duplicates */
-             i_section > i_section_last )
-        {
-            block_Release( p_content );
-            return NULL;
-        }
-
-        if( i_section != p_as->i_prev_section + 1 ) /* first or unfinished sections gathering */
-        {
-            ts_sections_assembler_Reset( p_as, false );
-            if( i_section > 0 || i_version == p_as->i_prev_version )
-            {
-                block_Release( p_content );
-                return NULL;
-            }
-        }
-
-        p_as->i_version = i_version;
-        p_as->i_prev_section = i_section;
-
-        /* Add one more section */
-        block_ChainLastAppend( &p_as->pp_sections_tail, p_content );
-
-        /* We finished gathering our sections */
-        if( i_section == i_section_last )
-        {
-            block_t *p_all_sections = block_ChainGather( p_as->p_sections );
-            p_as->p_sections = NULL;
-            p_as->pp_sections_tail = &p_as->p_sections;
-            p_as->i_prev_version = i_version;
-            ts_sections_assembler_Reset( p_as, false );
-            return p_all_sections;
+            p_proc->pf_callback( (demux_t *) p_dvbpsi->p_sys,
+                                 p_sec->p_data, i_rawlength,
+                                 p_sec->p_payload_start,
+                                 p_sec->p_payload_end - p_sec->p_payload_start,
+                                 p_proc->p_callback_data );
         }
     }
-
-    return NULL;
 }
 
-void ts_sections_processor_Add( ts_sections_processor_t **pp_chain,
-                                uint8_t i_table_id, uint8_t i_stream_type, bool b_raw,
-                                ts_section_callback_t pf_callback )
+void ts_sections_processor_Add( demux_t *p_demux,
+                                ts_sections_processor_t **pp_chain,
+                                uint8_t i_table_id, uint16_t i_extension_id,
+                                ts_section_processor_callback_t pf_callback,
+                                void *p_callback_data )
 {
     ts_sections_processor_t *p_proc = *pp_chain;
     for( ; p_proc; p_proc = p_proc->p_next )
     {
         /* Avoid duplicates */
-        if ( p_proc->i_stream_type == i_stream_type &&
+        if ( p_proc->i_extension_id == i_extension_id &&
              p_proc->i_table_id == i_table_id &&
              p_proc->pf_callback == pf_callback )
             return;
@@ -162,12 +99,19 @@ void ts_sections_processor_Add( ts_sections_processor_t **pp_chain,
     p_proc = malloc( sizeof(ts_sections_processor_t) );
     if( p_proc )
     {
-        ts_sections_assembler_Init( &p_proc->assembler );
-        p_proc->assembler.b_raw = b_raw;
         p_proc->pf_callback = pf_callback;
-        p_proc->i_stream_type = i_stream_type;
+        p_proc->i_extension_id = i_extension_id;
         p_proc->i_table_id = i_table_id;
+        p_proc->p_dvbpsi = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+        p_proc->p_dvbpsi->p_sys = p_demux;
+        p_proc->p_callback_data = p_callback_data;
 
+        if( !ts_dvbpsi_AttachRawDecoder( p_proc->p_dvbpsi,
+                                         ts_subdecoder_rawsection_Callback, p_proc ) )
+        {
+            ts_sections_processor_ChainDelete( p_proc );
+            return;
+        }
         /* Insert as head */
         p_proc->p_next = *pp_chain;
         *pp_chain = p_proc;
@@ -178,7 +122,8 @@ void ts_sections_processor_ChainDelete( ts_sections_processor_t *p_chain )
 {
     while( p_chain )
     {
-        ts_sections_assembler_Reset( &p_chain->assembler, false );
+        ts_dvbpsi_DetachRawDecoder( p_chain->p_dvbpsi );
+        dvbpsi_delete( p_chain->p_dvbpsi );
         ts_sections_processor_t *p_next = p_chain->p_next;
         free( p_chain );
         p_chain = p_next;
@@ -189,31 +134,26 @@ void ts_sections_processor_Reset( ts_sections_processor_t *p_chain )
 {
     while( p_chain )
     {
-        ts_sections_assembler_Reset( &p_chain->assembler, true );
+        dvbpsi_decoder_reset( p_chain->p_dvbpsi->p_decoder, true );
         p_chain = p_chain->p_next;
     }
 }
 
 void ts_sections_processor_Push( ts_sections_processor_t *p_chain,
-                                 uint8_t i_table_id, uint8_t i_stream_type,
-                                 demux_t *p_demux, ts_pid_t *p_pid,
-                                 block_t *p_blockschain )
+                                 block_t *p_pkt )
 {
-    while( p_chain )
+    if(likely(p_pkt->i_buffer >= 188 ))
     {
-        if( ( !p_chain->i_stream_type || p_chain->i_stream_type == i_stream_type ) &&
-            ( !p_chain->i_table_id || p_chain->i_table_id == i_table_id ) )
+        for( ts_sections_processor_t *p_proc = p_chain;
+             p_proc; p_proc = p_proc->p_next )
         {
-            block_t *p_block = block_ChainGather( p_blockschain );
-            if( p_block )
-            {
-                p_block = ts_sections_assembler_Append( &p_chain->assembler, p_block );
-                if( p_block )
-                    p_chain->pf_callback( p_demux, p_pid, p_block );
-            }
-            return;
+            dvbpsi_packet_push( p_chain->p_dvbpsi, p_pkt->p_buffer );
         }
-        p_chain = p_chain->p_next;
     }
-    block_ChainRelease( p_blockschain );
+    else
+    {
+        assert( p_pkt->i_buffer >= 188 );
+    }
+
+    block_Release( p_pkt );
 }
