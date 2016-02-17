@@ -244,7 +244,7 @@ bool StandardPLPanel::popup( const QPoint &point )
     /* Playlist sorting */
     if ( model->isSupportedAction( VLCModelSubInterface::ACTION_SORT, index ) )
     {
-        QMenu *sortingMenu = new QMenu( qtr( "Sort by" ) );
+        QMenu *sortingMenu = new QMenu( qtr( "Sort by" ), &menu );
         /* Choose what columns to show in sorting menu, not sure if this should be configurable*/
         QList<int> sortingColumns;
         sortingColumns << COLUMN_TITLE << COLUMN_ARTIST << COLUMN_ALBUM << COLUMN_TRACK_NUMBER << COLUMN_URI;
@@ -263,7 +263,7 @@ bool StandardPLPanel::popup( const QPoint &point )
     }
 
     /* Zoom */
-    QMenu *zoomMenu = new QMenu( qtr( "Display size" ) );
+    QMenu *zoomMenu = new QMenu( qtr( "Display size" ), &menu );
     zoomMenu->addAction( qtr( "Increase" ), this, SLOT( increaseZoom() ) );
     zoomMenu->addAction( qtr( "Decrease" ), this, SLOT( decreaseZoom() ) );
     menu.addMenu( zoomMenu );
