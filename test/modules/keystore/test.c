@@ -47,7 +47,7 @@ static const struct
     bool b_test_default;
 } keystore_args[] =
 {
-    { "memory", true },
+    { "memory", false },
     /* Following keystores are tested only when asked explicitly by the tester
      * (with "-a" argv) */
     { "secret", false },

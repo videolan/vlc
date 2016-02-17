@@ -66,17 +66,6 @@ struct vlc_keystore_sys
     bool        b_error;
 };
 
-static struct
-{
-    vlc_mutex_t         lock;
-    unsigned int        i_ref_count;
-    vlc_keystore_sys *  p_sys;
-} instance = {
-    .lock = VLC_STATIC_MUTEX,
-    .i_ref_count = 0,
-    .p_sys = NULL
-};
-
 static const char *const ppsz_keys[] = {
     "protocol",
     "user",
@@ -351,11 +340,8 @@ static int
 Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
       const uint8_t *p_secret, size_t i_secret_len, const char *psz_label)
 {
-    vlc_mutex_lock(&instance.lock);
-
     (void) psz_label;
     vlc_keystore_sys *p_sys = p_keystore->p_sys;
-    assert(p_sys == instance.p_sys);
     struct list *p_list = &p_sys->list;
     vlc_keystore_entry *p_entry = list_get_entry(p_list, ppsz_values, NULL);
 
@@ -365,31 +351,22 @@ Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
     {
         p_entry = list_new_entry(p_list);
         if (!p_entry)
-            goto error;
+            return VLC_EGENERIC;
     }
     if (values_copy((const char **)p_entry->ppsz_values, ppsz_values))
-        goto error;
+        return VLC_EGENERIC;
 
     if (vlc_keystore_entry_set_secret(p_entry, p_secret, i_secret_len))
-        goto error;
+        return VLC_EGENERIC;
 
-    int i_ret = list_save(p_sys, &p_sys->list);
-    vlc_mutex_unlock(&instance.lock);
-    return i_ret;
-
-error:
-    vlc_mutex_unlock(&instance.lock);
-    return VLC_EGENERIC;
+    return list_save(p_sys, &p_sys->list);
 }
 
 static unsigned int
 Find(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
      vlc_keystore_entry **pp_entries)
 {
-    vlc_mutex_lock(&instance.lock);
-
     vlc_keystore_sys *p_sys = p_keystore->p_sys;
-    assert(p_sys == instance.p_sys);
     struct list *p_list = &p_sys->list;
     struct list out_list = { 0 };
     vlc_keystore_entry *p_entry;
@@ -416,17 +393,13 @@ Find(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
 
     *pp_entries = out_list.p_entries;
 
-    vlc_mutex_unlock(&instance.lock);
     return out_list.i_count;
 }
 
 static unsigned int
 Remove(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX])
 {
-    vlc_mutex_lock(&instance.lock);
-
     vlc_keystore_sys *p_sys = p_keystore->p_sys;
-    assert(p_sys == instance.p_sys);
     struct list *p_list = &p_sys->list;
     vlc_keystore_entry *p_entry;
     unsigned i_index = 0, i_count = 0;
@@ -438,18 +411,17 @@ Remove(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX])
     }
 
     if (list_save(p_sys, &p_sys->list) != VLC_SUCCESS)
-    {
-        vlc_mutex_unlock(&instance.lock);
         return 0;
-    }
 
-    vlc_mutex_unlock(&instance.lock);
     return i_count;
 }
 
 static void
-CleanUp(vlc_keystore_sys *p_sys)
+Close(vlc_object_t *p_this)
 {
+    vlc_keystore *p_keystore = (vlc_keystore *)p_this;
+    vlc_keystore_sys *p_sys = p_keystore->p_sys;
+
     if (p_sys->p_file)
     {
         if (p_sys->b_error)
@@ -476,84 +448,55 @@ Open(vlc_object_t *p_this)
     vlc_keystore *p_keystore = (vlc_keystore *)p_this;
     vlc_keystore_sys *p_sys;
 
-    vlc_mutex_lock(&instance.lock);
+    char *psz_file = var_InheritString(p_this, "keystore-file");
+    if (!psz_file)
+        return VLC_EGENERIC;
 
-    /* The p_sys context is shared and protected between all threads */
-    if (instance.i_ref_count == 0)
+    p_keystore->p_sys = p_sys = calloc(1, sizeof(vlc_keystore_sys));
+    if (!p_sys)
     {
-        char *psz_file = var_InheritString(p_this, "keystore-file");
-        if (!psz_file)
-            return VLC_EGENERIC;
-
-        p_sys = calloc(1, sizeof(vlc_keystore_sys));
-        if (!p_sys)
-        {
-            free(psz_file);
-            return VLC_EGENERIC;
-        }
-
-        p_sys->psz_file = psz_file;
-        p_sys->p_file = vlc_fopen(p_sys->psz_file, "a+");
-        p_sys->i_fd = -1;
-
-        if (!p_sys->p_file)
-        {
-            CleanUp(p_sys);
-            return VLC_EGENERIC;
-        }
-
-        int i_fd = fileno(p_sys->p_file);
-        if (i_fd == -1)
-        {
-            CleanUp(p_sys);
-            return VLC_EGENERIC;
-        }
-
-        /* Fail if an other LibVLC process acquired the file lock.
-         * If HAVE_FLOCK is not defined, the running OS is most likely Windows
-         * and a lock was already acquired when the file was opened. */
-#ifdef HAVE_FLOCK
-        if (flock(i_fd, LOCK_EX|LOCK_NB) != 0)
-        {
-            CleanUp(p_sys);
-            return VLC_EGENERIC;
-        }
-#endif
-        p_sys->i_fd = i_fd;
-
-        if (list_read(p_sys, &p_sys->list) != VLC_SUCCESS)
-        {
-            CleanUp(p_sys);
-            return VLC_EGENERIC;
-        }
-        instance.p_sys = p_sys;
+        free(psz_file);
+        return VLC_EGENERIC;
     }
-    else
-        p_sys = instance.p_sys;
 
-    instance.i_ref_count++;
-    p_keystore->p_sys = p_sys;
+    p_sys->psz_file = psz_file;
+    p_sys->p_file = vlc_fopen(p_sys->psz_file, "a+");
+    p_sys->i_fd = -1;
+
+    if (!p_sys->p_file)
+    {
+        Close(p_this);
+        return VLC_EGENERIC;
+    }
+
+    int i_fd = fileno(p_sys->p_file);
+    if (i_fd == -1)
+    {
+        Close(p_this);
+        return VLC_EGENERIC;
+    }
+
+    /* Fail if an other LibVLC process acquired the file lock.
+     * If HAVE_FLOCK is not defined, the running OS is most likely Windows
+     * and a lock was already acquired when the file was opened. */
+#ifdef HAVE_FLOCK
+    if (flock(i_fd, LOCK_EX|LOCK_NB) != 0)
+    {
+        Close(p_this);
+        return VLC_EGENERIC;
+    }
+#endif
+    p_sys->i_fd = i_fd;
+
+    if (list_read(p_sys, &p_sys->list) != VLC_SUCCESS)
+    {
+        Close(p_this);
+        return VLC_EGENERIC;
+    }
 
     p_keystore->pf_store = Store;
     p_keystore->pf_find = Find;
     p_keystore->pf_remove = Remove;
 
-    vlc_mutex_unlock(&instance.lock);
-
     return VLC_SUCCESS;
-}
-
-static void
-Close(vlc_object_t *p_this)
-{
-    (void) p_this;
-
-    vlc_mutex_lock(&instance.lock);
-    assert(((vlc_keystore *)p_this)->p_sys == instance.p_sys);
-    if (--instance.i_ref_count == 0)
-    {
-        CleanUp(instance.p_sys);
-        instance.p_sys = NULL;
-    }
-    vlc_mutex_unlock(&instance.lock);
 }
