@@ -66,27 +66,8 @@ struct vlc_keystore_sys
     bool        b_error;
 };
 
-static const char *const ppsz_keys[] = {
-    "protocol",
-    "user",
-    "server",
-    "path",
-    "port",
-    "realm",
-    "authtype",
-};
-static_assert(sizeof(ppsz_keys)/sizeof(*ppsz_keys) == KEY_MAX, "key mismatch");
-
-static int
-str2key(const char *psz_key)
-{
-    for (unsigned int i = 0; i < KEY_MAX; ++i)
-    {
-        if (strcmp(ppsz_keys[i], psz_key) == 0)
-            return i;
-    }
-    return -1;
-}
+static int list_save(vlc_keystore_sys *p_sys, struct list *p_list);
+static int list_read(vlc_keystore_sys *p_sys, struct list *p_list);
 
 static void
 list_free(struct list *p_list)
@@ -109,46 +90,6 @@ values_copy(const char * ppsz_dst[KEY_MAX], const char *const ppsz_src[KEY_MAX])
                 return VLC_EGENERIC;
         }
     }
-    return VLC_SUCCESS;
-}
-
-static int
-str_write(FILE *p_file, const char *psz_str)
-{
-    size_t i_len = strlen(psz_str);
-    return fwrite(psz_str, sizeof(char), i_len, p_file) == i_len ? VLC_SUCCESS
-                                                                 : VLC_EGENERIC;
-}
-
-static int
-values_write(FILE *p_file, const char *const ppsz_values[KEY_MAX])
-{
-    for (unsigned int i = 0; i < KEY_MAX; ++i)
-    {
-        if (!ppsz_values[i])
-            continue;
-        if (str_write(p_file, ppsz_keys[i]))
-            return VLC_EGENERIC;
-        if (str_write(p_file, ":"))
-            return VLC_EGENERIC;
-        char *psz_b64 = vlc_b64_encode(ppsz_values[i]);
-        if (!psz_b64 || str_write(p_file, psz_b64))
-        {
-            free(psz_b64);
-            return VLC_EGENERIC;
-        }
-        free(psz_b64);
-        for (unsigned int j = i + 1; j < KEY_MAX; ++j)
-        {
-            if (ppsz_values[j])
-            {
-                if (str_write(p_file, ","))
-                    return VLC_EGENERIC;
-                break;
-            }
-        }
-    }
-
     return VLC_SUCCESS;
 }
 
@@ -205,6 +146,148 @@ list_get_entry(struct list *p_list, const char *const ppsz_values[KEY_MAX],
         }
     }
     return NULL;
+}
+
+static int
+Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
+      const uint8_t *p_secret, size_t i_secret_len, const char *psz_label)
+{
+    (void) psz_label;
+    vlc_keystore_sys *p_sys = p_keystore->p_sys;
+    struct list *p_list = &p_sys->list;
+    vlc_keystore_entry *p_entry = list_get_entry(p_list, ppsz_values, NULL);
+
+    if (p_entry)
+        vlc_keystore_release_entry(p_entry);
+    else
+    {
+        p_entry = list_new_entry(p_list);
+        if (!p_entry)
+            return VLC_EGENERIC;
+    }
+    if (values_copy((const char **)p_entry->ppsz_values, ppsz_values))
+        return VLC_EGENERIC;
+
+    if (vlc_keystore_entry_set_secret(p_entry, p_secret, i_secret_len))
+        return VLC_EGENERIC;
+
+    return list_save(p_sys, &p_sys->list);
+}
+
+static unsigned int
+Find(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
+     vlc_keystore_entry **pp_entries)
+{
+    vlc_keystore_sys *p_sys = p_keystore->p_sys;
+    struct list *p_list = &p_sys->list;
+    struct list out_list = { 0 };
+    vlc_keystore_entry *p_entry;
+    unsigned i_index = 0;
+
+    while ((p_entry = list_get_entry(p_list, ppsz_values, &i_index)))
+    {
+        vlc_keystore_entry *p_out_entry = list_new_entry(&out_list);
+
+        if (!p_out_entry || values_copy((const char **)p_out_entry->ppsz_values,
+                                        (const char *const*)p_entry->ppsz_values))
+        {
+            list_free(&out_list);
+            break;
+        }
+
+        if (vlc_keystore_entry_set_secret(p_out_entry, p_entry->p_secret,
+                                          p_entry->i_secret_len))
+        {
+            list_free(&out_list);
+            break;
+        }
+    }
+
+    *pp_entries = out_list.p_entries;
+
+    return out_list.i_count;
+}
+
+static unsigned int
+Remove(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX])
+{
+    vlc_keystore_sys *p_sys = p_keystore->p_sys;
+    struct list *p_list = &p_sys->list;
+    vlc_keystore_entry *p_entry;
+    unsigned i_index = 0, i_count = 0;
+
+    while ((p_entry = list_get_entry(p_list, ppsz_values, &i_index)))
+    {
+        vlc_keystore_release_entry(p_entry);
+        i_count++;
+    }
+
+    if (list_save(p_sys, &p_sys->list) != VLC_SUCCESS)
+        return 0;
+
+    return i_count;
+}
+
+static const char *const ppsz_keys[] = {
+    "protocol",
+    "user",
+    "server",
+    "path",
+    "port",
+    "realm",
+    "authtype",
+};
+static_assert(sizeof(ppsz_keys)/sizeof(*ppsz_keys) == KEY_MAX, "key mismatch");
+
+static int
+str2key(const char *psz_key)
+{
+    for (unsigned int i = 0; i < KEY_MAX; ++i)
+    {
+        if (strcmp(ppsz_keys[i], psz_key) == 0)
+            return i;
+    }
+    return -1;
+}
+
+static int
+str_write(FILE *p_file, const char *psz_str)
+{
+    size_t i_len = strlen(psz_str);
+    return fwrite(psz_str, sizeof(char), i_len, p_file) == i_len ? VLC_SUCCESS
+                                                                 : VLC_EGENERIC;
+}
+
+static int
+values_write(FILE *p_file, const char *const ppsz_values[KEY_MAX])
+{
+    for (unsigned int i = 0; i < KEY_MAX; ++i)
+    {
+        if (!ppsz_values[i])
+            continue;
+        if (str_write(p_file, ppsz_keys[i]))
+            return VLC_EGENERIC;
+        if (str_write(p_file, ":"))
+            return VLC_EGENERIC;
+        char *psz_b64 = vlc_b64_encode(ppsz_values[i]);
+        if (!psz_b64 || str_write(p_file, psz_b64))
+        {
+            free(psz_b64);
+            return VLC_EGENERIC;
+        }
+        free(psz_b64);
+        for (unsigned int j = i + 1; j < KEY_MAX; ++j)
+        {
+            if (ppsz_values[j])
+            {
+                if (str_write(p_file, ","))
+                    return VLC_EGENERIC;
+                break;
+            }
+        }
+    }
+
+    return VLC_SUCCESS;
 }
 
 static int
@@ -336,85 +419,6 @@ end:
     return VLC_SUCCESS;
 }
 
-static int
-Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
-      const uint8_t *p_secret, size_t i_secret_len, const char *psz_label)
-{
-    (void) psz_label;
-    vlc_keystore_sys *p_sys = p_keystore->p_sys;
-    struct list *p_list = &p_sys->list;
-    vlc_keystore_entry *p_entry = list_get_entry(p_list, ppsz_values, NULL);
-
-    if (p_entry)
-        vlc_keystore_release_entry(p_entry);
-    else
-    {
-        p_entry = list_new_entry(p_list);
-        if (!p_entry)
-            return VLC_EGENERIC;
-    }
-    if (values_copy((const char **)p_entry->ppsz_values, ppsz_values))
-        return VLC_EGENERIC;
-
-    if (vlc_keystore_entry_set_secret(p_entry, p_secret, i_secret_len))
-        return VLC_EGENERIC;
-
-    return list_save(p_sys, &p_sys->list);
-}
-
-static unsigned int
-Find(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
-     vlc_keystore_entry **pp_entries)
-{
-    vlc_keystore_sys *p_sys = p_keystore->p_sys;
-    struct list *p_list = &p_sys->list;
-    struct list out_list = { 0 };
-    vlc_keystore_entry *p_entry;
-    unsigned i_index = 0;
-
-    while ((p_entry = list_get_entry(p_list, ppsz_values, &i_index)))
-    {
-        vlc_keystore_entry *p_out_entry = list_new_entry(&out_list);
-
-        if (!p_out_entry || values_copy((const char **)p_out_entry->ppsz_values,
-                                        (const char *const*)p_entry->ppsz_values))
-        {
-            list_free(&out_list);
-            break;
-        }
-
-        if (vlc_keystore_entry_set_secret(p_out_entry, p_entry->p_secret,
-                                          p_entry->i_secret_len))
-        {
-            list_free(&out_list);
-            break;
-        }
-    }
-
-    *pp_entries = out_list.p_entries;
-
-    return out_list.i_count;
-}
-
-static unsigned int
-Remove(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX])
-{
-    vlc_keystore_sys *p_sys = p_keystore->p_sys;
-    struct list *p_list = &p_sys->list;
-    vlc_keystore_entry *p_entry;
-    unsigned i_index = 0, i_count = 0;
-
-    while ((p_entry = list_get_entry(p_list, ppsz_values, &i_index)))
-    {
-        vlc_keystore_release_entry(p_entry);
-        i_count++;
-    }
-
-    if (list_save(p_sys, &p_sys->list) != VLC_SUCCESS)
-        return 0;
-
-    return i_count;
-}
 
 static void
 Close(vlc_object_t *p_this)
