@@ -83,11 +83,13 @@ namespace SD
 
 struct MediaServerDesc
 {
-    MediaServerDesc(const std::string& udn, const std::string& fName, const std::string& loc);
+    MediaServerDesc( const std::string& udn, const std::string& fName,
+                    const std::string& loc, const std::string& iconUrl );
     ~MediaServerDesc();
     std::string UDN;
     std::string friendlyName;
     std::string location;
+    std::string iconUrl;
     input_item_t* inputItem;
     bool isSatIp;
 };
@@ -107,6 +109,7 @@ public:
 
 private:
     void parseNewServer( IXML_Document* doc, const std::string& location );
+    std::string getIconURL( IXML_Element* p_device_elem , const char* psz_base_url );
 
 private:
     services_discovery_t* p_sd_;

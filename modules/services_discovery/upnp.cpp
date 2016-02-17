@@ -277,10 +277,12 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-MediaServerDesc::MediaServerDesc(const std::string& udn, const std::string& fName, const std::string& loc)
+MediaServerDesc::MediaServerDesc( const std::string& udn, const std::string& fName,
+                                  const std::string& loc, const std::string& iconUrl )
     : UDN( udn )
     , friendlyName( fName )
     , location( loc )
+    , iconUrl( iconUrl )
     , inputItem( NULL )
     , isSatIp( false )
 {
@@ -332,6 +334,8 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
     if ( !p_input_item )
         return false;
 
+    if ( desc->iconUrl.empty() == false )
+        input_item_SetArtworkURL( p_input_item, desc->iconUrl.c_str() );
     desc->inputItem = p_input_item;
     input_item_SetDescription( p_input_item, desc->UDN.c_str() );
     services_discovery_AddItem( p_sd_, p_input_item, NULL );
@@ -435,6 +439,8 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
             continue;
         }
 
+        std::string iconUrl = getIconURL( p_device_element, psz_base_url );
+
         // We now have basic info, we need to get the content browsing url
         // so the access module can browse without fetching the manifest again
 
@@ -451,11 +457,11 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                     char* psz_url = NULL;
                     if ( UpnpResolveURL2( psz_base_url, psz_m3u_url, &psz_url ) == UPNP_E_SUCCESS )
                     {
-                        p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_url );
+                        p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_url, iconUrl );
                         free(psz_url);
                     }
                 } else
-                    p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_m3u_url );
+                    p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_m3u_url, iconUrl );
 
                 if ( unlikely( !p_server ) )
                     break;
@@ -485,7 +491,7 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                 vlc_UrlClean( &url );
 
                 p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn,
-                                                                  psz_friendly_name, psz_url );
+                                                                  psz_friendly_name, psz_url, iconUrl );
 
                 p_server->isSatIp = true;
                 if( !addServer( p_server ) ) {
@@ -532,7 +538,7 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                 if ( UpnpResolveURL( psz_base_url, psz_control_url, psz_url ) == UPNP_E_SUCCESS )
                 {
                     SD::MediaServerDesc* p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn,
-                            psz_friendly_name, psz_url );
+                            psz_friendly_name, psz_url, iconUrl );
                     free( psz_url );
                     if ( unlikely( !p_server ) )
                         break;
@@ -550,6 +556,60 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
         ixmlNodeList_free( p_service_list );
     }
     ixmlNodeList_free( p_device_list );
+}
+
+std::string MediaServerList::getIconURL( IXML_Element* p_device_elem, const char* psz_base_url )
+{
+    std::string res;
+    IXML_NodeList* p_icon_lists = ixmlElement_getElementsByTagName( p_device_elem, "iconList" );
+    if ( p_icon_lists == NULL )
+        return res;
+    IXML_Element* p_icon_list = (IXML_Element*)ixmlNodeList_item( p_icon_lists, 0 );
+    if ( p_icon_list != NULL )
+    {
+        IXML_NodeList* p_icons = ixmlElement_getElementsByTagName( p_icon_list, "icon" );
+        if ( p_icons != NULL )
+        {
+            unsigned int maxWidth = 0;
+            unsigned int maxHeight = 0;
+            for ( unsigned int i = 0; i < ixmlNodeList_length( p_icons ); ++i )
+            {
+                IXML_Element* p_icon = (IXML_Element*)ixmlNodeList_item( p_icons, i );
+                const char* widthStr = xml_getChildElementValue( p_icon, "width" );
+                const char* heightStr = xml_getChildElementValue( p_icon, "height" );
+                if ( widthStr == NULL || heightStr == NULL )
+                    continue;
+                unsigned int width = atoi( widthStr );
+                unsigned int height = atoi( heightStr );
+                if ( width <= maxWidth || height <= maxHeight )
+                    continue;
+                const char* iconUrl = xml_getChildElementValue( p_icon, "url" );
+                if ( iconUrl == NULL )
+                    continue;
+                maxWidth = width;
+                maxHeight = height;
+                res = iconUrl;
+            }
+            ixmlNodeList_free( p_icons );
+        }
+    }
+    ixmlNodeList_free( p_icon_lists );
+
+    if ( res.empty() == false )
+    {
+        vlc_url_t url;
+        vlc_UrlParse( &url, psz_base_url );
+        char* psz_url;
+        if ( asprintf( &psz_url, "%s://%s:%u%s", url.psz_protocol, url.psz_host, url.i_port, res.c_str() ) < 0 )
+            res.clear();
+        else
+        {
+            res = psz_url;
+            free( psz_url );
+        }
+        vlc_UrlClean( &url );
+    }
+    return res;
 }
 
 void MediaServerList::removeServer( const std::string& udn )
