@@ -106,9 +106,6 @@ struct access_sys_t
     vlc_url_t           url;
     char               *psz_share;
     char               *psz_path;
-    char               *psz_user_opt;
-    char               *psz_pwd_opt;
-    char               *psz_domain_opt;
 
     char                netbios_name[16];
     struct in_addr      addr;
@@ -218,9 +215,6 @@ static void Close( vlc_object_t *p_this )
         smb_share_list_destroy( p_sys->shares );
     if( p_sys->files )
         smb_stat_list_destroy( p_sys->files );
-    free( p_sys->psz_user_opt );
-    free( p_sys->psz_pwd_opt );
-    free( p_sys->psz_domain_opt );
     free( p_sys->psz_share );
     free( p_sys->psz_path );
     free( p_sys );
@@ -376,18 +370,7 @@ success:
     msg_Warn( p_access, "Creds: username = '%s', domain = '%s'",
              psz_login, psz_domain );
     if( !b_guest )
-    {
-        if( asprintf( &p_sys->psz_user_opt, "smb-user=%s", psz_login ) == -1 )
-            p_sys->psz_user_opt = NULL;
-        if( credential.psz_realm != NULL
-         && asprintf( &p_sys->psz_domain_opt, "smb-domain=%s",
-                      credential.psz_realm ) == -1 )
-            p_sys->psz_domain_opt = NULL;
-
-        if( !vlc_credential_store( &credential, p_access  )
-         && asprintf( &p_sys->psz_pwd_opt, "smb-pwd=%s", psz_password ) == -1 )
-            p_sys->psz_pwd_opt = NULL;
-    }
+        vlc_credential_store( &credential, p_access );
 
     i_ret = VLC_SUCCESS;
 error:
@@ -542,7 +525,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
 static input_item_t *new_item( access_t *p_access, const char *psz_name,
                                int i_type )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     input_item_t *p_item;
     char         *psz_uri;
     int           i_ret;
@@ -564,18 +546,6 @@ static input_item_t *new_item( access_t *p_access, const char *psz_name,
     free( psz_uri );
     if( p_item == NULL )
         return NULL;
-
-    /* Here we save on the node the credentials that allowed us to login.
-     * That way the user isn't prompted more than once for credentials */
-    if( p_sys->psz_user_opt != NULL )
-        input_item_AddOption( p_item, p_sys->psz_user_opt,
-                              VLC_INPUT_OPTION_TRUSTED );
-    if( p_sys->psz_pwd_opt != NULL )
-        input_item_AddOption( p_item, p_sys->psz_pwd_opt,
-                              VLC_INPUT_OPTION_TRUSTED );
-    if( p_sys->psz_domain_opt != NULL )
-        input_item_AddOption( p_item, p_sys->psz_domain_opt,
-                              VLC_INPUT_OPTION_TRUSTED );
 
     return p_item;
 }
