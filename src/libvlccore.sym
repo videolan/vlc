@@ -221,6 +221,8 @@ input_Stop
 input_vaControl
 input_Close
 intf_Create
+libvlc_dialog_provider_init
+libvlc_dialog_provider_deinit
 libvlc_InternalAddIntf
 libvlc_InternalPlay
 libvlc_InternalCleanup
@@ -525,8 +527,6 @@ vlc_dialog_id_post_action
 vlc_dialog_id_post_login
 vlc_dialog_id_set_context
 vlc_dialog_is_cancelled
-vlc_dialog_provider_new
-vlc_dialog_provider_release
 vlc_dialog_provider_set_callbacks
 vlc_dialog_provider_set_ext_callback
 vlc_dialog_release
