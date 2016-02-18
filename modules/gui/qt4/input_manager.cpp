@@ -143,6 +143,7 @@ void InputManager::setInput( input_thread_t *_p_input )
     else
     {
         p_item = NULL;
+        lastURI.clear();
         assert( !p_input_vbi );
         emit rateChanged( var_InheritFloat( p_intf, "rate" ) );
     }
@@ -1075,7 +1076,6 @@ void MainInputManager::probeCurrentInput()
 void MainInputManager::stop()
 {
    playlist_Stop( THEPL );
-   getIM()->lastURI.clear();
 }
 
 void MainInputManager::next()
