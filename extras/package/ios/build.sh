@@ -13,6 +13,7 @@ TVOS=no
 OSSTYLE=iPhone
 OSVERSIONMINCFLAG=miphoneos-version-min
 OSVERSIONMINLDFLAG=ios_version_min
+BITCODE=no
 
 CORE_COUNT=`sysctl -n machdep.cpu.core_count`
 let MAKE_JOBS=$CORE_COUNT+1
@@ -30,6 +31,7 @@ OPTIONS
    -v            Enable verbose command-line output
    -t            Build for tvOS
    -w            Build a limited stack of non-scary libraries only
+   -b            Enable bitcode
 EOF
 }
 
@@ -50,7 +52,7 @@ info()
     echo "[${blue}info${normal}] $1"
 }
 
-while getopts "hvwdstk:a:" OPTION
+while getopts "hvbwdstk:a:" OPTION
 do
      case $OPTION in
          h)
@@ -69,6 +71,9 @@ do
          w)
              SCARY=no
              ;;
+         b)
+             BITCODE=yes
+             ;;
          k)
              SDK_VERSION=$OPTARG
              ;;
@@ -77,6 +82,7 @@ do
              ;;
          t)
              TVOS=yes
+             BITCODE=yes
              SDK_VERSION=`xcrun --sdk appletvos --show-sdk-version`
              OSVERSIONMINCFLAG=mtvos-version-min
              OSVERSIONMINLDFLAG=tvos_version_min
@@ -183,7 +189,7 @@ else
 CFLAGS+=" -${OSVERSIONMINCFLAG}=${SIXTYFOURBIT_SDK_MIN}"
 fi
 
-if [ "$TVOS" = "yes" ]; then
+if [ "$BITCODE" = "yes" ]; then
 CFLAGS+=" -fembed-bitcode"
 fi
 
