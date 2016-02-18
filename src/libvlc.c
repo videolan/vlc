@@ -235,8 +235,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 #endif
 
-    priv->p_dialog_provider = vlc_dialog_provider_new();
-    if( priv->p_dialog_provider == NULL )
+    if( libvlc_dialog_provider_init( p_libvlc ) != VLC_SUCCESS )
     {
         vlc_LogDeinit (p_libvlc);
         module_EndBank (true);
@@ -511,7 +510,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     libvlc_Quit( p_libvlc );
     intf_DestroyAll( p_libvlc );
 
-    vlc_dialog_provider_release( priv->p_dialog_provider );
+    libvlc_dialog_provider_deinit( p_libvlc );
 
 #ifdef ENABLE_VLM
     /* Destroy VLM if created in libvlc_InternalInit */
