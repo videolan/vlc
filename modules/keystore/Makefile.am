@@ -7,6 +7,9 @@ keystore_LTLIBRARIES = libmemory_keystore_plugin.la
 libfile_keystore_plugin_la_SOURCES = keystore/file.c \
 	keystore/file_crypt.h \
 	keystore/list_util.c keystore/list_util.h
+if HAVE_ANDROID
+libfile_keystore_plugin_la_SOURCES += keystore/file_crypt_android.c
+endif
 keystore_LTLIBRARIES += libfile_keystore_plugin.la
 
 libsecret_plugin_la_SOURCES = keystore/secret.c
