@@ -28,12 +28,12 @@ typedef struct vlc_dialog_id vlc_dialog_id;
 typedef struct extension_dialog_t extension_dialog_t;
 
 /* Called from src/libvlc.c */
-int
-libvlc_dialog_provider_init(libvlc_int_t *p_libvlc);
+vlc_dialog_provider *
+vlc_dialog_provider_new(void);
 
 /* Called from src/libvlc.c */
 void
-libvlc_dialog_provider_deinit(libvlc_int_t *p_libvlc);
+vlc_dialog_provider_release(vlc_dialog_provider *p_provider);
 
 /**
  * @defgroup vlc_dialog VLC dialog
