@@ -27,9 +27,11 @@ $(TARBALLS)/dxgidebug.idl:
 .sum-d3d11: $(TARBALLS)/d3d11.idl $(TARBALLS)/dxgidebug.idl
 
 $(DST_D3D11_H): $(TARBALLS)/d3d11.idl
+	mkdir -p -- "$(PREFIX)/include/"
 	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
 
 $(DST_DXGIDEBUG_H): $(TARBALLS)/dxgidebug.idl
+	mkdir -p -- "$(PREFIX)/include/"
 	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
 
 .d3d11: $(DST_D3D11_H) $(DST_DXGIDEBUG_H)
