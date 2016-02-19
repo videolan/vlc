@@ -145,12 +145,13 @@ dialog_id_release(vlc_dialog_id *p_id)
     free(p_id);
 }
 
-vlc_dialog_provider *
-vlc_dialog_provider_new(void)
+int
+libvlc_InternalDialogInit(libvlc_int_t *p_libvlc)
 {
+    assert(p_libvlc != NULL);
     vlc_dialog_provider *p_provider = malloc(sizeof(*p_provider));
-    if( p_provider == NULL )
-        return NULL;
+    if (p_provider == NULL)
+        return VLC_EGENERIC;
 
     vlc_mutex_init(&p_provider->lock);
     vlc_array_init(&p_provider->dialog_array);
@@ -160,8 +161,9 @@ vlc_dialog_provider_new(void)
 
     p_provider->pf_ext_update = NULL;
     p_provider->p_ext_data = NULL;
+    libvlc_priv(p_libvlc)->p_dialog_provider = p_provider;
 
-    return p_provider;
+    return VLC_SUCCESS;
 }
 
 static int
@@ -239,9 +241,10 @@ dialog_clear_all_locked(vlc_dialog_provider *p_provider)
 }
 
 void
-vlc_dialog_provider_release(vlc_dialog_provider *p_provider)
+libvlc_InternalDialogClean(libvlc_int_t *p_libvlc)
 {
-    assert(p_provider != NULL);
+    assert(p_libvlc != NULL);
+    vlc_dialog_provider *p_provider = libvlc_priv(p_libvlc)->p_dialog_provider;
 
     vlc_mutex_lock(&p_provider->lock);
     dialog_clear_all_locked(p_provider);
@@ -249,6 +252,7 @@ vlc_dialog_provider_release(vlc_dialog_provider *p_provider)
 
     vlc_mutex_destroy(&p_provider->lock);
     free(p_provider);
+    libvlc_priv(p_libvlc)->p_dialog_provider = NULL;
 }
 
 #undef vlc_dialog_provider_set_callbacks
