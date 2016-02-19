@@ -129,6 +129,12 @@ File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProper
     return 0;
 }
 
+#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
+static VLCTagLib::ExtResolver<MPEG::File> aacresolver(".aac");
+#endif
+static VLCTagLib::ExtResolver<MP4::File> m4vresolver(".m4v");
+static bool b_extensions_registered = false;
+
 // taglib is not thread safe
 static vlc_mutex_t taglib_lock = VLC_STATIC_MUTEX;
 
@@ -718,11 +724,14 @@ static int ReadMeta( vlc_object_t* p_this)
     if( psz_path == NULL )
         return VLC_EGENERIC;
 
+    if( !b_extensions_registered )
+    {
 #if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
-    FileRef::addFileTypeResolver( new VLCTagLib::ExtResolver<MPEG::File>(".aac") );
+        FileRef::addFileTypeResolver( &aacresolver );
 #endif
-
-    FileRef::addFileTypeResolver( new VLCTagLib::ExtResolver<MP4::File>(".m4v") );
+        FileRef::addFileTypeResolver( &m4vresolver );
+        b_extensions_registered = true;
+    }
 
 #if defined(_WIN32)
     wchar_t *wpath = ToWide( psz_path );
