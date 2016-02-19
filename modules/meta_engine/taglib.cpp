@@ -100,28 +100,47 @@
 using namespace TagLib;
 
 #define TAGLIB_SYNCDECODE_FIXED_VERSION VERSION_INT(1,11,0)
-#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
+
+#include <algorithm>
+
 namespace VLCTagLib
 {
-    class FileAAC : public FileRef::FileTypeResolver
+    template <class T>
+    class ExtResolver : public FileRef::FileTypeResolver
     {
         public:
+            ExtResolver(const std::string &);
+            ~ExtResolver() {}
             virtual File *createFile(FileName, bool, AudioProperties::ReadStyle) const;
+
+        protected:
+            std::string ext;
     };
 }
 
-File *VLCTagLib::FileAAC::createFile(FileName fileName, bool, AudioProperties::ReadStyle) const
+template <class T>
+VLCTagLib::ExtResolver<T>::ExtResolver(const std::string & ext) : FileTypeResolver()
+{
+    this->ext = ext;
+    std::transform(this->ext.begin(), this->ext.end(), this->ext.begin(), ::toupper);
+}
+
+template <class T>
+File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProperties::ReadStyle) const
 {
     std::string filename = std::string(fileName);
     std::size_t namesize = filename.size();
 
-    /* Just pass AAC file as MPEG one. Only ID3 headers will be decoded */
-    if (namesize > 4 && filename.substr(namesize - 4, 4) == ".aac")
-        return new MPEG::File(fileName, false, AudioProperties::ReadStyle::Fast);
+    if (namesize > ext.length())
+    {
+        std::string fext = filename.substr(namesize - ext.length(), ext.length());
+        std::transform(fext.begin(), fext.end(), fext.begin(), ::toupper);
+        if(fext == ext)
+            return new T(fileName, false, AudioProperties::ReadStyle::Fast);
+    }
 
     return 0;
 }
-#endif
 
 // taglib is not thread safe
 static vlc_mutex_t taglib_lock = VLC_STATIC_MUTEX;
@@ -719,8 +738,10 @@ static int ReadMeta( vlc_object_t* p_this)
         return VLC_EGENERIC;
 
 #if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
-    FileRef::addFileTypeResolver( new VLCTagLib::FileAAC );
+    FileRef::addFileTypeResolver( new VLCTagLib::ExtResolver<MPEG::File>(".aac") );
 #endif
+
+    FileRef::addFileTypeResolver( new VLCTagLib::ExtResolver<MP4::File>(".m4v") );
 
 #if defined(_WIN32)
     wchar_t *wpath = ToWide( psz_path );
