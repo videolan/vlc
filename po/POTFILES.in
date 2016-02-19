@@ -442,7 +442,7 @@ modules/control/ntservice.c
 modules/control/oldrc.c
 modules/control/unimotion.c
 modules/control/unimotion.h
-modules/demux/adaptative/adaptative.cpp
+modules/demux/adaptive/adaptive.cpp
 modules/demux/aiff.c
 modules/demux/asf/asf.c
 modules/demux/asf/libasf.c

@@ -21,13 +21,13 @@
 #ifndef M3U8_H_
 #define M3U8_H_
 
-#include "../adaptative/playlist/AbstractPlaylist.hpp"
+#include "../adaptive/playlist/AbstractPlaylist.hpp"
 
 namespace hls
 {
     namespace playlist
     {
-        using namespace adaptative::playlist;
+        using namespace adaptive::playlist;
 
         class M3U8 : public AbstractPlaylist
         {

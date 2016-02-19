@@ -26,8 +26,8 @@
 #define DASHREPRESENTATION_H_
 
 #include "DASHCommonAttributesElements.h"
-#include "../adaptative/playlist/SegmentInfoCommon.h"
-#include "../adaptative/playlist/BaseRepresentation.h"
+#include "../adaptive/playlist/SegmentInfoCommon.h"
+#include "../adaptive/playlist/BaseRepresentation.h"
 
 namespace dash
 {
@@ -37,8 +37,8 @@ namespace dash
         class TrickModeType;
         class MPD;
 
-        using namespace adaptative;
-        using namespace adaptative::playlist;
+        using namespace adaptive;
+        using namespace adaptive::playlist;
 
         class Representation : public BaseRepresentation,
                                public DASHCommonAttributesElements

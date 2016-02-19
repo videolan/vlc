@@ -20,9 +20,9 @@
 #ifndef SMOOTHINDEXREADER_HPP
 #define SMOOTHINDEXREADER_HPP
 
-#include "../adaptative/mp4/AtomsReader.hpp"
+#include "../adaptive/mp4/AtomsReader.hpp"
 
-namespace adaptative
+namespace adaptive
 {
     namespace playlist
     {
@@ -34,8 +34,8 @@ namespace smooth
 {
     namespace mp4
     {
-        using namespace adaptative::mp4;
-        using namespace adaptative::playlist;
+        using namespace adaptive::mp4;
+        using namespace adaptive::playlist;
 
         class IndexReader : public AtomsReader
         {

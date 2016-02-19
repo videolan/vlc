@@ -25,11 +25,11 @@
 #ifndef DASHMANAGER_H_
 #define DASHMANAGER_H_
 
-#include "../adaptative/PlaylistManager.h"
-#include "../adaptative/logic/AbstractAdaptationLogic.h"
+#include "../adaptive/PlaylistManager.h"
+#include "../adaptive/logic/AbstractAdaptationLogic.h"
 #include "mpd/MPD.h"
 
-namespace adaptative
+namespace adaptive
 {
     namespace xml
     {
@@ -39,7 +39,7 @@ namespace adaptative
 
 namespace dash
 {
-    using namespace adaptative;
+    using namespace adaptive;
 
     class DASHManager : public PlaylistManager
     {

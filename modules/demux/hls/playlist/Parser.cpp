@@ -24,12 +24,12 @@
 #include "Parser.hpp"
 #include "HLSSegment.hpp"
 #include "Representation.hpp"
-#include "../adaptative/playlist/BasePeriod.h"
-#include "../adaptative/playlist/BaseAdaptationSet.h"
-#include "../adaptative/playlist/SegmentList.h"
-#include "../adaptative/tools/Retrieve.hpp"
-#include "../adaptative/tools/Helper.h"
-#include "../adaptative/tools/Conversions.hpp"
+#include "../adaptive/playlist/BasePeriod.h"
+#include "../adaptive/playlist/BaseAdaptationSet.h"
+#include "../adaptive/playlist/SegmentList.h"
+#include "../adaptive/tools/Retrieve.hpp"
+#include "../adaptive/tools/Helper.h"
+#include "../adaptive/tools/Conversions.hpp"
 #include "M3U8.hpp"
 #include "Tags.hpp"
 
@@ -41,8 +41,8 @@
 #include <cctype>
 #include <algorithm>
 
-using namespace adaptative;
-using namespace adaptative::playlist;
+using namespace adaptive;
+using namespace adaptive::playlist;
 using namespace hls::playlist;
 
 M3U8Parser::M3U8Parser()

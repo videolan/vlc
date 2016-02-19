@@ -23,8 +23,8 @@
 
 #include "M3U8.hpp"
 #include "Representation.hpp"
-#include "../adaptative/playlist/BasePeriod.h"
-#include "../adaptative/playlist/BaseAdaptationSet.h"
+#include "../adaptive/playlist/BasePeriod.h"
+#include "../adaptive/playlist/BaseAdaptationSet.h"
 
 #include <vlc_common.h>
 #include <vlc_stream.h>

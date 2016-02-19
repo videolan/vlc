@@ -20,8 +20,8 @@
 #ifndef FORGEDINITSEGMENT_HPP
 #define FORGEDINITSEGMENT_HPP
 
-#include "../adaptative/playlist/Segment.h"
-#include "../adaptative/playlist/Inheritables.hpp"
+#include "../adaptive/playlist/Segment.h"
+#include "../adaptive/playlist/Inheritables.hpp"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -33,8 +33,8 @@ namespace smooth
 {
     namespace playlist
     {
-        using namespace adaptative::playlist;
-        using namespace adaptative::http;
+        using namespace adaptive::playlist;
+        using namespace adaptive::http;
 
         class ForgedInitSegment : public InitSegment,
                                   public TimescaleAble

@@ -20,13 +20,13 @@
 #ifndef MANIFEST_HPP
 #define MANIFEST_HPP
 
-#include "../adaptative/playlist/AbstractPlaylist.hpp"
+#include "../adaptive/playlist/AbstractPlaylist.hpp"
 
 namespace smooth
 {
     namespace playlist
     {
-        using namespace adaptative::playlist;
+        using namespace adaptive::playlist;
 
         class Manifest : public AbstractPlaylist
         {

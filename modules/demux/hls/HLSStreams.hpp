@@ -24,11 +24,11 @@
 # include "config.h"
 #endif
 
-#include "../adaptative/Streams.hpp"
+#include "../adaptive/Streams.hpp"
 
 namespace hls
 {
-    using namespace adaptative;
+    using namespace adaptive;
 
     class HLSStream : public AbstractStream
     {

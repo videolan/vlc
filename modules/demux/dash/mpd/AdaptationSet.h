@@ -29,7 +29,7 @@
 #include <string>
 #include <map>
 
-#include "../adaptative/playlist/BaseAdaptationSet.h"
+#include "../adaptive/playlist/BaseAdaptationSet.h"
 #include "DASHCommonAttributesElements.h"
 
 namespace dash
@@ -39,9 +39,9 @@ namespace dash
         class Period;
         class Representation;
 
-        using namespace adaptative;
+        using namespace adaptive;
 
-        class AdaptationSet : public adaptative::playlist::BaseAdaptationSet,
+        class AdaptationSet : public adaptive::playlist::BaseAdaptationSet,
                               public DASHCommonAttributesElements
         {
             public:

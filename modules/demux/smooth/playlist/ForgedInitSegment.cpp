@@ -19,7 +19,7 @@
  *****************************************************************************/
 #include "ForgedInitSegment.hpp"
 #include "MemoryChunk.hpp"
-#include "../adaptative/playlist/SegmentChunk.hpp"
+#include "../adaptive/playlist/SegmentChunk.hpp"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -35,7 +35,7 @@ extern "C"
     #include "../../demux/mp4/libmp4.h" /* majors */
 }
 
-using namespace adaptative::playlist;
+using namespace adaptive::playlist;
 using namespace smooth::playlist;
 using namespace smooth::http;
 

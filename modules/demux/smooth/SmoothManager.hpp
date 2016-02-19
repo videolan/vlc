@@ -20,11 +20,11 @@
 #ifndef SMOOTHMANAGER_HPP
 #define SMOOTHMANAGER_HPP
 
-#include "../adaptative/PlaylistManager.h"
-#include "../adaptative/logic/AbstractAdaptationLogic.h"
+#include "../adaptive/PlaylistManager.h"
+#include "../adaptive/logic/AbstractAdaptationLogic.h"
 #include "playlist/Manifest.hpp"
 
-namespace adaptative
+namespace adaptive
 {
     namespace xml
     {
@@ -34,7 +34,7 @@ namespace adaptative
 
 namespace smooth
 {
-    using namespace adaptative;
+    using namespace adaptive;
 
     class SmoothManager : public PlaylistManager
     {

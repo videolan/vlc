@@ -20,10 +20,10 @@
 #ifndef SMOOTHREPRESENTATION_HPP
 #define SMOOTHREPRESENTATION_HPP
 
-#include "../adaptative/playlist/SegmentInfoCommon.h"
-#include "../adaptative/playlist/BaseRepresentation.h"
+#include "../adaptive/playlist/SegmentInfoCommon.h"
+#include "../adaptive/playlist/BaseRepresentation.h"
 
-namespace adaptative
+namespace adaptive
 {
     namespace playlist
     {
@@ -35,8 +35,8 @@ namespace smooth
 {
     namespace playlist
     {
-        using namespace adaptative;
-        using namespace adaptative::playlist;
+        using namespace adaptive;
+        using namespace adaptive::playlist;
 
         class Representation : public BaseRepresentation
         {

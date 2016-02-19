@@ -20,13 +20,13 @@
 #ifndef SMOOTHSEGMENT_HPP
 #define SMOOTHSEGMENT_HPP
 
-#include "../adaptative/playlist/SegmentTemplate.h"
+#include "../adaptive/playlist/SegmentTemplate.h"
 
 namespace smooth
 {
     namespace playlist
     {
-        using namespace adaptative::playlist;
+        using namespace adaptive::playlist;
 
         class SmoothSegment : public MediaSegmentTemplate
         {

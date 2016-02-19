@@ -20,13 +20,13 @@
 #ifndef HLSMANAGER_HPP
 #define HLSMANAGER_HPP
 
-#include "../adaptative/PlaylistManager.h"
-#include "../adaptative/logic/AbstractAdaptationLogic.h"
+#include "../adaptive/PlaylistManager.h"
+#include "../adaptive/logic/AbstractAdaptationLogic.h"
 #include "playlist/M3U8.hpp"
 
 namespace hls
 {
-    using namespace adaptative;
+    using namespace adaptive;
 
     class HLSManager : public PlaylistManager
     {

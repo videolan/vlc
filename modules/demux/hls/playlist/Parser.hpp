@@ -24,14 +24,14 @@
 # include "config.h"
 #endif
 
-#include "../adaptative/playlist/SegmentInfoCommon.h"
+#include "../adaptive/playlist/SegmentInfoCommon.h"
 
 #include <cstdlib>
 #include <sstream>
 
 #include <vlc_common.h>
 
-namespace adaptative
+namespace adaptive
 {
     namespace playlist
     {
@@ -46,7 +46,7 @@ namespace hls
 {
     namespace playlist
     {
-        using namespace adaptative::playlist;
+        using namespace adaptive::playlist;
 
         class M3U8;
         class AttributesTag;

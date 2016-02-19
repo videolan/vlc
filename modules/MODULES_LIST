@@ -23,7 +23,7 @@ $Id$
  * access_realrtsp: Real RTSP access
  * access_wasapi: WASAPI audio input
  * accesstweaks: access control tweaking module (dev tool)
- * adaptative: Unified adaptative streaming module (DASH/HLS)
+ * adaptive: Unified adaptive streaming module (DASH/HLS)
  * addonsfsstorage: Local storage extensions repository
  * addonsvorepository: Videolan extensions repository
  * adjust: Contrast/Hue/saturation/Brightness adjust module

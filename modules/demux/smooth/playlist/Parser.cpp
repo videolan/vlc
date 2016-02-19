@@ -23,17 +23,17 @@
 #include "Representation.hpp"
 #include "ForgedInitSegment.hpp"
 #include "SmoothSegment.hpp"
-#include "../adaptative/playlist/BasePeriod.h"
-#include "../adaptative/playlist/BaseAdaptationSet.h"
-#include "../adaptative/playlist/SegmentTimeline.h"
-#include "../adaptative/playlist/SegmentList.h"
-#include "../adaptative/xml/DOMHelper.h"
-#include "../adaptative/xml/Node.h"
-#include "../adaptative/tools/Helper.h"
-#include "../adaptative/tools/Conversions.hpp"
+#include "../adaptive/playlist/BasePeriod.h"
+#include "../adaptive/playlist/BaseAdaptationSet.h"
+#include "../adaptive/playlist/SegmentTimeline.h"
+#include "../adaptive/playlist/SegmentList.h"
+#include "../adaptive/xml/DOMHelper.h"
+#include "../adaptive/xml/Node.h"
+#include "../adaptive/tools/Helper.h"
+#include "../adaptive/tools/Conversions.hpp"
 
 using namespace smooth::playlist;
-using namespace adaptative::xml;
+using namespace adaptive::xml;
 
 ManifestParser::ManifestParser(Node *root_, stream_t *stream, const std::string & streambaseurl_)
 {

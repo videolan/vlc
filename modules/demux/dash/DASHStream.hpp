@@ -24,11 +24,11 @@
 # include "config.h"
 #endif
 
-#include "../adaptative/Streams.hpp"
+#include "../adaptive/Streams.hpp"
 
 namespace dash
 {
-    using namespace adaptative;
+    using namespace adaptive;
 
     class DASHStream : public AbstractStream
     {

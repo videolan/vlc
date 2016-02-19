@@ -23,16 +23,16 @@
 # include "config.h"
 #endif
 
-#include "../adaptative/tools/Retrieve.hpp"
+#include "../adaptive/tools/Retrieve.hpp"
 #include "playlist/Parser.hpp"
-#include "../adaptative/xml/DOMParser.h"
+#include "../adaptive/xml/DOMParser.h"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 #include <time.h>
 
-using namespace adaptative;
-using namespace adaptative::logic;
+using namespace adaptive;
+using namespace adaptive::logic;
 using namespace smooth;
 using namespace smooth::playlist;
 

@@ -21,9 +21,9 @@
 #ifndef HLSREPRESENTATION_H_
 #define HLSREPRESENTATION_H_
 
-#include "../adaptative/playlist/BaseRepresentation.h"
-#include "../adaptative/tools/Properties.hpp"
-#include "../adaptative/StreamFormat.hpp"
+#include "../adaptive/playlist/BaseRepresentation.h"
+#include "../adaptive/tools/Properties.hpp"
+#include "../adaptive/StreamFormat.hpp"
 
 namespace hls
 {
@@ -31,8 +31,8 @@ namespace hls
     {
         class M3U8;
 
-        using namespace adaptative;
-        using namespace adaptative::playlist;
+        using namespace adaptive;
+        using namespace adaptive::playlist;
 
         class Representation : public BaseRepresentation
         {

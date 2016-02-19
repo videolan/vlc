@@ -25,16 +25,16 @@
 #ifndef MPD_H_
 #define MPD_H_
 
-#include "../adaptative/playlist/AbstractPlaylist.hpp"
-#include "../adaptative/StreamFormat.hpp"
+#include "../adaptive/playlist/AbstractPlaylist.hpp"
+#include "../adaptive/StreamFormat.hpp"
 #include "Profile.hpp"
 
 namespace dash
 {
     namespace mpd
     {
-        using namespace adaptative::playlist;
-        using namespace adaptative;
+        using namespace adaptive::playlist;
+        using namespace adaptive;
 
         class ProgramInformation;
 

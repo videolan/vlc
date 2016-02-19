@@ -23,15 +23,15 @@
 #endif
 
 #include "HLSManager.hpp"
-#include "../adaptative/tools/Retrieve.hpp"
-#include "../adaptative/http/HTTPConnectionManager.h"
+#include "../adaptive/tools/Retrieve.hpp"
+#include "../adaptive/http/HTTPConnectionManager.h"
 #include "playlist/Parser.hpp"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 #include <time.h>
 
-using namespace adaptative;
-using namespace adaptative::logic;
+using namespace adaptive;
+using namespace adaptive::logic;
 using namespace hls;
 using namespace hls::playlist;
 

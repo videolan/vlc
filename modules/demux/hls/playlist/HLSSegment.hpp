@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include "../adaptative/playlist/Segment.h"
+#include "../adaptive/playlist/Segment.h"
 #include <vector>
 #ifdef HAVE_GCRYPT
  #include <gcrypt.h>
@@ -34,7 +34,7 @@ namespace hls
 {
     namespace playlist
     {
-        using namespace adaptative::playlist;
+        using namespace adaptive::playlist;
 
         class SegmentEncryption
         {

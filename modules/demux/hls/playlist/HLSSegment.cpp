@@ -18,8 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "HLSSegment.hpp"
-#include "../adaptative/playlist/SegmentChunk.hpp"
-#include "../adaptative/playlist/BaseRepresentation.h"
+#include "../adaptive/playlist/SegmentChunk.hpp"
+#include "../adaptive/playlist/BaseRepresentation.h"
 
 #include <vlc_common.h>
 #include <vlc_block.h>

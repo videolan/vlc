@@ -30,7 +30,7 @@
 using namespace dash::mpd;
 
 AdaptationSet::AdaptationSet(Period *period) :
-    adaptative::playlist::BaseAdaptationSet( period ),
+    adaptive::playlist::BaseAdaptationSet( period ),
     DASHCommonAttributesElements(),
     subsegmentAlignmentFlag( false )
 {

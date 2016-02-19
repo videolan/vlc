@@ -33,20 +33,20 @@
 #include "mpd/IsoffMainParser.h"
 #include "xml/DOMParser.h"
 #include "xml/Node.h"
-#include "../adaptative/tools/Helper.h"
-#include "../adaptative/http/HTTPConnectionManager.h"
+#include "../adaptive/tools/Helper.h"
+#include "../adaptive/http/HTTPConnectionManager.h"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 #include <vlc_meta.h>
 #include <vlc_block.h>
-#include "../adaptative/tools/Retrieve.hpp"
+#include "../adaptive/tools/Retrieve.hpp"
 
 #include <algorithm>
 #include <ctime>
 
 using namespace dash;
 using namespace dash::mpd;
-using namespace adaptative::logic;
+using namespace adaptive::logic;
 
 DASHManager::DASHManager(demux_t *demux_, MPD *mpd,
                          AbstractStreamFactory *factory,
@@ -200,7 +200,7 @@ bool DASHManager::isDASH(xml::Node *root)
     std::string ns = root->getAttributeValue("xmlns");
     for( size_t i=0; i<ARRAY_SIZE(namespaces); i++ )
     {
-        if ( adaptative::Helper::ifind(ns, namespaces[i]) )
+        if ( adaptive::Helper::ifind(ns, namespaces[i]) )
             return true;
     }
     return false;

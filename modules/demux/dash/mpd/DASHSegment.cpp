@@ -27,12 +27,12 @@
 #endif
 
 #include "DASHSegment.h"
-#include "../adaptative/playlist/BaseRepresentation.h"
+#include "../adaptive/playlist/BaseRepresentation.h"
 #include "../mp4/IndexReader.hpp"
-#include "../adaptative/playlist/AbstractPlaylist.hpp"
-#include "../adaptative/playlist/SegmentChunk.hpp"
+#include "../adaptive/playlist/AbstractPlaylist.hpp"
+#include "../adaptive/playlist/SegmentChunk.hpp"
 
-using namespace adaptative::playlist;
+using namespace adaptive::playlist;
 using namespace dash::mpd;
 using namespace dash::mp4;
 

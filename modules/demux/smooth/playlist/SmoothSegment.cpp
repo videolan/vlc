@@ -20,8 +20,8 @@
 
 #include "SmoothSegment.hpp"
 
-#include "../adaptative/playlist/BaseRepresentation.h"
-#include "../adaptative/playlist/AbstractPlaylist.hpp"
+#include "../adaptive/playlist/BaseRepresentation.h"
+#include "../adaptive/playlist/AbstractPlaylist.hpp"
 #include "../mp4/IndexReader.hpp"
 
 using namespace smooth::playlist;

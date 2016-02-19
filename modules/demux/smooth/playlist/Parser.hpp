@@ -24,14 +24,14 @@
 # include "config.h"
 #endif
 
-#include "../adaptative/playlist/SegmentInfoCommon.h"
+#include "../adaptive/playlist/SegmentInfoCommon.h"
 
 #include <cstdlib>
 #include <sstream>
 
 #include <vlc_common.h>
 
-namespace adaptative
+namespace adaptive
 {
     namespace playlist
     {
@@ -50,8 +50,8 @@ namespace smooth
 {
     namespace playlist
     {
-        using namespace adaptative::playlist;
-        using namespace adaptative;
+        using namespace adaptive::playlist;
+        using namespace adaptive;
 
         class Manifest;
 

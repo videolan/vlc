@@ -18,13 +18,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "IndexReader.hpp"
-#include "../adaptative/playlist/BaseRepresentation.h"
-#include "../adaptative/playlist/BaseAdaptationSet.h"
-#include "../adaptative/playlist/SegmentTemplate.h"
-#include "../adaptative/playlist/SegmentTimeline.h"
-#include "../adaptative/playlist/AbstractPlaylist.hpp"
+#include "../adaptive/playlist/BaseRepresentation.h"
+#include "../adaptive/playlist/BaseAdaptationSet.h"
+#include "../adaptive/playlist/SegmentTemplate.h"
+#include "../adaptive/playlist/SegmentTimeline.h"
+#include "../adaptive/playlist/AbstractPlaylist.hpp"
 
-using namespace adaptative::mp4;
+using namespace adaptive::mp4;
 using namespace smooth::mp4;
 
 IndexReader::IndexReader(vlc_object_t *obj)

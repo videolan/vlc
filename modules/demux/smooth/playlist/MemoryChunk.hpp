@@ -20,13 +20,13 @@
 #ifndef MEMORYCHUNK_HPP
 #define MEMORYCHUNK_HPP
 
-#include "../adaptative/http/Chunk.h"
+#include "../adaptive/http/Chunk.h"
 
 namespace smooth
 {
     namespace http
     {
-        using namespace adaptative::http;
+        using namespace adaptive::http;
 
         class MemoryChunkSource : public AbstractChunkSource
         {

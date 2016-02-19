@@ -28,13 +28,13 @@
 #include "DASHCommonAttributesElements.h"
 
 #include "ContentDescription.h"
-#include "../adaptative/StreamFormat.hpp"
+#include "../adaptive/StreamFormat.hpp"
 
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 
 using namespace dash::mpd;
-using namespace adaptative;
+using namespace adaptive;
 
 DASHCommonAttributesElements::DASHCommonAttributesElements() :
     parX( 1 ),

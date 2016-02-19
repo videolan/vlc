@@ -21,7 +21,7 @@
 #include "../mpd/Representation.h"
 #include "../mpd/MPD.h"
 
-using namespace adaptative::mp4;
+using namespace adaptive::mp4;
 using namespace dash::mp4;
 using namespace dash::mpd;
 
