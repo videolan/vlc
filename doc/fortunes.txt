@@ -1024,4 +1024,13 @@ reactor leaks ionizing radiations."
 < EvilCourmisch> muahahahahahahahahahahahahahahahahahahahahaha
  -- IRC, we're loosing Rémi!
 %
-
+< courmisch> lo
+< j-b> courmisch: SanDiego?
+< courmisch> j-b: uh?
+< j-b> uh!
+ * j-b lost context
+ * evilril gives j-b an MpegEncContext
+< courmisch> this happens when you omit the frame pointer
+< Sean_McG> lol
+ -- IRC, MpegEncContext is evil
+%
