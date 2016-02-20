@@ -26,6 +26,7 @@
 #define VLC_MKV_MATROSKA_SEGMENT_HPP_
 
 #include "mkv.hpp"
+#include <vector>
 
 class EbmlParser;
 
@@ -72,6 +73,8 @@ public:
 class matroska_segment_c
 {
 public:
+    typedef std::vector<mkv_index_t> indexes_t;
+
     matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream );
     virtual ~matroska_segment_c();
 
@@ -107,9 +110,7 @@ public:
     KaxNextUID              *p_next_segment_uid;
 
     bool                    b_cues;
-    int                     i_index;
-    int                     i_index_max;
-    mkv_index_t             *p_indexes;
+    indexes_t               indexes;
 
     /* info */
     char                    *psz_muxing_application;
@@ -144,6 +145,10 @@ public:
 
     bool Select( mtime_t i_mk_start_time );
     void UnSelect();
+
+    size_t        index_idx () const { return indexes.size () - 1; }
+    mkv_index_t&      index () { return *indexes.rbegin (); }
+    mkv_index_t& prev_index () { return *(indexes.end()-2); }
 
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
 

@@ -441,8 +441,6 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
     int64_t            i_global_position = -1;
 
-    int         i_index;
-
     msg_Dbg( p_demux, "seek request to %" PRId64 " (%f%%)", i_mk_date, f_percent );
     if( i_mk_date < 0 && f_percent < 0 )
     {
@@ -474,19 +472,26 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
             int64_t i_pos = int64_t( f_percent * stream_Size( p_demux->s ) );
 
             msg_Dbg( p_demux, "lengthy way of seeking for pos:%" PRId64, i_pos );
-            for( i_index = 0; i_index < p_segment->i_index; i_index++ )
-            {
-                if( p_segment->p_indexes[i_index].i_position >= i_pos &&
-                    p_segment->p_indexes[i_index].i_mk_time != -1 )
-                    break;
-            }
-            if( i_index == p_segment->i_index )
-                i_index--;
 
-            if( p_segment->p_indexes[i_index].i_position < i_pos )
+            if (p_segment->indexes.size())
             {
-                msg_Dbg( p_demux, "no cues, seek request to global pos: %" PRId64, i_pos );
-                i_global_position = i_pos;
+                matroska_segment_c::indexes_t::iterator it          = p_segment->indexes.begin ();
+                matroska_segment_c::indexes_t::iterator last_active = p_segment->indexes.end()-1;
+
+                for ( ; it != last_active; ++it )
+                {
+                    if( it->i_position >= i_pos && it->i_mk_time != -1 )
+                        break;
+                }
+
+                if ( it == last_active && it != p_segment->indexes.begin() )
+                    --it;
+
+                if( it->i_position < i_pos )
+                {
+                    msg_Dbg( p_demux, "no cues, seek request to global pos: %" PRId64, i_pos );
+                    i_global_position = i_pos;
+                }
             }
         }
     }
