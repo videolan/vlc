@@ -316,6 +316,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/http/BytesRange.hpp \
     demux/adaptive/http/Chunk.cpp \
     demux/adaptive/http/Chunk.h \
+    demux/adaptive/http/ConnectionParams.cpp \
+    demux/adaptive/http/ConnectionParams.hpp \
     demux/adaptive/http/Downloader.cpp \
     demux/adaptive/http/Downloader.hpp \
     demux/adaptive/http/HTTPConnection.cpp \

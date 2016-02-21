@@ -26,6 +26,7 @@
 #define CHUNK_H_
 
 #include "BytesRange.hpp"
+#include "ConnectionParams.hpp"
 #include <vector>
 #include <string>
 #include <stdint.h>
@@ -99,11 +100,7 @@ namespace adaptive
 
             private:
                 bool init(const std::string &);
-                std::string         url;
-                std::string         scheme;
-                std::string         path;
-                std::string         hostname;
-                uint16_t            port;
+                ConnectionParams    params;
         };
 
         class HTTPChunkBufferedSource : public HTTPChunkSource

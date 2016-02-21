@@ -31,7 +31,6 @@
 #include "Downloader.hpp"
 
 #include <vlc_common.h>
-#include <vlc_url.h>
 #include <vlc_block.h>
 
 #include <algorithm>
@@ -113,8 +112,7 @@ HTTPChunkSource::HTTPChunkSource(const std::string& url, HTTPConnectionManager *
     AbstractChunkSource(),
     connection   (NULL),
     connManager  (manager),
-    consumed     (0),
-    port         (0)
+    consumed     (0)
 {
     prepared = false;
     eof = false;
@@ -130,35 +128,12 @@ HTTPChunkSource::~HTTPChunkSource()
 
 bool HTTPChunkSource::init(const std::string &url)
 {
-    this->url = url;
+    params = ConnectionParams(url);
 
-    std::size_t pos = url.find("://");
-    if(pos != std::string::npos)
-    {
-        scheme = url.substr(0, pos);
-    }
-
-    if(scheme != "http" && scheme != "https")
+    if(params.getScheme() != "http" && params.getScheme() != "https")
         return false;
 
-    vlc_url_t url_components;
-    vlc_UrlParse(&url_components, url.c_str());
-
-    if(url_components.psz_path)
-        path = url_components.psz_path;
-    if(url_components.psz_option)
-    {
-        path += "?";
-        path += url_components.psz_option;
-    }
-    port = url_components.i_port ? url_components.i_port :
-                         ((scheme == "https") ? 443 : 80);
-    if(url_components.psz_host)
-        hostname = url_components.psz_host;
-
-    vlc_UrlClean(&url_components);
-
-    if(path.empty() || hostname.empty())
+    if(params.getPath().empty() || params.getHostname().empty())
         return false;
 
     return true;
@@ -228,12 +203,14 @@ bool HTTPChunkSource::prepare()
 
     if(!connection)
     {
-        connection = connManager->getConnection(scheme, hostname, port);
+        connection = connManager->getConnection(params.getScheme(),
+                                                params.getHostname(),
+                                                params.getPort());
         if(!connection)
             return false;
     }
 
-    if( connection->query(path, bytesRange) != VLC_SUCCESS )
+    if( connection->query(params.getPath(), bytesRange) != VLC_SUCCESS )
         return false;
     /* Because we don't know Chunk size at start, we need to get size
            from content length */
