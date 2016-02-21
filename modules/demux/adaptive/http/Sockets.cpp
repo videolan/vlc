@@ -41,9 +41,9 @@ Socket::~Socket()
     disconnect();
 }
 
-bool Socket::connect(vlc_object_t *stream, const std::string &hostname, int port)
+bool Socket::connect(vlc_object_t *p_object, const std::string &hostname, int port)
 {
-    netfd = net_ConnectTCP(stream, hostname.c_str(), port);
+    netfd = net_ConnectTCP(p_object, hostname.c_str(), port);
 
     if(netfd == -1)
         return false;
@@ -70,14 +70,14 @@ void Socket::disconnect()
     }
 }
 
-ssize_t Socket::read(vlc_object_t *stream, void *p_buffer, size_t len)
+ssize_t Socket::read(vlc_object_t *p_object, void *p_buffer, size_t len)
 {
-    return net_Read(stream, netfd, p_buffer, len);
+    return net_Read(p_object, netfd, p_buffer, len);
 }
 
-std::string Socket::readline(vlc_object_t *stream)
+std::string Socket::readline(vlc_object_t *p_object)
 {
-    char *line = ::net_Gets(stream, netfd);
+    char *line = ::net_Gets(p_object, netfd);
     if(line == NULL)
         return "";
     std::string ret(line);
@@ -85,7 +85,7 @@ std::string Socket::readline(vlc_object_t *stream)
     return ret;
 }
 
-bool Socket::send(vlc_object_t *stream, const void *buf, size_t size)
+bool Socket::send(vlc_object_t *p_object, const void *buf, size_t size)
 {
     if (netfd == -1)
         return false;
@@ -93,7 +93,7 @@ bool Socket::send(vlc_object_t *stream, const void *buf, size_t size)
     if (size == 0)
         return true;
 
-    return net_Write(stream, netfd, buf, size) == (ssize_t)size;
+    return net_Write(p_object, netfd, buf, size) == (ssize_t)size;
 }
 
 TLSSocket::TLSSocket() : Socket( TLS )
@@ -107,13 +107,13 @@ TLSSocket::~TLSSocket()
     disconnect();
 }
 
-bool TLSSocket::connect(vlc_object_t *stream, const std::string &hostname, int port)
+bool TLSSocket::connect(vlc_object_t *p_object, const std::string &hostname, int port)
 {
     disconnect();
-    if(!Socket::connect(stream, hostname, port))
+    if(!Socket::connect(p_object, hostname, port))
         return false;
 
-    creds = vlc_tls_ClientCreate(stream);
+    creds = vlc_tls_ClientCreate(p_object);
     if(!creds)
     {
         disconnect();
