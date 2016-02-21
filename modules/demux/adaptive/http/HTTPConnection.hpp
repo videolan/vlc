@@ -70,7 +70,7 @@ namespace adaptive
                 std::string hostname;
                 uint16_t port;
                 char * psz_useragent;
-                vlc_object_t *stream;
+                vlc_object_t *p_object;
                 size_t bytesRead;
                 size_t contentLength;
                 BytesRange bytesRange;

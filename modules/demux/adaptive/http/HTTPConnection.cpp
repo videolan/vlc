@@ -26,11 +26,11 @@
 
 using namespace adaptive::http;
 
-HTTPConnection::HTTPConnection(vlc_object_t *stream_, Socket *socket_, bool persistent)
+HTTPConnection::HTTPConnection(vlc_object_t *p_object_, Socket *socket_, bool persistent)
 {
     socket = socket_;
-    stream = stream_;
-    psz_useragent = var_InheritString(stream, "http-user-agent");
+    p_object = p_object_;
+    psz_useragent = var_InheritString(p_object, "http-user-agent");
     bytesRead = 0;
     contentLength = 0;
     queryOk = false;
@@ -55,7 +55,7 @@ bool HTTPConnection::compare(const std::string &hostname, uint16_t port, int typ
 
 bool HTTPConnection::connect(const std::string &hostname, uint16_t port)
 {
-    if(!socket->connect(stream, hostname.c_str(), port))
+    if(!socket->connect(p_object, hostname.c_str(), port))
         return false;
 
     this->hostname = hostname;
@@ -82,7 +82,7 @@ int HTTPConnection::query(const std::string &path, const BytesRange &range)
 {
     queryOk = false;
 
-    msg_Dbg(stream, "Retrieving ://%s:%u%s @%zu", hostname.c_str(), port, path.c_str(),
+    msg_Dbg(p_object, "Retrieving ://%s:%u%s @%zu", hostname.c_str(), port, path.c_str(),
             range.isValid() ? range.getStartByte() : 0);
 
     if(!connected() && ( hostname.empty() || !connect(hostname, port) ))
@@ -145,7 +145,7 @@ ssize_t HTTPConnection::read(void *p_buffer, size_t len)
     if(len > toRead)
         len = toRead;
 
-    ssize_t ret = socket->read(stream, p_buffer, len);
+    ssize_t ret = socket->read(p_object, p_buffer, len);
     if(ret >= 0)
         bytesRead += ret;
 
@@ -165,7 +165,7 @@ bool HTTPConnection::send(const std::string &data)
 
 bool HTTPConnection::send(const void *buf, size_t size)
 {
-    return socket->send(stream, buf, size);
+    return socket->send(p_object, buf, size);
 }
 
 int HTTPConnection::parseReply()
@@ -204,7 +204,7 @@ int HTTPConnection::parseReply()
 
 std::string HTTPConnection::readLine()
 {
-    return socket->readline(stream);
+    return socket->readline(p_object);
 }
 
 bool HTTPConnection::isAvailable() const
