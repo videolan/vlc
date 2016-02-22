@@ -1114,7 +1114,7 @@ void AVI_ChunkFreeRoot( stream_t *s,
 }
 
 
-int  _AVI_ChunkCount( avi_chunk_t *p_chk, vlc_fourcc_t i_fourcc )
+int  AVI_ChunkCount_( avi_chunk_t *p_chk, vlc_fourcc_t i_fourcc )
 {
     int i_count;
     avi_chunk_t *p_child;
@@ -1139,7 +1139,7 @@ int  _AVI_ChunkCount( avi_chunk_t *p_chk, vlc_fourcc_t i_fourcc )
     return i_count;
 }
 
-void *_AVI_ChunkFind( avi_chunk_t *p_chk,
+void *AVI_ChunkFind_( avi_chunk_t *p_chk,
                       vlc_fourcc_t i_fourcc, int i_number )
 {
     avi_chunk_t *p_child;
