@@ -23,8 +23,8 @@
 
 /* VLC <-> avutil tables */
 
-#ifndef _VLC_AVUTIL_CHROMA_H
-#define _VLC_AVUTIL_CHROMA_H 1
+#ifndef VLC_AVUTIL_CHROMA_H_
+#define VLC_AVUTIL_CHROMA_H_
 
 int FindFfmpegChroma( vlc_fourcc_t );
 int GetFfmpegChroma( int *i_ffmpeg_chroma, const video_format_t *fmt );
