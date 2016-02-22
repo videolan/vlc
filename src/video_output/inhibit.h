@@ -18,8 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef LIBVLC_INHIBIT_H
-# define LIVCLC_INHIBIT_H 1
+#ifndef LIBVLC_VIDEO_OUTPUT_INHIBIT_H_
+#define LIBVLC_VIDEO_OUTPUT_INHIBIT_H_
 
 # include <vlc_inhibit.h>
 
