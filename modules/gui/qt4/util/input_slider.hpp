@@ -23,8 +23,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _INPUTSLIDER_H_
-#define _INPUTSLIDER_H_
+#ifndef VLC_QT_INPUT_SLIDER_HPP_
+#define VLC_QT_INPUT_SLIDER_HPP_
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

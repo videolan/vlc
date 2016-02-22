@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _QVLCFRAME_H_
-#define _QVLCFRAME_H_
+#ifndef VLC_QT_QVLCFRAME_HPP_
+#define VLC_QT_QVLCFRAME_HPP_
 
 #include <QWidget>
 #include <QDialog>

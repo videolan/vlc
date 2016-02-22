@@ -22,8 +22,8 @@
  *****************************************************************************/
 
 
-#ifndef _QVLC_APP_H_
-#define _QVLC_APP_H_
+#ifndef VLC_QT_QVLCAPP_HPP_
+#define VLC_QT_QVLCAPP_HPP_
 
 #include <QApplication>
 #include <QEvent>

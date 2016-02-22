@@ -20,8 +20,8 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _SINGLETON_HPP_
-#define _SINGLETON_HPP_
+#ifndef VLC_QT_SINGLETON_HPP_
+#define VLC_QT_SINGLETON_HPP_
 
 #include <stdlib.h>
 #include <vlc_threads.h>
@@ -68,4 +68,4 @@ T*  Singleton<T>::m_instance = NULL;
 template <typename T>
 vlc_mutex_t Singleton<T>::m_mutex = VLC_STATIC_MUTEX;
 
-#endif // _SINGLETON_HPP_
+#endif // include-guard
