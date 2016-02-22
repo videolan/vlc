@@ -154,8 +154,8 @@ static void BlockBlendC(uint8_t *dst, size_t dst_pitch,
 }
 
 #ifdef CAN_COMPILE_SSE2
-#define _STRING(x) #x
-#define STRING(x) _STRING(x)
+#define STRING_EXPAND(x) #x
+#define STRING(x) STRING_EXPAND(x)
 VLC_SSE
 static void BlockBlendSse2(uint8_t *dst, size_t dst_pitch,
                            const uint8_t *src, size_t src_pitch,
