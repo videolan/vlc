@@ -171,3 +171,8 @@ int AWindowHandler_setWindowLayout(AWindowHandler *p_awh,
                                    int i_width, int i_height,
                                    int i_visible_width, int i_visible_height,
                                    int i_sar_num, int i_sar_den);
+
+/* Signal a critical error
+ * TODO: remove this when there is a decoder fallback */
+int
+AWindowHandler_sendHardwareAccelerationError(AWindowHandler *p_awh);

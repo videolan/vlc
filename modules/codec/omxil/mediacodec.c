@@ -50,9 +50,6 @@
 #include "omxil_utils.h"
 #include "../../video_output/android/android_window.h"
 
-/* JNI functions to get/set an Android Surface object. */
-extern void jni_EventHardwareAccelerationError(); // TODO REMOVE
-
 #define BLOCK_FLAG_CSD (0x01 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 /* Codec Specific Data */
@@ -115,7 +112,7 @@ struct decoder_sys_t
     /* If true, the first input block was successfully dequeued */
     bool            b_input_dequeued;
     bool            b_aborted;
-    /* TODO: remove. See jni_EventHardwareAccelerationError */
+    /* TODO: remove */
     bool            b_error_signaled;
 
     union
@@ -1476,7 +1473,8 @@ end:
         if (!p_sys->b_error_signaled) {
             /* Signal the error to the Java.
              * TODO: remove this when there is a decoder fallback */
-            jni_EventHardwareAccelerationError();
+            if (p_dec->fmt_in.i_cat == VIDEO_ES && p_sys->u.video.p_awh)
+                AWindowHandler_sendHardwareAccelerationError(p_sys->u.video.p_awh);
             p_sys->b_error_signaled = true;
             vlc_cond_broadcast(&p_sys->cond);
         }
