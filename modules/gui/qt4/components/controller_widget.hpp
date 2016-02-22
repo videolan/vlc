@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _CONTROLLER_WIDGET_H_
-#define _CONTROLLER_WIDGET_H_
+#ifndef VLC_QT_CONTROLLER_WIDGET_HPP_
+#define VLC_QT_CONTROLLER_WIDGET_HPP_
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

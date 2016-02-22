@@ -25,8 +25,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _OPENPANELS_H_
-#define _OPENPANELS_H_
+#ifndef VLC_QT_OPEN_PANELS_HPP_
+#define VLC_QT_OPEN_PANELS_HPP_
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
