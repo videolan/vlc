@@ -17,8 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef _VLC_MP4_LANGUAGES_H
-#define _VLC_MP4_LANGUAGES_H 1
+#ifndef VLC_MP4_LANGUAGES_H_
+#define VLC_MP4_LANGUAGES_H_
 
 static bool decodeQtLanguageCode( uint16_t i_language_code, char *psz_iso,
                                   bool *b_mactables )

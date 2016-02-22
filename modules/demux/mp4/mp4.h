@@ -18,8 +18,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef _VLC_MP4_H
-#define _VLC_MP4_H 1
+#ifndef VLC_MP4_MP4_H_
+#define VLC_MP4_MP4_H_
 
 /*****************************************************************************
  * Preamble

@@ -17,8 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef _VLC_FRAGMENTS_H
-#define _VLC_FRAGMENTS_H 1
+#ifndef VLC_MP4_FRAGMENTS_H_
+#define VLC_MP4_FRAGMENTS_H_
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

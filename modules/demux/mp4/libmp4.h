@@ -20,8 +20,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_LIBMP4_H
-#define _VLC_LIBMP4_H 1
+#ifndef VLC_MP4_LIBMP4_H_
+#define VLC_MP4_LIBMP4_H_
 
 #include <vlc_es.h>
 #include <vlc_codecs.h>
