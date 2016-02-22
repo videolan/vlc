@@ -23,8 +23,8 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _PLAYLISTWIDGET_H_
-#define _PLAYLISTWIDGET_H_
+#ifndef VLC_QT_PLAYLIST_HPP_
+#define VLC_QT_PLAYLIST_HPP_
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _SORTING_H_
-#define _SORTING_H_
+#ifndef VLC_QT_SORTING_H_
+#define VLC_QT_SORTING_H_
 
 #include <vlc_media_library.h>
 #include <vlc_input_item.h>

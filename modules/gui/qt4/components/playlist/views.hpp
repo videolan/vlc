@@ -21,8 +21,8 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _ICON_VIEW_H_
-#define _ICON_VIEW_H_
+#ifndef VLC_QT_VIEWS_HPP_
+#define VLC_QT_VIEWS_HPP_
 
 #include <QStyledItemDelegate>
 #include <QListView>
