@@ -321,7 +321,7 @@ case "${OS}" in
 			;;
 		esac
 		case "${HOST}" in
-			*winphone*|*windowsphone*|*winrt*)
+			*winphone*|*windowsphone*|*winrt*|*uwp*)
 			add_make_enabled "HAVE_WINSTORE"
 			;;
 		esac
