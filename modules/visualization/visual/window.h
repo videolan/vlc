@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _WINDOW_H_
-#define _WINDOW_H_
+#ifndef VLC_VISUAL_WINDOW_H_
+#define VLC_VISUAL_WINDOW_H_
 
 #include <vlc_common.h>
 
@@ -63,4 +63,4 @@ void window_close( window_context * p_ctx );
 /* Macro for defining a new window context */
 #define DEFINE_WIND_CONTEXT(name) window_context name = {NULL, 0}
 
-#endif /* _WINDOW_H_ */
+#endif /* include-guard */
