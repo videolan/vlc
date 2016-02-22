@@ -24,8 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_DBUS_ROOT_H
-#define _VLC_DBUS_ROOT_H
+#ifndef VLC_DBUS_DBUS_ROOT_H_
+#define VLC_DBUS_DBUS_ROOT_H_
 
 #include "dbus_common.h"
 
@@ -39,4 +39,4 @@ DBusHandlerResult handle_root ( DBusConnection *p_conn,
 int RootPropertiesChangedEmit ( intf_thread_t *,
                                 vlc_dictionary_t * );
 
-#endif //dbus-root.h
+#endif /* include-guard */

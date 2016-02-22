@@ -24,8 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_DBUS_PLAYER_H
-#define _VLC_DBUS_PLAYER_H
+#ifndef VLC_DBUS_DBUS_PLAYER_H_
+#define VLC_DBUS_DBUS_PLAYER_H_
 
 #include <vlc_interface.h>
 #include "dbus_common.h"
@@ -73,4 +73,4 @@ int PlayerPropertiesChangedEmit( intf_thread_t *, vlc_dictionary_t * );
 
 void UpdatePlayerCaps( intf_thread_t * );
 
-#endif //dbus_player.h
+#endif /* include-guard */

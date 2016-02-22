@@ -26,8 +26,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_DBUS_COMMON_H
-#define _VLC_DBUS_COMMON_H
+#ifndef VLC_DBUS_DBUS_COMMON_H_
+#define VLC_DBUS_DBUS_COMMON_H_
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
@@ -146,4 +146,4 @@ int AddProperty ( intf_thread_t *p_intf,
                   const char* psz_signature,
                   int (*pf_marshaller) (intf_thread_t*, DBusMessageIter*) );
 
-#endif //dbus-common.h
+#endif /* include-guard */
