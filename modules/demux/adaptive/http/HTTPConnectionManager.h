@@ -39,6 +39,7 @@ namespace adaptive
 {
     namespace http
     {
+        class ConnectionParams;
         class HTTPConnection;
         class Downloader;
 
@@ -49,9 +50,7 @@ namespace adaptive
                 virtual ~HTTPConnectionManager  ();
 
                 void    closeAllConnections ();
-                HTTPConnection * getConnection(const std::string &scheme,
-                                               const std::string &hostname,
-                                               uint16_t port);
+                HTTPConnection * getConnection(ConnectionParams &);
 
                 virtual void updateDownloadRate(size_t, mtime_t); /* reimpl */
                 void setDownloadRateObserver(IDownloadRateObserver *);
@@ -63,7 +62,7 @@ namespace adaptive
                 std::vector<HTTPConnection *>                       connectionPool;
                 vlc_object_t                                       *stream;
                 IDownloadRateObserver                              *rateObserver;
-                HTTPConnection * getConnection(const std::string &hostname, uint16_t port, int);
+                HTTPConnection * reuseConnection(ConnectionParams &);
         };
     }
 }

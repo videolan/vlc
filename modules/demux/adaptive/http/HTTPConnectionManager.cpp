@@ -27,6 +27,7 @@
 
 #include "HTTPConnectionManager.h"
 #include "HTTPConnection.hpp"
+#include "ConnectionParams.hpp"
 #include "Sockets.hpp"
 #include "Downloader.hpp"
 #include <vlc_url.h>
@@ -63,28 +64,26 @@ void HTTPConnectionManager::releaseAllConnections()
         (*it)->setUsed(false);
 }
 
-HTTPConnection * HTTPConnectionManager::getConnection(const std::string &hostname, uint16_t port, int sockettype)
+HTTPConnection * HTTPConnectionManager::reuseConnection(ConnectionParams &params)
 {
     std::vector<HTTPConnection *>::const_iterator it;
     for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
     {
-        HTTPConnection *conn = *it;
-        if(conn->isAvailable() && conn->compare(hostname, port, sockettype))
+        AbstractConnection *conn = *it;
+        if(conn->isAvailable() && conn->canReuse(params))
             return conn;
     }
     return NULL;
 }
 
-HTTPConnection * HTTPConnectionManager::getConnection(const std::string &scheme,
-                                                      const std::string &hostname,
-                                                      uint16_t port)
+HTTPConnection * HTTPConnectionManager::getConnection(ConnectionParams &params)
 {
-    if((scheme != "http" && scheme != "https") || hostname.empty())
+    if((params.getScheme() != "http" && params.getScheme() != "https") || params.getHostname().empty())
         return NULL;
 
-    const int sockettype = (scheme == "https") ? TLSSocket::TLS : Socket::REGULAR;
+    const int sockettype = (params.getScheme() == "https") ? TLSSocket::TLS : Socket::REGULAR;
     vlc_mutex_lock(&lock);
-    HTTPConnection *conn = getConnection(hostname, port, sockettype);
+    HTTPConnection *conn = reuseConnection(params);
     if(!conn)
     {
         Socket *socket = (sockettype == TLSSocket::TLS) ? new (std::nothrow) TLSSocket()
@@ -105,7 +104,7 @@ HTTPConnection * HTTPConnectionManager::getConnection(const std::string &scheme,
 
         connectionPool.push_back(conn);
 
-        if (!conn->connect(hostname, port))
+        if (!conn->prepare(params) || !conn->connect())
         {
             vlc_mutex_unlock(&lock);
             return NULL;

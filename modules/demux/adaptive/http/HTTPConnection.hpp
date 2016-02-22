@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 
+#include "ConnectionParams.hpp"
 #include "BytesRange.hpp"
 #include <vlc_common.h>
 #include <string>
@@ -39,26 +40,50 @@ namespace adaptive
     {
         class Socket;
 
-        class HTTPConnection
+        class AbstractConnection
+        {
+            public:
+                AbstractConnection(vlc_object_t *);
+                virtual ~AbstractConnection();
+
+                virtual bool    prepare     (const ConnectionParams &);
+                virtual bool    canReuse     (const ConnectionParams &) const = 0;
+
+                virtual bool    connect     () = 0;
+                virtual int     query       (const std::string& path, const BytesRange & = BytesRange()) = 0;
+                virtual ssize_t read        (void *p_buffer, size_t len) = 0;
+
+                bool            isAvailable () const;
+                virtual size_t  getContentLength() const;
+                virtual void    setUsed( bool ) = 0;
+
+            protected:
+                vlc_object_t      *p_object;
+                ConnectionParams   params;
+                bool               available;
+                size_t             contentLength;
+                BytesRange         bytesRange;
+                size_t             bytesRead;
+        };
+
+        class HTTPConnection : public AbstractConnection
         {
             public:
                 HTTPConnection(vlc_object_t *stream, Socket *, bool = false);
                 virtual ~HTTPConnection();
 
-                virtual bool    compare     (const std::string &, uint16_t, int) const;
-                virtual bool    connect     (const std::string& hostname, uint16_t port = 80);
-                virtual bool    connected   () const;
+                virtual bool    canReuse     (const ConnectionParams &) const;
+                virtual bool    connect     ();
                 virtual int     query       (const std::string& path, const BytesRange & = BytesRange());
-                virtual bool    send        (const void *buf, size_t size);
                 virtual ssize_t read        (void *p_buffer, size_t len);
-                virtual void    disconnect  ();
-                virtual bool    send        (const std::string &data);
 
-                size_t getContentLength() const;
-                bool isAvailable () const;
                 void setUsed( bool );
 
             protected:
+                virtual bool    connected   () const;
+                virtual void    disconnect  ();
+                virtual bool    send        (const void *buf, size_t size);
+                virtual bool    send        (const std::string &data);
 
                 virtual void    onHeader    (const std::string &line,
                                              const std::string &value);
@@ -67,14 +92,7 @@ namespace adaptive
 
                 int parseReply();
                 std::string readLine();
-                std::string hostname;
-                uint16_t port;
                 char * psz_useragent;
-                vlc_object_t *p_object;
-                size_t bytesRead;
-                size_t contentLength;
-                BytesRange bytesRange;
-                bool available;
 
                 bool                connectionClose;
                 bool                queryOk;

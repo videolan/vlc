@@ -203,9 +203,7 @@ bool HTTPChunkSource::prepare()
 
     if(!connection)
     {
-        connection = connManager->getConnection(params.getScheme(),
-                                                params.getHostname(),
-                                                params.getPort());
+        connection = connManager->getConnection(params);
         if(!connection)
             return false;
     }

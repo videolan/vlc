@@ -19,25 +19,55 @@
  *****************************************************************************/
 
 #include "HTTPConnection.hpp"
+#include "ConnectionParams.hpp"
 #include "Sockets.hpp"
 #include "../adaptive/tools/Helper.h"
 
 #include <sstream>
+#include <vlc_stream.h>
 
 using namespace adaptive::http;
 
-HTTPConnection::HTTPConnection(vlc_object_t *p_object_, Socket *socket_, bool persistent)
+AbstractConnection::AbstractConnection(vlc_object_t *p_object_)
 {
-    socket = socket_;
     p_object = p_object_;
-    psz_useragent = var_InheritString(p_object, "http-user-agent");
+    available = true;
     bytesRead = 0;
     contentLength = 0;
+}
+
+AbstractConnection::~AbstractConnection()
+{
+
+}
+
+bool AbstractConnection::prepare(const ConnectionParams &params_)
+{
+    if (!available)
+        return false;
+    params = params_;
+    available = false;
+    return true;
+}
+
+bool AbstractConnection::isAvailable() const
+{
+    return available;
+}
+
+size_t AbstractConnection::getContentLength() const
+{
+    return contentLength;
+}
+
+HTTPConnection::HTTPConnection(vlc_object_t *p_object_, Socket *socket_, bool persistent)
+    : AbstractConnection( p_object_ )
+{
+    socket = socket_;
+    psz_useragent = var_InheritString(p_object_, "http-user-agent");
     queryOk = false;
     retries = 0;
     connectionClose = !persistent;
-    port = 80;
-    available = true;
 }
 
 HTTPConnection::~HTTPConnection()
@@ -46,22 +76,17 @@ HTTPConnection::~HTTPConnection()
     delete socket;
 }
 
-bool HTTPConnection::compare(const std::string &hostname, uint16_t port, int type) const
+bool HTTPConnection::canReuse(const ConnectionParams &params_) const
 {
-    return ( hostname == this->hostname &&
-            (socket && socket->getType() == type) &&
-             port == this->port );
+    return ( params.getHostname() == params_.getHostname() &&
+             params.getScheme() == params_.getScheme() &&
+             params.getPort() == params_.getPort() );
 }
 
-bool HTTPConnection::connect(const std::string &hostname, uint16_t port)
+bool HTTPConnection::connect()
 {
-    if(!socket->connect(p_object, hostname.c_str(), port))
-        return false;
-
-    this->hostname = hostname;
-    this->port = port;
-
-    return true;
+    return socket->connect(p_object, params.getHostname().c_str(),
+                                     params.getPort());
 }
 
 bool HTTPConnection::connected() const
@@ -82,10 +107,13 @@ int HTTPConnection::query(const std::string &path, const BytesRange &range)
 {
     queryOk = false;
 
-    msg_Dbg(p_object, "Retrieving ://%s:%u%s @%zu", hostname.c_str(), port, path.c_str(),
-            range.isValid() ? range.getStartByte() : 0);
+    /* Set new path for this query */
+    params.setPath(path);
 
-    if(!connected() && ( hostname.empty() || !connect(hostname, port) ))
+    msg_Dbg(p_object, "Retrieving %s @%zu", params.getUrl().c_str(),
+                       range.isValid() ? range.getStartByte() : 0);
+
+    if(!connected() && ( params.getHostname().empty() || !connect() ))
         return VLC_EGENERIC;
 
     bytesRange = range;
@@ -207,11 +235,6 @@ std::string HTTPConnection::readLine()
     return socket->readline(p_object);
 }
 
-bool HTTPConnection::isAvailable() const
-{
-    return available;
-}
-
 void HTTPConnection::setUsed( bool b )
 {
     available = !b;
@@ -227,11 +250,6 @@ void HTTPConnection::setUsed( bool b )
         else  /* We can't resend request if we haven't finished reading */
             disconnect();
     }
-}
-
-size_t HTTPConnection::getContentLength() const
-{
-    return contentLength;
 }
 
 void HTTPConnection::onHeader(const std::string &key,
@@ -255,7 +273,7 @@ std::string HTTPConnection::buildRequestHeader(const std::string &path) const
 {
     std::stringstream req;
     req << "GET " << path << " HTTP/1.1\r\n" <<
-           "Host: " << hostname << "\r\n" <<
+           "Host: " << params.getHostname() << "\r\n" <<
            "Cache-Control: no-cache" << "\r\n" <<
            "Accept-Encoding: " << "\r\n" <<
            "User-Agent: " << std::string(psz_useragent) << "\r\n";
