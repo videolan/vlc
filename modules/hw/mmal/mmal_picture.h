@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _MMAL_PICTURE_H
-#define _MMAL_PICTURE_H
+#ifndef VLC_MMAL_MMAL_PICTURE_H_
+#define VLC_MMAL_MMAL_PICTURE_H_
 
 #include <vlc_common.h>
 #include <interface/mmal/mmal.h>
