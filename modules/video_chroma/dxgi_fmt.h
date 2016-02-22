@@ -20,8 +20,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_VIDEOCHROMA_DXGI_H
-#define _VLC_VIDEOCHROMA_DXGI_H 1
+#ifndef VLC_VIDEOCHROMA_DXGI_FMT_H_
+#define VLC_VIDEOCHROMA_DXGI_FMT_H_
 
 #include <dxgiformat.h>
 
@@ -40,4 +40,4 @@ typedef struct
 extern const char *DxgiFormatToStr(DXGI_FORMAT format);
 extern const d3d_format_t *GetRenderFormatList(void);
 
-#endif /* _VLC_VIDEOCHROMA_DXGI_H */
+#endif /* include-guard */

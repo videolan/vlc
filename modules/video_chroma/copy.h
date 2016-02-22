@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_VIDEOCHROMA_COPY_H
-#define _VLC_VIDEOCHROMA_COPY_H 1
+#ifndef VLC_VIDEOCHROMA_COPY_H_
+#define VLC_VIDEOCHROMA_COPY_H_
 
 typedef struct {
 # ifdef CAN_COMPILE_SSE2
