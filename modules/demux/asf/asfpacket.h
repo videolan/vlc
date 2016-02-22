@@ -19,8 +19,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef _VLC_ASFPACKET_H
-#define _VLC_ASFPACKET_H
+#ifndef VLC_ASF_ASFPACKET_H_
+#define VLC_ASF_ASFPACKET_H_
 
 #include <vlc_demux.h>
 #include <vlc_es.h>
