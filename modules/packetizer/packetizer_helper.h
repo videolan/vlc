@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _PACKETIZER_H
-#define _PACKETIZER_H 1
+#ifndef VLC_PACKETIZER_HELPER_H_
+#define VLC_PACKETIZER_HELPER_H_
 
 #include <vlc_block.h>
 
