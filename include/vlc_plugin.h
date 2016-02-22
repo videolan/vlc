@@ -234,7 +234,7 @@ enum vlc_module_properties
 #   define EXTERN_SYMBOL
 #endif
 
-typedef int (*vlc_set_cb) (void *, void *, int, ...);
+EXTERN_SYMBOL typedef int (*vlc_set_cb) (void *, void *, int, ...);
 
 #define vlc_plugin_set(...) vlc_set (opaque,   NULL, __VA_ARGS__)
 #define vlc_module_set(...) vlc_set (opaque, module, __VA_ARGS__)
