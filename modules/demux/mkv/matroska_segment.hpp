@@ -22,8 +22,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _MATROSKA_SEGMENT_HPP_
-#define _MATROSKA_SEGMENT_HPP_
+#ifndef VLC_MKV_MATROSKA_SEGMENT_HPP_
+#define VLC_MKV_MATROSKA_SEGMENT_HPP_
 
 #include "mkv.hpp"
 

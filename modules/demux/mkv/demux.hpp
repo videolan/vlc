@@ -22,8 +22,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _DEMUX_SYS_H
-#define _DEMUX_SYS_H
+#ifndef VLC_MKV_DEMUX_HPP_
+#define VLC_MKV_DEMUX_HPP_
 
 #include "mkv.hpp"
 

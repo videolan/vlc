@@ -24,8 +24,8 @@
 
 /* chapter_item, chapter_edition, and chapter_translation classes */
 
-#ifndef _CHAPTER_H_
-#define _CHAPTER_H_
+#ifndef VLC_MKV_CHAPTERS_HPP_
+#define VLC_MKV_CHAPTERS_HPP_
 
 #include "mkv.hpp"
 

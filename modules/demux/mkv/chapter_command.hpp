@@ -22,8 +22,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _CHAPTER_COMMAND_H_
-#define _CHAPTER_COMMAND_H_
+#ifndef VLC_MKV_CHAPTER_COMMAND_HPP_
+#define VLC_MKV_CHAPTER_COMMAND_HPP_
 
 #include "mkv.hpp"
 

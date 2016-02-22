@@ -23,8 +23,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VIRTUAL_SEGMENT_HPP_
-#define _VIRTUAL_SEGMENT_HPP_
+#ifndef VLC_MKV_VIRTUAL_SEGMENT_HPP_
+#define VLC_MKV_VIRTUAL_SEGMENT_HPP_
 
 #include "mkv.hpp"
 
