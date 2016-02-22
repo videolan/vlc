@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _CC_H
-#define _CC_H 1
+#ifndef VLC_CC_H_
+#define VLC_CC_H_
 
 #include <vlc_bits.h>
 
