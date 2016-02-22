@@ -31,8 +31,8 @@
  */
 
 
-#ifndef _DCPPARSER_H
-#define _DCPPARSER_H
+#ifndef VLC_DCP_DCPPARSER_H_
+#define VLC_DCP_DCPPARSER_H_
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -395,4 +395,4 @@ private:
     string s_path;
 };
 
-#endif /* _DCPPARSER_H */
+#endif /* include-guard */
