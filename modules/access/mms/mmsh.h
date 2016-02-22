@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _MMSH_H_
-#define _MMSH_H_ 1
+#ifndef VLC_MMS_MMSH_H_
+#define VLC_MMS_MMSH_H_
 
 typedef struct
 {

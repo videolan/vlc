@@ -28,8 +28,8 @@
  *
  ****************************************************************************/
 
-#ifndef _ASF_H_
-#define _ASF_H_ 1
+#ifndef VLC_MMS_ASF_H_
+#define VLC_MMS_ASF_H_
 
 #include <vlc_codecs.h>
 

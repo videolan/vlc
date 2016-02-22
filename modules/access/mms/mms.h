@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _MMS_H_
-#define _MMS_H_ 1
+#ifndef VLC_MMS_MMS_H_
+#define VLC_MMS_MMS_H_
 
 #define MMS_PROTO_AUTO  0
 #define MMS_PROTO_TCP   1
