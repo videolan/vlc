@@ -224,7 +224,7 @@ void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext )
 }
 
 /** Push a UI command */
-int __PushCommand( extension_t *p_ext,  bool b_unique, command_type_e i_command,
+int PushCommand__( extension_t *p_ext,  bool b_unique, command_type_e i_command,
                    va_list args )
 {
     vlc_mutex_lock( &p_ext->p_sys->command_lock );

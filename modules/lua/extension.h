@@ -102,12 +102,12 @@ int Activate( extensions_manager_t *p_mgr, extension_t * );
 bool IsActivated( extensions_manager_t *p_mgr, extension_t * );
 int Deactivate( extensions_manager_t *p_mgr, extension_t * );
 void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext );
-int __PushCommand( extension_t *ext, bool unique, command_type_e cmd, va_list options );
+int PushCommand__( extension_t *ext, bool unique, command_type_e cmd, va_list options );
 static inline int PushCommand( extension_t *ext, int cmd, ... )
 {
     va_list args;
     va_start( args, cmd );
-    int i_ret = __PushCommand( ext, false, cmd, args );
+    int i_ret = PushCommand__( ext, false, cmd, args );
     va_end( args );
     return i_ret;
 }
@@ -115,7 +115,7 @@ static inline int PushCommandUnique( extension_t *ext, int cmd, ... )
 {
     va_list args;
     va_start( args, cmd );
-    int i_ret = __PushCommand( ext, true, cmd, args );
+    int i_ret = PushCommand__( ext, true, cmd, args );
     va_end( args );
     return i_ret;
 }
