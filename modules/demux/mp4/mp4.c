@@ -3836,7 +3836,11 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
                i_trakcount = 0;
                while( p_trak )
                {
-                   if ( p_trak->i_type == ATOM_trak && (p_tkhd = MP4_BoxGet( p_trak, "tkhd" )) )
+                   const MP4_Box_t *p_stsz;
+                   if ( p_trak->i_type == ATOM_trak &&
+                       (p_tkhd = MP4_BoxGet( p_trak, "tkhd" )) &&
+                       (p_stsz = MP4_BoxGet( p_trak, "mdia/minf/stbl/stsz" )) &&
+                        BOXDATA(p_stsz)->i_sample_count > 0 )
                    {
                        p_moovfragment->p_durations[i_trakcount].i_duration = BOXDATA(p_tkhd)->i_duration;
                        p_moovfragment->p_durations[i_trakcount++].i_track_ID = BOXDATA(p_tkhd)->i_track_ID;
