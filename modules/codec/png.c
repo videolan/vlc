@@ -395,9 +395,6 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     if( p_info == NULL )
         goto error;
 
-    png_infop p_end_info = png_create_info_struct( p_png );
-    if( p_end_info == NULL ) goto error;
-
     png_set_IHDR( p_png, p_info,
             p_enc->fmt_in.video.i_visible_width,
             p_enc->fmt_in.video.i_visible_height,
@@ -416,7 +413,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
         if( p_sys->b_error ) goto error;
     }
 
-    png_write_end( p_png, p_end_info );
+    png_write_end( p_png, p_info );
     if( p_sys->b_error ) goto error;
 
     png_destroy_write_struct( &p_png, &p_info );
