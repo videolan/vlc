@@ -40,14 +40,12 @@ BasePeriod::BasePeriod(AbstractPlaylist *playlist_) :
 {
     duration.Set(0);
     startTime.Set(0);
-    baseUrl.Set(NULL);
     playlist = playlist_;
 }
 
 BasePeriod::~BasePeriod ()
 {
     vlc_delete_all( adaptationSets );
-    delete baseUrl.Get();
     childs.clear();
 }
 

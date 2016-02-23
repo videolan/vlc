@@ -62,6 +62,7 @@ SegmentInformation::~SegmentInformation()
     delete segmentBase;
     delete segmentList;
     delete mediaSegmentTemplate;
+    delete baseUrl.Get();
 }
 
 AbstractPlaylist * SegmentInformation::getPlaylist() const
