@@ -269,7 +269,7 @@ SOURCES_libvlc_android = \
 	posix/timer.c \
 	posix/linux_cpu.c \
 	posix/linux_specific.c \
-	posix/specific.c \
+	android/specific.c \
 	posix/rand.c \
 	$(NULL)
 

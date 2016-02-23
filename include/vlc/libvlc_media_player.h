@@ -548,13 +548,11 @@ LIBVLC_API void *libvlc_media_player_get_hwnd ( libvlc_media_player_t *p_mi );
  * \version LibVLC 3.0.0 and later.
  *
  * \param p_mi the media player
- * \param p_jvm the Java VM of the android process.
  * \param p_awindow_handler org.videolan.libvlc.IAWindowNativeHandler jobject
  *        implemented by the org.videolan.libvlc.MediaPlayer class from the
  *        libvlc-android project.
  */
 LIBVLC_API void libvlc_media_player_set_android_context( libvlc_media_player_t *p_mi,
-                                                         void *p_jvm,
                                                          void *p_awindow_handler );
 
 /**
