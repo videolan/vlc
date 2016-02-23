@@ -56,11 +56,19 @@ NSString *const VLCBonjourProtocolServiceName = @"VLCBonjourProtocolServiceName"
 
 @interface VLCNetServiceDiscoveryController : NSObject <NSNetServiceBrowserDelegate, NSNetServiceDelegate>
 {
+#ifdef MAC_OS_X_VERSION_10_11
     NSArray<NSNetServiceBrowser *> *_serviceBrowsers;
 
     NSMutableArray<NSNetService *> *_rawNetServices;
     NSMutableArray<NSNetService *> *_resolvedNetServices;
     NSMutableArray<NSValue *> *_inputItemsForNetServices;
+#else
+    NSArray *_serviceBrowsers;
+
+    NSMutableArray *_rawNetServices;
+    NSMutableArray *_resolvedNetServices;
+    NSMutableArray *_inputItemsForNetServices;
+#endif
 
     NSArray *_activeProtocols;
 }
