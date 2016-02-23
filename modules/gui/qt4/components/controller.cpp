@@ -403,6 +403,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case ADVANCED_CONTROLLER:
+        if( qobject_cast<AdvControlsWidget *>(this) == NULL )
         {
             advControls = new AdvControlsWidget( p_intf, this );
             widget = advControls;
