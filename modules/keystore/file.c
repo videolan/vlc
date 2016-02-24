@@ -81,40 +81,30 @@ str2key(const char *psz_key)
 }
 
 static int
-str_write(FILE *p_file, const char *psz_str)
-{
-    size_t i_len = strlen(psz_str);
-    return fwrite(psz_str, sizeof(char), i_len, p_file) == i_len ? VLC_SUCCESS
-                                                                 : VLC_EGENERIC;
-}
-
-static int
 values_write(FILE *p_file, const char *const ppsz_values[KEY_MAX])
 {
     for (unsigned int i = 0; i < KEY_MAX; ++i)
     {
         if (!ppsz_values[i])
             continue;
-        if (str_write(p_file, ppsz_keys[i]))
-            return VLC_EGENERIC;
-        if (str_write(p_file, ":"))
-            return VLC_EGENERIC;
         char *psz_b64 = vlc_b64_encode(ppsz_values[i]);
-        if (!psz_b64 || str_write(p_file, psz_b64))
+        if (!psz_b64)
+            return VLC_EGENERIC;
+        const char *psz_end_sep = "";
+        for (unsigned int j = i + 1; j < KEY_MAX; ++j)
+        {
+            if (ppsz_values[j])
+            {
+                psz_end_sep = ",";
+                break;
+            }
+        }
+        if (fprintf(p_file, "%s:%s%s", ppsz_keys[i], psz_b64, psz_end_sep) < 0)
         {
             free(psz_b64);
             return VLC_EGENERIC;
         }
         free(psz_b64);
-        for (unsigned int j = i + 1; j < KEY_MAX; ++j)
-        {
-            if (ppsz_values[j])
-            {
-                if (str_write(p_file, ","))
-                    return VLC_EGENERIC;
-                break;
-            }
-        }
     }
 
     return VLC_SUCCESS;
@@ -150,22 +140,20 @@ file_save(vlc_keystore *p_keystore, FILE *p_file, int i_fd, struct ks_list *p_li
         if (!p_entry->p_secret)
             continue;
 
-        if (str_write(p_file, "{"))
+        if (fprintf(p_file, "{") < 0)
             goto end;
         if (values_write(p_file, (const char *const *) p_entry->ppsz_values))
             goto end;
-        if (str_write(p_file, "}:"))
-            goto end;
         char *psz_b64 = vlc_b64_encode_binary(p_entry->p_secret,
                                               p_entry->i_secret_len);
-        if (!psz_b64 || str_write(p_file, psz_b64))
+        if (!psz_b64)
+            goto end;
+        if (fprintf(p_file, "}:%s\n", psz_b64) < 0)
         {
             free(psz_b64);
             goto end;
         }
         free(psz_b64);
-        if (i < p_list->i_count - 1 && str_write(p_file, "\n"))
-            goto end;
     }
     i_ret = VLC_SUCCESS;
 end:
