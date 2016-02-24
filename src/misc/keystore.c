@@ -550,8 +550,10 @@ vlc_credential_store(vlc_credential *p_credential, vlc_object_t *p_parent)
         return false;
     }
 
-    bool b_ret = vlc_keystore_store(p_credential->p_keystore, ppsz_values,
-                                    (const uint8_t *)p_credential->psz_password,
+    const uint8_t *p_password = (const uint8_t *)
+        (p_credential->psz_password != NULL ? p_credential->psz_password : "");
+
+    bool b_ret = vlc_keystore_store(p_keystore, ppsz_values, p_password,
                                     -1, psz_label) == VLC_SUCCESS;
     free(psz_label);
     free(psz_path);
