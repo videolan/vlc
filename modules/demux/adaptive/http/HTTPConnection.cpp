@@ -294,3 +294,35 @@ std::string HTTPConnection::extraRequestHeaders() const
     }
     return ss.str();
 }
+
+ConnectionFactory::ConnectionFactory()
+{
+}
+
+ConnectionFactory::~ConnectionFactory()
+{
+}
+
+AbstractConnection * ConnectionFactory::createConnection(vlc_object_t *p_object,
+                                                         const ConnectionParams &params)
+{
+    if((params.getScheme() != "http" && params.getScheme() != "https") || params.getHostname().empty())
+        return NULL;
+
+    const int sockettype = (params.getScheme() == "https") ? TLSSocket::TLS : Socket::REGULAR;
+    Socket *socket = (sockettype == TLSSocket::TLS) ? new (std::nothrow) TLSSocket()
+                                                    : new (std::nothrow) Socket();
+    if(!socket)
+        return NULL;
+
+    /* disable pipelined tls until we have ticket/resume session support */
+    HTTPConnection *conn = new (std::nothrow)
+            HTTPConnection(p_object, socket, sockettype != TLSSocket::TLS);
+    if(!conn)
+    {
+        delete socket;
+        return NULL;
+    }
+
+    return conn;
+}

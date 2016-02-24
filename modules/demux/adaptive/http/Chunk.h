@@ -37,7 +37,7 @@ namespace adaptive
 {
     namespace http
     {
-        class HTTPConnection;
+        class AbstractConnection;
         class HTTPConnectionManager;
         class AbstractChunk;
 
@@ -92,7 +92,7 @@ namespace adaptive
 
             protected:
                 virtual bool      prepare();
-                HTTPConnection     *connection;
+                AbstractConnection    *connection;
                 HTTPConnectionManager *connManager;
                 size_t              consumed; /* read pointer */
                 bool                prepared;

@@ -102,6 +102,14 @@ namespace adaptive
             private:
                 Socket *socket;
        };
+
+       class ConnectionFactory
+       {
+           public:
+               ConnectionFactory();
+               virtual ~ConnectionFactory();
+               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &);
+       };
     }
 }
 

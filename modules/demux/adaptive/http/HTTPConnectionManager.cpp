@@ -34,17 +34,22 @@
 
 using namespace adaptive::http;
 
-HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *stream) :
+HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *stream, ConnectionFactory *factory_) :
                        stream                   (stream),
                        rateObserver             (NULL)
 {
     vlc_mutex_init(&lock);
     downloader = new (std::nothrow) Downloader();
     downloader->start();
+    if(!factory_)
+        factory = new (std::nothrow) ConnectionFactory();
+    else
+        factory = factory_;
 }
 HTTPConnectionManager::~HTTPConnectionManager   ()
 {
     delete downloader;
+    delete factory;
     this->closeAllConnections();
     vlc_mutex_destroy(&lock);
 }
@@ -59,14 +64,14 @@ void HTTPConnectionManager::closeAllConnections      ()
 
 void HTTPConnectionManager::releaseAllConnections()
 {
-    std::vector<HTTPConnection *>::iterator it;
+    std::vector<AbstractConnection *>::iterator it;
     for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
         (*it)->setUsed(false);
 }
 
-HTTPConnection * HTTPConnectionManager::reuseConnection(ConnectionParams &params)
+AbstractConnection * HTTPConnectionManager::reuseConnection(ConnectionParams &params)
 {
-    std::vector<HTTPConnection *>::const_iterator it;
+    std::vector<AbstractConnection *>::const_iterator it;
     for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
     {
         AbstractConnection *conn = *it;
@@ -76,31 +81,16 @@ HTTPConnection * HTTPConnectionManager::reuseConnection(ConnectionParams &params
     return NULL;
 }
 
-HTTPConnection * HTTPConnectionManager::getConnection(ConnectionParams &params)
+AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &params)
 {
-    if((params.getScheme() != "http" && params.getScheme() != "https") || params.getHostname().empty())
+    if(unlikely(!factory || !downloader))
         return NULL;
 
-    const int sockettype = (params.getScheme() == "https") ? TLSSocket::TLS : Socket::REGULAR;
     vlc_mutex_lock(&lock);
-    HTTPConnection *conn = reuseConnection(params);
+    AbstractConnection *conn = reuseConnection(params);
     if(!conn)
     {
-        Socket *socket = (sockettype == TLSSocket::TLS) ? new (std::nothrow) TLSSocket()
-                                                        : new (std::nothrow) Socket();
-        if(!socket)
-        {
-            vlc_mutex_unlock(&lock);
-            return NULL;
-        }
-        /* disable pipelined tls until we have ticket/resume session support */
-        conn = new (std::nothrow) HTTPConnection(stream, socket, sockettype != TLSSocket::TLS);
-        if(!conn)
-        {
-            delete socket;
-            vlc_mutex_unlock(&lock);
-            return NULL;
-        }
+        conn = factory->createConnection(stream, params);
 
         connectionPool.push_back(conn);
 

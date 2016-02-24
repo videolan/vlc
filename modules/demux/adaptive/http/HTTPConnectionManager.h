@@ -40,17 +40,18 @@ namespace adaptive
     namespace http
     {
         class ConnectionParams;
-        class HTTPConnection;
+        class ConnectionFactory;
+        class AbstractConnection;
         class Downloader;
 
         class HTTPConnectionManager : public IDownloadRateObserver
         {
             public:
-                HTTPConnectionManager           (vlc_object_t *stream);
+                HTTPConnectionManager           (vlc_object_t *stream, ConnectionFactory * = NULL);
                 virtual ~HTTPConnectionManager  ();
 
                 void    closeAllConnections ();
-                HTTPConnection * getConnection(ConnectionParams &);
+                AbstractConnection * getConnection(ConnectionParams &);
 
                 virtual void updateDownloadRate(size_t, mtime_t); /* reimpl */
                 void setDownloadRateObserver(IDownloadRateObserver *);
@@ -59,10 +60,11 @@ namespace adaptive
             private:
                 void    releaseAllConnections ();
                 vlc_mutex_t                                         lock;
-                std::vector<HTTPConnection *>                       connectionPool;
+                std::vector<AbstractConnection *>                   connectionPool;
                 vlc_object_t                                       *stream;
                 IDownloadRateObserver                              *rateObserver;
-                HTTPConnection * reuseConnection(ConnectionParams &);
+                ConnectionFactory                                  *factory;
+                AbstractConnection * reuseConnection(ConnectionParams &);
         };
     }
 }
