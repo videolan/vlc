@@ -384,7 +384,7 @@ success:
                       credential.psz_realm ) == -1 )
             p_sys->psz_domain_opt = NULL;
 
-        if( !vlc_credential_store( &credential )
+        if( !vlc_credential_store( &credential, p_access  )
          && asprintf( &p_sys->psz_pwd_opt, "smb-pwd=%s", psz_password ) == -1 )
             p_sys->psz_pwd_opt = NULL;
     }

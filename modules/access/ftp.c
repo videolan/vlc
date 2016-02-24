@@ -427,7 +427,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
         && !b_logged );
     if( b_logged )
     {
-        vlc_credential_store( &credential );
+        vlc_credential_store( &credential, p_access );
         vlc_credential_clean( &credential );
         vlc_UrlClean( &url );
         return 0;

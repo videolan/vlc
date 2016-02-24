@@ -223,7 +223,7 @@ static int Open( vlc_object_t* p_this )
                                        credential.psz_username,
                                        credential.psz_password ) == 0 )
         {
-            b_stored = vlc_credential_store( &credential );
+            b_stored = vlc_credential_store( &credential, p_access );
             break;
         }
         else

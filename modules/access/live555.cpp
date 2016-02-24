@@ -680,7 +680,7 @@ describe:
         i_ret = VLC_EGENERIC;
     }
     else
-        vlc_credential_store( &credential );
+        vlc_credential_store( &credential, p_demux );
 
 bailout:
     /* malloc-ated copy */

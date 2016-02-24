@@ -27,6 +27,14 @@ typedef struct vlc_keystore vlc_keystore;
 typedef struct vlc_keystore_entry vlc_keystore_entry;
 typedef struct vlc_credential vlc_credential;
 
+/* Called from src/libvlc.c */
+int
+libvlc_InternalKeystoreInit(libvlc_int_t *p_libvlc);
+
+/* Called from src/libvlc.c */
+void
+libvlc_InternalKeystoreClean(libvlc_int_t *p_libvlc);
+
 /**
  * @defgroup keystore Keystore and credential API
  * @{
@@ -168,6 +176,7 @@ struct vlc_credential
     enum {
         GET_FROM_URL,
         GET_FROM_OPTION,
+        GET_FROM_MEMORY_KEYSTORE,
         GET_FROM_KEYSTORE,
         GET_FROM_DIALOG,
     } i_get_order;
@@ -242,7 +251,9 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
  * otherwise
  */
 VLC_API bool
-vlc_credential_store(vlc_credential *p_credential);
+vlc_credential_store(vlc_credential *p_credential, vlc_object_t *p_parent);
+#define vlc_credential_store(a, b) \
+    vlc_credential_store(a, VLC_OBJECT(b))
 
 /**
  * @}

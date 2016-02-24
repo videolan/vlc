@@ -211,7 +211,7 @@ static int Open( vlc_object_t *p_this )
         break;
     }
 
-    vlc_credential_store( &credential );
+    vlc_credential_store( &credential, p_access );
     vlc_credential_clean( &credential );
     free(psz_var_domain);
     vlc_UrlClean( &url );

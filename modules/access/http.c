@@ -407,7 +407,7 @@ connect:
             goto error;
     }
     else
-        vlc_credential_store( &credential );
+        vlc_credential_store( &credential, p_access );
 
     if( ( p_sys->i_code == 301 || p_sys->i_code == 302 ||
           p_sys->i_code == 303 || p_sys->i_code == 307 ) &&
