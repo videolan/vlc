@@ -649,13 +649,11 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   status=rtsp_request_describe(rtsp_session,NULL);
   if ( status<200 || status>299 ) {
     msg_Dbg (p_access, "server returned status code %d", status);
-    char *alert=rtsp_search_answers(rtsp_session,"Alert");
-    if (alert) {
-        msg_Dbg(p_access, "server replied with a message: %s", alert);
+    if ((p_data = rtsp_search_answers(rtsp_session, "Alert"))) {
+      msg_Dbg(p_access, "server replied with a message: '%s'", p_data);
     }
     rtsp_send_ok( rtsp_session );
     free( challenge1 );
-    free( alert );
     free( buf );
     return NULL;
   }
