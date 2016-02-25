@@ -211,7 +211,8 @@ sdpplin_t *sdpplin_parse(access_t *p_access, char *data)
 
     if (filter(p_access, data, "m=", &buf, BUFLEN)) {
         if ( !desc->stream ) {
-            fprintf(stderr, "sdpplin.c: stream identifier found before stream count, skipping.");
+            msg_Warn(p_access, "sdpplin.c: stream identifier found before stream count, skipping.");
+            data = nl(data);
             continue;
         }
         stream=sdpplin_parse_stream(p_access, &data);
