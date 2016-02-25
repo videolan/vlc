@@ -37,6 +37,8 @@
 
 #include <assert.h>
 
+#include "list_util.h"
+
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -50,103 +52,17 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end ()
 
-struct list
-{
-    vlc_keystore_entry *p_entries;
-    unsigned            i_count;
-    unsigned            i_max;
-};
-
 struct vlc_keystore_sys
 {
     char *      psz_file;
     FILE *      p_file;
     int         i_fd;
-    struct list list;
+    struct ks_list list;
     bool        b_error;
 };
 
-static int list_save(vlc_keystore_sys *p_sys, struct list *p_list);
-static int list_read(vlc_keystore_sys *p_sys, struct list *p_list);
-
-static void
-list_free(struct list *p_list)
-{
-    vlc_keystore_release_entries(p_list->p_entries, p_list->i_count);
-    p_list->p_entries = NULL;
-    p_list->i_count = 0;
-    p_list->i_max = 0;
-}
-
-static int
-values_copy(const char * ppsz_dst[KEY_MAX], const char *const ppsz_src[KEY_MAX])
-{
-    for (unsigned int i = 0; i < KEY_MAX; ++i)
-    {
-        if (ppsz_src[i])
-        {
-            ppsz_dst[i] = strdup(ppsz_src[i]);
-            if (!ppsz_dst[i])
-                return VLC_EGENERIC;
-        }
-    }
-    return VLC_SUCCESS;
-}
-
-static vlc_keystore_entry *
-list_new_entry(struct list *p_list)
-{
-    if (p_list->i_count + 1 > p_list->i_max)
-    {
-        p_list->i_max += 10;
-        vlc_keystore_entry *p_entries = realloc(p_list->p_entries, p_list->i_max
-                                                * sizeof(*p_list->p_entries));
-        if (!p_entries)
-        {
-            list_free(p_list);
-            return NULL;
-        }
-        p_list->p_entries = p_entries;
-    }
-    vlc_keystore_entry *p_entry = &p_list->p_entries[p_list->i_count];
-    p_entry->p_secret = NULL;
-    VLC_KEYSTORE_VALUES_INIT(p_entry->ppsz_values);
-    p_list->i_count++;
-
-    return p_entry;
-}
-
-static vlc_keystore_entry *
-list_get_entry(struct list *p_list, const char *const ppsz_values[KEY_MAX],
-              unsigned *p_start_index)
-{
-    for (unsigned int i = p_start_index ? *p_start_index : 0;
-         i < p_list->i_count; ++i)
-    {
-        vlc_keystore_entry *p_entry = &p_list->p_entries[i];
-        if (!p_entry->p_secret)
-            continue;
-
-        bool b_match = true;
-        for (unsigned int j = 0; j < KEY_MAX; ++j)
-        {
-            const char *psz_value1 = ppsz_values[j];
-            const char *psz_value2 = p_entry->ppsz_values[j];
-
-            if (!psz_value1)
-                continue;
-            if (!psz_value2 || strcmp(psz_value1, psz_value2))
-                b_match = false;
-        }
-        if (b_match)
-        {
-            if (p_start_index)
-                *p_start_index = i + 1;
-            return p_entry;
-        }
-    }
-    return NULL;
-}
+static int list_save(vlc_keystore_sys *p_sys, struct ks_list *p_list);
+static int list_read(vlc_keystore_sys *p_sys, struct ks_list *p_list);
 
 static int
 Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
@@ -154,18 +70,18 @@ Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
 {
     (void) psz_label;
     vlc_keystore_sys *p_sys = p_keystore->p_sys;
-    struct list *p_list = &p_sys->list;
-    vlc_keystore_entry *p_entry = list_get_entry(p_list, ppsz_values, NULL);
+    struct ks_list *p_list = &p_sys->list;
+    vlc_keystore_entry *p_entry = ks_list_find_entry(p_list, ppsz_values, NULL);
 
     if (p_entry)
         vlc_keystore_release_entry(p_entry);
     else
     {
-        p_entry = list_new_entry(p_list);
+        p_entry = ks_list_new_entry(p_list);
         if (!p_entry)
             return VLC_EGENERIC;
     }
-    if (values_copy((const char **)p_entry->ppsz_values, ppsz_values))
+    if (ks_values_copy((const char **)p_entry->ppsz_values, ppsz_values))
         return VLC_EGENERIC;
 
     if (vlc_keystore_entry_set_secret(p_entry, p_secret, i_secret_len))
@@ -179,26 +95,27 @@ Find(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
      vlc_keystore_entry **pp_entries)
 {
     vlc_keystore_sys *p_sys = p_keystore->p_sys;
-    struct list *p_list = &p_sys->list;
-    struct list out_list = { 0 };
+    struct ks_list *p_list = &p_sys->list;
+    struct ks_list out_list = { 0 };
     vlc_keystore_entry *p_entry;
     unsigned i_index = 0;
 
-    while ((p_entry = list_get_entry(p_list, ppsz_values, &i_index)))
+    while ((p_entry = ks_list_find_entry(p_list, ppsz_values, &i_index)))
     {
-        vlc_keystore_entry *p_out_entry = list_new_entry(&out_list);
+        vlc_keystore_entry *p_out_entry = ks_list_new_entry(&out_list);
 
-        if (!p_out_entry || values_copy((const char **)p_out_entry->ppsz_values,
-                                        (const char *const*)p_entry->ppsz_values))
+        if (!p_out_entry
+         || ks_values_copy((const char **)p_out_entry->ppsz_values,
+                           (const char *const*)p_entry->ppsz_values))
         {
-            list_free(&out_list);
+            ks_list_free(&out_list);
             break;
         }
 
         if (vlc_keystore_entry_set_secret(p_out_entry, p_entry->p_secret,
                                           p_entry->i_secret_len))
         {
-            list_free(&out_list);
+            ks_list_free(&out_list);
             break;
         }
     }
@@ -212,11 +129,11 @@ static unsigned int
 Remove(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX])
 {
     vlc_keystore_sys *p_sys = p_keystore->p_sys;
-    struct list *p_list = &p_sys->list;
+    struct ks_list *p_list = &p_sys->list;
     vlc_keystore_entry *p_entry;
     unsigned i_index = 0, i_count = 0;
 
-    while ((p_entry = list_get_entry(p_list, ppsz_values, &i_index)))
+    while ((p_entry = ks_list_find_entry(p_list, ppsz_values, &i_index)))
     {
         vlc_keystore_release_entry(p_entry);
         i_count++;
@@ -302,7 +219,7 @@ truncate0(int i_fd)
 
 /* a line is "{key1:VALUE1_B64,key2:VALUE2_B64}:PASSWORD_B64" */
 static int
-list_save(vlc_keystore_sys *p_sys, struct list *p_list)
+list_save(vlc_keystore_sys *p_sys, struct ks_list *p_list)
 {
     int i_ret = VLC_EGENERIC;
     rewind(p_sys->p_file);
@@ -340,13 +257,13 @@ end:
     if (i_ret != VLC_SUCCESS)
     {
         p_sys->b_error = true;
-        list_free(p_list);
+        ks_list_free(p_list);
     }
     return i_ret;
 }
 
 static int
-list_read(vlc_keystore_sys *p_sys, struct list *p_list)
+list_read(vlc_keystore_sys *p_sys, struct ks_list *p_list)
 {
     char *psz_line = NULL;
     size_t i_line_len = 0;
@@ -359,7 +276,7 @@ list_read(vlc_keystore_sys *p_sys, struct list *p_list)
         if (*(p++) != '{')
             goto end;
 
-        vlc_keystore_entry *p_entry = list_new_entry(p_list);
+        vlc_keystore_entry *p_entry = ks_list_new_entry(p_list);
         if (!p_entry)
             goto end;
 
@@ -414,7 +331,7 @@ end:
     if (!b_valid)
     {
         p_sys->b_error = true;
-        list_free(p_list);
+        ks_list_free(p_list);
     }
     return VLC_SUCCESS;
 }
@@ -441,7 +358,7 @@ Close(vlc_object_t *p_this)
         fclose(p_sys->p_file);
     }
 
-    list_free(&p_sys->list);
+    ks_list_free(&p_sys->list);
     free(p_sys->psz_file);
     free(p_sys);
 }
