@@ -37,10 +37,15 @@
 
 #include <assert.h>
 
+#include "file_crypt.h"
 #include "list_util.h"
 
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
+#ifdef CRYPTFILE
+static int OpenCrypt(vlc_object_t *);
+static void CloseCrypt(vlc_object_t *);
+#endif
 
 vlc_module_begin()
     set_shortname(N_("file keystore (plaintext)"))
@@ -51,11 +56,25 @@ vlc_module_begin()
     add_string("keystore-file", NULL, NULL, NULL, true)
     set_capability("keystore", 0)
     add_shortcut("file_plaintext")
+#ifdef CRYPTFILE
+    add_submodule()
+        set_shortname(N_("crypt keystore"))
+        set_description(N_("secrets are stored encrypted on a file"))
+        set_category(CAT_ADVANCED)
+        set_subcategory(SUBCAT_ADVANCED_MISC)
+        set_callbacks(OpenCrypt, CloseCrypt)
+        set_capability("keystore", 1)
+        add_shortcut("file_crypt")
+#endif
 vlc_module_end ()
 
 struct vlc_keystore_sys
 {
     char *          psz_file;
+#ifdef CRYPTFILE
+    bool            b_crypted;
+    struct crypt    crypt;
+#endif
 };
 
 static const char *const ppsz_keys[] = {
@@ -303,8 +322,29 @@ Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
     if (ks_values_copy((const char **)p_entry->ppsz_values, ppsz_values))
         goto end;
 
-    if (vlc_keystore_entry_set_secret(p_entry, p_secret, i_secret_len))
-        goto end;
+#ifdef CRYPTFILE
+    if (p_sys->b_crypted)
+    {
+        struct crypt *p_crypt = &p_sys->crypt;
+        uint8_t *p_enc_secret;
+        size_t i_enc_secret_len =
+            p_crypt->pf_encrypt(p_keystore, p_crypt->p_ctx, p_secret,
+                                i_secret_len, &p_enc_secret);
+        if (i_enc_secret_len == 0)
+            goto end;
+
+        if (vlc_keystore_entry_set_secret(p_entry, p_enc_secret,
+                                          i_enc_secret_len))
+            goto end;
+        free(p_enc_secret);
+    }
+    else
+#endif
+    {
+        if (vlc_keystore_entry_set_secret(p_entry, p_secret, i_secret_len))
+            goto end;
+    }
+
 
     i_ret = file_save(p_keystore, p_file, i_fd, &list);
 
@@ -342,6 +382,26 @@ Find(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
             ks_list_free(&out_list);
             goto end;
         }
+
+#ifdef CRYPTFILE
+        if (p_sys->b_crypted)
+        {
+            struct crypt *p_crypt = &p_sys->crypt;
+            uint8_t *p_dec_secret;
+            size_t i_dec_secret_len =
+                p_crypt->pf_decrypt(p_keystore, p_crypt->p_ctx, p_entry->p_secret,
+                                    p_entry->i_secret_len, &p_dec_secret);
+            if (i_dec_secret_len == 0)
+            {
+                ks_list_free(&out_list);
+                goto end;
+            }
+
+            free(p_entry->p_secret);
+            p_entry->p_secret = p_dec_secret;
+            p_entry->i_secret_len = i_dec_secret_len;
+        }
+#endif
 
         if (vlc_keystore_entry_set_secret(p_out_entry, p_entry->p_secret,
                                           p_entry->i_secret_len))
@@ -445,3 +505,39 @@ Open(vlc_object_t *p_this)
 
     return VLC_SUCCESS;
 }
+
+#ifdef CRYPTFILE
+static void
+CloseCrypt(vlc_object_t *p_this)
+{
+    vlc_keystore *p_keystore = (vlc_keystore *)p_this;
+    struct crypt *p_crypt = &p_keystore->p_sys->crypt;
+
+    if (p_crypt->pf_clean != NULL)
+        p_crypt->pf_clean(p_keystore, p_crypt->p_ctx);
+
+    Close(p_this);
+}
+
+static int
+OpenCrypt(vlc_object_t *p_this)
+{
+    int i_ret = Open(p_this);
+
+    if (i_ret != VLC_SUCCESS)
+        return i_ret;
+
+    vlc_keystore *p_keystore = (vlc_keystore *)p_this;
+    vlc_keystore_sys *p_sys = p_keystore->p_sys;
+
+    if (CryptInit(p_keystore, &p_sys->crypt) != VLC_SUCCESS)
+    {
+        Close(p_this);
+        return VLC_EGENERIC;
+    }
+    assert(p_sys->crypt.pf_encrypt != NULL && p_sys->crypt.pf_decrypt != NULL);
+    p_sys->b_crypted = true;
+
+    return VLC_SUCCESS;
+}
+#endif /* CRYPTFILE */
