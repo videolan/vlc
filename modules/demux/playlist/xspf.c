@@ -519,6 +519,7 @@ static bool parse_track_node COMPLEX_INTERFACE
 
 end:
 
+    vlc_gc_decref(p_new_input);
     input_item_node_Delete(p_new_node);
     free(psz_value);
     return false;
