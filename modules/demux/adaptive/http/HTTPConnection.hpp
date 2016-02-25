@@ -49,7 +49,6 @@ namespace adaptive
                 virtual bool    prepare     (const ConnectionParams &);
                 virtual bool    canReuse     (const ConnectionParams &) const = 0;
 
-                virtual bool    connect     () = 0;
                 virtual int     query       (const std::string& path, const BytesRange & = BytesRange()) = 0;
                 virtual ssize_t read        (void *p_buffer, size_t len) = 0;
 
@@ -72,7 +71,6 @@ namespace adaptive
                 virtual ~HTTPConnection();
 
                 virtual bool    canReuse     (const ConnectionParams &) const;
-                virtual bool    connect     ();
                 virtual int     query       (const std::string& path, const BytesRange & = BytesRange());
                 virtual ssize_t read        (void *p_buffer, size_t len);
 
@@ -80,6 +78,7 @@ namespace adaptive
 
             protected:
                 virtual bool    connected   () const;
+                virtual bool    connect     ();
                 virtual void    disconnect  ();
                 virtual bool    send        (const void *buf, size_t size);
                 virtual bool    send        (const std::string &data);

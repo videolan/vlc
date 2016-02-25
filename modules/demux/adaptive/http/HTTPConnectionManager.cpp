@@ -94,7 +94,7 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
 
         connectionPool.push_back(conn);
 
-        if (!conn->prepare(params) || !conn->connect())
+        if (!conn->prepare(params))
         {
             vlc_mutex_unlock(&lock);
             return NULL;
