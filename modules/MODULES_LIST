@@ -224,6 +224,7 @@ $Id$
  * marq: Overlays a marquee on the video
  * mediacodec: Android Jelly Bean MediaCodec decoder module
  * mediadirs: Picture/Music/Video user directories as service discoveries
+ * memory: store secrets in memory
  * mft: Media Foundation Transform audio/video decoder
  * microdns: mDNS services discovery
  * minimal_macosx: a minimal Mac OS X GUI, using the FrameWork
@@ -290,7 +291,6 @@ $Id$
  * packetizer_vc1: VC-1 video packetizer
  * panoramix: image wall panoramic video with edge blending filter
  * param_eq: parametric equalizer
- * plaintext_keystore: store secrets in a plaintext file (insecure)
  * playlist: playlist import module
  * png: PNG images decoder
  * podcast: podcast feed parser

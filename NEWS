@@ -201,7 +201,7 @@ Misc
  * Add a text-to-speech renderer for subtitles on Windows
  * Add Gnome libsecret-based crypto keystore
  * Add KDE Kwallet-based crypto keystore
- * Add a plaintext keystore
+ * Add a memory keystore
  * Add Keychain based crypto keystore for iOS, Mac OS X and tvOS
 
 Removed modules

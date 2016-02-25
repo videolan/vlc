@@ -1,7 +1,7 @@
 keystoredir = $(pluginsdir)/keystore
 
-libplaintext_keystore_plugin_la_SOURCES = keystore/plaintext.c
-keystore_LTLIBRARIES = libplaintext_keystore_plugin.la
+libmemory_keystore_plugin_la_SOURCES = keystore/memory.c
+keystore_LTLIBRARIES = libmemory_keystore_plugin.la
 
 libsecret_plugin_la_SOURCES = keystore/secret.c
 libsecret_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SECRET_CFLAGS)

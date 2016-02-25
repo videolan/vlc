@@ -47,7 +47,7 @@ static const struct
     bool b_test_default;
 } keystore_args[] =
 {
-    { "plaintext", true },
+    { "memory", true },
     /* Following keystores are tested only when asked explicitly by the tester
      * (with "-a" argv) */
     { "secret", false },
@@ -296,12 +296,12 @@ main(int i_argc, char *ppsz_argv[])
             assert(asprintf(&ppsz_vlc_argv[0], "--keystore=%s,none",
                    psz_module) != -1);
 
-            if (strcmp(psz_module, "plaintext") == 0)
+            if (strcmp(psz_module, "memory") == 0)
             {
                 assert((i_tmp_fd = mkstemp(psz_tmp_path)) != -1);
                 printf("plaintext tmp file: '%s'\n", psz_tmp_path);
                 assert(asprintf(&ppsz_vlc_argv[1],
-                       "--keystore-plaintext-file=%s", psz_tmp_path) != -1);
+                       "--keystore-file=%s", psz_tmp_path) != -1);
                 i_vlc_argc++;
             }
             else if (strcmp(psz_module, "kwallet") == 0)

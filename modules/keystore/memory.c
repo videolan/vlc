@@ -1,5 +1,5 @@
 /*****************************************************************************
- * plaintext.c: Insecure keystore
+ * memory.c: Memory keystore
  *****************************************************************************
  * Copyright © 2015-2016 VLC authors, VideoLAN and VideoLabs
  *
@@ -41,11 +41,11 @@ static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
 vlc_module_begin()
-    set_shortname(N_("plaintext keystore (insecure)"))
-    set_description(N_("secrets are stored in plaintext without any encryption"))
+    set_shortname(N_("memory keystore (insecure)"))
+    set_description(N_("secrets are stored in memory without any encryption"))
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
-    add_string("keystore-plaintext-file", NULL, NULL, NULL, false )
+    add_string("keystore-file", NULL, NULL, NULL, true)
     set_capability("keystore", 0)
     set_callbacks(Open, Close)
 vlc_module_end ()
@@ -481,7 +481,7 @@ Open(vlc_object_t *p_this)
     /* The p_sys context is shared and protected between all threads */
     if (instance.i_ref_count == 0)
     {
-        char *psz_file = var_InheritString(p_this, "keystore-plaintext-file");
+        char *psz_file = var_InheritString(p_this, "keystore-file");
         if (!psz_file)
             return VLC_EGENERIC;
 
