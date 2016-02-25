@@ -72,6 +72,9 @@ static void Close   (vlc_object_t *);
 
 #define ADAPT_LOGIC_TEXT N_("Adaptation Logic")
 
+#define ADAPT_ACCESS_TEXT N_("Use regular HTTP modules")
+#define ADAPT_ACCESS_LONGTEXT N_("Connect using http access instead of custom http code")
+
 static const int pi_logics[] = {AbstractAdaptationLogic::RateBased,
                                 AbstractAdaptationLogic::FixedRate,
                                 AbstractAdaptationLogic::AlwaysLowest,
@@ -94,6 +97,7 @@ vlc_module_begin ()
         add_integer( "adaptive-width",  480, ADAPT_WIDTH_TEXT,  ADAPT_WIDTH_TEXT,  true )
         add_integer( "adaptive-height", 360, ADAPT_HEIGHT_TEXT, ADAPT_HEIGHT_TEXT, true )
         add_integer( "adaptive-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT,     false )
+        add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT, true );
         set_callbacks( Open, Close )
 vlc_module_end ()
 

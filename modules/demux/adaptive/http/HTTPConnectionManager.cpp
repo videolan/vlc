@@ -34,15 +34,20 @@
 
 using namespace adaptive::http;
 
-HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *stream, ConnectionFactory *factory_) :
-                       stream                   (stream),
+HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_, ConnectionFactory *factory_) :
+                       p_object                 (p_object_),
                        rateObserver             (NULL)
 {
     vlc_mutex_init(&lock);
     downloader = new (std::nothrow) Downloader();
     downloader->start();
     if(!factory_)
-        factory = new (std::nothrow) ConnectionFactory();
+    {
+        if(var_InheritBool(p_object, "adaptive-use-access"))
+            factory = new (std::nothrow) StreamUrlConnectionFactory();
+        else
+            factory = new (std::nothrow) ConnectionFactory();
+    }
     else
         factory = factory_;
 }
@@ -90,7 +95,7 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
     AbstractConnection *conn = reuseConnection(params);
     if(!conn)
     {
-        conn = factory->createConnection(stream, params);
+        conn = factory->createConnection(p_object, params);
 
         connectionPool.push_back(conn);
 

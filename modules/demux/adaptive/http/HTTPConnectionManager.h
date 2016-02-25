@@ -47,7 +47,7 @@ namespace adaptive
         class HTTPConnectionManager : public IDownloadRateObserver
         {
             public:
-                HTTPConnectionManager           (vlc_object_t *stream, ConnectionFactory * = NULL);
+                HTTPConnectionManager           (vlc_object_t *p_object, ConnectionFactory * = NULL);
                 virtual ~HTTPConnectionManager  ();
 
                 void    closeAllConnections ();
@@ -61,7 +61,7 @@ namespace adaptive
                 void    releaseAllConnections ();
                 vlc_mutex_t                                         lock;
                 std::vector<AbstractConnection *>                   connectionPool;
-                vlc_object_t                                       *stream;
+                vlc_object_t                                       *p_object;
                 IDownloadRateObserver                              *rateObserver;
                 ConnectionFactory                                  *factory;
                 AbstractConnection * reuseConnection(ConnectionParams &);
