@@ -215,6 +215,7 @@ static void rtsp_schedule_standard( rtsp_client_t *rtsp )
 
 static int rtsp_get_answers( rtsp_client_t *rtsp )
 {
+    access_t *p_access = (access_t*)rtsp->p_userdata;
     char *answer = NULL;
     unsigned int answer_seq;
     char **answer_ptr = rtsp->p_private->answers;
@@ -235,40 +236,46 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
 
       if( !strncasecmp( answer, "CSeq:", 5 ) )
       {
-          sscanf( answer, "%*s %u", &answer_seq );
-          if( rtsp->p_private->cseq != answer_seq )
-          {
-            //fprintf( stderr, "warning: Cseq mismatch. got %u, assumed %u",
-            //       answer_seq, rtsp->p_private->cseq );
-
-              rtsp->p_private->cseq = answer_seq;
+          if (sscanf( answer, "%*s %u", &answer_seq ) == 1) {
+              if( rtsp->p_private->cseq != answer_seq )
+              {
+                msg_Warn (p_access, "Cseq mismatch, got %u, assumed %u", answer_seq, rtsp->p_private->cseq);
+                rtsp->p_private->cseq = answer_seq;
+              }
+          } else {
+            msg_Warn (p_access, "remote server sent CSeq without payload, ignoring.");
           }
       }
       if( !strncasecmp( answer, "Server:", 7 ) )
       {
           char *buf = xmalloc( strlen(answer) );
-          sscanf( answer, "%*s %s", buf );
-          free( rtsp->p_private->server );
-          rtsp->p_private->server = buf;
+          if (sscanf( answer, "%*s %s", buf ) == 1) {
+            free( rtsp->p_private->server );
+            rtsp->p_private->server = buf;
+          } else {
+            msg_Warn(p_access, "remote server sent Server without payload, ignoring.");
+          }
       }
       if( !strncasecmp( answer, "Session:", 8 ) )
       {
           char *buf = xmalloc( strlen(answer) );
-          sscanf( answer, "%*s %s", buf );
-          if( rtsp->p_private->session )
-          {
-              if( strcmp( buf, rtsp->p_private->session ) )
+          if (sscanf( answer, "%*s %s", buf ) == 1) { // TODO: ignore attributes "Session: ${session-id};${attribute=value...}"
+              if( rtsp->p_private->session )
               {
-                  //fprintf( stderr,
-                  //         "rtsp: warning: setting NEW session: %s\n", buf );
-                  free( rtsp->p_private->session );
+                  if( strcmp( buf, rtsp->p_private->session ) )
+                  {
+                      msg_Warn (p_access, "setting NEW session: %s", buf);
+                      free( rtsp->p_private->session );
+                      rtsp->p_private->session = strdup( buf );
+                  }
+              }
+              else
+              {
+                  msg_Dbg (p_access, "session id: '%s'", buf);
                   rtsp->p_private->session = strdup( buf );
               }
-          }
-          else
-          {
-              //fprintf( stderr, "setting session id to: %s\n", buf );
-              rtsp->p_private->session = strdup( buf );
+          } else {
+            msg_Warn(p_access, "remote server sent Session without payload, ignoring.");
           }
           free( buf );
       }
@@ -279,7 +286,10 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
 
     rtsp->p_private->cseq++;
 
-    *answer_ptr = NULL;
+    if (ans_count != MAX_FIELDS) {
+      *answer_ptr = NULL;
+    }
+
     rtsp_schedule_standard( rtsp );
 
     return code;
