@@ -206,7 +206,7 @@ is_credential_valid(vlc_credential *p_credential)
 static struct
 {
     const char *    psz_protocol;
-    unsigned int    i_port;
+    uint16_t        i_port;
 } protocol_default_ports [] = {
     { "rtsp", 80 },
     { "http", 80 },
@@ -218,15 +218,29 @@ static struct
 
 /* Don't store a port if it's the default one */
 static bool
-protocol_is_default_port(const vlc_url_t *p_url)
+protocol_set_port(const vlc_url_t *p_url, char *psz_port)
 {
-    for (unsigned int i = 0; i < sizeof(protocol_default_ports)
-                               / sizeof(*protocol_default_ports); ++i)
+    int i_port = -1;
+
+    if (p_url->i_port != 0 && p_url->i_port <= UINT16_MAX)
+        i_port = p_url->i_port;
+    else
     {
-        if (p_url->i_port == protocol_default_ports[i].i_port
-         && strcasecmp(p_url->psz_protocol,
-                       protocol_default_ports[i].psz_protocol) == 0)
-            return true;
+        for (unsigned int i = 0; i < sizeof(protocol_default_ports)
+                                   / sizeof(*protocol_default_ports); ++i)
+        {
+            if (strcasecmp(p_url->psz_protocol,
+                           protocol_default_ports[i].psz_protocol) == 0)
+            {
+                i_port = protocol_default_ports[i].i_port;
+                break;
+            }
+        }
+    }
+    if (i_port != -1)
+    {
+        sprintf(psz_port, "%u", (uint16_t) i_port);
+        return true;
     }
     return false;
 }
@@ -277,11 +291,8 @@ credential_find_keystore(vlc_credential *p_credential, vlc_keystore *p_keystore)
     ppsz_values[KEY_REALM] = p_credential->psz_realm;
     ppsz_values[KEY_AUTHTYPE] = p_credential->psz_authtype;
     char psz_port[21];
-    if (p_url->i_port > 0 && !protocol_is_default_port(p_url))
-    {
-        sprintf(psz_port, "%u", p_url->i_port);
+    if (protocol_set_port(p_url, psz_port))
         ppsz_values[KEY_PORT] = psz_port;
-    }
 
     vlc_keystore_entry *p_entries;
     unsigned int i_entries_count;
@@ -299,6 +310,7 @@ credential_find_keystore(vlc_credential *p_credential, vlc_keystore *p_keystore)
     if (p_credential->i_entries_count > 0)
     {
         vlc_keystore_entry *p_entry;
+
         if (protocol_store_path(p_url))
             p_entry = find_closest_path(p_credential->p_entries,
                                         p_credential->i_entries_count,
@@ -535,11 +547,8 @@ vlc_credential_store(vlc_credential *p_credential, vlc_object_t *p_parent)
     ppsz_values[KEY_AUTHTYPE] = p_credential->psz_authtype;
 
     char psz_port[21];
-    if (p_url->i_port > 0 && !protocol_is_default_port(p_url))
-    {
-        sprintf(psz_port, "%u", p_url->i_port);
+    if (protocol_set_port(p_url, psz_port))
         ppsz_values[KEY_PORT] = psz_port;
-    }
 
     char *psz_label;
     if (asprintf(&psz_label, "LibVLC password for %s://%s%s",
