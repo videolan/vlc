@@ -129,13 +129,12 @@ static int rtsp_put( rtsp_client_t *rtsp, const char *psz_string )
 static int rtsp_get_status_code( rtsp_client_t *rtsp, const char *psz_string )
 {
     VLC_UNUSED(rtsp);
-    char psz_buffer[4];
+    char psz_buffer[4] = {0,0,0,0};
     int i_code = 0;
 
     if( !strncmp( psz_string, "RTSP/1.0", sizeof("RTSP/1.0") - 1 ) )
     {
-        memcpy( psz_buffer, psz_string + sizeof("RTSP/1.0"), 3 );
-        psz_buffer[3] = 0;
+        strncpy(psz_buffer, psz_string + sizeof("RTSP/1.0"), 3);
         i_code = atoi( psz_buffer );
     }
     else if( !strncmp( psz_string, "SET_PARAMETER", sizeof("SET_PARAMETER") - 1 ) )
