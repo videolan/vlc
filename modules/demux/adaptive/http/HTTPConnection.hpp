@@ -101,11 +101,35 @@ namespace adaptive
                 Socket *socket;
        };
 
+       class StreamUrlConnection : public AbstractConnection
+       {
+            public:
+                StreamUrlConnection(vlc_object_t *);
+                virtual ~StreamUrlConnection();
+
+                virtual bool    canReuse     (const ConnectionParams &) const;
+
+                virtual int     request     (const std::string& path, const BytesRange & = BytesRange());
+                virtual ssize_t read        (void *p_buffer, size_t len);
+
+                virtual void    setUsed( bool );
+
+            protected:
+                void reset();
+                stream_t *p_streamurl;
+       };
+
        class ConnectionFactory
        {
            public:
                ConnectionFactory();
                virtual ~ConnectionFactory();
+               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &);
+       };
+
+       class StreamUrlConnectionFactory : public ConnectionFactory
+       {
+           public:
                virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &);
        };
     }

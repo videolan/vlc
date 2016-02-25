@@ -292,6 +292,104 @@ std::string HTTPConnection::extraRequestHeaders() const
     return ss.str();
 }
 
+StreamUrlConnection::StreamUrlConnection(vlc_object_t *p_object)
+    : AbstractConnection(p_object)
+{
+    p_streamurl = NULL;
+    bytesRead = 0;
+    contentLength = 0;
+}
+
+StreamUrlConnection::~StreamUrlConnection()
+{
+    reset();
+}
+
+void StreamUrlConnection::reset()
+{
+    if(p_streamurl)
+        stream_Delete(p_streamurl);
+    p_streamurl = NULL;
+    bytesRead = 0;
+    contentLength = 0;
+    bytesRange = BytesRange();
+}
+
+bool StreamUrlConnection::canReuse(const ConnectionParams &) const
+{
+    return available;
+}
+
+int StreamUrlConnection::request(const std::string &path, const BytesRange &range)
+{
+    reset();
+
+    /* Set new path for this query */
+    params.setPath(path);
+
+    msg_Dbg(p_object, "Retrieving %s @%zu", params.getUrl().c_str(),
+                      range.isValid() ? range.getStartByte() : 0);
+
+    p_streamurl = stream_UrlNew(p_object, params.getUrl().c_str());
+    if(!p_streamurl)
+        return VLC_EGENERIC;
+
+    if(range.isValid() && range.getEndByte() > 0)
+    {
+        if(stream_Seek(p_streamurl, range.getStartByte()) != VLC_SUCCESS)
+        {
+            stream_Delete(p_streamurl);
+            return VLC_EGENERIC;
+        }
+        bytesRange = range;
+        contentLength = range.getEndByte() - range.getStartByte() + 1;
+    }
+
+    int64_t i_size = stream_Size(p_streamurl);
+    if(i_size > -1)
+    {
+        if(!range.isValid() || contentLength > (size_t) i_size)
+            contentLength = (size_t) i_size;
+    }
+    return VLC_SUCCESS;
+}
+
+ssize_t StreamUrlConnection::read(void *p_buffer, size_t len)
+{
+    if( !p_streamurl )
+        return VLC_EGENERIC;
+
+    if(len == 0)
+        return VLC_SUCCESS;
+
+    const size_t toRead = (contentLength) ? contentLength - bytesRead : len;
+    if (toRead == 0)
+        return VLC_SUCCESS;
+
+    if(len > toRead)
+        len = toRead;
+
+    ssize_t ret =  stream_Read(p_streamurl, p_buffer, len);
+    if(ret >= 0)
+        bytesRead += ret;
+
+    if(ret < 0 || (size_t)ret < len || /* set EOF */
+       contentLength == bytesRead )
+    {
+        reset();
+        return ret;
+    }
+
+    return ret;
+}
+
+void StreamUrlConnection::setUsed( bool b )
+{
+    available = !b;
+    if(available && contentLength == bytesRead)
+       reset();
+}
+
 ConnectionFactory::ConnectionFactory()
 {
 }
@@ -322,4 +420,10 @@ AbstractConnection * ConnectionFactory::createConnection(vlc_object_t *p_object,
     }
 
     return conn;
+}
+
+AbstractConnection * StreamUrlConnectionFactory::createConnection(vlc_object_t *p_object,
+                                                                  const ConnectionParams &)
+{
+    return new (std::nothrow) StreamUrlConnection(p_object);
 }
