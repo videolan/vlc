@@ -29,6 +29,8 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_access.h>
+#include <vlc_messages.h>
 
 #include "rtsp.h"
 
@@ -636,15 +638,27 @@ char *rtsp_get_mrl( rtsp_client_t *rtsp )
  * schedules a field for transmission
  */
 
-void rtsp_schedule_field( rtsp_client_t *rtsp, const char *string )
+void rtsp_schedule_field( rtsp_client_t *rtsp, const char *data )
 {
+    access_t * p_access = (access_t*)rtsp->p_userdata;
+    char **pptr;
     int i = 0;
 
-    if( !string ) return;
+    if( rtsp->p_private == NULL || data == NULL)
+      return;
 
-    while( rtsp->p_private->scheduled[i] ) i++;
+    pptr = rtsp->p_private->scheduled;
 
-    rtsp->p_private->scheduled[i] = strdup(string);
+    for (i = 0; i < MAX_FIELDS; ++i) {
+      if (pptr[i] == NULL) {
+        pptr[i] = strdup(data);
+        break;
+      }
+    }
+
+    if (i == MAX_FIELDS) {
+      msg_Warn (p_access, "Unable to schedule '%s': the buffer is full!", data);
+    }
 }
 
 /*
