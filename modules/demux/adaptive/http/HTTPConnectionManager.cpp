@@ -75,7 +75,7 @@ AbstractConnection * HTTPConnectionManager::reuseConnection(ConnectionParams &pa
     for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
     {
         AbstractConnection *conn = *it;
-        if(conn->isAvailable() && conn->canReuse(params))
+        if(conn->canReuse(params))
             return conn;
     }
     return NULL;

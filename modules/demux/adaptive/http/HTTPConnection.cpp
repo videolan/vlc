@@ -50,11 +50,6 @@ bool AbstractConnection::prepare(const ConnectionParams &params_)
     return true;
 }
 
-bool AbstractConnection::isAvailable() const
-{
-    return available;
-}
-
 size_t AbstractConnection::getContentLength() const
 {
     return contentLength;
@@ -78,7 +73,8 @@ HTTPConnection::~HTTPConnection()
 
 bool HTTPConnection::canReuse(const ConnectionParams &params_) const
 {
-    return ( params.getHostname() == params_.getHostname() &&
+    return ( available &&
+             params.getHostname() == params_.getHostname() &&
              params.getScheme() == params_.getScheme() &&
              params.getPort() == params_.getPort() );
 }

@@ -53,7 +53,6 @@ namespace adaptive
                 virtual int     query       (const std::string& path, const BytesRange & = BytesRange()) = 0;
                 virtual ssize_t read        (void *p_buffer, size_t len) = 0;
 
-                bool            isAvailable () const;
                 virtual size_t  getContentLength() const;
                 virtual void    setUsed( bool ) = 0;
 
