@@ -144,6 +144,7 @@ $Id$
  * faad: AAC decoder using libfaad2
  * fb: video output module for the Linux framebuffer
  * fdkaac: AAC encoder using the fdk-aac library
+ * file_crypt: store secrets on a file, may use a submodule to crypt secrets
  * file_logger: file logger plugin
  * filesystem: Filesystem access module
  * fingerprinter: AcoustID audio fingerprinter using chromaprint

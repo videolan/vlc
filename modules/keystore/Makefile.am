@@ -4,6 +4,10 @@ libmemory_keystore_plugin_la_SOURCES = keystore/memory.c \
 	keystore/list_util.c keystore/list_util.h
 keystore_LTLIBRARIES = libmemory_keystore_plugin.la
 
+libfile_keystore_plugin_la_SOURCES = keystore/file.c \
+	keystore/list_util.c keystore/list_util.h
+keystore_LTLIBRARIES += libfile_keystore_plugin.la
+
 libsecret_plugin_la_SOURCES = keystore/secret.c
 libsecret_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SECRET_CFLAGS)
 libsecret_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(keystoredir)'

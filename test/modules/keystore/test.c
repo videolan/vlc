@@ -45,14 +45,16 @@ static const struct
 {
     const char *psz_module;
     bool b_test_default;
+    bool b_persistent;
 } keystore_args[] =
 {
-    { "memory", false },
+    { "memory", true, false },
+    { "file", true, true },
     /* Following keystores are tested only when asked explicitly by the tester
      * (with "-a" argv) */
-    { "secret", false },
-    { "kwallet", false },
-    { "keychain", false }
+    { "secret", false, true },
+    { "kwallet", false, true },
+    { "keychain", false, true }
 };
 
 static void
@@ -108,7 +110,7 @@ ks_store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
 }
 
 static void
-test_module(const char *psz_module, bool b_test_all,
+test_module(const char *psz_module, bool b_test_all, bool b_persistent,
             int argc, const char * const *argv)
 {
 #define VALUES_INSERT(i_key, psz_value) ppsz_values[i_key] = psz_value
@@ -173,34 +175,52 @@ test_module(const char *psz_module, bool b_test_all,
     KS_FIND();
     assert(i_entries == 2);
 
-    printf("testing that entries are still present after a module unload\n");
-    vlc_keystore_release(p_keystore);
-    p_keystore = vlc_keystore_create(p_libvlc->p_libvlc_int);
-    assert(p_keystore);
-    KS_FIND();
-    assert(i_entries == 2);
+    if (b_persistent)
+    {
+        printf("testing that entries are still present after a module unload\n");
+        vlc_keystore_release(p_keystore);
+        p_keystore = vlc_keystore_create(p_libvlc->p_libvlc_int);
+        assert(p_keystore);
+        KS_FIND();
+        assert(i_entries == 2);
+    }
 
-    printf("testing adding a third entry from a second running instance\n");
     VALUES_REINIT();
     VALUES_INSERT(KEY_PROTOCOL, "smb");
     VALUES_INSERT(KEY_SERVER, "example");
     VALUES_INSERT(KEY_PATH, "/example.mkv");
     VALUES_INSERT(KEY_USER, "user1");
-    KS_FIND();
-    assert(i_entries == 0);
 
-    vlc_keystore *old_keystore = p_keystore;
-    p_keystore = vlc_keystore_create(p_libvlc->p_libvlc_int);
-    assert(p_keystore);
+    if (b_persistent)
+    {
+        printf("testing adding a third entry from a second running instance\n");
 
-    KS_STORE();
-    KS_FIND();
-    assert(i_entries == 1);
+        KS_FIND();
+        assert(i_entries == 0);
 
-    vlc_keystore_release(p_keystore);
-    p_keystore = old_keystore;
-    KS_FIND();
-    assert(i_entries == 1);
+        vlc_keystore *old_keystore = p_keystore;
+        p_keystore = vlc_keystore_create(p_libvlc->p_libvlc_int);
+        assert(p_keystore);
+
+        KS_STORE();
+        KS_FIND();
+        assert(i_entries == 1);
+
+        vlc_keystore_release(p_keystore);
+        p_keystore = old_keystore;
+        KS_FIND();
+        assert(i_entries == 1);
+    }
+    else
+    {
+        printf("testing adding a third entry\n");
+        KS_FIND();
+        assert(i_entries == 0);
+        KS_STORE();
+        KS_FIND();
+        assert(i_entries == 1);
+    }
+
 
     printf("testing adding a fourth entry (without user/path)\n");
     VALUES_REINIT();
@@ -231,7 +251,7 @@ test_module(const char *psz_module, bool b_test_all,
     KS_FIND();
     assert(i_entries == 4);
 
-    if (b_test_all)
+    if (b_test_all && b_persistent)
     {
         printf("\nPress ENTER to remove entries\n");
         getchar();
@@ -296,7 +316,7 @@ main(int i_argc, char *ppsz_argv[])
             assert(asprintf(&ppsz_vlc_argv[0], "--keystore=%s,none",
                    psz_module) != -1);
 
-            if (strcmp(psz_module, "memory") == 0)
+            if (strcmp(psz_module, "file") == 0)
             {
                 assert((i_tmp_fd = mkstemp(psz_tmp_path)) != -1);
                 printf("plaintext tmp file: '%s'\n", psz_tmp_path);
@@ -310,8 +330,8 @@ main(int i_argc, char *ppsz_argv[])
                 assert(libvlc_InternalAddIntf(p_libvlc->p_libvlc_int, "qt") == VLC_SUCCESS);
             }
 
-            test_module(psz_module, b_test_all, i_vlc_argc,
-                        (const char * const *)ppsz_vlc_argv);
+            test_module(psz_module, b_test_all, keystore_args[i].b_persistent,
+                        i_vlc_argc, (const char * const *)ppsz_vlc_argv);
 
             if (i_tmp_fd != -1)
             {

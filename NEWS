@@ -202,6 +202,7 @@ Misc
  * Add Gnome libsecret-based crypto keystore
  * Add KDE Kwallet-based crypto keystore
  * Add a memory keystore
+ * Add a file keystore that can use a submodule to crypt secrets
  * Add Keychain based crypto keystore for iOS, Mac OS X and tvOS
 
 Removed modules
