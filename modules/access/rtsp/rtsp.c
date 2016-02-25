@@ -157,9 +157,14 @@ static int rtsp_get_status_code( rtsp_client_t *rtsp, const char *psz_string )
 static int rtsp_send_request( rtsp_client_t *rtsp, const char *psz_type,
                               const char *psz_what )
 {
-    char **ppsz_payload = rtsp->p_private->scheduled;
+    char **ppsz_payload;
     char *psz_buffer;
-    int i_ret;
+    int i_ret, i;
+
+    if (rtsp->p_private == NULL)
+      return -1;
+
+    ppsz_payload = rtsp->p_private->scheduled;
 
     psz_buffer = xmalloc( strlen(psz_type) + strlen(psz_what) +
                          sizeof("RTSP/1.0") + 2 );
@@ -168,12 +173,13 @@ static int rtsp_send_request( rtsp_client_t *rtsp, const char *psz_type,
     i_ret = rtsp_put( rtsp, psz_buffer );
     free( psz_buffer );
 
-    if( ppsz_payload )
-        while( *ppsz_payload )
-        {
-            rtsp_put( rtsp, *ppsz_payload );
-            ppsz_payload++;
-        }
+    for (i = 0; i < MAX_FIELDS; ++i) {
+      if (!ppsz_payload[i])
+        break;
+
+      rtsp_put (rtsp, ppsz_payload[i]);
+    }
+
     rtsp_put( rtsp, "" );
     rtsp_unschedule_all( rtsp );
 
