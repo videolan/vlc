@@ -208,7 +208,7 @@ bool HTTPChunkSource::prepare()
             return false;
     }
 
-    if( connection->query(params.getPath(), bytesRange) != VLC_SUCCESS )
+    if( connection->request(params.getPath(), bytesRange) != VLC_SUCCESS )
         return false;
     /* Because we don't know Chunk size at start, we need to get size
            from content length */

@@ -99,7 +99,7 @@ void HTTPConnection::disconnect()
     socket->disconnect();
 }
 
-int HTTPConnection::query(const std::string &path, const BytesRange &range)
+int HTTPConnection::request(const std::string &path, const BytesRange &range)
 {
     queryOk = false;
 
@@ -128,7 +128,7 @@ int HTTPConnection::query(const std::string &path, const BytesRange &range)
         {
             /* server closed connection pipeline after last req. need new */
             connectionClose = true;
-            return query(path, range);
+            return request(path, range);
         }
         return VLC_EGENERIC;
     }
@@ -144,7 +144,7 @@ int HTTPConnection::query(const std::string &path, const BytesRange &range)
         if(!connectionClose)
         {
             connectionClose = true;
-            return query(path, range);
+            return request(path, range);
         }
     }
 
