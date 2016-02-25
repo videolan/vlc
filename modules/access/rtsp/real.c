@@ -622,10 +622,17 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   char *mrl=rtsp_get_mrl(rtsp_session);
   unsigned int size;
   int status;
+  char *p_data;
 
   /* get challenge */
-  challenge1=strdup(rtsp_search_answers(rtsp_session,"RealChallenge1"));
-  msg_Dbg(p_access, "Challenge1: %s", challenge1);
+  if (NULL == (p_data = rtsp_search_answers(rtsp_session, "RealChallenge1"))) {
+    msg_Warn(p_access, "server did not reply with RealChallenge1, aborting!");
+    return NULL;
+
+  } else {
+    challenge1 = strdup(p_data);
+    msg_Dbg(p_access, "Challenge1: %s", challenge1);
+  }
 
   sprintf(buf, "Bandwidth: %u", bandwidth);
 
