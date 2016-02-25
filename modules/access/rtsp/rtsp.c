@@ -695,23 +695,28 @@ void rtsp_unschedule_field( rtsp_client_t *rtsp, const char *needle )
     }
 }
 
+static void pp_free_helper_ (char **pptr, int max_length) {
+  int i;
+
+  for (i = 0; i < max_length; ++i) {
+    if (pptr[i] == NULL)
+      break;
+
+    free (pptr[i]);
+    pptr[i] = NULL;
+  }
+}
+
 /*
  * unschedule all fields
  */
 
 void rtsp_unschedule_all( rtsp_client_t *rtsp )
 {
-    char **ptr;
+  if (rtsp->p_private == NULL)
+    return;
 
-    if( !rtsp->p_private->scheduled ) return;
-    ptr = rtsp->p_private->scheduled;
-
-    while( *ptr )
-    {
-        free( *ptr );
-        *ptr = NULL;
-        ptr++;
-    }
+  pp_free_helper_ (rtsp->p_private->scheduled, MAX_FIELDS);
 }
 /*
  * free answers
@@ -719,15 +724,8 @@ void rtsp_unschedule_all( rtsp_client_t *rtsp )
 
 void rtsp_free_answers( rtsp_client_t *rtsp )
 {
-    char **answer;
+  if (rtsp->p_private == NULL)
+    return;
 
-    if( !rtsp->p_private->answers ) return;
-    answer = rtsp->p_private->answers;
-
-    while( *answer )
-    {
-        free( *answer );
-        *answer = NULL;
-        answer++;
-    }
+  pp_free_helper_ (rtsp->p_private->answers, MAX_FIELDS);
 }
