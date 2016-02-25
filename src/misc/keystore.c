@@ -196,7 +196,7 @@ is_credential_valid(vlc_credential *p_credential)
         return true;
     else
     {
-        p_credential->psz_username = p_credential->psz_password = NULL;
+        p_credential->psz_password = NULL;
         return false;
     }
 
