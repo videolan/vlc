@@ -665,22 +665,34 @@ void rtsp_schedule_field( rtsp_client_t *rtsp, const char *data )
  * removes the first scheduled field which prefix matches string.
  */
 
-void rtsp_unschedule_field( rtsp_client_t *rtsp, const char *string )
+void rtsp_unschedule_field( rtsp_client_t *rtsp, const char *needle )
 {
-    char **ptr = rtsp->p_private->scheduled;
+    char **pptr;
+    int i;
 
-    if( !string ) return;
+    if (rtsp->p_private == NULL || needle == NULL)
+      return;
 
-    while( *ptr )
-    {
-      if( !strncmp(*ptr, string, strlen(string)) ) break;
+    pptr = rtsp->p_private->scheduled;
+
+    for (i = 0; i < MAX_FIELDS; ++i) {
+      if (pptr[i] == NULL)
+        break;
+
+      if (!strncmp (pptr[i], needle, strlen(needle))) {
+        free (pptr[i]);
+        pptr[i] = NULL;
+        break;
+      }
     }
-    free( *ptr );
-    ptr++;
-    do
-    {
-        *(ptr-1) = *ptr;
-    } while( *ptr );
+
+    for (i++; i < MAX_FIELDS && pptr[i]; ++i) {
+      pptr[i-1] = pptr[i];
+    }
+
+    if (i < MAX_FIELDS) {
+      pptr[i] = NULL;
+    }
 }
 
 /*
