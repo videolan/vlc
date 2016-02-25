@@ -24,6 +24,9 @@
  */
 
 #include "real.h"
+#include "real_rmff.h"
+
+#include <vlc_messages.h>
 
 #define BE_16(x)  ((((uint8_t*)(x))[0] << 8) | ((uint8_t*)(x))[1])
 #define BE_32(x)  ((((uint8_t*)(x))[0] << 24) | \
@@ -508,7 +511,7 @@ void rmff_print_header(rmff_header_t *h) {
   }
 }
 
-void rmff_fix_header(rmff_header_t *h) {
+void rmff_fix_header(access_t *p_access, rmff_header_t *h) {
 
   unsigned int num_headers=0;
   unsigned int header_size=0;
@@ -516,11 +519,11 @@ void rmff_fix_header(rmff_header_t *h) {
   int num_streams=0;
 
   if (!h) {
-    lprintf("rmff_fix_header: fatal: no header given.\n");
+    msg_Warn(p_access, "rmff_fix_header: fatal: no header given.");
     return;
   }
   if (!h->streams) {
-    lprintf("rmff_fix_header: warning: no MDPR chunks\n");
+    msg_Warn(p_access, "rmff_fix_header: warning: no MDPR chunks");
   } else
   {
     streams=h->streams;
@@ -535,27 +538,27 @@ void rmff_fix_header(rmff_header_t *h) {
   if (h->prop) {
     if (h->prop->size != 50)
     {
-      lprintf("rmff_fix_header: correcting prop.size from %i to %i\n", h->prop->size, 50);
+      msg_Dbg(p_access, "rmff_fix_header: correcting prop.size from %i to %i", h->prop->size, 50);
       h->prop->size=50;
     }
     if (h->prop->num_streams != num_streams)
     {
-      lprintf("rmff_fix_header: correcting prop.num_streams from %i to %i\n", h->prop->num_streams, num_streams);
+      msg_Dbg(p_access, "rmff_fix_header: correcting prop.num_streams from %i to %i", h->prop->num_streams, num_streams);
       h->prop->num_streams=num_streams;
     }
     num_headers++;
     header_size+=50;
   } else
-    lprintf("rmff_fix_header: warning: no PROP chunk.\n");
+    msg_Warn(p_access, "rmff_fix_header: warning: no PROP chunk.");
 
   if (h->cont) {
     num_headers++;
     header_size+=h->cont->size;
   } else
-    lprintf("rmff_fix_header: warning: no CONT chunk.\n");
+    msg_Warn(p_access, "rmff_fix_header: warning: no CONT chunk.");
 
   if (!h->data) {
-    lprintf("rmff_fix_header: no DATA chunk, creating one\n");
+    msg_Warn(p_access, "rmff_fix_header: no DATA chunk, creating one");
     h->data = calloc( 1, sizeof(rmff_data_t) );
     if( h->data )
     {
@@ -569,7 +572,7 @@ void rmff_fix_header(rmff_header_t *h) {
   num_headers++;
 
   if (!h->fileheader) {
-    lprintf("rmff_fix_header: no fileheader, creating one");
+    msg_Warn(p_access, "rmff_fix_header: no fileheader, creating one");
     h->fileheader = calloc( 1, sizeof(rmff_fileheader_t) );
     if( h->fileheader )
     {
@@ -584,12 +587,12 @@ void rmff_fix_header(rmff_header_t *h) {
   num_headers++;
 
   if(h->fileheader->num_headers != num_headers) {
-    lprintf("rmff_fix_header: setting num_headers from %i to %i\n", h->fileheader->num_headers, num_headers);
+    msg_Dbg(p_access, "rmff_fix_header: setting num_headers from %i to %i", h->fileheader->num_headers, num_headers);
     h->fileheader->num_headers=num_headers;
   }
   if(h->prop) {
     if (h->prop->data_offset != header_size) {
-      lprintf("rmff_fix_header: setting prop.data_offset from %i to %i\n", h->prop->data_offset, header_size);
+      msg_Dbg(p_access, "rmff_fix_header: setting prop.data_offset from %i to %i", h->prop->data_offset, header_size);
       h->prop->data_offset=header_size;
     }
 
@@ -597,15 +600,15 @@ void rmff_fix_header(rmff_header_t *h) {
      * It should belong to the demux. */
     if (h->prop->num_packets == 0) {
       int p=(int)(h->prop->avg_bit_rate/8.0*(h->prop->duration/1000.0)/h->prop->avg_packet_size);
-      lprintf("rmff_fix_header: assuming prop.num_packets=%i\n", p);
+      msg_Dbg(p_access, "rmff_fix_header: assuming prop.num_packets=%i", p);
       h->prop->num_packets=p;
     }
     if (h->data->num_packets == 0) {
-      lprintf("rmff_fix_header: assuming data.num_packets=%i\n", h->prop->num_packets);
+      msg_Dbg(p_access, "rmff_fix_header: assuming data.num_packets=%i", h->prop->num_packets);
       h->data->num_packets=h->prop->num_packets;
     }
     if (h->data->size == 18 || !h->data->size ) {
-      lprintf("rmff_fix_header: assuming data.size=%i\n", h->prop->num_packets*h->prop->avg_packet_size);
+      msg_Dbg(p_access, "rmff_fix_header: assuming data.size=%i", h->prop->num_packets*h->prop->avg_packet_size);
       h->data->size+=h->prop->num_packets*h->prop->avg_packet_size;
     }
   }

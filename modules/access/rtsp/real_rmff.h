@@ -26,6 +26,7 @@
 #ifndef HAVE_RMFF_H
 #define HAVE_RMFF_H
 
+#include <vlc_access.h>
 
 #define RMFF_HEADER_SIZE 0x12
 
@@ -230,7 +231,7 @@ void rmff_print_header(rmff_header_t *h);
 /*
  * does some checks and fixes header if possible
  */
-void rmff_fix_header(rmff_header_t *h);
+void rmff_fix_header(access_t *p_access, rmff_header_t *h);
 
 /*
  * returns the size of the header (incl. first data-header)

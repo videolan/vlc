@@ -29,6 +29,8 @@
 
 #include <vlc_common.h>
 #include <vlc_memory.h>
+#include <vlc_access.h>
+#include <vlc_messages.h>
 
 #include "rtsp.h"
 #include "real.h"
@@ -50,7 +52,7 @@ static const unsigned char xor_table[] = {
 #define LE_32C(x,y) do {uint32_t in=y; *(uint32_t *)(x)=GetDWLE(&in);} while(0)
 #define MAX(x,y) ((x>y) ? x : y)
 
-static void hash(char *field, char *param)
+static void hash(access_t *p_access, char *field, char *param)
 {
   uint32_t a, b, c, d;
 
@@ -60,8 +62,7 @@ static void hash(char *field, char *param)
   c = LE_32(field+8);
   d = LE_32(field+12);
 
-  lprintf("hash input: %x %x %x %x\n", a, b, c, d);
-  lprintf("hash parameter:\n");
+  msg_Dbg(p_access, "hash input: %x %x %x %x", a, b, c, d);
 
   a = ((b & c) | (~b & d)) + LE_32((param+0x00)) + a - 0x28955B88;
   a = ((a << 0x07) | (a >> 0x19)) + b;
@@ -195,7 +196,7 @@ static void hash(char *field, char *param)
   b = ((~a | c) ^ d)  + LE_32((param+0x24)) + b - 0x14792C6F;
   b = ((b << 0x15) | (b >> 0x0b)) + c;
 
-  lprintf("hash output: %x %x %x %x\n", a, b, c, d);
+  msg_Dbg(p_access, "hash output: %x %x %x %x", a, b, c, d);
 
   a += LE_32(field);
   b += LE_32(field+4);
@@ -208,7 +209,7 @@ static void hash(char *field, char *param)
   LE_32C(field+12, d);
 }
 
-static void call_hash (char *key, char *challenge, unsigned int len) {
+static void call_hash (access_t * p_access, char *key, char *challenge, unsigned int len) {
   uint8_t *ptr1, *ptr2;
   uint32_t a, b, c, d, tmp;
 
@@ -222,7 +223,7 @@ static void call_hash (char *key, char *challenge, unsigned int len) {
 
   if (a < (len << 3))
   {
-    lprintf("not verified: (len << 3) > a true\n");
+    msg_Dbg(p_access, "not verified: (len << 3) > a true");
     ptr2 += 4;
   }
 
@@ -233,13 +234,13 @@ static void call_hash (char *key, char *challenge, unsigned int len) {
   if (a <= len)
   {
     memcpy(key+b+24, challenge, a);
-    hash(key, key+24);
+    hash(p_access, key, key+24);
     c = a;
     d = c + 0x3f;
 
     while ( d < len ) {
-      lprintf("not verified:  while ( d < len )\n");
-      hash(key, challenge+d-0x3f);
+      msg_Dbg(p_access, "not verified:  while ( d < len )");
+      hash(p_access, key, challenge+d-0x3f);
       d += 64;
       c += 64;
     }
@@ -249,7 +250,7 @@ static void call_hash (char *key, char *challenge, unsigned int len) {
   memcpy(key+b+24, challenge+c, len-c);
 }
 
-static void calc_response (char *result, char *field) {
+static void calc_response (access_t *p_access, char *result, char *field) {
   char buf1[128];
   char buf2[128];
   int i;
@@ -265,16 +266,16 @@ static void calc_response (char *result, char *field) {
     i = 56 - i;
   } else
   {
-    lprintf("not verified: ! (i < 56)\n");
+    msg_Dbg(p_access, "not verified: ! (i < 56)");
     i = 120 - i;
   }
 
-  call_hash (field, buf1, i);
-  call_hash (field, buf2, 8);
+  call_hash (p_access, field, buf1, i);
+  call_hash (p_access, field, buf2, 8);
   memcpy (result, field, 16);
 }
 
-static void calc_response_string (char *result, char *challenge) {
+static void calc_response_string (access_t *p_access, char *result, char *challenge) {
 
   char field[128] = {
     0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
@@ -286,8 +287,8 @@ static void calc_response_string (char *result, char *challenge) {
   int  i;
 
   /* calculate response */
-  call_hash(field, challenge, 64);
-  calc_response(zres,field);
+  call_hash(p_access, field, challenge, 64);
+  calc_response(p_access, zres,field);
 
   /* convert zres to ascii string */
   for (i=0; i<16; i++ ) {
@@ -301,7 +302,7 @@ static void calc_response_string (char *result, char *challenge) {
   }
 }
 
-static void real_calc_response_and_checksum (char *response, char *chksum, char *challenge) {
+static void real_calc_response_and_checksum (access_t *p_access, char *response, char *chksum, char *challenge) {
 
   int   ch_len, resp_len;
   int   i;
@@ -340,7 +341,7 @@ static void real_calc_response_and_checksum (char *response, char *chksum, char 
   for (i=0; i<XOR_TABLE_LEN; i++)
     ptr[i] = ptr[i] ^ xor_table[i];
 
-  calc_response_string (response, buf);
+  calc_response_string (p_access, response, buf);
 
   /* add tail */
   resp_len = strlen (response);
@@ -357,7 +358,7 @@ static void real_calc_response_and_checksum (char *response, char *chksum, char 
  * takes a MLTI-Chunk and a rule number got from match_asm_rule,
  * returns a pointer to selected data and number of bytes in that.
  */
-static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection, char **out) {
+static int select_mlti_data(access_t *p_access, const char *mlti_chunk, int mlti_size, int selection, char **out) {
 
   int numrules, codec, size;
   int i;
@@ -368,7 +369,7 @@ static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection
       ||(mlti_chunk[2] != 'T')
       ||(mlti_chunk[3] != 'I'))
   {
-    lprintf("MLTI tag not detected, copying data\n");
+    msg_Dbg(p_access, "MLTI tag not detected, copying data");
     memcpy(*out, mlti_chunk, __MIN(mlti_size,MLTI_BUF_MAX_SIZE));
     return mlti_size;
   }
@@ -393,7 +394,7 @@ static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection
   numrules=BE_16(mlti_chunk);
 
   if (codec >= numrules) {
-    lprintf("codec index >= number of codecs. %i %i\n", codec, numrules);
+    msg_Dbg(p_access, "codec index >= number of codecs. %i %i", codec, numrules);
     return 0;
   }
 
@@ -414,7 +415,7 @@ static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection
  * looking at stream description.
  */
 
-static rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidth) {
+static rmff_header_t *real_parse_sdp(access_t *p_access, char *data, char **stream_rules, uint32_t bandwidth) {
 
   sdpplin_t *desc = NULL;
   rmff_header_t *header = NULL;
@@ -428,7 +429,7 @@ static rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t b
 
   if( !data ) return NULL;
 
-  desc=sdpplin_parse(data);
+  desc=sdpplin_parse(p_access, data);
   if( !desc ) return NULL;
 
   buf= (char *)malloc(MLTI_BUF_MAX_SIZE);
@@ -450,7 +451,7 @@ static rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t b
   header->streams = calloc( desc->stream_count+1, sizeof(rmff_mdpr_t*) );
   if( !header->streams ) goto error;
 
-  lprintf("number of streams: %u\n", desc->stream_count);
+  msg_Dbg(p_access, "number of streams: %u", desc->stream_count);
 
   for (i=0; i<desc->stream_count; i++) {
 
@@ -459,11 +460,11 @@ static rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t b
     char b[64];
     int rulematches[16];
 
-    lprintf("calling asmrp_match with:\n%s\n%u\n", desc->stream[i]->asm_rule_book, bandwidth);
+    msg_Dbg(p_access, "calling asmrp_match with: bandwidth: %u, rule book: >>%s<<", bandwidth, desc->stream[i]->asm_rule_book);
 
     n=asmrp_match(desc->stream[i]->asm_rule_book, bandwidth, rulematches, sizeof(rulematches)/sizeof(rulematches[0]));
     for (j=0; j<n; j++) {
-      lprintf("asmrp rule match: %u for stream %u\n", rulematches[j], desc->stream[i]->stream_id);
+      msg_Dbg(p_access, "asmrp rule match: %u for stream %u", rulematches[j], desc->stream[i]->stream_id);
       sprintf(b,"stream=%u;rule=%u,", desc->stream[i]->stream_id, rulematches[j]);
       strcat(*stream_rules, b);
     }
@@ -473,7 +474,7 @@ static rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t b
       free( buf );
       buf = NULL;
     } else
-      len=select_mlti_data(desc->stream[i]->mlti_data,
+      len=select_mlti_data(p_access, desc->stream[i]->mlti_data,
         desc->stream[i]->mlti_data_size, rulematches[0], &buf);
 
     header->streams[i]=rmff_new_mdpr(
@@ -518,7 +519,7 @@ static rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t b
       desc->flags);
   if( !header->prop ) goto error;
 
-  rmff_fix_header(header);
+  rmff_fix_header(p_access, header);
 
   sdpplin_free( desc );
   free( buf );
@@ -533,6 +534,7 @@ error:
 
 int real_get_rdt_chunk_header(rtsp_client_t *rtsp_session, rmff_pheader_t *ph) {
 
+  access_t *p_access = (access_t*)rtsp_session->p_userdata;
   int n=1;
   uint8_t header[8];
   int size;
@@ -544,17 +546,17 @@ int real_get_rdt_chunk_header(rtsp_client_t *rtsp_session, rmff_pheader_t *ph) {
   if (n<8) return 0;
   if (header[0] != 0x24)
   {
-    lprintf("rdt chunk not recognized: got 0x%02x\n", header[0]);
+    msg_Dbg(p_access, "rdt-chunk-header: rdt chunk not recognized, got 0x%02x", header[0]);
     return 0;
   }
   size=(header[1]<<16)+(header[2]<<8)+(header[3]);
   flags1=header[4];
   if ((flags1!=0x40)&&(flags1!=0x42))
   {
-    lprintf("got flags1: 0x%02x\n",flags1);
+    msg_Dbg(p_access, "rdt-chunk-header: got flags1: 0x%02x", flags1);
     if (header[6]==0x06)
     {
-      lprintf("got end of stream packet\n");
+      msg_Dbg(p_access, "rdt-chunk-header: got end of stream packet");
       return 0;
     }
     header[0]=header[5];
@@ -562,7 +564,7 @@ int real_get_rdt_chunk_header(rtsp_client_t *rtsp_session, rmff_pheader_t *ph) {
     header[2]=header[7];
     n=rtsp_read_data(rtsp_session, header+3, 5);
     if (n<5) return 0;
-    lprintf("ignoring bytes:\n");
+    msg_Dbg(p_access, "rdt-chunk-header: ignoring bytes");
     n=rtsp_read_data(rtsp_session, header+4, 4);
     if (n<4) return 0;
     flags1=header[4];
@@ -574,8 +576,12 @@ int real_get_rdt_chunk_header(rtsp_client_t *rtsp_session, rmff_pheader_t *ph) {
   ts=BE_32(header);
 
 #if 0
-  lprintf("ts: %u size: %u, flags: 0x%02x, unknown values: %u 0x%02x 0x%02x\n",
-          ts, size, flags1, unknown1, header[4], header[5]);
+  msg_Dbg(p_access,
+    "ts: %u size: %u, flags: 0x%02x, unknown values: %u 0x%02x 0x%02x\n",
+    ts, size, flags1, unknown1, header[4], header[5]
+  );
+#else
+  VLC_UNUSED(unknown1);
 #endif
 
   size+=2;
@@ -601,6 +607,7 @@ int real_get_rdt_chunk(rtsp_client_t *rtsp_session, rmff_pheader_t *ph,
 //! maximum size of the rtsp description, must be < INT_MAX
 #define MAX_DESC_BUF (20 * 1024 * 1024)
 rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandwidth) {
+  access_t *p_access = (access_t *) rtsp_session->p_userdata;
 
   char *description=NULL;
   char *session_id=NULL;
@@ -618,11 +625,12 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
 
   /* get challenge */
   challenge1=strdup(rtsp_search_answers(rtsp_session,"RealChallenge1"));
-  lprintf("Challenge1: %s\n", challenge1);
+  msg_Dbg(p_access, "Challenge1: %s", challenge1);
+
+  sprintf(buf, "Bandwidth: %u", bandwidth);
 
   /* request stream description */
   rtsp_schedule_field(rtsp_session, "Accept: application/sdp");
-  sprintf(buf, "Bandwidth: %u", bandwidth);
   rtsp_schedule_field(rtsp_session, buf);
   rtsp_schedule_field(rtsp_session, "GUID: 00000000-0000-0000-0000-000000000000");
   rtsp_schedule_field(rtsp_session, "RegionData: 0");
@@ -633,9 +641,10 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
 
   status=rtsp_request_describe(rtsp_session,NULL);
   if ( status<200 || status>299 ) {
+    msg_Dbg (p_access, "server returned status code %d", status);
     char *alert=rtsp_search_answers(rtsp_session,"Alert");
     if (alert) {
-        lprintf("real: got message from server:\n%s\n", alert);
+        msg_Dbg(p_access, "server replied with a message: %s", alert);
     }
     rtsp_send_ok( rtsp_session );
     free( challenge1 );
@@ -647,22 +656,23 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   /* receive description */
   size=0;
   if (!rtsp_search_answers(rtsp_session,"Content-length"))
-    lprintf("real: got no Content-length!\n");
+    msg_Dbg(p_access, "server reply missing Content-Length");
   else
     size=atoi(rtsp_search_answers(rtsp_session,"Content-length"));
 
   if (size > MAX_DESC_BUF) {
-    printf("real: Content-length for description too big (> %uMB)!\n",
-        MAX_DESC_BUF/(1024*1024) );
+    msg_Warn(p_access, "Content-length for description is too big (> %uMB), aborting.",
+      MAX_DESC_BUF/(1024*1024)
+    );
     goto error;
   }
 
   if (!rtsp_search_answers(rtsp_session,"ETag"))
-    lprintf("real: got no ETag!\n");
+    msg_Warn (p_access, "server reply missing ETag");
   else
     session_id=strdup(rtsp_search_answers(rtsp_session,"ETag"));
 
-  lprintf("Stream description size: %i\n", size);
+  msg_Dbg(p_access, "Stream description size: %u", size);
 
   description = malloc(size+1);
   if( !description )
@@ -678,11 +688,11 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
     goto error;
 
   strcpy(subscribe, "Subscribe: ");
-  h=real_parse_sdp(description, &subscribe, bandwidth);
+  h=real_parse_sdp(p_access, description, &subscribe, bandwidth);
   if (!h)
     goto error;
 
-  rmff_fix_header(h);
+  rmff_fix_header(p_access, h);
 
 #if 0
   fprintf("Title: %s\nCopyright: %s\nAuthor: %s\nStreams: %i\n",
@@ -690,7 +700,7 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
 #endif
 
   /* setup our streams */
-  real_calc_response_and_checksum (challenge2, checksum, challenge1);
+  real_calc_response_and_checksum (p_access, challenge2, checksum, challenge1);
   buf = realloc_or_free(buf, strlen(challenge2) + strlen(checksum) + 32);
   if( !buf ) goto error;
   sprintf(buf, "RealChallenge2: %s, sd=%s", challenge2, checksum);

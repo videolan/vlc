@@ -38,8 +38,8 @@
 #include "real_rmff.h"
 #include "real_sdpplin.h"
 
-#ifdef REALDEBUG
-#   define lprintf printf
+#if 0 /*def REALDEBUG*/
+#   define lprintf(...) fprintf (stderr, __VA_ARGS__)
 #else
     static inline void lprintf( const char *dummy, ... ) { (void)dummy; }
 #endif
