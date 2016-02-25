@@ -32,6 +32,14 @@ static inline char *nl(char *data) {
   return (nlptr) ? nlptr + 1 : NULL;
 }
 
+static inline int line_length(char * data) {
+  char const * p = nl(data);
+  if (p) {
+    return p - data - 1;
+  }
+  return strlen(data);
+}
+
 static int filter(access_t *p_access, const char *in, const char *filter, char **out, size_t outlen) {
 
   int flen=strlen(filter);
@@ -158,12 +166,13 @@ static sdpplin_stream_t *sdpplin_parse_stream(access_t *p_access, char **data) {
 
     if(!handled) {
 #ifdef LOG
-      int len=strchr(*data,'\n')-(*data);
-      memcpy(buf, *data, len+1);
-      buf[len]=0;
-      msg_Warn(p_access, "libreal: sdpplin: not handled: '%s'\n", buf);
+      int len = line_length(*data);
+      ;   len = len < BUFLEN ? len : BUFLEN-1;
+      buf[len] = '\0';
+      strncpy (buf, *data, len);
+      msg_Warn(p_access, "libreal: sdpplin: not handled: '%s'", buf);
 #endif
-      *data=nl(*data);
+      *data=nl(*data); /* always move to next line */
     }
   }
   free( buf );
@@ -272,9 +281,10 @@ sdpplin_t *sdpplin_parse(access_t *p_access, char *data)
 
     if(!handled) {
 #ifdef LOG
-      int len=strchr(data,'\n')-data;
-      memcpy(buf, data, len+1);
-      buf[len]=0;
+      int len = line_length(data);
+      ;   len = len < BUFLEN ? len : BUFLEN-1;
+      buf[len] = '\0';
+      strncpy (buf, data, len);
       msg_Warn(p_access, "libreal: sdpplin: not handled: '%s'", buf);
 #endif
       data=nl(data);
