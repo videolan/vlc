@@ -583,22 +583,30 @@ void rtsp_close( rtsp_client_t *rtsp )
 
 char *rtsp_search_answers( rtsp_client_t *rtsp, const char *tag )
 {
-    char **answer;
+    char **answers;
     char *ptr;
+    int i;
 
-    if( !rtsp->p_private->answers ) return NULL;
-    answer = rtsp->p_private->answers;
+    if(rtsp->p_private->answers == NULL || tag == NULL)
+      return NULL;
 
-    while(*answer)
-    {
-        if( !strncasecmp( *answer, tag, strlen(tag) ) )
-        {
-            ptr = strchr(*answer, ':');
-            ptr++;
-            while( *ptr == ' ' ) ptr++;
-            return ptr;
-        }
-        answer++;
+    answers = rtsp->p_private->answers;
+
+    for (i = 0; i < MAX_FIELDS; ++i) {
+      if (answers[i] == NULL)
+        break;
+
+      if (!strncasecmp(answers[i], tag, strlen(tag))){
+        ptr = strchr(answers[i], ':');
+
+        if (ptr == NULL)
+          return answers[i] + strlen(answers[i]); /* no payload => empty string */
+
+        for (++ptr; *ptr == ' '; ++ptr)
+          ;
+
+        return ptr;
+      }
     }
 
     return NULL;
