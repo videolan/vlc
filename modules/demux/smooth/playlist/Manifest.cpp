@@ -25,12 +25,11 @@
 #include "../adaptive/playlist/BasePeriod.h"
 
 #include <vlc_common.h>
-#include <vlc_stream.h>
 
 using namespace smooth::playlist;
 
-Manifest::Manifest (stream_t *stream_) :
-    AbstractPlaylist(stream_)
+Manifest::Manifest (vlc_object_t *p_object) :
+    AbstractPlaylist(p_object)
 {
     minUpdatePeriod.Set( 5 * CLOCK_FREQ );
     timescale.Set( 10000000 );
@@ -51,5 +50,5 @@ void Manifest::debug()
 {
     std::vector<BasePeriod *>::const_iterator i;
     for(i = periods.begin(); i != periods.end(); ++i)
-        (*i)->debug(VLC_OBJECT(stream));
+        (*i)->debug(VLC_OBJECT(p_object));
 }

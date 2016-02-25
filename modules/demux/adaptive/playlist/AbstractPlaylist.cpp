@@ -31,9 +31,9 @@
 
 using namespace adaptive::playlist;
 
-AbstractPlaylist::AbstractPlaylist (stream_t *stream_) :
+AbstractPlaylist::AbstractPlaylist (vlc_object_t *p_object_) :
     ICanonicalUrl(),
-    stream(stream_)
+    p_object(p_object_)
 {
     playbackStart.Set(0);
     availabilityStartTime.Set( 0 );
@@ -91,7 +91,7 @@ Url AbstractPlaylist::getUrlSegment() const
 
 vlc_object_t * AbstractPlaylist::getVLCObject() const
 {
-    return VLC_OBJECT(stream);
+    return p_object;
 }
 
 BasePeriod* AbstractPlaylist::getFirstPeriod()

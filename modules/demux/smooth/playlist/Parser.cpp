@@ -35,9 +35,11 @@
 using namespace smooth::playlist;
 using namespace adaptive::xml;
 
-ManifestParser::ManifestParser(Node *root_, stream_t *stream, const std::string & streambaseurl_)
+ManifestParser::ManifestParser(Node *root_, vlc_object_t *p_object_,
+                               stream_t *stream, const std::string & streambaseurl_)
 {
     root = root_;
+    p_object = p_object_;
     p_stream = stream;
     playlisturl = streambaseurl_;
 }
@@ -245,7 +247,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
 
 Manifest * ManifestParser::parse()
 {
-    Manifest *manifest = new (std::nothrow) Manifest(p_stream);
+    Manifest *manifest = new (std::nothrow) Manifest(p_object);
     if(!manifest)
         return NULL;
 

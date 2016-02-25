@@ -63,7 +63,8 @@ namespace dash
         class IsoffMainParser
         {
             public:
-                IsoffMainParser             (xml::Node *root, stream_t *p_stream, const std::string &);
+                IsoffMainParser             (xml::Node *root, vlc_object_t *p_object,
+                                             stream_t *p_stream, const std::string &);
                 virtual ~IsoffMainParser    ();
                 MPD *   parse();
 
@@ -83,6 +84,7 @@ namespace dash
                 void    parseProgramInformation(xml::Node *, MPD *);
 
                 xml::Node       *root;
+                vlc_object_t    *p_object;
                 stream_t        *p_stream;
                 std::string      playlisturl;
         };

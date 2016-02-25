@@ -74,7 +74,8 @@ Manifest * SmoothManager::fetchManifest()
 
     Manifest *manifest = NULL;
 
-    ManifestParser *manifestParser = new (std::nothrow) ManifestParser(parser.getRootNode(), memorystream, playlisturl);
+    ManifestParser *manifestParser = new (std::nothrow) ManifestParser(parser.getRootNode(), VLC_OBJECT(p_demux),
+                                                                       memorystream, playlisturl);
     if(manifestParser)
     {
         manifest = manifestParser->parse();

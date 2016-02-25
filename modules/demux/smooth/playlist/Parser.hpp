@@ -58,13 +58,15 @@ namespace smooth
         class ManifestParser
         {
             public:
-                ManifestParser             (xml::Node *, stream_t *, const std::string &);
+                ManifestParser             (xml::Node *, vlc_object_t *,
+                                            stream_t *, const std::string &);
                 virtual ~ManifestParser    ();
 
                 Manifest * parse();
 
             private:
                 xml::Node       *root;
+                vlc_object_t    *p_object;
                 stream_t        *p_stream;
                 std::string      playlisturl;
         };

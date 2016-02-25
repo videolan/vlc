@@ -34,8 +34,8 @@
 
 using namespace dash::mpd;
 
-MPD::MPD (stream_t *stream_, Profile profile_) :
-    AbstractPlaylist(stream_),
+MPD::MPD (vlc_object_t *p_object, Profile profile_) :
+    AbstractPlaylist(p_object),
     profile( profile_ )
 {
     programInfo.Set( NULL );
@@ -82,14 +82,14 @@ StreamFormat MPD::mimeToFormat(const std::string &mime)
 
 void MPD::debug()
 {
-    msg_Dbg(stream, "MPD profile=%s mediaPresentationDuration=%" PRId64
+    msg_Dbg(p_object, "MPD profile=%s mediaPresentationDuration=%" PRId64
             " minBufferTime=%" PRId64,
             static_cast<std::string>(getProfile()).c_str(),
             duration.Get() / CLOCK_FREQ,
             minBufferTime.Get());
-    msg_Dbg(stream, "BaseUrl=%s", getUrlSegment().toString().c_str());
+    msg_Dbg(p_object, "BaseUrl=%s", getUrlSegment().toString().c_str());
 
     std::vector<BasePeriod *>::const_iterator i;
     for(i = periods.begin(); i != periods.end(); ++i)
-        (*i)->debug(VLC_OBJECT(stream));
+        (*i)->debug(VLC_OBJECT(p_object));
 }

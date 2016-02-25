@@ -50,10 +50,12 @@ using namespace dash::mpd;
 using namespace adaptive::xml;
 using namespace adaptive::playlist;
 
-IsoffMainParser::IsoffMainParser    (Node *root_, stream_t *stream, const std::string & streambaseurl_)
+IsoffMainParser::IsoffMainParser    (Node *root_, vlc_object_t *p_object_,
+                                     stream_t *stream, const std::string & streambaseurl_)
 {
     root = root_;
     p_stream = stream;
+    p_object = p_object_;
     playlisturl = streambaseurl_;
 }
 
@@ -73,7 +75,7 @@ void IsoffMainParser::parseMPDBaseUrl(MPD *mpd, Node *root)
 
 MPD * IsoffMainParser::parse()
 {
-    MPD *mpd = new (std::nothrow) MPD(p_stream, getProfile());
+    MPD *mpd = new (std::nothrow) MPD(p_object, getProfile());
     if(mpd)
     {
         parseMPDAttributes(mpd, root);

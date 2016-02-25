@@ -33,7 +33,7 @@ namespace smooth
             friend class ManifestParser;
 
             public:
-                Manifest(stream_t *);
+                Manifest(vlc_object_t *);
                 virtual ~Manifest();
 
                 virtual bool                    isLive() const;

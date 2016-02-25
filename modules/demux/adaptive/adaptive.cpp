@@ -135,7 +135,7 @@ static int Open(vlc_object_t *p_obj)
     if(!dashmime && !smoothmime && HLSManager::isHTTPLiveStreaming(p_demux->s))
     {
         M3U8Parser parser;
-        M3U8 *p_playlist = parser.parse(p_demux->s, playlisturl);
+        M3U8 *p_playlist = parser.parse(VLC_OBJECT(p_demux),p_demux->s, playlisturl);
         if(!p_playlist)
         {
             msg_Err( p_demux, "Could not parse playlist" );
@@ -222,7 +222,8 @@ static PlaylistManager * HandleDash(demux_t *p_demux, DOMParser &xmlParser,
         msg_Err(p_demux, "Cannot parse MPD");
         return NULL;
     }
-    IsoffMainParser mpdparser(xmlParser.getRootNode(), p_demux->s, playlisturl);
+    IsoffMainParser mpdparser(xmlParser.getRootNode(), VLC_OBJECT(p_demux),
+                              p_demux->s, playlisturl);
     MPD *p_playlist = mpdparser.parse();
     if(p_playlist == NULL)
     {
@@ -244,7 +245,8 @@ static PlaylistManager * HandleSmooth(demux_t *p_demux, DOMParser &xmlParser,
         msg_Err(p_demux, "Cannot parse Manifest");
         return NULL;
     }
-    ManifestParser mparser(xmlParser.getRootNode(), p_demux->s, playlisturl);
+    ManifestParser mparser(xmlParser.getRootNode(), VLC_OBJECT(p_demux),
+                           p_demux->s, playlisturl);
     Manifest *p_playlist = mparser.parse();
     if(p_playlist == NULL)
     {

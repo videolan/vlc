@@ -32,7 +32,7 @@ namespace hls
         class M3U8 : public AbstractPlaylist
         {
             public:
-                M3U8(stream_t *);
+                M3U8(vlc_object_t *);
                 virtual ~M3U8();
 
                 virtual bool                    isLive() const;

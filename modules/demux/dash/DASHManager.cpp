@@ -102,11 +102,11 @@ bool DASHManager::updatePlaylist()
         url.append("://");
         url.append(p_demux->psz_location);
 
-        block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux->s), url);
+        block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux), url);
         if(!p_block)
             return false;
 
-        stream_t *mpdstream = stream_MemoryNew(p_demux->s, p_block->p_buffer, p_block->i_buffer, true);
+        stream_t *mpdstream = stream_MemoryNew(p_demux, p_block->p_buffer, p_block->i_buffer, true);
         if(!mpdstream)
         {
             block_Release(p_block);
@@ -130,8 +130,8 @@ bool DASHManager::updatePlaylist()
                 minsegmentTime = segmentTime;
         }
 
-        IsoffMainParser mpdparser(parser.getRootNode(), mpdstream,
-                                Helper::getDirectoryPath(url).append("/"));
+        IsoffMainParser mpdparser(parser.getRootNode(), VLC_OBJECT(p_demux),
+                                  mpdstream, Helper::getDirectoryPath(url).append("/"));
         MPD *newmpd = mpdparser.parse();
         if(newmpd)
         {

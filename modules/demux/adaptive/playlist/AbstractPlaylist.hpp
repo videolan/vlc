@@ -37,7 +37,7 @@ namespace adaptive
         class AbstractPlaylist : public ICanonicalUrl
         {
             public:
-                AbstractPlaylist(stream_t *);
+                AbstractPlaylist(vlc_object_t *);
                 virtual ~AbstractPlaylist();
 
                 virtual bool                    isLive() const = 0;
@@ -68,7 +68,7 @@ namespace adaptive
                 Property<mtime_t>                   timeShiftBufferDepth;
 
             protected:
-                stream_t                           *stream;
+                vlc_object_t                       *p_object;
                 std::vector<BasePeriod *>           periods;
                 std::vector<std::string>            baseUrls;
                 std::string                         playlistUrl;

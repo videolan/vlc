@@ -41,7 +41,7 @@ namespace dash
         class MPD : public AbstractPlaylist
         {
             public:
-                MPD(stream_t *, Profile);
+                MPD(vlc_object_t *, Profile);
                 virtual ~MPD();
 
                 Profile                         getProfile() const;

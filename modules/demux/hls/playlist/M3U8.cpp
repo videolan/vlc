@@ -31,8 +31,8 @@
 
 using namespace hls::playlist;
 
-M3U8::M3U8 (stream_t *stream_) :
-    AbstractPlaylist(stream_)
+M3U8::M3U8 (vlc_object_t *p_object) :
+    AbstractPlaylist(p_object)
 {
     minUpdatePeriod.Set( 5 * CLOCK_FREQ );
 }
@@ -69,6 +69,6 @@ void M3U8::debug()
 {
     std::vector<BasePeriod *>::const_iterator i;
     for(i = periods.begin(); i != periods.end(); ++i)
-        (*i)->debug(VLC_OBJECT(stream));
+        (*i)->debug(VLC_OBJECT(p_object));
 }
 

@@ -384,7 +384,7 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
 
     rep->setSegmentList(segmentList);
 }
-M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
+M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::string &playlisturl)
 {
     char *psz_line = stream_ReadLine(p_stream);
     if(!psz_line || strcmp(psz_line, "#EXTM3U"))
@@ -394,7 +394,7 @@ M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
     }
     free(psz_line);
 
-    M3U8 *playlist = new (std::nothrow) M3U8(p_stream);
+    M3U8 *playlist = new (std::nothrow) M3U8(p_object);
     if(!playlist)
         return NULL;
 
@@ -502,7 +502,7 @@ M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
             period->addAdaptationSet(adaptSet);
             AttributesTag *tag = new AttributesTag(AttributesTag::EXTXSTREAMINF, "");
             tag->addAttribute(new Attribute("URI", playlisturl));
-            createAndFillRepresentation(VLC_OBJECT(p_stream), adaptSet, tag, tagslist);
+            createAndFillRepresentation(p_object, adaptSet, tag, tagslist);
             delete tag;
         }
     }
