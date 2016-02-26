@@ -415,6 +415,8 @@ void MainInterface::showResumePanel( int64_t _time ) {
         resumePlayback();
     else
     {
+        if( !isFullScreen() && !isMaximized() )
+            resize( width(), height() + resumePanel->height() );
         resumePanel->setVisible(true);
         resumeTimer->start();
     }
