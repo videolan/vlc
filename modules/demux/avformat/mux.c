@@ -209,9 +209,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         return VLC_EGENERIC;
     }
 
+    /* */
     p_input->p_sys = malloc( sizeof( int ) );
+    if( unlikely(p_input->p_sys == NULL) )
+        return VLC_ENOMEM;
+
     *((int *)p_input->p_sys) = p_sys->oc->nb_streams;
 
+    /* */
     stream = avformat_new_stream( p_sys->oc, NULL);
     if( !stream )
     {
