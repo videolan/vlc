@@ -487,6 +487,7 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, const es_format_t *p_fmt )
         msg_Err( p_mux, "cannot add this stream" );
         TAB_REMOVE( p_mux->i_nb_inputs, p_mux->pp_inputs, p_input );
         block_FifoRelease( p_input->p_fifo );
+        es_format_Clean( &p_input->fmt );
         free( p_input );
         return NULL;
     }
