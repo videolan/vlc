@@ -139,6 +139,7 @@ static void Direct3D11DestroyPool(vout_display_t *);
 static void DestroyDisplayPicture(picture_t *);
 static void DestroyDisplayPoolPicture(picture_t *);
 static int  Direct3D11MapTexture(picture_t *);
+static int  Direct3D11UnmapTexture(picture_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
@@ -787,6 +788,9 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+    if (picture->format.i_chroma != VLC_CODEC_D3D11_OPAQUE)
+        Direct3D11UnmapTexture(picture);
+
     /* Render the quad */
     DisplayD3DPicture(sys, &sys->picQuad);
 
@@ -1424,6 +1428,7 @@ static int Direct3D11CreatePool(vout_display_t *vd, video_format_t *fmt)
     pool_cfg.picture_count = 1;
     pool_cfg.picture       = &picture;
     pool_cfg.lock          = Direct3D11MapTexture;
+    //pool_cfg.unlock        = Direct3D11UnmapTexture;
 
     sys->pool = picture_pool_NewExtended(&pool_cfg);
     if (!sys->pool) {
@@ -1607,9 +1612,15 @@ static int Direct3D11MapTexture(picture_t *picture)
         msg_Dbg( vd, "failed to map the texture (hr=0x%lX)", hr );
         return VLC_EGENERIC;
     }
-    res = CommonUpdatePicture(picture, NULL, mappedResource.pData, mappedResource.RowPitch);
-    ID3D11DeviceContext_Unmap(vd->sys->d3dcontext,(ID3D11Resource *)p_sys->texture, 0);
-    return res;
+    return CommonUpdatePicture(picture, NULL, mappedResource.pData, mappedResource.RowPitch);
+}
+
+static int Direct3D11UnmapTexture(picture_t *picture)
+{
+    picture_sys_pool_t *p_sys = (picture_sys_pool_t*)picture->p_sys;
+    vout_display_t     *vd = p_sys->vd;
+    ID3D11DeviceContext_Unmap(vd->sys->d3dcontext, (ID3D11Resource *)p_sys->texture, 0);
+    return VLC_SUCCESS;
 }
 
 static void Direct3D11DeleteRegions(int count, picture_t **region)
