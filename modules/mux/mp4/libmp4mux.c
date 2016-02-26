@@ -764,6 +764,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
             bo_add_mem(hvcC, p_nal->i_buffer, p_nal->p_buffer);
         }
     }
+    free(p_sei);
     return hvcC;
 }
 
