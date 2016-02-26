@@ -24,6 +24,9 @@ $(TARBALLS)/zlib-$(ZLIB_VERSION).tar.gz:
 
 zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
 	$(UNPACK)
+ifdef HAVE_WIN32
+	$(APPLY) $(SRC)/zlib/mingw.patch
+endif
 	$(MOVE)
 
 .zlib: zlib
