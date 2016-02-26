@@ -19,6 +19,8 @@
 #ifndef VLC_TS_PSI_EIT_H
 #define VLC_TS_PSI_EIT_H
 
+//#define PSI_DEBUG_EIT
+
 bool AttachDvbpsiNewEITTableHandler( dvbpsi_t *p_handle, demux_t * p_demux );
 
 #endif

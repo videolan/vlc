@@ -50,6 +50,18 @@
 #include <time.h>
 #include <assert.h>
 
+#ifndef PSI_DEBUG_EIT
+ #define PSI_DEBUG_TIMESHIFT(t)
+#else
+ static time_t i_eit_debug_offset = 0;
+ #define PSI_DEBUG_TIMESHIFT(t) \
+    do {\
+        if( i_eit_debug_offset == 0 )\
+            i_eit_debug_offset = time(NULL) - t;\
+        t = t + i_eit_debug_offset;\
+    } while(0);
+#endif
+
 static char *EITConvertToUTF8( demux_t *p_demux,
                                const unsigned char *psz_instring,
                                size_t i_length,
@@ -322,6 +334,7 @@ static void EITCallBack( demux_t *p_demux,
         int i_min_age = 0;
 
         i_start = EITConvertStartTime( p_evt->i_start_time );
+        PSI_DEBUG_TIMESHIFT(i_start);
         i_duration = EITConvertDuration( p_evt->i_duration );
 
         if( p_sys->arib.e_mode == ARIBMODE_ENABLED )
