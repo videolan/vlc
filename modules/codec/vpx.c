@@ -306,6 +306,7 @@ static int OpenEncoder(vlc_object_t *p_this)
         break;
 #endif
     default:
+        free(p_sys);
         return VLC_EGENERIC;
     }
 
