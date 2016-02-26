@@ -282,6 +282,7 @@ static void Close( vlc_object_t * p_this )
         asf_track_t *track = (asf_track_t *)vlc_array_item_at_index( p_sys->p_tracks, i );
         free( track->p_extra );
         es_format_Clean( &track->fmt );
+        free( track );
     }
 
     vlc_array_clear( p_sys->p_tracks );
@@ -616,6 +617,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         }
         default:
             msg_Err(p_mux, "unhandled track type" );
+            free( tk );
             return VLC_EGENERIC;
     }
 
