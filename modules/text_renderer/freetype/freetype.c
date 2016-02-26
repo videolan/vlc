@@ -988,7 +988,7 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
     *pi_styles = 0;
     for( const text_segment_t *s = p_segment; s != NULL; s = s->p_next )
     {
-        if( !s->psz_text )
+        if( !s->psz_text || !s->psz_text[0] )
             continue;
         size_t i_string_bytes = 0;
         uni_char_t *psz_tmp = ToCharset( FREETYPE_TO_UCS, s->psz_text, &i_string_bytes );
