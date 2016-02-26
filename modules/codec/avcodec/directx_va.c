@@ -51,6 +51,7 @@ static const int PROF_HEVC_MAIN[]    = { FF_PROFILE_HEVC_MAIN, 0 };
 static const int PROF_HEVC_MAIN10[]  = { FF_PROFILE_HEVC_MAIN,
                                          FF_PROFILE_HEVC_MAIN_10, 0 };
 
+#include <d3d9.h>
 #include <dxva2api.h>
 
 #include <initguid.h> /* must be last included to not redefine existing GUIDs */
