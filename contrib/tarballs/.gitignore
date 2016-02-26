@@ -2,4 +2,5 @@
 *.zip
 *.h
 *.tgz
+*.idl
 *-git/
