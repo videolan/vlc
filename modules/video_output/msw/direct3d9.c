@@ -1124,8 +1124,8 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
      */
     LPDIRECT3DTEXTURE9 d3dtex;
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
-                                        fmt->i_width,
-                                        fmt->i_height,
+                                        fmt->i_visible_width,
+                                        fmt->i_visible_height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
                                         sys->d3dpp.BackBufferFormat,
@@ -1468,15 +1468,10 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
 }
 
 static void Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
-                                  const RECT src_full,
-                                  const RECT src_crop,
                                   const RECT dst,
                                   int alpha,
                                   video_orientation_t orientation)
 {
-    const float src_full_width  = src_full.right  - src_full.left;
-    const float src_full_height = src_full.bottom - src_full.top;
-
     /* Vertices of the dst rectangle in the unrotated (clockwise) order. */
     const int vertices_coords[4][2] = {
         { dst.left,  dst.top    },
@@ -1494,17 +1489,17 @@ static void Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
         vertices[i].y  = vertices_coords[vertex_order[i]][1];
     }
 
-    vertices[0].tu = src_crop.left / src_full_width;
-    vertices[0].tv = src_crop.top  / src_full_height;
+    vertices[0].tu = .0f;
+    vertices[0].tv = .0f;
 
-    vertices[1].tu = src_crop.right / src_full_width;
-    vertices[1].tv = src_crop.top   / src_full_height;
+    vertices[1].tu = 1.f;
+    vertices[1].tv = .0f;
 
-    vertices[2].tu = src_crop.right  / src_full_width;
-    vertices[2].tv = src_crop.bottom / src_full_height;
+    vertices[2].tu = 1.f;
+    vertices[2].tv = 1.f;
 
-    vertices[3].tu = src_crop.left   / src_full_width;
-    vertices[3].tv = src_crop.bottom / src_full_height;
+    vertices[3].tu = .0f;
+    vertices[3].tv = 1.f;
 
     for (int i = 0; i < 4; i++) {
         /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
@@ -1543,12 +1538,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* Copy picture surface into texture surface
      * color space conversion happen here */
-    RECT cropSource;
-    cropSource.left = 0;
-    cropSource.top = 0;
-    cropSource.right = vd->fmt.i_visible_width;
-    cropSource.bottom = vd->fmt.i_visible_height;
-    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &cropSource, destination, NULL, D3DTEXF_LINEAR);
+    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &vd->sys->rect_src_clipped, destination, NULL, D3DTEXF_LINEAR);
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DDevice9_StretchRect: source 0x%p 0x%0lx",
@@ -1558,10 +1548,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* */
     region->texture = sys->d3dtex;
-    Direct3D9SetupVertices(region->vertex,
-                          vd->sys->rect_src,
-                          vd->sys->rect_src_clipped,
-                          vd->sys->rect_dest_clipped, 255, vd->fmt.orientation);
+    Direct3D9SetupVertices(region->vertex, vd->sys->rect_dest_clipped, 255, vd->fmt.orientation);
     return VLC_SUCCESS;
 }
 
@@ -1669,12 +1656,6 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         }
 
         /* Map the subpicture to sys->rect_dest */
-        RECT src;
-        src.left   = 0;
-        src.right  = src.left + r->fmt.i_visible_width;
-        src.top    = 0;
-        src.bottom = src.top  + r->fmt.i_visible_height;
-
         const RECT video = sys->rect_dest;
         const float scale_w = (float)(video.right  - video.left) / subpicture->i_original_picture_width;
         const float scale_h = (float)(video.bottom - video.top)  / subpicture->i_original_picture_height;
@@ -1685,8 +1666,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         dst.top    = video.top  + scale_h * r->i_y,
         dst.bottom = dst.top  + scale_h * r->fmt.i_visible_height,
         Direct3D9SetupVertices(d3dr->vertex,
-                              src, src, dst,
-                              subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
+                              dst, subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
     }
 }
 
