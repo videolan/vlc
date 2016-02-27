@@ -21,6 +21,12 @@
 
 //#define PSI_DEBUG_EIT
 
+#define TS_PSI_RUNSTATUS_UNDEFINED 0x00
+#define TS_PSI_RUNSTATUS_STOPPED   0x01
+#define TS_PSI_RUNSTATUS_STARTING  0x02
+#define TS_PSI_RUNSTATUS_PAUSING   0x03
+#define TS_PSI_RUNSTATUS_RUNNING   0x04
+
 bool AttachDvbpsiNewEITTableHandler( dvbpsi_t *p_handle, demux_t * p_demux );
 
 #endif

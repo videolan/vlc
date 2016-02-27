@@ -351,12 +351,12 @@ static void EITCallBack( demux_t *p_demux,
             i_start += timezone; // FIXME: what about DST?
             i_tot_time += timezone;
 
-            if( p_evt->i_running_status == 0x00 &&
+            if( p_evt->i_running_status == TS_PSI_RUNSTATUS_UNDEFINED &&
                 (i_start - 5 < i_tot_time &&
                  i_tot_time < i_start + i_duration + 5) )
             {
-                p_evt->i_running_status = 0x04;
-                msg_Dbg( p_demux, "  EIT running status 0x00 -> 0x04" );
+                p_evt->i_running_status = TS_PSI_RUNSTATUS_RUNNING;
+                msg_Dbg( p_demux, "  EIT running status undefined -> running" );
             }
         }
 
@@ -478,7 +478,7 @@ static void EITCallBack( demux_t *p_demux,
                               *psz_extra ? psz_extra : NULL, i_min_age );
 
         /* Update "now playing" field */
-        if( p_evt->i_running_status == 0x04 && i_start > 0  && psz_name && psz_text )
+        if( p_evt->i_running_status == TS_PSI_RUNSTATUS_RUNNING && i_start > 0  && psz_name && psz_text )
             vlc_epg_SetCurrent( p_epg, i_start );
 
         free( psz_name );
