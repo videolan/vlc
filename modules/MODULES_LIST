@@ -144,7 +144,7 @@ $Id$
  * faad: AAC decoder using libfaad2
  * fb: video output module for the Linux framebuffer
  * fdkaac: AAC encoder using the fdk-aac library
- * file_crypt: store secrets on a file, may use a submodule to crypt secrets
+ * file_keystore: store secrets on a file, may use a submodule to crypt secrets
  * file_logger: file logger plugin
  * filesystem: Filesystem access module
  * fingerprinter: AcoustID audio fingerprinter using chromaprint
@@ -225,7 +225,7 @@ $Id$
  * marq: Overlays a marquee on the video
  * mediacodec: Android Jelly Bean MediaCodec decoder module
  * mediadirs: Picture/Music/Video user directories as service discoveries
- * memory: store secrets in memory
+ * memory_keystore: store secrets in memory
  * mft: Media Foundation Transform audio/video decoder
  * microdns: mDNS services discovery
  * minimal_macosx: a minimal Mac OS X GUI, using the FrameWork
