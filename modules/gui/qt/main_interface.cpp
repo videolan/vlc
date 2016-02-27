@@ -1012,13 +1012,13 @@ void MainInterface::setMinimalView( bool b_minimal )
     {
         int i_heightChange = 0;
 
-        if( !b_menuBarVisible )
+        if( !b_menuBarVisible && menuBar()->isVisible() )
             i_heightChange += menuBar()->height();
-        if( !b_controlsVisible )
+        if( !b_controlsVisible && controls->isVisible() )
             i_heightChange += controls->height();
         if( !b_statusBarVisible && statusBar()->isVisible() )
             i_heightChange += statusBar()->height();
-        if( !b_inputCVisible )
+        if( !b_inputCVisible && inputC->isVisible() )
             i_heightChange += inputC->height();
 
         if( i_heightChange != 0 )
