@@ -1329,6 +1329,9 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
             /* Handle PES private data */
             PMTSetupEs0x06( p_demux, p_pes, p_dvbpsies );
             break;
+        case 0x0b: /* DSM-CC */
+            p_pes->data_type = TS_ES_DATA_TABLE_SECTION;
+            break;
         /* All other private or reserved types */
         case 0x13: /* SL in sections */
             p_pes->data_type = TS_ES_DATA_TABLE_SECTION;
