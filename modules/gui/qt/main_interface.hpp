@@ -25,7 +25,7 @@
 #ifndef QVLC_MAIN_INTERFACE_H_
 #define QVLC_MAIN_INTERFACE_H_
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include "util/qvlcframe.hpp"
 

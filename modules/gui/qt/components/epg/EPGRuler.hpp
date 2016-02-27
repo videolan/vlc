@@ -24,7 +24,7 @@
 #ifndef EPGRULER_H
 #define EPGRULER_H
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QWidget>
 #include <QDateTime>

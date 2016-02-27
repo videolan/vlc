@@ -40,7 +40,7 @@
 #include <QTimer>
 #include <QDateTime>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "input_manager.hpp"
 
 EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )

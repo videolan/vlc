@@ -24,7 +24,7 @@
 #ifndef EPGWIDGET_H
 #define EPGWIDGET_H
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <vlc_epg.h>
 

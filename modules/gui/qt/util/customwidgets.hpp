@@ -38,7 +38,7 @@
 #include <QDial>
 
 #include "animators.hpp"
-#include "qt4.hpp"
+#include "qt.hpp"
 
 class QWidget;
 

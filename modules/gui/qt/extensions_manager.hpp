@@ -30,7 +30,7 @@
 
 #include <vlc_extensions.h>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QObject>
 #include <QMenu>

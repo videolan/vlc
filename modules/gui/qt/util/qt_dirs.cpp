@@ -22,7 +22,7 @@
 # include <config.h>
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "qt_dirs.hpp"
 #include <vlc_url.h>
 

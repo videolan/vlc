@@ -23,7 +23,7 @@
 #ifndef SEEKSTYLE_HPP
 #define SEEKSTYLE_HPP
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <inttypes.h>
 #include <QProxyStyle>

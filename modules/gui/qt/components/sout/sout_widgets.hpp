@@ -24,7 +24,7 @@
 #ifndef SOUT_WIDGETS_H
 #define SOUT_WIDGETS_H
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QGroupBox>
 

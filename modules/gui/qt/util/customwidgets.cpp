@@ -29,7 +29,7 @@
 #endif
 
 #include "customwidgets.hpp"
-#include "qt4.hpp"               /* needed for qtr,  but not necessary */
+#include "qt.hpp"               /* needed for qtr,  but not necessary */
 
 #include <QPainter>
 #include <QRect>

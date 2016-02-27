@@ -26,7 +26,7 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "components/playlist/selector.hpp"
 #include "playlist_model.hpp"                /* plMimeData */
 #include "input_manager.hpp"                 /* MainInputManager, for podcast */

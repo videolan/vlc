@@ -31,7 +31,7 @@
 
 #include <vlc_common.h>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
 

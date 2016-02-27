@@ -29,7 +29,7 @@
 #include <QEvent>
 
 #if defined(Q_OS_WIN)
-#   include "qt4.hpp"
+#   include "qt.hpp"
 #   include <windows.h>
 #   include "input_manager.hpp"
 #endif

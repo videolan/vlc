@@ -28,7 +28,7 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "input_manager.hpp"
 #include <vlc_vout.h>                       /* vout_thread_t for aspect ratio combobox */
 

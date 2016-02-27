@@ -23,7 +23,7 @@
 # include <config.h>
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "variables.hpp"
 
 QVLCVariable::QVLCVariable (vlc_object_t *obj, const char *varname, int type,

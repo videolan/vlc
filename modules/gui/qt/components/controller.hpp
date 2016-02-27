@@ -28,7 +28,7 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QFrame>
 #include <QString>

@@ -25,7 +25,7 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "util/singleton.hpp"
 
 #include <vlc_events.h>

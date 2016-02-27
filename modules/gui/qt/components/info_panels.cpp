@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "components/info_panels.hpp"
 #include "components/interface_widgets.hpp"
 #include "info_widgets.hpp"

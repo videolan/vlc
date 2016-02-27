@@ -25,7 +25,7 @@
 #ifndef QVLC_RECENTS_H_
 #define QVLC_RECENTS_H_
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "util/singleton.hpp"
 
 #include <QObject>

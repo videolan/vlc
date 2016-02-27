@@ -32,7 +32,7 @@
 #include <QDate>
 #include <QMutex>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include "input_manager.hpp"    /* THEMIM destruction */
 #include "dialogs_provider.hpp" /* THEDP creation */

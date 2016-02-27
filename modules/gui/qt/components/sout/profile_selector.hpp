@@ -24,7 +24,7 @@
 #ifndef VLC_QT_PROFILE_SELECTOR_HPP_
 #define VLC_QT_PROFILE_SELECTOR_HPP_
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QWidget>
 #include <QSet>

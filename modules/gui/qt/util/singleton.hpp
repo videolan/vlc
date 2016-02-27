@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <vlc_threads.h>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 template <typename T>
 class       Singleton

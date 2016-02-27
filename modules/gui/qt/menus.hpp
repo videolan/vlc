@@ -25,7 +25,7 @@
 #ifndef QVLC_MENUS_H_
 #define QVLC_MENUS_H_
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QObject>
 #include <QMenu>

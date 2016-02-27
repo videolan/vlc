@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "components/playlist/playlist_model.hpp"
 #include "input_manager.hpp"                            /* THEMIM */
 #include "util/qt_dirs.hpp"

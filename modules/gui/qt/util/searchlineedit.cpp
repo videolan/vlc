@@ -31,7 +31,7 @@
 #include "searchlineedit.hpp"
 #include "customwidgets.hpp"
 
-#include "qt4.hpp" /*needed for qtr and CONNECT, but not necessary */
+#include "qt.hpp" /*needed for qtr and CONNECT, but not necessary */
 
 #include <QPainter>
 #include <QRect>

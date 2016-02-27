@@ -23,7 +23,7 @@
 #ifndef EPGCHANNELS_HPP
 #define EPGCHANNELS_HPP
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QWidget>
 

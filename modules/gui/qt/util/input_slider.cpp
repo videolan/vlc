@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include "util/input_slider.hpp"
 #include "util/timetooltip.hpp"

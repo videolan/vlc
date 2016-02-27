@@ -28,9 +28,9 @@
 #define VLC_QT_SEARCHLINEEDIT_HPP_
 
 #ifdef __APPLE__
-#include "../qt4.hpp"
+#include "../qt.hpp"
 #else
-#include "qt4.hpp"
+#include "qt.hpp"
 #endif
 #include <QLineEdit>
 

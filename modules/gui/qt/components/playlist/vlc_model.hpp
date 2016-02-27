@@ -28,7 +28,7 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "sorting.h"
 
 #include "playlist_item.hpp"

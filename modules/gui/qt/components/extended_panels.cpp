@@ -42,7 +42,7 @@
 
 #include "components/extended_panels.hpp"
 #include "dialogs/preferences.hpp"
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "input_manager.hpp"
 #include "util/qt_dirs.hpp"
 #include "util/customwidgets.hpp"

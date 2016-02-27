@@ -34,7 +34,7 @@
 #include <QSettings>
 #include <QStyle>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 class QVLCTools
 {

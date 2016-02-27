@@ -21,7 +21,7 @@
 #ifndef VALIDATORS_HPP
 #define VALIDATORS_HPP
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QValidator>
 

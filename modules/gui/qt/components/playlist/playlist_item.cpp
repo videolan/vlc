@@ -28,7 +28,7 @@
 
 #include <assert.h>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "playlist_item.hpp"
 #include <vlc_input_item.h>
 

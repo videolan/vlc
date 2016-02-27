@@ -26,7 +26,7 @@
 
 #include "seekpoints.hpp"
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "input_manager.hpp"
 
 SeekPoints::SeekPoints( QObject *parent, intf_thread_t *p_intf_ ) :

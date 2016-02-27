@@ -24,7 +24,7 @@
 #ifndef EXTENSIONS_HPP
 #define EXTENSIONS_HPP
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include <vlc_extensions.h>
 
 #include "assert.h"

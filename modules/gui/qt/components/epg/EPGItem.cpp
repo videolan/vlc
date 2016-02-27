@@ -33,7 +33,7 @@
 #include "EPGItem.hpp"
 #include "EPGView.hpp"
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 EPGItem::EPGItem( vlc_epg_event_t *data, EPGView *view )
     : m_view( view )

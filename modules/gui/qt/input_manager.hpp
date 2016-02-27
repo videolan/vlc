@@ -31,7 +31,7 @@
 
 #include <vlc_input.h>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "util/singleton.hpp"
 #include "adapters/variables.hpp"
 

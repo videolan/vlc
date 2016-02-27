@@ -31,7 +31,7 @@
 
 #include <assert.h>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include "dialogs/open.hpp"
 #include <QObject>

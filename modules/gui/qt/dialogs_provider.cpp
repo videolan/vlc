@@ -28,7 +28,7 @@
 
 #include <vlc_intf_strings.h>
 
-#include "qt4.hpp"
+#include "qt.hpp"
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp" /* Load Subtitles */
 #include "menus.hpp"

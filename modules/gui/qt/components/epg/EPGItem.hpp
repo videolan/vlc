@@ -24,7 +24,7 @@
 #ifndef EPGITEM_H
 #define EPGITEM_H
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <vlc_epg.h>
 #include <QGraphicsItem>

@@ -22,7 +22,7 @@
 #ifndef TIMETOOLTIP_H
 #define TIMETOOLTIP_H
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QWidget>
 #include <QBitmap>

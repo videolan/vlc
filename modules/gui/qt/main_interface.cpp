@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include "main_interface.hpp"
 #include "input_manager.hpp"                    // Creation

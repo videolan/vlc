@@ -24,7 +24,7 @@
 #ifndef EPGVIEW_H
 #define EPGVIEW_H
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <vlc_epg.h>
 

@@ -21,7 +21,7 @@
 #ifndef ANIMATORS_HPP
 #define ANIMATORS_HPP
 
-#include "qt4.hpp"
+#include "qt.hpp"
 
 #include <QObject>
 #include <QList>
