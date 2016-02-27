@@ -128,6 +128,7 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     id->p_decoder->fmt_out = id->p_decoder->fmt_in;
     id->p_decoder->fmt_out.i_extra = 0;
     id->p_decoder->fmt_out.p_extra = NULL;
+    id->p_decoder->fmt_out.psz_language = NULL;
     id->p_decoder->pf_decode_video = NULL;
     id->p_decoder->pf_get_cc = NULL;
     id->p_decoder->pf_vout_format_update = video_update_format_decoder;
