@@ -557,7 +557,7 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
             msg_Err( p_demux, "PSINewTableCallback: failed attaching EITCallback" );
     }
     else if( GetPID(p_sys, 0x11)->u.p_psi->i_version != -1 &&
-            (i_table_id == 0x70 /* TDT */ || i_table_id == 0x73 /* TOT */) )
+            (i_table_id == TS_PSI_TDT_TABLE_ID || i_table_id == TS_PSI_TOT_TABLE_ID) )
     {
          msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
