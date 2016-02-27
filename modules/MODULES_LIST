@@ -307,7 +307,7 @@ $Id$
  * puzzle: puzzle video filter
  * pva: PVA demuxer
  * qsv: QuickSyncVideo Encoder for Intel hardware
- * qt4: interface module using the cross-platform Qt4 library
+ * qt: interface module using the cross-platform Qt widget library
  * qtsound: Quicktime Audio Capture
  * quicktime: Quicktime decoder that uses the QT library
  * rar: RAR access and stream filter

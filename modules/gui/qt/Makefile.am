@@ -14,25 +14,25 @@ guidir = $(pluginsdir)/gui
 
 SUFFIXES += .ui .h .hpp .moc.cpp
 
-libqt4_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt4)
-libqt4_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt4) $(LIBM)
-libqt4_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
+libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
+libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
+libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
 if HAVE_OS2
 else
 if HAVE_WIN32
-libqt4_plugin_la_LIBADD += -lole32 -lcomctl32 -luuid
+libqt_plugin_la_LIBADD += -lole32 -lcomctl32 -luuid
 else
-libqt4_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIB) -lX11
+libqt_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIB) -lX11
 endif
 endif
 if HAVE_DARWIN
-libqt4_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
+libqt_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
 endif
 
-gui_LTLIBRARIES =  $(LTLIBqt4)
-EXTRA_LTLIBRARIES = libqt4_plugin.la
+gui_LTLIBRARIES =  $(LTLIBqt)
+EXTRA_LTLIBRARIES = libqt_plugin.la
 
-libqt4_plugin_la_SOURCES = \
+libqt_plugin_la_SOURCES = \
 	qt4.cpp qt4.hpp \
 	menus.cpp menus.hpp \
 	main_interface.cpp main_interface.hpp \
@@ -116,7 +116,7 @@ libqt4_plugin_la_SOURCES = \
 	util/singleton.hpp \
 	styles/seekstyle.cpp styles/seekstyle.hpp
 if HAVE_WIN32
-libqt4_plugin_la_SOURCES += main_interface_win32.cpp
+libqt_plugin_la_SOURCES += main_interface_win32.cpp
 endif
 
 # Meta-object compilation
@@ -132,7 +132,7 @@ moc_verbose__0 = $(moc_verbose_0)
 # These MOC files depend on the configure settings:
 dialogs_provider.moc.cpp dialogs/vlm.moc.cpp: $(top_builddir)/config.h
 
-nodist_libqt4_plugin_la_SOURCES = \
+nodist_libqt_plugin_la_SOURCES = \
 	main_interface.moc.cpp \
 	menus.moc.cpp \
 	dialogs_provider.moc.cpp \
@@ -202,7 +202,7 @@ nodist_libqt4_plugin_la_SOURCES = \
 	util/buttons/BrowseButton.moc.cpp \
 	styles/seekstyle.moc.cpp
 
-nodist_libqt4_plugin_la_SOURCES += \
+nodist_libqt_plugin_la_SOURCES += \
 	ui/equalizer.h \
 	ui/video_effects.h \
 	ui/open_file.h \
@@ -234,7 +234,7 @@ uic_verbose__0 = $(uic_verbose_0)
 
 MOC_CPPFLAGS = $(DEFS) \
 	-I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) \
-	$(libqt4_plugin_la_CPPFLAGS)
+	$(libqt_plugin_la_CPPFLAGS)
 if HAVE_DARWIN
 MOC_CPPFLAGS += -DQ_OS_MAC
 endif
@@ -242,7 +242,7 @@ if HAVE_WIN32
 MOC_CPPFLAGS += -D_WIN32
 endif
 
-libqt4_plugin_la_UI = \
+libqt_plugin_la_UI = \
 	ui/equalizer.ui \
 	ui/video_effects.ui \
 	ui/open_file.ui \
@@ -264,7 +264,7 @@ libqt4_plugin_la_UI = \
 	ui/sout.ui \
 	ui/vlm.ui \
 	ui/fingerprintdialog.ui
-EXTRA_DIST = $(libqt4_plugin_la_UI)
+EXTRA_DIST = $(libqt_plugin_la_UI)
 
 .ui.h:
 	$(AM_V_at)mkdir -p -- ui
@@ -413,10 +413,10 @@ DEPS_res = \
 	pixmaps/lock.png
 EXTRA_DIST += vlc.qrc $(DEPS_res)
 
-nodist_libqt4_plugin_la_SOURCES += resources.cpp
+nodist_libqt_plugin_la_SOURCES += resources.cpp
 
 resources.cpp: vlc.qrc $(DEPS_res)
 	$(AM_V_GEN)$(RCC) -name vlc -o $@ $<
 
 
-BUILT_SOURCES += $(nodist_libqt4_plugin_la_SOURCES)
+BUILT_SOURCES += $(nodist_libqt_plugin_la_SOURCES)

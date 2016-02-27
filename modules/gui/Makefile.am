@@ -6,7 +6,7 @@ DIST_SUBDIRS += gui/macosx gui/qt gui/skins2
 if ENABLE_MACOSX_UI
 SUBDIRS += gui/macosx
 endif
-if ENABLE_QT4
+if ENABLE_QT
 SUBDIRS += gui/qt
 endif
 if BUILD_SKINS
