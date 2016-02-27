@@ -1290,8 +1290,11 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     input_SendEventMetaEpg( p_sys->p_input );
 
     /* Update now playing */
-    free( p_pgrm->psz_now_playing );
-    p_pgrm->psz_now_playing = NULL;
+    if( p_epg->p_current || p_epg->i_event == 0 )
+    {
+        free( p_pgrm->psz_now_playing );
+        p_pgrm->psz_now_playing = NULL;
+    }
 
     vlc_mutex_lock( &p_item->lock );
     for( int i = 0; i < p_item->i_epg; i++ )
