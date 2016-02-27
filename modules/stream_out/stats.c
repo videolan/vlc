@@ -225,7 +225,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         char *outputhash = psz_md5_hash( &hash );
 
         /* We could just set p_sys->output to stdout and remove user of msg_Dbg
-         * if we don't need ability to output info to gui modules (like qt4 messages window
+         * if we don't need ability to output info to gui modules (like qt messages window
          */
         mtime_t dts_difference = VLC_TS_INVALID;
         if( likely( id->previous_dts != VLC_TS_INVALID ) )

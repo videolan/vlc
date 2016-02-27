@@ -334,7 +334,7 @@ static const float f_min_window_height = 307.;
     SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
     SideBarItem *internetItem = [SideBarItem itemWithTitle:_NS("INTERNET") identifier:@"internet"];
 
-    /* SD subnodes, inspired by the Qt4 intf */
+    /* SD subnodes, inspired by the Qt intf */
     char **ppsz_longnames = NULL;
     int *p_categories = NULL;
     char **ppsz_names = vlc_sd_GetNames(pl_Get(getIntf()), &ppsz_longnames, &p_categories);

@@ -75,7 +75,7 @@
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-    /* We are using the same format as the Qt4 intf here:
+    /* We are using the same format as the Qt intf here:
      * Container(string), transcode video(bool), transcode audio(bool),
      * use subtitles(bool), video codec(string), video bitrate(integer),
      * scale(float), fps(float), width(integer, height(integer),

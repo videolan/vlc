@@ -245,7 +245,7 @@ static void *Run( void * p_obj )
     }
     if( Dialogs::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "cannot instantiate qt4 dialogs provider" );
+        msg_Err( p_intf, "cannot instantiate qt dialogs provider" );
         b_error = true;
         goto end;
     }

@@ -246,7 +246,7 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     libvlc_playlist_play (vlc, -1, 0, NULL);
 
-    /* Qt4 insists on catching SIGCHLD via signal handler. To work around that,
+    /* Qt insists on catching SIGCHLD via signal handler. To work around that,
      * unblock it after all our child threads are created. */
     sigdelset (&set, SIGCHLD);
     pthread_sigmask (SIG_SETMASK, &set, NULL);

@@ -429,7 +429,7 @@ void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
  *
  * Or it can be an NSView object.
  *
- * If you want to use it along with Qt4 see the QMacCocoaViewContainer. Then
+ * If you want to use it along with Qt see the QMacCocoaViewContainer. Then
  * the following code should work:
  * @code{.mm}
  * {

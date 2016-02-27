@@ -61,7 +61,7 @@ struct input_resource_t
 
     /* This lock is used to protect vout resources access (for hold)
      * It is a special case because of embed video (possible deadlock
-     * between vout window request and vout holds in some(qt4) interface)
+     * between vout window request and vout holds in some(qt) interface)
      */
     vlc_mutex_t    lock_hold;
 
