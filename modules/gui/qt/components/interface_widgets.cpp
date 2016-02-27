@@ -146,7 +146,7 @@ WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
 #ifdef Q_WS_X11
     /* HACK: Only one X11 client can subscribe to mouse button press events.
      * VLC currently handles those in the video display.
-     * Force Qt4 to unsubscribe from mouse press and release events. */
+     * Force Qt to unsubscribe from mouse press and release events. */
     Display *dpy = QX11Info::display();
     Window w = stable->winId();
     XWindowAttributes attr;
