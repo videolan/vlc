@@ -29,6 +29,7 @@ typedef struct ts_psip_t ts_psip_t;
 /* Structs */
 ts_pat_t *ts_pat_New( demux_t * );
 void ts_pat_Del( demux_t *, ts_pat_t * );
+ts_pmt_t *ts_pat_Get_pmt( ts_pat_t *, uint16_t );
 
 ts_pmt_t *ts_pmt_New( demux_t * );
 void ts_pmt_Del( demux_t *, ts_pmt_t * );

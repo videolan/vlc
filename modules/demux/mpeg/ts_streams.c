@@ -86,6 +86,18 @@ void ts_pat_Del( demux_t *p_demux, ts_pat_t *pat )
     free( pat );
 }
 
+ts_pmt_t *ts_pat_Get_pmt( ts_pat_t *pat, uint16_t i_number )
+{
+    ts_pmt_t *p_pmt = NULL;
+    for( int i=0; i<pat->programs.i_size; i++ )
+    {
+        p_pmt = pat->programs.p_elems[i]->u.p_pmt;
+        if( p_pmt->i_number == i_number )
+            break;
+    }
+    return p_pmt;
+}
+
 ts_pmt_t *ts_pmt_New( demux_t *p_demux )
 {
     ts_pmt_t *pmt = malloc( sizeof( ts_pmt_t ) );
