@@ -33,7 +33,7 @@ gui_LTLIBRARIES =  $(LTLIBqt)
 EXTRA_LTLIBRARIES = libqt_plugin.la
 
 libqt_plugin_la_SOURCES = \
-	qt4.cpp qt4.hpp \
+	qt.cpp qt4.hpp \
 	menus.cpp menus.hpp \
 	main_interface.cpp main_interface.hpp \
 	dialogs_provider.cpp dialogs_provider.hpp \
