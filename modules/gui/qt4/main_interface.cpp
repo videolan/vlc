@@ -821,8 +821,8 @@ void MainInterface::setVideoFullScreen( bool fs )
     {
         /* TODO do we want to restore screen and position ? (when
          * qt-fullscreen-screennumber is forced) */
-        setMinimalView( b_minimalView );
         setInterfaceFullScreen( b_interfaceFullScreen );
+        setMinimalView( b_minimalView );
 #ifdef _WIN32
         changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 #endif
@@ -979,10 +979,49 @@ void MainInterface::dockPlaylist( bool p_docked )
  */
 void MainInterface::setMinimalView( bool b_minimal )
 {
+    bool b_menuBarVisible = menuBar()->isVisible();
+    bool b_controlsVisible = controls->isVisible();
+    bool b_statusBarVisible = statusBar()->isVisible();
+    bool b_inputCVisible = inputC->isVisible();
+
+    if( !isFullScreen() && !isMaximized() && b_minimal )
+    {
+        int i_heightChange = 0;
+
+        if( b_menuBarVisible )
+            i_heightChange += menuBar()->height();
+        if( b_controlsVisible )
+            i_heightChange += controls->height();
+        if( b_statusBarVisible )
+            i_heightChange += statusBar()->height();
+        if( b_inputCVisible )
+            i_heightChange += inputC->height();
+
+        if( i_heightChange != 0 )
+            resize( width(), height() - i_heightChange );
+    }
+
     menuBar()->setVisible( !b_minimal );
     controls->setVisible( !b_minimal );
     statusBar()->setVisible( !b_minimal && b_statusbarVisible );
     inputC->setVisible( !b_minimal );
+
+    if( !isFullScreen() && !isMaximized() && !b_minimal )
+    {
+        int i_heightChange = 0;
+
+        if( !b_menuBarVisible )
+            i_heightChange += menuBar()->height();
+        if( !b_controlsVisible )
+            i_heightChange += controls->height();
+        if( !b_statusBarVisible && statusBar()->isVisible() )
+            i_heightChange += statusBar()->height();
+        if( !b_inputCVisible )
+            i_heightChange += inputC->height();
+
+        if( i_heightChange != 0 )
+            resize( width(), height() + i_heightChange );
+    }
 }
 
 /*
