@@ -1322,6 +1322,9 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
 
         switch( p_dvbpsies->i_type )
         {
+        case 0x05: /* Private data in sections */
+            p_pes->data_type = TS_ES_DATA_TABLE_SECTION;
+            break;
         case 0x06:
             /* Handle PES private data */
             PMTSetupEs0x06( p_demux, p_pes, p_dvbpsies );
