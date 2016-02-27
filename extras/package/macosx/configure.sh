@@ -34,7 +34,6 @@ OPTIONS="
         --disable-xcb
         --disable-caca
         --disable-sdl
-        --disable-macosx-dialog-provider
         --with-macosx-version-min=10.7
 "
 
