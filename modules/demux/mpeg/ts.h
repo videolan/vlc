@@ -99,8 +99,6 @@ struct demux_sys_t
     /* */
     bool        b_dvb_meta;
     int64_t     i_tdt_delta;
-    int64_t     i_dvb_start;
-    int64_t     i_dvb_length;
     bool        b_broken_charset; /* True if broken encoding is used in EPG/SDT */
 
     /* Selected programs */

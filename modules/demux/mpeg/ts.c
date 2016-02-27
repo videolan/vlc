@@ -388,8 +388,6 @@ static int Open( vlc_object_t *p_this )
     ARRAY_INIT( p_sys->programs );
     p_sys->b_default_selection = false;
     p_sys->i_tdt_delta = 0;
-    p_sys->i_dvb_start = 0;
-    p_sys->i_dvb_length = 0;
 
     p_sys->vdr = vdr;
 
@@ -746,24 +744,23 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_length )
+static int EITCurrentEventTime( const ts_pmt_t *p_pmt, mtime_t i_tdt_offset,
+                                time_t *pi_time, time_t *pi_length )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
     if( pi_length )
         *pi_length = 0;
     if( pi_time )
         *pi_time = 0;
 
-    if( p_sys->i_dvb_length > 0 )
+    if( p_pmt && p_pmt->eit.i_event_length > 0 )
     {
-        const int64_t t = mdate() + p_sys->i_tdt_delta;
-
-        if( p_sys->i_dvb_start <= t && t < p_sys->i_dvb_start + p_sys->i_dvb_length )
+        const time_t t = time(NULL) + i_tdt_offset / CLOCK_FREQ;
+        if( p_pmt->eit.i_event_start <= t && t < p_pmt->eit.i_event_start + p_pmt->eit.i_event_length )
         {
             if( pi_length )
-                *pi_length = p_sys->i_dvb_length;
+                *pi_length = p_pmt->eit.i_event_length;
             if( pi_time )
-                *pi_time   = t - p_sys->i_dvb_start;
+                *pi_time   = t - p_pmt->eit.i_event_start;
             return VLC_SUCCESS;
         }
     }
@@ -893,7 +890,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( p_sys->b_dvb_meta && p_sys->b_access_control )
         {
             int64_t i_time, i_length;
-            if( !DVBEventInformation( p_demux, &i_time, &i_length ) && i_length > 0 )
+            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_time, &i_length ) && i_length > 0 )
             {
                 *pf = (double)i_time/(double)i_length;
                 return VLC_SUCCESS;
@@ -934,7 +931,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
            !p_sys->b_force_seek_per_percent && p_pmt )
         {
             int64_t i_time, i_length;
-            if( !DVBEventInformation( p_demux, &i_time, &i_length ) &&
+            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_time, &i_length ) &&
                  i_length > 0 && !SeekToTime( p_demux, p_pmt, (int64_t)(TO_SCALE(i_length) * f) ) )
             {
                 ReadyQueuesPostSeek( p_demux );
@@ -989,7 +986,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( p_sys->b_dvb_meta && p_sys->b_access_control )
         {
-            if( !DVBEventInformation( p_demux, pi64, NULL ) )
+            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, pi64, NULL ) )
                 return VLC_SUCCESS;
         }
 
@@ -1006,7 +1003,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( p_sys->b_dvb_meta && p_sys->b_access_control )
         {
-            if( !DVBEventInformation( p_demux, NULL, pi64 ) )
+            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, NULL, pi64 ) )
                 return VLC_SUCCESS;
         }
 

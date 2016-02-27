@@ -480,13 +480,18 @@ static void EITCallBack( demux_t *p_demux,
                     p_eit->i_extension
                 ) )
         {
-            p_sys->i_dvb_length = 0;
-            p_sys->i_dvb_start = 0;
-
-            if( p_epg->p_current )
+            ts_pat_t *p_pat = ts_pid_Get(&p_sys->pids, 0)->u.p_pat;
+            ts_pmt_t *p_pmt = ts_pat_Get_pmt(p_pat, p_eit->i_extension);
+            if(p_pmt)
             {
-                p_sys->i_dvb_start = CLOCK_FREQ * p_epg->p_current->i_start;
-                p_sys->i_dvb_length = CLOCK_FREQ * p_epg->p_current->i_duration;
+                p_pmt->eit.i_event_length = 0;
+                p_pmt->eit.i_event_start = 0;
+
+                if( p_epg->p_current )
+                {
+                    p_pmt->eit.i_event_start = p_epg->p_current->i_start;
+                    p_pmt->eit.i_event_length = p_epg->p_current->i_duration;
+                }
             }
         }
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG,

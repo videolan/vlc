@@ -62,6 +62,12 @@ struct ts_pmt_t
         bool    b_fix_done;
     } pcr;
 
+    struct
+    {
+        time_t i_event_start;
+        time_t i_event_length;
+    } eit;
+
     mtime_t i_last_dts;
 
 };

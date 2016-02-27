@@ -132,6 +132,9 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
 
     pmt->pcr.b_fix_done = false;
 
+    pmt->eit.i_event_length = 0;
+    pmt->eit.i_event_start = 0;
+
     return pmt;
 }
 
