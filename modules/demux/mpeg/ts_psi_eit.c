@@ -342,7 +342,7 @@ static void EITCallBack( demux_t *p_demux,
             time_t i_now = time(NULL);
             time_t i_tot_time = 0;
 
-            if( p_sys->i_tdt_delta == 0 )
+            if( p_sys->i_tdt_delta == TS_TIME_DELTA_INVALID )
                 p_sys->i_tdt_delta = (i_start + i_duration - 5) - i_now;
 
             i_tot_time = i_now + p_sys->i_tdt_delta;

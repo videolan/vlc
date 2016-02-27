@@ -20,6 +20,9 @@
 #ifndef VLC_TS_H
 #define VLC_TS_H
 
+#include <limits.h>
+#define TS_TIME_DELTA_INVALID    INT64_MAX
+
 #ifdef HAVE_ARIBB24
     typedef struct arib_instance_t arib_instance_t;
 #endif
