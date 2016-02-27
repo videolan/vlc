@@ -744,7 +744,7 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int EITCurrentEventTime( const ts_pmt_t *p_pmt, mtime_t i_tdt_offset,
+static int EITCurrentEventTime( const ts_pmt_t *p_pmt, time_t i_tdt_offset,
                                 time_t *pi_time, time_t *pi_length )
 {
     if( pi_length )
@@ -754,7 +754,7 @@ static int EITCurrentEventTime( const ts_pmt_t *p_pmt, mtime_t i_tdt_offset,
 
     if( p_pmt && p_pmt->eit.i_event_length > 0 )
     {
-        const time_t t = time(NULL) + i_tdt_offset / CLOCK_FREQ;
+        const time_t t = time(NULL) + i_tdt_offset;
         if( p_pmt->eit.i_event_start <= t && t < p_pmt->eit.i_event_start + p_pmt->eit.i_event_length )
         {
             if( pi_length )
@@ -889,7 +889,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         /* Access control test is because EPG for recordings is not relevant */
         if( p_sys->b_dvb_meta && p_sys->b_access_control )
         {
-            int64_t i_time, i_length;
+            time_t i_time, i_length;
             if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_time, &i_length ) && i_length > 0 )
             {
                 *pf = (double)i_time/(double)i_length;
@@ -930,13 +930,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( p_sys->b_dvb_meta && p_sys->b_access_control &&
            !p_sys->b_force_seek_per_percent && p_pmt )
         {
-            int64_t i_time, i_length;
+            time_t i_time, i_length;
             if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_time, &i_length ) &&
-                 i_length > 0 && !SeekToTime( p_demux, p_pmt, (int64_t)(TO_SCALE(i_length) * f) ) )
+                 i_length > 0 && !SeekToTime( p_demux, p_pmt, (int64_t)(TO_SCALE(i_length * CLOCK_FREQ) * f) ) )
             {
                 ReadyQueuesPostSeek( p_demux );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                (int64_t)(TO_SCALE(i_length) * f) );
+                                (int64_t)(TO_SCALE(i_length * CLOCK_FREQ) * f) );
                 return VLC_SUCCESS;
             }
         }
@@ -986,8 +986,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( p_sys->b_dvb_meta && p_sys->b_access_control )
         {
-            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, pi64, NULL ) )
+            time_t i_event_start;
+            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_event_start, NULL ) )
+            {
+                *pi64 = i_event_start * CLOCK_FREQ;
                 return VLC_SUCCESS;
+            }
         }
 
         if( p_pmt && p_pmt->pcr.i_current > -1 && p_pmt->pcr.i_first > -1 )
@@ -1003,8 +1007,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( p_sys->b_dvb_meta && p_sys->b_access_control )
         {
-            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, NULL, pi64 ) )
+            time_t i_event_duration;
+            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, NULL, &i_event_duration ) )
+            {
+                *pi64 = i_event_duration * CLOCK_FREQ;
                 return VLC_SUCCESS;
+            }
         }
 
         if( p_pmt &&

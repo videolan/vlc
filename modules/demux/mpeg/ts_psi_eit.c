@@ -283,8 +283,7 @@ static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
 
-    p_sys->i_tdt_delta = CLOCK_FREQ * EITConvertStartTime( p_tdt->i_utc_time )
-                         - mdate();
+    p_sys->i_tdt_delta = EITConvertStartTime( p_tdt->i_utc_time ) - time(NULL);
     dvbpsi_tot_delete(p_tdt);
 }
 
@@ -321,17 +320,19 @@ static void EITCallBack( demux_t *p_demux,
         int64_t i_start;
         int i_duration;
         int i_min_age = 0;
-        int64_t i_tot_time = 0;
 
         i_start = EITConvertStartTime( p_evt->i_start_time );
         i_duration = EITConvertDuration( p_evt->i_duration );
 
         if( p_sys->arib.e_mode == ARIBMODE_ENABLED )
         {
-            if( p_sys->i_tdt_delta == 0 )
-                p_sys->i_tdt_delta = CLOCK_FREQ * (i_start + i_duration - 5) - mdate();
+            time_t i_now = time(NULL);
+            time_t i_tot_time = 0;
 
-            i_tot_time = (mdate() + p_sys->i_tdt_delta) / CLOCK_FREQ;
+            if( p_sys->i_tdt_delta == 0 )
+                p_sys->i_tdt_delta = (i_start + i_duration - 5) - i_now;
+
+            i_tot_time = i_now + p_sys->i_tdt_delta;
 
             tzset(); // JST -> UTC
             i_start += timezone; // FIXME: what about DST?
