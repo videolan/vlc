@@ -4304,7 +4304,7 @@ AC_CONFIG_FILES([
   bin/Makefile
   test/Makefile
   modules/gui/macosx/Makefile
-  modules/gui/qt4/Makefile
+  modules/gui/qt/Makefile
   modules/gui/skins2/Makefile
   modules/hw/mmal/Makefile
 ])

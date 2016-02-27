@@ -1,13 +1,13 @@
 guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
 
-DIST_SUBDIRS += gui/macosx gui/qt4 gui/skins2
+DIST_SUBDIRS += gui/macosx gui/qt gui/skins2
 
 if ENABLE_MACOSX_UI
 SUBDIRS += gui/macosx
 endif
 if ENABLE_QT4
-SUBDIRS += gui/qt4
+SUBDIRS += gui/qt
 endif
 if BUILD_SKINS
 SUBDIRS += gui/skins2

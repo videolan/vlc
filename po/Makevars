@@ -1,6 +1,6 @@
 # Makefile variables for PO directory in any package using GNU gettext.
 
-VPATH += ../modules/gui ../modules/gui/qt4 ../modules/gui/qt4/ui
+VPATH += ../modules/gui ../modules/gui/qt ../modules/gui/qt/ui
 
 # Usually the message domain is the same as the package name.
 DOMAIN = $(PACKAGE)
