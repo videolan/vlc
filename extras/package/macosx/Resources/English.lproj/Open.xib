@@ -615,7 +615,6 @@ Gw
                     <constraint firstAttribute="trailing" secondItem="640" secondAttribute="trailing" constant="20" id="fwB-4h-Xua"/>
                     <constraint firstItem="929" firstAttribute="leading" secondItem="678" secondAttribute="leading" id="gPB-5G-X6T"/>
                     <constraint firstItem="929" firstAttribute="centerY" secondItem="1256" secondAttribute="centerY" id="jRR-ho-Y62"/>
-                    <constraint firstItem="929" firstAttribute="leading" secondItem="2258" secondAttribute="leading" id="n5A-Zx-H1L"/>
                     <constraint firstAttribute="bottom" secondItem="678" secondAttribute="bottom" constant="106" id="pDE-n6-2wP"/>
                     <constraint firstItem="640" firstAttribute="leading" secondItem="641" secondAttribute="trailing" constant="12" id="pzg-l3-etg"/>
                     <constraint firstItem="640" firstAttribute="width" secondItem="1256" secondAttribute="width" id="qIY-Fe-KNM"/>
