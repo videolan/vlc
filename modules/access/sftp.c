@@ -465,14 +465,12 @@ static input_item_t* DirRead( access_t *p_access )
         int i_type = LIBSSH2_SFTP_S_ISDIR( attrs.permissions ) ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
         p_item = input_item_NewWithTypeExt( psz_full_uri, psz_file,
                                             0, NULL, 0, 0, i_type, 1 );
+        free( psz_full_uri );
 
         if( p_item == NULL )
         {
-            free( psz_full_uri );
             break;
         }
-
-        free( psz_full_uri );
     }
 
     free( psz_file );
