@@ -158,6 +158,7 @@ static int Open( vlc_object_t* p_this )
 
     /* Parse the URL */
     vlc_UrlParse( &url, p_access->psz_location );
+    vlc_uri_decode( url.psz_path );
 
     /* Check for some parameters */
     if( EMPTY_STR( url.psz_host ) )
