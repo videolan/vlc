@@ -96,7 +96,7 @@ int OpenIntf (vlc_object_t *p_this)
 
         [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
         // if statusbar enabled in preferences
-        if (config_GetInt(p_intf, "macosx-statusicon")) {
+        if (var_InheritBool(p_intf, "macosx-statusicon")) {
             [NSBundle loadNibNamed:@"VLCStatusBarIconMainMenu" owner:[[VLCMain sharedInstance] statusBarIcon]];
         }
         [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
@@ -233,7 +233,7 @@ static VLCMain *sharedInstance = nil;
         _mainmenu = [[VLCMainMenu alloc] init];
 
         // if statusbar enabled in preferences
-        if (config_GetInt(p_intf, "macosx-statusicon")) {
+        if (var_InheritBool(p_intf, "macosx-statusicon")) {
             _statusBarIcon = [[VLCStatusBarIcon  alloc] init];
         }
 
