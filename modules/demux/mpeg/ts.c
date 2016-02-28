@@ -2135,10 +2135,8 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
         i_pts = TimeStampWrapAround( i_pcr, i_pts );
 
         if( i_dts > 0 && i_dts <= i_pcr ) {
-            msg_Err( p_demux, "send queued data for pid %d: DTS %"PRId64" >= PCR %"PRId64"\n", p_pid->i_pid, i_dts, i_pcr);
             ParsePESDataChain( p_demux, p_pid );
         } else if( i_pts > 0 && i_pts <= i_pcr ) {
-            msg_Err( p_demux, "send queued data for pid %d: PTS %"PRId64" >= PCR %"PRId64"\n", p_pid->i_pid, i_pts, i_pcr);
             ParsePESDataChain( p_demux, p_pid );
         }
     }
