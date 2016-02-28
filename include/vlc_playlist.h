@@ -206,7 +206,8 @@ struct playlist_add_t
     DEF( SORT_TRACK_NUMBER )\
     DEF( SORT_DESCRIPTION )\
     DEF( SORT_RATING )\
-    DEF( SORT_URI )
+    DEF( SORT_URI )\
+    DEF( SORT_DISC_NUMBER )
 
 #define DEF( s ) s,
 enum

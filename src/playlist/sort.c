@@ -306,6 +306,11 @@ SORTFN( SORT_TRACK_NUMBER, first, second )
     return meta_sort( first, second, vlc_meta_TrackNumber, true );
 }
 
+SORTFN( SORT_DISC_NUMBER, first, second )
+{
+  return meta_sort( first, second, vlc_meta_DiscNumber, true );
+}
+
 SORTFN( SORT_URI, first, second )
 {
     int i_ret;
