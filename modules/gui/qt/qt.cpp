@@ -346,7 +346,7 @@ static void RegisterIntf( intf_thread_t *p_this )
     var_Create (pl, "qt4-iface", VLC_VAR_ADDRESS);
     var_SetAddress (pl, "qt4-iface", p_this);
     var_Create (pl, "window", VLC_VAR_STRING);
-    var_SetString (pl, "window", "qt4,any");
+    var_SetString (pl, "window", "qt,any");
 }
 
 /* Open Interface */
