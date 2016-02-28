@@ -284,7 +284,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             }
         }
 
-        BOOL shouldDisableScreensaver = var_InheritInteger(p_intf, "disable-screensaver");
+        BOOL shouldDisableScreensaver = var_InheritBool(p_intf, "disable-screensaver");
 
         /* Declare user activity.
          This wakes the display if it is off, and postpones display sleep according to the users system preferences
