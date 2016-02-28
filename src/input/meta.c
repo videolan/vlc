@@ -77,7 +77,7 @@ const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
         [vlc_meta_ShowName]    = N_("Show Name"),
         [vlc_meta_Actors]      = N_("Actors"),
         [vlc_meta_AlbumArtist] = N_("Album Artist"),
-        [vlc_meta_DiscNumber]  = N_("DiscNumber")
+        [vlc_meta_DiscNumber]  = N_("Disc number")
     };
 
     assert (meta_type < (sizeof(posix_names) / sizeof(posix_names[0])));
