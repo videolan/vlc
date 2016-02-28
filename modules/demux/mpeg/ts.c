@@ -2123,20 +2123,20 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
             continue;
 
         if (p_pmt->pcr.i_pcroffset > 0) {
-            if( i_dts > 0 ) {
+            if( i_dts > VLC_TS_INVALID )
                 i_dts += p_pmt->pcr.i_pcroffset;
-            }
-            if( i_pts > 0 ) {
+            if( i_pts > VLC_TS_INVALID )
                 i_pts += p_pmt->pcr.i_pcroffset;
-            }
         }
 
-        i_dts = TimeStampWrapAround( i_pcr, i_dts );
-        i_pts = TimeStampWrapAround( i_pcr, i_pts );
+        if( i_dts > VLC_TS_INVALID )
+            i_dts = TimeStampWrapAround( i_pcr, i_dts );
+        if( i_pts > VLC_TS_INVALID )
+            i_pts = TimeStampWrapAround( i_pcr, i_pts );
 
-        if( i_dts > 0 && i_dts <= i_pcr ) {
-            ParsePESDataChain( p_demux, p_pid );
-        } else if( i_pts > 0 && i_pts <= i_pcr ) {
+        if(( i_dts > VLC_TS_INVALID && i_dts <= i_pcr ) ||
+           ( i_pts > VLC_TS_INVALID && i_pts <= i_pcr ))
+        {
             ParsePESDataChain( p_demux, p_pid );
         }
     }
