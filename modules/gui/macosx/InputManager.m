@@ -294,10 +294,14 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         if ([o_main activeVideoPlayback] && &IOPMAssertionDeclareUserActivity && shouldDisableScreensaver)
         {
             CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
-            IOPMAssertionDeclareUserActivity(reasonForActivity,
+            IOReturn success = IOPMAssertionDeclareUserActivity(reasonForActivity,
                                              kIOPMUserActiveLocal,
                                              &userActivityAssertionID);
             CFRelease(reasonForActivity);
+
+            if (success != kIOReturnSuccess)
+                msg_Warn(getIntf(), "failed to declare user activity");
+
         }
 #endif
 
