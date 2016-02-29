@@ -326,7 +326,7 @@ else
 fi
 
 if [ "$SCARY" = "yes" ]; then
-	SCARYFLAG="--enable-dvbpsi --enable-avcodec"
+	SCARYFLAG="--enable-dvbpsi --enable-avcodec --disable-vpx"
 else
 	SCARYFLAG="--disable-dca --disable-dvbpsi --disable-avcodec --disable-avformat --disable-zvbi --enable-vpx"
 fi
@@ -349,7 +349,6 @@ ${VLCROOT}/configure \
     ${SCARYFLAG} \
     ${TVOSOPTIONS} \
     --disable-macosx \
-    --disable-macosx-dialog-provider \
     --disable-macosx-qtkit \
     --disable-macosx-eyetv \
     --disable-macosx-vlc-app \
