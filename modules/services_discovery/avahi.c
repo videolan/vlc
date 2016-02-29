@@ -1,10 +1,10 @@
 /*****************************************************************************
  * avahi.c: Bonjour services discovery module
  *****************************************************************************
- * Copyright (C) 2005-2009 the VideoLAN team
- * $Id$
+ * Copyright (C) 2005-2009, 2016 VideoLAN and VLC authors
  *
  * Authors: Jon Lech Johansen <jon@nanocrew.net>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,9 +75,18 @@ struct services_discovery_sys_t
     vlc_dictionary_t    services_name_to_input_item;
 };
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
+static const struct
+{
+    const char *psz_protocol;
+    const char *psz_service_name;
+    uint16_t    i_default_port;
+} protocols[] = {
+    { "ftp", "_ftp._tcp", 21 },
+    { "smb", "_smb._tcp", 445 },
+    { "nfs", "_nfs._tcp", 2049 },
+    { "sftp", "_sftp-ssh._tcp", 22 },
+};
+#define NB_PROTOCOLS (sizeof(protocols) / sizeof(*protocols))
 
 /*****************************************************************************
  * client_callback
@@ -134,13 +143,22 @@ static void resolve_callback(
         AvahiStringList *asl = NULL;
         input_item_t *p_input = NULL;
 
-        msg_Dbg( p_sd, "service '%s' of type '%s' in domain '%s'",
-                 name, type, domain );
+        msg_Err( p_sd, "service '%s' of type '%s' in domain '%s' port %i",
+                 name, type, domain, port );
 
         avahi_address_snprint(a, (sizeof(a)/sizeof(a[0]))-1, address);
         if( protocol == AVAHI_PROTO_INET6 )
             if( asprintf( &psz_addr, "[%s]", a ) == -1 )
                 return;
+
+        const char *psz_protocol = NULL;
+        for( unsigned int i = 0; i < NB_PROTOCOLS; i++ )
+        {
+            if( !strcmp(type, protocols[i].psz_service_name) )
+                psz_protocol = protocols[i].psz_protocol;
+        }
+        if( psz_protocol == NULL )
+            return;
 
         if( txt != NULL )
             asl = avahi_string_list_find( txt, "path" );
@@ -152,8 +170,10 @@ static void resolve_callback(
             if( avahi_string_list_get_pair( asl, &key, &value, &size ) == 0 &&
                 value != NULL )
             {
-                if( asprintf( &psz_uri, "http://%s:%d%s",
-                          psz_addr != NULL ? psz_addr : a, port, value ) == -1 )
+                if( asprintf( &psz_uri, "%s://%s:%d%s",
+                          psz_protocol,
+                          psz_addr != NULL ? psz_addr : a,
+                          port, value ) == -1 )
                 {
                     free( psz_addr );
                     return;
@@ -166,7 +186,8 @@ static void resolve_callback(
         }
         else
         {
-            if( asprintf( &psz_uri, "http://%s:%d",
+            if( asprintf( &psz_uri, "%s://%s:%d",
+                      psz_protocol,
                       psz_addr != NULL ? psz_addr : a, port ) == -1 )
             {
                 free( psz_addr );
@@ -272,15 +293,20 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    p_sys->sb = avahi_service_browser_new( p_sys->client, AVAHI_IF_UNSPEC,
-                                           AVAHI_PROTO_UNSPEC,
-                                           "_vlc-http._tcp", NULL,
-                                           0, browse_callback, p_sd );
-    if( p_sys->sb == NULL )
+    for( unsigned i = 0; i < NB_PROTOCOLS; i++ )
     {
-        msg_Err( p_sd, "failed to create avahi service browser" );
-        goto error;
+        p_sys->sb = avahi_service_browser_new( p_sys->client, AVAHI_IF_UNSPEC,
+                AVAHI_PROTO_UNSPEC,
+                protocols[i].psz_service_name, NULL,
+                0, browse_callback, p_sd );
+        if( p_sys->sb == NULL )
+        {
+            msg_Err( p_sd, "failed to create avahi service browser %s", avahi_strerror( avahi_client_errno(p_sys->client) ) );
+            goto error;
+        }
     }
+
+    avahi_threaded_poll_start( p_sys->poll );
 
     return VLC_SUCCESS;
 
@@ -290,7 +316,10 @@ error:
     if( p_sys->client != NULL )
         avahi_client_free( p_sys->client );
     if( p_sys->poll != NULL )
+    {
+        avahi_threaded_poll_stop( p_sys->poll );
         avahi_threaded_poll_free( p_sys->poll );
+    }
 
     vlc_dictionary_clear( &p_sys->services_name_to_input_item, NULL, NULL );
     free( p_sys );
@@ -305,6 +334,7 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
+    avahi_threaded_poll_stop( p_sys->poll );
 
     avahi_service_browser_free( p_sys->sb );
     avahi_client_free( p_sys->client );
