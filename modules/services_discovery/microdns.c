@@ -98,6 +98,7 @@ static const struct
     { "smb", "_smb._tcp.local", 445 },
     { "nfs", "_nfs._tcp.local", 2049 },
     { "sftp", "_sftp-ssh._tcp.local", 22 },
+    { "rtsp", "_rtsp._tcp.local", 554 },
 };
 #define NB_PROTOCOLS (sizeof(protocols) / sizeof(*protocols))
 
