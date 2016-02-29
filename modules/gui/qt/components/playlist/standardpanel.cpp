@@ -247,7 +247,7 @@ bool StandardPLPanel::popup( const QPoint &point )
         QMenu *sortingMenu = new QMenu( qtr( "Sort by" ), &menu );
         /* Choose what columns to show in sorting menu, not sure if this should be configurable*/
         QList<int> sortingColumns;
-        sortingColumns << COLUMN_TITLE << COLUMN_ARTIST << COLUMN_ALBUM << COLUMN_TRACK_NUMBER << COLUMN_URI;
+        sortingColumns << COLUMN_TITLE << COLUMN_ARTIST << COLUMN_ALBUM << COLUMN_TRACK_NUMBER << COLUMN_URI << COLUMN_DISC_NUMBER;
         container.action = VLCModelSubInterface::ACTION_SORT;
         foreach( int Column, sortingColumns )
         {

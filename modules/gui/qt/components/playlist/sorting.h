@@ -41,10 +41,11 @@ enum
     COLUMN_NUMBER         = 0x0100,
     COLUMN_RATING         = 0x0200,
     COLUMN_COVER          = 0x0400,
+    COLUMN_DISC_NUMBER    = 0x0800,
 
     /* Add new entries here and update the COLUMN_END value*/
 
-    COLUMN_END          = 0x0800
+    COLUMN_END          = 0x1000
 };
 
 #define COLUMN_DEFAULT (COLUMN_TITLE|COLUMN_DURATION|COLUMN_ALBUM)
@@ -65,6 +66,7 @@ static inline const char * psz_column_title( uint32_t i_column )
     case COLUMN_URI:             return _("URI");
     case COLUMN_RATING:          return VLC_META_RATING;
     case COLUMN_COVER:           return _("Cover");
+    case COLUMN_DISC_NUMBER:     return VLC_META_DISCNUMBER;
     default: abort();
     }
 }
@@ -102,6 +104,8 @@ static inline char * psz_column_meta( input_item_t *p_item, uint32_t i_column )
         return input_item_GetRating( p_item );
     case COLUMN_COVER:
         return input_item_GetArtworkURL( p_item );
+    case COLUMN_DISC_NUMBER:
+        return input_item_GetDiscNumber( p_item );
     default:
         abort();
     }
@@ -122,6 +126,7 @@ static inline int i_column_sorting( uint32_t i_column )
     case COLUMN_DESCRIPTION:    return SORT_DESCRIPTION;
     case COLUMN_URI:            return SORT_URI;
     case COLUMN_RATING:         return SORT_RATING;
+    case COLUMN_DISC_NUMBER:    return SORT_DISC_NUMBER;
     default: abort();
     }
 }
@@ -141,6 +146,7 @@ static inline ml_select_e meta_to_mlmeta( uint32_t i_column )
     case COLUMN_URI:            return ML_URI;
     case COLUMN_RATING:         return ML_VOTE;
     case COLUMN_COVER:          return ML_COVER;
+    case COLUMN_DISC_NUMBER:    return ML_DISC_NUMBER;
     default: abort();
     }
 }
