@@ -30,6 +30,6 @@
 #define TS_PSI_RUNSTATUS_PAUSING   0x03
 #define TS_PSI_RUNSTATUS_RUNNING   0x04
 
-bool AttachDvbpsiNewEITTableHandler( dvbpsi_t *p_handle, demux_t * p_demux );
+bool ts_attach_PSINewTableCallBack( dvbpsi_t *p_handle, void * );
 
 #endif

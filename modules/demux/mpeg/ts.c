@@ -350,10 +350,10 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
 /*****************************************************************************
  * Open
  *****************************************************************************/
-# define VLC_DVBPSI_DEMUX_TABLE_INIT(table,obj) \
+# define VLC_DVBPSI_DEMUX_TABLE_INIT(obj, pid) \
     do { \
-        if( !AttachDvbpsiNewEITTableHandler( (table)->u.p_psi->handle, obj ) ) \
-            msg_Warn( obj, "Can't dvbpsi_AttachDemux on pid %d", (table)->i_pid );\
+        if( !ts_attach_PSINewTableCallBack( (pid)->u.p_psi->handle, pid ) ) \
+            msg_Warn( obj, "Can't dvbpsi_AttachDemux on pid %d", (pid)->i_pid );\
     } while (0)
 
 static int Open( vlc_object_t *p_this )
@@ -437,9 +437,9 @@ static int Open( vlc_object_t *p_this )
           }
           else
           {
-              VLC_DVBPSI_DEMUX_TABLE_INIT(GetPID(p_sys, 0x11), p_demux);
-              VLC_DVBPSI_DEMUX_TABLE_INIT(GetPID(p_sys, 0x12), p_demux);
-              VLC_DVBPSI_DEMUX_TABLE_INIT(GetPID(p_sys, 0x14), p_demux);
+              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, 0x11));
+              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, 0x12));
+              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, 0x14));
               if( p_sys->b_access_control &&
                   ( SetPIDFilter( p_sys, GetPID(p_sys, 0x11), true ) ||
                     SetPIDFilter( p_sys, GetPID(p_sys, 0x14), true ) ||

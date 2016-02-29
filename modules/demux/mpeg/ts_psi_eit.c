@@ -526,10 +526,12 @@ static void EITCallBackSchedule( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 }
 
 static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
-                                 uint16_t i_extension, demux_t *p_demux )
+                                 uint16_t i_extension, void *p_pid_cbdata )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    VLC_UNUSED(p_pid_cbdata);
     assert( h );
+    demux_t *p_demux = (demux_t *) h->p_sys;
+    demux_sys_t *p_sys = p_demux->p_sys;
 #if 0
     msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
              i_table_id, i_table_id, i_extension, i_extension );
@@ -567,7 +569,7 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
     }
 }
 
-bool AttachDvbpsiNewEITTableHandler( dvbpsi_t *p_handle, demux_t * p_demux )
+bool ts_attach_PSINewTableCallBack( dvbpsi_t *p_handle, void *p_pid )
 {
-    return dvbpsi_AttachDemux( p_handle, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_demux );
+    return dvbpsi_AttachDemux( p_handle, PSINewTableCallBack, p_pid );
 }
