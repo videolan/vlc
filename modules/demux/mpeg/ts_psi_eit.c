@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ts_psi_eit.c : TS demuxer EIT handling
+ * ts_psi_eit.c : TS demuxer SI handling
  *****************************************************************************
  * Copyright (C) 2014-2016 - VideoLAN Authors
  *
@@ -351,11 +351,11 @@ static void EITCallBack( demux_t *p_demux,
             i_start += timezone; // FIXME: what about DST?
             i_tot_time += timezone;
 
-            if( p_evt->i_running_status == TS_PSI_RUNSTATUS_UNDEFINED &&
+            if( p_evt->i_running_status == TS_SI_RUNSTATUS_UNDEFINED &&
                 (i_start - 5 < i_tot_time &&
                  i_tot_time < i_start + i_duration + 5) )
             {
-                p_evt->i_running_status = TS_PSI_RUNSTATUS_RUNNING;
+                p_evt->i_running_status = TS_SI_RUNSTATUS_RUNNING;
                 msg_Dbg( p_demux, "  EIT running status undefined -> running" );
             }
         }
@@ -478,7 +478,7 @@ static void EITCallBack( demux_t *p_demux,
                               *psz_extra ? psz_extra : NULL, i_min_age );
 
         /* Update "now playing" field */
-        if( p_evt->i_running_status == TS_PSI_RUNSTATUS_RUNNING && i_start > 0  && psz_name && psz_text )
+        if( p_evt->i_running_status == TS_SI_RUNSTATUS_RUNNING && i_start > 0  && psz_name && psz_text )
             vlc_epg_SetCurrent( p_epg, i_start );
 
         free( psz_name );
@@ -559,7 +559,7 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
             msg_Err( p_demux, "PSINewTableCallback: failed attaching EITCallback" );
     }
     else if( GetPID(p_sys, 0x11)->u.p_psi->i_version != -1 &&
-            (i_table_id == TS_PSI_TDT_TABLE_ID || i_table_id == TS_PSI_TOT_TABLE_ID) )
+            (i_table_id == TS_SI_TDT_TABLE_ID || i_table_id == TS_SI_TOT_TABLE_ID) )
     {
          msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );

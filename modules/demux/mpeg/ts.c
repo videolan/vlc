@@ -426,24 +426,24 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->b_dvb_meta )
     {
-          if( !PIDSetup( p_demux, TYPE_SDT, GetPID(p_sys, 0x11), NULL ) ||
-              !PIDSetup( p_demux, TYPE_EIT, GetPID(p_sys, 0x12), NULL ) ||
-              !PIDSetup( p_demux, TYPE_TDT, GetPID(p_sys, 0x14), NULL ) )
+          if( !PIDSetup( p_demux, TYPE_SDT, GetPID(p_sys, TS_PID_SDT), NULL ) ||
+              !PIDSetup( p_demux, TYPE_EIT, GetPID(p_sys, TS_PID_EIT), NULL ) ||
+              !PIDSetup( p_demux, TYPE_TDT, GetPID(p_sys, TS_PID_TDT), NULL ) )
           {
-              PIDRelease( p_demux, GetPID(p_sys, 0x11) );
-              PIDRelease( p_demux, GetPID(p_sys, 0x12) );
-              PIDRelease( p_demux, GetPID(p_sys, 0x14) );
+              PIDRelease( p_demux, GetPID(p_sys, TS_PID_SDT) );
+              PIDRelease( p_demux, GetPID(p_sys, TS_PID_EIT) );
+              PIDRelease( p_demux, GetPID(p_sys, TS_PID_TDT) );
               p_sys->b_dvb_meta = false;
           }
           else
           {
-              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, 0x11));
-              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, 0x12));
-              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, 0x14));
+              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, TS_PID_SDT));
+              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, TS_PID_EIT));
+              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, TS_PID_TDT));
               if( p_sys->b_access_control &&
-                  ( SetPIDFilter( p_sys, GetPID(p_sys, 0x11), true ) ||
-                    SetPIDFilter( p_sys, GetPID(p_sys, 0x14), true ) ||
-                    SetPIDFilter( p_sys, GetPID(p_sys, 0x12), true ) )
+                  ( SetPIDFilter( p_sys, GetPID(p_sys, TS_PID_SDT), true ) ||
+                    SetPIDFilter( p_sys, GetPID(p_sys, TS_PID_TDT), true ) ||
+                    SetPIDFilter( p_sys, GetPID(p_sys, TS_PID_EIT), true ) )
                  )
                      p_sys->b_access_control = false;
           }

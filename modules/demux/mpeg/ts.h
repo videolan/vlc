@@ -30,6 +30,8 @@ typedef struct csa_t csa_t;
 
 #define TS_USER_PMT_NUMBER (0)
 
+#define TS_PSI_PAT_PID 0x00
+
 typedef enum arib_modes_e
 {
     ARIBMODE_AUTO = -1,
