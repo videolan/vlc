@@ -341,10 +341,25 @@ static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
 
-    p_sys->i_tdt_delta = EITConvertStartTime( p_tdt->i_utc_time ) - time(NULL);
+
+    p_sys->i_network_time = EITConvertStartTime( p_tdt->i_utc_time );
+    p_sys->i_network_time_update = time(NULL);
+    if( p_sys->standard == TS_STANDARD_ARIB )
+    {
+        /* All ARIB-B10 times are in JST time, where DVB is UTC. (spec being a fork)
+           DVB TOT should include DTS offset in descriptor 0x58 (including DST),
+           but as there's no DST in JAPAN (since Showa 27/1952)
+           and considering that no-one seems to send TDT or desc 0x58,
+           falling back on fixed offset is safe */
+        p_sys->i_network_time += 9 * 3600;
+    }
+
+    /* Because libdvbpsi is broken and deduplicating timestamp tables,
+     * we need to reset it to get next timestamp callback */
+    ts_pid_t *pid = ts_pid_Get( &p_sys->pids, TS_SI_TDT_PID );
+    dvbpsi_decoder_reset( pid->u.p_si->handle->p_decoder, true );
     dvbpsi_tot_delete(p_tdt);
 }
-
 
 static void EITCallBack( demux_t *p_demux,
                          dvbpsi_eit_t *p_eit, bool b_current_following )
@@ -386,24 +401,14 @@ static void EITCallBack( demux_t *p_demux,
         /* We have to fix ARIB-B10 as all timestamps are JST */
         if( p_sys->standard == TS_STANDARD_ARIB )
         {
-            time_t i_now = time(NULL);
-            time_t i_tot_time = 0;
-
-            if( p_sys->i_tdt_delta == TS_TIME_DELTA_INVALID )
-                p_sys->i_tdt_delta = (i_start + i_duration - 5) - i_now;
-
-            i_tot_time = i_now + p_sys->i_tdt_delta;
-
-            tzset(); // JST -> UTC
-            i_start += timezone; // FIXME: what about DST?
-            i_tot_time += timezone;
-
+            /* See comments on TDT callback */
+            i_start += 9 * 3600;
+            /* Services are not setting runstatus */
             if( p_evt->i_running_status == TS_SI_RUNSTATUS_UNDEFINED &&
-                (i_start - 5 < i_tot_time &&
-                 i_tot_time < i_start + i_duration + 5) )
+               (i_start <= p_sys->i_network_time &&
+                p_sys->i_network_time < i_start + i_duration) )
             {
                 p_evt->i_running_status = TS_SI_RUNSTATUS_RUNNING;
-                msg_Dbg( p_demux, "  EIT running status undefined -> running" );
             }
         }
 
@@ -601,12 +606,16 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
         msg_Dbg( p_demux, "SINewTableCallback: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
 
-        dvbpsi_eit_callback cb = i_table_id == 0x4e ?
-                                    (dvbpsi_eit_callback)EITCallBackCurrentFollowing :
-                                    (dvbpsi_eit_callback)EITCallBackSchedule;
+        /* Do not attach decoders if we can't decode timestamps */
+        if( p_demux->p_sys->i_network_time > 0 )
+        {
+            dvbpsi_eit_callback cb = i_table_id == 0x4e ?
+                                        (dvbpsi_eit_callback)EITCallBackCurrentFollowing :
+                                        (dvbpsi_eit_callback)EITCallBackSchedule;
 
-        if( !dvbpsi_eit_attach( h, i_table_id, i_extension, cb, p_demux ) )
-            msg_Err( p_demux, "SINewTableCallback: failed attaching EITCallback" );
+            if( !dvbpsi_eit_attach( h, i_table_id, i_extension, cb, p_demux ) )
+                msg_Err( p_demux, "SINewTableCallback: failed attaching EITCallback" );
+        }
     }
     else if( p_pid->i_pid == TS_SI_TDT_PID &&
             (i_table_id == TS_SI_TDT_TABLE_ID || i_table_id == TS_SI_TOT_TABLE_ID) )

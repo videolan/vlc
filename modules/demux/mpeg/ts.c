@@ -367,7 +367,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_end_preparse = false;
     ARRAY_INIT( p_sys->programs );
     p_sys->b_default_selection = false;
-    p_sys->i_tdt_delta = TS_TIME_DELTA_INVALID;
+    p_sys->i_network_time = 0;
+    p_sys->i_network_time_update = 0;
 
     p_sys->vdr = vdr;
 
@@ -700,29 +701,25 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int EITCurrentEventTime( const ts_pmt_t *p_pmt, time_t i_tdt_delta,
+static int EITCurrentEventTime( const ts_pmt_t *p_pmt, demux_sys_t *p_sys,
                                 time_t *pi_time, time_t *pi_length )
 {
-    if( i_tdt_delta == TS_TIME_DELTA_INVALID )
+    if( p_sys->i_network_time == 0 || !p_pmt || p_pmt->eit.i_event_length == 0 )
         return VLC_EGENERIC;
 
-    if( pi_length )
-        *pi_length = 0;
-    if( pi_time )
-        *pi_time = 0;
-
-    if( p_pmt && p_pmt->eit.i_event_length > 0 )
+    if( p_pmt->eit.i_event_start <= p_sys->i_network_time &&
+        p_sys->i_network_time < p_pmt->eit.i_event_start + p_pmt->eit.i_event_length )
     {
-        const time_t t = time(NULL) + i_tdt_delta;
-        if( p_pmt->eit.i_event_start <= t && t < p_pmt->eit.i_event_start + p_pmt->eit.i_event_length )
+        if( pi_length )
+            *pi_length = p_pmt->eit.i_event_length;
+        if( pi_time )
         {
-            if( pi_length )
-                *pi_length = p_pmt->eit.i_event_length;
-            if( pi_time )
-                *pi_time   = t - p_pmt->eit.i_event_start;
-            return VLC_SUCCESS;
+            *pi_time = p_sys->i_network_time - p_pmt->eit.i_event_start;
+            *pi_time += time(NULL) - p_sys->i_network_time_update;
         }
+        return VLC_SUCCESS;
     }
+
     return VLC_EGENERIC;
 }
 
@@ -849,7 +846,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( p_sys->b_access_control )
         {
             time_t i_time, i_length;
-            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_time, &i_length ) && i_length > 0 )
+            if( !EITCurrentEventTime( p_pmt, p_sys, &i_time, &i_length ) && i_length > 0 )
             {
                 *pf = (double)i_time/(double)i_length;
                 return VLC_SUCCESS;
@@ -890,7 +887,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
            !p_sys->b_force_seek_per_percent && p_pmt )
         {
             time_t i_time, i_length;
-            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_time, &i_length ) &&
+            if( !EITCurrentEventTime( p_pmt, p_sys, &i_time, &i_length ) &&
                  i_length > 0 && !SeekToTime( p_demux, p_pmt, (int64_t)(TO_SCALE(i_length * CLOCK_FREQ) * f) ) )
             {
                 ReadyQueuesPostSeek( p_demux );
@@ -946,7 +943,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( p_sys->b_access_control )
         {
             time_t i_event_start;
-            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_event_start, NULL ) )
+            if( !EITCurrentEventTime( p_pmt, p_sys, &i_event_start, NULL ) )
             {
                 *pi64 = i_event_start * CLOCK_FREQ;
                 return VLC_SUCCESS;
@@ -967,7 +964,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( p_sys->b_access_control )
         {
             time_t i_event_duration;
-            if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, NULL, &i_event_duration ) )
+            if( !EITCurrentEventTime( p_pmt, p_sys, NULL, &i_event_duration ) )
             {
                 *pi64 = i_event_duration * CLOCK_FREQ;
                 return VLC_SUCCESS;
