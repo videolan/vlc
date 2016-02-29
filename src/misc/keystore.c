@@ -202,6 +202,13 @@ is_credential_valid(vlc_credential *p_credential)
 
 }
 
+static bool
+is_url_valid(const vlc_url_t *p_url)
+{
+    return p_url && p_url->psz_protocol && p_url->psz_protocol[0]
+        && p_url->psz_host && p_url->psz_host[0];
+}
+
 /* Default port for each protocol */
 static struct
 {
@@ -370,7 +377,7 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
     assert(p_credential && p_parent);
     const vlc_url_t *p_url = p_credential->p_url;
 
-    if (!p_url || !p_url->psz_protocol || !p_url->psz_host)
+    if (!is_url_valid(p_url))
     {
         msg_Err(p_parent, "vlc_credential_get: invalid url");
         return false;
