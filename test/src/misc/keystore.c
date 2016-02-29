@@ -189,6 +189,14 @@ static const struct testcase
 
     { false, SMB("user6;wrong_domain@host/share/path1/ks_find"),
       { "user6", "pwd6" }, {}, {}, false },
+
+    WIPE_MEMORY_KEYSTORE,
+
+    { false, "://invalid_url", NULL, NULL,
+      { "user1", "pwd1" }, {}, { "user1", "pwd1" }, false },
+
+    { false, "/invalid_path", NULL, NULL,
+      { "user1", "pwd1" }, {}, { "user1", "pwd1" }, false },
 };
 
 static void
@@ -248,7 +256,6 @@ test(vlc_object_t *p_obj, unsigned int i_id, const struct testcase *p_test)
 
     vlc_url_t url;
     vlc_UrlParse(&url, p_test->psz_url);
-    assert(url.psz_protocol != NULL && url.psz_host != NULL);
 
     vlc_credential credential;
     vlc_credential_init(&credential, &url);
@@ -263,11 +270,11 @@ test(vlc_object_t *p_obj, unsigned int i_id, const struct testcase *p_test)
          && strcmp(credential.psz_password, p_test->result.psz_pwd) == 0)
         {
             b_found = true;
-            vlc_credential_store(&credential, p_obj);
             break;
         }
     }
     assert(b_found == p_test->b_found);
+    vlc_credential_store(&credential, p_obj);
 
     vlc_UrlClean(&url);
     vlc_credential_clean(&credential);
