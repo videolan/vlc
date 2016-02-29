@@ -317,6 +317,8 @@ static int  Open ( vlc_object_t *p_this )
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_sys->psz_path );
+    /* Add the access protocol to url, it will be used by vlc_credential */
+    p_sys->url.psz_protocol = p_demux->psz_access;
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
     {
