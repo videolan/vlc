@@ -496,6 +496,8 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
 bool
 vlc_credential_store(vlc_credential *p_credential, vlc_object_t *p_parent)
 {
+    if (!is_credential_valid(p_credential))
+        return false;
     /* Don't need to store again */
     if (p_credential->b_from_keystore)
         return p_credential->b_from_keystore;

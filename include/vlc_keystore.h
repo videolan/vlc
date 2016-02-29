@@ -244,8 +244,9 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
 /**
  * Store the last dialog credential returned by vlc_credential_get()
  *
- * This function will store the credential only if it comes from the dialog and
- * if the vlc_keystore object is valid.
+ * This function will store the credential in the memory keystore if it's
+ * valid, or will store in the permanent one if it comes from the dialog and if
+ * the user asked for it.
  *
  * @return true if the credential was stored or comes from the keystore, false
  * otherwise
