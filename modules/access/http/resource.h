@@ -34,6 +34,7 @@ struct vlc_http_resource
     char *host;
     unsigned port;
     bool secure;
+    bool negotiate;
     char *authority;
     char *path;
     char *agent;

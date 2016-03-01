@@ -49,10 +49,13 @@ vlc_http_res_req(const struct vlc_http_resource *res)
     /* Content negotiation */
     vlc_http_msg_add_header(req, "Accept", "*/*");
 
-    const char *lang = vlc_gettext("C");
-    if (!strcmp(lang, "C"))
-        lang = "en_US";
-    vlc_http_msg_add_header(req, "Accept-Language", "%s, *;q=0.5", lang);
+    if (res->negotiate)
+    {
+        const char *lang = vlc_gettext("C");
+        if (!strcmp(lang, "C"))
+            lang = "en_US";
+        vlc_http_msg_add_header(req, "Accept-Language", "%s", lang);
+    }
 
     /* Authentication */
     /* TODO: authentication */
@@ -75,7 +78,9 @@ struct vlc_http_msg *vlc_http_res_open(struct vlc_http_resource *res,
     int (*request_cb)(struct vlc_http_msg *, const struct vlc_http_resource *,
                       void *), void *opaque)
 {
-    struct vlc_http_msg *req = vlc_http_res_req(res);
+    struct vlc_http_msg *req;
+retry:
+    req = vlc_http_res_req(res);
     if (unlikely(req == NULL))
         return NULL;
 
@@ -99,6 +104,19 @@ struct vlc_http_msg *vlc_http_res_open(struct vlc_http_resource *res,
     int status = vlc_http_msg_get_status(resp);
     if (status < 200 || status >= 599)
         goto fail;
+
+    if (status == 406 && res->negotiate)
+    {   /* Not Acceptable: Content negotiation failed. Normally it means
+         * one (or more) Accept or Accept-* header line does not match any
+         * representation of the entity. So we set a flag to remove those
+         * header lines (unless they accept everything), and retry.
+         * In principles, it could be any header line, and the server can
+         * pass Vary to clarify. It cannot be caused by If-*, Range, TE or the
+         * other transfer- rather than representation-affecting header lines.
+         */
+        res->negotiate = false;
+        goto retry;
+    }
 
     return resp;
 fail:
@@ -152,6 +170,7 @@ int vlc_http_res_init(struct vlc_http_resource *restrict res,
     }
 
     res->secure = secure;
+    res->negotiate = true;
     res->host = strdup(url.psz_host);
     res->port = url.i_port;
     res->authority = vlc_http_authority(url.psz_host, url.i_port);
