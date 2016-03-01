@@ -589,8 +589,11 @@ void transcode_video_close( sout_stream_t *p_stream,
         block_ChainRelease( p_stream->p_sys->p_buffers );
     }
 
-    vlc_mutex_destroy( &p_stream->p_sys->lock_out );
-    vlc_cond_destroy( &p_stream->p_sys->cond );
+    if( p_stream->p_sys->i_threads >= 1 )
+    {
+        vlc_mutex_destroy( &p_stream->p_sys->lock_out );
+        vlc_cond_destroy( &p_stream->p_sys->cond );
+    }
 
     /* Close decoder */
     if( id->p_decoder->p_module )
