@@ -209,6 +209,16 @@ char *vlc_http_res_get_redirect(const struct vlc_http_resource *restrict res,
 {
     int status = vlc_http_msg_get_status(resp);
 
+    if ((status / 100) == 2 && !res->secure)
+    {
+        char *url;
+
+        /* HACK: Seems like an MMS server. Redirect to MMSH scheme. */
+        if (vlc_http_msg_get_token(resp, "Pragma", "features") != NULL
+         && asprintf(&url, "mmsh://%s%s", res->authority, res->path) >= 0)
+            return url;
+    }
+
     /* TODO: if (status == 426 Upgrade Required) */
 
     /* Location header is only meaningful for 201 and 3xx */
@@ -218,15 +228,6 @@ char *vlc_http_res_get_redirect(const struct vlc_http_resource *restrict res,
      || status == 305 /* Use Proxy (deprecated) */
      || status == 306 /* Switch Proxy (former) */)
         return NULL;
-
-    if (!res->secure
-     && vlc_http_msg_get_token(resp, "Pragma", "features") != NULL)
-    {   /* HACK: Seems like an MMS server. Redirect to MMSH scheme. */
-        char *url;
-
-        if (asprintf(&url, "mmsh://%s%s", res->authority, res->path) >= 0)
-            return url;
-    }
 
     const char *location = vlc_http_msg_get_header(resp, "Location");
     if (location == NULL)
