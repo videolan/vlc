@@ -71,7 +71,6 @@ struct services_discovery_sys_t
 {
     AvahiThreadedPoll   *poll;
     AvahiClient         *client;
-    AvahiServiceBrowser *sb;
     vlc_dictionary_t    services_name_to_input_item;
 };
 
@@ -295,11 +294,12 @@ static int Open( vlc_object_t *p_this )
 
     for( unsigned i = 0; i < NB_PROTOCOLS; i++ )
     {
-        p_sys->sb = avahi_service_browser_new( p_sys->client, AVAHI_IF_UNSPEC,
+        AvahiServiceBrowser *sb;
+        sb = avahi_service_browser_new( p_sys->client, AVAHI_IF_UNSPEC,
                 AVAHI_PROTO_UNSPEC,
                 protocols[i].psz_service_name, NULL,
                 0, browse_callback, p_sd );
-        if( p_sys->sb == NULL )
+        if( sb == NULL )
         {
             msg_Err( p_sd, "failed to create avahi service browser %s", avahi_strerror( avahi_client_errno(p_sys->client) ) );
             goto error;
@@ -311,8 +311,6 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-    if( p_sys->sb != NULL )
-        avahi_service_browser_free( p_sys->sb );
     if( p_sys->client != NULL )
         avahi_client_free( p_sys->client );
     if( p_sys->poll != NULL )
@@ -336,7 +334,6 @@ static void Close( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys = p_sd->p_sys;
     avahi_threaded_poll_stop( p_sys->poll );
 
-    avahi_service_browser_free( p_sys->sb );
     avahi_client_free( p_sys->client );
     avahi_threaded_poll_free( p_sys->poll );
 
