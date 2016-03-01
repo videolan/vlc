@@ -314,10 +314,7 @@ error:
     if( p_sys->client != NULL )
         avahi_client_free( p_sys->client );
     if( p_sys->poll != NULL )
-    {
-        avahi_threaded_poll_stop( p_sys->poll );
         avahi_threaded_poll_free( p_sys->poll );
-    }
 
     vlc_dictionary_clear( &p_sys->services_name_to_input_item, NULL, NULL );
     free( p_sys );
