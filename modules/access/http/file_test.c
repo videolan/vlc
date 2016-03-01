@@ -40,6 +40,7 @@ static const char ua[] = PACKAGE_NAME "/" PACKAGE_VERSION " (test suite)";
 static const char *replies[2] = { NULL, NULL };
 static uintmax_t offset = 0;
 static bool etags = false;
+static int lang = -1;
 
 static vlc_http_cookie_jar_t *jar;
 
@@ -199,6 +200,17 @@ int main(void)
     assert(vlc_http_file_seek(f, 0) == 0);
     assert(vlc_http_file_get_size(f) == (uintmax_t)-1);
 
+    /* Non-negotiable language */
+    replies[0] = "HTTP/1.1 406 Not Acceptable\r\n"
+                 "\r\n";
+    replies[1] = "HTTP/1.1 206 OK\r\n"
+                 "Content-Range: bytes 0-1/2\r\n"
+                 "\r\n";
+    lang = 1;
+    assert(vlc_http_file_seek(f, 0) == 0);
+    assert(vlc_http_file_can_seek(f));
+    assert(vlc_http_file_get_size(f) == 2);
+
     vlc_http_file_destroy(f);
 
     /* Dummy API calls */
@@ -299,9 +311,17 @@ struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
     assert(str == NULL);
     str = vlc_http_msg_get_header(req, "Accept");
     assert(str == NULL || strstr(str, "*/*") != NULL);
+
     str = vlc_http_msg_get_header(req, "Accept-Language");
     /* This test case does not call setlocale(), so en_US can be assumed. */
-    assert(str != NULL && strncmp(str, "en_US", 5) == 0);
+    if (lang != 0)
+    {
+        assert(str != NULL && strncmp(str, "en_US", 5) == 0);
+        if (lang > 0)
+            lang--;
+    }
+    else
+        assert(str == NULL);
 
     str = vlc_http_msg_get_header(req, "Range");
     assert(str != NULL && !strncmp(str, "bytes=", 6)
