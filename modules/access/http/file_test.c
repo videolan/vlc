@@ -37,6 +37,7 @@
 static const char url[] = "https://www.example.com:8443/dir/file.ext?a=b";
 static const char url_http[] = "http://www.example.com:8443/dir/file.ext?a=b";
 static const char url_mmsh[] = "mmsh://www.example.com:8443/dir/file.ext?a=b";
+static const char url_icyx[] = "icyx://www.example.com:8443/dir/file.ext?a=b";
 static const char ua[] = PACKAGE_NAME "/" PACKAGE_VERSION " (test suite)";
 
 static const char *replies[2] = { NULL, NULL };
@@ -221,6 +222,12 @@ int main(void)
     assert(vlc_http_file_seek(f, 0) == 0);
     assert(vlc_http_file_get_redirect(f) == NULL);
 
+    replies[0] = "HTTP/1.1 200 OK\r\n"
+                 "Icy-Name:CraptasticRadio\r\n"
+                 "\r\n";
+    assert(vlc_http_file_seek(f, 0) == 0);
+    assert(vlc_http_file_get_redirect(f) == NULL);
+
     vlc_http_file_destroy(f);
 
     secure = false;
@@ -234,6 +241,14 @@ int main(void)
                  "\r\n";
     str = vlc_http_file_get_redirect(f);
     assert(str != NULL && strcmp(str, url_mmsh) == 0);
+    free(str);
+
+    replies[0] = "HTTP/1.1 200 OK\r\n"
+                 "Icy-Name:CraptasticRadio\r\n"
+                 "\r\n";
+    vlc_http_file_seek(f, 0);
+    str = vlc_http_file_get_redirect(f);
+    assert(str != NULL && strcmp(str, url_icyx) == 0);
     free(str);
 
     vlc_http_file_destroy(f);
