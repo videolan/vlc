@@ -50,9 +50,9 @@ vlc_http_res_req(const struct vlc_http_resource *res)
     vlc_http_msg_add_header(req, "Accept", "*/*");
 
     const char *lang = vlc_gettext("C");
-    if (strcmp(lang, "C"))
-        vlc_http_msg_add_header(req, "Accept-Language",
-                                "%s, *;q=0.5", lang);
+    if (!strcmp(lang, "C"))
+        lang = "en_US";
+    vlc_http_msg_add_header(req, "Accept-Language", "%s, *;q=0.5", lang);
 
     /* Authentication */
     /* TODO: authentication */

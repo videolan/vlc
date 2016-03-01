@@ -300,7 +300,8 @@ struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
     str = vlc_http_msg_get_header(req, "Accept");
     assert(str == NULL || strstr(str, "*/*") != NULL);
     str = vlc_http_msg_get_header(req, "Accept-Language");
-    assert(str == NULL || strstr(str, "*") != NULL);
+    /* This test case does not call setlocale(), so en_US can be assumed. */
+    assert(str != NULL && strncmp(str, "en_US", 5) == 0);
 
     str = vlc_http_msg_get_header(req, "Range");
     assert(str != NULL && !strncmp(str, "bytes=", 6)
