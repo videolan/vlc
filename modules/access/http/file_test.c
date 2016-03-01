@@ -35,10 +35,13 @@
 #include "message.h"
 
 static const char url[] = "https://www.example.com:8443/dir/file.ext?a=b";
+static const char url_http[] = "http://www.example.com:8443/dir/file.ext?a=b";
+static const char url_mmsh[] = "mmsh://www.example.com:8443/dir/file.ext?a=b";
 static const char ua[] = PACKAGE_NAME "/" PACKAGE_VERSION " (test suite)";
 
 static const char *replies[2] = { NULL, NULL };
 static uintmax_t offset = 0;
+static bool secure = true;
 static bool etags = false;
 static int lang = -1;
 
@@ -211,6 +214,28 @@ int main(void)
     assert(vlc_http_file_can_seek(f));
     assert(vlc_http_file_get_size(f) == 2);
 
+    /* Protocol redirect hacks - not over TLS */
+    replies[0] = "HTTP/1.1 200 OK\r\n"
+                 "Pragma: features\r\n"
+                 "\r\n";
+    assert(vlc_http_file_seek(f, 0) == 0);
+    assert(vlc_http_file_get_redirect(f) == NULL);
+
+    vlc_http_file_destroy(f);
+
+    secure = false;
+    lang = -1;
+    f = vlc_http_file_create(NULL, url_http, ua, NULL);
+    assert(f != NULL);
+
+    /* Protocol redirect hacks - over insecure HTTP */
+    replies[0] = "HTTP/1.1 200 OK\r\n"
+                 "Pragma: features\r\n"
+                 "\r\n";
+    str = vlc_http_file_get_redirect(f);
+    assert(str != NULL && strcmp(str, url_mmsh) == 0);
+    free(str);
+
     vlc_http_file_destroy(f);
 
     /* Dummy API calls */
@@ -292,7 +317,7 @@ struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
     const char *str;
     char *end;
 
-    assert(https);
+    assert(https == secure);
     assert(mgr == NULL);
     assert(!strcmp(host, "www.example.com"));
     assert(port == 8443);
@@ -300,7 +325,7 @@ struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
     str = vlc_http_msg_get_method(req);
     assert(!strcmp(str, "GET"));
     str = vlc_http_msg_get_scheme(req);
-    assert(!strcmp(str, "https"));
+    assert(!strcmp(str, secure ? "https" : "http"));
     str = vlc_http_msg_get_authority(req);
     assert(!strcmp(str, "www.example.com:8443"));
     str = vlc_http_msg_get_path(req);
