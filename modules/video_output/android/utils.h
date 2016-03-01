@@ -175,4 +175,4 @@ int AWindowHandler_setWindowLayout(AWindowHandler *p_awh,
 /* Signal a critical error
  * TODO: remove this when there is a decoder fallback */
 int
-AWindowHandler_sendHardwareAccelerationError(AWindowHandler *p_awh);
+AWindowHandler_sendHardwareAccelerationError(vlc_object_t *p_obj, AWindowHandler *p_awh);

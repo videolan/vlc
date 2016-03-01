@@ -1473,8 +1473,9 @@ end:
         if (!p_sys->b_error_signaled) {
             /* Signal the error to the Java.
              * TODO: remove this when there is a decoder fallback */
-            if (p_dec->fmt_in.i_cat == VIDEO_ES && p_sys->u.video.p_awh)
-                AWindowHandler_sendHardwareAccelerationError(p_sys->u.video.p_awh);
+            if (p_dec->fmt_in.i_cat == VIDEO_ES)
+                AWindowHandler_sendHardwareAccelerationError(VLC_OBJECT(p_dec),
+                                                             p_sys->u.video.p_awh);
             p_sys->b_error_signaled = true;
             vlc_cond_broadcast(&p_sys->cond);
         }
