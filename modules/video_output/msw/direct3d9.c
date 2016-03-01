@@ -28,7 +28,7 @@
  * Preamble:
  *
  * This plugin will use YUV surface if supported, using YUV will result in
- * the best video quality (hardware filering when rescaling the picture)
+ * the best video quality (hardware filtering when rescaling the picture)
  * and the fastest display as it requires less processing.
  *
  * If YUV overlay is not supported this plugin will use RGB offscreen video
