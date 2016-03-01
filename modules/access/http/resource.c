@@ -217,6 +217,12 @@ char *vlc_http_res_get_redirect(const struct vlc_http_resource *restrict res,
         if (vlc_http_msg_get_token(resp, "Pragma", "features") != NULL
          && asprintf(&url, "mmsh://%s%s", res->authority, res->path) >= 0)
             return url;
+
+        /* HACK: Seems like an ICY server. Redirect to ICYX scheme. */
+        if ((vlc_http_msg_get_header(resp, "Icy-Name") != NULL
+          || vlc_http_msg_get_header(resp, "Icy-Genre") != NULL)
+         && asprintf(&url, "icyx://%s%s", res->authority, res->path) >= 0)
+            return url;
     }
 
     /* TODO: if (status == 426 Upgrade Required) */
