@@ -229,7 +229,7 @@ libplaylist_plugin_la_SOURCES = \
 demux_LTLIBRARIES += libplaylist_plugin.la
 
 libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
-        demux/mpeg/ts_pid.h demux/mpeg/ts_pid.c \
+        demux/mpeg/ts_pid.h demux/mpeg/ts_pid_fwd.h demux/mpeg/ts_pid.c \
         demux/mpeg/ts_psi.h demux/mpeg/ts_psi.c \
         demux/mpeg/ts_psi_eit.h demux/mpeg/ts_psi_eit.c \
         demux/mpeg/ts_psip.h demux/mpeg/ts_psip.c \

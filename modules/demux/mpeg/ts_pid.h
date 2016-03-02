@@ -19,7 +19,7 @@
 #ifndef VLC_TS_PID_H
 #define VLC_TS_PID_H
 
-typedef struct ts_pid_t ts_pid_t;
+#include "ts_pid_fwd.h"
 
 #define MIN_ES_PID 4    /* Should be 32.. broken muxers */
 #define MAX_ES_PID 8190
@@ -76,7 +76,7 @@ struct ts_pid_t
 
 };
 
-typedef struct ts_pid_list_t
+struct ts_pid_list_t
 {
     ts_pid_t   pat;
     ts_pid_t   dummy;
@@ -89,7 +89,7 @@ typedef struct ts_pid_list_t
     uint16_t   i_last_pid;
     ts_pid_t  *p_last;
 
-} ts_pid_list_t;
+};
 
 /* opacified pid list */
 void ts_pid_list_Init( ts_pid_list_t * );
