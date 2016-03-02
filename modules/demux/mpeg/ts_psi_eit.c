@@ -62,6 +62,9 @@
     } while(0);
 #endif
 
+static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
+                                uint16_t i_extension, void *p_pid_cbdata );
+
 static char *EITConvertToUTF8( demux_t *p_demux,
                                const unsigned char *psz_instring,
                                size_t i_length,
@@ -112,7 +115,7 @@ static char *EITConvertToUTF8( demux_t *p_demux,
 static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 {
     demux_sys_t          *p_sys = p_demux->p_sys;
-    ts_pid_t             *sdt = GetPID(p_sys, 0x11);
+    ts_pid_t             *sdt = GetPID(p_sys, TS_SI_SDT_PID);
     dvbpsi_sdt_service_t *p_srv;
 
     msg_Dbg( p_demux, "SDTCallBack called" );
@@ -123,6 +126,23 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
     {
         dvbpsi_sdt_delete( p_sdt );
         return;
+    }
+
+    if( sdt->u.p_psi->i_version == -1 )
+    {
+        ts_pid_t *eitpid = GetPID(p_sys, TS_SI_EIT_PID);
+        if( eitpid->type == TYPE_EIT &&
+           !dvbpsi_decoder_present( eitpid->u.p_psi->handle ) )
+        {
+            dvbpsi_AttachDemux( eitpid->u.p_psi->handle, SINewTableCallBack, eitpid );
+        }
+
+        ts_pid_t *tdtpid = GetPID(p_sys, TS_SI_TDT_PID);
+        if( tdtpid->type == TYPE_TDT &&
+           !dvbpsi_decoder_present( tdtpid->u.p_psi->handle ) )
+        {
+            dvbpsi_AttachDemux( tdtpid->u.p_psi->handle, SINewTableCallBack, tdtpid );
+        }
     }
 
     msg_Dbg( p_demux, "new SDT ts_id=%d version=%d current_next=%d "
@@ -527,30 +547,29 @@ static void EITCallBackSchedule( demux_t *p_demux, dvbpsi_eit_t *p_eit )
     EITCallBack( p_demux, p_eit, false );
 }
 
-static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
-                                 uint16_t i_extension, void *p_pid_cbdata )
+static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
+                                uint16_t i_extension, void *p_pid_cbdata )
 {
-    VLC_UNUSED(p_pid_cbdata);
     assert( h );
+    ts_pid_t *p_pid = (ts_pid_t *) p_pid_cbdata;
     demux_t *p_demux = (demux_t *) h->p_sys;
-    demux_sys_t *p_sys = p_demux->p_sys;
 #if 0
-    msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
-             i_table_id, i_table_id, i_extension, i_extension );
+    msg_Dbg( p_demux, "SINewTableCallback: table 0x%x(%d) ext=0x%x(%d) pid=0x%x",
+             i_table_id, i_table_id, i_extension, i_extension, p_pid->i_pid );
 #endif
-    if( GetPID(p_sys, 0)->u.p_pat->i_version != -1 && i_table_id == 0x42 )
+    if( p_pid->i_pid == TS_SI_SDT_PID && i_table_id == 0x42 )
     {
-        msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
+        msg_Dbg( p_demux, "SINewTableCallback: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
 
         if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_demux ) )
-            msg_Err( p_demux, "PSINewTableCallback: failed attaching SDTCallback" );
+            msg_Err( p_demux, "SINewTableCallback: failed attaching SDTCallback" );
     }
-    else if( GetPID(p_sys, 0x11)->u.p_psi->i_version != -1 &&
+    else if( p_pid->i_pid == TS_SI_EIT_PID &&
              ( i_table_id == 0x4e || /* Current/Following */
                (i_table_id >= 0x50 && i_table_id <= 0x5f) ) ) /* Schedule */
     {
-        msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
+        msg_Dbg( p_demux, "SINewTableCallback: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
 
         dvbpsi_eit_callback cb = i_table_id == 0x4e ?
@@ -558,20 +577,27 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
                                     (dvbpsi_eit_callback)EITCallBackSchedule;
 
         if( !dvbpsi_eit_attach( h, i_table_id, i_extension, cb, p_demux ) )
-            msg_Err( p_demux, "PSINewTableCallback: failed attaching EITCallback" );
+            msg_Err( p_demux, "SINewTableCallback: failed attaching EITCallback" );
     }
-    else if( GetPID(p_sys, 0x11)->u.p_psi->i_version != -1 &&
+    else if( p_pid->i_pid == TS_SI_TDT_PID &&
             (i_table_id == TS_SI_TDT_TABLE_ID || i_table_id == TS_SI_TOT_TABLE_ID) )
     {
-         msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
+         msg_Dbg( p_demux, "SINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
 
         if( !dvbpsi_tot_attach( h, i_table_id, i_extension, (dvbpsi_tot_callback)TDTCallBack, p_demux ) )
-            msg_Err( p_demux, "PSINewTableCallback: failed attaching TDTCallback" );
+            msg_Err( p_demux, "SINewTableCallback: failed attaching TDTCallback" );
     }
 }
 
-bool ts_attach_PSINewTableCallBack( dvbpsi_t *p_handle, void *p_pid )
+bool ts_attach_SI_Tables_Decoders( dvbpsi_t *p_handle, void *p_pid )
 {
-    return dvbpsi_AttachDemux( p_handle, PSINewTableCallBack, p_pid );
+    bool b_ret = dvbpsi_AttachDemux( p_handle, SINewTableCallBack, p_pid );
+    if(!b_ret)
+    {
+        demux_t *p_demux = (demux_t *) p_handle->p_sys;
+        ts_pid_t *pid = (ts_pid_t *) p_pid;
+        msg_Warn( p_demux, "Can't attach new SI table callback for pid %d", pid->i_pid );
+    }
+    return b_ret;
 }

@@ -50,6 +50,7 @@
 #include "ts_sl.h"
 #include "ts_scte.h"
 #include "ts_psip.h"
+#include "ts_psi_eit.h"
 
 #include <assert.h>
 
@@ -117,6 +118,16 @@ void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
     {
         dvbpsi_pat_delete( p_dvbpsipat );
         return;
+    }
+
+    /* Attach SDT after PAT. (3.14,T,A,4,Z,X100) */
+    if( p_pat->i_version == -1 && p_sys->b_dvb_meta )
+    {
+        ts_pid_t *sdtpid = GetPID(p_sys, TS_SI_SDT_PID);
+        if( sdtpid->type == TYPE_SDT )
+        {
+            (void) ts_attach_SI_Tables_Decoders( sdtpid->u.p_psi->handle, sdtpid );
+        }
     }
 
     msg_Dbg( p_demux, "new PAT ts_id=%d version=%d current_next=%d",

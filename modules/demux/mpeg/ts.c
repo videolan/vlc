@@ -352,8 +352,8 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
  *****************************************************************************/
 # define VLC_DVBPSI_DEMUX_TABLE_INIT(obj, pid) \
     do { \
-        if( !ts_attach_PSINewTableCallBack( (pid)->u.p_psi->handle, pid ) ) \
-            msg_Warn( obj, "Can't dvbpsi_AttachDemux on pid %d", (pid)->i_pid );\
+        if( !ts_attach_SI_Tables_Decoders( (pid)->u.p_psi->handle, pid ) ) \
+            msg_Warn( obj, "Can't ts_attach_SI_Tables_Decoders on pid %d", (pid)->i_pid );\
     } while (0)
 
 static int Open( vlc_object_t *p_this )
@@ -426,24 +426,21 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->b_dvb_meta )
     {
-          if( !PIDSetup( p_demux, TYPE_SDT, GetPID(p_sys, TS_PID_SDT), NULL ) ||
-              !PIDSetup( p_demux, TYPE_EIT, GetPID(p_sys, TS_PID_EIT), NULL ) ||
-              !PIDSetup( p_demux, TYPE_TDT, GetPID(p_sys, TS_PID_TDT), NULL ) )
+          if( !PIDSetup( p_demux, TYPE_SDT, GetPID(p_sys, TS_SI_SDT_PID), NULL ) ||
+              !PIDSetup( p_demux, TYPE_EIT, GetPID(p_sys, TS_SI_EIT_PID), NULL ) ||
+              !PIDSetup( p_demux, TYPE_TDT, GetPID(p_sys, TS_SI_TDT_PID), NULL ) )
           {
-              PIDRelease( p_demux, GetPID(p_sys, TS_PID_SDT) );
-              PIDRelease( p_demux, GetPID(p_sys, TS_PID_EIT) );
-              PIDRelease( p_demux, GetPID(p_sys, TS_PID_TDT) );
+              PIDRelease( p_demux, GetPID(p_sys, TS_SI_SDT_PID) );
+              PIDRelease( p_demux, GetPID(p_sys, TS_SI_EIT_PID) );
+              PIDRelease( p_demux, GetPID(p_sys, TS_SI_TDT_PID) );
               p_sys->b_dvb_meta = false;
           }
           else
           {
-              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, TS_PID_SDT));
-              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, TS_PID_EIT));
-              VLC_DVBPSI_DEMUX_TABLE_INIT(p_demux, GetPID(p_sys, TS_PID_TDT));
               if( p_sys->b_access_control &&
-                  ( SetPIDFilter( p_sys, GetPID(p_sys, TS_PID_SDT), true ) ||
-                    SetPIDFilter( p_sys, GetPID(p_sys, TS_PID_TDT), true ) ||
-                    SetPIDFilter( p_sys, GetPID(p_sys, TS_PID_EIT), true ) )
+                  ( SetPIDFilter( p_sys, GetPID(p_sys, TS_SI_SDT_PID), true ) ||
+                    SetPIDFilter( p_sys, GetPID(p_sys, TS_SI_TDT_PID), true ) ||
+                    SetPIDFilter( p_sys, GetPID(p_sys, TS_SI_EIT_PID), true ) )
                  )
                      p_sys->b_access_control = false;
           }
@@ -715,7 +712,7 @@ static int Demux( demux_t *p_demux )
         case TYPE_SDT:
         case TYPE_TDT:
         case TYPE_EIT:
-            if( p_sys->b_dvb_meta )
+            if( p_sys->b_dvb_meta && p_pid->u.p_psi->handle->p_decoder )
                 dvbpsi_packet_push( p_pid->u.p_psi->handle, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
