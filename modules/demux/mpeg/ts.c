@@ -416,7 +416,7 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
-    if( !dvbpsi_pat_attach( patpid->u.p_pat->handle, PATCallBack, p_demux ) )
+    if( !ts_psi_PAT_Attach( patpid, p_demux ) )
     {
         PIDRelease( p_demux, patpid );
         vlc_mutex_destroy( &p_sys->csa_lock );

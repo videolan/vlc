@@ -55,6 +55,7 @@
 #include <assert.h>
 
 static void PIDFillFormat( demux_t *, ts_pes_t *p_pes, int i_stream_type, ts_es_data_type_t * );
+static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt );
 
 static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
 {
@@ -92,7 +93,7 @@ static int PATCheck( demux_t *p_demux, dvbpsi_pat_t *p_pat )
     return VLC_SUCCESS;
 }
 
-void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
+static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
 {
     demux_t              *p_demux = data;
     demux_sys_t          *p_sys = p_demux->p_sys;
@@ -1390,7 +1391,7 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
         p_pes->p_es->fmt.i_id = p_dvbpsies->i_pid;
 }
 
-void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
+static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 {
     demux_t      *p_demux = data;
     demux_sys_t  *p_sys = p_demux->p_sys;
@@ -1827,4 +1828,11 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
 error:
     free( psz_dup );
     return VLC_EGENERIC;
+}
+
+bool ts_psi_PAT_Attach( ts_pid_t *patpid, void *cbdata )
+{
+    if( unlikely(patpid->type != TYPE_PAT || patpid->i_pid != TS_PSI_PAT_PID) )
+        return false;
+    return dvbpsi_pat_attach( patpid->u.p_pat->handle, PATCallBack, cbdata );
 }
