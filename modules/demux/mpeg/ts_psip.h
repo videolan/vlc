@@ -19,6 +19,8 @@
 #ifndef VLC_ATSC_PSIP_H
 #define VLC_ATSC_PSIP_H
 
+#include "ts_pid_fwd.h"
+
 #ifndef _DVBPSI_DVBPSI_H_
  #include <dvbpsi/dvbpsi.h>
 #endif
@@ -55,6 +57,8 @@
 #define ATSC_DESCRIPTOR_EXTENDED_CHANNEL_NAME       0xA0
 
 typedef struct ts_psip_context_t ts_psip_context_t;
+
+void ts_psip_Packet_Push( ts_pid_t *, const uint8_t * );
 
 ts_psip_context_t * ts_psip_context_New( void );
 void ts_psip_context_Delete( ts_psip_context_t * );

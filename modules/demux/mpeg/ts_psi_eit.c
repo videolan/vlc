@@ -65,6 +65,13 @@
 static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
                                 uint16_t i_extension, void *p_pid_cbdata );
 
+void ts_si_Packet_Push( ts_pid_t *p_pid, const uint8_t *p_pktbuffer )
+{
+    if( likely(p_pid->type == TYPE_SI) &&
+        dvbpsi_decoder_present( p_pid->u.p_si->handle ) )
+        dvbpsi_packet_push( p_pid->u.p_si->handle, (uint8_t *) p_pktbuffer );
+}
+
 static char *EITConvertToUTF8( demux_t *p_demux,
                                const unsigned char *psz_instring,
                                size_t i_length,

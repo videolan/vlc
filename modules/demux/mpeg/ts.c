@@ -35,19 +35,12 @@
 #include <vlc_access.h>    /* DVB-specific things */
 #include <vlc_demux.h>
 
-/* Include dvbpsi headers */
-#ifndef _DVBPSI_DVBPSI_H_
- # include <dvbpsi/dvbpsi.h>
-#endif
-# include <dvbpsi/descriptor.h>
-# include <dvbpsi/pat.h>
-# include <dvbpsi/pmt.h>
-
 #include "ts_pid.h"
 #include "ts_streams.h"
 #include "ts_streams_private.h"
 #include "ts_psi.h"
 #include "ts_psi_eit.h"
+#include "ts_psip.h"
 
 #include "ts_hotfixes.h"
 #include "ts_sl.h"
@@ -680,12 +673,8 @@ static int Demux( demux_t *p_demux )
         switch( p_pid->type )
         {
         case TYPE_PAT:
-            dvbpsi_packet_push( p_pid->u.p_pat->handle, p_pkt->p_buffer );
-            block_Release( p_pkt );
-            break;
-
         case TYPE_PMT:
-            dvbpsi_packet_push( p_pid->u.p_pmt->handle, p_pkt->p_buffer );
+            ts_psi_Packet_Push( p_pid, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
 
@@ -710,14 +699,12 @@ static int Demux( demux_t *p_demux )
             break;
 
         case TYPE_SI:
-            if( p_sys->b_dvb_meta && p_pid->u.p_si->handle->p_decoder )
-                dvbpsi_packet_push( p_pid->u.p_si->handle, p_pkt->p_buffer );
+            ts_si_Packet_Push( p_pid, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
 
         case TYPE_PSIP:
-            if( p_pid->u.p_psip->handle->p_decoder )
-                dvbpsi_packet_push( p_pid->u.p_psip->handle, p_pkt->p_buffer );
+            ts_psip_Packet_Push( p_pid, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
 
@@ -2430,11 +2417,6 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt,
     return i_ret;
 }
 
-/****************************************************************************
- ****************************************************************************
- ** libdvbpsi callbacks
- ****************************************************************************
- ****************************************************************************/
 bool ProgramIsSelected( demux_sys_t *p_sys, uint16_t i_pgrm )
 {
     for(int i=0; i<p_sys->programs.i_size; i++)

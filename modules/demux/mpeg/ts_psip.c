@@ -73,6 +73,12 @@ struct ts_psip_context_t
     DECL_ARRAY(dvbpsi_atsc_eit_t *) eits; /* For EIT pid, used on new ETT update */
 };
 
+void ts_psip_Packet_Push( ts_pid_t *p_pid, const uint8_t *p_pktbuffer )
+{
+    if( p_pid->u.p_psip->handle->p_decoder && likely(p_pid->type == TYPE_PSIP) )
+        dvbpsi_packet_push( p_pid->u.p_psip->handle, (uint8_t *) p_pktbuffer );
+}
+
 ts_psip_context_t * ts_psip_context_New()
 {
     ts_psip_context_t *p_ctx = malloc(sizeof(*p_ctx));

@@ -1836,3 +1836,11 @@ bool ts_psi_PAT_Attach( ts_pid_t *patpid, void *cbdata )
         return false;
     return dvbpsi_pat_attach( patpid->u.p_pat->handle, PATCallBack, cbdata );
 }
+
+void ts_psi_Packet_Push( ts_pid_t *p_pid, const uint8_t *p_pktbuffer )
+{
+    if( p_pid->type == TYPE_PAT )
+        dvbpsi_packet_push( p_pid->u.p_pat->handle, (uint8_t *) p_pktbuffer );
+    else if( p_pid->type == TYPE_PMT )
+        dvbpsi_packet_push( p_pid->u.p_pmt->handle, (uint8_t *) p_pktbuffer );
+}
