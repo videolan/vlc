@@ -297,30 +297,30 @@ void ts_pes_Del( demux_t *p_demux, ts_pes_t *pes )
     free( pes );
 }
 
-ts_psi_t *ts_psi_New( demux_t *p_demux )
+ts_si_t *ts_si_New( demux_t *p_demux )
 {
-    ts_psi_t *psi = malloc( sizeof( ts_psi_t ) );
-    if( !psi )
+    ts_si_t *si = malloc( sizeof( ts_si_t ) );
+    if( !si )
         return NULL;
 
-    if( !handle_Init( p_demux, &psi->handle ) )
+    if( !handle_Init( p_demux, &si->handle ) )
     {
-        free( psi );
+        free( si );
         return NULL;
     }
 
-    psi->i_version  = -1;
+    si->i_version  = -1;
 
-    return psi;
+    return si;
 }
 
-void ts_psi_Del( demux_t *p_demux, ts_psi_t *psi )
+void ts_si_Del( demux_t *p_demux, ts_si_t *si )
 {
     VLC_UNUSED(p_demux);
-    if( dvbpsi_decoder_present( psi->handle ) )
-        dvbpsi_DetachDemux( psi->handle );
-    dvbpsi_delete( psi->handle );
-    free( psi );
+    if( dvbpsi_decoder_present( si->handle ) )
+        dvbpsi_DetachDemux( si->handle );
+    dvbpsi_delete( si->handle );
+    free( si );
 }
 
 void ts_psip_Del( demux_t *p_demux, ts_psip_t *psip )

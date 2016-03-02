@@ -166,12 +166,10 @@ bool PIDSetup( demux_t *p_demux, ts_pid_type_t i_type, ts_pid_t *pid, ts_pid_t *
                 return false;
             break;
 
-        case TYPE_SDT:
-        case TYPE_TDT:
-        case TYPE_EIT:
+        case TYPE_SI:
             PIDReset( pid );
-            pid->u.p_psi = ts_psi_New( p_demux );
-            if( !pid->u.p_psi )
+            pid->u.p_si = ts_si_New( p_demux );
+            if( !pid->u.p_si )
                 return false;
             break;
 
@@ -245,11 +243,9 @@ void PIDRelease( demux_t *p_demux, ts_pid_t *pid )
             pid->u.p_pes = NULL;
             break;
 
-        case TYPE_SDT:
-        case TYPE_TDT:
-        case TYPE_EIT:
-            ts_psi_Del( p_demux, pid->u.p_psi );
-            pid->u.p_psi = NULL;
+        case TYPE_SI:
+            ts_si_Del( p_demux, pid->u.p_si );
+            pid->u.p_si = NULL;
             break;
 
         case TYPE_PSIP:

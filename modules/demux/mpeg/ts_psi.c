@@ -124,9 +124,9 @@ void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
     if( p_pat->i_version == -1 && p_sys->b_dvb_meta )
     {
         ts_pid_t *sdtpid = GetPID(p_sys, TS_SI_SDT_PID);
-        if( sdtpid->type == TYPE_SDT )
+        if( sdtpid->type == TYPE_SI )
         {
-            (void) ts_attach_SI_Tables_Decoders( sdtpid->u.p_psi->handle, sdtpid );
+            (void) ts_attach_SI_Tables_Decoders( sdtpid->u.p_si->handle, sdtpid );
         }
     }
 

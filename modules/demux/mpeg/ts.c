@@ -426,9 +426,9 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->b_dvb_meta )
     {
-          if( !PIDSetup( p_demux, TYPE_SDT, GetPID(p_sys, TS_SI_SDT_PID), NULL ) ||
-              !PIDSetup( p_demux, TYPE_EIT, GetPID(p_sys, TS_SI_EIT_PID), NULL ) ||
-              !PIDSetup( p_demux, TYPE_TDT, GetPID(p_sys, TS_SI_TDT_PID), NULL ) )
+          if( !PIDSetup( p_demux, TYPE_SI, GetPID(p_sys, TS_SI_SDT_PID), NULL ) ||
+              !PIDSetup( p_demux, TYPE_SI, GetPID(p_sys, TS_SI_EIT_PID), NULL ) ||
+              !PIDSetup( p_demux, TYPE_SI, GetPID(p_sys, TS_SI_TDT_PID), NULL ) )
           {
               PIDRelease( p_demux, GetPID(p_sys, TS_SI_SDT_PID) );
               PIDRelease( p_demux, GetPID(p_sys, TS_SI_EIT_PID) );
@@ -709,11 +709,9 @@ static int Demux( demux_t *p_demux )
             b_frame = ProcessTSPacket( p_demux, p_pid, p_pkt );
             break;
 
-        case TYPE_SDT:
-        case TYPE_TDT:
-        case TYPE_EIT:
-            if( p_sys->b_dvb_meta && p_pid->u.p_psi->handle->p_decoder )
-                dvbpsi_packet_push( p_pid->u.p_psi->handle, p_pkt->p_buffer );
+        case TYPE_SI:
+            if( p_sys->b_dvb_meta && p_pid->u.p_si->handle->p_decoder )
+                dvbpsi_packet_push( p_pid->u.p_si->handle, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
 

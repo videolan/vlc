@@ -114,13 +114,12 @@ struct ts_pes_t
     } sl;
 };
 
+typedef struct ts_si_context_t ts_si_context_t;
 
-struct ts_psi_t
+struct ts_si_t
 {
-    /* for special PAT/SDT case */
-    dvbpsi_t       *handle; /* PAT/SDT/EIT */
-    int             i_version;
-
+    dvbpsi_t *handle;
+    int       i_version;
 };
 
 typedef struct ts_psip_context_t ts_psip_context_t;

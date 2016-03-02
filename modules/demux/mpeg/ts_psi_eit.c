@@ -122,26 +122,26 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 
     if( p_sys->es_creation != CREATE_ES ||
        !p_sdt->b_current_next ||
-        p_sdt->i_version == sdt->u.p_psi->i_version )
+        p_sdt->i_version == sdt->u.p_si->i_version )
     {
         dvbpsi_sdt_delete( p_sdt );
         return;
     }
 
-    if( sdt->u.p_psi->i_version == -1 )
+    if( sdt->u.p_si->i_version == -1 )
     {
         ts_pid_t *eitpid = GetPID(p_sys, TS_SI_EIT_PID);
-        if( eitpid->type == TYPE_EIT &&
-           !dvbpsi_decoder_present( eitpid->u.p_psi->handle ) )
+        if( eitpid->type == TYPE_SI &&
+           !dvbpsi_decoder_present( eitpid->u.p_si->handle ) )
         {
-            dvbpsi_AttachDemux( eitpid->u.p_psi->handle, SINewTableCallBack, eitpid );
+            dvbpsi_AttachDemux( eitpid->u.p_si->handle, SINewTableCallBack, eitpid );
         }
 
         ts_pid_t *tdtpid = GetPID(p_sys, TS_SI_TDT_PID);
-        if( tdtpid->type == TYPE_TDT &&
-           !dvbpsi_decoder_present( tdtpid->u.p_psi->handle ) )
+        if( tdtpid->type == TYPE_SI &&
+           !dvbpsi_decoder_present( tdtpid->u.p_si->handle ) )
         {
-            dvbpsi_AttachDemux( tdtpid->u.p_psi->handle, SINewTableCallBack, tdtpid );
+            dvbpsi_AttachDemux( tdtpid->u.p_si->handle, SINewTableCallBack, tdtpid );
         }
     }
 
@@ -268,7 +268,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
         vlc_meta_Delete( p_meta );
     }
 
-    sdt->u.p_psi->i_version = p_sdt->i_version;
+    sdt->u.p_si->i_version = p_sdt->i_version;
     dvbpsi_sdt_delete( p_sdt );
 }
 
