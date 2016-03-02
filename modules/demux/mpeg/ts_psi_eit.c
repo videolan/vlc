@@ -79,7 +79,7 @@ static char *EITConvertToUTF8( demux_t *p_demux,
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 #ifdef HAVE_ARIBB24
-    if( p_sys->arib.e_mode == ARIBMODE_ENABLED )
+    if( p_sys->standard == TS_STANDARD_ARIB )
     {
         if ( !p_sys->arib.p_instance )
             p_sys->arib.p_instance = arib_instance_new( p_demux );
@@ -364,7 +364,8 @@ static void EITCallBack( demux_t *p_demux,
         PSI_DEBUG_TIMESHIFT(i_start);
         i_duration = EITConvertDuration( p_evt->i_duration );
 
-        if( p_sys->arib.e_mode == ARIBMODE_ENABLED )
+        /* We have to fix ARIB-B10 as all timestamps are JST */
+        if( p_sys->standard == TS_STANDARD_ARIB )
         {
             time_t i_now = time(NULL);
             time_t i_tot_time = 0;

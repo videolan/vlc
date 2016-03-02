@@ -112,23 +112,23 @@ static void Close ( vlc_object_t * );
 #define PCR_TEXT N_("Trust in-stream PCR")
 #define PCR_LONGTEXT N_("Use the stream PCR as a reference.")
 
-static const int const arib_mode_list[] =
-  { ARIBMODE_AUTO, ARIBMODE_ENABLED, ARIBMODE_DISABLED };
-static const char *const arib_mode_list_text[] =
-  { N_("Auto"), N_("Enabled"), N_("Disabled") };
+static const char *const ts_standards_list[] =
+    { "auto", "mpeg", "dvb", "arib", "atsc", "tdmb" };
+static const char *const ts_standards_list_text[] =
+  { N_("Auto"), "MPEG", "DVB", "ARIB", "ATSC", "T-DMB" };
 
-#define SUPPORT_ARIB_TEXT N_("ARIB STD-B24 mode")
-#define SUPPORT_ARIB_LONGTEXT N_( \
-    "Forces ARIB STD-B24 mode for decoding characters." \
-    "This feature affects EPG information and subtitles." )
-
-#define ATSC_MODE_TEXT N_("ATSC")
+#define STANDARD_TEXT N_("Digital TV Standard")
+#define STANDARD_LONGTEXT N_( "Selects mode for digital TV standard." \
+                              "This feature affects EPG information and subtitles." )
 
 vlc_module_begin ()
     set_description( N_("MPEG Transport Stream demuxer") )
     set_shortname ( "MPEG-TS" )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
+
+    add_string( "ts-standard", "auto", STANDARD_TEXT, STANDARD_LONGTEXT, true )
+        change_string_list( ts_standards_list, ts_standards_list_text )
 
     add_string( "ts-extra-pmt", NULL, PMT_TEXT, PMT_LONGTEXT, true )
     add_bool( "ts-trust-pcr", true, PCR_TEXT, PCR_LONGTEXT, true )
@@ -146,11 +146,6 @@ vlc_module_begin ()
 
     add_bool( "ts-split-es", true, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT, false )
     add_bool( "ts-seek-percent", false, SEEK_PERCENT_TEXT, SEEK_PERCENT_LONGTEXT, true )
-
-    add_integer( "ts-arib", ARIBMODE_AUTO, SUPPORT_ARIB_TEXT, SUPPORT_ARIB_LONGTEXT, false )
-        change_integer_list( arib_mode_list, arib_mode_list_text )
-
-    add_bool( "ts-atsc", false, ATSC_MODE_TEXT, NULL, false )
 
     add_obsolete_bool( "ts-silent" );
 
@@ -510,13 +505,28 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_canfastseek = false;
     p_sys->b_force_seek_per_percent = var_InheritBool( p_demux, "ts-seek-percent" );
 
-    p_sys->b_atsc = var_InheritBool( p_demux, "ts-atsc" );
-    if( !p_sys->b_atsc )
+    p_sys->standard = TS_STANDARD_AUTO;
+    char *psz_standard = var_InheritString( p_demux, "ts-standard" );
+    if( psz_standard )
     {
-        p_sys->b_atsc = !strcmp( p_demux->psz_access, "atsc" ) ||
-                        !strcmp( p_demux->psz_access, "usdigital" );
+        for( unsigned i=0; i<ARRAY_SIZE(ts_standards_list); i++ )
+        {
+            if( !strcmp( psz_standard, ts_standards_list[i] ) )
+            {
+                TsChangeStandard( p_sys, TS_STANDARD_AUTO + i );
+                msg_Dbg( p_demux, "Standard set to %s", ts_standards_list_text[i] );
+                break;
+            }
+        }
+        free( psz_standard );
     }
-    p_sys->arib.e_mode = var_InheritInteger( p_demux, "ts-arib" );
+
+    if( p_sys->standard == TS_STANDARD_AUTO &&
+       ( !strcmp( p_demux->psz_access, "atsc" ) ||
+         !strcmp( p_demux->psz_access, "usdigital" ) ) )
+    {
+        TsChangeStandard( p_sys, TS_STANDARD_ATSC );
+    }
 
     stream_Control( p_sys->stream, STREAM_CAN_SEEK, &p_sys->b_canseek );
     stream_Control( p_sys->stream, STREAM_CAN_FASTSEEK, &p_sys->b_canfastseek );
@@ -2415,6 +2425,14 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt,
     }
 
     return i_ret;
+}
+
+void TsChangeStandard( demux_sys_t *p_sys, ts_standards_e v )
+{
+    if( p_sys->standard != TS_STANDARD_AUTO &&
+        p_sys->standard != v )
+        return; /* TODO */
+    p_sys->standard = v;
 }
 
 bool ProgramIsSelected( demux_sys_t *p_sys, uint16_t i_pgrm )

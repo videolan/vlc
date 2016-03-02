@@ -282,12 +282,11 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
         }
     }
 
-    if ( p_sys->arib.e_mode == ARIBMODE_AUTO &&
+    if ( p_sys->standard == TS_STANDARD_AUTO &&
          registration_type == TS_PMT_REGISTRATION_NONE &&
          i_arib_score_flags == 0x07 ) //0b111
     {
         registration_type = TS_PMT_REGISTRATION_ARIB;
-        p_sys->arib.e_mode = ARIBMODE_ENABLED;
     }
 
     /* Now process private descriptors >= 0x40 */
@@ -874,7 +873,7 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pes_t *p_pes,
         p_fmt->i_cat = VIDEO_ES;
         p_fmt->i_codec = VLC_CODEC_HEVC;
     }
-    else if ( p_demux->p_sys->arib.e_mode == ARIBMODE_ENABLED )
+    else if ( p_demux->p_sys->standard == TS_STANDARD_ARIB )
     {
         /* Lookup our data component descriptor first ARIB STD B10 6.4 */
         dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0xFD );
@@ -1467,6 +1466,23 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     ts_pmt_registration_type_t registration_type = TS_PMT_REGISTRATION_NONE;
     ParsePMTRegistrations( p_demux, p_dvbpsipmt->p_first_descriptor, p_pmt, &registration_type );
 
+    if( p_sys->standard == TS_STANDARD_AUTO )
+    {
+        switch( registration_type )
+        {
+            case TS_PMT_REGISTRATION_BLURAY:
+                TsChangeStandard( p_sys, TS_STANDARD_MPEG );
+                break;
+            case TS_PMT_REGISTRATION_ARIB:
+                TsChangeStandard( p_sys, TS_STANDARD_ARIB );
+                break;
+            case TS_PMT_REGISTRATION_ATSC:
+                TsChangeStandard( p_sys, TS_STANDARD_ATSC );
+            default:
+                break;
+        }
+    }
+
     dvbpsi_pmt_es_t *p_dvbpsies;
     for( p_dvbpsies = p_dvbpsipmt->p_first_es; p_dvbpsies != NULL; p_dvbpsies = p_dvbpsies->p_next )
     {
@@ -1617,7 +1633,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     else if( stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
                              p_dvbpsipmt ) != VLC_SUCCESS )
     {
-        if ( p_sys->arib.e_mode == ARIBMODE_ENABLED && !p_sys->arib.b25stream )
+        if ( p_sys->standard == TS_STANDARD_ARIB && !p_sys->arib.b25stream )
         {
             p_sys->arib.b25stream = stream_FilterNew( p_demux->s, "aribcam" );
             p_sys->stream = ( p_sys->arib.b25stream ) ? p_sys->arib.b25stream : p_demux->s;
@@ -1627,7 +1643,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     }
 
      /* Add arbitrary PID from here */
-    if ( registration_type == TS_PMT_REGISTRATION_ATSC || p_sys->b_atsc )
+    if ( p_sys->standard == TS_STANDARD_ATSC )
     {
         ts_pid_t *atsc_base_pid = GetPID(p_sys, ATSC_BASE_PID);
         if ( PIDSetup( p_demux, TYPE_PSIP, atsc_base_pid, pmtpid ) )
