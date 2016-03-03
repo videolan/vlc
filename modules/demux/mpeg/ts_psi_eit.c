@@ -474,12 +474,14 @@ static void EITCallBack( demux_t *p_demux,
 
         /* */
         if( i_start > 0 && psz_name && psz_text)
+        {
             vlc_epg_AddEvent( p_epg, i_start, i_duration, psz_name, psz_text,
                               *psz_extra ? psz_extra : NULL, i_min_age );
 
-        /* Update "now playing" field */
-        if( p_evt->i_running_status == TS_SI_RUNSTATUS_RUNNING && i_start > 0  && psz_name && psz_text )
-            vlc_epg_SetCurrent( p_epg, i_start );
+            /* Update "now playing" field */
+            if( p_evt->i_running_status == TS_SI_RUNSTATUS_RUNNING )
+                vlc_epg_SetCurrent( p_epg, i_start );
+        }
 
         free( psz_name );
         free( psz_text );
