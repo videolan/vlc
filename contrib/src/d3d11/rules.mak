@@ -26,6 +26,7 @@ $(TARBALLS)/dxgidebug.idl:
 .sum-d3d11: $(TARBALLS)/d3d11.idl $(TARBALLS)/dxgidebug.idl
 
 $(DST_D3D11_H): $(TARBALLS)/d3d11.idl .sum-d3d11
+	(cd $(TARBALLS) && patch -fp1) < $(SRC)/d3d11/processor_format.patch
 	mkdir -p -- "$(PREFIX)/include/"
 	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
 
