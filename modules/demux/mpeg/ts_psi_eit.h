@@ -39,6 +39,6 @@
 
 void ts_si_Packet_Push( ts_pid_t *, const uint8_t * );
 
-bool ts_attach_SI_Tables_Decoders( dvbpsi_t *p_handle, void * );
+bool ts_attach_SI_Tables_Decoders( ts_pid_t * );
 
 #endif

@@ -57,24 +57,6 @@
 static void PIDFillFormat( demux_t *, ts_pes_t *p_pes, int i_stream_type, ts_es_data_type_t * );
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt );
 
-static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    if( !p_sys->b_dvb_meta || ( i_pid != 0x11 && i_pid != 0x12 && i_pid != 0x14 ) )
-        return;
-
-    msg_Warn( p_demux, "Switching to non DVB mode" );
-
-    /* This doesn't look like a DVB stream so don't try
-     * parsing the SDT/EDT/TDT */
-
-    PIDRelease( p_demux, GetPID(p_sys, 0x11) );
-    PIDRelease( p_demux, GetPID(p_sys, 0x12) );
-    PIDRelease( p_demux, GetPID(p_sys, 0x14) );
-    p_sys->b_dvb_meta = false;
-}
-
 static int PATCheck( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 {
     /* Some Dreambox streams have all PMT set to same pid */
@@ -121,16 +103,6 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
         return;
     }
 
-    /* Attach SDT after PAT. (3.14,T,A,4,Z,X100) */
-    if( p_pat->i_version == -1 && p_sys->b_dvb_meta )
-    {
-        ts_pid_t *sdtpid = GetPID(p_sys, TS_SI_SDT_PID);
-        if( sdtpid->type == TYPE_SI )
-        {
-            (void) ts_attach_SI_Tables_Decoders( sdtpid->u.p_si->handle, sdtpid );
-        }
-    }
-
     msg_Dbg( p_demux, "new PAT ts_id=%d version=%d current_next=%d",
              p_dvbpsipat->i_ts_id, p_dvbpsipat->i_version, p_dvbpsipat->b_current_next );
 
@@ -151,8 +123,6 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
             continue;
 
         ts_pid_t *pmtpid = GetPID(p_sys, p_program->i_pid);
-
-        ValidateDVBMeta( p_demux, p_program->i_pid );
 
         bool b_existing = (pmtpid->type == TYPE_PMT);
         /* create or temporary incref pid */
@@ -1444,6 +1414,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     pid_to_decref.p_elems = p_pmt->e_streams.p_elems;
     if( p_pmt->p_atsc_si_basepid )
         ARRAY_APPEND( pid_to_decref, p_pmt->p_atsc_si_basepid );
+    if( p_pmt->p_si_sdt_pid )
+        ARRAY_APPEND( pid_to_decref, p_pmt->p_si_sdt_pid );
     ARRAY_INIT(p_pmt->e_streams);
 
     if( p_pmt->iod )
@@ -1456,8 +1428,6 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
              p_dvbpsipmt->i_program_number, p_dvbpsipmt->i_version, p_dvbpsipmt->i_pcr_pid );
     p_pmt->i_pid_pcr = p_dvbpsipmt->i_pcr_pid;
     p_pmt->i_version = p_dvbpsipmt->i_version;
-
-    ValidateDVBMeta( p_demux, p_pmt->i_pid_pcr );
 
     if( ProgramIsSelected( p_sys, p_pmt->i_number ) )
         SetPIDFilter( p_sys, GetPID(p_sys, p_pmt->i_pid_pcr), true ); /* Set demux filter */
@@ -1492,8 +1462,6 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             msg_Warn( p_demux, " * PMT wants to create PES on pid %d used by non PES", pespid->i_pid );
             continue;
         }
-
-        ValidateDVBMeta( p_demux, p_dvbpsies->i_pid );
 
         char const * psz_typedesc = ISO13818_1_Get_StreamType_Description( p_dvbpsies->i_type );
 
@@ -1691,6 +1659,30 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         {
             msg_Err( p_demux, "can't attach PSIP table handlers"
                               "on already in use ATSC base pid %d", ATSC_BASE_PID );
+        }
+    }
+    else if( p_sys->standard != TS_STANDARD_MPEG && p_sys->standard != TS_STANDARD_TDMB )
+    {
+        ts_pid_t *p_sdt_pid = ts_pid_Get( &p_sys->pids, TS_SI_SDT_PID );
+        if ( PIDSetup( p_demux, TYPE_SI, p_sdt_pid, pmtpid ) ) /* Create or incref SDT */
+        {
+            if( !ts_attach_SI_Tables_Decoders( p_sdt_pid ) )
+            {
+                msg_Err( p_demux, "Can't attach SI table decoders from program %d",
+                         p_pmt->i_number );
+                PIDRelease( p_demux, p_sdt_pid );
+            }
+            else
+            {
+                p_pmt->p_si_sdt_pid = p_sdt_pid;
+                SetPIDFilter( p_demux->p_sys, p_sdt_pid, true );
+                msg_Dbg( p_demux, "  * pid=%d listening for SDT", p_sdt_pid->i_pid );
+            }
+        }
+        else if( p_sdt_pid->type != TYPE_FREE )
+        {
+            msg_Err( p_demux, "can't attach SI SDT table handler"
+                              "on already in used pid %d (Not DVB ?)", p_sdt_pid->i_pid );
         }
     }
 

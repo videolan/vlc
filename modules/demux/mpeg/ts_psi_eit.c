@@ -135,20 +135,39 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
         return;
     }
 
+    /* First callback */
     if( sdt->u.p_si->i_version == -1 )
     {
         ts_pid_t *eitpid = GetPID(p_sys, TS_SI_EIT_PID);
-        if( eitpid->type == TYPE_SI &&
-           !dvbpsi_decoder_present( eitpid->u.p_si->handle ) )
+        if ( PIDSetup( p_demux, TYPE_SI, eitpid, NULL ) )
         {
-            dvbpsi_AttachDemux( eitpid->u.p_si->handle, SINewTableCallBack, eitpid );
+            if( !ts_attach_SI_Tables_Decoders( eitpid ) )
+            {
+                msg_Err( p_demux, "Can't attach SI table decoders for pid %d", TS_SI_EIT_PID );
+                PIDRelease( p_demux, eitpid );
+            }
+            else
+            {
+                sdt->u.p_si->eitpid = eitpid;
+                SetPIDFilter( p_demux->p_sys, eitpid, true );
+                msg_Dbg( p_demux, "  * pid=%d listening for EIT", eitpid->i_pid );
+            }
         }
 
         ts_pid_t *tdtpid = GetPID(p_sys, TS_SI_TDT_PID);
-        if( tdtpid->type == TYPE_SI &&
-           !dvbpsi_decoder_present( tdtpid->u.p_si->handle ) )
+        if ( PIDSetup( p_demux, TYPE_SI, tdtpid, NULL ) )
         {
-            dvbpsi_AttachDemux( tdtpid->u.p_si->handle, SINewTableCallBack, tdtpid );
+            if( !ts_attach_SI_Tables_Decoders( tdtpid ) )
+            {
+                msg_Err( p_demux, "Can't attach SI table decoders for pid %d", TS_SI_TDT_PID );
+                PIDRelease( p_demux, tdtpid );
+            }
+            else
+            {
+                sdt->u.p_si->tdtpid = tdtpid;
+                SetPIDFilter( p_demux->p_sys, tdtpid, true );
+                msg_Dbg( p_demux, "  * pid=%d listening for TDT", tdtpid->i_pid );
+            }
         }
     }
 
@@ -598,14 +617,13 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
     }
 }
 
-bool ts_attach_SI_Tables_Decoders( dvbpsi_t *p_handle, void *p_pid )
+bool ts_attach_SI_Tables_Decoders( ts_pid_t *p_pid )
 {
-    bool b_ret = dvbpsi_AttachDemux( p_handle, SINewTableCallBack, p_pid );
-    if(!b_ret)
-    {
-        demux_t *p_demux = (demux_t *) p_handle->p_sys;
-        ts_pid_t *pid = (ts_pid_t *) p_pid;
-        msg_Warn( p_demux, "Can't attach new SI table callback for pid %d", pid->i_pid );
-    }
-    return b_ret;
+    if( p_pid->type != TYPE_SI )
+        return false;
+
+    if( dvbpsi_decoder_present( p_pid->u.p_si->handle ) )
+        return true;
+
+    return dvbpsi_AttachDemux( p_pid->u.p_si->handle, SINewTableCallBack, p_pid );
 }

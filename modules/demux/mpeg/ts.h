@@ -105,7 +105,6 @@ struct demux_sys_t
     bool        b_end_preparse;
 
     /* */
-    bool        b_dvb_meta;
     time_t      i_tdt_delta;
     bool        b_broken_charset; /* True if broken encoding is used in EPG/SDT */
 

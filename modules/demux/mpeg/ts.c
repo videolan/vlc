@@ -338,12 +338,6 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
 /*****************************************************************************
  * Open
  *****************************************************************************/
-# define VLC_DVBPSI_DEMUX_TABLE_INIT(obj, pid) \
-    do { \
-        if( !ts_attach_SI_Tables_Decoders( (pid)->u.p_psi->handle, pid ) ) \
-            msg_Warn( obj, "Can't ts_attach_SI_Tables_Decoders on pid %d", (pid)->i_pid );\
-    } while (0)
-
 static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
@@ -370,8 +364,6 @@ static int Open( vlc_object_t *p_this )
     p_demux->pf_control = Control;
 
     /* Init p_sys field */
-    p_sys->b_dvb_meta = true;
-    p_sys->b_access_control = true;
     p_sys->b_end_preparse = false;
     ARRAY_INIT( p_sys->programs );
     p_sys->b_default_selection = false;
@@ -412,29 +404,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_sys->b_dvb_meta )
-    {
-          if( !PIDSetup( p_demux, TYPE_SI, GetPID(p_sys, TS_SI_SDT_PID), NULL ) ||
-              !PIDSetup( p_demux, TYPE_SI, GetPID(p_sys, TS_SI_EIT_PID), NULL ) ||
-              !PIDSetup( p_demux, TYPE_SI, GetPID(p_sys, TS_SI_TDT_PID), NULL ) )
-          {
-              PIDRelease( p_demux, GetPID(p_sys, TS_SI_SDT_PID) );
-              PIDRelease( p_demux, GetPID(p_sys, TS_SI_EIT_PID) );
-              PIDRelease( p_demux, GetPID(p_sys, TS_SI_TDT_PID) );
-              p_sys->b_dvb_meta = false;
-          }
-          else
-          {
-              if( p_sys->b_access_control &&
-                  ( SetPIDFilter( p_sys, GetPID(p_sys, TS_SI_SDT_PID), true ) ||
-                    SetPIDFilter( p_sys, GetPID(p_sys, TS_SI_TDT_PID), true ) ||
-                    SetPIDFilter( p_sys, GetPID(p_sys, TS_SI_EIT_PID), true ) )
-                 )
-                     p_sys->b_access_control = false;
-          }
-    }
-
-# undef VLC_DVBPSI_DEMUX_TABLE_INIT
+    p_sys->b_access_control = true;
+    p_sys->b_access_control = ( VLC_SUCCESS == SetPIDFilter( p_sys, patpid, true ) );
 
     p_sys->i_pmt_es = 0;
     p_sys->b_es_all = false;
@@ -555,13 +526,6 @@ static void Close( vlc_object_t *p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     PIDRelease( p_demux, GetPID(p_sys, 0) );
-
-    if( p_sys->b_dvb_meta )
-    {
-        PIDRelease( p_demux, GetPID(p_sys, 0x11) );
-        PIDRelease( p_demux, GetPID(p_sys, 0x12) );
-        PIDRelease( p_demux, GetPID(p_sys, 0x14) );
-    }
 
     vlc_mutex_lock( &p_sys->csa_lock );
     if( p_sys->csa )
@@ -882,7 +846,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         pf = (double*) va_arg( args, double* );
 
         /* Access control test is because EPG for recordings is not relevant */
-        if( p_sys->b_dvb_meta && p_sys->b_access_control )
+        if( p_sys->b_access_control )
         {
             time_t i_time, i_length;
             if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_time, &i_length ) && i_length > 0 )
@@ -922,7 +886,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if(!p_sys->b_canseek)
             break;
 
-        if( p_sys->b_dvb_meta && p_sys->b_access_control &&
+        if( p_sys->b_access_control &&
            !p_sys->b_force_seek_per_percent && p_pmt )
         {
             time_t i_time, i_length;
@@ -979,7 +943,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_GET_TIME:
         pi64 = (int64_t*)va_arg( args, int64_t * );
 
-        if( p_sys->b_dvb_meta && p_sys->b_access_control )
+        if( p_sys->b_access_control )
         {
             time_t i_event_start;
             if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, &i_event_start, NULL ) )
@@ -1000,7 +964,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_GET_LENGTH:
         pi64 = (int64_t*)va_arg( args, int64_t * );
 
-        if( p_sys->b_dvb_meta && p_sys->b_access_control )
+        if( p_sys->b_access_control )
         {
             time_t i_event_duration;
             if( !EITCurrentEventTime( p_pmt, p_sys->i_tdt_delta, NULL, &i_event_duration ) )

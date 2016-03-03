@@ -122,7 +122,8 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
 
     pmt->i_last_dts = -1;
 
-    pmt->p_mgt      = NULL;
+    pmt->p_atsc_si_basepid      = NULL;
+    pmt->p_si_sdt_pid = NULL;
 
     pmt->pcr.i_current = -1;
     pmt->pcr.i_first  = -1;
@@ -146,8 +147,10 @@ void ts_pmt_Del( demux_t *p_demux, ts_pmt_t *pmt )
     for( int i=0; i<pmt->e_streams.i_size; i++ )
         PIDRelease( p_demux, pmt->e_streams.p_elems[i] );
     ARRAY_RESET( pmt->e_streams );
-    if( pmt->p_mgt )
-        PIDRelease( p_demux, pmt->p_mgt );
+    if( pmt->p_atsc_si_basepid )
+        PIDRelease( p_demux, pmt->p_atsc_si_basepid );
+    if( pmt->p_si_sdt_pid )
+        PIDRelease( p_demux, pmt->p_si_sdt_pid );
     if( pmt->iod )
         ODFree( pmt->iod );
     for( int i=0; i<pmt->od.objects.i_size; i++ )
@@ -310,16 +313,21 @@ ts_si_t *ts_si_New( demux_t *p_demux )
     }
 
     si->i_version  = -1;
+    si->eitpid = NULL;
+    si->tdtpid = NULL;
 
     return si;
 }
 
 void ts_si_Del( demux_t *p_demux, ts_si_t *si )
 {
-    VLC_UNUSED(p_demux);
     if( dvbpsi_decoder_present( si->handle ) )
         dvbpsi_DetachDemux( si->handle );
     dvbpsi_delete( si->handle );
+    if( si->eitpid )
+        PIDRelease( p_demux, si->eitpid );
+    if( si->tdtpid )
+        PIDRelease( p_demux, si->tdtpid );
     free( si );
 }
 
