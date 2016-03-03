@@ -886,7 +886,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     scd.OutputWindow = sys->hvideownd;
 
     IDXGIAdapter *dxgiadapter;
-# if USE_DXGI
     static const D3D_FEATURE_LEVEL featureLevels[] =
     {
         D3D_FEATURE_LEVEL_11_1,
@@ -898,6 +897,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         D3D_FEATURE_LEVEL_9_1
     };
 
+# if USE_DXGI
     /* TODO : list adapters for the user to choose from */
     hr = IDXGIFactory_EnumAdapters(sys->dxgifactory, 0, &dxgiadapter);
     if (FAILED(hr)) {
@@ -954,7 +954,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 
     for (UINT driver = 0; driver < ARRAYSIZE(driverAttempts); driver++) {
         hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
-                    NULL, 0, D3D11_SDK_VERSION,
+                    featureLevels, ARRAY_SIZE(featureLevels), D3D11_SDK_VERSION,
                     &sys->d3ddevice, NULL, &sys->d3dcontext);
         if (SUCCEEDED(hr)) {
 #ifndef NDEBUG
