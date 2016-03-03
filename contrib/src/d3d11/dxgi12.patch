@@ -1,0 +1,109 @@
+--- tarballs/dxgi1_2.idl.orig	2016-03-02 16:01:30.243405100 +0100
++++ tarballs/dxgi1_2.idl	2016-03-02 16:19:58.006959300 +0100
+@@ -232,3 +232,106 @@ interface IDXGIAdapter2 : IDXGIAdapter1
+ {
+     HRESULT GetDesc2([out] DXGI_ADAPTER_DESC2 *pDesc);
+ }
++
++typedef struct DXGI_OUTDUPL_DESC {
++    DXGI_MODE_DESC ModeDesc;
++    DXGI_MODE_ROTATION Rotation;
++    BOOL DesktopImageInSystemMemory;
++} DXGI_OUTDUPL_DESC;
++
++typedef struct DXGI_OUTDUPL_POINTER_POSITION {
++    POINT Position;
++    BOOL Visible;
++} DXGI_OUTDUPL_POINTER_POSITION;
++
++typedef struct DXGI_OUTDUPL_FRAME_INFO {
++    LARGE_INTEGER LastPresentTime;
++    LARGE_INTEGER LastMouseUpdateTime;
++    UINT AccumulatedFrames;
++    BOOL RectsCoalesced;
++    BOOL ProtectedContentMaskedOut;
++    DXGI_OUTDUPL_POINTER_POSITION PointerPosition;
++    UINT TotalMetadataBufferSize;
++    UINT PointerShapeBufferSize;
++} DXGI_OUTDUPL_FRAME_INFO;
++
++typedef struct DXGI_OUTDUPL_MOVE_RECT {
++    POINT SourcePoint;
++    RECT  DestinationRect;
++} DXGI_OUTDUPL_MOVE_RECT;
++
++typedef struct DXGI_OUTDUPL_POINTER_SHAPE_INFO {
++    UINT Type;
++    UINT Width;
++    UINT Height;
++    UINT Pitch;
++    POINT HotSpot;
++} DXGI_OUTDUPL_POINTER_SHAPE_INFO;
++[
++    object,
++    uuid(191cfac3-a341-470d-b26e-a864f428319c),
++    local,
++    pointer_default(unique)
++]
++interface IDXGIOutputDuplication :
++    IDXGIObject
++{
++    void GetDesc(
++            [out] DXGI_OUTDUPL_DESC* pDesc);
++    HRESULT AcquireNextFrame(
++            [in] UINT TimeoutInMilliseconds,
++            [out] DXGI_OUTDUPL_FRAME_INFO* pFrameInfo,
++            [out] IDXGIResource** ppDesktopResource);
++    HRESULT GetFrameDirtyRects(
++            [in] UINT DirtyRectsBufferSize,
++            [out] RECT* pDirtyRectsBuffer,
++            [out] UINT* pDirtyRectsBufferSizeRequired);
++    HRESULT GetFrameMoveRects(
++            [in] UINT MoveRectsBufferSize,
++            [out] DXGI_OUTDUPL_MOVE_RECT* pMoveRectBuffer,
++            [out] UINT* pMoveRectsBufferSizeRequired);
++    HRESULT GetFramePointerShape(
++            [in] UINT PointerShapeBufferSize,
++            [out] void* pPointerShapeBuffer,
++            [out] UINT* pPointerShapeBufferSizeRequired,
++            [out] DXGI_OUTDUPL_POINTER_SHAPE_INFO* pPointerShapeInfo);
++    HRESULT MapDesktopSurface(
++            [out] DXGI_MAPPED_RECT* pLockedRect);
++    HRESULT UnMapDesktopSurface();
++    HRESULT ReleaseFrame();
++};
++
++typedef struct DXGI_MODE_DESC1
++{
++    UINT Width;
++    UINT Height;
++    DXGI_RATIONAL RefreshRate;
++    DXGI_FORMAT Format;
++    DXGI_MODE_SCANLINE_ORDER ScanlineOrdering;
++    DXGI_MODE_SCALING Scaling;
++    BOOL Stereo;
++} DXGI_MODE_DESC1;
++
++[
++    object,
++    uuid(00cddea8-939b-4b83-a340-a685226666cc),
++    local,
++    pointer_default(unique)
++]
++interface IDXGIOutput1 : IDXGIOutput
++{
++    HRESULT GetDisplayModeList1(
++            [in] DXGI_FORMAT EnumFormat,
++            [in] UINT Flags,
++            [in, out] UINT * pNumModes,
++            [out] DXGI_MODE_DESC1 *pDesc);
++    HRESULT FindClosestMatchingMode1(
++            [in] const DXGI_MODE_DESC1 *pModeToMatch,
++            [out] DXGI_MODE_DESC1 *pClosestMatch,
++            [in] IUnknown * pConcernedDevice);
++    HRESULT GetDisplaySurfaceData1(
++            [in] IDXGIResource *pDestination);
++    HRESULT DuplicateOutput(
++            [in] IUnknown    *pDevice,
++            [out] IDXGIOutputDuplication **ppOutputDuplication);
++};
