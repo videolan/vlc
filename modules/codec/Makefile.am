@@ -289,6 +289,13 @@ libvorbis_plugin_la_LIBADD = $(VORBIS_LIBS)
 EXTRA_LTLIBRARIES += libvorbis_plugin.la
 codec_LTLIBRARIES += $(LTLIBvorbis)
 
+liboggspots_plugin_la_SOURCES = codec/oggspots.c
+liboggspots_plugin_la_CFLAGS = $(AM_CFLAGS) $(OGGSPOTS_CFLAGS)
+liboggspots_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+liboggspots_plugin_la_LIBADD = $(OGGSPOTS_LIBS)
+EXTRA_LTLIBRARIES += liboggspots_plugin.la
+codec_LTLIBRARIES += $(LTLIBoggspots)
+
 libvideotoolbox_plugin_la_SOURCES = video_chroma/copy.c video_chroma/copy.h codec/videotoolbox.m \
                                     packetizer/h264_nal.c packetizer/h264_nal.h \
                                     packetizer/hxxx_nal.c packetizer/hxxx_nal.h

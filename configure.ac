@@ -2763,6 +2763,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([THEORA], [], [ogg theoradec >= 1.0 theoraenc], [experimental theora codec], [auto])
 
 dnl
+dnl  OggSpots decoder plugin
+dnl
+PKG_ENABLE_MODULES_VLC([OGGSPOTS], [], [ogg], [experimental OggSpots codec], [auto])
+
+dnl
 dnl  Daala decoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([DAALA], [], [ogg daaladec daalaenc], [experimental daala codec], [disabled])
