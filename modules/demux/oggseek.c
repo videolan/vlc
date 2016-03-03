@@ -738,6 +738,13 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
         i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
         break;
     }
+    case VLC_CODEC_OGGSPOTS:
+    {
+        if ( b_presentation ) return VLC_TS_INVALID;
+        i_timestamp = ( i_granule >> p_stream->i_granule_shift )
+                * CLOCK_FREQ / p_stream->f_rate;
+        break;
+    }
     }
 
     return i_timestamp;

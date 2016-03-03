@@ -151,6 +151,7 @@ static void Ogg_ReadAnnodexHeader( demux_t *, logical_stream_t *, ogg_packet * )
 static bool Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
 static bool Ogg_ReadVP8Header( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadSkeletonHeader( demux_t *, logical_stream_t *, ogg_packet * );
+static bool Ogg_ReadOggSpotsHeader( logical_stream_t *, ogg_packet * );
 
 /* Skeleton */
 static void Ogg_ReadSkeletonBones( demux_t *, ogg_packet * );
@@ -639,6 +640,8 @@ static int Demux( demux_t * p_demux )
 
         if( p_stream->fmt.i_cat == SPU_ES )
             continue;
+        if( p_stream->fmt.i_codec == VLC_CODEC_OGGSPOTS )
+            continue;
         if( p_stream->i_pcr < VLC_TS_0 )
             continue;
         if ( p_stream->b_finished || p_stream->b_initializing )
@@ -983,6 +986,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             p_stream->fmt.i_codec == VLC_CODEC_VP8 ||
             p_stream->fmt.i_codec == VLC_CODEC_DIRAC ||
             p_stream->fmt.i_codec == VLC_CODEC_SPEEX ||
+            p_stream->fmt.i_codec == VLC_CODEC_OGGSPOTS ||
             (p_stream->b_oggds && p_stream->fmt.i_cat == VIDEO_ES) )
         {
             p_stream->i_pcr = VLC_TS_0 + Oggseek_GranuleToAbsTimestamp( p_stream,
@@ -1413,7 +1417,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_stream->fmt.i_codec != VLC_CODEC_DAALA &&
         p_stream->fmt.i_codec != VLC_CODEC_CMML &&
         p_stream->fmt.i_codec != VLC_CODEC_DIRAC &&
-        p_stream->fmt.i_codec != VLC_CODEC_KATE )
+        p_stream->fmt.i_codec != VLC_CODEC_KATE &&
+        p_stream->fmt.i_codec != VLC_CODEC_OGGSPOTS )
     {
         if( p_oggpacket->bytes <= 0 )
         {
@@ -2012,6 +2017,22 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     msg_Dbg( p_demux, "stream %d is a skeleton",
                                 p_ogg->i_streams-1 );
                     Ogg_ReadSkeletonHeader( p_demux, p_stream, &oggpacket );
+                }
+                /* Check for OggSpots header */
+                else if( oggpacket.bytes >= 8 &&
+                         ! memcmp( oggpacket.packet, "SPOTS\0\0", 8 ) )
+                {
+                    if ( Ogg_ReadOggSpotsHeader( p_stream, &oggpacket ) )
+                        msg_Dbg( p_demux,
+                                 "found OggSpots header, time resolution: %f",
+                                 p_stream->f_rate );
+                    else
+                    {
+                        msg_Err( p_demux, "found invalid OggSpots header" );
+                        Ogg_LogicalStreamDelete( p_demux, p_stream );
+                        p_stream = NULL;
+                        p_ogg->i_streams--;
+                    }
                 }
                 else
                 {
@@ -3381,6 +3402,69 @@ static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     /* probably is an ogg dirac es */
     p_stream->fmt.i_cat = VIDEO_ES;
     p_stream->fmt.i_codec = VLC_CODEC_DIRAC;
+
+    return true;
+}
+
+static bool Ogg_ReadOggSpotsHeader( logical_stream_t *p_stream,
+                                    ogg_packet *p_oggpacket )
+{
+    uint64_t i_granulerate_numerator;
+    uint64_t i_granulerate_denominator;
+    int i_major;
+    int i_minor;
+
+    p_stream->fmt.i_cat = VIDEO_ES;
+    p_stream->fmt.i_codec = VLC_CODEC_OGGSPOTS;
+
+    /* Signal that we want to keep a backup of the OggSpots
+     * stream headers. They will be used when switching between
+     * audio streams. */
+    p_stream->b_force_backup = true;
+
+    /* Cheat and get additionnal info ;) */
+    if ( p_oggpacket->bytes != 52 )
+    {
+        /* The OggSpots header is always 52 bytes */
+        return false;
+    }
+
+    i_major = GetWLE( &p_oggpacket->packet[ 8] ); /* major version num */
+    i_minor = GetWLE( &p_oggpacket->packet[10] ); /* minor version num */
+    if ( i_major != 0 || i_minor != 1 )
+    {
+        return false;
+    }
+
+    /* Granule rate */
+    i_granulerate_numerator   = GetQWLE( &p_oggpacket->packet[12] );
+    i_granulerate_denominator = GetQWLE( &p_oggpacket->packet[20] );
+    if ( i_granulerate_numerator == 0 || i_granulerate_denominator == 0 )
+    {
+        return false;
+    }
+
+    /* The OggSpots spec contained an error and there are implementations out
+     * there that used the wrong value. So we detect that case and switch
+     * numerator and denominator in that case */
+    if ( i_granulerate_numerator == 1 && i_granulerate_denominator == 30 )
+    {
+        i_granulerate_numerator   = 30;
+        i_granulerate_denominator = 1;
+    }
+
+    p_stream->f_rate = ((double)i_granulerate_numerator) / i_granulerate_denominator;
+    if ( p_stream->f_rate == 0 )
+    {
+        return false;
+    }
+
+    /* Normalize granulerate */
+    vlc_ureduce(&p_stream->fmt.video.i_frame_rate,
+                &p_stream->fmt.video.i_frame_rate_base,
+                i_granulerate_numerator, i_granulerate_denominator, 0);
+
+    p_stream->i_granule_shift = p_oggpacket->packet[28];
 
     return true;
 }
