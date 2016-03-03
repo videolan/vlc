@@ -61,9 +61,9 @@ static const char *demux_FromContentType(const char *mime)
         { "audio/mpeg",          "mp3"     },
         { "application/rss+xml", "podcast" },
         //{ "video/MP1S",          "es,mpgv" }, !b_force
+        { "video/dv",            "rawdv"   },
         { "video/MP2P",          "ps"      },
         { "video/MP2T",          "ts"      },
-        { "video/dv",            "rawdv"   },
         { "video/nsa",           "nsv"     },
         { "video/nsv",           "nsv"     },
     };
