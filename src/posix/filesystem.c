@@ -49,7 +49,7 @@
 #include <vlc_common.h>
 #include <vlc_fs.h>
 
-#ifndef HAVE_ACCEPT4
+#if !defined(HAVE_ACCEPT4) || !defined HAVE_MKOSTEMP
 static inline void vlc_cloexec(int fd)
 {
     fcntl(fd, F_SETFD, FD_CLOEXEC | fcntl(fd, F_GETFD));
