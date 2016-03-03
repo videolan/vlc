@@ -28,11 +28,7 @@
 #endif
 #ifdef MODULE_NAME_IS_direct3d11
 # include <d3d11.h>
-# if VLC_WINSTORE_APP
-#  include <dxgi1_2.h>
-# else
-#  include <dxgi.h>
-#endif
+# include <dxgi1_2.h>
 # include <d3dcompiler.h>
 #endif
 #ifdef MODULE_NAME_IS_direct3d9
@@ -174,15 +170,13 @@ struct vout_display_sys_t
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
     HINSTANCE                hd3d11_dll;       /* handle of the opened d3d11 dll */
     HINSTANCE                hd3dcompiler_dll; /* handle of the opened d3dcompiler dll */
-    IDXGIFactory             *dxgifactory;     /* DXGI factory */
-    IDXGISwapChain           *dxgiswapChain;   /* DXGI 1.0 swap chain */
+    IDXGIFactory2            *dxgifactory;     /* DXGI 1.2 factory */
     /* We should find a better way to store this or atleast a shorter name */
     PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN OurD3D11CreateDeviceAndSwapChain;
     PFN_D3D11_CREATE_DEVICE                OurD3D11CreateDevice;
     pD3DCompile                            OurD3DCompile;
-#else
-    IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.1 swap chain */
 #endif
+    IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.1 swap chain */
     ID3D11Device             *d3ddevice;       /* D3D device */
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
     d3d_quad_t               picQuad;
