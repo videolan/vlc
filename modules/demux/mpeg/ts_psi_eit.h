@@ -33,6 +33,7 @@
 #define TS_SI_RUNSTATUS_STARTING  0x02
 #define TS_SI_RUNSTATUS_PAUSING   0x03
 #define TS_SI_RUNSTATUS_RUNNING   0x04
+#define TS_SI_RUNSTATUS_OFF_AIR   0x05
 
 bool ts_attach_PSINewTableCallBack( dvbpsi_t *p_handle, void * );
 
