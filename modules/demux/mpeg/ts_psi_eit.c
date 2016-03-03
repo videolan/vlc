@@ -520,10 +520,12 @@ static void EITCallBack( demux_t *p_demux,
         }
 
         /* */
-        if( i_start > 0 && psz_name && psz_text)
+        if( i_start > 0 )
         {
-            vlc_epg_AddEvent( p_epg, i_start, i_duration, psz_name, psz_text,
-                              *psz_extra ? psz_extra : NULL, i_min_age );
+            vlc_epg_AddEvent( p_epg, i_start, i_duration,
+                              (psz_name && *psz_name) ? psz_name : NULL,
+                              (psz_text && *psz_text) ? psz_text : NULL,
+                              (psz_extra && *psz_extra) ? psz_extra : NULL, i_min_age );
 
             /* Update "now playing" field */
             if( p_evt->i_running_status == TS_SI_RUNSTATUS_RUNNING )
