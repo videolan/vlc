@@ -1442,8 +1442,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     pid_to_decref.i_alloc = p_pmt->e_streams.i_alloc;
     pid_to_decref.i_size = p_pmt->e_streams.i_size;
     pid_to_decref.p_elems = p_pmt->e_streams.p_elems;
-    if( p_pmt->p_mgt )
-        ARRAY_APPEND( pid_to_decref, p_pmt->p_mgt );
+    if( p_pmt->p_atsc_si_basepid )
+        ARRAY_APPEND( pid_to_decref, p_pmt->p_atsc_si_basepid );
     ARRAY_INIT(p_pmt->e_streams);
 
     if( p_pmt->iod )
@@ -1657,7 +1657,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             }
             else
             {
-                p_pmt->p_mgt = atsc_base_pid;
+                p_pmt->p_atsc_si_basepid = atsc_base_pid;
                 SetPIDFilter( p_demux->p_sys, atsc_base_pid, true );
                 msg_Dbg( p_demux, "  * pid=%d listening for MGT/STT", atsc_base_pid->i_pid );
 

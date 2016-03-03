@@ -49,7 +49,7 @@ struct ts_pmt_t
 
     DECL_ARRAY(ts_pid_t *) e_streams;
 
-    ts_pid_t        *p_mgt;
+    ts_pid_t        *p_atsc_si_basepid;
 
     struct
     {
