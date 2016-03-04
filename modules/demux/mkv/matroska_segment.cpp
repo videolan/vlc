@@ -818,12 +818,11 @@ struct spoint
 {
     spoint(unsigned int tk, mtime_t mk_date, int64_t pos, int64_t cpos):
         i_track(tk),i_mk_date(mk_date), i_seek_pos(pos),
-        i_cluster_pos(cpos), p_next(NULL){}
+        i_cluster_pos(cpos){}
     unsigned int     i_track;
     mtime_t i_mk_date;
     int64_t i_seek_pos;
     int64_t i_cluster_pos;
-    spoint * p_next;
 };
 
 void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int64_t i_global_position )
@@ -835,10 +834,10 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
     int64_t     i_seek_position = i_start_pos;
     mtime_t     i_mk_seek_time = i_mk_start_time;
     mtime_t     i_mk_pts = 0;
-    spoint *p_first = NULL;
-    spoint *p_last = NULL;
     int i_cat;
     bool b_has_key = false;
+
+    std::vector<spoint> spoints;
 
     for( size_t i = 0; i < tracks.size(); i++)
         tracks[i]->i_last_dts = VLC_TS_INVALID;
@@ -947,34 +946,16 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
             }
             if( tracks[i_track]->fmt.i_cat == i_cat )
             {
-                spoint * seekpoint = new (std::nothrow) spoint(i_track, i_mk_seek_time, i_seek_position, i_seek_position);
-                if( unlikely( !seekpoint ) )
-                {
-                    for( spoint * sp = p_first; sp; )
-                    {
-                        spoint * tmp = sp;
-                        sp = sp->p_next;
-                        delete tmp;
-                    }
-                    return;
-                }
-                if( unlikely( !p_first ) )
-                {
-                    p_first = seekpoint;
-                    p_last = seekpoint;
-                }
-                else
-                {
-                    p_last->p_next = seekpoint;
-                    p_last = seekpoint;
-                }
+                spoints.push_back (
+                  spoint (i_track, i_mk_seek_time, i_seek_position, i_seek_position)
+                );
             }
         }
-        if( likely( p_first ) )
+        if ( likely( !spoints.empty() ) )
             break;
     }
     /*Neither video nor audio track... no seek further*/
-    if( unlikely( !p_first ) )
+    if( unlikely( spoints.empty() ) )
     {
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_date );
         return;
@@ -989,12 +970,6 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
             if( BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
             {
                 msg_Warn( &sys.demuxer, "cannot get block EOF?" );
-                while( p_first )
-                {
-                    spoint *tmp = p_first;
-                    p_first = p_first->p_next;
-                    delete tmp;
-                }
                 return;
             }
 
@@ -1015,17 +990,18 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
                 if( tracks[i_track]->fmt.i_cat == i_cat && b_key_picture )
                 {
                     /* get the seekpoint */
-                    spoint * sp;
-                    for( sp =  p_first; sp; sp = sp->p_next )
-                        if( sp->i_track == i_track )
+                    std::vector<spoint>::iterator it;
+
+                    for ( it = spoints.begin (); it != spoints.end (); ++it )
+                        if (it->i_track == i_track)
                             break;
 
-                    sp->i_mk_date = i_mk_pts;
+                    it->i_mk_date = i_mk_pts;
                     if( simpleblock )
-                        sp->i_seek_pos = simpleblock->GetElementPosition();
+                        it->i_seek_pos = simpleblock->GetElementPosition();
                     else
-                        sp->i_seek_pos = i_block_pos;
-                    sp->i_cluster_pos = i_cluster_pos;
+                        it->i_seek_pos = i_block_pos;
+                    it->i_cluster_pos = i_cluster_pos;
                     b_has_key = true;
                 }
             }
@@ -1047,15 +1023,17 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
     }
 
     /* rewind to the last I img */
-    spoint * p_min;
-    for( p_min  = p_first, p_last = p_first; p_last; p_last = p_last->p_next )
-        if( p_last->i_mk_date < p_min->i_mk_date )
-            p_min = p_last;
+    std::vector<spoint>::const_iterator it;
+    std::vector<spoint>::const_iterator it_min = spoints.begin ();
 
-    sys.i_pts = p_min->i_mk_date + VLC_TS_0;
+    for (it = spoints.begin () + 1; it != spoints.end (); ++it)
+        if ( it->i_mk_date < it_min->i_mk_date )
+            it_min = it;
+
+    sys.i_pts = it_min->i_mk_date + VLC_TS_0;
     sys.i_pcr = VLC_TS_INVALID;
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_date );
-    cluster = static_cast<KaxCluster*>( ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos ) );
+    cluster = static_cast<KaxCluster*>( ep->UnGet( it_min->i_seek_pos, it_min->i_cluster_pos ) );
 
     /* hack use BlockGet to get the cluster then goto the wanted block */
     if ( !cluster )
@@ -1064,14 +1042,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
         bool b_discardable_picture;
         BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration );
         delete block;
-        cluster = static_cast<KaxCluster*>( ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos ) );
-    }
-
-    while( p_first )
-    {
-        p_min = p_first;
-        p_first = p_first->p_next;
-        delete p_min;
+        cluster = static_cast<KaxCluster*>( ep->UnGet( it_min->i_seek_pos, it_min->i_cluster_pos ) );
     }
 }
 
