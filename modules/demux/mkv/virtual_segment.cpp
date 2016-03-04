@@ -575,8 +575,8 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
         sk->psz_name = strdup( p_edition->psz_name.c_str() );
 
         title.i_seekpoint++;
-        title.seekpoint = (seekpoint_t**)xrealloc( title.seekpoint,
-                             title.i_seekpoint * sizeof( seekpoint_t* ) );
+        title.seekpoint = static_cast<seekpoint_t**>( xrealloc( title.seekpoint,
+                             title.i_seekpoint * sizeof( seekpoint_t* ) ) );
         title.seekpoint[title.i_seekpoint - 1] = sk;
         i_level++;
 
