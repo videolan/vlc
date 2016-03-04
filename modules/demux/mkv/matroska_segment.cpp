@@ -65,7 +65,7 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estr
     ,b_preloaded(false)
     ,b_ref_external_segments(false)
 {
-    p_indexes = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * i_index_max );
+    p_indexes = static_cast<mkv_index_t*>( malloc( sizeof( mkv_index_t ) * i_index_max ) );
 }
 
 matroska_segment_c::~matroska_segment_c()
@@ -139,7 +139,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             {
                 if( MKV_IS_ID( el, KaxCueTime ) )
                 {
-                    KaxCueTime &ctime = *(KaxCueTime*)el;
+                    KaxCueTime &ctime = *static_cast<KaxCueTime*>( el );
                     try
                     {
                         if( unlikely( !ctime.ValidateSize() ) )
@@ -156,7 +156,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                         b_invalid_cue = true;
                         break;
                     }
-                    idx.i_mk_time = uint64( ctime ) * i_timescale / INT64_C(1000);
+                    idx.i_mk_time = static_cast<uint64>( ctime ) * i_timescale / INT64_C(1000);
                 }
                 else if( MKV_IS_ID( el, KaxCueTrackPositions ) )
                 {
@@ -175,23 +175,23 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 
                             if( MKV_IS_ID( el, KaxCueTrack ) )
                             {
-                                KaxCueTrack &ctrack = *(KaxCueTrack*)el;
+                                KaxCueTrack &ctrack = *static_cast<KaxCueTrack*>( el );
                                 ctrack.ReadData( es.I_O() );
-                                idx.i_track = uint16( ctrack );
+                                idx.i_track = static_cast<uint16>( ctrack );
                             }
                             else if( MKV_IS_ID( el, KaxCueClusterPosition ) )
                             {
-                                KaxCueClusterPosition &ccpos = *(KaxCueClusterPosition*)el;
+                                KaxCueClusterPosition &ccpos = *static_cast<KaxCueClusterPosition*>( el );
 
                                 ccpos.ReadData( es.I_O() );
-                                idx.i_position = segment->GetGlobalPosition( uint64( ccpos ) );
+                                idx.i_position = segment->GetGlobalPosition( static_cast<uint64>( ccpos ) );
                             }
                             else if( MKV_IS_ID( el, KaxCueBlockNumber ) )
                             {
-                                KaxCueBlockNumber &cbnum = *(KaxCueBlockNumber*)el;
+                                KaxCueBlockNumber &cbnum = *static_cast<KaxCueBlockNumber*>( el );
 
                                 cbnum.ReadData( es.I_O() );
-                                idx.i_block_number = uint32( cbnum );
+                                idx.i_block_number = static_cast<uint32>( cbnum );
                             }
 #if LIBMATROSKA_VERSION >= 0x010401
                             else if( MKV_IS_ID( el, KaxCueRelativePosition ) )
@@ -236,8 +236,8 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                 if( i_index >= i_index_max )
                 {
                     i_index_max += 1024;
-                    p_indexes = (mkv_index_t*)xrealloc( p_indexes,
-                                                        sizeof( mkv_index_t ) * i_index_max );
+                    p_indexes = static_cast<mkv_index_t*>( xrealloc( p_indexes,
+                                                        sizeof( mkv_index_t ) * i_index_max ) );
                 }
             }
 #undef idx
@@ -309,32 +309,32 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
             }
             if( MKV_IS_ID( el, KaxTagName ) )
             {
-                KaxTagName &key = *(KaxTagName*)el;
+                KaxTagName &key = *static_cast<KaxTagName*>( el );
                 key.ReadData( es.I_O(), SCOPE_ALL_DATA );
                 p_simple->psz_tag_name = strdup( UTFstring( key ).GetUTF8().c_str() );
             }
             else if( MKV_IS_ID( el, KaxTagString ) )
             {
-                KaxTagString &value = *(KaxTagString*)el;
+                KaxTagString &value = *static_cast<KaxTagString*>( el );
                 value.ReadData( es.I_O(), SCOPE_ALL_DATA );
                 p_simple->p_value = strdup( UTFstring( value ).GetUTF8().c_str() );
             }
             else if(  MKV_IS_ID( el, KaxTagLangue ) )
             {
-                KaxTagLangue &language = *(KaxTagLangue*) el;
+                KaxTagLangue &language = *static_cast<KaxTagLangue*>( el );
                 language.ReadData( es.I_O(), SCOPE_ALL_DATA );
                 p_simple->psz_lang = strdup( std::string( language ).c_str());
             }
             else if(  MKV_IS_ID( el, KaxTagDefault ) )
             {
-                KaxTagDefault & dft = *(KaxTagDefault*) el;
+                KaxTagDefault & dft = *static_cast<KaxTagDefault*>( el );
                 dft.ReadData( es.I_O(), SCOPE_ALL_DATA );
-                p_simple->b_default = (bool) uint8( dft );
+                p_simple->b_default = static_cast<bool>( static_cast<uint8>( dft ) );
             }
             /*Tags can be nested*/
             else if( MKV_IS_ID( el, KaxTagSimple) )
             {
-                SimpleTag * p_st = ParseSimpleTags( (KaxTagSimple*)el, target_type );
+                SimpleTag * p_st = ParseSimpleTags( static_cast<KaxTagSimple*>( el ), target_type );
                 if( p_st )
                     p_simple->sub_tags.push_back( p_st );
             }
@@ -420,43 +420,43 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                             }
                             if( MKV_IS_ID( el, KaxTagTargetTypeValue ) )
                             {
-                                KaxTagTargetTypeValue &value = *(KaxTagTargetTypeValue*)el;
+                                KaxTagTargetTypeValue &value = *static_cast<KaxTagTargetTypeValue*>( el );
                                 value.ReadData( es.I_O() );
 
-                                msg_Dbg( &sys.demuxer, "|   |   + TargetTypeValue: %u", uint32(value));
-                                target_type = uint32(value);
+                                msg_Dbg( &sys.demuxer, "|   |   + TargetTypeValue: %u", static_cast<uint32>(value));
+                                target_type = static_cast<uint32>(value);
                             }
                             else if( MKV_IS_ID( el, KaxTagTrackUID ) )
                             {
                                 p_tag->i_tag_type = TRACK_UID;
-                                KaxTagTrackUID &uid = *(KaxTagTrackUID*) el;
+                                KaxTagTrackUID &uid = *static_cast<KaxTagTrackUID*>( el );
                                 uid.ReadData( es.I_O() );
-                                p_tag->i_uid = uint64( uid );
+                                p_tag->i_uid = static_cast<uint64>( uid );
                                 msg_Dbg( &sys.demuxer, "|   |   + TrackUID: %" PRIu64, p_tag->i_uid);
 
                             }
                             else if( MKV_IS_ID( el, KaxTagEditionUID ) )
                             {
                                 p_tag->i_tag_type = EDITION_UID;
-                                KaxTagEditionUID &uid = *(KaxTagEditionUID*) el;
+                                KaxTagEditionUID &uid = *static_cast<KaxTagEditionUID*>( el );
                                 uid.ReadData( es.I_O() );
-                                p_tag->i_uid = uint64( uid );
+                                p_tag->i_uid = static_cast<uint64>( uid );
                                 msg_Dbg( &sys.demuxer, "|   |   + EditionUID: %" PRIu64, p_tag->i_uid);
                             }
                             else if( MKV_IS_ID( el, KaxTagChapterUID ) )
                             {
                                 p_tag->i_tag_type = CHAPTER_UID;
-                                KaxTagChapterUID &uid = *(KaxTagChapterUID*) el;
+                                KaxTagChapterUID &uid = *static_cast<KaxTagChapterUID*>( el );
                                 uid.ReadData( es.I_O() );
-                                p_tag->i_uid = uint64( uid );
+                                p_tag->i_uid = static_cast<uint64>( uid );
                                 msg_Dbg( &sys.demuxer, "|   |   + ChapterUID: %" PRIu64, p_tag->i_uid);
                             }
                             else if( MKV_IS_ID( el, KaxTagAttachmentUID ) )
                             {
                                 p_tag->i_tag_type = ATTACHMENT_UID;
-                                KaxTagAttachmentUID &uid = *(KaxTagAttachmentUID*) el;
+                                KaxTagAttachmentUID &uid = *static_cast<KaxTagAttachmentUID*>( el );
                                 uid.ReadData( es.I_O() );
-                                p_tag->i_uid = uint64( uid );
+                                p_tag->i_uid = static_cast<uint64>( uid );
                                 msg_Dbg( &sys.demuxer, "|   |   + AttachmentUID: %" PRIu64, p_tag->i_uid);
                             }
                             else
@@ -607,8 +607,8 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     if( i_index >= i_index_max )
     {
         i_index_max += 1024;
-        p_indexes = (mkv_index_t*)xrealloc( p_indexes,
-                                        sizeof( mkv_index_t ) * i_index_max );
+        p_indexes = static_cast<mkv_index_t*>( xrealloc( p_indexes,
+                                        sizeof( mkv_index_t ) * i_index_max ) );
     }
 #undef idx
 }
@@ -637,12 +637,12 @@ bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a
     if ( p_item_a == NULL || p_item_b == NULL )
         return false;
 
-    p_tmp = (EbmlBinary *)p_item_a->p_segment_uid;
+    p_tmp = static_cast<EbmlBinary *>( p_item_a->p_segment_uid );
     if ( p_item_b->p_prev_segment_uid != NULL
           && *p_tmp == *p_item_b->p_prev_segment_uid )
         return true;
 
-    p_tmp = (EbmlBinary *)p_item_a->p_next_segment_uid;
+    p_tmp = static_cast<EbmlBinary *>( p_item_a->p_next_segment_uid );
     if ( !p_tmp )
         return false;
 
@@ -717,7 +717,7 @@ bool matroska_segment_c::Preload( )
         {
             msg_Dbg( &sys.demuxer, "|   + Cluster" );
 
-            cluster = (KaxCluster*)el;
+            cluster = static_cast<KaxCluster*>( el );
 
             i_cluster_pos = i_start_pos = cluster->GetElementPosition();
             ParseCluster( cluster );
@@ -771,7 +771,7 @@ bool matroska_segment_c::Preload( )
 /* Here we try to load elements that were found in Seek Heads, but not yet parsed */
 bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int64_t i_element_position )
 {
-    int64_t     i_sav_position = (int64_t)es.I_O().getFilePointer();
+    int64_t     i_sav_position = static_cast<int64_t>( es.I_O().getFilePointer() );
     EbmlElement *el;
 
     es.I_O().setFilePointer( i_element_position, seek_beginning );
@@ -917,16 +917,16 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
         {
             if( MKV_IS_ID( el, KaxCluster ) )
             {
-                cluster = (KaxCluster *)el;
+                cluster = static_cast<KaxCluster *>( el );
                 i_cluster_pos = cluster->GetElementPosition();
                 if( i_index == 0 ||
                     ( i_index > 0 &&
-                      p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
+                      p_indexes[i_index - 1].i_position < static_cast<int64_t> ( cluster->GetElementPosition() ) ) )
                 {
                     ParseCluster( cluster, false, SCOPE_NO_DATA );
                     IndexAppendCluster( cluster );
                 }
-                if( es.I_O().getFilePointer() >= (unsigned) i_global_position )
+                if( es.I_O().getFilePointer() >= static_cast<unsigned>( i_global_position ) )
                     break;
             }
         }
@@ -1103,7 +1103,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
     sys.i_pts = p_min->i_mk_date + VLC_TS_0;
     sys.i_pcr = VLC_TS_INVALID;
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_date );
-    cluster = (KaxCluster *) ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos );
+    cluster = static_cast<KaxCluster*>( ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos ) );
 
     /* hack use BlockGet to get the cluster then goto the wanted block */
     if ( !cluster )
@@ -1112,7 +1112,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
         bool b_discardable_picture;
         BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration );
         delete block;
-        cluster = (KaxCluster *) ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos );
+        cluster = static_cast<KaxCluster*>( ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos ) );
     }
 
     while( p_first )
@@ -1170,7 +1170,7 @@ void matroska_segment_c::ComputeTrackPriority()
 
         if( unlikely( p_fmt->i_cat == UNKNOWN_ES || !p_tk->psz_codec ) )
         {
-            msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", (int)i_track, p_tk->i_number );
+            msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", static_cast<int>( i_track ), p_tk->i_number );
             p_tk->p_es = NULL;
             continue;
         }
@@ -1254,7 +1254,7 @@ void matroska_segment_c::EnsureDuration()
         ep = new EbmlParser( &es , segment, &sys.demuxer,
                              var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
 
-        KaxCluster *p_last_cluster = (KaxCluster *) ep->Get();
+        KaxCluster *p_last_cluster = static_cast<KaxCluster*>( ep->Get() );
         if( p_last_cluster == NULL )
             return;
         ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA );
@@ -1267,13 +1267,13 @@ void matroska_segment_c::EnsureDuration()
 
             if( MKV_IS_ID( l, KaxSimpleBlock ) )
             {
-                KaxSimpleBlock *block = (KaxSimpleBlock*)l;
+                KaxSimpleBlock *block = static_cast<KaxSimpleBlock*>( l );
                 block->SetParent( *p_last_cluster );
                 i_last_timecode = std::max(i_last_timecode, block->GlobalTimecode());
             }
             else if( MKV_IS_ID( l, KaxBlockGroup ) )
             {
-                KaxBlockGroup *group = (KaxBlockGroup*)l;
+                KaxBlockGroup *group = static_cast<KaxBlockGroup*>( l );
                 uint64 i_group_timecode = 0;
                 for( unsigned int j = 0; j < group->ListSize(); j++ )
                 {
@@ -1281,14 +1281,14 @@ void matroska_segment_c::EnsureDuration()
 
                     if( MKV_IS_ID( l, KaxBlock ) )
                     {
-                        KaxBlock *block = (KaxBlock*)l;
+                        KaxBlock *block = static_cast<KaxBlock*>( l );
                         block->SetParent( *p_last_cluster );
                         i_group_timecode += block->GlobalTimecode();
                     }
                     else if( MKV_IS_ID( l, KaxBlockDuration ) )
                     {
-                        KaxBlockDuration & dur = *(KaxBlockDuration*)l;
-                        i_group_timecode += uint64( dur );
+                        KaxBlockDuration & dur = *static_cast<KaxBlockDuration*>( l );
+                        i_group_timecode += static_cast<uint64>( dur );
                     }
                 }
                 i_last_timecode = std::max(i_last_timecode, i_group_timecode);
@@ -1308,7 +1308,7 @@ void matroska_segment_c::EnsureDuration()
 bool matroska_segment_c::Select( mtime_t i_mk_start_time )
 {
     /* add all es */
-    msg_Dbg( &sys.demuxer, "found %d es", (int)tracks.size() );
+    msg_Dbg( &sys.demuxer, "found %d es", static_cast<int>( tracks.size() ) );
 
     for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
     {
@@ -1317,7 +1317,7 @@ bool matroska_segment_c::Select( mtime_t i_mk_start_time )
 
         if( unlikely( p_fmt->i_cat == UNKNOWN_ES || !p_tk->psz_codec ) )
         {
-            msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", (int)i_track, p_tk->i_number );
+            msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", static_cast<int>( i_track ), p_tk->i_number );
             p_tk->p_es = NULL;
             continue;
         }
@@ -1472,7 +1472,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 case 1:
                     if( MKV_IS_ID( el, KaxCluster ) )
                     {
-                        cluster = (KaxCluster*)el;
+                        cluster = static_cast<KaxCluster*>( el );
                         i_cluster_pos = cluster->GetElementPosition();
 
                         // reset silent tracks
@@ -1503,15 +1503,15 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     }
                     if( MKV_IS_ID( el, KaxClusterTimecode ) )
                     {
-                        KaxClusterTimecode &ctc = *(KaxClusterTimecode*)el;
+                        KaxClusterTimecode &ctc = *static_cast<KaxClusterTimecode*>( el );
 
                         ctc.ReadData( es.I_O(), SCOPE_ALL_DATA );
-                        cluster->InitTimecode( uint64( ctc ), i_timescale );
+                        cluster->InitTimecode( static_cast<uint64>( ctc ), i_timescale );
 
                         /* add it to the index */
                         if( i_index == 0 ||
                             ( i_index > 0 &&
-                              p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
+                              p_indexes[i_index - 1].i_position < static_cast<int64_t> ( cluster->GetElementPosition() ) ) )
                             IndexAppendCluster( cluster );
                     }
                     else if( MKV_IS_ID( el, KaxClusterSilentTracks ) )
@@ -1525,7 +1525,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     }
                     else if( MKV_IS_ID( el, KaxSimpleBlock ) )
                     {
-                        pp_simpleblock = (KaxSimpleBlock*)el;
+                        pp_simpleblock = static_cast<KaxSimpleBlock*>( el );
 
                         pp_simpleblock->ReadData( es.I_O() );
                         pp_simpleblock->SetParent( *cluster );
@@ -1544,7 +1544,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     }
                     if( MKV_IS_ID( el, KaxBlock ) )
                     {
-                        pp_block = (KaxBlock*)el;
+                        pp_block = static_cast<KaxBlock*>( el );
 
                         pp_block->ReadData( es.I_O() );
                         pp_block->SetParent( *cluster );
@@ -1553,14 +1553,14 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     }
                     else if( MKV_IS_ID( el, KaxBlockDuration ) )
                     {
-                        KaxBlockDuration &dur = *(KaxBlockDuration*)el;
+                        KaxBlockDuration &dur = *static_cast<KaxBlockDuration*>( el );
 
                         dur.ReadData( es.I_O() );
-                        *pi_duration = uint64( dur );
+                        *pi_duration = static_cast<uint64>( dur );
                     }
                     else if( MKV_IS_ID( el, KaxReferenceBlock ) )
                     {
-                        KaxReferenceBlock &ref = *(KaxReferenceBlock*)el;
+                        KaxReferenceBlock &ref = *static_cast<KaxReferenceBlock*>( el );
 
                         ref.ReadData( es.I_O() );
 
@@ -1571,12 +1571,12 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     }
                     else if( MKV_IS_ID( el, KaxClusterSilentTrackNumber ) )
                     {
-                        KaxClusterSilentTrackNumber &track_num = *(KaxClusterSilentTrackNumber*)el;
+                        KaxClusterSilentTrackNumber &track_num = *static_cast<KaxClusterSilentTrackNumber*>( el );
                         track_num.ReadData( es.I_O() );
                         // find the track
                         for (size_t i=0; i<tracks.size(); i++)
                         {
-                            if ( tracks[i]->i_number == uint32(track_num))
+                            if ( tracks[i]->i_number == static_cast<uint32>(track_num))
                             {
                                 tracks[i]->b_silent = true;
                                 break;
@@ -1586,7 +1586,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 #if LIBMATROSKA_VERSION >= 0x010401
                     else if( MKV_IS_ID( el, KaxDiscardPadding ) )
                     {
-                        KaxDiscardPadding &dp = *(KaxDiscardPadding*) el;
+                        KaxDiscardPadding &dp = *static_cast<KaxDiscardPadding*>( el );
                         dp.ReadData( es.I_O() );
                         if ( *pi_duration < int64(dp) )
                             *pi_duration = 0;
