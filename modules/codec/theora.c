@@ -399,9 +399,16 @@ static int ProcessHeaders( decoder_t *p_dec )
     }
     else
     {
+        void* p_extra = realloc( p_dec->fmt_out.p_extra,
+                                 p_dec->fmt_in.i_extra );
+        if( unlikely( p_extra == NULL ) )
+        {
+            /* Clean up the decoder setup info... we're done with it */
+            th_setup_free( ts );
+            return VLC_ENOMEM;
+        }
+        p_dec->fmt_out.p_extra = p_extra;
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
-        p_dec->fmt_out.p_extra = xrealloc( p_dec->fmt_out.p_extra,
-                                                  p_dec->fmt_out.i_extra );
         memcpy( p_dec->fmt_out.p_extra,
                 p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
     }
