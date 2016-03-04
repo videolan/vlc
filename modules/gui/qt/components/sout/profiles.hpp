@@ -27,6 +27,7 @@ static const char video_profile_name_list[][37] = {
     "Video for Youtube HD",
 };
 
+/* !!! Do not add profiles here without widget or muxer alias (see standard.c) support in profile editor !!! */
 static const char * video_profile_value_list[] = {
     "audio_enable=yes;audio_codec=mpga;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;video_enable=yes;video_codec=h264;vcodec_bitrate=0;vcodec_qp=0;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;muxer_mux=mp4",
     "video_enable=yes;video_codec=VP80;vcodec_bitrate=2000;vcodec_framerate=0;vcodec_width=0;vcodec_height=0;audio_enable=yes;audio_codec=vorb;acodec_bitrate=128;acodec_channels=2;acodec_samplerate=44100;muxer_mux=webm",

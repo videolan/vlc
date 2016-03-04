@@ -39,76 +39,23 @@
           </sizepolicy>
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
-          <item row="0" column="0">
-           <widget class="QRadioButton" name="TSMux">
+          <item row="3" column="1">
+           <widget class="QRadioButton" name="FLACMux">
             <property name="text">
-             <string>MPEG-TS</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>FLAC</string>
             </property>
             <attribute name="buttonGroup">
-             <string>buttonGroup</string>
+             <string notr="true">buttonGroup</string>
             </attribute>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QRadioButton" name="PSMux">
+          <item row="0" column="3">
+           <widget class="QRadioButton" name="MOVMux">
             <property name="text">
-             <string>MPEG-PS</string>
+             <string>MP&amp;4/MOV</string>
             </property>
             <attribute name="buttonGroup">
-             <string>buttonGroup</string>
-            </attribute>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QRadioButton" name="MPEG1Mux">
-            <property name="text">
-             <string>MPEG 1</string>
-            </property>
-            <attribute name="buttonGroup">
-             <string>buttonGroup</string>
-            </attribute>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QRadioButton" name="ASFMux">
-            <property name="text">
-             <string>ASF/WMV</string>
-            </property>
-            <attribute name="buttonGroup">
-             <string>buttonGroup</string>
-            </attribute>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QRadioButton" name="WEBMux">
-            <property name="text">
-             <string>Webm</string>
-            </property>
-            <attribute name="buttonGroup">
-             <string>buttonGroup</string>
-            </attribute>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QRadioButton" name="MJPEGMux">
-            <property name="text">
-             <string>MJPEG</string>
-            </property>
-            <attribute name="buttonGroup">
-             <string>buttonGroup</string>
-            </attribute>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QRadioButton" name="MKVMux">
-            <property name="text">
-             <string>MKV</string>
-            </property>
-            <attribute name="buttonGroup">
-             <string>buttonGroup</string>
+             <string notr="true">buttonGroup</string>
             </attribute>
            </widget>
           </item>
@@ -118,17 +65,60 @@
              <string>Ogg/Ogm</string>
             </property>
             <attribute name="buttonGroup">
-             <string>buttonGroup</string>
+             <string notr="true">buttonGroup</string>
             </attribute>
            </widget>
           </item>
-          <item row="1" column="2">
-           <widget class="QRadioButton" name="WAVMux">
+          <item row="2" column="1">
+           <widget class="QRadioButton" name="MKVMux">
             <property name="text">
-             <string>WAV</string>
+             <string>M&amp;KV</string>
             </property>
             <attribute name="buttonGroup">
-             <string>buttonGroup</string>
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QRadioButton" name="MJPEGMux">
+            <property name="text">
+             <string>M&amp;JPEG</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="PSMux">
+            <property name="text">
+             <string>MPEG-PS</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QRadioButton" name="FLVMux">
+            <property name="text">
+             <string>F&amp;LV</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="TSMux">
+            <property name="text">
+             <string>&amp;MPEG-TS</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
             </attribute>
            </widget>
           </item>
@@ -138,27 +128,37 @@
              <string>RAW</string>
             </property>
             <attribute name="buttonGroup">
-             <string>buttonGroup</string>
+             <string notr="true">buttonGroup</string>
             </attribute>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QRadioButton" name="MOVMux">
+          <item row="1" column="2">
+           <widget class="QRadioButton" name="WAVMux">
             <property name="text">
-             <string>MP4/MOV</string>
+             <string>WAV</string>
             </property>
             <attribute name="buttonGroup">
-             <string>buttonGroup</string>
+             <string notr="true">buttonGroup</string>
             </attribute>
            </widget>
           </item>
-          <item row="1" column="3">
-           <widget class="QRadioButton" name="FLVMux">
+          <item row="0" column="1">
+           <widget class="QRadioButton" name="WEBMux">
             <property name="text">
-             <string>FLV</string>
+             <string>Webm</string>
             </property>
             <attribute name="buttonGroup">
-             <string>buttonGroup</string>
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QRadioButton" name="MPEG1Mux">
+            <property name="text">
+             <string>MPEG &amp;1</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
             </attribute>
            </widget>
           </item>
@@ -168,7 +168,27 @@
              <string>AVI</string>
             </property>
             <attribute name="buttonGroup">
-             <string>buttonGroup</string>
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QRadioButton" name="ASFMux">
+            <property name="text">
+             <string>ASF/WMV</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QRadioButton" name="MP3Mux">
+            <property name="text">
+             <string>MP&amp;3</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
             </attribute>
            </widget>
           </item>
@@ -353,7 +373,7 @@
               <item row="3" column="0">
                <widget class="QLabel" name="vFrameLabel">
                 <property name="text">
-                 <string>Frame Rate</string>
+                 <string>Fra&amp;me Rate</string>
                 </property>
                 <property name="buddy">
                  <cstring>valueholder_vcodec_framerate</cstring>
@@ -398,7 +418,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Quality</string>
+                 <string>&amp;Quality</string>
                 </property>
                 <property name="buddy">
                  <cstring>valueholder_vcodec_qp</cstring>
@@ -685,7 +705,7 @@
               <item row="3" column="0">
                <widget class="QLabel" name="aSampleLabel">
                 <property name="text">
-                 <string>Sample Rate</string>
+                 <string>Sa&amp;mple Rate</string>
                 </property>
                 <property name="buddy">
                  <cstring>valueholder_acodec_samplerate</cstring>
@@ -780,7 +800,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Profile Name</string>
+      <string>Profile &amp;Name</string>
      </property>
      <property name="buddy">
       <cstring>profileLine</cstring>
@@ -828,6 +848,8 @@
   <tabstop>RAWMux</tabstop>
   <tabstop>AVIMux</tabstop>
   <tabstop>ASFMux</tabstop>
+  <tabstop>FLACMux</tabstop>
+  <tabstop>MP3Mux</tabstop>
   <tabstop>valueholder_video_enable</tabstop>
   <tabstop>valueholder_video_copy</tabstop>
   <tabstop>transcodevideo</tabstop>
@@ -851,7 +873,6 @@
   <tabstop>valueholder_subtitles_enable</tabstop>
   <tabstop>valueholder_subtitles_codec</tabstop>
   <tabstop>valueholder_subtitles_overlay</tabstop>
-  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
