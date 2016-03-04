@@ -682,21 +682,21 @@ bool demux_sys_t::PreloadLinked()
                         /* Check in tags if the edition has a name */
 
                         /* We use only the tags of the first segment as it contains the edition */
-                        std::vector<Tag*> &tags = opened_segments[0]->tags;
+                        matroska_segment_c::tags_t const& tags = opened_segments[0]->tags;
                         uint64_t i_ed_uid = 0;
                         if( p_ved->p_edition )
                             i_ed_uid = (uint64_t) p_ved->p_edition->i_uid;
 
                         for( size_t k = 0; k < tags.size(); k++ )
                         {
-                            if( tags[k]->i_tag_type == EDITION_UID && tags[k]->i_uid == i_ed_uid )
-                                for( size_t l = 0; l < tags[k]->simple_tags.size(); l++ )
+                            if( tags[k].i_tag_type == EDITION_UID && tags[k].i_uid == i_ed_uid )
+                                for( size_t l = 0; l < tags[k].simple_tags.size(); l++ )
                                 {
-                                    SimpleTag * p_st = tags[k]->simple_tags[l];
-                                    if( !strcmp(p_st->psz_tag_name,"TITLE") )
+                                    SimpleTag const& st = tags[k].simple_tags[l];
+                                    if ( st.tag_name == "TITLE" )
                                     {
-                                        msg_Dbg( &demuxer, "Using title \"%s\" from tag for edition %" PRIu64, p_st->p_value, i_ed_uid );
-                                        p_title->psz_name = strdup( p_st->p_value );
+                                        msg_Dbg( &demuxer, "Using title \"%s\" from tag for edition %" PRIu64, st.value.c_str (), i_ed_uid );
+                                        p_title->psz_name = strdup( st.value.c_str () );
                                         break;
                                     }
                                 }
