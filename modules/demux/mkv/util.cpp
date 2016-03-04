@@ -69,7 +69,7 @@ int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t * tk )
             return 1;
         }
 
-        p_new_extra = (uint8_t *)alloc;
+        p_new_extra = static_cast<uint8_t *>( alloc );
         d_stream.next_out = &p_new_extra[(n - 1) * 1024];
         d_stream.avail_out = 1024;
         result = inflate(&d_stream, Z_NO_FLUSH);
@@ -88,7 +88,7 @@ int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t * tk )
 
     free( tk->p_extra_data );
     tk->i_extra_data = d_stream.total_out;
-    p_new_extra = (uint8_t *) realloc(p_new_extra, tk->i_extra_data);
+    p_new_extra = static_cast<uint8_t *>( realloc(p_new_extra, tk->i_extra_data) );
     if( !p_new_extra )
     {
         msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %d",
@@ -111,9 +111,9 @@ block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
     block_t *p_block;
     z_stream d_stream;
 
-    d_stream.zalloc = (alloc_func)0;
-    d_stream.zfree = (free_func)0;
-    d_stream.opaque = (voidpf)0;
+    d_stream.zalloc = NULL;
+    d_stream.zfree = NULL;
+    d_stream.opaque = NULL;
     result = inflateInit(&d_stream);
     if( result != Z_OK )
     {
@@ -130,7 +130,7 @@ block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
     {
         n++;
         p_block = block_Realloc( p_block, 0, n * 1000 );
-        dst = (unsigned char *)p_block->p_buffer;
+        dst = static_cast<unsigned char *>( p_block->p_buffer );
         d_stream.next_out = (Bytef *)&dst[(n - 1) * 1000];
         d_stream.avail_out = 1000;
         result = inflate(&d_stream, Z_NO_FLUSH);
@@ -305,7 +305,7 @@ msg_Dbg( p_demux, "block (track=%d) i_dts: %" PRId64" / i_pts: %" PRId64, p_tk->
 int32_t Cook_PrivateTrackData::Init()
 {
     i_subpackets = (size_t) i_sub_packet_h * (size_t) i_frame_size / (size_t) i_subpacket_size;
-    p_subpackets = (block_t**) calloc(i_subpackets, sizeof(block_t*));
+    p_subpackets = static_cast<block_t**> ( calloc(i_subpackets, sizeof(block_t*)) );
 
     if( unlikely( !p_subpackets ) )
     {
