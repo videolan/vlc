@@ -479,6 +479,13 @@ static void *Run( void *obj )
 
     if( !Init( p_input ) )
     {
+        if( p_input->p->b_can_pace_control && p_input->p->b_out_pace_control )
+        {
+            /* We don't want a high input priority here or we'll
+             * end-up sucking up all the CPU time */
+            vlc_set_priority( p_input->p->thread, VLC_THREAD_PRIORITY_LOW );
+        }
+
         MainLoop( p_input, true ); /* FIXME it can be wrong (like with VLM) */
 
         /* Clean up */
@@ -1201,13 +1208,6 @@ static int Init( input_thread_t * p_input )
     if( !p_input->b_preparsing && p_input->p->p_sout )
     {
         p_input->p->b_out_pace_control = (p_input->p->p_sout->i_out_pace_nocontrol > 0);
-
-        if( p_input->p->b_can_pace_control && p_input->p->b_out_pace_control )
-        {
-            /* We don't want a high input priority here or we'll
-             * end-up sucking up all the CPU time */
-            vlc_set_priority( p_input->p->thread, VLC_THREAD_PRIORITY_LOW );
-        }
 
         msg_Dbg( p_input, "starting in %s mode",
                  p_input->p->b_out_pace_control ? "async" : "sync" );
