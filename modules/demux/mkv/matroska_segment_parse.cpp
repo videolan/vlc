@@ -81,7 +81,6 @@ static inline char * ToUTF8( const UTFstring &u )
  *****************************************************************************/
 void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 {
-    EbmlParser  *ep;
     EbmlElement *l;
     bool b_seekable;
 
@@ -91,10 +90,10 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
     if( !b_seekable )
         return;
 
-    ep = new EbmlParser( &es, seekhead, &sys.demuxer,
-                         var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+    EbmlParser eparser ( &es, seekhead, &sys.demuxer,
+                        var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
 
-    while( ( l = ep->Get() ) != NULL )
+    while( ( l = eparser.Get() ) != NULL )
     {
         if( MKV_IS_ID( l, KaxSeek ) )
         {
@@ -104,10 +103,10 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 #ifdef MKV_DEBUG
             msg_Dbg( &sys.demuxer, "|   |   + Seek" );
 #endif
-            ep->Down();
+            eparser.Down();
             try
             {
-                while( ( l = ep->Get() ) != NULL )
+                while( ( l = eparser.Get() ) != NULL )
                 {
                     if( unlikely( !l->ValidateSize() ) )
                     {
@@ -137,7 +136,7 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
             {
                 msg_Err( &sys.demuxer,"Error while reading %s",  typeid(*l).name() );
             }
-            ep->Up();
+            eparser.Up();
 
             if( i_pos >= 0 )
             {
@@ -186,7 +185,6 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
         else if ( !MKV_IS_ID( l, EbmlVoid ) && !MKV_IS_ID( l, EbmlCrc32 ))
             msg_Dbg( &sys.demuxer, "|   |   + ParseSeekHead Unknown (%s)", typeid(*l).name() );
     }
-    delete ep;
 }
 
 
