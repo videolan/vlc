@@ -706,12 +706,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
 {
     bool b_result = false;
 
-    char *psz_str = static_cast<char*>( malloc( i_size + 1 ) );
-    memcpy( psz_str, p_command, i_size );
-    psz_str[ i_size ] = '\0';
-
-    std::string sz_command = psz_str;
-    free( psz_str );
+    std::string sz_command( reinterpret_cast<const char*> (p_command), i_size );
 
     msg_Dbg( &sys.demuxer, "command : %s", sz_command.c_str() );
 
