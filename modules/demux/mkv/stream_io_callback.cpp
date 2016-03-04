@@ -104,6 +104,6 @@ uint64 vlc_stream_io_callback::toRead( void )
     if( i_size <= 0 )
         return UINT64_MAX;
 
-    return (uint64) i_size - stream_Tell( s );
+    return static_cast<uint64>( i_size - stream_Tell( s ) );
 }
 
