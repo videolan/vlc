@@ -996,6 +996,11 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
                         if (it->i_track == i_track)
                             break;
 
+                    if (unlikely (it == spoints.end ()) ) {
+                        msg_Err( &sys.demuxer, "Unable to locate seekpoint using i_track = %zu!", i_track);
+                        return;
+                    }
+
                     it->i_mk_date = i_mk_pts;
                     if( simpleblock )
                         it->i_seek_pos = simpleblock->GetElementPosition();
