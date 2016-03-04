@@ -108,7 +108,6 @@ matroska_segment_c::~matroska_segment_c()
 void matroska_segment_c::LoadCues( KaxCues *cues )
 {
     bool b_invalid_cue;
-    EbmlParser  *ep;
     EbmlElement *el;
 
     if( b_cues )
@@ -117,9 +116,8 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
         return;
     }
 
-    ep = new EbmlParser( &es, cues, &sys.demuxer,
-                         var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
-    while( ( el = ep->Get() ) != NULL )
+    EbmlParser eparser (&es, cues, &sys.demuxer, var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+    while( ( el = eparser.Get() ) != NULL )
     {
         if( MKV_IS_ID( el, KaxCuePoint ) )
         {
@@ -132,8 +130,8 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             last_idx.i_mk_time     = -1;
             last_idx.b_key         = true;
 
-            ep->Down();
-            while( ( el = ep->Get() ) != NULL )
+            eparser.Down();
+            while( ( el = eparser.Get() ) != NULL )
             {
                 if ( MKV_CHECKED_PTR_DECL( kct_ptr, KaxCueTime, el ) )
                 {
@@ -157,14 +155,14 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                 }
                 else if( MKV_IS_ID( el, KaxCueTrackPositions ) )
                 {
-                    ep->Down();
+                    eparser.Down();
                     try
                     {
-                        while( ( el = ep->Get() ) != NULL )
+                        while( ( el = eparser.Get() ) != NULL )
                         {
                             if( unlikely( !el->ValidateSize() ) )
                             {
-                                ep->Up();
+                                eparser.Up();
                                 msg_Err( &sys.demuxer, "Error %s too big, aborting", typeid(*el).name() );
                                 b_invalid_cue = true;
                                 break;
@@ -203,19 +201,19 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                     }
                     catch(...)
                     {
-                        ep->Up();
+                        eparser.Up();
                         msg_Err( &sys.demuxer, "Error while reading %s", typeid(*el).name() );
                         b_invalid_cue = true;
                         break;
                     }
-                    ep->Up();
+                    eparser.Up();
                 }
                 else
                 {
                     msg_Dbg( &sys.demuxer, "     * Unknown (%s)", typeid(*el).name() );
                 }
             }
-            ep->Up();
+            eparser.Up();
 
 #if 0
             msg_Dbg( &sys.demuxer, " * added time=%" PRId64 " pos=%" PRId64
@@ -230,7 +228,6 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             msg_Dbg( &sys.demuxer, " * Unknown (%s)", typeid(*el).name() );
         }
     }
-    delete ep;
     b_cues = true;
     msg_Dbg( &sys.demuxer, "|   - loading cues done." );
 }
@@ -262,9 +259,8 @@ static const struct {
 
 SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_type )
 {
+    EbmlParser eparser ( &es, tag, &sys.demuxer, var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
     EbmlElement *el;
-    EbmlParser *ep = new EbmlParser( &es, tag, &sys.demuxer,
-                                     var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
     SimpleTag * p_simple = new (std::nothrow) SimpleTag;
     size_t max_size = tag->GetSize();
     size_t size = 0;
@@ -281,7 +277,7 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
     msg_Dbg( &sys.demuxer, "|   + Simple Tag ");
     try
     {
-        while( ( el = ep->Get() ) != NULL && size < max_size)
+        while( ( el = eparser.Get() ) != NULL && size < max_size)
         {
             if( unlikely( !el->ValidateSize() ) )
             {
@@ -328,7 +324,6 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
         delete p_simple;
         return NULL;
     }
-    delete ep;
 
     if( !p_simple->psz_tag_name || !p_simple->p_value )
     {
@@ -366,10 +361,10 @@ done:
 void matroska_segment_c::LoadTags( KaxTags *tags )
 {
     /* Master elements */
-    EbmlParser *ep = new EbmlParser( &es, tags, &sys.demuxer, true );
+    EbmlParser eparser = EbmlParser( &es, tags, &sys.demuxer, true );
     EbmlElement *el;
 
-    while( ( el = ep->Get() ) != NULL )
+    while( ( el = eparser.Get() ) != NULL )
     {
         if( MKV_IS_ID( el, KaxTag ) )
         {
@@ -380,15 +375,15 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                 continue;
             }
             msg_Dbg( &sys.demuxer, "+ Tag" );
-            ep->Down();
+            eparser.Down();
             int target_type = 50;
-            while( ( el = ep->Get() ) != NULL )
+            while( ( el = eparser.Get() ) != NULL )
             {
                 if( MKV_IS_ID( el, KaxTagTargets ) )
                 {
                     msg_Dbg( &sys.demuxer, "|   + Targets" );
-                    ep->Down();
-                    while( ( el = ep->Get() ) != NULL )
+                    eparser.Down();
+                    while( ( el = eparser.Get() ) != NULL )
                     {
                         try
                         {
@@ -444,7 +439,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                             break;
                         }
                     }
-                    ep->Up();
+                    eparser.Up();
                 }
                 else if( MKV_CHECKED_PTR_DECL ( kts_ptr, KaxTagSimple, el ) )
                 {
@@ -495,7 +490,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                     msg_Dbg( &sys.demuxer, "|   + LoadTag Unknown (%s)", typeid( *el ).name() );
                 }
             }
-            ep->Up();
+            eparser.Up();
             this->tags.push_back(p_tag);
         }
         else
@@ -503,7 +498,6 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
             msg_Dbg( &sys.demuxer, "+ Unknown (%s)", typeid( *el ).name() );
         }
     }
-    delete ep;
 
     msg_Dbg( &sys.demuxer, "loading tags done." );
 }
@@ -1220,13 +1214,12 @@ void matroska_segment_c::EnsureDuration()
     // find the last timecode in the Cluster
     if ( i_last_cluster_pos )
     {
-        EbmlParser *ep;
-
         es.I_O().setFilePointer( i_last_cluster_pos, seek_beginning );
-        ep = new EbmlParser( &es , segment, &sys.demuxer,
-                             var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
 
-        KaxCluster *p_last_cluster = static_cast<KaxCluster*>( ep->Get() );
+        EbmlParser eparser (
+            &es , segment, &sys.demuxer, var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+
+        KaxCluster *p_last_cluster = static_cast<KaxCluster*>( eparser.Get() );
         if( p_last_cluster == NULL )
             return;
         ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA );
@@ -1265,8 +1258,6 @@ void matroska_segment_c::EnsureDuration()
 
         i_duration = ( i_last_timecode - cluster->GlobalTimecode() ) / INT64_C(1000000);
         msg_Dbg( &sys.demuxer, " extracted Duration=%" PRId64, i_duration );
-
-        delete ep;
     }
 
     // get back to the reading position we were at before looking for a duration
