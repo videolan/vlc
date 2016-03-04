@@ -415,3 +415,45 @@ block_t * packetize_wavpack( mkv_track_t * p_tk, uint8_t * buffer, size_t  size)
 
     return p_block;
 }
+
+void MkvTree_va( demux_t& demuxer, int i_level, const char* fmt, va_list args)
+{
+    static char const * indent = "|    ";
+    static char const * prefix = "+ ";
+    static int  const   indent_len = strlen( indent );
+    static int  const   prefix_len = strlen( prefix );
+
+    char   fixed_buffer[256] = {};
+    size_t const  static_len = sizeof( fixed_buffer );
+    char *            buffer = fixed_buffer;
+    size_t         total_len = indent_len * i_level + prefix_len + strlen( fmt );
+
+    if( total_len >= static_len ) {
+        buffer = new (std::nothrow) char[total_len] ();
+
+        if (buffer == NULL) {
+            msg_Err (&demuxer, "Unable to allocate memory for format string");
+            return;
+        }
+    }
+
+    char * dst = buffer;
+
+    for (int i = 0; i < i_level; ++i, dst += indent_len)
+        memcpy( dst, indent, indent_len );
+
+    strcat( dst, prefix );
+    strcat( dst, fmt );
+
+    msg_GenericVa( &demuxer, VLC_MSG_DBG, buffer, args );
+
+    if (buffer != fixed_buffer)
+        delete [] buffer;
+}
+
+void MkvTree( demux_t & demuxer, int i_level, const char *psz_format, ... )
+{
+    va_list args; va_start( args, psz_format );
+    MkvTree_va( demuxer, i_level, psz_format, args );
+    va_end( args );
+}
