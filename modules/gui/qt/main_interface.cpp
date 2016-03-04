@@ -1489,6 +1489,12 @@ void MainInterface::handleKeyPress( QKeyEvent *e )
         toggleMinimalView( !b_minimalView );
         e->accept();
     }
+    else if( ( e->modifiers() & Qt::ControlModifier ) && ( e->key() == Qt::Key_K ) &&
+        playlistWidget )
+    {
+        playlistWidget->setSearchFieldFocus();
+        e->accept();
+    }
 
     int i_vlck = qtEventToVLCKey( e );
     if( i_vlck > 0 )

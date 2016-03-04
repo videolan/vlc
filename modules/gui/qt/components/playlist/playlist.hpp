@@ -56,6 +56,7 @@ public:
 
     void forceHide();
     void forceShow();
+    void setSearchFieldFocus();
     QStackedWidget *artContainer;
     StandardPLPanel      *mainView;
 

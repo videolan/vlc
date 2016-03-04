@@ -226,6 +226,11 @@ void PlaylistWidget::changeView( const QModelIndex& index )
     locationBar->setIndex( index );
 }
 
+void PlaylistWidget::setSearchFieldFocus()
+{
+    searchEdit->setFocus();
+}
+
 #include <QSignalMapper>
 #include <QMenu>
 #include <QPainter>
