@@ -2404,15 +2404,6 @@ have_avcodec_dxva2="no"
 AS_IF([test "${enable_dxva2}" != "no"], [
   if test "${SYS}" = "mingw32"; then
   AS_IF([test "x${have_avcodec}" = "xyes"], [
-    case "${avfork}" in
-      ffmpeg)
-        PKG_CHECK_EXISTS([libavcodec >= 57.10.100], [
-          PKG_CHECK_EXISTS([libavcodec <= 57.12.100], [
-            AC_MSG_ERROR([DXVA2 requires FFmpeg libavcodec < 57.10 or > 57.12 or libav.])
-          ])
-        ])
-        ;;
-    esac
     AC_CHECK_HEADERS(dxva2api.h,
       [
         AC_CHECK_HEADERS(libavcodec/dxva2.h, [
@@ -3113,16 +3104,6 @@ AM_CONDITIONAL([HAVE_VDPAU], [test "${have_vdpau}" = "yes"])
 
 have_avcodec_vdpau="no"
 AS_IF([test "${have_vdpau}" = "yes" -a "${have_avcodec}" = "yes"], [
-  case "${avfork}" in
-    libav) av_vdpau_ver="55.26.0" ;;
-    ffmpeg) av_vdpau_ver="55.42.100"
-      PKG_CHECK_EXISTS([libavcodec >= 57.10.100], [
-        PKG_CHECK_EXISTS([libavcodec <= 57.12.100], [
-          AC_MSG_ERROR([VDPAU requires FFmpeg libavcodec < 57.10 or > 57.12 or libav.])
-        ])
-      ])
-      ;;
-  esac
   PKG_CHECK_EXISTS([libavutil >= 52.4.0 libavcodec >= ${av_vdpau_ver}], [
     have_avcodec_vdpau="yes"
     AC_MSG_NOTICE([VDPAU decoding acceleration activated])
