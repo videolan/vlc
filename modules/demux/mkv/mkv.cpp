@@ -267,7 +267,7 @@ error:
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    demux_t     *p_demux = (demux_t*)p_this;
+    demux_t     *p_demux = reinterpret_cast<demux_t*>( p_this );
     demux_sys_t *p_sys   = p_demux->p_sys;
     virtual_segment_c *p_vsegment = p_sys->p_current_segment;
     if( p_vsegment )
@@ -301,15 +301,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return stream_vaControl( p_demux->s, i_query, args );
 
         case DEMUX_GET_ATTACHMENTS:
-            ppp_attach = (input_attachment_t***)va_arg( args, input_attachment_t*** );
-            pi_int = (int*)va_arg( args, int * );
+            ppp_attach = va_arg( args, input_attachment_t*** );
+            pi_int = va_arg( args, int * );
 
             if( p_sys->stored_attachments.size() <= 0 )
                 return VLC_EGENERIC;
 
             *pi_int = p_sys->stored_attachments.size();
-            *ppp_attach = (input_attachment_t**)malloc( sizeof(input_attachment_t*) *
-                                                        p_sys->stored_attachments.size() );
+            *ppp_attach = static_cast<input_attachment_t**>( malloc( sizeof(input_attachment_t*) *
+                                                        p_sys->stored_attachments.size() ) );
             if( !(*ppp_attach) )
                 return VLC_ENOMEM;
             for( size_t i = 0; i < p_sys->stored_attachments.size(); i++ )
@@ -326,47 +326,47 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_META:
-            p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
+            p_meta = va_arg( args, vlc_meta_t* );
             vlc_meta_Merge( p_meta, p_sys->meta );
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             if( p_sys->f_duration > 0.0 )
             {
-                *pi64 = (int64_t)(p_sys->f_duration * 1000);
+                *pi64 = static_cast<int64_t>( p_sys->f_duration * 1000 );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
             if ( p_sys->f_duration > 0.0 )
-                *pf = (double)(p_sys->i_pcr >= p_sys->i_start_pts ? p_sys->i_pcr : p_sys->i_start_pts ) / (1000.0 * p_sys->f_duration);
+                *pf = static_cast<double> (p_sys->i_pcr >= p_sys->i_start_pts ? p_sys->i_pcr : p_sys->i_start_pts ) / (1000.0 * p_sys->f_duration);
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
             if( p_sys->f_duration > 0.0 )
             {
-                f = (double)va_arg( args, double );
+                f = va_arg( args, double );
                 Seek( p_demux, -1, f, NULL );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
+            pi64 = va_arg( args, int64_t * );
             *pi64 = p_sys->i_pcr;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:
             if( p_sys->titles.size() > 1 || ( p_sys->titles.size() == 1 && p_sys->titles[0]->i_seekpoint > 0 ) )
             {
-                input_title_t ***ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
-                int *pi_int    = (int*)va_arg( args, int* );
+                input_title_t ***ppp_title = va_arg( args, input_title_t*** );
+                int *pi_int = va_arg( args, int* );
 
                 *pi_int = p_sys->titles.size();
-                *ppp_title = (input_title_t**)malloc( sizeof( input_title_t* ) * p_sys->titles.size() );
+                *ppp_title = static_cast<input_title_t**>( malloc( sizeof( input_title_t* ) * p_sys->titles.size() ) );
 
                 for( size_t i = 0; i < p_sys->titles.size(); i++ )
                     (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->titles[i] );
@@ -376,14 +376,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TITLE:
             /* handle editions as titles */
-            i_idx = (int)va_arg( args, int );
+            i_idx = va_arg( args, int );
             if(i_idx <  p_sys->titles.size() && p_sys->titles[i_idx]->i_seekpoint)
             {
                 p_sys->p_current_segment->i_current_edition = i_idx;
                 p_sys->i_current_title = i_idx;
                 p_sys->p_current_segment->p_current_chapter = p_sys->p_current_segment->editions[p_sys->p_current_segment->i_current_edition]->getChapterbyTimecode(0);
 
-                Seek( p_demux, (int64_t)p_sys->titles[i_idx]->seekpoint[0]->i_time_offset, -1, NULL);
+                Seek( p_demux, static_cast<int64_t>( p_sys->titles[i_idx]->seekpoint[0]->i_time_offset ), -1, NULL);
                 p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_TITLE;
                 p_demux->info.i_seekpoint = 0;
                 p_demux->info.i_title = i_idx;
@@ -393,12 +393,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_SEEKPOINT:
-            i_skp = (int)va_arg( args, int );
+            i_skp = va_arg( args, int );
 
             // TODO change the way it works with the << & >> buttons on the UI (+1/-1 instead of a number)
             if( p_sys->titles.size() && i_skp < p_sys->titles[p_sys->i_current_title]->i_seekpoint)
             {
-                Seek( p_demux, (int64_t)p_sys->titles[p_sys->i_current_title]->seekpoint[i_skp]->i_time_offset, -1, NULL);
+                Seek( p_demux, static_cast<int64_t>( p_sys->titles[p_sys->i_current_title]->seekpoint[i_skp]->i_time_offset ), -1, NULL);
                 p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
                 p_demux->info.i_seekpoint = i_skp;
                 return VLC_SUCCESS;
@@ -406,7 +406,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_FPS:
-            pf = (double *)va_arg( args, double * );
+            pf = va_arg( args, double * );
             *pf = 0.0;
             if( p_sys->p_current_segment && p_sys->p_current_segment->CurrentSegment() )
             {
@@ -424,7 +424,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
-            i64 = (int64_t) va_arg( args, int64_t );
+            i64 = va_arg( args, int64_t );
             msg_Dbg(p_demux,"SET_TIME to %" PRId64, i64 );
             Seek( p_demux, i64, -1, NULL );
             return VLC_SUCCESS;
