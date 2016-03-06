@@ -367,6 +367,7 @@ static void EITCallBack( demux_t *p_demux,
     demux_sys_t        *p_sys = p_demux->p_sys;
     dvbpsi_eit_event_t *p_evt;
     vlc_epg_t *p_epg;
+    VLC_UNUSED(b_current_following);
 
     msg_Dbg( p_demux, "EITCallBack called" );
     if( !p_eit->b_current_next )
@@ -403,13 +404,6 @@ static void EITCallBack( demux_t *p_demux,
         {
             /* See comments on TDT callback */
             i_start += 9 * 3600;
-            /* Services are not setting runstatus */
-            if( p_evt->i_running_status == TS_SI_RUNSTATUS_UNDEFINED &&
-               (i_start <= p_sys->i_network_time &&
-                p_sys->i_network_time < i_start + i_duration) )
-            {
-                p_evt->i_running_status = TS_SI_RUNSTATUS_RUNNING;
-            }
         }
 
         msg_Dbg( p_demux, "  * event id=%d start_time:%d duration=%d "
@@ -524,6 +518,23 @@ static void EITCallBack( demux_t *p_demux,
             }
         }
 
+        bool b_current_event = false;
+        switch ( p_evt->i_running_status )
+        {
+            case TS_SI_RUNSTATUS_RUNNING:
+                b_current_event = true;
+                break;
+            case TS_SI_RUNSTATUS_UNDEFINED:
+            {
+                if( i_start <= p_sys->i_network_time &&
+                    p_sys->i_network_time < i_start + i_duration )
+                    b_current_event = true;
+                break;
+            }
+            default:
+                break;
+        }
+
         /* */
         if( i_start > 0 )
         {
@@ -533,7 +544,7 @@ static void EITCallBack( demux_t *p_demux,
                               (psz_extra && *psz_extra) ? psz_extra : NULL, i_min_age );
 
             /* Update "now playing" field */
-            if( p_evt->i_running_status == TS_SI_RUNSTATUS_RUNNING )
+            if( b_current_event )
                 vlc_epg_SetCurrent( p_epg, i_start );
         }
 
@@ -542,31 +553,20 @@ static void EITCallBack( demux_t *p_demux,
 
         free( psz_extra );
     }
+
     if( p_epg->i_event > 0 )
     {
-        if( b_current_following &&
-            (  p_sys->programs.i_size == 0 ||
-               p_sys->programs.p_elems[0] ==
-                    p_eit->i_extension
-                ) )
+        if( p_epg->p_current )
         {
             ts_pat_t *p_pat = ts_pid_Get(&p_sys->pids, 0)->u.p_pat;
             ts_pmt_t *p_pmt = ts_pat_Get_pmt(p_pat, p_eit->i_extension);
             if(p_pmt)
             {
-                p_pmt->eit.i_event_length = 0;
-                p_pmt->eit.i_event_start = 0;
-
-                if( p_epg->p_current )
-                {
-                    p_pmt->eit.i_event_start = p_epg->p_current->i_start;
-                    p_pmt->eit.i_event_length = p_epg->p_current->i_duration;
-                }
+                p_pmt->eit.i_event_start = p_epg->p_current->i_start;
+                p_pmt->eit.i_event_length = p_epg->p_current->i_duration;
             }
         }
-        es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG,
-                        p_eit->i_extension,
-                        p_epg );
+        es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG, p_eit->i_extension, p_epg );
     }
     vlc_epg_Delete( p_epg );
 
