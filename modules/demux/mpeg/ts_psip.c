@@ -448,7 +448,16 @@ static void ATSC_EIT_Callback( void *p_pid, dvbpsi_atsc_eit_t* p_eit )
 
     /* Update epg current time from system time ( required for pruning ) */
     if( i_current_event_start_time )
+    {
         vlc_epg_SetCurrent( p_epg, i_current_event_start_time );
+        ts_pat_t *p_pat = ts_pid_Get(&p_demux->p_sys->pids, 0)->u.p_pat;
+        ts_pmt_t *p_pmt = ts_pat_Get_pmt(p_pat, i_program_number);
+        if(p_pmt)
+        {
+            p_pmt->eit.i_event_start = p_epg->p_current->i_start;
+            p_pmt->eit.i_event_length = p_epg->p_current->i_duration;
+        }
+    }
 
     if( p_epg->i_event > 0 )
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG, (int)i_program_number, p_epg );
@@ -743,6 +752,15 @@ static void ATSC_STT_Callback( void *p_cb_basepid, dvbpsi_atsc_stt_t* p_stt )
     else
     {
         dvbpsi_atsc_DeleteSTT( p_ctx->p_stt );
+    }
+
+    if( p_stt )
+    {
+        time_t i_current_time = atsc_a65_GPSTimeToEpoch( p_stt->i_system_time,
+                                                         p_stt->i_gps_utc_offset );
+        EIT_DEBUG_TIMESHIFT( i_current_time );
+        p_demux->p_sys->i_network_time =  i_current_time;
+        p_demux->p_sys->i_network_time_update = time(NULL);
     }
 
     p_ctx->p_stt = p_stt;
