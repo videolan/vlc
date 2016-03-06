@@ -2317,14 +2317,18 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
         return i_ret;
     }
 
-    if( pid->u.p_pes->data_type == TS_ES_DATA_TABLE_SECTION )
+    if( pid->u.p_pes->transport == TS_TRANSPORT_PES )
+    {
+        return GatherPESData( p_demux, pid, p_pkt, i_skip, b_unit_start );
+    }
+    else if( pid->u.p_pes->transport == TS_TRANSPORT_SECTIONS )
     {
         ts_sections_processor_Push( pid->u.p_pes->p_sections_proc, p_pkt );
         return VLC_DEMUXER_SUCCESS;
     }
-    else
+    else // pid->u.p_pes->transport == TS_TRANSPORT_IGNORE
     {
-        return GatherPESData( p_demux, pid, p_pkt, i_skip, b_unit_start );
+        return VLC_DEMUXER_SUCCESS;
     }
 }
 

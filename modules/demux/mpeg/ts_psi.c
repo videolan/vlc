@@ -54,7 +54,7 @@
 
 #include <assert.h>
 
-static void PIDFillFormat( demux_t *, ts_pes_t *p_pes, int i_stream_type, ts_es_data_type_t * );
+static void PIDFillFormat( demux_t *, ts_pes_t *p_pes, int i_stream_type, ts_transport_type_t * );
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt );
 
 static int PATCheck( demux_t *p_demux, dvbpsi_pat_t *p_pat )
@@ -1189,7 +1189,7 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
 }
 
 static void PIDFillFormat( demux_t *p_demux, ts_pes_t *p_pes,
-                           int i_stream_type, ts_es_data_type_t *p_datatype )
+                           int i_stream_type, ts_transport_type_t *p_datatype )
 {
     es_format_t *fmt = &p_pes->p_es->fmt;
     switch( i_stream_type )
@@ -1227,7 +1227,7 @@ static void PIDFillFormat( demux_t *p_demux, ts_pes_t *p_pes,
         break;
     case 0x82:  /* SCTE-27 (sub) */
         es_format_Init( fmt, SPU_ES, VLC_CODEC_SCTE_27 );
-        *p_datatype = TS_ES_DATA_TABLE_SECTION;
+        *p_datatype = TS_TRANSPORT_SECTIONS;
         ts_sections_processor_Add( p_demux, &p_pes->p_sections_proc, 0xC6, 0x00,
                                    SCTE27_Section_Callback, p_pes );
         break;
@@ -1275,7 +1275,7 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
                                  const ts_pmt_t *p_pmt,
                                  ts_pes_t *p_pes )
 {
-    ts_es_data_type_t type_change = TS_ES_DATA_PES;
+    ts_transport_type_t type_change = TS_TRANSPORT_PES;
     PIDFillFormat( p_demux, p_pes, p_dvbpsies->i_type, &type_change );
 
     p_pes->i_stream_type = p_dvbpsies->i_type;
@@ -1299,23 +1299,26 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
 
     if ( !b_registration_applied )
     {
-        p_pes->data_type = type_change; /* Only change type if registration has not changed meaning */
+        p_pes->transport = type_change; /* Only change type if registration has not changed meaning */
 
         switch( p_dvbpsies->i_type )
         {
         case 0x05: /* Private data in sections */
-            p_pes->data_type = TS_ES_DATA_TABLE_SECTION;
+            p_pes->transport = TS_TRANSPORT_SECTIONS;
             break;
         case 0x06:
             /* Handle PES private data */
             PMTSetupEs0x06( p_demux, p_pes, p_dvbpsies );
             break;
-        case 0x0b: /* DSM-CC */
-            p_pes->data_type = TS_ES_DATA_TABLE_SECTION;
+        case 0x0a: /* DSM-CC */
+        case 0x0b:
+        case 0x0c:
+        case 0x0d:
+            p_pes->transport = TS_TRANSPORT_IGNORE;
             break;
         /* All other private or reserved types */
         case 0x13: /* SL in sections */
-            p_pes->data_type = TS_ES_DATA_TABLE_SECTION;
+            p_pes->transport = TS_TRANSPORT_SECTIONS;
             //ft
         case 0x0f:
         case 0x10:
@@ -1809,7 +1812,7 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
             else
             {
                 const int i_stream_type = strtol( psz_opt, NULL, 0 );
-                PIDFillFormat( p_demux, pid->u.p_pes, i_stream_type, &pid->u.p_pes->data_type );
+                PIDFillFormat( p_demux, pid->u.p_pes, i_stream_type, &pid->u.p_pes->transport );
             }
 
             fmt->i_group = i_number;

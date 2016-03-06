@@ -270,7 +270,7 @@ ts_pes_t *ts_pes_New( demux_t *p_demux, ts_pmt_t *p_program )
         return NULL;
     }
     pes->i_stream_type = 0;
-    pes->data_type = TS_ES_DATA_PES;
+    pes->transport = TS_TRANSPORT_PES;
     pes->i_data_size = 0;
     pes->i_data_gathered = 0;
     pes->p_data = NULL;

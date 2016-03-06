@@ -89,9 +89,10 @@ struct ts_pes_es_t
 
 typedef enum
 {
-    TS_ES_DATA_PES,
-    TS_ES_DATA_TABLE_SECTION
-} ts_es_data_type_t;
+    TS_TRANSPORT_PES,
+    TS_TRANSPORT_SECTIONS,
+    TS_TRANSPORT_IGNORE
+} ts_transport_type_t;
 
 struct ts_pes_t
 {
@@ -99,7 +100,7 @@ struct ts_pes_t
 
     uint8_t i_stream_type;
 
-    ts_es_data_type_t data_type;
+    ts_transport_type_t transport;
     int         i_data_size;
     int         i_data_gathered;
     block_t     *p_data;
