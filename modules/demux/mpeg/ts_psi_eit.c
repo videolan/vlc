@@ -390,7 +390,7 @@ static void EITCallBack( demux_t *p_demux,
         dvbpsi_descriptor_t *p_dr;
         char                *psz_name = NULL;
         char                *psz_text = NULL;
-        char                *psz_extra = strdup("");
+        char                *psz_extra = NULL;
         int64_t i_start;
         int i_duration;
         int i_min_age = 0;
@@ -454,10 +454,21 @@ static void EITCallBack( demux_t *p_demux,
                         {
                             msg_Dbg( p_demux, "       - text='%s'", psz_text );
 
-                            psz_extra = xrealloc( psz_extra,
-                                   strlen(psz_extra) + strlen(psz_text) + 1 );
-                            strcat( psz_extra, psz_text );
-                            free( psz_text );
+                            if( psz_extra )
+                            {
+                                size_t i_extra = strlen( psz_extra ) + strlen( psz_text ) + 1;
+                                char *psz_realloc = realloc( psz_extra, i_extra );
+                                if( psz_realloc )
+                                {
+                                    psz_extra = psz_realloc;
+                                    strcat( psz_extra, psz_text );
+                                }
+                                free( psz_text );
+                            }
+                            else
+                            {
+                                psz_extra = psz_text;
+                            }
                         }
                     }
 
