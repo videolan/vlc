@@ -156,4 +156,25 @@ static const char *ISO13818_1_Get_Descriptor_Description(uint8_t i_desc)
         return ISO13818_1_other_descs[1];
 }
 
+/* From ARIB TR-B14 */
+static const struct
+{
+    uint8_t id;
+    const char *psz_desc;
+} ARIB_B10_PMT_Descriptors_descs[5] = {
+    { 0xC1, "Digital copy control" },
+    { 0xDE, "Content availability" },
+    { 0xF6, "Access Control" },
+    { 0xFC, "Emergency Information" },
+    { 0xFD, "Source Coding" },
+};
+
+static const char *ARIB_B10_Get_PMT_Descriptor_Description(uint8_t i_desc)
+{
+    for(uint8_t i=0; i<5; i++)
+        if(ARIB_B10_PMT_Descriptors_descs[i].id == i_desc)
+            return ARIB_B10_PMT_Descriptors_descs[i].psz_desc;
+    return NULL;
+}
+
 #endif

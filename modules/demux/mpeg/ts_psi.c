@@ -265,27 +265,28 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
         if( p_dr->i_tag < 0x40 )
             continue;
 
-        switch(p_dr->i_tag)
+        if( registration_type == TS_PMT_REGISTRATION_NONE )
         {
-            case 0x88: /* EACEM Simulcast HD Logical channels ordering */
-                if( registration_type == TS_PMT_REGISTRATION_NONE )
-                    msg_Dbg( p_demux, PMT_DESC_PREFIX "EACEM Simulcast HD" );
-                    /* TODO: apply visibility flags */
-                break;
+            switch(p_dr->i_tag)
+            {
+                case 0x88: /* EACEM Simulcast HD Logical channels ordering */
+                    if( registration_type == TS_PMT_REGISTRATION_NONE )
+                        msg_Dbg( p_demux, PMT_DESC_PREFIX "EACEM Simulcast HD" );
+                        /* TODO: apply visibility flags */
+                    break;
 
-            case 0xC1:
-                if( registration_type == TS_PMT_REGISTRATION_ARIB )
-                    msg_Dbg( p_demux, PMT_DESC_PREFIX "Digital copy control (0xC1)" );
-                break;
-
-            case 0xDE:
-                if( registration_type == TS_PMT_REGISTRATION_ARIB )
-                    msg_Dbg( p_demux, PMT_DESC_PREFIX "Content availability (0xDE)" );
-                break;
-
-            default:
+                default:
+                    msg_Dbg( p_demux, PMT_DESC_PREFIX "Unknown Private (0x%x)", p_dr->i_tag );
+                    break;
+            }
+        }
+        else if( registration_type == TS_PMT_REGISTRATION_ARIB )
+        {
+            const char *psz_desc = ARIB_B10_Get_PMT_Descriptor_Description( p_dr->i_tag );
+            if( psz_desc )
+                msg_Dbg( p_demux, PMT_DESC_PREFIX "%s (0x%x)", psz_desc, p_dr->i_tag );
+            else
                 msg_Dbg( p_demux, PMT_DESC_PREFIX "Unknown Private (0x%x)", p_dr->i_tag );
-                break;
         }
     }
 
@@ -1471,11 +1472,18 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         msg_Dbg( p_demux, "  * pid=%d type=0x%x %s",
                  p_dvbpsies->i_pid, p_dvbpsies->i_type, psz_typedesc );
 
+        /* PMT element/component descriptors */
         for( dvbpsi_descriptor_t *p_dr = p_dvbpsies->p_first_descriptor;
              p_dr != NULL; p_dr = p_dr->p_next )
         {
-            msg_Dbg( p_demux, "    - ES descriptor tag 0x%x",
-                     p_dr->i_tag );
+            const char *psz_desc = NULL;
+            if( registration_type == TS_PMT_REGISTRATION_ARIB )
+                psz_desc = ARIB_B10_Get_PMT_Descriptor_Description( p_dr->i_tag );
+
+            if( psz_desc )
+                msg_Dbg( p_demux, "    - ES descriptor %s 0x%x", psz_desc, p_dr->i_tag );
+            else
+                msg_Dbg( p_demux, "    - ES descriptor tag 0x%x", p_dr->i_tag );
         }
 
         const bool b_pid_inuse = ( pespid->type == TYPE_PES );
