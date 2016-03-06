@@ -195,7 +195,7 @@ void vlc_epg_Merge( vlc_epg_t *p_dst_epg, const vlc_epg_t *p_src_epg )
     int i_src=0;
     for( ; i_src < p_src_epg->i_event; i_src++ )
     {
-        const bool b_current = ( p_src_epg->pp_event[i_src] == p_src_epg->p_current );
+        bool b_current = ( p_src_epg->pp_event[i_src] == p_src_epg->p_current );
 
         vlc_epg_event_t *p_src = vlc_epg_Event_Duplicate( p_src_epg->pp_event[i_src] );
         if( unlikely(!p_src) )
@@ -218,8 +218,11 @@ void vlc_epg_Merge( vlc_epg_t *p_dst_epg, const vlc_epg_t *p_src_epg )
                     ( i_dst_end > p_src->i_start && i_dst_end <= i_src_end ) )
             {
                 vlc_epg_Event_Delete( p_dst );
-                if( p_dst_epg->p_current )
+                if( p_dst_epg->p_current == p_dst )
+                {
+                    b_current |= true;
                     p_dst_epg->p_current = NULL;
+                }
                 TAB_ERASE( p_dst_epg->i_event, p_dst_epg->pp_event, i_dst );
             }
             else

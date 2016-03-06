@@ -43,6 +43,8 @@ static void print_order( const vlc_epg_t *p_epg )
     printf("order: ");
     for( int i=0; i<p_epg->i_event; i++ )
         printf("%s ", p_epg->pp_event[i]->psz_name );
+    if( p_epg->p_current )
+        printf(" current %s", p_epg->p_current->psz_name );
     printf("\n");
 }
 
@@ -173,7 +175,7 @@ int main( void )
     print_order( p_epg );
     assert_events( p_epg, "ECD", 3 );
 
-    assert_current( p_epg, NULL );
+    assert_current( p_epg, "E" );
 
     EPG_ADD( p_epg2,  70, 42, "F" );
     print_order( p_epg2 );
@@ -181,6 +183,28 @@ int main( void )
     printf("merged " );
     print_order( p_epg );
     assert_events( p_epg, "F", 1 );
+
+    /* Test current overwriting */
+    printf("--test %d\n", i++);
+    vlc_epg_SetCurrent( p_epg, 70 );
+    assert_current( p_epg, "F" );
+    print_order( p_epg );
+    print_order( p_epg2 );
+    vlc_epg_Merge( p_epg, p_epg2 );
+    printf("merged " );
+    print_order( p_epg );
+    assert_events( p_epg, "F", 1 );
+    assert_current( p_epg, "F" );
+
+    printf("--test %d\n", i++);
+    print_order( p_epg );
+    EPG_ADD( p_epg2,  270, 42, "Z" );
+    vlc_epg_SetCurrent( p_epg2, 270 );
+    print_order( p_epg2 );
+    vlc_epg_Merge( p_epg, p_epg2 );
+    printf("merged " );
+    print_order( p_epg );
+    assert_current( p_epg, "Z" );
 
     vlc_epg_Delete( p_epg );
     vlc_epg_Delete( p_epg2 );
