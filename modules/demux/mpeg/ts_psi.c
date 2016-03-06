@@ -158,9 +158,9 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
                 ARRAY_APPEND( p_sys->programs, p_program->i_number );
             }
 
-            if( SetPIDFilter( p_sys, pmtpid, true ) )
-                p_sys->b_access_control = false;
-            else if ( p_sys->es_creation == DELAY_ES )
+            SetPIDFilter( p_sys, pmtpid, true );
+
+            if ( p_sys->es_creation == DELAY_ES )
                 p_sys->es_creation = CREATE_ES;
         }
     }
