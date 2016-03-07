@@ -617,9 +617,13 @@ void InputManager::UpdateEPG()
 
 void InputManager::UpdateVout()
 {
-    /* Get current vout lists from input */
     size_t i_vout;
     vout_thread_t **pp_vout;
+
+    if( !p_input )
+        return;
+
+    /* Get current vout lists from input */
     if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
     {
         i_vout = 0;
