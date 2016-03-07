@@ -766,6 +766,18 @@ static int Demux( demux_t *p_demux)
             p_sys->i_pts = (mtime_t)block->GlobalTimecode() / INT64_C(1000);
         p_sys->i_pts += p_sys->i_mk_chapter_time + VLC_TS_0;
 
+        mtime_t i_pcr = VLC_TS_INVALID;
+        for( size_t i = 0; i < p_segment->tracks.size(); i++)
+            if( p_segment->tracks[i]->i_last_dts > VLC_TS_INVALID &&
+                ( p_segment->tracks[i]->i_last_dts < i_pcr || i_pcr == VLC_TS_INVALID ))
+                i_pcr = p_segment->tracks[i]->i_last_dts;
+
+        if( i_pcr > p_sys->i_pcr + 300000 )
+        {
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+            p_sys->i_pcr = i_pcr;
+        }
+
         if( p_sys->i_pts >= p_sys->i_start_pts  )
         {
             if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )

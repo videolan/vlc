@@ -270,35 +270,6 @@ void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsig
             (double) p_segment->i_timescale / ( 1000.0 * i_number_frames );
     }
 
-    // find the latest DTS for an active track
-    mtime_t i_ts_max = INT64_MIN;
-    for( size_t j = 0; j < p_segment->tracks.size(); j++ )
-    {
-        mkv_track_t *tk = p_segment->tracks[j];
-        if( tk->i_last_dts > VLC_TS_INVALID )
-            i_ts_max = __MAX( i_ts_max, tk->i_last_dts );
-    }
-
-    // find the earliest DTS less than 10 clock ticks away from the latest DTS
-    mtime_t i_ts_min = INT64_MAX;
-    for( size_t j = 0; j < p_segment->tracks.size(); j++ )
-    {
-        mkv_track_t *tk = p_segment->tracks[j];
-        if( tk->i_last_dts > VLC_TS_INVALID && tk->i_last_dts + 10 * CLOCK_FREQ >= i_ts_max )
-            i_ts_min = __MIN( i_ts_min, tk->i_last_dts );
-    }
-
-    // the PCR is the earliest active DTS if we found one
-    if( i_ts_min != INT64_MAX && ( i_ts_min > p_sys->i_pcr || p_sys->i_pcr == VLC_TS_INVALID ) )
-    {
-        p_sys->i_pcr = i_ts_min;
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_ts_min );
-    }
-
-#if 0
-msg_Dbg( p_demux, "block (track=%d) i_dts: %" PRId64" / i_pts: %" PRId64, p_tk->i_number, p_block->i_dts, p_block->i_pts);
-#endif
-
     es_out_Send( p_demux->out, p_tk->p_es, p_block);
 }
 
