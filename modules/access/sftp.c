@@ -113,6 +113,7 @@ static int Open( vlc_object_t* p_this )
     vlc_url_t url;
     size_t i_len;
     int i_type;
+    int i_result = VLC_EGENERIC;
 
     if( !p_access->psz_location )
         return VLC_EGENERIC;
@@ -312,26 +313,17 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
-    free( psz_remote_home );
-    vlc_UrlClean( &url );
-    vlc_credential_clean( &credential );
-    vlc_UrlClean( &credential_url );
-    return VLC_SUCCESS;
+    i_result = VLC_SUCCESS;
 
 error:
-    if( p_sys->file )
-        libssh2_sftp_close_handle( p_sys->file );
-    if( p_sys->ssh_session )
-        libssh2_session_free( p_sys->ssh_session );
-    free( p_sys->psz_base_url );
     free( psz_remote_home );
     vlc_UrlClean( &url );
     vlc_credential_clean( &credential );
     vlc_UrlClean( &credential_url );
-    if( p_sys->i_socket >= 0 )
-        net_Close( p_sys->i_socket );
-    free( p_sys );
-    return VLC_EGENERIC;
+    if( i_result != VLC_SUCCESS ) {
+        Close( p_this );
+    }
+    return i_result;
 }
 
 
@@ -341,11 +333,14 @@ static void Close( vlc_object_t* p_this )
     access_t*   p_access = (access_t*)p_this;
     access_sys_t* p_sys = p_access->p_sys;
 
-    libssh2_sftp_close_handle( p_sys->file );
-    libssh2_sftp_shutdown( p_sys->sftp_session );
-
-    libssh2_session_free( p_sys->ssh_session );
-    net_Close( p_sys->i_socket );
+    if( p_sys->file )
+        libssh2_sftp_close_handle( p_sys->file );
+    if( p_sys->sftp_session )
+        libssh2_sftp_shutdown( p_sys->sftp_session );
+    if( p_sys->ssh_session )
+        libssh2_session_free( p_sys->ssh_session );
+    if( p_sys->i_socket >= 0 )
+        net_Close( p_sys->i_socket );
 
     free( p_sys->psz_base_url );
     free( p_sys );
