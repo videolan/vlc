@@ -79,13 +79,12 @@ static const struct
 {
     const char *psz_protocol;
     const char *psz_service_name;
-    uint16_t    i_default_port;
 } protocols[] = {
-    { "ftp", "_ftp._tcp", 21 },
-    { "smb", "_smb._tcp", 445 },
-    { "nfs", "_nfs._tcp", 2049 },
-    { "sftp", "_sftp-ssh._tcp", 22 },
-    { "rtsp", "_rtsp._tcp.local", 554 },
+    { "ftp", "_ftp._tcp" },
+    { "smb", "_smb._tcp" },
+    { "nfs", "_nfs._tcp" },
+    { "sftp", "_sftp-ssh._tcp" },
+    { "rtsp", "_rtsp._tcp.local" },
 };
 #define NB_PROTOCOLS (sizeof(protocols) / sizeof(*protocols))
 
