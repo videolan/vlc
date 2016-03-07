@@ -1768,7 +1768,7 @@ AS_IF([test "${SYS}" = "mingw32"], [ VLC_ADD_PLUGIN([smb]) ])
 dnl
 dnl  liBDSM access module
 dnl
-PKG_ENABLE_MODULES_VLC([DSM], [dsm], [libdsm >= 0.0.7], [libdsm SMB/CIFS access/sd module], [auto])
+PKG_ENABLE_MODULES_VLC([DSM], [dsm], [libdsm >= 0.2.0], [libdsm SMB/CIFS access/sd module], [auto])
 
 dnl
 dnl sftp access support

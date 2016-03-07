@@ -154,8 +154,9 @@ static int Open( vlc_object_t *p_this )
              inet_ntoa( p_sys->addr ) );
 
     /* Now that we have the required data, let's establish a session */
-    if( !smb_session_connect( p_sys->p_session, p_sys->netbios_name,
-                              p_sys->addr.s_addr, SMB_TRANSPORT_TCP ) )
+    if( smb_session_connect( p_sys->p_session, p_sys->netbios_name,
+                             p_sys->addr.s_addr, SMB_TRANSPORT_TCP )
+                             != DSM_SUCCESS )
     {
         msg_Err( p_access, "Unable to connect/negotiate SMB session");
         goto error;
@@ -237,7 +238,7 @@ static int get_address( access_t *p_access )
         /* Is this a netbios name on this LAN ? */
         if( netbios_ns_resolve( p_sys->p_ns, p_sys->url.psz_host,
                                 NETBIOS_FILESERVER,
-                                &p_sys->addr.s_addr) )
+                                &p_sys->addr.s_addr) == 0 )
         {
             strlcpy( p_sys->netbios_name, p_sys->url.psz_host, 16);
             return VLC_SUCCESS;
@@ -276,33 +277,40 @@ static int get_address( access_t *p_access )
 }
 
 static int smb_connect( access_t *p_access, const char *psz_login,
-                        const char *psz_password, const char *psz_domain )
+                        const char *psz_password, const char *psz_domain)
 {
     access_sys_t *p_sys = p_access->p_sys;
 
     smb_session_set_creds( p_sys->p_session, psz_domain,
                            psz_login, psz_password );
-    if( smb_session_login( p_sys->p_session ) )
+    if( smb_session_login( p_sys->p_session ) == DSM_SUCCESS )
     {
         if( p_sys->psz_share )
         {
             /* Connect to the share */
-            p_sys->i_tid = smb_tree_connect( p_sys->p_session, p_sys->psz_share );
-            if( !p_sys->i_tid )
+            if( smb_tree_connect( p_sys->p_session, p_sys->psz_share,
+                                  &p_sys->i_tid ) != DSM_SUCCESS )
                 return VLC_EGENERIC;
 
             /* Let's finally ask a handle to the file we wanna read ! */
-            p_sys->i_fd = smb_fopen( p_sys->p_session, p_sys->i_tid,
-                                     p_sys->psz_path, SMB_MOD_RO );
-            /* TODO: fix smb_fopen to return a specific error code in case of
-             * wrong permissions */
-            return p_sys->i_fd > 0 ? VLC_SUCCESS : VLC_EGENERIC;
+            return smb_fopen( p_sys->p_session, p_sys->i_tid, p_sys->psz_path,
+                              SMB_MOD_RO, &p_sys->i_fd )
+                              == DSM_SUCCESS ? VLC_SUCCESS : VLC_EGENERIC;
         }
         else
             return VLC_SUCCESS;
     }
     else
         return VLC_EGENERIC;
+}
+
+static bool smb_has_invalid_creds( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    uint32_t i_nt_status = smb_session_get_nt_status( p_sys->p_session );
+
+    return i_nt_status == NT_STATUS_ACCESS_DENIED
+        || i_nt_status == NT_STATUS_LOGON_FAILURE;
 }
 
 /* Performs login with existing credentials and ask the user for new ones on
@@ -342,7 +350,8 @@ static int login( access_t *p_access )
     if( smb_connect( p_access, psz_login, psz_password, psz_domain )
                      != VLC_SUCCESS )
     {
-        while( vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
+        while( smb_has_invalid_creds( p_access)
+            && vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
                                    SMB_LOGIN_DIALOG_TITLE,
                                    SMB_LOGIN_DIALOG_TEXT, p_sys->netbios_name ) )
         {
@@ -452,8 +461,8 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 
     msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
-    /* seek cannot fail in bdsm, but the subsequent read can */
-    smb_fseek(p_sys->p_session, p_sys->i_fd, i_pos, SMB_SEEK_SET);
+    if (smb_fseek(p_sys->p_session, p_sys->i_fd, i_pos, SMB_SEEK_SET) == -1)
+        return VLC_EGENERIC;
 
     p_access->info.b_eof = false;
 
@@ -557,8 +566,14 @@ static input_item_t* BrowseShare( access_t *p_access )
     input_item_t   *p_item = NULL;
 
     if( !p_sys->i_browse_count )
-        p_sys->i_browse_count = smb_share_get_list( p_sys->p_session,
-                                                    &p_sys->shares );
+    {
+        size_t i_count;
+        if( smb_share_get_list( p_sys->p_session, &p_sys->shares, &i_count )
+            != DSM_SUCCESS )
+            return NULL;
+        else
+            p_sys->i_browse_count = i_count;
+    }
     for( ; !p_item && p_sys->i_browse_idx < p_sys->i_browse_count
          ; p_sys->i_browse_idx++ )
     {

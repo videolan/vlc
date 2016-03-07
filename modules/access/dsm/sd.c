@@ -160,8 +160,8 @@ int bdsm_SdOpen (vlc_object_t *p_this)
     callbacks.pf_on_entry_added = netbios_ns_discover_on_entry_added;
     callbacks.pf_on_entry_removed = netbios_ns_discover_on_entry_removed;
 
-    if( !netbios_ns_discover_start( p_sys->p_ns, BROADCAST_TIMEOUT,
-                                    &callbacks) )
+    if( netbios_ns_discover_start( p_sys->p_ns, BROADCAST_TIMEOUT,
+                                   &callbacks) != 0 )
         goto error;
 
     return VLC_SUCCESS;
