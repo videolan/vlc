@@ -365,9 +365,7 @@ void StandardPLPanel::popupAction( QAction *action )
         foreach( const QString &file, uris )
             a.uris << qtu( toURI( toNativeSeparators( file ) ) );
         action->setData( QVariant::fromValue( a ) );
-        if ( model->action( action, list ) )
-            foreach( const QString &file, a.uris )
-                RecentsMRL::getInstance( p_intf )->addRecent( file );
+        model->action( action, list );
         break;
 
     case VLCModelSubInterface::ACTION_ENQUEUEDIR:
@@ -386,9 +384,7 @@ void StandardPLPanel::popupAction( QAction *action )
         a.options = dialog->getOptions();
         if ( a.uris.isEmpty() ) return;
         action->setData( QVariant::fromValue( a ) );
-        if ( model->action( action, list ) )
-            foreach( const QString &file, a.uris )
-                RecentsMRL::getInstance( p_intf )->addRecent( file );
+        model->action( action, list );
         break;
 
     case VLCModelSubInterface::ACTION_SAVETOPLAYLIST:

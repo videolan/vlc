@@ -129,7 +129,7 @@ void InputManager::setInput( input_thread_t *_p_input )
             playlist_Lock( THEPL );
             // Add root items only
             playlist_item_t* p_node = playlist_CurrentPlayingItem( THEPL );
-            if ( p_node != NULL && ( p_node->p_parent == NULL || p_node->i_children == -1 ) )
+            if ( p_node != NULL && p_node->p_parent != NULL && p_node->p_parent->i_id == THEPL->p_playing->i_id )
             {
                 // Save the latest URI to avoid asking to restore the
                 // position on the same input file.
