@@ -94,6 +94,34 @@ struct access_sys_t
 };
 
 
+static int AuthPublicKey( access_t *p_access, const char *psz_home, const char *psz_username )
+{
+    access_sys_t* p_sys = p_access->p_sys;
+    int i_result = VLC_EGENERIC;
+    char *psz_keyfile1 = NULL;
+    char *psz_keyfile2 = NULL;
+
+    if( !psz_username || !psz_username[0] )
+        return i_result;
+
+    if( asprintf( &psz_keyfile1, "%s/.ssh/id_rsa.pub", psz_home ) == -1 ||
+        asprintf( &psz_keyfile2, "%s/.ssh/id_rsa",     psz_home ) == -1 )
+        goto bailout;
+
+    if( libssh2_userauth_publickey_fromfile( p_sys->ssh_session, psz_username, psz_keyfile1, psz_keyfile2, NULL ) )
+    {
+        msg_Dbg( p_access, "Public key authentication failed" );
+        goto bailout;
+    }
+
+    msg_Info( p_access, "Public key authentication succeeded" );
+    i_result = VLC_SUCCESS;
+
+ bailout:
+    free( psz_keyfile1 );
+    free( psz_keyfile2 );
+    return i_result;
+}
 
 /**
  * Connect to the sftp server and ask for a file
@@ -108,6 +136,7 @@ static int Open( vlc_object_t* p_this )
     vlc_credential credential;
     const char* psz_path;
     char* psz_remote_home = NULL;
+    char* psz_home = NULL;
     int i_port;
     int i_ret;
     vlc_url_t url;
@@ -173,7 +202,7 @@ static int Open( vlc_object_t* p_this )
     if( !ssh_knownhosts )
         goto error;
 
-    char *psz_home = config_GetUserDir( VLC_HOME_DIR );
+    psz_home = config_GetUserDir( VLC_HOME_DIR );
     char *psz_knownhosts_file;
     if( asprintf( &psz_knownhosts_file, "%s/.ssh/known_hosts", psz_home ) != -1 )
     {
@@ -181,7 +210,6 @@ static int Open( vlc_object_t* p_this )
                 LIBSSH2_KNOWNHOST_FILE_OPENSSH );
         free( psz_knownhosts_file );
     }
-    free( psz_home );
 
     const char *fingerprint = libssh2_session_hostkey( p_sys->ssh_session, &i_len, &i_type );
     struct libssh2_knownhost *host;
@@ -210,6 +238,9 @@ static int Open( vlc_object_t* p_this )
 
     //TODO: ask for the available auth methods
 
+    /* Try public key auth first */
+    if( AuthPublicKey( p_access, psz_home, url.psz_username ) != VLC_SUCCESS )
+    {
     while( vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
                                _("SFTP authentication"),
                                _("Please enter a valid login and password for "
@@ -223,8 +254,12 @@ static int Open( vlc_object_t* p_this )
             vlc_credential_store( &credential, p_access );
             break;
         }
-        else
-            msg_Warn( p_access, "sftp auth failed for %s", credential.psz_username );
+
+        if( AuthPublicKey( p_access, psz_home, credential.psz_username ) == VLC_SUCCESS )
+            break;
+
+        msg_Warn( p_access, "sftp auth failed for %s", credential.psz_username );
+    }
     }
 
     /* Create the sftp session */
@@ -316,6 +351,7 @@ static int Open( vlc_object_t* p_this )
     i_result = VLC_SUCCESS;
 
 error:
+    free( psz_home );
     free( psz_remote_home );
     vlc_UrlClean( &url );
     vlc_credential_clean( &credential );
