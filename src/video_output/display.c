@@ -437,7 +437,8 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     if (!convert)
         return 0;
 
-    msg_Dbg(vd, "A filter to adapt decoder to display is needed");
+    msg_Dbg(vd, "A filter to adapt decoder %4.4s to display %4.4s is needed",
+            (const char *)&v_src.i_chroma, (const char *)&v_dst.i_chroma);
 
     filter_owner_t owner = {
         .sys = vd,
