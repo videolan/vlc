@@ -90,6 +90,7 @@ struct access_sys_t
     LIBSSH2_SFTP* sftp_session;
     LIBSSH2_SFTP_HANDLE* file;
     uint64_t filesize;
+    char *psz_base_url;
 };
 
 
@@ -254,6 +255,17 @@ static int Open( vlc_object_t* p_this )
         }
         psz_remote_home[i_ret] = '\0';
         psz_path = psz_remote_home;
+
+        /* store base url for directory read */
+        char *base = vlc_path2uri( psz_path, "sftp" );
+        if( !base )
+            goto error;
+        if( -1 == asprintf( &p_sys->psz_base_url, "sftp://%s%s", p_access->psz_location, base + 7 ) )
+        {
+            free( base );
+            goto error;
+        }
+        free( base );
     }
     else
         psz_path = url.psz_path;
@@ -281,6 +293,17 @@ static int Open( vlc_object_t* p_this )
 
         p_access->pf_readdir = DirRead;
         p_access->pf_control = DirControl;
+
+        if( !p_sys->psz_base_url )
+        {
+            if( asprintf( &p_sys->psz_base_url, "sftp://%s", p_access->psz_location ) == -1 )
+                goto error;
+
+            /* trim trailing '/' */
+            size_t len = strlen( p_sys->psz_base_url );
+            if( len > 0 && p_sys->psz_base_url[ len - 1 ] == '/' )
+                p_sys->psz_base_url[ len - 1 ] = 0;
+        }
     }
 
     if( !p_sys->file )
@@ -300,6 +323,7 @@ error:
         libssh2_sftp_close_handle( p_sys->file );
     if( p_sys->ssh_session )
         libssh2_session_free( p_sys->ssh_session );
+    free( p_sys->psz_base_url );
     free( psz_remote_home );
     vlc_UrlClean( &url );
     vlc_credential_clean( &credential );
@@ -323,6 +347,7 @@ static void Close( vlc_object_t* p_this )
     libssh2_session_free( p_sys->ssh_session );
     net_Close( p_sys->i_socket );
 
+    free( p_sys->psz_base_url );
     free( p_sys );
 }
 
@@ -455,7 +480,7 @@ static input_item_t* DirRead( access_t *p_access )
         if( psz_uri == NULL )
             continue;
 
-        if( asprintf( &psz_full_uri, "sftp://%s/%s", p_access->psz_location, psz_uri ) == -1 )
+        if( asprintf( &psz_full_uri, "%s/%s", p_sys->psz_base_url, psz_uri ) == -1 )
         {
             free( psz_uri );
             continue;
