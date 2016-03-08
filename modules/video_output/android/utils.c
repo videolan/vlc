@@ -761,7 +761,9 @@ AWindowHandler_sendHardwareAccelerationError(vlc_object_t *p_obj,
     if (p_awh)
     {
         p_env = AWindowHandler_getEnv(p_awh);
-        p_awh = NULL;
+        if (!p_env)
+            return VLC_EGENERIC;
+        JNI_CALL(CallVoidMethod, sendHardwareAccelerationError);
     }
     else
     {
@@ -769,12 +771,11 @@ AWindowHandler_sendHardwareAccelerationError(vlc_object_t *p_obj,
         if (!p_awh)
             return VLC_EGENERIC;
         p_env = AWindowHandler_getEnv(p_awh);
-    }
-    if (!p_env)
-        return VLC_EGENERIC;
-
-    JNI_CALL(CallVoidMethod, sendHardwareAccelerationError);
-    if (p_awh)
+        if (!p_env)
+            return VLC_EGENERIC;
+        JNI_CALL(CallVoidMethod, sendHardwareAccelerationError);
         AWindowHandler_destroy(p_awh);
+    }
+
     return VLC_SUCCESS;
 }
