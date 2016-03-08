@@ -971,7 +971,7 @@ static int blurayEsPid(demux_sys_t *p_sys, int es_type, int i_es_idx)
 
     if (p_sys->p_clip_info) {
         if (es_type == AUDIO_ES) {
-            if (i_es_idx >= 0 && i_es_idx < p_sys->p_clip_info->pg_stream_count) {
+            if (i_es_idx >= 0 && i_es_idx < p_sys->p_clip_info->audio_stream_count) {
                 i_pid = p_sys->p_clip_info->audio_streams[i_es_idx].pid;
             }
         } else if (es_type == SPU_ES) {
