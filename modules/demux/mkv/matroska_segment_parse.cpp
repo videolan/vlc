@@ -26,6 +26,7 @@
 #include "chapters.hpp"
 #include "demux.hpp"
 #include "Ebml_parser.hpp"
+#include "Ebml_dispatcher.hpp"
 #include "util.hpp"
 
 extern "C" {
@@ -190,6 +191,7 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 /*****************************************************************************
  * ParseTrackEntry:
  *****************************************************************************/
+
 void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 {
     bool bSupported = true;
@@ -231,410 +233,263 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
     msg_Dbg( &sys.demuxer, "|   |   + Track Entry" );
 
-    for( size_t i = 0; i < m->ListSize(); i++ )
+    struct MetaDataCapture {
+      matroska_segment_c * obj;
+      mkv_track_t        * tk;
+      demux_t            * p_demuxer;
+      bool&                bSupported;
+      int                  level;
+      struct {
+        unsigned int i_crop_right;
+        unsigned int i_crop_left;
+        unsigned int i_crop_top;
+        unsigned int i_crop_bottom;
+        unsigned int i_display_unit;
+        unsigned int i_display_width;
+        unsigned int i_display_height;
+      } track_video_info;
+
+    } metadata_payload = {
+      this, tk, &sys.demuxer, bSupported, 3, { }
+    };
+
+    MKV_SWITCH_CREATE( EbmlTypeDispatcher, MetaDataHandlers, MetaDataCapture )
     {
-        EbmlElement *l = (*m)[i];
+        MKV_SWITCH_INIT();
 
-        if( MKV_IS_ID( l, KaxTrackNumber ) )
+        E_CASE( KaxTrackNumber, tnum )
         {
-            KaxTrackNumber &tnum = *static_cast<KaxTrackNumber*>( l );
-
-            tk->i_number = static_cast<uint32>( tnum );
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Number=%u", static_cast<uint32>( tnum ) );
+            vars.tk->i_number = static_cast<uint32>( tnum );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Number=%u", static_cast<uint32>( tnum ) );
         }
-        else  if( MKV_IS_ID( l, KaxTrackUID ) )
+        E_CASE( KaxTrackUID, tuid )
         {
-            KaxTrackUID &tuid = *static_cast<KaxTrackUID*>( l );
-
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track UID=%u",  static_cast<uint32>( tuid ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track UID=%u",  static_cast<uint32>( tuid ) );
         }
-        else  if( MKV_IS_ID( l, KaxTrackType ) )
+        E_CASE( KaxTrackType, ttype )
         {
             const char *psz_type;
-            KaxTrackType &ttype = *static_cast<KaxTrackType*>( l );
 
             switch( static_cast<uint8>( ttype ) )
             {
                 case track_audio:
                     psz_type = "audio";
-                    tk->fmt.i_cat = AUDIO_ES;
-                    tk->fmt.audio.i_channels = 1;
-                    tk->fmt.audio.i_rate = 8000;
+                    vars.tk->fmt.i_cat = AUDIO_ES;
+                    vars.tk->fmt.audio.i_channels = 1;
+                    vars.tk->fmt.audio.i_rate = 8000;
                     break;
                 case track_video:
                     psz_type = "video";
-                    tk->fmt.i_cat = VIDEO_ES;
+                    vars.tk->fmt.i_cat = VIDEO_ES;
                     break;
                 case track_subtitle:
                     psz_type = "subtitle";
-                    tk->fmt.i_cat = SPU_ES;
+                    vars.tk->fmt.i_cat = SPU_ES;
                     break;
                 case track_buttons:
                     psz_type = "buttons";
-                    tk->fmt.i_cat = SPU_ES;
+                    vars.tk->fmt.i_cat = SPU_ES;
                     break;
                 default:
                     psz_type = "unknown";
-                    tk->fmt.i_cat = UNKNOWN_ES;
+                    vars.tk->fmt.i_cat = UNKNOWN_ES;
                     break;
             }
 
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Type=%s", psz_type );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Type=%s", psz_type );
         }
-        else  if( MKV_IS_ID( l, KaxTrackFlagEnabled ) ) // UNUSED
+        E_CASE( KaxTrackFlagEnabled, fenb ) // UNUSED
         {
-            KaxTrackFlagEnabled &fenb = *static_cast<KaxTrackFlagEnabled*>( l );
-
-            tk->b_enabled = static_cast<uint32>( fenb );
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Enabled=%u", static_cast<uint32>( fenb ) );
+            uint32 fenb_value = static_cast<uint32>( fenb );
+            vars.tk->b_enabled = fenb_value;
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Enabled=%u", fenb_value );
         }
-        else  if( MKV_IS_ID( l, KaxTrackFlagDefault ) )
+        E_CASE( KaxTrackFlagDefault, fdef )
         {
-            KaxTrackFlagDefault &fdef = *static_cast<KaxTrackFlagDefault*>( l );
-
-            tk->b_default = static_cast<uint32>( fdef );
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Default=%u", static_cast<uint32>( fdef ) );
+            uint32 fdef_value = static_cast<uint32>( fdef );
+            vars.tk->b_default = fdef_value;
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Default=%u", fdef_value );
         }
-        else  if( MKV_IS_ID( l, KaxTrackFlagForced ) ) // UNUSED
+        E_CASE( KaxTrackFlagForced, ffor ) // UNUSED
         {
-            KaxTrackFlagForced &ffor = *static_cast<KaxTrackFlagForced*>( l );
-            tk->b_forced = static_cast<uint32>( ffor );
+            vars.tk->b_forced = static_cast<uint32>( ffor );
 
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Forced=%u", static_cast<uint32>( ffor ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Forced=%u", static_cast<uint32>( ffor ) );
         }
-        else  if( MKV_IS_ID( l, KaxTrackFlagLacing ) ) // UNUSED
+        E_CASE( KaxTrackFlagLacing, lac ) // UNUSED
         {
-            KaxTrackFlagLacing &lac = *static_cast<KaxTrackFlagLacing*>( l );
-
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Lacing=%d", static_cast<uint32>( lac ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Lacing=%d", static_cast<uint32>( lac ) );
         }
-        else  if( MKV_IS_ID( l, KaxTrackMinCache ) ) // UNUSED
+        E_CASE( KaxTrackMinCache, cmin ) // UNUSED
         {
-            KaxTrackMinCache &cmin = *static_cast<KaxTrackMinCache*>( l );
-
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track MinCache=%d", static_cast<uint32>( cmin ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track MinCache=%d", static_cast<uint32>( cmin ) );
         }
-        else  if( MKV_IS_ID( l, KaxTrackMaxCache ) ) // UNUSED
+        E_CASE( KaxTrackMaxCache, cmax ) // UNUSED
         {
-            KaxTrackMaxCache &cmax = *static_cast<KaxTrackMaxCache*>( l );
-
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track MaxCache=%d", static_cast<uint32>( cmax ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track MaxCache=%d", static_cast<uint32>( cmax ) );
         }
-        else  if( MKV_IS_ID( l, KaxTrackDefaultDuration ) )
+        E_CASE( KaxTrackDefaultDuration, defd )
         {
-            KaxTrackDefaultDuration &defd = *static_cast<KaxTrackDefaultDuration*>( l );
-
-            tk->i_default_duration = uint64(defd);
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Default Duration=%" PRId64, tk->i_default_duration );
-            tk->i_default_duration /= 1000;
+            vars.tk->i_default_duration = static_cast<uint64>( defd );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Default Duration=%" PRId64, vars.tk->i_default_duration );
+            vars.tk->i_default_duration /= 1000;
         }
-        else  if( MKV_IS_ID( l, KaxTrackTimecodeScale ) )
+        E_CASE( KaxTrackTimecodeScale, ttcs )
         {
-            KaxTrackTimecodeScale &ttcs = *static_cast<KaxTrackTimecodeScale*>( l );
-
-            tk->f_timecodescale = static_cast<float>( ttcs );
-            if ( tk->f_timecodescale <= 0 ) tk->f_timecodescale = 1.0;
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track TimeCodeScale=%f", tk->f_timecodescale );
+            vars.tk->f_timecodescale = static_cast<float>( ttcs );
+            if ( vars.tk->f_timecodescale <= 0 ) vars.tk->f_timecodescale = 1.0;
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track TimeCodeScale=%f", vars.tk->f_timecodescale );
         }
-        else  if( MKV_IS_ID( l, KaxMaxBlockAdditionID ) ) // UNUSED
+        E_CASE( KaxMaxBlockAdditionID, mbl ) // UNUSED
         {
-            KaxMaxBlockAdditionID &mbl = *static_cast<KaxMaxBlockAdditionID*>( l );
-
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Max BlockAdditionID=%d", static_cast<uint32>( mbl ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Max BlockAdditionID=%d", static_cast<uint32>( mbl ) );
         }
-        else if( MKV_IS_ID( l, KaxTrackName ) )
+        E_CASE( KaxTrackName, tname )
         {
-            KaxTrackName &tname = *static_cast<KaxTrackName*>( l );
-
-            tk->fmt.psz_description = ToUTF8( UTFstring( tname ) );
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Name=%s", tk->fmt.psz_description );
+            vars.tk->fmt.psz_description = ToUTF8( UTFstring( tname ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Name=%s", vars.tk->fmt.psz_description );
         }
-        else  if( MKV_IS_ID( l, KaxTrackLanguage ) )
+        E_CASE( KaxTrackLanguage, lang )
         {
-            KaxTrackLanguage &lang = *static_cast<KaxTrackLanguage*>( l );
-
-            free( tk->fmt.psz_language );
-            tk->fmt.psz_language = strdup( std::string( lang ).c_str() );
-            msg_Dbg( &sys.demuxer,
-                     "|   |   |   + Track Language=`%s'", tk->fmt.psz_language );
+            free( vars.tk->fmt.psz_language );
+            vars.tk->fmt.psz_language = strdup( std::string( lang ).c_str() );
+            msg_Dbg( vars.p_demuxer,
+                     "|   |   |   + Track Language=`%s'", vars.tk->fmt.psz_language );
         }
-        else  if( MKV_IS_ID( l, KaxCodecID ) )
+        E_CASE( KaxCodecID, codecid )
         {
-            KaxCodecID &codecid = *static_cast<KaxCodecID*>( l );
-
-            tk->psz_codec = strdup( std::string( codecid ).c_str() );
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track CodecId=%s", std::string( codecid ).c_str() );
+            vars.tk->psz_codec = strdup( std::string( codecid ).c_str() );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track CodecId=%s", std::string( codecid ).c_str() );
         }
-        else  if( MKV_IS_ID( l, KaxCodecPrivate ) )
+        E_CASE( KaxCodecPrivate, cpriv )
         {
-            KaxCodecPrivate &cpriv = *static_cast<KaxCodecPrivate*>( l );
-
-            tk->i_extra_data = cpriv.GetSize();
-            if( tk->i_extra_data > 0 )
+            vars.tk->i_extra_data = cpriv.GetSize();
+            if( vars.tk->i_extra_data > 0 )
             {
-                tk->p_extra_data = static_cast<uint8_t*>( malloc( tk->i_extra_data ) );
-                memcpy( tk->p_extra_data, cpriv.GetBuffer(), tk->i_extra_data );
+                vars.tk->p_extra_data = static_cast<uint8_t*>( malloc( vars.tk->i_extra_data ) );
+                memcpy( vars.tk->p_extra_data, cpriv.GetBuffer(), vars.tk->i_extra_data );
             }
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track CodecPrivate size=%" PRId64, cpriv.GetSize() );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track CodecPrivate size=%" PRId64, cpriv.GetSize() );
         }
-        else if( MKV_IS_ID( l, KaxCodecName ) )
+        E_CASE( KaxCodecName, cname )
         {
-            KaxCodecName &cname = *static_cast<KaxCodecName*>( l );
-
-            tk->psz_codec_name = ToUTF8( UTFstring( cname ) );
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Name=%s", tk->psz_codec_name );
+            vars.tk->psz_codec_name = ToUTF8( UTFstring( cname ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Codec Name=%s", vars.tk->psz_codec_name );
         }
         //AttachmentLink
-        else if( MKV_IS_ID( l, KaxCodecDecodeAll ) ) // UNUSED
+        E_CASE( KaxCodecDecodeAll, cdall ) // UNUSED
         {
-            KaxCodecDecodeAll &cdall = *static_cast<KaxCodecDecodeAll*>( l );
-
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Decode All=%u", static_cast<uint8>( cdall ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Codec Decode All=%u", static_cast<uint8>( cdall ) );
         }
-        else if( MKV_IS_ID( l, KaxTrackOverlay ) ) // UNUSED
+        E_CASE( KaxTrackOverlay, tovr ) // UNUSED
         {
-            KaxTrackOverlay &tovr = *static_cast<KaxTrackOverlay*>( l );
-
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Overlay=%u", static_cast<uint32>( tovr ) );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Overlay=%u", static_cast<uint32>( tovr ) );
         }
 #if LIBMATROSKA_VERSION >= 0x010401
-        else if( MKV_IS_ID( l, KaxCodecDelay ) )
+        E_CASE( KaxCodecDelay, codecdelay )
         {
-            KaxCodecDelay &codecdelay = *static_cast<KaxCodecDelay*>( l );
-            tk->i_codec_delay = uint64_t( codecdelay ) / 1000;
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Delay =%" PRIu64,
-                     tk->i_codec_delay );
+            vars.tk->i_codec_delay = static_cast<uint64_t>( codecdelay ) / 1000;
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Codec Delay =%" PRIu64,
+                     vars.tk->i_codec_delay );
         }
-        else if( MKV_IS_ID( l, KaxSeekPreRoll ) )
+        E_CASE( KaxSeekPreRoll, spr )
         {
-            KaxSeekPreRoll &spr = *static_cast<KaxSeekPreRoll*>( l );
-            tk->i_seek_preroll = uint64_t(spr) / 1000;
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Seek Preroll =%" PRIu64, tk->i_seek_preroll );
+            vars.tk->i_seek_preroll = static_cast<uint64_t>( spr ) / 1000;
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Seek Preroll =%" PRIu64, vars.tk->i_seek_preroll );
         }
 #endif
-        else if( MKV_IS_ID( l, KaxContentEncodings ) )
+        E_CASE( KaxContentEncodings, cencs )
         {
-            EbmlMaster *cencs = static_cast<EbmlMaster*>(l);
-            MkvTree( sys.demuxer, 3, "Content Encodings" );
-            if ( cencs->ListSize() > 1 )
+            MkvTree( *vars.p_demuxer, 3, "Content Encodings" );
+
+            if ( cencs.ListSize () > 1 )
             {
-                msg_Err( &sys.demuxer, "Multiple Compression method not supported" );
-                bSupported = false;
+                msg_Err( vars.p_demuxer, "Multiple Compression method not supported" );
+                vars.bSupported = false;
             }
-            for( size_t j = 0; j < cencs->ListSize(); j++ )
+
+            vars.level += 1;
+            dispatcher.iterate( cencs.begin(), cencs.end(), Payload( vars ) );
+            vars.level -= 1;
+        }
+        E_CASE( KaxContentEncoding, cenc )
+        {
+            MkvTree( *vars.p_demuxer, 4, "Content Encoding" );
+
+            vars.level += 1;
+            dispatcher.iterate( cenc.begin(), cenc.end(), Payload( vars ) );
+            vars.level -= 1;
+        }
+        E_CASE( KaxContentEncodingOrder, encord )
+        {
+            MkvTree( *vars.p_demuxer, 4, "Order: %i", static_cast<uint32>( encord ) );
+        }
+        E_CASE( KaxContentEncodingScope, encscope )
+        {
+            vars.tk->i_encoding_scope = static_cast<uint32>( encscope );
+            MkvTree( *vars.p_demuxer, 4, "Scope: %i", static_cast<uint32>( encscope ) );
+        }
+        E_CASE( KaxContentEncodingType, enctype )
+        {
+            MkvTree( *vars.p_demuxer, 4, "Type: %i", static_cast<uint32>( enctype ) );
+        }
+        E_CASE( KaxContentCompression, compr )
+        {
+            MkvTree( *vars.p_demuxer, 5, "Content Compression" );
+            //Default compression type is 0 (Zlib)
+            vars.tk->i_compression_type = MATROSKA_COMPRESSION_ZLIB;
+
+            vars.level += 1;
+            dispatcher.iterate( compr.begin(), compr.end(), Payload( vars ) );
+            vars.level -= 1;
+        }
+        E_CASE( KaxContentCompAlgo, compalg )
+        {
+            MkvTree( *vars.p_demuxer, 6, "Compression Algorithm: %i", uint32(compalg) );
+            vars.tk->i_compression_type = static_cast<uint32>( compalg );
+            if ( ( vars.tk->i_compression_type != MATROSKA_COMPRESSION_ZLIB ) &&
+                 ( vars.tk->i_compression_type != MATROSKA_COMPRESSION_HEADER ) )
             {
-                EbmlElement *l2 = (*cencs)[j];
-                if( MKV_IS_ID( l2, KaxContentEncoding ) )
-                {
-                    MkvTree( sys.demuxer, 4, "Content Encoding" );
-                    EbmlMaster *cenc = static_cast<EbmlMaster*>(l2);
-                    for( size_t k = 0; k < cenc->ListSize(); k++ )
-                    {
-                        EbmlElement *l3 = (*cenc)[k];
-                        if( MKV_IS_ID( l3, KaxContentEncodingOrder ) )
-                        {
-                            KaxContentEncodingOrder &encord = *(KaxContentEncodingOrder*)l3;
-                            MkvTree( sys.demuxer, 5, "Order: %i", static_cast<uint32>( encord ) );
-                        }
-                        else if( MKV_IS_ID( l3, KaxContentEncodingScope ) )
-                        {
-                            KaxContentEncodingScope &encscope = *(KaxContentEncodingScope*)l3;
-                            tk->i_encoding_scope = static_cast<uint32>( encscope );
-                            MkvTree( sys.demuxer, 5, "Scope: %i", static_cast<uint32>( encscope ) );
-                        }
-                        else if( MKV_IS_ID( l3, KaxContentEncodingType ) )
-                        {
-                            KaxContentEncodingType &enctype = *(KaxContentEncodingType*)l3;
-                            MkvTree( sys.demuxer, 5, "Type: %i", static_cast<uint32>( enctype ) );
-                        }
-                        else if( MKV_IS_ID( l3, KaxContentCompression ) )
-                        {
-                            EbmlMaster *compr = static_cast<EbmlMaster*>(l3);
-                            MkvTree( sys.demuxer, 5, "Content Compression" );
-                            //Default compression type is 0 (Zlib)
-                            tk->i_compression_type = MATROSKA_COMPRESSION_ZLIB;
-                            for( size_t n = 0; n < compr->ListSize(); n++ )
-                            {
-                                EbmlElement *l4 = (*compr)[n];
-                                if( MKV_IS_ID( l4, KaxContentCompAlgo ) )
-                                {
-                                    KaxContentCompAlgo &compalg = *(KaxContentCompAlgo*)l4;
-                                    MkvTree( sys.demuxer, 6, "Compression Algorithm: %i", static_cast<uint32>(compalg) );
-                                    tk->i_compression_type = static_cast<uint32>( compalg );
-                                    if ( ( tk->i_compression_type != MATROSKA_COMPRESSION_ZLIB ) &&
-                                         ( tk->i_compression_type != MATROSKA_COMPRESSION_HEADER ) )
-                                    {
-                                        msg_Err( &sys.demuxer, "Track Compression method %d not supported", tk->i_compression_type );
-                                        bSupported = false;
-                                    }
-                                }
-                                else if( MKV_IS_ID( l4, KaxContentCompSettings ) )
-                                {
-                                    tk->p_compression_data = new KaxContentCompSettings( *(KaxContentCompSettings*)l4 );
-                                }
-                                else if ( !MKV_IS_ID( l4, EbmlVoid ) )
-                                {
-                                    MkvTree( sys.demuxer, 6, "Unknown (%s)", typeid(*l4).name() );
-                                }
-                            }
-                        }
-                        // ContentEncryption Unsupported
-                        else if ( !MKV_IS_ID( l3, EbmlVoid ) )
-                        {
-                            MkvTree( sys.demuxer, 5, "Unknown (%s)", typeid(*l3).name() );
-                        }
-                    }
-                }
-                else if ( !MKV_IS_ID( l2, EbmlVoid ) )
-                {
-                    MkvTree( sys.demuxer, 4, "Unknown (%s)", typeid(*l2).name() );
-                }
+                msg_Err( vars.p_demuxer, "Track Compression method %d not supported", vars.tk->i_compression_type );
+                vars.bSupported = false;
             }
         }
-//        else if( MKV_IS_ID( l, KaxCodecSettings) ) DEPRECATED by matroska
-//        {
-//            KaxCodecSettings &cset = *(KaxCodecSettings*)l;
-
-//            tk->psz_codec_settings = ToUTF8( UTFstring( cset ) );
-//            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Settings=%s", tk->psz_codec_settings );
-//        }
-//        else if( MKV_IS_ID( l, KaxCodecInfoURL) ) DEPRECATED by matroska
-//        {
-//            KaxCodecInfoURL &ciurl = *(KaxCodecInfoURL*)l;
-
-//            tk->psz_codec_info_url = strdup( string( ciurl ).c_str() );
-//            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Info URL=%s", tk->psz_codec_info_url );
-//        }
-//        else if( MKV_IS_ID( l, KaxCodecDownloadURL) ) DEPRECATED by matroska
-//        {
-//            KaxCodecDownloadURL &cdurl = *(KaxCodecDownloadURL*)l;
-
-//            tk->psz_codec_download_url = strdup( string( cdurl ).c_str() );
-//            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Info URL=%s", tk->psz_codec_download_url );
-//        }
-        else  if( MKV_IS_ID( l, KaxTrackVideo ) )
+        E_CASE( KaxContentCompSettings, kccs )
         {
-            EbmlMaster *tkv = static_cast<EbmlMaster*>(l);
-            unsigned int i_crop_right = 0, i_crop_left = 0, i_crop_top = 0, i_crop_bottom = 0;
-            unsigned int i_display_unit = 0, i_display_width = 0, i_display_height = 0;
+            vars.tk->p_compression_data = new KaxContentCompSettings( kccs );
+        }
+        E_CASE( KaxTrackVideo, tkv )
+        {
+            mkv_track_t *tk = vars.tk;
 
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Video" );
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Video" );
             tk->f_fps = 0.0;
 
             tk->fmt.video.i_frame_rate_base = (unsigned int)tk->i_default_duration;
             tk->fmt.video.i_frame_rate = 1000000;
 
-            for( unsigned int j = 0; j < tkv->ListSize(); j++ )
-            {
-                EbmlElement *l = (*tkv)[j];
-                if( MKV_IS_ID( l, KaxVideoFlagInterlaced ) ) // UNUSED
-                {
-                    KaxVideoFlagInterlaced &fint = *static_cast<KaxVideoFlagInterlaced*>( l );
+            vars.level += 1;
+            dispatcher.iterate (tkv.begin (), tkv.end (), Payload( vars ) );
+            vars.level -= 1;
 
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Interlaced=%u", static_cast<uint8>( fint ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoStereoMode ) ) // UNUSED
-                {
-                    KaxVideoStereoMode &stereo = *static_cast<KaxVideoStereoMode*>( l );
+            unsigned int i_crop_top    = vars.track_video_info.i_crop_top;
+            unsigned int i_crop_right  = vars.track_video_info.i_crop_right;
+            unsigned int i_crop_bottom = vars.track_video_info.i_crop_bottom;
+            unsigned int i_crop_left   = vars.track_video_info.i_crop_left;
 
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Stereo Mode=%u", static_cast<uint8>( stereo ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoPixelWidth ) )
-                {
-                    KaxVideoPixelWidth &vwidth = *static_cast<KaxVideoPixelWidth*>( l );
+            unsigned int i_display_unit   = vars.track_video_info.i_display_unit; VLC_UNUSED(i_display_unit);
+            unsigned int i_display_width  = vars.track_video_info.i_display_width;
+            unsigned int i_display_height = vars.track_video_info.i_display_height;
 
-                    tk->fmt.video.i_width += static_cast<uint16>( vwidth );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + width=%d", static_cast<uint16>( vwidth ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoPixelHeight ) )
-                {
-                    KaxVideoPixelWidth &vheight = *static_cast<KaxVideoPixelWidth*>( l );
-
-                    tk->fmt.video.i_height += static_cast<uint16>( vheight );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + height=%d", static_cast<uint16>( vheight ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoDisplayWidth ) )
-                {
-                    KaxVideoDisplayWidth &vwidth = *static_cast<KaxVideoDisplayWidth*>( l );
-
-                    i_display_width = static_cast<uint16>( vwidth );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + display width=%d", static_cast<uint16>( vwidth ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoDisplayHeight ) )
-                {
-                    KaxVideoDisplayWidth &vheight = *static_cast<KaxVideoDisplayWidth*>( l );
-
-                    i_display_height = static_cast<uint16>( vheight );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + display height=%d", static_cast<uint16>( vheight ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoPixelCropBottom ) )
-                {
-                    KaxVideoPixelCropBottom &cropval = *static_cast<KaxVideoPixelCropBottom*>( l );
-
-                    i_crop_bottom = static_cast<uint16>( cropval );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel bottom=%d", static_cast<uint16>( cropval ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoPixelCropTop ) )
-                {
-                    KaxVideoPixelCropTop &cropval = *static_cast<KaxVideoPixelCropTop*>( l );
-
-                    i_crop_top = static_cast<uint16>( cropval );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel top=%d", static_cast<uint16>( cropval ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoPixelCropRight ) )
-                {
-                    KaxVideoPixelCropRight &cropval = *static_cast<KaxVideoPixelCropRight*>( l );
-
-                    i_crop_right = static_cast<uint16>( cropval );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel right=%d", static_cast<uint16>( cropval ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoPixelCropLeft ) )
-                {
-                    KaxVideoPixelCropLeft &cropval = *static_cast<KaxVideoPixelCropLeft*>( l );
-
-                    i_crop_left = static_cast<uint16>( cropval );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel left=%d", static_cast<uint16>( cropval ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoDisplayUnit ) )
-                {
-                    KaxVideoDisplayUnit &vdmode = *static_cast<KaxVideoDisplayUnit*>( l );
-
-                    i_display_unit = static_cast<uint8>( vdmode );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Display Unit=%s",
-                             i_display_unit == 0 ? "pixels" : ( i_display_unit == 1 ? "centimeters": "inches" ) );
-                }
-                else if( MKV_IS_ID( l, KaxVideoAspectRatio ) ) // UNUSED
-                {
-                    KaxVideoAspectRatio &ratio = *static_cast<KaxVideoAspectRatio*>( l );
-
-                    msg_Dbg( &sys.demuxer, "   |   |   |   + Track Video Aspect Ratio Type=%u", static_cast<uint8>( ratio ) );
-                }
-                // ColourSpace UNUSED
-                else if( MKV_IS_ID( l, KaxVideoFrameRate ) )
-                {
-                    KaxVideoFrameRate &vfps = *static_cast<KaxVideoFrameRate*>( l );
-
-                    tk->f_fps = __MAX( static_cast<float>( vfps ), 1 );
-                    msg_Dbg( &sys.demuxer, "   |   |   |   + fps=%f", static_cast<float>( vfps ) );
-                }
-//                else if( MKV_IS_ID( l, KaxVideoGamma) ) //DEPRECATED by Matroska
-//                {
-//                    KaxVideoGamma &gamma = *(KaxVideoGamma*)l;
-
-//                    msg_Dbg( &sys.demuxer, "   |   |   |   + gamma=%f", float( gamma ) );
-//                }
-                else if ( !MKV_IS_ID( l, EbmlVoid ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Unknown (%s)", typeid(*l).name() );
-                }
-            }
             if( i_display_height && i_display_width )
             {
                 tk->fmt.video.i_sar_num = i_display_width  * tk->fmt.video.i_height;
                 tk->fmt.video.i_sar_den = i_display_height * tk->fmt.video.i_width;
             }
+
             tk->fmt.video.i_visible_width   = tk->fmt.video.i_width;
             tk->fmt.video.i_visible_height  = tk->fmt.video.i_height;
+
             if( i_crop_left || i_crop_right || i_crop_top || i_crop_bottom )
             {
                 tk->fmt.video.i_x_offset        = i_crop_left;
@@ -645,60 +500,109 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             /* FIXME: i_display_* allows you to not only set DAR, but also a zoom factor.
                we do not support this atm */
         }
-        else  if( MKV_IS_ID( l, KaxTrackAudio ) )
+        E_CASE( KaxVideoFlagInterlaced, fint ) // UNUSED
         {
-            EbmlMaster *tka = static_cast<EbmlMaster*>(l);
-
-            /* Initialize default values */
-            tk->fmt.audio.i_channels = 1;
-            tk->fmt.audio.i_rate = 8000;
-
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Audio" );
-
-            for( unsigned int j = 0; j < tka->ListSize(); j++ )
-            {
-                EbmlElement *l = (*tka)[j];
-
-                if( MKV_IS_ID( l, KaxAudioSamplingFreq ) )
-                {
-                    KaxAudioSamplingFreq &afreq = *static_cast<KaxAudioSamplingFreq*>( l );
-
-                    tk->i_original_rate = tk->fmt.audio.i_rate = static_cast<int>( static_cast<float>( afreq ) );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + afreq=%d", tk->fmt.audio.i_rate );
-                }
-                else if( MKV_IS_ID( l, KaxAudioOutputSamplingFreq ) )
-                {
-                    KaxAudioOutputSamplingFreq &afreq = *static_cast<KaxAudioOutputSamplingFreq*>( l );
-
-                    tk->fmt.audio.i_rate = static_cast<int>( static_cast<float>( afreq ) );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + aoutfreq=%d", tk->fmt.audio.i_rate );
-                }
-                else if( MKV_IS_ID( l, KaxAudioChannels ) )
-                {
-                    KaxAudioChannels &achan = *static_cast<KaxAudioChannels*>( l );
-
-                    tk->fmt.audio.i_channels = static_cast<uint8>( achan );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + achan=%u", static_cast<uint8>( achan ) );
-                }
-                else if( MKV_IS_ID( l, KaxAudioBitDepth ) )
-                {
-                    KaxAudioBitDepth &abits = *static_cast<KaxAudioBitDepth*>( l );
-
-                    tk->fmt.audio.i_bitspersample = static_cast<uint8>( abits );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + abits=%u", static_cast<uint8>( abits ) );
-                }
-                else if ( !MKV_IS_ID( l, EbmlVoid ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Unknown (%s)", typeid(*l).name() );
-                }
-            }
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + Track Video Interlaced=%u", static_cast<uint8>( fint ) );
         }
-        else if ( !MKV_IS_ID( l, EbmlVoid ) )
+        E_CASE( KaxVideoStereoMode, stereo ) // UNUSED
         {
-            msg_Dbg( &sys.demuxer, "|   |   |   + Unknown (%s)",
-                     typeid(*l).name() );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + Track Video Stereo Mode=%u", static_cast<uint8>( stereo ) );
         }
-    }
+        E_CASE( KaxVideoPixelWidth, vwidth )
+        {
+            vars.tk->fmt.video.i_width += static_cast<uint16>( vwidth );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + width=%d", static_cast<uint16>( vwidth ) );
+        }
+        E_CASE( KaxVideoPixelHeight, vheight )
+        {
+            vars.tk->fmt.video.i_height += static_cast<uint16>( vheight );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + height=%d", static_cast<uint16>( vheight ) );
+        }
+        E_CASE( KaxVideoDisplayWidth, vwidth )
+        {
+            vars.track_video_info.i_display_width = static_cast<uint16>( vwidth );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + display width=%d", static_cast<uint16>( vwidth ) );
+        }
+        E_CASE( KaxVideoDisplayHeight, vheight )
+        {
+            vars.track_video_info.i_display_height = static_cast<uint16>( vheight );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + display height=%d", static_cast<uint16>( vheight ) );
+        }
+        E_CASE( KaxVideoPixelCropBottom, cropval )
+        {
+            vars.track_video_info.i_crop_bottom = static_cast<uint16>( cropval );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + crop pixel bottom=%d", static_cast<uint16>( cropval ) );
+        }
+        E_CASE( KaxVideoPixelCropTop, cropval )
+        {
+            vars.track_video_info.i_crop_top = static_cast<uint16>( cropval );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + crop pixel top=%d", static_cast<uint16>( cropval ) );
+        }
+        E_CASE( KaxVideoPixelCropRight, cropval )
+        {
+            vars.track_video_info.i_crop_right = static_cast<uint16>( cropval );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + crop pixel right=%d", static_cast<uint16>( cropval ) );
+        }
+        E_CASE( KaxVideoPixelCropLeft, cropval )
+        {
+            vars.track_video_info.i_crop_left = static_cast<uint16>( cropval );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + crop pixel left=%d", static_cast<uint16>( cropval ) );
+        }
+        E_CASE( KaxVideoDisplayUnit, vdmode )
+        {
+            vars.track_video_info.i_display_unit = static_cast<uint8>( vdmode );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + Track Video Display Unit=%s",
+                     vars.track_video_info.i_display_unit == 0 ? "pixels" : ( vars.track_video_info.i_display_unit == 1 ? "centimeters": "inches" ) );
+        }
+        E_CASE( KaxVideoAspectRatio, ratio ) // UNUSED
+        {
+            msg_Dbg( vars.p_demuxer, "   |   |   |   + Track Video Aspect Ratio Type=%u", static_cast<uint8>( ratio ) );
+        }
+        E_CASE( KaxVideoFrameRate, vfps )
+        {
+            vars.tk->f_fps = __MAX( float( vfps ), 1 );
+            msg_Dbg( vars.p_demuxer, "   |   |   |   + fps=%f", float( vfps ) );
+        }
+        E_CASE( KaxTrackAudio, tka ) {
+            vars.tk->fmt.audio.i_channels = 1;
+            vars.tk->fmt.audio.i_rate = 8000;
+
+            msg_Dbg( vars.p_demuxer, "|   |   |   + Track Audio" );
+
+            vars.level += 1;
+            dispatcher.iterate( tka.begin(), tka.end(), Payload( vars ));
+            vars.level -= 1;
+        }
+        E_CASE( KaxAudioSamplingFreq, afreq )
+        {
+            vars.tk->i_original_rate = vars.tk->fmt.audio.i_rate = (int)float( afreq );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + afreq=%d", vars.tk->fmt.audio.i_rate );
+        }
+        E_CASE( KaxAudioOutputSamplingFreq, afreq )
+        {
+            vars.tk->fmt.audio.i_rate = (int)float( afreq );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + aoutfreq=%d", vars.tk->fmt.audio.i_rate );
+        }
+        E_CASE( KaxAudioChannels, achan )
+        {
+            vars.tk->fmt.audio.i_channels = static_cast<uint8>( achan );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + achan=%u", static_cast<uint8>( achan ) );
+        }
+        E_CASE( KaxAudioBitDepth, abits )
+        {
+            vars.tk->fmt.audio.i_bitspersample = static_cast<uint8>( abits );
+            msg_Dbg( vars.p_demuxer, "|   |   |   |   + abits=%u", static_cast<uint8>( abits ) );
+        }
+        E_CASE ( EbmlVoid, ) {
+          VLC_UNUSED( vars );
+        }
+        E_CASE_DEFAULT(element) {
+            MkvTree( *vars.p_demuxer, vars.level, "Unknown (%s)", typeid(element).name() );
+        }
+    };
+
+    MetaDataHandlers::Dispatcher().iterate ( m->begin(), m->end(), MetaDataHandlers::Payload( metadata_payload ) );
+
 
     if ( bSupported )
     {
@@ -751,19 +655,31 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
         return;
     }
 
-    for( size_t i = 0; i < tracks->ListSize(); i++ )
-    {
-        EbmlElement *l = (*tracks)[i];
+    struct Capture {
+      matroska_segment_c * obj;
+      demux_t            * p_demuxer;
 
-        if( MKV_IS_ID( l, KaxTrackEntry ) )
-        {
-            ParseTrackEntry( static_cast<KaxTrackEntry *>(l) );
+    } payload = {
+      this, &sys.demuxer
+    };
+
+    MKV_SWITCH_CREATE( EbmlTypeDispatcher, TrackHandlers, struct Capture )
+    {
+        MKV_SWITCH_INIT();
+
+        E_CASE( KaxTrackEntry, track_number ) {
+            vars.obj->ParseTrackEntry( &track_number );
         }
-        else if ( !MKV_IS_ID( l, EbmlVoid ) )
-        {
-            msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
+        E_CASE( EbmlVoid, ) {
+            VLC_UNUSED( vars );
         }
-    }
+        E_CASE_DEFAULT(element) {
+            msg_Dbg( vars.p_demuxer, "|   |   + Unknown (%s)", typeid(element).name() );
+        }
+    };
+
+    TrackHandlers::Dispatcher().iterate(
+      tracks->begin(), tracks->end(), TrackHandlers::Payload( payload ) );
 }
 
 /*****************************************************************************
