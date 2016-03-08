@@ -173,7 +173,7 @@ void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
          * Rewind buffer and offset, then copy and scale line */              \
         p_buffer = p_buffer_start;                                            \
         p_offset = p_offset_start;                                            \
-        for( i_x = p_filter->fmt_out.video.i_width / 16; i_x--; )             \
+        for( i_x = (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) / 16; i_x--; )             \
         {                                                                     \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
@@ -192,7 +192,7 @@ void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
         }                                                                     \
-        for( i_x = p_filter->fmt_out.video.i_width & 15; i_x--; )             \
+        for( i_x = (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) & 15; i_x--; )             \
         {                                                                     \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
         }                                                                     \
@@ -215,7 +215,7 @@ void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
     {                                                                         \
         /* Horizontal scaling - we can't use a buffer due to dithering */     \
         p_offset = p_offset_start;                                            \
-        for( i_x = p_filter->fmt_out.video.i_width / 16; i_x--; )             \
+        for( i_x = (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) / 16; i_x--; )             \
         {                                                                     \
             CONVERT_4YUV_PIXEL_SCALE( CHROMA )                                \
             CONVERT_4YUV_PIXEL_SCALE( CHROMA )                                \
@@ -225,7 +225,7 @@ void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
     }                                                                         \
     else                                                                      \
     {                                                                         \
-        for( i_x = p_filter->fmt_in.video.i_width / 16; i_x--;  )             \
+        for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 16; i_x--;  )             \
         {                                                                     \
             CONVERT_4YUV_PIXEL( CHROMA )                                      \
             CONVERT_4YUV_PIXEL( CHROMA )                                      \
@@ -261,10 +261,10 @@ void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
     switch( i_vscale )                                                        \
     {                                                                         \
     case -1:                             /* vertical scaling factor is < 1 */ \
-        while( (i_scale_count -= p_filter->fmt_out.video.i_height) > 0 )      \
+        while( (i_scale_count -= (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height)) > 0 )      \
         {                                                                     \
             /* Height reduction: skip next source line */                     \
-            p_y += p_filter->fmt_in.video.i_width;                            \
+            p_y += (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width);                            \
             i_y++;                                                            \
             if( (CHROMA == 420) || (CHROMA == 422) )                          \
             {                                                                 \
@@ -276,20 +276,20 @@ void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
             }                                                                 \
             else if( CHROMA == 444 )                                          \
             {                                                                 \
-                p_u += p_filter->fmt_in.video.i_width;                        \
-                p_v += p_filter->fmt_in.video.i_width;                        \
+                p_u += (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width);                        \
+                p_v += (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width);                        \
             }                                                                 \
         }                                                                     \
-        i_scale_count += p_filter->fmt_in.video.i_height;                     \
+        i_scale_count += (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);                     \
         break;                                                                \
     case 1:                              /* vertical scaling factor is > 1 */ \
-        while( (i_scale_count -= p_filter->fmt_in.video.i_height) > 0 )       \
+        while( (i_scale_count -= (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height)) > 0 )       \
         {                                                                     \
             /* Height increment: copy previous picture line */                \
-            memcpy( p_pic, p_pic_start, p_filter->fmt_out.video.i_width * BPP ); \
+            memcpy( p_pic, p_pic_start, (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) * BPP ); \
             p_pic = (void*)((uint8_t*)p_pic + p_dest->p->i_pitch );           \
         }                                                                     \
-        i_scale_count += p_filter->fmt_out.video.i_height;                    \
+        i_scale_count += (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height);                    \
         break;                                                                \
     }                                                                         \
 
@@ -316,10 +316,10 @@ void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
     switch( i_vscale )                                                        \
     {                                                                         \
     case -1:                             /* vertical scaling factor is < 1 */ \
-        while( (i_scale_count -= p_filter->fmt_out.video.i_height) > 0 )      \
+        while( (i_scale_count -= (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height)) > 0 )      \
         {                                                                     \
             /* Height reduction: skip next source line */                     \
-            p_y += p_filter->fmt_in.video.i_width;                            \
+            p_y += (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width);                            \
             i_y++;                                                            \
             if( (CHROMA == 420) || (CHROMA == 422) )                          \
             {                                                                 \
@@ -331,21 +331,21 @@ void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
             }                                                                 \
             else if( CHROMA == 444 )                                          \
             {                                                                 \
-                p_u += p_filter->fmt_in.video.i_width;                        \
-                p_v += p_filter->fmt_in.video.i_width;                        \
+                p_u += (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width);                        \
+                p_v += (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width);                        \
             }                                                                 \
         }                                                                     \
-        i_scale_count += p_filter->fmt_in.video.i_height;                     \
+        i_scale_count += (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);                     \
         break;                                                                \
     case 1:                              /* vertical scaling factor is > 1 */ \
-        while( (i_scale_count -= p_filter->fmt_in.video.i_height) > 0 )       \
+        while( (i_scale_count -= (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height)) > 0 )       \
         {                                                                     \
-            p_y -= p_filter->fmt_in.video.i_width;                            \
+            p_y -= (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width);                            \
             p_u -= i_chroma_width;                                            \
             p_v -= i_chroma_width;                                            \
             SCALE_WIDTH_DITHER( CHROMA );                                     \
         }                                                                     \
-        i_scale_count += p_filter->fmt_out.video.i_height;                    \
+        i_scale_count += (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height);                    \
         break;                                                                \
     }                                                                         \
 
