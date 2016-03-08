@@ -1188,10 +1188,20 @@ static int DirectXCreatePictureResource(vout_display_t *vd,
 
                 if (pass == 0) {
                     if (DirectXCreatePictureResourceYuvOverlay(vd, fmt, fourcc))
+                    {
+#ifndef NDEBUG
+                        msg_Dbg(vd, "Failed to create YUV overlay surface %4.4s", (const char*)&fourcc);
+#endif
                         continue;
+                    }
                 } else {
                     if (DirectXCreatePictureResourceYuv(vd, fmt, fourcc))
+                    {
+#ifndef NDEBUG
+                        msg_Dbg(vd, "Failed to create YUV surface %4.4s", (const char*)&fourcc);
+#endif
                         continue;
+                    }
                 }
                 /* */
                 *use_overlay = pass == 0;
