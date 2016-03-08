@@ -1016,7 +1016,7 @@ static int DirectXCreatePictureResourceYuvOverlay(vout_display_t *vd,
         ret = DirectXCreateSurface(vd, &front_surface, fmt, fourcc, true, false, 0);
     if (ret)
         return VLC_EGENERIC;
-    msg_Dbg(vd, "YUV overlay surface created successfully");
+    msg_Dbg(vd, "YUV overlay surface (%4.4s) created successfully", (const char *)&fourcc);
 
     /* Get the back buffer */
     LPDIRECTDRAWSURFACE2 surface;
@@ -1083,7 +1083,7 @@ static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
     LPDIRECTDRAWSURFACE2 surface;
     if (DirectXCreateSurface(vd, &surface, fmt, fourcc, false, allow_sysmem, 0))
         return VLC_EGENERIC;
-    msg_Dbg(vd, "YUV plain surface created successfully");
+    msg_Dbg(vd, "YUV plain surface (%4.4s) created successfully", (const char *)&fourcc);
 
     if (DirectXCheckLockingSurface(surface, surface)) {
         DirectXDestroySurface(surface);
@@ -1143,7 +1143,7 @@ static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
         ret = DirectXCreateSurface(vd, &surface, fmt, 0, false, true, 0);
     if (ret)
         return VLC_EGENERIC;
-    msg_Dbg(vd, "RGB plain surface created successfully");
+    msg_Dbg(vd, "RGB plain surface (%4.4s) created successfully", (const char *)&fmt->i_chroma);
 
     if (DirectXCheckLockingSurface(surface, surface)) {
         DirectXDestroySurface(surface);
