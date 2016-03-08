@@ -712,101 +712,95 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         return;
     }   
 
-    for( size_t i = 0; i < m->ListSize(); i++ )
+    struct InfoHandlerPayload {
+        demux_t            * p_demuxer;
+        matroska_segment_c * obj;
+        EbmlElement       *&  el;
+        EbmlMaster        *&   m;
+        int& i_upper_level;
+
+    } captures = { &sys.demuxer, this, el, m, i_upper_level };
+
+    MKV_SWITCH_CREATE(EbmlTypeDispatcher, InfoHandlers, InfoHandlerPayload)
     {
-        EbmlElement *l = (*m)[i];
+        MKV_SWITCH_INIT();
 
-        if( MKV_IS_ID( l, KaxSegmentUID ) )
+        E_CASE( KaxSegmentUID, uid )
         {
-            if ( p_segment_uid == NULL )
-                p_segment_uid = new KaxSegmentUID(*static_cast<KaxSegmentUID*>(l));
+            if ( vars.obj->p_segment_uid == NULL )
+                vars.obj->p_segment_uid = new KaxSegmentUID( uid );
 
-            msg_Dbg( &sys.demuxer, "|   |   + UID=%d", *reinterpret_cast<uint32*>( p_segment_uid->GetBuffer() ) );
+            msg_Dbg( vars.p_demuxer, "|   |   + UID=%d", *reinterpret_cast<uint32*>( vars.obj->p_segment_uid->GetBuffer() ) );
         }
-        else if( MKV_IS_ID( l, KaxPrevUID ) )
+        E_CASE( KaxPrevUID, uid )
         {
-            if ( p_prev_segment_uid == NULL )
+            if ( vars.obj->p_prev_segment_uid == NULL )
             {
-                p_prev_segment_uid = new KaxPrevUID(*static_cast<KaxPrevUID*>(l));
-                b_ref_external_segments = true;
+                vars.obj->p_prev_segment_uid = new KaxPrevUID( uid );
+                vars.obj->b_ref_external_segments = true;
             }
 
-            msg_Dbg( &sys.demuxer, "|   |   + PrevUID=%d", *reinterpret_cast<uint32*>( p_prev_segment_uid->GetBuffer() ) );
+            msg_Dbg( vars.p_demuxer, "|   |   + PrevUID=%d", *reinterpret_cast<uint32*>( vars.obj->p_prev_segment_uid->GetBuffer() ) );
         }
-        else if( MKV_IS_ID( l, KaxNextUID ) )
+        E_CASE( KaxNextUID, uid )
         {
-            if ( p_next_segment_uid == NULL )
+            if ( vars.obj->p_next_segment_uid == NULL )
             {
-                p_next_segment_uid = new KaxNextUID(*static_cast<KaxNextUID*>(l));
-                b_ref_external_segments = true;
+                vars.obj->p_next_segment_uid = new KaxNextUID( uid );
+                vars.obj->b_ref_external_segments = true;
             }
 
-            msg_Dbg( &sys.demuxer, "|   |   + NextUID=%d", *reinterpret_cast<uint32*>( p_next_segment_uid->GetBuffer() ) );
+            msg_Dbg( vars.p_demuxer, "|   |   + NextUID=%d", *reinterpret_cast<uint32*>( vars.obj->p_next_segment_uid->GetBuffer() ) );
         }
-        else if( MKV_IS_ID( l, KaxTimecodeScale ) )
+        E_CASE( KaxTimecodeScale, tcs )
         {
-            KaxTimecodeScale &tcs = *static_cast<KaxTimecodeScale*>( l );
+            vars.obj->i_timescale = static_cast<uint64>( tcs );
 
-            i_timescale = static_cast<uint64>( tcs );
-
-            msg_Dbg( &sys.demuxer, "|   |   + TimecodeScale=%" PRId64,
-                     i_timescale );
+            msg_Dbg( vars.p_demuxer, "|   |   + TimecodeScale=%" PRId64,
+                     vars.obj->i_timescale );
         }
-        else if( MKV_IS_ID( l, KaxDuration ) )
+        E_CASE( KaxDuration, dur )
         {
-            KaxDuration &dur = *static_cast<KaxDuration*>( l );
+            vars.obj->i_duration = mtime_t( static_cast<double>( dur ) );
 
-            i_duration = mtime_t( double( dur ) );
-
-            msg_Dbg( &sys.demuxer, "|   |   + Duration=%" PRId64,
-                     i_duration );
+            msg_Dbg( vars.p_demuxer, "|   |   + Duration=%" PRId64,
+                     vars.obj->i_duration );
         }
-        else if( MKV_IS_ID( l, KaxMuxingApp ) )
+        E_CASE( KaxMuxingApp, mapp )
         {
-            KaxMuxingApp &mapp = *static_cast<KaxMuxingApp*>( l );
+            vars.obj->psz_muxing_application = ToUTF8( UTFstring( mapp ) );
 
-            psz_muxing_application = ToUTF8( UTFstring( mapp ) );
-
-            msg_Dbg( &sys.demuxer, "|   |   + Muxing Application=%s",
-                     psz_muxing_application );
+            msg_Dbg( vars.p_demuxer, "|   |   + Muxing Application=%s",
+                     vars.obj->psz_muxing_application );
         }
-        else if( MKV_IS_ID( l, KaxWritingApp ) )
+        E_CASE( KaxWritingApp, wapp )
         {
-            KaxWritingApp &wapp = *static_cast<KaxWritingApp*>( l );
+            vars.obj->psz_writing_application = ToUTF8( UTFstring( wapp ) );
 
-            psz_writing_application = ToUTF8( UTFstring( wapp ) );
-
-            msg_Dbg( &sys.demuxer, "|   |   + Writing Application=%s",
-                     psz_writing_application );
+            msg_Dbg( vars.p_demuxer, "|   |   + Writing Application=%s",
+                     vars.obj->psz_writing_application );
         }
-        else if( MKV_IS_ID( l, KaxSegmentFilename ) )
+        E_CASE( KaxSegmentFilename, sfn )
         {
-            KaxSegmentFilename &sfn = *static_cast<KaxSegmentFilename*>( l );
+            vars.obj->psz_segment_filename = ToUTF8( UTFstring( sfn ) );
 
-            psz_segment_filename = ToUTF8( UTFstring( sfn ) );
-
-            msg_Dbg( &sys.demuxer, "|   |   + Segment Filename=%s",
-                     psz_segment_filename );
+            msg_Dbg( vars.p_demuxer, "|   |   + Segment Filename=%s",
+                     vars.obj->psz_segment_filename );
         }
-        else if( MKV_IS_ID( l, KaxTitle ) )
+        E_CASE( KaxTitle, title )
         {
-            KaxTitle &title = *static_cast<KaxTitle*>( l );
+            vars.obj->psz_title = ToUTF8( UTFstring( title ) );
 
-            psz_title = ToUTF8( UTFstring( title ) );
-
-            msg_Dbg( &sys.demuxer, "|   |   + Title=%s", psz_title );
+            msg_Dbg( vars.p_demuxer, "|   |   + Title=%s", vars.obj->psz_title );
         }
-        else if( MKV_IS_ID( l, KaxSegmentFamily ) )
+        E_CASE( KaxSegmentFamily, uid )
         {
-            KaxSegmentFamily *uid = static_cast<KaxSegmentFamily*>(l);
+            vars.obj->families.push_back( new KaxSegmentFamily(uid) );
 
-            families.push_back( new KaxSegmentFamily(*uid) );
-
-            msg_Dbg( &sys.demuxer, "|   |   + family=%d", *reinterpret_cast<uint32*>( uid->GetBuffer() ) );
+            msg_Dbg( vars.p_demuxer, "|   |   + family=%d", *(uint32*)uid.GetBuffer() );
         }
-        else if( MKV_IS_ID( l, KaxDateUTC ) )
+        E_CASE( KaxDateUTC, date )
         {
-            KaxDateUTC &date = *static_cast<KaxDateUTC*>( l );
             time_t i_date;
             struct tm tmres;
             char   buffer[25];
@@ -816,54 +810,62 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 strftime( buffer, sizeof(buffer), "%a %b %d %H:%M:%S %Y",
                           &tmres ) )
             {
-                psz_date_utc = strdup( buffer );
-                msg_Dbg( &sys.demuxer, "|   |   + Date=%s", buffer );
+                vars.obj->psz_date_utc = strdup( buffer );
+                msg_Dbg( vars.p_demuxer, "|   |   + Date=%s", buffer );
             }
         }
-        else if( MKV_IS_ID( l, KaxChapterTranslate ) )
+        E_CASE( KaxChapterTranslate, trans )
         {
-            KaxChapterTranslate *p_trans = static_cast<KaxChapterTranslate*>( l );
+            KaxChapterTranslate *p_trans = &trans;
             try
             {
                 if( unlikely( p_trans->IsFiniteSize() && p_trans->GetSize() >= SIZE_MAX ) )
                 {
-                    msg_Err( &sys.demuxer, "Chapter translate too big, aborting" );
-                    continue;
+                    msg_Err( vars.p_demuxer, "Chapter translate too big, aborting" );
+                    return;
                 }
 
-                p_trans->Read( es, EBML_CONTEXT(p_trans), i_upper_level, el, true );
-                chapter_translation_c *p_translate = new chapter_translation_c();
+                p_trans->Read( vars.obj->es, EBML_CONTEXT(p_trans), vars.i_upper_level, vars.el, true );
 
-                for( size_t j = 0; j < p_trans->ListSize(); j++ )
-                {
-                    EbmlElement *l = (*p_trans)[j];
-
-                    if( MKV_IS_ID( l, KaxChapterTranslateEditionUID ) )
-                    {
-                        p_translate->editions.push_back( static_cast<uint64>( *static_cast<KaxChapterTranslateEditionUID*>( l ) ) );
-                    }
-                    else if( MKV_IS_ID( l, KaxChapterTranslateCodec ) )
-                    {
-                        p_translate->codec_id = static_cast<uint32>( *static_cast<KaxChapterTranslateCodec*>( l ) );
-                    }
-                    else if( MKV_IS_ID( l, KaxChapterTranslateID ) )
-                    {
-                        p_translate->p_translated = new KaxChapterTranslateID( *static_cast<KaxChapterTranslateID*>( l ) );
-                    }
-                }
-
-                translations.push_back( p_translate );
+                dispatcher.iterate( p_trans->begin(), p_trans->end(), Payload( vars ) );
             }
             catch(...)
             {
-                msg_Err( &sys.demuxer, "Error while reading Chapter Tranlate");
+                msg_Err( vars.p_demuxer, "Error while reading Chapter Tranlate");
             }
         }
-        else if ( !MKV_IS_ID( l, EbmlVoid ) )
+        E_CASE( KaxChapterTranslateEditionUID, uid )
         {
-            msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
+            chapter_translation_c *p_translate = new chapter_translation_c();
+            p_translate->editions.push_back( uint64( uid ) );
+
+            vars.obj->translations.push_back( p_translate );
         }
-    }
+        E_CASE( KaxChapterTranslateCodec, codec_id )
+        {
+            chapter_translation_c *p_translate = new chapter_translation_c();
+            p_translate->codec_id = uint32( codec_id );
+
+            vars.obj->translations.push_back( p_translate );
+        }
+        E_CASE( KaxChapterTranslateID, translated_id )
+        {
+            chapter_translation_c *p_translate = new chapter_translation_c();
+            p_translate->p_translated = new KaxChapterTranslateID( translated_id );
+
+            vars.obj->translations.push_back( p_translate );
+        }
+        E_CASE( EbmlVoid, )
+        {
+            VLC_UNUSED( vars );
+        }
+        E_CASE_DEFAULT(element)
+        {
+            msg_Dbg( vars.p_demuxer, "|   |   + Unknown (%s)", typeid(element).name() );
+        }
+    };
+
+    InfoHandlers::Dispatcher().iterate( m->begin(), m->end(), InfoHandlers::Payload( captures ) );
 
     double f_dur = double(i_duration) * double(i_timescale) / 1000000.0;
     i_duration = mtime_t(f_dur);
