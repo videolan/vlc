@@ -503,11 +503,14 @@ static void I420_YVYU( filter_t *p_filter, picture_t *p_source,
 #endif
 
     const int i_source_margin = p_source->p[0].i_pitch
-                                 - p_source->p[0].i_visible_pitch;
+                                 - p_source->p[0].i_visible_pitch
+                                 - p_filter->fmt_in.video.i_x_offset;
     const int i_source_margin_c = p_source->p[1].i_pitch
-                                 - p_source->p[1].i_visible_pitch;
+                                 - p_source->p[1].i_visible_pitch
+                                 - ( p_filter->fmt_in.video.i_x_offset / 2 );
     const int i_dest_margin = p_dest->p->i_pitch
-                               - p_dest->p->i_visible_pitch;
+                               - p_dest->p->i_visible_pitch
+                               - ( p_filter->fmt_out.video.i_x_offset * 2 );
 
 #if !defined(MODULE_NAME_IS_i420_yuy2_sse2)
     for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
@@ -713,11 +716,14 @@ static void I420_UYVY( filter_t *p_filter, picture_t *p_source,
 #endif
 
     const int i_source_margin = p_source->p[0].i_pitch
-                                 - p_source->p[0].i_visible_pitch;
+                                 - p_source->p[0].i_visible_pitch
+                                 - p_filter->fmt_in.video.i_x_offset;
     const int i_source_margin_c = p_source->p[1].i_pitch
-                                 - p_source->p[1].i_visible_pitch;
+                                 - p_source->p[1].i_visible_pitch
+                                 - ( p_filter->fmt_in.video.i_x_offset / 2 );
     const int i_dest_margin = p_dest->p->i_pitch
-                               - p_dest->p->i_visible_pitch;
+                               - p_dest->p->i_visible_pitch
+                               - ( p_filter->fmt_out.video.i_x_offset * 2 );
 
 #if !defined(MODULE_NAME_IS_i420_yuy2_sse2)
     for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
@@ -856,11 +862,14 @@ static void I420_Y211( filter_t *p_filter, picture_t *p_source,
     int i_x, i_y;
 
     const int i_source_margin = p_source->p[0].i_pitch
-                                 - p_source->p[0].i_visible_pitch;
+                                 - p_source->p[0].i_visible_pitch
+                                 - p_filter->fmt_in.video.i_x_offset;
     const int i_source_margin_c = p_source->p[1].i_pitch
-                                 - p_source->p[1].i_visible_pitch;
+                                 - p_source->p[1].i_visible_pitch
+                                 - ( p_filter->fmt_in.video.i_x_offset / 2 );
     const int i_dest_margin = p_dest->p->i_pitch
-                               - p_dest->p->i_visible_pitch;
+                               - p_dest->p->i_visible_pitch
+                               - ( p_filter->fmt_out.video.i_x_offset * 2 );
 
     for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
     {
