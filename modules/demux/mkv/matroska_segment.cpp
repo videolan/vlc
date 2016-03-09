@@ -979,19 +979,12 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
                 return;
             }
 
-            /* check if block's track is in our list */
-            for( i_track = 0; i_track < tracks.size(); i_track++ )
-            {
-                if( (simpleblock && tracks[i_track]->i_number == simpleblock->TrackNum()) ||
-                    (block && tracks[i_track]->i_number == block->TrackNum()) )
-                    break;
-            }
-
             if( simpleblock )
                 i_mk_pts = sys.i_mk_chapter_time + simpleblock->GlobalTimecode() / INT64_C(1000);
             else
                 i_mk_pts = sys.i_mk_chapter_time + block->GlobalTimecode() / INT64_C(1000);
-            if( i_track < tracks.size() )
+
+            if( BlockFindTrackIndex( &i_track, block, simpleblock ) == VLC_SUCCESS )
             {
                 if( tracks[i_track]->fmt.i_cat == i_cat && b_key_picture )
                 {
