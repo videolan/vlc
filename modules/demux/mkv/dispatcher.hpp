@@ -90,6 +90,7 @@ namespace {
 #define MKV_SWITCH_CREATE(DispatchType_, GroupName_, PayloadType_) \
   typedef DispatcherTag<__LINE__> GroupName_ ## _tag_t; \
   extern GroupName_##_tag_t GroupName_ ## _tag; \
+  struct GroupName_; \
   struct GroupName_##_base : DispatchContainer<GroupName_##_tag_t, &GroupName_##_tag, DispatchType_> { \
       typedef      PayloadType_ payload_t;                         \
       typedef     DispatchType_ dispatch_t;                        \
