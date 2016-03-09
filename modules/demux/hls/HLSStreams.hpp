@@ -20,10 +20,6 @@
 #ifndef HLSSTREAM_HPP
 #define HLSSTREAM_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "../adaptive/Streams.hpp"
 
 namespace hls

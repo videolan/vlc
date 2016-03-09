@@ -20,10 +20,6 @@
 #ifndef HLSSEGMENT_HPP
 #define HLSSEGMENT_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "../adaptive/playlist/Segment.h"
 #include <vector>
 #ifdef HAVE_GCRYPT
