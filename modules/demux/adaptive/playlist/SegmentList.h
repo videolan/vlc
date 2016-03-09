@@ -25,10 +25,6 @@
 #ifndef SEGMENTLIST_H_
 #define SEGMENTLIST_H_
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "SegmentInfoCommon.h"
 
 namespace adaptive

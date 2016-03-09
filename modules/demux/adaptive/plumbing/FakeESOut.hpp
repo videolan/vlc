@@ -20,10 +20,6 @@
 #ifndef FAKEESOUT_HPP
 #define FAKEESOUT_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "CommandsQueue.hpp"
 #include <vlc_atomic.h>
 

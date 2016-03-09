@@ -25,10 +25,6 @@
 #ifndef HTTPCONNECTION_H_
 #define HTTPCONNECTION_H_
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "ConnectionParams.hpp"
 #include "BytesRange.hpp"
 #include <vlc_common.h>

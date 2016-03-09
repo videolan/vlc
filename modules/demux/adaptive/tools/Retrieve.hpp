@@ -20,10 +20,6 @@
 #ifndef RETRIEVE_HPP
 #define RETRIEVE_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 #include <string>
 

@@ -25,10 +25,6 @@
 #ifndef HTTPCONNECTIONMANAGER_H_
 #define HTTPCONNECTIONMANAGER_H_
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "../logic/IDownloadRateObserver.h"
 
 #include <vlc_common.h>

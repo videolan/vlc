@@ -20,10 +20,6 @@
 #ifndef CHUNKSSOURCE_HPP
 #define CHUNKSSOURCE_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 
 namespace adaptive

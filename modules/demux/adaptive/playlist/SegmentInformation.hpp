@@ -20,10 +20,6 @@
 #ifndef SEGMENTINFORMATION_HPP
 #define SEGMENTINFORMATION_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "ICanonicalUrl.hpp"
 #include "../tools/Properties.hpp"
 #include "SegmentInfoCommon.h"

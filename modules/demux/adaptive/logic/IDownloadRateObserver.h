@@ -25,10 +25,6 @@
 #ifndef IDOWNLOADRATEOBSERVER_H_
 #define IDOWNLOADRATEOBSERVER_H_
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 
 namespace adaptive

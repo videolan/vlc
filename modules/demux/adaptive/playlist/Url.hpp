@@ -20,10 +20,6 @@
 #ifndef URL_HPP
 #define URL_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <string>
 #include <vector>
 #include <vlc_common.h>

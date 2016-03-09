@@ -20,10 +20,6 @@
 #ifndef BYTESRANGE_HPP
 #define BYTESRANGE_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 
 namespace adaptive

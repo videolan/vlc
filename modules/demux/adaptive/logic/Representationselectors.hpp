@@ -20,10 +20,6 @@
 #ifndef REPRESENTATIONSELECTORS_HPP
 #define REPRESENTATIONSELECTORS_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vector>
 #include <vlc_common.h>
 

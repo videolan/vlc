@@ -24,10 +24,6 @@
 #ifndef SEGMENTTIMELINE_H
 #define SEGMENTTIMELINE_H
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "SegmentInfoCommon.h"
 #include <vlc_common.h>
 #include <list>

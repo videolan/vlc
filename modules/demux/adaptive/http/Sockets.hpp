@@ -20,10 +20,6 @@
 #ifndef SOCKETS_HPP
 #define SOCKETS_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 #include <vlc_tls.h>
 #include <string>
