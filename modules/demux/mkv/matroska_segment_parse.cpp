@@ -862,8 +862,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
     InfoHandlers::Dispatcher().iterate( m->begin(), m->end(), InfoHandlers::Payload( captures ) );
 
-    double f_dur = double(i_duration) * double(i_timescale) / 1000000.0;
-    i_duration = mtime_t(f_dur);
+    i_duration = mtime_t( static_cast<double>( i_duration * i_timescale ) / 10e5 );
     if( !i_duration ) i_duration = -1;
 }
 
