@@ -475,8 +475,8 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
 
             if (p_segment->indexes.size())
             {
-                matroska_segment_c::indexes_t::iterator it          = p_segment->indexes.begin ();
-                matroska_segment_c::indexes_t::iterator last_active = p_segment->indexes.end()-1;
+                matroska_segment_c::indexes_t::iterator it          = p_segment->indexes_begin ();
+                matroska_segment_c::indexes_t::iterator last_active = p_segment->indexes_end ();
 
                 for ( ; it != last_active; ++it )
                 {

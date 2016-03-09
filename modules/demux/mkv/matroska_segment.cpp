@@ -893,13 +893,11 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
         return;
     }
 
-    indexes_t::const_iterator index_it = indexes.begin ();
+    indexes_t::const_iterator index_it = indexes_begin ();
 
     if ( index_idx() )
     {
-        indexes_t::const_iterator last_active_it = indexes.end() - 1;
-
-        for( ; index_it != last_active_it; ++index_it )
+        for( ; index_it != indexes_end(); ++index_it )
         {
             if (index_it->i_mk_time == -1)
                 continue;
@@ -908,7 +906,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
                 break;
         }
 
-        if( index_it != indexes.begin ())
+        if( index_it != indexes_begin ())
             --index_it;
 
         i_seek_position = index_it->i_position;

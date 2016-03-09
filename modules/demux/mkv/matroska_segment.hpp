@@ -145,8 +145,11 @@ public:
     void UnSelect();
 
     size_t        index_idx () const { return indexes.size () - 1; }
-    mkv_index_t&      index () { return *indexes.rbegin (); }
-    mkv_index_t& prev_index () { return *(indexes.end()-2); }
+    mkv_index_t&      index ()       { return *(indexes.rbegin()); }
+    mkv_index_t& prev_index ()       { return *(indexes.rbegin()+1); }
+
+    indexes_t::iterator indexes_begin () { return indexes.begin(); }
+    indexes_t::iterator indexes_end   () { return indexes.end() - (indexes.size() ? 1 : 0); }
 
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
 
