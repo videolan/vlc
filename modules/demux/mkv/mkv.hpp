@@ -246,6 +246,10 @@ struct mkv_index_t
     mtime_t i_mk_time;
 
     bool       b_key;
+
+    bool operator< (mkv_index_t const& rhs) const {
+        return i_mk_time < rhs.i_mk_time;
+    }
 };
 
 

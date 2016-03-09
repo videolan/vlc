@@ -229,6 +229,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
     }
     b_cues = true;
     msg_Dbg( &sys.demuxer, "|   - loading cues done." );
+    std::sort( indexes_begin(), indexes_end() );
 }
 
 
@@ -800,6 +801,8 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
                     break;
             }
         }
+
+        std::sort( indexes_begin(), indexes_end() );
     }
 
     /* Don't try complex seek if we seek to 0 */
