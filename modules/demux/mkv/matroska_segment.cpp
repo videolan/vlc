@@ -338,17 +338,6 @@ done:
     return true;
 }
 
-#define PARSE_TAG( type ) \
-    do { \
-        msg_Dbg( &sys.demuxer, "|   + " type ); \
-        ep->Down();                             \
-        while( ( el = ep->Get() ) != NULL )     \
-        {                                       \
-            msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid( *el ).name() ); \
-        }                                      \
-        ep->Up(); } while( 0 )
-
-
 void matroska_segment_c::LoadTags( KaxTags *tags )
 {
     /* Master elements */
@@ -436,44 +425,6 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                       tag.simple_tags.push_back( simple );
                     }
                 }
-#if 0 // not valid anymore
-                else if( MKV_IS_ID( el, KaxTagGeneral ) )
-                    PARSE_TAG( "General" );
-                else if( MKV_IS_ID( el, KaxTagGenres ) )
-                    PARSE_TAG( "Genres" );
-                else if( MKV_IS_ID( el, KaxTagAudioSpecific ) )
-                    PARSE_TAG( "Audio Specific" );
-                else if( MKV_IS_ID( el, KaxTagImageSpecific ) )
-                    PARSE_TAG( "Images Specific" );
-                else if( MKV_IS_ID( el, KaxTagMultiComment ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Multi Comment" );
-                }
-                else if( MKV_IS_ID( el, KaxTagMultiCommercial ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Multi Commercial" );
-                }
-                else if( MKV_IS_ID( el, KaxTagMultiDate ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Multi Date" );
-                }
-                else if( MKV_IS_ID( el, KaxTagMultiEntity ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Multi Entity" );
-                }
-                else if( MKV_IS_ID( el, KaxTagMultiIdentifier ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Multi Identifier" );
-                }
-                else if( MKV_IS_ID( el, KaxTagMultiLegal ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Multi Legal" );
-                }
-                else if( MKV_IS_ID( el, KaxTagMultiTitle ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Multi Title" );
-                }
-#endif
                 else
                 {
                     msg_Dbg( &sys.demuxer, "|   + LoadTag Unknown (%s)", typeid( *el ).name() );
@@ -490,7 +441,6 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
 
     msg_Dbg( &sys.demuxer, "loading tags done." );
 }
-#undef PARSE_TAG
 
 /*****************************************************************************
  * InformationCreate:
@@ -504,44 +454,6 @@ void matroska_segment_c::InformationCreate( )
     {
         vlc_meta_SetTitle( sys.meta, psz_title );
     }
-#if 0
-    if( psz_date_utc )
-    {
-        vlc_meta_SetDate( sys.meta, psz_date_utc );
-    }
-
-    if( psz_segment_filename )
-    {
-        fprintf( stderr, "***** WARNING: Unhandled meta - Use custom\n" );
-    }
-    if( psz_muxing_application )
-    {
-        fprintf( stderr, "***** WARNING: Unhandled meta - Use custom\n" );
-    }
-    if( psz_writing_application )
-    {
-        fprintf( stderr, "***** WARNING: Unhandled meta - Use custom\n" );
-    }
-
-    for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
-    {
-//        mkv_track_t *tk = tracks[i_track];
-//        vlc_meta_t *mtk = vlc_meta_New();
-        fprintf( stderr, "***** WARNING: Unhandled child meta\n");
-    }
-#endif
-#if 0
-    if( !tags.empty () )
-    {
-        bool b_seekable;
-
-        stream_Control( sys.demuxer.s, STREAM_CAN_FASTSEEK, &b_seekable );
-        if( b_seekable )
-        {
-            LoadTags( );
-        }
-    }
-#endif
 }
 
 
