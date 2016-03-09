@@ -195,6 +195,12 @@ int main (void)
     test_url_parse("p://h?o=v", "p", NULL, NULL, "h", 0, NULL, "o=v");
     test_url_parse("p://h:123?o=v", "p", NULL, NULL, "h", 123, NULL, "o=v");
     test_url_parse("p://u:p@h:123?o=v", "p", "u", "p", "h", 123, NULL, "o=v");
-
+    test_url_parse("p://white%20spaced", "p", NULL, NULL, "white%20spaced", 0,
+                   NULL, NULL);
+    test_url_parse("p://h/white%20spaced", "p", NULL, NULL, "h", 0,
+                   "/white%20spaced", NULL);
+    /* Invalid URIs */
+    test_url_parse("p://G a r b a g e", "p", NULL, NULL, NULL, 0, NULL, NULL);
+    test_url_parse("p://h/G a r b a g e", "p", NULL, NULL, "h", 0, NULL, NULL);
     return 0;
 }
