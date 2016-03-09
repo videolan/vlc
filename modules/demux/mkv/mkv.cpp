@@ -441,7 +441,9 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
     int64_t            i_global_position = -1;
 
-    msg_Dbg( p_demux, "seek request to %" PRId64 " (%.2f%%)", i_mk_date, f_percent * 100);
+    if( f_percent < 0 ) msg_Dbg( p_demux, "seek request to i_pos = %" PRId64, i_mk_date );
+    else                msg_Dbg( p_demux, "seek request to %.2f%%", f_percent * 100 );
+
     if( i_mk_date < 0 && f_percent < 0 )
     {
         msg_Warn( p_demux, "cannot seek nowhere!" );
