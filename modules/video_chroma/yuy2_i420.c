@@ -169,11 +169,11 @@ static void YUY2_I420( filter_t *p_filter, picture_t *p_source,
             {
                 C_YUYV_YUV422( p_line, p_y, p_u, p_v );
             }
+            p_u += i_dest_margin_c;
+            p_v += i_dest_margin_c;
         }
         p_line += i_source_margin;
         p_y += i_dest_margin;
-        p_u += i_dest_margin_c;
-        p_v += i_dest_margin_c;
 
         b_skip = !b_skip;
     }
@@ -237,11 +237,11 @@ static void YVYU_I420( filter_t *p_filter, picture_t *p_source,
             {
                 C_YVYU_YUV422( p_line, p_y, p_u, p_v );
             }
+            p_u += i_dest_margin_c;
+            p_v += i_dest_margin_c;
         }
         p_line += i_source_margin;
         p_y += i_dest_margin;
-        p_u += i_dest_margin_c;
-        p_v += i_dest_margin_c;
 
         b_skip = !b_skip;
     }
@@ -305,9 +305,9 @@ static void UYVY_I420( filter_t *p_filter, picture_t *p_source,
             {
                 C_UYVY_YUV422( p_line, p_y, p_u, p_v );
             }
+            p_y += i_dest_margin;
         }
         p_line += i_source_margin;
-        p_y += i_dest_margin;
         p_u += i_dest_margin_c;
         p_v += i_dest_margin_c;
 
