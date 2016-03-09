@@ -37,6 +37,9 @@ class EbmlParser
                 bool b_with_dummy );
     ~EbmlParser( void );
 
+    void reconstruct( EbmlStream*, EbmlElement*, demux_t*);
+    void reconstruct( EbmlStream*, EbmlElement*, demux_t*, bool b_with_dummy );
+
     void Up( void );
     void Down( void );
     void Reset( demux_t *p_demux );

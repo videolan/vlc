@@ -63,6 +63,21 @@ EbmlParser::~EbmlParser( void )
     }
 }
 
+void EbmlParser::reconstruct( EbmlStream* es, EbmlElement* el_start, demux_t* p_demux )
+{
+    this->reconstruct( es, el_start, p_demux, var_InheritBool( p_demux, "mkv-use-dummy" ) );
+}
+
+void EbmlParser::reconstruct( EbmlStream* es, EbmlElement* el_start, demux_t* p_demux,
+  bool b_with_dummy)
+{
+    this->~EbmlParser();
+
+    new( static_cast<void*>( this ) ) EbmlParser(
+      es, el_start, p_demux, b_with_dummy
+    );
+}
+
 EbmlElement* EbmlParser::UnGet( uint64 i_block_pos, uint64 i_cluster_pos )
 {
     if ( mi_user_level > mi_level )
