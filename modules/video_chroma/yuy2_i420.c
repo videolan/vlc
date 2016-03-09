@@ -73,8 +73,8 @@ static int Activate( vlc_object_t *p_this )
         return -1;
     }
 
-    if( p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width
-     || p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height
+    if( p_filter->fmt_in.video.i_width != (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width)
+     || p_filter->fmt_in.video.i_height != (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height)
      || p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation)
         return -1;
 
@@ -126,19 +126,22 @@ static void YUY2_I420( filter_t *p_filter, picture_t *p_source,
     int i_x, i_y;
 
     const int i_dest_margin = p_dest->p[0].i_pitch
-                                 - p_dest->p[0].i_visible_pitch;
+                                 - p_dest->p[0].i_visible_pitch
+                                 - p_filter->fmt_out.video.i_x_offset;
     const int i_dest_margin_c = p_dest->p[1].i_pitch
-                                 - p_dest->p[1].i_visible_pitch;
+                                 - p_dest->p[1].i_visible_pitch
+                                 - ( p_filter->fmt_out.video.i_x_offset / 2 );
     const int i_source_margin = p_source->p->i_pitch
-                               - p_source->p->i_visible_pitch;
+                               - p_source->p->i_visible_pitch
+                               - ( p_filter->fmt_in.video.i_x_offset * 2 );
 
     bool b_skip = false;
 
-    for( i_y = p_filter->fmt_out.video.i_height ; i_y-- ; )
+    for( i_y = (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) ; i_y-- ; )
     {
         if( b_skip )
         {
-            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
+            for( i_x = (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) / 8 ; i_x-- ; )
             {
     #define C_YUYV_YUV422_skip( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; p_line++; \
@@ -148,14 +151,14 @@ static void YUY2_I420( filter_t *p_filter, picture_t *p_source,
                 C_YUYV_YUV422_skip( p_line, p_y, p_u, p_v );
                 C_YUYV_YUV422_skip( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) % 8 ) / 2; i_x-- ; )
             {
                 C_YUYV_YUV422_skip( p_line, p_y, p_u, p_v );
             }
         }
         else
         {
-            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
+            for( i_x = (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) / 8 ; i_x-- ; )
             {
     #define C_YUYV_YUV422( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; *p_u++ = *p_line++; \
@@ -165,7 +168,7 @@ static void YUY2_I420( filter_t *p_filter, picture_t *p_source,
                 C_YUYV_YUV422( p_line, p_y, p_u, p_v );
                 C_YUYV_YUV422( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) % 8 ) / 2; i_x-- ; )
             {
                 C_YUYV_YUV422( p_line, p_y, p_u, p_v );
             }
@@ -194,19 +197,22 @@ static void YVYU_I420( filter_t *p_filter, picture_t *p_source,
     int i_x, i_y;
 
     const int i_dest_margin = p_dest->p[0].i_pitch
-                                 - p_dest->p[0].i_visible_pitch;
+                                 - p_dest->p[0].i_visible_pitch
+                                 - p_filter->fmt_out.video.i_x_offset;
     const int i_dest_margin_c = p_dest->p[1].i_pitch
-                                 - p_dest->p[1].i_visible_pitch;
+                                 - p_dest->p[1].i_visible_pitch
+                                 - ( p_filter->fmt_out.video.i_x_offset / 2 );
     const int i_source_margin = p_source->p->i_pitch
-                               - p_source->p->i_visible_pitch;
+                               - p_source->p->i_visible_pitch
+                               - ( p_filter->fmt_in.video.i_x_offset * 2 );
 
     bool b_skip = false;
 
-    for( i_y = p_filter->fmt_out.video.i_height ; i_y-- ; )
+    for( i_y = (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) ; i_y-- ; )
     {
         if( b_skip )
         {
-            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
+            for( i_x = (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) / 8 ; i_x-- ; )
             {
     #define C_YVYU_YUV422_skip( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; p_line++; \
@@ -216,14 +222,14 @@ static void YVYU_I420( filter_t *p_filter, picture_t *p_source,
                 C_YVYU_YUV422_skip( p_line, p_y, p_u, p_v );
                 C_YVYU_YUV422_skip( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) % 8 ) / 2; i_x-- ; )
             {
                 C_YVYU_YUV422_skip( p_line, p_y, p_u, p_v );
             }
         }
         else
         {
-            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
+            for( i_x = (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) / 8 ; i_x-- ; )
             {
     #define C_YVYU_YUV422( p_line, p_y, p_u, p_v )      \
                 *p_y++ = *p_line++; *p_v++ = *p_line++; \
@@ -233,7 +239,7 @@ static void YVYU_I420( filter_t *p_filter, picture_t *p_source,
                 C_YVYU_YUV422( p_line, p_y, p_u, p_v );
                 C_YVYU_YUV422( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) % 8 ) / 2; i_x-- ; )
             {
                 C_YVYU_YUV422( p_line, p_y, p_u, p_v );
             }
@@ -262,19 +268,22 @@ static void UYVY_I420( filter_t *p_filter, picture_t *p_source,
     int i_x, i_y;
 
     const int i_dest_margin = p_dest->p[0].i_pitch
-                                 - p_dest->p[0].i_visible_pitch;
+                                 - p_dest->p[0].i_visible_pitch
+                                 - p_filter->fmt_out.video.i_x_offset;
     const int i_dest_margin_c = p_dest->p[1].i_pitch
-                                 - p_dest->p[1].i_visible_pitch;
+                                 - p_dest->p[1].i_visible_pitch
+                                 - ( p_filter->fmt_out.video.i_x_offset / 2 );
     const int i_source_margin = p_source->p->i_pitch
-                               - p_source->p->i_visible_pitch;
+                               - p_source->p->i_visible_pitch
+                               - ( p_filter->fmt_in.video.i_x_offset * 2 );
 
     bool b_skip = false;
 
-    for( i_y = p_filter->fmt_out.video.i_height ; i_y-- ; )
+    for( i_y = (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) ; i_y-- ; )
     {
         if( b_skip )
         {
-            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
+            for( i_x = (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) / 8 ; i_x-- ; )
             {
     #define C_UYVY_YUV422_skip( p_line, p_y, p_u, p_v )      \
                 *p_u++ = *p_line++; p_line++; \
@@ -284,14 +293,14 @@ static void UYVY_I420( filter_t *p_filter, picture_t *p_source,
                 C_UYVY_YUV422_skip( p_line, p_y, p_u, p_v );
                 C_UYVY_YUV422_skip( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) % 8 ) / 2; i_x-- ; )
             {
                 C_UYVY_YUV422_skip( p_line, p_y, p_u, p_v );
             }
         }
         else
         {
-            for( i_x = p_filter->fmt_out.video.i_width / 8 ; i_x-- ; )
+            for( i_x = (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) / 8 ; i_x-- ; )
             {
     #define C_UYVY_YUV422( p_line, p_y, p_u, p_v )      \
                 *p_u++ = *p_line++; *p_y++ = *p_line++; \
@@ -301,7 +310,7 @@ static void UYVY_I420( filter_t *p_filter, picture_t *p_source,
                 C_UYVY_YUV422( p_line, p_y, p_u, p_v );
                 C_UYVY_YUV422( p_line, p_y, p_u, p_v );
             }
-            for( i_x = ( p_filter->fmt_out.video.i_width % 8 ) / 2; i_x-- ; )
+            for( i_x = ( (p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width) % 8 ) / 2; i_x-- ; )
             {
                 C_UYVY_YUV422( p_line, p_y, p_u, p_v );
             }
