@@ -1,6 +1,6 @@
 # live555
 
-LIVE555_FILE := live.2016.01.12.tar.gz
+LIVE555_FILE := live.2016.02.22.tar.gz
 #LIVEDOTCOM_URL := http://live555.com/liveMedia/public/$(LIVE555_FILE)
 LIVEDOTCOM_URL := $(CONTRIB_VIDEOLAN)/live555/$(LIVE555_FILE)
 
