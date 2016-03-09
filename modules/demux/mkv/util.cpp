@@ -389,7 +389,7 @@ block_t * packetize_wavpack( mkv_track_t * p_tk, uint8_t * buffer, size_t  size)
 
 void MkvTree_va( demux_t& demuxer, int i_level, const char* fmt, va_list args)
 {
-    static char const * indent = "|    ";
+    static char const * indent = "|   ";
     static char const * prefix = "+ ";
     static int  const   indent_len = strlen( indent );
     static int  const   prefix_len = strlen( prefix );
