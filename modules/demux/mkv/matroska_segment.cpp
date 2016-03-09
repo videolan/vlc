@@ -1061,22 +1061,19 @@ void matroska_segment_c::EnsureDuration()
     // find the last Cluster manually
     if ( !i_last_cluster_pos && cluster != NULL )
     {
-        EbmlElement *el;
-        EbmlParser *ep;
-
         es.I_O().setFilePointer( cluster->GetElementPosition(), seek_beginning );
-        ep = new EbmlParser( &es , segment, &sys.demuxer,
+
+        EbmlElement* el;
+        EbmlParser ep( &es, segment, &sys.demuxer,
                              var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
 
-        while( ( el = ep->Get() ) != NULL )
+        while( ( el = ep.Get() ) != NULL )
         {
             if ( MKV_IS_ID( el, KaxCluster ) )
             {
                 i_last_cluster_pos = el->GetElementPosition();
             }
         }
-
-        delete ep;
     }
 
     // find the last timecode in the Cluster
