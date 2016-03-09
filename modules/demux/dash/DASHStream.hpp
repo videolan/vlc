@@ -20,10 +20,6 @@
 #ifndef DASHSTREAM_HPP
 #define DASHSTREAM_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "../adaptive/Streams.hpp"
 
 namespace dash
