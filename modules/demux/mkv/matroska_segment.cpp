@@ -766,9 +766,8 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
         else
             es.I_O().setFilePointer( prev_index().i_position,
                                      seek_beginning );
-        delete ep;
-        ep = new EbmlParser( &es, segment, &sys.demuxer,
-                             var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+
+        ep->reconstruct( &es, segment, &sys.demuxer );
         cluster = NULL;
 
         while( ( el = ep->Get() ) != NULL )
@@ -796,9 +795,8 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
                         INT64_C(0) );
         es.I_O().setFilePointer( i_start_pos );
 
-        delete ep;
-        ep = new EbmlParser( &es, segment, &sys.demuxer,
-                             var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+        ep->reconstruct( &es, segment, &sys.demuxer );
+
         cluster = NULL;
         sys.i_start_pts = VLC_TS_0;
         sys.i_pcr = sys.i_pts = VLC_TS_INVALID;
@@ -836,9 +834,8 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
 
     es.I_O().setFilePointer( i_seek_position, seek_beginning );
 
-    delete ep;
-    ep = new EbmlParser( &es, segment, &sys.demuxer,
-                         var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+    ep->reconstruct( &es, segment, &sys.demuxer );
+
     cluster = NULL;
 
     sys.i_start_pts = i_mk_date + VLC_TS_0;
@@ -932,9 +929,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
         index_it--;
         i_mk_pts = 0;
         es.I_O().setFilePointer( index_it->i_position );
-        delete ep;
-        ep = new EbmlParser( &es, segment, &sys.demuxer,
-                             var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+        ep->reconstruct( &es, segment, &sys.demuxer );
         cluster = NULL;
     }
 
@@ -1175,9 +1170,7 @@ bool matroska_segment_c::Select( mtime_t i_mk_start_time )
     // reset the stream reading to the first cluster of the segment used
     es.I_O().setFilePointer( i_start_pos );
 
-    delete ep;
-    ep = new EbmlParser( &es, segment, &sys.demuxer,
-                         var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+    ep->reconstruct( &es, segment, &sys.demuxer );
 
     return true;
 }
