@@ -872,139 +872,151 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
  *****************************************************************************/
 void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_c & chapters )
 {
-    msg_Dbg( &sys.demuxer, "|   |   |   + ChapterAtom (level=%d)", i_level );
-    for( size_t i = 0; i < ca->ListSize(); i++ )
+    MkvTree( sys.demuxer, 3, "ChapterAtom (level=%d)", i_level );
+
+    struct ChapterPayload {
+        matroska_segment_c * const       obj;
+        demux_t            * const p_demuxer;
+        chapter_item_c     &        chapters;
+
+        int& i_level;
+        int level;
+
+    } payload = {
+        this, &sys.demuxer, chapters,
+        i_level, 4
+    };
+
+    MKV_SWITCH_CREATE( EbmlTypeDispatcher, ChapterAtomHandlers, ChapterPayload )
     {
-        EbmlElement *l = (*ca)[i];
+        MKV_SWITCH_INIT();
 
-        if( MKV_IS_ID( l, KaxChapterUID ) )
+        static void debug (ChapterPayload const& vars, char const * fmt, ...)
         {
-            chapters.i_uid = static_cast<uint64_t>( *static_cast<KaxChapterUID*>( l ) );
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterUID: %" PRIu64, chapters.i_uid );
+            va_list args; va_start( args, fmt );
+            MkvTree_va( *vars.p_demuxer, vars.level, fmt, args);
+            va_end( args );
         }
-        else if( MKV_IS_ID( l, KaxChapterFlagHidden ) )
+        E_CASE( KaxChapterUID, uid )
         {
-            KaxChapterFlagHidden &flag = *static_cast<KaxChapterFlagHidden*>( l );
-            chapters.b_display_seekpoint = static_cast<uint8>( flag ) == 0;
+            vars.chapters.i_uid = static_cast<uint64_t>( uid );
+            debug( vars, "ChapterUID=%" PRIu64, vars.chapters.i_uid );
+        }
+        E_CASE( KaxChapterFlagHidden, flag )
+        {
+            vars.chapters.b_display_seekpoint = static_cast<uint8>( flag ) == 0;
+            debug( vars, "ChapterFlagHidden=%s", vars.chapters.b_display_seekpoint ? "no" : "yes" );
+        }
+        E_CASE( KaxChapterSegmentUID, uid )
+        {
+            vars.chapters.p_segment_uid = new KaxChapterSegmentUID( uid );
+            vars.obj->b_ref_external_segments = true;
 
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterFlagHidden: %s", chapters.b_display_seekpoint ? "no":"yes" );
+            debug( vars, "ChapterSegmentUID=%u", *reinterpret_cast<uint32*>( vars.chapters.p_segment_uid->GetBuffer() ) );
         }
-        else if( MKV_IS_ID( l, KaxChapterSegmentUID ) )
+        E_CASE( KaxChapterSegmentEditionUID, euid )
         {
-            chapters.p_segment_uid = new KaxChapterSegmentUID( *static_cast<KaxChapterSegmentUID*>(l) );
-            b_ref_external_segments = true;
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterSegmentUID= %u", *reinterpret_cast<uint32*>( chapters.p_segment_uid->GetBuffer() ) );
-        }
-        else if( MKV_IS_ID( l, KaxChapterSegmentEditionUID ) )
-        {
-            chapters.p_segment_edition_uid = new KaxChapterSegmentEditionUID( *static_cast<KaxChapterSegmentEditionUID*>(l) );
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterSegmentEditionUID= %u",
+            vars.chapters.p_segment_edition_uid = new KaxChapterSegmentEditionUID( euid );
+
+            debug( vars, "ChapterSegmentEditionUID=%u",
 #if LIBMATROSKA_VERSION < 0x010300
-                     *reinterpret_cast<uint32*>( chapters.p_segment_edition_uid->GetBuffer() )
+              *reinterpret_cast<uint32*>( vars.chapters.p_segment_edition_uid->GetBuffer() )
 #else
-                     static_cast<uint32>( *chapters.p_segment_edition_uid )
+              static_cast<uint32>( *vars.chapters.p_segment_edition_uid )
 #endif
-                   );
+            );
         }
-        else if( MKV_IS_ID( l, KaxChapterTimeStart ) )
+        E_CASE( KaxChapterTimeStart, start )
         {
-            KaxChapterTimeStart &start = *static_cast<KaxChapterTimeStart*>( l );
-            chapters.i_start_time = static_cast<uint64>( start ) / INT64_C(1000);
-
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterTimeStart: %" PRId64, chapters.i_start_time );
+            vars.chapters.i_start_time = static_cast<uint64>( start ) / INT64_C(1000);
+            debug( vars, "ChapterTimeStart=%" PRId64, vars.chapters.i_start_time );
         }
-        else if( MKV_IS_ID( l, KaxChapterTimeEnd ) )
+        E_CASE( KaxChapterTimeEnd, end )
         {
-            KaxChapterTimeEnd &end = *static_cast<KaxChapterTimeEnd*>( l );
-            chapters.i_end_time = static_cast<uint64>( end ) / INT64_C(1000);
-
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterTimeEnd: %" PRId64, chapters.i_end_time );
+            vars.chapters.i_end_time = static_cast<uint64>( end ) / INT64_C(1000);
+            debug( vars, "ChapterTimeEnd=%" PRId64, vars.chapters.i_end_time );
         }
-        else if( MKV_IS_ID( l, KaxChapterDisplay ) )
+        E_CASE( KaxChapterDisplay, chapter_display )
         {
-            EbmlMaster *cd = static_cast<EbmlMaster *>(l);
+            debug( vars, "ChapterDisplay" );
 
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterDisplay" );
-            for( size_t j = 0; j < cd->ListSize(); j++ )
-            {
-                EbmlElement *l= (*cd)[j];
-
-                if( MKV_IS_ID( l, KaxChapterString ) )
-                {
-                    KaxChapterString &name = *static_cast<KaxChapterString*>( l );
-                    for ( int k = 0; k < i_level; k++)
-                        chapters.psz_name += '+';
-                    chapters.psz_name += ' ';
-                    char *psz_tmp_utf8 = ToUTF8( UTFstring( name ) );
-                    chapters.psz_name += psz_tmp_utf8;
-                    chapters.b_user_display = true;
-
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterString '%s'", psz_tmp_utf8 );
-                    free( psz_tmp_utf8 );
-                }
-                else if( MKV_IS_ID( l, KaxChapterLanguage ) )
-                {
-                    KaxChapterLanguage &lang = *static_cast<KaxChapterLanguage*>( l );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterLanguage '%s'",
-                             std::string( lang ).c_str() );
-                }
-                else if( MKV_IS_ID( l, KaxChapterCountry ) )
-                {
-                    KaxChapterCountry &ct = *static_cast<KaxChapterCountry*>( l );
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterCountry '%s'",
-                             std::string( ct ).c_str() );
-                }
-            }
+            vars.level += 1;
+            dispatcher.iterate( chapter_display.begin(), chapter_display.end(), Payload( vars ) );
+            vars.level -= 1;
         }
-        else if( MKV_IS_ID( l, KaxChapterProcess ) )
+        E_CASE( KaxChapterString, name )
         {
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterProcess" );
+            char *psz_tmp_utf8 = ToUTF8( UTFstring( name ) );
 
-            KaxChapterProcess *cp = static_cast<KaxChapterProcess *>(l);
+            for ( int k = 0; k < vars.i_level; k++)
+                vars.chapters.psz_name += '+';
+
+            vars.chapters.psz_name += ' ';
+            vars.chapters.psz_name += psz_tmp_utf8;
+            vars.chapters.b_user_display = true;
+
+            debug( vars, "ChapterString=%s", psz_tmp_utf8 );
+
+            free( psz_tmp_utf8 );
+        }
+        E_CASE( KaxChapterLanguage, lang )
+        {
+            debug( vars, "ChapterLanguage=%s", static_cast<std::string const&>( lang ).c_str() );
+        }
+        E_CASE( KaxChapterCountry, ct )
+        {
+            debug( vars, "ChapterCountry=%s", static_cast<std::string const&>( ct ).c_str() );
+        }
+
+        E_CASE( KaxChapterProcess, cp )
+        {
+            debug( vars, "ChapterProcess" );
+
             chapter_codec_cmds_c *p_ccodec = NULL;
 
-            for( size_t j = 0; j < cp->ListSize(); j++ )
+            for( size_t j = 0; j < cp.ListSize(); j++ )
             {
-                EbmlElement *k= (*cp)[j];
+                EbmlElement *k= cp[j];
 
-                if( MKV_IS_ID( k, KaxChapterProcessCodecID ) )
+                if( MKV_CHECKED_PTR_DECL( p_codec_id, KaxChapterProcessCodecID, k ) )
                 {
-                    KaxChapterProcessCodecID *p_codec_id = static_cast<KaxChapterProcessCodecID*>( k );
                     if ( static_cast<uint32>(*p_codec_id) == 0 )
-                        p_ccodec = new matroska_script_codec_c( sys );
+                        p_ccodec = new matroska_script_codec_c( vars.obj->sys );
                     else if ( static_cast<uint32>(*p_codec_id) == 1 )
-                        p_ccodec = new dvd_chapter_codec_c( sys );
+                        p_ccodec = new dvd_chapter_codec_c( vars.obj->sys );
                     break;
                 }
             }
 
             if ( p_ccodec != NULL )
             {
-                for( size_t j = 0; j < cp->ListSize(); j++ )
+                for( size_t j = 0; j < cp.ListSize(); j++ )
                 {
-                    EbmlElement *k= (*cp)[j];
+                    EbmlElement *k= cp[j];
 
-                    if( MKV_IS_ID( k, KaxChapterProcessPrivate ) )
+                    if( MKV_CHECKED_PTR_DECL( p_private, KaxChapterProcessPrivate, k ) )
                     {
-                        KaxChapterProcessPrivate * p_private = static_cast<KaxChapterProcessPrivate*>( k );
                         p_ccodec->SetPrivate( *p_private );
                     }
-                    else if( MKV_IS_ID( k, KaxChapterProcessCommand ) )
+                    else if ( MKV_CHECKED_PTR_DECL( cmd, KaxChapterProcessCommand, k ) )
                     {
-                        p_ccodec->AddCommand( *static_cast<KaxChapterProcessCommand*>( k ) );
+                        p_ccodec->AddCommand( *cmd );
                     }
                 }
-                chapters.codecs.push_back( p_ccodec );
+                vars.chapters.codecs.push_back( p_ccodec );
             }
         }
-        else if( MKV_IS_ID( l, KaxChapterAtom ) )
+        E_CASE( KaxChapterAtom, atom )
         {
             chapter_item_c *new_sub_chapter = new chapter_item_c();
-            ParseChapterAtom( i_level+1, static_cast<KaxChapterAtom *>(l), *new_sub_chapter );
-            new_sub_chapter->p_parent = &chapters;
-            chapters.sub_chapters.push_back( new_sub_chapter );
+            new_sub_chapter->p_parent = &vars.chapters;
+
+            vars.obj->ParseChapterAtom( vars.i_level+1, &atom, *new_sub_chapter );
+            vars.chapters.sub_chapters.push_back( new_sub_chapter );
         }
-    }
+    };
+
+    ChapterAtomHandlers::Dispatcher().iterate( ca->begin(), ca->end(), ChapterAtomHandlers::Payload( payload ) );
 }
 
 /*****************************************************************************
