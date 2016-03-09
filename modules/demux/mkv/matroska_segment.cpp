@@ -893,20 +893,27 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
         return;
     }
 
-    indexes_t::const_iterator index_it = indexes_begin ();
+    indexes_t::const_iterator index_it = indexes_begin();
 
     if ( index_idx() )
     {
-        for( ; index_it != indexes_end(); ++index_it )
-        {
-            if (index_it->i_mk_time == -1)
-                continue;
+        struct IndexFinder {
+            IndexFinder( mtime_t mk_time_offset )
+                : _mk_time_offset( mk_time_offset )
+            { }
 
-            if(index_it->i_mk_time + i_mk_time_offset > i_mk_date )
-                break;
-        }
+            bool operator()(mtime_t target, mkv_index_t const& mkv_index) const {
+                return target < mkv_index.i_mk_time + _mk_time_offset;
+            }
 
-        if( index_it != indexes_begin ())
+            mtime_t _mk_time_offset;
+        };
+
+        index_it = std::upper_bound (
+          indexes_begin(), indexes_end(), i_mk_date, IndexFinder( i_mk_time_offset )
+        );
+
+        if (index_it != indexes_begin())
             --index_it;
 
         i_seek_position = index_it->i_position;
