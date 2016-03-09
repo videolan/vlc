@@ -796,11 +796,10 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
         E_CASE( KaxDateUTC, date )
         {
-            time_t i_date;
             struct tm tmres;
             char   buffer[25];
+            time_t i_date = date.GetEpochDate();
 
-            i_date = date.GetEpochDate();
             if( gmtime_r( &i_date, &tmres ) &&
                 strftime( buffer, sizeof(buffer), "%a %b %d %H:%M:%S %Y",
                           &tmres ) )
@@ -832,14 +831,14 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         E_CASE( KaxChapterTranslateEditionUID, uid )
         {
             chapter_translation_c *p_translate = new chapter_translation_c();
-            p_translate->editions.push_back( uint64( uid ) );
+            p_translate->editions.push_back( static_cast<uint64>( uid ) );
 
             vars.obj->translations.push_back( p_translate );
         }
         E_CASE( KaxChapterTranslateCodec, codec_id )
         {
             chapter_translation_c *p_translate = new chapter_translation_c();
-            p_translate->codec_id = uint32( codec_id );
+            p_translate->codec_id = static_cast<uint32>( codec_id );
 
             vars.obj->translations.push_back( p_translate );
         }
