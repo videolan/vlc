@@ -72,13 +72,25 @@ char *vlc_uri_decode (char *str)
     return str;
 }
 
-static inline bool isurisafe (int c)
+static bool isurisafe (int c)
 {
     /* These are the _unreserved_ URI characters (RFC3986 §2.3) */
     return ((unsigned char)(c - 'a') < 26)
         || ((unsigned char)(c - 'A') < 26)
         || ((unsigned char)(c - '0') < 10)
         || (strchr ("-._~", c) != NULL);
+}
+
+static bool isurisubdelim(int c)
+{
+    return strchr("!$&'()*+,;=", c) != NULL;
+}
+
+static bool isurihex(int c)
+{   /* Same as isxdigit() but does not depend on locale and unsignedness */
+    return ((unsigned char)(c - '0') < 10)
+        || ((unsigned char)(c - 'A') < 6)
+        || ((unsigned char)(c - 'a') < 6);
 }
 
 static char *encode_URI_bytes (const char *str, size_t *restrict lenp)
@@ -309,6 +321,39 @@ out:
 
 static char *vlc_idna_to_ascii (const char *);
 
+static bool vlc_uri_component_validate(const char *str, const char *extras)
+{
+    if (str == NULL)
+        return false;
+
+    for (size_t i = 0; str[i] != '\0'; i++)
+    {
+        int c = str[i];
+
+        if (isurisafe(c) || isurisubdelim(c))
+            continue;
+        if (strchr(extras, c) != NULL)
+            continue;
+        if (c == '%' && isurihex(str[i + 1]) && isurihex(str[i + 2]))
+        {
+            i += 2;
+            continue;
+        }
+        return false;
+    }
+    return true;
+}
+
+static bool vlc_uri_host_validate(const char *str)
+{
+    return vlc_uri_component_validate(str, "");
+}
+
+static bool vlc_uri_path_validate(const char *str)
+{
+    return vlc_uri_component_validate(str, "/@:");
+}
+
 /**
  * Splits an URL into parts.
  * \param url structure of URL parts [OUT]
@@ -412,6 +457,11 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
 
         url->psz_host = vlc_idna_to_ascii (cur);
     }
+    if (!vlc_uri_host_validate(url->psz_host))
+    {
+        free(url->psz_host);
+        url->psz_host = NULL;
+    }
 
     /* Port number */
     if (next != NULL)
@@ -419,6 +469,8 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
 
     if (url->psz_path != NULL)
         *url->psz_path = '/'; /* restore leading slash */
+    if (!vlc_uri_path_validate(url->psz_path))
+        url->psz_path = NULL;
 }
 
 /**
