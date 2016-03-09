@@ -20,10 +20,6 @@
 #ifndef MANIFESTPARSER_HPP
 #define MANIFESTPARSER_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "../adaptive/playlist/SegmentInfoCommon.h"
 
 #include <cstdlib>

@@ -20,10 +20,6 @@
 #ifndef SMOOTHSTREAM_HPP
 #define SMOOTHSTREAM_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "../adaptive/Streams.hpp"
 
 namespace smooth

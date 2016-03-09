@@ -17,13 +17,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include "ForgedInitSegment.hpp"
-#include "MemoryChunk.hpp"
-#include "../adaptive/playlist/SegmentChunk.hpp"
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include "ForgedInitSegment.hpp"
+#include "MemoryChunk.hpp"
+#include "../adaptive/playlist/SegmentChunk.hpp"
 
 #include <vlc_common.h>
 

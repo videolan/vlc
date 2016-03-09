@@ -23,10 +23,6 @@
 #include "../adaptive/playlist/Segment.h"
 #include "../adaptive/playlist/Inheritables.hpp"
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_codecs.h>
 
 namespace smooth
