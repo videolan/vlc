@@ -1491,7 +1491,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
             {
                 int j = 0;
                 while( s->i_date + j * s->i_period <= i_time &&
-                       s->i_repeat > j )
+                       ( s->i_repeat > j || s->i_repeat == -1 ) )
                 {
                     j++;
                 }
