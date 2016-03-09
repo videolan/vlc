@@ -727,12 +727,19 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
     {
         MKV_SWITCH_INIT();
 
+        static void debug (InfoHandlerPayload& vars, char const * fmt, ...)
+        {
+            va_list args; va_start( args, fmt );
+            MkvTree_va( *vars.p_demuxer, 2, fmt, args);
+            va_end( args );
+        }
         E_CASE( KaxSegmentUID, uid )
         {
             if ( vars.obj->p_segment_uid == NULL )
+            {
                 vars.obj->p_segment_uid = new KaxSegmentUID( uid );
-
-            msg_Dbg( vars.p_demuxer, "|   |   + UID=%d", *reinterpret_cast<uint32*>( vars.obj->p_segment_uid->GetBuffer() ) );
+            }
+            debug( vars, "UID=%d", *reinterpret_cast<uint32*>( vars.obj->p_segment_uid->GetBuffer() ) );
         }
         E_CASE( KaxPrevUID, uid )
         {
@@ -741,8 +748,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 vars.obj->p_prev_segment_uid = new KaxPrevUID( uid );
                 vars.obj->b_ref_external_segments = true;
             }
-
-            msg_Dbg( vars.p_demuxer, "|   |   + PrevUID=%d", *reinterpret_cast<uint32*>( vars.obj->p_prev_segment_uid->GetBuffer() ) );
+            debug( vars, "PrevUID=%d", *reinterpret_cast<uint32*>( vars.obj->p_prev_segment_uid->GetBuffer() ) );
         }
         E_CASE( KaxNextUID, uid )
         {
@@ -751,55 +757,42 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 vars.obj->p_next_segment_uid = new KaxNextUID( uid );
                 vars.obj->b_ref_external_segments = true;
             }
-
-            msg_Dbg( vars.p_demuxer, "|   |   + NextUID=%d", *reinterpret_cast<uint32*>( vars.obj->p_next_segment_uid->GetBuffer() ) );
+            debug( vars, "NextUID=%d", *reinterpret_cast<uint32*>( vars.obj->p_next_segment_uid->GetBuffer() ) );
         }
         E_CASE( KaxTimecodeScale, tcs )
         {
             vars.obj->i_timescale = static_cast<uint64>( tcs );
-
-            msg_Dbg( vars.p_demuxer, "|   |   + TimecodeScale=%" PRId64,
-                     vars.obj->i_timescale );
+            debug( vars, "TimecodeScale=%" PRId64, vars.obj->i_timescale );
         }
         E_CASE( KaxDuration, dur )
         {
             vars.obj->i_duration = mtime_t( static_cast<double>( dur ) );
-
-            msg_Dbg( vars.p_demuxer, "|   |   + Duration=%" PRId64,
-                     vars.obj->i_duration );
+            debug( vars, "Duration=%" PRId64, vars.obj->i_duration );
         }
         E_CASE( KaxMuxingApp, mapp )
         {
             vars.obj->psz_muxing_application = ToUTF8( UTFstring( mapp ) );
-
-            msg_Dbg( vars.p_demuxer, "|   |   + Muxing Application=%s",
-                     vars.obj->psz_muxing_application );
+            debug( vars, "Muxing Application=%s", vars.obj->psz_muxing_application );
         }
         E_CASE( KaxWritingApp, wapp )
         {
             vars.obj->psz_writing_application = ToUTF8( UTFstring( wapp ) );
-
-            msg_Dbg( vars.p_demuxer, "|   |   + Writing Application=%s",
-                     vars.obj->psz_writing_application );
+            debug( vars, "Writing Application=%s", vars.obj->psz_writing_application );
         }
         E_CASE( KaxSegmentFilename, sfn )
         {
             vars.obj->psz_segment_filename = ToUTF8( UTFstring( sfn ) );
-
-            msg_Dbg( vars.p_demuxer, "|   |   + Segment Filename=%s",
-                     vars.obj->psz_segment_filename );
+            debug( vars, "Segment Filename=%s", vars.obj->psz_segment_filename );
         }
         E_CASE( KaxTitle, title )
         {
             vars.obj->psz_title = ToUTF8( UTFstring( title ) );
-
-            msg_Dbg( vars.p_demuxer, "|   |   + Title=%s", vars.obj->psz_title );
+            debug( vars, "Title=%s", vars.obj->psz_title );
         }
         E_CASE( KaxSegmentFamily, uid )
         {
             vars.obj->families.push_back( new KaxSegmentFamily(uid) );
-
-            msg_Dbg( vars.p_demuxer, "|   |   + family=%d", *(uint32*)uid.GetBuffer() );
+            debug( vars, "Family=%d", *reinterpret_cast<uint32*>( uid.GetBuffer() ) );
         }
         E_CASE( KaxDateUTC, date )
         {
@@ -813,7 +806,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                           &tmres ) )
             {
                 vars.obj->psz_date_utc = strdup( buffer );
-                msg_Dbg( vars.p_demuxer, "|   |   + Date=%s", buffer );
+                debug( vars, "Date=%s", vars.obj->psz_date_utc );
             }
         }
         E_CASE( KaxChapterTranslate, trans )
@@ -863,7 +856,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
         E_CASE_DEFAULT(element)
         {
-            msg_Dbg( vars.p_demuxer, "|   |   + Unknown (%s)", typeid(element).name() );
+            debug( vars, "Unknown (%s)", typeid(element).name() );
         }
     };
 
