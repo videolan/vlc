@@ -861,8 +861,9 @@ static int DirectXCreateSurface(vout_display_t *vd,
     if (use_overlay) {
         ddsd.dwFlags |= DDSD_CAPS;
         ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY | DDSCAPS_VIDEOMEMORY;
+        ddsd.ddsCaps.dwCaps |= DDSCAPS_FLIP | DDSCAPS_FRONTBUFFER;
         if (backbuffer_count > 0)
-            ddsd.ddsCaps.dwCaps |= DDSCAPS_COMPLEX | DDSCAPS_FLIP;
+            ddsd.ddsCaps.dwCaps |= DDSCAPS_COMPLEX;
 
         if (backbuffer_count > 0) {
             ddsd.dwFlags |= DDSD_BACKBUFFERCOUNT;
