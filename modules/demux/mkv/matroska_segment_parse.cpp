@@ -27,6 +27,7 @@
 #include "demux.hpp"
 #include "Ebml_parser.hpp"
 #include "Ebml_dispatcher.hpp"
+#include "string_dispatcher.hpp"
 #include "util.hpp"
 
 extern "C" {
@@ -37,6 +38,7 @@ extern "C" {
 }
 
 #include <vlc_codecs.h>
+#include <stdexcept>
 
 /* GetFourCC helper */
 #define GetFOURCC( p )  __GetFOURCC( (uint8_t*)p )
@@ -710,7 +712,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
     {
         msg_Err( &sys.demuxer, "Couldn't read info" );
         return;
-    }   
+    }
 
     struct InfoHandlerPayload {
         demux_t            * p_demuxer;
@@ -1193,8 +1195,6 @@ void matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
 
 int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 {
-    es_format_t *p_fmt = &p_tk->fmt;
-
     if( p_tk->psz_codec == NULL )
     {
         msg_Err( &sys.demuxer, "Empty codec id" );
@@ -1202,555 +1202,554 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         return 0;
     }
 
-    if( !strcmp( p_tk->psz_codec, "V_MS/VFW/FOURCC" ) )
+    struct HandlerPayload {
+        matroska_segment_c * obj;
+        mkv_track_t        * p_tk;
+        es_format_t        * p_fmt;
+        demux_t            * p_demuxer;
+    } captures = {
+        this, p_tk, &p_tk->fmt, &sys.demuxer
+    };
+
+    MKV_SWITCH_CREATE( StringDispatcher, TrackCodecHandlers, HandlerPayload )
     {
-        if( p_tk->i_extra_data < (int)sizeof( VLC_BITMAPINFOHEADER ) )
-        {
-            msg_Err( &sys.demuxer, "missing/invalid VLC_BITMAPINFOHEADER" );
-            p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
-        }
-        else
-        {
-            VLC_BITMAPINFOHEADER *p_bih = (VLC_BITMAPINFOHEADER*)p_tk->p_extra_data;
+        MKV_SWITCH_INIT();
 
-            p_tk->fmt.video.i_width = GetDWLE( &p_bih->biWidth );
-            p_tk->fmt.video.i_height= GetDWLE( &p_bih->biHeight );
-            p_tk->fmt.i_codec       = GetFOURCC( &p_bih->biCompression );
-
-            p_tk->fmt.i_extra       = GetDWLE( &p_bih->biSize ) - sizeof( VLC_BITMAPINFOHEADER );
-            if( p_tk->fmt.i_extra > 0 )
+        S_CASE("V_MS/VFW/FOURCC") {
+            if( vars.p_tk->i_extra_data < (int)sizeof( VLC_BITMAPINFOHEADER ) )
             {
-                /* Very unlikely yet possible: bug #5659*/
-                size_t maxlen = p_tk->i_extra_data - sizeof( VLC_BITMAPINFOHEADER );
-                p_tk->fmt.i_extra = ( (unsigned)p_tk->fmt.i_extra < maxlen )?
-                    p_tk->fmt.i_extra : maxlen;
-
-                p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
-                memcpy( p_tk->fmt.p_extra, &p_bih[1], p_tk->fmt.i_extra );
+                msg_Err(vars.p_demuxer, "missing/invalid VLC_BITMAPINFOHEADER" );
+                vars.p_fmt->i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
             }
-        }
-        p_tk->b_dts_only = true;
-    }
-    else if( !strcmp( p_tk->psz_codec, "V_MPEG1" ) ||
-             !strcmp( p_tk->psz_codec, "V_MPEG2" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_MPGV;
-        if( p_tk->i_extra_data )
-            fill_extra_data( p_tk, 0 );
-    }
-    else if( !strncmp( p_tk->psz_codec, "V_THEORA", 8 ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_THEORA;
-        fill_extra_data( p_tk, 0 );
-        p_tk->b_pts_only = true;
-    }
-    else if( !strncmp( p_tk->psz_codec, "V_REAL/RV", 9 ) )
-    {
-        uint8_t *p = p_tk->p_extra_data;
-
-        if( !strcmp( p_tk->psz_codec, "V_REAL/RV10" ) )
-            p_fmt->i_codec = VLC_CODEC_RV10;
-        else if( !strcmp( p_tk->psz_codec, "V_REAL/RV20" ) )
-            p_fmt->i_codec = VLC_CODEC_RV20;
-        else if( !strcmp( p_tk->psz_codec, "V_REAL/RV30" ) )
-            p_fmt->i_codec = VLC_CODEC_RV30;
-        else if( !strcmp( p_tk->psz_codec, "V_REAL/RV40" ) )
-            p_fmt->i_codec = VLC_CODEC_RV40;
-
-        /* Extract the framerate from the header */
-        if( p_tk->i_extra_data >= 26 &&
-            p[4] == 'V' && p[5] == 'I' && p[6] == 'D' && p[7] == 'O' &&
-            p[8] == 'R' && p[9] == 'V' &&
-            (p[10] == '3' || p[10] == '4') && p[11] == '0' )
-        {
-            p_tk->fmt.video.i_frame_rate =
-                p[22] << 24 | p[23] << 16 | p[24] << 8 | p[25] << 0;
-            p_tk->fmt.video.i_frame_rate_base = 65536;
-        }
-
-        fill_extra_data( p_tk, 26 );
-        p_tk->b_dts_only = true;
-    }
-    else if( !strncmp( p_tk->psz_codec, "V_DIRAC", 7 ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_DIRAC;
-    }
-    else if( !strncmp( p_tk->psz_codec, "V_VP8", 5 ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_VP8;
-        p_tk->b_pts_only = true;
-    }
-    else if( !strncmp( p_tk->psz_codec, "V_VP9", 5 ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_VP9;
-        p_tk->fmt.b_packetized = false;
-        p_tk->b_pts_only = true;
-        fill_extra_data( p_tk, 0 );
-    }
-    else if( !strncmp( p_tk->psz_codec, "V_MPEG4", 7 ) )
-    {
-        if( !strcmp( p_tk->psz_codec, "V_MPEG4/MS/V3" ) )
-        {
-            p_tk->fmt.i_codec = VLC_CODEC_DIV3;
-        }
-        else if( !strncmp( p_tk->psz_codec, "V_MPEG4/ISO", 11 ) )
-        {
-            /* A MPEG 4 codec, SP, ASP, AP or AVC */
-            if( !strcmp( p_tk->psz_codec, "V_MPEG4/ISO/AVC" ) )
-                p_tk->fmt.i_codec = VLC_FOURCC( 'a', 'v', 'c', '1' );
             else
-                p_tk->fmt.i_codec = VLC_CODEC_MP4V;
-            fill_extra_data( p_tk, 0 );
-        }
-    }
-    else if( !strncmp( p_tk->psz_codec, "V_MPEGH/ISO/HEVC", 16) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_HEVC;
-        fill_extra_data( p_tk, 0 );
-    } 
-    else if( !strcmp( p_tk->psz_codec, "V_QUICKTIME" ) )
-    {
-        MP4_Box_t *p_box = (MP4_Box_t*)xmalloc( sizeof( MP4_Box_t ) );
-        stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(&sys.demuxer),
-                                                   p_tk->p_extra_data,
-                                                   p_tk->i_extra_data,
-                                                   true );
-        if( MP4_PeekBoxHeader( p_mp4_stream, p_box ) &&
-            MP4_ReadBox_sample_vide( p_mp4_stream, p_box ) )
-        {
-            p_tk->fmt.i_codec = p_box->i_type;
-            uint32_t i_width = p_box->data.p_sample_vide->i_width;
-            uint32_t i_height = p_box->data.p_sample_vide->i_height;
-            if( i_width && i_height )
             {
-                p_tk->fmt.video.i_width = i_width;
-                p_tk->fmt.video.i_height = i_height;
-            }
-            p_tk->fmt.i_extra = p_box->data.p_sample_vide->i_qt_image_description;
-            p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
-            memcpy( p_tk->fmt.p_extra, p_box->data.p_sample_vide->p_qt_image_description, p_tk->fmt.i_extra );
-            MP4_FreeBox_sample_vide( p_box );
-        }
-        else
-        {
-            free( p_box );
-        }
-        stream_Delete( p_mp4_stream );
-    }
-    else if( !strcmp( p_tk->psz_codec, "V_MJPEG" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_MJPG;
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_MS/ACM" ) )
-    {
-        if( p_tk->i_extra_data < (int)sizeof( WAVEFORMATEX ) )
-        {
-            msg_Err( &sys.demuxer, "missing/invalid WAVEFORMATEX" );
-            p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
-        }
-        else
-        {
-            WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_tk->p_extra_data;
+                VLC_BITMAPINFOHEADER *p_bih = (VLC_BITMAPINFOHEADER*)vars.p_tk->p_extra_data;
 
-            p_tk->fmt.audio.i_channels   = GetWLE( &p_wf->nChannels );
-            p_tk->fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
-            p_tk->fmt.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
-            p_tk->fmt.audio.i_blockalign = GetWLE( &p_wf->nBlockAlign );;
-            p_tk->fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
+                vars.p_fmt->video.i_width = GetDWLE( &p_bih->biWidth );
+                vars.p_fmt->video.i_height= GetDWLE( &p_bih->biHeight );
+                vars.p_fmt->i_codec       = GetFOURCC( &p_bih->biCompression );
 
-            p_tk->fmt.i_extra            = GetWLE( &p_wf->cbSize );
-            if( p_tk->fmt.i_extra > 0 )
-            {
-                p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
-                if( p_tk->fmt.p_extra )
-                    memcpy( p_tk->fmt.p_extra, &p_wf[1], p_tk->fmt.i_extra );
-                else
-                    p_tk->fmt.i_extra = 0;
-            }
-
-            if( p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE && 
-                p_tk->i_extra_data >= sizeof(WAVEFORMATEXTENSIBLE) )
-            {
-                WAVEFORMATEXTENSIBLE * p_wext = (WAVEFORMATEXTENSIBLE*) p_wf;
-                sf_tag_to_fourcc( &p_wext->SubFormat,  &p_tk->fmt.i_codec, NULL);
-                /* FIXME should we use Samples */
-
-                if( p_tk->fmt.audio.i_channels > 2 &&
-                    ( p_tk->fmt.i_codec != VLC_FOURCC( 'u', 'n', 'd', 'f' ) ) ) 
+                vars.p_fmt->i_extra       = GetDWLE( &p_bih->biSize ) - sizeof( VLC_BITMAPINFOHEADER );
+                if( vars.p_fmt->i_extra > 0 )
                 {
-                    uint32_t wfextcm = GetDWLE( &p_wext->dwChannelMask );
-                    int match;
-                    unsigned i_channel_mask = getChannelMask( &wfextcm,
-                                                              p_tk->fmt.audio.i_channels,
-                                                              &match );
-                    p_tk->fmt.i_codec = vlc_fourcc_GetCodecAudio( p_tk->fmt.i_codec,
-                                                                  p_tk->fmt.audio.i_bitspersample );
-                    if( i_channel_mask )
-                    {
-                        p_tk->i_chans_to_reorder = aout_CheckChannelReorder(
-                            pi_channels_aout, NULL,
-                            i_channel_mask,
-                            p_tk->pi_chan_table );
+                    /* Very unlikely yet possible: bug #5659*/
+                    size_t maxlen = vars.p_tk->i_extra_data - sizeof( VLC_BITMAPINFOHEADER );
+                    vars.p_fmt->i_extra = ( (unsigned)vars.p_fmt->i_extra < maxlen )?
+                        vars.p_fmt->i_extra : maxlen;
 
-                        p_tk->fmt.audio.i_physical_channels =
-                        p_tk->fmt.audio.i_original_channels = i_channel_mask;
-                    }
+                    vars.p_fmt->p_extra = xmalloc( vars.p_fmt->i_extra );
+                    memcpy( vars.p_fmt->p_extra, &p_bih[1], vars.p_fmt->i_extra );
                 }
             }
-            else
-                wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_tk->fmt.i_codec, NULL );
+            vars.p_tk->b_dts_only = true;
+        }
+        S_CASE("V_MPEG1") {
+            vars.p_fmt->i_codec = VLC_CODEC_MPGV;
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("V_MPEG2") {
+            vars.p_fmt->i_codec = VLC_CODEC_MPGV;
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("V_THEORA") {
+            vars.p_fmt->i_codec = VLC_CODEC_THEORA;
+            vars.p_tk->b_pts_only = true;
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        static void v_real_helper (vlc_fourcc_t codec, HandlerPayload& vars)
+        {
+            vars.p_tk->b_dts_only = true;
+            vars.p_fmt->i_codec   = codec;
 
-            if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
-                msg_Err( &sys.demuxer, "Unrecognized wf tag: 0x%x", GetWLE( &p_wf->wFormatTag ) );
-        }
-        p_fmt->b_packetized = !p_fmt->audio.i_blockalign;
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_MPEG/L3" ) ||
-             !strcmp( p_tk->psz_codec, "A_MPEG/L2" ) ||
-             !strcmp( p_tk->psz_codec, "A_MPEG/L1" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_MPGA;
-        p_fmt->b_packetized = false;
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_AC3" ) )
-    {
-        // the AC-3 default duration cannot be trusted, see #8512
-        if ( p_tk->fmt.audio.i_rate == 8000 )
-        {
-            p_tk->b_no_duration = true;
-            p_tk->i_default_duration = 0;
-        }
-        p_tk->fmt.i_codec = VLC_CODEC_A52;
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_EAC3" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_EAC3;
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_DTS" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_DTS;
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_MLP" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_MLP;
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_TRUEHD" ) )
-    {
-        /* FIXME when more samples arrive */
-        p_tk->fmt.i_codec = VLC_CODEC_TRUEHD;
-        p_fmt->b_packetized = false;
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_FLAC" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_FLAC;
-        fill_extra_data( p_tk, 8 );
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_VORBIS" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_VORBIS;
-        fill_extra_data( p_tk, 0 );
-    }
-    else if( !strncmp( p_tk->psz_codec, "A_OPUS", 6 ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_OPUS;
-        if( !p_tk->fmt.audio.i_rate )
-        {
-            msg_Err( &sys.demuxer,"No sampling rate, defaulting to 48kHz");
-            p_tk->fmt.audio.i_rate = 48000;
-        }
-        const uint8_t tags[16] = {'O','p','u','s','T','a','g','s',
-                                   0, 0, 0, 0, 0, 0, 0, 0};
-        unsigned ps[2] = { p_tk->i_extra_data, 16 };
-        const void *pkt[2] = { static_cast<const void *>( p_tk->p_extra_data ),
-                               static_cast<const void *>( tags ) };
+            /* Extract the framerate from the header */
+            uint8_t *p = vars.p_tk->p_extra_data;
 
-        if( xiph_PackHeaders( &p_tk->fmt.i_extra,
-                              &p_tk->fmt.p_extra,
-                              ps, pkt, 2 ) )
-            msg_Err( &sys.demuxer, "Couldn't pack OPUS headers");
-
-    }
-    else if( !strncmp( p_tk->psz_codec, "A_AAC/MPEG2/", strlen( "A_AAC/MPEG2/" ) ) ||
-             !strncmp( p_tk->psz_codec, "A_AAC/MPEG4/", strlen( "A_AAC/MPEG4/" ) ) )
-    {
-        int i_profile, i_srate, sbr = 0;
-        static const unsigned int i_sample_rates[] =
-        {
-            96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
-            16000, 12000, 11025,  8000,  7350,     0,     0,     0
-        };
-
-        p_tk->fmt.i_codec = VLC_CODEC_MP4A;
-        /* create data for faad (MP4DecSpecificDescrTag)*/
-
-        if( !strcmp( &p_tk->psz_codec[12], "MAIN" ) )
-        {
-            i_profile = 0;
-        }
-        else if( !strcmp( &p_tk->psz_codec[12], "LC" ) )
-        {
-            i_profile = 1;
-        }
-        else if( !strcmp( &p_tk->psz_codec[12], "SSR" ) )
-        {
-            i_profile = 2;
-        }
-        else if( !strcmp( &p_tk->psz_codec[12], "LC/SBR" ) )
-        {
-            i_profile = 1;
-            sbr = 1;
-        }
-        else
-        {
-            i_profile = 3;
-        }
-
-        for( i_srate = 0; i_srate < 13; i_srate++ )
-        {
-            if( i_sample_rates[i_srate] == p_tk->i_original_rate )
+            if (
+                vars.p_tk->i_extra_data >= 26 && !memcmp(p+4, "VIDORV", 6) && strchr("34", p[10]) && p[11] == '0')
             {
-                break;
+                vars.p_tk->fmt.video.i_frame_rate      = p[22] << 24 | p[23] << 16 | p[24] << 8 | p[25] << 0;
+                vars.p_tk->fmt.video.i_frame_rate_base = 65536;
             }
-        }
-        msg_Dbg( &sys.demuxer, "profile=%d srate=%d", i_profile, i_srate );
 
-        p_tk->fmt.i_extra = sbr ? 5 : 2;
-        p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
-        ((uint8_t*)p_tk->fmt.p_extra)[0] = ((i_profile + 1) << 3) | ((i_srate&0xe) >> 1);
-        ((uint8_t*)p_tk->fmt.p_extra)[1] = ((i_srate & 0x1) << 7) | (p_tk->fmt.audio.i_channels << 3);
-        if (sbr != 0)
-        {
-            int syncExtensionType = 0x2B7;
-            int iDSRI;
-            for (iDSRI=0; iDSRI<13; iDSRI++)
-                if( i_sample_rates[iDSRI] == p_tk->fmt.audio.i_rate )
-                    break;
-            ((uint8_t*)p_tk->fmt.p_extra)[2] = (syncExtensionType >> 3) & 0xFF;
-            ((uint8_t*)p_tk->fmt.p_extra)[3] = ((syncExtensionType & 0x7) << 5) | 5;
-            ((uint8_t*)p_tk->fmt.p_extra)[4] = ((1 & 0x1) << 7) | (iDSRI << 3);
+            fill_extra_data( vars.p_tk, 26 );
         }
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_AAC" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_MP4A;
-        fill_extra_data( p_tk, 0 );
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_ALAC" ) )
-    {
-        p_tk->fmt.i_codec =  VLC_CODEC_ALAC;
-        fill_extra_data_alac( p_tk );
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_WAVPACK4" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_WAVPACK;
-        fill_extra_data( p_tk, 0 );
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_TTA1" ) )
-    {
-        p_fmt->i_codec = VLC_CODEC_TTA;
-        if( p_tk->i_extra_data > 0 )
-        {
-            fill_extra_data( p_tk, 0 );
+        S_CASE("V_REAL/RV10") { v_real_helper (VLC_CODEC_RV10, vars ); }
+        S_CASE("V_REAL/RV20") { v_real_helper (VLC_CODEC_RV20, vars ); }
+        S_CASE("V_REAL/RV30") { v_real_helper (VLC_CODEC_RV30, vars ); }
+        S_CASE("V_REAL/RV40") { v_real_helper (VLC_CODEC_RV40, vars ); }
+        S_CASE("V_DIRAC")     {
+            vars.p_fmt->i_codec = VLC_CODEC_DIRAC;
         }
-        else
-        {
-            p_fmt->i_extra = 30;
-            p_fmt->p_extra = xmalloc( p_fmt->i_extra );
-            uint8_t *p_extra = static_cast<uint8_t*>( p_fmt->p_extra );
-            memcpy( &p_extra[ 0], "TTA1", 4 );
-            SetWLE( &p_extra[ 4], 1 );
-            SetWLE( &p_extra[ 6], p_fmt->audio.i_channels );
-            SetWLE( &p_extra[ 8], p_fmt->audio.i_bitspersample );
-            SetDWLE( &p_extra[10], p_fmt->audio.i_rate );
-            SetDWLE( &p_extra[14], 0xffffffff );
-            memset( &p_extra[18], 0, 30  - 18 );
+        S_CASE("V_VP8") {
+            vars.p_fmt->i_codec = VLC_CODEC_VP8;
+            vars.p_tk->b_pts_only = true;
         }
-    }
-    else if( !strcmp( p_tk->psz_codec, "A_PCM/INT/BIG" ) ||
-             !strcmp( p_tk->psz_codec, "A_PCM/INT/LIT" ) ||
-             !strcmp( p_tk->psz_codec, "A_PCM/FLOAT/IEEE" ) )
-    {
-        if( !strcmp( p_tk->psz_codec, "A_PCM/INT/BIG" ) )
-        {
-            p_tk->fmt.i_codec = VLC_FOURCC( 't', 'w', 'o', 's' );
+        S_CASE("V_VP9") {
+            vars.p_fmt->i_codec = VLC_CODEC_VP9;
+            vars.p_fmt->b_packetized = false;
+            vars.p_tk->b_pts_only = true;
+
+            fill_extra_data( vars.p_tk, 0 );
         }
-        else
-        {
-            p_tk->fmt.i_codec = VLC_FOURCC( 'a', 'r', 'a', 'w' );
+        S_CASE("V_MPEG4/MS/V3") {
+            vars.p_fmt->i_codec = VLC_CODEC_DIV3;
         }
-        p_tk->fmt.audio.i_blockalign = ( p_tk->fmt.audio.i_bitspersample + 7 ) / 8 * p_tk->fmt.audio.i_channels;
-    }
-    else if( !strncmp( p_tk->psz_codec, "A_REAL/", 7 ) )
-    {
-        if( !strcmp( p_tk->psz_codec, "A_REAL/14_4" ) )
-        {
-            p_fmt->i_codec = VLC_CODEC_RA_144;
-            p_fmt->audio.i_channels = 1;
-            p_fmt->audio.i_rate = 8000;
-            p_fmt->audio.i_blockalign = 0x14;
+        S_CASE("V_MPEG4/ISO/AVC") {
+            vars.p_fmt->i_codec = VLC_FOURCC( 'a','v','c','1' );
+            fill_extra_data( vars.p_tk, 0 );
         }
-        else if( p_tk->i_extra_data > 28 )
-        {
-            uint8_t *p = p_tk->p_extra_data;
-            if( memcmp( p, ".ra", 3 ) ) {
-                msg_Err( &sys.demuxer, "Invalid Real ExtraData 0x%4.4s", (char *)p );
+        S_CASE_GLOB("V_MPEG4/ISO*") {
+            vars.p_fmt->i_codec = VLC_CODEC_MP4V;
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("V_MPEGH/ISO/HEVC") {
+            vars.p_tk->fmt.i_codec = VLC_CODEC_HEVC;
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("V_QUICKTIME") {
+            MP4_Box_t *p_box = (MP4_Box_t*)xmalloc( sizeof( MP4_Box_t ) );
+            stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(vars.p_demuxer),
+                                                       vars.p_tk->p_extra_data,
+                                                       vars.p_tk->i_extra_data,
+                                                       true );
+            if( MP4_PeekBoxHeader( p_mp4_stream, p_box ) &&
+                MP4_ReadBox_sample_vide( p_mp4_stream, p_box ) )
+            {
+                vars.p_fmt->i_codec = p_box->i_type;
+                uint32_t i_width = p_box->data.p_sample_vide->i_width;
+                uint32_t i_height = p_box->data.p_sample_vide->i_height;
+                if( i_width && i_height )
+                {
+                    vars.p_tk->fmt.video.i_width = i_width;
+                    vars.p_tk->fmt.video.i_height = i_height;
+                }
+                vars.p_fmt->i_extra = p_box->data.p_sample_vide->i_qt_image_description;
+                vars.p_fmt->p_extra = xmalloc( vars.p_fmt->i_extra );
+                memcpy( vars.p_fmt->p_extra, p_box->data.p_sample_vide->p_qt_image_description, vars.p_fmt->i_extra );
+                MP4_FreeBox_sample_vide( p_box );
+            }
+            else
+            {
+                free( p_box );
+            }
+            stream_Delete( p_mp4_stream );
+        }
+        S_CASE("V_MJPEG") {
+            vars.p_fmt->i_codec = VLC_CODEC_MJPG;
+        }
+        S_CASE("A_MS/ACM") {
+            mkv_track_t * p_tk = vars.p_tk;
+            es_format_t * p_fmt = &vars.p_tk->fmt;
+
+            if( p_tk->i_extra_data < (int)sizeof( WAVEFORMATEX ) )
+            {
+                msg_Err( vars.p_demuxer, "missing/invalid WAVEFORMATEX" );
                 p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
             }
             else
             {
-                real_audio_private * priv = (real_audio_private*) p_tk->p_extra_data;
-                if( !strcmp( p_tk->psz_codec, "A_REAL/COOK" ) )
-                {
-                    p_tk->fmt.i_codec = VLC_CODEC_COOK;
-                    p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
-                }
-                else if( !strcmp( p_tk->psz_codec, "A_REAL/ATRC" ) )
-                {
-                    p_tk->fmt.i_codec = VLC_CODEC_ATRAC3;
-                    p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
-                }
-                else if( !strcmp( p_tk->psz_codec, "A_REAL/28_8" ) )
-                    p_tk->fmt.i_codec = VLC_CODEC_RA_288;
-                /* FIXME RALF and SIPR */
-                uint16_t version = static_cast<uint16_t>( hton16(priv->version) );
-                p_tk->p_sys =
-                    new Cook_PrivateTrackData( hton16(priv->sub_packet_h),
-                                               hton16(priv->frame_size),
-                                               hton16(priv->sub_packet_size));
-                if( unlikely( !p_tk->p_sys ) )
-                    return 1;
+                WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_tk->p_extra_data;
 
-                if( unlikely( p_tk->p_sys->Init() ) )
-                    return 1;
+                p_tk->fmt.audio.i_channels   = GetWLE( &p_wf->nChannels );
+                p_tk->fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
+                p_tk->fmt.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
+                p_tk->fmt.audio.i_blockalign = GetWLE( &p_wf->nBlockAlign );;
+                p_tk->fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
 
-                if( version == 4 )
+                p_tk->fmt.i_extra            = GetWLE( &p_wf->cbSize );
+                if( p_tk->fmt.i_extra > 0 )
                 {
-                    real_audio_private_v4 * v4 = (real_audio_private_v4*) priv;
-                    p_tk->fmt.audio.i_channels = hton16(v4->channels);
-                    p_tk->fmt.audio.i_bitspersample = hton16(v4->sample_size);
-                    p_tk->fmt.audio.i_rate = hton16(v4->sample_rate);
+                    p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
+                    if( p_tk->fmt.p_extra )
+                        memcpy( p_tk->fmt.p_extra, &p_wf[1], p_tk->fmt.i_extra );
+                    else
+                        p_tk->fmt.i_extra = 0;
                 }
-                else if( version == 5 )
-                {
-                    real_audio_private_v5 * v5 = (real_audio_private_v5*) priv;
-                    p_tk->fmt.audio.i_channels = hton16(v5->channels);
-                    p_tk->fmt.audio.i_bitspersample = hton16(v5->sample_size);
-                    p_tk->fmt.audio.i_rate = hton16(v5->sample_rate);
-                }
-                msg_Dbg(&sys.demuxer, "%d channels %d bits %d Hz",p_tk->fmt.audio.i_channels, p_tk->fmt.audio.i_bitspersample, p_tk->fmt.audio.i_rate);
 
-                fill_extra_data( p_tk, p_tk->fmt.i_codec == VLC_CODEC_RA_288 ? 0 : 78);
+                if( p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE &&
+                    p_tk->i_extra_data >= sizeof(WAVEFORMATEXTENSIBLE) )
+                {
+                    WAVEFORMATEXTENSIBLE * p_wext = (WAVEFORMATEXTENSIBLE*) p_wf;
+                    sf_tag_to_fourcc( &p_wext->SubFormat,  &p_tk->fmt.i_codec, NULL);
+                    /* FIXME should we use Samples */
+
+                    if( p_tk->fmt.audio.i_channels > 2 &&
+                        ( p_tk->fmt.i_codec != VLC_FOURCC( 'u', 'n', 'd', 'f' ) ) )
+                    {
+                        uint32_t wfextcm = GetDWLE( &p_wext->dwChannelMask );
+                        int match;
+                        unsigned i_channel_mask = getChannelMask( &wfextcm,
+                                                                  p_tk->fmt.audio.i_channels,
+                                                                  &match );
+                        p_tk->fmt.i_codec = vlc_fourcc_GetCodecAudio( p_tk->fmt.i_codec,
+                                                                      p_tk->fmt.audio.i_bitspersample );
+                        if( i_channel_mask )
+                        {
+                            p_tk->i_chans_to_reorder = aout_CheckChannelReorder(
+                                pi_channels_aout, NULL,
+                                i_channel_mask,
+                                p_tk->pi_chan_table );
+
+                            p_tk->fmt.audio.i_physical_channels =
+                            p_tk->fmt.audio.i_original_channels = i_channel_mask;
+                        }
+                    }
+                }
+                else
+                    wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_tk->fmt.i_codec, NULL );
+
+                if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
+                    msg_Err( vars.p_demuxer, "Unrecognized wf tag: 0x%x", GetWLE( &p_wf->wFormatTag ) );
             }
+            p_fmt->b_packetized = !p_fmt->audio.i_blockalign;
         }
-    }
-    else if( !strncmp( p_tk->psz_codec, "A_QUICKTIME", 11 ) )
-    {
-        p_tk->fmt.i_cat = AUDIO_ES;
-        if ( !strncmp( p_tk->psz_codec+11, "/QDM2", 5 ) )
-            p_tk->fmt.i_codec = VLC_CODEC_QDM2;
-        else if( !strncmp( p_tk->psz_codec+11, "/QDMC", 5 ) )
-            p_tk->fmt.i_codec = VLC_FOURCC('Q','D','M','C');
-        else if( p_tk->i_extra_data >= 8)
-            p_tk->fmt.i_codec = VLC_FOURCC(p_tk->p_extra_data[4],
-                                           p_tk->p_extra_data[5],
-                                           p_tk->p_extra_data[6],
-                                           p_tk->p_extra_data[7]);
-        fill_extra_data( p_tk, 0 );
-    }
-    else if( !strcmp( p_tk->psz_codec, "S_KATE" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_KATE;
-        p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
-
-        fill_extra_data( p_tk, 0 );
-    }
-    else if( !strcmp( p_tk->psz_codec, "S_TEXT/ASCII" ) )
-    {
-        p_fmt->i_codec = VLC_CODEC_SUBT;
-        p_fmt->subs.psz_encoding = strdup( "ASCII" );
-    }
-    else if( !strcmp( p_tk->psz_codec, "S_TEXT/UTF8" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_SUBT;
-        p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
-    }
-    else if( !strcmp( p_tk->psz_codec, "S_TEXT/USF" ) )
-    {
-        p_tk->fmt.i_codec = VLC_FOURCC( 'u', 's', 'f', ' ' );
-        p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
-        if( p_tk->i_extra_data )
-            fill_extra_data( p_tk, 0 );
-    }
-    else if( !strcmp( p_tk->psz_codec, "S_TEXT/SSA" ) ||
-             !strcmp( p_tk->psz_codec, "S_TEXT/ASS" ) ||
-             !strcmp( p_tk->psz_codec, "S_SSA" ) ||
-             !strcmp( p_tk->psz_codec, "S_ASS" ))
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_SSA;
-        p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
-        if( p_tk->i_extra_data )
-            fill_extra_data( p_tk, 0 );
-    }
-    else if( !strcmp( p_tk->psz_codec, "S_VOBSUB" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_SPU;
-        p_tk->b_no_duration = true;
-        if( p_tk->i_extra_data )
-        {
-            char *psz_start;
-            char *psz_buf = (char *)malloc( p_tk->i_extra_data + 1);
-            if( psz_buf != NULL )
+        static void A_MPEG_helper_ (HandlerPayload& vars) {
+            vars.p_tk->fmt.i_codec = VLC_CODEC_MPGA;
+            vars.p_fmt->b_packetized = false;
+        }
+        S_CASE("A_MPEG/L3") { A_MPEG_helper_(vars); }
+        S_CASE("A_MPEG/L2") { A_MPEG_helper_(vars); }
+        S_CASE("A_MPEG/L1") { A_MPEG_helper_(vars); }
+        S_CASE("A_AC3") {
+            // the AC-3 default duration cannot be trusted, see #8512
+            if ( vars.p_tk->fmt.audio.i_rate == 8000 )
             {
-                memcpy( psz_buf, p_tk->p_extra_data , p_tk->i_extra_data );
-                psz_buf[p_tk->i_extra_data] = '\0';
+                vars.p_tk->b_no_duration = true;
+                vars.p_tk->i_default_duration = 0;
+            }
 
-                psz_start = strstr( psz_buf, "size:" );
-                if( psz_start &&
-                    vobsub_size_parse( psz_start,
-                                       &p_tk->fmt.subs.spu.i_original_frame_width,
-                                       &p_tk->fmt.subs.spu.i_original_frame_height ) == VLC_SUCCESS )
-                {
-                    msg_Dbg( &sys.demuxer, "original frame size vobsubs: %dx%d",
-                             p_tk->fmt.subs.spu.i_original_frame_width,
-                             p_tk->fmt.subs.spu.i_original_frame_height );
-                }
-                else
-                {
-                    msg_Warn( &sys.demuxer, "reading original frame size for vobsub failed" );
-                }
+            vars.p_fmt->i_codec = VLC_CODEC_A52;
+        }
+        S_CASE("A_EAC3") { vars.p_fmt->i_codec = VLC_CODEC_EAC3; }
+        S_CASE("A_DTS")  { vars.p_fmt->i_codec = VLC_CODEC_DTS; }
+        S_CASE("A_MLP")  { vars.p_fmt->i_codec = VLC_CODEC_MLP; }
+        S_CASE("A_TRUEHD") { /* FIXME when more samples arrive */
+            vars.p_fmt->i_codec = VLC_CODEC_TRUEHD;
+            vars.p_fmt->b_packetized = false;
+        }
+        S_CASE("A_FLAC") {
+            vars.p_fmt->i_codec = VLC_CODEC_FLAC;
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("A_VORBIS") {
+            vars.p_fmt->i_codec = VLC_CODEC_VORBIS;
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("A_OPUS") {
+            vars.p_fmt->i_codec = VLC_CODEC_OPUS;
+            if( !vars.p_tk->fmt.audio.i_rate )
+            {
+                msg_Err( vars.p_demuxer,"No sampling rate, defaulting to 48kHz");
+                vars.p_fmt->audio.i_rate = 48000;
+            }
+            const uint8_t tags[16] = {'O','p','u','s','T','a','g','s',
+                                       0, 0, 0, 0, 0, 0, 0, 0};
+            unsigned ps[2] = { vars.p_tk->i_extra_data, 16 };
+            const void *pkt[2] = { static_cast<const void *>( vars.p_tk->p_extra_data ),
+                                   static_cast<const void *>( tags ) };
 
-                psz_start = strstr( psz_buf, "palette:" );
-                if( psz_start &&
-                    vobsub_palette_parse( psz_start, &p_tk->fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
-                {
-                    p_tk->fmt.subs.spu.palette[0] =  0xBeef;
-                    msg_Dbg( &sys.demuxer, "vobsub palette read" );
-                }
-                else
-                {
-                    msg_Warn( &sys.demuxer, "reading original palette failed" );
-                }
-                free( psz_buf );
+            if( xiph_PackHeaders( &vars.p_fmt->i_extra,
+                &vars.p_fmt->p_extra,
+                ps, pkt, 2 ) )
+                msg_Err( vars.p_demuxer, "Couldn't pack OPUS headers");
+        }
+        static void A_AAC_MPEG__helper(HandlerPayload& vars, int i_profile, bool sbr = false) {
+            int i_srate;
+
+            mkv_track_t * p_tk = vars.p_tk;
+
+            static const unsigned int i_sample_rates[] =
+            {
+                96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
+                16000, 12000, 11025,  8000,  7350,     0,     0,     0
+            };
+
+            p_tk->fmt.i_codec = VLC_CODEC_MP4A;
+
+            for( i_srate = 0; i_srate < 13; i_srate++ )
+            {
+                if( i_sample_rates[i_srate] == p_tk->i_original_rate )
+                    break;
+            }
+
+            msg_Dbg (vars.p_demuxer, "profile=%d srate=%d", i_profile, i_srate );
+
+            p_tk->fmt.i_extra = sbr ? 5 : 2;
+            p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
+            ((uint8_t*)p_tk->fmt.p_extra)[0] = ((i_profile + 1) << 3) | ((i_srate&0xe) >> 1);
+            ((uint8_t*)p_tk->fmt.p_extra)[1] = ((i_srate & 0x1) << 7) | (p_tk->fmt.audio.i_channels << 3);
+
+            if (sbr) {
+                int syncExtensionType = 0x2B7;
+                int iDSRI;
+                for (iDSRI=0; iDSRI<13; iDSRI++)
+                    if( i_sample_rates[iDSRI] == p_tk->fmt.audio.i_rate )
+                        break;
+                ((uint8_t*)p_tk->fmt.p_extra)[2] = (syncExtensionType >> 3) & 0xFF;
+                ((uint8_t*)p_tk->fmt.p_extra)[3] = ((syncExtensionType & 0x7) << 5) | 5;
+                ((uint8_t*)p_tk->fmt.p_extra)[4] = ((1 & 0x1) << 7) | (iDSRI << 3);
+            }
+
+        }
+        S_CASE("A_AAC/MPEG2/MAIN")   { A_AAC_MPEG__helper( vars, 0 ); }
+        S_CASE("A_AAC/MPEG4/MAIN")   { A_AAC_MPEG__helper( vars, 0 ); }
+        S_CASE("A_AAC/MPEG2/LC")     { A_AAC_MPEG__helper( vars, 1 ); }
+        S_CASE("A_AAC/MPEG4/LC")     { A_AAC_MPEG__helper( vars, 1 ); }
+        S_CASE("A_AAC/MPEG2/SSR")    { A_AAC_MPEG__helper( vars, 2 ); }
+        S_CASE("A_AAC/MPEG4/SSR")    { A_AAC_MPEG__helper( vars, 2 ); }
+        S_CASE("A_AAC/MPEG4/LTP")    { A_AAC_MPEG__helper( vars, 3 ); }
+        S_CASE("A_AAC/MPEG2/LC/SBR") { A_AAC_MPEG__helper( vars, 1, true ); }
+        S_CASE("A_AAC/MPEG4/LC/SBR") { A_AAC_MPEG__helper( vars, 1, true ); }
+        S_CASE("A_AAC") {
+            vars.p_tk->fmt.i_codec = VLC_CODEC_MP4A;
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("A_ALAC") {
+            vars.p_tk->fmt.i_codec = VLC_CODEC_ALAC;
+            fill_extra_data( vars.p_tk, 0);
+        }
+        S_CASE("A_WAVPACK4") {
+            vars.p_tk->fmt.i_codec = VLC_CODEC_WAVPACK;
+            fill_extra_data( vars.p_tk, 0);
+        }
+        S_CASE("A_TTA1") {
+            mkv_track_t * p_tk  = vars.p_tk;
+            es_format_t * p_fmt = vars.p_fmt;
+
+            p_fmt->i_codec = VLC_CODEC_TTA;
+            if( p_tk->i_extra_data > 0 )
+            {
+                fill_extra_data( p_tk, 0 );
+            }
+            else
+            {
+                p_fmt->i_extra = 30;
+                p_fmt->p_extra = xmalloc( p_fmt->i_extra );
+                uint8_t *p_extra = (uint8_t*)p_fmt->p_extra;
+                memcpy( &p_extra[ 0], "TTA1", 4 );
+                SetWLE( &p_extra[ 4], 1 );
+                SetWLE( &p_extra[ 6], p_fmt->audio.i_channels );
+                SetWLE( &p_extra[ 8], p_fmt->audio.i_bitspersample );
+                SetDWLE( &p_extra[10], p_fmt->audio.i_rate );
+                SetDWLE( &p_extra[14], 0xffffffff );
+                memset( &p_extra[18], 0, 30  - 18 );
             }
         }
+        static void A_PCM__helper (HandlerPayload& vars, uint32_t i_codec) {
+            vars.p_fmt->i_codec = i_codec;
+            vars.p_fmt->audio.i_blockalign = ( vars.p_fmt->audio.i_bitspersample + 7 ) / 8 * vars.p_fmt->audio.i_channels;
+
+        }
+        S_CASE("A_PCM/INT/BIG")    { A_PCM__helper ( vars, VLC_FOURCC( 't','w','o','s' ) ); }
+        S_CASE("A_PCM/INT/LIT")    { A_PCM__helper ( vars, VLC_FOURCC( 'a','r','a','w' ) ); }
+        S_CASE("A_PCM/FLOAT/IEEE") { A_PCM__helper ( vars, VLC_FOURCC( 'a','r','a','w' ) ) ;}
+        S_CASE("A_REAL/14_4") {
+            vars.p_fmt->i_codec = VLC_CODEC_RA_144;
+            vars.p_fmt->audio.i_channels = 1;
+            vars.p_fmt->audio.i_rate = 8000;
+            vars.p_fmt->audio.i_blockalign = 0x14;
+        }
+        static bool A_REAL__is_valid (HandlerPayload& vars) {
+            uint8_t *p = vars.p_tk->p_extra_data;
+
+            if (vars.p_tk->i_extra_data <= 28)
+                return false;
+
+            if( memcmp( p, ".ra", 3 ) ) {
+                msg_Err( vars.p_demuxer, "Invalid Real ExtraData 0x%4.4s", (char *)p );
+                vars.p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+                return false;
+            }
+
+            return true;
+        }
+        static void A_REAL__helper (HandlerPayload& vars, uint32_t i_codec) {
+            mkv_track_t        * p_tk = vars.p_tk;
+            real_audio_private * priv = (real_audio_private*) p_tk->p_extra_data;
+
+            p_tk->fmt.i_codec = i_codec;
+
+            /* FIXME RALF and SIPR */
+            uint16_t version = (uint16_t) hton16(priv->version);
+
+            p_tk->p_sys = new Cook_PrivateTrackData(
+                  hton16( priv->sub_packet_h ),
+                  hton16( priv->frame_size ),
+                  hton16( priv->sub_packet_size )
+            );
+
+            if( unlikely( !p_tk->p_sys ) )
+                throw std::runtime_error ("p_tk->p_sys is NULL when handling A_REAL/28_8");
+
+            if( unlikely( p_tk->p_sys->Init() ) )
+                throw std::runtime_error ("p_tk->p_sys->Init() failed when handling A_REAL/28_8");
+
+            if( version == 4 )
+            {
+                real_audio_private_v4 * v4 = (real_audio_private_v4*) priv;
+                p_tk->fmt.audio.i_channels = hton16(v4->channels);
+                p_tk->fmt.audio.i_bitspersample = hton16(v4->sample_size);
+                p_tk->fmt.audio.i_rate = hton16(v4->sample_rate);
+            }
+            else if( version == 5 )
+            {
+                real_audio_private_v5 * v5 = (real_audio_private_v5*) priv;
+                p_tk->fmt.audio.i_channels = hton16(v5->channels);
+                p_tk->fmt.audio.i_bitspersample = hton16(v5->sample_size);
+                p_tk->fmt.audio.i_rate = hton16(v5->sample_rate);
+            }
+            msg_Dbg(vars.p_demuxer, "%d channels %d bits %d Hz",p_tk->fmt.audio.i_channels, p_tk->fmt.audio.i_bitspersample, p_tk->fmt.audio.i_rate);
+
+            fill_extra_data( p_tk, p_tk->fmt.i_codec == VLC_CODEC_RA_288 ? 0 : 78);
+        }
+        S_CASE("A_REAL/COOK") {
+            if (!A_REAL__is_valid (vars))
+                return;
+
+            real_audio_private * priv = (real_audio_private*) vars.p_tk->p_extra_data;
+            vars.p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
+
+            A_REAL__helper (vars, VLC_CODEC_COOK);
+        }
+        S_CASE("A_REAL/ATRC") {
+            if (!A_REAL__is_valid (vars))
+                return;
+
+            real_audio_private * priv = (real_audio_private*) vars.p_tk->p_extra_data;
+            vars.p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
+
+            A_REAL__helper (vars, VLC_CODEC_ATRAC3);
+        }
+        S_CASE("A_REAL/28_8") {
+            if (!A_REAL__is_valid (vars))
+                return;
+
+            A_REAL__helper (vars, VLC_CODEC_RA_288);
+        }
+        S_CASE("A_QUICKTIME/QDM2") {
+            vars.p_fmt->i_cat   = AUDIO_ES;
+            vars.p_fmt->i_codec = VLC_CODEC_QDM2;
+
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("A_QUICKTIME/QDMC") {
+            vars.p_fmt->i_cat   = AUDIO_ES;
+            vars.p_fmt->i_codec = VLC_FOURCC('Q','D','M','C');
+
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE_GLOB("A_QUICKTIME/*") {
+            vars.p_fmt->i_cat = AUDIO_ES;
+
+            if (vars.p_tk->i_extra_data < 8)
+                throw std::runtime_error ("vars.p_tk->i_extra_data < 8 when handling A_QUICKTIME/*");
+
+            uint8_t const * p = vars.p_tk->p_extra_data;
+            vars.p_fmt->i_codec = VLC_FOURCC(p[4],p[5],p[6],p[7]);
+
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("S_KATE") {
+            vars.p_fmt->i_codec = VLC_CODEC_KATE;
+            vars.p_fmt->subs.psz_encoding = strdup( "UTF-8" );
+
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("S_TEXT/ASCII") {
+            vars.p_fmt->i_codec = VLC_CODEC_SUBT;
+            vars.p_fmt->subs.psz_encoding = strdup( "ASCII" );
+        }
+        S_CASE("S_TEXT/UTF-8") {
+            vars.p_tk->fmt.i_codec = VLC_CODEC_SUBT;
+            vars.p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
+        }
+        S_CASE("S_TEXT/USF") {
+            vars.p_tk->fmt.i_codec = VLC_FOURCC( 'u', 's', 'f', ' ' );
+            vars.p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        static void SSA__helper (HandlerPayload& vars) {
+            vars.p_tk->fmt.i_codec = VLC_CODEC_SSA;
+            vars.p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
+            fill_extra_data( vars.p_tk, 0 );
+        }
+        S_CASE("S_TEXT/SSA") { SSA__helper( vars ); }
+        S_CASE("S_TEXT/ASS") { SSA__helper( vars ); }
+        S_CASE("S_SSA")      { SSA__helper( vars ); }
+        S_CASE("S_ASS")      { SSA__helper( vars ); }
+        S_CASE("S_VOBSUB") {
+            mkv_track_t * p_tk = vars.p_tk;
+
+            p_tk->fmt.i_codec = VLC_CODEC_SPU;
+            p_tk->b_no_duration = true;
+            if( p_tk->i_extra_data )
+            {
+                char *psz_start;
+                char *psz_buf = (char *)malloc( p_tk->i_extra_data + 1);
+                if( psz_buf != NULL )
+                {
+                    memcpy( psz_buf, p_tk->p_extra_data , p_tk->i_extra_data );
+                    psz_buf[p_tk->i_extra_data] = '\0';
+
+                    psz_start = strstr( psz_buf, "size:" );
+                    if( psz_start &&
+                        vobsub_size_parse( psz_start,
+                                           &p_tk->fmt.subs.spu.i_original_frame_width,
+                                           &p_tk->fmt.subs.spu.i_original_frame_height ) == VLC_SUCCESS )
+                    {
+                        msg_Dbg( vars.p_demuxer, "original frame size vobsubs: %dx%d",
+                                 p_tk->fmt.subs.spu.i_original_frame_width,
+                                 p_tk->fmt.subs.spu.i_original_frame_height );
+                    }
+                    else
+                    {
+                        msg_Warn( vars.p_demuxer, "reading original frame size for vobsub failed" );
+                    }
+
+                    psz_start = strstr( psz_buf, "palette:" );
+                    if( psz_start &&
+                        vobsub_palette_parse( psz_start, &p_tk->fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
+                    {
+                        p_tk->fmt.subs.spu.palette[0] =  0xBeef;
+                        msg_Dbg( vars.p_demuxer, "vobsub palette read" );
+                    }
+                    else
+                    {
+                        msg_Warn( vars.p_demuxer, "reading original palette failed" );
+                    }
+                    free( psz_buf );
+                }
+            }
+        }
+        S_CASE("S_VOBSUB") {
+            VLC_UNUSED(vars);
+        }
+        S_CASE("S_HDMV/PGS") {
+            vars.p_fmt->i_codec = VLC_CODEC_BD_PG;
+        }
+        S_CASE("D_WEBVTT/SUBTITLES") {
+            vars.p_fmt->i_codec = VLC_CODEC_SUBT;
+            vars.p_fmt->subs.psz_encoding = strdup( "UTF-8");
+        }
+        S_CASE("B_VOBBTN") {
+            vars.p_fmt->i_cat = NAV_ES;
+        }
+        S_CASE_DEFAULT(str) {
+            msg_Err( vars.p_demuxer, "unknown codec id=`%s'", str );
+            vars.p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+        }
+    };
+
+    try {
+        TrackCodecHandlers::Dispatcher().send( p_tk->psz_codec,
+          TrackCodecHandlers::Payload( captures )
+        );
     }
-    else if( !strcmp( p_tk->psz_codec, "S_HDMV/PGS" ) )
+    catch (std::exception const& e)
     {
-        p_tk->fmt.i_codec = VLC_CODEC_BD_PG;
+        msg_Err( &sys.demuxer, "Error when trying to initiate track (codec: %s): %s",
+          p_tk->psz_codec, e.what () );
     }
-    else if( !strcmp( p_tk->psz_codec, "D_WEBVTT/SUBTITLES" ) )
-    {
-        p_tk->fmt.i_codec = VLC_CODEC_SUBT;
-        p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
-    }
-    else if( !strcmp( p_tk->psz_codec, "B_VOBBTN" ) )
-    {
-        p_tk->fmt.i_cat = NAV_ES;
-    }
-    else
-    {
-        msg_Err( &sys.demuxer, "unknown codec id=`%s'", p_tk->psz_codec );
-        p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
-    }
+
     return 0;
 }
