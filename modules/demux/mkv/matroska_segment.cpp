@@ -628,6 +628,20 @@ bool matroska_segment_c::Preload( )
     return true;
 }
 
+namespace {
+    struct SeekIndexFinder {
+        SeekIndexFinder( mtime_t mk_time_offset )
+            : _mk_time_offset( mk_time_offset )
+        { }
+
+        bool operator()(mtime_t target, mkv_index_t const& mkv_index) const {
+            return target < mkv_index.i_mk_time + _mk_time_offset;
+        }
+
+        mtime_t _mk_time_offset;
+    };
+}
+
 /* Here we try to load elements that were found in Seek Heads, but not yet parsed */
 bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int64_t i_element_position )
 {
@@ -807,20 +821,8 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
 
     if ( index_idx() )
     {
-        struct IndexFinder {
-            IndexFinder( mtime_t mk_time_offset )
-                : _mk_time_offset( mk_time_offset )
-            { }
-
-            bool operator()(mtime_t target, mkv_index_t const& mkv_index) const {
-                return target < mkv_index.i_mk_time + _mk_time_offset;
-            }
-
-            mtime_t _mk_time_offset;
-        };
-
         index_it = std::upper_bound (
-          indexes_begin(), indexes_end(), i_mk_date, IndexFinder( i_mk_time_offset )
+          indexes_begin(), indexes_end(), i_mk_date, SeekIndexFinder( i_mk_time_offset )
         );
 
         if (index_it != indexes_begin())
