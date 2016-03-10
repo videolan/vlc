@@ -1346,7 +1346,7 @@ static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface
     sys->restore_overlay = hr != DD_OK;
 
     if (hr != DD_OK) {
-        msg_Warn(vd, "DirectDrawUpdateOverlay cannot move/resize overlay");
+        msg_Warn(vd, "DirectDrawUpdateOverlay cannot move/resize overlay. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
