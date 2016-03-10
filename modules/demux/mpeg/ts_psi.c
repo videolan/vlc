@@ -1540,8 +1540,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                      (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
         }
 
-        const bool b_create_es = ((p_pes->p_es->fmt.i_cat == VIDEO_ES) ||
-                                  (p_pes->p_es->fmt.i_cat == AUDIO_ES));
+        const bool b_create_es = (p_pes->p_es->fmt.i_cat != UNKNOWN_ES);
 
         /* Now check and merge */
         if( b_pid_inuse ) /* We need to compare to the existing pes/es */
