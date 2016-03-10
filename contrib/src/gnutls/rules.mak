@@ -1,7 +1,7 @@
 # GnuTLS
 
-GNUTLS_VERSION := 3.2.21
-GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-$(GNUTLS_VERSION).tar.xz
+GNUTLS_VERSION := 3.3.22
+GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$(GNUTLS_VERSION).tar.xz
 
 ifdef BUILD_NETWORK
 ifndef HAVE_DARWIN_OS
@@ -25,7 +25,6 @@ endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
 endif
-	$(APPLY) $(SRC)/gnutls/gnutls-no-egd.patch
 	$(APPLY) $(SRC)/gnutls/read-file-limits.h.patch
 	$(APPLY) $(SRC)/gnutls/mac-keychain-lookup.patch
 ifdef HAVE_MACOSX
