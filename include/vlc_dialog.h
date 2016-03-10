@@ -277,12 +277,12 @@ typedef struct vlc_dialog_cbs
     /**
      * Called when an error message needs to be displayed
      *
+     * @param p_data opaque pointer for the callback
      * @param psz_title title of the diaog
      * @param psz_text text of the dialog
-     * @param p_data opaque pointer for the callback
      */
-    void (*pf_display_error)(const char *psz_title, const char *psz_text,
-                             void *p_data);
+    void (*pf_display_error)(void *p_data, const char *psz_title,
+                             const char *psz_text);
 
     /**
      * Called when a login dialog needs to be displayed
@@ -293,18 +293,18 @@ typedef struct vlc_dialog_cbs
      * @note to receive this callack, vlc_dialog_cbs.pf_cancel should not be
      * NULL.
      *
+     * @param p_data opaque pointer for the callback
      * @param p_id id used to interact with the dialog
      * @param psz_title title of the diaog
      * @param psz_text text of the dialog
      * @param psz_default_username user name that should be set on the user form
      * @param b_ask_store if true, ask the user if he wants to save the
      * credentials
-     * @param p_data opaque pointer for the callback
      */
-    void (*pf_display_login)(vlc_dialog_id *p_id, const char *psz_title,
-                             const char *psz_text,
+    void (*pf_display_login)(void *p_data, vlc_dialog_id *p_id,
+                             const char *psz_title, const char *psz_text,
                              const char *psz_default_username,
-                             bool b_ask_store, void *p_data);
+                             bool b_ask_store);
 
     /**
      * Called when a question dialog needs to be displayed
@@ -315,6 +315,7 @@ typedef struct vlc_dialog_cbs
      * @note to receive this callack, vlc_dialog_cbs.pf_cancel should not be
      * NULL.
      *
+     * @param p_data opaque pointer for the callback
      * @param p_id id used to interact with the dialog
      * @param psz_title title of the diaog
      * @param psz_text text of the dialog
@@ -324,13 +325,12 @@ typedef struct vlc_dialog_cbs
      * button
      * @param psz_action2 text of the second button, if NULL, don't display
      * this button
-     * @param p_data opaque pointer for the callback
      */
-    void (*pf_display_question)(vlc_dialog_id *p_id, const char *psz_title,
-                                const char *psz_text,
+    void (*pf_display_question)(void *p_data, vlc_dialog_id *p_id,
+                                const char *psz_title, const char *psz_text,
                                 vlc_dialog_question_type i_type,
                                 const char *psz_cancel, const char *psz_action1,
-                                const char *psz_action2, void *p_data);
+                                const char *psz_action2);
 
     /**
      * Called when a progress dialog needs to be displayed
@@ -341,6 +341,7 @@ typedef struct vlc_dialog_cbs
      * @note to receive this callack, vlc_dialog_cbs.pf_cancel and
      * vlc_dialog_cbs.pf_update_progress should not be NULL.
      *
+     * @param p_data opaque pointer for the callback
      * @param p_id id used to interact with the dialog
      * @param psz_title title of the diaog
      * @param psz_text text of the dialog
@@ -349,12 +350,11 @@ typedef struct vlc_dialog_cbs
      * 1.0)
      * @param psz_cancel text of the cancel button, if NULL the dialog is not
      * cancellable
-     * @param p_data opaque pointer for the callback
      */
-    void (*pf_display_progress)(vlc_dialog_id *p_id, const char *psz_title,
-                                const char *psz_text, bool b_indeterminate,
-                                float f_position, const char *psz_cancel,
-                                void *p_data);
+    void (*pf_display_progress)(void *p_data, vlc_dialog_id *p_id,
+                                const char *psz_title, const char *psz_text,
+                                bool b_indeterminate, float f_position,
+                                const char *psz_cancel);
 
     /**
      * Called when a displayed dialog needs to be cancelled
@@ -362,21 +362,21 @@ typedef struct vlc_dialog_cbs
      * The implementation must call vlc_dialog_id_dismiss() to really release
      * the dialog.
      *
-     * @param p_id id of the dialog
      * @param p_data opaque pointer for the callback
+     * @param p_id id of the dialog
      */
-    void (*pf_cancel)(vlc_dialog_id *p_id, void *p_data);
+    void (*pf_cancel)(void *p_data, vlc_dialog_id *p_id);
 
     /**
      * Called when a progress dialog needs to be updated
      *
+     * @param p_data opaque pointer for the callback
      * @param p_id id of the dialog
      * @param f_position osition of the progress bar (between 0.0 and 1.0)
      * @param psz_text new text of the progress dialog
-     * @param p_data opaque pointer for the callback
      */
-    void (*pf_update_progress)(vlc_dialog_id *p_id, float f_position,
-                               const char *psz_text, void *p_data);
+    void (*pf_update_progress)(void *p_data, vlc_dialog_id *p_id,
+                               float f_position, const char *psz_text);
 } vlc_dialog_cbs;
 
 /**

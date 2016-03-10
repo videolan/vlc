@@ -54,16 +54,16 @@ struct cb_answer
 
 
 static void
-display_error_cb(const char *psz_title, const char *psz_text, void *p_data)
+display_error_cb(void *p_data, const char *psz_title, const char *psz_text)
 {
     (void) p_data;
     printf("error message: title: '%s', text: '%s'\n", psz_title, psz_text);
 }
 
 static void
-display_login_cb(vlc_dialog_id *p_id, const char *psz_title,
+display_login_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
                  const char *psz_text, const char *psz_default_username,
-                 bool b_ask_store, void *p_data)
+                 bool b_ask_store)
 {
     struct cb_answer *p_ans = p_data;
     printf("login dialog: title: '%s', text: '%s', "
@@ -77,10 +77,10 @@ display_login_cb(vlc_dialog_id *p_id, const char *psz_title,
 }
 
 static void
-display_question_cb(vlc_dialog_id *p_id, const char *psz_title,
+display_question_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
                     const char *psz_text, vlc_dialog_question_type i_type,
                     const char *psz_cancel, const char *psz_action1,
-                    const char *psz_action2, void *p_data)
+                    const char *psz_action2)
 {
     struct cb_answer *p_ans = p_data;
     printf("question dialog: title: '%s', text: '%s', "
@@ -94,9 +94,9 @@ display_question_cb(vlc_dialog_id *p_id, const char *psz_title,
 }
 
 static void
-display_progress_cb(vlc_dialog_id *p_id, const char *psz_title,
+display_progress_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
                     const char *psz_text, bool b_indeterminate,
-                    float f_position, const char *psz_cancel, void *p_data)
+                    float f_position, const char *psz_cancel)
 {
     struct cb_answer *p_ans = p_data;
     printf("progress dialog: title: '%s', text: '%s', "
@@ -107,14 +107,14 @@ display_progress_cb(vlc_dialog_id *p_id, const char *psz_title,
         vlc_dialog_id_dismiss(p_id);
 }
 
-static void cancel_cb(vlc_dialog_id *p_id, void *p_data)
+static void cancel_cb(void *p_data, vlc_dialog_id *p_id)
 {
     (void) p_data;
     vlc_dialog_id_dismiss(p_id);
 }
 
-static void update_progress_cb(vlc_dialog_id *p_id, float f_position,
-                               const char *psz_text, void *p_data)
+static void update_progress_cb(void *p_data, vlc_dialog_id *p_id, float f_position,
+                               const char *psz_text)
 {
     (void) p_id;
     (void) p_data;

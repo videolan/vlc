@@ -78,16 +78,16 @@ private slots:
 private:
     intf_thread_t *p_intf;
 
-    static void displayErrorCb(const char *, const char *, void *);
-    static void displayLoginCb(vlc_dialog_id *, const char *, const char *,
-                               const char *, bool, void *);
-    static void displayQuestionCb(vlc_dialog_id *, const char *, const char *,
-                                  vlc_dialog_question_type, const char *, 
-                                  const char *, const char *, void *);
-    static void displayProgressCb(vlc_dialog_id *, const char *, const char *,
-                                  bool, float, const char *, void *);
-    static void cancelCb(vlc_dialog_id *, void *);
-    static void updateProgressCb(vlc_dialog_id *, float, const char *, void *);
+    static void displayErrorCb(void *, const char *, const char *);
+    static void displayLoginCb(void *, vlc_dialog_id *, const char *,
+                               const char *, const char *, bool);
+    static void displayQuestionCb(void *, vlc_dialog_id *, const char *,
+                                  const char *, vlc_dialog_question_type,
+                                  const char *, const char *, const char *);
+    static void displayProgressCb(void *, vlc_dialog_id *, const char *,
+                                  const char *, bool, float, const char *);
+    static void cancelCb(void *, vlc_dialog_id *);
+    static void updateProgressCb(void *, vlc_dialog_id *, float, const char *);
 };
 
 class DialogWrapper : public QObject

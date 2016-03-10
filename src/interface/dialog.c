@@ -189,7 +189,7 @@ dialog_cancel_locked(vlc_dialog_provider *p_provider, vlc_dialog_id *p_id)
     p_id->b_cancelled = true;
     vlc_mutex_unlock(&p_id->lock);
 
-    p_provider->cbs.pf_cancel(p_id, p_provider->p_cbs_data);
+    p_provider->cbs.pf_cancel(p_provider->p_cbs_data, p_id);
 }
 
 static vlc_dialog_id *
@@ -349,7 +349,7 @@ dialog_display_error_va(vlc_dialog_provider *p_provider, const char *psz_title,
         return VLC_ENOMEM;
     }
 
-    p_provider->cbs.pf_display_error(psz_title, psz_text, p_provider->p_cbs_data);
+    p_provider->cbs.pf_display_error(p_provider->p_cbs_data, psz_title, psz_text);
     free(psz_text);
     vlc_mutex_unlock(&p_provider->lock);
 
@@ -418,9 +418,8 @@ dialog_display_login_va(vlc_dialog_provider *p_provider, vlc_dialog_id **pp_id,
         vlc_mutex_unlock(&p_provider->lock);
         return VLC_ENOMEM;
     }
-    p_provider->cbs.pf_display_login(p_id, psz_title, psz_text,
-                                     psz_default_username, b_ask_store,
-                                     p_provider->p_cbs_data);
+    p_provider->cbs.pf_display_login(p_provider->p_cbs_data, p_id, psz_title,
+                                     psz_text, psz_default_username, b_ask_store);
     free(psz_text);
     vlc_mutex_unlock(&p_provider->lock);
     *pp_id = p_id;
@@ -506,9 +505,9 @@ dialog_display_question_va(vlc_dialog_provider *p_provider, vlc_dialog_id **pp_i
         vlc_mutex_unlock(&p_provider->lock);
         return VLC_ENOMEM;
     }
-    p_provider->cbs.pf_display_question(p_id, psz_title, psz_text,
-                                        i_type, psz_cancel, psz_action1,
-                                        psz_action2, p_provider->p_cbs_data);
+    p_provider->cbs.pf_display_question(p_provider->p_cbs_data, p_id, psz_title,
+                                        psz_text, i_type, psz_cancel, psz_action1,
+                                        psz_action2);
     free(psz_text);
     vlc_mutex_unlock(&p_provider->lock);
     *pp_id = p_id;
@@ -597,9 +596,9 @@ display_progress_va(vlc_dialog_provider *p_provider, vlc_dialog_id **pp_id,
     }
     p_id->b_progress_indeterminate = b_indeterminate;
     p_id->psz_progress_text = psz_text;
-    p_provider->cbs.pf_display_progress(p_id, psz_title, psz_text,
-                                        b_indeterminate, f_position, psz_cancel,
-                                        p_provider->p_cbs_data);
+    p_provider->cbs.pf_display_progress(p_provider->p_cbs_data, p_id, psz_title,
+                                        psz_text, b_indeterminate, f_position,
+                                        psz_cancel);
     vlc_mutex_unlock(&p_provider->lock);
     *pp_id = p_id;
 
@@ -666,8 +665,8 @@ dialog_update_progress(vlc_object_t *p_obj, vlc_dialog_id *p_id, float f_value,
         free(p_id->psz_progress_text);
         p_id->psz_progress_text = psz_text;
     }
-    p_provider->cbs.pf_update_progress(p_id, f_value, p_id->psz_progress_text,
-                                       p_provider->p_cbs_data);
+    p_provider->cbs.pf_update_progress(p_provider->p_cbs_data, p_id, f_value,
+                                       p_id->psz_progress_text);
 
     vlc_mutex_unlock(&p_provider->lock);
     return VLC_SUCCESS;

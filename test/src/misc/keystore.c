@@ -200,9 +200,9 @@ static const struct testcase
 };
 
 static void
-display_login_cb(vlc_dialog_id *p_id, const char *psz_title,
+display_login_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
                  const char *psz_text, const char *psz_default_username,
-                 bool b_ask_store, void *p_data)
+                 bool b_ask_store)
 {
     (void) psz_title;
     (void) psz_text;
@@ -220,7 +220,7 @@ display_login_cb(vlc_dialog_id *p_id, const char *psz_title,
 }
 
 static void
-cancel_cb(vlc_dialog_id *p_id, void *p_data)
+cancel_cb(void *p_data, vlc_dialog_id *p_id)
 {
     (void) p_data;
     vlc_dialog_id_dismiss(p_id);

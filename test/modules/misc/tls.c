@@ -48,10 +48,10 @@ static int tlspair(int fds[2])
 }
 
 static void
-dialog_display_question_cb(vlc_dialog_id *p_id, const char *psz_title,
+dialog_display_question_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
                            const char *psz_text, vlc_dialog_question_type i_type,
                            const char *psz_cancel, const char *psz_action1,
-                           const char *psz_action2, void *p_data)
+                           const char *psz_action2)
 {
     (void) psz_title;
     (void) psz_text;
@@ -63,9 +63,9 @@ dialog_display_question_cb(vlc_dialog_id *p_id, const char *psz_title,
     vlc_dialog_id_post_action(p_id, *value);
 }
 
-static void dialog_cancel_cb(vlc_dialog_id *id, void *data)
+static void dialog_cancel_cb(void *p_data, vlc_dialog_id *id)
 {
-    (void)data;
+    (void)p_data;
     vlc_dialog_id_dismiss(id);
 }
 

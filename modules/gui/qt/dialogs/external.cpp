@@ -81,8 +81,8 @@ DialogHandler::~DialogHandler()
 }
 
 void
-DialogHandler::displayErrorCb(const char *psz_title, const char *psz_text,
-                              void *p_data)
+DialogHandler::displayErrorCb(void *p_data, const char *psz_title,
+                              const char *psz_text)
 {
     DialogHandler *self =  static_cast<DialogHandler *>(p_data);
     const QString title = qfu(psz_title);
@@ -93,10 +93,10 @@ DialogHandler::displayErrorCb(const char *psz_title, const char *psz_text,
 
 
 void
-DialogHandler::displayLoginCb(vlc_dialog_id *p_id, const char *psz_title,
-                              const char *psz_text,
+DialogHandler::displayLoginCb(void *p_data, vlc_dialog_id *p_id,
+                              const char *psz_title, const char *psz_text,
                               const char *psz_default_username,
-                              bool b_ask_store, void *p_data)
+                              bool b_ask_store)
 {
     DialogHandler *self =  static_cast<DialogHandler *>(p_data);
     const QString title = qfu(psz_title);
@@ -110,11 +110,11 @@ DialogHandler::displayLoginCb(vlc_dialog_id *p_id, const char *psz_title,
 }
 
 void
-DialogHandler::displayQuestionCb(vlc_dialog_id *p_id, const char *psz_title,
-                                 const char *psz_text,
+DialogHandler::displayQuestionCb(void *p_data, vlc_dialog_id *p_id,
+                                 const char *psz_title, const char *psz_text,
                                  vlc_dialog_question_type i_type,
                                  const char *psz_cancel, const char *psz_action1,
-                                 const char *psz_action2, void *p_data)
+                                 const char *psz_action2)
 {
     DialogHandler *self =  static_cast<DialogHandler *>(p_data);
     const QString title = qfu(psz_title);
@@ -129,10 +129,10 @@ DialogHandler::displayQuestionCb(vlc_dialog_id *p_id, const char *psz_title,
 }
 
 void
-DialogHandler::displayProgressCb(vlc_dialog_id *p_id, const char *psz_title,
-                                 const char *psz_text, bool b_indeterminate,
-                                 float f_position, const char *psz_cancel,
-                                 void *p_data)
+DialogHandler::displayProgressCb(void *p_data, vlc_dialog_id *p_id,
+                                 const char *psz_title, const char *psz_text,
+                                 bool b_indeterminate, float f_position,
+                                 const char *psz_cancel)
 {
     DialogHandler *self =  static_cast<DialogHandler *>(p_data);
     const QString title = qfu(psz_title);
@@ -143,14 +143,14 @@ DialogHandler::displayProgressCb(vlc_dialog_id *p_id, const char *psz_title,
                                  f_position, cancel);
 }
 
-void DialogHandler::cancelCb(vlc_dialog_id *p_id, void *p_data)
+void DialogHandler::cancelCb(void *p_data, vlc_dialog_id *p_id)
 {
     DialogHandler *self = static_cast<DialogHandler *>(p_data);
     emit self->cancelled(p_id);
 }
 
-void DialogHandler::updateProgressCb(vlc_dialog_id *p_id, float f_value,
-                                     const char *psz_text, void *p_data)
+void DialogHandler::updateProgressCb(void *p_data, vlc_dialog_id *p_id,
+                                     float f_value, const char *psz_text)
 {
     DialogHandler *self = static_cast<DialogHandler *>(p_data);
     emit self->progressUpdated(p_id, f_value, qfu(psz_text));
