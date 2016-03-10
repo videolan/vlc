@@ -1604,21 +1604,20 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     }
 
     /* Set CAM descrambling */
-    if( !ProgramIsSelected( p_sys, p_pmt->i_number ) )
+    if( ProgramIsSelected( p_sys, p_pmt->i_number ) )
     {
-        dvbpsi_pmt_delete( p_dvbpsipmt );
-    }
-    else if( stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
-                             p_dvbpsipmt ) != VLC_SUCCESS )
-    {
-        if ( p_sys->standard == TS_STANDARD_ARIB && !p_sys->arib.b25stream )
+        /* DTV/CAM takes ownership of p_dvbpsipmt on success */
+        if( stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA, p_dvbpsipmt ) != VLC_SUCCESS )
         {
-            p_sys->arib.b25stream = stream_FilterNew( p_demux->s, "aribcam" );
-            p_sys->stream = ( p_sys->arib.b25stream ) ? p_sys->arib.b25stream : p_demux->s;
-            if (!p_sys->arib.b25stream)
-                dvbpsi_pmt_delete( p_dvbpsipmt );
-        } else dvbpsi_pmt_delete( p_dvbpsipmt );
+            if ( p_sys->standard == TS_STANDARD_ARIB && !p_sys->arib.b25stream )
+            {
+                p_sys->arib.b25stream = stream_FilterNew( p_demux->s, "aribcam" );
+                p_sys->stream = ( p_sys->arib.b25stream ) ? p_sys->arib.b25stream : p_demux->s;
+            }
+            dvbpsi_pmt_delete( p_dvbpsipmt );
+        }
     }
+    else dvbpsi_pmt_delete( p_dvbpsipmt );
 
      /* Add arbitrary PID from here */
     if ( p_sys->standard == TS_STANDARD_ATSC )
