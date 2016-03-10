@@ -1700,8 +1700,6 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         PIDRelease( p_demux, pid_to_decref.p_elems[i] );
     ARRAY_RESET( pid_to_decref );
 
-    UpdatePESFilters( p_demux, p_sys->b_es_all );
-
     if( !p_sys->b_trust_pcr )
     {
         int i_cand = FindPCRCandidate( p_pmt );
@@ -1710,6 +1708,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         msg_Warn( p_demux, "PCR not trusted for program %d, set up workaround using pid %d",
                   p_pmt->i_number, i_cand );
     }
+
+    UpdatePESFilters( p_demux, p_sys->b_es_all );
 
     /* Probe Boundaries */
     if( p_sys->b_canfastseek && p_pmt->i_last_dts == -1 )
