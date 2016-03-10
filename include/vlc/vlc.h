@@ -39,7 +39,6 @@ extern "C" {
 
 #include <vlc/libvlc_structures.h>
 #include <vlc/libvlc.h>
-#include <vlc/libvlc_dialog.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_media_player.h>
 #include <vlc/libvlc_media_list.h>
