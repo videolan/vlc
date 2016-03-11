@@ -266,6 +266,8 @@ static const char *GetEsVarName( int i_cat )
         return "video-es";
     case AUDIO_ES:
         return "audio-es";
+    case NAV_ES:
+        return "nav-es";
     default:
         assert( i_cat == SPU_ES );
         return "spu-es";
