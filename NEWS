@@ -33,7 +33,7 @@ Access:
    domain / path matching, Secure cookies)
  * Support DVB-T2 on Windows BDA
  * Support depayloading Opus from RTP
- * Support sftp username and passwords options and URL
+ * Support sftp username and passwords options in URL, and key authentication
  * New UPnP access module, to list directories without infinite recursions
  * New WASAPI audio capture module on Windows
  * SMB/FTP/SFTP accesses can list directories
