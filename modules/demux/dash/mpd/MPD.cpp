@@ -25,6 +25,9 @@
 # include "config.h"
 #endif
 
+#include <vlc_fixups.h>
+#include <cinttypes>
+
 #include "MPD.h"
 #include "ProgramInformation.h"
 #include "Period.h"

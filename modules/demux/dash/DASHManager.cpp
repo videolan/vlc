@@ -26,7 +26,8 @@
 # include "config.h"
 #endif
 
-#include <inttypes.h>
+#include <vlc_fixups.h>
+#include <cinttypes>
 
 #include "DASHManager.h"
 #include "mpd/ProgramInformation.h"
