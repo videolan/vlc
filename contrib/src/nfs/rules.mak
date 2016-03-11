@@ -17,6 +17,7 @@ $(TARBALLS)/libnfs-$(NFS_VERSION).tar.gz:
 nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 	$(UNPACK)
 	mv libnfs-libnfs-$(NFS_VERSION) libnfs-$(NFS_VERSION)
+	$(APPLY) $(SRC)/nfs/Android-statvfs.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
