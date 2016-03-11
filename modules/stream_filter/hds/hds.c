@@ -24,8 +24,6 @@
 # include "config.h"
 #endif
 
-#include <limits.h> /* INT_MAX */
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
@@ -210,7 +208,6 @@ vlc_module_begin()
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
     set_description( N_("HTTP Dynamic Streaming") )
     set_shortname( "Dynamic Streaming")
-    add_shortcut( "hds" )
     set_capability( "stream_filter", 30 )
     set_callbacks( Open, Close )
 vlc_module_end()
