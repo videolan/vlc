@@ -179,6 +179,7 @@ static gboolean caps_handoff_cb( GstElement* p_ele, GstCaps *p_caps,
     VLC_UNUSED( p_ele );
     decoder_t *p_dec = p_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
+    GstVideoAlignment align;
 
     msg_Info( p_dec, "got new caps %s", gst_caps_to_string( p_caps ));
 
@@ -189,8 +190,9 @@ static gboolean caps_handoff_cb( GstElement* p_ele, GstCaps *p_caps,
     }
 
     gst_vlc_dec_ensure_empty_queue( p_dec );
+    gst_video_alignment_reset( &align );
 
-    return gst_vlc_set_vout_fmt( &p_sys->vinfo, p_caps, p_dec );
+    return gst_vlc_set_vout_fmt( &p_sys->vinfo, &align, p_caps, p_dec );
 }
 
 /* Emitted by vlcvideosink for every buffer,

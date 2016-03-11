@@ -197,8 +197,8 @@ bool gst_vlc_picture_plane_allocator_alloc(
         GstVlcPicturePlane *p_mem =
             (GstVlcPicturePlane*) g_slice_new0( GstVlcPicturePlane );
 
-        i_size = p_pic->p[ i_plane ].i_visible_pitch *
-            p_pic->p[ i_plane ].i_visible_lines;
+        i_size = p_pic->p[ i_plane ].i_pitch *
+            p_pic->p[ i_plane ].i_lines;
         i_max_size = p_pic->p[ i_plane ].i_pitch *
             p_pic->p[ i_plane ].i_lines;
         i_align = 0;
@@ -213,13 +213,14 @@ bool gst_vlc_picture_plane_allocator_alloc(
     return true;
 }
 
-bool gst_vlc_set_vout_fmt( GstVideoInfo *p_info, GstCaps *p_caps,
-        decoder_t *p_dec )
+bool gst_vlc_set_vout_fmt( GstVideoInfo *p_info, GstVideoAlignment *p_align,
+        GstCaps *p_caps, decoder_t *p_dec )
 {
     es_format_t *p_outfmt = &p_dec->fmt_out;
     video_format_t *p_voutfmt = &p_dec->fmt_out.video;
     GstStructure *p_str = gst_caps_get_structure( p_caps, 0 );
     vlc_fourcc_t i_chroma;
+    int i_padded_width, i_padded_height;
 
     i_chroma = p_outfmt->i_codec = vlc_fourcc_GetCodecFromString(
             VIDEO_ES,
@@ -230,10 +231,16 @@ bool gst_vlc_set_vout_fmt( GstVideoInfo *p_info, GstCaps *p_caps,
         return false;
     }
 
-    video_format_Setup( &p_dec->fmt_out.video, i_chroma,
-            GST_VIDEO_INFO_WIDTH( p_info ), GST_VIDEO_INFO_HEIGHT( p_info ),
+    i_padded_width = GST_VIDEO_INFO_WIDTH( p_info ) + p_align->padding_left +
+        p_align->padding_right;
+    i_padded_height = GST_VIDEO_INFO_HEIGHT( p_info ) + p_align->padding_top +
+        p_align->padding_bottom;
+
+    video_format_Setup( p_voutfmt, i_chroma, i_padded_width, i_padded_height,
             GST_VIDEO_INFO_WIDTH( p_info ), GST_VIDEO_INFO_HEIGHT( p_info ),
             GST_VIDEO_INFO_PAR_N( p_info ), GST_VIDEO_INFO_PAR_D( p_info ));
+    p_voutfmt->i_x_offset = p_align->padding_left;
+    p_voutfmt->i_y_offset = p_align->padding_top;
 
     p_voutfmt->i_frame_rate = GST_VIDEO_INFO_FPS_N( p_info );
     p_voutfmt->i_frame_rate_base = GST_VIDEO_INFO_FPS_D( p_info );
@@ -241,15 +248,19 @@ bool gst_vlc_set_vout_fmt( GstVideoInfo *p_info, GstCaps *p_caps,
     return true;
 }
 
-static bool gst_vlc_video_info_from_vout( GstVideoInfo *p_info, GstCaps *p_caps,
-        decoder_t *p_dec, picture_t *p_pic_info )
+static bool gst_vlc_video_info_from_vout( GstVideoInfo *p_info,
+        GstVideoAlignment *p_align, GstCaps *p_caps, decoder_t *p_dec,
+        picture_t *p_pic_info )
 {
+    const GstVideoFormatInfo *p_vinfo = p_info->finfo;
     picture_t *p_pic;
+    int i;
 
     /* Ensure the queue is empty */
     gst_vlc_dec_ensure_empty_queue( p_dec );
+    gst_video_info_align( p_info, p_align );
 
-    if( !gst_vlc_set_vout_fmt( p_info, p_caps, p_dec ))
+    if( !gst_vlc_set_vout_fmt( p_info, p_align, p_caps, p_dec ))
     {
         msg_Err( p_dec, "failed to set output format to vout" );
         return false;
@@ -265,51 +276,69 @@ static bool gst_vlc_video_info_from_vout( GstVideoInfo *p_info, GstCaps *p_caps,
         return false;
     }
 
+    /* reject if strides don't match */
+    for( i = 0; i < p_pic->i_planes; i++ )
+        if( p_info->stride[i] != p_pic->p[i].i_pitch )
+            goto strides_mismatch;
+
+    p_info->offset[0] = 0;
+    for( i = 1; i < p_pic->i_planes; i++ )
+    {
+        p_info->offset[i] = p_info->offset[i-1] +
+            p_pic->p[i-1].i_pitch * p_pic->p[i-1].i_lines;
+    }
+    GST_VIDEO_INFO_SIZE( p_info ) = p_info->offset[i-1] +
+        p_pic->p[i-1].i_pitch * p_pic->p[i-1].i_lines;
+
+    for( i = 0; i < p_pic->i_planes; i++ )
+    {
+        int i_v_edge, i_h_edge;
+
+        i_h_edge =
+            GST_VIDEO_FORMAT_INFO_SCALE_WIDTH( p_vinfo, i,
+                    p_align->padding_left);
+        i_v_edge =
+            GST_VIDEO_FORMAT_INFO_SCALE_HEIGHT( p_vinfo, i,
+                    p_align->padding_top);
+
+        p_info->offset[i] += ( i_v_edge * p_info->stride[i] ) +
+            ( i_h_edge * GST_VIDEO_FORMAT_INFO_PSTRIDE( p_vinfo, i ));
+    }
+
     memcpy( p_pic_info, p_pic, sizeof( picture_t ));
     picture_Release( p_pic );
 
     return true;
+
+strides_mismatch:
+    msg_Err( p_dec, "strides mismatch" );
+    picture_Release( p_pic );
+    return false;
 }
 
 bool gst_vlc_picture_plane_allocator_query_format(
-        GstVlcPicturePlaneAllocator *p_allocator,
-        GstVideoInfo *p_info, GstCaps *p_caps )
+        GstVlcPicturePlaneAllocator *p_allocator, GstVideoInfo *p_info,
+        GstVideoAlignment *p_align, GstCaps *p_caps )
 {
     decoder_t *p_dec = p_allocator->p_dec;
     video_format_t v_fmt;
     picture_t *p_pic_info = &p_allocator->pic_info;
-    int i_plane, i_offset = 0, i_size = 0;
 
     /* Back up the original format; as this is just a query  */
     memcpy( &v_fmt, &p_dec->fmt_out.video, sizeof( video_format_t ));
 
-    if( !gst_vlc_video_info_from_vout( p_info, p_caps, p_dec, p_pic_info ))
+    if( !gst_vlc_video_info_from_vout( p_info, p_align, p_caps, p_dec,
+                p_pic_info ))
     {
         msg_Err( p_allocator->p_dec, "failed to get the vout info" );
         return false;
     }
-
-    //GST_VIDEO_INFO_N_PLANES( p_info ) = p_pic_info->i_planes;
-    for( i_plane = 0; i_plane < p_pic_info->i_planes; i_plane++ )
-    {
-        GST_VIDEO_INFO_PLANE_STRIDE( p_info, i_plane ) =
-            p_pic_info->p[ i_plane ].i_pitch;
-        GST_VIDEO_INFO_PLANE_OFFSET( p_info, i_plane ) = i_offset;
-        //i_offset += p_pic_info->p[ i_plane ].i_pitch *
-            //p_pic_info->p[ i_plane ].i_lines;
-        i_offset += p_pic_info->p[ i_plane ].i_visible_pitch *
-            p_pic_info->p[ i_plane ].i_visible_lines;
-        i_size += p_pic_info->p[ i_plane ].i_visible_pitch *
-            p_pic_info->p[ i_plane ].i_visible_lines;
-    }
-    GST_VIDEO_INFO_SIZE( p_info ) = i_size;
 
     /* Restore the original format; as this was just a query  */
     memcpy( &p_dec->fmt_out.video, &v_fmt, sizeof( video_format_t ));
 
     return true;
 }
-
 
 GstVlcPicturePlaneAllocator* gst_vlc_picture_plane_allocator_new(
         decoder_t *p_dec )

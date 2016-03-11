@@ -40,7 +40,7 @@ static const gchar** gst_vlc_video_pool_get_options (GstBufferPool *p_pool)
     VLC_UNUSED( p_pool );
 
     static const gchar *options[] = { GST_BUFFER_POOL_OPTION_VIDEO_META,
-        NULL
+        GST_BUFFER_POOL_OPTION_VIDEO_ALIGNMENT, NULL
     };
 
     return options;
@@ -52,6 +52,7 @@ static gboolean gst_vlc_video_pool_set_config( GstBufferPool *p_pool,
     GstVlcVideoPool *p_vpool = GST_VLC_VIDEO_POOL_CAST( p_pool );
     GstCaps *p_caps;
     GstVideoInfo info;
+    GstVideoAlignment align;
     guint size, min_buffers, max_buffers;
     GstAllocator *p_allocator;
     GstAllocationParams params;
@@ -59,7 +60,6 @@ static gboolean gst_vlc_video_pool_set_config( GstBufferPool *p_pool,
     if( !gst_buffer_pool_config_get_params( p_config, &p_caps, &size,
                 &min_buffers, &max_buffers ))
         goto wrong_config;
-
     if( p_caps == NULL )
         goto no_caps;
 
@@ -85,14 +85,37 @@ static gboolean gst_vlc_video_pool_set_config( GstBufferPool *p_pool,
         gst_buffer_pool_config_has_option( p_config,
                 GST_BUFFER_POOL_OPTION_VIDEO_META );
 
+    p_vpool->b_need_aligned =
+        gst_buffer_pool_config_has_option( p_config,
+                GST_BUFFER_POOL_OPTION_VIDEO_ALIGNMENT );
+
+    if( p_vpool->b_need_aligned )
+    {
+        p_vpool->b_add_metavideo = true;
+        gst_buffer_pool_config_get_video_alignment( p_config, &align );
+    }
+    else
+         gst_video_alignment_reset( &align );
+
+    // FIXME: the gst decoders' min buffers may not be equal to the number
+    // of buffers it actually allocates. Also the max buffers here could
+    // be zero. Moreover even if it was right, need to check if it can be
+    // communicated to the vout (including the dpb_size it calculates in
+    // src/input/decoder.c).
+    p_vpool->p_dec->i_extra_picture_buffers = 16;
+
     if( !gst_vlc_picture_plane_allocator_query_format( p_vpool->p_allocator,
-                &info, p_caps))
+                &info, &align, p_caps))
         goto unknown_format;
+
+    if( p_vpool->b_need_aligned )
+        gst_buffer_pool_config_set_video_alignment( p_config, &align);
 
     if( p_vpool->p_caps )
         gst_caps_unref( p_vpool->p_caps );
     p_vpool->p_caps = gst_caps_ref( p_caps );
     p_vpool->info = info;
+    p_vpool->align = align;
 
     msg_Dbg( p_vpool->p_dec, "setting the following config on the pool: %s, \
             size: %lu, min buffers: %u, max buffers: %u", gst_caps_to_string( p_caps ),
@@ -206,6 +229,17 @@ static GstFlowReturn gst_vlc_video_pool_alloc_buffer( GstBufferPool *p_pool,
     return GST_FLOW_OK;
 }
 
+static gboolean gst_vlc_video_pool_start( GstBufferPool *p_pool )
+{
+    GstVlcVideoPool *p_vpool = GST_VLC_VIDEO_POOL_CAST( p_pool );
+
+    if( !gst_vlc_set_vout_fmt( &p_vpool->info, &p_vpool->align,
+                p_vpool->p_caps, p_vpool->p_dec ))
+        return FALSE;
+
+    return GST_BUFFER_POOL_CLASS( parent_class )->start( p_pool );
+}
+
 static void gst_vlc_video_pool_class_init( GstVlcVideoPoolClass *p_klass )
 {
     GObjectClass *p_gobject_class = ( GObjectClass* )p_klass;
@@ -213,6 +247,7 @@ static void gst_vlc_video_pool_class_init( GstVlcVideoPoolClass *p_klass )
 
     p_gobject_class->finalize = gst_vlc_video_pool_finalize;
 
+    p_gstbufferpool_class->start = gst_vlc_video_pool_start;
     p_gstbufferpool_class->get_options = gst_vlc_video_pool_get_options;
     p_gstbufferpool_class->set_config = gst_vlc_video_pool_set_config;
     p_gstbufferpool_class->alloc_buffer = gst_vlc_video_pool_alloc_buffer;

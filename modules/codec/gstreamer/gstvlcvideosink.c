@@ -208,7 +208,6 @@ static gboolean gst_vlc_video_sink_propose_allocation( GstBaseSink* p_bsink,
     gsize i_size;
 
     gst_query_parse_allocation (p_query, &p_caps, &b_need_pool);
-
     if( p_caps == NULL )
         goto no_caps;
 
@@ -219,18 +218,12 @@ static gboolean gst_vlc_video_sink_propose_allocation( GstBaseSink* p_bsink,
         if( !gst_video_info_from_caps( &info, p_caps ))
             goto invalid_caps;
 
-        if( !gst_vlc_picture_plane_allocator_query_format(
-                    (GstVlcPicturePlaneAllocator*) p_vsink->p_allocator,
-                    &info, p_caps ))
-            goto invalid_format;
-
         p_pool = (GstBufferPool*) gst_vlc_video_sink_create_pool( p_vsink,
-                p_caps, info.size, 0 );
-
+                p_caps, info.size, 2 );
         if( p_pool == NULL )
             goto no_pool;
 
-        i_size = info.size;
+        i_size = GST_VIDEO_INFO_SIZE( &GST_VLC_VIDEO_POOL_CAST( p_pool )->info);
     }
 
     if( p_pool )
@@ -259,11 +252,6 @@ no_caps:
 invalid_caps:
     {
         msg_Err( p_vsink->p_dec, "invalid caps in allocation query" );
-        return FALSE;
-    }
-invalid_format:
-    {
-        msg_Err( p_vsink->p_dec, "vout query returned invalid format" );
         return FALSE;
     }
 }

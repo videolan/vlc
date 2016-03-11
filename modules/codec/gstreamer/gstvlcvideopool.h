@@ -51,7 +51,9 @@ struct _GstVlcVideoPool
 
     GstCaps *p_caps;
     GstVideoInfo info;
+    GstVideoAlignment align;
     bool b_add_metavideo;
+    bool b_need_aligned;
 
     decoder_t *p_dec;
 };
