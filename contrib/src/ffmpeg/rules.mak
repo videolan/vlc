@@ -19,6 +19,7 @@ FFMPEGCONF = \
 	--pkg-config="$(PKG_CONFIG)" \
 	--disable-doc \
 	--disable-encoder=vorbis \
+	--disable-decoder=opus \
 	--enable-libgsm \
 	--enable-libopenjpeg \
 	--disable-debug \
