@@ -1724,9 +1724,6 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                 }
             }
         }
-        S_CASE("S_VOBSUB") {
-            VLC_UNUSED(vars);
-        }
         S_CASE("S_HDMV/PGS") {
             vars.p_fmt->i_codec = VLC_CODEC_BD_PG;
         }
