@@ -810,44 +810,45 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
         E_CASE( KaxChapterTranslate, trans )
         {
-            KaxChapterTranslate *p_trans = &trans;
+            MKV_SWITCH_CREATE( EbmlTypeDispatcher, TranslationHandler, chapter_translation_c* )
+            {
+                MKV_SWITCH_INIT();
+
+                E_CASE( KaxChapterTranslateEditionUID, uid )
+                {
+                    vars->editions.push_back( static_cast<uint64>( uid ) );
+                }
+                E_CASE( KaxChapterTranslateCodec, codec_id )
+                {
+                    vars->codec_id = static_cast<uint32>( codec_id );
+                }
+                E_CASE( KaxChapterTranslateID, translated_id )
+                {
+                    vars->p_translated = new KaxChapterTranslateID( translated_id );
+                }
+            };
             try
             {
-                if( unlikely( p_trans->IsFiniteSize() && p_trans->GetSize() >= SIZE_MAX ) )
+                if( unlikely( trans.IsFiniteSize() && trans.GetSize() >= SIZE_MAX ) )
                 {
                     msg_Err( vars.p_demuxer, "Chapter translate too big, aborting" );
                     return;
                 }
 
-                p_trans->Read( vars.obj->es, EBML_CONTEXT(p_trans), vars.i_upper_level, vars.el, true );
+                trans.Read( vars.obj->es, EBML_CONTEXT(&trans), vars.i_upper_level, vars.el, true );
 
-                dispatcher.iterate( p_trans->begin(), p_trans->end(), Payload( vars ) );
+                chapter_translation_c *p_translate = new chapter_translation_c();
+
+                TranslationHandler::Dispatcher().iterate(
+                    trans.begin(), trans.end(), TranslationHandler::Payload( p_translate ) 
+                );
+
+                vars.obj->translations.push_back( p_translate );
             }
             catch(...)
             {
                 msg_Err( vars.p_demuxer, "Error while reading Chapter Tranlate");
             }
-        }
-        E_CASE( KaxChapterTranslateEditionUID, uid )
-        {
-            chapter_translation_c *p_translate = new chapter_translation_c();
-            p_translate->editions.push_back( static_cast<uint64>( uid ) );
-
-            vars.obj->translations.push_back( p_translate );
-        }
-        E_CASE( KaxChapterTranslateCodec, codec_id )
-        {
-            chapter_translation_c *p_translate = new chapter_translation_c();
-            p_translate->codec_id = static_cast<uint32>( codec_id );
-
-            vars.obj->translations.push_back( p_translate );
-        }
-        E_CASE( KaxChapterTranslateID, translated_id )
-        {
-            chapter_translation_c *p_translate = new chapter_translation_c();
-            p_translate->p_translated = new KaxChapterTranslateID( translated_id );
-
-            vars.obj->translations.push_back( p_translate );
         }
         E_CASE( EbmlVoid, )
         {
