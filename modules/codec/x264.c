@@ -854,7 +854,7 @@ static int  Open ( vlc_object_t *p_this )
 # ifdef MODULE_NAME_IS_x26410b
         if( mask == 0)
         {
-            msg_Err( p_enc, "Only high bith depth encoding supported, bit depth:%d", x264_bit_depth);
+            msg_Err( p_enc, "Only high bit depth encoding supported, bit depth:%d", x264_bit_depth);
             return VLC_EGENERIC;
         }
 # endif
