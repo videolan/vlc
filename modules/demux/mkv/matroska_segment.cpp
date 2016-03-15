@@ -480,14 +480,8 @@ bool matroska_segment_c::PreloadFamily( const matroska_segment_c & of_segment )
     if ( b_preloaded )
         return false;
 
-    for (size_t i=0; i<families.size(); i++)
-    {
-        for (size_t j=0; j<of_segment.families.size(); j++)
-        {
-            if ( *(families[i]) == *(of_segment.families[j]) )
-                return Preload( );
-        }
-    }
+    if ( SameFamily( of_segment ) )
+        return Preload( );
 
     return false;
 }
@@ -516,6 +510,19 @@ bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a
           && *p_tmp == *p_item_b->p_prev_segment_uid )
         return true;
 
+    return false;
+}
+
+bool matroska_segment_c::SameFamily( const matroska_segment_c & of_segment ) const
+{
+    for (size_t i=0; i<families.size(); i++)
+    {
+        for (size_t j=0; j<of_segment.families.size(); j++)
+        {
+            if ( *(families[i]) == *(of_segment.families[j]) )
+                return true;
+        }
+    }
     return false;
 }
 

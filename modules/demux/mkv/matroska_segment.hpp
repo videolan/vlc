@@ -153,6 +153,8 @@ public:
 
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
 
+    bool SameFamily( const matroska_segment_c & of_segment ) const;
+
 private:
     void LoadCues( KaxCues *cues );
     void LoadTags( KaxTags *tags );
