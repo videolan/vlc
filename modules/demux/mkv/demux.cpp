@@ -660,6 +660,17 @@ bool demux_sys_t::PreloadLinked()
 
     used_segments.push_back( p_current_segment );
 
+    for ( i=1; i< opened_segments.size(); i++ )
+    {
+        /* add segments from the same family to used_segments */
+        if ( opened_segments[0]->SameFamily( *(opened_segments[i]) ) )
+        {
+            virtual_segment_c *p_virtual_segment = new (std::nothrow) virtual_segment_c( *(opened_segments[i]), opened_segments );
+            if ( p_virtual_segment != NULL )
+                used_segments.push_back( p_virtual_segment );
+        }
+    }
+
     // publish all editions of all usable segment
     for ( i=0; i< used_segments.size(); i++ )
     {
