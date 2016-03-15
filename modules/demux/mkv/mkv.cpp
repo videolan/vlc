@@ -713,13 +713,17 @@ static int Demux( demux_t *p_demux)
     vlc_mutex_locker( &p_sys->lock_demuxer );
 
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
+
+    if( p_sys->i_pts >= p_sys->i_start_pts )
+    {
+        if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
+            return 1;
+        p_vsegment = p_sys->p_current_segment;
+    }
+
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
     if ( p_segment == NULL )
         return 0;
-
-    if( p_sys->i_pts >= p_sys->i_start_pts  )
-        if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
-            return 1;
 
     KaxBlock *block;
     KaxSimpleBlock *simpleblock;
@@ -772,6 +776,7 @@ static int Demux( demux_t *p_demux)
             delete block;
             return 1;
         }
+        p_vsegment = p_sys->p_current_segment;
     }
 
     if ( p_vsegment->CurrentEdition() &&
