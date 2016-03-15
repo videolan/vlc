@@ -654,7 +654,7 @@ bool demux_sys_t::PreloadLinked()
     size_t i, j, ij = 0;
     virtual_segment_c *p_seg;
 
-    p_current_segment = VirtualFromSegments( &opened_segments );
+    p_current_segment = opened_segments.size() ? new (std::nothrow) virtual_segment_c( opened_segments ) : NULL;
     if ( !p_current_segment )
         return false;
 
@@ -755,14 +755,6 @@ void demux_sys_t::FreeUnused()
             opened_segments[i] = NULL;
         }
     }
-}
-
-virtual_segment_c *demux_sys_t::VirtualFromSegments( std::vector<matroska_segment_c*> *p_segments ) const
-{
-    if ( p_segments->empty() )
-        return NULL;
-    virtual_segment_c *p_result = new virtual_segment_c( *p_segments );
-    return p_result;
 }
 
 bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_segment )

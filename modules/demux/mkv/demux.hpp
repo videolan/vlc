@@ -397,9 +397,6 @@ public:
 
     /* event */
     event_thread_t *p_ev;
-
-protected:
-    virtual_segment_c *VirtualFromSegments( std::vector<matroska_segment_c*> *p_segments ) const;
 };
 
 
