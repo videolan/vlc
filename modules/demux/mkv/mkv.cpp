@@ -710,109 +710,88 @@ static int Demux( demux_t *p_demux)
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
 
-    vlc_mutex_lock( &p_sys->lock_demuxer );
+    vlc_mutex_locker( &p_sys->lock_demuxer );
 
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
     if ( p_segment == NULL )
+        return 0;
+
+    if( p_sys->i_pts >= p_sys->i_start_pts  )
+        if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
+            return 1;
+
+    if ( p_vsegment->CurrentEdition() &&
+         p_vsegment->CurrentEdition()->b_ordered &&
+         p_vsegment->CurrentChapter() == NULL )
+        /* nothing left to read in this ordered edition */
+        return 0;
+
+    KaxBlock *block;
+    KaxSimpleBlock *simpleblock;
+    int64_t i_block_duration = 0;
+    bool b_key_picture;
+    bool b_discardable_picture;
+    if( p_segment->BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
     {
-        vlc_mutex_unlock( &p_sys->lock_demuxer );
+        if ( p_vsegment->CurrentEdition() && p_vsegment->CurrentEdition()->b_ordered )
+        {
+            const virtual_chapter_c *p_chap = p_vsegment->CurrentChapter();
+            // check if there are more chapters to read
+            if ( p_chap != NULL )
+            {
+                /* TODO handle successive chapters with the same user_start_time/user_end_time
+                */
+                p_sys->i_pts = p_chap->i_mk_virtual_stop_time + VLC_TS_0;
+                p_sys->i_pts++; // trick to avoid staying on segments with no duration and no content
+
+                return 1;
+            }
+        }
+
+        msg_Warn( p_demux, "cannot get block EOF?" );
         return 0;
     }
-    int i_return = 0;
 
-    do
+    if( simpleblock != NULL )
+        p_sys->i_pts = (mtime_t)simpleblock->GlobalTimecode() / INT64_C(1000);
+    else
+        p_sys->i_pts = (mtime_t)block->GlobalTimecode() / INT64_C(1000);
+    p_sys->i_pts += p_sys->i_mk_chapter_time + VLC_TS_0;
+
+    mtime_t i_pcr = VLC_TS_INVALID;
+    for( size_t i = 0; i < p_segment->tracks.size(); i++)
+        if( p_segment->tracks[i]->i_last_dts > VLC_TS_INVALID &&
+            ( p_segment->tracks[i]->i_last_dts < i_pcr || i_pcr == VLC_TS_INVALID ))
+            i_pcr = p_segment->tracks[i]->i_last_dts;
+
+    if( i_pcr > p_sys->i_pcr + 300000 )
     {
-        if( p_sys->i_pts >= p_sys->i_start_pts  )
-            if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
-            {
-                i_return = 1;
-                break;
-            }
-
-        if ( p_vsegment->CurrentEdition() &&
-             p_vsegment->CurrentEdition()->b_ordered &&
-             p_vsegment->CurrentChapter() == NULL )
-            /* nothing left to read in this ordered edition */
-            break;
-
-        KaxBlock *block;
-        KaxSimpleBlock *simpleblock;
-        int64_t i_block_duration = 0;
-        bool b_key_picture;
-        bool b_discardable_picture;
-        if( p_segment->BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
-        {
-            if ( p_vsegment->CurrentEdition() && p_vsegment->CurrentEdition()->b_ordered )
-            {
-                const virtual_chapter_c *p_chap = p_vsegment->CurrentChapter();
-                // check if there are more chapters to read
-                if ( p_chap != NULL )
-                {
-                    /* TODO handle successive chapters with the same user_start_time/user_end_time
-                    */
-                    p_sys->i_pts = p_chap->i_mk_virtual_stop_time + VLC_TS_0;
-                    p_sys->i_pts++; // trick to avoid staying on segments with no duration and no content
-
-                    i_return = 1;
-                }
-
-                break;
-            }
-            else
-            {
-                msg_Warn( p_demux, "cannot get block EOF?" );
-                break;
-            }
-        }
-
-        if( simpleblock != NULL )
-            p_sys->i_pts = (mtime_t)simpleblock->GlobalTimecode() / INT64_C(1000);
-        else
-            p_sys->i_pts = (mtime_t)block->GlobalTimecode() / INT64_C(1000);
-        p_sys->i_pts += p_sys->i_mk_chapter_time + VLC_TS_0;
-
-        mtime_t i_pcr = VLC_TS_INVALID;
-        for( size_t i = 0; i < p_segment->tracks.size(); i++)
-            if( p_segment->tracks[i]->i_last_dts > VLC_TS_INVALID &&
-                ( p_segment->tracks[i]->i_last_dts < i_pcr || i_pcr == VLC_TS_INVALID ))
-                i_pcr = p_segment->tracks[i]->i_last_dts;
-
-        if( i_pcr > p_sys->i_pcr + 300000 )
-        {
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
-            p_sys->i_pcr = i_pcr;
-        }
-
-        if( p_sys->i_pts >= p_sys->i_start_pts  )
-        {
-            if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
-            {
-                i_return = 1;
-                delete block;
-                break;
-            }
-        }
-
-        if ( p_vsegment->CurrentEdition() &&
-             p_vsegment->CurrentEdition()->b_ordered &&
-             p_vsegment->CurrentChapter() == NULL )
-        {
-            /* nothing left to read in this ordered edition */
-            delete block;
-            break;
-        }
-
-        BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, b_key_picture, b_discardable_picture );
-
-        delete block;
-
-        vlc_mutex_unlock( &p_sys->lock_demuxer );
-        return 1;
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+        p_sys->i_pcr = i_pcr;
     }
-    while (0);
 
-    vlc_mutex_unlock( &p_sys->lock_demuxer );
+    if( p_sys->i_pts >= p_sys->i_start_pts  )
+    {
+        if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
+        {
+            delete block;
+            return 1;
+        }
+    }
 
-    return i_return;
+    if ( p_vsegment->CurrentEdition() &&
+         p_vsegment->CurrentEdition()->b_ordered &&
+         p_vsegment->CurrentChapter() == NULL )
+    {
+        /* nothing left to read in this ordered edition */
+        delete block;
+        return 0;
+    }
+
+    BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, b_key_picture, b_discardable_picture );
+
+    delete block;
+
+    return 1;
 }
