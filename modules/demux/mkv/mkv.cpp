@@ -138,6 +138,10 @@ static int Open( vlc_object_t * p_this )
     {
         p_stream->segments[i]->Preload();
         b_need_preload |= p_stream->segments[i]->b_ref_external_segments;
+        if ( p_stream->segments[i]->translations.size() &&
+             p_stream->segments[i]->translations[0]->codec_id == MATROSKA_CHAPTER_CODEC_DVD &&
+             p_stream->segments[i]->families.size() )
+            b_need_preload = true;
     }
 
     p_segment = p_stream->segments[0];

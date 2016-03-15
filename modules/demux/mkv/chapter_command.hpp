@@ -27,6 +27,9 @@
 
 #include "mkv.hpp"
 
+const int MATROSKA_CHAPTER_CODEC_NATIVE  = 0x00;
+const int MATROSKA_CHAPTER_CODEC_DVD     = 0x01;
+
 const binary MATROSKA_DVD_LEVEL_SS   = 0x30;
 const binary MATROSKA_DVD_LEVEL_LU   = 0x2A;
 const binary MATROSKA_DVD_LEVEL_TT   = 0x28;
