@@ -761,7 +761,7 @@ virtual_segment_c *demux_sys_t::VirtualFromSegments( std::vector<matroska_segmen
 {
     if ( p_segments->empty() )
         return NULL;
-    virtual_segment_c *p_result = new virtual_segment_c( p_segments );
+    virtual_segment_c *p_result = new virtual_segment_c( *p_segments );
     return p_result;
 }
 

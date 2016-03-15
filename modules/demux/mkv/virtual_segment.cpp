@@ -28,20 +28,20 @@
 #include "demux.hpp"
 
 /* FIXME move this */
-matroska_segment_c * getSegmentbyUID( KaxSegmentUID * p_uid, std::vector<matroska_segment_c*> *segments )
+matroska_segment_c * getSegmentbyUID( KaxSegmentUID * p_uid, std::vector<matroska_segment_c*> & segments )
 {
-    for( size_t i = 0; i < (*segments).size(); i++ )
+    for( size_t i = 0; i < segments.size(); i++ )
     {
-        if( (*segments)[i]->p_segment_uid &&
-            *p_uid == *((*segments)[i]->p_segment_uid) )
-            return (*segments)[i];
+        if( segments[i]->p_segment_uid &&
+            *p_uid == *(segments[i]->p_segment_uid) )
+            return segments[i];
     }
     return NULL;
 }
 
 virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_chap,
                                                              matroska_segment_c * p_main_segment,
-                                                             std::vector<matroska_segment_c*> * segments,
+                                                             std::vector<matroska_segment_c*> & segments,
                                                              int64_t * usertime_offset, bool b_ordered)
 {
     matroska_segment_c * p_segment = p_main_segment;
@@ -102,10 +102,10 @@ virtual_chapter_c::~virtual_chapter_c()
 }
 
 
-virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<matroska_segment_c*> *opened_segments)
+virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<matroska_segment_c*> & opened_segments)
 {
     bool b_fake_ordered = false;
-    matroska_segment_c *p_main_segment = (*opened_segments)[0];
+    matroska_segment_c *p_main_segment = opened_segments[0];
     p_edition = p_edit;
     b_ordered = false;
 
@@ -259,11 +259,11 @@ void virtual_edition_c::retimeChapters()
     }
 }
 
-virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opened_segments )
+virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> & p_opened_segments )
 {
     /* Main segment */
     std::vector<chapter_edition_c*>::size_type i;
-    matroska_segment_c *p_segment = (*p_opened_segments)[0];
+    matroska_segment_c *p_segment = p_opened_segments[0];
     i_sys_title = 0;
     p_current_chapter = NULL;
     b_current_chapter_entered = false;

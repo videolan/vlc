@@ -44,7 +44,7 @@ public:
 
     static virtual_chapter_c * CreateVirtualChapter( chapter_item_c * p_chap,
                                                      matroska_segment_c * p_main_segment,
-                                                     std::vector<matroska_segment_c*> * segments,
+                                                     std::vector<matroska_segment_c*> & segments,
                                                      int64_t * usertime_offset, bool b_ordered );
 
     virtual_chapter_c* getSubChapterbyTimecode( int64_t time );
@@ -80,7 +80,7 @@ public:
 class virtual_edition_c
 {
 public:
-    virtual_edition_c( chapter_edition_c * p_edition, std::vector<matroska_segment_c*> *opened_segments );
+    virtual_edition_c( chapter_edition_c * p_edition, std::vector<matroska_segment_c*> & opened_segments );
     ~virtual_edition_c();
     std::vector<virtual_chapter_c*> chapters;
 
@@ -111,7 +111,7 @@ private:
 class virtual_segment_c
 {
 public:
-    virtual_segment_c( std::vector<matroska_segment_c*> * opened_segments );
+    virtual_segment_c( std::vector<matroska_segment_c*> & opened_segments );
     ~virtual_segment_c();
     std::vector<virtual_edition_c*> editions;
     std::vector<virtual_edition_c*>::size_type i_current_edition;
