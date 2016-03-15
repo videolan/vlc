@@ -395,6 +395,12 @@ virtual_chapter_c* virtual_edition_c::getChapterbyTimecode( int64_t time )
             return chapters[i]->getSubChapterbyTimecode( time );
     }
 
+    /* special case for the beggining of the first ordered chapter */
+    if ( time == 0 && b_ordered && chapters.size() )
+    {
+        return chapters[0]->getSubChapterbyTimecode( time );
+    }
+
     return NULL;
 }
 
