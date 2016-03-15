@@ -142,7 +142,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_session == NULL )
         goto error;
 
-    vlc_UrlParse( &p_sys->url, p_access->psz_location );
+    vlc_UrlParse( &p_sys->url, p_access->psz_url );
     if( get_address( p_access ) != VLC_SUCCESS )
         goto error;
 
@@ -314,14 +314,12 @@ static int login( access_t *p_access )
 {
     int i_ret = VLC_EGENERIC;
     access_sys_t *p_sys = p_access->p_sys;
-    vlc_url_t url;
     vlc_credential credential;
     char *psz_var_domain;
     const char *psz_login, *psz_password, *psz_domain;
     bool b_guest = false;
 
-    vlc_UrlParse( &url, p_access->psz_url );
-    vlc_credential_init( &credential, &url );
+    vlc_credential_init( &credential, &p_sys->url );
     psz_var_domain = var_InheritString( p_access, "smb-domain" );
     credential.psz_realm = psz_var_domain ? psz_var_domain : NULL;
 
@@ -379,7 +377,6 @@ success:
     i_ret = VLC_SUCCESS;
 error:
     vlc_credential_clean( &credential );
-    vlc_UrlClean( &url );
     free( psz_var_domain );
     return i_ret;
 }
