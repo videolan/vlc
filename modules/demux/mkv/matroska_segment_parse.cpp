@@ -847,7 +847,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
             }
             catch(...)
             {
-                msg_Err( vars.p_demuxer, "Error while reading Chapter Tranlate");
+                msg_Err( vars.p_demuxer, "Error while reading Chapter Translate");
             }
         }
         E_CASE( EbmlVoid, )
