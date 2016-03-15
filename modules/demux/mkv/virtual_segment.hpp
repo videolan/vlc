@@ -80,7 +80,7 @@ public:
 class virtual_edition_c
 {
 public:
-    virtual_edition_c( chapter_edition_c * p_edition, std::vector<matroska_segment_c*> & opened_segments );
+    virtual_edition_c( chapter_edition_c * p_edition, matroska_segment_c & segment, std::vector<matroska_segment_c*> & opened_segments );
     ~virtual_edition_c();
     std::vector<virtual_chapter_c*> chapters;
 
@@ -111,7 +111,7 @@ private:
 class virtual_segment_c
 {
 public:
-    virtual_segment_c( std::vector<matroska_segment_c*> & opened_segments );
+    virtual_segment_c( matroska_segment_c & segment, std::vector<matroska_segment_c*> & opened_segments );
     ~virtual_segment_c();
     std::vector<virtual_edition_c*> editions;
     std::vector<virtual_edition_c*>::size_type i_current_edition;

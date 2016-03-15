@@ -101,10 +101,9 @@ virtual_chapter_c::~virtual_chapter_c()
 }
 
 
-virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<matroska_segment_c*> & opened_segments)
+virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segment_c & p_main_segment, std::vector<matroska_segment_c*> & opened_segments)
 {
     bool b_fake_ordered = false;
-    matroska_segment_c *p_main_segment = opened_segments[0];
     p_edition = p_edit;
     b_ordered = false;
 
@@ -117,7 +116,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
         for( size_t i = 0; i < p_edition->sub_chapters.size(); i++ )
         {
             virtual_chapter_c * p_vchap = virtual_chapter_c::CreateVirtualChapter( p_edition->sub_chapters[i],
-                                                                                   *p_main_segment, opened_segments,
+                                                                                   p_main_segment, opened_segments,
                                                                                    &usertime_offset, b_ordered );
             if( p_vchap )
                 chapters.push_back( p_vchap );
@@ -129,7 +128,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
     }
     else /* Not ordered or no edition at all */
     {
-        matroska_segment_c * p_cur = p_main_segment;
+        matroska_segment_c * p_cur = &p_main_segment;
         virtual_chapter_c * p_vchap = NULL;
         int64_t tmp = 0;
 
@@ -141,7 +140,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
             if( ( p_prev = getSegmentbyUID( p_cur->p_prev_segment_uid, opened_segments ) ) )
             {
                 tmp = 0;
-                msg_Dbg( &p_main_segment->sys.demuxer, "Prev segment 0x%x found\n",
+                msg_Dbg( &p_main_segment.sys.demuxer, "Prev segment 0x%x found\n",
                          *(int32_t*)p_cur->p_prev_segment_uid->GetBuffer() );
 
                 /* Preload segment */
@@ -166,7 +165,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
         tmp = 0;
 
         /* Append the main segment */
-        p_vchap = virtual_chapter_c::CreateVirtualChapter( (chapter_item_c*) p_edit, *p_main_segment,
+        p_vchap = virtual_chapter_c::CreateVirtualChapter( (chapter_item_c*) p_edit, p_main_segment,
                                                            opened_segments, &tmp, b_ordered );
         if( p_vchap )
             chapters.push_back( p_vchap );
@@ -178,7 +177,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
             if( ( p_next = getSegmentbyUID( p_cur->p_next_segment_uid, opened_segments ) ) )
             {
                 tmp = 0;
-                msg_Dbg( &p_main_segment->sys.demuxer, "Next segment 0x%x found\n",
+                msg_Dbg( &p_main_segment.sys.demuxer, "Next segment 0x%x found\n",
                          *(int32_t*) p_cur->p_next_segment_uid->GetBuffer() );
 
                 /* Preload segment */
@@ -208,9 +207,9 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
     }
 
 #ifdef MKV_DEBUG
-    msg_Dbg( &p_main_segment->sys.demuxer, "-- RECAP-BEGIN --" );
+    msg_Dbg( &p_main_segment.sys.demuxer, "-- RECAP-BEGIN --" );
     print();
-    msg_Dbg( &p_main_segment->sys.demuxer, "-- RECAP-END --" );
+    msg_Dbg( &p_main_segment.sys.demuxer, "-- RECAP-END --" );
 #endif
 }
 
@@ -258,33 +257,32 @@ void virtual_edition_c::retimeChapters()
     }
 }
 
-virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> & p_opened_segments )
+virtual_segment_c::virtual_segment_c( matroska_segment_c & p_segment, std::vector<matroska_segment_c*> & p_opened_segments )
 {
     /* Main segment */
     std::vector<chapter_edition_c*>::size_type i;
-    matroska_segment_c *p_segment = p_opened_segments[0];
     i_sys_title = 0;
     p_current_chapter = NULL;
     b_current_chapter_entered = false;
 
-    i_current_edition = p_segment->i_default_edition;
+    i_current_edition = p_segment.i_default_edition;
 
-    for( i = 0; i < p_segment->stored_editions.size(); i++ )
+    for( i = 0; i < p_segment.stored_editions.size(); i++ )
     {
         /* Create a virtual edition from opened */
-        virtual_edition_c * p_vedition = new virtual_edition_c( p_segment->stored_editions[i], p_opened_segments );
+        virtual_edition_c * p_vedition = new virtual_edition_c( p_segment.stored_editions[i], p_segment, p_opened_segments );
 
         /* Ordered empty edition can happen when all chapters are
          * on an other segment which couldn't be found... ignore it */
         if(p_vedition->b_ordered && p_vedition->i_duration == 0)
         {
 
-            msg_Warn( &p_segment->sys.demuxer,
+            msg_Warn( &segment.sys.demuxer,
                       "Edition %s (%zu) links to other segments not found and is empty... ignoring it",
                        p_vedition->GetMainName().c_str(), i );
             if(i_current_edition == i)
             {
-                msg_Warn( &p_segment->sys.demuxer,
+                msg_Warn( &segment.sys.demuxer,
                           "Empty edition was the default... defaulting to 0");
                 i_current_edition = 0;
             }
@@ -294,9 +292,9 @@ virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> & p_opene
             editions.push_back( p_vedition );
     }
     /*if we don't have edition create a dummy one*/
-    if( !p_segment->stored_editions.size() )
+    if( !p_segment.stored_editions.size() )
     {
-        virtual_edition_c * p_vedition = new virtual_edition_c( NULL, p_opened_segments );
+        virtual_edition_c * p_vedition = new virtual_edition_c( NULL, p_segment, p_opened_segments );
         editions.push_back( p_vedition );
     }
 

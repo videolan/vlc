@@ -654,7 +654,7 @@ bool demux_sys_t::PreloadLinked()
     size_t i, j, ij = 0;
     virtual_segment_c *p_seg;
 
-    p_current_segment = opened_segments.size() ? new (std::nothrow) virtual_segment_c( opened_segments ) : NULL;
+    p_current_segment = opened_segments.size() ? new (std::nothrow) virtual_segment_c( *(opened_segments[0]), opened_segments ) : NULL;
     if ( !p_current_segment )
         return false;
 
