@@ -765,8 +765,6 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
     int i_cat;
     bool b_has_key = false;
 
-    std::vector<spoint> spoints;
-
     for( size_t i = 0; i < tracks.size(); i++)
         tracks[i]->i_last_dts = VLC_TS_INVALID;
 
@@ -846,6 +844,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
     sys.i_start_pts = i_mk_date + VLC_TS_0;
 
     /* now parse until key frame */
+    std::vector<spoint> spoints;
     const int es_types[3] = { VIDEO_ES, AUDIO_ES, SPU_ES };
     i_cat = es_types[0];
     mtime_t i_seek_preroll = 0;
