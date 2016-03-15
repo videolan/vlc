@@ -721,12 +721,6 @@ static int Demux( demux_t *p_demux)
         if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             return 1;
 
-    if ( p_vsegment->CurrentEdition() &&
-         p_vsegment->CurrentEdition()->b_ordered &&
-         p_vsegment->CurrentChapter() == NULL )
-        /* nothing left to read in this ordered edition */
-        return 0;
-
     KaxBlock *block;
     KaxSimpleBlock *simpleblock;
     int64_t i_block_duration = 0;
