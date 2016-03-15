@@ -154,7 +154,8 @@ static int Open( vlc_object_t *p_this )
     struct stat  filestat;
     vlc_url_t    url;
     vlc_credential credential;
-    char         *psz_uri = NULL, *psz_var_domain = NULL;
+    char         *psz_decoded_path = NULL, *psz_uri = NULL,
+                 *psz_var_domain = NULL;
     int          i_ret;
     int          i_smb;
     uint64_t     i_size;
@@ -174,11 +175,17 @@ static int Open( vlc_object_t *p_this )
 # undef open
 #endif
 
-    char *psz_decoded_url = vlc_uri_decode_duplicate( p_access->psz_url );
-    if( psz_decoded_url == NULL )
-        return VLC_ENOMEM;
-    vlc_UrlParse( &url, psz_decoded_url );
-    free( psz_decoded_url );
+    vlc_UrlParse( &url, p_access->psz_url );
+    if( url.psz_path )
+    {
+        psz_decoded_path = vlc_uri_decode_duplicate( url.psz_path );
+        if( !psz_decoded_path )
+        {
+            vlc_UrlClean( &url );
+            return VLC_EGENERIC;
+        }
+    }
+
     vlc_credential_init( &credential, &url );
     psz_var_domain = var_InheritString( p_access, "smb-domain" );
     credential.psz_realm = psz_var_domain;
@@ -188,10 +195,11 @@ static int Open( vlc_object_t *p_this )
     {
         if( smb_get_uri( p_access, &psz_uri, credential.psz_realm,
                          credential.psz_username, credential.psz_password,
-                         url.psz_host, url.psz_path, NULL ) == -1 )
+                         url.psz_host, psz_decoded_path, NULL ) == -1 )
         {
             vlc_credential_clean( &credential );
             free(psz_var_domain);
+            free( psz_decoded_path );
             vlc_UrlClean( &url );
             return VLC_ENOMEM;
         }
@@ -214,7 +222,7 @@ static int Open( vlc_object_t *p_this )
     vlc_credential_store( &credential, p_access );
     vlc_credential_clean( &credential );
     free(psz_var_domain);
-    vlc_UrlClean( &url );
+    free( psz_decoded_path );
 
     /* Init p_access */
     access_InitFields( p_access );
@@ -223,6 +231,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
     {
         free( psz_uri );
+        vlc_UrlClean( &url );
         return VLC_ENOMEM;
     }
 
@@ -231,9 +240,10 @@ static int Open( vlc_object_t *p_this )
 #ifdef _WIN32
         free( p_sys );
         free( psz_uri );
+        vlc_UrlClean( &url );
         return VLC_EGENERIC;
 #else
-        vlc_UrlParse( &p_sys->url, p_access->psz_url );
+        p_sys->url = url;
         p_access->pf_readdir = DirRead;
         p_access->pf_control = DirControl;
         i_smb = smbc_opendir( psz_uri );
