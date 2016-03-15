@@ -267,6 +267,7 @@ virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opene
     i_current_edition = 0;
     i_sys_title = 0;
     p_current_chapter = NULL;
+    b_current_chapter_entered = false;
 
     i_current_edition = p_segment->i_default_edition;
 
@@ -405,6 +406,12 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 
     bool b_has_seeked = false;
 
+    if ( !b_current_chapter_entered && p_current_chapter != NULL )
+    {
+        p_current_chapter->Enter( true );
+        b_current_chapter_entered = true;
+    }
+
     if ( sys.i_pts != VLC_TS_INVALID )
         p_cur_chapter = p_cur_edition->getChapterbyTimecode( sys.i_pts - VLC_TS_0 );
 
@@ -450,7 +457,10 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
             {
                 /* TODO */
                 if ( !p_cur_edition->p_edition->EnterAndLeave( p_current_chapter->p_chapter, false ) )
+                {
                     p_current_chapter = NULL;
+                    b_current_chapter_entered = false;
+                }
                 else
                     return true;
             }

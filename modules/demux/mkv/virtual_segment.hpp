@@ -116,6 +116,7 @@ public:
     std::vector<virtual_edition_c*> editions;
     std::vector<virtual_edition_c*>::size_type i_current_edition;
     virtual_chapter_c               *p_current_chapter;
+    bool                            b_current_chapter_entered;
     int                             i_sys_title;
 
 
