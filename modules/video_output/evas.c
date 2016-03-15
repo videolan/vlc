@@ -34,6 +34,11 @@
 
 #include <Evas.h>
 #include <Ecore.h>
+
+/* Deactivate TBM surface for now: it's impossible to specify a crop (visible
+ * lines/pitch) and to avoid green borders. */
+#undef HAVE_TIZEN_SDK
+
 #ifdef HAVE_TIZEN_SDK
 # include <tbm_surface.h>
 #endif
