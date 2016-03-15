@@ -36,14 +36,14 @@
 class virtual_chapter_c
 {
 public:
-    virtual_chapter_c( matroska_segment_c *p_seg, chapter_item_c *p_chap, int64_t start, int64_t stop ):
+    virtual_chapter_c( matroska_segment_c &p_seg, chapter_item_c *p_chap, int64_t start, int64_t stop ):
         p_segment(p_seg), p_chapter(p_chap),
         i_mk_virtual_start_time(start), i_mk_virtual_stop_time(stop)
     {}
     ~virtual_chapter_c();
 
     static virtual_chapter_c * CreateVirtualChapter( chapter_item_c * p_chap,
-                                                     matroska_segment_c * p_main_segment,
+                                                     matroska_segment_c & p_main_segment,
                                                      std::vector<matroska_segment_c*> & segments,
                                                      int64_t * usertime_offset, bool b_ordered );
 
@@ -66,7 +66,7 @@ public:
         return ( itemA->i_mk_virtual_start_time < itemB->i_mk_virtual_start_time );
     }
 
-    matroska_segment_c  *p_segment;
+    matroska_segment_c  &p_segment;
     chapter_item_c      *p_chapter;
     mtime_t             i_mk_virtual_start_time;
     mtime_t             i_mk_virtual_stop_time;
@@ -136,7 +136,7 @@ public:
     {
         if ( !p_current_chapter )
             return NULL;
-        return p_current_chapter->p_segment;
+        return &p_current_chapter->p_segment;
     }
 
     inline int64_t Duration()
@@ -159,7 +159,7 @@ public:
     void Seek( demux_t & demuxer, mtime_t i_mk_date,
                virtual_chapter_c *p_chapter, int64_t i_global_position );
 private:
-    void ChangeSegment( matroska_segment_c * p_old, matroska_segment_c * p_new, mtime_t i_mk_start_time );
+    void ChangeSegment( matroska_segment_c & p_old, matroska_segment_c & p_new, mtime_t i_mk_start_time );
 };
 
 #endif

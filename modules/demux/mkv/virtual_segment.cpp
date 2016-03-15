@@ -40,25 +40,24 @@ matroska_segment_c * getSegmentbyUID( KaxSegmentUID * p_uid, std::vector<matrosk
 }
 
 virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_chap,
-                                                             matroska_segment_c * p_main_segment,
+                                                             matroska_segment_c & p_main_segment,
                                                              std::vector<matroska_segment_c*> & segments,
                                                              int64_t * usertime_offset, bool b_ordered)
 {
-    matroska_segment_c * p_segment = p_main_segment;
-
     if( !p_chap )
     {
         /* Dummy chapter use the whole segment */
-        return new virtual_chapter_c( p_segment, NULL, 0, p_segment->i_duration*1000 );
+        return new (std::nothrow) virtual_chapter_c( p_main_segment, NULL, 0, p_main_segment.i_duration * 1000 );
     }
 
     int64_t start = ( b_ordered )? *usertime_offset : p_chap->i_start_time;
     int64_t stop = ( b_ordered )? ( *usertime_offset + p_chap->i_end_time - p_chap->i_start_time ) : p_chap->i_end_time;
 
+    matroska_segment_c * p_segment = &p_main_segment;
     if( p_chap->p_segment_uid &&
        ( !( p_segment = getSegmentbyUID( (KaxSegmentUID*) p_chap->p_segment_uid,segments ) ) || !b_ordered ) )
     {
-        msg_Warn( &p_main_segment->sys.demuxer,
+        msg_Warn( &p_main_segment.sys.demuxer,
                   "Couldn't find segment 0x%x or not ordered... - ignoring chapter %s",
                   *( (uint32_t *) p_chap->p_segment_uid->GetBuffer() ),p_chap->psz_name.c_str() );
         return NULL;
@@ -68,7 +67,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     if ( !p_segment->b_preloaded )
         p_segment->Preload();
 
-    virtual_chapter_c * p_vchap = new (std::nothrow) virtual_chapter_c( p_segment, p_chap, start, stop );
+    virtual_chapter_c * p_vchap = new (std::nothrow) virtual_chapter_c( *p_segment, p_chap, start, stop );
 
     if( !p_vchap )
         return NULL;
@@ -77,7 +76,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
 
     for( size_t i = 0; i < p_chap->sub_chapters.size(); i++ )
     {
-        virtual_chapter_c * p_vsubchap = CreateVirtualChapter( p_chap->sub_chapters[i], p_segment, segments, &tmp, b_ordered );
+        virtual_chapter_c * p_vsubchap = CreateVirtualChapter( p_chap->sub_chapters[i], *p_segment, segments, &tmp, b_ordered );
 
         if( p_vsubchap )
             p_vchap->sub_chapters.push_back( p_vsubchap );
@@ -88,7 +87,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     else
         *usertime_offset = tmp;
 
-    msg_Dbg( &p_main_segment->sys.demuxer,
+    msg_Dbg( &p_main_segment.sys.demuxer,
              "Virtual chapter %s from %" PRId64 " to %" PRId64 " - " ,
              p_chap->psz_name.c_str(), p_vchap->i_mk_virtual_start_time, p_vchap->i_mk_virtual_stop_time );
 
@@ -118,7 +117,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
         for( size_t i = 0; i < p_edition->sub_chapters.size(); i++ )
         {
             virtual_chapter_c * p_vchap = virtual_chapter_c::CreateVirtualChapter( p_edition->sub_chapters[i],
-                                                                                   p_main_segment, opened_segments,
+                                                                                   *p_main_segment, opened_segments,
                                                                                    &usertime_offset, b_ordered );
             if( p_vchap )
                 chapters.push_back( p_vchap );
@@ -152,7 +151,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
                 /* Create virtual_chapter from the first edition if any */
                 chapter_item_c * p_chap = ( p_prev->stored_editions.size() > 0 )? ((chapter_item_c *)p_prev->stored_editions[0]) : NULL;
 
-                p_vchap = virtual_chapter_c::CreateVirtualChapter( p_chap, p_prev, opened_segments, &tmp, b_ordered );
+                p_vchap = virtual_chapter_c::CreateVirtualChapter( p_chap, *p_prev, opened_segments, &tmp, b_ordered );
 
                 if( p_vchap )
                     chapters.insert( chapters.begin(), p_vchap );
@@ -167,7 +166,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
         tmp = 0;
 
         /* Append the main segment */
-        p_vchap = virtual_chapter_c::CreateVirtualChapter( (chapter_item_c*) p_edit, p_main_segment,
+        p_vchap = virtual_chapter_c::CreateVirtualChapter( (chapter_item_c*) p_edit, *p_main_segment,
                                                            opened_segments, &tmp, b_ordered );
         if( p_vchap )
             chapters.push_back( p_vchap );
@@ -189,7 +188,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
                 /* Create virtual_chapter from the first edition if any */
                 chapter_item_c * p_chap = ( p_next->stored_editions.size() > 0 )?( (chapter_item_c *)p_next->stored_editions[0] ) : NULL;
 
-                 p_vchap = virtual_chapter_c::CreateVirtualChapter( p_chap, p_next, opened_segments, &tmp, b_ordered );
+                 p_vchap = virtual_chapter_c::CreateVirtualChapter( p_chap, *p_next, opened_segments, &tmp, b_ordered );
 
                 if( p_vchap )
                     chapters.push_back( p_vchap );
@@ -252,7 +251,7 @@ void virtual_edition_c::retimeChapters()
         virtual_chapter_c * p_vchap = chapters[i];
 
         p_vchap->i_mk_virtual_start_time = i_duration;
-        i_duration += p_vchap->p_segment->i_duration * 1000;
+        i_duration += p_vchap->p_segment.i_duration * 1000;
         p_vchap->i_mk_virtual_stop_time = i_duration;
 
         retimeSubChapters( p_vchap );
@@ -433,7 +432,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                 {
                     // only physically seek if necessary
                     if ( p_current_chapter == NULL ||
-                        ( p_current_chapter && p_current_chapter->p_segment != p_cur_chapter->p_segment ) ||
+                        ( p_current_chapter && &p_current_chapter->p_segment != &p_cur_chapter->p_segment ) ||
                         ( p_current_chapter->p_chapter->i_end_time != p_cur_chapter->p_chapter->i_start_time ))
                     {
                         /* Forcing reset pcr */
@@ -495,7 +494,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
     if ( p_chapter != NULL )
     {
         mtime_t i_mk_time_offset = p_chapter->i_mk_virtual_start_time - ( ( p_chapter->p_chapter )? p_chapter->p_chapter->i_start_time : 0 );
-        p_sys->i_mk_chapter_time = i_mk_time_offset - p_chapter->p_segment->i_mk_start_time;
+        p_sys->i_mk_chapter_time = i_mk_time_offset - p_chapter->p_segment.i_mk_start_time;
         if ( p_chapter->p_chapter && p_chapter->i_seekpoint_num > 0 )
         {
             demuxer.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
@@ -503,10 +502,10 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
             demuxer.info.i_seekpoint = p_chapter->i_seekpoint_num - 1;
         }
 
-        if( p_current_chapter->p_segment != p_chapter->p_segment )
+        if( &p_current_chapter->p_segment != &p_chapter->p_segment )
             ChangeSegment( p_current_chapter->p_segment, p_chapter->p_segment, i_mk_date );
         p_current_chapter = p_chapter;
-        p_chapter->p_segment->Seek( i_mk_date, i_mk_time_offset, i_global_position );
+        p_chapter->p_segment.Seek( i_mk_date, i_mk_time_offset, i_global_position );
     }
 }
 
@@ -638,18 +637,18 @@ void virtual_chapter_c::print()
 }
 #endif
 
-void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segment_c * p_new, mtime_t i_mk_start_time )
+void virtual_segment_c::ChangeSegment( matroska_segment_c & p_old, matroska_segment_c & p_new, mtime_t i_mk_start_time )
 {
     size_t i, j;
     char *sub_lang = NULL, *aud_lang = NULL;
-    for( i = 0; i < p_old->tracks.size(); i++)
+    for( i = 0; i < p_old.tracks.size(); i++)
     {
-        mkv_track_t *p_tk = p_old->tracks[i];
+        mkv_track_t *p_tk = p_old.tracks[i];
         es_format_t *p_ofmt = &p_tk->fmt;
         if( p_tk->p_es )
         {
             bool state = false;
-            es_out_Control( p_old->sys.demuxer.out, ES_OUT_GET_ES_STATE, p_tk->p_es, &state );
+            es_out_Control( p_old.sys.demuxer.out, ES_OUT_GET_ES_STATE, p_tk->p_es, &state );
             if( state )
             {
                 if( p_ofmt->i_cat == AUDIO_ES )
@@ -659,9 +658,9 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segm
             }
         }
     }
-    for( i = 0; i < p_new->tracks.size(); i++)
+    for( i = 0; i < p_new.tracks.size(); i++)
     {
-        mkv_track_t *p_tk = p_new->tracks[i];
+        mkv_track_t *p_tk = p_new.tracks[i];
         es_format_t *p_nfmt = &p_tk->fmt;
 
         /* Let's only do that for audio and video for now */
@@ -669,11 +668,11 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segm
         {
 
             /* check for a similar elementary stream */
-            for( j = 0; j < p_old->tracks.size(); j++)
+            for( j = 0; j < p_old.tracks.size(); j++)
             {
-                es_format_t * p_ofmt = &p_old->tracks[j]->fmt;
+                es_format_t * p_ofmt = &p_old.tracks[j]->fmt;
 
-                if( !p_old->tracks[j]->p_es )
+                if( !p_old.tracks[j]->p_es )
                     continue;
 
                 if( ( p_nfmt->i_cat == p_ofmt->i_cat ) &&
@@ -690,9 +689,9 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segm
                         !memcmp( &p_nfmt->video, &p_ofmt->video, sizeof(video_format_t) ) ) ) )
                 {
                     /* FIXME handle video palettes... */
-                    msg_Warn( &p_old->sys.demuxer, "Reusing decoder of old track %zu for track %zu", j, i);
-                    p_tk->p_es = p_old->tracks[j]->p_es;
-                    p_old->tracks[j]->p_es = NULL;
+                    msg_Warn( &p_old.sys.demuxer, "Reusing decoder of old track %zu for track %zu", j, i);
+                    p_tk->p_es = p_old.tracks[j]->p_es;
+                    p_old.tracks[j]->p_es = NULL;
                     break;
                 }
             }
@@ -701,12 +700,12 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segm
         if( ( sub_lang && p_nfmt->i_cat == SPU_ES && !strcasecmp(sub_lang, p_nfmt->psz_language) ) ||
             ( aud_lang && p_nfmt->i_cat == AUDIO_ES && !strcasecmp(aud_lang, p_nfmt->psz_language) ) )
         {
-            msg_Warn( &p_old->sys.demuxer, "Since previous segment used lang %s forcing track %zu",
+            msg_Warn( &p_old.sys.demuxer, "Since previous segment used lang %s forcing track %zu",
                       p_nfmt->psz_language, i);
             p_tk->fmt.i_priority |= 0x10;
             p_tk->b_forced = true;
         }
     }
-    p_new->Select( i_mk_start_time );
-    p_old->UnSelect();
+    p_new.Select( i_mk_start_time );
+    p_old.UnSelect();
 }
