@@ -94,7 +94,6 @@ static int BrowserInit( access_t *p_access );
 
 static int get_address( access_t *p_access );
 static int login( access_t *p_access );
-static void backslash_path( vlc_url_t *p_url );
 static bool get_path( access_t *p_access );
 static input_item_t* new_item( access_t *p_access, const char *psz_name, int i_type );
 
@@ -104,8 +103,9 @@ struct access_sys_t
     smb_session        *p_session;          /**< bdsm SMB Session object */
 
     vlc_url_t           url;
-    char               *psz_share;
-    char               *psz_path;
+    char               *psz_fullpath;
+    const char         *psz_share;
+    const char         *psz_path;
 
     char                netbios_name[16];
     struct in_addr      addr;
@@ -142,11 +142,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_session == NULL )
         goto error;
 
-    char *psz_decoded_location = vlc_uri_decode_duplicate( p_access->psz_location );
-    if( psz_decoded_location == NULL )
-        goto error;
-    vlc_UrlParse( &p_sys->url, psz_decoded_location );
-    free( psz_decoded_location );
+    vlc_UrlParse( &p_sys->url, p_access->psz_location );
     if( get_address( p_access ) != VLC_SUCCESS )
         goto error;
 
@@ -216,8 +212,7 @@ static void Close( vlc_object_t *p_this )
         smb_share_list_destroy( p_sys->shares );
     if( p_sys->files )
         smb_stat_list_destroy( p_sys->files );
-    free( p_sys->psz_share );
-    free( p_sys->psz_path );
+    free( p_sys->psz_fullpath );
     free( p_sys );
 }
 
@@ -389,9 +384,9 @@ error:
     return i_ret;
 }
 
-static void backslash_path( vlc_url_t *p_url )
+static void backslash_path( char *psz_path )
 {
-    char *iter = p_url->psz_path;
+    char *iter = psz_path;
 
     /* Let's switch the path delimiters from / to \ */
     while( *iter != '\0' )
@@ -411,17 +406,19 @@ static bool get_path( access_t *p_access )
     if( p_sys->url.psz_path == NULL )
         return false;
 
-    backslash_path( &p_sys->url );
+    p_sys->psz_fullpath = vlc_uri_decode_duplicate( p_sys->url.psz_path );
+    if( p_sys->psz_fullpath == NULL )
+        return false;
+
+    backslash_path( p_sys->psz_fullpath );
 
     /* Is path longer than just "/" ? */
-    if( strlen( p_sys->url.psz_path ) > 1 )
+    if( strlen( p_sys->psz_fullpath ) > 1 )
     {
-        iter = p_sys->url.psz_path;
+        iter = p_sys->psz_fullpath;
         while( *iter == '\\' ) iter++; /* Handle smb://Host/////Share/ */
 
-        p_sys->psz_share = strdup( iter );
-        if ( p_sys->psz_share == NULL )
-            return false;
+        p_sys->psz_share = iter;
     }
     else
     {
@@ -429,22 +426,19 @@ static bool get_path( access_t *p_access )
         return false;
     }
 
-
     iter = strchr( p_sys->psz_share, '\\' );
     if( iter == NULL || strlen(iter + 1) == 0 )
     {
         if( iter != NULL ) /* Remove the trailing \ */
             *iter = '\0';
-        p_sys->psz_path = strdup( "" );
+        p_sys->psz_path = "";
 
         msg_Dbg( p_access, "no file path provided, will switch to browser ");
         return true;
     }
 
-    p_sys->psz_path = strdup( iter + 1); /* Skip the first \ */
+    p_sys->psz_path = iter + 1; /* Skip the first \ */
     *iter = '\0';
-    if( p_sys->psz_path == NULL )
-        return false;
 
     return true;
 }
