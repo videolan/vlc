@@ -50,6 +50,12 @@
 # define lua_strlen(L,idx)         lua_rawlen(L,idx)
 #endif
 
+#if LUA_VERSION_NUM >= 503
+# undef luaL_register
+# define luaL_register(L, n, l) luaL_setfuncs(L, (l), 0)
+#endif
+
+
 /*****************************************************************************
  * Module entry points
  *****************************************************************************/
