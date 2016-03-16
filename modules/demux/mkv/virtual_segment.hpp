@@ -39,7 +39,7 @@ public:
     virtual_chapter_c( matroska_segment_c &seg, chapter_item_c *p_chap, int64_t start, int64_t stop, std::vector<virtual_chapter_c *> & sub_chaps ):
         segment(seg), p_chapter(p_chap),
         i_mk_virtual_start_time(start), i_mk_virtual_stop_time(stop),
-        sub_chapters(sub_chaps)
+        sub_vchapters(sub_chaps)
     {}
     ~virtual_chapter_c();
 
@@ -72,7 +72,7 @@ public:
     mtime_t             i_mk_virtual_start_time;
     mtime_t             i_mk_virtual_stop_time;
     int                 i_seekpoint_num;
-    std::vector<virtual_chapter_c *> sub_chapters;
+    std::vector<virtual_chapter_c *> sub_vchapters;
 #ifdef MKV_DEBUG
     void print();
 #endif
@@ -83,7 +83,7 @@ class virtual_edition_c
 public:
     virtual_edition_c( chapter_edition_c * p_edition, matroska_segment_c & main_segment, std::vector<matroska_segment_c*> & opened_segments );
     ~virtual_edition_c();
-    std::vector<virtual_chapter_c*> chapters;
+    std::vector<virtual_chapter_c*> vchapters;
 
     virtual_chapter_c* getChapterbyTimecode( int64_t time );
     std::string GetMainName();
@@ -114,38 +114,38 @@ class virtual_segment_c
 public:
     virtual_segment_c( matroska_segment_c & segment, std::vector<matroska_segment_c*> & opened_segments );
     ~virtual_segment_c();
-    std::vector<virtual_edition_c*> editions;
+    std::vector<virtual_edition_c*> veditions;
     std::vector<virtual_edition_c*>::size_type i_current_edition;
-    virtual_chapter_c               *p_current_chapter;
-    bool                            b_current_chapter_entered;
+    virtual_chapter_c               *p_current_vchapter;
+    bool                            b_current_vchapter_entered;
     int                             i_sys_title;
 
 
     inline virtual_edition_c * CurrentEdition()
     {
-        if( i_current_edition < editions.size() )
-            return editions[i_current_edition];
+        if( i_current_edition < veditions.size() )
+            return veditions[i_current_edition];
         return NULL;
     }
 
     virtual_chapter_c * CurrentChapter() const
     {
-        return p_current_chapter;
+        return p_current_vchapter;
     }
 
     matroska_segment_c * CurrentSegment() const
     {
-        if ( !p_current_chapter )
+        if ( !p_current_vchapter )
             return NULL;
-        return &p_current_chapter->segment;
+        return &p_current_vchapter->segment;
     }
 
     inline int64_t Duration()
     {
-        return editions[i_current_edition]->i_duration / 1000;
+        return veditions[i_current_edition]->i_duration / 1000;
     }
 
-    inline std::vector<virtual_edition_c*>* Editions() { return &editions; }
+    inline std::vector<virtual_edition_c*>* Editions() { return &veditions; }
 
     virtual_chapter_c *BrowseCodecPrivate( unsigned int codec_id,
                                            bool (*match)( const chapter_codec_cmds_c &data,
@@ -158,7 +158,7 @@ public:
 
     bool UpdateCurrentToChapter( demux_t & demux );
     void Seek( demux_t & demuxer, mtime_t i_mk_date,
-               virtual_chapter_c *p_chapter, int64_t i_global_position );
+               virtual_chapter_c *p_vchapter, int64_t i_global_position );
 private:
     void ChangeSegment( matroska_segment_c & p_old, matroska_segment_c & p_new, mtime_t i_mk_start_time );
 };

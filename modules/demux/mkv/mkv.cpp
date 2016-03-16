@@ -83,7 +83,7 @@ struct demux_sys_t;
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
-static void Seek   ( demux_t *, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_chapter );
+static void Seek   ( demux_t *, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter );
 
 /*****************************************************************************
  * Open: initializes matroska demux structures
@@ -273,7 +273,7 @@ static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = reinterpret_cast<demux_t*>( p_this );
     demux_sys_t *p_sys   = p_demux->p_sys;
-    virtual_segment_c *p_vsegment = p_sys->p_current_segment;
+    virtual_segment_c *p_vsegment = p_sys->p_current_vsegment;
     if( p_vsegment )
     {
         matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
@@ -383,9 +383,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i_idx = va_arg( args, int );
             if(i_idx <  p_sys->titles.size() && p_sys->titles[i_idx]->i_seekpoint)
             {
-                p_sys->p_current_segment->i_current_edition = i_idx;
+                p_sys->p_current_vsegment->i_current_edition = i_idx;
                 p_sys->i_current_title = i_idx;
-                p_sys->p_current_segment->p_current_chapter = p_sys->p_current_segment->editions[p_sys->p_current_segment->i_current_edition]->getChapterbyTimecode(0);
+                p_sys->p_current_vsegment->p_current_vchapter = p_sys->p_current_vsegment->veditions[p_sys->p_current_vsegment->i_current_edition]->getChapterbyTimecode(0);
 
                 Seek( p_demux, static_cast<int64_t>( p_sys->titles[i_idx]->seekpoint[0]->i_time_offset ), -1, NULL);
                 p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_TITLE;
@@ -412,9 +412,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_FPS:
             pf = va_arg( args, double * );
             *pf = 0.0;
-            if( p_sys->p_current_segment && p_sys->p_current_segment->CurrentSegment() )
+            if( p_sys->p_current_vsegment && p_sys->p_current_vsegment->CurrentSegment() )
             {
-                const matroska_segment_c *p_segment = p_sys->p_current_segment->CurrentSegment();
+                const matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
                 for( size_t i = 0; i < p_segment->tracks.size(); i++ )
                 {
                     mkv_track_t *tk = p_segment->tracks[i];
@@ -438,10 +438,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 }
 
 /* Seek */
-static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_chapter )
+static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
+    virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
     int64_t            i_global_position = -1;
 
@@ -501,7 +501,7 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
             }
         }
     }
-    p_vsegment->Seek( *p_demux, i_mk_date, p_chapter, i_global_position );
+    p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter, i_global_position );
 }
 
 /* Needed by matroska_segment::Seek() and Seek */
@@ -510,7 +510,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                   bool b_discardable_picture )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_segment_c *p_segment = p_sys->p_current_segment->CurrentSegment();
+    matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
 
     if( !p_segment ) return;
 
@@ -712,13 +712,13 @@ static int Demux( demux_t *p_demux)
 
     vlc_mutex_locker( &p_sys->lock_demuxer );
 
-    virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
+    virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
 
     if( p_sys->i_pts >= p_sys->i_start_pts )
     {
         if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             return 1;
-        p_vsegment = p_sys->p_current_segment;
+        p_vsegment = p_sys->p_current_vsegment;
     }
 
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
@@ -776,7 +776,7 @@ static int Demux( demux_t *p_demux)
             delete block;
             return 1;
         }
-        p_vsegment = p_sys->p_current_segment;
+        p_vsegment = p_sys->p_current_vsegment;
     }
 
     if ( p_vsegment->CurrentEdition() &&

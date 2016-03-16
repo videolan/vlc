@@ -337,7 +337,7 @@ public:
         ,i_mk_chapter_time(0)
         ,meta(NULL)
         ,i_current_title(0)
-        ,p_current_segment(NULL)
+        ,p_current_vsegment(NULL)
         ,dvd_interpretor( *this )
         ,f_duration(-1.0)
         ,p_input(NULL)
@@ -364,8 +364,8 @@ public:
     std::vector<matroska_stream_c*>  streams;
     std::vector<attachment_c*>       stored_attachments;
     std::vector<matroska_segment_c*> opened_segments;
-    std::vector<virtual_segment_c*>  used_segments;
-    virtual_segment_c                *p_current_segment;
+    std::vector<virtual_segment_c*>  used_vsegments;
+    virtual_segment_c                *p_current_vsegment;
 
     dvd_command_interpretor_c        dvd_interpretor;
 
@@ -377,15 +377,15 @@ public:
                                         bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                         const void *p_cookie,
                                         size_t i_cookie_size,
-                                        virtual_segment_c * & p_segment_found );
-    virtual_chapter_c *FindChapter( int64_t i_find_uid, virtual_segment_c * & p_segment_found );
+                                        virtual_segment_c * & p_vsegment_found );
+    virtual_chapter_c *FindChapter( int64_t i_find_uid, virtual_segment_c * & p_vsegment_found );
 
     void PreloadFamily( const matroska_segment_c & of_segment );
     bool PreloadLinked();
     void FreeUnused();
-    bool PreparePlayback( virtual_segment_c *p_new_segment );
+    bool PreparePlayback( virtual_segment_c *p_new_vsegment );
     matroska_stream_c *AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial = false );
-    void JumpTo( virtual_segment_c & p_segment, virtual_chapter_c * p_chapter );
+    void JumpTo( virtual_segment_c & p_vsegment, virtual_chapter_c * p_vchapter );
 
     void InitUi();
     void CleanUi();
