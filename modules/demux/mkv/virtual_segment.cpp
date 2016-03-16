@@ -44,10 +44,11 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
                                                              std::vector<matroska_segment_c*> & segments,
                                                              int64_t & usertime_offset, bool b_ordered)
 {
+    std::vector<virtual_chapter_c *> sub_chapters;
     if( !p_chap )
     {
         /* Dummy chapter use the whole segment */
-        return new (std::nothrow) virtual_chapter_c( main_segment, NULL, 0, main_segment.i_duration * 1000 );
+        return new (std::nothrow) virtual_chapter_c( main_segment, NULL, 0, main_segment.i_duration * 1000, sub_chapters );
     }
 
     int64_t start = ( b_ordered )? usertime_offset : p_chap->i_start_time;
@@ -67,11 +68,6 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     if ( !p_segment->b_preloaded )
         p_segment->Preload();
 
-    virtual_chapter_c * p_vchap = new (std::nothrow) virtual_chapter_c( *p_segment, p_chap, start, stop );
-
-    if( !p_vchap )
-        return NULL;
-
     int64_t tmp = usertime_offset;
 
     for( size_t i = 0; i < p_chap->sub_chapters.size(); i++ )
@@ -79,7 +75,15 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         virtual_chapter_c * p_vsubchap = CreateVirtualChapter( p_chap->sub_chapters[i], *p_segment, segments, tmp, b_ordered );
 
         if( p_vsubchap )
-            p_vchap->sub_chapters.push_back( p_vsubchap );
+            sub_chapters.push_back( p_vsubchap );
+    }
+
+    virtual_chapter_c * p_vchap = new (std::nothrow) virtual_chapter_c( *p_segment, p_chap, start, stop, sub_chapters );
+    if( !p_vchap )
+    {
+        for( size_t i = 0 ; i < sub_chapters.size(); i++ )
+            delete sub_chapters[i];
+        return NULL;
     }
 
     if( tmp == usertime_offset )

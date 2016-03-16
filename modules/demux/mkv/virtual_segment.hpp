@@ -36,9 +36,10 @@
 class virtual_chapter_c
 {
 public:
-    virtual_chapter_c( matroska_segment_c &seg, chapter_item_c *p_chap, int64_t start, int64_t stop ):
+    virtual_chapter_c( matroska_segment_c &seg, chapter_item_c *p_chap, int64_t start, int64_t stop, std::vector<virtual_chapter_c *> & sub_chaps ):
         segment(seg), p_chapter(p_chap),
-        i_mk_virtual_start_time(start), i_mk_virtual_stop_time(stop)
+        i_mk_virtual_start_time(start), i_mk_virtual_stop_time(stop),
+        sub_chapters(sub_chaps)
     {}
     ~virtual_chapter_c();
 
