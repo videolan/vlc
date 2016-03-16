@@ -43,6 +43,9 @@
 #include <vlc_network.h>
 #include <vlc_block.h>
 #include <vlc_interrupt.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
 #include <fcntl.h>
 
 #define MTU 65535
@@ -55,6 +58,7 @@ static void Close( vlc_object_t * );
 
 #define BUFFER_TEXT N_("Receive buffer")
 #define BUFFER_LONGTEXT N_("UDP receive buffer size (bytes)" )
+#define TIMEOUT_TEXT N_("UDP Source timeout (sec)")
 
 vlc_module_begin ()
     set_shortname( N_("UDP" ) )
@@ -64,6 +68,7 @@ vlc_module_begin ()
 
     add_obsolete_integer( "server-port" ) /* since 2.0.0 */
     add_integer( "udp-buffer", 0x400000, BUFFER_TEXT, BUFFER_LONGTEXT, true )
+    add_integer( "udp-timeout", -1, TIMEOUT_TEXT, NULL, true )
 
     set_capability( "access", 0 )
     add_shortcut( "udp", "udpstream", "udp4", "udp6" )
@@ -74,10 +79,12 @@ vlc_module_end ()
 struct access_sys_t
 {
     int fd;
+    int timeout;
     size_t fifo_size;
     block_fifo_t *fifo;
     vlc_sem_t semaphore;
     vlc_thread_t thread;
+    bool timeout_reached;
 };
 
 /*****************************************************************************
@@ -181,6 +188,11 @@ static int Open( vlc_object_t *p_this )
     sys->fifo_size = var_InheritInteger( p_access, "udp-buffer");
     vlc_sem_init( &sys->semaphore, 0 );
 
+    sys->timeout = var_InheritInteger( p_access, "udp-timeout");
+    sys->timeout_reached = false;
+    if( sys->timeout > 0)
+        sys->timeout *= 1000;
+
     if( vlc_clone( &sys->thread, ThreadRead, p_access,
                    VLC_THREAD_PRIORITY_INPUT ) )
     {
@@ -254,7 +266,12 @@ static block_t *BlockUDP( access_t *p_access )
 
     vlc_sem_wait_i11e(&sys->semaphore);
     vlc_fifo_Lock(sys->fifo);
-    block = vlc_fifo_DequeueUnlocked(sys->fifo);
+
+    block = vlc_fifo_DequeueAllUnlocked(sys->fifo);
+
+    if (unlikely(sys->timeout_reached == true))
+        p_access->info.b_eof=true;
+
     vlc_fifo_Unlock(sys->fifo);
 
     return block;
@@ -283,10 +300,22 @@ static void* ThreadRead( void *data )
         block_cleanup_push(pkt);
         do
         {
-#ifndef LIBVLC_USE_PTHREAD
-            struct pollfd ufd = { .fd = sys->fd, .events = POLLIN };
-            while (poll(&ufd, 1, -1) <= 0); /* cancellation point */
-#endif
+            int poll_return=0;
+            struct pollfd ufd[1];
+            ufd[0].fd = sys->fd;
+            ufd[0].events = POLLIN;
+
+            while ((poll_return = poll(ufd, 1, sys->timeout)) < 0); /* cancellation point */
+            if (unlikely( poll_return == 0))
+            {
+                msg_Err( access, "Timeout on receiving, timeout %d seconds", sys->timeout/1000 );
+                vlc_fifo_Lock(sys->fifo);
+                sys->timeout_reached=true;
+                vlc_fifo_Unlock(sys->fifo);
+                vlc_sem_post(&sys->semaphore);
+                len=0;
+                break;
+            }
             len = recv(sys->fd, pkt->p_buffer, MTU, 0);
         }
         while (len == -1);
