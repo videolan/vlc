@@ -84,7 +84,7 @@ static int vlclua_config_set( lua_State *L )
             break;
 
         case VLC_VAR_INTEGER:
-            config_PutInt( p_this, psz_name, luaL_checkint( L, 2 ) );
+            config_PutInt( p_this, psz_name, (int64_t)luaL_checkinteger( L, 2 ) );
             break;
 
         case VLC_VAR_BOOL:

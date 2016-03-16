@@ -210,7 +210,7 @@ static int vlclua_net_listen_tcp( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     const char *psz_host = luaL_checkstring( L, 1 );
-    int i_port = luaL_checkint( L, 2 );
+    int i_port = (int)luaL_checkinteger( L, 2 );
     int *pi_fd = net_ListenTCP( p_this, psz_host, i_port );
     if( pi_fd == NULL )
         return luaL_error( L, "Cannot listen on %s:%d", psz_host, i_port );
@@ -282,7 +282,7 @@ static int vlclua_net_connect_tcp( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     const char *psz_host = luaL_checkstring( L, 1 );
-    int i_port = luaL_checkint( L, 2 );
+    int i_port = (int)luaL_checkinteger( L, 2 );
     int i_fd = net_Connect( p_this, psz_host, i_port, SOCK_STREAM, IPPROTO_TCP );
     lua_pushinteger( L, vlclua_fd_map_safe( L, i_fd ) );
     return 1;
@@ -290,18 +290,18 @@ static int vlclua_net_connect_tcp( lua_State *L )
 
 static int vlclua_net_close( lua_State *L )
 {
-    int i_fd = luaL_checkint( L, 1 );
+    int i_fd = (int)luaL_checkinteger( L, 1 );
     vlclua_fd_unmap_safe( L, i_fd );
     return 0;
 }
 
 static int vlclua_net_send( lua_State *L )
 {
-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
+    int fd = vlclua_fd_get( L, (unsigned)luaL_checkinteger( L, 1 ) );
     size_t i_len;
     const char *psz_buffer = luaL_checklstring( L, 2, &i_len );
 
-    i_len = luaL_optint( L, 3, i_len );
+    i_len = (size_t)luaL_optinteger( L, 3, i_len );
     lua_pushinteger( L,
         (fd != -1) ? send( fd, psz_buffer, i_len, MSG_NOSIGNAL ) : -1 );
     return 1;
@@ -309,8 +309,8 @@ static int vlclua_net_send( lua_State *L )
 
 static int vlclua_net_recv( lua_State *L )
 {
-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
-    size_t i_len = luaL_optint( L, 2, 1 );
+    int fd = vlclua_fd_get( L, (unsigned)luaL_checkinteger( L, 1 ) );
+    size_t i_len = (size_t)luaL_optinteger( L, 2, 1 );
     char psz_buffer[i_len];
 
     ssize_t i_ret = (fd != -1) ? recv( fd, psz_buffer, i_len, 0 ) : -1;
@@ -391,19 +391,19 @@ static int vlclua_fd_open( lua_State *L )
 #ifndef _WIN32
 static int vlclua_fd_write( lua_State *L )
 {
-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
+    int fd = vlclua_fd_get( L, (unsigned)luaL_checkinteger( L, 1 ) );
     size_t i_len;
     const char *psz_buffer = luaL_checklstring( L, 2, &i_len );
 
-    i_len = luaL_optint( L, 3, i_len );
+    i_len = (size_t)luaL_optinteger( L, 3, i_len );
     lua_pushinteger( L, (fd != -1) ? vlc_write( fd, psz_buffer, i_len ) : -1 );
     return 1;
 }
 
 static int vlclua_fd_read( lua_State *L )
 {
-    int fd = vlclua_fd_get( L, luaL_checkint( L, 1 ) );
-    size_t i_len = luaL_optint( L, 2, 1 );
+    int fd = vlclua_fd_get( L, (unsigned)luaL_checkinteger( L, 1 ) );
+    size_t i_len = (size_t)luaL_optinteger( L, 2, 1 );
     char psz_buffer[i_len];
 
     ssize_t i_ret = (fd != -1) ? read( fd, psz_buffer, i_len ) : -1;
