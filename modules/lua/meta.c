@@ -55,7 +55,7 @@ static lua_State * init( vlc_object_t *p_this, input_item_t * p_item, const char
     /* Load Lua libraries */
     luaL_openlibs( L ); /* XXX: Don't open all the libs? */
 
-    luaL_register( L, "vlc", p_reg );
+    luaL_register_namespace( L, "vlc", p_reg );
 
     luaopen_msg( L );
     luaopen_stream( L );

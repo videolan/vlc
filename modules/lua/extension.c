@@ -816,7 +816,7 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
         vlclua_extension_set( L, p_ext );
 
         luaL_openlibs( L );
-        luaL_register( L, "vlc", p_reg );
+        luaL_register_namespace( L, "vlc", p_reg );
         luaopen_msg( L );
 
         if( p_ext )

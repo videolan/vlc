@@ -141,7 +141,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
     luaL_openlibs( L ); /* FIXME: Don't open all the libs? */
 
     vlclua_set_this( L, p_demux );
-    luaL_register( L, "vlc", p_reg );
+    luaL_register_namespace( L, "vlc", p_reg );
     luaopen_msg( L );
     luaopen_strings( L );
     luaopen_stream( L );
@@ -248,7 +248,7 @@ static int Demux( demux_t *p_demux )
 
     input_item_t *p_current_input = input_GetItem( p_demux->p_input );
 
-    luaL_register( L, "vlc", p_reg_parse );
+    luaL_register_namespace( L, "vlc", p_reg_parse );
 
     lua_getglobal( L, "parse" );
 
