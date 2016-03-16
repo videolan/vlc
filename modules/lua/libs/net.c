@@ -131,7 +131,7 @@ static int vlclua_fd_get_lua( lua_State *L, int fd )
 static void vlclua_fd_unmap( lua_State *L, unsigned idx )
 {
     vlclua_dtable_t *dt = vlclua_get_dtable( L );
-    int fd = -1;
+    int fd;
 
     if( idx < 3u )
         return; /* Never close stdin/stdout/stderr. */
@@ -148,6 +148,8 @@ static void vlclua_fd_unmap( lua_State *L, unsigned idx )
 #ifndef NDEBUG
     for( unsigned i = 0; i < dt->fdc; i++ )
         assert( dt->fdv[i] != fd );
+#else
+    (void) fd;
 #endif
 }
 
