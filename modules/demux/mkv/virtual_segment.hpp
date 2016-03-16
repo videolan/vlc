@@ -45,7 +45,7 @@ public:
     static virtual_chapter_c * CreateVirtualChapter( chapter_item_c * p_chap,
                                                      matroska_segment_c & main_segment,
                                                      std::vector<matroska_segment_c*> & segments,
-                                                     int64_t * usertime_offset, bool b_ordered );
+                                                     int64_t & usertime_offset, bool b_ordered );
 
     virtual_chapter_c* getSubChapterbyTimecode( int64_t time );
     bool EnterAndLeave( virtual_chapter_c *p_item, bool b_enter = true );

@@ -42,7 +42,7 @@ matroska_segment_c * getSegmentbyUID( KaxSegmentUID * p_uid, std::vector<matrosk
 virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_chap,
                                                              matroska_segment_c & main_segment,
                                                              std::vector<matroska_segment_c*> & segments,
-                                                             int64_t * usertime_offset, bool b_ordered)
+                                                             int64_t & usertime_offset, bool b_ordered)
 {
     if( !p_chap )
     {
@@ -50,8 +50,8 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         return new (std::nothrow) virtual_chapter_c( main_segment, NULL, 0, main_segment.i_duration * 1000 );
     }
 
-    int64_t start = ( b_ordered )? *usertime_offset : p_chap->i_start_time;
-    int64_t stop = ( b_ordered )? ( *usertime_offset + p_chap->i_end_time - p_chap->i_start_time ) : p_chap->i_end_time;
+    int64_t start = ( b_ordered )? usertime_offset : p_chap->i_start_time;
+    int64_t stop = ( b_ordered )? ( usertime_offset + p_chap->i_end_time - p_chap->i_start_time ) : p_chap->i_end_time;
 
     matroska_segment_c * p_segment = &main_segment;
     if( p_chap->p_segment_uid &&
@@ -72,20 +72,20 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     if( !p_vchap )
         return NULL;
 
-    int64_t tmp = *usertime_offset;
+    int64_t tmp = usertime_offset;
 
     for( size_t i = 0; i < p_chap->sub_chapters.size(); i++ )
     {
-        virtual_chapter_c * p_vsubchap = CreateVirtualChapter( p_chap->sub_chapters[i], *p_segment, segments, &tmp, b_ordered );
+        virtual_chapter_c * p_vsubchap = CreateVirtualChapter( p_chap->sub_chapters[i], *p_segment, segments, tmp, b_ordered );
 
         if( p_vsubchap )
             p_vchap->sub_chapters.push_back( p_vsubchap );
     }
 
-    if( tmp == *usertime_offset )
-        *usertime_offset += p_chap->i_end_time - p_chap->i_start_time;
+    if( tmp == usertime_offset )
+        usertime_offset += p_chap->i_end_time - p_chap->i_start_time;
     else
-        *usertime_offset = tmp;
+        usertime_offset = tmp;
 
     msg_Dbg( &main_segment.sys.demuxer,
              "Virtual chapter %s from %" PRId64 " to %" PRId64 " - " ,
@@ -117,7 +117,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segme
         {
             virtual_chapter_c * p_vchap = virtual_chapter_c::CreateVirtualChapter( p_edition->sub_chapters[i],
                                                                                    main_segment, opened_segments,
-                                                                                   &usertime_offset, b_ordered );
+                                                                                   usertime_offset, b_ordered );
             if( p_vchap )
                 chapters.push_back( p_vchap );
         }
@@ -150,7 +150,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segme
                 /* Create virtual_chapter from the first edition if any */
                 chapter_item_c * p_chap = ( p_prev->stored_editions.size() > 0 )? ((chapter_item_c *)p_prev->stored_editions[0]) : NULL;
 
-                p_vchap = virtual_chapter_c::CreateVirtualChapter( p_chap, *p_prev, opened_segments, &tmp, b_ordered );
+                p_vchap = virtual_chapter_c::CreateVirtualChapter( p_chap, *p_prev, opened_segments, tmp, b_ordered );
 
                 if( p_vchap )
                     chapters.insert( chapters.begin(), p_vchap );
@@ -166,7 +166,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segme
 
         /* Append the main segment */
         p_vchap = virtual_chapter_c::CreateVirtualChapter( (chapter_item_c*) p_edit, main_segment,
-                                                           opened_segments, &tmp, b_ordered );
+                                                           opened_segments, tmp, b_ordered );
         if( p_vchap )
             chapters.push_back( p_vchap );
 
@@ -187,11 +187,10 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segme
                 /* Create virtual_chapter from the first edition if any */
                 chapter_item_c * p_chap = ( p_next->stored_editions.size() > 0 )?( (chapter_item_c *)p_next->stored_editions[0] ) : NULL;
 
-                 p_vchap = virtual_chapter_c::CreateVirtualChapter( p_chap, *p_next, opened_segments, &tmp, b_ordered );
+                 p_vchap = virtual_chapter_c::CreateVirtualChapter( p_chap, *p_next, opened_segments, tmp, b_ordered );
 
                 if( p_vchap )
                     chapters.push_back( p_vchap );
-
 
                 p_cur = p_next;
                 b_fake_ordered = true;
