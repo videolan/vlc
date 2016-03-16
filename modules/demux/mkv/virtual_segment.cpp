@@ -377,7 +377,8 @@ virtual_chapter_c* virtual_chapter_c::getSubChapterbyTimecode( int64_t time )
 {
     for( size_t i = 0; i < sub_vchapters.size(); i++ )
     {
-        if( time >= sub_vchapters[i]->i_mk_virtual_start_time && time < sub_vchapters[i]->i_mk_virtual_stop_time )
+        if( time >= sub_vchapters[i]->i_mk_virtual_start_time &&
+            ( sub_vchapters[i]->i_mk_virtual_stop_time < 0 || time < sub_vchapters[i]->i_mk_virtual_stop_time ) )
             return sub_vchapters[i]->getSubChapterbyTimecode( time );
     }
 
