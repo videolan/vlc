@@ -51,9 +51,6 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         return new (std::nothrow) virtual_chapter_c( main_segment, NULL, 0, main_segment.i_duration * 1000, sub_chapters );
     }
 
-    int64_t start = ( b_ordered )? usertime_offset : p_chap->i_start_time;
-    int64_t stop = ( b_ordered )? ( usertime_offset + p_chap->i_end_time - p_chap->i_start_time ) : p_chap->i_end_time;
-
     matroska_segment_c * p_segment = &main_segment;
     if( p_chap->p_segment_uid &&
        ( !( p_segment = getSegmentbyUID( (KaxSegmentUID*) p_chap->p_segment_uid,segments ) ) || !b_ordered ) )
@@ -68,6 +65,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     if ( !p_segment->b_preloaded )
         p_segment->Preload();
 
+    int64_t start = ( b_ordered )? usertime_offset : p_chap->i_start_time;
     int64_t tmp = usertime_offset;
 
     for( size_t i = 0; i < p_chap->sub_chapters.size(); i++ )
@@ -77,6 +75,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         if( p_vsubchap )
             sub_chapters.push_back( p_vsubchap );
     }
+    int64_t stop = ( b_ordered )? tmp : p_chap->i_end_time;
 
     virtual_chapter_c * p_vchap = new (std::nothrow) virtual_chapter_c( *p_segment, p_chap, start, stop, sub_chapters );
     if( !p_vchap )
@@ -87,7 +86,10 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     }
 
     if( tmp == usertime_offset )
-        usertime_offset += p_chap->i_end_time - p_chap->i_start_time;
+    {
+        if ( p_chap->i_end_time >= 0 )
+            usertime_offset += p_chap->i_end_time - p_chap->i_start_time;
+    }
     else
         usertime_offset = tmp;
 
