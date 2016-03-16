@@ -473,12 +473,12 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     return false;
 }
 
-bool virtual_chapter_c::EnterAndLeave( virtual_chapter_c *p_item, bool b_enter )
+bool virtual_chapter_c::EnterAndLeave( virtual_chapter_c *p_leaving_vchapter, bool b_enter )
 {
     if( !p_chapter )
         return false;
 
-    return p_chapter->EnterAndLeave( p_item->p_chapter, b_enter );
+    return p_chapter->EnterAndLeave( p_leaving_vchapter->p_chapter, b_enter );
 }
 
 void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,

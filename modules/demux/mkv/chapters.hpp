@@ -87,7 +87,7 @@ public:
 
     bool Enter( bool b_do_subchapters );
     bool Leave( bool b_do_subchapters );
-    bool EnterAndLeave( chapter_item_c *p_item, bool b_enter = true );
+    bool EnterAndLeave( chapter_item_c *p_leaving_chapter, bool b_enter = true );
 
   protected:
       bool EnterLeaveHelper_ (bool, bool(chapter_codec_cmds_c::*)(), bool(chapter_item_c::*)(bool));

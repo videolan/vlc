@@ -180,9 +180,9 @@ bool chapter_item_c::Leave( bool b_do_subs )
     return f_result;
 }
 
-bool chapter_item_c::EnterAndLeave( chapter_item_c *p_item, bool b_final_enter )
+bool chapter_item_c::EnterAndLeave( chapter_item_c *p_leaving_chapter, bool b_final_enter )
 {
-    chapter_item_c *p_common_parent = p_item;
+    chapter_item_c *p_common_parent = p_leaving_chapter;
 
     // leave, up to a common parent
     while ( p_common_parent != NULL && !p_common_parent->ParentOf( *this ) )
