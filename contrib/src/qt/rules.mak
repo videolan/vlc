@@ -1,7 +1,7 @@
 # qt
 
-QT_VERSION = 5.3.0
-QT_URL := http://download.qt-project.org/official_releases/qt/5.3/$(QT_VERSION)/submodules/qtbase-opensource-src-$(QT_VERSION).tar.xz
+QT_VERSION = 5.6.0
+QT_URL := https://download.qt.io/official_releases/qt/5.6/$(QT_VERSION)/submodules/qtbase-opensource-src-$(QT_VERSION).tar.xz
 
 ifdef HAVE_MACOSX
 #PKGS += qt
@@ -24,7 +24,6 @@ $(TARBALLS)/qt-$(QT_VERSION).tar.xz:
 qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(UNPACK)
 	mv qtbase-opensource-src-$(QT_VERSION) qt-$(QT_VERSION)
-	$(APPLY) $(SRC)/qt/Win32-AOT.patch
 	$(MOVE)
 
 ifdef HAVE_MACOSX
@@ -35,7 +34,7 @@ QT_PLATFORM := -xplatform win32-g++ -device-option CROSS_COMPILE=$(HOST)-
 endif
 
 .qt: qt
-	cd $< && ./configure $(QT_PLATFORM) -static -release -no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -opensource -confirm-license
+	cd $< && ./configure $(QT_PLATFORM) -static -release -no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -opensource -confirm-license -no-dbus -pkg-config -no-qml-debug
 	cd $< && $(MAKE) sub-src
 	# INSTALLING LIBRARIES
 	for lib in Widgets Gui Core; \
@@ -43,7 +42,6 @@ endif
 	done
 	# INSTALLING PLUGINS
 	install -D -- $</plugins/platforms/libqwindows.a "$(PREFIX)/lib/libqwindows.a"
-	install -D -- $</plugins/accessible/libqtaccessiblewidgets.a "$(PREFIX)/lib/libqtaccessiblewidgets.a"
 	# INSTALLING HEADERS
 	for h in corelib gui widgets; \
 		do (cd $</src/$${h} && find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt5/src/$${h}/{}" \;) ; \
