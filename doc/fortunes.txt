@@ -1034,3 +1034,12 @@ reactor leaks ionizing radiations."
 < Sean_McG> lol
  -- IRC, MpegEncContext is evil
 %
+< VLC> http://www.videolan.org/developers/libdvdcss.txt
+< VLC> i want to know if this is only for reading content, or also for ripping it
+< VLC> does VLC provide any kind of protection against unauthorized ripping?
+< VLC> or is this within the scope of the end user?
+<@j-b> end user
+< courmisch> VLC: what's the difference between ripping and reading?
+< TypX> courmisch: Jack the Reader was way less dangerous than Jack the Ripper
+ -- #videolan, badum ching
+%
