@@ -85,11 +85,8 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         return NULL;
     }
 
-    if( tmp == usertime_offset )
-    {
-        if ( p_chap->i_end_time >= 0 )
-            usertime_offset += p_chap->i_end_time - p_chap->i_start_time;
-    }
+    if ( p_chap->i_end_time >= 0 )
+        usertime_offset += p_chap->i_end_time - p_chap->i_start_time;
     else
         usertime_offset = tmp;
 
