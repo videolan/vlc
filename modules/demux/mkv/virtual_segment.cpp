@@ -274,9 +274,19 @@ virtual_segment_c::virtual_segment_c( matroska_segment_c & main_segment, std::ve
         /* Create a virtual edition from opened */
         virtual_edition_c * p_vedition = new virtual_edition_c( main_segment.stored_editions[i], main_segment, p_opened_segments );
 
+        bool b_has_translate = false;
+        for (size_t i=0; i < p_vedition->vchapters.size(); i++)
+        {
+            if ( p_vedition->vchapters[i]->segment.translations.size() != 0 )
+            {
+                b_has_translate = true;
+                break;
+            }
+        }
         /* Ordered empty edition can happen when all chapters are
          * on an other segment which couldn't be found... ignore it */
-        if(p_vedition->b_ordered && p_vedition->i_duration == 0)
+        /* OK if it has chapters and the translate codec in Matroska */
+        if(p_vedition->b_ordered && p_vedition->i_duration == 0 && !b_has_translate)
         {
 
             msg_Warn( &main_segment.sys.demuxer,
