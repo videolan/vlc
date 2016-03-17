@@ -432,7 +432,12 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     }
 
     if ( sys.i_pts != VLC_TS_INVALID )
-        p_cur_vchapter = p_cur_vedition->getChapterbyTimecode( sys.i_pts - VLC_TS_0 );
+    {
+        if ( p_current_vchapter != NULL && p_current_vchapter->ContainsTimestamp( sys.i_pts - VLC_TS_0 ))
+            p_cur_vchapter = p_current_vchapter;
+        else
+            p_cur_vchapter = p_cur_vedition->getChapterbyTimecode( sys.i_pts - VLC_TS_0 );
+    }
 
     /* we have moved to a new chapter */
     if ( p_cur_vchapter != NULL && p_current_vchapter != p_cur_vchapter )
