@@ -48,8 +48,8 @@ QT_CONFIG := -static -release -opensource -confirm-license -no-pkg-config \
 	cd $</src/plugins && $(MAKE) sub-platforms-install_subtargets
 	mv $(PREFIX)/plugins/platforms/libqwindows.a $(PREFIX)/lib/ && rm -rf $(PREFIX)/plugins
 	# Move includes to match what VLC expects
-	rm -rf $(PREFIX)/include/qt5/ && mkdir $(PREFIX)/include/qt5/ && mv -v $(PREFIX)/include/Q* $(PREFIX)/include/qt5/
-	mkdir $(PREFIX)/include/qt5/QtGui/qpa && cp $(PREFIX)/include/qt5/QtGui/$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h $(PREFIX)/include/qt5/QtGui/qpa
+	mkdir -p $(PREFIX)/include/QtGui/qpa
+	cp $(PREFIX)/include/QtGui/$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h $(PREFIX)/include/QtGui/qpa
 	# Clean Qt mess
 	rm -rf $(PREFIX)/lib/libQt5Bootstrap* $(PREFIX)/lib/*.prl $(PREFIX)/mkspecs
 ifdef HAVE_CROSS_COMPILE
