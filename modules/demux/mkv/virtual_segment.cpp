@@ -550,7 +550,7 @@ virtual_chapter_c * virtual_segment_c::FindChapter( int64_t i_find_uid )
 {
     virtual_edition_c * p_edition = veditions[i_current_edition];
 
-    for( size_t i = 0; p_edition->vchapters.size(); i++ )
+    for( size_t i = 0; i < p_edition->vchapters.size(); i++ )
     {
         virtual_chapter_c * p_chapter = p_edition->vchapters[i]->FindChapter( i_find_uid );
         if( p_chapter )
