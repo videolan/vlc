@@ -427,8 +427,9 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 
     if ( !b_current_vchapter_entered && p_current_vchapter != NULL )
     {
-        p_current_vchapter->Enter( true );
         b_current_vchapter_entered = true;
+        if (p_current_vchapter->Enter( true ))
+            return true;
     }
 
     if ( sys.i_pts != VLC_TS_INVALID )
