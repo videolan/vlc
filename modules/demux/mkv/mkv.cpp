@@ -769,16 +769,6 @@ static int Demux( demux_t *p_demux)
         p_sys->i_pcr = i_pcr;
     }
 
-    if( p_sys->i_pts >= p_sys->i_start_pts  )
-    {
-        if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
-        {
-            delete block;
-            return 1;
-        }
-        p_vsegment = p_sys->p_current_vsegment;
-    }
-
     if ( p_vsegment->CurrentEdition() &&
          p_vsegment->CurrentEdition()->b_ordered &&
          p_vsegment->CurrentChapter() == NULL )
