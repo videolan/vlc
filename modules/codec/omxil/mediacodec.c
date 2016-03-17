@@ -124,7 +124,6 @@ struct decoder_sys_t
             int i_pixel_format;
             uint8_t i_nal_length_size;
             size_t i_h264_profile;
-            ArchitectureSpecificCopyData ascd;
             /* stores the inflight picture for each output buffer or NULL */
             picture_sys_t** pp_inflight_pictures;
             unsigned int i_inflight_pictures;
@@ -738,8 +737,6 @@ static void CleanDecoder(decoder_t *p_dec)
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        ArchitectureSpecificCopyHooksDestroy(p_sys->u.video.i_pixel_format,
-                                             &p_sys->u.video.ascd);
         if (p_sys->u.video.timestamp_fifo)
             timestamp_FifoRelease(p_sys->u.video.timestamp_fifo);
         if (p_sys->u.video.p_awh)
@@ -894,8 +891,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
                               NULL, NULL, &chroma_div);
             CopyOmxPicture(p_sys->u.video.i_pixel_format, p_pic,
                            p_sys->u.video.i_slice_height, p_sys->u.video.i_stride,
-                           (uint8_t *)p_out->u.buf.p_ptr, chroma_div,
-                           &p_sys->u.video.ascd);
+                           (uint8_t *)p_out->u.buf.p_ptr, chroma_div, NULL);
 
             if (p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false))
             {
@@ -909,8 +905,6 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
     } else {
         assert(p_out->type == MC_OUT_TYPE_CONF);
         p_sys->u.video.i_pixel_format = p_out->u.conf.video.pixel_format;
-        ArchitectureSpecificCopyHooksDestroy(p_sys->u.video.i_pixel_format,
-                                             &p_sys->u.video.ascd);
 
         const char *name = "unknown";
         if (p_sys->api->b_direct_rendering)
@@ -947,9 +941,6 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
         if (p_sys->u.video.i_slice_height <= 0)
             p_sys->u.video.i_slice_height = p_out->u.conf.video.height;
 
-        ArchitectureSpecificCopyHooks(p_dec, p_out->u.conf.video.pixel_format,
-                                      p_out->u.conf.video.slice_height,
-                                      p_sys->u.video.i_stride, &p_sys->u.video.ascd);
         if (p_sys->u.video.i_pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
             p_sys->u.video.i_slice_height -= p_out->u.conf.video.crop_top/2;
         if ((p_sys->i_quirks & OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING))

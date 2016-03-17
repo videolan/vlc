@@ -218,7 +218,7 @@ void CopyOmxPicture( int i_color_format, picture_t *p_pic,
     }
 #ifdef CAN_COMPILE_SSE2
     if( i_color_format == OMX_COLOR_FormatYUV420SemiPlanar
-        && vlc_CPU_SSE2() && p_architecture_specific->data )
+        && vlc_CPU_SSE2() && p_architecture_specific && p_architecture_specific->data )
     {
         copy_cache_t *p_surface_cache = (copy_cache_t*)p_architecture_specific->data;
         uint8_t *ppi_src_pointers[2] = { p_src, p_src + i_src_stride * i_slice_height };
