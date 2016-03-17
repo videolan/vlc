@@ -525,7 +525,11 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
         }
 
         if( &p_current_vchapter->segment != &p_vchapter->segment )
-            ChangeSegment( p_current_vchapter->segment, p_vchapter->segment, i_mk_date );
+        {
+            ChangeSegment( p_current_vchapter->segment, p_vchapter->segment );
+            p_current_vchapter->segment.UnSelect();
+            p_vchapter->segment.Select( i_mk_date );
+        }
         p_current_vchapter = p_vchapter;
         p_vchapter->segment.Seek( i_mk_date, i_mk_time_offset, i_global_position );
     }
@@ -659,7 +663,7 @@ void virtual_chapter_c::print()
 }
 #endif
 
-void virtual_segment_c::ChangeSegment( matroska_segment_c & old, matroska_segment_c & next, mtime_t i_mk_start_time )
+void virtual_segment_c::ChangeSegment( matroska_segment_c & old, matroska_segment_c & next )
 {
     size_t i, j;
     char *sub_lang = NULL, *aud_lang = NULL;
@@ -728,6 +732,4 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c & old, matroska_segmen
             p_tk->b_forced = true;
         }
     }
-    next.Select( i_mk_start_time );
-    old.UnSelect();
 }
