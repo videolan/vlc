@@ -801,12 +801,6 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_m
 
 void demux_sys_t::JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter )
 {
-    // if the segment is not part of the current segment, select the new one
-    if ( &vsegment != p_current_vsegment )
-    {
-        PreparePlayback( vsegment, vchapter.i_mk_virtual_start_time );
-    }
-
     if ( !vchapter.p_chapter || !vchapter.p_chapter->Enter( true ) )
     {
         // jump to the location in the found segment
