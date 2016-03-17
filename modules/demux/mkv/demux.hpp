@@ -385,7 +385,7 @@ public:
     void FreeUnused();
     bool PreparePlayback( virtual_segment_c *p_new_vsegment );
     matroska_stream_c *AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial = false );
-    void JumpTo( virtual_segment_c & p_vsegment, virtual_chapter_c * p_vchapter );
+    void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 
     void InitUi();
     void CleanUi();

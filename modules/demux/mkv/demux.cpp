@@ -799,7 +799,7 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_vsegment )
     return true;
 }
 
-void demux_sys_t::JumpTo( virtual_segment_c & vsegment, virtual_chapter_c * p_vchapter )
+void demux_sys_t::JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter )
 {
     // if the segment is not part of the current segment, select the new one
     if ( &vsegment != p_current_vsegment )
@@ -807,15 +807,11 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, virtual_chapter_c * p_vc
         PreparePlayback( &vsegment );
     }
 
-    if ( p_vchapter )
+    if ( !vchapter.p_chapter || !vchapter.p_chapter->Enter( true ) )
     {
-        if ( !p_vchapter->p_chapter || !p_vchapter->p_chapter->Enter( true ) )
-        {
-            // jump to the location in the found segment
-            vsegment.Seek( demuxer, p_vchapter->i_mk_virtual_start_time, p_vchapter, -1 );
-        }
+        // jump to the location in the found segment
+        vsegment.Seek( demuxer, vchapter.i_mk_virtual_start_time, &vchapter, -1 );
     }
-
 }
 
 matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const

@@ -308,9 +308,9 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 
             // find in the ChapProcessPrivate matching this Title level
             p_vchapter = sys.BrowseCodecPrivate( 1, MatchTitleNumber, &i_title, sizeof(i_title), p_vsegment );
-            if ( p_vsegment != NULL )
+            if ( p_vsegment != NULL && p_vchapter != NULL )
             {
-                sys.JumpTo( *p_vsegment, p_vchapter );
+                sys.JumpTo( *p_vsegment, *p_vchapter );
                 f_result = true;
             }
 
@@ -351,9 +351,9 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         break;
                     }
                     p_vchapter = sys.BrowseCodecPrivate( 1, MatchPgcType, &p_type, 1, p_vsegment );
-                    if ( p_vsegment != NULL )
+                    if ( p_vsegment != NULL && p_vchapter != NULL )
                     {
-                        sys.JumpTo( *p_vsegment, p_vchapter );
+                        sys.JumpTo( *p_vsegment, *p_vchapter );
                         f_result = true;
                     }
                 break;
@@ -410,7 +410,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         p_vchapter = p_vsegment->BrowseCodecPrivate( 1, MatchPgcType, &p_type, 1 );
                         if ( p_vchapter != NULL )
                         {
-                            sys.JumpTo( *p_vsegment, p_vchapter );
+                            sys.JumpTo( *p_vsegment, *p_vchapter );
                             f_result = true;
                         }
                     }
@@ -454,7 +454,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                             p_vchapter = p_vsegment->BrowseCodecPrivate( 1, MatchPgcType, &p_type, 1 );
                             if ( p_vchapter != NULL )
                             {
-                                sys.JumpTo( *p_vsegment, p_vchapter );
+                                sys.JumpTo( *p_vsegment, *p_vchapter );
                                 f_result = true;
                             }
                         }
@@ -496,7 +496,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                             p_vchapter = p_vchapter->BrowseCodecPrivate( 1, MatchChapterNumber, &i_ptt, sizeof(i_ptt) );
                             if ( p_vchapter != NULL )
                             {
-                                sys.JumpTo( *p_vsegment, p_vchapter );
+                                sys.JumpTo( *p_vsegment, *p_vchapter );
                                 f_result = true;
                             }
                         }
