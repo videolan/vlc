@@ -771,15 +771,15 @@ void demux_sys_t::FreeUnused()
     }
 }
 
-bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_vsegment, mtime_t i_mk_date )
+bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_mk_date )
 {
-    if ( p_new_vsegment != NULL && p_new_vsegment != p_current_vsegment )
+    if ( p_current_vsegment != &new_vsegment )
     {
         if ( p_current_vsegment->CurrentSegment() != NULL )
             p_current_vsegment->CurrentSegment()->UnSelect();
 
-        p_current_vsegment = p_new_vsegment;
-        i_current_title = p_new_vsegment->i_sys_title;
+        p_current_vsegment = &new_vsegment;
+        i_current_title = p_current_vsegment->i_sys_title;
     }
     if( !p_current_vsegment->CurrentSegment() )
         return false;
@@ -804,7 +804,7 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vcha
     // if the segment is not part of the current segment, select the new one
     if ( &vsegment != p_current_vsegment )
     {
-        PreparePlayback( &vsegment, vchapter.i_mk_virtual_start_time );
+        PreparePlayback( vsegment, vchapter.i_mk_virtual_start_time );
     }
 
     if ( !vchapter.p_chapter || !vchapter.p_chapter->Enter( true ) )

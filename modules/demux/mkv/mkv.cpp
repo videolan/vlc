@@ -249,7 +249,7 @@ static int Open( vlc_object_t * p_this )
         msg_Warn( p_demux, "This file references other files, you may want to enable the preload of local directory");
 
     if ( !p_sys->PreloadLinked() ||
-         !p_sys->PreparePlayback( NULL ) )
+         !p_sys->PreparePlayback( *p_sys->p_current_vsegment, 0 ) )
     {
         msg_Err( p_demux, "cannot use the segment" );
         goto error;
