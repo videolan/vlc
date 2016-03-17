@@ -794,7 +794,7 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_m
 
     /* Seek to the beginning */
     p_current_vsegment->Seek(p_current_vsegment->CurrentSegment()->sys.demuxer,
-                            i_mk_date, NULL, -1);
+                             i_mk_date, p_current_vsegment->p_current_vchapter, -1);
 
     return true;
 }
