@@ -654,7 +654,10 @@ bool demux_sys_t::PreloadLinked()
     size_t i, j, ij = 0;
     virtual_segment_c *p_vseg;
 
-    p_current_vsegment = opened_segments.size() ? new (std::nothrow) virtual_segment_c( *(opened_segments[0]), opened_segments ) : NULL;
+    if ( unlikely(opened_segments.size() == 0) )
+        return false;
+
+    p_current_vsegment = new (std::nothrow) virtual_segment_c( *(opened_segments[0]), opened_segments );
     if ( !p_current_vsegment )
         return false;
 
@@ -772,7 +775,7 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_vsegment )
 {
     if ( p_new_vsegment != NULL && p_new_vsegment != p_current_vsegment )
     {
-        if ( p_current_vsegment != NULL && p_current_vsegment->CurrentSegment() != NULL )
+        if ( p_current_vsegment->CurrentSegment() != NULL )
             p_current_vsegment->CurrentSegment()->UnSelect();
 
         p_current_vsegment = p_new_vsegment;
