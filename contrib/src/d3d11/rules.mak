@@ -50,7 +50,7 @@ $(DST_DXGIDEBUG_H): $(TARBALLS)/dxgidebug.idl
 
 $(DST_DXGI12_H): dxgi12
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $</dxgi1_2.idl
 
 $(DST_DXGI13_H): $(SRC)/d3d11/dxgi1_3.idl $(DST_DXGI12_H)
 	mkdir -p -- "$(PREFIX)/include/"
