@@ -32,28 +32,32 @@ $(TARBALLS)/dxgi1_2.idl:
 
 .sum-d3d11: $(TARBALLS)/d3d11.idl $(TARBALLS)/dxgidebug.idl $(TARBALLS)/dxgi1_2.idl
 
-.sum-dxgi12: $(TARBALLS)/dxgi1_2.idl
-	(cd $(TARBALLS) && patch -fp1) < $(SRC)/d3d11/dxgi12.patch
+d3d11: .sum-d3d11
+	mkdir -p $@
+	cp $(TARBALLS)/d3d11.idl $@ && cd $@ && patch -fp1 < ../$(SRC)/d3d11/processor_format.patch
 
-$(DST_D3D11_H): $(TARBALLS)/d3d11.idl .sum-d3d11
-	(cd $(TARBALLS) && patch -fp1) < $(SRC)/d3d11/processor_format.patch
+dxgi12: .sum-d3d11
+	mkdir -p $@
+	cp $(TARBALLS)/dxgi1_2.idl $@ && cd $@ && patch -fp1 < ../$(SRC)/d3d11/dxgi12.patch
+
+$(DST_D3D11_H): d3d11
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $</d3d11.idl
 
 $(DST_DXGIDEBUG_H): $(TARBALLS)/dxgidebug.idl
 	mkdir -p -- "$(PREFIX)/include/"
 	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
 
-$(DST_DXGI12_H): $(TARBALLS)/dxgi1_2.idl .sum-dxgi12
+$(DST_DXGI12_H): dxgi12
 	mkdir -p -- "$(PREFIX)/include/"
 	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
 
 $(DST_DXGI13_H): $(SRC)/d3d11/dxgi1_3.idl $(DST_DXGI12_H)
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -I$(TARBALLS) -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(IDL_INC_PATH) -h -o $@ $<
 
 .dxgi13: $(DST_DXGI13_H)
 	touch $@
 
-.d3d11: $(DST_D3D11_H) $(DST_DXGIDEBUG_H)
+.d3d11: $(DST_D3D11_H) $(DST_DXGIDEBUG_H) $(DST_DXGI12_H) dxgi12
 	touch $@
