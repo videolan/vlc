@@ -310,8 +310,14 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             p_vchapter = sys.BrowseCodecPrivate( 1, MatchTitleNumber, &i_title, sizeof(i_title), p_vsegment );
             if ( p_vsegment != NULL && p_vchapter != NULL )
             {
-                sys.JumpTo( *p_vsegment, *p_vchapter );
-                f_result = true;
+                /* enter via the First Cell */
+                uint8 i_cell = 1;
+                p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cell, sizeof(i_cell) );
+                if ( p_vchapter != NULL )
+                {
+                    sys.JumpTo( *p_vsegment, *p_vchapter );
+                    f_result = true;
+                }
             }
 
             break;
@@ -353,8 +359,14 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                     p_vchapter = sys.BrowseCodecPrivate( 1, MatchPgcType, &p_type, 1, p_vsegment );
                     if ( p_vsegment != NULL && p_vchapter != NULL )
                     {
-                        sys.JumpTo( *p_vsegment, *p_vchapter );
-                        f_result = true;
+                        /* enter via the first Cell */
+                        uint8 i_cell = 1;
+                        p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cell, sizeof(i_cell) );
+                        if ( p_vchapter != NULL )
+                        {
+                            sys.JumpTo( *p_vsegment, *p_vchapter );
+                            f_result = true;
+                        }
                     }
                 break;
                 case 1:
