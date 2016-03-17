@@ -661,6 +661,11 @@ bool demux_sys_t::PreloadLinked()
     if ( !p_current_vsegment )
         return false;
 
+    /* Set current chapter */
+    p_current_vsegment->p_current_vchapter = p_current_vsegment->veditions[p_current_vsegment->i_current_edition]->getChapterbyTimecode(0);
+    msg_Dbg( &demuxer, "NEW START CHAPTER uid=%" PRId64, p_current_vsegment->p_current_vchapter && p_current_vsegment->p_current_vchapter->p_chapter ?
+                 p_current_vsegment->p_current_vchapter->p_chapter->i_uid : 0 );
+
     used_vsegments.push_back( p_current_vsegment );
 
     for ( i=1; i< opened_segments.size(); i++ )

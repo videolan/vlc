@@ -320,9 +320,6 @@ virtual_segment_c::virtual_segment_c( matroska_segment_c & main_segment, std::ve
             break;
         }
     }
-    /* Set current chapter */
-    p_current_vchapter = veditions[i_current_edition]->getChapterbyTimecode(0);
-
 }
 
 virtual_segment_c::~virtual_segment_c()
