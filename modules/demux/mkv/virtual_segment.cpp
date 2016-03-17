@@ -462,8 +462,8 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                         Seek( demux, p_cur_vchapter->i_mk_virtual_start_time, p_cur_vchapter, -1 );
                         return true;
                     }
+                    sys.i_start_pts = p_cur_vchapter->i_mk_virtual_start_time + VLC_TS_0;
                 }
-                sys.i_start_pts = p_cur_vchapter->i_mk_virtual_start_time + VLC_TS_0;
             }
 
             p_current_vchapter = p_cur_vchapter;
