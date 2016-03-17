@@ -481,8 +481,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
             /* out of the scope of the data described by chapters, leave the edition */
             if ( p_cur_vedition->b_ordered && p_current_vchapter != NULL )
             {
-                /* TODO */
-                if ( !p_cur_vedition->p_edition->EnterAndLeave( p_current_vchapter->p_chapter, false ) )
+                if ( !p_current_vchapter->Leave( ) )
                 {
                     p_current_vchapter = NULL;
                     b_current_vchapter_entered = false;
@@ -492,6 +491,14 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
             }
         }
     return false;
+}
+
+bool virtual_chapter_c::Leave( )
+{
+    if( !p_chapter )
+        return false;
+
+    return p_chapter->Leave( true );
 }
 
 bool virtual_chapter_c::EnterAndLeave( virtual_chapter_c *p_leaving_vchapter, bool b_enter )
