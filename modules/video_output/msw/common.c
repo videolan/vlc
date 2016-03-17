@@ -268,8 +268,8 @@ void UpdateRects(vout_display_t *vd,
     /* src image dimensions */
     rect_src.left = 0;
     rect_src.top = 0;
-    rect_src.right = vd->fmt.i_visible_width;
-    rect_src.bottom = vd->fmt.i_visible_height;
+    rect_src.right = vd->fmt.i_width;
+    rect_src.bottom = vd->fmt.i_height;
 
     /* Clip the source image */
     rect_src_clipped.left = source->i_x_offset +
