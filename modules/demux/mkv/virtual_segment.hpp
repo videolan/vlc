@@ -67,6 +67,8 @@ public:
         return ( itemA->i_mk_virtual_start_time < itemB->i_mk_virtual_start_time );
     }
 
+    bool ContainsTimestamp( mtime_t i_pts );
+
     matroska_segment_c  &segment;
     chapter_item_c      *p_chapter;
     mtime_t             i_mk_virtual_start_time;

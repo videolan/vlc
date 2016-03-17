@@ -382,12 +382,18 @@ virtual_chapter_c * virtual_chapter_c::BrowseCodecPrivate( unsigned int codec_id
     return NULL;
 }
 
+bool virtual_chapter_c::ContainsTimestamp( int64_t time )
+{
+    /*with the current implementation only the last chapter can have a negative virtual_stop_time*/
+    return ( time >= i_mk_virtual_start_time &&
+        ( i_mk_virtual_stop_time < 0 || time < i_mk_virtual_stop_time ) );
+}
+
 virtual_chapter_c* virtual_chapter_c::getSubChapterbyTimecode( int64_t time )
 {
     for( size_t i = 0; i < sub_vchapters.size(); i++ )
     {
-        if( time >= sub_vchapters[i]->i_mk_virtual_start_time &&
-            ( sub_vchapters[i]->i_mk_virtual_stop_time < 0 || time < sub_vchapters[i]->i_mk_virtual_stop_time ) )
+        if( sub_vchapters[i]->ContainsTimestamp( time ) )
             return sub_vchapters[i]->getSubChapterbyTimecode( time );
     }
 
@@ -398,9 +404,7 @@ virtual_chapter_c* virtual_edition_c::getChapterbyTimecode( int64_t time )
 {
     for( size_t i = 0; i < vchapters.size(); i++ )
     {
-        if( time >= vchapters[i]->i_mk_virtual_start_time &&
-            ( vchapters[i]->i_mk_virtual_stop_time < 0 || time < vchapters[i]->i_mk_virtual_stop_time ) )
-            /*with the current implementation only the last chapter can have a negative virtual_stop_time*/
+        if( vchapters[i]->ContainsTimestamp( time ) )
             return vchapters[i]->getSubChapterbyTimecode( time );
     }
 
