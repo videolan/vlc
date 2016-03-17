@@ -383,8 +383,7 @@ virtual_chapter_c * virtual_chapter_c::BrowseCodecPrivate( unsigned int codec_id
 bool virtual_chapter_c::ContainsTimestamp( int64_t time )
 {
     /*with the current implementation only the last chapter can have a negative virtual_stop_time*/
-    return ( time >= i_mk_virtual_start_time &&
-        ( i_mk_virtual_stop_time < 0 || time < i_mk_virtual_stop_time ) );
+    return ( time >= i_mk_virtual_start_time && time < i_mk_virtual_stop_time );
 }
 
 virtual_chapter_c* virtual_chapter_c::getSubChapterbyTimecode( int64_t time )
