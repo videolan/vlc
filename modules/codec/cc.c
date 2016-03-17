@@ -466,7 +466,8 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t **pp_block )
     /* TODO do the real decoding here */
     while( p_block->i_buffer >= 3 && !(i_status & EIA608_STATUS_DISPLAY) )
     {
-        if( p_block->p_buffer[0] == p_sys->i_field )
+        /* Mask off the specific i_field bit, else some sequences can be lost. */
+        if ( (p_block->p_buffer[0] & 0x01) == p_sys->i_field )
             i_status = Eia608Parse( &p_sys->eia608, p_sys->i_channel, &p_block->p_buffer[1] );
 
         p_block->i_buffer -= 3;
