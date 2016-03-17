@@ -383,7 +383,7 @@ public:
     void PreloadFamily( const matroska_segment_c & of_segment );
     bool PreloadLinked();
     void FreeUnused();
-    bool PreparePlayback( virtual_segment_c *p_new_vsegment );
+    bool PreparePlayback( virtual_segment_c *p_new_vsegment, mtime_t i_mk_date = 0 );
     matroska_stream_c *AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial = false );
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 
