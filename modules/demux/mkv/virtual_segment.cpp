@@ -524,14 +524,22 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
             demuxer.info.i_seekpoint = p_vchapter->i_seekpoint_num - 1;
         }
 
-        if( &p_current_vchapter->segment != &p_vchapter->segment )
+        if( p_current_vchapter == NULL || &p_current_vchapter->segment != &p_vchapter->segment )
         {
-            KeepTrackSelection( p_current_vchapter->segment, p_vchapter->segment );
-            p_current_vchapter->segment.UnSelect();
-            p_vchapter->segment.Select( i_mk_date );
+            if ( p_current_vchapter )
+            {
+                KeepTrackSelection( p_current_vchapter->segment, p_vchapter->segment );
+                p_current_vchapter->segment.UnSelect();
+            }
+            msg_Dbg( &demuxer, "SWITCH CHAPTER uid=%" PRId64, p_vchapter->p_chapter ? p_vchapter->p_chapter->i_uid : 0 );
+            p_current_vchapter = p_vchapter;
+            p_sys->PreparePlayback( *this, i_mk_date );
         }
-        p_current_vchapter = p_vchapter;
-        p_vchapter->segment.Seek( i_mk_date, i_mk_time_offset, i_global_position );
+        else
+        {
+            p_current_vchapter = p_vchapter;
+            p_current_vchapter->segment.Seek( i_mk_date, i_mk_time_offset, i_global_position );
+        }
     }
 }
 
