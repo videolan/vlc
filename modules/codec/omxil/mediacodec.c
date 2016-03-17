@@ -120,7 +120,8 @@ struct decoder_sys_t
         struct
         {
             AWindowHandler *p_awh;
-            int i_pixel_format, i_stride, i_slice_height, i_width, i_height;
+            unsigned int i_stride, i_slice_height, i_width, i_height;
+            int i_pixel_format;
             uint8_t i_nal_length_size;
             size_t i_h264_profile;
             ArchitectureSpecificCopyData ascd;

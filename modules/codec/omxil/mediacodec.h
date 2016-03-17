@@ -53,16 +53,16 @@ struct mc_api_out
         {
             int i_index;
             mtime_t i_ts;
-            const void *p_ptr;
-            int i_size;
+            const uint8_t *p_ptr;
+            size_t i_size;
         } buf;
         union
         {
             struct
             {
-                int width, height;
-                int stride;
-                int slice_height;
+                unsigned int width, height;
+                unsigned int stride;
+                unsigned int slice_height;
                 int pixel_format;
                 int crop_left;
                 int crop_top;
