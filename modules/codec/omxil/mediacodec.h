@@ -30,8 +30,6 @@ typedef struct mc_api_out mc_api_out;
 
 typedef int (*pf_MediaCodecApi_init)(mc_api*);
 
-char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         size_t h264_profile);
 int MediaCodecJni_Init(mc_api*);
 int MediaCodecNdk_Init(mc_api*);
 
@@ -39,6 +37,13 @@ int MediaCodecNdk_Init(mc_api*);
 #define MC_API_INFO_TRYAGAIN (-11)
 #define MC_API_INFO_OUTPUT_FORMAT_CHANGED (-12)
 #define MC_API_INFO_OUTPUT_BUFFERS_CHANGED (-13)
+
+/* in sync with OMXCODEC QUIRKS */
+#define MC_API_NO_QUIRKS 0
+#define MC_API_QUIRKS_NEED_CSD 0x1
+#define MC_API_VIDEO_QUIRKS_NEED_SIZE 0x2
+#define MC_API_VIDEO_QUIRKS_IGNORE_PADDING 0x4
+#define MC_API_AUDIO_QUIRKS_NEED_CHANNELS 0x8
 
 struct mc_api_out
 {
@@ -98,19 +103,24 @@ union mc_api_args
 
 struct mc_api
 {
-    vlc_object_t *p_obj;
-
     mc_api_sys *p_sys;
 
-    char *psz_name;
-    const char *psz_mime;
+    /* Set before init */
+    vlc_object_t *  p_obj;
+    const char *    psz_mime;
+    int             i_cat;
+    vlc_fourcc_t    i_codec;
 
-    bool b_started;
-    bool b_video;
-    bool b_direct_rendering;
+    /* Set after configure */
+    int  i_quirks;
+    char *psz_name;
     bool b_support_interlaced;
 
+    bool b_started;
+    bool b_direct_rendering;
+
     void (*clean)(mc_api *);
+    int (*configure)(mc_api *, size_t i_h264_profile);
     int (*start)(mc_api *, union mc_api_args *p_args);
     int (*stop)(mc_api *);
     int (*flush)(mc_api *);

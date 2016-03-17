@@ -38,6 +38,9 @@
 
 #include "mediacodec.h"
 
+char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
+                         size_t h264_profile);
+
 #define THREAD_NAME "mediacodec_ndk"
 
 /* Not in NdkMedia API but we need it since we send config data via input
@@ -303,6 +306,8 @@ static int Start(mc_api *api, union mc_api_args *p_args)
     int i_ret = MC_API_ERROR;
     ANativeWindow *p_anw = NULL;
 
+    assert(api->psz_mime && api->psz_name);
+
     p_sys->p_codec = syms.AMediaCodec.createCodecByName(api->psz_name);
     if (!p_sys->p_codec)
     {
@@ -322,7 +327,7 @@ static int Start(mc_api *api, union mc_api_args *p_args)
     syms.AMediaFormat.setString(p_sys->p_format, "mime", api->psz_mime);
     /* No limits for input size */
     syms.AMediaFormat.setInt32(p_sys->p_format, "max-input-size", 0);
-    if (api->b_video)
+    if (api->i_cat == VIDEO_ES)
     {
         syms.AMediaFormat.setInt32(p_sys->p_format, "width", p_args->video.i_width);
         syms.AMediaFormat.setInt32(p_sys->p_format, "height", p_args->video.i_height);
@@ -508,7 +513,7 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
 
         p_out->type = MC_OUT_TYPE_CONF;
         p_out->b_eos = false;
-        if (api->b_video)
+        if (api->i_cat == VIDEO_ES)
         {
             p_out->u.conf.video.width         = GetFormatInteger(format, "width");
             p_out->u.conf.video.height        = GetFormatInteger(format, "height");
@@ -552,7 +557,23 @@ static int ReleaseOutput(mc_api *api, int i_index, bool b_render)
  *****************************************************************************/
 static void Clean(mc_api *api)
 {
+    free(api->psz_name);
     free(api->p_sys);
+}
+
+/*****************************************************************************
+ * Configure
+ *****************************************************************************/
+static int Configure(mc_api * api, size_t i_h264_profile)
+{
+    free(api->psz_name);
+    api->psz_name = MediaCodec_GetName(api->p_obj, api->psz_mime,
+                                       i_h264_profile);
+    if (!api->psz_name)
+        return MC_API_ERROR;
+    api->i_quirks = OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,
+                                       strlen(api->psz_name));
+    return 0;
 }
 
 /*****************************************************************************
@@ -568,6 +589,7 @@ int MediaCodecNdk_Init(mc_api *api)
         return MC_API_ERROR;
 
     api->clean = Clean;
+    api->configure = Configure;
     api->start = Start;
     api->stop = Stop;
     api->flush = Flush;

@@ -27,7 +27,6 @@
 # include "config.h"
 #endif
 
-#include <jni.h>
 #include <stdint.h>
 #include <assert.h>
 
@@ -36,7 +35,6 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_block_helper.h>
-#include <vlc_cpu.h>
 #include <vlc_memory.h>
 #include <vlc_timestamp_helper.h>
 #include <vlc_threads.h>
@@ -430,7 +428,7 @@ static int StartMediaCodec(decoder_t *p_dec)
                 args.video.i_angle = 0;
         }
 
-        /* Check again the codec name if h264 profile changed */
+        /* Configure again if h264 profile changed */
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
          && !p_sys->u.video.i_h264_profile)
         {
@@ -438,11 +436,8 @@ static int StartMediaCodec(decoder_t *p_dec)
                                    &p_sys->u.video.i_h264_profile, NULL, NULL);
             if (p_sys->u.video.i_h264_profile)
             {
-                free(p_sys->api->psz_name);
-                p_sys->api->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec),
-                                                          p_sys->api->psz_mime,
-                                                          p_sys->u.video.i_h264_profile);
-                if (!p_sys->api->psz_name)
+                if (p_sys->api->configure(p_sys->api,
+                                          p_sys->u.video.i_h264_profile) != 0 )
                     return VLC_EGENERIC;
             }
         }
@@ -509,6 +504,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
     mc_api *api;
+    size_t i_h264_profile = 0;
     const char *mime = NULL;
     bool b_late_opening = false;
 
@@ -573,13 +569,23 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         return VLC_EGENERIC;
     }
 
-    api = calloc(1, sizeof(mc_api));
-    if (!api)
+    if ((api = calloc(1, sizeof(mc_api))) == NULL)
         return VLC_ENOMEM;
     api->p_obj = p_this;
-    api->b_video = p_dec->fmt_in.i_cat == VIDEO_ES;
-    if (pf_init(api) != VLC_SUCCESS)
+    api->i_codec = p_dec->fmt_in.i_codec;
+    api->i_cat = p_dec->fmt_in.i_cat;
+    api->psz_mime = mime;
+
+    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+        h264_get_profile_level(&p_dec->fmt_in, &i_h264_profile, NULL, NULL);
+    if (pf_init(api) != 0)
     {
+        free(api);
+        return VLC_EGENERIC;
+    }
+    if (api->configure(api, i_h264_profile) != 0)
+    {
+        api->clean(api);
         free(api);
         return VLC_EGENERIC;
     }
@@ -601,7 +607,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
     p_dec->fmt_out.video = p_dec->fmt_in.video;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
-    p_sys->api->psz_mime = mime;
 
     vlc_mutex_init(&p_sys->lock);
     vlc_cond_init(&p_sys->cond);
@@ -614,29 +619,16 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         p_sys->pf_process_output = Video_ProcessOutput;
         p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
         p_sys->u.video.i_height = p_dec->fmt_in.video.i_height;
+        p_sys->u.video.i_h264_profile = i_h264_profile;
 
         p_sys->u.video.timestamp_fifo = timestamp_FifoNew(32);
         if (!p_sys->u.video.timestamp_fifo)
             goto bailout;
+
         TAB_INIT( p_sys->u.video.i_inflight_pictures,
                   p_sys->u.video.pp_inflight_pictures );
 
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-            h264_get_profile_level(&p_dec->fmt_in,
-                                   &p_sys->u.video.i_h264_profile, NULL, NULL);
-
-        p_sys->api->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec),
-                                                  p_sys->api->psz_mime,
-                                                  p_sys->u.video.i_h264_profile);
-        if (!p_sys->api->psz_name)
-            goto bailout;
-
-        p_sys->i_quirks = OMXCodec_GetQuirks(VIDEO_ES,
-                                             p_dec->fmt_in.i_codec,
-                                             p_sys->api->psz_name,
-                                             strlen(p_sys->api->psz_name));
-
-        if ((p_sys->i_quirks & OMXCODEC_VIDEO_QUIRKS_NEED_SIZE)
+        if ((p_sys->api->i_quirks & MC_API_VIDEO_QUIRKS_NEED_SIZE)
          && (!p_sys->u.video.i_width || !p_sys->u.video.i_height))
         {
             msg_Warn(p_dec, "waiting for a valid video size for codec %4.4s",
@@ -651,23 +643,14 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         p_sys->pf_process_output = Audio_ProcessOutput;
         p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
 
-        p_sys->api->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec),
-                                                  p_sys->api->psz_mime, 0);
-        if (!p_sys->api->psz_name)
-            goto bailout;
-
-        p_sys->i_quirks = OMXCodec_GetQuirks(AUDIO_ES,
-                                             p_dec->fmt_in.i_codec,
-                                             p_sys->api->psz_name,
-                                             strlen(p_sys->api->psz_name));
-        if ((p_sys->i_quirks & OMXCODEC_AUDIO_QUIRKS_NEED_CHANNELS)
+        if ((p_sys->api->i_quirks & MC_API_AUDIO_QUIRKS_NEED_CHANNELS)
          && !p_sys->u.audio.i_channels)
         {
             msg_Warn(p_dec, "waiting for valid channel count");
             b_late_opening = true;
         }
     }
-    if ((p_sys->i_quirks & OMXCODEC_QUIRKS_NEED_CSD)
+    if ((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD)
      && !p_dec->fmt_in.i_extra)
     {
         msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
@@ -742,7 +725,6 @@ static void CleanDecoder(decoder_t *p_dec)
         if (p_sys->u.video.p_awh)
             AWindowHandler_destroy(p_sys->u.video.p_awh);
     }
-    free(p_sys->api->psz_name);
     free(p_sys->api);
     free(p_sys);
 }
@@ -943,7 +925,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 
         if (p_sys->u.video.i_pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
             p_sys->u.video.i_slice_height -= p_out->u.conf.video.crop_top/2;
-        if ((p_sys->i_quirks & OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING))
+        if ((p_sys->api->i_quirks & MC_API_VIDEO_QUIRKS_IGNORE_PADDING))
         {
             p_sys->u.video.i_slice_height = 0;
             p_sys->u.video.i_stride = p_dec->fmt_out.video.i_width;
@@ -1515,12 +1497,12 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
         *p_flags |= NEWBLOCK_FLAG_RESTART;
 
         /* Don't start if we don't have any csd */
-        if ((p_sys->i_quirks & OMXCODEC_QUIRKS_NEED_CSD)
+        if ((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD)
          && !p_dec->fmt_in.i_extra && !p_sys->pp_csd)
             *p_flags &= ~NEWBLOCK_FLAG_RESTART;
 
         /* Don't start if we don't have a valid video size */
-        if ((p_sys->i_quirks & OMXCODEC_VIDEO_QUIRKS_NEED_SIZE)
+        if ((p_sys->api->i_quirks & MC_API_VIDEO_QUIRKS_NEED_SIZE)
          && (!p_sys->u.video.i_width || !p_sys->u.video.i_height))
             *p_flags &= ~NEWBLOCK_FLAG_RESTART;
     }
@@ -1569,12 +1551,12 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
         *p_flags |= NEWBLOCK_FLAG_RESTART;
 
         /* Don't start if we don't have any csd */
-        if ((p_sys->i_quirks & OMXCODEC_QUIRKS_NEED_CSD)
+        if ((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD)
          && !p_dec->fmt_in.i_extra)
             *p_flags &= ~NEWBLOCK_FLAG_RESTART;
 
         /* Don't start if we don't have a valid channels count */
-        if ((p_sys->i_quirks & OMXCODEC_AUDIO_QUIRKS_NEED_CHANNELS)
+        if ((p_sys->api->i_quirks & MC_API_AUDIO_QUIRKS_NEED_CHANNELS)
          && !p_dec->p_sys->u.audio.i_channels)
             *p_flags &= ~NEWBLOCK_FLAG_RESTART;
     }
