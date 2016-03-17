@@ -526,7 +526,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
 
         if( &p_current_vchapter->segment != &p_vchapter->segment )
         {
-            ChangeSegment( p_current_vchapter->segment, p_vchapter->segment );
+            KeepTrackSelection( p_current_vchapter->segment, p_vchapter->segment );
             p_current_vchapter->segment.UnSelect();
             p_vchapter->segment.Select( i_mk_date );
         }
@@ -663,10 +663,11 @@ void virtual_chapter_c::print()
 }
 #endif
 
-void virtual_segment_c::ChangeSegment( matroska_segment_c & old, matroska_segment_c & next )
+void virtual_segment_c::KeepTrackSelection( matroska_segment_c & old, matroska_segment_c & next )
 {
     size_t i, j;
     char *sub_lang = NULL, *aud_lang = NULL;
+    /* get the current ES language selection */
     for( i = 0; i < old.tracks.size(); i++)
     {
         mkv_track_t *p_tk = old.tracks[i];

@@ -162,7 +162,7 @@ public:
     void Seek( demux_t & demuxer, mtime_t i_mk_date,
                virtual_chapter_c *p_vchapter, int64_t i_global_position );
 private:
-    void ChangeSegment( matroska_segment_c & p_old, matroska_segment_c & p_new );
+    void KeepTrackSelection( matroska_segment_c & old, matroska_segment_c & next );
 };
 
 #endif
