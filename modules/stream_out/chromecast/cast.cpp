@@ -157,6 +157,7 @@ static int Open(vlc_object_t *p_this)
     sout_stream_sys_t *p_sys = NULL;
     intf_sys_t *p_intf = NULL;
     char *psz_mux = NULL;
+    char *psz_var_mime = NULL;
     sout_stream_t *p_sout = NULL;
     bool b_has_video = true;
     std::stringstream ss;
@@ -168,10 +169,13 @@ static int Open(vlc_object_t *p_this)
     {
         goto error;
     }
+    psz_var_mime = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mime");
+    if (psz_var_mime == NULL || !psz_var_mime[0])
+        goto error;
 
     ss << "http{dst=:" << var_InheritInteger(p_stream, SOUT_CFG_PREFIX "http-port") << "/stream"
        << ",mux=" << psz_mux
-       << ",access=http}";
+       << ",access=http{mime=" << psz_var_mime << "}}";
 
     p_sout = sout_StreamChainNew( p_stream->p_sout, ss.str().c_str(), NULL, NULL);
     if (p_sout == NULL) {
@@ -194,12 +198,13 @@ static int Open(vlc_object_t *p_this)
 
     p_stream->p_sys = p_sys;
     free(psz_mux);
-
+    free(psz_var_mime);
     return VLC_SUCCESS;
 
 error:
     sout_StreamChainDelete(p_sout, p_sout);
     free(psz_mux);
+    free(psz_var_mime);
     delete p_sys;
     return VLC_EGENERIC;
 }
