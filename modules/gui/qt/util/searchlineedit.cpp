@@ -40,69 +40,6 @@
 
 #include <vlc_intf_strings.h>
 
-#if !HAS_QT47
-
-ClickLineEdit::ClickLineEdit( const QString &msg, QWidget *parent) : QLineEdit( parent )
-{
-    mDrawClickMsg = true;
-    setPlaceholderText( msg );
-}
-
-void ClickLineEdit::setPlaceholderText( const QString &msg )
-{
-    mClickMessage = msg;
-    repaint();
-}
-
-
-void ClickLineEdit::setText( const QString &txt )
-{
-    mDrawClickMsg = txt.isEmpty();
-    repaint();
-    QLineEdit::setText( txt );
-}
-
-void ClickLineEdit::paintEvent( QPaintEvent *pe )
-{
-    QLineEdit::paintEvent( pe );
-    if ( mDrawClickMsg && !hasFocus() ) {
-        QPainter p( this );
-        QPen tmp = p.pen();
-        p.setPen( palette().color( QPalette::Disabled, QPalette::Text ) );
-        QRect cr = contentsRect();
-        // Add two pixel margin on the left side
-        cr.setLeft( cr.left() + 3 );
-        p.drawText( cr, Qt::AlignLeft | Qt::AlignVCenter, mClickMessage );
-        p.setPen( tmp );
-        p.end();
-    }
-}
-
-void ClickLineEdit::dropEvent( QDropEvent *ev )
-{
-    mDrawClickMsg = false;
-    QLineEdit::dropEvent( ev );
-}
-
-void ClickLineEdit::focusInEvent( QFocusEvent *ev )
-{
-    if ( mDrawClickMsg ) {
-        mDrawClickMsg = false;
-        repaint();
-    }
-    QLineEdit::focusInEvent( ev );
-}
-
-void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
-{
-    if ( text().isEmpty() ) {
-        mDrawClickMsg = true;
-        repaint();
-    }
-    QLineEdit::focusOutEvent( ev );
-}
-#endif
-
 #ifndef Q_OS_MAC
 SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 {

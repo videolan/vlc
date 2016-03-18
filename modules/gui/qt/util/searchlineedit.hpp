@@ -34,7 +34,6 @@
 #endif
 #include <QLineEdit>
 
-#if HAS_QT47
 class ClickLineEdit : public QLineEdit
 {
     Q_OBJECT
@@ -44,33 +43,6 @@ public:
         QLineEdit::setPlaceholderText ( msg );
     }
 };
-#else
-/**
-  This class provides a QLineEdit which contains a greyed-out hinting
-  text as long as the user didn't enter any text
-
-  @short LineEdit with customizable "Click here" text
-  @author Daniel Molkentin
-*/
-class ClickLineEdit : public QLineEdit
-{
-    Q_OBJECT
-    Q_PROPERTY( QString clickMessage READ placeholderText WRITE setPlaceholderText )
-public:
-    ClickLineEdit( const QString &msg, QWidget *parent );
-    void setPlaceholderText( const QString &msg ) Q_DECL_OVERRIDE;
-    const QString& placeholderText() const Q_DECLARE_OVERRIDE { return mClickMessage; }
-    void setText( const QString& txt ) Q_DECLARE_OVERRIDE;
-protected:
-    void paintEvent( QPaintEvent *e ) Q_DECL_OVERRIDE;
-    void dropEvent( QDropEvent *ev ) Q_DECL_OVERRIDE;
-    void focusInEvent( QFocusEvent *ev ) Q_DECL_OVERRIDE;
-    void focusOutEvent( QFocusEvent *ev ) Q_DECL_OVERRIDE;
-private:
-    QString mClickMessage;
-    bool mDrawClickMsg;
-};
-#endif
 
 #ifndef Q_OS_MAC
 class QFramelessButton;

@@ -3772,7 +3772,7 @@ AC_ARG_ENABLE(qt, [
   ])
 ])
 AS_IF([test "${enable_qt}" != "no"], [
-  PKG_CHECK_MODULES([QT], [Qt5Core >= 5.1.0 Qt5Widgets Qt5Gui], [
+  PKG_CHECK_MODULES([QT], [Qt5Core >= 5.2.0 Qt5Widgets Qt5Gui], [
       PKG_CHECK_MODULES([QTX11], [Qt5X11Extras], [
           VLC_ADD_LIBS([qt],[${QTX11_LIBS}])
           VLC_ADD_CXXFLAGS([qt],[${QTX11_CFLAGS} -DQT5_HAS_X11])
@@ -3795,7 +3795,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${CONTRIB_DIR}/bin"])
       AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${CONTRIB_DIR}/bin"])
     ], [
-      PKG_CHECK_MODULES([QT], [QtCore QtGui >= 4.6.0],, [
+      PKG_CHECK_MODULES([QT], [QtCore QtGui >= 4.8.0],, [
         AS_IF([test -n "${enable_qt}"],[
           AC_MSG_ERROR([${QT_PKG_ERRORS}.])
         ],[

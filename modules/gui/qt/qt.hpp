@@ -42,11 +42,10 @@
 #define QT_NO_CAST_TO_ASCII
 #include <QString>
 
-#if ( QT_VERSION < 0x040600 )
-# error Update your Qt version to at least 4.6.0
+#if ( QT_VERSION < 0x040800 )
+# error Update your Qt version to at least 4.8.0
 #endif
 
-#define HAS_QT47 ( QT_VERSION >= 0x040700 )
 #define HAS_QT5  ( QT_VERSION >= 0x050000 )
 #define HAS_QT56 ( QT_VERSION >= 0x050600 )
 
