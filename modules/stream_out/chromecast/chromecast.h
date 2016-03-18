@@ -61,10 +61,10 @@ enum connection_status
 
 struct intf_sys_t
 {
-    intf_sys_t(intf_thread_t * const intf);
+    intf_sys_t(vlc_object_t * const p_this);
     ~intf_sys_t();
 
-    intf_thread_t  * const p_stream;
+    vlc_object_t  * const p_module;
     std::string    serverIP;
     std::string appTransportId;
 
@@ -91,7 +91,7 @@ struct intf_sys_t
         if (conn_status != status)
         {
 #ifndef NDEBUG
-            msg_Dbg(p_stream, "change Chromecast connection status from %d to %d", conn_status, status);
+            msg_Dbg(p_module, "change Chromecast connection status from %d to %d", conn_status, status);
 #endif
             conn_status = status;
             vlc_cond_broadcast(&loadCommandCond);
