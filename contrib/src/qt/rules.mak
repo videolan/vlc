@@ -41,7 +41,7 @@ QT_CONFIG := -static -release -opensource -confirm-license -no-pkg-config \
 	cd $< && ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
 	# Make && Install libraries
 	cd $< && $(MAKE)
-	cd $</src && $(MAKE) sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets
+	cd $</src && $(MAKE) sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets
 	# Install tools
 	cd $</src && $(MAKE) sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets
 	# Install plugins
@@ -52,8 +52,10 @@ QT_CONFIG := -static -release -opensource -confirm-license -no-pkg-config \
 	cp $(PREFIX)/include/QtGui/$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h $(PREFIX)/include/QtGui/qpa
 	# Clean Qt mess
 	rm -rf $(PREFIX)/lib/libQt5Bootstrap* $(PREFIX)/lib/*.prl $(PREFIX)/mkspecs
-	# Fix .pc files
+	# Fix .pc files to remove debug version (d)
 	cd $(PREFIX)/lib/pkgconfig; for i in Qt5Core.pc Qt5Gui.pc Qt5Widgets.pc; do sed -i -e 's/d\.a/.a/g' -e 's/d $$/ /' $$i; done
+	# Fix Qt5Gui.pc file to include qwindows (QWindowsIntegrationPlugin) and Qt5Platform Support
+	cd $(PREFIX)/lib/pkgconfig; do sed -i -e 's/ -lQt5Gui/ -lqwindows -lQt5PlatformSupport -lQt5Gui/g' Qt5Gui.pc; done
 ifdef HAVE_CROSS_COMPILE
 	# Building Qt build tools for Xcompilation
 	cd $</include/QtCore; ln -sf $(QT_VERSION)/QtCore/private
