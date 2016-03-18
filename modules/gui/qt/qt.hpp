@@ -48,6 +48,7 @@
 
 #define HAS_QT47 ( QT_VERSION >= 0x040700 )
 #define HAS_QT5  ( QT_VERSION >= 0x050000 )
+#define HAS_QT56 ( QT_VERSION >= 0x050600 )
 
 /* Q_DECL_OVERRIDE is a Qt5 feature, add empty define to not break with Qt4 */
 #if !HAS_QT5 && !defined(Q_DECL_OVERRIDE)

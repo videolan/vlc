@@ -56,7 +56,9 @@
  #if HAS_QT5
   #ifdef QT_STATICPLUGIN
    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
-   Q_IMPORT_PLUGIN(AccessibleFactory)
+   #if !HAS_QT56
+    Q_IMPORT_PLUGIN(AccessibleFactory)
+   #endif
   #endif
  #else
   Q_IMPORT_PLUGIN(qjpeg)
