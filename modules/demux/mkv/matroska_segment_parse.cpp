@@ -1663,7 +1663,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             vars.p_fmt->i_codec = VLC_CODEC_SUBT;
             vars.p_fmt->subs.psz_encoding = strdup( "ASCII" );
         }
-        S_CASE("S_TEXT/UTF-8") {
+        S_CASE("S_TEXT/UTF8") {
             vars.p_tk->fmt.i_codec = VLC_CODEC_SUBT;
             vars.p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
         }
