@@ -710,7 +710,7 @@ static int Demux( demux_t *p_demux)
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
 
-    vlc_mutex_locker( &p_sys->lock_demuxer );
+    vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
 
     virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
 
