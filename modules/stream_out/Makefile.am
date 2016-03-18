@@ -80,14 +80,14 @@ SUFFIXES += .proto .pb.cc
 %.pb.h %.pb.cc: %.proto
 	$(PROTOC) --cpp_out=. -I$(srcdir) $<
 
-libctrl_chromecast_plugin_la_SOURCES = \
+libchromecast_plugin_la_SOURCES = \
     stream_out/chromecast/cast_channel.proto stream_out/chromecast/chromecast.h \
     stream_out/chromecast/chromecast_ctrl.cpp \
     misc/webservices/json.h misc/webservices/json.c
-nodist_libctrl_chromecast_plugin_la_SOURCES = stream_out/chromecast/cast_channel.pb.cc
-libctrl_chromecast_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Istream_out/chromecast $(CHROMECAST_CFLAGS)
-libctrl_chromecast_plugin_la_LIBADD = $(CHROMECAST_LIBS) $(SOCKET_LIBS)
-CLEANFILES += $(nodist_libctrl_chromecast_plugin_la_SOURCES)
+nodist_libchromecast_plugin_la_SOURCES = stream_out/chromecast/cast_channel.pb.cc
+libchromecast_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Istream_out/chromecast $(CHROMECAST_CFLAGS)
+libchromecast_plugin_la_LIBADD = $(CHROMECAST_LIBS) $(SOCKET_LIBS)
+CLEANFILES += $(nodist_libchromecast_plugin_la_SOURCES)
 
 libstream_out_chromecast_plugin_la_SOURCES = stream_out/chromecast/cast.cpp stream_out/chromecast/chromecast.h
 libstream_out_chromecast_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Istream_out/chromecast $(CHROMECAST_CFLAGS)
@@ -97,6 +97,6 @@ if ENABLE_SOUT
 if BUILD_CHROMECAST
 BUILT_SOURCES += stream_out/chromecast/cast_channel.pb.h
 sout_LTLIBRARIES += libstream_out_chromecast_plugin.la
-control_LTLIBRARIES += libctrl_chromecast_plugin.la
+control_LTLIBRARIES += libchromecast_plugin.la
 endif
 endif
