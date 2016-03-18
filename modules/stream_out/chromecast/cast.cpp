@@ -38,9 +38,10 @@
 
 struct sout_stream_sys_t
 {
-    sout_stream_sys_t(intf_sys_t *intf, sout_stream_t *sout)
+    sout_stream_sys_t(intf_sys_t *intf, sout_stream_t *sout, bool has_video)
         : p_out(sout)
         , p_intf(intf)
+        , b_has_video(has_video)
     {
         assert(p_intf != NULL);
     }
@@ -54,6 +55,7 @@ struct sout_stream_sys_t
 
     sout_stream_t * const p_out;
     intf_sys_t * const p_intf;
+    const bool b_has_video;
 };
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
@@ -65,7 +67,7 @@ static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
 static const char *const ppsz_sout_options[] = {
-    "http-port", "mux", "mime", NULL
+    "http-port", "mux", "mime", "video", NULL
 };
 
 /*****************************************************************************
@@ -75,6 +77,8 @@ static const char *const ppsz_sout_options[] = {
 #define HTTP_PORT_TEXT N_("HTTP port")
 #define HTTP_PORT_LONGTEXT N_("This sets the HTTP port of the server " \
                               "used to stream the media to the Chromecast.")
+#define HAS_VIDEO_TEXT N_("Video")
+#define HAS_VIDEO_LONGTEXT N_("The Chromecast receiver can receive video.")
 #define MUX_TEXT N_("Muxer")
 #define MUX_LONGTEXT N_("This sets the muxer used to stream to the Chromecast.")
 #define MIME_TEXT N_("MIME content type")
@@ -91,6 +95,7 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
 
     add_integer(SOUT_CFG_PREFIX "http-port", HTTP_PORT, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT, false)
+    add_bool(SOUT_CFG_PREFIX "video", true, HAS_VIDEO_TEXT, HAS_VIDEO_LONGTEXT, false)
     add_string(SOUT_CFG_PREFIX "mux", "mp4stream", MUX_TEXT, MUX_LONGTEXT, false)
     add_string(SOUT_CFG_PREFIX "mime", "video/mp4", MIME_TEXT, MIME_LONGTEXT, false)
 
@@ -104,6 +109,11 @@ static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_f
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
+    if (!p_sys->b_has_video)
+    {
+        if (p_fmt->i_cat != AUDIO_ES)
+            return NULL;
+    }
     return sout_StreamIdAdd(p_sys->p_out, p_fmt);
 }
 
@@ -148,6 +158,7 @@ static int Open(vlc_object_t *p_this)
     intf_sys_t *p_intf = NULL;
     char *psz_mux = NULL;
     sout_stream_t *p_sout = NULL;
+    bool b_has_video = true;
     std::stringstream ss;
 
     config_ChainParse(p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg);
@@ -168,7 +179,9 @@ static int Open(vlc_object_t *p_this)
         goto error;
     }
 
-    p_sys = new(std::nothrow) sout_stream_sys_t(p_intf, p_sout);
+    b_has_video = var_GetBool(p_stream, SOUT_CFG_PREFIX "video");
+
+    p_sys = new(std::nothrow) sout_stream_sys_t(p_intf, p_sout, b_has_video);
     if (unlikely(p_sys == NULL))
         goto error;
 
