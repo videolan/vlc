@@ -216,27 +216,32 @@ void RenderBlend( filter_t *p_filter,
                   picture_t *p_outpic, picture_t *p_pic )
 {
     int i_plane;
+    vlc_chroma_description_t* p_desc = p_filter->p_sys->chroma;
 
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
         uint8_t *p_in, *p_out_end, *p_out;
+        size_t i_x_offset = p_pic->format.i_x_offset * p_desc->p[i_plane].w.num /
+                p_desc->p[i_plane].w.den * p_pic->p[i_plane].i_pixel_pitch;
+        size_t i_y_offset = p_pic->format.i_y_offset * p_desc->p[i_plane].h.num /
+                p_desc->p[i_plane].h.den * p_pic->p[i_plane].i_pitch;
 
-        p_in = p_pic->p[i_plane].p_pixels;
+        p_in = p_pic->p[i_plane].p_pixels + i_y_offset;
 
-        p_out = p_outpic->p[i_plane].p_pixels;
+        p_out = p_outpic->p[i_plane].p_pixels + i_y_offset;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
                              * p_outpic->p[i_plane].i_visible_lines;
 
         /* First line: simple copy */
-        memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+        memcpy( p_out + i_x_offset, p_in + i_x_offset, p_pic->p[i_plane].i_visible_pitch );
         p_out += p_outpic->p[i_plane].i_pitch;
 
         /* Remaining lines: mean value */
         for( ; p_out < p_out_end ; )
         {
-            Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
-                   p_pic->p[i_plane].i_pitch );
+            Merge( p_out + i_x_offset, p_in + i_x_offset, p_in + p_pic->p[i_plane].i_pitch + i_x_offset,
+                   p_pic->p[i_plane].i_visible_pitch );
 
             p_out += p_outpic->p[i_plane].i_pitch;
             p_in  += p_pic->p[i_plane].i_pitch;
