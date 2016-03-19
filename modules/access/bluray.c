@@ -388,18 +388,17 @@ static void startBackground(demux_t *p_demux)
     fmt.i_group = 1;
 
     p_sys->p_dummy_video = es_out_Add(p_demux->out, &fmt);
-    es_format_Clean(&fmt);
 
     if (!p_sys->p_dummy_video) {
-      msg_Err(p_demux, "Error adding background ES");
-      return;
+        msg_Err(p_demux, "Error adding background ES");
+        goto out;
     }
 
     block_t *p_block = block_Alloc(fmt.video.i_width * fmt.video.i_height *
                                    fmt.video.i_bits_per_pixel / 8);
     if (!p_block) {
         msg_Err(p_demux, "Error allocating block for background video");
-        return;
+        goto out;
     }
 
     // XXX TODO: what would be correct timestamp ???
@@ -411,6 +410,9 @@ static void startBackground(demux_t *p_demux)
     memset(p, 0x80, fmt.video.i_width * fmt.video.i_height / 2);
 
     es_out_Send(p_demux->out, p_sys->p_dummy_video, p_block);
+
+ out:
+    es_format_Clean(&fmt);
 }
 
 static void stopBackground(demux_t *p_demux)
