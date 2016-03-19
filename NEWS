@@ -42,7 +42,7 @@ Access:
  * New HTTP/TLS access module for HTTP 2.0 support
  * Named pipes and device nodes are no longer included in directory listings
    by default. Use --list-special-files to include them back.
- * Support for timeout in udp input --udp-input=<seconds>
+ * Support for timeout in UDP input --udp-timeout=<seconds>
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
