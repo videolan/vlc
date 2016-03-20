@@ -27,4 +27,5 @@ DEPS_vncserver = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png)
 .vncserver: vncserver
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) -C libvncclient install
+	cd $< && $(MAKE) install-pkgconfigDATA
 	touch $@
