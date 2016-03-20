@@ -20,6 +20,7 @@ vncserver: LibVNCServer-$(VNCSERVER_VERSION).tar.gz .sum-vncserver
 	mv libvncserver-LibVNCServer-$(VNCSERVER_VERSION)  LibVNCServer-$(VNCSERVER_VERSION)
 	$(APPLY) $(SRC)/vncserver/libvncclient-libjpeg-win32.patch
 	$(APPLY) $(SRC)/vncserver/rfbproto.patch
+	$(APPLY) $(SRC)/vncserver/png-detection.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 

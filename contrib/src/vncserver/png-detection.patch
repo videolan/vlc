@@ -1,0 +1,11 @@
+--- vncserver/configure.ac	2014-10-21 17:57:11.000000000 +0200
++++ vncserver.new/configure.ac	2016-03-20 19:01:59.541057066 +0100
+@@ -295,7 +295,7 @@
+ 	fi
+ 	AC_CHECK_HEADER(png.h, HAVE_PNGLIB_H="true")
+ 	if test "x$HAVE_PNGLIB_H" = "xtrue"; then
+-		AC_CHECK_LIB(png, png_create_write_struct, , HAVE_PNGLIB_H="")
++		AC_CHECK_LIB(png, png_create_write_struct, , HAVE_PNGLIB_H="", -lz)
+ 	fi
+ 	if test ! -z "$with_png" -a "x$with_png" != "xyes"; then
+ 		if test "x$HAVE_PNGLIB_H" != "xtrue"; then
