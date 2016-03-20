@@ -23,6 +23,7 @@ vncserver: LibVNCServer-$(VNCSERVER_VERSION).tar.gz .sum-vncserver
 	$(APPLY) $(SRC)/vncserver/png-detection.patch
 	$(APPLY) $(SRC)/vncserver/vnc-gnutls-pkg.patch
 	$(APPLY) $(SRC)/vncserver/gnutls-recent.patch
+	$(APPLY) $(SRC)/vncserver/vnc-gnutls-anon.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 

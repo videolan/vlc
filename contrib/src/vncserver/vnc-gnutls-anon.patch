@@ -1,0 +1,20 @@
+--- vncserver/libvncclient/tls_gnutls.c	2016-03-20 21:03:17.093404245 +0100
++++ vncserver/libvncclient/tls_gnutls.c.new	2016-03-20 21:03:56.265406113 +0100
+@@ -162,6 +162,9 @@
+   gnutls_anon_client_credentials anonCred;
+   int ret;
+ 
++  return FALSE;
++
++#if 0
+   if ((ret = gnutls_anon_allocate_client_credentials(&anonCred)) < 0 ||
+       (ret = gnutls_credentials_set((gnutls_session_t)client->tlsSession, GNUTLS_CRD_ANON, anonCred)) < 0)
+   {
+@@ -171,6 +174,7 @@
+   }
+   rfbClientLog("TLS anonymous credential created.\n");
+   return TRUE;
++#endif
+ }
+ 
+ static rfbBool
