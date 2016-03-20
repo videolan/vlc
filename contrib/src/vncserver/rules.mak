@@ -24,11 +24,11 @@ vncserver: LibVNCServer-$(VNCSERVER_VERSION).tar.gz .sum-vncserver
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-DEPS_vncserver = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png)
+DEPS_vncserver = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png) gnutls $(DEP_gnutls)
 
 .vncserver: vncserver
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) -C libvncclient install
-	cd $< && $(MAKE) install-pkgconfigDATA
+	cd $< && $(MAKE) install-data
 	touch $@
