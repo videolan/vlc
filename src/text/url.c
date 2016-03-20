@@ -346,7 +346,7 @@ static bool vlc_uri_component_validate(const char *str, const char *extras)
 
 static bool vlc_uri_host_validate(const char *str)
 {
-    return vlc_uri_component_validate(str, "");
+    return vlc_uri_component_validate(str, ":");
 }
 
 static bool vlc_uri_path_validate(const char *str)
