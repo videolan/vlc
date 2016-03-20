@@ -81,6 +81,8 @@ static void proxy_client_process(int fd)
     shutdown(fd, SHUT_WR);
 }
 
+static unsigned connection_count = 0;
+
 static void *proxy_thread(void *data)
 {
     int lfd = (intptr_t)data;
@@ -94,6 +96,7 @@ static void *proxy_thread(void *data)
         int canc = vlc_savecancel();
         proxy_client_process(cfd);
         close(cfd);
+        connection_count++;
         vlc_restorecancel(canc);
     }
     vlc_assert_unreachable();
@@ -165,6 +168,7 @@ int main(void)
 
     vlc_cancel(th);
     vlc_join(th, NULL);
+    assert(connection_count > 0);
     free(url);
     close(lfd);
 }
