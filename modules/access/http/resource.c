@@ -114,6 +114,7 @@ retry:
          * pass Vary to clarify. It cannot be caused by If-*, Range, TE or the
          * other transfer- rather than representation-affecting header lines.
          */
+        vlc_http_msg_destroy(resp);
         res->negotiate = false;
         goto retry;
     }
