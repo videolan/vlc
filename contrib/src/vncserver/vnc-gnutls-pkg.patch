@@ -1,0 +1,11 @@
+--- vncserver.new/libvncclient.pc.in	2014-10-21 17:57:11.000000000 +0200
++++ vncserver/libvncclient.pc.in	2016-03-20 20:31:25.809313066 +0100
+@@ -7,7 +7,7 @@
+ Description: A library for easy implementation of a VNC client.
+ Version: @VERSION@
+ Requires:
+-Requires.private: zlib
++Requires.private: zlib, gnutls
+ Libs: -L${libdir} -lvncclient
+ Libs.private: @LIBS@ @WSOCKLIB@
+ Cflags: -I${includedir}
