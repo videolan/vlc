@@ -2,9 +2,7 @@
 NFS_VERSION := 1.10.0
 NFS_URL := https://github.com/sahlberg/libnfs/archive/libnfs-$(NFS_VERSION).tar.gz
 
-ifndef HAVE_WIN32
 PKGS += nfs
-endif
 ifeq ($(call need_pkg,"libnfs"),)
 PKGS_FOUND += nfs
 endif
