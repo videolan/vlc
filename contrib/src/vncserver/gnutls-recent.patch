@@ -1,0 +1,42 @@
+--- vncserver/libvncclient/tls_gnutls.c	2014-10-21 17:57:11.000000000 +0200
++++ vncserver.new/libvncclient/tls_gnutls.c	2016-03-20 20:56:31.769384909 +0100
+@@ -67,17 +67,17 @@
+  * libvncclient are linked to different versions of msvcrt.dll.
+  */
+ #ifdef WIN32
+-static void WSAtoTLSErrno()
++static void WSAtoTLSErrno(rfbClient *client)
+ {
+   switch(WSAGetLastError()) {
+   case WSAEWOULDBLOCK:
+-    gnutls_transport_set_global_errno(EAGAIN);
++    gnutls_transport_set_errno(client->tlsSession, EAGAIN);
+     break;
+   case WSAEINTR:
+-    gnutls_transport_set_global_errno(EINTR);
++    gnutls_transport_set_errno(client->tlsSession, EINTR);
+     break;
+   default:
+-    gnutls_transport_set_global_errno(EIO);
++    gnutls_transport_set_errno(client->tlsSession, EIO);
+     break;
+   }
+ }
+@@ -96,7 +96,7 @@
+     if (ret < 0)
+     {
+ #ifdef WIN32
+-      WSAtoTLSErrno();
++      WSAtoTLSErrno(client);
+ #endif
+       if (errno == EINTR) continue;
+       return -1;
+@@ -118,7 +118,7 @@
+     if (ret < 0)
+     {
+ #ifdef WIN32
+-      WSAtoTLSErrno();
++      WSAtoTLSErrno(client);
+ #endif
+       if (errno == EINTR) continue;
+       return -1;

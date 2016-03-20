@@ -22,6 +22,7 @@ vncserver: LibVNCServer-$(VNCSERVER_VERSION).tar.gz .sum-vncserver
 	$(APPLY) $(SRC)/vncserver/rfbproto.patch
 	$(APPLY) $(SRC)/vncserver/png-detection.patch
 	$(APPLY) $(SRC)/vncserver/vnc-gnutls-pkg.patch
+	$(APPLY) $(SRC)/vncserver/gnutls-recent.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
