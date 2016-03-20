@@ -186,8 +186,12 @@ int main (void)
     test ("fd://12345", "/dev/fd/12345");
 #undef test
 
-    test_url_parse("http://test.com", "http", NULL, NULL, "test.com", 0, NULL, NULL);
-    test_url_parse("http://test.com/", "http", NULL, NULL, "test.com", 0, "/", NULL);
+    test_url_parse("http://example.com", "http", NULL, NULL, "example.com", 0,
+                   NULL, NULL);
+    test_url_parse("http://example.com/", "http", NULL, NULL, "example.com", 0,
+                   "/", NULL);
+    test_url_parse("http://[2001:db8::1]", "http", NULL, NULL, "2001:db8::1",
+                   0, NULL, NULL);
     test_url_parse("protocol://john:doe@1.2.3.4:567", "protocol", "john", "doe", "1.2.3.4", 567, NULL, NULL);
     test_url_parse("http://a.b/?opt=val", "http", NULL, NULL, "a.b", 0, "/", "opt=val");
     test_url_parse("p://u:p@host:123/a/b/c?o=v", "p", "u", "p", "host", 123, "/a/b/c", "o=v");
