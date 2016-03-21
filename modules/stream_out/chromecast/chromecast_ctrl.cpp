@@ -450,7 +450,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
             vlc_mutex_locker locker(&lock);
             setConnectionStatus(CHROMECAST_AUTHENTICATED);
             msgConnect(DEFAULT_CHOMECAST_RECEIVER);
-            msgReceiverLaunchApp();
+            msgReceiverGetStatus();
         }
     }
     else if (namespace_ == NAMESPACE_HEARTBEAT)
