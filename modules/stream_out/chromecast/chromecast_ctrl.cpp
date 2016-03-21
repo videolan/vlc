@@ -171,7 +171,7 @@ int Open(vlc_object_t *p_module)
     // Lock the sout thread until we have sent the media loading command to the Chromecast.
     deadline = mdate() + 6 * CLOCK_FREQ;
     vlc_mutex_lock(&p_sys->lock);
-    while (p_sys->getConnectionStatus() != CHROMECAST_MEDIA_LOAD_SENT)
+    while (p_sys->getPlayerStatus() != CMD_LOAD_SENT)
     {
         int i_ret = vlc_cond_timedwait(&p_sys->loadCommandCond, &p_sys->lock, deadline);
         if (i_ret == ETIMEDOUT)
@@ -244,6 +244,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this)
  , receiverState(RECEIVER_IDLE)
  , p_tls(NULL)
  , conn_status(CHROMECAST_DISCONNECTED)
+ , cmd_status(NO_CMD_PENDING)
  , i_receiver_requestId(0)
  , i_requestId(0)
 {
@@ -255,7 +256,6 @@ intf_sys_t::~intf_sys_t()
 {
     switch (getConnectionStatus())
     {
-    case CHROMECAST_MEDIA_LOAD_SENT:
     case CHROMECAST_APP_STARTED:
         // Generate the close messages.
         msgReceiverClose(appTransportId);
@@ -320,6 +320,7 @@ void intf_sys_t::disconnectChromecast()
         setConnectionStatus(CHROMECAST_DISCONNECTED);
         appTransportId = "";
         mediaSessionId = ""; // this session is not valid anymore
+        setPlayerStatus(NO_CMD_PENDING);
         receiverState = RECEIVER_IDLE;
     }
 }
@@ -521,7 +522,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                     msgConnect(appTransportId);
                     setConnectionStatus(CHROMECAST_APP_STARTED);
                     msgPlayerLoad();
-                    setConnectionStatus(CHROMECAST_MEDIA_LOAD_SENT);
+                    setPlayerStatus(CMD_LOAD_SENT);
                     vlc_cond_signal(&loadCommandCond);
                 }
             }
@@ -531,7 +532,6 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                 {
                 /* If the app is no longer present */
                 case CHROMECAST_APP_STARTED:
-                case CHROMECAST_MEDIA_LOAD_SENT:
                     msg_Warn( p_module, "app is no longer present. closing");
                     msgReceiverClose(appTransportId);
                     setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
@@ -616,6 +616,11 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 #endif
                 switch( receiverState )
                 {
+                case RECEIVER_PLAYING:
+                    /* TODO reset demux PCR ? */
+                    setPlayerStatus(CMD_PLAYBACK_SENT);
+                    break;
+
                 case RECEIVER_PAUSED:
 #ifndef NDEBUG
                     msg_Dbg( p_module, "Playback paused");
@@ -623,6 +628,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                     break;
 
                 case RECEIVER_IDLE:
+                    setPlayerStatus(NO_CMD_PENDING);
                     break;
                 }
             }
