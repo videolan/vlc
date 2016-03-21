@@ -242,6 +242,8 @@ void intf_sys_t::buildMessage(const std::string & namespace_,
 intf_sys_t::intf_sys_t(vlc_object_t * const p_this)
  : p_module(p_this)
  , receiverState(RECEIVER_IDLE)
+ , i_sock_fd(-1)
+ , p_creds(NULL)
  , p_tls(NULL)
  , conn_status(CHROMECAST_DISCONNECTED)
  , cmd_status(NO_CMD_PENDING)
