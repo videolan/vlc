@@ -193,25 +193,6 @@ void Close(vlc_object_t *p_module)
     intf_thread_t *p_intf = reinterpret_cast<intf_thread_t*>(p_module);
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    vlc_cancel(p_sys->chromecastThread);
-    vlc_join(p_sys->chromecastThread, NULL);
-
-    switch (p_sys->getConnectionStatus())
-    {
-    case CHROMECAST_MEDIA_LOAD_SENT:
-    case CHROMECAST_APP_STARTED:
-        // Generate the close messages.
-        p_sys->msgReceiverClose(p_sys->appTransportId);
-        // ft
-    case CHROMECAST_AUTHENTICATED:
-        p_sys->msgReceiverClose(DEFAULT_CHOMECAST_RECEIVER);
-        // ft
-    default:
-        break;
-    }
-
-    p_sys->disconnectChromecast();
-
     delete p_sys;
 }
 
@@ -260,6 +241,25 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this)
 
 intf_sys_t::~intf_sys_t()
 {
+    switch (getConnectionStatus())
+    {
+    case CHROMECAST_MEDIA_LOAD_SENT:
+    case CHROMECAST_APP_STARTED:
+        // Generate the close messages.
+        msgReceiverClose(appTransportId);
+        // ft
+    case CHROMECAST_AUTHENTICATED:
+        msgReceiverClose(DEFAULT_CHOMECAST_RECEIVER);
+        // ft
+    default:
+        break;
+    }
+
+    vlc_cancel(chromecastThread);
+    vlc_join(chromecastThread, NULL);
+
+    disconnectChromecast();
+
     vlc_cond_destroy(&loadCommandCond);
     vlc_mutex_destroy(&lock);
 }
