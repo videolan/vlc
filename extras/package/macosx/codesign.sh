@@ -96,9 +96,9 @@ else
     codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none VLC.app/Contents/Frameworks/BGHUDAppKit.framework/Versions/A
     IDENTIFIER="com.growl.growlframework"
     codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none VLC.app/Contents/Frameworks/Growl.framework/Versions/A
-    IDENTIFIER="org.andymatuschak.sparkle.Autoupdate"
+    IDENTIFIER="org.sparkle-project.Sparkle.Autoupdate"
     codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app
-    IDENTIFIER="org.andymatuschak.Sparkle"
+    IDENTIFIER="org.sparkle-project.Sparkle"
     codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A
 
     info "Signing the framework headers"
