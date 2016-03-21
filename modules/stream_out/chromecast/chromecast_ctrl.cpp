@@ -33,7 +33,6 @@
 #include "chromecast.h"
 
 #include <vlc_playlist.h>
-#include <vlc_threads.h>
 
 #include <cassert>
 #include <cerrno>
