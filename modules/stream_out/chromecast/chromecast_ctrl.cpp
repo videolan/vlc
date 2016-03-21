@@ -580,9 +580,12 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         else if (type == "LOAD_FAILED")
         {
             msg_Err( p_module, "Media load failed");
-            msgReceiverClose(appTransportId);
             vlc_mutex_locker locker(&lock);
-            setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
+            /* close the app to restart it */
+            if (getConnectionStatus() == CHROMECAST_APP_STARTED)
+                msgReceiverClose(appTransportId);
+            else
+                msgReceiverGetStatus();
         }
         else if (type == "INVALID_REQUEST")
         {
