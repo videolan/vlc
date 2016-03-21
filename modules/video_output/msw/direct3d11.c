@@ -116,9 +116,6 @@ typedef struct d3d_vertex_t {
 #define RECTWidth(r)   (int)((r).right - (r).left)
 #define RECTHeight(r)  (int)((r).bottom - (r).top)
 
-static int  Open(vlc_object_t *);
-static void Close(vlc_object_t *object);
-
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count);
 
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture);
