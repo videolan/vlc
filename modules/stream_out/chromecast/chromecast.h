@@ -66,6 +66,9 @@ struct intf_sys_t
 
     vlc_object_t  * const p_module;
     std::string    serverIP;
+    std::string    mime;
+    std::string    muxer;
+
     std::string appTransportId;
     std::string mediaSessionId;
 

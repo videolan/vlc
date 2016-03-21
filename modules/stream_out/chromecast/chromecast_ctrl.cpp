@@ -144,6 +144,17 @@ int Open(vlc_object_t *p_module)
         msg_Err( p_module, "Bad muxer provided");
         goto error;
     }
+    p_sys->muxer = psz_mux;
+    free(psz_mux);
+
+    psz_mux = var_InheritString( p_module, CONTROL_CFG_PREFIX "mime");
+    if (psz_mux == NULL)
+    {
+        msg_Err( p_module, "Bad MIME type provided");
+        goto error;
+    }
+    p_sys->mime = psz_mux; /* TODO get the MIME type from the playlist/input ? */
+    free(psz_mux);
 
     // Start the Chromecast event thread.
     if (vlc_clone(&p_sys->chromecastThread, ChromecastThread, p_module,
