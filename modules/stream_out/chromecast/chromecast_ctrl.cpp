@@ -104,18 +104,18 @@ vlc_module_end ()
 /*****************************************************************************
  * Open: connect to the Chromecast and initialize the sout
  *****************************************************************************/
-int Open(vlc_object_t *p_this)
+int Open(vlc_object_t *p_module)
 {
-    intf_thread_t *p_intf = reinterpret_cast<intf_thread_t*>(p_this);
-    intf_sys_t *p_sys = new(std::nothrow) intf_sys_t(p_this);
+    intf_thread_t *p_intf = reinterpret_cast<intf_thread_t*>(p_module);
+    intf_sys_t *p_sys = new(std::nothrow) intf_sys_t(p_module);
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
     p_intf->p_sys = p_sys;
 
-    char *psz_ipChromecast = var_InheritString(p_intf, CONTROL_CFG_PREFIX "addr");
+    char *psz_ipChromecast = var_InheritString( p_module, CONTROL_CFG_PREFIX "addr");
     if (psz_ipChromecast == NULL)
     {
-        msg_Err(p_intf, "No Chromecast receiver IP provided");
+        msg_Err( p_module, "No Chromecast receiver IP provided");
         Clean(p_intf);
         return VLC_EGENERIC;
     }
@@ -124,7 +124,7 @@ int Open(vlc_object_t *p_this)
     free(psz_ipChromecast);
     if (p_sys->i_sock_fd < 0)
     {
-        msg_Err(p_intf, "Could not connect the Chromecast");
+        msg_Err( p_module, "Could not connect the Chromecast");
         Clean(p_intf);
         return VLC_EGENERIC;
     }
@@ -133,24 +133,25 @@ int Open(vlc_object_t *p_this)
     char psz_localIP[NI_MAXNUMERICHOST];
     if (net_GetSockAddress(p_sys->i_sock_fd, psz_localIP, NULL))
     {
-        msg_Err(p_this, "Cannot get local IP address");
+        msg_Err( p_module, "Cannot get local IP address");
         Clean(p_intf);
         return VLC_EGENERIC;
     }
     p_sys->serverIP = psz_localIP;
 
-    char *psz_mux = var_InheritString(p_intf, CONTROL_CFG_PREFIX "mux");
+    psz_mux = var_InheritString( p_module, CONTROL_CFG_PREFIX "mux");
     if (psz_mux == NULL)
     {
+        msg_Err( p_module, "Bad muxer provided");
         Clean(p_intf);
         return VLC_EGENERIC;
     }
 
     // Start the Chromecast event thread.
-    if (vlc_clone(&p_sys->chromecastThread, ChromecastThread, p_intf,
+    if (vlc_clone(&p_sys->chromecastThread, ChromecastThread, p_module,
                   VLC_THREAD_PRIORITY_LOW))
     {
-        msg_Err(p_intf, "Could not start the Chromecast talking thread");
+        msg_Err( p_module, "Could not start the Chromecast talking thread");
         Clean(p_intf);
         return VLC_EGENERIC;
     }
@@ -168,7 +169,7 @@ int Open(vlc_object_t *p_this)
         i_ret = vlc_cond_timedwait(&p_sys->loadCommandCond, &p_sys->lock, deadline);
         if (i_ret == ETIMEDOUT)
         {
-            msg_Err(p_intf, "Timeout reached before sending the media loading command");
+            msg_Err( p_module, "Timeout reached before sending the media loading command");
             vlc_mutex_unlock(&p_sys->lock);
             vlc_cancel(p_sys->chromecastThread);
             Clean(p_intf);
@@ -188,9 +189,9 @@ int Open(vlc_object_t *p_this)
 /*****************************************************************************
  * Close: destroy interface
  *****************************************************************************/
-void Close(vlc_object_t *p_this)
+void Close(vlc_object_t *p_module)
 {
-    intf_thread_t *p_intf = reinterpret_cast<intf_thread_t*>(p_this);
+    intf_thread_t *p_intf = reinterpret_cast<intf_thread_t*>(p_module);
     intf_sys_t *p_sys = p_intf->p_sys;
 
     vlc_cancel(p_sys->chromecastThread);
