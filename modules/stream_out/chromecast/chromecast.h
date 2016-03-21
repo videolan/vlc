@@ -110,6 +110,13 @@ struct intf_sys_t
     void msgReceiverGetStatus();
 
     void msgPlayerLoad();
+    void msgPlayerPlay();
+    void msgPlayerStop();
+    void msgPlayerPause();
+    void msgPlayerGetStatus();
+    void msgPlayerSeek(const std::string & currentTime);
+    void msgPlayerSetVolume(float volume);
+    void msgPlayerSetMute(bool mute);
 
     void processMessage(const castchannel::CastMessage &msg);
 
