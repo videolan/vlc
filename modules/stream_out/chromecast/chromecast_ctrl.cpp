@@ -255,6 +255,9 @@ void intf_sys_t::buildMessage(const std::string & namespace_,
     sendMessage(msg);
 }
 
+/*****************************************************************************
+ * intf_sys_t: class definition
+ *****************************************************************************/
 intf_sys_t::intf_sys_t(vlc_object_t * const p_this)
  : p_module(p_this)
  , p_tls(NULL)
@@ -278,7 +281,7 @@ intf_sys_t::~intf_sys_t()
  */
 int intf_sys_t::connectChromecast(char *psz_ipChromecast)
 {
-    int fd = net_ConnectTCP(p_module, psz_ipChromecast, CHROMECAST_CONTROL_PORT);
+    int fd = net_ConnectTCP( p_module, psz_ipChromecast, CHROMECAST_CONTROL_PORT);
     if (fd < 0)
         return -1;
 
@@ -320,7 +323,7 @@ void intf_sys_t::disconnectChromecast()
 
 /**
  * @brief Receive a data packet from the Chromecast
- * @param p_module the sout_stream_t structure
+ * @param p_module the module to log with
  * @param b_msgReceived returns true if a message has been entirely received else false
  * @param i_payloadSize returns the payload size of the message received
  * @return the number of bytes received of -1 on error
@@ -345,7 +348,7 @@ extern "C" int recvPacket(vlc_object_t *p_module, bool &b_msgReceived,
         {
             if (!*pi_wait_retries)
             {
-                msg_Err(p_module, "No PONG answer received from the Chromecast");
+                msg_Err( p_module, "No PONG answer received from the Chromecast");
                 return 0; // Connection died
             }
             (*pi_wait_retries)--;
@@ -355,7 +358,7 @@ extern "C" int recvPacket(vlc_object_t *p_module, bool &b_msgReceived,
             /* now expect a pong */
             *pi_wait_delay = PONG_WAIT_TIME;
             *pi_wait_retries = PONG_WAIT_RETRIES;
-            msg_Warn(p_module, "No PING received from the Chromecast, sending a PING");
+            msg_Warn( p_module, "No PING received from the Chromecast, sending a PING");
         }
         *pb_pingTimeout = true;
     }
@@ -391,7 +394,7 @@ extern "C" int recvPacket(vlc_object_t *p_module, bool &b_msgReceived,
     if (i_payloadSize > i_maxPayloadSize)
     {
         // Error case: the packet sent by the Chromecast is too long: we drop it.
-        msg_Err(p_module, "Packet too long: droping its data");
+        msg_Err( p_module, "Packet too long: droping its data");
 
         uint32_t i_size = i_payloadSize - (*pi_received - PACKET_HEADER_LEN);
         if (i_size > i_maxPayloadSize)
@@ -435,7 +438,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
     const std::string & namespace_ = msg.namespace_();
 
 #ifndef NDEBUG
-    msg_Dbg(p_module,"processMessage: %s->%s %s", namespace_.c_str(), msg.destination_id().c_str(), msg.payload_utf8().c_str());
+    msg_Dbg( p_module, "processMessage: %s->%s %s", namespace_.c_str(), msg.destination_id().c_str(), msg.payload_utf8().c_str());
 #endif
 
     if (namespace_ == NAMESPACE_DEVICEAUTH)
@@ -445,11 +448,11 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 
         if (authMessage.has_error())
         {
-            msg_Err(p_module, "Authentification error: %d", authMessage.error().error_type());
+            msg_Err( p_module, "Authentification error: %d", authMessage.error().error_type());
         }
         else if (!authMessage.has_response())
         {
-            msg_Err(p_module, "Authentification message has no response field");
+            msg_Err( p_module, "Authentification message has no response field");
         }
         else
         {
@@ -466,16 +469,16 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 
         if (type == "PING")
         {
-            msg_Dbg(p_module, "PING received from the Chromecast");
+            msg_Dbg( p_module, "PING received from the Chromecast");
             msgPong();
         }
         else if (type == "PONG")
         {
-            msg_Dbg(p_module, "PONG received from the Chromecast");
+            msg_Dbg( p_module, "PONG received from the Chromecast");
         }
         else
         {
-            msg_Warn(p_module, "Heartbeat command not supported: %s", type.c_str());
+            msg_Warn( p_module, "Heartbeat command not supported: %s", type.c_str());
         }
 
         json_value_free(p_data);
@@ -525,13 +528,13 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                 /* If the app is no longer present */
                 case CHROMECAST_APP_STARTED:
                 case CHROMECAST_MEDIA_LOAD_SENT:
-                    msg_Warn(p_module, "app is no longer present. closing");
+                    msg_Warn( p_module, "app is no longer present. closing");
                     msgReceiverClose(appTransportId);
                     setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
                     break;
 
                 case CHROMECAST_AUTHENTICATED:
-                    msg_Dbg(p_module, "Chromecast was running no app, launch media_app");
+                    msg_Dbg( p_module, "Chromecast was running no app, launch media_app");
                     appTransportId = "";
                     msgReceiverLaunchApp();
                     break;
@@ -545,12 +548,12 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         else if (type == "LAUNCH_ERROR")
         {
             json_value reason = (*p_data)["reason"];
-            msg_Err(p_module, "Failed to start the MediaPlayer: %s",
+            msg_Err( p_module, "Failed to start the MediaPlayer: %s",
                     (const char *)reason);
         }
         else
         {
-            msg_Warn(p_module, "Receiver command not supported: %s",
+            msg_Warn( p_module, "Receiver command not supported: %s",
                     msg.payload_utf8().c_str());
         }
 
@@ -564,24 +567,24 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         if (type == "MEDIA_STATUS")
         {
             json_value status = (*p_data)["status"];
-            msg_Dbg(p_module, "Player state: %s sessionId:%d",
+            msg_Dbg( p_module, "Player state: %s sessionId:%d",
                     status[0]["playerState"].operator const char *(),
                     (int)(json_int_t) status[0]["mediaSessionId"]);
         }
         else if (type == "LOAD_FAILED")
         {
-            msg_Err(p_module, "Media load failed");
+            msg_Err( p_module, "Media load failed");
             msgReceiverClose(appTransportId);
             vlc_mutex_locker locker(&lock);
             setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
         }
         else if (type == "INVALID_REQUEST")
         {
-            msg_Dbg(p_module, "We sent an invalid request reason:%s", (*p_data)["reason"].operator const char *());
+            msg_Dbg( p_module, "We sent an invalid request reason:%s", (*p_data)["reason"].operator const char *());
         }
         else
         {
-            msg_Warn(p_module, "Media command not supported: %s",
+            msg_Warn( p_module, "Media command not supported: %s",
                     msg.payload_utf8().c_str());
         }
 
@@ -595,19 +598,19 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 
         if (type == "CLOSE")
         {
-            msg_Warn(p_module, "received close message");
+            msg_Warn( p_module, "received close message");
             vlc_mutex_locker locker(&lock);
             setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
         }
         else
         {
-            msg_Warn(p_module, "Connection command not supported: %s",
+            msg_Warn( p_module, "Connection command not supported: %s",
                     type.c_str());
         }
     }
     else
     {
-        msg_Err(p_module, "Unknown namespace: %s", msg.namespace_().c_str());
+        msg_Err( p_module, "Unknown namespace: %s", msg.namespace_().c_str());
     }
 }
 
@@ -627,27 +630,27 @@ void intf_sys_t::msgAuth()
 void intf_sys_t::msgPing()
 {
     std::string s("{\"type\":\"PING\"}");
-    buildMessage(NAMESPACE_HEARTBEAT, s);
+    buildMessage( NAMESPACE_HEARTBEAT, s );
 }
 
 
 void intf_sys_t::msgPong()
 {
     std::string s("{\"type\":\"PONG\"}");
-    buildMessage(NAMESPACE_HEARTBEAT, s);
+    buildMessage( NAMESPACE_HEARTBEAT, s );
 }
 
 void intf_sys_t::msgConnect(const std::string & destinationId)
 {
     std::string s("{\"type\":\"CONNECT\"}");
-    buildMessage(NAMESPACE_CONNECTION, s, destinationId);
+    buildMessage( NAMESPACE_CONNECTION, s, destinationId );
 }
 
 
 void intf_sys_t::msgReceiverClose(std::string destinationId)
 {
     std::string s("{\"type\":\"CLOSE\"}");
-    buildMessage(NAMESPACE_CONNECTION, s, destinationId);
+    buildMessage( NAMESPACE_CONNECTION, s, destinationId );
 }
 
 void intf_sys_t::msgReceiverGetStatus()
@@ -656,7 +659,7 @@ void intf_sys_t::msgReceiverGetStatus()
     ss << "{\"type\":\"GET_STATUS\","
        <<  "\"requestId\":" << i_receiver_requestId++ << "}";
 
-    buildMessage(NAMESPACE_RECEIVER, ss.str());
+    buildMessage( NAMESPACE_RECEIVER, ss.str() );
 }
 
 void intf_sys_t::msgReceiverLaunchApp()
@@ -666,7 +669,7 @@ void intf_sys_t::msgReceiverLaunchApp()
        <<  "\"appId\":\"" << APP_ID << "\","
        <<  "\"requestId\":" << i_receiver_requestId++ << "}";
 
-    buildMessage(NAMESPACE_RECEIVER, ss.str());
+    buildMessage( NAMESPACE_RECEIVER, ss.str() );
 }
 
 
@@ -703,7 +706,7 @@ int intf_sys_t::sendMessage(const castchannel::CastMessage &msg)
         return VLC_ENOMEM;
 
 #ifndef NDEBUG
-    msg_Dbg(p_module, "sendMessage: %s->%s %s", msg.namespace_().c_str(), msg.destination_id().c_str(), msg.payload_utf8().c_str());
+    msg_Dbg( p_module, "sendMessage: %s->%s %s", msg.namespace_().c_str(), msg.destination_id().c_str(), msg.payload_utf8().c_str());
 #endif
 
     SetDWBE(p_data, i_size);
@@ -754,7 +757,7 @@ void intf_sys_t::handleMessages()
 
     bool b_msgReceived = false;
     uint32_t i_payloadSize = 0;
-    int i_ret = recvPacket(p_module, b_msgReceived, i_payloadSize, i_sock_fd,
+    int i_ret = recvPacket( p_module, b_msgReceived, i_payloadSize, i_sock_fd,
                            p_tls, &i_received, p_packet, &b_pingTimeout,
                            &i_waitdelay, &i_retries);
 
@@ -767,7 +770,7 @@ void intf_sys_t::handleMessages()
     if ((i_ret < 0 && errno != EAGAIN) || i_ret == 0)
 #endif
     {
-        msg_Err(p_module, "The connection to the Chromecast died (receiving).");
+        msg_Err( p_module, "The connection to the Chromecast died (receiving).");
         vlc_mutex_locker locker(&lock);
         setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
         vlc_restorecancel(canc);
