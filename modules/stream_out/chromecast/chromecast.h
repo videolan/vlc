@@ -67,6 +67,7 @@ struct intf_sys_t
     vlc_object_t  * const p_module;
     std::string    serverIP;
     std::string appTransportId;
+    std::string mediaSessionId;
 
     int i_sock_fd;
     vlc_tls_creds_t *p_creds;
