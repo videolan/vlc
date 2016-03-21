@@ -121,6 +121,8 @@ private:
                       const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER,
                       castchannel::CastMessage_PayloadType payloadType = castchannel::CastMessage_PayloadType_STRING);
 
+    void pushMediaPlayerMessage(const std::stringstream & payload);
+
     enum connection_status conn_status;
 
     unsigned i_receiver_requestId;

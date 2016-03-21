@@ -703,7 +703,7 @@ void intf_sys_t::msgPlayerLoad()
 
     free(psz_mime);
 
-    buildMessage(NAMESPACE_MEDIA, ss.str(), appTransportId);
+    pushMediaPlayerMessage( ss );
 }
 
 /**
@@ -732,6 +732,11 @@ int intf_sys_t::sendMessage(const castchannel::CastMessage &msg)
         return VLC_SUCCESS;
 
     return VLC_EGENERIC;
+}
+
+void intf_sys_t::pushMediaPlayerMessage(const std::stringstream & payload) {
+    assert(!appTransportId.empty());
+    buildMessage( NAMESPACE_MEDIA, payload.str(), appTransportId );
 }
 
 /*****************************************************************************
