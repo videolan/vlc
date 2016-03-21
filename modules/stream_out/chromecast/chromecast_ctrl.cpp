@@ -640,6 +640,13 @@ void intf_sys_t::msgReceiverClose(std::string destinationId)
 {
     std::string s("{\"type\":\"CLOSE\"}");
     buildMessage( NAMESPACE_CONNECTION, s, destinationId );
+    if (appTransportId != destinationId)
+        setConnectionStatus( CHROMECAST_DISCONNECTED );
+    else
+    {
+        appTransportId = "";
+        setConnectionStatus( CHROMECAST_AUTHENTICATED );
+    }
 }
 
 void intf_sys_t::msgReceiverGetStatus()
