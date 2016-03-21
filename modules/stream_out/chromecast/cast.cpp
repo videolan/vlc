@@ -51,8 +51,6 @@ struct sout_stream_sys_t
         sout_StreamChainDelete(p_out, p_out);
     }
 
-    vlc_thread_t chromecastThread;
-
     sout_stream_t * const p_out;
     intf_sys_t * const p_intf;
     const bool b_has_video;
