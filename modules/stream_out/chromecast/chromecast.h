@@ -59,6 +59,13 @@ enum connection_status
     CHROMECAST_CONNECTION_DEAD,
 };
 
+enum receiver_state {
+    RECEIVER_IDLE,
+    RECEIVER_PLAYING,
+    RECEIVER_BUFFERING,
+    RECEIVER_PAUSED,
+};
+
 struct intf_sys_t
 {
     intf_sys_t(vlc_object_t * const p_this);
@@ -71,6 +78,7 @@ struct intf_sys_t
 
     std::string appTransportId;
     std::string mediaSessionId;
+    receiver_state receiverState;
 
     int i_sock_fd;
     vlc_tls_creds_t *p_creds;
