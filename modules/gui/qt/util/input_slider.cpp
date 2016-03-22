@@ -53,7 +53,7 @@
 
 namespace {
     int const MIN_SLIDER_VALUE = 0;
-    int const MAX_SLIDER_VALUE = 1000;
+    int const MAX_SLIDER_VALUE = 10000;
 
     int const CHAPTER_SPOT_SIZE = 3;
 
