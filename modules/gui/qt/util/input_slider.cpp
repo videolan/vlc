@@ -209,7 +209,7 @@ void SeekSlider::setPosition( float pos, int64_t time, int length )
 
     if( !isSliding )
     {
-        setValue( (int)( pos * 1000.0 ) );
+        setValue( pos * static_cast<float>( maximum() ) );
         if ( animLoading != NULL && pos >= 0.0f && animLoading->state() != QAbstractAnimation::Stopped )
         {
             animLoading->stop();
@@ -230,7 +230,7 @@ void SeekSlider::startSeekTimer()
 
 void SeekSlider::updatePos()
 {
-    float f_pos = (float)( value() ) / 1000.0;
+    float f_pos = value() / static_cast<float>( maximum() );
     emit sliderDragged( f_pos ); /* Send new position to VLC's core */
 }
 
@@ -336,7 +336,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
 
     isSliding = true ;
 
-    setValue( QStyle::sliderValueFromPosition( MIN_SLIDER_VALUE, MAX_SLIDER_VALUE, event->x() - handleLength() / 2, width() - handleLength(), false ) );
+    setValue( QStyle::sliderValueFromPosition( minimum(), maximum(), event->x() - handleLength() / 2, width() - handleLength(), false ) );
     emit sliderMoved( value() );
     event->accept();
 }
@@ -353,7 +353,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 
     if( isSliding )
     {
-        setValue( QStyle::sliderValueFromPosition( MIN_SLIDER_VALUE, MAX_SLIDER_VALUE, event->x() - handleLength() / 2, width() - handleLength(), false) );
+        setValue( QStyle::sliderValueFromPosition( minimum(), maximum(), event->x() - handleLength() / 2, width() - handleLength(), false) );
         emit sliderMoved( value() );
     }
 
@@ -400,7 +400,7 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
          Since delta is in 1/8 of ° and mouse have steps of 15 °
          and that our slider is in 0.1% and we want one step to be a 1%
          increment of position */
-        emit sliderDragged( value() / 1000.0 );
+        emit sliderDragged( value() / static_cast<float>( maximum() ) );
     }
     event->accept();
 }
