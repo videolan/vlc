@@ -336,7 +336,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
 
     isSliding = true ;
 
-    setValue( QStyle::sliderValueFromPosition( minimum(), maximum(), event->x() - handleLength() / 2, width() - handleLength(), false ) );
+    setValue( getValueFromXPos( event->x() ) );
     emit sliderMoved( value() );
     event->accept();
 }
@@ -353,7 +353,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 
     if( isSliding )
     {
-        setValue( QStyle::sliderValueFromPosition( minimum(), maximum(), event->x() - handleLength() / 2, width() - handleLength(), false) );
+        setValue( getValueFromXPos( event->x() ) );
         emit sliderMoved( value() );
     }
 
@@ -384,7 +384,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
         QPoint target( event->globalX() - ( event->x() - posX ),
                 QWidget::mapToGlobal( QPoint( 0, 0 ) ).y() );
         if( likely( size().width() > handleLength() ) ) {
-            secstotimestr( psz_length, ( ( posX - margin ) * inputLength ) / ( size().width() - handleLength() ) );
+            secstotimestr( psz_length, getValuePercentageFromXPos( event->x() ) * inputLength );
             mTimeTooltip->setTip( target, psz_length, chapterLabel );
         }
     }
@@ -529,6 +529,21 @@ inline int SeekSlider::handleLength()
     initStyleOption( &option );
     mHandleLength = style()->pixelMetric( QStyle::PM_SliderLength, &option );
     return mHandleLength;
+}
+
+inline int SeekSlider::getValueFromXPos( int posX )
+{
+    return QStyle::sliderValueFromPosition(
+        minimum(), maximum(),
+        posX    - handleLength() / 2,
+        width() - handleLength(),
+        false
+    );
+}
+
+inline float SeekSlider::getValuePercentageFromXPos( int posX )
+{
+    return getValueFromXPos( posX ) / static_cast<float>( maximum() );
 }
 
 void SeekSlider::hideHandle()

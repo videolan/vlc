@@ -80,6 +80,9 @@ protected:
     void setLoading( qreal loading );
     int handleLength();
 
+    float getValuePercentageFromXPos( int );
+    int   getValueFromXPos( int );
+
 private:
     bool isSliding;        /* Whether we are currently sliding by user action */
     bool isJumping;              /* if we requested a jump to another chapter */
