@@ -527,6 +527,7 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     theora_CopyPicture( p_pic, ycbcr );
 
     p_pic->date = p_sys->i_pts;
+    p_pic->b_progressive = true;
 
     return p_pic;
 }
