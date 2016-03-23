@@ -421,7 +421,10 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
         int w, h;
         result = p_display_iterator->Next(&p_display_mode);
         if (result != S_OK)
+        {
+            msg_Dbg(vd, "No more modes");
             break;
+        }
 
         BMDDisplayMode mode_id = ntohl(p_display_mode->GetDisplayMode());
 
@@ -446,6 +449,8 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
 
         decklink_sys->i_width = w;
         decklink_sys->i_height = h;
+
+        msg_Dbg(vd, "Selected mode(%dx%d)", w, h);
 
         mode_id = htonl(mode_id);
 
