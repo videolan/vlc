@@ -2397,7 +2397,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     }
 
     case ES_OUT_RESET_PCR:
-        msg_Err( p_sys->p_input, "ES_OUT_RESET_PCR called" );
+        msg_Dbg( p_sys->p_input, "ES_OUT_RESET_PCR called" );
         EsOutChangePosition( out );
         return VLC_SUCCESS;
 
