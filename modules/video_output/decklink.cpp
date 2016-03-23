@@ -297,13 +297,44 @@ end:
  *
  *****************************************************************************/
 
+static struct
+{
+    long i_return_code;
+    const char * const psz_string;
+} const errors_to_string[] = {
+    { E_UNEXPECTED,  "Unexpected error" },
+    { E_NOTIMPL,     "Not implemented" },
+    { E_OUTOFMEMORY, "Out of memory" },
+    { E_INVALIDARG,  "Invalid argument" },
+    { E_NOINTERFACE, "No interface" },
+    { E_POINTER,     "Invalid pointer" },
+    { E_HANDLE,      "Invalid handle" },
+    { E_ABORT,       "Aborted" },
+    { E_FAIL,        "Failed" },
+    { E_ACCESSDENIED,"Access denied" }
+};
+
+static const char * lookup_error_string(long i_code)
+{
+    for(size_t i=0; i<ARRAY_SIZE(errors_to_string); i++)
+    {
+        if(errors_to_string[i].i_return_code == i_code)
+            return errors_to_string[i].psz_string;
+    }
+    return NULL;
+}
+
 static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 #define CHECK(message) do { \
     if (result != S_OK) \
     { \
-        msg_Err(vd, message ": 0x%X", result); \
+        const char *psz_err = lookup_error_string(result); \
+        if(psz_err)\
+            msg_Err(vd, message ": %s", psz_err); \
+        else \
+            msg_Err(vd, message ": 0x%X", result); \
         goto error; \
     } \
 } while(0)
