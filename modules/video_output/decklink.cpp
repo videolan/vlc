@@ -481,7 +481,7 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
         break;
     }
 
-    if (decklink_sys->i_width < 0 || decklink_sys->i_width & 1)
+    if (decklink_sys->i_width <= 0 || decklink_sys->i_width & 1)
     {
         msg_Err(vd, "Unknown video mode specified.");
         goto error;
