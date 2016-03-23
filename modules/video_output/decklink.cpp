@@ -320,6 +320,7 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
     decklink_sys->users++;
 
     /* wait until aout is ready */
+    msg_Info(vd, "Waiting for DeckLink audio input module to start");
     while (decklink_sys->i_rate == -1)
         vlc_cond_wait(&decklink_sys->cond, &decklink_sys->lock);
 
@@ -457,8 +458,8 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
             bmdAudioSampleType16bitInteger,
             /*decklink_sys->i_channels*/ 2,
             bmdAudioOutputStreamTimestamped);
+        CHECK("Could not start audio output");
     }
-    CHECK("Could not start audio output");
 
     /* start */
     result = decklink_sys->p_output->StartScheduledPlayback(
