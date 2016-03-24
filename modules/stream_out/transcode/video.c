@@ -500,7 +500,7 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
         id->p_encoder->fmt_in.video.i_frame_rate,
         id->p_encoder->fmt_in.video.i_frame_rate_base,
         0 );
-     msg_Dbg( p_stream, "source fps %d/%d, destination %d/%d",
+     msg_Dbg( p_stream, "source fps %u/%u, destination %u/%u",
         id->p_decoder->fmt_out.video.i_frame_rate,
         id->p_decoder->fmt_out.video.i_frame_rate_base,
         id->p_encoder->fmt_in.video.i_frame_rate,
