@@ -37,6 +37,7 @@
 #include <string.h>
 
 typedef struct input_item_opaque input_item_opaque_t;
+typedef struct input_item_slave input_item_slave_t;
 
 struct info_t
 {
@@ -83,6 +84,10 @@ struct input_item_t
     int         i_epg;               /**< Number of EPG entries */
     vlc_epg_t   **pp_epg;            /**< EPG entries */
 
+    int         i_slaves;            /**< Number of slaves */
+    input_item_slave_t **pp_slaves;  /**< Slave entries that will be loaded by
+                                          the input_thread */
+
     vlc_event_manager_t event_manager;
 
     vlc_mutex_t lock;                 /**< Lock for the item */
@@ -121,6 +126,40 @@ enum input_item_net_type
     ITEM_NET_UNKNOWN,
     ITEM_NET,
     ITEM_LOCAL
+};
+
+enum slave_type
+{
+    SLAVE_TYPE_SPU,
+    SLAVE_TYPE_AUDIO,
+};
+
+enum slave_priority
+{
+    SLAVE_PRIORITY_MATCH_NONE = 1,
+    SLAVE_PRIORITY_MATCH_RIGHT,
+    SLAVE_PRIORITY_MATCH_LEFT,
+    SLAVE_PRIORITY_MATCH_ALL,
+    SLAVE_PRIORITY_USER
+};
+
+#define SLAVE_SPU_EXTENSIONS \
+    "idx", "sub",  "srt", \
+    "ssa", "ass",  "smi", \
+    "utf", "utf8", "utf-8", \
+    "rt",   "aqt", "txt", \
+    "usf", "jss",  "cdg", \
+    "psb", "mpsub","mpl2", \
+    "pjs", "dks", "stl", \
+    "vtt", "sbv"
+#define SLAVE_AUDIO_EXTENSIONS \
+    "ac3", "m4a"
+
+struct input_item_slave
+{
+    enum slave_type     i_type;     /**< Slave type (spu, audio) */
+    enum slave_priority i_priority; /**< Slave priority */
+    char                psz_uri[];  /**< Slave mrl */
 };
 
 typedef int (*input_item_compar_cb)( input_item_t *, input_item_t * );
@@ -219,6 +258,18 @@ VLC_API int input_item_AddOptions(input_item_t *, int i_options,
 VLC_API int input_item_AddOpaque(input_item_t *, const char *, void *);
 
 void input_item_ApplyOptions(vlc_object_t *, input_item_t *);
+
+VLC_API bool input_item_slave_GetType(const char *, enum slave_type *);
+
+VLC_API input_item_slave_t *input_item_slave_New(const char *, enum slave_type,
+                                               enum slave_priority);
+#define input_item_slave_Delete(p_slave) free(p_slave)
+
+/**
+ * This function allows adding a slave to an existing input item.
+ * The slave is owned by the input item after this call.
+ */
+VLC_API int input_item_AddSlave(input_item_t *, input_item_slave_t *);
 
 /* */
 VLC_API bool input_item_HasErrorWhenReading( input_item_t * );

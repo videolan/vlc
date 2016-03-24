@@ -521,6 +521,10 @@ void input_item_Release( input_item_t *p_item )
         info_category_Delete( p_item->pp_categories[i] );
     TAB_CLEAN( p_item->i_categories, p_item->pp_categories );
 
+    for( int i = 0; i < p_item->i_slaves; i++ )
+        input_item_slave_Delete( p_item->pp_slaves[i] );
+    TAB_CLEAN( p_item->i_slaves, p_item->pp_slaves );
+
     vlc_mutex_destroy( &p_item->lock );
     free( owner );
 }
@@ -602,6 +606,69 @@ void input_item_ApplyOptions(vlc_object_t *obj, input_item_t *item)
     }
 
     vlc_mutex_unlock(&item->lock);
+}
+
+bool input_item_slave_GetType(const char *psz_filename,
+                              enum slave_type *p_slave_type)
+{
+    static const char *const ppsz_sub_exts[] = { SLAVE_SPU_EXTENSIONS, NULL };
+    static const char *const ppsz_audio_exts[] = { SLAVE_AUDIO_EXTENSIONS, NULL };
+
+    static struct {
+        enum slave_type i_type;
+        const char *const *ppsz_exts;
+    } p_slave_list[] = {
+        { SLAVE_TYPE_SPU, ppsz_sub_exts },
+        { SLAVE_TYPE_AUDIO, ppsz_audio_exts },
+    };
+
+    const char *psz_ext = strrchr(psz_filename, '.');
+    if (psz_ext == NULL || *(++psz_ext) == '\0')
+        return false;
+
+    for (unsigned int i = 0; i < sizeof(p_slave_list) / sizeof(*p_slave_list); ++i)
+    {
+        for (const char *const *ppsz_slave_ext = p_slave_list[i].ppsz_exts;
+             *ppsz_slave_ext != NULL; ppsz_slave_ext++)
+        {
+            if (!strcasecmp(psz_ext, *ppsz_slave_ext))
+            {
+                *p_slave_type = p_slave_list[i].i_type;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+input_item_slave_t *input_item_slave_New(const char *psz_uri, enum slave_type i_type,
+                                       enum slave_priority i_priority)
+{
+    if( !psz_uri )
+        return NULL;
+
+    input_item_slave_t *p_slave = malloc( sizeof( *p_slave ) + strlen( psz_uri ) + 1 );
+    if( !p_slave )
+        return NULL;
+
+    p_slave->i_type = i_type;
+    p_slave->i_priority = i_priority;
+    strcpy( p_slave->psz_uri, psz_uri );
+
+    return p_slave;
+}
+
+int input_item_AddSlave(input_item_t *p_item, input_item_slave_t *p_slave)
+{
+    if( p_item == NULL || p_slave == NULL )
+        return VLC_EGENERIC;
+
+    vlc_mutex_lock( &p_item->lock );
+
+    INSERT_ELEM( p_item->pp_slaves, p_item->i_slaves, p_item->i_slaves, p_slave );
+
+    vlc_mutex_unlock( &p_item->lock );
+    return VLC_SUCCESS;
 }
 
 static info_category_t *InputItemFindCat( input_item_t *p_item,
@@ -956,6 +1023,7 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
     p_input->p_stats = NULL;
     p_input->p_meta = NULL;
     TAB_INIT( p_input->i_epg, p_input->pp_epg );
+    TAB_INIT( p_input->i_slaves, p_input->pp_slaves );
 
     vlc_event_manager_init( p_em, p_input );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemMetaChanged );
