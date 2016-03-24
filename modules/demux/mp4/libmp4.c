@@ -1680,6 +1680,69 @@ static int MP4_ReadBox_ASF( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static void MP4_FreeBox_sbgp( MP4_Box_t *p_box )
+{
+    MP4_Box_data_sbgp_t *p_sbgp = p_box->data.p_sbgp;
+    free( p_sbgp->entries.pi_sample_count );
+    free( p_sbgp->entries.pi_group_description_index );
+}
+
+static int MP4_ReadBox_sbgp( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_sbgp_t, MP4_FreeBox_sbgp );
+    MP4_Box_data_sbgp_t *p_sbgp = p_box->data.p_sbgp;
+    uint32_t i_flags;
+
+    if ( i_read < 12 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GET1BYTE( p_sbgp->i_version );
+    MP4_GET3BYTES( i_flags );
+    if( i_flags != 0 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GETFOURCC( p_sbgp->i_grouping_type );
+
+    if( p_sbgp->i_version == 1 )
+    {
+        if( i_read < 8 )
+            MP4_READBOX_EXIT( 0 );
+        MP4_GET4BYTES( p_sbgp->i_grouping_type_parameter );
+    }
+
+    MP4_GET4BYTES( p_sbgp->i_entry_count );
+    if( p_sbgp->i_entry_count > i_read / (4 + 4) )
+        p_sbgp->i_entry_count = i_read / (4 + 4);
+
+    p_sbgp->entries.pi_sample_count = malloc( p_sbgp->i_entry_count * sizeof(uint32_t) );
+    p_sbgp->entries.pi_group_description_index = malloc( p_sbgp->i_entry_count * sizeof(uint32_t) );
+
+    if( !p_sbgp->entries.pi_sample_count || !p_sbgp->entries.pi_group_description_index )
+    {
+        MP4_FreeBox_sbgp( p_box );
+        MP4_READBOX_EXIT( 0 );
+    }
+
+    for( uint32_t i=0; i<p_sbgp->i_entry_count; i++ )
+    {
+        MP4_GET4BYTES( p_sbgp->entries.pi_sample_count[i] );
+        MP4_GET4BYTES( p_sbgp->entries.pi_group_description_index[i] );
+    }
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream,
+        "read box: \"sbgp\" grouping type %4.4s", (char*) &p_sbgp->i_grouping_type );
+ #ifdef MP4_ULTRA_VERBOSE
+    for (uint32_t i = 0; i < p_sbgp->i_entry_count; i++)
+        msg_Dbg( p_stream, "\t samples %" PRIu32 " group %" PRIu32,
+                 p_sbgp->entries.pi_sample_count[i],
+                 p_sbgp->entries.pi_group_description_index[i] );
+ #endif
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static void MP4_FreeBox_stsdext_chan( MP4_Box_t *p_box )
 {
     MP4_Box_data_chan_t *p_chan = p_box->data.p_chan;
@@ -3687,6 +3750,10 @@ static const struct
     { ATOM_pasp,    MP4_ReadBox_pasp,         0 },
     { ATOM_btrt,    MP4_ReadBox_btrt,         0 }, /* codecs bitrate stsd/????/btrt */
     { ATOM_keys,    MP4_ReadBox_keys,         ATOM_meta },
+
+    /* Samples groups specific information */
+    { ATOM_sbgp,    MP4_ReadBox_sbgp,         ATOM_stbl },
+    { ATOM_sbgp,    MP4_ReadBox_sbgp,         ATOM_traf },
 
     /* Quicktime preview atoms, all at root */
     { ATOM_pnot,    MP4_ReadBox_pnot,         0 },

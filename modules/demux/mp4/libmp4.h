@@ -93,6 +93,7 @@ typedef int64_t stime_t;
 #define ATOM_stsc VLC_FOURCC( 's', 't', 's', 'c' )
 #define ATOM_stco VLC_FOURCC( 's', 't', 'c', 'o' )
 #define ATOM_co64 VLC_FOURCC( 'c', 'o', '6', '4' )
+#define ATOM_sbgp VLC_FOURCC( 's', 'b', 'g', 'p' )
 #define ATOM_stss VLC_FOURCC( 's', 't', 's', 's' )
 #define ATOM_stsh VLC_FOURCC( 's', 't', 's', 'h' )
 #define ATOM_stdp VLC_FOURCC( 's', 't', 'd', 'p' )
@@ -1146,6 +1147,19 @@ typedef struct
     uint8_t i_stream_number;
 } MP4_Box_data_ASF_t;
 
+typedef struct
+{
+    uint8_t i_version;
+    uint32_t i_grouping_type;
+    uint32_t i_grouping_type_parameter;
+    uint32_t i_entry_count;
+    struct
+    {
+        uint32_t *pi_sample_count;
+        uint32_t *pi_group_description_index;
+    } entries;
+} MP4_Box_data_sbgp_t;
+
 /* According to Apple's CoreAudio/CoreAudioTypes.h */
 #define MP4_CHAN_USE_CHANNELS_DESC           0
 #define MP4_CHAN_USE_CHANNELS_BITMAP         (1<<16)
@@ -1416,6 +1430,9 @@ typedef union MP4_Box_data_s
     MP4_Box_data_lcont_t *p_lcont;
     MP4_Box_data_stts_t *p_stts;
     MP4_Box_data_ctts_t *p_ctts;
+
+    MP4_Box_data_sbgp_t *p_sbgp;
+
     MP4_Box_data_sample_vide_t *p_sample_vide;
     MP4_Box_data_sample_soun_t *p_sample_soun;
     MP4_Box_data_sample_text_t *p_sample_text;
