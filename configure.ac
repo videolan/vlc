@@ -789,7 +789,7 @@ dnl Check for headers
 dnl
 
 dnl  POSIX
-AC_CHECK_HEADERS([arpa/inet.h pthread.h search.h sys/shm.h sys/socket.h])
+AC_CHECK_HEADERS([arpa/inet.h pthread.h search.h sys/shm.h sys/socket.h sys/uio.h])
 AC_CHECK_HEADERS([net/if.h], [], [],
 [
 #include <sys/types.h>
