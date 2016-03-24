@@ -924,6 +924,26 @@ static void StartTitle( input_thread_t * p_input )
     p_input->p->b_fast_seek = var_GetBool( p_input, "input-fast-seek" );
 }
 
+static int SlaveCompare(const void *a, const void *b)
+{
+    const input_item_slave_t *p_slave0 = *((const input_item_slave_t **) a);
+    const input_item_slave_t *p_slave1 = *((const input_item_slave_t **) b);
+
+    if( p_slave0 == NULL || p_slave1 == NULL )
+    {
+        /* Put NULL (or rejected) subs at the end */
+        return p_slave0 == NULL ? 1 : p_slave1 == NULL ? -1 : 0;
+    }
+
+    if( p_slave0->i_priority > p_slave1->i_priority )
+        return -1;
+
+    if( p_slave0->i_priority < p_slave1->i_priority )
+        return 1;
+
+    return 0;
+}
+
 static void LoadSubtitles( input_thread_t *p_input )
 {
     /* Load subtitles */
@@ -960,23 +980,44 @@ static void LoadSubtitles( input_thread_t *p_input )
 
     if( var_GetBool( p_input, "sub-autodetect-file" ) )
     {
+        /* Add local subtitles */
+        input_item_slave_t **pp_slaves;
+        int i_slaves;
+        TAB_INIT( i_slaves, pp_slaves );
         char *psz_autopath = var_GetNonEmptyString( p_input, "sub-autodetect-path" );
-        char **ppsz_subs = subtitles_Detect( p_input, psz_autopath,
-                                             p_input->p->p_item->psz_uri );
+
+        if( subtitles_Detect( p_input, psz_autopath, p_input->p->p_item->psz_uri,
+                              &pp_slaves, &i_slaves ) == VLC_SUCCESS )
+        {
+            /* check that we did not add the subtitle through sub-file */
+            for( int i = 0; i < i_slaves; i++ )
+            {
+                input_item_slave_t *p_curr = pp_slaves[i];
+                if( p_curr != NULL && psz_subtitle != NULL
+                 && !strcmp( psz_subtitle, p_curr->psz_uri ) )
+                {
+                    /* reject current sub */
+                    input_item_slave_Delete( p_curr );
+                    pp_slaves[i] = NULL;
+                }
+            }
+        }
         free( psz_autopath );
 
-        for( int i = 0; ppsz_subs && ppsz_subs[i]; i++ )
-        {
-            if( !psz_subtitle || strcmp( psz_subtitle, ppsz_subs[i] ) )
-            {
-                i_flags |= SUB_CANFAIL;
-                input_SubtitleFileAdd( p_input, ppsz_subs[i], i_flags, false );
-                i_flags = SUB_NOFLAG;
-            }
+        qsort( pp_slaves, i_slaves, sizeof(input_item_slave_t*), SlaveCompare );
 
-            free( ppsz_subs[i] );
+        /* add all detected subtitles */
+        for( int i = 0; i < i_slaves && pp_slaves[i] != NULL; i++ )
+        {
+            const char *psz_uri = pp_slaves[i]->psz_uri;
+            i_flags |= SUB_CANFAIL;
+            input_SubtitleAdd( p_input, psz_uri, i_flags );
+            i_flags = SUB_NOFLAG;
+
+            input_item_slave_Delete( pp_slaves[i] );
         }
-        free( ppsz_subs );
+
+        TAB_CLEAN( i_slaves, pp_slaves );
     }
     free( psz_subtitle );
 

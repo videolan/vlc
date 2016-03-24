@@ -249,7 +249,7 @@ void input_ControlVarTitle( input_thread_t *, int i_title );
 void input_ConfigVarInit ( input_thread_t * );
 
 /* Subtitles */
-char **subtitles_Detect( input_thread_t *, char* path, const char *fname );
+int subtitles_Detect( input_thread_t *, char *, const char *, input_item_slave_t ***, int * );
 int subtitles_Filter( const char *);
 
 /* input.c */
