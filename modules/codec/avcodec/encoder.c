@@ -248,7 +248,7 @@ static void probe_video_frame_rate( encoder_t *p_enc, AVCodecContext *p_context,
     p_context->time_base.den = p_enc->fmt_in.video.i_frame_rate_base ? p_enc->fmt_in.video.i_frame_rate :
                                   ( p_enc->fmt_out.i_codec == VLC_CODEC_MP4V ? 25 : CLOCK_FREQ );
 
-    msg_Dbg( p_enc, "Time base for probing setted to %d/%d", p_context->time_base.num, p_context->time_base.den );
+    msg_Dbg( p_enc, "Time base for probing set to %d/%d", p_context->time_base.num, p_context->time_base.den );
     if( p_codec->supported_framerates )
     {
         /* We are finding fps values so 1/time_base */
