@@ -1743,6 +1743,108 @@ static int MP4_ReadBox_sbgp( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static void MP4_FreeBox_sgpd( MP4_Box_t *p_box )
+{
+    MP4_Box_data_sgpd_t *p_sgpd = p_box->data.p_sgpd;
+    free( p_sgpd->p_entries );
+}
+
+static int MP4_ReadBox_sgpd( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_sgpd_t, MP4_FreeBox_sgpd );
+    MP4_Box_data_sgpd_t *p_sgpd = p_box->data.p_sgpd;
+    uint32_t i_flags;
+    uint32_t i_default_length = 0;
+
+    if ( i_read < 8 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GET1BYTE( p_sgpd->i_version );
+    MP4_GET3BYTES( i_flags );
+    if( i_flags != 0 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GETFOURCC( p_sgpd->i_grouping_type );
+
+    switch( p_sgpd->i_grouping_type )
+    {
+        case SAMPLEGROUP_rap:
+            break;
+
+        default:
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream,
+        "read box: \"sgpd\" grouping type %4.4s (unimplemented)", (char*) &p_sgpd->i_grouping_type );
+#endif
+            MP4_READBOX_EXIT( 1 );
+    }
+
+    if( p_sgpd->i_version == 1 )
+    {
+        if( i_read < 8 )
+            MP4_READBOX_EXIT( 0 );
+        MP4_GET4BYTES( i_default_length );
+    }
+    else if( p_sgpd->i_version >= 2 )
+    {
+        if( i_read < 8 )
+            MP4_READBOX_EXIT( 0 );
+        MP4_GET4BYTES( p_sgpd->i_default_sample_description_index );
+    }
+
+    MP4_GET4BYTES( p_sgpd->i_entry_count );
+
+    p_sgpd->p_entries = malloc( p_sgpd->i_entry_count * sizeof(*p_sgpd->p_entries) );
+    if( !p_sgpd->p_entries )
+        MP4_READBOX_EXIT( 0 );
+
+    uint32_t i = 0;
+    for( ; i<p_sgpd->i_entry_count; i++ )
+    {
+        uint32_t i_description_length = i_default_length;
+        if( p_sgpd->i_version == 1 && i_default_length == 0 )
+        {
+            if( i_read < 4 )
+                break;
+            MP4_GET4BYTES( i_description_length );
+        }
+
+        if( p_sgpd->i_version == 1 && i_read < i_description_length )
+            break;
+
+        switch( p_sgpd->i_grouping_type )
+        {
+            case SAMPLEGROUP_rap:
+                {
+                    if( i_read < 1 )
+                    {
+                        p_sgpd->i_entry_count = 0;
+                        MP4_FreeBox_sgpd( p_box );
+                        MP4_READBOX_EXIT( 0 );
+                    }
+                    uint8_t i_data;
+                    MP4_GET1BYTE( i_data );
+                    p_sgpd->p_entries[i].rap.i_num_leading_samples_known = i_data & 0x80;
+                    p_sgpd->p_entries[i].rap.i_num_leading_samples = i_data & 0x7F;
+                }
+                break;
+
+            default:
+                assert(0);
+        }
+    }
+
+    if( i != p_sgpd->i_entry_count )
+        p_sgpd->i_entry_count = i;
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream,
+        "read box: \"sgpd\" grouping type %4.4s", (char*) &p_sgpd->i_grouping_type );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static void MP4_FreeBox_stsdext_chan( MP4_Box_t *p_box )
 {
     MP4_Box_data_chan_t *p_chan = p_box->data.p_chan;
@@ -3754,6 +3856,8 @@ static const struct
     /* Samples groups specific information */
     { ATOM_sbgp,    MP4_ReadBox_sbgp,         ATOM_stbl },
     { ATOM_sbgp,    MP4_ReadBox_sbgp,         ATOM_traf },
+    { ATOM_sgpd,    MP4_ReadBox_sgpd,         ATOM_stbl },
+    { ATOM_sgpd,    MP4_ReadBox_sgpd,         ATOM_traf },
 
     /* Quicktime preview atoms, all at root */
     { ATOM_pnot,    MP4_ReadBox_pnot,         0 },

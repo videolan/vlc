@@ -94,6 +94,7 @@ typedef int64_t stime_t;
 #define ATOM_stco VLC_FOURCC( 's', 't', 'c', 'o' )
 #define ATOM_co64 VLC_FOURCC( 'c', 'o', '6', '4' )
 #define ATOM_sbgp VLC_FOURCC( 's', 'b', 'g', 'p' )
+#define ATOM_sgpd VLC_FOURCC( 's', 'g', 'p', 'd' )
 #define ATOM_stss VLC_FOURCC( 's', 't', 's', 's' )
 #define ATOM_stsh VLC_FOURCC( 's', 't', 's', 'h' )
 #define ATOM_stdp VLC_FOURCC( 's', 't', 'd', 'p' )
@@ -344,6 +345,8 @@ typedef int64_t stime_t;
 
 #define HANDLER_mdta VLC_FOURCC('m', 'd', 't', 'a')
 #define HANDLER_mdir VLC_FOURCC('m', 'd', 'i', 'r')
+
+#define SAMPLEGROUP_rap  VLC_FOURCC('r', 'a', 'p', ' ')
 
 /* Do you want some debug information on all read boxes ? */
 #ifndef NDEBUG
@@ -1151,6 +1154,22 @@ typedef struct
 {
     uint8_t i_version;
     uint32_t i_grouping_type;
+    uint32_t i_default_sample_description_index;
+    uint32_t i_entry_count;
+    union
+    {
+        struct
+        {
+            uint8_t i_num_leading_samples_known;
+            uint8_t i_num_leading_samples;
+        } rap;
+    } *p_entries;
+} MP4_Box_data_sgpd_t;
+
+typedef struct
+{
+    uint8_t i_version;
+    uint32_t i_grouping_type;
     uint32_t i_grouping_type_parameter;
     uint32_t i_entry_count;
     struct
@@ -1432,6 +1451,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_ctts_t *p_ctts;
 
     MP4_Box_data_sbgp_t *p_sbgp;
+    MP4_Box_data_sgpd_t *p_sgpd;
 
     MP4_Box_data_sample_vide_t *p_sample_vide;
     MP4_Box_data_sample_soun_t *p_sample_soun;
