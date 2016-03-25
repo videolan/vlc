@@ -1,6 +1,6 @@
 # libmicrodns
 
-LIBMICRODNS_VERSION := 0.0.2
+LIBMICRODNS_VERSION := 0.0.3
 LIBMICRODNS_URL := https://github.com/videolabs/libmicrodns/releases/download/$(LIBMICRODNS_VERSION)/microdns-$(LIBMICRODNS_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
