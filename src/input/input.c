@@ -944,9 +944,8 @@ static int SlaveCompare(const void *a, const void *b)
     return 0;
 }
 
-static void LoadSubtitles( input_thread_t *p_input )
+static void SetSubtitlesOptions( input_thread_t *p_input )
 {
-    /* Load subtitles */
     /* Get fps and set it if not already set */
     const float f_fps = p_input->p->master->f_fps;
     if( f_fps > 1.f )
@@ -966,7 +965,10 @@ static void LoadSubtitles( input_thread_t *p_input )
     const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
     if( i_delay != 0 )
         var_SetInteger( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
+}
 
+static void LoadSubtitles( input_thread_t *p_input )
+{
     /* Look for and add subtitle files */
 
     char *psz_subtitle = var_GetNonEmptyString( p_input, "sub-file" );
@@ -1233,6 +1235,7 @@ static int Init( input_thread_t * p_input )
     if( !p_input->b_preparsing )
     {
         StartTitle( p_input );
+        SetSubtitlesOptions( p_input );
         LoadSubtitles( p_input );
         LoadSlaves( p_input );
         InitPrograms( p_input );
