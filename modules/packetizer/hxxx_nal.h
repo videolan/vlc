@@ -20,10 +20,6 @@
 #ifndef HXXX_NAL_H
 #define HXXX_NAL_H
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 
 static const uint8_t  annexb_startcode4[] = { 0x00, 0x00, 0x00, 0x01 };

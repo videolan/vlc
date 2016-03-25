@@ -20,10 +20,6 @@
 #ifndef HXXX_COMMON_H
 #define HXXX_COMMON_H
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 
 typedef block_t * (*pf_annexb_nal_packetizer)(decoder_t *, bool *, block_t *);
