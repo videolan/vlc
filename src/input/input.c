@@ -968,14 +968,12 @@ static void LoadSubtitles( input_thread_t *p_input )
         var_SetInteger( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
 
     /* Look for and add subtitle files */
-    unsigned i_flags = SUB_FORCED;
 
     char *psz_subtitle = var_GetNonEmptyString( p_input, "sub-file" );
     if( psz_subtitle != NULL )
     {
         msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
-        input_SubtitleFileAdd( p_input, psz_subtitle, i_flags, true );
-        i_flags = SUB_NOFLAG;
+        input_SubtitleFileAdd( p_input, psz_subtitle, SUB_FORCED, true );
     }
 
     if( var_GetBool( p_input, "sub-autodetect-file" ) )
@@ -1010,9 +1008,7 @@ static void LoadSubtitles( input_thread_t *p_input )
         for( int i = 0; i < i_slaves && pp_slaves[i] != NULL; i++ )
         {
             const char *psz_uri = pp_slaves[i]->psz_uri;
-            i_flags |= SUB_CANFAIL;
-            input_SubtitleAdd( p_input, psz_uri, i_flags );
-            i_flags = SUB_NOFLAG;
+            input_SubtitleAdd( p_input, psz_uri, SUB_CANFAIL );
 
             input_item_slave_Delete( pp_slaves[i] );
         }
@@ -1049,9 +1045,8 @@ static void LoadSubtitles( input_thread_t *p_input )
         {
             var_SetString( p_input, "sub-description", a->psz_description ? a->psz_description : "");
 
-            input_SubtitleAdd( p_input, psz_mrl, i_flags );
+            input_SubtitleAdd( p_input, psz_mrl, SUB_NOFLAG );
 
-            i_flags = SUB_NOFLAG;
             free( psz_mrl );
         }
         vlc_input_attachment_Delete( a );
