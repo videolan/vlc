@@ -116,7 +116,6 @@ vlc_module_end ()
 static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 {
     char *psz_name;
-    char psz_name_output[32];
     struct aout_sys_t *p_sys = p_aout->sys;
     int status = VLC_SUCCESS;
     unsigned int i;
@@ -137,8 +136,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_sys->p_jack_client = jack_client_open( psz_name,
                                              JackNullOption | JackNoStartServer,
                                              NULL );
-    free( psz_name );
-
     if( p_sys->p_jack_client == NULL )
     {
         msg_Err( p_aout, "failed to connect to JACK server" );
@@ -198,10 +195,13 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     /* Create the output ports */
     for( i = 0; i < p_sys->i_channels; i++ )
     {
-        snprintf( psz_name_output, sizeof(psz_name_output), "out_%d", i + 1);
-        psz_name_output[sizeof(psz_name_output) - 1] = '\0';
-        p_sys->p_jack_ports[i] = jack_port_register( p_sys->p_jack_client,
-                psz_name_output, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0 );
+        char *psz_name_output;
+        if( asprintf( &psz_name_output, "%s_out_%d", psz_name, i + 1) != -1 )
+        {
+            p_sys->p_jack_ports[i] = jack_port_register( p_sys->p_jack_client,
+                    psz_name_output, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0 );
+            free( psz_name_output );
+        }
 
         if( p_sys->p_jack_ports[i] == NULL )
         {
@@ -275,6 +275,7 @@ error_out:
         free( p_sys->p_jack_ports );
         free( p_sys->p_jack_buffers );
     }
+    free( psz_name );
     return status;
 }
 
