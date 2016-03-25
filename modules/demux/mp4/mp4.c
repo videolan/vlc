@@ -19,19 +19,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-
 #include "mp4.h"
-
-#include <vlc_plugin.h>
 
 #include <vlc_demux.h>
 #include <vlc_charset.h>                           /* EnsureUTF8 */
 #include <vlc_input.h>
 #include <vlc_aout.h>
+#include <vlc_plugin.h>
 #include <assert.h>
 #include <limits.h>
 #include "../codec/cc.h"

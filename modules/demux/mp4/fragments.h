@@ -20,10 +20,6 @@
 #ifndef VLC_MP4_FRAGMENTS_H_
 #define VLC_MP4_FRAGMENTS_H_
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 #include "libmp4.h"
 

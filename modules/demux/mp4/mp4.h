@@ -25,10 +25,6 @@
  * Preamble
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 #include "libmp4.h"
 #include "fragments.h"

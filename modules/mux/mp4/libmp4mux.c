@@ -20,15 +20,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "libmp4mux.h"
 #include "../demux/mp4/libmp4.h" /* flags */
 #include "../packetizer/hevc_nal.h"
 #include "../packetizer/h264_nal.h" /* h264_get_spspps */
 #include "../packetizer/hxxx_nal.h"
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
 
 #include <vlc_es.h>
 #include <vlc_iso_lang.h>
