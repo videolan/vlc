@@ -255,12 +255,6 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
     return p_box;
 }
 
-static inline MP4_Box_t *MP4_ReadNextBox( stream_t *p_stream, MP4_Box_t *p_father )
-{
-    bool b;
-    return MP4_ReadBoxRestricted( p_stream, p_father, NULL, NULL, &b );
-}
-
 /*****************************************************************************
  * For all known box a loader is given,
  * you have to be already read container header
