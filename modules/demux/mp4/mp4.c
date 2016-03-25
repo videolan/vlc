@@ -2353,6 +2353,7 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
                                      uint32_t i_sample, uint32_t *pi_sync_sample )
 {
     int i_ret = VLC_EGENERIC;
+    *pi_sync_sample = 0;
 
     const MP4_Box_t *p_stss;
     if( ( p_stss = MP4_BoxGet( p_track->p_stbl, "stss" ) ) )
@@ -2370,6 +2371,46 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
                          i_sample, *pi_sync_sample );
                 i_ret = VLC_SUCCESS;
                 break;
+            }
+        }
+    }
+
+    /* try rap samples groups */
+    const MP4_Box_t *p_sbgp = MP4_BoxGet( p_track->p_stbl, "sbgp" );
+    for( ; p_sbgp; p_sbgp = p_sbgp->p_next )
+    {
+        const MP4_Box_data_sbgp_t *p_sbgp_data = BOXDATA(p_sbgp);
+        if( p_sbgp->i_type != ATOM_sbgp || !p_sbgp_data )
+            continue;
+
+        if( p_sbgp_data->i_grouping_type == SAMPLEGROUP_rap )
+        {
+            uint32_t i_group_sample = 0;
+            for ( uint32_t i=0; i<p_sbgp_data->i_entry_count; i++ )
+            {
+                /* Sample belongs to rap group ? */
+                if( p_sbgp_data->entries.pi_group_description_index[i] != 0 )
+                {
+                    if( i_sample < i_group_sample )
+                    {
+                        msg_Dbg( p_demux, "sbgp lookup failed %" PRIu32 " (sample number)",
+                                 i_sample );
+                        break;
+                    }
+                    else if ( i_sample >= i_group_sample &&
+                              *pi_sync_sample < i_group_sample )
+                    {
+                        *pi_sync_sample = i_group_sample;
+                        i_ret = VLC_SUCCESS;
+                    }
+                }
+                i_group_sample += p_sbgp_data->entries.pi_sample_count[i];
+            }
+
+            if( i_ret == VLC_SUCCESS && *pi_sync_sample )
+            {
+                msg_Dbg( p_demux, "sbgp gives %d --> %" PRIu32 " (sample number)",
+                         i_sample, *pi_sync_sample );
             }
         }
     }
