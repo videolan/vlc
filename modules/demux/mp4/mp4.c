@@ -763,7 +763,7 @@ static int Open( vlc_object_t * p_this )
         p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );
         MP4_TrackCreate( p_demux, &p_sys->track[i], p_trak, true, !b_enabled_es );
 
-        if( p_sys->track[i].b_ok && !p_sys->track[i].b_chapter )
+        if( p_sys->track[i].b_ok && !p_sys->track[i].b_chapters_source )
         {
             const char *psz_cat;
             switch( p_sys->track[i].fmt.i_cat )
@@ -789,7 +789,7 @@ static int Open( vlc_object_t * p_this )
                      p_sys->track[i].fmt.psz_language ?
                      p_sys->track[i].fmt.psz_language : "undef" );
         }
-        else if( p_sys->track[i].b_ok && p_sys->track[i].b_chapter )
+        else if( p_sys->track[i].b_ok && p_sys->track[i].b_chapters_source )
         {
             msg_Dbg( p_demux, "using track[Id 0x%x] for chapter language %s",
                      p_sys->track[i].i_track_ID,
@@ -883,7 +883,7 @@ static int Demux( demux_t *p_demux )
         mp4_track_t *tk = &p_sys->track[i_track];
         bool b;
 
-        if( !tk->b_ok || tk->b_chapter ||
+        if( !tk->b_ok || tk->b_chapters_source ||
             ( tk->b_selected && tk->i_sample >= tk->i_sample_count ) )
         {
             continue;
@@ -938,7 +938,7 @@ static int Demux( demux_t *p_demux )
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
         mp4_track_t *tk_tmp = &p_sys->track[i_track];
-        if( !tk_tmp->b_ok || tk_tmp->b_chapter || !tk_tmp->b_selected || tk_tmp->i_sample >= tk_tmp->i_sample_count )
+        if( !tk_tmp->b_ok || tk_tmp->b_chapters_source || !tk_tmp->b_selected || tk_tmp->i_sample >= tk_tmp->i_sample_count )
             continue;
 
         if ( p_sys->b_seekmode )
@@ -2643,7 +2643,7 @@ static void MP4_TrackRestart( demux_t *p_demux, mp4_track_t *p_track,
             if( p_es_backup )
                 es_out_Del( p_demux->out, p_es_backup );
 
-            if( !p_track->b_chapter )
+            if( !p_track->b_chapters_source )
             {
                 p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
                 p_track->b_ok = !!p_track->p_es;
@@ -2841,7 +2841,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
             if( p_track->i_track_ID == p_chap->i_track_ID[i] &&
                 p_track->fmt.i_cat == UNKNOWN_ES )
             {
-                p_track->b_chapter = true;
+                p_track->b_chapters_source = true;
                 p_track->b_enable = false;
                 break;
             }
@@ -2900,7 +2900,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 
     if( TrackCreateES( p_demux,
                        p_track, p_track->i_chunk,
-                      (p_track->b_chapter || !b_create_es) ? NULL : &p_track->p_es ) )
+                      (p_track->b_chapters_source || !b_create_es) ? NULL : &p_track->p_es ) )
     {
         msg_Err( p_demux, "cannot create es for track[Id 0x%x]",
                  p_track->i_track_ID );
@@ -2962,7 +2962,7 @@ static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
 static int MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track,
                             mtime_t i_start )
 {
-    if( !p_track->b_ok || p_track->b_chapter )
+    if( !p_track->b_ok || p_track->b_chapters_source )
     {
         return VLC_EGENERIC;
     }
@@ -2979,7 +2979,7 @@ static int MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track,
 
 static void MP4_TrackUnselect( demux_t *p_demux, mp4_track_t *p_track )
 {
-    if( !p_track->b_ok || p_track->b_chapter )
+    if( !p_track->b_ok || p_track->b_chapters_source )
     {
         return;
     }
@@ -3005,7 +3005,7 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
     uint32_t i_chunk;
     uint32_t i_sample;
 
-    if( !p_track->b_ok || p_track->b_chapter )
+    if( !p_track->b_ok || p_track->b_chapters_source )
         return VLC_EGENERIC;
 
     p_track->b_selected = false;
@@ -3674,7 +3674,7 @@ MP4_frg_GetChunks_Error:
 
 static int MP4_frg_TrackSelect( demux_t *p_demux, mp4_track_t *p_track )
 {
-    if( !p_track->b_ok || p_track->b_chapter )
+    if( !p_track->b_ok || p_track->b_chapters_source )
     {
         return VLC_EGENERIC;
     }
@@ -3707,7 +3707,7 @@ int DemuxFrg( demux_t *p_demux )
         mp4_track_t *tk = &p_sys->track[i_track];
         bool b;
 
-        if( !tk->b_ok || tk->b_chapter )
+        if( !tk->b_ok || tk->b_chapters_source )
             continue;
 
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
@@ -3756,7 +3756,7 @@ int DemuxFrg( demux_t *p_demux )
     {
         mp4_track_t *tk = &p_sys->track[i_track];
 
-        if( !tk->b_ok || tk->b_chapter || !tk->b_selected )
+        if( !tk->b_ok || tk->b_chapters_source || !tk->b_selected )
         {
             msg_Warn( p_demux, "Skipping track id %u", tk->i_track_ID );
             continue;
@@ -4764,7 +4764,7 @@ static void RestartAllTracks( demux_t *p_demux, const MP4_Box_t *p_root )
     for( unsigned i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
         mp4_track_t *tk = &p_sys->track[i_track];
-        if( !tk->b_ok || tk->b_chapter )
+        if( !tk->b_ok || tk->b_chapters_source )
             continue;
 
         ReInitDecoder( p_demux, p_root, tk );
@@ -4782,7 +4782,7 @@ static int DemuxAsLeaf( demux_t *p_demux )
         mp4_track_t *tk = &p_sys->track[i_track];
         bool b;
 
-        if( !tk->b_ok || tk->b_chapter )
+        if( !tk->b_ok || tk->b_chapters_source )
             continue;
 
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
