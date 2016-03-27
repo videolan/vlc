@@ -321,11 +321,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if ( p_dec->fmt_in.subs.p_style )
         p_segment3g->s->style = text_style_Duplicate( p_dec->fmt_in.subs.p_style );
 
+    free( psz_subtitle );
+
     if ( !p_segment3g->s->psz_text )
     {
         text_segment_Delete( p_segment3g->s );
         free( p_segment3g );
-        free( psz_subtitle );
         return NULL;
     }
 
@@ -333,7 +334,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu = decoder_NewSubpictureText( p_dec );
     if( !p_spu )
     {
-        free( psz_subtitle );
         text_segment_Delete( p_segment3g->s );
         free( p_segment3g );
         return NULL;
