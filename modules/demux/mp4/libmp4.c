@@ -4236,10 +4236,10 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
 
     if( p_tmp_box->i_type == ATOM_ftyp )
     {
-        free( p_tmp_box );
+        MP4_BoxFree( p_tmp_box );
         return MP4_BoxGetRoot( s );
     }
-    free( p_tmp_box );
+    MP4_BoxFree( p_tmp_box );
 
     p_fakeroot = MP4_BoxNew( ATOM_root );
     if( unlikely( p_fakeroot == NULL ) )
