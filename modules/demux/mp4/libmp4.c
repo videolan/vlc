@@ -4638,7 +4638,11 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
         return NULL;
 
     /* We might get a ftyp box or a SmooBox */
-    MP4_PeekBoxHeader( s, p_tmp_box );
+    if( MP4_PeekBoxHeader( s, p_tmp_box ) == 0 )
+    {
+        free( p_tmp_box );
+        return NULL;
+    }
 
     if( p_tmp_box->i_type == ATOM_ftyp )
     {
