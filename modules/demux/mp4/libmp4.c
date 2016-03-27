@@ -74,6 +74,7 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date, bool b_relative )
 static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father );
 static int MP4_Box_Read_Specific( stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father );
 static void MP4_Box_Clean_Specific( MP4_Box_t *p_box );
+static inline MP4_Box_t * MP4_BoxNew( uint32_t i_type );
 
 static int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
 {
@@ -4182,6 +4183,19 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
 }
 
 /*****************************************************************************
+ * MP4_BoxNew : creates and initializes an arbitrary box
+ *****************************************************************************/
+static inline MP4_Box_t * MP4_BoxNew( uint32_t i_type )
+{
+    MP4_Box_t *p_box = calloc( 1, sizeof( MP4_Box_t ) );
+    if( likely( p_box != NULL ) )
+    {
+        p_box->i_type = i_type;
+    }
+    return p_box;
+}
+
+/*****************************************************************************
  * MP4_FreeBox : free memory after read with MP4_ReadBox and all
  * the children
  *****************************************************************************/
@@ -4212,10 +4226,8 @@ void MP4_BoxFree( MP4_Box_t *p_box )
 MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
 {
     /* p_chunk is a virtual root container for the moof and mdat boxes */
-    MP4_Box_t *p_chunk;
-    MP4_Box_t *p_tmp_box = NULL;
-
-    p_tmp_box = calloc( 1, sizeof( MP4_Box_t ) );
+    MP4_Box_t *p_fakeroot;
+    MP4_Box_t *p_tmp_box = MP4_BoxNew( 0 );
     if( unlikely( p_tmp_box == NULL ) )
         return NULL;
 
@@ -4229,24 +4241,22 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
     }
     free( p_tmp_box );
 
-    p_chunk = calloc( 1, sizeof( MP4_Box_t ) );
-    if( unlikely( p_chunk == NULL ) )
+    p_fakeroot = MP4_BoxNew( ATOM_root );
+    if( unlikely( p_fakeroot == NULL ) )
         return NULL;
-
-    p_chunk->i_type = ATOM_root;
-    p_chunk->i_shortsize = 1;
+    p_fakeroot->i_shortsize = 1;
 
     const uint32_t stoplist[] = { ATOM_moof, 0 };
-    MP4_ReadBoxContainerChildren( s, p_chunk, stoplist );
+    MP4_ReadBoxContainerChildren( s, p_fakeroot, stoplist );
 
-    p_tmp_box = p_chunk->p_first;
+    p_tmp_box = p_fakeroot->p_first;
     while( p_tmp_box )
     {
-        p_chunk->i_size += p_tmp_box->i_size;
+        p_fakeroot->i_size += p_tmp_box->i_size;
         p_tmp_box = p_tmp_box->p_next;
     }
 
-    return p_chunk;
+    return p_fakeroot;
 }
 
 /*****************************************************************************
@@ -4259,11 +4269,10 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
 {
     int i_result;
 
-    MP4_Box_t *p_vroot = calloc( 1, sizeof( MP4_Box_t ) );
+    MP4_Box_t *p_vroot = MP4_BoxNew( ATOM_root );
     if( p_vroot == NULL )
         return NULL;
 
-    p_vroot->i_type = ATOM_root;
     p_vroot->i_shortsize = 1;
     int64_t i_size = stream_Size( p_stream );
     if( i_size > 0 )
