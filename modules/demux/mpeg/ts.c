@@ -1492,7 +1492,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                                 {
                                     block_t *p_dup = block_Duplicate( p_block );
                                     if( p_dup )
-                                        es_out_Send( p_demux->out, p_es_send->id, p_dup );
+                                        es_out_Send( p_demux->out, p_extra_es->id, p_dup );
                                 }
                                 p_extra_es = p_extra_es->p_next;
                             }
