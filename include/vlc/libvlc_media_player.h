@@ -570,8 +570,24 @@ LIBVLC_API int libvlc_media_player_set_evas_object( libvlc_media_player_t *p_mi,
 
 /**
  * Callback prototype for audio playback.
+ *
+ * The LibVLC media player decodes and post-processes the audio signal
+ * asynchronously (in an internal thread). Whenever audio samples are ready
+ * to be queued to the output, this callback is invoked.
+ *
+ * The number of samples provided per invocation may depend on the file format,
+ * the audio coding algorithm, the decoder plug-in, the post-processing
+ * filters and timing. Application must not assume a certain number of samples.
+ *
+ * The exact format of audio samples is determined by libvlc_audio_set_format()
+ * or libvlc_audio_set_format_callbacks() as is the channels layout.
+ *
+ * Note that the number of samples is per channel. For instance, if the audio
+ * track sampling rate is 48000 Hz, then 1200 samples represent 25 milliseconds
+ * of audio signal - regardless of the number of audio channels. 
+ *
  * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
- * \param samples pointer to the first audio sample to play back [IN]
+ * \param samples pointer to a table of audio samples to play back [IN]
  * \param count number of audio samples to play back
  * \param pts expected play time stamp (see libvlc_delay())
  */
@@ -580,6 +596,9 @@ typedef void (*libvlc_audio_play_cb)(void *data, const void *samples,
 
 /**
  * Callback prototype for audio pause.
+ *
+ * LibVLC invokes this callback to pause audio playback.
+ *
  * \note The pause callback is never called if the audio is already paused.
  * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
  * \param pts time stamp of the pause request (should be elapsed already)
@@ -587,7 +606,11 @@ typedef void (*libvlc_audio_play_cb)(void *data, const void *samples,
 typedef void (*libvlc_audio_pause_cb)(void *data, int64_t pts);
 
 /**
- * Callback prototype for audio resumption (i.e. restart from pause).
+ * Callback prototype for audio resumption.
+ *
+ * LibVLC invokes this callback to resume audio playback after it was
+ * previously paused.
+ *
  * \note The resume callback is never called if the audio is not paused.
  * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
  * \param pts time stamp of the resumption request (should be elapsed already)
@@ -595,15 +618,23 @@ typedef void (*libvlc_audio_pause_cb)(void *data, int64_t pts);
 typedef void (*libvlc_audio_resume_cb)(void *data, int64_t pts);
 
 /**
- * Callback prototype for audio buffer flush
- * (i.e. discard all pending buffers and stop playback as soon as possible).
+ * Callback prototype for audio buffer flush.
+ *
+ * LibVLC invokes this callback if it needs to discard all pending buffers and
+ * stop playback as soon as possible. This typically occurs when the media is
+ * stopped.
+ *
  * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
  */
 typedef void (*libvlc_audio_flush_cb)(void *data, int64_t pts);
 
 /**
- * Callback prototype for audio buffer drain
- * (i.e. wait for pending buffers to be played).
+ * Callback prototype for audio buffer drain.
+ *
+ * LibVLC may invoke this callback when the decoded audio track is ending.
+ * There will be no further decoded samples for the track, but playback should
+ * nevertheless continue until all already pending buffers are rendered.
+ *
  * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
  */
 typedef void (*libvlc_audio_drain_cb)(void *data);
@@ -618,9 +649,13 @@ typedef void (*libvlc_audio_set_volume_cb)(void *data,
                                            float volume, bool mute);
 
 /**
- * Set callbacks and private data for decoded audio.
+ * Sets callbacks and private data for decoded audio.
+ *
  * Use libvlc_audio_set_format() or libvlc_audio_set_format_callbacks()
  * to configure the decoded audio format.
+ *
+ * \note The audio callbacks override any other audio output mechanism.
+ * If the callbacks are set, LibVLC will <b>not</b> output audio in any way.
  *
  * \param mp the media player
  * \param play callback to play audio samples (must not be NULL)
@@ -657,6 +692,7 @@ void libvlc_audio_set_volume_callback( libvlc_media_player_t *mp,
 
 /**
  * Callback prototype to setup the audio playback.
+ *
  * This is called when the media player needs to create a new audio output.
  * \param opaque pointer to the data pointer passed to
  *               libvlc_audio_set_callbacks() [IN/OUT]
@@ -670,14 +706,16 @@ typedef int (*libvlc_audio_setup_cb)(void **data, char *format, unsigned *rate,
 
 /**
  * Callback prototype for audio playback cleanup.
+ *
  * This is called when the media player no longer needs an audio output.
  * \param opaque data pointer as passed to libvlc_audio_set_callbacks() [IN]
  */
 typedef void (*libvlc_audio_cleanup_cb)(void *data);
 
 /**
- * Set decoded audio format. This only works in combination with
- * libvlc_audio_set_callbacks().
+ * Sets decoded audio format via callbacks.
+ *
+ * This only works in combination with libvlc_audio_set_callbacks().
  *
  * \param mp the media player
  * \param setup callback to select the audio format (cannot be NULL)
@@ -690,7 +728,8 @@ void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
                                         libvlc_audio_cleanup_cb cleanup );
 
 /**
- * Set decoded audio format.
+ * Sets a fixed decoded audio format.
+ *
  * This only works in combination with libvlc_audio_set_callbacks(),
  * and is mutually exclusive with libvlc_audio_set_format_callbacks().
  *
