@@ -137,7 +137,8 @@ typedef enum libvlc_navigate_mode_t
     libvlc_navigate_up,
     libvlc_navigate_down,
     libvlc_navigate_left,
-    libvlc_navigate_right
+    libvlc_navigate_right,
+    libvlc_navigate_popup
 } libvlc_navigate_mode_t;
 
 /**
