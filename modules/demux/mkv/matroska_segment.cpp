@@ -254,6 +254,7 @@ static const struct {
                      {vlc_meta_Publisher,   "PUBLISHER",     0},
                      {vlc_meta_EncodedBy,   "ENCODED_BY",    0},
                      {vlc_meta_TrackTotal,  "TOTAL_PARTS",   0},
+                     {vlc_meta_Album,       "ALBUM",         0},
                      {vlc_meta_Title,       NULL,            0},
 };
 
