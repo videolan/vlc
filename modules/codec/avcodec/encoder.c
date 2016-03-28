@@ -1088,6 +1088,10 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame->interlaced_frame = !p_pict->b_progressive;
         frame->top_field_first = !!p_pict->b_top_field_first;
 
+        frame->format = p_sys->p_context->pix_fmt;
+        frame->width = p_sys->p_context->width;
+        frame->height = p_sys->p_context->height;
+
         /* Set the pts of the frame being encoded
          * avcodec likes pts to be in time_base units
          * frame number */
