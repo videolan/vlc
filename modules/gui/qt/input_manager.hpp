@@ -132,7 +132,7 @@ public:
     void delInput();
     bool hasInput() const { return p_input != NULL; }
 
-    int playingStatus();
+    int playingStatus() const;
     bool hasAudio();
     bool hasVideo() { return hasInput() && b_video; }
     bool hasVisualisation();

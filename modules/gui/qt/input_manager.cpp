@@ -535,7 +535,7 @@ void InputManager::UpdateName()
     }
 }
 
-int InputManager::playingStatus()
+int InputManager::playingStatus() const
 {
     return i_old_playing_status;
 }
