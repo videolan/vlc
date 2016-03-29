@@ -147,7 +147,7 @@ void UpdateRects(vout_display_t *vd,
         source = &vd->source;
 
     /* Retrieve the window size */
-#if VLC_WINSTORE_APP
+#if VLC_WINSTORE_APP && MODULE_NAME_IS_direct3d11
     rect.left   = 0;
     rect.top    = 0;
     uint32_t i_width;
