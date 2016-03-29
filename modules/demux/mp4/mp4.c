@@ -4819,21 +4819,21 @@ static int DemuxAsLeaf( demux_t *p_demux )
                 if(!p_vroot)
                     return VLC_DEMUXER_SUCCESS;
 
-                MP4_Box_t *p_fragbox = MP4_BoxGet( p_vroot, "moof" );
-                if( !p_fragbox )
+                MP4_Box_t *p_mooxbox = MP4_BoxExtract( &p_vroot->p_first, ATOM_moof );
+                if( !p_mooxbox )
                 {
-                    p_fragbox = MP4_BoxGet( p_vroot, "moov" );
                     RestartAllTracks( p_demux, p_vroot );
+                    p_mooxbox = MP4_BoxExtract( &p_vroot->p_first, ATOM_moov );
                 }
 
-                if(!p_fragbox)
+                if(!p_mooxbox)
                 {
                     MP4_BoxFree( p_vroot );
                     msg_Info(p_demux, "no moof or moov in current chunk");
                     return VLC_DEMUXER_SUCCESS;
                 }
 
-                MP4_Box_t *p_mfhd = MP4_BoxGet( p_fragbox, "mfhd" );
+                MP4_Box_t *p_mfhd = MP4_BoxGet( p_mooxbox, "mfhd" );
                 if( p_mfhd && BOXDATA(p_mfhd) )
                 {
                     /* Detect and Handle Passive Seek */
@@ -4859,30 +4859,12 @@ static int DemuxAsLeaf( demux_t *p_demux )
                     p_sys->context.i_lastseqnumber = BOXDATA(p_mfhd)->i_sequence_number;
                 }
 
-                /* detach */
-                while( p_vroot->p_first )
-                {
-                    if( p_vroot->p_first == p_fragbox )
-                    {
-                        p_vroot->p_first = p_fragbox->p_next;
-                    }
-                    else
-                    {
-                        MP4_Box_t *p_cur = p_vroot->p_first;
-                        p_vroot->p_first = p_cur->p_next;
-                        p_cur->p_next = NULL;
-                        msg_Dbg(p_demux, "ignoring box %4.4s", (char*)&p_cur->i_type);
-                        MP4_BoxFree( p_cur );
-                    }
-                }
-                p_fragbox->p_next = NULL;
-
                 /* create fragment */
-                AddFragment( p_demux, p_fragbox );
+                AddFragment( p_demux, p_mooxbox );
 
                 /* Append to root */
-                p_sys->p_root->p_last->p_next = p_fragbox;
-                p_sys->p_root->p_last = p_fragbox;
+                p_sys->p_root->p_last->p_next = p_mooxbox;
+                p_sys->p_root->p_last = p_mooxbox;
                 MP4_BoxFree( p_vroot );
             }
             else

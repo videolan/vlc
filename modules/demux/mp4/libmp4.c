@@ -110,6 +110,23 @@ static void MP4_BoxAddChild( MP4_Box_t *p_parent, MP4_Box_t *p_childbox )
     p_childbox->p_father = p_parent;
 }
 
+MP4_Box_t * MP4_BoxExtract( MP4_Box_t **pp_chain, uint32_t i_type )
+{
+    MP4_Box_t *p_box = *pp_chain;
+    while( p_box )
+    {
+        if( p_box->i_type == i_type )
+        {
+            *pp_chain = p_box->p_next;
+            p_box->p_next = NULL;
+            return p_box;
+        }
+        pp_chain = &p_box->p_next;
+        p_box = p_box->p_next;
+    }
+    return NULL;
+}
+
 /* Don't use stream_Seek directly */
 #undef stream_Seek
 #define stream_Seek(a,b) __NO__

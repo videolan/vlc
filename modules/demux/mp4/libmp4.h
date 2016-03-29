@@ -1725,6 +1725,8 @@ MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt, ... );
  *****************************************************************************/
 unsigned MP4_BoxCount( const MP4_Box_t *p_box, const char *psz_fmt, ... );
 
+MP4_Box_t * MP4_BoxExtract( MP4_Box_t **pp_chain, uint32_t i_type );
+
 /* Internal functions exposed for MKV demux */
 int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box );
 int MP4_ReadBoxContainerChildren( stream_t *p_stream, MP4_Box_t *p_container,
