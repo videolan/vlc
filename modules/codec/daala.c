@@ -34,8 +34,6 @@
 #include <vlc_input.h>
 #include "../demux/xiph.h"
 
-#include <ogg/ogg.h>
-
 #include <daala/codec.h>
 #include <daala/daaladec.h>
 #ifdef ENABLE_SOUT
@@ -84,12 +82,12 @@ static void CloseDecoder  ( vlc_object_t * );
 
 static void *DecodeBlock  ( decoder_t *, block_t ** );
 static int  ProcessHeaders( decoder_t * );
-static void *ProcessPacket ( decoder_t *, ogg_packet *, block_t ** );
+static void *ProcessPacket ( decoder_t *, daala_packet *, block_t ** );
 
-static picture_t *DecodePacket( decoder_t *, ogg_packet * );
+static picture_t *DecodePacket( decoder_t *, daala_packet * );
 
 static void ParseDaalaComments( decoder_t * );
-static void daala_CopyPicture( picture_t *, od_img * );
+static void daala_CopyPicture( picture_t *, daala_image * );
 
 #ifdef ENABLE_SOUT
 static int  OpenEncoder( vlc_object_t *p_this );
@@ -215,25 +213,25 @@ static int OpenPacketizer( vlc_object_t *p_this )
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************
- * This function must be fed with ogg packets.
+ * This function must be fed with Daala packets.
  ****************************************************************************/
 static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block;
-    ogg_packet oggpacket;
+    daala_packet dpacket;
 
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
 
-    /* Block to Ogg packet */
-    oggpacket.packet = p_block->p_buffer;
-    oggpacket.bytes = p_block->i_buffer;
-    oggpacket.granulepos = p_block->i_dts;
-    oggpacket.b_o_s = 0;
-    oggpacket.e_o_s = 0;
-    oggpacket.packetno = 0;
+    /* Block to Daala packet */
+    dpacket.packet = p_block->p_buffer;
+    dpacket.bytes = p_block->i_buffer;
+    dpacket.granulepos = p_block->i_dts;
+    dpacket.b_o_s = 0;
+    dpacket.e_o_s = 0;
+    dpacket.packetno = 0;
 
     /* Check for headers */
     if( !p_sys->b_has_headers )
@@ -254,7 +252,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !p_sys->b_decoded_first_keyframe )
         p_block->i_flags |= BLOCK_FLAG_PREROLL; /* Wait until we've decoded the first keyframe */
 
-    return ProcessPacket( p_dec, &oggpacket, pp_block );
+    return ProcessPacket( p_dec, &dpacket, pp_block );
 }
 
 /*****************************************************************************
@@ -264,7 +262,7 @@ static int ProcessHeaders( decoder_t *p_dec )
 {
     int ret = VLC_SUCCESS;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    ogg_packet oggpacket;
+    daala_packet dpacket;
     daala_setup_info *ds = NULL; /* daala setup information */
 
     unsigned pi_size[XIPH_MAX_HEADER_COUNT];
@@ -276,15 +274,15 @@ static int ProcessHeaders( decoder_t *p_dec )
     if( i_count < 3 )
         return VLC_EGENERIC;
 
-    oggpacket.granulepos = -1;
-    oggpacket.e_o_s = 0;
-    oggpacket.packetno = 0;
+    dpacket.granulepos = -1;
+    dpacket.e_o_s = 0;
+    dpacket.packetno = 0;
 
     /* Take care of the initial info header */
-    oggpacket.b_o_s  = 1; /* yes this actually is a b_o_s packet :) */
-    oggpacket.bytes  = pi_size[0];
-    oggpacket.packet = pp_data[0];
-    if( daala_decode_header_in( &p_sys->di, &p_sys->dc, &ds, &oggpacket ) < 0 )
+    dpacket.b_o_s  = 1; /* yes this actually is a b_o_s packet :) */
+    dpacket.bytes  = pi_size[0];
+    dpacket.packet = pp_data[0];
+    if( daala_decode_header_in( &p_sys->di, &p_sys->dc, &ds, &dpacket ) < 0 )
     {
         msg_Err( p_dec, "this bitstream does not contain Daala video data" );
         ret = VLC_EGENERIC;
@@ -342,11 +340,11 @@ static int ProcessHeaders( decoder_t *p_dec )
              (double)p_sys->di.timebase_numerator/p_sys->di.timebase_denominator );
 
     /* The next packet in order is the comments header */
-    oggpacket.b_o_s  = 0;
-    oggpacket.bytes  = pi_size[1];
-    oggpacket.packet = pp_data[1];
+    dpacket.b_o_s  = 0;
+    dpacket.bytes  = pi_size[1];
+    dpacket.packet = pp_data[1];
 
-    if( daala_decode_header_in( &p_sys->di, &p_sys->dc, &ds, &oggpacket ) < 0 )
+    if( daala_decode_header_in( &p_sys->di, &p_sys->dc, &ds, &dpacket ) < 0 )
     {
         msg_Err( p_dec, "Daala comment header is corrupted" );
         ret = VLC_EGENERIC;
@@ -358,10 +356,10 @@ static int ProcessHeaders( decoder_t *p_dec )
     /* The next packet in order is the setup header
      * We need to watch out that this packet is not missing as a
      * missing or corrupted header is fatal. */
-    oggpacket.b_o_s  = 0;
-    oggpacket.bytes  = pi_size[2];
-    oggpacket.packet = pp_data[2];
-    if( daala_decode_header_in( &p_sys->di, &p_sys->dc, &ds, &oggpacket ) < 0 )
+    dpacket.b_o_s  = 0;
+    dpacket.bytes  = pi_size[2];
+    dpacket.packet = pp_data[2];
+    if( daala_decode_header_in( &p_sys->di, &p_sys->dc, &ds, &dpacket ) < 0 )
     {
         msg_Err( p_dec, "Daala setup header is corrupted" );
         ret = VLC_EGENERIC;
@@ -371,7 +369,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     if( !p_sys->b_packetizer )
     {
         /* We have all the headers, initialize decoder */
-        if ( ( p_sys->dcx = daala_decode_alloc( &p_sys->di, ds ) ) == NULL )
+        if ( ( p_sys->dcx = daala_decode_create( &p_sys->di, ds ) ) == NULL )
         {
             msg_Err( p_dec, "Could not allocate Daala decoder" );
             ret = VLC_EGENERIC;
@@ -403,7 +401,7 @@ cleanup:
 /*****************************************************************************
  * ProcessPacket: processes a daala packet.
  *****************************************************************************/
-static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
+static void *ProcessPacket( decoder_t *p_dec, daala_packet *p_dpacket,
                             block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -438,7 +436,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     }
     else
     {
-        p_buf = DecodePacket( p_dec, p_oggpacket );
+        p_buf = DecodePacket( p_dec, p_dpacket );
         block_Release( p_block );
     }
 
@@ -452,17 +450,20 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 /*****************************************************************************
  * DecodePacket: decodes a Daala packet.
  *****************************************************************************/
-static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
+static picture_t *DecodePacket( decoder_t *p_dec, daala_packet *p_dpacket )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic;
-    od_img ycbcr;
+    daala_image ycbcr;
 
-    if (daala_decode_packet_in( p_sys->dcx, &ycbcr, p_oggpacket ) < 0)
+    if (daala_decode_packet_in( p_sys->dcx, p_dpacket ) < 0)
         return NULL; /* bad packet */
 
+    if (!daala_decode_img_out( p_sys->dcx, &ycbcr ))
+        return NULL;
+
     /* Check for keyframe */
-    if( daala_packet_iskeyframe( p_oggpacket->packet, p_oggpacket->bytes ) )
+    if( daala_packet_iskeyframe( p_dpacket ) )
         p_sys->b_decoded_first_keyframe = true;
 
     /* Get a new picture */
@@ -544,7 +545,7 @@ static void CloseDecoder( vlc_object_t *p_this )
  *                     picture_t structure.
  *****************************************************************************/
 static void daala_CopyPicture( picture_t *p_pic,
-                               od_img *ycbcr )
+                               daala_image *ycbcr )
 {
     const int i_planes = p_pic->i_planes < 3 ? p_pic->i_planes : 3;
     for( int i_plane = 0; i_plane < i_planes; i_plane++ )
@@ -576,7 +577,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
-    ogg_packet header;
+    daala_packet header;
     int status;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_DAALA &&
@@ -705,9 +706,9 @@ static int OpenEncoder( vlc_object_t *p_this )
 static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    ogg_packet oggpacket;
+    daala_packet dpacket;
     block_t *p_block;
-    od_img img;
+    daala_image img;
 
     if( !p_pict ) return NULL;
 
@@ -746,14 +747,14 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         return NULL;
     }
 
-    daala_encode_packet_out( p_sys->dcx, 0, &oggpacket );
+    daala_encode_packet_out( p_sys->dcx, 0, &dpacket );
 
-    /* Ogg packet to block */
-    p_block = block_Alloc( oggpacket.bytes );
-    memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
+    /* Daala packet to block */
+    p_block = block_Alloc( dpacket.bytes );
+    memcpy( p_block->p_buffer, dpacket.packet, dpacket.bytes );
     p_block->i_dts = p_block->i_pts = p_pict->date;
 
-    if( daala_packet_iskeyframe( oggpacket.packet, oggpacket.bytes ) )
+    if( daala_packet_iskeyframe( &dpacket ) )
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
 
     return p_block;
