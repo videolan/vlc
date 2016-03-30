@@ -1677,7 +1677,7 @@ static void blurayInitTitles(demux_t *p_demux, int menu_titles)
             }
         } else {
             /* add possible title name from disc metadata */
-            if (di && di->titles && i < di->num_titles) {
+            if (di && di->titles && i <= di->num_titles) {
                 if (di->titles[i]->name) {
                     t->psz_name = strdup(di->titles[i]->name);
                 }
