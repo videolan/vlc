@@ -41,16 +41,6 @@
 /* DVB Card Drivers */
 #include <linux/dvb/ca.h>
 
-/* Include dvbpsi headers */
-# include <dvbpsi/dvbpsi.h>
-# include <dvbpsi/descriptor.h>
-# include <dvbpsi/pat.h>
-# include <dvbpsi/pmt.h>
-# include <dvbpsi/dr.h>
-# include <dvbpsi/psi.h>
-# include <dvbpsi/demux.h>
-# include <dvbpsi/sdt.h>
-
 #undef ENABLE_HTTPD
 #ifdef ENABLE_HTTPD
 #   include <vlc_httpd.h>
@@ -58,8 +48,7 @@
 
 #include "../demux/dvb-text.h"
 #include "dtv/en50221.h"
-
-#include "../mux/mpeg/dvbpsi_compat.h"
+#include "dtv/en50221_capmt.h"
 
 typedef struct en50221_session_t
 {
@@ -139,7 +128,7 @@ struct cam
     bool pb_slot_mmi_undisplayed[MAX_CI_SLOTS];
     en50221_session_t p_sessions[MAX_SESSIONS];
 
-    dvbpsi_pmt_t *pp_selected_programs[MAX_PROGRAMS];
+    en50221_capmt_info_t *pp_selected_programs[MAX_PROGRAMS];
     int i_selected_programs;
 };
 
@@ -816,7 +805,7 @@ static uint8_t *APDUGetLength( uint8_t *p_apdu, int *pi_size )
  * APDUSend
  *****************************************************************************/
 static int APDUSend( cam_t * p_cam, int i_session_id, int i_tag,
-                     uint8_t *p_data, int i_size )
+                     uint8_t *p_data, size_t i_size )
 {
     uint8_t *p_apdu = xmalloc( i_size + 12 );
     uint8_t *p = p_apdu;
@@ -1046,7 +1035,7 @@ typedef struct
     uint16_t pi_system_ids[MAX_CASYSTEM_IDS + 1];
 } system_ids_t;
 
-static bool CheckSystemID( system_ids_t *p_ids, uint16_t i_id )
+static bool CheckSystemID( const system_ids_t *p_ids, uint16_t i_id )
 {
     int i = 0;
     if( !p_ids ) return true;      /* dummy session for high-level CI intf */
@@ -1064,29 +1053,15 @@ static bool CheckSystemID( system_ids_t *p_ids, uint16_t i_id )
 /*****************************************************************************
  * CAPMTNeedsDescrambling
  *****************************************************************************/
-static bool CAPMTNeedsDescrambling( dvbpsi_pmt_t *p_pmt )
+static bool CAPMTNeedsDescrambling( const en50221_capmt_info_t *p_info )
 {
-    dvbpsi_descriptor_t *p_dr;
-    dvbpsi_pmt_es_t *p_es;
+    if( p_info->p_program_descriptors )
+        return true;
 
-    for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
+    for( size_t i=0; i<p_info->i_es_count; i++ )
     {
-        if( p_dr->i_tag == 0x9 )
-        {
+        if( p_info->p_es[i].p_descriptors )
             return true;
-        }
-    }
- 
-    for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
-    {
-        for( p_dr = p_es->p_first_descriptor; p_dr != NULL;
-             p_dr = p_dr->p_next )
-        {
-            if( p_dr->i_tag == 0x9 )
-            {
-                return true;
-            }
-        }
     }
 
     return false;
@@ -1095,29 +1070,36 @@ static bool CAPMTNeedsDescrambling( dvbpsi_pmt_t *p_pmt )
 /*****************************************************************************
  * CAPMTBuild
  *****************************************************************************/
-static int GetCADSize( system_ids_t *p_ids, dvbpsi_descriptor_t *p_dr )
+static size_t CopyDescriptors( const uint8_t *p_drdata, size_t i_drdata,
+                               const system_ids_t *p_ids, uint8_t *p_dest )
 {
-    int i_cad_size = 0;
-
-    while ( p_dr != NULL )
+    size_t i_total = 0;
+    while( i_drdata > 0 )
     {
-        if( p_dr->i_tag == 0x9 )
+        assert( p_drdata[0] == 0x09 );
+        uint8_t i_dr_len = p_drdata[1];
+        uint16_t i_sysid = GetWBE( &p_drdata[2] );
+        if( CheckSystemID( p_ids, i_sysid ) )
         {
-            uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
-                                    | p_dr->p_data[1];
-            if ( CheckSystemID( p_ids, i_sysid ) )
-                i_cad_size += p_dr->i_length + 2;
+            if( p_dest ) /* if p_dest is NULL, just count required space */
+                memcpy( &p_dest[i_total], p_drdata, (size_t) i_dr_len + 2 );
+            i_total += i_dr_len + 2;
         }
-        p_dr = p_dr->p_next;
+        i_drdata = i_drdata - i_dr_len - 2;
+        p_drdata += i_dr_len + 2;
     }
-
-    return i_cad_size;
+    return i_total;
 }
 
-static uint8_t *CAPMTHeader( system_ids_t *p_ids, uint8_t i_list_mgt,
-                             uint16_t i_program_number, uint8_t i_version,
-                             int i_size, dvbpsi_descriptor_t *p_dr,
-                             uint8_t i_cmd )
+static size_t GetCADSize( const system_ids_t *p_ids,
+                          const uint8_t *p_drdata, size_t i_drdata )
+{
+    return CopyDescriptors( p_drdata, i_drdata, p_ids, NULL );
+}
+
+static uint8_t *CAPMTHeader( const en50221_capmt_info_t *p_info,
+                             const system_ids_t *p_ids, uint8_t i_list_mgt,
+                             size_t i_size, uint8_t i_cmd )
 {
     uint8_t *p_data;
 
@@ -1127,36 +1109,19 @@ static uint8_t *CAPMTHeader( system_ids_t *p_ids, uint8_t i_list_mgt,
         p_data = xmalloc( 6 );
 
     p_data[0] = i_list_mgt;
-    p_data[1] = i_program_number >> 8;
-    p_data[2] = i_program_number & 0xff;
-    p_data[3] = ((i_version & 0x1f) << 1) | 0x1;
+    p_data[1] = p_info->i_program_number >> 8;
+    p_data[2] = p_info->i_program_number & 0xff;
+    p_data[3] = ((p_info->i_version & 0x1f) << 1) | 0x1;
 
     if ( i_size )
     {
-        int i;
-
         p_data[4] = (i_size + 1) >> 8;
         p_data[5] = (i_size + 1) & 0xff;
         p_data[6] = i_cmd;
-        i = 7;
 
-        while ( p_dr != NULL )
-        {
-            if( p_dr->i_tag == 0x9 )
-            {
-                uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
-                                    | p_dr->p_data[1];
-                if ( CheckSystemID( p_ids, i_sysid ) )
-                {
-                    p_data[i] = 0x9;
-                    p_data[i + 1] = p_dr->i_length;
-                    memcpy( &p_data[i + 2], p_dr->p_data, p_dr->i_length );
-//                    p_data[i+4] &= 0x1f;
-                    i += p_dr->i_length + 2;
-                }
-            }
-            p_dr = p_dr->p_next;
-        }
+        CopyDescriptors( p_info->p_program_descriptors,
+                         p_info->i_program_descriptors,
+                         p_ids, &p_data[7] );
     }
     else
     {
@@ -1167,101 +1132,87 @@ static uint8_t *CAPMTHeader( system_ids_t *p_ids, uint8_t i_list_mgt,
     return p_data;
 }
 
-static uint8_t *CAPMTES( system_ids_t *p_ids, uint8_t *p_capmt,
-                         int i_capmt_size, uint8_t i_type, uint16_t i_pid,
-                         int i_size, dvbpsi_descriptor_t *p_dr,
-                         uint8_t i_cmd )
+static uint8_t *CAPMTES( const en50221_capmt_es_info_t *p_es,
+                         const system_ids_t *p_ids,
+                         size_t i_capmt_size, size_t i_size,
+                         uint8_t i_cmd, uint8_t *p_capmt )
 {
     uint8_t *p_data;
-    int i;
- 
+
     if ( i_size )
         p_data = xrealloc( p_capmt, i_capmt_size + 6 + i_size );
     else
         p_data = xrealloc( p_capmt, i_capmt_size + 5 );
 
-    i = i_capmt_size;
+    uint8_t *p_dest = &p_data[ i_capmt_size ];
 
-    p_data[i] = i_type;
-    p_data[i + 1] = i_pid >> 8;
-    p_data[i + 2] = i_pid & 0xff;
+    p_dest[0] = p_es->i_stream_type;
+    p_dest[1] = p_es->i_es_pid >> 8;
+    p_dest[2] = p_es->i_es_pid & 0xff;
 
     if ( i_size )
     {
-        p_data[i + 3] = (i_size + 1) >> 8;
-        p_data[i + 4] = (i_size + 1) & 0xff;
-        p_data[i + 5] = i_cmd;
-        i += 6;
+        p_dest[3] = (i_size + 1) >> 8;
+        p_dest[4] = (i_size + 1) & 0xff;
+        p_dest[5] = i_cmd;
 
-        while ( p_dr != NULL )
-        {
-            if( p_dr->i_tag == 0x9 )
-            {
-                uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
-                                    | p_dr->p_data[1];
-                if ( CheckSystemID( p_ids, i_sysid ) )
-                {
-                    p_data[i] = 0x9;
-                    p_data[i + 1] = p_dr->i_length;
-                    memcpy( &p_data[i + 2], p_dr->p_data, p_dr->i_length );
-                    i += p_dr->i_length + 2;
-                }
-            }
-            p_dr = p_dr->p_next;
-        }
+        CopyDescriptors( p_es->p_descriptors,
+                         p_es->i_descriptors,
+                         p_ids, &p_dest[6] );
     }
     else
     {
-        p_data[i + 3] = 0;
-        p_data[i + 4] = 0;
+        p_dest[3] = 0;
+        p_dest[4] = 0;
     }
 
     return p_data;
 }
 
 static uint8_t *CAPMTBuild( cam_t * p_cam, int i_session_id,
-                            dvbpsi_pmt_t *p_pmt, uint8_t i_list_mgt,
-                            uint8_t i_cmd, int *restrict pi_capmt_size )
+                            const en50221_capmt_info_t *p_info,
+                            uint8_t i_list_mgt,
+                            uint8_t i_cmd, size_t *restrict pi_capmt_size )
 {
     system_ids_t *p_ids =
         (system_ids_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
-    dvbpsi_pmt_es_t *p_es;
-    int i_cad_size, i_cad_program_size;
+    size_t i_cad_size, i_cad_program_size;
     uint8_t *p_capmt;
 
-    i_cad_size = i_cad_program_size =
-            GetCADSize( p_ids, p_pmt->p_first_descriptor );
-    for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
+    i_cad_size = i_cad_program_size = GetCADSize( p_ids,
+                                                  p_info->p_program_descriptors,
+                                                  p_info->i_program_descriptors );
+    for( size_t i=0; i < p_info->i_es_count; i++ )
     {
-        i_cad_size += GetCADSize( p_ids, p_es->p_first_descriptor );
+        const en50221_capmt_es_info_t *p_es = &p_info->p_es[i];
+        i_cad_size += GetCADSize( p_ids, p_es->p_descriptors, p_es->i_descriptors );
     }
 
     if ( !i_cad_size )
     {
         msg_Warn( p_cam->obj,
                   "no compatible scrambling system for SID %d on session %d",
-                  p_pmt->i_program_number, i_session_id );
+                  p_info->i_program_number, i_session_id );
         return NULL;
     }
 
-    p_capmt = CAPMTHeader( p_ids, i_list_mgt, p_pmt->i_program_number,
-                           p_pmt->i_version, i_cad_program_size,
-                           p_pmt->p_first_descriptor, i_cmd );
+    p_capmt = CAPMTHeader( p_info, p_ids, i_list_mgt,
+                           i_cad_program_size, i_cmd );
 
     if ( i_cad_program_size )
         *pi_capmt_size = 7 + i_cad_program_size;
     else
         *pi_capmt_size = 6;
 
-    for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
+    for( size_t i=0; i < p_info->i_es_count; i++ )
     {
-        i_cad_size = GetCADSize( p_ids, p_es->p_first_descriptor );
+        const en50221_capmt_es_info_t *p_es = &p_info->p_es[i];
+        i_cad_size = GetCADSize( p_ids, p_es->p_descriptors, p_es->i_descriptors );
 
         if ( i_cad_size || i_cad_program_size )
         {
-            p_capmt = CAPMTES( p_ids, p_capmt, *pi_capmt_size, p_es->i_type,
-                               p_es->i_pid, i_cad_size,
-                               p_es->p_first_descriptor, i_cmd );
+            p_capmt = CAPMTES( p_es, p_ids, *pi_capmt_size, i_cad_size,
+                               i_cmd, p_capmt );
             if ( i_cad_size )
                 *pi_capmt_size += 6 + i_cad_size;
             else
@@ -1276,15 +1227,15 @@ static uint8_t *CAPMTBuild( cam_t * p_cam, int i_session_id,
  * CAPMTFirst
  *****************************************************************************/
 static void CAPMTFirst( cam_t * p_cam, int i_session_id,
-                        dvbpsi_pmt_t *p_pmt )
+                        const en50221_capmt_info_t *p_info )
 {
     uint8_t *p_capmt;
-    int i_capmt_size;
+    size_t i_capmt_size;
 
     msg_Dbg( p_cam->obj, "adding first CAPMT for SID %d on session %d",
-             p_pmt->i_program_number, i_session_id );
+             p_info->i_program_number, i_session_id );
 
-    p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
+    p_capmt = CAPMTBuild( p_cam, i_session_id, p_info,
                           0x3 /* only */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
     if( p_capmt != NULL )
@@ -1298,21 +1249,21 @@ static void CAPMTFirst( cam_t * p_cam, int i_session_id,
  * CAPMTAdd
  *****************************************************************************/
 static void CAPMTAdd( cam_t * p_cam, int i_session_id,
-                      dvbpsi_pmt_t *p_pmt )
+                      const en50221_capmt_info_t *p_info )
 {
     uint8_t *p_capmt;
-    int i_capmt_size;
+    size_t i_capmt_size;
 
     if( p_cam->i_selected_programs >= CAM_PROG_MAX )
     {
         msg_Warn( p_cam->obj, "Not adding CAPMT for SID %d, too many programs",
-                  p_pmt->i_program_number );
+                  p_info->i_program_number );
         return;
     }
     p_cam->i_selected_programs++;
     if( p_cam->i_selected_programs == 1 )
     {
-        CAPMTFirst( p_cam, i_session_id, p_pmt );
+        CAPMTFirst( p_cam, i_session_id, p_info );
         return;
     }
  
@@ -1321,9 +1272,9 @@ static void CAPMTAdd( cam_t * p_cam, int i_session_id,
 #endif
  
     msg_Dbg( p_cam->obj, "adding CAPMT for SID %d on session %d",
-             p_pmt->i_program_number, i_session_id );
+             p_info->i_program_number, i_session_id );
 
-    p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
+    p_capmt = CAPMTBuild( p_cam, i_session_id, p_info,
                           0x4 /* add */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
     if( p_capmt != NULL )
@@ -1337,15 +1288,15 @@ static void CAPMTAdd( cam_t * p_cam, int i_session_id,
  * CAPMTUpdate
  *****************************************************************************/
 static void CAPMTUpdate( cam_t * p_cam, int i_session_id,
-                         dvbpsi_pmt_t *p_pmt )
+                         const en50221_capmt_info_t *p_info )
 {
     uint8_t *p_capmt;
-    int i_capmt_size;
+    size_t i_capmt_size;
 
     msg_Dbg( p_cam->obj, "updating CAPMT for SID %d on session %d",
-             p_pmt->i_program_number, i_session_id );
+             p_info->i_program_number, i_session_id );
 
-    p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
+    p_capmt = CAPMTBuild( p_cam, i_session_id, p_info,
                           0x5 /* update */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
     if( p_capmt != NULL )
@@ -1359,16 +1310,16 @@ static void CAPMTUpdate( cam_t * p_cam, int i_session_id,
  * CAPMTDelete
  *****************************************************************************/
 static void CAPMTDelete( cam_t * p_cam, int i_session_id,
-                         dvbpsi_pmt_t *p_pmt )
+                         const en50221_capmt_info_t *p_info )
 {
     uint8_t *p_capmt;
-    int i_capmt_size;
+    size_t i_capmt_size;
 
     p_cam->i_selected_programs--;
     msg_Dbg( p_cam->obj, "deleting CAPMT for SID %d on session %d",
-             p_pmt->i_program_number, i_session_id );
+             p_info->i_program_number, i_session_id );
 
-    p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
+    p_capmt = CAPMTBuild( p_cam, i_session_id, p_info,
                           0x5 /* update */, 0x4 /* not selected */,
                           &i_capmt_size );
     if( p_capmt != NULL )
@@ -2225,29 +2176,29 @@ void en50221_Poll( cam_t * p_cam )
 /*****************************************************************************
  * en50221_SetCAPMT :
  *****************************************************************************/
-int en50221_SetCAPMT( cam_t * p_cam, dvbpsi_pmt_t *p_pmt )
+int en50221_SetCAPMT( cam_t * p_cam, en50221_capmt_info_t *p_info )
 {
     bool b_update = false;
-    bool b_needs_descrambling = CAPMTNeedsDescrambling( p_pmt );
+    bool b_needs_descrambling = CAPMTNeedsDescrambling( p_info );
 
     for ( unsigned i = 0; i < MAX_PROGRAMS; i++ )
     {
         if ( p_cam->pp_selected_programs[i] != NULL
               && p_cam->pp_selected_programs[i]->i_program_number
-                  == p_pmt->i_program_number )
+                  == p_info->i_program_number )
         {
             b_update = true;
 
             if ( !b_needs_descrambling )
             {
-                dvbpsi_pmt_delete( p_pmt );
-                p_pmt = p_cam->pp_selected_programs[i];
+                en50221_capmt_Delete( p_info );
+                p_info = p_cam->pp_selected_programs[i];
                 p_cam->pp_selected_programs[i] = NULL;
             }
-            else if( p_pmt != p_cam->pp_selected_programs[i] )
+            else if( p_info != p_cam->pp_selected_programs[i] )
             {
-                dvbpsi_pmt_delete( p_cam->pp_selected_programs[i] );
-                p_cam->pp_selected_programs[i] = p_pmt;
+                en50221_capmt_Delete( p_cam->pp_selected_programs[i] );
+                p_cam->pp_selected_programs[i] = p_info;
             }
 
             break;
@@ -2260,7 +2211,7 @@ int en50221_SetCAPMT( cam_t * p_cam, dvbpsi_pmt_t *p_pmt )
         {
             if ( p_cam->pp_selected_programs[i] == NULL )
             {
-                p_cam->pp_selected_programs[i] = p_pmt;
+                p_cam->pp_selected_programs[i] = p_info;
                 break;
             }
         }
@@ -2274,18 +2225,18 @@ int en50221_SetCAPMT( cam_t * p_cam, dvbpsi_pmt_t *p_pmt )
                     == RI_CONDITIONAL_ACCESS_SUPPORT )
             {
                 if ( b_update && b_needs_descrambling )
-                    CAPMTUpdate( p_cam, i, p_pmt );
+                    CAPMTUpdate( p_cam, i, p_info );
                 else if ( b_update )
-                    CAPMTDelete( p_cam, i, p_pmt );
+                    CAPMTDelete( p_cam, i, p_info );
                 else
-                    CAPMTAdd( p_cam, i, p_pmt );
+                    CAPMTAdd( p_cam, i, p_info );
             }
         }
     }
 
     if ( !b_needs_descrambling )
     {
-        dvbpsi_pmt_delete( p_pmt );
+        en50221_capmt_Delete( p_info );
     }
 
     return VLC_SUCCESS;
@@ -2661,7 +2612,7 @@ void en50221_End( cam_t * p_cam )
     {
         if( p_cam->pp_selected_programs[i] != NULL )
         {
-            dvbpsi_pmt_delete( p_cam->pp_selected_programs[i] );
+            en50221_capmt_Delete( p_cam->pp_selected_programs[i] );
         }
     }
 

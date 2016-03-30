@@ -254,6 +254,7 @@ libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
 	mux/mpeg/streams.h \
         mux/mpeg/tables.c mux/mpeg/tables.h \
 	mux/mpeg/tsutil.c mux/mpeg/tsutil.h \
+        access/dtv/en50221_capmt.h \
         codec/scte18.h \
         codec/atsc_a65.c codec/atsc_a65.h \
 	codec/opus_header.c

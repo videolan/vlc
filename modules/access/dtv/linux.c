@@ -39,9 +39,7 @@
 #include <linux/dvb/dmx.h>
 
 #include "dtv/dtv.h"
-#ifdef HAVE_DVBPSI
-# include "dtv/en50221.h"
-#endif
+#include "dtv/en50221.h"
 
 #ifndef O_SEARCH
 # define O_SEARCH O_RDONLY
@@ -158,9 +156,7 @@ struct dvb_device
         uint16_t pid;
     } pids[MAX_PIDS];
 #endif
-#ifdef HAVE_DVBPSI
     cam_t *cam;
-#endif
     uint8_t device;
     bool budget;
     //size_t buffer_size;
@@ -207,9 +203,7 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
         return NULL;
     }
     d->frontend = -1;
-#ifdef HAVE_DVBPSI
     d->cam = NULL;
-#endif
     d->budget = var_InheritBool (obj, "dvb-budget-mode");
 
 #ifndef USE_DMX
@@ -262,7 +256,6 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
 #endif
     }
 
-#ifdef HAVE_DVBPSI
     int ca = dvb_open_node (d, "ca", O_RDWR);
     if (ca != -1)
     {
@@ -273,7 +266,6 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
     else
         msg_Dbg (obj, "conditional access module not available: %s",
                  vlc_strerror_c(errno));
-#endif
     return d;
 
 error:
@@ -291,10 +283,8 @@ void dvb_close (dvb_device_t *d)
                 close (d->pids[i].fd);
     }
 #endif
-#ifdef HAVE_DVBPSI
     if (d->cam != NULL)
         en50221_End (d->cam);
-#endif
     if (d->frontend != -1)
         close (d->frontend);
     close (d->demux);
@@ -328,10 +318,8 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len, int ms)
     struct pollfd ufd[2];
     int n;
 
-#ifdef HAVE_DVBPSI
     if (d->cam != NULL)
         en50221_Poll (d->cam);
-#endif
 
     ufd[0].fd = d->demux;
     ufd[0].events = POLLIN;
@@ -645,13 +633,11 @@ float dvb_get_snr (dvb_device_t *d)
     return snr / 65535.;
 }
 
-#ifdef HAVE_DVBPSI
-void dvb_set_ca_pmt (dvb_device_t *d, struct dvbpsi_pmt_s *pmt)
+void dvb_set_ca_pmt (dvb_device_t *d, en50221_capmt_info_t *p_capmtinfo)
 {
     if (d->cam != NULL)
-        en50221_SetCAPMT (d->cam, pmt);
+        en50221_SetCAPMT (d->cam, p_capmtinfo);
 }
-#endif
 
 static int dvb_vset_props (dvb_device_t *d, size_t n, va_list ap)
 {

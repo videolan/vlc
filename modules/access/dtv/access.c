@@ -576,15 +576,14 @@ static int Control (access_t *access, int query, va_list args)
             break;
         }
 
-#ifdef HAVE_DVBPSI
         case ACCESS_SET_PRIVATE_ID_CA:
         {
-            struct dvbpsi_pmt_s *pmt = va_arg (args, struct dvbpsi_pmt_s *);
+            en50221_capmt_info_t *pmt = va_arg (args, en50221_capmt_info_t *);
 
             dvb_set_ca_pmt (dev, pmt);
             break;
         }
-#endif
+
         case ACCESS_GET_PRIVATE_ID_STATE:
         {
             unsigned pid = va_arg (args, int);
