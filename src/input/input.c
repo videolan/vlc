@@ -547,11 +547,13 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
     *pb_changed = false;
 
     if( p_input->p->i_stop > 0 && p_input->p->i_time >= p_input->p->i_stop )
-        i_ret = 0; /* EOF */
+        i_ret = VLC_DEMUXER_EOF;
     else
         i_ret = demux_Demux( p_input->p->master->p_demux );
 
-    if( i_ret > 0 )
+    i_ret = i_ret > 0 ? VLC_DEMUXER_SUCCESS : ( i_ret < 0 ? VLC_DEMUXER_EGENERIC : VLC_DEMUXER_EOF);
+
+    if( i_ret == VLC_DEMUXER_SUCCESS )
     {
         if( p_input->p->master->p_demux->info.i_update )
         {
@@ -569,18 +571,17 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
         }
     }
 
-    if( i_ret == 0 )    /* EOF */
+    if( i_ret == VLC_DEMUXER_EOF )
     {
         msg_Dbg( p_input, "EOF reached" );
         p_input->p->master->b_eof = true;
         es_out_Eos(p_input->p->p_es_out);
     }
-    else if( i_ret < 0 )
+    else if( i_ret == VLC_DEMUXER_EGENERIC )
     {
         input_ChangeState( p_input, ERROR_S );
     }
-
-    if( i_ret > 0 && p_input->p->i_slave > 0 )
+    else if( p_input->p->i_slave > 0 )
         SlaveDemux( p_input );
 }
 
@@ -2004,19 +2005,19 @@ static int UpdateTitleSeekpoint( input_thread_t *p_input,
     {
         if( i_title > i_title_end ||
             ( i_title == i_title_end && i_seekpoint > i_seekpoint_end ) )
-            return 0;
+            return VLC_DEMUXER_EOF;
     }
     else if( i_seekpoint_end >= 0 )
     {
         if( i_seekpoint > i_seekpoint_end )
-            return 0;
+            return VLC_DEMUXER_EOF;
     }
     else if( i_title_end >= 0 )
     {
         if( i_title > i_title_end )
-            return 0;
+            return VLC_DEMUXER_EOF;
     }
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 /*****************************************************************************
  * Update*FromDemux:

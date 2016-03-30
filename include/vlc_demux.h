@@ -297,7 +297,7 @@ VLC_API int demux_vaControlHelper( stream_t *, int64_t i_start, int64_t i_end,
 VLC_USED static inline int demux_Demux( demux_t *p_demux )
 {
     if( !p_demux->pf_demux )
-        return 1;
+        return VLC_DEMUXER_SUCCESS;
 
     return p_demux->pf_demux( p_demux );
 }
