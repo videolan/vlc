@@ -739,6 +739,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         img.planes[i].ydec = p_sys->di.plane_info[i].ydec;
         img.planes[i].xstride = 1;
         img.planes[i].ystride = p_pict->p[i].i_pitch;
+        img.planes[i].bitdepth = 8; /*FIXME: support higher bit depths*/
     }
 
     if( daala_encode_img_in( p_sys->dcx, &img, 0 ) < 0 )
