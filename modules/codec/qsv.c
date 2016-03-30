@@ -44,7 +44,7 @@
 /* The SDK doesn't have a default bitrate, so here's one. */
 #define QSV_BITRATE_DEFAULT (842)
 
-/* Makes x a multiple of 'align'. 'align' must me a power of 2 */
+/* Makes x a multiple of 'align'. 'align' must be a power of 2 */
 #define QSV_ALIGN(align, x)     (((x)+(align)-1)&~((align)-1))
 
 /*****************************************************************************

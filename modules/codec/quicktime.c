@@ -241,7 +241,7 @@ static int Open( vlc_object_t *p_this )
 #endif
 
     /* bail out. This plugin is soo Carbon, that it can't be used on 10.5 at all */
-    msg_Info( p_dec, "Your Mac OS version is to new to use this plugin for anything." );
+    msg_Info( p_dec, "Your Mac OS version is too new to use this plugin for anything." );
     return VLC_EGENERIC;
 #endif
 
