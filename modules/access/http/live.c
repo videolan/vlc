@@ -35,6 +35,7 @@ struct vlc_http_live
 {
     struct vlc_http_resource resource;
     struct vlc_http_msg *resp;
+    bool failed;
 };
 
 static int vlc_http_live_req(struct vlc_http_msg *req,
@@ -74,6 +75,7 @@ struct vlc_http_live *vlc_http_live_create(struct vlc_http_mgr *mgr,
     }
 
     live->resp = NULL;
+    live->failed = false;
     return live;
 }
 
@@ -81,9 +83,14 @@ int vlc_http_live_get_status(struct vlc_http_live *live)
 {
     if (live->resp == NULL)
     {
+        if (live->failed)
+            return -1;
         live->resp = vlc_http_live_open(live);
         if (live->resp == NULL)
+        {
+            live->failed = true;
             return -1;
+        }
     }
     return vlc_http_msg_get_status(live->resp);
 }

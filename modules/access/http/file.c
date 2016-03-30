@@ -44,6 +44,7 @@ struct vlc_http_file
     struct vlc_http_resource resource;
     struct vlc_http_msg *resp;
     uintmax_t offset;
+    bool failed;
 };
 
 static int vlc_http_file_req(struct vlc_http_msg *req,
@@ -132,6 +133,7 @@ struct vlc_http_file *vlc_http_file_create(struct vlc_http_mgr *mgr,
 
     file->resp = NULL;
     file->offset = 0;
+    file->failed = false;
     return file;
 }
 
@@ -139,9 +141,14 @@ int vlc_http_file_get_status(struct vlc_http_file *file)
 {
     if (file->resp == NULL)
     {
+        if (file->failed)
+            return -1;
         file->resp = vlc_http_file_open(file, file->offset);
         if (file->resp == NULL)
+        {
+            file->failed = true;
             return -1;
+        }
     }
     return vlc_http_msg_get_status(file->resp);
 }
