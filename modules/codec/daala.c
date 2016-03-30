@@ -134,7 +134,7 @@ vlc_module_begin ()
     add_shortcut( "daala" )
 
 #   define ENC_CFG_PREFIX "sout-daala-"
-    add_integer_with_range( ENC_CFG_PREFIX "quality", 30, 0, 511,
+    add_integer_with_range( ENC_CFG_PREFIX "quality", 10, 0, 511,
                  ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT, false )
     add_integer_with_range( ENC_CFG_PREFIX "keyint", 256, 1, 1000,
                  ENC_KEYINT_TEXT, ENC_KEYINT_LONGTEXT, false )
