@@ -2770,7 +2770,7 @@ PKG_ENABLE_MODULES_VLC([OGGSPOTS], [], [ogg], [experimental OggSpots codec], [au
 dnl
 dnl  Daala decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([DAALA], [], [ogg daaladec daalaenc], [experimental daala codec], [disabled])
+PKG_ENABLE_MODULES_VLC([DAALA], [], [daaladec daalaenc], [experimental daala codec], [disabled])
 
 dnl
 dnl  schroedinger decoder plugin (for dirac format video)
