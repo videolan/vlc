@@ -54,6 +54,7 @@ ifdef HAVE_ANDROID
 	cd live && sed -e 's%-DPIC%-DPIC -DNO_SSTREAM=1 -DLOCALE_NOT_USED -I$(ANDROID_NDK)/platforms/$(ANDROID_API)/arch-$(PLATFORM_SHORT_ARCH)/usr/include%' -i.orig config.linux
 endif
 	cd live && patch -lfp1 < ../../src/live555/winstore.patch
+	cd live && patch -lfp1 < ../../src/live555/no-gettimeofday.patch
 	mv live $@
 	touch $@
 
