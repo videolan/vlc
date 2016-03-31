@@ -647,8 +647,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         if ((p_sys->api->i_quirks & MC_API_AUDIO_QUIRKS_NEED_CHANNELS)
          && !p_sys->u.audio.i_channels)
         {
-            msg_Warn(p_dec, "waiting for valid channel count");
-            b_late_opening = true;
+            msg_Warn(p_dec, "codec need a valid channel count");
+            goto bailout;
         }
     }
     if ((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD)
@@ -1507,8 +1507,7 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
         *p_flags |= NEWBLOCK_FLAG_RESTART;
 
         /* Don't start if we don't have any csd */
-        if ((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD)
-         && !p_dec->fmt_in.i_extra && !p_sys->pp_csd)
+        if ((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->pp_csd)
             *p_flags &= ~NEWBLOCK_FLAG_RESTART;
 
         /* Don't start if we don't have a valid video size */
@@ -1553,23 +1552,6 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
         date_Set(&p_sys->u.audio.i_end_date, p_block->i_pts);
     }
 
-    /* try delayed opening if there is a new extra data */
-    if (!p_sys->api->b_started)
-    {
-        p_dec->p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
-
-        *p_flags |= NEWBLOCK_FLAG_RESTART;
-
-        /* Don't start if we don't have any csd */
-        if ((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD)
-         && !p_dec->fmt_in.i_extra)
-            *p_flags &= ~NEWBLOCK_FLAG_RESTART;
-
-        /* Don't start if we don't have a valid channels count */
-        if ((p_sys->api->i_quirks & MC_API_AUDIO_QUIRKS_NEED_CHANNELS)
-         && !p_dec->p_sys->u.audio.i_channels)
-            *p_flags &= ~NEWBLOCK_FLAG_RESTART;
-    }
     return 1;
 }
 
