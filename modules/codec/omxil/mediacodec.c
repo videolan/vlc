@@ -938,7 +938,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 }
 
 /* samples will be in the following order: FL FR FC LFE BL BR BC SL SR */
-uint32_t pi_audio_order_src[] =
+static uint32_t pi_audio_order_src[] =
 {
     AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER, AOUT_CHAN_LFE,
     AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
