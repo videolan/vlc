@@ -122,6 +122,7 @@ struct decoder_sys_t
             int i_pixel_format;
             uint8_t i_nal_length_size;
             size_t i_h264_profile;
+            bool b_first_mp4v_iframe;
             /* stores the inflight picture for each output buffer or NULL */
             picture_sys_t** pp_inflight_pictures;
             unsigned int i_inflight_pictures;
@@ -1476,6 +1477,15 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
         H264ProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
     else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
         HEVCProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
+    else if (p_dec->fmt_in.i_codec == VLC_CODEC_MP4V
+          && !p_sys->u.video.b_first_mp4v_iframe)
+    {
+        /* The first input sent to MediaCodec must be an I-Frame */
+        if ((p_block->i_flags & BLOCK_FLAG_TYPE_I))
+            p_sys->u.video.b_first_mp4v_iframe = true;
+        else
+            return 0; /* Drop current block */
+    }
 
     if (b_csd_changed)
     {
