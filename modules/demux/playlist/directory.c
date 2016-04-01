@@ -163,13 +163,13 @@ static int Demux( demux_t *p_demux )
     {
         int i_name_len = p_item->psz_name ? strlen( p_item->psz_name ) : 0;
 
-        /* skip "." and ".." and hidden files if option is activated */
-        if( ( !b_show_hiddenfiles && i_name_len > 0 &&
-              p_item->psz_name[0] == '.' ) ||
-            ( i_name_len == 1 && p_item->psz_name[0] == '.' ) ||
-            ( i_name_len == 2 && p_item->psz_name[0] == '.' &&
-              p_item->psz_name[1] == '.' ) ||
-            has_ext( psz_ignored_exts, p_item->psz_name ))
+        /* skip null, "." and ".." and hidden files if option is activated */
+        if( !i_name_len || strcmp( p_item->psz_name, "." ) == 0
+         || strcmp( p_item->psz_name, ".." ) == 0
+         || ( !b_show_hiddenfiles && p_item->psz_name[0] == '.' ) )
+            goto skip_item;
+        /* skip ignored files */
+        if( has_ext( psz_ignored_exts, p_item->psz_name ) )
             goto skip_item;
 
         input_item_CopyOptions( p_node->p_item, p_item );
