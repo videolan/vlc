@@ -1232,9 +1232,10 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
         return;
     }
 
-    if( SCRAMBLED(*pid) || header[0] != 0 || header[1] != 0 || header[2] != 1 )
+    if( (p_pes->i_flags & BLOCK_FLAG_SCRAMBLED) ||
+         header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
-        if ( !SCRAMBLED(*pid) )
+        if ( !(p_pes->i_flags & BLOCK_FLAG_SCRAMBLED) )
             msg_Warn( p_demux, "invalid header [0x%02x:%02x:%02x:%02x] (pid: %d)",
                         header[0], header[1],header[2],header[3], pid->i_pid );
         block_ChainRelease( p_pes );
@@ -2239,11 +2240,18 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
             pid->u.p_pes->p_data->i_flags |= BLOCK_FLAG_CORRUPTED;
     }
 
-    if( p_demux->p_sys->csa && SCRAMBLED(*pid) )
+    if( SCRAMBLED(*pid) )
     {
-        vlc_mutex_lock( &p_demux->p_sys->csa_lock );
-        csa_Decrypt( p_demux->p_sys->csa, p_pkt->p_buffer, p_demux->p_sys->i_csa_pkt_size );
-        vlc_mutex_unlock( &p_demux->p_sys->csa_lock );
+        if( p_demux->p_sys->csa )
+        {
+            vlc_mutex_lock( &p_demux->p_sys->csa_lock );
+            csa_Decrypt( p_demux->p_sys->csa, p_pkt->p_buffer, p_demux->p_sys->i_csa_pkt_size );
+            vlc_mutex_unlock( &p_demux->p_sys->csa_lock );
+        }
+        else
+        {
+            p_pkt->i_flags |= BLOCK_FLAG_SCRAMBLED;
+        }
     }
 
     if( !b_adaptation )
@@ -2317,7 +2325,12 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
         return i_ret;
     }
 
-    if( pid->u.p_pes->transport == TS_TRANSPORT_PES )
+    if( p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED )
+    {
+        block_Release( p_pkt );
+        return VLC_DEMUXER_SUCCESS;
+    }
+    else if( pid->u.p_pes->transport == TS_TRANSPORT_PES )
     {
         return GatherPESData( p_demux, pid, p_pkt, i_skip, b_unit_start );
     }
