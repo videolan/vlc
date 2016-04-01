@@ -141,6 +141,9 @@ DEFINE_GUID(DXVA_ModeH263_D,                        0x1b81be06, 0xa0c7, 0x11d3, 
 DEFINE_GUID(DXVA_ModeH263_E,                        0x1b81be07, 0xa0c7, 0x11d3, 0xb9, 0x84, 0x00, 0xc0, 0x4f, 0x2e, 0x73, 0xc5);
 DEFINE_GUID(DXVA_ModeH263_F,                        0x1b81be08, 0xa0c7, 0x11d3, 0xb9, 0x84, 0x00, 0xc0, 0x4f, 0x2e, 0x73, 0xc5);
 
+DEFINE_GUID(DXVA_ModeVP8_VLD,                       0x90b899ea, 0x3a62, 0x4705, 0x88, 0xb3, 0x8d, 0xf0, 0x4b, 0x27, 0x44, 0xe7);
+DEFINE_GUID(DXVA_ModeVP9_VLD_Profile0,              0x463707f8, 0xa1d0, 0x4585, 0x87, 0x6d, 0x83, 0xaa, 0x6d, 0x60, 0xb8, 0x9e);
+
 typedef struct {
     const char   *name;
     const GUID   *guid;
@@ -234,6 +237,10 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { "H.263 decoder, restricted profile D",                                          &DXVA_ModeH263_D,                       0, NULL },
     { "H.263 decoder, restricted profile E",                                          &DXVA_ModeH263_E,                       0, NULL },
     { "H.263 decoder, restricted profile F",                                          &DXVA_ModeH263_F,                       0, NULL },
+
+    /* VPx */
+    { "VP8",                                                                          &DXVA_ModeVP8_VLD,                      0, NULL },
+    { "VP9 profile 0",                                                                &DXVA_ModeVP9_VLD_Profile0,             0, NULL },
 
     { NULL, NULL, 0, NULL }
 };
