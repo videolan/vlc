@@ -531,7 +531,7 @@ static void Close( vlc_object_t *p_this )
     vlc_mutex_lock( &p_sys->csa_lock );
     if( p_sys->csa )
     {
-        var_DelCallback( p_demux, "ts-csa-ck", ChangeKeyCallback, NULL );
+        var_DelCallback( p_demux, "ts-csa-ck", ChangeKeyCallback, (void *)1 );
         var_DelCallback( p_demux, "ts-csa2-ck", ChangeKeyCallback, NULL );
         csa_Delete( p_sys->csa );
     }
