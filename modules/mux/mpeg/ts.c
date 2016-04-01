@@ -1325,7 +1325,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
             p_data->i_length = 1000;
 
         if (p_sys->first_dts == 0)
-            p_sys->first_dts = p_data->i_dts;
+            p_sys->first_dts = p_data->i_dts - p_sys->i_dts_delay;
 
         if( ( p_pcr_stream->state.i_pes_dts > 0 &&
               p_data->i_dts - 10 * CLOCK_FREQ > p_pcr_stream->state.i_pes_dts +
