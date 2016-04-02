@@ -100,8 +100,8 @@ void vlc_rand_bytes (void *buf, size_t len)
         PROV_RSA_FULL,          // Type of provider to acquire.
         CRYPT_VERIFYCONTEXT) )  // Flag values
     {
-        /* fill buffer with pseudo-random data, intial buffer content
-           is used as auxillary random seed */
+        /* fill buffer with pseudo-random data, initial buffer content
+           is used as auxiliary random seed */
         CryptGenRandom(hProv, len, buf);
         CryptReleaseContext(hProv, 0);
     }

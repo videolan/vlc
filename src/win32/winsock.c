@@ -28,7 +28,7 @@
 #if 0
 ssize_t vlc_sendmsg (int s, struct msghdr *hdr, int flags)
 {
-    /* WSASendMsg would be more straightforward, and would support ancilliary
+    /* WSASendMsg would be more straightforward, and would support ancillary
      * data, but it's not yet in mingw32. */
     if ((hdr->msg_iovlen > 100) || (hdr->msg_controllen > 0))
     {
@@ -50,7 +50,7 @@ ssize_t vlc_sendmsg (int s, struct msghdr *hdr, int flags)
 
 ssize_t vlc_recvmsg (int s, struct msghdr *hdr, int flags)
 {
-    /* WSARecvMsg would be more straightforward, and would support ancilliary
+    /* WSARecvMsg would be more straightforward, and would support ancillary
      * data, but it's not yet in mingw32. */
     if (hdr->msg_iovlen > 100)
     {
