@@ -26,9 +26,14 @@
 #ifndef LIBVLC_FIXUPS_H
 # define LIBVLC_FIXUPS_H 1
 
+/* needed to detect uClibc */
+#ifdef HAVE_FEATURES_H
+#include <features.h>
+#endif
+
 /* C++11 says there's no need to define __STDC_*_MACROS when including
  * inttypes.h and stdint.h. */
-#if defined (__cplusplus) && (!defined(HAVE_CXX11) || defined(__MINGW32__))
+#if defined (__cplusplus) && (!defined(HAVE_CXX11) || defined(__MINGW32__) || defined(__UCLIBC__))
 # ifndef __STDC_FORMAT_MACROS
 #  define __STDC_FORMAT_MACROS 1
 # endif
