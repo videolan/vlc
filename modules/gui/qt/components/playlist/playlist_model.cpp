@@ -998,7 +998,6 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
         return ( canEdit() && isTree() );
     case ACTION_RENAMENODE:
         return ( index != rootIndex() ) && !isLeaf( index );
-        break;
     case ACTION_CLEAR:
         return rowCount() && canEdit();
     case ACTION_ENQUEUEFILE:
