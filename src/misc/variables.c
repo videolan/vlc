@@ -32,7 +32,6 @@
 # include <search.h>
 #endif
 #include <assert.h>
-#include <float.h>
 #include <math.h>
 #include <limits.h>
 
@@ -1290,56 +1289,66 @@ int (var_InheritURational)(vlc_object_t *object,
                            unsigned *num, unsigned *den,
                            const char *var)
 {
-    /* */
-    *num = 0;
-    *den = 0;
-
-    /* */
-    char *tmp = var_InheritString(object, var);
-    if (!tmp)
+    char *str = var_InheritString(object, var);
+    if (str == NULL)
         goto error;
 
-    char *next;
-    unsigned n = strtol(tmp,  &next, 0);
-    unsigned d = strtol(*next ? &next[1] : "0", NULL, 0);
+    char *sep;
+    unsigned n = strtoul(str, &sep, 10);
+    unsigned d;
 
-    if (*next == '.') {
-        /* Interpret as a (finite positive) float number */
-        const int ubits = CHAR_BIT * sizeof (unsigned);
-        int exp;
-        double f = frexp(us_atof(tmp), &exp);
-
-        if (!isgreaterequal(f, 0.))
-            goto error; /* negative or not a number */
-
-        if (exp <= 1 - ubits) {
-            n = 0; /* too small */
+    switch (*sep) {
+        case '\0':
+            /* Decimal integer */
             d = 1;
-        } else if (exp <= 0) {
-            n = floor(scalbn(f, ubits - 1 + exp));
-#if (FLT_RADIX != 2)
-# error Floating point configuration not supported.
-#endif
-            d = 1u << (ubits - 1);
-        } else if (exp <= ubits) {
-            n = floor(scalbn(f, ubits));
-            d = 1u << (ubits - exp);
-        } else
-            goto error; /* too big */
-    } else if ( *next == '\0' ) {
-        /* plain integer given */
-        *num = n;
-        *den = 1;
+            break;
+
+        case ':':
+        case '/':
+            /* Decimal fraction */
+            d = strtoul(sep + 1, &sep, 10);
+            if (*sep != '\0')
+                goto error;
+            break;
+
+        case '.': {
+            /* Decimal number */
+            unsigned char c;
+
+            d = 1;
+            while ((c = *(++sep)) != '\0') {
+                c -= '0';
+
+                if (c >= 10)
+                    goto error;
+
+                n = n * 10 + c;
+                d *= 10;
+            }
+            break;
+        }
+
+        default:
+            goto error;
     }
 
-    if (n > 0 && d > 0)
+    free(str);
+
+    if (n == 0) {
+        *num = 0;
+        *den = d ? 1 : 0;
+    } else if (d == 0) {
+        *num = 1;
+        *den = 0;
+    } else
         vlc_ureduce(num, den, n, d, 0);
 
-    free(tmp);
     return VLC_SUCCESS;
 
 error:
-    free(tmp);
+    free(str);
+    *num = 0;
+    *den = 0;
     return VLC_EGENERIC;
 }
 
