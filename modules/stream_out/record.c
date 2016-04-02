@@ -525,29 +525,39 @@ static void OutputStart( sout_stream_t *p_stream )
             p_sys->i_dts_start = i_dts;
     }
 
-    /* Send buffered data */
-    for( int i = 0; i < p_sys->i_id; i++ )
+    sout_stream_id_sys_t *p_cand;
+    do
     {
-        sout_stream_id_sys_t *id = p_sys->id[i];
+        /* dequeue candidate */
+        p_cand = NULL;
 
-        if( !id->id )
-            continue;
-
-        block_t *p_block = id->p_first;
-        while( p_block )
+        /* Send buffered data in dts order */
+        for( int i = 0; i < p_sys->i_id; i++ )
         {
-            block_t *p_next = p_block->p_next;
+            sout_stream_id_sys_t *id = p_sys->id[i];
 
-            p_block->p_next = NULL;
+            if( !id->id || id->p_first == NULL )
+                continue;
 
-            OutputSend( p_stream, id, p_block );
-
-            p_block = p_next;
+            if( p_cand == NULL || id->p_first->i_dts < p_cand->p_first->i_dts )
+                p_cand = id;
         }
 
-        id->p_first = NULL;
-        id->pp_last = &id->p_first;
-    }
+        if( p_cand != NULL )
+        {
+            block_t *p_block = p_cand->p_first;
+            p_cand->p_first = p_block->p_next;
+            if( p_cand->p_first == NULL )
+                p_cand->pp_last = &p_cand->p_first;
+            p_block->p_next = NULL;
+
+            if( p_block->i_dts >= p_sys->i_dts_start )
+                OutputSend( p_stream, p_cand, p_block );
+            else
+                block_Release( p_block );
+        }
+
+    } while( p_cand != NULL );
 }
 
 static void OutputSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id, block_t *p_block )
