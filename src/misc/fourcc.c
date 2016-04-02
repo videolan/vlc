@@ -153,7 +153,6 @@ vlc_fourcc_t vlc_fourcc_GetCodecAudio( vlc_fourcc_t i_fourcc, int i_bits )
             return VLC_CODEC_S16L;
         case 3:
             return VLC_CODEC_S24L;
-            break;
         case 4:
             return VLC_CODEC_S32L;
         default:
