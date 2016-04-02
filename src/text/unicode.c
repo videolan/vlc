@@ -192,8 +192,8 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc)
 
  * @param haystack string to look into
  * @param needle string to look for
- * @return a pointer to the first occurence of the needle within the haystack,
- * or NULL if no occurence were found.
+ * @return a pointer to the first occurrence of the needle within the haystack,
+ * or NULL if no occurrence were found.
  */
 char *vlc_strcasestr (const char *haystack, const char *needle)
 {
