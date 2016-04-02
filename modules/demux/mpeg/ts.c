@@ -171,6 +171,7 @@ static inline int PIDGet( block_t *p )
 {
     return ( (p->p_buffer[1]&0x1f)<<8 )|p->p_buffer[2];
 }
+static mtime_t GetPCR( const block_t * );
 
 static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt );
 static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk, size_t, bool );
@@ -179,7 +180,7 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_prg, mtime_t i_pcr );
 static block_t* ReadTSPacket( demux_t *p_demux );
 static int SeekToTime( demux_t *p_demux, const ts_pmt_t *, int64_t time );
 static void ReadyQueuesPostSeek( demux_t *p_demux );
-static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
+static void PCRHandle( demux_t *p_demux, ts_pid_t *, mtime_t );
 static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 
 #define TS_PACKET_SIZE_188 188
@@ -628,9 +629,13 @@ static int Demux( demux_t *p_demux )
             p_pid->i_flags |= FLAG_SEEN;
         }
 
+        /* Adaptation field cannot be scrambled */
+        mtime_t i_pcr = GetPCR( p_pkt );
+        if( i_pcr > VLC_TS_INVALID )
+            PCRHandle( p_demux, p_pid, i_pcr );
+
         if ( SCRAMBLED(*p_pid) && !p_demux->p_sys->csa )
         {
-            PCRHandle( p_demux, p_pid, p_pkt );
             block_Release( p_pkt );
             continue;
         }
@@ -685,7 +690,6 @@ static int Demux( demux_t *p_demux )
 
         default:
             /* We have to handle PCR if present */
-            PCRHandle( p_demux, p_pid, p_pkt );
             block_Release( p_pkt );
             break;
         }
@@ -1632,13 +1636,14 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     return p_pkt;
 }
 
-static mtime_t GetPCR( block_t *p_pkt )
+static mtime_t GetPCR( const block_t *p_pkt )
 {
     const uint8_t *p = p_pkt->p_buffer;
 
     mtime_t i_pcr = -1;
 
-    if( ( p[3]&0x20 ) && /* adaptation */
+    if( likely(p_pkt->i_buffer > 11) &&
+        ( p[3]&0x20 ) && /* adaptation */
         ( p[5]&0x10 ) &&
         ( p[4] >= 7 ) )
     {
@@ -2096,13 +2101,9 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
     }
 }
 
-static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
+static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, mtime_t i_pcr )
 {
     demux_sys_t   *p_sys = p_demux->p_sys;
-
-    mtime_t i_pcr = GetPCR( p_bk );
-    if( i_pcr < 0 )
-        return;
 
     pid->probed.i_pcr_count++;
 
@@ -2316,8 +2317,6 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
             }
         }
     }
-
-    PCRHandle( p_demux, pid, p_pkt );
 
     if( i_skip >= 188 )
     {
