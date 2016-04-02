@@ -451,7 +451,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
 /**
  * Stops the audio output stream (undoes aout_OutputNew()).
- * \note This can only be called after a succesful aout_OutputNew().
+ * \note This can only be called after a successful aout_OutputNew().
  * \warning The caller must hold the audio output lock.
  */
 void aout_OutputDelete (audio_output_t *aout)
@@ -474,7 +474,7 @@ int aout_OutputTimeGet (audio_output_t *aout, mtime_t *delay)
 
 /**
  * Plays a decoded audio buffer.
- * \note This can only be called after a succesful aout_OutputNew().
+ * \note This can only be called after a successful aout_OutputNew().
  * \warning The caller must hold the audio output lock.
  */
 void aout_OutputPlay (audio_output_t *aout, block_t *block)
@@ -494,7 +494,7 @@ static void PauseDefault (audio_output_t *aout, bool pause, mtime_t date)
  * Notifies the audio output (if any) of pause/resume events.
  * This enables the output to expedite pause, instead of waiting for its
  * buffers to drain.
- * \note This can only be called after a succesful aout_OutputNew().
+ * \note This can only be called after a successful aout_OutputNew().
  * \warning The caller must hold the audio output lock.
  */
 void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
@@ -508,7 +508,7 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
  * This enables the output to expedite seek and stop.
  * \param wait if true, wait for buffer playback (i.e. drain),
  *             if false, discard the buffers immediately (i.e. flush)
- * \note This can only be called after a succesful aout_OutputNew().
+ * \note This can only be called after a successful aout_OutputNew().
  * \warning The caller must hold the audio output lock.
  */
 void aout_OutputFlush( audio_output_t *aout, bool wait )
