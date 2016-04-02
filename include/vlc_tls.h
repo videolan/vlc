@@ -108,7 +108,7 @@ VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds, int fd,
  *
  * All resources associated with the TLS session are released.
  *
- * If the session was established succesfully, then shutdown cleanly, the
+ * If the session was established successfully, then shutdown cleanly, the
  * underlying socket can be reused. Otherwise, it must be closed. Either way,
  * this function does not close the underlying socket: Use vlc_tls_Close()
  * instead to close it at the same.

@@ -771,7 +771,7 @@ mtime_t impossible_deadline( mtime_t deadline )
  * \return 0 on success, a system error code otherwise.
  *
  * \warning Asynchronous timers are processed from an unspecified thread.
- * \note Multiple occurences of a single interval timer are serialized:
+ * \note Multiple occurrences of a single interval timer are serialized:
  * they cannot run concurrently.
  */
 VLC_API int vlc_timer_create(vlc_timer_t *id, void (*func)(void *), void *data)

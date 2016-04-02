@@ -1620,7 +1620,7 @@ void libvlc_audio_output_list_release( libvlc_audio_output_t *p_list );
  * \param p_mi media player
  * \param psz_name name of audio output,
  *               use psz_name of \see libvlc_audio_output_t
- * \return 0 if function succeded, -1 on error
+ * \return 0 if function succeeded, -1 on error
  */
 LIBVLC_API int libvlc_audio_output_set( libvlc_media_player_t *p_mi,
                                         const char *psz_name );

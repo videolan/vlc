@@ -220,7 +220,7 @@ VLC_API void vlc_interrupt_forward_start(vlc_interrupt_t *to,
 /**
  * Undoes vlc_interrupt_forward_start().
  *
- * This function must be called after each succesful call to
+ * This function must be called after each successful call to
  * vlc_interrupt_forward_start() before any other interruptible call is made
  * in the same thread.
  *

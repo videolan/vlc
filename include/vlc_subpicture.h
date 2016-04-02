@@ -161,7 +161,7 @@ struct subpicture_t
     mtime_t         i_start;                  /**< beginning of display date */
     mtime_t         i_stop;                         /**< end of display date */
     bool            b_ephemer;    /**< If this flag is set to true the subtitle
-                                will be displayed untill the next one appear */
+                                will be displayed until the next one appear */
     bool            b_fade;                               /**< enable fading */
     /**@}*/
 
@@ -218,7 +218,7 @@ VLC_API void subpicture_Update( subpicture_t *, const video_format_t *src, const
  *  - not be ephemere.
  *  - not have the fade flag.
  *  - contains only picture (no text rendering).
- * \return the number of region(s) succesfully blent
+ * \return the number of region(s) successfully blent
  */
 VLC_API unsigned picture_BlendSubpicture( picture_t *, filter_t *p_blend, subpicture_t * );
 

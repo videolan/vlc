@@ -219,7 +219,7 @@ struct encoder_t
  * \note
  * This function is not reentrant.
  *
- * @return 0 if the video output was set up succesfully, -1 otherwise.
+ * @return 0 if the video output was set up successfully, -1 otherwise.
  */
 static inline int decoder_UpdateVideoFormat( decoder_t *dec )
 {

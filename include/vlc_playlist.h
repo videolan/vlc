@@ -115,7 +115,7 @@ struct intf_thread_t;
  * The playlist contains rate-variable which is propagated to current input if available
  * also rate-slower/rate-faster is in use
  *
- * \warning Be really carefull, playlist_item_t->i_id and input_item_t->i_id
+ * \warning Be really careful, playlist_item_t->i_id and input_item_t->i_id
  * are not the same. Yes, the situation is pretty bad.
  */
 

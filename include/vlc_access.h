@@ -98,7 +98,7 @@ struct access_t
      * XXX can be null */
     int         (*pf_seek) ( access_t *, uint64_t );         /* can be null if can't seek */
 
-    /* Used to retreive and configure the access
+    /* Used to retrieve and configure the access
      * XXX mandatory. look at access_query_e to know what query you *have to* support */
     int         (*pf_control)( access_t *, int i_query, va_list args);
 

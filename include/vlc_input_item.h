@@ -136,7 +136,7 @@ VLC_API void input_item_SetName( input_item_t *p_item, const char *psz_name );
  *
  * This won't hold the item, but can tell to interested third parties
  * Like the playlist, that there is a new sub item. With this design
- * It is not the input item's responsability to keep all the ref of
+ * It is not the input item's responsibility to keep all the ref of
  * the input item children.
  *
  * Sends a vlc_InputItemSubItemTreeAdded and a vlc_InputItemSubItemAdded event
