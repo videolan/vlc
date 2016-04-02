@@ -74,7 +74,8 @@ typedef struct
 #if !defined (HAVE_POSIX_MEMALIGN) || \
     !defined (HAVE_STRLCPY) || \
     !defined (HAVE_STRNDUP) || \
-    !defined (HAVE_STRNLEN)
+    !defined (HAVE_STRNLEN) || \
+    !defined (HAVE_STRNSTR)
 # include <stddef.h> /* size_t */
 #endif
 
