@@ -1645,7 +1645,6 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
                 (char*)&fmt.i_codec );
         es_format_Clean( &fmt );
         return VLC_EGENERIC;
-        break;
     }
     msg_Dbg( p_demux, "    - extra data=%d", fmt.i_extra );
 

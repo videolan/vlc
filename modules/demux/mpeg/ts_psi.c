@@ -1074,7 +1074,6 @@ static bool PMTSetupEsHDMV( demux_t *p_demux, ts_pes_es_t *p_es,
         msg_Info( p_demux, "HDMV registration not implemented for pid 0x%x type 0x%x",
                   p_dvbpsies->i_pid, p_dvbpsies->i_type );
         return false;
-        break;
     }
     return true;
 }

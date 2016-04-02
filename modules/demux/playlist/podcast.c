@@ -355,7 +355,6 @@ static mtime_t strTimeToMTime( const char *psz )
         return (mtime_t)( ( h*60 + m )*60 + s ) * 1000000;
     case 2:
         return (mtime_t)( h*60 + m ) * 1000000;
-        break;
     default:
         return -1;
     }
