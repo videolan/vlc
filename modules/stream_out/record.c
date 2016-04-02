@@ -503,16 +503,24 @@ static void OutputStart( sout_stream_t *p_stream )
 
     /* Compute highest timestamp of first I over all streams */
     p_sys->i_dts_start = 0;
+    mtime_t i_highest_head_dts = 0;
     for( int i = 0; i < p_sys->i_id; i++ )
     {
         sout_stream_id_sys_t *id = p_sys->id[i];
-        block_t *p_block;
 
         if( !id->id || !id->p_first )
             continue;
 
-        mtime_t i_dts = id->p_first->i_dts;
-        for( p_block = id->p_first; p_block != NULL; p_block = p_block->p_next )
+        const block_t *p_block = id->p_first;
+        mtime_t i_dts = p_block->i_dts;
+
+        if( i_dts > i_highest_head_dts &&
+           ( id->fmt.i_cat == AUDIO_ES || id->fmt.i_cat == VIDEO_ES ) )
+        {
+            i_highest_head_dts = i_dts;
+        }
+
+        for( ; p_block != NULL; p_block = p_block->p_next )
         {
             if( p_block->i_flags & BLOCK_FLAG_TYPE_I )
             {
@@ -524,6 +532,9 @@ static void OutputStart( sout_stream_t *p_stream )
         if( i_dts > p_sys->i_dts_start )
             p_sys->i_dts_start = i_dts;
     }
+
+    if( p_sys->i_dts_start == 0 )
+        p_sys->i_dts_start = i_highest_head_dts;
 
     sout_stream_id_sys_t *p_cand;
     do
