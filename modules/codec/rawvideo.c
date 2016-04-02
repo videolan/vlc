@@ -101,6 +101,12 @@ static int OpenCommon( decoder_t *p_dec )
 
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
+    if( p_dec->fmt_in.i_codec == VLC_CODEC_YUV2 )
+    {
+        p_dec->fmt_out.video.i_chroma =
+        p_dec->fmt_out.i_codec = VLC_CODEC_YUYV;
+    }
+
     if( p_dec->fmt_out.video.i_frame_rate == 0 ||
         p_dec->fmt_out.video.i_frame_rate_base == 0)
     {
@@ -207,6 +213,12 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
         for( int x = 0; x < p_pic->p[i].i_visible_lines; x++ )
         {
             memcpy( p_dst, p_src, p_pic->p[i].i_visible_pitch );
+            /*Fix chroma sign.*/
+            if( p_dec->fmt_in.i_codec == VLC_CODEC_YUV2 ) {
+                for( int y = 0; y < p_pic->p[i].i_visible_pitch; y++ ) {
+                    p_dst[2*y + 1] ^= 0x80;
+                }
+            }
             p_src += p_sys->pitches[i];
             p_dst += p_pic->p[i].i_pitch;
         }
