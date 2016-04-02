@@ -27,11 +27,11 @@ A call to pf_readdir has 3 possible results:
   input_item_t possible depending on system state and module options. In this
   case, pf_readdir MUST return VLC_SUCCESS and info.b_eof MUST be set to true.
   This callback must NOT be called again.
-* An unrecoverable error has occured and no input_item_t was added to the node.
+* An unrecoverable error has occurred and no input_item_t was added to the node.
   The callback returns a VLC_ENOITEM error code, and sets info.b_eof to true.
   This error SHOULD be propagated by the calling code (stream/demux/...)
   This callback must NOT be called again.
-* A recoverable error has occured. The callback MUST return an error code
+* A recoverable error has occurred. The callback MUST return an error code
   that is not VLC_SUCCESS or VLC_ENOITEM (e.g. VLC_EGENERIC, VLC_ENOMEM, ...).
   Some input_item_t objects might have been added to the node; they are
   owned by the node which is owned by the access. This callback CAN be

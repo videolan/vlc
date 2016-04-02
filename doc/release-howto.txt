@@ -57,7 +57,7 @@ Release HOWTO
   - edit the /index.php /vlc/*.php, include/os-specific.php files
   - create a /vlc/release/X.X.X page
   - add a news item to news.msg
-  - update the front page OS dependant screenshots if the interface changed.
+  - update the front page OS dependent screenshots if the interface changed.
   - update the md5
 
  * "Check for updates" functionality

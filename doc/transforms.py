@@ -77,7 +77,7 @@ def unscaled_DFT_radix2_time (N, input, output):
 # reversible, so we can calculate the IDFT with the same complexity.
 
 
-# A varient of this is the radix-2 decimation-in-frequency algorithm :
+# A variant of this is the radix-2 decimation-in-frequency algorithm :
 
 def unscaled_DFT_radix2_freq (N, input, output):
     even_input = vector(N/2)
@@ -103,7 +103,7 @@ def unscaled_DFT_radix2_freq (N, input, output):
 # have exactly the same complexity, they only do the operations in a different
 # order.
 
-# Actually, if you look at the decimation-in-time varient of the DFT, and
+# Actually, if you look at the decimation-in-time variant of the DFT, and
 # reverse it to calculate an IDFT, you get something that is extremely close
 # to the decimation-in-frequency DFT algorithm...
 
@@ -275,7 +275,7 @@ def unscaled_DFT_radix4_freq (N, input, output):
 #	output[i+N/2] = tmp_0[i] - tmp_2[i]
 #	output[i+3*N/4] = tmp_1[i] + 1j * tmp_3[i]
 
-# We didnt do anything here, only reorder the operations. But now, look at the
+# We didn't do anything here, only reorder the operations. But now, look at the
 # first part of this function, up to the calculations of tmp0 and tmp1 : this
 # is extremely similar to the radix-2 decimation-in-time algorithm ! or more
 # precisely, it IS the radix-2 decimation-in-time algorithm, with size N/2,
@@ -368,7 +368,7 @@ def unscaled_DFT_split_radix_freq (N, input, output):
 	output[4*i+1] = output_1[i]
 	output[4*i+3] = output_3[i]
 
-# The complexity is again the same as for the decimation-in-time varient.
+# The complexity is again the same as for the decimation-in-time variant.
 
 
 # Now let us now summarize our various algorithms for DFT decomposition :
@@ -862,7 +862,7 @@ def unscaled_DCT_Lee (N, input, output):
 # Some of the multiplication coefficients 0.5/cos(...) can get quite large.
 # This means that a small error in the input will give a large error on the
 # output... For a DCT of size N the biggest coefficient will be at i=N/2-1
-# and it will be slighly more than N/pi which can be large for large N's.
+# and it will be slightly more than N/pi which can be large for large N's.
 
 # In the IDCT however, the multiplication coefficients for the reverse
 # transformation are of the form 2*cos(...) so they can not get big and there
@@ -958,15 +958,15 @@ def unscaled_DCT_AAN (N, input, output):
 # but that one does not save operations actually, because the other
 # coefficients are the conjugates of the ones we look anyway.
 
-# One useful way to use the symetry of the input is to use the radix-2
+# One useful way to use the symmetry of the input is to use the radix-2
 # decimation-in-frequency algorithm. We can write a version of
-# unscaled_DFT_radix2_freq for the case where the input is symetrical :
+# unscaled_DFT_radix2_freq for the case where the input is symmetrical :
 # we have removed a few additions in the first stages because even_input
-# is symetrical and odd_input is antisymetrical. Also, we have modified the
+# is symmetrical and odd_input is antisymetrical. Also, we have modified the
 # odd_input vector so that the second half of it is set to zero and the real
 # part of the DFT output is not modified. After that modification, the second
 # part of the odd_input was null so we used the radix-2 decimation-in-frequency
-# again on the odd DFT. Also odd_output is symetrical because input is real...
+# again on the odd DFT. Also odd_output is symmetrical because input is real...
 
 def symetrical_unscaled_DFT (N, input, output):
     even_input = vector(N/2)
@@ -986,7 +986,7 @@ def symetrical_unscaled_DFT (N, input, output):
 	odd_input[i] = (odd_tmp[i] + odd_tmp[i-1]) * W (i, N)
 
     unscaled_DFT (N/2, even_input, even_output)
-    # symetrical real inputs, real outputs
+    # symmetrical real inputs, real outputs
 
     unscaled_DFT (N/4, odd_input, odd_output)
     # complex inputs, real outputs
@@ -998,7 +998,7 @@ def symetrical_unscaled_DFT (N, input, output):
 	output[N-1-4*i] = output[4*i+1] = odd_output[i]
 
 # This procedure takes 3*N/4-1 real additions and N/2-3 real multiplies,
-# followed by another symetrical real DFT of size N/2 and a "complex to real"
+# followed by another symmetrical real DFT of size N/2 and a "complex to real"
 # DFT of size N/4.
 
 # We thus get the following performance results :

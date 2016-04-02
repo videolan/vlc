@@ -17,7 +17,7 @@ How to create an event ?
 
 An event describes a simple action as seen above.
 All attributes are explained in the 'skins-howto.txt' file except the 'event'
-attribute wich is a bit special.
+attribute which is a bit special.
 In the 'event' attribute you will enter a simple script with the following
 syntax :
   "EVENT(parameter1,parameter2,...)"
@@ -180,12 +180,12 @@ When creating your event, you must assign an ID to each of them.
 Now you have to associate events with controls.
 Some attributes of some controls are supposed to be filled with those IDs. That
 is to say that when the action corresponding to the attribute will be done,
-the event associated will be executed. The best exemple is assigning an event
+the event associated will be executed. The best example is assigning an event
 to the 'onclick' attribute of a button control. The event will be executed when
 clicking on the button.
 You can execute several events. To do this you just have to separate them with
 semicolon.
-Exemple:
+Example:
   <ButtonControl [...] onclick="event1;event2;event3"/>
 
 
