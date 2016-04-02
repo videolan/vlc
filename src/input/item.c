@@ -192,7 +192,7 @@ static void post_subitems( input_item_node_t *p_node )
 
 /* This won't hold the item, but can tell to interested third parties
  * Like the playlist, that there is a new sub item. With this design
- * It is not the input item's responsability to keep all the ref of
+ * It is not the input item's responsibility to keep all the ref of
  * the input item children. */
 void input_item_PostSubItem( input_item_t *p_parent, input_item_t *p_child )
 {
@@ -1055,7 +1055,7 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "qtcapt", ITEM_TYPE_CARD, false }, /* qtcapture */
         { "raw139", ITEM_TYPE_CARD, false }, /* raw1394 */
         { "rt",     ITEM_TYPE_STREAM, true }, /* rtp, rtsp, rtmp */
-        { "satell", ITEM_TYPE_CARD, false }, /* sattelite */
+        { "satell", ITEM_TYPE_CARD, false }, /* satellite */
         { "screen", ITEM_TYPE_CARD, false },
         { "sdp",    ITEM_TYPE_STREAM, true },
         { "sftp",   ITEM_TYPE_FILE, true },

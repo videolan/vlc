@@ -24,7 +24,7 @@
 
 /**
  *  \file
- *  This file contains functions to dectect subtitle files.
+ *  This file contains functions to detect subtitle files.
  */
 
 #ifdef HAVE_CONFIG_H

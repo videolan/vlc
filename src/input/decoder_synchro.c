@@ -30,7 +30,7 @@
  * This implementation is based on mathematical and statistical
  * developments. Older implementations used an enslavement, considering
  * that if we're late when reading an I picture, we will decode one frame
- * less. It had a tendancy to derive, and wasn't responsive enough, which
+ * less. It had a tendency to derive, and wasn't responsive enough, which
  * would have caused trouble with the stream control stuff.
  *
  * 1. Structure of a picture stream

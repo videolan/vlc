@@ -137,7 +137,7 @@ stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 }
 
 /**
- * Read from the stream untill first newline.
+ * Read from the stream until first newline.
  * \param s Stream handle to read from
  * \return A pointer to the allocated output string. You need to free this when you are done.
  */

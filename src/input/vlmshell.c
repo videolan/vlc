@@ -135,7 +135,7 @@ static int Unescape( char *out, const char *in )
     while( (c = *in++) != '\0' )
     {
         // Don't escape the end of the string if we find a '#'
-        // that's the begining of a vlc command
+        // that's the beginning of a vlc command
         // TODO: find a better solution
         if( ( c == '#' && !quote ) || param )
         {
