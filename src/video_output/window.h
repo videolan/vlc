@@ -1,5 +1,5 @@
 /*****************************************************************************
- * window.h: window managment for VLC video output
+ * window.h: window management for VLC video output
  *****************************************************************************
  * Copyright © 2014 Rémi Denis-Courmont
  *

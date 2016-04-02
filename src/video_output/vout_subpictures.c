@@ -96,7 +96,7 @@ struct spu_private_t {
 };
 
 /*****************************************************************************
- * heap managment
+ * heap management
  *****************************************************************************/
 static void SpuHeapInit(spu_heap_t *heap)
 {
@@ -257,7 +257,7 @@ static void SpuRenderText(spu_t *spu, bool *rerender_text,
      * time-dependent text (and effects). The first indicates
      * the total amount of time the text will be on screen,
      * the second the amount of time it has already been on
-     * screen (can be a negative value as text is layed out
+     * screen (can be a negative value as text is laid out
      * before it is rendered) and the third is a feedback
      * variable from the renderer - if the renderer sets it
      * then this particular text is time-dependent, eg. the
@@ -550,7 +550,7 @@ static void SpuSelectSubpictures(spu_t *spu,
             channel[channel_count++] = i_channel;
     }
 
-    /* Fill up the subpicture_array arrays with relevent pictures */
+    /* Fill up the subpicture_array arrays with relevant pictures */
     for (int i = 0; i < channel_count; i++) {
         subpicture_t *available_subpic[VOUT_MAX_SUBPICTURES];
         bool         is_available_late[VOUT_MAX_SUBPICTURES];
