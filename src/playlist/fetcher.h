@@ -30,7 +30,7 @@
 /**
  * Fetcher opaque structure.
  *
- * The fether object will retrieve the art album data for any given input
+ * The fetcher object will retrieve the art album data for any given input
  * item in an asynchronous way.
  */
 typedef struct playlist_fetcher_t playlist_fetcher_t;
