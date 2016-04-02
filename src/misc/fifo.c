@@ -329,7 +329,7 @@ block_t *block_FifoGet(block_fifo_t *fifo)
  *
  * @warning This function leaves the block in the FIFO.
  * You need to protect against concurrent threads who could dequeue the block.
- * Preferrably, there should be only one thread reading from the FIFO.
+ * Preferably, there should be only one thread reading from the FIFO.
  *
  * @warning This function is undefined if the FIFO is empty.
  *

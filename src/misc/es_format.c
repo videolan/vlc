@@ -248,7 +248,7 @@ void video_format_ScaleCropAr( video_format_t *p_dst, const video_format_t *p_sr
                 p_dst->i_sar_num, p_dst->i_sar_den, 65536);
 }
 
-//Simplify transforms to have something more managable. Order: angle, hflip.
+//Simplify transforms to have something more manageable. Order: angle, hflip.
 static void transform_GetBasicOps( video_transform_t transform,
                                    unsigned *restrict angle,
                                    bool *restrict hflip )

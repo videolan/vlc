@@ -236,7 +236,7 @@ static bool GetUpdateFile( update_t *p_update )
                     &p_update->release.i_revision, &p_update->release.i_extra);
     if( ret != 3 && ret != 4 )
     {
-            msg_Err( p_update->p_libvlc, "Update version false formated" );
+            msg_Err( p_update->p_libvlc, "Update version false formatted" );
             goto error;
     }
 
@@ -566,7 +566,7 @@ static void* update_DownloadReal( void *obj )
     psz_tmpdestfile = strrchr( p_update->release.psz_url, '/' );
     if( !psz_tmpdestfile )
     {
-        msg_Err( p_udt, "The URL %s is badly formated",
+        msg_Err( p_udt, "The URL %s is badly formatted",
                  p_update->release.psz_url );
         goto end;
     }

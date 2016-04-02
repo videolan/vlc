@@ -419,7 +419,7 @@ static const staticentry_t p_list_video[] = {
         A("WMV3"),
         A("wmv3"),
 
-    /* WMVA is the VC-1 codec before the standardization proces,
+    /* WMVA is the VC-1 codec before the standardization process,
      * it is not bitstream compatible and deprecated  */
     B(VLC_CODEC_WMVA, "Windows Media Video Advanced Profile"),
         A("WMVA"),

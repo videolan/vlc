@@ -171,7 +171,7 @@ static vlc_interrupt_t *vlc_interrupt_get(void)
  * Prepares to enter interruptible wait.
  * @param cb callback to interrupt the wait (i.e. wake up the thread)
  * @param data opaque data pointer for the callback
- * @note Any <b>succesful</b> call <b>must</b> be paired with a call to
+ * @note Any <b>successful</b> call <b>must</b> be paired with a call to
  * vlc_interrupt_finish().
  */
 static void vlc_interrupt_prepare(vlc_interrupt_t *ctx,
@@ -470,7 +470,7 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
  *
  * So in the event that more than one thread tries to read or write on the same
  * file at the same time, there is a race condition where these functions might
- * block inspite of an interruption. This should never happen in practice.
+ * block in spite of an interruption. This should never happen in practice.
  */
 
 /**

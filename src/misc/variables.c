@@ -1160,7 +1160,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
     }
 
     /* Create the variable in the input object.
-     * Children of the input object will be able to retreive this value
+     * Children of the input object will be able to retrieve this value
      * thanks to the inheritance property of the object variables. */
     var_Create( p_obj, psz_name, i_type );
 
