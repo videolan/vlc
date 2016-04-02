@@ -2341,6 +2341,7 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
     }
     else // pid->u.p_pes->transport == TS_TRANSPORT_IGNORE
     {
+        block_Release( p_pkt );
         return VLC_DEMUXER_SUCCESS;
     }
 }
