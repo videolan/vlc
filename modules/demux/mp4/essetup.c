@@ -401,7 +401,7 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             p_track->fmt.i_codec = VLC_CODEC_YV12;
             break;
         case VLC_FOURCC('y','u','v','2'):
-            p_track->fmt.i_codec = VLC_CODEC_YUYV;
+            p_track->fmt.i_codec = VLC_CODEC_YUV2;
             break;
         case VLC_FOURCC('A','B','G','R'):
             p_track->fmt.i_codec = VLC_CODEC_ARGB;
