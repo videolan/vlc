@@ -62,7 +62,7 @@ static inline int meta_strcasecmp_title( const playlist_item_t *first,
 }
 
 /**
- * Compare two intems accoring to the given meta type
+ * Compare two intems according to the given meta type
  * @param first: the first item
  * @param second: the second item
  * @param meta: the meta type to use to sort the items

@@ -29,7 +29,7 @@
 /**
  * Preparser opaque structure.
  *
- * The preparser object will retreive the meta data of any given input item in
+ * The preparser object will retrieve the meta data of any given input item in
  * an asynchronous way.
  * It will also issue art fetching requests.
  */

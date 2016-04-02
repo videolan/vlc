@@ -709,7 +709,7 @@ int playlist_TreeMoveMany( playlist_t *p_playlist,
  *
  * \param p_playlist the playlist object
  * \param i_item_id id of the item added
- * \param i_node_id id of the node in wich the item was added
+ * \param i_node_id id of the node in which the item was added
  * \param b_signal TRUE if the function must send a signal
  * \return nothing
  */
@@ -774,7 +774,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
             input_Stop( sys->p_input );
         vlc_cond_signal( &sys->signal );
     }
-    /* Preparse if no artist/album info, and hasn't been preparsed allready
+    /* Preparse if no artist/album info, and hasn't been preparsed already
        and if user has some preparsing option (auto-preparse variable)
        enabled*/
     char *psz_artist = input_item_GetArtist( p_item->p_input );

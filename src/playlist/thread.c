@@ -394,7 +394,7 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
 
         PL_DEBUG( "changing item without a request (current %i/%i)",
                   p_playlist->i_current_index, p_playlist->current.i_size );
-        /* Cant go to next from current item */
+        /* Can't go to next from current item */
         if( get_current_status_item( p_playlist ) &&
             get_current_status_item( p_playlist )->i_flags & PLAYLIST_SKIP_FLAG )
             return NULL;
