@@ -1475,7 +1475,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
         default:
             return VLC_EGENERIC;
-            break;
     }
 
     httpd_MsgAdd( answer, "Server", "VLC/%s", VERSION );
