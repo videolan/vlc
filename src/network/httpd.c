@@ -614,7 +614,7 @@ struct httpd_stream_t
     /* circular buffer */
     int         i_buffer_size;      /* buffer size, can't be reallocated smaller */
     uint8_t     *p_buffer;          /* buffer */
-    int64_t     i_buffer_pos;       /* absolute position from begining */
+    int64_t     i_buffer_pos;       /* absolute position from beginning */
     int64_t     i_buffer_last_pos;  /* a new connection will start with that */
 
     /* custom headers */
