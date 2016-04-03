@@ -48,7 +48,9 @@ static char *vlc_http_authority(const char *host, unsigned port)
 
 static struct vlc_http_msg *vlc_http_tunnel_open(struct vlc_http_conn *conn,
                                                  const char *hostname,
-                                                 unsigned port)
+                                                 unsigned port,
+                                                 const char *username,
+                                                 const char *password)
 {
     char *authority = vlc_http_authority(hostname, port);
     if (authority == NULL)
@@ -62,6 +64,9 @@ static struct vlc_http_msg *vlc_http_tunnel_open(struct vlc_http_conn *conn,
 
     vlc_http_msg_add_header(req, "ALPN", "h2, http%%2F1.1");
     vlc_http_msg_add_agent(req, PACKAGE_NAME "/" PACKAGE_VERSION);
+    if (username != NULL)
+        vlc_http_msg_add_creds_basic(req, true, username,
+                                     (password != NULL) ? password : "");
 
     struct vlc_http_stream *stream = vlc_http_stream_open(conn, req);
 
@@ -151,16 +156,20 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
     else
         sock = NULL;
 
-    vlc_UrlClean(&url);
-
     if (sock == NULL)
+    {
+        vlc_UrlClean(&url);
         return NULL;
+    }
 
     assert(!ptwo); /* HTTP/2 proxy not supported yet */
 
     struct vlc_tls *psock = malloc(sizeof (*psock));
     if (unlikely(psock == NULL))
+    {
+        vlc_UrlClean(&url);
         goto error;
+    }
 
     psock->obj = VLC_OBJECT(creds);
     psock->sys = sock;
@@ -176,10 +185,14 @@ vlc_tls_t *vlc_https_connect_proxy(vlc_tls_creds_t *creds,
     if (unlikely(conn == NULL))
     {
         vlc_tls_Close(psock);
+        vlc_UrlClean(&url);
         goto error;
     }
 
-    struct vlc_http_msg *resp = vlc_http_tunnel_open(conn, hostname, port);
+    struct vlc_http_msg *resp = vlc_http_tunnel_open(conn, hostname, port,
+                                                     url.psz_username,
+                                                     url.psz_password);
+    vlc_UrlClean(&url);
 
     /* TODO: reuse connection to HTTP/2 proxy */
     vlc_http_conn_release(conn); /* psock is destroyed there too */
