@@ -74,6 +74,9 @@ static void proxy_client_process(int fd)
     assert(!strcmp(host, "www.example.com"));
     assert(port == 443);
 
+    assert(strstr(buf, "\r\nProxy-Authorization: Basic "
+                  "QWxhZGRpbjpvcGVuIHNlc2FtZQ==\r\n") != NULL);
+
     const char resp[] = "HTTP/1.1 500 Failure\r\n\r\n";
 
     val = write(fd, resp, strlen(resp));
@@ -144,7 +147,7 @@ int main(void)
     if (lfd == -1)
         return 77;
 
-    if (asprintf(&url, "http://[::1]:%u", port) < 0)
+    if (asprintf(&url, "http://Aladdin:open%%20sesame@[::1]:%u", port) < 0)
         url = NULL;
 
     assert(url != NULL);
