@@ -134,7 +134,7 @@ time_t vlc_http_msg_get_mtime(const struct vlc_http_msg *);
 /**
  * Gets retry timeout.
  *
- * Exrtacts the time (in seconds) until the expiration of the "retry-after"
+ * Extracts the time (in seconds) until the expiration of the "retry-after"
  * time-out in the HTTP message. If the header value is an absolute date, it
  * is converted relative to the current time.
  *
