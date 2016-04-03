@@ -216,6 +216,14 @@ int main(void)
     assert(vlc_http_msg_add_time(m, "Last-Modified", &t) == 0);
     assert(t == vlc_http_msg_get_mtime(m));
 
+    assert(vlc_http_msg_add_creds_basic(m, false,
+                                        "Aladdin", "open sesame") == 0);
+    assert(vlc_http_msg_add_creds_basic(m, true, "test", "123£") == 0);
+    str = vlc_http_msg_get_header(m, "Authorization");
+    assert(str != NULL && !strcmp(str, "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="));
+    str = vlc_http_msg_get_header(m, "Proxy-Authorization");
+    assert(str != NULL && !strcmp(str, "Basic dGVzdDoxMjPCow=="));
+
     vlc_http_msg_add_header(m, "Content-Length", "1234");
     assert(vlc_http_msg_get_size(m) == 1234);
 
@@ -274,6 +282,10 @@ int main(void)
     assert(vlc_http_msg_add_agent(m, "Bad/1.0 (\\\x08)") != 0);
     assert(vlc_http_msg_add_agent(m, "Bad/1.0 \"Evil\"") != 0);
     assert(vlc_http_msg_add_agent(m, "(Hello world)") != 0);
+
+    assert(vlc_http_msg_add_creds_basic(m, false, "User:name", "12345") != 0);
+    assert(vlc_http_msg_add_creds_basic(m, false, "Alice\nand\nbob", "") != 0);
+    assert(vlc_http_msg_add_creds_basic(m, false, "john", "asdfg\x7f") != 0);
 
     vlc_http_msg_destroy(m);
 
