@@ -1195,6 +1195,9 @@ static void PIDFillFormat( demux_t *p_demux, ts_pes_t *p_pes,
     switch( i_stream_type )
     {
     case 0x01:  /* MPEG-1 video */
+        es_format_Init( fmt, VIDEO_ES, VLC_CODEC_MPGV );
+        fmt->i_original_fourcc = VLC_CODEC_MP1V;
+        break;
     case 0x02:  /* MPEG-2 video */
     case 0x80:  /* MPEG-2 MOTO video */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_MPGV );
