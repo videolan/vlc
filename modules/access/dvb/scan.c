@@ -222,6 +222,8 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
 
 void scan_Destroy( scan_t *p_scan )
 {
+    if( !p_scan )
+        return;
     if( p_scan->p_dialog_id != NULL )
         vlc_dialog_release( p_scan->p_obj, p_scan->p_dialog_id );
 
