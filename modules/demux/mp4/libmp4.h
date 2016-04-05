@@ -127,14 +127,23 @@ typedef int64_t stime_t;
 #define ATOM_soun VLC_FOURCC( 's', 'o', 'u', 'n' )
 #define ATOM_hint VLC_FOURCC( 'h', 'i', 'n', 't' )
 #define ATOM_hdv2 VLC_FOURCC( 'h', 'd', 'v', '2' )
+#define ATOM_rrtp VLC_FOURCC( 'r', 'r', 't', 'p' )
 
 #define ATOM_dpnd VLC_FOURCC( 'd', 'p', 'n', 'd' )
+#define ATOM_cdsc VLC_FOURCC( 'c', 'd', 's', 'c' )
 #define ATOM_ipir VLC_FOURCC( 'i', 'p', 'i', 'r' )
 #define ATOM_mpod VLC_FOURCC( 'm', 'p', 'o', 'd' )
 #define ATOM_hnti VLC_FOURCC( 'h', 'n', 't', 'i' )
 #define ATOM_rtp  VLC_FOURCC( 'r', 't', 'p', ' ' )
 #define ATOM_btrt VLC_FOURCC( 'b', 't', 'r', 't' )
+#define ATOM_sdp  VLC_FOURCC( 's', 'd', 'p', ' ' )
 
+#define ATOM_tims VLC_FOURCC( 't', 'i', 'm', 's' )
+#define ATOM_tsro VLC_FOURCC( 't', 's', 'r', 'o' )
+#define ATOM_tssy VLC_FOURCC( 't', 's', 's', 'y' )
+
+#define ATOM_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
+#define ATOM_3gp4 VLC_FOURCC( '3', 'g', 'p', '4' )
 #define ATOM_esds VLC_FOURCC( 'e', 's', 'd', 's' )
 
 #define ATOM_lpcm VLC_FOURCC( 'l', 'p', 'c', 'm' )
@@ -704,12 +713,76 @@ typedef struct MP4_Box_data_sample_hint_s
 
 } MP4_Box_data_sample_hint_t;
 
+typedef struct MP4_Box_data_rrtp_sample_s
+{
+    uint16_t i_hinttrackversion;
+    uint16_t i_highestcompatibleversion;
+    uint32_t i_maxpacketsize;
+
+    uint8_t *p_additionaldata;
+
+} MP4_Box_data_rrtp_sample_t;
+
+typedef struct MP4_Box_data_timescale_entry_s
+{
+    uint32_t i_timescale;
+
+} MP4_Box_data_timescale_entry_t;
+
+typedef struct MP4_Box_data_time_offset_s
+{
+    uint32_t i_offset;
+
+} MP4_Box_data_time_offset_t;
+
+typedef struct MP4_Box_data_timestampsynchrony_s
+{
+    uint8_t i_reserved_timestamp_sync;
+
+} MP4_Box_data_timestampsynchrony_t;
+
 typedef struct MP4_Box_data_moviehintinformation_rtp_s
 {
     uint32_t i_description_format;
     unsigned char *psz_text;
 
 } MP4_Box_data_moviehintinformation_rtp_t;
+
+typedef struct MP4_Box_data_sdp_s
+{
+    char *psz_text;
+
+} MP4_Box_data_sdp_t;
+
+typedef struct MP4_Box_data_tims_s
+{
+    uint32_t i_timescale;
+
+} MP4_Box_data_tims_t;
+
+typedef struct MP4_Box_data_tsro_s
+{
+    int32_t i_offset;
+
+} MP4_Box_data_tsro_t;
+
+typedef struct MP4_Box_data_tssy_s
+{
+    uint8_t i_reserved_timestamp_sync;
+
+} MP4_Box_data_tssy_t;
+
+typedef struct MP4_Box_data_stsd_s
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint32_t i_entry_count;
+
+    /* it contains SampleEntry handled as if it was Box */
+
+} MP4_Box_data_stsd_t;
+
 
 typedef struct MP4_Box_data_stsz_s
 {
@@ -1479,6 +1552,12 @@ typedef union MP4_Box_data_s
     MP4_Box_data_tfra_t *p_tfra;
     MP4_Box_data_mfro_t *p_mfro;
 
+    MP4_Box_data_sdp_t *p_sdp;
+
+    MP4_Box_data_tims_t *p_tims;
+    MP4_Box_data_tsro_t *p_tsro;
+    MP4_Box_data_tssy_t *p_tssy;
+
     MP4_Box_data_stsz_t *p_stsz;
     MP4_Box_data_stz2_t *p_stz2;
     MP4_Box_data_stsc_t *p_stsc;
@@ -1494,7 +1573,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_cmvd_t *p_cmvd;
     MP4_Box_data_cmov_t *p_cmov;
 
-    MP4_Box_data_moviehintinformation_rtp_t p_moviehintinformation_rtp;
+    MP4_Box_data_moviehintinformation_rtp_t *p_moviehintinformation_rtp;
 
     MP4_Box_data_frma_t *p_frma;
     MP4_Box_data_skcr_t *p_skcr;
@@ -1733,5 +1812,8 @@ int MP4_ReadBoxContainerChildren( stream_t *p_stream, MP4_Box_t *p_container,
                                   const uint32_t stoplist[] );
 int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box );
 void MP4_FreeBox_sample_vide( MP4_Box_t *p_box );
+
+int MP4_ReadBox_sample_hint8( stream_t *p_stream, MP4_Box_t *p_box );
+void MP4_FreeBox_sample_hint( MP4_Box_t *p_box );
 
 #endif
