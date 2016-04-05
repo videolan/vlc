@@ -288,12 +288,7 @@ main(int i_argc, char *ppsz_argv[])
 
     setenv("VLC_PLUGIN_PATH", "../modules", 1);
 
-    static const char *test_defaults_args[] = {
-        "-v",
-        "--no-qt-privacy-ask", /* avoid dialog that ask for privacy */
-    };
-
-    libvlc_instance_t *p_libvlc = libvlc_new(2, test_defaults_args);
+    libvlc_instance_t *p_libvlc = libvlc_new(0, NULL);
     assert(p_libvlc != NULL);
 
     printf("testing dialog callbacks\n");
@@ -310,15 +305,23 @@ main(int i_argc, char *ppsz_argv[])
     test_dialogs(VLC_OBJECT(p_libvlc->p_libvlc_int), &ans, 100000);
     vlc_dialog_provider_set_callbacks(p_libvlc->p_libvlc_int, NULL, NULL);
 
+    libvlc_release(p_libvlc);
+
     if (b_test_all)
     {
         printf("testing Qt dialog callbacks\n");
+        static const char *args[] = {
+            "--no-qt-privacy-ask", /* avoid dialog that ask for privacy */
+        };
+        libvlc_instance_t *p_libvlc = libvlc_new(1, args);
+        assert(p_libvlc != NULL);
+
         int i_ret = libvlc_InternalAddIntf(p_libvlc->p_libvlc_int, "qt");
         assert(i_ret == VLC_SUCCESS);
         test_dialogs(VLC_OBJECT(p_libvlc->p_libvlc_int), NULL, 3000000);
-    }
 
-    libvlc_release(p_libvlc);
+        libvlc_release(p_libvlc);
+    }
 
     return 0;
 }
