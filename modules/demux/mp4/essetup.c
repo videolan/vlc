@@ -31,6 +31,11 @@
 #include <vlc_aout.h>
 #include <assert.h>
 
+
+
+int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
+
+
 static void SetupGlobalExtensions( mp4_track_t *p_track, MP4_Box_t *p_sample )
 {
     if( !p_track->fmt.i_bitrate )
@@ -164,6 +169,144 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
     }
 }
 
+int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
+{
+    p_track->fmt.i_original_fourcc = p_sample->i_type;
+
+    if( !p_track->p_sdp )
+    {
+        msg_Err(p_demux, "Required 'sdp '-box not found");
+        return 0;
+    }
+    MP4_Box_t *p_sdp = p_track->p_sdp;
+    char *strtok_state;
+    char * pch = strtok_r(BOXDATA(p_sdp)->psz_text, " =\n", &strtok_state); /* media entry */
+    if( pch && pch[0] != 'm' )
+    {
+        msg_Err(p_demux, "No Media entry found in SDP:%s", pch);
+        return 0;
+    }
+
+    if( !( pch = strtok_r(NULL, " =\n", &strtok_state) ) ) /* media type */
+        return 0;
+    /* media type has already been checked */
+    msg_Dbg(p_demux, "sdp: media type:%s", pch);
+    if( !( pch = strtok_r(NULL, " =\n", &strtok_state) ) ) /* port */
+        return 0;
+    msg_Dbg(p_demux, "sdp: port:%s", pch);
+    if( !( pch = strtok_r(NULL, " =\n", &strtok_state) ) ) /* protocol */
+        return 0;
+    msg_Dbg(p_demux, "sdp: protocol:%s", pch);
+
+    if( !( pch = strtok_r(NULL, " =\n", &strtok_state) ) ) /* fmt */
+        return 0;
+
+    bool codec_set = false;
+    /* process rtp types until we get an attribute field or end of sdp */
+    while( pch && pch[0] != 'a' )
+    {
+        int rtp_payload = atoi(pch);
+        msg_Dbg(p_demux, "sdp: payload type:%d", rtp_payload);
+
+        if( !codec_set )
+        {
+            /* Payload types 34 and under have a set type and can be identified here */
+            switch( rtp_payload )
+            {
+             case 3:
+                p_track->fmt.i_codec = VLC_CODEC_GSM;
+                codec_set = true;
+                break;
+             default:
+                break;
+            }
+        }
+        pch = strtok_r(NULL, " =\n", &strtok_state); /* attribute or additional payload type */
+        if( !pch && !codec_set )
+            return 0;
+    }
+
+    while( pch && pch[0] == 'a' )
+    {
+        if( !( pch = strtok_r(NULL, " :=\n", &strtok_state) ) ) /* attribute type */
+            return 0;
+        msg_Dbg(p_demux, "sdp: atrribute type:%s", pch);
+
+        if( !strcmp(pch, "rtpmap") )
+        {
+            if( !( pch = strtok_r(NULL, " :=\n", &strtok_state) ) ) /* payload type */
+                return 0;
+            msg_Dbg(p_demux, "sdp: payload type:%s", pch);
+            if( !(pch = strtok_r(NULL, " /:=\n", &strtok_state) ) ) /* encoding name */
+                return 0;
+            msg_Dbg(p_demux, "sdp: encoding name:%s", pch);
+
+            /* Simply adding codec recognition should work for most codecs */
+            /* Codecs using slices need their picture constructed from sample */
+            if( !strcmp(pch, "H264") )
+            {
+                p_track->fmt.i_codec = VLC_CODEC_H264;
+            }
+            else if( !strcmp(pch, "GSM") )
+            {
+                p_track->fmt.i_codec = VLC_CODEC_GSM;
+            }
+            else if( !strcmp(pch, "Speex") )
+            {
+                p_track->fmt.i_codec = VLC_CODEC_SPEEX;
+            }
+            else if( !codec_set )
+            {
+                msg_Err(p_demux, "Support for codec contained in RTP \
+                        Reception Hint Track RTP stream has not been added");
+                return 0;
+            }
+
+            if( !( pch = strtok_r(NULL, " :=\n", &strtok_state) ) ) /* clock rate */
+                return 0;
+            int clock_rate = atoi(pch);
+            msg_Dbg(p_demux, "sdp clock rate:%d", clock_rate);
+            if( p_track->fmt.i_cat == AUDIO_ES )
+                p_track->fmt.audio.i_rate = clock_rate;
+        }
+        pch = strtok_r(NULL, " =\n", &strtok_state); /* next attribute */
+    }
+
+    MP4_Box_t *p_tims_box = MP4_BoxGet(p_sample, "tims", 0);
+    if( p_tims_box != NULL )
+    {
+        MP4_Box_data_tims_t *p_tims = p_tims_box->data.p_tims;
+        p_track->i_timescale = p_tims->i_timescale;
+    }
+    else
+        msg_Warn(p_demux, "Missing mandatory box tims");
+
+    MP4_Box_t *p_tssy_box = MP4_BoxGet(p_sample, "tssy", 0);
+    if( p_tssy_box != NULL )
+    {
+        MP4_Box_data_tssy_t *p_tssy = p_tssy_box->data.p_tssy;
+        /* take the 2 last bits which indicate the synchronization mode */
+        uint8_t temp = p_tssy->i_reserved_timestamp_sync & 0x03;
+        p_track->sync_mode = (RTP_timstamp_synchronization_t)temp;
+    }
+
+    MP4_Box_t *p_tsro_box = MP4_BoxGet(p_sample, "tsro", 0);
+    if( p_tsro_box != NULL )
+    {
+        MP4_Box_data_tsro_t *p_tsro = p_tsro_box->data.p_tsro;
+        msg_Dbg(p_demux, "setting tsro: %d",
+            p_tsro->i_offset);
+        p_track->i_tsro_offset = p_tsro->i_offset;
+    }
+    else
+    {
+        msg_Dbg(p_demux, "No tsro box present. Assuming 0 as track offset");
+        p_track->i_tsro_offset = 0;
+    }
+    return 1;
+}
+
+
 int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 {
     MP4_Box_data_sample_vide_t *p_vide = p_sample->data.p_sample_vide;
@@ -239,7 +382,12 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                     break;
             }
             break;
-
+        case( VLC_FOURCC( 'r', 'r', 't', 'p' ) ): /* RTP Reception Hint Track */
+        {
+            if( !SetupRTPReceptionHintTrack( p_demux, p_track, p_sample ) )
+                p_track->fmt.i_codec = p_sample->i_type;
+            break;
+        }
         default:
             p_track->fmt.i_codec = p_sample->i_type;
             break;
@@ -564,6 +712,12 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )
     {
+        case( VLC_FOURCC( 'r', 'r', 't', 'p' ) ): /* RTP Reception Hint Track */
+        {
+            if( !SetupRTPReceptionHintTrack( p_demux, p_track, p_sample ) )
+                return 0;
+            break;
+        }
         case ATOM_agsm: /* Apple gsm 33 bytes != MS GSM (agsm fourcc, 65 bytes) */
             p_track->fmt.i_codec = VLC_CODEC_GSM;
             break;

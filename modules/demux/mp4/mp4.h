@@ -61,6 +61,11 @@ typedef struct
 
 } mp4_chunk_t;
 
+typedef enum RTP_timstamp_synchronization_s
+{
+    UNKNOWN_SYNC = 0, UNSYNCHRONIZED = 1, SYNCHRONIZED = 2, RESERVED = 3
+} RTP_timstamp_synchronization_t;
+
  /* Contain all needed information for read all track with vlc */
 typedef struct
 {
@@ -126,6 +131,14 @@ typedef struct
 
     mtime_t i_time; // track scaled
 
+    /* rrtp reception hint track */
+    MP4_Box_t *p_sdp;                         /* parsed for codec and other info */
+    RTP_timstamp_synchronization_t sync_mode; /* whether track is already in sync */
+
+    /* First recorded RTP timestamp offset.
+     * Needed for rrtp synchronization */
+    int32_t         i_tsro_offset;
+
     struct
     {
         /* for moof parsing */
@@ -147,4 +160,18 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
 int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
 int SetupCCES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
 void SetupMeta( vlc_meta_t *p_meta, MP4_Box_t *p_udta );
+
+/* format of RTP reception hint track sample constructor */
+typedef struct
+{
+    uint8_t  type;
+    int8_t   trackrefindex;
+    uint16_t length;
+    uint32_t samplenumber;
+    uint32_t sampleoffset; /* indicates where the payload is located within sample */
+    uint16_t bytesperblock;
+    uint16_t samplesperblock;
+
+} mp4_rtpsampleconstructor_t;
+
 #endif
