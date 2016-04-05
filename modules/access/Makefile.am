@@ -341,6 +341,7 @@ libdvb_plugin_la_SOURCES = \
 	access/dvb/access.c \
 	access/dvb/linux_dvb.c \
 	access/dvb/scan.c access/dvb/scan.h \
+	access/dvb/scan_list.c access/dvb/scan_list.h \
 	access/dvb/dvb.h
 libdvb_plugin_la_CFLAGS = $(AM_CFLAGS)
 if HAVE_LINUX_DVB

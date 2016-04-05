@@ -51,6 +51,7 @@
 
 #include "dvb.h"
 #include "scan.h"
+#include "scan_list.h"
 #include "../../demux/dvb-text.h"
 #include "../../mux/mpeg/dvbpsi_compat.h"
 
@@ -103,6 +104,10 @@ struct scan_t
     /* dvbv3 list file */
     scan_dvbs_transponder_t *p_transponders;
     unsigned                 i_transponders;
+
+    scan_list_entry_t *p_scanlist;
+    size_t             i_scanlist;
+    const scan_list_entry_t *p_current;
 };
 
 struct scan_session_t
@@ -239,6 +244,9 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
     scan_parameter_Init( &p_scan->parameter );
     scan_parameter_Copy( p_parameter, &p_scan->parameter );
     p_scan->i_time_start = mdate();
+    p_scan->p_scanlist = NULL;
+    p_scan->p_current = p_scan->p_scanlist;
+    p_scan->i_scanlist = 0;
 
     scan_Debug_Parameters( p_obj, p_parameter );
 
@@ -257,6 +265,9 @@ void scan_Destroy( scan_t *p_scan )
     for( int i = 0; i < p_scan->i_service; i++ )
         scan_service_Delete( p_scan->pp_service[i] );
     TAB_CLEAN( p_scan->i_service, p_scan->pp_service );
+
+    scan_list_entries_release( p_scan->p_scanlist );
+
     free( p_scan );
 }
 
