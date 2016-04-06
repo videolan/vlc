@@ -854,11 +854,14 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                     if( (ScanFindService( p_scan, 0, i_service_id ) == NULL) &&
                          scan_service_type( i_service_type ) != SERVICE_UNKNOWN )
                     {
-                       scan_service_t *s = scan_service_New( i_service_id, p_cfg );
-                       s->type          = scan_service_type( i_service_type );
-                       s->i_network_id  = p_nit->i_network_id;
-                       s->i_nit_version = p_nit->i_version;
-                       TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+                        scan_service_t *s = scan_service_New( i_service_id, p_cfg );
+                        if( likely(s) )
+                        {
+                            s->type          = scan_service_type( i_service_type );
+                            s->i_network_id  = p_nit->i_network_id;
+                            s->i_nit_version = p_nit->i_version;
+                            TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+                        }
                     }
                 }
             }
@@ -970,7 +973,8 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
             if( s == NULL )
             {
                 s = scan_service_New( p_program->i_number, &p_session->cfg );
-                TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+                if( likely(s) )
+                    TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
             }
         }
     }
