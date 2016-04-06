@@ -47,10 +47,7 @@
 #include <dvbpsi/psi.h>
 #include <dvbpsi/demux.h>
 #include <dvbpsi/sdt.h>
-#ifdef _DVBPSI_DR_43_H_
-#   define DVBPSI_USE_NIT 1
-#   include <dvbpsi/nit.h>
-#endif
+#include <dvbpsi/nit.h>
 
 #include "dvb.h"
 #include "scan.h"
@@ -122,13 +119,8 @@ struct scan_session_t
     dvbpsi_t *sdt;
     dvbpsi_sdt_t *p_sdt;
 
-#ifdef DVBPSI_USE_NIT
     dvbpsi_t *nit;
     dvbpsi_nit_t *p_nit;
-#else
-#   warning NIT is not supported by your libdvbpsi version
-#endif
-
 };
 
 /* */
@@ -798,7 +790,6 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
     }
 }
 
-#ifdef DVBPSI_USE_NIT
 static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 {
     vlc_object_t *p_obj = p_session->p_obj;
@@ -942,7 +933,6 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
         }
     }
 }
-#endif
 
 static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id, uint16_t i_extension, void *p_data )
 {
@@ -974,10 +964,8 @@ scan_session_t *scan_session_New( vlc_object_t *p_obj,
     p_session->i_nit_pid = -1;
     p_session->sdt = NULL;
     p_session->p_sdt = NULL;
-#ifdef DVBPSI_USE_NIT
     p_session->nit = NULL;
     p_session->p_nit = NULL;
-#endif
     return p_session;;
 }
 
@@ -987,10 +975,7 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 
     dvbpsi_pat_t *p_pat = p_session->p_pat;
     dvbpsi_sdt_t *p_sdt = p_session->p_sdt;
-
-#ifdef DVBPSI_USE_NIT
     dvbpsi_nit_t *p_nit = p_session->p_nit;
-#endif
 
     if( p_pat )
     {
@@ -1041,7 +1026,6 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
         }
     }
 
-#ifdef DVBPSI_USE_NIT
     /* Parse NIT */
     if( p_pat && p_nit )
     {
@@ -1075,7 +1059,6 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
             }
         }
     }
-#endif
 
     /* */
     for( int i = i_service_start; i < p_scan->i_service; i++ )
@@ -1085,13 +1068,11 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
         p_srv->i_snr = p_session->i_snr;
         if( p_sdt )
             p_srv->i_sdt_version = p_sdt->i_version;
-#ifdef DVBPSI_USE_NIT
         if( p_nit )
         {
             p_srv->i_network_id = p_nit->i_network_id;
             p_srv->i_nit_version = p_nit->i_version;
         }
-#endif
     }
 
     /* */
@@ -1105,12 +1086,11 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
     if( p_session->p_sdt )
         dvbpsi_sdt_delete( p_session->p_sdt );
 
-#ifdef DVBPSI_USE_NIT
     if( p_session->nit )
         dvbpsi_DetachDemux( p_session->nit );
     if( p_session->p_nit )
         dvbpsi_nit_delete( p_session->p_nit );
-#endif
+
     free( p_session );
 }
 
@@ -1271,7 +1251,6 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
     }
     else /*if( i_pid == p_scan->i_nit_pid )*/
     {
-#ifdef DVBPSI_USE_NIT
         if( !p_scan->nit )
         {
             p_scan->nit = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
@@ -1291,17 +1270,11 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
         }
         if( p_scan->nit )
             dvbpsi_packet_push( p_scan->nit, p_block->p_buffer );
-#endif
     }
 
     block_Release( p_block );
 
-    return p_scan->p_pat && p_scan->p_sdt && 
-#ifdef DVBPSI_USE_NIT
-        p_scan->p_nit;
-#else
-        true;
-#endif
+    return p_scan->p_pat && p_scan->p_sdt && p_scan->p_nit;
 }
 
 void scan_service_SetSNR( scan_session_t *p_session, int i_snr )
