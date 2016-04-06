@@ -503,7 +503,6 @@ static int ScanDvbTNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
 static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
     bool b_servicefound = false;
-#ifdef _DVBPSI_DR_44_H_
     /* We iterate frequencies/modulations/symbolrates until we get first hit and find NIT,
        from that we fill pp_service with configurations and after that we iterate over
        pp_services for all that doesn't have name yet (tune to that cfg and get SDT and name
@@ -530,17 +529,6 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
     /* We should have iterated all channels by now */
     if( p_scan->i_service )
         return VLC_EGENERIC;
-#else
-    /* fallback to old, so when we get one channe, use that
-       symbolrate/modulation until bitter end
-     */
-    for( int i=0; i < p_scan->i_service; i++ )
-    {
-        b_servicefound = p_scan->pp_service[i]->type != SERVICE_UNKNOWN;
-        if( b_servicefound )
-            break;
-    }
-#endif
 
     if( !b_servicefound )
     {
@@ -568,10 +556,6 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
                 as all channel-seed files have atleast one channel that
                 has one of these symbolrate
               */
-#ifndef _DVBPSI_DR_44_H_
-             ,7000, 3450, 6111,
-             6428, 6952, 5900, 5000
-#endif
              };
 
             enum { num_symbols = (sizeof(symbolrates)/sizeof(*symbolrates)) };
@@ -867,7 +851,6 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                     uint16_t i_service_id = GetWBE( &p_dsc->p_data[3*i+0] );
                     uint8_t  i_service_type = p_dsc->p_data[3*i+2];
                     msg_Dbg( p_obj, "           * service_id=%d type=%d", i_service_id, i_service_type );
-#ifdef _DVBPSI_DR_44_H_
                     if( (ScanFindService( p_scan, 0, i_service_id ) == NULL) &&
                          scan_service_type( i_service_type ) != SERVICE_UNKNOWN )
                     {
@@ -877,7 +860,6 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                        s->i_nit_version = p_nit->i_version;
                        TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
                     }
-#endif
                 }
             }
             else if( p_dsc->i_tag == 0x5a )
@@ -893,7 +875,6 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                 msg_Dbg( p_obj, "           * transmission_mode %d", p_t->i_transmission_mode );
                 msg_Dbg( p_obj, "           * other_frequency_flag %d", p_t->i_other_frequency_flag );
             }
-#ifdef _DVBPSI_DR_44_H_
             else if( p_dsc->i_tag == 0x44 )
             {
                 dvbpsi_cable_deliv_sys_dr_t *p_t = dvbpsi_DecodeCableDelivSysDr( p_dsc );
@@ -906,7 +887,6 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                 p_cfg->i_modulation = (8 << p_t->i_modulation);
                 msg_Dbg( p_obj, "           * modulation %u", p_cfg->i_modulation );
             }
-#endif
             else if( p_dsc->i_tag == 0x5f )
             {
                 msg_Dbg( p_obj, "       * private data specifier descriptor" );
