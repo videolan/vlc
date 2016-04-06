@@ -477,6 +477,7 @@ static void *Thread( void *p_data )
         }
         else
         {
+            vlc_interrupt_set( NULL );
             p_fetcher->b_live = false;
             vlc_cond_signal( &p_fetcher->wait );
         }
