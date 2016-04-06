@@ -248,56 +248,22 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
     /* if there are no transponders in mem, laod from config file */
     if( !*pi_count )
     {
-        DIR *p_dir;
-
-        char *psz_dir = NULL;
+        char *psz_path = NULL;
         char *data_dir = config_GetDataDir();
 
-        if( asprintf( &psz_dir, "%s" DIR_SEP "dvb" DIR_SEP "dvb-s", data_dir ) == -1 )
-            psz_dir = NULL;
+        if( !data_dir ||
+             asprintf( &psz_path, "%s" DIR_SEP "dvb" DIR_SEP "dvb-s" DIR_SEP "%s", data_dir,
+                       p_scan->parameter.sat_info.psz_name ) == -1 )
+        {
+            free( data_dir );
+            free( p_scan->parameter.sat_info.psz_name );
+            return VLC_EGENERIC;
+        }
         free( data_dir );
 
-        if( !psz_dir )
-        {
-            free( p_scan->parameter.sat_info.psz_name );
-            return VLC_EGENERIC;
-        }
+        msg_Dbg( p_scan->p_obj, "using satellite config file (%s)", psz_path );
 
-        /* open config directory */
-        if( !( p_dir = vlc_opendir( psz_dir ) ) )
-        {
-            msg_Err( p_scan->p_obj, "could not open satellite info directory (%s)", psz_dir );
-            free( p_scan->parameter.sat_info.psz_name );
-            return VLC_EGENERIC;
-        }
-
-        /* find the requested file in the directory */
-        for( ; ; ) {
-            const char *psz_filename = vlc_readdir( p_dir );
-
-            if( psz_filename == NULL )
-                break;
-
-            if( !strncmp( p_scan->parameter.sat_info.psz_name, psz_filename, 20 ) )
-            {
-                if( asprintf( &p_scan->parameter.sat_info.psz_path, "%s" DIR_SEP "%s", psz_dir, psz_filename ) == -1 )
-                    p_scan->parameter.sat_info.psz_path = NULL;
-                break;
-            }
-        }
-
-        closedir( p_dir );
-
-        if( !p_scan->parameter.sat_info.psz_path )
-        {
-            msg_Err( p_scan->p_obj, "could not find satellite config (%s)", p_scan->parameter.sat_info.psz_name );
-            free( p_scan->parameter.sat_info.psz_name );
-            return VLC_EGENERIC;
-        }
-
-        msg_Dbg( p_scan->p_obj, "using satellite config file (%s)", p_scan->parameter.sat_info.psz_path );
-
-        FILE *f = vlc_fopen( p_scan->parameter.sat_info.psz_path, "r" );
+        FILE *f = vlc_fopen( psz_path, "r" );
 
         /* parse file */
         if( f )
@@ -340,13 +306,13 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
         }
         else
         {
-            msg_Err( p_scan->p_obj, "failed to open satellite file (%s)", p_scan->parameter.sat_info.psz_path );
+            msg_Err( p_scan->p_obj, "failed to open satellite file (%s)", psz_path );
             free( p_scan->parameter.sat_info.psz_name );
-            free( p_scan->parameter.sat_info.psz_path );
+            free( psz_path );
             return VLC_EGENERIC;
         }
         free( p_scan->parameter.sat_info.psz_name );
-        free( p_scan->parameter.sat_info.psz_path );
+        free( psz_path );
     }
 
     if( p_scan->i_index < *pi_count )

@@ -70,7 +70,6 @@ typedef struct scan_parameter_t
     struct
     {
         char *psz_name;         /* satellite name */
-        char *psz_path;         /* config file path */
 
         scan_dvbs_transponder_t *p_transponders;
         unsigned i_count;
