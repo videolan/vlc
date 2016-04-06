@@ -274,66 +274,62 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
         msg_Dbg( p_scan->p_obj, "using satellite config file (%s)", psz_path );
 
         FILE *f = vlc_fopen( psz_path, "r" );
-
-        /* parse file */
-        if( f )
-        {
-            scan_dvbs_transponder_t *p_transponders = malloc( sizeof( scan_dvbs_transponder_t ) );
-            if( !p_transponders )
-            {
-                fclose( f );
-                free( psz_path );
-                return VLC_ENOMEM;
-            }
-
-            char type;
-            char psz_fec[3];
-
-            int res;
-            do
-            {
-                if ( ( res = fscanf( f, "%c %d %c %d %2s\n",
-                            &type,
-                            &p_transponders[p_scan->i_transponders].i_frequency,
-                            &p_transponders[p_scan->i_transponders].c_polarization,
-                            &p_transponders[p_scan->i_transponders].i_symbol_rate,
-                            psz_fec ) ) != 5 )
-                {
-                    msg_Dbg( p_scan->p_obj, "error parsing transponder from file" );
-                    continue;
-                }
-
-                /* decode fec */
-                char psz_fec_list[] = "1/22/33/44/55/66/77/88/9";
-                char *p_fec = strstr( psz_fec_list, psz_fec );
-                if ( !p_fec )
-                    p_transponders[p_scan->i_transponders].i_fec = 9;    /* FEC_AUTO */
-                else
-                    p_transponders[p_scan->i_transponders].i_fec = 1 + ( ( p_fec-psz_fec_list ) / 3 );
-
-                p_scan->i_transponders++;
-
-                scan_dvbs_transponder_t *p_realloc = realloc( p_transponders, ( p_scan->i_transponders + 1 ) * sizeof(*p_realloc) );
-                if( p_realloc )
-                    p_transponders = p_realloc;
-                else
-                    res = EOF;
-            } while (res != EOF);
-
-            msg_Dbg( p_scan->p_obj, "parsed %d transponders from config", p_scan->i_transponders);
-
-            fclose( f );
-            p_scan->p_transponders = p_transponders;
-        }
-        else
+        if( !f )
         {
             msg_Err( p_scan->p_obj, "failed to open satellite file (%s)", psz_path );
             free( p_scan->parameter.sat_info.psz_name );
             free( psz_path );
             return VLC_EGENERIC;
         }
-        free( p_scan->parameter.sat_info.psz_name );
         free( psz_path );
+
+        /* parse file */
+        scan_dvbs_transponder_t *p_transponders = malloc( sizeof( scan_dvbs_transponder_t ) );
+        if( !p_transponders )
+        {
+            fclose( f );
+            return VLC_ENOMEM;
+        }
+
+        char type;
+        char psz_fec[3];
+
+        int res;
+        do
+        {
+            if ( ( res = fscanf( f, "%c %d %c %d %2s\n",
+                                 &type,
+                                 &p_transponders[p_scan->i_transponders].i_frequency,
+                                 &p_transponders[p_scan->i_transponders].c_polarization,
+                                 &p_transponders[p_scan->i_transponders].i_symbol_rate,
+                                 psz_fec ) ) != 5 )
+            {
+                msg_Dbg( p_scan->p_obj, "error parsing transponder from file" );
+                continue;
+            }
+
+            /* decode fec */
+            char psz_fec_list[] = "1/22/33/44/55/66/77/88/9";
+            char *p_fec = strstr( psz_fec_list, psz_fec );
+            if ( !p_fec )
+                p_transponders[p_scan->i_transponders].i_fec = 9;    /* FEC_AUTO */
+            else
+                p_transponders[p_scan->i_transponders].i_fec = 1 + ( ( p_fec-psz_fec_list ) / 3 );
+
+            p_scan->i_transponders++;
+
+            scan_dvbs_transponder_t *p_realloc = realloc( p_transponders, ( p_scan->i_transponders + 1 ) * sizeof(*p_realloc) );
+            if( p_realloc )
+                p_transponders = p_realloc;
+            else
+                res = EOF;
+        } while (res != EOF);
+
+        msg_Dbg( p_scan->p_obj, "parsed %d transponders from config", p_scan->i_transponders);
+
+        p_scan->p_transponders = p_transponders;
+        fclose( f );
+        free( p_scan->parameter.sat_info.psz_name );
     }
 
     if( p_scan->i_index < p_scan->i_transponders )
