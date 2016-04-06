@@ -29,14 +29,6 @@ typedef enum
     SCAN_DVB_C,
 } scan_type_t;
 
-typedef struct
-{
-    int i_frequency;
-    int i_symbol_rate;
-    int i_fec;
-    char c_polarization;
-} scan_dvbs_transponder_t;
-
 typedef struct scan_parameter_t
 {
     scan_type_t type;
@@ -71,8 +63,6 @@ typedef struct scan_parameter_t
     {
         char *psz_name;         /* satellite name */
 
-        scan_dvbs_transponder_t *p_transponders;
-        unsigned i_count;
     } sat_info;
 } scan_parameter_t;
 
