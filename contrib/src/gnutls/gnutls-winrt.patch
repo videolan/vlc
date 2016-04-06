@@ -1,0 +1,16 @@
+--- gnutls/lib/system.c.orig2	2016-04-05 11:14:43.364389441 +0200
++++ gnutls/lib/system.c	2016-04-05 11:20:18.535618044 +0200
+@@ -429,9 +429,11 @@
+ 		gnutls_datum_t data;
+ 
+ 		if (i == 0)
+-			store = CertOpenSystemStore(0, "ROOT");
++			store = CertOpenStore(CERT_STORE_PROV_SYSTEM_A, X509_ASN_ENCODING, 0, 
++                        CERT_SYSTEM_STORE_CURRENT_USER, TEXT("ROOT"));
+ 		else
+-			store = CertOpenSystemStore(0, "CA");
++			store = CertOpenStore(CERT_STORE_PROV_SYSTEM_A, X509_ASN_ENCODING, 0, 
++                        CERT_SYSTEM_STORE_CURRENT_USER, TEXT("CA"));
+ 
+ 		if (store == NULL)
+ 			return GNUTLS_E_FILE_ERROR;
