@@ -79,6 +79,16 @@ static bool scan_list_entry_add( scan_list_entry_t ***ppp_last, scan_list_entry_
     return false;
 }
 
+static void scan_list_parse_fec( scan_list_entry_t *p_entry, const char *psz )
+{
+    const char *psz_fec_list = "1/22/33/44/55/66/77/88/9";
+    const char *psz_fec = strstr( psz_fec_list, psz );
+    if ( !psz_fec )
+        p_entry->i_fec = 9;    /* FEC_AUTO */
+    else
+        p_entry->i_fec = 1 + ( ( psz_fec - psz_fec_list ) / 3 );
+}
+
 void scan_list_entries_release( scan_list_entry_t *p_list )
 {
     while( p_list )
@@ -87,4 +97,97 @@ void scan_list_entries_release( scan_list_entry_t *p_list )
         scan_list_entry_Delete( p_list );
         p_list = p_next;
     }
+}
+
+scan_list_entry_t * scan_list_dvbv3_load( vlc_object_t *p_obj, const char *psz_source, size_t *pi_count )
+{
+    FILE *p_file = vlc_fopen( psz_source, "r" );
+    if( !p_file )
+    {
+        msg_Err( p_obj, "failed to open satellite file (%s)", psz_source );
+        return NULL;
+    }
+
+    scan_list_entry_t *p_list = NULL;
+    scan_list_entry_t **pp_list_last = &p_list;
+    scan_list_entry_t *p_entry = NULL;
+    *pi_count = 0;
+
+    const char *psz_delims = " \t";
+
+    char *psz_line = NULL;
+    size_t i_len = 0;
+    ssize_t i_read;
+
+    while ( (i_read = getline( &psz_line, &i_len, p_file )) != -1 )
+    {
+        char *psz_token;
+        char *p_save = NULL;
+
+        if( p_entry && scan_list_entry_add( &pp_list_last, p_entry ) )
+            (*pi_count)++;
+
+        p_entry = scan_list_entry_New();
+        if( unlikely(p_entry == NULL) )
+            continue;
+
+        /* DELIVERY */
+        if( !(psz_token = strtok_r( psz_line, psz_delims, &p_save )) )
+            continue;
+
+        if( !strcmp( psz_token, "S" ) )
+        {
+            p_entry->delivery = DELIVERY_DVBS;
+        }
+        else if( !strcmp( psz_token, "S2" ) )
+        {
+            p_entry->delivery = DELIVERY_DVBS2;
+        }
+
+        /* Parse the delivery format */
+        if( p_entry->delivery == DELIVERY_DVBS || p_entry->delivery == DELIVERY_DVBS2 )
+        {
+            /* FREQUENCY */
+            if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
+                continue;
+            p_entry->i_freq = atoi( psz_token );
+
+            /* POLARIZATION */
+            if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
+                continue;
+            p_entry->polarization = !strcasecmp(psz_token, "H") ? POLARIZATION_HORIZONTAL
+                                                                : POLARIZATION_VERTICAL;
+
+            /* RATE */
+            if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
+                continue;
+            p_entry->i_rate = atoi( psz_token );
+
+            /* FEC */
+            if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
+                continue;
+            scan_list_parse_fec( p_entry, psz_token );
+
+            /* INVERSION */
+            if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
+                continue;
+
+            /* MODULATION */
+            if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
+                continue;
+
+            /* STREAM_ID */
+            if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
+                continue;
+            p_entry->i_stream_id = atoi( psz_token );
+        }
+
+    }
+
+    if( p_entry && scan_list_entry_add( &pp_list_last, p_entry ) )
+        (*pi_count)++;
+
+    fclose( p_file );
+
+    return p_list;
 }

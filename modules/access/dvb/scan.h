@@ -59,11 +59,12 @@ typedef struct scan_parameter_t
         unsigned i_count;
     } bandwidth;
 
-    struct
+    char *psz_scanlist_file;
+    enum
     {
-        char *psz_name;         /* satellite name */
+        FORMAT_DVBv3,
+    } scanlist_format;
 
-    } sat_info;
 } scan_parameter_t;
 
 typedef struct

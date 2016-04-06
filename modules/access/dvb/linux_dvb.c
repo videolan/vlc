@@ -388,7 +388,19 @@ static int ScanParametersDvbS( access_t *p_access, scan_parameter_t *p_scan )
     p_scan->frequency.i_min = p_frontend->info.frequency_min;
     p_scan->frequency.i_max = p_frontend->info.frequency_max;
     /* set satellite config file path */
-    p_scan->sat_info.psz_name = var_InheritString( p_access, "dvb-satellite" );
+    char *psz_name = var_InheritString( p_access, "dvb-satellite" );
+    if( psz_name )
+    {
+        char *data_dir = config_GetDataDir();
+        if( !data_dir || -1 ==  asprintf( &p_scan->psz_scanlist_file,
+            "%s" DIR_SEP "dvb" DIR_SEP "dvb-s" DIR_SEP "%s", data_dir, psz_name ) )
+        {
+            p_scan->psz_scanlist_file = NULL;
+        }
+        p_scan->scanlist_format = FORMAT_DVBv3;
+        free( data_dir );
+        free( psz_name );
+    }
 
     return VLC_SUCCESS;
 }

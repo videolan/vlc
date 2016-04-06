@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include <vlc_dialog.h>
-#include <vlc_fs.h>
 #include <vlc_charset.h>
 #include <vlc_access.h>
 
@@ -82,14 +81,6 @@ typedef struct
 
 } scan_service_t;
 
-typedef struct
-{
-    int i_frequency;
-    int i_symbol_rate;
-    int i_fec;
-    char c_polarization;
-} scan_dvbs_transponder_t;
-
 struct scan_t
 {
     vlc_object_t *p_obj;
@@ -100,10 +91,6 @@ struct scan_t
 
     int            i_service;
     scan_service_t **pp_service;
-
-    /* dvbv3 list file */
-    scan_dvbs_transponder_t *p_transponders;
-    unsigned                 i_transponders;
 
     scan_list_entry_t *p_scanlist;
     size_t             i_scanlist;
@@ -188,16 +175,27 @@ void scan_parameter_Init( scan_parameter_t *p_dst )
 
 void scan_parameter_Clean( scan_parameter_t *p_dst )
 {
-    if( p_dst->sat_info.psz_name )
-        free( p_dst->sat_info.psz_name );
+    free( p_dst->psz_scanlist_file );
 }
 
 static void scan_parameter_Copy( const scan_parameter_t *p_src, scan_parameter_t *p_dst )
 {
     scan_parameter_Clean( p_dst );
     *p_dst = *p_src;
-    if( p_src->sat_info.psz_name )
-        p_dst->sat_info.psz_name = strdup( p_src->sat_info.psz_name );
+    if( p_src->psz_scanlist_file )
+        p_dst->psz_scanlist_file = strdup( p_src->psz_scanlist_file );
+}
+
+static void scan_Prepare( vlc_object_t *p_obj, const scan_parameter_t *p_parameter, scan_t *p_scan )
+{
+    if( p_parameter->type == SCAN_DVB_S &&
+        p_parameter->psz_scanlist_file && p_parameter->scanlist_format == FORMAT_DVBv3 )
+    {
+        p_scan->p_scanlist =
+                scan_list_dvbv3_load( p_obj, p_parameter->psz_scanlist_file, &p_scan->i_scanlist );
+        if( p_scan->p_scanlist )
+            msg_Dbg( p_scan->p_obj, "using satellite config file (%s)", p_parameter->psz_scanlist_file );
+    }
 }
 
 static void scan_Debug_Parameters( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
@@ -220,8 +218,8 @@ static void scan_Debug_Parameters( vlc_object_t *p_obj, const scan_parameter_t *
     if( p_parameter->type == SCAN_DVB_C )
         msg_Dbg( p_obj, " - scannin modulations %s", p_parameter->b_modulation_set ? "off" : "on" );
 
-    if( p_parameter->type == SCAN_DVB_S )
-        msg_Dbg( p_obj, " - satellite [%s]", p_parameter->sat_info.psz_name );
+    if( p_parameter->type == SCAN_DVB_S && p_parameter->psz_scanlist_file )
+        msg_Dbg( p_obj, " - satellite [%s]", p_parameter->psz_scanlist_file );
 
     msg_Dbg( p_obj, " - use NIT %s", p_parameter->b_use_nit ? "on" : "off" );
     msg_Dbg( p_obj, " - FTA only %s", p_parameter->b_free_only ? "on" : "off" );
@@ -245,8 +243,10 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
     scan_parameter_Copy( p_parameter, &p_scan->parameter );
     p_scan->i_time_start = mdate();
     p_scan->p_scanlist = NULL;
-    p_scan->p_current = p_scan->p_scanlist;
     p_scan->i_scanlist = 0;
+
+    scan_Prepare( p_obj, p_parameter, p_scan );
+    p_scan->p_current = p_scan->p_scanlist;
 
     scan_Debug_Parameters( p_obj, p_parameter );
 
@@ -273,118 +273,30 @@ void scan_Destroy( scan_t *p_scan )
 
 static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
-    msg_Dbg( p_scan->p_obj, "Scan index %"PRId64, p_scan->i_index );
-
-    if( !p_scan->parameter.sat_info.psz_name )
-    {
-        msg_Err( p_scan->p_obj, "no satellite selected" );
+    const scan_list_entry_t *p_entry = p_scan->p_current;
+    if( !p_entry )
         return VLC_EGENERIC;
-    }
 
-    /* if there are no transponders in mem, laod from config file */
-    if( p_scan->i_transponders == 0 )
-    {
-        char *psz_path = NULL;
-        char *data_dir = config_GetDataDir();
+    /* setup params for scan */
+    p_cfg->i_symbol_rate = p_entry->i_rate / 1000;
+    p_cfg->i_frequency = p_entry->i_freq;
+    p_cfg->i_fec = p_entry->i_fec;
+    p_cfg->c_polarization = ( p_entry->polarization == POLARIZATION_HORIZONTAL ) ? 'H' : 'V';
 
-        if( !data_dir ||
-             asprintf( &psz_path, "%s" DIR_SEP "dvb" DIR_SEP "dvb-s" DIR_SEP "%s", data_dir,
-                       p_scan->parameter.sat_info.psz_name ) == -1 )
-        {
-            free( data_dir );
-            return VLC_EGENERIC;
-        }
-        free( data_dir );
+    msg_Dbg( p_scan->p_obj,
+             "transponder [%"PRId64"/%zd]: frequency=%d, symbolrate=%d, fec=%d, polarization=%c",
+             p_scan->i_index + 1,
+             p_scan->i_scanlist,
+             p_cfg->i_frequency,
+             p_cfg->i_symbol_rate,
+             p_cfg->i_fec,
+             p_cfg->c_polarization );
 
-        msg_Dbg( p_scan->p_obj, "using satellite config file (%s)", psz_path );
+    p_scan->i_index++;
+    p_scan->p_current = p_scan->p_current->p_next;
+    *pf_pos = (double) p_scan->i_index / p_scan->i_scanlist;
 
-        FILE *f = vlc_fopen( psz_path, "r" );
-        if( !f )
-        {
-            msg_Err( p_scan->p_obj, "failed to open satellite file (%s)", psz_path );
-            free( psz_path );
-            return VLC_EGENERIC;
-        }
-        free( psz_path );
-
-        /* parse file */
-        scan_dvbs_transponder_t *p_transponders = malloc( sizeof( scan_dvbs_transponder_t ) );
-        if( !p_transponders )
-        {
-            fclose( f );
-            return VLC_ENOMEM;
-        }
-
-        char type;
-        char psz_fec[3];
-
-        int res;
-        do
-        {
-            if ( ( res = fscanf( f, "%c %d %c %d %2s\n",
-                                 &type,
-                                 &p_transponders[p_scan->i_transponders].i_frequency,
-                                 &p_transponders[p_scan->i_transponders].c_polarization,
-                                 &p_transponders[p_scan->i_transponders].i_symbol_rate,
-                                 psz_fec ) ) != 5 )
-            {
-                msg_Dbg( p_scan->p_obj, "error parsing transponder from file" );
-                continue;
-            }
-
-            /* decode fec */
-            char psz_fec_list[] = "1/22/33/44/55/66/77/88/9";
-            char *p_fec = strstr( psz_fec_list, psz_fec );
-            if ( !p_fec )
-                p_transponders[p_scan->i_transponders].i_fec = 9;    /* FEC_AUTO */
-            else
-                p_transponders[p_scan->i_transponders].i_fec = 1 + ( ( p_fec-psz_fec_list ) / 3 );
-
-            p_scan->i_transponders++;
-
-            scan_dvbs_transponder_t *p_realloc = realloc( p_transponders, ( p_scan->i_transponders + 1 ) * sizeof(*p_realloc) );
-            if( p_realloc )
-                p_transponders = p_realloc;
-            else
-                res = EOF;
-        } while (res != EOF);
-
-        msg_Dbg( p_scan->p_obj, "parsed %d transponders from config", p_scan->i_transponders);
-
-        p_scan->p_transponders = p_transponders;
-        fclose( f );
-    }
-
-    if( p_scan->i_index < p_scan->i_transponders )
-    {
-        /* setup params for scan */
-        p_cfg->i_symbol_rate = p_scan->p_transponders[p_scan->i_index].i_symbol_rate / 1000;
-        p_cfg->i_frequency = p_scan->p_transponders[p_scan->i_index].i_frequency;
-        p_cfg->i_fec = p_scan->p_transponders[p_scan->i_index].i_fec;
-        p_cfg->c_polarization = p_scan->p_transponders[p_scan->i_index].c_polarization;
-
-        msg_Dbg( p_scan->p_obj,
-                 "transponder [%"PRId64"/%d]: frequency=%d, symbolrate=%d, fec=%d, polarization=%c",
-                 p_scan->i_index + 1,
-                 p_scan->i_transponders,
-                 p_cfg->i_frequency,
-                 p_cfg->i_symbol_rate,
-                 p_cfg->i_fec,
-                 p_cfg->c_polarization );
-
-        *pf_pos = (double)p_scan->i_index / p_scan->i_transponders;
-
-        return VLC_SUCCESS;
-    }
-
-    if( p_scan->p_transponders )
-    {
-        free( p_scan->p_transponders );
-        p_scan->p_transponders = NULL;
-        p_scan->i_transponders = 0;
-    }
-
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )

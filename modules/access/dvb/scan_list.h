@@ -53,6 +53,8 @@ typedef struct scan_list_entry_t
 
 } scan_list_entry_t;
 
+scan_list_entry_t * scan_list_dvbv3_load( vlc_object_t *, const char *, size_t * );
+
 void scan_list_entries_release( scan_list_entry_t * );
 
 #endif
