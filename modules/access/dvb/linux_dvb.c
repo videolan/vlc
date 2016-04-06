@@ -383,7 +383,6 @@ static int ScanParametersDvbS( access_t *p_access, scan_parameter_t *p_scan )
 {
     const frontend_t *p_frontend = p_access->p_sys->p_frontend;
 
-    memset( p_scan, 0, sizeof(*p_scan) );
     p_scan->type = SCAN_DVB_S;
 
     p_scan->frequency.i_min = p_frontend->info.frequency_min;
@@ -398,7 +397,6 @@ static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
 {
     const frontend_t *p_frontend = p_access->p_sys->p_frontend;
 
-    memset( p_scan, 0, sizeof(*p_scan) );
     p_scan->type = SCAN_DVB_C;
     p_scan->b_exhaustive = false;
 
@@ -437,7 +435,6 @@ static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
 {
     const frontend_t *p_frontend = p_access->p_sys->p_frontend;
 
-    memset( p_scan, 0, sizeof(*p_scan) );
     p_scan->type = SCAN_DVB_T;
     p_scan->b_exhaustive = false;
 
@@ -456,7 +453,7 @@ static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
     return VLC_SUCCESS;
 }
 
-int  FrontendGetScanParameter( access_t *p_access, scan_parameter_t *p_scan )
+int  FrontendFillScanParameter( access_t *p_access, scan_parameter_t *p_scan )
 {
     access_sys_t *p_sys = p_access->p_sys;
     const frontend_t *p_frontend = p_sys->p_frontend;

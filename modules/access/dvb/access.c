@@ -157,17 +157,21 @@ static int Open( vlc_object_t *p_this )
         scan_parameter_t parameter;
         scan_t *p_scan;
 
+        scan_parameter_Init( &parameter );
+
         msg_Dbg( p_access, "setting filter on PAT/NIT/SDT (DVB only)" );
         FilterSet( p_access, 0x00, OTHER_TYPE );    // PAT
         FilterSet( p_access, 0x10, OTHER_TYPE );    // NIT
         FilterSet( p_access, 0x11, OTHER_TYPE );    // SDT
 
-        if( FrontendGetScanParameter( p_access, &parameter ) ||
+        if( FrontendFillScanParameter( p_access, &parameter ) ||
             (p_scan = scan_New( VLC_OBJECT(p_access), &parameter )) == NULL )
         {
+            scan_parameter_Clean( &parameter );
             Close( VLC_OBJECT(p_access) );
             return VLC_EGENERIC;
         }
+        scan_parameter_Clean( &parameter );
         p_sys->scan = p_scan;
         p_sys->i_read_once = DVB_READ_ONCE_SCAN;
     }

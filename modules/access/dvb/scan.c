@@ -184,6 +184,25 @@ static int scan_service_type( int service_type )
     }
 }
 
+void scan_parameter_Init( scan_parameter_t *p_dst )
+{
+    memset( p_dst, 0, sizeof(*p_dst) );
+}
+
+void scan_parameter_Clean( scan_parameter_t *p_dst )
+{
+    if( p_dst->sat_info.psz_name )
+        free( p_dst->sat_info.psz_name );
+}
+
+static void scan_parameter_Copy( const scan_parameter_t *p_src, scan_parameter_t *p_dst )
+{
+    scan_parameter_Clean( p_dst );
+    *p_dst = *p_src;
+    if( p_src->sat_info.psz_name )
+        p_dst->sat_info.psz_name = strdup( p_src->sat_info.psz_name );
+}
+
 /* */
 scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
 {
@@ -226,7 +245,8 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
     p_scan->i_index = 0;
     p_scan->p_dialog_id = NULL;
     TAB_INIT( p_scan->i_service, p_scan->pp_service );
-    p_scan->parameter = *p_parameter;
+    scan_parameter_Init( &p_scan->parameter );
+    scan_parameter_Copy( p_parameter, &p_scan->parameter );
     p_scan->i_time_start = mdate();
 
     return p_scan;
@@ -238,6 +258,8 @@ void scan_Destroy( scan_t *p_scan )
         return;
     if( p_scan->p_dialog_id != NULL )
         vlc_dialog_release( p_scan->p_obj, p_scan->p_dialog_id );
+
+    scan_parameter_Clean( &p_scan->parameter );
 
     for( int i = 0; i < p_scan->i_service; i++ )
         scan_service_Delete( p_scan->pp_service[i] );
@@ -266,7 +288,6 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
                        p_scan->parameter.sat_info.psz_name ) == -1 )
         {
             free( data_dir );
-            free( p_scan->parameter.sat_info.psz_name );
             return VLC_EGENERIC;
         }
         free( data_dir );
@@ -277,7 +298,6 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
         if( !f )
         {
             msg_Err( p_scan->p_obj, "failed to open satellite file (%s)", psz_path );
-            free( p_scan->parameter.sat_info.psz_name );
             free( psz_path );
             return VLC_EGENERIC;
         }
@@ -329,7 +349,6 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
 
         p_scan->p_transponders = p_transponders;
         fclose( f );
-        free( p_scan->parameter.sat_info.psz_name );
     }
 
     if( p_scan->i_index < p_scan->i_transponders )

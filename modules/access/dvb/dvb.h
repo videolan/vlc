@@ -91,7 +91,7 @@ void FrontendClose( access_t * );
 
 int  FrontendGetStatistic( access_t *, frontend_statistic_t * );
 void FrontendGetStatus( access_t *, frontend_status_t * );
-int  FrontendGetScanParameter( access_t *, struct scan_parameter_t * );
+int  FrontendFillScanParameter( access_t *, struct scan_parameter_t * );
 
 int DMXSetFilter( access_t *, int i_pid, int * pi_fd, int i_type );
 int DMXUnsetFilter( access_t *, int i_fd );

@@ -82,6 +82,9 @@ typedef struct
 
 typedef struct scan_t scan_t;
 
+void scan_parameter_Init( scan_parameter_t * );
+void scan_parameter_Clean( scan_parameter_t * );
+
 scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter );
 void scan_Destroy( scan_t *p_scan );
 
