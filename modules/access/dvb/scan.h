@@ -99,5 +99,5 @@ scan_session_t *scan_session_New( vlc_object_t *,
                                   const scan_configuration_t * );
 void scan_session_Destroy( scan_t *, scan_session_t * );
 bool scan_session_Push( scan_session_t *p_scan, block_t *p_block );
-void scan_service_SetSNR( scan_session_t *p_scan, int i_snr );
+void scan_session_SetSNR( scan_session_t *p_scan, int i_snr );
 

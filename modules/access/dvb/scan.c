@@ -1261,7 +1261,7 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
     return p_scan->p_pat && p_scan->p_sdt && p_scan->p_nit;
 }
 
-void scan_service_SetSNR( scan_session_t *p_session, int i_snr )
+void scan_session_SetSNR( scan_session_t *p_session, int i_snr )
 {
     p_session->i_snr = i_snr;
 }

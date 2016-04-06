@@ -356,7 +356,7 @@ static block_t *BlockScan( access_t *p_access )
 
     /* */
     if( i_best_snr > 0 )
-        scan_service_SetSNR( session, i_best_snr );
+        scan_session_SetSNR( session, i_best_snr );
 
     scan_session_Destroy( p_scan, session );
     return NULL;
