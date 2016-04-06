@@ -279,6 +279,13 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
         if( f )
         {
             scan_dvbs_transponder_t *p_transponders = malloc( sizeof( scan_dvbs_transponder_t ) );
+            if( !p_transponders )
+            {
+                fclose( f );
+                free( psz_path );
+                return VLC_ENOMEM;
+            }
+
             char type;
             char psz_fec[3];
 
@@ -306,7 +313,11 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
 
                 p_scan->i_transponders++;
 
-                p_transponders = xrealloc(p_transponders, ( p_scan->i_transponders + 1 ) * sizeof( scan_dvbs_transponder_t ) );
+                scan_dvbs_transponder_t *p_realloc = realloc( p_transponders, ( p_scan->i_transponders + 1 ) * sizeof(*p_realloc) );
+                if( p_realloc )
+                    p_transponders = p_realloc;
+                else
+                    res = EOF;
             } while (res != EOF);
 
             msg_Dbg( p_scan->p_obj, "parsed %d transponders from config", p_scan->i_transponders);
