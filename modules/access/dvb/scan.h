@@ -63,6 +63,7 @@ typedef struct scan_parameter_t
     enum
     {
         FORMAT_DVBv3,
+        FORMAT_DVBv5,
     } scanlist_format;
 
 } scan_parameter_t;

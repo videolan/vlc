@@ -196,6 +196,16 @@ static void scan_Prepare( vlc_object_t *p_obj, const scan_parameter_t *p_paramet
         if( p_scan->p_scanlist )
             msg_Dbg( p_scan->p_obj, "using satellite config file (%s)", p_parameter->psz_scanlist_file );
     }
+    else if( p_parameter->psz_scanlist_file &&
+             p_parameter->scanlist_format == FORMAT_DVBv5 )
+    {
+        if( p_parameter->type == SCAN_DVB_T )
+        {
+            p_scan->p_scanlist = scan_list_dvbv5_load( p_obj,
+                                                       p_parameter->psz_scanlist_file,
+                                                       &p_scan->i_scanlist );
+        }
+    }
 }
 
 static void scan_Debug_Parameters( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
@@ -269,6 +279,40 @@ void scan_Destroy( scan_t *p_scan )
     scan_list_entries_release( p_scan->p_scanlist );
 
     free( p_scan );
+}
+
+static int ScanDvbv5NextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+{
+    if( !p_scan->p_current )
+        return VLC_EGENERIC;
+
+    bool b_valid = false;
+    while( p_scan->p_current && !b_valid )
+    {
+        const scan_list_entry_t *p_entry = p_scan->p_current;
+
+        if( p_entry->i_bw / 1000000 <= (uint32_t)  p_scan->parameter.bandwidth.i_max ||
+            p_entry->i_bw / 1000000 >= (uint32_t)  p_scan->parameter.bandwidth.i_min ||
+            p_entry->i_freq >= (uint32_t)p_scan->parameter.frequency.i_min ||
+            p_entry->i_freq <= (uint32_t)p_scan->parameter.frequency.i_max )
+        {
+            p_cfg->i_frequency = p_entry->i_freq;
+            p_cfg->i_bandwidth = p_entry->i_bw / 1000000;
+            b_valid = true;
+            msg_Dbg( p_scan->p_obj, "selected freq %d bw %d", p_cfg->i_frequency, p_cfg->i_bandwidth );
+        }
+        else
+        {
+            p_scan->i_index++;
+            msg_Dbg( p_scan->p_obj, "rejecting entry %s %d %d", p_entry->psz_channel, p_entry->i_bw, p_scan->parameter.bandwidth.i_max );
+        }
+
+        p_scan->p_current = p_scan->p_current->p_next;
+    }
+
+    *pf_pos = (double) p_scan->i_index / p_scan->i_scanlist;
+
+    return VLC_SUCCESS;
 }
 
 static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
@@ -512,6 +556,8 @@ static int ScanDvbTNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
 {
     if( p_scan->parameter.b_exhaustive )
         return ScanDvbNextExhaustive( p_scan, p_cfg, pf_pos );
+    else if( p_scan->p_scanlist )
+        return ScanDvbv5NextFast( p_scan, p_cfg, pf_pos );
     else
         return ScanDvbTNextFast( p_scan, p_cfg, pf_pos );
 }

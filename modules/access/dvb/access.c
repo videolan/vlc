@@ -59,6 +59,9 @@ static void Close( vlc_object_t *p_this );
 #define SATELLITE_TEXT N_("Satellite scanning config")
 #define SATELLITE_LONGTEXT N_("filename of config file in share/dvb/dvb-s")
 
+#define SCANLIST_TEXT N_("Scan tuning list")
+#define SCANLIST_LONGTEXT N_("filename containing initial scan tuning data")
+
 vlc_module_begin ()
     set_shortname( N_("DVB") )
     set_description( N_("DVB input with v4l2 support") )
@@ -68,6 +71,8 @@ vlc_module_begin ()
     add_bool( "dvb-probe", true, PROBE_TEXT, PROBE_LONGTEXT, true )
     /* DVB-S (satellite) */
     add_string( "dvb-satellite", NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT,
+                true )
+    add_string( "dvb-scanlist", NULL, SCANLIST_TEXT, SCANLIST_LONGTEXT,
                 true )
 
     set_capability( "access", 0 )

@@ -87,6 +87,127 @@ static void scan_list_parse_fec( scan_list_entry_t *p_entry, const char *psz )
         p_entry->i_fec = 9;    /* FEC_AUTO */
     else
         p_entry->i_fec = 1 + ( ( psz_fec - psz_fec_list ) / 3 );
+
+}
+
+static void scan_token_strip( const char **ppsz, size_t *pi_len )
+{
+    const char *p = *ppsz;
+    size_t i_len = *pi_len;
+
+    for ( ; *p <= ' ' && *p ; p++ )
+        i_len--;
+
+    for( ; i_len > 0; i_len-- )
+    {
+        const char c = p[ i_len - 1 ];
+        if( c > ' ' || c == '\0' )
+            break;
+    }
+
+    *ppsz = p;
+    *pi_len = i_len;
+}
+
+static bool scan_list_token_split( const char *psz_line, size_t i_len,
+                                   const char **ppsz_key, size_t *pi_keylen,
+                                   const char **ppsz_value, size_t *pi_valuelen )
+{
+    const char *p_split = strchr( psz_line, '=' );
+    if( !p_split )
+        return false;
+
+    size_t i_keylen = p_split - psz_line;
+    p_split++;
+    size_t i_valuelen = &psz_line[i_len] - p_split;
+
+    scan_token_strip( &psz_line, &i_keylen );
+    scan_token_strip( &p_split, &i_valuelen );
+
+    if( !i_keylen || !i_valuelen )
+        return false;
+
+    *ppsz_key = psz_line;
+    *pi_keylen = i_keylen;
+
+    *ppsz_value = p_split;
+    *pi_valuelen = i_valuelen;
+
+    return true;
+}
+
+#define STRING_EQUALS(token, string, stringlen) \
+    ((sizeof(token) - 1) == stringlen && !strncasecmp( string, token, stringlen ))
+
+#define KEY_EQUALS(token) \
+    ((sizeof(token) - 1) == i_keylen && !strncasecmp( psz_key, token, i_keylen ))
+
+#define VALUE_EQUALS(token) \
+    ((sizeof(token) - 1) == i_valuelen && !strncasecmp( psz_value, token, i_valuelen ))
+
+static void scan_list_dvbv5_entry_fill( scan_list_entry_t *p_entry, const char *psz_line, size_t i_len )
+{
+    const char *psz_key;
+    const char *psz_value;
+    size_t i_keylen;
+    size_t i_valuelen;
+
+    if( !scan_list_token_split( psz_line, i_len, &psz_key, &i_keylen, &psz_value, &i_valuelen ) )
+        return;
+
+    char *psz_end = (char *) &psz_value[i_valuelen];
+
+    if ( KEY_EQUALS("SERVICE_ID") )
+    {
+        p_entry->i_service = strtoll( psz_value, &psz_end, 10 );
+    }
+    else if( KEY_EQUALS("FREQUENCY") )
+    {
+        p_entry->i_freq = strtoll( psz_value, &psz_end, 10 );
+    }
+    else if( KEY_EQUALS("BANDWIDTH_HZ") )
+    {
+        p_entry->i_bw = strtoll( psz_value, &psz_end, 10 );
+    }
+    else if( KEY_EQUALS("DELIVERY_SYSTEM") )
+    {
+        if( VALUE_EQUALS("DVBT") )
+            p_entry->delivery = DELIVERY_DVBT;
+        else if( VALUE_EQUALS("DVBT2") )
+            p_entry->delivery = DELIVERY_DVBT2;
+        else if( VALUE_EQUALS("DVBS") )
+            p_entry->delivery = DELIVERY_DVBS;
+        else if( VALUE_EQUALS("DVBS2") )
+            p_entry->delivery = DELIVERY_DVBS2;
+        else if( VALUE_EQUALS("DVBC/ANNEX_A") )
+            p_entry->delivery = DELIVERY_DVBC;
+        else if( VALUE_EQUALS("ISDBT") )
+            p_entry->delivery = DELIVERY_ISDBT;
+    }
+    else if( KEY_EQUALS("POLARIZATION") )
+    {
+        if( VALUE_EQUALS("VERTICAL") )
+            p_entry->polarization = POLARIZATION_VERTICAL;
+        else
+            p_entry->polarization = POLARIZATION_HORIZONTAL;
+    }
+    else if( KEY_EQUALS("SYMBOL_RATE") )
+    {
+        p_entry->i_rate = strtoll( psz_value, &psz_end, 10 );
+    }
+    else if( KEY_EQUALS("STREAM_ID") )
+    {
+        p_entry->i_stream_id = strtoll( psz_value, &psz_end, 10 );
+    }
+    else if( KEY_EQUALS("INNER_FEC") )
+    {
+        char *psz_val = strndup(psz_value, i_valuelen);
+        if( psz_val )
+        {
+            scan_list_parse_fec( p_entry, psz_val );
+            free( psz_val );
+        }
+    }
 }
 
 void scan_list_entries_release( scan_list_entry_t *p_list )
@@ -97,6 +218,87 @@ void scan_list_entries_release( scan_list_entry_t *p_list )
         scan_list_entry_Delete( p_list );
         p_list = p_next;
     }
+}
+
+scan_list_entry_t * scan_list_dvbv5_load( vlc_object_t *p_obj, const char *psz_source, size_t *pi_count )
+{
+    FILE *p_file = vlc_fopen( psz_source, "r" );
+    if( !p_file )
+    {
+        msg_Err( p_obj, "failed to open dvbv5 file (%s)", psz_source );
+        return NULL;
+    }
+
+    scan_list_entry_t *p_list = NULL;
+    scan_list_entry_t **pp_list_last = &p_list;
+    scan_list_entry_t *p_entry = NULL;
+    *pi_count = 0;
+
+    char *psz_line = NULL;
+    size_t i_len = 0;
+    ssize_t i_read;
+    bool b_error = false;
+
+    while ( (i_read = getline( &psz_line, &i_len, p_file )) != -1 && !b_error )
+    {
+        const char *p = psz_line;
+
+        for ( ; *p == ' ' || *p == '\t'; p++ )
+            i_read--;
+
+        switch( *p )
+        {
+            case 0:
+            case '\n':
+            case '#': /* comment line */
+                continue;
+            case '[':
+            {
+                if( p_entry && scan_list_entry_add( &pp_list_last, p_entry ) )
+                    (*pi_count)++;
+                p_entry = scan_list_entry_New();
+                if( !p_entry )
+                {
+                    b_error = true;
+                }
+                else
+                {
+                    char *p_end = strstr( p, "]" );
+                    if( !p_end )
+                        b_error = true;
+                    else
+                    {
+                        const char *psz_name = p + 1;
+                        size_t i_len_name = p_end - p - 1;
+                        scan_token_strip( &psz_name, &i_len_name );
+                        p_entry->psz_channel = strndup( psz_name, i_len_name );
+                    }
+                }
+                break;
+            }
+
+            default:
+            {
+                if( p_entry )
+                    scan_list_dvbv5_entry_fill( p_entry, p, i_read );
+                break;
+            }
+        }
+
+    }
+
+    if( p_entry )
+    {
+        if( b_error )
+            scan_list_entry_Delete( p_entry );
+        else if( scan_list_entry_add( &pp_list_last, p_entry ) )
+            (*pi_count)++;
+    }
+
+    free( psz_line );
+    fclose( p_file );
+
+    return p_list;
 }
 
 scan_list_entry_t * scan_list_dvbv3_load( vlc_object_t *p_obj, const char *psz_source, size_t *pi_count )

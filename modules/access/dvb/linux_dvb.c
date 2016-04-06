@@ -450,6 +450,9 @@ static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
     p_scan->type = SCAN_DVB_T;
     p_scan->b_exhaustive = false;
 
+    p_scan->psz_scanlist_file = var_InheritString( p_access, "dvb-scanlist" );
+    p_scan->scanlist_format = FORMAT_DVBv5;
+
     /* */
     p_scan->frequency.i_min = p_frontend->info.frequency_min;
     p_scan->frequency.i_max = p_frontend->info.frequency_max;
