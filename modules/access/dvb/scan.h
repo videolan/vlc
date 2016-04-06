@@ -23,7 +23,7 @@
 
 typedef enum
 {
-    SCAN_NONE,
+    SCAN_NONE = 0,
     SCAN_DVB_T,
     SCAN_DVB_S,
     SCAN_DVB_C,
