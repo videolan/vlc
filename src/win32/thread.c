@@ -43,9 +43,10 @@
 static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
 
+#define IS_INTERRUPTIBLE (!VLC_WINSTORE_APP || _WIN32_WINNT >= 0x0A00)
 
 /*** Common helpers ***/
-#if VLC_WINSTORE_APP
+#if !IS_INTERRUPTIBLE
 static bool isCancelled(void);
 #endif
 
@@ -55,7 +56,7 @@ static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
     DWORD ret;
     if (count == 0)
     {
-#if VLC_WINSTORE_APP
+#if !IS_INTERRUPTIBLE
         do {
             DWORD new_delay = 50;
             if (new_delay > delay)
@@ -74,7 +75,7 @@ static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
             ret = WAIT_TIMEOUT;
     }
     else {
-#if VLC_WINSTORE_APP
+#if !IS_INTERRUPTIBLE
         do {
             DWORD new_delay = 50;
             if (new_delay > delay)
@@ -448,7 +449,7 @@ struct vlc_thread
     HANDLE         id;
 
     bool           killable;
-#if !VLC_WINSTORE_APP
+#if IS_INTERRUPTIBLE
     bool           killed;
 #else
     atomic_bool    killed;
@@ -459,7 +460,7 @@ struct vlc_thread
     void          *data;
 };
 
-#if VLC_WINSTORE_APP
+#if !IS_INTERRUPTIBLE
 static bool isCancelled(void)
 {
     struct vlc_thread *th = TlsGetValue(thread_key);
@@ -493,7 +494,7 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     th->entry = entry;
     th->data = data;
     th->killable = false; /* not until vlc_entry() ! */
-#if !VLC_WINSTORE_APP
+#if IS_INTERRUPTIBLE
     th->killed = false;
 #else
     atomic_init(&th->killed, false);
@@ -566,7 +567,7 @@ int vlc_set_priority (vlc_thread_t th, int priority)
 
 /*** Thread cancellation ***/
 
-#if !VLC_WINSTORE_APP
+#if IS_INTERRUPTIBLE
 /* APC procedure for thread cancellation */
 static void CALLBACK vlc_cancel_self (ULONG_PTR self)
 {
@@ -579,7 +580,7 @@ static void CALLBACK vlc_cancel_self (ULONG_PTR self)
 
 void vlc_cancel (vlc_thread_t th)
 {
-#if !VLC_WINSTORE_APP
+#if IS_INTERRUPTIBLE
     QueueUserAPC (vlc_cancel_self, th->id, (uintptr_t)th);
 #else
     atomic_store (&th->killed, true);
@@ -616,7 +617,7 @@ void vlc_testcancel (void)
         return; /* Main thread - cannot be cancelled anyway */
     if (!th->killable)
         return;
-#if !VLC_WINSTORE_APP
+#if IS_INTERRUPTIBLE
     if (likely(!th->killed))
         return;
 #else
