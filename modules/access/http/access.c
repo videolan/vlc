@@ -96,8 +96,8 @@ static int FileControl(access_t *access, int query, va_list args)
         }
 
         case ACCESS_GET_PTS_DELAY:
-            *va_arg(args, int64_t *) = var_InheritInteger(access,
-                                                          "network-caching");
+            *va_arg(args, int64_t *) = INT64_C(1000) *
+                var_InheritInteger(access, "network-caching");
             break;
 
         case ACCESS_GET_CONTENT_TYPE:
@@ -144,8 +144,8 @@ static int LiveControl(access_t *access, int query, va_list args)
             break;
 
         case ACCESS_GET_PTS_DELAY:
-            *va_arg(args, int64_t *) = var_InheritInteger(access,
-                                                          "network-caching");
+            *va_arg(args, int64_t *) = INT64_C(1000) *
+                var_InheritInteger(access, "network-caching");
             break;
 
         case ACCESS_GET_CONTENT_TYPE:
