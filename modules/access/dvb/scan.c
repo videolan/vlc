@@ -839,27 +839,33 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
             else if( p_dsc->i_tag == 0x5a )
             {
                 dvbpsi_terr_deliv_sys_dr_t *p_t = dvbpsi_DecodeTerrDelivSysDr( p_dsc );
-                msg_Dbg( p_obj, "       * terrestrial delivery system" );
-                msg_Dbg( p_obj, "           * centre_frequency 0x%x", p_t->i_centre_frequency  );
-                msg_Dbg( p_obj, "           * bandwidth %d", 8 - p_t->i_bandwidth );
-                msg_Dbg( p_obj, "           * constellation %d", p_t->i_constellation );
-                msg_Dbg( p_obj, "           * hierarchy %d", p_t->i_hierarchy_information );
-                msg_Dbg( p_obj, "           * code_rate hp %d lp %d", p_t->i_code_rate_hp_stream, p_t->i_code_rate_lp_stream );
-                msg_Dbg( p_obj, "           * guard_interval %d", p_t->i_guard_interval );
-                msg_Dbg( p_obj, "           * transmission_mode %d", p_t->i_transmission_mode );
-                msg_Dbg( p_obj, "           * other_frequency_flag %d", p_t->i_other_frequency_flag );
+                if( p_t )
+                {
+                    msg_Dbg( p_obj, "       * terrestrial delivery system" );
+                    msg_Dbg( p_obj, "           * centre_frequency 0x%x", p_t->i_centre_frequency  );
+                    msg_Dbg( p_obj, "           * bandwidth %d", 8 - p_t->i_bandwidth );
+                    msg_Dbg( p_obj, "           * constellation %d", p_t->i_constellation );
+                    msg_Dbg( p_obj, "           * hierarchy %d", p_t->i_hierarchy_information );
+                    msg_Dbg( p_obj, "           * code_rate hp %d lp %d", p_t->i_code_rate_hp_stream, p_t->i_code_rate_lp_stream );
+                    msg_Dbg( p_obj, "           * guard_interval %d", p_t->i_guard_interval );
+                    msg_Dbg( p_obj, "           * transmission_mode %d", p_t->i_transmission_mode );
+                    msg_Dbg( p_obj, "           * other_frequency_flag %d", p_t->i_other_frequency_flag );
+                }
             }
             else if( p_dsc->i_tag == 0x44 )
             {
                 dvbpsi_cable_deliv_sys_dr_t *p_t = dvbpsi_DecodeCableDelivSysDr( p_dsc );
-                msg_Dbg( p_obj, "       * Cable delivery system");
+                if( p_t )
+                {
+                    msg_Dbg( p_obj, "       * Cable delivery system");
 
-                cfg.i_frequency =  decode_BCD( p_t->i_frequency ) * 100;
-                msg_Dbg( p_obj, "           * frequency %d", cfg.i_frequency );
-                cfg.i_symbolrate =  decode_BCD( p_t->i_symbol_rate ) * 100;
-                msg_Dbg( p_obj, "           * symbolrate %u", cfg.i_symbolrate );
-                cfg.i_modulation = (8 << p_t->i_modulation);
-                msg_Dbg( p_obj, "           * modulation %u", cfg.i_modulation );
+                    cfg.i_frequency =  decode_BCD( p_t->i_frequency ) * 100;
+                    msg_Dbg( p_obj, "           * frequency %d", cfg.i_frequency );
+                    cfg.i_symbolrate =  decode_BCD( p_t->i_symbol_rate ) * 100;
+                    msg_Dbg( p_obj, "           * symbolrate %u", cfg.i_symbolrate );
+                    cfg.i_modulation = (8 << p_t->i_modulation);
+                    msg_Dbg( p_obj, "           * modulation %u", cfg.i_modulation );
+                }
             }
             else if( p_dsc->i_tag == 0x5f )
             {
