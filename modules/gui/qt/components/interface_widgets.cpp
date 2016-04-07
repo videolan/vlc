@@ -797,7 +797,18 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
     CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
               this, setDisplayPosition( float, int64_t, int ) );
 
+    connect( this, SIGNAL( broadcastRemainingTime( bool ) ),
+	     THEMIM->getIM(), SIGNAL( remainingTimeChanged( bool ) ) );
+
+    CONNECT( THEMIM->getIM(), remainingTimeChanged( bool ),
+              this, setRemainingTime( bool ) );
+
     setStyleSheet( "QLabel { padding-left: 4px; padding-right: 4px; }" );
+}
+
+void TimeLabel::setRemainingTime( bool remainingTime )
+{
+    b_remainingTime = remainingTime;
 }
 
 void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
@@ -890,5 +901,6 @@ void TimeLabel::toggleTimeDisplay()
 {
     b_remainingTime = !b_remainingTime;
     getSettings()->setValue( "MainWindow/ShowRemainingTime", b_remainingTime );
+    emit broadcastRemainingTime( b_remainingTime );
 }
 

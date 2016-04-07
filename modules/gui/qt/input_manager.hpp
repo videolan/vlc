@@ -212,6 +212,7 @@ private slots:
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int64_t, int );
+    void remainingTimeChanged( bool );
     void seekRequested( float pos );
     void rateChanged( float );
     void nameChanged( const QString& );

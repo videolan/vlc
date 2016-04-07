@@ -209,8 +209,11 @@ private:
     char psz_time[MSTRTIME_MAX_SIZE];
     void toggleTimeDisplay();
 private slots:
+    void setRemainingTime( bool );
     void setDisplayPosition( float pos, int64_t time, int length );
     void setDisplayPosition( float pos );
+signals:
+    void broadcastRemainingTime( bool );
 };
 
 class SpeedLabel : public QLabel
