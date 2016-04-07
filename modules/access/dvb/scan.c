@@ -813,12 +813,15 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
         {
             if( p_dsc->i_tag == 0x41 )
             {
+                dvbpsi_service_list_dr_t *p_sl = dvbpsi_DecodeServiceListDr( p_dsc );
                 msg_Dbg( p_obj, "       * service list descriptor" );
-                for( int i = 0; i < p_dsc->i_length/3; i++ )
+                for( uint8_t i = 0; p_sl && i < p_sl->i_service_count; i++ )
                 {
-                    uint16_t i_service_id = GetWBE( &p_dsc->p_data[3*i+0] );
-                    uint8_t  i_service_type = p_dsc->p_data[3*i+2];
-                    msg_Dbg( p_obj, "           * service_id=%d type=%d", i_service_id, i_service_type );
+                    const uint16_t i_service_id = p_sl->i_service[i].i_service_id;
+                    const uint8_t i_service_type = p_sl->i_service[i].i_service_type;
+                    msg_Dbg( p_obj, "           * service_id=%" PRIu16 " type=%" PRIu8,
+                                    i_service_id, i_service_type );
+
                     if( (ScanFindService( p_scan, 0, i_service_id ) == NULL) &&
                          scan_service_type( i_service_type ) != SERVICE_UNKNOWN )
                     {
