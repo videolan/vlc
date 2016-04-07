@@ -1122,26 +1122,49 @@ block_t *scan_GetM3U( scan_t *p_scan )
 
         if( !s->cfg.i_fec )
             s->cfg.i_fec = 9;   /* FEC_AUTO */
+        char *psz_mrl;
+        int i_ret = -1;
+        switch( p_scan->parameter.type )
+        {
+            case SCAN_DVB_T:
+                i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:bandwidth=%d:modulation=%d",
+                                   s->cfg.i_frequency,
+                                   s->cfg.i_bandwidth,
+                                   s->cfg.i_modulation );
+                break;
+            case SCAN_DVB_S:
+                i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:voltage=%d:fec=%d",
+                                   s->cfg.i_frequency,
+                                   s->cfg.i_symbolrate,
+                                   s->cfg.c_polarization == 'H' ? 18 : 13,
+                                   s->cfg.i_fec );
+                break;
+            case SCAN_DVB_C:
+                i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:modulation=%d:fec=%d",
+                                   s->cfg.i_frequency,
+                                   s->cfg.i_symbolrate,
+                                   s->cfg.i_modulation,
+                                   s->cfg.i_fec );
+            default:
+                break;
+        }
+        if( i_ret < 0 )
+            continue;
 
         char *psz;
-        if( asprintf( &psz, "#EXTINF:,,%s\n"
-                        "#EXTVLCOPT:program=%d\n"
-                        "dvb://frequency=%d:bandwidth=%d:voltage=%d:fec=%d:modulation=%d:srate=%d\n"
-                        "\n",
-                      s->psz_name && * s->psz_name ? s->psz_name : "Unknown",
-                      s->i_program,
-                      s->cfg.i_frequency,
-                      s->cfg.i_bandwidth,
-                      s->cfg.c_polarization == 'H' ? 18 : 13,
-                      s->cfg.i_fec,
-                      s->cfg.i_modulation,
-                      s->cfg.i_symbolrate ) < 0 )
-            psz = NULL;
-        if( psz )
+        i_ret = asprintf( &psz, "#EXTINF:,,%s\n"
+                                "#EXTVLCOPT:program=%d\n"
+                                "%s\n\n",
+                                s->psz_name && * s->psz_name ? s->psz_name : "Unknown",
+                                s->i_program,
+                                psz_mrl );
+        free( psz_mrl );
+        if( i_ret != -1 )
         {
             block_t *p_block = BlockString( psz );
             if( p_block )
                 block_ChainAppend( &p_playlist, p_block );
+            free( psz );
         }
     }
 
