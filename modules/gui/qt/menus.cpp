@@ -338,7 +338,7 @@ void VLCMenuBar::createMenuBar( MainInterface *mi,
     BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
     BAR_DADD( SubtitleMenu( p_intf, bar ), qtr( "Subti&tle" ), 5 );
 
-    addMenuToMainbar( ToolsMenu( p_intf, bar ), qtr( "T&ools" ), bar );
+    addMenuToMainbar( ToolsMenu( p_intf, bar ), qtr( "Tool&s" ), bar );
 
     /* View menu, a bit different */
     BAR_DADD( ViewMenu( p_intf, NULL, mi ), qtr( "V&iew" ), 4 );
@@ -1063,7 +1063,7 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
     /* Add some special entries for windowed mode: Interface Menu */
     if( !b_isFullscreen )
     {
-        QMenu *submenu = new QMenu( qtr( "T&ools" ), menu );
+        QMenu *submenu = new QMenu( qtr( "Tool&s" ), menu );
         /*QMenu *tools =*/ ToolsMenu( p_intf, submenu );
         submenu->addSeparator();
 
