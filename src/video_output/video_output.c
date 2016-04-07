@@ -1289,7 +1289,7 @@ static void ThreadExecuteCropRatio(vout_thread_t *vout,
                         0, 0, 0, 0);
 }
 
-static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
+static int ThreadStart(vout_thread_t *vout, vout_display_state_t *state)
 {
     vlc_mouse_Init(&vout->p->mouse);
     vout->p->decoder_fifo = picture_fifo_New();
@@ -1334,7 +1334,10 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
     if (vout_OpenWrapper(vout, vout->p->splitter_name, state))
         goto error;
     if (vout_InitWrapper(vout))
+    {
+        vout_CloseWrapper(vout, state);
         goto error;
+    }
     assert(vout->p->decoder_pool);
 
     vout->p->displayed.current       = NULL;
