@@ -1,0 +1,13 @@
+--- taglib/taglib/toolkit/tfilestream.cpp.orig	2016-04-07 15:14:47.251819871 +0200
++++ taglib/taglib/toolkit/tfilestream.cpp	2016-04-07 15:15:05.491812493 +0200
+@@ -53,8 +53,10 @@
+ 
+     if(!path.wstr().empty())
+       return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
++#ifndef UNICODE
+     else if(!path.str().empty())
+       return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
++#endif
+     else
+       return InvalidFileHandle;
+   }
