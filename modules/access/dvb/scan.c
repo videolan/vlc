@@ -728,13 +728,16 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
             if( p_dr->i_tag == 0x48 )
             {
                 dvbpsi_service_dr_t *pD = dvbpsi_DecodeServiceDr( p_dr );
-                char str2[257];
+                if( pD )
+                {
+                    char str2[257];
 
-                memcpy( str2, pD->i_service_name, pD->i_service_name_length );
-                str2[pD->i_service_name_length] = '\0';
+                    memcpy( str2, pD->i_service_name, pD->i_service_name_length );
+                    str2[pD->i_service_name_length] = '\0';
 
-                msg_Dbg( p_obj, "    - type=%d name=%s",
-                         pD->i_service_type, str2 );
+                    msg_Dbg( p_obj, "    - type=%d name=%s",
+                             pD->i_service_type, str2 );
+                }
             }
             else
             {
@@ -974,8 +977,7 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
                 if( p_dr->i_tag == 0x48 )
                 {
                     dvbpsi_service_dr_t *pD = dvbpsi_DecodeServiceDr( p_dr );
-
-                    if( s )
+                    if( s && pD )
                     {
                         if( !s->psz_name )
                             s->psz_name = vlc_from_EIT( pD->i_service_name,
