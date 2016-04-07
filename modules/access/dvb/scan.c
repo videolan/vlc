@@ -876,11 +876,13 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
             else if( i_private_data_id == 0x28 && p_dsc->i_tag == 0x83 )
             {
                 msg_Dbg( p_obj, "       * logical channel descriptor (EICTA)" );
-                for( int i = 0; i < p_dsc->i_length/4; i++ )
+                dvbpsi_lcn_dr_t *p_lc = dvbpsi_DecodeLCNDr( p_dsc );
+                for( int i = 0; p_lc && i < p_lc->i_number_of_entries; i++ )
                 {
-                    uint16_t i_service_id = GetWBE( &p_dsc->p_data[4*i+0] );
-                    int i_channel_number = GetWBE( &p_dsc->p_data[4*i+2] ) & 0x3ff;
-                    msg_Dbg( p_obj, "           * service_id=%d channel_number=%d", i_service_id, i_channel_number );
+                    const uint16_t i_service_id = p_lc->p_entries[i].i_service_id;
+                    const uint16_t i_channel_number = p_lc->p_entries[i].i_logical_channel_number;
+                    msg_Dbg( p_obj, "           * service_id=%" PRIu16 " channel_number=%" PRIu16,
+                                    i_service_id, i_channel_number );
                     scan_service_t *s = ScanFindService( p_scan, 0, i_service_id );
                     if( s && s->i_channel < 0 ) s->i_channel = i_channel_number;
                 }
@@ -1007,14 +1009,13 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
                 }
                 else if( i_private_data_id == 0x28 && p_dsc->i_tag == 0x83 )
                 {
-                    for( int i = 0; i < p_dsc->i_length/4; i++ )
+                    dvbpsi_lcn_dr_t *p_lc = dvbpsi_DecodeLCNDr( p_dsc );
+                    for( int i = 0; p_lc && i < p_lc->i_number_of_entries; i++ )
                     {
-                        uint16_t i_service_id = GetWBE( &p_dsc->p_data[4*i+0] );
-                        int i_channel_number = GetWBE( &p_dsc->p_data[4*i+2] ) & 0x3ff;
-
-                        scan_service_t *s = ScanFindService( p_scan, i_service_start, i_service_id );
+                        scan_service_t *s = ScanFindService( p_scan, i_service_start,
+                                                             p_lc->p_entries[i].i_service_id );
                         if( s && s->i_channel < 0 )
-                            s->i_channel = i_channel_number;
+                            s->i_channel = p_lc->p_entries[i].i_logical_channel_number;
                     }
                 }
             }
