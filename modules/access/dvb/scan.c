@@ -1003,7 +1003,8 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 
             for( p_dsc = p_ts->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
             {
-                if( p_dsc->i_tag == 0x5f )
+                /* Private data specifier descriptor */
+                if( p_dsc->i_tag == 0x5f && p_dsc->i_length > 3 )
                 {
                     i_private_data_id = GetDWBE( &p_dsc->p_data[0] );
                 }
