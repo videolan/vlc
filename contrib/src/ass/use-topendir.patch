@@ -1,0 +1,79 @@
+--- libass/libass/ass_fontselect.c.orig	2016-04-07 14:00:48.412620215 +0200
++++ libass/libass/ass_fontselect.c	2016-04-07 14:51:29.220686538 +0200
+@@ -47,6 +47,9 @@
+ #include "ass_font.h"
+ #include "ass_string.h"
+ 
++#include <windows.h>
++#include <tchar.h>
++
+ #define ABS(x) ((x) < 0 ? -(x) : (x))
+ #define MAX_FULLNAME 100
+ 
+@@ -161,28 +164,61 @@
+     .destroy_font      = destroy_font_ft,
+ };
+ 
++static inline char *FromWide (const wchar_t *wide)
++{
++    size_t len = WideCharToMultiByte (CP_UTF8, 0, wide, -1, NULL, 0, NULL, NULL);
++    if (len == 0)
++        return NULL;
++
++    char *out = (char *)malloc (len);
++
++    if (out)
++        WideCharToMultiByte (CP_UTF8, 0, wide, -1, out, len, NULL, NULL);
++    return out;
++}
++
++static inline wchar_t *ToWide (const char *utf8)
++{
++    int len = MultiByteToWideChar (CP_UTF8, 0, utf8, -1, NULL, 0);
++    if (len == 0)
++        return NULL;
++
++    wchar_t *out = (wchar_t *)malloc (len * sizeof (wchar_t));
++
++    if (out)
++        MultiByteToWideChar (CP_UTF8, 0, utf8, -1, out, len);
++    return out;
++}
++
+ static void load_fonts_from_dir(ASS_Library *library, const char *dir)
+ {
+-    DIR *d = opendir(dir);
++    wchar_t *dirw = ToWide(dir);
++    _TDIR *d = _topendir(dirw);
++    free(dirw);
+     if (!d)
+         return;
+     while (1) {
+-        struct dirent *entry = readdir(d);
++        struct _tdirent *entry = _treaddir(d);
+         if (!entry)
+             break;
++        char* d_name = FromWide(entry->d_name);
+         if (entry->d_name[0] == '.')
++        {
++            free(d_name);
+             continue;
++        }
+         char fullname[4096];
+-        snprintf(fullname, sizeof(fullname), "%s/%s", dir, entry->d_name);
++        _snprintf(fullname, sizeof(fullname), "%s/%s", dir, d_name);
+         size_t bufsize = 0;
+         ass_msg(library, MSGL_WARN, "Loading font file '%s'", fullname);
+         void *data = read_file(library, fullname, &bufsize);
+         if (data) {
+-            ass_add_font(library, entry->d_name, data, bufsize);
++            ass_add_font(library, d_name, data, bufsize);
+             free(data);
+         }
++        free(d_name);
+     }
+-    closedir(d);
++    _tclosedir(d);
+ }
+ 
+ /**
