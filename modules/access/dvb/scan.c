@@ -784,16 +784,15 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
         }
         else if( p_dsc->i_tag == 0x4a )
         {
-            msg_Dbg( p_obj, "   * linkage descriptor" );
-            uint16_t i_ts_id = GetWBE( &p_dsc->p_data[0] );
-            uint16_t i_on_id = GetWBE( &p_dsc->p_data[2] );
-            uint16_t i_service_id = GetWBE( &p_dsc->p_data[4] );
-            int i_linkage_type = p_dsc->p_data[6];
-
-            msg_Dbg( p_obj, "       * ts_id %d", i_ts_id );
-            msg_Dbg( p_obj, "       * on_id %d", i_on_id );
-            msg_Dbg( p_obj, "       * service_id %d", i_service_id );
-            msg_Dbg( p_obj, "       * linkage_type %d", i_linkage_type );
+            dvbpsi_linkage_dr_t *p_l = dvbpsi_DecodeLinkageDr( p_dsc );
+            if( p_l )
+            {
+                msg_Dbg( p_obj, "   * linkage descriptor" );
+                msg_Dbg( p_obj, "       * ts_id %" PRIu16, p_l->i_transport_stream_id );
+                msg_Dbg( p_obj, "       * on_id %" PRIu16, p_l->i_original_network_id );
+                msg_Dbg( p_obj, "       * service_id %" PRIu16, p_l->i_service_id );
+                msg_Dbg( p_obj, "       * linkage_type %" PRIu8, p_l->i_linkage_type );
+            }
         }
         else 
         {
