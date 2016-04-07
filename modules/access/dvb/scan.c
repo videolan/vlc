@@ -776,7 +776,7 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
     dvbpsi_descriptor_t *p_dsc;
     for( p_dsc = p_nit->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
     {
-        if( p_dsc->i_tag == 0x40 )
+        if( p_dsc->i_tag == 0x40 && p_dsc->i_length > 0 )
         {
             msg_Dbg( p_obj, "   * network name descriptor" );
             char str1[257];
