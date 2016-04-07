@@ -54,6 +54,11 @@
 #include "../../demux/dvb-text.h"
 #include "../../mux/mpeg/dvbpsi_compat.h"
 
+#define NIT_CURRENT_NETWORK_TABLE_ID    0x40
+#define NIT_OTHER_NETWORK_TABLE_ID      0x41
+#define SDT_CURRENT_TS_TABLE_ID         0x42
+#define SDT_OTHER_TS_TABLE_ID           0x46
+
 typedef enum
 {
     SERVICE_UNKNOWN = 0,
@@ -65,8 +70,9 @@ typedef enum
 
 typedef struct
 {
-    int  i_program;     /* program number (service id) */
-    scan_configuration_t cfg;
+    uint16_t i_ts_id;
+    uint16_t i_program;     /* program number (service id) */
+    scan_tuner_config_t cfg;
     int i_snr;
 
     scan_service_type_t type;
@@ -75,6 +81,7 @@ typedef struct
     bool b_crypted;     /* True if potentially crypted */
 
     int i_network_id;
+    char *psz_network_name;
 
     int i_nit_version;
     int i_sdt_version;
@@ -89,7 +96,7 @@ struct scan_t
     scan_parameter_t parameter;
     int64_t i_time_start;
 
-    int            i_service;
+    size_t            i_service;
     scan_service_t **pp_service;
 
     scan_list_entry_t *p_scanlist;
@@ -101,28 +108,40 @@ struct scan_session_t
 {
     vlc_object_t *p_obj;
 
-    scan_configuration_t cfg;
+    scan_tuner_config_t cfg;
     int i_snr;
 
-    dvbpsi_t *pat;
-    dvbpsi_pat_t *p_pat;
-    int i_nit_pid;
+    struct
+    {
+        dvbpsi_pat_t *p_pat;
+        dvbpsi_sdt_t *p_sdt;
+        dvbpsi_nit_t *p_nit;
+    } local;
 
-    dvbpsi_t *sdt;
-    dvbpsi_sdt_t *p_sdt;
+    struct
+    {
+        dvbpsi_sdt_t **pp_sdt;
+        size_t i_sdt;
+        dvbpsi_nit_t **pp_nit;
+        size_t i_nit;
+    } others;
 
-    dvbpsi_t *nit;
-    dvbpsi_nit_t *p_nit;
+    uint16_t i_nit_pid;
+
+    dvbpsi_t *p_pathandle;
+    dvbpsi_t *p_sdthandle;
+    dvbpsi_t *p_nithandle;
 };
 
 /* */
-static scan_service_t *scan_service_New( int i_program,
-                                         const scan_configuration_t *p_cfg )
+static scan_service_t *scan_service_New( uint16_t i_ts_id, uint16_t i_program,
+                                         const scan_tuner_config_t *p_cfg )
 {
     scan_service_t *p_srv = malloc( sizeof(*p_srv) );
     if( !p_srv )
         return NULL;
 
+    p_srv->i_ts_id = i_ts_id;
     p_srv->i_program = i_program;
     p_srv->cfg = *p_cfg;
     p_srv->i_snr = -1;
@@ -136,11 +155,14 @@ static scan_service_t *scan_service_New( int i_program,
     p_srv->i_nit_version = -1;
     p_srv->i_sdt_version = -1;
 
+    p_srv->psz_network_name = NULL;
+
     return p_srv;
 }
 
 static void scan_service_Delete( scan_service_t *p_srv )
 {
+    free( p_srv->psz_network_name );
     free( p_srv->psz_name );
     free( p_srv );
 }
@@ -272,7 +294,7 @@ void scan_Destroy( scan_t *p_scan )
 
     scan_parameter_Clean( &p_scan->parameter );
 
-    for( int i = 0; i < p_scan->i_service; i++ )
+    for( size_t i = 0; i < p_scan->i_service; i++ )
         scan_service_Delete( p_scan->pp_service[i] );
     TAB_CLEAN( p_scan->i_service, p_scan->pp_service );
 
@@ -281,7 +303,7 @@ void scan_Destroy( scan_t *p_scan )
     free( p_scan );
 }
 
-static int ScanDvbv5NextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+static int ScanDvbv5NextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     if( !p_scan->p_current )
         return VLC_EGENERIC;
@@ -315,14 +337,14 @@ static int ScanDvbv5NextFast( scan_t *p_scan, scan_configuration_t *p_cfg, doubl
     return VLC_SUCCESS;
 }
 
-static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+static int ScanDvbSNextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     const scan_list_entry_t *p_entry = p_scan->p_current;
     if( !p_entry )
         return VLC_EGENERIC;
 
     /* setup params for scan */
-    p_cfg->i_symbol_rate = p_entry->i_rate / 1000;
+    p_cfg->i_symbolrate = p_entry->i_rate / 1000;
     p_cfg->i_frequency = p_entry->i_freq;
     p_cfg->i_fec = p_entry->i_fec;
     p_cfg->c_polarization = ( p_entry->polarization == POLARIZATION_HORIZONTAL ) ? 'H' : 'V';
@@ -332,7 +354,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
              p_scan->i_index + 1,
              p_scan->i_scanlist,
              p_cfg->i_frequency,
-             p_cfg->i_symbol_rate,
+             p_cfg->i_symbolrate,
              p_cfg->i_fec,
              p_cfg->c_polarization );
 
@@ -343,7 +365,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
     return VLC_SUCCESS;
 }
 
-static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+static int ScanDvbCNextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     msg_Dbg( p_scan->p_obj, "Scan index %"PRId64, p_scan->i_index );
     /* Values taken from dvb-scan utils frequency-files, sorted by how
@@ -381,7 +403,7 @@ static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
     return VLC_EGENERIC;
 }
 
-static int ScanDvbNextExhaustive( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+static int ScanDvbNextExhaustive( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     if( p_scan->i_index > p_scan->parameter.frequency.i_count * p_scan->parameter.bandwidth.i_count )
         return VLC_EGENERIC;
@@ -396,7 +418,7 @@ static int ScanDvbNextExhaustive( scan_t *p_scan, scan_configuration_t *p_cfg, d
     return VLC_SUCCESS;
 }
 
-static int ScanDvbTNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+static int ScanDvbTNextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     static const int i_band_count = 2;
     static const struct
@@ -468,7 +490,7 @@ static int ScanDvbTNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
     }
 }
 
-static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+static int ScanDvbCNext( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     bool b_servicefound = false;
     /* We iterate frequencies/modulations/symbolrates until we get first hit and find NIT,
@@ -476,7 +498,7 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
        pp_services for all that doesn't have name yet (tune to that cfg and get SDT and name
        for channel).
      */
-    for( int i = 0; i < p_scan->i_service; i++ )
+    for( size_t i = 0; i < p_scan->i_service; i++ )
     {
         /* We found radio/tv config that doesn't have a name,
            lets tune to that mux
@@ -488,7 +510,7 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
             p_cfg->i_modulation = p_scan->pp_service[i]->cfg.i_modulation;
             p_scan->i_index = i+1;
             msg_Dbg( p_scan->p_obj, "iterating to freq: %u, symbolrate %u, "
-                     "modulation %u index %"PRId64"/%d",
+                     "modulation %u index %"PRId64"/%ld",
                      p_cfg->i_frequency, p_cfg->i_symbolrate, p_cfg->i_modulation, p_scan->i_index, p_scan->i_service );
             *pf_pos = (double)i/p_scan->i_service;
             return VLC_SUCCESS;
@@ -552,7 +574,7 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
         return ScanDvbCNextFast( p_scan, p_cfg, pf_pos );
 }
 
-static int ScanDvbTNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+static int ScanDvbTNext( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     if( p_scan->parameter.b_exhaustive )
         return ScanDvbNextExhaustive( p_scan, p_cfg, pf_pos );
@@ -562,7 +584,7 @@ static int ScanDvbTNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
         return ScanDvbTNextFast( p_scan, p_cfg, pf_pos );
 }
 
-static int ScanDvbSNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+static int ScanDvbSNext( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     if( p_scan->parameter.b_exhaustive )
         msg_Dbg( p_scan->p_obj, "no exhaustive svb-d scan mode" );
@@ -570,7 +592,7 @@ static int ScanDvbSNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
     return ScanDvbSNextFast( p_scan, p_cfg, pf_pos );
 }
 
-int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
+int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
 {
     double f_position;
     int i_ret;
@@ -600,7 +622,7 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
 
     int i_service = 0;
 
-    for( int i = 0; i < p_scan->i_service; i++ )
+    for( size_t i = 0; i < p_scan->i_service; i++ )
     {
         if( p_scan->pp_service[i]->psz_name )
             i_service++;
@@ -643,14 +665,67 @@ bool scan_IsCancelled( scan_t *p_scan )
     return vlc_dialog_is_cancelled( p_scan->p_obj, p_scan->p_dialog_id );
 }
 
-static scan_service_t *ScanFindService( scan_t *p_scan, int i_service_start, int i_program )
+static scan_service_t *ScanFindService( scan_t *p_scan, size_t i_service_start,
+                                        uint16_t i_program, uint16_t i_ts_id )
 {
-    for( int i = i_service_start; i < p_scan->i_service; i++ )
+    for( size_t i = i_service_start; i < p_scan->i_service; i++ )
     {
-        if( p_scan->pp_service[i]->i_program == i_program )
+        if( p_scan->pp_service[i]->i_program == i_program &&
+            p_scan->pp_service[i]->i_ts_id == i_ts_id )
             return p_scan->pp_service[i];
     }
     return NULL;
+}
+
+static bool GetOtherNetworkNIT( scan_session_t *p_session, uint16_t i_network_id,
+                                dvbpsi_nit_t ***ppp_nit )
+{
+    for( size_t i=0; i<p_session->others.i_nit; i++ )
+    {
+        if( p_session->others.pp_nit[i]->i_network_id == i_network_id )
+        {
+            *ppp_nit = &p_session->others.pp_nit[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static bool GetOtherTsSDT( scan_session_t *p_session, uint16_t i_ts_id,
+                           dvbpsi_sdt_t ***ppp_sdt )
+{
+    for( size_t i=0; i<p_session->others.i_sdt; i++ )
+    {
+        if( p_session->others.pp_sdt[i]->i_extension == i_ts_id )
+        {
+            *ppp_sdt = &p_session->others.pp_sdt[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static void ParsePAT( vlc_object_t *p_obj, scan_t *p_scan,
+                      const dvbpsi_pat_t *p_pat, const scan_tuner_config_t *p_cfg )
+{
+    VLC_UNUSED(p_obj);
+    const dvbpsi_pat_program_t *p_program;
+    for( p_program = p_pat->p_first_program; p_program != NULL; p_program = p_program->p_next )
+    {
+        if( p_program->i_number == 0 )  /* NIT */
+            continue;
+
+        /* PAT must not create new service without proper config ( local ) */
+        scan_service_t *s = ScanFindService( p_scan, 0, p_program->i_number, p_pat->i_ts_id );
+        if( s == NULL && p_cfg )
+        {
+            s = scan_service_New( p_pat->i_ts_id, p_program->i_number, p_cfg );
+            if( likely(s) )
+                TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+        }
+    }
 }
 
 /* FIXME handle properly string (convert to utf8) */
@@ -658,15 +733,13 @@ static void PATCallBack( scan_session_t *p_session, dvbpsi_pat_t *p_pat )
 {
     vlc_object_t *p_obj = p_session->p_obj;
 
-    msg_Dbg( p_obj, "PATCallBack" );
-
     /* */
-    if( p_session->p_pat && p_session->p_pat->b_current_next )
+    if( p_session->local.p_pat && p_session->local.p_pat->b_current_next )
     {
-        dvbpsi_pat_delete( p_session->p_pat );
-        p_session->p_pat = NULL;
+        dvbpsi_pat_delete( p_session->local.p_pat );
+        p_session->local.p_pat = NULL;
     }
-    if( p_session->p_pat )
+    if( p_session->local.p_pat )
     {
         dvbpsi_pat_delete( p_pat );
         return;
@@ -675,7 +748,7 @@ static void PATCallBack( scan_session_t *p_session, dvbpsi_pat_t *p_pat )
     dvbpsi_pat_program_t *p_program;
 
     /* */
-    p_session->p_pat = p_pat;
+    p_session->local.p_pat = p_pat;
 
     /* */
     msg_Dbg( p_obj, "new PAT ts_id=%d version=%d current_next=%d",
@@ -687,32 +760,92 @@ static void PATCallBack( scan_session_t *p_session, dvbpsi_pat_t *p_pat )
             p_session->i_nit_pid = p_program->i_pid;
     }
 }
+
+static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan,
+                      const dvbpsi_sdt_t *p_sdt, const scan_tuner_config_t *p_cfg )
+{
+    VLC_UNUSED(p_obj);
+    for( const dvbpsi_sdt_service_t *p_srv = p_sdt->p_first_service;
+                                     p_srv; p_srv = p_srv->p_next )
+    {
+        scan_service_t *s = ScanFindService( p_scan, 0, p_srv->i_service_id, p_sdt->i_extension );
+        if( s == NULL )
+        {
+             /* SDT must not create new service without proper config ( local )
+                or it must has been created by another network NIT (providing freq) */
+            if( p_cfg )
+                s = scan_service_New( p_sdt->i_extension, p_srv->i_service_id, p_cfg );
+            if( s == NULL )
+                continue;
+            TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+        }
+
+        s->b_crypted = p_srv->b_free_ca;
+
+        for( dvbpsi_descriptor_t *p_dr = p_srv->p_first_descriptor;
+                                  p_dr; p_dr = p_dr->p_next )
+        {
+            if( p_dr->i_tag != 0x48 )
+                continue;
+
+            dvbpsi_service_dr_t *pD = dvbpsi_DecodeServiceDr( p_dr );
+            if( pD )
+            {
+                if( !s->psz_name )
+                    s->psz_name = vlc_from_EIT( pD->i_service_name,
+                                                pD->i_service_name_length );
+
+                if( s->type == SERVICE_UNKNOWN )
+                    s->type = scan_service_type( pD->i_service_type );
+            }
+        }
+    }
+}
+
 static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
 {
     vlc_object_t *p_obj = p_session->p_obj;
-
-    msg_Dbg( p_obj, "SDTCallBack" );
-
-    if( p_session->p_sdt && p_session->p_sdt->b_current_next )
+    dvbpsi_sdt_t **pp_stored_sdt = NULL;
+    if( p_sdt->i_table_id == SDT_OTHER_TS_TABLE_ID )
     {
-        dvbpsi_sdt_delete( p_session->p_sdt );
-        p_session->p_sdt = NULL;
+        if( !GetOtherTsSDT( p_session, p_sdt->i_extension, &pp_stored_sdt ) )
+        {
+            dvbpsi_sdt_t **pp_realloc = realloc( p_session->others.pp_sdt,
+                                                (p_session->others.i_sdt + 1) * sizeof( *pp_realloc ) );
+            if( !pp_realloc ) /* oom */
+            {
+                dvbpsi_sdt_delete( p_sdt );
+                return;
+            }
+            pp_stored_sdt = &pp_realloc[p_session->others.i_sdt];
+            p_session->others.pp_sdt = pp_realloc;
+            p_session->others.i_sdt++;
+        }
     }
-    if( p_session->p_sdt )
+    else /* SDT_CURRENT_TS_TABLE_ID */
     {
-        dvbpsi_sdt_delete( p_sdt );
-        return;
+        pp_stored_sdt = &p_session->local.p_sdt;
     }
+
+    /* Store, replace, or discard */
+    if( *pp_stored_sdt )
+    {
+        if( (*pp_stored_sdt)->i_version == p_sdt->i_version ||
+            (*pp_stored_sdt)->b_current_next > p_sdt->b_current_next )
+        {
+            /* Duplicate or stored one isn't current */
+            dvbpsi_sdt_delete( p_sdt );
+            return;
+        }
+        dvbpsi_sdt_delete( *pp_stored_sdt );
+    }
+    *pp_stored_sdt = p_sdt;
 
     /* */
-    p_session->p_sdt = p_sdt;
-
-    /* */
-    msg_Dbg( p_obj, "new SDT ts_id=%d version=%d current_next=%d network_id=%d",
-             p_sdt->i_extension,
-             p_sdt->i_version, p_sdt->b_current_next,
+    msg_Dbg( p_obj, "new SDT %s ts_id=%d version=%d current_next=%d network_id=%d",
+             ( p_sdt->i_table_id == SDT_CURRENT_TS_TABLE_ID ) ? "local" : "other",
+             p_sdt->i_extension, p_sdt->i_version, p_sdt->b_current_next,
              p_sdt->i_network_id );
-
 
     dvbpsi_sdt_service_t *p_srv;
     for( p_srv = p_sdt->p_first_service; p_srv; p_srv = p_srv->p_next )
@@ -747,32 +880,185 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
     }
 }
 
+static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
+                      const dvbpsi_nit_t *p_nit, const scan_tuner_config_t *p_cfg )
+{
+    for( const dvbpsi_nit_ts_t *p_ts = p_nit->p_first_ts;
+                                p_ts != NULL; p_ts = p_ts->p_next )
+    {
+        msg_Dbg( p_obj, "   * ts ts_id=0x%x original_id=0x%x", p_ts->i_ts_id, p_ts->i_orig_network_id );
+
+        uint32_t i_private_data_id = 0;
+        dvbpsi_descriptor_t *p_dsc;
+        scan_tuner_config_t tscfg = { 0 };
+        if( p_cfg != NULL ) // p_nit->i_table_id != NIT_CURRENT_NETWORK_TABLE_ID
+            tscfg = *p_cfg;
+
+        dvbpsi_service_list_dr_t *p_sl = NULL;
+        dvbpsi_lcn_dr_t *p_lc = NULL;
+        dvbpsi_descriptor_t *p_nn = NULL;
+
+        for( p_dsc = p_ts->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
+        {
+            if( p_dsc->i_tag == 0x41 )
+            {
+                /* Store it and process it after signal config
+                 * (required for NIT describing other networks) */
+                p_sl = dvbpsi_DecodeServiceListDr( p_dsc );
+            }
+            else if( p_dsc->i_tag == 0x5a )
+            {
+                dvbpsi_terr_deliv_sys_dr_t *p_t = dvbpsi_DecodeTerrDelivSysDr( p_dsc );
+                if( p_t )
+                {
+                    msg_Dbg( p_obj, "       * terrestrial delivery system" );
+                    msg_Dbg( p_obj, "           * centre_frequency 0x%x", p_t->i_centre_frequency  );
+                    msg_Dbg( p_obj, "           * bandwidth %d", 8 - p_t->i_bandwidth );
+                    msg_Dbg( p_obj, "           * constellation %d", p_t->i_constellation );
+                    msg_Dbg( p_obj, "           * hierarchy %d", p_t->i_hierarchy_information );
+                    msg_Dbg( p_obj, "           * code_rate hp %d lp %d", p_t->i_code_rate_hp_stream, p_t->i_code_rate_lp_stream );
+                    msg_Dbg( p_obj, "           * guard_interval %d", p_t->i_guard_interval );
+                    msg_Dbg( p_obj, "           * transmission_mode %d", p_t->i_transmission_mode );
+                    msg_Dbg( p_obj, "           * other_frequency_flag %d", p_t->i_other_frequency_flag );
+                }
+            }
+            else if( p_dsc->i_tag == 0x44 )
+            {
+                dvbpsi_cable_deliv_sys_dr_t *p_t = dvbpsi_DecodeCableDelivSysDr( p_dsc );
+                if( p_t )
+                {
+                    tscfg.i_frequency =  decode_BCD( p_t->i_frequency ) * 100;
+                    tscfg.i_symbolrate =  decode_BCD( p_t->i_symbol_rate ) * 100;
+                    tscfg.i_modulation = (8 << p_t->i_modulation);
+                    msg_Dbg( p_obj, "       * Cable delivery system");
+                    msg_Dbg( p_obj, "           * frequency %d", tscfg.i_frequency );
+                    msg_Dbg( p_obj, "           * symbolrate %u", tscfg.i_symbolrate );
+                    msg_Dbg( p_obj, "           * modulation %u", tscfg.i_modulation );
+                }
+            }
+            else if( p_dsc->i_tag == 0x5f )
+            {
+                msg_Dbg( p_obj, "       * private data specifier descriptor" );
+                i_private_data_id = GetDWBE( &p_dsc->p_data[0] );
+                msg_Dbg( p_obj, "           * value 0x%8.8x", i_private_data_id );
+            }
+            else if( i_private_data_id == 0x28 && p_dsc->i_tag == 0x83 )
+            {
+                msg_Dbg( p_obj, "       * logical channel descriptor (EICTA)" );
+                p_lc = dvbpsi_DecodeLCNDr( p_dsc );
+            }
+            else if( p_dsc->i_tag == 0x40 && p_dsc->i_length > 0 ) /* Network Name */
+            {
+                p_nn = p_dsc;
+            }
+            else
+            {
+                msg_Warn( p_obj, "       * dsc 0x%x", p_dsc->i_tag );
+            }
+        }
+
+        /* Now process service list, and create them if tuner config is known */
+        if( p_sl )
+        {
+            msg_Dbg( p_obj, "       * service list descriptor" );
+            for( uint8_t i = 0; p_sl && i < p_sl->i_service_count; i++ )
+            {
+                const uint16_t i_service_id = p_sl->i_service[i].i_service_id;
+                const uint8_t i_service_type = p_sl->i_service[i].i_service_type;
+                msg_Dbg( p_obj, "           * service_id=%" PRIu16 " type=%" PRIu8,
+                                i_service_id, i_service_type );
+
+                if( p_cfg->i_frequency == 0 )
+                {
+                    msg_Warn( p_obj, "cannot create service_id=%" PRIu16 " ts_id=%" PRIu16 " (no config)",
+                                     i_service_id, p_ts->i_ts_id );
+                    continue;
+                }
+
+                if( scan_service_type( i_service_type ) == SERVICE_UNKNOWN )
+                    continue;
+
+                scan_service_t *s = ScanFindService( p_scan, 0, i_service_id, p_ts->i_ts_id );
+                if( s == NULL )
+                {
+                    s = scan_service_New( p_ts->i_ts_id, i_service_id, &tscfg );
+                    if( likely(s) )
+                    {
+                        s->type          = scan_service_type( i_service_type );
+                        s->i_network_id  = p_nit->i_network_id;
+                        s->i_nit_version = p_nit->i_version;
+                        TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+                    }
+                }
+
+                if ( s && s->psz_network_name == NULL && p_nn )
+                    s->psz_network_name = strndup( (const char*) p_nn->p_data, p_dsc->i_length );
+
+            }
+        }
+
+        /* Set virtual channel numbers */
+        if( p_lc )
+        {
+            for( int i = 0; i < p_lc->i_number_of_entries; i++ )
+            {
+                const uint16_t i_service_id = p_lc->p_entries[i].i_service_id;
+                const uint16_t i_channel_number = p_lc->p_entries[i].i_logical_channel_number;
+                msg_Dbg( p_obj, "           * service_id=%" PRIu16 " channel_number=%" PRIu16,
+                                i_service_id, i_channel_number );
+                scan_service_t *s = ScanFindService( p_scan, 0, i_service_id, p_ts->i_ts_id );
+                if( s )
+                    s->i_channel = i_channel_number;
+            }
+        }
+    }
+}
+
 static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 {
     vlc_object_t *p_obj = p_session->p_obj;
-    access_t *p_access = (access_t*)p_obj;
-    access_sys_t *p_sys = p_access->p_sys;
-    scan_t *p_scan = p_sys->scan;
+    dvbpsi_nit_t **pp_stored_nit = NULL;
 
-    msg_Dbg( p_obj, "NITCallBack" );
-    msg_Dbg( p_obj, "new NIT network_id=%d version=%d current_next=%d",
+    if( p_nit->i_table_id == NIT_OTHER_NETWORK_TABLE_ID )
+    {
+        if( !GetOtherNetworkNIT( p_session, p_nit->i_network_id, &pp_stored_nit ) )
+        {
+            dvbpsi_nit_t **pp_realloc = realloc( p_session->others.pp_nit,
+                                                (p_session->others.i_nit + 1) * sizeof( *pp_realloc ) );
+            if( !pp_realloc ) /* oom */
+            {
+                dvbpsi_nit_delete( p_nit );
+                return;
+            }
+            pp_stored_nit = &pp_realloc[p_session->others.i_nit];
+            p_session->others.pp_nit = pp_realloc;
+            p_session->others.i_nit++;
+        }
+    }
+    else /* NIT_CURRENT_NETWORK_TABLE_ID */
+    {
+        pp_stored_nit = &p_session->local.p_nit;
+    }
+
+    /* Store, replace, or discard */
+    if( *pp_stored_nit )
+    {
+        if( (*pp_stored_nit)->i_version == p_nit->i_version ||
+            (*pp_stored_nit)->b_current_next > p_nit->b_current_next )
+        {
+            /* Duplicate or stored one isn't current */
+            dvbpsi_nit_delete( p_nit );
+            return;
+        }
+        dvbpsi_nit_delete( *pp_stored_nit );
+    }
+    *pp_stored_nit = p_nit;
+
+    msg_Dbg( p_obj, "new NIT %s network_id=%d version=%d current_next=%d",
+             ( p_nit->i_table_id == NIT_CURRENT_NETWORK_TABLE_ID ) ? "local" : "other",
              p_nit->i_network_id, p_nit->i_version, p_nit->b_current_next );
 
     /* */
-    if( p_session->p_nit && p_session->p_nit->b_current_next )
-    {
-        dvbpsi_nit_delete( p_session->p_nit );
-        p_session->p_nit = NULL;
-    }
-    if( p_session->p_nit )
-    {
-        dvbpsi_nit_delete( p_nit );
-        return;
-    }
-
-    /* */
-    p_session->p_nit = p_nit;
-
     dvbpsi_descriptor_t *p_dsc;
     for( p_dsc = p_nit->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
     {
@@ -797,118 +1083,24 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                 msg_Dbg( p_obj, "       * linkage_type %" PRIu8, p_l->i_linkage_type );
             }
         }
-        else 
+        else
         {
             msg_Dbg( p_obj, "   * dsc 0x%x", p_dsc->i_tag );
         }
     }
 
-    dvbpsi_nit_ts_t *p_ts;
-    for( p_ts = p_nit->p_first_ts; p_ts != NULL; p_ts = p_ts->p_next )
-    {
-        msg_Dbg( p_obj, "   * ts ts_id=0x%x original_id=0x%x", p_ts->i_ts_id, p_ts->i_orig_network_id );
-
-        uint32_t i_private_data_id = 0;
-        dvbpsi_descriptor_t *p_dsc;
-        scan_configuration_t cfg = { 0 };
-
-        for( p_dsc = p_ts->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
-        {
-            if( p_dsc->i_tag == 0x41 )
-            {
-                dvbpsi_service_list_dr_t *p_sl = dvbpsi_DecodeServiceListDr( p_dsc );
-                msg_Dbg( p_obj, "       * service list descriptor" );
-                for( uint8_t i = 0; p_sl && i < p_sl->i_service_count; i++ )
-                {
-                    const uint16_t i_service_id = p_sl->i_service[i].i_service_id;
-                    const uint8_t i_service_type = p_sl->i_service[i].i_service_type;
-                    msg_Dbg( p_obj, "           * service_id=%" PRIu16 " type=%" PRIu8,
-                                    i_service_id, i_service_type );
-
-                    if( (ScanFindService( p_scan, 0, i_service_id ) == NULL) &&
-                         scan_service_type( i_service_type ) != SERVICE_UNKNOWN )
-                    {
-                        scan_service_t *s = scan_service_New( i_service_id, &cfg );
-                        if( likely(s) )
-                        {
-                            s->type          = scan_service_type( i_service_type );
-                            s->i_network_id  = p_nit->i_network_id;
-                            s->i_nit_version = p_nit->i_version;
-                            TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
-                        }
-                    }
-                }
-            }
-            else if( p_dsc->i_tag == 0x5a )
-            {
-                dvbpsi_terr_deliv_sys_dr_t *p_t = dvbpsi_DecodeTerrDelivSysDr( p_dsc );
-                if( p_t )
-                {
-                    msg_Dbg( p_obj, "       * terrestrial delivery system" );
-                    msg_Dbg( p_obj, "           * centre_frequency 0x%x", p_t->i_centre_frequency  );
-                    msg_Dbg( p_obj, "           * bandwidth %d", 8 - p_t->i_bandwidth );
-                    msg_Dbg( p_obj, "           * constellation %d", p_t->i_constellation );
-                    msg_Dbg( p_obj, "           * hierarchy %d", p_t->i_hierarchy_information );
-                    msg_Dbg( p_obj, "           * code_rate hp %d lp %d", p_t->i_code_rate_hp_stream, p_t->i_code_rate_lp_stream );
-                    msg_Dbg( p_obj, "           * guard_interval %d", p_t->i_guard_interval );
-                    msg_Dbg( p_obj, "           * transmission_mode %d", p_t->i_transmission_mode );
-                    msg_Dbg( p_obj, "           * other_frequency_flag %d", p_t->i_other_frequency_flag );
-                }
-            }
-            else if( p_dsc->i_tag == 0x44 )
-            {
-                dvbpsi_cable_deliv_sys_dr_t *p_t = dvbpsi_DecodeCableDelivSysDr( p_dsc );
-                if( p_t )
-                {
-                    msg_Dbg( p_obj, "       * Cable delivery system");
-
-                    cfg.i_frequency =  decode_BCD( p_t->i_frequency ) * 100;
-                    msg_Dbg( p_obj, "           * frequency %d", cfg.i_frequency );
-                    cfg.i_symbolrate =  decode_BCD( p_t->i_symbol_rate ) * 100;
-                    msg_Dbg( p_obj, "           * symbolrate %u", cfg.i_symbolrate );
-                    cfg.i_modulation = (8 << p_t->i_modulation);
-                    msg_Dbg( p_obj, "           * modulation %u", cfg.i_modulation );
-                }
-            }
-            else if( p_dsc->i_tag == 0x5f )
-            {
-                msg_Dbg( p_obj, "       * private data specifier descriptor" );
-                i_private_data_id = GetDWBE( &p_dsc->p_data[0] );
-                msg_Dbg( p_obj, "           * value 0x%8.8x", i_private_data_id );
-            }
-            else if( i_private_data_id == 0x28 && p_dsc->i_tag == 0x83 )
-            {
-                msg_Dbg( p_obj, "       * logical channel descriptor (EICTA)" );
-                dvbpsi_lcn_dr_t *p_lc = dvbpsi_DecodeLCNDr( p_dsc );
-                for( int i = 0; p_lc && i < p_lc->i_number_of_entries; i++ )
-                {
-                    const uint16_t i_service_id = p_lc->p_entries[i].i_service_id;
-                    const uint16_t i_channel_number = p_lc->p_entries[i].i_logical_channel_number;
-                    msg_Dbg( p_obj, "           * service_id=%" PRIu16 " channel_number=%" PRIu16,
-                                    i_service_id, i_channel_number );
-                    scan_service_t *s = ScanFindService( p_scan, 0, i_service_id );
-                    if( s && s->i_channel < 0 ) s->i_channel = i_channel_number;
-                }
-
-            }
-            else
-            {
-                msg_Warn( p_obj, "       * dsc 0x%x", p_dsc->i_tag );
-            }
-        }
-    }
 }
 
 static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id, uint16_t i_extension, void *p_data )
 {
     scan_session_t *p_session = (scan_session_t *)p_data;
 
-    if( i_table_id == 0x42 )
+    if( i_table_id == SDT_CURRENT_TS_TABLE_ID || i_table_id == SDT_OTHER_TS_TABLE_ID )
     {
         if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_session ) )
             msg_Err( p_session->p_obj, "PSINewTableCallback: failed attaching SDTCallback" );
     }
-    else if( i_table_id == 0x40 || i_table_id == 0x41 )
+    else if( i_table_id == NIT_CURRENT_NETWORK_TABLE_ID || i_table_id == NIT_OTHER_NETWORK_TABLE_ID )
     {
         if( !dvbpsi_nit_attach( h, i_table_id, i_extension, (dvbpsi_nit_callback)NITCallBack, p_session ) )
             msg_Err( p_session->p_obj, "PSINewTableCallback: failed attaching NITCallback" );
@@ -916,7 +1108,7 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id, uint16_t i_ext
 }
 
 scan_session_t *scan_session_New( vlc_object_t *p_obj,
-                                  const scan_configuration_t *p_cfg )
+                                  const scan_tuner_config_t *p_cfg )
 {
     scan_session_t *p_session = malloc( sizeof( *p_session ) );
     if( unlikely(p_session == NULL) )
@@ -924,109 +1116,85 @@ scan_session_t *scan_session_New( vlc_object_t *p_obj,
     p_session->p_obj = p_obj;
     p_session->cfg = *p_cfg;
     p_session->i_snr = -1;
-    p_session->pat = NULL;
-    p_session->p_pat = NULL;
+    p_session->local.p_pat = NULL;
+    p_session->local.p_sdt = NULL;
+    p_session->local.p_nit = NULL;
     p_session->i_nit_pid = -1;
-    p_session->sdt = NULL;
-    p_session->p_sdt = NULL;
-    p_session->nit = NULL;
-    p_session->p_nit = NULL;
+    p_session->others.i_nit = 0;
+    p_session->others.i_sdt = 0;
+    p_session->others.pp_nit = NULL;
+    p_session->others.pp_sdt = NULL;
+    p_session->p_pathandle = NULL;
+    p_session->p_sdthandle = NULL;
+    p_session->p_nithandle = NULL;
     return p_session;;
+}
+
+static void scan_session_Delete( scan_session_t *p_session )
+{
+    for( size_t i=0; i< p_session->others.i_sdt; i++ )
+        dvbpsi_sdt_delete( p_session->others.pp_sdt[i] );
+    free( p_session->others.pp_sdt );
+
+    for( size_t i=0; i< p_session->others.i_nit; i++ )
+        dvbpsi_nit_delete( p_session->others.pp_nit[i] );
+    free( p_session->others.pp_nit );
+
+    if( p_session->p_pathandle )
+    {
+        dvbpsi_pat_detach( p_session->p_pathandle );
+        if( p_session->local.p_pat )
+            dvbpsi_pat_delete( p_session->local.p_pat );
+    }
+
+    if( p_session->p_sdthandle )
+    {
+        dvbpsi_DetachDemux( p_session->p_sdthandle );
+        if( p_session->local.p_sdt )
+            dvbpsi_sdt_delete( p_session->local.p_sdt );
+    }
+
+    if( p_session->p_nithandle )
+    {
+        dvbpsi_DetachDemux( p_session->p_nithandle );
+        if( p_session->local.p_nit )
+            dvbpsi_nit_delete( p_session->local.p_nit );
+    }
+
+    free( p_session );
 }
 
 void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 {
-    const int i_service_start = p_scan->i_service;
+//    const int i_service_start = p_scan->i_service;
 
-    dvbpsi_pat_t *p_pat = p_session->p_pat;
-    dvbpsi_sdt_t *p_sdt = p_session->p_sdt;
-    dvbpsi_nit_t *p_nit = p_session->p_nit;
+    dvbpsi_pat_t *p_pat = p_session->local.p_pat;
+    dvbpsi_sdt_t *p_sdt = p_session->local.p_sdt;
+    dvbpsi_nit_t *p_nit = p_session->local.p_nit;
 
+    /* Parse PAT (Declares only local services/programs) */
     if( p_pat )
-    {
-        /* Parse PAT */
-        dvbpsi_pat_program_t *p_program;
-        for( p_program = p_pat->p_first_program; p_program != NULL; p_program = p_program->p_next )
-        {
-            if( p_program->i_number == 0 )  /* NIT */
-                continue;
+        ParsePAT( p_scan->p_obj, p_scan, p_pat, &p_session->cfg );
 
-            scan_service_t *s = ScanFindService( p_scan, 0, p_program->i_number );
-            if( s == NULL )
-            {
-                s = scan_service_New( p_program->i_number, &p_session->cfg );
-                if( likely(s) )
-                    TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
-            }
-        }
-    }
-    /* Parse SDT */
-    if( p_pat && p_sdt )
-    {
-        dvbpsi_sdt_service_t *p_srv;
-        for( p_srv = p_sdt->p_first_service; p_srv; p_srv = p_srv->p_next )
-        {
-            scan_service_t *s = ScanFindService( p_scan, 0, p_srv->i_service_id );
-            dvbpsi_descriptor_t *p_dr;
+    /* Parse NIT (Declares local services/programs) */
+    if( p_nit )
+        ParseNIT( p_scan->p_obj, p_scan, p_nit, &p_session->cfg );
 
-            if( s )
-                s->b_crypted = p_srv->b_free_ca;
+    /* Parse SDT (Maps names to programs) */
+    if( p_sdt )
+        ParseSDT( p_scan->p_obj, p_scan, p_sdt, &p_session->cfg );
 
-            for( p_dr = p_srv->p_first_descriptor; p_dr; p_dr = p_dr->p_next )
-            {
-                if( p_dr->i_tag == 0x48 )
-                {
-                    dvbpsi_service_dr_t *pD = dvbpsi_DecodeServiceDr( p_dr );
-                    if( s && pD )
-                    {
-                        if( !s->psz_name )
-                            s->psz_name = vlc_from_EIT( pD->i_service_name,
-                                                   pD->i_service_name_length );
+    /* Do the same for all other networks */
+    for( size_t i=0; i<p_session->others.i_nit; i++ )
+        ParseNIT( p_scan->p_obj, p_scan, p_nit, NULL );
 
-                        if( s->type == SERVICE_UNKNOWN )
-                            s->type = scan_service_type( pD->i_service_type );
-                    }
-                }
-            }
-        }
-    }
-
-    /* Parse NIT */
-    if( p_pat && p_nit )
-    {
-        dvbpsi_nit_ts_t *p_ts;
-        for( p_ts = p_nit->p_first_ts; p_ts != NULL; p_ts = p_ts->p_next )
-        {
-            uint32_t i_private_data_id = 0;
-            dvbpsi_descriptor_t *p_dsc;
-
-            if( p_ts->i_orig_network_id != p_nit->i_network_id || p_ts->i_ts_id != p_pat->i_ts_id )
-                continue;
-
-            for( p_dsc = p_ts->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
-            {
-                /* Private data specifier descriptor */
-                if( p_dsc->i_tag == 0x5f && p_dsc->i_length > 3 )
-                {
-                    i_private_data_id = GetDWBE( &p_dsc->p_data[0] );
-                }
-                else if( i_private_data_id == 0x28 && p_dsc->i_tag == 0x83 )
-                {
-                    dvbpsi_lcn_dr_t *p_lc = dvbpsi_DecodeLCNDr( p_dsc );
-                    for( int i = 0; p_lc && i < p_lc->i_number_of_entries; i++ )
-                    {
-                        scan_service_t *s = ScanFindService( p_scan, i_service_start,
-                                                             p_lc->p_entries[i].i_service_id );
-                        if( s && s->i_channel < 0 )
-                            s->i_channel = p_lc->p_entries[i].i_logical_channel_number;
-                    }
-                }
-            }
-        }
-    }
+    /* Map service name for all other ts/networks */
+    for( size_t i=0; i<p_session->others.i_sdt; i++ )
+        ParseSDT( p_scan->p_obj, p_scan, p_sdt, NULL );
 
     /* */
-    for( int i = i_service_start; i < p_scan->i_service; i++ )
+#if 0
+    for( size_t i = i_service_start; i < p_scan->i_service; i++ )
     {
         scan_service_t *p_srv = p_scan->pp_service[i];
 
@@ -1039,30 +1207,21 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
             p_srv->i_nit_version = p_nit->i_version;
         }
     }
+#endif
 
     /* */
-    if( p_session->pat )
-        dvbpsi_pat_detach( p_session->pat );
-    if( p_session->p_pat )
-        dvbpsi_pat_delete( p_session->p_pat );
-
-    if( p_session->sdt )
-        dvbpsi_DetachDemux( p_session->sdt );
-    if( p_session->p_sdt )
-        dvbpsi_sdt_delete( p_session->p_sdt );
-
-    if( p_session->nit )
-        dvbpsi_DetachDemux( p_session->nit );
-    if( p_session->p_nit )
-        dvbpsi_nit_delete( p_session->p_nit );
-
-    free( p_session );
+    scan_session_Delete( p_session );
 }
 
 static int ScanServiceCmp( const void *a, const void *b )
 {
     scan_service_t *sa = *(scan_service_t**)a;
     scan_service_t *sb = *(scan_service_t**)b;
+
+    if( sa->i_ts_id < sb->i_ts_id )
+        return -1;
+    else if( sa->i_ts_id > sb->i_ts_id )
+        return 1;
 
     if( sa->i_channel == sb->i_channel )
     {
@@ -1104,7 +1263,7 @@ block_t *scan_GetM3U( scan_t *p_scan )
     /* */
     p_playlist = BlockString( "#EXTM3U\n\n" );/* */
 
-    for( int i = 0; i < p_scan->i_service; i++ )
+    for( size_t i = 0; i < p_scan->i_service; i++ )
     {
         scan_service_t *s = p_scan->pp_service[i];
 
@@ -1194,75 +1353,75 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
     const int i_pid = ( (p_block->p_buffer[1]&0x1f)<<8) | p_block->p_buffer[2];
     if( i_pid == 0x00 )
     {
-        if( !p_scan->pat )
+        if( !p_scan->p_pathandle )
         {
-            p_scan->pat = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
-            if( !p_scan->pat )
+            p_scan->p_pathandle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+            if( !p_scan->p_pathandle )
             {
                 block_Release( p_block );
                 return false;
             }
-            p_scan->pat->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
-            if( !dvbpsi_pat_attach( p_scan->pat, (dvbpsi_pat_callback)PATCallBack, p_scan ) )
+            p_scan->p_pathandle->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
+            if( !dvbpsi_pat_attach( p_scan->p_pathandle, (dvbpsi_pat_callback)PATCallBack, p_scan ) )
             {
-                dvbpsi_delete( p_scan->pat );
-                p_scan->pat = NULL;
+                dvbpsi_delete( p_scan->p_pathandle );
+                p_scan->p_pathandle = NULL;
                 block_Release( p_block );
                 return false;
             }
         }
-        if( p_scan->pat )
-            dvbpsi_packet_push( p_scan->pat, p_block->p_buffer );
+        if( p_scan->p_pathandle )
+            dvbpsi_packet_push( p_scan->p_pathandle, p_block->p_buffer );
     }
     else if( i_pid == 0x11 )
     {
-        if( !p_scan->sdt )
+        if( !p_scan->p_sdthandle )
         {
-            p_scan->sdt = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
-            if( !p_scan->sdt )
+            p_scan->p_sdthandle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+            if( !p_scan->p_sdthandle )
             {
                 block_Release( p_block );
                 return false;
             }
-            p_scan->sdt->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
-            if( !dvbpsi_AttachDemux( p_scan->sdt, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
+            p_scan->p_sdthandle->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
+            if( !dvbpsi_AttachDemux( p_scan->p_sdthandle, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
             {
-                dvbpsi_delete( p_scan->sdt );
-                p_scan->sdt = NULL;
+                dvbpsi_delete( p_scan->p_sdthandle );
+                p_scan->p_sdthandle = NULL;
                 block_Release( p_block );
                 return false;
             }
         }
 
-        if( p_scan->sdt )
-            dvbpsi_packet_push( p_scan->sdt, p_block->p_buffer );
+        if( p_scan->p_sdthandle )
+            dvbpsi_packet_push( p_scan->p_sdthandle, p_block->p_buffer );
     }
     else /*if( i_pid == p_scan->i_nit_pid )*/
     {
-        if( !p_scan->nit )
+        if( !p_scan->p_nithandle )
         {
-            p_scan->nit = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
-            if( !p_scan->nit )
+            p_scan->p_nithandle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+            if( !p_scan->p_nithandle )
             {
                 block_Release( p_block );
                 return false;
             }
-            p_scan->nit->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
-            if( !dvbpsi_AttachDemux( p_scan->nit, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
+            p_scan->p_nithandle->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
+            if( !dvbpsi_AttachDemux( p_scan->p_nithandle, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
             {
-                dvbpsi_delete( p_scan->nit );
-                p_scan->nit = NULL;
+                dvbpsi_delete( p_scan->p_nithandle );
+                p_scan->p_nithandle = NULL;
                 block_Release( p_block );
                 return false;
             }
         }
-        if( p_scan->nit )
-            dvbpsi_packet_push( p_scan->nit, p_block->p_buffer );
+        if( p_scan->p_nithandle )
+            dvbpsi_packet_push( p_scan->p_nithandle, p_block->p_buffer );
     }
 
     block_Release( p_block );
 
-    return p_scan->p_pat && p_scan->p_sdt && p_scan->p_nit;
+    return p_scan->local.p_pat && p_scan->local.p_sdt && p_scan->local.p_nit;
 }
 
 void scan_session_SetSNR( scan_session_t *p_session, int i_snr )

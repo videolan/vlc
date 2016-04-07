@@ -214,7 +214,7 @@ static block_t *BlockScan( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     scan_t *p_scan = p_sys->scan;
-    scan_configuration_t cfg;
+    scan_tuner_config_t cfg;
 
     /* */
     if( scan_Next( p_scan, &cfg ) )

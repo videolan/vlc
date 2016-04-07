@@ -29,6 +29,20 @@ typedef enum
     SCAN_DVB_C,
 } scan_type_t;
 
+typedef struct
+{
+    unsigned i_frequency;
+    union
+    {
+        unsigned i_bandwidth;
+        unsigned i_symbolrate;
+    };
+    int i_fec;
+    int i_modulation;
+    char c_polarization;
+
+} scan_tuner_config_t;
+
 typedef struct scan_parameter_t
 {
     scan_type_t type;
@@ -59,20 +73,6 @@ typedef struct scan_parameter_t
 
 } scan_parameter_t;
 
-typedef struct
-{
-    int i_frequency;
-    union
-    {
-        int i_bandwidth;
-        int i_symbol_rate;
-    };
-    int i_fec;
-    int i_modulation;
-    int i_symbolrate;
-    char c_polarization;
-} scan_configuration_t;
-
 typedef struct scan_t scan_t;
 
 void scan_parameter_Init( scan_parameter_t * );
@@ -81,7 +81,7 @@ void scan_parameter_Clean( scan_parameter_t * );
 scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter );
 void scan_Destroy( scan_t *p_scan );
 
-int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg );
+int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg );
 
 block_t *scan_GetM3U( scan_t *p_scan );
 bool scan_IsCancelled( scan_t *p_scan );
@@ -89,7 +89,7 @@ bool scan_IsCancelled( scan_t *p_scan );
 typedef struct scan_session_t scan_session_t;
 
 scan_session_t *scan_session_New( vlc_object_t *,
-                                  const scan_configuration_t * );
+                                  const scan_tuner_config_t * );
 void scan_session_Destroy( scan_t *, scan_session_t * );
 bool scan_session_Push( scan_session_t *p_scan, block_t *p_block );
 void scan_session_SetSNR( scan_session_t *p_scan, int i_snr );
