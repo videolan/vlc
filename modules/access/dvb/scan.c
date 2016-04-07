@@ -808,9 +808,8 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 
         uint32_t i_private_data_id = 0;
         dvbpsi_descriptor_t *p_dsc;
-        scan_configuration_t cfg, *p_cfg = &cfg;
+        scan_configuration_t cfg = { 0 };
 
-        memset(p_cfg,0,sizeof(*p_cfg));
         for( p_dsc = p_ts->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
         {
             if( p_dsc->i_tag == 0x41 )
@@ -824,7 +823,7 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                     if( (ScanFindService( p_scan, 0, i_service_id ) == NULL) &&
                          scan_service_type( i_service_type ) != SERVICE_UNKNOWN )
                     {
-                        scan_service_t *s = scan_service_New( i_service_id, p_cfg );
+                        scan_service_t *s = scan_service_New( i_service_id, &cfg );
                         if( likely(s) )
                         {
                             s->type          = scan_service_type( i_service_type );
@@ -853,12 +852,12 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                 dvbpsi_cable_deliv_sys_dr_t *p_t = dvbpsi_DecodeCableDelivSysDr( p_dsc );
                 msg_Dbg( p_obj, "       * Cable delivery system");
 
-                p_cfg->i_frequency =  decode_BCD( p_t->i_frequency ) * 100;
-                msg_Dbg( p_obj, "           * frequency %d", p_cfg->i_frequency );
-                p_cfg->i_symbolrate =  decode_BCD( p_t->i_symbol_rate ) * 100;
-                msg_Dbg( p_obj, "           * symbolrate %u", p_cfg->i_symbolrate );
-                p_cfg->i_modulation = (8 << p_t->i_modulation);
-                msg_Dbg( p_obj, "           * modulation %u", p_cfg->i_modulation );
+                cfg.i_frequency =  decode_BCD( p_t->i_frequency ) * 100;
+                msg_Dbg( p_obj, "           * frequency %d", cfg.i_frequency );
+                cfg.i_symbolrate =  decode_BCD( p_t->i_symbol_rate ) * 100;
+                msg_Dbg( p_obj, "           * symbolrate %u", cfg.i_symbolrate );
+                cfg.i_modulation = (8 << p_t->i_modulation);
+                msg_Dbg( p_obj, "           * modulation %u", cfg.i_modulation );
             }
             else if( p_dsc->i_tag == 0x5f )
             {
