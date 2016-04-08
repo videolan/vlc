@@ -230,6 +230,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->offset = 0;
     p_sys->size = 0;
     p_access->info.b_eof  = false;
+    p_access->p_sys = p_sys;
 
     /* Only forward an store cookies if the corresponding option is activated */
     if( var_CreateGetBool( p_access, "http-forward-cookies" ) )
@@ -350,8 +351,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_reconnect = var_InheritBool( p_access, "http-reconnect" );
     p_sys->b_continuous = var_InheritBool( p_access, "http-continuous" );
-
-    p_access->p_sys = p_sys;
 
     if( vlc_credential_get( &credential, p_access, NULL, NULL, NULL, NULL ) )
     {
