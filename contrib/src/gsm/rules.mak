@@ -11,6 +11,7 @@ gsm: libgsm_$(GSM_VERSION).tar.gz .sum-gsm
 	$(UNPACK)
 	mv gsm-1.0-* libgsm_$(GSM_VERSION)
 	$(APPLY) $(SRC)/gsm/gsm-cross.patch
+	$(APPLY) $(SRC)/gsm/gsm-missing-include.patch
 	sed -e 's/^CFLAGS.*=/CFLAGS+=/' -i.orig libgsm_$(GSM_VERSION)/Makefile
 	$(MOVE)
 

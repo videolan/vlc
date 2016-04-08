@@ -1,0 +1,11 @@
+diff -ru gsm-broken/src/code.c gsm/src/code.c
+--- gsm-broken/src/code.c	2006-04-26 21:16:50.000000000 +0200
++++ gsm/src/code.c	2016-04-05 17:13:19.000000000 +0200
+@@ -19,6 +19,7 @@
+ #include	"private.h"
+ #include	"gsm.h"
+ #include	"proto.h"
++#include	<string.h>
+ 
+ /* 
+  *  4.2 FIXED POINT IMPLEMENTATION OF THE RPE-LTP CODER 
