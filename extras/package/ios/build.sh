@@ -282,6 +282,8 @@ fi
     --enable-ass \
     --disable-fontconfig \
     --disable-gpg-error \
+    --disable-vncclient \
+    --disable-gnutls \
     --disable-lua \
     --disable-protobuf \
     --disable-aribb24 \
