@@ -4812,8 +4812,7 @@ static int DemuxAsLeaf( demux_t *p_demux )
 
         if ( p_sys->context.i_current_box_type != ATOM_mdat )
         {
-            const int i_tell = stream_Tell( p_demux->s );
-            if ( i_tell >= 0 && ! BoxExistsInRootTree( p_sys->p_root, p_sys->context.i_current_box_type, (uint64_t)i_tell ) )
+            if ( !BoxExistsInRootTree( p_sys->p_root, p_sys->context.i_current_box_type, stream_Tell( p_demux->s ) ) )
             {// only if !b_probed ??
                 MP4_Box_t *p_vroot = MP4_BoxGetNextChunk( p_demux->s );
                 if(!p_vroot)
