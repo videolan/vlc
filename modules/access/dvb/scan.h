@@ -42,22 +42,13 @@ typedef struct scan_parameter_t
     int i_symbolrate;
     struct
     {
-        int i_min;
-        int i_max;
-        int i_step;
+        unsigned i_min;
+        unsigned i_max;
+        unsigned i_step;
 
         unsigned i_count;    /* Number of frequency test to do */
-    } frequency;
-
-    struct
-    {
-        /* Bandwidth should be 6, 7 or 8 */
-        int i_min;
-        int i_max;
-        int i_step;
-
-        unsigned i_count;
-    } bandwidth;
+    } frequency,
+      bandwidth; /* Bandwidth should be 6, 7 or 8 */
 
     char *psz_scanlist_file;
     enum

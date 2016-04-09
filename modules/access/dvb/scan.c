@@ -438,12 +438,12 @@ static int ScanDvbTNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
             continue;
         }
 
-        const int i_frequency_min = band[i].i_min*i_mhz + i_bandwidth*i_mhz/2;
-        const int i_frequency_base = i_fi*i_mhz;
+        const unsigned i_frequency_min = band[i].i_min*i_mhz + i_bandwidth*i_mhz/2;
+        const unsigned i_frequency_base = i_fi*i_mhz;
 
         if( i_frequency_base >= i_frequency_min && ( i_frequency_base - i_frequency_min ) % ( i_bandwidth*i_mhz ) == 0 )
         {
-            const int i_frequency = i_frequency_base + ( i_oi - i_offset_count/2 ) * p_scan->parameter.frequency.i_step;
+            const unsigned i_frequency = i_frequency_base + ( i_oi - i_offset_count/2 ) * p_scan->parameter.frequency.i_step;
 
             if( i_frequency < p_scan->parameter.frequency.i_min ||
                 i_frequency > p_scan->parameter.frequency.i_max )
