@@ -2052,6 +2052,28 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
     }
 }
 
+static int IsVideoEnd( ts_pid_t *p_pid )
+{
+    /* jump to near end of PES packet */
+    block_t *p = p_pid->u.p_pes->p_data;
+    if( !p || !p->p_next )
+        return 0;
+    while( p->p_next->p_next )
+        p = p->p_next;
+    if( p->p_next->i_buffer > 4)
+        p = p->p_next;
+
+    /* extract last bytes */
+    uint8_t tail[ 188 ];
+    const int i_tail = block_ChainExtract( p, tail, sizeof( tail ) );
+    if( i_tail < 4 )
+        return 0;
+
+    /* check for start code at end */
+    return ( tail[ i_tail - 4 ] == 0 && tail[ i_tail - 3 ] == 0 && tail[ i_tail - 2 ] == 1 &&
+             ( tail[ i_tail - 1 ] == 0xb7 ||  tail[ i_tail - 1 ] == 0x0a ) );
+}
+
 static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
 {
     for( int i=0; i<p_pmt->e_streams.i_size; i++ )
@@ -2064,6 +2086,13 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
         if( p_pid->u.p_pes->p_data == NULL )
             continue;
         if( p_pid->u.p_pes->i_data_size != 0 )
+            continue;
+
+        /* check only MPEG2, H.264 and VC-1 */
+        ts_pes_es_t *p_es = p_pid->u.p_pes->p_es;
+        if( p_es->fmt.i_codec != VLC_CODEC_MPGV &&
+            p_es->fmt.i_codec != VLC_CODEC_H264 &&
+            p_es->fmt.i_codec != VLC_CODEC_VC1 )
             continue;
 
         uint8_t header[34];
@@ -2096,7 +2125,12 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
         if(( i_dts > VLC_TS_INVALID && i_dts <= i_pcr ) ||
            ( i_pts > VLC_TS_INVALID && i_pts <= i_pcr ))
         {
-            ParsePESDataChain( p_demux, p_pid );
+            if( IsVideoEnd( p_pid ) )
+            {
+                msg_Warn( p_demux, "send queued data for pid %d: TS %"PRId64" <= PCR %"PRId64"\n",
+                          p_pid->i_pid, i_dts > VLC_TS_INVALID ? i_dts : i_pts, i_pcr);
+                ParsePESDataChain( p_demux, p_pid );
+            }
         }
     }
 }
