@@ -941,6 +941,21 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                     msg_Dbg( p_obj, "           * other_frequency_flag %d", p_t->i_other_frequency_flag );
                 }
             }
+            else if( p_dsc->i_tag == 0x43 )
+            {
+                dvbpsi_sat_deliv_sys_dr_t *p_s = dvbpsi_DecodeSatDelivSysDr( p_dsc );
+                if( p_s )
+                {
+                    tscfg.i_frequency =  decode_BCD( p_s->i_frequency ) * 1000;
+                    tscfg.i_symbolrate =  decode_BCD( p_s->i_symbol_rate ) * 100;
+                    const char polarizations[] = { 'H', 'V', 'L', 'R' };
+                    tscfg.c_polarization = polarizations[p_s->i_polarization];
+                    msg_Dbg( p_obj, "       * satellite delivery system" );
+                    msg_Dbg( p_obj, "           * frequency %u", tscfg.i_frequency );
+                    msg_Dbg( p_obj, "           * symbolrate %u", tscfg.i_symbolrate );
+                    msg_Dbg( p_obj, "           * polarization %c", tscfg.c_polarization );
+                }
+            }
             else if( p_dsc->i_tag == 0x44 )
             {
                 dvbpsi_cable_deliv_sys_dr_t *p_t = dvbpsi_DecodeCableDelivSysDr( p_dsc );
