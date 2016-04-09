@@ -911,9 +911,28 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 dvbpsi_terr_deliv_sys_dr_t *p_t = dvbpsi_DecodeTerrDelivSysDr( p_dsc );
                 if( p_t )
                 {
+                    /* Invalid / broken transponder on French TNT */
+                    if( p_t->i_centre_frequency == UINT32_MAX )
+                        p_t->i_centre_frequency = 0;
+                    tscfg.i_frequency =  p_t->i_centre_frequency / 10;
+                    tscfg.i_bandwidth =  8 - p_t->i_bandwidth;
+                    switch(p_t->i_constellation)
+                    {
+                        default:
+                        case 0x00:
+                            tscfg.i_modulation = -1;
+                            break;
+                        case 0x01:
+                            tscfg.i_modulation = 16;
+                            break;
+                        case 0x02:
+                            tscfg.i_modulation = 64;
+                            break;
+                    }
+
                     msg_Dbg( p_obj, "       * terrestrial delivery system" );
-                    msg_Dbg( p_obj, "           * centre_frequency 0x%x", p_t->i_centre_frequency  );
-                    msg_Dbg( p_obj, "           * bandwidth %d", 8 - p_t->i_bandwidth );
+                    msg_Dbg( p_obj, "           * centre_frequency %u", p_t->i_centre_frequency / 10 );
+                    msg_Dbg( p_obj, "           * bandwidth %u", 8 - p_t->i_bandwidth );
                     msg_Dbg( p_obj, "           * constellation %d", p_t->i_constellation );
                     msg_Dbg( p_obj, "           * hierarchy %d", p_t->i_hierarchy_information );
                     msg_Dbg( p_obj, "           * code_rate hp %d lp %d", p_t->i_code_rate_hp_stream, p_t->i_code_rate_lp_stream );
