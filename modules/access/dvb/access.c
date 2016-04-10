@@ -230,7 +230,7 @@ static block_t *BlockScan( access_t *p_access )
     }
 
     /* */
-    scan_session_t *session = scan_session_New( VLC_OBJECT(p_access), &cfg );
+    scan_session_t *session = scan_session_New( p_scan, &cfg );
     if( session == NULL )
         return NULL;
 

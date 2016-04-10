@@ -126,6 +126,7 @@ struct scan_session_t
         size_t i_nit;
     } others;
 
+    bool b_use_nit;
     uint16_t i_nit_pid;
 
     dvbpsi_t *p_pathandle;
@@ -1141,19 +1142,19 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id, uint16_t i_ext
     }
 }
 
-scan_session_t *scan_session_New( vlc_object_t *p_obj,
-                                  const scan_tuner_config_t *p_cfg )
+scan_session_t *scan_session_New( scan_t *p_scan, const scan_tuner_config_t *p_cfg )
 {
     scan_session_t *p_session = malloc( sizeof( *p_session ) );
     if( unlikely(p_session == NULL) )
         return NULL;
-    p_session->p_obj = p_obj;
+    p_session->p_obj = p_scan->p_obj;
     p_session->cfg = *p_cfg;
     p_session->i_snr = -1;
     p_session->local.p_pat = NULL;
     p_session->local.p_sdt = NULL;
     p_session->local.p_nit = NULL;
     p_session->i_nit_pid = -1;
+    p_session->b_use_nit = p_scan->parameter.b_use_nit;
     p_session->others.i_nit = 0;
     p_session->others.i_sdt = 0;
     p_session->others.pp_nit = NULL;
