@@ -62,6 +62,8 @@ static void Close( vlc_object_t *p_this );
 #define SCANLIST_TEXT N_("Scan tuning list")
 #define SCANLIST_LONGTEXT N_("filename containing initial scan tuning data")
 
+#define SCAN_NIT_TEXT N_("Use NIT for scanning services")
+
 vlc_module_begin ()
     set_shortname( N_("DVB") )
     set_description( N_("DVB input with v4l2 support") )
@@ -74,6 +76,7 @@ vlc_module_begin ()
                 true )
     add_string( "dvb-scanlist", NULL, SCANLIST_TEXT, SCANLIST_LONGTEXT,
                 true )
+    add_bool( "dvb-scan-nit", true, SCAN_NIT_TEXT, NULL, true )
 
     set_capability( "access", 0 )
     add_shortcut( "dvb",                        /* Generic name */
@@ -164,10 +167,13 @@ static int Open( vlc_object_t *p_this )
 
         scan_parameter_Init( &parameter );
 
+        parameter.b_use_nit = var_GetBool( p_access, "dvb-scan-nit" );
+
         msg_Dbg( p_access, "setting filter on PAT/NIT/SDT (DVB only)" );
         FilterSet( p_access, 0x00, OTHER_TYPE );    // PAT
-        FilterSet( p_access, 0x10, OTHER_TYPE );    // NIT
         FilterSet( p_access, 0x11, OTHER_TYPE );    // SDT
+        if( parameter.b_use_nit )
+            FilterSet( p_access, 0x10, OTHER_TYPE );    // NIT
 
         if( FrontendFillScanParameter( p_access, &parameter ) ||
             (p_scan = scan_New( VLC_OBJECT(p_access), &parameter )) == NULL )

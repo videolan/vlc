@@ -1431,7 +1431,7 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
         if( p_scan->p_sdthandle )
             dvbpsi_packet_push( p_scan->p_sdthandle, p_block->p_buffer );
     }
-    else /*if( i_pid == p_scan->i_nit_pid )*/
+    else if( p_scan->b_use_nit ) /*if( i_pid == p_scan->i_nit_pid )*/
     {
         if( !p_scan->p_nithandle )
         {
@@ -1456,7 +1456,8 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
 
     block_Release( p_block );
 
-    return p_scan->local.p_pat && p_scan->local.p_sdt && p_scan->local.p_nit;
+    return p_scan->local.p_pat && p_scan->local.p_sdt &&
+            (!p_scan->b_use_nit || p_scan->local.p_nit);
 }
 
 void scan_session_SetSNR( scan_session_t *p_session, int i_snr )
