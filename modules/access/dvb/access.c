@@ -338,7 +338,10 @@ static block_t *BlockScan( access_t *p_access )
             if( !FrontendGetStatistic( p_access, &stat ) )
             {
                 if( stat.i_snr > i_best_snr )
+                {
                     i_best_snr = stat.i_snr;
+                    scan_session_SetSNR( session, i_best_snr );
+                }
             }
         }
 
@@ -373,10 +376,6 @@ static block_t *BlockScan( access_t *p_access )
             }
         }
     }
-
-    /* */
-    if( i_best_snr > 0 )
-        scan_session_SetSNR( session, i_best_snr );
 
     scan_session_Destroy( p_scan, session );
     return NULL;

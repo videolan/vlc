@@ -59,6 +59,8 @@
 #define SDT_CURRENT_TS_TABLE_ID         0x42
 #define SDT_OTHER_TS_TABLE_ID           0x46
 
+#define NETWORK_ID_RESERVED             0x0000
+
 typedef enum
 {
     SERVICE_UNKNOWN = 0,
@@ -68,25 +70,38 @@ typedef enum
     SERVICE_DIGITAL_TELEVISION_AC_HD,
 } scan_service_type_t;
 
+typedef struct scan_multiplex_t scan_multiplex_t;
+
 typedef struct
 {
-    uint16_t i_ts_id;
+    const scan_multiplex_t *p_mplex; /* multiplex reference */
+
+    uint16_t i_original_network_id;
     uint16_t i_program;     /* program number (service id) */
-    scan_tuner_config_t cfg;
-    int i_snr;
 
     scan_service_type_t type;
-    char *psz_name;     /* channel name in utf8 or NULL */
-    int  i_channel;     /* -1 if unknown */
+
+    char *psz_name;     /* channel name in utf8 */
+    uint16_t i_channel; /* logical channel number */
     bool b_crypted;     /* True if potentially crypted */
 
-    int i_network_id;
-    char *psz_network_name;
-
-    int i_nit_version;
-    int i_sdt_version;
+    char *psz_original_network_name;
 
 } scan_service_t;
+
+struct scan_multiplex_t
+{
+    scan_tuner_config_t cfg;
+    uint16_t         i_network_id;
+    uint16_t         i_ts_id;
+    char            *psz_network_name;
+    size_t           i_services;
+    scan_service_t **pp_services;
+    int i_snr;
+
+    uint8_t i_nit_version;
+    uint8_t i_sdt_version;
+};
 
 struct scan_t
 {
@@ -96,8 +111,10 @@ struct scan_t
     scan_parameter_t parameter;
     int64_t i_time_start;
 
-    size_t            i_service;
-    scan_service_t **pp_service;
+    size_t i_total_services;
+
+    size_t             i_multiplex;
+    scan_multiplex_t **pp_multiplex;
 
     scan_list_entry_t *p_scanlist;
     size_t             i_scanlist;
@@ -136,35 +153,34 @@ struct scan_session_t
 };
 
 /* */
-static scan_service_t *scan_service_New( uint16_t i_ts_id, uint16_t i_program,
-                                         const scan_tuner_config_t *p_cfg )
+static void scan_tuner_config_Init( scan_tuner_config_t *p_cfg )
+{
+    memset( p_cfg, 0, sizeof(*p_cfg) );
+    p_cfg->i_fec = 9; /* FEC_AUTO */
+}
+
+static scan_service_t *scan_service_New( uint16_t i_program )
 {
     scan_service_t *p_srv = malloc( sizeof(*p_srv) );
     if( !p_srv )
         return NULL;
 
-    p_srv->i_ts_id = i_ts_id;
+    p_srv->p_mplex = NULL;
     p_srv->i_program = i_program;
-    p_srv->cfg = *p_cfg;
-    p_srv->i_snr = -1;
+    p_srv->i_original_network_id = NETWORK_ID_RESERVED;
 
     p_srv->type = SERVICE_UNKNOWN;
     p_srv->psz_name = NULL;
+    p_srv->psz_original_network_name = NULL;
     p_srv->i_channel = -1;
     p_srv->b_crypted = false;
-
-    p_srv->i_network_id = -1;
-    p_srv->i_nit_version = -1;
-    p_srv->i_sdt_version = -1;
-
-    p_srv->psz_network_name = NULL;
 
     return p_srv;
 }
 
 static void scan_service_Delete( scan_service_t *p_srv )
 {
-    free( p_srv->psz_network_name );
+    free( p_srv->psz_original_network_name );
     free( p_srv->psz_name );
     free( p_srv );
 }
@@ -190,6 +206,64 @@ static int scan_service_type( int service_type )
     case 0x19: return SERVICE_DIGITAL_TELEVISION_AC_HD;
     default:   return SERVICE_UNKNOWN;
     }
+}
+
+static scan_multiplex_t *scan_multiplex_New( const scan_tuner_config_t *p_cfg, uint16_t i_ts_id )
+{
+    scan_multiplex_t *p_mplex = malloc( sizeof(*p_mplex) );
+    if( likely(p_mplex) )
+    {
+        p_mplex->cfg = *p_cfg;
+        p_mplex->i_ts_id = i_ts_id;
+        p_mplex->i_network_id = NETWORK_ID_RESERVED;
+        p_mplex->psz_network_name = NULL;
+        p_mplex->i_services = 0;
+        p_mplex->pp_services = NULL;
+        p_mplex->i_nit_version = UINT8_MAX;
+        p_mplex->i_sdt_version = UINT8_MAX;
+        p_mplex->i_snr = -1;
+    }
+    return p_mplex;
+}
+
+static void scan_multiplex_Clean( scan_multiplex_t *p_mplex )
+{
+    for( size_t i=0; i<p_mplex->i_services; i++ )
+        scan_service_Delete( p_mplex->pp_services[i] );
+    free( p_mplex->pp_services );
+    free( p_mplex->psz_network_name );
+}
+
+static void scan_multiplex_Delete( scan_multiplex_t *p_mplex )
+{
+    scan_multiplex_Clean( p_mplex );
+    free( p_mplex );
+}
+
+static bool scan_multiplex_AddService( scan_multiplex_t *p_mplex, scan_service_t *p_service )
+{
+    if( unlikely(p_service->p_mplex) ) /* Already belongs to another multiplex, should never happen */
+        return false;
+
+    scan_service_t **pp_realloc = realloc( p_mplex->pp_services,
+                                           sizeof(scan_service_t *) * (p_mplex->i_services + 1) );
+    if( unlikely(!pp_realloc) )
+        return false;
+    pp_realloc[p_mplex->i_services] = p_service;
+    p_mplex->pp_services = pp_realloc;
+    p_mplex->i_services++;
+    p_service->p_mplex = p_mplex;
+    return true;
+}
+
+static scan_service_t * scan_multiplex_FindService( const scan_multiplex_t *p_mplex, uint16_t i_program )
+{
+    for( size_t i = 0; i < p_mplex->i_services; i++ )
+    {
+        if( p_mplex->pp_services[i]->i_program == i_program )
+            return p_mplex->pp_services[i];
+    }
+    return NULL;
 }
 
 void scan_parameter_Init( scan_parameter_t *p_dst )
@@ -272,7 +346,9 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
     p_scan->p_obj = VLC_OBJECT(p_obj);
     p_scan->i_index = 0;
     p_scan->p_dialog_id = NULL;
-    TAB_INIT( p_scan->i_service, p_scan->pp_service );
+    p_scan->i_multiplex = 0;
+    p_scan->pp_multiplex = NULL;
+    p_scan->i_total_services = 0;
     scan_parameter_Init( &p_scan->parameter );
     scan_parameter_Copy( p_parameter, &p_scan->parameter );
     p_scan->i_time_start = mdate();
@@ -296,18 +372,54 @@ void scan_Destroy( scan_t *p_scan )
 
     scan_parameter_Clean( &p_scan->parameter );
 
-    for( size_t i = 0; i < p_scan->i_service; i++ )
-        scan_service_Delete( p_scan->pp_service[i] );
-    TAB_CLEAN( p_scan->i_service, p_scan->pp_service );
+    for( size_t i = 0; i < p_scan->i_multiplex; i++ )
+        scan_multiplex_Delete( p_scan->pp_multiplex[i] );
+    free( p_scan->pp_multiplex );
 
     scan_list_entries_release( p_scan->p_scanlist );
 
     free( p_scan );
 }
 
-static void scan_AddService( scan_t *p_scan, scan_service_t *p_service )
+static bool scan_AddMultiplex( scan_t *p_scan, scan_multiplex_t *p_mplex )
 {
-    TAB_APPEND( p_scan->i_service, p_scan->pp_service, p_service );
+    scan_multiplex_t **pp_realloc = realloc( p_scan->pp_multiplex,
+                                             sizeof(scan_multiplex_t *) * (p_scan->i_multiplex + 1) );
+    if( unlikely(!pp_realloc) )
+        return false;
+    pp_realloc[p_scan->i_multiplex] = p_mplex;
+    p_scan->pp_multiplex = pp_realloc;
+    p_scan->i_multiplex++;
+    return true;
+}
+
+static scan_multiplex_t * scan_FindMultiplex( const scan_t *p_scan, uint16_t i_ts_id )
+{
+    for( size_t i = 0; i < p_scan->i_multiplex; i++ )
+    {
+        if( p_scan->pp_multiplex[i]->i_ts_id == i_ts_id )
+            return p_scan->pp_multiplex[i];
+    }
+    return NULL;
+}
+
+static scan_multiplex_t *scan_FindOrCreateMultiplex( scan_t *p_scan, uint16_t i_ts_id,
+                                                     const scan_tuner_config_t *p_cfg )
+{
+    scan_multiplex_t *p_mplex = scan_FindMultiplex( p_scan, i_ts_id );
+    if( p_mplex == NULL )
+    {
+        p_mplex = scan_multiplex_New( p_cfg, i_ts_id );
+        if( likely(p_mplex) )
+        {
+            if ( unlikely(!scan_AddMultiplex( p_scan, p_mplex )) ) /* OOM */
+            {
+                scan_multiplex_Delete( p_mplex );
+                return NULL;
+            }
+        }
+    }
+    return p_mplex;
 }
 
 static int ScanDvbv5NextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
@@ -505,26 +617,33 @@ static int ScanDvbCNext( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_
        pp_services for all that doesn't have name yet (tune to that cfg and get SDT and name
        for channel).
      */
-    for( size_t i = 0; i < p_scan->i_service; i++ )
+
+    size_t i_index = 0;
+    for( size_t i = 0; i < p_scan->i_multiplex; i++ )
     {
+        const scan_multiplex_t *p_mplex = p_scan->pp_multiplex[i];
         /* We found radio/tv config that doesn't have a name,
            lets tune to that mux
          */
-        if( !p_scan->pp_service[i]->psz_name && ( p_scan->pp_service[i]->type != SERVICE_UNKNOWN ) )
+        for( size_t j = 0; j < p_mplex->i_services; j++ )
         {
-            p_cfg->i_frequency  = p_scan->pp_service[i]->cfg.i_frequency;
-            p_cfg->i_symbolrate = p_scan->pp_service[i]->cfg.i_symbolrate;
-            p_cfg->i_modulation = p_scan->pp_service[i]->cfg.i_modulation;
-            p_scan->i_index = i+1;
-            msg_Dbg( p_scan->p_obj, "iterating to freq: %u, symbolrate %u, "
-                     "modulation %u index %"PRId64"/%ld",
-                     p_cfg->i_frequency, p_cfg->i_symbolrate, p_cfg->i_modulation, p_scan->i_index, p_scan->i_service );
-            *pf_pos = (double)i/p_scan->i_service;
-            return VLC_SUCCESS;
+            i_index++;
+            if( !p_mplex->pp_services[i]->psz_name &&
+               ( p_mplex->pp_services[i]->type != SERVICE_UNKNOWN ) )
+            {
+                *p_cfg = p_mplex->cfg;
+                msg_Dbg( p_scan->p_obj, "iterating to freq: %u, symbolrate %u, "
+                         "modulation %u index %"PRId64"/%ld",
+                         p_cfg->i_frequency, p_cfg->i_symbolrate, p_cfg->i_modulation,
+                         p_scan->i_index, p_scan->i_total_services );
+                p_scan->i_index = i_index;
+                *pf_pos = (double)i/p_scan->i_total_services;
+                return VLC_SUCCESS;
+            }
         }
     }
     /* We should have iterated all channels by now */
-    if( p_scan->i_service )
+    if( p_scan->i_total_services )
         return VLC_EGENERIC;
 
     if( !b_servicefound )
@@ -607,7 +726,7 @@ int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
     if( scan_IsCancelled( p_scan ) )
         return VLC_EGENERIC;
 
-    memset( p_cfg, 0, sizeof(*p_cfg) );
+    scan_tuner_config_Init( p_cfg );
     switch( p_scan->parameter.type )
     {
     case SCAN_DVB_T:
@@ -627,12 +746,15 @@ int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
     if( i_ret )
         return i_ret;
 
-    int i_service = 0;
-
-    for( size_t i = 0; i < p_scan->i_service; i++ )
+    p_scan->i_total_services = 0;
+    for( size_t j = 0; j < p_scan->i_multiplex; j++ )
     {
-        if( p_scan->pp_service[i]->psz_name )
-            i_service++;
+        scan_multiplex_t *p_mplex = p_scan->pp_multiplex[j];
+        for( size_t i = 0; i < p_mplex->i_services; i++ )
+        {
+         //   if( p_mplex->pp_services[i]->psz_name )
+                p_scan->i_total_services++;
+        }
     }
 
     const mtime_t i_eta = f_position > 0.005 ? (mdate() - p_scan->i_time_start) * ( 1.0 / f_position - 1.0 ) : -1;
@@ -649,7 +771,7 @@ int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
                                          f_position, _("Cancel"),
                                          _("Scanning DVB"), psz_fmt,
                                          (double)p_cfg->i_frequency / 1000000,
-                                         i_service,
+                                         p_scan->i_total_services,
                                          secstotimestr( psz_eta, i_eta/1000000 ) );
     }
     else
@@ -657,7 +779,7 @@ int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
         vlc_dialog_update_progress_text( p_scan->p_obj, p_scan->p_dialog_id,
                                          f_position, psz_fmt,
                                          (double)p_cfg->i_frequency / 1000000,
-                                         i_service,
+                                         p_scan->i_total_services,
                                          secstotimestr( psz_eta, i_eta/1000000 ) );
     }
 
@@ -670,18 +792,6 @@ bool scan_IsCancelled( scan_t *p_scan )
     if( p_scan->p_dialog_id == NULL )
         return false;
     return vlc_dialog_is_cancelled( p_scan->p_obj, p_scan->p_dialog_id );
-}
-
-static scan_service_t *ScanFindService( scan_t *p_scan, size_t i_service_start,
-                                        uint16_t i_program, uint16_t i_ts_id )
-{
-    for( size_t i = i_service_start; i < p_scan->i_service; i++ )
-    {
-        if( p_scan->pp_service[i]->i_program == i_program &&
-            p_scan->pp_service[i]->i_ts_id == i_ts_id )
-            return p_scan->pp_service[i];
-    }
-    return NULL;
 }
 
 static bool GetOtherNetworkNIT( scan_session_t *p_session, uint16_t i_network_id,
@@ -718,19 +828,29 @@ static void ParsePAT( vlc_object_t *p_obj, scan_t *p_scan,
                       const dvbpsi_pat_t *p_pat, const scan_tuner_config_t *p_cfg )
 {
     VLC_UNUSED(p_obj);
+    /* PAT must not create new service without proper config ( local ) */
+    if( !p_cfg )
+        return;
+
+    scan_multiplex_t *p_mplex = scan_FindOrCreateMultiplex( p_scan, p_pat->i_ts_id, p_cfg );
+    if( unlikely(p_mplex == NULL) )
+        return;
+
     const dvbpsi_pat_program_t *p_program;
     for( p_program = p_pat->p_first_program; p_program != NULL; p_program = p_program->p_next )
     {
         if( p_program->i_number == 0 )  /* NIT */
             continue;
 
-        /* PAT must not create new service without proper config ( local ) */
-        scan_service_t *s = ScanFindService( p_scan, 0, p_program->i_number, p_pat->i_ts_id );
-        if( s == NULL && p_cfg )
+        scan_service_t *s = scan_multiplex_FindService( p_mplex, p_program->i_number );
+        if( s == NULL )
         {
-            s = scan_service_New( p_pat->i_ts_id, p_program->i_number, p_cfg );
+            s = scan_service_New( p_program->i_number );
             if( likely(s) )
-                scan_AddService( p_scan, s );
+            {
+                if( !scan_multiplex_AddService( p_mplex, s ) ) /* OOM */
+                    scan_service_Delete( s );
+            }
         }
     }
 }
@@ -772,19 +892,37 @@ static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan,
                       const dvbpsi_sdt_t *p_sdt, const scan_tuner_config_t *p_cfg )
 {
     VLC_UNUSED(p_obj);
+    scan_multiplex_t *p_mplex;
+    if( p_cfg )
+    {
+        /* SDT must not create new service without proper config ( local )
+           or it must has been created by another network NIT (providing freq) */
+        p_mplex = scan_FindOrCreateMultiplex( p_scan, p_sdt->i_extension, p_cfg );
+    }
+    else
+    {
+        p_mplex = scan_FindMultiplex( p_scan, p_sdt->i_extension );
+    }
+    if( unlikely(p_mplex == NULL) )
+        return ;
+
+    if( p_mplex->i_sdt_version == UINT8_MAX )
+        p_mplex->i_sdt_version = p_sdt->i_version;
+
     for( const dvbpsi_sdt_service_t *p_srv = p_sdt->p_first_service;
                                      p_srv; p_srv = p_srv->p_next )
     {
-        scan_service_t *s = ScanFindService( p_scan, 0, p_srv->i_service_id, p_sdt->i_extension );
+        scan_service_t *s = scan_multiplex_FindService( p_mplex, p_srv->i_service_id );
         if( s == NULL )
         {
-             /* SDT must not create new service without proper config ( local )
-                or it must has been created by another network NIT (providing freq) */
-            if( p_cfg )
-                s = scan_service_New( p_sdt->i_extension, p_srv->i_service_id, p_cfg );
-            if( s == NULL )
+            s = scan_service_New( p_srv->i_service_id );
+            if( unlikely(s == NULL) )
                 continue;
-            scan_AddService( p_scan, s );
+            if( !scan_multiplex_AddService( p_mplex, s ) )
+            {
+                scan_service_Delete( s );
+                continue;
+            }
         }
 
         s->b_crypted = p_srv->b_free_ca;
@@ -897,7 +1035,8 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
 
         uint32_t i_private_data_id = 0;
         dvbpsi_descriptor_t *p_dsc;
-        scan_tuner_config_t tscfg = { 0 };
+        scan_tuner_config_t tscfg;
+        scan_tuner_config_Init( &tscfg );
         if( p_cfg != NULL ) // p_nit->i_table_id != NIT_CURRENT_NETWORK_TABLE_ID
             tscfg = *p_cfg;
 
@@ -998,6 +1137,16 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
             }
         }
 
+        scan_multiplex_t *p_mplex = scan_FindOrCreateMultiplex( p_scan, p_ts->i_ts_id, &tscfg );
+        if( unlikely(!p_mplex) )
+            continue;
+
+        if( p_mplex->i_network_id == NETWORK_ID_RESERVED )
+        {
+            p_mplex->i_network_id = p_nit->i_network_id;
+            p_mplex->i_nit_version = p_nit->i_version;
+        }
+
         /* Now process service list, and create them if tuner config is known */
         if( p_sl )
         {
@@ -1019,21 +1168,24 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 if( scan_service_type( i_service_type ) == SERVICE_UNKNOWN )
                     continue;
 
-                scan_service_t *s = ScanFindService( p_scan, 0, i_service_id, p_ts->i_ts_id );
+                scan_service_t *s = scan_multiplex_FindService( p_mplex, i_service_id );
                 if( s == NULL )
                 {
-                    s = scan_service_New( p_ts->i_ts_id, i_service_id, &tscfg );
+                    s = scan_service_New( i_service_id );
                     if( likely(s) )
                     {
                         s->type          = scan_service_type( i_service_type );
-                        s->i_network_id  = p_nit->i_network_id;
-                        s->i_nit_version = p_nit->i_version;
-                        scan_AddService( p_scan, s );
+                        s->i_original_network_id = p_ts->i_orig_network_id;
+                        if( !scan_multiplex_AddService( p_mplex, s ) )
+                        {
+                            scan_service_Delete( s );
+                            s = NULL;
+                        }
                     }
                 }
 
-                if ( s && s->psz_network_name == NULL && p_nn )
-                    s->psz_network_name = strndup( (const char*) p_nn->p_data, p_dsc->i_length );
+                if ( s && s->psz_original_network_name == NULL && p_nn )
+                    s->psz_original_network_name = strndup( (const char*) p_nn->p_data, p_dsc->i_length );
 
             }
         }
@@ -1047,7 +1199,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 const uint16_t i_channel_number = p_lc->p_entries[i].i_logical_channel_number;
                 msg_Dbg( p_obj, "           * service_id=%" PRIu16 " channel_number=%" PRIu16,
                                 i_service_id, i_channel_number );
-                scan_service_t *s = ScanFindService( p_scan, 0, i_service_id, p_ts->i_ts_id );
+                scan_service_t *s = scan_multiplex_FindService( p_mplex, i_service_id );
                 if( s )
                     s->i_channel = i_channel_number;
             }
@@ -1208,8 +1360,6 @@ static void scan_session_Delete( scan_session_t *p_session )
 
 void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 {
-//    const int i_service_start = p_scan->i_service;
-
     dvbpsi_pat_t *p_pat = p_session->local.p_pat;
     dvbpsi_sdt_t *p_sdt = p_session->local.p_sdt;
     dvbpsi_nit_t *p_nit = p_session->local.p_nit;
@@ -1235,35 +1385,13 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
         ParseSDT( p_scan->p_obj, p_scan, p_sdt, NULL );
 
     /* */
-#if 0
-    for( size_t i = i_service_start; i < p_scan->i_service; i++ )
-    {
-        scan_service_t *p_srv = p_scan->pp_service[i];
-
-        p_srv->i_snr = p_session->i_snr;
-        if( p_sdt )
-            p_srv->i_sdt_version = p_sdt->i_version;
-        if( p_nit )
-        {
-            p_srv->i_network_id = p_nit->i_network_id;
-            p_srv->i_nit_version = p_nit->i_version;
-        }
-    }
-#endif
-
-    /* */
     scan_session_Delete( p_session );
 }
 
 static int ScanServiceCmp( const void *a, const void *b )
 {
-    scan_service_t *sa = *(scan_service_t**)a;
-    scan_service_t *sb = *(scan_service_t**)b;
-
-    if( sa->i_ts_id < sb->i_ts_id )
-        return -1;
-    else if( sa->i_ts_id > sb->i_ts_id )
-        return 1;
+    const scan_service_t *sa = *((const scan_service_t**)a);
+    const scan_service_t *sb = *((const scan_service_t**)b);
 
     if( sa->i_channel == sb->i_channel )
     {
@@ -1271,10 +1399,6 @@ static int ScanServiceCmp( const void *a, const void *b )
             return strcmp( sa->psz_name, sb->psz_name );
         return 0;
     }
-    if( sa->i_channel == -1 )
-        return 1;
-    else if( sb->i_channel == -1 )
-        return -1;
 
     if( sa->i_channel < sb->i_channel )
         return -1;
@@ -1294,69 +1418,91 @@ static block_t *BlockString( const char *psz )
 block_t *scan_GetM3U( scan_t *p_scan )
 {
     vlc_object_t *p_obj = p_scan->p_obj;
-    block_t *p_playlist = NULL;
-
-    if( p_scan->i_service <= 0 )
+    block_t *p_playlist = BlockString( "#EXTM3U\n\n" );
+    if( !p_playlist )
         return NULL;
 
-    /* */
-    qsort( p_scan->pp_service, p_scan->i_service, sizeof(scan_service_t*), ScanServiceCmp );
-
-    /* */
-    p_playlist = BlockString( "#EXTM3U\n\n" );/* */
-
-    for( size_t i = 0; i < p_scan->i_service; i++ )
+    p_scan->i_total_services = 0;
+    for( size_t j = 0; j < p_scan->i_multiplex; j++ )
     {
-        scan_service_t *s = p_scan->pp_service[i];
-
-        if( s->type == SERVICE_UNKNOWN )
+        scan_multiplex_t *p_mplex = p_scan->pp_multiplex[j];
+        for( size_t i = 0; i < p_mplex->i_services; i++ )
         {
-            /* We should only select service that have been described by SDT */
-            msg_Dbg( p_obj, "scan_GetM3U: ignoring service number %d", s->i_program );
-            continue;
+         //   if( p_mplex->pp_services[i]->psz_name )
+                p_scan->i_total_services++;
         }
+    }
+
+    size_t i_filtered_count = 0;
+    const scan_service_t **pp_filtered_list = malloc( sizeof(scan_service_t *) * p_scan->i_total_services );
+    if( !pp_filtered_list )
+    {
+        block_Release( p_playlist );
+        return NULL;
+    }
+
+    for( size_t j = 0; j < p_scan->i_multiplex; j++ )
+    {
+        const scan_multiplex_t *p_mplex = p_scan->pp_multiplex[j];
+        for( size_t i = 0; i < p_mplex->i_services; i++ )
+        {
+            const scan_service_t *s = p_mplex->pp_services[i];
+            if( s->type == SERVICE_UNKNOWN )
+            {
+                /* We should only select service that have been described by SDT */
+                msg_Dbg( p_obj, "scan_GetM3U: ignoring service number %d", s->i_program );
+                continue;
+            }
+            pp_filtered_list[i_filtered_count++] = s;
+        }
+    }
+
+    /* */
+    qsort( pp_filtered_list, i_filtered_count, sizeof(scan_service_t *), ScanServiceCmp );
+
+    for( size_t i = 0; i < i_filtered_count; i++ )
+    {
+        const scan_service_t *s = pp_filtered_list[i];
 
         const char *psz_type;
         switch( s->type )
         {
-        case SERVICE_DIGITAL_TELEVISION:       psz_type = "Digital television"; break;
-        case SERVICE_DIGITAL_TELEVISION_AC_SD: psz_type = "Digital television advanced codec SD"; break;
-        case SERVICE_DIGITAL_TELEVISION_AC_HD: psz_type = "Digital television advanced codec HD"; break;
-        case SERVICE_DIGITAL_RADIO:            psz_type = "Digital radio"; break;
-        default:
-            psz_type = "Unknown";
-            break;
+            case SERVICE_DIGITAL_TELEVISION:       psz_type = "Digital television"; break;
+            case SERVICE_DIGITAL_TELEVISION_AC_SD: psz_type = "Digital television advanced codec SD"; break;
+            case SERVICE_DIGITAL_TELEVISION_AC_HD: psz_type = "Digital television advanced codec HD"; break;
+            case SERVICE_DIGITAL_RADIO:            psz_type = "Digital radio"; break;
+            default:
+                psz_type = "Unknown";
+                break;
         }
         msg_Warn( p_obj, "scan_GetM3U: service number %d type '%s' name '%s' channel %d cypted=%d| network_id %d (nit:%d sdt:%d)| f=%d bw=%d snr=%d modulation=%d",
                   s->i_program, psz_type, s->psz_name, s->i_channel, s->b_crypted,
-                  s->i_network_id, s->i_nit_version, s->i_sdt_version,
-                  s->cfg.i_frequency, s->cfg.i_bandwidth, s->i_snr, s->cfg.i_modulation );
+                  s->p_mplex->i_network_id, s->p_mplex->i_nit_version, s->p_mplex->i_sdt_version,
+                  s->p_mplex->cfg.i_frequency, s->p_mplex->cfg.i_bandwidth, s->p_mplex->i_snr, s->p_mplex->cfg.i_modulation );
 
-        if( !s->cfg.i_fec )
-            s->cfg.i_fec = 9;   /* FEC_AUTO */
         char *psz_mrl;
         int i_ret = -1;
         switch( p_scan->parameter.type )
         {
             case SCAN_DVB_T:
                 i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:bandwidth=%d:modulation=%d",
-                                   s->cfg.i_frequency,
-                                   s->cfg.i_bandwidth,
-                                   s->cfg.i_modulation );
+                                  s->p_mplex->cfg.i_frequency,
+                                  s->p_mplex->cfg.i_bandwidth,
+                                  s->p_mplex->cfg.i_modulation );
                 break;
             case SCAN_DVB_S:
                 i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:voltage=%d:fec=%d",
-                                   s->cfg.i_frequency,
-                                   s->cfg.i_symbolrate,
-                                   s->cfg.c_polarization == 'H' ? 18 : 13,
-                                   s->cfg.i_fec );
+                                  s->p_mplex->cfg.i_frequency,
+                                  s->p_mplex->cfg.i_symbolrate,
+                                  s->p_mplex->cfg.c_polarization == 'H' ? 18 : 13,
+                                  s->p_mplex->cfg.i_fec );
                 break;
             case SCAN_DVB_C:
                 i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:modulation=%d:fec=%d",
-                                   s->cfg.i_frequency,
-                                   s->cfg.i_symbolrate,
-                                   s->cfg.i_modulation,
-                                   s->cfg.i_fec );
+                                  s->p_mplex->cfg.i_frequency,
+                                  s->p_mplex->cfg.i_symbolrate,
+                                  s->p_mplex->cfg.i_modulation,
+                                  s->p_mplex->cfg.i_fec );
             default:
                 break;
         }
@@ -1367,9 +1513,9 @@ block_t *scan_GetM3U( scan_t *p_scan )
         i_ret = asprintf( &psz, "#EXTINF:,,%s\n"
                                 "#EXTVLCOPT:program=%d\n"
                                 "%s\n\n",
-                                s->psz_name && * s->psz_name ? s->psz_name : "Unknown",
-                                s->i_program,
-                                psz_mrl );
+                          s->psz_name && * s->psz_name ? s->psz_name : "Unknown",
+                          s->i_program,
+                          psz_mrl );
         free( psz_mrl );
         if( i_ret != -1 )
         {
@@ -1379,6 +1525,8 @@ block_t *scan_GetM3U( scan_t *p_scan )
             free( psz );
         }
     }
+
+    free( pp_filtered_list );
 
     return p_playlist ? block_ChainGather( p_playlist ) : NULL;
 }
