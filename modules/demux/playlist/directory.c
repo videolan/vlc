@@ -177,7 +177,7 @@ static int Demux( demux_t *p_demux )
         if( has_ext( psz_ignored_exts, p_item->psz_name ) )
             goto skip_item;
 
-        input_item_CopyOptions( p_node->p_item, p_item );
+        input_item_CopyOptions( p_item, p_node->p_item );
         if( !input_item_node_AppendItem( p_node, p_item ) )
             i_ret = VLC_ENOMEM;
 skip_item:

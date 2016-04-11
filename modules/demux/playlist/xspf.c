@@ -502,7 +502,7 @@ static bool parse_track_node COMPLEX_INTERFACE
             }
             else
                 input_item_SetURI(p_new_input, psz_value);
-            input_item_CopyOptions(p_input_item, p_new_input);
+            input_item_CopyOptions(p_new_input, p_input_item);
         }
         else
         {

@@ -494,7 +494,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         if( unlikely(p_item == NULL) )
             continue;
 
-        input_item_CopyOptions( p_current, p_item );
+        input_item_CopyOptions( p_item, p_current );
 
         if( likely(asprintf( &psz_opt, "cdda-track=%i", i+1 ) != -1) )
         {
