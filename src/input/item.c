@@ -157,10 +157,8 @@ void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const cha
     vlc_event_send( &p_i->event_manager, &event );
 }
 
-/* FIXME GRRRRRRRRRR args should be in the reverse order to be
- * consistent with (nearly?) all or copy funcs */
-void input_item_CopyOptions( input_item_t *p_parent,
-                             input_item_t *p_child )
+void input_item_CopyOptions( input_item_t *p_child,
+                             input_item_t *p_parent )
 {
     char **optv = NULL;
     uint8_t *flagv = NULL;
@@ -1013,7 +1011,7 @@ input_item_t *input_item_Copy( input_item_t *p_input )
 
     if( likely(item != NULL) )
     {   /* No need to lock; no other thread has seen this new item yet. */
-        input_item_CopyOptions( p_input, item );
+        input_item_CopyOptions( item, p_input );
         item->p_meta = meta;
     }
 

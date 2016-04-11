@@ -574,7 +574,7 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     /* Append item to playlist */
                     if( p_parent ) /* Add to node */
                     {
-                        input_item_CopyOptions( p_parent, p_input );
+                        input_item_CopyOptions( p_input, p_parent );
                         input_item_node_AppendItem( p_parent_node, p_input );
                     }
                     else /* Play or Enqueue (preparse) */
