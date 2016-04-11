@@ -348,10 +348,14 @@ static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_t *p_pes,
         switch( p_dr->i_tag )
         {
             case 0x1f: /* FMC Descriptor */
-                while( i_length >= 3 && !p_es->i_sl_es_id )
+                while( i_length >= 2 /* see below */ && !p_es->i_sl_es_id )
                 {
                     p_es->i_sl_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
                     /* FIXME: map all ids and flexmux channels */
+                    /* Handle broken streams with 2 byte 0x1F descriptors
+                     * see samples/A-codecs/AAC/freetv_aac_latm.txt */
+                    if( i_length == 2 )
+                        break;
                     i_length -= 3;
                     msg_Dbg( p_demux, "     - found FMC_descriptor mapping es_id=%"PRIu16, p_es->i_sl_es_id );
                 }
