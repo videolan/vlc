@@ -468,90 +468,20 @@ static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
     return VLC_SUCCESS;
 }
 
-static enum fe_delivery_system FrontEndGetDeliverySys( access_t *p_access )
-{
-    access_sys_t *p_sys = p_access->p_sys;
-#ifdef DTV_ENUM_DELSYS
-    /* Determine type of frontend */
-    struct dtv_property prop = { .cmd = DTV_DELIVERY_SYSTEM };
-    struct dtv_properties tuple = { .num = 1, .props = &prop };
-    if( ioctl( p_sys->i_frontend_handle, FE_GET_PROPERTY, &tuple ) < 0 )
-    {
-        msg_Err( p_access, "frontend info request error: %s",
-                 vlc_strerror_c(errno) );
-        return SYS_UNDEFINED;
-    }
-    return prop.u.data;
-#else
-    frontend_t *p_frontend = p_sys->p_frontend;
-    /* DTV_ENUM_DELSYS requires linux dvb api >= 5.05
-       kernel commit ba2780c796badfc3741c7cb499a575ca49f17e6d */
-    const bool b_2g = ( p_frontend->info.caps & FE_CAN_2G_MODULATION );
-    if( p_frontend->info.type == FE_OFDM )
-    {
-        return ( b_2g ) ? SYS_DVBT2 : SYS_DVBT;
-    }
-    else if( p_frontend->info.type == FE_QAM )
-    {
-        return SYS_DVBC_ANNEX_C;
-    }
-    else if( p_frontend->info.type == FE_QPSK )
-    {
-        return ( b_2g ) ? SYS_DVBS2 : SYS_DVBS;
-    }
-    else if( p_frontend->info.type == FE_ATSC )
-    {
-        if ( p_frontend->info.caps &
-             (FE_CAN_QAM_16 | FE_CAN_QAM_64 | FE_CAN_QAM_128 | FE_CAN_QAM_256) )
-            return SYS_DVBC_ANNEX_B;
-
-        if ( p_frontend->info.caps & (FE_CAN_8VSB | FE_CAN_16VSB) )
-            return SYS_ATSC;
-    }
-    return SYS_UNDEFINED;
-#endif
-}
-
 int  FrontendFillScanParameter( access_t *p_access, scan_parameter_t *p_scan )
 {
-    int i_ret = VLC_EGENERIC;
+    access_sys_t *p_sys = p_access->p_sys;
+    const frontend_t *p_frontend = p_sys->p_frontend;
 
-    switch( FrontEndGetDeliverySys( p_access ) )
-    {
-        case SYS_DVBC_ANNEX_A:
-        case SYS_DVBC_ANNEX_B:
-        case SYS_DVBC_ANNEX_C:
-        case SYS_ISDBC:
-            i_ret = ScanParametersDvbC( p_access, p_scan );
-            break;
+    if( p_frontend->info.type == FE_OFDM )              /* DVB-T */
+        return ScanParametersDvbT( p_access, p_scan );
+    else if( p_frontend->info.type == FE_QAM )          /* DVB-C */
+        return ScanParametersDvbC( p_access, p_scan );
+    else if( p_frontend->info.type == FE_QPSK )
+        return ScanParametersDvbS( p_access, p_scan );  /* DVB-S */
 
-        case SYS_DVBT:
-        case SYS_DVBT2:
-        case SYS_ISDBT:
-            i_ret = ScanParametersDvbT( p_access, p_scan );
-            break;
-
-        case SYS_DVBS:
-        case SYS_DVBS2:
-        case SYS_ISDBS:
-            i_ret = ScanParametersDvbS( p_access, p_scan );
-            break;
-
-        /* FIXME or unsupported */
-        case SYS_ATSC:
-        case SYS_ATSCMH:
-
-        case SYS_DSS:
-        case SYS_DTMB:
-        case SYS_CMMB:
-        case SYS_DAB:
-        case SYS_TURBO:
-        default:
-            msg_Err( p_access, "frontend scanning not supported" );
-            break;
-    }
-
-    return i_ret;
+    msg_Err( p_access, "frontend scanning not supported" );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
