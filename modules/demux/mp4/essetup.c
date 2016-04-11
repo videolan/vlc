@@ -865,6 +865,9 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         {
             p_track->fmt.i_codec = VLC_CODEC_TX3G;
 
+            if( p_text->i_display_flags & 0xC0000000 )
+                p_track->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1;
+
             text_style_t *p_style = text_style_Create( STYLE_NO_DEFAULTS );
             if ( p_style )
             {
