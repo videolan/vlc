@@ -2754,7 +2754,9 @@ static char *LanguageGetName( const char *psz_code )
     }
     else
     {
-        return strdup( psz_code );
+        char *lang = LanguageGetCode( psz_code );
+        pl = GetLang_1( lang );
+        free( lang );
     }
 
     if( !strcmp( pl->psz_iso639_1, "??" ) )
