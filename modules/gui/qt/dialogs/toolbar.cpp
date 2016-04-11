@@ -257,6 +257,24 @@ void ToolbarEditDialog::changeProfile( int i )
 
 void ToolbarEditDialog::close()
 {
+    bool isChecked = getSettings()->value( "MainWindow/ToolbarPos" ).toBool();
+    QString c1 = getSettings()->value( "MainWindow/MainToolbar1" ).toString();
+    QString c2 = getSettings()->value( "MainWindow/MainToolbar2" ).toString();
+    QString cA = getSettings()->value( "MainWindow/AdvToolbar" ).toString();
+    QString c = getSettings()->value( "MainWindow/InputToolbar" ).toString();
+    QString cFSC = getSettings()->value( "MainWindow/FSCToolbar" ).toString();
+
+    if ( isChecked == positionCheckbox->isChecked()
+	 && c1 == controller1->getValue()
+	 && c2 == controller2->getValue()
+	 && cA == controllerA->getValue()
+	 && c == controller->getValue()
+	 && cFSC == controllerFSC->getValue() )
+    {
+	reject();
+	return;
+    }
+
     getSettings()->setValue( "MainWindow/ToolbarPos", !!positionCheckbox->isChecked() );
     getSettings()->setValue( "MainWindow/MainToolbar1", controller1->getValue() );
     getSettings()->setValue( "MainWindow/MainToolbar2", controller2->getValue() );
