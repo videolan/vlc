@@ -98,7 +98,8 @@ static int BrowserInit( access_t *p_access );
 static int get_address( access_t *p_access );
 static int login( access_t *p_access );
 static bool get_path( access_t *p_access );
-static input_item_t* new_item( access_t *p_access, const char *psz_name, int i_type );
+static int add_item( access_t *p_access,  struct access_fsdir *p_fsdir,
+                     const char *psz_name, int i_type );
 
 struct access_sys_t
 {
@@ -115,11 +116,6 @@ struct access_sys_t
 
     smb_fd              i_fd;               /**< SMB fd for the file we're reading */
     smb_tid             i_tid;              /**< SMB Tree ID we're connected to */
-
-    size_t              i_browse_count;
-    size_t              i_browse_idx;
-    smb_share_list      shares;
-    smb_stat_list       files;
 };
 
 /*****************************************************************************
@@ -211,11 +207,8 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_session )
         smb_session_destroy( p_sys->p_session );
     vlc_UrlClean( &p_sys->url );
-    if( p_sys->shares )
-        smb_share_list_destroy( p_sys->shares );
-    if( p_sys->files )
-        smb_stat_list_destroy( p_sys->files );
     free( p_sys->psz_fullpath );
+
     free( p_sys );
 }
 
@@ -525,16 +518,15 @@ static int Control( access_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-static input_item_t *new_item( access_t *p_access, const char *psz_name,
-                               int i_type )
+static int add_item( access_t *p_access, struct access_fsdir *p_fsdir,
+                     const char *psz_name, int i_type )
 {
-    input_item_t *p_item;
     char         *psz_uri;
     int           i_ret;
 
     char *psz_encoded_name = vlc_uri_encode( psz_name );
     if( psz_encoded_name == NULL )
-        return NULL;
+        return VLC_ENOMEM;
     const char *psz_sep = p_access->psz_location[0] != '\0'
         && p_access->psz_location[strlen(p_access->psz_location) -1] != '/'
         ? "/" : "";
@@ -542,90 +534,91 @@ static input_item_t *new_item( access_t *p_access, const char *psz_name,
                       psz_sep, psz_encoded_name );
     free( psz_encoded_name );
     if( i_ret == -1 )
-        return NULL;
+        return VLC_ENOMEM;
 
-    p_item = input_item_NewExt( psz_uri, psz_name, -1, i_type, ITEM_NET );
-    free( psz_uri );
-    if( p_item == NULL )
-        return NULL;
-
-    return p_item;
+    return access_fsdir_additem( p_fsdir, psz_uri, psz_name, i_type, ITEM_NET );
 }
 
-static input_item_t* BrowseShare( access_t *p_access )
+static int BrowseShare( access_t *p_access, input_item_node_t *p_node )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    smb_share_list  shares;
     const char     *psz_name;
-    input_item_t   *p_item = NULL;
+    size_t          share_count;
+    int             i_ret = VLC_SUCCESS;
 
-    if( !p_sys->i_browse_count )
+    if( smb_share_get_list( p_sys->p_session, &shares, &share_count )
+        != DSM_SUCCESS )
+        return VLC_EGENERIC;
+
+    struct access_fsdir fsdir;
+    access_fsdir_init( &fsdir, p_access, p_node );
+
+    for( size_t i = 0; i < share_count && i_ret == VLC_SUCCESS; i++ )
     {
-        size_t i_count;
-        if( smb_share_get_list( p_sys->p_session, &p_sys->shares, &i_count )
-            != DSM_SUCCESS )
-            return NULL;
-        else
-            p_sys->i_browse_count = i_count;
-    }
-    for( ; !p_item && p_sys->i_browse_idx < p_sys->i_browse_count
-         ; p_sys->i_browse_idx++ )
-    {
-        psz_name = smb_share_list_at( p_sys->shares, p_sys->i_browse_idx );
+        psz_name = smb_share_list_at( shares, i );
 
         if( psz_name[strlen( psz_name ) - 1] == '$')
             continue;
 
-        p_item = new_item( p_access, psz_name, ITEM_TYPE_DIRECTORY );
-        if( !p_item )
-            return NULL;
+        i_ret = add_item( p_access, &fsdir, psz_name, ITEM_TYPE_DIRECTORY );
     }
-    return p_item;
+
+    access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
+
+    smb_share_list_destroy( shares );
+    return i_ret;
 }
 
-static input_item_t* BrowseDirectory( access_t *p_access )
+static int BrowseDirectory( access_t *p_access, input_item_node_t *p_node )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    smb_stat_list   files;
     smb_stat        st;
-    input_item_t   *p_item = NULL;
     char           *psz_query;
     const char     *psz_name;
-    int             i_ret;
+    size_t          files_count;
+    int             i_ret = VLC_SUCCESS;
 
-    if( !p_sys->i_browse_count )
+    if( p_sys->psz_path != NULL )
     {
-        if( p_sys->psz_path != NULL )
-        {
-            i_ret = asprintf( &psz_query, "%s\\*", p_sys->psz_path );
-            if( i_ret == -1 )
-                return NULL;
-            p_sys->files = smb_find( p_sys->p_session, p_sys->i_tid, psz_query );
-            free( psz_query );
-        }
-        else
-            p_sys->files = smb_find( p_sys->p_session, p_sys->i_tid, "\\*" );
-        if( p_sys->files == NULL )
-            return NULL;
-        p_sys->i_browse_count = smb_stat_list_count( p_sys->files );
+        if( asprintf( &psz_query, "%s\\*", p_sys->psz_path ) == -1 )
+            return VLC_ENOMEM;
+        files = smb_find( p_sys->p_session, p_sys->i_tid, psz_query );
+        free( psz_query );
     }
+    else
+        files = smb_find( p_sys->p_session, p_sys->i_tid, "\\*" );
 
-    if( p_sys->i_browse_idx < p_sys->i_browse_count )
+    if( files == NULL )
+        return VLC_EGENERIC;
+
+    struct access_fsdir fsdir;
+    access_fsdir_init( &fsdir, p_access, p_node );
+
+    files_count = smb_stat_list_count( files );
+    for( size_t i = 0; i < files_count && i_ret == VLC_SUCCESS; i++ )
     {
         int i_type;
 
-        st = smb_stat_list_at( p_sys->files, p_sys->i_browse_idx++ );
+        st = smb_stat_list_at( files, i );
 
         if( st == NULL )
-            return NULL;
+        {
+            continue;
+        }
 
         psz_name = smb_stat_name( st );
 
         i_type = smb_stat_get( st, SMB_STAT_ISDIR ) ?
                  ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
-        p_item = new_item( p_access, psz_name, i_type );
-        if( !p_item )
-            return NULL;
+        i_ret = add_item( p_access, &fsdir, psz_name, i_type );
     }
-    return p_item;
+
+    access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
+
+    smb_stat_list_destroy( files );
+    return i_ret;
 }
 
 static int DirControl( access_t *p_access, int i_query, va_list args )

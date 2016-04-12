@@ -348,10 +348,10 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     return copy;
 }
 
-static input_item_t *ReadDir(stream_t *stream)
+static int ReadDir(stream_t *stream, input_item_node_t *node)
 {
-    (void) stream;
-    return NULL;
+    (void) stream; (void) node;
+    return VLC_EGENERIC;
 }
 
 static int Control(stream_t *stream, int query, va_list args)

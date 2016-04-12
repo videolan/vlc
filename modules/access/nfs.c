@@ -83,7 +83,6 @@ struct access_sys_t
         {
             char **         ppsz_names;
             int             i_count;
-            unsigned int    i_current;
         } exports;
         struct
         {
@@ -315,26 +314,33 @@ NfsGetUrl(vlc_url_t *p_url, const char *psz_file)
         return psz_url;
 }
 
-static input_item_t *
-DirRead(access_t *p_access)
+static int
+DirRead(access_t *p_access, input_item_node_t *p_node)
 {
     access_sys_t *p_sys = p_access->p_sys;
     struct nfsdirent *p_nfsdirent;
+    int i_ret = VLC_SUCCESS;
     assert(p_sys->p_nfsdir);
 
-    p_nfsdirent = nfs_readdir(p_sys->p_nfs, p_sys->p_nfsdir);
-    if (p_nfsdirent == NULL)
-        return NULL;
-    else
+    struct access_fsdir fsdir;
+    access_fsdir_init(&fsdir, p_access, p_node);
+
+    while (i_ret == VLC_SUCCESS
+        && (p_nfsdirent = nfs_readdir(p_sys->p_nfs, p_sys->p_nfsdir)) != NULL)
     {
-        input_item_t *p_item;
         char *psz_name_encoded = vlc_uri_encode(p_nfsdirent->name);
         if (psz_name_encoded == NULL)
-            return NULL;
+        {
+            i_ret = VLC_ENOMEM;
+            break;
+        }
         char *psz_url = NfsGetUrl(&p_sys->encoded_url, psz_name_encoded);
         free(psz_name_encoded);
         if (psz_url == NULL)
-            return NULL;
+        {
+            i_ret = VLC_ENOMEM;
+            break;
+        }
 
         int i_type;
         switch (p_nfsdirent->type)
@@ -348,34 +354,44 @@ DirRead(access_t *p_access)
         default:
             i_type = ITEM_TYPE_UNKNOWN;
         }
-        p_item = input_item_NewExt(psz_url, p_nfsdirent->name, -1, i_type,
-                                   ITEM_NET);
+        i_ret = access_fsdir_additem(&fsdir, psz_url, p_nfsdirent->name,
+                                     i_type, ITEM_NET);
         free(psz_url);
-        return p_item;
     }
+
+    access_fsdir_finish(&fsdir, i_ret == VLC_SUCCESS);
+
+    return i_ret;
 }
 
-static input_item_t *
-MountRead(access_t *p_access)
+static int
+MountRead(access_t *p_access, input_item_node_t *p_node)
 {
     access_sys_t *p_sys = p_access->p_sys;
     assert(p_sys->p_mount != NULL && p_sys->res.exports.i_count >= 0);
+    int i_ret = VLC_SUCCESS;
 
-    unsigned int i_count = p_sys->res.exports.i_count;
-    unsigned int i_current = p_sys->res.exports.i_current;
-    if (i_current >= i_count)
-        return NULL;
+    struct access_fsdir fsdir;
+    access_fsdir_init(&fsdir, p_access, p_node);
 
-    char *psz_name = p_sys->res.exports.ppsz_names[i_current];
-    p_sys->res.exports.i_current++;
+    for (int i = 0; i < p_sys->res.exports.i_count && i_ret == VLC_SUCCESS; ++i)
+    {
+        char *psz_name = p_sys->res.exports.ppsz_names[i];
 
-    char *psz_url = NfsGetUrl(&p_sys->encoded_url, psz_name);
-    if (psz_url == NULL)
-        return NULL;
+        char *psz_url = NfsGetUrl(&p_sys->encoded_url, psz_name);
+        if (psz_url == NULL)
+        {
+            i_ret = VLC_ENOMEM;
+            break;
+        }
+        i_ret = access_fsdir_additem(&fsdir, psz_url, psz_name,
+                                     ITEM_TYPE_DIRECTORY, ITEM_NET);
+        free(psz_url);
+    }
 
-    input_item_t *p_item = input_item_NewDirectory(psz_url, psz_name, ITEM_NET);
-    free(psz_url);
-    return p_item;
+    access_fsdir_finish(&fsdir, i_ret == VLC_SUCCESS);
+
+    return i_ret;
 }
 
 static int
@@ -706,7 +722,6 @@ Open(vlc_object_t *p_obj)
 
         p_sys->res.exports.ppsz_names = NULL;
         p_sys->res.exports.i_count = -1;
-        p_sys->res.exports.i_current = 0;
 
         if (mount_getexports_async(p_sys->p_mount, p_sys->p_nfs_url->server,
                                    mount_export_cb, p_access) < 0)

@@ -25,5 +25,6 @@ void FileClose (vlc_object_t *);
 
 int DirOpen (vlc_object_t *);
 int DirInit (access_t *p_access, DIR *handle);
-input_item_t* DirRead (access_t *);
+int DirRead (access_t *, input_item_node_t *);
+int DirControl (access_t *, int, va_list);
 void DirClose (vlc_object_t *);

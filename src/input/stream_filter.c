@@ -114,8 +114,8 @@ static void StreamDelete( stream_t *s )
         stream_Delete( s->p_source );
 }
 
-input_item_t *stream_FilterDefaultReadDir( stream_t *s )
+int stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node )
 {
     assert( s->p_source != NULL );
-    return stream_ReadDir( s->p_source );
+    return stream_ReadDir( s->p_source, p_node );
 }

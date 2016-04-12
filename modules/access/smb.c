@@ -84,7 +84,7 @@ static ssize_t Read( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 #ifndef _WIN32
-static input_item_t* DirRead( access_t * );
+static int DirRead( access_t *, input_item_node_t * );
 static int DirControl( access_t *, int, va_list );
 #endif
 
@@ -344,13 +344,16 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 /*****************************************************************************
  * DirRead:
  *****************************************************************************/
-static input_item_t* DirRead (access_t *p_access )
+static int DirRead (access_t *p_access, input_item_node_t *p_node )
 {
     access_sys_t *p_sys = p_access->p_sys;
     struct smbc_dirent *p_entry;
-    input_item_t *p_item = NULL;
+    int i_ret = VLC_SUCCESS;
 
-    while( !p_item && ( p_entry = smbc_readdir( p_sys->i_smb ) ) )
+    struct access_fsdir fsdir;
+    access_fsdir_init( &fsdir, p_access, p_node );
+
+    while( i_ret == VLC_SUCCESS && ( p_entry = smbc_readdir( p_sys->i_smb ) ) )
     {
         char *psz_uri;
         const char *psz_server = p_sys->url.psz_host;
@@ -383,22 +386,26 @@ static input_item_t* DirRead (access_t *p_access )
         char *psz_encoded_name = NULL;
         if( psz_name != NULL
          && ( psz_encoded_name = vlc_uri_encode( psz_name ) ) == NULL )
-            return NULL;
+        {
+            i_ret = VLC_ENOMEM;
+            break;
+        }
         if( smb_get_uri( p_access, &psz_uri, NULL, NULL, NULL,
                          psz_server, psz_path, psz_encoded_name ) < 0 )
         {
             free(psz_encoded_name);
-            return NULL;
+            i_ret = VLC_ENOMEM;
+            break;
         }
         free(psz_encoded_name);
-
-        p_item = input_item_NewExt( psz_uri, p_entry->name, -1, i_type,
-                                    ITEM_NET );
+        i_ret = access_fsdir_additem( &fsdir, psz_uri, p_entry->name,
+                                      i_type, ITEM_NET );
         free( psz_uri );
-        if( !p_item )
-            return NULL;
     }
-    return p_item;
+
+    access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
+
+    return i_ret;
 }
 
 static int DirControl( access_t *p_access, int i_query, va_list args )

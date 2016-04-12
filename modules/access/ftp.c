@@ -112,7 +112,7 @@ vlc_module_end ()
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
-static input_item_t* DirRead( access_t * );
+static int DirRead( access_t *, input_item_node_t * );
 static int DirControl( access_t *, int, va_list );
 #ifdef ENABLE_SOUT
 static int OutSeek( sout_access_out_t *, off_t );
@@ -877,37 +877,46 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 /*****************************************************************************
  * DirRead:
  *****************************************************************************/
-static input_item_t* DirRead( access_t *p_access )
+static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
 {
     access_sys_t *p_sys = p_access->p_sys;
-    input_item_t *p_item = NULL;
+    int i_ret = VLC_SUCCESS;
 
     assert( p_sys->data.fd != -1 );
     assert( !p_sys->out );
 
-    char *psz_line;
-    if( p_sys->data.p_tls != NULL )
-        psz_line = vlc_tls_GetLine( p_sys->data.p_tls );
-    else
-        psz_line = net_Gets( p_access, p_sys->data.fd );
-    if( psz_line == NULL )
-        return NULL;
+    struct access_fsdir fsdir;
+    access_fsdir_init( &fsdir, p_access, p_current_node );
 
-    char *psz_uri;
-    if( asprintf( &psz_uri, "%s://%s:%d%s%s/%s",
-                  ( p_sys->tlsmode == NONE ) ? "ftp" :
-                  ( ( p_sys->tlsmode == IMPLICIT ) ? "ftps" : "ftpes" ),
-                  p_sys->url.psz_host, p_sys->url.i_port,
-                  p_sys->url.psz_path ? "/" : "",
-                  p_sys->url.psz_path ? p_sys->url.psz_path : "",
-                  psz_line ) != -1 )
+    while (i_ret == VLC_SUCCESS)
     {
-        p_item = input_item_NewExt( psz_uri, psz_line, -1, ITEM_TYPE_UNKNOWN,
-                                    ITEM_NET );
-        free( psz_uri );
+        char *psz_line;
+        if( p_sys->data.p_tls != NULL )
+            psz_line = vlc_tls_GetLine( p_sys->data.p_tls );
+        else
+            psz_line = net_Gets( p_access, p_sys->data.fd );
+
+        if( psz_line == NULL )
+            break;
+
+        char *psz_uri;
+        if( asprintf( &psz_uri, "%s://%s:%d%s%s/%s",
+                      ( p_sys->tlsmode == NONE ) ? "ftp" :
+                      ( ( p_sys->tlsmode == IMPLICIT ) ? "ftps" : "ftpes" ),
+                      p_sys->url.psz_host, p_sys->url.i_port,
+                      p_sys->url.psz_path ? "/" : "",
+                      p_sys->url.psz_path ? p_sys->url.psz_path : "",
+                      psz_line ) != -1 )
+        {
+            i_ret = access_fsdir_additem( &fsdir, psz_uri, psz_line,
+                                          ITEM_TYPE_UNKNOWN, ITEM_NET );
+            free( psz_uri );
+        }
+        free( psz_line );
     }
-    free( psz_line );
-    return p_item;
+
+    access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
+    return i_ret;
 }
 
 static int DirControl( access_t *p_access, int i_query, va_list args )

@@ -128,34 +128,39 @@ static ssize_t SeekCallback(struct archive *p_archive, void *p_object, ssize_t i
     return stream_Tell(p_stream->p_source);
 }
 
-static input_item_t *Browse(stream_t *p_stream)
+static int Browse(stream_t *p_stream, input_item_node_t *p_node)
 {
     stream_sys_t *p_sys = p_stream->p_sys;
     struct archive_entry *p_entry;
-    input_item_t *p_item = NULL;
 
-    if (archive_read_next_header(p_sys->p_archive, &p_entry) == ARCHIVE_OK)
+    while(archive_read_next_header(p_sys->p_archive, &p_entry) == ARCHIVE_OK)
     {
         char *psz_uri = NULL;
         char *psz_access_uri = NULL;
         int i_ret = asprintf(&psz_access_uri, "%s%c%s", p_stream->psz_url,
                              ARCHIVE_SEP_CHAR, archive_entry_pathname(p_entry));
         if (i_ret == -1)
-            return NULL;
+            goto error;
         i_ret = asprintf(&psz_uri, "archive://%s", psz_access_uri);
         free(psz_access_uri);
-        if( i_ret == -1 )
-            return NULL;
+        if(i_ret == -1)
+            goto error;
 
-        p_item = input_item_New(psz_uri, archive_entry_pathname(p_entry));
+        input_item_t *p_item = input_item_New(psz_uri, archive_entry_pathname(p_entry));
         free( psz_uri );
-        if(p_item == NULL)
-            return NULL;
+        if (p_item == NULL)
+            goto error;
 
+        input_item_CopyOptions(p_node->p_item, p_item);
+        input_item_node_AppendItem(p_node, p_item);
         msg_Dbg(p_stream, "declaring playlist entry %s", archive_entry_pathname(p_entry));
+        input_item_Release(p_item);
     }
 
-    return p_item;
+    return VLC_SUCCESS;
+
+error:
+    return VLC_ENOMEM;
 }
 
 int StreamOpen(vlc_object_t *p_object)

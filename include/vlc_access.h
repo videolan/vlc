@@ -88,11 +88,7 @@ struct access_t
      * XXX A access should set one and only one of them */
     ssize_t     (*pf_read)   ( access_t *, uint8_t *, size_t );  /* Return -1 if no data yet, 0 if no more data, else real data read */
     block_t    *(*pf_block)  ( access_t * );                     /* Return a block of data in his 'natural' size, NULL if not yet data or eof */
-
-    /* pf_readdir: Read the next input_item_t from the directory stream. It
-     * returns the next input item on success or NULL in case of error or end
-     * of stream. The item must be released with input_item_Release. */
-    input_item_t *(*pf_readdir)( access_t * );
+    int         (*pf_readdir)( access_t *, input_item_node_t * );/* Fills the provided item_node, see doc/browsing.txt for details */
 
     /* Called for each seek.
      * XXX can be null */
@@ -239,6 +235,11 @@ static inline void access_InitFields( access_t *p_a )
 }
 
 /**
+ * \defgroup access_helper Access Helpers
+ * @{
+ */
+
+/**
  * Default pf_control callback for directory accesses.
  */
 VLC_API int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list args );
@@ -268,7 +269,51 @@ VLC_API int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va
     } while(0);
 
 /**
- * @}
+ * Access pf_readdir helper struct
+ * \see access_fsdir_init()
+ * \see access_fsdir_additem()
+ * \see access_fsdir_finish()
+ */
+struct access_fsdir
+{
+    input_item_node_t *p_node;
+    bool b_show_hiddenfiles;
+    char *psz_ignored_exts;
+    char *psz_sort;
+};
+
+/**
+ * Init a access_fsdir struct
+ *
+ * \param p_fsdir need to be cleaned with access_fsdir_finish()
+ * \param p_node node that will be used to add items
+ */
+VLC_API void access_fsdir_init(struct access_fsdir *p_fsdir,
+                               access_t *p_access, input_item_node_t *p_node);
+
+/**
+ * Finish adding items to the node
+ *
+ * \param b_success if true, items of the node will be sorted according
+ * "directory-sort" option.
+ */
+VLC_API void access_fsdir_finish(struct access_fsdir *p_fsdir, bool b_success);
+
+/**
+ * Add a new input_item_t entry to the node of the access_fsdir struct.
+ *
+ * \param p_fsdir previously inited access_fsdir struct
+ * \param psz_uri uri of the new item
+ * \param psz_filename file name of the new item
+ * \param i_type see \ref input_item_type_e
+ * \param i_net see \ref input_item_net_type
+ */
+VLC_API int access_fsdir_additem(struct access_fsdir *p_fsdir,
+                                 const char *psz_uri, const char *psz_filename,
+                                 int i_type, int i_net);
+
+/**
+ * @} @}
  */
 
 #endif

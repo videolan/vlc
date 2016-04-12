@@ -57,7 +57,7 @@ struct stream_t
 
     /* */
     ssize_t     (*pf_read)(stream_t *, void *, size_t);
-    input_item_t *(*pf_readdir)( stream_t * );
+    int         (*pf_readdir)( stream_t *, input_item_node_t * );
     int         (*pf_seek)(stream_t *, uint64_t);
     int         (*pf_control)( stream_t *, int i_query, va_list );
 
@@ -157,7 +157,7 @@ VLC_API void stream_Delete( stream_t *s );
 VLC_API int stream_Control( stream_t *s, int i_query, ... );
 VLC_API block_t * stream_Block( stream_t *s, size_t );
 VLC_API char * stream_ReadLine( stream_t * );
-VLC_API input_item_t *stream_ReadDir( stream_t * );
+VLC_API int stream_ReadDir( stream_t *, input_item_node_t * );
 
 /**
  * Low level custom stream creation.
@@ -248,7 +248,7 @@ VLC_API stream_t* stream_FilterNew( stream_t *p_source, const char *psz_stream_f
  * Default ReadDir implementation for stream Filter. This implementation just
  * forward the pf_readdir call to the p_source stream.
  */
-VLC_API input_item_t *stream_FilterDefaultReadDir( stream_t *s );
+VLC_API int stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node );
 
 /**
  * Sets stream_FilterDefaultReadDir as the pf_readdir callback for this stream filter

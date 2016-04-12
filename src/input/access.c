@@ -194,10 +194,10 @@ static ssize_t AStreamNoRead(stream_t *s, void *buf, size_t len)
     return -1;
 }
 
-static input_item_t *AStreamNoReadDir(stream_t *s)
+static int AStreamNoReadDir(stream_t *s, input_item_node_t *p_node)
 {
-    (void) s;
-    return NULL;
+    (void) s; (void) p_node;
+    return VLC_EGENERIC;;
 }
 
 /* Block access */
@@ -282,11 +282,11 @@ static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
 }
 
 /* Directory */
-static input_item_t *AStreamReadDir(stream_t *s)
+static int AStreamReadDir(stream_t *s, input_item_node_t *p_node)
 {
     stream_sys_t *sys = s->p_sys;
 
-    return sys->access->pf_readdir(sys->access);
+    return sys->access->pf_readdir(sys->access, p_node);
 }
 
 /* Common */
@@ -431,4 +431,133 @@ error:
     free(sys);
     stream_CommonDelete(s);
     return NULL;
+}
+
+static int compar_type(input_item_t *p1, input_item_t *p2)
+{
+    if (p1->i_type != p2->i_type)
+    {
+        if (p1->i_type == ITEM_TYPE_DIRECTORY)
+            return -1;
+        if (p2->i_type == ITEM_TYPE_DIRECTORY)
+            return 1;
+    }
+    return 0;
+}
+
+static int compar_collate(input_item_t *p1, input_item_t *p2)
+{
+    int i_ret = compar_type(p1, p2);
+
+    if (i_ret != 0)
+        return i_ret;
+
+#ifdef HAVE_STRCOLL
+    /* The program's LOCAL defines if case is ignored */
+    return strcoll(p1->psz_name, p2->psz_name);
+#else
+    return strcasecmp(p1->psz_name, p2->psz_name);
+#endif
+}
+
+static int compar_version(input_item_t *p1, input_item_t *p2)
+{
+    int i_ret = compar_type(p1, p2);
+
+    if (i_ret != 0)
+        return i_ret;
+
+    return strverscmp(p1->psz_name, p2->psz_name);
+}
+
+static void fsdir_sort(struct access_fsdir *p_fsdir)
+{
+    input_item_compar_cb pf_compar = NULL;
+
+    if (p_fsdir->psz_sort != NULL)
+    {
+        if (!strcasecmp(p_fsdir->psz_sort, "version"))
+            pf_compar = compar_version;
+        else if(strcasecmp(p_fsdir->psz_sort, "none"))
+            pf_compar = compar_collate;
+
+        if (pf_compar != NULL)
+            input_item_node_Sort(p_fsdir->p_node, pf_compar);
+    }
+}
+
+/**
+ * Does the provided file name has one of the extension provided ?
+ */
+static bool fsdir_has_ext(const char *psz_filename,
+                          const char *psz_ignored_exts)
+{
+    if (psz_ignored_exts == NULL)
+        return false;
+
+    const char *ext = strrchr(psz_filename, '.');
+    if (ext == NULL)
+        return false;
+
+    size_t extlen = strlen(++ext);
+
+    for (const char *type = psz_ignored_exts, *end; type[0]; type = end + 1)
+    {
+        end = strchr(type, ',');
+        if (end == NULL)
+            end = type + strlen(type);
+
+        if (type + extlen == end && !strncasecmp(ext, type, extlen))
+            return true;
+
+        if (*end == '\0')
+            break;
+    }
+
+    return false;
+}
+
+static bool fsdir_is_ignored(struct access_fsdir *p_fsdir,
+                             const char *psz_filename)
+{
+    return (psz_filename[0] == '\0'
+         || strcmp(psz_filename, ".") == 0
+         || strcmp(psz_filename, "..") == 0
+         || (!p_fsdir->b_show_hiddenfiles && psz_filename[0] == '.')
+         || fsdir_has_ext(psz_filename, p_fsdir->psz_ignored_exts));
+}
+
+void access_fsdir_init(struct access_fsdir *p_fsdir,
+                       access_t *p_access, input_item_node_t *p_node)
+{
+    p_fsdir->p_node = p_node;
+    p_fsdir->b_show_hiddenfiles = var_InheritBool(p_access, "show-hiddenfiles");
+    p_fsdir->psz_ignored_exts = var_InheritString(p_access, "ignore-filetypes");
+    p_fsdir->psz_sort = var_InheritString(p_access, "directory-sort");
+}
+
+void access_fsdir_finish(struct access_fsdir *p_fsdir, bool b_success)
+{
+    if (b_success)
+        fsdir_sort(p_fsdir);
+    free(p_fsdir->psz_ignored_exts);
+    free(p_fsdir->psz_sort);
+}
+
+int access_fsdir_additem(struct access_fsdir *p_fsdir,
+                         const char *psz_uri, const char *psz_filename,
+                         int i_type, int i_net)
+{
+    if (fsdir_is_ignored(p_fsdir, psz_filename))
+        return VLC_SUCCESS;
+
+    input_item_t *p_item = input_item_NewExt(psz_uri, psz_filename, -1,
+                                             i_type, i_net);
+    if (p_item == NULL)
+        return VLC_ENOMEM;
+
+    input_item_CopyOptions(p_item, p_fsdir->p_node->p_item);
+    input_item_node_AppendItem(p_fsdir->p_node, p_item);
+    input_item_Release(p_item);
+    return VLC_SUCCESS;
 }

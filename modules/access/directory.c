@@ -46,7 +46,6 @@ struct access_sys_t
 {
     char *base_uri;
     DIR *dir;
-    bool special_files;
 };
 
 /*****************************************************************************
@@ -70,7 +69,6 @@ int DirInit (access_t *access, DIR *dir)
         goto error;
 
     sys->dir = dir;
-    sys->special_files = var_InheritBool(access, "list-special-files");
 
     access->p_sys = sys;
     access->pf_readdir = DirRead;
@@ -113,12 +111,18 @@ void DirClose(vlc_object_t *obj)
     free(sys);
 }
 
-input_item_t *DirRead(access_t *access)
+int DirRead (access_t *access, input_item_node_t *node)
 {
     access_sys_t *sys = access->p_sys;
     const char *entry;
+    int ret = VLC_SUCCESS;
 
-    while ((entry = vlc_readdir(sys->dir)) != NULL)
+    bool special_files = var_InheritBool(access, "list-special-files");
+
+    struct access_fsdir fsdir;
+    access_fsdir_init(&fsdir, access, node);
+
+    while (ret == VLC_SUCCESS && (entry = vlc_readdir(sys->dir)) != NULL)
     {
         struct stat st;
         int type;
@@ -136,17 +140,17 @@ input_item_t *DirRead(access_t *access)
         switch (st.st_mode & S_IFMT)
         {
             case S_IFBLK:
-                if (!sys->special_files)
+                if (!special_files)
                     continue;
                 type = ITEM_TYPE_DISC;
                 break;
             case S_IFCHR:
-                if (!sys->special_files)
+                if (!special_files)
                     continue;
                 type = ITEM_TYPE_CARD;
                 break;
             case S_IFIFO:
-                if (!sys->special_files)
+                if (!special_files)
                     continue;
                 type = ITEM_TYPE_STREAM;
                 break;
@@ -165,20 +169,25 @@ input_item_t *DirRead(access_t *access)
         /* Create an input item for the current entry */
         char *encoded = vlc_uri_encode(entry);
         if (unlikely(encoded == NULL))
-            continue;
+        {
+            ret = VLC_ENOMEM;
+            break;
+        }
 
         char *uri;
         if (unlikely(asprintf(&uri, "%s/%s", sys->base_uri, encoded) == -1))
             uri = NULL;
         free(encoded);
         if (unlikely(uri == NULL))
-            continue;
-
-        input_item_t *item = input_item_NewExt(uri, entry, -1, type,
-                                               ITEM_NET_UNKNOWN);
+        {
+            ret = VLC_ENOMEM;
+            break;
+        }
+        ret = access_fsdir_additem(&fsdir, uri, entry, type, ITEM_NET_UNKNOWN);
         free(uri);
-        if (likely(item != NULL))
-            return item;
     }
-    return NULL;
+
+    access_fsdir_finish(&fsdir, ret == VLC_SUCCESS);
+
+    return ret;
 }

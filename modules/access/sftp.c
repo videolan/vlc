@@ -80,7 +80,7 @@ static ssize_t  Read( access_t *, uint8_t *, size_t );
 static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 
-static input_item_t* DirRead( access_t *p_access );
+static int DirRead( access_t *, input_item_node_t * );
 static int DirControl( access_t *, int, va_list );
 
 struct access_sys_t
@@ -464,11 +464,11 @@ static int Control( access_t* p_access, int i_query, va_list args )
  * Directory access
  *****************************************************************************/
 
-static input_item_t* DirRead( access_t *p_access )
+static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
 {
     access_sys_t *p_sys = p_access->p_sys;
     LIBSSH2_SFTP_ATTRIBUTES attrs;
-    input_item_t *p_item = NULL;
+    int i_ret = VLC_SUCCESS;
     int err;
     /* Allocate 1024 bytes for file name. Longer names are skipped.
      * libssh2 does not support seeking in directory streams.
@@ -479,9 +479,13 @@ static input_item_t* DirRead( access_t *p_access )
     char *psz_file = malloc( i_size );
 
     if( !psz_file )
-        return NULL;
+        return VLC_ENOMEM;
 
-    while( !p_item && 0 != ( err = libssh2_sftp_readdir( p_sys->file, psz_file, i_size, &attrs ) ) )
+    struct access_fsdir fsdir;
+    access_fsdir_init( &fsdir, p_access, p_current_node );
+
+    while( i_ret == VLC_SUCCESS
+        && 0 != ( err = libssh2_sftp_readdir( p_sys->file, psz_file, i_size, &attrs ) ) )
     {
         if( err < 0 )
         {
@@ -499,38 +503,34 @@ static input_item_t* DirRead( access_t *p_access )
             break;
         }
 
-        if( psz_file[0] == '.' )
-        {
-            continue;
-        }
-
         /* Create an input item for the current entry */
 
         char *psz_full_uri, *psz_uri;
 
         psz_uri = vlc_uri_encode( psz_file );
         if( psz_uri == NULL )
-            continue;
+        {
+            i_ret = VLC_ENOMEM;
+            break;
+        }
 
         if( asprintf( &psz_full_uri, "%s/%s", p_sys->psz_base_url, psz_uri ) == -1 )
         {
             free( psz_uri );
-            continue;
+            i_ret = VLC_ENOMEM;
+            break;
         }
         free( psz_uri );
 
         int i_type = LIBSSH2_SFTP_S_ISDIR( attrs.permissions ) ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
-        p_item = input_item_NewExt( psz_full_uri, psz_file, -1, i_type, ITEM_NET );
+        i_ret = access_fsdir_additem( &fsdir, psz_full_uri, psz_file, i_type,
+                                      ITEM_NET );
         free( psz_full_uri );
-
-        if( p_item == NULL )
-        {
-            break;
-        }
     }
 
+    access_fsdir_finish( &fsdir, i_ret == VLC_SUCCESS );
     free( psz_file );
-    return p_item;
+    return i_ret;
 }
 
 static int DirControl( access_t *p_access, int i_query, va_list args )

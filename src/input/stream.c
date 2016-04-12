@@ -617,11 +617,10 @@ block_t *stream_Block( stream_t *s, size_t size )
 }
 
 /**
- * Read the next input_item_t from the directory stream. It returns the next
- * input item on success or NULL in case of error or end of stream. The item
- * must be released with input_item_Release.
+ * Returns a node containing all the input_item of the directory pointer by
+ * this stream. returns VLC_SUCCESS on success.
  */
-input_item_t *stream_ReadDir( stream_t *s )
+int stream_ReadDir( stream_t *s, input_item_node_t *p_node )
 {
-    return s->pf_readdir( s );
+    return s->pf_readdir( s, p_node );
 }
