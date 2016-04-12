@@ -296,17 +296,22 @@ file_open(const char *psz_file, const char *psz_mode, FILE **pp_file)
 
     int i_fd = fileno(p_file);
     if (i_fd == -1)
+    {
+        fclose(p_file);
         return -1;
+    }
 
 #ifdef HAVE_FLOCK
     if (flock(i_fd, LOCK_EX) != 0)
     {
         fclose(p_file);
+        return -1;
     }
 #elif defined (HAVE_FCNTL) && defined (F_SETLKW)
     if (posix_lock_fd(i_fd) != 0)
     {
         fclose(p_file);
+        return -1;
     }
 #endif
     *pp_file = p_file;
