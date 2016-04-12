@@ -362,7 +362,7 @@ static int login( access_t *p_access )
                  psz_login, psz_domain );
         goto error;
     }
-    else if( smb_session_is_guest( p_sys->p_session )  )
+    else if( smb_session_is_guest( p_sys->p_session ) == 1 )
     {
         msg_Warn( p_access, "Login failure but you were logged in as a Guest");
         b_guest = true;
