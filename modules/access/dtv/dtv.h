@@ -46,7 +46,7 @@ typedef struct dvb_device dvb_device_t;
 
 dvb_device_t *dvb_open (vlc_object_t *obj);
 void dvb_close (dvb_device_t *);
-ssize_t dvb_read (dvb_device_t *, void *, size_t);
+ssize_t dvb_read (dvb_device_t *, void *, size_t, int);
 
 int dvb_add_pid (dvb_device_t *, uint16_t);
 void dvb_remove_pid (dvb_device_t *, uint16_t);

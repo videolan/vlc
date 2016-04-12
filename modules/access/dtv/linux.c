@@ -323,7 +323,7 @@ static void dvb_frontend_status(vlc_object_t *obj, fe_status_t s)
  * Reads TS data from the tuner.
  * @return number of bytes read, 0 on EOF, -1 if no data (yet).
  */
-ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
+ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len, int ms)
 {
     struct pollfd ufd[2];
     int n;
@@ -344,7 +344,10 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
     else
         n = 1;
 
-    if (vlc_poll_i11e (ufd, n, -1) < 0)
+    n = vlc_poll_i11e (ufd, n, ms);
+    if (n == 0)
+        errno = EAGAIN;
+    if (n <= 0)
         return -1;
 
     if (d->frontend != -1 && ufd[1].revents)

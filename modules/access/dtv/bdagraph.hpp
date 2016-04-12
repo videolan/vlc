@@ -70,7 +70,7 @@ public:
     ~BDAOutput();
 
     void    Push( block_t * );
-    ssize_t Pop(void *, size_t);
+    ssize_t Pop(void *, size_t, int);
     void    Empty();
 
 private:
@@ -103,7 +103,7 @@ public:
     int SetDVBS(long, long, uint32_t, int, char, long, long, long);
 
     /* */
-    ssize_t Pop(void *, size_t);
+    ssize_t Pop(void *, size_t, int);
 
 private:
     /* ISampleGrabberCB methods */

@@ -509,7 +509,7 @@ static block_t *Read (access_t *access)
         return NULL;
 
     access_sys_t *sys = access->p_sys;
-    ssize_t val = dvb_read (sys->dev, block->p_buffer, BUFSIZE);
+    ssize_t val = dvb_read (sys->dev, block->p_buffer, BUFSIZE, -1);
 
     if (val <= 0)
     {

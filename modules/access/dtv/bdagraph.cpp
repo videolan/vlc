@@ -153,9 +153,9 @@ void dvb_close (dvb_device_t *d)
     delete d;
 }
 
-ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
+ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len, int ms)
 {
-    return d->module->Pop(buf, len);
+    return d->module->Pop(buf, len, ms);
 }
 
 int dvb_add_pid (dvb_device_t *, uint16_t)
@@ -309,11 +309,14 @@ void BDAOutput::Push( block_t *p_block )
     vlc_cond_signal( &wait );
 }
 
-ssize_t BDAOutput::Pop(void *buf, size_t len)
+ssize_t BDAOutput::Pop(void *buf, size_t len, int ms)
 {
+    if( ms < 0 )
+        ms = 250;
+
     vlc_mutex_locker l( &lock );
 
-    mtime_t i_deadline = mdate() + 250 * 1000;
+    mtime_t i_deadline = mdate() + ms * 1000;
     while( !p_first )
     {
         if( vlc_cond_timedwait( &wait, &lock, i_deadline ) )
@@ -3015,9 +3018,9 @@ HRESULT BDAGraph::Start()
 /*****************************************************************************
 * Pop the stream of data
 *****************************************************************************/
-ssize_t BDAGraph::Pop(void *buf, size_t len)
+ssize_t BDAGraph::Pop(void *buf, size_t len, int ms)
 {
-    return output.Pop(buf, len);
+    return output.Pop(buf, len, ms);
 }
 
 /******************************************************************************
