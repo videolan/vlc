@@ -594,13 +594,9 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
                p_src, i_plane_count, b_swap_uvi );
     if( p_filter->fmt_in.video.i_chroma == VLC_CODEC_RGBP )
     {
-        video_palette_t *src_pal =
-            p_src->format.p_palette ?
-            p_src->format.p_palette :
-            p_filter->fmt_in.video.p_palette;
         memset( palette, 0, sizeof(palette) );
-        if( src_pal )
-            memcpy( palette, src_pal->palette,
+        if( p_filter->fmt_in.video.p_palette )
+            memcpy( palette, p_filter->fmt_in.video.p_palette->palette,
                     __MIN( sizeof(video_palette_t), AVPALETTE_SIZE ) );
         src[1] = palette;
         src_stride[1] = 4;
