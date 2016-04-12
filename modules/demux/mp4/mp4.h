@@ -70,6 +70,7 @@ typedef struct
     int b_enable;           /* is the trak enable by default */
     bool b_selected;  /* is the trak being played */
     bool b_chapters_source;   /* True when used for chapter only */
+    bool b_forced_spu; /* forced track selection (never done by default/priority) */
     uint32_t i_switch_group;
 
     bool b_mac_encoding;

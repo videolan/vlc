@@ -198,6 +198,16 @@ static MP4_Box_t * MP4_GetTrakByTrackID( MP4_Box_t *p_moov, const uint32_t i_id 
     return p_trak;
 }
 
+static es_out_id_t * MP4_AddTrackES( es_out_t *out, mp4_track_t *p_track )
+{
+    es_out_id_t *p_es = es_out_Add( out, &p_track->fmt );
+    /* Force SPU which isn't selected/defaulted */
+    if( p_track->fmt.i_cat == SPU_ES && p_es && p_track->b_forced_spu )
+        es_out_Control( out, ES_OUT_SET_ES_DEFAULT, p_es );
+
+    return p_es;
+}
+
 /* Return time in microsecond of a track */
 static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 {
@@ -2339,7 +2349,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     }
 
     if( pp_es )
-        *pp_es = es_out_Add( p_demux->out, &p_track->fmt );
+        *pp_es = MP4_AddTrackES( p_demux->out, p_track );
 
     return VLC_SUCCESS;
 }
@@ -2640,7 +2650,7 @@ static void MP4_TrackRestart( demux_t *p_demux, mp4_track_t *p_track,
 
             if( !p_track->b_chapters_source )
             {
-                p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
+                p_track->p_es = MP4_AddTrackES( p_demux->out, p_track );
                 p_track->b_ok = !!p_track->p_es;
             }
         }
