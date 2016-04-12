@@ -461,6 +461,7 @@
 		1CE5ED2619DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED2019DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png */; };
 		633121D01B5112C300E636DA /* ResumeDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 633121CE1B5112C300E636DA /* ResumeDialog.xib */; };
 		6B13E2A81BC67678001AD24A /* VLCScrollingClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */; };
+		6B242D4F1CBD18DA00016E2A /* statusBarIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B242D4E1CBD18DA00016E2A /* statusBarIcon.pdf */; };
 		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
@@ -471,8 +472,6 @@
 		7D9516C51C60B6DB00D14E1A /* pauseIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516BD1C60B6DB00D14E1A /* pauseIcon@2x.png */; };
 		7D9516C61C60B6DB00D14E1A /* playIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516BE1C60B6DB00D14E1A /* playIcon.png */; };
 		7D9516C71C60B6DB00D14E1A /* playIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516BF1C60B6DB00D14E1A /* playIcon@2x.png */; };
-		7D9516C81C60B6DB00D14E1A /* statusBarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C01C60B6DB00D14E1A /* statusBarIcon.png */; };
-		7D9516C91C60B6DB00D14E1A /* statusBarIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C11C60B6DB00D14E1A /* statusBarIcon@2x.png */; };
 		7D9516CA1C60B6DB00D14E1A /* stopIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C21C60B6DB00D14E1A /* stopIcon.png */; };
 		7D9516CB1C60B6DB00D14E1A /* stopIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C31C60B6DB00D14E1A /* stopIcon@2x.png */; };
 		7DB65D5618ABD6490053B874 /* AddonManager.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DB65D5418ABD6490053B874 /* AddonManager.xib */; };
@@ -1254,6 +1253,7 @@
 		633121CF1B5112C300E636DA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ResumeDialog.xib; sourceTree = "<group>"; };
 		6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCScrollingClipView.h; path = ../../../modules/gui/macosx/VLCScrollingClipView.h; sourceTree = "<group>"; };
 		6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCScrollingClipView.m; path = ../../../modules/gui/macosx/VLCScrollingClipView.m; sourceTree = "<group>"; };
+		6B242D4E1CBD18DA00016E2A /* statusBarIcon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = statusBarIcon.pdf; path = Resources/vlcmenubaricon/statusBarIcon.pdf; sourceTree = "<group>"; };
 		7D3F6524188051F2005776C4 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/BWQuincyMain.xib; sourceTree = "<group>"; };
 		7D3F652618805297005776C4 /* BWQuincyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BWQuincyManager.h; path = ../../../modules/gui/macosx/BWQuincyManager.h; sourceTree = SOURCE_ROOT; };
 		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyManager.m; path = ../../../modules/gui/macosx/BWQuincyManager.m; sourceTree = SOURCE_ROOT; };
@@ -1274,8 +1274,6 @@
 		7D9516BD1C60B6DB00D14E1A /* pauseIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "pauseIcon@2x.png"; path = "Resources/vlcmenubaricon/pauseIcon@2x.png"; sourceTree = "<group>"; };
 		7D9516BE1C60B6DB00D14E1A /* playIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = playIcon.png; path = Resources/vlcmenubaricon/playIcon.png; sourceTree = "<group>"; };
 		7D9516BF1C60B6DB00D14E1A /* playIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "playIcon@2x.png"; path = "Resources/vlcmenubaricon/playIcon@2x.png"; sourceTree = "<group>"; };
-		7D9516C01C60B6DB00D14E1A /* statusBarIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = statusBarIcon.png; path = Resources/vlcmenubaricon/statusBarIcon.png; sourceTree = "<group>"; };
-		7D9516C11C60B6DB00D14E1A /* statusBarIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "statusBarIcon@2x.png"; path = "Resources/vlcmenubaricon/statusBarIcon@2x.png"; sourceTree = "<group>"; };
 		7D9516C21C60B6DB00D14E1A /* stopIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = stopIcon.png; path = Resources/vlcmenubaricon/stopIcon.png; sourceTree = "<group>"; };
 		7D9516C31C60B6DB00D14E1A /* stopIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "stopIcon@2x.png"; path = "Resources/vlcmenubaricon/stopIcon@2x.png"; sourceTree = "<group>"; };
 		7DA481221B5FC13700917FD7 /* VLCPlaylistView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCPlaylistView.h; path = ../../../modules/gui/macosx/VLCPlaylistView.h; sourceTree = "<group>"; };
@@ -2373,8 +2371,7 @@
 				7D9516BD1C60B6DB00D14E1A /* pauseIcon@2x.png */,
 				7D9516BE1C60B6DB00D14E1A /* playIcon.png */,
 				7D9516BF1C60B6DB00D14E1A /* playIcon@2x.png */,
-				7D9516C01C60B6DB00D14E1A /* statusBarIcon.png */,
-				7D9516C11C60B6DB00D14E1A /* statusBarIcon@2x.png */,
+				6B242D4E1CBD18DA00016E2A /* statusBarIcon.pdf */,
 				7D9516C21C60B6DB00D14E1A /* stopIcon.png */,
 				7D9516C31C60B6DB00D14E1A /* stopIcon@2x.png */,
 			);
@@ -3198,7 +3195,6 @@
 				1C88BA7C19DC7B2200645190 /* yosemite-window-zoom-on.png in Resources */,
 				CC04331713B28B2900D7D52E /* fs_play_highlight.png in Resources */,
 				CC04331813B28B2900D7D52E /* fs_play.png in Resources */,
-				7D9516C81C60B6DB00D14E1A /* statusBarIcon.png in Resources */,
 				CC04331913B28B2900D7D52E /* fs_rewind_highlight.png in Resources */,
 				CC04331A13B28B2900D7D52E /* fs_rewind.png in Resources */,
 				CC04331B13B28B2900D7D52E /* fs_skip_next_highlight.png in Resources */,
@@ -3212,7 +3208,6 @@
 				CC04332013B28B2900D7D52E /* fs_stop.png in Resources */,
 				CC04332113B28B2900D7D52E /* fs_time_slider_knob_highlight.png in Resources */,
 				CC04332213B28B2900D7D52E /* fs_time_slider_knob.png in Resources */,
-				7D9516C91C60B6DB00D14E1A /* statusBarIcon@2x.png in Resources */,
 				1C88BC0919DC7C8100645190 /* ys-fullscreen-one-button_dark.png in Resources */,
 				CC04332313B28B2900D7D52E /* fs_time_slider.png in Resources */,
 				1C51BDE51B7A221B0056B9AA /* TimeSelectionPanel.xib in Resources */,
@@ -3302,6 +3297,7 @@
 				1C88BB0819DC7C7800645190 /* ys-backward-3btns-pressed.png in Resources */,
 				CC04338C13B28B8200D7D52E /* stop-pressed.png in Resources */,
 				CC04338D13B28B8200D7D52E /* stop.png in Resources */,
+				6B242D4F1CBD18DA00016E2A /* statusBarIcon.pdf in Resources */,
 				CC04338E13B28B8200D7D52E /* volume-high.png in Resources */,
 				CC04338F13B28B8200D7D52E /* volume-low.png in Resources */,
 				1C88BB3219DC7C7800645190 /* ys-pause.png in Resources */,

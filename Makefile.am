@@ -128,6 +128,7 @@ EXTRA_DIST += \
 	extras/package/macosx/eyetvplugin/EyeTVPluginDefs.h \
 	extras/package/macosx/eyetvplugin/Info.plist \
 	extras/package/macosx/fullscreen_panel.svg \
+	extras/package/macosx/vlc_status_icon.svg \
 	extras/package/macosx/Info.plist.in \
 	extras/package/macosx/package.mak \
 	extras/package/macosx/README.MacOSX.rtf \
