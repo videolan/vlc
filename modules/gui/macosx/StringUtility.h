@@ -58,7 +58,7 @@ NSImage *imageFromRes(NSString *o_id);
 
 + (VLCStringUtility *)sharedInstance;
 
-- (NSString *)localizedString:(const char *)psz;
+- (NSString *)localizedString:(const char *)psz NS_FORMAT_ARGUMENT(1);
 - (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;
 - (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input negative:(BOOL)b_negative;
 - (NSString *)stringForTime:(long long int)time;
