@@ -246,19 +246,6 @@ static void lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
             dst += dst_stride;
         }
     }
-
-    if (unlikely(sys->p_context->pix_fmt == AV_PIX_FMT_PAL8))
-    {
-        if (pic->format.p_palette == NULL)
-            pic->format.p_palette = calloc(1, sizeof (video_palette_t));
-
-        if (likely(pic->format.p_palette != NULL))
-        {
-            pic->format.p_palette->i_entries = AVPALETTE_COUNT;
-            memcpy(pic->format.p_palette->palette, frame->data[1],
-                   AVPALETTE_SIZE);
-        }
-    }
 }
 
 static int OpenVideoCodec( decoder_t *p_dec )
