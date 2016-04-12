@@ -78,9 +78,9 @@
     [self enableMenuIcon];
 
     // add the top menu item for dynamic data
-    _vlcStatusBarMenuItem = [[NSMenuItem alloc] initWithTitle:@"URL/Path Options" action:@selector(updateMenuItemContent:) keyEquivalent:@""];
+    _vlcStatusBarMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("URL/Path Options") action:@selector(updateMenuItemContent:) keyEquivalent:@""];
 
-    [_vlcStatusBarMenuItem setToolTip:@"Misc functions with media URL or Path"];
+    [_vlcStatusBarMenuItem setToolTip:_NS("Misc functions with media URL or Path")];
     [_vlcStatusBarMenuItem setTarget:self];
 
     [_vlcStatusBarIconMenu insertItem:_vlcStatusBarMenuItem atIndex:0];
@@ -233,12 +233,13 @@
 
     if ([self vlcPlayingStatus] == PLAYLIST_STOPPED) {
         // nothing playing
-        toolTipText = @"VLC media player\nNothing playing";
+        toolTipText = _NS("VLC media player\nNothing playing");
     } else {
 #ifdef showURLInToolTip
-        toolTipText = [NSString stringWithFormat:@"VLC media player\nName: %@\nDuration: %@\nTime: %@\nURL/Path: %@", _nameToDisplay, _durationToDisplay, _timeToDisplay, _urlToDisplay];
+        toolTipText = [NSString stringWithFormat:_NS("VLC media player\nName: %@\nDuration: %@\nTime: %@\nURL/Path: %@"), _nameToDisplay, _durationToDisplay, _timeToDisplay, _urlToDisplay];
 #else
-        toolTipText = [NSString stringWithFormat:@"VLC media player\nName: %@\nDuration: %@\nTime: %@", _nameToDisplay, _durationToDisplay, _timeToDisplay];
+        toolTipText = [NSString stringWithFormat:_NS("VLC media player\nName: %@\nDuration: %@\nTime: %@"), _nameToDisplay, _durationToDisplay, _timeToDisplay];
+        // Causes warning, we need NS_FORMAT_ARGUMENT(1) for the localize function
 #endif
     }
 
@@ -257,14 +258,14 @@
     // create string for dynamic menu bit (sync?)
     if ([self vlcPlayingStatus] == PLAYLIST_STOPPED) {
         // put back our disabled menu item text.
-        menuString =  @"URL/Path Options";
+        menuString =  _NS("URL/Path Options");
     } else {
         if ([_urlToDisplay hasPrefix:@"file://"]) {
             // offer to show 'file://' in finder
-            menuString = [NSString stringWithFormat:@"Select File In Finder"];
+            menuString = [NSString stringWithString:_NS("Select File In Finder")];
         } else {
             // offer to copy URL to clipboard
-            menuString = [NSString stringWithFormat:@"Copy URL to clipboard"];
+            menuString = [NSString stringWithString:_NS("Copy URL to clipboard")];
         }
     }
 
@@ -313,10 +314,10 @@
     NSMenuItem* menuItemToChange = [_vlcStatusBarIconMenu itemWithTag:playPauseMenuItemTag];
 
     if ([self vlcPlayingStatus] == PLAYLIST_RUNNING) {
-        [menuItemToChange setTitle:@"Pause"];
+        [menuItemToChange setTitle:_NS("Pause")];
         [menuItemToChange setImage:_menuImagePause];
     } else {
-        [menuItemToChange setTitle:@"Play"];
+        [menuItemToChange setTitle:_NS("Play")];
         [menuItemToChange setImage:_menuImagePlay];
     }
 }
