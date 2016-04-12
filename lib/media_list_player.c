@@ -666,8 +666,7 @@ int
 libvlc_media_list_player_is_playing(libvlc_media_list_player_t * p_mlp)
 {
     libvlc_state_t state = libvlc_media_player_get_state(p_mlp->p_mi);
-    return (state == libvlc_Opening) || (state == libvlc_Buffering) ||
-           (state == libvlc_Playing);
+    return (state == libvlc_Opening) || (state == libvlc_Playing);
 }
 
 /**************************************************************************

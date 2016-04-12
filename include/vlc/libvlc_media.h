@@ -85,14 +85,16 @@ typedef enum libvlc_meta_t {
  * and VideoLAN.LibVLC.State (at bindings/cil/src/media.cs).
  *
  * Expected states by web plugins are:
- * IDLE/CLOSE=0, OPENING=1, BUFFERING=2, PLAYING=3, PAUSED=4,
+ * IDLE/CLOSE=0, OPENING=1, PLAYING=3, PAUSED=4,
  * STOPPING=5, ENDED=6, ERROR=7
  */
 typedef enum libvlc_state_t
 {
     libvlc_NothingSpecial=0,
     libvlc_Opening,
-    libvlc_Buffering,
+    libvlc_Buffering, /* XXX: Deprecated value. Check the
+                       * libvlc_MediaPlayerBuffering event to know the
+                       * buffering state of a libvlc_media_player */
     libvlc_Playing,
     libvlc_Paused,
     libvlc_Stopped,
