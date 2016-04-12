@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10102" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9532" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10102"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9532"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCStatusBarIcon">
             <connections>
+                <outlet property="nextItem" destination="GhQ-VQ-jtu" id="45X-b4-mHv"/>
+                <outlet property="playPauseItem" destination="9kC-yJ-Gy5" id="laU-MV-Il1"/>
+                <outlet property="prevItem" destination="iHu-rd-8KL" id="IzO-1Q-rtv"/>
+                <outlet property="quitItem" destination="539" id="xuy-Vl-Ami"/>
+                <outlet property="randItem" destination="lPi-EL-hoN" id="dOE-ib-n98"/>
+                <outlet property="showMainWindowItem" destination="08C-TA-yqu" id="qQR-Ah-T0b"/>
+                <outlet property="stopItem" destination="4Sh-MJ-bSf" id="qBc-qg-d9R"/>
                 <outlet property="vlcStatusBarIconMenu" destination="534" id="O0F-8Q-FgA"/>
             </connections>
         </customObject>
@@ -16,7 +23,7 @@
         <customObject id="420" customClass="NSFontManager"/>
         <menu id="534" userLabel="vlcStatusBarIconMenu">
             <items>
-                <menuItem title="Show Main WIndow" toolTip="Restore main window" id="08C-TA-yqu">
+                <menuItem title="Show Main Window" toolTip="Restore main window" id="08C-TA-yqu">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="restoreMainWindow:" target="-2" id="2Uq-Pa-toi"/>

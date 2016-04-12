@@ -46,6 +46,14 @@
 {
     NSMenuItem *_vlcStatusBarMenuItem;
 
+    IBOutlet NSMenuItem *showMainWindowItem;
+    IBOutlet NSMenuItem *playPauseItem;
+    IBOutlet NSMenuItem *stopItem;
+    IBOutlet NSMenuItem *nextItem;
+    IBOutlet NSMenuItem *prevItem;
+    IBOutlet NSMenuItem *randItem;
+    IBOutlet NSMenuItem *quitItem;
+
     NSString *_nameToDisplay;
     NSString *_timeToDisplay;
     NSString *_durationToDisplay;
@@ -76,6 +84,15 @@
     [super awakeFromNib];
 
     [self enableMenuIcon];
+
+    // Populate menu items with localized strings
+    [showMainWindowItem setTitle:_NS("Show Main Window")];
+    [playPauseItem setTitle:_NS("Play")];
+    [stopItem setTitle:_NS("Stop")];
+    [nextItem setTitle:_NS("Next")];
+    [prevItem setTitle:_NS("Previous")];
+    [randItem setTitle:_NS("Random")];
+    [quitItem setTitle:_NS("Quit")];
 
     // add the top menu item for dynamic data
     _vlcStatusBarMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("URL/Path Options") action:@selector(updateMenuItemContent:) keyEquivalent:@""];
@@ -179,6 +196,7 @@
     // Make sure the b/w statusItem icon is inverted on dark/light mode
     menuIcon.template = YES;
     [_statusItem setImage:menuIcon];
+    [_statusItem setLength:24];
 
     // Attach pull-down menu
     [_statusItem setMenu:_vlcStatusBarIconMenu];
@@ -262,10 +280,10 @@
     } else {
         if ([_urlToDisplay hasPrefix:@"file://"]) {
             // offer to show 'file://' in finder
-            menuString = [NSString stringWithString:_NS("Select File In Finder")];
+            menuString = _NS("Select File In Finder");
         } else {
             // offer to copy URL to clipboard
-            menuString = [NSString stringWithString:_NS("Copy URL to clipboard")];
+            menuString = _NS("Copy URL to clipboard");
         }
     }
 
@@ -311,14 +329,12 @@
 //
 - (void)updateMenuItemPlayPause
 {
-    NSMenuItem* menuItemToChange = [_vlcStatusBarIconMenu itemWithTag:playPauseMenuItemTag];
-
     if ([self vlcPlayingStatus] == PLAYLIST_RUNNING) {
-        [menuItemToChange setTitle:_NS("Pause")];
-        [menuItemToChange setImage:_menuImagePause];
+        [playPauseItem setTitle:_NS("Pause")];
+        [playPauseItem setImage:_menuImagePause];
     } else {
-        [menuItemToChange setTitle:_NS("Play")];
-        [menuItemToChange setImage:_menuImagePlay];
+        [playPauseItem setTitle:_NS("Play")];
+        [playPauseItem setImage:_menuImagePlay];
     }
 }
 
