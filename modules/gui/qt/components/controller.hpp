@@ -260,6 +260,7 @@ public:
 
 signals:
     void keyPressed( QKeyEvent * );
+    void fullscreenChanged( bool );
 
 public slots:
     void setVoutList( vout_thread_t **, int );

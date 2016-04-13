@@ -316,6 +316,7 @@ public slots:
     void activatePlayQuit( bool );
 
     void loopRepeatLoopStatus();
+    void changeFullscreen( bool );
 
 private slots:
     void notifyRandom( bool );
