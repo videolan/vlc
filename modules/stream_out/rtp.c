@@ -1444,7 +1444,7 @@ static void* ThreadSend( void *data )
 
         vlc_mutex_lock( &id->lock_sink );
         unsigned deadc = 0; /* How many dead sockets? */
-        int deadv[id->sinkc]; /* Dead sockets list */
+        int deadv[id->sinkc ? id->sinkc : 1]; /* Dead sockets list */
 
         for( int i = 0; i < id->sinkc; i++ )
         {
