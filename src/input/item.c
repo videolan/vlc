@@ -993,32 +993,28 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
 
 input_item_t *input_item_Copy( input_item_t *p_input )
 {
+    vlc_meta_t *meta = NULL;
+    input_item_t *item;
+
     vlc_mutex_lock( &p_input->lock );
 
-    input_item_t *p_new_input =
-        input_item_NewWithType( p_input->psz_uri, p_input->psz_name,
-                                0, NULL, 0, p_input->i_duration,
-                                p_input->i_type );
-
-    if( p_new_input )
+    item = input_item_NewWithType( p_input->psz_uri, p_input->psz_name,
+                                   0, NULL, 0, p_input->i_duration,
+                                   p_input->i_type );
+    if( likely(item != NULL) && p_input->p_meta != NULL )
     {
-        for( int i = 0 ; i< p_input->i_options; i++ )
-        {
-            input_item_AddOption( p_new_input,
-                                  p_input->ppsz_options[i],
-                                  p_input->optflagv[i] );
-        }
-
-        if( p_input->p_meta )
-        {
-            p_new_input->p_meta = vlc_meta_New();
-            vlc_meta_Merge( p_new_input->p_meta, p_input->p_meta );
-        }
+        meta = vlc_meta_New();
+        vlc_meta_Merge( meta, p_input->p_meta );
     }
-
     vlc_mutex_unlock( &p_input->lock );
 
-    return p_new_input;
+    if( likely(item != NULL) )
+    {   /* No need to lock; no other thread has seen this new item yet. */
+        input_item_CopyOptions( p_input, item );
+        item->p_meta = meta;
+    }
+
+    return item;
 }
 
 struct item_type_entry
