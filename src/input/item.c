@@ -1073,26 +1073,22 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "vcd",    ITEM_TYPE_DISC, false },
         { "window", ITEM_TYPE_CARD, false },
     };
-    int i_item_type = ITEM_TYPE_UNKNOWN;
-    *p_net = false;
+    const struct item_type_entry *e;
 
     if( !strstr( p_item->psz_uri, "://" ) )
-    {
-        i_item_type = ITEM_TYPE_FILE;
-    }
-    else
-    {
-        const struct item_type_entry *e =
-            bsearch( p_item->psz_uri, tab, sizeof( tab ) / sizeof( tab[0] ),
-                     sizeof( tab[0] ), typecmp );
-        if( e )
-        {
-            *p_net = e->b_net;
-            return e->i_type;
-        }
-    }
+        return ITEM_TYPE_FILE;
 
-    return i_item_type;
+    e = bsearch( p_item->psz_uri, tab, sizeof( tab ) / sizeof( tab[0] ),
+                 sizeof( tab[0] ), typecmp );
+    if( e )
+    {
+        *p_net = e->b_net;
+        return e->i_type;
+    } else
+    {
+        *p_net = false;
+        return ITEM_TYPE_FILE;
+    }
 }
 
 input_item_node_t *input_item_node_Create( input_item_t *p_input )
