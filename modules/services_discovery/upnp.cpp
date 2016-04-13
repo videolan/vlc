@@ -321,14 +321,14 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
     if ( desc->isSatIp )
     {
         p_input_item = input_item_NewWithTypeExt( desc->location.c_str(), desc->friendlyName.c_str(), 0,
-                                                  NULL, 0, -1, ITEM_TYPE_NODE, 1);
+                                                  NULL, 0, -1, ITEM_TYPE_DIRECTORY, 1);
     } else {
         char* psz_mrl;
         if( asprintf(&psz_mrl, "upnp://%s?ObjectID=0", desc->location.c_str() ) < 0 )
             return false;
 
         p_input_item = input_item_NewWithTypeExt( psz_mrl, desc->friendlyName.c_str(), 0,
-                                                  NULL, 0, -1, ITEM_TYPE_NODE, 1);
+                                                  NULL, 0, -1, ITEM_TYPE_DIRECTORY, 1);
         free( psz_mrl );
     }
     if ( !p_input_item )
