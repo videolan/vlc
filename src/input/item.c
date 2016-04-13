@@ -944,7 +944,10 @@ input_item_NewWithTypeExt( const char *psz_uri, const char *psz_name,
     if( psz_uri )
         input_item_SetURI( p_input, psz_uri );
     else
+    {
         p_input->i_type = ITEM_TYPE_UNKNOWN;
+        p_input->b_net = false;
+    }
 
     TAB_INIT( p_input->i_options, p_input->ppsz_options );
     p_input->optflagc = 0;
@@ -977,8 +980,6 @@ input_item_NewWithTypeExt( const char *psz_uri, const char *psz_name,
 
     if( i_net != -1 )
         p_input->b_net = !!i_net;
-    else if( p_input->i_type == ITEM_TYPE_STREAM )
-        p_input->b_net = true;
     return p_input;
 }
 
