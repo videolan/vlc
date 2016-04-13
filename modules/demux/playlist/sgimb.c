@@ -383,7 +383,7 @@ static int Demux ( demux_t *p_demux )
         return -1;
     }
 
-    input_item_CopyOptions( p_child, p_current_input );
+    input_item_CopyOptions( p_current_input, p_child );
     if( p_sys->i_packet_size && p_sys->psz_mcast_ip )
     {
         char *psz_option;

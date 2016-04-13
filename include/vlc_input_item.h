@@ -128,7 +128,7 @@ struct input_item_node_t
     bool                   b_can_loop;
 };
 
-VLC_API void input_item_CopyOptions( input_item_t *p_child, const input_item_t *p_parent );
+VLC_API void input_item_CopyOptions( input_item_t *p_parent, input_item_t *p_child );
 VLC_API void input_item_SetName( input_item_t *p_item, const char *psz_name );
 
 /**

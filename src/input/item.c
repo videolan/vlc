@@ -157,8 +157,10 @@ void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const cha
     vlc_event_send( &p_i->event_manager, &event );
 }
 
-void input_item_CopyOptions( input_item_t *p_child,
-                             const input_item_t *p_parent )
+/* FIXME GRRRRRRRRRR args should be in the reverse order to be
+ * consistent with (nearly?) all or copy funcs */
+void input_item_CopyOptions( input_item_t *p_parent,
+                             input_item_t *p_child )
 {
     vlc_mutex_lock( &p_parent->lock );
 
