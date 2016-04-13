@@ -1085,6 +1085,7 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "sftp",   ITEM_TYPE_FILE, true },
         { "shm",    ITEM_TYPE_CARD, false },
         { "smb",    ITEM_TYPE_FILE, true },
+        { "stream", ITEM_TYPE_STREAM, false },
         { "svcd",   ITEM_TYPE_DISC, false },
         { "tcp",    ITEM_TYPE_STREAM, true },
         { "terres", ITEM_TYPE_CARD, false }, /* terrestrial */
@@ -1095,22 +1096,26 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "vcd",    ITEM_TYPE_DISC, false },
         { "window", ITEM_TYPE_CARD, false },
     };
-    const struct item_type_entry *e;
+    int i_item_type = ITEM_TYPE_UNKNOWN;
+    *p_net = false;
 
     if( !strstr( p_item->psz_uri, "://" ) )
-        return ITEM_TYPE_FILE;
-
-    e = bsearch( p_item->psz_uri, tab, sizeof( tab ) / sizeof( tab[0] ),
-                 sizeof( tab[0] ), typecmp );
-    if( e )
     {
-        *p_net = e->b_net;
-        return e->i_type;
-    } else
-    {
-        *p_net = false;
-        return ITEM_TYPE_FILE;
+        i_item_type = ITEM_TYPE_FILE;
     }
+    else
+    {
+        const struct item_type_entry *e =
+            bsearch( p_item->psz_uri, tab, sizeof( tab ) / sizeof( tab[0] ),
+                     sizeof( tab[0] ), typecmp );
+        if( e )
+        {
+            *p_net = e->b_net;
+            i_item_type = e->i_type;
+        }
+    }
+
+    return i_item_type;
 }
 
 input_item_node_t *input_item_node_Create( input_item_t *p_input )
