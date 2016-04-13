@@ -162,14 +162,43 @@ void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const cha
 void input_item_CopyOptions( input_item_t *p_parent,
                              input_item_t *p_child )
 {
+    char **optv = NULL;
+    uint8_t *flagv = NULL;
+    size_t optc;
+
     vlc_mutex_lock( &p_parent->lock );
 
-    for( int i = 0 ; i< p_parent->i_options; i++ )
-        input_item_AddOption( p_child,
-                              p_parent->ppsz_options[i],
-                              p_parent->optflagv[i] );
+    optc = p_parent->i_options;
+    if( optc > 0 )
+    {
+        optv = xmalloc( optc * sizeof (*optv) );
+        for( size_t i = 0; i < optc; i++ )
+            optv[i] = xstrdup( p_parent->ppsz_options[i] );
+
+        flagv = xmalloc( optc * sizeof (*flagv) );
+        memcpy( flagv, p_parent->optflagv, optc * sizeof (*flagv) );
+    }
 
     vlc_mutex_unlock( &p_parent->lock );
+
+    vlc_mutex_lock( &p_child->lock );
+
+    p_child->ppsz_options = xrealloc( p_child->ppsz_options,
+                                (p_child->i_options + optc) * sizeof (*optv) );
+    memcpy( p_child->ppsz_options + p_child->i_options, optv,
+            optc * sizeof (*optv) );
+    p_child->i_options += optc;
+
+    p_child->optflagv = xrealloc( p_child->optflagv,
+                               (p_child->i_options + optc) * sizeof (*flagv) );
+    memcpy( p_child->optflagv + p_child->i_options, flagv,
+            optc * sizeof (*flagv) );
+    p_child->optflagc += optc;
+
+    vlc_mutex_unlock( &p_child->lock );
+
+    free( flagv );
+    free( optv );
 }
 
 static void post_subitems( input_item_node_t *p_node )
