@@ -1034,6 +1034,7 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "dtv",    ITEM_TYPE_CARD, false },
         { "eyetv",  ITEM_TYPE_CARD, false },
         { "fd",     ITEM_TYPE_UNKNOWN, false },
+        { "file",   ITEM_TYPE_FILE, false },
         { "ftp",    ITEM_TYPE_FILE, true },
         { "http",   ITEM_TYPE_FILE, true },
         { "icyx",   ITEM_TYPE_STREAM, true },
