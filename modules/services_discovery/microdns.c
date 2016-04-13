@@ -140,7 +140,7 @@ items_add_input( services_discovery_t *p_sd, char *psz_uri,
 
     input_item_t *p_input_item =
         input_item_NewWithTypeExt( psz_uri, psz_name, 0, NULL, 0, -1,
-                                   ITEM_TYPE_NODE, true );
+                                   ITEM_TYPE_DIRECTORY, true );
     if( p_input_item == NULL )
     {
         free( psz_uri );
