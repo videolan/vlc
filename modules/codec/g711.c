@@ -263,9 +263,6 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    /* Create chunks of max 1024 samples */
-    if( samples > 1024 ) samples = 1024;
-
     block_t *p_out = decoder_NewAudioBuffer( p_dec, samples );
     if( p_out == NULL )
     {
