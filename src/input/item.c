@@ -181,6 +181,9 @@ void input_item_CopyOptions( input_item_t *p_parent,
 
     vlc_mutex_unlock( &p_parent->lock );
 
+    if( optc == 0 )
+        return;
+
     vlc_mutex_lock( &p_child->lock );
 
     p_child->ppsz_options = xrealloc( p_child->ppsz_options,
