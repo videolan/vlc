@@ -121,7 +121,7 @@ static void netbios_ns_discover_on_entry_added( void *p_opaque,
             return;
 
         p_item = input_item_NewWithTypeExt( psz_mrl, name, 0, NULL,
-                                            0, -1, ITEM_TYPE_NODE, 1 );
+                                            0, -1, ITEM_TYPE_DIRECTORY, 1 );
         msg_Dbg( p_sd, "Adding item %s", psz_mrl );
         free(psz_mrl);
 
