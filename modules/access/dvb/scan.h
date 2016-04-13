@@ -92,4 +92,4 @@ scan_session_t *scan_session_New( scan_t *, const scan_tuner_config_t * );
 void scan_session_Destroy( scan_t *, scan_session_t * );
 bool scan_session_Push( scan_session_t *p_scan, block_t *p_block );
 void scan_session_SetSNR( scan_session_t *p_scan, int i_snr );
-
+unsigned scan_session_GetTablesTimeout( const scan_session_t * );

@@ -262,6 +262,7 @@ static block_t *BlockScan( access_t *p_access )
 
     /* */
     int64_t i_scan_start = mdate();
+    int64_t i_probe_start = 0;
 
     bool b_has_dvb_signal = false;
     bool b_has_lock = false;
@@ -278,18 +279,23 @@ static block_t *BlockScan( access_t *p_access )
     for ( ; ; )
     {
         frontend_status_t status;
-
         FrontendGetStatus( p_access, &status );
         b_has_dvb_signal |= status.b_has_carrier;
         b_has_lock |= status.b_has_lock;
 
-        int64_t i_scan_end = i_scan_start;
-        if( !b_has_dvb_signal )
-            i_scan_end += DVB_SCAN_MAX_SIGNAL_TIME;
-        else if( !b_has_lock )
-            i_scan_end += DVB_SCAN_MAX_LOCK_TIME;
+        int64_t i_scan_end;
+        if( i_probe_start )
+        {
+            i_scan_end = i_probe_start + scan_session_GetTablesTimeout( session );
+        }
         else
-            i_scan_end += DVB_SCAN_MAX_PROBE_TIME;
+        {
+            i_scan_end = i_scan_start;
+            if( !b_has_dvb_signal )
+                i_scan_end += DVB_SCAN_MAX_SIGNAL_TIME;
+            else if( !b_has_lock )
+                i_scan_end += DVB_SCAN_MAX_LOCK_TIME;
+        }
 
         /* Find if some data is available */
         int i_ret;
@@ -344,6 +350,9 @@ static block_t *BlockScan( access_t *p_access )
 
         if ( ufds[0].revents )
         {
+            if( i_probe_start == 0 )
+                i_probe_start = mdate();
+
             const int i_read_once = 1;
             block_t *p_block = block_Alloc( i_read_once * TS_PACKET_SIZE );
 

@@ -126,6 +126,7 @@ struct scan_session_t
         size_t i_nit;
     } others;
 
+    scan_type_t type;
     bool b_use_nit;
     uint16_t i_nit_pid;
 
@@ -1155,6 +1156,7 @@ scan_session_t *scan_session_New( scan_t *p_scan, const scan_tuner_config_t *p_c
     p_session->local.p_nit = NULL;
     p_session->i_nit_pid = -1;
     p_session->b_use_nit = p_scan->parameter.b_use_nit;
+    p_session->type = p_scan->parameter.type;
     p_session->others.i_nit = 0;
     p_session->others.i_sdt = 0;
     p_session->others.pp_nit = NULL;
@@ -1463,4 +1465,26 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
 void scan_session_SetSNR( scan_session_t *p_session, int i_snr )
 {
     p_session->i_snr = i_snr;
+}
+
+unsigned scan_session_GetTablesTimeout( const scan_session_t *p_session )
+{
+    unsigned i_time = 0;
+    if( !p_session->local.p_pat )
+    {
+        i_time = 500;
+    }
+    else if( !p_session->local.p_sdt )
+    {
+        i_time = 2*1000;
+    }
+    else if( !p_session->local.p_nit && p_session->b_use_nit )
+    {
+        if( p_session->type == SCAN_DVB_T )
+            i_time = 6000;
+        else
+            i_time = 5000;
+    }
+
+    return i_time * 2 * 1000;
 }
