@@ -291,6 +291,8 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_block->p_buffer += samples;
     p_block->i_buffer -= samples;
 
+    *pp_block = p_block;
+
     return p_out;
 }
 
