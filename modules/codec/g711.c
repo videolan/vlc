@@ -285,9 +285,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     for( unsigned i = 0; i < samples; i++ )
        *(dst++) = p_sys->table[*(src++)];
 
-    p_block->p_buffer += samples;
-    p_block->i_buffer -= samples;
-
+    block_Release( p_block );
     return p_out;
 }
 
