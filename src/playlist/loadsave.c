@@ -91,19 +91,24 @@ out:
 int playlist_Import( playlist_t *p_playlist, const char *psz_file )
 {
     input_item_t *p_input;
-    const char *const psz_option = "meta-file";
     char *psz_uri = vlc_path2uri( psz_file, NULL );
 
     if( psz_uri == NULL )
         return VLC_EGENERIC;
 
-    p_input = input_item_NewExt( psz_uri, psz_file,
-                                 1, &psz_option, VLC_INPUT_OPTION_TRUSTED, -1 );
+    p_input = input_item_NewExt( psz_uri, psz_file, 0, NULL, 0, -1 );
     free( psz_uri );
 
     playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
                        true, false );
-    return input_Read( p_playlist, p_input );
+
+    vlc_object_t *dummy = vlc_object_create( p_playlist, sizeof (*dummy) );
+    var_Create( dummy, "meta-file", VLC_VAR_VOID );
+
+    int ret = input_Read( dummy, p_input );
+
+    vlc_object_release( dummy );
+    return ret;
 }
 
 /*****************************************************************************
@@ -153,11 +158,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( psz_uri == NULL )
         return VLC_ENOMEM;
 
-    const char *const options[1] = { "meta-file", };
-    /* that option has to be cleaned in input_item_subitem_tree_added() */
-    /* vlc_gc_decref() in the same function */
-    p_input = input_item_NewExt( psz_uri, _("Media Library"),
-                                 1, options, VLC_INPUT_OPTION_TRUSTED, -1 );
+    p_input = input_item_NewExt( psz_uri, _("Media Library"), 0, NULL, 0, -1 );
     free( psz_uri );
     if( p_input == NULL )
         return VLC_EGENERIC;
@@ -172,7 +173,10 @@ int playlist_MLLoad( playlist_t *p_playlist )
                         input_item_subitem_tree_added, p_playlist );
     PL_UNLOCK;
 
-    input_Read( p_playlist, p_input );
+    vlc_object_t *dummy = vlc_object_create( p_playlist, sizeof (*dummy) );
+    var_Create( dummy, "meta-file", VLC_VAR_VOID );
+    input_Read( dummy, p_input );
+    vlc_object_release( dummy );
 
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemTreeAdded,
                         input_item_subitem_tree_added, p_playlist );

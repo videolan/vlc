@@ -165,14 +165,9 @@ void input_item_CopyOptions( input_item_t *p_parent,
     vlc_mutex_lock( &p_parent->lock );
 
     for( int i = 0 ; i< p_parent->i_options; i++ )
-    {
-        if( !strcmp( p_parent->ppsz_options[i], "meta-file" ) )
-            continue;
-
         input_item_AddOption( p_child,
                               p_parent->ppsz_options[i],
                               p_parent->optflagv[i] );
-    }
 
     vlc_mutex_unlock( &p_parent->lock );
 }
