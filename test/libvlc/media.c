@@ -66,11 +66,7 @@ static void test_media_preparsed(const char** argv, int argc)
     vlc_sem_destroy (&sem);
 
     // We are good, now check Elementary Stream info.
-    libvlc_media_track_t **tracks;
-    unsigned nb_tracks = libvlc_media_tracks_get (media, &tracks);
-    assert (nb_tracks == 1);
-    assert (tracks[0]->i_type == libvlc_track_video);
-    libvlc_media_tracks_release (tracks, nb_tracks);
+    assert (libvlc_media_get_parsed_status(media) == libvlc_media_parse_done);
 
     libvlc_media_release (media);
     libvlc_release (vlc);
