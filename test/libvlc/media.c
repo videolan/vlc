@@ -181,10 +181,10 @@ static void test_media_subitems(const char** argv, int argc)
     test_media_subitems_media (media, false);
     libvlc_media_release (media);
 
-    #define NB_LOCATIONS 3
+    #define NB_LOCATIONS 2
     char *subitems_realpath = realpath (subitems_path, NULL);
     assert (subitems_realpath != NULL);
-    const char *schemes[NB_LOCATIONS] = { "file://", "stream://", "dir://" };
+    const char *schemes[NB_LOCATIONS] = { "file://", "dir://" };
     for (unsigned i = 0; i < NB_LOCATIONS; ++i)
     {
         char *location;
