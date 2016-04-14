@@ -37,7 +37,7 @@ static void media_parse_ended(const libvlc_event_t *event, void *user_data)
     vlc_sem_post (sem);
 }
 
-static void test_media_preparsed(const char** argv, int argc)
+static void test_media_preparsed(int argc, const char** argv)
 {
     // We use this image file because "empty.voc" has no track.
     const char * file = SRCDIR"/samples/image.jpg";
@@ -168,7 +168,7 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play)
     }
 }
 
-static void test_media_subitems(const char** argv, int argc)
+static void test_media_subitems(int argc, const char** argv)
 {
     const char *subitems_path = SRCDIR"/samples/subitems";
 
@@ -220,8 +220,8 @@ int main (void)
 {
     test_init();
 
-    test_media_preparsed (test_defaults_args, test_defaults_nargs);
-    test_media_subitems (test_defaults_args, test_defaults_nargs);
+    test_media_preparsed (test_defaults_nargs, test_defaults_args);
+    test_media_subitems (test_defaults_nargs, test_defaults_args);
 
     return 0;
 }
