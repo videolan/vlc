@@ -64,10 +64,11 @@ void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
         vlc_event_send( &p_i->event_manager, &event );
     }
 }
-void input_item_SignalPreparseEnded( input_item_t *p_i )
+void input_item_SignalPreparseEnded( input_item_t *p_i, int status )
 {
     vlc_event_t event;
     event.type = vlc_InputItemPreparseEnded;
+    event.u.input_item_preparse_ended.new_status = status;
     vlc_event_send( &p_i->event_manager, &event );
 }
 

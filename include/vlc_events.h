@@ -188,6 +188,10 @@ typedef struct vlc_event_t
         {
             bool new_value;
         } input_item_error_when_reading_changed;
+        struct input_item_preparse_ended
+        {
+            int new_status;
+        } input_item_preparse_ended;
 
         /* Service discovery events */
         struct vlc_services_discovery_item_added

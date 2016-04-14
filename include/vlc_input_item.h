@@ -337,6 +337,14 @@ typedef enum input_item_meta_request_option_t
     META_REQUEST_OPTION_DO_INTERACT   = 0x04
 } input_item_meta_request_option_t;
 
+/* status of the vlc_InputItemPreparseEnded event */
+enum input_item_preparse_status
+{
+    ITEM_PREPARSE_SKIPPED,
+    ITEM_PREPARSE_FAILED,
+    ITEM_PREPARSE_DONE
+};
+
 VLC_API int libvlc_MetaRequest(libvlc_int_t *, input_item_t *,
                                input_item_meta_request_option_t );
 VLC_API int libvlc_ArtRequest(libvlc_int_t *, input_item_t *,

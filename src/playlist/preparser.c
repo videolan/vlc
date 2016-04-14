@@ -187,7 +187,7 @@ static void Preparse( playlist_preparser_t *preparser, input_item_t *p_item,
                                                        p_item );
         if( input == NULL )
         {
-            input_item_SignalPreparseEnded( p_item );
+            input_item_SignalPreparseEnded( p_item, ITEM_PREPARSE_FAILED );
             return;
         }
 
@@ -205,9 +205,11 @@ static void Preparse( playlist_preparser_t *preparser, input_item_t *p_item,
 
         var_SetAddress( preparser->object, "item-change", p_item );
         input_item_SetPreparsed( p_item, true );
+        input_item_SignalPreparseEnded( p_item, ITEM_PREPARSE_DONE );
     }
+    else if (!b_preparse)
+        input_item_SignalPreparseEnded( p_item, ITEM_PREPARSE_SKIPPED );
 
-    input_item_SignalPreparseEnded( p_item );
 }
 
 /**
