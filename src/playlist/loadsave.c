@@ -96,7 +96,7 @@ int playlist_Import( playlist_t *p_playlist, const char *psz_file )
     if( psz_uri == NULL )
         return VLC_EGENERIC;
 
-    p_input = input_item_NewExt( psz_uri, psz_file, 0, NULL, 0, -1 );
+    p_input = input_item_New( psz_uri, psz_file );
     free( psz_uri );
 
     playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
@@ -158,7 +158,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( psz_uri == NULL )
         return VLC_ENOMEM;
 
-    p_input = input_item_NewExt( psz_uri, _("Media Library"), 0, NULL, 0, -1 );
+    p_input = input_item_New( psz_uri, _("Media Library") );
     free( psz_uri );
     if( p_input == NULL )
         return VLC_EGENERIC;

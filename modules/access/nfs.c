@@ -348,8 +348,8 @@ DirRead(access_t *p_access)
         default:
             i_type = ITEM_TYPE_UNKNOWN;
         }
-        p_item = input_item_NewWithTypeExt(psz_url, p_nfsdirent->name,
-                                           0, NULL, 0, -1, i_type, 1);
+        p_item = input_item_NewExt(psz_url, p_nfsdirent->name, -1, i_type,
+                                   ITEM_NET);
         free(psz_url);
         return p_item;
     }
@@ -373,9 +373,7 @@ MountRead(access_t *p_access)
     if (psz_url == NULL)
         return NULL;
 
-    input_item_t *p_item = input_item_NewWithTypeExt(psz_url, psz_name, 0,
-                                                     NULL, 0, -1,
-                                                     ITEM_TYPE_DIRECTORY, 1);
+    input_item_t *p_item = input_item_NewDirectory(psz_url, psz_name, ITEM_NET);
     free(psz_url);
     return p_item;
 }

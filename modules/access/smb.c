@@ -392,8 +392,8 @@ static input_item_t* DirRead (access_t *p_access )
         }
         free(psz_encoded_name);
 
-        p_item = input_item_NewWithTypeExt( psz_uri, p_entry->name, 0, NULL,
-                                            0, -1, i_type, 1 );
+        p_item = input_item_NewExt( psz_uri, p_entry->name, -1, i_type,
+                                    ITEM_NET );
         free( psz_uri );
         if( !p_item )
             return NULL;

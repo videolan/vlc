@@ -337,7 +337,9 @@ static int Demux( demux_t *p_demux )
             }
 
             /* Create the input item and pump in all the options into playlist item */
-            p_input = input_item_NewExt( psz_mrl, psz_title, i_options, ppsz_options, 0, i_duration );
+            p_input = input_item_NewExt( psz_mrl, psz_title, i_duration,
+                                         ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN );
+            input_item_AddOptions( p_input, i_options, ppsz_options, 0 );
 
             if( !EMPTY_STR( psz_artist ) ) input_item_SetArtist( p_input, psz_artist );
             if( !EMPTY_STR( psz_author ) ) input_item_SetPublisher( p_input, psz_author );

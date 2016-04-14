@@ -194,10 +194,9 @@ struct services_discovery_sys_t
                          aNetService.hostName,
                          aNetService.port];
 
-        input_item_t *p_input_item = input_item_NewWithTypeExt([uri UTF8String],
-                                                               [aNetService.name UTF8String],
-                                                               0, NULL, 0, -1,
-                                                               ITEM_TYPE_DIRECTORY, true );
+        input_item_t *p_input_item = input_item_NewDirectory([uri UTF8String],
+                                                             [aNetService.name UTF8String],
+                                                             ITEM_NET );
 
         if (p_input_item != NULL) {
             services_discovery_AddItem(self.p_sd, p_input_item, NULL);

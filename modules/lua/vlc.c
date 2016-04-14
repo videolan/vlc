@@ -541,10 +541,11 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     vlclua_read_options( p_this, L, &i_options, &ppsz_options );
 
                     /* Create input item */
-                    p_input = input_item_NewExt( psz_path, psz_name, i_options,
-                                                (const char **)ppsz_options,
-                                                VLC_INPUT_OPTION_TRUSTED,
-                                                i_duration );
+                    p_input = input_item_NewExt( psz_path, psz_name, i_duration,
+                                                 ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN );
+                    input_item_AddOptions( p_input, i_options,
+                                           (const char **)ppsz_options,
+                                           VLC_INPUT_OPTION_TRUSTED );
                     lua_pop( L, 3 ); /* pop "path name item" */
                     /* playlist key item */
 

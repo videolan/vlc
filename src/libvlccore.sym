@@ -191,8 +191,6 @@ input_item_IsPreparsed
 input_item_MetaMatch
 input_item_MergeInfos
 input_item_NewExt
-input_item_NewWithType
-input_item_NewWithTypeExt
 input_item_Hold
 input_item_Release
 input_item_node_AppendItem

@@ -320,15 +320,17 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
 
     if ( desc->isSatIp )
     {
-        p_input_item = input_item_NewWithTypeExt( desc->location.c_str(), desc->friendlyName.c_str(), 0,
-                                                  NULL, 0, -1, ITEM_TYPE_DIRECTORY, 1);
+        p_input_item = input_item_NewDirectory( desc->location.c_str(),
+                                                desc->friendlyName.c_str(),
+                                                ITEM_NET );
     } else {
         char* psz_mrl;
         if( asprintf(&psz_mrl, "upnp://%s?ObjectID=0", desc->location.c_str() ) < 0 )
             return false;
 
-        p_input_item = input_item_NewWithTypeExt( psz_mrl, desc->friendlyName.c_str(), 0,
-                                                  NULL, 0, -1, ITEM_TYPE_DIRECTORY, 1);
+        p_input_item = input_item_NewDirectory( psz_mrl,
+                                                desc->friendlyName.c_str(),
+                                                ITEM_NET );
         free( psz_mrl );
     }
     if ( !p_input_item )
@@ -790,8 +792,7 @@ input_item_t* MediaServer::newItem( const char *objectID, const char *title )
     if( asprintf( &psz_url, "upnp://%s?ObjectID=%s", psz_root_, objectID ) < 0 )
         return NULL;
 
-    input_item_t* p_item = input_item_NewWithTypeExt( psz_url, title, 0, NULL,
-                                                      0, -1, ITEM_TYPE_DIRECTORY, 1 );
+    input_item_t* p_item = input_item_NewDirectory( psz_url, title, ITEM_NET );
     free( psz_url);
     return p_item;
 }
@@ -799,8 +800,7 @@ input_item_t* MediaServer::newItem( const char *objectID, const char *title )
 input_item_t* MediaServer::newItem(const char* title, const char*,
                                    mtime_t duration, const char* psz_url)
 {
-    return input_item_NewWithTypeExt( psz_url, title, 0, NULL, 0,
-                                      duration, ITEM_TYPE_FILE, 1 );
+    return input_item_NewFile( psz_url, title, duration, ITEM_NET );
 }
 
 int MediaServer::sendActionCb( Upnp_EventType eventType,

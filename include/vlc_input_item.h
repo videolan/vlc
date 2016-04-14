@@ -116,6 +116,13 @@ enum input_item_type_e
     ITEM_TYPE_NUMBER
 };
 
+enum input_item_net_type
+{
+    ITEM_NET_UNKNOWN,
+    ITEM_NET,
+    ITEM_LOCAL
+};
+
 typedef int (*input_item_compar_cb)( input_item_t *, input_item_t * );
 
 struct input_item_node_t
@@ -281,34 +288,30 @@ VLC_API void input_item_MergeInfos( input_item_t *, info_category_t * );
 /**
  * This function creates a new input_item_t with the provided information.
  *
- * XXX You may also use input_item_New or input_item_NewExt as they need
- * less arguments.
+ * XXX You may also use input_item_New, as they need less arguments.
  */
-VLC_API input_item_t * input_item_NewWithType( const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type ) VLC_USED;
+VLC_API input_item_t * input_item_NewExt( const char *psz_uri,
+                                          const char *psz_name,
+                                          mtime_t i_duration, int i_type,
+                                          enum input_item_net_type i_net ) VLC_USED;
 
-/**
- * This function creates a new input_item_t with the provided information.
- *
- * \param i_net 1/0: force b_net to true/false, -1: default (guess it)
- *
- * XXX You may also use input_item_New, input_item_NewExt, or
- * input_item_NewWithType as they need less arguments.
- */
-VLC_API input_item_t * input_item_NewWithTypeExt( const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type, int i_net ) VLC_USED;
+#define input_item_New( psz_uri, psz_name ) \
+    input_item_NewExt( psz_uri, psz_name, -1, ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN )
 
-/**
- * This function creates a new input_item_t with the provided information.
- *
- * Provided for convenience.
- */
-VLC_API input_item_t * input_item_NewExt( const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration ) VLC_USED;
+#define input_item_NewCard( psz_uri, psz_name ) \
+    input_item_NewExt( psz_uri, psz_name, -1, ITEM_TYPE_CARD, ITEM_LOCAL )
 
-/**
- * This function creates a new input_item_t with the provided information.
- *
- * Provided for convenience.
- */
-#define input_item_New( a,b ) input_item_NewExt( a, b, 0, NULL, 0, -1 )
+#define input_item_NewDisc( psz_uri, psz_name, i_duration ) \
+    input_item_NewExt( psz_uri, psz_name, i_duration, ITEM_TYPE_DISC, ITEM_LOCAL )
+
+#define input_item_NewStream( psz_uri, psz_name, i_duration ) \
+    input_item_NewExt( psz_uri, psz_name, i_duration, ITEM_TYPE_STREAM, ITEM_NET )
+
+#define input_item_NewDirectory( psz_uri, psz_name, i_net ) \
+    input_item_NewExt( psz_uri, psz_name, -1, ITEM_TYPE_DIRECTORY, i_net )
+
+#define input_item_NewFile( psz_uri, psz_name, i_duration, i_net ) \
+    input_item_NewExt( psz_uri, psz_name, i_duration, ITEM_TYPE_FILE, i_net )
 
 /**
  * This function creates a new input_item_t as a copy of another.

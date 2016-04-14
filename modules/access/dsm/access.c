@@ -541,8 +541,7 @@ static input_item_t *new_item( access_t *p_access, const char *psz_name,
     if( i_ret == -1 )
         return NULL;
 
-    p_item = input_item_NewWithTypeExt( psz_uri, psz_name, 0, NULL, 0, -1,
-                                        i_type, 1 );
+    p_item = input_item_NewExt( psz_uri, psz_name, -1, i_type, ITEM_NET );
     free( psz_uri );
     if( p_item == NULL )
         return NULL;

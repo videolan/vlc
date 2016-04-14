@@ -902,8 +902,8 @@ static input_item_t* DirRead( access_t *p_access )
                   p_sys->url.psz_path ? p_sys->url.psz_path : "",
                   psz_line ) != -1 )
     {
-        p_item = input_item_NewWithTypeExt( psz_uri, psz_line, 0, NULL,
-                                            0, -1, ITEM_TYPE_UNKNOWN, 1 );
+        p_item = input_item_NewExt( psz_uri, psz_line, -1, ITEM_TYPE_UNKNOWN,
+                                    ITEM_NET );
         free( psz_uri );
     }
     free( psz_line );

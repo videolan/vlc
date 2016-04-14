@@ -913,24 +913,9 @@ void input_item_SetEpgOffline( input_item_t *p_item )
     vlc_event_send( &p_item->event_manager, &event );
 }
 
-input_item_t *input_item_NewExt( const char *psz_uri,
-                                 const char *psz_name,
-                                 int i_options,
-                                 const char *const *ppsz_options,
-                                 unsigned i_option_flags,
-                                 mtime_t i_duration )
-{
-    return input_item_NewWithType( psz_uri, psz_name,
-                                  i_options, ppsz_options, i_option_flags,
-                                  i_duration, ITEM_TYPE_UNKNOWN );
-}
-
-
 input_item_t *
-input_item_NewWithTypeExt( const char *psz_uri, const char *psz_name,
-                           int i_options, const char *const *ppsz_options,
-                           unsigned flags, mtime_t duration, int type,
-                           int i_net )
+input_item_NewExt( const char *psz_uri, const char *psz_name,
+                   mtime_t duration, int type, enum input_item_net_type i_net )
 {
     static atomic_uint last_input_id = ATOMIC_VAR_INIT(0);
 
@@ -962,8 +947,6 @@ input_item_NewWithTypeExt( const char *psz_uri, const char *psz_name,
     TAB_INIT( p_input->i_options, p_input->ppsz_options );
     p_input->optflagc = 0;
     p_input->optflagv = NULL;
-    for( int i = 0; i < i_options; i++ )
-        input_item_AddOption( p_input, ppsz_options[i], flags );
     p_input->opaques = NULL;
 
     p_input->i_duration = duration;
@@ -988,42 +971,35 @@ input_item_NewWithTypeExt( const char *psz_uri, const char *psz_name,
         p_input->i_type = type;
     p_input->b_error_when_reading = false;
 
-    if( i_net != -1 )
-        p_input->b_net = !!i_net;
+    if( i_net != ITEM_NET_UNKNOWN )
+        p_input->b_net = i_net == ITEM_NET;
     return p_input;
-}
-
-input_item_t *
-input_item_NewWithType( const char *psz_uri, const char *psz_name,
-                        int i_options, const char *const *ppsz_options,
-                        unsigned flags, mtime_t duration, int type )
-{
-    return input_item_NewWithTypeExt( psz_uri, psz_name, i_options,
-                                      ppsz_options, flags, duration, type,
-                                      -1 );
 }
 
 input_item_t *input_item_Copy( input_item_t *p_input )
 {
     vlc_meta_t *meta = NULL;
     input_item_t *item;
+    bool b_net;
 
     vlc_mutex_lock( &p_input->lock );
 
-    item = input_item_NewWithType( p_input->psz_uri, p_input->psz_name,
-                                   0, NULL, 0, p_input->i_duration,
-                                   p_input->i_type );
+    item = input_item_NewExt( p_input->psz_uri, p_input->psz_name,
+                              p_input->i_duration, p_input->i_type,
+                              ITEM_NET_UNKNOWN );
     if( likely(item != NULL) && p_input->p_meta != NULL )
     {
         meta = vlc_meta_New();
         vlc_meta_Merge( meta, p_input->p_meta );
     }
+    b_net = p_input->b_net;
     vlc_mutex_unlock( &p_input->lock );
 
     if( likely(item != NULL) )
     {   /* No need to lock; no other thread has seen this new item yet. */
         input_item_CopyOptions( item, p_input );
         item->p_meta = meta;
+        item->b_net = b_net;
     }
 
     return item;

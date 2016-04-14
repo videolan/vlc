@@ -181,9 +181,9 @@ static int vlclua_sd_add_node( lua_State *L )
         if( lua_isstring( L, -1 ) )
         {
             const char *psz_name = lua_tostring( L, -1 );
-            input_item_t *p_input = input_item_NewWithType( "vlc://nop",
-                                                            psz_name, 0, NULL, 0,
-                                                            -1, ITEM_TYPE_NODE );
+            input_item_t *p_input = input_item_NewExt( "vlc://nop",
+                                                       psz_name, -1,
+                                                       ITEM_TYPE_NODE, ITEM_NET_UNKNOWN );
             lua_pop( L, 1 );
 
             if( p_input )
@@ -244,14 +244,14 @@ static int vlclua_sd_add_item( lua_State *L )
             lua_pushvalue( L, -3 );
             vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
 
-            input_item_t *p_input = input_item_NewExt( psz_path, psz_title,
-                                                       i_options,
-                                                       (const char **)ppsz_options,
-                                                       VLC_INPUT_OPTION_TRUSTED, -1 );
+            input_item_t *p_input = input_item_New( psz_path, psz_title );
             lua_pop( L, 3 );
 
             if( p_input )
             {
+                input_item_AddOptions( p_input, i_options,
+                                       (const char **)ppsz_options,
+                                       VLC_INPUT_OPTION_TRUSTED );
                 vlclua_read_meta_data( p_sd, L, p_input );
                 /* This one is to be tested... */
                 vlclua_read_custom_meta_data( p_sd, L, p_input );
@@ -371,14 +371,14 @@ static int vlclua_node_add_subitem( lua_State *L )
                 lua_pushvalue( L, -2 );
                 vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
 
-                input_item_t *p_input = input_item_NewExt( psz_path,
-                                                           psz_path, i_options,
-                                                           (const char **)ppsz_options,
-                                                           VLC_INPUT_OPTION_TRUSTED, -1 );
+                input_item_t *p_input = input_item_New( psz_path, psz_path );
                 lua_pop( L, 2 );
 
                 if( p_input )
                 {
+                    input_item_AddOptions( p_input, i_options,
+                                           (const char **)ppsz_options,
+                                           VLC_INPUT_OPTION_TRUSTED );
                     input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
 
                     vlclua_read_meta_data( p_sd, L, p_input );
@@ -431,9 +431,9 @@ static int vlclua_node_add_subnode( lua_State *L )
             if( lua_isstring( L, -1 ) )
             {
                 const char *psz_name = lua_tostring( L, -1 );
-                input_item_t *p_input = input_item_NewWithType( "vlc://nop",
-                                                                psz_name, 0, NULL, 0,
-                                                                -1, ITEM_TYPE_NODE );
+                input_item_t *p_input = input_item_NewExt( "vlc://nop",
+                                                           psz_name, -1,
+                                                           ITEM_TYPE_NODE, ITEM_NET_UNKNOWN );
                 lua_pop( L, 1 );
 
                 if( p_input )

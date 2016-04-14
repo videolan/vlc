@@ -336,10 +336,9 @@ static input_item_t *ParseLine(char *line)
     char sid_opt[sizeof("program=65535")];
     snprintf(sid_opt, sizeof(sid_opt), "program=%lu", sid);
 
-    const char *opts[] = { sid_opt };
-
-    input_item_t *item = input_item_NewWithType(mrl, name, 1, opts, 0, -1,
-                                                ITEM_TYPE_CARD);
+    input_item_t *item = input_item_NewCard(mrl, name);
     free(mrl);
+    if (item != NULL)
+        input_item_AddOption(item, sid_opt, 0);
     return item;
 }

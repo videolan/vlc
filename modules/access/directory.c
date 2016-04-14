@@ -174,8 +174,8 @@ input_item_t *DirRead(access_t *access)
         if (unlikely(uri == NULL))
             continue;
 
-        input_item_t *item = input_item_NewWithType(uri, entry, 0, NULL, 0, 0,
-                                                    type);
+        input_item_t *item = input_item_NewExt(uri, entry, -1, type,
+                                               ITEM_NET_UNKNOWN);
         free(uri);
         if (likely(item != NULL))
             return item;

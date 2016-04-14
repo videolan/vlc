@@ -484,10 +484,8 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         const mtime_t i_duration = (int64_t)( p_sys->p_sectors[i+1] - p_sys->p_sectors[i] ) *
                                    CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
 
-        input_item_t *p_item = input_item_NewWithType( p_access->psz_url,
-                                                       psz_name, 0, NULL, 0,
-                                                       i_duration,
-                                                       ITEM_TYPE_DISC );
+        input_item_t *p_item = input_item_NewDisc( p_access->psz_url,
+                                                   psz_name, i_duration );
         if( likely(psz_name != p_access->psz_url) )
             free( psz_name );
 

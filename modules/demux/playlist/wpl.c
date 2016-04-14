@@ -114,7 +114,7 @@ static void read_body( demux_t* p_demux, input_item_node_t* p_node )
                     char* mrl = ProcessMRL( psz_val, p_sys->psz_prefix );
                     if ( unlikely( !mrl ) )
                         return;
-                    input_item_t* p_item = input_item_NewExt( mrl, NULL, 0, NULL, 0, -1 );
+                    input_item_t* p_item = input_item_New( mrl, NULL );
                     if ( likely( p_item ) )
                     {
                         input_item_node_AppendItem( p_node, p_item );
