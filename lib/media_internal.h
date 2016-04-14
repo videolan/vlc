@@ -45,6 +45,7 @@ struct libvlc_media_t
     vlc_mutex_t parsed_lock;
     vlc_mutex_t subitems_lock;
 
+    int  parsed_status;
     bool is_parsed;
     bool has_asked_preparse;
 };

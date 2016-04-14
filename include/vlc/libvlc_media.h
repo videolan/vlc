@@ -276,6 +276,19 @@ typedef enum libvlc_media_parse_flag_t
 } libvlc_media_parse_flag_t;
 
 /**
+ * Parse status used sent by libvlc_media_parse_with_options()
+ *
+ * \see libvlc_media_parse_with_options
+ */
+typedef enum libvlc_media_parsed_status_t
+{
+    libvlc_media_parse_init,
+    libvlc_media_parse_skipped,
+    libvlc_media_parse_failed,
+    libvlc_media_parse_done,
+} libvlc_media_parsed_status_t;
+
+/**
  * Callback prototype to open a custom bitstream input media.
  *
  * The same media item can be opened multiple times. Each time, this callback
@@ -665,15 +678,15 @@ libvlc_media_parse_async( libvlc_media_t *p_md );
  * This fetches (local or network) art, meta data and/or tracks information.
  * This method is the extended version of libvlc_media_parse_async().
  *
- * To track when this is over you can listen to libvlc_MediaParsedChanged
- * event. However if this functions returns an error, you will not receive this
- * event.
+ * To track when this is over you can listen to libvlc_MediaParsedStatus
+ * event. However if this functions returns an error, you will not receive any
+ * events.
  *
  * It uses a flag to specify parse options (see libvlc_media_parse_flag_t). All
  * these flags can be combined. By default, media is parsed if it's a local
  * file.
  *
- * \see libvlc_MediaParsedChanged
+ * \see libvlc_MediaParsedStatus
  * \see libvlc_media_get_meta
  * \see libvlc_media_tracks_get
  * \see libvlc_media_parse_flag_t
