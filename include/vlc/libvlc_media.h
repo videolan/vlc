@@ -541,10 +541,6 @@ LIBVLC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
  *
  * If the media has not yet been parsed this will return NULL.
  *
- * This methods automatically calls libvlc_media_parse_async(), so after calling
- * it you may receive a libvlc_MediaMetaChanged event. If you prefer a synchronous
- * version ensure that you call libvlc_media_parse() before get_meta().
- *
  * \see libvlc_media_parse
  * \see libvlc_media_parse_async
  * \see libvlc_MediaMetaChanged
