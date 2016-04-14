@@ -839,6 +839,17 @@ libvlc_media_is_parsed(libvlc_media_t *media)
     return parsed;
 }
 
+libvlc_media_parsed_status_t
+libvlc_media_get_parsed_status(libvlc_media_t *media)
+{
+    libvlc_media_parsed_status_t status;
+
+    vlc_mutex_lock(&media->parsed_lock);
+    status = media->parsed_status;
+    vlc_mutex_unlock(&media->parsed_lock);
+    return status;
+}
+
 /**************************************************************************
  * Sets media descriptor's user_data. user_data is specialized data
  * accessed by the host application, VLC.framework uses it as a pointer to

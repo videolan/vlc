@@ -276,9 +276,11 @@ typedef enum libvlc_media_parse_flag_t
 } libvlc_media_parse_flag_t;
 
 /**
- * Parse status used sent by libvlc_media_parse_with_options()
+ * Parse status used sent by libvlc_media_parse_with_options() or returned by
+ * libvlc_media_get_parsed_status()
  *
  * \see libvlc_media_parse_with_options
+ * \see libvlc_media_get_parsed_status
  */
 typedef enum libvlc_media_parsed_status_t
 {
@@ -689,6 +691,7 @@ libvlc_media_parse_async( libvlc_media_t *p_md );
  * \see libvlc_MediaParsedStatus
  * \see libvlc_media_get_meta
  * \see libvlc_media_tracks_get
+ * \see libvlc_media_get_parsed_status
  * \see libvlc_media_parse_flag_t
  *
  * \param p_md media descriptor object
@@ -701,7 +704,7 @@ libvlc_media_parse_with_options( libvlc_media_t *p_md,
                                  libvlc_media_parse_flag_t parse_flag );
 
 /**
- * Get Parsed status for media descriptor object.
+ * Return true is the media descriptor object is parsed
  *
  * \see libvlc_MediaParsedChanged
  *
@@ -712,6 +715,19 @@ libvlc_media_parse_with_options( libvlc_media_t *p_md,
  */
 LIBVLC_API int
    libvlc_media_is_parsed( libvlc_media_t *p_md );
+
+/**
+ * Get Parsed status for media descriptor object.
+ *
+ * \see libvlc_MediaParsedStatus
+ * \see libvlc_media_parsed_status_t
+ *
+ * \param p_md media descriptor object
+ * \return a value of the libvlc_media_parsed_status_t enum
+ * \version LibVLC 3.0.0 or later
+ */
+LIBVLC_API libvlc_media_parsed_status_t
+   libvlc_media_get_parsed_status( libvlc_media_t *p_md );
 
 /**
  * Sets media descriptor's user_data. user_data is specialized data
