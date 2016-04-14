@@ -213,17 +213,17 @@ static void input_item_duration_changed( const vlc_event_t *p_event,
     libvlc_event_send( p_md->p_event_manager, &event );
 }
 
-/**************************************************************************
- * input_item_preparsed_changed (Private) (vlc event Callback)
- **************************************************************************/
-static void input_item_preparsed_changed(const vlc_event_t *p_event,
-                                         void * user_data)
+static void send_preparsed_event(libvlc_media_t *media)
 {
-    libvlc_media_t *media = user_data;
     libvlc_event_t event;
 
     /* Eventually notify libvlc_media_parse() */
     vlc_mutex_lock(&media->parsed_lock);
+    if (media->is_parsed == true)
+    {
+        vlc_mutex_unlock(&media->parsed_lock);
+        return;
+    }
     media->is_parsed = true;
     vlc_cond_broadcast(&media->parsed_cond);
     vlc_mutex_unlock(&media->parsed_lock);
@@ -231,11 +231,21 @@ static void input_item_preparsed_changed(const vlc_event_t *p_event,
 
     /* Construct the event */
     event.type = libvlc_MediaParsedChanged;
-    event.u.media_parsed_changed.new_status =
-        p_event->u.input_item_preparsed_changed.new_status;
+    event.u.media_parsed_changed.new_status = true;
 
     /* Send the event */
     libvlc_event_send(media->p_event_manager, &event);
+}
+
+/**************************************************************************
+ * input_item_preparsed_changed (Private) (vlc event Callback)
+ **************************************************************************/
+static void input_item_preparsed_changed(const vlc_event_t *p_event,
+                                         void * user_data)
+{
+    VLC_UNUSED( p_event );
+    libvlc_media_t *media = user_data;
+    send_preparsed_event(media);
 }
 
 /**************************************************************************
