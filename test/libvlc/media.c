@@ -30,7 +30,7 @@
 
 #include <vlc_threads.h>
 
-static void preparsed_changed(const libvlc_event_t *event, void *user_data)
+static void media_parse_ended(const libvlc_event_t *event, void *user_data)
 {
     (void)event;
     vlc_sem_t *sem = user_data;
@@ -55,10 +55,11 @@ static void test_media_preparsed(const char** argv, int argc)
 
     // Check to see if we are properly receiving the event.
     libvlc_event_manager_t *em = libvlc_media_event_manager (media);
-    libvlc_event_attach (em, libvlc_MediaParsedChanged, preparsed_changed, &sem);
+    libvlc_event_attach (em, libvlc_MediaParsedStatus, media_parse_ended, &sem);
 
     // Parse the media. This is synchronous.
-    libvlc_media_parse_async(media);
+    int i_ret = libvlc_media_parse_with_options(media, libvlc_media_parse_local);
+    assert(i_ret == 0);
 
     // Wait for preparsed event
     vlc_sem_wait (&sem);
@@ -90,7 +91,7 @@ struct
     { "file.ts", libvlc_media_type_file },
 };
 
-static void subitem_tree_added(const libvlc_event_t *event, void *user_data)
+static void subitem_parse_ended(const libvlc_event_t *event, void *user_data)
 {
     (void)event;
     vlc_sem_t *sem = user_data;
@@ -138,14 +139,15 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play)
     vlc_sem_init (&sem, 0);
 
     libvlc_event_manager_t *em = libvlc_media_event_manager (media);
-    libvlc_event_attach (em, libvlc_MediaSubItemTreeAdded, subitem_tree_added, &sem);
     libvlc_event_attach (em, libvlc_MediaSubItemAdded, subitem_added, subitems_found);
 
     if (play)
     {
-        /* XXX: libvlc_media_parse_async won't work with fd, since it won't be
-         * preparsed because fd:// is an unknown type, so play the file to
-         * force parsing. */
+        /* XXX: libvlc_media_parse_with_options won't work with fd, since it
+         * won't be preparsed because fd:// is an unknown type, so play the
+         * file to force parsing. */
+        libvlc_event_attach (em, libvlc_MediaSubItemTreeAdded, subitem_parse_ended, &sem);
+
         libvlc_media_player_t *mp = libvlc_media_player_new_from_media (media);
         assert (mp);
         assert (libvlc_media_player_play (mp) != -1);
@@ -154,7 +156,10 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play)
     }
     else
     {
-        libvlc_media_parse_async (media);
+        libvlc_event_attach (em, libvlc_MediaParsedStatus, subitem_parse_ended, &sem);
+
+        int i_ret = libvlc_media_parse_with_options(media, libvlc_media_parse_local);
+        assert(i_ret == 0);
         vlc_sem_wait (&sem);
     }
 
