@@ -664,6 +664,10 @@ libvlc_media_parse( libvlc_media_t *p_md );
  * event. However if the media was already parsed you will not receive this
  * event.
  *
+ * \deprecated You can't be sure to receive the libvlc_MediaParsedChanged
+ *             event (you can wait indefinitely for this event).
+ *             Use libvlc_media_parse_with_options instead
+ *
  * \see libvlc_media_parse
  * \see libvlc_MediaParsedChanged
  * \see libvlc_media_get_meta
@@ -671,7 +675,7 @@ libvlc_media_parse( libvlc_media_t *p_md );
  *
  * \param p_md media descriptor object
  */
-LIBVLC_API void
+LIBVLC_DEPRECATED LIBVLC_API void
 libvlc_media_parse_async( libvlc_media_t *p_md );
 
 /**
