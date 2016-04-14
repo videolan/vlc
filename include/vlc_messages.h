@@ -54,7 +54,7 @@ enum vlc_log_type
  */
 typedef struct vlc_log_t
 {
-    uintptr_t   i_object_id; /**< Emitter (temporaly) unique object ID or 0 */
+    uintptr_t   i_object_id; /**< Emitter (temporarily) unique object ID or 0 */
     const char *psz_object_type; /**< Emitter object type name */
     const char *psz_module; /**< Emitter module (source code) */
     const char *psz_header; /**< Additional header (used by VLM media) */
