@@ -186,7 +186,10 @@ static void Preparse( playlist_preparser_t *preparser, input_item_t *p_item,
         input_thread_t *input = input_CreatePreparser( preparser->object,
                                                        p_item );
         if( input == NULL )
+        {
+            input_item_SignalPreparseEnded( p_item );
             return;
+        }
 
         var_AddCallback( input, "intf-event", InputEvent,
                          &preparser->item_done );
