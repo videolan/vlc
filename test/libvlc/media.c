@@ -131,7 +131,8 @@ static void subitem_added(const libvlc_event_t *event, void *user_data)
 #undef FILE_SEPARATOR
 }
 
-static void test_media_subitems_media(libvlc_media_t *media, bool play)
+static void test_media_subitems_media(libvlc_media_t *media, bool play,
+                                      bool b_items_expected)
 {
     libvlc_media_add_option(media, ":ignore-filetypes= ");
 
@@ -166,6 +167,9 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play)
 
     vlc_sem_destroy (&sem);
 
+    if (!b_items_expected)
+        return;
+
     for (unsigned i = 0; i < TEST_SUBITEMS_COUNT; ++i)
     {
         log ("test if %s was added\n", test_media_subitems_list[i].file);
@@ -184,7 +188,7 @@ static void test_media_subitems(int argc, const char** argv)
     log ("Testing media_subitems: path: '%s'\n", subitems_path);
     media = libvlc_media_new_path (vlc, subitems_path);
     assert (media != NULL);
-    test_media_subitems_media (media, false);
+    test_media_subitems_media (media, false, true);
     libvlc_media_release (media);
 
     #define NB_LOCATIONS 2
@@ -198,7 +202,7 @@ static void test_media_subitems(int argc, const char** argv)
         log ("Testing media_subitems: location: '%s'\n", location);
         media = libvlc_media_new_location (vlc, location);
         assert (media != NULL);
-        test_media_subitems_media (media, false);
+        test_media_subitems_media (media, false, true);
         free (location);
         libvlc_media_release (media);
     }
@@ -211,12 +215,18 @@ static void test_media_subitems(int argc, const char** argv)
     assert (fd >= 0);
     media = libvlc_media_new_fd (vlc, fd);
     assert (media != NULL);
-    test_media_subitems_media (media, true);
+    test_media_subitems_media (media, true, true);
     libvlc_media_release (media);
     close (fd);
 #else
 #warning not testing subitems list via a fd location
 #endif
+
+    log ("Testing media_subitems failure\n");
+    media = libvlc_media_new_location (vlc, "wrongfile://test");
+    assert (media != NULL);
+    test_media_subitems_media (media, false, false);
+    libvlc_media_release (media);
 
     libvlc_release (vlc);
 }
