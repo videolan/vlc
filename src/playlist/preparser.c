@@ -201,9 +201,9 @@ static void Preparse( playlist_preparser_t *preparser, input_item_t *p_item,
         input_Close( input );
 
         var_SetAddress( preparser->object, "item-change", p_item );
+        input_item_SetPreparsed( p_item, true );
     }
 
-    input_item_SetPreparsed( p_item, true );
     input_item_SignalPreparseEnded( p_item );
 }
 

@@ -265,6 +265,11 @@ static void input_item_preparse_ended( const vlc_event_t * p_event,
         libvlc_media_list_internal_end_reached( p_subitems );
         libvlc_media_list_unlock( p_subitems );
     }
+
+    /* XXX: libVLC 2.2.0 compat: even if case of preparse failure,
+     * libvlc_MediaParsedChanged was sent with a true status. Therefore, send
+     * this event if it was not previously sent */
+    send_preparsed_event(p_md);
 }
 
 /**************************************************************************
