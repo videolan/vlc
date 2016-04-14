@@ -37,17 +37,22 @@ static void media_parse_ended(const libvlc_event_t *event, void *user_data)
     vlc_sem_post (sem);
 }
 
-static void test_media_preparsed(int argc, const char** argv)
+static void test_media_preparsed(int argc, const char** argv,
+                                 const char *path,
+                                 const char *location,
+                                 libvlc_media_parsed_status_t i_expected_status)
 {
-    // We use this image file because "empty.voc" has no track.
-    const char * file = SRCDIR"/samples/image.jpg";
-
-    log ("Testing set_media\n");
+    log ("test_media_preparsed: %s, expected: %d\n", path ? path : location,
+         i_expected_status);
 
     libvlc_instance_t *vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    libvlc_media_t *media = libvlc_media_new_path (vlc, file);
+    libvlc_media_t *media;
+    if (path != NULL)
+        media = libvlc_media_new_path (vlc, path);
+    else
+        media = libvlc_media_new_location (vlc, location);
     assert (media != NULL);
 
     vlc_sem_t sem;
@@ -66,7 +71,7 @@ static void test_media_preparsed(int argc, const char** argv)
     vlc_sem_destroy (&sem);
 
     // We are good, now check Elementary Stream info.
-    assert (libvlc_media_get_parsed_status(media) == libvlc_media_parse_done);
+    assert (libvlc_media_get_parsed_status(media) == i_expected_status);
 
     libvlc_media_release (media);
     libvlc_release (vlc);
@@ -220,7 +225,15 @@ int main (void)
 {
     test_init();
 
-    test_media_preparsed (test_defaults_nargs, test_defaults_args);
+    test_media_preparsed (test_defaults_nargs, test_defaults_args,
+                          SRCDIR"/samples/image.jpg", NULL,
+                          libvlc_media_parse_done);
+    test_media_preparsed (test_defaults_nargs, test_defaults_args,
+                          NULL, "http://parsing_should_be_skipped.org/video.mp4",
+                          libvlc_media_parse_skipped);
+    test_media_preparsed (test_defaults_nargs, test_defaults_args,
+                          NULL, "unknown://parsing_should_be_skipped.org/video.mp4",
+                          libvlc_media_parse_skipped);
     test_media_subitems (test_defaults_nargs, test_defaults_args);
 
     return 0;
