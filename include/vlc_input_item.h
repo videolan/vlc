@@ -203,6 +203,12 @@ enum input_item_option_e
  * This function allows to add an option to an existing input_item_t.
  */
 VLC_API int input_item_AddOption(input_item_t *, const char *, unsigned i_flags );
+/**
+ * This function add several options to an existing input_item_t.
+ */
+VLC_API int input_item_AddOptions(input_item_t *, int i_options,
+                                  const char *const *ppsz_options,
+                                  unsigned i_flags );
 VLC_API int input_item_AddOpaque(input_item_t *, const char *, void *);
 
 void input_item_ApplyOptions(vlc_object_t *, input_item_t *);

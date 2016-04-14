@@ -173,6 +173,7 @@ input_DecoderFlush
 input_GetItem
 input_item_AddInfo
 input_item_AddOption
+input_item_AddOptions
 input_item_AddOpaque
 input_item_Copy
 input_item_CopyOptions
