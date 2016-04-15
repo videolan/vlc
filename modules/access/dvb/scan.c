@@ -972,7 +972,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                     msg_Dbg( p_obj, "           * modulation %u", tscfg.i_modulation );
                 }
             }
-            else if( p_dsc->i_tag == 0x5f )
+            else if( p_dsc->i_tag == 0x5f && p_dsc->i_length > 3 )
             {
                 msg_Dbg( p_obj, "       * private data specifier descriptor" );
                 i_private_data_id = GetDWBE( &p_dsc->p_data[0] );
