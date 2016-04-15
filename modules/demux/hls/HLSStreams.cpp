@@ -113,14 +113,23 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
     {
         uint32_t size = ReadID3Size(&p_block->p_buffer[6]);
         size = __MIN(p_block->i_buffer, size + 10);
-        if(size >= 73 && !b_timestamps_offset_set)
+        const uint8_t *p_frame = &p_block->p_buffer[10];
+        uint32_t i_left = (size >= 10) ? size - 10 : 0;
+        while(i_left >= 10 && !b_timestamps_offset_set)
         {
-            if(!memcmp(&p_block->p_buffer[10], "PRIV", 4) &&
-               !memcmp(&p_block->p_buffer[20], "com.apple.streaming.transportStreamTimestamp", 45))
+            uint32_t i_framesize = ReadID3Size(&p_frame[4]) + 10;
+            if( i_framesize > i_left )
+                break;
+            if(i_framesize == 63 && !memcmp(p_frame, "PRIV", 4))
             {
-                i_aac_offset = GetQWBE(&p_block->p_buffer[65]) * 100 / 9;
-                b_timestamps_offset_set = true;
+                if(!memcmp(&p_frame[10], "com.apple.streaming.transportStreamTimestamp", 45))
+                {
+                    i_aac_offset = GetQWBE(&p_frame[55]) * 100 / 9;
+                    b_timestamps_offset_set = true;
+                }
             }
+            i_left -= i_framesize;
+            p_frame += i_framesize;
         }
 
         /* Skip ID3 for demuxer */
