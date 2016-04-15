@@ -106,9 +106,9 @@ static uint32_t ReadID3Size(const uint8_t *p_buffer)
           (( (uint32_t)p_buffer[0] & 0x7F ) << 21);
 }
 
-static bool IsID3Tag(const uint8_t *p_buffer)
+static bool IsID3Tag(const uint8_t *p_buffer, bool b_footer)
 {
-    return( memcmp(p_buffer, "ID3", 3) == 0 &&
+    return( memcmp(p_buffer, (b_footer) ? "3DI" : "ID3", 3) == 0 &&
             p_buffer[3] < 0xFF &&
             p_buffer[4] < 0xFF &&
            ((GetDWBE(&p_buffer[6]) & 0x80808080) == 0) );
@@ -117,7 +117,7 @@ static bool IsID3Tag(const uint8_t *p_buffer)
 block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 {
     if(b_first && p_block &&
-       p_block->i_buffer >= 10 && IsID3Tag(p_block->p_buffer))
+       p_block->i_buffer >= 10 && IsID3Tag(p_block->p_buffer, false))
     {
         uint32_t size = ReadID3Size(&p_block->p_buffer[6]);
         size = __MIN(p_block->i_buffer, size + 10);
@@ -143,6 +143,13 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
         /* Skip ID3 for demuxer */
         p_block->p_buffer += size;
         p_block->i_buffer -= size;
+
+        /* Skip ID3 footer */
+        if(p_block->i_buffer >= 10 && IsID3Tag(p_block->p_buffer, true))
+        {
+            p_block->p_buffer += 10;
+            p_block->i_buffer -= 10;
+        }
     }
 
     return p_block;
