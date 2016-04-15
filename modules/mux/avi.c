@@ -368,6 +368,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 case VLC_CODEC_WMAL:
                     p_wf->wFormatTag = WAVE_FORMAT_WMAL;
                     break;
+                case VLC_CODEC_ALAW:
+                    p_wf->wFormatTag = WAVE_FORMAT_ALAW;
+                    break;
                     /* raw codec */
                 case VLC_CODEC_U8:
                     p_wf->wFormatTag = WAVE_FORMAT_PCM;
