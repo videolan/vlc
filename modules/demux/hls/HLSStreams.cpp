@@ -98,13 +98,21 @@ void HLSStream::prepareFormatChange()
     }
 }
 
+static uint32_t ReadID3Size(const uint8_t *p_buffer)
+{
+    return ( (uint32_t)p_buffer[3] & 0x7F ) |
+          (( (uint32_t)p_buffer[2] & 0x7F ) << 7) |
+          (( (uint32_t)p_buffer[1] & 0x7F ) << 14) |
+          (( (uint32_t)p_buffer[0] & 0x7F ) << 21);
+}
+
 block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 {
     if(b_first && p_block &&
        p_block->i_buffer >= 10 && !memcmp(p_block->p_buffer, "ID3", 3))
     {
-        uint32_t size = GetDWBE(&p_block->p_buffer[6]) + 10;
-        size = __MIN(p_block->i_buffer, size);
+        uint32_t size = ReadID3Size(&p_block->p_buffer[6]);
+        size = __MIN(p_block->i_buffer, size + 10);
         if(size >= 73 && !b_timestamps_offset_set)
         {
             if(!memcmp(&p_block->p_buffer[10], "PRIV", 4) &&
