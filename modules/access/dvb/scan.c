@@ -305,6 +305,11 @@ void scan_Destroy( scan_t *p_scan )
     free( p_scan );
 }
 
+static void scan_AddService( scan_t *p_scan, scan_service_t *p_service )
+{
+    TAB_APPEND( p_scan->i_service, p_scan->pp_service, p_service );
+}
+
 static int ScanDvbv5NextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     if( !p_scan->p_current )
@@ -725,7 +730,7 @@ static void ParsePAT( vlc_object_t *p_obj, scan_t *p_scan,
         {
             s = scan_service_New( p_pat->i_ts_id, p_program->i_number, p_cfg );
             if( likely(s) )
-                TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+                scan_AddService( p_scan, s );
         }
     }
 }
@@ -779,7 +784,7 @@ static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan,
                 s = scan_service_New( p_sdt->i_extension, p_srv->i_service_id, p_cfg );
             if( s == NULL )
                 continue;
-            TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+            scan_AddService( p_scan, s );
         }
 
         s->b_crypted = p_srv->b_free_ca;
@@ -1023,7 +1028,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                         s->type          = scan_service_type( i_service_type );
                         s->i_network_id  = p_nit->i_network_id;
                         s->i_nit_version = p_nit->i_version;
-                        TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+                        scan_AddService( p_scan, s );
                     }
                 }
 
