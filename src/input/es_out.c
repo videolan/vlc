@@ -3007,7 +3007,16 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                info_category_AddInfo( p_cat, _("Decoded format"), "%s",
                                       psz_chroma_description );
        }
-
+       {
+           static const char orient_names[][13] = {
+               N_("Top left"), N_("Left top"),
+               N_("Right bottom"), N_("Top right"),
+               N_("Bottom left"), N_("Bottom right"),
+               N_("Left bottom"), N_("Right top"),
+           };
+           info_category_AddInfo( p_cat, _("Orientation"), "%s",
+                                  _(orient_names[fmt->video.orientation]) );
+       }
        break;
 
     case SPU_ES:
