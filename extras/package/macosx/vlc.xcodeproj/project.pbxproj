@@ -476,6 +476,7 @@
 		7D9516CA1C60B6DB00D14E1A /* stopIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C21C60B6DB00D14E1A /* stopIcon.png */; };
 		7D9516CB1C60B6DB00D14E1A /* stopIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D9516C31C60B6DB00D14E1A /* stopIcon@2x.png */; };
 		7DB65D5618ABD6490053B874 /* AddonManager.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DB65D5418ABD6490053B874 /* AddonManager.xib */; };
+		7DBB06641CC2314D004C74D2 /* caopengllayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DBB06631CC2314D004C74D2 /* caopengllayer.m */; };
 		7DD6EC101B58136D0047CF5C /* SimplePreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DD6EC0E1B58136D0047CF5C /* SimplePreferences.xib */; };
 		7DE78AC61B5D0A360019454C /* StreamOutput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DE78AC41B5D0A360019454C /* StreamOutput.xib */; };
 		7DE88F2A1831396A00CD9DA2 /* PlaylistAccessoryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DE88F281831396A00CD9DA2 /* PlaylistAccessoryView.xib */; };
@@ -1282,6 +1283,7 @@
 		7DB65D5218ABD6380053B874 /* AddonsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonsWindowController.h; path = ../../../modules/gui/macosx/AddonsWindowController.h; sourceTree = SOURCE_ROOT; };
 		7DB65D5318ABD6380053B874 /* AddonsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonsWindowController.m; path = ../../../modules/gui/macosx/AddonsWindowController.m; sourceTree = SOURCE_ROOT; };
 		7DB65D5518ABD6490053B874 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AddonManager.xib; sourceTree = "<group>"; };
+		7DBB06631CC2314D004C74D2 /* caopengllayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = caopengllayer.m; path = ../../../modules/video_output/caopengllayer.m; sourceTree = "<group>"; };
 		7DD6EC0F1B58136D0047CF5C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/SimplePreferences.xib; sourceTree = "<group>"; };
 		7DE78AC51B5D0A360019454C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/StreamOutput.xib; sourceTree = "<group>"; };
 		7DE88F291831396A00CD9DA2 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistAccessoryView.xib; sourceTree = "<group>"; };
@@ -2873,6 +2875,7 @@
 				CC79F66614014FC30015D89E /* opengl.h */,
 				CC6C01BB0DDF3F0700C7D754 /* opengl.c */,
 				CCDBA3B313D32E200006127B /* macosx.m */,
+				7DBB06631CC2314D004C74D2 /* caopengllayer.m */,
 			);
 			name = vout;
 			sourceTree = "<group>";
@@ -3915,6 +3918,7 @@
 				1CCB5F681A62A724004C3E90 /* DebugMessageVisualizer.h in Sources */,
 				1CCB5F691A62A724004C3E90 /* DebugMessageVisualizer.m in Sources */,
 				1CCB5F6A1A62A724004C3E90 /* ExtensionsDialogProvider.h in Sources */,
+				7DBB06641CC2314D004C74D2 /* caopengllayer.m in Sources */,
 				1CCB5F6B1A62A724004C3E90 /* ExtensionsDialogProvider.m in Sources */,
 				1CCB5F6C1A62A724004C3E90 /* ExtensionsManager.h in Sources */,
 				1CCB5F6D1A62A724004C3E90 /* ExtensionsManager.m in Sources */,
