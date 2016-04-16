@@ -219,6 +219,11 @@ static int Open (vlc_object_t *p_this)
             msg_Dbg(vd, "OS does not support custom color spaces, output may be undefined");
         }
 
+        /* request our screen's HDR mode (introduced in OS X 10.11) */
+        if ([sys->cgLayer respondsToSelector:@selector(setWantsExtendedDynamicRangeContent:)]) {
+            [sys->cgLayer setWantsExtendedDynamicRangeContent:YES];
+        }
+
         /* setup initial state */
         CGSize outputSize;
         if ([container respondsToSelector:@selector(currentOutputSize)])
