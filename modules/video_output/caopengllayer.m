@@ -1,7 +1,7 @@
 /*****************************************************************************
  * caopengllayer.m: CAOpenGLLayer (Mac OS X) video output
  *****************************************************************************
- * Copyright (C) 2014-2015 VLC authors and VideoLAN
+ * Copyright (C) 2014-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: David Fuhrmann <david dot fuhrmann at googlemail dot com>
@@ -43,6 +43,8 @@
 
 #include "opengl.h"
 
+#define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404)
+
 /*****************************************************************************
  * Vout interface
  *****************************************************************************/
@@ -56,7 +58,6 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_callbacks(Open, Close)
 vlc_module_end()
-
 
 static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
 static void PictureRender   (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
@@ -89,6 +90,8 @@ struct vout_display_sys_t {
     CALayer <VLCCoreAnimationVideoLayerEmbedding> *container;
     vout_window_t *embed;
     VLCCAOpenGLLayer *cgLayer;
+
+    CGColorSpaceRef cgColorSpace;
 
     CGLContextObj glContext;
 
@@ -188,6 +191,34 @@ static int Open (vlc_object_t *p_this)
         vd->display = PictureDisplay;
         vd->control = Control;
 
+        /* handle color space if supported by the OS */
+        if ([sys->cgLayer respondsToSelector:@selector(setColorspace:)]) {
+
+            /* support for BT.709 and BT.2020 color spaces was introduced with OS X 10.11
+             * on older OS versions, we can't show correct colors, so we fallback on linear RGB */
+            if (OSX_EL_CAPITAN) {
+                msg_Warn(vd, "Guessing color space based on video dimensions (height: %i", fmt.i_height);
+
+                if (fmt.i_height >= 2000 || fmt.i_width >= 3800) {
+                    msg_Dbg(vd, "Should use BT.2020 color space, but in reality it's BT.709");
+                    sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+                } else if (fmt.i_height > 576) {
+                    msg_Dbg(vd, "Using BT.709 color space");
+                    sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+                } else {
+                    msg_Dbg(vd, "SD content, using linear RGB color space");
+                    sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+                }
+            } else {
+                msg_Dbg(vd, "OS does not support BT.709 or BT.2020 color spaces, output may vary");
+                sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGBLinear);
+            }
+
+            [sys->cgLayer setColorspace: sys->cgColorSpace];
+        } else {
+            msg_Dbg(vd, "OS does not support custom color spaces, output may be undefined");
+        }
+
         /* setup initial state */
         CGSize outputSize;
         if ([container respondsToSelector:@selector(currentOutputSize)])
@@ -229,6 +260,9 @@ static void Close (vlc_object_t *p_this)
 
     if (sys->glContext)
         CGLReleaseContext(sys->glContext);
+
+    if (sys->cgColorSpace != nil)
+        CGColorSpaceRelease(sys->cgColorSpace);
 
     free(sys);
 }
@@ -445,6 +479,12 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     // flush is also done by this method, no need to call super
     vout_display_opengl_Display (sys->vgl, &_voutDisplay->source);
     sys->b_frame_available = NO;
+}
+
+-(CGLPixelFormatObj)copyCGLPixelFormatForDisplayMask:(uint32_t)mask
+{
+    // The default is fine for this demonstration.
+    return [super copyCGLPixelFormatForDisplayMask:mask];
 }
 
 - (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat
