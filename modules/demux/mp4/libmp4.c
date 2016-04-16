@@ -3460,6 +3460,28 @@ static int MP4_ReadBox_keys( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_colr( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_colr_t, NULL );
+    MP4_GETFOURCC( p_box->data.p_colr->i_type );
+    if ( p_box->data.p_colr->i_type == VLC_FOURCC( 'n', 'c', 'l', 'c' ) ||
+         p_box->data.p_colr->i_type == VLC_FOURCC( 'n', 'c', 'l', 'x' ) )
+    {
+        MP4_GET2BYTES( p_box->data.p_colr->nclc.i_primary_idx );
+        MP4_GET2BYTES( p_box->data.p_colr->nclc.i_transfer_function_idx );
+        MP4_GET2BYTES( p_box->data.p_colr->nclc.i_matrix_idx );
+        if ( p_box->data.p_colr->i_type == VLC_FOURCC( 'n', 'c', 'l', 'x' ) )
+            MP4_GET1BYTE( p_box->data.p_colr->nclc.i_full_range );
+    }
+    else
+    {
+#ifdef MP4_VERBOSE
+        msg_Warn( p_stream, "Unhandled colr type: %4.4s", (char*)&p_box->data.p_colr->i_type );
+#endif
+    }
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
 {
     uint8_t meta_data[8];
@@ -3952,6 +3974,7 @@ static const struct
     { ATOM_pasp,    MP4_ReadBox_pasp,         0 },
     { ATOM_btrt,    MP4_ReadBox_btrt,         0 }, /* codecs bitrate stsd/????/btrt */
     { ATOM_keys,    MP4_ReadBox_keys,         ATOM_meta },
+    { ATOM_colr,    MP4_ReadBox_colr,         0 },
 
     /* Samples groups specific information */
     { ATOM_sbgp,    MP4_ReadBox_sbgp,         ATOM_stbl },

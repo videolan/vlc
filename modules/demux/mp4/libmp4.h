@@ -343,6 +343,7 @@ typedef int64_t stime_t;
 #define ATOM_gssd VLC_FOURCC( 'g', 's', 's', 'd' )
 #define ATOM_gsst VLC_FOURCC( 'g', 's', 's', 't' )
 #define ATOM_gstd VLC_FOURCC( 'g', 's', 't', 'd' )
+#define ATOM_colr VLC_FOURCC( 'c', 'o', 'l', 'r' )
 
 #define ATOM_0x40PRM VLC_FOURCC( '@', 'P', 'R', 'M' )
 #define ATOM_0x40PRQ VLC_FOURCC( '@', 'P', 'R', 'Q' )
@@ -581,6 +582,21 @@ typedef struct MP4_Box_data_ctts_s
 
 } MP4_Box_data_ctts_t;
 
+// https://developer.apple.com/library/mac/documentation/QuickTime/QTFF/QTFFChap3/qtff3.html#//apple_ref/doc/uid/TP40000939-CH205-125526
+typedef struct MP4_Box_data_colr_s
+{
+    uint32_t i_type;
+    union
+    {
+        struct
+        {
+            uint16_t i_primary_idx;
+            uint16_t i_transfer_function_idx;
+            uint16_t i_matrix_idx;
+            uint8_t i_full_range;
+        } nclc;
+    };
+} MP4_Box_data_colr_t;
 
 typedef struct MP4_Box_data_sample_soun_s
 {
@@ -1521,6 +1537,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_lcont_t *p_lcont;
     MP4_Box_data_stts_t *p_stts;
     MP4_Box_data_ctts_t *p_ctts;
+    MP4_Box_data_colr_t *p_colr;
 
     MP4_Box_data_sbgp_t *p_sbgp;
     MP4_Box_data_sgpd_t *p_sgpd;
