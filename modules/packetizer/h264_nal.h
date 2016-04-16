@@ -112,6 +112,12 @@ struct h264_sequence_parameter_set_t
     struct {
         bool b_valid;
         int i_sar_num, i_sar_den;
+        struct {
+            bool b_full_range;
+            uint8_t i_colour_primaries;
+            uint8_t i_transfer_characteristics;
+            uint8_t i_matrix_coefficients;
+        } colour;
         bool b_timing_info_present_flag;
         uint32_t i_num_units_in_tick;
         uint32_t i_time_scale;

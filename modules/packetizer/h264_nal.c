@@ -427,11 +427,22 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         i_tmp = bs_read( p_bs, 1 );
         if( i_tmp )
         {
-            bs_read( p_bs, 4 );
+            bs_read( p_bs, 3 );
+            p_sps->vui.colour.b_full_range = bs_read( p_bs, 1 );
             /* colour desc */
             i_tmp = bs_read( p_bs, 1 );
             if ( i_tmp )
-                bs_read( p_bs, 24 );
+            {
+                p_sps->vui.colour.i_colour_primaries = bs_read( p_bs, 8 );
+                p_sps->vui.colour.i_transfer_characteristics = bs_read( p_bs, 8 );
+                p_sps->vui.colour.i_matrix_coefficients = bs_read( p_bs, 8 );
+            }
+            else
+            {
+                p_sps->vui.colour.i_colour_primaries = HXXX_PRIMARIES_UNSPECIFIED;
+                p_sps->vui.colour.i_transfer_characteristics = HXXX_TRANSFER_UNSPECIFIED;
+                p_sps->vui.colour.i_matrix_coefficients = HXXX_MATRIX_UNSPECIFIED;
+            }
         }
 
         /* chroma loc info */
