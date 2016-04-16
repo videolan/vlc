@@ -21,6 +21,7 @@
 #define HXXX_NAL_H
 
 #include <vlc_common.h>
+#include <vlc_es.h>
 
 static const uint8_t  annexb_startcode4[] = { 0x00, 0x00, 0x00, 0x01 };
 #define annexb_startcode3 (&annexb_startcode4[1])
@@ -40,6 +41,35 @@ enum hxxx_colour_primaries
     HXXX_PRIMARIES_BT2020           = 9,
     HXXX_PRIMARIES_SMPTE_ST_428     = 10,
 };
+
+static inline video_color_primaries_t
+hxxx_colour_primaries_to_vlc( enum hxxx_colour_primaries i_colour )
+{
+    switch( i_colour )
+    {
+    case HXXX_PRIMARIES_BT470BG:
+        return COLOR_PRIMARIES_BT601_625;
+
+    case HXXX_PRIMARIES_BT601_525:
+    case HXXX_PRIMARIES_SMTPE_240M:
+        return COLOR_PRIMARIES_BT601_625;
+
+    case HXXX_PRIMARIES_BT709:
+        return COLOR_PRIMARIES_BT709;
+
+    case HXXX_PRIMARIES_BT2020:
+        return COLOR_PRIMARIES_BT2020;
+
+    case HXXX_PRIMARIES_BT470M:
+    case HXXX_PRIMARIES_RESERVED0:
+    case HXXX_PRIMARIES_UNSPECIFIED:
+    case HXXX_PRIMARIES_RESERVED3:
+    case HXXX_PRIMARIES_GENERIC_FILM:
+    case HXXX_PRIMARIES_SMPTE_ST_428:
+    default:
+        return COLOR_PRIMARIES_UNDEF;
+    }
+}
 
 /* Annex E: Transfer characteristics */
 enum hxxx_transfer_characteristics
@@ -64,6 +94,40 @@ enum hxxx_transfer_characteristics
     HXXX_TRANSFER_SMPTE_ST_428      = 17,
 };
 
+static inline video_transfer_func_t
+hxxx_transfer_characteristics_to_vlc( enum hxxx_transfer_characteristics i_transfer )
+{
+    switch( i_transfer )
+    {
+    case HXXX_TRANSFER_LINEAR:
+        return TRANSFER_FUNC_LINEAR;
+
+    case HXXX_TRANSFER_BT470M:
+        return TRANSFER_FUNC_SRGB;
+
+    case HXXX_TRANSFER_BT709:
+    case HXXX_TRANSFER_BT601_525:
+    case HXXX_TRANSFER_BT2020_V14:
+    case HXXX_TRANSFER_BT2020_V15:
+        return TRANSFER_FUNC_BT709;
+
+    case HXXX_TRANSFER_RESERVED0:
+    case HXXX_TRANSFER_UNSPECIFIED:
+    case HXXX_TRANSFER_RESERVED3:
+    case HXXX_TRANSFER_BT470BG:
+    case HXXX_TRANSFER_SMTPE_240M:
+    case HXXX_TRANSFER_LOG:
+    case HXXX_TRANSFER_LOG_SQRT:
+    case HXXX_TRANSFER_IEC61966_2_4:
+    case HXXX_TRANSFER_BT1361:
+    case HXXX_TRANSFER_IEC61966_2_1:
+    case HXXX_TRANSFER_SMPTE_ST_2084:
+    case HXXX_TRANSFER_SMPTE_ST_428:
+    default:
+        return TRANSFER_FUNC_UNDEF;
+    };
+}
+
 /* Annex E: Matrix coefficients */
 enum hxxx_matrix_coeffs
 {
@@ -79,6 +143,33 @@ enum hxxx_matrix_coeffs
     HXXX_MATRIX_BT2020_NCL          = 9,
     HXXX_MATRIX_BT2020_CL           = 10,
 };
+
+static inline video_color_space_t
+hxxx_matrix_coeffs_to_vlc( enum hxxx_matrix_coeffs i_transfer )
+{
+    switch( i_transfer )
+    {
+    case HXXX_MATRIX_BT470BG:
+    case HXXX_MATRIX_BT601_525:
+        return COLOR_SPACE_BT601;
+
+    case HXXX_MATRIX_BT709:
+        return COLOR_SPACE_BT709;
+
+    case HXXX_MATRIX_BT2020_NCL:
+    case HXXX_MATRIX_BT2020_CL:
+        return COLOR_SPACE_BT2020;
+
+    case HXXX_MATRIX_IDENTITY:
+    case HXXX_MATRIX_UNSPECIFIED:
+    case HXXX_MATRIX_RESERVED:
+    case HXXX_MATRIX_FCC:
+    case HXXX_MATRIX_SMTPE_240M:
+    case HXXX_MATRIX_YCGCO:
+    default:
+        return COLOR_SPACE_UNDEF;
+    }
+}
 
 /* strips any AnnexB startcode [0] 0 0 1 */
 static inline bool hxxx_strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_data )
