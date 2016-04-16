@@ -504,6 +504,11 @@ static void OpenglSwap (vlc_gl_t *gl)
     if (OSX_LION)
         [self setWantsBestResolutionOpenGLSurface:YES];
 
+    /* request our screen's HDR mode (introduced in OS X 10.11) */
+    if ([self respondsToSelector:@selector(setWantsExtendedDynamicRangeOpenGLSurface:)]) {
+        [self setWantsExtendedDynamicRangeOpenGLSurface:YES];
+    }
+
     /* Swap buffers only during the vertical retrace of the monitor.
      http://developer.apple.com/documentation/GraphicsImaging/
      Conceptual/OpenGL/chap5/chapter_5_section_44.html */
