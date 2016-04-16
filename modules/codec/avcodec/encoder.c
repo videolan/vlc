@@ -277,6 +277,55 @@ static void probe_video_frame_rate( encoder_t *p_enc, AVCodecContext *p_context,
     msg_Dbg( p_enc, "Time base set to %d/%d", p_context->time_base.num, p_context->time_base.den );
 }
 
+static void set_video_color_settings( encoder_t *p_enc, AVCodecContext *p_context )
+{
+    if( p_enc->fmt_in.video.b_color_range_full )
+        p_context->color_range = AVCOL_RANGE_JPEG;
+
+    switch( p_enc->fmt_in.video.space )
+    {
+        case COLOR_SPACE_BT709:
+            p_context->colorspace = AVCOL_SPC_BT709;
+            break;
+        case COLOR_SPACE_BT601:
+            p_context->colorspace = AVCOL_SPC_BT470BG;
+            break;
+        case COLOR_SPACE_BT2020:
+            p_context->colorspace = AVCOL_SPC_BT2020_CL;
+            break;
+        default:
+            break;
+    }
+
+    switch( p_enc->fmt_in.video.transfer )
+    {
+        case TRANSFER_FUNC_LINEAR:
+            p_context->color_trc = AVCOL_TRC_LINEAR;
+            break;
+        case TRANSFER_FUNC_SRGB:
+            p_context->color_trc = AVCOL_TRC_GAMMA22;
+            break;
+        case TRANSFER_FUNC_BT709:
+            p_context->color_trc = AVCOL_TRC_BT709;
+            break;
+    }
+    switch( p_enc->fmt_in.video.primaries )
+    {
+        case COLOR_PRIMARIES_BT601_525:
+            p_context->color_primaries = AVCOL_PRI_SMPTE170M;
+            break;
+        case COLOR_PRIMARIES_BT601_625:
+            p_context->color_primaries = AVCOL_PRI_BT470BG;
+            break;
+        case COLOR_PRIMARIES_BT709:
+            p_context->color_primaries = AVCOL_PRI_BT709;
+            break;
+        case COLOR_PRIMARIES_BT2020:
+            p_context->color_primaries = AVCOL_PRI_BT2020;
+            break;
+    }
+}
+
 int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
@@ -502,6 +551,7 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->height = p_enc->fmt_in.video.i_visible_height;
 
         probe_video_frame_rate( p_enc, p_context, p_codec );
+        set_video_color_settings( p_enc, p_context );
 
         /* Defaults from ffmpeg.c */
         p_context->qblur = 0.5;
