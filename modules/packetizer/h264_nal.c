@@ -429,7 +429,7 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         {
             bs_read( p_bs, 4 );
             /* colour desc */
-            bs_read( p_bs, 1 );
+            i_tmp = bs_read( p_bs, 1 );
             if ( i_tmp )
                 bs_read( p_bs, 24 );
         }
