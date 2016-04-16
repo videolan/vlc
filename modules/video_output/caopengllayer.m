@@ -201,21 +201,25 @@ static int Open (vlc_object_t *p_this)
                     case COLOR_PRIMARIES_BT601_525:
                     case COLOR_PRIMARIES_BT601_625:
                     {
+                        msg_Dbg(vd, "Using BT.601 color space");
                         sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
                         break;
                     }
                     case COLOR_PRIMARIES_BT709:
                     {
+                        msg_Dbg(vd, "Using BT.709 color space");
                         sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
                         break;
                     }
                     case COLOR_PRIMARIES_BT2020:
                     {
+                        msg_Dbg(vd, "Using BT.2020 color space");
                         sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
                         break;
                     }
                     case COLOR_PRIMARIES_DCI_P3:
                     {
+                        msg_Dbg(vd, "Using DCI P3 color space");
                         sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceDCIP3);
                         break;
                     }
