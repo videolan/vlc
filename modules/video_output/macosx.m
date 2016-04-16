@@ -49,17 +49,6 @@
 #include <vlc_dialog.h>
 #include "opengl.h"
 
-/* compilation support for 10.5 and 10.6 */
-#define OSX_LION NSAppKitVersionNumber >= 1115.2
-#ifndef MAC_OS_X_VERSION_10_7
-
-@interface NSView (IntroducedInLion)
-- (NSRect)convertRectToBacking:(NSRect)aRect;
-- (void)setWantsBestResolutionOpenGLSurface:(BOOL)aBool;
-@end
-
-#endif
-
 #define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404)
 
 /**
