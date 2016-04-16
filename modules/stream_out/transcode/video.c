@@ -313,6 +313,11 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
             id->p_encoder->fmt_in.video.i_sar_den;
     }
 
+    /* Keep colorspace etc info along */
+    id->p_encoder->fmt_in.video.space     = id->p_decoder->fmt_out.video.space;
+    id->p_encoder->fmt_in.video.transfer  = id->p_decoder->fmt_out.video.transfer;
+    id->p_encoder->fmt_in.video.primaries = id->p_decoder->fmt_out.video.primaries;
+    id->p_encoder->fmt_in.video.b_color_range_full = id->p_decoder->fmt_out.video.b_color_range_full;
 }
 
 /* Take care of the scaling and chroma conversions. */
