@@ -66,7 +66,6 @@ libtransform_plugin_la_SOURCES = video_filter/transform.c
 libvhs_plugin_la_SOURCES = video_filter/vhs.c
 libwave_plugin_la_SOURCES = video_filter/wave.c
 libwave_plugin_la_LIBADD = $(LIBM)
-libyuvp_plugin_la_SOURCES = video_filter/yuvp.c
 
 video_filter_LTLIBRARIES = \
 	libadjust_plugin.la \
@@ -98,7 +97,6 @@ video_filter_LTLIBRARIES = \
 	libtransform_plugin.la \
 	libwave_plugin.la \
 	libgradfun_plugin.la \
-	libyuvp_plugin.la \
 	libantiflicker_plugin.la \
 	libhqdn3d_plugin.la \
 	libanaglyph_plugin.la \
