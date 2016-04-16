@@ -66,9 +66,24 @@ static VdpStatus MixerSetupColors(filter_t *filter, const VdpProcamp *procamp,
     filter_sys_t *sys = filter->p_sys;
     VdpStatus err;
     /* XXX: add some margin for padding... */
-    VdpColorStandard std = (filter->fmt_in.video.i_height > 576 + 16)
-                         ? VDP_COLOR_STANDARD_ITUR_BT_709
-                         : VDP_COLOR_STANDARD_ITUR_BT_601;
+    VdpColorStandard std;
+
+    switch (filter->fmt_in.video.space)
+    {
+        case COLOR_SPACE_BT601:
+        case COLOR_SPACE_BT601_FULL: /* FIXME: wrong, use custom CSC */
+            std = VDP_COLOR_STANDARD_ITUR_BT_601;
+            break;
+        case COLOR_SPACE_BT709:
+        case COLOR_SPACE_BT709_FULL: /* FIXME: same as above */
+            std = VDP_COLOR_STANDARD_ITUR_BT_709;
+            break;
+        default:
+            if (filter->fmt_in.video.i_height >= 720)
+                std = VDP_COLOR_STANDARD_ITUR_BT_709;
+            else
+                std = VDP_COLOR_STANDARD_ITUR_BT_601;
+    }
 
     err = vdp_generate_csc_matrix(sys->vdp, procamp, std, csc);
     if (err != VDP_STATUS_OK)
