@@ -1040,6 +1040,24 @@ bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *p_sps,
     return false;
 }
 
+bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
+                           video_color_primaries_t *p_primaries,
+                           video_transfer_func_t *p_transfer,
+                           video_color_space_t *p_colorspace,
+                           bool *p_full_range )
+{
+    if( !p_sps->vui_parameters_present_flag )
+        return false;
+    *p_primaries =
+        hxxx_colour_primaries_to_vlc( p_sps->vui.vs.colour.colour_primaries );
+    *p_transfer =
+        hxxx_transfer_characteristics_to_vlc( p_sps->vui.vs.colour.transfer_characteristics );
+    *p_colorspace =
+        hxxx_matrix_coeffs_to_vlc( p_sps->vui.vs.colour.matrix_coeffs );
+    *p_full_range = p_sps->vui.vs.video_full_range_flag;
+    return true;
+}
+
 static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
                                                   uint8_t i_nal_type,
                                                   hevc_sequence_parameter_set_t **pp_sps,

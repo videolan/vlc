@@ -378,6 +378,11 @@ static block_t *ParseNonVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_nal
                     (void) hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps,
                                                 &p_dec->fmt_out.video.i_frame_rate,
                                                 &p_dec->fmt_out.video.i_frame_rate_base );
+                    (void) hevc_get_colorimetry( p_sps,
+                                                 &p_dec->fmt_out.video.primaries,
+                                                 &p_dec->fmt_out.video.transfer,
+                                                 &p_dec->fmt_out.video.space,
+                                                 &p_dec->fmt_out.video.b_color_range_full);
                 }
             }
         }

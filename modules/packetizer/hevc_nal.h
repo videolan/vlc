@@ -21,6 +21,7 @@
 # define HEVC_NAL_H
 
 # include <vlc_common.h>
+# include <vlc_es.h>
 
 #define HEVC_VPS_MAX 16
 #define HEVC_SPS_MAX 16
@@ -174,6 +175,11 @@ bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *, unsigned *p_w
 bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *,
                           hevc_video_parameter_set_t ** /* HEVC_MAX_VPS || NULL */,
                           unsigned *pi_num, unsigned *pi_den );
+bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
+                           video_color_primaries_t *p_primaries,
+                           video_transfer_func_t *p_transfer,
+                           video_color_space_t *p_colorspace,
+                           bool *p_full_range );
 bool hevc_get_slice_type( const hevc_slice_segment_header_t *, enum hevc_slice_type_e * );
 
 #endif /* HEVC_NAL_H */
