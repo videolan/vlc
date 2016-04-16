@@ -25,6 +25,61 @@
 static const uint8_t  annexb_startcode4[] = { 0x00, 0x00, 0x00, 0x01 };
 #define annexb_startcode3 (&annexb_startcode4[1])
 
+/* Annex E: Colour primaries */
+enum hxxx_colour_primaries
+{
+    HXXX_PRIMARIES_RESERVED0        = 0,
+    HXXX_PRIMARIES_BT709            = 1,
+    HXXX_PRIMARIES_UNSPECIFIED      = 2,
+    HXXX_PRIMARIES_RESERVED3        = 3,
+    HXXX_PRIMARIES_BT470M           = 4,
+    HXXX_PRIMARIES_BT470BG          = 5,
+    HXXX_PRIMARIES_BT601_525        = 6,
+    HXXX_PRIMARIES_SMTPE_240M       = 7,
+    HXXX_PRIMARIES_GENERIC_FILM     = 8,
+    HXXX_PRIMARIES_BT2020           = 9,
+    HXXX_PRIMARIES_SMPTE_ST_428     = 10,
+};
+
+/* Annex E: Transfer characteristics */
+enum hxxx_transfer_characteristics
+{
+    HXXX_TRANSFER_RESERVED0         = 0,
+    HXXX_TRANSFER_BT709             = 1,
+    HXXX_TRANSFER_UNSPECIFIED       = 2,
+    HXXX_TRANSFER_RESERVED3         = 3,
+    HXXX_TRANSFER_BT470M            = 4,
+    HXXX_TRANSFER_BT470BG           = 5,
+    HXXX_TRANSFER_BT601_525         = 6,
+    HXXX_TRANSFER_SMTPE_240M        = 7,
+    HXXX_TRANSFER_LINEAR            = 8,
+    HXXX_TRANSFER_LOG               = 9,
+    HXXX_TRANSFER_LOG_SQRT          = 10,
+    HXXX_TRANSFER_IEC61966_2_4      = 11,
+    HXXX_TRANSFER_BT1361            = 12,
+    HXXX_TRANSFER_IEC61966_2_1      = 13,
+    HXXX_TRANSFER_BT2020_V14        = 14,
+    HXXX_TRANSFER_BT2020_V15        = 15,
+    HXXX_TRANSFER_SMPTE_ST_2084     = 16,
+    HXXX_TRANSFER_SMPTE_ST_428      = 17,
+};
+
+/* Annex E: Matrix coefficients */
+enum hxxx_matrix_coeffs
+{
+    HXXX_MATRIX_IDENTITY            = 0,
+    HXXX_MATRIX_BT709               = 1,
+    HXXX_MATRIX_UNSPECIFIED         = 2,
+    HXXX_MATRIX_RESERVED            = 3,
+    HXXX_MATRIX_FCC                 = 4,
+    HXXX_MATRIX_BT470BG             = 5,
+    HXXX_MATRIX_BT601_525           = 6,
+    HXXX_MATRIX_SMTPE_240M          = 7,
+    HXXX_MATRIX_YCGCO               = 8,
+    HXXX_MATRIX_BT2020_NCL          = 9,
+    HXXX_MATRIX_BT2020_CL           = 10,
+};
+
 /* strips any AnnexB startcode [0] 0 0 1 */
 static inline bool hxxx_strip_AnnexB_startcode( const uint8_t **pp_data, size_t *pi_data )
 {
