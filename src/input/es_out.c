@@ -3017,6 +3017,40 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            info_category_AddInfo( p_cat, _("Orientation"), "%s",
                                   _(orient_names[fmt->video.orientation]) );
        }
+       if( fmt->video.primaries != COLOR_PRIMARIES_UNDEF )
+       {
+           static const char *primaries_names[] = { N_("Undefined"),
+               N_("ITU-R BT.601 (525 lines, 60 Hz)"),
+               N_("ITU-R BT.601 (625 lines, 50 Hz)"),
+               N_("ITU-R BT.709"),
+               N_("ITU-R BT.2020"),
+               N_("DCI/P3 D65"),
+           };
+           info_category_AddInfo( p_cat, _("Color primaries"), "%s",
+                                  _(primaries_names[fmt->video.primaries]) );
+       }
+       if( fmt->video.transfer != TRANSFER_FUNC_UNDEF )
+       {
+           static const char *func_names[] = { N_("Undefined"),
+               N_("Linear"),
+               N_("sRGB"),
+               N_("ITU-R BT.709 or BT.2020"),
+           };
+           info_category_AddInfo( p_cat, _("Color transfer function"), "%s",
+                                  _(func_names[fmt->video.transfer]) );
+       }
+       if( fmt->video.space != COLOR_SPACE_UNDEF )
+       {
+           static const char *space_names[] = { N_("Undefined"),
+               N_("ITU-R BT.601 limited range"),
+               N_("ITU-R BT.601 full range"),
+               N_("ITU-R BT.709 limited range"),
+               N_("ITU-R BT.709 full range"),
+               N_("ITU-R BT.2020"),
+           };
+           info_category_AddInfo( p_cat, _("Color space"), "%s",
+                                  _(space_names[fmt->video.space]) );
+       }
        break;
 
     case SPU_ES:
