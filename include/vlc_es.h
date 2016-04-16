@@ -193,6 +193,48 @@ typedef enum video_transform_t
 } video_transform_t;
 
 /**
+ * Video color primaries (a.k.a. chromacities)
+ */
+typedef enum video_color_primaries_t
+{
+    COLOR_PRIMARIES_UNDEF,
+    COLOR_PRIMARIES_BT601_525,
+    COLOR_PRIMARIES_BT601_625,
+    COLOR_PRIMARIES_BT709,
+    COLOR_PRIMARIES_BT2020,
+    COLOR_PRIMARIES_DCI_P3,
+#define COLOR_SRGB COLOR_BT709
+} video_color_primaries_t;
+
+/**
+ * Video transfer functions
+ */
+typedef enum video_transfer_func_t
+{
+    TRANSFER_FUNC_UNDEF,
+    TRANSFER_FUNC_LINEAR,
+    TRANSFER_FUNC_SRGB /*< Gamma 2.2 */,
+    TRANSFER_FUNC_BT709,
+#define TRANSFER_FUNC_BT2020 TRANSFER_FUNC_BT709
+} video_transfer_func_t;
+
+/**
+ * Video color space (i.e. YCbCr matrices)
+ */
+typedef enum video_color_space_t
+{
+    COLOR_SPACE_UNDEF,
+    COLOR_SPACE_BT601_LIMITED,
+#define COLOR_SPACE_BT601 COLOR_SPACE_BT601_LIMITED
+    COLOR_SPACE_BT601_FULL,
+    COLOR_SPACE_BT709_LIMITED,
+#define COLOR_SPACE_BT709 COLOR_SPACE_BT709_LIMITED
+    COLOR_SPACE_BT709_FULL,
+    COLOR_SPACE_BT2020_LIMITED,
+#define COLOR_SPACE_BT2020 COLOR_SPACE_BT2020_LIMITED
+} video_color_space_t;
+
+/**
  * video format description
  */
 struct video_format_t
@@ -220,6 +262,9 @@ struct video_format_t
     int i_rbshift, i_lbshift;
     video_palette_t *p_palette;              /**< video palette from demuxer */
     video_orientation_t orientation;                /**< picture orientation */
+    video_color_primaries_t primaries;                  /**< color primaries */
+    video_transfer_func_t transfer;                   /**< transfer function */
+    video_color_space_t space;                        /**< YCbCr color space */
 };
 
 /**
