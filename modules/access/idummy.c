@@ -197,7 +197,7 @@ nop:
         p_demux->pf_control = ControlPause;
         return VLC_SUCCESS;
     }
- 
+
     msg_Err( p_demux, "unknown command `%s'", psz_name );
     return VLC_EGENERIC;
 }
