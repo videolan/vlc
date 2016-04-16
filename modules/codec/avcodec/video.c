@@ -192,6 +192,67 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
         fmt->i_frame_rate_base = ctx->time_base.num
                                  * __MAX(ctx->ticks_per_frame, 1);
     }
+
+    if( ctx->color_range = AVCOL_RANGE_JPEG )
+        fmt->b_color_range_full = true;
+
+    switch( ctx->colorspace )
+    {
+        case AVCOL_SPC_BT709:
+            fmt->space = COLOR_SPACE_BT709;
+            break;
+        case AVCOL_SPC_SMPTE170M:
+        case AVCOL_SPC_BT470BG:
+            fmt->space = COLOR_SPACE_BT601;
+            break;
+        case AVCOL_SPC_BT2020_NCL:
+        case AVCOL_SPC_BT2020_CL:
+            fmt->space = COLOR_SPACE_BT2020;
+            break;
+        default:
+            break;
+    }
+
+    switch( ctx->color_trc )
+    {
+        case AVCOL_TRC_LINEAR:
+            fmt->transfer = TRANSFER_FUNC_LINEAR;
+            break;
+        case AVCOL_TRC_GAMMA22:
+            fmt->transfer = TRANSFER_FUNC_SRGB;
+            break;
+        case AVCOL_TRC_BT709:
+            fmt->transfer = TRANSFER_FUNC_BT709;
+            break;
+        case AVCOL_TRC_SMPTE170M:
+        case AVCOL_TRC_SMPTE240M:
+        case AVCOL_TRC_BT2020_10:
+        case AVCOL_TRC_BT2020_12:
+            fmt->transfer = TRANSFER_FUNC_BT2020;
+            break;
+        default:
+            break;
+    }
+
+    switch( ctx->color_primaries )
+    {
+        case AVCOL_PRI_BT709:
+            fmt->primaries = COLOR_PRIMARIES_BT709;
+            break;
+        case AVCOL_PRI_BT470BG:
+            fmt->primaries = COLOR_PRIMARIES_BT601_625;
+            break;
+        case AVCOL_PRI_SMPTE170M:
+        case AVCOL_PRI_SMPTE240M:
+            fmt->primaries = COLOR_PRIMARIES_BT601_525;
+            break;
+        case AVCOL_PRI_BT2020:
+            fmt->primaries = COLOR_PRIMARIES_BT2020;
+            break;
+        default:
+            break;
+    }
+
     return 0;
 }
 
