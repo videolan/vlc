@@ -462,6 +462,12 @@ static bool hevc_parse_vui_parameters_rbsp( bs_t *p_bs, hevc_vui_parameters_t *p
             p_vui->vs.colour.transfer_characteristics = bs_read( p_bs, 8 );
             p_vui->vs.colour.matrix_coeffs = bs_read( p_bs, 8 );
         }
+        else
+        {
+            p_vui->vs.colour.colour_primaries = HXXX_PRIMARIES_UNSPECIFIED;
+            p_vui->vs.colour.transfer_characteristics = HXXX_TRANSFER_UNSPECIFIED;
+            p_vui->vs.colour.matrix_coeffs = HXXX_MATRIX_UNSPECIFIED;
+        }
     }
 
     p_vui->chroma_loc_info_present_flag = bs_read1( p_bs );
