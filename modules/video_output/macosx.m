@@ -373,12 +373,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 /* we always use our current frame here, because we have some size constraints
                  in the ui vout provider */
                 vout_display_cfg_t cfg_tmp = *cfg;
-                NSRect bounds;
                 /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-                if (OSX_LION)
-                    bounds = [sys->glView convertRectToBacking:[sys->glView bounds]];
-                else
-                    bounds = [sys->glView bounds];
+                NSRect bounds = [sys->glView convertRectToBacking:[sys->glView bounds]];
                 cfg_tmp.display.width = bounds.size.width;
                 cfg_tmp.display.height = bounds.size.height;
 
@@ -489,9 +485,8 @@ static void OpenglSwap (vlc_gl_t *gl)
     if (!self)
         return nil;
 
-    /* enable HiDPI support on OS X 10.7 and later */
-    if (OSX_LION)
-        [self setWantsBestResolutionOpenGLSurface:YES];
+    /* enable HiDPI support */
+    [self setWantsBestResolutionOpenGLSurface:YES];
 
     /* request our screen's HDR mode (introduced in OS X 10.11) */
     if ([self respondsToSelector:@selector(setWantsExtendedDynamicRangeOpenGLSurface:)]) {
@@ -624,12 +619,8 @@ static void OpenglSwap (vlc_gl_t *gl)
 {
     VLCAssertMainThread();
 
-    NSRect bounds;
     /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-    if (OSX_LION)
-        bounds = [self convertRectToBacking:[self bounds]];
-    else
-        bounds = [self bounds];
+    NSRect bounds = [self convertRectToBacking:[self bounds]];
     vout_display_place_t place;
 
     @synchronized(self) {
@@ -769,10 +760,8 @@ static void OpenglSwap (vlc_gl_t *gl)
     NSRect videoRect = [self bounds];
     BOOL b_inside = [self mouse: ml inRect: videoRect];
 
-    if (OSX_LION) {
-        ml = [self convertPointToBacking: ml];
-        videoRect = [self convertRectToBacking: videoRect];
-    }
+    ml = [self convertPointToBacking: ml];
+    videoRect = [self convertRectToBacking: videoRect];
 
     if (b_inside) {
         @synchronized (self) {
