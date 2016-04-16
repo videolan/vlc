@@ -197,17 +197,43 @@ static int Open (vlc_object_t *p_this)
             /* support for BT.709 and BT.2020 color spaces was introduced with OS X 10.11
              * on older OS versions, we can't show correct colors, so we fallback on linear RGB */
             if (OSX_EL_CAPITAN) {
-                msg_Warn(vd, "Guessing color space based on video dimensions (height: %i", fmt.i_height);
-
-                if (fmt.i_height >= 2000 || fmt.i_width >= 3800) {
-                    msg_Dbg(vd, "Should use BT.2020 color space, but in reality it's BT.709");
-                    sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
-                } else if (fmt.i_height > 576) {
-                    msg_Dbg(vd, "Using BT.709 color space");
-                    sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
-                } else {
-                    msg_Dbg(vd, "SD content, using linear RGB color space");
-                    sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+                switch (fmt.primaries) {
+                    case COLOR_PRIMARIES_BT601_525:
+                    case COLOR_PRIMARIES_BT601_625:
+                    {
+                        sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+                        break;
+                    }
+                    case COLOR_PRIMARIES_BT709:
+                    {
+                        sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+                        break;
+                    }
+                    case COLOR_PRIMARIES_BT2020:
+                    {
+                        sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+                        break;
+                    }
+                    case COLOR_PRIMARIES_DCI_P3:
+                    {
+                        sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceDCIP3);
+                        break;
+                    }
+                    default:
+                    {
+                        msg_Dbg(vd, "Guessing color space based on video dimensions (%ix%i)", fmt.i_visible_width, fmt.i_visible_height);
+                        if (fmt.i_visible_height >= 2000 || fmt.i_visible_width >= 3800) {
+                            msg_Dbg(vd, "Using BT.2020 color space");
+                            sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_2020);
+                        } else if (fmt.i_height > 576) {
+                            msg_Dbg(vd, "Using BT.709 color space");
+                            sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+                        } else {
+                            msg_Dbg(vd, "SD content, using linear RGB color space");
+                            sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+                        }
+                        break;
+                    }
                 }
             } else {
                 msg_Dbg(vd, "OS does not support BT.709 or BT.2020 color spaces, output may vary");
