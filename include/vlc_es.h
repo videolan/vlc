@@ -230,6 +230,20 @@ typedef enum video_color_space_t
 } video_color_space_t;
 
 /**
+ * Video chroma location
+ */
+typedef enum video_chroma_location_t
+{
+    CHROMA_LOCATION_UNDEF,
+    CHROMA_LOCATION_LEFT,   /*< Most common in MPEG-2 Video, H.264/265 */
+    CHROMA_LOCATION_CENTER, /*< Most common in MPEG-1 Video, JPEG */
+    CHROMA_LOCATION_TOP_LEFT,
+    CHROMA_LOCATION_TOP_CENTER,
+    CHROMA_LOCATION_BOTTOM_LEFT,
+    CHROMA_LOCATION_BOTTOM_CENTER,
+} video_chroma_location_t;
+
+/**
  * video format description
  */
 struct video_format_t
@@ -261,6 +275,7 @@ struct video_format_t
     video_transfer_func_t transfer;                   /**< transfer function */
     video_color_space_t space;                        /**< YCbCr color space */
     bool b_color_range_full;                    /**< 0-255 instead of 16-235 */
+    video_chroma_location_t chroma_location;      /**< YCbCr chroma location */
 };
 
 /**
