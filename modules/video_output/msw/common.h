@@ -213,6 +213,7 @@ struct vout_display_sys_t
     D3DCAPS9                d3dcaps;
     LPDIRECT3DDEVICE9       d3ddev;
     D3DPRESENT_PARAMETERS   d3dpp;
+    bool                    use_d3d9ex;
 
     // scene objects
     LPDIRECT3DTEXTURE9      d3dtex;

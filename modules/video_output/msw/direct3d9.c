@@ -392,7 +392,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
 
     if (sys->lost_not_ready) {
         picture_Release(picture);
@@ -405,7 +404,15 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     // No stretching should happen here !
     const RECT src = sys->rect_dest_clipped;
     const RECT dst = sys->rect_dest_clipped;
-    HRESULT hr = IDirect3DDevice9_Present(d3ddev, &src, &dst, NULL, NULL);
+
+    HRESULT hr;
+    if (sys->use_d3d9ex) {
+        LPDIRECT3DDEVICE9EX d3ddev = (LPDIRECT3DDEVICE9EX)sys->d3ddev;
+        hr = IDirect3DDevice9Ex_PresentEx(d3ddev, &src, &dst, NULL, NULL, 0);
+    } else {
+        LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
+        hr = IDirect3DDevice9_Present(d3ddev, &src, &dst, NULL, NULL);
+    }
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DDevice9_Present: 0x%0lx", hr);
     }
@@ -594,13 +601,30 @@ static int Direct3D9Create(vout_display_t *vd)
         return VLC_EGENERIC;
     }
 
+    HRESULT (WINAPI *OurDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex **ppD3D);
+    OurDirect3DCreate9Ex =
+        (void *)GetProcAddress(sys->hd3d9_dll, "Direct3DCreate9Ex");
+
     /* Create the D3D object. */
-    LPDIRECT3D9 d3dobj = OurDirect3DCreate9(D3D_SDK_VERSION);
-    if (!d3dobj) {
-       msg_Err(vd, "Could not create Direct3D9 instance.");
-       return VLC_EGENERIC;
+    if (OurDirect3DCreate9Ex) {
+        LPDIRECT3D9EX d3d9exobj;
+        HRESULT hr = OurDirect3DCreate9Ex(D3D_SDK_VERSION, &d3d9exobj);
+        if(!FAILED(hr)) {
+            msg_Dbg(vd, "Using Direct3D9 Extended API!");
+            sys->d3dobj = (LPDIRECT3D9)d3d9exobj;
+            sys->use_d3d9ex = true;
+        }
     }
-    sys->d3dobj = d3dobj;
+
+    if (!sys->d3dobj)
+    {
+        LPDIRECT3D9 d3dobj = OurDirect3DCreate9(D3D_SDK_VERSION);
+        if (!d3dobj) {
+            msg_Err(vd, "Could not create Direct3D9 instance.");
+            return VLC_EGENERIC;
+        }
+        sys->d3dobj = d3dobj;
+    }
 
     sys->hd3d9x_dll = Direct3D9LoadShaderLibrary();
     if (!sys->hd3d9x_dll)
@@ -610,7 +634,7 @@ static int Direct3D9Create(vout_display_t *vd)
     ** Get device capabilities
     */
     ZeroMemory(&sys->d3dcaps, sizeof(sys->d3dcaps));
-    HRESULT hr = IDirect3D9_GetDeviceCaps(d3dobj, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &sys->d3dcaps);
+    HRESULT hr = IDirect3D9_GetDeviceCaps(sys->d3dobj, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &sys->d3dcaps);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not read adapter capabilities. (hr=0x%0lx)", hr);
        return VLC_EGENERIC;
@@ -709,8 +733,6 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     if (Direct3D9FillPresentationParameters(vd))
         return VLC_EGENERIC;
 
-    // Create the D3DDevice
-    LPDIRECT3DDEVICE9 d3ddev;
 
     UINT AdapterToUse = D3DADAPTER_DEFAULT;
     D3DDEVTYPE DeviceType = D3DDEVTYPE_HAL;
@@ -738,16 +760,30 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
                 d3dai.VendorId, d3dai.DeviceId, d3dai.Revision );
     }
 
-    HRESULT hr = IDirect3D9_CreateDevice(d3dobj, AdapterToUse,
+    // Create the D3DDevice
+    HRESULT hr;
+    if (sys->use_d3d9ex) {
+        LPDIRECT3DDEVICE9EX d3ddevex;
+        hr = IDirect3D9Ex_CreateDeviceEx((LPDIRECT3D9EX)d3dobj, AdapterToUse,
                                          DeviceType, sys->hvideownd,
                                          D3DCREATE_SOFTWARE_VERTEXPROCESSING|
                                          D3DCREATE_MULTITHREADED,
-                                         &sys->d3dpp, &d3ddev);
+                                         &sys->d3dpp, NULL, &d3ddevex);
+        sys->d3ddev = (LPDIRECT3DDEVICE9)d3ddevex;
+    } else {
+        LPDIRECT3DDEVICE9 d3ddev;
+        hr = IDirect3D9_CreateDevice(d3dobj, AdapterToUse,
+                                     DeviceType, sys->hvideownd,
+                                     D3DCREATE_SOFTWARE_VERTEXPROCESSING|
+                                     D3DCREATE_MULTITHREADED,
+                                     &sys->d3dpp, &d3ddev);
+        sys->d3ddev = d3ddev;
+    }
+
     if (FAILED(hr)) {
        msg_Err(vd, "Could not create the D3D9 device! (hr=0x%0lx)", hr);
        return VLC_EGENERIC;
     }
-    sys->d3ddev = d3ddev;
 
     UpdateRects(vd, NULL, NULL, true);
 
@@ -784,7 +820,6 @@ static void Direct3D9Close(vout_display_t *vd)
 static int Direct3D9Reset(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
 
     if (Direct3D9FillPresentationParameters(vd))
         return VLC_EGENERIC;
@@ -793,7 +828,14 @@ static int Direct3D9Reset(vout_display_t *vd)
     Direct3D9DestroyResources(vd);
 
     /* */
-    HRESULT hr = IDirect3DDevice9_Reset(d3ddev, &sys->d3dpp);
+    HRESULT hr;
+    if (sys->use_d3d9ex){
+        LPDIRECT3DDEVICE9EX d3ddev = (LPDIRECT3DDEVICE9EX)sys->d3ddev;
+        hr = IDirect3DDevice9Ex_ResetEx(d3ddev, &sys->d3dpp, NULL);
+    } else {
+        LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
+        hr = IDirect3DDevice9_Reset(d3ddev, &sys->d3dpp);
+    }
     if (FAILED(hr)) {
         msg_Err(vd, "IDirect3DDevice9_Reset failed! (hr=0x%0lx)", hr);
         return VLC_EGENERIC;
