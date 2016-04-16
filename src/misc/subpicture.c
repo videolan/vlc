@@ -185,13 +185,8 @@ subpicture_region_private_t *subpicture_region_private_New( video_format_t *p_fm
     if( !p_private )
         return NULL;
 
-    p_private->fmt = *p_fmt;
-    if( p_fmt->p_palette )
-    {
-        p_private->fmt.p_palette = malloc( sizeof(*p_private->fmt.p_palette) );
-        if( p_private->fmt.p_palette )
-            *p_private->fmt.p_palette = *p_fmt->p_palette;
-    }
+    if ( video_format_Copy( &p_private->fmt, p_fmt ) != VLC_SUCCESS )
+        return NULL;
     p_private->p_picture = NULL;
 
     return p_private;
@@ -201,7 +196,7 @@ void subpicture_region_private_Delete( subpicture_region_private_t *p_private )
 {
     if( p_private->p_picture )
         picture_Release( p_private->p_picture );
-    free( p_private->fmt.p_palette );
+    video_format_Clean( &p_private->fmt );
     free( p_private );
 }
 
@@ -211,13 +206,11 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
     if( !p_region )
         return NULL;
 
-    p_region->fmt = *p_fmt;
-    p_region->fmt.p_palette = NULL;
-    if( p_fmt->i_chroma == VLC_CODEC_YUVP )
+    video_format_Copy( &p_region->fmt, p_fmt );
+    if ( p_fmt->i_chroma != VLC_CODEC_YUVP )
     {
-        p_region->fmt.p_palette = calloc( 1, sizeof(*p_region->fmt.p_palette) );
-        if( p_fmt->p_palette )
-            *p_region->fmt.p_palette = *p_fmt->p_palette;
+        free( p_region->fmt.p_palette );
+        p_region->fmt.p_palette = NULL;
     }
     p_region->i_alpha = 0xff;
 
@@ -227,7 +220,7 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
     p_region->p_picture = picture_NewFromFormat( p_fmt );
     if( !p_region->p_picture )
     {
-        free( p_region->fmt.p_palette );
+        video_format_Clean( &p_region->fmt );
         free( p_region );
         return NULL;
     }
@@ -247,7 +240,7 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
         picture_Release( p_region->p_picture );
 
     text_segment_ChainDelete( p_region->p_text );
-    free( p_region->fmt.p_palette );
+    video_format_Clean( &p_region->fmt );
     free( p_region );
 }
 

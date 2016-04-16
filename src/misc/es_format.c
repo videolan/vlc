@@ -506,14 +506,9 @@ int es_format_Copy(es_format_t *restrict dst, const es_format_t *src)
             ret = VLC_ENOMEM;
     }
 
-    if (src->video.p_palette != NULL)
-    {
-        dst->video.p_palette = malloc(sizeof (video_palette_t));
-        if (likely(dst->video.p_palette != NULL))
-            *dst->video.p_palette = *src->video.p_palette;
-        else
-            ret = VLC_ENOMEM;
-    }
+    int err = video_format_Copy( &dst->video, &src->video );
+    if ( err != VLC_SUCCESS )
+        return err;
 
     if (src->i_extra_languages > 0)
     {
@@ -547,7 +542,7 @@ void es_format_Clean(es_format_t *fmt)
     assert(fmt->i_extra == 0 || fmt->p_extra != NULL);
     free(fmt->p_extra);
 
-    free(fmt->video.p_palette);
+    video_format_Clean( &fmt->video );
     free(fmt->subs.psz_encoding);
 
     if (fmt->subs.p_style != NULL)

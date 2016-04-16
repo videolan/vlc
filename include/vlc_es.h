@@ -261,7 +261,6 @@ static inline void video_format_Clean( video_format_t *p_src )
 {
     free( p_src->p_palette );
     memset( p_src, 0, sizeof( video_format_t ) );
-    p_src->p_palette = NULL;
 }
 
 /**
