@@ -60,6 +60,8 @@
 
 #endif
 
+#define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404)
+
 /**
  * Forward declarations
  */
@@ -115,6 +117,9 @@ struct vout_display_sys_t
     VLCOpenGLVideoView *glView;
     id<VLCOpenGLVideoViewEmbedding> container;
 
+    CGColorSpaceRef cgColorSpace;
+    NSColorSpace *nsColorSpace;
+
     vout_window_t *embed;
     vlc_gl_t gl;
     vout_display_opengl_t *vgl;
@@ -169,6 +174,27 @@ static int Open (vlc_object_t *this)
         /* This will be released in Close(), on
          * main thread, after we are done using it. */
         sys->container = [container retain];
+
+        /* support for BT.709 and BT.2020 color spaces was introduced with OS X 10.11
+         * on older OS versions, we can't show correct colors, so we fallback on linear RGB */
+        if (OSX_EL_CAPITAN) {
+            msg_Warn(vd, "Guessing color space based on video dimensions (height: %i", vd->fmt.i_height);
+
+            if (vd->fmt.i_height >= 2000 || vd->fmt.i_width >= 3800) {
+                msg_Dbg(vd, "Should use BT.2020 color space, but in reality it's BT.709");
+                sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+            } else if (vd->fmt.i_height > 576) {
+                msg_Dbg(vd, "Using BT.709 color space");
+                sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+            } else {
+                msg_Dbg(vd, "SD content, using linear RGB color space");
+                sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+            }
+        } else {
+            msg_Dbg(vd, "OS does not support BT.709 or BT.2020 color spaces, output may vary");
+            sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+        }
+        sys->nsColorSpace = [[NSColorSpace alloc] initWithCGColorSpace:sys->cgColorSpace];
 
         /* Get our main view*/
         [VLCOpenGLVideoView performSelectorOnMainThread:@selector(getNewView:)
@@ -269,6 +295,12 @@ void Close (vlc_object_t *this)
             vout_display_opengl_Delete (sys->vgl);
 
         [sys->glView release];
+
+        if (sys->cgColorSpace != nil)
+            CGColorSpaceRelease(sys->cgColorSpace);
+
+        if (sys->nsColorSpace != nil)
+            [sys->nsColorSpace release];
 
         if (sys->embed)
             vout_display_DeleteWindow (vd, sys->embed);
@@ -787,6 +819,15 @@ static void OpenglSwap (vlc_gl_t *gl)
 - (BOOL)mouseDownCanMoveWindow
 {
     return YES;
+}
+
+- (void)viewWillMoveToWindow:(nullable NSWindow *)newWindow
+{
+    [super viewWillMoveToWindow:newWindow];
+
+    if (newWindow != nil) {
+        [newWindow setColorSpace:vd->sys->nsColorSpace];
+    }
 }
 
 @end
