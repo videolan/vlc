@@ -310,7 +310,6 @@ $Id$
  * qsv: QuickSyncVideo Encoder for Intel hardware
  * qt: interface module using the cross-platform Qt widget library
  * qtsound: Quicktime Audio Capture
- * quicktime: Quicktime decoder that uses the QT library
  * rar: RAR access and stream filter
  * rawaud: raw audio input module for vlc
  * rawdv: Raw DV demuxer

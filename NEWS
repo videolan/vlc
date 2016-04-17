@@ -219,6 +219,7 @@ Removed modules
  * VCDX "extended" Video CD access module (use the normal VCD module)
  * Mac OS X Dialog Provider (use VLCKit instead)
  * iOS Dialog Provider (use MobileVLCKit / TVVLCKit instead)
+ * QuickTime decoder module (use native codecs)
 
 
 Changes between 2.2.0 and 2.2.1:

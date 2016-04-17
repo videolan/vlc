@@ -390,7 +390,6 @@ modules/codec/omxil/vout.c
 modules/codec/opus.c
 modules/codec/png.c
 modules/codec/qsv.c
-modules/codec/quicktime.c
 modules/codec/rawvideo.c
 modules/codec/rtpvideo.c
 modules/codec/schroedinger.c

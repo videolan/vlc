@@ -11011,10 +11011,6 @@ msgstr ""
 msgid "Intel QuickSync Video encoder for MPEG4-Part10/MPEG2 (aka H.264/H.262)"
 msgstr ""
 
-#: modules/codec/quicktime.c:66
-msgid "QuickTime library decoder"
-msgstr ""
-
 #: modules/codec/rawvideo.c:66
 msgid "Pseudo raw video decoder"
 msgstr ""

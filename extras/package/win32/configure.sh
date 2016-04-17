@@ -7,7 +7,6 @@ OPTIONS="
       --enable-flac
       --enable-theora
       --enable-twolame
-      --enable-quicktime
       --enable-avcodec --enable-merge-ffmpeg
       --enable-dca
       --enable-mpc

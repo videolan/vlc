@@ -2649,21 +2649,6 @@ dnl fdk-aac encoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([FDKAAC], [], [fdk-aac], [FDK-AAC encoder], [disabled])
 
-dnl
-dnl  QuickTime plugin
-dnl
-AC_ARG_ENABLE(quicktime,
-  [  --enable-quicktime      QuickTime module (deprecated)])
-if test "${enable_quicktime}" = "yes"; then
-  if test "${SYS}" = "mingw32"; then
-    VLC_ADD_PLUGIN([quicktime])
-  else
-  AC_CHECK_HEADERS(QuickTime/QuickTime.h,
-    [ VLC_ADD_PLUGIN([quicktime])
-      VLC_ADD_LIBS([quicktime],[-Wl,-framework,QuickTime,-framework,Carbon])
-    ], [ AC_MSG_ERROR([cannot find QuickTime headers]) ])
-  fi
-fi
 
 dnl
 dnl A52/AC3 decoder plugin

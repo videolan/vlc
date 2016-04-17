@@ -543,12 +543,6 @@ libmft_plugin_la_LIBADD = -lole32 -luuid -lmfuuid -lmfplat
 codec_LTLIBRARIES += libmft_plugin.la
 endif
 
-libquicktime_plugin_la_SOURCES = codec/quicktime.c
-libquicktime_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libquicktime_plugin_la_LIBADD = $(LIBM)
-EXTRA_LTLIBRARIES += libquicktime_plugin.la
-codec_LTLIBRARIES += $(LTLIBquicktime)
-
 libgstdecode_plugin_la_SOURCES = codec/gstreamer/gstdecode.c \
 								 codec/gstreamer/gstvlcpictureplaneallocator.c \
 								 codec/gstreamer/gstvlcpictureplaneallocator.h \
