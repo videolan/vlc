@@ -267,6 +267,9 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
                 /* Create the input item */
                 p_entry = input_item_NewExt( psz_mrl, psz_name, i_duration,
                                              ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN );
+                if( p_entry == NULL )
+                    goto end;
+
                 input_item_AddOptions( p_entry, i_options,
                                        (const char **)ppsz_options,
                                        VLC_INPUT_OPTION_TRUSTED );
@@ -290,6 +293,7 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
 
                 input_item_Release( p_entry );
 
+end:
                 while( i_options )
                     free( ppsz_options[--i_options] );
                 free( psz_name );
