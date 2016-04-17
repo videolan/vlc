@@ -22,7 +22,7 @@ DST_DXGI14_H = $(PREFIX)/include/dxgi1_4.h
 
 
 ifdef HAVE_WIN32
-PKGS += d3d11 dxgi13 dxgi14 dxgitype
+PKGS += d3d11
 endif
 
 $(TARBALLS)/d3d11.idl:
@@ -71,14 +71,17 @@ $(DST_DXGI14_H): $(SRC)/d3d11/dxgi1_4.idl $(DST_DXGI13_H)
 	mkdir -p -- "$(PREFIX)/include/"
 	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(IDL_INC_PATH) -h -o $@ $<
 
-.dxgi13: $(DST_DXGI13_H)
-	touch $@
-
-.dxgi14: $(DST_DXGI14_H)
-	touch $@
-
 .dxgitype: $(DST_DXGITYPE_H)
 	touch $@
 
-.d3d11: $(DST_D3D11_H) $(DST_DXGIDEBUG_H) $(DST_DXGI12_H) dxgi12
+.dxgi12: .dxgitype $(DST_DXGI12_H)
+	touch $@
+
+.dxgi13: .dxgi12 $(DST_DXGI13_H)
+	touch $@
+
+.dxgi14: .dxgi13 $(DST_DXGI14_H)
+	touch $@
+
+.d3d11: $(DST_D3D11_H) $(DST_DXGIDEBUG_H) .dxgi14
 	touch $@
