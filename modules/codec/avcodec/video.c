@@ -225,7 +225,6 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
             fmt->transfer = TRANSFER_FUNC_BT709;
             break;
         case AVCOL_TRC_SMPTE170M:
-        case AVCOL_TRC_SMPTE240M:
         case AVCOL_TRC_BT2020_10:
         case AVCOL_TRC_BT2020_12:
             fmt->transfer = TRANSFER_FUNC_BT2020;
