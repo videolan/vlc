@@ -203,7 +203,7 @@ typedef enum video_color_primaries_t
     COLOR_PRIMARIES_BT709,
     COLOR_PRIMARIES_BT2020,
     COLOR_PRIMARIES_DCI_P3,
-#define COLOR_SRGB COLOR_BT709
+#define COLOR_PRIMARIES_SRGB COLOR_PRIMARIES_BT709
 } video_color_primaries_t;
 
 /**
