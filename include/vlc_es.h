@@ -166,9 +166,9 @@ typedef enum video_orientation_t
     ORIENT_ROTATED_90  = ORIENT_RIGHT_TOP,
 } video_orientation_t;
 /** Convert EXIF orientation to enum video_orientation_t */
-#define ORIENT_FROM_EXIF(exif) ((0x01324675U >> (4 * ((exif) - 1))) & 7)
+#define ORIENT_FROM_EXIF(exif) ((0x57642310U >> (4 * ((exif) - 1))) & 7)
 /** Convert enum video_orientation_t to EXIF */
-#define ORIENT_TO_EXIF(orient) ((0x12435867U >> (4 * (orient))) & 15)
+#define ORIENT_TO_EXIF(orient) ((0x76853421U >> (4 * (orient))) & 15)
 /** If the orientation is natural or mirrored */
 #define ORIENT_IS_MIRROR(orient) parity(orient)
 /** If the orientation swaps dimensions */
