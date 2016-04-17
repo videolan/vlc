@@ -1590,10 +1590,14 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     else
         p_block->i_flags |= BLOCK_FLAG_TYPE_PB;
 
-    /* This isn't really valid for streams with B-frames */
-    p_block->i_length = CLOCK_FREQ *
-        p_enc->fmt_in.video.i_frame_rate_base /
-            p_enc->fmt_in.video.i_frame_rate;
+    /* If we happen to have vfr stream, don't set length at all */
+    if( !p_sys->param.b_vfr_input )
+    {
+        /* This isn't really valid for streams with B-frames */
+        p_block->i_length = CLOCK_FREQ *
+            p_enc->fmt_in.video.i_frame_rate_base /
+                p_enc->fmt_in.video.i_frame_rate;
+    }
 
     /* scale pts-values back*/
     p_block->i_pts = pic.i_pts;
