@@ -2977,15 +2977,16 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     case VIDEO_ES:
         info_category_AddInfo( p_cat, _("Type"), _("Video") );
 
-        if( fmt->video.i_width > 0 && fmt->video.i_height > 0 )
-            info_category_AddInfo( p_cat, _("Resolution"), "%ux%u",
-                                   fmt->video.i_width, fmt->video.i_height );
-
         if( fmt->video.i_visible_width > 0 &&
             fmt->video.i_visible_height > 0 )
             info_category_AddInfo( p_cat, _("Display resolution"), "%ux%u",
                                    fmt->video.i_visible_width,
                                    fmt->video.i_visible_height);
+
+        if( fmt->video.i_width > 0 && fmt->video.i_height > 0 )
+            info_category_AddInfo( p_cat, _("Buffer dimensions"), "%ux%u",
+                                   fmt->video.i_width, fmt->video.i_height );
+
        if( fmt->video.i_frame_rate > 0 &&
            fmt->video.i_frame_rate_base > 0 )
        {
