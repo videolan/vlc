@@ -252,6 +252,21 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
             break;
     }
 
+    switch( ctx->chroma_sample_location )
+    {
+        case AVCHROMA_LOC_LEFT:
+            fmt->chroma_location = CHROMA_LOCATION_LEFT;
+            break;
+        case AVCHROMA_LOC_CENTER:
+            fmt->chroma_location = CHROMA_LOCATION_CENTER;
+            break;
+        case AVCHROMA_LOC_TOPLEFT:
+            fmt->chroma_location = CHROMA_LOCATION_TOP_LEFT;
+            break;
+        default:
+            break;
+    }
+
     return 0;
 }
 
