@@ -41,6 +41,8 @@
 # include <srtp.h>
 #endif
 
+#define DEFAULT_MRU (1500u - (20 + 8))
+
 /**
  * Processes a packet received from the RTP socket.
  */
@@ -104,6 +106,15 @@ void *rtp_dgram_thread (void *opaque)
     demux_sys_t *sys = demux->p_sys;
     mtime_t deadline = VLC_TS_INVALID;
     int rtp_fd = sys->fd;
+    struct iovec iov =
+    {
+        .iov_len = DEFAULT_MRU,
+    };
+    struct msghdr msg =
+    {
+        .msg_iov = &iov,
+        .msg_iovlen = 1,
+    };
 
     struct pollfd ufd[1];
     ufd[0].fd = rtp_fd;
@@ -125,14 +136,37 @@ void *rtp_dgram_thread (void *opaque)
             if (unlikely(ufd[0].revents & POLLHUP))
                 break; /* RTP socket dead (DCCP only) */
 
-            block_t *block = block_Alloc (0xffff); /* TODO: p_sys->mru */
+            block_t *block = block_Alloc (iov.iov_len);
             if (unlikely(block == NULL))
-                break; /* we are totallly screwed */
+            {
+                if (iov.iov_len == DEFAULT_MRU)
+                    break; /* we are totallly screwed */
+                iov.iov_len = DEFAULT_MRU;
+                continue; /* retry with shrunk MRU */
+            }
 
-            ssize_t len = recv (rtp_fd, block->p_buffer, block->i_buffer, 0);
+            iov.iov_base = block->p_buffer;
+#ifdef __linux__
+            msg.msg_flags = MSG_TRUNC;
+#else
+            msg.msg_flags = 0;
+#endif
+
+            ssize_t len = recvmsg (rtp_fd, &msg, 0);
             if (len != -1)
             {
-                block->i_buffer = len;
+#ifdef MSG_TRUNC
+                if (msg.msg_flags & MSG_TRUNC)
+                {
+                    msg_Err(demux, "%zd bytes packet truncated (MRU was %zu)",
+                            len, iov.iov_len);
+                    block->i_flags |= BLOCK_FLAG_CORRUPTED;
+                    iov.iov_len = len;
+                }
+                else
+#endif
+                    block->i_buffer = len;
+
                 rtp_process (demux, block);
             }
             else
