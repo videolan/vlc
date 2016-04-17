@@ -3042,14 +3042,17 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        if( fmt->video.space != COLOR_SPACE_UNDEF )
        {
            static const char *space_names[] = { N_("Undefined"),
-               N_("ITU-R BT.601 limited range"),
-               N_("ITU-R BT.601 full range"),
-               N_("ITU-R BT.709 limited range"),
-               N_("ITU-R BT.709 full range"),
+               N_("ITU-R BT.601"),
+               N_("ITU-R BT.709"),
                N_("ITU-R BT.2020"),
            };
-           info_category_AddInfo( p_cat, _("Color space"), "%s",
-                                  _(space_names[fmt->video.space]) );
+           static const char *range_names[] = {
+               N_("Limited Range"),
+               N_("Full Range"),
+           };
+           info_category_AddInfo( p_cat, _("Color space"), "%s %s",
+                                  _(space_names[fmt->video.space]),
+                                  _(range_names[fmt->video.b_color_range_full]) );
        }
        static const char *c_loc_names[] = { N_("Undefined"),
            N_("Left"),
