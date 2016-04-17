@@ -193,7 +193,7 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
                                  * __MAX(ctx->ticks_per_frame, 1);
     }
 
-    if( ctx->color_range = AVCOL_RANGE_JPEG )
+    if( ctx->color_range == AVCOL_RANGE_JPEG )
         fmt->b_color_range_full = true;
 
     switch( ctx->colorspace )
