@@ -278,8 +278,7 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
         case COLOR_SPACE_BT601:
             matrix = matrix_bt601_tv2full;
             break;
-        case COLOR_SPACE_BT709:
-        case COLOR_SPACE_BT2020:
+        default:
             matrix = matrix_bt709_tv2full;
     };
 
