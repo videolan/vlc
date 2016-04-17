@@ -57,7 +57,7 @@ $(DST_DXGIDEBUG_H): $(TARBALLS)/dxgidebug.idl
 
 $(DST_DXGITYPE_H): $(TARBALLS)/dxgitype.h
 	mkdir -p -- "$(PREFIX)/include/"
-	cp $(TARBALLS)/dxgitype.h $@ && cd "$(PREFIX)/include/" && patch -fp1 < ../$(SRC)/d3d11/dxgitype.patch
+	cp $(TARBALLS)/dxgitype.h $@
 
 $(DST_DXGI12_H): dxgi12
 	mkdir -p -- "$(PREFIX)/include/"
