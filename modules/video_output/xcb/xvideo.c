@@ -537,13 +537,18 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Colour space */
+    fmt.space = COLOR_SPACE_BT601;
     {
         xcb_intern_atom_reply_t *r =
             xcb_intern_atom_reply (conn,
                 xcb_intern_atom (conn, 1, 13, "XV_ITURBT_709"), NULL);
         if (r != NULL && r->atom != 0)
-            xcb_xv_set_port_attribute(conn, p_sys->port, r->atom,
-                                      fmt.i_height > 576);
+        {
+            int_fast32_t value = (vd->source.space == COLOR_SPACE_BT709);
+            xcb_xv_set_port_attribute(conn, p_sys->port, r->atom, value);
+            if (value)
+                fmt.space = COLOR_SPACE_BT709;
+        }
         free(r);
     }
 
