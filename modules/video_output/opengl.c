@@ -272,8 +272,16 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
         1.164383561643836, -0.21324861427373,  -0.532909328559444,  0.301482665475862 ,
         1.164383561643836,  2.112401785714286,  0.0000,            -1.133402217873451 ,
     };
-    const float (*matrix) = fmt->i_height > 576 ? matrix_bt709_tv2full
-                                                : matrix_bt601_tv2full;
+    const float *matrix;
+    switch( fmt->space )
+    {
+        case COLOR_SPACE_BT601:
+            matrix = matrix_bt601_tv2full;
+            break;
+        case COLOR_SPACE_BT709:
+        case COLOR_SPACE_BT2020:
+            matrix = matrix_bt709_tv2full;
+    };
 
     /* Basic linear YUV -> RGB conversion using bilinear interpolation */
     const char *template_glsl_yuv =
