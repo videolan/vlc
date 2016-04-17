@@ -3057,16 +3057,19 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                                   _(space_names[fmt->video.space]),
                                   _(range_names[fmt->video.b_color_range_full]) );
        }
-       static const char *c_loc_names[] = { N_("Undefined"),
-           N_("Left"),
-           N_("Center"),
-           N_("Top Left"),
-           N_("Top Center"),
-           N_("Bottom Left"),
-           N_("Bottom Center"),
-       };
-       info_category_AddInfo( p_cat, _("Chroma location"), "%s",
-                              _(c_loc_names[fmt->video.chroma_location]) );
+       if( fmt->video.chroma_location != CHROMA_LOCATION_UNDEF )
+       {
+           static const char *c_loc_names[] = { N_("Undefined"),
+               N_("Left"),
+               N_("Center"),
+               N_("Top Left"),
+               N_("Top Center"),
+               N_("Bottom Left"),
+               N_("Bottom Center"),
+           };
+           info_category_AddInfo( p_cat, _("Chroma location"), "%s",
+                   _(c_loc_names[fmt->video.chroma_location]) );
+       }
        break;
 
     case SPU_ES:
