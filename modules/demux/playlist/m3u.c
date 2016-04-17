@@ -257,10 +257,12 @@ static int Demux( demux_t *p_demux )
 
             p_input = input_item_NewExt( psz_mrl, psz_name, i_duration,
                                          ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN );
-            input_item_AddOptions( p_input, i_options, ppsz_options, 0 );
-
             free( psz_parse );
             free( psz_mrl );
+
+            if( !p_input )
+                goto error;
+            input_item_AddOptions( p_input, i_options, ppsz_options, 0 );
 
             if( !EMPTY_STR(psz_artist) )
                 input_item_SetArtist( p_input, psz_artist );
