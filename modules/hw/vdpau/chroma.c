@@ -71,11 +71,9 @@ static VdpStatus MixerSetupColors(filter_t *filter, const VdpProcamp *procamp,
     switch (filter->fmt_in.video.space)
     {
         case COLOR_SPACE_BT601:
-        case COLOR_SPACE_BT601_FULL: /* FIXME: wrong, use custom CSC */
             std = VDP_COLOR_STANDARD_ITUR_BT_601;
             break;
         case COLOR_SPACE_BT709:
-        case COLOR_SPACE_BT709_FULL: /* FIXME: same as above */
             std = VDP_COLOR_STANDARD_ITUR_BT_709;
             break;
         default:
