@@ -309,6 +309,35 @@ static inline int video_format_Copy( video_format_t *p_dst, const video_format_t
     return VLC_SUCCESS;
 }
 
+static inline void video_format_AdjustColorSpace( video_format_t *p_fmt )
+{
+    if ( p_fmt->primaries == COLOR_PRIMARIES_UNDEF )
+    {
+        if ( p_fmt->i_visible_height > 576 ) // HD
+            p_fmt->primaries = COLOR_PRIMARIES_BT709;
+        else if ( p_fmt->i_visible_height > 525 ) // PAL
+            p_fmt->primaries = COLOR_PRIMARIES_BT601_625;
+        else
+            p_fmt->primaries = COLOR_PRIMARIES_BT601_525;
+    }
+
+    if ( p_fmt->transfer == TRANSFER_FUNC_UNDEF )
+    {
+        if ( p_fmt->i_visible_height > 576 ) // HD
+            p_fmt->transfer = TRANSFER_FUNC_BT709;
+        else
+            p_fmt->transfer = TRANSFER_FUNC_SRGB;
+    }
+
+    if ( p_fmt->space == COLOR_SPACE_UNDEF )
+    {
+        if ( p_fmt->i_visible_height > 576 ) // HD
+            p_fmt->space = COLOR_SPACE_BT709;
+        else
+            p_fmt->space = COLOR_SPACE_BT601;
+    }
+}
+
 /**
  * Cleanup and free palette of this video_format_t
  * \param p_src video_format_t structure to clean

@@ -394,6 +394,8 @@ static int vout_update_format( decoder_t *p_dec )
         vlc_ureduce( &fmt.i_sar_num, &fmt.i_sar_den,
                      fmt.i_sar_num, fmt.i_sar_den, 50000 );
 
+        video_format_AdjustColorSpace( &fmt );
+
         vlc_mutex_lock( &p_owner->lock );
 
         p_vout = p_owner->p_vout;
