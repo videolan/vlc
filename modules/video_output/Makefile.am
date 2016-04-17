@@ -157,10 +157,10 @@ endif
 
 
 ### Win32 ###
-libdirect2d_plugin_la_SOURCES = video_output/msw/direct2d.c \
-	video_output/msw/common.c video_output/msw/common.h \
-	video_output/msw/events.c video_output/msw/events.h \
-	video_output/msw/win32touch.c video_output/msw/win32touch.h
+libdirect2d_plugin_la_SOURCES = video_output/win32/direct2d.c \
+	video_output/win32/common.c video_output/win32/common.h \
+	video_output/win32/events.c video_output/win32/events.h \
+	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect2d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct2d
 libdirect2d_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
@@ -168,11 +168,11 @@ libdirect2d_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect2d)
 EXTRA_LTLIBRARIES += libdirect2d_plugin.la
 
-libdirect3d9_plugin_la_SOURCES = video_output/msw/direct3d9.c \
-	video_output/msw/common.c video_output/msw/common.h \
-	video_output/msw/events.c video_output/msw/events.h \
-	video_output/msw/builtin_shaders.h \
-	video_output/msw/win32touch.c video_output/msw/win32touch.h
+libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
+	video_output/win32/common.c video_output/win32/common.h \
+	video_output/win32/events.c video_output/win32/events.h \
+	video_output/win32/builtin_shaders.h \
+	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect3d9_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct3d9
 libdirect3d9_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
@@ -180,15 +180,15 @@ libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d9)
 EXTRA_LTLIBRARIES += libdirect3d9_plugin.la
 
-libdirect3d11_plugin_la_SOURCES = video_output/msw/direct3d11.c \
+libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
  video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
- video_output/msw/common.c video_output/msw/common.h
+ video_output/win32/common.c video_output/win32/common.h
 libdirect3d11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
  -DMODULE_NAME_IS_direct3d11
 if !HAVE_WINSTORE
-libdirect3d11_plugin_la_SOURCES += video_output/msw/events.c \
- video_output/msw/events.h \
- video_output/msw/win32touch.c video_output/msw/win32touch.h
+libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
+ video_output/win32/events.h \
+ video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect3d11_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
 else
 libdirect3d11_plugin_la_LIBADD = -ld3dcompiler -lole32 -luuid
@@ -197,10 +197,10 @@ libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
-libdirectdraw_plugin_la_SOURCES = video_output/msw/directdraw.c \
-	video_output/msw/common.c video_output/msw/common.h \
-	video_output/msw/events.c video_output/msw/events.h \
-	video_output/msw/win32touch.c video_output/msw/win32touch.h
+libdirectdraw_plugin_la_SOURCES = video_output/win32/directdraw.c \
+	video_output/win32/common.c video_output/win32/common.h \
+	video_output/win32/events.c video_output/win32/events.h \
+	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirectdraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_directdraw
 libdirectdraw_plugin_la_LIBADD = -luser32 -lgdi32 -lole32 -luuid
@@ -208,11 +208,11 @@ if HAVE_DIRECTX
 vout_LTLIBRARIES += libdirectdraw_plugin.la
 endif
 
-libglwin32_plugin_la_SOURCES = video_output/msw/glwin32.c \
+libglwin32_plugin_la_SOURCES = video_output/win32/glwin32.c \
 	video_output/opengl.c video_output/opengl.h \
-	video_output/msw/common.c video_output/msw/common.h \
-	video_output/msw/events.c video_output/msw/events.h \
-	video_output/msw/win32touch.c video_output/msw/win32touch.h
+	video_output/win32/common.c video_output/win32/common.h \
+	video_output/win32/events.c video_output/win32/events.h \
+	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_glwin32
 libglwin32_plugin_la_LIBADD = -lopengl32 -lgdi32 -lole32 -luuid
@@ -220,10 +220,10 @@ libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBglwin32)
 EXTRA_LTLIBRARIES += libglwin32_plugin.la
 
-libwingdi_plugin_la_SOURCES = video_output/msw/wingdi.c \
-	video_output/msw/common.c video_output/msw/common.h \
-	video_output/msw/events.c video_output/msw/events.h \
-	video_output/msw/win32touch.c video_output/msw/win32touch.h
+libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \
+	video_output/win32/common.c video_output/win32/common.h \
+	video_output/win32/events.c video_output/win32/events.h \
+	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libwingdi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_wingdi
 libwingdi_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
