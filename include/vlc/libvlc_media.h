@@ -706,6 +706,9 @@ libvlc_media_parse_with_options( libvlc_media_t *p_md,
 /**
  * Return true is the media descriptor object is parsed
  *
+ * \deprecated This can return true in case of failure.
+ *             Use libvlc_media_get_parsed_status instead
+ *
  * \see libvlc_MediaParsedChanged
  *
  * \param p_md media descriptor object
@@ -713,7 +716,7 @@ libvlc_media_parse_with_options( libvlc_media_t *p_md,
  *
  * \libvlc_return_bool
  */
-LIBVLC_API int
+LIBVLC_DEPRECATED LIBVLC_API int
    libvlc_media_is_parsed( libvlc_media_t *p_md );
 
 /**
