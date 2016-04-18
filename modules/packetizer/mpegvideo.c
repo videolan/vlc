@@ -538,6 +538,66 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             p_sys->i_seq_old = 0;
         }
     }
+    else if( p_frag->p_buffer[3] == 0xb5 && p_frag->i_buffer >= 10 )
+    {
+        /* Sequence display extension */
+        bool contains_color_description = (p_frag->p_buffer[4] & 0x01);
+        //uint8_t video_format = (p_frag->p_buffer[4] & 0x0f) >> 1;
+
+        if( contains_color_description )
+        {
+            int8_t color_primaries = p_frag->p_buffer[5];
+            int8_t color_transfer  = p_frag->p_buffer[6];
+            int8_t color_matrix    = p_frag->p_buffer[7];
+            switch( color_primaries )
+            {
+                case 1:
+                    p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT709;
+                    break;
+                case 4: /* BT.470M    */
+                case 5: /* BT.470BG   */
+                    p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT601_625;
+                    break;
+                case 6: /* SMPTE 170M */
+                case 7: /* SMPTE 240M */
+                    p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT601_525;
+                    break;
+                default:
+                    break;
+            }
+            switch( color_transfer )
+            {
+                case 1:
+                    p_dec->fmt_out.video.transfer = TRANSFER_FUNC_BT709;
+                    break;
+                case 4: /* BT.470M assumed gamma 2.2  */
+                    p_dec->fmt_out.video.transfer = TRANSFER_FUNC_SRGB;
+                    break;
+                case 5: /* BT.470BG */
+                case 6: /* SMPTE 170M */
+                    p_dec->fmt_out.video.transfer = TRANSFER_FUNC_BT2020;
+                    break;
+                case 8: /* Linear */
+                    p_dec->fmt_out.video.transfer = TRANSFER_FUNC_LINEAR;
+                    break;
+                default:
+                    break;
+            }
+            switch( color_matrix )
+            {
+                case 1:
+                    p_dec->fmt_out.video.space = COLOR_SPACE_BT709;
+                    break;
+                case 5: /* BT.470BG */
+                case 6: /* SMPTE 170 M */
+                    p_dec->fmt_out.video.space = COLOR_SPACE_BT601;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    }
     else if( p_frag->p_buffer[3] == 0xb3 && p_frag->i_buffer >= 8 )
     {
         /* Sequence header code */
@@ -577,6 +637,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         p_sys->b_seq_progressive = true;
         p_sys->b_low_delay = true;
+
 
         if ( !p_sys->b_inited )
         {
