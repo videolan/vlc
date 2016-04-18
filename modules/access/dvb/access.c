@@ -167,7 +167,7 @@ static int Open( vlc_object_t *p_this )
 
         scan_parameter_Init( &parameter );
 
-        parameter.b_use_nit = var_GetBool( p_access, "dvb-scan-nit" );
+        parameter.b_use_nit = var_InheritBool( p_access, "dvb-scan-nit" );
 
         msg_Dbg( p_access, "setting filter on PAT/NIT/SDT (DVB only)" );
         FilterSet( p_access, 0x00, OTHER_TYPE );    // PAT
