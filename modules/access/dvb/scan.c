@@ -113,8 +113,8 @@ struct scan_t
     uint64_t i_index;
     scan_parameter_t parameter;
     int64_t i_time_start;
+    bool b_ignore_nit; /* ignored or broken nit configurations */
 
-    size_t i_total_services;
     size_t i_multiplex_toscan;
 
     size_t             i_multiplex;
@@ -161,6 +161,25 @@ static void scan_tuner_config_Init( scan_tuner_config_t *p_cfg )
 {
     memset( p_cfg, 0, sizeof(*p_cfg) );
     p_cfg->i_fec = 9; /* FEC_AUTO */
+}
+
+static bool scan_tuner_config_Validate( const scan_tuner_config_t *p_cfg )
+{
+    if( p_cfg->i_frequency == 0 ||
+        p_cfg->i_bandwidth == 0 ||
+        p_cfg->i_frequency == UINT32_MAX / 10 ) /* Invalid / broken transponder info on French TNT */
+        return false;
+    return true;
+}
+
+static bool scan_tuner_config_FrontendValidate( const scan_t *p_scan, const scan_tuner_config_t *p_cfg )
+{
+    if( p_cfg->i_bandwidth > p_scan->parameter.bandwidth.i_max ||
+        p_cfg->i_bandwidth < p_scan->parameter.bandwidth.i_min ||
+        p_cfg->i_frequency < p_scan->parameter.frequency.i_min ||
+        p_cfg->i_frequency > p_scan->parameter.frequency.i_max )
+        return false;
+    return true;
 }
 
 static scan_service_t *scan_service_New( uint16_t i_program )
@@ -358,11 +377,11 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
     p_scan->p_dialog_id = NULL;
     p_scan->i_multiplex = 0;
     p_scan->pp_multiplex = NULL;
-    p_scan->i_total_services = 0;
     p_scan->i_multiplex_toscan = 0;
     scan_parameter_Init( &p_scan->parameter );
     scan_parameter_Copy( p_parameter, &p_scan->parameter );
     p_scan->i_time_start = mdate();
+    p_scan->b_ignore_nit = false;
     p_scan->p_scanlist = NULL;
     p_scan->i_scanlist = 0;
 
@@ -444,42 +463,34 @@ static scan_multiplex_t *scan_FindOrCreateMultiplex( scan_t *p_scan, uint16_t i_
     return p_mplex;
 }
 
-static int ScanDvbv5NextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
+static size_t scan_CountServices( const scan_t *p_scan )
 {
-    if( !p_scan->p_current )
+    size_t i_total_services = 0;
+    for( size_t j = 0; j < p_scan->i_multiplex; j++ )
+        i_total_services += p_scan->pp_multiplex[j]->i_services;
+    return i_total_services;
+}
+
+static int Scan_Next_DVB_SpectrumExhaustive( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
+{
+    if( p_scan->i_index > p_scan->parameter.frequency.i_count * p_scan->parameter.bandwidth.i_count )
         return VLC_EGENERIC;
 
-    bool b_valid = false;
-    while( p_scan->p_current && !b_valid )
-    {
-        const scan_list_entry_t *p_entry = p_scan->p_current;
+    const int i_bi = p_scan->i_index % p_scan->parameter.bandwidth.i_count;
+    const int i_fi = p_scan->i_index / p_scan->parameter.bandwidth.i_count;
 
-        if( p_entry->i_bw / 1000000 <= (uint32_t)  p_scan->parameter.bandwidth.i_max ||
-            p_entry->i_bw / 1000000 >= (uint32_t)  p_scan->parameter.bandwidth.i_min ||
-            p_entry->i_freq >= (uint32_t)p_scan->parameter.frequency.i_min ||
-            p_entry->i_freq <= (uint32_t)p_scan->parameter.frequency.i_max )
-        {
-            p_cfg->i_frequency = p_entry->i_freq;
-            p_cfg->i_bandwidth = p_entry->i_bw / 1000000;
-            b_valid = true;
-            msg_Dbg( p_scan->p_obj, "selected freq %d bw %d", p_cfg->i_frequency, p_cfg->i_bandwidth );
-        }
-        else
-        {
-            p_scan->i_index++;
-            msg_Dbg( p_scan->p_obj, "rejecting entry %s %d %d", p_entry->psz_channel, p_entry->i_bw, p_scan->parameter.bandwidth.i_max );
-        }
+    p_cfg->i_frequency = p_scan->parameter.frequency.i_min + i_fi * p_scan->parameter.frequency.i_step;
+    p_cfg->i_bandwidth = p_scan->parameter.bandwidth.i_min + i_bi * p_scan->parameter.bandwidth.i_step;
 
-        p_scan->p_current = p_scan->p_current->p_next;
-    }
-
-    *pf_pos = (double) p_scan->i_index / p_scan->i_scanlist;
-
+    *pf_pos = (double)p_scan->i_index / p_scan->parameter.frequency.i_count;
     return VLC_SUCCESS;
 }
 
-static int ScanDvbSNextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
+static int Scan_Next_DVBS( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
+    if( p_scan->parameter.b_exhaustive )
+        msg_Warn( p_scan->p_obj, "no exhaustive DVB-S scan mode" );
+
     const scan_list_entry_t *p_entry = p_scan->p_current;
     if( !p_entry )
         return VLC_EGENERIC;
@@ -506,9 +517,59 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double 
     return VLC_SUCCESS;
 }
 
-static int ScanDvbCNextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
+static int Scan_Next_DVBC( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
+    bool b_rotate=true;
+    if( !p_scan->parameter.b_modulation_set )
+    {
+        p_scan->parameter.i_modulation = (p_scan->parameter.i_modulation >> 1 );
+        /* if we iterated all modulations, move on */
+        /* dvb utils dvb-c channels files seems to have only
+               QAM64...QAM256, so lets just iterate over those */
+        if( p_scan->parameter.i_modulation < 64)
+        {
+            p_scan->parameter.i_modulation = 256;
+        } else {
+            b_rotate=false;
+        }
+        msg_Dbg( p_scan->p_obj, "modulation %d ", p_scan->parameter.i_modulation);
+    }
+    if( !p_scan->parameter.b_symbolrate_set )
+    {
+        /* symbol rates from dvb-tools dvb-c files */
+        static const unsigned short symbolrates[] = {
+            6900, 6875, 6950
+            /* With DR_44 we can cover other symbolrates from NIT-info
+                    as all channel-seed files have atleast one channel that
+                    has one of these symbolrate
+                  */
+        };
+
+        enum { num_symbols = (sizeof(symbolrates)/sizeof(*symbolrates)) };
+
+        /* if we rotated modulations, rotate symbolrate */
+        if( b_rotate )
+        {
+            p_scan->parameter.i_symbolrate++;
+            p_scan->parameter.i_symbolrate %= num_symbols;
+        }
+        p_cfg->i_symbolrate = 1000 * (symbolrates[ p_scan->parameter.i_symbolrate ] );
+        msg_Dbg( p_scan->p_obj, "symbolrate %d", p_cfg->i_symbolrate );
+        if( p_scan->parameter.i_symbolrate )
+            b_rotate=false;
+    }
+    if( !b_rotate && p_scan->i_index )
+        p_scan->i_index--;
+
+    p_cfg->i_modulation = p_scan->parameter.i_modulation;
+    if( !p_cfg->i_symbolrate )
+        p_cfg->i_symbolrate = var_GetInteger( p_scan->p_obj, "dvb-srate" );
+
     msg_Dbg( p_scan->p_obj, "Scan index %"PRId64, p_scan->i_index );
+
+    if( p_scan->parameter.b_exhaustive )
+        return Scan_Next_DVB_SpectrumExhaustive( p_scan, p_cfg, pf_pos );
+
     /* Values taken from dvb-scan utils frequency-files, sorted by how
      * often they appear. This hopefully speeds up finding services. */
     static const unsigned int frequencies[] = { 41000, 39400, 40200,
@@ -544,23 +605,11 @@ static int ScanDvbCNextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double 
     return VLC_EGENERIC;
 }
 
-static int ScanDvbNextExhaustive( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
+static int Scan_Next_DVBT( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
-    if( p_scan->i_index > p_scan->parameter.frequency.i_count * p_scan->parameter.bandwidth.i_count )
-        return VLC_EGENERIC;
+    if( p_scan->parameter.b_exhaustive )
+        return Scan_Next_DVB_SpectrumExhaustive( p_scan, p_cfg, pf_pos );
 
-    const int i_bi = p_scan->i_index % p_scan->parameter.bandwidth.i_count;
-    const int i_fi = p_scan->i_index / p_scan->parameter.bandwidth.i_count;
-
-    p_cfg->i_frequency = p_scan->parameter.frequency.i_min + i_fi * p_scan->parameter.frequency.i_step;
-    p_cfg->i_bandwidth = p_scan->parameter.bandwidth.i_min + i_bi * p_scan->parameter.bandwidth.i_step;
-
-    *pf_pos = (double)p_scan->i_index / p_scan->parameter.frequency.i_count;
-    return VLC_SUCCESS;
-}
-
-static int ScanDvbTNextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
-{
     static const int i_band_count = 2;
     static const struct
     {
@@ -631,113 +680,67 @@ static int ScanDvbTNextFast( scan_t *p_scan, scan_tuner_config_t *p_cfg, double 
     }
 }
 
-static int ScanDvbCNext( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
+static int Scan_GetNextSpectrumTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
-    bool b_servicefound = false;
-    /* We iterate frequencies/modulations/symbolrates until we get first hit and find NIT,
-       from that we fill pp_service with configurations and after that we iterate over
-       pp_services for all that doesn't have name yet (tune to that cfg and get SDT and name
-       for channel).
-     */
-
-    size_t i_index = 0;
-    for( size_t i = 0; i < p_scan->i_multiplex; i++ )
+    int i_ret = VLC_EGENERIC;
+    switch( p_scan->parameter.type )
     {
-        const scan_multiplex_t *p_mplex = p_scan->pp_multiplex[i];
-        /* We found radio/tv config that doesn't have a name,
-           lets tune to that mux
-         */
-        for( size_t j = 0; j < p_mplex->i_services; j++ )
+        case SCAN_DVB_T:
+            i_ret = Scan_Next_DVBT( p_scan, p_cfg, pf_pos );
+            break;
+        case SCAN_DVB_C:
+            i_ret = Scan_Next_DVBC( p_scan, p_cfg, pf_pos );
+            break;
+        case SCAN_DVB_S:
+            i_ret = Scan_Next_DVBS( p_scan, p_cfg, pf_pos );
+        default:
+            break;
+    }
+    return i_ret;
+}
+
+static int Scan_GetNextTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
+{
+    /* Note: Do not forget to advance current scan (avoid frontend tuning errors loops ) */
+    const bool b_using_scanlist = ( p_scan->p_scanlist && p_scan->parameter.type == SCAN_DVB_T );
+
+    if( b_using_scanlist && p_scan->p_current )
+    {
+        const scan_list_entry_t *p_entry = p_scan->p_current;
+        p_cfg->i_frequency = p_entry->i_freq;
+        p_cfg->i_bandwidth = p_entry->i_bw / 1000000;
+        p_scan->p_current = p_scan->p_current->p_next;
+        *pf_pos = (double) p_scan->i_index / p_scan->i_scanlist;
+        return VLC_SUCCESS;
+    }
+
+    if( !b_using_scanlist &&
+        /* Stop frequency scanning if we found a NIT */
+        ( p_scan->i_multiplex == 0 || p_scan->b_ignore_nit ||
+          p_scan->pp_multiplex[0]->i_nit_version == UINT8_MAX )
+      )
+    {
+        p_scan->i_index++;
+        int i_ret = Scan_GetNextSpectrumTunerConfig( p_scan, p_cfg, pf_pos );
+        if( i_ret == VLC_SUCCESS )
+            return i_ret;
+    }
+
+    if( p_scan->i_multiplex_toscan )
+    {
+        for( size_t i=0; i<p_scan->i_multiplex_toscan; i++ )
         {
-            i_index++;
-            if( !p_mplex->pp_services[i]->psz_name &&
-               ( p_mplex->pp_services[i]->type != SERVICE_UNKNOWN ) )
+            if( !p_scan->pp_multiplex[i]->b_scanned )
             {
-                *p_cfg = p_mplex->cfg;
-                msg_Dbg( p_scan->p_obj, "iterating to freq: %u, symbolrate %u, "
-                         "modulation %u index %"PRId64"/%ld",
-                         p_cfg->i_frequency, p_cfg->i_symbolrate, p_cfg->i_modulation,
-                         p_scan->i_index, p_scan->i_total_services );
-                p_scan->i_index = i_index;
-                *pf_pos = (double)i/p_scan->i_total_services;
+                scan_SetMultiplexScanStatus( p_scan, p_scan->pp_multiplex[i], true );
+                *p_cfg = p_scan->pp_multiplex[i]->cfg;
+                *pf_pos = (double) 1.0 - (p_scan->i_multiplex / p_scan->i_multiplex_toscan);
                 return VLC_SUCCESS;
             }
         }
     }
-    /* We should have iterated all channels by now */
-    if( p_scan->i_total_services )
-        return VLC_EGENERIC;
 
-    if( !b_servicefound )
-    {
-        bool b_rotate=true;
-        if( !p_scan->parameter.b_modulation_set )
-        {
-            p_scan->parameter.i_modulation = (p_scan->parameter.i_modulation >> 1 );
-            /* if we iterated all modulations, move on */
-            /* dvb utils dvb-c channels files seems to have only
-               QAM64...QAM256, so lets just iterate over those */
-            if( p_scan->parameter.i_modulation < 64)
-            {
-                p_scan->parameter.i_modulation = 256;
-            } else {
-                b_rotate=false;
-            }
-            msg_Dbg( p_scan->p_obj, "modulation %d ", p_scan->parameter.i_modulation);
-        }
-        if( !p_scan->parameter.b_symbolrate_set )
-        {
-            /* symbol rates from dvb-tools dvb-c files */
-            static const unsigned short symbolrates[] = {
-             6900, 6875, 6950
-             /* With DR_44 we can cover other symbolrates from NIT-info
-                as all channel-seed files have atleast one channel that
-                has one of these symbolrate
-              */
-             };
-
-            enum { num_symbols = (sizeof(symbolrates)/sizeof(*symbolrates)) };
-
-            /* if we rotated modulations, rotate symbolrate */
-            if( b_rotate )
-            {
-                p_scan->parameter.i_symbolrate++;
-                p_scan->parameter.i_symbolrate %= num_symbols;
-            }
-            p_cfg->i_symbolrate = 1000 * (symbolrates[ p_scan->parameter.i_symbolrate ] );
-            msg_Dbg( p_scan->p_obj, "symbolrate %d", p_cfg->i_symbolrate );
-            if( p_scan->parameter.i_symbolrate )
-                b_rotate=false;
-        }
-        if( !b_rotate && p_scan->i_index )
-            p_scan->i_index--;
-    }
-    p_cfg->i_modulation = p_scan->parameter.i_modulation;
-    if( !p_cfg->i_symbolrate )
-        p_cfg->i_symbolrate = var_GetInteger( p_scan->p_obj, "dvb-srate" );
-
-    if( p_scan->parameter.b_exhaustive )
-        return ScanDvbNextExhaustive( p_scan, p_cfg, pf_pos );
-    else
-        return ScanDvbCNextFast( p_scan, p_cfg, pf_pos );
-}
-
-static int ScanDvbTNext( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
-{
-    if( p_scan->parameter.b_exhaustive )
-        return ScanDvbNextExhaustive( p_scan, p_cfg, pf_pos );
-    else if( p_scan->p_scanlist )
-        return ScanDvbv5NextFast( p_scan, p_cfg, pf_pos );
-    else
-        return ScanDvbTNextFast( p_scan, p_cfg, pf_pos );
-}
-
-static int ScanDvbSNext( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
-{
-    if( p_scan->parameter.b_exhaustive )
-        msg_Dbg( p_scan->p_obj, "no exhaustive svb-d scan mode" );
-
-    return ScanDvbSNextFast( p_scan, p_cfg, pf_pos );
+    return VLC_ENOITEM;
 }
 
 int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
@@ -748,37 +751,17 @@ int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
     if( scan_IsCancelled( p_scan ) )
         return VLC_EGENERIC;
 
-    scan_tuner_config_Init( p_cfg );
-    switch( p_scan->parameter.type )
+    do
     {
-    case SCAN_DVB_T:
-        i_ret = ScanDvbTNext( p_scan, p_cfg, &f_position );
-        break;
-    case SCAN_DVB_C:
-        i_ret = ScanDvbCNext( p_scan, p_cfg, &f_position );
-        break;
-    case SCAN_DVB_S:
-        i_ret = ScanDvbSNext( p_scan, p_cfg, &f_position );
-        break;
-    default:
-        i_ret = VLC_EGENERIC;
-        break;
+        scan_tuner_config_Init( p_cfg );
+
+        i_ret = Scan_GetNextTunerConfig( p_scan, p_cfg, &f_position );
+        if( i_ret )
+            return i_ret;
     }
+    while( !scan_tuner_config_FrontendValidate( p_scan, p_cfg ) );
 
-    if( i_ret )
-        return i_ret;
-
-    p_scan->i_total_services = 0;
-    for( size_t j = 0; j < p_scan->i_multiplex; j++ )
-    {
-        scan_multiplex_t *p_mplex = p_scan->pp_multiplex[j];
-        for( size_t i = 0; i < p_mplex->i_services; i++ )
-        {
-         //   if( p_mplex->pp_services[i]->psz_name )
-                p_scan->i_total_services++;
-        }
-    }
-
+    const size_t i_total_services = scan_CountServices( p_scan );
     const mtime_t i_eta = f_position > 0.005 ? (mdate() - p_scan->i_time_start) * ( 1.0 / f_position - 1.0 ) : -1;
     char psz_eta[MSTRTIME_MAX_SIZE];
     const char *psz_fmt = _("%.1f MHz (%d services)\n~%s remaining");
@@ -793,7 +776,7 @@ int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
                                          f_position, _("Cancel"),
                                          _("Scanning DVB"), psz_fmt,
                                          (double)p_cfg->i_frequency / 1000000,
-                                         p_scan->i_total_services,
+                                         i_total_services,
                                          secstotimestr( psz_eta, i_eta/1000000 ) );
     }
     else
@@ -801,7 +784,7 @@ int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
         vlc_dialog_update_progress_text( p_scan->p_obj, p_scan->p_dialog_id,
                                          f_position, psz_fmt,
                                          (double)p_cfg->i_frequency / 1000000,
-                                         p_scan->i_total_services,
+                                         i_total_services,
                                          secstotimestr( psz_eta, i_eta/1000000 ) );
     }
 
@@ -1072,9 +1055,6 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 dvbpsi_terr_deliv_sys_dr_t *p_t = dvbpsi_DecodeTerrDelivSysDr( p_dsc );
                 if( p_t )
                 {
-                    /* Invalid / broken transponder on French TNT */
-                    if( p_t->i_centre_frequency == UINT32_MAX )
-                        p_t->i_centre_frequency = 0;
                     tscfg.i_frequency =  p_t->i_centre_frequency / 10;
                     tscfg.i_bandwidth =  8 - p_t->i_bandwidth;
                     switch(p_t->i_constellation)
@@ -1150,6 +1130,13 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
             {
                 msg_Warn( p_obj, "       * dsc 0x%x", p_dsc->i_tag );
             }
+        }
+
+        if ( !scan_tuner_config_Validate( &tscfg ) )
+        {
+            if( p_nit->i_table_id == NIT_CURRENT_NETWORK_TABLE_ID )
+                p_scan->b_ignore_nit = true;
+            continue;
         }
 
         scan_multiplex_t *p_mplex = scan_FindOrCreateMultiplex( p_scan, p_ts->i_ts_id, &tscfg );
@@ -1439,19 +1426,9 @@ block_t *scan_GetM3U( scan_t *p_scan )
     if( !p_playlist )
         return NULL;
 
-    p_scan->i_total_services = 0;
-    for( size_t j = 0; j < p_scan->i_multiplex; j++ )
-    {
-        scan_multiplex_t *p_mplex = p_scan->pp_multiplex[j];
-        for( size_t i = 0; i < p_mplex->i_services; i++ )
-        {
-         //   if( p_mplex->pp_services[i]->psz_name )
-                p_scan->i_total_services++;
-        }
-    }
-
+    const size_t i_total_services = scan_CountServices( p_scan );
     size_t i_filtered_count = 0;
-    const scan_service_t **pp_filtered_list = malloc( sizeof(scan_service_t *) * p_scan->i_total_services );
+    const scan_service_t **pp_filtered_list = malloc( sizeof(scan_service_t *) * i_total_services );
     if( !pp_filtered_list )
     {
         block_Release( p_playlist );

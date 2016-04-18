@@ -255,7 +255,7 @@ static block_t *BlockScan( access_t *p_access )
     if( FrontendSet( p_access ) < 0 )
     {
         msg_Err( p_access, "Failed to tune the frontend" );
-        p_access->info.b_eof = true;
+        //p_access->info.b_eof = true;
         scan_session_Destroy( p_scan, session );
         return NULL;
     }
