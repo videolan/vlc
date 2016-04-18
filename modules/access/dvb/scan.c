@@ -66,8 +66,10 @@ typedef enum
     SERVICE_TYPE_RESERVED                        = 0x00,
     SERVICE_TYPE_DIGITAL_TELEVISION              = 0x01,
     SERVICE_TYPE_DIGITAL_RADIO                   = 0x02,
+    SERVICE_TYPE_DIGITAL_MPEG2_HD                = 0x11,
     SERVICE_TYPE_DIGITAL_TELEVISION_AC_SD        = 0x16,
     SERVICE_TYPE_DIGITAL_TELEVISION_AC_HD        = 0x19,
+    SERVICE_TYPE_DIGITAL_RADIO_AC                = 0x0A,
 } scan_service_type_t;
 
 typedef struct scan_multiplex_t scan_multiplex_t;
@@ -204,8 +206,10 @@ static int scan_service_type_Supported( scan_service_type_t service_type )
     {
         case SERVICE_TYPE_DIGITAL_TELEVISION:
         case SERVICE_TYPE_DIGITAL_RADIO:
+        case SERVICE_TYPE_DIGITAL_MPEG2_HD:
         case SERVICE_TYPE_DIGITAL_TELEVISION_AC_SD:
         case SERVICE_TYPE_DIGITAL_TELEVISION_AC_HD:
+        case SERVICE_TYPE_DIGITAL_RADIO_AC:
             return true;
         default:
             break;
