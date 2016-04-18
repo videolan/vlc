@@ -63,11 +63,11 @@
 
 typedef enum
 {
-    SERVICE_UNKNOWN = 0,
-    SERVICE_DIGITAL_RADIO,
-    SERVICE_DIGITAL_TELEVISION,
-    SERVICE_DIGITAL_TELEVISION_AC_SD,
-    SERVICE_DIGITAL_TELEVISION_AC_HD,
+    SERVICE_TYPE_RESERVED                        = 0x00,
+    SERVICE_TYPE_DIGITAL_TELEVISION              = 0x01,
+    SERVICE_TYPE_DIGITAL_RADIO                   = 0x02,
+    SERVICE_TYPE_DIGITAL_TELEVISION_AC_SD        = 0x16,
+    SERVICE_TYPE_DIGITAL_TELEVISION_AC_HD        = 0x19,
 } scan_service_type_t;
 
 typedef struct scan_multiplex_t scan_multiplex_t;
@@ -171,7 +171,7 @@ static scan_service_t *scan_service_New( uint16_t i_program )
     p_srv->i_program = i_program;
     p_srv->i_original_network_id = NETWORK_ID_RESERVED;
 
-    p_srv->type = SERVICE_UNKNOWN;
+    p_srv->type = SERVICE_TYPE_RESERVED;
     p_srv->psz_name = NULL;
     p_srv->psz_original_network_name = NULL;
     p_srv->i_channel = -1;
@@ -198,16 +198,19 @@ static uint32_t decode_BCD( uint32_t input )
     return output;
 }
 
-static int scan_service_type( int service_type )
+static int scan_service_type_Supported( scan_service_type_t service_type )
 {
     switch( service_type )
     {
-    case 0x01: return SERVICE_DIGITAL_TELEVISION;
-    case 0x02: return SERVICE_DIGITAL_RADIO;
-    case 0x16: return SERVICE_DIGITAL_TELEVISION_AC_SD;
-    case 0x19: return SERVICE_DIGITAL_TELEVISION_AC_HD;
-    default:   return SERVICE_UNKNOWN;
+        case SERVICE_TYPE_DIGITAL_TELEVISION:
+        case SERVICE_TYPE_DIGITAL_RADIO:
+        case SERVICE_TYPE_DIGITAL_TELEVISION_AC_SD:
+        case SERVICE_TYPE_DIGITAL_TELEVISION_AC_HD:
+            return true;
+        default:
+            break;
     }
+    return false;
 }
 
 static scan_multiplex_t *scan_multiplex_New( const scan_tuner_config_t *p_cfg, uint16_t i_ts_id )
@@ -949,8 +952,7 @@ static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan, const dvbpsi_sdt_t *p
                     s->psz_name = vlc_from_EIT( pD->i_service_name,
                                                 pD->i_service_name_length );
 
-                if( s->type == SERVICE_UNKNOWN )
-                    s->type = scan_service_type( pD->i_service_type );
+                s->type = pD->i_service_type;
             }
         }
     }
@@ -1174,7 +1176,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                     continue;
                 }
 
-                if( scan_service_type( i_service_type ) == SERVICE_UNKNOWN )
+                if( !scan_service_type_Supported( i_service_type ) )
                     continue;
 
                 scan_service_t *s = scan_multiplex_FindService( p_mplex, i_service_id );
@@ -1183,7 +1185,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                     s = scan_service_New( i_service_id );
                     if( likely(s) )
                     {
-                        s->type          = scan_service_type( i_service_type );
+                        s->type = i_service_type;
                         s->i_original_network_id = p_ts->i_orig_network_id;
                         if( !scan_multiplex_AddService( p_mplex, s ) )
                         {
@@ -1458,7 +1460,7 @@ block_t *scan_GetM3U( scan_t *p_scan )
         for( size_t i = 0; i < p_mplex->i_services; i++ )
         {
             const scan_service_t *s = p_mplex->pp_services[i];
-            if( s->type == SERVICE_UNKNOWN )
+            if( !scan_service_type_Supported( s->type ) )
             {
                 /* We should only select service that have been described by SDT */
                 msg_Dbg( p_obj, "scan_GetM3U: ignoring service number %d", s->i_program );
@@ -1478,10 +1480,10 @@ block_t *scan_GetM3U( scan_t *p_scan )
         const char *psz_type;
         switch( s->type )
         {
-            case SERVICE_DIGITAL_TELEVISION:       psz_type = "Digital television"; break;
-            case SERVICE_DIGITAL_TELEVISION_AC_SD: psz_type = "Digital television advanced codec SD"; break;
-            case SERVICE_DIGITAL_TELEVISION_AC_HD: psz_type = "Digital television advanced codec HD"; break;
-            case SERVICE_DIGITAL_RADIO:            psz_type = "Digital radio"; break;
+            case SERVICE_TYPE_DIGITAL_TELEVISION:       psz_type = "Digital television"; break;
+            case SERVICE_TYPE_DIGITAL_TELEVISION_AC_SD: psz_type = "Digital television advanced codec SD"; break;
+            case SERVICE_TYPE_DIGITAL_TELEVISION_AC_HD: psz_type = "Digital television advanced codec HD"; break;
+            case SERVICE_TYPE_DIGITAL_RADIO:            psz_type = "Digital radio"; break;
             default:
                 psz_type = "Unknown";
                 break;
