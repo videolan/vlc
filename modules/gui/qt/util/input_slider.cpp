@@ -626,7 +626,7 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
                     ( background.saturation() + foreground.saturation() ) / 2,
                     ( background.value() + foreground.value() ) / 2 );
 
-    textfont.setPointSize( 9 );
+    textfont.setPointSize( 8 );
     textrect.setRect( 0, 0, 34.0*scalingFactorX, 15.0*scalingFactorY );
 
     /* Regular colors */
