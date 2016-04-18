@@ -98,6 +98,7 @@ struct scan_multiplex_t
     size_t           i_services;
     scan_service_t **pp_services;
     int i_snr;
+    bool b_scanned;
 
     uint8_t i_nit_version;
     uint8_t i_sdt_version;
@@ -112,6 +113,7 @@ struct scan_t
     int64_t i_time_start;
 
     size_t i_total_services;
+    size_t i_multiplex_toscan;
 
     size_t             i_multiplex;
     scan_multiplex_t **pp_multiplex;
@@ -222,6 +224,7 @@ static scan_multiplex_t *scan_multiplex_New( const scan_tuner_config_t *p_cfg, u
         p_mplex->i_nit_version = UINT8_MAX;
         p_mplex->i_sdt_version = UINT8_MAX;
         p_mplex->i_snr = -1;
+        p_mplex->b_scanned = false;
     }
     return p_mplex;
 }
@@ -349,6 +352,7 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
     p_scan->i_multiplex = 0;
     p_scan->pp_multiplex = NULL;
     p_scan->i_total_services = 0;
+    p_scan->i_multiplex_toscan = 0;
     scan_parameter_Init( &p_scan->parameter );
     scan_parameter_Copy( p_parameter, &p_scan->parameter );
     p_scan->i_time_start = mdate();
@@ -381,6 +385,15 @@ void scan_Destroy( scan_t *p_scan )
     free( p_scan );
 }
 
+static void scan_SetMultiplexScanStatus( scan_t *p_scan, scan_multiplex_t *p_mplex, bool b_scanned )
+{
+    if( p_mplex->b_scanned != b_scanned )
+    {
+        p_mplex->b_scanned = b_scanned;
+        p_scan->i_multiplex_toscan += ( b_scanned ) ? -1 : 1;
+    }
+}
+
 static bool scan_AddMultiplex( scan_t *p_scan, scan_multiplex_t *p_mplex )
 {
     scan_multiplex_t **pp_realloc = realloc( p_scan->pp_multiplex,
@@ -390,6 +403,8 @@ static bool scan_AddMultiplex( scan_t *p_scan, scan_multiplex_t *p_mplex )
     pp_realloc[p_scan->i_multiplex] = p_mplex;
     p_scan->pp_multiplex = pp_realloc;
     p_scan->i_multiplex++;
+    if( !p_mplex->b_scanned )
+        p_scan->i_multiplex_toscan++;
     return true;
 }
 
@@ -905,6 +920,8 @@ static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan,
     }
     if( unlikely(p_mplex == NULL) )
         return ;
+
+    scan_SetMultiplexScanStatus( p_scan, p_mplex, true );
 
     if( p_mplex->i_sdt_version == UINT8_MAX )
         p_mplex->i_sdt_version = p_sdt->i_version;
