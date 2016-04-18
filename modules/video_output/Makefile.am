@@ -165,8 +165,10 @@ libdirect2d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct2d
 libdirect2d_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
 libdirect2d_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+if !HAVE_WINSTORE
 vout_LTLIBRARIES += $(LTLIBdirect2d)
 EXTRA_LTLIBRARIES += libdirect2d_plugin.la
+endif
 
 libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_output/win32/common.c video_output/win32/common.h \
@@ -177,8 +179,10 @@ libdirect3d9_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct3d9
 libdirect3d9_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
 libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+if !HAVE_WINSTORE
 vout_LTLIBRARIES += $(LTLIBdirect3d9)
 EXTRA_LTLIBRARIES += libdirect3d9_plugin.la
+endif
 
 libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
  video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
@@ -191,7 +195,7 @@ libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect3d11_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
 else
-libdirect3d11_plugin_la_LIBADD = -ld3dcompiler -lole32 -luuid
+libdirect3d11_plugin_la_LIBADD = -ld3dcompiler_47 -lole32 -luuid
 endif
 libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11)
@@ -204,8 +208,10 @@ libdirectdraw_plugin_la_SOURCES = video_output/win32/directdraw.c \
 libdirectdraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_directdraw
 libdirectdraw_plugin_la_LIBADD = -luser32 -lgdi32 -lole32 -luuid
+if !HAVE_WINSTORE
 if HAVE_DIRECTX
 vout_LTLIBRARIES += libdirectdraw_plugin.la
+endif
 endif
 
 libglwin32_plugin_la_SOURCES = video_output/win32/glwin32.c \
@@ -217,8 +223,10 @@ libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_glwin32
 libglwin32_plugin_la_LIBADD = -lopengl32 -lgdi32 -lole32 -luuid
 libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+if !HAVE_WINSTORE
 vout_LTLIBRARIES += $(LTLIBglwin32)
 EXTRA_LTLIBRARIES += libglwin32_plugin.la
+endif
 
 libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \
 	video_output/win32/common.c video_output/win32/common.h \
