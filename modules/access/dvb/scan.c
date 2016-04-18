@@ -723,9 +723,7 @@ static int Scan_GetNextSpectrumTunerConfig( scan_t *p_scan, scan_tuner_config_t 
 static int Scan_GetNextTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     /* Note: Do not forget to advance current scan (avoid frontend tuning errors loops ) */
-    const bool b_using_scanlist = ( p_scan->p_scanlist && p_scan->parameter.type == SCAN_DVB_T );
-
-    if( b_using_scanlist && p_scan->p_current )
+    if( p_scan->p_scanlist && p_scan->p_current )
     {
         const scan_list_entry_t *p_entry = p_scan->p_current;
         p_cfg->i_frequency = p_entry->i_freq;
@@ -752,7 +750,7 @@ static int Scan_GetNextTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, 
         return VLC_SUCCESS;
     }
 
-    if( !b_using_scanlist &&
+    if( p_scan->p_scanlist == NULL &&
         /* Stop frequency scanning if we found a NIT */
         ( p_scan->i_multiplex == 0 ||
           p_scan->pp_multiplex[0]->i_nit_version == UINT8_MAX )
