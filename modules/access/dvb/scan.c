@@ -1273,6 +1273,7 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
             str1[p_dsc->i_length] = '\0';
             msg_Dbg( p_obj, "       * name %s", str1 );
         }
+#if 0
         else if( p_dsc->i_tag == 0x4a )
         {
             dvbpsi_linkage_dr_t *p_l = dvbpsi_DecodeLinkageDr( p_dsc );
@@ -1285,6 +1286,7 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                 msg_Dbg( p_obj, "       * linkage_type %" PRIu8, p_l->i_linkage_type );
             }
         }
+#endif
         else
         {
             msg_Dbg( p_obj, "   * dsc 0x%x", p_dsc->i_tag );
