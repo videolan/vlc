@@ -198,6 +198,11 @@ int dvb_tune (dvb_device_t *d)
     return d->module->SubmitTuneRequest ();
 }
 
+bool dvb_set_ca_pmt (dvb_device_t *, en50221_capmt_info_t *)
+{
+    return false;
+}
+
 /* DVB-C */
 int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *mod,
                   uint32_t srate, uint32_t /*fec*/)

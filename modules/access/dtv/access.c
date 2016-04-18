@@ -580,7 +580,8 @@ static int Control (access_t *access, int query, va_list args)
         {
             en50221_capmt_info_t *pmt = va_arg (args, en50221_capmt_info_t *);
 
-            dvb_set_ca_pmt (dev, pmt);
+            if( !dvb_set_ca_pmt (dev, pmt) )
+                return VLC_EGENERIC;
             break;
         }
 
