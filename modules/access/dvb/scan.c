@@ -903,21 +903,13 @@ static void PATCallBack( scan_session_t *p_session, dvbpsi_pat_t *p_pat )
     }
 }
 
-static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan,
-                      const dvbpsi_sdt_t *p_sdt, const scan_tuner_config_t *p_cfg )
+static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan, const dvbpsi_sdt_t *p_sdt )
 {
     VLC_UNUSED(p_obj);
-    scan_multiplex_t *p_mplex;
-    if( p_cfg )
-    {
-        /* SDT must not create new service without proper config ( local )
-           or it must has been created by another network NIT (providing freq) */
-        p_mplex = scan_FindOrCreateMultiplex( p_scan, p_sdt->i_extension, p_cfg );
-    }
-    else
-    {
-        p_mplex = scan_FindMultiplex( p_scan, p_sdt->i_extension );
-    }
+    /* SDT must not create new service without proper config ( local )
+       or it must has been created by another network NIT (providing freq).
+       Guaranteed by parsing order( PAT, current ts SDT ) or ( NIT, SDT ) */
+    scan_multiplex_t *p_mplex = scan_FindMultiplex( p_scan, p_sdt->i_extension );
     if( unlikely(p_mplex == NULL) )
         return ;
 
@@ -1391,7 +1383,7 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 
     /* Parse SDT (Maps names to programs) */
     if( p_sdt )
-        ParseSDT( p_scan->p_obj, p_scan, p_sdt, &p_session->cfg );
+        ParseSDT( p_scan->p_obj, p_scan, p_sdt );
 
     /* Do the same for all other networks */
     for( size_t i=0; i<p_session->others.i_nit; i++ )
@@ -1399,7 +1391,7 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 
     /* Map service name for all other ts/networks */
     for( size_t i=0; i<p_session->others.i_sdt; i++ )
-        ParseSDT( p_scan->p_obj, p_scan, p_sdt, NULL );
+        ParseSDT( p_scan->p_obj, p_scan, p_sdt );
 
     /* */
     scan_session_Delete( p_session );
