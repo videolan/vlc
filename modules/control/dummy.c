@@ -41,7 +41,9 @@
     "Enabling the quiet mode will not bring this command box but can also " \
     "be pretty annoying when you want to stop VLC and no video window is " \
     "open." )
+#if !VLC_WINSTORE_APP
 #include "intromsg.h"
+#endif
 #endif
 
 static int Open( vlc_object_t * );
