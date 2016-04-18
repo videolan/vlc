@@ -24,7 +24,9 @@ endif
 
 libprefetch_plugin_la_SOURCES = stream_filter/prefetch.c
 libprefetch_plugin_la_LIBADD = $(LIBPTHREAD)
+if !HAVE_WINSTORE
 stream_filter_LTLIBRARIES += libprefetch_plugin.la
+endif
 
 libhds_plugin_la_SOURCES = \
     stream_filter/hds/hds.c
