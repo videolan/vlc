@@ -1,0 +1,17 @@
+--- include/d3d9caps.h	2016-04-17 11:41:20.681535900 +0300
++++ include/d3d9caps.h.old	2016-04-17 11:49:14.065736000 +0300
+@@ -399,6 +399,14 @@ typedef struct _D3DCAPS9 {
+ 
+ } D3DCAPS9;
+ 
++typedef struct _D3DOVERLAYCAPS {
++  UINT                Caps;
++  UINT                MaxOverlayDisplayWidth;
++  UINT                MaxOverlayDisplayHeight;
++
++} D3DOVERLAYCAPS;
++
++
+ #ifdef __i386__
+ #include <poppack.h>
+ #endif

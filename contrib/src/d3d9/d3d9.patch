@@ -1,0 +1,45 @@
+--- include/d3d9.h	2016-04-17 11:41:20.676521300 +0300
++++ include/d3d9.h.new	2016-04-17 12:12:13.637219200 +0300
+@@ -2185,6 +2185,42 @@ __CRT_UUID_DECL(IDirect3DDevice9Ex,
+ #define IDirect3DDevice9Ex_GetDisplayModeEx(p,a,b,c)                     (p)->GetDisplayModeEx(a,b,c)
+ #endif
+ 
++/*****************************************************************************
++ * IDirect3D9ExOverlayExtension interface
++ */
++#define INTERFACE IDirect3D9ExOverlayExtension
++DECLARE_INTERFACE_(IDirect3D9ExOverlayExtension,IUnknown)
++{
++    /*** IUnknown methods ***/
++    STDMETHOD_(HRESULT,QueryInterface)(THIS_ REFIID riid, void** ppvObject) PURE;
++    STDMETHOD_(ULONG,AddRef)(THIS) PURE;
++    STDMETHOD_(ULONG,Release)(THIS) PURE;
++    /*** IDirect3D9ExOverlayExtension methods ***/
++    STDMETHOD(CheckDeviceOverlayType)(THIS_ UINT Adapter, D3DDEVTYPE DevType, UINT OverlayWidth, UINT OverlayHeight,
++            D3DFORMAT OverlayFormat, D3DDISPLAYMODEEX* pDisplayMode, D3DDISPLAYROTATION DisplayRotation, D3DOVERLAYCAPS* pOverlayCaps) PURE;
++};
++#undef INTERFACE
++
++#ifdef __CRT_UUID_DECL
++__CRT_UUID_DECL(IDirect3D9ExOverlayExtension,                   0x187aeb13, 0xaaf5, 0x4c59, 0x87, 0x6d, 0xe0, 0x59, 0x8, 0x8c, 0xd, 0xf8);
++#endif
++
++#if !defined(__cplusplus) || defined(CINTERFACE)
++/*** IUnknown methods ***/
++#define IDirect3D9ExOverlayExtension_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
++#define IDirect3D9ExOverlayExtension_AddRef(p) (p)->lpVtbl->AddRef(p)
++#define IDirect3D9ExOverlayExtension_Release(p) (p)->lpVtbl->Release(p)
++/*** IDirect3D9ExOverlayExtension ***/
++#define IDirect3D9ExOverlayExtension_CheckDeviceOverlayType(p,a,b,c,d,e,f,g,h) (p)->lpVtbl->CheckDeviceOverlayType(p,a,b,c,d,e,f,g,h)
++#else
++/*** IUnknown methods ***/
++#define IDirect3D9ExOverlayExtension_QueryInterface(p,a,b) (p)->QueryInterface(a,b)
++#define IDirect3D9ExOverlayExtension_AddRef(p) (p)->AddRef()
++#define IDirect3D9ExOverlayExtension_Release(p) (p)->Release()
++/*** IDirect3D9ExOverlayExtension ***/
++#define IDirect3D9ExOverlayExtension_CheckDeviceOverlayType(p,a,b,c,d,e,f,g,h) (p)->CheckDeviceOverlayType(a,b,c,d,e,f,g,h)
++#endif
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif  /* defined(__cplusplus) */
