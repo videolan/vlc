@@ -179,7 +179,9 @@ static void msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
     "Enabling the quiet mode will not bring this command box but can also " \
     "be pretty annoying when you want to stop VLC and no video window is " \
     "open." )
+#if !VLC_WINSTORE_APP
 #include "intromsg.h"
+#endif
 #endif
 
 vlc_module_begin ()
@@ -340,12 +342,12 @@ static int Activate( vlc_object_t *p_this )
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
-#ifdef _WIN32
+#if VLC_WINSTORE_APP
+    p_sys->b_quiet = true;
+#elif defined(_WIN32)
     p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
-# if !VLC_WINSTORE_APP
     if( !p_sys->b_quiet )
         intf_consoleIntroMsg( p_intf );
-# endif
 #endif
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
@@ -478,7 +480,7 @@ static void *Run( void *data )
 
     p_buffer[0] = 0;
 
-#ifdef _WIN32
+#if defined(_WIN32) && !VLC_WINSTORE_APP
     /* Get the file descriptor of the console input */
     p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
     if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
@@ -1770,7 +1772,7 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
     return VLC_SUCCESS;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) && !VLC_WINSTORE_APP
 static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 {
     INPUT_RECORD input_record;
@@ -1840,7 +1842,7 @@ static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 
 bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !VLC_WINSTORE_APP
     if( p_intf->p_sys->i_socket == -1 && !p_intf->p_sys->b_quiet )
         return ReadWin32( p_intf, p_buffer, pi_size );
     else if( p_intf->p_sys->i_socket == -1 )
