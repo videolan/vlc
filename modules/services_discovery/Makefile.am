@@ -61,7 +61,9 @@ endif
 
 libwindrive_plugin_la_SOURCES = services_discovery/windrive.c
 if HAVE_WIN32
+if !HAVE_WINSTORE
 sd_LTLIBRARIES += libwindrive_plugin.la
+endif
 endif
 
 libos2drive_plugin_la_SOURCES = services_discovery/os2drive.c
