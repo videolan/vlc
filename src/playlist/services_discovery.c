@@ -77,7 +77,13 @@ char **vlc_sd_GetNames (vlc_object_t *obj, char ***pppsz_longnames, int **pp_cat
     int *categories = malloc(sizeof(int) * (count + 1));
 
     if (unlikely (names == NULL || longnames == NULL || categories == NULL))
-        abort();
+    {
+        free(names);
+        free(longnames);
+        free(categories);
+        free(tab);
+        return NULL;
+    }
     for( size_t i = 0; i < count; i++ )
     {
         names[i] = tab[i].name;
