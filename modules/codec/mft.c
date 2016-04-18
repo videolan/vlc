@@ -37,6 +37,10 @@
 # define STDCALL __stdcall
 #endif
 
+#include <winapifamily.h>
+#undef WINAPI_FAMILY
+#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
+
 #include <assert.h>
 
 #include <vlc_common.h>
