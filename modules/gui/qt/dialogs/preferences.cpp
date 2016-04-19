@@ -47,6 +47,8 @@
 #include <QShortcut>
 #include <QScrollArea>
 
+#include <vlc_modules.h>
+
 PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
             : QVLCDialog( parent, _p_intf )
 {
@@ -81,6 +83,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 
     /* Tree and panel initialisations */
     advanced_tree = NULL;
+    p_list = NULL;
     tree_filter = NULL;
     current_filter = NULL;
     simple_tree = NULL;
@@ -144,6 +147,11 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     QVLCTools::restoreWidgetPosition( p_intf, "Preferences", this, QSize( 800 , 700 ) );
 }
 
+PrefsDialog::~PrefsDialog()
+{
+    module_list_free( p_list );
+}
+
 void PrefsDialog::setAdvanced()
 {
     if ( !tree_filter )
@@ -171,11 +179,12 @@ void PrefsDialog::setAdvanced()
     if( !advanced_tree )
     {
         /* Creation */
-         advanced_tree = new PrefsTree( p_intf, simple_tree_panel );
+        p_list = module_list_get( &count );
+        advanced_tree = new PrefsTree( p_intf, simple_tree_panel, p_list, count );
         /* and connections */
-         CONNECT( advanced_tree,
-                  currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ),
-                  this, changeAdvPanel( QTreeWidgetItem * ) );
+        CONNECT( advanced_tree,
+                 currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ),
+                 this, changeAdvPanel( QTreeWidgetItem * ) );
         advanced_tree_panel->layout()->addWidget( advanced_tree );
         advanced_tree_panel->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
     }

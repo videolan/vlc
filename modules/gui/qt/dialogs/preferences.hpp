@@ -44,7 +44,7 @@ class PrefsDialog : public QVLCDialog
     Q_OBJECT
 public:
     PrefsDialog( QWidget *, intf_thread_t * );
-    virtual ~PrefsDialog() {}
+    virtual ~PrefsDialog();
 #if 0
     /*Called from extended settings, is not used anymore, but could be useful one day*/
     void showModulePrefs( char* );
@@ -66,6 +66,8 @@ private:
 
     SPrefsCatList *simple_tree;
     PrefsTree *advanced_tree;
+    size_t count;
+    module_t **p_list;
     SearchLineEdit *tree_filter;
     QCheckBox *current_filter;
 

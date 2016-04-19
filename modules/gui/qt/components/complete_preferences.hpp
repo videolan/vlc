@@ -59,6 +59,7 @@ public:
     bool b_loaded;
     QString name;
     QString help;
+    module_t *p_module;
 };
 
 Q_DECLARE_METATYPE( PrefsItemData* );
@@ -68,7 +69,7 @@ class PrefsTree : public QTreeWidget
     Q_OBJECT
 
 public:
-    PrefsTree( intf_thread_t *, QWidget * );
+    PrefsTree( intf_thread_t *, QWidget *, module_t **, size_t );
 
     void applyAll();
     void cleanAll();

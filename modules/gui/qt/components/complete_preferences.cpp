@@ -50,7 +50,8 @@
 /*********************************************************************
  * The Tree
  *********************************************************************/
-PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
+PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
+                      module_t **p_list, size_t count ) :
                             QTreeWidget( _parent ), p_intf( _p_intf )
 {
     b_show_only_loaded = false;
@@ -194,8 +195,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     }
     module_config_free( p_config );
 
-    size_t count;
-    module_t **p_list = module_list_get( &count );
     /* Build the tree of plugins */
     for( size_t i = 0; i < count; i++ )
     {
@@ -273,6 +272,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         module_data->psz_shortcut = strdup( module_get_object( p_module ) );
         module_data->name = qtr( module_get_name( p_module, false ) );
         module_data->help.clear();
+        module_data->p_module = p_module;
         const char *psz_help = module_get_help( p_module );
         if ( psz_help )
             module_data->help = qtr( psz_help );
@@ -288,7 +288,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     /* We got everything, just sort a bit */
     sortItems( 0, Qt::AscendingOrder );
 
-    module_list_free( p_list );
     resizeColumnToContents( 0 );
 }
 
@@ -594,7 +593,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( data->i_type == PrefsItemData::TYPE_CATEGORY )
         return;
     else if( data->i_type == PrefsItemData::TYPE_MODULE )
-        p_module = module_find( data->psz_shortcut );
+        p_module = data->p_module;
     else
     {
         p_module = module_get_main();
