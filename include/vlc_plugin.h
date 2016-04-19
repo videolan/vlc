@@ -173,6 +173,7 @@ enum vlc_module_properties
 #define SUBCAT_SOUT_ACO 504
 #define SUBCAT_SOUT_PACKETIZER 505
 #define SUBCAT_SOUT_VOD 507
+#define SUBCAT_SOUT_RENDERER 508
 
 #define CAT_ADVANCED 6
 #define SUBCAT_ADVANCED_MISC 602

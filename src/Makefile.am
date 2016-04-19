@@ -82,6 +82,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_services_discovery.h \
 	../include/vlc_fingerprinter.h \
 	../include/vlc_interrupt.h \
+	../include/vlc_renderer_discovery.h \
 	../include/vlc_sout.h \
 	../include/vlc_spu.h \
 	../include/vlc_stream.h \
@@ -444,6 +445,7 @@ SOURCES_libvlc_common = \
 	misc/interrupt.h \
 	misc/interrupt.c \
 	misc/keystore.c \
+	misc/renderer_discovery.c \
 	modules/modules.h \
 	modules/modules.c \
 	modules/bank.c \
