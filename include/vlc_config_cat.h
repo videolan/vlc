@@ -58,6 +58,8 @@
 #define AFILTER_TITLE N_("Filters")
 #define AFILTER_HELP N_( "Audio filters are used to process the audio stream." )
 
+#define ARESAMPLER_TITLE N_("Audio resampler")
+
 #define AVISUAL_TITLE N_("Visualizations")
 #define AVISUAL_HELP N_( "Audio visualizations" )
 
@@ -198,6 +200,7 @@ static const struct config_category_t categories_array[] =
     { SUBCAT_AUDIO_GENERAL, AUDIO_TITLE, AUDIO_GENERAL_HELP },
     { SUBCAT_AUDIO_AOUT, AOUT_TITLE, AOUT_HELP },
     { SUBCAT_AUDIO_AFILTER, AFILTER_TITLE, AFILTER_HELP },
+    { SUBCAT_AUDIO_RESAMPLER, ARESAMPLER_TITLE, AFILTER_HELP },
     { SUBCAT_AUDIO_VISUAL, AVISUAL_TITLE, AVISUAL_HELP },
     { SUBCAT_AUDIO_MISC, AMISC_TITLE, AMISC_HELP },
 

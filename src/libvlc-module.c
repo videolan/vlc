@@ -1456,9 +1456,6 @@ vlc_module_begin ()
                  DESYNC_LONGTEXT, true )
         change_safe ()
 
-    add_module( "audio-resampler", "audio resampler", NULL,
-                AUDIO_RESAMPLER_TEXT, AUDIO_RESAMPLER_LONGTEXT, true )
-
     /* FIXME TODO create a subcat replay gain ? */
     add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], AUDIO_REPLAY_GAIN_MODE_TEXT,
                 AUDIO_REPLAY_GAIN_MODE_LONGTEXT, false )
@@ -1483,6 +1480,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     add_module( "audio-visual", "visualization", "none", AUDIO_VISUAL_TEXT,
                 AUDIO_VISUAL_LONGTEXT, false )
+
+    set_subcategory( SUBCAT_AUDIO_RESAMPLER )
+    add_module( "audio-resampler", "audio resampler", NULL,
+                AUDIO_RESAMPLER_TEXT, AUDIO_RESAMPLER_LONGTEXT, true )
+
 
 /* Video options */
     set_category( CAT_VIDEO )
