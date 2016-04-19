@@ -58,7 +58,7 @@ vlc_module_begin ()
     set_shortname (N_("SRC resampler"))
     set_description (N_("Secret Rabbit Code (libsamplerate) resampler") )
     set_category (CAT_AUDIO)
-    set_subcategory (SUBCAT_AUDIO_MISC)
+    set_subcategory (SUBCAT_AUDIO_RESAMPLER)
     add_integer ("src-converter-type", SRC_SINC_FASTEST,
                  SRC_CONV_TYPE_TEXT, SRC_CONV_TYPE_LONGTEXT, true)
         change_integer_list (conv_type_values, conv_type_texts)
