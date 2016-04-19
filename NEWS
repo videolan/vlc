@@ -91,6 +91,7 @@ Demuxers:
    stream filter with new Smooth demuxer, both using unified adaptive module
  * Improved smooth streaming compatibility
  * Support SCTE-18 / EAS inside TS
+ * Support for RTP Reception Hint Track In MP4 with H.264, GSM and Speex payloads.
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
