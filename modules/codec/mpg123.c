@@ -88,11 +88,11 @@ static void Flush( decoder_t *p_dec )
 static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     int i_err;
-    block_t *p_block = pp_block ? *pp_block : NULL;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( !pp_block || !p_block )
+    if( !pp_block || !*pp_block )
         return NULL;
+    block_t *p_block = *pp_block;
 
     if( p_block->i_buffer == 0 )
         return NULL;
