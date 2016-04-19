@@ -87,6 +87,7 @@ static char *config_GetShellDir (int csidl)
 
 static char *config_GetAppDir (void)
 {
+#if !VLC_WINSTORE_APP
     /* if portable directory exists, use it */
     TCHAR path[MAX_PATH];
     if (GetModuleFileName (NULL, path, MAX_PATH))
@@ -101,6 +102,7 @@ static char *config_GetAppDir (void)
                 return FromT (path);
         }
     }
+#endif
 
     char *psz_dir;
     char *psz_parent = config_GetShellDir (CSIDL_APPDATA);
