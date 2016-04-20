@@ -1540,7 +1540,7 @@ bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
             if( !p_scan->p_pathandle )
                 return false;
 
-            p_scan->p_pathandle->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
+            p_scan->p_pathandle->p_sys = (void *) p_scan->p_obj;
             if( !dvbpsi_pat_attach( p_scan->p_pathandle, (dvbpsi_pat_callback)PATCallBack, p_scan ) )
             {
                 dvbpsi_delete( p_scan->p_pathandle );
@@ -1559,7 +1559,7 @@ bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
             if( !p_scan->p_sdthandle )
                 return false;
 
-            p_scan->p_sdthandle->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
+            p_scan->p_sdthandle->p_sys = (void *) p_scan->p_obj;
             if( !dvbpsi_AttachDemux( p_scan->p_sdthandle, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
             {
                 dvbpsi_delete( p_scan->p_sdthandle );
@@ -1579,7 +1579,7 @@ bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
             if( !p_scan->p_nithandle )
                 return false;
 
-            p_scan->p_nithandle->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
+            p_scan->p_nithandle->p_sys = (void *) p_scan->p_obj;
             if( !dvbpsi_AttachDemux( p_scan->p_nithandle, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
             {
                 dvbpsi_delete( p_scan->p_nithandle );
