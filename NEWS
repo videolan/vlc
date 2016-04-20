@@ -67,6 +67,7 @@ Decoder:
    supporting H.263, H.264/MPEG-4 AVC, MPEG-4 Part 2, and DV depending on device
    and OS version
  * Support for the OggSpots video codec
+ * JPEG images correctly oriented using embedded orientation tag, if present
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
