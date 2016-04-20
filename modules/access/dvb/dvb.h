@@ -49,6 +49,7 @@ typedef struct
 } frontend_status_t;
 
 #define MAX_DEMUX 256
+#define TS_PACKET_SIZE 188
 
 struct scan_t;
 struct scan_parameter_t;
@@ -70,6 +71,7 @@ struct access_sys_t
 
     /* Scan */
     struct scan_t *scan;
+    uint8_t packet[TS_PACKET_SIZE];
 };
 
 #define VIDEO0_TYPE     1

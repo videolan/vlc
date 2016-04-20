@@ -1523,37 +1523,33 @@ block_t *scan_GetM3U( scan_t *p_scan )
     return p_playlist ? block_ChainGather( p_playlist ) : NULL;
 }
 
-bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
+#define dvbpsi_packet_push(a,b) dvbpsi_packet_push(a, (uint8_t *)b)
+
+bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
 {
-    if( p_block->i_buffer < 188 || p_block->p_buffer[0] != 0x47 )
-    {
-        block_Release( p_block );
+    if( p_packet[0] != 0x47 )
         return false;
-    }
 
     /* */
-    const int i_pid = ( (p_block->p_buffer[1]&0x1f)<<8) | p_block->p_buffer[2];
+    const int i_pid = ( (p_packet[1]&0x1f)<<8) | p_packet[2];
     if( i_pid == 0x00 )
     {
         if( !p_scan->p_pathandle )
         {
             p_scan->p_pathandle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
             if( !p_scan->p_pathandle )
-            {
-                block_Release( p_block );
                 return false;
-            }
+
             p_scan->p_pathandle->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
             if( !dvbpsi_pat_attach( p_scan->p_pathandle, (dvbpsi_pat_callback)PATCallBack, p_scan ) )
             {
                 dvbpsi_delete( p_scan->p_pathandle );
                 p_scan->p_pathandle = NULL;
-                block_Release( p_block );
                 return false;
             }
         }
         if( p_scan->p_pathandle )
-            dvbpsi_packet_push( p_scan->p_pathandle, p_block->p_buffer );
+            dvbpsi_packet_push( p_scan->p_pathandle, p_packet );
     }
     else if( i_pid == 0x11 )
     {
@@ -1561,22 +1557,19 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
         {
             p_scan->p_sdthandle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
             if( !p_scan->p_sdthandle )
-            {
-                block_Release( p_block );
                 return false;
-            }
+
             p_scan->p_sdthandle->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
             if( !dvbpsi_AttachDemux( p_scan->p_sdthandle, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
             {
                 dvbpsi_delete( p_scan->p_sdthandle );
                 p_scan->p_sdthandle = NULL;
-                block_Release( p_block );
                 return false;
             }
         }
 
         if( p_scan->p_sdthandle )
-            dvbpsi_packet_push( p_scan->p_sdthandle, p_block->p_buffer );
+            dvbpsi_packet_push( p_scan->p_sdthandle, p_packet );
     }
     else if( p_scan->b_use_nit ) /*if( i_pid == p_scan->i_nit_pid )*/
     {
@@ -1584,24 +1577,19 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
         {
             p_scan->p_nithandle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
             if( !p_scan->p_nithandle )
-            {
-                block_Release( p_block );
                 return false;
-            }
+
             p_scan->p_nithandle->p_sys = (void *) VLC_OBJECT(p_scan->p_obj);
             if( !dvbpsi_AttachDemux( p_scan->p_nithandle, (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan ) )
             {
                 dvbpsi_delete( p_scan->p_nithandle );
                 p_scan->p_nithandle = NULL;
-                block_Release( p_block );
                 return false;
             }
         }
         if( p_scan->p_nithandle )
-            dvbpsi_packet_push( p_scan->p_nithandle, p_block->p_buffer );
+            dvbpsi_packet_push( p_scan->p_nithandle, p_packet );
     }
-
-    block_Release( p_block );
 
     return p_scan->local.p_pat && p_scan->local.p_sdt &&
             (!p_scan->b_use_nit || p_scan->local.p_nit);

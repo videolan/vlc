@@ -99,7 +99,6 @@ static block_t *BlockScan( access_t * );
 #define DVB_READ_ONCE 20
 #define DVB_READ_ONCE_START 2
 #define DVB_READ_ONCE_SCAN 1
-#define TS_PACKET_SIZE 188
 
 #define DVB_SCAN_MAX_SIGNAL_TIME (1000*1000)
 #define DVB_SCAN_MAX_LOCK_TIME (5000*1000)
@@ -355,19 +354,16 @@ static block_t *BlockScan( access_t *p_access )
             if( i_probe_start == 0 )
                 i_probe_start = mdate();
 
-            block_t *p_block = block_Alloc( DVB_READ_ONCE_SCAN * TS_PACKET_SIZE );
-
-            if( ( i_ret = read( p_sys->i_handle, p_block->p_buffer,
-                                DVB_READ_ONCE_SCAN * TS_PACKET_SIZE ) ) <= 0 )
+            ssize_t i_read = read( p_sys->i_handle, &p_sys->packet, TS_PACKET_SIZE );
+            if( i_read <= 0 )
             {
                 msg_Warn( p_access, "read failed: %s", vlc_strerror_c(errno) );
-                block_Release( p_block );
                 continue;
             }
-            p_block->i_buffer = i_ret;
 
             /* */
-            if( scan_session_Push( session, p_block ) )
+            if( i_read == TS_PACKET_SIZE &&
+                scan_session_Push( session, &p_sys->packet ) )
             {
                 msg_Dbg( p_access, "finished scanning current frequency" );
                 break;
