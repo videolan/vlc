@@ -107,6 +107,11 @@ struct scan_multiplex_t
 struct scan_t
 {
     vlc_object_t *p_obj;
+    scan_frontend_tune_cb pf_tune;
+    scan_frontend_stats_cb pf_stats;
+    scan_demux_read_cb   pf_read;
+    void *p_cbdata;
+
     vlc_dialog_id *p_dialog_id;
     uint64_t i_index;
     scan_parameter_t parameter;
@@ -123,7 +128,7 @@ struct scan_t
     const scan_list_entry_t *p_current;
 };
 
-struct scan_session_t
+typedef struct
 {
     vlc_object_t *p_obj;
 
@@ -152,7 +157,12 @@ struct scan_session_t
     dvbpsi_t *p_pathandle;
     dvbpsi_t *p_sdthandle;
     dvbpsi_t *p_nithandle;
-};
+} scan_session_t;
+
+static scan_session_t * scan_session_New( scan_t *p_scan, const scan_tuner_config_t *p_cfg );
+static void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session );
+static bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet );
+static unsigned scan_session_GetTablesTimeout( const scan_session_t *p_session );
 
 /* */
 static void scan_tuner_config_Init( scan_tuner_config_t *p_cfg )
@@ -361,7 +371,11 @@ static void scan_Debug_Parameters( vlc_object_t *p_obj, const scan_parameter_t *
 }
 
 /* */
-scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
+scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter,
+                  scan_frontend_tune_cb pf_frontend,
+                  scan_frontend_stats_cb pf_status,
+                  scan_demux_read_cb pf_read,
+                  void *p_cbdata )
 {
     if( p_parameter->type == SCAN_NONE )
         return NULL;
@@ -371,6 +385,10 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
         return NULL;
 
     p_scan->p_obj = VLC_OBJECT(p_obj);
+    p_scan->pf_tune = pf_frontend;
+    p_scan->pf_stats = pf_status;
+    p_scan->pf_read = pf_read;
+    p_scan->p_cbdata = p_cbdata;
     p_scan->i_index = 0;
     p_scan->p_dialog_id = NULL;
     p_scan->i_multiplex = 0;
@@ -741,7 +759,7 @@ static int Scan_GetNextTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, 
     return VLC_ENOITEM;
 }
 
-int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
+static int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
 {
     double f_position;
     int i_ret;
@@ -795,6 +813,57 @@ bool scan_IsCancelled( scan_t *p_scan )
     if( p_scan->p_dialog_id == NULL )
         return false;
     return vlc_dialog_is_cancelled( p_scan->p_obj, p_scan->p_dialog_id );
+}
+
+int scan_Run( scan_t *p_scan )
+{
+    scan_tuner_config_t cfg;
+    if( scan_Next( p_scan, &cfg ) )
+        return VLC_ENOITEM;
+
+    scan_session_t *session = scan_session_New( p_scan, &cfg );
+    if( unlikely(session == NULL) )
+        return VLC_EGENERIC;
+
+    if( p_scan->pf_tune( p_scan, p_scan->p_cbdata, &cfg ) != VLC_SUCCESS )
+    {
+        scan_session_Destroy( p_scan, session );
+        return VLC_EGENERIC;
+    }
+
+    /* */
+    uint8_t packet[TS_PACKET_SIZE * SCAN_READ_BUFFER_COUNT];
+    int64_t i_scan_start = mdate();
+
+    for( ;; )
+    {
+        unsigned i_timeout = scan_session_GetTablesTimeout( session );
+        mtime_t i_remaining = mdate() - i_scan_start;
+        if( i_remaining > i_timeout )
+            break;
+
+        size_t i_packet_count = 0;
+        int i_ret = p_scan->pf_read( p_scan, p_scan->p_cbdata,
+                                     i_timeout - i_remaining,
+                                     SCAN_READ_BUFFER_COUNT,
+                                     (uint8_t *) &packet, &i_packet_count );
+        if ( i_ret != VLC_SUCCESS )
+            break;
+
+        if( p_scan->pf_stats )
+            p_scan->pf_stats( p_scan, p_scan->p_cbdata, &session->i_snr );
+
+        for( size_t i=0; i< i_packet_count; i++ )
+        {
+            if( scan_session_Push( session,
+                                   &packet[i * TS_PACKET_SIZE] ) )
+                break;
+        }
+    }
+
+    scan_session_Destroy( p_scan, session );
+
+    return VLC_SUCCESS;
 }
 
 static bool GetOtherNetworkNIT( scan_session_t *p_session, uint16_t i_network_id,
@@ -1302,7 +1371,7 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id, uint16_t i_ext
     }
 }
 
-scan_session_t *scan_session_New( scan_t *p_scan, const scan_tuner_config_t *p_cfg )
+static scan_session_t *scan_session_New( scan_t *p_scan, const scan_tuner_config_t *p_cfg )
 {
     scan_session_t *p_session = malloc( sizeof( *p_session ) );
     if( unlikely(p_session == NULL) )
@@ -1360,7 +1429,7 @@ static void scan_session_Delete( scan_session_t *p_session )
     free( p_session );
 }
 
-void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
+static void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 {
     dvbpsi_pat_t *p_pat = p_session->local.p_pat;
     dvbpsi_sdt_t *p_sdt = p_session->local.p_sdt;
@@ -1525,7 +1594,7 @@ block_t *scan_GetM3U( scan_t *p_scan )
 
 #define dvbpsi_packet_push(a,b) dvbpsi_packet_push(a, (uint8_t *)b)
 
-bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
+static bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
 {
     if( p_packet[0] != 0x47 )
         return false;
@@ -1595,12 +1664,7 @@ bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
             (!p_scan->b_use_nit || p_scan->local.p_nit);
 }
 
-void scan_session_SetSNR( scan_session_t *p_session, int i_snr )
-{
-    p_session->i_snr = i_snr;
-}
-
-unsigned scan_session_GetTablesTimeout( const scan_session_t *p_session )
+static unsigned scan_session_GetTablesTimeout( const scan_session_t *p_session )
 {
     unsigned i_time = 0;
     if( !p_session->local.p_pat )

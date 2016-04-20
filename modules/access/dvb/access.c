@@ -96,14 +96,17 @@ static int Control( access_t *, int, va_list );
 
 static block_t *BlockScan( access_t * );
 
-#define DVB_SCAN_MAX_SIGNAL_TIME (1000*1000)
-#define DVB_SCAN_MAX_LOCK_TIME (5000*1000)
+#define DVB_SCAN_MAX_LOCK_TIME (2*CLOCK_FREQ)
 
 static void FilterUnset( access_t *, int i_max );
 static void FilterSet( access_t *, int i_pid, int i_type );
 
 static void VarInit( access_t * );
 static int  ParseMRL( access_t * );
+
+static int ScanFrontendTuningHandler( scan_t *, void *, const scan_tuner_config_t * );
+static int ScanStatsCallback( scan_t *p_scan, void *p_privdata, int *pi_snr );
+static int ScanReadCallback( scan_t *, void *,  unsigned, size_t, uint8_t *, size_t *);
 
 /*****************************************************************************
  * Open: open the frontend device
@@ -169,12 +172,17 @@ static int Open( vlc_object_t *p_this )
         FilterSet( p_access, 0x10, OTHER_TYPE );    // NIT
 
     if( FrontendFillScanParameter( p_access, &parameter ) ||
-            (p_scan = scan_New( VLC_OBJECT(p_access), &parameter )) == NULL )
+            (p_scan = scan_New( VLC_OBJECT(p_access), &parameter,
+                                ScanFrontendTuningHandler,
+                                ScanStatsCallback,
+                                ScanReadCallback,
+                                p_access )) == NULL )
     {
         scan_parameter_Clean( &parameter );
         Close( VLC_OBJECT(p_access) );
         return VLC_EGENERIC;
     }
+
     scan_parameter_Clean( &parameter );
     p_sys->scan = p_scan;
 
@@ -203,60 +211,56 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-/*****************************************************************************
- * BlockScan:
- *****************************************************************************/
-static block_t *BlockScan( access_t *p_access )
+static int ScanFrontendTuningHandler( scan_t *p_scan, void *p_privdata,
+                                      const scan_tuner_config_t *p_cfg )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    scan_t *p_scan = p_sys->scan;
-    scan_tuner_config_t cfg;
+    access_t *p_access = (access_t *) p_privdata;
+    VLC_UNUSED(p_scan);
 
-    /* */
-    if( scan_Next( p_scan, &cfg ) )
-    {
-        const bool b_first_eof = !p_access->info.b_eof;
+    var_SetInteger( p_access, "dvb-frequency", p_cfg->i_frequency );
+    var_SetInteger( p_access, "dvb-bandwidth", p_cfg->i_bandwidth );
 
-        if( b_first_eof )
-            msg_Warn( p_access, "Scanning finished" );
+    if ( p_cfg->c_polarization )
+        var_SetInteger( p_access, "dvb-voltage", p_cfg->c_polarization == 'H' ? 18 : 13 );
 
-        /* */
-        p_access->info.b_eof = true;
-        return b_first_eof ? scan_GetM3U( p_scan ) : NULL;
-    }
+    if ( p_cfg->i_symbolrate )
+        var_SetInteger( p_access, "dvb-srate", p_cfg->i_symbolrate );
 
-    /* */
-    scan_session_t *session = scan_session_New( p_scan, &cfg );
-    if( session == NULL )
-        return NULL;
-
-    /* */
-    msg_Dbg( p_access, "Scanning frequency %d", cfg.i_frequency );
-    var_SetInteger( p_access, "dvb-frequency", cfg.i_frequency );
-    msg_Dbg( p_access, " bandwidth %d", cfg.i_bandwidth );
-    var_SetInteger( p_access, "dvb-bandwidth", cfg.i_bandwidth );
-    if ( cfg.c_polarization )
-        var_SetInteger( p_access, "dvb-voltage", cfg.c_polarization == 'H' ? 18 : 13 );
-
-    if ( cfg.i_symbolrate )
-        var_SetInteger( p_access, "dvb-srate", cfg.i_symbolrate );
+    msg_Dbg( p_access, "Scanning frequency %d", p_cfg->i_frequency );
+    msg_Dbg( p_access, " bandwidth %d", p_cfg->i_bandwidth );
 
     /* Setting frontend parameters for tuning the hardware */
     if( FrontendSet( p_access ) < 0 )
     {
         msg_Err( p_access, "Failed to tune the frontend" );
-        //p_access->info.b_eof = true;
-        scan_session_Destroy( p_scan, session );
-        return NULL;
+        return VLC_EGENERIC;
     }
 
-    /* */
-    int64_t i_scan_start = mdate();
-    int64_t i_probe_start = 0;
+    return VLC_SUCCESS;
+}
 
-    bool b_has_dvb_signal = false;
-    bool b_has_lock = false;
-    int i_best_snr = -1;
+static int ScanStatsCallback( scan_t *p_scan, void *p_privdata, int *pi_snr )
+{
+    access_t *p_access = (access_t *) p_privdata;
+    VLC_UNUSED(p_scan);
+
+    frontend_statistic_t stat;
+    if( !FrontendGetStatistic( p_access, &stat ) )
+    {
+        *pi_snr = stat.i_snr;
+        return VLC_SUCCESS;
+    }
+
+    return VLC_EGENERIC;
+}
+
+static int ScanReadCallback( scan_t *p_scan, void *p_privdata,
+                             unsigned i_probe_timeout, size_t i_packets_max,
+                             uint8_t *p_packet, size_t *pi_count )
+{
+    access_t *p_access = (access_t *) p_privdata;
+    access_sys_t *p_sys = p_access->p_sys;
+    *pi_count = 0;
 
     /* Initialize file descriptor sets */
     struct pollfd ufds[2];
@@ -266,105 +270,96 @@ static block_t *BlockScan( access_t *p_access )
     ufds[1].fd = p_sys->i_frontend_handle;
     ufds[1].events = POLLPRI;
 
-    for ( ; ; )
+    frontend_status_t status;
+    FrontendGetStatus( p_access, &status );
+    bool b_has_lock = status.b_has_lock;
+
+    mtime_t i_scan_start = mdate();
+
+    for( ; *pi_count == 0; )
     {
-        frontend_status_t status;
-        FrontendGetStatus( p_access, &status );
-        b_has_dvb_signal |= status.b_has_carrier;
-        b_has_lock |= status.b_has_lock;
-
-        int64_t i_scan_end;
-        if( i_probe_start )
-        {
-            i_scan_end = i_probe_start + scan_session_GetTablesTimeout( session );
-        }
-        else
-        {
-            i_scan_end = i_scan_start;
-            if( !b_has_dvb_signal )
-                i_scan_end += DVB_SCAN_MAX_SIGNAL_TIME;
-            else if( !b_has_lock )
-                i_scan_end += DVB_SCAN_MAX_LOCK_TIME;
-        }
-
         /* Find if some data is available */
         int i_ret;
 
+        mtime_t i_timeout = b_has_lock ? i_probe_timeout:
+                                         DVB_SCAN_MAX_LOCK_TIME;
+
         do
         {
-            int64_t timeout = i_scan_end - mdate();
+            mtime_t i_poll_timeout = i_scan_start - mdate() + i_timeout;
 
             i_ret = 0;
 
             if( vlc_killed() || scan_IsCancelled( p_scan ) )
                 break;
 
-            if( timeout >= 0 )
-                i_ret = vlc_poll_i11e( ufds, 2, timeout / 1000 );
+            if( i_poll_timeout >= 0 )
+                i_ret = vlc_poll_i11e( ufds, 2, i_poll_timeout / 1000 );
         }
         while( i_ret < 0 && errno == EINTR );
 
         if( i_ret < 0 )
         {
-            msg_Err( p_access, "poll error: %s", vlc_strerror_c(errno) );
-            p_access->info.b_eof = true;
-            break;
+            return VLC_EGENERIC;
         }
-
-        if( i_ret == 0 )
+        else if( i_ret == 0 )
         {
-            msg_Dbg( p_access,
-                     "timed out scanning current frequency (s=%d l=%d)",
-                     b_has_dvb_signal, b_has_lock );
-            break;
+            return VLC_ENOITEM;
         }
 
         if( ufds[1].revents )
         {
-            frontend_statistic_t stat;
-
             FrontendPoll( p_access );
 
-            if( !FrontendGetStatistic( p_access, &stat ) )
+            FrontendGetStatus( p_access, &status );
+            if( status.b_has_lock && !b_has_lock )
             {
-                if( stat.i_snr > i_best_snr )
-                {
-                    i_best_snr = stat.i_snr;
-                    scan_session_SetSNR( session, i_best_snr );
-                }
+                i_scan_start = mdate();
+                b_has_lock = true;
             }
-        }
-
-        if ( p_sys->i_frontend_timeout && mdate() > p_sys->i_frontend_timeout )
-        {
-            msg_Warn( p_access, "no lock, tuning again" );
-            FrontendSet( p_access );
         }
 
         if ( ufds[0].revents )
         {
-            if( i_probe_start == 0 )
-                i_probe_start = mdate();
-
-            ssize_t i_read = read( p_sys->i_handle, &p_sys->packet, TS_PACKET_SIZE );
-            if( i_read <= 0 )
+            for( size_t i=0; i<i_packets_max; i++ )
             {
-                msg_Warn( p_access, "read failed: %s", vlc_strerror_c(errno) );
-                continue;
-            }
-
-            /* */
-            if( i_read == TS_PACKET_SIZE &&
-                scan_session_Push( session, &p_sys->packet ) )
-            {
-                msg_Dbg( p_access, "finished scanning current frequency" );
-                break;
+                ssize_t i_read = read( p_sys->i_handle, p_packet, TS_PACKET_SIZE * i_packets_max );
+                if( i_read < 0 )
+                {
+                    msg_Warn( p_access, "read failed: %s", vlc_strerror_c(errno) );
+                    break;
+                }
+                else if ( i_read == TS_PACKET_SIZE )
+                {
+                    *pi_count = i_read / TS_PACKET_SIZE;
+                }
             }
         }
     }
 
-    scan_session_Destroy( p_scan, session );
-    return NULL;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * BlockScan:
+ *****************************************************************************/
+static block_t *BlockScan( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    scan_t *p_scan = p_sys->scan;
+    block_t *p_block = NULL;
+
+    if( scan_Run( p_scan ) != VLC_SUCCESS )
+    {
+        if( !p_access->info.b_eof )
+        {
+             msg_Warn( p_access, "Scanning finished" );
+             p_block = scan_GetM3U( p_scan );
+        }
+        p_access->info.b_eof = true;
+    }
+
+    return p_block;
 }
 
 /*****************************************************************************

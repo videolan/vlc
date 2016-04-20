@@ -73,23 +73,25 @@ typedef struct scan_parameter_t
 
 } scan_parameter_t;
 
+#define SCAN_READ_BUFFER_COUNT 20
+
 typedef struct scan_t scan_t;
+typedef int (*scan_frontend_tune_cb)( scan_t *, void *, const scan_tuner_config_t * );
+typedef int (*scan_frontend_stats_cb)( scan_t *, void *, int * );
+typedef int (*scan_demux_filter_cb)( scan_t *, void *, uint16_t );
+typedef int (*scan_demux_read_cb)( scan_t *, void *, unsigned, size_t, uint8_t *, size_t * );
 
 void scan_parameter_Init( scan_parameter_t * );
 void scan_parameter_Clean( scan_parameter_t * );
 
-scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter );
+scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter,
+                  scan_frontend_tune_cb,
+                  scan_frontend_stats_cb,
+                  scan_demux_read_cb,
+                  void * );
 void scan_Destroy( scan_t *p_scan );
 
-int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg );
+int scan_Run( scan_t *p_scan );
 
 block_t *scan_GetM3U( scan_t *p_scan );
 bool scan_IsCancelled( scan_t *p_scan );
-
-typedef struct scan_session_t scan_session_t;
-
-scan_session_t *scan_session_New( scan_t *, const scan_tuner_config_t * );
-void scan_session_Destroy( scan_t *, scan_session_t * );
-bool scan_session_Push( scan_session_t *p_scan, const uint8_t * );
-void scan_session_SetSNR( scan_session_t *p_scan, int i_snr );
-unsigned scan_session_GetTablesTimeout( const scan_session_t * );
