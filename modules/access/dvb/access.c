@@ -355,11 +355,10 @@ static block_t *BlockScan( access_t *p_access )
             if( i_probe_start == 0 )
                 i_probe_start = mdate();
 
-            const int i_read_once = 1;
-            block_t *p_block = block_Alloc( i_read_once * TS_PACKET_SIZE );
+            block_t *p_block = block_Alloc( DVB_READ_ONCE_SCAN * TS_PACKET_SIZE );
 
             if( ( i_ret = read( p_sys->i_handle, p_block->p_buffer,
-                                i_read_once * TS_PACKET_SIZE ) ) <= 0 )
+                                DVB_READ_ONCE_SCAN * TS_PACKET_SIZE ) ) <= 0 )
             {
                 msg_Warn( p_access, "read failed: %s", vlc_strerror_c(errno) );
                 block_Release( p_block );
