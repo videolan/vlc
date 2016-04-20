@@ -103,7 +103,6 @@ static block_t *BlockScan( access_t * );
 
 #define DVB_SCAN_MAX_SIGNAL_TIME (1000*1000)
 #define DVB_SCAN_MAX_LOCK_TIME (5000*1000)
-#define DVB_SCAN_MAX_PROBE_TIME (45000*1000)
 
 static void FilterUnset( access_t *, int i_max );
 static void FilterSet( access_t *, int i_pid, int i_type );
