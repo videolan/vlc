@@ -816,15 +816,15 @@ void MainInterface::setVideoFullScreen( bool fs )
         }
 
         /* */
-        setMinimalView( true );
+        displayNormalView();
         setInterfaceFullScreen( true );
     }
     else
     {
         /* TODO do we want to restore screen and position ? (when
          * qt-fullscreen-screennumber is forced) */
-        setInterfaceFullScreen( b_interfaceFullScreen );
         setMinimalView( b_minimalView );
+        setInterfaceFullScreen( b_interfaceFullScreen );
 #ifdef _WIN32
         changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 #endif
@@ -976,8 +976,21 @@ void MainInterface::dockPlaylist( bool p_docked )
 }
 
 /*
+ * displayNormalView is the private function used by
+ * the SLOT setVideoFullScreen to restore the menuBar
+ * if minimal view is off
+ */
+void MainInterface::displayNormalView()
+{
+    menuBar()->setVisible( false );
+    controls->setVisible( false );
+    statusBar()->setVisible( false );
+    inputC->setVisible( false );
+}
+
+/*
  * setMinimalView is the private function used by
- * the SLOT toggleMinimalView and setVideoFullScreen
+ * the SLOT toggleMinimalView
  */
 void MainInterface::setMinimalView( bool b_minimal )
 {

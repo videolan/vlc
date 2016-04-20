@@ -123,6 +123,7 @@ private:
     void restoreStackOldWidget();
 
     /* */
+    void displayNormalView();
     void setMinimalView( bool );
     void setInterfaceFullScreen( bool );
     void computeMinimumSize();
