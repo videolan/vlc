@@ -203,6 +203,9 @@ static int OpenDecoder(vlc_object_t *p_this)
 #define G_LITTLE_ENDIAN     1234
 #define G_BIG_ENDIAN        4321
 
+typedef unsigned int uint;
+typedef unsigned short ushort;
+
 LOCAL( unsigned short )
 de_get16( void * ptr, uint endian ) {
     unsigned short val;
