@@ -60,14 +60,6 @@ struct access_sys_t
     demux_handle_t p_demux_handles[MAX_DEMUX];
     frontend_t *p_frontend;
     mtime_t i_frontend_timeout;
-    bool b_budget_mode;
-
-    struct cam *p_cam;
-
-    /* */
-    int i_read_once;
-
-    int i_stat_counter;
 
     /* Scan */
     struct scan_t *scan;

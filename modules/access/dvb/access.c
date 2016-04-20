@@ -96,10 +96,6 @@ static int Control( access_t *, int, va_list );
 
 static block_t *BlockScan( access_t * );
 
-#define DVB_READ_ONCE 20
-#define DVB_READ_ONCE_START 2
-#define DVB_READ_ONCE_SCAN 1
-
 #define DVB_SCAN_MAX_SIGNAL_TIME (1000*1000)
 #define DVB_SCAN_MAX_LOCK_TIME (5000*1000)
 
@@ -159,36 +155,32 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    {
-        scan_parameter_t parameter;
-        scan_t *p_scan;
+    scan_parameter_t parameter;
+    scan_t *p_scan;
 
-        scan_parameter_Init( &parameter );
+    scan_parameter_Init( &parameter );
 
-        parameter.b_use_nit = var_InheritBool( p_access, "dvb-scan-nit" );
+    parameter.b_use_nit = var_InheritBool( p_access, "dvb-scan-nit" );
 
-        msg_Dbg( p_access, "setting filter on PAT/NIT/SDT (DVB only)" );
-        FilterSet( p_access, 0x00, OTHER_TYPE );    // PAT
-        FilterSet( p_access, 0x11, OTHER_TYPE );    // SDT
-        if( parameter.b_use_nit )
-            FilterSet( p_access, 0x10, OTHER_TYPE );    // NIT
+    msg_Dbg( p_access, "setting filter on PAT/NIT/SDT (DVB only)" );
+    FilterSet( p_access, 0x00, OTHER_TYPE );    // PAT
+    FilterSet( p_access, 0x11, OTHER_TYPE );    // SDT
+    if( parameter.b_use_nit )
+        FilterSet( p_access, 0x10, OTHER_TYPE );    // NIT
 
-        if( FrontendFillScanParameter( p_access, &parameter ) ||
+    if( FrontendFillScanParameter( p_access, &parameter ) ||
             (p_scan = scan_New( VLC_OBJECT(p_access), &parameter )) == NULL )
-        {
-            scan_parameter_Clean( &parameter );
-            Close( VLC_OBJECT(p_access) );
-            return VLC_EGENERIC;
-        }
+    {
         scan_parameter_Clean( &parameter );
-        p_sys->scan = p_scan;
-        p_sys->i_read_once = DVB_READ_ONCE_SCAN;
+        Close( VLC_OBJECT(p_access) );
+        return VLC_EGENERIC;
     }
+    scan_parameter_Clean( &parameter );
+    p_sys->scan = p_scan;
+
 
     /* Set up access */
-    p_access->pf_read = NULL;
     p_access->pf_control = Control;
-    p_access->pf_seek = NULL;
     access_InitFields( p_access );
 
     return VLC_SUCCESS;
@@ -455,9 +447,6 @@ static void FilterSet( access_t *p_access, int i_pid, int i_type )
     }
     p_sys->p_demux_handles[i].i_type = i_type;
     p_sys->p_demux_handles[i].i_pid = i_pid;
-
-    if( p_sys->i_read_once < DVB_READ_ONCE )
-        p_sys->i_read_once++;
 }
 
 static void FilterUnset( access_t *p_access, int i_max )
