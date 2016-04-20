@@ -829,6 +829,137 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
 }
 
 
+/**
+ * Create a region with a white transparent picture.
+ */
+static subpicture_region_t *newPaintRegion(int x, int y, int width, int height)
+{
+    video_palette_t palette = {
+        .i_entries = 2,
+        .palette = {
+            [0] = { 0xff, 0x80, 0x80, 0x00 },
+            [1] = { 0xff, 0x80, 0x80, 0xff },
+        },
+    };
+
+    video_format_t fmt;
+    video_format_Init(&fmt, VLC_CODEC_YUVP);
+    fmt.i_width          =
+    fmt.i_visible_width  = width;
+    fmt.i_height         =
+    fmt.i_visible_height = height;
+    fmt.i_sar_num        = 1;
+    fmt.i_sar_den        = 1;
+    fmt.p_palette        = &palette;
+
+    subpicture_region_t *r = subpicture_region_New(&fmt);
+    if (!r)
+        return NULL;
+    r->i_x = x;
+    r->i_y = y;
+    memset(r->p_picture->p->p_pixels, 0, r->p_picture->p->i_pitch * height);
+
+    return r;
+}
+
+/**
+ * Draw a rectangle into a paint region
+ */
+static void DrawRect(subpicture_region_t *r,
+                     int x1, int y1, int x2, int y2)
+{
+    uint8_t *p    = r->p_picture->p->p_pixels;
+    int     pitch = r->p_picture->p->i_pitch;
+
+    for (int y = y1; y <= y2; y++) {
+        p[x1 + pitch * y] = 1;
+        p[x2 + pitch * y] = 1;
+    }
+    for (int x = x1; x <= x2; x++) {
+        p[x + pitch * y1] = 1;
+        p[x + pitch * y2] = 1;
+    }
+}
+
+
+struct polydata {
+	int x;
+	int y;
+	struct polydata *next;
+};
+typedef struct polydata polydata;
+
+// FIXME[question]: is this from us? - not used!
+/*
+static int sign(int x) {
+	return (x > 0) - (x < 0);
+}
+*/
+
+static void DrawPoly(subpicture_region_t *r, polydata *root)
+{
+	uint8_t *pY    = r->p_picture->p[Y_PLANE].p_pixels;
+	int     pitchY = r->p_picture->p[Y_PLANE].i_pitch;
+
+
+	polydata *curr = root;
+	do {
+		// if end of list, set next to root for closed polygon
+		polydata *next = curr->next == NULL ? root : curr->next;
+
+		int x0 = curr->x;
+		int y0 = curr->y;
+		int x1 = next->x;
+		int y1 = next->y;
+
+		// bresenham's line algorithm
+		// from http://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C
+		int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+		int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1;
+		int err = (dx>dy ? dx : -dy)/2, e2;
+
+		for(;;){
+	        pY[x0 + pitchY * y0] = 1;
+			if (x0==x1 && y0==y1) break;
+			e2 = err;
+			if (e2 >-dx) { err -= dy; x0 += sx; }
+			if (e2 < dy) { err += dx; y0 += sy; }
+		}
+
+	} while((curr = curr->next) != NULL);
+
+}
+
+static void DrawCircle(subpicture_region_t *r, int x0, int y0, int diameter)
+{
+	uint8_t *pY    = r->p_picture->p[Y_PLANE].p_pixels;
+	int     pitchY = r->p_picture->p[Y_PLANE].i_pitch;
+
+	// bresenham's circle algorithm
+	// slightly optimized from https://de.wikipedia.org/wiki/Bresenham-Algorithmus#Kreisvariante_des_Algorithmus
+	int x = diameter/2;
+	int y = 0;
+	int err = x;
+	while(y <= x) {
+		pY[(x0 + x) + pitchY * (y0 + y)] = 1;
+		pY[(x0 - x) + pitchY * (y0 + y)] = 1;
+		pY[(x0 + x) + pitchY * (y0 - y)] = 1;
+		pY[(x0 - x) + pitchY * (y0 - y)] = 1;
+		pY[(x0 + y) + pitchY * (y0 + x)] = 1;
+		pY[(x0 - y) + pitchY * (y0 + x)] = 1;
+		pY[(x0 + y) + pitchY * (y0 - x)] = 1;
+		pY[(x0 - y) + pitchY * (y0 - x)] = 1;
+		err -= 2*y;
+		err++;
+		y++;
+		if(err < 0) {
+			err--;
+			err += 2*x;
+			x--;
+		}
+	}
+}
+
 
 static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                                             char *psz_subtitle )
@@ -839,22 +970,17 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
 
     while( *psz_subtitle )
     {
-        if( *psz_subtitle == '<' )
+        // ensure that all elements in subtitle are processed
+        while ( *psz_subtitle == '<')
         {
             char *psz_end = NULL;
-
 
             if(( !strncasecmp( psz_subtitle, "<karaoke ", 9 )) ||
                     ( !strncasecmp( psz_subtitle, "<karaoke>", 9 )))
             {
-                psz_end = strcasestr( psz_subtitle, "</karaoke>" );
+                if ((psz_end = strstr (psz_subtitle,"</karaoke>")) != NULL) {
 
-                if( psz_end )
-                {
                     subpicture_region_t  *p_text_region;
-
-                    psz_end += strcspn( psz_end, ">" ) + 1;
-
                     p_text_region = CreateTextRegion( p_dec,
                                                       psz_subtitle,
                                                       psz_end - psz_subtitle,
@@ -876,7 +1002,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
             {
                 subpicture_region_t *p_image_region = NULL;
 
-                char *psz_end = strcasestr( psz_subtitle, "</image>" );
+                psz_end = strstr (psz_subtitle,"</image>");
                 char *psz_content = strchr( psz_subtitle, '>' );
                 int   i_transparent = -1;
 
@@ -907,7 +1033,6 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                     }
                 }
 
-                if( psz_end ) psz_end += strcspn( psz_end, ">" ) + 1;
 
                 if( p_image_region )
                 {
@@ -925,14 +1050,176 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                     p_region_upto = p_region_upto->p_next;
                 }
             }
-            else
+            //start parsing the polygons
+            else if(( !strncasecmp( psz_subtitle, "<polygon ", 9 )) ||
+                    ( !strncasecmp( psz_subtitle, "<polygon>", 9 )))
+            {
+
+            	// get the end of the current polygon
+                psz_end = strstr (psz_subtitle,"</polygon>");
+
+            	// initialize stuff
+            	polydata *p_root = NULL;
+                polydata **pp_next = &p_root;
+
+            	// starting position of next point
+            	char *psz_point_start, *psz_point_end = NULL;
+
+            	// check if next point is found and in current polygon
+            	for ( psz_point_start = strstr(psz_subtitle, "<point ");
+                      pp_next &&
+                      psz_point_start && psz_point_start < psz_end ;
+                      psz_point_start = psz_point_end
+                        ? strstr(psz_point_end, "<point ") : NULL )
+                {
+            		// read attributes of points
+            		char *psz_point_x = GrabAttributeValue("posx", psz_point_start);
+            		char *psz_point_y = GrabAttributeValue("posy", psz_point_start);
+
+            		if ( psz_point_x && psz_point_y &&
+                         ((*pp_next = calloc(1,sizeof(polydata))) != NULL) )
+                    {
+                        (*pp_next)->x = (int)(strtol(psz_point_x, NULL, 10));
+                        (*pp_next)->y = (int)(strtol(psz_point_y, NULL, 10));
+                        pp_next = &((*pp_next)->next);
+                    }
+                    else
+                    {
+                        pp_next = NULL;
+            		}
+
+                    if (psz_point_x) free(psz_point_x);
+                    if (psz_point_y) free(psz_point_y);
+
+            		// get end of point and continue the search from there on
+            		psz_point_end = strstr(psz_point_start, "/>") + 2;
+            	}
+
+                if ( pp_next )
+                {
+                    // create and draw picture region
+                    subpicture_region_t *p_paint_region;
+                    int video_width = p_sys->i_original_width;
+                    int video_height = p_sys->i_original_height;
+                    p_paint_region = newPaintRegion(0,0,video_width + 1,video_height + 1);
+                    DrawPoly(p_paint_region, p_root);
+
+                    // save picture region in list
+                    if( !p_region_first )
+                    {
+                        p_region_first = p_region_upto = p_paint_region;
+                    }
+                    else if( p_paint_region )
+                    {
+                        p_region_upto->p_next = p_paint_region;
+                        p_region_upto = p_region_upto->p_next;
+                    }
+                }
+
+            	// free linked list
+            	while( p_root )
+                {
+            		polydata *p_tmp = p_root;
+                    p_root = p_root->next;
+            		free(p_tmp);
+            	}
+            }
+
+            //start parsing the rectangles
+			else if ( !strncasecmp( psz_subtitle, "<rectangle ", 11 ))
+			{
+				// get the end of the rectangle
+                psz_end = strstr (psz_subtitle,"/>");
+
+				// read attributes of rectangle
+				char *psz_rec_x = GrabAttributeValue("posx", psz_subtitle);
+				char *psz_rec_y = GrabAttributeValue("posy", psz_subtitle);
+				char *psz_rec_width = GrabAttributeValue("width", psz_subtitle);
+				char *psz_rec_height = GrabAttributeValue("height", psz_subtitle);
+
+				if ( psz_rec_x && psz_rec_y &&
+                     psz_rec_width && psz_rec_height )
+                {
+					// create and draw picture region
+					subpicture_region_t *p_paint_region;
+					int video_width = p_sys->i_original_width;
+					int video_height = p_sys->i_original_height;
+					p_paint_region = newPaintRegion(0,0,video_width + 1,video_height + 1);
+
+					// convert to int
+					int x = (int)(strtol(psz_rec_x, NULL, 10));
+					int y = (int)(strtol(psz_rec_y, NULL, 10));
+					int w = (int)(strtol(psz_rec_width, NULL, 10));
+					int h = (int)(strtol(psz_rec_height, NULL, 10));
+
+					DrawRect(p_paint_region,x,y,x+w,y+h);
+
+					// save picture region in list
+					if( !p_region_first )
+					{
+						p_region_first = p_region_upto = p_paint_region;
+					}
+					else if( p_paint_region )
+					{
+						p_region_upto->p_next = p_paint_region;
+						p_region_upto = p_region_upto->p_next;
+					}
+				}
+                if (psz_rec_x) free(psz_rec_x);
+                if (psz_rec_y) free(psz_rec_y);
+                if (psz_rec_width) free(psz_rec_width);
+                if (psz_rec_height) free(psz_rec_height);
+			}
+
+            // start parsing the points
+			else if ( !strncasecmp( psz_subtitle, "<point ", 7 ) )
+			{
+				// get the end of the point
+                psz_end = strstr (psz_subtitle,"/>");
+
+				// read attributes of point
+				char *psz_point_x = GrabAttributeValue("posx", psz_subtitle);
+				char *psz_point_y = GrabAttributeValue("posy", psz_subtitle);
+				char *psz_point_d = GrabAttributeValue("diameter", psz_subtitle);
+
+				if ( psz_point_x && psz_point_y && psz_point_d )
+                {
+
+					// create and draw picture region
+					subpicture_region_t *p_paint_region;
+					int video_width = p_sys->i_original_width;
+					int video_height = p_sys->i_original_height;
+					p_paint_region = newPaintRegion(0,0,video_width + 1,video_height + 1);
+
+					// convert to int
+					int x = (int)(strtol(psz_point_x, NULL, 10));
+					int y = (int)(strtol(psz_point_y, NULL, 10));
+					int d = (int)(strtol(psz_point_d, NULL, 10));
+
+					DrawCircle(p_paint_region,x,y,d);
+
+					// save picture region in list
+					if( !p_region_first )
+					{
+						p_region_first = p_region_upto = p_paint_region;
+					}
+					else if( p_paint_region )
+					{
+						p_region_upto->p_next = p_paint_region;
+						p_region_upto = p_region_upto->p_next;
+					}
+				}
+                if (psz_point_x) free(psz_point_x);
+                if (psz_point_y) free(psz_point_y);
+                if (psz_point_d) free(psz_point_d);
+			}
+
+            else if(( !strncasecmp( psz_subtitle, "<text ", 6 )) ||
+                    ( !strncasecmp( psz_subtitle, "<text>", 6 )))
             {
                 subpicture_region_t  *p_text_region;
 
-                if( psz_end )
-                    psz_end += strcspn( psz_end, ">" ) + 1;
-                else
-                    psz_end = psz_subtitle + strlen( psz_subtitle );
+                psz_end = strstr (psz_subtitle,"</text>");
 
                 p_text_region = CreateTextRegion( p_dec,
                                                   psz_subtitle,
@@ -954,14 +1241,26 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                     p_region_upto->p_next = p_text_region;
                     p_region_upto = p_region_upto->p_next;
                 }
-            }
-            if( psz_end )
-                psz_subtitle = psz_end - 1;
 
-            psz_subtitle += strcspn( psz_subtitle, ">" );
+			}
+            else
+            {
+            	msg_Warn( p_dec, "Unknown subtitle line: %s", psz_subtitle );
+            	psz_subtitle ++;
+            }
+
+            if ( psz_end )
+            {
+                psz_subtitle = psz_end + strcspn( psz_end, ">" )+1;
+            }
+            if ((unsigned)strlen(psz_subtitle)<=10)
+	    {
+		break;
+	    }
+
         }
 
-        psz_subtitle++;
+        if (*psz_subtitle) psz_subtitle++;
     }
 
     return p_region_first;
