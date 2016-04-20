@@ -573,7 +573,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     }
 
     jpeg_create_compress(&p_sys->p_jpeg);
-    jpeg_mem_dest(&p_sys->p_jpeg, &p_block->p_buffer, &p_block->i_buffer);
+    jpeg_mem_dest(&p_sys->p_jpeg, &p_block->p_buffer, (long unsigned int *)&p_block->i_buffer);
 
     p_sys->p_jpeg.image_width = p_enc->fmt_in.video.i_visible_width;
     p_sys->p_jpeg.image_height = p_enc->fmt_in.video.i_visible_height;
