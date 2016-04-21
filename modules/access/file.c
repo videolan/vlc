@@ -249,7 +249,7 @@ int FileOpen( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-    close (fd);
+    vlc_close (fd);
     return VLC_EGENERIC;
 }
 
@@ -268,7 +268,7 @@ void FileClose (vlc_object_t * p_this)
 
     access_sys_t *p_sys = p_access->p_sys;
 
-    close (p_sys->fd);
+    vlc_close (p_sys->fd);
     free (p_sys);
 }
 

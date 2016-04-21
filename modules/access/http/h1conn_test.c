@@ -76,7 +76,7 @@ static void conn_destroy(void)
 {
     conn_shutdown(SHUT_WR);
     vlc_http_conn_release(conn);
-    close(external_fd);
+    vlc_close(external_fd);
 }
 
 static struct vlc_http_stream *stream_open(void)

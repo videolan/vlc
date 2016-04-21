@@ -28,6 +28,7 @@
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
+#include <vlc_fs.h>
 
 #include <errno.h>
 #include <time.h>
@@ -2625,6 +2626,6 @@ void en50221_End( cam_t * p_cam )
         }
     }
 
-    close( p_cam->fd );
+    vlc_close( p_cam->fd );
     free( p_cam );
 }

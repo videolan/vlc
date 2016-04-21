@@ -543,13 +543,13 @@ static int ExecuteLoad( vlm_t *p_vlm, const char *psz_path, vlm_message_t **pp_s
      || read( fd, psz_buffer, st.st_size ) < (ssize_t)st.st_size )
     {
         free( psz_buffer );
-        close( fd );
+        vlc_close( fd );
 
         *pp_status = vlm_MessageNew( "load", "Read file error" );
         return VLC_EGENERIC;
     }
 
-    close( fd );
+    vlc_close( fd );
 
     psz_buffer[st.st_size] = '\0';
 

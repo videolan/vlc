@@ -334,7 +334,7 @@ static int Open( vlc_object_t *p_this )
     if (fstat (fd, &st))
     {
         msg_Err (p_access, "write error: %s", vlc_strerror_c(errno));
-        close (fd);
+        vlc_close (fd);
         return VLC_EGENERIC;
     }
 
@@ -374,7 +374,7 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
 
-    close( (intptr_t)p_access->p_sys );
+    vlc_close( (intptr_t)p_access->p_sys );
 
     msg_Dbg( p_access, "file access output closed" );
 }

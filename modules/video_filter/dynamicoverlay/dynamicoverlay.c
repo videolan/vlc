@@ -217,7 +217,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             {
                 msg_Warn( p_filter, "Error on input file: %s",
                           vlc_strerror_c(errno) );
-                close( p_sys->i_inputfd );
+                vlc_close( p_sys->i_inputfd );
                 p_sys->i_inputfd = -1;
             }
         }
@@ -324,7 +324,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             {
                 msg_Warn( p_filter, "Error on output file: %s",
                           vlc_strerror_c(errno) );
-                close( p_sys->i_outputfd );
+                vlc_close( p_sys->i_outputfd );
                 p_sys->i_outputfd = -1;
             }
         }

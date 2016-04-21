@@ -1110,7 +1110,7 @@ static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_
     p_storage->p_filew = fdopen( fd, "w+b" );
     if( p_storage->p_filew == NULL )
     {
-        close( fd );
+        vlc_close( fd );
         vlc_unlink( psz_file );
         goto error;
     }

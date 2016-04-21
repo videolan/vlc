@@ -215,7 +215,7 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
        {
            msg_Err (obj, "cannot access demultiplexer: %s",
                     vlc_strerror_c(errno));
-           close (d->dir);
+           vlc_close (d->dir);
            free (d);
            return NULL;
        }
@@ -249,7 +249,7 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
         if (d->demux == -1)
         {
             msg_Err (obj, "cannot access DVR: %s", vlc_strerror_c(errno));
-            close (d->dir);
+            vlc_close (d->dir);
             free (d);
             return NULL;
         }
@@ -261,7 +261,7 @@ dvb_device_t *dvb_open (vlc_object_t *obj)
     {
         d->cam = en50221_Init (obj, ca);
         if (d->cam == NULL)
-            close (ca);
+            vlc_close (ca);
     }
     else
         msg_Dbg (obj, "conditional access module not available: %s",
@@ -280,15 +280,15 @@ void dvb_close (dvb_device_t *d)
     {
         for (size_t i = 0; i < MAX_PIDS; i++)
             if (d->pids[i].fd != -1)
-                close (d->pids[i].fd);
+                vlc_close (d->pids[i].fd);
     }
 #endif
     if (d->cam != NULL)
         en50221_End (d->cam);
     if (d->frontend != -1)
-        close (d->frontend);
-    close (d->demux);
-    close (d->dir);
+        vlc_close (d->frontend);
+    vlc_close (d->demux);
+    vlc_close (d->dir);
     free (d);
 }
 
@@ -406,7 +406,7 @@ int dvb_add_pid (dvb_device_t *d, uint16_t pid)
         param.flags = DMX_IMMEDIATE_START;
         if (ioctl (fd, DMX_SET_PES_FILTER, &param) < 0)
         {
-            close (fd);
+            vlc_close (fd);
             goto error;
         }
         d->pids[i].fd = fd;
@@ -433,7 +433,7 @@ void dvb_remove_pid (dvb_device_t *d, uint16_t pid)
     {
         if (d->pids[i].pid == pid)
         {
-            close (d->pids[i].fd);
+            vlc_close (d->pids[i].fd);
             d->pids[i].pid = d->pids[i].fd = -1;
             return;
         }

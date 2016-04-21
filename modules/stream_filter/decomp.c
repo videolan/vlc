@@ -178,7 +178,7 @@ static void *Thread (void *data)
     msg_Dbg (stream, "compressed stream at EOF");
     /* Let child process know about EOF */
     p_sys->write_fd = -1;
-    close (fd);
+    vlc_close (fd);
     return NULL;
 }
 
@@ -327,13 +327,13 @@ static int Open (stream_t *stream, const char *path)
                         ret = VLC_SUCCESS;
             }
 #endif /* _POSIX_SPAWN < 0 */
-            close (uncomp[1]);
+            vlc_close (uncomp[1]);
             if (ret != VLC_SUCCESS)
-                close (uncomp[0]);
+                vlc_close (uncomp[0]);
         }
-        close (comp[0]);
+        vlc_close (comp[0]);
         if (ret != VLC_SUCCESS)
-            close (comp[1]);
+            vlc_close (comp[1]);
     }
 
     if (ret != VLC_SUCCESS)
@@ -363,11 +363,11 @@ static void Close (vlc_object_t *obj)
     int status;
 
     vlc_cancel (p_sys->thread);
-    close (p_sys->read_fd);
+    vlc_close (p_sys->read_fd);
     vlc_join (p_sys->thread, NULL);
     if (p_sys->write_fd != -1)
         /* Killed before EOF? */
-        close (p_sys->write_fd);
+        vlc_close (p_sys->write_fd);
 
     msg_Dbg (obj, "waiting for PID %u", (unsigned)p_sys->pid);
     while (waitpid (p_sys->pid, &status, 0) == -1);

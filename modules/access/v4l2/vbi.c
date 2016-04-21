@@ -72,7 +72,7 @@ vlc_v4l2_vbi_t *OpenVBI (demux_t *demux, const char *psz_device)
     {
         msg_Err (demux, "cannot capture VBI data: %s", errstr);
         free (errstr);
-        close (rawfd);
+        vlc_close (rawfd);
         goto err;
     }
 
@@ -155,7 +155,7 @@ void GrabVBI (demux_t *p_demux, vlc_v4l2_vbi_t *vbi)
 
 void CloseVBI (vlc_v4l2_vbi_t *vbi)
 {
-    close (vbi_capture_fd (vbi->cap));
+    vlc_close (vbi_capture_fd (vbi->cap));
     vbi_capture_delete (vbi->cap);
     free (vbi);
 }

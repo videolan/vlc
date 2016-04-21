@@ -215,7 +215,7 @@ static void Close( vlc_object_t * p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_sys->fd != -1 )
-        close( p_sys->fd );
+        vlc_close( p_sys->fd );
     ARRAY_RESET( p_sys->file_sizes );
 
     if( p_sys->p_meta )
@@ -504,7 +504,7 @@ static bool SwitchFile( access_t *p_access, unsigned i_file )
     /* close old file */
     if( p_sys->fd != -1 )
     {
-        close( p_sys->fd );
+        vlc_close( p_sys->fd );
         p_sys->fd = -1;
     }
 
@@ -545,7 +545,7 @@ error:
         " open the file \"%s\" (%s)."), psz_path, vlc_strerror(errno) );
     if( p_sys->fd != -1 )
     {
-        close( p_sys->fd );
+        vlc_close( p_sys->fd );
         p_sys->fd = -1;
     }
     free( psz_path );

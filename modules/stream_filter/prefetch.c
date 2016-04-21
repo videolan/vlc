@@ -499,10 +499,10 @@ static int Open(vlc_object_t *obj)
      || mmap(sys->buffer + sys->buffer_size, sys->buffer_size,
              PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, fd, 0) == MAP_FAILED)
     {
-        close(fd);
+        vlc_close(fd);
         goto error;
     }
-    close(fd);
+    vlc_close(fd);
 #elif defined(__OS2__)
     /* On OS/2 Warp, page size is 4K, but the smallest chunk size is 64K */
     int page_size = 64 * 1024;

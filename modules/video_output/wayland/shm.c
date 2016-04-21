@@ -124,7 +124,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     if (ftruncate(fd, length))
     {
         msg_Err(vd, "cannot allocate buffers: %s", vlc_strerror_c(errno));
-        close(fd);
+        vlc_close(fd);
         return NULL;
     }
 
@@ -132,7 +132,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     if (base == MAP_FAILED)
     {
         msg_Err(vd, "cannot map buffers: %s", vlc_strerror_c(errno));
-        close(fd);
+        vlc_close(fd);
         return NULL;
     }
 #ifndef NDEBUG
@@ -140,7 +140,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
 #endif
 
     struct wl_shm_pool *shm_pool = wl_shm_create_pool(sys->shm, fd, length);
-    close(fd);
+    vlc_close(fd);
     if (shm_pool == NULL)
     {
         munmap(base, length);

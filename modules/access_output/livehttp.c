@@ -355,7 +355,7 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
 
     ssize_t keylen = read( keyfd, key, 16 );
 
-    close( keyfd );
+    vlc_close( keyfd );
     if( keylen < 16 )
     {
         msg_Err( p_access, "No key at least 16 octects (you provided %zd), no encryption", keylen );
@@ -732,7 +732,7 @@ static void closeCurrentSegment( sout_access_out_t *p_access, sout_access_out_sy
         }
 
 
-        close( p_sys->i_handle );
+        vlc_close( p_sys->i_handle );
         p_sys->i_handle = -1;
 
         if( ! ( us_asprintf( &segment->psz_duration, "%.2f", p_sys->f_seglen ) ) )

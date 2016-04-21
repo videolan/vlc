@@ -93,7 +93,7 @@ FILE *vlc_fopen (const char *filename, const char *mode)
 
     FILE *stream = fdopen (fd, mode);
     if (stream == NULL)
-        close (fd);
+        vlc_close (fd);
 
     return stream;
 }

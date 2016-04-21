@@ -31,6 +31,7 @@
 #include <vlc_keystore.h>
 #include <vlc_dialog.h>
 #include <vlc_url.h>
+#include <vlc_fs.h>
 
 #undef NDEBUG
 #include <assert.h>
@@ -330,7 +331,7 @@ main(void)
     }
 
     libvlc_release(p_libvlc);
-    close(i_tmp_fd);
+    vlc_close(i_tmp_fd);
 
     return 0;
 }

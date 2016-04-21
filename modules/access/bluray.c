@@ -610,7 +610,7 @@ static int probeFile(const char *psz_name)
     ret = VLC_SUCCESS;
 
 bailout:
-    close(fd);
+    vlc_close(fd);
     return ret;
 }
 

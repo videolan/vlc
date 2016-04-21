@@ -442,6 +442,7 @@ us_atof
 us_strtod
 us_strtof
 us_vasprintf
+vlc_close
 vlc_fopen
 utf8_fprintf
 vlc_loaddir

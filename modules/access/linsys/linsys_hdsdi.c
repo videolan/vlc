@@ -253,7 +253,7 @@ static int Open( vlc_object_t *p_this )
 
     if( pthread_create( &p_sys->thread, NULL, Demux, p_demux ) )
     {
-        close( p_sys->evfd );
+        vlc_close( p_sys->evfd );
         goto error;
     }
 
@@ -275,7 +275,7 @@ static void Close( vlc_object_t *p_this )
 
     write( p_sys->evfd, &(uint64_t){ 1 }, sizeof (uint64_t));
     pthread_join( p_sys->thread, NULL );
-    close( p_sys->evfd );
+    vlc_close( p_sys->evfd );
     free( p_sys );
 }
 
@@ -667,7 +667,7 @@ static ssize_t WriteULSysfs( const char *psz_fmt, unsigned int i_link,
         return i_fd;
 
     i_ret = write( i_fd, psz_data, strlen(psz_data) + 1 );
-    close( i_fd );
+    vlc_close( i_fd );
     return i_ret;
 }
 
@@ -727,7 +727,7 @@ static int InitCapture( demux_t *p_demux )
 
         if( pfd[1].revents )
         {
-            close( p_sys->i_vfd );
+            vlc_close( p_sys->i_vfd );
             return VLC_EGENERIC;
         }
     }
@@ -737,10 +737,10 @@ static int InitCapture( demux_t *p_demux )
     {
         msg_Warn( p_demux, "couldn't SDIVIDEO_IOC_RXGETVIDSTATUS: %s",
                   vlc_strerror_c(errno) );
-        close( p_sys->i_vfd );
+        vlc_close( p_sys->i_vfd );
         return VLC_EGENERIC;
     }
-    close( p_sys->i_vfd );
+    vlc_close( p_sys->i_vfd );
 
     if ( InitVideo( p_demux ) != VLC_SUCCESS )
         return VLC_EGENERIC;
@@ -789,7 +789,7 @@ static int InitCapture( demux_t *p_demux )
             msg_Err( p_demux, "unknown sample rate %u", i_rate );
             return VLC_EGENERIC;
         }
-        close( p_sys->i_afd );
+        vlc_close( p_sys->i_afd );
 
         if ( InitAudio( p_demux ) != VLC_SUCCESS )
             return VLC_EGENERIC;
@@ -925,7 +925,7 @@ static void CloseCapture( demux_t *p_demux )
         munmap( p_sys->pp_vbuffers[i], p_sys->i_vbuffer_size );
     free( p_sys->pp_vbuffers );
 #endif
-    close( p_sys->i_vfd );
+    vlc_close( p_sys->i_vfd );
     if ( p_sys->i_max_channel != -1 )
     {
 #ifdef HAVE_MMAP_SDIAUDIO
@@ -933,7 +933,7 @@ static void CloseCapture( demux_t *p_demux )
             munmap( p_sys->pp_abuffers[i], p_sys->i_abuffer_size );
         free( p_sys->pp_abuffers );
 #endif
-        close( p_sys->i_afd );
+        vlc_close( p_sys->i_afd );
     }
 }
 

@@ -204,7 +204,7 @@ static void Delete( vlc_va_t *va, AVCodecContext *avctx )
     XCloseDisplay( sys->p_display_x11 );
 #endif
 #ifdef VLC_VA_BACKEND_DRM
-    close( sys->drm_fd );
+    vlc_close( sys->drm_fd );
 #endif
     free( sys );
 }
@@ -478,7 +478,7 @@ error:
 #endif
 #ifdef VLC_VA_BACKEND_DRM
     if( sys->drm_fd != -1 )
-        close( sys->drm_fd );
+        vlc_close( sys->drm_fd );
 #endif
     free( sys );
     return VLC_EGENERIC;

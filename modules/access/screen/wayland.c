@@ -219,7 +219,7 @@ static block_t *Shoot(demux_t *demux)
     }
 
 out:
-    close(fd);
+    vlc_close(fd);
     return block;
 }
 

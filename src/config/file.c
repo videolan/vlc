@@ -397,7 +397,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
         msg_Err (p_this, "cannot create configuration file: %s",
                  vlc_strerror_c(errno));
         vlc_rwlock_unlock (&config_lock);
-        close (fd);
+        vlc_close (fd);
         vlc_mutex_unlock (&lock);
         goto error;
     }

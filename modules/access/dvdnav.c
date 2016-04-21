@@ -1608,6 +1608,6 @@ static int ProbeDVD( const char *psz_name )
      && GetWLE( &anchor ) == 2 )
         ret = VLC_SUCCESS; /* Found a potential anchor */
 bailout:
-    close( fd );
+    vlc_close( fd );
     return ret;
 }

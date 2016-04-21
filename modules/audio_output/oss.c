@@ -237,7 +237,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->format = *fmt;
     return VLC_SUCCESS;
 error:
-    close (fd);
+    vlc_close (fd);
     return VLC_EGENERIC;
 }
 
@@ -313,7 +313,7 @@ static void Stop (audio_output_t *aout)
     int fd = sys->fd;
 
     ioctl (fd, SNDCTL_DSP_HALT, NULL);
-    close (fd);
+    vlc_close (fd);
     sys->fd = -1;
 }
 
@@ -356,7 +356,7 @@ static int DevicesEnum (audio_output_t *aout)
         n++;
     }
 out:
-    close (fd);
+    vlc_close (fd);
     return n;
 }
 

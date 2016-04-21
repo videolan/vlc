@@ -132,7 +132,7 @@ static int securepair(vlc_thread_t *th, vlc_tls_t **restrict client,
                                           alpnv[1], alp);
     if (*client == NULL)
     {
-        val = close(insecurev[1]);
+        val = vlc_close(insecurev[1]);
         assert(val == 0);
         vlc_join(*th, NULL);
         return -1;

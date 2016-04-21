@@ -110,7 +110,7 @@ int FrontendOpen( access_t *p_access )
 
         if( FrontendInfo( p_access ) < 0 )
         {
-            close( p_sys->i_frontend_handle );
+            vlc_close( p_sys->i_frontend_handle );
             free( p_frontend );
             return VLC_EGENERIC;
         }
@@ -165,7 +165,7 @@ int FrontendOpen( access_t *p_access )
         {
             msg_Err( p_access, "requested type %s not supported by %s tuner",
                      psz_expected, psz_real );
-            close( p_sys->i_frontend_handle );
+            vlc_close( p_sys->i_frontend_handle );
             free( p_frontend );
             return VLC_EGENERIC;
         }
@@ -202,7 +202,7 @@ void FrontendClose( access_t *p_access )
 
     if( p_sys->p_frontend )
     {
-        close( p_sys->i_frontend_handle );
+        vlc_close( p_sys->i_frontend_handle );
         free( p_sys->p_frontend );
 
         p_sys->p_frontend = NULL;
@@ -1216,7 +1216,7 @@ int DMXUnsetFilter( access_t * p_access, int i_fd )
     }
 
     msg_Dbg( p_access, "DMXUnsetFilter: closing demux %d", i_fd );
-    close( i_fd );
+    vlc_close( i_fd );
     return VLC_SUCCESS;
 }
 
@@ -1268,5 +1268,5 @@ void DVRClose( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    close( p_sys->i_handle );
+    vlc_close( p_sys->i_handle );
 }

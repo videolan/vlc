@@ -341,7 +341,7 @@ static void DemuxFile (void *data)
 
 static void CloseFile (demux_sys_t *sys)
 {
-    close (sys->fd);
+    vlc_close (sys->fd);
 }
 
 #ifdef HAVE_SYS_SHM_H

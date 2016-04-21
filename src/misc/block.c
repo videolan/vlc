@@ -488,6 +488,6 @@ block_t *block_FilePath (const char *path)
         return NULL;
 
     block_t *block = block_File (fd);
-    close (fd);
+    vlc_close (fd);
     return block;
 }

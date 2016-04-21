@@ -192,7 +192,8 @@ static void DemuxClose( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys   = p_demux->p_sys;
 
-    if( p_sys->i_fd >= 0 ) close( p_sys->i_fd );
+    if( p_sys->i_fd >= 0 )
+        vlc_close( p_sys->i_fd );
 
     if( p_sys->p_block ) block_Release( p_sys->p_block );
     free( p_sys );
@@ -376,7 +377,8 @@ static int OpenAudioDevOss( demux_t *p_demux )
 
  adev_fail:
 
-    if( i_fd >= 0 ) close( i_fd );
+    if( i_fd >= 0 )
+        vlc_close( i_fd );
     return -1;
 }
 
@@ -432,11 +434,13 @@ static bool ProbeAudioDevOss( demux_t *p_demux, const char *psz_device )
         goto open_failed;
     }
 
-    if( i_fd >= 0 ) close( i_fd );
+    if( i_fd >= 0 )
+        vlc_close( i_fd );
 
     return true;
 
 open_failed:
-    if( i_fd >= 0 ) close( i_fd );
+    if( i_fd >= 0 )
+        vöc_close( i_fd );
     return false;
 }

@@ -29,6 +29,7 @@
 #include <fcntl.h>
 
 #include <vlc_threads.h>
+#include <vlc_fs.h>
 
 static void media_parse_ended(const libvlc_event_t *event, void *user_data)
 {
@@ -217,7 +218,7 @@ static void test_media_subitems(int argc, const char** argv)
     assert (media != NULL);
     test_media_subitems_media (media, true, true);
     libvlc_media_release (media);
-    close (fd);
+    vlc_close (fd);
 #else
 #warning not testing subitems list via a fd location
 #endif

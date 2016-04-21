@@ -516,7 +516,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
     /* Get framebuffer device information */
     if (ioctl(sys->fd, FBIOGET_VSCREENINFO, &sys->var_info)) {
         msg_Err(vd, "cannot get fb info (%s)", vlc_strerror_c(errno));
-        close(sys->fd);
+        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
     sys->old_info = sys->var_info;
@@ -535,7 +535,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
 
     if (ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->var_info)) {
         msg_Err(vd, "cannot set fb info (%s)", vlc_strerror_c(errno));
-        close(sys->fd);
+        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
 
@@ -549,7 +549,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         /* Restore fb config */
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
 
-        close(sys->fd);
+        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
 
@@ -584,7 +584,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
             /* Restore fb config */
             ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
 
-            close(sys->fd);
+            vlc_close(sys->fd);
             return VLC_ENOMEM;
         }
         sys->fb_cmap.start = 0;
@@ -620,7 +620,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         /* Restore fb config */
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
 
-        close(sys->fd);
+        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
 
@@ -641,7 +641,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         /* Restore fb config */
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
 
-        close(sys->fd);
+        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
 
@@ -678,7 +678,7 @@ static void CloseDisplay(vout_display_t *vd)
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
 
         /* Close fb */
-        close(sys->fd);
+        vlc_close(sys->fd);
     }
 }
 

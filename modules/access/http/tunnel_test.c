@@ -98,7 +98,7 @@ static void *proxy_thread(void *data)
 
         int canc = vlc_savecancel();
         proxy_client_process(cfd);
-        close(cfd);
+        vlc_close(cfd);
         connection_count++;
         vlc_restorecancel(canc);
     }
@@ -123,7 +123,7 @@ static int server_socket(unsigned *port)
     if (bind(fd, (struct sockaddr *)&addr, addrlen)
      || getsockname(fd, (struct sockaddr *)&addr, &addrlen))
     {
-        close(fd);
+        vlc_close(fd);
         return -1;
     }
 
@@ -157,7 +157,7 @@ int main(void)
 
     if (listen(lfd, 255))
     {
-        close(lfd);
+        vlc_close(lfd);
         return 77;
     }
 
@@ -173,5 +173,5 @@ int main(void)
     vlc_join(th, NULL);
     assert(connection_count > 0);
     free(url);
-    close(lfd);
+    vlc_close(lfd);
 }

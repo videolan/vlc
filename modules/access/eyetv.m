@@ -180,7 +180,7 @@ static int Open(vlc_object_t *p_this)
 
     if (bind(publicSock, (struct sockaddr *)&publicAddr, sizeof(struct sockaddr_un)) == -1) {
         msg_Err(p_access, "bind local socket failed (errno=%d)", errno);
-        close(publicSock);
+        vlc_close(publicSock);
         free(p_sys);
         return VLC_EGENERIC;
     }
@@ -188,7 +188,7 @@ static int Open(vlc_object_t *p_this)
     /* we are not expecting more than one connection */
     if (listen(publicSock, 1) == -1) {
         msg_Err(p_access, "cannot accept connection (errno=%d)", errno);
-        close(publicSock);
+        vlc_close(publicSock);
         free(p_sys);
         return VLC_EGENERIC;
     } else {
@@ -207,7 +207,7 @@ static int Open(vlc_object_t *p_this)
         peerSock = accept(publicSock, (struct sockaddr *)&peerAddr, &peerSockLen);
         if (peerSock == -1) {
             msg_Err(p_access, "cannot wait for connection (errno=%d)", errno);
-            close(publicSock);
+            vlc_close(publicSock);
             free(p_sys);
             return VLC_EGENERIC;
         }
@@ -217,7 +217,7 @@ static int Open(vlc_object_t *p_this)
         p_sys->eyetvSock = peerSock;
 
         /* remove public access */
-        close(publicSock);
+        vlc_close(publicSock);
         unlink(publicAddr.sun_path);
     }
     return VLC_SUCCESS;
@@ -241,7 +241,7 @@ static void Close(vlc_object_t *p_this)
                                           TRUE);
     msg_Dbg(p_access, "plugin notified");
 
-    close(p_sys->eyetvSock);
+    vlc_close(p_sys->eyetvSock);
     msg_Dbg(p_access, "msg port closed and freed");
 
     free(p_sys);

@@ -140,7 +140,9 @@ VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const char *psz_fmt,
 #  define SHUT_WR    1
 #  define SHUT_RDWR  2
 # endif
-# define net_Close( fd ) (void)close (fd)
+
+VLC_API int vlc_close(int);
+# define net_Close( fd ) (void)vlc_close (fd)
 #endif
 
 /* Portable network names/addresses resolution layer */

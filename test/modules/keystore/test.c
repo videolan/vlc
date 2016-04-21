@@ -29,6 +29,7 @@
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_interrupt.h>
+#include <vlc_fs.h>
 #include <vlc_keystore.h>
 
 #undef NDEBUG
@@ -335,7 +336,7 @@ main(int i_argc, char *ppsz_argv[])
 
             if (i_tmp_fd != -1)
             {
-                close(i_tmp_fd);
+                vlc_close(i_tmp_fd);
                 unlink(psz_tmp_path);
             }
             free(ppsz_vlc_argv[0]);

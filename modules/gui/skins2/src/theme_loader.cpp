@@ -529,7 +529,7 @@ int tar_open( TAR **t, char *pathname, int oflags )
     if( f == NULL )
     {
         fprintf( stderr, "Couldn't gzopen %s\n", pathname );
-        close( fd );
+        vlc_close( fd );
         return -1;
     }
 
@@ -775,7 +775,7 @@ int gzopen_frontend( const char *pathname, int oflags, int mode )
     if( !gzf )
     {
         errno = ENOMEM;
-        close( fd );
+        vlc_close( fd );
         return -1;
     }
 
