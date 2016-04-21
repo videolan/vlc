@@ -184,7 +184,8 @@ static int OpenDecoder(vlc_object_t *p_this)
 /*
  * The following two functions are used to return 16 and 32 bit values from
  * the EXIF tag structure. That structure is borrowed from TIFF files and may be
- * in big endian or little endian format. The endian parameter tells us which.
+ * in big endian or little endian format. The boolean b_bigEndian parameter
+ * is TRUE if the EXIF data is in big endian format, and FALSE for little endian
  * Case Little Endian EXIF tag / Little Endian machine
  *   - just memcpy the tag structure into the value to return
  * Case Little Endian EXIF tag / Big Endian machine
