@@ -38,6 +38,7 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
+#include <vlc_fs.h>
 #include <vlc_plugin.h>
 
 struct demux_sys_t
@@ -171,14 +172,12 @@ static block_t *Shoot(demux_t *demux)
 {
     demux_sys_t *sys = demux->p_sys;
 
-    char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
-    int fd = mkostemp(bufpath, O_CLOEXEC);
+    int fd = vlc_memfd();
     if (fd == -1)
     {
         msg_Err(demux, "buffer creation error: %s", vlc_strerror_c(errno));
         return NULL;
     }
-    unlink(bufpath);
 
     /* NOTE: one extra line for overflow if screen-left > 0 */
     uint32_t pitch = 4u * sys->width;
