@@ -319,7 +319,7 @@ main(int i_argc, char *ppsz_argv[])
 
             if (strcmp(psz_module, "file") == 0)
             {
-                assert((i_tmp_fd = mkstemp(psz_tmp_path)) != -1);
+                assert((i_tmp_fd = vlc_mkstemp(psz_tmp_path)) != -1);
                 printf("plaintext tmp file: '%s'\n", psz_tmp_path);
                 assert(asprintf(&ppsz_vlc_argv[1],
                        "--keystore-file=%s", psz_tmp_path) != -1);

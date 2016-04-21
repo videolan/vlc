@@ -306,7 +306,7 @@ main(void)
     printf("creating tmp plaintext keystore file\n");
     char psz_tmp_path[] = "/tmp/libvlc_XXXXXX";
     int i_tmp_fd = -1;
-    i_tmp_fd = mkstemp(psz_tmp_path);
+    i_tmp_fd = vlc_mkstemp(psz_tmp_path);
     assert(i_tmp_fd != -1);
 
     int i_vlc_argc = 4;
