@@ -565,6 +565,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     }
 
     JSAMPIMAGE p_row_pointers = NULL;
+    unsigned long size = p_block->i_buffer;
 
     /* libjpeg longjmp's there in case of error */
     if (setjmp(p_sys->setjmp_buffer))
@@ -573,7 +574,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     }
 
     jpeg_create_compress(&p_sys->p_jpeg);
-    jpeg_mem_dest(&p_sys->p_jpeg, &p_block->p_buffer, (long unsigned int *)&p_block->i_buffer);
+    jpeg_mem_dest(&p_sys->p_jpeg, &p_block->p_buffer, &size);
 
     p_sys->p_jpeg.image_width = p_enc->fmt_in.video.i_visible_width;
     p_sys->p_jpeg.image_height = p_enc->fmt_in.video.i_visible_height;
@@ -627,6 +628,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     }
     free(p_row_pointers);
 
+    p_block->i_buffer = size;
     p_block->i_dts = p_block->i_pts = p_pic->date;
 
     return p_block;
