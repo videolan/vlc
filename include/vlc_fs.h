@@ -140,6 +140,28 @@ VLC_API ssize_t vlc_write(int, const void *, size_t);
 VLC_API ssize_t vlc_writev(int, const struct iovec *, int);
 
 /**
+ * Closes a file descriptor.
+ *
+ * This closes a file descriptor. If this is a last file descriptor for the
+ * underlying open file, the file is closed too; the exact semantics depend
+ * on the type of file.
+ *
+ * @note The file descriptor is always closed when the function returns, even
+ * if the function returns an error. The sole exception is if the file
+ * descriptor was not currently valid, and thus cannot be closed (errno will
+ * then be set to EBADF).
+ *
+ * @param fd file descriptor
+ * @return Normally, zero is returned.
+ * If an I/O error is detected before or while closing, the function may return
+ * -1. Such an error is unrecoverable since the descriptor is closed.
+ *
+ * A nul return value does not necessarily imply that all pending I/O
+ * succeeded, since I/O might still occur asynchronously afterwards.
+ */
+VLC_API int vlc_close(int fd);
+
+/**
  * @}
  */
 

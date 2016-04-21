@@ -86,6 +86,11 @@ int vlc_memfd (void)
     return -1;
 }
 
+int vlc_close (int fd)
+{
+    return close (fd);
+}
+
 int vlc_mkdir (const char *dirname, mode_t mode)
 {
     char *locname = ToLocaleDup (dirname);

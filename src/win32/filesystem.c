@@ -124,6 +124,11 @@ int vlc_memfd (void)
 #endif
 }
 
+int vlc_close (int fd)
+{
+    return close (fd);
+}
+
 int vlc_mkdir( const char *dirname, mode_t mode )
 {
     wchar_t *wpath = widen_path (dirname);

@@ -132,6 +132,11 @@ int vlc_memfd (void)
     return fd;
 }
 
+int vlc_close (int fd)
+{
+    return close (fd);
+}
+
 int vlc_mkdir (const char *dirname, mode_t mode)
 {
     return mkdir (dirname, mode);
