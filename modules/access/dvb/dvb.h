@@ -54,11 +54,17 @@ typedef struct
 struct scan_t;
 struct scan_parameter_t;
 
-struct access_sys_t
+typedef struct
 {
     int i_handle, i_frontend_handle;
-    demux_handle_t p_demux_handles[MAX_DEMUX];
     frontend_t *p_frontend;
+
+} dvb_sys_t;
+
+struct access_sys_t
+{
+    demux_handle_t p_demux_handles[MAX_DEMUX];
+    dvb_sys_t dvb;
 
     /* Scan */
     struct scan_t *scan;
@@ -76,17 +82,17 @@ struct access_sys_t
  * Prototypes
  *****************************************************************************/
 
-int  FrontendOpen( access_t * );
-void FrontendPoll( access_t *p_access );
-int  FrontendSet( access_t * );
-void FrontendClose( access_t * );
+int  FrontendOpen( vlc_object_t *, dvb_sys_t *, const char * );
+void FrontendPoll( vlc_object_t *, dvb_sys_t * );
+int  FrontendSet( vlc_object_t *, dvb_sys_t * );
+void FrontendClose( vlc_object_t *, dvb_sys_t * );
 
-int  FrontendGetStatistic( access_t *, frontend_statistic_t * );
-void FrontendGetStatus( access_t *, frontend_status_t * );
-int  FrontendFillScanParameter( access_t *, struct scan_parameter_t * );
+int  FrontendGetStatistic( dvb_sys_t *, frontend_statistic_t * );
+void FrontendGetStatus( dvb_sys_t *, frontend_status_t * );
+int  FrontendFillScanParameter( vlc_object_t *, dvb_sys_t *, struct scan_parameter_t * );
 
-int DMXSetFilter( access_t *, int i_pid, int * pi_fd, int i_type );
-int DMXUnsetFilter( access_t *, int i_fd );
+int DMXSetFilter( vlc_object_t *, int i_pid, int * pi_fd, int i_type );
+int DMXUnsetFilter( vlc_object_t *, int i_fd );
 
-int  DVROpen( access_t * );
-void DVRClose( access_t * );
+int  DVROpen( vlc_object_t *, dvb_sys_t * );
+void DVRClose( vlc_object_t *, dvb_sys_t * );
