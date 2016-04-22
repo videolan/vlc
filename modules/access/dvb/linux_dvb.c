@@ -320,7 +320,6 @@ void FrontendPoll( access_t *p_access )
                 frontend_statistic_t stat;
 
                 msg_Dbg( p_access, "frontend has acquired lock" );
-                p_sys->i_frontend_timeout = 0;
 
                 /* Read some statistics */
                 if( !FrontendGetStatistic( p_access, &stat ) )
@@ -336,7 +335,6 @@ void FrontendPoll( access_t *p_access )
             else
             {
                 msg_Dbg( p_access, "frontend has lost lock" );
-                p_sys->i_frontend_timeout = mdate() + FRONTEND_LOCK_TIMEOUT;
             }
 
             IF_UP( FE_REINIT )

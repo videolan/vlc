@@ -59,7 +59,6 @@ struct access_sys_t
     int i_handle, i_frontend_handle;
     demux_handle_t p_demux_handles[MAX_DEMUX];
     frontend_t *p_frontend;
-    mtime_t i_frontend_timeout;
 
     /* Scan */
     struct scan_t *scan;
