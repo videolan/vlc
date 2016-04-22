@@ -62,7 +62,6 @@ struct access_sys_t
 
     /* Scan */
     struct scan_t *scan;
-    uint8_t packet[TS_PACKET_SIZE];
 };
 
 #define VIDEO0_TYPE     1
