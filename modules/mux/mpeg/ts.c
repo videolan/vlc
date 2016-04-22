@@ -592,11 +592,11 @@ static int Open( vlc_object_t *p_this )
     else
         p_sys->i_tsid = nrand48(subi) & 0xffff;
 
-    p_sys->sdt.i_netid = nrand48(subi) & 0xffff;
-
     var_Get( p_mux, SOUT_CFG_PREFIX "netid", &val );
     if ( val.i_int )
         p_sys->sdt.i_netid = val.i_int;
+    else
+        p_sys->sdt.i_netid = 0xff00 | ( nrand48(subi) & 0xff );
 
     p_sys->i_pmt_version_number = nrand48(subi) & 0x1f;
     p_sys->sdt.ts.i_pid = 0x11;
