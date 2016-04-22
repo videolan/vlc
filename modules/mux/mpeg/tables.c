@@ -261,7 +261,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
 
     dvbpsi_sdt_t sdtpsi;
     if( p_sdt )
-        dvbpsi_sdt_init( &sdtpsi, i_tsid, 0, 1, true, p_sdt->i_netid );
+        dvbpsi_sdt_init( &sdtpsi, 0x42, i_tsid, 1, true, p_sdt->i_netid );
 
     for (unsigned i = 0; i < i_programs; i++ )
     {
