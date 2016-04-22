@@ -1076,6 +1076,7 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "svcd",   ITEM_TYPE_DISC, false },
         { "tcp",    ITEM_TYPE_STREAM, true },
         { "terres", ITEM_TYPE_CARD, false }, /* terrestrial */
+        { "upnp",   ITEM_TYPE_FILE, true },
         { "udp",    ITEM_TYPE_STREAM, true },  /* udplite too */
         { "unsv",   ITEM_TYPE_STREAM, true },
         { "usdigi", ITEM_TYPE_CARD, false }, /* usdigital */
