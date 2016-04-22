@@ -1553,7 +1553,8 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
     case ES_OUT_RESTART_ES:  /* arg1= es_out_id_t*                   */
     case ES_OUT_SET_ES_DEFAULT: /* arg1= es_out_id_t*                */
-        return es_out_Control( p_out, i_query, p_cmd->u.control.u.p_es->p_es );
+        return es_out_Control( p_out, i_query, !p_cmd->u.control.u.p_es ? NULL :
+                                               p_cmd->u.control.u.p_es->p_es );
 
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.es_bool.p_es->p_es,
