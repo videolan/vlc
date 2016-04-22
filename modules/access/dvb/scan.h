@@ -78,7 +78,7 @@ typedef struct scan_parameter_t
 typedef struct scan_t scan_t;
 typedef int (*scan_frontend_tune_cb)( scan_t *, void *, const scan_tuner_config_t * );
 typedef int (*scan_frontend_stats_cb)( scan_t *, void *, int * );
-typedef int (*scan_demux_filter_cb)( scan_t *, void *, uint16_t );
+typedef int (*scan_demux_filter_cb)( scan_t *, void *, uint16_t, bool );
 typedef int (*scan_demux_read_cb)( scan_t *, void *, unsigned, size_t, uint8_t *, size_t * );
 
 void scan_parameter_Init( scan_parameter_t * );
@@ -87,6 +87,7 @@ void scan_parameter_Clean( scan_parameter_t * );
 scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter,
                   scan_frontend_tune_cb,
                   scan_frontend_stats_cb,
+                  scan_demux_filter_cb,
                   scan_demux_read_cb,
                   void * );
 void scan_Destroy( scan_t *p_scan );

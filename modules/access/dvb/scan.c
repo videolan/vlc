@@ -108,6 +108,7 @@ struct scan_t
 {
     vlc_object_t *p_obj;
     scan_frontend_tune_cb pf_tune;
+    scan_demux_filter_cb pf_filter;
     scan_frontend_stats_cb pf_stats;
     scan_demux_read_cb   pf_read;
     void *p_cbdata;
@@ -374,6 +375,7 @@ static void scan_Debug_Parameters( vlc_object_t *p_obj, const scan_parameter_t *
 scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter,
                   scan_frontend_tune_cb pf_frontend,
                   scan_frontend_stats_cb pf_status,
+                  scan_demux_filter_cb pf_filter,
                   scan_demux_read_cb pf_read,
                   void *p_cbdata )
 {
@@ -388,6 +390,7 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter,
     p_scan->pf_tune = pf_frontend;
     p_scan->pf_stats = pf_status;
     p_scan->pf_read = pf_read;
+    p_scan->pf_filter = pf_filter;
     p_scan->p_cbdata = p_cbdata;
     p_scan->i_index = 0;
     p_scan->p_dialog_id = NULL;
@@ -830,6 +833,11 @@ int scan_Run( scan_t *p_scan )
         scan_session_Destroy( p_scan, session );
         return VLC_EGENERIC;
     }
+
+    p_scan->pf_filter( p_scan, p_scan->p_cbdata, 0x00, true );
+    p_scan->pf_filter( p_scan, p_scan->p_cbdata, 0x10, true );
+    if( p_scan->parameter.b_use_nit )
+        p_scan->pf_filter( p_scan, p_scan->p_cbdata, 0x11, true );
 
     /* */
     uint8_t packet[TS_PACKET_SIZE * SCAN_READ_BUFFER_COUNT];

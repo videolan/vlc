@@ -105,6 +105,7 @@ static void VarInit( access_t * );
 static int  ParseMRL( access_t * );
 
 static int ScanFrontendTuningHandler( scan_t *, void *, const scan_tuner_config_t * );
+static int ScanFilterHandler( scan_t *, void *, uint16_t, bool );
 static int ScanStatsCallback( scan_t *p_scan, void *p_privdata, int *pi_snr );
 static int ScanReadCallback( scan_t *, void *,  unsigned, size_t, uint8_t *, size_t *);
 
@@ -165,16 +166,11 @@ static int Open( vlc_object_t *p_this )
 
     parameter.b_use_nit = var_InheritBool( p_access, "dvb-scan-nit" );
 
-    msg_Dbg( p_access, "setting filter on PAT/NIT/SDT (DVB only)" );
-    FilterSet( p_access, 0x00, OTHER_TYPE );    // PAT
-    FilterSet( p_access, 0x11, OTHER_TYPE );    // SDT
-    if( parameter.b_use_nit )
-        FilterSet( p_access, 0x10, OTHER_TYPE );    // NIT
-
     if( FrontendFillScanParameter( p_access, &parameter ) ||
             (p_scan = scan_New( VLC_OBJECT(p_access), &parameter,
                                 ScanFrontendTuningHandler,
                                 ScanStatsCallback,
+                                ScanFilterHandler,
                                 ScanReadCallback,
                                 p_access )) == NULL )
     {
@@ -252,6 +248,17 @@ static int ScanStatsCallback( scan_t *p_scan, void *p_privdata, int *pi_snr )
     }
 
     return VLC_EGENERIC;
+}
+
+static int ScanFilterHandler( scan_t *p_scan, void *p_privdata, uint16_t i_pid, bool b_set )
+{
+    access_t *p_access = (access_t *) p_privdata;
+    VLC_UNUSED(p_scan);
+
+    if( b_set )
+        FilterSet( p_access, i_pid, OTHER_TYPE );
+
+    return VLC_SUCCESS;
 }
 
 static int ScanReadCallback( scan_t *p_scan, void *p_privdata,
