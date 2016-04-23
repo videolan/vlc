@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15F24b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainMenu">
@@ -53,6 +53,7 @@
                 <outlet property="extensions" destination="4942" id="qSU-2W-Chy"/>
                 <outlet property="extensionsMenu" destination="4943" id="IAw-5Z-Wvo"/>
                 <outlet property="fileMenu" destination="81" id="lbA-s5-6qj"/>
+                <outlet property="findItem" destination="6J6-tz-ctn" id="eZU-nd-y0B"/>
                 <outlet property="fittoscreen" destination="1514" id="79G-ad-1hf"/>
                 <outlet property="floatontop" destination="1499" id="yvd-Sz-zL3"/>
                 <outlet property="forum" destination="2300" id="cpt-gZ-e4k"/>
@@ -350,6 +351,12 @@
                             <menuItem title="Select All" keyEquivalent="a" id="198">
                                 <connections>
                                     <action selector="selectAll:" target="-1" id="232"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="K9x-W6-ycv"/>
+                            <menuItem title="Find" keyEquivalent="F" id="6J6-tz-ctn">
+                                <connections>
+                                    <action selector="highlightSearchField:" target="-1" id="GlP-7U-XF1"/>
                                 </connections>
                             </menuItem>
                         </items>

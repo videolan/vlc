@@ -330,6 +330,7 @@
     [_pasteItem setTitle: _NS("Paste")];
     [_clearItem setTitle: _NS("Delete")];
     [_select_all setTitle: _NS("Select All")];
+    [_findItem setTitle: _NS("Find")];
 
     [_viewMenu setTitle: _NS("View")];
     [_toggleJumpButtons setTitle: _NS("Show Previous & Next Buttons")];

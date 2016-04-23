@@ -985,6 +985,11 @@ static const float f_min_window_height = 307.;
     [[[[VLCMain sharedInstance] playlist] model] searchUpdate:[_searchField stringValue]];
 }
 
+- (IBAction)highlightSearchField:(id)sender
+{
+    [_searchField selectText:sender];
+}
+
 #pragma mark -
 #pragma mark Side Bar Data handling
 /* taken under BSD-new from the PXSourceList sample project, adapted for VLC */

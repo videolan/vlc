@@ -60,6 +60,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *pasteItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *clearItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *select_all;
+@property (readwrite, weak) IBOutlet NSMenuItem *findItem;
 
 @property (readwrite, weak) IBOutlet NSMenu *viewMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *toggleJumpButtons;

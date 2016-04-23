@@ -104,6 +104,7 @@ typedef enum {
 - (IBAction)removePodcastWindowAction:(id)sender;
 
 - (IBAction)searchItem:(id)sender;
+- (IBAction)highlightSearchField:(id)sender;
 
 - (void)windowResizedOrMoved:(NSNotification *)notification;
 
