@@ -1548,14 +1548,14 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     NSUInteger i_modifiers = [theEvent modifierFlags];
 
     /* modifiers */
-    if (i_modifiers & NSControlKeyMask)
-        [tempString appendString:@"Ctrl-"];
-    if (i_modifiers & NSAlternateKeyMask )
-        [tempString appendString:@"Alt-"];
-    if (i_modifiers & NSShiftKeyMask)
-        [tempString appendString:@"Shift-"];
     if (i_modifiers & NSCommandKeyMask)
         [tempString appendString:@"Command-"];
+    if (i_modifiers & NSControlKeyMask)
+        [tempString appendString:@"Ctrl-"];
+    if (i_modifiers & NSShiftKeyMask)
+        [tempString appendString:@"Shift-"];
+    if (i_modifiers & NSAlternateKeyMask)
+        [tempString appendString:@"Alt-"];
 
     /* non character keys */
     if (key == NSUpArrowFunctionKey)
