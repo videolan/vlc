@@ -526,21 +526,21 @@
     [_streamDestinationURLLabel setStringValue:labelContent];
 
     /* catch obvious errors */
-    if (![[_streamAddressField stringValue] length] > 0) {
+    if ([[_streamAddressField stringValue] length] == 0) {
         NSBeginInformationalAlertSheet(_NS("No Address given"),
                                        _NS("OK"), @"", @"", _streamPanel, nil, nil, nil, nil,
                                        @"%@", _NS("In order to stream, a valid destination address is required."));
         return;
     }
 
-    if ([_streamSAPCheckbox state] && ![[_streamChannelField stringValue] length] > 0) {
+    if ([_streamSAPCheckbox state] && [[_streamChannelField stringValue] length] == 0) {
         NSBeginInformationalAlertSheet(_NS("No Channel Name given"),
                                        _NS("OK"), @"", @"", _streamPanel, nil, nil, nil, nil,
                                        @"%@", _NS("SAP stream announcement is enabled. However, no channel name is provided."));
         return;
     }
 
-    if ([_streamSDPMatrix isEnabled] && [_streamSDPMatrix selectedCell] != [_streamSDPMatrix cellWithTag:0] && ![[_streamSDPField stringValue] length] > 0) {
+    if ([_streamSDPMatrix isEnabled] && [_streamSDPMatrix selectedCell] != [_streamSDPMatrix cellWithTag:0] && [[_streamSDPField stringValue] length] == 0) {
         NSBeginInformationalAlertSheet(_NS("No SDP URL given"),
                                        _NS("OK"), @"", @"", _streamPanel, nil, nil, nil, nil,
                                        @"%@", _NS("A SDP export is requested, but no URL is provided."));
