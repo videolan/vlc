@@ -92,12 +92,16 @@ void BuildPAT( dvbpsi_t *p_dvbpsi,
         dvbpsi_pat_program_add( &patpsi, pi_programs_number[i], p_pmt[i].i_pid );
 
     p_section = dvbpsi_pat_sections_generate( p_dvbpsi, &patpsi, 0 );
-    block_t *p_block = WritePSISection( p_section );
-
-    PEStoTS( p_opaque, pf_callback, p_block, p_pat->i_pid,
-             &p_pat->b_discontinuity, &p_pat->i_continuity_counter );
-
-    dvbpsi_DeletePSISections( p_section );
+    if( likely(p_section) )
+    {
+        block_t *p_block = WritePSISection( p_section );
+        if( likely(p_block) )
+        {
+            PEStoTS( p_opaque, pf_callback, p_block, p_pat->i_pid,
+                     &p_pat->b_discontinuity, &p_pat->i_continuity_counter );
+        }
+        dvbpsi_DeletePSISections( p_section );
+    }
     dvbpsi_pat_empty( &patpsi );
 }
 #if 1
@@ -503,10 +507,16 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
     for (unsigned i = 0; i < i_programs; i++ )
     {
         dvbpsi_psi_section_t *sect = dvbpsi_pmt_sections_generate( p_dvbpsi, &dvbpmt[i] );
-        block_t *pmt = WritePSISection( sect );
-        PEStoTS( p_opaque, pf_callback, pmt, p_pmt[i].i_pid,
-                 &p_pmt[i].b_discontinuity, &p_pmt[i].i_continuity_counter );
-        dvbpsi_DeletePSISections(sect);
+        if( likely(sect) )
+        {
+            block_t *pmt = WritePSISection( sect );
+            if( likely(pmt) )
+            {
+                PEStoTS( p_opaque, pf_callback, pmt, p_pmt[i].i_pid,
+                         &p_pmt[i].b_discontinuity, &p_pmt[i].i_continuity_counter );
+            }
+            dvbpsi_DeletePSISections(sect);
+        }
         dvbpsi_pmt_empty( &dvbpmt[i] );
     }
     free( dvbpmt );
@@ -549,10 +559,16 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
         free( pi_service_types );
 
         dvbpsi_psi_section_t *sect = dvbpsi_sdt_sections_generate( p_dvbpsi, &sdtpsi );
-        block_t *p_sdtblock = WritePSISection( sect );
-        PEStoTS( p_opaque, pf_callback, p_sdtblock, p_sdt->ts.i_pid,
-                 &p_sdt->ts.b_discontinuity, &p_sdt->ts.i_continuity_counter );
-        dvbpsi_DeletePSISections( sect );
+        if( likely(sect) )
+        {
+            block_t *p_sdtblock = WritePSISection( sect );
+            if( likely(p_sdtblock) )
+            {
+                PEStoTS( p_opaque, pf_callback, p_sdtblock, p_sdt->ts.i_pid,
+                         &p_sdt->ts.b_discontinuity, &p_sdt->ts.i_continuity_counter );
+            }
+            dvbpsi_DeletePSISections( sect );
+        }
         dvbpsi_sdt_empty( &sdtpsi );
     }
 }
