@@ -35,7 +35,6 @@
 #include <vlc/vlc.h>
 #include <vlc/deprecated.h>
 #include <vlc/libvlc.h>
-#include <vlc/libvlc_structures.h>
 #include <vlc/libvlc_events.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_media_discoverer.h>

@@ -29,7 +29,6 @@
 # include "config.h"
 #endif
 
-#include <vlc/libvlc_structures.h>
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_dialog.h>
 #include <vlc/libvlc_media.h>

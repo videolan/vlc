@@ -55,12 +55,11 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdint.h>
 
 # ifdef __cplusplus
 extern "C" {
 # endif
-
-#include <vlc/libvlc_structures.h>
 
 /** \defgroup libvlc_core LibVLC core
  * \ingroup libvlc
@@ -73,6 +72,11 @@ extern "C" {
  * Earlier versions (0.9.x and 1.0.x) are <b>not</b> compatible.
  * @{
  */
+
+/** This structure is opaque. It represents a libvlc instance */
+typedef struct libvlc_instance_t libvlc_instance_t;
+
+typedef int64_t libvlc_time_t;
 
 /** \defgroup libvlc_error LibVLC error handling
  * @{

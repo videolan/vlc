@@ -30,7 +30,6 @@
 #endif
 
 #include <vlc/vlc.h>
-#include <vlc/libvlc_structures.h>
 #include <vlc/libvlc_media.h>
 #include <vlc_input.h>
 

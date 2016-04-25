@@ -575,11 +575,9 @@ LIBVLC_API int libvlc_media_save_meta( libvlc_media_t *p_md );
 
 
 /**
- * Get current state of media descriptor object. Possible media states
- * are defined in libvlc_structures.c ( libvlc_NothingSpecial=0,
- * libvlc_Opening, libvlc_Buffering, libvlc_Playing, libvlc_Paused,
- * libvlc_Stopped, libvlc_Ended,
- * libvlc_Error).
+ * Get current state of media descriptor object. Possible media states are
+ * libvlc_NothingSpecial=0, libvlc_Opening, libvlc_Playing, libvlc_Paused,
+ * libvlc_Stopped, libvlc_Ended, libvlc_Error.
  *
  * \see libvlc_state_t
  * \param p_md a media descriptor object
