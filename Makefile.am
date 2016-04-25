@@ -60,7 +60,7 @@ EXTRA_DIST = \
 	extras/package/win32/NSIS/languages/occitan.nsh \
 	extras/package/win32/NSIS/languages/polish.nsh \
 	extras/package/win32/NSIS/languages/punjabi.nsh \
-	extras/package/win32/NSIS/languages/russian.nsh
+	extras/package/win32/NSIS/languages/russian.nsh \
 	extras/package/win32/NSIS/languages/romanian.nsh \
 	extras/package/win32/NSIS/languages/schinese.nsh \
 	extras/package/win32/NSIS/languages/slovak.nsh \
