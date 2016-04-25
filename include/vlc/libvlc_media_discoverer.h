@@ -70,13 +70,6 @@ typedef struct libvlc_media_discoverer_description {
 typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;
 
 /**
- * \deprecated Use libvlc_media_discoverer_new() and libvlc_media_discoverer_start().
- */
-LIBVLC_DEPRECATED LIBVLC_API libvlc_media_discoverer_t *
-libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
-                                       const char * psz_name );
-
-/**
  * Create a media discoverer object by name.
  *
  * After this object is created, you should attach to events in order to be

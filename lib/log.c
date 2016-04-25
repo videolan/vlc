@@ -27,7 +27,7 @@
 #endif
 
 #include <assert.h>
-#include <vlc/libvlc.h>
+#include <vlc/vlc.h>
 #include "libvlc_internal.h"
 #include <vlc_common.h>
 #include <vlc_interface.h>

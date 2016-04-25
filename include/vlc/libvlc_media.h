@@ -542,7 +542,7 @@ LIBVLC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
  * If the media has not yet been parsed this will return NULL.
  *
  * \see libvlc_media_parse
- * \see libvlc_media_parse_async
+ * \see libvlc_media_parse_with_options
  * \see libvlc_MediaMetaChanged
  *
  * \param p_md the media descriptor
@@ -641,7 +641,7 @@ LIBVLC_API libvlc_time_t
  * This fetches (local) art, meta data and tracks information.
  * The method is synchronous.
  *
- * \see libvlc_media_parse_async
+ * \see libvlc_media_parse_with_options
  * \see libvlc_media_get_meta
  * \see libvlc_media_get_tracks_info
  *
@@ -651,34 +651,10 @@ LIBVLC_API void
 libvlc_media_parse( libvlc_media_t *p_md );
 
 /**
- * Parse a media.
- *
- * This fetches (local) art, meta data and tracks information.
- * The method is the asynchronous of libvlc_media_parse().
- *
- * To track when this is over you can listen to libvlc_MediaParsedChanged
- * event. However if the media was already parsed you will not receive this
- * event.
- *
- * \deprecated You can't be sure to receive the libvlc_MediaParsedChanged
- *             event (you can wait indefinitely for this event).
- *             Use libvlc_media_parse_with_options instead
- *
- * \see libvlc_media_parse
- * \see libvlc_MediaParsedChanged
- * \see libvlc_media_get_meta
- * \see libvlc_media_get_tracks_info
- *
- * \param p_md media descriptor object
- */
-LIBVLC_DEPRECATED LIBVLC_API void
-libvlc_media_parse_async( libvlc_media_t *p_md );
-
-/**
  * Parse the media asynchronously with options.
  *
  * This fetches (local or network) art, meta data and/or tracks information.
- * This method is the extended version of libvlc_media_parse_async().
+ * This method is the extended version of libvlc_media_parse_with_options().
  *
  * To track when this is over you can listen to libvlc_MediaParsedStatus
  * event. However if this functions returns an error, you will not receive any
@@ -702,22 +678,6 @@ libvlc_media_parse_async( libvlc_media_t *p_md );
 LIBVLC_API int
 libvlc_media_parse_with_options( libvlc_media_t *p_md,
                                  libvlc_media_parse_flag_t parse_flag );
-
-/**
- * Return true is the media descriptor object is parsed
- *
- * \deprecated This can return true in case of failure.
- *             Use libvlc_media_get_parsed_status instead
- *
- * \see libvlc_MediaParsedChanged
- *
- * \param p_md media descriptor object
- * \return true if media object has been parsed otherwise it returns false
- *
- * \libvlc_return_bool
- */
-LIBVLC_DEPRECATED LIBVLC_API int
-   libvlc_media_is_parsed( libvlc_media_t *p_md );
 
 /**
  * Get Parsed status for media descriptor object.
@@ -751,25 +711,6 @@ LIBVLC_API void
  * \param p_md media descriptor object
  */
 LIBVLC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
-
-/**
- * Get media descriptor's elementary streams description
- *
- * Note, you need to call libvlc_media_parse() or play the media at least once
- * before calling this function.
- * Not doing this will result in an empty array.
- *
- * \deprecated Use libvlc_media_tracks_get instead
- *
- * \param p_md media descriptor object
- * \param tracks address to store an allocated array of Elementary Streams
- *        descriptions (must be freed by the caller) [OUT]
- *
- * \return the number of Elementary Streams
- */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_media_get_tracks_info( libvlc_media_t *p_md,
-                                  libvlc_media_track_info_t **tracks );
 
 /**
  * Get media descriptor's elementary streams description

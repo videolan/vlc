@@ -63,10 +63,6 @@ LIBVLC_API void
 LIBVLC_API void
     libvlc_media_list_retain( libvlc_media_list_t *p_ml );
 
-LIBVLC_DEPRECATED int
-    libvlc_media_list_add_file_content( libvlc_media_list_t * p_ml,
-                                        const char * psz_uri );
-
 /**
  * Associate media instance with this media list instance.
  * If another media instance was present it will be released.

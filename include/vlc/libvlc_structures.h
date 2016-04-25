@@ -47,25 +47,6 @@ typedef int64_t libvlc_time_t;
 
 /**@} */
 
-/**
- * \ingroup libvlc_log
- * @{
- */
-
-/** This structure is opaque. It represents a libvlc log iterator */
-typedef struct libvlc_log_iterator_t libvlc_log_iterator_t;
-
-typedef struct libvlc_log_message_t
-{
-    int         i_severity;   /* 0=INFO, 1=ERR, 2=WARN, 3=DBG */
-    const char *psz_type;     /* module type */
-    const char *psz_name;     /* module name */
-    const char *psz_header;   /* optional header */
-    const char *psz_message;  /* message */
-} libvlc_log_message_t;
-
-/**@} */
-
 # ifdef __cplusplus
 }
 # endif

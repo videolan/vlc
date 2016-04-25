@@ -458,18 +458,6 @@ LIBVLC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, 
 LIBVLC_API void * libvlc_media_player_get_nsobject ( libvlc_media_player_t *p_mi );
 
 /**
- * \deprecated Use libvlc_media_player_set_nsobject instead
- */
-LIBVLC_DEPRECATED
-LIBVLC_API void libvlc_media_player_set_agl ( libvlc_media_player_t *p_mi, uint32_t drawable );
-
-/**
- * \deprecated Use libvlc_media_player_get_nsobject instead
- */
-LIBVLC_DEPRECATED
-LIBVLC_API uint32_t libvlc_media_player_get_agl ( libvlc_media_player_t *p_mi );
-
-/**
  * Set an X Window System drawable where the media player should render its
  * video output. The call takes effect when the playback starts. If it is
  * already started, it might need to be stopped before changes apply.
@@ -901,23 +889,6 @@ LIBVLC_API int libvlc_media_player_set_rate( libvlc_media_player_t *p_mi, float 
 LIBVLC_API libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi );
 
 /**
- * Get movie fps rate
- *
- * This function is provided for backward compatibility. It cannot deal with
- * multiple video tracks. In LibVLC versions prior to 3.0, it would also fail
- * if the file format did not convey the frame rate explicitly.
- *
- * \deprecated Consider using libvlc_media_tracks_get() instead.
- *
- * \param p_mi the Media Player
- * \return frames per second (fps) for this playing movie, or 0 if unspecified
- */
-LIBVLC_DEPRECATED
-LIBVLC_API float libvlc_media_player_get_fps( libvlc_media_player_t *p_mi );
-
-/** end bug */
-
-/**
  * How many video outputs does this media player have?
  *
  * \param p_mi the media player
@@ -989,12 +960,6 @@ LIBVLC_API void libvlc_media_player_set_video_title_display( libvlc_media_player
  * \param p_track_description the structure to release
  */
 LIBVLC_API void libvlc_track_description_list_release( libvlc_track_description_t *p_track_description );
-
-/**
- * \deprecated Use libvlc_track_description_list_release instead
- */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
 
 /** \defgroup libvlc_video LibVLC video controls
  * @{
@@ -1080,26 +1045,6 @@ void libvlc_video_set_mouse_input( libvlc_media_player_t *p_mi, unsigned on );
 LIBVLC_API
 int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned num,
                            unsigned *px, unsigned *py );
-
-/**
- * Get current video height.
- * \deprecated Use libvlc_video_get_size() instead.
- *
- * \param p_mi the media player
- * \return the video pixel height or 0 if not applicable
- */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_video_get_height( libvlc_media_player_t *p_mi );
-
-/**
- * Get current video width.
- * \deprecated Use libvlc_video_get_size() instead.
- *
- * \param p_mi the media player
- * \return the video pixel width or 0 if not applicable
- */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_video_get_width( libvlc_media_player_t *p_mi );
 
 /**
  * Get the mouse pointer coordinates over a video.
@@ -1237,16 +1182,6 @@ LIBVLC_API int64_t libvlc_video_get_spu_delay( libvlc_media_player_t *p_mi );
 LIBVLC_API int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi, int64_t i_delay );
 
 /**
- * Get the description of available titles.
- *
- * \param p_mi the media player
- * \return list containing description of available titles.
- * It must be freed with libvlc_track_description_list_release()
- */
-LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
-        libvlc_video_get_title_description( libvlc_media_player_t *p_mi );
-
-/**
  * Get the full description of available titles
  *
  * \version LibVLC 3.0.0 and later.
@@ -1301,17 +1236,6 @@ LIBVLC_API int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_p
 LIBVLC_API
 void libvlc_chapter_descriptions_release( libvlc_chapter_description_t **p_chapters,
                                           unsigned i_count );
-
-/**
- * Get the description of available chapters for specific title.
- *
- * \param p_mi the media player
- * \param i_title selected title
- * \return list containing description of available chapter for title i_title.
- * It must be freed with libvlc_track_description_list_release()
- */
-LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
-        libvlc_video_get_chapter_description( libvlc_media_player_t *p_mi, int i_title );
 
 /**
  * Get current crop filter geometry.
@@ -1626,31 +1550,6 @@ LIBVLC_API int libvlc_audio_output_set( libvlc_media_player_t *p_mi,
                                         const char *psz_name );
 
 /**
- * Backward compatibility stub. Do not use in new code.
- * Use libvlc_audio_output_device_list_get() instead.
- * \return always 0.
- */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_audio_output_device_count( libvlc_instance_t *, const char * );
-
-/**
- * Backward compatibility stub. Do not use in new code.
- * Use libvlc_audio_output_device_list_get() instead.
- * \return always NULL.
- */
-LIBVLC_DEPRECATED LIBVLC_API
-char *libvlc_audio_output_device_longname( libvlc_instance_t *, const char *,
-                                           int );
-
-/**
- * Backward compatibility stub. Do not use in new code.
- * Use libvlc_audio_output_device_list_get() instead.
- * \return always NULL.
- */
-LIBVLC_DEPRECATED LIBVLC_API
-char *libvlc_audio_output_device_id( libvlc_instance_t *, const char *, int );
-
-/**
  * Gets a list of potential audio output devices,
  * \see libvlc_audio_output_device_set().
  *
@@ -1769,21 +1668,6 @@ LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
  * \version LibVLC 3.0.0 or later.
  */
 LIBVLC_API char *libvlc_audio_output_device_get( libvlc_media_player_t *mp );
-
-/**
- * Stub for backward compatibility.
- * \return always -1.
- */
-LIBVLC_DEPRECATED
-LIBVLC_API int libvlc_audio_output_get_device_type( libvlc_media_player_t *p_mi );
-
-/**
- * Stub for backward compatibility.
- */
-LIBVLC_DEPRECATED
-LIBVLC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *,
-                                                     int );
-
 
 /**
  * Toggle mute status.
