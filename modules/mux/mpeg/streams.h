@@ -36,9 +36,7 @@ typedef struct
     int             i_stream_type;
     int             i_stream_id;
 
-    /* to be used for carriege of DIV3 */
-    vlc_fourcc_t    i_bih_codec;
-    int             i_bih_width, i_bih_height;
+    int             i_width, i_height;
 
     /* Specific to mpeg4 in mpeg2ts */
     int             i_es_id;

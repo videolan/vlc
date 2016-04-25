@@ -884,6 +884,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->ts.i_pid = AllocatePID( p_mux, p_input->p_fmt->i_cat );
 
     p_stream->pes.i_codec = p_input->p_fmt->i_codec;
+    if( p_input->p_fmt->i_cat == VIDEO_ES )
+    {
+        p_stream->pes.i_width = p_input->fmt.video.i_width;
+        p_stream->pes.i_height = p_input->fmt.video.i_height;
+    }
 
     p_stream->pes.i_stream_type = -1;
     switch( p_input->p_fmt->i_codec )
@@ -922,9 +927,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     case VLC_CODEC_MJPG:
         p_stream->pes.i_stream_type = 0xa0; /* private */
         p_stream->pes.i_stream_id = 0xa0;   /* beurk */
-        p_stream->pes.i_bih_codec  = p_input->p_fmt->i_codec;
-        p_stream->pes.i_bih_width  = p_input->p_fmt->video.i_width;
-        p_stream->pes.i_bih_height = p_input->p_fmt->video.i_height;
         break;
     case VLC_CODEC_DIRAC:
         /* stream_id makes use of stream_id_extension */

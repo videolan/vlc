@@ -341,11 +341,11 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
             int i_extra = __MIN( p_stream->pes->i_extra, 502 );
 
             /* private DIV3 descripor */
-            memcpy( &data[0], &p_stream->pes->i_bih_codec, 4 );
-            data[4] = ( p_stream->pes->i_bih_width >> 8 )&0xff;
-            data[5] = ( p_stream->pes->i_bih_width      )&0xff;
-            data[6] = ( p_stream->pes->i_bih_height>> 8 )&0xff;
-            data[7] = ( p_stream->pes->i_bih_height     )&0xff;
+            memcpy( &data[0], &p_stream->pes->i_codec, 4 );
+            data[4] = ( p_stream->pes->i_width >> 8 )&0xff;
+            data[5] = ( p_stream->pes->i_width      )&0xff;
+            data[6] = ( p_stream->pes->i_height>> 8 )&0xff;
+            data[7] = ( p_stream->pes->i_height     )&0xff;
             data[8] = ( i_extra >> 8 )&0xff;
             data[9] = ( i_extra      )&0xff;
             if( i_extra > 0 )
