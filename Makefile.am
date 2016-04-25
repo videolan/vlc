@@ -860,8 +860,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/vlcmenubaricon/pauseIcon@2x.png \
 	extras/package/macosx/Resources/vlcmenubaricon/playIcon.png \
 	extras/package/macosx/Resources/vlcmenubaricon/playIcon@2x.png \
-	extras/package/macosx/Resources/vlcmenubaricon/statusBarIcon.png \
-	extras/package/macosx/Resources/vlcmenubaricon/statusBarIcon@2x.png \
+	extras/package/macosx/Resources/vlcmenubaricon/statusBarIcon.pdf \
 	extras/package/macosx/Resources/vlcmenubaricon/stopIcon.png \
 	extras/package/macosx/Resources/vlcmenubaricon/stopIcon@2x.png \
 	extras/package/macosx/Resources/vlc.scriptSuite \
