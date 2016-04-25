@@ -334,7 +334,6 @@ struct sout_mux_sys_t
 
     dvbpsi_t        *p_dvbpsi;
     bool            b_es_id_pid;
-    bool            b_sdt;
     int             i_pid_video;
     int             i_pid_audio;
     int             i_pid_spu;
@@ -606,8 +605,6 @@ static int Open( vlc_object_t *p_this )
     /* Syntax is provider_sdt1,service_name_sdt1,provider_sdt2,service_name_sdt2... */
     if( sdtdesc )
     {
-        p_sys->b_sdt = true;
-
         char *psz_sdttoken = sdtdesc;
 
         for (int i = 0; i < MAX_SDT_DESC * 2 && psz_sdttoken; i++)

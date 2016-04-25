@@ -535,25 +535,24 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
             const char *psz_sdtprov = p_sdt->desc[i].psz_provider;
             const char *psz_sdtserv = p_sdt->desc[i].psz_service_name;
 
-            if( !psz_sdtprov || !psz_sdtserv )
-                continue;
-            size_t provlen = VLC_CLIP(strlen(psz_sdtprov), 0, 255);
-            size_t servlen = VLC_CLIP(strlen(psz_sdtserv), 0, 255);
+            size_t i_prov = (psz_sdtprov) ? __MIN(255, strlen(psz_sdtprov)) : 0;
+            size_t i_serv = (psz_sdtserv) ? __MIN(255, strlen(psz_sdtserv)) : 0;
 
-            uint8_t psz_sdt_desc[3 + provlen + servlen];
+            uint8_t psz_sdt_desc[4 + i_prov + i_serv];
 
+            /* mapped service type according to es types */
             psz_sdt_desc[0] = pi_service_types[i];
 
             /* service provider name length */
-            psz_sdt_desc[1] = (char)provlen;
-            memcpy( &psz_sdt_desc[2], psz_sdtprov, provlen );
+            psz_sdt_desc[1] = i_prov;
+            memcpy( &psz_sdt_desc[2], psz_sdtprov, i_prov );
 
             /* service name length */
-            psz_sdt_desc[ 2 + provlen ] = (char)servlen;
-            memcpy( &psz_sdt_desc[3+provlen], psz_sdtserv, servlen );
+            psz_sdt_desc[ 2 + i_prov ] = i_serv;
+            memcpy( &psz_sdt_desc[3+i_prov], psz_sdtserv, i_serv );
 
             dvbpsi_sdt_service_descriptor_add( p_service, 0x48,
-                                               (3 + provlen + servlen),
+                                               (3 + i_prov + i_serv),
                                                psz_sdt_desc );
         }
         free( pi_service_types );
