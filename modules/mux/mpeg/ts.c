@@ -39,6 +39,7 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_rand.h>
+#include <vlc_charset.h>
 
 #include <vlc_iso_lang.h>
 
@@ -614,9 +615,9 @@ static int Open( vlc_object_t *p_this )
                 *psz_end++ = '\0';
 
             if (i % 2)
-                p_sys->sdt.desc[i/2].psz_service_name = strdup(psz_sdttoken);
+                p_sys->sdt.desc[i/2].psz_service_name = FromLocaleDup( psz_sdttoken );
             else
-                p_sys->sdt.desc[i/2].psz_provider = strdup(psz_sdttoken);
+                p_sys->sdt.desc[i/2].psz_provider = FromLocaleDup( psz_sdttoken );
 
             psz_sdttoken = psz_end;
         }

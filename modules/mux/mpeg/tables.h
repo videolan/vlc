@@ -28,8 +28,8 @@ typedef struct
     int i_netid;
     struct
     {
-        char *psz_provider;
-        char *psz_service_name;  /* name of program */
+        char *psz_provider; /* provider in UTF8 */
+        char *psz_service_name; /* program in UTF8 */
     } desc[MAX_SDT_DESC];
 } sdt_psi_t;
 

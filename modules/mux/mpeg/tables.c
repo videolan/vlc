@@ -323,6 +323,36 @@ static void UpdateServiceType( uint8_t *pi_service_cat, uint8_t *pi_service_type
     }
 }
 
+static inline size_t Write_AnnexA_String( uint8_t *p_dest, const char *p_src )
+{
+    size_t i_src;
+    if( p_src == NULL || !(i_src = strlen( p_src )) )
+    {
+        p_dest[0] = 0;
+        return 1;
+    }
+
+    bool b_latin = (p_src[0] > 0x20);
+    for ( size_t i=0; i< i_src && b_latin; i++ )
+        b_latin &= !( p_src[i] & 0x80 );
+
+    if( b_latin )
+    {
+        i_src = __MIN( i_src, UINT8_MAX );
+        p_dest[0] = i_src; /* Total size */
+        memcpy( &p_dest[1], p_src, i_src );
+        return 1 + i_src;
+    }
+    else
+    {
+        i_src = __MIN( i_src, UINT8_MAX - 1 );
+        p_dest[0] = 1 + i_src; /* Total size */
+        p_dest[1] = 0x15; /* UTF8 Encoding */
+        memcpy( &p_dest[2], p_src, i_src );
+        return 2 + i_src;
+    }
+}
+
 void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                void *p_opaque, PEStoTSCallback pf_callback,
                int i_tsid, int i_pmt_version_number,
@@ -535,25 +565,19 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
             const char *psz_sdtprov = p_sdt->desc[i].psz_provider;
             const char *psz_sdtserv = p_sdt->desc[i].psz_service_name;
 
-            size_t i_prov = (psz_sdtprov) ? __MIN(255, strlen(psz_sdtprov)) : 0;
-            size_t i_serv = (psz_sdtserv) ? __MIN(255, strlen(psz_sdtserv)) : 0;
-
-            uint8_t psz_sdt_desc[4 + i_prov + i_serv];
+            uint8_t p_sdt_desc[4 + 255 * 2];
+            size_t i_sdt_desc = 0;
 
             /* mapped service type according to es types */
-            psz_sdt_desc[0] = pi_service_types[i];
+            p_sdt_desc[i_sdt_desc++] = pi_service_types[i];
 
             /* service provider name length */
-            psz_sdt_desc[1] = i_prov;
-            memcpy( &psz_sdt_desc[2], psz_sdtprov, i_prov );
+            i_sdt_desc += Write_AnnexA_String( &p_sdt_desc[i_sdt_desc], psz_sdtprov );
 
             /* service name length */
-            psz_sdt_desc[ 2 + i_prov ] = i_serv;
-            memcpy( &psz_sdt_desc[3+i_prov], psz_sdtserv, i_serv );
+            i_sdt_desc += Write_AnnexA_String( &p_sdt_desc[i_sdt_desc], psz_sdtserv );
 
-            dvbpsi_sdt_service_descriptor_add( p_service, 0x48,
-                                               (3 + i_prov + i_serv),
-                                               psz_sdt_desc );
+            dvbpsi_sdt_service_descriptor_add( p_service, 0x48, i_sdt_desc, p_sdt_desc );
         }
         free( pi_service_types );
 
