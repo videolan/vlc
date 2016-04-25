@@ -301,6 +301,7 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
 
     /* There is one ip for several srvs, fetch them */
     const char *psz_ip = NULL;
+    char psz_ip6[INET6_ADDRSTRLEN + 2];
     i_nb_srv = 0;
     for( const struct rr_entry *p_entry = p_entries;
          p_entry != NULL; p_entry = p_entry->next )
@@ -329,10 +330,11 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
         }
         else if( p_entry->type == RR_A && psz_ip == NULL )
             psz_ip = p_entry->data.A.addr_str;
-        /* TODO support ipv6
-        else if( p_entry->type == RR_AAAA )
-            psz_ip = p_entry->data.AAAA.addr_str;
-        */
+        else if( p_entry->type == RR_AAAA && psz_ip == NULL )
+        {
+            if (snprintf(psz_ip6, sizeof(psz_ip6), "[%s]", p_entry->data.AAAA.addr_str) > 0)
+                psz_ip = psz_ip6;
+        }
     }
     if( psz_ip == NULL || i_nb_srv == 0 )
     {
