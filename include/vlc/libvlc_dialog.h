@@ -65,7 +65,7 @@ typedef struct libvlc_dialog_cbs
      * You can interact with this dialog by calling libvlc_dialog_post_login()
      * to post an answer or libvlc_dialog_dismiss() to cancel this dialog.
      *
-     * @note to receive this callack, libvlc_dialog_cbs.pf_cancel should not be
+     * @note to receive this callback, libvlc_dialog_cbs.pf_cancel should not be
      * NULL.
      *
      * @param p_data opaque pointer for the callback
@@ -87,7 +87,7 @@ typedef struct libvlc_dialog_cbs
      * You can interact with this dialog by calling libvlc_dialog_post_action()
      * to post an answer or libvlc_dialog_dismiss() to cancel this dialog.
      *
-     * @note to receive this callack, libvlc_dialog_cbs.pf_cancel should not be
+     * @note to receive this callback, libvlc_dialog_cbs.pf_cancel should not be
      * NULL.
      *
      * @param p_data opaque pointer for the callback
@@ -113,7 +113,7 @@ typedef struct libvlc_dialog_cbs
      * If cancellable (psz_cancel != NULL), you can cancel this dialog by
      * calling libvlc_dialog_dismiss()
      *
-     * @note to receive this callack, libvlc_dialog_cbs.pf_cancel and
+     * @note to receive this callback, libvlc_dialog_cbs.pf_cancel and
      * libvlc_dialog_cbs.pf_update_progress should not be NULL.
      *
      * @param p_data opaque pointer for the callback
