@@ -1040,7 +1040,6 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "dir",    ITEM_TYPE_DIRECTORY, false },
         { "dshow",  ITEM_TYPE_CARD, false },
         { "dtv",    ITEM_TYPE_CARD, false },
-        { "dv",     ITEM_TYPE_CARD, false },
         { "dvb",    ITEM_TYPE_CARD, false },
         { "dvd",    ITEM_TYPE_DISC, false },
         { "eyetv",  ITEM_TYPE_CARD, false },
@@ -1088,26 +1087,25 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "wasapi", ITEM_TYPE_CARD, false },
         { "window", ITEM_TYPE_CARD, false },
     };
-    int i_item_type = ITEM_TYPE_UNKNOWN;
+
+#ifndef NDEBUG
+    for( size_t i = 1; i < ARRAY_SIZE( tab ); i++ )
+        assert( typecmp( tab + i, tab + i - 1 ) > 0 );
+#endif
+
     *p_net = false;
 
-    if( !strstr( p_item->psz_uri, "://" ) )
-    {
-        i_item_type = ITEM_TYPE_FILE;
-    }
-    else
-    {
-        const struct item_type_entry *e =
-            bsearch( p_item->psz_uri, tab, sizeof( tab ) / sizeof( tab[0] ),
-                     sizeof( tab[0] ), typecmp );
-        if( e )
-        {
-            *p_net = e->b_net;
-            i_item_type = e->i_type;
-        }
-    }
+    if( strstr( p_item->psz_uri, "://" ) == NULL )
+        return ITEM_TYPE_UNKNOWN; /* invalid URI */
 
-    return i_item_type;
+    const struct item_type_entry *e =
+        bsearch( p_item->psz_uri, tab, ARRAY_SIZE( tab ),
+                 sizeof( tab[0] ), typecmp );
+    if( e == NULL )
+        return ITEM_TYPE_UNKNOWN;
+
+    *p_net = e->b_net;
+    return e->i_type;
 }
 
 input_item_node_t *input_item_node_Create( input_item_t *p_input )
