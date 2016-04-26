@@ -237,7 +237,10 @@ int net_AcceptSingle (vlc_object_t *obj, int lfd)
     int fd = vlc_accept (lfd, NULL, NULL, true);
     if (fd == -1)
     {
-        if (net_errno != EAGAIN && net_errno != EWOULDBLOCK)
+        if (net_errno != EAGAIN)
+#if (EAGAIN != EWOULDBLOCK)
+          if (net_errno != EWOULDBLOCK)
+#endif
             msg_Err (obj, "accept failed (from socket %d): %s", lfd,
                      vlc_strerror_c(net_errno));
         return -1;
