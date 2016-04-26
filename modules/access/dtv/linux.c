@@ -326,7 +326,7 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len, int ms)
     if (d->frontend != -1)
     {
         ufd[1].fd = d->frontend;
-        ufd[1].events = POLLIN;
+        ufd[1].events = POLLPRI;
         n = 2;
     }
     else
