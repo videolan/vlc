@@ -1029,8 +1029,8 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         /* Short match work, not just exact match */
         { "alsa",   ITEM_TYPE_CARD, false },
         { "atsc",   ITEM_TYPE_CARD, false },
-        { "bluray", ITEM_TYPE_DISC, false },
         { "bd",     ITEM_TYPE_DISC, false },
+        { "bluray", ITEM_TYPE_DISC, false },
         { "cable",  ITEM_TYPE_CARD, false },
         { "cdda",   ITEM_TYPE_DISC, false },
         { "cqam",   ITEM_TYPE_CARD, false },
@@ -1039,10 +1039,10 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "deckli", ITEM_TYPE_CARD, false }, /* decklink */
         { "dir",    ITEM_TYPE_DIRECTORY, false },
         { "dshow",  ITEM_TYPE_CARD, false },
+        { "dtv",    ITEM_TYPE_CARD, false },
         { "dv",     ITEM_TYPE_CARD, false },
         { "dvb",    ITEM_TYPE_CARD, false },
         { "dvd",    ITEM_TYPE_DISC, false },
-        { "dtv",    ITEM_TYPE_CARD, false },
         { "eyetv",  ITEM_TYPE_CARD, false },
         { "fd",     ITEM_TYPE_UNKNOWN, false },
         { "file",   ITEM_TYPE_FILE, false },
@@ -1060,12 +1060,12 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "nfs",    ITEM_TYPE_FILE, true },
         { "ofdm",   ITEM_TYPE_CARD, false },
         { "oss",    ITEM_TYPE_CARD, false },
-        { "pulse",  ITEM_TYPE_CARD, false },
-        { "qtsound",ITEM_TYPE_CARD, false },
         { "pnm",    ITEM_TYPE_STREAM, true },
+        { "pulse",  ITEM_TYPE_CARD, false },
         { "qam",    ITEM_TYPE_CARD, false },
         { "qpsk",   ITEM_TYPE_CARD, false },
         { "qtcapt", ITEM_TYPE_CARD, false }, /* qtcapture */
+        { "qtsound",ITEM_TYPE_CARD, false },
         { "raw139", ITEM_TYPE_CARD, false }, /* raw1394 */
         { "rt",     ITEM_TYPE_STREAM, true }, /* rtp, rtsp, rtmp */
         { "satell", ITEM_TYPE_CARD, false }, /* satellite */
@@ -1078,9 +1078,9 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "svcd",   ITEM_TYPE_DISC, false },
         { "tcp",    ITEM_TYPE_STREAM, true },
         { "terres", ITEM_TYPE_CARD, false }, /* terrestrial */
-        { "upnp",   ITEM_TYPE_FILE, true },
         { "udp",    ITEM_TYPE_STREAM, true },  /* udplite too */
         { "unsv",   ITEM_TYPE_STREAM, true },
+        { "upnp",   ITEM_TYPE_FILE, true },
         { "usdigi", ITEM_TYPE_CARD, false }, /* usdigital */
         { "v4l",    ITEM_TYPE_CARD, false },
         { "vcd",    ITEM_TYPE_DISC, false },
