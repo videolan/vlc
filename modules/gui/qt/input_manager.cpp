@@ -62,9 +62,10 @@ static inline void registerAndCheckEventIds( int start, int end )
  * But can also be used for VLM dialog or similar
  **********************************************************************/
 
-InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
-                           QObject( parent ), p_intf( _p_intf )
+InputManager::InputManager( MainInputManager *mim, intf_thread_t *_p_intf) :
+                           QObject( mim ), p_intf( _p_intf )
 {
+    p_mim        = mim;
     i_old_playing_status = END_S;
     oldName      = "";
     artUrl       = "";
@@ -87,7 +88,7 @@ InputManager::~InputManager()
 
 void InputManager::inputChangedHandler()
 {
-    setInput( THEMIM->getInput() );
+    setInput( p_mim->getInput() );
 }
 
 /* Define the Input used.
@@ -731,7 +732,7 @@ void InputManager::setArt( input_item_t *p_item, QString fileUrl )
     if( hasInput() )
     {
         char *psz_cachedir = config_GetUserDir( VLC_CACHE_DIR );
-        QString old_url = THEMIM->getIM()->decodeArtURL( p_item );
+        QString old_url = p_mim->getIM()->decodeArtURL( p_item );
         old_url = QDir( old_url ).canonicalPath();
 
         if( old_url.startsWith( QString::fromUtf8( psz_cachedir ) ) )
@@ -945,12 +946,12 @@ void InputManager::setAtoB()
 {
     if( !timeA )
     {
-        timeA = var_GetInteger( THEMIM->getInput(), "time"  );
+        timeA = var_GetInteger( p_mim->getInput(), "time"  );
     }
     else if( !timeB )
     {
-        timeB = var_GetInteger( THEMIM->getInput(), "time"  );
-        var_SetInteger( THEMIM->getInput(), "time" , timeA );
+        timeB = var_GetInteger( p_mim->getInput(), "time"  );
+        var_SetInteger( p_mim->getInput(), "time" , timeA );
         CONNECT( this, positionUpdated( float, int64_t, int ),
                  this, AtoBLoop( float, int64_t, int ) );
     }
@@ -968,7 +969,7 @@ void InputManager::setAtoB()
 void InputManager::AtoBLoop( float, int64_t i_time, int )
 {
     if( timeB && i_time >= timeB )
-        var_SetInteger( THEMIM->getInput(), "time" , timeA );
+        var_SetInteger( p_mim->getInput(), "time" , timeA );
 }
 
 /**********************************************************************

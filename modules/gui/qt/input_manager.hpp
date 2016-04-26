@@ -120,13 +120,15 @@ private:
     int i_parent;
 };
 
+class MainInputManager;
+
 class InputManager : public QObject
 {
     Q_OBJECT
     friend class MainInputManager;
 
 public:
-    InputManager( QObject *, intf_thread_t * );
+    InputManager( MainInputManager *, intf_thread_t * );
     virtual ~InputManager();
 
     void delInput();
@@ -144,6 +146,7 @@ public:
 
 private:
     intf_thread_t  *p_intf;
+    MainInputManager* p_mim;
     input_thread_t *p_input;
     vlc_object_t   *p_input_vbi;
     input_item_t   *p_item;
