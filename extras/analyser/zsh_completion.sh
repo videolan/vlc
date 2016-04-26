@@ -11,7 +11,7 @@ case $HOST in
     *cygwin*|*mingw*)
         SUFFIX=dll
     ;;
-    *linux*|*bsd*)
+    *linux*|*bsd*|*gnu*)
         SUFFIX=so
     ;;
     *)
