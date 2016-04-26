@@ -74,9 +74,6 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static const char *const ppsz_vout_options[] = {
-    "file", "chroma", "yuv4mpeg2", NULL
-};
 
 /* */
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
