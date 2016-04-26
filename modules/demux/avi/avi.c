@@ -223,7 +223,6 @@ static int   AVI_GetKeyFlag    ( vlc_fourcc_t , uint8_t * );
 
 static int AVI_PacketGetHeader( demux_t *, avi_packet_t *p_pk );
 static int AVI_PacketNext     ( demux_t * );
-static int AVI_PacketRead     ( demux_t *, avi_packet_t *, block_t **);
 static int AVI_PacketSearch   ( demux_t * );
 
 static void AVI_IndexLoad    ( demux_t * );
@@ -2218,29 +2217,6 @@ static int AVI_PacketNext( demux_t *p_demux )
     {
         return VLC_EGENERIC;
     }
-    return VLC_SUCCESS;
-}
-
-static int AVI_PacketRead( demux_t   *p_demux,
-                           avi_packet_t     *p_pk,
-                           block_t          **pp_frame )
-{
-    size_t i_size;
-
-    i_size = __EVEN( p_pk->i_size + 8 );
-
-    if( ( *pp_frame = stream_Block( p_demux->s, i_size ) ) == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-    (*pp_frame)->p_buffer += 8;
-    (*pp_frame)->i_buffer -= 8;
-
-    if( i_size != p_pk->i_size + 8 )
-    {
-        (*pp_frame)->i_buffer--;
-    }
-
     return VLC_SUCCESS;
 }
 
