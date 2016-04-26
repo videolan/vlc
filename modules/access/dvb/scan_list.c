@@ -24,6 +24,7 @@
 #include <vlc_common.h>
 #include <vlc_fs.h>
 
+#include "scan.h"
 #include "scan_list.h"
 
 static scan_list_entry_t * scan_list_entry_New()
@@ -31,8 +32,10 @@ static scan_list_entry_t * scan_list_entry_New()
     scan_list_entry_t *p_entry = calloc(1, sizeof(scan_list_entry_t));
     if( likely(p_entry) )
     {
-        p_entry->i_service = -1;
-        p_entry->i_stream_id = -1;
+        p_entry->coderate_hp = SCAN_CODERATE_AUTO;
+        p_entry->coderate_lp = SCAN_CODERATE_AUTO;
+        p_entry->inner_fec = SCAN_CODERATE_AUTO;
+        p_entry->modulation = SCAN_MODULATION_AUTO;
     }
     return p_entry;
 }
@@ -47,19 +50,17 @@ static bool scan_list_entry_validate( const scan_list_entry_t *p_entry )
 {
     switch( p_entry->delivery )
     {
-        case DELIVERY_DVBS:
-        case DELIVERY_DVBS2:
-            return p_entry->i_freq && p_entry->i_rate && p_entry->i_fec;
-
-        case DELIVERY_DVBT:
-        case DELIVERY_DVBT2:
-        case DELIVERY_ISDBT:
-            return p_entry->i_freq && p_entry->i_bw;
-
-        case DELIVERY_DVBC:
+        case SCAN_DELIVERY_DVB_S:
+        case SCAN_DELIVERY_DVB_S2:
+        case SCAN_DELIVERY_DVB_C:
             return p_entry->i_freq && p_entry->i_rate;
 
-        case DELIVERY_UNKNOWN:
+        case SCAN_DELIVERY_DVB_T:
+        case SCAN_DELIVERY_DVB_T2:
+        case SCAN_DELIVERY_ISDB_T:
+            return p_entry->i_freq && p_entry->i_bw;
+
+        case SCAN_DELIVERY_UNKNOWN:
         default:
             break;
     }
@@ -79,15 +80,31 @@ static bool scan_list_entry_add( scan_list_entry_t ***ppp_last, scan_list_entry_
     return false;
 }
 
-static void scan_list_parse_fec( scan_list_entry_t *p_entry, const char *psz )
+static int scan_list_parse_fec( const char *psz_fec )
 {
-    const char *psz_fec_list = "1/22/33/44/55/66/77/88/9";
-    const char *psz_fec = strstr( psz_fec_list, psz );
-    if ( !psz_fec )
-        p_entry->i_fec = 9;    /* FEC_AUTO */
-    else
-        p_entry->i_fec = 1 + ( ( psz_fec - psz_fec_list ) / 3 );
+    if ( psz_fec )
+    {
+        if( !strcmp( "NONE", psz_fec ) )
+            return SCAN_CODERATE_NONE;
 
+        uint16_t a, b;
+        if( 2 == sscanf(psz_fec, "%"SCNu16"/%"SCNu16, &a, &b) )
+            return make_tuple(a, b);
+    }
+
+    return SCAN_CODERATE_AUTO;
+}
+
+static int scan_list_parse_guard( const char *psz_guard )
+{
+    if ( psz_guard && strcmp( "AUTO", psz_guard ) )
+    {
+        uint16_t a, b;
+        if( 2 == sscanf(psz_guard, "%"SCNu16"/%"SCNu16, &a, &b) )
+            return make_tuple(a, b);
+    }
+
+    return SCAN_GUARD_INTERVAL_AUTO;
 }
 
 static void scan_token_strip( const char **ppsz, size_t *pi_len )
@@ -145,6 +162,16 @@ static bool scan_list_token_split( const char *psz_line, size_t i_len,
 #define VALUE_EQUALS(token) \
     ((sizeof(token) - 1) == i_valuelen && !strncasecmp( psz_value, token, i_valuelen ))
 
+#define READ_STRINGVAL(variable, parser) { \
+    char *psz_val = strndup(psz_value, i_valuelen);\
+    if( psz_val )\
+    {\
+        variable = parser( psz_val );\
+        free( psz_val );\
+    } }
+
+#define WLEN(string) (sizeof(string) - 1), string
+
 static void scan_list_dvbv5_entry_fill( scan_list_entry_t *p_entry, const char *psz_line, size_t i_len )
 {
     const char *psz_key;
@@ -157,11 +184,7 @@ static void scan_list_dvbv5_entry_fill( scan_list_entry_t *p_entry, const char *
 
     char *psz_end = (char *) &psz_value[i_valuelen];
 
-    if ( KEY_EQUALS("SERVICE_ID") )
-    {
-        p_entry->i_service = strtoll( psz_value, &psz_end, 10 );
-    }
-    else if( KEY_EQUALS("FREQUENCY") )
+    if( KEY_EQUALS("FREQUENCY") )
     {
         p_entry->i_freq = strtoll( psz_value, &psz_end, 10 );
     }
@@ -172,41 +195,77 @@ static void scan_list_dvbv5_entry_fill( scan_list_entry_t *p_entry, const char *
     else if( KEY_EQUALS("DELIVERY_SYSTEM") )
     {
         if( VALUE_EQUALS("DVBT") )
-            p_entry->delivery = DELIVERY_DVBT;
+            p_entry->delivery = SCAN_DELIVERY_DVB_T;
         else if( VALUE_EQUALS("DVBT2") )
-            p_entry->delivery = DELIVERY_DVBT2;
+            p_entry->delivery = SCAN_DELIVERY_DVB_T2;
         else if( VALUE_EQUALS("DVBS") )
-            p_entry->delivery = DELIVERY_DVBS;
+            p_entry->delivery = SCAN_DELIVERY_DVB_S;
         else if( VALUE_EQUALS("DVBS2") )
-            p_entry->delivery = DELIVERY_DVBS2;
+            p_entry->delivery = SCAN_DELIVERY_DVB_S2;
         else if( VALUE_EQUALS("DVBC/ANNEX_A") )
-            p_entry->delivery = DELIVERY_DVBC;
+            p_entry->delivery = SCAN_DELIVERY_DVB_C;
         else if( VALUE_EQUALS("ISDBT") )
-            p_entry->delivery = DELIVERY_ISDBT;
+            p_entry->delivery = SCAN_DELIVERY_ISDB_T;
+    }
+    else if( KEY_EQUALS("MODULATION") )
+    {
+        static const struct
+        {
+            size_t i_len;
+            const char *psz;
+            int val;
+        } map[] = {
+            { WLEN( "APSK/16" ), SCAN_MODULATION_APSK_16 },
+            { WLEN( "APSK/32" ), SCAN_MODULATION_APSK_32 },
+            { WLEN( "DQPSK" ),   SCAN_MODULATION_DQPSK },
+            { WLEN( "PSK/8" ),   SCAN_MODULATION_PSK_8 },
+            { WLEN( "QAM/4_NR" ),SCAN_MODULATION_QAM_4NR },
+            { WLEN( "QAM/16" ),  SCAN_MODULATION_QAM_16 },
+            { WLEN( "QAM/32" ),  SCAN_MODULATION_QAM_32 },
+            { WLEN( "QAM/64" ),  SCAN_MODULATION_QAM_64 },
+            { WLEN( "QAM/128" ), SCAN_MODULATION_QAM_128 },
+            { WLEN( "QAM/256" ), SCAN_MODULATION_QAM_256 },
+            { WLEN( "QAM/AUTO" ),SCAN_MODULATION_QAM_AUTO },
+            { WLEN( "QPSK" ),    SCAN_MODULATION_QPSK },
+            { WLEN( "VSB/8" ),   SCAN_MODULATION_VSB_8 },
+            { WLEN( "VSB/16" ),  SCAN_MODULATION_VSB_16 },
+        };
+        p_entry->modulation = SCAN_MODULATION_AUTO;
+        for(size_t i=0; i<ARRAY_SIZE(map); i++)
+        {
+            if( map[i].i_len == i_valuelen && !strncasecmp( psz_value, map[i].psz, i_valuelen ) )
+            {
+                p_entry->modulation = map[i].val;
+                break;
+            }
+        }
     }
     else if( KEY_EQUALS("POLARIZATION") )
     {
         if( VALUE_EQUALS("VERTICAL") )
-            p_entry->polarization = POLARIZATION_VERTICAL;
+            p_entry->polarization = SCAN_POLARIZATION_VERTICAL;
         else
-            p_entry->polarization = POLARIZATION_HORIZONTAL;
+            p_entry->polarization = SCAN_POLARIZATION_HORIZONTAL;
     }
     else if( KEY_EQUALS("SYMBOL_RATE") )
     {
         p_entry->i_rate = strtoll( psz_value, &psz_end, 10 );
     }
-    else if( KEY_EQUALS("STREAM_ID") )
-    {
-        p_entry->i_stream_id = strtoll( psz_value, &psz_end, 10 );
-    }
     else if( KEY_EQUALS("INNER_FEC") )
     {
-        char *psz_val = strndup(psz_value, i_valuelen);
-        if( psz_val )
-        {
-            scan_list_parse_fec( p_entry, psz_val );
-            free( psz_val );
-        }
+        READ_STRINGVAL( p_entry->inner_fec, scan_list_parse_fec );
+    }
+    else if( KEY_EQUALS("CODE_RATE_HP") )
+    {
+        READ_STRINGVAL( p_entry->coderate_hp, scan_list_parse_fec );
+    }
+    else if( KEY_EQUALS("CODE_RATE_LP") )
+    {
+        READ_STRINGVAL( p_entry->coderate_lp, scan_list_parse_fec );
+    }
+    else if( KEY_EQUALS("GUARD_INTERVAL") )
+    {
+        READ_STRINGVAL( p_entry->guard_interval, scan_list_parse_guard );
     }
 }
 
@@ -339,15 +398,15 @@ scan_list_entry_t * scan_list_dvbv3_load( vlc_object_t *p_obj, const char *psz_s
 
         if( !strcmp( psz_token, "S" ) )
         {
-            p_entry->delivery = DELIVERY_DVBS;
+            p_entry->delivery = SCAN_DELIVERY_DVB_S;
         }
         else if( !strcmp( psz_token, "S2" ) )
         {
-            p_entry->delivery = DELIVERY_DVBS2;
+            p_entry->delivery = SCAN_DELIVERY_DVB_S2;
         }
 
         /* Parse the delivery format */
-        if( p_entry->delivery == DELIVERY_DVBS || p_entry->delivery == DELIVERY_DVBS2 )
+        if( p_entry->delivery == SCAN_DELIVERY_DVB_S || p_entry->delivery == SCAN_DELIVERY_DVB_S2 )
         {
             /* FREQUENCY */
             if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
@@ -357,8 +416,8 @@ scan_list_entry_t * scan_list_dvbv3_load( vlc_object_t *p_obj, const char *psz_s
             /* POLARIZATION */
             if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
                 continue;
-            p_entry->polarization = !strcasecmp(psz_token, "H") ? POLARIZATION_HORIZONTAL
-                                                                : POLARIZATION_VERTICAL;
+            p_entry->polarization = !strcasecmp(psz_token, "H") ? SCAN_POLARIZATION_HORIZONTAL
+                                                                : SCAN_POLARIZATION_VERTICAL;
 
             /* RATE */
             if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
@@ -368,7 +427,7 @@ scan_list_entry_t * scan_list_dvbv3_load( vlc_object_t *p_obj, const char *psz_s
             /* FEC */
             if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
                 continue;
-            scan_list_parse_fec( p_entry, psz_token );
+            p_entry->inner_fec = scan_list_parse_fec( psz_token );
 
             /* INVERSION */
             if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
@@ -381,7 +440,6 @@ scan_list_entry_t * scan_list_dvbv3_load( vlc_object_t *p_obj, const char *psz_s
             /* STREAM_ID */
             if( !(psz_token = strtok_r( NULL, psz_delims, &p_save )) )
                 continue;
-            p_entry->i_stream_id = atoi( psz_token );
         }
 
     }

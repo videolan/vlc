@@ -111,7 +111,7 @@ struct scan_multiplex_t
 
 typedef struct
 {
-    unsigned i_modulation;
+    scan_modulation_t modulation;
     unsigned i_symbolrate_index;
     unsigned i_index;
 } scan_enumeration_t;
@@ -184,7 +184,16 @@ static unsigned scan_session_GetTablesTimeout( const scan_session_t *p_session )
 static void scan_tuner_config_Init( scan_tuner_config_t *p_cfg, const scan_parameter_t *p_params )
 {
     memset( p_cfg, 0, sizeof(*p_cfg) );
-    p_cfg->i_fec = 9; /* FEC_AUTO */
+    p_cfg->coderate_lp = SCAN_CODERATE_AUTO;
+    p_cfg->coderate_hp = SCAN_CODERATE_AUTO;
+    p_cfg->inner_fec = SCAN_CODERATE_AUTO;
+    switch(p_params->type)
+    {
+        case SCAN_DVB_T: p_cfg->delivery = SCAN_DELIVERY_DVB_T; break;
+        case SCAN_DVB_S: p_cfg->delivery = SCAN_DELIVERY_DVB_S; break;
+        case SCAN_DVB_C: p_cfg->delivery = SCAN_DELIVERY_DVB_C; break;
+        default: p_cfg->delivery = SCAN_DELIVERY_UNKNOWN; break;
+    }
     p_cfg->type = p_params->type;
 }
 
@@ -525,56 +534,24 @@ static int Scan_Next_DVB_SpectrumExhaustive( const scan_parameter_t *p_params, s
     return VLC_SUCCESS;
 }
 
-static int Scan_Next_DVBS( scan_t *p_scan, scan_tuner_config_t *p_cfg, double *pf_pos )
-{
-    if( p_scan->parameter.b_exhaustive )
-        msg_Warn( p_scan->p_obj, "no exhaustive DVB-S scan mode" );
-
-    const scan_list_entry_t *p_entry = p_scan->p_current;
-    if( !p_entry )
-        return VLC_EGENERIC;
-
-    /* setup params for scan */
-    p_cfg->i_symbolrate = p_entry->i_rate / 1000;
-    p_cfg->i_frequency = p_entry->i_freq;
-    p_cfg->i_fec = p_entry->i_fec;
-    p_cfg->c_polarization = ( p_entry->polarization == POLARIZATION_HORIZONTAL ) ? 'H' : 'V';
-
-    p_scan->spectrum.i_index++;
-
-    msg_Dbg( p_scan->p_obj,
-             "transponder [%"PRId64"/%zd]: frequency=%d, symbolrate=%d, fec=%d, polarization=%c",
-             p_scan->spectrum.i_index,
-             p_scan->i_scanlist,
-             p_cfg->i_frequency,
-             p_cfg->i_symbolrate,
-             p_cfg->i_fec,
-             p_cfg->c_polarization );
-
-    p_scan->p_current = p_scan->p_current->p_next;
-    *pf_pos = (double) p_scan->spectrum.i_index / p_scan->i_scanlist;
-
-    return VLC_SUCCESS;
-}
-
 static int Scan_Next_DVBC( const scan_parameter_t *p_params, scan_enumeration_t *p_spectrum,
                            scan_tuner_config_t *p_cfg, double *pf_pos )
 {
     bool b_rotate=true;
     if( !p_params->b_modulation_set )
     {
-        p_spectrum->i_modulation = (p_spectrum->i_modulation >> 1 );
+        p_spectrum->modulation = (p_spectrum->modulation >> 1 );
         /* if we iterated all modulations, move on */
         /* dvb utils dvb-c channels files seems to have only
                QAM64...QAM256, so lets just iterate over those */
-        if( p_spectrum->i_modulation < 64)
+        if( p_spectrum->modulation < SCAN_MODULATION_QAM_64)
         {
-            p_spectrum->i_modulation = 256;
+            p_spectrum->modulation = SCAN_MODULATION_QAM_256;
         } else {
             b_rotate=false;
         }
     }
-    p_cfg->i_modulation = p_spectrum->i_modulation;
+    p_cfg->modulation = p_spectrum->modulation;
 
     if( p_params->i_symbolrate == 0 )
     {
@@ -637,7 +614,7 @@ static int Scan_Next_DVBC( const scan_parameter_t *p_params, scan_enumeration_t 
     p_cfg->i_frequency = 10000 * ( frequencies[ p_spectrum->i_index ] );
     *pf_pos = (double)(p_spectrum->i_index * 1000 +
                        p_spectrum->i_symbolrate_index * 100 +
-                       (256 - (p_spectrum->i_modulation >> 4)) )
+                       (256 - (p_spectrum->modulation >> 4)) )
             / (num_frequencies * 1000 + 900 + 16);
 
     if( b_rotate )
@@ -739,8 +716,6 @@ static int Scan_GetNextSpectrumTunerConfig( scan_t *p_scan, scan_tuner_config_t 
         case SCAN_DVB_C:
             i_ret = Scan_Next_DVBC( &p_scan->parameter, &p_scan->spectrum, p_cfg, pf_pos );
             break;
-        case SCAN_DVB_S:
-            i_ret = Scan_Next_DVBS( p_scan, p_cfg, pf_pos );
         default:
             break;
     }
@@ -755,25 +730,36 @@ static int Scan_GetNextTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, 
         const scan_list_entry_t *p_entry = p_scan->p_current;
         p_cfg->i_frequency = p_entry->i_freq;
         p_cfg->i_bandwidth = p_entry->i_bw / 1000000;
-        p_scan->p_current = p_scan->p_current->p_next;
-        *pf_pos = (double) p_scan->spectrum.i_index++ / p_scan->i_scanlist;
+        p_cfg->modulation = p_entry->modulation;
+
         switch( p_entry->delivery )
         {
-            case DELIVERY_UNKNOWN:
+            case SCAN_DELIVERY_UNKNOWN:
                 break;
-            case DELIVERY_DVBT:
+            case SCAN_DELIVERY_DVB_T:
+                p_cfg->coderate_hp = p_entry->coderate_hp;
+                p_cfg->coderate_lp = p_entry->coderate_lp;
                 p_cfg->type = SCAN_DVB_T;
                 break;
-            case DELIVERY_DVBS:
+            case SCAN_DELIVERY_DVB_S:
                 p_cfg->type = SCAN_DVB_S;
+                p_cfg->polarization = p_entry->polarization;
+                p_cfg->i_symbolrate = p_entry->i_rate / 1000;
+                p_cfg->inner_fec = p_entry->inner_fec;
                 break;
-            case DELIVERY_DVBC:
+            case SCAN_DELIVERY_DVB_C:
                 p_cfg->type = SCAN_DVB_C;
+                p_cfg->i_symbolrate = p_entry->i_rate / 1000;
+                p_cfg->inner_fec = p_entry->inner_fec;
                 break;
             default:
                 p_cfg->type = SCAN_NONE;
                 break;
         }
+
+        p_scan->p_current = p_scan->p_current->p_next;
+        *pf_pos = (double) p_scan->spectrum.i_index++ / p_scan->i_scanlist;
+
         return VLC_SUCCESS;
     }
 
@@ -1169,6 +1155,33 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
     }
 }
 
+static scan_coderate_t ConvertDelDrInnerFec( uint8_t v )
+{
+    switch(v)
+    {
+        default:
+        case 0x0: return SCAN_CODERATE_AUTO;
+        case 0x1: return SCAN_CODERATE_1_2;
+        case 0x2: return SCAN_CODERATE_2_3;
+        case 0x3: return SCAN_CODERATE_3_4;
+        case 0x4: return SCAN_CODERATE_5_6;
+        case 0x5: return SCAN_CODERATE_7_8;
+        case 0x6: return SCAN_CODERATE_8_9;
+        case 0x7: return SCAN_CODERATE_3_5;
+        case 0x8: return SCAN_CODERATE_4_5;
+        case 0x9: return SCAN_CODERATE_9_10;
+        case 0xF: return SCAN_CODERATE_NONE;
+    }
+}
+
+static scan_coderate_t ConvertDelDrCodeRate( uint8_t v )
+{
+    if( v > 0x04 )
+        return SCAN_CODERATE_AUTO;
+    else
+        return ConvertDelDrInnerFec( v + 1 );
+}
+
 static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                       const dvbpsi_nit_t *p_nit, const scan_tuner_config_t *p_cfg )
 {
@@ -1205,24 +1218,33 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                     tscfg.i_bandwidth =  8 - p_t->i_bandwidth;
                     switch(p_t->i_constellation)
                     {
-                        default:
                         case 0x00:
-                            tscfg.i_modulation = -1;
+                            tscfg.modulation = SCAN_MODULATION_QPSK;
                             break;
                         case 0x01:
-                            tscfg.i_modulation = 16;
+                            tscfg.modulation = SCAN_MODULATION_QAM_16;
                             break;
                         case 0x02:
-                            tscfg.i_modulation = 64;
+                            tscfg.modulation = SCAN_MODULATION_QAM_64;
+                            break;
+                        default:
+                            tscfg.modulation = SCAN_MODULATION_AUTO;
                             break;
                     }
 
+                    tscfg.coderate_hp = ConvertDelDrCodeRate( p_t->i_code_rate_hp_stream );
+                    if( p_t->i_hierarchy_information == 0x0 || p_t->i_hierarchy_information == 0x4 )
+                        tscfg.coderate_lp = SCAN_CODERATE_NONE;
+                    else
+                        tscfg.coderate_lp = ConvertDelDrCodeRate( p_t->i_code_rate_lp_stream );
+
                     msg_Dbg( p_obj, "       * terrestrial delivery system" );
-                    msg_Dbg( p_obj, "           * centre_frequency %u", p_t->i_centre_frequency / 10 );
-                    msg_Dbg( p_obj, "           * bandwidth %u", 8 - p_t->i_bandwidth );
-                    msg_Dbg( p_obj, "           * constellation %d", p_t->i_constellation );
+                    msg_Dbg( p_obj, "           * centre_frequency %u", tscfg.i_frequency );
+                    msg_Dbg( p_obj, "           * bandwidth %u", tscfg.i_bandwidth );
+                    msg_Dbg( p_obj, "           * modulation %s", scan_value_modulation( tscfg.modulation ) );
                     msg_Dbg( p_obj, "           * hierarchy %d", p_t->i_hierarchy_information );
-                    msg_Dbg( p_obj, "           * code_rate hp %d lp %d", p_t->i_code_rate_hp_stream, p_t->i_code_rate_lp_stream );
+                    msg_Dbg( p_obj, "           * code_rate hp %s lp %s", scan_value_coderate( tscfg.coderate_hp ),
+                                                                          scan_value_coderate( tscfg.coderate_hp ) );
                     msg_Dbg( p_obj, "           * guard_interval %d", p_t->i_guard_interval );
                     msg_Dbg( p_obj, "           * transmission_mode %d", p_t->i_transmission_mode );
                     msg_Dbg( p_obj, "           * other_frequency_flag %d", p_t->i_other_frequency_flag );
@@ -1235,12 +1257,47 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 {
                     tscfg.i_frequency =  decode_BCD( p_s->i_frequency ) * 1000;
                     tscfg.i_symbolrate =  decode_BCD( p_s->i_symbol_rate ) * 100;
-                    const char polarizations[] = { 'H', 'V', 'L', 'R' };
-                    tscfg.c_polarization = polarizations[p_s->i_polarization];
+                    if( p_s->i_polarization > SCAN_POLARIZATION_CIRC_RIGHT )
+                        p_s->i_polarization = 0;
+
+                    const scan_polarization_t polarizations[] = {
+                                                  SCAN_POLARIZATION_HORIZONTAL,
+                                                  SCAN_POLARIZATION_VERTICAL,
+                                                  SCAN_POLARIZATION_CIRC_LEFT,
+                                                  SCAN_POLARIZATION_CIRC_RIGHT };
+                    tscfg.polarization = polarizations[p_s->i_polarization];
+
+                    switch(p_s->i_modulation_type)
+                    {
+                        default:
+                        case 0x00:
+                            tscfg.modulation = SCAN_MODULATION_AUTO;
+                            break;
+                        case 0x01:
+                            tscfg.modulation = SCAN_MODULATION_QPSK;
+                            break;
+                        case 0x02:
+                            tscfg.modulation = SCAN_MODULATION_PSK_8;
+                            break;
+                        case 0x03:
+                            tscfg.modulation = SCAN_MODULATION_QAM_16;
+                            break;
+                    }
+
+                    tscfg.delivery = (p_s->i_modulation_system == 0x01) ? SCAN_DELIVERY_DVB_S2
+                                                                        : SCAN_DELIVERY_DVB_S;
+                    tscfg.inner_fec = ConvertDelDrInnerFec( p_s->i_fec_inner );
+
                     msg_Dbg( p_obj, "       * satellite delivery system" );
                     msg_Dbg( p_obj, "           * frequency %u", tscfg.i_frequency );
                     msg_Dbg( p_obj, "           * symbolrate %u", tscfg.i_symbolrate );
-                    msg_Dbg( p_obj, "           * polarization %c", tscfg.c_polarization );
+                    msg_Dbg( p_obj, "           * polarization %c", (char) tscfg.polarization );
+                    msg_Dbg( p_obj, "           * modulation %s", scan_value_modulation( tscfg.modulation ) );
+                    msg_Dbg( p_obj, "           * fec inner %s", scan_value_coderate( tscfg.inner_fec ) );
+                    if( tscfg.delivery == SCAN_DELIVERY_DVB_S2 )
+                    {
+                        msg_Dbg( p_obj, "           * system DVB-S2" );
+                    }
                 }
             }
             else if( p_dsc->i_tag == 0x44 )
@@ -1250,11 +1307,17 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 {
                     tscfg.i_frequency =  decode_BCD( p_t->i_frequency ) * 100;
                     tscfg.i_symbolrate =  decode_BCD( p_t->i_symbol_rate ) * 100;
-                    tscfg.i_modulation = (8 << p_t->i_modulation);
+                    if( p_t->i_modulation <= 0x05 )
+                        tscfg.modulation = p_t->i_modulation;
+                    else
+                        tscfg.modulation = SCAN_MODULATION_AUTO;
+                    tscfg.inner_fec = ConvertDelDrInnerFec( p_t->i_fec_inner );
+
                     msg_Dbg( p_obj, "       * Cable delivery system");
                     msg_Dbg( p_obj, "           * frequency %d", tscfg.i_frequency );
                     msg_Dbg( p_obj, "           * symbolrate %u", tscfg.i_symbolrate );
-                    msg_Dbg( p_obj, "           * modulation %u", tscfg.i_modulation );
+                    msg_Dbg( p_obj, "           * modulation %s", scan_value_modulation( tscfg.modulation ) );
+                    msg_Dbg( p_obj, "           * fec inner %s", scan_value_coderate( tscfg.inner_fec ) );
                 }
             }
             else if( p_dsc->i_tag == 0x5f && p_dsc->i_length > 3 )
@@ -1605,7 +1668,6 @@ const char * scan_service_GetNetworkName( const scan_service_t *s )
         return NULL;
 }
 
-
 char * scan_service_GetUri( const scan_service_t *s )
 {
     char *psz_mrl = NULL;
@@ -1613,24 +1675,24 @@ char * scan_service_GetUri( const scan_service_t *s )
     switch( s->p_mplex->cfg.type )
     {
         case SCAN_DVB_T:
-            i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:bandwidth=%d:modulation=%d",
+            i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:bandwidth=%d:modulation=%s",
                               s->p_mplex->cfg.i_frequency,
                               s->p_mplex->cfg.i_bandwidth,
-                              s->p_mplex->cfg.i_modulation );
+                              scan_value_modulation( s->p_mplex->cfg.modulation ) );
             break;
         case SCAN_DVB_S:
-            i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:voltage=%d:fec=%d",
+            i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:polarization=%c:fec=%s",
                               s->p_mplex->cfg.i_frequency,
                               s->p_mplex->cfg.i_symbolrate,
-                              s->p_mplex->cfg.c_polarization == 'H' ? 18 : 13,
-                              s->p_mplex->cfg.i_fec );
+                              (char) s->p_mplex->cfg.polarization,
+                              scan_value_coderate( s->p_mplex->cfg.inner_fec ) );
             break;
         case SCAN_DVB_C:
-            i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:modulation=%d:fec=%d",
+            i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:modulation=%s:fec=%s",
                               s->p_mplex->cfg.i_frequency,
                               s->p_mplex->cfg.i_symbolrate,
-                              s->p_mplex->cfg.i_modulation,
-                              s->p_mplex->cfg.i_fec );
+                              scan_value_modulation( s->p_mplex->cfg.modulation ),
+                              scan_value_coderate( s->p_mplex->cfg.inner_fec ) );
         default:
             break;
     }
@@ -1687,10 +1749,12 @@ block_t *scan_GetM3U( scan_t *p_scan )
                 psz_type = "Unknown";
                 break;
         }
-        msg_Warn( p_obj, "scan_GetM3U: service number %d type '%s' name '%s' channel %d cypted=%d| network_id %d (nit:%d sdt:%d)| f=%d bw=%d snr=%d modulation=%d",
+        msg_Warn( p_obj, "scan_GetM3U: service number %d type '%s' name '%s' channel %d cypted=%d|"
+                         "network_id %d (nit:%d sdt:%d)| f=%d bw=%d snr=%d modulation=%s",
                   s->i_program, psz_type, s->psz_name, s->i_channel, s->b_crypted,
                   s->p_mplex->i_network_id, s->p_mplex->i_nit_version, s->p_mplex->i_sdt_version,
-                  s->p_mplex->cfg.i_frequency, s->p_mplex->cfg.i_bandwidth, s->p_mplex->i_snr, s->p_mplex->cfg.i_modulation );
+                  s->p_mplex->cfg.i_frequency, s->p_mplex->cfg.i_bandwidth, s->p_mplex->i_snr,
+                  scan_value_modulation( s->p_mplex->cfg.modulation ) );
 
         char *psz_mrl = scan_service_GetUri( s );
         if( psz_mrl == NULL )
@@ -1810,4 +1874,46 @@ static unsigned scan_session_GetTablesTimeout( const scan_session_t *p_session )
     }
 
     return i_time * 2 * 1000;
+}
+
+const char *scan_value_modulation( scan_modulation_t m )
+{
+    switch(m)
+    {
+        case SCAN_MODULATION_QAM_16:     return "16QAM";
+        case SCAN_MODULATION_QAM_32:     return "32QAM";
+        case SCAN_MODULATION_QAM_64:     return "64QAM";
+        case SCAN_MODULATION_QAM_128:    return "128QAM";
+        case SCAN_MODULATION_QAM_256:    return "256QAM";
+        case SCAN_MODULATION_QAM_AUTO:   return "QAM";
+        case SCAN_MODULATION_PSK_8:      return "8PSK";
+        case SCAN_MODULATION_QPSK:       return "QPSK";
+        case SCAN_MODULATION_DQPSK:      return "DQPSK";
+        case SCAN_MODULATION_APSK_16:    return "16APSK";
+        case SCAN_MODULATION_APSK_32:    return "32APSK";
+        case SCAN_MODULATION_VSB_8:      return "8VSB";
+        case SCAN_MODULATION_VSB_16:     return "16VSB";
+        case SCAN_MODULATION_QAM_4NR:
+        case SCAN_MODULATION_AUTO:
+        default:                        return "";
+    }
+}
+
+const char *scan_value_coderate( scan_coderate_t c )
+{
+    switch( c )
+    {
+        case SCAN_CODERATE_NONE: return "0";
+        case SCAN_CODERATE_1_2:  return "1/2";
+        case SCAN_CODERATE_2_3:  return "2/3";
+        case SCAN_CODERATE_3_4:  return "3/4";
+        case SCAN_CODERATE_3_5:  return "3/5";
+        case SCAN_CODERATE_4_5:  return "4/5";
+        case SCAN_CODERATE_5_6:  return "5/6";
+        case SCAN_CODERATE_7_8:  return "7/8";
+        case SCAN_CODERATE_8_9:  return "8/9";
+        case SCAN_CODERATE_9_10: return "9/10";
+        case SCAN_CODERATE_AUTO:
+        default:                 return "";
+    }
 }

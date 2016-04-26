@@ -29,6 +29,73 @@ typedef enum
     SCAN_DVB_C,
 } scan_type_t;
 
+typedef enum
+{
+    SCAN_DELIVERY_UNKNOWN = 0,
+    SCAN_DELIVERY_DVB_T,
+    SCAN_DELIVERY_DVB_T2,
+    SCAN_DELIVERY_DVB_S,
+    SCAN_DELIVERY_DVB_S2,
+    SCAN_DELIVERY_DVB_C,
+    SCAN_DELIVERY_ISDB_T,
+} scan_delivery_t;
+
+typedef enum
+{
+    SCAN_MODULATION_AUTO       = 0x00,
+    SCAN_MODULATION_QAM_16     = 0x01,
+    SCAN_MODULATION_QAM_32     = 0x02,
+    SCAN_MODULATION_QAM_64     = 0x03,
+    SCAN_MODULATION_QAM_128    = 0x04,
+    SCAN_MODULATION_QAM_256    = 0x05,
+    SCAN_MODULATION_QAM_4NR,
+    SCAN_MODULATION_QAM_AUTO,
+    SCAN_MODULATION_PSK_8,
+    SCAN_MODULATION_QPSK,
+    SCAN_MODULATION_DQPSK,
+    SCAN_MODULATION_APSK_16,
+    SCAN_MODULATION_APSK_32,
+    SCAN_MODULATION_VSB_8,
+    SCAN_MODULATION_VSB_16,
+} scan_modulation_t;
+
+#define make_tuple(a,b) ((a << 16)|b)
+typedef enum
+{
+    SCAN_CODERATE_AUTO = -1,
+    SCAN_CODERATE_NONE = 0,
+    SCAN_CODERATE_1_2  = make_tuple(1,2),
+    SCAN_CODERATE_2_3  = make_tuple(2,3),
+    SCAN_CODERATE_3_4  = make_tuple(3,4),
+    SCAN_CODERATE_3_5  = make_tuple(3,5),
+    SCAN_CODERATE_4_5  = make_tuple(4,5),
+    SCAN_CODERATE_5_6  = make_tuple(5,6),
+    SCAN_CODERATE_7_8  = make_tuple(7,8),
+    SCAN_CODERATE_8_9  = make_tuple(8,9),
+    SCAN_CODERATE_9_10 = make_tuple(9,10),
+} scan_coderate_t;
+
+typedef enum
+{
+    SCAN_POLARIZATION_NONE       = 0,
+    SCAN_POLARIZATION_HORIZONTAL = 'H',
+    SCAN_POLARIZATION_CIRC_LEFT  = 'L',
+    SCAN_POLARIZATION_CIRC_RIGHT = 'R',
+    SCAN_POLARIZATION_VERTICAL   = 'V',
+} scan_polarization_t;
+
+typedef enum
+{
+    SCAN_GUARD_INTERVAL_AUTO   = 0,
+    SCAN_GUARD_INTERVAL_1_4    = make_tuple(1,4),
+    SCAN_GUARD_INTERVAL_1_8    = make_tuple(1,8),
+    SCAN_GUARD_INTERVAL_1_16   = make_tuple(1,16),
+    SCAN_GUARD_INTERVAL_1_32   = make_tuple(1,32),
+    SCAN_GUARD_INTERVAL_1_128  = make_tuple(1,128),
+    SCAN_GUARD_INTERVAL_19_128 = make_tuple(19,128),
+    SCAN_GUARD_INTERVAL_19_256 = make_tuple(19,256),
+} scan_guard_t;
+
 typedef struct
 {
     unsigned i_frequency;
@@ -37,10 +104,15 @@ typedef struct
         unsigned i_bandwidth;
         unsigned i_symbolrate;
     };
-    int i_fec;
-    int i_modulation;
-    char c_polarization;
+
+    scan_modulation_t modulation;
+    scan_coderate_t coderate_lp;
+    scan_coderate_t coderate_hp;
+    scan_coderate_t inner_fec;
+    scan_polarization_t polarization;
+
     scan_type_t type;
+    scan_delivery_t delivery;
 
 } scan_tuner_config_t;
 
@@ -109,3 +181,6 @@ int scan_Run( scan_t *p_scan );
 
 block_t *scan_GetM3U( scan_t *p_scan );
 bool scan_IsCancelled( scan_t *p_scan );
+
+const char *scan_value_modulation(scan_modulation_t);
+const char *scan_value_coderate(scan_coderate_t);

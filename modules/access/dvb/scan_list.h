@@ -25,29 +25,18 @@ typedef struct scan_list_entry_t scan_list_entry_t;
 typedef struct scan_list_entry_t
 {
     char *psz_channel;
-    int   i_service;
-    int   i_stream_id;
+
     unsigned i_freq;
     unsigned i_bw;
-
     unsigned i_rate;
-    uint8_t  i_fec;
-    enum
-    {
-        POLARIZATION_VERTICAL = 0,
-        POLARIZATION_HORIZONTAL
-    } polarization;
 
-    enum
-    {
-        DELIVERY_UNKNOWN = 0,
-        DELIVERY_DVBT,
-        DELIVERY_DVBT2,
-        DELIVERY_DVBS,
-        DELIVERY_DVBS2,
-        DELIVERY_DVBC,
-        DELIVERY_ISDBT,
-    } delivery;
+    scan_modulation_t modulation;
+    scan_coderate_t   coderate_lp;
+    scan_coderate_t   coderate_hp;
+    scan_coderate_t   inner_fec;
+    scan_guard_t      guard_interval;
+    scan_delivery_t   delivery;
+    scan_polarization_t polarization;
 
     scan_list_entry_t *p_next;
 

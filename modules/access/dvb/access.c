@@ -222,8 +222,8 @@ static int ScanFrontendTuningHandler( scan_t *p_scan, void *p_privdata,
     var_SetInteger( p_access, "dvb-frequency", p_cfg->i_frequency );
     var_SetInteger( p_access, "dvb-bandwidth", p_cfg->i_bandwidth );
 
-    if ( p_cfg->c_polarization )
-        var_SetInteger( p_access, "dvb-voltage", p_cfg->c_polarization == 'H' ? 18 : 13 );
+    if ( p_cfg->polarization != SCAN_POLARIZATION_NONE )
+        var_SetInteger( p_access, "dvb-voltage", p_cfg->polarization == SCAN_POLARIZATION_HORIZONTAL ? 18 : 13 );
 
     if ( p_cfg->i_symbolrate )
         var_SetInteger( p_access, "dvb-srate", p_cfg->i_symbolrate );
