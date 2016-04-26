@@ -147,14 +147,16 @@ static void matrix_apply_rotation(es_format_t *fmt, uint32_t mvhd_matrix[9])
     if (fmt->i_cat == VIDEO_ES)
         orientation = fmt->video.orientation;
 
-#define ATAN(a, b) do { mvhd_matrix[1] = (a) << 16; \
-    mvhd_matrix[0] = (b) << 16; \
+#define ATAN(a, b) \
+    do { \
+        mvhd_matrix[1] = ((uint32_t)(a)) << 16; \
+        mvhd_matrix[0] = ((uint32_t)(b)) << 16; \
     } while(0)
 
     switch (orientation) {
     case ORIENT_ROTATED_90:  ATAN( 1,  0); break;
     case ORIENT_ROTATED_180: ATAN( 0, -1); break;
-    case ORIENT_ROTATED_270: ATAN( -1, 0); break;
+    case ORIENT_ROTATED_270: ATAN(-1,  0); break;
     default:                 ATAN( 0,  1); break;
     }
 
