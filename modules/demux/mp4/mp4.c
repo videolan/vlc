@@ -3216,7 +3216,7 @@ static inline uint32_t MP4_GetFixedSampleSize( const mp4_track_t *p_track,
 
      /* QuickTime "built-in" support case fixups */
     if( p_track->fmt.i_cat == AUDIO_ES &&
-        p_soun->i_compressionid == 0 && (p_track->i_sample_size == 1 || p_track->i_sample_size == 1) )
+        p_soun->i_compressionid == 0 && p_track->i_sample_size == 1 )
     {
         switch( p_track->fmt.i_codec )
         {
