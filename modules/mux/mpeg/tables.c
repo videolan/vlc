@@ -260,10 +260,7 @@ static void UpdateServiceType( uint8_t *pi_service_cat, uint8_t *pi_service_type
         case 0x01: /* MPEG1 */
         case 0x02: /* MPEG2 */
         case 0x80:
-            if( p_pes->i_height > 468 && p_pes->i_width > 720 )
-                i_type = 0x19;
-            else
-                i_type = 0x01;
+            i_type = 0x01;
             break;
 
         case 0x24: /* HEVC */
