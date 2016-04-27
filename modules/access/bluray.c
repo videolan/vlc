@@ -1633,15 +1633,15 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
         vlc_seekpoint_Delete( t->seekpoint[i] );
     TAB_CLEAN(t->i_seekpoint, t->seekpoint);
 
-        for (unsigned int j = 0; j < title_info->chapter_count; j++) {
-            seekpoint_t *s = vlc_seekpoint_New();
-            if (!s) {
-                break;
-            }
-            s->i_time_offset = FROM_TICKS(title_info->chapters[j].start);
-
-            TAB_APPEND(t->i_seekpoint, t->seekpoint, s);
+    for (unsigned int j = 0; j < title_info->chapter_count; j++) {
+        seekpoint_t *s = vlc_seekpoint_New();
+        if (!s) {
+            break;
         }
+        s->i_time_offset = FROM_TICKS(title_info->chapters[j].start);
+
+        TAB_APPEND(t->i_seekpoint, t->seekpoint, s);
+    }
 }
 
 static void blurayInitTitles(demux_t *p_demux, int menu_titles)
