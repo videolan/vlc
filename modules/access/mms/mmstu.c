@@ -123,16 +123,13 @@ int  MMSTUOpen( access_t *p_access )
     /* *** connect to this server *** */
     /* look at  requested protocol (udp/tcp) */
     i_proto = MMS_PROTO_AUTO;
-    if( *p_access->psz_access )
+    if( !strncmp( p_access->psz_access, "mmsu", 4 ) )
     {
-        if( !strncmp( p_access->psz_access, "mmsu", 4 ) )
-        {
-            i_proto = MMS_PROTO_UDP;
-        }
-        else if( !strncmp( p_access->psz_access, "mmst", 4 ) )
-        {
-            i_proto = MMS_PROTO_TCP;
-        }
+        i_proto = MMS_PROTO_UDP;
+    }
+    else if( !strncmp( p_access->psz_access, "mmst", 4 ) )
+    {
+        i_proto = MMS_PROTO_TCP;
     }
 
     /* connect */

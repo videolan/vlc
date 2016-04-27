@@ -148,10 +148,9 @@ static int Open( vlc_object_t *p_this )
     char* psz_server = NULL;
     int i_result;
 
-    if( !p_access->psz_access || (
-        strncmp( p_access->psz_access, "rtsp", 4 ) &&
+    if( strncmp( p_access->psz_access, "rtsp", 4 ) &&
         strncmp( p_access->psz_access, "pnm", 3 )  &&
-        strncmp( p_access->psz_access, "realrtsp", 8 ) ))
+        strncmp( p_access->psz_access, "realrtsp", 8 ) )
     {
             return VLC_EGENERIC;
     }

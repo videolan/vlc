@@ -79,7 +79,7 @@ struct access_t
     module_t    *p_module;
 
 
-    char        *psz_access; /**< Access name (empty if non forced) */
+    char        *psz_access; /**< Access name */
     char        *psz_url; /**< Full URL or MRL */
     const char  *psz_location; /**< Location (URL with the scheme stripped) */
     char        *psz_filepath; /**< Local file path (if applicable) */
