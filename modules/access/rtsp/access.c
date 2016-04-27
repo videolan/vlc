@@ -148,13 +148,6 @@ static int Open( vlc_object_t *p_this )
     char* psz_server = NULL;
     int i_result;
 
-    if( strncmp( p_access->psz_access, "rtsp", 4 ) &&
-        strncmp( p_access->psz_access, "pnm", 3 )  &&
-        strncmp( p_access->psz_access, "realrtsp", 8 ) )
-    {
-            return VLC_EGENERIC;
-    }
-
     /* Discard legacy username/password syntax - not supported */
     const char *psz_location = strchr( p_access->psz_location, '@' );
     if( psz_location != NULL )
