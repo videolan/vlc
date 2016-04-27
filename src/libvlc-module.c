@@ -761,7 +761,7 @@ static const char *const ppsz_prefres[] = {
     "This is the default Audio CD drive (or file) to use. Don't forget the " \
     "colon after the drive letter (e.g. D:)")
 # define DVD_DEVICE     NULL
-# define CD_DEVICE      "D:"
+# define VCD_DEVICE     "D:"
 
 #else
 # define DVD_DEV_LONGTEXT N_( \
@@ -773,18 +773,15 @@ static const char *const ppsz_prefres[] = {
 
 # if defined(__OpenBSD__)
 #  define DVD_DEVICE     "/dev/cd0c"
-#  define CD_DEVICE      "/dev/cd0c"
+#  define VCD_DEVICE     "/dev/cd0c"
 # elif defined(__linux__)
 #  define DVD_DEVICE     "/dev/sr0"
-#  define CD_DEVICE      "/dev/sr0"
+#  define VCD_DEVICE     "/dev/sr0"
 # else
 #  define DVD_DEVICE     "/dev/dvd"
-#  define CD_DEVICE      "/dev/cdrom"
+#  define VCD_DEVICE     "/dev/cdrom"
 # endif
 #endif
-
-#define VCD_DEVICE       CD_DEVICE
-#define CDAUDIO_DEVICE   CD_DEVICE
 
 #define TIMEOUT_TEXT N_("TCP connection timeout")
 #define TIMEOUT_LONGTEXT N_( \
@@ -1725,8 +1722,6 @@ vlc_module_begin ()
                   false )
     add_loadfile( "vcd", VCD_DEVICE, VCD_DEV_TEXT, VCD_DEV_LONGTEXT,
                   false )
-    add_loadfile( "cd-audio", CDAUDIO_DEVICE, CDAUDIO_DEV_TEXT,
-                  CDAUDIO_DEV_LONGTEXT, false )
 
     set_section( N_( "Network settings" ), NULL )
 

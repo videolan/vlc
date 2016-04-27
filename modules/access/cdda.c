@@ -58,6 +58,24 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define CDAUDIO_DEV_TEXT N_("Audio CD device")
+#if defined( _WIN32 ) || defined( __OS2__ )
+# define CDAUDIO_DEV_LONGTEXT N_( \
+    "This is the default Audio CD drive (or file) to use. Don't forget the " \
+    "colon after the drive letter (e.g. D:)")
+# define CD_DEVICE      "D:"
+#else
+# define CDAUDIO_DEV_LONGTEXT N_( \
+    "This is the default Audio CD device to use." )
+# if defined(__OpenBSD__)
+#  define CD_DEVICE      "/dev/cd0c"
+# elif defined(__linux__)
+#  define CD_DEVICE      "/dev/sr0"
+# else
+#  define CD_DEVICE      "/dev/cdrom"
+# endif
+#endif
+
 vlc_module_begin ()
     set_shortname( N_("Audio CD") )
     set_description( N_("Audio CD input") )
@@ -65,6 +83,9 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_callbacks( Open, Close )
+
+    add_loadfile( "cd-audio", CD_DEVICE, CDAUDIO_DEV_TEXT,
+                  CDAUDIO_DEV_LONGTEXT, false )
 
     add_usage_hint( N_("[cdda:][device][@[track]]") )
     add_integer( "cdda-track", 0 , NULL, NULL, true )
