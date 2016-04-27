@@ -884,11 +884,12 @@ int scan_Run( scan_t *p_scan )
                                      i_timeout - i_remaining,
                                      SCAN_READ_BUFFER_COUNT,
                                      (uint8_t *) &packet, &i_packet_count );
-        if ( i_ret != VLC_SUCCESS )
-            break;
 
         if( p_scan->pf_stats )
             p_scan->pf_stats( p_scan, p_scan->p_cbdata, &session->i_snr );
+
+        if ( i_ret != VLC_SUCCESS )
+            break;
 
         for( size_t i=0; i< i_packet_count; i++ )
         {
