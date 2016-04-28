@@ -145,11 +145,6 @@ struct intf_sys_t
 
     void processMessage(const castchannel::CastMessage &msg);
 
-    command_status getPlayerStatus() const
-    {
-        return cmd_status;
-    }
-
 private:
     int sendMessage(const castchannel::CastMessage &msg);
 
