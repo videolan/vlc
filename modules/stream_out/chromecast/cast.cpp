@@ -324,6 +324,9 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                 streams.erase( it, it );
             }
         }
+
+        /* tell the chromecast to load the content */
+        p_intf->setHasInput( true, mime );
     }
 
     return VLC_SUCCESS;
