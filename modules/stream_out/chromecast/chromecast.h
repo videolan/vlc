@@ -83,6 +83,7 @@ struct intf_sys_t
 
     void setHasInput( bool has_input, const std::string mime_type = "");
 
+private:
     vlc_object_t  * const p_module;
     const int      i_port;
     std::string    serverIP;
@@ -145,7 +146,6 @@ struct intf_sys_t
 
     void processMessage(const castchannel::CastMessage &msg);
 
-private:
     int sendMessage(const castchannel::CastMessage &msg);
 
     void buildMessage(const std::string & namespace_,
