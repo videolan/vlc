@@ -846,19 +846,12 @@ void* intf_sys_t::ChromecastThread(void* p_data)
     p_sys->msgAuth();
     vlc_restorecancel(canc);
 
-    while (1)
-    {
-        p_sys->handleMessages();
-
-        vlc_mutex_locker locker(&p_sys->lock);
-        if ( p_sys->getConnectionStatus() == CHROMECAST_CONNECTION_DEAD )
-            break;
-    }
+    while ( p_sys->handleMessages() );
 
     return NULL;
 }
 
-void intf_sys_t::handleMessages()
+bool intf_sys_t::handleMessages()
 {
     unsigned i_received = 0;
     uint8_t p_packet[PACKET_MAX_LEN];
@@ -885,8 +878,6 @@ void intf_sys_t::handleMessages()
         msg_Err( p_module, "The connection to the Chromecast died (receiving).");
         vlc_mutex_locker locker(&lock);
         setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
-        vlc_restorecancel(canc);
-        return;
     }
 
     if (b_pingTimeout)
@@ -901,6 +892,8 @@ void intf_sys_t::handleMessages()
         msg.ParseFromArray(p_packet + PACKET_HEADER_LEN, i_payloadSize);
         processMessage(msg);
     }
-
     vlc_restorecancel(canc);
+
+    vlc_mutex_locker locker(&lock);
+    return conn_status != CHROMECAST_CONNECTION_DEAD;
 }
