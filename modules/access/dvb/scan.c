@@ -1271,19 +1271,19 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 if( s == NULL )
                 {
                     s = scan_service_New( i_service_id );
-                    if( likely(s) )
+                    if( unlikely(s == NULL) )
+                        continue;
+
+                    s->type = i_service_type;
+                    s->i_original_network_id = p_ts->i_orig_network_id;
+                    if( !scan_multiplex_AddService( p_mplex, s ) )
                     {
-                        s->type = i_service_type;
-                        s->i_original_network_id = p_ts->i_orig_network_id;
-                        if( !scan_multiplex_AddService( p_mplex, s ) )
-                        {
-                            scan_service_Delete( s );
-                            s = NULL;
-                        }
+                        scan_service_Delete( s );
+                        s = NULL;
                     }
                 }
 
-                if ( s && s->psz_original_network_name == NULL && p_nn )
+                if ( s->psz_original_network_name == NULL && p_nn )
                     s->psz_original_network_name = strndup( (const char*) p_nn->p_data, p_dsc->i_length );
 
             }
