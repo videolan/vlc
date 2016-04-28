@@ -106,7 +106,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , i_requestId(0)
  , has_input(false)
 {
-    vlc_mutex_init(&lock);
+    vlc_mutex_init_recursive(&lock);
     vlc_cond_init(&loadCommandCond);
 
     // Start the Chromecast event thread.
