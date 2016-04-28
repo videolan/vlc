@@ -166,12 +166,12 @@ static int Open(vlc_object_t *p_this)
     config_ChainParse(p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg);
 
     psz_mux = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mux");
-    if (psz_mux == NULL || !psz_mux[0])
+    if (psz_mux == NULL)
     {
         goto error;
     }
     psz_var_mime = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mime");
-    if (psz_var_mime == NULL || !psz_var_mime[0])
+    if (psz_var_mime == NULL)
         goto error;
 
     ss << "http{dst=:" << var_InheritInteger(p_stream, SOUT_CFG_PREFIX "http-port") << "/stream"
