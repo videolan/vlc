@@ -45,8 +45,6 @@
 // Media player Chromecast app id
 #define APP_ID "CC1AD845" // Default media player aka DEFAULT_MEDIA_RECEIVER_APPLICATION_ID
 
-static const int CHROMECAST_CONTROL_PORT = 8009;
-
 /* deadline regarding pings sent from receiver */
 #define PING_WAIT_TIME 6000
 #define PING_WAIT_RETRIES 0

@@ -46,6 +46,7 @@ static const std::string DEFAULT_CHOMECAST_RECEIVER = "receiver-0";
 /* see https://developers.google.com/cast/docs/reference/messages */
 static const std::string NAMESPACE_MEDIA            = "urn:x-cast:com.google.cast.media";
 
+#define CHROMECAST_CONTROL_PORT 8009
 #define HTTP_PORT               8010
 
 // Status

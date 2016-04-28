@@ -54,6 +54,7 @@ struct sout_stream_sys_t
     ~sout_stream_sys_t()
     {
         sout_StreamChainDelete(p_out, p_out);
+        delete p_intf;
     }
 
     bool canDecodeVideo( const es_format_t *p_es ) const;
@@ -91,7 +92,7 @@ static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
 static const char *const ppsz_sout_options[] = {
-    "http-port", "mux", "mime", "video", NULL
+    "ip", "port",  "http-port", "mux", "mime", "video", NULL
 };
 
 /*****************************************************************************
@@ -99,7 +100,7 @@ static const char *const ppsz_sout_options[] = {
  *****************************************************************************/
 
 #define HTTP_PORT_TEXT N_("HTTP port")
-#define HTTP_PORT_LONGTEXT N_("This sets the HTTP port of the server " \
+#define HTTP_PORT_LONGTEXT N_("This sets the HTTP port of the local server " \
                               "used to stream the media to the Chromecast.")
 #define HAS_VIDEO_TEXT N_("Video")
 #define HAS_VIDEO_LONGTEXT N_("The Chromecast receiver can receive video.")
@@ -107,6 +108,11 @@ static const char *const ppsz_sout_options[] = {
 #define MUX_LONGTEXT N_("This sets the muxer used to stream to the Chromecast.")
 #define MIME_TEXT N_("MIME content type")
 #define MIME_LONGTEXT N_("This sets the media MIME content type sent to the Chromecast.")
+
+#define IP_ADDR_TEXT N_("IP Address")
+#define IP_ADDR_LONGTEXT N_("IP Address of the Chromecast.")
+#define PORT_TEXT N_("Chromecast port")
+#define PORT_LONGTEXT N_("The port used to talk to the Chromecast.")
 
 vlc_module_begin ()
 
@@ -118,6 +124,8 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_SOUT_STREAM)
     set_callbacks(Open, Close)
 
+    add_string(SOUT_CFG_PREFIX "ip", NULL, IP_ADDR_TEXT, IP_ADDR_LONGTEXT, false)
+    add_integer(SOUT_CFG_PREFIX "port", CHROMECAST_CONTROL_PORT, PORT_TEXT, PORT_LONGTEXT, false)
     add_integer(SOUT_CFG_PREFIX "http-port", HTTP_PORT, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT, false)
     add_bool(SOUT_CFG_PREFIX "video", true, HAS_VIDEO_TEXT, HAS_VIDEO_LONGTEXT, false)
     add_string(SOUT_CFG_PREFIX "mux", DEFAULT_MUXER, MUX_TEXT, MUX_LONGTEXT, false)
@@ -382,15 +390,33 @@ static int Open(vlc_object_t *p_this)
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
     sout_stream_sys_t *p_sys = NULL;
     intf_sys_t *p_intf = NULL;
+    char *psz_ip = NULL;
     char *psz_mux = NULL;
     char *psz_var_mime = NULL;
     sout_stream_t *p_sout = NULL;
     bool b_has_video = true;
     int i_local_server_port;
+    int i_device_port;
     std::stringstream ss;
 
     config_ChainParse(p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg);
+
+    psz_ip = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "ip");
+    if ( psz_ip == NULL )
+    {
+        msg_Err( p_this, "missing Chromecast IP address" );
+        goto error;
+    }
+
+    i_device_port = var_InheritInteger(p_stream, SOUT_CFG_PREFIX "port");
     i_local_server_port = var_InheritInteger(p_stream, SOUT_CFG_PREFIX "http-port");
+
+    p_intf = new(std::nothrow) intf_sys_t( p_this, i_local_server_port, psz_ip, i_device_port );
+    if ( p_intf == NULL)
+    {
+        msg_Err( p_this, "cannot load the Chromecast controler" );
+        goto error;
+    }
 
     psz_mux = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mux");
     if (psz_mux == NULL)
@@ -428,11 +454,14 @@ static int Open(vlc_object_t *p_this)
     p_stream->pf_control = Control;
 
     p_stream->p_sys = p_sys;
+    free(psz_ip);
     free(psz_mux);
     free(psz_var_mime);
     return VLC_SUCCESS;
 
 error:
+    delete p_intf;
+    free(psz_ip);
     free(psz_mux);
     free(psz_var_mime);
     delete p_sys;
