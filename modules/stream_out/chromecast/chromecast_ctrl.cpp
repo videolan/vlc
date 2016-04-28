@@ -793,6 +793,8 @@ int intf_sys_t::sendMessage(const castchannel::CastMessage &msg)
     if (i_ret == PACKET_HEADER_LEN + i_size)
         return VLC_SUCCESS;
 
+    msg_Warn( p_module, "failed to send message %s", msg.payload_utf8().c_str() );
+
     return VLC_EGENERIC;
 }
 
