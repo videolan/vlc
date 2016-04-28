@@ -54,6 +54,10 @@ struct sout_stream_sys_t
     sout_stream_t * const p_out;
     intf_sys_t * const p_intf;
     const bool b_has_video;
+
+    sout_stream_id_sys_t *GetSubId( sout_stream_t*, sout_stream_id_sys_t* );
+
+    std::vector<sout_stream_id_sys_t*> streams;
 };
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
@@ -100,6 +104,12 @@ vlc_module_begin ()
 vlc_module_end ()
 
 
+struct sout_stream_id_sys_t
+{
+    es_format_t           fmt;
+    sout_stream_id_sys_t  *p_sub_id;
+};
+
 /*****************************************************************************
  * Sout callbacks
  *****************************************************************************/
@@ -112,7 +122,16 @@ static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_f
         if (p_fmt->i_cat != AUDIO_ES)
             return NULL;
     }
-    return sout_StreamIdAdd(p_sys->p_out, p_fmt);
+
+    sout_stream_id_sys_t *p_sys_id = (sout_stream_id_sys_t *)malloc( sizeof(sout_stream_id_sys_t) );
+    if (p_sys_id != NULL)
+    {
+        es_format_Copy( &p_sys_id->fmt, p_fmt );
+        p_sys_id->p_sub_id = NULL;
+
+        p_sys->streams.push_back( p_sys_id );
+    }
+    return p_sys_id;
 }
 
 
@@ -120,14 +139,46 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    sout_StreamIdDel(p_sys->p_out, id);
+    for (size_t i=0; i<p_sys->streams.size(); i++)
+    {
+        if ( p_sys->streams[i] == id )
+        {
+            if ( p_sys->streams[i]->p_sub_id != NULL )
+                sout_StreamIdDel( p_sys->p_out, p_sys->streams[i]->p_sub_id );
+
+            es_format_Clean( &p_sys->streams[i]->fmt );
+            free( p_sys->streams[i] );
+            p_sys->streams.erase( p_sys->streams.begin() +  i );
+            break;
+        }
+    }
 }
 
+sout_stream_id_sys_t *sout_stream_sys_t::GetSubId( sout_stream_t *p_stream,
+                                                   sout_stream_id_sys_t *id )
+{
+    size_t i;
+
+    assert( p_stream->p_sys == this );
+
+    for (i = 0; i < streams.size(); ++i)
+    {
+        if ( id == (sout_stream_id_sys_t*) streams[i] )
+            return streams[i]->p_sub_id;
+    }
+
+    msg_Err( p_stream, "unknown stream ID" );
+    return NULL;
+}
 
 static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 block_t *p_buffer)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    id = p_sys->GetSubId( p_stream, id );
+    if ( id == NULL )
+        return VLC_EGENERIC;
 
     return sout_StreamIdSend(p_sys->p_out, id, p_buffer);
 }
@@ -135,6 +186,10 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    id = p_sys->GetSubId( p_stream, id );
+    if ( id == NULL )
+        return;
 
     sout_StreamFlush( p_sys->p_out, id );
 }
