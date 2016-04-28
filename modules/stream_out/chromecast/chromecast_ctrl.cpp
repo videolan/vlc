@@ -123,7 +123,7 @@ intf_sys_t::~intf_sys_t()
 {
     setHasInput( false );
 
-    switch (getConnectionStatus())
+    switch ( conn_status )
     {
     case CHROMECAST_APP_STARTED:
         // Generate the close messages.
@@ -423,7 +423,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
             if ( p_app )
             {
                 if (!appTransportId.empty()
-                        && getConnectionStatus() == CHROMECAST_AUTHENTICATED)
+                        && conn_status == CHROMECAST_AUTHENTICATED)
                 {
                     msgConnect(appTransportId);
                     setConnectionStatus(CHROMECAST_APP_STARTED);
@@ -435,7 +435,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
             }
             else
             {
-                switch(getConnectionStatus())
+                switch( conn_status )
                 {
                 /* If the app is no longer present */
                 case CHROMECAST_APP_STARTED:
@@ -553,7 +553,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
             msg_Err( p_module, "Media load failed");
             vlc_mutex_locker locker(&lock);
             /* close the app to restart it */
-            if (getConnectionStatus() == CHROMECAST_APP_STARTED)
+            if ( conn_status == CHROMECAST_APP_STARTED )
                 msgReceiverClose(appTransportId);
             else
                 msgReceiverGetStatus();
