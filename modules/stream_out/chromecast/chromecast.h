@@ -72,6 +72,10 @@ enum receiver_state {
     RECEIVER_PAUSED,
 };
 
+
+/*****************************************************************************
+ * intf_sys_t: description and status of interface
+ *****************************************************************************/
 struct intf_sys_t
 {
     intf_sys_t(vlc_object_t * const p_this);
@@ -80,7 +84,6 @@ struct intf_sys_t
     vlc_object_t  * const p_module;
     std::string    serverIP;
     std::string    mime;
-    std::string    muxer;
 
     std::string appTransportId;
     std::string mediaSessionId;
