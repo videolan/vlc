@@ -61,11 +61,6 @@ static const std::string NAMESPACE_CONNECTION       = "urn:x-cast:com.google.cas
 static const std::string NAMESPACE_HEARTBEAT        = "urn:x-cast:com.google.cast.tp.heartbeat";
 static const std::string NAMESPACE_RECEIVER         = "urn:x-cast:com.google.cast.receiver";
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static void *ChromecastThread(void *data);
-
 /**
  * @brief Build a CastMessage to send to the Chromecast
  * @param namespace_ the message namespace
@@ -114,6 +109,13 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
 {
     vlc_mutex_init(&lock);
     vlc_cond_init(&loadCommandCond);
+
+    // Start the Chromecast event thread.
+    if (vlc_clone(&chromecastThread, ChromecastThread, this,
+                  VLC_THREAD_PRIORITY_LOW))
+    {
+        msg_Err( p_module, "Could not start the Chromecast talking thread");
+    }
 }
 
 intf_sys_t::~intf_sys_t()
@@ -761,11 +763,10 @@ void intf_sys_t::pushMediaPlayerMessage(const std::stringstream & payload) {
 /*****************************************************************************
  * Chromecast thread
  *****************************************************************************/
-static void* ChromecastThread(void* p_data)
+void* intf_sys_t::ChromecastThread(void* p_data)
 {
     int canc;
-    intf_thread_t *p_stream = reinterpret_cast<intf_thread_t*>(p_data);
-    intf_sys_t *p_sys = p_stream->p_sys;
+    intf_sys_t *p_sys = reinterpret_cast<intf_sys_t*>(p_data);
     p_sys->setConnectionStatus( CHROMECAST_DISCONNECTED );
 
     p_sys->i_sock_fd = p_sys->connectChromecast();

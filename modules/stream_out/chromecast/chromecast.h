@@ -171,6 +171,8 @@ private:
 
     unsigned i_receiver_requestId;
     unsigned i_requestId;
+
+    static void* ChromecastThread(void* p_data);
 };
 
 #endif /* VLC_CHROMECAST_H */
