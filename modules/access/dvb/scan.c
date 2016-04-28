@@ -76,9 +76,10 @@ typedef enum
 
 typedef struct scan_multiplex_t scan_multiplex_t;
 
-typedef struct
+struct scan_service_t
 {
     const scan_multiplex_t *p_mplex; /* multiplex reference */
+    const void * stickyref; /* Callee private storage across updates */
 
     uint16_t i_original_network_id;
     uint16_t i_program;     /* program number (service id) */
@@ -91,7 +92,7 @@ typedef struct
 
     char *psz_original_network_name;
 
-} scan_service_t;
+};
 
 struct scan_multiplex_t
 {
@@ -115,6 +116,7 @@ struct scan_t
     scan_demux_filter_cb pf_filter;
     scan_frontend_stats_cb pf_stats;
     scan_demux_read_cb   pf_read;
+    scan_service_notify_cb pf_notify_service;
     void *p_cbdata;
 
     vlc_dialog_id *p_dialog_id;
@@ -203,6 +205,7 @@ static scan_service_t *scan_service_New( uint16_t i_program )
         return NULL;
 
     p_srv->p_mplex = NULL;
+    p_srv->stickyref = NULL;
     p_srv->i_program = i_program;
     p_srv->i_original_network_id = NETWORK_ID_RESERVED;
 
@@ -396,6 +399,7 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter,
     p_scan->pf_stats = pf_status;
     p_scan->pf_read = pf_read;
     p_scan->pf_filter = pf_filter;
+    p_scan->pf_notify_service = NULL;
     p_scan->p_cbdata = p_cbdata;
     p_scan->i_index = 0;
     p_scan->p_dialog_id = NULL;
@@ -896,6 +900,18 @@ int scan_Run( scan_t *p_scan )
     return VLC_SUCCESS;
 }
 
+static void scan_NotifyService( scan_t *p_scan, scan_service_t *p_service, bool b_updated )
+{
+    if( !p_scan->pf_notify_service || !scan_service_type_Supported( p_service->type ) )
+        return;
+    p_service->stickyref = p_scan->pf_notify_service( p_scan, p_scan->p_cbdata,
+                                                      p_service, p_service->stickyref,
+                                                      b_updated );
+}
+
+#define scan_NotifyNewService( a, b ) scan_NotifyService( a, b, false )
+#define scan_NotifyUpdatedService( a, b ) scan_NotifyService( a, b, true )
+
 static bool GetOtherNetworkNIT( scan_session_t *p_session, uint16_t i_network_id,
                                 dvbpsi_nit_t ***ppp_nit )
 {
@@ -952,6 +968,8 @@ static void ParsePAT( vlc_object_t *p_obj, scan_t *p_scan,
             {
                 if( !scan_multiplex_AddService( p_mplex, s ) ) /* OOM */
                     scan_service_Delete( s );
+                else
+                    scan_NotifyNewService( p_scan, s );
             }
         }
     }
@@ -1008,9 +1026,11 @@ static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan, const dvbpsi_sdt_t *p
     for( const dvbpsi_sdt_service_t *p_srv = p_sdt->p_first_service;
                                      p_srv; p_srv = p_srv->p_next )
     {
+        bool b_newservice = false;
         scan_service_t *s = scan_multiplex_FindService( p_mplex, p_srv->i_service_id );
         if( s == NULL )
         {
+            b_newservice = true;
             s = scan_service_New( p_srv->i_service_id );
             if( unlikely(s == NULL) )
                 continue;
@@ -1039,6 +1059,8 @@ static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan, const dvbpsi_sdt_t *p
                 s->type = pD->i_service_type;
             }
         }
+
+        scan_NotifyService( p_scan, s, !b_newservice );
     }
 }
 
@@ -1264,9 +1286,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                     continue;
                 }
 
-                if( !scan_service_type_Supported( i_service_type ) )
-                    continue;
-
+                bool b_newservice = false;
                 scan_service_t *s = scan_multiplex_FindService( p_mplex, i_service_id );
                 if( s == NULL )
                 {
@@ -1274,6 +1294,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                     if( unlikely(s == NULL) )
                         continue;
 
+                    b_newservice = true;
                     s->type = i_service_type;
                     s->i_original_network_id = p_ts->i_orig_network_id;
                     if( !scan_multiplex_AddService( p_mplex, s ) )
@@ -1286,6 +1307,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 if ( s->psz_original_network_name == NULL && p_nn )
                     s->psz_original_network_name = strndup( (const char*) p_nn->p_data, p_dsc->i_length );
 
+                scan_NotifyService( p_scan, s, !b_newservice );
             }
         }
 
@@ -1516,6 +1538,61 @@ static block_t *BlockString( const char *psz )
     return p;
 }
 
+void scan_set_NotifyCB( scan_t *p_scan, scan_service_notify_cb pf )
+{
+    p_scan->pf_notify_service = pf;
+}
+
+const char * scan_service_GetName( const scan_service_t *s )
+{
+    return s->psz_name;
+}
+
+uint16_t scan_service_GetProgram( const scan_service_t *s )
+{
+    return s->i_program;
+}
+
+const char * scan_service_GetNetworkName( const scan_service_t *s )
+{
+    if( s->p_mplex )
+        return s->p_mplex->psz_network_name;
+    else
+        return NULL;
+}
+
+
+char * scan_service_GetUri( const scan_service_t *s )
+{
+    char *psz_mrl = NULL;
+    int i_ret = -1;
+    switch( s->p_mplex->cfg.type )
+    {
+        case SCAN_DVB_T:
+            i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:bandwidth=%d:modulation=%d",
+                              s->p_mplex->cfg.i_frequency,
+                              s->p_mplex->cfg.i_bandwidth,
+                              s->p_mplex->cfg.i_modulation );
+            break;
+        case SCAN_DVB_S:
+            i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:voltage=%d:fec=%d",
+                              s->p_mplex->cfg.i_frequency,
+                              s->p_mplex->cfg.i_symbolrate,
+                              s->p_mplex->cfg.c_polarization == 'H' ? 18 : 13,
+                              s->p_mplex->cfg.i_fec );
+            break;
+        case SCAN_DVB_C:
+            i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:modulation=%d:fec=%d",
+                              s->p_mplex->cfg.i_frequency,
+                              s->p_mplex->cfg.i_symbolrate,
+                              s->p_mplex->cfg.i_modulation,
+                              s->p_mplex->cfg.i_fec );
+        default:
+            break;
+    }
+    return (i_ret >=0) ? psz_mrl : NULL;
+}
+
 block_t *scan_GetM3U( scan_t *p_scan )
 {
     vlc_object_t *p_obj = p_scan->p_obj;
@@ -1571,39 +1648,14 @@ block_t *scan_GetM3U( scan_t *p_scan )
                   s->p_mplex->i_network_id, s->p_mplex->i_nit_version, s->p_mplex->i_sdt_version,
                   s->p_mplex->cfg.i_frequency, s->p_mplex->cfg.i_bandwidth, s->p_mplex->i_snr, s->p_mplex->cfg.i_modulation );
 
-        char *psz_mrl;
-        int i_ret = -1;
-        switch( s->p_mplex->cfg.type )
-        {
-            case SCAN_DVB_T:
-                i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:bandwidth=%d:modulation=%d",
-                                  s->p_mplex->cfg.i_frequency,
-                                  s->p_mplex->cfg.i_bandwidth,
-                                  s->p_mplex->cfg.i_modulation );
-                break;
-            case SCAN_DVB_S:
-                i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:voltage=%d:fec=%d",
-                                  s->p_mplex->cfg.i_frequency,
-                                  s->p_mplex->cfg.i_symbolrate,
-                                  s->p_mplex->cfg.c_polarization == 'H' ? 18 : 13,
-                                  s->p_mplex->cfg.i_fec );
-                break;
-            case SCAN_DVB_C:
-                i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:srate=%d:modulation=%d:fec=%d",
-                                  s->p_mplex->cfg.i_frequency,
-                                  s->p_mplex->cfg.i_symbolrate,
-                                  s->p_mplex->cfg.i_modulation,
-                                  s->p_mplex->cfg.i_fec );
-            default:
-                break;
-        }
-        if( i_ret < 0 )
+        char *psz_mrl = scan_service_GetUri( s );
+        if( psz_mrl == NULL )
             continue;
 
         char *psz;
-        i_ret = asprintf( &psz, "#EXTINF:,,%s\n"
-                                "#EXTVLCOPT:program=%d\n"
-                                "%s\n\n",
+        int i_ret = asprintf( &psz, "#EXTINF:,,%s\n"
+                                    "#EXTVLCOPT:program=%d\n"
+                                    "%s\n\n",
                           s->psz_name && * s->psz_name ? s->psz_name : "Unknown",
                           s->i_program,
                           psz_mrl );
