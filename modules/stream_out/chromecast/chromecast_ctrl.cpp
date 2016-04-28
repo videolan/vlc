@@ -127,9 +127,12 @@ intf_sys_t::~intf_sys_t()
         // Generate the close messages.
         msgReceiverClose(appTransportId);
         // ft
+    case CHROMECAST_TLS_CONNECTED:
     case CHROMECAST_AUTHENTICATED:
         msgReceiverClose(DEFAULT_CHOMECAST_RECEIVER);
         // ft
+    case CHROMECAST_DISCONNECTED:
+    case CHROMECAST_CONNECTION_DEAD:
     default:
         break;
     }
