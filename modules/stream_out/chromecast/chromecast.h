@@ -82,6 +82,11 @@ struct intf_sys_t
     intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr, int device_port = 0);
     ~intf_sys_t();
 
+    bool isFinishedPlaying() {
+        vlc_mutex_locker locker(&lock);
+        return conn_status == CHROMECAST_CONNECTION_DEAD || (receiverState == RECEIVER_BUFFERING && cmd_status != CMD_SEEK_SENT);
+    }
+
     void setHasInput( bool has_input, const std::string mime_type = "");
 
 private:
