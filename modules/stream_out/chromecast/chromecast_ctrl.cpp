@@ -98,8 +98,11 @@ void intf_sys_t::buildMessage(const std::string & namespace_,
 /*****************************************************************************
  * intf_sys_t: class definition
  *****************************************************************************/
-intf_sys_t::intf_sys_t(vlc_object_t * const p_this)
+intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device_addr, int device_port)
  : p_module(p_this)
+ , i_port(port)
+ , i_target_port(device_port)
+ , targetIP(device_addr)
  , receiverState(RECEIVER_IDLE)
  , i_sock_fd(-1)
  , p_creds(NULL)
@@ -141,20 +144,23 @@ intf_sys_t::~intf_sys_t()
  * @brief Connect to the Chromecast
  * @return the opened socket file descriptor or -1 on error
  */
-int intf_sys_t::connectChromecast(char *psz_ipChromecast)
+int intf_sys_t::connectChromecast()
 {
-    int fd = net_ConnectTCP( p_module, psz_ipChromecast, CHROMECAST_CONTROL_PORT);
+    unsigned devicePort = i_target_port;
+    if (devicePort == 0)
+        devicePort = CHROMECAST_CONTROL_PORT;
+    int fd = net_ConnectTCP( p_module, targetIP.c_str(), devicePort);
     if (fd < 0)
         return -1;
 
-    p_creds = vlc_tls_ClientCreate( p_module );
+    p_creds = vlc_tls_ClientCreate( p_module->p_parent );
     if (p_creds == NULL)
     {
         net_Close(fd);
         return -1;
     }
 
-    p_tls = vlc_tls_ClientSessionCreateFD(p_creds, fd, psz_ipChromecast,
+    p_tls = vlc_tls_ClientSessionCreateFD(p_creds, fd, targetIP.c_str(),
                                                "tcps", NULL, NULL);
 
     if (p_tls == NULL)
@@ -624,7 +630,7 @@ void intf_sys_t::msgPlayerLoad()
     std::stringstream ss;
     ss << "{\"type\":\"LOAD\","
        <<  "\"media\":{\"contentId\":\"http://" << serverIP << ":"
-           << var_InheritInteger(p_module, CONTROL_CFG_PREFIX"http-port")
+           << i_port
            << "/stream\","
        <<             "\"streamType\":\"LIVE\","
        <<             "\"contentType\":\"" << std::string(psz_mime) << "\"},"
@@ -757,10 +763,41 @@ void intf_sys_t::pushMediaPlayerMessage(const std::stringstream & payload) {
  *****************************************************************************/
 static void* ChromecastThread(void* p_data)
 {
-    int canc = vlc_savecancel();
-    // Not cancellation-safe part.
+    int canc;
     intf_thread_t *p_stream = reinterpret_cast<intf_thread_t*>(p_data);
     intf_sys_t *p_sys = p_stream->p_sys;
+    p_sys->setConnectionStatus( CHROMECAST_DISCONNECTED );
+
+    p_sys->i_sock_fd = p_sys->connectChromecast();
+    if (p_sys->i_sock_fd < 0)
+    {
+        canc = vlc_savecancel();
+        msg_Err( p_sys->p_module, "Could not connect the Chromecast" );
+        vlc_mutex_lock(&p_sys->lock);
+        p_sys->setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
+        vlc_mutex_unlock(&p_sys->lock);
+        vlc_restorecancel(canc);
+        return NULL;
+    }
+
+    char psz_localIP[NI_MAXNUMERICHOST];
+    if (net_GetSockAddress(p_sys->i_sock_fd, psz_localIP, NULL))
+    {
+        canc = vlc_savecancel();
+        msg_Err( p_sys->p_module, "Cannot get local IP address" );
+        vlc_mutex_lock(&p_sys->lock);
+        p_sys->setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
+        vlc_mutex_unlock(&p_sys->lock);
+        vlc_restorecancel(canc);
+        return NULL;
+    }
+
+    canc = vlc_savecancel();
+    p_sys->serverIP = psz_localIP;
+
+    vlc_mutex_lock(&p_sys->lock);
+    p_sys->setConnectionStatus(CHROMECAST_TLS_CONNECTED);
+    vlc_mutex_unlock(&p_sys->lock);
 
     p_sys->msgAuth();
     vlc_restorecancel(canc);

@@ -78,11 +78,14 @@ enum receiver_state {
  *****************************************************************************/
 struct intf_sys_t
 {
-    intf_sys_t(vlc_object_t * const p_this);
+    intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr, int device_port = 0);
     ~intf_sys_t();
 
     vlc_object_t  * const p_module;
+    const int      i_port;
     std::string    serverIP;
+    const int      i_target_port;
+    std::string    targetIP;
     std::string    mime;
 
     std::string appTransportId;
@@ -119,7 +122,7 @@ struct intf_sys_t
         }
     }
 
-    int connectChromecast(char *psz_ipChromecast);
+    int connectChromecast();
     void disconnectChromecast();
 
     void msgPing();
