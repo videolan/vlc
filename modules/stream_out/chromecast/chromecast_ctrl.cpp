@@ -106,6 +106,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , cmd_status(NO_CMD_PENDING)
  , i_receiver_requestId(0)
  , i_requestId(0)
+ , has_input(false)
 {
     vlc_mutex_init(&lock);
     vlc_cond_init(&loadCommandCond);
@@ -120,6 +121,8 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
 
 intf_sys_t::~intf_sys_t()
 {
+    setHasInput( false );
+
     switch (getConnectionStatus())
     {
     case CHROMECAST_APP_STARTED:
@@ -140,6 +143,40 @@ intf_sys_t::~intf_sys_t()
 
     vlc_cond_destroy(&loadCommandCond);
     vlc_mutex_destroy(&lock);
+}
+
+void intf_sys_t::setHasInput( bool b_has_input, const std::string mime_type )
+{
+    vlc_mutex_locker locker(&lock);
+    msg_Dbg( p_module, "setHasInput device:%s session:%s",
+             targetIP.c_str(), mediaSessionId.c_str() );
+
+    this->has_input = b_has_input;
+    this->mime = mime_type;
+
+    if( this->has_input )
+    {
+        mutex_cleanup_push(&lock);
+        while (conn_status != CHROMECAST_APP_STARTED && conn_status != CHROMECAST_CONNECTION_DEAD)
+        {
+            msg_Dbg( p_module, "setHasInput waiting for Chromecast connection, current %d", conn_status);
+            vlc_cond_wait(&loadCommandCond, &lock);
+        }
+        vlc_cleanup_pop();
+
+        if (conn_status == CHROMECAST_CONNECTION_DEAD)
+        {
+            msg_Warn( p_module, "no Chromecast hook possible");
+            return;
+        }
+
+        if ( receiverState == RECEIVER_IDLE )
+        {
+            // we cannot start a new load when the last one is still processing
+            msgPlayerLoad();
+            setPlayerStatus(CMD_LOAD_SENT);
+        }
+    }
 }
 
 /**
@@ -390,9 +427,10 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                 {
                     msgConnect(appTransportId);
                     setConnectionStatus(CHROMECAST_APP_STARTED);
-                    msgPlayerLoad();
-                    setPlayerStatus(CMD_LOAD_SENT);
-                    vlc_cond_signal(&loadCommandCond);
+                }
+                else
+                {
+                    msgPlayerGetStatus();
                 }
             }
             else
@@ -497,9 +535,17 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                     break;
 
                 case RECEIVER_IDLE:
-                    setPlayerStatus(NO_CMD_PENDING);
+                    if ( has_input )
+                        setPlayerStatus(NO_CMD_PENDING);
                     break;
                 }
+            }
+
+            if ( cmd_status != CMD_LOAD_SENT && receiverState == RECEIVER_IDLE && has_input )
+            {
+                msg_Dbg( p_module, "the device missed the LOAD command");
+                msgPlayerLoad();
+                setPlayerStatus(CMD_LOAD_SENT);
             }
         }
         else if (type == "LOAD_FAILED")
@@ -533,6 +579,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
         if (type == "CLOSE")
         {
             msg_Warn( p_module, "received close message");
+            setHasInput( false );
             vlc_mutex_locker locker(&lock);
             setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
         }
@@ -625,20 +672,14 @@ void intf_sys_t::msgPlayerGetStatus()
 
 void intf_sys_t::msgPlayerLoad()
 {
-    char *psz_mime = var_InheritString(p_module, CONTROL_CFG_PREFIX "mime");
-    if (psz_mime == NULL)
-        return;
-
     std::stringstream ss;
     ss << "{\"type\":\"LOAD\","
        <<  "\"media\":{\"contentId\":\"http://" << serverIP << ":"
            << i_port
            << "/stream\","
        <<             "\"streamType\":\"LIVE\","
-       <<             "\"contentType\":\"" << std::string(psz_mime) << "\"},"
+       <<             "\"contentType\":\"" << mime << "\"},"
        <<  "\"requestId\":" << i_requestId++ << "}";
-
-    free(psz_mime);
 
     pushMediaPlayerMessage( ss );
 }

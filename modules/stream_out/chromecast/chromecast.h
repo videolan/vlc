@@ -81,6 +81,8 @@ struct intf_sys_t
     intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr, int device_port = 0);
     ~intf_sys_t();
 
+    void setHasInput( bool has_input, const std::string mime_type = "");
+
     vlc_object_t  * const p_module;
     const int      i_port;
     std::string    serverIP;
@@ -172,6 +174,7 @@ private:
     unsigned i_receiver_requestId;
     unsigned i_requestId;
 
+    bool           has_input;
     static void* ChromecastThread(void* p_data);
 };
 
