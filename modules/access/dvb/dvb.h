@@ -61,15 +61,6 @@ typedef struct
 
 } dvb_sys_t;
 
-struct access_sys_t
-{
-    demux_handle_t p_demux_handles[MAX_DEMUX];
-    dvb_sys_t dvb;
-
-    /* Scan */
-    struct scan_t *scan;
-};
-
 #define VIDEO0_TYPE     1
 #define AUDIO0_TYPE     2
 #define TELETEXT0_TYPE  3

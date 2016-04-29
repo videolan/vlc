@@ -37,6 +37,7 @@
 #include <vlc_access.h>
 #include <vlc_input.h>
 #include <vlc_interrupt.h>
+#include <vlc_dialog.h>
 
 #include <sys/types.h>
 #include <poll.h>
@@ -45,6 +46,15 @@
 
 #include "dvb.h"
 #include "scan.h"
+
+struct access_sys_t
+{
+    demux_handle_t p_demux_handles[MAX_DEMUX];
+    dvb_sys_t dvb;
+
+    /* Scan */
+    struct scan_t *scan;
+};
 
 /*****************************************************************************
  * Module descriptor
