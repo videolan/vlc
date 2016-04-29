@@ -182,9 +182,12 @@ static void scan_tuner_config_Init( scan_tuner_config_t *p_cfg, const scan_param
 static bool scan_tuner_config_Validate( const scan_tuner_config_t *p_cfg )
 {
     if( p_cfg->i_frequency == 0 ||
-        p_cfg->i_bandwidth == 0 ||
         p_cfg->i_frequency == UINT32_MAX / 10 ) /* Invalid / broken transponder info on French TNT */
         return false;
+
+    if( p_cfg->type == SCAN_DVB_T && p_cfg->i_bandwidth == 0 )
+        return false;
+
     return true;
 }
 
