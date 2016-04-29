@@ -37,10 +37,6 @@
 #include <sys/types.h>
 #include <vlc_network.h>
 
-#ifndef AF_UNSPEC
-#   define AF_UNSPEC   0
-#endif
-
 int vlc_getnameinfo( const struct sockaddr *sa, int salen,
                      char *host, int hostlen, int *portnum, int flags )
 {
