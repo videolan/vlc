@@ -332,6 +332,7 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len, int ms)
     else
         n = 1;
 
+    errno = 0;
     n = vlc_poll_i11e (ufd, n, ms);
     if (n == 0)
         errno = EAGAIN;
