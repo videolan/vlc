@@ -40,6 +40,7 @@ typedef struct
     int i_fec;
     int i_modulation;
     char c_polarization;
+    scan_type_t type;
 
 } scan_tuner_config_t;
 

@@ -166,10 +166,11 @@ static bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
 static unsigned scan_session_GetTablesTimeout( const scan_session_t *p_session );
 
 /* */
-static void scan_tuner_config_Init( scan_tuner_config_t *p_cfg )
+static void scan_tuner_config_Init( scan_tuner_config_t *p_cfg, const scan_parameter_t *p_params )
 {
     memset( p_cfg, 0, sizeof(*p_cfg) );
     p_cfg->i_fec = 9; /* FEC_AUTO */
+    p_cfg->type = p_params->type;
 }
 
 static bool scan_tuner_config_Validate( const scan_tuner_config_t *p_cfg )
@@ -772,7 +773,7 @@ static int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
 
     do
     {
-        scan_tuner_config_Init( p_cfg );
+        scan_tuner_config_Init( p_cfg, &p_scan->parameter );
 
         i_ret = Scan_GetNextTunerConfig( p_scan, p_cfg, &f_position );
         if( i_ret )
@@ -1109,7 +1110,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
         uint32_t i_private_data_id = 0;
         dvbpsi_descriptor_t *p_dsc;
         scan_tuner_config_t tscfg;
-        scan_tuner_config_Init( &tscfg );
+        scan_tuner_config_Init( &tscfg, &p_scan->parameter );
         if( p_cfg != NULL ) // p_nit->i_table_id != NIT_CURRENT_NETWORK_TABLE_ID
             tscfg = *p_cfg;
 
