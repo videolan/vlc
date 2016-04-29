@@ -731,6 +731,23 @@ static int Scan_GetNextTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, 
         p_cfg->i_bandwidth = p_entry->i_bw / 1000000;
         p_scan->p_current = p_scan->p_current->p_next;
         *pf_pos = (double) p_scan->i_index / p_scan->i_scanlist;
+        switch( p_entry->delivery )
+        {
+            case DELIVERY_UNKNOWN:
+                break;
+            case DELIVERY_DVBT:
+                p_cfg->type = SCAN_DVB_T;
+                break;
+            case DELIVERY_DVBS:
+                p_cfg->type = SCAN_DVB_S;
+                break;
+            case DELIVERY_DVBC:
+                p_cfg->type = SCAN_DVB_C;
+                break;
+            default:
+                p_cfg->type = SCAN_NONE;
+                break;
+        }
         return VLC_SUCCESS;
     }
 
@@ -1552,7 +1569,7 @@ block_t *scan_GetM3U( scan_t *p_scan )
 
         char *psz_mrl;
         int i_ret = -1;
-        switch( p_scan->parameter.type )
+        switch( s->p_mplex->cfg.type )
         {
             case SCAN_DVB_T:
                 i_ret = asprintf( &psz_mrl, "dvb://frequency=%d:bandwidth=%d:modulation=%d",
