@@ -357,8 +357,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         const uint8_t *p_stp_sps_buf = p_sps_buf;
         size_t i_stp_sps_nal = i_sps_size;
         h264_sequence_parameter_set_t *p_sps_data;
-        if( !hxxx_strip_AnnexB_startcode( &p_stp_sps_buf, &i_stp_sps_nal ) ||
-            !( p_sps_data = h264_decode_sps(p_stp_sps_buf, i_stp_sps_nal, true) ) )
+        if( !( p_sps_data = h264_decode_sps(p_stp_sps_buf, i_stp_sps_nal, true) ) )
         {
             msg_Warn(p_dec, "sps pps parsing failed");
             return VLC_EGENERIC;
