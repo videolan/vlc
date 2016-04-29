@@ -43,7 +43,7 @@ enum access_query_e
     ACCESS_CAN_PAUSE,       /* arg1= bool*    cannot fail */
     ACCESS_CAN_CONTROL_PACE,/* arg1= bool*    cannot fail */
     ACCESS_GET_SIZE=6,      /* arg1= uin64_t* */
-    ACCESS_IS_DIRECTORY,    /* arg1= bool *, arg2= bool *, res=can fail */
+    ACCESS_IS_DIRECTORY,    /* arg1= bool *, res=can fail */
 
     /* */
     ACCESS_GET_PTS_DELAY = 0x101,/* arg1= int64_t*       cannot fail */

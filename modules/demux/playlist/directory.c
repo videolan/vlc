@@ -35,7 +35,6 @@
 
 struct demux_sys_t
 {
-    bool b_dir_sorted;
     bool b_dir_can_loop;
 };
 
@@ -48,14 +47,12 @@ static int Demux( demux_t *p_demux );
 int Import_Dir ( vlc_object_t *p_this)
 {
     demux_t  *p_demux = (demux_t *)p_this;
-    bool b_dir_sorted, b_dir_can_loop;
+    bool b_dir_can_loop;
 
-    if( stream_Control( p_demux->s, STREAM_IS_DIRECTORY,
-                        &b_dir_sorted, &b_dir_can_loop ) )
+    if( stream_Control( p_demux->s, STREAM_IS_DIRECTORY, &b_dir_can_loop ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "reading directory content" );
-    p_demux->p_sys->b_dir_sorted = b_dir_sorted;
     p_demux->p_sys->b_dir_can_loop = b_dir_can_loop;
 
     return VLC_SUCCESS;

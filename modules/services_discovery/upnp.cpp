@@ -1061,7 +1061,6 @@ static int ControlDirectory( access_t *p_access, int i_query, va_list args )
     switch( i_query )
     {
     case ACCESS_IS_DIRECTORY:
-        *va_arg( args, bool * ) = true; /* is sorted */
         *va_arg( args, bool * ) = true; /* might loop */
         break;
     default:
