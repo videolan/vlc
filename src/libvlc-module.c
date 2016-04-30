@@ -296,11 +296,6 @@ static const char *const ppsz_align_descriptions[] =
 #define FULLSCREEN_LONGTEXT N_( \
     "Start video in fullscreen mode" )
 
-#define OVERLAY_TEXT N_("Overlay video output")
-#define OVERLAY_LONGTEXT N_( \
-    "Overlay is the hardware acceleration capability of your video card " \
-    "(ability to render video directly). VLC will try to use it by default." )
-
 #define VIDEO_ON_TOP_TEXT N_("Always on top")
 #define VIDEO_ON_TOP_LONGTEXT N_( \
     "Always place the video window on top of other windows." )
@@ -1512,10 +1507,7 @@ vlc_module_begin ()
               MOUSE_EVENTS_LONGTEXT, true )
     add_obsolete_integer( "vout-event" ) /* deprecated since 1.1.0 */
     add_obsolete_integer( "x11-event" ) /* renamed since 1.0.0 */
-#ifndef __APPLE__
-    add_bool( "overlay", 1, OVERLAY_TEXT, OVERLAY_LONGTEXT, false )
-        change_safe()
-#endif
+    add_obsolete_bool( "overlay" ) /* renamed since 3.0.0 */
     add_bool( "video-on-top", 0, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, false )
     add_bool( "video-wallpaper", false, WALLPAPER_TEXT,
