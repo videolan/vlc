@@ -355,9 +355,6 @@ static int Open (vlc_object_t *obj)
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *p_sys;
 
-    if (!var_InheritBool (obj, "overlay"))
-        return VLC_EGENERIC;
-    else
     {   /* NOTE: Reject hardware surface formats. Blending would break. */
         const vlc_chroma_description_t *chroma =
             vlc_fourcc_GetChromaDescription(vd->source.i_chroma);
