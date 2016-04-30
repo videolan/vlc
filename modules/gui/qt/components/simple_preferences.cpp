@@ -407,7 +407,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                      ui.videoZone, setEnabled( bool ) );
 
             CONFIG_BOOL( "fullscreen", fullscreen );
-            CONFIG_BOOL( "overlay", overlay );
             CONFIG_BOOL( "video-on-top", alwaysOnTop );
             CONFIG_BOOL( "video-deco", windowDecorations );
             CONFIG_GENERIC( "vout", StringList, ui.voutLabel, outputModule );
@@ -415,10 +414,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #ifdef _WIN32
             CONFIG_GENERIC( "directx-device", StringList, ui.dxDeviceLabel,
                             dXdisplayDevice );
+            CONFIG_BOOL( "directx-overlay", overlay );
             CONFIG_BOOL( "directx-hw-yuv", hwYUVBox );
             CONNECT( ui.overlay, toggled( bool ), ui.hwYUVBox, setEnabled( bool ) );
 #else
             ui.directXBox->setVisible( false );
+            ui.overlay->setVisible( false );
             ui.hwYUVBox->setVisible( false );
 #endif
 
