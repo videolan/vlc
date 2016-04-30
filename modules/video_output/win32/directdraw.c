@@ -67,6 +67,12 @@
     "Try to use hardware acceleration for YUV->RGB conversions. " \
     "This option doesn't have any effect when using overlays.")
 
+#define OVERLAY_TEXT N_("Overlay video output")
+#define OVERLAY_LONGTEXT N_(\
+#define OVERLAY_LONGTEXT N_(\
+    "Overlay is the hardware acceleration capability of your video card " \
+    "(ability to render video directly). VLC will try to use it by default.")
+
 #define SYSMEM_TEXT N_("Use video buffers in system memory")
 #define SYSMEM_LONGTEXT N_(\
     "Create video buffers in system memory instead of video memory. This " \
@@ -101,6 +107,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_bool("directx-hw-yuv", true, HW_YUV_TEXT, HW_YUV_LONGTEXT,
               true)
+    add_bool("directx-overlay", true, OVERLAY_TEXT, OVERLAY_LONGTEXT, false)
     add_bool("directx-use-sysmem", false, SYSMEM_TEXT, SYSMEM_LONGTEXT,
               true)
     add_bool("directx-3buffering", true, TRIPLEBUF_TEXT,
@@ -1175,7 +1182,7 @@ static int DirectXCreatePictureResource(vout_display_t *vd,
     bool allow_hw_yuv  = sys->can_blit_fourcc &&
                          vlc_fourcc_IsYUV(fmt->i_chroma) &&
                          var_InheritBool(vd, "directx-hw-yuv");
-    bool allow_overlay = var_InheritBool(vd, "overlay");
+    bool allow_overlay = var_InheritBool(vd, "directx-overlay");
 
     /* Try to use an yuv surface */
     if (allow_hw_yuv) {
