@@ -58,6 +58,10 @@ static void Close(vlc_object_t *);
     "Force the SDL renderer to use a specific chroma format instead of " \
     "trying to improve performances by using the most efficient one.")
 
+#define OVERLAY_TEXT N_("YUV overlay")
+#define OVERLAY_LONGTEXT N_(\
+    "Use the hardware YUV overlay of the graphic card (if available).")
+
 vlc_module_begin()
     set_shortname("SDL")
     set_category(CAT_VIDEO)
@@ -65,6 +69,7 @@ vlc_module_begin()
     set_description(N_("Simple DirectMedia Layer video output"))
     set_capability("vout display", 70)
     add_shortcut("sdl")
+    add_bool("sdl-overlay", true, OVERLAY_TEXT, OVERLAY_LONGTEXT, false)
     add_string("sdl-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
     add_obsolete_string("sdl-video-driver") /* obsolete since 1.1.0 */
     set_callbacks(Open, Close)
@@ -217,7 +222,7 @@ static int Open(vlc_object_t *object)
 
     /* Try to open an overlay if requested */
     sys->overlay = NULL;
-    const bool is_overlay = var_InheritBool(vd, "overlay");
+    const bool is_overlay = var_InheritBool(vd, "sdl-overlay");
     if (is_overlay) {
         static const struct
         {
