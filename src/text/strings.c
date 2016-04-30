@@ -832,12 +832,15 @@ char *str_format_meta(input_thread_t *input, const char *s)
 }
 
 /**
+ * Sanitize a file name.
+ *
  * Remove forbidden, potentially forbidden and otherwise evil characters from
- * filenames. This includes slashes, and popular characters like colon
- * (on Unix anyway), so this should only be used for automatically generated
- * filenames.
- * \warning Do not use this on full paths,
- * only single file names without any directory separator!
+ * file names. That includes slashes, and popular characters like colon
+ * (on Unix anyway).
+ *
+ * \warning This function should only be used for automatically generated
+ * file names. Do not use this on full paths, only single file names without
+ * any directory separator!
  */
 void filename_sanitize( char *str )
 {
@@ -851,7 +854,7 @@ void filename_sanitize( char *str )
         return;
     }
 
-    /* On platforms not using UTF-7, VLC cannot access non-Unicode paths.
+    /* On platforms not using UTF-8, VLC cannot access non-Unicode paths.
      * Also, some file systems require Unicode file names.
      * NOTE: This may inserts '?' thus is done replacing '?' with '_'. */
     EnsureUTF8( str );
