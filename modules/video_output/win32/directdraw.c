@@ -69,7 +69,6 @@
 
 #define OVERLAY_TEXT N_("Overlay video output")
 #define OVERLAY_LONGTEXT N_(\
-#define OVERLAY_LONGTEXT N_(\
     "Overlay is the hardware acceleration capability of your video card " \
     "(ability to render video directly). VLC will try to use it by default.")
 
