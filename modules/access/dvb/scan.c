@@ -122,7 +122,6 @@ struct scan_t
     uint64_t i_index;
     scan_parameter_t parameter;
     int64_t i_time_start;
-    bool b_ignore_nit; /* ignored or broken nit configurations */
 
     size_t i_multiplex_toscan;
 
@@ -411,7 +410,6 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter,
     scan_parameter_Init( &p_scan->parameter );
     scan_parameter_Copy( p_parameter, &p_scan->parameter );
     p_scan->i_time_start = mdate();
-    p_scan->b_ignore_nit = false;
     p_scan->p_scanlist = NULL;
     p_scan->i_scanlist = 0;
 
@@ -763,7 +761,7 @@ static int Scan_GetNextTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, 
 
     if( !b_using_scanlist &&
         /* Stop frequency scanning if we found a NIT */
-        ( p_scan->i_multiplex == 0 || p_scan->b_ignore_nit ||
+        ( p_scan->i_multiplex == 0 ||
           p_scan->pp_multiplex[0]->i_nit_version == UINT8_MAX )
       )
     {
@@ -1253,14 +1251,20 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
             }
         }
 
-        if ( !scan_tuner_config_Validate( &tscfg ) )
+        scan_multiplex_t *p_mplex = scan_FindMultiplex( p_scan, p_ts->i_ts_id );
+        if( p_mplex == NULL && scan_tuner_config_Validate( &tscfg ) )
         {
-            if( p_nit->i_table_id == NIT_CURRENT_NETWORK_TABLE_ID )
-                p_scan->b_ignore_nit = true;
-            continue;
+            p_mplex = scan_multiplex_New( &tscfg, p_ts->i_ts_id );
+            if( likely(p_mplex) )
+            {
+                if ( unlikely(!scan_AddMultiplex( p_scan, p_mplex )) )
+                {
+                    scan_multiplex_Delete( p_mplex );
+                    p_mplex = NULL;
+                }
+            }
         }
 
-        scan_multiplex_t *p_mplex = scan_FindOrCreateMultiplex( p_scan, p_ts->i_ts_id, &tscfg );
         if( unlikely(!p_mplex) )
             continue;
 
