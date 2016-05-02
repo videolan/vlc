@@ -744,6 +744,7 @@ vlc_dialog_id_set_context(vlc_dialog_id *p_id, void *p_context)
 void *
 vlc_dialog_id_get_context(vlc_dialog_id *p_id)
 {
+    assert(p_id != NULL);
     vlc_mutex_lock(&p_id->lock);
     void *p_context = p_id->p_context;
     vlc_mutex_unlock(&p_id->lock);
