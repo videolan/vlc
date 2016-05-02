@@ -584,6 +584,11 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                         msg_Dbg( p_module, "Playback pending with an offset of %" PRId64, m_chromecast_start_time);
                     }
                     m_time_playback_started = VLC_TS_INVALID;
+                    if (!mediaSessionId.empty())
+                    {
+                        msgPlayerSetMute( var_InheritBool( p_module, "mute" ) );
+                        msgPlayerSetVolume( var_InheritFloat( p_module, "volume" ) );
+                    }
                     break;
 
                 case RECEIVER_PLAYING:
@@ -600,6 +605,12 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                     break;
 
                 case RECEIVER_PAUSED:
+                    if (!mediaSessionId.empty())
+                    {
+                        msgPlayerSetMute( var_InheritBool( p_module, "mute" ) );
+                        msgPlayerSetVolume( var_InheritFloat( p_module, "volume" ) );
+                    }
+
                     m_chromecast_start_time = (1 + mtime_t( double( status[0]["currentTime"] ) ) ) * 1000000L;
 #ifndef NDEBUG
                     msg_Dbg( p_module, "Playback paused with an offset of %" PRId64 " date_play_start:%" PRId64, m_chromecast_start_time, m_time_playback_started);
