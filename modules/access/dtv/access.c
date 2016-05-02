@@ -638,38 +638,38 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
     /* Only wave carrier is specified */
     if (!strcasecmp (scheme, "cable"))
     {
-        if (systems & DVB_C)
+        if (systems & DTV_DELIVERY_DVB_C)
             return &dvbc;
-        if (systems & CQAM)
+        if (systems & DTV_DELIVERY_CQAM)
             return &cqam;
-        if (systems & ISDB_C)
+        if (systems & DTV_DELIVERY_ISDB_C)
             return &isdbc;
     }
     if (!strcasecmp (scheme, "satellite"))
     {
-        if (systems & DVB_S)
+        if (systems & DTV_DELIVERY_DVB_S)
             return &dvbs;
-        if (systems & ISDB_S)
+        if (systems & DTV_DELIVERY_ISDB_S)
             return &isdbs;
     }
     if (!strcasecmp (scheme, "terrestrial"))
     {
-        if (systems & DVB_T)
+        if (systems & DTV_DELIVERY_DVB_T)
             return &dvbc;
-        if (systems & ATSC)
+        if (systems & DTV_DELIVERY_ATSC)
             return &cqam;
-        if (systems & ISDB_T)
+        if (systems & DTV_DELIVERY_ISDB_T)
             return &isdbt;
     }
 
     /* Only standards family or nothing is specified */
-    if (systems & DVB_C)
+    if (systems & DTV_DELIVERY_DVB_C)
         return &dvbc;
-    if (systems & DVB_S)
+    if (systems & DTV_DELIVERY_DVB_S)
         return &dvbs;
-    if (systems & DVB_T)
+    if (systems & DTV_DELIVERY_DVB_T)
         return &dvbt;
-    if (systems & ATSC)
+    if (systems & DTV_DELIVERY_ATSC)
         return &atsc;
     return NULL;
 }
