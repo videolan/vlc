@@ -40,6 +40,9 @@
 #include <vlc_plugin.h>
 #include "audio_output/mmdevice.h"
 
+DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL, WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+static const GUID __KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL = {WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+
 static BOOL CALLBACK InitFreq(INIT_ONCE *once, void *param, void **context)
 {
     (void) once; (void) context;
@@ -69,6 +72,7 @@ typedef struct aout_stream_sys
     vlc_fourcc_t format; /**< Sample format */
     unsigned rate; /**< Sample rate */
     unsigned bytes_per_frame;
+    unsigned frame_length;
     UINT64 written; /**< Frames written to the buffer */
     UINT32 frames; /**< Total buffer size (frames) */
 } aout_stream_sys_t;
@@ -155,7 +159,7 @@ static HRESULT Play(aout_stream_t *s, block_t *block)
             break;
         }
 
-        const size_t copy = frames * sys->bytes_per_frame;
+        const size_t copy = frames * sys->bytes_per_frame / sys->frame_length;
 
         memcpy(dst, block->p_buffer, copy);
         hr = IAudioRenderClient_ReleaseBuffer(render, frames, 0);
@@ -230,6 +234,29 @@ static const uint32_t chans_in[] = {
     SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT, SPEAKER_BACK_CENTER,
     SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY, 0
 };
+
+static void vlc_SpdifToWave(WAVEFORMATEXTENSIBLE *restrict wf,
+                            audio_sample_format_t *restrict audio)
+{
+    audio->i_format = VLC_CODEC_SPDIFL;
+    aout_FormatPrepare (audio);
+    audio->i_bytes_per_frame = AOUT_SPDIF_SIZE;
+    audio->i_frame_length = A52_FRAME_NB;
+
+    wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL;
+
+    wf->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+    wf->Format.nChannels = 2; /* To prevent channel re-ordering */
+    wf->Format.nSamplesPerSec = audio->i_rate;
+    wf->Format.wBitsPerSample = 16;
+    wf->Format.nBlockAlign = 4; /* wf->Format.wBitsPerSample / 8 * wf->Format.nChannels  */
+    wf->Format.nAvgBytesPerSec = wf->Format.nSamplesPerSec * wf->Format.nBlockAlign;
+    wf->Format.cbSize = sizeof (*wf) - sizeof (wf->Format);
+
+    wf->Samples.wValidBitsPerSample = wf->Format.wBitsPerSample;
+
+    wf->dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT;
+}
 
 static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
                        audio_sample_format_t *restrict audio)
@@ -345,10 +372,6 @@ static unsigned vlc_CheckWaveOrder (const WAVEFORMATEX *restrict wf,
 static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
                      const GUID *sid)
 {
-    if (!s->b_force && var_InheritBool(s, "spdif") && AOUT_FMT_SPDIF(fmt))
-        /* Fallback to other plugin until pass-through is implemented */
-        return E_NOTIMPL;
-
     static INIT_ONCE freq_once = INIT_ONCE_STATIC_INIT;
 
     if (!InitOnceExecuteOnce(&freq_once, InitFreq, &freq, NULL))
@@ -371,10 +394,29 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
     /* Configure audio stream */
     WAVEFORMATEXTENSIBLE wf;
     WAVEFORMATEX *pwf;
+    AUDCLNT_SHAREMODE shared_mode;
 
-    vlc_ToWave(&wf, fmt);
-    hr = IAudioClient_IsFormatSupported(sys->client, AUDCLNT_SHAREMODE_SHARED,
+    if (AOUT_FMT_SPDIF(fmt) && var_InheritBool(s, "spdif"))
+    {
+        vlc_SpdifToWave(&wf, fmt);
+        shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
+    }
+    else
+    {
+        vlc_ToWave(&wf, fmt);
+        shared_mode = AUDCLNT_SHAREMODE_SHARED;
+    }
+
+    hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
                                         &wf.Format, &pwf);
+    if (FAILED(hr) && AOUT_FMT_SPDIF(fmt))
+    {
+        /* Device may not support SPDIF: try again with FL32 */
+        vlc_ToWave(&wf, fmt);
+        shared_mode = AUDCLNT_SHAREMODE_SHARED;
+        hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
+                                            &wf.Format, &pwf);
+    }
     if (FAILED(hr))
     {
         msg_Err(s, "cannot negotiate audio format (error 0x%lx)", hr);
@@ -391,6 +433,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
             hr = E_INVALIDARG;
             goto error;
         }
+        shared_mode = AUDCLNT_SHAREMODE_SHARED;
         msg_Dbg(s, "modified format");
     }
     else
@@ -400,7 +443,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
                                                sys->chans_table);
     sys->format = fmt->i_format;
 
-    hr = IAudioClient_Initialize(sys->client, AUDCLNT_SHAREMODE_SHARED, 0,
+    hr = IAudioClient_Initialize(sys->client, shared_mode, 0,
                                  AOUT_MAX_PREPARE_TIME * 10, 0,
                                  (hr == S_OK) ? &wf.Format : pwf, sid);
     CoTaskMemFree(pwf);
@@ -429,6 +472,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
 
     sys->rate = fmt->i_rate;
     sys->bytes_per_frame = fmt->i_bytes_per_frame;
+    sys->frame_length = fmt->i_frame_length > 0 ? fmt->i_frame_length : 1;
     sys->written = 0;
     s->sys = sys;
     s->time_get = TimeGet;
