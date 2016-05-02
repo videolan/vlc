@@ -33,7 +33,6 @@
 #include <vlc_block.h>
 #include <vlc_dialog.h>
 #include <vlc_charset.h>
-#include <vlc_access.h>
 
 #include <sys/types.h>
 
