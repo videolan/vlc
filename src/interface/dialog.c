@@ -647,7 +647,8 @@ dialog_update_progress(vlc_object_t *p_obj, vlc_dialog_id *p_id, float f_value,
     vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, false);
 
     vlc_mutex_lock(&p_provider->lock);
-    if (p_provider->cbs.pf_update_progress == NULL)
+    if (p_provider->cbs.pf_update_progress == NULL ||
+        vlc_dialog_is_cancelled(p_obj, p_id))
     {
         vlc_mutex_unlock(&p_provider->lock);
         free(psz_text);
