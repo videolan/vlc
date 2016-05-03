@@ -106,7 +106,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , i_requestId(0)
  , has_input(false)
 {
-    vlc_mutex_init_recursive(&lock);
+    vlc_mutex_init(&lock);
     vlc_cond_init(&loadCommandCond);
 
     // Start the Chromecast event thread.
@@ -788,7 +788,6 @@ int intf_sys_t::sendMessage(const castchannel::CastMessage &msg)
     SetDWBE(p_data, i_size);
     msg.SerializeWithCachedSizesToArray(p_data + PACKET_HEADER_LEN);
 
-    vlc_mutex_locker locker(&lock);
     int i_ret = tls_Send(p_tls, p_data, PACKET_HEADER_LEN + i_size);
     delete[] p_data;
     if (i_ret == PACKET_HEADER_LEN + i_size)
