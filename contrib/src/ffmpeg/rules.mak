@@ -30,8 +30,7 @@ FFMPEGCONF = \
 	--disable-protocol=concat \
 	--disable-bsfs \
 	--disable-bzlib \
-	--disable-avresample \
-	--disable-gnutls
+	--disable-avresample
 
 ifdef USE_FFMPEG
 FFMPEGCONF += \
