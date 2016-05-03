@@ -549,7 +549,11 @@ int tar_extract_all( TAR *t, char *prefix )
     union tar_buffer buffer;
     int   len, err, getheader = 1, remaining = 0;
     FILE  *outfile = NULL;
+#if defined( _WIN32 )
+    long  path_max = PATH_MAX;
+#else
     long  path_max = pathconf (".", _PC_PATH_MAX);
+#endif
     size_t maxsize = (path_max == -1 || path_max > 4096) ? 4096 : path_max;
     char  fname[BLOCKSIZE + maxsize];
 
