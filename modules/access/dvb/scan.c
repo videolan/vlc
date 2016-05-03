@@ -943,9 +943,9 @@ static bool GetOtherTsSDT( scan_session_t *p_session, uint16_t i_ts_id,
 }
 
 static void ParsePAT( vlc_object_t *p_obj, scan_t *p_scan,
-                      const dvbpsi_pat_t *p_pat, const scan_tuner_config_t *p_cfg )
+                      const dvbpsi_pat_t *p_pat, const scan_tuner_config_t *p_cfg,
+                      int i_snr )
 {
-    VLC_UNUSED(p_obj);
     /* PAT must not create new service without proper config ( local ) */
     if( !p_cfg )
         return;
@@ -953,6 +953,15 @@ static void ParsePAT( vlc_object_t *p_obj, scan_t *p_scan,
     scan_multiplex_t *p_mplex = scan_FindOrCreateMultiplex( p_scan, p_pat->i_ts_id, p_cfg );
     if( unlikely(p_mplex == NULL) )
         return;
+
+    if( p_mplex->i_snr > 0 && i_snr > p_mplex->i_snr )
+    {
+        msg_Info( p_obj, "multiplex ts_id %" PRIu16 " freq %u snr %d replaced by freq %u snr %d",
+                  p_mplex->i_ts_id, p_mplex->cfg.i_frequency, p_mplex->i_snr,
+                  p_cfg->i_frequency, i_snr );
+        p_mplex->cfg = *p_cfg;
+    }
+    p_mplex->i_snr = i_snr;
 
     const dvbpsi_pat_program_t *p_program;
     for( p_program = p_pat->p_first_program; p_program != NULL; p_program = p_program->p_next )
@@ -1495,7 +1504,7 @@ static void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 
     /* Parse PAT (Declares only local services/programs) */
     if( p_pat )
-        ParsePAT( p_scan->p_obj, p_scan, p_pat, &p_session->cfg );
+        ParsePAT( p_scan->p_obj, p_scan, p_pat, &p_session->cfg, p_session->i_snr );
 
     /* Parse NIT (Declares local services/programs) */
     if( p_nit )
