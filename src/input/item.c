@@ -1159,13 +1159,14 @@ input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_
     if( !p_new_child ) return NULL;
 
     vlc_mutex_lock( &p_node->p_item->lock );
-    vlc_mutex_lock( &p_item->lock );
     i_preparse_depth = p_node->p_item->i_preparse_depth;
+    vlc_mutex_unlock( &p_node->p_item->lock );
+
+    vlc_mutex_lock( &p_item->lock );
     p_item->i_preparse_depth = i_preparse_depth > 0 ?
                                i_preparse_depth -1 :
                                i_preparse_depth;
     vlc_mutex_unlock( &p_item->lock );
-    vlc_mutex_unlock( &p_node->p_item->lock );
 
     input_item_node_AppendNode( p_node, p_new_child );
     return p_new_child;
