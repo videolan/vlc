@@ -277,6 +277,9 @@ VLC_API int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va
 struct access_fsdir
 {
     input_item_node_t *p_node;
+    void **pp_slaves;
+    unsigned int i_slaves;
+    int i_sub_autodetect_fuzzy;
     bool b_show_hiddenfiles;
     char *psz_ignored_exts;
     char *psz_sort;
