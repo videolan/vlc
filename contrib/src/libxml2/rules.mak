@@ -38,6 +38,9 @@ libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 	$(APPLY) $(SRC)/libxml2/win32.patch
 	$(APPLY) $(SRC)/libxml2/bins.patch
 	$(APPLY) $(SRC)/libxml2/pthread.patch
+ifdef HAVE_WINRT
+	$(APPLY) $(SRC)/libxml2/nogetcwd.patch
+endif
 	$(MOVE)
 
 .libxml2: libxml2
