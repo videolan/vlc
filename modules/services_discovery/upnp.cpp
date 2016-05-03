@@ -800,6 +800,90 @@ bool MediaServer::addContainer( IXML_Element* containerElement )
     return true;
 }
 
+bool MediaServer::addItem( IXML_Element* itemElement )
+{
+    const char* objectID = ixmlElement_getAttribute( itemElement, "id" );
+    if ( !objectID )
+        return false;
+
+    const char* title = xml_getChildElementValue( itemElement, "dc:title" );
+    if ( !title )
+        return false;
+
+    const char* psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfo" );
+    if ( !psz_subtitles )
+    {
+        psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfoEx" );
+        if ( !psz_subtitles )
+            psz_subtitles = xml_getChildElementValue( itemElement, "pv:subtitlefile" );
+    }
+
+    /* Try to extract all resources in DIDL */
+    IXML_NodeList* p_resource_list = ixmlDocument_getElementsByTagName( (IXML_Document*) itemElement, "res" );
+    if ( !p_resource_list || ixmlNodeList_length( p_resource_list ) <= 0 )
+    {
+        if ( p_resource_list )
+            ixmlNodeList_free( p_resource_list );
+        return false;
+    }
+
+    mtime_t i_duration = -1;
+    IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, 0 );
+    const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
+    if( !psz_resource_url )
+    {
+        ixmlNodeList_free( p_resource_list );
+        return false;
+    }
+    const char* psz_duration = ixmlElement_getAttribute( p_resource, "duration" );
+
+    if ( psz_duration )
+    {
+        int i_hours, i_minutes, i_seconds;
+        if( sscanf( psz_duration, "%d:%02d:%02d", &i_hours, &i_minutes, &i_seconds ) )
+            i_duration = INT64_C(1000000) * ( i_hours * 3600 + i_minutes * 60 +
+                                              i_seconds );
+    }
+
+    input_item_t* p_item =
+        input_item_NewExt( psz_resource_url, title, i_duration,
+                           ITEM_TYPE_FILE, ITEM_NET );
+    if ( p_item == NULL )
+    {
+        ixmlNodeList_free( p_resource_list );
+        return false;
+    }
+    const char* psz_artist = xml_getChildElementValue( itemElement, "upnp:artist" );
+
+    if ( psz_artist != NULL )
+        input_item_SetArtist( p_item, psz_artist );
+    const char* psz_genre = xml_getChildElementValue( itemElement, "upnp:genre" );
+    if ( psz_genre != NULL )
+        input_item_SetGenre( p_item, psz_genre );
+    const char* psz_album = xml_getChildElementValue( itemElement, "upnp:album" );
+    if ( psz_album != NULL )
+        input_item_SetAlbum( p_item, psz_album );
+    const char* psz_date = xml_getChildElementValue( itemElement, "dc:date" );
+    if ( psz_date != NULL )
+        input_item_SetDate( p_item, psz_date );
+    const char* psz_orig_track_nb = xml_getChildElementValue( itemElement, "upnp:originalTrackNumber" );
+    if ( psz_orig_track_nb != NULL )
+        input_item_SetTrackNumber( p_item, psz_orig_track_nb );
+    const char* psz_album_artist = xml_getChildElementValue( itemElement, "upnp:albumArtist" );
+    if ( psz_album_artist != NULL )
+        input_item_SetAlbumArtist( p_item, psz_album_artist );
+    const char* psz_albumArt = xml_getChildElementValue( itemElement, "upnp:albumArtURI" );
+    if ( psz_albumArt != NULL )
+        input_item_SetArtworkURL( p_item, psz_albumArt );
+
+    input_item_CopyOptions( p_item, node_->p_item );
+    input_item_node_AppendItem( node_, p_item );
+    input_item_Release( p_item );
+
+    ixmlNodeList_free( p_resource_list );
+    return true;
+}
+
 int MediaServer::sendActionCb( Upnp_EventType eventType,
                                void *p_event, void *p_cookie )
 {
@@ -962,80 +1046,7 @@ bool MediaServer::fetchContents()
     if ( itemNodeList )
     {
         for ( unsigned int i = 0; i < ixmlNodeList_length( itemNodeList ); i++ )
-        {
-            IXML_Element* itemElement =
-                        ( IXML_Element* )ixmlNodeList_item( itemNodeList, i );
-
-            const char* objectID =
-                        ixmlElement_getAttribute( itemElement, "id" );
-            if ( !objectID )
-                continue;
-
-            const char* title = xml_getChildElementValue( itemElement, "dc:title" );
-            if ( !title )
-                continue;
-
-            const char* psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfo" );
-
-            if ( !psz_subtitles )
-                psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfoEx" );
-
-            if ( !psz_subtitles )
-                psz_subtitles = xml_getChildElementValue( itemElement, "pv:subtitlefile" );
-
-            /* Try to extract all resources in DIDL */
-            IXML_NodeList* p_resource_list = ixmlDocument_getElementsByTagName( (IXML_Document*) itemElement, "res" );
-            if ( p_resource_list && ixmlNodeList_length( p_resource_list ) > 0 )
-            {
-                mtime_t i_duration = -1;
-                IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, 0 );
-                const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
-                if( !psz_resource_url )
-                    continue;
-                const char* psz_duration = ixmlElement_getAttribute( p_resource, "duration" );
-
-                if ( psz_duration )
-                {
-                    int i_hours, i_minutes, i_seconds;
-                    if( sscanf( psz_duration, "%d:%02d:%02d", &i_hours, &i_minutes, &i_seconds ) )
-                        i_duration = INT64_C(1000000) * ( i_hours * 3600 +
-                                                          i_minutes * 60 +
-                                                          i_seconds );
-                }
-
-                input_item_t* p_item =
-                    input_item_NewExt( psz_resource_url, title, i_duration,
-                                       ITEM_TYPE_FILE, ITEM_NET );
-                if ( p_item != NULL )
-                {
-                    const char* psz_artist = xml_getChildElementValue( itemElement, "upnp:artist" );
-                    if ( psz_artist != NULL )
-                        input_item_SetArtist( p_item, psz_artist );
-                    const char* psz_genre = xml_getChildElementValue( itemElement, "upnp:genre" );
-                    if ( psz_genre != NULL )
-                        input_item_SetGenre( p_item, psz_genre );
-                    const char* psz_album = xml_getChildElementValue( itemElement, "upnp:album" );
-                    if ( psz_album != NULL )
-                        input_item_SetAlbum( p_item, psz_album );
-                    const char* psz_date = xml_getChildElementValue( itemElement, "dc:date" );
-                    if ( psz_date != NULL )
-                        input_item_SetDate( p_item, psz_date );
-                    const char* psz_orig_track_nb = xml_getChildElementValue( itemElement, "upnp:originalTrackNumber" );
-                    if ( psz_orig_track_nb != NULL )
-                        input_item_SetTrackNumber( p_item, psz_orig_track_nb );
-                    const char* psz_album_artist = xml_getChildElementValue( itemElement, "upnp:albumArtist" );
-                    if ( psz_album_artist != NULL )
-                        input_item_SetAlbumArtist( p_item, psz_album_artist );
-                    const char* psz_albumArt = xml_getChildElementValue( itemElement, "upnp:albumArtURI" );
-                    if ( psz_albumArt != NULL )
-                        input_item_SetArtworkURL( p_item, psz_albumArt );
-                }
-                input_item_CopyOptions( p_item, node_->p_item );
-                input_item_node_AppendItem( node_, p_item );
-                input_item_Release( p_item );
-            }
-            ixmlNodeList_free( p_resource_list );
-        }
+            addItem( (IXML_Element*)ixmlNodeList_item( itemNodeList, i ) );
         ixmlNodeList_free( itemNodeList );
     }
 

@@ -150,6 +150,7 @@ private:
     MediaServer& operator=(const MediaServer&);
 
     bool addContainer( IXML_Element* containerElement );
+    bool addItem( IXML_Element* itemElement );
 
     IXML_Document* _browseAction(const char*, const char*,
             const char*, const char*, const char* );
