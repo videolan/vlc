@@ -87,6 +87,7 @@ typedef const void * (*scan_service_notify_cb)( scan_t *, void *, const scan_ser
 void scan_set_NotifyCB( scan_t *, scan_service_notify_cb );
 
 const char * scan_service_GetName( const scan_service_t *s );
+const char * scan_service_GetProvider( const scan_service_t *s );
 char * scan_service_GetUri( const scan_service_t *s );
 uint16_t scan_service_GetProgram( const scan_service_t *s );
 const char * scan_service_GetNetworkName( const scan_service_t *s );

@@ -86,6 +86,7 @@ struct scan_service_t
     scan_service_type_t type;
 
     char *psz_name;     /* channel name in utf8 */
+    char *psz_provider; /* service provider */
     uint16_t i_channel; /* logical channel number */
     bool b_crypted;     /* True if potentially crypted */
 
@@ -212,6 +213,7 @@ static scan_service_t *scan_service_New( uint16_t i_program )
 
     p_srv->type = SERVICE_TYPE_RESERVED;
     p_srv->psz_name = NULL;
+    p_srv->psz_provider = NULL;
     p_srv->psz_original_network_name = NULL;
     p_srv->i_channel = -1;
     p_srv->b_crypted = false;
@@ -223,6 +225,7 @@ static void scan_service_Delete( scan_service_t *p_srv )
 {
     free( p_srv->psz_original_network_name );
     free( p_srv->psz_name );
+    free( p_srv->psz_provider );
     free( p_srv );
 }
 
@@ -1064,6 +1067,9 @@ static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan, const dvbpsi_sdt_t *p
                 if( !s->psz_name )
                     s->psz_name = vlc_from_EIT( pD->i_service_name,
                                                 pD->i_service_name_length );
+                free( s->psz_provider );
+                s->psz_provider = vlc_from_EIT( pD->i_service_provider_name,
+                                                pD->i_service_provider_name_length );
 
                 s->type = pD->i_service_type;
             }
@@ -1561,6 +1567,11 @@ void scan_set_NotifyCB( scan_t *p_scan, scan_service_notify_cb pf )
 const char * scan_service_GetName( const scan_service_t *s )
 {
     return s->psz_name;
+}
+
+const char * scan_service_GetProvider( const scan_service_t *s )
+{
+    return s->psz_provider;
 }
 
 uint16_t scan_service_GetProgram( const scan_service_t *s )
