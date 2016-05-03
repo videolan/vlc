@@ -206,12 +206,26 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
     if( !p_region )
         return NULL;
 
-    video_format_Copy( &p_region->fmt, p_fmt );
-    if ( p_fmt->i_chroma != VLC_CODEC_YUVP )
+    if ( p_fmt->i_chroma == VLC_CODEC_YUVP )
     {
-        free( p_region->fmt.p_palette );
+        video_format_Copy( &p_region->fmt, p_fmt );
+        /* YUVP should have a palette */
+        if( p_region->fmt.p_palette == NULL )
+        {
+            p_region->fmt.p_palette = calloc( 1, sizeof(*p_region->fmt.p_palette) );
+            if( p_region->fmt.p_palette == NULL )
+            {
+                free( p_region );
+                return NULL;
+            }
+        }
+    }
+    else
+    {
+        p_region->fmt = *p_fmt;
         p_region->fmt.p_palette = NULL;
     }
+
     p_region->i_alpha = 0xff;
 
     if( p_fmt->i_chroma == VLC_CODEC_TEXT )
