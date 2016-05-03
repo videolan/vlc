@@ -52,6 +52,10 @@
 #include "../../demux/dvb-text.h"
 #include "../../mux/mpeg/dvbpsi_compat.h"
 
+#define PSI_PAT_PID 0x00
+#define SI_NIT_PID  0x10
+#define SI_SDT_PID  0x11
+
 #define NIT_CURRENT_NETWORK_TABLE_ID    0x40
 #define NIT_OTHER_NETWORK_TABLE_ID      0x41
 #define SDT_CURRENT_TS_TABLE_ID         0x42
@@ -852,10 +856,10 @@ int scan_Run( scan_t *p_scan )
         return VLC_EGENERIC;
     }
 
-    p_scan->pf_filter( p_scan, p_scan->p_cbdata, 0x00, true );
-    p_scan->pf_filter( p_scan, p_scan->p_cbdata, 0x10, true );
+    p_scan->pf_filter( p_scan, p_scan->p_cbdata, PSI_PAT_PID, true );
+    p_scan->pf_filter( p_scan, p_scan->p_cbdata, SI_SDT_PID, true );
     if( p_scan->parameter.b_use_nit )
-        p_scan->pf_filter( p_scan, p_scan->p_cbdata, 0x11, true );
+        p_scan->pf_filter( p_scan, p_scan->p_cbdata, SI_NIT_PID, true );
 
     /* */
     uint8_t packet[TS_PACKET_SIZE * SCAN_READ_BUFFER_COUNT];
@@ -1627,7 +1631,7 @@ static bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
 
     /* */
     const int i_pid = ( (p_packet[1]&0x1f)<<8) | p_packet[2];
-    if( i_pid == 0x00 )
+    if( i_pid == PSI_PAT_PID )
     {
         if( !p_scan->p_pathandle )
         {
@@ -1646,7 +1650,7 @@ static bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
         if( p_scan->p_pathandle )
             dvbpsi_packet_push( p_scan->p_pathandle, p_packet );
     }
-    else if( i_pid == 0x11 )
+    else if( i_pid == SI_SDT_PID )
     {
         if( !p_scan->p_sdthandle )
         {
@@ -1666,7 +1670,7 @@ static bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
         if( p_scan->p_sdthandle )
             dvbpsi_packet_push( p_scan->p_sdthandle, p_packet );
     }
-    else if( p_scan->b_use_nit ) /*if( i_pid == p_scan->i_nit_pid )*/
+    else if( p_scan->b_use_nit && i_pid == SI_NIT_PID ) /*if( i_pid == p_scan->i_nit_pid )*/
     {
         if( !p_scan->p_nithandle )
         {
