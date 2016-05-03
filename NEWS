@@ -104,6 +104,7 @@ Audio output:
  * Complete rewrite of the AudioTrack Android module. This is now the default.
    It now supports HDMI/SPDIF passthrough for AC3, 5.1/7.1 and float output.
  * Added Tizen audio module.
+ * HDMI/SPDIF pass-through support for WASAPI
 
 Audio filters and output:
  * Add SoX Resampler library audio filter module (converter and resampler)
