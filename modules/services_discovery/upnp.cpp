@@ -876,6 +876,15 @@ bool MediaServer::addItem( IXML_Element* itemElement )
     if ( psz_albumArt != NULL )
         input_item_SetArtworkURL( p_item, psz_albumArt );
 
+    if ( psz_subtitles )
+    {
+        input_item_slave *p_slave =
+            input_item_slave_New( psz_subtitles, SLAVE_TYPE_SPU,
+                                  SLAVE_PRIORITY_MATCH_ALL );
+        if ( p_slave )
+            input_item_AddSlave( p_item, p_slave );
+    }
+
     input_item_CopyOptions( p_item, node_->p_item );
     input_item_node_AppendItem( node_, p_item );
     input_item_Release( p_item );
