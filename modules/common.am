@@ -33,8 +33,7 @@ AM_LDFLAGS = \
 	-no-undefined \
 	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE) 
 if HAVE_WIN32
-AM_LDFLAGS += $(top_builddir)/modules/module.rc.lo \
-              -Wc,--static -Wc,-static-libgcc
+AM_LDFLAGS += $(top_builddir)/modules/module.rc.lo -Wc,-static
 endif
 
 SUFFIXES =
