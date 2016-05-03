@@ -149,7 +149,7 @@ private:
     MediaServer(const MediaServer&);
     MediaServer& operator=(const MediaServer&);
 
-    void addItem(const char* objectID, const char* title);
+    bool addContainer( IXML_Element* containerElement );
 
     IXML_Document* _browseAction(const char*, const char*,
             const char*, const char*, const char* );

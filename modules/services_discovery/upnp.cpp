@@ -775,20 +775,29 @@ MediaServer::~MediaServer()
     free( psz_root_ );
 }
 
-void MediaServer::addItem(const char *objectID, const char *title )
+bool MediaServer::addContainer( IXML_Element* containerElement )
 {
     char* psz_url;
 
+    const char* objectID = ixmlElement_getAttribute( containerElement, "id" );
+    if ( !objectID )
+        return false;
+
+    const char* title = xml_getChildElementValue( containerElement, "dc:title" );
+    if ( !title )
+        return false;
+
     if( asprintf( &psz_url, "upnp://%s?ObjectID=%s", psz_root_, objectID ) < 0 )
-        return;
+        return false;
 
     input_item_t* p_item = input_item_NewDirectory( psz_url, title, ITEM_NET );
     free( psz_url);
     if ( !p_item )
-        return;
+        return false;
     input_item_CopyOptions( p_item, node_->p_item );
     input_item_node_AppendItem( node_, p_item );
     input_item_Release( p_item );
+    return true;
 }
 
 int MediaServer::sendActionCb( Upnp_EventType eventType,
@@ -944,20 +953,7 @@ bool MediaServer::fetchContents()
     if ( containerNodeList )
     {
         for ( unsigned int i = 0; i < ixmlNodeList_length( containerNodeList ); i++ )
-        {
-            IXML_Element* containerElement = (IXML_Element*)ixmlNodeList_item( containerNodeList, i );
-
-            const char* objectID = ixmlElement_getAttribute( containerElement,
-                                                             "id" );
-            if ( !objectID )
-                continue;
-
-            const char* title = xml_getChildElementValue( containerElement,
-                                                          "dc:title" );
-            if ( !title )
-                continue;
-            addItem(objectID, title);
-        }
+            addContainer( (IXML_Element*)ixmlNodeList_item( containerNodeList, i ) );
         ixmlNodeList_free( containerNodeList );
     }
 
