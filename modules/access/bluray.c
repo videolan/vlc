@@ -211,7 +211,7 @@ struct subpicture_updater_sys_t
 static void unref_subpicture_updater(subpicture_updater_sys_t *p_sys)
 {
     vlc_mutex_lock(&p_sys->lock);
-    int refs = p_sys->ref_cnt--;
+    int refs = --p_sys->ref_cnt;
     p_sys->p_overlay = NULL;
     vlc_mutex_unlock(&p_sys->lock);
 
