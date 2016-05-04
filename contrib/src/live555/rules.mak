@@ -35,7 +35,7 @@ LIVE_TARGET := solaris-32bit
 endif
 endif
 
-LIVE_EXTRA_CFLAGS := $(EXTRA_CFLAGS) -fexceptions
+LIVE_EXTRA_CFLAGS := $(EXTRA_CFLAGS) -fexceptions $(CFLAGS)
 
 live555: $(LIVE555_FILE) .sum-live555
 	rm -Rf live
