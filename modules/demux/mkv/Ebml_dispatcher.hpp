@@ -53,20 +53,18 @@ namespace {
     EbmlProcessorEntry (EbmlId const& id, std::type_info const* ti, EbmlProcessor cb)
       : p_ebmlid (&id), p_typeid (ti), callback (cb)
     { }
+
   };
 
-  struct ProcessorEntrySorter {
-    typedef EbmlProcessorEntry value_type;
-
-    bool operator() (value_type const& lhs, value_type const& rhs) const {
+  bool operator<( EbmlProcessorEntry const& lhs, EbmlProcessorEntry const& rhs )
+  {
       EbmlId const& lid = *lhs.p_ebmlid;
       EbmlId const& rid = *rhs.p_ebmlid;
 
       return lid.GetLength() < rid.GetLength() || (
         !( rid.GetLength() < lid.GetLength() ) && lid.GetValue() < rid.GetValue()
       );
-    }
-  };
+  }
 
   class EbmlTypeDispatcher : public Dispatcher<EbmlTypeDispatcher, EbmlProcessorEntry::EbmlProcessor> {
     protected:
@@ -78,7 +76,7 @@ namespace {
       }
 
       void on_create () {
-        std::sort (_processors.begin(), _processors.end(), _ebml_sorter);
+        std::sort (_processors.begin(), _processors.end());
       }
 
       bool send (EbmlElement * const& element, void* payload) const
@@ -93,7 +91,7 @@ namespace {
 
         ProcessorContainer::const_iterator cit_end = _processors.end();
         ProcessorContainer::const_iterator cit     = std::lower_bound (
-            _processors.begin(), cit_end, eb, _ebml_sorter
+            _processors.begin(), cit_end, eb
         );
 
         if (element && cit != cit_end)
@@ -128,8 +126,7 @@ namespace {
       }
 
     public:
-      ProcessorContainer           _processors;
-      static ProcessorEntrySorter _ebml_sorter;
+      ProcessorContainer _processors;
   };
 
 } /* end-of-namespace */
