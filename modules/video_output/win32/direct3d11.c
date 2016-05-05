@@ -1365,9 +1365,9 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     D3D11_SAMPLER_DESC sampDesc;
     memset(&sampDesc, 0, sizeof(sampDesc));
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
-    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
     sampDesc.MinLOD = 0;
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
