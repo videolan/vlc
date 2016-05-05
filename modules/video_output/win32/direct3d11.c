@@ -175,7 +175,7 @@ static const char* globVertexShaderDefault = "\
   VS_OUTPUT VS( VS_INPUT In )\
   {\
     VS_OUTPUT Output;\
-    Output.Position = float4(In.Position.xy, 0.0f, 1.0f);\
+    Output.Position = In.Position;\
     Output.Texture = In.Texture;\
     Output.Opacity = In.Opacity;\
     return Output;\
