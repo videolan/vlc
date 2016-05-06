@@ -178,7 +178,7 @@ static void scan_tuner_config_Init( scan_tuner_config_t *p_cfg, const scan_param
     p_cfg->type = p_params->type;
 }
 
-static bool scan_tuner_config_Validate( const scan_tuner_config_t *p_cfg )
+static bool scan_tuner_config_StandardValidate( const scan_tuner_config_t *p_cfg )
 {
     if( p_cfg->i_frequency == 0 ||
         p_cfg->i_frequency == UINT32_MAX / 10 ) /* Invalid / broken transponder info on French TNT */
@@ -187,16 +187,6 @@ static bool scan_tuner_config_Validate( const scan_tuner_config_t *p_cfg )
     if( p_cfg->type == SCAN_DVB_T && p_cfg->i_bandwidth == 0 )
         return false;
 
-    return true;
-}
-
-static bool scan_tuner_config_FrontendValidate( const scan_t *p_scan, const scan_tuner_config_t *p_cfg )
-{
-    if( p_cfg->i_bandwidth > p_scan->parameter.bandwidth.i_max ||
-        p_cfg->i_bandwidth < p_scan->parameter.bandwidth.i_min ||
-        p_cfg->i_frequency < p_scan->parameter.frequency.i_min ||
-        p_cfg->i_frequency > p_scan->parameter.frequency.i_max )
-        return false;
     return true;
 }
 
@@ -807,7 +797,7 @@ static int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
         if( i_ret )
             return i_ret;
     }
-    while( !scan_tuner_config_FrontendValidate( p_scan, p_cfg ) );
+    while( !scan_tuner_config_ParametersValidate( &p_scan->parameter, p_cfg ) );
 
     const size_t i_total_services = scan_CountServices( p_scan );
     const mtime_t i_eta = f_position > 0.005 ? (mdate() - p_scan->i_time_start) * ( 1.0 / f_position - 1.0 ) : -1;
@@ -1268,7 +1258,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
         }
 
         scan_multiplex_t *p_mplex = scan_FindMultiplex( p_scan, p_ts->i_ts_id );
-        if( p_mplex == NULL && scan_tuner_config_Validate( &tscfg ) )
+        if( p_mplex == NULL && scan_tuner_config_StandardValidate( &tscfg ) )
         {
             p_mplex = scan_multiplex_New( &tscfg, p_ts->i_ts_id );
             if( likely(p_mplex) )
