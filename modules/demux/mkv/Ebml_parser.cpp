@@ -39,7 +39,6 @@ EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux,
     mb_keep( false ),
     mb_dummy( b_with_dummy )
 {
-    mi_remain_size[0] = el_start->GetSize();
     memset( m_el, 0, sizeof( *m_el ) * M_EL_MAXSIZE);
     m_el[0] = el_start;
 }

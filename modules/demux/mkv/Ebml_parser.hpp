@@ -60,7 +60,6 @@ class EbmlParser
     EbmlStream  *m_es;
     int          mi_level;
     EbmlElement *m_el[M_EL_MAXSIZE];
-    int64_t      mi_remain_size[10];
 
     EbmlElement *m_got;
 
