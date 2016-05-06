@@ -567,6 +567,13 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="3">
+        <widget class="QPushButton" name="clearCacheButton">
+            <property name="text">
+                <string>Clear Art Cache</string>
+            </property>
+        </widget>
+      </item>
      </layout>
     </widget>
    </item>

@@ -39,6 +39,7 @@
 #include <QSignalMapper>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include <QMessageBox>
 
 #include <QStyleFactory>
 #include <QSettings>
@@ -816,6 +817,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_BOOL( "metadata-network-access", MetadataNetworkAccessMode );
 
+            BUTTONACT( ui.clearCacheButton, clearCache());
+
             /* UPDATE options */
 #ifdef UPDATE_CHECK
             CONFIG_BOOL( "qt-updates-notif", updatesBox );
@@ -1181,6 +1184,28 @@ void SPrefsPanel::changeStyle( QString s_style )
         (*it)->update();
         ++it;
     };
+}
+
+void SPrefsPanel::clearCache() {
+    int ret = QMessageBox::question(
+                 this,
+                 qtr( "Clear Art Cache" ),
+                 qtr( "Are you sure you want to clear downloaded cache?"),
+                 QMessageBox::Ok | QMessageBox::Cancel,
+                 QMessageBox::Ok);
+
+    if( ret == QMessageBox::Ok ) {
+        char *psz_dir;
+        char *psz_cachedir = config_GetUserDir( VLC_CACHE_DIR );
+        if (asprintf(&psz_dir, "%s" DIR_SEP "art", psz_cachedir) > -1) { 
+            if (boost::filesystem::exists(psz_dir)) {
+                boost::filesystem::path path_to_remove(psz_dir);
+                boost::filesystem::remove_all(path_to_remove);  
+            }
+        }
+        free(psz_cachedir);
+        free(psz_dir);
+    }
 }
 
 void SPrefsPanel::langChanged( int i )
