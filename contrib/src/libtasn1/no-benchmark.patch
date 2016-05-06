@@ -1,0 +1,39 @@
+--- libtasn1/src/benchmark.c.orig	2016-05-06 14:37:46.748895833 +0200
++++ libtasn1/src/benchmark.c	2016-05-06 14:38:16.620222564 +0200
+@@ -91,25 +91,6 @@
+   benchmark_must_finish = 0;
+ 
+ #if defined _WIN32
+-  st->wtimer = CreateWaitableTimer (NULL, TRUE, NULL);
+-  if (st->wtimer == NULL)
+-    {
+-      fprintf (stderr, "error: CreateWaitableTimer %u\n", GetLastError ());
+-      exit (1);
+-    }
+-  st->wthread = CreateThread (NULL, 0, alarm_handler, &st->wtimer, 0, NULL);
+-  if (st->wthread == NULL)
+-    {
+-      fprintf (stderr, "error: CreateThread %u\n", GetLastError ());
+-      exit (1);
+-    }
+-  st->alarm_timeout.QuadPart = (5) * 10000000;
+-  if (SetWaitableTimer (st->wtimer, &st->alarm_timeout, 0, NULL, NULL, FALSE)
+-      == 0)
+-    {
+-      fprintf (stderr, "error: SetWaitableTimer %u\n", GetLastError ());
+-      exit (1);
+-    }
+ #else
+   alarm (5);
+ #endif
+@@ -127,10 +108,6 @@
+   char imetric[16];
+ 
+ #if defined _WIN32
+-  if (st->wtimer != NULL)
+-    CloseHandle (st->wtimer);
+-  if (st->wthread != NULL)
+-    CloseHandle (st->wthread);
+ #else
+   signal (SIGALRM, st->old_handler);
+ #endif
