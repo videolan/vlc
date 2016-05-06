@@ -75,8 +75,11 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         if( p_vsubchap )
             sub_chapters.push_back( p_vsubchap );
     }
-    int64_t stop = ( b_ordered && (p_chap->i_end_time == -1 ||
-                                   (p_chap->i_end_time - p_chap->i_start_time) < (tmp - usertime_offset) )) ? tmp : p_chap->i_end_time;
+    int64_t stop = ( b_ordered )?
+            (((p_chap->i_end_time == -1 ||
+               (p_chap->i_end_time - p_chap->i_start_time) < (tmp - usertime_offset) )) ? tmp :
+             p_chap->i_end_time - p_chap->i_start_time + usertime_offset )
+            :p_chap->i_end_time;
 
     virtual_chapter_c * p_vchap = new (std::nothrow) virtual_chapter_c( *p_segment, p_chap, start, stop, sub_chapters );
     if( !p_vchap )
