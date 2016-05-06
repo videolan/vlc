@@ -47,6 +47,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QTextEdit>
+#include <QClipboard>
 
 static inline void setSpinBounds( QSpinBox *spinbox ) {
     spinbox->setRange( 0, INT_MAX );
@@ -150,6 +151,13 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->addWidget( fingerprintButton, line, 7 , 3, -1 );
     CONNECT( fingerprintButton, clicked(), this, fingerprint() );
 
+    line += 2;
+    cpyAndPasteButton = new QPushButton( qtr("&Copy") );
+    cpyAndPasteButton->setToolTip( qtr("Coping metadata to clipboard") );
+    cpyAndPasteButton->setVisible( false );
+    metaLayout->addWidget( cpyAndPasteButton, line, 7, 3, -1 );
+    CONNECT( cpyAndPasteButton, clicked(), this, cpyAndPasteInfo() );
+
     line++;
 
     lblURL = new QLabel;
@@ -237,6 +245,7 @@ void MetaPanel::update( input_item_t *p_item )
     if( !EMPTY_STR( psz_meta ) )
         emit uriSet( qfu( psz_meta ) );
     fingerprintButton->setVisible( Chromaprint::isSupported( QString( psz_meta ) ) );
+    cpyAndPasteButton->setVisible( Chromaprint::isSupported( QString( psz_meta ) ) );
     free( psz_meta );
 
     /* Other classic though */
@@ -360,9 +369,29 @@ void MetaPanel::clear()
     encodedby_text->clear();
     art_cover->clear();
     fingerprintButton->setVisible( false );
+    cpyAndPasteButton->setVisible( false );
 
     setEditMode( false );
     emit uriSet( "" );
+}
+
+/* In order to be able to copy metadata to the clipboard */
+void MetaPanel::cpyAndPasteInfo() {
+
+    QClipboard *clipboard = QApplication::clipboard();
+    QString originaltext;
+    originaltext.append("Title: " + title_text->text());
+    originaltext.append("\nArtist: " + artist_text->text());
+    originaltext.append("\nCollection: " + collection_text->text());
+    originaltext.append("\nGenre: " + genre_text->text());
+    originaltext.append("\nSequence Number: " + seqnum_text->text());
+    originaltext.append("/" + seqtot_text->text());
+    originaltext.append("\nDate: " + date_text->text());
+    originaltext.append("\nLanguage: " + language_text->text());
+    originaltext.append("\nCopyright: " + copyright_text->text());
+    originaltext.append("\nPublisher: " + publisher_text->text());
+    originaltext.append("\nDescription: " + description_text->toPlainText());
+    clipboard->setText(originaltext);
 }
 
 void MetaPanel::fingerprint()
