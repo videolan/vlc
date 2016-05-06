@@ -214,11 +214,6 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             }
             eparser.Up();
 
-#if 0
-            msg_Dbg( &sys.demuxer, " * added time=%" PRId64 " pos=%" PRId64
-                     " track=%d bnum=%d", last_idx.i_time, last_idx.i_position,
-                     last_idx.i_track, last_idx.i_block_number );
-#endif
             if( likely( !b_invalid_cue ) )
                 indexes.push_back (mkv_index_t ());
         }
