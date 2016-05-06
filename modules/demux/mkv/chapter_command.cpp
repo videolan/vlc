@@ -68,49 +68,35 @@ int16 dvd_chapter_codec_c::GetTitleNumber()
 
 bool dvd_chapter_codec_c::Enter()
 {
-    bool f_result = false;
-    std::vector<KaxChapterProcessData*>::iterator index = enter_cmds.begin();
-    while ( index != enter_cmds.end() )
-    {
-        if ( (*index)->GetSize() )
-        {
-            binary *p_data = (*index)->GetBuffer();
-            size_t i_size = *p_data++;
-            // avoid reading too much from the buffer
-            i_size = __MIN( i_size, ((*index)->GetSize() - 1) >> 3 );
-            for ( ; i_size > 0; i_size--, p_data += 8 )
-            {
-                msg_Dbg( &sys.demuxer, "Matroska DVD enter command" );
-                f_result |= sys.dvd_interpretor.Interpret( p_data );
-            }
-        }
-        ++index;
-    }
-    return f_result;
+    return EnterLeaveHelper( "Matroska DVD enter command", &enter_cmds );
 }
 
 bool dvd_chapter_codec_c::Leave()
 {
+    return EnterLeaveHelper( "Matroska DVD leave command", &leave_cmds );
+}
+
+bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, std::vector<KaxChapterProcessData*> * p_container )
+{
     bool f_result = false;
-    std::vector<KaxChapterProcessData*>::iterator index = leave_cmds.begin();
-    while ( index != leave_cmds.end() )
+    std::vector<KaxChapterProcessData*>::iterator it = p_container->begin ();
+    while( it != p_container->end() )
     {
-        if ( (*index)->GetSize() )
+        if( (*it)->GetSize() )
         {
-            binary *p_data = (*index)->GetBuffer();
-            size_t i_size = *p_data++;
-            // avoid reading too much from the buffer
-            i_size = __MIN( i_size, ((*index)->GetSize() - 1) >> 3 );
-            for ( ; i_size > 0; i_size--, p_data += 8 )
+            binary *p_data = (*it)->GetBuffer();
+            size_t i_size  = std::min<size_t>( *p_data++, ( (*it)->GetSize() - 1 ) >> 3 ); // avoid reading too much
+            for( ; i_size > 0; i_size -=1, p_data += 8 )
             {
-                msg_Dbg( &sys.demuxer, "Matroska DVD leave command" );
+                msg_Dbg( &sys.demuxer, "%s", str_diag);
                 f_result |= sys.dvd_interpretor.Interpret( p_data );
             }
         }
-        ++index;
+        ++it;
     }
     return f_result;
 }
+
 
 std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
 {

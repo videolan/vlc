@@ -256,8 +256,12 @@ public:
 
     bool Enter();
     bool Leave();
+
     std::string GetCodecName( bool f_for_title = false ) const;
     int16 GetTitleNumber();
+
+protected:
+    bool EnterLeaveHelper( char const*, std::vector<KaxChapterProcessData*>* );
 };
 
 class matroska_script_interpretor_c
