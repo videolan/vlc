@@ -82,12 +82,14 @@ private:
     QString  currentURL;
 
     QPushButton *fingerprintButton;
+    QPushButton *cpyAndPasteButton;
 
 public slots:
     void update( input_item_t * );
     void clear();
     void fingerprint();
     void fingerprintUpdate( input_item_t * );
+    void cpyAndPasteInfo();
 
 private slots:
     void enterEditMode();

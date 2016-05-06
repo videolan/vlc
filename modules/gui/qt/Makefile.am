@@ -13,8 +13,9 @@ guidir = $(pluginsdir)/gui
 #   - Add it to DEPS_res
 
 SUFFIXES += .ui .h .hpp .moc.cpp
+BOOST = -lboost_system -lboost_filesystem
 
-libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
+libqt_plugin_la_CXXFLAGS = $(BOOST) $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
 libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
 if HAVE_OS2

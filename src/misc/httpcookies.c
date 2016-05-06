@@ -357,7 +357,8 @@ static bool cookie_is_valid(const http_cookie_t * cookie, bool secure,
     return cookie && cookie->psz_name && strlen(cookie->psz_name) > 0 &&
         cookie->psz_domain &&
         !cookie_domain_is_public_suffix(cookie->psz_domain) &&
-        cookie_domain_matches(cookie, host);
+        cookie_domain_matches(cookie, host) &&
+        (secure || secure == cookie->b_secure);
 }
 
 static bool cookie_domain_matches( const http_cookie_t * cookie, const char *host )

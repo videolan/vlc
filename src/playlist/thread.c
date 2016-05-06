@@ -33,12 +33,14 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_rand.h>
+#include <vlc_url.h>
 #include "playlist_internal.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void *Thread   ( void * );
+static bool Next( playlist_t *p_playlist );
 
 /*****************************************************************************
  * Main functions for the global thread
@@ -191,10 +193,21 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist,
  * \param p_playlist the playlist object
  * \param p_item the item to play
  */
+
 static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
     input_item_t *p_input = p_item->p_input;
+
+    char *path = vlc_uri2path(p_input->psz_uri);
+    if ( path ) {
+        if (access( path, F_OK ) == -1) {
+            msg_Dbg( p_playlist, "item does not exist" );
+            playlist_DeleteItem(p_playlist, p_item, true);
+            return Next(p_playlist);
+        }
+    }
+    free(path);
 
     PL_ASSERT_LOCKED;
 
