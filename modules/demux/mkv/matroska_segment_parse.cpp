@@ -976,9 +976,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
 
             for( size_t j = 0; j < cp.ListSize(); j++ )
             {
-                EbmlElement *k= cp[j];
-
-                if( MKV_CHECKED_PTR_DECL( p_codec_id, KaxChapterProcessCodecID, k ) )
+                if( MKV_CHECKED_PTR_DECL( p_codec_id, KaxChapterProcessCodecID, cp[j] ) )
                 {
                     if ( static_cast<uint32>(*p_codec_id) == 0 )
                         p_ccodec = new matroska_script_codec_c( vars.obj->sys );
