@@ -704,6 +704,24 @@ int dvb_tune (dvb_device_t *d)
     return dvb_set_prop (d, DTV_TUNE, 0 /* dummy */);
 }
 
+int dvb_fill_device_caps(dvb_device_t *d, dvb_device_caps_t *caps)
+{
+    struct dvb_frontend_info info;
+    if (ioctl (d->frontend, FE_GET_INFO, &info) < 0)
+    {
+        msg_Err (d->obj, "cannot get frontend info: %s",
+                 vlc_strerror_c(errno));
+        return -1;
+    }
+
+    caps->frequency.min = info.frequency_min;
+    caps->frequency.max = info.frequency_max;
+    caps->symbolrate.min = info.symbol_rate_min;
+    caps->symbolrate.max = info.symbol_rate_max;
+    caps->b_can_cam_auto = ( info.caps & FE_CAN_QAM_AUTO );
+
+    return 0;
+}
 
 /*** DVB-C ***/
 int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *modstr,

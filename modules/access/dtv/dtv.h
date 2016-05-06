@@ -62,6 +62,25 @@ bool dvb_set_ca_pmt (dvb_device_t *, en50221_capmt_info_t *);
 int dvb_set_inversion (dvb_device_t *, int);
 int dvb_tune (dvb_device_t *);
 
+typedef struct
+{
+    struct
+    {
+        unsigned min;
+        unsigned max;
+        unsigned step;
+    } frequency;
+    struct
+    {
+        unsigned min;
+        unsigned max;
+        unsigned step;
+    } symbolrate;
+    bool b_can_cam_auto;
+} dvb_device_caps_t;
+
+int dvb_fill_device_caps( dvb_device_t *, dvb_device_caps_t * );
+
 #define VLC_FEC(a,b)   (((a) << 16u) | (b))
 #define VLC_FEC_AUTO   0xFFFFFFFF
 #define VLC_GUARD(a,b) (((a) << 16u) | (b))
