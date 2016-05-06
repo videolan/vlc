@@ -1086,10 +1086,6 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
  *****************************************************************************/
 void matroska_segment_c::ParseChapters( KaxChapters *chapters )
 {
-    EbmlElement *el;
-    int i_upper_level = 0;
-
-    /* Master elements */
     if( unlikely( chapters->IsFiniteSize() && chapters->GetSize() >= SIZE_MAX ) )
     {
         msg_Err( &sys.demuxer, "Chapters too big, aborting" );
@@ -1097,6 +1093,8 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
     }
     try
     {
+        EbmlElement *el;
+        int i_upper_level = 0;
         chapters->Read( es, EBML_CONTEXT(chapters), i_upper_level, el, true );
     }
     catch(...)
@@ -1104,56 +1102,70 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
         msg_Err( &sys.demuxer, "Error while reading chapters" );
         return;
     }
-
-    for( size_t i = 0; i < chapters->ListSize(); i++ )
+    MKV_SWITCH_CREATE( EbmlTypeDispatcher, KaxChapterHandler, matroska_segment_c )
     {
-        EbmlElement *l = (*chapters)[i];
-
-        if( MKV_IS_ID( l, KaxEditionEntry ) )
+        MKV_SWITCH_INIT();
+        E_CASE( KaxEditionEntry, entry )
         {
-            chapter_edition_c *p_edition = new chapter_edition_c();
+            struct EditionPayload {
+                matroska_segment_c * const obj;
+                demux_t            * const p_demuxer;
+                chapter_edition_c  * const p_edition;
 
-            EbmlMaster *E = static_cast<EbmlMaster *>(l );
-            msg_Dbg( &sys.demuxer, "|   |   + EditionEntry" );
-            for( size_t j = 0; j < E->ListSize(); j++ )
+            } data = { &vars, &vars.sys.demuxer, new chapter_edition_c };
+
+            MKV_SWITCH_CREATE( EbmlTypeDispatcher, KaxEditionHandler, EditionPayload )
             {
-                EbmlElement *l = (*E)[j];
-
-                if( MKV_IS_ID( l, KaxChapterAtom ) )
+                MKV_SWITCH_INIT();
+                E_CASE( KaxChapterAtom, chapter_atom )
                 {
                     chapter_item_c *new_sub_chapter = new chapter_item_c();
-                    ParseChapterAtom( 0, static_cast<KaxChapterAtom *>(l), *new_sub_chapter );
-                    p_edition->sub_chapters.push_back( new_sub_chapter );
+                    vars.obj->ParseChapterAtom( 0, &chapter_atom, *new_sub_chapter );
+                    vars.p_edition->sub_chapters.push_back( new_sub_chapter );
                 }
-                else if( MKV_IS_ID( l, KaxEditionUID ) )
+                E_CASE( KaxEditionUID, euid )
                 {
-                    p_edition->i_uid = static_cast<uint64> (*static_cast<KaxEditionUID *>( l ));
+                    vars.p_edition->i_uid = static_cast<uint64> ( euid );
                 }
-                else if( MKV_IS_ID( l, KaxEditionFlagOrdered ) )
+                E_CASE( KaxEditionFlagOrdered, flag_ordered )
                 {
-                    p_edition->b_ordered = var_InheritBool( &sys.demuxer, "mkv-use-ordered-chapters" ) ? (uint8(*static_cast<KaxEditionFlagOrdered *>( l )) != 0) : 0;
+                    vars.p_edition->b_ordered = var_InheritBool(vars.p_demuxer, "mkv-use-ordered-chapters") && static_cast<uint8>( flag_ordered );
                 }
-                else if( MKV_IS_ID( l, KaxEditionFlagDefault ) )
+                E_CASE( KaxEditionFlagDefault, flag_default )
                 {
-                    if (static_cast<uint8>( *static_cast<KaxEditionFlagDefault *>( l ) ) != 0)
-                        i_default_edition = stored_editions.size();
+                    if( static_cast<uint8>( flag_default ) )
+                        vars.obj->i_default_edition = vars.obj->stored_editions.size();
                 }
-                else if( MKV_IS_ID( l, KaxEditionFlagHidden ) )
+                E_CASE( KaxEditionFlagHidden, flag_hidden )
                 {
-                    // FIXME to implement
+                    VLC_UNUSED( flag_hidden ); // TODO: FIXME: implement
+                    VLC_UNUSED( vars );
                 }
-                else if ( !MKV_IS_ID( l, EbmlVoid ) )
+                E_CASE( EbmlVoid, el )
                 {
-                    msg_Dbg( &sys.demuxer, "|   |   |   + Unknown (%s)", typeid(*l).name() );
+                    VLC_UNUSED( el );
+                    VLC_UNUSED( vars );
                 }
-            }
-            stored_editions.push_back( p_edition );
+                E_CASE_DEFAULT( el )
+                {
+                    msg_Dbg( vars.p_demuxer, "|   |   |   + Unknown (%s)", typeid(el).name() );
+                }
+            };
+            KaxEditionHandler::Dispatcher().iterate( entry.begin(), entry.end(), KaxEditionHandler::Payload( data ) );
+
+            data.obj->stored_editions.push_back( data.p_edition );
         }
-        else if ( !MKV_IS_ID( l, EbmlVoid ) )
+        E_CASE( EbmlVoid, el ) {
+            VLC_UNUSED( el );
+            VLC_UNUSED( vars );
+        }
+        E_CASE_DEFAULT( el )
         {
-            msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
+            msg_Dbg( &vars.sys.demuxer, "|   |   + Unknown (%s)", typeid(el).name() );
         }
-    }
+    };
+
+    KaxChapterHandler::Dispatcher().iterate( chapters->begin(), chapters->end(), KaxChapterHandler::Payload( *this ) );
 }
 
 void matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_time, ScopeMode read_fully )
