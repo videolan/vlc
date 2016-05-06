@@ -23,42 +23,32 @@
  *****************************************************************************/
 
 #include "chapter_command.hpp"
+#include <algorithm>
 
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {
     uint32 codec_time = uint32(-1);
     for( size_t i = 0; i < command.ListSize(); i++ )
     {
-        const EbmlElement *k = command[i];
-
-        if( MKV_IS_ID( k, KaxChapterProcessTime ) )
+        if( MKV_CHECKED_PTR_DECL( p_cpt, KaxChapterProcessTime const, command[i] ) )
         {
-            codec_time = static_cast<uint32>( *static_cast<const KaxChapterProcessTime*>( k ) );
+            codec_time = static_cast<uint32>( *p_cpt );
             break;
         }
     }
 
     for( size_t i = 0; i < command.ListSize(); i++ )
     {
-        const EbmlElement *k = command[i];
-
-        if( MKV_IS_ID( k, KaxChapterProcessData ) )
+        if( MKV_CHECKED_PTR_DECL( p_cpd, KaxChapterProcessData const, command[i] ) )
         {
-            KaxChapterProcessData *p_data =  new KaxChapterProcessData( *static_cast<const KaxChapterProcessData*>( k ) );
-            switch ( codec_time )
-            {
-            case 0:
-                during_cmds.push_back( p_data );
-                break;
-            case 1:
-                enter_cmds.push_back( p_data );
-                break;
-            case 2:
-                leave_cmds.push_back( p_data );
-                break;
-            default:
-                delete p_data;
-            }
+            std::vector<KaxChapterProcessData*> *containers[] = {
+                &during_cmds, /* codec_time = 0 */
+                &enter_cmds,  /* codec_time = 1 */
+                &leave_cmds   /* codec_time = 2 */
+            };
+
+            if( codec_time < 3 )
+                containers[codec_time]->push_back( new KaxChapterProcessData( *p_cpd ) );
         }
     }
 }
