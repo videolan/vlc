@@ -875,7 +875,7 @@ void PLModel::removeAll()
 
 void PLModel::createNode( QModelIndex index, QString name )
 {
-    if( name.isEmpty() || !index.isValid() ) return;
+    if( name.isEmpty() ) return;
 
     PL_LOCK;
     index = index.parent();
