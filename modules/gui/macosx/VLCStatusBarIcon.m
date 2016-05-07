@@ -35,9 +35,6 @@
 #pragma mark -
 #pragma mark Defines
 
-#define playPauseMenuItemTag 74747
-#define stopMenuItemTag 83838
-#define randomMenuItemTag 63636
 #define dataUpdateTimerInterval 1.0
 #define NSInitialToolTipDelayIn_ms 20
 // #define showURLInToolTip 1
@@ -123,8 +120,7 @@
     _menuImagePause = [NSImage imageNamed:@"pauseIcon"];
 
     _menuImageStop = [NSImage imageNamed:@"stopIcon"];
-    NSMenuItem *menuItemToChange = [_vlcStatusBarIconMenu itemWithTag:stopMenuItemTag];
-    [menuItemToChange setImage:_menuImageStop];
+    [stopItem setImage:_menuImageStop];
 
     // I'd rather not use a timer and only update when mouse comes near
     // status icon in bar. But one can't tell without evil sourcery :(
@@ -314,12 +310,10 @@
     playlist_t *p_playlist = pl_Get(getIntf());
     b_value = var_GetBool(p_playlist, "random");
 
-    // get menuitem 'Random'
-    NSMenuItem* menuItemToChange = [_vlcStatusBarIconMenu itemWithTag:randomMenuItemTag];
     if (b_value) {
-        [menuItemToChange setState:NSOnState];
+        [randItem setState:NSOnState];
     } else {
-        [menuItemToChange setState:NSOffState];
+        [randItem setState:NSOffState];
     }
 }
 
