@@ -50,20 +50,22 @@ typedef struct scan_parameter_t
     bool b_exhaustive;
     bool b_use_nit;
     bool b_free_only;
-    bool b_modulation_set;
-    bool b_symbolrate_set;
 
-    int i_modulation;
-    int i_symbolrate;
+    bool b_modulation_set;
+    unsigned i_symbolrate;
+
     struct
     {
         unsigned i_min;
         unsigned i_max;
         unsigned i_step;
+    } frequency;
 
-        unsigned i_count;    /* Number of frequency test to do */
-    } frequency,
-      bandwidth; /* Bandwidth should be 6, 7 or 8 */
+    struct
+    {
+        unsigned i_min;
+        unsigned i_max;
+    } bandwidth;/* Bandwidth should be 6, 7 or 8 */
 
     char *psz_scanlist_file;
     enum
