@@ -681,7 +681,9 @@ void DialogsProvider::saveRecentsToPlaylist()
     }
 
     saveAPlaylist(THEPL, p_node_recents);
+    playlist_Lock(THEPL);
     playlist_NodeDelete(THEPL, p_node_recents, true, false);
+    playlist_Unlock(THEPL);
 }
 
 /****************************************************************************
