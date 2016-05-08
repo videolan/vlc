@@ -152,6 +152,7 @@ typedef enum {
     PLAYLIST_REMOVE_FLAG       = 0x0010,  /**< Remove this item at the end */
     PLAYLIST_EXPANDED_FLAG     = 0x0020,  /**< Expanded node */
     PLAYLIST_SUBITEM_STOP_FLAG = 0x0040,  /**< Must playlist stop if the item gets subitems ?*/
+    PLAYLIST_NO_INHERIT_FLAG   = 0x0080,  /**< Childs must not inherit flags from parent node */
 } playlist_item_flags_e;
 
 /** Playlist status */

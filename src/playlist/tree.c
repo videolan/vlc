@@ -222,6 +222,11 @@ int playlist_NodeInsert( playlist_t *p_playlist,
                  i_position,
                  p_item );
     p_item->p_parent = p_parent;
+
+    /* Inherit special flags from parent (sd cases) */
+    if( ( p_parent->i_flags & PLAYLIST_NO_INHERIT_FLAG ) == 0 )
+        p_item->i_flags |= (p_parent->i_flags & (PLAYLIST_RO_FLAG | PLAYLIST_SKIP_FLAG));
+
     return VLC_SUCCESS;
 }
 

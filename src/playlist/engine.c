@@ -237,10 +237,10 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     root = playlist_NodeCreate( p_playlist, NULL, NULL,
                                 PLAYLIST_END, 0, NULL );
     playing = playlist_NodeCreate( p_playlist, _( "Playlist" ), root,
-                                   PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
+                                   PLAYLIST_END, PLAYLIST_RO_FLAG | PLAYLIST_NO_INHERIT_FLAG, NULL );
     if( var_InheritBool( p_parent, "media-library") )
         ml = playlist_NodeCreate( p_playlist, _( "Media Library" ), root,
-                                  PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
+                                  PLAYLIST_END, PLAYLIST_RO_FLAG | PLAYLIST_NO_INHERIT_FLAG, NULL );
     else
         ml = NULL;
     PL_UNLOCK;
