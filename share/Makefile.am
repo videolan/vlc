@@ -6,11 +6,12 @@ appdatadir = $(datadir)/applications
 if !HAVE_WIN32
 appdata_DATA = vlc.desktop
 endif
-EXTRA_DIST += vlc.desktop.in
+EXTRA_DIST += vlc.desktop.in vlc.desktop.mimetypes
 CLEANFILES += $(appdata_DATA)
 
 vlc.desktop: vlc.desktop.in $(top_builddir)/config.status
 	$(AM_V_GEN)sed -e 's,\@bindir\@,$(bindir),g' < "$<" > tmp-$@
+	$(AM_V_GEN)mimetypes="$$(sed 's/\s*#.*$$//g' vlc.desktop.mimetypes | egrep -v '^$$' | tr "\n" ';')"; sed -ie "s,\@MIMETYPES\@,$$mimetypes,g" tmp-$@
 	$(AM_V_at)$(DESKTOP_FILE_VALIDATE) tmp-$@
 	$(AM_V_at)mv -f tmp-$@ $@
 
