@@ -13,11 +13,15 @@ video/x-ogm+ogg
 audio/x-ms-asf
 audio/x-ms-asx
 audio/x-ms-wax
+audio/x-ms-wma
 audio/x-pn-windows-acm
+video/divx
 video/msvideo
 video/x-avi
 video/x-ms-asf
+video/x-ms-asf-plugin
 video/x-ms-wmv
+video/x-ms-wvx
 video/x-msvideo
 
 # Real audio and video
@@ -26,10 +30,14 @@ audio/vnd.rn-realaudio
 audio/x-pn-realaudio
 audio/x-pn-realaudio-plugin
 audio/x-real-audio
+audio/x-realaudio
 video/vnd.rn-realvideo
 
 # MPEG related audio, video and transport
+application/mpeg4-iod 	    	# IANA-registered
+application/mpeg4-muxcodetable
 application/x-extension-mp4
+audio/m4a
 audio/mp4                        # IANA-registered
 audio/mpeg                       # IANA-registered
 audio/x-m4a
@@ -39,10 +47,14 @@ video/mp2t
 video/mp4                        # IANA-registered
 video/mp4v-es
 video/mpeg
+video/mpeg-system
+video/x-m4v
 video/x-mpeg
+video/x-mpeg-system
 
 # FLAC lossless audio
 application/x-flac
+audio/flac
 audio/x-flac
 
 # Matroska container format
@@ -55,8 +67,12 @@ video/webm
 audio/webm
 
 # RTSP related
+audio/3gpp
+audio/3gpp2
 audio/amr
 audio/amr-wb
+video/3gpp
+video/3gpp2
 
 # URI scheme handlers (ie IP protocol support)
 x-scheme-handler/mms
@@ -90,14 +106,16 @@ video/x-anim
 video/x-nsv
 
 # Autodesk animation format
+video/flv
 video/x-flc
 video/x-fli
 video/x-flv
 
 # Audio sample formats
-audio/x-wav
+audio/wav
 audio/x-pn-au
 audio/x-pn-wav
+audio/x-wav
 
 # Adobe Flash player related
 application/x-shockwave-flash
