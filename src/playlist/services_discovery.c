@@ -289,7 +289,7 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
         {
             p_cat = playlist_NodeCreate( p_playlist, psz_cat,
                                          p_parent, PLAYLIST_END, 0, NULL );
-            p_cat->i_flags &= ~PLAYLIST_SKIP_FLAG;
+            p_cat->i_flags |= PLAYLIST_RO_FLAG | PLAYLIST_SKIP_FLAG;
         }
         p_parent = p_cat;
     }
@@ -376,7 +376,9 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
 
     PL_LOCK;
     p_node = playlist_NodeCreate( p_playlist, psz_longname,
-                                  p_playlist->p_root, PLAYLIST_END, 0, NULL );
+                                  p_playlist->p_root, PLAYLIST_END,
+                                  PLAYLIST_RO_FLAG | PLAYLIST_SKIP_FLAG,
+                                  NULL );
     PL_UNLOCK;
 
     vlc_event_manager_t *em = services_discovery_EventManager( p_sd );
