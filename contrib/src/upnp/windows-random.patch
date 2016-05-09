@@ -1,0 +1,34 @@
+diff -ruN upnp/upnp/src/uuid/sysdep.c upnp.new/upnp/src/uuid/sysdep.c
+--- upnp/upnp/src/uuid/sysdep.c	2011-04-03 04:50:36.000000000 +0200
++++ upnp.new/upnp/src/uuid/sysdep.c	2016-05-09 19:08:15.225581588 +0200
+@@ -23,6 +23,8 @@
+ 
+ #include "config.h"
+ 
++#define _CRT_RAND_S
++
+ #include "sysdep.h"
+ 
+ #include "UpnpInet.h"
+@@ -78,6 +80,7 @@
+ 
+ void get_random_info(unsigned char seed[16])
+ {
++#if 0
+ 	MD5_CTX c;
+ 	typedef struct {
+ 		MEMORYSTATUS m;
+@@ -108,6 +111,13 @@
+ 	MD5Init(&c);
+ 	MD5Update(&c, (unsigned char *)(&r), sizeof r);
+ 	MD5Final(seed, &c);
++#endif
++    for( int i = 0; i < 16; i++ )
++    {
++        unsigned int number;
++        rand_s(&number);
++        seed[i] = number;
++    }
+ };
+ 
+ #else /* WIN32 */
