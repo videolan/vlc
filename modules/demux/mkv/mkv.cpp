@@ -481,26 +481,6 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
             int64_t i_pos = int64_t( f_percent * stream_Size( p_demux->s ) );
 
             msg_Dbg( p_demux, "lengthy way of seeking for pos:%" PRId64, i_pos );
-
-            if (p_segment->indexes.size())
-            {
-                matroska_segment_c::indexes_t::iterator it          = p_segment->indexes_begin ();
-                matroska_segment_c::indexes_t::iterator last_active = p_segment->indexes_end ();
-
-                for ( ; it != last_active; ++it )
-                {
-                    if( it->i_position >= i_pos && it->i_mk_time != -1 )
-                        break;
-                }
-
-                if ( it == last_active && it != p_segment->indexes.begin() )
-                    --it;
-
-                if( it->i_position < i_pos )
-                {
-                    msg_Dbg( p_demux, "no cues, seek request to global pos: %" PRId64, i_pos );
-                }
-            }
         }
     }
     p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter );

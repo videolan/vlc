@@ -233,20 +233,5 @@ class mkv_track_t
         mtime_t i_codec_delay;
 };
 
-struct mkv_index_t
-{
-    int     i_track;
-    int     i_block_number;
-
-    int64_t i_position;
-    mtime_t i_mk_time;
-
-    bool       b_key;
-
-    bool operator< (mkv_index_t const& rhs) const {
-        return i_mk_time < rhs.i_mk_time;
-    }
-};
-
 
 #endif /* _MKV_HPP_ */

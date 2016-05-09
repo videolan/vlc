@@ -71,7 +71,6 @@ public:
 class matroska_segment_c
 {
 public:
-    typedef std::vector<mkv_index_t> indexes_t;
     typedef std::vector<Tag>            tags_t;
 
     matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream );
@@ -107,7 +106,6 @@ public:
     KaxNextUID              *p_next_segment_uid;
 
     bool                    b_cues;
-    indexes_t               indexes;
 
     /* info */
     char                    *psz_muxing_application;
@@ -144,12 +142,7 @@ public:
     bool Select( mtime_t i_mk_start_time );
     void UnSelect();
 
-    size_t        index_idx () const { return indexes.size () - 1; }
-    mkv_index_t&      index ()       { return *(indexes.rbegin()); }
-    mkv_index_t& prev_index ()       { return *(indexes.rbegin()+1); }
 
-    indexes_t::iterator indexes_begin () { return indexes.begin(); }
-    indexes_t::iterator indexes_end   () { return indexes.end() - (indexes.size() ? 1 : 0); }
 
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
 
