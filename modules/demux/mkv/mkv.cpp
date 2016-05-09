@@ -736,8 +736,35 @@ static int Demux( demux_t *p_demux)
         return 0;
     }
 
+    {
+        matroska_segment_c::tracks_map_t::iterator track_it;
+
+        if( p_segment->FindTrackByBlock( &track_it, block, simpleblock ) )
+        {
+            msg_Err( p_demux, "invalid track number" );
+            delete block;
+            return 0;
+        }
+
+        matroska_segment_c::tracks_map_t::mapped_type& track = track_it->second;
 
 
+        if( track.i_skip_until_fpos != std::numeric_limits<uint64_t>::max() ) {
+
+            uint64_t block_fpos = 0;
+
+            if( block ) block_fpos = block->GetElementPosition();
+            else        block_fpos = simpleblock->GetElementPosition();
+
+            if ( track.i_skip_until_fpos > block_fpos )
+            {
+                delete block;
+                return 1; // this block shall be ignored
+            }
+
+            track.i_skip_until_fpos = -1;
+        }
+    }
 
     /* update pcr */
     {
