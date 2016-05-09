@@ -123,15 +123,8 @@ void EbmlParser::Reset( demux_t *p_demux )
 }
 
 
-// Define a special Segment context that doesn't allow void/crc32 elements
 static const EbmlSemanticContext & GetEbmlNoGlobal_Context();
-static const EbmlSemanticContext Context_EbmlNoGlobal = EbmlSemanticContext(0, NULL, NULL, *GetEbmlNoGlobal_Context, NULL);
-static const EbmlSemantic EbmlNoGlobal_ContextList[0] =
-{
-  //EbmlSemantic(false, false, EBML_INFO(EbmlCrc32)),   ///< EbmlCrc32
-  //EbmlSemantic(false, false, EBML_INFO(EbmlVoid)),    ///< EbmlVoid
-};
-static const EbmlSemanticContext EbmlNoGlobal_Context = EbmlSemanticContext(countof(EbmlNoGlobal_ContextList), EbmlNoGlobal_ContextList, NULL, *GetEbmlNoGlobal_Context, NULL);
+static const EbmlSemanticContext EbmlNoGlobal_Context = EbmlSemanticContext(0, NULL, NULL, *GetEbmlNoGlobal_Context, NULL);
 static const EbmlSemanticContext & GetEbmlNoGlobal_Context()
 {
   return EbmlNoGlobal_Context;
@@ -168,11 +161,13 @@ EbmlElement *EbmlParser::Get( int n_call )
 
     }
 
-    // ignore global Void/CRC32 elements when looking for level 1 elements in the Segment
+    // If the parent is a segment, use the segment context when creating children
+    // (to prolong their lifetime), otherwise just continue as normal
     EbmlSemanticContext e_context =
             EBML_CTX_MASTER( EBML_CONTEXT(m_el[mi_level - 1]) ) == EBML_CTX_MASTER( Context_KaxSegmentVLC )
             ? Context_KaxSegmentVLC
             : EBML_CONTEXT(m_el[mi_level - 1]);
+
     /* Ignore unknown level 0 or 1 elements */
     m_el[mi_level] = m_es->FindNextElement( e_context,
                                             i_ulev, UINT64_MAX,
