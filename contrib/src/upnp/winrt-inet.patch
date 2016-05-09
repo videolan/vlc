@@ -1,0 +1,36 @@
+--- upnp/upnp/Makefile.am	2013-11-15 17:01:35.000000000 +0100
++++ upnp.new/upnp/Makefile.am	2016-05-09 19:16:43.909558923 +0200
+@@ -148,9 +148,9 @@
+ 
+ 
+ # inet_pton (needed on Win32, compiles to nothing elsewhere)
+-libupnp_la_SOURCES += \
+-	src/inet_pton.c \
+-	src/inc/inet_pton.h
++#libupnp_la_SOURCES += \
++#	src/inet_pton.c \
++#	src/inc/inet_pton.h
+ 
+ 
+ # check / distcheck tests
+diff -ruN upnp.new/upnp/src/inc/inet_pton.h upnp/upnp/src/inc/inet_pton.h
+--- upnp.new/upnp/src/inc/inet_pton.h	2010-12-23 21:24:06.000000000 +0100
++++ upnp/upnp/src/inc/inet_pton.h	2016-05-09 20:25:37.765374740 +0200
+@@ -31,6 +31,11 @@
+  * \return
+  *	pointer to presentation format address (`dst'), or NULL (see errno).
+  */
++#define inet_ntop InetNtopA
++
++#define inet_pton InetPtonA
++
++#if 0
+ extern const char *inet_ntop(int af, const void *src, char *dst,
+ 			     socklen_t size);
+ 
+@@ -47,4 +52,5 @@
+ 
+ #endif /* WIN32 */
+ 
++#endif
+ #endif /* INET_PTON */
