@@ -20,6 +20,6 @@ libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
 DEPS_libdsm = libtasn1 iconv
 
 .libdsm: libdsm
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure --disable-programs $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
