@@ -476,15 +476,9 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
     }
 
     /* seek without index or without date */
-    if( f_percent >= 0 && (var_InheritBool( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_mk_date < 0 ))
+    if( f_percent >= 0 && (var_InheritBool( p_demux, "mkv-seek-percent" ) || i_mk_date < 0 ))
     {
         i_mk_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
-        if( !p_segment->b_cues )
-        {
-            int64_t i_pos = int64_t( f_percent * stream_Size( p_demux->s ) );
-
-            msg_Dbg( p_demux, "lengthy way of seeking for pos:%" PRId64, i_pos );
-        }
     }
     p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter );
 }
