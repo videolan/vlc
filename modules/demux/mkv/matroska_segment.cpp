@@ -103,7 +103,6 @@ matroska_segment_c::~matroska_segment_c()
  *****************************************************************************/
 void matroska_segment_c::LoadCues( KaxCues *cues )
 {
-    bool b_invalid_cue;
     EbmlElement *el;
 
     if( b_cues )
@@ -117,7 +116,11 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
     {
         if( MKV_IS_ID( el, KaxCuePoint ) )
         {
-            b_invalid_cue = false;
+            uint64_t cue_position = -1;
+            mtime_t  cue_mk_time = -1;
+
+            unsigned int track_id = 0;
+            bool b_invalid_cue = false;
 
             eparser.Down();
             while( ( el = eparser.Get() ) != NULL )
@@ -140,6 +143,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                         b_invalid_cue = true;
                         break;
                     }
+                    cue_mk_time = static_cast<uint64>( *kct_ptr ) * i_timescale / INT64_C(1000);
                 }
                 else if( MKV_IS_ID( el, KaxCueTrackPositions ) )
                 {
@@ -159,19 +163,29 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                             if( MKV_CHECKED_PTR_DECL ( kct_ptr, KaxCueTrack, el ) )
                             {
                                 kct_ptr->ReadData( es.I_O() );
+                                track_id = static_cast<uint16>( *kct_ptr );
                             }
                             else if( MKV_CHECKED_PTR_DECL ( kccp_ptr, KaxCueClusterPosition, el ) )
                             {
                                 kccp_ptr->ReadData( es.I_O() );
+                                cue_position = segment->GetGlobalPosition( static_cast<uint64>( *kccp_ptr ) );
                             }
                             else if( MKV_CHECKED_PTR_DECL ( kcbn_ptr, KaxCueBlockNumber, el ) )
                             {
-                                kcbn_ptr->ReadData( es.I_O() );
+                                VLC_UNUSED( kcbn_ptr );
                             }
 #if LIBMATROSKA_VERSION >= 0x010401
                             else if( MKV_IS_ID( el, KaxCueRelativePosition ) )
                             {
-                                /* For future use */
+                                b_invalid_cue = true; // since we do not support this type of cue: IGNORE
+                            }
+                            else if( MKV_IS_ID( el, KaxCueBlockNumber ) )
+                            {
+                                b_invalid_cue = true; // since we do not support this type of cue: IGNORE
+                            }
+                            else if( MKV_IS_ID( el, KaxCueReference ) )
+                            {
+                                b_invalid_cue = true; // since we do not support this type of cue: IGNORE
                             }
                             else if( MKV_IS_ID( el, KaxCueDuration ) )
                             {
@@ -200,6 +214,15 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             }
             eparser.Up();
 
+            if( likely( !b_invalid_cue ) && track_id != 0 && cue_mk_time != -1 && cue_position != static_cast<uint64_t>( -1 ) ) {
+
+                if( tracks.find( track_id ) != tracks.end() )
+                {
+                   // TODO: handle addition of seekpoint
+                }
+                else
+                    msg_Warn( &sys.demuxer, "Found cue with invalid track id = %u", track_id );
+            }
         }
         else
         {
