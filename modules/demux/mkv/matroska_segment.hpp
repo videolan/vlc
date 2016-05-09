@@ -138,10 +138,11 @@ public:
     bool PreloadFamily( const matroska_segment_c & segment );
     bool PreloadClusters( uint64 i_cluster_position );
     void InformationCreate();
+
+    void FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset );
     void Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset );
+
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
-
-
 
     int FindTrackByBlock(tracks_map_t::iterator* track_it, const KaxBlock *, const KaxSimpleBlock * );
 

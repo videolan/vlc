@@ -794,9 +794,58 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     return true;
 }
 
-void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
+void matroska_segment_c::FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
 {
-    // TODO: implement
+    VLC_UNUSED( i_mk_date );
+    VLC_UNUSED( i_mk_time_offset );
+
+    msg_Err( &sys.demuxer, "%s is not implemented in this patch", __func__ );
+}
+
+void matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset )
+{
+    uint64_t i_seek_position = -1;
+    mtime_t  i_mk_seek_time  = -1;
+
+    mtime_t i_mk_date = i_absolute_mk_date - i_mk_time_offset;
+
+    SegmentSeeker::tracks_seekpoint_t seekpoints = _seeker.get_seekpoints_cues( *this, i_mk_date );
+
+    for( SegmentSeeker::tracks_seekpoint_t::iterator it = seekpoints.begin(); it != seekpoints.end(); ++it )
+    {
+        mkv_track_t& track = tracks[ it->first ];
+
+        if( i_seek_position > it->second.fpos )
+        {
+            i_seek_position = it->second.fpos;
+            i_mk_seek_time  = it->second.pts;
+        }
+
+        track.i_skip_until_fpos = it->second.fpos;
+        track.i_last_dts        = it->second.pts;
+
+
+        bool is_active;
+
+        if( es_out_Control( sys.demuxer.out, ES_OUT_GET_ES_STATE, track.p_es, &is_active ) )
+        {
+            msg_Err( &sys.demuxer, "Unable to query track %u for ES_OUT_GET_ES_STATE", it->first );
+        }
+        else if( !is_active )
+        {
+            track.i_last_dts = VLC_TS_INVALID;
+        }
+    }
+
+    _seeker.mkv_jump_to( *this, i_seek_position );
+
+    sys.i_pcr       = VLC_TS_INVALID;
+    sys.i_pts       = VLC_TS_0 + i_mk_seek_time + i_mk_time_offset;
+    sys.i_start_pts = VLC_TS_0 + i_absolute_mk_date;
+
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
+
+    msg_Dbg( &sys.demuxer, "seek got i_mk_date = % " PRId64 ", i_mk_seek_time = %" PRId64 ", i_seek_position = %" PRId64 ", i_absolute_mk_date = %" PRId64 ", i_mk_time_offset = %" PRId64, i_mk_date, i_mk_seek_time, i_seek_position, i_absolute_mk_date,  i_mk_time_offset );
 }
 
 
