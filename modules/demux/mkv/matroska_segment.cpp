@@ -47,7 +47,6 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estr
     ,cluster(NULL)
     ,i_block_pos(0)
     ,i_cluster_pos(0)
-    ,i_start_pos(0)
     ,p_segment_uid(NULL)
     ,p_prev_segment_uid(NULL)
     ,p_next_segment_uid(NULL)
@@ -584,7 +583,7 @@ bool matroska_segment_c::Preload( )
 
             cluster = kc_ptr;
 
-            i_cluster_pos = i_start_pos = cluster->GetElementPosition();
+            i_cluster_pos = cluster->GetElementPosition();
             ParseCluster( cluster );
 
             ep->Down();
@@ -762,7 +761,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
     KaxSimpleBlock *simpleblock;
     int64_t     i_block_duration;
     size_t      i_track;
-    int64_t     i_seek_position = i_start_pos;
+    int64_t     i_seek_position = 0; // previously i_start_pos
     mtime_t     i_mk_seek_time = i_mk_start_time;
     mtime_t     i_mk_pts = 0;
     int i_cat;
@@ -776,7 +775,7 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
     {
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                         INT64_C(0) );
-        es.I_O().setFilePointer( i_start_pos );
+        es.I_O().setFilePointer( 0 /* previously i_start_pos */ );
 
         ep->reconstruct( &es, segment, &sys.demuxer );
 
@@ -1137,7 +1136,7 @@ bool matroska_segment_c::Select( mtime_t i_mk_start_time )
 
     sys.i_start_pts = i_mk_start_time + VLC_TS_0;
     // reset the stream reading to the first cluster of the segment used
-    es.I_O().setFilePointer( i_start_pos );
+    es.I_O().setFilePointer( 0 /* previously i_start_pos */ );
 
     ep->reconstruct( &es, segment, &sys.demuxer );
 
