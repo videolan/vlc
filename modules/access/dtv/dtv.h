@@ -26,7 +26,8 @@
 extern "C" {
 # endif
 
-enum {
+typedef enum {
+    DTV_DELIVERY_NONE   = 0x00000000,
     DTV_DELIVERY_ATSC   = 0x00000001,
     DTV_DELIVERY_CQAM   = 0x00000002,
 
@@ -40,9 +41,24 @@ enum {
     DTV_DELIVERY_ISDB_C = 0x00001000,
     DTV_DELIVERY_ISDB_S = 0x00002000,
     DTV_DELIVERY_ISDB_T = 0x00004000,
-};
+} dtv_delivery_t;
+
+#define DTV_DELGROUP_G2         ( DTV_DELIVERY_DVB_C2 | DTV_DELIVERY_DVB_T2 | \
+                                  DTV_DELIVERY_DVB_S2 )
+
+#define DTV_DELGROUP_SAT        ( DTV_DELIVERY_DVB_S | DTV_DELIVERY_DVB_S2 | \
+                                  DTV_DELIVERY_ISDB_S )
+
+#define DTV_DELGROUP_CABLE      ( DTV_DELIVERY_DVB_C | DTV_DELIVERY_DVB_C2 | \
+                                  DTV_DELIVERY_CQAM  | DTV_DELIVERY_ISDB_C )
+
+#define DTV_DELGROUP_TERRES     ( DTV_DELIVERY_DVB_T | DTV_DELIVERY_DVB_T2 | \
+                                  DTV_DELIVERY_ATSC  | DTV_DELIVERY_ISDB_T )
 
 typedef struct dvb_device dvb_device_t;
+
+typedef int (* tuner_setup_t) (vlc_object_t *, dvb_device_t *, uint64_t freq);
+tuner_setup_t dtv_get_delivery_tuner_setup( dtv_delivery_t );
 
 dvb_device_t *dvb_open (vlc_object_t *obj);
 void dvb_close (dvb_device_t *);
