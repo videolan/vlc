@@ -630,6 +630,7 @@ bool matroska_segment_c::Preload( )
 
             i_cluster_pos = cluster->GetElementPosition();
             ParseCluster( cluster );
+            IndexAppendCluster( cluster );
 
             ep->Down();
             /* stop pre-parsing the stream */
