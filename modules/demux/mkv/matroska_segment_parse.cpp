@@ -211,7 +211,6 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->b_default              = true;
     tk->b_enabled              = true;
     tk->b_forced               = false;
-    tk->b_silent               = false;
     tk->i_number               = tracks.size() - 1;
     tk->i_extra_data           = 0;
     tk->p_extra_data           = NULL;

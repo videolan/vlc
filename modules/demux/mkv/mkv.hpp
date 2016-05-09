@@ -218,7 +218,6 @@ struct mkv_track_t
 
     /* hack : it's for seek */
     bool            b_search_keyframe;
-    bool            b_silent;
 
     /* informative */
     const char   *psz_codec_name;
