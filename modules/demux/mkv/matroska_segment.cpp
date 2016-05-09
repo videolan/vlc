@@ -66,14 +66,14 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estr
 
 matroska_segment_c::~matroska_segment_c()
 {
-    for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
+    for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it)
     {
-        delete tracks[i_track]->p_compression_data;
-        es_format_Clean( &tracks[i_track]->fmt );
-        delete tracks[i_track]->p_sys;
-        free( tracks[i_track]->p_extra_data );
-        free( tracks[i_track]->psz_codec );
-        delete tracks[i_track];
+        tracks_map_t::mapped_type& track = it->second;
+
+        es_format_Clean( &track.fmt );
+        delete track.p_compression_data;
+        delete track.p_sys;
+        free( track.p_extra_data );
     }
 
     free( psz_writing_application );
@@ -757,27 +757,25 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
     // TODO: implement
 }
 
-int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
+
+int matroska_segment_c::FindTrackByBlock(tracks_map_t::iterator* p_track_it,
                                              const KaxBlock *p_block, const KaxSimpleBlock *p_simpleblock )
 {
-    size_t i_track;
-    for( i_track = 0; i_track < tracks.size(); i_track++ )
-    {
-        const mkv_track_t *tk = tracks[i_track];
+    *p_track_it = tracks.end();
 
-        if( ( p_block != NULL && tk->i_number == p_block->TrackNum() ) ||
-            ( p_simpleblock != NULL && tk->i_number == p_simpleblock->TrackNum() ) )
-        {
-            break;
-        }
-    }
-
-    if( i_track >= tracks.size() )
+    if( p_block == NULL && p_simpleblock == NULL )
         return VLC_EGENERIC;
 
-    if( pi_track )
-        *pi_track = i_track;
-    return VLC_SUCCESS;
+    if (p_block != NULL)
+    {
+        *p_track_it = tracks.find( p_block->TrackNum() );
+    }
+    else if( p_simpleblock != NULL)
+    {
+        *p_track_it = tracks.find( p_simpleblock->TrackNum() );
+    }
+
+    return *p_track_it != tracks.end() ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 void matroska_segment_c::ComputeTrackPriority()
@@ -785,51 +783,52 @@ void matroska_segment_c::ComputeTrackPriority()
     bool b_has_default_video = false;
     bool b_has_default_audio = false;
     /* check for default */
-    for(size_t i_track = 0; i_track < tracks.size(); i_track++)
+    for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {
-        mkv_track_t *p_tk = tracks[i_track];
-        es_format_t *p_fmt = &p_tk->fmt;
-        if( p_fmt->i_cat == VIDEO_ES )
-            b_has_default_video |=
-                p_tk->b_enabled && ( p_tk->b_default || p_tk->b_forced );
-        else if( p_fmt->i_cat == AUDIO_ES )
-            b_has_default_audio |=
-                p_tk->b_enabled && ( p_tk->b_default || p_tk->b_forced );
+        tracks_map_t::mapped_type& track = it->second;
+
+        bool flag = track.b_enabled && ( track.b_default || track.b_forced );
+
+        switch( track.fmt.i_cat )
+        {
+            case VIDEO_ES: b_has_default_video |= flag; break;
+            case AUDIO_ES: b_has_default_audio |= flag; break;
+        }
     }
 
-    for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
+    for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {
-        mkv_track_t *p_tk = tracks[i_track];
-        es_format_t *p_fmt = &p_tk->fmt;
+        tracks_map_t::key_type    track_id = it->first;
+        tracks_map_t::mapped_type track    = it->second;
 
-        if( unlikely( p_fmt->i_cat == UNKNOWN_ES || !p_tk->psz_codec ) )
+        if( unlikely( track.fmt.i_cat == UNKNOWN_ES || !track.psz_codec ) )
         {
-            msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", static_cast<int>( i_track ), p_tk->i_number );
-            p_tk->p_es = NULL;
+            msg_Warn( &sys.demuxer, "invalid track[%d]", static_cast<int>( track_id ) );
+            track.p_es = NULL;
             continue;
         }
-        else if( unlikely( !b_has_default_video && p_fmt->i_cat == VIDEO_ES ) )
+        else if( unlikely( !b_has_default_video && track.fmt.i_cat == VIDEO_ES ) )
         {
-            p_tk->b_default = true;
+            track.b_default = true;
             b_has_default_video = true;
         }
-        else if( unlikely( !b_has_default_audio &&  p_fmt->i_cat == AUDIO_ES ) )
+        else if( unlikely( !b_has_default_audio &&  track.fmt.i_cat == AUDIO_ES ) )
         {
-            p_tk->b_default = true;
+            track.b_default = true;
             b_has_default_audio = true;
         }
-        if( unlikely( !p_tk->b_enabled ) )
-            p_tk->fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
-        else if( p_tk->b_forced )
-            p_tk->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 2;
-        else if( p_tk->b_default )
-            p_tk->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1;
+        if( unlikely( !track.b_enabled ) )
+            track.fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
+        else if( track.b_forced )
+            track.fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 2;
+        else if( track.b_default )
+            track.fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1;
         else
-            p_tk->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
+            track.fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
 
         /* Avoid multivideo tracks when unnecessary */
-        if( p_tk->fmt.i_cat == VIDEO_ES )
-            p_tk->fmt.i_priority--;
+        if( track.fmt.i_cat == VIDEO_ES )
+            track.fmt.i_priority--;
     }
 }
 
@@ -932,31 +931,29 @@ bool matroska_segment_c::Select( mtime_t i_mk_start_time )
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", static_cast<int>( tracks.size() ) );
 
-    for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
+    for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {
-        mkv_track_t *p_tk = tracks[i_track];
-        es_format_t *p_fmt = &p_tk->fmt;
+        tracks_map_t::key_type     track_id = it->first;
+        tracks_map_t::mapped_type& track    = it->second;
 
-        if( unlikely( p_fmt->i_cat == UNKNOWN_ES || !p_tk->psz_codec ) )
+        if( unlikely( track.fmt.i_cat == UNKNOWN_ES || !track.psz_codec ) )
         {
-            msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", static_cast<int>( i_track ), p_tk->i_number );
-            p_tk->p_es = NULL;
+            msg_Warn( &sys.demuxer, "invalid track[%d]", static_cast<int>( track_id ) );
+            track.p_es = NULL;
             continue;
         }
 
-        if( !p_tk->p_es )
-            p_tk->p_es = es_out_Add( sys.demuxer.out, &p_tk->fmt );
+        if( !track.p_es )
+            track.p_es = es_out_Add( sys.demuxer.out, &track.fmt );
 
         /* Turn on a subtitles track if it has been flagged as default -
          * but only do this if no subtitles track has already been engaged,
          * either by an earlier 'default track' (??) or by default
          * language choice behaviour.
          */
-        if( p_tk->b_default || p_tk->b_forced )
+        if( track.b_default || track.b_forced )
         {
-            es_out_Control( sys.demuxer.out,
-                            ES_OUT_SET_ES_DEFAULT,
-                            p_tk->p_es );
+            es_out_Control( sys.demuxer.out, ES_OUT_SET_ES_DEFAULT, track.p_es );
         }
     }
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_start_time );
@@ -973,27 +970,33 @@ bool matroska_segment_c::Select( mtime_t i_mk_start_time )
 void matroska_segment_c::UnSelect( )
 {
     sys.p_ev->ResetPci();
-    for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
+
+    for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {
-        if ( tracks[i_track]->p_es != NULL )
+        tracks_map_t::mapped_type& track = it->second;
+
+        if( track.p_es != NULL )
         {
-//            es_format_Clean( &tracks[i_track]->fmt );
-            es_out_Del( sys.demuxer.out, tracks[i_track]->p_es );
-            tracks[i_track]->p_es = NULL;
+            es_out_Del( sys.demuxer.out, track.p_es );
+            track.p_es = NULL;
         }
     }
+
+    /* TODO: we will leak, fix this!
     delete ep;
     ep = NULL;
+    */
 }
 
 int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_simpleblock, bool *pb_key_picture, bool *pb_discardable_picture, int64_t *pi_duration )
 {
+    tracks_map_t::iterator track_it;
+
     pp_simpleblock = NULL;
     pp_block = NULL;
 
     *pb_key_picture         = true;
     *pb_discardable_picture = false;
-    size_t i_tk;
     *pi_duration = 0;
 
     struct BlockPayload {
@@ -1136,7 +1139,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         if( pp_simpleblock != NULL || ((el = ep->Get()) == NULL && pp_block != NULL) )
         {
             /* Check blocks validity to protect againts broken files */
-            if( BlockFindTrackIndex( &i_tk, pp_block , pp_simpleblock ) )
+            if( FindTrackByBlock( &track_it, pp_block , pp_simpleblock ) )
             {
                 ep->Unkeep();
                 pp_simpleblock = NULL;
@@ -1151,7 +1154,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             /* We have block group let's check if the picture is a keyframe */
             else if( *pb_key_picture )
             {
-                if( tracks[i_tk]->fmt.i_codec == VLC_CODEC_THEORA )
+                if( track_it->second.fmt.i_codec == VLC_CODEC_THEORA )
                 {
                     DataBuffer *    p_data = &pp_block->GetBuffer(0);
                     const uint8_t * p_buff = p_data->Buffer();

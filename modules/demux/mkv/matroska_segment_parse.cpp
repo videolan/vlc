@@ -39,6 +39,7 @@ extern "C" {
 
 #include <vlc_codecs.h>
 #include <stdexcept>
+#include <limits>
 
 /* GetFourCC helper */
 #define GetFOURCC( p )  __GetFOURCC( (uint8_t*)p )
@@ -200,33 +201,53 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     bool bSupported = true;
 
     /* Init the track */
-    mkv_track_t *tk = new mkv_track_t();
-    memset( tk, 0, sizeof( mkv_track_t ) );
+    mkv_track_t track;
 
-    es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
-    tk->p_es = NULL;
-    tk->fmt.psz_language       = strdup("English");
-    tk->fmt.psz_description    = NULL;
+    track.fmt.psz_language       = strdup("English");
+    track.fmt.psz_description    = NULL;
 
-    tk->b_default              = true;
-    tk->b_enabled              = true;
-    tk->b_forced               = false;
-    tk->i_number               = tracks.size() - 1;
-    tk->i_extra_data           = 0;
-    tk->p_extra_data           = NULL;
-    tk->psz_codec              = NULL;
-    tk->b_dts_only             = false;
-    tk->i_default_duration     = 0;
-    tk->b_no_duration          = false;
-    tk->f_timecodescale        = 1.0;
+    track.b_default              = true;
+    track.b_enabled              = true;
+    track.b_forced               = false;
+    track.i_number               = 0;
 
-    tk->b_inited               = false;
-    tk->i_data_init            = 0;
-    tk->p_data_init            = NULL;
+    track.i_extra_data           = 0;
+    track.p_extra_data           = NULL;
 
-    tk->i_compression_type     = MATROSKA_COMPRESSION_NONE;
-    tk->i_encoding_scope       = MATROSKA_ENCODING_SCOPE_ALL_FRAMES;
-    tk->p_compression_data     = NULL;
+    track.psz_codec              = NULL;
+    track.b_dts_only             = false;
+    track.b_pts_only             = false;
+
+    track.b_no_duration          = false;
+    track.i_default_duration     = 0;
+    track.f_timecodescale        = 1.0;
+    track.i_last_dts             = 0;
+    track.i_skip_until_fpos      = -1;
+
+    std::memset(    &track.fmt, 0, sizeof( track.fmt ) );
+    es_format_Init( &track.fmt, UNKNOWN_ES, 0 );
+    track.f_fps = 0;
+    track.p_es = NULL;
+
+    track.i_original_rate        = 0;
+    track.i_chans_to_reorder     = 0;
+    std::memset( &track.pi_chan_table, 0, sizeof( track.pi_chan_table ) );
+
+    track.p_sys                  = NULL;
+
+    track.b_inited               = false;
+
+    track.i_data_init            = 0;
+    track.p_data_init            = NULL;
+
+    track.str_codec_name         = "";
+
+    track.i_compression_type     = MATROSKA_COMPRESSION_NONE;
+    track.i_encoding_scope       = MATROSKA_ENCODING_SCOPE_ALL_FRAMES;
+    track.p_compression_data     = NULL;
+
+    track.i_seek_preroll          = 0;
+    track.i_codec_delay           = 0;
 
     MkvTree( sys.demuxer, 2, "Track Entry" );
 
@@ -247,7 +268,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
       } track_video_info;
 
     } metadata_payload = {
-      this, tk, &sys.demuxer, bSupported, 3, { }
+      this, &track, &sys.demuxer, bSupported, 3, { }
     };
 
     MKV_SWITCH_CREATE( EbmlTypeDispatcher, MetaDataHandlers, MetaDataCapture )
@@ -603,31 +624,34 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
     MetaDataHandlers::Dispatcher().iterate ( m->begin(), m->end(), MetaDataHandlers::Payload( metadata_payload ) );
 
+    if( track.i_number == 0 )
+    {
+        msg_Warn( &sys.demuxer, "Missing KaxTrackNumber, discarding track!" );
+        return;
+    }
 
     if ( bSupported )
     {
 #ifdef HAVE_ZLIB_H
-        if( tk->i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
-            tk->i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
-            tk->i_extra_data && tk->p_extra_data &&
-            zlib_decompress_extra( &sys.demuxer, tk) )
+        if( track.i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
+            track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
+            track.i_extra_data && track.p_extra_data &&
+            zlib_decompress_extra( &sys.demuxer, &track ) )
             return;
 #endif
-        if( TrackInit( tk ) )
+        if( TrackInit( &track ) )
         {
-            msg_Err(&sys.demuxer, "Couldn't init track %d", tk->i_number );
-            free(tk->p_extra_data);
-            delete tk;
+            msg_Err(&sys.demuxer, "Couldn't init track %d", track.i_number );
+            free(track.p_extra_data);
             return;
         }
 
-        tracks.push_back( tk );
+        tracks.insert( std::make_pair( track.i_number, track ) ); // TODO: add warning if two tracks have the same key
     }
     else
     {
-        msg_Err( &sys.demuxer, "Track Entry %d not supported", tk->i_number );
-        free(tk->p_extra_data);
-        delete tk;
+        msg_Err( &sys.demuxer, "Track Entry %d not supported", track.i_number );
+        free(track.p_extra_data);
     }
 }
 

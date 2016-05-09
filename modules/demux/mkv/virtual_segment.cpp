@@ -678,72 +678,71 @@ void virtual_chapter_c::print()
 
 void virtual_segment_c::KeepTrackSelection( matroska_segment_c & old, matroska_segment_c & next )
 {
-    size_t i, j;
+    typedef matroska_segment_c::tracks_map_t tracks_map_t;
+
     char *sub_lang = NULL, *aud_lang = NULL;
-    /* get the current ES language selection */
-    for( i = 0; i < old.tracks.size(); i++)
+    for( tracks_map_t::iterator it = old.tracks.begin(); it != old.tracks.end(); ++it )
     {
-        mkv_track_t *p_tk = old.tracks[i];
-        es_format_t *p_ofmt = &p_tk->fmt;
-        if( p_tk->p_es )
+        tracks_map_t::mapped_type& track = it->second;
+        if( track.p_es )
         {
             bool state = false;
-            es_out_Control( old.sys.demuxer.out, ES_OUT_GET_ES_STATE, p_tk->p_es, &state );
+            es_out_Control( old.sys.demuxer.out, ES_OUT_GET_ES_STATE, track.p_es, &state );
             if( state )
             {
-                if( p_ofmt->i_cat == AUDIO_ES )
-                    aud_lang = p_tk->fmt.psz_language;
-                else if( p_ofmt->i_cat == SPU_ES )
-                    sub_lang = p_tk->fmt.psz_language;
+                if( track.fmt.i_cat == AUDIO_ES )
+                    aud_lang = track.fmt.psz_language;
+                else if( track.fmt.i_cat == SPU_ES )
+                    sub_lang = track.fmt.psz_language;
             }
         }
     }
-    for( i = 0; i < next.tracks.size(); i++)
+    for( tracks_map_t::iterator it = next.tracks.begin(); it != next.tracks.end(); ++it )
     {
-        mkv_track_t *p_tk = next.tracks[i];
-        es_format_t *p_nfmt = &p_tk->fmt;
+        tracks_map_t::mapped_type& new_track = it->second;
+        es_format_t &              new_fmt   = new_track.fmt;
 
         /* Let's only do that for audio and video for now */
-        if( p_nfmt->i_cat == AUDIO_ES || p_nfmt->i_cat == VIDEO_ES )
+        if( new_fmt.i_cat == AUDIO_ES || new_fmt.i_cat == VIDEO_ES )
         {
-
             /* check for a similar elementary stream */
-            for( j = 0; j < old.tracks.size(); j++)
+            for( tracks_map_t::iterator old_it = old.tracks.begin(); old_it != old.tracks.end(); ++old_it )
             {
-                es_format_t * p_ofmt = &old.tracks[j]->fmt;
+                tracks_map_t::mapped_type& old_track = old_it->second;
+                es_format_t& old_fmt = old_track.fmt;
 
-                if( !old.tracks[j]->p_es )
+                if( !old_track.p_es )
                     continue;
 
-                if( ( p_nfmt->i_cat == p_ofmt->i_cat ) &&
-                    ( p_nfmt->i_codec == p_ofmt->i_codec ) &&
-                    ( p_nfmt->i_priority == p_ofmt->i_priority ) &&
-                    ( p_nfmt->i_bitrate == p_ofmt->i_bitrate ) &&
-                    ( p_nfmt->i_extra == p_ofmt->i_extra ) &&
-                    ( p_nfmt->i_extra == 0 ||
-                      !memcmp( p_nfmt->p_extra, p_ofmt->p_extra, p_nfmt->i_extra ) ) &&
-                    !strcasecmp( p_nfmt->psz_language, p_ofmt->psz_language ) &&
-                    ( ( p_nfmt->i_cat == AUDIO_ES &&
-                        !memcmp( &p_nfmt->audio, &p_ofmt->audio, sizeof(audio_format_t) ) ) ||
-                      ( p_nfmt->i_cat == VIDEO_ES &&
-                        !memcmp( &p_nfmt->video, &p_ofmt->video, sizeof(video_format_t) ) ) ) )
+                if( ( new_fmt.i_cat == old_fmt.i_cat ) &&
+                    ( new_fmt.i_codec == old_fmt.i_codec ) &&
+                    ( new_fmt.i_priority == old_fmt.i_priority ) &&
+                    ( new_fmt.i_bitrate == old_fmt.i_bitrate ) &&
+                    ( new_fmt.i_extra == old_fmt.i_extra ) &&
+                    ( new_fmt.i_extra == 0 ||
+                      !memcmp( new_fmt.p_extra, old_fmt.p_extra, new_fmt.i_extra ) ) &&
+                    !strcasecmp( new_fmt.psz_language, old_fmt.psz_language ) &&
+                    ( ( new_fmt.i_cat == AUDIO_ES &&
+                        !memcmp( &new_fmt.audio, &old_fmt.audio, sizeof(audio_format_t) ) ) ||
+                      ( new_fmt.i_cat == VIDEO_ES &&
+                        !memcmp( &new_fmt.video, &old_fmt.video, sizeof(video_format_t) ) ) ) )
                 {
                     /* FIXME handle video palettes... */
-                    msg_Warn( &old.sys.demuxer, "Reusing decoder of old track %zu for track %zu", j, i);
-                    p_tk->p_es = old.tracks[j]->p_es;
-                    old.tracks[j]->p_es = NULL;
+                    msg_Warn( &old.sys.demuxer, "Reusing decoder of old track %u for track %u", old_track.i_number, new_track.i_number);
+                    new_track.p_es = old_track.p_es;
+                    old_track.p_es = NULL;
                     break;
                 }
             }
         }
-        p_tk->fmt.i_priority &= ~(0x10);
-        if( ( sub_lang && p_nfmt->i_cat == SPU_ES && !strcasecmp(sub_lang, p_nfmt->psz_language) ) ||
-            ( aud_lang && p_nfmt->i_cat == AUDIO_ES && !strcasecmp(aud_lang, p_nfmt->psz_language) ) )
+        new_track.fmt.i_priority &= ~(0x10);
+        if( ( sub_lang && new_fmt.i_cat == SPU_ES && !strcasecmp(sub_lang, new_fmt.psz_language) ) ||
+            ( aud_lang && new_fmt.i_cat == AUDIO_ES && !strcasecmp(aud_lang, new_fmt.psz_language) ) )
         {
-            msg_Warn( &old.sys.demuxer, "Since previous segment used lang %s forcing track %zu",
-                      p_nfmt->psz_language, i);
-            p_tk->fmt.i_priority |= 0x10;
-            p_tk->b_forced = true;
+            msg_Warn( &old.sys.demuxer, "Since previous segment used lang %s forcing track %u",
+                      new_fmt.psz_language, new_track.i_number );
+            new_fmt.i_priority |= 0x10;
+            new_track.b_forced = true;
         }
     }
 }

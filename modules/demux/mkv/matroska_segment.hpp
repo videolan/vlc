@@ -71,6 +71,7 @@ public:
 class matroska_segment_c
 {
 public:
+    typedef std::map<mkv_track_t::track_id_t, mkv_track_t> tracks_map_t;
     typedef std::vector<Tag>            tags_t;
 
     matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream );
@@ -87,7 +88,7 @@ public:
     mtime_t                 i_mk_start_time;
 
     /* all tracks */
-    std::vector<mkv_track_t*> tracks;
+    tracks_map_t tracks;
 
     /* from seekhead */
     int                     i_seekhead_count;
@@ -136,12 +137,11 @@ public:
     void Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset );
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
 
-    int BlockFindTrackIndex( size_t *pi_track,
-                             const KaxBlock *, const KaxSimpleBlock * );
 
     bool Select( mtime_t i_mk_start_time );
     void UnSelect();
 
+    int FindTrackByBlock(tracks_map_t::iterator* track_it, const KaxBlock *, const KaxSimpleBlock * );
 
 
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );

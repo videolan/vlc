@@ -52,6 +52,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 /* libebml and matroska */
 #include "ebml/EbmlHead.h"
