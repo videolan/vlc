@@ -77,44 +77,6 @@ void EbmlParser::reconstruct( EbmlStream* es, EbmlElement* el_start, demux_t* p_
     );
 }
 
-EbmlElement* EbmlParser::UnGet( uint64 i_block_pos, uint64 i_cluster_pos )
-{
-    if ( mi_user_level > mi_level )
-    {
-        while ( mi_user_level != mi_level )
-        {
-            delete m_el[mi_user_level];
-            m_el[mi_user_level] = NULL;
-            mi_user_level--;
-        }
-    }
-
-    /* Avoid data skip in BlockGet */
-    delete m_el[mi_level];
-    m_el[mi_level] = NULL;
-
-    m_got = NULL;
-    mb_keep = false;
-    if ( m_el[1] && m_el[1]->GetElementPosition() == i_cluster_pos )
-    {
-        m_es->I_O().setFilePointer( i_block_pos, seek_beginning );
-        return m_el[1];
-    }
-    else
-    {
-        // seek to the previous Cluster
-        m_es->I_O().setFilePointer( i_cluster_pos, seek_beginning );
-        while(mi_level > 1)
-        {
-            mi_level--;
-            mi_user_level--;
-            delete m_el[mi_level];
-            m_el[mi_level] = NULL;
-        }
-        return NULL;
-    }
-}
-
 void EbmlParser::Up( void )
 {
     if( mi_user_level == mi_level && m_el[mi_level] )
