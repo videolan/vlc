@@ -1118,15 +1118,18 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             vars.block->ReadData( vars.obj->es.I_O() );
             vars.block->SetParent( *vars.obj->cluster );
 
+            if( vars.obj->tracks[ kblock.TrackNum() ].fmt.i_cat == SPU_ES )
+            {
+                vars.obj->_seeker.add_seekpoint( kblock.TrackNum(), SegmentSeeker::Seekpoint::TRUSTED, kblock.GetElementPosition(), kblock.GlobalTimecode() / 1000 );
+            }
+
             vars.obj->ep->Keep ();
         }
-
         E_CASE( KaxBlockDuration, kduration )
         {
             kduration.ReadData( vars.obj->es.I_O() );
             vars.i_duration = static_cast<uint64>( kduration );
         }
-
         E_CASE( KaxReferenceBlock, kreference )
         {
            kreference.ReadData( vars.obj->es.I_O() );
