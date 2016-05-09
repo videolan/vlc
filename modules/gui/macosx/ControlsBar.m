@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ControlsBar.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2014 VLC authors and VideoLAN
+ * Copyright (C) 2012-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -39,10 +39,10 @@
 
 @interface VLCControlsBarCommon ()
 {
-    NSImage * o_pause_img;
-    NSImage * o_pause_pressed_img;
-    NSImage * o_play_img;
-    NSImage * o_play_pressed_img;
+    NSImage * _pauseImage;
+    NSImage * _pressedPauseImage;
+    NSImage * _playImage;
+    NSImage * _pressedPlayImage;
 
     NSTimeInterval last_fwd_event;
     NSTimeInterval last_bwd_event;
@@ -58,112 +58,112 @@
     _darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
     _nativeFullscreenMode = NO;
 
-    [o_drop_view setDrawBorder: NO];
+    [self.dropView setDrawBorder: NO];
 
-    [o_play_btn setToolTip: _NS("Play/Pause")];
-    [[o_play_btn cell] accessibilitySetOverrideValue:_NS("Click to play or pause the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_play_btn cell] accessibilitySetOverrideValue:[o_play_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.playButton setToolTip: _NS("Play/Pause")];
+    [[self.playButton cell] accessibilitySetOverrideValue:_NS("Click to play or pause the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.playButton cell] accessibilitySetOverrideValue:[self.playButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    [o_bwd_btn setToolTip: _NS("Backward")];
-    [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_bwd_btn cell] accessibilitySetOverrideValue:[o_bwd_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.backwardButton setToolTip: _NS("Backward")];
+    [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.backwardButton cell] accessibilitySetOverrideValue:[self.backwardButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    [o_fwd_btn setToolTip: _NS("Forward")];
-    [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_fwd_btn cell] accessibilitySetOverrideValue:[o_fwd_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.forwardButton setToolTip: _NS("Forward")];
+    [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.forwardButton cell] accessibilitySetOverrideValue:[self.forwardButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    [o_time_sld setToolTip: _NS("Position")];
-    [[o_time_sld cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change current playback position.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_time_sld cell] accessibilitySetOverrideValue:[o_time_sld toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.timeSlider setToolTip: _NS("Position")];
+    [[self.timeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change current playback position.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.timeSlider cell] accessibilitySetOverrideValue:[self.timeSlider toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    [o_fullscreen_btn setToolTip: _NS("Toggle Fullscreen mode")];
-    [[o_fullscreen_btn cell] accessibilitySetOverrideValue:_NS("Click to enable fullscreen video playback.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_fullscreen_btn cell] accessibilitySetOverrideValue:[o_fullscreen_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.fullscreenButton setToolTip: _NS("Toggle Fullscreen mode")];
+    [[self.fullscreenButton cell] accessibilitySetOverrideValue:_NS("Click to enable fullscreen video playback.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.fullscreenButton cell] accessibilitySetOverrideValue:[self.fullscreenButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
     if (!_darkInterface) {
         [self.bottomBarView setImagesLeft: imageFromRes(@"bottom-background") middle: imageFromRes(@"bottom-background") right: imageFromRes(@"bottom-background")];
 
-        [o_bwd_btn setImage: imageFromRes(@"backward-3btns")];
-        [o_bwd_btn setAlternateImage: imageFromRes(@"backward-3btns-pressed")];
-        o_play_img = imageFromRes(@"play");
-        o_play_pressed_img = imageFromRes(@"play-pressed");
-        o_pause_img = imageFromRes(@"pause");
-        o_pause_pressed_img = imageFromRes(@"pause-pressed");
-        [o_fwd_btn setImage: imageFromRes(@"forward-3btns")];
-        [o_fwd_btn setAlternateImage: imageFromRes(@"forward-3btns-pressed")];
+        [self.backwardButton setImage: imageFromRes(@"backward-3btns")];
+        [self.backwardButton setAlternateImage: imageFromRes(@"backward-3btns-pressed")];
+        _playImage = imageFromRes(@"play");
+        _pressedPlayImage = imageFromRes(@"play-pressed");
+        _pauseImage = imageFromRes(@"pause");
+        _pressedPauseImage = imageFromRes(@"pause-pressed");
+        [self.forwardButton setImage: imageFromRes(@"forward-3btns")];
+        [self.forwardButton setAlternateImage: imageFromRes(@"forward-3btns-pressed")];
 
-        [o_time_sld_background setImagesLeft: imageFromRes(@"progression-track-wrapper-left") middle: imageFromRes(@"progression-track-wrapper-middle") right: imageFromRes(@"progression-track-wrapper-right")];
-        [o_time_sld_fancygradient_view setImagesLeft:imageFromRes(@"progression-fill-left") middle:imageFromRes(@"progression-fill-middle") right:imageFromRes(@"progression-fill-right")];
+        [self.timeSliderBackgroundView setImagesLeft: imageFromRes(@"progression-track-wrapper-left") middle: imageFromRes(@"progression-track-wrapper-middle") right: imageFromRes(@"progression-track-wrapper-right")];
+        [self.timeSliderGradientView setImagesLeft:imageFromRes(@"progression-fill-left") middle:imageFromRes(@"progression-fill-middle") right:imageFromRes(@"progression-fill-right")];
 
-        [o_fullscreen_btn setImage: imageFromRes(@"fullscreen-one-button")];
-        [o_fullscreen_btn setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
+        [self.fullscreenButton setImage: imageFromRes(@"fullscreen-one-button")];
+        [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
     } else {
         [self.bottomBarView setImagesLeft: imageFromRes(@"bottomdark-left") middle: imageFromRes(@"bottom-background_dark") right: imageFromRes(@"bottomdark-right")];
 
-        [o_bwd_btn setImage: imageFromRes(@"backward-3btns-dark")];
-        [o_bwd_btn setAlternateImage: imageFromRes(@"backward-3btns-dark-pressed")];
-        o_play_img = imageFromRes(@"play_dark");
-        o_play_pressed_img = imageFromRes(@"play-pressed_dark");
-        o_pause_img = imageFromRes(@"pause_dark");
-        o_pause_pressed_img = imageFromRes(@"pause-pressed_dark");
-        [o_fwd_btn setImage: imageFromRes(@"forward-3btns-dark")];
-        [o_fwd_btn setAlternateImage: imageFromRes(@"forward-3btns-dark-pressed")];
+        [self.backwardButton setImage: imageFromRes(@"backward-3btns-dark")];
+        [self.backwardButton setAlternateImage: imageFromRes(@"backward-3btns-dark-pressed")];
+        _playImage = imageFromRes(@"play_dark");
+        _pressedPlayImage = imageFromRes(@"play-pressed_dark");
+        _pauseImage = imageFromRes(@"pause_dark");
+        _pressedPauseImage = imageFromRes(@"pause-pressed_dark");
+        [self.forwardButton setImage: imageFromRes(@"forward-3btns-dark")];
+        [self.forwardButton setAlternateImage: imageFromRes(@"forward-3btns-dark-pressed")];
 
-        [o_time_sld_background setImagesLeft: imageFromRes(@"progression-track-wrapper-left_dark") middle: imageFromRes(@"progression-track-wrapper-middle_dark") right: imageFromRes(@"progression-track-wrapper-right_dark")];
-        [o_time_sld_fancygradient_view setImagesLeft:imageFromRes(@"progressbar-fill-left_dark") middle:imageFromRes(@"progressbar-fill-middle_dark") right:imageFromRes(@"progressbar-fill-right_dark")];
+        [self.timeSliderBackgroundView setImagesLeft: imageFromRes(@"progression-track-wrapper-left_dark") middle: imageFromRes(@"progression-track-wrapper-middle_dark") right: imageFromRes(@"progression-track-wrapper-right_dark")];
+        [self.timeSliderGradientView setImagesLeft:imageFromRes(@"progressbar-fill-left_dark") middle:imageFromRes(@"progressbar-fill-middle_dark") right:imageFromRes(@"progressbar-fill-right_dark")];
 
-        [o_fullscreen_btn setImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
-        [o_fullscreen_btn setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
+        [self.fullscreenButton setImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
+        [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
     }
 
-    [o_play_btn setImage: o_play_img];
-    [o_play_btn setAlternateImage: o_play_pressed_img];
+    [self.playButton setImage: _playImage];
+    [self.playButton setAlternateImage: _pressedPlayImage];
 
-    NSColor *o_string_color;
+    NSColor *timeFieldTextColor;
     if (!var_InheritBool(getIntf(), "macosx-interfacestyle"))
-        o_string_color = [NSColor colorWithCalibratedRed:0.229 green:0.229 blue:0.229 alpha:100.0];
+        timeFieldTextColor = [NSColor colorWithCalibratedRed:0.229 green:0.229 blue:0.229 alpha:100.0];
     else
-        o_string_color = [NSColor colorWithCalibratedRed:0.64 green:0.64 blue:0.64 alpha:100.0];
-    [o_time_fld setTextColor: o_string_color];
-    [o_time_fld setFont:[NSFont titleBarFontOfSize:10.0]];
-    [o_time_fld setAlignment: NSCenterTextAlignment];
-    [o_time_fld setNeedsDisplay:YES];
-    [o_time_fld setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
+        timeFieldTextColor = [NSColor colorWithCalibratedRed:0.64 green:0.64 blue:0.64 alpha:100.0];
+    [self.timeField setTextColor: timeFieldTextColor];
+    [self.timeField setFont:[NSFont titleBarFontOfSize:10.0]];
+    [self.timeField setAlignment: NSCenterTextAlignment];
+    [self.timeField setNeedsDisplay:YES];
+    [self.timeField setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
 
     // prepare time slider fance gradient view
     if (!_darkInterface) {
         NSRect frame;
-        frame = [o_time_sld_fancygradient_view frame];
+        frame = [self.timeSliderGradientView frame];
         frame.size.height = frame.size.height - 1;
         frame.origin.y = frame.origin.y + 1;
-        [o_time_sld_fancygradient_view setFrame: frame];
+        [self.timeSliderGradientView setFrame: frame];
     }
 
     NSRect frame;
-    frame = [o_time_sld_fancygradient_view frame];
+    frame = [_timeSliderGradientView frame];
     frame.size.width = 0;
-    [o_time_sld_fancygradient_view setFrame: frame];
+    [_timeSliderGradientView setFrame: frame];
 
     // hide resize view if necessary
-    [o_resize_view setImage: NULL];
+    [self.resizeView setImage: NULL];
 
     if ([[self.bottomBarView window] styleMask] & NSResizableWindowMask)
-        [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
+        [self.resizeView removeFromSuperviewWithoutNeedingDisplay];
 
 
     // remove fullscreen button for lion fullscreen
     if (_nativeFullscreenMode) {
-        CGFloat f_width = [o_fullscreen_btn frame].size.width;
+        CGFloat f_width = [self.fullscreenButton frame].size.width;
 
-        NSRect frame = [o_time_fld frame];
+        NSRect frame = [self.timeField frame];
         frame.origin.x += f_width;
-        [o_time_fld setFrame: frame];
+        [self.timeField setFrame: frame];
 
-        frame = [o_progress_view frame];
+        frame = [self.progressView frame];
         frame.size.width = f_width + frame.size.width;
-        [o_progress_view setFrame: frame];
+        [self.progressView setFrame: frame];
 
-        [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
+        [self.fullscreenButton removeFromSuperviewWithoutNeedingDisplay];
     }
 
     if (config_GetInt(getIntf(), "macosx-show-playback-buttons"))
@@ -180,19 +180,19 @@
 {
     if (b_alt == YES) {
         /* change the accessibility help for the backward/forward buttons accordingly */
-        [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-        [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click and hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+        [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Click and hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+        [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Click and hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
 
-        [o_fwd_btn setAction:@selector(alternateForward:)];
-        [o_bwd_btn setAction:@selector(alternateBackward:)];
+        [self.forwardButton setAction:@selector(alternateForward:)];
+        [self.backwardButton setAction:@selector(alternateBackward:)];
 
     } else {
         /* change the accessibility help for the backward/forward buttons accordingly */
-        [[o_bwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
-        [[o_fwd_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+        [[self.backwardButton cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item. Hold to skip backward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
+        [[self.forwardButton cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item. Hold to skip forward through the current media.") forAttribute:NSAccessibilityDescriptionAttribute];
 
-        [o_fwd_btn setAction:@selector(fwd:)];
-        [o_bwd_btn setAction:@selector(bwd:)];
+        [self.forwardButton setAction:@selector(fwd:)];
+        [self.backwardButton setAction:@selector(bwd:)];
     }
 }
 
@@ -307,10 +307,10 @@
 
         pos.f_float = f_updated / 10000.;
         var_Set(p_input, "position", pos);
-        [o_time_sld setFloatValue: f_updated];
+        [self.timeSlider setFloatValue: f_updated];
 
-        o_time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString: p_input negative:[o_time_fld timeRemaining]];
-        [o_time_fld setStringValue: o_time];
+        o_time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString: p_input negative:[self.timeField timeRemaining]];
+        [self.timeField setStringValue: o_time];
         vlc_object_release(p_input);
     }
 }
@@ -334,55 +334,55 @@
 
         var_Get(p_input, "position", &pos);
         f_updated = 10000. * pos.f_float;
-        [o_time_sld setFloatValue: f_updated];
+        [self.timeSlider setFloatValue: f_updated];
 
-        o_time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString: p_input negative:[o_time_fld timeRemaining]];
+        o_time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString: p_input negative:[self.timeField timeRemaining]];
 
         mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
         if (dur == -1) {
-            [o_time_sld setHidden: YES];
-            [o_time_sld_fancygradient_view setHidden: YES];
+            [self.timeSlider setHidden: YES];
+            [self.timeSliderGradientView setHidden: YES];
         } else {
-            if ([o_time_sld isHidden] == YES) {
+            if ([self.timeSlider isHidden] == YES) {
                 bool b_buffering = false;
                 input_state_e inputState = input_GetState(p_input);
                 if (inputState == INIT_S || inputState == OPENING_S)
                     b_buffering = YES;
 
-                [o_time_sld setHidden: b_buffering];
-                [o_time_sld_fancygradient_view setHidden: b_buffering];
+                [self.timeSlider setHidden: b_buffering];
+                [self.timeSliderGradientView setHidden: b_buffering];
             }
         }
-        [o_time_fld setStringValue: o_time];
-        [o_time_fld setNeedsDisplay:YES];
+        [self.timeField setStringValue: o_time];
+        [self.timeField setNeedsDisplay:YES];
 
         vlc_object_release(p_input);
     } else {
-        [o_time_sld setFloatValue: 0.0];
-        [o_time_fld setStringValue: @"00:00"];
-        [o_time_sld setHidden: YES];
-        [o_time_sld_fancygradient_view setHidden: YES];
+        [self.timeSlider setFloatValue: 0.0];
+        [self.timeField setStringValue: @"00:00"];
+        [self.timeSlider setHidden: YES];
+        [self.timeSliderGradientView setHidden: YES];
     }
 }
 
 - (void)drawFancyGradientEffectForTimeSlider
 {
-    CGFloat f_value = [o_time_sld knobPosition];
+    CGFloat f_value = [self.timeSlider knobPosition];
     if (f_value > 7.5) {
-        NSRect oldFrame = [o_time_sld_fancygradient_view frame];
+        NSRect oldFrame = [self.timeSliderGradientView frame];
         if (f_value != oldFrame.size.width) {
-            if ([o_time_sld_fancygradient_view isHidden])
-                [o_time_sld_fancygradient_view setHidden: NO];
-            [o_time_sld_fancygradient_view setFrame: NSMakeRect(oldFrame.origin.x, oldFrame.origin.y, f_value, oldFrame.size.height)];
+            if ([self.timeSliderGradientView isHidden])
+                [self.timeSliderGradientView setHidden: NO];
+            [self.timeSliderGradientView setFrame: NSMakeRect(oldFrame.origin.x, oldFrame.origin.y, f_value, oldFrame.size.height)];
         }
     } else {
         NSRect frame;
-        frame = [o_time_sld_fancygradient_view frame];
+        frame = [self.timeSliderGradientView frame];
         if (frame.size.width > 0) {
             frame.size.width = 0;
-            [o_time_sld_fancygradient_view setFrame: frame];
+            [self.timeSliderGradientView setFrame: frame];
         }
-        [o_time_sld_fancygradient_view setHidden: YES];
+        [self.timeSliderGradientView setHidden: YES];
     }
 }
 
@@ -401,7 +401,6 @@
 
     input_thread_t * p_input = playlist_CurrentInput(p_playlist);
 
-
     if (p_input) {
         input_state_e inputState = input_GetState(p_input);
         if (inputState == INIT_S || inputState == OPENING_S)
@@ -416,40 +415,39 @@
         vlc_object_release(p_input);
     }
 
-
     if (b_buffering) {
-        [o_progress_bar startAnimation:self];
-        [o_progress_bar setIndeterminate:YES];
-        [o_progress_bar setHidden:NO];
+        [self.progressBar startAnimation:self];
+        [self.progressBar setIndeterminate:YES];
+        [self.progressBar setHidden:NO];
     } else {
-        [o_progress_bar stopAnimation:self];
-        [o_progress_bar setHidden:YES];
+        [self.progressBar stopAnimation:self];
+        [self.progressBar setHidden:YES];
     }
 
-    [o_time_sld setEnabled: b_seekable];
+    [self.timeSlider setEnabled: b_seekable];
 
-    [o_fwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
-    [o_bwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
+    [self.forwardButton setEnabled: (b_seekable || b_plmul || b_chapters)];
+    [self.backwardButton setEnabled: (b_seekable || b_plmul || b_chapters)];
 }
 
 - (void)setPause
 {
-    [o_play_btn setImage: o_pause_img];
-    [o_play_btn setAlternateImage: o_pause_pressed_img];
-    [o_play_btn setToolTip: _NS("Pause")];
+    [self.playButton setImage: _pauseImage];
+    [self.playButton setAlternateImage: _pressedPauseImage];
+    [self.playButton setToolTip: _NS("Pause")];
 }
 
 - (void)setPlay
 {
-    [o_play_btn setImage: o_play_img];
-    [o_play_btn setAlternateImage: o_play_pressed_img];
-    [o_play_btn setToolTip: _NS("Play")];
+    [self.playButton setImage: _playImage];
+    [self.playButton setAlternateImage: _pressedPlayImage];
+    [self.playButton setToolTip: _NS("Play")];
 }
 
 - (void)setFullscreenState:(BOOL)b_fullscreen
 {
     if (!self.nativeFullscreenMode)
-        [o_fullscreen_btn setState:b_fullscreen];
+        [self.fullscreenButton setState:b_fullscreen];
 }
 
 @end
@@ -463,19 +461,19 @@
 
 @interface VLCMainWindowControlsBar()
 {
-    NSImage * o_repeat_img;
-    NSImage * o_repeat_pressed_img;
-    NSImage * o_repeat_all_img;
-    NSImage * o_repeat_all_pressed_img;
-    NSImage * o_repeat_one_img;
-    NSImage * o_repeat_one_pressed_img;
-    NSImage * o_shuffle_img;
-    NSImage * o_shuffle_pressed_img;
-    NSImage * o_shuffle_on_img;
-    NSImage * o_shuffle_on_pressed_img;
+    NSImage * _repeatImage;
+    NSImage * _pressedRepeatImage;
+    NSImage * _repeatAllImage;
+    NSImage * _pressedRepeatAllImage;
+    NSImage * _repeatOneImage;
+    NSImage * _pressedRepeatOneImage;
+    NSImage * _shuffleImage;
+    NSImage * _pressedShuffleImage;
+    NSImage * _shuffleOnImage;
+    NSImage * _pressedShuffleOnImage;
 
-    NSButton * o_prev_btn;
-    NSButton * o_next_btn;
+    NSButton * _previousButton;
+    NSButton * _nextButton;
 
     BOOL b_show_jump_buttons;
     BOOL b_show_playmode_buttons;
@@ -494,117 +492,117 @@
 {
     [super awakeFromNib];
 
-    [o_stop_btn setToolTip: _NS("Stop")];
-    [[o_stop_btn cell] accessibilitySetOverrideValue:_NS("Click to stop playback.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_stop_btn cell] accessibilitySetOverrideValue:[o_stop_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.stopButton setToolTip: _NS("Stop")];
+    [[self.stopButton cell] accessibilitySetOverrideValue:_NS("Click to stop playback.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.stopButton cell] accessibilitySetOverrideValue:[self.stopButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    [o_playlist_btn setToolTip: _NS("Show/Hide Playlist")];
-    [[o_playlist_btn cell] accessibilitySetOverrideValue:_NS("Click to switch between video output and playlist. If no video is shown in the main window, this allows you to hide the playlist.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_playlist_btn cell] accessibilitySetOverrideValue:[o_playlist_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.playlistButton setToolTip: _NS("Show/Hide Playlist")];
+    [[self.playlistButton cell] accessibilitySetOverrideValue:_NS("Click to switch between video output and playlist. If no video is shown in the main window, this allows you to hide the playlist.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.playlistButton cell] accessibilitySetOverrideValue:[self.playlistButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    [o_repeat_btn setToolTip: _NS("Repeat")];
-    [[o_repeat_btn cell] accessibilitySetOverrideValue:_NS("Click to change repeat mode. There are 3 states: repeat one, repeat all and off.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_repeat_btn cell] accessibilitySetOverrideValue:[o_repeat_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.repeatButton setToolTip: _NS("Repeat")];
+    [[self.repeatButton cell] accessibilitySetOverrideValue:_NS("Click to change repeat mode. There are 3 states: repeat one, repeat all and off.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.repeatButton cell] accessibilitySetOverrideValue:[self.repeatButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    [o_shuffle_btn setToolTip: _NS("Shuffle")];
-    [[o_shuffle_btn cell] accessibilitySetOverrideValue:[o_shuffle_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
-    [[o_shuffle_btn cell] accessibilitySetOverrideValue:_NS("Click to enable or disable random playback.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [self.shuffleButton setToolTip: _NS("Shuffle")];
+    [[self.shuffleButton cell] accessibilitySetOverrideValue:[self.shuffleButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [[self.shuffleButton cell] accessibilitySetOverrideValue:_NS("Click to enable or disable random playback.") forAttribute:NSAccessibilityDescriptionAttribute];
 
     NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), 100];
-    [o_volume_sld setToolTip: volumeTooltip];
-    [[o_volume_sld cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change the volume.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_volume_sld cell] accessibilitySetOverrideValue:[o_volume_sld toolTip] forAttribute:NSAccessibilityTitleAttribute];
-    [o_volume_down_btn setToolTip: _NS("Mute")];
-    [[o_volume_down_btn cell] accessibilitySetOverrideValue:_NS("Click to mute or unmute the audio.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_volume_down_btn cell] accessibilitySetOverrideValue:[o_volume_down_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
-    [o_volume_up_btn setToolTip: _NS("Full Volume")];
-    [[o_volume_up_btn cell] accessibilitySetOverrideValue:_NS("Click to play the audio at maximum volume.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_volume_up_btn cell] accessibilitySetOverrideValue:[o_volume_up_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.volumeSlider setToolTip: volumeTooltip];
+    [[self.volumeSlider cell] accessibilitySetOverrideValue:_NS("Click and move the mouse while keeping the button pressed to use this slider to change the volume.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.volumeSlider cell] accessibilitySetOverrideValue:[self.volumeSlider toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.volumeDownButton setToolTip: _NS("Mute")];
+    [[self.volumeDownButton cell] accessibilitySetOverrideValue:_NS("Click to mute or unmute the audio.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.volumeDownButton cell] accessibilitySetOverrideValue:[self.volumeDownButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.volumeUpButton setToolTip: _NS("Full Volume")];
+    [[self.volumeUpButton cell] accessibilitySetOverrideValue:_NS("Click to play the audio at maximum volume.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.volumeUpButton cell] accessibilitySetOverrideValue:[self.volumeUpButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    [o_effects_btn setToolTip: _NS("Audio Effects")];
-    [[o_effects_btn cell] accessibilitySetOverrideValue:_NS("Click to show an Audio Effects panel featuring an equalizer and further filters.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[o_effects_btn cell] accessibilitySetOverrideValue:[o_effects_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    [self.effectsButton setToolTip: _NS("Audio Effects")];
+    [[self.effectsButton cell] accessibilitySetOverrideValue:_NS("Click to show an Audio Effects panel featuring an equalizer and further filters.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [[self.effectsButton cell] accessibilitySetOverrideValue:[self.effectsButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
     if (!self.darkInterface) {
-        [o_stop_btn setImage: imageFromRes(@"stop")];
-        [o_stop_btn setAlternateImage: imageFromRes(@"stop-pressed")];
+        [self.stopButton setImage: imageFromRes(@"stop")];
+        [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
 
-        [o_playlist_btn setImage: imageFromRes(@"playlist-btn")];
-        [o_playlist_btn setAlternateImage: imageFromRes(@"playlist-btn-pressed")];
-        o_repeat_img = imageFromRes(@"repeat");
-        o_repeat_pressed_img = imageFromRes(@"repeat-pressed");
-        o_repeat_all_img  = imageFromRes(@"repeat-all");
-        o_repeat_all_pressed_img = imageFromRes(@"repeat-all-pressed");
-        o_repeat_one_img = imageFromRes(@"repeat-one");
-        o_repeat_one_pressed_img = imageFromRes(@"repeat-one-pressed");
-        o_shuffle_img = imageFromRes(@"shuffle");
-        o_shuffle_pressed_img = imageFromRes(@"shuffle-pressed");
-        o_shuffle_on_img = imageFromRes(@"shuffle-blue");
-        o_shuffle_on_pressed_img = imageFromRes(@"shuffle-blue-pressed");
+        [self.playlistButton setImage: imageFromRes(@"playlist-btn")];
+        [self.playlistButton setAlternateImage: imageFromRes(@"playlist-btn-pressed")];
+        _repeatImage = imageFromRes(@"repeat");
+        _pressedRepeatImage = imageFromRes(@"repeat-pressed");
+        _repeatAllImage  = imageFromRes(@"repeat-all");
+        _pressedRepeatAllImage = imageFromRes(@"repeat-all-pressed");
+        _repeatOneImage = imageFromRes(@"repeat-one");
+        _pressedRepeatOneImage = imageFromRes(@"repeat-one-pressed");
+        _shuffleImage = imageFromRes(@"shuffle");
+        _pressedShuffleImage = imageFromRes(@"shuffle-pressed");
+        _shuffleOnImage = imageFromRes(@"shuffle-blue");
+        _pressedShuffleOnImage = imageFromRes(@"shuffle-blue-pressed");
 
-        [o_volume_down_btn setImage: imageFromRes(@"volume-low")];
-        [o_volume_track_view setImage: imageFromRes(@"volume-slider-track")];
-        [o_volume_up_btn setImage: imageFromRes(@"volume-high")];
-        [o_volume_sld setUsesBrightArtwork: YES];
+        [self.volumeDownButton setImage: imageFromRes(@"volume-low")];
+        [self.volumeTrackImageView setImage: imageFromRes(@"volume-slider-track")];
+        [self.volumeUpButton setImage: imageFromRes(@"volume-high")];
+        [self.volumeSlider setUsesBrightArtwork: YES];
 
         if (self.nativeFullscreenMode) {
-            [o_effects_btn setImage: imageFromRes(@"effects-one-button")];
-            [o_effects_btn setAlternateImage: imageFromRes(@"effects-one-button-pressed")];
+            [self.effectsButton setImage: imageFromRes(@"effects-one-button")];
+            [self.effectsButton setAlternateImage: imageFromRes(@"effects-one-button-pressed")];
         } else {
-            [o_effects_btn setImage: imageFromRes(@"effects-double-buttons")];
-            [o_effects_btn setAlternateImage: imageFromRes(@"effects-double-buttons-pressed")];
+            [self.effectsButton setImage: imageFromRes(@"effects-double-buttons")];
+            [self.effectsButton setAlternateImage: imageFromRes(@"effects-double-buttons-pressed")];
         }
 
-        [o_fullscreen_btn setImage: imageFromRes(@"fullscreen-double-buttons")];
-        [o_fullscreen_btn setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
+        [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons")];
+        [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
     } else {
-        [o_stop_btn setImage: imageFromRes(@"stop_dark")];
-        [o_stop_btn setAlternateImage: imageFromRes(@"stop-pressed_dark")];
+        [self.stopButton setImage: imageFromRes(@"stop_dark")];
+        [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed_dark")];
 
-        [o_playlist_btn setImage: imageFromRes(@"playlist_dark")];
-        [o_playlist_btn setAlternateImage: imageFromRes(@"playlist-pressed_dark")];
-        o_repeat_img = imageFromRes(@"repeat_dark");
-        o_repeat_pressed_img = imageFromRes(@"repeat-pressed_dark");
-        o_repeat_all_img  = imageFromRes(@"repeat-all-blue_dark");
-        o_repeat_all_pressed_img = imageFromRes(@"repeat-all-blue-pressed_dark");
-        o_repeat_one_img = imageFromRes(@"repeat-one-blue_dark");
-        o_repeat_one_pressed_img = imageFromRes(@"repeat-one-blue-pressed_dark");
-        o_shuffle_img = imageFromRes(@"shuffle_dark");
-        o_shuffle_pressed_img = imageFromRes(@"shuffle-pressed_dark");
-        o_shuffle_on_img = imageFromRes(@"shuffle-blue_dark");
-        o_shuffle_on_pressed_img = imageFromRes(@"shuffle-blue-pressed_dark");
+        [self.playlistButton setImage: imageFromRes(@"playlist_dark")];
+        [self.playlistButton setAlternateImage: imageFromRes(@"playlist-pressed_dark")];
+        _repeatImage = imageFromRes(@"repeat_dark");
+        _pressedRepeatImage = imageFromRes(@"repeat-pressed_dark");
+        _repeatAllImage  = imageFromRes(@"repeat-all-blue_dark");
+        _pressedRepeatAllImage = imageFromRes(@"repeat-all-blue-pressed_dark");
+        _repeatOneImage = imageFromRes(@"repeat-one-blue_dark");
+        _pressedRepeatOneImage = imageFromRes(@"repeat-one-blue-pressed_dark");
+        _shuffleImage = imageFromRes(@"shuffle_dark");
+        _pressedShuffleImage = imageFromRes(@"shuffle-pressed_dark");
+        _shuffleOnImage = imageFromRes(@"shuffle-blue_dark");
+        _pressedShuffleOnImage = imageFromRes(@"shuffle-blue-pressed_dark");
 
-        [o_volume_down_btn setImage: imageFromRes(@"volume-low_dark")];
-        [o_volume_track_view setImage: imageFromRes(@"volume-slider-track_dark")];
-        [o_volume_up_btn setImage: imageFromRes(@"volume-high_dark")];
-        [o_volume_sld setUsesBrightArtwork: NO];
+        [self.volumeDownButton setImage: imageFromRes(@"volume-low_dark")];
+        [self.volumeTrackImageView setImage: imageFromRes(@"volume-slider-track_dark")];
+        [self.volumeUpButton setImage: imageFromRes(@"volume-high_dark")];
+        [self.volumeSlider setUsesBrightArtwork: NO];
 
         if (self.nativeFullscreenMode) {
-            [o_effects_btn setImage: imageFromRes(@"effects-one-button_dark")];
-            [o_effects_btn setAlternateImage: imageFromRes(@"effects-one-button-pressed-dark")];
+            [self.effectsButton setImage: imageFromRes(@"effects-one-button_dark")];
+            [self.effectsButton setAlternateImage: imageFromRes(@"effects-one-button-pressed-dark")];
         } else {
-            [o_effects_btn setImage: imageFromRes(@"effects-double-buttons_dark")];
-            [o_effects_btn setAlternateImage: imageFromRes(@"effects-double-buttons-pressed_dark")];
+            [self.effectsButton setImage: imageFromRes(@"effects-double-buttons_dark")];
+            [self.effectsButton setAlternateImage: imageFromRes(@"effects-double-buttons-pressed_dark")];
         }
 
-        [o_fullscreen_btn setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
-        [o_fullscreen_btn setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
+        [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
+        [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
     }
-    [o_repeat_btn setImage: o_repeat_img];
-    [o_repeat_btn setAlternateImage: o_repeat_pressed_img];
-    [o_shuffle_btn setImage: o_shuffle_img];
-    [o_shuffle_btn setAlternateImage: o_shuffle_pressed_img];
+    [self.repeatButton setImage: _repeatImage];
+    [self.repeatButton setAlternateImage: _pressedRepeatImage];
+    [self.shuffleButton setImage: _shuffleImage];
+    [self.shuffleButton setAlternateImage: _pressedShuffleImage];
 
     BOOL b_mute = ![[VLCCoreInteraction sharedInstance] mute];
-    [o_volume_sld setEnabled: b_mute];
-    [o_volume_sld setMaxValue: [[VLCCoreInteraction sharedInstance] maxVolume]];
-    [o_volume_up_btn setEnabled: b_mute];
+    [self.volumeSlider setEnabled: b_mute];
+    [self.volumeSlider setMaxValue: [[VLCCoreInteraction sharedInstance] maxVolume]];
+    [self.volumeUpButton setEnabled: b_mute];
 
     // remove fullscreen button for lion fullscreen
     if (self.nativeFullscreenMode) {
         NSRect frame;
 
-        // == [o_fullscreen_btn frame].size.width;
+        // == [fullscreenButton frame].size.width;
         // button is already removed!
         float f_width = 29.;
 #define moveItem(item) \
@@ -612,11 +610,11 @@ frame = [item frame]; \
 frame.origin.x = f_width + frame.origin.x; \
 [item setFrame: frame]
 
-        moveItem(o_effects_btn);
-        moveItem(o_volume_up_btn);
-        moveItem(o_volume_sld);
-        moveItem(o_volume_track_view);
-        moveItem(o_volume_down_btn);
+        moveItem(self.effectsButton);
+        moveItem(self.volumeUpButton);
+        moveItem(self.volumeSlider);
+        moveItem(self.volumeTrackImageView);
+        moveItem(self.volumeDownButton);
 #undef moveItem
 
         // time field and progress bar are moved in super method!
@@ -652,13 +650,13 @@ frame.origin.x = f_width + frame.origin.x; \
 
 - (void)addEffectsButton:(BOOL)b_fast
 {
-    if (!o_effects_btn)
+    if (!self.effectsButton)
         return;
 
     if (b_fast) {
-        [o_effects_btn setHidden: NO];
+        [self.effectsButton setHidden: NO];
     } else {
-        [[o_effects_btn animator] setHidden: NO];
+        [[self.effectsButton animator] setHidden: NO];
     }
 
 #define moveItem(item) \
@@ -670,34 +668,34 @@ else \
 [[item animator] setFrame: frame]
 
     NSRect frame;
-    CGFloat f_space = [o_effects_btn frame].size.width;
+    CGFloat f_space = [self.effectsButton frame].size.width;
     // extra margin between button and volume up button
     if (self.nativeFullscreenMode)
         f_space += 2;
 
 
-    moveItem(o_volume_up_btn);
-    moveItem(o_volume_sld);
-    moveItem(o_volume_track_view);
-    moveItem(o_volume_down_btn);
-    moveItem(o_time_fld);
+    moveItem(self.volumeUpButton);
+    moveItem(self.volumeSlider);
+    moveItem(self.volumeTrackImageView);
+    moveItem(self.volumeDownButton);
+    moveItem(self.timeField);
 #undef moveItem
 
 
-    frame = [o_progress_view frame];
+    frame = [self.progressView frame];
     frame.size.width = frame.size.width - f_space;
     if (b_fast)
-        [o_progress_view setFrame: frame];
+        [self.progressView setFrame: frame];
     else
-        [[o_progress_view animator] setFrame: frame];
+        [[self.progressView animator] setFrame: frame];
 
     if (!self.nativeFullscreenMode) {
         if (self.darkInterface) {
-            [o_fullscreen_btn setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
-            [o_fullscreen_btn setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
+            [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
+            [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
         } else {
-            [o_fullscreen_btn setImage: imageFromRes(@"fullscreen-double-buttons")];
-            [o_fullscreen_btn setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
+            [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons")];
+            [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
         }
     }
 
@@ -706,10 +704,10 @@ else \
 
 - (void)removeEffectsButton:(BOOL)b_fast
 {
-    if (!o_effects_btn)
+    if (!self.effectsButton)
         return;
 
-    [o_effects_btn setHidden: YES];
+    [self.effectsButton setHidden: YES];
 
 #define moveItem(item) \
 frame = [item frame]; \
@@ -720,33 +718,33 @@ else \
 [[item animator] setFrame: frame]
 
     NSRect frame;
-    CGFloat f_space = [o_effects_btn frame].size.width;
+    CGFloat f_space = [self.effectsButton frame].size.width;
     // extra margin between button and volume up button
     if (self.nativeFullscreenMode)
         f_space += 2;
 
-    moveItem(o_volume_up_btn);
-    moveItem(o_volume_sld);
-    moveItem(o_volume_track_view);
-    moveItem(o_volume_down_btn);
-    moveItem(o_time_fld);
+    moveItem(self.volumeUpButton);
+    moveItem(self.volumeSlider);
+    moveItem(self.volumeTrackImageView);
+    moveItem(self.volumeDownButton);
+    moveItem(self.timeField);
 #undef moveItem
 
 
-    frame = [o_progress_view frame];
+    frame = [self.progressView frame];
     frame.size.width = frame.size.width + f_space;
     if (b_fast)
-        [o_progress_view setFrame: frame];
+        [self.progressView setFrame: frame];
     else
-        [[o_progress_view animator] setFrame: frame];
+        [[self.progressView animator] setFrame: frame];
 
     if (!self.nativeFullscreenMode) {
         if (self.darkInterface) {
-            [[o_fullscreen_btn animator] setImage: imageFromRes(@"fullscreen-one-button_dark")];
-            [[o_fullscreen_btn animator] setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
+            [[self.fullscreenButton animator] setImage: imageFromRes(@"fullscreen-one-button_dark")];
+            [[self.fullscreenButton animator] setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
         } else {
-            [[o_fullscreen_btn animator] setImage: imageFromRes(@"fullscreen-one-button")];
-            [[o_fullscreen_btn animator] setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
+            [[self.fullscreenButton animator] setImage: imageFromRes(@"fullscreen-one-button")];
+            [[self.fullscreenButton animator] setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
         }
     }
 
@@ -765,50 +763,50 @@ else \
 
 - (void)addJumpButtons:(BOOL)b_fast
 {
-    NSRect preliminaryFrame = [o_bwd_btn frame];
-    BOOL b_enabled = [o_bwd_btn isEnabled];
+    NSRect preliminaryFrame = [self.backwardButton frame];
+    BOOL b_enabled = [self.backwardButton isEnabled];
     preliminaryFrame.size.width = 29.;
-    o_prev_btn = [[NSButton alloc] initWithFrame:preliminaryFrame];
-    [o_prev_btn setButtonType: NSMomentaryChangeButton];
-    [o_prev_btn setBezelStyle:NSRegularSquareBezelStyle];
-    [o_prev_btn setBordered:NO];
-    [o_prev_btn setTarget:self];
-    [o_prev_btn setAction:@selector(prev:)];
-    [o_prev_btn setToolTip: _NS("Previous")];
-    [[o_prev_btn cell] accessibilitySetOverrideValue:_NS("Previous") forAttribute:NSAccessibilityTitleAttribute];
-    [[o_prev_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [o_prev_btn setEnabled: b_enabled];
+    _previousButton = [[NSButton alloc] initWithFrame:preliminaryFrame];
+    [_previousButton setButtonType: NSMomentaryChangeButton];
+    [_previousButton setBezelStyle:NSRegularSquareBezelStyle];
+    [_previousButton setBordered:NO];
+    [_previousButton setTarget:self];
+    [_previousButton setAction:@selector(prev:)];
+    [_previousButton setToolTip: _NS("Previous")];
+    [[_previousButton cell] accessibilitySetOverrideValue:_NS("Previous") forAttribute:NSAccessibilityTitleAttribute];
+    [[_previousButton cell] accessibilitySetOverrideValue:_NS("Click to go to the previous playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [_previousButton setEnabled: b_enabled];
 
-    o_next_btn = [[NSButton alloc] initWithFrame:preliminaryFrame];
-    [o_next_btn setButtonType: NSMomentaryChangeButton];
-    [o_next_btn setBezelStyle:NSRegularSquareBezelStyle];
-    [o_next_btn setBordered:NO];
-    [o_next_btn setTarget:self];
-    [o_next_btn setAction:@selector(next:)];
-    [o_next_btn setToolTip: _NS("Next")];
-    [[o_next_btn cell] accessibilitySetOverrideValue:_NS("Next") forAttribute:NSAccessibilityTitleAttribute];
-    [[o_next_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [o_next_btn setEnabled: b_enabled];
+    _nextButton = [[NSButton alloc] initWithFrame:preliminaryFrame];
+    [_nextButton setButtonType: NSMomentaryChangeButton];
+    [_nextButton setBezelStyle:NSRegularSquareBezelStyle];
+    [_nextButton setBordered:NO];
+    [_nextButton setTarget:self];
+    [_nextButton setAction:@selector(next:)];
+    [_nextButton setToolTip: _NS("Next")];
+    [[_nextButton cell] accessibilitySetOverrideValue:_NS("Next") forAttribute:NSAccessibilityTitleAttribute];
+    [[_nextButton cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [_nextButton setEnabled: b_enabled];
 
     if (self.darkInterface) {
-        [o_prev_btn setImage: imageFromRes(@"previous-6btns-dark")];
-        [o_prev_btn setAlternateImage: imageFromRes(@"previous-6btns-dark-pressed")];
-        [o_next_btn setImage: imageFromRes(@"next-6btns-dark")];
-        [o_next_btn setAlternateImage: imageFromRes(@"next-6btns-dark-pressed")];
+        [_previousButton setImage: imageFromRes(@"previous-6btns-dark")];
+        [_previousButton setAlternateImage: imageFromRes(@"previous-6btns-dark-pressed")];
+        [_nextButton setImage: imageFromRes(@"next-6btns-dark")];
+        [_nextButton setAlternateImage: imageFromRes(@"next-6btns-dark-pressed")];
     } else {
-        [o_prev_btn setImage: imageFromRes(@"previous-6btns")];
-        [o_prev_btn setAlternateImage: imageFromRes(@"previous-6btns-pressed")];
-        [o_next_btn setImage: imageFromRes(@"next-6btns")];
-        [o_next_btn setAlternateImage: imageFromRes(@"next-6btns-pressed")];
+        [_previousButton setImage: imageFromRes(@"previous-6btns")];
+        [_previousButton setAlternateImage: imageFromRes(@"previous-6btns-pressed")];
+        [_nextButton setImage: imageFromRes(@"next-6btns")];
+        [_nextButton setAlternateImage: imageFromRes(@"next-6btns-pressed")];
     }
 
     NSRect frame;
-    frame = [o_bwd_btn frame];
+    frame = [self.backwardButton frame];
     frame.size.width--;
-    [o_bwd_btn setFrame:frame];
-    frame = [o_fwd_btn frame];
+    [self.backwardButton setFrame:frame];
+    frame = [self.forwardButton frame];
     frame.size.width--;
-    [o_fwd_btn setFrame:frame];
+    [self.forwardButton setFrame:frame];
 
 #define moveItem(item) \
 frame = [item frame]; \
@@ -819,47 +817,47 @@ else \
     [[item animator] setFrame: frame]
 
     float f_space = 29.;
-    moveItem(o_bwd_btn);
+    moveItem(self.backwardButton);
     f_space = 28.;
-    moveItem(o_play_btn);
-    moveItem(o_fwd_btn);
+    moveItem(self.playButton);
+    moveItem(self.forwardButton);
     f_space = 28. * 2;
-    moveItem(o_stop_btn);
-    moveItem(o_playlist_btn);
-    moveItem(o_repeat_btn);
-    moveItem(o_shuffle_btn);
+    moveItem(self.stopButton);
+    moveItem(self.playlistButton);
+    moveItem(self.repeatButton);
+    moveItem(self.shuffleButton);
 #undef moveItem
 
-    frame = [o_progress_view frame];
+    frame = [self.progressView frame];
     frame.size.width = frame.size.width - f_space;
     frame.origin.x = frame.origin.x + f_space;
     if (b_fast)
-        [o_progress_view setFrame: frame];
+        [self.progressView setFrame: frame];
     else
-        [[o_progress_view animator] setFrame: frame];
+        [[self.progressView animator] setFrame: frame];
 
     if (self.darkInterface) {
-        [[o_fwd_btn animator] setImage:imageFromRes(@"forward-6btns-dark")];
-        [[o_fwd_btn animator] setAlternateImage:imageFromRes(@"forward-6btns-dark-pressed")];
-        [[o_bwd_btn animator] setImage:imageFromRes(@"backward-6btns-dark")];
-        [[o_bwd_btn animator] setAlternateImage:imageFromRes(@"backward-6btns-dark-pressed")];
+        [[self.forwardButton animator] setImage:imageFromRes(@"forward-6btns-dark")];
+        [[self.forwardButton animator] setAlternateImage:imageFromRes(@"forward-6btns-dark-pressed")];
+        [[self.backwardButton animator] setImage:imageFromRes(@"backward-6btns-dark")];
+        [[self.backwardButton animator] setAlternateImage:imageFromRes(@"backward-6btns-dark-pressed")];
     } else {
-        [[o_fwd_btn animator] setImage:imageFromRes(@"forward-6btns")];
-        [[o_fwd_btn animator] setAlternateImage:imageFromRes(@"forward-6btns-pressed")];
-        [[o_bwd_btn animator] setImage:imageFromRes(@"backward-6btns")];
-        [[o_bwd_btn animator] setAlternateImage:imageFromRes(@"backward-6btns-pressed")];
+        [[self.forwardButton animator] setImage:imageFromRes(@"forward-6btns")];
+        [[self.forwardButton animator] setAlternateImage:imageFromRes(@"forward-6btns-pressed")];
+        [[self.backwardButton animator] setImage:imageFromRes(@"backward-6btns")];
+        [[self.backwardButton animator] setAlternateImage:imageFromRes(@"backward-6btns-pressed")];
     }
 
-    preliminaryFrame.origin.x = [o_prev_btn frame].origin.x + [o_prev_btn frame].size.width + [o_bwd_btn frame].size.width + [o_play_btn frame].size.width + [o_fwd_btn frame].size.width;
-    [o_next_btn setFrame: preliminaryFrame];
+    preliminaryFrame.origin.x = [_previousButton frame].origin.x + [_previousButton frame].size.width + [self.backwardButton frame].size.width + [self.playButton frame].size.width + [self.forwardButton frame].size.width;
+    [_nextButton setFrame: preliminaryFrame];
 
     // wait until the animation is done, if displayed
     if (b_fast) {
-        [self.bottomBarView addSubview:o_prev_btn];
-        [self.bottomBarView addSubview:o_next_btn];
+        [self.bottomBarView addSubview:_previousButton];
+        [self.bottomBarView addSubview:_nextButton];
     } else {
-        [self.bottomBarView performSelector:@selector(addSubview:) withObject:o_prev_btn afterDelay:.2];
-        [self.bottomBarView performSelector:@selector(addSubview:) withObject:o_next_btn afterDelay:.2];
+        [self.bottomBarView performSelector:@selector(addSubview:) withObject:_previousButton afterDelay:.2];
+        [self.bottomBarView performSelector:@selector(addSubview:) withObject:_nextButton afterDelay:.2];
     }
 
     [self toggleForwardBackwardMode: YES];
@@ -867,28 +865,28 @@ else \
 
 - (void)removeJumpButtons:(BOOL)b_fast
 {
-    if (!o_prev_btn || !o_next_btn)
+    if (!_previousButton || !_nextButton)
         return;
 
     if (b_fast) {
-        [o_prev_btn setHidden: YES];
-        [o_next_btn setHidden: YES];
+        [_previousButton setHidden: YES];
+        [_nextButton setHidden: YES];
     } else {
-        [[o_prev_btn animator] setHidden: YES];
-        [[o_next_btn animator] setHidden: YES];
+        [[_previousButton animator] setHidden: YES];
+        [[_nextButton animator] setHidden: YES];
     }
-    [o_prev_btn removeFromSuperviewWithoutNeedingDisplay];
-    [o_next_btn removeFromSuperviewWithoutNeedingDisplay];
-    o_prev_btn = nil;
-    o_next_btn = nil;
+    [_previousButton removeFromSuperviewWithoutNeedingDisplay];
+    [_nextButton removeFromSuperviewWithoutNeedingDisplay];
+    _previousButton = nil;
+    _nextButton = nil;
 
     NSRect frame;
-    frame = [o_bwd_btn frame];
+    frame = [self.backwardButton frame];
     frame.size.width++;
-    [o_bwd_btn setFrame:frame];
-    frame = [o_fwd_btn frame];
+    [self.backwardButton setFrame:frame];
+    frame = [self.forwardButton frame];
     frame.size.width++;
-    [o_fwd_btn setFrame:frame];
+    [self.forwardButton setFrame:frame];
 
 #define moveItem(item) \
 frame = [item frame]; \
@@ -899,35 +897,35 @@ else \
     [[item animator] setFrame: frame]
 
     float f_space = 29.;
-    moveItem(o_bwd_btn);
+    moveItem(self.backwardButton);
     f_space = 28.;
-    moveItem(o_play_btn);
-    moveItem(o_fwd_btn);
+    moveItem(self.playButton);
+    moveItem(self.forwardButton);
     f_space = 28. * 2;
-    moveItem(o_stop_btn);
-    moveItem(o_playlist_btn);
-    moveItem(o_repeat_btn);
-    moveItem(o_shuffle_btn);
+    moveItem(self.stopButton);
+    moveItem(self.playlistButton);
+    moveItem(self.repeatButton);
+    moveItem(self.shuffleButton);
 #undef moveItem
 
-    frame = [o_progress_view frame];
+    frame = [self.progressView frame];
     frame.size.width = frame.size.width + f_space;
     frame.origin.x = frame.origin.x - f_space;
     if (b_fast)
-        [o_progress_view setFrame: frame];
+        [self.progressView setFrame: frame];
     else
-        [[o_progress_view animator] setFrame: frame];
+        [[self.progressView animator] setFrame: frame];
 
     if (self.darkInterface) {
-        [[o_fwd_btn animator] setImage:imageFromRes(@"forward-3btns-dark")];
-        [[o_fwd_btn animator] setAlternateImage:imageFromRes(@"forward-3btns-dark-pressed")];
-        [[o_bwd_btn animator] setImage:imageFromRes(@"backward-3btns-dark")];
-        [[o_bwd_btn animator] setAlternateImage:imageFromRes(@"backward-3btns-dark-pressed")];
+        [[self.forwardButton animator] setImage:imageFromRes(@"forward-3btns-dark")];
+        [[self.forwardButton animator] setAlternateImage:imageFromRes(@"forward-3btns-dark-pressed")];
+        [[self.backwardButton animator] setImage:imageFromRes(@"backward-3btns-dark")];
+        [[self.backwardButton animator] setAlternateImage:imageFromRes(@"backward-3btns-dark-pressed")];
     } else {
-        [[o_fwd_btn animator] setImage:imageFromRes(@"forward-3btns")];
-        [[o_fwd_btn animator] setAlternateImage:imageFromRes(@"forward-3btns-pressed")];
-        [[o_bwd_btn animator] setImage:imageFromRes(@"backward-3btns")];
-        [[o_bwd_btn animator] setAlternateImage:imageFromRes(@"backward-3btns-pressed")];
+        [[self.forwardButton animator] setImage:imageFromRes(@"forward-3btns")];
+        [[self.forwardButton animator] setAlternateImage:imageFromRes(@"forward-3btns-pressed")];
+        [[self.backwardButton animator] setImage:imageFromRes(@"backward-3btns")];
+        [[self.backwardButton animator] setAlternateImage:imageFromRes(@"backward-3btns-pressed")];
     }
 
     [self toggleForwardBackwardMode: NO];
@@ -948,61 +946,61 @@ else \
 - (void)addPlaymodeButtons:(BOOL)b_fast
 {
     NSRect frame;
-    CGFloat f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
+    CGFloat f_space = [self.repeatButton frame].size.width + [self.shuffleButton frame].size.width - 6.;
 
     if (self.darkInterface) {
-        [[o_playlist_btn animator] setImage:imageFromRes(@"playlist_dark")];
-        [[o_playlist_btn animator] setAlternateImage:imageFromRes(@"playlist-pressed_dark")];
+        [[self.playlistButton animator] setImage:imageFromRes(@"playlist_dark")];
+        [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-pressed_dark")];
     } else {
-        [[o_playlist_btn animator] setImage:imageFromRes(@"playlist-btn")];
-        [[o_playlist_btn animator] setAlternateImage:imageFromRes(@"playlist-btn-pressed")];
+        [[self.playlistButton animator] setImage:imageFromRes(@"playlist-btn")];
+        [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-btn-pressed")];
     }
-    frame = [o_playlist_btn frame];
+    frame = [self.playlistButton frame];
     frame.size.width--;
-    [o_playlist_btn setFrame:frame];
+    [self.playlistButton setFrame:frame];
 
     if (b_fast) {
-        [o_repeat_btn setHidden: NO];
-        [o_shuffle_btn setHidden: NO];
+        [self.repeatButton setHidden: NO];
+        [self.shuffleButton setHidden: NO];
     } else {
-        [[o_repeat_btn animator] setHidden: NO];
-        [[o_shuffle_btn animator] setHidden: NO];
+        [[self.repeatButton animator] setHidden: NO];
+        [[self.shuffleButton animator] setHidden: NO];
     }
 
-    frame = [o_progress_view frame];
+    frame = [self.progressView frame];
     frame.size.width = frame.size.width - f_space;
     frame.origin.x = frame.origin.x + f_space;
     if (b_fast)
-        [o_progress_view setFrame: frame];
+        [self.progressView setFrame: frame];
     else
-        [[o_progress_view animator] setFrame: frame];
+        [[self.progressView animator] setFrame: frame];
 }
 
 - (void)removePlaymodeButtons:(BOOL)b_fast
 {
     NSRect frame;
-    CGFloat f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
-    [o_repeat_btn setHidden: YES];
-    [o_shuffle_btn setHidden: YES];
+    CGFloat f_space = [self.repeatButton frame].size.width + [self.shuffleButton frame].size.width - 6.;
+    [self.repeatButton setHidden: YES];
+    [self.shuffleButton setHidden: YES];
 
     if (self.darkInterface) {
-        [[o_playlist_btn animator] setImage:imageFromRes(@"playlist-1btn-dark")];
-        [[o_playlist_btn animator] setAlternateImage:imageFromRes(@"playlist-1btn-dark-pressed")];
+        [[self.playlistButton animator] setImage:imageFromRes(@"playlist-1btn-dark")];
+        [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-1btn-dark-pressed")];
     } else {
-        [[o_playlist_btn animator] setImage:imageFromRes(@"playlist-1btn")];
-        [[o_playlist_btn animator] setAlternateImage:imageFromRes(@"playlist-1btn-pressed")];
+        [[self.playlistButton animator] setImage:imageFromRes(@"playlist-1btn")];
+        [[self.playlistButton animator] setAlternateImage:imageFromRes(@"playlist-1btn-pressed")];
     }
-    frame = [o_playlist_btn frame];
+    frame = [self.playlistButton frame];
     frame.size.width++;
-    [o_playlist_btn setFrame:frame];
+    [self.playlistButton setFrame:frame];
 
-    frame = [o_progress_view frame];
+    frame = [self.progressView frame];
     frame.size.width = frame.size.width + f_space;
     frame.origin.x = frame.origin.x - f_space;
     if (b_fast)
-        [o_progress_view setFrame: frame];
+        [self.progressView setFrame: frame];
     else
-        [[o_progress_view animator] setFrame: frame];
+        [[self.progressView animator] setFrame: frame];
 }
 
 #pragma mark -
@@ -1026,20 +1024,20 @@ else \
 
 - (void)setRepeatOne
 {
-    [o_repeat_btn setImage: o_repeat_one_img];
-    [o_repeat_btn setAlternateImage: o_repeat_one_pressed_img];
+    [self.repeatButton setImage: _repeatOneImage];
+    [self.repeatButton setAlternateImage: _pressedRepeatOneImage];
 }
 
 - (void)setRepeatAll
 {
-    [o_repeat_btn setImage: o_repeat_all_img];
-    [o_repeat_btn setAlternateImage: o_repeat_all_pressed_img];
+    [self.repeatButton setImage: _repeatAllImage];
+    [self.repeatButton setAlternateImage: _pressedRepeatAllImage];
 }
 
 - (void)setRepeatOff
 {
-    [o_repeat_btn setImage: o_repeat_img];
-    [o_repeat_btn setAlternateImage: o_repeat_pressed_img];
+    [self.repeatButton setImage: _repeatImage];
+    [self.repeatButton setAlternateImage: _pressedRepeatImage];
 }
 
 - (IBAction)repeat:(id)sender
@@ -1074,11 +1072,11 @@ else \
     b_value = var_GetBool(p_playlist, "random");
 
     if (b_value) {
-        [o_shuffle_btn setImage: o_shuffle_on_img];
-        [o_shuffle_btn setAlternateImage: o_shuffle_on_pressed_img];
+        [self.shuffleButton setImage: _shuffleOnImage];
+        [self.shuffleButton setAlternateImage: _pressedShuffleOnImage];
     } else {
-        [o_shuffle_btn setImage: o_shuffle_img];
-        [o_shuffle_btn setAlternateImage: o_shuffle_pressed_img];
+        [self.shuffleButton setImage: _shuffleImage];
+        [self.shuffleButton setAlternateImage: _pressedShuffleImage];
     }
 }
 
@@ -1095,9 +1093,9 @@ else \
 
 - (IBAction)volumeAction:(id)sender
 {
-    if (sender == o_volume_sld)
+    if (sender == self.volumeSlider)
         [[VLCCoreInteraction sharedInstance] setVolume: [sender intValue]];
-    else if (sender == o_volume_down_btn)
+    else if (sender == self.volumeDownButton)
         [[VLCCoreInteraction sharedInstance] toggleMute];
     else
         [[VLCCoreInteraction sharedInstance] setVolume: AOUT_VOLUME_MAX];
@@ -1119,14 +1117,14 @@ else \
     if (b_muted)
         i_volume = 0;
 
-    [o_volume_sld setIntValue: i_volume];
+    [self.volumeSlider setIntValue: i_volume];
 
     i_volume = (i_volume * 200) / AOUT_VOLUME_MAX;
     NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), i_volume];
-    [o_volume_sld setToolTip:volumeTooltip];
+    [self.volumeSlider setToolTip:volumeTooltip];
 
-    [o_volume_sld setEnabled: !b_muted];
-    [o_volume_up_btn setEnabled: !b_muted];
+    [self.volumeSlider setEnabled: !b_muted];
+    [self.volumeUpButton setEnabled: !b_muted];
 }
 
 - (void)updateControls
@@ -1159,11 +1157,11 @@ else \
         vlc_object_release(p_input);
     }
 
-    [o_stop_btn setEnabled: b_input];
+    [self.stopButton setEnabled: b_input];
 
     if (b_show_jump_buttons) {
-        [o_prev_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
-        [o_next_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
+        [_previousButton setEnabled: (b_seekable || b_plmul || b_chapters)];
+        [_nextButton setEnabled: (b_seekable || b_plmul || b_chapters)];
     }
 
     [[[VLCMain sharedInstance] mainMenu] setRateControlsEnabled: b_control];

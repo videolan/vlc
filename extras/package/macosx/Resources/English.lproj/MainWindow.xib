@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10102" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10102"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -408,28 +408,28 @@
         </window>
         <customObject id="5339" customClass="VLCMainWindowControlsBar">
             <connections>
+                <outlet property="backwardButton" destination="3651" id="spd-Ox-yOI"/>
                 <outlet property="bottomBarView" destination="4756" id="5621"/>
-                <outlet property="o_bwd_btn" destination="3651" id="5340"/>
-                <outlet property="o_drop_view" destination="5608" id="5609"/>
-                <outlet property="o_effects_btn" destination="3654" id="5353"/>
-                <outlet property="o_fullscreen_btn" destination="4419" id="5355"/>
-                <outlet property="o_fwd_btn" destination="3648" id="5344"/>
-                <outlet property="o_play_btn" destination="3571" id="5342"/>
-                <outlet property="o_playlist_btn" destination="4671" id="5348"/>
-                <outlet property="o_progress_bar" destination="3584" id="5368"/>
-                <outlet property="o_progress_view" destination="5335" id="5366"/>
-                <outlet property="o_repeat_btn" destination="2789" id="5349"/>
-                <outlet property="o_resize_view" destination="4839" id="5364"/>
-                <outlet property="o_shuffle_btn" destination="2208" id="5351"/>
-                <outlet property="o_stop_btn" destination="3647" id="5346"/>
-                <outlet property="o_time_fld" destination="4423" id="5393"/>
-                <outlet property="o_time_sld" destination="4422" id="5369"/>
-                <outlet property="o_time_sld_background" destination="4919" id="5367"/>
-                <outlet property="o_time_sld_fancygradient_view" destination="4701" id="5371"/>
-                <outlet property="o_volume_down_btn" destination="3653" id="5360"/>
-                <outlet property="o_volume_sld" destination="3649" id="5357"/>
-                <outlet property="o_volume_track_view" destination="4417" id="5395"/>
-                <outlet property="o_volume_up_btn" destination="3652" id="5362"/>
+                <outlet property="dropView" destination="5608" id="zUe-aW-9EY"/>
+                <outlet property="effectsButton" destination="3654" id="VfE-Hs-5Ni"/>
+                <outlet property="forwardButton" destination="3648" id="0bA-YS-tkr"/>
+                <outlet property="fullscreenButton" destination="4419" id="hgS-Tk-jle"/>
+                <outlet property="playButton" destination="3571" id="5Mf-48-Ga9"/>
+                <outlet property="playlistButton" destination="4671" id="AZd-5b-MrA"/>
+                <outlet property="progressBar" destination="3584" id="d57-az-Grm"/>
+                <outlet property="progressView" destination="5335" id="dBT-U1-rmL"/>
+                <outlet property="repeatButton" destination="2789" id="lRj-JN-Yry"/>
+                <outlet property="resizeView" destination="4839" id="26r-ET-oqH"/>
+                <outlet property="shuffleButton" destination="2208" id="kf1-mU-75T"/>
+                <outlet property="stopButton" destination="3647" id="ddx-Gq-iPV"/>
+                <outlet property="timeField" destination="4423" id="Wvo-az-Lou"/>
+                <outlet property="timeSlider" destination="4422" id="I3H-rQ-4GH"/>
+                <outlet property="timeSliderBackgroundView" destination="4919" id="6gl-QT-tF7"/>
+                <outlet property="timeSliderGradientView" destination="4701" id="2CZ-VD-eHh"/>
+                <outlet property="volumeDownButton" destination="3653" id="brO-P5-sUM"/>
+                <outlet property="volumeSlider" destination="3649" id="NDW-el-poL"/>
+                <outlet property="volumeTrackImageView" destination="4417" id="xH3-Dg-2Ok"/>
+                <outlet property="volumeUpButton" destination="3652" id="vXR-KC-L2N"/>
             </connections>
         </customObject>
         <customView id="4850" customClass="VLCMainWindowTitleView">

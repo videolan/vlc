@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ControlsBar.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2014 VLC authors and VideoLAN
+ * Copyright (C) 2012-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -26,6 +26,7 @@
 #import "misc.h"
 
 @class VLCFSPanel;
+@class VLCResizeControl;
 
 /*****************************************************************************
  * VLCControlsBarCommon
@@ -35,25 +36,25 @@
  *****************************************************************************/
 
 @interface VLCControlsBarCommon : NSObject
-{
-    IBOutlet VLCDragDropView *o_drop_view;
 
-    IBOutlet id o_play_btn;
-    IBOutlet id o_bwd_btn;
-    IBOutlet id o_fwd_btn;
+@property (readwrite, strong) IBOutlet VLCDragDropView *dropView;
 
-    IBOutlet id o_progress_view;
-    IBOutlet id o_time_sld;
-    IBOutlet id o_time_sld_fancygradient_view;
-    IBOutlet id o_time_sld_background;
-    IBOutlet id o_progress_bar;
+@property (readwrite, strong) IBOutlet NSButton *playButton;
+@property (readwrite, strong) IBOutlet NSButton *backwardButton;
+@property (readwrite, strong) IBOutlet NSButton *forwardButton;
 
-    IBOutlet id o_time_fld;
-    IBOutlet id o_fullscreen_btn;
-    IBOutlet id o_resize_view;
-}
+@property (readwrite, strong) IBOutlet VLCProgressView *progressView;
+@property (readwrite, strong) IBOutlet TimeLineSlider *timeSlider;
+@property (readwrite, strong) IBOutlet VLCThreePartImageView *timeSliderGradientView;
+@property (readwrite, strong) IBOutlet VLCThreePartImageView *timeSliderBackgroundView;
+@property (readwrite, strong) IBOutlet NSProgressIndicator *progressBar;
 
-@property (readwrite, strong) IBOutlet id bottomBarView;
+@property (readwrite, strong) IBOutlet VLCTimeField *timeField;
+@property (readwrite, strong) IBOutlet NSButton *fullscreenButton;
+@property (readwrite, strong) IBOutlet VLCResizeControl *resizeView;
+
+@property (readwrite, strong) IBOutlet VLCThreePartImageView *bottomBarView;
+
 @property (readonly) BOOL darkInterface;
 @property (readonly) BOOL nativeFullscreenMode;
 
@@ -84,20 +85,19 @@
  *****************************************************************************/
 
 @interface VLCMainWindowControlsBar : VLCControlsBarCommon
-{
-    IBOutlet id o_stop_btn;
 
-    IBOutlet id o_playlist_btn;
-    IBOutlet id o_repeat_btn;
-    IBOutlet id o_shuffle_btn;
+@property (readwrite, strong) IBOutlet NSButton *stopButton;
 
-    IBOutlet VLCVolumeSliderCommon * o_volume_sld;
-    IBOutlet id o_volume_track_view;
-    IBOutlet id o_volume_down_btn;
-    IBOutlet id o_volume_up_btn;
+@property (readwrite, strong) IBOutlet NSButton *playlistButton;
+@property (readwrite, strong) IBOutlet NSButton *repeatButton;
+@property (readwrite, strong) IBOutlet NSButton *shuffleButton;
 
-    IBOutlet id o_effects_btn;
-}
+@property (readwrite, strong) IBOutlet VLCVolumeSliderCommon * volumeSlider;
+@property (readwrite, strong) IBOutlet NSImageView *volumeTrackImageView;
+@property (readwrite, strong) IBOutlet NSButton *volumeDownButton;
+@property (readwrite, strong) IBOutlet NSButton *volumeUpButton;
+
+@property (readwrite, strong) IBOutlet NSButton *effectsButton;
 
 - (IBAction)stop:(id)sender;
 
