@@ -733,11 +733,6 @@ static int Demux( demux_t *p_demux)
         return 0;
     }
 
-    if( simpleblock != NULL )
-        p_sys->i_pts = (mtime_t)simpleblock->GlobalTimecode() / INT64_C(1000);
-    else
-        p_sys->i_pts = (mtime_t)block->GlobalTimecode() / INT64_C(1000);
-    p_sys->i_pts += p_sys->i_mk_chapter_time + VLC_TS_0;
 
 
 
@@ -773,6 +768,14 @@ static int Demux( demux_t *p_demux)
 
             p_sys->i_pcr = i_pcr;
         }
+    }
+
+    /* set pts */
+    {
+        p_sys->i_pts = p_sys->i_mk_chapter_time + VLC_TS_0;
+
+        if( simpleblock != NULL ) p_sys->i_pts += simpleblock->GlobalTimecode() / INT64_C( 1000 );
+        else                      p_sys->i_pts +=       block->GlobalTimecode() / INT64_C( 1000 );
     }
 
     if ( p_vsegment->CurrentEdition() &&
