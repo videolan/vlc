@@ -138,11 +138,11 @@ public:
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
 
 
-    bool Select( mtime_t i_mk_start_time );
-    void UnSelect();
 
     int FindTrackByBlock(tracks_map_t::iterator* track_it, const KaxBlock *, const KaxSimpleBlock * );
 
+    bool ESCreate( );
+    void ESDestroy( );
 
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
 

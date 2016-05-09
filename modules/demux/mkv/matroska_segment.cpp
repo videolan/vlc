@@ -926,7 +926,7 @@ void matroska_segment_c::EnsureDuration()
     es.I_O().setFilePointer( i_current_position, seek_beginning );
 }
 
-bool matroska_segment_c::Select( mtime_t i_mk_start_time )
+bool matroska_segment_c::ESCreate()
 {
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", static_cast<int>( tracks.size() ) );
@@ -960,7 +960,7 @@ bool matroska_segment_c::Select( mtime_t i_mk_start_time )
     return true;
 }
 
-void matroska_segment_c::UnSelect( )
+void matroska_segment_c::ESDestroy( )
 {
     sys.p_ev->ResetPci();
 

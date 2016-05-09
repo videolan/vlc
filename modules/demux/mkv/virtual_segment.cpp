@@ -534,7 +534,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date, virtual_chap
             if ( p_current_vchapter )
             {
                 KeepTrackSelection( p_current_vchapter->segment, p_vchapter->segment );
-                p_current_vchapter->segment.UnSelect();
+                p_current_vchapter->segment.ESDestroy();
             }
             msg_Dbg( &demuxer, "SWITCH CHAPTER uid=%" PRId64, p_vchapter->p_chapter ? p_vchapter->p_chapter->i_uid : 0 );
             p_current_vchapter = p_vchapter;

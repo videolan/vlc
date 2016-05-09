@@ -781,9 +781,10 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_m
     if ( p_current_vsegment != &new_vsegment )
     {
         if ( p_current_vsegment->CurrentSegment() != NULL )
-            p_current_vsegment->CurrentSegment()->UnSelect();
+            p_current_vsegment->CurrentSegment()->ESDestroy();
 
         p_current_vsegment = &new_vsegment;
+        p_current_vsegment->CurrentSegment()->ESCreate();
         i_current_title = p_current_vsegment->i_sys_title;
     }
     if( !p_current_vsegment->CurrentSegment() )
@@ -795,7 +796,7 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_m
 
     /* add information */
     p_current_vsegment->CurrentSegment()->InformationCreate( );
-    p_current_vsegment->CurrentSegment()->Select( i_mk_date );
+    p_current_vsegment->CurrentSegment()->ESCreate( );
 
     /* Seek to the beginning */
     p_current_vsegment->Seek(p_current_vsegment->CurrentSegment()->sys.demuxer,

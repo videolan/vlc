@@ -282,7 +282,7 @@ static void Close( vlc_object_t *p_this )
     {
         matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
         if( p_segment )
-            p_segment->UnSelect();
+            p_segment->ESDestroy();
     }
 
     delete p_sys;
