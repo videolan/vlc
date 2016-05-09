@@ -183,6 +183,16 @@ WId VideoWidget::request( struct vout_window_t *p_wnd, unsigned int *pi_width,
    Parent has to care about resizing itself */
 void VideoWidget::setSize( unsigned int w, unsigned int h )
 {
+    /* If the size changed, resizeEvent will be called, otherwise not,
+     * in which case we need to tell the vout what the size actually is
+     */
+    if( (unsigned)size().width() == w && (unsigned)size().height() == h )
+    {
+        if( p_window != NULL )
+            vout_window_ReportSize( p_window, w, h );
+        return;
+    }
+
     resize( w, h );
     emit sizeChanged( w, h );
     /* Work-around a bug?misconception? that would happen when vout core resize

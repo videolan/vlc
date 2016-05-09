@@ -215,11 +215,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     {
         if( b_autoresize )
         {
-            CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
-                     this, setVideoSize( unsigned int, unsigned int ) );
             CONNECT( videoWidget, sizeChanged( int, int ),
                      this, videoSizeChanged( int,  int ) );
         }
+        CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
+                 this, setVideoSize( unsigned int, unsigned int ) );
+
         CONNECT( this, askVideoSetFullScreen( bool ),
                  this, setVideoFullScreen( bool ) );
     }
@@ -777,8 +778,17 @@ void MainInterface::releaseVideoSlot( void )
 
 void MainInterface::setVideoSize( unsigned int w, unsigned int h )
 {
-    if( !isFullScreen() && !isMaximized() )
-        videoWidget->setSize( w, h );
+    if (!isFullScreen() && !isMaximized() )
+    {
+        /* Resize video widget to video size, or keep it at the same
+         * size. Call setSize() either way so that vout_window_ReportSize
+         * will always get called.
+         */
+        if (b_autoresize)
+            videoWidget->setSize( w, h );
+        else
+            videoWidget->setSize( videoWidget->width(), videoWidget->height() );
+    }
 }
 
 void MainInterface::videoSizeChanged( int w, int h )
