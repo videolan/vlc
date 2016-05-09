@@ -1193,20 +1193,18 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
 
 void matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_time, ScopeMode read_fully )
 {
-    EbmlElement *el;
-    EbmlMaster  *m;
-    int i_upper_level = 0;
-
-    /* Master elements */
-    m = static_cast<EbmlMaster *>( cluster );
-    if( unlikely( m->IsFiniteSize() && m->GetSize() >= SIZE_MAX ) )
+    if( unlikely( cluster->IsFiniteSize() && cluster->GetSize() >= SIZE_MAX ) )
     {
         msg_Err( &sys.demuxer, "Cluster too big, aborting" );
         return;
     }
+
     try
     {
-        m->Read( es, EBML_CONTEXT(cluster), i_upper_level, el, true, read_fully );
+        EbmlElement *el;
+        int i_upper_level = 0;
+
+        cluster->Read( es, EBML_CONTEXT(cluster), i_upper_level, el, true, read_fully );
     }
     catch(...)
     {
@@ -1214,21 +1212,18 @@ void matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
         return;
     }
 
-    for( unsigned int i = 0; i < m->ListSize(); i++ )
+    for( unsigned int i = 0; i < cluster->ListSize(); ++i )
     {
-        EbmlElement *l = (*m)[i];
-
-        if( MKV_IS_ID( l, KaxClusterTimecode ) )
+        if( MKV_CHECKED_PTR_DECL( p_ctc, KaxClusterTimecode, (*cluster)[i] ) )
         {
-            KaxClusterTimecode &ctc = *static_cast<KaxClusterTimecode*>( l );
-
-            cluster->InitTimecode( static_cast<uint64>( ctc ), i_timescale );
+            cluster->InitTimecode( static_cast<uint64>( *p_ctc ), i_timescale );
+            _seeker.add_cluster( cluster );
             break;
         }
     }
 
     if( b_update_start_time )
-        i_mk_start_time = cluster->GlobalTimecode() / 1000;
+        i_mk_start_time = cluster->GlobalTimecode() / INT64_C( 1000 );
 }
 
 
