@@ -26,8 +26,12 @@
 #define VLC_MKV_MATROSKA_SEGMENT_HPP_
 
 #include "mkv.hpp"
+#include "matroska_segment_seeker.hpp"
 #include <vector>
 #include <string>
+
+#include <map>
+#include <set>
 
 class EbmlParser;
 
@@ -165,6 +169,10 @@ private:
     int32_t TrackInit( mkv_track_t * p_tk );
     void ComputeTrackPriority();
     void EnsureDuration();
+
+    SegmentSeeker _seeker;
+
+    friend SegmentSeeker;
 };
 
 

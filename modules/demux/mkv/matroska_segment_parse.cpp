@@ -144,7 +144,11 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 
             if( i_pos >= 0 )
             {
-                if( id == EBML_ID(KaxCues) )
+                if( id == EBML_ID(KaxCluster) )
+                {
+                    _seeker.add_cluster_position( i_pos );
+                }
+                else if( id == EBML_ID(KaxCues) )
                 {
                     msg_Dbg( &sys.demuxer, "|   - cues at %" PRId64, i_pos );
                     LoadSeekHeadItem( EBML_INFO(KaxCues), i_pos );

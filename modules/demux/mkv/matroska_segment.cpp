@@ -218,7 +218,15 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 
                 if( tracks.find( track_id ) != tracks.end() )
                 {
-                   // TODO: handle addition of seekpoint
+                    for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
+                    {
+                        int const tlevel = SegmentSeeker::Seekpoint::QUESTIONABLE; // TODO: var_inheritBool( ..., "mkv-trust-cues" ) => TRUSTED;
+                        int const qlevel = SegmentSeeker::Seekpoint::QUESTIONABLE;
+
+                        int level = ( track_id == it->first ? tlevel : qlevel );
+
+                        _seeker.add_seekpoint( it->first, level, cue_position, cue_mk_time );
+                    }
                 }
                 else
                     msg_Warn( &sys.demuxer, "Found cue with invalid track id = %u", track_id );
@@ -466,7 +474,7 @@ void matroska_segment_c::InformationCreate( )
 
 void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
 {
-
+    _seeker.add_cluster( cluster );
 }
 
 bool matroska_segment_c::PreloadClusters(uint64 i_cluster_pos)
@@ -630,6 +638,17 @@ bool matroska_segment_c::Preload( )
             i_cluster_pos = cluster->GetElementPosition();
             ParseCluster( cluster );
             IndexAppendCluster( cluster );
+
+            // add first cluster as trusted seekpoint for all tracks
+            for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
+            {
+                _seeker.add_seekpoint(
+                  it->first,
+                  SegmentSeeker::Seekpoint::TRUSTED,
+                  cluster->GetElementPosition(),
+                  cluster->GlobalTimecode() / 1000
+                );
+            }
 
             ep->Down();
             /* stop pre-parsing the stream */
@@ -875,7 +894,9 @@ void matroska_segment_c::EnsureDuration()
     uint64 i_last_cluster_pos = 0;
 
     // find the last Cluster from the Cues
+    if ( b_cues && _seeker._cluster_positions.size() )
     {
+        i_last_cluster_pos = *_seeker._cluster_positions.rbegin();
     }
 
     // find the last Cluster manually
@@ -1061,26 +1082,29 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         {
             ktimecode.ReadData( vars.obj->es.I_O(), SCOPE_ALL_DATA );
             vars.obj->cluster->InitTimecode( static_cast<uint64>( ktimecode ), vars.obj->i_timescale );
+            vars.obj->IndexAppendCluster( vars.obj->cluster );
         }
-
         E_CASE( KaxClusterSilentTracks, ksilent )
         {
             vars.obj->ep->Down ();
 
             VLC_UNUSED( ksilent );
         }
-
         E_CASE( KaxBlockGroup, kbgroup )
         {
             vars.obj->i_block_pos = kbgroup.GetElementPosition();
             vars.obj->ep->Down ();
         }
-
         E_CASE( KaxSimpleBlock, ksblock )
         {
             vars.simpleblock = &ksblock;
             vars.simpleblock->ReadData( vars.obj->es.I_O() );
             vars.simpleblock->SetParent( *vars.obj->cluster );
+
+            if( ksblock.IsKeyframe() )
+            {
+                vars.obj->_seeker.add_seekpoint( ksblock.TrackNum(), SegmentSeeker::Seekpoint::TRUSTED, ksblock.GetElementPosition(), ksblock.GlobalTimecode() / 1000 );
+            }
         }
     };
 
