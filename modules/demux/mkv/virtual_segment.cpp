@@ -508,7 +508,8 @@ bool virtual_chapter_c::EnterAndLeave( virtual_chapter_c *p_leaving_vchapter, bo
     return p_chapter->EnterAndLeave( p_leaving_vchapter->p_chapter, b_enter );
 }
 
-void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date, virtual_chapter_c *p_vchapter )
+void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
+                              virtual_chapter_c *p_vchapter, bool b_precise )
 {
     demux_sys_t *p_sys = demuxer.p_sys;
 

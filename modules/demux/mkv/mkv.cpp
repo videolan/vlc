@@ -87,7 +87,7 @@ struct demux_sys_t;
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
-static void Seek   ( demux_t *, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter );
+static void Seek   ( demux_t *, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise = true );
 
 /*****************************************************************************
  * Open: initializes matroska demux structures
@@ -298,6 +298,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     double      *pf, f;
     int         i_skp;
     size_t      i_idx;
+    bool            b;
 
     vlc_meta_t *p_meta;
     input_attachment_t ***ppp_attach;
@@ -357,7 +358,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->f_duration > 0.0 )
             {
                 f = va_arg( args, double );
-                Seek( p_demux, -1, f, NULL );
+                b = va_arg( args, int ); /* precise? */
+                Seek( p_demux, -1, f, NULL, b );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -436,8 +438,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = va_arg( args, int64_t );
+            b = va_arg( args, int ); /* precise? */
             msg_Dbg(p_demux,"SET_TIME to %" PRId64, i64 );
-            Seek( p_demux, i64, -1, NULL );
+            Seek( p_demux, i64, -1, NULL, b );
             return VLC_SUCCESS;
         default:
             return VLC_EGENERIC;
@@ -445,7 +448,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 }
 
 /* Seek */
-static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter )
+static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
@@ -480,7 +483,7 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
     {
         i_mk_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
     }
-    p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter );
+    p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter, b_precise );
 }
 
 /* Needed by matroska_segment::Seek() and Seek */
