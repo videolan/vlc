@@ -224,11 +224,6 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->i_data_init            = 0;
     tk->p_data_init            = NULL;
 
-    tk->psz_codec_name         = NULL;
-    tk->psz_codec_settings     = NULL;
-    tk->psz_codec_info_url     = NULL;
-    tk->psz_codec_download_url = NULL;
-
     tk->i_compression_type     = MATROSKA_COMPRESSION_NONE;
     tk->i_encoding_scope       = MATROSKA_ENCODING_SCOPE_ALL_FRAMES;
     tk->p_compression_data     = NULL;
@@ -378,8 +373,8 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         }
         E_CASE( KaxCodecName, cname )
         {
-            vars.tk->psz_codec_name = ToUTF8( UTFstring( cname ) );
-            debug( vars, "Track Codec Name=%s", vars.tk->psz_codec_name ) ;
+            vars.tk->str_codec_name = static_cast<UTFstring const&>( cname ).GetUTF8();
+            debug( vars, "Track Codec Name=%s", vars.tk->str_codec_name.c_str() ) ;
         }
         //AttachmentLink
         E_CASE( KaxCodecDecodeAll, cdall ) // UNUSED

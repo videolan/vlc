@@ -178,62 +178,59 @@ public:
     virtual int32_t Init() { return 0; }
 };
 
-struct mkv_track_t
+class mkv_track_t
 {
-    bool         b_default;
-    bool         b_enabled;
-    bool         b_forced;
-    unsigned int i_number;
+    public:
+        typedef unsigned int track_id_t;
 
-    unsigned int i_extra_data;
-    uint8_t      *p_extra_data;
+        bool         b_default;
+        bool         b_enabled;
+        bool         b_forced;
+        track_id_t   i_number;
 
-    char         *psz_codec;
-    bool         b_dts_only;
-    bool         b_pts_only;
+        unsigned int i_extra_data;
+        uint8_t      *p_extra_data;
 
-    bool         b_no_duration;
-    uint64_t     i_default_duration;
-    float        f_timecodescale;
-    mtime_t      i_last_dts;
+        char         *psz_codec;
+        bool         b_dts_only;
+        bool         b_pts_only;
 
-    /* video */
-    es_format_t fmt;
-    float       f_fps;
-    es_out_id_t *p_es;
+        bool         b_no_duration;
+        uint64_t     i_default_duration;
+        float        f_timecodescale;
+        mtime_t      i_last_dts;
+        uint64_t     i_skip_until_fpos;
 
-    /* audio */
-    unsigned int i_original_rate;
-    uint8_t i_chans_to_reorder;            /* do we need channel reordering */
-    uint8_t pi_chan_table[AOUT_CHAN_MAX];
+        /* video */
+        es_format_t fmt;
+        float       f_fps;
+        es_out_id_t *p_es;
+
+        /* audio */
+        unsigned int i_original_rate;
+        uint8_t i_chans_to_reorder;            /* do we need channel reordering */
+        uint8_t pi_chan_table[AOUT_CHAN_MAX];
 
 
-    /* Private track paramters */
-    PrivateTrackData *p_sys;
+        /* Private track paramters */
+        PrivateTrackData *p_sys;
 
-    bool            b_inited;
-    /* data to be send first */
-    int             i_data_init;
-    uint8_t         *p_data_init;
+        bool            b_inited;
+        /* data to be send first */
+        int             i_data_init;
+        uint8_t         *p_data_init;
 
-    /* hack : it's for seek */
-    bool            b_search_keyframe;
+        /* informative */
+        std::string str_codec_name;
 
-    /* informative */
-    const char   *psz_codec_name;
-    const char   *psz_codec_settings;
-    const char   *psz_codec_info_url;
-    const char   *psz_codec_download_url;
+        /* encryption/compression */
+        int                    i_compression_type;
+        uint32_t               i_encoding_scope;
+        KaxContentCompSettings *p_compression_data;
 
-    /* encryption/compression */
-    int                    i_compression_type;
-    uint32_t               i_encoding_scope;
-    KaxContentCompSettings *p_compression_data;
-
-    /* Matroska 4 new elements used by Opus */
-    mtime_t i_seek_preroll;
-    mtime_t i_codec_delay;
-
+        /* Matroska 4 new elements used by Opus */
+        mtime_t i_seek_preroll;
+        mtime_t i_codec_delay;
 };
 
 struct mkv_index_t
