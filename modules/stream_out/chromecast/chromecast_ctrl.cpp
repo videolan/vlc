@@ -142,8 +142,6 @@ intf_sys_t::~intf_sys_t()
 
     vlc_join(chromecastThread, NULL);
 
-    disconnectChromecast();
-
     vlc_interrupt_destroy( p_ctl_thread_interrupt );
 
     vlc_cond_destroy(&loadCommandCond);
@@ -831,9 +829,8 @@ void* intf_sys_t::ChromecastThread(void* p_data)
     if (p_sys->i_sock_fd < 0)
     {
         msg_Err( p_sys->p_module, "Could not connect the Chromecast" );
-        vlc_mutex_lock(&p_sys->lock);
+        vlc_mutex_locker locker(&p_sys->lock);
         p_sys->setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
-        vlc_mutex_unlock(&p_sys->lock);
         return NULL;
     }
 
@@ -841,9 +838,8 @@ void* intf_sys_t::ChromecastThread(void* p_data)
     if (net_GetSockAddress(p_sys->i_sock_fd, psz_localIP, NULL))
     {
         msg_Err( p_sys->p_module, "Cannot get local IP address" );
-        vlc_mutex_lock(&p_sys->lock);
-        p_sys->setConnectionStatus(CHROMECAST_CONNECTION_DEAD);
-        vlc_mutex_unlock(&p_sys->lock);
+        vlc_mutex_locker locker(&p_sys->lock);
+        p_sys->disconnectChromecast();
         return NULL;
     }
 
@@ -857,6 +853,8 @@ void* intf_sys_t::ChromecastThread(void* p_data)
     p_sys->msgAuth();
 
     while ( !vlc_killed() && p_sys->handleMessages() );
+
+    p_sys->disconnectChromecast();
 
     return NULL;
 }
