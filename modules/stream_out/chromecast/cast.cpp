@@ -374,6 +374,9 @@ static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     if ( id == NULL )
         return;
 
+    /* a seek on the Chromecast flushes its buffers */
+    p_sys->p_intf->requestPlayerSeek();
+
     sout_StreamFlush( p_sys->p_out, id );
 }
 

@@ -52,6 +52,8 @@
 #define PONG_WAIT_TIME 500
 #define PONG_WAIT_RETRIES 2
 
+static const mtime_t SEEK_FORWARD_OFFSET = 1000000;
+
 #define CONTROL_CFG_PREFIX "chromecast-"
 
 static const std::string NAMESPACE_DEVICEAUTH       = "urn:x-cast:com.google.cast.tp.deviceauth";
@@ -101,6 +103,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , p_creds(NULL)
  , p_tls(NULL)
  , requested_stop(false)
+ , requested_seek(false)
  , conn_status(CHROMECAST_DISCONNECTED)
  , cmd_status(NO_CMD_PENDING)
  , i_receiver_requestId(0)
@@ -877,6 +880,21 @@ bool intf_sys_t::handleMessages()
         msgPlayerStop();
     }
 
+    if ( requested_seek.exchange(false) && !mediaSessionId.empty() )
+    {
+        char current_time[32];
+        mtime_t m_seek_request_time = mdate() + SEEK_FORWARD_OFFSET;
+        if( snprintf( current_time, sizeof(current_time), "%.3f", double( m_seek_request_time ) / 1000000.0 ) >= (int)sizeof(current_time) )
+        {
+            msg_Err( p_module, "snprintf() truncated string for mediaSessionId" );
+            current_time[sizeof(current_time) - 1] = '\0';
+        }
+        vlc_mutex_locker locker(&lock);
+        setPlayerStatus(CMD_SEEK_SENT);
+        /* send a fake time to seek to, to make sure the device flushes its buffers */
+        msgPlayerSeek( current_time );
+    }
+
     int i_ret = recvPacket( b_msgReceived, i_payloadSize,
                             &i_received, p_packet, &b_pingTimeout,
                             &i_waitdelay, &i_retries);
@@ -918,5 +936,11 @@ void intf_sys_t::notifySendRequest()
 void intf_sys_t::requestPlayerStop()
 {
     requested_stop = true;
+    notifySendRequest();
+}
+
+void intf_sys_t::requestPlayerSeek()
+{
+    requested_seek = true;
     notifySendRequest();
 }
