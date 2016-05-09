@@ -76,6 +76,10 @@ vlc_module_begin ()
             N_("Dummy Elements"),
             N_("Read and discard unknown EBML elements (not good for broken files)."), true );
 
+    add_bool( "mkv-preload-clusters", false,
+            N_("Preload clusters"),
+            N_("Find all cluster positions by jumping cluster-to-cluster before playback"), true );
+
     add_shortcut( "mka", "mkv" )
 vlc_module_end ()
 

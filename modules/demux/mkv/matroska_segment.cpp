@@ -470,6 +470,46 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     indexes.push_back (mkv_index_t ());
 }
 
+bool matroska_segment_c::PreloadClusters(uint64 i_cluster_pos)
+{
+    struct ClusterHandlerPayload
+    {
+        matroska_segment_c * const obj;
+        bool stop_parsing;
+
+    } payload = { this, false };
+
+    MKV_SWITCH_CREATE(EbmlTypeDispatcher, ClusterHandler, ClusterHandlerPayload )
+    {
+        MKV_SWITCH_INIT();
+
+        E_CASE( KaxCluster, kcluster )
+        {
+            vars.obj->ParseCluster( &kcluster, false );
+            vars.obj->IndexAppendCluster( &kcluster );
+        }
+
+        E_CASE_DEFAULT( el )
+        {
+            VLC_UNUSED( el );
+            vars.stop_parsing = true;
+        }
+    };
+
+    {
+        es.I_O().setFilePointer( i_cluster_pos );
+
+        while (payload.stop_parsing == false)
+        {
+            EbmlParser parser ( &es, segment, &sys.demuxer, var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
+
+            ClusterHandler::Dispatcher().send( parser.Get(), ClusterHandler::Payload( payload ) );
+        }
+    }
+
+    return true;
+}
+
 bool matroska_segment_c::PreloadFamily( const matroska_segment_c & of_segment )
 {
     if ( b_preloaded )
@@ -579,6 +619,11 @@ bool matroska_segment_c::Preload( )
         }
         else if( MKV_CHECKED_PTR_DECL ( kc_ptr, KaxCluster, el ) )
         {
+            if( var_InheritBool( &sys.demuxer, "mkv-preload-clusters" ) )
+            {
+                PreloadClusters        ( kc_ptr->GetElementPosition() );
+                es.I_O().setFilePointer( kc_ptr->GetElementPosition() );
+            }
             msg_Dbg( &sys.demuxer, "|   + Cluster" );
 
             cluster = kc_ptr;
