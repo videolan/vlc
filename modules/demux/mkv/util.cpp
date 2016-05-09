@@ -44,7 +44,7 @@ int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t * tk )
     d_stream.opaque = Z_NULL;
     if( inflateInit( &d_stream ) != Z_OK )
     {
-        msg_Err( p_demux, "Couldn't initiate inflation ignore track %d",
+        msg_Err( p_demux, "Couldn't initiate inflation ignore track %u",
                  tk->i_number );
         free(tk->p_extra_data);
         delete tk;
@@ -59,7 +59,7 @@ int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t * tk )
         void *alloc = realloc(p_new_extra, n*1024);
         if( alloc == NULL )
         {
-            msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %d",
+            msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %u",
                       tk->i_number );
             free(p_new_extra);
             inflateEnd( &d_stream );
@@ -90,7 +90,7 @@ int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t * tk )
     p_new_extra = static_cast<uint8_t *>( realloc(p_new_extra, tk->i_extra_data) );
     if( !p_new_extra )
     {
-        msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %d",
+        msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %u",
                  tk->i_number );
         inflateEnd( &d_stream );
         free(p_new_extra);
@@ -188,7 +188,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
 
         if ( !( p_blk->i_flags & BLOCK_FLAG_TYPE_I) )
         {
-            msg_Dbg( p_demux, "discard non-key preroll block in track %d at%" PRId64,
+            msg_Dbg( p_demux, "discard non-key preroll block in track %u at %" PRId64,
                      p_tk->i_number, i_pts );
             return;
         }

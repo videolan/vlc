@@ -649,7 +649,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 #endif
         if( TrackInit( &track ) )
         {
-            msg_Err(&sys.demuxer, "Couldn't init track %d", track.i_number );
+            msg_Err(&sys.demuxer, "Couldn't init track %u", track.i_number );
             free(track.p_extra_data);
             return;
         }
@@ -658,7 +658,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     }
     else
     {
-        msg_Err( &sys.demuxer, "Track Entry %d not supported", track.i_number );
+        msg_Err( &sys.demuxer, "Track Entry %u not supported", track.i_number );
         free(track.p_extra_data);
     }
 }
