@@ -443,7 +443,6 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
-    int64_t            i_global_position = -1;
 
     if( f_percent < 0 ) msg_Dbg( p_demux, "seek request to i_pos = %" PRId64, i_mk_date );
     else                msg_Dbg( p_demux, "seek request to %.2f%%", f_percent * 100 );
@@ -496,12 +495,11 @@ static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual
                 if( it->i_position < i_pos )
                 {
                     msg_Dbg( p_demux, "no cues, seek request to global pos: %" PRId64, i_pos );
-                    i_global_position = i_pos;
                 }
             }
         }
     }
-    p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter, i_global_position );
+    p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter );
 }
 
 /* Needed by matroska_segment::Seek() and Seek */

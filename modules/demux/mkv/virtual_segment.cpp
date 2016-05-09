@@ -458,7 +458,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                     {
                         /* Forcing reset pcr */
                         es_out_Control( demux.out, ES_OUT_RESET_PCR);
-                        Seek( demux, p_cur_vchapter->i_mk_virtual_start_time, p_cur_vchapter, -1 );
+                        Seek( demux, p_cur_vchapter->i_mk_virtual_start_time, p_cur_vchapter );
                         return true;
                     }
                     sys.i_start_pts = p_cur_vchapter->i_mk_virtual_start_time + VLC_TS_0;
@@ -508,8 +508,7 @@ bool virtual_chapter_c::EnterAndLeave( virtual_chapter_c *p_leaving_vchapter, bo
     return p_chapter->EnterAndLeave( p_leaving_vchapter->p_chapter, b_enter );
 }
 
-void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
-                              virtual_chapter_c *p_vchapter, int64_t i_global_position )
+void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date, virtual_chapter_c *p_vchapter )
 {
     demux_sys_t *p_sys = demuxer.p_sys;
 
@@ -544,7 +543,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
         else
         {
             p_current_vchapter = p_vchapter;
-            p_current_vchapter->segment.Seek( i_mk_date, i_mk_time_offset, i_global_position );
+            p_current_vchapter->segment.Seek( i_mk_date, i_mk_time_offset );
         }
     }
 }

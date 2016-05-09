@@ -160,8 +160,7 @@ public:
     virtual_chapter_c * FindChapter( int64_t i_find_uid );
 
     bool UpdateCurrentToChapter( demux_t & demux );
-    void Seek( demux_t & demuxer, mtime_t i_mk_date,
-               virtual_chapter_c *p_vchapter, int64_t i_global_position );
+    void Seek( demux_t & demuxer, mtime_t i_mk_date, virtual_chapter_c *p_vchapter );
 private:
     void KeepTrackSelection( matroska_segment_c & old, matroska_segment_c & next );
 };

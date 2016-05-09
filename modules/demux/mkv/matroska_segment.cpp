@@ -756,7 +756,7 @@ struct spoint
     int64_t i_cluster_pos;
 };
 
-void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int64_t i_global_position )
+void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
 {
     KaxBlock    *block;
     KaxSimpleBlock *simpleblock;
@@ -770,41 +770,6 @@ void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int6
 
     for( size_t i = 0; i < tracks.size(); i++)
         tracks[i]->i_last_dts = VLC_TS_INVALID;
-
-    if( i_global_position >= 0 )
-    {
-        /* Special case for seeking in files with no cues */
-        EbmlElement *el = NULL;
-
-        /* Start from the last known index instead of the beginning eachtime */
-        if(index_idx() == 0)
-            es.I_O().setFilePointer( i_start_pos, seek_beginning );
-        else
-            es.I_O().setFilePointer( prev_index().i_position,
-                                     seek_beginning );
-
-        ep->reconstruct( &es, segment, &sys.demuxer );
-        cluster = NULL;
-
-        while( ( el = ep->Get() ) != NULL )
-        {
-            if( MKV_CHECKED_PTR_DECL ( kc_ptr, KaxCluster, el ) )
-            {
-                cluster = kc_ptr;
-                i_cluster_pos = cluster->GetElementPosition();
-                if( index_idx() == 0 ||
-                    ( prev_index().i_position < (int64_t)cluster->GetElementPosition() ) )
-                {
-                    ParseCluster( cluster, false, SCOPE_NO_DATA );
-                    IndexAppendCluster( cluster );
-                }
-                if( es.I_O().getFilePointer() >= static_cast<unsigned>( i_global_position ) )
-                    break;
-            }
-        }
-
-        std::sort( indexes_begin(), indexes_end() );
-    }
 
     /* Don't try complex seek if we seek to 0 */
     if( i_mk_date == 0 && i_mk_time_offset == 0 )

@@ -726,7 +726,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         else
         {
             if ( !p_vchapter->EnterAndLeave( sys.p_current_vsegment->CurrentChapter() ) )
-                p_vsegment->Seek( sys.demuxer, p_vchapter->i_mk_virtual_start_time, p_vchapter, -1 );
+                p_vsegment->Seek( sys.demuxer, p_vchapter->i_mk_virtual_start_time, p_vchapter );
             b_result = true;
         }
     }
