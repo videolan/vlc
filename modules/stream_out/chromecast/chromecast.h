@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_tls.h>
+#include <vlc_interrupt.h>
 
 #include <sstream>
 
@@ -77,7 +78,7 @@ enum receiver_state {
  *****************************************************************************/
 struct intf_sys_t
 {
-    intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr, int device_port = 0);
+    intf_sys_t(vlc_object_t * const p_this, int local_port, std::string device_addr, int device_port, vlc_interrupt_t *);
     ~intf_sys_t();
 
     bool isFinishedPlaying() {
@@ -145,6 +146,8 @@ private:
 
     void processMessage(const castchannel::CastMessage &msg);
 
+    void notifySendRequest();
+
     int sendMessage(const castchannel::CastMessage &msg);
 
     void buildMessage(const std::string & namespace_,
@@ -170,6 +173,11 @@ private:
 
     bool           has_input;
     static void* ChromecastThread(void* p_data);
+    vlc_interrupt_t *p_ctl_thread_interrupt;
+
+    int recvPacket(bool &b_msgReceived, uint32_t &i_payloadSize,
+                   unsigned *pi_received, uint8_t *p_data, bool *pb_pingTimeout,
+                   int *pi_wait_delay, int *pi_wait_retries);
 };
 
 #endif /* VLC_CHROMECAST_H */

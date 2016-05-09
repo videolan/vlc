@@ -410,6 +410,10 @@ static int Open(vlc_object_t *p_this)
     int i_device_port;
     std::stringstream ss;
 
+    vlc_interrupt_t *p_interrupt = vlc_interrupt_create();
+    if (unlikely(p_interrupt == NULL))
+        goto error;
+
     config_ChainParse(p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg);
 
     psz_ip = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "ip");
@@ -422,12 +426,13 @@ static int Open(vlc_object_t *p_this)
     i_device_port = var_InheritInteger(p_stream, SOUT_CFG_PREFIX "port");
     i_local_server_port = var_InheritInteger(p_stream, SOUT_CFG_PREFIX "http-port");
 
-    p_intf = new(std::nothrow) intf_sys_t( p_this, i_local_server_port, psz_ip, i_device_port );
+    p_intf = new(std::nothrow) intf_sys_t( p_this, i_local_server_port, psz_ip, i_device_port, p_interrupt );
     if ( p_intf == NULL)
     {
         msg_Err( p_this, "cannot load the Chromecast controler" );
         goto error;
     }
+    p_interrupt = NULL;
 
     psz_mux = var_GetNonEmptyString(p_stream, SOUT_CFG_PREFIX "mux");
     if (psz_mux == NULL)
@@ -471,6 +476,8 @@ static int Open(vlc_object_t *p_this)
     return VLC_SUCCESS;
 
 error:
+    if (p_interrupt)
+        vlc_interrupt_destroy(p_interrupt);
     delete p_intf;
     free(psz_ip);
     free(psz_mux);
