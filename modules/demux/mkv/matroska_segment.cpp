@@ -1067,11 +1067,6 @@ void matroska_segment_c::ESDestroy( )
             track.p_es = NULL;
         }
     }
-
-    /* TODO: we will leak, fix this!
-    delete ep;
-    ep = NULL;
-    */
 }
 
 int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_simpleblock, bool *pb_key_picture, bool *pb_discardable_picture, int64_t *pi_duration )
