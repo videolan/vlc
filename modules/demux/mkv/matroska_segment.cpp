@@ -956,13 +956,6 @@ bool matroska_segment_c::Select( mtime_t i_mk_start_time )
             es_out_Control( sys.demuxer.out, ES_OUT_SET_ES_DEFAULT, track.p_es );
         }
     }
-    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_start_time );
-
-    sys.i_start_pts = i_mk_start_time + VLC_TS_0;
-    // reset the stream reading to the first cluster of the segment used
-    es.I_O().setFilePointer( 0 /* previously i_start_pos */ );
-
-    ep->reconstruct( &es, segment, &sys.demuxer );
 
     return true;
 }
