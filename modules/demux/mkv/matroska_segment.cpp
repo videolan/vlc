@@ -1193,21 +1193,14 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             vars.obj->cluster = &kcluster;
             vars.obj->i_cluster_pos = vars.obj->cluster->GetElementPosition();
 
-            for ( size_t i = 0; i < vars.obj->tracks.size(); ++i)
-            {
-                vars.obj->tracks[i]->b_silent = false;
-            }
-
             vars.ep->Down ();
         }
-
         E_CASE( KaxCues, kcue )
         {
             VLC_UNUSED( kcue );
             msg_Warn( vars.p_demuxer, "find KaxCues FIXME" );
             throw VLC_EGENERIC;
         }
-
         E_CASE_DEFAULT(element)
         {
             msg_Dbg( vars.p_demuxer, "Unknown (%s)", typeid (element).name () );
@@ -1273,22 +1266,10 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
            else if( static_cast<int64>( kreference ) )
                vars.b_discardable_picture = true;
         }
-
         E_CASE( KaxClusterSilentTrackNumber, kstrackn )
         {
-            kstrackn.ReadData( vars.obj->es.I_O() );
-
-            std::vector<mkv_track_t*> const& tracks = vars.obj->tracks;
-            uint32 i_number = static_cast<uint32> ( kstrackn );
-
-            for (size_t i = 0; i < tracks.size(); ++i )
-            {
-                if( tracks[i]->i_number == i_number )
-                {
-                    tracks[i]->b_silent = true;
-                    break;
-                }
-            }
+            VLC_UNUSED( kstrackn );
+            VLC_UNUSED( vars );
         }
 #if LIBMATROSKA_VERSION >= 0x010401
         E_CASE( KaxDiscardPadding, kdiscardp )
