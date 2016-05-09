@@ -648,7 +648,7 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
 
     vlc_interrupt_prepare(ctx, vlc_poll_i11e_wake, th);
 
-    vlc_cleanup_push(vlc_poll_i11e_cleanup, th);
+    vlc_cleanup_push(vlc_poll_i11e_cleanup, ctx);
     ret = vlc_poll(fds, nfds, timeout);
     vlc_cleanup_pop();
 
