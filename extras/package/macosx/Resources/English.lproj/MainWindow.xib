@@ -491,11 +491,11 @@
                 </textField>
             </subviews>
             <connections>
-                <outlet property="o_fullscreen_btn" destination="4898" id="4910"/>
-                <outlet property="o_green_btn" destination="4897" id="4911"/>
-                <outlet property="o_red_btn" destination="4895" id="4913"/>
-                <outlet property="o_title_lbl" destination="4899" id="4909"/>
-                <outlet property="o_yellow_btn" destination="4896" id="4912"/>
+                <outlet property="fullscreenButton" destination="4898" id="lbk-lI-Uov"/>
+                <outlet property="greenButton" destination="4897" id="2J9-uI-vLb"/>
+                <outlet property="redButton" destination="4895" id="ktq-aJ-S89"/>
+                <outlet property="titleLabel" destination="4899" id="44w-AH-65I"/>
+                <outlet property="yellowButton" destination="4896" id="aib-Yt-4kE"/>
             </connections>
         </customView>
         <customView id="4722" userLabel="Dropzone">

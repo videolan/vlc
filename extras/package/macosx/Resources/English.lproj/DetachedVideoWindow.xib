@@ -190,11 +190,11 @@
                 </textField>
             </subviews>
             <connections>
-                <outlet property="o_fullscreen_btn" destination="27" id="34"/>
-                <outlet property="o_green_btn" destination="26" id="36"/>
-                <outlet property="o_red_btn" destination="24" id="61"/>
-                <outlet property="o_title_lbl" destination="28" id="54"/>
-                <outlet property="o_yellow_btn" destination="25" id="35"/>
+                <outlet property="fullscreenButton" destination="27" id="Q7Q-c7-2mT"/>
+                <outlet property="greenButton" destination="26" id="ene-pt-Lib"/>
+                <outlet property="redButton" destination="24" id="gRU-rk-buI"/>
+                <outlet property="titleLabel" destination="28" id="hLC-1g-oFA"/>
+                <outlet property="yellowButton" destination="25" id="RzQ-RH-CMN"/>
             </connections>
         </customView>
         <customObject id="3" userLabel="Detached Window Controls Bar" customClass="VLCControlsBarCommon">

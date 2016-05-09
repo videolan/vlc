@@ -28,14 +28,20 @@
  * VLCMainWindowTitleView
  *****************************************************************************/
 
+@class VLCCustomWindowCloseButton;
+@class VLCCustomWindowMinimizeButton;
+@class VLCCustomWindowZoomButton;
+@class VLCCustomWindowFullscreenButton;
+@class VLCWindowTitleTextField;
+
 @interface VLCMainWindowTitleView : VLCThreePartImageView
-{
-    IBOutlet id o_red_btn;
-    IBOutlet id o_yellow_btn;
-    IBOutlet id o_green_btn;
-    IBOutlet id o_fullscreen_btn;
-    IBOutlet id o_title_lbl;
-}
+
+@property (readwrite, strong) IBOutlet VLCCustomWindowCloseButton *redButton;
+@property (readwrite, strong) IBOutlet VLCCustomWindowMinimizeButton *yellowButton;
+@property (readwrite, strong) IBOutlet VLCCustomWindowZoomButton *greenButton;
+@property (readwrite, strong) IBOutlet VLCCustomWindowFullscreenButton *fullscreenButton;
+@property (readwrite, strong) IBOutlet VLCWindowTitleTextField *titleLabel;
+
 @property (readonly) NSButton * closeButton;
 @property (readonly) NSButton * minimizeButton;
 @property (readonly) NSButton * zoomButton;
