@@ -105,7 +105,6 @@ public:
 
     KaxCluster              *cluster;
     uint64                  i_block_pos;
-    uint64                  i_cluster_pos;
     KaxSegmentUID           *p_segment_uid;
     KaxPrevUID              *p_prev_segment_uid;
     KaxNextUID              *p_next_segment_uid;

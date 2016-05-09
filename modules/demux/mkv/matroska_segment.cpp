@@ -46,7 +46,6 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estr
     ,i_attachments_position(-1)
     ,cluster(NULL)
     ,i_block_pos(0)
-    ,i_cluster_pos(0)
     ,p_segment_uid(NULL)
     ,p_prev_segment_uid(NULL)
     ,p_next_segment_uid(NULL)
@@ -635,7 +634,6 @@ bool matroska_segment_c::Preload( )
 
             cluster = kc_ptr;
 
-            i_cluster_pos = cluster->GetElementPosition();
             ParseCluster( cluster );
             IndexAppendCluster( cluster );
 
@@ -1102,7 +1100,6 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         E_CASE( KaxCluster, kcluster )
         {
             vars.obj->cluster = &kcluster;
-            vars.obj->i_cluster_pos = vars.obj->cluster->GetElementPosition();
 
             vars.ep->Down ();
         }

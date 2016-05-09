@@ -380,8 +380,8 @@ SegmentSeeker::get_search_areas( fptr_t start, fptr_t end ) const
 void
 SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
 {
-    ms.cluster       = NULL;
-    ms.i_cluster_pos =   -1;
+    fptr_t i_cluster_pos = -1;
+    ms.cluster = NULL;
 
     {
         cluster_positions_t::iterator cluster_it = greatest_lower_bound(
@@ -394,12 +394,12 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
 
     while( ms.cluster == NULL || ms.cluster->GetEndPosition() < fpos )
     {
-        ms.cluster       = static_cast<KaxCluster*>( ms.ep->Get() );
-        ms.i_cluster_pos = ms.cluster->GetElementPosition();
+        ms.cluster    = static_cast<KaxCluster*>( ms.ep->Get() );
+        i_cluster_pos = ms.cluster->GetElementPosition();
 
-        add_cluster_position( ms.i_cluster_pos );
+        add_cluster_position( i_cluster_pos );
 
-        mark_range_as_searched( Range( ms.i_cluster_pos, ms.es.I_O().getFilePointer() ) );
+        mark_range_as_searched( Range( i_cluster_pos, ms.es.I_O().getFilePointer() ) );
     }
 
     ms.ep->Down();
@@ -418,7 +418,7 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
 
     /* TODO: add error handling; what if we never get a KaxCluster and/or KaxClusterTimecode? */
 
-    mark_range_as_searched( Range( ms.i_cluster_pos, ms.es.I_O().getFilePointer() ) );
+    mark_range_as_searched( Range( i_cluster_pos, ms.es.I_O().getFilePointer() ) );
 
     /* jump to desired position */
 
