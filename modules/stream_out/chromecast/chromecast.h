@@ -34,6 +34,7 @@
 #include <vlc_tls.h>
 #include <vlc_interrupt.h>
 
+#include <atomic>
 #include <sstream>
 
 #include "cast_channel.pb.h"
@@ -87,6 +88,8 @@ struct intf_sys_t
     }
 
     void setHasInput( bool has_input, const std::string mime_type = "");
+
+    void requestPlayerStop();
 
 private:
     vlc_object_t  * const p_module;
@@ -147,6 +150,7 @@ private:
     void processMessage(const castchannel::CastMessage &msg);
 
     void notifySendRequest();
+    std::atomic_bool requested_stop;
 
     int sendMessage(const castchannel::CastMessage &msg);
 

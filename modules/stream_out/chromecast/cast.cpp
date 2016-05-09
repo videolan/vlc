@@ -187,6 +187,8 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 
     if ( p_sys->streams.empty() )
     {
+        p_sys->p_intf->requestPlayerStop();
+
         sout_StreamChainDelete( p_sys->p_out, p_sys->p_out );
         p_sys->p_out = NULL;
         p_sys->sout = "";

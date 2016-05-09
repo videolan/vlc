@@ -100,6 +100,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , i_sock_fd(-1)
  , p_creds(NULL)
  , p_tls(NULL)
+ , requested_stop(false)
  , conn_status(CHROMECAST_DISCONNECTED)
  , cmd_status(NO_CMD_PENDING)
  , i_receiver_requestId(0)
@@ -871,6 +872,11 @@ bool intf_sys_t::handleMessages()
     bool b_msgReceived = false;
     uint32_t i_payloadSize = 0;
 
+    if ( requested_stop.exchange(false) && !mediaSessionId.empty() )
+    {
+        msgPlayerStop();
+    }
+
     int i_ret = recvPacket( b_msgReceived, i_payloadSize,
                             &i_received, p_packet, &b_pingTimeout,
                             &i_waitdelay, &i_retries);
@@ -907,4 +913,10 @@ bool intf_sys_t::handleMessages()
 void intf_sys_t::notifySendRequest()
 {
     vlc_interrupt_raise( p_ctl_thread_interrupt );
+}
+
+void intf_sys_t::requestPlayerStop()
+{
+    requested_stop = true;
+    notifySendRequest();
 }
