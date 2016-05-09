@@ -596,7 +596,10 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         }
         E_CASE( KaxAudioSamplingFreq, afreq )
         {
-            vars.tk->i_original_rate = vars.tk->fmt.audio.i_rate = static_cast<float>( afreq );
+            float const value = static_cast<float>( afreq );
+
+            vars.tk->i_original_rate  = value;
+            vars.tk->fmt.audio.i_rate = value;
             debug( vars, "afreq=%d", vars.tk->fmt.audio.i_rate ) ;
         }
         E_CASE( KaxAudioOutputSamplingFreq, afreq )
