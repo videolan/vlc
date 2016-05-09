@@ -1,0 +1,29 @@
+--- libgpg-error/src/w32-gettext.c.orig	2016-05-09 17:30:18.306788566 +0200
++++ libgpg-error/src/w32-gettext.c	2016-05-09 17:32:19.830771580 +0200
+@@ -53,7 +53,7 @@
+ #include "init.h"
+ #include "gpg-error.h"
+ 
+-#ifdef HAVE_W32CE_SYSTEM
++#if defined(HAVE_W32CE_SYSTEM) || WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP)
+ /* Forward declaration.  */
+ static wchar_t *utf8_to_wchar (const char *string, size_t length, size_t *retlen);
+ 
+@@ -644,6 +644,7 @@
+ static const char *
+ my_nl_locale_name (const char *categoryname)
+ {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+ #ifndef HAVE_W32CE_SYSTEM
+   const char *retval;
+ #endif
+@@ -1053,6 +1054,9 @@
+     case LANG_ZULU: return "zu_ZA";
+     default: return "C";
+     }
++#else
++    return "C";
++#endif
+ }
+ 
+ /* localname.c from gettext END.  */
