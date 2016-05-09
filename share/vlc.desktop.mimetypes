@@ -1,7 +1,7 @@
 # List of MIME types to announce in the desktop file, to let desktop
 # environments and browsers know which file types to pass on to VLC.
 
-# Ogg Vorbis and Theora
+# Ogg Vorbis and Theora (Xiph family)
 application/ogg                  # IANA-registered
 application/x-ogg
 audio/ogg                        # IANA-registered
@@ -11,16 +11,17 @@ video/ogg                        # IANA-registered
 video/x-ogm+ogg
 video/x-theora+ogg
 
+# FLAC lossless audio
+application/x-flac
+audio/flac
+audio/x-flac
+
 # Microsoft audio and video
+# ASF
 audio/x-ms-asf
 audio/x-ms-asx
 audio/x-ms-wax
 audio/x-ms-wma
-audio/x-pn-windows-acm
-video/divx
-video/msvideo
-video/vnd.divx
-video/x-avi
 video/x-ms-asf
 video/x-ms-asf-plugin
 video/x-ms-asx
@@ -28,7 +29,13 @@ video/x-ms-wm
 video/x-ms-wmv
 video/x-ms-wmx
 video/x-ms-wvx
+# AVI et al.
 video/x-msvideo
+audio/x-pn-windows-acm
+video/divx
+video/msvideo
+video/vnd.divx
+video/x-avi
 
 # Real audio and video
 application/vnd.rn-realmedia
@@ -40,55 +47,62 @@ audio/x-realaudio
 video/vnd.rn-realvideo
 
 # MPEG related audio, video and transport
+# MPEG-2
+audio/mp2
+audio/mpeg                       # IANA-registered
+audio/x-mp3
+audio/x-mpeg
+video/mp2t                       # TS
+video/mpeg
+video/mpeg-system
+video/x-mpeg
+video/x-mpeg2
+video/x-mpeg-system
+# MP4
 application/mpeg4-iod            # IANA-registered
 application/mpeg4-muxcodetable
 application/x-extension-m4a
 application/x-extension-mp4
 audio/m4a
-audio/mp2
 audio/mp4                        # IANA-registered
-audio/mpeg                       # IANA-registered
 audio/x-m4a
-audio/x-mp3
-audio/x-mpeg
-video/mp2t
 video/mp4                        # IANA-registered
 video/mp4v-es
-video/mpeg
-video/mpeg-system
 video/x-m4v
-video/x-mpeg
-video/x-mpeg-system
-video/x-mpeg2
 
-# FLAC lossless audio
-application/x-flac
-audio/flac
-audio/x-flac
+# Apple QuickTime (MOV)
+application/x-quicktime-media-link
+application/x-quicktimeplayer
+video/quicktime                  # IANA-registered
 
 # Matroska container format
 application/x-matroska
 audio/x-matroska
 video/x-matroska
 
-# WebM (Matroska + Vorbis + VP8)
+# WebM (Matroska + Vorbis/Opus + VP8/9)
 video/webm
 audio/webm
 
-# RTSP related
+# 3GPP related
 audio/3gpp
 audio/3gpp2
 audio/AMR                        # IANA-registered
 audio/AMR-WB                     # IANA-registered
 audio/amr
 audio/amr-wb
+video/3gp
 video/3gpp
 video/3gpp2
 
 # URI scheme handlers (ie IP protocol support)
-x-scheme-handler/mms
+x-scheme-handler/mms    # MMS
+x-scheme-handler/mmsh   # MMS over HTTP
+x-scheme-handler/rtsp   # RSTP
+x-scheme-handler/rtp
 x-scheme-handler/rtmp
-x-scheme-handler/rtsp
+x-scheme-handler/icy    # Icecast
+x-scheme-handler/icyx   # Icecast
 
 # Linux desktop environment hooks for ISOs etc.
 x-content/video-vcd
@@ -103,14 +117,12 @@ audio/mpegurl
 audio/x-mpegurl
 audio/x-scpls
 video/vnd.mpegurl                # IANA-registered
+application/vnd.apple.mpegurl    # HLS / M3U8
+application/vnd.ms-asf           # ZPL/WVX
+application/vnd.ms-wpl           # WPL
 
 # Digital Video
 video/dv
-
-# Apple QuickTime
-application/x-quicktime-media-link
-application/x-quicktimeplayer
-video/quicktime                  # IANA-registered
 
 # IFF related formats
 audio/x-aiff
@@ -143,15 +155,18 @@ misc/ultravox
 # RealPix
 image/vnd.rn-realpix
 
+# Modplug / GME
+audio/x-it
+audio/x-mod
+audio/x-s3m
+audio/x-xm
+
 # From the totem desktop file in Debian.  These need more work.
 application/mxf
 #application/ram
 application/sdp
 #application/smil
 #application/smil+xml
-application/vnd.apple.mpegurl
-application/vnd.ms-asf
-application/vnd.ms-wpl
 #application/x-netshow-channel
 #application/x-shorten
 #application/x-smil
@@ -161,28 +176,19 @@ audio/ac3
 #audio/prs.sid
 audio/x-ape
 audio/x-gsm
-audio/x-it
-audio/x-mod
 audio/x-musepack
-audio/x-s3m
 #audio/x-sbc
 audio/x-speex
 #audio/x-stm
 audio/x-tta
 audio/x-wavpack
-audio/x-xm
 #image/x-pict
 #text/google-video-pointer
 #text/x-google-video-pointer
-video/3gp
 #video/vivo
 #video/vnd.vivo
 #video/x-flic
 #video/x-totem-stream
-x-scheme-handler/icy
-x-scheme-handler/icyx
-x-scheme-handler/mmsh
 #x-scheme-handler/net
 #x-scheme-handler/pnm
-x-scheme-handler/rtp
 #x-scheme-handler/uvox
