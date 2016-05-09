@@ -15,6 +15,9 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(APPLY) $(SRC)/gcrypt/0001-Fix-assembly-division-check.patch
 	$(APPLY) $(SRC)/gcrypt/disable-doc-compilation.patch
 	$(APPLY) $(SRC)/gcrypt/disable-tests-compilation.patch
+ifdef HAVE_WINRT
+	$(APPLY) $(SRC)/gcrypt/winrt.patch
+endif
 	$(MOVE)
 
 DEPS_gcrypt = gpg-error

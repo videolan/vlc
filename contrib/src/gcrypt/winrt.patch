@@ -1,0 +1,108 @@
+--- libgcrypt/random/rndw32.c.orig	2016-05-09 16:48:42.495200068 +0200
++++ libgcrypt/random/rndw32.c	2016-05-09 16:55:07.423179353 +0200
+@@ -337,6 +337,7 @@
+   HANDLE hMBMData;
+   SharedData *mbmDataPtr;
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   hMBMData = OpenFileMapping (FILE_MAP_READ, FALSE, "$M$B$M$5$S$D$" );
+   if (hMBMData)
+     {
+@@ -351,6 +352,7 @@
+         }
+       CloseHandle (hMBMData);
+     }
++#endif
+ }
+ 
+ 
+@@ -594,6 +596,7 @@
+       }
+   }
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   /* Get disk I/O statistics for all the hard drives.  100 is an
+      arbitrary failsafe limit.  */
+   for (drive_no = 0; drive_no < 100 ; drive_no++)
+@@ -628,6 +631,7 @@
+         }
+       CloseHandle (hDevice);
+     }
++#endif
+ 
+   /* In theory we should be using the Win32 performance query API to obtain
+      unpredictable data from the system, however this is so unreliable (see
+@@ -786,12 +790,16 @@
+ 
+   if (!is_initialized)
+     {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+       OSVERSIONINFO osvi = { sizeof( osvi ) };
+ 
+       GetVersionEx( &osvi );
+       if (osvi.dwPlatformId != VER_PLATFORM_WIN32_NT)
+         log_fatal ("can only run on a Windows NT platform\n" );
+       system_is_w2000 = (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0);
++#else
++      system_is_w2000 = 0;
++#endif
+       init_system_rng ();
+       is_initialized = 1;
+     }
+@@ -842,14 +850,11 @@
+                         ADDINT((SIZE_T)aptr);                      \
+                       } while (0)
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+     ADDPTR ( GetActiveWindow ());
+     ADDPTR ( GetCapture ());
+     ADDPTR ( GetClipboardOwner ());
+     ADDPTR ( GetClipboardViewer ());
+-    ADDPTR ( GetCurrentProcess ());
+-    ADDINT ( GetCurrentProcessId ());
+-    ADDPTR ( GetCurrentThread ());
+-    ADDINT ( GetCurrentThreadId ());
+     ADDPTR ( GetDesktopWindow ());
+     ADDPTR ( GetFocus ());
+     ADDINT ( GetInputState ());
+@@ -858,6 +863,11 @@
+     ADDPTR ( GetOpenClipboardWindow ());
+     ADDPTR ( GetProcessHeap ());
+     ADDPTR ( GetProcessWindowStation ());
++#endif
++    ADDPTR ( GetCurrentProcess ());
++    ADDINT ( GetCurrentProcessId ());
++    ADDPTR ( GetCurrentThread ());
++    ADDINT ( GetCurrentThreadId ());
+     /* Following function in some cases stops returning events, and cannot
+        be used as an entropy source.  */
+     /*ADDINT ( GetQueueStatus (QS_ALLEVENTS));*/
+@@ -871,6 +881,7 @@
+ 
+   /* Get multiword system information: Current caret position, current
+      mouse cursor position.  */
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   {
+     POINT point;
+ 
+@@ -922,10 +933,12 @@
+     (*add) ( &minimumWorkingSetSize, sizeof (int), origin );
+     (*add) ( &maximumWorkingSetSize, sizeof (int), origin );
+   }
++#endif
+ 
+ 
+   /* The following are fixed for the lifetime of the process so we only
+    * add them once */
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   if (!addedFixedItems)
+     {
+       STARTUPINFO startupInfo;
+@@ -938,6 +951,7 @@
+       (*add) ( &startupInfo, sizeof (STARTUPINFO), origin );
+       addedFixedItems = 1;
+     }
++#endif
+ 
+   /* The performance of QPC varies depending on the architecture it's
+      running on and on the OS, the MS documentation is vague about the
