@@ -550,9 +550,10 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         block_size = simpleblock->GetSize();
     else
         block_size = block->GetSize();
- 
+
     const unsigned int i_number_frames = block != NULL ? block->NumberFrames() :
             ( simpleblock != NULL ? simpleblock->NumberFrames() : 0 );
+
     for( unsigned int i_frame = 0; i_frame < i_number_frames; i_frame++ )
     {
         block_t *p_block;
@@ -715,6 +716,7 @@ static int Demux( demux_t *p_demux)
     int64_t i_block_duration = 0;
     bool b_key_picture;
     bool b_discardable_picture;
+
     if( p_segment->BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
     {
         if ( p_vsegment->CurrentEdition() && p_vsegment->CurrentEdition()->b_ordered )

@@ -30,6 +30,7 @@
 #include "stream_io_callback.hpp"
 
 #include <sstream>
+#include <limits>
 
 namespace { 
     template<class It, class T>

@@ -26,10 +26,10 @@
 
 #include "mkv.hpp"
 
-#include <cstdint>
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <limits>
 
 class matroska_segment_c;
 

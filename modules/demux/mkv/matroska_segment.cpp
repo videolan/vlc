@@ -1197,7 +1197,6 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 vars.i_duration -= i_duration;
         }
 #endif
-
         E_CASE_DEFAULT( element )
         {
             VLC_UNUSED(element);
