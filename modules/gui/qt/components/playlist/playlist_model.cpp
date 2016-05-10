@@ -557,30 +557,22 @@ PLModel::pl_nodetype PLModel::getPLRootType() const
 {
     /* can't rely on rootitem as it depends on view / rebuild() */
     AbstractPLItem *plitem = rootItem;
-
     while( plitem->parent() ) plitem = plitem->parent();
 
-    switch( plitem->id( PLAYLIST_ID ) )
-    {
-    case 2:
+    const input_item_t *p_item = plitem->inputItem();
+    if( p_item == p_playlist->p_playing->p_input )
         return ROOTTYPE_CURRENT_PLAYING;
-    case 3:
+
+    if( p_playlist->p_media_library &&
+        p_item == p_playlist->p_media_library->p_input )
         return ROOTTYPE_MEDIA_LIBRARY;
-    default:
-        return ROOTTYPE_OTHER;
-    }
+
+    return ROOTTYPE_OTHER;
 }
 
 bool PLModel::canEdit() const
 {
-    return (
-            rootItem != NULL &&
-            (
-             rootItem->inputItem() == p_playlist->p_playing->p_input ||
-             ( p_playlist->p_media_library &&
-              rootItem->inputItem() == p_playlist->p_media_library->p_input )
-            )
-           );
+    return ( getPLRootType() != ROOTTYPE_OTHER );
 }
 
 /************************* Updates handling *****************************/
@@ -987,34 +979,39 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 
 bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) const
 {
+    if( !index.isValid() )
+        return false;
+
+    const PLItem *item = getItem( index );
+
     switch ( action )
     {
     case ACTION_ADDTOPLAYLIST:
         /* Only if we are not already in Current Playing */
         if ( getPLRootType() == ROOTTYPE_CURRENT_PLAYING ) return false;
-        if( index.isValid() && index != rootIndex() )
-            return ( itemId( index, PLAYLIST_ID ) != THEPL->p_playing->i_id );
+        if( index != rootIndex() )
+            return ( item->id( PLAYLIST_ID ) != THEPL->p_playing->i_id );
     case ACTION_SORT:
-        return rowCount();
+        return rowCount() && !item->readOnly();
     case ACTION_PLAY:
     case ACTION_STREAM:
     case ACTION_SAVE:
     case ACTION_INFO:
+        return index != rootIndex();
     case ACTION_REMOVE:
-        return index.isValid() && index != rootIndex();
+        return index != rootIndex() && !item->readOnly();
     case ACTION_EXPLORE:
-        if( index.isValid() )
             return getURI( index ).startsWith( "file://" );
     case ACTION_CREATENODE:
-        return ( canEdit() && isTree() );
+            return ( isTree() && !item->readOnly() );
     case ACTION_RENAMENODE:
-        return ( index != rootIndex() ) && !isLeaf( index );
+            return ( index != rootIndex() ) && !isLeaf( index ) && !item->readOnly();
     case ACTION_CLEAR:
-        return rowCount() && canEdit();
+            return rowCount() && !item->readOnly();
     case ACTION_ENQUEUEFILE:
     case ACTION_ENQUEUEDIR:
     case ACTION_ENQUEUEGENERIC:
-        return canEdit();
+        return !item->readOnly();
     case ACTION_SAVETOPLAYLIST:
         return rowCount() > 0;
     default:
