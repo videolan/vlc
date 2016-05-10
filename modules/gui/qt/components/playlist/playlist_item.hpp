@@ -64,6 +64,7 @@ protected:
     void clearChildren();
     virtual QUrl getURI() const = 0;
     virtual QString getTitle() const = 0;
+    virtual bool readOnly() const = 0;
 
     QList<AbstractPLItem *> children;
     AbstractPLItem *parentItem;
@@ -85,6 +86,7 @@ private:
     AbstractPLItem *child( int id ) const { return children.value( id ); };
     virtual QUrl getURI() const;
     virtual QString getTitle() const;
+    virtual bool readOnly() const;
 
     /* Local */
     PLItem( playlist_item_t *, PLItem *parent );
@@ -94,6 +96,7 @@ private:
     PLItem( playlist_item_t * );
     void init( playlist_item_t *, PLItem * );
     int i_playlist_id;
+    int i_flags;
     input_item_t *p_input;
 };
 

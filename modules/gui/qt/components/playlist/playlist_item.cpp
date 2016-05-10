@@ -60,6 +60,7 @@ void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent )
     parentItem = parent;          /* Can be NULL, but only for the rootItem */
     i_playlist_id = _playlist_item->i_id;           /* Playlist item specific id */
     p_input = _playlist_item->p_input;
+    i_flags = _playlist_item->i_flags;
     vlc_gc_incref( p_input );
 }
 
@@ -155,4 +156,9 @@ QString PLItem::getTitle() const
     title = qfu(fb_name);
     free(fb_name);
     return title;
+}
+
+bool PLItem::readOnly() const
+{
+    return i_flags & PLAYLIST_RO_FLAG;
 }
