@@ -352,8 +352,13 @@ FREENULL( psz_##foo );
 
 - (IBAction)saveMetaData:(id)sender
 {
-    if (!p_item)
-        goto error;
+    if (!p_item) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:_NS("Error while saving meta")];
+        [alert setInformativeText:_NS("VLC was unable to save the meta data.")];
+        [alert addButtonWithTitle:_NS("OK")];
+        [alert runModal];
+    }
 
     #define utf8( _blub ) \
         [[_blub stringValue] UTF8String]
@@ -377,12 +382,6 @@ FREENULL( psz_##foo );
     [self updatePanelWithItem: p_item];
 
     [_saveMetaDataButton setEnabled: NO];
-    return;
-
-error:
-    NSRunAlertPanel(_NS("Error while saving meta"), @"%@",
-                    _NS("OK"), nil, nil,
-                    _NS("VLC was unable to save the meta data."));
 }
 
 - (IBAction)downloadCoverArt:(id)sender
