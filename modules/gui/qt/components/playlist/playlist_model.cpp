@@ -297,83 +297,90 @@ void PLModel::activateItem( playlist_item_t *p_item )
 /****************** Base model mandatory implementations *****************/
 QVariant PLModel::data( const QModelIndex &index, const int role ) const
 {
+    if( !index.isValid() )
+        return QVariant();
+
     switch( role )
     {
 
-    case Qt::FontRole:
-        return customFont;
+        case Qt::FontRole:
+            return customFont;
 
-    default:
-        if( !index.isValid() )
-            return QVariant();
-    }
-
-    if( role == Qt::DisplayRole )
-    {
-        PLItem *item = getItem( index );
-        int metadata = columnToMeta( index.column() );
-        if( metadata == COLUMN_END ) return QVariant();
-
-        QString returninfo;
-        if( metadata == COLUMN_NUMBER )
-            returninfo = QString::number( index.row() + 1 );
-        else if( metadata == COLUMN_COVER )
+        case Qt::DisplayRole:
         {
-            QString artUrl;
-            artUrl = InputManager::decodeArtURL( item->inputItem() );
-            if( artUrl.isEmpty() )
-            {
-                for( int i = 0; i < item->childCount(); i++ )
-                {
-                    artUrl = InputManager::decodeArtURL( item->child( i )->inputItem() );
-                    if( !artUrl.isEmpty() )
-                        break;
-                }
-            }
-            return artUrl;
-        }
-        else
-        {
-            char *psz = psz_column_meta( item->inputItem(), metadata );
-            returninfo = qfu( psz );
-            free( psz );
-        }
-        return QVariant( returninfo );
-    }
-    else if( role == Qt::DecorationRole )
-    {
-        switch( columnToMeta(index.column()) )
-        {
-        case COLUMN_TITLE:
-            {
             PLItem *item = getItem( index );
-            /* Used to segfault here because i_type wasn't always initialized */
-            return QVariant( icons[item->inputItem()->i_type] );
+            int metadata = columnToMeta( index.column() );
+            if( metadata == COLUMN_END )
+                return QVariant();
+
+            QString returninfo;
+            if( metadata == COLUMN_NUMBER )
+            {
+                returninfo = QString::number( index.row() + 1 );
             }
-        case COLUMN_COVER:
-            /* !warn: changes tree item line height. Otherwise, override
-             * delegate's sizehint */
-            return getArtPixmap( index, QSize(16,16) );
-        default:
-            return QVariant();
+            else if( metadata == COLUMN_COVER )
+            {
+                QString artUrl;
+                artUrl = InputManager::decodeArtURL( item->inputItem() );
+                if( artUrl.isEmpty() )
+                {
+                    for( int i = 0; i < item->childCount(); i++ )
+                    {
+                        artUrl = InputManager::decodeArtURL( item->child( i )->inputItem() );
+                        if( !artUrl.isEmpty() )
+                            break;
+                    }
+                }
+                return artUrl;
+            }
+            else
+            {
+                char *psz = psz_column_meta( item->inputItem(), metadata );
+                returninfo = qfu( psz );
+                free( psz );
+            }
+
+            return QVariant( returninfo );
         }
+
+        case Qt::DecorationRole:
+        {
+            switch( columnToMeta(index.column()) )
+            {
+                case COLUMN_TITLE:
+                {
+                    PLItem *item = getItem( index );
+                    /* Used to segfault here because i_type wasn't always initialized */
+                    return QVariant( icons[item->inputItem()->i_type] );
+                }
+                case COLUMN_COVER:
+                    /* !warn: changes tree item line height. Otherwise, override
+                     * delegate's sizehint */
+                    return getArtPixmap( index, QSize(16,16) );
+                default:
+                    break;
+            }
+            break;
+        }
+
+        case Qt::BackgroundRole:
+            if( isCurrent( index ) )
+                return QVariant( QBrush( Qt::gray ) );
+            break;
+
+        case CURRENT_ITEM_ROLE:
+            return QVariant( isCurrent( index ) );
+
+        case CURRENT_ITEM_CHILD_ROLE:
+            return QVariant( isParent( index, currentIndex() ) );
+
+        case LEAF_NODE_ROLE:
+            return QVariant( isLeaf( index ) );
+
+        default:
+            break;
     }
-    else if( role == Qt::BackgroundRole && isCurrent( index ) )
-    {
-        return QVariant( QBrush( Qt::gray ) );
-    }
-    else if( role == IsCurrentRole )
-    {
-        return QVariant( isCurrent( index ) );
-    }
-    else if( role == IsLeafNodeRole )
-    {
-        return QVariant( isLeaf( index ) );
-    }
-    else if( role == IsCurrentsParentNodeRole )
-    {
-        return QVariant( isParent( index, currentIndex() ) );
-    }
+
     return QVariant();
 }
 
