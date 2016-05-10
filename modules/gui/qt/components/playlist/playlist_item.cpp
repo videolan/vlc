@@ -85,12 +85,12 @@ PLItem::~PLItem()
     children.clear();
 }
 
-int PLItem::id( int type )
+int PLItem::id( int type ) const
 {
     switch( type )
     {
     case INPUTITEM_ID:
-        return inputItem()->i_id;
+        return p_input->i_id;
     case PLAYLIST_ID:
         return i_playlist_id;
     default:
