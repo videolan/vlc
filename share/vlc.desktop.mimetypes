@@ -12,6 +12,7 @@ video/x-ogm+ogg
 video/x-theora+ogg
 video/x-theora
 audio/x-speex
+audio/opus                       # IANA-registered
 
 # FLAC lossless audio
 application/x-flac
@@ -96,8 +97,8 @@ video/webm
 audio/webm
 
 # 3GPP related
-audio/3gpp
-audio/3gpp2
+audio/3gpp                       # IANA-registered
+audio/3gpp2                      # IANA-registered
 audio/AMR                        # IANA-registered
 audio/AMR-WB                     # IANA-registered
 audio/amr
@@ -138,7 +139,8 @@ application/vnd.ms-wpl           # WPL
 application/sdp                  # SDP for RT*P
 
 # Digital Video
-video/dv
+audio/dv                         # IANA-registered
+video/dv                         # IANA-registered
 
 # IFF related formats
 audio/x-aiff
@@ -162,9 +164,13 @@ audio/x-pn-wav
 audio/x-wav
 
 # Raw audio
-audio/ac3
+audio/ac3               # IANA AC3
+audio/eac3              # IANA E-AC3
 audio/vnd.dts           # IANA DTS Audio
 audio/vnd.dts.hd        # IANA DTS-HD
+audio/vnd.dolby.heaac.1 # IANA Dolby HeAAC
+audio/vnd.dolby.heaac.2 # IANA Dolby HeAAC
+audio/vnd.dolby.mlp     # IANA MLP/TrueHD
 audio/basic             # IANA mulaw
 audio/midi
 # Weird audio formats
