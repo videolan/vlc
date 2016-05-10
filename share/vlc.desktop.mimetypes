@@ -123,11 +123,14 @@ x-content/audio-cdda
 x-content/audio-player
 
 # Playlists / text/xml list with URLs
+application/ram                # Realaudio Metadata
 application/xspf+xml
 audio/mpegurl
 audio/x-mpegurl
 audio/scpls
 audio/x-scpls
+text/google-video-pointer
+text/x-google-video-pointer
 video/vnd.mpegurl                # IANA-registered
 application/vnd.apple.mpegurl    # HLS / M3U8
 application/vnd.ms-asf           # ZPL/WVX
@@ -189,21 +192,18 @@ audio/x-s3m
 audio/x-xm
 
 # From the totem desktop file in Debian.  These need more work.
-application/mxf
-#application/ram
-#application/smil
-#application/smil+xml
+application/mxf                 # IANA-registered
+#application/smil               # IANA-registered
+#application/smil+xml           # IANA-registered
 #application/x-netshow-channel
 #application/x-shorten
 #application/x-smil
-#audio/prs.sid
+#audio/prs.sid                  # IANA-registered
 #audio/x-sbc
 #audio/x-stm
 #image/x-pict
-#text/google-video-pointer
-#text/x-google-video-pointer
 #video/vivo
-#video/vnd.vivo
+#video/vnd.vivo                 # IANA-registered
 #video/x-flic
 #video/x-totem-stream
 #x-scheme-handler/net
