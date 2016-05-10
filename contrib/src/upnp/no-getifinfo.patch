@@ -1,0 +1,18 @@
+--- upnp/upnp/src/api/upnpapi.c.orig	2016-05-10 10:39:59.757852761 +0200
++++ upnp/upnp/src/api/upnpapi.c	2016-05-10 10:40:24.885603353 +0200
+@@ -3205,6 +3205,7 @@
+ }
+ 
+ 
++#ifdef UPNP_ENABLE_IPV6
+ int UpnpGetIfInfo(const char *IfName)
+ {
+ #ifdef WIN32
+@@ -3587,6 +3588,7 @@
+ 
+ 	return UPNP_E_SUCCESS;
+ }
++#endif
+ 
+ 
+ /*!

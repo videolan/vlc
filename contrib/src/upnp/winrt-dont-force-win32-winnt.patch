@@ -1,0 +1,10 @@
+--- upnp/configure.ac.orig	2016-05-10 11:28:35.866723477 +0200
++++ upnp/configure.ac	2016-05-10 11:28:58.186564849 +0200
+@@ -676,7 +676,6 @@
+ AC_SUBST(PTHREAD_CFLAGS)
+ AC_SUBST(PTHREAD_CC)
+ 
+-AC_DEFINE([_WIN32_WINNT], 0x0501, [Define to '0x0500' for Windows 2000 APIs.])
+ #
+ # Determine if pthread_rwlock_t is available
+ #
