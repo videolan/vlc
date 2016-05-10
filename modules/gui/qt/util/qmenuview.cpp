@@ -96,7 +96,7 @@ QAction* QMenuView::createActionFromIndex( QModelIndex index )
     QAction * action = new QAction( icon, index.data().toString(), this );
 
     /* Display in bold the active element */
-    if( index.data( VLCModel::IsCurrentRole ).toBool() )
+    if( index.data( VLCModel::CURRENT_ITEM_ROLE ).toBool() )
     {
         QFont font; font.setBold ( true );
         action->setFont( font );

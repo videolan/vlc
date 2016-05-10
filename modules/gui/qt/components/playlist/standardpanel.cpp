@@ -791,7 +791,7 @@ void StandardPLPanel::activate( const QModelIndex &index )
     if( currentView->model() == model )
     {
         /* If we are not a leaf node */
-        if( !index.data( VLCModelSubInterface::IsLeafNodeRole ).toBool() )
+        if( !index.data( VLCModelSubInterface::LEAF_NODE_ROLE ).toBool() )
         {
             if( currentView != treeView )
                 browseInto( index );

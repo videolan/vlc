@@ -57,9 +57,9 @@ public:
     virtual ~VLCModelSubInterface();
     enum nodeRole
     {
-      IsCurrentRole = Qt::UserRole,
-      IsLeafNodeRole,
-      IsCurrentsParentNodeRole
+      CURRENT_ITEM_ROLE = Qt::UserRole,
+      CURRENT_ITEM_CHILD_ROLE,
+      LEAF_NODE_ROLE, /* FIXME: same as index().child() ? */
     };
     virtual void rebuild( playlist_item_t * p = NULL ) = 0;
     virtual void doDelete( QModelIndexList ) = 0;

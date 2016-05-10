@@ -503,7 +503,7 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
         artURL = m->data( index, COLUMN_COVER ).toString();
     }
 
-    QString key = QString("%1%2%3%4").arg(VLCModel::getMeta( index, COLUMN_TITLE )).arg( VLCModel::getMeta( index, COLUMN_ARTIST ) ).arg(index.data( VLCModel::IsCurrentRole ).toBool() ).arg( artURL );
+    QString key = QString("%1%2%3%4").arg(VLCModel::getMeta( index, COLUMN_TITLE )).arg( VLCModel::getMeta( index, COLUMN_ARTIST ) ).arg(index.data( VLCModel::CURRENT_ITEM_ROLE ).toBool() ).arg( artURL );
 
     QImage* src;
     if( cache.contains( key ) )

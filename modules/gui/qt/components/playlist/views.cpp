@@ -58,7 +58,7 @@ void AbstractPlViewItemDelegate::paintBackground(
         painter->setPen( option.palette.color( QPalette::Highlight ).darker( 150 ) );
         painter->drawRect( r );
     }
-    else if( index.data( VLCModel::IsCurrentRole ).toBool() )
+    else if( index.data( VLCModel::CURRENT_ITEM_ROLE ).toBool() )
     {
         painter->setBrush( QBrush( Qt::lightGray ) );
         painter->setPen( QColor( Qt::darkGray ) );
@@ -80,7 +80,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QString artist = VLCModel::getMeta( index, COLUMN_ARTIST );
 
     QFont font( index.data( Qt::FontRole ).value<QFont>() );
-    font.setBold( index.data( VLCModel::IsCurrentRole ).toBool() );
+    font.setBold( index.data( VLCModel::CURRENT_ITEM_ROLE ).toBool() );
     painter->setFont( font );
     QFontMetrics fm = painter->fontMetrics();
 
@@ -119,12 +119,12 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
 
     //Draw children indicator
-    if( !index.data( VLCModel::IsLeafNodeRole ).toBool() )
+    if( !index.data( VLCModel::LEAF_NODE_ROLE ).toBool() )
     {
         QRect r( option.rect );
         r.setSize( QSize( 25, 25 ) );
         r.translate( 5, 5 );
-        if( index.data( VLCModel::IsCurrentsParentNodeRole ).toBool() )
+        if( index.data( VLCModel::CURRENT_ITEM_CHILD_ROLE ).toBool() )
         {
             painter->setOpacity( 0.75 );
             QPainterPath nodeRectPath;
@@ -219,7 +219,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     //Draw title info
     f.setItalic( true );
-    f.setBold( index.data( VLCModel::IsCurrentRole ).toBool() );
+    f.setBold( index.data( VLCModel::CURRENT_ITEM_ROLE ).toBool() );
     painter->setFont( f );
     QFontMetrics fm( painter->fontMetrics() );
 
@@ -231,7 +231,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     }
 
     //Draw children indicator
-    if( !index.data( VLCModel::IsLeafNodeRole ).toBool() )
+    if( !index.data( VLCModel::LEAF_NODE_ROLE ).toBool() )
     {
         QPixmap dirPix = QPixmap( ":/type/node" );
         painter->drawPixmap( QPoint( textRect.x(), textRect.center().y() - dirPix.height() / 2 ),
@@ -273,7 +273,7 @@ QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem &, const QMo
 
 void PlTreeViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    if ( index.data( VLCModel::IsCurrentRole ).toBool() )
+    if ( index.data( VLCModel::CURRENT_ITEM_ROLE ).toBool() )
     {
         QStyleOptionViewItem myoptions = option;
         myoptions.font.setBold( true );
