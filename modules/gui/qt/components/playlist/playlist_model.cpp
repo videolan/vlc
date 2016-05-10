@@ -308,9 +308,9 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
             return QVariant();
     }
 
-    PLItem *item = getItem( index );
     if( role == Qt::DisplayRole )
     {
+        PLItem *item = getItem( index );
         int metadata = columnToMeta( index.column() );
         if( metadata == COLUMN_END ) return QVariant();
 
@@ -345,8 +345,11 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
         switch( columnToMeta(index.column()) )
         {
         case COLUMN_TITLE:
+            {
+            PLItem *item = getItem( index );
             /* Used to segfault here because i_type wasn't always initialized */
             return QVariant( icons[item->inputItem()->i_type] );
+            }
         case COLUMN_COVER:
             /* !warn: changes tree item line height. Otherwise, override
              * delegate's sizehint */
