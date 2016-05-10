@@ -546,9 +546,9 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         if( contains_color_description )
         {
-            int8_t color_primaries = p_frag->p_buffer[5];
-            int8_t color_transfer  = p_frag->p_buffer[6];
-            int8_t color_matrix    = p_frag->p_buffer[7];
+            uint8_t color_primaries = p_frag->p_buffer[5];
+            uint8_t color_transfer  = p_frag->p_buffer[6];
+            uint8_t color_matrix    = p_frag->p_buffer[7];
             switch( color_primaries )
             {
                 case 1:
