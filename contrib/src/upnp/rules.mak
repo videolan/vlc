@@ -31,6 +31,7 @@ ifdef HAVE_WIN32
 ifdef HAVE_WINRT
 	$(APPLY) $(SRC)/upnp/winrt-dont-force-win32-winnt.patch
 	$(APPLY) $(SRC)/upnp/no-getifinfo.patch
+	$(APPLY) $(SRC)/upnp/winrt-inet.patch
 endif
 endif
 	$(APPLY) $(SRC)/upnp/libupnp-ipv6.patch
