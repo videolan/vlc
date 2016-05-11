@@ -1,0 +1,56 @@
+--- pthreads/ptw32_getprocessors.c.orig	2016-05-11 20:50:47.774849703 +0200
++++ pthreads/ptw32_getprocessors.c	2016-05-11 20:50:56.054865989 +0200
+@@ -55,6 +55,11 @@
+ int
+ ptw32_getprocessors (int *count)
+ {
++     SYSTEM_INFO systemInfo;
++     GetNativeSystemInfo(&systemInfo);
++     return systemInfo.dwNumberOfProcessors;
++#if 0
++
+   DWORD_PTR vProcessCPUs;
+   DWORD_PTR vSystemCPUs;
+   int result = 0;
+@@ -88,4 +93,5 @@
+ #endif
+ 
+   return (result);
++#endif
+ }
+--- pthreads/pthread_win32_attach_detach_np.c.orig	2016-05-11 21:08:47.988487073 +0200
++++ pthreads/pthread_win32_attach_detach_np.c	2016-05-11 21:09:06.804511207 +0200
+@@ -70,6 +70,7 @@
+    *
+    * This should take care of any security issues.
+    */
++#if 0
+ #if defined(__GNUC__) || _MSC_VER < 1400
+   if(GetSystemDirectory(QuserExDLLPathBuf, sizeof(QuserExDLLPathBuf)))
+   {
+@@ -97,6 +98,7 @@
+ 	GetProcAddress (ptw32_h_quserex, (LPCSTR) "QueueUserAPCEx");
+ #endif
+     }
++#endif
+ 
+   if (NULL == ptw32_register_cancelation)
+     {
+--- pthreads/pthread_cancel.c.orig	2016-05-11 22:43:53.653343096 +0200
++++ pthreads/pthread_cancel.c	2016-05-11 22:54:22.110220490 +0200
+@@ -62,6 +62,7 @@
+ DWORD
+ ptw32_RegisterCancelation (PAPCFUNC unused1, HANDLE threadH, DWORD unused2)
+ {
++#if 0
+   CONTEXT context;
+ 
+   context.ContextFlags = CONTEXT_CONTROL;
+@@ -69,6 +70,7 @@
+   PTW32_PROGCTR (context) = (DWORD_PTR) ptw32_cancel_self;
+   SetThreadContext (threadH, &context);
+   return 0;
++#endif
+ }
+ 
+ int
