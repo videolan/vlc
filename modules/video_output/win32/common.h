@@ -181,6 +181,10 @@ struct vout_display_sys_t
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
     d3d_quad_t               picQuad;
     d3d_quad_cfg_t           picQuadConfig;
+
+    /* staging quad to adjust visible borders */
+    d3d_quad_t               stagingQuad;
+
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
     const char               *d3dPxShader;

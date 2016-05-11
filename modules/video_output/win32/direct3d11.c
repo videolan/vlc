@@ -141,7 +141,7 @@ static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
 static int AllocQuad(vout_display_t *, const video_format_t *, d3d_quad_t *,
-                     d3d_quad_cfg_t *, ID3D11PixelShader *);
+                     d3d_quad_cfg_t *, ID3D11PixelShader *, bool b_visible);
 static void ReleaseQuad(d3d_quad_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
 static void UpdateQuadOpacity(vout_display_t *, const d3d_quad_t *, float);
@@ -731,6 +731,30 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
 
+    if ( picture->format.i_chroma != VLC_CODEC_D3D11_OPAQUE &&
+         sys->stagingQuad.pTexture != NULL )
+    {
+        Direct3D11UnmapTexture(picture);
+
+        D3D11_TEXTURE2D_DESC picDesc, stagingDesc;
+        ID3D11Texture2D_GetDesc( sys->picQuad.pTexture, &picDesc );
+        ID3D11Texture2D_GetDesc( sys->stagingQuad.pTexture, &stagingDesc );
+
+        D3D11_BOX box;
+        box.left   = picture->format.i_x_offset;
+        box.right  = picture->format.i_x_offset + picture->format.i_visible_width;
+        box.top    = picture->format.i_y_offset;
+        box.bottom = picture->format.i_y_offset + picture->format.i_visible_height;
+        box.back = 1;
+        box.front = 0;
+
+        ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
+                                                  (ID3D11Resource*) sys->picQuad.pTexture,
+                                                  0, 0, 0, 0,
+                                                  (ID3D11Resource*) sys->stagingQuad.pTexture,
+                                                  0, &box);
+    }
+
 #ifdef HAVE_ID3D11VIDEODECODER 
     if (picture->format.i_chroma == VLC_CODEC_D3D11_OPAQUE) {
         D3D11_BOX box;
@@ -790,7 +814,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-    if (picture->format.i_chroma != VLC_CODEC_D3D11_OPAQUE)
+    if ( picture->format.i_chroma != VLC_CODEC_D3D11_OPAQUE &&
+         sys->stagingQuad.pTexture == NULL )
         Direct3D11UnmapTexture(picture);
 
     /* Render the quad */
@@ -1113,6 +1138,12 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     else
         sys->psz_rgbaPxShader = NULL;
 
+    if ( fmt->i_height != fmt->i_visible_height || fmt->i_width != fmt->i_visible_width )
+    {
+        msg_Dbg( vd, "use a staging texture to crop to visible size" );
+        AllocQuad( vd, fmt, &sys->stagingQuad, &sys->picQuadConfig, NULL, false );
+    }
+
     UpdateRects(vd, NULL, NULL, true);
 
     if (Direct3D11CreateResources(vd, fmt)) {
@@ -1160,19 +1191,30 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
     int i_width  = RECTWidth(sys->rect_dest_clipped);
     int i_height = RECTHeight(sys->rect_dest_clipped);
 
-    int i_top = sys->rect_src_clipped.top * i_height;
-    i_top /= vd->source.i_visible_height;
-    i_top -= sys->rect_dest_clipped.top;
-    int i_left = sys->rect_src_clipped.left * i_width;
-    i_left /= vd->source.i_visible_width;
-    i_left -= sys->rect_dest_clipped.left;
+    if ( sys->stagingQuad.pTexture != NULL )
+    {
+        sys->picQuad.cropViewport.Width =  (FLOAT) i_width;
+        sys->picQuad.cropViewport.Height = (FLOAT) i_height;
+        sys->picQuad.cropViewport.TopLeftX = 0.0f;
+        sys->picQuad.cropViewport.TopLeftY = 0.0f;
+    }
+    else
+    {
+        int i_top = sys->rect_src_clipped.top * i_height;
+        i_top /= vd->source.i_visible_height;
+        i_top -= sys->rect_dest_clipped.top;
+        int i_left = sys->rect_src_clipped.left * i_width;
+        i_left /= vd->source.i_visible_width;
+        i_left -= sys->rect_dest_clipped.left;
 
-    sys->picQuad.cropViewport.Width =  (FLOAT) vd->source.i_width  * i_width  / vd->source.i_visible_width;
-    sys->picQuad.cropViewport.Height = (FLOAT) vd->source.i_height * i_height / vd->source.i_visible_height;
+        sys->picQuad.cropViewport.Width =  (FLOAT) vd->source.i_width  * i_width  / vd->source.i_visible_width;
+        sys->picQuad.cropViewport.Height = (FLOAT) vd->source.i_height * i_height / vd->source.i_visible_height;
+        sys->picQuad.cropViewport.TopLeftX = -i_left;
+        sys->picQuad.cropViewport.TopLeftY = -i_top;
+    }
+
     sys->picQuad.cropViewport.MinDepth = 0.0f;
     sys->picQuad.cropViewport.MaxDepth = 1.0f;
-    sys->picQuad.cropViewport.TopLeftX = -i_left;
-    sys->picQuad.cropViewport.TopLeftY = -i_top;
 
 #ifndef NDEBUG
     msg_Dbg(vd, "picQuad position (%.02f,%.02f) %.02fx%.02f", sys->picQuad.cropViewport.TopLeftX, sys->picQuad.cropViewport.TopLeftY, sys->picQuad.cropViewport.Width, sys->picQuad.cropViewport.Height );
@@ -1353,7 +1395,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         }
     }
 
-    if (AllocQuad( vd, fmt, &sys->picQuad, &sys->picQuadConfig, pPicQuadShader) != VLC_SUCCESS) {
+    if (AllocQuad( vd, fmt, &sys->picQuad, &sys->picQuadConfig, pPicQuadShader, true) != VLC_SUCCESS) {
         ID3D11PixelShader_Release(pPicQuadShader);
         msg_Err(vd, "Could not Create the main quad picture. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
@@ -1405,7 +1447,10 @@ static int Direct3D11CreatePool(vout_display_t *vd, video_format_t *fmt)
         return VLC_ENOMEM;
     }
 
-    picsys->texture  = sys->picQuad.pTexture;
+    if ( sys->stagingQuad.pTexture != NULL )
+        picsys->texture  = sys->stagingQuad.pTexture;
+    else
+        picsys->texture  = sys->picQuad.pTexture;
     picsys->vd       = vd;
 
     picture_resource_t resource = {
@@ -1446,7 +1491,7 @@ static void Direct3D11DestroyPool(vout_display_t *vd)
 }
 
 static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *quad,
-                     d3d_quad_cfg_t *cfg, ID3D11PixelShader *d3dpixelShader)
+                     d3d_quad_cfg_t *cfg, ID3D11PixelShader *d3dpixelShader, bool b_visible)
 {
     vout_display_sys_t *sys = vd->sys;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -1467,8 +1512,8 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
     D3D11_TEXTURE2D_DESC texDesc;
     memset(&texDesc, 0, sizeof(texDesc));
-    texDesc.Width = fmt->i_width;
-    texDesc.Height = fmt->i_height;
+    texDesc.Width  = b_visible ? fmt->i_visible_width  : fmt->i_width;
+    texDesc.Height = b_visible ? fmt->i_visible_height : fmt->i_height;
     texDesc.MipLevels = texDesc.ArraySize = 1;
     texDesc.Format = cfg->textureFormat;
     texDesc.SampleDesc.Count = 1;
@@ -1505,54 +1550,57 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         }
     }
 
-    quad->d3dpixelShader = d3dpixelShader;
-    ID3D11PixelShader_AddRef(quad->d3dpixelShader);
+    if ( d3dpixelShader != NULL )
+    {
+        quad->d3dpixelShader = d3dpixelShader;
+        ID3D11PixelShader_AddRef(quad->d3dpixelShader);
 
-    float right = 1.0f;
-    float left = -1.0f;
-    float top = 1.0f;
-    float bottom = -1.0f;
+        float right = 1.0f;
+        float left = -1.0f;
+        float top = 1.0f;
+        float bottom = -1.0f;
 
-    hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    if (SUCCEEDED(hr)) {
-        d3d_vertex_t *dst_data = mappedResource.pData;
+        hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        if (SUCCEEDED(hr)) {
+            d3d_vertex_t *dst_data = mappedResource.pData;
 
-        // bottom left
-        dst_data[0].position.x = left;
-        dst_data[0].position.y = bottom;
-        dst_data[0].position.z = 0.0f;
-        dst_data[0].texture.x = 0.0f;
-        dst_data[0].texture.y = 1.0f;
-        dst_data[0].opacity = 1.0f;
+            // bottom left
+            dst_data[0].position.x = left;
+            dst_data[0].position.y = bottom;
+            dst_data[0].position.z = 0.0f;
+            dst_data[0].texture.x = 0.0f;
+            dst_data[0].texture.y = 1.0f;
+            dst_data[0].opacity = 1.0f;
 
-        // bottom right
-        dst_data[1].position.x = right;
-        dst_data[1].position.y = bottom;
-        dst_data[1].position.z = 0.0f;
-        dst_data[1].texture.x = 1.0f;
-        dst_data[1].texture.y = 1.0f;
-        dst_data[1].opacity = 1.0f;
+            // bottom right
+            dst_data[1].position.x = right;
+            dst_data[1].position.y = bottom;
+            dst_data[1].position.z = 0.0f;
+            dst_data[1].texture.x = 1.0f;
+            dst_data[1].texture.y = 1.0f;
+            dst_data[1].opacity = 1.0f;
 
-        // top right
-        dst_data[2].position.x = right;
-        dst_data[2].position.y = top;
-        dst_data[2].position.z = 0.0f;
-        dst_data[2].texture.x = 1.0f;
-        dst_data[2].texture.y = 0.0f;
-        dst_data[2].opacity = 1.0f;
+            // top right
+            dst_data[2].position.x = right;
+            dst_data[2].position.y = top;
+            dst_data[2].position.z = 0.0f;
+            dst_data[2].texture.x = 1.0f;
+            dst_data[2].texture.y = 0.0f;
+            dst_data[2].opacity = 1.0f;
 
-        // top left
-        dst_data[3].position.x = left;
-        dst_data[3].position.y = top;
-        dst_data[3].position.z = 0.0f;
-        dst_data[3].texture.x = 0.0f;
-        dst_data[3].texture.y = 0.0f;
-        dst_data[3].opacity = 1.0f;
+            // top left
+            dst_data[3].position.x = left;
+            dst_data[3].position.y = top;
+            dst_data[3].position.z = 0.0f;
+            dst_data[3].texture.x = 0.0f;
+            dst_data[3].texture.y = 0.0f;
+            dst_data[3].opacity = 1.0f;
 
-        ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
-    }
-    else {
-        msg_Err(vd, "Failed to lock the subpicture vertex buffer (hr=0x%lX)", hr);
+            ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
+        }
+        else {
+            msg_Err(vd, "Failed to lock the subpicture vertex buffer (hr=0x%lX)", hr);
+        }
     }
 
     return VLC_SUCCESS;
@@ -1582,6 +1630,8 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
 
     Direct3D11DestroyPool(vd);
 
+    if ( sys->stagingQuad.pTexture )
+        ReleaseQuad(&sys->stagingQuad);
     ReleaseQuad(&sys->picQuad);
     Direct3D11DeleteRegions(sys->d3dregion_count, sys->d3dregions);
     sys->d3dregion_count = 0;
@@ -1701,7 +1751,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 .textureFormat      = sys->d3dregion_format,
                 .resourceFormatYRGB = sys->d3dregion_format,
             };
-            err = AllocQuad(vd, &r->fmt, d3dquad, &rgbaCfg, sys->pSPUPixelShader);
+            err = AllocQuad(vd, &r->fmt, d3dquad, &rgbaCfg, sys->pSPUPixelShader, false);
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to create %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
