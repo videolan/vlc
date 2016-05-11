@@ -106,3 +106,21 @@
  
    /* The performance of QPC varies depending on the architecture it's
       running on and on the OS, the MS documentation is vague about the
+--- libgcrypt.old/random/rndw32.c	2016-05-11 19:53:20.614939666 +0200
++++ libgcrypt/random/rndw32.c	2016-05-11 19:54:37.410941944 +0200
+@@ -361,6 +361,7 @@
+ registry_poll (void (*add)(const void*, size_t, enum random_origins),
+                enum random_origins requester)
+ {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   static int cbPerfData = PERFORMANCE_BUFFER_SIZE;
+   int iterations;
+   DWORD dwSize, status;
+@@ -480,6 +481,7 @@
+      isn't done then any system components which provide performance data
+      can't be removed or changed while the handle remains active.  */
+   RegCloseKey (HKEY_PERFORMANCE_DATA);
++#endif
+ }
+ 
+ 
