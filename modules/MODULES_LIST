@@ -80,7 +80,6 @@ $Id$
  * chorus_flanger: Basic chorus/flanger/variable delay audio filter
  * chroma_omx: OMX Development Layer chroma conversions
  * chroma_yuv_neon: ARM NEON video chroma conversion
- * chromecast: Module to handle communication with Chromecast and redirect input playback
  * clone: Clone video filter
  * colorthres:  Theshold color based on similarity to reference color Video filter
  * compressor: Dynamic range compressor
