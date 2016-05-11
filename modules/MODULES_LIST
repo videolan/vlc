@@ -268,7 +268,7 @@ $Id$
  * ntservice: run VLC as a NT service
  * nuv: NUV demuxer
  * ogg: input module for OGG decapsulation
- * oggspots: an OggSpots video decoder/packetizer/encoder
+ * oggspots: an OggSpots video decoder/packetizer
  * oldmovie: oldmovie style video filter
  * oldrc: old interface module using stdio
  * omxil: OpenMAX IL audio/video decoder
