@@ -124,3 +124,21 @@
  }
  
  
+--- libgcrypt/random/rndw32.c.orig	2016-05-11 22:50:39.145927976 +0200
++++ libgcrypt/random/rndw32.c	2016-05-11 22:50:42.529932530 +0200
+@@ -502,6 +502,7 @@
+     {
+       HKEY hKey;
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+       if ( debug_me )
+         log_debug ("rndw32#slow_gatherer: init toolkit\n" );
+       /* Find out whether this is an NT server or workstation if necessary */
+@@ -528,6 +529,7 @@
+             }
+           RegCloseKey (hKey);
+         }
++#endif
+ 
+       /* The following are fixed for the lifetime of the process so we
+          only add them once */
