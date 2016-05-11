@@ -181,6 +181,7 @@ $Id$
  * hqdn3d: High Quality denoising filter
  * http: HTTP Network access module
  * https: HTTP/TLS access module for HTTP 2.0 support
+ * i420_nv12: planar YUV to semi-planar YUV conversion functions
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb
  * i420_rgb_sse2: sse2 accelerated version of i420_rgb

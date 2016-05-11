@@ -50,4 +50,8 @@ void CopyFromNv12ToNv12(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
 void CopyFromNv12ToI420(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
                         unsigned width, unsigned height);
 
+void CopyFromI420ToNv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
+                        unsigned width, unsigned height,
+                        copy_cache_t *cache);
+
 #endif

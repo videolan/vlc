@@ -21,6 +21,11 @@ libi420_yuy2_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2
 libi420_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_i420_yuy2
 
+libi420_nv12_plugin_la_SOURCES = video_chroma/i420_nv12.c \
+	video_chroma/copy.c video_chroma/copy.h
+libi420_nv12_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i420_nv12
+
 libi422_i420_plugin_la_SOURCES = video_chroma/i422_i420.c
 
 libi422_yuy2_plugin_la_SOURCES = video_chroma/i422_yuy2.c video_chroma/i422_yuy2.h
@@ -38,6 +43,7 @@ libyuvp_plugin_la_SOURCES = video_chroma/yuvp.c
 chroma_LTLIBRARIES = \
 	libi420_rgb_plugin.la \
 	libi420_yuy2_plugin.la \
+	libi420_nv12_plugin.la \
 	libi422_i420_plugin.la \
 	libi422_yuy2_plugin.la \
 	libgrey_yuv_plugin.la \

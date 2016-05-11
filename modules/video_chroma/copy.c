@@ -365,6 +365,41 @@ static void SSE_CopyFromNv12ToNv12(picture_t *dst,
                   width, height/2, cpu);
     asm volatile ("emms");
 }
+
+static void SSE_CopyFromI420ToNv12(picture_t *dst,
+                             uint8_t *src[2], size_t src_pitch[2],
+                             unsigned width, unsigned height,
+                             copy_cache_t *cache, unsigned cpu)
+{
+    SSE_CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
+                  src[0], src_pitch[0],
+                  cache->buffer, cache->size,
+                  width, height, cpu);
+
+    /* TODO optimise the plane merging */
+    const unsigned copy_lines = height / 2;
+    const unsigned copy_pitch = width / 2;
+
+    const int i_extra_pitch_uv = dst->p[1].i_pitch - 2 * copy_pitch;
+    const int i_extra_pitch_u  = src_pitch[U_PLANE] - copy_pitch;
+    const int i_extra_pitch_v  = src_pitch[V_PLANE] - copy_pitch;
+
+    uint8_t *dstUV = dst->p[1].p_pixels;
+    uint8_t *srcU  = src[U_PLANE];
+    uint8_t *srcV  = src[V_PLANE];
+    for ( unsigned int line = 0; line < copy_lines; line++ )
+    {
+        for ( unsigned int col = 0; col < copy_pitch; col++ )
+        {
+            *dstUV++ = *srcU++;
+            *dstUV++ = *srcV++;
+        }
+        dstUV += i_extra_pitch_uv;
+        srcU  += i_extra_pitch_u;
+        srcV  += i_extra_pitch_v;
+    }
+    asm volatile ("emms");
+}
 #undef COPY64
 #endif /* CAN_COMPILE_SSE2 */
 
@@ -449,6 +484,47 @@ void CopyFromNv12ToI420(picture_t *dst, uint8_t *src[2], size_t src_pitch[2],
                 src[1], src_pitch[1],
                 width/2, height/2);
 }
+
+void CopyFromI420ToNv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
+                        unsigned width, unsigned height,
+                        copy_cache_t *cache)
+{
+#ifdef CAN_COMPILE_SSE2
+    unsigned cpu = vlc_CPU();
+    if (vlc_CPU_SSE2())
+        return SSE_CopyFromI420ToNv12(dst, src, src_pitch, width, height,
+                                cache, cpu);
+#else
+    (void) cache;
+#endif
+
+    CopyPlane(dst->p[0].p_pixels, dst->p[0].i_pitch,
+              src[0], src_pitch[0],
+              width, height);
+
+    const unsigned copy_lines = height / 2;
+    const unsigned copy_pitch = width / 2;
+
+    const int i_extra_pitch_uv = dst->p[1].i_pitch - 2 * copy_pitch;
+    const int i_extra_pitch_u  = src_pitch[U_PLANE] - copy_pitch;
+    const int i_extra_pitch_v  = src_pitch[V_PLANE] - copy_pitch;
+
+    uint8_t *dstUV = dst->p[1].p_pixels;
+    uint8_t *srcU  = src[U_PLANE];
+    uint8_t *srcV  = src[V_PLANE];
+    for ( unsigned int line = 0; line < copy_lines; line++ )
+    {
+        for ( unsigned int col = 0; col < copy_pitch; col++ )
+        {
+            *dstUV++ = *srcU++;
+            *dstUV++ = *srcV++;
+        }
+        dstUV += i_extra_pitch_uv;
+        srcU  += i_extra_pitch_u;
+        srcV  += i_extra_pitch_v;
+    }
+}
+
 
 void CopyFromYv12(picture_t *dst, uint8_t *src[3], size_t src_pitch[3],
                   unsigned width, unsigned height,
