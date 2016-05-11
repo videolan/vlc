@@ -1,0 +1,93 @@
+--- gnutls/lib/x509/verify-high2.c.orig	2016-05-11 21:28:25.584504325 +0200
++++ gnutls/lib/x509/verify-high2.c	2016-05-11 21:32:00.596348074 +0200
+@@ -37,6 +37,10 @@
+ 
+ #include <dirent.h>
+ 
++#include <windows.h>
++#include <tchar.h>
++
++
+ #ifndef _DIRENT_HAVE_D_TYPE
+ # ifdef DT_UNKNOWN
+ #  define _DIRENT_HAVE_D_TYPE
+@@ -366,14 +370,40 @@
+ 	return ret;
+ }
+ 
++static inline char *FromWide (const wchar_t *wide)
++{
++    size_t len = WideCharToMultiByte (CP_UTF8, 0, wide, -1, NULL, 0, NULL, NULL);
++    if (len == 0)
++        return NULL;
++
++    char *out = (char *)malloc (len);
++
++    if (out)
++        WideCharToMultiByte (CP_UTF8, 0, wide, -1, out, len, NULL, NULL);
++    return out;
++}
++
++static inline wchar_t *ToWide (const char *utf8)
++{
++    int len = MultiByteToWideChar (CP_UTF8, 0, utf8, -1, NULL, 0);
++    if (len == 0)
++        return NULL;
++
++    wchar_t *out = (wchar_t *)malloc (len * sizeof (wchar_t));
++
++    if (out)
++        MultiByteToWideChar (CP_UTF8, 0, utf8, -1, out, len);
++    return out;
++}
++
+ static
+ int load_dir_certs(const char *dirname,
+ 			  gnutls_x509_trust_list_t list,
+ 			  unsigned int tl_flags, unsigned int tl_vflags,
+ 			  unsigned type, unsigned crl)
+ {
+-	DIR *dirp;
+-	struct dirent *d;
++	_TDIR *dirp;
++	struct _tdirent *d;
+ 	int ret;
+ 	int r = 0;
+ 	char path[GNUTLS_PATH_MAX];
+@@ -381,11 +411,13 @@
+ 	struct dirent e;
+ #endif
+ 
+-	dirp = opendir(dirname);
++    TCHAR* dirnameW = ToWide(dirname);
++	dirp = _topendir(dirnameW);
++    free(dirnameW);
+ 	if (dirp != NULL) {
+ 		do {
+ #ifdef _WIN32
+-			d = readdir(dirp);
++			d = _treaddir(dirp);
+ 			if (d != NULL) {
+ #else
+ 			ret = readdir_r(dirp, &e, &d);
+@@ -395,8 +427,10 @@
+ #endif
+ 			) {
+ #endif
++                char* d_name = FromWide(d->d_name);
+ 				snprintf(path, sizeof(path), "%s/%s",
+-					 dirname, d->d_name);
++					 dirname, d_name);
++                free(d_name);
+ 
+ 				if (crl != 0) {
+ 					ret =
+@@ -414,7 +448,7 @@
+ 			}
+ 		}
+ 		while (d != NULL);
+-		closedir(dirp);
++		_tclosedir(dirp);
+ 	}
+ 
+ 	return r;

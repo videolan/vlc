@@ -24,6 +24,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-mingw64.patch
 ifdef HAVE_WINRT
 	$(APPLY) $(SRC)/gnutls/gnutls-winrt.patch
+	$(APPLY) $(SRC)/gnutls/winrt-topendir.patch
 endif
 endif
 ifdef HAVE_ANDROID
