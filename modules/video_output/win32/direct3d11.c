@@ -295,23 +295,10 @@ static int Open(vlc_object_t *object)
     }
 # endif
 
-#else
-    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
-    if (!dxgiswapChain)
-        return VLC_EGENERIC;
-    ID3D11Device* d3ddevice         = var_InheritInteger(vd, "winrt-d3ddevice");
-    if (!d3ddevice)
-        return VLC_EGENERIC;
-    ID3D11DeviceContext* d3dcontext = var_InheritInteger(vd, "winrt-d3dcontext");
-    if (!d3dcontext)
-        return VLC_EGENERIC;
-#endif
-
     vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
     if (!sys)
         return VLC_ENOMEM;
 
-#if !VLC_WINSTORE_APP
     sys->hd3d11_dll       = hd3d11_dll;
     sys->hd3dcompiler_dll = hd3dcompiler_dll;
 
@@ -327,7 +314,7 @@ static int Open(vlc_object_t *object)
 
     /* TODO : enable all dxgi versions from 1.3 -> 1.1 */
     PFN_CREATE_DXGI_FACTORY OurCreateDXGIFactory =
-        (void *)GetProcAddress(sys->hdxgi_dll, "CreateDXGIFactory");
+        (void *)GetProcAddress(hdxgi_dll, "CreateDXGIFactory");
     if (!OurCreateDXGIFactory) {
         msg_Err(vd, "Cannot locate reference to CreateDXGIFactory in dxgi DLL");
         Direct3D11Destroy(vd);
@@ -348,7 +335,7 @@ static int Open(vlc_object_t *object)
     }
 
     sys->OurD3D11CreateDeviceAndSwapChain =
-        (void *)GetProcAddress(sys->hd3d11_dll, "D3D11CreateDeviceAndSwapChain");
+        (void *)GetProcAddress(hd3d11_dll, "D3D11CreateDeviceAndSwapChain");
     if (!sys->OurD3D11CreateDeviceAndSwapChain) {
         msg_Err(vd, "Cannot locate reference to D3D11CreateDeviceAndSwapChain in d3d11 DLL");
         Direct3D11Destroy(vd);
@@ -357,7 +344,7 @@ static int Open(vlc_object_t *object)
 
 # else
     sys->OurD3D11CreateDevice =
-        (void *)GetProcAddress(sys->hd3d11_dll, "D3D11CreateDevice");
+        (void *)GetProcAddress(hd3d11_dll, "D3D11CreateDevice");
     if (!sys->OurD3D11CreateDevice) {
         msg_Err(vd, "Cannot locate reference to D3D11CreateDevice in d3d11 DLL");
         Direct3D11Destroy(vd);
@@ -366,6 +353,20 @@ static int Open(vlc_object_t *object)
 # endif
 
 #else
+    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
+    if (!dxgiswapChain)
+        return VLC_EGENERIC;
+    ID3D11Device* d3ddevice         = var_InheritInteger(vd, "winrt-d3ddevice");
+    if (!d3ddevice)
+        return VLC_EGENERIC;
+    ID3D11DeviceContext* d3dcontext = var_InheritInteger(vd, "winrt-d3dcontext");
+    if (!d3dcontext)
+        return VLC_EGENERIC;
+
+    vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
+    if (!sys)
+        return VLC_ENOMEM;
+
     sys->dxgiswapChain = dxgiswapChain;
     sys->d3ddevice     = d3ddevice;
     sys->d3dcontext    = d3dcontext;
