@@ -1663,7 +1663,6 @@ static int Direct3D11MapTexture(picture_t *picture)
     vout_display_t     *vd = p_sys->vd;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     HRESULT hr;
-    int res;
     hr = ID3D11DeviceContext_Map(vd->sys->d3dcontext, (ID3D11Resource *)p_sys->texture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if( FAILED(hr) )
     {
