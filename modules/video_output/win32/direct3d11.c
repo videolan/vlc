@@ -269,11 +269,9 @@ static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
   }\
 ";
 
-static int Open(vlc_object_t *object)
-{
-    vout_display_t *vd = (vout_display_t *)object;
-
 #if !VLC_WINSTORE_APP
+static int OpenHwnd(vout_display_t *vd)
+{
     HINSTANCE hd3d11_dll = LoadLibrary(TEXT("D3D11.DLL"));
     if (!hd3d11_dll) {
         msg_Warn(vd, "cannot load d3d11.dll, aborting");
@@ -352,8 +350,11 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 # endif
-
+    return VLC_SUCCESS;
+}
 #else
+static int OpenCoreW(vout_display_t *vd)
+{
     IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
     if (!dxgiswapChain)
         return VLC_EGENERIC;
@@ -374,7 +375,23 @@ static int Open(vlc_object_t *object)
     IDXGISwapChain_AddRef     (sys->dxgiswapChain);
     ID3D11Device_AddRef       (sys->d3ddevice);
     ID3D11DeviceContext_AddRef(sys->d3dcontext);
+
+    return VLC_SUCCESS;
+}
 #endif
+
+static int Open(vlc_object_t *object)
+{
+    vout_display_t *vd = (vout_display_t *)object;
+
+#if !VLC_WINSTORE_APP
+    int ret = OpenHwnd(vd);
+#else
+    int ret = OpenCoreW(vd);
+#endif
+
+    if (ret != VLC_SUCCESS)
+        return ret;
 
     if (CommonInit(vd))
         goto error;
@@ -393,8 +410,8 @@ static int Open(vlc_object_t *object)
     info.has_pictures_invalid = fmt.i_chroma != VLC_CODEC_D3D11_OPAQUE;
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
-        sys->d3dregion_format != DXGI_FORMAT_UNKNOWN)
-        info.subpicture_chromas = sys->pSubpictureChromas;
+        vd->sys->d3dregion_format != DXGI_FORMAT_UNKNOWN)
+        info.subpicture_chromas = vd->sys->pSubpictureChromas;
     else
         info.subpicture_chromas = NULL;
 
