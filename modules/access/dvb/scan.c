@@ -692,7 +692,10 @@ static int Scan_Next_DVBT( const scan_parameter_t *p_params, scan_enumeration_t 
         if( i >=i_band_count )
         {
             if( i_fi > band[i_band_count-1].i_max )
+            {
+                p_spectrum->i_index++;
                 return VLC_EGENERIC;
+            }
             continue;
         }
 
@@ -717,6 +720,7 @@ static int Scan_Next_DVBT( const scan_parameter_t *p_params, scan_enumeration_t 
             }
 
             *pf_pos = (double)( i_current + (double)i_oi / i_offset_count ) / i_total;
+            p_spectrum->i_index++;
             return VLC_SUCCESS;
         }
     }
