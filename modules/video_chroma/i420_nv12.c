@@ -60,6 +60,9 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
+    if ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_NV12 )
+        return -1;
+
     if( p_filter->fmt_in.video.i_width & 1
      || p_filter->fmt_in.video.i_height & 1 )
     {
