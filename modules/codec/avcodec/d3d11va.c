@@ -92,6 +92,7 @@ vlc_module_end()
 # include <dxgidebug.h>
 #endif
 
+DEFINE_GUID(GUID_CONTEXT_MUTEX,      0x472e8835, 0x3f8e, 0x4f93, 0xa0, 0xcb, 0x25, 0x79, 0x77, 0x6c, 0xed, 0x86);
 DEFINE_GUID(IID_ID3D11VideoDevice,   0x10EC4D5B, 0x975A, 0x4689, 0xB9, 0xE4, 0xD0, 0xAA, 0xC3, 0x0F, 0xE3, 0x33);
 DEFINE_GUID(IID_ID3D11VideoContext,  0x61F21C45, 0x3C0E, 0x4a74, 0x9C, 0xEA, 0x67, 0x10, 0x0D, 0x9A, 0xD5, 0xE4);
 DEFINE_GUID(IID_IDXGIDevice,         0x54ec77fa, 0x1377, 0x44e6, 0x8c, 0x32, 0x88, 0xfd, 0x5f, 0x44, 0xc8, 0x4c);
@@ -114,6 +115,9 @@ struct vlc_va_sys_t
     DXGI_FORMAT                  render;
 
     ID3D11DeviceContext          *d3dctx;
+#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(56, 36, 0, 36, 100)
+    HANDLE                       context_mutex;
+#endif
 
     /* Video decoder */
     D3D11_VIDEO_DECODER_CONFIG   cfg;
@@ -170,6 +174,13 @@ void SetupAVCodecContext(vlc_va_t *va)
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface_count = dx_sys->surface_count;
     sys->hw.surface = (ID3D11VideoDecoderOutputView**) dx_sys->hw_surface;
+#if LIBAVCODEC_VERSION_CHECK(56, 36, 0, 36, 100)
+#if VLC_WINSTORE_APP
+    sys->hw.context_mutex = sys->context_mutex;
+#else
+    sys->hw.context_mutex = INVALID_HANDLE_VALUE;
+#endif
+#endif
 
     if (IsEqualGUID(&dx_sys->input, &DXVA_Intel_H264_NoFGT_ClearVideo))
         sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
@@ -223,18 +234,25 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
     vlc_va_sys_t *sys = va->sys;
     ID3D11VideoDecoderOutputView *src = (ID3D11VideoDecoderOutputView*)(uintptr_t)data;
     vlc_va_surface_t *surface = output->context;
+    int ret = VLC_SUCCESS;
 
     if (output->format.i_chroma == VLC_CODEC_D3D11_OPAQUE)
     {
-        /* copy decoder slice to surface */
-        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
         picture_sys_t *p_sys_out = output->p_sys;
         picture_sys_t *p_sys_in = surface->p_pic->p_sys;
 
         assert(p_sys_out->texture != NULL);
         assert(p_sys_in->decoder == src);
 
+#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(56, 36, 0, 36, 100)
+        if( sys->context_mutex > 0 ) {
+            WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
+        }
+#endif
+        D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
         ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
+
+        /* copy decoder slice to surface */
         ID3D11DeviceContext_CopySubresourceRegion(sys->d3dctx, (ID3D11Resource*) p_sys_out->texture,
                                                   0, 0, 0, 0,
                                                   (ID3D11Resource*) p_sys_in->texture,
@@ -247,10 +265,16 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         va->sys->filter->pf_video_filter( va->sys->filter, surface->p_pic );
     } else {
         msg_Err(va, "Unsupported output picture format %08X", output->format.i_chroma );
-        return VLC_EGENERIC;
+        ret = VLC_EGENERIC;
     }
 
-    return VLC_SUCCESS;
+#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(56, 36, 0, 36, 100)
+    if( sys->context_mutex > 0 ) {
+        ReleaseMutex( sys->context_mutex );
+    }
+#endif
+
+    return ret;
 }
 
 static int CheckDevice(vlc_va_t *va)
@@ -344,6 +368,16 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
            msg_Err(va, "Could not Query ID3D11VideoDevice Interface from the picture. (hr=0x%lX)", hr);
         } else {
             ID3D11DeviceContext_GetDevice( p_sys->context, (ID3D11Device**) &dx_sys->d3ddev );
+#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(56, 36, 0, 36, 100)
+            HANDLE context_lock = INVALID_HANDLE_VALUE;
+            UINT dataSize = sizeof(context_lock);
+            hr = ID3D11Device_GetPrivateData((ID3D11Device*)dx_sys->d3ddev, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
+            if (SUCCEEDED(hr))
+                sys->context_mutex = context_lock;
+            else
+                msg_Warn(va, "No mutex found to lock the decoder");
+#endif
+
             sys->d3dctx = p_sys->context;
             sys->d3dvidctx = d3dvidctx;
 
