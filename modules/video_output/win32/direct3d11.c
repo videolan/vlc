@@ -428,11 +428,9 @@ static int Open(vlc_object_t *object)
     msg_Dbg(vd, "Direct3D11 Open Succeeded");
 
     return VLC_SUCCESS;
+
 error:
-    Direct3D11Close(vd);
-    CommonClean(vd);
-    Direct3D11Destroy(vd);
-    free(vd->sys);
+    Close(object);
     return VLC_EGENERIC;
 }
 
@@ -851,8 +849,6 @@ static void Direct3D11Destroy(vout_display_t *vd)
         FreeLibrary(sys->hd3d11_dll);
     if (sys->hd3dcompiler_dll)
         FreeLibrary(sys->hd3dcompiler_dll);
-
-    /* TODO : add release of d3d11 objects here */
 
     sys->OurD3D11CreateDevice = NULL;
     sys->OurD3D11CreateDeviceAndSwapChain = NULL;
