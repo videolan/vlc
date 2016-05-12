@@ -653,7 +653,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         SetWindowPos(sys->hwnd, 0, 0, 0,
                      rect_window.right - rect_window.left,
                      rect_window.bottom - rect_window.top, SWP_NOMOVE);
-        UpdateRects(vd, cfg, &vd->source, false);
+        UpdateRects(vd, cfg, NULL, false);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED: /* const vout_display_cfg_t *p_cfg */
