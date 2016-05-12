@@ -146,6 +146,7 @@ static void ReleaseQuad(d3d_quad_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
 static void UpdateQuadOpacity(vout_display_t *, const d3d_quad_t *, float);
 
+static int Control(vout_display_t *vd, int query, va_list args);
 static void Manage(vout_display_t *vd);
 
 /* All the #if USE_DXGI contain an alternative method to setup dx11
@@ -395,7 +396,7 @@ static int Open(vlc_object_t *object)
     vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
-    vd->control = CommonControl;
+    vd->control = Control;
     vd->manage  = Manage;
 
     msg_Dbg(vd, "Direct3D11 Open Succeeded");
@@ -624,11 +625,42 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     return S_OK;
 }
 
+static void CropStagingFormat(vout_display_t *vd, video_format_t *backup_fmt)
+{
+    if ( vd->sys->stagingQuad.pTexture == NULL )
+        return;
+
+    video_format_Copy( backup_fmt, &vd->source );
+    /* the texture we display is a cropped version of the source */
+    vd->source.i_x_offset = 0;
+    vd->source.i_y_offset = 0;
+    vd->source.i_width  = vd->source.i_visible_width;
+    vd->source.i_height = vd->source.i_visible_height;
+}
+
+static void UncropStagingFormat(vout_display_t *vd, video_format_t *backup_fmt)
+{
+    if ( vd->sys->stagingQuad.pTexture == NULL )
+        return;
+    video_format_Copy( &vd->source, backup_fmt );
+}
+
+static int Control(vout_display_t *vd, int query, va_list args)
+{
+    video_format_t core_source;
+    CropStagingFormat( vd, &core_source );
+    int res = CommonControl( vd, query, args );
+    UncropStagingFormat( vd, &core_source );
+    return res;
+}
+
 static void Manage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     RECT size_before = sys->rect_dest_clipped;
 
+    video_format_t core_source;
+    CropStagingFormat( vd, &core_source );
     CommonManage(vd);
 
     if (RECTWidth(size_before)  != RECTWidth(sys->rect_dest_clipped) ||
@@ -641,6 +673,7 @@ static void Manage(vout_display_t *vd)
 
         UpdatePicQuadPosition(vd);
     }
+    UncropStagingFormat( vd, &core_source );
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
@@ -651,10 +684,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
          sys->stagingQuad.pTexture != NULL )
     {
         Direct3D11UnmapTexture(picture);
-
-        D3D11_TEXTURE2D_DESC picDesc, stagingDesc;
-        ID3D11Texture2D_GetDesc( sys->picQuad.pTexture, &picDesc );
-        ID3D11Texture2D_GetDesc( sys->stagingQuad.pTexture, &stagingDesc );
 
         D3D11_BOX box;
         box.left   = picture->format.i_x_offset;
@@ -674,10 +703,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 #ifdef HAVE_ID3D11VIDEODECODER 
     if (picture->format.i_chroma == VLC_CODEC_D3D11_OPAQUE) {
         D3D11_BOX box;
-        box.left = 0;
-        box.right = picture->format.i_visible_width;
-        box.top = 0;
-        box.bottom = picture->format.i_visible_height;
+        box.left   = picture->format.i_x_offset;
+        box.right  = picture->format.i_x_offset + picture->format.i_visible_width;
+        box.top    = picture->format.i_y_offset;
+        box.bottom = picture->format.i_y_offset + picture->format.i_visible_height;
         box.back = 1;
         box.front = 0;
 
@@ -1047,7 +1076,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         AllocQuad( vd, fmt, &sys->stagingQuad, &sys->picQuadConfig, NULL, false );
     }
 
+    video_format_t core_source;
+    CropStagingFormat( vd, &core_source );
     UpdateRects(vd, NULL, NULL, true);
+    UncropStagingFormat( vd, &core_source );
 
     if (Direct3D11CreateResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate resources");
@@ -1094,27 +1126,17 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
     int i_width  = RECTWidth(sys->rect_dest_clipped);
     int i_height = RECTHeight(sys->rect_dest_clipped);
 
-    if ( sys->stagingQuad.pTexture != NULL )
-    {
-        sys->picQuad.cropViewport.Width =  (FLOAT) i_width;
-        sys->picQuad.cropViewport.Height = (FLOAT) i_height;
-        sys->picQuad.cropViewport.TopLeftX = 0.0f;
-        sys->picQuad.cropViewport.TopLeftY = 0.0f;
-    }
-    else
-    {
-        int i_top = sys->rect_src_clipped.top * i_height;
-        i_top /= vd->source.i_visible_height;
-        i_top -= sys->rect_dest_clipped.top;
-        int i_left = sys->rect_src_clipped.left * i_width;
-        i_left /= vd->source.i_visible_width;
-        i_left -= sys->rect_dest_clipped.left;
+    int i_top = sys->rect_src_clipped.top * i_height;
+    i_top /= vd->source.i_visible_height;
+    i_top -= sys->rect_dest_clipped.top;
+    int i_left = sys->rect_src_clipped.left * i_width;
+    i_left /= vd->source.i_visible_width;
+    i_left -= sys->rect_dest_clipped.left;
 
-        sys->picQuad.cropViewport.Width =  (FLOAT) vd->source.i_width  * i_width  / vd->source.i_visible_width;
-        sys->picQuad.cropViewport.Height = (FLOAT) vd->source.i_height * i_height / vd->source.i_visible_height;
-        sys->picQuad.cropViewport.TopLeftX = -i_left;
-        sys->picQuad.cropViewport.TopLeftY = -i_top;
-    }
+    sys->picQuad.cropViewport.Width =  (FLOAT) vd->source.i_width  * i_width  / vd->source.i_visible_width;
+    sys->picQuad.cropViewport.Height = (FLOAT) vd->source.i_height * i_height / vd->source.i_visible_height;
+    sys->picQuad.cropViewport.TopLeftX = -i_left;
+    sys->picQuad.cropViewport.TopLeftY = -i_top;
 
     sys->picQuad.cropViewport.MinDepth = 0.0f;
     sys->picQuad.cropViewport.MaxDepth = 1.0f;
@@ -1305,7 +1327,10 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     }
     ID3D11PixelShader_Release(pPicQuadShader);
 
+    video_format_t core_source;
+    CropStagingFormat( vd, &core_source );
     UpdatePicQuadPosition(vd);
+    UncropStagingFormat( vd, &core_source );
 
     D3D11_SAMPLER_DESC sampDesc;
     memset(&sampDesc, 0, sizeof(sampDesc));
