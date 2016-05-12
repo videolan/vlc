@@ -283,7 +283,7 @@ static int Open(vlc_object_t *object)
     HINSTANCE hd3dcompiler_dll = Direct3D11LoadShaderLibrary();
     if (!hd3dcompiler_dll) {
         msg_Err(vd, "cannot load d3dcompiler.dll, aborting");
-        FreeLibrary(hd3d11_dll);
+        Direct3D11Destroy(vd);
         return VLC_EGENERIC;
     }
 
@@ -291,6 +291,7 @@ static int Open(vlc_object_t *object)
     HINSTANCE hdxgi_dll = LoadLibrary(TEXT("DXGI.DLL"));
     if (!hdxgi_dll) {
         msg_Warn(vd, "cannot load dxgi.dll, aborting");
+        Direct3D11Destroy(vd);
         return VLC_EGENERIC;
     }
 # endif
