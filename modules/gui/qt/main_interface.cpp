@@ -1539,6 +1539,8 @@ void MainInterface::wheelEvent( QWheelEvent *e )
 void MainInterface::closeEvent( QCloseEvent *e )
 {
 //  hide();
+    if ( b_minimalView )
+        setMinimalView( false );
     emit askToQuit(); /* ask THEDP to quit, so we have a unique method */
     /* Accept session quit. Otherwise we break the desktop mamager. */
     e->accept();
