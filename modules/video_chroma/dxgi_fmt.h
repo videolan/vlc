@@ -39,5 +39,6 @@ typedef struct
 
 extern const char *DxgiFormatToStr(DXGI_FORMAT format);
 extern const d3d_format_t *GetRenderFormatList(void);
+extern void DxgiFormatMask(DXGI_FORMAT format, video_format_t *);
 
 #endif /* include-guard */

@@ -969,6 +969,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                 msg_Dbg( vd, "Using pixel format %s from chroma %4.4s", output_format->name,
                              (char *)&i_src_chroma );
                 fmt->i_chroma = output_format->fourcc;
+                DxgiFormatMask( output_format->formatTexture, fmt );
                 sys->picQuadConfig.textureFormat      = output_format->formatTexture;
                 sys->picQuadConfig.resourceFormatYRGB = output_format->formatY;
                 sys->picQuadConfig.resourceFormatUV   = output_format->formatUV;
@@ -991,6 +992,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                 msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", output_format->name,
                              (char *)&i_src_chroma );
                 fmt->i_chroma = output_format->fourcc;
+                DxgiFormatMask( output_format->formatTexture, fmt );
                 sys->picQuadConfig.textureFormat      = output_format->formatTexture;
                 sys->picQuadConfig.resourceFormatYRGB = output_format->formatY;
                 sys->picQuadConfig.resourceFormatUV   = output_format->formatUV;
