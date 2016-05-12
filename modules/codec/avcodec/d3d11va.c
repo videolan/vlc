@@ -244,7 +244,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         assert(p_sys_out->texture != NULL);
         assert(p_sys_in->decoder == src);
 
-#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(56, 2, 0, 3, 100)
+#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
         if( sys->context_mutex > 0 ) {
             WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
         }
