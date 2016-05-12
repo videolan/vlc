@@ -89,7 +89,7 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
 vlc_module_end ()
 
-#ifdef HAVE_ID3D11VIDEODECODER 
+#ifdef HAVE_ID3D11VIDEODECODER
 /* VLC_CODEC_D3D11_OPAQUE */
 struct picture_sys_t
 {
@@ -433,7 +433,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if ( vd->sys->pool != NULL )
         return vd->sys->pool;
 
-#ifdef HAVE_ID3D11VIDEODECODER 
+#ifdef HAVE_ID3D11VIDEODECODER
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
     HRESULT           hr;
@@ -519,7 +519,7 @@ error:
     return vd->sys->pool;
 }
 
-#ifdef HAVE_ID3D11VIDEODECODER 
+#ifdef HAVE_ID3D11VIDEODECODER
 static void DestroyDisplayPoolPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = (picture_sys_t*) picture->p_sys;
@@ -720,7 +720,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                                                   0, &box);
     }
 
-#ifdef HAVE_ID3D11VIDEODECODER 
+#ifdef HAVE_ID3D11VIDEODECODER
     if (picture->format.i_chroma == VLC_CODEC_D3D11_OPAQUE) {
 #if VLC_WINSTORE_APP
         if( sys->context_lock > 0 )
