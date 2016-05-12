@@ -69,8 +69,11 @@ static int Create( vlc_object_t *p_this )
         return -1;
     }
 
-    if( p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width
-       || p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height
+    /* resizing not supported */
+    if( p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width !=
+            p_filter->fmt_out.video.i_x_offset + p_filter->fmt_out.video.i_visible_width
+       || p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height !=
+            p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height
        || p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation )
         return -1;
 
