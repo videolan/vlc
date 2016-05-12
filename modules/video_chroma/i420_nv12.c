@@ -1,5 +1,5 @@
 /*****************************************************************************
- * i420_nv12.c : Planar YUV 4:2:0 to Planar NV12 4:2:0 to  conversion module for vlc
+ * i420_nv12.c : Planar YUV 4:2:0 to SemiPlanar NV12 4:2:0
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  *
@@ -33,11 +33,6 @@
 #include <vlc_filter.h>
 #include "copy.h"
 
-#include <assert.h>
-
-#define SRC_FOURCC  "I420,YV12"
-#define DEST_FOURCC "NV12"
-
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
@@ -63,7 +58,8 @@ static int Create( vlc_object_t *p_this )
     if ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_NV12 )
         return -1;
 
-    if( p_filter->fmt_in.video.i_width & 1
+    /* video must be even, because 4:2:0 is subsampled by 2 in both ways */
+    if( p_filter->fmt_in.video.i_width  & 1
      || p_filter->fmt_in.video.i_height & 1 )
     {
         return -1;
@@ -114,8 +110,6 @@ static void Delete(vlc_object_t *p_this)
 VIDEO_FILTER_WRAPPER( I420_NV12 )
 VIDEO_FILTER_WRAPPER( YV12_NV12 )
 
-#define UVPLANE 1
-
 static void I420_YUV( filter_sys_t *p_sys, picture_t *p_src, picture_t *p_dst, bool invertUV )
 {
     p_dst->format.i_x_offset = p_src->format.i_x_offset;
@@ -165,7 +159,7 @@ static void YV12_NV12( filter_t *p_filter, picture_t *p_src,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-    set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
+    set_description( N_("YUV planar to semiplanar conversions") )
     set_capability( "video filter2", 160 )
     set_callbacks( Create, Delete )
 vlc_module_end ()
