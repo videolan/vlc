@@ -736,6 +736,26 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             break;
         }
 
+        case DEMUX_NAV_MENU:
+        {
+            if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Title )
+                != DVDNAV_STATUS_OK )
+            {
+                msg_Warn( p_demux, "cannot select Title menu" );
+                if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root )
+                    != DVDNAV_STATUS_OK )
+                {
+                    msg_Warn( p_demux, "cannot select Root menu" );
+                    return VLC_EGENERIC;
+                }
+            }
+            p_demux->info.i_update |=
+                INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+            p_demux->info.i_title = 0;
+            p_demux->info.i_seekpoint = 2;
+            break;
+        }
+
         /* TODO implement others */
         default:
             return VLC_EGENERIC;
