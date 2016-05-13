@@ -142,6 +142,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         case INPUT_NAV_LEFT:
         case INPUT_NAV_RIGHT:
         case INPUT_NAV_POPUP:
+        case INPUT_NAV_MENU:
             input_ControlPush( p_input, i_query - INPUT_NAV_ACTIVATE
                                + INPUT_CONTROL_NAV_ACTIVATE, NULL );
             return VLC_SUCCESS;

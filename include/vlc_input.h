@@ -443,6 +443,8 @@ enum input_query_e
     INPUT_NAV_RIGHT,
     /** Activate the popup Menu (for BD). res=can fail */
     INPUT_NAV_POPUP,
+    /** Activate disc Root Menu. res=can fail */
+    INPUT_NAV_MENU,
 
     /* Meta datas */
     INPUT_ADD_INFO,   /* arg1= char* arg2= char* arg3=...     res=can fail */

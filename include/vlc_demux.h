@@ -278,6 +278,8 @@ enum demux_query_e
     DEMUX_NAV_RIGHT,
     /** Activate the popup Menu (for BD). Can fail */
     DEMUX_NAV_POPUP,
+    /** Activate disc Root Menu. Can fail */
+    DEMUX_NAV_MENU,            /* res=can fail */
 };
 
 /*************************************************************************
