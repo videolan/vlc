@@ -35,14 +35,6 @@ vlc_fourcc_t GetVlcAudioFormat( int i_sample_fmt );
 int  OpenEncoder ( vlc_object_t * );
 void CloseEncoder( vlc_object_t * );
 
-/* Audio encoder module */
-int  OpenAudioEncoder ( vlc_object_t * );
-void CloseAudioEncoder( vlc_object_t * );
-
-/* Deinterlace video filter module */
-int  OpenDeinterlace( vlc_object_t * );
-void CloseDeinterlace( vlc_object_t * );
-
 /* Video Decoder */
 int InitVideoDec( decoder_t *, AVCodecContext *, const AVCodec * );
 void EndVideoDec( decoder_t *p_dec );
