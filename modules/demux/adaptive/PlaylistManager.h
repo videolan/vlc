@@ -71,6 +71,10 @@ namespace adaptive
             virtual mtime_t getDuration() const;
             mtime_t getPCR() const;
             mtime_t getFirstDTS() const;
+
+            virtual mtime_t getFirstPlaybackTime() const;
+            mtime_t getCurrentPlaybackTime() const;
+
             int     esCount() const;
             bool    seekAble() const;
             void pruneLiveStream();
@@ -90,6 +94,7 @@ namespace adaptive
             std::vector<AbstractStream *>        streams;
             time_t                               nextPlaylistupdate;
             mtime_t                              i_nzpcr;
+            mtime_t                              i_firstpcr;
             BasePeriod                          *currentPeriod;
             int                                  failedupdates;
     };

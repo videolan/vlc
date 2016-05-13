@@ -36,6 +36,9 @@ namespace hls
                         logic::AbstractAdaptationLogic::LogicType type );
             virtual ~HLSManager();
             static bool isHTTPLiveStreaming(stream_t *);
+
+        protected:
+            virtual mtime_t getFirstPlaybackTime() const;
     };
 
 }

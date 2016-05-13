@@ -54,10 +54,11 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
              streamFactory  ( factory ),
              p_demux        ( p_demux_ ),
              nextPlaylistupdate  ( 0 ),
-             i_nzpcr        ( 0 )
+             i_nzpcr        ( VLC_TS_INVALID )
 {
     currentPeriod = playlist->getFirstPeriod();
     failedupdates = 0;
+    i_firstpcr = i_nzpcr;
 }
 
 PlaylistManager::~PlaylistManager   ()
@@ -287,6 +288,16 @@ bool PlaylistManager::updatePlaylist()
     return true;
 }
 
+mtime_t PlaylistManager::getFirstPlaybackTime() const
+{
+    return 0;
+}
+
+mtime_t PlaylistManager::getCurrentPlaybackTime() const
+{
+    return i_nzpcr;
+}
+
 void PlaylistManager::pruneLiveStream()
 {
     mtime_t minValidPos = 0;
@@ -328,6 +339,8 @@ int PlaylistManager::doDemux(int64_t increment)
         i_nzpcr = getFirstDTS();
         if(i_nzpcr == VLC_TS_INVALID)
             i_nzpcr = getPCR();
+        if(i_firstpcr == VLC_TS_INVALID)
+            i_firstpcr = i_nzpcr;
     }
 
     AbstractStream::status status = demux(i_nzpcr + increment, true);
@@ -342,6 +355,7 @@ int PlaylistManager::doDemux(int64_t increment)
     case AbstractStream::status_dis:
     case AbstractStream::status_eop:
         i_nzpcr = VLC_TS_INVALID;
+        i_firstpcr = VLC_TS_INVALID;
         es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         break;
     case AbstractStream::status_demuxed:
@@ -394,38 +408,56 @@ int PlaylistManager::doControl(int i_query, va_list args)
             return (playlist->isLive()) ? VLC_EGENERIC : VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            *(va_arg (args, int64_t *)) = i_nzpcr;
+        {
+            mtime_t i_time = getCurrentPlaybackTime();
+            if(!playlist->isLive())
+                i_time -= getFirstPlaybackTime();
+            *(va_arg (args, int64_t *)) = i_time;
             break;
+        }
 
         case DEMUX_GET_LENGTH:
+            if(playlist->isLive())
+                return VLC_EGENERIC;
             *(va_arg (args, int64_t *)) = getDuration();
             break;
 
         case DEMUX_GET_POSITION:
-            if(!getDuration())
+        {
+            const mtime_t i_duration = getDuration();
+            if(i_duration == 0) /* == playlist->isLive() */
                 return VLC_EGENERIC;
 
-            *(va_arg (args, double *)) = (double) i_nzpcr
-                                         / getDuration();
+            const mtime_t i_length = getCurrentPlaybackTime() - getFirstPlaybackTime();
+            *(va_arg (args, double *)) = (double) i_length / i_duration;
             break;
+        }
 
         case DEMUX_SET_POSITION:
         {
-            int64_t time = getDuration() * va_arg(args, double);
-            if(playlist->isLive() ||
-               !getDuration() ||
-               !setPosition(time))
+            const mtime_t i_duration = getDuration();
+            if(i_duration == 0) /* == playlist->isLive() */
                 return VLC_EGENERIC;
+
+            int64_t time = i_duration * va_arg(args, double);
+            time += getFirstPlaybackTime();
+
+            if(!setPosition(time))
+                return VLC_EGENERIC;
+
             i_nzpcr = VLC_TS_INVALID;
             break;
         }
 
         case DEMUX_SET_TIME:
         {
-            int64_t time = va_arg(args, int64_t);
-            if(playlist->isLive() ||
-               !setPosition(time))
+            if(playlist->isLive())
                 return VLC_EGENERIC;
+
+            int64_t time = va_arg(args, int64_t);// + getFirstPlaybackTime();
+            if(!setPosition(time))
+                return VLC_EGENERIC;
+
             i_nzpcr = VLC_TS_INVALID;
             break;
         }
