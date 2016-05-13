@@ -827,21 +827,7 @@ void InputManager::sectionMenu()
 {
     if( hasInput() )
     {
-        vlc_value_t val, text;
-
-        if( var_Change( p_input, "title  0", VLC_VAR_GETCHOICES, &val, &text ) < 0 )
-            return;
-
-        /* XXX is it "Root" or "Title" we want here ?" (set 0 by default) */
-        int root = 0;
-        for( int i = 0; i < val.p_list->i_count; i++ )
-        {
-            if( !strcmp( text.p_list->p_values[i].psz_string, "Title" ) )
-                root = i;
-        }
-        var_FreeList( &val, &text );
-
-        var_SetInteger( p_input, "title  0", root );
+        var_TriggerCallback( p_input, "menu-title" );
     }
 }
 
