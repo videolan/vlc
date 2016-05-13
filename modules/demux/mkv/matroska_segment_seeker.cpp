@@ -283,8 +283,7 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
 
         if( ms.BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
         {
-            msg_Err( &ms.sys.demuxer, "Unable to BlockGet in matroska_segment_c::Seek, EOF?" );
-            return;
+            throw std::runtime_error( "Unable to BlockGet in SegmentSeeker::index_unsearched_range, EOF?" );
         }
 
         if( simpleblock ) {

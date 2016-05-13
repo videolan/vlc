@@ -53,6 +53,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <stdexcept>
 
 /* libebml and matroska */
 #include "ebml/EbmlHead.h"

@@ -807,7 +807,17 @@ void matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
 
     mtime_t i_mk_date = i_absolute_mk_date - i_mk_time_offset;
 
-    SegmentSeeker::tracks_seekpoint_t seekpoints = _seeker.get_seekpoints_cues( *this, i_mk_date );
+    SegmentSeeker::tracks_seekpoint_t seekpoints;
+
+    try {
+        seekpoints = _seeker.get_seekpoints_cues( *this, i_mk_date );
+
+    }
+    catch( std::exception const& e )
+    {
+        msg_Err( &sys.demuxer, "error during seek: \"%s\", aborting!", e.what() );
+        return;
+    }
 
     for( SegmentSeeker::tracks_seekpoint_t::iterator it = seekpoints.begin(); it != seekpoints.end(); ++it )
     {
