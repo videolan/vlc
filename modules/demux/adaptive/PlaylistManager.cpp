@@ -390,6 +390,9 @@ int PlaylistManager::doControl(int i_query, va_list args)
             *(va_arg (args, bool *)) = !playlist->isLive();
             break;
 
+        case DEMUX_SET_PAUSE_STATE:
+            return (playlist->isLive()) ? VLC_EGENERIC : VLC_SUCCESS;
+
         case DEMUX_GET_TIME:
             *(va_arg (args, int64_t *)) = i_nzpcr;
             break;
