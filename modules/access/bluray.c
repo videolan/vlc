@@ -1961,6 +1961,16 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         return sendKeyEvent(p_sys, BD_VK_RIGHT);
     case DEMUX_NAV_POPUP:
         return sendKeyEvent(p_sys, BD_VK_POPUP);
+    case DEMUX_NAV_MENU:
+        if (p_sys->b_menu) {
+            if (bd_menu_call(p_sys->bluray, -1) == 1) {
+                p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+                return VLC_SUCCESS;
+            }
+            msg_Err(p_demux, "Can't select Top Menu title");
+            return sendKeyEvent(p_sys, BD_VK_POPUP);
+        }
+        return VLC_EGENERIC;
 
     case DEMUX_CAN_RECORD:
     case DEMUX_GET_FPS:
