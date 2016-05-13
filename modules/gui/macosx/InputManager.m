@@ -64,6 +64,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                 break;
             case INPUT_EVENT_POSITION:
                 [[[VLCMain sharedInstance] mainWindow] performSelectorOnMainThread:@selector(updateTimeSlider) withObject: nil waitUntilDone:NO];
+                [[[VLCMain sharedInstance] statusBarIcon] performSelectorOnMainThread:@selector(updateProgress) withObject:nil waitUntilDone:NO];
                 break;
             case INPUT_EVENT_TITLE:
             case INPUT_EVENT_CHAPTER:

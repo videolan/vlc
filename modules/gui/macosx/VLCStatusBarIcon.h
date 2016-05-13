@@ -26,15 +26,12 @@
 @interface VLCStatusBarIcon : NSObject <NSMenuDelegate>
 
 @property NSStatusItem *statusItem;
-@property NSTimer *dataRefreshUpdateTimer;
 @property (readwrite, strong) IBOutlet NSMenu *vlcStatusBarIconMenu;
 
-// get data from VLC and update the little status menu
+// Get data from VLC and update the little status menu
 - (void)updateMenuItemRandom;
-- (void)updateMenuItemPlayPause;
-- (void)setDataUpdateTimer:(float)interval;
+- (void)updateProgress;
 
-- (IBAction)updateMenuItemContent:(id)sender;
 - (IBAction)restoreMainWindow:(id)sender;
 - (IBAction)statusBarIconTogglePlayPause:(id)sender;
 - (IBAction)statusBarIconStop:(id)sender;

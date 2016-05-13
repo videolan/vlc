@@ -1,71 +1,205 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9532" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9532"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCStatusBarIcon">
             <connections>
-                <outlet property="nextItem" destination="GhQ-VQ-jtu" id="45X-b4-mHv"/>
-                <outlet property="playPauseItem" destination="9kC-yJ-Gy5" id="laU-MV-Il1"/>
-                <outlet property="prevItem" destination="iHu-rd-8KL" id="IzO-1Q-rtv"/>
+                <outlet property="albumField" destination="SKt-XT-Vki" id="33Z-OU-f74"/>
+                <outlet property="artistField" destination="FnZ-Gr-BKf" id="wl6-Tg-uhc"/>
+                <outlet property="backwardsButton" destination="p8X-zU-PwN" id="y6F-9l-mm8"/>
+                <outlet property="coverImageView" destination="0kw-t4-DcN" id="QmE-0F-ud4"/>
+                <outlet property="forwardButton" destination="NHj-Vf-SPF" id="XOV-fo-CZn"/>
+                <outlet property="pathActionItem" destination="1QM-IB-vK4" id="gbD-sJ-WLP"/>
+                <outlet property="playPauseButton" destination="lvI-lN-t4O" id="kA7-4Q-q36"/>
+                <outlet property="progressField" destination="z3X-aG-Veg" id="wV9-n7-N7O"/>
                 <outlet property="quitItem" destination="539" id="xuy-Vl-Ami"/>
-                <outlet property="randItem" destination="lPi-EL-hoN" id="dOE-ib-n98"/>
+                <outlet property="randButton" destination="PaW-Fe-vxo" id="L3x-xm-50A"/>
+                <outlet property="separatorField" destination="za4-8d-tZy" id="Qcx-VE-sZY"/>
                 <outlet property="showMainWindowItem" destination="08C-TA-yqu" id="qQR-Ah-T0b"/>
-                <outlet property="stopItem" destination="4Sh-MJ-bSf" id="qBc-qg-d9R"/>
+                <outlet property="titleField" destination="Byt-pH-60l" id="JKP-xq-fIb"/>
+                <outlet property="totalField" destination="wXO-2p-mxK" id="XoY-cx-jzm"/>
                 <outlet property="vlcStatusBarIconMenu" destination="534" id="O0F-8Q-FgA"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="420" customClass="NSFontManager"/>
-        <menu id="534" userLabel="vlcStatusBarIconMenu">
+        <menu autoenablesItems="NO" id="534" userLabel="vlcStatusBarIconMenu">
             <items>
-                <menuItem title="Show Main Window" toolTip="Restore main window" id="08C-TA-yqu">
+                <menuItem title="Loading Now playing view..." id="KRm-PC-DPQ">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <outlet property="view" destination="fDN-Tb-DeD" id="T0n-Z2-HeL"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="hOT-4N-jtU"/>
+                <menuItem title="Loading Player view..." id="w9T-bW-Qom">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <outlet property="view" destination="v97-Ct-Yqs" id="mXc-iD-4sJ"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="dNe-Wu-c6x"/>
+                <menuItem title="URL/Path action" enabled="NO" id="1QM-IB-vK4">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="copyOrOpenCurrentPlaybackItem:" target="-2" id="I4p-PQ-kPp"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Show Main Window" id="08C-TA-yqu">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="restoreMainWindow:" target="-2" id="2Uq-Pa-toi"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="t2X-zn-Z4x"/>
-                <menuItem title="Play" tag="74747" toolTip="Start/Pause playback" id="9kC-yJ-Gy5">
+                <menuItem title="Quit" id="539">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="statusBarIconTogglePlayPause:" target="-2" id="py3-sd-ST2"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Stop" tag="83838" toolTip="Stop playback" id="4Sh-MJ-bSf">
-                    <connections>
-                        <action selector="statusBarIconStop:" target="-2" id="unT-d5-vlC"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="b5S-aL-b79"/>
-                <menuItem title="Next" toolTip="Next track in playlist" id="GhQ-VQ-jtu">
-                    <connections>
-                        <action selector="statusBarIconNext:" target="-2" id="VZh-xB-5IC"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Previous" toolTip="Previous track in playlist" id="iHu-rd-8KL">
-                    <connections>
-                        <action selector="statusBarIconPrevious:" target="-2" id="rNU-Dq-Sot"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="Dn5-wA-WfF"/>
-                <menuItem title="Random" tag="63636" toolTip="Randomize play order" id="lPi-EL-hoN">
-                    <connections>
-                        <action selector="statusBarIconToggleRandom:" target="-2" id="DyP-Hd-KHG"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="p96-c8-lBM"/>
-                <menuItem title="Quit" toolTip="Quit VLC" id="539">
                     <connections>
                         <action selector="quitAction:" target="-2" id="OJL-0Y-e8i"/>
                     </connections>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="328.5" y="267.5"/>
+            <point key="canvasLocation" x="354" y="328.5"/>
         </menu>
+        <customView id="fDN-Tb-DeD">
+            <rect key="frame" x="0.0" y="0.0" width="247" height="70"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="0kw-t4-DcN">
+                    <rect key="frame" x="6" y="4" width="48" height="62"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="vlc" id="7Ns-2s-EgU"/>
+                </imageView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Byt-pH-60l">
+                    <rect key="frame" x="60" y="42" width="183" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="The Fox (What Does the Fox Say?) to this very very" usesSingleLineMode="YES" id="Fo7-qA-sCC">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="FnZ-Gr-BKf">
+                    <rect key="frame" x="60" y="27" width="183" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="by Ylvis" usesSingleLineMode="YES" id="TWt-2V-iGT">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" red="0.34105039267015702" green="0.34105039267015702" blue="0.34105039267015702" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.021842277486911033" green="0.021842277486911033" blue="0.021842277486911033" alpha="1" colorSpace="calibratedRGB"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="SKt-XT-Vki">
+                    <rect key="frame" x="60" y="12" width="183" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="on “The Fox”" usesSingleLineMode="YES" id="IKI-Pl-Iji">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" red="0.34105039269999998" green="0.34105039269999998" blue="0.34105039269999998" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.021842277489999999" green="0.021842277489999999" blue="0.021842277489999999" alpha="1" colorSpace="calibratedRGB"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <point key="canvasLocation" x="370.5" y="-52"/>
+        </customView>
+        <customView id="v97-Ct-Yqs">
+            <rect key="frame" x="0.0" y="0.0" width="247" height="45"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <button verticalHuggingPriority="750" id="rih-mA-gAq">
+                    <rect key="frame" x="32" y="1" width="184" height="14"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" alignment="center" transparent="YES" imageScaling="proportionallyDown" inset="2" id="RbD-Js-cLU">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="toggelProgressTime:" target="-2" id="S3e-vr-guH"/>
+                    </connections>
+                </button>
+                <button id="p8X-zU-PwN">
+                    <rect key="frame" x="76" y="20" width="28" height="24"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCPreviousTemplate" imagePosition="overlaps" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="PSI-Wi-u0R">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="statusBarIconPrevious:" target="-2" id="kAL-hK-8qL"/>
+                    </connections>
+                </button>
+                <button id="lvI-lN-t4O">
+                    <rect key="frame" x="109" y="20" width="28" height="24"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCPlayTemplate" imagePosition="only" alignment="center" alternateImage="VLCPauseTemplate" imageScaling="proportionallyUpOrDown" inset="2" id="nqu-wV-vI1">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="statusBarIconTogglePlayPause:" target="-2" id="K38-Dr-lNS"/>
+                    </connections>
+                </button>
+                <button id="NHj-Vf-SPF">
+                    <rect key="frame" x="141" y="20" width="28" height="24"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCNextTemplate" imagePosition="overlaps" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="BIa-Vy-yD2">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="statusBarIconNext:" target="-2" id="4I4-wu-R5u"/>
+                    </connections>
+                </button>
+                <button id="PaW-Fe-vxo">
+                    <rect key="frame" x="179" y="12" width="18" height="21"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCShuffleTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="VEm-qG-2cc">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="statusBarIconToggleRandom:" target="-2" id="IHE-JL-EfK"/>
+                    </connections>
+                </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="z3X-aG-Veg">
+                    <rect key="frame" x="18" y="0.0" width="100" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" title="00:00" usesSingleLineMode="YES" id="CLT-p2-bxf">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="za4-8d-tZy">
+                    <rect key="frame" x="115" y="1" width="17" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="/" usesSingleLineMode="YES" id="y3P-oA-eTa">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="wXO-2p-mxK">
+                    <rect key="frame" x="127" y="0.0" width="102" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="00:00" usesSingleLineMode="YES" id="vF8-Z8-vhW">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <point key="canvasLocation" x="370.5" y="100.5"/>
+        </customView>
     </objects>
+    <resources>
+        <image name="VLCNextTemplate" width="128" height="128"/>
+        <image name="VLCPauseTemplate" width="128" height="128"/>
+        <image name="VLCPlayTemplate" width="128" height="128"/>
+        <image name="VLCPreviousTemplate" width="128" height="128"/>
+        <image name="VLCShuffleTemplate" width="128" height="128"/>
+        <image name="vlc" width="512" height="512"/>
+    </resources>
 </document>
