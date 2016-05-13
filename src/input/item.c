@@ -1008,7 +1008,7 @@ input_item_t *input_item_Copy( input_item_t *p_input )
 
 struct item_type_entry
 {
-    const char psz_scheme[7];
+    const char *psz_scheme;
     uint8_t    i_type;
     bool       b_net;
 };
@@ -1090,7 +1090,7 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
 
 #ifndef NDEBUG
     for( size_t i = 1; i < ARRAY_SIZE( tab ); i++ )
-        assert( typecmp( tab + i, tab + i - 1 ) > 0 );
+        assert( typecmp( (tab + i)->psz_scheme, tab + i - 1 ) > 0 );
 #endif
 
     *p_net = false;
