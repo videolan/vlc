@@ -823,9 +823,9 @@ void matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
         track.i_last_dts        = it->second.pts;
 
 
-        bool is_active;
+        bool is_active = false;
 
-        if( es_out_Control( sys.demuxer.out, ES_OUT_GET_ES_STATE, track.p_es, &is_active ) )
+        if( track.p_es && es_out_Control( sys.demuxer.out, ES_OUT_GET_ES_STATE, track.p_es, &is_active ) )
         {
             msg_Err( &sys.demuxer, "Unable to query track %u for ES_OUT_GET_ES_STATE", it->first );
         }
