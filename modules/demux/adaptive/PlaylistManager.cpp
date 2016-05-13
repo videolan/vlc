@@ -387,7 +387,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             break;
 
         case DEMUX_CAN_PAUSE:
-            *(va_arg (args, bool *)) = playlist->isLive();
+            *(va_arg (args, bool *)) = !playlist->isLive();
             break;
 
         case DEMUX_GET_TIME:
