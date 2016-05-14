@@ -41,7 +41,7 @@ namespace dash
         {
             public:
                 IndexReader(vlc_object_t *);
-                bool parseIndex(block_t *, BaseRepresentation *);
+                bool parseIndex(block_t *, BaseRepresentation *, uint64_t);
         };
     }
 }

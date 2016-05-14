@@ -34,7 +34,7 @@ IndexReader::IndexReader(vlc_object_t *obj)
 {
 }
 
-bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep)
+bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep, uint64_t i_fileoffset)
 {
     if(!rep || !parseBlock(p_block))
         return false;
@@ -45,7 +45,8 @@ bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep)
         Representation::SplitPoint point;
         std::vector<Representation::SplitPoint> splitlist;
         MP4_Box_data_sidx_t *sidx = sidxbox->data.p_sidx;
-        point.offset = sidx->i_first_offset;
+        /* sidx refers to offsets from end of sidx pos in the file + first offset */
+        point.offset = sidx->i_first_offset + i_fileoffset + sidxbox->i_pos + sidxbox->i_size;
         point.time = 0;
         for(uint16_t i=0; i<sidx->i_reference_count && sidx->i_timescale; i++)
         {

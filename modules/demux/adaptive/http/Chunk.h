@@ -63,6 +63,7 @@ namespace adaptive
                 virtual ~AbstractChunk();
 
                 size_t              getBytesRead            () const;
+                uint64_t            getStartByteInFile      () const;
                 bool                isEmpty                 () const;
 
                 virtual block_t *   readBlock       ();
