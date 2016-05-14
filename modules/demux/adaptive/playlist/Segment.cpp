@@ -128,6 +128,8 @@ void ISegment::debug(vlc_object_t *obj, int indent) const
     ss << " url=" << getUrlSegment().toString();
     if(startByte!=endByte)
         ss << " @" << startByte << ".." << endByte;
+    if(startTime.Get() > 0)
+    	 ss << " stime " << startTime.Get();
     msg_Dbg(obj, "%s", ss.str().c_str());
 }
 
