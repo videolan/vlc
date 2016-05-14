@@ -288,13 +288,9 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
-    *pp_block = NULL; /* So the packet doesn't get re-sent */
 
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-    {
-        block_Release( p_block );
-        return NULL;
-    }
+        goto drop;
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         Flush( p_dec );
@@ -305,11 +301,8 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
     else if( !date_Get( &p_sys->end_date ) )
-    {
         /* We've just started the stream, wait for the first PTS. */
-        block_Release( p_block );
-        return NULL;
-    }
+        goto drop;
 
     /* Don't re-use the same pts twice */
     p_block->i_pts = VLC_TS_INVALID;
@@ -320,10 +313,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         p_out = decoder_NewAudioBuffer( p_dec, p_sys->i_samplesperblock );
         if( p_out == NULL )
-        {
-            block_Release( p_block );
-            return NULL;
-        }
+            goto drop;
 
         p_out->i_pts = date_Get( &p_sys->end_date );
         p_out->i_length = date_Increment( &p_sys->end_date,
@@ -363,7 +353,9 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return p_out;
     }
 
+drop:
     block_Release( p_block );
+    *pp_block = NULL;
     return NULL;
 }
 
