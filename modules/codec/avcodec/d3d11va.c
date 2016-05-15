@@ -256,6 +256,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         }
 #endif
 
+#ifdef ID3D11VideoContext_VideoProcessorBlt
         if (sys->videoProcessor)
         {
             // extract the decoded video to a the output Texture
@@ -292,6 +293,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
             }
         }
         else
+#endif
         {
             D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
             ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
@@ -715,6 +717,7 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     return VLC_SUCCESS;
 }
 
+#ifdef ID3D11VideoContext_VideoProcessorBlt
 static bool SetupProcessor(vlc_va_t *va, const video_format_t *fmt)
 {
     vlc_va_sys_t *sys = va->sys;
@@ -816,6 +819,7 @@ static bool SetupProcessor(vlc_va_t *va, const video_format_t *fmt)
     ID3D11VideoProcessorEnumerator_Release(processorEnumerator);
     return false;
 }
+#endif
 
 static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *fmt)
 {
@@ -864,9 +868,13 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
                 ( i_formatSupport & i_quadSupportFlags ) != i_quadSupportFlags )
         {
             msg_Dbg(va, "Format %s needs a processor", DxgiFormatToStr(processorInput[idx]));
+#ifdef ID3D11VideoContext_VideoProcessorBlt
             if (!SetupProcessor( va, fmt ))
                 continue;
             msg_Dbg(va, "Using processor %s to %s", DxgiFormatToStr(processorInput[idx]), DxgiFormatToStr(va->sys->processorFormat));
+#else
+            continue;
+#endif
         }
 
         msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
