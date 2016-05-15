@@ -75,6 +75,14 @@ size_t MediaSegmentTemplate::pruneBySequenceNumber(uint64_t number)
     return 0;
 }
 
+stime_t MediaSegmentTemplate::getMinAheadScaledTime(uint64_t number) const
+{
+    if( segmentTimeline.Get() )
+        return segmentTimeline.Get()->getMinAheadScaledTime(number);
+
+    return duration.Get(); /* FIXME: use stream end time */
+}
+
 uint64_t MediaSegmentTemplate::getSequenceNumber() const
 {
     return startNumber.Get();

@@ -108,12 +108,15 @@ mtime_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
     if(seglist.size() == 1 && seglist.front()->isTemplate())
     {
         const MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate *>(seglist.front());
-        const SegmentTimeline *timeline;
-        if(templ && (timeline = templ->segmentTimeline.Get()))
+        if(templ)
         {
             const uint64_t timescale = templ->inheritTimescale();
-            return timeline->getMinAheadScaledTime(curnum) * CLOCK_FREQ / timescale;
+            stime_t i_length = templ->getMinAheadScaledTime(curnum);
+            return i_length * CLOCK_FREQ / timescale;
         }
+
+        /* should not happen */
+        return CLOCK_FREQ;
     }
 
     mtime_t minTime = 0;
