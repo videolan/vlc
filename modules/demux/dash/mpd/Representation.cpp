@@ -192,7 +192,7 @@ uint64_t Representation::getLiveTemplateNumberOffset(uint64_t index, const Media
             const stime_t duration = templ->duration.Get();
             const uint64_t timescale = templ->inheritTimescale();
             if(duration && timescale)
-                index += (playbackstart - streamstart) * CLOCK_FREQ / (timescale * duration);
+                index += (playbackstart - streamstart) * timescale / duration;
         }
     }
     return index;
