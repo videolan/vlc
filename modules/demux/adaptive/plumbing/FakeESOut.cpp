@@ -114,6 +114,7 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
                Otherwise the es will select any other compatible track
                and will end this in a activate/select loop when reactivating a track */
             es_out_Control( real_es_out, ES_OUT_GET_ES_STATE, cand->realESID(), &b_select );
+            break;
         }
     }
 
