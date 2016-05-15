@@ -357,6 +357,7 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
                 fakeesout->setTimestampOffset(time);
         }
 
+        pcr = VLC_TS_INVALID;
         es_out_Control(p_realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                        VLC_TS_0 + time);
     }
