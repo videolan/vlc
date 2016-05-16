@@ -325,6 +325,11 @@ case "${OS}" in
 			add_make_enabled "HAVE_WINSTORE"
 			;;
 		esac
+        case "${HOST}" in
+            armv7*)
+                add_make_enabled "HAVE_ARMV7A"
+                ;;
+        esac
 		;;
 	*solaris*)
 		add_make_enabled "HAVE_SOLARIS"
