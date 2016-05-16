@@ -274,7 +274,8 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
                 if (FAILED(hr))
                 {
                     msg_Err(va, "Failed to create the processor output. (hr=0x%lX)", hr);
-                    return VLC_EGENERIC;
+                    ret = VLC_EGENERIC;
+                    goto done;
                 }
             }
 
@@ -289,7 +290,8 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
             if (FAILED(hr))
             {
                 msg_Err(va, "Failed to process the video. (hr=0x%lX)", hr);
-                return VLC_EGENERIC;
+                ret = VLC_EGENERIC;
+                goto done;
             }
         }
         else
@@ -315,6 +317,8 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         ret = VLC_EGENERIC;
     }
 
+
+done:
 #if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
     if( sys->context_mutex > 0 ) {
         ReleaseMutex( sys->context_mutex );
