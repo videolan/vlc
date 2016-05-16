@@ -317,15 +317,17 @@ AS_IF([test "${SYS}" = "mingw32"],[
   ])
 AC_DEFINE_UNQUOTED(VLC_WINSTORE_APP, ${vlc_winstore_app}, [Define to 1 if you want to build for Windows Store apps])
 
-AM_CONDITIONAL(HAVE_DARWIN,  test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_LINUX,   test "${SYS}" = "linux")
 AM_CONDITIONAL(HAVE_OS2,     test "${SYS}" = "os2")
-AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
-AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1") dnl Only used for the packaging
-AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])
+
+AM_CONDITIONAL(HAVE_DARWIN,  test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_IOS,     test "${HAVE_IOS}" = "1")
 AM_CONDITIONAL(HAVE_OSX,     test "${HAVE_OSX}" = "1")
 AM_CONDITIONAL(HAVE_TVOS,    test "${HAVE_TVOS}" = "1")
+
+AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
+AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1") dnl Only used for the packaging
+AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])
 
 dnl
 dnl Sadly autoconf does not think about testing foo.exe when ask to test
