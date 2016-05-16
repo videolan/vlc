@@ -34,13 +34,16 @@
 #include <vlc_access.h>
 #include <vlc_variables.h>
 #include <vlc_keystore.h>
+#include <vlc_network.h>
 
 #include <assert.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#ifdef HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+#endif
 
 #include <bdsm/bdsm.h>
 #include "../smb_common.h"
