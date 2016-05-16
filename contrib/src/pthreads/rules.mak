@@ -16,7 +16,7 @@ ifdef HAVE_WIN32
 pthreads: pthreads-w32-$(PTHREADS_W32_VERSION)-release.tar.gz .sum-pthreads
 	$(UNPACK)
 	sed -e 's/^CROSS.*=/CROSS ?=/' -i.orig $(UNPACK_DIR)/GNUmakefile
-ifdef HAVE_WINRT
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/pthreads/winrt.patch
 endif
 	$(MOVE)

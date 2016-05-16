@@ -14,7 +14,7 @@ $(TARBALLS)/libtasn1-$(LIBTASN1_VERSION).tar.gz:
 
 libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	$(UNPACK)
-ifdef HAVE_WINRT
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libtasn1/no-benchmark.patch
 endif
 	$(MOVE)

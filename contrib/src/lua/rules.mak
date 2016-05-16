@@ -48,7 +48,7 @@ lua: lua-$(LUA_VERSION).tar.gz .sum-lua
 	$(APPLY) $(SRC)/lua/no-dylibs.patch
 	$(APPLY) $(SRC)/lua/no-localeconv.patch
 	$(APPLY) $(SRC)/lua/lua-android-log2.patch
-ifdef HAVE_WINRT
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/lua/winrt-nopopen.patch
 	$(APPLY) $(SRC)/lua/winrt-nosystem.patch
 endif

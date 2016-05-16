@@ -20,7 +20,7 @@ ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz .sum-ssh2
 	$(APPLY) $(SRC)/ssh2/no-tests.patch
 	$(APPLY) $(SRC)/ssh2/configure-zlib.patch
 	$(APPLY) $(SRC)/ssh2/gpg-error-pc.patch
-ifdef HAVE_WINRT
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/ssh2/winrt-no-agent.patch
 endif
 	$(MOVE)

@@ -15,7 +15,7 @@ ifdef HAVE_WIN32
 DEPS_upnp += pthreads $(DEPS_pthreads)
 LIBUPNP_ECFLAGS = -DPTW32_STATIC_LIB
 endif
-ifdef HAVE_WINRT
+ifdef HAVE_WINSTORE
 	CONFIGURE_ARGS=--disable-ipv6 --enable-unspecified_server
 else
 	CONFIGURE_ARGS=--enable-ipv6
@@ -28,7 +28,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/libupnp-win32.patch
 	$(APPLY) $(SRC)/upnp/libupnp-win64.patch
 	$(APPLY) $(SRC)/upnp/windows-random.patch
-ifdef HAVE_WINRT
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/upnp/winrt-dont-force-win32-winnt.patch
 	$(APPLY) $(SRC)/upnp/no-getifinfo.patch
 	$(APPLY) $(SRC)/upnp/winrt-inet.patch

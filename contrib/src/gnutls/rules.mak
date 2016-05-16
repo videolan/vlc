@@ -22,7 +22,7 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-mingw64.patch
-ifdef HAVE_WINRT
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/gnutls/gnutls-winrt.patch
 	$(APPLY) $(SRC)/gnutls/winrt-topendir.patch
 endif

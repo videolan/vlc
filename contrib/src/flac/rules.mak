@@ -15,7 +15,7 @@ $(TARBALLS)/flac-$(FLAC_VERSION).tar.xz:
 
 flac: flac-$(FLAC_VERSION).tar.xz .sum-flac
 	$(UNPACK)
-ifdef HAVE_WINRT
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/flac/console_write.patch
 	$(APPLY) $(SRC)/flac/remove_blocking_code_useless_flaclib.patch
 endif
