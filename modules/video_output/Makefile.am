@@ -165,7 +165,7 @@ libdirect2d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct2d
 libdirect2d_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
 libdirect2d_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-if !HAVE_WINSTORE
+if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBdirect2d)
 EXTRA_LTLIBRARIES += libdirect2d_plugin.la
 endif
@@ -179,7 +179,7 @@ libdirect3d9_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_direct3d9
 libdirect3d9_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
 libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-if !HAVE_WINSTORE
+if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBdirect3d9)
 EXTRA_LTLIBRARIES += libdirect3d9_plugin.la
 endif
@@ -208,10 +208,8 @@ libdirectdraw_plugin_la_SOURCES = video_output/win32/directdraw.c \
 libdirectdraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_directdraw
 libdirectdraw_plugin_la_LIBADD = -luser32 -lgdi32 -lole32 -luuid
-if !HAVE_WINSTORE
-if HAVE_DIRECTX
+if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libdirectdraw_plugin.la
-endif
 endif
 
 libglwin32_plugin_la_SOURCES = video_output/win32/glwin32.c \
@@ -223,7 +221,7 @@ libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_glwin32
 libglwin32_plugin_la_LIBADD = -lopengl32 -lgdi32 -lole32 -luuid
 libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-if !HAVE_WINSTORE
+if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBglwin32)
 EXTRA_LTLIBRARIES += libglwin32_plugin.la
 endif
@@ -235,10 +233,8 @@ libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \
 libwingdi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_wingdi
 libwingdi_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
-if HAVE_WIN32
-if !HAVE_WINSTORE
+if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libwingdi_plugin.la
-endif
 endif
 
 libegl_win32_plugin_la_SOURCES = video_output/egl.c

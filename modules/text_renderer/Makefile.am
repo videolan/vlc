@@ -12,11 +12,9 @@ libfreetype_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(FREETYPE_CFLAGS)
 libfreetype_plugin_la_LIBADD = $(LIBM) $(FREETYPE_LIBS)
 libfreetype_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(FREETYPE_LDFLAGS) -rpath '$(textdir)'
 
-if HAVE_WIN32
-if !HAVE_WINSTORE
+if HAVE_WIN32_DESKTOP
 libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/win32.c
 libfreetype_plugin_la_LIBADD += -liconv -lz -lgdi32 -lusp10
-endif
 endif
 if HAVE_FONTCONFIG
 libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/fontconfig.c

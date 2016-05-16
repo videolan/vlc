@@ -94,7 +94,7 @@ endif
 libwaveout_plugin_la_SOURCES = audio_output/waveout.c \
 	audio_output/windows_audio_common.h
 libwaveout_plugin_la_LIBADD = -lwinmm
-if HAVE_WIN32
+if HAVE_WIN32_DESKTOP
 aout_LTLIBRARIES += libwaveout_plugin.la
 endif
 

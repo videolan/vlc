@@ -63,9 +63,7 @@ endif
 libntservice_plugin_la_SOURCES = control/ntservice.c
 libwin_hotkeys_plugin_la_SOURCES = control/globalhotkeys/win32.c
 libwin_msg_plugin_la_SOURCES = control/win_msg.c
-if HAVE_WIN32
-if !HAVE_WINSTORE
+if HAVE_WIN32_DESKTOP
 control_LTLIBRARIES += libntservice_plugin.la
 control_LTLIBRARIES += libwin_hotkeys_plugin.la libwin_msg_plugin.la
-endif
 endif
