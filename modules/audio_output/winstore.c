@@ -57,6 +57,70 @@ struct aout_sys_t
     IAudioClient *client;
 };
 
+
+static int VolumeSet(audio_output_t *aout, float vol)
+{
+    aout_sys_t *sys = aout->sys;
+    HRESULT hr;
+    ISimpleAudioVolume *pc_AudioVolume = NULL;
+    float gain = 1.f;
+
+    vol = vol * vol * vol; /* ISimpleAudioVolume is tapered linearly. */
+
+    if (vol > 1.f)
+    {
+        gain = vol;
+        vol = 1.f;
+    }
+
+    aout_GainRequest(aout, gain);
+
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pc_AudioVolume);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot get volume service (error 0x%lx)", hr);
+        goto done;
+    }
+
+    hr = ISimpleAudioVolume_SetMasterVolume(pc_AudioVolume, vol, NULL);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
+        goto done;
+    }
+
+done:
+    ISimpleAudioVolume_Release(pc_AudioVolume);
+
+    return SUCCEEDED(hr) ? 0 : -1;
+}
+
+static int MuteSet(audio_output_t *aout, bool mute)
+{
+    aout_sys_t *sys = aout->sys;
+    HRESULT hr;
+    ISimpleAudioVolume *pc_AudioVolume = NULL;
+
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pc_AudioVolume);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot get volume service (error 0x%lx)", hr);
+        goto done;
+    }
+
+    hr = ISimpleAudioVolume_SetMute(pc_AudioVolume, mute, NULL);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
+        goto done;
+    }
+
+done:
+    ISimpleAudioVolume_Release(pc_AudioVolume);
+
+    return SUCCEEDED(hr) ? 0 : -1;
+}
+
 static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
@@ -193,6 +257,8 @@ static int Open(vlc_object_t *obj)
     aout->start = Start;
     aout->stop = Stop;
     aout->time_get = TimeGet;
+    aout->volume_set = VolumeSet;
+    aout->mute_set = MuteSet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
