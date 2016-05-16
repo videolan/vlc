@@ -209,7 +209,8 @@ libdirectdraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_directdraw
 libdirectdraw_plugin_la_LIBADD = -luser32 -lgdi32 -lole32 -luuid
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libdirectdraw_plugin.la
+vout_LTLIBRARIES += $(LTLIBdirectdraw)
+EXTRA_LTLIBRARIES += libdirectdraw_plugin.la
 endif
 
 libglwin32_plugin_la_SOURCES = video_output/win32/glwin32.c \

@@ -3317,13 +3317,10 @@ AC_ARG_ENABLE(directx,
     enable_directx="no"
   ])
 ])
-have_directx="no"
 AS_IF([test "${enable_directx}" != "no"], [
   dnl DirectDraw
   AC_CHECK_HEADERS(ddraw.h, [
-    have_directx="yes"
-  ], [
-    AC_MSG_ERROR([Cannot find DirectX headers!])
+    VLC_ADD_PLUGIN([directdraw])
   ])
 
   dnl OpenGL
@@ -3349,7 +3346,6 @@ AS_IF([test "${enable_directx}" != "no"], [
     VLC_ADD_PLUGIN([direct2d])
   ])
 ])
-AM_CONDITIONAL([HAVE_DIRECTX], [test "$have_directx" = "yes"])
 
 dnl
 dnl  Linux framebuffer module
