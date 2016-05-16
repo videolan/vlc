@@ -1,0 +1,46 @@
+--- mpg123/configure.ac	2015-08-12 07:38:31.000000000 +0200
++++ mpg123/configure.ac.winstore	2016-05-16 16:23:05.234325900 +0200
+@@ -2290,23 +2292,41 @@ win32_fifo_working=no
+ if test x$win32_specific_codes = xenabled; then
+   AC_MSG_CHECKING([if we have Named Pipes])
+   if test "x$fifo" != "xdisabled"; then
++    if test "x$win32_wide_working" = xyes; then
+     AC_LINK_IFELSE([AC_LANG_SOURCE([
+     #include <windows.h>
+       int main(){
+-        CreateNamedPipeA(NULL,PIPE_ACCESS_DUPLEX|FILE_FLAG_OVERLAPPED,PIPE_TYPE_BYTE,1,255,255,0,NULL);
+         CreateNamedPipeW(NULL,PIPE_ACCESS_DUPLEX|FILE_FLAG_OVERLAPPED,PIPE_TYPE_BYTE,1,255,255,0,NULL);
+         return 0;
+       }])],[win32_fifo_working=yes],[win32_winver_bump=yes])
++    else
++    AC_LINK_IFELSE([AC_LANG_SOURCE([
++    #include <windows.h>
++      int main(){
++        CreateNamedPipeA(NULL,PIPE_ACCESS_DUPLEX|FILE_FLAG_OVERLAPPED,PIPE_TYPE_BYTE,1,255,255,0,NULL);
++        return 0;
++      }])],[win32_fifo_working=yes],[win32_winver_bump=yes])
++    fi
+     if test "x$win32_fifo_working" != "xyes"; then
++      if test "x$win32_wide_working" = xyes; then
+     AC_LINK_IFELSE([AC_LANG_SOURCE([
+     #define WINVER 0x501
+     #define _WIN32_WINNT 0x501
+     #include <windows.h>
+       int main(){
+-        CreateNamedPipeA(NULL,PIPE_ACCESS_DUPLEX|FILE_FLAG_OVERLAPPED,PIPE_TYPE_BYTE,1,255,255,0,NULL);
+         CreateNamedPipeW(NULL,PIPE_ACCESS_DUPLEX|FILE_FLAG_OVERLAPPED,PIPE_TYPE_BYTE,1,255,255,0,NULL);
+         return 0;
+       }])],[win32_fifo_working=yes],[win32_fifo_working=no])
++      else
++    AC_LINK_IFELSE([AC_LANG_SOURCE([
++    #define WINVER 0x501
++    #define _WIN32_WINNT 0x501
++    #include <windows.h>
++      int main(){
++        CreateNamedPipeA(NULL,PIPE_ACCESS_DUPLEX|FILE_FLAG_OVERLAPPED,PIPE_TYPE_BYTE,1,255,255,0,NULL);
++        return 0;
++      }])],[win32_fifo_working=yes],[win32_fifo_working=no])
++      fi
+     fi
+   fi
+   have_mkfifo=$win32_fifo_working

@@ -27,6 +27,9 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/mpg123/mpg123_android_off_t.patch
 endif
+ifdef HAVE_WINSTORE
+	$(APPLY) $(SRC)/mpg123/winstore.patch
+endif
 	$(MOVE)
 
 .mpg123: mpg123
