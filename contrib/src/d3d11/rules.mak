@@ -48,7 +48,6 @@ dxgi12: .sum-d3d11
 	cp $(TARBALLS)/dxgi1_2.idl $@ && cd $@ && patch -fp1 < ../$(SRC)/d3d11/dxgi12.patch
 
 $(DST_D3D11_H): d3d11
-	(cd $(TARBALLS) && patch -fp1) < $(SRC)/d3d11/processor_format.patch
 	mkdir -p -- "$(PREFIX)/include/"
 	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $</d3d11.idl
 
