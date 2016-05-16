@@ -46,5 +46,9 @@ endif
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DSHARED=OFF .
 	cd $< && $(MAKE) install
 	mkdir -p -- "$(PREFIX)/lib"
+ifdef HAVE_WIN32
+	cd $< && cp libmpcdec/mpcdec_static.lib "$(PREFIX)/lib/libmpcdec.a"
+else
 	cd $< && cp libmpcdec/libmpcdec_static.a "$(PREFIX)/lib/libmpcdec.a"
+endif
 	touch $@
