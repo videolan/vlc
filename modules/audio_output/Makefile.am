@@ -75,7 +75,7 @@ endif
 libdirectsound_plugin_la_SOURCES = audio_output/directsound.c \
 	audio_output/windows_audio_common.h
 libdirectsound_plugin_la_LIBADD = -lole32
-if HAVE_DIRECTX
+if HAVE_WIN32_DESKTOP
 aout_LTLIBRARIES += libdirectsound_plugin.la
 endif
 
