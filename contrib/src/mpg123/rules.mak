@@ -14,6 +14,11 @@ ifeq ($(ANDROID_ABI), x86)
 MPG123CONF += --with-cpu=generic_fpu
 endif
 endif
+ifdef HAVE_VISUALSTUDIO
+ifeq ($(ARCH), x86_64)
+MPG123CONF += --with-cpu=generic_dither
+endif
+endif
 
 $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 	$(call download,$(MPG123_URL))
