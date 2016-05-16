@@ -1,0 +1,39 @@
+--- flac/src/share/win_utf8_io/win_utf8_io.c.orig	2016-05-13 11:27:58.508525189 +0200
++++ flac/src/share/win_utf8_io/win_utf8_io.c	2016-05-13 12:16:51.951811662 +0200
+@@ -162,33 +162,14 @@
+ /* get the console width in characters */
+ int win_get_console_width(void)
+ {
+-	int width = 80;
+-	CONSOLE_SCREEN_BUFFER_INFO csbi;
+-	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+-	if (GetConsoleScreenBufferInfo(hOut, &csbi) != 0) width = csbi.dwSize.X;
+-	return width;
++    return 80;
+ }
+ 
+ /* print functions */
+-
+ int print_console(FILE *stream, const wchar_t *text, size_t len)
+ {
+-	static HANDLE hOut;
+-	static HANDLE hErr;
+-	DWORD out;
+-	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+-	hErr = GetStdHandle(STD_ERROR_HANDLE);
+-	if (stream == stdout && hOut != INVALID_HANDLE_VALUE && GetFileType(hOut) == FILE_TYPE_CHAR) {
+-		if (WriteConsoleW(hOut, text, len, &out, NULL) == 0) return -1;
+-		return out;
+-	} else if (stream == stderr && hErr != INVALID_HANDLE_VALUE && GetFileType(hErr) == FILE_TYPE_CHAR) {
+-		if (WriteConsoleW(hErr, text, len, &out, NULL) == 0) return -1;
+-		return out;
+-	} else {
+-		int ret = fputws(text, stream);
+-		if (ret < 0) return ret;
+-		return len;
+-	}
++    (void)stream, (void)text;
++    return len;
+ }
+ 
+ int printf_utf8(const char *format, ...)

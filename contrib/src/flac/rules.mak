@@ -15,6 +15,10 @@ $(TARBALLS)/flac-$(FLAC_VERSION).tar.xz:
 
 flac: flac-$(FLAC_VERSION).tar.xz .sum-flac
 	$(UNPACK)
+ifdef HAVE_WINRT
+	$(APPLY) $(SRC)/flac/console_write.patch
+	$(APPLY) $(SRC)/flac/remove_blocking_code_useless_flaclib.patch
+endif
 ifdef HAVE_DARWIN_OS
 	cd $(UNPACK_DIR) && sed -e 's,-dynamiclib,-dynamiclib -arch $(ARCH),' -i.orig configure
 endif
