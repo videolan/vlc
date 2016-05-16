@@ -1,7 +1,7 @@
 /*****************************************************************************
  * taglib.cpp: Taglib tag parser/writer
  *****************************************************************************
- * Copyright (C) 2003-2011 VLC authors and VideoLAN
+ * Copyright (C) 2003-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -39,14 +39,10 @@
 #include <sys/stat.h>
 
 #ifdef _WIN32
-# include <vlc_charset.h>
+# include <vlc_charset.h>           /* ToWide */
 # include <io.h>
 #else
 # include <unistd.h>
-#endif
-
-#if VLC_WINSTORE_APP
-# include <vlc_access.h>
 #endif
 
 // Taglib headers
@@ -54,16 +50,22 @@
 # define TAGLIB_STATIC
 #endif
 #include <taglib.h>
+
 #define VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
 #define TAGLIB_VERSION VERSION_INT(TAGLIB_MAJOR_VERSION, \
                                    TAGLIB_MINOR_VERSION, \
                                    TAGLIB_PATCH_VERSION)
 
+#define TAGLIB_VERSION_1_11 VERSION_INT(1,11,0)
+
 #include <fileref.h>
 #include <tag.h>
 #include <tbytevector.h>
-#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
-#include <tiostream.h>
+
+/* Support for stream-based metadata */
+#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
+# include <vlc_access.h>
+# include <tiostream.h>
 #endif
 
 #include <apefile.h>
@@ -92,7 +94,6 @@
 
 using namespace TagLib;
 
-#define TAGLIB_SYNCDECODE_FIXED_VERSION VERSION_INT(1,11,0)
 
 #include <algorithm>
 
@@ -135,7 +136,7 @@ File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProper
     return 0;
 }
 
-#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
+#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
 static VLCTagLib::ExtResolver<MPEG::File> aacresolver(".aac");
 #endif
 static VLCTagLib::ExtResolver<MP4::File> m4vresolver(".m4v");
@@ -156,7 +157,7 @@ vlc_module_begin ()
         set_callbacks( WriteMeta, NULL )
 vlc_module_end ()
 
-#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
+#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
 class VlcIostream : public IOStream
 {
 public:
@@ -258,7 +259,7 @@ private:
     access_t* m_demux;
     int64_t m_previousPos;
 };
-#endif /* TAGLIB_SYNCDECODE_FIXED_VERSION */
+#endif /* TAGLIB_VERSION_1_11 */
 
 static int ExtractCoupleNumberValues( vlc_meta_t* p_meta, const char *psz_value,
         vlc_meta_type_t first, vlc_meta_type_t second)
@@ -852,7 +853,7 @@ static int ReadMeta( vlc_object_t* p_this)
 
     if( !b_extensions_registered )
     {
-#if TAGLIB_VERSION >= TAGLIB_SYNCDECODE_FIXED_VERSION
+#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
         FileRef::addFileTypeResolver( &aacresolver );
 #endif
         FileRef::addFileTypeResolver( &m4vresolver );
