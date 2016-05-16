@@ -25,6 +25,9 @@
 # include "config.h"
 #endif
 
+#define COBJMACROS
+#define INITGUID
+
 #ifndef UNICODE
 #define UNICODE
 #endif
@@ -45,15 +48,9 @@
 #include <limits.h>
 
 #if VLC_WINSTORE_APP
-#define COBJMACROS
-#define INITGUID
 #include <winstring.h>
 #include <windows.storage.h>
 #include <roapi.h>
-
-DEFINE_GUID(IID_IStorageItem, 0x4207a996, 0xca2f, 0x42f7, 0xbd, 0xe8, 0x8b, 0x10, 0x45, 0x7a, 0x7f, 0x30);
-DEFINE_GUID(IID_IApplicationDataStatics, 0x5612147b, 0xe843, 0x45e3, 0x94, 0xd8, 0x06, 0x16, 0x9e, 0x3c, 0x8e, 0x17);
-DEFINE_GUID(IID_IKnownFoldersStatics, 0x5a2a7520, 0x4802, 0x452d, 0x9a, 0xd9, 0x43, 0x51, 0xad, 0xa7, 0xec, 0x35);
 
 static HRESULT WinRTSHGetFolderPath(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWSTR pszPath)
 {
