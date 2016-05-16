@@ -299,11 +299,30 @@ case "${host_os}" in
     SYS="${host_os}"
     ;;
 esac
+
+dnl WinRT
+AC_ARG_ENABLE(winstore_app,
+     AS_HELP_STRING([--enable-winstore-app],
+                    [Build targetted for Windows Store apps (default disabled)]))
+
+vlc_winstore_app=0
+AS_IF([test "${SYS}" = "mingw32"],[
+  AS_IF([test "${enable_winstore_app}" = "yes"], [
+    vlc_winstore_app=1
+     VLC_ADD_LIBS([libvlccore], [-lole32 -lruntimeobject])
+     AC_LIBOBJ([gai_strerror])
+    ],[
+     VLC_ADD_LIBS([libvlccore],[-lwinmm])
+    ])
+  ])
+AC_DEFINE_UNQUOTED(VLC_WINSTORE_APP, ${vlc_winstore_app}, [Define to 1 if you want to build for Windows Store apps])
+
 AM_CONDITIONAL(HAVE_DARWIN,  test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_LINUX,   test "${SYS}" = "linux")
 AM_CONDITIONAL(HAVE_OS2,     test "${SYS}" = "os2")
 AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
-AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
+AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1") dnl Only used for the packaging
+AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])
 AM_CONDITIONAL(HAVE_IOS,     test "${HAVE_IOS}" = "1")
 AM_CONDITIONAL(HAVE_OSX,     test "${HAVE_OSX}" = "1")
 AM_CONDITIONAL(HAVE_TVOS,    test "${HAVE_TVOS}" = "1")
@@ -526,23 +545,6 @@ dnl Check for broken versions of mingw-runtime compatability library
         "${ac_cv_c_fnative_struct}" = "no" && VLC_RESTORE_FLAGS
     fi
 ])
-
-AC_ARG_ENABLE(winstore_app,
-     AS_HELP_STRING([--enable-winstore-app],
-                    [Build targetted for Windows Store apps (default disabled)]))
-
-vlc_winstore_app=0
-AS_IF([test "${SYS}" = "mingw32"],[
-  AS_IF([test "${enable_winstore_app}" = "yes"], [
-    vlc_winstore_app=1
-     VLC_ADD_LIBS([libvlccore], [-lole32 -lruntimeobject])
-     AC_LIBOBJ([gai_strerror])
-    ],[
-     VLC_ADD_LIBS([libvlccore],[-lwinmm])
-    ])
-  ])
-AC_DEFINE_UNQUOTED(VLC_WINSTORE_APP, ${vlc_winstore_app}, [Define to 1 if you want to build for Windows Store apps])
-AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])
 
 
 dnl
