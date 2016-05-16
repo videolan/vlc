@@ -228,7 +228,7 @@ static int get_address( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    if( !inet_aton( p_sys->url.psz_host, &p_sys->addr ) )
+    if( !inet_pton( AF_INET, p_sys->url.psz_host, &p_sys->addr ) )
     {
         /* This is not an ip address, let's try netbios/dns resolve */
         struct addrinfo *p_info = NULL;
