@@ -135,6 +135,7 @@ struct scan_t
 
     size_t             i_multiplex;
     scan_multiplex_t **pp_multiplex;
+    bool               b_multiplexes_from_nit;
 
     scan_list_entry_t *p_scanlist;
     size_t             i_scanlist;
@@ -408,6 +409,7 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter,
     p_scan->i_multiplex = 0;
     p_scan->pp_multiplex = NULL;
     p_scan->i_multiplex_toscan = 0;
+    p_scan->b_multiplexes_from_nit = false;
     scan_parameter_Init( &p_scan->parameter );
     scan_parameter_Copy( p_parameter, &p_scan->parameter );
     p_scan->i_time_start = mdate();
@@ -776,10 +778,8 @@ static int Scan_GetNextTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, 
     }
 
     if( p_scan->p_scanlist == NULL &&
-        /* Stop frequency scanning if we found a NIT */
-        ( p_scan->i_multiplex == 0 ||
-          p_scan->pp_multiplex[0]->i_nit_version == UINT8_MAX )
-      )
+        ( p_scan->i_multiplex == 0 || /* Stop frequency scanning if we've found a valid NIT */
+         (p_scan->parameter.b_use_nit && !p_scan->b_multiplexes_from_nit) ) )
     {
         int i_ret = Scan_GetNextSpectrumTunerConfig( p_scan, p_cfg, pf_pos );
         if( i_ret == VLC_SUCCESS )
@@ -1278,8 +1278,14 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
             }
         }
 
+        bool b_valid = scan_tuner_config_StandardValidate( &tscfg );
+        if( b_valid && p_nit->i_table_id == NIT_CURRENT_NETWORK_TABLE_ID )
+        {
+            p_scan->b_multiplexes_from_nit |= b_valid;
+        }
+
         scan_multiplex_t *p_mplex = scan_FindMultiplex( p_scan, p_ts->i_ts_id );
-        if( p_mplex == NULL && scan_tuner_config_StandardValidate( &tscfg ) )
+        if( p_mplex == NULL && b_valid )
         {
             p_mplex = scan_multiplex_New( &tscfg, p_ts->i_ts_id );
             if( likely(p_mplex) )
