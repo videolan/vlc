@@ -137,37 +137,6 @@ static inline char *str_format( input_thread_t *input, const char *fmt )
 void filename_sanitize(char *);
 
 /**
- * Remove forbidden characters from full paths (leaves slashes)
- */
-static inline void path_sanitize(char *str)
-{
-#if defined( _WIN32 ) || defined( __OS2__ )
-    /* check drive prefix if path is absolute */
-    if ((((unsigned char)(str[0] - 'A') < 26)
-      || ((unsigned char)(str[0] - 'a') < 26)) && (str[1] == ':'))
-        str += 2;
-
-    while (*str != '\0')
-    {
-        if (strchr("*\"?:|<>", *str) != NULL)
-            *str = '_';
-        if (*str == '/')
-            *str = DIR_SEP_CHAR;
-        str++;
-    }
-#elif defined( __APPLE__ )
-    while (*str != '\0')
-    {
-        if (*str == ':')
-            *str = '_';
-        str++;
-    }
-#else
-    (void) str;
-#endif
-}
-
-/**
  * @}
  */
 

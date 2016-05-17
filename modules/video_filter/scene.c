@@ -308,7 +308,6 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
         msg_Err( p_filter, "could not create snapshot %s", psz_filename );
         goto error;
     }
-    path_sanitize( psz_filename );
 
     i_ret = asprintf( &psz_temp, "%s.swp", psz_filename );
     if( i_ret == -1 )
@@ -316,7 +315,6 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
         msg_Err( p_filter, "could not create snapshot temporarily file %s", psz_temp );
         goto error;
     }
-    path_sanitize( psz_temp );
 
     /* Save the image */
     i_ret = image_WriteUrl( p_sys->p_image, p_pic, &fmt_in, &fmt_out,
