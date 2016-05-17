@@ -1217,13 +1217,8 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     HRESULT hr;
 
 #if defined(HAVE_ID3D11VIDEODECODER) && VLC_WINSTORE_APP
-    D3D11_FEATURE_DATA_THREADING threading;
-    hr = ID3D11Device_CheckFeatureSupport( sys->d3ddevice, D3D11_FEATURE_THREADING, &threading, sizeof( threading ) );
-    if( FAILED( hr ) || !threading.DriverConcurrentCreates )
-    {
-        sys->context_lock = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
-        ID3D11Device_SetPrivateData( sys->d3ddevice, &GUID_CONTEXT_MUTEX, sizeof( sys->context_lock ), &sys->context_lock );
-    }
+    sys->context_lock = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
+    ID3D11Device_SetPrivateData( sys->d3ddevice, &GUID_CONTEXT_MUTEX, sizeof( sys->context_lock ), &sys->context_lock );
 #endif
 
     hr = UpdateBackBuffer(vd);
