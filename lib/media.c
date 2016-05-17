@@ -1096,3 +1096,147 @@ libvlc_media_type_t libvlc_media_get_type( libvlc_media_t *p_md )
         return libvlc_media_type_unknown;
     }
 }
+
+int libvlc_media_slaves_add( libvlc_media_t *p_md,
+                             libvlc_media_slave_type_t i_type,
+                             unsigned int i_priority,
+                             const char *psz_uri )
+{
+    assert( p_md && psz_uri );
+    input_item_t *p_input_item = p_md->p_input_item;
+
+    enum slave_type i_input_slave_type;
+    switch( i_type )
+    {
+    case libvlc_media_slave_type_subtitle:
+        i_input_slave_type = SLAVE_TYPE_SPU;
+        break;
+    case libvlc_media_slave_type_audio:
+        i_input_slave_type = SLAVE_TYPE_AUDIO;
+    default:
+        vlc_assert_unreachable();
+        return -1;
+    }
+
+    enum slave_priority i_input_slave_priority;
+    switch( i_priority )
+    {
+    case 0:
+        i_input_slave_priority = SLAVE_PRIORITY_MATCH_NONE;
+        break;
+    case 1:
+        i_input_slave_priority = SLAVE_PRIORITY_MATCH_RIGHT;
+        break;
+    case 2:
+        i_input_slave_priority = SLAVE_PRIORITY_MATCH_LEFT;
+        break;
+    case 3:
+        i_input_slave_priority = SLAVE_PRIORITY_MATCH_ALL;
+        break;
+    default:
+    case 4:
+        i_input_slave_priority = SLAVE_PRIORITY_USER;
+        break;
+    }
+
+    input_item_slave_t *p_slave = input_item_slave_New( psz_uri,
+                                                      i_input_slave_type,
+                                                      i_input_slave_priority );
+    if( p_slave == NULL )
+        return -1;
+    return input_item_AddSlave( p_input_item, p_slave ) == VLC_SUCCESS ? 0 : -1;
+}
+
+void libvlc_media_slaves_clear( libvlc_media_t *p_md )
+{
+    assert( p_md );
+    input_item_t *p_input_item = p_md->p_input_item;
+
+    vlc_mutex_lock( &p_input_item->lock );
+    for( int i = 0; i < p_input_item->i_slaves; i++ )
+        input_item_slave_Delete( p_input_item->pp_slaves[i] );
+    TAB_CLEAN( p_input_item->i_slaves, p_input_item->pp_slaves );
+    vlc_mutex_unlock( &p_input_item->lock );
+}
+
+unsigned int libvlc_media_slaves_get( libvlc_media_t *p_md,
+                                      libvlc_media_slave_t ***ppp_slaves )
+{
+    assert( p_md && ppp_slaves );
+    input_item_t *p_input_item = p_md->p_input_item;
+
+    vlc_mutex_lock( &p_input_item->lock );
+
+    int i_count = p_input_item->i_slaves;
+    if( i_count <= 0 )
+        return vlc_mutex_unlock( &p_input_item->lock ), 0;
+
+    libvlc_media_slave_t **pp_slaves = calloc( i_count, sizeof(*pp_slaves) );
+    if( pp_slaves == NULL )
+        return vlc_mutex_unlock( &p_input_item->lock ), 0;
+
+    for( int i = 0; i < i_count; ++i )
+    {
+        input_item_slave_t *p_item_slave = p_input_item->pp_slaves[i];
+        if( p_item_slave->i_priority == 0 )
+            continue;
+
+        libvlc_media_slave_t *p_slave = malloc( sizeof(*p_slave) +
+                                                strlen( p_item_slave->psz_uri )
+                                                + 1 );
+
+        if( p_slave == NULL )
+        {
+            libvlc_media_slaves_release(pp_slaves, i);
+            return vlc_mutex_unlock( &p_input_item->lock ), 0;
+        }
+        strcpy( p_slave->psz_uri, p_item_slave->psz_uri );
+
+        switch( p_item_slave->i_type )
+        {
+        case SLAVE_TYPE_SPU:
+            p_slave->i_type = libvlc_media_slave_type_subtitle;
+            break;
+        case SLAVE_TYPE_AUDIO:
+            p_slave->i_type = libvlc_media_slave_type_audio;
+            break;
+        default:
+            vlc_assert_unreachable();
+        }
+
+        switch( p_item_slave->i_priority )
+        {
+        case SLAVE_PRIORITY_MATCH_NONE:
+            p_slave->i_priority = 0;
+            break;
+        case SLAVE_PRIORITY_MATCH_RIGHT:
+            p_slave->i_priority = 1;
+            break;
+        case SLAVE_PRIORITY_MATCH_LEFT:
+            p_slave->i_priority = 2;
+            break;
+        case SLAVE_PRIORITY_MATCH_ALL:
+            p_slave->i_priority = 3;
+            break;
+        case SLAVE_PRIORITY_USER:
+            p_slave->i_priority = 4;
+            break;
+        default:
+            vlc_assert_unreachable();
+        }
+        pp_slaves[i] = p_slave;
+    }
+    vlc_mutex_unlock( &p_input_item->lock );
+
+    *ppp_slaves = pp_slaves;
+    return i_count;
+}
+
+void libvlc_media_slaves_release( libvlc_media_slave_t **pp_slaves,
+                                  unsigned int i_count )
+{
+    assert( pp_slaves );
+    for( unsigned int i = 0; i < i_count; ++i )
+        free(pp_slaves[i]);
+    free(pp_slaves);
+}
