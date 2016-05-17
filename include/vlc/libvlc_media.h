@@ -41,11 +41,6 @@ extern "C" {
 
 typedef struct libvlc_media_t libvlc_media_t;
 
-/** defgroup libvlc_meta LibVLC meta data
- * \ingroup libvlc_media
- * @{
- */
-
 /** Meta data types */
 typedef enum libvlc_meta_t {
     libvlc_meta_Title,
@@ -76,8 +71,6 @@ typedef enum libvlc_meta_t {
     libvlc_meta_DiscTotal
     /* Add new meta types HERE */
 } libvlc_meta_t;
-
-/** @}*/
 
 /**
  * Note the order of libvlc_state_t enum must match exactly the order of
@@ -116,10 +109,6 @@ typedef enum libvlc_track_type_t
     libvlc_track_text      = 2
 } libvlc_track_type_t;
 
-/** defgroup libvlc_media_stats_t LibVLC media statistics
- * \ingroup libvlc_media
- * @{
- */
 typedef struct libvlc_media_stats_t
 {
     /* Input */
@@ -149,7 +138,6 @@ typedef struct libvlc_media_stats_t
     int         i_sent_bytes;
     float       f_send_bitrate;
 } libvlc_media_stats_t;
-/** @}*/
 
 typedef struct libvlc_media_track_info_t
 {
@@ -223,11 +211,6 @@ typedef struct libvlc_media_track_t
 
 } libvlc_media_track_t;
 
-/** defgroup libvlc_media_type LibVLC media type
- * \ingroup libvlc_media
- * @{
- */
-
 /**
  * Media type
  *
@@ -241,8 +224,6 @@ typedef enum libvlc_media_type_t {
     libvlc_media_type_stream,
     libvlc_media_type_playlist,
 } libvlc_media_type_t;
-
-/** @}*/
 
 /**
  * Parse flags used by libvlc_media_parse_with_options()
