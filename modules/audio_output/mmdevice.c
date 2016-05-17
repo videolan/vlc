@@ -613,8 +613,24 @@ vlc_MMNotificationClient_OnDeviceStateChanged(IMMNotificationClient *this,
     aout_sys_t *sys = vlc_MMNotificationClient_sys(this);
     audio_output_t *aout = sys->aout;
 
-    /* TODO: show device state / ignore missing devices */
-    msg_Dbg(aout, "device %ls state changed %08lx", wid, state);
+    switch (state) {
+        case DEVICE_STATE_UNPLUGGED:
+            msg_Dbg(aout, "device %ls state changed: unplugged", wid);
+            break;
+        case DEVICE_STATE_ACTIVE:
+            msg_Dbg(aout, "device %ls state changed: active", wid);
+            break;
+        case DEVICE_STATE_DISABLED:
+            msg_Dbg(aout, "device %ls state changed: disabled", wid);
+            break;
+        case DEVICE_STATE_NOTPRESENT:
+            msg_Dbg(aout, "device %ls state changed: not present", wid);
+            break;
+        default:
+            msg_Dbg(aout, "device %ls state changed: unknown: %08lx", wid, state);
+            break;
+    }
+
     return S_OK;
 }
 
