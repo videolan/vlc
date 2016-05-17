@@ -257,7 +257,7 @@ static int Open( vlc_object_t *p_this )
     if ( psz_idx )
     {
         char *psz_tmp;
-        psz_tmp = str_format_time( psz_idx );
+        psz_tmp = vlc_strftime( psz_idx );
         free( psz_idx );
         if ( !psz_tmp )
         {
@@ -479,7 +479,7 @@ static char *formatSegmentPath( char *psz_path, uint32_t i_seg )
     char *psz_result;
     char *psz_firstNumSign;
 
-    if ( ! ( psz_result  = str_format_time( psz_path ) ) )
+    if ( ! ( psz_result  = vlc_strftime( psz_path ) ) )
         return NULL;
 
     psz_firstNumSign = psz_result + strcspn( psz_result, SEG_NUMBER_PLACEHOLDER );

@@ -123,12 +123,20 @@ VLC_API size_t vlc_b64_decode_binary_to_buffer( uint8_t *p_dst, size_t i_dst_max
 VLC_API size_t vlc_b64_decode_binary( uint8_t **pp_dst, const char *psz_src );
 VLC_API char * vlc_b64_decode( const char *psz_src );
 
-VLC_API char * str_format_time( const char * );
+/**
+ * Convenience wrapper for strftime().
+ *
+ * Formats the current time into a heap-allocated string.
+ *
+ * @param tformat time format (as with C strftime())
+ * @return an allocated string (must be free()'d), or NULL on memory error.
+ */
+VLC_API char *vlc_strftime( const char * );
 VLC_API char * str_format_meta( input_thread_t *, const char * );
 
 static inline char *str_format( input_thread_t *input, const char *fmt )
 {
-    char *s1 = str_format_time( fmt );
+    char *s1 = vlc_strftime( fmt );
     char *s2 = str_format_meta( input, s1 );
     free( s1 );
     return s2;

@@ -34,7 +34,7 @@
 #include <vlc_common.h>
 #include <assert.h>
 
-/* Needed by str_format_time */
+/* Needed by vlc_strftime */
 #include <time.h>
 #include <limits.h>
 #include <math.h>
@@ -468,12 +468,7 @@ char *vlc_b64_decode( const char *psz_src )
     return p_dst;
 }
 
-/**
- * Formats current time into a heap-allocated string.
- * @param tformat time format (as with C strftime())
- * @return an allocated string (must be free()'d), or NULL on memory error.
- */
-char *str_format_time( const char *tformat )
+char *vlc_strftime( const char *tformat )
 {
     time_t curtime;
     struct tm loctime;

@@ -292,7 +292,7 @@ static int Open( vlc_object_t *p_this )
 
         if (var_InheritBool (p_access, SOUT_CFG_PREFIX"format"))
         {
-            buf = str_format_time (path);
+            buf = vlc_strftime (path);
             path = buf;
         }
 
