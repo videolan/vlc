@@ -38,10 +38,8 @@ packetizer_LTLIBRARIES = \
 	libpacketizer_dirac_plugin.la \
 	libpacketizer_flac_plugin.la \
 	libpacketizer_hevc_plugin.la \
+	libpacketizer_copy_plugin.la \
 	$(NULL)
-if ENABLE_SOUT
-packetizer_LTLIBRARIES += libpacketizer_copy_plugin.la
-endif
 
 if HAVE_AVCODEC
 if !MERGE_FFMPEG
