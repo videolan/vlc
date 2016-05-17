@@ -465,8 +465,6 @@ InfoPanel::InfoPanel( QWidget *parent ) : QWidget( parent )
 {
      QGridLayout *layout = new QGridLayout(this);
 
-     QList<QTreeWidgetItem *> items;
-
      QLabel *topLabel = new QLabel( qtr( "Information about what your media or"
               " stream is made of.\nMuxer, Audio and Video Codecs, Subtitles "
               "are shown." ) );
