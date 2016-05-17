@@ -389,12 +389,15 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
     }
 
 #define IF_EXTRACT_FMT(txt,var,fmt,target) \
-    IF_EXTRACT(txt,var)\
-    if( fmt && !strncasecmp(psz_comment, txt, strlen(txt)) )\
+    if( !strncasecmp(psz_comment, txt, strlen(txt)) ) \
+    { \
+        IF_EXTRACT(txt,var)\
+        if( fmt )\
         {\
-            if ( fmt->target ) free( fmt->target );\
+            free( fmt->target );\
             fmt->target = strdup(&psz_comment[strlen(txt)]);\
-        }
+        }\
+    }
 
         IF_EXTRACT("TITLE=", Title )
         else IF_EXTRACT("ARTIST=", Artist )
