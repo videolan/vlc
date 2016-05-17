@@ -1,6 +1,6 @@
 --- mpg123/configure.ac	2015-08-12 07:38:31.000000000 +0200
 +++ mpg123/configure.ac.winstore	2016-05-16 16:23:05.234325900 +0200
-@@ -2290,23 +2292,41 @@ win32_fifo_working=no
+@@ -2294,23 +2294,41 @@ win32_fifo_working=no
  if test x$win32_specific_codes = xenabled; then
    AC_MSG_CHECKING([if we have Named Pipes])
    if test "x$fifo" != "xdisabled"; then
@@ -44,3 +44,14 @@
      fi
    fi
    have_mkfifo=$win32_fifo_working
+@@ -2324,6 +2342,10 @@ fi
+ 
+ #### WINVER Bump
+ if test x$win32_specific_codes = xenabled; then
++  AC_PREPROC_IFELSE([AC_LANG_SOURCE([[
++  #if defined(WINVER) && WINVER > 0x0501
++  #error don't bump
++  #endif]])],[],[win32_winver_bump=no])
+   AC_MSG_CHECKING([if WINVER and _WIN32_WINNT needs version bumps])
+   if test "x$win32_winver_bump" = "xyes"; then
+     AC_MSG_RESULT([yes])
