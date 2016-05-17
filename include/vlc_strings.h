@@ -132,12 +132,18 @@ VLC_API char * vlc_b64_decode( const char *psz_src );
  * @return an allocated string (must be free()'d), or NULL on memory error.
  */
 VLC_API char *vlc_strftime( const char * );
-VLC_API char * str_format_meta( input_thread_t *, const char * );
+
+/**
+ * Formats input meta-data.
+ *
+ * Formats input and input item meta-informations into a heap-allocated string.
+ */
+VLC_API char *vlc_strfinput( input_thread_t *, const char * );
 
 static inline char *str_format( input_thread_t *input, const char *fmt )
 {
     char *s1 = vlc_strftime( fmt );
-    char *s2 = str_format_meta( input, s1 );
+    char *s2 = vlc_strfinput( input, s1 );
     free( s1 );
     return s2;
 }

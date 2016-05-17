@@ -39,7 +39,7 @@
 #include <limits.h>
 #include <math.h>
 
-/* Needed by str_format_meta */
+/* Needed by vlc_strfinput */
 #include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_aout.h>
@@ -524,7 +524,7 @@ static int write_meta(FILE *stream, input_item_t *item, vlc_meta_type_t type)
     return ret;
 }
 
-char *str_format_meta(input_thread_t *input, const char *s)
+char *vlc_strfinput(input_thread_t *input, const char *s)
 {
     char *str;
     size_t len;

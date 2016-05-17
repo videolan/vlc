@@ -405,7 +405,7 @@ stream_UrlNew
 stream_vaControl
 stream_ReadDir
 stream_FilterDefaultReadDir
-str_format_meta
+vlc_strfinput
 vlc_strftime
 subpicture_Delete
 subpicture_New

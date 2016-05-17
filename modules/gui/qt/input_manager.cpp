@@ -32,7 +32,7 @@
 
 #include <vlc_keys.h>           /* ACTION_ID */
 #include <vlc_url.h>            /* vlc_uri_decode */
-#include <vlc_strings.h>        /* str_format_meta */
+#include <vlc_strings.h>        /* vlc_strfinput */
 #include <vlc_aout.h>           /* audio_output_t */
 
 #include <QApplication>
@@ -520,7 +520,7 @@ void InputManager::UpdateName()
     char *formatted = NULL;
     if (format != NULL)
     {
-        formatted = str_format_meta( p_input, format );
+        formatted = vlc_strfinput( p_input, format );
         free( format );
         if( formatted != NULL )
         {

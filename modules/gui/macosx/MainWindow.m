@@ -691,7 +691,7 @@ static const float f_min_window_height = 307.;
         if (!config_GetPsz(getIntf(), "video-title")) {
             char *format = var_InheritString(getIntf(), "input-title-format");
             if (format) {
-                char *formated = str_format_meta(p_input, format);
+                char *formated = vlc_strfinput(p_input, format);
                 free(format);
                 aString = toNSStr(formated);
                 free(formated);

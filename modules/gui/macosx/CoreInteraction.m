@@ -309,7 +309,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     NSString *o_name = @"";
     char *format = var_InheritString(getIntf(), "input-title-format");
     if (format) {
-        char *formated = str_format_meta(p_input, format);
+        char *formated = vlc_strfinput(p_input, format);
         free(format);
         o_name = toNSStr(formated);
         free(formated);
