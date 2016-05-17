@@ -652,9 +652,9 @@ static const char *const ppsz_prefres[] = {
     "the form \"{name=bookmark-name,time=optional-time-offset," \
     "bytes=optional-byte-offset},{...}\"")
 
-#define INPUT_RECORD_PATH_TEXT N_("Record directory or filename")
+#define INPUT_RECORD_PATH_TEXT N_("Record directory")
 #define INPUT_RECORD_PATH_LONGTEXT N_( \
-    "Directory or filename where the records will be stored" )
+    "Directory where the records will be stored" )
 
 #define INPUT_RECORD_NATIVE_TEXT N_("Prefer native stream recording")
 #define INPUT_RECORD_NATIVE_LONGTEXT N_( \

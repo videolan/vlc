@@ -145,62 +145,53 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
 {
     /* */
     char *filename;
-    DIR *pathdir = vlc_opendir(cfg->path);
     input_thread_t *input = (input_thread_t*)p_vout->p->input;
-    if (pathdir != NULL) {
-        /* The use specified a directory path */
-        closedir(pathdir);
 
-        /* */
-        char *prefix = NULL;
-        if (cfg->prefix_fmt)
-            prefix = str_format(input, cfg->prefix_fmt);
-        if (prefix)
-            filename_sanitize(prefix);
-        else {
-            prefix = strdup("vlcsnap-");
-            if (!prefix)
-                goto error;
-        }
-
-        if (cfg->is_sequential) {
-            for (int num = cfg->sequence; ; num++) {
-                struct stat st;
-
-                if (asprintf(&filename, "%s" DIR_SEP "%s%05d.%s",
-                             cfg->path, prefix, num, cfg->format) < 0) {
-                    free(prefix);
-                    goto error;
-                }
-                if (vlc_stat(filename, &st)) {
-                    *sequential = num;
-                    break;
-                }
-                free(filename);
-            }
-        } else {
-            struct timespec ts;
-            struct tm curtime;
-            char buffer[128];
-
-            timespec_get(&ts, TIME_UTC);
-            if (localtime_r(&ts.tv_sec, &curtime) == NULL)
-                gmtime_r(&ts.tv_sec, &curtime);
-            if (strftime(buffer, sizeof(buffer), "%Y-%m-%d-%Hh%Mm%Ss",
-                         &curtime) == 0)
-                strcpy(buffer, "error");
-
-            if (asprintf(&filename, "%s" DIR_SEP "%s%s%03lu.%s",
-                         cfg->path, prefix, buffer, ts.tv_nsec / 1000000,
-                         cfg->format) < 0)
-                filename = NULL;
-        }
-        free(prefix);
-    } else {
-        /* The user specified a full path name (including file name) */
-        filename = str_format(input, cfg->path);
-        path_sanitize(filename);
+    /* */
+    char *prefix = NULL;
+    if (cfg->prefix_fmt)
+        prefix = str_format(input, cfg->prefix_fmt);
+    if (prefix)
+        filename_sanitize(prefix);
+    else {
+        prefix = strdup("vlcsnap-");
+        if (prefix == NULL)
+            goto error;
     }
+
+    if (cfg->is_sequential) {
+        for (int num = cfg->sequence; ; num++) {
+            struct stat st;
+
+            if (asprintf(&filename, "%s" DIR_SEP "%s%05d.%s",
+                         cfg->path, prefix, num, cfg->format) < 0) {
+                free(prefix);
+                goto error;
+            }
+            if (vlc_stat(filename, &st)) {
+                *sequential = num;
+                break;
+            }
+            free(filename);
+        }
+    } else {
+        struct timespec ts;
+        struct tm curtime;
+        char buffer[128];
+
+        timespec_get(&ts, TIME_UTC);
+        if (localtime_r(&ts.tv_sec, &curtime) == NULL)
+            gmtime_r(&ts.tv_sec, &curtime);
+        if (strftime(buffer, sizeof(buffer), "%Y-%m-%d-%Hh%Mm%Ss",
+                     &curtime) == 0)
+            strcpy(buffer, "error");
+
+        if (asprintf(&filename, "%s" DIR_SEP "%s%s%03lu.%s",
+                     cfg->path, prefix, buffer, ts.tv_nsec / 1000000,
+                     cfg->format) < 0)
+            filename = NULL;
+    }
+    free(prefix);
 
     if (!filename)
         goto error;
