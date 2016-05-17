@@ -341,21 +341,6 @@ esac
 #
 test -e Makefile && unlink Makefile
 ln -sf ../../contrib/src/main.mak Makefile || exit $?
-cat << EOF
-Bootstrap completed.
-
-Run "make" to start compilation.
-
-Other targets:
- * make install      same as "make"
- * make prebuilt     fetch and install prebuilt binaries
- * make list         list packages
- * make fetch        fetch required source tarballs
- * make fetch-all    fetch all source tarballs
- * make distclean    clean everything and undo bootstrap
- * make mostlyclean  clean everything except source tarballs
- * make clean        clean everything
- * make package      prepare prebuilt packages
-EOF
-
+echo "Bootstrap completed."
+make help
 mkdir -p ../../contrib/tarballs || exit $?

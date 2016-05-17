@@ -442,7 +442,10 @@ list:
 	@echo To-be-built packages:
 	@echo '  $(PKGS)' | tr " " "\n" | sort | tr "\n" " " |fmt
 
-.PHONY: all fetch fetch-all install mostlyclean clean distclean package list prebuilt
+help:
+	@cat $(SRC)/help.txt
+
+.PHONY: all fetch fetch-all install mostlyclean clean distclean package list help prebuilt
 
 # CMake toolchain
 toolchain.cmake:
