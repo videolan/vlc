@@ -1808,8 +1808,15 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         break;
 
     case DEMUX_SET_PAUSE_STATE:
-        /* Nothing to do */
+    {
+#ifdef BLURAY_RATE_NORMAL
+        bool b_paused = (bool)va_arg(args, int);
+        if (bd_set_rate(p_sys->bluray, BLURAY_RATE_NORMAL * (!b_paused)) < 0) {
+            return VLC_EGENERIC;
+        }
+#endif
         break;
+    }
     case DEMUX_SET_ES:
     {
         int i_id = (int)va_arg(args, int);
