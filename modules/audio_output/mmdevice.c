@@ -619,7 +619,7 @@ vlc_MMNotificationClient_OnDeviceStateChanged(IMMNotificationClient *this,
             break;
         case DEVICE_STATE_ACTIVE:
             msg_Dbg(aout, "device %ls state changed: active", wid);
-            break;
+            return DeviceUpdated(aout, wid);
         case DEVICE_STATE_DISABLED:
             msg_Dbg(aout, "device %ls state changed: disabled", wid);
             break;
@@ -628,8 +628,15 @@ vlc_MMNotificationClient_OnDeviceStateChanged(IMMNotificationClient *this,
             break;
         default:
             msg_Dbg(aout, "device %ls state changed: unknown: %08lx", wid, state);
-            break;
+            return E_FAIL;
     }
+
+    /* Unplugged, disabled or notpresent */
+    char *id = FromWide(wid);
+    if (unlikely(id == NULL))
+        return E_OUTOFMEMORY;
+    aout_HotplugReport(aout, id, NULL);
+    free(id);
 
     return S_OK;
 }
