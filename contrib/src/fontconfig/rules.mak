@@ -60,7 +60,7 @@ ifndef HAVE_MACOSX
 	cd $< && $(MAKE) install
 else
 	cd $< && $(MAKE) install-exec
-	cd $</fontconfig && $(MAKE) install-data
+	cd $< && $(MAKE) -C fontconfig install-data
 	sed -e 's%/usr/lib/libiconv.la%%' -i.orig $(PREFIX)/lib/libfontconfig.la
 	cp $</fontconfig.pc $(PREFIX)/lib/pkgconfig/
 endif

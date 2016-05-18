@@ -86,6 +86,6 @@ endif
 .gnutls: gnutls
 	$(RECONF)
 	cd $< && $(GNUTLS_ENV) ./configure $(GNUTLS_CONF)
-	cd $</gl && $(MAKE) install
-	cd $</lib && $(MAKE) install
+	cd $< && $(MAKE) -C gl install
+	cd $< && $(MAKE) -C lib install
 	touch $@

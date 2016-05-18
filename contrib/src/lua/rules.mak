@@ -75,7 +75,7 @@ endif
 .lua: lua
 	cd $< && $(HOSTVARS_PIC) $(MAKE) $(LUA_TARGET)
 ifdef HAVE_WIN32
-	cd $</src && $(HOSTVARS) $(MAKE) liblua.a
+	cd $< && $(HOSTVARS) $(MAKE) -C src liblua.a
 endif
 	cd $< && $(HOSTVARS) $(MAKE) install INSTALL_TOP="$(PREFIX)"
 ifdef HAVE_WIN32

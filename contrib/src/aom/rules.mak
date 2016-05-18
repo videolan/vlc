@@ -94,7 +94,7 @@ endif
 .aom: aom toolchain.cmake
 	cd $< && mkdir -p aom_build
 	cd $</aom_build && LDFLAGS="$(AOM_LDFLAGS)" $(HOSTVARS) CFLAGS="$(AOM_CFLAGS)" CXXFLAGS="$(AOM_CXXFLAGS)" $(CMAKE) ../ $(AOM_CONF)
-	cd $</aom_build && $(MAKE)
+	cd $< && $(MAKE) -C aom_build
 	cd $</aom_build && ../../../../contrib/src/pkg-static.sh aom.pc
 	cd $</aom_build && $(MAKE) install
 	touch $@

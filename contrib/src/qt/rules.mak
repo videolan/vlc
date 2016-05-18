@@ -51,11 +51,11 @@ QT_CONFIG += -release
 	cd $< && ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
 	# Make && Install libraries
 	cd $< && $(MAKE)
-	cd $</src && $(MAKE) sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets
+	cd $< && $(MAKE) -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets
 	# Install tools
-	cd $</src && $(MAKE) sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets
+	cd $< && $(MAKE) -C src sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets
 	# Install plugins
-	cd $</src/plugins && $(MAKE) sub-platforms-install_subtargets
+	cd $< && $(MAKE) -C src/plugins sub-platforms-install_subtargets
 	mv $(PREFIX)/plugins/platforms/libqwindows.a $(PREFIX)/lib/ && rm -rf $(PREFIX)/plugins
 	# Move includes to match what VLC expects
 	mkdir -p $(PREFIX)/include/QtGui/qpa
@@ -69,7 +69,7 @@ QT_CONFIG += -release
 ifdef HAVE_CROSS_COMPILE
 	# Building Qt build tools for Xcompilation
 	cd $</include/QtCore; ln -sf $(QT_VERSION)/QtCore/private
-	cd $</qmake; $(MAKE)
+	cd $<; $(MAKE) -C qmake
 	cd $<; $(MAKE) install_qmake install_mkspecs
 	cd $</src/tools; \
 	for i in bootstrap uic rcc moc; \
