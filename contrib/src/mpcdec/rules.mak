@@ -46,9 +46,6 @@ endif
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DSHARED=OFF .
 	cd $< && $(MAKE) install
 	mkdir -p -- "$(PREFIX)/lib"
-ifdef HAVE_WIN32
-	cd $< && cp libmpcdec/mpcdec_static.lib "$(PREFIX)/lib/libmpcdec.a"
-else
-	cd $< && cp libmpcdec/libmpcdec_static.a "$(PREFIX)/lib/libmpcdec.a"
-endif
+	# Use globbing to work around cmake's change of destination file
+	cd $< && cp libmpcdec/*mpcdec_static.* "$(PREFIX)/lib/libmpcdec.a"
 	touch $@
