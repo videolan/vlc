@@ -26,6 +26,7 @@
 
 #include "mp4.h"
 #include "avci.h"
+#include "../xiph.h"
 
 #include <vlc_demux.h>
 #include <vlc_aout.h>
@@ -751,6 +752,36 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
         {
             p_track->fmt.i_codec = VLC_CODEC_MPGA;
+            break;
+        }
+        case VLC_FOURCC( 'X', 'i', 'V', 's' ):
+        {
+            const MP4_Box_t *p_vCtH = MP4_BoxGet( p_sample, "wave/vCtH" ); /* kCookieTypeVorbisHeader */
+            const MP4_Box_t *p_vCtd = MP4_BoxGet( p_sample, "wave/vCt#" ); /* kCookieTypeVorbisComments */
+            const MP4_Box_t *p_vCtC = MP4_BoxGet( p_sample, "wave/vCtC" ); /* kCookieTypeVorbisCodebooks */
+            if( p_vCtH && p_vCtH->data.p_binary &&
+                p_vCtd && p_vCtd->data.p_binary &&
+                p_vCtC && p_vCtC->data.p_binary )
+            {
+                unsigned headers_sizes[3] = {
+                    p_vCtH->data.p_binary->i_blob,
+                    p_vCtd->data.p_binary->i_blob,
+                    p_vCtC->data.p_binary->i_blob
+                };
+
+                const void * headers[3] = {
+                    p_vCtH->data.p_binary->p_blob,
+                    p_vCtd->data.p_binary->p_blob,
+                    p_vCtC->data.p_binary->p_blob
+                };
+
+                if( xiph_PackHeaders( &p_track->fmt.i_extra, &p_track->fmt.p_extra,
+                                      headers_sizes, headers, 3 ) == VLC_SUCCESS )
+                {
+                    p_track->fmt.i_codec = VLC_CODEC_VORBIS;
+                    p_track->fmt.b_packetized = false;
+                }
+            }
             break;
         }
         case( ATOM_eac3 ):
