@@ -431,7 +431,7 @@ static BC_STATUS ourCallback(void *shnd, uint32_t width, uint32_t height, uint32
 static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
+    block_t *p_block = NULL;
 
     BC_DTS_PROC_OUT proc_out;
     BC_DTS_STATUS driver_stat;
@@ -440,7 +440,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( BC_FUNC_PSYS(DtsGetDriverStatus)( p_sys->bcm_handle, &driver_stat ) != BC_STS_SUCCESS )
         return NULL;
 
-    p_block = *pp_block;
+    if( pp_block )
+        p_block = *pp_block;
+
     if( p_block )
     {
         if( ( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) ) == 0 )
