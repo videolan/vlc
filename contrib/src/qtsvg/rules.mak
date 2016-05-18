@@ -28,7 +28,7 @@ qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	cd $< && $(PREFIX)/bin/qmake
 	# Make && Install libraries
 	cd $< && $(MAKE)
-	cd $</src && $(MAKE) sub-plugins-install_subtargets sub-svg-install_subtargets
+	cd $< && $(MAKE) -C src sub-plugins-install_subtargets sub-svg-install_subtargets
 	mv $(PREFIX)/plugins/iconengines/libqsvgicon.a $(PREFIX)/lib/
 	mv $(PREFIX)/plugins/imageformats/libqsvg.a $(PREFIX)/lib/
 	cd $(PREFIX)/lib/pkgconfig; sed -i \
