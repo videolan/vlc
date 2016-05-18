@@ -1,16 +1,20 @@
---- gnutls/lib/system.c.orig2	2016-04-05 11:14:43.364389441 +0200
-+++ gnutls/lib/system.c	2016-04-05 11:20:18.535618044 +0200
-@@ -429,9 +429,11 @@
- 		gnutls_datum_t data;
- 
- 		if (i == 0)
--			store = CertOpenSystemStore(0, "ROOT");
-+			store = CertOpenStore(CERT_STORE_PROV_SYSTEM_A, X509_ASN_ENCODING, 0, 
-+                        CERT_SYSTEM_STORE_CURRENT_USER, TEXT("ROOT"));
- 		else
--			store = CertOpenSystemStore(0, "CA");
-+			store = CertOpenStore(CERT_STORE_PROV_SYSTEM_A, X509_ASN_ENCODING, 0, 
-+                        CERT_SYSTEM_STORE_CURRENT_USER, TEXT("CA"));
- 
- 		if (store == NULL)
- 			return GNUTLS_E_FILE_ERROR;
+--- gnutls/lib/system.c	2016-05-18 09:28:09.902830600 +0200
++++ gnutls/lib/system.c.winstore	2016-05-18 13:06:32.408396400 +0200
+@@ -34,6 +34,17 @@
+ #ifdef _WIN32
+ # include <windows.h>
+ # include <wincrypt.h>
++# include <winapifamily.h>
++# if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
++#  if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0A00 /* Univeral Winstore */
++#  undef CertOpenSystemStore
++HCERTSTORE CertOpenSystemStore( HCRYPTPROV_LEGACY hprov, LPCSTR szSubsystemProtocol )
++{
++    return CertOpenStore( CERT_STORE_PROV_SYSTEM_A, X509_ASN_ENCODING, 0,
++        CERT_SYSTEM_STORE_CURRENT_USER, szSubsystemProtocol );
++}
++#  endif /* _WIN32_WINNT */
++# endif /* WINAPI_FAMILY */
+ # if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
+ typedef PCCRL_CONTEXT WINAPI(*Type_CertEnumCRLsInStore) (HCERTSTORE
+ 							 hCertStore,
