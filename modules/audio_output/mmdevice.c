@@ -163,10 +163,13 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
 static void Flush(audio_output_t *aout, bool wait)
 {
     aout_sys_t *sys = aout->sys;
+    HRESULT hr;
 
     EnterMTA();
-    aout_stream_Flush(sys->stream, wait);
+    hr = aout_stream_Flush(sys->stream, wait);
     LeaveMTA();
+
+    vlc_FromHR(aout, hr);
 }
 
 static int VolumeSet(audio_output_t *aout, float vol)
