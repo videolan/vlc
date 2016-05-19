@@ -856,13 +856,12 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/sidebar-icons_yosemite/ys-sidebar-playlist@2x.png \
 	extras/package/macosx/Resources/sidebar-icons_yosemite/ys-sidebar-podcast.png \
 	extras/package/macosx/Resources/sidebar-icons_yosemite/ys-sidebar-podcast@2x.png \
-	extras/package/macosx/Resources/vlcmenubaricon/pauseIcon.png \
-	extras/package/macosx/Resources/vlcmenubaricon/pauseIcon@2x.png \
-	extras/package/macosx/Resources/vlcmenubaricon/playIcon.png \
-	extras/package/macosx/Resources/vlcmenubaricon/playIcon@2x.png \
-	extras/package/macosx/Resources/vlcmenubaricon/statusBarIcon.pdf \
-	extras/package/macosx/Resources/vlcmenubaricon/stopIcon.png \
-	extras/package/macosx/Resources/vlcmenubaricon/stopIcon@2x.png \
+	extras/package/macosx/Resources/vlcmenubaricon/VLCNextTemplate.pdf \
+   	extras/package/macosx/Resources/vlcmenubaricon/VLCPauseTemplate.pdf \
+   	extras/package/macosx/Resources/vlcmenubaricon/VLCPlayTemplate.pdf \
+   	extras/package/macosx/Resources/vlcmenubaricon/VLCPreviousTemplate.pdf \
+   	extras/package/macosx/Resources/vlcmenubaricon/VLCShuffleTemplate.pdf \
+   	extras/package/macosx/Resources/vlcmenubaricon/VLCStatusBarIcon.pdf \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
 	extras/package/macosx/ub.sh \
