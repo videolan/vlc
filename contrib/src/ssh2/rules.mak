@@ -10,10 +10,8 @@ ifeq ($(call need_pkg,"libssh2"),)
 PKGS_FOUND += ssh2
 endif
 
-ifndef HAVE_WIN32
-ifeq ($(shell echo `${CC} -dumpversion | cut -f1-2 -d.` == 4.9 | bc ),1)
+ifeq ($(shell echo `${CC} -dumpversion | cut -f1-2 -d.`),4.9)
 	BROKEN_GCC_CFLAGS:="CFLAGS=-O1"
-endif
 endif
 
 $(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.gz:
