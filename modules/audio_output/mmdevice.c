@@ -114,11 +114,12 @@ struct aout_sys_t
  * synchronization between the set of audio output callbacks, MMThread()
  * and (trivially) the device and session notifications. */
 
+static int DeviceSelect(audio_output_t *, const char *);
 static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
 {
-    /* Restart on unplug */
+    /* Select the default device (and restart) on unplug */
     if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED))
-        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
+        DeviceSelect(aout, NULL);
     return SUCCEEDED(hr) ? 0 : -1;
 }
 
