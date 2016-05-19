@@ -1040,7 +1040,9 @@ static void LoadSlaves( input_thread_t *p_input )
         }
         vlc_mutex_unlock( &p_item->lock );
 
-        qsort( pp_slaves, i_slaves, sizeof(input_item_slave_t*), SlaveCompare );
+        if( i_slaves > 0 )
+            qsort( pp_slaves, i_slaves, sizeof (input_item_slave_t*),
+                   SlaveCompare );
 
         /* add all detected slaves */
         for( int i = 0; i < i_slaves && pp_slaves[i] != NULL; i++ )
