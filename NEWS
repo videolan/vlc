@@ -19,6 +19,7 @@ Core:
  * VLC now assumes vlcrc config file is in UTF-8
  * Add a keystore API: fetch and store password for common protocols (HTTP,
    SMB, SFTP, FTP, RTSP ...)
+ * Autodetect external audio tracks (ac3,m4a,aac,dts...)
 
 Access:
  * New NFS access module using libnfs
@@ -191,6 +192,9 @@ libVLC:
    libvlc_dialog_set_context, libvlc_dialog_get_context, libvlc_dialog_set_callbacks,
    libvlc_dialog_dismiss, libvlc_dialog_post_action, libvlc_dialog_post_login
  * Add libvlc_media_discoverer_list_get|release to list the media discoverers
+ * Add libvlc_media_slaves_add, libvlc_media_slaves_clear
+   libvlc_media_slaves_get, libvlc_media_slaves_release to add and get slaves
+   from a libvlc_media
 
 Logging
  * Support for the SystemD Journal
