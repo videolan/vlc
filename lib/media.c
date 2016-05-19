@@ -1178,8 +1178,7 @@ unsigned int libvlc_media_slaves_get( libvlc_media_t *p_md,
     for( int i = 0; i < i_count; ++i )
     {
         input_item_slave_t *p_item_slave = p_input_item->pp_slaves[i];
-        if( p_item_slave->i_priority == 0 )
-            continue;
+        assert( p_item_slave->i_priority >= SLAVE_PRIORITY_MATCH_NONE );
 
         libvlc_media_slave_t *p_slave = malloc( sizeof(*p_slave) +
                                                 strlen( p_item_slave->psz_uri )

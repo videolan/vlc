@@ -660,7 +660,8 @@ input_item_slave_t *input_item_slave_New(const char *psz_uri, enum slave_type i_
 
 int input_item_AddSlave(input_item_t *p_item, input_item_slave_t *p_slave)
 {
-    if( p_item == NULL || p_slave == NULL )
+    if( p_item == NULL || p_slave == NULL
+     || p_slave->i_priority < SLAVE_PRIORITY_MATCH_NONE )
         return VLC_EGENERIC;
 
     vlc_mutex_lock( &p_item->lock );
