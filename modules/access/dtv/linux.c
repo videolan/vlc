@@ -41,11 +41,6 @@
 #include "dtv/dtv.h"
 #include "dtv/en50221.h"
 
-/* dvbv5 has no support for automatic bandwidth */
-#define DEFAULT_BANDWIDTH_DVBT  8000000
-#define DEFAULT_BANDWIDTH_DVBT2 DEFAULT_BANDWIDTH_DVBT  /* Assume DVB-T2 comes from reused DVB-T freqs */
-#define DEFAULT_BANDWIDTH_ISDBT 6000000
-
 #ifndef O_SEARCH
 # define O_SEARCH O_RDONLY
 #endif
@@ -1032,8 +1027,6 @@ int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *modstr,
     fec_hp = dvb_parse_fec (fec_hp);
     fec_lp = dvb_parse_fec (fec_lp);
     bandwidth = dvb_parse_bandwidth (bandwidth);
-    if(bandwidth == 0)
-        bandwidth = DEFAULT_BANDWIDTH_DVBT;
     transmit_mode = dvb_parse_transmit_mode (transmit_mode);
     guard = dvb_parse_guard (guard);
     hierarchy = dvb_parse_hierarchy (hierarchy);
@@ -1057,8 +1050,6 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
     uint32_t mod = dvb_parse_modulation (modstr, QAM_AUTO);
     fec = dvb_parse_fec (fec);
     bandwidth = dvb_parse_bandwidth (bandwidth);
-    if(bandwidth == 0)
-        bandwidth = DEFAULT_BANDWIDTH_DVBT2;
     transmit_mode = dvb_parse_transmit_mode (transmit_mode);
     guard = dvb_parse_guard (guard);
 
@@ -1147,8 +1138,6 @@ int dvb_set_isdbt (dvb_device_t *d, uint32_t freq, uint32_t bandwidth,
                    const isdbt_layer_t layers[3])
 {
     bandwidth = dvb_parse_bandwidth (bandwidth);
-    if(bandwidth == 0)
-        bandwidth = DEFAULT_BANDWIDTH_ISDBT;
     transmit_mode = dvb_parse_transmit_mode (transmit_mode);
     guard = dvb_parse_guard (guard);
 
