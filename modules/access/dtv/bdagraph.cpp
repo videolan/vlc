@@ -198,13 +198,7 @@ int dvb_tune (dvb_device_t *d)
     return d->module->SubmitTuneRequest ();
 }
 
-int dvb_fill_device_caps( dvb_device_t *d, unsigned *min, unsigned *max, unsigned *step )
-{
-
-    return -1;
-}
-
-int dvb_get_symbolrates_range( dvb_device_t *d, unsigned *min, unsigned *max, unsigned *step )
+int dvb_fill_device_caps( dvb_device_t *, dvb_device_caps_t * )
 {
 
     return -1;
