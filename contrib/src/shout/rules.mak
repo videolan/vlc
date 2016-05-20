@@ -34,6 +34,9 @@ SHOUT_CONF :=
 ifdef HAVE_WIN32
 SHOUT_CONF += "--disable-thread"
 endif
+ifdef HAVE_ANDROID
+SHOUT_CONF += "--disable-thread"
+endif
 
 .shout: libshout
 	$(RECONF)
