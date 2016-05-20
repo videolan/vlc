@@ -286,9 +286,9 @@ typedef enum
  */
 typedef struct
 {
+    char *                          psz_uri;
     libvlc_media_slave_type_t       i_type;
     unsigned int                    i_priority;
-    char                            psz_uri[];
 } libvlc_media_slave_t;
 
 /**

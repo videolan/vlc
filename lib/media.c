@@ -1164,15 +1164,16 @@ unsigned int libvlc_media_slaves_get( libvlc_media_t *p_md,
         input_item_slave_t *p_item_slave = p_input_item->pp_slaves[i];
         assert( p_item_slave->i_priority >= SLAVE_PRIORITY_MATCH_NONE );
 
+        /* also allocate psz_uri buffer at the end of the struct */
         libvlc_media_slave_t *p_slave = malloc( sizeof(*p_slave) +
                                                 strlen( p_item_slave->psz_uri )
                                                 + 1 );
-
         if( p_slave == NULL )
         {
             libvlc_media_slaves_release(pp_slaves, i);
             return vlc_mutex_unlock( &p_input_item->lock ), 0;
         }
+        p_slave->psz_uri = (char *) ((uint8_t *)p_slave) + sizeof(*p_slave);
         strcpy( p_slave->psz_uri, p_item_slave->psz_uri );
 
         switch( p_item_slave->i_type )
