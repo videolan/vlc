@@ -93,6 +93,7 @@ public:
 
     /* all tracks */
     tracks_map_t tracks;
+    std::vector<mkv_track_t::track_id_t> priority_tracks;
 
     /* from seekhead */
     int                     i_seekhead_count;

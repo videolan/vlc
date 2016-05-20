@@ -930,6 +930,36 @@ void matroska_segment_c::ComputeTrackPriority()
         if( track.fmt.i_cat == VIDEO_ES )
             track.fmt.i_priority--;
     }
+
+    // find track(s) with highest priority //
+    {
+        int   score = -1;
+        int es_type = -1;
+
+        for( tracks_map_t::const_iterator it = this->tracks.begin(); it != this->tracks.end(); ++it )
+        {
+            int track_score = -1;
+
+            switch( it->second.fmt.i_cat )
+            {
+                case VIDEO_ES: ++track_score;
+                case AUDIO_ES: ++track_score;
+                case   SPU_ES: ++track_score;
+                default:
+                  if( score < track_score )
+                  {
+                      es_type = it->second.fmt.i_cat;
+                      score   = track_score;
+                  }
+            }
+        }
+
+        for( tracks_map_t::const_iterator it = this->tracks.begin(); it != this->tracks.end(); ++it )
+        {
+            if( it->second.fmt.i_cat == es_type )
+                priority_tracks.push_back( it->first );
+        }
+    }
 }
 
 void matroska_segment_c::EnsureDuration()
