@@ -1198,6 +1198,29 @@ static int DemuxInit( demux_t *p_demux )
             vlc_meta_SetRating( p_sys->meta, p_cd->psz_rating );
         }
     }
+    asf_object_extended_content_description_t *p_ecd;
+    if( ( p_ecd = ASF_FindObject( p_sys->p_root->p_hdr,
+                                 &asf_object_extended_content_description, 0 ) ) )
+    {
+        for( int i = 0; i < p_ecd->i_count; i++ )
+        {
+
+#define set_meta( name, vlc_type ) \
+            if( !strncmp( p_ecd->ppsz_name[i], name, strlen(name) ) ) \
+                vlc_meta_Set( p_sys->meta, vlc_type, p_ecd->ppsz_value[i] );
+
+            set_meta( "WM/AlbumTitle",   vlc_meta_Album );
+            set_meta( "WM/TrackNumber",  vlc_meta_TrackNumber );
+            set_meta( "WM/Year",         vlc_meta_Date );
+            set_meta( "WM/Genre",        vlc_meta_Genre );
+            set_meta( "WM/Genre",        vlc_meta_Genre );
+            set_meta( "WM/AlbumArtist",  vlc_meta_Artist );
+            set_meta( "WM/Publisher",    vlc_meta_Publisher );
+            /* TODO map WM/Composer, WM/Provider, WM/PartOfSet, PeakValue, AverageLevel  */
+#undef set_meta
+        }
+    }
+
     /// \tood Fix Child meta for ASF tracks
 #if 0
     for( i_stream = 0, i = 0; i < MAX_ASF_TRACKS; i++ )
