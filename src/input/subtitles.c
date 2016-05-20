@@ -312,6 +312,8 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
 
                 size_t i_len = strlen( psz_dir );
                 const char *psz_format;
+                if ( i_len == 0 )
+                    continue;
                 if( psz_dir[i_len - 1] == DIR_SEP_CHAR )
                     psz_format = "%s%s";
                 else
