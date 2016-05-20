@@ -29,10 +29,10 @@ endif
 	$(APPLY) $(SRC)/mad/mad-noopt.patch
 	$(APPLY) $(SRC)/mad/Provide-Thumb-2-alternative-code-for-MAD_F_MLN.diff
 	$(APPLY) $(SRC)/mad/mad-mips-h-constraint-removal.patch
+	$(APPLY) $(SRC)/mad/mad-foreign.patch
 	$(MOVE)
 
 .mad: libmad
-	touch libmad/NEWS libmad/AUTHORS libmad/ChangeLog
 	$(RECONF)
 ifdef HAVE_IOS
 	cd $< && $(HOSTVARS) CCAS="$(AS)" CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) $(MAD_CONF)

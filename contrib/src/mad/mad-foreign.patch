@@ -1,0 +1,11 @@
+--- libmad/configure.ac.foreign	2016-05-20 14:08:42.644100100 +0200
++++ libmad/configure.ac	2016-05-20 14:08:32.875935700 +0200
+@@ -26,7 +26,7 @@ AC_PREREQ(2.53)
+ 
+ AC_CONFIG_SRCDIR([decoder.h])
+ 
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([1.15 foreign])
+ 
+ AM_CONFIG_HEADER([config.h])
+ 
