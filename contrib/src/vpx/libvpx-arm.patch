@@ -1,0 +1,10 @@
+--- libvpx/vpx_ports/arm_cpudetect.c	2015-04-03 20:49:19.000000000 +0200
++++ libvpx.ok/vpx_ports/arm_cpudetect.c	2016-05-20 09:57:06.066241700 +0200
+@@ -84,7 +84,6 @@ int arm_cpu_caps(void) {
+     } __except (GetExceptionCode() == EXCEPTION_ILLEGAL_INSTRUCTION) {
+     /*Ignore exception.*/
+   }
+-}
+ #endif /* HAVE_MEDIA */
+ #if HAVE_NEON || HAVE_NEON_ASM
+ if (mask &HAS_NEON) {
