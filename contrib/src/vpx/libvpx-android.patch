@@ -1,0 +1,34 @@
+We don't use Android.mk to build libvpx. Then we have to force the build of
+cpu-features.c. Additionally, we don't need to link with pthread.
+
+--- libvpx/libs.mk.orig	2016-05-20 12:24:16.635969371 +0200
++++ libvpx/libs.mk	2016-05-20 12:25:01.275249347 +0200
+@@ -300,7 +300,7 @@
+ 	$(qexec)echo 'Conflicts:' >> $@
+ 	$(qexec)echo 'Libs: -L$${libdir} -lvpx -lm' >> $@
+ ifeq ($(HAVE_PTHREAD_H),yes)
+-	$(qexec)echo 'Libs.private: -lm -lpthread' >> $@
++	$(qexec)echo 'Libs.private: -lm' >> $@
+ else
+ 	$(qexec)echo 'Libs.private: -lm' >> $@
+ endif
+--- libvpx/vpx_ports/vpx_ports.mk.orig	2016-05-20 12:35:19.293271792 +0200
++++ libvpx/vpx_ports/vpx_ports.mk	2016-05-20 12:35:06.857472718 +0200
+@@ -21,4 +21,5 @@
+ endif
+ 
+ PORTS_SRCS-$(ARCH_ARM) += arm_cpudetect.c
++PORTS_SRCS-$(ARCH_ARM) += cpu-features.c
+ PORTS_SRCS-$(ARCH_ARM) += arm.h
+--- libvpx/build/make/configure.sh.orig	2016-05-20 12:48:54.468179035 +0200
++++ libvpx/build/make/configure.sh	2016-05-20 12:49:30.379601840 +0200
+@@ -907,7 +907,8 @@
+             soft_enable runtime_cpu_detect
+           fi
+           if enabled runtime_cpu_detect; then
+-            add_cflags "-I${SDK_PATH}/sources/android/cpufeatures"
++            cp "${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c" vpx_ports
++            add_cflags "-I${ANDROID_NDK}/sources/android/cpufeatures"
+           fi
+           ;;
+ 
