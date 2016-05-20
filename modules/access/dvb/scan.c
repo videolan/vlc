@@ -428,6 +428,10 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter,
     scan_Prepare( p_obj, p_parameter, p_scan );
     p_scan->p_current = p_scan->p_scanlist;
 
+    p_scan->spectrum.i_index = 0;
+    p_scan->spectrum.i_symbolrate_index = 0;
+    p_scan->spectrum.modulation = 0;
+
     scan_Debug_Parameters( p_obj, p_parameter );
 
     return p_scan;
