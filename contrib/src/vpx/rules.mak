@@ -112,6 +112,10 @@ VPX_CONF += --sdk-path=$(shell dirname $(shell which $(HOST)-gcc))
 VPX_CONF += --extra-cflags="-I $(ANDROID_NDK)/sources/cpufeatures/"
 endif
 
+ifndef WITH_OPTIMIZATION
+VPX_CONF += --enable-debug --disable-optimizations
+endif
+
 .vpx: libvpx
 	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
