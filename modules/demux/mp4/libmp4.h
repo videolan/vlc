@@ -142,8 +142,6 @@ typedef int64_t stime_t;
 #define ATOM_tsro VLC_FOURCC( 't', 's', 'r', 'o' )
 #define ATOM_tssy VLC_FOURCC( 't', 's', 's', 'y' )
 
-#define ATOM_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
-#define ATOM_3gp4 VLC_FOURCC( '3', 'g', 'p', '4' )
 #define ATOM_esds VLC_FOURCC( 'e', 's', 'd', 's' )
 
 #define ATOM_lpcm VLC_FOURCC( 'l', 'p', 'c', 'm' )
