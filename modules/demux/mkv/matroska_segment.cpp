@@ -168,6 +168,8 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                             {
                                 kccp_ptr->ReadData( es.I_O() );
                                 cue_position = segment->GetGlobalPosition( static_cast<uint64>( *kccp_ptr ) );
+
+                                _seeker.add_cluster_position( cue_position );
                             }
                             else if( MKV_CHECKED_PTR_DECL ( kcbn_ptr, KaxCueBlockNumber, el ) )
                             {
