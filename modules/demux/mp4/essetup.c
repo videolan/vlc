@@ -754,7 +754,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             p_track->fmt.i_codec = VLC_CODEC_MPGA;
             break;
         }
-        case VLC_FOURCC( 'X', 'i', 'V', 's' ):
+        case ATOM_XiVs:
         {
             const MP4_Box_t *p_vCtH = MP4_BoxGet( p_sample, "wave/vCtH" ); /* kCookieTypeVorbisHeader */
             const MP4_Box_t *p_vCtd = MP4_BoxGet( p_sample, "wave/vCt#" ); /* kCookieTypeVorbisComments */
