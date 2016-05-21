@@ -541,13 +541,8 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
 
             seek_callback_t pf_seek = &matroska_segment_c::Seek;
 
-#if 0
-            /* disabled due to non-existing implementation */
             if( ! b_precise )
                 pf_seek = &matroska_segment_c::FastSeek;
-#else
-            VLC_UNUSED( b_precise );
-#endif
 
             p_current_vchapter = p_vchapter;
 

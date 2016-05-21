@@ -795,10 +795,10 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
 
 void matroska_segment_c::FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
 {
-    VLC_UNUSED( i_mk_date );
-    VLC_UNUSED( i_mk_time_offset );
+    Seek( i_mk_date, i_mk_time_offset );
 
-    msg_Err( &sys.demuxer, "%s is not implemented in this patch", __func__ );
+    sys.i_start_pts = sys.i_pts;
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
 }
 
 void matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset )
