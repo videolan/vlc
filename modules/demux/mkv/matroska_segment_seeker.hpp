@@ -99,6 +99,12 @@ class SegmentSeeker
 
         void add_seekpoint( track_id_t track_id, int level, fptr_t fpos, mtime_t pts );
 
+        seekpoint_pair_t get_seekpoints_around( mtime_t, seekpoints_t const&, int = Seekpoint::DISABLED );
+        seekpoint_pair_t get_seekpoints_around( mtime_t, track_ids_t const& );
+
+        tracks_seekpoint_t get_seekpoints( matroska_segment_c&, mtime_t, track_ids_t const& );
+        tracks_seekpoint_t find_greatest_seekpoints_in_range( fptr_t , mtime_t );
+
         cluster_positions_t::iterator add_cluster_position( fptr_t pos );
         cluster_map_t      ::iterator add_cluster( KaxCluster * const );
 
