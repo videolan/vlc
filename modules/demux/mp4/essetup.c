@@ -290,19 +290,13 @@ static int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, M
                              BOXDATA(p_tssy)->i_reserved_timestamp_sync & 0x03;
     }
 
-    MP4_Box_t *p_tsro_box = MP4_BoxGet(p_sample, "tsro", 0);
-    if( p_tsro_box != NULL )
-    {
-        MP4_Box_data_tsro_t *p_tsro = p_tsro_box->data.p_tsro;
-        msg_Dbg(p_demux, "setting tsro: %d",
-            p_tsro->i_offset);
-        p_track->i_tsro_offset = p_tsro->i_offset;
-    }
+    const MP4_Box_t *p_tsro = MP4_BoxGet(p_sample, "tsro");
+    if( p_tsro && BOXDATA(p_tsro) )
+        p_track->i_tsro_offset = BOXDATA(p_tsro)->i_offset;
     else
-    {
-        msg_Dbg(p_demux, "No tsro box present. Assuming 0 as track offset");
-        p_track->i_tsro_offset = 0;
-    }
+        msg_Dbg(p_demux, "No tsro box present");
+    msg_Dbg(p_demux, "setting tsro: %" PRId32, p_track->i_tsro_offset);
+
     return 1;
 }
 
