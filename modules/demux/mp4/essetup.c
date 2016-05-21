@@ -34,8 +34,6 @@
 
 
 
-int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
-
 
 static void SetupGlobalExtensions( mp4_track_t *p_track, MP4_Box_t *p_sample )
 {
@@ -170,7 +168,7 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
     }
 }
 
-int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
+static int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 {
     p_track->fmt.i_original_fourcc = p_sample->i_type;
 
