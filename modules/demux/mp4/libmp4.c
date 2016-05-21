@@ -2313,7 +2313,12 @@ static int MP4_ReadBox_sample_mp4s( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-int MP4_ReadBox_sample_hint8( stream_t *p_stream, MP4_Box_t *p_box )
+static void MP4_FreeBox_sample_hint( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_sample_hint->p_data );
+}
+
+static int MP4_ReadBox_sample_hint8( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_sample_hint_t, 24, MP4_FreeBox_sample_hint );
 
@@ -2335,11 +2340,6 @@ int MP4_ReadBox_sample_hint8( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
 
     MP4_READBOX_EXIT( 1 );
-}
-
-void MP4_FreeBox_sample_hint( MP4_Box_t *p_box )
-{
-    FREENULL( p_box->data.p_sample_hint->p_data );
 }
 
 static int MP4_ReadBox_sample_text( stream_t *p_stream, MP4_Box_t *p_box )

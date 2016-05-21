@@ -1836,7 +1836,4 @@ int MP4_ReadBoxContainerChildren( stream_t *p_stream, MP4_Box_t *p_container,
 int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box );
 void MP4_FreeBox_sample_vide( MP4_Box_t *p_box );
 
-int MP4_ReadBox_sample_hint8( stream_t *p_stream, MP4_Box_t *p_box );
-void MP4_FreeBox_sample_hint( MP4_Box_t *p_box );
-
 #endif
