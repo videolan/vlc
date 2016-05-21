@@ -282,13 +282,12 @@ static int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, M
         return 0;
     }
 
-    MP4_Box_t *p_tssy_box = MP4_BoxGet(p_sample, "tssy", 0);
-    if( p_tssy_box != NULL )
+    const MP4_Box_t *p_tssy = MP4_BoxGet(p_sample, "tssy");
+    if( p_tssy && BOXDATA(p_tssy) )
     {
-        MP4_Box_data_tssy_t *p_tssy = p_tssy_box->data.p_tssy;
         /* take the 2 last bits which indicate the synchronization mode */
-        uint8_t temp = p_tssy->i_reserved_timestamp_sync & 0x03;
-        p_track->sync_mode = (RTP_timstamp_synchronization_t)temp;
+        p_track->sync_mode = (RTP_timstamp_synchronization_t)
+                             BOXDATA(p_tssy)->i_reserved_timestamp_sync & 0x03;
     }
 
     MP4_Box_t *p_tsro_box = MP4_BoxGet(p_sample, "tsro", 0);
