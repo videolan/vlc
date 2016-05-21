@@ -62,6 +62,8 @@
 
 #include "tables.h"
 
+#include "../../codec/jpeg2000.h"
+
 /*
  * TODO:
  *  - check PCR frequency requirement
@@ -1111,6 +1113,84 @@ static void SetBlockDuration( sout_input_t *p_input, block_t *p_data )
     }
 }
 
+static block_t *Encap_J2K( block_t *p_data, const es_format_t *p_fmt )
+{
+    size_t i_offset = 0;
+    uint32_t i_box = 0;
+    while( p_data->i_buffer > 8 && p_data->i_buffer - i_offset > 8 )
+    {
+        const uint32_t i_size = GetDWBE( &p_data->p_buffer[i_offset] );
+        i_box = VLC_FOURCC( p_data->p_buffer[i_offset + 4],
+                            p_data->p_buffer[i_offset + 5],
+                            p_data->p_buffer[i_offset + 6],
+                            p_data->p_buffer[i_offset + 7] );
+        if( p_data->i_buffer - i_offset < i_size || i_size < 8 )
+        {
+            i_box = 0;
+            break;
+        }
+        else if( i_box == J2K_BOX_JP2C )
+        {
+            break;
+        }
+
+        i_offset += i_size;
+    }
+
+    if( i_box != J2K_BOX_JP2C )
+    {
+        block_Release( p_data );
+        return NULL;
+    }
+
+    if( i_offset < 38 )
+    {
+        block_t *p_realloc = block_Realloc( p_data, 38 - i_offset, p_data->i_buffer );
+        if( unlikely(!p_realloc) )
+        {
+            block_Release( p_data );
+            return NULL;
+        }
+        p_data = p_realloc;
+    }
+    else
+    {
+        p_data->p_buffer += (i_offset - 38);
+        p_data->i_buffer -= (i_offset - 38);
+    }
+
+    const int profile = j2k_get_profile( p_fmt->video.i_visible_width,
+                                         p_fmt->video.i_visible_height,
+                                         p_fmt->video.i_frame_rate,
+                                         p_fmt->video.i_frame_rate_base, true );
+    memcpy(  p_data->p_buffer,     "elsmfrat", 8 );
+    SetWBE( &p_data->p_buffer[8],  p_fmt->video.i_frame_rate_base );
+    SetWBE( &p_data->p_buffer[10], p_fmt->video.i_frame_rate );
+    memcpy( &p_data->p_buffer[12], "brat", 4 );
+    unsigned min = j2k_profiles_rates[profile].min * 1000000;
+    unsigned max = j2k_profiles_rates[profile].max * 1000000;
+    SetDWBE(&p_data->p_buffer[16], max );
+    SetDWBE(&p_data->p_buffer[20], min );
+    memcpy( &p_data->p_buffer[24], "tcod", 4 );
+    const unsigned s = p_data->i_pts / CLOCK_FREQ;
+    const unsigned m = s / 60;
+    const unsigned h = m / 60;
+    const uint64_t l = p_fmt->video.i_frame_rate_base * CLOCK_FREQ /
+                       p_fmt->video.i_frame_rate;
+    const unsigned f = (p_data->i_pts % CLOCK_FREQ) / l;
+    p_data->p_buffer[28] = h;
+    p_data->p_buffer[29] = m % 60;
+    p_data->p_buffer[30] = s % 60;
+    p_data->p_buffer[31] = f;
+    memcpy( &p_data->p_buffer[32], "bcol", 4 );
+    p_data->p_buffer[36] = j2k_get_color_spec( p_fmt->video.primaries,
+                                               p_fmt->video.transfer,
+                                               p_fmt->video.space );
+    p_data->p_buffer[37] = 0;
+
+    return p_data;
+}
+
 /* returns true if needs more data */
 static bool MuxStreams(sout_mux_t *p_mux )
 {
@@ -1302,6 +1382,17 @@ static bool MuxStreams(sout_mux_t *p_mux )
             /* EN 300 743 */
             b_data_alignment = 1;
             break;
+        }
+        else if( p_input->fmt.i_cat == VIDEO_ES )
+        {
+            if( p_input->fmt.i_codec == VLC_CODEC_JPEG2000 )
+            {
+                if( p_data->i_flags & BLOCK_FLAG_INTERLACED_MASK )
+                    msg_Warn( p_mux, "Unsupported interlaced J2K content. Expect broken result");
+                p_data = Encap_J2K( p_data, &p_input->fmt );
+                if( !p_data )
+                    return false;
+            }
         }
         else if( p_data->i_length < 0 || p_data->i_length > 2000000 )
         {

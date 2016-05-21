@@ -42,6 +42,8 @@
 #include "bits.h"
 #include "pes.h"
 
+#include "../../codec/jpeg2000.h"
+
 #include <assert.h>
 
 block_t *WritePSISection( dvbpsi_psi_section_t* p_section )
@@ -504,6 +506,34 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
             /* 0xa0 is private */
             dvbpsi_pmt_es_descriptor_add( p_es, 0xa0, i_extra + 10, data );
         }
+        else if( p_stream->fmt->i_codec == VLC_CODEC_JPEG2000 )
+        {
+            uint8_t *p_data = calloc( 1, 24 + p_stream->fmt->i_extra );
+            if( p_data )
+            {
+                const int profile = j2k_get_profile( p_stream->fmt->video.i_visible_width,
+                                                     p_stream->fmt->video.i_visible_height,
+                                                     p_stream->fmt->video.i_frame_rate,
+                                                     p_stream->fmt->video.i_frame_rate_base, true );
+                p_data[0] = 0x01;
+                if( profile < J2K_PROFILE_HD )
+                    p_data[1] = 0x01; /* 0x0101 */
+                else if( profile < J2K_PROFILE_3G )
+                    p_data[1] = 0x02; /* 0x0102 */
+                else
+                    p_data[1] = 0x04; /* 0x0104 */
+                SetDWBE( &p_data[2], p_stream->fmt->video.i_visible_width );
+                SetDWBE( &p_data[6], p_stream->fmt->video.i_visible_height );
+                SetWBE( &p_data[18], p_stream->fmt->video.i_frame_rate_base );
+                SetWBE( &p_data[20], p_stream->fmt->video.i_frame_rate );
+                p_data[21] = j2k_get_color_spec( p_stream->fmt->video.primaries,
+                                                 p_stream->fmt->video.transfer,
+                                                 p_stream->fmt->video.space );
+                memcpy( &p_data[24], p_stream->fmt->p_extra, p_stream->fmt->i_extra );
+                dvbpsi_pmt_es_descriptor_add( p_es, 0x32, 24 + p_stream->fmt->i_extra, p_data );
+                free(p_data);
+            }
+        }
         else if( p_stream->fmt->i_codec == VLC_CODEC_DIRAC )
         {
             /* Dirac registration descriptor */
@@ -741,6 +771,13 @@ int FillPMTESParams( ts_mux_standard standard, const es_format_t *fmt,
         pes->i_stream_id = (PES_EXTENDED_STREAM_ID << 8) | 0x60;
         ts->i_stream_type = 0xd1;
         break;
+    case VLC_CODEC_JPEG2000:
+        if( !j2k_is_valid_framerate( fmt->video.i_frame_rate,
+                                     fmt->video.i_frame_rate_base ) )
+            return VLC_EGENERIC;
+        ts->i_stream_type = 0x21;
+        pes->i_stream_id = 0xbd;
+    break;
 
     /* AUDIO */
 

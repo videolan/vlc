@@ -20,6 +20,66 @@
 #ifndef VLC_JPEG2000_H
 #define VLC_JPEG2000_H
 
+#define J2K_BOX_JP2C VLC_FOURCC('j','p','2','c')
+
+enum j2k_profiles_e
+{
+    J2K_PROFILE_SD = 0,
+    J2K_PROFILE_HD,
+    J2K_PROFILE_3G,
+    J2K_PROFILE_S3D_HD,
+    J2K_PROFILE_S3D_3G,
+};
+
+static inline bool j2k_is_valid_framerate( unsigned num, unsigned den )
+{
+    const struct
+    {
+        const unsigned num;
+        const unsigned den;
+    } numdens[] = { /* table 2-99 */
+        { 24000, 1001 },
+        { 24, 1 },
+        { 25, 1 },
+        { 30000, 1001 },
+        { 30, 1 },
+        { 50, 1 },
+        { 60000, 1001 },
+        { 60, 1 },
+    };
+    for( size_t i=0; i<ARRAY_SIZE(numdens); i++ )
+        if( numdens[i].den == den && numdens[i].num == num )
+            return true;
+    return false;
+}
+
+static inline enum j2k_profiles_e j2k_get_profile( unsigned w, unsigned h,
+                                                   unsigned num, unsigned den, bool p )
+{
+    const uint64_t s = w * h;
+    const uint64_t f = num / den;
+    if( s <= 720*576 && f < 50 )
+        return J2K_PROFILE_SD; /* VSF_TR-01_2013-04-15 */
+    else if( s <= 1280*720 && f < 60 && p )
+        return J2K_PROFILE_HD;
+    else if( s <= 1920*1080 && f < 60 && !p )
+        return J2K_PROFILE_HD;
+    else
+        return J2K_PROFILE_3G;
+}
+
+static const struct
+{
+    const uint16_t min;
+    const uint16_t max;
+} j2k_profiles_rates[] = {
+    [J2K_PROFILE_SD]     = {  25, 200 },
+    [J2K_PROFILE_HD]     = {  75, 200 },
+    [J2K_PROFILE_3G]     = { 100, 400 },
+    [J2K_PROFILE_S3D_HD] = { 150, 200 },
+    [J2K_PROFILE_S3D_3G] = { 200, 400 },
+};
+
 enum j2k_color_specs_e
 {
     J2K_COLOR_SPEC_UNKNOWN = 0,
