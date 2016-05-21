@@ -803,10 +803,68 @@ void matroska_segment_c::FastSeek( mtime_t i_mk_date, mtime_t i_mk_time_offset )
 
 void matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset )
 {
-    VLC_UNUSED( i_absolute_mk_date );
-    VLC_UNUSED( i_mk_time_offset );
+    SegmentSeeker::tracks_seekpoint_t seekpoints;
 
-    // TODO: reimplement
+    uint64_t i_seek_position = -1;
+    mtime_t i_mk_seek_time   = -1;
+    mtime_t i_mk_date = i_absolute_mk_date - i_mk_time_offset;
+
+    // reset information for all tracks //
+
+    for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
+    {
+        mkv_track_t& track = it->second;
+
+        track.i_skip_until_fpos = -1;
+        track.i_last_dts        = VLC_TS_INVALID;
+    }
+
+    // find appropriate seekpoints //
+
+    try {
+        seekpoints = _seeker.get_seekpoints( *this, i_mk_date, priority_tracks );
+    }
+    catch( std::exception const& e )
+    {
+        msg_Err( &sys.demuxer, "error during seek: \"%s\", aborting!", e.what() );
+        return;
+    }
+
+    // initialize seek information in order to set up playback //
+
+    for( SegmentSeeker::tracks_seekpoint_t::iterator it = seekpoints.begin(); it != seekpoints.end(); ++it )
+    {
+        mkv_track_t& track = tracks[ it->first ];
+
+        if( i_seek_position > it->second.fpos )
+        {
+            i_seek_position = it->second.fpos;
+            i_mk_seek_time  = it->second.pts;
+        }
+
+        track.i_skip_until_fpos = it->second.fpos;
+        track.i_last_dts        = it->second.pts;
+
+        msg_Dbg( &sys.demuxer, "seek: preroll{ track: %u, pts: %" PRId64 ", fpos: %" PRIu64 " } ",
+          it->first, it->second.pts, it->second.fpos );
+    }
+
+    // propogate seek information //
+
+    sys.i_pcr       = VLC_TS_INVALID;
+    sys.i_pts       = VLC_TS_0 + i_mk_seek_time + i_mk_time_offset;
+    sys.i_start_pts = VLC_TS_0 + i_absolute_mk_date;
+
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
+
+    // make the jump //
+
+    _seeker.mkv_jump_to( *this, i_seek_position );
+
+    // debug diagnostics //
+
+    msg_Dbg( &sys.demuxer, "seek: preroll{ start-pts: %" PRId64 ", start-fpos: %" PRIu64 "} ",
+      sys.i_pts, i_seek_position );
 }
 
 
