@@ -366,9 +366,11 @@ SegmentSeeker::get_search_areas( fptr_t start, fptr_t end ) const
             areas_to_search.push_back( Range( needle.start, it->start ) );
         }
 
-        needle.start = it->end + 1;
+        if( needle.start <= it->end )
+            needle.start = it->end + 1;
     }
 
+    needle.start = std::max( needle.start, start );
     if( it == _ranges_searched.end() && needle.start < needle.end )
     {
         areas_to_search.push_back( needle );
