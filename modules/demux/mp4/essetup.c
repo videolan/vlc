@@ -784,6 +784,27 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             }
             break;
         }
+        case ATOM_XiFL:
+        {
+            const MP4_Box_t *p_fCtS = MP4_BoxGet( p_sample, "wave/fCtS" ); /* kCookieTypeFLACStreaminfo */
+            if( p_fCtS && p_fCtS->data.p_binary )
+            {
+                size_t i_extra = 8 + p_fCtS->data.p_binary->i_blob;
+                uint8_t *p_extra = malloc(i_extra);
+                if( p_extra )
+                {
+                    p_track->fmt.i_extra = i_extra;
+                    p_track->fmt.p_extra = p_extra;
+                    memcpy( p_extra, "fLaC", 4 );
+                    SetDWBE( &p_extra[4], p_fCtS->data.p_binary->i_blob ); /* want the lowest 24bits */
+                    p_extra[4] = 0x80; /* 0x80 Last metablock | 0x00 StreamInfo */
+                    memcpy( &p_extra[8], p_fCtS->data.p_binary->p_blob, p_fCtS->data.p_binary->i_blob );
+
+                    p_track->fmt.i_codec = VLC_CODEC_FLAC;
+                    p_track->fmt.b_packetized = false;
+                }
+            }
+        }
         case( ATOM_eac3 ):
         {
             const MP4_Box_t *p_dec3 = MP4_BoxGet(  p_sample, "dec3", 0 );

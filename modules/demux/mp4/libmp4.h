@@ -155,6 +155,7 @@ typedef int64_t stime_t;
 #define ATOM_sowt VLC_FOURCC( 's', 'o', 'w', 't' )
 #define ATOM_QDMC VLC_FOURCC( 'Q', 'D', 'M', 'C' )
 #define ATOM_QDM2 VLC_FOURCC( 'Q', 'D', 'M', '2' )
+#define ATOM_XiFL VLC_FOURCC( 'X', 'i', 'F', 'L' )
 #define ATOM_XiVs VLC_FOURCC( 'X', 'i', 'V', 's' )
 #define ATOM_ima4 VLC_FOURCC( 'i', 'm', 'a', '4' )
 #define ATOM_IMA4 VLC_FOURCC( 'I', 'M', 'A', '4' )
@@ -188,6 +189,7 @@ typedef int64_t stime_t;
 #define ATOM_Opus VLC_FOURCC( 'O', 'p', 'u', 's' )
 
 /* XiphQT */
+#define ATOM_fCtS VLC_FOURCC( 'f', 'C', 't', 'S' )
 #define ATOM_vCtH VLC_FOURCC( 'v', 'C', 't', 'H' )
 #define ATOM_vCtC VLC_FOURCC( 'v', 'C', 't', 'C' )
 #define ATOM_vCtd VLC_FOURCC( 'v', 'C', 't', '#' )

@@ -3919,6 +3919,7 @@ static const struct
     { ATOM_wave,    MP4_ReadBoxContainer,     ATOM_fl64 },
     { ATOM_wave,    MP4_ReadBoxContainer,     ATOM_QDMC },
     { ATOM_wave,    MP4_ReadBoxContainer,     ATOM_QDM2 },
+    { ATOM_wave,    MP4_ReadBoxContainer,     ATOM_XiFL }, /* XiphQT */
     { ATOM_wave,    MP4_ReadBoxContainer,     ATOM_XiVs }, /* XiphQT */
     { ATOM_ilst,    MP4_ReadBox_ilst,         ATOM_meta },
     { ATOM_mvex,    MP4_ReadBoxContainer,     ATOM_moov },
@@ -3981,6 +3982,7 @@ static const struct
     { ATOM_vCtH,    MP4_ReadBox_Binary,       ATOM_wave },
     { ATOM_vCtC,    MP4_ReadBox_Binary,       ATOM_wave },
     { ATOM_vCtd,    MP4_ReadBox_Binary,       ATOM_wave },
+    { ATOM_fCtS,    MP4_ReadBox_Binary,       ATOM_wave },
 
     /* Samples groups specific information */
     { ATOM_sbgp,    MP4_ReadBox_sbgp,         ATOM_stbl },
