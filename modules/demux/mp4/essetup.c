@@ -271,14 +271,16 @@ static int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, M
         pch = strtok_r(NULL, " =\n", &strtok_state); /* next attribute */
     }
 
-    MP4_Box_t *p_tims_box = MP4_BoxGet(p_sample, "tims", 0);
-    if( p_tims_box != NULL )
+    const MP4_Box_t *p_tims = MP4_BoxGet(p_sample, "tims");
+    if( p_tims && BOXDATA(p_tims) && BOXDATA(p_tims)->i_timescale )
     {
-        MP4_Box_data_tims_t *p_tims = p_tims_box->data.p_tims;
-        p_track->i_timescale = p_tims->i_timescale;
+        p_track->i_timescale = BOXDATA(p_tims)->i_timescale;
     }
     else
+    {
         msg_Warn(p_demux, "Missing mandatory box tims");
+        return 0;
+    }
 
     MP4_Box_t *p_tssy_box = MP4_BoxGet(p_sample, "tssy", 0);
     if( p_tssy_box != NULL )
