@@ -882,8 +882,9 @@ const unsigned int CONSTRUCTORSIZE = 16;
 static int MP4_RTPHintToFrame( demux_t *p_demux, block_t **pp_block, uint32_t packetcount )
 {
     block_t* p_block = *pp_block;
-    size_t i_samplesize = p_block->i_buffer;
     uint8_t *p_slice = p_block->p_buffer + SAMPLEHEADERSIZE;
+    block_t *p_newblock = NULL;
+    size_t i_payload = 0;
 
     if( p_block->i_buffer < SAMPLEHEADERSIZE + RTPPACKETSIZE + CONSTRUCTORSIZE )
     {
@@ -891,14 +892,14 @@ static int MP4_RTPHintToFrame( demux_t *p_demux, block_t **pp_block, uint32_t pa
         return VLC_EGENERIC;
     }
 
-    block_t *p_newblock = block_Alloc( i_samplesize + packetcount*10 );
-    if( !p_newblock )
-        return VLC_ENOMEM;
-
-    uint8_t *p_dst = p_newblock->p_buffer;
-
     for( uint32_t i = 0; i < packetcount; ++i )
     {
+        if( (p_slice - p_block->p_buffer) + RTPPACKETSIZE + CONSTRUCTORSIZE > p_block->i_buffer )
+        {
+            if( p_newblock )
+                block_Release( p_newblock );
+            return VLC_EGENERIC;
+        }
         /* skip RTP header in sample. Could be used to detect packet losses */
         p_slice += RTPPACKETSIZE;
 
@@ -920,7 +921,8 @@ static int MP4_RTPHintToFrame( demux_t *p_demux, block_t **pp_block, uint32_t pa
             ||sample_cons.samplesperblock != 1||sample_cons.bytesperblock != 1 )
         {
             msg_Err(p_demux, "Unhandled constructor in RTP Reception Hint Track. Type:%u", sample_cons.type);
-            block_Release( p_newblock );
+            if( p_newblock )
+                block_Release( p_newblock );
             return VLC_EGENERIC;
         }
 
@@ -928,9 +930,21 @@ static int MP4_RTPHintToFrame( demux_t *p_demux, block_t **pp_block, uint32_t pa
         if( sample_cons.sampleoffset + sample_cons.length > p_block->i_buffer)
         {
             msg_Err(p_demux, "Sample buffer is smaller than sample" );
-            block_Release( p_newblock );
+            if( p_newblock )
+                block_Release( p_newblock );
             return VLC_EGENERIC;
         }
+
+        block_t *p_realloc = block_Realloc( p_newblock, 0, i_payload + sample_cons.length + 4 );
+        if( !p_realloc )
+        {
+            if( p_newblock )
+                block_Release( p_newblock );
+            return VLC_ENOMEM;
+        }
+
+        p_newblock = p_realloc;
+        uint8_t *p_dst = &p_newblock->p_buffer[i_payload];
 
         const uint8_t* p_src = p_block->p_buffer + sample_cons.sampleoffset;
         uint8_t i_type = (*p_src) & ((1<<5)-1);
@@ -949,10 +963,15 @@ static int MP4_RTPHintToFrame( demux_t *p_demux, block_t **pp_block, uint32_t pa
 
         memcpy( p_dst, p_src, sample_cons.length );
         p_dst += sample_cons.length;
+
+        i_payload += p_dst - p_newblock->p_buffer;
     }
 
+    if( p_newblock == NULL )
+        return VLC_EGENERIC;
+
     block_Release( p_block );
-    p_newblock->i_buffer = p_dst - p_newblock->p_buffer;
+    p_newblock->i_buffer = i_payload;
     *pp_block = p_newblock;
 
     return VLC_SUCCESS;
