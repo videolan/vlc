@@ -23,6 +23,7 @@
 #define VLC_ASF_LIBASF_H_
 
 #define ASF_MAX_STREAMNUMBER 127
+#define ASF_OBJECT_COMMON_SIZE 24
 
 /*****************************************************************************
  * Structure needed for decoder
