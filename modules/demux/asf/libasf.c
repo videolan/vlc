@@ -1209,12 +1209,12 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
         i_type = ASF_READ2();
         i_size = ASF_READ2();
 
-        if( i_type == 0 )
+        if( i_type == ASF_METADATA_TYPE_STRING )
         {
             /* Unicode string */
             p_ec->ppsz_value[i] = ASF_READS( i_size );
         }
-        else if( i_type == 1 )
+        else if( i_type == ASF_METADATA_TYPE_BYTE )
         {
             /* Byte array */
             static const char hex[16] = "0123456789ABCDEF";
@@ -1232,25 +1232,25 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
                 psz_value[2*i_size] = '\0';
             }
         }
-        else if( i_type == 2 )
+        else if( i_type == ASF_METADATA_TYPE_BOOL )
         {
             /* Bool */
             p_ec->ppsz_value[i] = strdup( ASF_READ1() ? "true" : "false" );
             ASF_SKIP(i_size-1);
         }
-        else if( i_type == 3 )
+        else if( i_type == ASF_METADATA_TYPE_DWORD )
         {
             /* DWord */
             if( asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ4() ) == -1 )
                 p_ec->ppsz_value[i] = NULL;
         }
-        else if( i_type == 4 )
+        else if( i_type == ASF_METADATA_TYPE_QWORD )
         {
             /* QWord */
             if( asprintf( &p_ec->ppsz_value[i], "%"PRId64, ASF_READ8() ) == -1 )
                 p_ec->ppsz_value[i] = NULL;
         }
-        else if( i_type == 5 )
+        else if( i_type == ASF_METADATA_TYPE_WORD )
         {
             /* Word */
             if( asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ2() ) == -1 )
