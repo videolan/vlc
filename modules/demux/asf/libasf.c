@@ -92,13 +92,7 @@ static char *AsfObjectHelperReadString( const uint8_t *p_peek, int i_peek, uint8
     char *psz_string;
     if( ASF_HAVE(i_size) )
     {
-        psz_string = calloc( i_size/2 + 1, sizeof( char ) );
-        if( psz_string )
-        {
-            for( int i = 0; i < i_size/2; i++ )
-                psz_string[i] = GetWLE( &p_data[2*i] );
-            psz_string[i_size/2] = '\0';
-        }
+        psz_string = FromCharset( "UTF-16LE", p_data, i_size );
     }
     else
     {
