@@ -847,6 +847,11 @@ bool MediaServer::addItem( IXML_Element* itemElement )
                                               i_seconds );
     }
 
+    if ( psz_subtitles == NULL )
+    {
+        psz_subtitles = ixmlElement_getAttribute( p_resource, "pv:subtitleFileUri" );
+    }
+
     input_item_t* p_item =
         input_item_NewExt( psz_resource_url, title, i_duration,
                            ITEM_TYPE_FILE, ITEM_NET );
