@@ -23,7 +23,7 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	$(UNPACK)
 	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-static.patch
 ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
+	cd $(UNPACK_DIR) && sed -i.orig -e s/"@INET_PTON_LIB@ @LIBPTHREAD@"/"@INET_PTON_LIB@ -lcrypt32 @LIBPTHREAD@"/g lib/gnutls.pc.in
 	# disable the dllimport in static linking (pkg-config --static doesn't handle Cflags.private)
 	cd $(UNPACK_DIR) && sed -i.orig -e s/"_SYM_EXPORT __declspec(dllimport)"/"_SYM_EXPORT"/g lib/includes/gnutls/gnutls.h.in
 endif
