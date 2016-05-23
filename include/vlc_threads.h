@@ -72,9 +72,8 @@ typedef struct
 {
     HANDLE   semaphore;
     LONG     waiters;
-    unsigned clock;
 } vlc_cond_t;
-#define VLC_STATIC_COND { NULL, 0, 0 }
+#define VLC_STATIC_COND { NULL, 0 }
 typedef HANDLE vlc_sem_t;
 #define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
@@ -124,9 +123,8 @@ typedef struct
     unsigned waiters;
     HEV      hevAck;
     unsigned signaled;
-    unsigned clock;
 } vlc_cond_t;
-#define VLC_STATIC_COND { NULLHANDLE, 0, NULLHANDLE, 0, 0 }
+#define VLC_STATIC_COND { NULLHANDLE, 0, NULLHANDLE, 0 }
 #define LIBVLC_NEED_SEMAPHORE
 #define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
@@ -174,14 +172,9 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED NULL
 typedef pthread_mutex_t vlc_mutex_t;
-
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
-typedef struct
-{
-    pthread_cond_t cond;
-    unsigned clock;
-} vlc_cond_t;
-#define VLC_STATIC_COND  { PTHREAD_COND_INITIALIZER, CLOCK_REALTIME }
+typedef pthread_cond_t vlc_cond_t;
+#define VLC_STATIC_COND PTHREAD_COND_INITIALIZER
 
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
@@ -227,12 +220,8 @@ typedef pthread_t       vlc_thread_t;
 #define VLC_THREAD_CANCELED PTHREAD_CANCELED
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
-typedef struct
-{
-    pthread_cond_t cond;
-    unsigned clock;
-} vlc_cond_t;
-#define VLC_STATIC_COND  { PTHREAD_COND_INITIALIZER, 0 }
+typedef pthread_cond_t vlc_cond_t;
+#define VLC_STATIC_COND PTHREAD_COND_INITIALIZER
 typedef semaphore_t     vlc_sem_t;
 typedef pthread_rwlock_t vlc_rwlock_t;
 #define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
@@ -292,6 +281,12 @@ typedef pthread_cond_t  vlc_cond_t;
 
 /**
  * Static initializer for (static) condition variable.
+ *
+ * \note
+ * The condition variable will use the default clock, which is OS-dependent.
+ * Therefore, where timed waits are necessary the condition variable should
+ * always be initialized dynamically explicit instead of using this
+ * initializer.
  */
 #define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
 
@@ -419,10 +414,13 @@ VLC_API void vlc_cond_init(vlc_cond_t *);
 /**
  * Initializes a condition variable (wall clock).
  *
- * Contrary to vlc_cond_init(), the wall clock will be used as a reference for
- * the vlc_cond_timedwait() time-out parameter.
+ * This function initializes a condition variable for timed waiting using the
+ * UTC wall clock time. The time reference is the same as with time() and with
+ * timespec_get() and TIME_UTC.
+ * vlc_cond_timedwait_daytime() must be instead of
+ * vlc_cond_timedwait() for actual waiting.
  */
-VLC_API void vlc_cond_init_daytime(vlc_cond_t *);
+void vlc_cond_init_daytime(vlc_cond_t *);
 
 /**
  * Deinitializes a condition variable.
@@ -485,22 +483,25 @@ VLC_API void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex);
  * Waits on a condition variable up to a certain date.
  *
  * This works like vlc_cond_wait() but with an additional time-out.
+ * The time-out is expressed as an absolute timestamp using the same arbitrary
+ * time reference as the mdate() and mwait() functions.
  *
- * If the variable was initialized with vlc_cond_init(), the timeout has the
- * same arbitrary origin as mdate(). If the variable was initialized with
- * vlc_cond_init_daytime(), or was statically initialized with
- * \ref VLC_STATIC_COND, the timeout is expressed from the Unix epoch (i.e.
- * the wall clock).
- *
- * \param p_condvar condition variable to wait on
- * \param p_mutex mutex which is unlocked while waiting,
- *                then locked again when waking up.
+ * \param cond condition variable to wait on
+ * \param mutex mutex which is unlocked while waiting,
+ *              then locked again when waking up
  * \param deadline <b>absolute</b> timeout
+ *
+ * \warning If the variable was initialized with vlc_cond_init_daytime(), or
+ * was statically initialized with \ref VLC_STATIC_COND, the time reference
+ * used by this function is unspecified (depending on the implementation, it
+ * might be the Unix epoch or the mdate() clock).
  *
  * \return 0 if the condition was signaled, an error code in case of timeout.
  */
 VLC_API int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex,
                                mtime_t deadline);
+
+int vlc_cond_timedwait_daytime(vlc_cond_t *, vlc_mutex_t *, time_t);
 
 /**
  * Initializes a semaphore.

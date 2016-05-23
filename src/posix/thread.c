@@ -303,6 +303,16 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     return val;
 }
 
+int vlc_cond_timedwait_daytime (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
+                                time_t deadline)
+{
+    struct timespec ts = { deadline, 0 };
+    int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
+    if (val != ETIMEDOUT)
+        VLC_THREAD_ASSERT ("timed-waiting on condition");
+    return val;
+}
+
 void vlc_sem_init (vlc_sem_t *sem, unsigned value)
 {
     if (unlikely(sem_init (sem, 0, value)))

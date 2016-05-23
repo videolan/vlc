@@ -395,7 +395,7 @@ static void* Manage( void* p_object )
         while( !vlm->input_state_changed && !scheduled_command )
         {
             if( nextschedule != 0 )
-                scheduled_command = vlc_cond_timedwait( &vlm->wait_manage, &vlm->lock_manage, nextschedule * CLOCK_FREQ ) != 0;
+                scheduled_command = vlc_cond_timedwait_daytime( &vlm->wait_manage, &vlm->lock_manage, nextschedule ) != 0;
             else
                 vlc_cond_wait( &vlm->wait_manage, &vlm->lock_manage );
         }

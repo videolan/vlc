@@ -190,7 +190,7 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
 void vlc_cond_init (vlc_cond_t *condvar)
 {
 #ifdef HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP
-    if (unlikely(pthread_cond_init (&condvar->cond, NULL)))
+    if (unlikely(pthread_cond_init (condvar, NULL)))
         abort ();
 #else
     pthread_condattr_t attr;
@@ -198,34 +198,32 @@ void vlc_cond_init (vlc_cond_t *condvar)
     pthread_condattr_init (&attr);
     pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
 
-    if (unlikely(pthread_cond_init (&condvar->cond, &attr)))
+    if (unlikely(pthread_cond_init (condvar, &attr)))
         abort ();
 #endif
-    condvar->clock = CLOCK_MONOTONIC;
 }
 
 void vlc_cond_init_daytime (vlc_cond_t *condvar)
 {
-    if (unlikely(pthread_cond_init (&condvar->cond, NULL)))
+    if (unlikely(pthread_cond_init (condvar, NULL)))
         abort ();
-    condvar->clock = CLOCK_REALTIME;
 }
 
 void vlc_cond_destroy (vlc_cond_t *condvar)
 {
-    int val = pthread_cond_destroy (&condvar->cond);
+    int val = pthread_cond_destroy (condvar);
     VLC_THREAD_ASSERT ("destroying condition");
 }
 
 void vlc_cond_signal (vlc_cond_t *condvar)
 {
-    int val = pthread_cond_signal (&condvar->cond);
+    int val = pthread_cond_signal (condvar);
     VLC_THREAD_ASSERT ("signaling condition variable");
 }
 
 void vlc_cond_broadcast (vlc_cond_t *condvar)
 {
-    pthread_cond_broadcast (&condvar->cond);
+    pthread_cond_broadcast (condvar);
 }
 
 void vlc_cond_wait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex)
@@ -237,7 +235,7 @@ void vlc_cond_wait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex)
         vlc_testcancel ();
         if (vlc_mutex_trylock (&th->lock) == 0)
         {
-            th->cond = &condvar->cond;
+            th->cond = condvar;
             vlc_mutex_unlock (&th->lock);
         }
         else
@@ -250,7 +248,7 @@ void vlc_cond_wait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex)
         }
     }
 
-    int val = pthread_cond_wait (&condvar->cond, p_mutex);
+    int val = pthread_cond_wait (condvar, p_mutex);
     VLC_THREAD_ASSERT ("waiting on condition");
 
     if (th != NULL)
@@ -262,21 +260,21 @@ void vlc_cond_wait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex)
     }
 }
 
-int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
-                        mtime_t deadline)
+typedef int (*vlc_cond_wait_cb)(pthread_cond_t *, pthread_mutex_t *,
+                                const struct timespec *);
+
+static int vlc_cond_timedwait_common(vlc_cond_t *condvar, vlc_mutex_t *mutex,
+                                     const struct timespec *ts,
+                                     vlc_cond_wait_cb cb)
 {
-    struct timespec ts = mtime_to_ts (deadline);
     vlc_thread_t th = thread;
-#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP
-    int (*cb)(pthread_cond_t *, pthread_mutex_t *, const struct timespec *);
-#endif
 
     if (th != NULL)
     {
         vlc_testcancel ();
         if (vlc_mutex_trylock (&th->lock) == 0)
         {
-            th->cond = &condvar->cond;
+            th->cond = condvar;
             vlc_mutex_unlock (&th->lock);
         }
         else
@@ -289,24 +287,7 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
         }
     }
 
-#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP
-    switch (condvar->clock)
-    {
-         case CLOCK_REALTIME:
-             cb = pthread_cond_timedwait;
-             break;
-         case CLOCK_MONOTONIC:
-             cb = pthread_cond_timedwait_monotonic_np;
-             break;
-         default:
-             vlc_assert_unreachable ();
-    }
-
-    int val = cb (&condvar->cond, p_mutex, &ts);
-#else
-    int val = pthread_cond_timedwait(&condvar->cond, p_mutex, &ts);
-#endif
-
+    int val = cb(condvar, p_mutex, ts);
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
 
@@ -318,6 +299,26 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
         vlc_testcancel();
     }
     return val;
+}
+
+int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex, mtime_t deadline)
+{
+    struct timespec ts = mtime_to_ts(deadline);
+
+#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP
+    return vlc_cond_timedwait_common(cond, mutex, &ts,
+                                     pthread_cond_timedwait_monotonic_np);
+#else
+    return vlc_cond_timedwait_common(cond, mutex, &ts, pthread_cond_timedwait);
+#endif
+}
+
+int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
+                               time_t deadline)
+{
+    struct timespec ts = { deadline, 0 };
+
+    return vlc_cond_timedwait_common(cond, mutex, &ts, pthread_cond_timedwait);
 }
 
 /* pthread */

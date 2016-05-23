@@ -195,29 +195,17 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 }
 
 /*** Condition variables ***/
-enum
-{
-    VLC_CLOCK_REALTIME=0, /* must be zero for VLC_STATIC_COND */
-    VLC_CLOCK_MONOTONIC,
-};
-
-static void vlc_cond_init_common(vlc_cond_t *wait, unsigned clock)
+void vlc_cond_init(vlc_cond_t *wait)
 {
     wait->semaphore = CreateSemaphore(NULL, 0, 0x7FFFFFFF, NULL);
     if (unlikely(wait->semaphore == NULL))
         abort();
     wait->waiters = 0;
-    wait->clock = clock;
-}
-
-void vlc_cond_init (vlc_cond_t *p_condvar)
-{
-    vlc_cond_init_common (p_condvar, VLC_CLOCK_MONOTONIC);
 }
 
 void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
 {
-    vlc_cond_init_common (p_condvar, VLC_CLOCK_REALTIME);
+    vlc_cond_init (p_condvar);
 }
 
 void vlc_cond_destroy(vlc_cond_t *wait)
@@ -260,9 +248,15 @@ void vlc_cond_broadcast(vlc_cond_t *wait)
         ReleaseSemaphore(wait->semaphore, waiters, NULL);
 }
 
-static DWORD vlc_cond_wait_delay(vlc_cond_t *wait, vlc_mutex_t *lock,
-                                 DWORD delay)
+static int vlc_cond_wait_delay(vlc_cond_t *wait, vlc_mutex_t *lock,
+                               mtime_t us)
 {
+    if (us < 0)
+        us = 0;
+    if (us > 0x7fffffff)
+        us = 0x7fffffff;
+
+    DWORD delay = us;
     DWORD result;
 
     vlc_testcancel();
@@ -282,7 +276,7 @@ static DWORD vlc_cond_wait_delay(vlc_cond_t *wait, vlc_mutex_t *lock,
 
     if (result == WAIT_IO_COMPLETION)
         vlc_testcancel();
-    return result;
+    return result == WAIT_TIMEOUT ? ETIMEDOUT : 0;
 }
 
 void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
@@ -292,29 +286,19 @@ void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
 
 int vlc_cond_timedwait(vlc_cond_t *wait, vlc_mutex_t *lock, mtime_t deadline)
 {
-    mtime_t total;
+    return vlc_cond_wait_delay(wait, lock, deadline - mdate());
+}
 
-    switch (wait->clock)
-    {
-        case VLC_CLOCK_REALTIME: /* FIXME? sub-second precision */
-            total = CLOCK_FREQ * time(NULL);
-            break;
-        case VLC_CLOCK_MONOTONIC:
-            total = mdate();
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
+int vlc_cond_timedwait_daytime(vlc_cond_t *wait, vlc_mutex_t *lock,
+                               time_t deadline)
+{
+    time_t now;
+    mtime_t delay;
 
-    total = (deadline - total) / 1000;
-    if (total < 0)
-        total = 0;
+    time(&now);
+    delay = ((mtime_t)deadline - (mtime_t)now) * CLOCK_FREQ;
 
-    DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
-
-    if (vlc_cond_wait_delay(wait, lock, delay) == WAIT_TIMEOUT)
-        return ETIMEDOUT;
-    return 0;
+    return vlc_cond_wait_delay(wait, lock, delay);
 }
 
 /*** Semaphore ***/
