@@ -755,8 +755,10 @@ int Upnp_i11e_cb::run( Upnp_EventType eventType, void *p_event, void *p_cookie )
 }
 
 MediaServer::MediaServer( access_t *p_access, input_item_node_t *node )
-    : access_( p_access )
+    : psz_objectId_( NULL )
+    , access_( p_access )
     , node_( node )
+
 {
     vlc_url_t url;
     vlc_UrlParse( &url, p_access->psz_location );
