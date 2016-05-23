@@ -1209,13 +1209,18 @@ static int DemuxInit( demux_t *p_demux )
             if( !strncmp( p_ecd->ppsz_name[i], name, strlen(name) ) ) \
                 vlc_meta_Set( p_sys->meta, vlc_type, p_ecd->ppsz_value[i] );
 
-            set_meta( "WM/AlbumTitle",   vlc_meta_Album );
-            set_meta( "WM/TrackNumber",  vlc_meta_TrackNumber );
-            set_meta( "WM/Year",         vlc_meta_Date );
-            set_meta( "WM/Genre",        vlc_meta_Genre );
-            set_meta( "WM/Genre",        vlc_meta_Genre );
-            set_meta( "WM/AlbumArtist",  vlc_meta_Artist );
-            set_meta( "WM/Publisher",    vlc_meta_Publisher );
+            set_meta( "WM/AlbumTitle",   vlc_meta_Album )
+            else set_meta( "WM/TrackNumber",  vlc_meta_TrackNumber )
+            else set_meta( "WM/Year",         vlc_meta_Date )
+            else set_meta( "WM/Genre",        vlc_meta_Genre )
+            else set_meta( "WM/Genre",        vlc_meta_Genre )
+            else set_meta( "WM/AlbumArtist",  vlc_meta_Artist )
+            else set_meta( "WM/Publisher",    vlc_meta_Publisher )
+            else if( p_ecd->ppsz_value[i] != NULL &&
+                    *p_ecd->ppsz_value[i] != '\0' && /* no empty value */
+                    *p_ecd->ppsz_value[i] != '{'  && /* no guid value */
+                    *p_ecd->ppsz_name[i] != '{' )    /* no guid name */
+                    vlc_meta_AddExtra( p_sys->meta, p_ecd->ppsz_name[i], p_ecd->ppsz_value[i] );
             /* TODO map WM/Composer, WM/Provider, WM/PartOfSet, PeakValue, AverageLevel  */
 #undef set_meta
         }
