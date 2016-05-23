@@ -969,8 +969,8 @@ static vlm_schedule_sys_t *vlm_ScheduleNew( vlm_t *vlm, const char *psz_name )
     p_sched->b_enabled = false;
     p_sched->i_command = 0;
     p_sched->command = NULL;
-    p_sched->i_date = 0;
-    p_sched->i_period = 0;
+    p_sched->date = 0;
+    p_sched->period = 0;
     p_sched->i_repeat = -1;
 
     TAB_APPEND( vlm->i_schedule, vlm->schedule, p_sched );
@@ -1026,7 +1026,6 @@ static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
     {
         struct tm time;
         const char *p;
-        time_t date;
 
         time.tm_sec = 0;         /* seconds */
         time.tm_min = 0;         /* minutes */
@@ -1043,7 +1042,7 @@ static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
 
         if( !strcmp( psz_value, "now" ) )
         {
-            schedule->i_date = 0;
+            schedule->date = 0;
         }
         else if(p == NULL)
         {
@@ -1089,8 +1088,7 @@ static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
                     return 1;
             }
 
-            date = mktime( &time );
-            schedule->i_date = ((mtime_t) date) * 1000000;
+            schedule->date = mktime(&time);
         }
     }
     else if( !strcmp( psz_cmd, "period" ) )
@@ -1098,7 +1096,6 @@ static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
         struct tm time;
         const char *p;
         const char *psz_time = NULL, *psz_date = NULL;
-        time_t date;
         unsigned i,j,k;
 
         /* First, if date or period are modified, repeat should be equal to -1 */
@@ -1165,8 +1162,9 @@ static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
         }
 
         /* ok, that's stupid... who is going to schedule streams every 42 years ? */
-        date = (((( time.tm_year * 12 + time.tm_mon ) * 30 + time.tm_mday ) * 24 + time.tm_hour ) * 60 + time.tm_min ) * 60 + time.tm_sec ;
-        schedule->i_period = ((mtime_t) date) * 1000000;
+        schedule->period = ((((time.tm_year * 12 + time.tm_mon) * 30
+            + time.tm_mday) * 24 + time.tm_hour) * 60 + time.tm_min) * 60
+            + time.tm_sec;
     }
     else if( !strcmp( psz_cmd, "repeat" ) )
     {
@@ -1380,12 +1378,11 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
                         vlm_MessageNew( "enabled", schedule->b_enabled ?
                                         "yes" : "no" ) );
 
-        if( schedule->i_date != 0 )
+        if( schedule->date != 0 )
         {
             struct tm date;
-            time_t i_time = (time_t)( schedule->i_date / 1000000 );
 
-            localtime_r( &i_time, &date);
+            localtime_r( &schedule->date, &date);
             vlm_MessageAdd( msg_schedule,
                             vlm_MessageNew( "date", "%d/%d/%d-%d:%d:%d",
                                             date.tm_year + 1900, date.tm_mon + 1,
@@ -1395,23 +1392,23 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
         else
             vlm_MessageAdd( msg_schedule, vlm_MessageNew("date", "now") );
 
-        if( schedule->i_period != 0 )
+        if( schedule->period != 0 )
         {
-            time_t i_time = (time_t) ( schedule->i_period / 1000000 );
+            div_t d;
             struct tm date;
 
-            date.tm_sec = (int)( i_time % 60 );
-            i_time = i_time / 60;
-            date.tm_min = (int)( i_time % 60 );
-            i_time = i_time / 60;
-            date.tm_hour = (int)( i_time % 24 );
-            i_time = i_time / 24;
-            date.tm_mday = (int)( i_time % 30 );
-            i_time = i_time / 30;
+            d = div(schedule->period, 60);
+            date.tm_sec = d.rem;
+            d = div(d.quot, 60);
+            date.tm_min = d.rem;
+            d = div(d.quot, 24);
+            date.tm_hour = d.rem;
             /* okay, okay, months are not always 30 days long */
-            date.tm_mon = (int)( i_time % 12 );
-            i_time = i_time / 12;
-            date.tm_year = (int)i_time;
+            d = div(d.quot, 30);
+            date.tm_mday = d.rem;
+            d = div(d.quot, 12);
+            date.tm_mon = d.rem;
+            date.tm_year = d.quot;
 
             sprintf( buffer, "%d/%d/%d-%d:%d:%d", date.tm_year, date.tm_mon,
                      date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
@@ -1475,7 +1472,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
         {
             vlm_schedule_sys_t *s = vlm->schedule[i];
             vlm_message_t *msg_schedule;
-            mtime_t i_time, i_next_date;
+            time_t now, next_date;
 
             msg_schedule = vlm_MessageAdd( msg_child,
                                            vlm_MessageSimpleNew( s->psz_name ) );
@@ -1484,29 +1481,28 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
                                             "yes" : "no" ) );
 
             /* calculate next date */
-            i_time = vlm_Date();
-            i_next_date = s->i_date;
+            time(&now);
+            next_date = s->date;
 
-            if( s->i_period != 0 )
+            if( s->period != 0 )
             {
                 int j = 0;
-                while( s->i_date + j * s->i_period <= i_time &&
-                       ( s->i_repeat > j || s->i_repeat == -1 ) )
+                while( ((s->date + j * s->period) <= now) &&
+                       ( s->i_repeat > j || s->i_repeat < 0 ) )
                 {
                     j++;
                 }
 
-                i_next_date = s->i_date + j * s->i_period;
+                next_date = s->date + j * s->period;
             }
 
-            if( i_next_date > i_time )
+            if( next_date > now )
             {
-                time_t i_date = (time_t) (i_next_date / 1000000) ;
                 struct tm tm;
                 char psz_date[32];
 
                 strftime( psz_date, sizeof(psz_date), "%Y-%m-%d %H:%M:%S (%a)",
-                          localtime_r( &i_date, &tm ) );
+                          localtime_r( &next_date, &tm ) );
                 vlm_MessageAdd( msg_schedule,
                                 vlm_MessageNew( "next launch", "%s", psz_date ) );
             }
@@ -1640,7 +1636,7 @@ static char *Save( vlm_t *vlm )
         }
 
 
-        if( schedule->i_period != 0 )
+        if( schedule->period != 0 )
         {
             i_length += strlen( "setup  " ) + strlen( schedule->psz_name ) +
                 strlen( "period //-::\n" ) + 14;
@@ -1716,9 +1712,8 @@ static char *Save( vlm_t *vlm )
     {
         vlm_schedule_sys_t *schedule = vlm->schedule[i];
         struct tm date;
-        time_t i_time = (time_t) ( schedule->i_date / 1000000 );
 
-        localtime_r( &i_time, &date);
+        localtime_r( &schedule->date, &date);
         p += sprintf( p, "new %s schedule ", schedule->psz_name);
 
         if( schedule->b_enabled )
@@ -1734,24 +1729,24 @@ static char *Save( vlm_t *vlm )
                           date.tm_hour, date.tm_min, date.tm_sec);
         }
 
-        if( schedule->i_period != 0 )
+        if( schedule->period != 0 )
         {
+            div_t d;
+
             p += sprintf( p, "setup %s ", schedule->psz_name );
 
-            i_time = (time_t) ( schedule->i_period / 1000000 );
-
-            date.tm_sec = (int)( i_time % 60 );
-            i_time = i_time / 60;
-            date.tm_min = (int)( i_time % 60 );
-            i_time = i_time / 60;
-            date.tm_hour = (int)( i_time % 24 );
-            i_time = i_time / 24;
-            date.tm_mday = (int)( i_time % 30 );
-            i_time = i_time / 30;
+            d = div(schedule->period, 60);
+            date.tm_sec = d.rem;
+            d = div(d.quot, 60);
+            date.tm_min = d.rem;
+            d = div(d.quot, 24);
+            date.tm_hour = d.rem;
+            d = div(d.quot, 30);
+            date.tm_mday = d.rem;
             /* okay, okay, months are not always 30 days long */
-            date.tm_mon = (int)( i_time % 12 );
-            i_time = i_time / 12;
-            date.tm_year = (int)i_time;
+            d = div(d.quot, 12);
+            date.tm_mon = d.rem;
+            date.tm_year = d.quot;
 
             p += sprintf( p, "period %d/%d/%d-%d:%d:%d\n",
                           date.tm_year, date.tm_mon, date.tm_mday,
