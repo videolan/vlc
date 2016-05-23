@@ -45,6 +45,25 @@ static vlc_cond_t  super_variable;
 
 #define IS_INTERRUPTIBLE (!VLC_WINSTORE_APP || _WIN32_WINNT >= 0x0A00)
 
+/*** Threads ***/
+static DWORD thread_key;
+
+struct vlc_thread
+{
+    HANDLE         id;
+
+    bool           killable;
+#if IS_INTERRUPTIBLE
+    bool           killed;
+#else
+    atomic_bool    killed;
+#endif
+    vlc_cleanup_t *cleaners;
+
+    void        *(*entry) (void *);
+    void          *data;
+};
+
 /*** Common helpers ***/
 #if !IS_INTERRUPTIBLE
 static bool isCancelled(void);
@@ -424,25 +443,6 @@ retry:
     }
     vlc_mutex_unlock(&super_mutex);
 }
-
-/*** Threads ***/
-static DWORD thread_key;
-
-struct vlc_thread
-{
-    HANDLE         id;
-
-    bool           killable;
-#if IS_INTERRUPTIBLE
-    bool           killed;
-#else
-    atomic_bool    killed;
-#endif
-    vlc_cleanup_t *cleaners;
-
-    void        *(*entry) (void *);
-    void          *data;
-};
 
 #if !IS_INTERRUPTIBLE
 static bool isCancelled(void)
