@@ -52,7 +52,9 @@ if HAVE_SPARKLE
 	cp -R $(CONTRIB_DIR)/Sparkle.framework $@/Contents/Frameworks/
 endif
 	mkdir -p $@/Contents/MacOS/share/locale/
+if BUILD_LUA
 	cp -r "$(prefix)/lib/vlc/lua" "$(prefix)/share/vlc/lua" $@/Contents/MacOS/share/
+endif
 	mkdir -p $@/Contents/MacOS/include/
 	(cd "$(prefix)/include" && $(AMTAR) -c --exclude "plugins" vlc) | $(AMTAR) -x -C $@/Contents/MacOS/include/
 	$(INSTALL) -m 644 $(srcdir)/share/vlc512x512.png $@/Contents/MacOS/share/vlc512x512.png
