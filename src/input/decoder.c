@@ -1309,7 +1309,6 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block )
  *
  * \param p_dec the decoder object
  * \param p_block the block to decode
- * \return VLC_SUCCESS or an error code
  */
 static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
 {
