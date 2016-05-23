@@ -1315,20 +1315,13 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     if( p_dec->b_error )
-    {
-        if( p_block )
-            block_Release( p_block );
-        return;
-    }
-
-    if( p_block && p_block->i_buffer <= 0 )
-    {
-        block_Release( p_block );
-        return;
-    }
+        goto error;
 
     if( p_block )
     {
+        if( p_block->i_buffer <= 0 )
+            goto error;
+
         vlc_mutex_lock( &p_owner->lock );
         DecoderUpdatePreroll( &p_owner->i_preroll_end, p_block );
         vlc_mutex_unlock( &p_owner->lock );
@@ -1336,30 +1329,23 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
 
 #ifdef ENABLE_SOUT
     if( p_owner->p_sout != NULL )
-    {
-        DecoderProcessSout( p_dec, p_block );
-    }
-    else
+        return DecoderProcessSout( p_dec, p_block );
 #endif
+
+    switch( p_dec->fmt_out.i_cat )
     {
-        if( p_dec->fmt_out.i_cat == AUDIO_ES )
-        {
-            DecoderProcessAudio( p_dec, p_block );
-        }
-        else if( p_dec->fmt_out.i_cat == VIDEO_ES )
-        {
-            DecoderProcessVideo( p_dec, p_block );
-        }
-        else if( p_dec->fmt_out.i_cat == SPU_ES )
-        {
-            DecoderProcessSpu( p_dec, p_block );
-        }
-        else
-        {
+        case VIDEO_ES: return DecoderProcessVideo( p_dec, p_block );
+        case AUDIO_ES: return DecoderProcessAudio( p_dec, p_block );
+        case   SPU_ES: return DecoderProcessSpu( p_dec, p_block );
+
+        default:
             msg_Err( p_dec, "unknown ES format" );
             p_dec->b_error = true;
-        }
     }
+
+error:
+    if( p_block )
+        block_Release( p_block );
 }
 
 static void DecoderProcessFlush( decoder_t *p_dec )
