@@ -71,8 +71,7 @@ struct vlc_thread
 static bool isCancelled(void);
 #endif
 
-static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
-                                         DWORD delay)
+static DWORD vlc_WaitForSingleObject(HANDLE handle, DWORD delay)
 {
     DWORD ret;
 #if !IS_INTERRUPTIBLE
@@ -80,27 +79,22 @@ static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
             DWORD new_delay = 50;
             if (new_delay > delay)
                 new_delay = delay;
-            ret = WaitForMultipleObjectsEx (count, handles, FALSE, new_delay, TRUE);
+            ret = WaitForSingleObjectEx(handle, new_delay, TRUE);
             if (delay != INFINITE)
                 delay -= new_delay;
             if (isCancelled())
                 ret = WAIT_IO_COMPLETION;
         } while (delay && ret == WAIT_TIMEOUT);
 #else
-        ret = WaitForMultipleObjectsEx (count, handles, FALSE, delay, TRUE);
+    ret = WaitForSingleObjectEx(handle, delay, TRUE);
 #endif
 
     /* We do not abandon objects... this would be a bug */
-    assert (ret < WAIT_ABANDONED_0 || WAIT_ABANDONED_0 + count - 1 < ret);
+    assert(ret != WAIT_ABANDONED_0);
 
     if (unlikely(ret == WAIT_FAILED))
         abort (); /* We are screwed! */
     return ret;
-}
-
-static DWORD vlc_WaitForSingleObject (HANDLE handle, DWORD delay)
-{
-    return vlc_WaitForMultipleObjects (1, &handle, delay);
 }
 
 
