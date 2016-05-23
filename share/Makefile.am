@@ -4,7 +4,9 @@ EXTRA_DIST =
 
 appdatadir = $(datadir)/applications
 if !HAVE_WIN32
+if !HAVE_DARWIN
 appdata_DATA = vlc.desktop
+endif
 endif
 EXTRA_DIST += vlc.desktop.in vlc.desktop.mimetypes
 CLEANFILES += $(appdata_DATA)
