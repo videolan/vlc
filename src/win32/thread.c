@@ -75,27 +75,6 @@ static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
                                          DWORD delay)
 {
     DWORD ret;
-    if (count == 0)
-    {
-#if !IS_INTERRUPTIBLE
-        do {
-            DWORD new_delay = 50;
-            if (new_delay > delay)
-                new_delay = delay;
-            ret = SleepEx (new_delay, TRUE);
-            if (delay != INFINITE)
-                delay -= new_delay;
-            if (isCancelled())
-                ret = WAIT_IO_COMPLETION;
-        } while (delay && ret == 0);
-#else
-        ret = SleepEx (delay, TRUE);
-#endif
-
-        if (ret == 0)
-            ret = WAIT_TIMEOUT;
-    }
-    else {
 #if !IS_INTERRUPTIBLE
         do {
             DWORD new_delay = 50;
@@ -110,7 +89,6 @@ static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
 #else
         ret = WaitForMultipleObjectsEx (count, handles, FALSE, delay, TRUE);
 #endif
-    }
 
     /* We do not abandon objects... this would be a bug */
     assert (ret < WAIT_ABANDONED_0 || WAIT_ABANDONED_0 + count - 1 < ret);
@@ -127,7 +105,26 @@ static DWORD vlc_WaitForSingleObject (HANDLE handle, DWORD delay)
 
 static DWORD vlc_Sleep (DWORD delay)
 {
-    DWORD ret = vlc_WaitForMultipleObjects (0, NULL, delay);
+    DWORD ret;
+#if !IS_INTERRUPTIBLE
+    do {
+        DWORD new_delay = 50;
+        if (new_delay > delay)
+            new_delay = delay;
+        ret = SleepEx (new_delay, TRUE);
+        if (delay != INFINITE)
+            delay -= new_delay;
+        if (isCancelled())
+            ret = WAIT_IO_COMPLETION;
+    } while (delay && ret == 0);
+#else
+    ret = SleepEx (delay, TRUE);
+#endif
+
+    if (unlikely(ret == WAIT_FAILED))
+        abort (); /* We are screwed! */
+    if (ret == 0)
+        ret = WAIT_TIMEOUT;
     return (ret != WAIT_TIMEOUT) ? ret : 0;
 }
 
