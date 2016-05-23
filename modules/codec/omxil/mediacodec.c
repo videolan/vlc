@@ -332,6 +332,70 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
     return VLC_EGENERIC;
 }
 
+static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+{
+    int offset = 0;
+    struct csd csd;
+
+    if (i_extra < 4)
+        return VLC_EGENERIC;
+
+    /* Initialisation data starts with : 0x00 0x00 0x01 0x0f */
+    /* Skipping unecessary data */
+    static const uint8_t vc1_start_code[4] = {0x00, 0x00, 0x01, 0x0f};
+    for (; offset < i_extra - 4 ; ++offset)
+    {
+        if (!memcmp(&p_extra[offset], vc1_start_code, 4))
+            break;
+    }
+
+    /* Could not find the sequence header start code */
+    if (offset >= i_extra - 4)
+        return VLC_EGENERIC;
+
+    csd.i_size = i_extra - offset;
+    csd.p_buf = p_extra + offset;
+
+    return CSDDup(p_dec, &csd, 1);
+}
+
+static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+{
+    /* WMV3 initialisation data :
+     * 8 fixed bytes
+     * 4 extradata bytes
+     * 4 height bytes (little endian)
+     * 4 width bytes (little endian)
+     * 16 fixed bytes */
+
+    if (i_extra < 4)
+        return VLC_EGENERIC;
+
+    uint8_t p_data[36] = {
+        0x8e, 0x01, 0x00, 0xc5, /* Fixed bytes values */
+        0x04, 0x00, 0x00, 0x00, /* Same */
+        0x00, 0x00, 0x00, 0x00, /* extradata emplacement */
+        0x00, 0x00, 0x00, 0x00, /* height emplacement (little endian) */
+        0x00, 0x00, 0x00, 0x00, /* width emplacement (little endian) */
+        0x0c, 0x00, 0x00, 0x00, /* Fixed byte pattern */
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00
+    };
+
+    struct csd csd;
+
+    csd.i_size = sizeof(p_data);
+    /* Adding extradata */
+    memcpy(&p_data[8], p_extra, 4);
+    /* Adding height and width, little endian */
+    SetDWLE(&(p_data[12]), p_dec->fmt_in.video.i_height);
+    SetDWLE(&(p_data[16]), p_dec->fmt_in.video.i_width);
+
+    csd.p_buf = p_data;
+    return CSDDup(p_dec, &csd, 1);
+}
+
 static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -370,6 +434,14 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
             }
             /* FIXME: what to do with AnnexB ? */
         }
+    }
+    else if (p_dec->fmt_in.i_codec == VLC_CODEC_WMV3)
+    {
+        return ParseVideoExtraWmv3(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+    }
+    else if (p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
+    {
+        return ParseVideoExtraVc1(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
     }
     return VLC_SUCCESS;
 }
@@ -518,7 +590,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     {
         if (!p_dec->fmt_in.video.i_width || !p_dec->fmt_in.video.i_height)
         {
-            /* We can handle h264 without a valid video size */
+            /* We can handle h264 without a valid video size
+             * TODO handle VC1 with no size */
             if (p_dec->fmt_in.i_codec != VLC_CODEC_H264)
             {
                 msg_Dbg(p_dec, "resolution (%dx%d) not supported",
@@ -586,9 +659,24 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     }
     if (api->configure(api, i_h264_profile) != 0)
     {
-        api->clean(api);
-        free(api);
-        return VLC_EGENERIC;
+        /* If the device can't handle video/wvc1,
+         * it can probably handle video/x-ms-wmv */
+        if (!strcmp(mime, "video/wvc1") && p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
+        {
+            api->psz_mime = "video/x-ms-wmv";
+            if (api->configure(api, i_h264_profile) != 0)
+            {
+                api->clean(api);
+                free(api);
+                return (VLC_EGENERIC);
+            }
+        }
+        else
+        {
+            api->clean(api);
+            free(api);
+            return VLC_EGENERIC;
+        }
     }
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -1485,6 +1573,16 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
             p_sys->u.video.b_first_mp4v_iframe = true;
         else
             return 0; /* Drop current block */
+    }
+    else if (p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
+    {
+        /* Adding frame start code */
+        if (!block_Realloc(p_block, 4, p_block->i_buffer))
+            return VLC_ENOMEM;
+        p_block->p_buffer[0] = 0x00;
+        p_block->p_buffer[1] = 0x00;
+        p_block->p_buffer[2] = 0x01;
+        p_block->p_buffer[3] = 0x0d;
     }
 
     if (b_csd_changed)

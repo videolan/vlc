@@ -301,11 +301,6 @@ bool OMXCodec_IsBlacklisted( const char *p_name, unsigned int i_name_len )
          * sensible latency. (Also, even if that one isn't found, in general,
          * using SW codecs is usually more than fast enough for MP3.) */
         "OMX.SEC.MP3.Decoder",
-        /* This codec should be able to handle both VC1 and WMV3, but
-         * for VC1 it doesn't output any buffers at all (in the way we use
-         * it) and for WMV3 it outputs plain black buffers. Thus ignore
-         * it until we can make it work properly. */
-        "OMX.Nvidia.vc1.decode",
         /* black screen */
         "OMX.MTK.VIDEO.DECODER.VC1",
         /* Not working or crashing (Samsung) */
