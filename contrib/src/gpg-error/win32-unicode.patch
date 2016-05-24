@@ -1,0 +1,29 @@
+--- libgpg-error/src/estream.c	2016-05-24 11:21:10.180251700 +0200
++++ libgpg-error/src/estream.c.msvc	2016-05-24 11:23:18.195880200 +0200
+@@ -4115,7 +4115,7 @@ tmpfd (void)
+ {
+ #ifdef HAVE_W32_SYSTEM
+   int attempts, n;
+-#ifdef HAVE_W32CE_SYSTEM
++#if defined(HAVE_W32CE_SYSTEM) || defined(UNICODE)
+   wchar_t buffer[MAX_PATH+9+12+1];
+ # define mystrlen(a) wcslen (a)
+   wchar_t *name, *p;
+@@ -4136,7 +4136,7 @@ tmpfd (void)
+       return -1;
+     }
+   p = buffer + mystrlen (buffer);
+-#ifdef HAVE_W32CE_SYSTEM
++#if defined(HAVE_W32CE_SYSTEM) || defined(UNICODE)
+   wcscpy (p, L"_estream");
+ #else
+   strcpy (p, "_estream");
+@@ -4157,7 +4157,7 @@ tmpfd (void)
+           *p++ = tohex (((value >> 28) & 0x0f));
+           value <<= 4;
+         }
+-#ifdef HAVE_W32CE_SYSTEM
++#if defined(HAVE_W32CE_SYSTEM) || defined(UNICODE)
+       wcscpy (p, L".tmp");
+ #else
+       strcpy (p, ".tmp");

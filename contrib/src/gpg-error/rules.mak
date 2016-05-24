@@ -17,6 +17,7 @@ endif
 endif
 	$(APPLY) $(SRC)/gpg-error/missing-unistd-include.patch
 	$(APPLY) $(SRC)/gpg-error/no-executable.patch
+	$(APPLY) $(SRC)/gpg-error/win32-unicode.patch
 	$(MOVE)
 	cp $@/src/syscfg/lock-obj-pub.arm-unknown-linux-androideabi.h $@/src/syscfg/lock-obj-pub.linux-android.h
 ifdef HAVE_TIZEN
