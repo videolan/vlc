@@ -28,6 +28,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <vlc_common.h>
 #include <vlc_tls.h>
 #include "h2frame.h"
@@ -43,7 +44,7 @@ static vlc_sem_t rx;
 static int fd_callback(vlc_tls_t *tls)
 {
     (void) tls;
-    return -1;
+    return fileno(stderr); /* should be writable (at least most of the time) */
 }
 
 static ssize_t send_callback(vlc_tls_t *tls, const struct iovec *iov,
@@ -73,8 +74,12 @@ static ssize_t send_callback(vlc_tls_t *tls, const struct iovec *iov,
     assert(len == 9 + 1);
     assert(p[9] == counter);
 
-    counter++;
+    if (send_failure)
+        errno = EIO;
+    else
+        counter++;
     vlc_sem_post(&rx);
+
     return send_failure ? -1 : (ssize_t)len;
 }
 
