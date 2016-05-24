@@ -171,7 +171,6 @@ static const event_name_t event_list[] = {
     DEF(MediaFreed)
     DEF(MediaStateChanged)
     DEF(MediaSubItemTreeAdded)
-    DEF(MediaParsedStatus)
 
     DEF(MediaPlayerMediaChanged)
     DEF(MediaPlayerNothingSpecial)

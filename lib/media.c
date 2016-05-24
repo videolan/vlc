@@ -213,39 +213,49 @@ static void input_item_duration_changed( const vlc_event_t *p_event,
     libvlc_event_send( p_md->p_event_manager, &event );
 }
 
-static void send_preparsed_event(libvlc_media_t *media)
+static void send_parsed_changed( libvlc_media_t *p_md,
+                                 libvlc_media_parsed_status_t new_status )
 {
     libvlc_event_t event;
 
-    /* Eventually notify libvlc_media_parse() */
-    vlc_mutex_lock(&media->parsed_lock);
-    if (media->is_parsed == true)
+    vlc_mutex_lock( &p_md->parsed_lock );
+    if( p_md->parsed_status == new_status )
     {
-        vlc_mutex_unlock(&media->parsed_lock);
+        vlc_mutex_unlock( &p_md->parsed_lock );
         return;
     }
-    media->is_parsed = true;
-    vlc_cond_broadcast(&media->parsed_cond);
-    vlc_mutex_unlock(&media->parsed_lock);
 
+    /* Legacy: notify libvlc_media_parse */
+    if( !p_md->is_parsed )
+    {
+        p_md->is_parsed = true;
+        vlc_cond_broadcast( &p_md->parsed_cond );
+    }
+
+    p_md->parsed_status = new_status;
+    if( p_md->parsed_status == libvlc_media_parsed_status_skipped )
+        p_md->has_asked_preparse = false;
+
+    vlc_mutex_unlock( &p_md->parsed_lock );
+
+    if( new_status == libvlc_media_parsed_status_done )
+    {
+        libvlc_media_list_t *p_subitems = media_get_subitems( p_md, false );
+        if( p_subitems != NULL )
+        {
+            /* notify the media list */
+            libvlc_media_list_lock( p_subitems );
+            libvlc_media_list_internal_end_reached( p_subitems );
+            libvlc_media_list_unlock( p_subitems );
+        }
+    }
 
     /* Construct the event */
     event.type = libvlc_MediaParsedChanged;
-    event.u.media_parsed_changed.new_status = true;
+    event.u.media_parsed_changed.new_status = new_status;
 
     /* Send the event */
-    libvlc_event_send(media->p_event_manager, &event);
-}
-
-/**************************************************************************
- * input_item_preparsed_changed (Private) (vlc event Callback)
- **************************************************************************/
-static void input_item_preparsed_changed(const vlc_event_t *p_event,
-                                         void * user_data)
-{
-    VLC_UNUSED( p_event );
-    libvlc_media_t *media = user_data;
-    send_preparsed_event(media);
+    libvlc_event_send( p_md->p_event_manager, &event );
 }
 
 /**************************************************************************
@@ -254,44 +264,24 @@ static void input_item_preparsed_changed(const vlc_event_t *p_event,
 static void input_item_preparse_ended( const vlc_event_t * p_event,
                                        void * user_data )
 {
-    VLC_UNUSED( p_event );
     libvlc_media_t * p_md = user_data;
-    libvlc_media_list_t *p_subitems = media_get_subitems( p_md, false );
-    libvlc_event_t event;
+    libvlc_media_parsed_status_t new_status;
 
-    event.type = libvlc_MediaParsedStatus;
-
-    vlc_mutex_lock(&p_md->parsed_lock);
-    switch (p_event->u.input_item_preparse_ended.new_status)
+    switch( p_event->u.input_item_preparse_ended.new_status )
     {
         case ITEM_PREPARSE_SKIPPED:
-            p_md->parsed_status = libvlc_media_parse_skipped;
-            p_md->has_asked_preparse = false;
+            new_status = libvlc_media_parsed_status_skipped;
             break;
         case ITEM_PREPARSE_FAILED:
-            p_md->parsed_status = libvlc_media_parse_failed;
+            new_status = libvlc_media_parsed_status_failed;
             break;
         case ITEM_PREPARSE_DONE:
-            p_md->parsed_status = libvlc_media_parse_done;
+            new_status = libvlc_media_parsed_status_done;
             break;
+        default:
+            return;
     }
-    event.u.media_parsed_status.new_status = p_md->parsed_status;
-    vlc_mutex_unlock(&p_md->parsed_lock);
-
-    if( p_subitems != NULL )
-    {
-        /* notify the media list */
-        libvlc_media_list_lock( p_subitems );
-        libvlc_media_list_internal_end_reached( p_subitems );
-        libvlc_media_list_unlock( p_subitems );
-    }
-
-    /* XXX: libVLC 2.2.0 compat: even if case of preparse failure,
-     * libvlc_MediaParsedChanged was sent with a true status. Therefore, send
-     * this event if it was not previously sent */
-    send_preparsed_event(p_md);
-
-    libvlc_event_send(p_md->p_event_manager, &event);
+    send_parsed_changed( p_md, new_status );
 }
 
 /**************************************************************************
@@ -310,10 +300,6 @@ static void install_input_item_observer( libvlc_media_t *p_md )
     vlc_event_attach( &p_md->p_input_item->event_manager,
                       vlc_InputItemDurationChanged,
                       input_item_duration_changed,
-                      p_md );
-    vlc_event_attach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemPreparsedChanged,
-                      input_item_preparsed_changed,
                       p_md );
     vlc_event_attach( &p_md->p_input_item->event_manager,
                       vlc_InputItemSubItemTreeAdded,
@@ -341,10 +327,6 @@ static void uninstall_input_item_observer( libvlc_media_t *p_md )
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemDurationChanged,
                       input_item_duration_changed,
-                      p_md );
-    vlc_event_detach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemPreparsedChanged,
-                      input_item_preparsed_changed,
                       p_md );
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemSubItemTreeAdded,
@@ -756,6 +738,8 @@ static int media_parse(libvlc_media_t *media, bool b_async,
     vlc_mutex_lock(&media->parsed_lock);
     needed = !media->has_asked_preparse;
     media->has_asked_preparse = true;
+    if (needed)
+        media->is_parsed = false;
     vlc_mutex_unlock(&media->parsed_lock);
 
     if (needed)

@@ -265,10 +265,10 @@ typedef enum libvlc_media_parse_flag_t
  */
 typedef enum libvlc_media_parsed_status_t
 {
-    libvlc_media_parse_init,
-    libvlc_media_parse_skipped,
-    libvlc_media_parse_failed,
-    libvlc_media_parse_done,
+    libvlc_media_parsed_status_init,
+    libvlc_media_parsed_status_skipped,
+    libvlc_media_parsed_status_failed,
+    libvlc_media_parsed_status_done,
 } libvlc_media_parsed_status_t;
 
 /**
@@ -655,7 +655,7 @@ libvlc_media_parse( libvlc_media_t *p_md );
  * This fetches (local or network) art, meta data and/or tracks information.
  * This method is the extended version of libvlc_media_parse_with_options().
  *
- * To track when this is over you can listen to libvlc_MediaParsedStatus
+ * To track when this is over you can listen to libvlc_MediaParsedChanged
  * event. However if this functions returns an error, you will not receive any
  * events.
  *
@@ -663,7 +663,7 @@ libvlc_media_parse( libvlc_media_t *p_md );
  * these flags can be combined. By default, media is parsed if it's a local
  * file.
  *
- * \see libvlc_MediaParsedStatus
+ * \see libvlc_MediaParsedChanged
  * \see libvlc_media_get_meta
  * \see libvlc_media_tracks_get
  * \see libvlc_media_get_parsed_status
@@ -681,7 +681,7 @@ libvlc_media_parse_with_options( libvlc_media_t *p_md,
 /**
  * Get Parsed status for media descriptor object.
  *
- * \see libvlc_MediaParsedStatus
+ * \see libvlc_MediaParsedChanged
  * \see libvlc_media_parsed_status_t
  *
  * \param p_md media descriptor object

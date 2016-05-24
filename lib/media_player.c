@@ -124,6 +124,35 @@ static inline void unlock_input(libvlc_media_player_t *mp)
     vlc_mutex_unlock(&mp->input.lock);
 }
 
+static void input_item_preparsed_changed( const vlc_event_t *p_event,
+                                          void * user_data )
+{
+    libvlc_media_t *p_md = user_data;
+    if( p_event->u.input_item_preparsed_changed.new_status & ITEM_PREPARSED )
+    {
+        /* Send the event */
+        libvlc_event_t event;
+        event.type = libvlc_MediaParsedChanged;
+        event.u.media_parsed_changed.new_status = libvlc_media_parsed_status_done;
+        libvlc_event_send( p_md->p_event_manager, &event );
+    }
+}
+
+static void media_attach_preparsed_event( libvlc_media_t *p_md )
+{
+    vlc_event_attach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemPreparsedChanged,
+                      input_item_preparsed_changed, p_md );
+}
+
+static void media_detach_preparsed_event( libvlc_media_t *p_md )
+{
+    vlc_event_detach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemPreparsedChanged,
+                      input_item_preparsed_changed,
+                      p_md );
+}
+
 /*
  * Release the associated input thread.
  *
@@ -138,6 +167,8 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
     if( !p_input_thread )
         return;
     p_mi->input.p_thread = NULL;
+
+    media_detach_preparsed_event( p_mi->p_md );
 
     var_DelCallback( p_input_thread, "can-seek",
                      input_seekable_changed, p_mi );
@@ -914,12 +945,15 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         return -1;
     }
 
+    media_attach_preparsed_event( p_mi->p_md );
+
     p_input_thread = input_Create( p_mi, p_mi->p_md->p_input_item, NULL,
                                    p_mi->input.p_resource );
     unlock(p_mi);
     if( !p_input_thread )
     {
         unlock_input(p_mi);
+        media_detach_preparsed_event( p_mi->p_md );
         libvlc_printerr( "Not enough memory" );
         return -1;
     }
@@ -939,6 +973,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         var_DelCallback( p_input_thread, "program-scrambled", input_scrambled_changed, p_mi );
         var_DelCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
         input_Close( p_input_thread );
+        media_detach_preparsed_event( p_mi->p_md );
         libvlc_printerr( "Input initialization failure" );
         return -1;
     }

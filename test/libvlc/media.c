@@ -61,7 +61,7 @@ static void test_media_preparsed(int argc, const char** argv,
 
     // Check to see if we are properly receiving the event.
     libvlc_event_manager_t *em = libvlc_media_event_manager (media);
-    libvlc_event_attach (em, libvlc_MediaParsedStatus, media_parse_ended, &sem);
+    libvlc_event_attach (em, libvlc_MediaParsedChanged, media_parse_ended, &sem);
 
     // Parse the media. This is synchronous.
     int i_ret = libvlc_media_parse_with_options(media, libvlc_media_parse_local);
@@ -159,7 +159,7 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play,
     }
     else
     {
-        libvlc_event_attach (em, libvlc_MediaParsedStatus, subitem_parse_ended, &sem);
+        libvlc_event_attach (em, libvlc_MediaParsedChanged, subitem_parse_ended, &sem);
 
         int i_ret = libvlc_media_parse_with_options(media, libvlc_media_parse_local);
         assert(i_ret == 0);
@@ -238,13 +238,13 @@ int main (void)
 
     test_media_preparsed (test_defaults_nargs, test_defaults_args,
                           SRCDIR"/samples/image.jpg", NULL,
-                          libvlc_media_parse_done);
+                          libvlc_media_parsed_status_done);
     test_media_preparsed (test_defaults_nargs, test_defaults_args,
                           NULL, "http://parsing_should_be_skipped.org/video.mp4",
-                          libvlc_media_parse_skipped);
+                          libvlc_media_parsed_status_skipped);
     test_media_preparsed (test_defaults_nargs, test_defaults_args,
                           NULL, "unknown://parsing_should_be_skipped.org/video.mp4",
-                          libvlc_media_parse_skipped);
+                          libvlc_media_parsed_status_skipped);
     test_media_subitems (test_defaults_nargs, test_defaults_args);
 
     return 0;
