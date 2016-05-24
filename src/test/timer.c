@@ -34,6 +34,7 @@ struct timer_data
 {
     vlc_timer_t timer;
     vlc_mutex_t lock;
+    vlc_cond_t  wait;
     unsigned count;
 };
 
@@ -43,6 +44,7 @@ static void callback (void *ptr)
 
     vlc_mutex_lock (&data->lock);
     data->count += 1 + vlc_timer_getoverrun (data->timer);
+    vlc_cond_signal (&data->wait);
     vlc_mutex_unlock (&data->lock);
 }
 
@@ -50,9 +52,11 @@ static void callback (void *ptr)
 int main (void)
 {
     struct timer_data data;
+    mtime_t ts;
     int val;
 
     vlc_mutex_init (&data.lock);
+    vlc_cond_init (&data.wait);
     data.count = 0;
 
     val = vlc_timer_create (&data.timer, callback, &data);
@@ -70,28 +74,38 @@ int main (void)
     assert (val == 0);
 
     /* Relative timer */
+    ts = mdate ();
     vlc_timer_schedule (data.timer, false, 1, CLOCK_FREQ / 100);
-    msleep (CLOCK_FREQ / 10);
+
     vlc_mutex_lock (&data.lock);
-    data.count += vlc_timer_getoverrun (data.timer);
-    printf ("Count = %u\n", data.count);
-    assert (data.count >= 10);
+    while (data.count <= 10)
+        vlc_cond_wait(&data.wait, &data.lock);
+
+    ts = mdate () - ts;
+    printf ("%u iterations in %"PRId64" us\n", data.count, ts);
     data.count = 0;
     vlc_mutex_unlock (&data.lock);
+    assert(ts >= (CLOCK_FREQ / 10));
+
     vlc_timer_schedule (data.timer, false, 0, 0);
 
     /* Absolute timer */
-    mtime_t now = mdate ();
+    ts = mdate ();
 
-    vlc_timer_schedule (data.timer, true, now, CLOCK_FREQ / 100);
-    msleep (CLOCK_FREQ / 10);
+    vlc_timer_schedule (data.timer, true, ts + CLOCK_FREQ / 10,
+                        CLOCK_FREQ / 100);
+
     vlc_mutex_lock (&data.lock);
-    data.count += vlc_timer_getoverrun (data.timer);
-    printf ("Count = %u\n", data.count);
-    assert (data.count >= 10);
+    while (data.count <= 10)
+        vlc_cond_wait(&data.wait, &data.lock);
+
+    ts = mdate () - ts;
+    printf ("%u iterations in %"PRId64" us\n", data.count, ts);
     vlc_mutex_unlock (&data.lock);
+    assert(ts >= (CLOCK_FREQ / 5));
 
     vlc_timer_destroy (data.timer);
+    vlc_cond_destroy (&data.wait);
     vlc_mutex_destroy (&data.lock);
 
     return 0;
