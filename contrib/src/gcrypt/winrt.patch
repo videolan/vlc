@@ -1,6 +1,75 @@
---- libgcrypt/random/rndw32.c.orig	2016-05-09 16:48:42.495200068 +0200
-+++ libgcrypt/random/rndw32.c	2016-05-09 16:55:07.423179353 +0200
-@@ -337,6 +337,7 @@
+--- libgcrypt/random/rndw32.c	2015-09-08 08:17:06.000000000 +0200
++++ libgcrypt/random/rndw32.c.winrt	2016-05-24 14:07:35.202767500 +0200
+@@ -96,8 +96,13 @@
+    value in a newer release. So we use a far larger value. */
+ #define SIZEOF_DISK_PERFORMANCE_STRUCT 256
+ 
++#include <winapifamily.h>
++#if (WINAPI_FAMILY == WINAPI_FAMILY_PC_APP || WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
++#include <wincrypt.h>
++#else
+ /* We don't include wincrypt.h so define it here.  */
+ #define HCRYPTPROV  HANDLE
++#endif
+ 
+ 
+ /* When we query the performance counters, we allocate an initial buffer and
+@@ -234,7 +239,9 @@ static NTQUERYSYSTEMINFORMATION  pNtQuer
+ static NTQUERYINFORMATIONPROCESS pNtQueryInformationProcess;
+ static NTPOWERINFORMATION        pNtPowerInformation;
+ 
++#if (WINAPI_FAMILY != WINAPI_FAMILY_PC_APP && WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP)
+ static HANDLE hAdvAPI32;
++#endif
+ static CRYPTACQUIRECONTEXT pCryptAcquireContext;
+ static CRYPTGENRANDOM      pCryptGenRandom;
+ static CRYPTRELEASECONTEXT pCryptReleaseContext;
+@@ -259,6 +266,12 @@ init_system_rng (void)
+   system_rng_available = 0;
+   hRNGProv = NULL;
+ 
++#if (WINAPI_FAMILY == WINAPI_FAMILY_PC_APP || WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
++    pCryptAcquireContext = CryptAcquireContext;
++    pCryptGenRandom      = CryptGenRandom;
++    pCryptReleaseContext = CryptReleaseContext;
++    pRtlGenRandom        = CryptGenRandom;
++#else
+   hAdvAPI32 = GetModuleHandle ("AdvAPI32.dll");
+   if (!hAdvAPI32)
+     return;
+@@ -274,6 +287,7 @@ init_system_rng (void)
+      This isn't exported by name, so we have to get it by ordinal.  */
+   pRtlGenRandom = (RTLGENRANDOM)
+     GetProcAddress (hAdvAPI32, "SystemFunction036");
++#endif
+ 
+   /* Try and connect to the PIII RNG CSP.  The AMD 768 southbridge (from
+      the 760 MP chipset) also has a hardware RNG, but there doesn't appear
+@@ -286,7 +300,9 @@ init_system_rng (void)
+                                   PROV_INTEL_SEC, 0) )
+        && !pRtlGenRandom)
+     {
++#if (WINAPI_FAMILY != WINAPI_FAMILY_PC_APP && WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP)
+       hAdvAPI32 = NULL;
++#endif
+     }
+   else
+     system_rng_available = 1;
+@@ -312,11 +328,13 @@ read_system_rng (void (*add)(const void*
+       if (pCryptGenRandom (hRNGProv, SYSTEMRNG_BYTES, buffer))
+         quality = 80;
+     }
++#if (WINAPI_FAMILY != WINAPI_FAMILY_PC_APP && WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP)
+   else if (pRtlGenRandom)
+     {
+       if ( pRtlGenRandom (buffer, SYSTEMRNG_BYTES))
+         quality = 50;
+     }
++#endif
+   if (quality > 0)
+     {
+       if (debug_me)
+@@ -337,6 +355,7 @@ read_mbm_data (void (*add)(const void*,
    HANDLE hMBMData;
    SharedData *mbmDataPtr;
  
@@ -8,7 +77,7 @@
    hMBMData = OpenFileMapping (FILE_MAP_READ, FALSE, "$M$B$M$5$S$D$" );
    if (hMBMData)
      {
-@@ -351,6 +352,7 @@
+@@ -351,6 +370,7 @@ read_mbm_data (void (*add)(const void*,
          }
        CloseHandle (hMBMData);
      }
@@ -16,7 +85,39 @@
  }
  
  
-@@ -594,6 +596,7 @@
+@@ -359,6 +379,7 @@ static void
+ registry_poll (void (*add)(const void*, size_t, enum random_origins),
+                enum random_origins requester)
+ {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   static int cbPerfData = PERFORMANCE_BUFFER_SIZE;
+   int iterations;
+   DWORD dwSize, status;
+@@ -478,6 +499,7 @@ registry_poll (void (*add)(const void*,
+      isn't done then any system components which provide performance data
+      can't be removed or changed while the handle remains active.  */
+   RegCloseKey (HKEY_PERFORMANCE_DATA);
++#endif
+ }
+ 
+ 
+@@ -496,6 +518,7 @@ slow_gatherer ( void (*add)(const void*,
+ 
+   if ( !is_initialized )
+     {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+       HKEY hKey;
+ 
+       if ( debug_me )
+@@ -565,6 +588,7 @@ slow_gatherer ( void (*add)(const void*,
+           if (!pNtQuerySystemInformation || !pNtQueryInformationProcess)
+             hNTAPI = NULL;
+         }
++#endif
+ 
+ 
+       is_initialized = 1;
+@@ -594,6 +618,7 @@ slow_gatherer ( void (*add)(const void*,
        }
    }
  
@@ -24,7 +125,7 @@
    /* Get disk I/O statistics for all the hard drives.  100 is an
       arbitrary failsafe limit.  */
    for (drive_no = 0; drive_no < 100 ; drive_no++)
-@@ -628,6 +631,7 @@
+@@ -628,6 +653,7 @@ slow_gatherer ( void (*add)(const void*,
          }
        CloseHandle (hDevice);
      }
@@ -32,7 +133,7 @@
  
    /* In theory we should be using the Win32 performance query API to obtain
       unpredictable data from the system, however this is so unreliable (see
-@@ -786,12 +790,16 @@
+@@ -786,12 +812,16 @@ _gcry_rndw32_gather_random (void (*add)(
  
    if (!is_initialized)
      {
@@ -49,7 +150,7 @@
        init_system_rng ();
        is_initialized = 1;
      }
-@@ -842,14 +850,11 @@
+@@ -842,14 +872,11 @@ _gcry_rndw32_gather_random_fast (void (*
                          ADDINT((SIZE_T)aptr);                      \
                        } while (0)
  
@@ -65,7 +166,7 @@
      ADDPTR ( GetDesktopWindow ());
      ADDPTR ( GetFocus ());
      ADDINT ( GetInputState ());
-@@ -858,6 +863,11 @@
+@@ -858,6 +885,11 @@ _gcry_rndw32_gather_random_fast (void (*
      ADDPTR ( GetOpenClipboardWindow ());
      ADDPTR ( GetProcessHeap ());
      ADDPTR ( GetProcessWindowStation ());
@@ -77,7 +178,7 @@
      /* Following function in some cases stops returning events, and cannot
         be used as an entropy source.  */
      /*ADDINT ( GetQueueStatus (QS_ALLEVENTS));*/
-@@ -871,6 +881,7 @@
+@@ -871,6 +903,7 @@ _gcry_rndw32_gather_random_fast (void (*
  
    /* Get multiword system information: Current caret position, current
       mouse cursor position.  */
@@ -85,7 +186,7 @@
    {
      POINT point;
  
-@@ -922,10 +933,12 @@
+@@ -922,10 +955,12 @@ _gcry_rndw32_gather_random_fast (void (*
      (*add) ( &minimumWorkingSetSize, sizeof (int), origin );
      (*add) ( &maximumWorkingSetSize, sizeof (int), origin );
    }
@@ -98,7 +199,7 @@
    if (!addedFixedItems)
      {
        STARTUPINFO startupInfo;
-@@ -938,6 +951,7 @@
+@@ -938,6 +973,7 @@ _gcry_rndw32_gather_random_fast (void (*
        (*add) ( &startupInfo, sizeof (STARTUPINFO), origin );
        addedFixedItems = 1;
      }
@@ -106,39 +207,3 @@
  
    /* The performance of QPC varies depending on the architecture it's
       running on and on the OS, the MS documentation is vague about the
---- libgcrypt.old/random/rndw32.c	2016-05-11 19:53:20.614939666 +0200
-+++ libgcrypt/random/rndw32.c	2016-05-11 19:54:37.410941944 +0200
-@@ -361,6 +361,7 @@
- registry_poll (void (*add)(const void*, size_t, enum random_origins),
-                enum random_origins requester)
- {
-+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
-   static int cbPerfData = PERFORMANCE_BUFFER_SIZE;
-   int iterations;
-   DWORD dwSize, status;
-@@ -480,6 +481,7 @@
-      isn't done then any system components which provide performance data
-      can't be removed or changed while the handle remains active.  */
-   RegCloseKey (HKEY_PERFORMANCE_DATA);
-+#endif
- }
- 
- 
---- libgcrypt/random/rndw32.c.orig	2016-05-11 22:50:39.145927976 +0200
-+++ libgcrypt/random/rndw32.c	2016-05-11 22:50:42.529932530 +0200
-@@ -502,6 +502,7 @@
-     {
-       HKEY hKey;
- 
-+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
-       if ( debug_me )
-         log_debug ("rndw32#slow_gatherer: init toolkit\n" );
-       /* Find out whether this is an NT server or workstation if necessary */
-@@ -528,6 +529,7 @@
-             }
-           RegCloseKey (hKey);
-         }
-+#endif
- 
-       /* The following are fixed for the lifetime of the process so we
-          only add them once */
