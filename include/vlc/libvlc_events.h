@@ -148,7 +148,7 @@ typedef struct libvlc_event_t
         } media_freed;
         struct
         {
-            libvlc_state_t new_state;
+            int new_state; /**< see @ref libvlc_state_t */
         } media_state_changed;
         struct
         {
