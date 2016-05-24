@@ -178,6 +178,7 @@
 #define VLC_CODEC_HQ_HQA          VLC_FOURCC('C','U','V','C')
 #define VLC_CODEC_HAP             VLC_FOURCC('H','A','P','1')
 #define VLC_CODEC_DXV             VLC_FOURCC('D','X','D','3')
+#define VLC_CODEC_CINEFORM        VLC_FOURCC('C','F','H','D')
 
 /***********
  * Chromas

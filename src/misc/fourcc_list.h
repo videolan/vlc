@@ -1078,6 +1078,8 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_DFA, "Chronomaster DFA"),
 
     B(VLC_CODEC_HNM4_VIDEO, "Cryo Interactive Entertainment HNM4"),
+
+    B(VLC_CODEC_CINEFORM, "CineForm" ),
 };
 
 static const staticentry_t p_list_audio[] = {
