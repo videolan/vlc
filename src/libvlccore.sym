@@ -653,6 +653,8 @@ vlc_sdp_Start
 vlc_sd_Start
 vlc_sd_Stop
 vlc_testcancel
+vlc_thread_self
+vlc_thread_id
 vlc_threadvar_create
 vlc_threadvar_delete
 vlc_threadvar_get

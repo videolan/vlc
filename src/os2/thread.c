@@ -77,7 +77,7 @@ static ULONG vlc_DosWaitEventSemEx( HEV hev, ULONG ulTimeout )
     int       n;
     ULONG     rc;
 
-    struct vlc_thread *th = vlc_threadvar_get( thread_key );
+    struct vlc_thread *th = vlc_thread_self( thread_key );
     if( th == NULL || !th->killable )
     {
         /* Main thread - cannot be cancelled anyway
@@ -638,6 +638,20 @@ int vlc_set_priority (vlc_thread_t th, int priority)
     return VLC_SUCCESS;
 }
 
+vlc_thread_t vlc_thread_self (void)
+{
+    return vlc_threadvar_get (thread_key);
+}
+
+unsigned long vlc_thread_id (void)
+{
+#if 0
+    return vlc_thread_self ()->tid; /* potential NULL deref */
+#else
+    return -1;
+#endif
+}
+
 /*** Thread cancellation ***/
 
 /* APC procedure for thread cancellation */
@@ -659,7 +673,7 @@ int vlc_savecancel (void)
 {
     int state;
 
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = vlc_thread_self ();
     if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
@@ -670,7 +684,7 @@ int vlc_savecancel (void)
 
 void vlc_restorecancel (int state)
 {
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = vlc_thread_self ();
     assert (state == false || state == true);
 
     if (th == NULL)
@@ -682,7 +696,7 @@ void vlc_restorecancel (int state)
 
 void vlc_testcancel (void)
 {
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = vlc_thread_self ();
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
@@ -709,7 +723,7 @@ void vlc_control_cancel (int cmd, ...)
      * need to lock anything. */
     va_list ap;
 
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = vlc_thread_self ();
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
@@ -738,7 +752,7 @@ void vlc_control_cancel (int cmd, ...)
 static int vlc_select( int nfds, fd_set *rdset, fd_set *wrset, fd_set *exset,
                        struct timeval *timeout )
 {
-    struct vlc_thread *th = vlc_threadvar_get( thread_key );
+    struct vlc_thread *th = vlc_thread_self( );
 
     int rc;
 

@@ -43,9 +43,6 @@
 #include <pthread.h>
 #include <sched.h>
 
-#ifdef __linux__
-# include <sys/syscall.h> /* SYS_gettid */
-#endif
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
 #endif
@@ -136,20 +133,6 @@ void vlc_trace (const char *fn, const char *file, unsigned line)
      fsync (2);
 }
 
-static inline unsigned long vlc_threadid (void)
-{
-#if defined (__linux__)
-     /* glibc does not provide a call for this */
-     return syscall (__NR_gettid);
-
-#else
-     union { pthread_t th; unsigned long int i; } v = { };
-     v.th = pthread_self ();
-     return v.i;
-
-#endif
-}
-
 #ifndef NDEBUG
 /**
  * Reports a fatal error from the threading layer, for debugging purposes.
@@ -160,7 +143,7 @@ vlc_thread_fatal (const char *action, int error,
 {
     int canc = vlc_savecancel ();
     fprintf (stderr, "LibVLC fatal error %s (%d) in thread %lu ",
-             action, error, vlc_threadid ());
+             action, error, vlc_thread_id ());
     vlc_trace (function, file, line);
     perror ("Thread error");
     fflush (stderr);
@@ -562,6 +545,18 @@ int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
     pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
     return vlc_clone_attr (th, &attr, entry, data, priority);
 }
+
+vlc_thread_t vlc_thread_self (void)
+{
+    return pthread_self ();
+}
+
+#if !defined (__linux__)
+unsigned long vlc_thread_id (void)
+{
+     return -1;
+}
+#endif
 
 int vlc_set_priority (vlc_thread_t th, int priority)
 {

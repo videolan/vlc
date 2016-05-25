@@ -74,13 +74,6 @@ void vlc_trace (const char *fn, const char *file, unsigned line)
      fsync (2);
 }
 
-static inline unsigned long vlc_threadid (void)
-{
-     union { pthread_t th; unsigned long int i; } v = { };
-     v.th = pthread_self ();
-     return v.i;
-}
-
 #ifndef NDEBUG
 /* Reports a fatal error from the threading layer, for debugging purposes. */
 static void
@@ -89,7 +82,7 @@ vlc_thread_fatal (const char *action, int error,
 {
     int canc = vlc_savecancel ();
     fprintf (stderr, "LibVLC fatal error %s (%d) in thread %lu ",
-             action, error, vlc_threadid ());
+             action, error, vlc_thread_id ());
     vlc_trace (function, file, line);
 
     char buf[1000];
@@ -461,6 +454,16 @@ int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
     pthread_attr_init (&attr);
     pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
     return vlc_clone_attr (th, &attr, entry, data, priority);
+}
+
+vlc_thread_t vlc_thread_self (void)
+{
+    return pthread_self ();
+}
+
+unsigned long vlc_thread_id (void)
+{
+    return -1;
 }
 
 int vlc_set_priority (vlc_thread_t th, int priority)

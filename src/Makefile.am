@@ -263,6 +263,7 @@ SOURCES_libvlc_android = \
 	linux/cpu.c \
 	linux/dirs.c \
 	android/dirs.c \
+	linux/thread.c \
 	android/thread.c \
 	android/error.c \
 	posix/filesystem.c \
@@ -281,6 +282,7 @@ SOURCES_libvlc_linux = \
 	posix/filesystem.c \
 	posix/netconf.c \
 	posix/plugin.c \
+	linux/thread.c \
 	posix/thread.c \
 	posix/timer.c \
 	posix/specific.c \

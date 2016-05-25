@@ -676,6 +676,42 @@ VLC_API void vlc_restorecancel(int state);
 VLC_API void vlc_control_cancel(int cmd, ...);
 
 /**
+ * Thread handle.
+ *
+ * This function returns the thread handle of the calling thread.
+ *
+ * \note The exact type of the thread handle depends on the platform,
+ * including an integer type, a pointer type or a compound type of any size.
+ * If you need an integer identifier, use vlc_thread_id() instead.
+ *
+ * \note vlc_join(vlc_thread_self(), NULL) is undefined,
+ * as it obviously does not make any sense (it might result in a deadlock, but
+ * there are no warranties that it will).
+ *
+ * \return the thread handle
+ */
+VLC_API vlc_thread_t vlc_thread_self(void) VLC_USED;
+
+/**
+ * Thread identifier.
+ *
+ * This function returns the identifier of the calling thread. The identifier
+ * cannot change for the entire duration of the thread, and no other thread can
+ * have the same identifier at the same time in the same process. Typically,
+ * the identifier is also unique across all running threads of all existing
+ * processes, but that depends on the operating system.
+ *
+ * There are no particular semantics to the thread ID with LibVLC.
+ * It is provided mainly for tracing and debugging.
+ *
+ * \warning This function is not currently implemented on all supported
+ * platforms. Where not implemented, it returns (unsigned long)-1.
+ *
+ * \return the thread identifier (or -1 if unimplemented)
+ */
+VLC_API unsigned long vlc_thread_id(void) VLC_USED;
+
+/**
  * Precision monotonic clock.
  *
  * In principles, the clock has a precision of 1 MHz. But the actual resolution

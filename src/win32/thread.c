@@ -447,7 +447,7 @@ retry:
 #if !IS_INTERRUPTIBLE
 static bool isCancelled(void)
 {
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = vlc_thread_self();
     if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
@@ -542,6 +542,16 @@ int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
     return vlc_clone_attr (p_handle, true, entry, data, priority);
 }
 
+vlc_thread_t vlc_thread_self (void)
+{
+    return TlsGetValue(thread_key);
+}
+
+unsigned long vlc_thread_id (void)
+{
+    return GetCurrentThreadId ();
+}
+
 int vlc_set_priority (vlc_thread_t th, int priority)
 {
     if (!SetThreadPriority (th->id, priority))
@@ -573,7 +583,7 @@ void vlc_cancel (vlc_thread_t th)
 
 int vlc_savecancel (void)
 {
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = vlc_thread_self();
     if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
@@ -584,7 +594,7 @@ int vlc_savecancel (void)
 
 void vlc_restorecancel (int state)
 {
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = vlc_thread_self();
     assert (state == false || state == true);
 
     if (th == NULL)
@@ -596,7 +606,7 @@ void vlc_restorecancel (int state)
 
 void vlc_testcancel (void)
 {
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = vlc_thread_self();
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
     if (!th->killable)
@@ -625,7 +635,7 @@ void vlc_control_cancel (int cmd, ...)
      * need to lock anything. */
     va_list ap;
 
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = vlc_thread_self();
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 

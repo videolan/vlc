@@ -90,9 +90,9 @@ vlc_thread_fatal (const char *action, int error,
     }
 
     __android_log_print(ANDROID_LOG_ERROR, "vlc",
-        "LibVLC fatal error %s (%d) in thread %d "
+        "LibVLC fatal error %s (%d) in thread %lu "
         "at %s:%u in %s\n Error message: %s\n",
-        action, error, syscall (__NR_gettid), file, line, function, msg);
+        action, error, vlc_thread_id (), file, line, function, msg);
 
     abort ();
 }
@@ -179,6 +179,16 @@ struct vlc_thread
 };
 
 static __thread struct vlc_thread *thread = NULL;
+
+vlc_thread_t vlc_thread_self (void)
+{
+    return thread;
+}
+
+unsigned long vlc_thread_id (void)
+{
+    return syscall (__NR_gettid);
+}
 
 void vlc_threads_setup (libvlc_int_t *p_libvlc)
 {
