@@ -1,0 +1,166 @@
+--- libmad/bit.c.orig	2016-05-24 17:15:59.774492679 +0200
++++ libmad/bit.c	2016-05-24 17:31:11.453880933 +0200
+@@ -85,11 +85,12 @@
+  * NAME:	bit->init()
+  * DESCRIPTION:	initialize bit pointer struct
+  */
+-void mad_bit_init(struct mad_bitptr *bitptr, unsigned char const *byte)
++void mad_bit_init(struct mad_bitptr *bitptr, unsigned char const *byte, unsigned int length)
+ {
+   bitptr->byte  = byte;
+   bitptr->cache = 0;
+   bitptr->left  = CHAR_BIT;
++  bitptr->length = length;
+ }
+ 
+ /*
+@@ -109,7 +110,11 @@
+  */
+ unsigned char const *mad_bit_nextbyte(struct mad_bitptr const *bitptr)
+ {
+-  return bitptr->left == CHAR_BIT ? bitptr->byte : bitptr->byte + 1;
++    if (bitptr->left == CHAR_BIT)
++        return bitptr->byte;
++    if (bitptr->length == 0)
++        return 0;
++    return bitptr->byte + 1;
+ }
+ 
+ /*
+@@ -118,11 +123,17 @@
+  */
+ void mad_bit_skip(struct mad_bitptr *bitptr, unsigned int len)
+ {
++  if (bitptr->length < len / CHAR_BIT)
++    return;
+   bitptr->byte += len / CHAR_BIT;
+   bitptr->left -= len % CHAR_BIT;
++  bitptr->length -= len / CHAR_BIT;
+ 
+   if (bitptr->left > CHAR_BIT) {
++    if (bitptr->length == 0)
++      return;
+     bitptr->byte++;
++    bitptr->length--;
+     bitptr->left += CHAR_BIT;
+   }
+ 
+@@ -154,17 +165,21 @@
+   value = bitptr->cache & ((1 << bitptr->left) - 1);
+   len  -= bitptr->left;
+ 
++  if (bitptr->length == 0)
++    return value;
+   bitptr->byte++;
++  bitptr->length--;
+   bitptr->left = CHAR_BIT;
+ 
+   /* more bytes */
+ 
+-  while (len >= CHAR_BIT) {
++  while (len >= CHAR_BIT && bitptr->length > 0) {
+     value = (value << CHAR_BIT) | *bitptr->byte++;
++    bitptr->length--;
+     len  -= CHAR_BIT;
+   }
+ 
+-  if (len > 0) {
++  if (len > 0 && bitptr->length > 0) {
+     bitptr->cache = *bitptr->byte;
+ 
+     value = (value << len) | (bitptr->cache >> (CHAR_BIT - len));
+--- libmad/frame.c.orig	2016-05-24 17:33:50.469874358 +0200
++++ libmad/frame.c	2016-05-24 17:40:37.345904926 +0200
+@@ -348,7 +348,7 @@
+     }
+   }
+   else {
+-    mad_bit_init(&stream->ptr, ptr);
++    mad_bit_init(&stream->ptr, ptr, stream->bufend - ptr);
+ 
+     if (mad_stream_sync(stream) == -1) {
+       if (end - stream->next_frame >= MAD_BUFFER_GUARD)
+@@ -365,7 +365,7 @@
+   stream->this_frame = ptr;
+   stream->next_frame = ptr + 1;  /* possibly bogus sync word */
+ 
+-  mad_bit_init(&stream->ptr, stream->this_frame);
++  mad_bit_init(&stream->ptr, stream->this_frame, stream->bufend - stream->this_frame);
+ 
+   if (decode_header(header, stream) == -1)
+     goto fail;
+@@ -462,7 +462,7 @@
+   if (frame->header.layer != MAD_LAYER_III) {
+     struct mad_bitptr next_frame;
+ 
+-    mad_bit_init(&next_frame, stream->next_frame);
++    mad_bit_init(&next_frame, stream->next_frame, stream->bufend - stream->next_frame);
+ 
+     stream->anc_ptr    = stream->ptr;
+     stream->anc_bitlen = mad_bit_length(&stream->ptr, &next_frame);
+--- libmad/stream.c.orig	2016-05-24 17:31:32.237879250 +0200
++++ libmad/stream.c	2016-05-24 17:33:35.541874407 +0200
+@@ -45,9 +45,9 @@
+ 
+   stream->this_frame = 0;
+   stream->next_frame = 0;
+-  mad_bit_init(&stream->ptr, 0);
++  mad_bit_init(&stream->ptr, 0, 0);
+ 
+-  mad_bit_init(&stream->anc_ptr, 0);
++  mad_bit_init(&stream->anc_ptr, 0, 0);
+   stream->anc_bitlen = 0;
+ 
+   stream->main_data  = 0;
+@@ -87,7 +87,7 @@
+ 
+   stream->sync = 1;
+ 
+-  mad_bit_init(&stream->ptr, buffer);
++  mad_bit_init(&stream->ptr, buffer, length);
+ }
+ 
+ /*
+@@ -117,7 +117,7 @@
+   if (end - ptr < MAD_BUFFER_GUARD)
+     return -1;
+ 
+-  mad_bit_init(&stream->ptr, ptr);
++  mad_bit_init(&stream->ptr, ptr, stream->bufend - stream->buffer);
+ 
+   return 0;
+ }
+--- libmad/bit.h.orig	2016-05-24 17:16:15.634465975 +0200
++++ libmad/bit.h	2016-05-24 17:17:29.030354093 +0200
+@@ -26,9 +26,10 @@
+   unsigned char const *byte;
+   unsigned short cache;
+   unsigned short left;
++  unsigned int length;
+ };
+ 
+-void mad_bit_init(struct mad_bitptr *, unsigned char const *);
++void mad_bit_init(struct mad_bitptr *, unsigned char const *, unsigned int length);
+ 
+ # define mad_bit_finish(bitptr)		/* nothing */
+ 
+--- libmad/layer3.c.orig	2016-05-24 17:39:34.709897058 +0200
++++ libmad/layer3.c	2016-05-24 17:53:32.125728363 +0200
+@@ -2586,7 +2586,7 @@
+     struct mad_bitptr peek;
+     unsigned long header;
+ 
+-    mad_bit_init(&peek, stream->next_frame);
++    mad_bit_init(&peek, stream->next_frame, stream->bufend - stream->next_frame);
+ 
+     header = mad_bit_read(&peek, 32);
+     if ((header & 0xffe60000L) /* syncword | layer */ == 0xffe20000L) {
+@@ -2626,7 +2626,7 @@
+     }
+     else {
+       mad_bit_init(&ptr,
+-		   *stream->main_data + stream->md_len - si.main_data_begin);
++           *stream->main_data + stream->md_len - si.main_data_begin, md_len);
+ 
+       if (md_len > si.main_data_begin) {
+ 	assert(stream->md_len + md_len -
