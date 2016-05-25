@@ -1097,6 +1097,7 @@ int libvlc_media_slaves_add( libvlc_media_t *p_md,
         break;
     case libvlc_media_slave_type_audio:
         i_input_slave_type = SLAVE_TYPE_AUDIO;
+        break;
     default:
         vlc_assert_unreachable();
         return -1;
