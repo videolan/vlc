@@ -1538,6 +1538,11 @@ typedef struct
     uint32_t i_blob;
 } MP4_Box_data_data_t;
 
+typedef struct
+{
+    uint32_t i_projection_mode;
+} MP4_Box_data_360_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -1642,6 +1647,8 @@ typedef union MP4_Box_data_s
     MP4_Box_data_WMA2_t *p_WMA2; /* flip4mac Little endian audio config */
     MP4_Box_data_strf_t *p_strf; /* flip4mac Little endian video config */
     MP4_Box_data_ASF_t  *p_asf;  /* flip4mac asf streams indicator */
+
+    MP4_Box_data_360_t  *p_360;
 
     /* for generic handlers */
     MP4_Box_data_string_t *p_string;
@@ -1800,6 +1807,10 @@ static const UUID_t TfrfBoxUUID = {
 static const UUID_t TfxdBoxUUID = {
                 { 0x6d, 0x1d, 0x9b, 0x05, 0x42, 0xd5, 0x44, 0xe6,
                   0x80, 0xe2, 0x14, 0x1d, 0xaf, 0xf7, 0x57, 0xb2 } };
+
+static const UUID_t XML360BoxUUID = {
+                { 0xff, 0xcc, 0x82, 0x63, 0xf8, 0x55, 0x4a, 0x93,
+                  0x88, 0x14, 0x58, 0x7a, 0x02, 0x52, 0x1f, 0xdd } };
 
 /*****************************************************************************
  * MP4_BoxGetNextChunk : Parse the entire moof box.

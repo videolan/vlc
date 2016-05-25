@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_stream.h>                               /* vlc_stream_Peek*/
+#include <vlc_strings.h>                              /* vlc_ascii_tolower */
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>                                  /* for compressed moov */
@@ -712,12 +713,45 @@ static int MP4_ReadBox_tfrf(  stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_XML360( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_360_t, NULL );
+
+    MP4_Box_data_360_t *p_360_data = p_box->data.p_360;
+
+    /* Copy the string for pattern matching as it does not end
+    with a '\0' in the stream. */
+    char *psz_rdf = strndup((char *)p_peek, i_read);
+
+    if ( unlikely( !psz_rdf ) )
+        MP4_READBOX_EXIT( 0 );
+
+    /* Try to find the string "GSpherical:Spherical" because the v1
+    spherical video spec says the tag must be there. */
+
+    if ( strcasestr( psz_rdf, "Gspherical:Spherical" ) )
+        p_360_data->i_projection_mode = PROJECTION_MODE_EQUIRECTANGULAR;
+
+    /* Try to find the stero mode. */
+    if ( strcasestr( psz_rdf, "left-right" ) )
+        msg_Dbg( p_stream, "Left-right stereo mode" );
+
+    if ( strcasestr( psz_rdf, "top-bottom" ) )
+        msg_Dbg( p_stream, "Top-bottom stereo mode" );
+
+    free( psz_rdf );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_uuid( stream_t *p_stream, MP4_Box_t *p_box )
 {
     if( !CmpUUID( &p_box->i_uuid, &TfrfBoxUUID ) )
         return MP4_ReadBox_tfrf( p_stream, p_box );
     if( !CmpUUID( &p_box->i_uuid, &TfxdBoxUUID ) )
         return MP4_ReadBox_tfxd( p_stream, p_box );
+    if( !CmpUUID( &p_box->i_uuid, &XML360BoxUUID ) )
+        return MP4_ReadBox_XML360( p_stream, p_box );
 
 #ifdef MP4_VERBOSE
     msg_Warn( p_stream, "Unknown uuid type box: "
