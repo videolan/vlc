@@ -936,11 +936,11 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
         return NULL;
 
     i_res = UpnpAddToAction( &p_action, "Browse",
-            CONTENT_DIRECTORY_SERVICE_TYPE, "ObjectID", psz_object_id_ );
+            CONTENT_DIRECTORY_SERVICE_TYPE, "ContainerID", psz_object_id_ ? psz_object_id_ : "0" );
 
     if ( i_res != UPNP_E_SUCCESS )
     {
-        msg_Dbg( access_, "AddToAction 'ObjectID' failed: %s",
+        msg_Dbg( access_, "AddToAction 'ContainerID' failed: %s",
                 UpnpGetErrorMessage( i_res ) );
         goto browseActionCleanup;
     }
