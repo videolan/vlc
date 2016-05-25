@@ -175,6 +175,12 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( p_dec->fmt_in.i_codec )
     {
         case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
+            if (p_dec->fmt_in.audio.i_channels > 2) {
+                free(p_sys);
+                msg_Err(p_dec, "Invalid number of channels %i",
+                        p_dec->fmt_in.audio.i_channels );
+                return VLC_EGENERIC;
+            }
             p_sys->codec = ADPCM_IMA_QT;
             break;
         case VLC_CODEC_ADPCM_IMA_WAV: /* IMA ADPCM */
