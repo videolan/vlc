@@ -61,6 +61,7 @@ typedef struct vlc_log_t
     const char *file; /**< Source code file name or NULL */
     int line; /**< Source code file line number or -1 */
     const char *func; /**< Source code calling function name or NULL */
+    unsigned long tid; /**< Emitter thread ID */
 } vlc_log_t;
 
 VLC_API void vlc_Log(vlc_object_t *obj, int prio, const char *module,

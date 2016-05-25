@@ -118,6 +118,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     msg.file = file;
     msg.line = line;
     msg.func = func;
+    msg.tid = vlc_thread_id();
 
     for (vlc_object_t *o = obj; o != NULL; o = o->p_parent)
         if (o->psz_header != NULL)

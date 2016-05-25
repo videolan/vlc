@@ -52,6 +52,7 @@ static void Log(void *opaque, int type, const vlc_log_t *meta,
         "CODE_LINE=%u", meta->line,
         "CODE_FUNC=%s", (meta->func != NULL) ? meta->func : "",
         //"ERRNO=%d"
+        "VLC_TID=%lu" /* change to OBJECT_TID if standardized */, meta->tid,
         "VLC_OBJECT_ID=%"PRIxPTR, meta->i_object_id,
         "VLC_OBJECT_TYPE=%s", meta->psz_object_type,
         "VLC_MODULE=%s", meta->psz_module,
