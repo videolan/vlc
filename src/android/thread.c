@@ -287,7 +287,7 @@ static int vlc_cond_timedwait_common(vlc_cond_t *condvar, vlc_mutex_t *mutex,
         }
     }
 
-    int val = cb(condvar, p_mutex, ts);
+    int val = cb(condvar, mutex, ts);
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
 
