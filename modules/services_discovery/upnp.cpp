@@ -1025,7 +1025,8 @@ bool MediaServer::fetchContents()
     IXML_Document* p_response = _browseAction( psz_objectId_,
                                       "BrowseDirectChildren",
                                       "*",
-                                      "0", /* RequestedCount */
+                                      // Some servers don't understand "0" as "no-limit"
+                                      "1000", /* RequestedCount */
                                       "" /* SortCriteria */
                                       );
     if ( !p_response )
