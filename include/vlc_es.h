@@ -193,6 +193,17 @@ typedef enum video_transform_t
 } video_transform_t;
 
 /**
+ * Video projection mode.
+ */
+typedef enum video_projection_mode_t
+{
+    PROJECTION_MODE_RECTANGULAR = 0,
+    PROJECTION_MODE_EQUIRECTANGULAR,
+
+    PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD = 0x100,
+} video_projection_mode_t;
+
+/**
  * Video color primaries (a.k.a. chromacities)
  */
 typedef enum video_color_primaries_t
@@ -276,6 +287,12 @@ struct video_format_t
     video_color_space_t space;                        /**< YCbCr color space */
     bool b_color_range_full;                    /**< 0-255 instead of 16-235 */
     video_chroma_location_t chroma_location;      /**< YCbCr chroma location */
+
+    video_projection_mode_t projection_mode;            /**< projection mode */
+    float f_pose_yaw_degrees;      /**< view point yaw in degrees ]-180;180] */
+    float f_pose_pitch_degrees;    /**< view point pitch in degrees ]-90;90] */
+    float f_pose_roll_degrees;    /**< view point roll in degrees ]-180;180] */
+    uint32_t i_cubemap_padding; /**< padding in pixels of the cube map faces */
 };
 
 /**
