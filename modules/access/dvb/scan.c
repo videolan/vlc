@@ -1261,7 +1261,7 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
                 {
                     tscfg.i_frequency =  decode_BCD( p_s->i_frequency ) * 1000;
                     tscfg.i_symbolrate =  decode_BCD( p_s->i_symbol_rate ) * 100;
-                    if( p_s->i_polarization > SCAN_POLARIZATION_CIRC_RIGHT )
+                    if( unlikely(p_s->i_polarization > 0x03) )
                         p_s->i_polarization = 0;
 
                     const scan_polarization_t polarizations[] = {
