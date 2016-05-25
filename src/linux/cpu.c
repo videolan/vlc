@@ -1,5 +1,5 @@
 /*****************************************************************************
- * linux_cpu.c: CPU detection code for Linux
+ * linux/cpu.c: CPU detection code for Linux
  *****************************************************************************
  * Copyright (C) 2012 Rémi Denis-Courmont
  *

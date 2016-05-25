@@ -1,5 +1,5 @@
 /*****************************************************************************
- * linux_specific.c: Linux-specific initialization
+ * linux/dirs.c: Linux-specific directories
  *****************************************************************************
  * Copyright © 2008-2012 Rémi Denis-Courmont
  *

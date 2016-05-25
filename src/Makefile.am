@@ -260,6 +260,8 @@ SOURCES_libvlc_darwin = \
 	$(NULL)
 
 SOURCES_libvlc_android = \
+	linux/cpu.c \
+	linux/dirs.c \
 	android/dirs.c \
 	android/thread.c \
 	android/error.c \
@@ -267,13 +269,13 @@ SOURCES_libvlc_android = \
 	android/netconf.c \
 	posix/plugin.c \
 	posix/timer.c \
-	posix/linux_cpu.c \
-	posix/linux_specific.c \
 	android/specific.c \
 	posix/rand.c \
 	$(NULL)
 
 SOURCES_libvlc_linux = \
+	linux/cpu.c \
+	linux/dirs.c \
 	posix/dirs.c \
 	posix/error.c \
 	posix/filesystem.c \
@@ -281,8 +283,6 @@ SOURCES_libvlc_linux = \
 	posix/plugin.c \
 	posix/thread.c \
 	posix/timer.c \
-	posix/linux_cpu.c \
-	posix/linux_specific.c \
 	posix/specific.c \
 	posix/rand.c \
 	$(NULL)
