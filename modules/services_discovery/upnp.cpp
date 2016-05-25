@@ -324,7 +324,9 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
                                                 ITEM_NET );
     } else {
         char* psz_mrl;
-        if( asprintf(&psz_mrl, "upnp://%s?ObjectID=0", desc->location.c_str() ) < 0 )
+        // We might already have some options specified in the location.
+        char opt_delim = desc->location.find( '?' ) == 0 ? '?' : '&';
+        if( asprintf( &psz_mrl, "upnp://%s%cObjectID=0", desc->location.c_str(), opt_delim ) < 0 )
             return false;
 
         p_input_item = input_item_NewDirectory( psz_mrl,
@@ -760,20 +762,19 @@ MediaServer::MediaServer( access_t *p_access, input_item_node_t *node )
     , node_( node )
 
 {
-    vlc_url_t url;
-    vlc_UrlParse( &url, p_access->psz_location );
-    if ( asprintf( &psz_root_, "%s://%s:%u%s", url.psz_protocol,
-                  url.psz_host, url.i_port ? url.i_port : 80, url.psz_path ) < 0 )
-        psz_root_ = NULL;
-
-    if ( url.psz_option && !strncmp( url.psz_option, "ObjectID=", strlen( "ObjectID=" ) ) )
-        psz_objectId_ = strdup( &url.psz_option[strlen( "ObjectID=" )] );
-    vlc_UrlClean( &url );
+    psz_root_ = strdup( p_access->psz_location );
+    char* psz_objectid = strstr( psz_root_, "ObjectID=" );
+    if ( psz_objectid != NULL )
+    {
+        // Remove this parameter from the URL, since it might cause some servers to fail
+        // Keep in mind that we added a '&' or a '?' to the URL, so remove it as well
+        *( psz_objectid - 1) = 0;
+        psz_objectId_ = &psz_objectid[strlen( "ObjectID=" )];
+    }
 }
 
 MediaServer::~MediaServer()
 {
-    free( psz_objectId_ );
     free( psz_root_ );
 }
 
