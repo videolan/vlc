@@ -71,11 +71,11 @@ private:
 private:
     static UpnpInstanceWrapper* s_instance;
     static vlc_mutex_t s_lock;
-    UpnpClient_Handle handle_;
-    vlc_mutex_t callback_lock_; // protect opaque_ and callback_
-    SD::MediaServerList* opaque_;
-    Upnp_FunPtr callback_;
-    int refcount_;
+    UpnpClient_Handle m_handle;
+    vlc_mutex_t m_callback_lock; // protect opaque_ and callback_
+    SD::MediaServerList* m_opaque;
+    Upnp_FunPtr m_callback;
+    int m_refcount;
 };
 
 namespace SD
@@ -112,9 +112,9 @@ private:
     std::string getIconURL( IXML_Element* p_device_elem , const char* psz_base_url );
 
 private:
-    services_discovery_t* p_sd_;
-    std::vector<MediaServerDesc*> list_;
-    vlc_mutex_t lock_;
+    services_discovery_t* m_sd;
+    std::vector<MediaServerDesc*> m_list;
+    vlc_mutex_t m_lock;
 };
 
 }
@@ -131,11 +131,11 @@ public:
     static int run( Upnp_EventType, void *, void *);
 
 private:
-    vlc_sem_t       sem_;
-    vlc_mutex_t     lock_;
-    int             refCount_;
-    Upnp_FunPtr     callback_;
-    void*           cookie_;
+    vlc_sem_t       m_sem;
+    vlc_mutex_t     m_lock;
+    int             m_refCount;
+    Upnp_FunPtr     m_callback;
+    void*           m_cookie;
 };
 
 class MediaServer
@@ -157,10 +157,10 @@ private:
     static int sendActionCb( Upnp_EventType, void *, void *);
 
 private:
-    char* psz_root_;
-    char* psz_objectId_;
-    access_t* access_;
-    input_item_node_t* node_;
+    char* m_psz_root;
+    char* m_psz_objectId;
+    access_t* m_access;
+    input_item_node_t* m_node;
 };
 
 }
