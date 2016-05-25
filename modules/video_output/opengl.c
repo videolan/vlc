@@ -143,6 +143,7 @@ struct vout_display_opengl_t {
     GLfloat    local_value[16];
 
     GLuint vertex_buffer_object;
+    GLuint index_buffer_object;
     GLuint texture_buffer_object[PICTURE_PLANE_MAX];
 
     GLuint *subpicture_buffer_object;
@@ -236,13 +237,13 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
         PRECISION
         "varying vec4 TexCoord0,TexCoord1, TexCoord2;"
         "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
-        "attribute vec2 VertexPosition;"
-        "uniform mat4 RotationMatrix;"
+        "attribute vec3 VertexPosition;"
+        "uniform mat4 OrientationMatrix;"
         "void main() {"
         " TexCoord0 = MultiTexCoord0;"
         " TexCoord1 = MultiTexCoord1;"
         " TexCoord2 = MultiTexCoord2;"
-        " gl_Position = RotationMatrix * vec4(VertexPosition, 0.0, 1.0);"
+        " gl_Position = OrientationMatrix * vec4(VertexPosition, 1.0);"
         "}";
 
     *shader = vgl->CreateShader(GL_VERTEX_SHADER);
@@ -681,12 +682,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
 #ifdef SUPPORTS_SHADERS
     vgl->GenBuffers(1, &vgl->vertex_buffer_object);
+    vgl->GenBuffers(1, &vgl->index_buffer_object);
     vgl->GenBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
 
     /* Initial number of allocated buffer objects for subpictures, will grow dynamically. */
@@ -741,6 +743,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
                 vgl->DeleteShader(vgl->shader[i]);
         }
         vgl->DeleteBuffers(1, &vgl->vertex_buffer_object);
+        vgl->DeleteBuffers(1, &vgl->index_buffer_object);
         vgl->DeleteBuffers(vgl->chroma->plane_count, vgl->texture_buffer_object);
         if (vgl->subpicture_buffer_object_count > 0)
             vgl->DeleteBuffers(vgl->subpicture_buffer_object_count, vgl->subpicture_buffer_object);
@@ -1116,6 +1119,65 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
 }
 #endif
 
+
+static int BuildRectangle(unsigned nbPlanes,
+                          GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
+                          GLushort **indices, unsigned *nbIndices,
+                          float *left, float *top, float *right, float *bottom)
+{
+    *nbVertices = 4;
+    *nbIndices = 6;
+
+    *vertexCoord = malloc(*nbVertices * 3 * sizeof(GLfloat));
+    if (*vertexCoord == NULL)
+        return VLC_ENOMEM;
+    *textureCoord = malloc(nbPlanes * *nbVertices * 2 * sizeof(GLfloat));
+    if (*textureCoord == NULL)
+    {
+        free(*vertexCoord);
+        return VLC_ENOMEM;
+    }
+    *indices = malloc(*nbIndices * sizeof(GLushort));
+    if (*indices == NULL)
+    {
+        free(*textureCoord);
+        free(*vertexCoord);
+        return VLC_ENOMEM;
+    }
+
+    static const GLfloat coord[] = {
+       -1.0,    1.0,    -1.0f,
+       -1.0,    -1.0,   -1.0f,
+       1.0,     1.0,    -1.0f,
+       1.0,     -1.0,   -1.0f
+    };
+
+    memcpy(*vertexCoord, coord, *nbVertices * 3 * sizeof(GLfloat));
+
+    for (unsigned p = 0; p < nbPlanes; ++p)
+    {
+        const GLfloat tex[] = {
+            left[p],  top[p],
+            left[p],  bottom[p],
+            right[p], top[p],
+            right[p], bottom[p]
+        };
+
+        memcpy(*textureCoord + p * *nbVertices * 2, tex,
+               *nbVertices * 2 * sizeof(GLfloat));
+    }
+
+    const GLushort ind[] = {
+        0, 1, 2,
+        2, 1, 3
+    };
+
+    memcpy(*indices, ind, *nbIndices * sizeof(GLushort));
+
+    return VLC_SUCCESS;
+}
+
+
 #ifdef SUPPORTS_SHADERS
 static void DrawWithShaders(vout_display_opengl_t *vgl,
                             float *left, float *top, float *right, float *bottom,
@@ -1137,46 +1199,55 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
         vgl->Uniform4f(vgl->GetUniformLocation(vgl->program[1], "FillColor"), 1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    static const GLfloat vertexCoord[] = {
-        -1.0,  1.0,
-        -1.0, -1.0,
-         1.0,  1.0,
-         1.0, -1.0,
-    };
+    GLfloat *vertexCoord, *textureCoord;
+    GLushort *indices;
+    unsigned nbVertices, nbIndices;
 
-    GLfloat transformMatrix[16];
-    orientationTransformMatrix(transformMatrix, vgl->fmt.orientation);
+    int i_ret = BuildRectangle(vgl->chroma->plane_count,
+                               &vertexCoord, &textureCoord, &nbVertices,
+                               &indices, &nbIndices,
+                               left, top, right, bottom);
+
+    if (i_ret != VLC_SUCCESS)
+        return;
+
+    GLfloat projectionMatrix[16], viewMatrix[16],
+            yRotMatrix[16], xRotMatrix[16],
+            zoomMatrix[16], orientationMatrix[16];
+
+    orientationTransformMatrix(orientationMatrix, vgl->fmt.orientation);
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        const GLfloat textureCoord[] = {
-            left[j],  top[j],
-            left[j],  bottom[j],
-            right[j], top[j],
-            right[j], bottom[j],
-        };
         glActiveTexture(GL_TEXTURE0+j);
         glClientActiveTexture(GL_TEXTURE0+j);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
 
         vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
-        vgl->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
+        vgl->BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
+                        textureCoord + j * nbVertices * 2, GL_STATIC_DRAW);
 
         char attribute[20];
         snprintf(attribute, sizeof(attribute), "MultiTexCoord%1d", j);
         vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[program], attribute));
         vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], attribute), 2, GL_FLOAT, 0, 0, 0);
     }
+    free(textureCoord);
     glActiveTexture(GL_TEXTURE0 + 0);
     glClientActiveTexture(GL_TEXTURE0 + 0);
 
     vgl->BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
-    vgl->BufferData(GL_ARRAY_BUFFER, sizeof(vertexCoord), vertexCoord, GL_STATIC_DRAW);
+    vgl->BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat), vertexCoord, GL_STATIC_DRAW);
+    free(vertexCoord);
+    vgl->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
+    vgl->BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort), indices, GL_STATIC_DRAW);
+    free(indices);
     vgl->EnableVertexAttribArray(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"));
-    vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
+    vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"), 3, GL_FLOAT, 0, 0, 0);
 
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "RotationMatrix"), 1, GL_FALSE, transformMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "OrientationMatrix"), 1, GL_FALSE, orientationMatrix);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    vgl->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
+    glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
 }
 #endif
 
