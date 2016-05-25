@@ -945,15 +945,6 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     }
 
     i_res = UpnpAddToAction( &p_action, "Browse",
-            CONTENT_DIRECTORY_SERVICE_TYPE, "StartingIndex", "0" );
-    if ( i_res != UPNP_E_SUCCESS )
-    {
-        msg_Dbg( access_, "AddToAction 'StartingIndex' failed: %s",
-                UpnpGetErrorMessage( i_res ) );
-        goto browseActionCleanup;
-    }
-
-    i_res = UpnpAddToAction( &p_action, "Browse",
             CONTENT_DIRECTORY_SERVICE_TYPE, "BrowseFlag", psz_browser_flag_ );
 
     if ( i_res != UPNP_E_SUCCESS )
@@ -969,6 +960,15 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     if ( i_res != UPNP_E_SUCCESS )
     {
         msg_Dbg( access_, "AddToAction 'Filter' failed: %s",
+                UpnpGetErrorMessage( i_res ) );
+        goto browseActionCleanup;
+    }
+
+    i_res = UpnpAddToAction( &p_action, "Browse",
+            CONTENT_DIRECTORY_SERVICE_TYPE, "StartingIndex", "0" );
+    if ( i_res != UPNP_E_SUCCESS )
+    {
+        msg_Dbg( access_, "AddToAction 'StartingIndex' failed: %s",
                 UpnpGetErrorMessage( i_res ) );
         goto browseActionCleanup;
     }
