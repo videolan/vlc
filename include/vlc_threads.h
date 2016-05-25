@@ -3,7 +3,7 @@
  * This header provides portable declarations for mutexes & conditions
  *****************************************************************************
  * Copyright (C) 1999, 2002 VLC authors and VideoLAN
- * Copyright © 2007-2008 Rémi Denis-Courmont
+ * Copyright © 2007-2016 Rémi Denis-Courmont
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -598,6 +598,57 @@ VLC_API int vlc_threadvar_set(vlc_threadvar_t key, void *value);
  * or NULL if no value was set.
  */
 VLC_API void *vlc_threadvar_get(vlc_threadvar_t);
+
+/**
+ * Waits on an address.
+ *
+ * Puts the calling thread to sleep if a specific value is stored at a
+ * specified address. If the value does not match, do nothing and return
+ * immediately.
+ *
+ * \param addr address to check for
+ * \param val value to match at the address
+ */
+void vlc_addr_wait(void *addr, int val);
+
+/**
+ * Waits on an address with a time-out.
+ *
+ * This function operates as vlc_addr_wait() but provides an additional
+ * time-out. If the time-out elapses, the thread resumes and the function
+ * returns.
+ *
+ * \param addr address to check for
+ * \param val value to match at the address
+ * \param delay time-out duration
+ *
+ * \return true if the function was woken up before the time-out,
+ * false if the time-out elapsed.
+ */
+bool vlc_addr_timedwait(void *addr, int val, mtime_t delay);
+
+/**
+ * Wakes up one thread on an address.
+ *
+ * Wakes up (at least) one of the thread sleeping on the specified address.
+ * The address must be equal to the first parameter given by at least one
+ * thread sleeping within the vlc_addr_wait() or vlc_addr_timedwait()
+ * functions. If no threads are found, this function does nothing.
+ *
+ * \param addr address identifying which threads may be woken up
+ */
+void vlc_addr_signal(void *addr);
+
+/**
+ * Wakes up all thread on an address.
+ *
+ * Wakes up all threads sleeping on the specified address (if any).
+ * Any thread sleeping within a call to vlc_addr_wait() or vlc_addr_timedwait()
+ * with the specified address as first call parameter will be woken up.
+ *
+ * \param addr address identifying which threads to wake up
+ */
+void vlc_addr_broadcast(void *addr);
 
 /**
  * Creates and starts a new thread.

@@ -22,11 +22,20 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/syscall.h>
+#include <linux/futex.h>
+
+#ifndef FUTEX_PRIVATE_FLAG
+#define FUTEX_WAKE_PRIVATE FUTEX_WAKE
+#define FUTEX_WAIT_PRIVATE FUTEX_WAIT
+#endif
+
+#include <vlc_common.h>
 
 unsigned long vlc_thread_id(void)
 {
@@ -36,4 +45,43 @@ unsigned long vlc_thread_id(void)
          tid = syscall(__NR_gettid);
 
      return tid;
+}
+
+static int sys_futex(void *addr, int op, int val, const struct timespec *to,
+                     void *addr2, int val3)
+{
+    return syscall(SYS_futex, addr, op, val, to, addr2, val3);
+}
+
+static int vlc_futex_wake(void *addr, int nr)
+{
+    return sys_futex(addr, FUTEX_WAKE_PRIVATE, nr, NULL, NULL, 0);
+}
+
+static int vlc_futex_wait(void *addr, int val, const struct timespec *to)
+{
+    return sys_futex(addr, FUTEX_WAIT_PRIVATE, val, to, NULL, 0);
+}
+
+void vlc_addr_signal(void *addr)
+{
+    vlc_futex_wake(addr, 1);
+}
+
+void vlc_addr_broadcast(void *addr)
+{
+    vlc_futex_wake(addr, INT_MAX);
+}
+
+void vlc_addr_wait(void *addr, int val)
+{
+    vlc_futex_wait(addr, val, NULL);
+}
+
+bool vlc_addr_timedwait(void *addr, int val, mtime_t delay)
+{
+    lldiv_t d = lldiv(delay, CLOCK_FREQ);
+    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
+
+    return (vlc_futex_wait(addr, val, &ts) == 0 || errno != ETIMEDOUT);
 }
