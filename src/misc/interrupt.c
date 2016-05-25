@@ -528,7 +528,7 @@ ssize_t vlc_read_i11e(int fd, void *buf, size_t count)
 ssize_t vlc_write_i11e(int fd, const void *buf, size_t count)
 {
     struct iovec iov = { (void *)buf, count };
-    return writev(fd, &iov, 1);
+    return vlc_writev_i11e(fd, &iov, 1);
 }
 
 ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
