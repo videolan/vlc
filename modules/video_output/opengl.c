@@ -30,6 +30,7 @@
 #endif
 
 #include <assert.h>
+#include <math.h>
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
@@ -200,6 +201,11 @@ struct vout_display_opengl_t {
 
     uint8_t *texture_temp_buf;
     int      texture_temp_buf_size;
+
+    /* View point */
+    float f_teta;
+    float f_phi;
+    float f_zoom;
 };
 
 static inline int GetAlignedSize(unsigned size)
@@ -239,11 +245,16 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
         "attribute vec4 MultiTexCoord0,MultiTexCoord1,MultiTexCoord2;"
         "attribute vec3 VertexPosition;"
         "uniform mat4 OrientationMatrix;"
+        "uniform mat4 ProjectionMatrix;"
+        "uniform mat4 ViewMatrix;"
+        "uniform mat4 XRotMatrix;"
+        "uniform mat4 YRotMatrix;"
+        "uniform mat4 ZoomMatrix;"
         "void main() {"
         " TexCoord0 = MultiTexCoord0;"
         " TexCoord1 = MultiTexCoord1;"
         " TexCoord2 = MultiTexCoord2;"
-        " gl_Position = OrientationMatrix * vec4(VertexPosition, 1.0);"
+        " gl_Position = OrientationMatrix * ProjectionMatrix * ZoomMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);"
         "}";
 
     *shader = vgl->CreateShader(GL_VERTEX_SHADER);
@@ -678,6 +689,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #endif
     }
 
+    if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
+        || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
+    {
+        vgl->f_teta = vgl->fmt.f_pose_roll_degrees / 180. * M_PI;
+        vgl->f_phi  = vgl->fmt.f_pose_yaw_degrees  / 180. * M_PI;
+    }
+
     /* */
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -1000,6 +1018,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     return VLC_SUCCESS;
 }
 
+#ifdef SUPPORTS_SHADERS
 static const GLfloat identity[] = {
     1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f,
@@ -1007,8 +1026,72 @@ static const GLfloat identity[] = {
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
-void orientationTransformMatrix(GLfloat matrix[static 16], video_orientation_t orientation) {
+static void getViewMatrix(GLfloat matrix[static 16]) {
+    // 90° rotation on the Y axis
+    const GLfloat m[] = {
+        0.0f,  0.0f, 1.0f, 0.0f,
+        0.0f,  1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f,  0.0f, 0.0f, 1.0f
+    };
 
+     memcpy(matrix, m, sizeof(m));
+}
+
+static void getYRotMatrix(float teta, GLfloat matrix[static 16]) {
+
+    const GLfloat m[] = {
+        cos(teta), 0.0f, -sin(teta), 0.0f,
+        0.0f,      1.0f, 0.0f,       0.0f,
+        sin(teta), 0.0f, cos(teta),  0.0f,
+        0.0f,      0.0f, 0.0f,       1.0f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+static void getXRotMatrix(float phi, GLfloat matrix[static 16]) {
+
+    const GLfloat m[] = {
+        1.0f, 0.0f,      0.0f,     0.0f,
+        0.0f, cos(phi),  sin(phi), 0.0f,
+        0.0f, -sin(phi), cos(phi), 0.0f,
+        0.0f, 0.0f,      0.0f,     1.0f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
+
+    const GLfloat m[] = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, zoom, 1.0f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+static void getProjectionMatrix(float sar, GLfloat matrix[static 16]) {
+
+    float f = 3;
+    float n = 0.1;
+
+    float fovy = M_PI / 3;
+    float d = 1 / tan(fovy / 2);
+
+    const GLfloat m[] = {
+        d / sar, 0.0, 0.0,                   0.0,
+        0.0,     d,   0.0,                   0.0,
+        0.0,     0.0, (n + f) / (n - f),     -1.0,
+        0.0,     0.0, (2 * n * f) / (n - f), 0.0};
+
+     memcpy(matrix, m, sizeof(m));
+}
+
+void orientationTransformMatrix(GLfloat matrix[static 16], video_orientation_t orientation) {
     memcpy(matrix, identity, sizeof(identity));
 
     const int k_cos_pi = -1;
@@ -1069,6 +1152,7 @@ void orientationTransformMatrix(GLfloat matrix[static 16], video_orientation_t o
         matrix[1 * 4 + 1] = cos;
     }
 }
+#endif
 
 #ifdef SUPPORTS_FIXED_PIPELINE
 static void DrawWithoutShaders(vout_display_opengl_t *vgl,
@@ -1119,6 +1203,213 @@ static void DrawWithoutShaders(vout_display_opengl_t *vgl,
 }
 #endif
 
+#ifdef SUPPORTS_SHADERS
+static int BuildSphere(unsigned nbPlanes,
+                        GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
+                        GLushort **indices, unsigned *nbIndices,
+                        float *left, float *top, float *right, float *bottom)
+{
+    float radius = 1;
+    unsigned nbLatBands = 128;
+    unsigned nbLonBands = 128;
+
+    *nbVertices = (nbLatBands + 1) * (nbLonBands + 1);
+    *nbIndices = nbLatBands * nbLonBands * 3 * 2;
+
+    *vertexCoord = malloc(*nbVertices * 3 * sizeof(GLfloat));
+    if (*vertexCoord == NULL)
+        return VLC_ENOMEM;
+    *textureCoord = malloc(nbPlanes * *nbVertices * 2 * sizeof(GLfloat));
+    if (*textureCoord == NULL)
+    {
+        free(*vertexCoord);
+        return VLC_ENOMEM;
+    }
+    *indices = malloc(*nbIndices * sizeof(GLushort));
+    if (*indices == NULL)
+    {
+        free(*textureCoord);
+        free(*vertexCoord);
+        return VLC_ENOMEM;
+    }
+
+    for (unsigned lat = 0; lat <= nbLatBands; lat++) {
+        float theta = lat * M_PI / nbLatBands;
+        float sinTheta = sin(theta);
+        float cosTheta = cos(theta);
+
+        for (unsigned lon = 0; lon <= nbLonBands; lon++) {
+            float phi = lon * 2 * M_PI / nbLonBands;
+            float sinPhi = sin(phi);
+            float cosPhi = cos(phi);
+
+            float x = cosPhi * sinTheta;
+            float y = cosTheta;
+            float z = sinPhi * sinTheta;
+
+            unsigned off1 = (lat * (nbLonBands + 1) + lon) * 3;
+            (*vertexCoord)[off1] = radius * x;
+            (*vertexCoord)[off1 + 1] = radius * y;
+            (*vertexCoord)[off1 + 2] = radius * z;
+
+            for (unsigned p = 0; p < nbPlanes; ++p)
+            {
+                unsigned off2 = (p * (nbLatBands + 1) * (nbLonBands + 1)
+                                + lat * (nbLonBands + 1) + lon) * 2;
+                float width = right[p] - left[p];
+                float height = bottom[p] - top[p];
+                float u = (float)lon / nbLonBands * width;
+                float v = (float)lat / nbLatBands * height;
+                (*textureCoord)[off2] = u;
+                (*textureCoord)[off2 + 1] = v;
+            }
+        }
+    }
+
+    for (unsigned lat = 0; lat < nbLatBands; lat++) {
+        for (unsigned lon = 0; lon < nbLonBands; lon++) {
+            unsigned first = (lat * (nbLonBands + 1)) + lon;
+            unsigned second = first + nbLonBands + 1;
+
+            unsigned off = (lat * nbLatBands + lon) * 3 * 2;
+
+            (*indices)[off] = first;
+            (*indices)[off + 1] = second;
+            (*indices)[off + 2] = first + 1;
+
+            (*indices)[off + 3] = second;
+            (*indices)[off + 4] = second + 1;
+            (*indices)[off + 5] = first + 1;
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
+
+static int BuildCube(unsigned nbPlanes,
+                     float padW, float padH,
+                     GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
+                     GLushort **indices, unsigned *nbIndices,
+                     float *left, float *top, float *right, float *bottom)
+{
+    *nbVertices = 4 * 6;
+    *nbIndices = 6 * 6;
+
+    *vertexCoord = malloc(*nbVertices * 3 * sizeof(GLfloat));
+    if (*vertexCoord == NULL)
+        return VLC_ENOMEM;
+    *textureCoord = malloc(nbPlanes * *nbVertices * 2 * sizeof(GLfloat));
+    if (*textureCoord == NULL)
+    {
+        free(*vertexCoord);
+        return VLC_ENOMEM;
+    }
+    *indices = malloc(*nbIndices * sizeof(GLushort));
+    if (*indices == NULL)
+    {
+        free(*textureCoord);
+        free(*vertexCoord);
+        return VLC_ENOMEM;
+    }
+
+    static const GLfloat coord[] = {
+        -1.0,    1.0,    -1.0f, // front
+        -1.0,    -1.0,   -1.0f,
+        1.0,     1.0,    -1.0f,
+        1.0,     -1.0,   -1.0f,
+
+        -1.0,    1.0,    1.0f, // back
+        -1.0,    -1.0,   1.0f,
+        1.0,     1.0,    1.0f,
+        1.0,     -1.0,   1.0f,
+
+        -1.0,    1.0,    -1.0f, // left
+        -1.0,    -1.0,   -1.0f,
+        -1.0,     1.0,    1.0f,
+        -1.0,     -1.0,   1.0f,
+
+        1.0f,    1.0,    -1.0f, // right
+        1.0f,   -1.0,    -1.0f,
+        1.0f,   1.0,     1.0f,
+        1.0f,   -1.0,    1.0f,
+
+        -1.0,    -1.0,    1.0f, // bottom
+        -1.0,    -1.0,   -1.0f,
+        1.0,     -1.0,    1.0f,
+        1.0,     -1.0,   -1.0f,
+
+        -1.0,    1.0,    1.0f, // top
+        -1.0,    1.0,   -1.0f,
+        1.0,     1.0,    1.0f,
+        1.0,     1.0,   -1.0f,
+    };
+
+    memcpy(*vertexCoord, coord, *nbVertices * 3 * sizeof(GLfloat));
+
+    for (unsigned p = 0; p < nbPlanes; ++p)
+    {
+        float width = right[p] - left[p];
+        float height = bottom[p] - top[p];
+
+        float col[] = {left[p],
+                       left[p] + width * 1.f/3,
+                       left[p] + width * 2.f/3,
+                       left[p] + width};
+
+        float row[] = {top[p],
+                       top[p] + height * 1.f/2,
+                       top[p] + height};
+
+        const GLfloat tex[] = {
+            col[1] + padW, row[1] + padH, // front
+            col[1] + padW, row[2] - padH,
+            col[2] - padW, row[1] + padH,
+            col[2] - padW, row[2] - padH,
+
+            col[3] - padW, row[1] + padH, // back
+            col[3] - padW, row[2] - padH,
+            col[2] + padW, row[1] + padH,
+            col[2] + padW, row[2] - padH,
+
+            col[2] - padW, row[0] + padH, // left
+            col[2] - padW, row[1] - padH,
+            col[1] + padW, row[0] + padH,
+            col[1] + padW, row[1] - padH,
+
+            col[0] + padW, row[0] + padH, // right
+            col[0] + padW, row[1] - padH,
+            col[1] - padW, row[0] + padH,
+            col[1] - padW, row[1] - padH,
+
+            col[0] + padW, row[2] - padH, // bottom
+            col[0] + padW, row[1] + padH,
+            col[1] - padW, row[2] - padH,
+            col[1] - padW, row[1] + padH,
+
+            col[2] + padW, row[0] + padH, // top
+            col[2] + padW, row[1] - padH,
+            col[3] - padW, row[0] + padH,
+            col[3] - padW, row[1] - padH,
+        };
+
+        memcpy(*textureCoord + p * *nbVertices * 2, tex,
+               *nbVertices * 2 * sizeof(GLfloat));
+    }
+
+    const GLushort ind[] = {
+        0, 1, 2,       2, 1, 3, // front
+        6, 7, 4,       4, 7, 5, // back
+        10, 11, 8,     8, 11, 9, // left
+        12, 13, 14,    14, 13, 15, // right
+        18, 19, 16,    16, 19, 17, // bottom
+        20, 21, 22,    22, 21, 23, // top
+    };
+
+    memcpy(*indices, ind, *nbIndices * sizeof(GLushort));
+
+    return VLC_SUCCESS;
+}
 
 static int BuildRectangle(unsigned nbPlanes,
                           GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
@@ -1177,8 +1468,6 @@ static int BuildRectangle(unsigned nbPlanes,
     return VLC_SUCCESS;
 }
 
-
-#ifdef SUPPORTS_SHADERS
 static void DrawWithShaders(vout_display_opengl_t *vgl,
                             float *left, float *top, float *right, float *bottom,
                             int program)
@@ -1203,10 +1492,33 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     GLushort *indices;
     unsigned nbVertices, nbIndices;
 
-    int i_ret = BuildRectangle(vgl->chroma->plane_count,
+    int i_ret;
+    switch (vgl->fmt.projection_mode)
+    {
+    case PROJECTION_MODE_RECTANGULAR:
+        i_ret = BuildRectangle(vgl->chroma->plane_count,
                                &vertexCoord, &textureCoord, &nbVertices,
                                &indices, &nbIndices,
                                left, top, right, bottom);
+        break;
+    case PROJECTION_MODE_EQUIRECTANGULAR:
+        i_ret = BuildSphere(vgl->chroma->plane_count,
+                            &vertexCoord, &textureCoord, &nbVertices,
+                            &indices, &nbIndices,
+                            left, top, right, bottom);
+        break;
+    case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
+        i_ret = BuildCube(vgl->chroma->plane_count,
+                          (float)vgl->fmt.i_cubemap_padding / vgl->fmt.i_width,
+                          (float)vgl->fmt.i_cubemap_padding / vgl->fmt.i_height,
+                          &vertexCoord, &textureCoord, &nbVertices,
+                          &indices, &nbIndices,
+                          left, top, right, bottom);
+        break;
+    default:
+        i_ret = VLC_EGENERIC;
+        break;
+    }
 
     if (i_ret != VLC_SUCCESS)
         return;
@@ -1216,6 +1528,25 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
             zoomMatrix[16], orientationMatrix[16];
 
     orientationTransformMatrix(orientationMatrix, vgl->fmt.orientation);
+
+    if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
+        || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
+    {
+        float sar = vgl->fmt.i_visible_width / vgl->fmt.i_visible_height;
+        getProjectionMatrix(sar, projectionMatrix);
+        getViewMatrix(viewMatrix);
+        getYRotMatrix(vgl->f_teta, yRotMatrix);
+        getXRotMatrix(vgl->f_phi, xRotMatrix);
+        getZoomMatrix(vgl->f_zoom, zoomMatrix);
+    }
+    else
+    {
+        memcpy(projectionMatrix, identity, sizeof(identity));
+        memcpy(viewMatrix, identity, sizeof(identity));
+        memcpy(yRotMatrix, identity, sizeof(identity));
+        memcpy(xRotMatrix, identity, sizeof(identity));
+        memcpy(zoomMatrix, identity, sizeof(identity));
+    }
 
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         glActiveTexture(GL_TEXTURE0+j);
@@ -1245,6 +1576,11 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[program], "VertexPosition"), 3, GL_FLOAT, 0, 0, 0);
 
     vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "OrientationMatrix"), 1, GL_FALSE, orientationMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "ProjectionMatrix"), 1, GL_FALSE, projectionMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "ViewMatrix"), 1, GL_FALSE, viewMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "YRotMatrix"), 1, GL_FALSE, yRotMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "XRotMatrix"), 1, GL_FALSE, xRotMatrix);
+    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "ZoomMatrix"), 1, GL_FALSE, zoomMatrix);
 
     vgl->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
     glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_SHORT, 0);
