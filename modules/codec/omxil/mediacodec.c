@@ -38,6 +38,7 @@
 #include <vlc_memory.h>
 #include <vlc_timestamp_helper.h>
 #include <vlc_threads.h>
+#include <vlc_bits.h>
 
 #include "mediacodec.h"
 #include "../../packetizer/h264_nal.h"
@@ -1616,7 +1617,21 @@ static int VideoMP4V_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
         if ((p_block->i_flags & BLOCK_FLAG_TYPE_I))
             p_sys->u.video.b_first_mp4v_iframe = true;
         else
-            return 0;
+        {
+            static const uint8_t p_mp4v_startcode[3] = {0x00, 0x00, 0x01};
+
+            if (p_block->i_buffer > 6
+             && memcmp(p_mp4v_startcode, p_block->p_buffer, 3) == 0
+             && p_block->p_buffer[3] == 0xb6)
+            {
+                bs_t s;
+                bs_init(&s, &p_block->p_buffer[4], 2);
+                if (bs_read(&s, 2) == 0)
+                    p_sys->u.video.b_first_mp4v_iframe = true;
+            }
+        }
+        if (!p_sys->u.video.b_first_mp4v_iframe)
+             return 0; /* Drop current block */
     }
 
     return Video_OnNewBlock(p_dec, pp_block, p_flags);
