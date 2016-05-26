@@ -346,16 +346,15 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
         size_t i_size = 0;
         uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(p_extra, i_extra, &i_size,
                                                  &p_sys->u.video.i_nal_length_size);
-        if (p_buf)
-        {
-            H264SetCSD(p_dec, p_buf, i_size, NULL);
-            free(p_buf);
-        }
+        if (!p_buf)
+            return VLC_EGENERIC;
+
+        int i_ret = H264SetCSD(p_dec, p_buf, i_size, NULL);
+        free(p_buf);
+        return i_ret;
     }
     else
-        H264SetCSD(p_dec, p_extra, i_extra, NULL);
-
-    return VLC_SUCCESS;
+        return H264SetCSD(p_dec, p_extra, i_extra, NULL);
 }
 
 static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
