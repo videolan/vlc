@@ -268,14 +268,14 @@ void vlc_cond_broadcast(vlc_cond_t *wait)
 }
 
 static int vlc_cond_wait_delay(vlc_cond_t *wait, vlc_mutex_t *lock,
-                               mtime_t us)
+                               mtime_t ms)
 {
-    if (us < 0)
-        us = 0;
-    if (us > 0x7fffffff)
-        us = 0x7fffffff;
+    if (ms < 0)
+        ms = 0;
+    if (ms > 0x7fffffff)
+        ms = 0x7fffffff;
 
-    DWORD delay = us;
+    DWORD delay = ms;
     DWORD result;
 
     vlc_testcancel();
@@ -305,7 +305,7 @@ void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
 
 int vlc_cond_timedwait(vlc_cond_t *wait, vlc_mutex_t *lock, mtime_t deadline)
 {
-    return vlc_cond_wait_delay(wait, lock, deadline - mdate());
+    return vlc_cond_wait_delay(wait, lock, (deadline - mdate()) / 1000);
 }
 
 int vlc_cond_timedwait_daytime(vlc_cond_t *wait, vlc_mutex_t *lock,
@@ -315,7 +315,7 @@ int vlc_cond_timedwait_daytime(vlc_cond_t *wait, vlc_mutex_t *lock,
     mtime_t delay;
 
     time(&now);
-    delay = ((mtime_t)deadline - (mtime_t)now) * CLOCK_FREQ;
+    delay = ((mtime_t)deadline - (mtime_t)now) * 1000;
 
     return vlc_cond_wait_delay(wait, lock, delay);
 }
