@@ -63,7 +63,7 @@ struct csd
  * Callback called when a new block is processed from DecodeCommon.
  * It returns -1 in case of error, 0 if block should be dropped, 1 otherwise.
  */
-typedef int (*dec_on_new_block_cb)(decoder_t *, block_t *, int *);
+typedef int (*dec_on_new_block_cb)(decoder_t *, block_t **, int *);
 
 /**
  * Callback called when decoder is flushing.
@@ -147,12 +147,12 @@ static int  OpenDecoderNdk(vlc_object_t *);
 static void CleanDecoder(decoder_t *);
 static void CloseDecoder(vlc_object_t *);
 
-static int Video_OnNewBlock(decoder_t *, block_t *, int *);
+static int Video_OnNewBlock(decoder_t *, block_t **, int *);
 static void Video_OnFlush(decoder_t *);
 static int Video_ProcessOutput(decoder_t *, mc_api_out *, picture_t **, block_t **);
 static picture_t *DecodeVideo(decoder_t *, block_t **);
 
-static int Audio_OnNewBlock(decoder_t *, block_t *, int *);
+static int Audio_OnNewBlock(decoder_t *, block_t **, int *);
 static void Audio_OnFlush(decoder_t *);
 static int Audio_ProcessOutput(decoder_t *, mc_api_out *, picture_t **, block_t **);
 static block_t *DecodeAudio(decoder_t *, block_t **);
@@ -1351,7 +1351,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
         }
 
         /* Parse input block */
-        if ((i_ret = p_sys->pf_on_new_block(p_dec, p_block, &i_flags)) == 1)
+        if ((i_ret = p_sys->pf_on_new_block(p_dec, pp_block, &i_flags)) == 1)
         {
             if (i_flags & (NEWBLOCK_FLAG_FLUSH|NEWBLOCK_FLAG_RESTART))
             {
@@ -1554,9 +1554,10 @@ end:
     }
 }
 
-static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
+static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block = *pp_block;
     bool b_csd_changed = false, b_size_changed = false;
 
     if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
@@ -1626,9 +1627,11 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     return NULL;
 }
 
-static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
+static int Audio_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block = *pp_block;
+    VLC_UNUSED(p_flags);
 
     /* We've just started the stream, wait for the first PTS. */
     if (!date_Get(&p_sys->u.audio.i_end_date))
