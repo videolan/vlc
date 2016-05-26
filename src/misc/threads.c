@@ -49,8 +49,7 @@ void vlc_global_mutex (unsigned n, bool acquire)
         vlc_mutex_unlock (lock);
 }
 
-#ifdef LIBVLC_NEED_CONDVAR
-#include <stdalign.h>
+#if defined(LIBVLC_NEED_SLEEP) || defined(LIBVLC_NEED_CONDVAR)
 #include <vlc_atomic.h>
 
 static void vlc_cancel_addr_prepare(void *addr)
@@ -69,6 +68,30 @@ static void vlc_cancel_addr_finish(void *addr)
     /* Act on cancellation as potential wake-up source */
     vlc_testcancel();
 }
+#endif
+
+#ifdef LIBVLC_NEED_SLEEP
+void (mwait)(mtime_t deadline)
+{
+    mtime_t delay;
+    atomic_int value = ATOMIC_VAR_INIT(0);
+
+    vlc_cancel_addr_prepare(&value);
+
+    while ((delay = (deadline - mdate())) > 0)
+        vlc_addr_timedwait(&value, 0, delay);
+
+    vlc_cancel_addr_finish(&value);
+}
+
+void (msleep)(mtime_t delay)
+{
+    mwait(mdate() + delay);
+}
+#endif
+
+#ifdef LIBVLC_NEED_CONDVAR
+#include <stdalign.h>
 
 static inline atomic_int *vlc_cond_value(vlc_cond_t *cond)
 {
