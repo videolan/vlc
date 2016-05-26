@@ -272,7 +272,7 @@ static int vlc_cond_wait_delay(vlc_cond_t *wait, vlc_mutex_t *lock,
 {
     if (ms < 0)
         ms = 0;
-    if (ms > 0x7fffffff)
+    if (ms > 0x7fffffff && ms != INFINITE)
         ms = 0x7fffffff;
 
     DWORD delay = ms;
