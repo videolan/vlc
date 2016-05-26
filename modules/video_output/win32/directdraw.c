@@ -882,13 +882,22 @@ static int DirectXCreateSurface(vout_display_t *vd,
 
     /* Create the video surface */
     LPDIRECTDRAWSURFACE surface_v1;
-    if (IDirectDraw2_CreateSurface(sys->ddobject, &ddsd, &surface_v1, NULL) != DD_OK)
+    HRESULT hr = IDirectDraw2_CreateSurface(sys->ddobject, &ddsd, &surface_v1, NULL);
+    if (hr == DDERR_INVALIDCAPS)
+    {
+        msg_Dbg(vd, "failed to create a DirectDrawSurface with invalid caps %lx", ddsd.ddsCaps.dwCaps);
         return VLC_EGENERIC;
+    }
+    if (hr != DD_OK)
+    {
+        msg_Dbg(vd, "failed to create a DirectDrawSurface (error %li)", hr);
+        return VLC_EGENERIC;
+    }
 
     /* Now that the surface is created, try to get a newer DirectX interface */
-    HRESULT hr = IDirectDrawSurface_QueryInterface(surface_v1,
-                                                   &IID_IDirectDrawSurface2,
-                                                   (LPVOID *)surface);
+    hr = IDirectDrawSurface_QueryInterface(surface_v1,
+                                           &IID_IDirectDrawSurface2,
+                                           (LPVOID *)surface);
     IDirectDrawSurface_Release(surface_v1);
     if (hr != DD_OK) {
         msg_Err(vd, "cannot query IDirectDrawSurface2 interface (error %li)", hr);
