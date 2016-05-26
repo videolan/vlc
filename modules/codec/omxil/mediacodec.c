@@ -444,7 +444,6 @@ static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 
 static int ParseVideoExtra(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *p_extra = p_dec->fmt_in.p_extra;
     int i_extra = p_dec->fmt_in.i_extra;
 
