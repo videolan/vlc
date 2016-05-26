@@ -440,9 +440,116 @@ retry:
     vlc_mutex_unlock(&super_mutex);
 }
 
+#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
 /*** Futeces^WAddress waits ***/
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+static BOOL (WINAPI *WaitOnAddress_)(VOID volatile *, PVOID, SIZE_T, DWORD);
+#define WaitOnAddress (*WaitOnAddress_)
+static VOID (WINAPI *WakeByAddressAll_)(PVOID);
+#define WakeByAddressAll (*WakeByAddressAll_)
+static VOID (WINAPI *WakeByAddressSingle_)(PVOID);
+#define WakeByAddressSingle (*WakeByAddressSingle_)
 
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+static struct wait_addr_bucket
+{
+    CRITICAL_SECTION lock;
+    CONDITION_VARIABLE wait;
+} wait_addr_buckets[32];
+
+static struct wait_addr_bucket *wait_addr_get_bucket(void volatile *addr)
+{
+    uintptr_t u = (uintptr_t)addr;
+
+    return wait_addr_buckets + ((u >> 3) % ARRAY_SIZE(wait_addr_buckets));
+}
+
+static void vlc_wait_addr_init(void)
+{
+    for (size_t i = 0; i < ARRAY_SIZE(wait_addr_buckets); i++)
+    {
+        struct wait_addr_bucket *bucket = wait_addr_buckets + i;
+
+        InitializeCriticalSection(&bucket->lock);
+        InitializeConditionVariable(&bucket->wait);
+    }
+}
+
+static void vlc_wait_addr_deinit(void)
+{
+    for (size_t i = 0; i < ARRAY_SIZE(wait_addr_buckets); i++)
+    {
+        struct wait_addr_bucket *bucket = wait_addr_buckets + i;
+
+        DeleteCriticalSection(&bucket->lock);
+    }
+}
+
+static BOOL WINAPI WaitOnAddressFallback(void volatile *addr, void *value,
+                                         SIZE_T size, DWORD ms)
+{
+    struct wait_addr_bucket *bucket = wait_addr_get_bucket(addr);
+    uint64_t futex, val = 0;
+    BOOL ret = 0;
+
+    EnterCriticalSection(&bucket->lock);
+
+    switch (size)
+    {
+        case 1:
+            futex = atomic_load_explicit((atomic_char *)addr,
+                                         memory_order_relaxed);
+            val = *(const char *)value;
+            break;
+        case 2:
+            futex = atomic_load_explicit((atomic_short *)addr,
+                                         memory_order_relaxed);
+            val = *(const short *)value;
+            break;
+        case 4:
+            futex = atomic_load_explicit((atomic_int *)addr,
+                                         memory_order_relaxed);
+            val = *(const int *)value;
+            break;
+        case 8:
+            futex = atomic_load_explicit((atomic_llong *)addr,
+                                         memory_order_relaxed);
+            val = *(const long long *)value;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    if (futex == val)
+        ret = SleepConditionVariableCS(&bucket->wait, &bucket->lock, ms);
+
+    LeaveCriticalSection(&bucket->lock);
+    return ret;
+}
+
+static void WINAPI WakeByAddressFallback(void *addr)
+{
+    struct wait_addr_bucket *bucket = wait_addr_get_bucket(addr);
+
+    /* Acquire the bucket critical section (only) to enforce proper sequencing.
+     * The critical section does not protect any actual memory object. */
+    EnterCriticalSection(&bucket->lock);
+    /* No other threads can hold the lock for this bucket while it is held
+     * here. Thus any other thread either:
+     * - is already sleeping in SleepConditionVariableCS(), and to be woken up
+     *   by the following WakeAllConditionVariable(), or
+     * - has yet to retrieve the value at the wait address (with the
+     *   'switch (size)' block). */
+    LeaveCriticalSection(&bucket->lock);
+    /* At this point, other threads can retrieve the value at the wait address.
+     * But the value will have already been changed by our call site, thus
+     * (futex == val) will be false, and the threads will not go to sleep. */
+
+    /* Wake up any thread that was already sleeping. Since there are more than
+     * one wait address per bucket, all threads must be woken up :-/ */
+    WakeAllConditionVariable(&bucket->wait);
+}
+#endif
+
 void vlc_addr_wait(void *addr, int val)
 {
     WaitOnAddress(addr, &val, sizeof (val), -1);
@@ -1041,6 +1148,8 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
     SelectClockSource (VLC_OBJECT(p_libvlc));
 }
 
+#define LOOKUP(s) (((s##_) = (void *)GetProcAddress(h, #s)) != NULL)
+
 extern vlc_rwlock_t config_lock;
 BOOL WINAPI DllMain (HINSTANCE, DWORD, LPVOID);
 
@@ -1052,6 +1161,23 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
+        {
+#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+            HANDLE h = GetModuleHandle(TEXT("kernel32.dll"));
+            if (unlikely(h == NULL))
+                return FALSE;
+
+            if (!LOOKUP(WaitOnAddress)
+             || !LOOKUP(WakeByAddressAll) || !LOOKUP(WakeByAddressSingle))
+            {
+                vlc_wait_addr_init();
+                WaitOnAddress_ = WaitOnAddressFallback;
+                WakeByAddressAll_ = WakeByAddressFallback;
+                WakeByAddressSingle_ = WakeByAddressFallback;
+            }
+#endif
+#endif
             thread_key = TlsAlloc();
             if (unlikely(thread_key == TLS_OUT_OF_INDEXES))
                 return FALSE;
@@ -1061,6 +1187,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             vlc_rwlock_init (&config_lock);
             vlc_CPU_init ();
             break;
+        }
 
         case DLL_PROCESS_DETACH:
             vlc_rwlock_destroy (&config_lock);
@@ -1068,6 +1195,12 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             vlc_mutex_destroy (&super_mutex);
             DeleteCriticalSection (&clock_lock);
             TlsFree(thread_key);
+#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+            if (WaitOnAddress_ == WaitOnAddressFallback)
+                vlc_wait_addr_deinit();
+#endif
+#endif
             break;
 
         case DLL_THREAD_DETACH:
