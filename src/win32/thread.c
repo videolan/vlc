@@ -619,11 +619,12 @@ void vlc_testcancel (void)
         return;
 #endif
 
+    th->killable = true; /* Do not re-enter cancellation cleanup */
+
     for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
         p->proc (p->data);
 
     th->data = NULL; /* TODO: special value? */
-    TlsSetValue(thread_key, NULL);
     if (th->id == NULL) /* Detached thread */
         free(th);
     _endthreadex(0);
