@@ -380,7 +380,6 @@ int OMXCodec_GetQuirks( int i_cat, vlc_fourcc_t i_codec,
 
     if( i_cat == VIDEO_ES )
     {
-        i_quirks |= OMXCODEC_VIDEO_QUIRKS_NEED_SIZE;
         switch( i_codec )
         {
         case VLC_CODEC_H264:
