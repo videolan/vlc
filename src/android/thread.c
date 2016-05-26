@@ -1,7 +1,7 @@
 /*****************************************************************************
  * thread.c : android pthread back-end for LibVLC
  *****************************************************************************
- * Copyright (C) 1999-2012 VLC authors and VideoLAN
+ * Copyright (C) 1999-2016 VLC authors and VideoLAN
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -47,15 +47,6 @@
 #if !defined(HAVE_PTHREAD_CONDATTR_SETCLOCK) && !defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP)
 #error no pthread monotonic clock support
 #endif
-
-/* helper */
-static struct timespec mtime_to_ts (mtime_t date)
-{
-    lldiv_t d = lldiv (date, CLOCK_FREQ);
-    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
-
-    return ts;
-}
 
 /* debug */
 #define vlc_assert(x) do { \
@@ -166,12 +157,16 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 struct vlc_thread
 {
     pthread_t      thread;
-    pthread_cond_t *cond; /// Non-null if thread waiting on cond
-    vlc_mutex_t    lock ; /// Protects cond
     vlc_sem_t      finished;
 
     void *(*entry)(void*);
     void *data;
+
+    struct
+    {
+        void *addr; /// Non-null if waiting on futex
+        vlc_mutex_t lock ; /// Protects futex address
+    } wait;
 
     atomic_bool killed;
     bool killable;
@@ -189,149 +184,13 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
     (void)p_libvlc;
 }
 
-/* cond */
-
-void vlc_cond_init (vlc_cond_t *condvar)
-{
-#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP
-    if (unlikely(pthread_cond_init (condvar, NULL)))
-        abort ();
-#else
-    pthread_condattr_t attr;
-
-    pthread_condattr_init (&attr);
-    pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
-
-    if (unlikely(pthread_cond_init (condvar, &attr)))
-        abort ();
-#endif
-}
-
-void vlc_cond_init_daytime (vlc_cond_t *condvar)
-{
-    if (unlikely(pthread_cond_init (condvar, NULL)))
-        abort ();
-}
-
-void vlc_cond_destroy (vlc_cond_t *condvar)
-{
-    int val = pthread_cond_destroy (condvar);
-    VLC_THREAD_ASSERT ("destroying condition");
-}
-
-void vlc_cond_signal (vlc_cond_t *condvar)
-{
-    int val = pthread_cond_signal (condvar);
-    VLC_THREAD_ASSERT ("signaling condition variable");
-}
-
-void vlc_cond_broadcast (vlc_cond_t *condvar)
-{
-    pthread_cond_broadcast (condvar);
-}
-
-void vlc_cond_wait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex)
-{
-    vlc_thread_t th = thread;
-
-    if (th != NULL)
-    {
-        vlc_testcancel ();
-        if (vlc_mutex_trylock (&th->lock) == 0)
-        {
-            th->cond = condvar;
-            vlc_mutex_unlock (&th->lock);
-        }
-        else
-        {   /* The lock is already held by another thread.
-             * => That other thread has just cancelled this one. */
-            vlc_testcancel ();
-            /* Cancellation did not occur even though this thread is cancelled.
-             * => Cancellation is disabled. */
-            th = NULL;
-        }
-    }
-
-    int val = pthread_cond_wait (condvar, p_mutex);
-    VLC_THREAD_ASSERT ("waiting on condition");
-
-    if (th != NULL)
-    {
-        vlc_mutex_lock(&th->lock);
-        th->cond = NULL;
-        vlc_mutex_unlock(&th->lock);
-        vlc_testcancel();
-    }
-}
-
-typedef int (*vlc_cond_wait_cb)(pthread_cond_t *, pthread_mutex_t *,
-                                const struct timespec *);
-
-static int vlc_cond_timedwait_common(vlc_cond_t *condvar, vlc_mutex_t *mutex,
-                                     const struct timespec *ts,
-                                     vlc_cond_wait_cb cb)
-{
-    vlc_thread_t th = thread;
-
-    if (th != NULL)
-    {
-        vlc_testcancel ();
-        if (vlc_mutex_trylock (&th->lock) == 0)
-        {
-            th->cond = condvar;
-            vlc_mutex_unlock (&th->lock);
-        }
-        else
-        {   /* The lock is already held by another thread.
-             * => That other thread has just cancelled this one. */
-            vlc_testcancel ();
-            /* Cancellation did not occur even though this thread is cancelled.
-             * => Cancellation is disabled. */
-            th = NULL;
-        }
-    }
-
-    int val = cb(condvar, mutex, ts);
-    if (val != ETIMEDOUT)
-        VLC_THREAD_ASSERT ("timed-waiting on condition");
-
-    if (th != NULL)
-    {
-        vlc_mutex_lock(&th->lock);
-        th->cond = NULL;
-        vlc_mutex_unlock(&th->lock);
-        vlc_testcancel();
-    }
-    return val;
-}
-
-int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex, mtime_t deadline)
-{
-    struct timespec ts = mtime_to_ts(deadline);
-
-#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP
-    return vlc_cond_timedwait_common(cond, mutex, &ts,
-                                     pthread_cond_timedwait_monotonic_np);
-#else
-    return vlc_cond_timedwait_common(cond, mutex, &ts, pthread_cond_timedwait);
-#endif
-}
-
-int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
-                               time_t deadline)
-{
-    struct timespec ts = { deadline, 0 };
-
-    return vlc_cond_timedwait_common(cond, mutex, &ts, pthread_cond_timedwait);
-}
-
 /* pthread */
 static void clean_detached_thread(void *data)
 {
     struct vlc_thread *th = data;
 
     /* release thread handle */
-    vlc_mutex_destroy(&th->lock);
+    vlc_mutex_destroy(&th->wait.lock);
     free(th);
 }
 
@@ -344,9 +203,7 @@ static void *detached_thread(void *data)
     vlc_cleanup_push(clean_detached_thread, th);
     th->entry(th->data);
     vlc_cleanup_pop();
-    vlc_mutex_destroy(&th->lock);
-    free(th);
-
+    clean_detached_thread(th);
     return NULL;
 }
 
@@ -397,10 +254,10 @@ static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
         vlc_sem_init(&thread->finished, 0);
     atomic_store(&thread->killed, false);
     thread->killable = true;
-    thread->cond = NULL;
     thread->entry = entry;
     thread->data = data;
-    vlc_mutex_init(&thread->lock);
+    thread->wait.addr = NULL;
+    vlc_mutex_init(&thread->wait.lock);
 
     pthread_attr_t attr;
     pthread_attr_init (&attr);
@@ -430,8 +287,7 @@ void vlc_join (vlc_thread_t handle, void **result)
 
     int val = pthread_join (handle->thread, result);
     VLC_THREAD_ASSERT ("joining thread");
-    vlc_mutex_destroy(&handle->lock);
-    free(handle);
+    clean_detached_thread(handle);
 }
 
 int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
@@ -453,15 +309,18 @@ int vlc_set_priority (vlc_thread_t th, int priority)
 
 void vlc_cancel (vlc_thread_t thread_id)
 {
-    pthread_cond_t *cond;
+    atomic_int *addr;
 
     atomic_store(&thread_id->killed, true);
 
-    vlc_mutex_lock(&thread_id->lock);
-    cond = thread_id->cond;
-    if (cond)
-        pthread_cond_broadcast(cond);
-    vlc_mutex_unlock(&thread_id->lock);
+    vlc_mutex_lock(&thread_id->wait.lock);
+    addr = thread_id->wait.addr;
+    if (addr != NULL)
+    {
+        atomic_fetch_and_explicit(addr, -2, memory_order_relaxed);
+        vlc_addr_broadcast(addr);
+    }
+    vlc_mutex_unlock(&thread_id->wait.lock);
 }
 
 int vlc_savecancel (void)
@@ -492,6 +351,43 @@ void vlc_testcancel (void)
         return;
 
     pthread_exit(NULL);
+}
+
+void vlc_control_cancel(int cmd, ...)
+{
+    vlc_thread_t th = vlc_thread_self();
+    va_list ap;
+
+    va_start(ap, cmd);
+    switch (cmd)
+    {
+        case VLC_CANCEL_ADDR_SET:
+        {
+            void *addr = va_arg(ap, void *);
+
+            vlc_mutex_lock(&th->wait.lock);
+            assert(th->wait.addr == NULL);
+            th->wait.addr = addr;
+            vlc_mutex_unlock(&th->wait.lock);
+            break;
+        }
+
+        case VLC_CANCEL_ADDR_CLEAR:
+        {
+            void *addr = va_arg(ap, void *);
+
+            vlc_mutex_lock(&th->wait.lock);
+            assert(th->wait.addr == addr);
+            th->wait.addr = NULL;
+            (void) addr;
+            vlc_mutex_unlock(&th->wait.lock);
+            break;
+        }
+
+        default:
+            vlc_assert_unreachable ();
+    }
+    va_end(ap);
 }
 
 /* threadvar */
@@ -525,31 +421,6 @@ mtime_t mdate (void)
         abort ();
 
     return (INT64_C(1000000) * ts.tv_sec) + (ts.tv_nsec / 1000);
-}
-
-#undef mwait
-void mwait (mtime_t deadline)
-{
-    vlc_mutex_t lock;
-    vlc_cond_t wait;
-
-    vlc_mutex_init (&lock);
-    vlc_cond_init (&wait);
-
-    vlc_mutex_lock (&lock);
-    mutex_cleanup_push (&lock);
-    while (!vlc_cond_timedwait (&wait, &lock, deadline));
-    vlc_cleanup_pop ();
-    vlc_mutex_unlock (&lock);
-
-    vlc_cond_destroy (&wait);
-    vlc_mutex_destroy (&lock);
-}
-
-#undef msleep
-void msleep (mtime_t delay)
-{
-    mwait (mdate () + delay);
 }
 
 /* cpu */
