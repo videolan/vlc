@@ -1580,7 +1580,8 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
     else if (p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
     {
         /* Adding frame start code */
-        if (!block_Realloc(p_block, 4, p_block->i_buffer))
+        p_block = *pp_block = block_Realloc(p_block, 4, p_block->i_buffer);
+        if (p_block == NULL)
             return VLC_ENOMEM;
         p_block->p_buffer[0] = 0x00;
         p_block->p_buffer[1] = 0x00;
