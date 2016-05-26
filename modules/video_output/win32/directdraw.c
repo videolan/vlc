@@ -864,8 +864,8 @@ static int DirectXCreateSurface(vout_display_t *vd,
         ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
         ddsd.ddpfPixelFormat.dwFourCC = fourcc;
     }
+    ddsd.dwFlags |= DDSD_CAPS;
     if (use_overlay) {
-        ddsd.dwFlags |= DDSD_CAPS;
         ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY | DDSCAPS_VIDEOMEMORY;
         ddsd.ddsCaps.dwCaps |= DDSCAPS_FLIP | DDSCAPS_FRONTBUFFER;
         if (backbuffer_count > 0)
@@ -876,7 +876,6 @@ static int DirectXCreateSurface(vout_display_t *vd,
             ddsd.dwBackBufferCount = backbuffer_count;
         }
     } else {
-        ddsd.dwFlags |= DDSD_CAPS;
         ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
         if (use_sysmem)
             ddsd.ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
