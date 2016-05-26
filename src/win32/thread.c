@@ -58,6 +58,12 @@ struct vlc_thread
 
     void        *(*entry) (void *);
     void          *data;
+
+    struct
+    {
+        atomic_int      *addr;
+        CRITICAL_SECTION lock;
+    } wait;
 };
 
 /*** Common helpers ***/
@@ -207,113 +213,6 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
     }
 
     LeaveCriticalSection (&p_mutex->mutex);
-}
-
-/*** Condition variables ***/
-void vlc_cond_init(vlc_cond_t *wait)
-{
-    wait->semaphore = CreateSemaphore(NULL, 0, 0x7FFFFFFF, NULL);
-    if (unlikely(wait->semaphore == NULL))
-        abort();
-    wait->waiters = 0;
-}
-
-void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
-{
-    vlc_cond_init (p_condvar);
-}
-
-void vlc_cond_destroy(vlc_cond_t *wait)
-{
-    CloseHandle(wait->semaphore);
-}
-
-static LONG InterlockedDecrementNonZero(LONG volatile *dst)
-{
-    LONG cmp, val = 1;
-
-    do
-    {
-        cmp = val;
-        val = InterlockedCompareExchange(dst, val - 1, val);
-        if (val == 0)
-            return 0;
-    }
-    while (cmp != val);
-
-    return val;
-}
-
-void vlc_cond_signal(vlc_cond_t *wait)
-{
-    if (wait->semaphore == NULL)
-        return;
-
-    if (InterlockedDecrementNonZero(&wait->waiters) > 0)
-        ReleaseSemaphore(wait->semaphore, 1, NULL);
-}
-
-void vlc_cond_broadcast(vlc_cond_t *wait)
-{
-    if (wait->semaphore == NULL)
-        return;
-
-    LONG waiters = InterlockedExchange(&wait->waiters, 0);
-    if (waiters > 0)
-        ReleaseSemaphore(wait->semaphore, waiters, NULL);
-}
-
-static int vlc_cond_wait_delay(vlc_cond_t *wait, vlc_mutex_t *lock,
-                               mtime_t ms)
-{
-    if (ms < 0)
-        ms = 0;
-    if (ms > 0x7fffffff && ms != INFINITE)
-        ms = 0x7fffffff;
-
-    DWORD delay = ms;
-    DWORD result;
-
-    vlc_testcancel();
-
-    if (wait->semaphore == NULL)
-    {   /* FIXME FIXME FIXME */
-        vlc_mutex_unlock(lock);
-        result = SleepEx((delay > 50u) ? 50u : delay, TRUE);
-    }
-    else
-    {
-        InterlockedIncrement(&wait->waiters);
-        vlc_mutex_unlock(lock);
-        result = vlc_WaitForSingleObject(wait->semaphore, delay);
-    }
-    vlc_mutex_lock(lock);
-
-    if (result == WAIT_IO_COMPLETION)
-        vlc_testcancel();
-    return result == WAIT_TIMEOUT ? ETIMEDOUT : 0;
-}
-
-void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
-{
-    vlc_cond_wait_delay(wait, lock, INFINITE);
-}
-
-int vlc_cond_timedwait(vlc_cond_t *wait, vlc_mutex_t *lock, mtime_t deadline)
-{
-    return vlc_cond_wait_delay(wait, lock, (deadline + 999 - mdate()) / 1000);
-}
-
-int vlc_cond_timedwait_daytime(vlc_cond_t *wait, vlc_mutex_t *lock,
-                               time_t deadline)
-{
-    time_t now;
-    mtime_t delay;
-
-    time(&now);
-    delay = ((mtime_t)deadline - (mtime_t)now) * 1000;
-
-    return vlc_cond_wait_delay(wait, lock, delay);
 }
 
 /*** Semaphore ***/
@@ -616,6 +515,12 @@ static bool isCancelled(void)
 }
 #endif
 
+static void vlc_thread_destroy(vlc_thread_t th)
+{
+    DeleteCriticalSection(&th->wait.lock);
+    free(th);
+}
+
 static unsigned __stdcall vlc_entry (void *p)
 {
     struct vlc_thread *th = p;
@@ -626,7 +531,7 @@ static unsigned __stdcall vlc_entry (void *p)
     TlsSetValue(thread_key, NULL);
 
     if (th->id == NULL) /* Detached thread */
-        free(th);
+        vlc_thread_destroy(th);
     return 0;
 }
 
@@ -641,6 +546,8 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     th->killable = false; /* not until vlc_entry() ! */
     atomic_init(&th->killed, false);
     th->cleaners = NULL;
+    th->wait.addr = NULL;
+    InitializeCriticalSection(&th->wait.lock);
 
     /* When using the MSVCRT C library you have to use the _beginthreadex
      * function instead of CreateThread, otherwise you'll end up with
@@ -686,7 +593,7 @@ void vlc_join (vlc_thread_t th, void **result)
     if (result != NULL)
         *result = th->data;
     CloseHandle (th->id);
-    free (th);
+    vlc_thread_destroy(th);
 }
 
 int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
@@ -729,6 +636,15 @@ static void CALLBACK vlc_cancel_self (ULONG_PTR self)
 void vlc_cancel (vlc_thread_t th)
 {
     atomic_store_explicit(&th->killed, true, memory_order_relaxed);
+
+    EnterCriticalSection(&th->wait.lock);
+    if (th->wait.addr != NULL)
+    {
+        atomic_fetch_and_explicit(th->wait.addr, -2, memory_order_relaxed);
+        vlc_addr_broadcast(th->wait.addr);
+    }
+    LeaveCriticalSection(&th->wait.lock);
+
 #if IS_INTERRUPTIBLE
     QueueUserAPC (vlc_cancel_self, th->id, (uintptr_t)th);
 #endif
@@ -774,7 +690,7 @@ void vlc_testcancel (void)
 
     th->data = NULL; /* TODO: special value? */
     if (th->id == NULL) /* Detached thread */
-        free(th);
+        vlc_thread_destroy(th);
     _endthreadex(0);
 }
 
@@ -804,6 +720,27 @@ void vlc_control_cancel (int cmd, ...)
         case VLC_CLEANUP_POP:
         {
             th->cleaners = th->cleaners->next;
+            break;
+        }
+
+        case VLC_CANCEL_ADDR_SET:
+        {
+            void *addr = va_arg(ap, void *);
+
+            EnterCriticalSection(&th->wait.lock);
+            th->wait.addr = addr;
+            LeaveCriticalSection(&th->wait.lock);
+            break;
+        }
+
+        case VLC_CANCEL_ADDR_CLEAR:
+        {
+            void *addr = va_arg(ap, void *);
+
+            EnterCriticalSection(&th->wait.lock);
+            assert(th->wait.addr == addr);
+            th->wait.addr = NULL;
+            LeaveCriticalSection(&th->wait.lock);
             break;
         }
     }
