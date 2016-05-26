@@ -1344,7 +1344,8 @@ static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface
 
     HRESULT hr = IDirectDrawSurface2_UpdateOverlay(surface,
                                                    &src, sys->display, &dst,
-                                                   DDOVER_SHOW | DDOVER_KEYDESTOVERRIDE, &ddofx);
+                                                   DDOVER_SHOW | DDOVER_KEYDESTOVERRIDE | DDOVER_DDFX,
+                                                   &ddofx);
     sys->restore_overlay = hr != DD_OK;
 
     if (hr != DD_OK) {
