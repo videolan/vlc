@@ -185,11 +185,6 @@ vlc_thread_t vlc_thread_self (void)
     return thread;
 }
 
-unsigned long vlc_thread_id (void)
-{
-    return syscall (__NR_gettid);
-}
-
 void vlc_threads_setup (libvlc_int_t *p_libvlc)
 {
     (void)p_libvlc;
