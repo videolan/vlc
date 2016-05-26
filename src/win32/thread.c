@@ -1,7 +1,7 @@
 /*****************************************************************************
  * thread.c : Win32 back-end for LibVLC
  *****************************************************************************
- * Copyright (C) 1999-2009 VLC authors and VideoLAN
+ * Copyright (C) 1999-2016 VLC authors and VideoLAN
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -440,6 +440,39 @@ retry:
     vlc_mutex_unlock(&super_mutex);
 }
 
+/*** Futeces^WAddress waits ***/
+
+#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+void vlc_addr_wait(void *addr, int val)
+{
+    WaitOnAddress(addr, &val, sizeof (val), -1);
+}
+
+bool vlc_addr_timedwait(void *addr, int val, mtime_t delay)
+{
+    delay = (delay + 999) / 1000;
+
+    if (delay > 0x7fffffff)
+    {
+        WaitOnAddress(addr, &val, sizeof (val), 0x7fffffff);
+        return true; /* woke up early, claim spurious wake-up */
+    }
+
+    return WaitOnAddress(addr, &val, sizeof (val), delay);
+}
+
+void vlc_addr_signal(void *addr)
+{
+    WakeByAddressSingle(addr);
+}
+
+void vlc_addr_broadcast(void *addr)
+{
+    WakeByAddressAll(addr);
+}
+#endif
+
+/*** Threads ***/
 #if !IS_INTERRUPTIBLE
 static bool isCancelled(void)
 {
