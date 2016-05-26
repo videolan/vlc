@@ -148,6 +148,10 @@ static void CleanDecoder(decoder_t *);
 static void CloseDecoder(vlc_object_t *);
 
 static int Video_OnNewBlock(decoder_t *, block_t **, int *);
+static int VideoH264_OnNewBlock(decoder_t *, block_t **, int *);
+static int VideoHEVC_OnNewBlock(decoder_t *, block_t **, int *);
+static int VideoMP4V_OnNewBlock(decoder_t *, block_t **, int *);
+static int VideoVC1_OnNewBlock(decoder_t *, block_t **, int *);
 static void Video_OnFlush(decoder_t *);
 static int Video_ProcessOutput(decoder_t *, mc_api_out *, picture_t **, block_t **);
 static picture_t *DecodeVideo(decoder_t *, block_t **);
@@ -687,7 +691,24 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        p_sys->pf_on_new_block = Video_OnNewBlock;
+        switch (p_dec->fmt_in.i_codec)
+        {
+        case VLC_CODEC_H264:
+            p_sys->pf_on_new_block = VideoH264_OnNewBlock;
+            break;
+        case VLC_CODEC_HEVC:
+            p_sys->pf_on_new_block = VideoHEVC_OnNewBlock;
+            break;
+        case VLC_CODEC_MP4V:
+            p_sys->pf_on_new_block = VideoMP4V_OnNewBlock;
+            break;
+        case VLC_CODEC_VC1:
+            p_sys->pf_on_new_block = VideoVC1_OnNewBlock;
+            break;
+        default:
+            p_sys->pf_on_new_block = Video_OnNewBlock;
+            break;
+        }
         p_sys->pf_on_flush = Video_OnFlush;
         p_sys->pf_process_output = Video_ProcessOutput;
         p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
@@ -1131,42 +1152,6 @@ static int Audio_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
     }
 }
 
-static void H264ProcessBlock(decoder_t *p_dec, block_t *p_block,
-                             bool *p_csd_changed, bool *p_size_changed)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    assert(p_dec->fmt_in.i_codec == VLC_CODEC_H264 && p_block);
-
-    if (p_sys->u.video.i_nal_length_size)
-    {
-        h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->u.video.i_nal_length_size);
-    } else if (H264SetCSD(p_dec, p_block->p_buffer, p_block->i_buffer,
-                          p_size_changed) == VLC_SUCCESS)
-    {
-        *p_csd_changed = true;
-    }
-}
-
-static void HEVCProcessBlock(decoder_t *p_dec, block_t *p_block,
-                             bool *p_csd_changed, bool *p_size_changed)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    assert(p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && p_block);
-
-    if (p_sys->u.video.i_nal_length_size)
-    {
-        h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->u.video.i_nal_length_size);
-    }
-
-    /* TODO */
-    VLC_UNUSED(p_csd_changed);
-    VLC_UNUSED(p_size_changed);
-}
-
 static void DecodeFlushLocked(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1558,38 +1543,33 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block = *pp_block;
-    bool b_csd_changed = false, b_size_changed = false;
+    VLC_UNUSED(p_flags);
 
     if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
         && !p_sys->api->b_support_interlaced)
         return -1;
 
-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-        H264ProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
-    else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
-        HEVCProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
-    else if (p_dec->fmt_in.i_codec == VLC_CODEC_MP4V
-          && !p_sys->u.video.b_first_mp4v_iframe)
-    {
-        /* The first input sent to MediaCodec must be an I-Frame */
-        if ((p_block->i_flags & BLOCK_FLAG_TYPE_I))
-            p_sys->u.video.b_first_mp4v_iframe = true;
-        else
-            return 0; /* Drop current block */
-    }
-    else if (p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
-    {
-        /* Adding frame start code */
-        p_block = *pp_block = block_Realloc(p_block, 4, p_block->i_buffer);
-        if (p_block == NULL)
-            return VLC_ENOMEM;
-        p_block->p_buffer[0] = 0x00;
-        p_block->p_buffer[1] = 0x00;
-        p_block->p_buffer[2] = 0x01;
-        p_block->p_buffer[3] = 0x0d;
-    }
+    timestamp_FifoPut(p_sys->u.video.timestamp_fifo,
+                      p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
 
-    if (b_csd_changed)
+    return 1;
+}
+
+static int VideoH264_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
+                                int *p_flags)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block = *pp_block;
+    bool b_size_changed;
+
+    assert(p_dec->fmt_in.i_codec == VLC_CODEC_H264 && p_block);
+
+    if (p_sys->u.video.i_nal_length_size)
+    {
+        h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
+                               p_sys->u.video.i_nal_length_size);
+    } else if (H264SetCSD(p_dec, p_block->p_buffer, p_block->i_buffer,
+                          &b_size_changed) == VLC_SUCCESS)
     {
         if (b_size_changed || !p_sys->api->b_started)
         {
@@ -1604,10 +1584,59 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t **pp_block, int *p_flags)
         }
     }
 
-    timestamp_FifoPut(p_sys->u.video.timestamp_fifo,
-                      p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
+    return Video_OnNewBlock(p_dec, pp_block, p_flags);
+}
 
-    return 1;
+static int VideoHEVC_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
+                                int *p_flags)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block = *pp_block;
+
+    assert(p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && p_block);
+
+    if (p_sys->u.video.i_nal_length_size)
+    {
+        h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
+                               p_sys->u.video.i_nal_length_size);
+    }
+
+    return Video_OnNewBlock(p_dec, pp_block, p_flags);
+}
+
+static int VideoMP4V_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
+                                int *p_flags)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block = *pp_block;
+
+    /* The first input sent to MediaCodec must be an I-Frame */
+    if (!p_sys->u.video.b_first_mp4v_iframe)
+    {
+        if ((p_block->i_flags & BLOCK_FLAG_TYPE_I))
+            p_sys->u.video.b_first_mp4v_iframe = true;
+        else
+            return 0;
+    }
+
+    return Video_OnNewBlock(p_dec, pp_block, p_flags);
+}
+
+static int VideoVC1_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
+                               int *p_flags)
+{
+    block_t *p_block = *pp_block;
+
+    /* Adding frame start code */
+    p_block = *pp_block = block_Realloc(p_block, 4, p_block->i_buffer);
+    if (p_block == NULL)
+        return VLC_ENOMEM;
+    p_block->p_buffer[0] = 0x00;
+    p_block->p_buffer[1] = 0x00;
+    p_block->p_buffer[2] = 0x01;
+    p_block->p_buffer[3] = 0x0d;
+
+    return Video_OnNewBlock(p_dec, pp_block, p_flags);
 }
 
 static void Video_OnFlush(decoder_t *p_dec)
