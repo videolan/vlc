@@ -33,28 +33,14 @@
 TimeTooltip::TimeTooltip( QWidget *parent ) :
     QWidget( parent )
 {
-    setWindowFlags(
-#if defined( Q_OS_WIN )
-                    Qt::ToolTip
-#else
-                    Qt::Window                  |
+    setWindowFlags( Qt::Tool                    |
                     Qt::WindowStaysOnTopHint    |
                     Qt::FramelessWindowHint     |
-                    Qt::X11BypassWindowManagerHint
-#endif
-                    );
+                    Qt::X11BypassWindowManagerHint );
 
     // Tell Qt that it doesn't need to erase the background before
     // a paintEvent occurs. This should save some CPU cycles.
     setAttribute( Qt::WA_OpaquePaintEvent );
-
-#if defined( Q_OS_WIN ) || defined( Q_OS_OS2 )
-    /*
-    - This attribute is required on Windows and OS/2 to avoid focus stealing of other windows.
-    - When set on Linux the TimeTooltip appears behind the FSController in fullscreen.
-    */
-    setAttribute( Qt::WA_ShowWithoutActivating );
-#endif
 
     // Inherit from the system default font size -5
     mFont = QFont( "Verdana", qMax( qApp->font().pointSize() - 5, 7 ) );
@@ -83,7 +69,11 @@ void TimeTooltip::adjustPosition()
 
     // The desired label position is just above the target
     QPoint position( mTarget.x() - size.width() / 2,
+#if defined( Q_OS_WIN )
+        mTarget.y() - 2 * size.height() - TIP_HEIGHT / 2 );
+#else
         mTarget.y() - size.height() + TIP_HEIGHT / 2 );
+#endif
 
     // Keep the tooltip on the same screen if possible
     QRect screen = QApplication::desktop()->screenGeometry( mTarget );
