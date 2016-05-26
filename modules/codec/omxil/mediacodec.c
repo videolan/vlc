@@ -396,9 +396,11 @@ static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     return CSDDup(p_dec, &csd, 1);
 }
 
-static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+static int ParseVideoExtra(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    uint8_t *p_extra = p_dec->fmt_in.p_extra;
+    int i_extra = p_dec->fmt_in.i_extra;
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
      || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
@@ -437,11 +439,11 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     }
     else if (p_dec->fmt_in.i_codec == VLC_CODEC_WMV3)
     {
-        return ParseVideoExtraWmv3(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+        return ParseVideoExtraWmv3(p_dec, p_extra, i_extra);
     }
     else if (p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
     {
-        return ParseVideoExtraVc1(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+        return ParseVideoExtraVc1(p_dec, p_extra, i_extra);
     }
     return VLC_SUCCESS;
 }
@@ -452,36 +454,22 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 static int StartMediaCodec(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_ret = 0;
     union mc_api_args args;
 
-    if (p_dec->fmt_in.i_extra && !p_sys->pp_csd)
+    if (((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->pp_csd))
     {
-        /* Try first to configure specific Video CSD */
-        if (p_dec->fmt_in.i_cat == VIDEO_ES)
-            i_ret = ParseVideoExtra(p_dec, p_dec->fmt_in.p_extra,
-                                    p_dec->fmt_in.i_extra);
-
-        if (i_ret != VLC_SUCCESS)
-            return i_ret;
-
-        /* Set default CSD if ParseVideoExtra failed to configure one */
-        if (!p_sys->pp_csd)
-        {
-            struct csd csd;
-
-            csd.p_buf = p_dec->fmt_in.p_extra;
-            csd.i_size = p_dec->fmt_in.i_extra;
-            CSDDup(p_dec, &csd, 1);
-        }
+        msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
+                 (const char *)&p_dec->fmt_in.i_codec);
+        return VLC_ENOOBJ;
     }
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
         if (!p_sys->u.video.i_width || !p_sys->u.video.i_height)
         {
-            msg_Err(p_dec, "invalid size, abort MediaCodec");
-            return VLC_EGENERIC;
+            msg_Warn(p_dec, "waiting for a valid video size for codec %4.4s",
+                     (const char *)&p_dec->fmt_in.i_codec);
+            return VLC_ENOOBJ;
         }
         args.video.i_width = p_sys->u.video.i_width;
         args.video.i_height = p_sys->u.video.i_height;
@@ -577,9 +565,9 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
     mc_api *api;
+    int i_ret;
     size_t i_h264_profile = 0;
     const char *mime = NULL;
-    bool b_late_opening = false;
 
     /* Video or Audio if "mediacodec-audio" bool is true */
     if (p_dec->fmt_in.i_cat != VIDEO_ES && (p_dec->fmt_in.i_cat != AUDIO_ES
@@ -712,14 +700,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
         TAB_INIT( p_sys->u.video.i_inflight_pictures,
                   p_sys->u.video.pp_inflight_pictures );
-
-        if ((p_sys->api->i_quirks & MC_API_VIDEO_QUIRKS_NEED_SIZE)
-         && (!p_sys->u.video.i_width || !p_sys->u.video.i_height))
-        {
-            msg_Warn(p_dec, "waiting for a valid video size for codec %4.4s",
-                     (const char *)&p_dec->fmt_in.i_codec);
-            b_late_opening = true;
-        }
     }
     else
     {
@@ -735,21 +715,36 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             goto bailout;
         }
     }
-    if ((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD)
-     && !p_dec->fmt_in.i_extra)
+
+    if (p_dec->fmt_in.i_extra)
     {
-        msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
-                 (const char *)&p_dec->fmt_in.i_codec);
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_MP4V)
+        /* Try first to configure specific Video CSD */
+        if (p_dec->fmt_in.i_cat == VIDEO_ES)
+            if (ParseVideoExtra(p_dec) != VLC_SUCCESS)
+                return VLC_EGENERIC;
+
+        /* Set default CSD if ParseVideoExtra failed to configure one */
+        if (!p_sys->pp_csd)
         {
-            msg_Warn(p_dec, "late opening with MPEG4 not handled"); /* TODO */
-            goto bailout;
+            struct csd csd;
+
+            csd.p_buf = p_dec->fmt_in.p_extra;
+            csd.i_size = p_dec->fmt_in.i_extra;
+            CSDDup(p_dec, &csd, 1);
         }
-        b_late_opening = true;
     }
 
-    if (!b_late_opening && StartMediaCodec(p_dec) != VLC_SUCCESS)
+    i_ret = StartMediaCodec(p_dec);
+    switch (i_ret)
     {
+    case VLC_SUCCESS:
+        break;
+    case VLC_ENOOBJ:
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_MP4V)
+            msg_Warn(p_dec, "late opening with MPEG4 not handled"); /* TODO */
+        else
+            break;
+    default:
         msg_Err(p_dec, "StartMediaCodec failed");
         goto bailout;
     }
@@ -1369,10 +1364,17 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
 
                 if (i_flags & NEWBLOCK_FLAG_RESTART)
                 {
-                    msg_Warn(p_dec, "Restarting from DecodeCommon");
                     StopMediaCodec(p_dec);
-                    if (StartMediaCodec(p_dec) != VLC_SUCCESS)
+
+                    int i_ret = StartMediaCodec(p_dec);
+                    switch (i_ret)
                     {
+                    case VLC_SUCCESS:
+                        msg_Warn(p_dec, "Restarted from DecodeCommon");
+                        break;
+                    case VLC_ENOOBJ:
+                        break;
+                    default:
                         msg_Err(p_dec, "StartMediaCodec failed");
                         AbortDecoderLocked(p_dec);
                         goto end;
@@ -1598,20 +1600,6 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
             msg_Err(p_dec, "SPS/PPS changed during playback. Flush it");
             *p_flags |= NEWBLOCK_FLAG_FLUSH;
         }
-    }
-
-    if (!p_sys->api->b_started)
-    {
-        *p_flags |= NEWBLOCK_FLAG_RESTART;
-
-        /* Don't start if we don't have any csd */
-        if ((p_sys->api->i_quirks & MC_API_QUIRKS_NEED_CSD) && !p_sys->pp_csd)
-            *p_flags &= ~NEWBLOCK_FLAG_RESTART;
-
-        /* Don't start if we don't have a valid video size */
-        if ((p_sys->api->i_quirks & MC_API_VIDEO_QUIRKS_NEED_SIZE)
-         && (!p_sys->u.video.i_width || !p_sys->u.video.i_height))
-            *p_flags &= ~NEWBLOCK_FLAG_RESTART;
     }
 
     timestamp_FifoPut(p_sys->u.video.timestamp_fifo,
