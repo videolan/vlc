@@ -641,12 +641,8 @@ bool matroska_segment_c::Preload( )
             // add first cluster as trusted seekpoint for all tracks
             for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
             {
-                _seeker.add_seekpoint(
-                  it->first,
-                  SegmentSeeker::Seekpoint::TRUSTED,
-                  cluster->GetElementPosition(),
-                  cluster->GlobalTimecode() / 1000
-                );
+                _seeker.add_seekpoint( it->first, SegmentSeeker::Seekpoint::TRUSTED,
+                  cluster->GetElementPosition(), 0 );
             }
 
             ep->Down();
