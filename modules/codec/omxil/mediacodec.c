@@ -337,6 +337,47 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
     return VLC_EGENERIC;
 }
 
+static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (h264_isavcC(p_extra, i_extra))
+    {
+        size_t i_size = 0;
+        uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(p_extra, i_extra, &i_size,
+                                                 &p_sys->u.video.i_nal_length_size);
+        if (p_buf)
+        {
+            H264SetCSD(p_dec, p_buf, i_size, NULL);
+            free(p_buf);
+        }
+    }
+    else
+        H264SetCSD(p_dec, p_extra, i_extra, NULL);
+
+    return VLC_SUCCESS;
+}
+
+static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (hevc_ishvcC(p_extra, i_extra))
+    {
+        struct csd csd;
+        csd.p_buf = hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra, &csd.i_size,
+                                            &p_sys->u.video.i_nal_length_size);
+        if (csd.p_buf)
+        {
+            CSDDup(p_dec, &csd, 1);
+            free(csd.p_buf);
+        }
+    }
+    /* FIXME: what to do with AnnexB ? */
+
+    return VLC_SUCCESS;
+}
+
 static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 {
     int offset = 0;
@@ -407,50 +448,19 @@ static int ParseVideoExtra(decoder_t *p_dec)
     uint8_t *p_extra = p_dec->fmt_in.p_extra;
     int i_extra = p_dec->fmt_in.i_extra;
 
-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
-     || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
+    switch (p_dec->fmt_in.i_codec)
     {
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-        {
-            if (h264_isavcC(p_extra, i_extra))
-            {
-                size_t i_size = 0;
-                uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(p_extra, i_extra, &i_size,
-                                                         &p_sys->u.video.i_nal_length_size);
-                if(p_buf)
-                {
-                    H264SetCSD(p_dec, p_buf, i_size, NULL);
-                    free(p_buf);
-                }
-            }
-            else
-                H264SetCSD(p_dec, p_extra, i_extra, NULL);
-        }
-        else  /* FIXME and refactor: CSDDup vs CSDless SetCSD */
-        {
-            if (hevc_ishvcC(p_extra, i_extra))
-            {
-                struct csd csd;
-                csd.p_buf = hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra, &csd.i_size,
-                                                    &p_sys->u.video.i_nal_length_size);
-                if(csd.p_buf)
-                {
-                    CSDDup(p_dec, &csd, 1);
-                    free(csd.p_buf);
-                }
-            }
-            /* FIXME: what to do with AnnexB ? */
-        }
-    }
-    else if (p_dec->fmt_in.i_codec == VLC_CODEC_WMV3)
-    {
+    case VLC_CODEC_H264:
+        return ParseVideoExtraH264(p_dec, p_extra, i_extra);
+    case VLC_CODEC_HEVC:
+        return ParseVideoExtraHEVC(p_dec, p_extra, i_extra);
+    case VLC_CODEC_WMV3:
         return ParseVideoExtraWmv3(p_dec, p_extra, i_extra);
-    }
-    else if (p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
-    {
+    case VLC_CODEC_VC1:
         return ParseVideoExtraVc1(p_dec, p_extra, i_extra);
+    default:
+        return VLC_SUCCESS;
     }
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
