@@ -94,6 +94,7 @@ Demuxers:
  * Improved smooth streaming compatibility
  * Support SCTE-18 / EAS inside TS
  * Support for RTP Reception Hint Track In MP4 with H.264, GSM and Speex payloads.
+ * Support for XiphQt(MP4) vorbis and Flac
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
