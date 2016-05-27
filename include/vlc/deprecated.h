@@ -117,6 +117,17 @@ LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
 LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
         libvlc_video_get_chapter_description( libvlc_media_player_t *p_mi, int i_title );
 
+/**
+ * Set new video subtitle file.
+ * \deprecated Use libvlc_media_player_add_slave() instead.
+ *
+ * \param p_mi the media player
+ * \param psz_subtitle new video subtitle file
+ * \return the success status (boolean)
+ */
+LIBVLC_DEPRECATED LIBVLC_API int
+libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi, const char *psz_subtitle );
+
 /** @}*/
 
 /**

@@ -1170,15 +1170,6 @@ LIBVLC_API libvlc_track_description_t *
 LIBVLC_API int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu );
 
 /**
- * Set new video subtitle file.
- *
- * \param p_mi the media player
- * \param psz_subtitle new video subtitle file
- * \return the success status (boolean)
- */
-LIBVLC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi, const char *psz_subtitle );
-
-/**
  * Get the current subtitle delay. Positive values means subtitles are being
  * displayed later, negative values earlier.
  *
