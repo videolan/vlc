@@ -301,7 +301,7 @@ void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
 
 int vlc_cond_timedwait(vlc_cond_t *wait, vlc_mutex_t *lock, mtime_t deadline)
 {
-    return vlc_cond_wait_delay(wait, lock, (deadline - mdate()) / 1000);
+    return vlc_cond_wait_delay(wait, lock, (deadline + 999 - mdate()) / 1000);
 }
 
 int vlc_cond_timedwait_daytime(vlc_cond_t *wait, vlc_mutex_t *lock,
@@ -771,7 +771,7 @@ void mwait (mtime_t deadline)
     vlc_testcancel();
     while ((delay = (deadline - mdate())) > 0)
     {
-        delay /= 1000;
+        delay = (delay + 999) / 1000;
         if (unlikely(delay > 0x7fffffff))
             delay = 0x7fffffff;
         vlc_Sleep (delay);
