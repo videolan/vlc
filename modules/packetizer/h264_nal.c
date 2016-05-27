@@ -273,20 +273,20 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         i_profile_idc == PROFILE_H264_MFC_HIGH )
     {
         /* chroma_format_idc */
-        const int i_chroma_format_idc = bs_read_ue( p_bs );
-        if( i_chroma_format_idc == 3 )
+        p_sps->i_chroma_idc = bs_read_ue( p_bs );
+        if( p_sps->i_chroma_idc == 3 )
             bs_skip( p_bs, 1 ); /* separate_colour_plane_flag */
         /* bit_depth_luma_minus8 */
-        bs_read_ue( p_bs );
+        p_sps->i_bit_depth_luma = bs_read_ue( p_bs ) + 8;
         /* bit_depth_chroma_minus8 */
-        bs_read_ue( p_bs );
+        p_sps->i_bit_depth_chroma = bs_read_ue( p_bs ) + 8;
         /* qpprime_y_zero_transform_bypass_flag */
         bs_skip( p_bs, 1 );
         /* seq_scaling_matrix_present_flag */
         i_tmp = bs_read( p_bs, 1 );
         if( i_tmp )
         {
-            for( int i = 0; i < ((3 != i_chroma_format_idc) ? 8 : 12); i++ )
+            for( int i = 0; i < ((3 != p_sps->i_chroma_idc) ? 8 : 12); i++ )
             {
                 /* seq_scaling_list_present_flag[i] */
                 i_tmp = bs_read( p_bs, 1 );
@@ -603,6 +603,17 @@ bool h264_get_picture_size( const h264_sequence_parameter_set_t *p_sps, unsigned
     *p_vw = *p_w - p_sps->frame_crop.left_offset - p_sps->frame_crop.right_offset;
     *p_vh = *p_h - p_sps->frame_crop.bottom_offset - p_sps->frame_crop.top_offset;
 
+    return true;
+}
+
+bool h264_get_chroma_luma( const h264_sequence_parameter_set_t *p_sps, uint8_t *pi_chroma_format,
+                           uint8_t *pi_depth_luma, uint8_t *pi_depth_chroma )
+{
+    if( p_sps->i_bit_depth_luma == 0 )
+        return false;
+    *pi_chroma_format = p_sps->i_chroma_idc;
+    *pi_depth_luma = p_sps->i_bit_depth_luma;
+    *pi_depth_chroma = p_sps->i_bit_depth_chroma;
     return true;
 }
 

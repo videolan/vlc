@@ -94,6 +94,11 @@ struct h264_sequence_parameter_set_t
 {
     int i_id;
     int i_profile, i_profile_compatibility, i_level;
+    /* according to avcC, 3 bits max for those */
+    uint8_t i_chroma_idc;
+    uint8_t i_bit_depth_luma;
+    uint8_t i_bit_depth_chroma;
+
     uint32_t pic_width_in_mbs_minus1;
     uint32_t pic_height_in_map_units_minus1;
     struct
@@ -170,6 +175,9 @@ uint8_t * h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
 
 bool h264_get_picture_size( const h264_sequence_parameter_set_t *, unsigned *p_w, unsigned *p_h,
                             unsigned *p_vw, unsigned *p_vh );
+bool h264_get_chroma_luma( const h264_sequence_parameter_set_t *, uint8_t *pi_chroma_format,
+                           uint8_t *pi_depth_luma, uint8_t *pi_depth_chroma );
+
 /* Get level and Profile */
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
                             size_t *p_level, uint8_t *p_nal_length_size);
