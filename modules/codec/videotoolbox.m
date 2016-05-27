@@ -329,8 +329,8 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             i_ret = VLC_SUCCESS;
         }
 
-        uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL, *p_ext_buf = NULL;
-        size_t i_sps_size = 0, i_pps_size = 0, i_ext_size = 0;
+        uint8_t *p_sps_ab = NULL, *p_pps_ab = NULL, *p_ext_ab = NULL;
+        size_t i_sps_absize = 0, i_pps_absize = 0, i_ext_absize = 0;
         if (!p_buf) {
             msg_Warn(p_dec, "no valid extradata or conversion failed");
             return VLC_EGENERIC;
@@ -339,9 +339,9 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         /* get the SPS and PPS units from the NAL unit which is either
          * part of the demuxer's avvC atom or the mid stream data block */
         i_ret = h264_get_spspps(p_buf, i_buf,
-                                &p_sps_buf, &i_sps_size,
-                                &p_pps_buf, &i_pps_size,
-                                &p_ext_buf, &i_ext_size);
+                                &p_sps_ab, &i_sps_absize,
+                                &p_pps_ab, &i_pps_absize,
+                                &p_ext_ab, &i_ext_absize);
         if(p_alloc_buf)
             free(p_alloc_buf);
         if (i_ret != VLC_SUCCESS) {
@@ -350,35 +350,39 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         }
 
         /* Decode Sequence Parameter Set */
-        const uint8_t *p_stp_sps_buf = p_sps_buf;
-        size_t i_stp_sps_nal = i_sps_size;
-        h264_sequence_parameter_set_t *p_sps_data;
-        if( !( p_sps_data = h264_decode_sps(p_stp_sps_buf, i_stp_sps_nal, true) ) )
+        if( p_sps_ab )
         {
-            msg_Warn(p_dec, "sps pps parsing failed");
-            return VLC_EGENERIC;
+            const uint8_t *p_stp_sps_buf = p_sps_ab;
+            size_t i_stp_sps_nal = i_sps_absize;
+            h264_sequence_parameter_set_t *p_sps_data;
+            if( ! hxxx_strip_AnnexB_startcode( &p_stp_sps_buf, &i_stp_sps_nal ) ||
+                !( p_sps_data = h264_decode_sps(p_stp_sps_buf, i_stp_sps_nal, true) ) )
+            {
+                msg_Warn(p_dec, "sps pps parsing failed");
+                return VLC_EGENERIC;
+            }
+
+            /* this data is more trust-worthy than what we receive
+            * from the demuxer, so we will use it to over-write
+            * the current values */
+            (void)
+            h264_get_picture_size( p_sps_data, &i_video_width,
+                                               &i_video_height,
+                                               &i_video_visible_width,
+                                               &i_video_visible_height );
+            i_sar_den = p_sps_data->vui.i_sar_den;
+            i_sar_num = p_sps_data->vui.i_sar_num;
+
+            h264_release_sps( p_sps_data );
         }
-
-        /* this data is more trust-worthy than what we receive
-         * from the demuxer, so we will use it to over-write
-         * the current values */
-        (void)
-        h264_get_picture_size( p_sps_data, &i_video_width,
-                                           &i_video_height,
-                                           &i_video_visible_width,
-                                           &i_video_visible_height );
-        i_sar_den = p_sps_data->vui.i_sar_den;
-        i_sar_num = p_sps_data->vui.i_sar_num;
-
-        h264_release_sps( p_sps_data );
         /* !Decode Sequence Parameter Set */
 
         if(!p_sys->b_is_avcc)
         {
             block_t *p_avcC = h264_AnnexB_NAL_to_avcC(
                                     p_sys->i_nal_length_size,
-                                    p_sps_buf, i_sps_size,
-                                    p_pps_buf, i_pps_size);
+                                    p_sps_ab, i_sps_absize,
+                                    p_pps_ab, i_pps_absize);
             if (!p_avcC) {
                 msg_Warn(p_dec, "buffer creation failed");
                 return VLC_EGENERIC;
