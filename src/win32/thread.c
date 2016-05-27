@@ -53,11 +53,7 @@ struct vlc_thread
     HANDLE         id;
 
     bool           killable;
-#if IS_INTERRUPTIBLE
-    bool           killed;
-#else
     atomic_bool    killed;
-#endif
     vlc_cleanup_t *cleaners;
 
     void        *(*entry) (void *);
@@ -478,11 +474,7 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     th->entry = entry;
     th->data = data;
     th->killable = false; /* not until vlc_entry() ! */
-#if IS_INTERRUPTIBLE
-    th->killed = false;
-#else
     atomic_init(&th->killed, false);
-#endif
     th->cleaners = NULL;
 
     /* When using the MSVCRT C library you have to use the _beginthreadex
@@ -565,19 +557,15 @@ int vlc_set_priority (vlc_thread_t th, int priority)
 /* APC procedure for thread cancellation */
 static void CALLBACK vlc_cancel_self (ULONG_PTR self)
 {
-    struct vlc_thread *th = (void *)self;
-
-    if (likely(th != NULL))
-        th->killed = true;
+    (void) self;
 }
 #endif
 
 void vlc_cancel (vlc_thread_t th)
 {
+    atomic_store_explicit(&th->killed, true, memory_order_relaxed);
 #if IS_INTERRUPTIBLE
     QueueUserAPC (vlc_cancel_self, th->id, (uintptr_t)th);
-#else
-    atomic_store (&th->killed, true);
 #endif
 }
 
@@ -611,13 +599,8 @@ void vlc_testcancel (void)
         return; /* Main thread - cannot be cancelled anyway */
     if (!th->killable)
         return;
-#if IS_INTERRUPTIBLE
-    if (likely(!th->killed))
+    if (!atomic_load_explicit(&th->killed, memory_order_relaxed))
         return;
-#else
-    if (!atomic_load(&th->killed))
-        return;
-#endif
 
     th->killable = true; /* Do not re-enter cancellation cleanup */
 
