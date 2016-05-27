@@ -1,5 +1,5 @@
 /**
- * @file androidnativewindow.c
+ * @file window.c
  * @brief Android native window provider module for VLC media player
  */
 /*****************************************************************************
@@ -37,7 +37,7 @@
 
 #include "utils.h"
 
-#define THREAD_NAME "ANativeWindow"
+#define THREAD_NAME "Android Window"
 
 static int Open(vout_window_t *, const vout_window_cfg_t *);
 static void Close(vout_window_t *);
@@ -47,7 +47,7 @@ static int Control(vout_window_t *, int, va_list ap);
  * Module descriptor
  */
 vlc_module_begin()
-    set_shortname(N_("ANativeWindow"))
+    set_shortname(N_("Android Window"))
     set_description(N_("Android native window"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)

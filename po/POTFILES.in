@@ -1141,7 +1141,7 @@ modules/video_filter/vhs.c
 modules/video_filter/wave.c
 modules/video_output/aa.c
 modules/video_output/android/display.c
-modules/video_output/android/nativewindow.c
+modules/video_output/android/window.c
 modules/video_output/caca.c
 modules/video_output/caopengllayer.m
 modules/video_output/decklink.cpp

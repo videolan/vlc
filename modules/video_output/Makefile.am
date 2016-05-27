@@ -272,10 +272,10 @@ libegl_android_plugin_la_SOURCES = video_output/egl.c
 libegl_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_ANDROID=1
 libegl_android_plugin_la_LIBADD = $(EGL_LIBS)
 
-libandroid_native_window_plugin_la_SOURCES = video_output/android/nativewindow.c \
+libandroid_window_plugin_la_SOURCES = video_output/android/window.c \
 	video_output/android/utils.c video_output/android/utils.h
-libandroid_native_window_plugin_la_CFLAGS = $(AM_CFLAGS)
-libandroid_native_window_plugin_la_LIBADD = $(LIBDL)
+libandroid_window_plugin_la_CFLAGS = $(AM_CFLAGS)
+libandroid_window_plugin_la_LIBADD = $(LIBDL)
 
 libandroid_display_plugin_la_SOURCES = video_output/android/display.c \
 	video_output/android/display.h \
@@ -284,7 +284,7 @@ libandroid_display_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_display_plugin_la_LIBADD = $(LIBDL)
 
 if HAVE_ANDROID
-vout_LTLIBRARIES += libandroid_native_window_plugin.la libandroid_display_plugin.la
+vout_LTLIBRARIES += libandroid_window_plugin.la libandroid_display_plugin.la
 if HAVE_EGL
 vout_LTLIBRARIES += libegl_android_plugin.la
 endif
