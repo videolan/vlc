@@ -36,15 +36,7 @@
 #include <vlc_common.h>
 #include <assert.h>
 
-#include <unistd.h>
-#if !defined (_POSIX_TIMERS) || defined (_WIN32)
-# define _POSIX_TIMERS (-1)
-#endif
-#if (_POSIX_TIMERS > 0)
-# include <time.h> /* clock_gettime() */
-#else
-# include <sys/time.h>
-#endif
+#include <time.h>
 
 /**
  * Convert seconds to a time in the format h:mm:ss.
