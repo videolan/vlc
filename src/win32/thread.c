@@ -646,20 +646,6 @@ void vlc_control_cancel (int cmd, ...)
 }
 
 /*** Clock ***/
-static CRITICAL_SECTION clock_lock;
-
-static mtime_t mdate_giveup (void)
-{
-    abort ();
-}
-
-static mtime_t (*mdate_selected) (void) = mdate_giveup;
-
-mtime_t mdate (void)
-{
-    return mdate_selected ();
-}
-
 static union
 {
 #if (_WIN32_WINNT < 0x0601)
@@ -753,6 +739,30 @@ static mtime_t mdate_wall (void)
     return s.QuadPart / (10000000 / CLOCK_FREQ);
 }
 
+static CRITICAL_SECTION clock_lock;
+static bool clock_used_early = false;
+
+static mtime_t mdate_default(void)
+{
+    EnterCriticalSection(&clock_lock);
+    if (!clock_used_early)
+    {
+        if (!QueryPerformanceFrequency(&clk.perf.freq))
+            abort();
+        clock_used_early = true;
+    }
+    LeaveCriticalSection(&clock_lock);
+
+    return mdate_perf();
+}
+
+static mtime_t (*mdate_selected) (void) = mdate_default;
+
+mtime_t mdate (void)
+{
+    return mdate_selected ();
+}
+
 #undef mwait
 void mwait (mtime_t deadline)
 {
@@ -778,11 +788,13 @@ void msleep (mtime_t delay)
 static void SelectClockSource (vlc_object_t *obj)
 {
     EnterCriticalSection (&clock_lock);
-    if (mdate_selected != mdate_giveup)
+    if (mdate_selected != mdate_default)
     {
         LeaveCriticalSection (&clock_lock);
         return;
     }
+
+    assert(!clock_used_early);
 
 #if VLC_WINSTORE_APP
     const char *name = "perf";
