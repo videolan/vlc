@@ -1618,8 +1618,11 @@ static void ControlRelease( int i_type, vlc_value_t val )
     switch( i_type )
     {
     case INPUT_CONTROL_ADD_SUBTITLE:
-    case INPUT_CONTROL_ADD_SLAVE:
         free( val.psz_string );
+        break;
+    case INPUT_CONTROL_ADD_SLAVE:
+        if( val.p_address )
+            input_item_slave_Delete( val.p_address );
         break;
 
     default:
@@ -1986,9 +1989,21 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_ADD_SLAVE:
-            if( val.psz_string )
+            if( val.p_address )
             {
-                const char *uri = val.psz_string;
+                input_item_slave_t *p_item_slave  = val.p_address;
+                if( p_item_slave->i_type == SLAVE_TYPE_SPU )
+                {
+                    input_SubtitleAdd( p_input, p_item_slave->psz_uri,
+                                       SUB_CANFAIL | SUB_FORCED );
+
+                    /* Update item slaves */
+                    input_item_AddSlave( p_input->p->p_item, p_item_slave );
+                    /* The slave is now owned by the ite */
+                    val.p_address = NULL;
+                    break;
+                }
+                const char *uri = p_item_slave->psz_uri;
                 input_source_t *slave = InputSourceNew( p_input, uri, NULL,
                                                         false );
                 if( slave == NULL )
@@ -2023,6 +2038,11 @@ static bool Control( input_thread_t *p_input,
                 InputUpdateMeta( p_input, slave->p_demux );
 
                 TAB_APPEND( p_input->p->i_slave, p_input->p->slave, slave );
+
+                /* Update item slaves */
+                input_item_AddSlave( p_input->p->p_item, p_item_slave );
+                /* The slave is now owned by the ite */
+                val.p_address = NULL;
             }
             break;
 
