@@ -786,9 +786,9 @@ libvlc_media_type_t libvlc_media_get_type( libvlc_media_t *p_md );
  * \version LibVLC 3.0.0 and later.
  *
  * \param p_md media descriptor object
- * \param psz_uri Uri of the slave (should contain a valid scheme).
  * \param i_type subtitle or audio
  * \param i_priority from 0 (low priority) to 4 (high priority)
+ * \param psz_uri Uri of the slave (should contain a valid scheme).
  *
  * \return 0 on success, -1 on error.
  */

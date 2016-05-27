@@ -955,6 +955,27 @@ LIBVLC_API void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
 LIBVLC_API void libvlc_media_player_set_video_title_display( libvlc_media_player_t *p_mi, libvlc_position_t position, unsigned int timeout );
 
 /**
+ * Add a slave to the current media player.
+ *
+ * \note If the player is playing, the slave will be added directly. This call
+ * will also update the slave list of the attached libvlc_media_t.
+ *
+ * \version LibVLC 3.0.0 and later.
+ *
+ * \see libvlc_media_slaves_add
+ *
+ * \param p_mi the media player
+ * \param i_type subtitle or audio
+ * \param psz_uri Uri of the slave (should contain a valid scheme).
+ *
+ * \return 0 on success, -1 on error.
+ */
+LIBVLC_API
+int libvlc_media_player_add_slave( libvlc_media_player_t *p_mi,
+                                   libvlc_media_slave_type_t i_type,
+                                   const char *psz_uri );
+
+/**
  * Release (free) libvlc_track_description_t
  *
  * \param p_track_description the structure to release
