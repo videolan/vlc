@@ -282,7 +282,7 @@ items_clear( struct discovery_sys *p_sys )
 static int
 parse_entries( const struct rr_entry *p_entries, bool b_renderer,
                struct srv **pp_srvs, unsigned int *p_nb_srv,
-               const char **ppsz_ip )
+               const char **ppsz_ip, bool *p_ipv6 )
 {
     /* Count the number of servers */
     unsigned int i_nb_srv = 0;
@@ -301,7 +301,6 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
 
     /* There is one ip for several srvs, fetch them */
     const char *psz_ip = NULL;
-    char psz_ip6[INET6_ADDRSTRLEN + 2];
     i_nb_srv = 0;
     for( const struct rr_entry *p_entry = p_entries;
          p_entry != NULL; p_entry = p_entry->next )
@@ -332,8 +331,8 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
             psz_ip = p_entry->data.A.addr_str;
         else if( p_entry->type == RR_AAAA && psz_ip == NULL )
         {
-            if (snprintf(psz_ip6, sizeof(psz_ip6), "[%s]", p_entry->data.AAAA.addr_str) > 0)
-                psz_ip = psz_ip6;
+            psz_ip = p_entry->data.AAAA.addr_str;
+            *p_ipv6 = true;
         }
     }
     if( psz_ip == NULL || i_nb_srv == 0 )
@@ -346,6 +345,17 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
     *p_nb_srv = i_nb_srv;
     *ppsz_ip = psz_ip;
     return VLC_SUCCESS;
+}
+
+static char *
+create_uri( const char *psz_protocol, const char *psz_ip, bool b_ipv6,
+            uint16_t i_port )
+{
+    char *psz_uri;
+
+    return asprintf( &psz_uri, "%s://%s%s%s:%u", psz_protocol,
+                     b_ipv6 ? "[" : "", psz_ip, b_ipv6 ? "]" : "",
+                     i_port ) < 0 ? NULL : psz_uri;
 }
 
 static void
@@ -362,18 +372,19 @@ new_entries_sd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
     struct srv *p_srvs;
     unsigned i_nb_srv;
     const char *psz_ip;
+    bool b_ipv6;
     if( parse_entries( p_entries, false, &p_srvs, &i_nb_srv,
-                       &psz_ip ) != VLC_SUCCESS )
+                       &psz_ip, &b_ipv6 ) != VLC_SUCCESS )
         return;
 
     /* send new input items (if they don't already exist) */
     for( unsigned int i = 0; i < i_nb_srv; ++i )
     {
         struct srv *p_srv = &p_srvs[i];
-        char *psz_uri;
+        char *psz_uri = create_uri( p_srv->psz_protocol, psz_ip, b_ipv6,
+                                    p_srv->i_port );
 
-        if( asprintf( &psz_uri, "%s://%s:%u", p_srv->psz_protocol, psz_ip,
-                      p_srv->i_port ) < 0 )
+        if( psz_uri == NULL )
             break;
 
         if( items_exists( p_sys, psz_uri ) )
@@ -437,8 +448,9 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
     struct srv *p_srvs;
     unsigned i_nb_srv;
     const char *psz_ip;
+    bool b_ipv6;
     if( parse_entries( p_entries, true, &p_srvs, &i_nb_srv,
-                       &psz_ip ) != VLC_SUCCESS )
+                       &psz_ip, &b_ipv6 ) != VLC_SUCCESS )
         return;
 
     const char *psz_model = NULL;
@@ -468,10 +480,11 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
     for( unsigned int i = 0; i < i_nb_srv; ++i )
     {
         struct srv *p_srv = &p_srvs[i];
-        char *psz_uri, *psz_icon_uri = NULL;
+        char *psz_icon_uri = NULL;
+        char *psz_uri = create_uri( p_srv->psz_protocol, psz_ip, b_ipv6,
+                                    p_srv->i_port );
 
-        if( asprintf( &psz_uri, "%s://%s:%u", p_srv->psz_protocol, psz_ip,
-                      p_srv->i_port ) == -1 )
+        if( psz_uri == NULL )
             break;
 
         if( items_exists( p_sys, psz_uri ) )
