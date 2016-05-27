@@ -159,10 +159,11 @@ void h264_AVC_to_AnnexB( uint8_t *p_buf, uint32_t i_len,
 
 int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
                      uint8_t **pp_sps, size_t *p_sps_size,
-                     uint8_t **pp_pps, size_t *p_pps_size )
+                     uint8_t **pp_pps, size_t *p_pps_size,
+                     uint8_t **pp_ext, size_t *p_ext_size )
 {
-    uint8_t *p_sps = NULL, *p_pps = NULL;
-    size_t i_sps_size = 0, i_pps_size = 0;
+    uint8_t *p_sps = NULL, *p_pps = NULL, *p_ext = NULL;
+    size_t i_sps_size = 0, i_pps_size = 0, i_ext_size = 0;
     int i_nal_type = H264_NAL_UNKNOWN;
     bool b_first_nal = true;
     bool b_has_zero_byte = false;
@@ -181,8 +182,10 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
                     i_sps_size = p_buf - p_sps - (b_has_zero_byte ? 1 : 0);
                 if( i_nal_type == H264_NAL_PPS )
                     i_pps_size = p_buf - p_pps - (b_has_zero_byte ? 1 : 0);
+                if( i_nal_type == H264_NAL_SPS_EXT )
+                    i_ext_size = p_buf - p_pps - (b_has_zero_byte ? 1 : 0);
 
-                if( i_sps_size && i_pps_size )
+                if( i_sps_size && i_pps_size && i_ext_size ) /* early end */
                     break;
             }
 
@@ -201,6 +204,8 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
                 p_sps = p_buf - 1;
             if( i_nal_type == H264_NAL_PPS && !p_pps )
                 p_pps = p_buf - 1;
+            if( i_nal_type == H264_NAL_SPS_EXT && !p_ext )
+                p_ext = p_buf - 1;
 
             /* cf. 7.4.1.2.3 */
             if( i_nal_type > 18 || ( i_nal_type >= 10 && i_nal_type <= 12 ) )
@@ -228,6 +233,8 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
             i_sps_size = p_buf - p_sps;
         if( !i_pps_size && i_nal_type == H264_NAL_PPS )
             i_pps_size = p_buf - p_pps;
+        if( !i_ext_size && i_nal_type == H264_NAL_SPS_EXT )
+            i_ext_size = p_buf - p_ext;
     }
     if( ( !p_sps || !i_sps_size ) && ( !p_pps || !i_pps_size ) )
         return -1;
@@ -235,6 +242,8 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
     *p_sps_size = i_sps_size;
     *pp_pps = p_pps;
     *p_pps_size = i_pps_size;
+    *pp_ext = p_ext;
+    *p_ext_size = i_ext_size;
 
     return 0;
 }

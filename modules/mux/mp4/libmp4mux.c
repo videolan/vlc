@@ -807,11 +807,15 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
         return NULL;
     uint8_t *p_sps = NULL;
     uint8_t *p_pps = NULL;
+    uint8_t *p_ext = NULL;
     size_t   i_sps_size = 0;
     size_t   i_pps_size = 0;
+    size_t   i_ext_size = 0;
 
     if( h264_get_spspps(p_fmt->p_extra, p_fmt->i_extra,
-                        &p_sps, &i_sps_size, &p_pps, &i_pps_size) != 0 || !p_sps || !p_pps )
+                        &p_sps, &i_sps_size,
+                        &p_pps, &i_pps_size,
+                        &p_ext, &i_ext_size ) != 0 || !p_sps || !p_pps )
     {
         bo_free(avcC);
         return NULL;

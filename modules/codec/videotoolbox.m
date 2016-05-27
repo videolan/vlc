@@ -329,8 +329,8 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             i_ret = VLC_SUCCESS;
         }
 
-        uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
-        size_t i_sps_size = 0, i_pps_size = 0;
+        uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL, *p_ext_buf = NULL;
+        size_t i_sps_size = 0, i_pps_size = 0, i_ext_size = 0;
         if (!p_buf) {
             msg_Warn(p_dec, "no valid extradata or conversion failed");
             return VLC_EGENERIC;
@@ -338,12 +338,10 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 
         /* get the SPS and PPS units from the NAL unit which is either
          * part of the demuxer's avvC atom or the mid stream data block */
-        i_ret = h264_get_spspps(p_buf,
-                                i_buf,
-                                &p_sps_buf,
-                                &i_sps_size,
-                                &p_pps_buf,
-                                &i_pps_size);
+        i_ret = h264_get_spspps(p_buf, i_buf,
+                                &p_sps_buf, &i_sps_size,
+                                &p_pps_buf, &i_pps_size,
+                                &p_ext_buf, &i_ext_size);
         if(p_alloc_buf)
             free(p_alloc_buf);
         if (i_ret != VLC_SUCCESS) {
