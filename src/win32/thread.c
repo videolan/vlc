@@ -440,7 +440,33 @@ retry:
     vlc_mutex_unlock(&super_mutex);
 }
 
-#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
+/*** Condition variables (low-level) ***/
+#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
+static VOID (WINAPI *InitializeConditionVariable_)(PCONDITION_VARIABLE);
+#define InitializeConditionVariable InitializeConditionVariable_
+static BOOL (WINAPI *SleepConditionVariableCS_)(PCONDITION_VARIABLE,
+                                                PCRITICAL_SECTION, DWORD);
+#define SleepConditionVariableCS SleepConditionVariableCS_
+static VOID (WINAPI *WakeAllConditionVariable_)(PCONDITION_VARIABLE);
+#define WakeAllConditionVariable WakeAllConditionVariable_
+
+static void WINAPI DummyConditionVariable(CONDITION_VARIABLE *cv)
+{
+    (void) cv;
+}
+
+static BOOL WINAPI SleepConditionVariableFallback(CONDITION_VARIABLE *cv,
+                                                  CRITICAL_SECTION *cs,
+                                                  DWORD ms)
+{
+    (void) cv;
+    LeaveCriticalSection(cs);
+    SleepEx(0, TRUE);
+    EnterCriticalSection(cs);
+    return ms != 0;
+}
+#endif
+
 /*** Futeces^WAddress waits ***/
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
 static BOOL (WINAPI *WaitOnAddress_)(VOID volatile *, PVOID, SIZE_T, DWORD);
@@ -577,7 +603,6 @@ void vlc_addr_broadcast(void *addr)
 {
     WakeByAddressAll(addr);
 }
-#endif
 
 /*** Threads ***/
 #if !IS_INTERRUPTIBLE
@@ -1162,7 +1187,6 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     {
         case DLL_PROCESS_ATTACH:
         {
-#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
             HANDLE h = GetModuleHandle(TEXT("kernel32.dll"));
             if (unlikely(h == NULL))
@@ -1171,12 +1195,21 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             if (!LOOKUP(WaitOnAddress)
              || !LOOKUP(WakeByAddressAll) || !LOOKUP(WakeByAddressSingle))
             {
+# if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
+                if (!LOOKUP(InitializeConditionVariable)
+                 || !LOOKUP(SleepConditionVariableCS)
+                 || !LOOKUP(WakeAllConditionVariable))
+                {
+                    InitializeConditionVariable_ = DummyConditionVariable;
+                    SleepConditionVariableCS_ = SleepConditionVariableFallback;
+                    WakeAllConditionVariable_ = DummyConditionVariable;
+                }
+# endif
                 vlc_wait_addr_init();
                 WaitOnAddress_ = WaitOnAddressFallback;
                 WakeByAddressAll_ = WakeByAddressFallback;
                 WakeByAddressSingle_ = WakeByAddressFallback;
             }
-#endif
 #endif
             thread_key = TlsAlloc();
             if (unlikely(thread_key == TLS_OUT_OF_INDEXES))
@@ -1195,11 +1228,9 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             vlc_mutex_destroy (&super_mutex);
             DeleteCriticalSection (&clock_lock);
             TlsFree(thread_key);
-#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
             if (WaitOnAddress_ == WaitOnAddressFallback)
                 vlc_wait_addr_deinit();
-#endif
 #endif
             break;
 
