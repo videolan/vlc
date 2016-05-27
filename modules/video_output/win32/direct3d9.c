@@ -648,6 +648,16 @@ static int Direct3D9Create(vout_display_t *vd)
         return VLC_EGENERIC;
     }
 
+    if ( vd->fmt.i_width > sys->d3dcaps.MaxTextureWidth ||
+         vd->fmt.i_height > sys->d3dcaps.MaxTextureHeight )
+    {
+        msg_Err(vd, "Textures too large %ux%u max possible: %ux%u",
+                vd->fmt.i_width, vd->fmt.i_height,
+                (unsigned) sys->d3dcaps.MaxTextureWidth,
+                (unsigned) sys->d3dcaps.MaxTextureHeight);
+        return VLC_EGENERIC;
+    }
+
     return VLC_SUCCESS;
 }
 
