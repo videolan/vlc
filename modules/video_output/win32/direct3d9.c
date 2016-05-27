@@ -1191,7 +1191,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
 
 #ifndef NDEBUG
     msg_Dbg(vd, "Direct3D created texture: %ix%i",
-                fmt->i_width, fmt->i_height);
+                fmt->i_visible_width, fmt->i_visible_height);
 #endif
 
     /*
