@@ -821,6 +821,10 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
         return NULL;
     }
 
+    (void) hxxx_strip_AnnexB_startcode( (const uint8_t **) &p_sps, &i_sps_size );
+    (void) hxxx_strip_AnnexB_startcode( (const uint8_t **) &p_sps, &i_sps_size );
+    (void) hxxx_strip_AnnexB_startcode( (const uint8_t **) &p_ext, &i_ext_size );
+
     bo_add_8(avcC, 1);      /* configuration version */
     bo_add_8(avcC, i_sps_size ? p_sps[1] : PROFILE_H264_MAIN);
     bo_add_8(avcC, i_sps_size ? p_sps[2] : 64);
