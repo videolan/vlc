@@ -1,5 +1,5 @@
 /*****************************************************************************
- * android_window.c: Android video output module
+ * display.h: Android video output module
  *****************************************************************************
  * Copyright (C) 2014 VLC authors and VideoLAN
  *

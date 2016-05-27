@@ -45,7 +45,7 @@
 #if defined(USE_IOMX)
 #include <dlfcn.h>
 #include <jni.h>
-#include "../../video_output/android/android_window.h"
+#include "../../video_output/android/display.h"
 #endif
 
 #ifndef NDEBUG

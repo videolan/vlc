@@ -1,5 +1,5 @@
 /*****************************************************************************
- * android_window.c: Android video output module
+ * display.c: Android video output module
  *****************************************************************************
  * Copyright (C) 2014 VLC authors and VideoLAN
  *
@@ -36,7 +36,7 @@
 
 #include <dlfcn.h>
 
-#include "android_window.h"
+#include "display.h"
 #include "utils.h"
 
 /*****************************************************************************
@@ -47,7 +47,7 @@
 #define CHROMA_LONGTEXT N_(\
     "Force use of a specific chroma for output. Default is RGB32.")
 
-#define CFG_PREFIX "androidwindow-"
+#define CFG_PREFIX "android-display-"
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture);
@@ -55,10 +55,9 @@ static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture);
 vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_shortname("android_window")
     set_description(N_("Android video output"))
     set_capability("vout display", 260)
-    add_shortcut("androidwindow", "android")
+    add_shortcut("android-display")
     add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
     set_callbacks(Open, Close)
 vlc_module_end()
@@ -67,7 +66,7 @@ vlc_module_end()
  * Local prototypes
  *****************************************************************************/
 
-#define THREAD_NAME "android_window"
+#define THREAD_NAME "android-display"
 
 static const vlc_fourcc_t subpicture_chromas[] =
 {
@@ -1129,7 +1128,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     default:
-        msg_Warn(vd, "Unknown request in android_window");
+        msg_Warn(vd, "Unknown request in android-display: %d", query);
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         return VLC_EGENERIC;
