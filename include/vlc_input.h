@@ -603,6 +603,12 @@ static inline int input_AddSubtitleOSD( input_thread_t *p_input, const char *psz
 }
 #define input_AddSubtitle(a, b, c) input_AddSubtitleOSD(a, b, c, false)
 
+static inline int input_AddSlave( input_thread_t *p_input, enum slave_type type,
+                                  const char *psz_uri )
+{
+    return input_Control( p_input, INPUT_ADD_SLAVE, type, psz_uri );
+}
+
 
 /**
  * Return the audio output (if any) associated with an input.
