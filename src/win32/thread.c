@@ -1075,7 +1075,11 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
         return; /* Disarm */
 
     if (absolute)
+    {
         value -= mdate ();
+        if (value < 0)
+            value = 0;
+    }
     value = (value + 999) / 1000;
     interval = (interval + 999) / 1000;
 
