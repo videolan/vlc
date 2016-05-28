@@ -50,7 +50,7 @@ unsigned long vlc_thread_id(void)
 static int sys_futex(void *addr, int op, int val, const struct timespec *to,
                      void *addr2, int val3)
 {
-    return syscall(SYS_futex, addr, op, val, to, addr2, val3);
+    return syscall(__NR_futex, addr, op, val, to, addr2, val3);
 }
 
 static int vlc_futex_wake(void *addr, int nr)
