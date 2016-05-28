@@ -60,7 +60,7 @@ static struct timespec mtime_to_ts (mtime_t date)
 
 /* debug */
 #define vlc_assert(x) do { \
-    if (unlikely(!x)) { \
+    if (unlikely(!(x))) { \
     __android_log_print(ANDROID_LOG_ERROR, "vlc", "assert failed %s:%d: %s", \
         __FILE__, __LINE__, #x \
         ); \
