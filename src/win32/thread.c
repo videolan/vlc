@@ -1067,7 +1067,7 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
     if (timer->handle != INVALID_HANDLE_VALUE)
     {
 #if !VLC_WINSTORE_APP
-        DeleteTimerQueueTimer (NULL, timer->handle, NULL);
+        DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
 #endif
         timer->handle = INVALID_HANDLE_VALUE;
     }
