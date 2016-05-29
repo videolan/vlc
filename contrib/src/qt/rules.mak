@@ -55,7 +55,7 @@ QT_CONFIG := -static -release -opensource -confirm-license -no-pkg-config \
 	# Fix .pc files to remove debug version (d)
 	cd $(PREFIX)/lib/pkgconfig; for i in Qt5Core.pc Qt5Gui.pc Qt5Widgets.pc; do sed -i -e 's/d\.a/.a/g' -e 's/d $$/ /' $$i; done
 	# Fix Qt5Gui.pc file to include qwindows (QWindowsIntegrationPlugin) and Qt5Platform Support
-	cd $(PREFIX)/lib/pkgconfig; do sed -i -e 's/ -lQt5Gui/ -lqwindows -lQt5PlatformSupport -lQt5Gui/g' Qt5Gui.pc; done
+	cd $(PREFIX)/lib/pkgconfig; sed -i -e 's/ -lQt5Gui/ -lqwindows -lQt5PlatformSupport -lQt5Gui/g' Qt5Gui.pc
 ifdef HAVE_CROSS_COMPILE
 	# Building Qt build tools for Xcompilation
 	cd $</include/QtCore; ln -sf $(QT_VERSION)/QtCore/private
