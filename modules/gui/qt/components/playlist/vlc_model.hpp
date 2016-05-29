@@ -81,6 +81,7 @@ public:
     enum actions
     {
         ACTION_PLAY = 1,
+        ACTION_PAUSE,
         ACTION_STREAM,
         ACTION_SAVE,
         ACTION_INFO,

@@ -913,7 +913,18 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
     case ACTION_PLAY:
         if ( !indexes.empty() && indexes.first().isValid() )
         {
-            activateItem( indexes.first() );
+            if( isCurrent( indexes.first() ) )
+                playlist_Resume(THEPL);
+            else
+                activateItem( indexes.first() );
+            return true;
+        }
+        break;
+
+    case ACTION_PAUSE:
+        if ( !indexes.empty() && indexes.first().isValid() )
+        {
+            playlist_Pause(THEPL);
             return true;
         }
         break;
@@ -994,6 +1005,9 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     case ACTION_SORT:
         return rowCount() && !item->readOnly();
     case ACTION_PLAY:
+        return !isCurrent( index ) || playlist_Status(THEPL) == PLAYLIST_PAUSED;
+    case ACTION_PAUSE:
+        return isCurrent( index ) && playlist_Status(THEPL) == PLAYLIST_RUNNING;
     case ACTION_STREAM:
     case ACTION_SAVE:
     case ACTION_INFO:

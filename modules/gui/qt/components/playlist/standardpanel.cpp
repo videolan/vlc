@@ -189,6 +189,9 @@ bool StandardPLPanel::popup( const QPoint &point )
     ADD_MENU_ENTRY( QIcon( ":/menu/play" ), qtr(I_POP_PLAY),
                     VLCModelSubInterface::ACTION_PLAY )
 
+    ADD_MENU_ENTRY( QIcon( ":/menu/pause" ), qtr("Pause"),
+                    VLCModelSubInterface::ACTION_PAUSE )
+
     ADD_MENU_ENTRY( QIcon( ":/menu/stream" ), qtr(I_POP_STREAM),
                     VLCModelSubInterface::ACTION_STREAM )
 
