@@ -265,14 +265,14 @@ void ToolbarEditDialog::close()
     QString cFSC = getSettings()->value( "MainWindow/FSCToolbar" ).toString();
 
     if ( isChecked == positionCheckbox->isChecked()
-	 && c1 == controller1->getValue()
-	 && c2 == controller2->getValue()
-	 && cA == controllerA->getValue()
-	 && c == controller->getValue()
-	 && cFSC == controllerFSC->getValue() )
+         && c1 == controller1->getValue()
+         && c2 == controller2->getValue()
+         && cA == controllerA->getValue()
+         && c == controller->getValue()
+         && cFSC == controllerFSC->getValue() )
     {
-	reject();
-	return;
+        reject();
+        return;
     }
 
     getSettings()->setValue( "MainWindow/ToolbarPos", !!positionCheckbox->isChecked() );
