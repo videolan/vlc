@@ -37,6 +37,12 @@ AC_DEFUN([RDC_PROG_CC_WFLAGS],
   done
 ])
 
+AC_DEFUN([RDC_PROG_CC_FFLAGS],
+[ for a in $1; do
+    RDC_PROG_CC_FLAGS([-f$a])
+  done
+])
+
 AC_DEFUN([RDC_PROG_CXX_FLAGS_IFELSE],
 [AC_LANG_ASSERT(C++)
   CXXFLAGS_save="${CXXFLAGS}"
@@ -63,6 +69,12 @@ AC_DEFUN([RDC_PROG_CXX_FLAGS],
 AC_DEFUN([RDC_PROG_CXX_WFLAGS],
 [ for a in $1; do
     RDC_PROG_CXX_FLAGS([-W$a])
+  done
+])
+
+AC_DEFUN([RDC_PROG_CXX_FFLAGS],
+[ for a in $1; do
+    RDC_PROG_CXX_FLAGS([-f$a])
   done
 ])
 
