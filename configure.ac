@@ -1011,28 +1011,21 @@ AS_IF([test "${enable_optimizations}" != "no"], [
     AS_IF([test "${ac_cv_c_o3}" = "no"], [VLC_RESTORE_FLAGS])
   ])
 
-  dnl Check for -ffast-math
-  VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -ffast-math"
-  CXXFLAGS="${CXXFLAGS} -ffast-math"
-  OBJCFLAGS="${OBJCFLAGS} -ffast-math"
-  AC_CACHE_CHECK([if $CC accepts -ffast-math], [ac_cv_c_fast_math], [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
-      ac_cv_c_fast_math=yes
-    ], [
-      ac_cv_c_fast_math=no
-    ])
-  ])
-  AS_IF([test "${ac_cv_c_fast_math}" = "no"], [VLC_RESTORE_FLAGS])
-  AH_BOTTOM([
-#ifndef __FAST_MATH__
-# ifndef _MSC_VER
-#  pragma STDC FENV_ACCESS OFF
-#  pragma STDC FP_CONTRACT ON
-# else
-#  pragma fenv_access(off)
-#  pragma fp_contract(on)
-# endif
+  dnl Check for fast maths
+  RDC_PROG_CC_FFLAGS([no-math-errno unsafe-math-optimizations no-rounding-math no-signaling-nans cx-limited-range])
+  AC_LANG_PUSH(C++)
+  RDC_PROG_CXX_FFLAGS([no-math-errno unsafe-math-optimizations no-rounding-math no-signaling-nans cx-limited-range])
+  AC_LANG_POP
+
+AH_BOTTOM([
+#if defined(_MSC_VER)
+# pragma fenv_access(off)
+# pragma fp_contract(on)
+#elif defined(__GNUC__)
+/* Not supported so far */
+#else
+# pragma STDC FENV_ACCESS OFF
+# pragma STDC FP_CONTRACT ON
 #endif
 ])
 
