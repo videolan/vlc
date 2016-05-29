@@ -358,6 +358,9 @@ void vlc_control_cancel(int cmd, ...)
     vlc_thread_t th = vlc_thread_self();
     va_list ap;
 
+    if (th == NULL)
+        return;
+
     va_start(ap, cmd);
     switch (cmd)
     {
