@@ -992,11 +992,19 @@ static void LoadSlaves( input_thread_t *p_input )
     {
         msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
         char *psz_uri = input_SubtitleFile2Uri( p_input, psz_subtitle );
+        free( psz_subtitle );
+        psz_subtitle = NULL;
         if( psz_uri != NULL )
         {
-            free( psz_subtitle );
-            psz_subtitle = psz_uri;
-            input_SubtitleAdd( p_input, psz_uri, SUB_FORCED  );
+            input_item_slave_t *p_slave =
+                input_item_slave_New( psz_uri, SLAVE_TYPE_SPU,
+                                      SLAVE_PRIORITY_USER );
+            free( psz_uri );
+            if( p_slave )
+            {
+                INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_slave );
+                psz_subtitle = p_slave->psz_uri;
+            }
         }
     }
 
@@ -1053,7 +1061,9 @@ static void LoadSlaves( input_thread_t *p_input )
         if( p_slave->i_type == SLAVE_TYPE_SPU )
         {
             msg_Err( p_input, "Loading spu slave: %s", p_slave->psz_uri );
-            input_SubtitleAdd( p_input, p_slave->psz_uri, SUB_CANFAIL );
+            const unsigned i_flags = p_slave->i_priority == SLAVE_PRIORITY_USER
+                                   ? SUB_FORCED : SUB_CANFAIL;
+            input_SubtitleAdd( p_input, p_slave->psz_uri, i_flags );
         }
         else
         {
@@ -1068,7 +1078,6 @@ static void LoadSlaves( input_thread_t *p_input )
     }
 
     TAB_CLEAN( i_slaves, pp_slaves );
-    free( psz_subtitle );
 
     /* Load subtitles from attachments */
     int i_attachment = 0;
