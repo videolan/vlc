@@ -18,6 +18,7 @@ check_PROGRAMS = \
 	test_libvlc_media \
 	test_libvlc_media_list \
 	test_libvlc_media_player \
+	test_libvlc_slaves \
 	test_src_config_chain \
 	test_src_misc_variables \
 	test_src_crypto_update \
@@ -80,6 +81,8 @@ test_libvlc_media_list_SOURCES = libvlc/media_list.c
 test_libvlc_media_list_LDADD = $(LIBVLC)
 test_libvlc_media_player_SOURCES = libvlc/media_player.c
 test_libvlc_media_player_LDADD = $(LIBVLC)
+test_libvlc_slaves_SOURCES = libvlc/slaves.c
+test_libvlc_slaves_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_meta_SOURCES = libvlc/meta.c
 test_libvlc_meta_LDADD = $(LIBVLC)
 test_src_misc_variables_SOURCES = src/misc/variables.c
