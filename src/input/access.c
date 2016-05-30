@@ -669,7 +669,10 @@ static void fsdir_attach_slaves(struct access_fsdir *p_fsdir)
         {
             struct fsdir_slave *p_fsdir_slave = p_fsdir->pp_slaves[j];
 
-            if (p_fsdir_slave == NULL || p_fsdir_slave->p_node == p_node)
+            /* Don't try to match slaves with themselves or slaves already
+             * attached with the higher priority */
+            if (p_fsdir_slave->p_node == p_node
+             || p_fsdir_slave->p_slave->i_priority == SLAVE_PRIORITY_MATCH_ALL)
                 continue;
 
             uint8_t i_priority =
@@ -684,19 +687,28 @@ static void fsdir_attach_slaves(struct access_fsdir *p_fsdir)
              && fsdir_should_match_idx(p_fsdir, p_fsdir_slave))
                 continue;
 
-            p_fsdir_slave->p_slave->i_priority = i_priority;
-            input_item_AddSlave(p_item, p_fsdir_slave->p_slave);
+            input_item_slave_t *p_slave =
+                input_item_slave_New(p_fsdir_slave->p_slave->psz_uri,
+                                     p_fsdir_slave->p_slave->i_type,
+                                     i_priority);
+            if (p_slave == NULL)
+                break;
+
+            if (input_item_AddSlave(p_item, p_slave) != VLC_SUCCESS)
+            {
+                input_item_slave_Delete(p_slave);
+                break;
+            }
 
             /* Remove the corresponding node if any: This slave won't be
              * added in the parent node */
             if (p_fsdir_slave->p_node != NULL)
+            {
                 input_item_node_Delete(p_fsdir_slave->p_node);
+                p_fsdir_slave->p_node = NULL;
+            }
 
-            /* Remove this slave from the list: we don't want to match
-             * other items */
-            free(p_fsdir_slave->psz_filename);
-            free(p_fsdir_slave);
-            p_fsdir->pp_slaves[j] = NULL;
+            p_fsdir_slave->p_slave->i_priority = i_priority;
         }
     }
 }
