@@ -1131,10 +1131,12 @@ void MainInputManager::notifyRandom(bool value)
 
 void MainInputManager::notifyRepeatLoop(bool)
 {
-    int i_value = var_GetBool( THEPL, "loop" ) * REPEAT_ALL
-              + var_GetBool( THEPL, "repeat" ) * REPEAT_ONE;
+    int i_state = NORMAL;
 
-    emit repeatLoopChanged( i_value );
+    if( var_GetBool( THEPL, "loop" ) )   i_state = REPEAT_ALL;
+    if( var_GetBool( THEPL, "repeat" ) ) i_state = REPEAT_ONE;
+
+    emit repeatLoopChanged( i_state );
 }
 
 void MainInputManager::loopRepeatLoopStatus()
