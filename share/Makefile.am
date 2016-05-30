@@ -17,6 +17,9 @@ vlc.desktop: vlc.desktop.in $(top_builddir)/config.status
 	$(AM_V_at)$(DESKTOP_FILE_VALIDATE) tmp-$@
 	$(AM_V_at)mv -f tmp-$@ $@
 
+vlc.appdata.xml: vlc.appdata.xml.in $(top_builddir)/config.status
+	cd $(top_builddir) && $(SHELL) ./config.status --file=$(subdir)/$@
+
 iconsdatadir = $(datadir)/icons/hicolor
 icons16dir = $(iconsdatadir)/16x16/apps
 icons32dir = $(iconsdatadir)/32x32/apps
