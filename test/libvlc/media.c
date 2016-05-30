@@ -79,7 +79,7 @@ static void test_media_preparsed(int argc, const char** argv,
 }
 
 #define TEST_SUBITEMS_COUNT 6
-struct
+static struct
 {
     const char *file;
     libvlc_media_type_t type;
