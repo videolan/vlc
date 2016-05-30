@@ -1035,19 +1035,31 @@ static void LoadSlaves( input_thread_t *p_input )
     /* Add slaves found by the directory demuxer or via libvlc */
     input_item_t *p_item = p_input->p->p_item;
     vlc_mutex_lock( &p_item->lock );
+
+    /* Move item slaves to local pp_slaves */
     for( int i = 0; i < p_item->i_slaves; i++ )
     {
         input_item_slave_t *p_slave = p_item->pp_slaves[i];
         if( !SlaveExists( pp_slaves, i_slaves, p_slave->psz_uri )
          && ( !psz_subtitle || strcmp( psz_subtitle, p_slave->psz_uri ) ) )
-        {
-            input_item_slave_t *p_dup_slave =
-                input_item_slave_New( p_slave->psz_uri, p_slave->i_type,
-                                      p_slave->i_priority );
-            if( p_dup_slave )
-                INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_dup_slave );
-        }
+            INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_slave );
+        else
+            input_item_slave_Delete( p_slave );
     }
+    TAB_CLEAN( p_item->i_slaves, p_item->pp_slaves );
+
+    if( i_slaves > 0 )
+    {
+        qsort( pp_slaves, i_slaves, sizeof (input_item_slave_t*),
+               SlaveCompare );
+        /* Update slave count if there are ignored slaves */
+        for( ; i_slaves > 0 && pp_slaves[i_slaves - 1] == NULL; --i_slaves );
+    }
+
+    /* Update item slaves: add all slaves found with subtitles_Detect(), the
+     * "--sub-file" option and from the item */
+    p_item->pp_slaves = pp_slaves;
+    p_item->i_slaves = i_slaves;
     vlc_mutex_unlock( &p_item->lock );
 
     if( i_slaves > 0 )
@@ -1055,7 +1067,7 @@ static void LoadSlaves( input_thread_t *p_input )
                SlaveCompare );
 
     /* add all detected slaves */
-    for( int i = 0; i < i_slaves && pp_slaves[i] != NULL; i++ )
+    for( int i = 0; i < i_slaves; i++ )
     {
         input_item_slave_t *p_slave = pp_slaves[i];
         if( p_slave->i_type == SLAVE_TYPE_SPU )
@@ -1074,10 +1086,7 @@ static void LoadSlaves( input_thread_t *p_input )
             if( p_source )
                 TAB_APPEND( p_input->p->i_slave, p_input->p->slave, p_source );
         }
-        input_item_slave_Delete( pp_slaves[i] );
     }
-
-    TAB_CLEAN( i_slaves, pp_slaves );
 
     /* Load subtitles from attachments */
     int i_attachment = 0;
