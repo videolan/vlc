@@ -26,7 +26,7 @@ endif
 
 DEPS_projectM = glew $(DEPS_glew)
 
-.projectM: projectM
+.projectM: projectM toolchain.cmake
 	-cd $< && rm CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE) \
 		-DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF \
