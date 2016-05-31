@@ -68,6 +68,11 @@ static void vlc_cancel_addr_finish(void *addr)
     /* Act on cancellation as potential wake-up source */
     vlc_testcancel();
 }
+
+# if defined (_WIN32) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+/* Cannot define OS version-dependent stuff in public headers */
+#  define LIBVLC_NEED_SLEEP
+# endif
 #endif
 
 #ifdef LIBVLC_NEED_SLEEP

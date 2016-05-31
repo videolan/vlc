@@ -103,31 +103,6 @@ static DWORD vlc_WaitForSingleObject (HANDLE handle, DWORD delay)
     return vlc_WaitForMultipleObjects (1, &handle, delay);
 }
 
-static DWORD vlc_Sleep (DWORD delay)
-{
-    DWORD ret;
-#if !IS_INTERRUPTIBLE
-    do {
-        DWORD new_delay = 50;
-        if (new_delay > delay)
-            new_delay = delay;
-        ret = SleepEx (new_delay, TRUE);
-        if (delay != INFINITE)
-            delay -= new_delay;
-        if (isCancelled())
-            ret = WAIT_IO_COMPLETION;
-    } while (delay && ret == 0);
-#else
-    ret = SleepEx (delay, TRUE);
-#endif
-
-    if (unlikely(ret == WAIT_FAILED))
-        abort (); /* We are screwed! */
-    if (ret == 0)
-        ret = WAIT_TIMEOUT;
-    return (ret != WAIT_TIMEOUT) ? ret : 0;
-}
-
 
 /*** Mutexes ***/
 void vlc_mutex_init( vlc_mutex_t *p_mutex )
@@ -862,8 +837,8 @@ mtime_t mdate (void)
     return mdate_selected ();
 }
 
-#undef mwait
-void mwait (mtime_t deadline)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+void (mwait)(mtime_t deadline)
 {
     mtime_t delay;
 
@@ -873,16 +848,17 @@ void mwait (mtime_t deadline)
         delay = (delay + 999) / 1000;
         if (unlikely(delay > 0x7fffffff))
             delay = 0x7fffffff;
-        vlc_Sleep (delay);
+
+        SleepEx(delay, TRUE);
         vlc_testcancel();
     }
 }
 
-#undef msleep
-void msleep (mtime_t delay)
+void (msleep)(mtime_t delay)
 {
     mwait (mdate () + delay);
 }
+#endif
 
 static void SelectClockSource (vlc_object_t *obj)
 {
