@@ -314,7 +314,7 @@ static BOOL WINAPI SleepConditionVariableFallback(CONDITION_VARIABLE *cv,
 {
     (void) cv;
     LeaveCriticalSection(cs);
-    SleepEx(0, TRUE);
+    SleepEx(ms > 5 ? 5 : ms, TRUE);
     EnterCriticalSection(cs);
     return ms != 0;
 }
