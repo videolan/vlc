@@ -1653,7 +1653,7 @@ float libvlc_media_player_get_fps( libvlc_media_player_t *p_mi )
     if( media == NULL )
         return 0.f;
 
-    input_item_t *item = p_mi->p_md->p_input_item;
+    input_item_t *item = media->p_input_item;
     float fps = 0.f;
 
     vlc_mutex_lock( &item->lock );
@@ -1666,6 +1666,7 @@ float libvlc_media_player_get_fps( libvlc_media_player_t *p_mi )
                   / (float)fmt->video.i_frame_rate_base;
     }
     vlc_mutex_unlock( &item->lock );
+    libvlc_media_release( media );
 
     return fps;
 }
