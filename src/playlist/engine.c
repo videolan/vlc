@@ -470,6 +470,9 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( p_playlist, "video-splitter", VideoSplitterCallback, NULL );
 
+    /* sout variables */
+    var_Create( p_playlist, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+
     /* */
     var_Create( p_playlist, "album-art", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "metadata-network-access", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
