@@ -42,6 +42,7 @@
         <file alias="previous_b">pixmaps/previous.png</file>
         <file alias="eject">pixmaps/eject.png</file>
         <file alias="fullscreen">pixmaps/toolbar/fullscreen.png</file>
+        <file alias="renderer">pixmaps/toolbar/renderer.png</file>
         <file alias="defullscreen">pixmaps/toolbar/defullscreen.png</file>
         <file alias="extended">pixmaps/toolbar/extended_16px.png</file>
         <file alias="playlist">pixmaps/playlist/playlist.png</file>

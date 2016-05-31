@@ -366,6 +366,7 @@ DEPS_res = \
 	pixmaps/toolbar/atob.png \
 	pixmaps/toolbar/atob_noa.png \
 	pixmaps/toolbar/atob_nob.png \
+	pixmaps/toolbar/renderer.png \
 	pixmaps/toolbar/defullscreen.png \
 	pixmaps/toolbar/dvd_menu.png \
 	pixmaps/toolbar/dvd_next.png \
