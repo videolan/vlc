@@ -1484,12 +1484,14 @@ void input_ControlPush( input_thread_t *p_input,
     input_thread_private_t *sys = p_input->p;
 
     vlc_mutex_lock( &sys->lock_control );
-    if( sys->is_stopped )
-        ;
-    else if( sys->i_control >= INPUT_CONTROL_FIFO_SIZE )
+    if( sys->is_stopped || sys->i_control >= INPUT_CONTROL_FIFO_SIZE )
     {
-        msg_Err( p_input, "input control fifo overflow, trashing type=%d",
-                 i_type );
+        if( sys->is_stopped )
+            msg_Dbg( p_input, "input control stopped, trashing type=%d",
+                     i_type );
+        else
+            msg_Err( p_input, "input control fifo overflow, trashing type=%d",
+                     i_type );
         if( p_val )
             ControlRelease( i_type, *p_val );
     }
@@ -1503,8 +1505,9 @@ void input_ControlPush( input_thread_t *p_input,
             memset( &c.val, 0, sizeof(c.val) );
 
         sys->control[sys->i_control++] = c;
+
+        vlc_cond_signal( &sys->wait_control );
     }
-    vlc_cond_signal( &sys->wait_control );
     vlc_mutex_unlock( &sys->lock_control );
 }
 
