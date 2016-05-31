@@ -1271,5 +1271,5 @@ int MainInputManager::PLItemRemoved
 void MainInputManager::changeFullscreen( bool new_val )
 {
     if ( var_GetBool( THEPL, "fullscreen" ) != new_val)
-	var_SetBool( THEPL, "fullscreen", new_val );
+        var_SetBool( THEPL, "fullscreen", new_val );
 }
