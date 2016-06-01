@@ -112,7 +112,7 @@ private:
     std::string getIconURL( IXML_Element* p_device_elem , const char* psz_base_url );
 
 private:
-    services_discovery_t* m_sd;
+    services_discovery_t* const m_sd;
     std::vector<MediaServerDesc*> m_list;
     vlc_mutex_t m_lock;
 };
