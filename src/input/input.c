@@ -365,7 +365,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     else if( p_item->b_preparse_interact )
     {
         /* If true, this item was asked explicitly to interact with the user
-         * (via libvlc_MetaRequest). Sub items created from this input won't
+         * (via libvlc_MetadataRequest). Sub items created from this input won't
          * have this flag and won't interact with the user */
         p_input->i_flags &= ~OBJECT_FLAGS_NOINTERACT;
     }

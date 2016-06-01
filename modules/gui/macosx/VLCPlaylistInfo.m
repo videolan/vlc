@@ -209,7 +209,7 @@
         [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
     } else {
         if (!input_item_IsPreparsed(p_item))
-            libvlc_MetaRequest(getIntf()->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
+            libvlc_MetadataRequest(getIntf()->p_libvlc, p_item, META_REQUEST_OPTION_NONE, -1, NULL);
 
         /* fill uri info */
         char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));

@@ -399,8 +399,9 @@ enum input_item_preparse_status
     ITEM_PREPARSE_DONE
 };
 
-VLC_API int libvlc_MetaRequest(libvlc_int_t *, input_item_t *,
-                               input_item_meta_request_option_t );
+VLC_API int libvlc_MetadataRequest( libvlc_int_t *, input_item_t *,
+                                    input_item_meta_request_option_t,
+                                    int, void * );
 VLC_API int libvlc_ArtRequest(libvlc_int_t *, input_item_t *,
                               input_item_meta_request_option_t );
 

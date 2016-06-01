@@ -354,7 +354,7 @@
             continue;
         }
 
-        libvlc_MetaRequest(p_intf->p_libvlc, [o_item input], META_REQUEST_OPTION_NONE);
+        libvlc_MetadataRequest(p_intf->p_libvlc, [o_item input], META_REQUEST_OPTION_NONE, -1, NULL);
 
     }
     [self playlistUpdated];
