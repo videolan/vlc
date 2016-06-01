@@ -528,6 +528,10 @@ void libvlc_media_release( libvlc_media_t *p_md )
 
     uninstall_input_item_observer( p_md );
 
+    /* Cancel asynchronous parsing (if any) */
+    if( p_md->p_input_item )
+        libvlc_MetadataCancel( p_md->p_libvlc_instance->p_libvlc_int, p_md );
+
     if( p_md->p_subitems )
         libvlc_media_list_release( p_md->p_subitems );
 
@@ -764,7 +768,7 @@ static int media_parse(libvlc_media_t *media, bool b_async,
             parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
         if (parse_flag & libvlc_media_do_interact)
             parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
-        ret = libvlc_MetadataRequest(libvlc, item, parse_scope, 0, NULL);
+        ret = libvlc_MetadataRequest(libvlc, item, parse_scope, 0, media);
         if (ret != VLC_SUCCESS)
             return ret;
     }
