@@ -299,14 +299,20 @@ block_t * ForgedInitSegment::buildMoovBox()
     return moov;
 }
 
-SegmentChunk * ForgedInitSegment::getChunk(const std::string &, BaseRepresentation *rep, HTTPConnectionManager *)
+SegmentChunk* ForgedInitSegment::toChunk(size_t, BaseRepresentation *rep, HTTPConnectionManager *)
 {
     block_t *moov = buildMoovBox();
     if(moov)
     {
         MemoryChunkSource *source = new (std::nothrow) MemoryChunkSource(moov);
-        return new (std::nothrow) SegmentChunk(this, source, rep);
+        if( source )
+        {
+            SegmentChunk *chunk = new (std::nothrow) SegmentChunk(this, source, rep);
+            if( chunk )
+                return chunk;
+            else
+                delete source;
+        }
     }
-
     return NULL;
 }

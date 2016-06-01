@@ -39,6 +39,7 @@ namespace smooth
                 ForgedInitSegment(ICanonicalUrl *parent, const std::string &,
                                   uint64_t, uint64_t);
                 virtual ~ForgedInitSegment();
+                virtual SegmentChunk* toChunk(size_t, BaseRepresentation *, HTTPConnectionManager *); /* reimpl */
                 void setWaveFormatEx(const std::string &);
                 void setCodecPrivateData(const std::string &);
                 void setChannels(uint16_t);
@@ -50,9 +51,6 @@ namespace smooth
                 void setAudioTag(uint16_t);
                 void setTrackID(unsigned);
                 void setLanguage(const std::string &);
-
-            protected:
-                virtual SegmentChunk * getChunk(const std::string &, BaseRepresentation *, HTTPConnectionManager *); /* reimpl */
 
             private:
                 void fromWaveFormatEx(const uint8_t *p_data, size_t i_data);

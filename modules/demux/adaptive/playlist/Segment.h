@@ -88,8 +88,6 @@ namespace adaptive
                 uint64_t                sequence;
                 static const int        SEQUENCE_INVALID;
                 static const int        SEQUENCE_FIRST;
-
-                virtual SegmentChunk * getChunk(const std::string &, BaseRepresentation *, HTTPConnectionManager *);
         };
 
         class Segment : public ISegment
