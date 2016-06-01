@@ -57,7 +57,7 @@ struct playlist_preparser_t
     vlc_cond_t      thread_wait;
     bool            b_live;
     preparser_entry_t  **pp_waiting;
-    int             i_waiting;
+    size_t          i_waiting;
 };
 
 static void *Thread( void * );
