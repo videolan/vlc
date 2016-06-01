@@ -398,6 +398,8 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
 
     if ( !p_device_list )
         return;
+
+    vlc_mutex_locker lock( &m_lock );
     for ( unsigned int i = 0; i < ixmlNodeList_length( p_device_list ); i++ )
     {
         IXML_Element* p_device_element = ( IXML_Element* ) ixmlNodeList_item( p_device_list, i );
