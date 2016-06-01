@@ -42,6 +42,7 @@ struct preparser_entry_t
 {
     input_item_t    *p_item;
     input_item_meta_request_option_t i_options;
+    void            *id;
 };
 
 struct playlist_preparser_t
@@ -50,6 +51,7 @@ struct playlist_preparser_t
     playlist_fetcher_t  *p_fetcher;
 
     input_thread_t      *input;
+    void                *input_id;
     bool                 input_done;
 
     vlc_mutex_t     lock;
@@ -72,6 +74,7 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
         return NULL;
 
     p_preparser->input = NULL;
+    p_preparser->input_id = NULL;
     p_preparser->input_done = false;
     p_preparser->object = parent;
     p_preparser->p_fetcher = playlist_fetcher_New( parent );
@@ -89,7 +92,8 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
 }
 
 void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p_item,
-                              input_item_meta_request_option_t i_options )
+                              input_item_meta_request_option_t i_options,
+                              void *id )
 {
     preparser_entry_t *p_entry = malloc( sizeof(preparser_entry_t) );
 
@@ -97,6 +101,7 @@ void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p
         return;
     p_entry->p_item = p_item;
     p_entry->i_options = i_options;
+    p_entry->id = id;
     vlc_gc_incref( p_entry->p_item );
 
     vlc_mutex_lock( &p_preparser->lock );
@@ -118,6 +123,32 @@ void playlist_preparser_fetcher_Push( playlist_preparser_t *p_preparser,
 {
     if( p_preparser->p_fetcher != NULL )
         playlist_fetcher_Push( p_preparser->p_fetcher, p_item, i_options );
+}
+
+void playlist_preparser_Cancel( playlist_preparser_t *p_preparser, void *id )
+{
+    assert( id != NULL );
+    vlc_mutex_lock( &p_preparser->lock );
+
+    /* Remove entries that match with the id */
+    for( int i = p_preparser->i_waiting - 1; i >= 0; ++i )
+    {
+        preparser_entry_t *p_entry = p_preparser->pp_waiting[i];
+        if( p_entry->id == id )
+        {
+            vlc_gc_decref( p_entry->p_item );
+            free( p_entry );
+            REMOVE_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting, i );
+        }
+    }
+
+    /* Stop the input_thread reading the item (if any) */
+    if( p_preparser->input_id == id )
+    {
+        assert( p_preparser->input != NULL );
+        input_Stop( p_preparser->input );
+    }
+    vlc_mutex_unlock( &p_preparser->lock );
 }
 
 void playlist_preparser_Delete( playlist_preparser_t *p_preparser )
@@ -203,6 +234,7 @@ static void Preparse( playlist_preparser_t *preparser,
             return;
         }
         preparser->input_done = false;
+        preparser->input_id = p_entry->id;
 
         var_AddCallback( preparser->input, "intf-event", InputEvent,
                          preparser );
@@ -216,6 +248,7 @@ static void Preparse( playlist_preparser_t *preparser,
                          preparser );
         input_Close( preparser->input );
         preparser->input = NULL;
+        preparser->input_id = NULL;
 
         var_SetAddress( preparser->object, "item-change", p_item );
         input_item_SetPreparsed( p_item, true );
