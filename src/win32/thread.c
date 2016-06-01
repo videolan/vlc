@@ -475,12 +475,12 @@ static void WINAPI WakeByAddressFallback(void *addr)
 }
 #endif
 
-void vlc_addr_wait(void *addr, int val)
+void vlc_addr_wait(void *addr, unsigned val)
 {
     WaitOnAddress(addr, &val, sizeof (val), -1);
 }
 
-bool vlc_addr_timedwait(void *addr, int val, mtime_t delay)
+bool vlc_addr_timedwait(void *addr, unsigned val, mtime_t delay)
 {
     delay = (delay + 999) / 1000;
 

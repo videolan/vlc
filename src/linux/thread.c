@@ -47,8 +47,8 @@ unsigned long vlc_thread_id(void)
      return tid;
 }
 
-static int sys_futex(void *addr, int op, int val, const struct timespec *to,
-                     void *addr2, int val3)
+static int sys_futex(void *addr, int op, unsigned val,
+                     const struct timespec *to, void *addr2, int val3)
 {
     return syscall(__NR_futex, addr, op, val, to, addr2, val3);
 }
@@ -58,7 +58,7 @@ static int vlc_futex_wake(void *addr, int nr)
     return sys_futex(addr, FUTEX_WAKE_PRIVATE, nr, NULL, NULL, 0);
 }
 
-static int vlc_futex_wait(void *addr, int val, const struct timespec *to)
+static int vlc_futex_wait(void *addr, unsigned val, const struct timespec *to)
 {
     return sys_futex(addr, FUTEX_WAIT_PRIVATE, val, to, NULL, 0);
 }
@@ -73,12 +73,12 @@ void vlc_addr_broadcast(void *addr)
     vlc_futex_wake(addr, INT_MAX);
 }
 
-void vlc_addr_wait(void *addr, int val)
+void vlc_addr_wait(void *addr, unsigned val)
 {
     vlc_futex_wait(addr, val, NULL);
 }
 
-bool vlc_addr_timedwait(void *addr, int val, mtime_t delay)
+bool vlc_addr_timedwait(void *addr, unsigned val, mtime_t delay)
 {
     lldiv_t d = lldiv(delay, CLOCK_FREQ);
     struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
