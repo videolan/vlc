@@ -256,7 +256,7 @@ static void check_crashdump(void)
             {
                 MessageBox( NULL, L"There was an error while connecting to " \
                                 "the FTP server. "\
-                                "Thanks a lot for the help.",
+                                "Thanks for trying, anyway.",
                                 L"Report sending failed", MB_OK);
                 fprintf(stderr,"Can't connect to FTP server 0x%08lu\n",
                         (unsigned long)GetLastError());
