@@ -93,14 +93,14 @@ void (msleep)(mtime_t delay)
 #ifdef LIBVLC_NEED_CONDVAR
 #include <stdalign.h>
 
-static inline atomic_int *vlc_cond_value(vlc_cond_t *cond)
+static inline atomic_uint *vlc_cond_value(vlc_cond_t *cond)
 {
     /* XXX: ugly but avoids including vlc_atomic.h in vlc_threads.h */
-    static_assert (sizeof (cond->value) <= sizeof (atomic_int),
+    static_assert (sizeof (cond->value) <= sizeof (atomic_uint),
                    "Size mismatch!");
-    static_assert ((alignof (cond->value) % alignof (atomic_int)) == 0,
+    static_assert ((alignof (cond->value) % alignof (atomic_uint)) == 0,
                    "Alignment mismatch");
-    return (atomic_int *)&cond->value;
+    return (atomic_uint *)&cond->value;
 }
 
 void vlc_cond_init(vlc_cond_t *cond)
@@ -127,30 +127,36 @@ void vlc_cond_destroy(vlc_cond_t *cond)
 void vlc_cond_signal(vlc_cond_t *cond)
 {
     /* Probably the best documented approach is that of Bionic: increment
-     * the futex here, and simply load the value in cond_wait(). This has a bug
+     * the futex here, and simply load the value in cnd_wait(). This has a bug
      * as unlikely as well-known: signals get lost if the futex is incremented
      * an exact multiple of 2^(CHAR_BIT * sizeof (int)) times.
      *
-     * Here, we simply clear the low order bit, while cond_wait() sets it.
-     * It makes cond_wait() somewhat slower, but it should be free of bugs,
-     * leaves the other bits free for other uses (e.g. flags).
+     * A different presumably bug-free solution is used here:
+     * - cnd_signal() sets the futex to the equal-or-next odd value, while
+     * - cnd_wait() sets the futex to the equal-or-next even value.
      **/
-    atomic_fetch_and_explicit(vlc_cond_value(cond), -2, memory_order_relaxed);
-    /* We have to wake the futex even if the low order bit is cleared, as there
-     * could be more than one thread queued, not all of them already awoken. */
+    atomic_fetch_or_explicit(vlc_cond_value(cond), 1, memory_order_relaxed);
     vlc_addr_signal(&cond->value);
 }
 
 void vlc_cond_broadcast(vlc_cond_t *cond)
 {
-    atomic_fetch_and_explicit(vlc_cond_value(cond), -2, memory_order_relaxed);
+    atomic_fetch_or_explicit(vlc_cond_value(cond), 1, memory_order_relaxed);
     vlc_addr_broadcast(&cond->value);
 }
 
 void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
 {
-    int value = atomic_fetch_or_explicit(vlc_cond_value(cond), 1,
-                                         memory_order_relaxed) | 1;
+    unsigned value = atomic_load_explicit(vlc_cond_value(cond),
+                                     memory_order_relaxed);
+    while (value & 1)
+    {
+        if (atomic_compare_exchange_weak_explicit(vlc_cond_value(cond), &value,
+                                                  value + 1,
+                                                  memory_order_relaxed,
+                                                  memory_order_relaxed))
+            value++;
+    }
 
     vlc_cancel_addr_prepare(&cond->value);
     vlc_mutex_unlock(mutex);
@@ -164,8 +170,16 @@ void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
 static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
                                mtime_t delay)
 {
-    int value = atomic_fetch_or_explicit(vlc_cond_value(cond), 1,
-                                         memory_order_relaxed) | 1;
+    unsigned value = atomic_load_explicit(vlc_cond_value(cond),
+                                          memory_order_relaxed);
+    while (value & 1)
+    {
+        if (atomic_compare_exchange_weak_explicit(vlc_cond_value(cond), &value,
+                                                  value + 1,
+                                                  memory_order_relaxed,
+                                                  memory_order_relaxed))
+            value++;
+    }
 
     vlc_cancel_addr_prepare(&cond->value);
     vlc_mutex_unlock(mutex);

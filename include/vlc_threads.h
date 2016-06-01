@@ -326,7 +326,7 @@ typedef struct vlc_timer *vlc_timer_t;
 #ifdef LIBVLC_NEED_CONDVAR
 typedef struct
 {
-    int value;
+    unsigned value;
 } vlc_cond_t;
 # define VLC_STATIC_COND { 0 }
 #endif

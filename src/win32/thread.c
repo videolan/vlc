@@ -640,7 +640,7 @@ void vlc_cancel (vlc_thread_t th)
     EnterCriticalSection(&th->wait.lock);
     if (th->wait.addr != NULL)
     {
-        atomic_fetch_and_explicit(th->wait.addr, -2, memory_order_relaxed);
+        atomic_fetch_or_explicit(th->wait.addr, 1, memory_order_relaxed);
         vlc_addr_broadcast(th->wait.addr);
     }
     LeaveCriticalSection(&th->wait.lock);

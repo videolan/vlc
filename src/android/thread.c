@@ -317,7 +317,7 @@ void vlc_cancel (vlc_thread_t thread_id)
     addr = thread_id->wait.addr;
     if (addr != NULL)
     {
-        atomic_fetch_and_explicit(addr, -2, memory_order_relaxed);
+        atomic_fetch_or_explicit(addr, 1, memory_order_relaxed);
         vlc_addr_broadcast(addr);
     }
     vlc_mutex_unlock(&thread_id->wait.lock);
