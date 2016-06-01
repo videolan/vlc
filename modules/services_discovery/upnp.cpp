@@ -428,7 +428,7 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
         }
 
         /* Check if server is already added */
-        if ( m_sd->p_sys->p_server_list->getServer( psz_udn ) )
+        if ( getServer( psz_udn ) )
         {
             msg_Warn( m_sd, "Server with uuid '%s' already exists.", psz_udn );
             continue;
