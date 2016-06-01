@@ -58,7 +58,7 @@ class UpnpInstanceWrapper
 {
 public:
     // This increases the refcount before returning the instance
-    static UpnpInstanceWrapper* get(vlc_object_t* p_obj, SD::MediaServerList *opaque);
+    static UpnpInstanceWrapper* get(vlc_object_t* p_obj, services_discovery_t *p_sd);
     void release(bool isSd);
     UpnpClient_Handle handle() const;
 
