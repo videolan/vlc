@@ -957,7 +957,7 @@ static block_t * MP4_RTPHintToFrame( demux_t *p_demux, block_t *p_block, uint32_
         memcpy( p_dst, p_src, sample_cons.length );
         p_dst += sample_cons.length;
 
-        i_payload += p_dst - p_newblock->p_buffer;
+        i_payload = p_dst - p_newblock->p_buffer;
     }
 
     block_Release( p_block );
