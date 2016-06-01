@@ -207,6 +207,10 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
           | AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT
           | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE:
         return "3F2M1R/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_REARCENTER
+          | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE:
+        return "3F2M3R/LFE";
     }
 
     return "ERROR";
