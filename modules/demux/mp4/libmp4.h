@@ -331,6 +331,7 @@ typedef int64_t stime_t;
 #define ATOM_0xa9xyz VLC_FOURCC( 0xa9, 'x', 'y', 'z' )
 #define ATOM_aART VLC_FOURCC( 'a', 'A', 'R', 'T' )
 #define ATOM_chpl VLC_FOURCC( 'c', 'h', 'p', 'l' )
+#define ATOM_HMMT VLC_FOURCC( 'H', 'M', 'M', 'T' )
 #define ATOM_disk VLC_FOURCC( 'd', 'i', 's', 'k' )
 #define ATOM_WLOC VLC_FOURCC( 'W', 'L', 'O', 'C' )
 
@@ -1202,6 +1203,13 @@ typedef struct
 
 typedef struct
 {
+    uint32_t i_chapter_count;
+    uint32_t *pi_chapter_start;
+
+} MP4_Box_data_HMMT_t;
+
+typedef struct
+{
     uint8_t i_version;
     uint8_t i_profile;
     uint8_t i_profile_compatibility;
@@ -1608,6 +1616,7 @@ typedef union MP4_Box_data_s
 
     MP4_Box_data_pnot_t *p_pnot;
     MP4_Box_data_chpl_t *p_chpl;
+    MP4_Box_data_HMMT_t *p_hmmt;
     MP4_Box_data_tref_generic_t *p_tref_generic;
 
     MP4_Box_data_tfrf_t *p_tfrf;

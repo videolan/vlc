@@ -1813,6 +1813,26 @@ static void LoadChapterGpac( demux_t  *p_demux, MP4_Box_t *p_chpl )
         TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
     }
 }
+static void LoadChapterGoPro( demux_t *p_demux, MP4_Box_t *p_hmmt )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->p_title = vlc_input_title_New();
+    if( p_sys->p_title )
+        for( unsigned i = 0; i < BOXDATA(p_hmmt)->i_chapter_count; i++ )
+        {
+            seekpoint_t *s = vlc_seekpoint_New();
+            if( s )
+            {
+                if( asprintf( &s->psz_name, "HiLight tag #%u", i+1 ) != -1 )
+                    EnsureUTF8( s->psz_name );
+
+                /* HiLights are stored in ms so we convert them to µs */
+                s->i_time_offset = BOXDATA(p_hmmt)->pi_chapter_start[i] * 1000;
+                TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
+            }
+        }
+}
 static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -1856,11 +1876,17 @@ static void LoadChapter( demux_t  *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     MP4_Box_t *p_chpl;
+    MP4_Box_t *p_hmmt;
 
     if( ( p_chpl = MP4_BoxGet( p_sys->p_root, "/moov/udta/chpl" ) ) &&
           BOXDATA(p_chpl) && BOXDATA(p_chpl)->i_chapter > 0 )
     {
         LoadChapterGpac( p_demux, p_chpl );
+    }
+    else if( ( p_hmmt = MP4_BoxGet( p_sys->p_root, "/moov/udta/HMMT" ) ) &&
+             BOXDATA(p_hmmt) && BOXDATA(p_hmmt)->pi_chapter_start && BOXDATA(p_hmmt)->i_chapter_count > 0 )
+    {
+        LoadChapterGoPro( p_demux, p_hmmt );
     }
     else if( p_sys->p_tref_chap )
     {

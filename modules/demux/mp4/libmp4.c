@@ -3378,6 +3378,55 @@ static int MP4_ReadBox_chpl( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+/* GoPro HiLight tags support */
+static void MP4_FreeBox_HMMT( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_hmmt->pi_chapter_start );
+}
+
+static int MP4_ReadBox_HMMT( stream_t *p_stream, MP4_Box_t *p_box )
+{
+#define MAX_CHAPTER_COUNT 100
+
+    MP4_Box_data_HMMT_t *p_hmmt;
+    MP4_READBOX_ENTER( MP4_Box_data_HMMT_t, MP4_FreeBox_HMMT );
+
+    if( i_read < 4 )
+        MP4_READBOX_EXIT( 0 );
+
+    p_hmmt = p_box->data.p_hmmt;
+
+    MP4_GET4BYTES( p_hmmt->i_chapter_count );
+
+    if( p_hmmt->i_chapter_count <= 0 )
+    {
+        p_hmmt->pi_chapter_start = NULL;
+        MP4_READBOX_EXIT( 1 );
+    }
+
+    if( ( i_read / sizeof(uint32_t) ) < p_hmmt->i_chapter_count )
+        MP4_READBOX_EXIT( 0 );
+
+    /* Cameras are allowing a maximum of 100 tags */
+    if( p_hmmt->i_chapter_count > MAX_CHAPTER_COUNT )
+        p_hmmt->i_chapter_count = MAX_CHAPTER_COUNT;
+
+    p_hmmt->pi_chapter_start = malloc( p_hmmt->i_chapter_count * sizeof(uint32_t) );
+    if( p_hmmt->pi_chapter_start == NULL )
+        MP4_READBOX_EXIT( 0 );
+
+    for( uint32_t i = 0; i < p_hmmt->i_chapter_count; i++ )
+    {
+        MP4_GET4BYTES( p_hmmt->pi_chapter_start[i] );
+    }
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "read box: \"HMMT\" %d HiLight tags", p_hmmt->i_chapter_count );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static void MP4_FreeBox_tref_generic( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_tref_generic->i_track_ID );
@@ -4224,6 +4273,7 @@ static const struct
     { ATOM_name,    MP4_ReadBox_String,    ATOM_udta },
     { ATOM_vndr,    MP4_ReadBox_String,    ATOM_udta },
     { ATOM_SDLN,    MP4_ReadBox_String,    ATOM_udta },
+    { ATOM_HMMT,    MP4_ReadBox_HMMT,      ATOM_udta }, /* GoPro HiLight tags */
 
     /* udta, non meta */
     { ATOM_tsel,    MP4_ReadBox_tsel,    ATOM_udta },
