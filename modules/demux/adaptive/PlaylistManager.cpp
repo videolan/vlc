@@ -260,20 +260,6 @@ bool PlaylistManager::needsUpdate() const
     return playlist->isLive() && (failedupdates < 3);
 }
 
-bool PlaylistManager::seekAble() const
-{
-    if(playlist->isLive())
-        return false;
-
-    std::vector<AbstractStream *>::const_iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
-    {
-        if(!(*it)->seekAble())
-            return false;
-    }
-    return true;
-}
-
 void PlaylistManager::scheduleNextUpdate()
 {
 
@@ -393,7 +379,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
     switch (i_query)
     {
         case DEMUX_CAN_SEEK:
-            *(va_arg (args, bool *)) = seekAble();
+            *(va_arg (args, bool *)) = !playlist->isLive();
             break;
 
         case DEMUX_CAN_CONTROL_PACE:

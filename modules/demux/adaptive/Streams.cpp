@@ -336,7 +336,7 @@ block_t * AbstractStream::readNextBlock()
 
 bool AbstractStream::setPosition(mtime_t time, bool tryonly)
 {
-    if(!demuxer)
+    if(!seekAble())
         return false;
 
     bool ret = segmentTracker->setPositionByTime(time, demuxer->reinitsOnSeek(), tryonly);

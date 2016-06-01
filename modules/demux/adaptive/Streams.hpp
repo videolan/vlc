@@ -65,7 +65,6 @@ namespace adaptive
         mtime_t getMinAheadTime() const;
         mtime_t getFirstDTS() const;
         int esCount() const;
-        bool seekAble() const;
         bool isSelected() const;
         virtual bool reactivate(mtime_t);
         bool isDisabled() const;
@@ -86,6 +85,7 @@ namespace adaptive
         virtual void trackerEvent(const SegmentTrackerEvent &); /* impl */
 
     protected:
+        bool seekAble() const;
         virtual block_t *checkBlock(block_t *, bool) = 0;
         virtual AbstractDemuxer * createDemux(const StreamFormat &) = 0;
         virtual bool startDemux();

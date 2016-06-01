@@ -76,7 +76,6 @@ namespace adaptive
             mtime_t getCurrentPlaybackTime() const;
 
             int     esCount() const;
-            bool    seekAble() const;
             void pruneLiveStream();
             virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();
