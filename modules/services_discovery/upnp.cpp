@@ -36,6 +36,8 @@
 #include <assert.h>
 #include <limits.h>
 #include <algorithm>
+#include <set>
+#include <string>
 
 /*
  * Constants
@@ -803,101 +805,185 @@ bool MediaServer::addContainer( IXML_Element* containerElement )
     return true;
 }
 
+namespace
+{
+    class ItemDescriptionHolder
+    {
+    private:
+        std::set<std::string> slaves;
+
+        const char* objectID,
+            * title,
+            * psz_artist,
+            * psz_genre,
+            * psz_album,
+            * psz_date,
+            * psz_orig_track_nb,
+            * psz_album_artist,
+            * psz_albumArt;
+
+    public:
+        enum MEDIA_TYPE
+            {
+                VIDEO = 0,
+                AUDIO,
+                IMAGE
+            };
+
+        MEDIA_TYPE media_type;
+
+        ItemDescriptionHolder()
+        {
+        }
+
+        bool init(IXML_Element *itemElement)
+        {
+            objectID = ixmlElement_getAttribute( itemElement, "id" );
+            if ( !objectID )
+                return false;
+            title = xml_getChildElementValue( itemElement, "dc:title" );
+            if ( !title )
+                return false;
+            const char *psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfo" );
+            if ( !psz_subtitles &&
+                 !(psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfoEx" )) )
+                psz_subtitles = xml_getChildElementValue( itemElement, "pv:subtitlefile" );
+            addSlave(psz_subtitles);
+            psz_artist = xml_getChildElementValue( itemElement, "upnp:artist" );
+            psz_genre = xml_getChildElementValue( itemElement, "upnp:genre" );
+            psz_album = xml_getChildElementValue( itemElement, "upnp:album" );
+            psz_date = xml_getChildElementValue( itemElement, "dc:date" );
+            psz_orig_track_nb = xml_getChildElementValue( itemElement, "upnp:originalTrackNumber" );
+            psz_album_artist = xml_getChildElementValue( itemElement, "upnp:albumArtist" );
+            psz_albumArt = xml_getChildElementValue( itemElement, "upnp:albumArtURI" );
+            const char *psz_media_type = xml_getChildElementValue( itemElement, "upnp:class" );
+            if (strncmp(psz_media_type, "object.item.videoItem", 21) == 0)
+                media_type = VIDEO;
+            else if (strncmp(psz_media_type, "object.item.audioItem", 21) == 0)
+                media_type = AUDIO;
+            else if (strncmp(psz_media_type, "object.item.imageItem", 21) == 0)
+                media_type = IMAGE;
+            else
+                return false;
+            return true;
+        }
+
+        void addSlave(const char *psz_slave)
+        {
+            if (psz_slave)
+                slaves.insert(psz_slave);
+        }
+
+        void addSubtitleSlave(IXML_Element* p_resource)
+        {
+            if (slaves.empty())
+                addSlave(ixmlElement_getAttribute( p_resource, "pv:subtitleFileUri" ));
+        }
+
+        void setArtworkURL(IXML_Element* p_resource)
+        {
+            psz_albumArt = xml_getChildElementValue( p_resource, "res" );
+        }
+
+        void apply(input_item_t *p_item)
+        {
+            if ( psz_artist != NULL )
+                input_item_SetArtist( p_item, psz_artist );
+            if ( psz_genre != NULL )
+                input_item_SetGenre( p_item, psz_genre );
+            if ( psz_album != NULL )
+                input_item_SetAlbum( p_item, psz_album );
+            if ( psz_date != NULL )
+                input_item_SetDate( p_item, psz_date );
+            if ( psz_orig_track_nb != NULL )
+                input_item_SetTrackNumber( p_item, psz_orig_track_nb );
+            if ( psz_album_artist != NULL )
+                input_item_SetAlbumArtist( p_item, psz_album_artist );
+            if ( psz_albumArt != NULL )
+                input_item_SetArtworkURL( p_item, psz_albumArt );
+            for (std::set<std::string>::iterator it = slaves.begin(); it != slaves.end(); ++it)
+            {
+                input_item_slave *p_slave = input_item_slave_New( it->c_str(), SLAVE_TYPE_SPU,
+                                                                  SLAVE_PRIORITY_MATCH_ALL );
+                if ( p_slave )
+                    input_item_AddSlave( p_item, p_slave );
+            }
+        }
+
+        input_item_t *createNewItem(IXML_Element *p_resource)
+        {
+            mtime_t i_duration = -1;
+            const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
+            if( !psz_resource_url )
+                return NULL;
+            const char* psz_duration = ixmlElement_getAttribute( p_resource, "duration" );
+            if ( psz_duration )
+            {
+                int i_hours, i_minutes, i_seconds;
+                if( sscanf( psz_duration, "%d:%02d:%02d", &i_hours, &i_minutes, &i_seconds ) )
+                    i_duration = INT64_C(1000000) * ( i_hours * 3600 + i_minutes * 60 +
+                                                      i_seconds );
+            }
+            return input_item_NewExt( psz_resource_url, title, i_duration,
+                                      ITEM_TYPE_FILE, ITEM_NET );
+        }
+    };
+}
+
 bool MediaServer::addItem( IXML_Element* itemElement )
 {
-    const char* objectID = ixmlElement_getAttribute( itemElement, "id" );
-    if ( !objectID )
+    ItemDescriptionHolder holder;
+
+    if (!holder.init(itemElement))
         return false;
-
-    const char* title = xml_getChildElementValue( itemElement, "dc:title" );
-    if ( !title )
-        return false;
-
-    const char* psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfo" );
-    if ( !psz_subtitles )
-    {
-        psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfoEx" );
-        if ( !psz_subtitles )
-            psz_subtitles = xml_getChildElementValue( itemElement, "pv:subtitlefile" );
-    }
-
     /* Try to extract all resources in DIDL */
     IXML_NodeList* p_resource_list = ixmlDocument_getElementsByTagName( (IXML_Document*) itemElement, "res" );
-    if ( !p_resource_list || ixmlNodeList_length( p_resource_list ) <= 0 )
-    {
-        if ( p_resource_list )
-            ixmlNodeList_free( p_resource_list );
+    if ( !p_resource_list)
         return false;
-    }
-
-    mtime_t i_duration = -1;
-    IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, 0 );
-    const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
-    if( !psz_resource_url )
-    {
+    int list_lenght = ixmlNodeList_length( p_resource_list );
+    if (list_lenght <= 0 ) {
         ixmlNodeList_free( p_resource_list );
         return false;
     }
-    const char* psz_duration = ixmlElement_getAttribute( p_resource, "duration" );
+    input_item_t *p_item = NULL;
 
-    if ( psz_duration )
+    for (int index = 0; index < list_lenght; index++)
     {
-        int i_hours, i_minutes, i_seconds;
-        if( sscanf( psz_duration, "%d:%02d:%02d", &i_hours, &i_minutes, &i_seconds ) )
-            i_duration = INT64_C(1000000) * ( i_hours * 3600 + i_minutes * 60 +
-                                              i_seconds );
+        IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, index );
+        const char* rez_type = ixmlElement_getAttribute( p_resource, "protocolInfo" );
+
+        if (strncmp(rez_type, "http-get:*:video/", 17) == 0 && holder.media_type == ItemDescriptionHolder::VIDEO)
+        {
+            if (!p_item)
+                p_item = holder.createNewItem(p_resource);
+            holder.addSubtitleSlave(p_resource);
+        }
+        else if (strncmp(rez_type, "http-get:*:image/", 17) == 0)
+            switch (holder.media_type)
+            {
+            case ItemDescriptionHolder::IMAGE:
+                if (!p_item) {
+                    p_item = holder.createNewItem(p_resource);
+                    break;
+                }
+            case ItemDescriptionHolder::VIDEO:
+            case ItemDescriptionHolder::AUDIO:
+                holder.setArtworkURL(p_resource);
+                break;
+            }
+        else if (strncmp(rez_type, "http-get:*:text/", 16) == 0)
+            holder.addSlave(xml_getChildElementValue( p_resource, "res" ));
+        else if (strncmp(rez_type, "http-get:*:audio/", 17) == 0)
+            if (holder.media_type == ItemDescriptionHolder::AUDIO && !p_item)
+                p_item = holder.createNewItem(p_resource);
     }
-
-    if ( psz_subtitles == NULL )
-    {
-        psz_subtitles = ixmlElement_getAttribute( p_resource, "pv:subtitleFileUri" );
-    }
-
-    input_item_t* p_item =
-        input_item_NewExt( psz_resource_url, title, i_duration,
-                           ITEM_TYPE_FILE, ITEM_NET );
-    if ( p_item == NULL )
-    {
-        ixmlNodeList_free( p_resource_list );
+    ixmlNodeList_free( p_resource_list );
+    if (!p_item)
         return false;
-    }
-    const char* psz_artist = xml_getChildElementValue( itemElement, "upnp:artist" );
-
-    if ( psz_artist != NULL )
-        input_item_SetArtist( p_item, psz_artist );
-    const char* psz_genre = xml_getChildElementValue( itemElement, "upnp:genre" );
-    if ( psz_genre != NULL )
-        input_item_SetGenre( p_item, psz_genre );
-    const char* psz_album = xml_getChildElementValue( itemElement, "upnp:album" );
-    if ( psz_album != NULL )
-        input_item_SetAlbum( p_item, psz_album );
-    const char* psz_date = xml_getChildElementValue( itemElement, "dc:date" );
-    if ( psz_date != NULL )
-        input_item_SetDate( p_item, psz_date );
-    const char* psz_orig_track_nb = xml_getChildElementValue( itemElement, "upnp:originalTrackNumber" );
-    if ( psz_orig_track_nb != NULL )
-        input_item_SetTrackNumber( p_item, psz_orig_track_nb );
-    const char* psz_album_artist = xml_getChildElementValue( itemElement, "upnp:albumArtist" );
-    if ( psz_album_artist != NULL )
-        input_item_SetAlbumArtist( p_item, psz_album_artist );
-    const char* psz_albumArt = xml_getChildElementValue( itemElement, "upnp:albumArtURI" );
-    if ( psz_albumArt != NULL )
-        input_item_SetArtworkURL( p_item, psz_albumArt );
-
-    if ( psz_subtitles )
-    {
-        input_item_slave *p_slave =
-            input_item_slave_New( psz_subtitles, SLAVE_TYPE_SPU,
-                                  SLAVE_PRIORITY_MATCH_ALL );
-        if ( p_slave )
-            input_item_AddSlave( p_item, p_slave );
-    }
-
+    holder.apply(p_item);
     input_item_CopyOptions( p_item, m_node->p_item );
     input_item_node_AppendItem( m_node, p_item );
     input_item_Release( p_item );
-
-    ixmlNodeList_free( p_resource_list );
     return true;
 }
 
