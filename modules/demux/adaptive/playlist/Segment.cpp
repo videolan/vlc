@@ -61,13 +61,13 @@ ISegment::~ISegment()
     assert(chunksuse.Get() == 0);
 }
 
-SegmentChunk * ISegment::getChunk(const std::string &url, HTTPConnectionManager *connManager)
+SegmentChunk * ISegment::getChunk(const std::string &url, BaseRepresentation *rep, HTTPConnectionManager *connManager)
 {
     HTTPChunkBufferedSource *source = new HTTPChunkBufferedSource(url, connManager);
     if(startByte != endByte)
         source->setBytesRange(BytesRange(startByte, endByte));
     connManager->downloader->schedule(source);
-    return new (std::nothrow) SegmentChunk(this, source);
+    return new (std::nothrow) SegmentChunk(this, source, rep);
 }
 
 void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
@@ -80,7 +80,7 @@ SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep, HTTPCo
     SegmentChunk *chunk;
     try
     {
-        chunk = getChunk(getUrlSegment().toString(index, ctxrep), connManager);
+        chunk = getChunk(getUrlSegment().toString(index, ctxrep), ctxrep, connManager);
         if (!chunk)
             return NULL;
     }
@@ -88,8 +88,6 @@ SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep, HTTPCo
     {
         return NULL;
     };
-
-    chunk->setRepresentation(ctxrep);
 
     return chunk;
 }

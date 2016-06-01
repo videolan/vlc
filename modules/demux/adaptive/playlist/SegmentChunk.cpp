@@ -29,12 +29,13 @@
 using namespace adaptive::playlist;
 using namespace adaptive;
 
-SegmentChunk::SegmentChunk(ISegment *segment_, AbstractChunkSource *source) :
+SegmentChunk::SegmentChunk(ISegment *segment_, AbstractChunkSource *source,
+                           BaseRepresentation *rep_) :
     AbstractChunk(source)
 {
     segment = segment_;
     segment->chunksuse.Set(segment->chunksuse.Get() + 1);
-    rep = NULL;
+    rep = rep_;
     discontinuity = segment_->discontinuity;
 }
 
@@ -42,11 +43,6 @@ SegmentChunk::~SegmentChunk()
 {
     assert(segment->chunksuse.Get() > 0);
     segment->chunksuse.Set(segment->chunksuse.Get() - 1);
-}
-
-void SegmentChunk::setRepresentation(BaseRepresentation *rep_)
-{
-    rep = rep_;
 }
 
 void SegmentChunk::onDownload(block_t **pp_block)

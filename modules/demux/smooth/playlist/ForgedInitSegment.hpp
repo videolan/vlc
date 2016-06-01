@@ -52,7 +52,7 @@ namespace smooth
                 void setLanguage(const std::string &);
 
             protected:
-                virtual SegmentChunk * getChunk(const std::string &, HTTPConnectionManager *); /* reimpl */
+                virtual SegmentChunk * getChunk(const std::string &, BaseRepresentation *, HTTPConnectionManager *); /* reimpl */
 
             private:
                 void fromWaveFormatEx(const uint8_t *p_data, size_t i_data);

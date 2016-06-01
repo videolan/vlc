@@ -38,9 +38,8 @@ namespace adaptive
         class SegmentChunk : public AbstractChunk
         {
         public:
-            SegmentChunk(ISegment *segment, AbstractChunkSource *);
+            SegmentChunk(ISegment *segment, AbstractChunkSource *, BaseRepresentation *);
             virtual ~SegmentChunk();
-            void setRepresentation(BaseRepresentation *);
             virtual void onDownload(block_t **); // reimpl
             StreamFormat getStreamFormat() const;
             bool discontinuity;
