@@ -611,7 +611,8 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
 
 /**
  * Requests extraction of the meta data for an input item (a.k.a. preparsing).
- * The actual extraction is asynchronous.
+ * The actual extraction is asynchronous. It can be cancelled with
+ * libvlc_MetadataCancel()
  */
 int libvlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
                            input_item_meta_request_option_t i_options,
@@ -646,4 +647,20 @@ int libvlc_ArtRequest(libvlc_int_t *libvlc, input_item_t *item,
 
     playlist_preparser_fetcher_Push(priv->parser, item, i_options);
     return VLC_SUCCESS;
+}
+
+/**
+ * Cancels extraction of the meta data for an input item.
+ *
+ * This does nothing if the input item is already processed or if it was not
+ * added with libvlc_MetadataRequest()
+ */
+void libvlc_MetadataCancel(libvlc_int_t *libvlc, void *id)
+{
+    libvlc_priv_t *priv = libvlc_priv(libvlc);
+
+    if (unlikely(priv->parser == NULL))
+        return;
+
+    playlist_preparser_Cancel(priv->parser, id);
 }

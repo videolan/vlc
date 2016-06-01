@@ -404,6 +404,7 @@ VLC_API int libvlc_MetadataRequest( libvlc_int_t *, input_item_t *,
                                     int, void * );
 VLC_API int libvlc_ArtRequest(libvlc_int_t *, input_item_t *,
                               input_item_meta_request_option_t );
+VLC_API void libvlc_MetadataCancel( libvlc_int_t *, void * );
 
 /******************
  * Input stats
