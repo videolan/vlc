@@ -810,7 +810,17 @@ namespace
     class ItemDescriptionHolder
     {
     private:
-        std::set<std::string> slaves;
+        struct Slave : std::string
+        {
+            slave_type type;
+
+            Slave(std::string const &url, slave_type type) :
+                std::string(url), type(type)
+            {
+            }
+        };
+
+        std::set<Slave> slaves;
 
         const char* objectID,
             * title,
@@ -848,7 +858,7 @@ namespace
             if ( !psz_subtitles &&
                  !(psz_subtitles = xml_getChildElementValue( itemElement, "sec:CaptionInfoEx" )) )
                 psz_subtitles = xml_getChildElementValue( itemElement, "pv:subtitlefile" );
-            addSlave(psz_subtitles);
+            addSlave(psz_subtitles, SLAVE_TYPE_SPU);
             psz_artist = xml_getChildElementValue( itemElement, "upnp:artist" );
             psz_genre = xml_getChildElementValue( itemElement, "upnp:genre" );
             psz_album = xml_getChildElementValue( itemElement, "upnp:album" );
@@ -868,16 +878,17 @@ namespace
             return true;
         }
 
-        void addSlave(const char *psz_slave)
+        void addSlave(const char *psz_slave, slave_type type)
         {
             if (psz_slave)
-                slaves.insert(psz_slave);
+                slaves.insert(Slave(psz_slave, type));
         }
 
         void addSubtitleSlave(IXML_Element* p_resource)
         {
             if (slaves.empty())
-                addSlave(ixmlElement_getAttribute( p_resource, "pv:subtitleFileUri" ));
+                addSlave(ixmlElement_getAttribute( p_resource, "pv:subtitleFileUri" ),
+                         SLAVE_TYPE_SPU);
         }
 
         void setArtworkURL(IXML_Element* p_resource)
@@ -901,9 +912,9 @@ namespace
                 input_item_SetAlbumArtist( p_item, psz_album_artist );
             if ( psz_albumArt != NULL )
                 input_item_SetArtworkURL( p_item, psz_albumArt );
-            for (std::set<std::string>::iterator it = slaves.begin(); it != slaves.end(); ++it)
+            for (std::set<Slave>::iterator it = slaves.begin(); it != slaves.end(); ++it)
             {
-                input_item_slave *p_slave = input_item_slave_New( it->c_str(), SLAVE_TYPE_SPU,
+                input_item_slave *p_slave = input_item_slave_New( it->c_str(), it->type,
                                                                   SLAVE_PRIORITY_MATCH_ALL );
                 if ( p_slave )
                     input_item_AddSlave( p_item, p_slave );
@@ -972,10 +983,18 @@ bool MediaServer::addItem( IXML_Element* itemElement )
                 break;
             }
         else if (strncmp(rez_type, "http-get:*:text/", 16) == 0)
-            holder.addSlave(xml_getChildElementValue( p_resource, "res" ));
+            holder.addSlave(xml_getChildElementValue( p_resource, "res" ), SLAVE_TYPE_SPU);
         else if (strncmp(rez_type, "http-get:*:audio/", 17) == 0)
-            if (holder.media_type == ItemDescriptionHolder::AUDIO && !p_item)
-                p_item = holder.createNewItem(p_resource);
+        {
+            if (holder.media_type == ItemDescriptionHolder::AUDIO)
+            {
+                if (!p_item)
+                    p_item = holder.createNewItem(p_resource);
+            }
+            else
+                holder.addSlave(xml_getChildElementValue( p_resource, "res" ),
+                                SLAVE_TYPE_AUDIO);
+        }
     }
     ixmlNodeList_free( p_resource_list );
     if (!p_item)
