@@ -932,7 +932,9 @@ static block_t * MP4_RTPHintToFrame( demux_t *p_demux, block_t *p_block, uint32_
             goto error;
         }
 
-        block_t *p_realloc = block_Realloc( p_newblock, 0, i_payload + sample_cons.length + 4 );
+        block_t *p_realloc = ( p_newblock ) ?
+                             block_Realloc( p_newblock, 0, i_payload + sample_cons.length + 4 ):
+                             block_Alloc( i_payload + sample_cons.length + 4 );
         if( !p_realloc )
             goto error;
 
