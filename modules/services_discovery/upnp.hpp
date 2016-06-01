@@ -58,7 +58,7 @@ class UpnpInstanceWrapper
 {
 public:
     // This increases the refcount before returning the instance
-    static UpnpInstanceWrapper* get(vlc_object_t* p_obj, Upnp_FunPtr callback, SD::MediaServerList *opaque);
+    static UpnpInstanceWrapper* get(vlc_object_t* p_obj, SD::MediaServerList *opaque);
     void release(bool isSd);
     UpnpClient_Handle handle() const;
 
@@ -72,9 +72,8 @@ private:
     static UpnpInstanceWrapper* s_instance;
     static vlc_mutex_t s_lock;
     UpnpClient_Handle m_handle;
-    vlc_mutex_t m_callback_lock; // protect opaque_ and callback_
+    vlc_mutex_t m_callback_lock; // protect m_opaque
     SD::MediaServerList* m_opaque;
-    Upnp_FunPtr m_callback;
     int m_refcount;
 };
 
@@ -105,7 +104,7 @@ public:
     bool addServer(MediaServerDesc *desc );
     void removeServer(const std::string &udn );
     MediaServerDesc* getServer( const std::string& udn );
-    static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data );
+    static int Callback( Upnp_EventType event_type, void* p_event, MediaServerList* self );
 
 private:
     void parseNewServer( IXML_Document* doc, const std::string& location );
