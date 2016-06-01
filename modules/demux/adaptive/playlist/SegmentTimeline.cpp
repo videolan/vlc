@@ -112,9 +112,11 @@ uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) c
     return prevnumber;
 }
 
-stime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) const
+bool SegmentTimeline::getScaledPlaybackTimeDurationBySegmentNumber(uint64_t number,
+                                                                   stime_t *time, stime_t *duration) const
 {
     stime_t totalscaledtime = 0;
+    stime_t lastduration = 0;
 
     std::list<Element *>::const_iterator it;
     for(it = elements.begin(); it != elements.end(); ++it)
@@ -126,6 +128,8 @@ stime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) c
         {
             totalscaledtime = el->t;
         }
+
+        lastduration = el->d;
 
         if(number <= el->number)
             break;
@@ -139,7 +143,16 @@ stime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) c
         totalscaledtime += (el->d * (el->r + 1));
     }
 
-    return totalscaledtime;
+    *time = totalscaledtime;
+    *duration = lastduration;
+    return true;
+}
+
+stime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) const
+{
+    stime_t time, duration;
+    (void) getScaledPlaybackTimeDurationBySegmentNumber(number, &time, &duration);
+    return time;
 }
 
 uint64_t SegmentTimeline::maxElementNumber() const

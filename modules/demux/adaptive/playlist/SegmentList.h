@@ -48,7 +48,7 @@ namespace adaptive
                 void                    pruneBySegmentNumber(uint64_t);
                 void                    pruneByPlaybackTime(mtime_t);
                 bool                    getSegmentNumberByScaledTime(stime_t, uint64_t *) const;
-                mtime_t                 getPlaybackTimeBySegmentNumber(uint64_t);
+                bool                    getPlaybackTimeDurationBySegmentNumber(uint64_t, mtime_t *, mtime_t *) const;
 
             private:
                 std::vector<ISegment *>  segments;

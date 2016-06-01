@@ -42,6 +42,7 @@ namespace adaptive
                 virtual ~SegmentTimeline();
                 void addElement(uint64_t, stime_t d, uint64_t r = 0, stime_t t = 0);
                 uint64_t getElementNumberByScaledPlaybackTime(stime_t) const;
+                bool    getScaledPlaybackTimeDurationBySegmentNumber(uint64_t, mtime_t *, mtime_t *) const;
                 stime_t getScaledPlaybackTimeByElementNumber(uint64_t) const;
                 stime_t getMinAheadScaledTime(uint64_t) const;
                 uint64_t maxElementNumber() const;

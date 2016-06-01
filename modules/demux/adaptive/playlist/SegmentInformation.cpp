@@ -329,31 +329,36 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
         return false;
 }
 
-mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) const
+bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
+                                                                mtime_t *time, mtime_t *duration) const
 {
     SegmentList *segList;
     MediaSegmentTemplate *mediaTemplate;
-    mtime_t time = 0;
+
     if( (mediaTemplate = inheritSegmentTemplate()) )
     {
         uint64_t timescale = mediaTemplate->inheritTimescale();
+        stime_t stime, sduration;
         if(mediaTemplate->segmentTimeline.Get())
         {
-            time = mediaTemplate->segmentTimeline.Get()->
-                    getScaledPlaybackTimeByElementNumber(number);
+            mediaTemplate->segmentTimeline.Get()->
+                getScaledPlaybackTimeDurationBySegmentNumber(number, &stime, &sduration);
         }
         else
         {
-            time = number * mediaTemplate->duration.Get();
+            stime = number * mediaTemplate->duration.Get();
+            sduration = mediaTemplate->duration.Get();
         }
-        time = CLOCK_FREQ * time / timescale;
+        *time = CLOCK_FREQ * stime / timescale;
+        *duration = CLOCK_FREQ * sduration / timescale;
+        return true;
     }
     else if ( (segList = inheritSegmentList()) )
     {
-        time = segList->getPlaybackTimeBySegmentNumber(number);
+        return segList->getPlaybackTimeDurationBySegmentNumber(number, time, duration);
     }
 
-    return time;
+    return false;
 }
 
 SegmentInformation * SegmentInformation::getChildByID(const ID &id)
@@ -424,8 +429,9 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
 
 uint64_t SegmentInformation::translateSegmentNumber(uint64_t num, const SegmentInformation *from) const
 {
-    mtime_t time = from->getPlaybackTimeBySegmentNumber(num);
-    getSegmentNumberByTime(time, &num);
+    mtime_t time, duration;
+    if( from->getPlaybackTimeDurationBySegmentNumber(num, &time, &duration) )
+        getSegmentNumberByTime(time, &num);
     return num;
 }
 

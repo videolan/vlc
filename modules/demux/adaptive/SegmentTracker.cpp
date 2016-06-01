@@ -252,10 +252,13 @@ void SegmentTracker::setPositionByNumber(uint64_t segnumber, bool restarted)
 
 mtime_t SegmentTracker::getPlaybackTime() const
 {
-    if(curRepresentation)
-        return curRepresentation->getPlaybackTimeBySegmentNumber(next);
-    else
-        return 0;
+    mtime_t time, duration;
+    if(curRepresentation &&
+       curRepresentation->getPlaybackTimeDurationBySegmentNumber(next, &time, &duration))
+    {
+        return time;
+    }
+    return 0;
 }
 
 mtime_t SegmentTracker::getMinAheadTime() const
