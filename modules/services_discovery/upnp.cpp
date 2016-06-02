@@ -299,11 +299,10 @@ MediaServerList::~MediaServerList()
     vlc_mutex_destroy( &m_lock );
 }
 
-bool MediaServerList::addServer( MediaServerDesc* desc )
+bool MediaServerList::addServerLocked( MediaServerDesc* desc )
 {
-    vlc_mutex_locker lock( &m_lock );
     input_item_t* p_input_item = NULL;
-    if ( getServer( desc->UDN ) )
+    if ( getServerLocked( desc->UDN ) )
         return false;
 
     msg_Dbg( m_sd, "Adding server '%s' with uuid '%s'", desc->friendlyName.c_str(), desc->UDN.c_str() );
@@ -338,7 +337,7 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
     return true;
 }
 
-MediaServerDesc* MediaServerList::getServer( const std::string& udn )
+MediaServerDesc* MediaServerList::getServerLocked( const std::string& udn )
 {
     std::vector<MediaServerDesc*>::const_iterator it = m_list.begin();
     std::vector<MediaServerDesc*>::const_iterator ite = m_list.end();
@@ -419,7 +418,7 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
         }
 
         /* Check if server is already added */
-        if ( getServer( psz_udn ) )
+        if ( getServerLocked( psz_udn ) )
         {
             msg_Warn( m_sd, "Server with uuid '%s' already exists.", psz_udn );
             continue;
@@ -463,7 +462,7 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                     break;
 
                 p_server->isSatIp = true;
-                if ( !addServer( p_server ) )
+                if ( !addServerLocked( p_server ) )
                     delete p_server;
             } else {
                 /* if no playlist is found, add a playlist from the web based on the chosen
@@ -490,7 +489,7 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                                                                   psz_friendly_name, psz_url, iconUrl );
 
                 p_server->isSatIp = true;
-                if( !addServer( p_server ) ) {
+                if( !addServerLocked( p_server ) ) {
                     delete p_server;
                 }
                 free( psz_url );
@@ -539,7 +538,7 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                     if ( unlikely( !p_server ) )
                         break;
 
-                    if ( !addServer( p_server ) )
+                    if ( !addServerLocked( p_server ) )
                     {
                         delete p_server;
                         continue;
@@ -612,7 +611,7 @@ void MediaServerList::removeServer( const std::string& udn )
 {
     vlc_mutex_locker lock( &m_lock );
 
-    MediaServerDesc* p_server = getServer( udn );
+    MediaServerDesc* p_server = getServerLocked( udn );
     if ( !p_server )
         return;
 

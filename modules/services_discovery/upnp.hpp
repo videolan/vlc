@@ -101,9 +101,9 @@ public:
     MediaServerList( services_discovery_t* p_sd );
     ~MediaServerList();
 
-    bool addServer(MediaServerDesc *desc );
+    bool addServerLocked(MediaServerDesc *desc );
     void removeServer(const std::string &udn );
-    MediaServerDesc* getServer( const std::string& udn );
+    MediaServerDesc* getServerLocked( const std::string& udn );
     static int Callback( Upnp_EventType event_type, void* p_event, MediaServerList* self );
 
 private:
