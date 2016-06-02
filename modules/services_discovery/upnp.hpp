@@ -100,9 +100,9 @@ public:
     MediaServerList( services_discovery_t* p_sd );
     ~MediaServerList();
 
-    bool addServerLocked(MediaServerDesc *desc );
+    bool addServer(MediaServerDesc *desc );
     void removeServer(const std::string &udn );
-    MediaServerDesc* getServerLocked( const std::string& udn );
+    MediaServerDesc* getServer( const std::string& udn );
     static int Callback( Upnp_EventType event_type, void* p_event, MediaServerList* self );
 
 private:
@@ -112,7 +112,6 @@ private:
 private:
     services_discovery_t* const m_sd;
     std::vector<MediaServerDesc*> m_list;
-    vlc_mutex_t m_lock;
 };
 
 }
