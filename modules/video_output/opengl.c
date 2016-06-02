@@ -1377,7 +1377,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             vgl->VertexAttribPointer(vgl->GetAttribLocation(vgl->program[1], "VertexPosition"), 2, GL_FLOAT, 0, 0, 0);
 
             // Subpictures have the correct orientation:
-            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "RotationMatrix"), 1, GL_FALSE, identity);
+            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "OrientationMatrix"), 1, GL_FALSE, identity);
 #endif
         } else {
 #ifdef SUPPORTS_FIXED_PIPELINE
