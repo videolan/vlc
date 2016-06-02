@@ -1224,14 +1224,12 @@ UpnpInstanceWrapper::UpnpInstanceWrapper()
     : m_handle( -1 )
     , m_refcount( 0 )
 {
-    vlc_mutex_init( &m_server_list_lock );
 }
 
 UpnpInstanceWrapper::~UpnpInstanceWrapper()
 {
     UpnpUnRegisterClient( m_handle );
     UpnpFinish();
-    vlc_mutex_destroy( &m_server_list_lock );
 }
 
 UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_discovery_t *p_sd)
@@ -1297,7 +1295,6 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
     // This assumes a single UPNP SD instance
     if (p_server_list != NULL)
     {
-        vlc_mutex_locker lock( &s_instance->m_server_list_lock );
         assert(!UpnpInstanceWrapper::p_server_list);
         UpnpInstanceWrapper::p_server_list = p_server_list;
     }
@@ -1309,7 +1306,6 @@ void UpnpInstanceWrapper::release(bool isSd)
     vlc_mutex_locker lock( &s_lock );
     if ( isSd )
     {
-        vlc_mutex_locker lock( &m_server_list_lock );
         delete UpnpInstanceWrapper::p_server_list;
         UpnpInstanceWrapper::p_server_list = NULL;
     }
@@ -1327,8 +1323,8 @@ UpnpClient_Handle UpnpInstanceWrapper::handle() const
 
 int UpnpInstanceWrapper::Callback(Upnp_EventType event_type, void *p_event, void *p_user_data)
 {
-    UpnpInstanceWrapper* self = static_cast<UpnpInstanceWrapper*>( p_user_data );
-    vlc_mutex_locker lock( &self->m_server_list_lock );
+    VLC_UNUSED(p_user_data);
+    vlc_mutex_locker lock( &s_lock );
     if ( !UpnpInstanceWrapper::p_server_list )
         return 0;
     SD::MediaServerList::Callback( event_type, p_event, UpnpInstanceWrapper::p_server_list );
