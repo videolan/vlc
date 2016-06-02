@@ -627,10 +627,8 @@ void MediaServerList::removeServer( const std::string& udn )
 /*
  * Handles servers listing UPnP events
  */
-int MediaServerList::Callback( Upnp_EventType event_type, void* p_event, MediaServerList* self )
+int MediaServerList::Callback( Upnp_EventType event_type, void* p_event )
 {
-    services_discovery_t* p_sd = self->m_sd;
-
     switch( event_type )
     {
     case UPNP_DISCOVERY_ADVERTISEMENT_ALIVE:
@@ -642,14 +640,24 @@ int MediaServerList::Callback( Upnp_EventType event_type, void* p_event, MediaSe
 
         int i_res;
         i_res = UpnpDownloadXmlDoc( p_discovery->Location, &p_description_doc );
+
+        MediaServerList *self = UpnpInstanceWrapper::lockMediaServerList();
+        if ( !self )
+        {
+            UpnpInstanceWrapper::unlockMediaServerList();
+            return UPNP_E_CANCELED;
+        }
+
         if ( i_res != UPNP_E_SUCCESS )
         {
-            msg_Warn( p_sd, "Could not download device description! "
+            msg_Warn( self->m_sd, "Could not download device description! "
                             "Fetching data from %s failed: %s",
                             p_discovery->Location, UpnpGetErrorMessage( i_res ) );
+            UpnpInstanceWrapper::unlockMediaServerList();
             return i_res;
         }
         self->parseNewServer( p_description_doc, p_discovery->Location );
+        UpnpInstanceWrapper::unlockMediaServerList();
         ixmlDocument_free( p_description_doc );
     }
     break;
@@ -658,16 +666,29 @@ int MediaServerList::Callback( Upnp_EventType event_type, void* p_event, MediaSe
     {
         struct Upnp_Discovery* p_discovery = ( struct Upnp_Discovery* )p_event;
 
-        self->removeServer( p_discovery->DeviceId );
+        MediaServerList *self = UpnpInstanceWrapper::lockMediaServerList();
+        if ( self )
+            self->removeServer( p_discovery->DeviceId );
+        UpnpInstanceWrapper::unlockMediaServerList();
     }
     break;
 
     case UPNP_EVENT_SUBSCRIBE_COMPLETE:
-        msg_Warn( p_sd, "subscription complete" );
+    {
+        MediaServerList *self = UpnpInstanceWrapper::lockMediaServerList();
+        if ( self )
+            msg_Warn( self->m_sd, "subscription complete" );
+        UpnpInstanceWrapper::unlockMediaServerList();
+    }
         break;
 
     case UPNP_DISCOVERY_SEARCH_TIMEOUT:
-        msg_Warn( p_sd, "search timeout" );
+    {
+        MediaServerList *self = UpnpInstanceWrapper::lockMediaServerList();
+        if ( self )
+            msg_Warn( self->m_sd, "search timeout" );
+        UpnpInstanceWrapper::unlockMediaServerList();
+    }
         break;
 
     case UPNP_EVENT_RECEIVED:
@@ -677,7 +698,12 @@ int MediaServerList::Callback( Upnp_EventType event_type, void* p_event, MediaSe
         break;
 
     default:
-        msg_Err( p_sd, "Unhandled event, please report ( type=%d )", event_type );
+    {
+        MediaServerList *self = UpnpInstanceWrapper::lockMediaServerList();
+        if ( self )
+            msg_Err( self->m_sd, "Unhandled event, please report ( type=%d )", event_type );
+        UpnpInstanceWrapper::unlockMediaServerList();
+    }
         break;
     }
 
@@ -1322,9 +1348,25 @@ UpnpClient_Handle UpnpInstanceWrapper::handle() const
 int UpnpInstanceWrapper::Callback(Upnp_EventType event_type, void *p_event, void *p_user_data)
 {
     VLC_UNUSED(p_user_data);
-    vlc_mutex_locker lock( &s_lock );
+    vlc_mutex_lock( &s_lock );
     if ( !UpnpInstanceWrapper::p_server_list )
+    {
+        vlc_mutex_unlock( &s_lock );
+        /* no MediaServerList available (anymore), do nothing */
         return 0;
-    SD::MediaServerList::Callback( event_type, p_event, UpnpInstanceWrapper::p_server_list );
+    }
+    vlc_mutex_unlock( &s_lock );
+    SD::MediaServerList::Callback( event_type, p_event );
     return 0;
+}
+
+SD::MediaServerList *UpnpInstanceWrapper::lockMediaServerList()
+{
+    vlc_mutex_lock( &s_lock ); /* do not allow deleting the p_server_list while using it */
+    return UpnpInstanceWrapper::p_server_list;
+}
+
+void UpnpInstanceWrapper::unlockMediaServerList()
+{
+    vlc_mutex_unlock( &s_lock );
 }

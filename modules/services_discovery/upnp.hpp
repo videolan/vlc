@@ -61,6 +61,8 @@ public:
     static UpnpInstanceWrapper* get(vlc_object_t* p_obj, services_discovery_t *p_sd);
     void release(bool isSd);
     UpnpClient_Handle handle() const;
+    static SD::MediaServerList *lockMediaServerList();
+    static void unlockMediaServerList();
 
 private:
     static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data );
@@ -103,7 +105,7 @@ public:
     bool addServer(MediaServerDesc *desc );
     void removeServer(const std::string &udn );
     MediaServerDesc* getServer( const std::string& udn );
-    static int Callback( Upnp_EventType event_type, void* p_event, MediaServerList* self );
+    static int Callback( Upnp_EventType event_type, void* p_event );
 
 private:
     void parseNewServer( IXML_Document* doc, const std::string& location );
