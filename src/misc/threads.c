@@ -49,6 +49,12 @@ void vlc_global_mutex (unsigned n, bool acquire)
         vlc_mutex_unlock (lock);
 }
 
+#if defined (_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+/* Cannot define OS version-dependent stuff in public headers */
+# undef LIBVLC_NEED_SLEEP
+# undef LIBVLC_NEED_SEMAPHORE
+#endif
+
 #if defined(LIBVLC_NEED_SLEEP) || defined(LIBVLC_NEED_CONDVAR)
 #include <vlc_atomic.h>
 
@@ -68,11 +74,6 @@ static void vlc_cancel_addr_finish(void *addr)
     /* Act on cancellation as potential wake-up source */
     vlc_testcancel();
 }
-
-# if defined (_WIN32) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
-/* Cannot define OS version-dependent stuff in public headers */
-#  define LIBVLC_NEED_SLEEP
-# endif
 #endif
 
 #ifdef LIBVLC_NEED_SLEEP

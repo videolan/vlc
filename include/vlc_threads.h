@@ -53,7 +53,8 @@ VLC_API void vlc_testcancel(void);
 # endif
 
 typedef struct vlc_thread *vlc_thread_t;
-#define VLC_THREAD_CANCELED NULL
+# define VLC_THREAD_CANCELED NULL
+# define LIBVLC_NEED_SLEEP
 typedef struct
 {
     bool dynamic;
@@ -69,7 +70,7 @@ typedef struct
 } vlc_mutex_t;
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
 #define LIBVLC_NEED_CONDVAR
-typedef HANDLE vlc_sem_t;
+#define LIBVLC_NEED_SEMAPHORE
 #define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;

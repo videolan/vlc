@@ -182,35 +182,55 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 }
 
 /*** Semaphore ***/
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+# include <stdalign.h>
+
+static inline HANDLE *vlc_sem_handle_p(vlc_sem_t *sem)
+{
+    /* NOTE: vlc_sem_t layout cannot easily depend on Windows version */
+    static_assert (sizeof (HANDLE) <= sizeof (vlc_sem_t), "Size mismatch!");
+    static_assert ((alignof (HANDLE) % alignof (vlc_sem_t)) == 0,
+                   "Alignment mismatch");
+    return (HANDLE *)sem;
+}
+#define vlc_sem_handle(sem) (*vlc_sem_handle_p(sem))
+
 void vlc_sem_init (vlc_sem_t *sem, unsigned value)
 {
-    *sem = CreateSemaphore (NULL, value, 0x7fffffff, NULL);
-    if (*sem == NULL)
+    HANDLE handle = CreateSemaphore(NULL, value, 0x7fffffff, NULL);
+    if (handle == NULL)
         abort ();
+
+    vlc_sem_handle(sem) = handle;
 }
 
 void vlc_sem_destroy (vlc_sem_t *sem)
 {
-    CloseHandle (*sem);
+    CloseHandle(vlc_sem_handle(sem));
 }
 
 int vlc_sem_post (vlc_sem_t *sem)
 {
-    ReleaseSemaphore (*sem, 1, NULL);
+    ReleaseSemaphore(vlc_sem_handle(sem), 1, NULL);
     return 0; /* FIXME */
 }
 
 void vlc_sem_wait (vlc_sem_t *sem)
 {
+    HANDLE handle = vlc_sem_handle(sem);
     DWORD result;
 
     do
     {
         vlc_testcancel ();
-        result = vlc_WaitForSingleObject (*sem, INFINITE);
+        result = WaitForSingleObjectEx(handle, INFINITE, TRUE);
+
+        /* Semaphore abandoned would be a bug. */
+        assert(result != WAIT_ABANDONED_0);
     }
-    while (result == WAIT_IO_COMPLETION);
+    while (result == WAIT_IO_COMPLETION || result == WAIT_FAILED);
 }
+#endif
 
 /*** Thread-specific variables (TLS) ***/
 struct vlc_threadvar
