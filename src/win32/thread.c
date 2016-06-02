@@ -66,38 +66,6 @@ struct vlc_thread
     } wait;
 };
 
-/*** Common helpers ***/
-#if !IS_INTERRUPTIBLE
-static bool isCancelled(void);
-#endif
-
-static DWORD vlc_WaitForSingleObject(HANDLE handle, DWORD delay)
-{
-    DWORD ret;
-#if !IS_INTERRUPTIBLE
-        do {
-            DWORD new_delay = 50;
-            if (new_delay > delay)
-                new_delay = delay;
-            ret = WaitForSingleObjectEx(handle, new_delay, TRUE);
-            if (delay != INFINITE)
-                delay -= new_delay;
-            if (isCancelled())
-                ret = WAIT_IO_COMPLETION;
-        } while (delay && ret == WAIT_TIMEOUT);
-#else
-    ret = WaitForSingleObjectEx(handle, delay, TRUE);
-#endif
-
-    /* We do not abandon objects... this would be a bug */
-    assert(ret != WAIT_ABANDONED_0);
-
-    if (unlikely(ret == WAIT_FAILED))
-        abort (); /* We are screwed! */
-    return ret;
-}
-
-
 /*** Mutexes ***/
 void vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
@@ -490,17 +458,6 @@ void vlc_addr_broadcast(void *addr)
 }
 
 /*** Threads ***/
-#if !IS_INTERRUPTIBLE
-static bool isCancelled(void)
-{
-    struct vlc_thread *th = vlc_thread_self();
-    if (th == NULL)
-        return false; /* Main thread - cannot be cancelled anyway */
-
-    return atomic_load(&th->killed);
-}
-#endif
-
 static void vlc_thread_destroy(vlc_thread_t th)
 {
     DeleteCriticalSection(&th->wait.lock);
@@ -572,9 +529,15 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
 
 void vlc_join (vlc_thread_t th, void **result)
 {
+    DWORD ret;
+
     do
+    {
         vlc_testcancel ();
-    while (vlc_WaitForSingleObject (th->id, INFINITE) == WAIT_IO_COMPLETION);
+        ret = WaitForSingleObjectEx(th->id, INFINITE, TRUE);
+        assert(ret != WAIT_ABANDONED_0);
+    }
+    while (ret == WAIT_IO_COMPLETION || ret == WAIT_FAILED);
 
     if (result != NULL)
         *result = th->data;
