@@ -74,6 +74,7 @@ struct access_sys_t
 
 UpnpInstanceWrapper* UpnpInstanceWrapper::s_instance;
 vlc_mutex_t UpnpInstanceWrapper::s_lock = VLC_STATIC_MUTEX;
+SD::MediaServerList *UpnpInstanceWrapper::p_server_list = NULL;
 
 /*
  * VLC callback prototypes
@@ -1221,7 +1222,6 @@ static void Close( vlc_object_t* p_this )
 
 UpnpInstanceWrapper::UpnpInstanceWrapper()
     : m_handle( -1 )
-    , p_server_list( NULL )
     , m_refcount( 0 )
 {
     vlc_mutex_init( &m_server_list_lock );
@@ -1298,8 +1298,8 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
     if (p_server_list != NULL)
     {
         vlc_mutex_locker lock( &s_instance->m_server_list_lock );
-        assert(!s_instance->p_server_list);
-        s_instance->p_server_list = p_server_list;
+        assert(!UpnpInstanceWrapper::p_server_list);
+        UpnpInstanceWrapper::p_server_list = p_server_list;
     }
     return s_instance;
 }
@@ -1310,8 +1310,8 @@ void UpnpInstanceWrapper::release(bool isSd)
     if ( isSd )
     {
         vlc_mutex_locker lock( &m_server_list_lock );
-        delete p_server_list;
-        p_server_list = NULL;
+        delete UpnpInstanceWrapper::p_server_list;
+        UpnpInstanceWrapper::p_server_list = NULL;
     }
     if (--s_instance->m_refcount == 0)
     {
@@ -1329,8 +1329,8 @@ int UpnpInstanceWrapper::Callback(Upnp_EventType event_type, void *p_event, void
 {
     UpnpInstanceWrapper* self = static_cast<UpnpInstanceWrapper*>( p_user_data );
     vlc_mutex_locker lock( &self->m_server_list_lock );
-    if ( !self->p_server_list )
+    if ( !UpnpInstanceWrapper::p_server_list )
         return 0;
-    SD::MediaServerList::Callback( event_type, p_event, self->p_server_list );
+    SD::MediaServerList::Callback( event_type, p_event, UpnpInstanceWrapper::p_server_list );
     return 0;
 }

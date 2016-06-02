@@ -73,7 +73,7 @@ private:
     static vlc_mutex_t s_lock;
     UpnpClient_Handle m_handle;
     vlc_mutex_t m_server_list_lock; // protect p_server_list
-    SD::MediaServerList* p_server_list;
+    static SD::MediaServerList* p_server_list;
     int m_refcount;
 };
 
