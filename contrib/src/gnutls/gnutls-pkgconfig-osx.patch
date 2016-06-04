@@ -1,5 +1,18 @@
---- a/m4/intlmacosx.m4.orig	2014-06-25 17:40:22.000000000 -0400
-+++ b/m4/intlmacosx.m4	2014-06-25 17:40:29.000000000 -0400
+diff -ru gnutls/libdane/gnutls-dane.pc.in gnutls-fixed/libdane/gnutls-dane.pc.in
+--- gnutls/libdane/gnutls-dane.pc.in	2015-03-23 08:19:23.000000000 +0100
++++ gnutls-fixed/libdane/gnutls-dane.pc.in	2016-06-04 14:25:53.000000000 +0200
+@@ -18,7 +18,7 @@
+ Description: DANE security library for the GNU system
+ URL: http://www.gnu.org/software/gnutls/
+ Version: @VERSION@
+-Libs: -L${libdir} -lgnutls-dane
++Libs: -L${libdir} -lgnutls-dane @INTL_MACOSX_LIBS@
+ Libs.private: @UNBOUND_LIBS@
+ Requires.private: gnutls
+ Cflags: -I${includedir}
+diff -ru gnutls/m4/intlmacosx.m4 gnutls-fixed/m4/intlmacosx.m4
+--- gnutls/m4/intlmacosx.m4	2015-03-23 19:23:36.000000000 +0100
++++ gnutls-fixed/m4/intlmacosx.m4	2016-06-04 14:25:53.000000000 +0200
 @@ -43,9 +43,25 @@
      AC_DEFINE([HAVE_CFLOCALECOPYCURRENT], [1],
        [Define to 1 if you have the MacOS X function CFLocaleCopyCurrent in the CoreFoundation framework.])
@@ -27,26 +40,3 @@
    fi
    AC_SUBST([INTL_MACOSX_LIBS])
  ])
-
---- a/libdane/gnutls-dane.pc.in.orig	2014-06-25 17:57:29.000000000 -0400
-+++ b/libdane/gnutls-dane.pc.in	2014-06-25 17:57:39.000000000 -0400
-@@ -19,7 +19,7 @@
- Description: DANE security library for the GNU system
- URL: http://www.gnu.org/software/gnutls/
- Version: @VERSION@
--Libs: -L${libdir} -lgnutls-dane
-+Libs: -L${libdir} -lgnutls-dane @INTL_MACOSX_LIBS@
- Libs.private: @UNBOUND_LIBS@
- Requires.private: gnutls
- Cflags: -I${includedir}
---- gnutls/lib/gnutls.pc.in.orig	2016-03-10 16:33:20.547831009 +0100
-+++ gnutls/lib/gnutls.pc.in	2016-03-10 16:33:47.747832306 +0100
-@@ -18,7 +18,7 @@
- Description: Transport Security Layer implementation for the GNU system
- URL: http://www.gnutls.org/
- Version: @VERSION@
--@GNUTLS_REQUIRES_PRIVATE@
-+@GNUTLS_REQUIRES_PRIVATE@ @INTL_MACOSX_LIBS@
- Cflags: -I${includedir}
- Libs:  -L${libdir} -lgnutls  @LIBZ@ @LIBINTL@ @LIBSOCKET@ -lcrypt32 @LIBPTHREAD@ @LIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @GMP_LIBS@
- Requires:  
