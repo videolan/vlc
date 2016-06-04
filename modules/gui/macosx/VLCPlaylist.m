@@ -282,6 +282,7 @@
     }
 
     [_outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: itemIndex] byExtendingSelection: NO];
+    [_outlineView scrollRowToVisible: itemIndex];
 }
 
 #pragma mark -
