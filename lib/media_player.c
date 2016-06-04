@@ -677,6 +677,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "volume", VLC_VAR_FLOAT);
     var_Create (mp, "corks", VLC_VAR_INTEGER);
     var_Create (mp, "audio-filter", VLC_VAR_STRING);
+    var_Create (mp, "role", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Create (mp, "amem-data", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-setup", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-cleanup", VLC_VAR_ADDRESS);
@@ -1961,4 +1962,43 @@ int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equal
     }
 
     return 0;
+}
+
+static const char roles[][16] =
+{
+    [libvlc_role_Music] =         "music",
+    [libvlc_role_Video] =         "video",
+    [libvlc_role_Communication] = "communication",
+    [libvlc_role_Game] =          "game",
+    [liblvc_role_Notification] =  "notification",
+    [libvlc_role_Animation] =     "animation",
+    [libvlc_role_Production] =    "production",
+    [libvlc_role_Accessibility] = "accessibility",
+    [libvlc_role_Test] =          "test",
+};
+
+int libvlc_media_player_set_role(libvlc_media_player_t *mp, unsigned role)
+{
+    if (role >= ARRAY_SIZE(roles)
+     || var_SetString(mp, "role", roles[role]) != VLC_SUCCESS)
+        return -1;
+    return 0;
+}
+
+int libvlc_media_player_get_role(libvlc_media_player_t *mp)
+{
+    int ret = -1;
+    char *str = var_GetString(mp, "role");
+    if (str == NULL)
+        return 0;
+
+    for (size_t i = 0; i < ARRAY_SIZE(roles); i++)
+        if (!strcmp(roles[i], str))
+        {
+            ret = i;
+            break;
+        }
+
+    free(str);
+    return ret;
 }

@@ -1967,6 +1967,39 @@ LIBVLC_API float libvlc_audio_equalizer_get_amp_at_index( libvlc_equalizer_t *p_
  */
 LIBVLC_API int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equalizer_t *p_equalizer );
 
+/**
+ * Media player roles.
+ *
+ * See \ref libvlc_media_player_set_role()
+ */
+typedef enum libvlc_media_player_role {
+    libvlc_role_Music=1 /**< Music (or radio) playback */,
+    libvlc_role_Video /**< Video playback */,
+    libvlc_role_Communication /**< Speech, real-time communication */,
+    libvlc_role_Game /**< Video game */,
+    liblvc_role_Notification /**< User interaction feedback */,
+    libvlc_role_Animation /**< Embedded animation (e.g. in web page) */,
+    libvlc_role_Production /**< Audio editting/production */,
+    libvlc_role_Accessibility /**< Accessibility */,
+    libvlc_role_Test /** Testing */,
+} libvlc_media_player_role_t;
+
+/**
+ * Gets the media role.
+ *
+ * \return the media player role (\ref libvlc_media_player_role_t)
+ */
+LIBVLC_API int libvlc_media_player_get_role(libvlc_media_player_t *);
+
+/**
+ * Sets the media role.
+ *
+ * \param role the media player role (\ref libvlc_media_player_role_t)
+ * \return 0 on success, -1 on error
+ */
+LIBVLC_API int libvlc_media_player_set_role(libvlc_media_player_t *,
+                                            unsigned role);
+
 /** @} audio */
 
 /** @} media_player */
