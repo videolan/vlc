@@ -61,7 +61,7 @@ char *get_path(const char *location)
  * access_New:
  *****************************************************************************/
 static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
-                            const char *mrl)
+                            bool preparsing, const char *mrl)
 {
     char *redirv[MAX_REDIR];
     unsigned redirc = 0;
@@ -80,6 +80,7 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
     access->pf_seek = NULL;
     access->pf_control = NULL;
     access->p_sys = NULL;
+    access->b_preparsing = preparsing;
     access_InitFields(access);
 
     if (unlikely(access->psz_url == NULL))
@@ -142,7 +143,7 @@ error:
 
 access_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
 {
-    return access_New(parent, NULL, mrl);
+    return access_New(parent, NULL, false, mrl);
 }
 
 void vlc_access_Delete(access_t *access)
@@ -378,7 +379,7 @@ static void AStreamDestroy(stream_t *s)
 }
 
 stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
-                           const char *url)
+                           bool preparsing, const char *url)
 {
     stream_t *s = stream_CommonNew(parent, AStreamDestroy);
     if (unlikely(s == NULL))
@@ -388,7 +389,7 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     if (unlikely(sys == NULL))
         goto error;
 
-    sys->access = access_New(VLC_OBJECT(s), input, url);
+    sys->access = access_New(VLC_OBJECT(s), input, preparsing, url);
     if (sys->access == NULL)
         goto error;
 

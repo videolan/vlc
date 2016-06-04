@@ -35,7 +35,7 @@ void stream_CommonDelete( stream_t *s );
 /**
  * This function creates a stream_t with an access_t back-end.
  */
-stream_t *stream_AccessNew(vlc_object_t *, input_thread_t *, const char *);
+stream_t *stream_AccessNew(vlc_object_t *, input_thread_t *, bool, const char *);
 
 /**
  * This function creates a new stream_t filter.

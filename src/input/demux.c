@@ -285,7 +285,7 @@ demux_t *input_DemuxNew( vlc_object_t *obj, const char *access_name,
 
         if( likely(asprintf( &url, "%s://%s", access_name, path) >= 0) )
         {
-            stream = stream_AccessNew( obj, input, url );
+            stream = stream_AccessNew( obj, input, preparsing, url );
             free( url );
         }
 
