@@ -678,6 +678,27 @@ static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
     }
 }
 
+static void update_late_frame_count( decoder_t *p_dec, block_t *p_block, mtime_t current_time, mtime_t i_pts )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+   /* Update frame late count (except when doing preroll) */
+   mtime_t i_display_date = VLC_TS_INVALID;
+   if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
+       i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
+
+   if( i_display_date > VLC_TS_INVALID && i_display_date <= current_time )
+   {
+       p_sys->i_late_frames++;
+       if( p_sys->i_late_frames == 1 )
+           p_sys->i_late_frames_start = current_time;
+   }
+   else
+   {
+       p_sys->i_late_frames = 0;
+   }
+}
+
+
 /*****************************************************************************
  * DecodeVideo: Called to decode one or more frames
  *****************************************************************************/
@@ -880,21 +901,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         interpolate_next_pts( p_dec, frame );
 
-        /* Update frame late count (except when doing preroll) */
-        mtime_t i_display_date = VLC_TS_INVALID;
-        if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
-            i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
-
-        if( i_display_date > VLC_TS_INVALID && i_display_date <= current_time )
-        {
-            p_sys->i_late_frames++;
-            if( p_sys->i_late_frames == 1 )
-                p_sys->i_late_frames_start = current_time;
-        }
-        else
-        {
-            p_sys->i_late_frames = 0;
-        }
+        update_late_frame_count( p_dec, p_block, current_time, i_pts);
 
         if( !b_need_output_picture || ( !p_sys->p_va && !frame->linesize[0] ) )
         {
