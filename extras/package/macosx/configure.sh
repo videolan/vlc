@@ -34,6 +34,7 @@ OPTIONS="
         --disable-xcb
         --disable-caca
         --disable-sdl
+        --disable-vnc
         --with-macosx-version-min=10.7
 "
 
