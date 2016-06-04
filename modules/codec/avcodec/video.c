@@ -599,7 +599,7 @@ static bool check_block_validity( decoder_sys_t *p_sys, block_t *block )
     return true;
 }
 
-static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block )
+static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block, mtime_t current_time)
 {
     if( !block )
         return false;
@@ -672,6 +672,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
 
     block_t *p_block;
+    mtime_t current_time = VLC_TS_INVALID;
 
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
     {
@@ -694,7 +695,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     if( !check_block_validity( p_sys, p_block ) )
         return NULL;
 
-    if( p_dec->b_frame_drop_allowed &&  check_block_being_late( p_sys, p_block) )
+    current_time = mdate();
+    if( p_dec->b_frame_drop_allowed &&  check_block_being_late( p_sys, p_block, current_time) )
     {
         msg_Err( p_dec, "more than 5 seconds of late video -> "
                  "dropping frame (computer too slow ?)" );
@@ -872,15 +874,15 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         interpolate_next_pts( p_dec, frame );
 
         /* Update frame late count (except when doing preroll) */
-        mtime_t i_display_date = 0;
+        mtime_t i_display_date = VLC_TS_INVALID;
         if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
             i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
 
-        if( i_display_date > 0 && i_display_date <= mdate() )
+        if( i_display_date > VLC_TS_INVALID && i_display_date <= current_time )
         {
             p_sys->i_late_frames++;
             if( p_sys->i_late_frames == 1 )
-                p_sys->i_late_frames_start = mdate();
+                p_sys->i_late_frames_start = current_time;
         }
         else
         {
