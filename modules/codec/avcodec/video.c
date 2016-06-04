@@ -584,6 +584,83 @@ static void Flush( decoder_t *p_dec )
     decoder_AbortPictures( p_dec, false );
 }
 
+static bool check_block_validity( decoder_sys_t *p_sys, block_t *block )
+{
+    if( !block)
+        return true;
+
+    if( block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    {
+        p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
+
+        p_sys->i_late_frames = 0;
+        if( block->i_flags & BLOCK_FLAG_CORRUPTED )
+        {
+            block_Release( block );
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block )
+{
+    if( !block )
+        return false;
+    if( block->i_flags & BLOCK_FLAG_PREROLL )
+    {
+        /* Do not care about late frames when prerolling
+         * TODO avoid decoding of non reference frame
+         * (ie all B except for H264 where it depends only on nal_ref_idc) */
+        p_sys->i_late_frames = 0;
+    }
+
+    if( p_sys->i_late_frames <= 0 )
+        return false;
+
+    if( current_time - p_sys->i_late_frames_start > (5*CLOCK_FREQ))
+    {
+        if( p_sys->i_pts > VLC_TS_INVALID )
+        {
+            p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
+        }
+        if( block )
+            block_Release( block );
+        p_sys->i_late_frames--;
+        return true;
+    }
+    return false;
+}
+
+
+static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    AVCodecContext *p_context = p_sys->p_context;
+
+    if( p_sys->i_pts <= VLC_TS_INVALID )
+        return;
+
+    /* interpolate the next PTS */
+    if( p_dec->fmt_in.video.i_frame_rate > 0 &&
+        p_dec->fmt_in.video.i_frame_rate_base > 0 )
+    {
+        p_sys->i_pts += CLOCK_FREQ * (2 + frame->repeat_pict) *
+            p_dec->fmt_in.video.i_frame_rate_base /
+            (2 * p_dec->fmt_in.video.i_frame_rate);
+    }
+    else if( p_context->time_base.den > 0 )
+    {
+        int i_tick = p_context->ticks_per_frame;
+        if( i_tick <= 0 )
+            i_tick = 1;
+
+        p_sys->i_pts += CLOCK_FREQ * (2 + frame->repeat_pict) *
+            i_tick * p_context->time_base.num /
+            (2 * p_context->time_base.den);
+    }
+}
+
 /*****************************************************************************
  * DecodeVideo: Called to decode one or more frames
  *****************************************************************************/
@@ -612,43 +689,16 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( p_block)
+    if( !check_block_validity( p_sys, p_block ) )
+        return NULL;
+
+    if( p_dec->b_frame_drop_allowed &&  check_block_being_late( p_sys, p_block) )
     {
-        if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
-        {
-            p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
-
-            p_sys->i_late_frames = 0;
-            if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-            {
-                block_Release( p_block );
-                return NULL;
-            }
-        }
-
-        if( p_block->i_flags & BLOCK_FLAG_PREROLL )
-        {
-            /* Do not care about late frames when prerolling
-             * TODO avoid decoding of non reference frame
-             * (ie all B except for H264 where it depends only on nal_ref_idc) */
-            p_sys->i_late_frames = 0;
-        }
-    }
-
-    if( p_dec->b_frame_drop_allowed && (p_sys->i_late_frames > 0) &&
-        (mdate() - p_sys->i_late_frames_start > INT64_C(5000000)) )
-    {
-        if( p_sys->i_pts > VLC_TS_INVALID )
-        {
-            p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
-        }
-        if( p_block )
-            block_Release( p_block );
-        p_sys->i_late_frames--;
         msg_Err( p_dec, "more than 5 seconds of late video -> "
                  "dropping frame (computer too slow ?)" );
         return NULL;
     }
+
 
     /* A good idea could be to decode all I pictures and see for the other */
     if( p_dec->b_frame_drop_allowed &&
@@ -815,27 +865,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         /* Interpolate the next PTS */
         if( i_pts > VLC_TS_INVALID )
             p_sys->i_pts = i_pts;
-        if( p_sys->i_pts > VLC_TS_INVALID )
-        {
-            /* interpolate the next PTS */
-            if( p_dec->fmt_in.video.i_frame_rate > 0 &&
-                p_dec->fmt_in.video.i_frame_rate_base > 0 )
-            {
-                p_sys->i_pts += CLOCK_FREQ * (2 + frame->repeat_pict) *
-                    p_dec->fmt_in.video.i_frame_rate_base /
-                    (2 * p_dec->fmt_in.video.i_frame_rate);
-            }
-            else if( p_context->time_base.den > 0 )
-            {
-                int i_tick = p_context->ticks_per_frame;
-                if( i_tick <= 0 )
-                    i_tick = 1;
 
-                p_sys->i_pts += CLOCK_FREQ * (2 + frame->repeat_pict) *
-                    i_tick * p_context->time_base.num /
-                    (2 * p_context->time_base.den);
-            }
-        }
+        interpolate_next_pts( p_dec, frame );
 
         /* Update frame late count (except when doing preroll) */
         mtime_t i_display_date = 0;
