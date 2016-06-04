@@ -673,6 +673,19 @@ static int StreamMove(audio_output_t *aout, const char *name)
 
 static void Stop(audio_output_t *);
 
+static int strcmp_void(const void *a, const void *b)
+{
+    const char *const *entry = b;
+    return strcmp(a, *entry);
+}
+
+static const char *str_map(const char *key, const char *const table[][2],
+                           size_t n)
+{
+     const char **r = bsearch(key, table, n, sizeof (*table), strcmp_void);
+     return (r != NULL) ? r[1] : NULL;
+}
+
 /**
  * Create a PulseAudio playback stream, a.k.a. a sink input.
  */
@@ -845,8 +858,28 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     /* Create a playback stream */
     pa_proplist *props = pa_proplist_new();
     if (likely(props != NULL))
+    {
         /* TODO: set other stream properties */
-        pa_proplist_sets (props, PA_PROP_MEDIA_ROLE, "video");
+        char *str = var_InheritString(aout, "role");
+        if (str != NULL)
+        {
+            static const char *const role_map[][2] = {
+                { "accessibility", "a11y"       },
+                { "animation",     "animation"  },
+                { "communication", "phone"      },
+                { "game",          "game"       },
+                { "music",         "music"      },
+                { "notification",  "event"      },
+                { "production",    "production" },
+                { "test",          "test"       },
+                { "video",         "video"      },
+            };
+            const char *role = str_map(str, role_map, ARRAY_SIZE(role_map));
+            if (role != NULL)
+                pa_proplist_sets(props, PA_PROP_MEDIA_ROLE, role);
+            free(str);
+       }
+    }
 
     pa_threaded_mainloop_lock(sys->mainloop);
     pa_stream *s = pa_stream_new_extended(sys->context, "audio stream",
