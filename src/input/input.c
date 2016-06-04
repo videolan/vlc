@@ -273,7 +273,7 @@ input_item_t *input_GetItem( input_thread_t *p_input )
  * XXX Do not forget to update vlc_input.h if you add new variables.
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
-                               const char *psz_header, bool b_quick,
+                               const char *psz_header, bool b_preparsing,
                                input_resource_t *p_resource )
 {
     input_thread_t *p_input = NULL;                 /* thread descriptor */
@@ -289,7 +289,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     snprintf( psz_timer_name, sizeof(psz_timer_name),
               "input launching for '%s'", psz_name );
 
-    msg_Dbg( p_input, "Creating an input for %s'%s'", b_quick ? "preparsing " : "", psz_name);
+    msg_Dbg( p_input, "Creating an input for %s'%s'", b_preparsing ? "preparsing " : "", psz_name);
 
     free( psz_name );
 
@@ -303,7 +303,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* Parse input options */
     input_item_ApplyOptions( VLC_OBJECT(p_input), p_item );
 
-    p_input->b_preparsing = b_quick;
+    p_input->b_preparsing = b_preparsing;
     p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
 
     /* Init Common fields */

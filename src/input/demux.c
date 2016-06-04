@@ -95,7 +95,7 @@ demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
 demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                             const char *psz_access, const char *psz_demux,
                             const char *psz_location,
-                            stream_t *s, es_out_t *out, bool b_quick )
+                            stream_t *s, es_out_t *out, bool b_preparsing )
 {
     demux_t *p_demux = vlc_custom_create( p_obj, sizeof( *p_demux ), "demux" );
     if( unlikely(p_demux == NULL) )
@@ -122,7 +122,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
               || p_demux->psz_location == NULL) )
         goto error;
 
-    if( !b_quick )
+    if( !b_preparsing )
         msg_Dbg( p_obj, "creating demux: access='%s' demux='%s' "
                  "location='%s' file='%s'",
                  p_demux->psz_access, p_demux->psz_demux,
@@ -186,7 +186,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         {
             psz_ext++; // skip '.'
 
-            if( !b_quick )
+            if( !b_preparsing )
             {
                 for( unsigned i = 0; exttodemux[i].ext[0]; i++ )
                 {
@@ -242,7 +242,7 @@ error:
 
 demux_t *input_DemuxNew( vlc_object_t *obj, const char *access_name,
                          const char *demux_name, const char *path,
-                         es_out_t *out, bool quick, input_thread_t *input )
+                         es_out_t *out, bool preparsing, input_thread_t *input )
 {
     char *demux_var = NULL;
 
@@ -266,7 +266,7 @@ demux_t *input_DemuxNew( vlc_object_t *obj, const char *access_name,
 
     demux_t *demux = NULL;
 
-    if( quick )
+    if( preparsing )
     {
         if( strcasecmp( demux_name, "any" ) )
             goto out;
@@ -323,7 +323,7 @@ demux_t *input_DemuxNew( vlc_object_t *obj, const char *access_name,
         }
 
         demux = demux_NewAdvanced( obj, input, access_name, demux_name, path,
-                                   stream, out, quick );
+                                   stream, out, preparsing );
         if( demux == NULL )
         {
             msg_Err( obj, "cannot parse %s://%s", access_name, path );
