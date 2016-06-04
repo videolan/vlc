@@ -668,7 +668,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
-    int b_drawpicture;
+    /* Boolean if we assume that we should get valid pic as result */
+    bool b_need_output_picture = true;
     block_t *p_block;
 
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
@@ -705,7 +706,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_sys->b_hurry_up &&
         (p_sys->i_late_frames > 4) )
     {
-        b_drawpicture = 0;
+        b_need_output_picture = false;
         if( p_sys->i_late_frames < 12 )
         {
             p_context->skip_frame =
@@ -727,10 +728,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         if( p_sys->b_hurry_up )
             p_context->skip_frame = p_sys->i_skip_frame;
+
         if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
-            b_drawpicture = 1;
+            b_need_output_picture = true;
         else
-            b_drawpicture = 0;
+            b_need_output_picture = false;
     }
 
     if( p_context->width <= 0 || p_context->height <= 0 )
@@ -738,7 +740,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( p_sys->b_hurry_up )
             p_context->skip_frame = p_sys->i_skip_frame;
     }
-    else if( !b_drawpicture )
+    else if( !b_need_output_picture )
     {
         /* It creates broken picture
          * FIXME either our parser or ffmpeg is broken */
@@ -830,7 +832,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if( i_used < 0 )
             {
                 av_frame_free(&frame);
-                if( b_drawpicture )
+                if( b_need_output_picture )
                     msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
                             p_block->i_buffer );
                 break;
@@ -884,7 +886,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_late_frames = 0;
         }
 
-        if( !b_drawpicture || ( !p_sys->p_va && !frame->linesize[0] ) )
+        if( !b_need_output_picture || ( !p_sys->p_va && !frame->linesize[0] ) )
         {
             av_frame_free(&frame);
             continue;
