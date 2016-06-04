@@ -719,7 +719,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_late_frames--; /* needed else it will never be decrease */
             if( p_block )
                 block_Release( p_block );
-            msg_Warn( p_dec, "More than 4 late frames, dropping frame" );
+            msg_Warn( p_dec, "More than 11 late frames, dropping frame" );
             return NULL;
         }
     }
