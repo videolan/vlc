@@ -628,6 +628,27 @@ static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block, mtime_
     return false;
 }
 
+static bool check_frame_should_be_dropped( decoder_sys_t *p_sys, AVCodecContext *p_context, bool *b_need_output_picture )
+{
+    if( p_sys->i_late_frames <= 4)
+        return false;
+
+    *b_need_output_picture = false;
+    if( p_sys->i_late_frames < 12 )
+    {
+        p_context->skip_frame =
+                (p_sys->i_skip_frame <= AVDISCARD_NONREF) ?
+                AVDISCARD_NONREF : p_sys->i_skip_frame;
+    }
+    else
+    {
+        /* picture too late, won't decode
+         * but break picture until a new I, and for mpeg4 ...*/
+        p_sys->i_late_frames--; /* needed else it will never be decrease */
+        return true;
+    }
+    return false;
+}
 
 static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
 {
@@ -705,53 +726,39 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
 
     /* A good idea could be to decode all I pictures and see for the other */
-    if( p_dec->b_frame_drop_allowed &&
-        p_sys->b_hurry_up &&
-        (p_sys->i_late_frames > 4) )
-    {
+
+    /* Defaults that if we aren't in prerolling, we want output picture
+       same for if we are flushing (p_block==NULL) */
+    if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
+        b_need_output_picture = true;
+    else
         b_need_output_picture = false;
-        if( p_sys->i_late_frames < 12 )
+
+    /* Change skip_frame config only if hurry_up is enabled */
+    if( p_sys->b_hurry_up )
+    {
+        p_context->skip_frame = p_sys->i_skip_frame;
+
+        /* Check also if we should/can drop the block and move to next block
+            as trying to catchup the speed*/
+        if( p_dec->b_frame_drop_allowed &&
+            check_frame_should_be_dropped( p_sys, p_context, &b_need_output_picture ) )
         {
-            p_context->skip_frame =
-                    (p_sys->i_skip_frame <= AVDISCARD_NONREF) ?
-                    AVDISCARD_NONREF : p_sys->i_skip_frame;
-        }
-        else
-        {
-            /* picture too late, won't decode
-             * but break picture until a new I, and for mpeg4 ...*/
-            p_sys->i_late_frames--; /* needed else it will never be decrease */
             if( p_block )
                 block_Release( p_block );
             msg_Warn( p_dec, "More than 11 late frames, dropping frame" );
             return NULL;
         }
-    }
-    else
-    {
-        if( p_sys->b_hurry_up )
-            p_context->skip_frame = p_sys->i_skip_frame;
 
-        if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
-            b_need_output_picture = true;
-        else
-            b_need_output_picture = false;
-    }
-
-    if( p_context->width <= 0 || p_context->height <= 0 )
-    {
-        if( p_sys->b_hurry_up )
+        if( p_context->width <= 0 || p_context->height <= 0 )
+        {
             p_context->skip_frame = p_sys->i_skip_frame;
-    }
-    else if( !b_need_output_picture )
-    {
-        /* It creates broken picture
-         * FIXME either our parser or ffmpeg is broken */
-#if 0
-        if( p_sys->b_hurry_up )
+        }
+        else if( !b_need_output_picture )
+        {
             p_context->skip_frame = __MAX( p_context->skip_frame,
                                                   AVDISCARD_NONREF );
-#endif
+        }
     }
 
     /*
