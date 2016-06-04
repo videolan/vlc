@@ -148,6 +148,9 @@ static int Open( vlc_object_t *p_this )
     char* psz_server = NULL;
     int i_result;
 
+    if( p_access->b_preparsing )
+        return VLC_EGENERIC;
+
     /* Discard legacy username/password syntax - not supported */
     const char *psz_location = strchr( p_access->psz_location, '@' );
     if( psz_location != NULL )
