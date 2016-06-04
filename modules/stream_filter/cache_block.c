@@ -402,6 +402,16 @@ static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
             AStreamRefillBlock(s);
     }
 
+    /**
+     * we should not signal end-of-file if we have not exhausted
+     * the blocks we know about, as such we should try again if that
+     * is the case. i_copy == 0 just means that the processed block does
+     * not contain data at the offset that we want, not EOF.
+     **/
+
+    if( i_copy == 0 && sys->p_current )
+        return AStreamReadBlock( s, buf, len );
+
     sys->i_pos += i_copy;
     return i_copy;
 }
