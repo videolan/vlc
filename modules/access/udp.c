@@ -99,7 +99,12 @@ static void* ThreadRead( void *data );
 static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
-    access_sys_t *sys = malloc( sizeof( *sys ) );
+    access_sys_t *sys;
+
+    if( p_access->b_preparsing )
+        return VLC_EGENERIC;
+
+    sys = malloc( sizeof( *sys ) );
     if( unlikely( sys == NULL ) )
         return VLC_ENOMEM;
 
