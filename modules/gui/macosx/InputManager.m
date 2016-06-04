@@ -181,7 +181,9 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     var_DelCallback(pl_Get(getIntf()), "input-current", InputThreadChanged, (__bridge void *)self);
 
+#if !OS_OBJECT_USE_OBJC
     dispatch_release(informInputChangedQueue);
+#endif
 }
 
 - (void)inputThreadChanged
