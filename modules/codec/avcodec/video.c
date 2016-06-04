@@ -812,8 +812,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         {
             pkt.data = p_block->p_buffer;
             pkt.size = p_block->i_buffer;
-            pkt.pts = p_block->i_pts;
-            pkt.dts = p_block->i_dts;
+            pkt.pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
+            pkt.dts = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
         }
         else
         {
@@ -881,10 +881,10 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         /* Compute the PTS */
         mtime_t i_pts = frame->pkt_pts;
-        if (i_pts <= VLC_TS_INVALID)
+        if (i_pts == AV_NOPTS_VALUE )
             i_pts = frame->pkt_dts;
 
-        if( i_pts <= VLC_TS_INVALID )
+        if( i_pts == AV_NOPTS_VALUE )
             i_pts = p_sys->i_pts;
 
         /* Interpolate the next PTS */
