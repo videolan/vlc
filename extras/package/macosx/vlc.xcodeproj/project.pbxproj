@@ -467,6 +467,11 @@
 		6B3F8D2F1CE58E0E002A4998 /* VLCPreviousTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D2B1CE58E0E002A4998 /* VLCPreviousTemplate.pdf */; };
 		6B3F8D311CE5CC21002A4998 /* VLCStatusBarIcon.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D301CE5CC21002A4998 /* VLCStatusBarIcon.pdf */; };
 		6B3F8D331CE5CD57002A4998 /* VLCShuffleTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D321CE5CD57002A4998 /* VLCShuffleTemplate.pdf */; };
+		6B846FE41CF5D88C00112E54 /* VLCHUDButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FDD1CF5D88C00112E54 /* VLCHUDButtonCell.m */; };
+		6B846FE51CF5D88C00112E54 /* VLCHUDCheckboxCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FDF1CF5D88C00112E54 /* VLCHUDCheckboxCell.m */; };
+		6B846FE61CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FE11CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m */; };
+		6B846FE71CF5D88C00112E54 /* VLCHUDSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */; };
+		6B846FEB1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FEA1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m */; };
 		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
@@ -1258,6 +1263,16 @@
 		6B3F8D2B1CE58E0E002A4998 /* VLCPreviousTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPreviousTemplate.pdf; path = Resources/vlcmenubaricon/VLCPreviousTemplate.pdf; sourceTree = "<group>"; };
 		6B3F8D301CE5CC21002A4998 /* VLCStatusBarIcon.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCStatusBarIcon.pdf; path = Resources/vlcmenubaricon/VLCStatusBarIcon.pdf; sourceTree = "<group>"; };
 		6B3F8D321CE5CD57002A4998 /* VLCShuffleTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCShuffleTemplate.pdf; path = Resources/vlcmenubaricon/VLCShuffleTemplate.pdf; sourceTree = "<group>"; };
+		6B846FDC1CF5D88C00112E54 /* VLCHUDButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCHUDButtonCell.h; path = ../../../modules/gui/macosx/VLCHUDButtonCell.h; sourceTree = "<group>"; };
+		6B846FDD1CF5D88C00112E54 /* VLCHUDButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCHUDButtonCell.m; path = ../../../modules/gui/macosx/VLCHUDButtonCell.m; sourceTree = "<group>"; };
+		6B846FDE1CF5D88C00112E54 /* VLCHUDCheckboxCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCHUDCheckboxCell.h; path = ../../../modules/gui/macosx/VLCHUDCheckboxCell.h; sourceTree = "<group>"; };
+		6B846FDF1CF5D88C00112E54 /* VLCHUDCheckboxCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCHUDCheckboxCell.m; path = ../../../modules/gui/macosx/VLCHUDCheckboxCell.m; sourceTree = "<group>"; };
+		6B846FE01CF5D88C00112E54 /* VLCHUDRadiobuttonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCHUDRadiobuttonCell.h; path = ../../../modules/gui/macosx/VLCHUDRadiobuttonCell.h; sourceTree = "<group>"; };
+		6B846FE11CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCHUDRadiobuttonCell.m; path = ../../../modules/gui/macosx/VLCHUDRadiobuttonCell.m; sourceTree = "<group>"; };
+		6B846FE21CF5D88C00112E54 /* VLCHUDSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCHUDSliderCell.h; path = ../../../modules/gui/macosx/VLCHUDSliderCell.h; sourceTree = "<group>"; };
+		6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCHUDSliderCell.m; path = ../../../modules/gui/macosx/VLCHUDSliderCell.m; sourceTree = "<group>"; };
+		6B846FE91CF5DBFF00112E54 /* VLCHUDTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCHUDTextFieldCell.h; path = ../../../modules/gui/macosx/VLCHUDTextFieldCell.h; sourceTree = "<group>"; };
+		6B846FEA1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCHUDTextFieldCell.m; path = ../../../modules/gui/macosx/VLCHUDTextFieldCell.m; sourceTree = "<group>"; };
 		7D3F6524188051F2005776C4 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/BWQuincyMain.xib; sourceTree = "<group>"; };
 		7D3F652618805297005776C4 /* BWQuincyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BWQuincyManager.h; path = ../../../modules/gui/macosx/BWQuincyManager.h; sourceTree = SOURCE_ROOT; };
 		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyManager.m; path = ../../../modules/gui/macosx/BWQuincyManager.m; sourceTree = SOURCE_ROOT; };
@@ -1923,6 +1938,7 @@
 				7D9516B91C60B6AB00D14E1A /* VLCStatusBarIcon.m */,
 				1CD366791B7A242E0054E39F /* VLCTimeSelectionPanelController.h */,
 				1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */,
+				6B846FE81CF5D89500112E54 /* HUD UI Classes */,
 				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
 				5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */,
 				E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */,
@@ -2349,6 +2365,23 @@
 			);
 			name = "fspanel-yosemite";
 			path = "Resources/fspanel-yosemite";
+			sourceTree = "<group>";
+		};
+		6B846FE81CF5D89500112E54 /* HUD UI Classes */ = {
+			isa = PBXGroup;
+			children = (
+				6B846FE91CF5DBFF00112E54 /* VLCHUDTextFieldCell.h */,
+				6B846FEA1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m */,
+				6B846FDC1CF5D88C00112E54 /* VLCHUDButtonCell.h */,
+				6B846FDD1CF5D88C00112E54 /* VLCHUDButtonCell.m */,
+				6B846FDE1CF5D88C00112E54 /* VLCHUDCheckboxCell.h */,
+				6B846FDF1CF5D88C00112E54 /* VLCHUDCheckboxCell.m */,
+				6B846FE01CF5D88C00112E54 /* VLCHUDRadiobuttonCell.h */,
+				6B846FE11CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m */,
+				6B846FE21CF5D88C00112E54 /* VLCHUDSliderCell.h */,
+				6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */,
+			);
+			name = "HUD UI Classes";
 			sourceTree = "<group>";
 		};
 		7D3F652A1880529C005776C4 /* QuincyKit */ = {
@@ -3909,6 +3942,7 @@
 				1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */,
 				1CCB5F681A62A724004C3E90 /* DebugMessageVisualizer.h in Sources */,
 				1CCB5F691A62A724004C3E90 /* DebugMessageVisualizer.m in Sources */,
+				6B846FE51CF5D88C00112E54 /* VLCHUDCheckboxCell.m in Sources */,
 				1CCB5F6A1A62A724004C3E90 /* ExtensionsDialogProvider.h in Sources */,
 				7DBB06641CC2314D004C74D2 /* caopengllayer.m in Sources */,
 				1CCB5F6B1A62A724004C3E90 /* ExtensionsDialogProvider.m in Sources */,
@@ -3927,6 +3961,7 @@
 				1CCB5F761A62A724004C3E90 /* MainMenu.m in Sources */,
 				1CCB5F771A62A724004C3E90 /* MainWindow.h in Sources */,
 				1CCB5F781A62A724004C3E90 /* MainWindow.m in Sources */,
+				6B846FE61CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m in Sources */,
 				1CCB5F791A62A724004C3E90 /* open.h in Sources */,
 				1CCB5F7A1A62A724004C3E90 /* open.m in Sources */,
 				1CCB5F7B1A62A724004C3E90 /* output.h in Sources */,
@@ -3962,6 +3997,7 @@
 				1CCB5F9A1A62A724004C3E90 /* misc.m in Sources */,
 				1CCB5F9B1A62A724004C3E90 /* MainWindowTitle.h in Sources */,
 				1CCB5F9C1A62A724004C3E90 /* MainWindowTitle.m in Sources */,
+				6B846FE41CF5D88C00112E54 /* VLCHUDButtonCell.m in Sources */,
 				1CCB5F9D1A62A724004C3E90 /* BWQuincyManager.h in Sources */,
 				1CCB5F9E1A62A724004C3E90 /* BWQuincyManager.m in Sources */,
 				1CCB5F9F1A62A724004C3E90 /* BWQuincyUI.h in Sources */,
@@ -3973,7 +4009,9 @@
 				1CCB5FA51A62A724004C3E90 /* PXSourceList.h in Sources */,
 				1CCB5FA61A62A724004C3E90 /* PXSourceList.m in Sources */,
 				1CCB5FA71A62A724004C3E90 /* PXSourceListDataSource.h in Sources */,
+				6B846FE71CF5D88C00112E54 /* VLCHUDSliderCell.m in Sources */,
 				1CCB5FA81A62A724004C3E90 /* PXSourceListDelegate.h in Sources */,
+				6B846FEB1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m in Sources */,
 				1CCB5FA91A62A724004C3E90 /* SPInvocationGrabbing.h in Sources */,
 				1CCB5FAA1A62A724004C3E90 /* SPInvocationGrabbing.m in Sources */,
 				1CCB5FAB1A62A724004C3E90 /* SPMediaKeyTap.h in Sources */,
