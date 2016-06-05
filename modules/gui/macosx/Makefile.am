@@ -76,4 +76,8 @@ libmacosx_plugin_la_SOURCES = \
 	VLCScrollingClipView.h VLCScrollingClipView.m \
 	VLCStatusBarIcon.h VLCStatusBarIcon.m \
 	VLCVoutWindowController.h VLCVoutWindowController.m \
-	Windows.h Windows.m
+	Windows.h Windows.m \
+	VLCHUDSliderCell.h VLCHUDSliderCell.m \
+	VLCHUDButtonCell.h VLCHUDButtonCell.m \
+	VLCHUDCheckboxCell.h VLCHUDCheckboxCell.m \
+	VLCHUDRadiobuttonCell.h VLCHUDRadiobuttonCell.m
