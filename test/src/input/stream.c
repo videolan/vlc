@@ -23,6 +23,8 @@
 
 #include <vlc_md5.h>
 #include <vlc_stream.h>
+#include <vlc_rand.h>
+#include <vlc_fs.h>
 
 #include <inttypes.h>
 #include <limits.h>
@@ -31,8 +33,7 @@
 #include <unistd.h>
 
 #ifndef TEST_NET
-#define FILE_PATH SRCDIR"/samples/image.jpg"
-#define FILE_MD5 "8cb4173266779095a5eb3f1ba2a42a21"
+#define RAND_FILE_SIZE (25 * 1024 * 1024)
 #else
 #define HTTP_URL "http://streams.videolan.org/streams/ogm/MJPEG.ogm"
 #define HTTP_MD5 "4eaf9e8837759b670694398a33f02bc0"
@@ -305,17 +306,22 @@ test( struct reader **pp_readers, unsigned int i_readers, const char *psz_md5 )
         assert( pp_readers[i]->pf_getsize( pp_readers[i] ) == i_size );
 
     /* Read the whole file and compare between each readers */
-    InitMD5( &md5 );
+    if( psz_md5 != NULL )
+        InitMD5( &md5 );
     while( ( i_ret = READ_AT( i_offset, 4096 ) ) > 0 )
     {
         i_offset += i_ret;
-        AddMD5( &md5, p_buf, i_ret );
+        if( psz_md5 != NULL )
+            AddMD5( &md5, p_buf, i_ret );
     }
-    EndMD5( &md5 );
-    psz_read_md5 = psz_md5_hash( &md5 );
-    assert( psz_read_md5 );
-    assert( strcmp( psz_read_md5, psz_md5 ) == 0 );
-    free( psz_read_md5 );
+    if( psz_md5 != NULL )
+    {
+        EndMD5( &md5 );
+        psz_read_md5 = psz_md5_hash( &md5 );
+        assert( psz_read_md5 );
+        assert( strcmp( psz_read_md5, psz_md5 ) == 0 );
+        free( psz_read_md5 );
+    }
 
     /* Test cache skip */
     i_offset = 9 * i_size / 10;
@@ -337,6 +343,25 @@ test( struct reader **pp_readers, unsigned int i_readers, const char *psz_md5 )
     PEEK_AT( 0, 46 );
 }
 
+#ifndef TEST_NET
+static void
+fill_rand( int i_fd, size_t i_size )
+{
+    uint8_t p_buf[4096];
+    size_t i_written = 0;
+    while( i_written < i_size )
+    {
+        size_t i_tocopy = __MIN( i_size - i_written, 4096 );
+
+        vlc_rand_bytes(p_buf, i_tocopy);
+        ssize_t i_ret = write( i_fd, p_buf, i_tocopy );
+        assert( i_ret > 0 );
+        i_written += i_ret;
+    }
+    assert( i_written == i_size );
+}
+#endif
+
 int
 main( void )
 {
@@ -345,21 +370,25 @@ main( void )
     test_init();
 
 #ifndef TEST_NET
-    char psz_file[PATH_MAX];
+    char psz_tmp_path[] = "/tmp/libvlc_XXXXXX";
     char *psz_url;
+    int i_tmp_fd;
 
-    log( "Test local file with libc, and stream\n" );
-    assert( realpath( FILE_PATH, psz_file ) == psz_file );
-    assert( asprintf( &psz_url, "file://%s", psz_file ) != -1 );
+    log( "Test random file with libc, and stream\n" );
+    i_tmp_fd = vlc_mkstemp( psz_tmp_path );
+    fill_rand( i_tmp_fd, RAND_FILE_SIZE );
+    assert( i_tmp_fd != -1 );
+    assert( asprintf( &psz_url, "file://%s", psz_tmp_path ) != -1 );
 
-    assert( ( pp_readers[0] = libc_open( psz_file ) ) );
+    assert( ( pp_readers[0] = libc_open( psz_tmp_path ) ) );
     assert( ( pp_readers[1] = stream_open( psz_url ) ) );
 
-    test( pp_readers, 2, FILE_MD5 );
+    test( pp_readers, 2, NULL );
     for( unsigned int i = 0; i < 2; ++i )
         pp_readers[i]->pf_close( pp_readers[i] );
     free( psz_url );
 
+    close( i_tmp_fd );
 #else
 
     log( "Test http url with stream\n" );
