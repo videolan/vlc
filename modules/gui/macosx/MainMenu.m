@@ -1012,6 +1012,7 @@
     int intValue = [sender tag];
     NSString *representedObject = [sender representedObject];
 
+#warning this won't work anymore and is heritably bad
     config_PutInt(getIntf(), [representedObject UTF8String], intValue);
 
     NSMenu *menu = [sender menu];
