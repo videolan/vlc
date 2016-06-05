@@ -1103,6 +1103,10 @@ static const char *const ppsz_prefres[] = {
     "Automatically preparse files added to the playlist " \
     "(to retrieve some metadata)." )
 
+#define PREPARSE_TIMEOUT_TEXT N_( "Preparsing timeout" )
+#define PREPARSE_TIMEOUT_LONGTEXT N_( \
+    "Maximum time allowed to preparse a file" )
+
 #define METADATA_NETWORK_TEXT N_( "Allow metadata network access" )
 
 #define SD_TEXT N_( "Services discovery modules")
@@ -2031,6 +2035,9 @@ vlc_module_begin ()
 
     add_bool( "auto-preparse", true, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, false )
+
+    add_integer( "preparse-timeout", 5000, PREPARSE_TIMEOUT_TEXT,
+                 PREPARSE_TIMEOUT_LONGTEXT, false )
 
     add_obsolete_integer( "album-art" )
     add_bool( "metadata-network-access", false, METADATA_NETWORK_TEXT,

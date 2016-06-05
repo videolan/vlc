@@ -43,12 +43,14 @@ struct preparser_entry_t
     input_item_t    *p_item;
     input_item_meta_request_option_t i_options;
     void            *id;
+    mtime_t          timeout;
 };
 
 struct playlist_preparser_t
 {
     vlc_object_t        *object;
     playlist_fetcher_t  *p_fetcher;
+    mtime_t              default_timeout;
 
     input_thread_t      *input;
     void                *input_id;
@@ -77,6 +79,7 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
     p_preparser->input_id = NULL;
     p_preparser->input_done = false;
     p_preparser->object = parent;
+    p_preparser->default_timeout = var_InheritInteger( parent, "preparse-timeout" );
     p_preparser->p_fetcher = playlist_fetcher_New( parent );
     if( unlikely(p_preparser->p_fetcher == NULL) )
         msg_Err( parent, "cannot create fetcher" );
@@ -93,7 +96,7 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
 
 void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p_item,
                               input_item_meta_request_option_t i_options,
-                              void *id )
+                              int timeout, void *id )
 {
     preparser_entry_t *p_entry = malloc( sizeof(preparser_entry_t) );
 
@@ -102,6 +105,7 @@ void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p
     p_entry->p_item = p_item;
     p_entry->i_options = i_options;
     p_entry->id = id;
+    p_entry->timeout = (timeout < 0 ? p_preparser->default_timeout : timeout) * 1000;
     vlc_gc_incref( p_entry->p_item );
 
     vlc_mutex_lock( &p_preparser->lock );
@@ -227,6 +231,7 @@ static void Preparse( playlist_preparser_t *preparser,
     /* Do not preparse if it is already done (like by playing it) */
     if( b_preparse && !input_item_IsPreparsed( p_item ) )
     {
+        int status;
         preparser->input = input_CreatePreparser( preparser->object, p_item );
         if( preparser->input == NULL )
         {
@@ -240,9 +245,24 @@ static void Preparse( playlist_preparser_t *preparser,
                          preparser );
         if( input_Start( preparser->input ) == VLC_SUCCESS )
         {
-            while( !preparser->input_done )
-                vlc_cond_wait( &preparser->thread_wait, &preparser->lock );
+            if( p_entry->timeout > 0 )
+            {
+                mtime_t deadline = mdate() + p_entry->timeout;
+                int ret = 0;
+                while( !preparser->input_done && ret == 0 )
+                    ret = vlc_cond_timedwait( &preparser->thread_wait,
+                                              &preparser->lock, deadline );
+                status = ret == 0 ? ITEM_PREPARSE_DONE : ITEM_PREPARSE_TIMEOUT;
+            }
+            else
+            {
+                while( !preparser->input_done )
+                    vlc_cond_wait( &preparser->thread_wait, &preparser->lock );
+                status = ITEM_PREPARSE_DONE;
+            }
         }
+        else
+            status = ITEM_PREPARSE_FAILED;
 
         var_DelCallback( preparser->input, "intf-event", InputEvent,
                          preparser );
@@ -252,7 +272,7 @@ static void Preparse( playlist_preparser_t *preparser,
 
         var_SetAddress( preparser->object, "item-change", p_item );
         input_item_SetPreparsed( p_item, true );
-        input_item_SignalPreparseEnded( p_item, ITEM_PREPARSE_DONE );
+        input_item_SignalPreparseEnded( p_item, status );
     }
     else if (!b_preparse)
         input_item_SignalPreparseEnded( p_item, ITEM_PREPARSE_SKIPPED );

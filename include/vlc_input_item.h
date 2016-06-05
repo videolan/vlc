@@ -395,6 +395,7 @@ enum input_item_preparse_status
 {
     ITEM_PREPARSE_SKIPPED,
     ITEM_PREPARSE_FAILED,
+    ITEM_PREPARSE_TIMEOUT,
     ITEM_PREPARSE_DONE
 };
 

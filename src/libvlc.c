@@ -627,7 +627,7 @@ int libvlc_MetaRequest(libvlc_int_t *libvlc, input_item_t *item,
     if( i_options & META_REQUEST_OPTION_DO_INTERACT )
         item->b_preparse_interact = true;
     vlc_mutex_unlock( &item->lock );
-    playlist_preparser_Push(priv->parser, item, i_options, NULL);
+    playlist_preparser_Push(priv->parser, item, i_options, -1, NULL);
     return VLC_SUCCESS;
 }
 
