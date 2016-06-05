@@ -812,7 +812,6 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
     [self resetControls];
 
-    [self.window center];
     [self.window makeKeyAndOrderFront: self];
 }
 
