@@ -1970,6 +1970,8 @@ LIBVLC_API int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, l
 /**
  * Media player roles.
  *
+ * \version LibVLC 3.0.0 and later.
+ *
  * See \ref libvlc_media_player_set_role()
  */
 typedef enum libvlc_media_player_role {
@@ -1987,6 +1989,8 @@ typedef enum libvlc_media_player_role {
 
 /**
  * Gets the media role.
+ *
+ * \version LibVLC 3.0.0 and later.
  *
  * \return the media player role (\ref libvlc_media_player_role_t)
  */
