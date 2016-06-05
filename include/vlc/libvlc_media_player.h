@@ -1982,6 +1982,7 @@ typedef enum libvlc_media_player_role {
     libvlc_role_Production /**< Audio editting/production */,
     libvlc_role_Accessibility /**< Accessibility */,
     libvlc_role_Test /** Testing */,
+#define libvlc_role_Last libvlc_role_Test
 } libvlc_media_player_role_t;
 
 /**
