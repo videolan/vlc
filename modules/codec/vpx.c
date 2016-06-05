@@ -163,13 +163,10 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
         v->i_visible_height = img->d_h;
     }
 
-    if( !dec->fmt_in.video.i_sar_num || !dec->fmt_in.video.i_sar_den )
+    if( !dec->fmt_out.video.i_sar_num || !dec->fmt_out.video.i_sar_den )
     {
-        if( !dec->fmt_out.video.i_sar_num || !dec->fmt_out.video.i_sar_den )
-        {
-            dec->fmt_out.video.i_sar_num = 1;
-            dec->fmt_out.video.i_sar_den = 1;
-        }
+        dec->fmt_out.video.i_sar_num = 1;
+        dec->fmt_out.video.i_sar_den = 1;
     }
 
     picture_t *pic = decoder_NewPicture(dec);
