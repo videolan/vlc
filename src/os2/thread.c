@@ -645,11 +645,7 @@ vlc_thread_t vlc_thread_self (void)
 
 unsigned long vlc_thread_id (void)
 {
-#if 0
-    return vlc_thread_self ()->tid; /* potential NULL deref */
-#else
-    return -1;
-#endif
+    return _gettid();
 }
 
 /*** Thread cancellation ***/
