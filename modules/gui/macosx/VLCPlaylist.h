@@ -40,6 +40,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *sortNamePlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *sortAuthorPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *recursiveExpandPlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *addFilesToPlaylistMenuItem;
 
 @property (nonatomic, readwrite, weak) VLCPlaylistView *outlineView;
 @property (nonatomic, readwrite, weak) NSTableHeaderView *playlistHeaderView;
@@ -68,6 +69,7 @@
 - (IBAction)sortNodeByAuthor:(id)sender;
 - (IBAction)recursiveExpandNode:(id)sender;
 - (IBAction)showInfoPanel:(id)sender;
+- (IBAction)addFilesToPlaylist:(id)sender;
 
 - (NSArray *)draggedItems;
 

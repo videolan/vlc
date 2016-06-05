@@ -46,6 +46,7 @@
 #import "MainMenu.h"
 #import "VLCPlaylistInfo.h"
 #import "ResumeDialogController.h"
+#import "open.h"
 
 #include <vlc_keys.h>
 #import <vlc_interface.h>
@@ -236,6 +237,7 @@
     [_revealInFinderPlaylistMenuItem setTitle: _NS("Reveal in Finder")];
     [_sortNamePlaylistMenuItem setTitle: _NS("Sort Node by Name")];
     [_sortAuthorPlaylistMenuItem setTitle: _NS("Sort Node by Author")];
+    [_addFilesToPlaylistMenuItem setTitle: _NS("Add File...")];
 }
 
 - (void)playlistUpdated
@@ -392,6 +394,11 @@
 - (IBAction)showInfoPanel:(id)sender
 {
     [[[VLCMain sharedInstance] currentMediaInfoPanel] toggleWindow:sender];
+}
+
+- (IBAction)addFilesToPlaylist:(id)sender
+{
+    [[[VLCMain sharedInstance] open] openFile];
 }
 
 - (IBAction)deleteItem:(id)sender

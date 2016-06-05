@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10102" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10102"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCPlaylist">
             <connections>
+                <outlet property="addFilesToPlaylistMenuItem" destination="lGc-nc-8Yq" id="joN-zx-w8u"/>
                 <outlet property="deletePlaylistMenuItem" destination="13" id="Qwn-a7-On0"/>
                 <outlet property="downloadCoverArtPlaylistMenuItem" destination="2" id="z0y-0U-uRz"/>
                 <outlet property="infoPlaylistMenuItem" destination="9" id="uIr-Np-fpB"/>
@@ -82,6 +83,13 @@
                 <menuItem title="Reveal in Finder" id="3">
                     <connections>
                         <action selector="revealItemInFinder:" target="-2" id="4WU-rm-69M"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="sUF-9g-Rxq"/>
+                <menuItem title="Add Files" id="lGc-nc-8Yq">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="addFilesToPlaylist:" target="-2" id="r6Z-KP-ovf"/>
                     </connections>
                 </menuItem>
             </items>
