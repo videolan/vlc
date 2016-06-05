@@ -196,6 +196,7 @@ libVLC:
  * Add libvlc_media_slaves_add, libvlc_media_slaves_clear
    libvlc_media_slaves_get, libvlc_media_slaves_release to add and get slaves
    from a libvlc_media
+ * Add libvlc_media_player_(get|set)_role to set the media role
 
 Logging
  * Support for the SystemD Journal
