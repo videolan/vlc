@@ -275,6 +275,9 @@ static void input_item_preparse_ended( const vlc_event_t * p_event,
         case ITEM_PREPARSE_FAILED:
             new_status = libvlc_media_parsed_status_failed;
             break;
+        case ITEM_PREPARSE_TIMEOUT:
+            new_status = libvlc_media_parsed_status_timeout;
+            break;
         case ITEM_PREPARSE_DONE:
             new_status = libvlc_media_parsed_status_done;
             break;
@@ -735,7 +738,7 @@ libvlc_media_get_duration( libvlc_media_t * p_md )
 }
 
 static int media_parse(libvlc_media_t *media, bool b_async,
-                       libvlc_media_parse_flag_t parse_flag)
+                       libvlc_media_parse_flag_t parse_flag, int timeout)
 {
     bool needed;
 
@@ -768,7 +771,7 @@ static int media_parse(libvlc_media_t *media, bool b_async,
             parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
         if (parse_flag & libvlc_media_do_interact)
             parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
-        ret = libvlc_MetadataRequest(libvlc, item, parse_scope, 0, media);
+        ret = libvlc_MetadataRequest(libvlc, item, parse_scope, timeout, media);
         if (ret != VLC_SUCCESS)
             return ret;
     }
@@ -791,7 +794,7 @@ static int media_parse(libvlc_media_t *media, bool b_async,
 void
 libvlc_media_parse(libvlc_media_t *media)
 {
-    media_parse( media, false, libvlc_media_fetch_local );
+    media_parse( media, false, -1, libvlc_media_fetch_local );
 }
 
 /**************************************************************************
@@ -800,7 +803,7 @@ libvlc_media_parse(libvlc_media_t *media)
 void
 libvlc_media_parse_async(libvlc_media_t *media)
 {
-    media_parse( media, true, libvlc_media_fetch_local );
+    media_parse( media, true, -1, libvlc_media_fetch_local );
 }
 
 /**************************************************************************
@@ -808,9 +811,10 @@ libvlc_media_parse_async(libvlc_media_t *media)
  **************************************************************************/
 int
 libvlc_media_parse_with_options( libvlc_media_t *media,
-                                 libvlc_media_parse_flag_t parse_flag )
+                                 libvlc_media_parse_flag_t parse_flag,
+                                 int timeout )
 {
-    return media_parse( media, true, parse_flag ) == VLC_SUCCESS ? 0 : -1;
+    return media_parse( media, true, parse_flag, timeout ) == VLC_SUCCESS ? 0 : -1;
 }
 
 /**************************************************************************

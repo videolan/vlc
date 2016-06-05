@@ -43,7 +43,7 @@ media_parse_sync(libvlc_media_t *p_m)
     libvlc_event_manager_t *p_em = libvlc_media_event_manager(p_m);
     libvlc_event_attach(p_em, libvlc_MediaParsedChanged, finished_event, &sem);
 
-    int i_ret = libvlc_media_parse_with_options(p_m, libvlc_media_parse_local);
+    int i_ret = libvlc_media_parse_with_options(p_m, libvlc_media_parse_local, -1);
     assert(i_ret == 0);
 
     vlc_sem_wait (&sem);

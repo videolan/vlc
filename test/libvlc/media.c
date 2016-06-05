@@ -64,7 +64,7 @@ static void test_media_preparsed(int argc, const char** argv,
     libvlc_event_attach (em, libvlc_MediaParsedChanged, media_parse_ended, &sem);
 
     // Parse the media. This is synchronous.
-    int i_ret = libvlc_media_parse_with_options(media, libvlc_media_parse_local);
+    int i_ret = libvlc_media_parse_with_options(media, libvlc_media_parse_local, -1);
     assert(i_ret == 0);
 
     // Wait for preparsed event
@@ -161,7 +161,7 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play,
     {
         libvlc_event_attach (em, libvlc_MediaParsedChanged, subitem_parse_ended, &sem);
 
-        int i_ret = libvlc_media_parse_with_options(media, libvlc_media_parse_local);
+        int i_ret = libvlc_media_parse_with_options(media, libvlc_media_parse_local, -1);
         assert(i_ret == 0);
         vlc_sem_wait (&sem);
     }

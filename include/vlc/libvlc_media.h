@@ -268,6 +268,7 @@ typedef enum libvlc_media_parsed_status_t
     libvlc_media_parsed_status_init,
     libvlc_media_parsed_status_skipped,
     libvlc_media_parsed_status_failed,
+    libvlc_media_parsed_status_timeout,
     libvlc_media_parsed_status_done,
 } libvlc_media_parsed_status_t;
 
@@ -671,12 +672,16 @@ libvlc_media_parse( libvlc_media_t *p_md );
  *
  * \param p_md media descriptor object
  * \param parse_flag parse options:
+ * \param timeout maximum time allowed to preparse the media. If -1, the
+ * default "preparse-timeout" option will be used as a timeout. If 0, it will
+ * wait indefinitely. If > 0, the timeout will be used (in milliseconds).
  * \return -1 in case of error, 0 otherwise
  * \version LibVLC 3.0.0 or later
  */
 LIBVLC_API int
 libvlc_media_parse_with_options( libvlc_media_t *p_md,
-                                 libvlc_media_parse_flag_t parse_flag );
+                                 libvlc_media_parse_flag_t parse_flag,
+                                 int timeout );
 
 /**
  * Get Parsed status for media descriptor object.
