@@ -423,6 +423,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                  *psz_end = ',';
 
                  p_seekpoint = vlc_seekpoint_New();
+                 
+                 if( unlikely( p_seekpoint == NULL ) )
+                     break;
+                    
                  while( (psz_end = strchr( psz_start, ',' ) ) )
                  {
                      *psz_end = 0;
