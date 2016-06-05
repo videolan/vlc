@@ -653,8 +653,9 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
     p_logo_list->i_next_pic = 0;
 
     psz_original = psz_list = strdup( psz_filename );
+
     if( !psz_list )
-        abort();
+        return;
 
     /* Count the number logos == number of ';' + 1 */
     p_logo_list->i_count = 1;
@@ -666,8 +667,12 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
 
     p_logo_list->p_logo =
     p_logo              = calloc( p_logo_list->i_count, sizeof(*p_logo) );
+
     if( !p_logo )
-        abort();
+    {
+        free( psz_list );
+        return;
+    }
 
     /* Fill the data */
     for( unsigned i = 0; i < p_logo_list->i_count; i++ )
