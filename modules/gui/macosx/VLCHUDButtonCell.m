@@ -29,21 +29,25 @@
 {
     self = [super initWithCoder:coder];
     if (self) {
-        _normalGradient    = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:0.251f green:0.251f blue:0.255f alpha:1.0f]
+        _disabledGradient  = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:0.251f green:0.251f blue:0.255f alpha:1.0f]
                                                            endingColor:[NSColor colorWithDeviceRed:0.118f green:0.118f blue:0.118f alpha:1.0f]];
+        _normalGradient    = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:0.251f green:0.251f blue:0.255f alpha:0.7f]
+                                                           endingColor:[NSColor colorWithDeviceRed:0.118f green:0.118f blue:0.118f alpha:0.7f]];
         _highlightGradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:0.451f green:0.451f blue:0.455f alpha:1.0f]
                                                            endingColor:[NSColor colorWithDeviceRed:0.318f green:0.318f blue:0.318f alpha:1.0f]];
         _pushedGradient    = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithDeviceRed:0.451f green:0.451f blue:0.455f alpha:1.0f]
                                                            endingColor:[NSColor colorWithDeviceRed:0.318f green:0.318f blue:0.318f alpha:1.0f]];
+        _enabledTextColor  = [NSColor whiteColor];
+        _disabledTextColor = [NSColor grayColor];
     }
     return self;
 }
 
 - (void) drawBezelWithFrame:(NSRect)frame inView:(NSView *)controlView
 {
-    NSLog(@"Bezel style: %lu", self.bezelStyle);
     // Set frame to the correct size
     frame.size.height = self.cellSize.height;
+
     // Inset rect to have enough room for the stroke
     frame = NSInsetRect(frame, 1, 1);
     if (self.bezelStyle == NSRoundRectBezelStyle) {
@@ -53,13 +57,32 @@
     }
 }
 
+- (NSRect)drawTitle:(NSAttributedString *)title withFrame:(NSRect)frame inView:(NSView *)controlView
+{
+    NSMutableAttributedString *coloredTitle = [[NSMutableAttributedString alloc]
+                                               initWithAttributedString:title];
+    if (self.isEnabled) {
+        [coloredTitle addAttribute:NSForegroundColorAttributeName
+                             value:_enabledTextColor
+                             range:NSMakeRange(0, coloredTitle.length)];
+    } else {
+        [coloredTitle addAttribute:NSForegroundColorAttributeName
+                             value:_disabledTextColor
+                             range:NSMakeRange(0, coloredTitle.length)];
+    }
+
+    return [super drawTitle:coloredTitle withFrame:frame inView:controlView];
+}
+
 - (void) drawRoundRectButtonBezelInRect:(NSRect)rect
 {
     NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:8.0 yRadius:8.0];
     if (self.highlighted) {
-        [_normalGradient drawInBezierPath:path angle:90.0f];
-    } else {
         [_pushedGradient drawInBezierPath:path angle:90.0f];
+    } else if (!self.enabled) {
+        [_disabledGradient drawInBezierPath:path angle:90.0f];
+    } else {
+        [_normalGradient drawInBezierPath:path angle:90.0f];
     }
     [[NSColor colorWithCalibratedWhite:1.0 alpha:1.0] setStroke];
     [path setLineWidth:0.5];

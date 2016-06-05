@@ -31,7 +31,11 @@
 @interface VLCHUDButtonCell : NSButtonCell
 
 @property NSGradient *normalGradient;
+@property NSGradient *disabledGradient;
 @property NSGradient *highlightGradient;
 @property NSGradient *pushedGradient;
+
+@property NSColor *enabledTextColor;
+@property NSColor *disabledTextColor;
 
 @end
