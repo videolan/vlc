@@ -233,8 +233,8 @@ read_at( struct reader **pp_readers, unsigned int i_readers,
         const uint8_t *p_peek = NULL;
         struct reader *p_reader = pp_readers[i];
 
-        log( "%s: %s %zu @ %"PRIu64"\n", p_reader->psz_name,
-              p_buf ? "read" : "peek", i_read, i_offset );
+        log( "%s: %s %zu @ %"PRIu64" (size: %" PRIu64 ")\n", p_reader->psz_name,
+              p_buf ? "read" : "peek", i_read, i_offset, i_size );
         assert( p_reader->pf_seek( p_reader, i_offset ) != -1 );
 
         i_last_pos = p_reader->pf_tell( p_reader );
