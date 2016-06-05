@@ -70,6 +70,12 @@
 - (void)startListeningWithAppleRemote;
 - (void)stopListeningWithAppleRemote;
 
+- (void)menuFocusActivate;
+- (void)moveMenuFocusLeft;
+- (void)moveMenuFocusRight;
+- (void)moveMenuFocusUp;
+- (void)moveMenuFocusDown;
+
 - (void)addSubtitlesToCurrentInput:(NSArray *)paths;
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;

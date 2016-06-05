@@ -47,5 +47,6 @@
 @property (readonly) int durationOfCurrentItem;
 @property (readonly) NSString *pathOfCurrentItem;
 @property (readonly) NSString *nameOfCurrentItem;
+@property (readonly) BOOL playbackShowsMenu;
 
 @end

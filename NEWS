@@ -158,6 +158,7 @@ Mac OS X Interface
  * new AppleScript API giving access to audio desynchronization
  * Support for building with disabled sparkle update mechanism
  * New configure flag to disable automatic updates
+ * Expanded AppleScript API for menu detection and navigation
 
 iOS:
  * Dropped support for iOS 6.x

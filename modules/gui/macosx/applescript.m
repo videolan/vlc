@@ -102,6 +102,16 @@
         [[VLCCoreInteraction sharedInstance] volumeUp];
     else if ([o_command isEqualToString:@"volumeDown"])
         [[VLCCoreInteraction sharedInstance] volumeDown];
+    else if ([o_command isEqualToString:@"moveMenuFocusUp"])
+        [[VLCCoreInteraction sharedInstance] moveMenuFocusUp];
+    else if ([o_command isEqualToString:@"moveMenuFocusDown"])
+        [[VLCCoreInteraction sharedInstance] moveMenuFocusDown];
+    else if ([o_command isEqualToString:@"moveMenuFocusLeft"])
+        [[VLCCoreInteraction sharedInstance] moveMenuFocusLeft];
+    else if ([o_command isEqualToString:@"moveMenuFocusRight"])
+        [[VLCCoreInteraction sharedInstance] moveMenuFocusRight];
+    else if ([o_command isEqualToString:@"menuFocusActivate"])
+        [[VLCCoreInteraction sharedInstance] menuFocusActivate];
     else if ([o_command isEqualToString:@"stepForward"]) {
         //default: forwardShort
         if (o_parameter) {
@@ -266,6 +276,40 @@
 
 - (NSString*) nameOfCurrentItem {
     return [[VLCCoreInteraction sharedInstance] nameOfCurrentPlaylistItem];
+}
+
+- (BOOL)playbackShowsMenu {
+    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
+
+    if (!p_input_thread)
+        return NO;
+
+    int i_current_title = var_GetInteger(p_input_thread, "title");
+
+    input_title_t **p_input_title;
+    int count;
+
+    /* fetch data */
+    int coreret = input_Control(p_input_thread, INPUT_GET_FULL_TITLE_INFO,
+                                &p_input_title, &count);
+    vlc_object_release(p_input_thread);
+
+    if (coreret != VLC_SUCCESS)
+        return NO;
+
+    BOOL ret = NO;
+
+    if (count > 0 && i_current_title < count) {
+        ret = p_input_title[i_current_title]->i_flags & INPUT_TITLE_MENU;
+    }
+
+    /* free array */
+    for (int i = 0; i < count; i++) {
+        vlc_input_title_Delete(p_input_title[i]);
+    }
+    free(p_input_title);
+
+    return ret;
 }
 
 @end

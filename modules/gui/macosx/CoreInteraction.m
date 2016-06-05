@@ -1057,6 +1057,57 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     [_remote stopListening:self];
 }
 
+#pragma mark - menu navigation
+- (void)menuFocusActivate
+{
+    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
+    if (p_input_thread == NULL)
+        return;
+
+    input_Control(p_input_thread, INPUT_NAV_ACTIVATE, NULL );
+    vlc_object_release(p_input_thread);
+}
+
+- (void)moveMenuFocusLeft
+{
+    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
+    if (p_input_thread == NULL)
+        return;
+
+    input_Control(p_input_thread, INPUT_NAV_LEFT, NULL );
+    vlc_object_release(p_input_thread);
+}
+
+- (void)moveMenuFocusRight
+{
+    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
+    if (p_input_thread == NULL)
+        return;
+
+    input_Control(p_input_thread, INPUT_NAV_RIGHT, NULL );
+    vlc_object_release(p_input_thread);
+}
+
+- (void)moveMenuFocusUp
+{
+    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
+    if (p_input_thread == NULL)
+        return;
+
+    input_Control(p_input_thread, INPUT_NAV_UP, NULL );
+    vlc_object_release(p_input_thread);
+}
+
+- (void)moveMenuFocusDown
+{
+    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
+    if (p_input_thread == NULL)
+        return;
+
+    input_Control(p_input_thread, INPUT_NAV_DOWN, NULL );
+    vlc_object_release(p_input_thread);
+}
+
 /* Helper method for the remote control interface in order to trigger forward/backward and volume
  increase/decrease as long as the user holds the left/right, plus/minus button */
 - (void) executeHoldActionForRemoteButton: (NSNumber*) buttonIdentifierNumber
