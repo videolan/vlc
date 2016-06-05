@@ -77,7 +77,7 @@ static ULONG vlc_DosWaitEventSemEx( HEV hev, ULONG ulTimeout )
     int       n;
     ULONG     rc;
 
-    struct vlc_thread *th = vlc_thread_self( thread_key );
+    struct vlc_thread *th = vlc_thread_self ();
     if( th == NULL || !th->killable )
     {
         /* Main thread - cannot be cancelled anyway
