@@ -138,7 +138,7 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
         [_disabledStrokeColor setStroke];
     }
 
-    [path setLineWidth:0.5f];
+    [path setLineWidth:1.0];
     [path stroke];
 }
 
