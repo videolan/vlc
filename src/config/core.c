@@ -360,8 +360,13 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
         return cfg->list.i_cb(obj, name, values, texts);
     }
 
-    int64_t *vals = xmalloc (sizeof (*vals) * count);
-    char **txts = xmalloc (sizeof (*txts) * count);
+    int64_t *vals = malloc (sizeof (*vals) * count);
+    char **txts = malloc (sizeof (*txts) * count);
+    if (vals == NULL || txts == NULL)
+    {
+        errno = ENOMEM;
+        goto error;
+    }
 
     for (size_t i = 0; i < count; i++)
     {
@@ -370,12 +375,22 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
         txts[i] = strdup ((cfg->list_text[i] != NULL)
                                        ? vlc_gettext (cfg->list_text[i]) : "");
         if (unlikely(txts[i] == NULL))
-            abort ();
+        {
+            for (int j = i - 1; j >= 0; --j)
+                free(txts[j]);
+            errno = ENOMEM;
+            goto error;
+        }
     }
 
     *values = vals;
     *texts = txts;
     return count;
+error:
+
+    free(vals);
+    free(txts);
+    return -1;
 }
 
 
