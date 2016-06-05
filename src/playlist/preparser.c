@@ -172,9 +172,11 @@ static int InputEvent( vlc_object_t *obj, const char *varname,
 /**
  * This function preparses an item when needed.
  */
-static void Preparse( playlist_preparser_t *preparser, input_item_t *p_item,
-                      input_item_meta_request_option_t i_options )
+static void Preparse( playlist_preparser_t *preparser,
+                      preparser_entry_t *p_entry )
 {
+    input_item_t *p_item = p_entry->p_item;
+
     vlc_mutex_lock( &p_item->lock );
     int i_type = p_item->i_type;
     bool b_net = p_item->b_net;
@@ -186,7 +188,7 @@ static void Preparse( playlist_preparser_t *preparser, input_item_t *p_item,
     case ITEM_TYPE_DIRECTORY:
     case ITEM_TYPE_PLAYLIST:
     case ITEM_TYPE_NODE:
-        if (!b_net || i_options & META_REQUEST_OPTION_SCOPE_NETWORK)
+        if( !b_net || p_entry->i_options & META_REQUEST_OPTION_SCOPE_NETWORK )
             b_preparse = true;
         break;
     }
@@ -275,31 +277,27 @@ static void *Thread( void *data )
     vlc_mutex_lock( &p_preparser->lock );
     for( ;; )
     {
-        input_item_t *p_current;
-        input_item_meta_request_option_t i_options;
+        preparser_entry_t *p_entry;
 
         /* */
         if( p_preparser->i_waiting > 0 )
         {
-            preparser_entry_t *p_entry = p_preparser->pp_waiting[0];
-            p_current = p_entry->p_item;
-            i_options = p_entry->i_options;
-            free( p_entry );
+            p_entry = p_preparser->pp_waiting[0];
             REMOVE_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting, 0 );
         }
         else
         {
-            p_current = NULL;
             p_preparser->b_live = false;
             vlc_cond_signal( &p_preparser->wait );
             break;
         }
-        assert( p_current );
+        assert( p_entry );
 
-        Preparse( p_preparser, p_current, i_options );
+        Preparse( p_preparser, p_entry );
 
-        Art( p_preparser, p_current );
-        vlc_gc_decref(p_current);
+        Art( p_preparser, p_entry->p_item );
+        vlc_gc_decref( p_entry->p_item );
+        free( p_entry );
     }
     vlc_mutex_unlock( &p_preparser->lock );
     return NULL;
