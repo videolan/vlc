@@ -770,12 +770,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             msg_Warn( p_dec, "More than 11 late frames, dropping frame" );
             return NULL;
         }
-
-        if( !b_need_output_picture )
-        {
-            p_context->skip_frame = __MAX( p_context->skip_frame,
-                                                  AVDISCARD_NONREF );
-        }
+    }
+    if( !b_need_output_picture )
+    {
+        p_context->skip_frame = __MAX( p_context->skip_frame,
+                                              AVDISCARD_NONREF );
     }
 
     /*
