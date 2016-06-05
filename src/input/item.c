@@ -653,6 +653,7 @@ input_item_slave_t *input_item_slave_New(const char *psz_uri, enum slave_type i_
 
     p_slave->i_type = i_type;
     p_slave->i_priority = i_priority;
+    p_slave->b_forced = false;
     strcpy( p_slave->psz_uri, psz_uri );
 
     return p_slave;

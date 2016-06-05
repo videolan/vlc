@@ -1079,8 +1079,10 @@ static void LoadSlaves( input_thread_t *p_input )
         if( p_slave->i_type == SLAVE_TYPE_SPU )
         {
             msg_Err( p_input, "Loading spu slave: %s", p_slave->psz_uri );
-            const unsigned i_flags = p_slave->i_priority == SLAVE_PRIORITY_USER
-                                   ? SUB_FORCED : SUB_CANFAIL;
+            unsigned i_flags = p_slave->i_priority == SLAVE_PRIORITY_USER
+                               ? SUB_FORCED : SUB_CANFAIL;
+            if( p_slave->b_forced )
+                i_flags |= SUB_FORCED;
             input_SubtitleAdd( p_input, p_slave->psz_uri, i_flags );
         }
         else

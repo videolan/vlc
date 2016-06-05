@@ -334,7 +334,10 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
                         input_item_slave_New( psz_uri, SLAVE_TYPE_SPU, i_prio )
                         : NULL;
                     if( p_sub )
+                    {
+                        p_sub->b_forced = true;
                         INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_sub );
+                    }
                     free( psz_uri );
                 }
                 free( path );

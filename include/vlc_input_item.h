@@ -161,6 +161,7 @@ struct input_item_slave
 {
     enum slave_type     i_type;     /**< Slave type (spu, audio) */
     enum slave_priority i_priority; /**< Slave priority */
+    bool                b_forced;   /**< Slave should be selected */
     char                psz_uri[];  /**< Slave mrl */
 };
 
