@@ -771,11 +771,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             return NULL;
         }
 
-        if( p_context->width <= 0 || p_context->height <= 0 )
-        {
-            p_context->skip_frame = p_sys->i_skip_frame;
-        }
-        else if( !b_need_output_picture )
+        if( !b_need_output_picture )
         {
             p_context->skip_frame = __MAX( p_context->skip_frame,
                                                   AVDISCARD_NONREF );
