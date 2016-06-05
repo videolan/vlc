@@ -298,6 +298,8 @@ test( struct reader **pp_readers, unsigned int i_readers, const char *psz_md5 )
 
     /* Compare size between each readers */
     i_size = pp_readers[0]->pf_getsize( pp_readers[0] );
+    assert( i_size > 0 );
+
     log( "stream size: %"PRIu64"\n", i_size );
     for( unsigned int i = 1; i < i_readers; ++i )
         assert( pp_readers[i]->pf_getsize( pp_readers[i] ) == i_size );
@@ -317,16 +319,12 @@ test( struct reader **pp_readers, unsigned int i_readers, const char *psz_md5 )
 
     /* Test cache skip */
     i_offset = 9 * i_size / 10;
-    while( ( i_ret = READ_AT( i_offset, 4096 ) ) > 0 )
+    while( i_offset < i_size && ( i_ret = READ_AT( i_offset, 4096 ) ) > 0 )
         i_offset += i_ret + 1;
 
     /* Test seek and peek */
     READ_AT( 0, 42 );
     READ_AT( i_size - 5, 43 );
-    READ_AT( i_size, 43 );
-    READ_AT( i_size + 1, 43 );
-    READ_AT( i_size * 2, 43 );
-    READ_AT( 99999999LL, 44 );
     READ_AT( 1, 45 );
     READ_AT( 2, 45 );
     READ_AT( i_size / 2, 45 );
@@ -335,9 +333,7 @@ test( struct reader **pp_readers, unsigned int i_readers, const char *psz_md5 )
 
     PEEK_AT( 0, 46 );
     PEEK_AT( i_size - 23, 46 );
-    PEEK_AT( i_size, 46 );
     PEEK_AT( i_size / 2, 46 );
-    PEEK_AT( i_size * 2, 46 );
     PEEK_AT( 0, 46 );
 }
 
