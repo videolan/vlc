@@ -92,4 +92,21 @@
     }
 }
 
+- (NSRect)drawTitle:(NSAttributedString *)title withFrame:(NSRect)frame inView:(NSView *)controlView
+{
+    NSMutableAttributedString *coloredTitle = [[NSMutableAttributedString alloc]
+                                               initWithAttributedString:title];
+    if (self.isEnabled) {
+        [coloredTitle addAttribute:NSForegroundColorAttributeName
+                             value:[NSColor whiteColor]
+                             range:NSMakeRange(0, coloredTitle.length)];
+    } else {
+        [coloredTitle addAttribute:NSForegroundColorAttributeName
+                             value:[NSColor grayColor]
+                             range:NSMakeRange(0, coloredTitle.length)];
+    }
+
+    return [super drawTitle:coloredTitle withFrame:frame inView:controlView];
+}
+
 @end
