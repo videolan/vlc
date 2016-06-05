@@ -1975,7 +1975,8 @@ LIBVLC_API int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, l
  * See \ref libvlc_media_player_set_role()
  */
 typedef enum libvlc_media_player_role {
-    libvlc_role_Music=1 /**< Music (or radio) playback */,
+    libvlc_role_None = 0 /**< Don't use a media player role */,
+    libvlc_role_Music   /**< Music (or radio) playback */,
     libvlc_role_Video /**< Video playback */,
     libvlc_role_Communication /**< Speech, real-time communication */,
     libvlc_role_Game /**< Video game */,
