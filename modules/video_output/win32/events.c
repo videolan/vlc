@@ -35,6 +35,7 @@
 
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
+#include <vlc_atomic.h>
 
 #include <windows.h>
 #include <windowsx.h>                                        /* GET_X_LPARAM */
@@ -93,7 +94,7 @@ struct event_thread_t
 
     HICON vlc_icon;
 
-    bool has_moved;
+    atomic_bool has_moved;
 };
 
 /***************************
@@ -444,12 +445,7 @@ void EventThreadUseOverlay( event_thread_t *p_event, bool b_used )
 }
 bool EventThreadGetAndResetHasMoved( event_thread_t *p_event )
 {
-    vlc_mutex_lock( &p_event->lock );
-    const bool has_moved = p_event->has_moved;
-    p_event->has_moved = false;
-    vlc_mutex_unlock( &p_event->lock );
-
-    return has_moved;
+    return atomic_exchange(&p_event->has_moved, false);
 }
 
 event_thread_t *EventThreadCreate( vout_display_t *vd)
@@ -474,6 +470,7 @@ event_thread_t *EventThreadCreate( vout_display_t *vd)
     p_event->button_pressed = 0;
     p_event->psz_title = NULL;
     p_event->source = vd->source;
+    atomic_init(&p_event->has_moved, false);
     vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, false);
 
     _sntprintf( p_event->class_main, sizeof(p_event->class_main)/sizeof(*p_event->class_main),
@@ -500,7 +497,7 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     p_event->width       = p_cfg->width;
     p_event->height      = p_cfg->height;
 
-    p_event->has_moved = false;
+    atomic_store(&p_event->has_moved, false);
 
     p_event->b_ready = false;
     p_event->b_done  = false;
@@ -1002,9 +999,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     {
 
     case WM_WINDOWPOSCHANGED:
-        vlc_mutex_lock( &p_event->lock );
-        p_event->has_moved = true;
-        vlc_mutex_unlock( &p_event->lock );
+        atomic_store(&p_event->has_moved, true);
         return 0;
 
     /* the user wants to close the window */
