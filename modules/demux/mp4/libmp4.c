@@ -690,7 +690,17 @@ static int MP4_ReadBox_uuid( stream_t *p_stream, MP4_Box_t *p_box )
     if( !CmpUUID( &p_box->i_uuid, &TfxdBoxUUID ) )
         return MP4_ReadBox_tfxd( p_stream, p_box );
 
+#ifdef MP4_VERBOSE
+    msg_Warn( p_stream, "Unknown uuid type box: "
+    "0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
+    "%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
+    p_box->i_uuid.b[0],  p_box->i_uuid.b[1],  p_box->i_uuid.b[2],  p_box->i_uuid.b[3],
+    p_box->i_uuid.b[4],  p_box->i_uuid.b[5],  p_box->i_uuid.b[6],  p_box->i_uuid.b[7],
+    p_box->i_uuid.b[8],  p_box->i_uuid.b[9],  p_box->i_uuid.b[10], p_box->i_uuid.b[11],
+    p_box->i_uuid.b[12], p_box->i_uuid.b[13], p_box->i_uuid.b[14], p_box->i_uuid.b[15] );
+#else
     msg_Warn( p_stream, "Unknown uuid type box" );
+#endif
     return 1;
 }
 
