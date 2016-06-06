@@ -198,6 +198,8 @@ libVLC:
    libvlc_media_slaves_get, libvlc_media_slaves_release to add and get slaves
    from a libvlc_media
  * Add libvlc_media_player_(get|set)_role to set the media role
+ * Add libvlc_media_player_add_slave to replace libvlc_video_set_subtitle_file,
+   working with MRL and supporting also audio slaves
 
 Logging
  * Support for the SystemD Journal
