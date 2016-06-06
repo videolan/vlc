@@ -101,6 +101,7 @@ $Id$
  * decomp: Decompression module
  * deinterlace: naive deinterlacing filter
  * demux_cdg: Demuxer for CD-G files (Karaoke)
+ * demux_chromecast: Internal demux filter to report the playback time on the Chromecast
  * demux_stl: EBU STL subtitles demuxer
  * demuxdump: Pseudo-demuxer that dumps the stream
  * diracsys: BBC Dirac demuxer

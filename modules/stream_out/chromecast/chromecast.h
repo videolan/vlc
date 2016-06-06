@@ -38,6 +38,7 @@
 #include <sstream>
 
 #include "cast_channel.pb.h"
+#include "chromecast_common.h"
 
 #define PACKET_HEADER_LEN 4
 
@@ -184,6 +185,9 @@ private:
     int recvPacket(bool &b_msgReceived, uint32_t &i_payloadSize,
                    unsigned *pi_received, uint8_t *p_data, bool *pb_pingTimeout,
                    int *pi_wait_delay, int *pi_wait_retries);
+
+    /* shared structure with the demux-filter */
+    chromecast_common      common;
 };
 
 #endif /* VLC_CHROMECAST_H */
