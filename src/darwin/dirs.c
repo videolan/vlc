@@ -154,7 +154,7 @@ static char *getAppDependentDir(vlc_userdir_t type)
             char identifier[256];
             Boolean ret = CFStringGetCString(identifierAsNS, identifier, sizeof(identifier), kCFStringEncodingUTF8);
             if (ret)
-                name = identifier;            
+                name = identifier;
         }
     }
 
@@ -164,7 +164,7 @@ static char *getAppDependentDir(vlc_userdir_t type)
         psz_dir = NULL;
     free(psz_parent);
 
-    return psz_dir;    
+    return psz_dir;
 }
 
 char *config_GetUserDir (vlc_userdir_t type)
