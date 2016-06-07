@@ -35,7 +35,7 @@
 # include <d3d9.h>
 # include <d3dx9effect.h>
 #endif
-#ifdef MODULE_NAME_IS_glwin32
+#if defined(MODULE_NAME_IS_glwin32) || defined(MODULE_NAME_IS_wgl)
 # include "../opengl.h"
 #endif
 #ifdef MODULE_NAME_IS_direct2d
@@ -150,11 +150,13 @@ struct vout_display_sys_t
     bool           wallpaper_requested;
 #endif
 
-#ifdef MODULE_NAME_IS_glwin32
+#if defined(MODULE_NAME_IS_glwin32) || defined(MODULE_NAME_IS_wgl)
     HDC                   hGLDC;
     HGLRC                 hGLRC;
     vlc_gl_t              gl;
+# ifdef MODULE_NAME_IS_glwin32
     vout_display_opengl_t *vgl;
+# endif
     HDC                   affinityHDC; // DC for the selected GPU
 #endif
 

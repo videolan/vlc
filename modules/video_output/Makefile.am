@@ -219,13 +219,23 @@ libglwin32_plugin_la_SOURCES = video_output/win32/glwin32.c \
 	video_output/win32/common.c video_output/win32/common.h \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
+libwgl_plugin_la_SOURCES = video_output/win32/wgl.c \
+        video_output/opengl.c video_output/opengl.h
+
 libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_glwin32
+libwgl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+        -DMODULE_NAME_IS_wgl
+
 libglwin32_plugin_la_LIBADD = -lopengl32 -lgdi32 -lole32 -luuid
+libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32
+
 libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libwgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += $(LTLIBglwin32)
-EXTRA_LTLIBRARIES += libglwin32_plugin.la
+vout_LTLIBRARIES += $(LTLIBglwin32) $(LTLIBwgl)
+EXTRA_LTLIBRARIES += libglwin32_plugin.la libwgl_plugin.la
 endif
 
 libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \

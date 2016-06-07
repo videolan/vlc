@@ -447,6 +447,7 @@ $Id$
  * wav: Wav demuxer
  * wave: Wave video effect
  * waveout: simple audio output module for Windows
+ * wgl: WGL extension for OpenGL
  * win_hotkeys: module to catch hotkeys when application doesn't have the focus
  * win_msg: Windows Messages module
  * windrive: Windows logical disc drives

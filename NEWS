@@ -122,6 +122,7 @@ Video ouput:
  * Added Direct3D11 video mode supporting both Windows desktop and WinRT modes,
    supporting subpicture blending and hardware acceleration
  * EFL Evas video output with Tizen TBM Surface support
+ * New OpenGL provider for Windows
 
 Text renderer:
  * CTL support through Harfbuzz in the Freetype module
