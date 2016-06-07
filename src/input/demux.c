@@ -657,3 +657,22 @@ static bool SkipAPETag( demux_t *p_demux )
     return true;
 }
 
+int demux_GetUpdateFlags( demux_t *p_demux )
+{
+    return p_demux->info.i_update;
+}
+
+void demux_ResetUpdateFlags( demux_t *p_demux, int i_flags )
+{
+    p_demux->info.i_update &= ~i_flags;
+}
+
+int demux_GetTitle( demux_t *p_demux )
+{
+    return p_demux->info.i_title;
+}
+
+int demux_GetSeekpoint( demux_t *p_demux )
+{
+    return p_demux->info.i_seekpoint;
+}

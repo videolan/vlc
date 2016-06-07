@@ -562,12 +562,12 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
 
     if( i_ret == VLC_DEMUXER_SUCCESS )
     {
-        if( p_demux->info.i_update )
+        if( demux_GetUpdateFlags( p_demux ) )
         {
-            if( p_demux->info.i_update & INPUT_UPDATE_TITLE_LIST )
+            if( demux_GetUpdateFlags( p_demux ) & INPUT_UPDATE_TITLE_LIST )
             {
                 UpdateTitleListfromDemux( p_input );
-                p_demux->info.i_update &= ~INPUT_UPDATE_TITLE_LIST;
+                demux_ResetUpdateFlags( p_demux, INPUT_UPDATE_TITLE_LIST );
             }
             if( p_input->p->master->b_title_demux )
             {
@@ -1933,7 +1933,7 @@ static bool Control( input_thread_t *p_input,
             if( p_input->p->master->i_title <= 0 )
                 break;
 
-            int i_title = p_input->p->master->p_demux->info.i_title;
+            int i_title = demux_GetTitle( p_input->p->master->p_demux );
             if( i_type == INPUT_CONTROL_SET_TITLE_PREV )
                 i_title--;
             else if( i_type == INPUT_CONTROL_SET_TITLE_NEXT )
@@ -1963,8 +1963,8 @@ static bool Control( input_thread_t *p_input,
 
             demux_t *p_demux = p_input->p->master->p_demux;
 
-            int i_title = p_demux->info.i_title;
-            int i_seekpoint = p_demux->info.i_seekpoint;
+            int i_title = demux_GetTitle( p_demux );
+            int i_seekpoint = demux_GetSeekpoint( p_demux );
 
             if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
             {
@@ -2144,33 +2144,33 @@ static int UpdateTitleSeekpointFromDemux( input_thread_t *p_input )
     demux_t *p_demux = p_input->p->master->p_demux;
 
     /* TODO event-like */
-    if( p_demux->info.i_update & INPUT_UPDATE_TITLE )
+    if( demux_GetUpdateFlags( p_demux ) & INPUT_UPDATE_TITLE )
     {
-        input_SendEventTitle( p_input, p_demux->info.i_title );
+        input_SendEventTitle( p_input, demux_GetTitle( p_demux ) );
 
-        p_demux->info.i_update &= ~INPUT_UPDATE_TITLE;
+        demux_ResetUpdateFlags( p_demux, INPUT_UPDATE_TITLE );
     }
-    if( p_demux->info.i_update & INPUT_UPDATE_SEEKPOINT )
+    if( demux_GetUpdateFlags( p_demux ) & INPUT_UPDATE_SEEKPOINT )
     {
         input_SendEventSeekpoint( p_input,
-                                  p_demux->info.i_title, p_demux->info.i_seekpoint );
+                                  demux_GetTitle( p_demux ), demux_GetSeekpoint( p_demux ) );
 
-        p_demux->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
+        demux_ResetUpdateFlags( p_demux, INPUT_UPDATE_SEEKPOINT );
     }
 
     return UpdateTitleSeekpoint( p_input,
-                                 p_demux->info.i_title,
-                                 p_demux->info.i_seekpoint );
+                                 demux_GetTitle( p_demux ),
+                                 demux_GetSeekpoint( p_demux ) );
 }
 
 static void UpdateGenericFromDemux( input_thread_t *p_input )
 {
     demux_t *p_demux = p_input->p->master->p_demux;
 
-    if( p_demux->info.i_update & INPUT_UPDATE_META )
+    if( demux_GetUpdateFlags( p_demux ) & INPUT_UPDATE_META )
     {
         InputUpdateMeta( p_input, p_demux );
-        p_demux->info.i_update &= ~INPUT_UPDATE_META;
+        demux_ResetUpdateFlags( p_demux, INPUT_UPDATE_META );
     }
     {
         double quality;
