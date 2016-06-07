@@ -1099,31 +1099,19 @@ static void LoadSlaves( input_thread_t *p_input )
         else
             input_item_slave_Delete( p_slave );
     }
+    /* Slaves that are successfully loaded will be added back to the item */
     TAB_CLEAN( p_item->i_slaves, p_item->pp_slaves );
+    vlc_mutex_unlock( &p_item->lock );
 
     /* Add slaves from the "input-slave" option */
     GetVarSlaves( p_input, &pp_slaves, &i_slaves );
-
-    if( i_slaves > 0 )
-    {
-        qsort( pp_slaves, i_slaves, sizeof (input_item_slave_t*),
-               SlaveCompare );
-        /* Update slave count if there are ignored slaves */
-        for( ; i_slaves > 0 && pp_slaves[i_slaves - 1] == NULL; --i_slaves );
-    }
-
-    /* Update item slaves: add all slaves found with subtitles_Detect(), the
-     * "--sub-file" option and from the item */
-    p_item->pp_slaves = pp_slaves;
-    p_item->i_slaves = i_slaves;
-    vlc_mutex_unlock( &p_item->lock );
 
     if( i_slaves > 0 )
         qsort( pp_slaves, i_slaves, sizeof (input_item_slave_t*),
                SlaveCompare );
 
     /* add all detected slaves */
-    for( int i = 0; i < i_slaves; i++ )
+    for( int i = 0; i < i_slaves && pp_slaves[i] != NULL; i++ )
     {
         input_item_slave_t *p_slave = pp_slaves[i];
         if( p_slave->i_type == SLAVE_TYPE_SPU )
@@ -1144,7 +1132,9 @@ static void LoadSlaves( input_thread_t *p_input )
             if( p_source )
                 TAB_APPEND( p_input->p->i_slave, p_input->p->slave, p_source );
         }
+        input_item_AddSlave( p_input->p->p_item, p_slave );
     }
+    TAB_CLEAN( i_slaves, pp_slaves );
 
     /* Load subtitles from attachments */
     int i_attachment = 0;
