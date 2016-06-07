@@ -329,8 +329,10 @@ int vlc_socketpair(int pf, int type, int proto, int fds[2], bool nonblock)
 # ifdef SO_NOSIGPIPE
     if (ret == 0)
     {
-        setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
-        setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+        const int val = 1;
+
+        setsockopt(fds[0], SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof (val));
+        setsockopt(fds[1], SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof (val));
     }
 # endif
 #else
