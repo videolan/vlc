@@ -433,6 +433,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         {
             enum slave_type type =  (enum slave_type) va_arg( args, enum slave_type );
             psz = (char*)va_arg( args, char * );
+            b_bool = (bool)va_arg( args, int );
 
             if( !psz || ( type != SLAVE_TYPE_SPU && type != SLAVE_TYPE_AUDIO ) )
                 return VLC_EGENERIC;
@@ -441,6 +442,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 input_item_slave_New( psz, type, SLAVE_PRIORITY_USER );
             if( !p_slave )
                 return VLC_ENOMEM;
+            p_slave->b_forced = b_bool;
 
             val.p_address = p_slave;
             input_ControlPush( p_input, INPUT_CONTROL_ADD_SLAVE, &val );

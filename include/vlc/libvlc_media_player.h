@@ -967,13 +967,14 @@ LIBVLC_API void libvlc_media_player_set_video_title_display( libvlc_media_player
  * \param p_mi the media player
  * \param i_type subtitle or audio
  * \param psz_uri Uri of the slave (should contain a valid scheme).
+ * \param b_select True if this slave should be selected when it's loaded
  *
  * \return 0 on success, -1 on error.
  */
 LIBVLC_API
 int libvlc_media_player_add_slave( libvlc_media_player_t *p_mi,
                                    libvlc_media_slave_type_t i_type,
-                                   const char *psz_uri );
+                                   const char *psz_uri, bool b_select );
 
 /**
  * Release (free) libvlc_track_description_t

@@ -1895,7 +1895,7 @@ void libvlc_media_player_set_video_title_display( libvlc_media_player_t *p_mi, l
 
 int libvlc_media_player_add_slave( libvlc_media_player_t *p_mi,
                                    libvlc_media_slave_type_t i_type,
-                                   const char *psz_uri )
+                                   const char *psz_uri, bool b_select )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
 
@@ -1911,7 +1911,7 @@ int libvlc_media_player_add_slave( libvlc_media_player_t *p_mi,
     }
     else
     {
-        int i_ret = input_AddSlave( p_input_thread, i_type, psz_uri );
+        int i_ret = input_AddSlave( p_input_thread, i_type, psz_uri, b_select );
         vlc_object_release( p_input_thread );
 
         return i_ret == VLC_SUCCESS ? 0 : -1;
