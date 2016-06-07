@@ -116,6 +116,22 @@ static int whiteonly( const char *s )
     return 1;
 }
 
+static int slave_strcmp( const void *a, const void *b )
+{
+    const input_item_slave_t *p_slave0 = *((const input_item_slave_t **) a);
+    const input_item_slave_t *p_slave1 = *((const input_item_slave_t **) b);
+
+    if( p_slave0 == NULL || p_slave1 == NULL )
+        return 0;
+
+    /* We can compare these uris since they come from the file system */
+#ifdef HAVE_STRCOLL
+    return strcoll( p_slave0->psz_uri, p_slave1->psz_uri );
+#else
+    return strcmp( p_slave0->psz_uri, p_slave1->psz_uri );
+#endif
+}
+
 /*
  * Check if a file ends with a subtitle extension
  */
@@ -401,6 +417,10 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
             input_item_slave_Delete( p_sub );
         }
     }
+
+    /* Sort alphabetically */
+    if( i_slaves > 0 )
+        qsort( pp_slaves, i_slaves, sizeof (input_item_slave_t*), slave_strcmp );
 
     *ppp_slaves = pp_slaves; /* in case of realloc */
     *p_slaves = i_slaves;
