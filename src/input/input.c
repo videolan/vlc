@@ -1111,6 +1111,9 @@ static void LoadSlaves( input_thread_t *p_input )
                SlaveCompare );
 
     /* add all detected slaves */
+    bool p_forced[2] = {};
+    static_assert( SLAVE_TYPE_AUDIO <= 1 && SLAVE_TYPE_SPU <= 1,
+                   "slave type size mismatch");
     for( int i = 0; i < i_slaves && pp_slaves[i] != NULL; i++ )
     {
         input_item_slave_t *p_slave = pp_slaves[i];
@@ -1118,13 +1121,15 @@ static void LoadSlaves( input_thread_t *p_input )
         unsigned i_flags = p_slave->i_priority != SLAVE_PRIORITY_USER
                            ? SLAVE_ADD_CANFAIL : SLAVE_ADD_NOFLAG;
 
-        if( p_slave->b_forced || p_slave->i_priority == SLAVE_PRIORITY_USER )
+        if( !p_forced[p_slave->i_type]
+         && ( p_slave->b_forced || p_slave->i_priority == SLAVE_PRIORITY_USER ) )
             i_flags |= SLAVE_ADD_FORCED;
 
         if( input_SlaveSourceAdd( p_input, p_slave->i_type, p_slave->psz_uri,
                                   i_flags ) == VLC_SUCCESS )
         {
             input_item_AddSlave( p_input->p->p_item, p_slave );
+            p_forced[p_slave->i_type] = true;
         }
         else
             input_item_slave_Delete( p_slave );
