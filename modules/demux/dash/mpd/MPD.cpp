@@ -89,7 +89,7 @@ void MPD::debug()
             " minBufferTime=%" PRId64,
             static_cast<std::string>(getProfile()).c_str(),
             duration.Get() / CLOCK_FREQ,
-            minBufferTime.Get());
+            minBufferTime);
     msg_Dbg(p_object, "BaseUrl=%s", getUrlSegment().toString().c_str());
 
     std::vector<BasePeriod *>::const_iterator i;

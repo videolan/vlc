@@ -99,7 +99,7 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
     it = attr.find("minBufferTime");
     if(it != attr.end())
-        mpd->minBufferTime.Set(IsoTime(it->second) * CLOCK_FREQ);
+        mpd->setMinBuffering(IsoTime(it->second) * CLOCK_FREQ);
 
     it = attr.find("minimumUpdatePeriod");
     if(it != attr.end())
