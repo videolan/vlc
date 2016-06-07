@@ -135,7 +135,7 @@ void playlist_preparser_Cancel( playlist_preparser_t *p_preparser, void *id )
     vlc_mutex_lock( &p_preparser->lock );
 
     /* Remove entries that match with the id */
-    for( int i = p_preparser->i_waiting - 1; i >= 0; ++i )
+    for( int i = p_preparser->i_waiting - 1; i >= 0; --i )
     {
         preparser_entry_t *p_entry = p_preparser->pp_waiting[i];
         if( p_entry->id == id )
