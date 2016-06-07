@@ -441,6 +441,6 @@ static bool ProbeAudioDevOss( demux_t *p_demux, const char *psz_device )
 
 open_failed:
     if( i_fd >= 0 )
-        vöc_close( i_fd );
+        vlc_close( i_fd );
     return false;
 }
