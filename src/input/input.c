@@ -989,11 +989,15 @@ static void SetSubtitlesOptions( input_thread_t *p_input )
         var_SetInteger( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
 }
 
-static void LoadVarSlaves( input_thread_t *p_input )
+static void GetVarSlaves( input_thread_t *p_input,
+                          input_item_slave_t ***ppp_slaves, int *p_slaves )
 {
     char *psz = var_GetNonEmptyString( p_input, "input-slave" );
     if( !psz )
         return;
+
+    input_item_slave_t **pp_slaves = *ppp_slaves;
+    int i_slaves = *p_slaves;
 
     char *psz_org = psz;
     while( psz && *psz )
@@ -1013,14 +1017,19 @@ static void LoadVarSlaves( input_thread_t *p_input )
         psz = psz_delim;
         if( uri == NULL )
             continue;
-        msg_Dbg( p_input, "adding slave input '%s'", uri );
 
-        input_source_t *p_slave = InputSourceNew( p_input, uri, NULL, false );
-        if( p_slave )
-            TAB_APPEND( p_input->p->i_slave, p_input->p->slave, p_slave );
+        input_item_slave_t *p_slave =
+            input_item_slave_New( uri, SLAVE_TYPE_AUDIO, SLAVE_PRIORITY_USER );
         free( uri );
+
+        if( unlikely( p_slave == NULL ) )
+            break;
+        INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_slave );
     }
     free( psz_org );
+
+    *ppp_slaves = pp_slaves; /* in case of realloc */
+    *p_slaves = i_slaves;
 }
 
 static void LoadSlaves( input_thread_t *p_input )
@@ -1091,6 +1100,9 @@ static void LoadSlaves( input_thread_t *p_input )
             input_item_slave_Delete( p_slave );
     }
     TAB_CLEAN( p_item->i_slaves, p_item->pp_slaves );
+
+    /* Add slaves from the "input-slave" option */
+    GetVarSlaves( p_input, &pp_slaves, &i_slaves );
 
     if( i_slaves > 0 )
     {
@@ -1312,7 +1324,6 @@ static int Init( input_thread_t * p_input )
         StartTitle( p_input );
         SetSubtitlesOptions( p_input );
         LoadSlaves( p_input );
-        LoadVarSlaves( p_input );
         InitPrograms( p_input );
 
         double f_rate = var_InheritFloat( p_input, "rate" );
