@@ -59,6 +59,8 @@ struct demux_t
     /* es output */
     es_out_t    *out;   /* our p_es_out */
 
+    bool         b_preparsing; /* True if the demux is used to preparse */
+
     /* set by demuxer */
     int (*pf_demux)  ( demux_t * );   /* demux one frame only */
     int (*pf_control)( demux_t *, int i_query, va_list args);

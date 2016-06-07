@@ -128,8 +128,9 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                  p_demux->psz_access, p_demux->psz_demux,
                  p_demux->psz_location, p_demux->psz_file );
 
-    p_demux->s          = s;
-    p_demux->out        = out;
+    p_demux->s              = s;
+    p_demux->out            = out;
+    p_demux->b_preparsing   = b_preparsing;
 
     p_demux->pf_demux   = NULL;
     p_demux->pf_control = NULL;
