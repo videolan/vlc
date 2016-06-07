@@ -684,6 +684,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     bool b_pause_after_eof = b_interactive &&
                              var_InheritBool( p_input, "play-and-pause" );
 
+    demux_t *p_demux = p_input->p->master->p_demux;
+    const bool b_can_demux = p_demux->pf_demux != NULL;
+
     while( !input_Stopped( p_input ) && p_input->p->i_state != ERROR_S )
     {
         mtime_t i_wakeup = -1;
@@ -703,7 +706,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
 
                 MainLoopDemux( p_input, &b_force_update );
 
-                if( p_input->p->master->p_demux->pf_demux != NULL )
+                if( b_can_demux )
                     i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
                 if( b_force_update )
                     i_intf_update = 0;
