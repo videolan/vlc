@@ -549,24 +549,25 @@ bool input_Stopped( input_thread_t *input )
 static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
 {
     int i_ret;
+    demux_t *p_demux = p_input->p->master->p_demux;
 
     *pb_changed = false;
 
     if( p_input->p->i_stop > 0 && p_input->p->i_time >= p_input->p->i_stop )
         i_ret = VLC_DEMUXER_EOF;
     else
-        i_ret = demux_Demux( p_input->p->master->p_demux );
+        i_ret = demux_Demux( p_demux );
 
     i_ret = i_ret > 0 ? VLC_DEMUXER_SUCCESS : ( i_ret < 0 ? VLC_DEMUXER_EGENERIC : VLC_DEMUXER_EOF);
 
     if( i_ret == VLC_DEMUXER_SUCCESS )
     {
-        if( p_input->p->master->p_demux->info.i_update )
+        if( p_demux->info.i_update )
         {
-            if( p_input->p->master->p_demux->info.i_update & INPUT_UPDATE_TITLE_LIST )
+            if( p_demux->info.i_update & INPUT_UPDATE_TITLE_LIST )
             {
                 UpdateTitleListfromDemux( p_input );
-                p_input->p->master->p_demux->info.i_update &= ~INPUT_UPDATE_TITLE_LIST;
+                p_demux->info.i_update &= ~INPUT_UPDATE_TITLE_LIST;
             }
             if( p_input->p->master->b_title_demux )
             {
