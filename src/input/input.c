@@ -2355,13 +2355,14 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
                        &in->b_can_pace_control ) )
         in->b_can_pace_control = false;
 
-    assert( in->p_demux->pf_demux != NULL || !in->b_can_pace_control );
+    demux_t *p_demux = in->p_demux;
+    assert( p_demux->pf_demux != NULL || !in->b_can_pace_control );
 
-    if( in->p_demux->s != NULL )
+    if( p_demux->s != NULL )
     {
         if( !in->b_can_pace_control )
         {
-            if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_RATE,
+            if( demux_Control( p_demux, DEMUX_CAN_CONTROL_RATE,
                                 &in->b_can_rate_control, &in->b_rescale_ts ) )
             {
                 in->b_can_rate_control = false;
