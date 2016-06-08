@@ -247,7 +247,9 @@ bool PlaylistManager::setPosition(mtime_t time)
         std::vector<AbstractStream *>::iterator it;
         for(it=streams.begin(); it!=streams.end(); ++it)
         {
-            ret &= (*it)->setPosition(time, !real);
+            AbstractStream *st = *it;
+            if(!st->isDisabled())
+                ret &= st->setPosition(time, !real);
         }
         if(!ret)
             break;
