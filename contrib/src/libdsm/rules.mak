@@ -1,7 +1,7 @@
 # libdsm
 
 #LIBDSM_GITURL := git://github.com/videolabs/libdsm.git
-LIBDSM_VERSION := 0.2.4
+LIBDSM_VERSION := 0.2.5
 LIBDSM_URL := https://github.com/videolabs/libdsm/releases/download/v$(LIBDSM_VERSION)/libdsm-$(LIBDSM_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"libdsm >= 0.2.0"),)
