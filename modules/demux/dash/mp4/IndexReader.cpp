@@ -52,8 +52,9 @@ bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep, uint64_t
         {
             splitlist.push_back(point);
             point.offset += sidx->p_items[i].i_referenced_size;
-            point.time += CLOCK_FREQ * sidx->p_items[i].i_subsegment_duration /
+            point.duration = CLOCK_FREQ * sidx->p_items[i].i_subsegment_duration /
                     sidx->i_timescale;
+            point.time += point.duration;
         }
         rep->SplitUsingIndex(splitlist);
         rep->getPlaylist()->debug();

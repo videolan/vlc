@@ -477,7 +477,7 @@ void SegmentInformation::setSegmentTemplate(MediaSegmentTemplate *templ)
 }
 
 static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
-                              size_t end, stime_t time)
+                              size_t end, stime_t time, stime_t duration)
 {
     std::vector<ISegment *>::iterator segIt;
     for(segIt = seglist.begin(); segIt < seglist.end(); ++segIt)
@@ -488,6 +488,7 @@ static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
         {
             SubSegment *subsegment = new SubSegment(segment, start, (end != 0) ? end : 0);
             subsegment->startTime.Set(time);
+            subsegment->duration.Set(duration);
             segment->addSubSegment(subsegment);
             break;
         }
@@ -502,7 +503,7 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
     stime_t prevtime = 0;
     const uint64_t i_timescale = inheritTimescale();
 
-    SplitPoint split = {0,0};
+    SplitPoint split = {0,0,0};
     std::vector<SplitPoint>::const_iterator splitIt;
     for(splitIt = splitlist.begin(); splitIt < splitlist.end(); ++splitIt)
     {
@@ -510,7 +511,8 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
         if(splitIt != splitlist.begin())
         {
             /* do previous splitpoint */
-            insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime);
+            const stime_t duration = (split.duration * i_timescale / CLOCK_FREQ);
+            insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime, duration);
         }
         prevstart = split.offset;
         prevtime = split.time * i_timescale / CLOCK_FREQ;
@@ -518,11 +520,13 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
 
     if(splitlist.size() == 1)
     {
-        insertIntoSegment(seglist, prevstart, 0, prevtime);
+        const stime_t duration = (split.duration * i_timescale / CLOCK_FREQ);
+        insertIntoSegment(seglist, prevstart, 0, prevtime, duration);
     }
     else if(splitlist.size() > 1)
     {
-        insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime);
+        const stime_t duration = (split.duration * i_timescale / CLOCK_FREQ);
+        insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime, duration);
     }
 }
 
