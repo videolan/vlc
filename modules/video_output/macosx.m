@@ -839,7 +839,9 @@ static void OpenglSwap (vlc_gl_t *gl)
     [super viewWillMoveToWindow:newWindow];
 
     if (newWindow != nil) {
-        [newWindow setColorSpace:vd->sys->nsColorSpace];
+        @synchronized(newWindow) {
+            [newWindow setColorSpace:vd->sys->nsColorSpace];
+        }
     }
 }
 
