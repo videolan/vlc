@@ -84,7 +84,7 @@ static void CreateGPUAffinityDC(vlc_gl_t *gl, UINT nVidiaAffinity) {
     HGLRC hGLRC = wglCreateContext(winDC);
     wglMakeCurrent(winDC, hGLRC);
 
-    /* Initialize the neccessary function pointers */
+    /* Initialize the necessary function pointers */
     PFNWGLENUMGPUSNVPROC fncEnumGpusNV = (PFNWGLENUMGPUSNVPROC)wglGetProcAddress("wglEnumGpusNV");
     PFNWGLCREATEAFFINITYDCNVPROC fncCreateAffinityDCNV = (PFNWGLCREATEAFFINITYDCNVPROC)wglGetProcAddress("wglCreateAffinityDCNV");
 
@@ -133,7 +133,7 @@ static void DestroyGPUAffinityDC(vlc_gl_t *gl) {
     HGLRC hGLRC = wglCreateContext(winDC);
     wglMakeCurrent(winDC, hGLRC);
 
-    /* Initialize the neccessary function pointers */
+    /* Initialize the necessary function pointers */
     PFNWGLDELETEDCNVPROC fncDeleteDCNV = (PFNWGLDELETEDCNVPROC)wglGetProcAddress("wglDeleteDCNV");
 
     /* delete the temporary GL context */
