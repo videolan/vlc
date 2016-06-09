@@ -156,6 +156,12 @@ test_module(const char *psz_module, bool b_test_all, bool b_persistent,
     KS_FIND();
     assert(i_entries == 1);
 
+    printf("testing that we can override the secret of a previous entry\n");
+    psz_secret = "libvlc test secret NEW";
+    KS_STORE();
+    KS_FIND();
+    assert(i_entries == 1);
+
     printf("testing adding an other entry\n");
     VALUES_INSERT(KEY_USER, "user2");
     KS_FIND();
