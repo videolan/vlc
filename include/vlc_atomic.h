@@ -144,7 +144,7 @@ typedef         uintmax_t atomic_uintmax_t;
 #  define atomic_compare_exchange_weak(object,expected,desired) \
     atomic_compare_exchange(object, expected, desired)
 
-#  define atomic_compare_exchange_weak_explicit(object,expected,desired,order) \
+#  define atomic_compare_exchange_weak_explicit(object,expected,desired,order_equal,order_different) \
     atomic_compare_exchange_weak(object, expected, desired)
 
 #  define atomic_fetch_add(object,operand) \
