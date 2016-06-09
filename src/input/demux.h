@@ -40,8 +40,7 @@ demux_t *input_DemuxNew( vlc_object_t *, const char *access, const char *demux,
                          const char *path, es_out_t *out, bool quick,
                          input_thread_t * );
 
-int demux_GetUpdateFlags( demux_t * );
-void demux_ResetUpdateFlags( demux_t *, int );
+unsigned demux_TestAndClearFlags( demux_t *, unsigned );
 int demux_GetTitle( demux_t * );
 int demux_GetSeekpoint( demux_t * );
 

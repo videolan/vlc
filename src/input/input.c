@@ -562,20 +562,16 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
 
     if( i_ret == VLC_DEMUXER_SUCCESS )
     {
-        if( demux_GetUpdateFlags( p_demux ) )
+        if( demux_TestAndClearFlags( p_demux, INPUT_UPDATE_TITLE_LIST ) )
+            UpdateTitleListfromDemux( p_input );
+
+        if( p_input->p->master->b_title_demux )
         {
-            if( demux_GetUpdateFlags( p_demux ) & INPUT_UPDATE_TITLE_LIST )
-            {
-                UpdateTitleListfromDemux( p_input );
-                demux_ResetUpdateFlags( p_demux, INPUT_UPDATE_TITLE_LIST );
-            }
-            if( p_input->p->master->b_title_demux )
-            {
-                i_ret = UpdateTitleSeekpointFromDemux( p_input );
-                *pb_changed = true;
-            }
-            UpdateGenericFromDemux( p_input );
+            i_ret = UpdateTitleSeekpointFromDemux( p_input );
+            *pb_changed = true;
         }
+
+        UpdateGenericFromDemux( p_input );
     }
 
     if( i_ret == VLC_DEMUXER_EOF )
@@ -2144,19 +2140,12 @@ static int UpdateTitleSeekpointFromDemux( input_thread_t *p_input )
     demux_t *p_demux = p_input->p->master->p_demux;
 
     /* TODO event-like */
-    if( demux_GetUpdateFlags( p_demux ) & INPUT_UPDATE_TITLE )
-    {
+    if( demux_TestAndClearFlags( p_demux, INPUT_UPDATE_TITLE ) )
         input_SendEventTitle( p_input, demux_GetTitle( p_demux ) );
 
-        demux_ResetUpdateFlags( p_demux, INPUT_UPDATE_TITLE );
-    }
-    if( demux_GetUpdateFlags( p_demux ) & INPUT_UPDATE_SEEKPOINT )
-    {
-        input_SendEventSeekpoint( p_input,
-                                  demux_GetTitle( p_demux ), demux_GetSeekpoint( p_demux ) );
-
-        demux_ResetUpdateFlags( p_demux, INPUT_UPDATE_SEEKPOINT );
-    }
+    if( demux_TestAndClearFlags( p_demux, INPUT_UPDATE_SEEKPOINT ) )
+        input_SendEventSeekpoint( p_input, demux_GetTitle( p_demux ),
+                                  demux_GetSeekpoint( p_demux ) );
 
     return UpdateTitleSeekpoint( p_input,
                                  demux_GetTitle( p_demux ),
@@ -2167,11 +2156,9 @@ static void UpdateGenericFromDemux( input_thread_t *p_input )
 {
     demux_t *p_demux = p_input->p->master->p_demux;
 
-    if( demux_GetUpdateFlags( p_demux ) & INPUT_UPDATE_META )
-    {
+    if( demux_TestAndClearFlags( p_demux, INPUT_UPDATE_META ) )
         InputUpdateMeta( p_input, p_demux );
-        demux_ResetUpdateFlags( p_demux, INPUT_UPDATE_META );
-    }
+
     {
         double quality;
         double strength;
