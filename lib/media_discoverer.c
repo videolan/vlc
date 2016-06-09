@@ -269,7 +269,7 @@ libvlc_media_discoverer_start( libvlc_media_discoverer_t * p_mdis )
 LIBVLC_API void
 libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis )
 {
-    return vlc_sd_Stop( p_mdis->p_sd );
+    vlc_sd_Stop( p_mdis->p_sd );
 }
 
 /**************************************************************************
