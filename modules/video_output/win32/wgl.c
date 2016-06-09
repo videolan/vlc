@@ -222,15 +222,12 @@ static void Close(vlc_object_t *object)
     vlc_gl_t *gl = (vlc_gl_t *)object;
     vout_display_sys_t *sys = gl->sys;
 
-#ifdef WGL_EXT_swap_control
-    wglMakeCurrent(sys->hGLDC, sys->hGLRC);
-    DestroyGPUAffinityDC(gl);
-#endif
-
     if (sys->hGLRC)
         wglDeleteContext(sys->hGLRC);
     if (sys->hGLDC)
         ReleaseDC(sys->hvideownd, sys->hGLDC);
+
+    DestroyGPUAffinityDC(gl);
 
     free(sys);
 }
