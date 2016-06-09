@@ -357,6 +357,17 @@ bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     {
         return segList->getPlaybackTimeDurationBySegmentNumber(number, time, duration);
     }
+    else
+    {
+        const uint64_t timescale = inheritTimescale();
+        const ISegment *segment = getSegment(SegmentInfoType::INFOTYPE_MEDIA, number);
+        if( segment )
+        {
+            *time = segment->startTime.Get() * CLOCK_FREQ / timescale;
+            *duration = segment->duration.Get() * CLOCK_FREQ / timescale;
+            return true;
+        }
+    }
 
     return false;
 }
