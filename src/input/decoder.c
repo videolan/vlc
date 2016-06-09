@@ -1330,14 +1330,17 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
 
 #ifdef ENABLE_SOUT
     if( p_owner->p_sout != NULL )
-        return DecoderProcessSout( p_dec, p_block );
+    {
+        DecoderProcessSout( p_dec, p_block );
+        return;
+    }
 #endif
 
     switch( p_dec->fmt_out.i_cat )
     {
-        case VIDEO_ES: return DecoderProcessVideo( p_dec, p_block );
-        case AUDIO_ES: return DecoderProcessAudio( p_dec, p_block );
-        case   SPU_ES: return DecoderProcessSpu( p_dec, p_block );
+        case VIDEO_ES: DecoderProcessVideo( p_dec, p_block ); return;
+        case AUDIO_ES: DecoderProcessAudio( p_dec, p_block ); return;
+        case   SPU_ES: DecoderProcessSpu( p_dec, p_block ); return;
 
         default:
             msg_Err( p_dec, "unknown ES format" );
