@@ -250,6 +250,7 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
             dead = true; /* Prevent further retries */
             return AbstractStream::status_eof;
         }
+        setTimeOffset();
     }
 
     if(nz_deadline + VLC_TS_0 > getBufferingLevel()) /* not already demuxed */
@@ -351,10 +352,7 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
             if( !restartDemux() )
                 dead = true;
 
-            /* Check if we need to set an offset as the demuxer
-             * will start from zero from seek point */
-            if(demuxer->alwaysStartsFromZero())
-                fakeesout->setTimestampOffset(time);
+            setTimeOffset();
         }
 
         pcr = VLC_TS_INVALID;
@@ -381,6 +379,16 @@ void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
         p_fmt->psz_language = strdup(language.c_str());
     if(!p_fmt->psz_description && !description.empty())
         p_fmt->psz_description = strdup(description.c_str());
+}
+
+void AbstractStream::setTimeOffset()
+{
+    /* Check if we need to set an offset as the demuxer
+     * will start from zero from seek point */
+    if(demuxer && demuxer->alwaysStartsFromZero())
+        fakeesout->setTimestampOffset(segmentTracker->getPlaybackTime());
+    else
+        fakeesout->setTimestampOffset(0);
 }
 
 void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
