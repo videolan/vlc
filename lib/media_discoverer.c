@@ -148,43 +148,6 @@ static void services_discovery_removeall( const vlc_event_t * p_event,
     libvlc_media_list_unlock( p_mdis->p_mlist );
 }
 
-/**************************************************************************
- *       services_discovery_started (Private) (VLC event callback)
- **************************************************************************/
-
-static void services_discovery_started( const vlc_event_t * p_event,
-                                        void * user_data )
-{
-    VLC_UNUSED(p_event);
-    libvlc_media_discoverer_t * p_mdis = user_data;
-    libvlc_event_t event;
-    p_mdis->running = true;
-    event.type = libvlc_MediaDiscovererStarted;
-    libvlc_event_send( p_mdis->p_event_manager, &event );
-}
-
-/**************************************************************************
- *       services_discovery_ended (Private) (VLC event callback)
- **************************************************************************/
-
-static void services_discovery_ended( const vlc_event_t * p_event,
-                                      void * user_data )
-{
-    VLC_UNUSED(p_event);
-    libvlc_media_discoverer_t * p_mdis = user_data;
-    libvlc_media_list_t * p_mlist = p_mdis->p_mlist;
-    libvlc_event_t event;
-
-    p_mdis->running = false;
-
-    libvlc_media_list_lock( p_mlist );
-    libvlc_media_list_internal_end_reached( p_mlist );
-    libvlc_media_list_unlock( p_mlist );
-
-    event.type = libvlc_MediaDiscovererEnded;
-    libvlc_event_send( p_mdis->p_event_manager, &event );
-}
-
 /*
  * Public libvlc functions
  */
@@ -240,14 +203,6 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
                       services_discovery_item_removed,
                       p_mdis );
     vlc_event_attach( services_discovery_EventManager( p_mdis->p_sd ),
-                      vlc_ServicesDiscoveryStarted,
-                      services_discovery_started,
-                      p_mdis );
-    vlc_event_attach( services_discovery_EventManager( p_mdis->p_sd ),
-                      vlc_ServicesDiscoveryEnded,
-                      services_discovery_ended,
-                      p_mdis );
-    vlc_event_attach( services_discovery_EventManager( p_mdis->p_sd ),
                       vlc_ServicesDiscoveryItemRemoveAll,
                       services_discovery_removeall,
                       p_mdis );
@@ -263,7 +218,14 @@ LIBVLC_API int
 libvlc_media_discoverer_start( libvlc_media_discoverer_t * p_mdis )
 {
     /* Here we go */
-    return vlc_sd_Start( p_mdis->p_sd ) ? 0 : -1;
+    if (!vlc_sd_Start( p_mdis->p_sd ))
+        return -1;
+
+    p_mdis->running = true;
+    libvlc_event_t event;
+    event.type = libvlc_MediaDiscovererStarted;
+    libvlc_event_send( p_mdis->p_event_manager, &event );
+    return 0;
 }
 
 /**************************************************************************
@@ -273,6 +235,17 @@ LIBVLC_API void
 libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis )
 {
     vlc_sd_Stop( p_mdis->p_sd );
+
+    p_mdis->running = false;
+
+    libvlc_media_list_t * p_mlist = p_mdis->p_mlist;
+    libvlc_media_list_lock( p_mlist );
+    libvlc_media_list_internal_end_reached( p_mlist );
+    libvlc_media_list_unlock( p_mlist );
+
+    libvlc_event_t event;
+    event.type = libvlc_MediaDiscovererEnded;
+    libvlc_event_send( p_mdis->p_event_manager, &event );
 }
 
 /**************************************************************************
@@ -315,14 +288,6 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
                      services_discovery_item_removed,
                      p_mdis );
     vlc_event_detach( services_discovery_EventManager( p_mdis->p_sd ),
-                     vlc_ServicesDiscoveryStarted,
-                     services_discovery_started,
-                     p_mdis );
-    vlc_event_detach( services_discovery_EventManager( p_mdis->p_sd ),
-                     vlc_ServicesDiscoveryEnded,
-                     services_discovery_ended,
-                     p_mdis );
-    vlc_event_detach( services_discovery_EventManager( p_mdis->p_sd ),
                      vlc_ServicesDiscoveryItemRemoveAll,
                      services_discovery_removeall,
                      p_mdis );
@@ -330,7 +295,7 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
     libvlc_media_list_release( p_mdis->p_mlist );
 
     if( p_mdis->running )
-        vlc_sd_Stop( p_mdis->p_sd );
+        libvlc_media_discoverer_stop( p_mdis );
 
     vlc_sd_Destroy( p_mdis->p_sd );
 
