@@ -325,6 +325,11 @@ case "${OS}" in
 			add_make_enabled "HAVE_WINSTORE"
 			;;
 		esac
+		case "${HOST}" in
+			amd64*|x86_64*)
+			add_make_enabled "HAVE_WIN64"
+			;;
+		esac
         case "${HOST}" in
             armv7*)
                 add_make_enabled "HAVE_ARMV7A"
