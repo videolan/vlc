@@ -133,7 +133,7 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
  * Get media service discover object its localized name.
  *
  * \param p_mdis media discover object
- * \return localized name
+ * \return localized name or NULL if the media_discoverer is not started
  */
 LIBVLC_API char *
 libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );

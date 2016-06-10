@@ -199,6 +199,8 @@ static void services_discovery_Destructor ( vlc_object_t *p_obj )
 char *
 services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
 {
+    if (p_sd->p_module == NULL)
+        return NULL;
     return strdup( module_get_name( p_sd->p_module, true ) );
 }
 
