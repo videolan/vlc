@@ -1,0 +1,11 @@
+--- upnp/upnp/src/inc/config.h	2016-05-27 21:10:05.804950200 +0200
++++ upnp/upnp/src/inc/config.h.debug	2016-05-27 20:59:31.808017700 +0200
+@@ -383,7 +383,7 @@
+  *
+  * @{
+  */
+-#define DEBUG_TARGET		1   
++#define DEBUG_TARGET		0   
+ /* @} */
+ 
+ 
