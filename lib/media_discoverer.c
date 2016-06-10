@@ -481,15 +481,14 @@ libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
     p_category = p_categories;
     unsigned int i_service_idx = 0;
     libvlc_media_discoverer_description *p_service = p_services;
-    for( ; *ppsz_name != NULL; ppsz_name++, ppsz_longname++, p_category++,
-            p_service++ )
+    for( ; *ppsz_name != NULL; ppsz_name++, ppsz_longname++, p_category++ )
     {
         if( pp_services != NULL && *p_category == i_core_cat )
         {
             p_service->psz_name = *ppsz_name;
             p_service->psz_longname = *ppsz_longname;
             p_service->i_cat = i_cat;
-            pp_services[i_service_idx++] = p_service;
+            pp_services[i_service_idx++] = p_service++;
         }
         else
         {
