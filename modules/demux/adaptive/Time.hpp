@@ -20,8 +20,37 @@
 #ifndef TIME_HPP
 #define TIME_HPP
 
+#include <vlc_common.h>
+
 /* Scaled time */
 typedef int64_t stime_t;
+
+class Timescale
+{
+    public:
+        Timescale(uint64_t v = 0) : scale(v) {}
+
+        mtime_t ToTime(stime_t t) const
+        {
+            if( !scale ) return 0;
+            stime_t v = t / scale;
+            stime_t r = t % scale;
+            return v * 1000000 + r * 1000000 / scale;
+        }
+
+        stime_t ToScaled(mtime_t t) const
+        {
+            mtime_t v = t / 1000000;
+            mtime_t r = t % 1000000;
+            return v * scale + r * scale / 1000000;
+        }
+
+        bool isValid() const { return !!scale; }
+        operator uint64_t() const { return scale; }
+
+    private:
+        uint64_t scale;
+};
 
 #endif // TIME_HPP
 

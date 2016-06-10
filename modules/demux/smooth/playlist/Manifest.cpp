@@ -29,10 +29,10 @@
 using namespace smooth::playlist;
 
 Manifest::Manifest (vlc_object_t *p_object) :
-    AbstractPlaylist(p_object)
+    AbstractPlaylist(p_object), TimescaleAble()
 {
     minUpdatePeriod.Set( 5 * CLOCK_FREQ );
-    timescale.Set( 10000000 );
+    setTimescale( 10000000 );
     b_live = false;
 }
 

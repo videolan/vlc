@@ -223,7 +223,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
             adaptSet->addLang(streamIndexNode->getAttributeValue("Language"));
 
         if(streamIndexNode->hasAttribute("TimeScale"))
-            adaptSet->timescale.Set(Integer<uint64_t>(streamIndexNode->getAttributeValue("TimeScale")));
+            adaptSet->setTimescale(Integer<uint64_t>(streamIndexNode->getAttributeValue("TimeScale")));
 
         const std::string url = streamIndexNode->getAttributeValue("Url");
         if(!url.empty())
@@ -258,16 +258,12 @@ Manifest * ManifestParser::parse()
     manifest->setPlaylistUrl(Helper::getDirectoryPath(playlisturl).append("/"));
 
     if(root->hasAttribute("TimeScale"))
-        manifest->timescale.Set(Integer<uint64_t>(root->getAttributeValue("TimeScale")));
+        manifest->setTimescale(Integer<uint64_t>(root->getAttributeValue("TimeScale")));
 
     if(root->hasAttribute("Duration"))
     {
-        mtime_t time = Integer<mtime_t>(root->getAttributeValue("Duration"));
-        if(manifest->timescale.Get() > CLOCK_FREQ)
-            time /= (manifest->timescale.Get() / CLOCK_FREQ);
-        else
-            time = time * CLOCK_FREQ / manifest->timescale.Get();
-        manifest->duration.Set(time);
+        stime_t time = Integer<stime_t>(root->getAttributeValue("Duration"));
+        manifest->duration.Set(manifest->getTimescale().ToTime(time));
     }
 
     if(root->hasAttribute("IsLive") && root->getAttributeValue("IsLive") == "TRUE")
@@ -277,7 +273,7 @@ Manifest * ManifestParser::parse()
     BasePeriod *period = new (std::nothrow) BasePeriod(manifest);
     if(period)
     {
-        period->timescale.Set(manifest->timescale.Get());
+        period->setTimescale(manifest->getTimescale());
         period->duration.Set(manifest->duration.Get());
         unsigned nextid = 1;
         std::vector<Node *> streamIndexes = DOMHelper::getElementByTagName(root, "StreamIndex", true);

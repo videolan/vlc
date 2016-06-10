@@ -54,9 +54,9 @@ void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, mtime_t prun
         timeline->mergeWith(*updated->segmentTimeline.Get());
         if(prunebarrier)
         {
-            const uint64_t timescale = timeline->inheritTimescale();
+            const Timescale timescale = timeline->inheritTimescale();
             const uint64_t number =
-                    timeline->getElementNumberByScaledPlaybackTime(prunebarrier * timescale / CLOCK_FREQ);
+                    timeline->getElementNumberByScaledPlaybackTime(timescale.ToScaled(prunebarrier));
             timeline->pruneBySequenceNumber(number);
         }
     }

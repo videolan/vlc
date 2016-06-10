@@ -39,27 +39,41 @@ Timelineable::~Timelineable()
 
 TimescaleAble::TimescaleAble(TimescaleAble *parent)
 {
-    timescale.Set(0);
-    parentTimescale = parent;
+    parentTimescaleAble = parent;
 }
 
 TimescaleAble::~TimescaleAble()
 {
 }
 
-void TimescaleAble::setParentTimescale(TimescaleAble *parent)
+void TimescaleAble::setParentTimescaleAble(TimescaleAble *parent)
 {
-    parentTimescale = parent;
+    parentTimescaleAble = parent;
 }
 
-uint64_t TimescaleAble::inheritTimescale() const
+Timescale TimescaleAble::inheritTimescale() const
 {
-    if(timescale.Get())
-        return timescale.Get();
-    else if(parentTimescale)
-        return parentTimescale->inheritTimescale();
+    if(timescale.isValid())
+        return timescale;
+    else if(parentTimescaleAble)
+        return parentTimescaleAble->inheritTimescale();
     else
-        return 1;
+        return Timescale(1);
+}
+
+void TimescaleAble::setTimescale(const Timescale & t)
+{
+    timescale = t;
+}
+
+void TimescaleAble::setTimescale(uint64_t t)
+{
+    timescale = Timescale(t);
+}
+
+const Timescale & TimescaleAble::getTimescale() const
+{
+    return timescale;
 }
 
 const ID & Unique::getID() const

@@ -24,6 +24,7 @@
 #include <string>
 #include <stdint.h>
 #include "ID.hpp"
+#include "../Time.hpp"
 
 namespace adaptive
 {
@@ -44,12 +45,17 @@ namespace adaptive
             public:
                 TimescaleAble( TimescaleAble * = NULL );
                 ~TimescaleAble();
-                void setParentTimescale( TimescaleAble * );
-                uint64_t inheritTimescale() const;
-                Property<uint64_t> timescale;
+                void setParentTimescaleAble( TimescaleAble * );
+                Timescale inheritTimescale() const;
+                void setTimescale( const Timescale & );
+                void setTimescale( uint64_t );
+                const Timescale & getTimescale() const;
 
             protected:
-                TimescaleAble *parentTimescale;
+                TimescaleAble *parentTimescaleAble;
+
+            private:
+                Timescale timescale;
         };
 
         class Unique

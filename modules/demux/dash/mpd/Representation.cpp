@@ -190,9 +190,9 @@ uint64_t Representation::getLiveTemplateNumberOffset(uint64_t index, const Media
             time_t streamstart = getPlaylist()->availabilityStartTime.Get();
             streamstart += getPeriodStart();
             const stime_t duration = templ->duration.Get();
-            const uint64_t timescale = templ->inheritTimescale();
-            if(duration && timescale)
-                index += (playbackstart - streamstart) * timescale / duration;
+            const Timescale timescale = templ->inheritTimescale();
+            if(duration)
+                index += timescale.ToScaled(CLOCK_FREQ * (playbackstart - streamstart)) / duration;
         }
     }
     return index;

@@ -38,7 +38,7 @@ SegmentTimeline::SegmentTimeline(TimescaleAble *parent)
 SegmentTimeline::SegmentTimeline(uint64_t scale)
     :TimescaleAble(NULL)
 {
-    timescale.Set(scale);
+    setTimescale(scale);
 }
 
 SegmentTimeline::~SegmentTimeline()
@@ -173,8 +173,8 @@ uint64_t SegmentTimeline::minElementNumber() const
 
 void SegmentTimeline::pruneByPlaybackTime(mtime_t time)
 {
-    const uint64_t timescale = inheritTimescale();
-    uint64_t num = getElementNumberByScaledPlaybackTime(time * timescale / CLOCK_FREQ);
+    const Timescale timescale = inheritTimescale();
+    uint64_t num = getElementNumberByScaledPlaybackTime(timescale.ToScaled(time));
     pruneBySequenceNumber(num);
 }
 
@@ -249,7 +249,7 @@ mtime_t SegmentTimeline::start() const
 {
     if(elements.empty())
         return 0;
-    return elements.front()->t * CLOCK_FREQ / inheritTimescale();
+    return inheritTimescale().ToTime(elements.front()->t);
 }
 
 mtime_t SegmentTimeline::end() const
@@ -258,7 +258,7 @@ mtime_t SegmentTimeline::end() const
         return 0;
     const Element *last = elements.back();
     stime_t scaled = last->t + last->d * (last->r + 1);
-    return scaled  * CLOCK_FREQ / inheritTimescale();
+    return inheritTimescale().ToTime(scaled);
 }
 
 void SegmentTimeline::debug(vlc_object_t *obj, int indent) const

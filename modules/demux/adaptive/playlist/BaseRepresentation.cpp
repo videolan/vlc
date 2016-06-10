@@ -110,9 +110,9 @@ mtime_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
         const MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate *>(seglist.front());
         if(templ)
         {
-            const uint64_t timescale = templ->inheritTimescale();
+            const Timescale timescale = templ->inheritTimescale();
             stime_t i_length = templ->getMinAheadScaledTime(curnum);
-            return i_length * CLOCK_FREQ / timescale;
+            return timescale.ToTime(i_length);
         }
 
         /* should not happen */
@@ -120,12 +120,13 @@ mtime_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
     }
 
     mtime_t minTime = 0;
+    const Timescale timescale = inheritTimescale();
     std::vector<ISegment *>::const_iterator it;
     for(it = seglist.begin(); it != seglist.end(); ++it)
     {
         const ISegment *seg = *it;
         if(seg->getSequenceNumber() > curnum)
-            minTime += seg->duration.Get() * CLOCK_FREQ / inheritTimescale();
+            minTime += timescale.ToTime(seg->duration.Get());
     }
 
     return minTime;

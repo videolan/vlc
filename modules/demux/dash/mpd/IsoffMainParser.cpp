@@ -167,7 +167,7 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
         mediaTemplate->startNumber.Set(Integer<uint64_t>(templateNode->getAttributeValue("startNumber")));
 
     if(templateNode->hasAttribute("timescale"))
-        mediaTemplate->timescale.Set(Integer<uint64_t>(templateNode->getAttributeValue("timescale")));
+        mediaTemplate->setTimescale(Integer<uint64_t>(templateNode->getAttributeValue("timescale")));
 
     if(templateNode->hasAttribute("duration"))
         mediaTemplate->duration.Set(Integer<stime_t>(templateNode->getAttributeValue("duration")));
@@ -207,7 +207,7 @@ size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *
             info->setSwitchPolicy(SegmentInformation::SWITCH_UNAVAILABLE);
     }
     if(node->hasAttribute("timescale"))
-        info->timescale.Set(Integer<uint64_t>(node->getAttributeValue("timescale")));
+        info->setTimescale(Integer<uint64_t>(node->getAttributeValue("timescale")));
 
     if(node->hasAttribute("id"))
         info->setID(node->getAttributeValue("id"));
@@ -373,7 +373,7 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
                 list->duration.Set(Integer<stime_t>(segListNode->getAttributeValue("duration")));
 
             if(segListNode->hasAttribute("timescale"))
-                list->timescale.Set(Integer<uint64_t>(segListNode->getAttributeValue("timescale")));
+                list->setTimescale(Integer<uint64_t>(segListNode->getAttributeValue("timescale")));
 
             uint64_t nzStartTime = 0;
             std::vector<Node *>::const_iterator it;
