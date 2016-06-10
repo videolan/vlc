@@ -481,6 +481,7 @@ libvlc_media_t * libvlc_media_new_as_node( libvlc_instance_t *p_instance,
     }
 
     p_md = libvlc_media_new_from_input_item( p_instance, p_input_item );
+    input_item_Release( p_input_item );
 
     p_subitems = media_get_subitems( p_md, true );
     if( p_subitems == NULL) {
