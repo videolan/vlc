@@ -21,7 +21,7 @@ else
 CONFIGURE_ARGS=--enable-ipv6
 endif
 ifndef WITH_OPTIMIZATION
-CONFIGURE_ARGS += -enable-debug
+CONFIGURE_ARGS += --enable-debug
 endif
 
 upnp: libupnp-$(UPNP_VERSION).tar.bz2 .sum-upnp
