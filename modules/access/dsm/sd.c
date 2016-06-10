@@ -43,7 +43,6 @@
 
 int bdsm_SdOpen( vlc_object_t * );
 void bdsm_SdClose( vlc_object_t * );
-int bdsm_sd_probe_Open( vlc_object_t * );
 
 struct entry_item
 {
@@ -56,16 +55,6 @@ struct services_discovery_sys_t
     netbios_ns      *p_ns;
     vlc_array_t     *p_entry_item_list;
 };
-
-int bdsm_sd_probe_Open (vlc_object_t *p_this)
-{
-    vlc_probe_t *p_probe = (vlc_probe_t *)p_this;
-
-    vlc_sd_probe_Add( p_probe, "dsm{longname=\"Windows networks\"}",
-                      N_( "Windows networks" ), SD_CAT_LAN );
-
-    return VLC_PROBE_CONTINUE;
-}
 
 static void entry_item_append( services_discovery_t *p_sd,
                                netbios_ns_entry *p_entry,
