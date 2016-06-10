@@ -351,4 +351,5 @@ static void AddDesktop(services_discovery_t *sd)
         return;
 
     services_discovery_AddItem (sd, item, NULL);
+    input_item_Release (item);
 }
