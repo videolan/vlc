@@ -1588,6 +1588,12 @@ static inline int ControlPop( input_thread_t *p_input,
     /* */
     const int i_index = ControlGetReducedIndexLocked( p_input );
 
+    for( int i = 0; i < i_index; ++i )
+    {
+        /* Release Reduced controls */
+        ControlRelease( p_sys->control[i].i_type, p_sys->control[i].val );
+    }
+
     /* */
     *pi_type = p_sys->control[i_index].i_type;
     *p_val   = p_sys->control[i_index].val;
