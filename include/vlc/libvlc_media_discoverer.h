@@ -139,15 +139,6 @@ LIBVLC_API libvlc_media_list_t *
 libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis );
 
 /**
- * Get event manager from media service discover object.
- *
- * \param p_mdis media service discover object
- * \return event manager object.
- */
-LIBVLC_API libvlc_event_manager_t *
-libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis );
-
-/**
  * Query if media service discover object is running.
  *
  * \param p_mdis media service discover object

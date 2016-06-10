@@ -100,7 +100,15 @@ enum libvlc_event_e {
     libvlc_MediaListPlayerNextItemSet,
     libvlc_MediaListPlayerStopped,
 
+    /**
+     * \deprecated Useless event, it will be triggered only when calling
+     * libvlc_media_discoverer_start()
+     */
     libvlc_MediaDiscovererStarted=0x500,
+    /**
+     * \deprecated Useless event, it will be triggered only when calling
+     * libvlc_media_discoverer_stop()
+     */
     libvlc_MediaDiscovererEnded,
 
     libvlc_VlmMediaAdded=0x600,
