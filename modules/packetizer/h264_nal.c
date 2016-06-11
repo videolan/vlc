@@ -253,6 +253,8 @@ void h264_release_sps( h264_sequence_parameter_set_t *p_sps )
     free( p_sps );
 }
 
+#define H264_CONSTRAINT_SET_FLAG(N) (0x80 >> N)
+
 static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
                                                     h264_sequence_parameter_set_t *p_sps )
 {
@@ -260,7 +262,7 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
 
     int i_profile_idc = bs_read( p_bs, 8 );
     p_sps->i_profile = i_profile_idc;
-    p_sps->i_profile_compatibility = bs_read( p_bs, 8 );
+    p_sps->i_constraint_set_flags = bs_read( p_bs, 8 );
     p_sps->i_level = bs_read( p_bs, 8 );
     /* sps id */
     p_sps->i_id = bs_read_ue( p_bs );

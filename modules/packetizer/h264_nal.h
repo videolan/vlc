@@ -93,7 +93,8 @@ void h264_release_pps( h264_picture_parameter_set_t * );
 struct h264_sequence_parameter_set_t
 {
     int i_id;
-    int i_profile, i_profile_compatibility, i_level;
+    int i_profile, i_level;
+    uint8_t i_constraint_set_flags;
     /* according to avcC, 3 bits max for those */
     uint8_t i_chroma_idc;
     uint8_t i_bit_depth_luma;
