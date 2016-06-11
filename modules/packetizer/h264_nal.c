@@ -453,12 +453,22 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         }
 
         if( p_sps->vui.b_hrd_parameters_present_flag )
-            bs_read( p_bs, 1 );
+            bs_read( p_bs, 1 ); /* low delay hrd */
 
         /* pic struct info */
         p_sps->vui.b_pic_struct_present_flag = bs_read( p_bs, 1 );
 
-        /* + unparsed remains */
+        p_sps->vui.b_bitstream_restriction_flag = bs_read( p_bs, 1 );
+        if( p_sps->vui.b_bitstream_restriction_flag )
+        {
+            bs_read( p_bs, 1 ); /* motion vector pic boundaries */
+            bs_read_ue( p_bs ); /* max bytes per pic */
+            bs_read_ue( p_bs ); /* max bits per mb */
+            bs_read_ue( p_bs ); /* log2 max mv h */
+            bs_read_ue( p_bs ); /* log2 max mv v */
+            p_sps->vui.i_max_num_reorder_frames = bs_read_ue( p_bs );
+            bs_read_ue( p_bs ); /* max dec frame buffering */
+        }
     }
 
     return true;

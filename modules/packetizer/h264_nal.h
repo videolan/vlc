@@ -124,6 +124,10 @@ struct h264_sequence_parameter_set_t
         bool b_hrd_parameters_present_flag;
         uint8_t i_cpb_removal_delay_length_minus1;
         uint8_t i_dpb_output_delay_length_minus1;
+
+        /* restrictions */
+        uint8_t b_bitstream_restriction_flag;
+        uint8_t i_max_num_reorder_frames;
     } vui;
 };
 
