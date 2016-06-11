@@ -769,7 +769,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         p_sys->i_time_scale = p_sps->vui.i_time_scale;
         p_sys->b_fixed_frame_rate = p_sps->vui.b_fixed_frame_rate;
         p_sys->b_pic_struct_present_flag = p_sps->vui.b_pic_struct_present_flag;
-        p_sys->b_cpb_dpb_delays_present_flag = p_sps->vui.b_cpb_dpb_delays_present_flag;
+        p_sys->b_cpb_dpb_delays_present_flag = p_sps->vui.b_hrd_parameters_present_flag;
         p_sys->i_cpb_removal_delay_length_minus1 = p_sps->vui.i_cpb_removal_delay_length_minus1;
         p_sys->i_dpb_output_delay_length_minus1 = p_sps->vui.i_dpb_output_delay_length_minus1;
 

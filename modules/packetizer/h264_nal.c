@@ -474,13 +474,13 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         }
 
         /* Nal hrd & VC1 hrd parameters */
-        p_sps->vui.b_cpb_dpb_delays_present_flag = false;
+        p_sps->vui.b_hrd_parameters_present_flag = false;
         for ( int i=0; i<2; i++ )
         {
             i_tmp = bs_read( p_bs, 1 );
             if( i_tmp )
             {
-                p_sps->vui.b_cpb_dpb_delays_present_flag = true;
+                p_sps->vui.b_hrd_parameters_present_flag = true;
                 uint32_t count = bs_read_ue( p_bs ) + 1;
                 bs_read( p_bs, 4 );
                 bs_read( p_bs, 4 );
@@ -497,7 +497,7 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
             }
         }
 
-        if( p_sps->vui.b_cpb_dpb_delays_present_flag )
+        if( p_sps->vui.b_hrd_parameters_present_flag )
             bs_read( p_bs, 1 );
 
         /* pic struct info */
