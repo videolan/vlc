@@ -177,6 +177,9 @@ block_t *h264_NAL_to_avcC( uint8_t i_nal_length_size,
 uint8_t * h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
                                    size_t *pi_result, uint8_t *pi_nal_length_size );
 
+bool h264_get_dpb_values( const h264_sequence_parameter_set_t *,
+                          uint8_t *pi_depth, unsigned *pi_delay );
+
 bool h264_get_picture_size( const h264_sequence_parameter_set_t *, unsigned *p_w, unsigned *p_h,
                             unsigned *p_vw, unsigned *p_vh );
 bool h264_get_chroma_luma( const h264_sequence_parameter_set_t *, uint8_t *pi_chroma_format,

@@ -29,6 +29,57 @@
 #include <vlc_es.h>
 #include <limits.h>
 
+/* H264 Level limits from Table A-1 */
+typedef struct
+{
+    unsigned i_max_dpb_mbs;
+} h264_level_limits_t;
+
+enum h264_level_numbers_e
+{
+    H264_LEVEL_NUMBER_1_B = 9, /* special level not following the 10x rule */
+    H264_LEVEL_NUMBER_1   = 10,
+    H264_LEVEL_NUMBER_1_1 = 11,
+    H264_LEVEL_NUMBER_1_2 = 12,
+    H264_LEVEL_NUMBER_1_3 = 13,
+    H264_LEVEL_NUMBER_2   = 20,
+    H264_LEVEL_NUMBER_2_1 = 21,
+    H264_LEVEL_NUMBER_2_2 = 22,
+    H264_LEVEL_NUMBER_3   = 30,
+    H264_LEVEL_NUMBER_3_1 = 31,
+    H264_LEVEL_NUMBER_3_2 = 32,
+    H264_LEVEL_NUMBER_4   = 40,
+    H264_LEVEL_NUMBER_4_1 = 41,
+    H264_LEVEL_NUMBER_4_2 = 42,
+    H264_LEVEL_NUMBER_5   = 50,
+    H264_LEVEL_NUMBER_5_1 = 51,
+    H264_LEVEL_NUMBER_5_2 = 52,
+};
+
+const struct
+{
+    const uint16_t i_level;
+    const h264_level_limits_t limits;
+} h264_levels_limits[] = {
+    { H264_LEVEL_NUMBER_1_B, { 396 } },
+    { H264_LEVEL_NUMBER_1,   { 396 } },
+    { H264_LEVEL_NUMBER_1_1, { 900 } },
+    { H264_LEVEL_NUMBER_1_2, { 2376 } },
+    { H264_LEVEL_NUMBER_1_3, { 2376 } },
+    { H264_LEVEL_NUMBER_2,   { 2376 } },
+    { H264_LEVEL_NUMBER_2_1, { 4752 } },
+    { H264_LEVEL_NUMBER_2_2, { 8100 } },
+    { H264_LEVEL_NUMBER_3,   { 8100 } },
+    { H264_LEVEL_NUMBER_3_1, { 18000 } },
+    { H264_LEVEL_NUMBER_3_2, { 20480 } },
+    { H264_LEVEL_NUMBER_4,   { 32768 } },
+    { H264_LEVEL_NUMBER_4_1, { 32768 } },
+    { H264_LEVEL_NUMBER_4_2, { 34816 } },
+    { H264_LEVEL_NUMBER_5,   { 110400 } },
+    { H264_LEVEL_NUMBER_5_1, { 184320 } },
+    { H264_LEVEL_NUMBER_5_2, { 184320 } },
+};
+
 /*
  * For avcC specification, see ISO/IEC 14496-15,
  * For Annex B specification, see ISO/IEC 14496-10
@@ -579,6 +630,69 @@ block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
     return h264_NAL_to_avcC( i_nal_length_size,
                              p_sps_buf, i_sps_size,
                              p_pps_buf, i_pps_size );
+}
+
+static const h264_level_limits_t * h264_get_level_limits( const h264_sequence_parameter_set_t *p_sps )
+{
+    uint16_t i_level_number = p_sps->i_level;
+    if( i_level_number == H264_LEVEL_NUMBER_1_1 &&
+       (p_sps->i_constraint_set_flags & H264_CONSTRAINT_SET_FLAG(3)) )
+    {
+        i_level_number = H264_LEVEL_NUMBER_1_B;
+    }
+
+    for( size_t i=0; i< ARRAY_SIZE(h264_levels_limits); i++ )
+        if( h264_levels_limits[i].i_level == i_level_number )
+            return & h264_levels_limits[i].limits;
+
+    return NULL;
+}
+
+static uint8_t h264_get_max_dpb_frames( const h264_sequence_parameter_set_t *p_sps )
+{
+    const h264_level_limits_t *limits = h264_get_level_limits( p_sps );
+    if( limits )
+    {
+        unsigned i_frame_height_in_mbs = ( p_sps->pic_height_in_map_units_minus1 + 1 ) *
+                                         ( 2 - p_sps->frame_mbs_only_flag );
+        unsigned i_den = ( p_sps->pic_width_in_mbs_minus1 + 1 ) * i_frame_height_in_mbs;
+        uint8_t i_max_dpb_frames = limits->i_max_dpb_mbs / i_den;
+        if( i_max_dpb_frames < 16 )
+            return i_max_dpb_frames;
+    }
+    return 16;
+}
+
+bool h264_get_dpb_values( const h264_sequence_parameter_set_t *p_sps,
+                          uint8_t *pi_depth, unsigned *pi_delay )
+{
+    uint8_t i_max_num_reorder_frames = p_sps->vui.i_max_num_reorder_frames;
+    if( !p_sps->vui.b_bitstream_restriction_flag )
+    {
+        switch( p_sps->i_profile ) /* E-2.1 */
+        {
+            case PROFILE_H264_CAVLC_INTRA:
+            case PROFILE_H264_SVC_HIGH:
+            case PROFILE_H264_HIGH:
+            case PROFILE_H264_HIGH_10:
+            case PROFILE_H264_HIGH_422:
+            case PROFILE_H264_HIGH_444_PREDICTIVE:
+                if( p_sps->i_constraint_set_flags & H264_CONSTRAINT_SET_FLAG(3) )
+                {
+                    i_max_num_reorder_frames = 0; /* all IDR */
+                    break;
+                }
+                // ft
+            default:
+                i_max_num_reorder_frames = h264_get_max_dpb_frames( p_sps );
+                break;
+        }
+    }
+
+    *pi_depth = i_max_num_reorder_frames;
+    *pi_delay = 0;
+
+    return true;
 }
 
 bool h264_get_picture_size( const h264_sequence_parameter_set_t *p_sps, unsigned *p_w, unsigned *p_h,
