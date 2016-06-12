@@ -513,6 +513,7 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     /* */
     var_Create( p_input, "access", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "demux", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "demux-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "stream-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     /* Meta */

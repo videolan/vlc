@@ -682,6 +682,8 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                              var_InheritBool( p_input, "play-and-pause" );
 
     demux_t *p_demux = p_input->p->master->p_demux;
+    while (p_demux->p_next)
+        p_demux = p_demux->p_next;
     const bool b_can_demux = p_demux->pf_demux != NULL;
 
     while( !input_Stopped( p_input ) && p_input->p->i_state != ERROR_S )
@@ -1858,6 +1860,8 @@ static bool Control( input_thread_t *p_input,
             {
                 demux_t *p_demux = p_input->p->master->p_demux;
                 int i_ret = VLC_EGENERIC;
+                while (p_demux->p_next)
+                    p_demux = p_demux->p_next;
 
                 if( p_demux->s == NULL )
                 {
@@ -2304,6 +2308,15 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         return NULL;
     }
 
+    char *psz_demux_chain = var_GetNonEmptyString(p_input, "demux-filter");
+    /* add the chain of demux filters */
+    demux_t *p_filtered_demux = demux_FilterChainNew( in->p_demux, psz_demux_chain );
+    if ( p_filtered_demux != NULL )
+        in->p_demux = p_filtered_demux;
+    else if ( psz_demux_chain != NULL )
+        msg_Dbg(p_input, "Failed to create demux filter %s", psz_demux_chain);
+    free( psz_demux_chain );
+
     /* Get infos from (access_)demux */
     bool b_can_seek;
     if( demux_Control( in->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
@@ -2315,6 +2328,8 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         in->b_can_pace_control = false;
 
     demux_t *p_demux = in->p_demux;
+    while (p_demux->p_next)
+        p_demux = p_demux->p_next;
     assert( p_demux->pf_demux != NULL || !in->b_can_pace_control );
 
     if( p_demux->s != NULL )

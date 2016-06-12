@@ -472,6 +472,7 @@ static void VariablesInit( playlist_t *p_playlist )
 
     /* sout variables */
     var_Create( p_playlist, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "demux-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     /* */
     var_Create( p_playlist, "album-art", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );

@@ -44,4 +44,6 @@ unsigned demux_TestAndClearFlags( demux_t *, unsigned );
 int demux_GetTitle( demux_t * );
 int demux_GetSeekpoint( demux_t * );
 
+demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_name );
+
 #endif

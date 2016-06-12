@@ -79,6 +79,9 @@ struct demux_t
 
     /* Weak link to parent input */
     input_thread_t *p_input;
+
+    /* demux_t filter chaining */
+    demux_t        *p_next;
 };
 
 /* pf_demux return values */
