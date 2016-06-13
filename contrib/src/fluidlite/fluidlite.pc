@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: fluidlite
+Description: Software SoundFont synth
+Version: 0.0.1
+Libs: -L${libdir} -lfluidlite
+Cflags: -I${includedir}
