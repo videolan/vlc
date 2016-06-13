@@ -30,6 +30,31 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+static void test_towc(const char *in, size_t want_len, uint32_t want_cp)
+{
+    uint32_t cp;
+    size_t len;
+
+    if (want_len != (size_t)-1)
+        printf("\"%s\" is U+%04"PRIX32" (%zu bytes)\n", in, want_cp, want_len);
+    else
+        printf("Invalid sequence of %zu bytes\n", strlen(in));
+
+    len = vlc_towc(in, &cp);
+
+    if (len != want_len)
+    {
+        printf(" ERROR: length mismatch: %zd\n", len);
+        exit(1);
+    }
+
+    if (len != (size_t)-1 && want_cp != cp)
+    {
+        printf(" ERROR: code point mismatch: %04"PRIX32"\n", cp);
+        exit(1);
+    }
+}
+
 static void test (const char *in, const char *out)
 {
     bool isutf8 = !strcmp (in, out);
@@ -102,8 +127,44 @@ static void test_strcasestr (const char *h, const char *n, ssize_t offset)
 int main (void)
 {
     (void)setvbuf (stdout, NULL, _IONBF, 0);
-    test ("", "");
 
+    /* Valid sequences */
+    test_towc("", 0, 0);
+    test_towc("\n", 1, '\n');
+    test_towc("\x7F", 1, 0x7F);
+    test_towc("\xC3\xA9", 2, 0xE9);
+    test_towc("\xDF\xBF", 2, 0x7FF);
+    test_towc("\xE2\x82\xAC", 3, 0x20AC);
+    test_towc("\xEF\xBF\xBF", 3, 0xFFFF);
+    test_towc("\xF0\x90\x80\x81", 4, 0x10001);
+    test_towc("\xF4\x80\x80\x81", 4, 0x100001);
+    test_towc("\xF4\x8F\xBF\xBF", 4, 0x10FFFF);
+    /* Overlongs */
+    test_towc("\xC0\x80", -1, 0);
+    test_towc("\xC1\xBF", -1, 0x7F);
+    test_towc("\xE0\x80\x80", -1, 0);
+    test_towc("\xE0\x9F\xBF", -1, 0x7FF);
+    test_towc("\xF0\x80\x80\x80", -1, 0);
+    test_towc("\xF0\x8F\xBF\xBF", -1, 0xFFFF);
+    /* Out of range */
+    test_towc("\xF4\x90\x80\x80", -1, 0x110000);
+    test_towc("\xF7\xBF\xBF\xBF", -1, 0x1FFFFF);
+    /* Surrogates */
+    test_towc("\xED\x9F\xBF", 3, 0xD7FF);
+    test_towc("\xED\xA0\x80", -1, 0xD800);
+    test_towc("\xED\xBF\xBF", -1, 0xDFFF);
+    test_towc("\xEE\x80\x80", 3, 0xE000);
+    /* Spurious continuation byte */
+    test_towc("\x80", -1, 0);
+    test_towc("\xBF", -1, 0);
+    /* Missing continuation byte */
+    test_towc("\xDF", -1, 0x7FF);
+    test_towc("\xEF", -1, 0xFFFF);
+    test_towc("\xF4", -1, 0x10FFFF);
+    test_towc("\xEF\xBF", -1, 0xFFFF);
+    test_towc("\xF4\xBF\xBF", -1, 0x10FFFF);
+
+    test ("", "");
     test ("this_should_not_be_modified_1234",
           "this_should_not_be_modified_1234");
 
