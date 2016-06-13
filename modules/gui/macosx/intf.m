@@ -153,9 +153,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 @interface VLCMain () <BWQuincyManagerDelegate
 #ifdef HAVE_SPARKLE
-#ifdef SUUpdaterDelegate
     , SUUpdaterDelegate
-#endif
 #endif
 >
 {
