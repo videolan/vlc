@@ -38,7 +38,11 @@
 # define FLUIDSYNTH_NOT_A_DLL
 #endif
 
+#ifndef HAVE_FLUIDLITE_H
 #include <fluidsynth.h>
+#else
+#include <fluidlite.h>
+#endif
 
 #define SOUNDFONT_TEXT N_("Sound fonts")
 #define SOUNDFONT_LONGTEXT N_( \
