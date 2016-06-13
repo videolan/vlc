@@ -41,7 +41,7 @@ FLUIDCONF := $(HOSTCONF) \
 	--disable-libsndfile-support \
 	--disable-midishare \
 	--disable-oss-support \
-  	--disable-portaudio-support \
+	--disable-portaudio-support \
 	--disable-pulse-support \
 	--without-readline
 
