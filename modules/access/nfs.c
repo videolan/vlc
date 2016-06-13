@@ -174,6 +174,7 @@ static void
 nfs_read_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
             void *p_private_data)
 {
+    VLC_UNUSED(p_nfs);
     access_t *p_access = p_private_data;
     access_sys_t *p_sys = p_access->p_sys;
     assert(p_sys->p_nfs == p_nfs);
@@ -220,6 +221,7 @@ static void
 nfs_seek_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
             void *p_private_data)
 {
+    VLC_UNUSED(p_nfs);
     access_t *p_access = p_private_data;
     access_sys_t *p_sys = p_access->p_sys;
     assert(p_sys->p_nfs == p_nfs);
@@ -413,6 +415,7 @@ static void
 nfs_opendir_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
                void *p_private_data)
 {
+    VLC_UNUSED(p_nfs);
     access_t *p_access = p_private_data;
     access_sys_t *p_sys = p_access->p_sys;
     assert(p_sys->p_nfs == p_nfs);
@@ -426,6 +429,7 @@ static void
 nfs_open_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
             void *p_private_data)
 {
+    VLC_UNUSED(p_nfs);
     access_t *p_access = p_private_data;
     access_sys_t *p_sys = p_access->p_sys;
     assert(p_sys->p_nfs == p_nfs);
@@ -439,6 +443,7 @@ static void
 nfs_stat64_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
               void *p_private_data)
 {
+    VLC_UNUSED(p_nfs);
     access_t *p_access = p_private_data;
     access_sys_t *p_sys = p_access->p_sys;
     assert(p_sys->p_nfs == p_nfs);
@@ -485,6 +490,7 @@ static void
 nfs_mount_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
              void *p_private_data)
 {
+    VLC_UNUSED(p_nfs);
     access_t *p_access = p_private_data;
     access_sys_t *p_sys = p_access->p_sys;
     assert(p_sys->p_nfs == p_nfs);
@@ -546,6 +552,7 @@ static void
 mount_export_cb(struct rpc_context *p_ctx, int i_status, void *p_data,
                 void *p_private_data)
 {
+    VLC_UNUSED(p_ctx);
     access_t *p_access = p_private_data;
     access_sys_t *p_sys = p_access->p_sys;
     assert(p_sys->p_mount == p_ctx);
