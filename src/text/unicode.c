@@ -142,7 +142,7 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc)
             break;
 
         case 4:
-            cp = (c & 0x07) << 16;
+            cp = (c & 0x07) << 18;
             break;
 
         default:
@@ -154,18 +154,18 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc)
     {
         case 4:
             c = *++ptr;
-            if (unlikely((c >> 6) != 2)) // not a continuation byte
+            if (unlikely((c & 0xC0) != 0x80)) // not a continuation byte
                 return -1;
-            cp |= (c & 0x3f) << 12;
+            cp |= (c & 0x3F) << 12;
 
             if (unlikely(cp >= 0x110000)) // beyond Unicode range
                 return -1;
             /* fall through */
         case 3:
             c = *++ptr;
-            if (unlikely((c >> 6) != 2)) // not a continuation byte
+            if (unlikely((c & 0xC0) != 0x80)) // not a continuation byte
                 return -1;
-            cp |= (c & 0x3f) << 6;
+            cp |= (c & 0x3F) << 6;
 
             if (unlikely(cp >= 0xD800 && cp < 0xE000)) // UTF-16 surrogate
                 return -1;
@@ -174,9 +174,9 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc)
             /* fall through */
         case 2:
             c = *++ptr;
-            if (unlikely((c >> 6) != 2)) // not a continuation byte
+            if (unlikely((c & 0xC0) != 0x80)) // not a continuation byte
                 return -1;
-            cp |= (c & 0x3f);
+            cp |= (c & 0x3F);
             break;
     }
 
