@@ -148,6 +148,8 @@ namespace adaptive
             mtime_t getFirstDTS() const;
 
         private:
+            vlc_mutex_t lock;
+            void LockedCommit();
             std::list<AbstractCommand *> incoming;
             std::list<AbstractCommand *> commands;
             mtime_t bufferinglevel;

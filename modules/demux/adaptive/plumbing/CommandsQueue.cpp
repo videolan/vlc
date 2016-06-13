@@ -197,11 +197,13 @@ CommandsQueue::CommandsQueue()
 {
     bufferinglevel = VLC_TS_INVALID;
     b_drop = false;
+    vlc_mutex_init(&lock);
 }
 
 CommandsQueue::~CommandsQueue()
 {
     Abort( false );
+    vlc_mutex_destroy(&lock);
 }
 
 static bool compareCommands( AbstractCommand *a, AbstractCommand *b )
@@ -211,6 +213,7 @@ static bool compareCommands( AbstractCommand *a, AbstractCommand *b )
 
 void CommandsQueue::Schedule( AbstractCommand *command )
 {
+    vlc_mutex_lock(&lock);
     if( b_drop )
     {
         delete command;
@@ -218,13 +221,14 @@ void CommandsQueue::Schedule( AbstractCommand *command )
     else if( command->getType() == ES_OUT_SET_GROUP_PCR )
     {
         bufferinglevel = command->getTime();
-        Commit();
+        LockedCommit();
         commands.push_back( command );
     }
     else
     {
         incoming.push_back( command );
     }
+    vlc_mutex_unlock(&lock);
 }
 
 mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
@@ -232,6 +236,7 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
     mtime_t lastdts = barrier;
     bool b_datasent = false;
 
+    vlc_mutex_lock(&lock);
     while( !commands.empty() && commands.front()->getTime() <= barrier )
     {
         AbstractCommand *command = commands.front();
@@ -253,18 +258,28 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
         command->Execute( out );
         delete command;
     }
+    vlc_mutex_unlock(&lock);
+
     return lastdts;
 }
 
-void CommandsQueue::Commit()
+void CommandsQueue::LockedCommit()
 {
     /* reorder all blocks by time between 2 PCR and merge with main list */
     incoming.sort( compareCommands );
     commands.splice( commands.end(), incoming );
 }
 
+void CommandsQueue::Commit()
+{
+    vlc_mutex_lock(&lock);
+    LockedCommit();
+    vlc_mutex_unlock(&lock);
+}
+
 void CommandsQueue::Abort( bool b_reset )
 {
+    vlc_mutex_lock(&lock);
     commands.splice( commands.end(), incoming );
     while( !commands.empty() )
     {
@@ -274,27 +289,38 @@ void CommandsQueue::Abort( bool b_reset )
 
     if( b_reset )
         bufferinglevel = VLC_TS_INVALID;
+    vlc_mutex_unlock(&lock);
 }
 
 bool CommandsQueue::isEmpty() const
 {
-    return commands.empty() && incoming.empty();
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    bool b_empty = commands.empty() && incoming.empty();
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return b_empty;
 }
 
 void CommandsQueue::setDrop( bool b )
 {
+    vlc_mutex_lock(&lock);
     b_drop = b;
+    vlc_mutex_unlock(&lock);
 }
 
 mtime_t CommandsQueue::getBufferingLevel() const
 {
-    return bufferinglevel;
+    mtime_t i_buffer;
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    i_buffer = bufferinglevel;
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return i_buffer;
 }
 
 mtime_t CommandsQueue::getFirstDTS() const
 {
     mtime_t i_dts = VLC_TS_INVALID;
     std::list<AbstractCommand *>::const_iterator it;
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     for( it = commands.begin(); it != commands.end(); ++it )
     {
         if( (*it)->getTime() > VLC_TS_INVALID )
@@ -303,5 +329,6 @@ mtime_t CommandsQueue::getFirstDTS() const
             break;
         }
     }
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return i_dts;
 }
