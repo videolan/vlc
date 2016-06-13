@@ -58,9 +58,9 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
 {
     if(self=[super initWithCoder:decoder])
     {
-        [self setDelegate:(id<PXSourceListDelegate>)[super delegate]];
+        [self setDelegate:(id<PXSourceListDelegate, NSOutlineViewDelegate>)[super delegate]];
         [super setDelegate:self];
-        [self setDataSource:(id<PXSourceListDataSource>)[super dataSource]];
+        [self setDataSource:(id<PXSourceListDataSource, NSOutlineViewDataSource>)[super dataSource]];
         [super setDataSource:self];
 
         _iconSize = NSMakeSize(16,16);

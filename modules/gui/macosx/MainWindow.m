@@ -46,7 +46,7 @@
 #import "VLCVoutWindowController.h"
 
 
-@interface VLCMainWindow() <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate>
+@interface VLCMainWindow() <PXSourceListDataSource, PXSourceListDelegate, NSOutlineViewDataSource, NSOutlineViewDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate>
 {
     BOOL videoPlaybackEnabled;
     BOOL dropzoneActive;

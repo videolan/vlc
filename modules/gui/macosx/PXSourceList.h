@@ -19,15 +19,14 @@
 
 @property (nonatomic) NSSize iconSize;
 
-@property (assign) id<PXSourceListDataSource> dataSource;
-@property (assign) id<PXSourceListDelegate> delegate;
+@property (assign) id<PXSourceListDataSource, NSOutlineViewDataSource> _Nullable dataSource;
+@property (assign) id<PXSourceListDelegate, NSOutlineViewDelegate> _Nullable delegate;
 
 - (NSUInteger)numberOfGroups; //Returns the number of groups in the Source List
-- (BOOL)isGroupItem:(id)item; //Returns whether `item` is a group
-- (BOOL)isGroupAlwaysExpanded:(id)group; //Returns whether `group` is displayed as always expanded
+- (BOOL)isGroupItem:(nonnull id)item; //Returns whether `item` is a group
+- (BOOL)isGroupAlwaysExpanded:(nonnull id)group; //Returns whether `group` is displayed as always expanded
 
-- (BOOL)itemHasBadge:(id)item; //Returns whether `item` has a badge
-- (NSInteger)badgeValueForItem:(id)item; //Returns the badge value for `item`
+- (BOOL)itemHasBadge:(nonnull id)item; //Returns whether `item` has a badge
+- (NSInteger)badgeValueForItem:(nonnull id)item; //Returns the badge value for `item`
 
 @end
-
