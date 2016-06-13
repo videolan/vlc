@@ -2081,7 +2081,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     /* FIXME: support for multiple selection... */
     //    [o_tableview setAllowsMultipleSelection:YES];
 
-    NSCell *o_headerCell = [[NSCell alloc] initTextCell:@"Enabled"];
+    NSTableHeaderCell *o_headerCell = [[NSTableHeaderCell alloc] initTextCell:@"Enabled"];
     NSCell *o_dataCell = [[NSButtonCell alloc] init];
     [(NSButtonCell*)o_dataCell setButtonType:NSSwitchButton];
     [o_dataCell setTitle:@""];
@@ -2093,7 +2093,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     [o_tableColumn setWidth:17];
     [o_tableview addTableColumn: o_tableColumn];
 
-    o_headerCell = [[NSCell alloc] initTextCell:@"Module Name"];
+    o_headerCell = [[NSTableHeaderCell alloc] initTextCell:@"Module Name"];
     o_dataCell = [[NSTextFieldCell alloc] init];
     [o_dataCell setFont:[NSFont systemFontOfSize:12]];
     o_tableColumn = [[NSTableColumn alloc]
