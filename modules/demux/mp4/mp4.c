@@ -1757,10 +1757,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_GROUP:
         case DEMUX_HAS_UNSUPPORTED_META:
         case DEMUX_CAN_RECORD:
-            return VLC_EGENERIC;
-
         default:
-            msg_Warn( p_demux, "control query %u unimplemented", i_query );
             return VLC_EGENERIC;
     }
 }
