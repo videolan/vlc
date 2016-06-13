@@ -20,8 +20,7 @@
 
 #include "test.h"
 
-#include <vlc_common.h>
-#include <vlc_mtime.h> /* for msleep */
+#include <string.h>
 
 static void
 ml_item_event(const struct libvlc_event_t *p_ev, const char *psz_event)
@@ -29,7 +28,8 @@ ml_item_event(const struct libvlc_event_t *p_ev, const char *psz_event)
     char *psz_mrl = libvlc_media_get_mrl(p_ev->u.media_list_item_added.item);
     assert(psz_mrl);
 
-    log("item added(%d): '%s'\n", p_ev->u.media_list_item_added.index, psz_mrl);
+    log("item %s(%d): '%s'\n", psz_event, p_ev->u.media_list_item_added.index,
+        psz_mrl);
     free(psz_mrl);
 }
 
@@ -50,6 +50,8 @@ ml_item_deleted(const struct libvlc_event_t *p_ev, void *p_data)
 static void
 test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name)
 {
+    log("creating and starting discoverer %s\n", psz_name);
+
     libvlc_media_discoverer_t *p_md =
         libvlc_media_discoverer_new(p_vlc, psz_name);
     assert(p_md != NULL);
@@ -75,7 +77,6 @@ test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name)
     else
     {
         assert(libvlc_media_discoverer_is_running(p_md));
-        msleep(20000);
         libvlc_media_discoverer_stop(p_md);
     }
 
@@ -117,10 +118,11 @@ main (void)
             libvlc_media_discoverer_description *p_service = pp_services[i];
 
             assert(i_cat == p_service->i_cat);
-            log("= creating and start discoverer: name: '%s', longname: '%s' =\n",
+            log("= discoverer: name: '%s', longname: '%s' =\n",
                 p_service->psz_name, p_service->psz_longname);
 
-            if( !strncasecmp( p_service->psz_name, "podcast", 7 ) )
+            if (!strncasecmp(p_service->psz_name, "podcast", 7)
+             || i_cat == libvlc_media_discoverer_lan)
             {
                 /* see comment in libvlc_media_discoverer_new() */
                 continue;
