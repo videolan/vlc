@@ -48,7 +48,7 @@ ml_item_deleted(const struct libvlc_event_t *p_ev, void *p_data)
 }
 
 static void
-test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name)
+test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name, bool b_wait)
 {
     log("creating and starting discoverer %s\n", psz_name);
 
@@ -77,6 +77,11 @@ test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name)
     else
     {
         assert(libvlc_media_discoverer_is_running(p_md));
+        if (b_wait)
+        {
+            log("Press any keys to stop\n");
+            getchar();
+        }
         libvlc_media_discoverer_stop(p_md);
     }
 
@@ -90,13 +95,24 @@ test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name)
 }
 
 int
-main (void)
+main(int i_argc, char *ppsz_argv[])
 {
     test_init();
+
+    char *psz_test_name = i_argc > 1 ? ppsz_argv[1] : NULL;
 
     libvlc_instance_t *p_vlc = libvlc_new(test_defaults_nargs,
                                           test_defaults_args);
     assert(p_vlc != NULL);
+
+    if (psz_test_name != NULL)
+    {
+        /* Test a specific service discovery from command line */
+        alarm(0);
+        test_discoverer(p_vlc, psz_test_name, true);
+        libvlc_release(p_vlc);
+        return 0;
+    }
 
     for(libvlc_media_discoverer_category i_cat = libvlc_media_discoverer_devices;
         i_cat <= libvlc_media_discoverer_localdirs; i_cat ++)
@@ -127,7 +143,7 @@ main (void)
                 /* see comment in libvlc_media_discoverer_new() */
                 continue;
             }
-            test_discoverer(p_vlc, p_service->psz_name);
+            test_discoverer(p_vlc, p_service->psz_name, false);
         }
         libvlc_media_discoverer_list_release(pp_services, i_count);
     }
