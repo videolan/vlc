@@ -292,12 +292,12 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
                      services_discovery_removeall,
                      p_mdis );
 
-    libvlc_media_list_release( p_mdis->p_mlist );
-
     if( p_mdis->running )
         libvlc_media_discoverer_stop( p_mdis );
 
     vlc_sd_Destroy( p_mdis->p_sd );
+
+    libvlc_media_list_release( p_mdis->p_mlist );
 
     /* Free catname_to_submedialist and all the mlist */
     char ** all_keys = vlc_dictionary_all_keys( &p_mdis->catname_to_submedialist );
