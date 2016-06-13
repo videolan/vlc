@@ -1009,7 +1009,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %dir %_vlc_pluginsdir/audio_filter
 %_vlc_pluginsdir/audio_filter/libbandlimited_resampler_plugin.so*
 %_vlc_pluginsdir/audio_filter/libdolby_surround_decoder_plugin.so*
-%_vlc_pluginsdir/audio_filter/libdtstospdif_plugin.so*
 %_vlc_pluginsdir/audio_filter/libheadphone_channel_mixer_plugin.so*
 %_vlc_pluginsdir/audio_filter/liblinear_resampler_plugin.so*
 %_vlc_pluginsdir/audio_filter/libtrivial_channel_mixer_plugin.so*

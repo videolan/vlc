@@ -117,7 +117,6 @@ $Id$
  * dsm: SMB access module
  * dts: DTS basic parser/packetizer
  * dtstofloat32: DTS Audio converter
- * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
  * dtv: DVB support (superseds bda module for Windows)
  * dummy: dummy interface
  * dv1394: Digital Video (Firewire/IEEE1394/I-Link) access module

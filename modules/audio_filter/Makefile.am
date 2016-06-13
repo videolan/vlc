@@ -99,12 +99,10 @@ libaudio_format_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libaudio_format_plugin_la_LIBADD = $(LIBM)
 
 liba52tospdif_plugin_la_SOURCES = audio_filter/converter/a52tospdif.c
-libdtstospdif_plugin_la_SOURCES = audio_filter/converter/dtstospdif.c
 
 audio_filter_LTLIBRARIES += \
 	liba52tospdif_plugin.la \
-	libaudio_format_plugin.la \
-	libdtstospdif_plugin.la
+	libaudio_format_plugin.la
 
 # Resamplers
 libbandlimited_resampler_plugin_la_SOURCES = \
