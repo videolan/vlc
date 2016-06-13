@@ -1947,13 +1947,14 @@ fi
 dnl
 dnl QTKit
 AC_ARG_ENABLE(macosx-qtkit,
-  [  --enable-macosx-qtkit Mac OS X qtsound (audio) module (default enabled on Mac OS X)])
+  [  --enable-macosx-qtkit Mac OS X qtsound (audio) module (default enabled on Mac OS X <= v10.11)])
 if test "x${enable_macosx_qtkit}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_qtkit}" = "yes")
 then
-  VLC_ADD_PLUGIN([qtsound])
+  AC_CHECK_HEADERS(QTKit/QTKit.h, [
+      VLC_ADD_PLUGIN([qtsound])
+    ])
 fi
-AM_CONDITIONAL(HAVE_QTKIT, [test "${SYS}" = "darwin" -a "x${enable_macosx_qtkit}" != "xno"])
 
 dnl
 dnl AVFoundation
