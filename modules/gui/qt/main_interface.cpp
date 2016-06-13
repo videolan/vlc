@@ -740,7 +740,7 @@ void MainInterface::getVideoSlot( WId *p_id, struct vout_window_t *p_wnd,
         showVideo();
 
         /* Ask videoWidget to resize correctly, if we are in normal mode */
-        if( !isFullScreen() && !isMaximized() && b_autoresize )
+        if( b_autoresize )
             videoWidget->setSize( *pi_width, *pi_height );
     }
 }
