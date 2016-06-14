@@ -1,7 +1,7 @@
 /*****************************************************************************
  * chromecast_common.h: Chromecast common code between modules for vlc
  *****************************************************************************
- * Copyright © 2016 VideoLAN
+ * Copyright Â© 2015-2016 VideoLAN
  *
  * Authors: Adrien Maglo <magsoft@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
