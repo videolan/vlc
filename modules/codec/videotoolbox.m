@@ -627,10 +627,10 @@ static void StopVideoToolbox(decoder_t *p_dec)
 
     if (p_sys->b_started) {
         if (p_sys->outputTimeStamps != nil)
-            CFRelease(p_sys->outputTimeStamps);
+            [p_sys->outputTimeStamps release];
         p_sys->outputTimeStamps = nil;
         if (p_sys->outputFrames != nil)
-            CFRelease(p_sys->outputFrames);
+            [p_sys->outputFrames release];
         p_sys->outputFrames = nil;
 
         p_sys->b_started = false;
