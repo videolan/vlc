@@ -130,6 +130,8 @@ private:
         }
     }
 
+    void waitAppStarted();
+
     int connectChromecast();
     void disconnectChromecast();
 
@@ -225,6 +227,8 @@ private:
     static void set_length(void*, mtime_t length);
     static mtime_t get_time(void*);
     static double get_position(void*);
+
+    static void wait_app_started(void*);
 };
 
 #endif /* VLC_CHROMECAST_H */

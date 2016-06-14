@@ -121,6 +121,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     common.pf_get_position     = get_position;
     common.pf_get_time         = get_time;
     common.pf_set_length       = set_length;
+    common.pf_wait_app_started = wait_app_started;
 
     assert( var_Type( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME) == 0 );
     if (var_Create( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME, VLC_VAR_ADDRESS ) == VLC_SUCCESS )
@@ -976,6 +977,16 @@ void intf_sys_t::requestPlayerSeek()
     notifySendRequest();
 }
 
+void intf_sys_t::waitAppStarted()
+{
+    vlc_mutex_locker locker(&lock);
+    mutex_cleanup_push(&lock);
+    while ( conn_status != CHROMECAST_APP_STARTED &&
+            conn_status != CHROMECAST_CONNECTION_DEAD )
+        vlc_cond_wait(&loadCommandCond, &lock);
+    vlc_cleanup_pop();
+}
+
 mtime_t intf_sys_t::get_time(void *pt)
 {
     intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
@@ -994,4 +1005,10 @@ void intf_sys_t::set_length(void *pt, mtime_t length)
 {
     intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
     p_this->i_length = length;
+}
+
+void intf_sys_t::wait_app_started(void *pt)
+{
+    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    p_this->waitAppStarted();
 }

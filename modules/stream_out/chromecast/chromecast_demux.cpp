@@ -41,6 +41,7 @@ struct demux_sys_t
     demux_sys_t(demux_t * const demux, chromecast_common * const renderer)
         :p_demux(demux)
         ,p_renderer(renderer)
+        ,demuxReady(false)
     {
     }
 
@@ -69,12 +70,21 @@ struct demux_sys_t
 
     int Demux()
     {
+        if (!demuxReady)
+        {
+            msg_Dbg(p_demux, "wait to demux");
+            p_renderer->pf_wait_app_started( p_renderer->p_opaque );
+            demuxReady = true;
+            msg_Dbg(p_demux, "ready to demux");
+        }
+
         return demux_Demux( p_demux->p_next );
     }
 
 protected:
     demux_t     * const p_demux;
     chromecast_common  * const p_renderer;
+    bool          demuxReady;
 };
 
 static int Demux( demux_t *p_demux_filter )
