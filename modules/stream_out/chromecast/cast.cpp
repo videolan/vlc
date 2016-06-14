@@ -50,7 +50,7 @@ struct sout_stream_sys_t
     {
         assert(p_intf != NULL);
     }
-    
+
     ~sout_stream_sys_t()
     {
         sout_StreamChainDelete(p_out, p_out);
