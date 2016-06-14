@@ -137,6 +137,7 @@ main(int i_argc, char *ppsz_argv[])
             log("= discoverer: name: '%s', longname: '%s' =\n",
                 p_service->psz_name, p_service->psz_longname);
 
+#if 0
             if (!strncasecmp(p_service->psz_name, "podcast", 7)
              || i_cat == libvlc_media_discoverer_lan)
             {
@@ -144,6 +145,7 @@ main(int i_argc, char *ppsz_argv[])
                 continue;
             }
             test_discoverer(p_vlc, p_service->psz_name, false);
+#endif
         }
         libvlc_media_discoverer_list_release(pp_services, i_count);
     }
