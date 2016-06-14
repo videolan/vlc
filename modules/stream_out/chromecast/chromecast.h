@@ -159,6 +159,8 @@ private:
     std::atomic_bool requested_stop;
     std::atomic_bool requested_seek;
 
+    void setInputState(input_state_e state);
+
     int sendMessage(const castchannel::CastMessage &msg);
 
     void buildMessage(const std::string & namespace_,
@@ -183,6 +185,8 @@ private:
     unsigned i_requestId;
 
     bool           has_input;
+    input_state_e  input_state;
+
     static void* ChromecastThread(void* p_data);
     vlc_interrupt_t *p_ctl_thread_interrupt;
 
@@ -241,6 +245,8 @@ private:
 
     static void request_seek(void*, mtime_t pos);
     static void wait_seek_done(void*);
+
+    static void set_input_state(void*, input_state_e state);
 };
 
 #endif /* VLC_CHROMECAST_H */

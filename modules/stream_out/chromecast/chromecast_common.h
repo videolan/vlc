@@ -25,6 +25,8 @@
 #ifndef VLC_CHROMECAST_COMMON_H
 #define VLC_CHROMECAST_COMMON_H
 
+#include <vlc_input.h>
+
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -43,6 +45,8 @@ typedef struct
 
     void (*pf_request_seek)(void*, mtime_t pos);
     void (*pf_wait_seek_done)(void*);
+
+    void (*pf_set_input_state)(void*, input_state_e state);
 } chromecast_common;
 
 # ifdef __cplusplus

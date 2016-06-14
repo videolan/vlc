@@ -109,6 +109,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , i_receiver_requestId(0)
  , i_requestId(0)
  , has_input(false)
+ , input_state( INIT_S )
  , p_ctl_thread_interrupt(p_interrupt)
  , m_time_playback_started( VLC_TS_INVALID )
  , i_ts_local_start( VLC_TS_INVALID )
@@ -127,6 +128,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     common.pf_wait_app_started = wait_app_started;
     common.pf_request_seek     = request_seek;
     common.pf_wait_seek_done   = wait_seek_done;
+    common.pf_set_input_state  = set_input_state;
 
     assert( var_Type( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME) == 0 );
     if (var_Create( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME, VLC_VAR_ADDRESS ) == VLC_SUCCESS )
@@ -1018,6 +1020,31 @@ void intf_sys_t::requestPlayerSeek(mtime_t pos)
     notifySendRequest();
 }
 
+void intf_sys_t::setInputState(input_state_e state)
+{
+    input_state = state;
+    msg_Dbg( p_module, "new %d state", state );
+    switch( input_state )
+    {
+        case PLAYING_S:
+            if ( !mediaSessionId.empty() && receiverState != RECEIVER_IDLE )
+            {
+                msgPlayerPlay();
+                setPlayerStatus(CMD_PLAYBACK_SENT);
+            }
+            break;
+        case PAUSE_S:
+            if ( !mediaSessionId.empty() && receiverState != RECEIVER_IDLE )
+            {
+                msgPlayerPause();
+                setPlayerStatus(CMD_PLAYBACK_SENT);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 void intf_sys_t::waitAppStarted()
 {
     vlc_mutex_locker locker(&lock);
@@ -1086,4 +1113,10 @@ void intf_sys_t::wait_seek_done(void *pt)
 {
     intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
     p_this->waitSeekDone();
+}
+
+void intf_sys_t::set_input_state(void *pt, input_state_e state)
+{
+    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    p_this->setInputState( state );
 }
