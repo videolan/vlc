@@ -29,4 +29,5 @@
 #define OSX_MOUNTAIN_LION (NSAppKitVersionNumber < 1244 && NSAppKitVersionNumber >= 1162)
 #define OSX_MAVERICKS (NSAppKitVersionNumber < 1334 && NSAppKitVersionNumber >= 1244)
 #define OSX_YOSEMITE (NSAppKitVersionNumber < 1404 && NSAppKitVersionNumber >= 1334)
-#define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404)
+#define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404 && NSAppKitVersionNumber < 1485)
+#define OSX_SIERRA (NSAppKitVersionNumber >= 1485)
