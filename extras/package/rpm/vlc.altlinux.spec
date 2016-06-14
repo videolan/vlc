@@ -1011,6 +1011,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/audio_filter/libdolby_surround_decoder_plugin.so*
 %_vlc_pluginsdir/audio_filter/libheadphone_channel_mixer_plugin.so*
 %_vlc_pluginsdir/audio_filter/liblinear_resampler_plugin.so*
+%_vlc_pluginsdir/audio_filter/libtospdif_plugin.so*
 %_vlc_pluginsdir/audio_filter/libtrivial_channel_mixer_plugin.so*
 %_vlc_pluginsdir/audio_filter/libtrivial_resampler_plugin.so*
 %_vlc_pluginsdir/audio_filter/libugly_resampler_plugin.so*
@@ -1311,7 +1312,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 
 %files plugin-a52
 %_vlc_pluginsdir/audio_filter/liba52tofloat32_plugin.so*
-%_vlc_pluginsdir/audio_filter/liba52tospdif_plugin.so*
 
 %files plugin-h264
 %_vlc_pluginsdir/codec/libx264_plugin.so*

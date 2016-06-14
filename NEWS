@@ -110,6 +110,7 @@ Audio output:
 
 Audio filters and output:
  * Add SoX Resampler library audio filter module (converter and resampler)
+ * a52tospdif and dtstospdif audio converters are merged into tospdif
 
 Video ouput:
  * Linux/BSD default video output is now OpenGL, instead of Xvideo

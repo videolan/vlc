@@ -2,7 +2,6 @@ List of vlc plugins (475)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
- * a52tospdif: Audio converter module to encapsulate A/52 into S/PDIF
  * aa: Ascii art video output
  * access_alsa: Alsa access module
  * access_archive: libarchive based access and stream filter
@@ -399,6 +398,7 @@ $Id$
  * theora: a theora video decoder/packetizer/encoder using the libtheora
  * timecode: clock/timecode as a subtitle input
  * tizen_audio: audio output for Tizen
+ * tospdif: Audio converter module to encapsulate A/52 and DTS into S/PDIF
  * transform: filter for horizontal and vertical image flips and 90° rotations
  * tremor: a vorbis audio decoder using the libvorbisidec (aka tremor) library
  * trivial_channel_mixer: Simple channel mixer plugin
