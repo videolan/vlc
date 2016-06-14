@@ -129,6 +129,8 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     common.pf_request_seek     = request_seek;
     common.pf_wait_seek_done   = wait_seek_done;
     common.pf_set_input_state  = set_input_state;
+    common.pf_set_artwork      = set_artwork;
+    common.pf_set_title        = set_title;
 
     assert( var_Type( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME) == 0 );
     if (var_Create( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME, VLC_VAR_ADDRESS ) == VLC_SUCCESS )
@@ -761,16 +763,42 @@ void intf_sys_t::msgPlayerGetStatus()
     pushMediaPlayerMessage( ss );
 }
 
+std::string intf_sys_t::GetMedia()
+{
+    std::stringstream ss;
+
+    if ( title.size() )
+    {
+        ss << "\"metadata\":{"
+           << " \"metadataType\":0"
+           << ",\"title\":\"" << title << "\"";
+
+        if ( artwork.size() && !strncmp(artwork.c_str(), "http", 4))
+            ss << ",\"images\":[\"" << artwork << "\"]";
+
+        ss << "},";
+    }
+
+    std::stringstream chromecast_url;
+    chromecast_url << "http://" << serverIP << ":" << i_port << "/stream";
+
+    msg_Dbg( p_module, "s_chromecast_url: %s", chromecast_url.str().c_str());
+
+    ss << "\"contentId\":\"" << chromecast_url.str() << "\""
+       << ",\"streamType\":\"LIVE\""
+       << ",\"contentType\":\"" << mime << "\"";
+
+    return ss.str();
+}
+
 void intf_sys_t::msgPlayerLoad()
 {
     std::stringstream ss;
     ss << "{\"type\":\"LOAD\","
-       <<  "\"media\":{\"contentId\":\"http://" << serverIP << ":"
-           << i_port
-           << "/stream\","
-       <<             "\"streamType\":\"LIVE\","
-       <<             "\"contentType\":\"" << mime << "\"},"
-       <<  "\"requestId\":" << i_requestId++ << "}";
+       <<  "\"media\":{" << GetMedia() << "},"
+       <<  "\"autoplay\":\"false\","
+       <<  "\"requestId\":" << i_requestId++
+       << "}";
 
     pushMediaPlayerMessage( ss );
 }
@@ -1023,7 +1051,7 @@ void intf_sys_t::requestPlayerSeek(mtime_t pos)
 void intf_sys_t::setInputState(input_state_e state)
 {
     input_state = state;
-    msg_Dbg( p_module, "new %d state", state );
+    msg_Dbg( p_module, "new %d state for %s", state, title.c_str() );
     switch( input_state )
     {
         case PLAYING_S:
@@ -1119,4 +1147,16 @@ void intf_sys_t::set_input_state(void *pt, input_state_e state)
 {
     intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
     p_this->setInputState( state );
+}
+
+void intf_sys_t::set_title(void *pt, const char *psz_title)
+{
+    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    p_this->setTitle( psz_title );
+}
+
+void intf_sys_t::set_artwork(void *pt, const char *psz_artwork)
+{
+    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    p_this->setArtwork( psz_artwork );
 }

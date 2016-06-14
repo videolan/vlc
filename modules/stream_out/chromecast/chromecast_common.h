@@ -47,6 +47,10 @@ typedef struct
     void (*pf_wait_seek_done)(void*);
 
     void (*pf_set_input_state)(void*, input_state_e state);
+
+    void (*pf_set_title)(void*, const char *psz_title);
+    void (*pf_set_artwork)(void*, const char *psz_artwork);
+
 } chromecast_common;
 
 # ifdef __cplusplus
