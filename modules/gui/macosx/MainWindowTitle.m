@@ -89,7 +89,7 @@
 {
     b_nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
-    if (!b_nativeFullscreenMode || OSX_YOSEMITE || OSX_EL_CAPITAN) {
+    if (!b_nativeFullscreenMode || OSX_YOSEMITE || OSX_EL_CAPITAN || OSX_SIERRA) {
         [_fullscreenButton setHidden: YES];
     }
 

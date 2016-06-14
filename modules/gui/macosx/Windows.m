@@ -334,7 +334,7 @@
 
     if (b_nativeFullscreenMode) {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
-    } else if (OSX_EL_CAPITAN) {
+    } else if (OSX_EL_CAPITAN || OSX_SIERRA) {
         // Native fullscreen seems to be default on El Capitan, this disables it explicitely
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     }
