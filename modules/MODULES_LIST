@@ -19,6 +19,7 @@ $Id$
  * access_output_livehttp: Live HTTP stream output
  * access_output_shout: Shoutcast access output
  * access_output_udp: UDP Network access_output module
+ * access_qtsound: Quicktime Audio Capture
  * access_realrtsp: Real RTSP access
  * access_wasapi: WASAPI audio input
  * accesstweaks: access control tweaking module (dev tool)
@@ -307,7 +308,6 @@ $Id$
  * pva: PVA demuxer
  * qsv: QuickSyncVideo Encoder for Intel hardware
  * qt: interface module using the cross-platform Qt widget library
- * qtsound: Quicktime Audio Capture
  * rar: RAR access and stream filter
  * rawaud: raw audio input module for vlc
  * rawdv: Raw DV demuxer
