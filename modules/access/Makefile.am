@@ -120,8 +120,8 @@ endif
 ### Video capture ###
 
 libavcapture_plugin_la_SOURCES = access/avcapture.m
-libavcapture_plugin_la_LDFLAGS = \
-	-Wl,-framework,AVFoundation -Wl,-framework,CoreMedia
+libavcapture_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
+libavcapture_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' -Wl,-framework,Foundation -Wl,-framework,AVFoundation -Wl,-framework,CoreMedia,  -Wl,-framework,CoreVideo
 if HAVE_AVFOUNDATION
 access_LTLIBRARIES += libavcapture_plugin.la
 endif

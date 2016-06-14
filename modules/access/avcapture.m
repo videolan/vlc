@@ -116,7 +116,6 @@ vlc_module_end ()
         bytesPerRow = 0;
         videoDimensionsReady = NO;
     }
-    [super dealloc];
 }
 
 - (long)timeScale
@@ -229,9 +228,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 struct demux_sys_t
 {
-    AVCaptureSession                *session;
-    AVCaptureDevice                 *device;
-    VLCAVDecompressedVideoOutput    *output;
+    CFTypeRef _Nullable             session;       // AVCaptureSession
+    CFTypeRef _Nullable             device;        // AVCaptureDevice
+    CFTypeRef _Nullable             output;        // VLCAVDecompressedVideoOutput
     es_out_id_t                     *p_es_video;
     es_format_t                     fmt;
     int                             height, width;
@@ -278,8 +277,8 @@ static int Open(vlc_object_t *p_this)
         if ( !p_sys )
             return VLC_ENOMEM;
 
-        myVideoDevices = [[[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]
-                           arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]] retain];
+        myVideoDevices = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]
+                           arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]];
         if ( [myVideoDevices count] == 0 )
         {
             vlc_dialog_display_error(p_demux, _("No video devices found"),
@@ -302,12 +301,12 @@ static int Open(vlc_object_t *p_this)
 
         if ( ivideo < [myVideoDevices count] )
         {
-            p_sys->device = [myVideoDevices objectAtIndex:ivideo];
+            p_sys->device = CFBridgingRetain(myVideoDevices[ivideo]);
         }
         else
         {
             msg_Dbg(p_demux, "Cannot find designated device as %s, falling back to default.", [avf_currdevice_uid UTF8String]);
-            p_sys->device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+            p_sys->device = CFBridgingRetain([AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo]);
         }
         if ( !p_sys->device )
         {
@@ -318,13 +317,13 @@ static int Open(vlc_object_t *p_this)
             goto error;
         }
 
-        if ( [p_sys->device isInUseByAnotherApplication] == YES )
+        if ( [(__bridge AVCaptureDevice *)p_sys->device isInUseByAnotherApplication] == YES )
         {
             msg_Err(p_demux, "default capture device is exclusively in use by another application");
             goto error;
         }
 
-        input = [AVCaptureDeviceInput deviceInputWithDevice:p_sys->device error:&o_returnedError];
+        input = [AVCaptureDeviceInput deviceInputWithDevice:(__bridge AVCaptureDevice *)p_sys->device error:&o_returnedError];
 
         if ( !input )
         {
@@ -337,30 +336,30 @@ static int Open(vlc_object_t *p_this)
         memset(&p_sys->fmt, 0, sizeof(es_format_t));
         es_format_Init(&p_sys->fmt, VIDEO_ES, chroma);
 
-        p_sys->session = [[AVCaptureSession alloc] init];
-        [p_sys->session addInput:input];
+        p_sys->session = CFBridgingRetain([[AVCaptureSession alloc] init]);
+        [(__bridge AVCaptureSession *)p_sys->session addInput:input];
 
-        p_sys->output = [[VLCAVDecompressedVideoOutput alloc] initWithDemux:p_demux];
-        [p_sys->session addOutput:p_sys->output];
+        p_sys->output = CFBridgingRetain([[VLCAVDecompressedVideoOutput alloc] initWithDemux:p_demux]);
+        [(__bridge AVCaptureSession *)p_sys->session addOutput:(__bridge VLCAVDecompressedVideoOutput *)p_sys->output];
 
         dispatch_queue_t queue = dispatch_queue_create("avCaptureQueue", NULL);
-        [p_sys->output setSampleBufferDelegate:(id)p_sys->output queue:queue];
+        [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output setSampleBufferDelegate:(__bridge id)p_sys->output queue:queue];
         dispatch_release(queue);
 
-        p_sys->output.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];
-        [p_sys->session startRunning];
-        
-        [input release];
-        
+        [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
+        [(__bridge AVCaptureSession *)p_sys->session startRunning];
+
+        input = nil;
+
         msg_Dbg(p_demux, "AVCapture: Video device ready!");
-        
+
         return VLC_SUCCESS;
     error:
         msg_Err(p_demux, "Error");
-        [input release];
-        
+        input = nil;
+
         free(p_sys);
-        
+
         return VLC_EGENERIC;
     }
 }
@@ -378,10 +377,10 @@ static void Close(vlc_object_t *p_this)
 
         // Perform this on main thread, as the framework itself will sometimes try to synchronously
         // work on main thread. And this will create a dead lock.
-        [p_sys->session performSelectorOnMainThread:@selector(stopRunning) withObject:nil waitUntilDone:NO];
-        [p_sys->output performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
-        [p_sys->session performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
-        
+        [(__bridge AVCaptureSession *)p_sys->session performSelectorOnMainThread:@selector(stopRunning) withObject:nil waitUntilDone:NO];
+        CFBridgingRelease(p_sys->output);
+        CFBridgingRelease(p_sys->session);
+
         free(p_sys);
     }
 }
@@ -397,7 +396,7 @@ static int Demux(demux_t *p_demux)
     @autoreleasepool {
         @synchronized ( p_sys->output )
         {
-            p_block = block_Alloc([p_sys->output width] * [p_sys->output bytesPerRow]);
+            p_block = block_Alloc([(__bridge VLCAVDecompressedVideoOutput *)p_sys->output width] * [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output bytesPerRow]);
 
             if ( !p_block )
             {
@@ -405,7 +404,7 @@ static int Demux(demux_t *p_demux)
                 return 0;
             }
 
-            p_block->i_pts = [p_sys->output copyCurrentFrameToBuffer: p_block->p_buffer];
+            p_block->i_pts = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output copyCurrentFrameToBuffer: p_block->p_buffer];
 
             if ( !p_block->i_pts )
             {
@@ -416,10 +415,10 @@ static int Demux(demux_t *p_demux)
             }
             else if ( !p_sys->b_es_setup )
             {
-                p_sys->fmt.video.i_frame_rate_base = [p_sys->output timeScale];
+                p_sys->fmt.video.i_frame_rate_base = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output timeScale];
                 msg_Dbg(p_demux, "using frame rate base: %i", p_sys->fmt.video.i_frame_rate_base);
-                p_sys->width = p_sys->fmt.video.i_width = [p_sys->output width];
-                p_sys->height = p_sys->fmt.video.i_height = [p_sys->output height];
+                p_sys->width = p_sys->fmt.video.i_width = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output width];
+                p_sys->height = p_sys->fmt.video.i_height = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output height];
                 p_sys->p_es_video = es_out_Add(p_demux->out, &p_sys->fmt);
                 msg_Dbg(p_demux, "added new video es %4.4s %dx%d", (char*)&p_sys->fmt.i_codec, p_sys->width, p_sys->height);
                 p_sys->b_es_setup = YES;
