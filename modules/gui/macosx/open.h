@@ -199,12 +199,6 @@
 @property (readwrite, weak) IBOutlet NSButton *qtkVideoCheckbox;
 @property (readwrite, weak) IBOutlet NSPopUpButton *qtkAudioDevicePopup;
 @property (readwrite, weak) IBOutlet NSButton *qtkAudioCheckbox;
-@property (readwrite, weak) IBOutlet NSTextField *qtkWidthLabel;
-@property (readwrite, weak) IBOutlet NSTextField *qtkWidthTextField;
-@property (readwrite, weak) IBOutlet NSStepper *qtkWidthStepper;
-@property (readwrite, weak) IBOutlet NSTextField *qtkHeightLabel;
-@property (readwrite, weak) IBOutlet NSTextField *qtkHeightTextField;
-@property (readwrite, weak) IBOutlet NSStepper *qtkHeightStepper;
 
 /* text field / stepper binding values - subs panel */
 @property (nonatomic) float fileSubDelay;

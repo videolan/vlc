@@ -202,8 +202,6 @@ struct display_info_t
     [_eyeTVnoInstanceLongLabel setStringValue: _NS("VLC could not connect to EyeTV.\nMake sure that you installed VLC's EyeTV plugin.")];
     [_eyeTVlaunchEyeTVButton setTitle: _NS("Launch EyeTV now")];
     [_eyeTVgetPluginButton setTitle: _NS("Download Plugin")];
-    [_qtkWidthLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Image Width")]];
-    [_qtkHeightLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Image Height")]];
 
     // setup start / stop time fields
     [_fileStartTimeTextField setFormatter:[[PositionFormatter alloc] init]];
@@ -491,8 +489,6 @@ struct display_info_t
             }
             else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Input Devices")]) {
                 if ([_qtkVideoCheckbox state]) {
-                    [options addObject: [NSString stringWithFormat: @"qtcapture-Width=%i", [_qtkWidthTextField intValue]]];
-                    [options addObject: [NSString stringWithFormat: @"qtcapture-Height=%i", [_qtkHeightTextField intValue]]];
                     if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
                         [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _avCurrentAudioDeviceUID]];
                 }
@@ -527,13 +523,6 @@ struct display_info_t
 {
     NSInteger selectedDevice = [_qtkVideoDevicePopup indexOfSelectedItem];
     if (_avvideoDevices.count >= 1) {
-        CMVideoFormatDescriptionRef formatDescription = [[[_avvideoDevices[selectedDevice] formats] firstObject] formatDescription];
-        CMVideoDimensions dimensions = CMVideoFormatDescriptionGetDimensions(formatDescription);
-
-        [_qtkWidthTextField setIntValue: dimensions.width];
-        [_qtkHeightTextField setIntValue: dimensions.height];
-        [_qtkWidthStepper setIntValue: [_qtkWidthTextField intValue]];
-        [_qtkHeightStepper setIntValue: [_qtkHeightTextField intValue]];
         _avCurrentDeviceUID = [[(AVCaptureDevice *)_avvideoDevices[selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
 }
@@ -553,10 +542,6 @@ struct display_info_t
     [_qtkAudioDevicePopup setEnabled:[_qtkAudioCheckbox state]];
     BOOL b_state = [_qtkVideoCheckbox state];
     [_qtkVideoDevicePopup setEnabled:b_state];
-    [_qtkWidthTextField setEnabled:b_state];
-    [_qtkWidthStepper setEnabled:b_state];
-    [_qtkHeightTextField setEnabled:b_state];
-    [_qtkHeightStepper setEnabled:b_state];
     [self qtkAudioChanged:sender];
     [self qtkChanged:sender];
     [self openCaptureModeChanged:sender];
@@ -1241,15 +1226,13 @@ struct display_info_t
     }
     else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Input Devices")]) {
         [self showCaptureView: _qtkView];
-        if ([_qtkWidthTextField intValue] <= 0)
-            [self qtkChanged:nil];
-
+        [self qtkChanged:nil];
         [self qtkAudioChanged:nil];
 
         [self setMRL: @""];
 
         if ([_qtkVideoCheckbox state] && _avCurrentDeviceUID)
-            [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", _avCurrentDeviceUID]];
+            [self setMRL:[NSString stringWithFormat:@"avcapture://%@", _avCurrentDeviceUID]];
         else if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
             [self setMRL:[NSString stringWithFormat:@"qtsound://%@", _avCurrentAudioDeviceUID]];
     }

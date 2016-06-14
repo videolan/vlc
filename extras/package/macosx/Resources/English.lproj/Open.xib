@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11129.15" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9532"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11129.15"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -129,15 +128,9 @@
                 <outlet property="outputSettingsButton" destination="1256" id="ruY-7h-HIS"/>
                 <outlet property="qtkAudioCheckbox" destination="3492" id="5d3-k7-1dB"/>
                 <outlet property="qtkAudioDevicePopup" destination="3438" id="Jt3-3n-AjR"/>
-                <outlet property="qtkHeightLabel" destination="3349" id="1V9-Wm-BdJ"/>
-                <outlet property="qtkHeightStepper" destination="3351" id="v8k-yD-WE5"/>
-                <outlet property="qtkHeightTextField" destination="3348" id="8c7-le-9su"/>
                 <outlet property="qtkVideoCheckbox" destination="3490" id="S1B-xw-YKh"/>
                 <outlet property="qtkVideoDevicePopup" destination="3071" id="wma-HH-ELO"/>
                 <outlet property="qtkView" destination="3013" id="Wg4-GC-17d"/>
-                <outlet property="qtkWidthLabel" destination="3347" id="oHc-a5-8wQ"/>
-                <outlet property="qtkWidthStepper" destination="3350" id="X4f-so-Mux"/>
-                <outlet property="qtkWidthTextField" destination="3346" id="ldN-GB-hNL"/>
                 <outlet property="screenFPSLabel" destination="2351" id="fNh-dQ-cWm"/>
                 <outlet property="screenFPSStepper" destination="2352" id="5MV-V5-oeN"/>
                 <outlet property="screenFPSTextField" destination="2349" id="Ptg-Br-V44"/>
@@ -1348,13 +1341,13 @@ Check the device's connection, make sure that the latest EyeTV software is insta
             <rect key="frame" x="0.0" y="0.0" width="528" height="222"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <box title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3014">
+                <box ambiguous="YES" misplaced="YES" title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3014">
                     <rect key="frame" x="17" y="87" width="494" height="117"/>
-                    <view key="contentView" id="5ez-W4-Btp">
+                    <view key="contentView" ambiguous="YES" id="5ez-W4-Btp">
                         <rect key="frame" x="2" y="2" width="490" height="113"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3071">
+                            <popUpButton verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3071">
                                 <rect key="frame" x="102" y="49" width="286" height="26"/>
                                 <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3074" id="3072">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1371,66 +1364,6 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                                     <action selector="qtkChanged:" target="-2" id="3BT-jd-WjF"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3346">
-                                <rect key="frame" x="157" y="14" width="43" height="19"/>
-                                <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="0" drawsBackground="YES" id="3357">
-                                    <font key="font" metaFont="smallSystem"/>
-                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                                <connections>
-                                    <action selector="qtkChanged:" target="-2" id="Mam-ry-7Jz"/>
-                                    <outlet property="nextKeyView" destination="3348" id="3359"/>
-                                </connections>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3347">
-                                <rect key="frame" x="80" y="16" width="72" height="14"/>
-                                <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Image width:" id="3356">
-                                    <font key="font" metaFont="smallSystem"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3348">
-                                <rect key="frame" x="364" y="14" width="43" height="19"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="43" id="iLp-7C-0nw"/>
-                                </constraints>
-                                <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="0" drawsBackground="YES" id="3355">
-                                    <font key="font" metaFont="smallSystem"/>
-                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                                <connections>
-                                    <action selector="qtkChanged:" target="-2" id="p6V-2h-C7A"/>
-                                    <outlet property="nextKeyView" destination="3346" id="3368"/>
-                                </connections>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3349">
-                                <rect key="frame" x="225" y="16" width="134" height="14"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="130" id="HDf-XQ-rez"/>
-                                </constraints>
-                                <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Image height:" id="3354">
-                                    <font key="font" metaFont="smallSystem"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3350">
-                                <rect key="frame" x="206" y="12" width="15" height="22"/>
-                                <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="20" maxValue="2000" valueWraps="YES" id="3353"/>
-                                <connections>
-                                    <action selector="qtkChanged:" target="-2" id="NJN-8p-dqB"/>
-                                </connections>
-                            </stepper>
-                            <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3351">
-                                <rect key="frame" x="414" y="12" width="15" height="22"/>
-                                <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="20" maxValue="1000" valueWraps="YES" id="3352"/>
-                                <connections>
-                                    <action selector="qtkChanged:" target="-2" id="lg6-bz-uHy"/>
-                                </connections>
-                            </stepper>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="3490">
                                 <rect key="frame" x="15" y="86" width="62" height="18"/>
                                 <buttonCell key="cell" type="check" title="Video" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3491">
@@ -1443,25 +1376,10 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                             </button>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="3351" secondAttribute="bottom" constant="14" id="3iF-FU-3Z0"/>
                             <constraint firstItem="3071" firstAttribute="centerX" secondItem="5ez-W4-Btp" secondAttribute="centerX" id="7gd-q5-SBe"/>
-                            <constraint firstItem="3351" firstAttribute="leading" secondItem="3348" secondAttribute="trailing" constant="9" id="A7c-RK-idg"/>
-                            <constraint firstItem="3347" firstAttribute="leading" secondItem="5ez-W4-Btp" secondAttribute="leading" constant="82" id="DCa-ox-OQb"/>
-                            <constraint firstItem="3346" firstAttribute="centerY" secondItem="3350" secondAttribute="centerY" id="DPZ-9g-tSD"/>
-                            <constraint firstItem="3348" firstAttribute="top" secondItem="3071" secondAttribute="bottom" constant="19" id="FBx-EZ-4zr"/>
-                            <constraint firstItem="3346" firstAttribute="leading" secondItem="3347" secondAttribute="trailing" constant="7" id="IaJ-OW-btp"/>
-                            <constraint firstItem="3349" firstAttribute="leading" secondItem="3350" secondAttribute="trailing" constant="8" symbolic="YES" id="MXO-4R-NUH"/>
                             <constraint firstItem="3490" firstAttribute="top" secondItem="5ez-W4-Btp" secondAttribute="top" constant="11" id="PqJ-Sc-hIR"/>
-                            <constraint firstItem="3348" firstAttribute="centerY" secondItem="3349" secondAttribute="centerY" id="RvS-70-Dje"/>
-                            <constraint firstItem="3348" firstAttribute="leading" secondItem="3349" secondAttribute="trailing" constant="7" id="TeC-51-llH"/>
-                            <constraint firstItem="3348" firstAttribute="centerY" secondItem="3351" secondAttribute="centerY" id="VT7-LJ-xXh"/>
                             <constraint firstItem="3490" firstAttribute="leading" secondItem="5ez-W4-Btp" secondAttribute="leading" constant="17" id="af2-gj-bJD"/>
-                            <constraint firstItem="3346" firstAttribute="centerY" secondItem="3347" secondAttribute="centerY" id="huf-aI-n6z"/>
-                            <constraint firstItem="3346" firstAttribute="width" secondItem="3348" secondAttribute="width" id="mpS-dr-YDh"/>
-                            <constraint firstAttribute="trailing" secondItem="3351" secondAttribute="trailing" constant="63" id="qtL-Zl-qjR"/>
-                            <constraint firstItem="3350" firstAttribute="leading" secondItem="3346" secondAttribute="trailing" constant="8" id="xO5-aI-C19"/>
                             <constraint firstItem="3071" firstAttribute="top" secondItem="3490" secondAttribute="bottom" constant="15" id="xtJ-Dv-dQN"/>
-                            <constraint firstAttribute="bottom" secondItem="3347" secondAttribute="bottom" constant="16" id="yLO-DR-h8n"/>
                         </constraints>
                     </view>
                     <constraints>
@@ -1470,13 +1388,13 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                     <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                     <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </box>
-                <box title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3429">
+                <box ambiguous="YES" misplaced="YES" title="Title" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="3429">
                     <rect key="frame" x="18" y="16" width="492" height="71"/>
-                    <view key="contentView" id="vMn-AX-cmE">
+                    <view key="contentView" ambiguous="YES" id="vMn-AX-cmE">
                         <rect key="frame" x="2" y="2" width="488" height="67"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3438">
+                            <popUpButton verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3438">
                                 <rect key="frame" x="101" y="12" width="286" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="281" id="nyI-r0-6X3"/>
