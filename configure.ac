@@ -4094,7 +4094,7 @@ AS_IF([test "${enable_taglib}" != "no"], [
 dnl
 dnl  libsecret
 dnl
-PKG_ENABLE_MODULES_VLC([SECRET], [], [libsecret-1], [use libsecret for keystore], [auto])
+PKG_ENABLE_MODULES_VLC([SECRET], [], [libsecret-1 >= 0.18], [use libsecret for keystore], [auto])
 
 dnl
 dnl  kwallet
