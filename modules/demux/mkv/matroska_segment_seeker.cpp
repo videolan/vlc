@@ -427,7 +427,12 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
 
     while( ms.cluster == NULL || ms.cluster->GetEndPosition() < fpos )
     {
-        ms.cluster    = static_cast<KaxCluster*>( ms.ep->Get() );
+        if( !( ms.cluster = static_cast<KaxCluster*>( ms.ep->Get() ) ) )
+        {
+            msg_Err( &ms.sys.demuxer, "unable to read KaxCluster during seek, giving up" );
+            return;
+        }
+
         i_cluster_pos = ms.cluster->GetElementPosition();
 
         add_cluster_position( i_cluster_pos );
