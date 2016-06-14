@@ -189,6 +189,31 @@ enum demux_query_e
      * arg1= int */
     DEMUX_SET_SEEKPOINT,        /* arg1= int            can fail */
 
+    /** Check which INPUT_UPDATE_XXX flag is set and reset the ones set.
+     *
+     * The unsigned* argument is set with the flags needed to be checked,
+     * on return it contains the values that were reset during the call 
+     *
+     * This can can fail, in which case flags from demux_t.info.i_update
+     * are read/reset
+     *
+     * arg1= unsigned * */
+    DEMUX_TEST_AND_CLEAR_FLAGS, /* arg1= unsigned*      can fail */
+
+    /** Read the title number currently playing
+     *
+     * Can fail, in which case demux_t.info.i_title is used
+     *
+     * arg1= int * */
+    DEMUX_GET_TITLE,            /* arg1= int*           can fail */
+
+    /* Read the seekpoint/chapter currently playing
+     *
+     * Can fail, in which case demux_t.info.i_seekpoint is used
+     *
+     * arg1= int * */
+    DEMUX_GET_SEEKPOINT,        /* arg1= int*           can fail */
+
     /* I. Common queries to access_demux and demux */
     /* POSITION double between 0.0 and 1.0 */
     DEMUX_GET_POSITION = 0x300, /* arg1= double *       res=    */

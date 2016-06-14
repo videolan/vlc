@@ -659,6 +659,9 @@ static bool SkipAPETag( demux_t *p_demux )
 
 unsigned demux_TestAndClearFlags( demux_t *p_demux, unsigned flags )
 {
+    unsigned i_update;
+    if ( demux_Control( p_demux, DEMUX_TEST_AND_CLEAR_FLAGS, &i_update ) == VLC_SUCCESS )
+        return i_update;
     unsigned ret = p_demux->info.i_update & flags;
     p_demux->info.i_update &= ~flags;
     return ret;
@@ -666,10 +669,16 @@ unsigned demux_TestAndClearFlags( demux_t *p_demux, unsigned flags )
 
 int demux_GetTitle( demux_t *p_demux )
 {
+    int i_title;
+    if ( demux_Control( p_demux, DEMUX_GET_TITLE, &i_title ) == VLC_SUCCESS )
+        return i_title;
     return p_demux->info.i_title;
 }
 
 int demux_GetSeekpoint( demux_t *p_demux )
 {
+    int i_seekpoint;
+    if ( demux_Control( p_demux, DEMUX_GET_SEEKPOINT, &i_seekpoint ) == VLC_SUCCESS  )
+        return i_seekpoint;
     return p_demux->info.i_seekpoint;
 }
