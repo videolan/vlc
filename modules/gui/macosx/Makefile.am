@@ -6,10 +6,10 @@ guidir = $(pluginsdir)/gui
 libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc -F${CONTRIB_DIR}
 libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreServices \
-	-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook \
-	-Wl,-framework,WebKit -Wl,-framework,CoreAudio -Wl,-framework,SystemConfiguration \
-	-Wl,-framework,ScriptingBridge -F${CONTRIB_DIR} -Wl,-framework,BGHUDAppKit \
-	-Wl,-framework,QuartzCore
+	-Wl,-framework,AVFoundation -Wl,-framework,CoreMedia -Wl,-framework,IOKit \
+	-Wl,-framework,AddressBook -Wl,-framework,WebKit -Wl,-framework,CoreAudio \
+	-Wl,-framework,SystemConfiguration -Wl,-framework,ScriptingBridge \
+	-F${CONTRIB_DIR} -Wl,-framework,BGHUDAppKit -Wl,-framework,QuartzCore
 
 if HAVE_SPARKLE
 libmacosx_plugin_la_LDFLAGS += -Wl,-framework,Sparkle

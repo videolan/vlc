@@ -33,7 +33,8 @@
 #import <paths.h>
 #import <IOKit/IOBSD.h>
 #import <Cocoa/Cocoa.h>
-#import <QTKit/QTKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import <CoreMedia/CoreMedia.h>
 
 #import "intf.h"
 #import "VLCPlaylist.h"
@@ -54,10 +55,10 @@ struct display_info_t
 {
     VLCOutput *_output;
     BOOL b_outputNibLoaded;
-    NSArray *_qtkvideoDevices;
-    NSArray *_qtkaudioDevices;
-    NSString *_qtkCurrentDeviceUID;
-    NSString *_qtkCurrentAudioDeviceUID;
+    NSArray *_avvideoDevices;
+    NSArray *_avaudioDevices;
+    NSString *_avCurrentDeviceUID;
+    NSString *_avCurrentAudioDeviceUID;
 
     BOOL b_autoplay;
     BOOL b_nodvdmenus;
@@ -210,21 +211,20 @@ struct display_info_t
 
     [self updateQTKVideoDevices];
     [_qtkVideoDevicePopup removeAllItems];
-    msg_Dbg(getIntf(), "Found %lu video capture devices", _qtkvideoDevices.count);
+    msg_Dbg(getIntf(), "Found %lu video capture devices", _avvideoDevices.count);
 
-    if (_qtkvideoDevices.count >= 1) {
-        if (!_qtkCurrentDeviceUID)
-            _qtkCurrentDeviceUID = [[[QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo] uniqueID]
+    if (_avvideoDevices.count >= 1) {
+        if (!_avCurrentDeviceUID)
+            _avCurrentDeviceUID = [[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] uniqueID]
                                     stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
-        NSUInteger deviceCount = _qtkvideoDevices.count;
+        NSUInteger deviceCount = _avvideoDevices.count;
         for (int ivideo = 0; ivideo < deviceCount; ivideo++) {
-            QTCaptureDevice *qtkDevice;
-            qtkDevice = _qtkvideoDevices[ivideo];
+            AVCaptureDevice *avDevice = _avvideoDevices[ivideo];
             // allow same name for multiple times
-            [[_qtkVideoDevicePopup menu] addItemWithTitle:[qtkDevice localizedDisplayName] action:nil keyEquivalent:@""];
+            [[_qtkVideoDevicePopup menu] addItemWithTitle:[avDevice localizedName] action:nil keyEquivalent:@""];
 
-            if ([[[qtkDevice uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:_qtkCurrentDeviceUID])
+            if ([[[avDevice uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:_avCurrentDeviceUID])
                 [_qtkVideoDevicePopup selectItemAtIndex:ivideo];
         }
     } else {
@@ -235,22 +235,23 @@ struct display_info_t
     [_screenqtkAudioPopup removeAllItems];
 
     [self updateQTKAudioDevices];
-    msg_Dbg(getIntf(), "Found %lu audio capture devices", _qtkaudioDevices.count);
+    msg_Dbg(getIntf(), "Found %lu audio capture devices", _avaudioDevices.count);
 
-    if (_qtkaudioDevices.count >= 1) {
-        if (!_qtkCurrentAudioDeviceUID)
-            _qtkCurrentAudioDeviceUID = [[[QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeSound] uniqueID]
+    if (_avaudioDevices.count >= 1) {
+        if (!_avCurrentAudioDeviceUID)
+            _avCurrentAudioDeviceUID = [[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio] uniqueID]
                                          stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
-        NSUInteger deviceCount = _qtkaudioDevices.count;
+        NSUInteger deviceCount = _avaudioDevices.count;
         for (int iaudio = 0; iaudio < deviceCount; iaudio++) {
-            QTCaptureDevice *qtkaudioDevice = _qtkaudioDevices[iaudio];
+            AVCaptureDevice *avAudioDevice = _avaudioDevices[iaudio];
 
             // allow same name for multiple times
-            [[_qtkAudioDevicePopup menu] addItemWithTitle:[qtkaudioDevice localizedDisplayName] action:nil keyEquivalent:@""];
-            [[_screenqtkAudioPopup menu] addItemWithTitle:[qtkaudioDevice localizedDisplayName] action:nil keyEquivalent:@""];
+            NSString *localizedName = [avAudioDevice localizedName];
+            [[_qtkAudioDevicePopup menu] addItemWithTitle:localizedName action:nil keyEquivalent:@""];
+            [[_screenqtkAudioPopup menu] addItemWithTitle:localizedName action:nil keyEquivalent:@""];
 
-            if ([[[qtkaudioDevice uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:_qtkCurrentAudioDeviceUID]) {
+            if ([[[avAudioDevice uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:_avCurrentAudioDeviceUID]) {
                 [_qtkAudioDevicePopup selectItemAtIndex:iaudio];
                 [_screenqtkAudioPopup selectItemAtIndex:iaudio];
             }
@@ -485,15 +486,15 @@ struct display_info_t
                     [options addObject: @"screen-follow-mouse"];
                 else
                     [options addObject: @"no-screen-follow-mouse"];
-                if ([_screenqtkAudioCheckbox state] && _qtkCurrentAudioDeviceUID)
-                    [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _qtkCurrentAudioDeviceUID]];
+                if ([_screenqtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
+                    [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _avCurrentAudioDeviceUID]];
             }
             else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Input Devices")]) {
                 if ([_qtkVideoCheckbox state]) {
                     [options addObject: [NSString stringWithFormat: @"qtcapture-Width=%i", [_qtkWidthTextField intValue]]];
                     [options addObject: [NSString stringWithFormat: @"qtcapture-Height=%i", [_qtkHeightTextField intValue]]];
-                    if ([_qtkAudioCheckbox state] && _qtkCurrentAudioDeviceUID)
-                        [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _qtkCurrentAudioDeviceUID]];
+                    if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
+                        [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _avCurrentAudioDeviceUID]];
                 }
             }
         }
@@ -525,22 +526,23 @@ struct display_info_t
 - (IBAction)qtkChanged:(id)sender
 {
     NSInteger selectedDevice = [_qtkVideoDevicePopup indexOfSelectedItem];
-    if (_qtkvideoDevices.count >= 1) {
-        NSValue *sizes = [[[_qtkvideoDevices[selectedDevice] formatDescriptions] firstObject] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
+    if (_avvideoDevices.count >= 1) {
+        CMVideoFormatDescriptionRef formatDescription = [[[_avvideoDevices[selectedDevice] formats] firstObject] formatDescription];
+        CMVideoDimensions dimensions = CMVideoFormatDescriptionGetDimensions(formatDescription);
 
-        [_qtkWidthTextField setIntValue: [sizes sizeValue].width];
-        [_qtkHeightTextField setIntValue: [sizes sizeValue].height];
+        [_qtkWidthTextField setIntValue: dimensions.width];
+        [_qtkHeightTextField setIntValue: dimensions.height];
         [_qtkWidthStepper setIntValue: [_qtkWidthTextField intValue]];
         [_qtkHeightStepper setIntValue: [_qtkHeightTextField intValue]];
-        _qtkCurrentDeviceUID = [[(QTCaptureDevice *)_qtkvideoDevices[selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        _avCurrentDeviceUID = [[(AVCaptureDevice *)_avvideoDevices[selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
 }
 
 - (IBAction)qtkAudioChanged:(id)sender
 {
     NSInteger selectedDevice = [_qtkAudioDevicePopup indexOfSelectedItem];
-    if (_qtkaudioDevices.count >= 1) {
-        _qtkCurrentAudioDeviceUID = [[(QTCaptureDevice *)_qtkaudioDevices[selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    if (_avaudioDevices.count >= 1) {
+        _avCurrentAudioDeviceUID = [[(AVCaptureDevice *)_avaudioDevices[selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
     [_screenqtkAudioPopup selectItemAtIndex: selectedDevice];
     [_qtkAudioDevicePopup selectItemAtIndex: selectedDevice];
@@ -1201,7 +1203,7 @@ struct display_info_t
         int screenIindex = config_GetInt(p_intf, "screen-index");
         int displayID = config_GetInt(p_intf, "screen-display-id");
         unsigned int displayCount = 0;
-        CGLError returnedError;
+        CGError returnedError;
         struct display_info_t *item;
         NSValue *v;
 
@@ -1246,10 +1248,10 @@ struct display_info_t
 
         [self setMRL: @""];
 
-        if ([_qtkVideoCheckbox state] && _qtkCurrentDeviceUID)
-            [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", _qtkCurrentDeviceUID]];
-        else if ([_qtkAudioCheckbox state] && _qtkCurrentAudioDeviceUID)
-            [self setMRL:[NSString stringWithFormat:@"qtsound://%@", _qtkCurrentAudioDeviceUID]];
+        if ([_qtkVideoCheckbox state] && _avCurrentDeviceUID)
+            [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", _avCurrentDeviceUID]];
+        else if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
+            [self setMRL:[NSString stringWithFormat:@"qtsound://%@", _avCurrentAudioDeviceUID]];
     }
 }
 
@@ -1441,12 +1443,14 @@ struct display_info_t
 
 - (void)updateQTKVideoDevices
 {
-    _qtkvideoDevices = [[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]];
+    _avvideoDevices = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]
+                         arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]];
 }
 
 - (void)updateQTKAudioDevices
 {
-    _qtkaudioDevices = [[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeSound] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]];
+    _avaudioDevices = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio]
+                        arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]];
 }
 
 @end
