@@ -375,7 +375,7 @@ static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
         return;
 
     /* a seek on the Chromecast flushes its buffers */
-    p_sys->p_intf->requestPlayerSeek();
+    p_sys->p_intf->requestPlayerSeek( VLC_TS_INVALID );
 
     sout_StreamFlush( p_sys->p_out, id );
 }

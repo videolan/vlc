@@ -40,6 +40,9 @@ typedef struct
     double (*pf_get_position)(void*);
 
     void (*pf_wait_app_started)(void*);
+
+    void (*pf_request_seek)(void*, mtime_t pos);
+    void (*pf_wait_seek_done)(void*);
 } chromecast_common;
 
 # ifdef __cplusplus
