@@ -110,11 +110,17 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , i_requestId(0)
  , has_input(false)
  , p_ctl_thread_interrupt(p_interrupt)
+ , m_time_playback_started( VLC_TS_INVALID )
+ , i_ts_local_start( VLC_TS_INVALID )
+ , i_length( VLC_TS_INVALID )
 {
     vlc_mutex_init(&lock);
     vlc_cond_init(&loadCommandCond);
 
     common.p_opaque = this;
+    common.pf_get_position     = get_position;
+    common.pf_get_time         = get_time;
+    common.pf_set_length       = set_length;
 
     assert( var_Type( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME) == 0 );
     if (var_Create( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME, VLC_VAR_ADDRESS ) == VLC_SUCCESS )
@@ -188,6 +194,7 @@ void intf_sys_t::setHasInput( bool b_has_input, const std::string mime_type )
         if ( receiverState == RECEIVER_IDLE )
         {
             // we cannot start a new load when the last one is still processing
+            i_ts_local_start = VLC_TS_0;
             msgPlayerLoad();
             setPlayerStatus(CMD_LOAD_SENT);
         }
@@ -553,17 +560,32 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                 case RECEIVER_PLAYING:
                     /* TODO reset demux PCR ? */
                     setPlayerStatus(CMD_PLAYBACK_SENT);
+                    m_time_playback_started = mdate();
+#ifndef NDEBUG
+                    msg_Dbg( p_module, "Playback started now:%" PRId64 " i_ts_local_start:%" PRId64, m_time_playback_started, i_ts_local_start);
+#endif
                     break;
 
                 case RECEIVER_PAUSED:
 #ifndef NDEBUG
-                    msg_Dbg( p_module, "Playback paused");
+                    msg_Dbg( p_module, "Playback paused date_play_start:%" PRId64, m_time_playback_started);
 #endif
+
+                    if ( m_time_playback_started != VLC_TS_INVALID && oldPlayerState == RECEIVER_PLAYING )
+                    {
+                        /* this is a pause generated remotely, adjust the playback time */
+                        i_ts_local_start += mdate() - m_time_playback_started;
+#ifndef NDEBUG
+                        msg_Dbg( p_module, "updated i_ts_local_start:%" PRId64, i_ts_local_start);
+#endif
+                    }
+                    m_time_playback_started = VLC_TS_INVALID;
                     break;
 
                 case RECEIVER_IDLE:
                     if ( has_input )
                         setPlayerStatus(NO_CMD_PENDING);
+                    m_time_playback_started = VLC_TS_INVALID;
                     break;
                 }
             }
@@ -571,6 +593,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
             if ( cmd_status != CMD_LOAD_SENT && receiverState == RECEIVER_IDLE && has_input )
             {
                 msg_Dbg( p_module, "the device missed the LOAD command");
+                i_ts_local_start = VLC_TS_0;
                 msgPlayerLoad();
                 setPlayerStatus(CMD_LOAD_SENT);
             }
@@ -951,4 +974,24 @@ void intf_sys_t::requestPlayerSeek()
 {
     requested_seek = true;
     notifySendRequest();
+}
+
+mtime_t intf_sys_t::get_time(void *pt)
+{
+    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    vlc_mutex_locker locker( &p_this->lock );
+    return p_this->getPlaybackTimestamp();
+}
+
+double intf_sys_t::get_position(void *pt)
+{
+    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    vlc_mutex_locker locker( &p_this->lock );
+    return p_this->getPlaybackPosition( p_this->i_length );
+}
+
+void intf_sys_t::set_length(void *pt, mtime_t length)
+{
+    intf_sys_t *p_this = reinterpret_cast<intf_sys_t*>(pt);
+    p_this->i_length = length;
 }

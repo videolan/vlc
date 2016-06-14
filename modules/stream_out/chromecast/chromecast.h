@@ -182,12 +182,49 @@ private:
     static void* ChromecastThread(void* p_data);
     vlc_interrupt_t *p_ctl_thread_interrupt;
 
+    mtime_t getPlaybackTimestamp() const
+    {
+        switch( receiverState )
+        {
+        case RECEIVER_PLAYING:
+            return ( mdate() - m_time_playback_started ) + i_ts_local_start;
+
+        case RECEIVER_IDLE:
+            msg_Dbg(p_module, "receiver idle using buffering time %" PRId64, i_ts_local_start);
+            break;
+        case RECEIVER_BUFFERING:
+            msg_Dbg(p_module, "receiver buffering using buffering time %" PRId64, i_ts_local_start);
+            break;
+        case RECEIVER_PAUSED:
+            msg_Dbg(p_module, "receiver paused using buffering time %" PRId64, i_ts_local_start);
+            break;
+        }
+        return i_ts_local_start;
+    }
+
+    double getPlaybackPosition( mtime_t i_length ) const
+    {
+        if( i_length > 0 && m_time_playback_started != VLC_TS_INVALID)
+            return (double) getPlaybackTimestamp() / (double)( i_length );
+        return 0.0;
+    }
+
+    /* local date when playback started/resumed, used by monotone clock */
+    mtime_t           m_time_playback_started;
+    /* local playback time of the input when playback started/resumed */
+    mtime_t           i_ts_local_start;
+    mtime_t           i_length;
+
     int recvPacket(bool &b_msgReceived, uint32_t &i_payloadSize,
                    unsigned *pi_received, uint8_t *p_data, bool *pb_pingTimeout,
                    int *pi_wait_delay, int *pi_wait_retries);
 
     /* shared structure with the demux-filter */
     chromecast_common      common;
+
+    static void set_length(void*, mtime_t length);
+    static mtime_t get_time(void*);
+    static double get_position(void*);
 };
 
 #endif /* VLC_CHROMECAST_H */

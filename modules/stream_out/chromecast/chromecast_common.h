@@ -35,6 +35,9 @@ typedef struct
 {
     void *p_opaque;
 
+    void (*pf_set_length)(void*, mtime_t length);
+    mtime_t (*pf_get_time)(void*);
+    double (*pf_get_position)(void*);
 } chromecast_common;
 
 # ifdef __cplusplus

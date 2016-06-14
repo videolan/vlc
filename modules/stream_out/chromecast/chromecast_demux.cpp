@@ -48,6 +48,25 @@ struct demux_sys_t
     {
     }
 
+    /**
+     * @brief getPlaybackTime
+     * @return the current playback time on the device or VLC_TS_INVALID if unknown
+     */
+    mtime_t getPlaybackTime()
+    {
+        return p_renderer->pf_get_time( p_renderer->p_opaque );
+    }
+
+    double getPlaybackPosition()
+    {
+        return p_renderer->pf_get_position( p_renderer->p_opaque );
+    }
+
+    void setLength( mtime_t length )
+    {
+        p_renderer->pf_set_length( p_renderer->p_opaque, length );
+    }
+
     int Demux()
     {
         return demux_Demux( p_demux->p_next );
@@ -67,6 +86,32 @@ static int Demux( demux_t *p_demux_filter )
 
 static int Control( demux_t *p_demux_filter, int i_query, va_list args)
 {
+    demux_sys_t *p_sys = p_demux_filter->p_sys;
+
+    switch (i_query)
+    {
+    case DEMUX_GET_POSITION:
+        *va_arg( args, double * ) = p_sys->getPlaybackPosition();
+        return VLC_SUCCESS;
+
+    case DEMUX_GET_TIME:
+        *va_arg(args, int64_t *) = p_sys->getPlaybackTime();
+        return VLC_SUCCESS;
+
+    case DEMUX_GET_LENGTH:
+    {
+        int ret;
+        va_list ap;
+
+        va_copy( ap, args );
+        ret = demux_vaControl( p_demux_filter->p_next, i_query, args );
+        if( ret == VLC_SUCCESS )
+            p_sys->setLength( *va_arg( ap, int64_t * ) );
+        va_end( ap );
+        return ret;
+    }
+    }
+
     return demux_vaControl( p_demux_filter->p_next, i_query, args );
 }
 
