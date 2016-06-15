@@ -91,7 +91,6 @@ static const vlc_input_callback_t p_input_callbacks[] =
     CALLBACK( "state", StateCallback ),
     CALLBACK( "rate", RateCallback ),
     CALLBACK( "position", PositionCallback ),
-    CALLBACK( "position-offset", PositionCallback ),
     CALLBACK( "time", TimeCallback ),
     CALLBACK( "time-offset", TimeOffsetCallback ),
     CALLBACK( "bookmark", BookmarkCallback ),
@@ -146,7 +145,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     /* Position */
     var_Create( p_input, "position",  VLC_VAR_FLOAT );
-    var_Create( p_input, "position-offset",  VLC_VAR_FLOAT );
 
     /* Time */
     var_Create( p_input, "time", VLC_VAR_INTEGER );
@@ -586,32 +584,20 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
                              void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    if( !strcmp( psz_cmd, "position-offset" ) )
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+
+    /* Update "length" for better intf behaviour */
+    const int64_t i_length = var_GetInteger( p_input, "length" );
+    if( i_length > 0 && newval.f_float >= 0.f && newval.f_float <= 1.f )
     {
-        float f_position = var_GetFloat( p_input, "position" ) + newval.f_float;
-        if( f_position < 0.f )
-            f_position = 0.f;
-        else if( f_position > 1.f )
-            f_position = 1.f;
-        var_SetFloat( p_this, "position", f_position );
-    }
-    else
-    {
-        /* Update "length" for better intf behaviour */
-        const int64_t i_length = var_GetInteger( p_input, "length" );
-        if( i_length > 0 && newval.f_float >= 0.f && newval.f_float <= 1.f )
-        {
-            vlc_value_t val;
+        vlc_value_t val;
 
-            val.i_int = i_length * newval.f_float;
-            var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
-        }
-
-        /* */
-        input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &newval );
+        val.i_int = i_length * newval.f_float;
+        var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
     }
+
+    input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &newval );
     return VLC_SUCCESS;
 }
 
