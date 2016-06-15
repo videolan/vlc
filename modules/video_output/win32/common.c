@@ -75,8 +75,6 @@ int CommonInit(vout_display_t *vd)
     sys->event = EventThreadCreate(vd);
     if (!sys->event)
         return VLC_EGENERIC;
-#elif defined(HAVE_ID3D11VIDEODECODER)
-    sys->context_lock = INVALID_HANDLE_VALUE;
 #endif
 
     event_cfg_t cfg;
