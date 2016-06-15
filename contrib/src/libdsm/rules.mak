@@ -11,6 +11,11 @@ endif
 $(TARBALLS)/libdsm-$(LIBDSM_VERSION).tar.gz:
 	$(call download,$(LIBDSM_URL))
 
+LIBDSM_CONF = $(HOSTCONF)
+
+ifndef WITH_OPTIMIZATION
+LIBDSM_CONF += --enable-debug
+endif
 .sum-libdsm: libdsm-$(LIBDSM_VERSION).tar.gz
 
 libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
@@ -20,6 +25,6 @@ libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
 DEPS_libdsm = libtasn1 iconv
 
 .libdsm: libdsm
-	cd $< && $(HOSTVARS) ./configure --disable-programs $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure --disable-programs $(LIBDSM_CONF)
 	cd $< && $(MAKE) install
 	touch $@
