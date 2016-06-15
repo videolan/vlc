@@ -87,7 +87,6 @@ struct decoder_sys_t
     size_t i_csd_count;
     size_t i_csd_send;
 
-    bool b_update_format;
     bool b_has_format;
 
     int64_t i_preroll_end;
@@ -921,29 +920,6 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
     {
         picture_t *p_pic = NULL;
 
-        /* Use the aspect ratio provided by the input (ie read from packetizer).
-         * Don't check the current value of the aspect ratio in fmt_out, since we
-         * want to allow changes in it to propagate. */
-        if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0
-         && (p_dec->fmt_out.video.i_sar_num != p_dec->fmt_in.video.i_sar_num ||
-             p_dec->fmt_out.video.i_sar_den != p_dec->fmt_in.video.i_sar_den))
-        {
-            p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
-            p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
-            p_sys->b_update_format = true;
-        }
-
-        if (p_sys->b_update_format)
-        {
-            p_sys->b_update_format = false;
-            if (decoder_UpdateVideoFormat(p_dec) != 0)
-            {
-                msg_Err(p_dec, "decoder_UpdateVideoFormat failed");
-                p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
-                return -1;
-            }
-        }
-
         /* If the oldest input block had no PTS, the timestamp of
          * the frame returned by MediaCodec might be wrong so we
          * overwrite it with the corresponding dts. Call FifoGet
@@ -1046,8 +1022,14 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             p_sys->u.video.i_slice_height = 0;
             p_sys->u.video.i_stride = p_dec->fmt_out.video.i_width;
         }
-        p_sys->b_update_format = true;
+
         p_sys->b_has_format = true;
+
+        if (decoder_UpdateVideoFormat(p_dec) != 0)
+        {
+            msg_Err(p_dec, "decoder_UpdateVideoFormat failed");
+            return -1;
+        }
         return 0;
     }
 }
