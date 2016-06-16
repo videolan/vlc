@@ -277,10 +277,10 @@ enum demux_query_e
 
     /* II. Specific access_demux queries */
 
-    /* DEMUX_CAN_CONTROL_RATE is called only if DEMUX_CAN_CONTROL_PACE has returned false.
-     * *pb_rate should be true when the rate can be changed (using DEMUX_SET_RATE)
-     * *pb_ts_rescale should be true when the timestamps (pts/dts/pcr) have to be rescaled */
-    DEMUX_CAN_CONTROL_RATE,     /* arg1= bool*pb_rate arg2= bool*pb_ts_rescale  can fail(assume false) */
+    /* DEMUX_CAN_CONTROL_RATE is called only if DEMUX_CAN_CONTROL_PACE has
+     *  returned false. *pb_rate should be true when the rate can be changed
+     * (using DEMUX_SET_RATE). */
+    DEMUX_CAN_CONTROL_RATE,     /* arg1= bool*pb_rate */
     /* DEMUX_SET_RATE is called only if DEMUX_CAN_CONTROL_RATE has returned true.
      * It should return the value really used in *pi_rate */
     DEMUX_SET_RATE,             /* arg1= int*pi_rate                                        can fail */

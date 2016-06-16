@@ -2337,11 +2337,13 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         if( !in->b_can_pace_control )
         {
             if( demux_Control( p_demux, DEMUX_CAN_CONTROL_RATE,
-                                &in->b_can_rate_control, &in->b_rescale_ts ) )
+                                &in->b_can_rate_control ) )
             {
                 in->b_can_rate_control = false;
                 in->b_rescale_ts = true; /* not used */
             }
+            else
+                in->b_rescale_ts = !in->b_can_rate_control;
         }
         else
         {

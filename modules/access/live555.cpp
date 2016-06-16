@@ -1573,13 +1573,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_CAN_CONTROL_RATE:
             pb = (bool*)va_arg( args, bool * );
-            pb2 = (bool*)va_arg( args, bool * );
 
             *pb = (p_sys->rtsp != NULL) &&
                     (p_sys->f_npt_length > 0) &&
                     ( !var_GetBool( p_demux, "rtsp-kasenna" ) ||
                       !var_GetBool( p_demux, "rtsp-wmserver" ) );
-            *pb2 = false;
             return VLC_SUCCESS;
 
         case DEMUX_SET_RATE:
