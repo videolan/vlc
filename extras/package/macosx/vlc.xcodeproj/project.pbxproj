@@ -472,6 +472,10 @@
 		6B846FE61CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FE11CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m */; };
 		6B846FE71CF5D88C00112E54 /* VLCHUDSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */; };
 		6B846FEB1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B846FEA1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m */; };
+		6BBBB8AA1D108A17001BD9BA /* VLCRendererDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBB8A81D108A17001BD9BA /* VLCRendererDialog.m */; };
+		6BBBB8B41D112BAC001BD9BA /* VLCRendererItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBB8B11D10A994001BD9BA /* VLCRendererItem.m */; };
+		6BBBB8B71D114628001BD9BA /* VLCRendererDiscovery.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBB8B61D114628001BD9BA /* VLCRendererDiscovery.m */; };
+		6BBBB8B81D12AF72001BD9BA /* VLCRendererDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6BBBB8AC1D108A87001BD9BA /* VLCRendererDialog.xib */; };
 		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
@@ -1273,6 +1277,13 @@
 		6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCHUDSliderCell.m; path = ../../../modules/gui/macosx/VLCHUDSliderCell.m; sourceTree = "<group>"; };
 		6B846FE91CF5DBFF00112E54 /* VLCHUDTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCHUDTextFieldCell.h; path = ../../../modules/gui/macosx/VLCHUDTextFieldCell.h; sourceTree = "<group>"; };
 		6B846FEA1CF5DBFF00112E54 /* VLCHUDTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCHUDTextFieldCell.m; path = ../../../modules/gui/macosx/VLCHUDTextFieldCell.m; sourceTree = "<group>"; };
+		6BBBB8A71D108A17001BD9BA /* VLCRendererDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCRendererDialog.h; path = ../../../modules/gui/macosx/VLCRendererDialog.h; sourceTree = "<group>"; };
+		6BBBB8A81D108A17001BD9BA /* VLCRendererDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCRendererDialog.m; path = ../../../modules/gui/macosx/VLCRendererDialog.m; sourceTree = "<group>"; };
+		6BBBB8AD1D108A87001BD9BA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/VLCRendererDialog.xib; sourceTree = "<group>"; };
+		6BBBB8B01D10A994001BD9BA /* VLCRendererItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCRendererItem.h; path = ../../../modules/gui/macosx/VLCRendererItem.h; sourceTree = "<group>"; };
+		6BBBB8B11D10A994001BD9BA /* VLCRendererItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCRendererItem.m; path = ../../../modules/gui/macosx/VLCRendererItem.m; sourceTree = "<group>"; };
+		6BBBB8B51D114628001BD9BA /* VLCRendererDiscovery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCRendererDiscovery.h; path = ../../../modules/gui/macosx/VLCRendererDiscovery.h; sourceTree = "<group>"; };
+		6BBBB8B61D114628001BD9BA /* VLCRendererDiscovery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCRendererDiscovery.m; path = ../../../modules/gui/macosx/VLCRendererDiscovery.m; sourceTree = "<group>"; };
 		7D3F6524188051F2005776C4 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/BWQuincyMain.xib; sourceTree = "<group>"; };
 		7D3F652618805297005776C4 /* BWQuincyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BWQuincyManager.h; path = ../../../modules/gui/macosx/BWQuincyManager.h; sourceTree = SOURCE_ROOT; };
 		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyManager.m; path = ../../../modules/gui/macosx/BWQuincyManager.m; sourceTree = SOURCE_ROOT; };
@@ -1938,6 +1949,7 @@
 				7D9516B91C60B6AB00D14E1A /* VLCStatusBarIcon.m */,
 				1CD366791B7A242E0054E39F /* VLCTimeSelectionPanelController.h */,
 				1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */,
+				6BBBB8AF1D10A96B001BD9BA /* Renderers */,
 				6B846FE81CF5D89500112E54 /* HUD UI Classes */,
 				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
 				5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */,
@@ -2382,6 +2394,19 @@
 				6B846FE31CF5D88C00112E54 /* VLCHUDSliderCell.m */,
 			);
 			name = "HUD UI Classes";
+			sourceTree = "<group>";
+		};
+		6BBBB8AF1D10A96B001BD9BA /* Renderers */ = {
+			isa = PBXGroup;
+			children = (
+				6BBBB8B51D114628001BD9BA /* VLCRendererDiscovery.h */,
+				6BBBB8B61D114628001BD9BA /* VLCRendererDiscovery.m */,
+				6BBBB8B01D10A994001BD9BA /* VLCRendererItem.h */,
+				6BBBB8B11D10A994001BD9BA /* VLCRendererItem.m */,
+				6BBBB8A71D108A17001BD9BA /* VLCRendererDialog.h */,
+				6BBBB8A81D108A17001BD9BA /* VLCRendererDialog.m */,
+			);
+			name = Renderers;
 			sourceTree = "<group>";
 		};
 		7D3F652A1880529C005776C4 /* QuincyKit */ = {
@@ -2975,6 +3000,7 @@
 				7D3F6523188051F2005776C4 /* BWQuincyMain.xib */,
 				7DB65D5418ABD6490053B874 /* AddonManager.xib */,
 				7DE78AC41B5D0A360019454C /* StreamOutput.xib */,
+				6BBBB8AC1D108A87001BD9BA /* VLCRendererDialog.xib */,
 				7D9516B51C60B69200D14E1A /* VLCStatusBarIconMainMenu.xib */,
 			);
 			name = xibs;
@@ -3150,6 +3176,7 @@
 				1C88BA7719DC7B2200645190 /* yosemite-window-minimize@2x.png in Resources */,
 				CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */,
 				CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */,
+				6BBBB8B81D12AF72001BD9BA /* VLCRendererDialog.xib in Resources */,
 				CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */,
 				7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */,
 				1C88BBFD19DC7C8100645190 /* ys-forward-3btns-dark.png in Resources */,
@@ -3939,6 +3966,7 @@
 				1CCB5F641A62A724004C3E90 /* coredialogs.h in Sources */,
 				1CCB5F651A62A724004C3E90 /* coredialogs.m in Sources */,
 				1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */,
+				6BBBB8AA1D108A17001BD9BA /* VLCRendererDialog.m in Sources */,
 				1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */,
 				1CCB5F681A62A724004C3E90 /* DebugMessageVisualizer.h in Sources */,
 				1CCB5F691A62A724004C3E90 /* DebugMessageVisualizer.m in Sources */,
@@ -3948,6 +3976,7 @@
 				1CCB5F6B1A62A724004C3E90 /* ExtensionsDialogProvider.m in Sources */,
 				1CCB5F6C1A62A724004C3E90 /* ExtensionsManager.h in Sources */,
 				1CCB5F6D1A62A724004C3E90 /* ExtensionsManager.m in Sources */,
+				6BBBB8B41D112BAC001BD9BA /* VLCRendererItem.m in Sources */,
 				1CCB5F6E1A62A724004C3E90 /* eyetv.h in Sources */,
 				1CCB5F6F1A62A724004C3E90 /* eyetv.m in Sources */,
 				1CCB5F701A62A724004C3E90 /* fspanel.h in Sources */,
@@ -3983,6 +4012,7 @@
 				1CCB5F8A1A62A724004C3E90 /* StringUtility.m in Sources */,
 				1CCB5F8B1A62A724004C3E90 /* TrackSynchronization.h in Sources */,
 				1CCB5F8C1A62A724004C3E90 /* TrackSynchronization.m in Sources */,
+				6BBBB8B71D114628001BD9BA /* VLCRendererDiscovery.m in Sources */,
 				1CCB5F8D1A62A724004C3E90 /* VideoEffects.h in Sources */,
 				1CCB5F8E1A62A724004C3E90 /* VideoEffects.m in Sources */,
 				1CCB5F8F1A62A724004C3E90 /* VideoView.h in Sources */,
@@ -4068,6 +4098,14 @@
 				633121CF1B5112C300E636DA /* English */,
 			);
 			name = ResumeDialog.xib;
+			sourceTree = "<group>";
+		};
+		6BBBB8AC1D108A87001BD9BA /* VLCRendererDialog.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6BBBB8AD1D108A87001BD9BA /* English */,
+			);
+			name = VLCRendererDialog.xib;
 			sourceTree = "<group>";
 		};
 		7D3F6523188051F2005776C4 /* BWQuincyMain.xib */ = {
