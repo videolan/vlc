@@ -46,6 +46,7 @@
 #import "DebugMessageVisualizer.h"
 #import "AddonsWindowController.h"
 #import "VLCTimeSelectionPanelController.h"
+#import "VLCRendererDialog.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>
@@ -56,6 +57,7 @@
     AboutWindowController *_aboutWindowController;
     HelpWindowController  *_helpWindowController;
     AddonsWindowController *_addonsController;
+    VLCRendererDialog *_rendererDialog;
 
     NSMenu *_playlistTableColumnsContextMenu;
 
@@ -369,6 +371,7 @@
     [_titleMenu setTitle: _NS("Title")];
     [_chapter setTitle: _NS("Chapter")];
     [_chapterMenu setTitle: _NS("Chapter")];
+    [_renderer setTitle: _NS("Select Renderer…")];
 
     [_audioMenu setTitle: _NS("Audio")];
     [_vol_up setTitle: _NS("Increase Volume")];
@@ -1237,6 +1240,14 @@
     [_helpWindowController showHelp];
 }
 
+- (IBAction)showRenderers:(id)sender
+{
+    if (!_rendererDialog)
+        _rendererDialog = [[VLCRendererDialog alloc] init];
+
+    [_rendererDialog showWindow:self];
+}
+
 - (IBAction)openReadMe:(id)sender
 {
     NSString *path = [[NSBundle mainBundle] pathForResource: @"README.MacOSX" ofType: @"rtf"];
@@ -1603,6 +1614,8 @@
 
         [self setupMenus]; /* Make sure video menu is up to date */
 
+    } else if ([title isEqualToString: _NS("Select Renderer…")]) {
+        bEnabled = TRUE;
     } else if ([title isEqualToString: _NS("Add Subtitle File...")]) {
         bEnabled = [mi isEnabled];
         [self setupMenus]; /* Make sure subtitles menu is up to date */

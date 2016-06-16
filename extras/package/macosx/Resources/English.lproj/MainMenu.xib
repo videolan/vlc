@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15F24b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainMenu">
@@ -106,6 +106,7 @@
                 <outlet property="rate_view" destination="4596" id="MPC-hG-6bj"/>
                 <outlet property="readme" destination="1136" id="QoP-Va-kF5"/>
                 <outlet property="record" destination="5137" id="Ka3-jl-auY"/>
+                <outlet property="renderer" destination="Rf6-Uj-7Ja" id="Nzc-Qb-SnK"/>
                 <outlet property="repeat" destination="5143" id="ulG-wD-gtG"/>
                 <outlet property="revealInFinder" destination="3945" id="z7n-A2-K5o"/>
                 <outlet property="save_playlist" destination="1599" id="spC-pk-6W4"/>
@@ -482,6 +483,12 @@
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="5154">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Select Renderer…" id="Rf6-Uj-7Ja">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showRenderers:" target="-2" id="Y9L-YQ-3RJ"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Program" id="5150">
                                 <menu key="submenu" title="Program" id="5157"/>

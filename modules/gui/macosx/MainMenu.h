@@ -99,6 +99,7 @@
 @property (readwrite, weak) IBOutlet NSMenu *titleMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *chapter;
 @property (readwrite, weak) IBOutlet NSMenu *chapterMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *renderer;
 
 @property (readwrite, weak) IBOutlet NSMenu *audioMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *vol_up;
