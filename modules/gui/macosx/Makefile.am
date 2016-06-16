@@ -81,4 +81,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCHUDButtonCell.h VLCHUDButtonCell.m \
 	VLCHUDCheckboxCell.h VLCHUDCheckboxCell.m \
 	VLCHUDRadiobuttonCell.h VLCHUDRadiobuttonCell.m \
-	VLCHUDTextFieldCell.h VLCHUDTextFieldCell.m
+	VLCHUDTextFieldCell.h VLCHUDTextFieldCell.m \
+	VLCRendererDiscovery.h VLCRendererDiscovery.m \
+	VLCRendererItem.h VLCRendererItem.m \
+	VLCRendererDialog.h VLCRendererDialog.m
