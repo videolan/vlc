@@ -40,8 +40,8 @@
 #include <time.h>
 
 /*** Static mutex and condition variable ***/
-static vlc_mutex_t super_mutex;
-static vlc_cond_t  super_variable;
+static CRITICAL_SECTION super_mutex;
+static CONDITION_VARIABLE super_variable;
 
 #define IS_INTERRUPTIBLE (!VLC_WINSTORE_APP || _WIN32_WINNT >= 0x0A00)
 
@@ -65,6 +65,33 @@ struct vlc_thread
         CRITICAL_SECTION lock;
     } wait;
 };
+
+/*** Condition variables (low-level) ***/
+#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
+static VOID (WINAPI *InitializeConditionVariable_)(PCONDITION_VARIABLE);
+#define InitializeConditionVariable InitializeConditionVariable_
+static BOOL (WINAPI *SleepConditionVariableCS_)(PCONDITION_VARIABLE,
+                                                PCRITICAL_SECTION, DWORD);
+#define SleepConditionVariableCS SleepConditionVariableCS_
+static VOID (WINAPI *WakeAllConditionVariable_)(PCONDITION_VARIABLE);
+#define WakeAllConditionVariable WakeAllConditionVariable_
+
+static void WINAPI DummyConditionVariable(CONDITION_VARIABLE *cv)
+{
+    (void) cv;
+}
+
+static BOOL WINAPI SleepConditionVariableFallback(CONDITION_VARIABLE *cv,
+                                                  CRITICAL_SECTION *cs,
+                                                  DWORD ms)
+{
+    (void) cv;
+    LeaveCriticalSection(cs);
+    SleepEx(ms > 5 ? 5 : ms, TRUE);
+    EnterCriticalSection(cs);
+    return ms != 0;
+}
+#endif
 
 /*** Mutexes ***/
 void vlc_mutex_init( vlc_mutex_t *p_mutex )
@@ -92,19 +119,15 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
 {
     if (!p_mutex->dynamic)
     {   /* static mutexes */
-        int canc = vlc_savecancel ();
-        assert (p_mutex != &super_mutex); /* this one cannot be static */
-
-        vlc_mutex_lock (&super_mutex);
+        EnterCriticalSection(&super_mutex);
         while (p_mutex->locked)
         {
             p_mutex->contention++;
-            vlc_cond_wait (&super_variable, &super_mutex);
+            SleepConditionVariableCS(&super_variable, &super_mutex, INFINITE);
             p_mutex->contention--;
         }
         p_mutex->locked = true;
-        vlc_mutex_unlock (&super_mutex);
-        vlc_restorecancel (canc);
+        LeaveCriticalSection(&super_mutex);
         return;
     }
 
@@ -117,14 +140,13 @@ int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
     {   /* static mutexes */
         int ret = EBUSY;
 
-        assert (p_mutex != &super_mutex); /* this one cannot be static */
-        vlc_mutex_lock (&super_mutex);
+        EnterCriticalSection(&super_mutex);
         if (!p_mutex->locked)
         {
             p_mutex->locked = true;
             ret = 0;
         }
-        vlc_mutex_unlock (&super_mutex);
+        LeaveCriticalSection(&super_mutex);
         return ret;
     }
 
@@ -135,14 +157,12 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 {
     if (!p_mutex->dynamic)
     {   /* static mutexes */
-        assert (p_mutex != &super_mutex); /* this one cannot be static */
-
-        vlc_mutex_lock (&super_mutex);
+        EnterCriticalSection(&super_mutex);
         assert (p_mutex->locked);
         p_mutex->locked = false;
         if (p_mutex->contention)
-            vlc_cond_broadcast (&super_variable);
-        vlc_mutex_unlock (&super_mutex);
+            WakeAllConditionVariable(&super_variable);
+        LeaveCriticalSection(&super_mutex);
         return;
     }
 
@@ -225,13 +245,13 @@ int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
     var->next = NULL;
     *p_tls = var;
 
-    vlc_mutex_lock (&super_mutex);
+    EnterCriticalSection(&super_mutex);
     var->prev = vlc_threadvar_last;
     if (var->prev)
         var->prev->next = var;
 
     vlc_threadvar_last = var;
-    vlc_mutex_unlock (&super_mutex);
+    LeaveCriticalSection(&super_mutex);
     return 0;
 }
 
@@ -239,7 +259,7 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
     struct vlc_threadvar *var = *p_tls;
 
-    vlc_mutex_lock (&super_mutex);
+    EnterCriticalSection(&super_mutex);
     if (var->prev != NULL)
         var->prev->next = var->next;
 
@@ -248,7 +268,7 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
     else
         vlc_threadvar_last = var->prev;
 
-    vlc_mutex_unlock (&super_mutex);
+    LeaveCriticalSection(&super_mutex);
 
     TlsFree (var->id);
     free (var);
@@ -278,47 +298,20 @@ static void vlc_threadvars_cleanup(void)
     vlc_threadvar_t key;
 retry:
     /* TODO: use RW lock or something similar */
-    vlc_mutex_lock(&super_mutex);
+    EnterCriticalSection(&super_mutex);
     for (key = vlc_threadvar_last; key != NULL; key = key->prev)
     {
         void *value = vlc_threadvar_get(key);
         if (value != NULL && key->destroy != NULL)
         {
-            vlc_mutex_unlock(&super_mutex);
+            LeaveCriticalSection(&super_mutex);
             vlc_threadvar_set(key, NULL);
             key->destroy(value);
             goto retry;
         }
     }
-    vlc_mutex_unlock(&super_mutex);
+    LeaveCriticalSection(&super_mutex);
 }
-
-/*** Condition variables (low-level) ***/
-#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-static VOID (WINAPI *InitializeConditionVariable_)(PCONDITION_VARIABLE);
-#define InitializeConditionVariable InitializeConditionVariable_
-static BOOL (WINAPI *SleepConditionVariableCS_)(PCONDITION_VARIABLE,
-                                                PCRITICAL_SECTION, DWORD);
-#define SleepConditionVariableCS SleepConditionVariableCS_
-static VOID (WINAPI *WakeAllConditionVariable_)(PCONDITION_VARIABLE);
-#define WakeAllConditionVariable WakeAllConditionVariable_
-
-static void WINAPI DummyConditionVariable(CONDITION_VARIABLE *cv)
-{
-    (void) cv;
-}
-
-static BOOL WINAPI SleepConditionVariableFallback(CONDITION_VARIABLE *cv,
-                                                  CRITICAL_SECTION *cs,
-                                                  DWORD ms)
-{
-    (void) cv;
-    LeaveCriticalSection(cs);
-    SleepEx(ms > 5 ? 5 : ms, TRUE);
-    EnterCriticalSection(cs);
-    return ms != 0;
-}
-#endif
 
 /*** Futeces^WAddress waits ***/
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
@@ -1106,8 +1099,8 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             if (unlikely(thread_key == TLS_OUT_OF_INDEXES))
                 return FALSE;
             InitializeCriticalSection (&clock_lock);
-            vlc_mutex_init (&super_mutex);
-            vlc_cond_init (&super_variable);
+            InitializeCriticalSection(&super_mutex);
+            InitializeConditionVariable(&super_variable);
             vlc_rwlock_init (&config_lock);
             vlc_CPU_init ();
             break;
@@ -1115,8 +1108,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 
         case DLL_PROCESS_DETACH:
             vlc_rwlock_destroy (&config_lock);
-            vlc_cond_destroy (&super_variable);
-            vlc_mutex_destroy (&super_mutex);
+            DeleteCriticalSection(&super_mutex);
             DeleteCriticalSection (&clock_lock);
             TlsFree(thread_key);
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
