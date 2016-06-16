@@ -292,8 +292,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         /* Declare user activity.
          This wakes the display if it is off, and postpones display sleep according to the users system preferences
          Available from 10.7.3 */
-
-#ifdef MAC_OS_X_VERSION_10_7
         if ([o_main activeVideoPlayback] && &IOPMAssertionDeclareUserActivity && shouldDisableScreensaver)
         {
             CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
@@ -306,7 +304,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                 msg_Warn(getIntf(), "failed to declare user activity");
 
         }
-#endif
 
         /* prevent the system from sleeping */
         if (systemSleepAssertionID > 0) {

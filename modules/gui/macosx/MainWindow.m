@@ -41,6 +41,9 @@
 #import <vlc_services_discovery.h>
 #import "PLModel.h"
 
+#import "PXSourceList.h"
+#import "PXSourceListDataSource.h"
+
 #import "ControlsBar.h"
 #import "VideoView.h"
 #import "VLCVoutWindowController.h"

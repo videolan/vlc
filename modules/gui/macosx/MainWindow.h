@@ -26,8 +26,6 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "PXSourceList.h"
-#import "PXSourceListDataSource.h"
 
 #import <vlc_input.h>
 #import <vlc_vout_window.h>
@@ -40,6 +38,7 @@
 @class VLCDetachedVideoWindow;
 @class VLCMainWindowControlsBar;
 @class VLCVoutView;
+@class PXSourceList;
 
 typedef enum {
     psUserEvent,
