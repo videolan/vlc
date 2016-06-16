@@ -1858,20 +1858,11 @@ static bool Control( input_thread_t *p_input,
             if( i_rate != p_input->p->i_rate &&
                 !p_input->p->b_can_pace_control && p_input->p->b_can_rate_control )
             {
-                demux_t *p_demux = p_input->p->master->p_demux;
-                int i_ret = VLC_EGENERIC;
-                while (p_demux->p_next)
-                    p_demux = p_demux->p_next;
+                if( !p_input->p->master->b_rescale_ts )
+                    es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
 
-                if( p_demux->s == NULL )
-                {
-                    if( !p_input->p->master->b_rescale_ts )
-                        es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-
-                    i_ret = demux_Control( p_input->p->master->p_demux,
-                                           DEMUX_SET_RATE, &i_rate );
-                }
-                if( i_ret )
+                if( demux_Control( p_input->p->master->p_demux, DEMUX_SET_RATE,
+                                   &i_rate ) )
                 {
                     msg_Warn( p_input, "ACCESS/DEMUX_SET_RATE failed" );
                     i_rate = p_input->p->i_rate;
