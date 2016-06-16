@@ -2332,7 +2332,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         p_demux = p_demux->p_next;
     assert( p_demux->pf_demux != NULL || !in->b_can_pace_control );
 
-    if( p_demux->s != NULL )
+    if( p_demux->s == NULL )
     {
         if( !in->b_can_pace_control )
         {
