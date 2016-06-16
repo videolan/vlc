@@ -145,11 +145,20 @@ int main (void)
     test_b64 ("foobar", "Zm9vYmFy");
 
     /* Path test */
+#ifndef _WIN32
     test_path ("/", "file:///");
     test_path ("/home/john/", "file:///home/john/");
     test_path ("/home/john//too///many//slashes",
                "file:///home/john//too///many//slashes");
     test_path ("/home/john/music.ogg", "file:///home/john/music.ogg");
+#else
+    test_path ("C:\\", "file:///C:/");
+    test_path ("C:\\Users\\john\\", "file:///C:/Users/john/");
+    test_path ("C:\\Users\\john\\music.ogg",
+               "file:///C:/Users/john/music.ogg");
+    test_path ("\\\\server\\share\\dir\\file.ext",
+               "file://server/share/dir/file.ext");
+#endif
 
     /*int fd = open (".", O_RDONLY);
     assert (fd != -1);*/
@@ -161,9 +170,11 @@ int main (void)
     tmpdir = getcwd(buf, sizeof(buf)/sizeof(*buf));
     assert (tmpdir);
 
+#ifndef _WIN32 /* FIXME: deal with anti-slashes */
     test_current_directory_path ("movie.ogg", tmpdir, "movie.ogg");
     test_current_directory_path (".", tmpdir, ".");
     test_current_directory_path ("", tmpdir, "");
+#endif
 
     /*val = fchdir (fd);
     assert (val != -1);*/
@@ -173,6 +184,7 @@ int main (void)
     test ("mailto:john@example.com", NULL);
     test ("http://www.example.com/file.html#ref", NULL);
     test ("file://", NULL);
+#ifndef _WIN32
     test ("file:///", "/");
     test ("file://localhost/home/john/music%2Eogg", "/home/john/music.ogg");
     test ("file://localhost/home/john/text#ref", "/home/john/text");
@@ -184,6 +196,22 @@ int main (void)
     test ("fd://0#ref", "/dev/stdin");
     test ("fd://1", "/dev/stdout");
     test ("fd://12345", "/dev/fd/12345");
+#else
+    test ("file:///C:", "C:");
+    test ("file:///C:/Users/john/music%2Eogg", "C:\\Users\\john\\music.ogg");
+    test ("file://server/share/dir/file%2Eext",
+          "\\\\server\\share\\dir\\file.ext");
+    test ("file:///C:/Users/john/text#ref", "C:\\Users\\john\\text");
+    test ("file:///C:/Users/john/text?name=value", "C:\\Users\\john\\text");
+    test ("file:///C:/Users/john/text?name=value#ref",
+          "C:\\Users\\john\\text");
+    test ("file://?name=value", NULL);
+    test ("file:///C:?name=value", "C:");
+    test ("fd://0foobar", NULL);
+    test ("fd://0#ref", "CON");
+    test ("fd://1", "CON");
+    test ("fd://12345", NULL);
+#endif
 #undef test
 
     test_url_parse("http://example.com", "http", NULL, NULL, "example.com", 0,
