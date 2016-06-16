@@ -670,6 +670,7 @@ void vlc_control_cancel (int cmd, ...)
             void *addr = va_arg(ap, void *);
 
             EnterCriticalSection(&th->wait.lock);
+            assert(th->wait.addr == NULL);
             th->wait.addr = addr;
             LeaveCriticalSection(&th->wait.lock);
             break;
