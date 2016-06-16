@@ -142,10 +142,11 @@ bool PlaylistManager::start()
     return true;
 }
 
-AbstractStream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
+AbstractStream::status PlaylistManager::demux(mtime_t *pi_nzbarrier, bool send)
 {
     AbstractStream::status i_return = AbstractStream::status_eof;
 
+    const mtime_t i_nzdeadline = *pi_nzbarrier;
     std::vector<AbstractStream *>::iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
@@ -159,7 +160,7 @@ AbstractStream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
                 continue;
         }
 
-        AbstractStream::status i_ret = st->demux(nzdeadline, send);
+        AbstractStream::status i_ret = st->demux(i_nzdeadline, send);
         if(i_ret == AbstractStream::status_buffering_ahead ||
            i_return == AbstractStream::status_buffering_ahead)
         {
@@ -178,6 +179,9 @@ AbstractStream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
         {
             i_return = AbstractStream::status_dis;
         }
+
+        *pi_nzbarrier = std::min( *pi_nzbarrier, st->getPCR() - VLC_TS_0 );
+        *pi_nzbarrier = std::max( (mtime_t)0, *pi_nzbarrier );
     }
 
     /* might be end of current period */
@@ -318,9 +322,10 @@ int PlaylistManager::demux_callback(demux_t *p_demux)
 
 int PlaylistManager::doDemux(int64_t increment)
 {
+    mtime_t i_nzbarrier = i_nzpcr + increment;
     if(i_nzpcr == VLC_TS_INVALID)
     {
-        if( AbstractStream::status_eof == demux(i_nzpcr + increment, false) )
+        if( AbstractStream::status_eof == demux(&i_nzbarrier, false) )
         {
             return VLC_DEMUXER_EOF;
         }
@@ -329,9 +334,10 @@ int PlaylistManager::doDemux(int64_t increment)
             i_nzpcr = getPCR();
         if(i_firstpcr == VLC_TS_INVALID)
             i_firstpcr = i_nzpcr;
+        i_nzbarrier = i_nzpcr + increment;
     }
 
-    AbstractStream::status status = demux(i_nzpcr + increment, true);
+    AbstractStream::status status = demux(&i_nzbarrier, true);
     AdvDebug(msg_Dbg( p_demux, "doDemux() status %d dts %ld pcr %ld", status, getFirstDTS(), getPCR() ));
     switch(status)
     {
@@ -347,9 +353,9 @@ int PlaylistManager::doDemux(int64_t increment)
         es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         break;
     case AbstractStream::status_demuxed:
-        if( i_nzpcr != VLC_TS_INVALID )
+        if( i_nzpcr != VLC_TS_INVALID && i_nzbarrier != i_nzpcr )
         {
-            i_nzpcr += increment;
+            i_nzpcr = i_nzbarrier;
             es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, 0, VLC_TS_0 + i_nzpcr);
         }
         break;
