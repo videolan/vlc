@@ -219,8 +219,8 @@ static int Create( vlc_object_t *p_this )
     const char *psz_font = NULL; /* We don't ship a default font with VLC */
     const char *psz_family = "Helvetica Neue"; /* Use HN if we can't find anything more suitable - Arial is not on all Apple platforms */
 #elif VLC_WINSTORE_APP
-    const char *psz_font = "segoeui.ttf";
-    const char *psz_family = "Segoe UI";
+    const char *psz_font = "NotoSans-Regular.ttf";
+    const char *psz_family = "Noto Sans";
 #else
     const char *psz_font = NULL; /* We don't ship a default font with VLC */
     const char *psz_family = "Arial"; /* Use Arial if we can't find anything more suitable */
