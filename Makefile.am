@@ -161,6 +161,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/TimeSelectionPanel.xib \
 	extras/package/macosx/Resources/English.lproj/VideoEffects.xib \
 	extras/package/macosx/Resources/English.lproj/VLCStatusBarIconMainMenu.xib \
+	extras/package/macosx/Resources/English.lproj/VLCRendererDialog.xib \
 	extras/package/macosx/Resources/fspanel/fs_background.png \
 	extras/package/macosx/Resources/fspanel/fs_background@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen.png \
