@@ -2318,10 +2318,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
                        &in->b_can_pace_control ) )
         in->b_can_pace_control = false;
 
-    demux_t *p_demux = in->p_demux;
-    while (p_demux->p_next)
-        p_demux = p_demux->p_next;
-    assert( p_demux->pf_demux != NULL || !in->b_can_pace_control );
+    assert( in->p_demux->pf_demux != NULL || !in->b_can_pace_control );
 
     if( !in->b_can_pace_control )
     {
