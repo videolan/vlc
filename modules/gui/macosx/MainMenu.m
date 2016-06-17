@@ -1539,101 +1539,108 @@
 - (BOOL)validateMenuItem:(NSMenuItem *)mi
 {
     NSString *title = [mi title];
-    BOOL bEnabled = TRUE;
+    BOOL enabled = YES;
     vlc_value_t val;
     playlist_t *p_playlist = pl_Get(getIntf());
     input_thread_t *p_input = playlist_CurrentInput(p_playlist);
 
-    if ([title isEqualToString: _NS("Stop")]) {
+    if (mi == _stop || mi == _voutMenustop || mi == _dockMenustop) {
         if (!p_input)
-            bEnabled = FALSE;
+            enabled = NO;
         [self setupMenus]; /* Make sure input menu is up to date */
-    } else if ([title isEqualToString: _NS("Record")]) {
-        bEnabled = FALSE;
-        if (p_input)
-            bEnabled = var_GetBool(p_input, "can-record");
-    } else if ([title isEqualToString: _NS("Previous")] ||
-            [title isEqualToString: _NS("Next")]) {
+    } else if (mi == _previous          ||
+               mi == _voutMenuprev      ||
+               mi == _dockMenuprevious  ||
+               mi == _next              ||
+               mi == _voutMenunext      ||
+               mi == _dockMenunext
+               ) {
         PL_LOCK;
-        bEnabled = playlist_CurrentSize(p_playlist) > 1;
+        enabled = playlist_CurrentSize(p_playlist) > 1;
         PL_UNLOCK;
-    } else if ([title isEqualToString: _NS("Random")]) {
+    } else if (mi == _record) {
+        enabled = NO;
+        if (p_input)
+            enabled = var_GetBool(p_input, "can-record");
+    } else if (mi == _random) {
         int i_state;
         var_Get(p_playlist, "random", &val);
         i_state = val.b_bool ? NSOnState : NSOffState;
         [mi setState: i_state];
-    } else if ([title isEqualToString: _NS("Repeat One")]) {
+    } else if (mi == _repeat) {
         int i_state;
         var_Get(p_playlist, "repeat", &val);
         i_state = val.b_bool ? NSOnState : NSOffState;
         [mi setState: i_state];
-    } else if ([title isEqualToString: _NS("Repeat All")]) {
+    } else if (mi == _loop) {
         int i_state;
         var_Get(p_playlist, "loop", &val);
         i_state = val.b_bool ? NSOnState : NSOffState;
         [mi setState: i_state];
-    } else if ([title isEqualToString: _NS("Quit after Playback")]) {
+    } else if (mi == _quitAfterPB) {
         int i_state;
         bool b_value = var_InheritBool(p_playlist, "play-and-exit");
         i_state = b_value ? NSOnState : NSOffState;
         [mi setState: i_state];
-    } else if ([title isEqualToString: _NS("Step Forward")] ||
-               [title isEqualToString: _NS("Step Backward")] ||
-               [title isEqualToString: _NS("Jump to Time")]) {
+    } else if (mi == _fwd || mi == _bwd || mi == _jumpToTime) {
         if (p_input != NULL) {
             var_Get(p_input, "can-seek", &val);
-            bEnabled = val.b_bool;
+            enabled = val.b_bool;
+        } else {
+            enabled = NO;
         }
-        else bEnabled = FALSE;
-    } else if ([title isEqualToString: _NS("Mute")]) {
+    } else if (mi == _mute || mi == _dockMenumute || mi == _voutMenumute) {
         [mi setState: [[VLCCoreInteraction sharedInstance] mute] ? NSOnState : NSOffState];
         [self setupMenus]; /* Make sure audio menu is up to date */
         [self refreshAudioDeviceList];
-    } else if ([title isEqualToString: _NS("Half Size")] ||
-               [title isEqualToString: _NS("Normal Size")] ||
-               [title isEqualToString: _NS("Double Size")] ||
-               [title isEqualToString: _NS("Fit to Screen")] ||
-               [title isEqualToString: _NS("Snapshot")] ||
-               [title isEqualToString: _NS("Fullscreen")] ||
-               [title isEqualToString: _NS("Float on Top")]) {
-        bEnabled = FALSE;
+    } else if (mi == _half_window           ||
+               mi == _normal_window         ||
+               mi == _double_window         ||
+               mi == _fittoscreen           ||
+               mi == _snapshot              ||
+               mi == _voutMenusnapshot      ||
+               mi == _fullscreenItem        ||
+               mi == _voutMenufullscreen    ||
+               mi == _floatontop
+               ) {
+        enabled = NO;
 
         if (p_input != NULL) {
             vout_thread_t *p_vout = getVoutForActiveWindow();
             if (p_vout != NULL) {
-                if ([title isEqualToString: _NS("Float on Top")])
+                if (mi == _floatontop)
                     [mi setState: var_GetBool(p_vout, "video-on-top")];
 
-                if ([title isEqualToString: _NS("Fullscreen")])
+                if (mi == _fullscreenItem || mi == _voutMenufullscreen)
                     [mi setState: var_GetBool(p_vout, "fullscreen")];
 
-                bEnabled = TRUE;
+                enabled = YES;
                 vlc_object_release(p_vout);
             }
         }
 
         [self setupMenus]; /* Make sure video menu is up to date */
 
-    } else if ([title isEqualToString: _NS("Select Renderer…")]) {
-        bEnabled = TRUE;
-    } else if ([title isEqualToString: _NS("Add Subtitle File...")]) {
-        bEnabled = [mi isEnabled];
+    } else if (mi == _openSubtitleFile) {
+        enabled = [mi isEnabled];
         [self setupMenus]; /* Make sure subtitles menu is up to date */
     } else {
         NSMenuItem *_parent = [mi parentItem];
-        if (_parent == _subtitle_size || mi == _subtitle_size ||
+        if (_parent == _subtitle_size || mi == _subtitle_size           ||
             _parent == _subtitle_textcolor || mi == _subtitle_textcolor ||
-            _parent == _subtitle_bgcolor || mi == _subtitle_bgcolor ||
+            _parent == _subtitle_bgcolor || mi == _subtitle_bgcolor     ||
             _parent == _subtitle_bgopacity || mi == _subtitle_bgopacity ||
             _parent == _subtitle_outlinethickness || mi == _subtitle_outlinethickness ||
-            _parent == _teletext || mi == _teletext)
-            bEnabled = _openSubtitleFile.isEnabled;
+            _parent == _teletext || mi == _teletext
+            ) {
+            enabled = _openSubtitleFile.isEnabled;
+        }
     }
 
     if (p_input)
         vlc_object_release(p_input);
 
-    return bEnabled;
+    return enabled;
 }
 
 @end
