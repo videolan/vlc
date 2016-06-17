@@ -104,5 +104,5 @@ bool HLSManager::isHTTPLiveStreaming(stream_t *s)
 
 mtime_t HLSManager::getFirstPlaybackTime() const
 {
-    return i_firstpcr;
+    return demux.i_firstpcr;
 }

@@ -211,6 +211,7 @@ static void Close(vlc_object_t *p_obj)
     demux_t         *p_demux       = (demux_t*) p_obj;
     PlaylistManager *p_manager  = reinterpret_cast<PlaylistManager *>(p_demux->p_sys);
 
+    p_manager->stop();
     delete p_manager;
 }
 
