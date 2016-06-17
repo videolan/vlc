@@ -1,7 +1,7 @@
 /*****************************************************************************
- * darwin_dirs.c: Mac OS X directories configuration
+ * darwin_dirs.c: Darwin directories configuration
  *****************************************************************************
- * Copyright (C) 2001-2014 VLC authors and VideoLAN
+ * Copyright (C) 2001-2016 VLC authors and VideoLAN
  * Copyright (C) 2007-2012 Rémi Denis-Courmont
  *
  * Authors: Rémi Denis-Courmont
@@ -23,25 +23,18 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <CoreFoundation/CoreFoundation.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <vlc_common.h>
-
 #include "../libvlc.h"
-#include <vlc_configuration.h>
-#include "config/configuration.h"
 
 #include <libgen.h>
 #include <dlfcn.h>
 #include <mach-o/dyld.h>
 
-#ifndef MAXPATHLEN
-# define MAXPATHLEN 1024
-#endif
+#include <CoreFoundation/CoreFoundation.h>
 
 char *config_GetLibDir (void)
 {
