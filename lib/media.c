@@ -795,7 +795,7 @@ static int media_parse(libvlc_media_t *media, bool b_async,
 void
 libvlc_media_parse(libvlc_media_t *media)
 {
-    media_parse( media, false, -1, libvlc_media_fetch_local );
+    media_parse( media, false, libvlc_media_fetch_local, -1 );
 }
 
 /**************************************************************************
@@ -804,7 +804,7 @@ libvlc_media_parse(libvlc_media_t *media)
 void
 libvlc_media_parse_async(libvlc_media_t *media)
 {
-    media_parse( media, true, -1, libvlc_media_fetch_local );
+    media_parse( media, true, libvlc_media_fetch_local, -1 );
 }
 
 /**************************************************************************
