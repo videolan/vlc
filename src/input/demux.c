@@ -87,6 +87,24 @@ demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
                               psz_location, s, out, false );
 }
 
+typedef struct demux_priv_t
+{
+    demux_t demux;
+    void (*destroy)(demux_t *);
+} demux_priv_t;
+
+static void demux_DestroyDemux(demux_t *demux)
+{
+    assert(demux->s != NULL);
+    stream_Delete(demux->s);
+}
+
+static void demux_DestroyAccessDemux(demux_t *demux)
+{
+    assert(demux->s == NULL);
+    (void) demux;
+}
+
 /*****************************************************************************
  * demux_NewAdvanced:
  *  if s is NULL then load a access_demux
@@ -97,9 +115,11 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                             const char *psz_location,
                             stream_t *s, es_out_t *out, bool b_preparsing )
 {
-    demux_t *p_demux = vlc_custom_create( p_obj, sizeof( *p_demux ), "demux" );
-    if( unlikely(p_demux == NULL) )
+    demux_priv_t *priv = vlc_custom_create(p_obj, sizeof (*priv), "demux");
+    if (unlikely(priv == NULL))
         return NULL;
+
+    demux_t *p_demux = &priv->demux;
 
     if( s != NULL && (!strcasecmp( psz_demux, "any" ) || !psz_demux[0]) )
     {   /* Look up demux by Content-Type for hard to detect formats */
@@ -139,6 +159,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_demux->info.i_update = 0;
     p_demux->info.i_title  = 0;
     p_demux->info.i_seekpoint = 0;
+    priv->destroy = s ? demux_DestroyDemux : demux_DestroyAccessDemux;
 
     /* NOTE: Add only file without any problems here and with strong detection:
      * - no .mp3, .a52, ...
@@ -342,22 +363,16 @@ out:
  *****************************************************************************/
 void demux_Delete( demux_t *p_demux )
 {
-    stream_t *s;
-
-    demux_t *p_next = p_demux->p_next;
-    if ( p_next != NULL )
-        demux_Delete( p_next );
+    demux_priv_t *priv = (demux_priv_t *)p_demux;
 
     module_unneed( p_demux, p_demux->p_module );
+
+    priv->destroy(p_demux);
     free( p_demux->psz_file );
     free( p_demux->psz_location );
     free( p_demux->psz_demux );
     free( p_demux->psz_access );
-
-    s = p_demux->s;
     vlc_object_release( p_demux );
-    if( s != NULL )
-        stream_Delete( s );
 }
 
 #define static_control_match(foo) \
