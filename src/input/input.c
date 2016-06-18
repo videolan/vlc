@@ -682,8 +682,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                              var_InheritBool( p_input, "play-and-pause" );
 
     demux_t *p_demux = p_input->p->master->p_demux;
-    while (p_demux->p_next)
-        p_demux = p_demux->p_next;
     const bool b_can_demux = p_demux->pf_demux != NULL;
 
     while( !input_Stopped( p_input ) && p_input->p->i_state != ERROR_S )
