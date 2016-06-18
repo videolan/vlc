@@ -88,7 +88,7 @@ static int Open( vlc_object_t *p_this )
     if( p_peek[0] != 'A' || p_peek[1] != 'V' || p_peek[4] != 0x55 )
     {
         /* In case we had forced this demuxer we try to resynch */
-        if( !p_demux->b_force || ReSynch( p_demux ) )
+        if( !p_demux->obj.force || ReSynch( p_demux ) )
             return VLC_EGENERIC;
     }
 

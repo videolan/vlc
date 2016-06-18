@@ -135,7 +135,7 @@ static vlc_tls_t *vlc_tls_SessionCreate(vlc_tls_creds_t *crd,
     if (unlikely(session == NULL))
         return NULL;
 
-    session->obj = crd->p_parent;
+    session->obj = crd->obj.parent;
     session->p = NULL;
 
     int canc = vlc_savecancel();

@@ -48,7 +48,7 @@ void CmdQuit::execute()
     }
 
     // Kill libvlc
-    libvlc_Quit( getIntf()->p_libvlc );
+    libvlc_Quit( getIntf()->obj.libvlc );
 }
 
 

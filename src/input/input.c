@@ -304,7 +304,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_item_ApplyOptions( VLC_OBJECT(p_input), p_item );
 
     p_input->b_preparsing = b_preparsing;
-    p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
+    p_input->obj.header = psz_header ? strdup( psz_header ) : NULL;
 
     /* Init Common fields */
     p_input->p->b_can_pace_control = true;
@@ -357,17 +357,17 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* */
     if( p_input->b_preparsing )
-        p_input->i_flags |= OBJECT_FLAGS_QUIET | OBJECT_FLAGS_NOINTERACT;
+        p_input->obj.flags |= OBJECT_FLAGS_QUIET | OBJECT_FLAGS_NOINTERACT;
 
     /* Make sure the interaction option is honored */
     if( !var_InheritBool( p_input, "interact" ) )
-        p_input->i_flags |= OBJECT_FLAGS_NOINTERACT;
+        p_input->obj.flags |= OBJECT_FLAGS_NOINTERACT;
     else if( p_item->b_preparse_interact )
     {
         /* If true, this item was asked explicitly to interact with the user
          * (via libvlc_MetadataRequest). Sub items created from this input won't
          * have this flag and won't interact with the user */
-        p_input->i_flags &= ~OBJECT_FLAGS_NOINTERACT;
+        p_input->obj.flags &= ~OBJECT_FLAGS_NOINTERACT;
     }
 
     vlc_mutex_unlock( &p_item->lock );
@@ -1262,7 +1262,7 @@ static int Init( input_thread_t * p_input )
 {
     input_source_t *master;
 
-    if( var_Type( p_input->p_parent, "meta-file" ) )
+    if( var_Type( p_input->obj.parent, "meta-file" ) )
     {
         msg_Dbg( p_input, "Input is a meta file: disabling unneeded options" );
         var_SetString( p_input, "sout", "" );

@@ -80,5 +80,5 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     /* Flush the queue and unsubscribe from the message queue */
-    vlc_LogSet( p_this->p_libvlc, NULL, NULL );
+    vlc_LogSet( p_this->obj.libvlc, NULL, NULL );
 }

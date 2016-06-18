@@ -957,7 +957,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     uint8_t *p_extra;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_SPEEX &&
-        !p_enc->b_force )
+        !p_enc->obj.force )
     {
         return VLC_EGENERIC;
     }

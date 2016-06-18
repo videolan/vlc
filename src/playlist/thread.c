@@ -229,7 +229,7 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     if( !b_has_art || strncmp( psz_arturl, "attachment://", 13 ) )
     {
         PL_DEBUG( "requesting art for new input thread" );
-        libvlc_ArtRequest( p_playlist->p_libvlc, p_input, META_REQUEST_OPTION_NONE );
+        libvlc_ArtRequest( p_playlist->obj.libvlc, p_input, META_REQUEST_OPTION_NONE );
     }
     free( psz_arturl );
 
@@ -511,7 +511,7 @@ static void *Thread ( void *data )
         if( var_InheritBool( p_playlist, "play-and-exit" ) )
         {
             msg_Info( p_playlist, "end of playlist, exiting" );
-            libvlc_Quit( p_playlist->p_libvlc );
+            libvlc_Quit( p_playlist->obj.libvlc );
         }
 
         /* Destroy any video display now (XXX: ugly hack) */

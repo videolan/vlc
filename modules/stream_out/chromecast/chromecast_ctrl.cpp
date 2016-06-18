@@ -132,9 +132,9 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
     common.pf_set_artwork      = set_artwork;
     common.pf_set_title        = set_title;
 
-    assert( var_Type( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME) == 0 );
-    if (var_Create( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME, VLC_VAR_ADDRESS ) == VLC_SUCCESS )
-        var_SetAddress( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME, &common );
+    assert( var_Type( p_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME) == 0 );
+    if (var_Create( p_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME, VLC_VAR_ADDRESS ) == VLC_SUCCESS )
+        var_SetAddress( p_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME, &common );
 
     // Start the Chromecast event thread.
     if (vlc_clone(&chromecastThread, ChromecastThread, this,
@@ -148,7 +148,7 @@ intf_sys_t::~intf_sys_t()
 {
     setHasInput( false );
 
-    var_Destroy( p_module->p_parent->p_parent, CC_SHARED_VAR_NAME );
+    var_Destroy( p_module->obj.parent->obj.parent, CC_SHARED_VAR_NAME );
 
     switch ( conn_status )
     {
@@ -229,7 +229,7 @@ int intf_sys_t::connectChromecast()
     if (fd < 0)
         return -1;
 
-    p_creds = vlc_tls_ClientCreate( p_module->p_parent );
+    p_creds = vlc_tls_ClientCreate( p_module->obj.parent );
     if (p_creds == NULL)
     {
         net_Close(fd);

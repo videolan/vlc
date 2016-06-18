@@ -1078,7 +1078,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     char *psz_tmp;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_DIRAC &&
-        !p_enc->b_force )
+        !p_enc->obj.force )
     {
         return VLC_EGENERIC;
     }

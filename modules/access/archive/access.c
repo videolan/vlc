@@ -118,10 +118,10 @@ static int FindVolumes(access_t *p_access, struct archive *p_archive, const char
                     break;
 
                 /* Probe URI */
-                int i_savedflags = p_access->i_flags;
-                p_access->i_flags |= OBJECT_FLAGS_NOINTERACT;
+                int i_savedflags = p_access->obj.flags;
+                p_access->obj.flags |= OBJECT_FLAGS_NOINTERACT;
                 stream_t *p_stream = stream_UrlNew(p_access, psz_newuri);
-                p_access->i_flags = i_savedflags;
+                p_access->obj.flags = i_savedflags;
                 if (p_stream)
                 {
                     ppsz_files[*pi_files] = psz_newuri;

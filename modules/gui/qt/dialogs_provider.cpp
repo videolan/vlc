@@ -118,7 +118,7 @@ DialogsProvider::~DialogsProvider()
 void DialogsProvider::quit()
 {
     b_isDying = true;
-    libvlc_Quit( p_intf->p_libvlc );
+    libvlc_Quit( p_intf->obj.libvlc );
 }
 
 void DialogsProvider::customEvent( QEvent *event )
@@ -865,5 +865,5 @@ void DialogsProvider::sendKey( int key )
      }
 
      // forward key to vlc core when not a key accelerator
-     var_SetInteger( p_intf->p_libvlc, "key-pressed", key );
+     var_SetInteger( p_intf->obj.libvlc, "key-pressed", key );
 }

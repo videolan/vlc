@@ -279,7 +279,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     p_sys->b_vnc_key_events = var_InheritBool( p_this,
                                                RMTOSD_CFG "key-events" );
     if( p_sys->b_vnc_key_events )
-        var_AddCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
+        var_AddCallback( p_filter->obj.libvlc, "key-pressed", KeyEvent, p_this );
 
     msg_Dbg( p_filter, "osdvnc filter started" );
 
@@ -307,7 +307,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     msg_Dbg( p_filter, "DestroyFilter called." );
 
     if( p_sys->b_vnc_key_events )
-        var_DelCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
+        var_DelCallback( p_filter->obj.libvlc, "key-pressed", KeyEvent, p_this );
 
     vlc_cancel( p_sys->worker_thread );
     vlc_join( p_sys->worker_thread, NULL );

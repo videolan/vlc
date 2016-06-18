@@ -90,7 +90,7 @@ MRESULT EXPENTRY OS2Factory::OS2FrameProc( HWND hwnd, ULONG msg,
         // If closing parent window
         if( SHORT1FROMMP(mp1) == SC_CLOSE )
         {
-            libvlc_Quit( p_intf->p_libvlc );
+            libvlc_Quit( p_intf->obj.libvlc );
 
             return 0;
         }

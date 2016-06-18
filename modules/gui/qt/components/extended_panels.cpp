@@ -81,7 +81,7 @@ QString OptionFromWidgetName( QObject *obj )
 static inline void setup_vfilter( intf_thread_t *p_intf, const char* psz_name, QWidget *widget )
 {
     vlc_object_t *p_obj = ( vlc_object_t * )
-        vlc_object_find_name( p_intf->p_libvlc, psz_name );
+        vlc_object_find_name( p_intf->obj.libvlc, psz_name );
     QCheckBox *checkbox = qobject_cast<QCheckBox*>( widget );
     QGroupBox *groupbox = qobject_cast<QGroupBox*>( widget );
     if( p_obj )
@@ -481,7 +481,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
     //std::cout << "Option name: " << option.toStdString() << std::endl;
 
     vlc_object_t *p_obj = ( vlc_object_t * )
-        vlc_object_find_name( p_intf->p_libvlc, qtu( module ) );
+        vlc_object_find_name( p_intf->obj.libvlc, qtu( module ) );
     int i_type;
     vlc_value_t val;
 
@@ -568,7 +568,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
 void ExtVideo::setFilterOption( struct intf_thread_t *p_intf, const char *psz_module, const char *psz_option,
         int i_int, double f_float, QString val )
 {
-    vlc_object_t *p_obj = ( vlc_object_t * )vlc_object_find_name( p_intf->p_libvlc, psz_module );
+    vlc_object_t *p_obj = ( vlc_object_t * )vlc_object_find_name( p_intf->obj.libvlc, psz_module );
     int i_type;
     bool b_is_command;
 
@@ -1651,7 +1651,7 @@ void SyncControls::subsdelaySetFactor( double f_factor )
     config_PutFloat( p_intf, SUBSDELAY_CFG_FACTOR, f_factor );
 
     /* Try to find an instance of subsdelay, and set its factor */
-    vlc_object_t *p_obj = ( vlc_object_t * ) vlc_object_find_name( p_intf->p_libvlc, "subsdelay" );
+    vlc_object_t *p_obj = ( vlc_object_t * ) vlc_object_find_name( p_intf->obj.libvlc, "subsdelay" );
     if( p_obj )
     {
         var_SetFloat( p_obj, SUBSDELAY_CFG_FACTOR, f_factor );

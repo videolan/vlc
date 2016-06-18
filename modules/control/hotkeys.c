@@ -112,7 +112,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->subtitle_delaybookmarks.i_time_audio = 0;
     p_sys->subtitle_delaybookmarks.i_time_subtitle = 0;
 
-    var_AddCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
+    var_AddCallback( p_intf->obj.libvlc, "key-action", ActionEvent, p_intf );
     return VLC_SUCCESS;
 }
 
@@ -124,7 +124,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    var_DelCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
+    var_DelCallback( p_intf->obj.libvlc, "key-action", ActionEvent, p_intf );
 
     /* Destroy structure */
     free( p_sys );
@@ -154,7 +154,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
     {
         /* Libvlc / interface actions */
         case ACTIONID_QUIT:
-            libvlc_Quit( p_intf->p_libvlc );
+            libvlc_Quit( p_intf->obj.libvlc );
 
             ClearChannels( p_intf, p_vout );
             DisplayMessage( p_vout, _( "Quit" ) );
@@ -162,13 +162,13 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
         case ACTIONID_INTF_TOGGLE_FSC:
         case ACTIONID_INTF_HIDE:
-            var_TriggerCallback( p_intf->p_libvlc, "intf-toggle-fscontrol" );
+            var_TriggerCallback( p_intf->obj.libvlc, "intf-toggle-fscontrol" );
             break;
         case ACTIONID_INTF_BOSS:
-            var_TriggerCallback( p_intf->p_libvlc, "intf-boss" );
+            var_TriggerCallback( p_intf->obj.libvlc, "intf-boss" );
             break;
         case ACTIONID_INTF_POPUP_MENU:
-            var_TriggerCallback( p_intf->p_libvlc, "intf-popupmenu" );
+            var_TriggerCallback( p_intf->obj.libvlc, "intf-popupmenu" );
             break;
 
         /* Playlist actions (including audio) */

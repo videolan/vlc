@@ -714,7 +714,7 @@ static int SubDrawObject(intf_sys_t *sys, int l, vlc_object_t *p_obj, int i_leve
 {
     char *name = vlc_object_get_name(p_obj);
     MainBoxWrite(sys, l++, "%*s%s%s \"%s\" (%p)", 2 * i_level++, "", prefix,
-                  p_obj->psz_object_type, name ? name : "", (void *)p_obj);
+                  p_obj->obj.object_type, name ? name : "", (void *)p_obj);
     free(name);
 
     vlc_list_t *list = vlc_list_children(p_obj);
@@ -729,7 +729,7 @@ static int SubDrawObject(intf_sys_t *sys, int l, vlc_object_t *p_obj, int i_leve
 static int DrawObjects(intf_thread_t *intf, input_thread_t *input)
 {
     (void) input;
-    return SubDrawObject(intf->p_sys, 0, VLC_OBJECT(intf->p_libvlc), 0, "");
+    return SubDrawObject(intf->p_sys, 0, VLC_OBJECT(intf->obj.libvlc), 0, "");
 }
 
 static int DrawMeta(intf_thread_t *intf, input_thread_t *p_input)
@@ -1594,7 +1594,7 @@ static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
     case 'q':
     case 'Q':
     case KEY_EXIT:
-        libvlc_Quit(intf->p_libvlc);
+        libvlc_Quit(intf->obj.libvlc);
         sys->exit = true;           // terminate the main loop
         return;
 
@@ -1835,7 +1835,7 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init(&sys->pl_lock);
 
     sys->verbosity = var_InheritInteger(intf, "verbose");
-    vlc_LogSet(intf->p_libvlc, MsgCallback, sys);
+    vlc_LogSet(intf->obj.libvlc, MsgCallback, sys);
 
     sys->box_type = BOX_PLAYLIST;
     sys->plidx_follow = true;
@@ -1894,7 +1894,7 @@ static void Close(vlc_object_t *p_this)
 
     endwin();   /* Close the ncurses interface */
 
-    vlc_LogSet(p_this->p_libvlc, NULL, NULL);
+    vlc_LogSet(p_this->obj.libvlc, NULL, NULL);
     vlc_mutex_destroy(&sys->msg_lock);
     vlc_mutex_destroy(&sys->pl_lock);
     for(unsigned i = 0; i < sizeof sys->msgs / sizeof *sys->msgs; i++) {

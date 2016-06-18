@@ -242,8 +242,8 @@ static VLCMain *sharedInstance = nil;
 
         var_Create(p_intf, "intf-change", VLC_VAR_BOOL);
 
-        var_AddCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
-        var_AddCallback(p_intf->p_libvlc, "intf-show", ShowController, (__bridge void *)self);
+        var_AddCallback(p_intf->obj.libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
+        var_AddCallback(p_intf->obj.libvlc, "intf-show", ShowController, (__bridge void *)self);
 
         playlist_t *p_playlist = pl_Get(p_intf);
         if ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)
@@ -367,8 +367,8 @@ static VLCMain *sharedInstance = nil;
 
     msg_Dbg(p_intf, "Terminating");
 
-    var_DelCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
-    var_DelCallback(p_intf->p_libvlc, "intf-show", ShowController, (__bridge void *)self);
+    var_DelCallback(p_intf->obj.libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
+    var_DelCallback(p_intf->obj.libvlc, "intf-show", ShowController, (__bridge void *)self);
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 

@@ -764,7 +764,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     /********************
      * hotkeys settings *
      ********************/
-    const struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
+    const struct hotkey *p_hotkeys = p_intf->obj.libvlc->p_hotkeys;
     _hotkeySettings = [[NSMutableArray alloc] init];
     NSMutableArray *tempArray_desc = [[NSMutableArray alloc] init];
     NSMutableArray *tempArray_names = [[NSMutableArray alloc] init];

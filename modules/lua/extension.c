@@ -812,7 +812,7 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
         }
         vlclua_set_this( L, p_mgr );
         vlclua_set_playlist_internal( L,
-            pl_Get((intf_thread_t *)(p_mgr->p_parent)) );
+            pl_Get((intf_thread_t *)(p_mgr->obj.parent)) );
         vlclua_extension_set( L, p_ext );
 
         luaL_openlibs( L );

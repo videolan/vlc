@@ -298,7 +298,7 @@ static int Open( vlc_object_t * p_this )
     int         i_size;
     bool        b_matched = false;
 
-    if( IsMxpeg( p_demux->s ) && !p_demux->b_force )
+    if( IsMxpeg( p_demux->s ) && !p_demux->obj.force )
         // let avformat handle this case
         return VLC_EGENERIC;
 

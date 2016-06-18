@@ -216,7 +216,7 @@ static vlc_mutex_t sys_lock = VLC_STATIC_MUTEX;
 
 static struct decklink_sys_t *GetDLSys(vlc_object_t *obj)
 {
-    vlc_object_t *libvlc = VLC_OBJECT(obj->p_libvlc);
+    vlc_object_t *libvlc = VLC_OBJECT(obj->obj.libvlc);
     struct decklink_sys_t *sys;
 
     vlc_mutex_lock(&sys_lock);
@@ -243,7 +243,7 @@ static struct decklink_sys_t *GetDLSys(vlc_object_t *obj)
 
 static void ReleaseDLSys(vlc_object_t *obj)
 {
-    vlc_object_t *libvlc = VLC_OBJECT(obj->p_libvlc);
+    vlc_object_t *libvlc = VLC_OBJECT(obj->obj.libvlc);
 
     vlc_mutex_lock(&sys_lock);
 

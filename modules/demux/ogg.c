@@ -208,7 +208,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Check if we are dealing with an ogg stream */
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
-    if( !p_demux->b_force && memcmp( p_peek, "OggS", 4 ) )
+    if( !p_demux->obj.force && memcmp( p_peek, "OggS", 4 ) )
     {
         char *psz_mime = stream_ContentType( p_demux->s );
         if( !psz_mime )

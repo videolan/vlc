@@ -170,7 +170,7 @@ static void *Run( void *data )
     free( p_intf->p_sys->psz_service );
 
     /* Make sure we exit (In case other interfaces have been spawned) */
-    libvlc_Quit( p_intf->p_libvlc );
+    libvlc_Quit( p_intf->obj.libvlc );
     return NULL;
 }
 

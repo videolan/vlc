@@ -156,7 +156,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "volume" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "mute" )
-    ADD_CALLBACK( pIntf->p_libvlc, "intf-toggle-fscontrol" )
+    ADD_CALLBACK( pIntf->obj.libvlc, "intf-toggle-fscontrol" )
 
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "random" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "loop" )
@@ -199,7 +199,7 @@ VlcProc::~VlcProc()
                      onGenericCallback, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "mute",
                      onGenericCallback, this );
-    var_DelCallback( getIntf()->p_libvlc, "intf-toggle-fscontrol",
+    var_DelCallback( getIntf()->obj.libvlc, "intf-toggle-fscontrol",
                      onGenericCallback, this );
 
     var_DelCallback( getIntf()->p_sys->p_playlist, "random",

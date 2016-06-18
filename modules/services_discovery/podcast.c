@@ -120,7 +120,7 @@ static void SaveUrls( services_discovery_t *p_sd );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    if( strcmp( p_this->p_parent->psz_object_type, "playlist" ) )
+    if( strcmp( p_this->obj.parent->obj.object_type, "playlist" ) )
         return VLC_EGENERIC; /* FIXME: support LibVLC SD too! */
 
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
@@ -144,7 +144,7 @@ static int Open( vlc_object_t *p_this )
     p_sd->p_sys  = p_sys;
 
     /* Launch the callback associated with this variable */
-    vlc_object_t *pl = p_sd->p_parent;
+    vlc_object_t *pl = p_sd->obj.parent;
     var_Create( pl, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( pl, "podcast-urls", UrlsChange, p_sys );
 
@@ -170,7 +170,7 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
-    vlc_object_t *pl = p_sd->p_parent;
+    vlc_object_t *pl = p_sd->obj.parent;
     int i;
 
     vlc_cancel (p_sys->thread);
@@ -222,7 +222,7 @@ static void *Run( void *data )
 
         if( p_sys->update_type == UPDATE_URLS )
         {
-            char *psz_urls = var_GetNonEmptyString( p_sd->p_parent,
+            char *psz_urls = var_GetNonEmptyString( p_sd->obj.parent,
                                                     "podcast-urls" );
             ParseUrls( p_sd, psz_urls );
             free( psz_urls );
@@ -375,7 +375,7 @@ static void ParseRequest( services_discovery_t *p_sd )
 
     if ( ! p_sys->b_savedurls_loaded )
     {
-        char *psz_urls = var_GetNonEmptyString( p_sd->p_parent,
+        char *psz_urls = var_GetNonEmptyString( p_sd->obj.parent,
                                                 "podcast-urls" );
         ParseUrls( p_sd, psz_urls );
         free( psz_urls );

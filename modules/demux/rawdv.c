@@ -138,7 +138,7 @@ static int Open( vlc_object_t * p_this )
      * it is possible to force this demux. */
 
     /* Check for DV file extension */
-    if( !demux_IsPathExtension( p_demux, ".dv" ) && !p_demux->b_force )
+    if( !demux_IsPathExtension( p_demux, ".dv" ) && !p_demux->obj.force )
         return VLC_EGENERIC;
 
     if( stream_Peek( p_demux->s, &p_peek, DV_PAL_FRAME_SIZE ) <

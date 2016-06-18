@@ -209,7 +209,7 @@
         [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
     } else {
         if (!input_item_IsPreparsed(p_item))
-            libvlc_MetadataRequest(getIntf()->p_libvlc, p_item, META_REQUEST_OPTION_NONE, -1, NULL);
+            libvlc_MetadataRequest(getIntf()->obj.libvlc, p_item, META_REQUEST_OPTION_NONE, -1, NULL);
 
         /* fill uri info */
         char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
@@ -387,7 +387,7 @@ FREENULL( psz_##foo );
 - (IBAction)downloadCoverArt:(id)sender
 {
     playlist_t *p_playlist = pl_Get(getIntf());
-    if (p_item) libvlc_ArtRequest(getIntf()->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
+    if (p_item) libvlc_ArtRequest(getIntf()->obj.libvlc, p_item, META_REQUEST_OPTION_NONE);
 }
 
 @end

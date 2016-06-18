@@ -167,7 +167,7 @@ int XCB_keyHandler_Process (key_handler_t *ctx, xcb_generic_event_t *ev)
                 vk |= KEY_MODIFIER_META;
             if (e->state & XCB_MOD_MASK_5) /* Alternate Graphic */
                 vk |= KEY_MODIFIER_ALT;
-            var_SetInteger (ctx->obj->p_libvlc, "key-pressed", vk);
+            var_SetInteger (ctx->obj->obj.libvlc, "key-pressed", vk);
             break;
         }
 

@@ -111,7 +111,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         [_remote setClickCountEnabledButtons: kRemoteButtonPlay];
         [_remote setDelegate: self];
 
-        var_AddCallback(p_intf->p_libvlc, "intf-boss", BossCallback, (__bridge void *)self);
+        var_AddCallback(p_intf->obj.libvlc, "intf-boss", BossCallback, (__bridge void *)self);
     }
     return self;
 }
@@ -119,7 +119,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (void)dealloc
 {
     intf_thread_t *p_intf = getIntf();
-    var_DelCallback(p_intf->p_libvlc, "intf-boss", BossCallback, (__bridge void *)self);
+    var_DelCallback(p_intf->obj.libvlc, "intf-boss", BossCallback, (__bridge void *)self);
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
@@ -621,7 +621,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (p_input != NULL) {
         vout_thread_t *p_vout = input_GetVout(p_input);
         if (p_vout != NULL) {
-            var_SetInteger(getIntf()->p_libvlc, "key-action", ACTIONID_POSITION);
+            var_SetInteger(getIntf()->obj.libvlc, "key-action", ACTIONID_POSITION);
             vlc_object_release(p_vout);
         }
         vlc_object_release(p_input);
@@ -1126,11 +1126,11 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                 break;
             case kRemoteButtonVolume_Plus_Hold:
                 if (p_intf)
-                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_UP);
+                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_UP);
                 break;
             case kRemoteButtonVolume_Minus_Hold:
                 if (p_intf)
-                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN);
+                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_DOWN);
                 break;
         }
         if (b_remote_button_hold) {
@@ -1169,14 +1169,14 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                 [NSSound increaseSystemVolume];
             else
                 if (p_intf)
-                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_UP);
+                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_UP);
             break;
         case kRemoteButtonVolume_Minus:
             if (config_GetInt(getIntf(), "macosx-appleremote-sysvol"))
                 [NSSound decreaseSystemVolume];
             else
                 if (p_intf)
-                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN);
+                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_DOWN);
             break;
         case kRemoteButtonRight:
             if (config_GetInt(getIntf(), "macosx-appleremote-prevnext"))
@@ -1322,7 +1322,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         }
 
         if (b_found_key) {
-            var_SetInteger(p_intf->p_libvlc, "key-pressed", val.i_int);
+            var_SetInteger(p_intf->obj.libvlc, "key-pressed", val.i_int);
             return YES;
         }
     }

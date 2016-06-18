@@ -328,7 +328,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p
     p_bridge = GetBridge( p_stream );
     if ( p_bridge == NULL )
     {
-        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->p_libvlc );
+        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->obj.libvlc );
         vlc_value_t val;
 
         p_bridge = xmalloc( sizeof( bridge_t ) );
@@ -463,7 +463,7 @@ static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 
     if ( b_last_es )
     {
-        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->p_libvlc );
+        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->obj.libvlc );
         for ( i = 0; i < p_bridge->i_es_num; i++ )
             free( p_bridge->pp_es[i] );
         free( p_bridge->pp_es );

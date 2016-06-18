@@ -384,7 +384,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 
     /* set up the playlist to work on */
     if( isDialogProvider )
-        p_intf->p_sys->p_playlist = pl_Get( (intf_thread_t *)p_intf->p_parent );
+        p_intf->p_sys->p_playlist = pl_Get( (intf_thread_t *)p_intf->obj.parent );
     else
         p_intf->p_sys->p_playlist = pl_Get( p_intf );
 
@@ -392,7 +392,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     vlc_sem_init (&ready, 0);
 #ifdef Q_OS_MAC
     /* Run mainloop on the main thread as Cocoa requires */
-    libvlc_SetExitHandler( p_intf->p_libvlc, Abort, p_intf );
+    libvlc_SetExitHandler( p_intf->obj.libvlc, Abort, p_intf );
     Thread( (void *)p_intf );
 #else
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )

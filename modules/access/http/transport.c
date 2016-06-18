@@ -127,7 +127,7 @@ vlc_tls_t *vlc_https_connect(vlc_tls_creds_t *creds, const char *name,
     if (port == 0)
         port = 443;
 
-    int fd = vlc_tcp_connect(creds->p_parent, name, port);
+    int fd = vlc_tcp_connect(creds->obj.parent, name, port);
     if (fd == -1)
         return NULL;
 

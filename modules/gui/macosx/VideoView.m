@@ -170,7 +170,7 @@
                 [[VLCCoreInteraction sharedInstance] toggleFullscreen];
             else if (p_vout) {
                 val.i_int |= (int)CocoaKeyToVLC(key);
-                var_Set(p_vout->p_libvlc, "key-pressed", val);
+                var_Set(p_vout->obj.libvlc, "key-pressed", val);
             }
             else
                 msg_Dbg(getIntf(), "could not send keyevent to VLC core");
@@ -266,7 +266,7 @@
 
         i_lastScrollWheelDirection = 1; // Y
         for (NSUInteger i = 0; i < (int)(f_yabsvalue/4.+1.); i++)
-            var_SetInteger(p_intf->p_libvlc, "key-pressed", i_yvlckey);
+            var_SetInteger(p_intf->obj.libvlc, "key-pressed", i_yvlckey);
 
         t_lastScrollEvent = [NSDate timeIntervalSinceReferenceDate];
         [self performSelector:@selector(resetScrollWheelDirection)
@@ -280,7 +280,7 @@
 
         i_lastScrollWheelDirection = -1; // X
         for (NSUInteger i = 0; i < (int)(f_xabsvalue/6.+1.); i++)
-            var_SetInteger(p_intf->p_libvlc, "key-pressed", i_xvlckey);
+            var_SetInteger(p_intf->obj.libvlc, "key-pressed", i_xvlckey);
 
         t_lastScrollEvent = [NSDate timeIntervalSinceReferenceDate];
         [self performSelector:@selector(resetScrollWheelDirection)

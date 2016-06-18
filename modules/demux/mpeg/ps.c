@@ -164,7 +164,7 @@ static int OpenForce( vlc_object_t *p_this )
 
 static int Open( vlc_object_t *p_this )
 {
-    return OpenCommon( p_this, ((demux_t *)p_this)->b_force );
+    return OpenCommon( p_this, p_this->obj.force );
 }
 
 /*****************************************************************************

@@ -219,7 +219,7 @@ int OpenDemux( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( !p_demux->b_force )
+    if( !p_demux->obj.force )
     {
         static const char ppsz_blacklist[][16] = {
             /* Don't handle MPEG unless forced */
@@ -244,7 +244,7 @@ int OpenDemux( vlc_object_t *p_this )
     }
 
     /* Don't trigger false alarms on bin files */
-    if( !p_demux->b_force && !strcmp( fmt->name, "psxstr" ) )
+    if( !p_demux->obj.force && !strcmp( fmt->name, "psxstr" ) )
     {
         int i_len;
 

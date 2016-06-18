@@ -74,7 +74,7 @@ LRESULT CALLBACK Win32Factory::Win32Proc( HWND hwnd, UINT uMsg,
             // If closing parent window
             if( (wParam & 0xFFF0) == SC_CLOSE )
             {
-                libvlc_Quit( p_intf->p_libvlc );
+                libvlc_Quit( p_intf->obj.libvlc );
                 return 0;
             }
             else if( (wParam & 0xFFF0) == SC_MINIMIZE )

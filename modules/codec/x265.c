@@ -141,7 +141,7 @@ static int  Open (vlc_object_t *p_this)
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
 
-    if (p_enc->fmt_out.i_codec != VLC_CODEC_HEVC && !p_enc->b_force)
+    if (p_enc->fmt_out.i_codec != VLC_CODEC_HEVC && !p_enc->obj.force)
         return VLC_EGENERIC;
 
     p_enc->fmt_out.i_cat = VIDEO_ES;

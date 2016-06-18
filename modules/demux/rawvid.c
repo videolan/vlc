@@ -147,7 +147,7 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    if( !p_demux->b_force )
+    if( !p_demux->obj.force )
     {
         /* guess preset based on file extension */
         if( !p_demux->psz_file )

@@ -420,7 +420,7 @@ void PrefsTree::updateLoadedStatus( QTreeWidgetItem *item = NULL,
 
     if( loaded == NULL )
     {
-        vlc_object_t *p_root = VLC_OBJECT( p_intf->p_libvlc );
+        vlc_object_t *p_root = VLC_OBJECT( p_intf->obj.libvlc );
         loaded = new QSet<QString>();
         populateLoadedSet( loaded, p_root );
         b_release = true;

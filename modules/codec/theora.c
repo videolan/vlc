@@ -677,7 +677,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     int status;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_THEORA &&
-        !p_enc->b_force )
+        !p_enc->obj.force )
     {
         return VLC_EGENERIC;
     }

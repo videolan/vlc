@@ -85,7 +85,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_demux->b_force )
+    if( p_demux->obj.force )
         b_forced = true;
 
     if( p_peek[0] != 0x00 || p_peek[1] != 0x00 || p_peek[2] != 0x01 )

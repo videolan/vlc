@@ -42,7 +42,7 @@ stream_t *stream_FilterNew( stream_t *p_source,
     stream_t *s;
     assert( p_source != NULL );
 
-    s = stream_CommonNew( p_source->p_parent, StreamDelete );
+    s = stream_CommonNew( p_source->obj.parent, StreamDelete );
     if( s == NULL )
         return NULL;
 

@@ -99,7 +99,7 @@ static int Open( vlc_object_t * p_this )
     if( p_peek[0] != 'B' || p_peek[1] != 'B' ||
         p_peek[2] != 'C' || p_peek[3] != 'D') /* start of ParseInfo */
     {
-        if( !p_demux->b_force ) return VLC_EGENERIC;
+        if( !p_demux->obj.force ) return VLC_EGENERIC;
 
         msg_Err( p_demux, "This doesn't look like a Dirac stream (incorrect parsecode)" );
         msg_Warn( p_demux, "continuing anyway" );

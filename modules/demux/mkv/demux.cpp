@@ -146,7 +146,7 @@ void event_thread_t::EventThread()
     b_vout       = true;
 
     /* catch all key event */
-    var_AddCallback( p_demux->p_libvlc, "key-action", EventKey, this );
+    var_AddCallback( p_demux->obj.libvlc, "key-action", EventKey, this );
     /* catch input event */
     var_AddCallback( p_demux->p_input, "intf-event", EventInput, this );
 
@@ -417,7 +417,7 @@ void event_thread_t::EventThread()
         vlc_object_release( p_vout );
     }
     var_DelCallback( p_demux->p_input, "intf-event", EventInput, this );
-    var_DelCallback( p_demux->p_libvlc, "key-action", EventKey, this );
+    var_DelCallback( p_demux->obj.libvlc, "key-action", EventKey, this );
 
     vlc_restorecancel (canc);
 }

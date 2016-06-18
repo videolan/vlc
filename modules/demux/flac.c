@@ -119,7 +119,7 @@ static int Open( vlc_object_t * p_this )
 
     if( p_peek[0]!='f' || p_peek[1]!='L' || p_peek[2]!='a' || p_peek[3]!='C' )
     {
-        if( !p_demux->b_force
+        if( !p_demux->obj.force
          && !demux_IsContentType( p_demux, "audio/flac" ) )
             return VLC_EGENERIC;
 

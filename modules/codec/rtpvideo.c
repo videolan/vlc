@@ -53,7 +53,7 @@ vlc_module_end ()
 static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
-    if( p_enc->fmt_out.i_codec != VLC_CODEC_R420 && !p_enc->b_force )
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_R420 && !p_enc->obj.force )
         return VLC_EGENERIC;
 
     p_enc->pf_encode_video = Encode;

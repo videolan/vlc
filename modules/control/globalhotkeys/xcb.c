@@ -294,7 +294,7 @@ static bool Mapping( intf_thread_t *p_intf )
     p_sys->p_map = NULL;
 
     /* Registering of Hotkeys */
-    for( const struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
+    for( const struct hotkey *p_hotkey = p_intf->obj.libvlc->p_hotkeys;
             p_hotkey->psz_action != NULL;
             p_hotkey++ )
     {
@@ -408,8 +408,8 @@ static void *Thread( void *p_data )
                     if( p_map->p_keys[j] == e->detail &&
                         p_map->i_modifier == e->state )
                     {
-                        var_SetInteger( p_intf->p_libvlc, "global-key-pressed",
-                                        p_map->i_vlc );
+                        var_SetInteger( p_intf->obj.libvlc,
+                                        "global-key-pressed", p_map->i_vlc );
                         goto done;
                     }
             }

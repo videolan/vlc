@@ -411,47 +411,86 @@ typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's objec
 #include "vlc_mtime.h"
 #include "vlc_threads.h"
 
-/*****************************************************************************
+/**
  * Common structure members
  *****************************************************************************/
 
-/* VLC_COMMON_MEMBERS : members common to all basic vlc objects */
-#define VLC_COMMON_MEMBERS                                                  \
-/** \name VLC_COMMON_MEMBERS                                                \
- * these members are common for all vlc objects                             \
- */                                                                         \
-/**@{*/                                                                     \
-    const char *psz_object_type;                                            \
-                                                                            \
-    /* Messages header */                                                   \
-    char *psz_header;                                                       \
-    int  i_flags;                                                           \
-                                                                            \
-    /* Object properties */                                                 \
-    bool b_force;      /**< set by the outside (eg. module_need()) */ \
-                                                                            \
-    /* Stuff related to the libvlc structure */                             \
-    libvlc_int_t *p_libvlc;                  /**< (root of all evil) - 1 */ \
-                                                                            \
-    vlc_object_t *  p_parent;                            /**< our parent */ \
-                                                                            \
-/**@}*/                                                                     \
+/**
+ * VLC object common members
+ *
+ * Common public properties for all VLC objects.
+ * Object also have private properties maintained by the core, see
+ * \ref vlc_object_internals_t
+ */
+struct vlc_common_members
+{
+    /** Object type name
+     *
+     * A constant string identifying the type of the object (for logging)
+     */
+    const char *object_type;
 
-/* VLC_OBJECT: attempt at doing a clever cast */
-#if VLC_GCC_VERSION(4,0)
+    /** Log messages header
+     *
+     * Human-readable header for log messages. This is not thread-safe and
+     * only used by VLM and Lua interfaces.
+     */
+    char *header;
+
+    int  flags;
+
+    /** Module probe flag
+     *
+     * A boolean during module probing when the probe is "forced".
+     * See \ref module_need().
+     */
+    bool force;
+
+    /** LibVLC instance
+     *
+     * Root VLC object of the objects tree that this object belongs in.
+     */
+    libvlc_int_t *libvlc;
+
+    /** Parent object
+     *
+     * The parent VLC object in the objects tree. For the root (the LibVLC
+     * instance) object, this is NULL.
+     */
+    vlc_object_t *parent;
+};
+
+/**
+ * Backward compatibility macro
+ */
+#define VLC_COMMON_MEMBERS struct vlc_common_members obj;
+
+/**
+ * Type-safe vlc_object_t cast
+ *
+ * This macro attempts to cast a pointer to a compound type to a
+ * \ref vlc_object_t pointer in a type-safe manner.
+ * It checks if the compound type actually starts with an embedded
+ * \ref vlc_object_t structure.
+ */
+#if !defined(__cplusplus) && (__STDC_VERSION__ >= 201112L)
+# define VLC_OBJECT(x) \
+    _Generic((x)->obj, \
+        struct vlc_common_members: (vlc_object_t *)(&(x)->obj) \
+    )
+#elif VLC_GCC_VERSION(4,0)
 # ifndef __cplusplus
 #  define VLC_OBJECT( x ) \
     __builtin_choose_expr( \
-        __builtin_offsetof(__typeof__(*(x)), psz_object_type), \
-        (void)0 /* screw you */, \
-        (vlc_object_t *)(x))
+        __builtin_types_compatible_p(__typeof__((x)->obj), struct vlc_common_members), \
+        (vlc_object_t *)(x), (void)0)
 # else
 #  define VLC_OBJECT( x ) \
-    ((vlc_object_t *)(x) \
-      + 0 * __builtin_offsetof(__typeof__(*(x)), psz_object_type))
+    ((vlc_object_t *)(&((x)->obj)) \
+      + 0 * __builtin_offsetof(__typeof__(*(x)), obj.object_type))
 # endif
 #else
-# define VLC_OBJECT( x ) ((vlc_object_t *)(x))
+# define VLC_OBJECT( x ) ((vlc_object_t *)&(x)->obj)
 #endif
 
 /*****************************************************************************

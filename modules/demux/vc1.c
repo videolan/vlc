@@ -86,7 +86,7 @@ static int Open( vlc_object_t * p_this )
     if( p_peek[0] != 0x00 || p_peek[1] != 0x00 ||
         p_peek[2] != 0x01 || p_peek[3] != 0x0f ) /* Sequence header */
     {
-        if( !p_demux->b_force )
+        if( !p_demux->obj.force )
         {
             msg_Warn( p_demux, "vc-1 module discarded (no startcode)" );
             return VLC_EGENERIC;

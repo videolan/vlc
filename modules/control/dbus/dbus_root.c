@@ -261,14 +261,14 @@ MarshalSupportedUriSchemes( intf_thread_t *p_intf, DBusMessageIter *container )
 DBUS_METHOD( Quit )
 { /* exits vlc */
     REPLY_INIT;
-    libvlc_Quit(INTF->p_libvlc);
+    libvlc_Quit(INTF->obj.libvlc);
     REPLY_SEND;
 }
 
 DBUS_METHOD( Raise )
 {/* shows vlc's main window */
     REPLY_INIT;
-    var_ToggleBool( INTF->p_libvlc, "intf-show" );
+    var_ToggleBool( INTF->obj.libvlc, "intf-show" );
     REPLY_SEND;
 }
 

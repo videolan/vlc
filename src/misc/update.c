@@ -113,7 +113,7 @@ update_t *update_New( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_update->lock );
 
-    p_update->p_libvlc = p_this->p_libvlc;
+    p_update->p_libvlc = p_this->obj.libvlc;
 
     p_update->release.psz_url = NULL;
     p_update->release.psz_desc = NULL;

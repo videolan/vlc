@@ -739,7 +739,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
      * FIXME: It's unclear why we want to put this in public API, and why we
      * want to expose it in such a limiting and ugly way.
      */
-    var_AddCallback(mp->p_libvlc, "snapshot-file", snapshot_was_taken, mp);
+    var_AddCallback(mp->obj.libvlc, "snapshot-file", snapshot_was_taken, mp);
 
     libvlc_retain(instance);
     return mp;
@@ -773,7 +773,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     assert( p_mi );
 
     /* Detach Callback from the main libvlc object */
-    var_DelCallback( p_mi->p_libvlc,
+    var_DelCallback( p_mi->obj.libvlc,
                      "snapshot-file", snapshot_was_taken, p_mi );
 
     /* Detach callback from the media player / input manager object */

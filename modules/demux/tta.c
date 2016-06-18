@@ -96,7 +96,7 @@ static int Open( vlc_object_t * p_this )
 
     if( memcmp( p_peek, "TTA1", 4 ) )
     {
-        if( !p_demux->b_force )
+        if( !p_demux->obj.force )
             return VLC_EGENERIC;
 
         /* User forced */

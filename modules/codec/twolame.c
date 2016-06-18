@@ -133,7 +133,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_codec != VLC_CODEC_MP2 &&
         p_enc->fmt_out.i_codec != VLC_CODEC_MPGA &&
         p_enc->fmt_out.i_codec != VLC_FOURCC( 'm', 'p', '2', 'a' ) &&
-        !p_enc->b_force )
+        !p_enc->obj.force )
     {
         return VLC_EGENERIC;
     }

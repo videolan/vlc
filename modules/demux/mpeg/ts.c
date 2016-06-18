@@ -233,7 +233,7 @@ static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_o
         }
     }
 
-    if( p_demux->b_force )
+    if( p_demux->obj.force )
     {
         msg_Warn( p_demux, "this does not look like a TS stream, continuing" );
         return TS_PACKET_SIZE_188;

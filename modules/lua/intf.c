@@ -208,17 +208,17 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
         char *n = var_InheritString( p_this, "lua-intf" );
         if( unlikely(n == NULL) )
             return VLC_EGENERIC;
-        name = p_intf->psz_header = n;
+        name = p_intf->obj.header = n;
     }
     else
         /* Cleaned up by vlc_object_release() */
-        p_intf->psz_header = strdup( name );
+        p_intf->obj.header = strdup( name );
 
     intf_sys_t *p_sys = malloc( sizeof(*p_sys) );
     if( unlikely(p_sys == NULL) )
     {
-        free( p_intf->psz_header );
-        p_intf->psz_header = NULL;
+        free( p_intf->obj.header );
+        p_intf->obj.header = NULL;
         return VLC_ENOMEM;
     }
     p_intf->p_sys = p_sys;
@@ -377,8 +377,8 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 error:
     free( p_sys->psz_filename );
     free( p_sys );
-    free( p_intf->psz_header );
-    p_intf->psz_header = NULL;
+    free( p_intf->obj.header );
+    p_intf->obj.header = NULL;
     return VLC_EGENERIC;
 }
 

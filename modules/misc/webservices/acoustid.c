@@ -162,13 +162,13 @@ int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
          return VLC_EGENERIC;
 
     msg_Dbg( p_obj, "Querying AcoustID from %s", psz_url );
-    int i_saved_flags = p_obj->i_flags;
-    p_obj->i_flags |= OBJECT_FLAGS_NOINTERACT;
+    int i_saved_flags = p_obj->obj.flags;
+    p_obj->obj.flags |= OBJECT_FLAGS_NOINTERACT;
 
     stream_t *p_stream = stream_UrlNew( p_obj, psz_url );
 
     free( psz_url );
-    p_obj->i_flags = i_saved_flags;
+    p_obj->obj.flags = i_saved_flags;
     if ( p_stream == NULL )
         return VLC_EGENERIC;
 

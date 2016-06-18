@@ -141,7 +141,7 @@ static int Open( vlc_object_t *p_this )
     ModPlug_Settings settings;
 
     /* We accept file based on extension match */
-    if( !p_demux->b_force )
+    if( !p_demux->obj.force )
     {
         const char *psz_ext = p_demux->psz_file ? strrchr( p_demux->psz_file, '.' )
                                                 : NULL;

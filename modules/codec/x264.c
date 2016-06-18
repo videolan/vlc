@@ -818,7 +818,7 @@ static int  Open ( vlc_object_t *p_this )
 #else
     if( p_enc->fmt_out.i_codec != VLC_CODEC_H264 &&
 #endif
-        !p_enc->b_force )
+        !p_enc->obj.force )
     {
         return VLC_EGENERIC;
     }

@@ -154,11 +154,11 @@ static int Open( vlc_object_t *p_this, enum type_e i_type )
         return VLC_EGENERIC;
     }
 
-    var_AddCallback( p_sd->p_libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
+    var_AddCallback( p_sd->obj.libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
 
     if( vlc_clone( &p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW ) )
     {
-        var_DelCallback( p_sd->p_libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
+        var_DelCallback( p_sd->obj.libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
         free( p_sys->psz_dir[1] );
         free( p_sys->psz_dir[0] );
         free( p_sys );
@@ -229,7 +229,7 @@ static void Close( vlc_object_t *p_this )
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
 
-    var_DelCallback( p_sd->p_libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
+    var_DelCallback( p_sd->obj.libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
 
     free( p_sys->psz_dir[1] );
     free( p_sys->psz_dir[0] );

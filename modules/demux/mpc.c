@@ -130,7 +130,7 @@ static int Open( vlc_object_t * p_this )
         if( i_version  < 4 || i_version > 6 )
             return VLC_EGENERIC;
 
-        if( !p_demux->b_force )
+        if( !p_demux->obj.force )
         {
             /* Check file name extension */
             if( !demux_IsPathExtension( p_demux, ".mpc" ) &&

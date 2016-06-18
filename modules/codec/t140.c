@@ -60,7 +60,7 @@ static int Open( vlc_object_t *p_this )
             break;
 
         default:
-            if( !p_enc->b_force )
+            if( !p_enc->obj.force )
                 return VLC_EGENERIC;
 
             p_enc->fmt_out.i_codec = VLC_CODEC_ITU_T140;

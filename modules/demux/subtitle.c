@@ -244,7 +244,7 @@ static int Open ( vlc_object_t *p_this )
     int  (*pf_read)( demux_t *, subtitle_t*, int );
     int            i, i_max;
 
-    if( !p_demux->b_force )
+    if( !p_demux->obj.force )
     {
         msg_Dbg( p_demux, "subtitle demux discarded" );
         return VLC_EGENERIC;
@@ -717,7 +717,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_subtitle >= p_sys->i_subtitles )
         return 0;
 
-    i_maxdate = p_sys->i_next_demux_date - var_GetInteger( p_demux->p_parent, "spu-delay" );;
+    i_maxdate = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );;
     if( i_maxdate <= 0 && p_sys->i_subtitle < p_sys->i_subtitles )
     {
         /* Should not happen */

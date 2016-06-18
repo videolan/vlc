@@ -257,7 +257,7 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
     int i_ret = 0;
 
     /* Restrict by type first */
-    if( !p_demux->b_force &&
+    if( !p_demux->obj.force &&
         !check_Property( p_demux, pp_psz_exts, demux_IsPathExtension ) &&
         !check_Property( p_demux, pp_psz_mimes, demux_IsContentType ) )
     {
@@ -314,7 +314,7 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
 
     if( i_ret < 1 )
     {
-        if( !p_demux->b_force )
+        if( !p_demux->obj.force )
         {
             msg_Warn( p_demux, "%s module discarded (no startcode)", psz_module );
             return VLC_EGENERIC;

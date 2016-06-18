@@ -61,8 +61,8 @@ static void PrintObject (vlc_object_t *obj, const char *prefix)
 
     int canc = vlc_savecancel ();
     printf (" %so %p %s, %u refs, parent %p\n", prefix, (void *)obj,
-            obj->psz_object_type, atomic_load(&priv->refs),
-            (void *)obj->p_parent);
+            obj->obj.object_type, atomic_load(&priv->refs),
+            (void *)obj->obj.parent);
     vlc_restorecancel (canc);
 }
 
@@ -201,20 +201,20 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_mutex_init (&priv->tree_lock);
 
     vlc_object_t *obj = (vlc_object_t *)(priv + 1);
-    obj->psz_object_type = typename;
-    obj->psz_header = NULL;
-    obj->b_force = false;
+    obj->obj.object_type = typename;
+    obj->obj.header = NULL;
+    obj->obj.force = false;
     memset (obj + 1, 0, length - sizeof (*obj)); /* type-specific stuff */
 
     if (likely(parent != NULL))
     {
         vlc_object_internals_t *papriv = vlc_internals (parent);
 
-        obj->i_flags = parent->i_flags;
-        obj->p_libvlc = parent->p_libvlc;
+        obj->obj.flags = parent->obj.flags;
+        obj->obj.libvlc = parent->obj.libvlc;
 
         /* Attach the child to its parent (no lock needed) */
-        obj->p_parent = vlc_object_hold (parent);
+        obj->obj.parent = vlc_object_hold (parent);
 
         /* Attach the parent to its child (structure lock needed) */
         vlc_mutex_lock (&papriv->tree_lock);
@@ -228,9 +228,9 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     {
         libvlc_int_t *self = (libvlc_int_t *)obj;
 
-        obj->i_flags = 0;
-        obj->p_libvlc = self;
-        obj->p_parent = NULL;
+        obj->obj.flags = 0;
+        obj->obj.libvlc = self;
+        obj->obj.parent = NULL;
         priv->next = NULL;
 
         /* TODO: should be in src/libvlc.c */
@@ -319,7 +319,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     if( p_priv->pf_destructor )
         p_priv->pf_destructor( p_this );
 
-    if (unlikely(p_this->p_parent == NULL))
+    if (unlikely(p_this->obj.parent == NULL))
     {
         /* TODO: should be in src/libvlc.c */
         var_DelCallback (p_this, "vars", VarsCommand, NULL);
@@ -332,7 +332,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     vlc_mutex_destroy (&p_priv->tree_lock);
     vlc_cond_destroy( &p_priv->var_wait );
     vlc_mutex_destroy( &p_priv->var_lock );
-    free( p_this->psz_header );
+    free( p_this->obj.header );
     free( p_priv->psz_name );
     free( p_priv );
 }
@@ -362,7 +362,7 @@ static vlc_object_t *FindName (vlc_object_t *obj, const char *name)
  * Beware that objects found in this manner can be "owned" by another thread,
  * be of _any_ type, and be attached to any module (if any). With such an
  * object reference, you can set or get object variables, emit log messages,
- * and read write-once object parameters (psz_object_type, etc).
+ * and read write-once object parameters (obj.object_type, etc).
  * You CANNOT cast the object to a more specific object type, and you
  * definitely cannot invoke object type-specific callbacks with this.
  *
@@ -437,7 +437,7 @@ void vlc_object_release (vlc_object_t *obj)
         assert (refs > 0);
     }
 
-    vlc_object_t *parent = obj->p_parent;
+    vlc_object_t *parent = obj->obj.parent;
 
     if (unlikely(parent == NULL))
     {   /* Destroying the root object */

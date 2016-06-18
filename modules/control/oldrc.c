@@ -617,16 +617,16 @@ static void *Run( void *data )
                     psz_cmd, i_ret, vlc_error( i_ret ) );
         }
         /* Or maybe it's a global command */
-        else if( var_Type( p_intf->p_libvlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
+        else if( var_Type( p_intf->obj.libvlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
         {
             int i_ret = VLC_SUCCESS;
 
             /* FIXME: it's a global command, but we should pass the
-             * local object as an argument, not p_intf->p_libvlc. */
-            if ((var_Type( p_intf->p_libvlc, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
+             * local object as an argument, not p_intf->obj.libvlc. */
+            if ((var_Type( p_intf->obj.libvlc, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
                 var_TriggerCallback( p_intf, psz_cmd );
             else
-                i_ret = var_SetString( p_intf->p_libvlc, psz_cmd, psz_arg );
+                i_ret = var_SetString( p_intf->obj.libvlc, psz_cmd, psz_arg );
             if( i_ret != 0 )
             {
                 msg_rc( "%s: returned %i (%s)",
@@ -714,7 +714,7 @@ static void *Run( void *data )
         }
         else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
         {
-            var_SetInteger( p_intf->p_libvlc, "key-action",
+            var_SetInteger( p_intf->obj.libvlc, "key-action",
                             vlc_GetActionId( psz_arg ) );
         }
         else switch( psz_cmd[0] )
@@ -987,7 +987,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_EXTRASHORT );
+            var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_JUMP_FORWARD_EXTRASHORT );
         }
         i_error = VLC_SUCCESS;
     }
@@ -1001,7 +1001,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_EXTRASHORT );
+            var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_JUMP_BACKWARD_EXTRASHORT );
         }
         i_error = VLC_SUCCESS;
     }
@@ -1396,7 +1396,7 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(p_data); VLC_UNUSED(psz_cmd);
     VLC_UNUSED(oldval); VLC_UNUSED(newval);
 
-    libvlc_Quit( p_this->p_libvlc );
+    libvlc_Quit( p_this->obj.libvlc );
     return VLC_SUCCESS;
 }
 

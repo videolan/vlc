@@ -95,7 +95,7 @@ static void aout_MuteNotify (audio_output_t *aout, bool mute)
 
 static void aout_PolicyNotify (audio_output_t *aout, bool cork)
 {
-    (cork ? var_IncInteger : var_DecInteger) (aout->p_parent, "corks");
+    (cork ? var_IncInteger : var_DecInteger) (aout->obj.parent, "corks");
 }
 
 static void aout_DeviceNotify (audio_output_t *aout, const char *id)
@@ -334,10 +334,10 @@ void aout_Destroy (audio_output_t *aout)
     aout_OutputUnlock (aout);
 
     var_DelCallback (aout, "audio-filter", FilterCallback, NULL);
-    var_DelCallback (aout, "device", var_CopyDevice, aout->p_parent);
-    var_DelCallback (aout, "mute", var_Copy, aout->p_parent);
+    var_DelCallback (aout, "device", var_CopyDevice, aout->obj.parent);
+    var_DelCallback (aout, "mute", var_Copy, aout->obj.parent);
     var_SetFloat (aout, "volume", -1.f);
-    var_DelCallback (aout, "volume", var_Copy, aout->p_parent);
+    var_DelCallback (aout, "volume", var_Copy, aout->obj.parent);
     vlc_object_release (aout);
 }
 

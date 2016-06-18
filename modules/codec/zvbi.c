@@ -267,7 +267,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_level = var_CreateGetInteger( p_dec, "vbi-level" );
 
     /* Listen for keys */
-    var_AddCallback( p_dec->p_libvlc, "key-pressed", EventKey, p_dec );
+    var_AddCallback( p_dec->obj.libvlc, "key-pressed", EventKey, p_dec );
 
     es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_CODEC_SPU );
     if( p_sys->b_text )
@@ -289,7 +289,7 @@ static void Close( vlc_object_t *p_this )
 
     var_DelCallback( p_dec, "vbi-opaque", Opaque, p_sys );
     var_DelCallback( p_dec, "vbi-page", RequestPage, p_sys );
-    var_DelCallback( p_dec->p_libvlc, "key-pressed", EventKey, p_dec );
+    var_DelCallback( p_dec->obj.libvlc, "key-pressed", EventKey, p_dec );
 
     vlc_mutex_destroy( &p_sys->lock );
 

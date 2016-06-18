@@ -239,12 +239,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /************
      * Callbacks
      ************/
-    var_AddCallback( p_intf->p_libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
-    var_AddCallback( p_intf->p_libvlc, "intf-boss", IntfBossCB, p_intf );
-    var_AddCallback( p_intf->p_libvlc, "intf-show", IntfRaiseMainCB, p_intf );
+    var_AddCallback( p_intf->obj.libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
+    var_AddCallback( p_intf->obj.libvlc, "intf-boss", IntfBossCB, p_intf );
+    var_AddCallback( p_intf->obj.libvlc, "intf-show", IntfRaiseMainCB, p_intf );
 
     /* Register callback for the intf-popupmenu variable */
-    var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
+    var_AddCallback( p_intf->obj.libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
 
     /* Final Sizing, restoration and placement of the interface */
@@ -308,10 +308,10 @@ MainInterface::~MainInterface()
     QVLCTools::saveWidgetPosition(settings, this);
 
     /* Unregister callbacks */
-    var_DelCallback( p_intf->p_libvlc, "intf-boss", IntfBossCB, p_intf );
-    var_DelCallback( p_intf->p_libvlc, "intf-show", IntfRaiseMainCB, p_intf );
-    var_DelCallback( p_intf->p_libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
-    var_DelCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
+    var_DelCallback( p_intf->obj.libvlc, "intf-boss", IntfBossCB, p_intf );
+    var_DelCallback( p_intf->obj.libvlc, "intf-show", IntfRaiseMainCB, p_intf );
+    var_DelCallback( p_intf->obj.libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
+    var_DelCallback( p_intf->obj.libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
     p_intf->p_sys->p_mi = NULL;
 }
@@ -1522,7 +1522,7 @@ void MainInterface::handleKeyPress( QKeyEvent *e )
     int i_vlck = qtEventToVLCKey( e );
     if( i_vlck > 0 )
     {
-        var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlck );
+        var_SetInteger( p_intf->obj.libvlc, "key-pressed", i_vlck );
         e->accept();
     }
     else
@@ -1532,7 +1532,7 @@ void MainInterface::handleKeyPress( QKeyEvent *e )
 void MainInterface::wheelEvent( QWheelEvent *e )
 {
     int i_vlckey = qtWheelEventToVLCKey( e );
-    var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlckey );
+    var_SetInteger( p_intf->obj.libvlc, "key-pressed", i_vlckey );
     e->accept();
 }
 

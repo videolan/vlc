@@ -132,7 +132,7 @@ static int Open( vlc_object_t *p_this )
 {
     filter_t     *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    vlc_object_t *p_aout = p_filter->p_parent;
+    vlc_object_t *p_aout = p_filter->obj.parent;
 
      /* Allocate structure */
     p_sys = p_filter->p_sys = (filter_sys_t*)malloc( sizeof( *p_sys ) );
@@ -172,7 +172,7 @@ static void Close( vlc_object_t *p_this )
 {
     filter_t     *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_object_t *p_aout = p_filter->p_parent;
+    vlc_object_t *p_aout = p_filter->obj.parent;
 
     /* Delete the callbacks */
     for(unsigned i=0;i<num_callbacks;++i)

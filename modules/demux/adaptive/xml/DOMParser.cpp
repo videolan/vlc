@@ -66,11 +66,11 @@ bool    DOMParser::parse                    (bool b)
     if(!vlc_reader && !(vlc_reader = xml_ReaderCreate(stream, stream)))
         return false;
 
-    const int i_flags = vlc_reader->i_flags;
+    const int i_flags = vlc_reader->obj.flags;
     if(!b)
-        vlc_reader->i_flags |= OBJECT_FLAGS_QUIET;
+        vlc_reader->obj.flags |= OBJECT_FLAGS_QUIET;
     root = processNode(b);
-    vlc_reader->i_flags = i_flags;
+    vlc_reader->obj.flags = i_flags;
     if ( root == NULL )
         return false;
 

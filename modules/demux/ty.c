@@ -307,7 +307,7 @@ static int Open(vlc_object_t *p_this)
          U32_AT(&p_peek[4]) != 0x02 ||
          U32_AT(&p_peek[8]) != CHUNK_SIZE )
     {
-        if( !p_demux->b_force &&
+        if( !p_demux->obj.force &&
             !demux_IsPathExtension( p_demux, ".ty" ) &&
             !demux_IsPathExtension( p_demux, ".ty+" ) )
             return VLC_EGENERIC;

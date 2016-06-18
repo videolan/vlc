@@ -144,7 +144,7 @@ static void vout_display_window_ResizeNotify(vout_window_t *window,
 
 static void vout_display_window_CloseNotify(vout_window_t *window)
 {
-    vout_thread_t *vout = (vout_thread_t *)window->p_parent;
+    vout_thread_t *vout = (vout_thread_t *)window->obj.parent;
 
     vout_SendEventClose(vout);
 }

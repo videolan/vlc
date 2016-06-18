@@ -46,7 +46,7 @@ static inline void vout_SendEventClose(vout_thread_t *vout)
 }
 static inline void vout_SendEventKey(vout_thread_t *vout, int key)
 {
-    var_SetInteger(vout->p_libvlc, "key-pressed", key);
+    var_SetInteger(vout->obj.libvlc, "key-pressed", key);
 }
 static inline void vout_SendEventMouseMoved(vout_thread_t *vout, int x, int y)
 {
@@ -65,14 +65,14 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
         int x, y;
         var_GetCoords(vout, "mouse-moved", &x, &y);
         var_SetCoords(vout, "mouse-clicked", x, y);
-        var_SetBool(vout->p_libvlc, "intf-popupmenu", false);
+        var_SetBool(vout->obj.libvlc, "intf-popupmenu", false);
         return;
     }
     case MOUSE_BUTTON_CENTER:
-        var_ToggleBool(vout->p_libvlc, "intf-toggle-fscontrol");
+        var_ToggleBool(vout->obj.libvlc, "intf-toggle-fscontrol");
         return;
     case MOUSE_BUTTON_RIGHT:
-        var_SetBool(vout->p_libvlc, "intf-popupmenu", true);
+        var_SetBool(vout->obj.libvlc, "intf-popupmenu", true);
         return;
     case MOUSE_BUTTON_WHEEL_UP:    key = KEY_MOUSEWHEELUP;    break;
     case MOUSE_BUTTON_WHEEL_DOWN:  key = KEY_MOUSEWHEELDOWN;  break;
@@ -105,7 +105,7 @@ static inline void vout_SendEventMouseHidden(vout_thread_t *vout)
 static inline void vout_SendEventSnapshot(vout_thread_t *vout, const char *filename)
 {
     /* signal creation of a new snapshot file */
-    var_SetString(vout->p_libvlc, "snapshot-file", filename);
+    var_SetString(vout->obj.libvlc, "snapshot-file", filename);
 }
 
 #warning "FIXME clean up postproc event"

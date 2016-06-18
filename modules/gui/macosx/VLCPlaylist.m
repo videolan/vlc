@@ -356,7 +356,7 @@
             continue;
         }
 
-        libvlc_MetadataRequest(p_intf->p_libvlc, [o_item input], META_REQUEST_OPTION_NONE, -1, NULL);
+        libvlc_MetadataRequest(p_intf->obj.libvlc, [o_item input], META_REQUEST_OPTION_NONE, -1, NULL);
 
     }
     [self playlistUpdated];
@@ -381,7 +381,7 @@
         if (![o_item isLeaf])
             continue;
 
-        libvlc_ArtRequest(p_intf->p_libvlc, [o_item input], META_REQUEST_OPTION_NONE);
+        libvlc_ArtRequest(p_intf->obj.libvlc, [o_item input], META_REQUEST_OPTION_NONE);
     }
     [self playlistUpdated];
 }
