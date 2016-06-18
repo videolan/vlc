@@ -733,7 +733,7 @@ static void* update_DownloadReal( void *obj )
         MultiByteToWideChar( CP_UTF8, 0, psz_destfile, -1, psz_wdestfile, MAX_PATH );
         answer = (int)ShellExecuteW( NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW);
         if(answer > 32)
-            libvlc_Quit(p_udt->p_libvlc);
+            libvlc_Quit(p_udt->obj.libvlc);
     }
 #endif
 end:
