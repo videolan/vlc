@@ -544,14 +544,6 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
                                     p_filter->fmt_in.video.i_width  - i_logo_w );
             p_sys->i_pos_y = VLC_CLIP( p_sys->i_pos_y + i_dy, 0,
                                     p_filter->fmt_in.video.i_height - i_logo_h );
-
-            /* object under mouse has moved */
-            var_SetBool( p_filter->p_parent, "mouse-object", true );
-        }
-        else if( b_over )
-        {
-            /* object under mouse stoped moving */
-            var_SetBool( p_filter->p_parent, "mouse-object", false );
         }
 
         if( p_sys->b_mouse_grab || b_over )
