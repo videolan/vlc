@@ -372,7 +372,7 @@ void WindowClose(vout_window_t *p_wnd)
 
     [o_new_video_window setAlphaValue: config_GetFloat(getIntf(), "macosx-opaqueness")];
 
-    [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
+    [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->obj.parent];
     [o_new_video_window setHasActiveVideo: YES];
     [o_vout_dict setObject:o_new_video_window forKey:[NSValue valueWithPointer:p_wnd]];
 
@@ -399,7 +399,7 @@ void WindowClose(vout_window_t *p_wnd)
 
         // this is not set when we start in fullscreen because of
         // fullscreen settings in video prefs the second time
-        var_SetBool(p_wnd->p_parent, "fullscreen", 1);
+        var_SetBool(p_wnd->obj.parent, "fullscreen", 1);
 
         [self setFullscreen:1 forWindow:p_wnd withAnimation:NO];
     }
