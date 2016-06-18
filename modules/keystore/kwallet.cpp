@@ -682,7 +682,7 @@ Open(vlc_object_t *p_this)
     if (!p_wallet)
         return VLC_EGENERIC;
 
-    if (!p_wallet->open(p_this->b_force))
+    if (!p_wallet->open(p_this->obj.force))
     {
         p_wallet->close();
         return VLC_EGENERIC;
