@@ -410,7 +410,7 @@ static int Open(vlc_object_t *this)
     uint8_t nals[128];
 
     if (enc->fmt_out.i_codec != VLC_CODEC_H264 &&
-        enc->fmt_out.i_codec != VLC_CODEC_MPGV && !enc->b_force)
+        enc->fmt_out.i_codec != VLC_CODEC_MPGV && !enc->obj.force)
         return VLC_EGENERIC;
 
     if (!enc->fmt_in.video.i_visible_height || !enc->fmt_in.video.i_visible_width ||
