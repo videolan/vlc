@@ -163,7 +163,7 @@ static int Open(vlc_object_t *object)
 
     OSVERSIONINFO winVer;
     winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if(GetVersionEx(&winVer) && winVer.dwMajorVersion < 6 && !object->b_force)
+    if(GetVersionEx(&winVer) && winVer.dwMajorVersion < 6 && !object->obj.force)
         return VLC_EGENERIC;
 
     /* Allocate structure */

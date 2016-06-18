@@ -136,7 +136,7 @@ LRESULT DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
                 break;
             case GID_TWOFINGERTAP:
                 p_gesture->i_type = GID_TWOFINGERTAP;
-                var_SetInteger( p_this->ovj.libvlc, "key-action", ACTIONID_PLAY_PAUSE );
+                var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_PLAY_PAUSE );
                 bHandled = TRUE;
                 break;
             case GID_ZOOM:

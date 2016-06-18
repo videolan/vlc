@@ -91,7 +91,7 @@ static int Open(vlc_object_t *object)
 
     sys->d2_dll = LoadLibrary(TEXT("D2D1.DLL"));
     if (!sys->d2_dll) {
-        if (object->b_force)
+        if (object->obj.force)
             msg_Err(vd, "Cannot load D2D1.DLL, aborting");
         goto error;
     }
