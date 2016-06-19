@@ -1630,17 +1630,6 @@
             bEnabled = _openSubtitleFile.isEnabled;
     }
 
-    /* Special case for telx menu */
-    if ([title isEqualToString: _NS("Normal Size")]) {
-        NSMenuItem *item = [[mi menu] itemWithTitle:_NS("Teletext")];
-        bool b_telx = p_input && var_GetInteger(p_input, "teletext-es") >= 0;
-
-        [[item submenu] setAutoenablesItems:NO];
-
-        for (int k=0; k < [[item submenu] numberOfItems]; k++)
-            [[[item submenu] itemAtIndex:k] setEnabled: b_telx];
-    }
-
     if (p_input)
         vlc_object_release(p_input);
 
