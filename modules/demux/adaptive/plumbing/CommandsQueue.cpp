@@ -314,6 +314,11 @@ void CommandsQueue::setDrop( bool b )
     vlc_mutex_unlock(&lock);
 }
 
+mtime_t CommandsQueue::getDemuxedAmount() const
+{
+    return bufferinglevel - getFirstDTS();
+}
+
 mtime_t CommandsQueue::getBufferingLevel() const
 {
     mtime_t i_buffer;

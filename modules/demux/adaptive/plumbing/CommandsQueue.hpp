@@ -145,6 +145,7 @@ namespace adaptive
             void Commit();
             bool isEmpty() const;
             void setDrop( bool );
+            mtime_t getDemuxedAmount() const;
             mtime_t getBufferingLevel() const;
             mtime_t getFirstDTS() const;
 
