@@ -1,0 +1,70 @@
+--- orc/configure.ac.orig	2016-06-20 13:07:27.584543779 +0000
++++ orc/configure.ac	2016-06-20 13:14:21.920651349 +0000
+@@ -90,20 +90,7 @@
+   AS_COMPILER_FLAG(-Werror, ERROR_CFLAGS="-Werror")
+ fi
+ 
+-case "${host_os}" in
+-  nobody_is_using_this_currently)
+-    AC_DEFINE(HAVE_CODEMEM_MALLOC, 1, [Use malloc to allocate code for execution])
+-    ;;
+-  mingw*|pw32*|cygwin*)
+-    AC_DEFINE(HAVE_CODEMEM_VIRTUALALLOC, 1, [Use VirtualAlloc to allocate code for execution])
+-    ;;
+-  linux*|darwin*|solaris*|netbsd*|freebsd*|openbsd*|kfreebsd*|dragonfly*|gnu*)
+-    AC_DEFINE(HAVE_CODEMEM_MMAP, 1, [Use mmap to allocate code for execution])
+-    ;;
+-  *)
+-    AC_ERROR([no code allocation backend])
+-    ;;
+-esac
++AC_CHECK_FUNCS([VirtualAlloc mmap])
+ 
+ case "${host_os}" in
+   mingw*|pw32*|cygwin*)
+--- orc/orc/orccodemem.c.orig	2016-06-20 16:43:22.126619599 +0200
++++ orc/orc/orccodemem.c	2016-06-20 16:45:03.370771546 +0200
+@@ -11,10 +11,10 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+-#ifdef HAVE_CODEMEM_MMAP
++#ifdef HAVE_MMAP
+ #include <sys/mman.h>
+ #endif
+-#ifdef HAVE_CODEMEM_VIRTUALALLOC
++#ifdef HAVE_VIRTUALALLOC
+ #include <windows.h>
+ #endif
+ 
+@@ -190,7 +190,7 @@
+   }
+ }
+ 
+-#ifdef HAVE_CODEMEM_MMAP
++#ifdef HAVE_MMAP
+ int
+ orc_code_region_allocate_codemem_dual_map (OrcCodeRegion *region,
+     const char *dir, int force_unlink)
+@@ -285,9 +285,7 @@
+       "and $TMPDIR and $HOME are mounted noexec (bad).");
+ }
+ 
+-#endif
+-
+-#ifdef HAVE_CODEMEM_VIRTUALALLOC
++#elif defined(HAVE_VIRTUALALLOC)
+ void
+ orc_code_region_allocate_codemem (OrcCodeRegion *region)
+ {
+@@ -295,9 +293,7 @@
+   region->exec_ptr = region->write_ptr;
+   region->size = SIZE;
+ }
+-#endif
+-
+-#ifdef HAVE_CODEMEM_MALLOC
++#else
+ void
+ orc_code_region_allocate_codemem (OrcCodeRegion *region)
+ {
