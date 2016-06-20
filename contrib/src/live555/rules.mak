@@ -1,15 +1,14 @@
 # live555
 
 LIVE555_FILE := live.2016.02.22.tar.gz
-#LIVEDOTCOM_URL := http://live555.com/liveMedia/public/$(LIVE555_FILE)
-LIVEDOTCOM_URL := $(CONTRIB_VIDEOLAN)/live555/$(LIVE555_FILE)
+LIVEDOTCOM_URL := http://live555.com/liveMedia/public/$(LIVE555_FILE)
 
 ifdef BUILD_NETWORK
 PKGS += live555
 endif
 
 $(TARBALLS)/$(LIVE555_FILE):
-	$(call download,$(LIVEDOTCOM_URL))
+	$(call download_pkg,$(LIVEDOTCOM_URL),live555)
 
 .sum-live555: $(LIVE555_FILE)
 

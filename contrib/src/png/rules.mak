@@ -8,7 +8,7 @@ PKGS_FOUND += png
 endif
 
 $(TARBALLS)/libpng-$(PNG_VERSION).tar.xz:
-	$(call download,$(PNG_URL))
+	$(call download_pkg,$(PNG_URL),png)
 
 .sum-png: libpng-$(PNG_VERSION).tar.xz
 

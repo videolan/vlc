@@ -3,7 +3,6 @@
 OGG_VERSION := 1.3.2
 
 OGG_URL := http://downloads.xiph.org/releases/ogg/libogg-$(OGG_VERSION).tar.xz
-#OGG_URL := $(CONTRIB_VIDEOLAN)/libogg-$(OGG_VERSION).tar.xz
 #OGG_CVSROOT := :pserver:anoncvs@xiph.org:/usr/local/cvsroot
 
 PKGS += ogg
@@ -12,7 +11,7 @@ PKGS_FOUND += ogg
 endif
 
 $(TARBALLS)/libogg-$(OGG_VERSION).tar.xz:
-	$(call download,$(OGG_URL))
+	$(call download_pkg,$(OGG_URL),ogg)
 
 .sum-ogg: libogg-$(OGG_VERSION).tar.xz
 

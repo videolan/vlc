@@ -1,8 +1,7 @@
 # GnuTLS
 
 GNUTLS_VERSION := 3.3.22
-#GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$(GNUTLS_VERSION).tar.xz
-GNUTLS_URL := $(CONTRIB_VIDEOLAN)/gnutls-$(GNUTLS_VERSION).tar.xz
+GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-$(GNUTLS_VERSION).tar.xz
 
 ifdef BUILD_NETWORK
 ifndef HAVE_DARWIN_OS
@@ -14,7 +13,7 @@ PKGS_FOUND += gnutls
 endif
 
 $(TARBALLS)/gnutls-$(GNUTLS_VERSION).tar.xz:
-	$(call download,$(GNUTLS_URL))
+	$(call download_pkg,$(GNUTLS_URL),gnutls)
 
 .sum-gnutls: gnutls-$(GNUTLS_VERSION).tar.xz
 
