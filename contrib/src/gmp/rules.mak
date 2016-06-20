@@ -4,7 +4,7 @@ GMP_VERSION := 6.0.0
 GMP_URL := https://gmplib.org/download/gmp-$(GMP_VERSION)/gmp-$(GMP_VERSION).tar.bz2
 
 $(TARBALLS)/gmp-$(GMP_VERSION).tar.bz2:
-	$(call download,$(GMP_URL))
+	$(call download_pkg,$(GMP_URL),gmp)
 
 .sum-gmp: gmp-$(GMP_VERSION).tar.bz2
 

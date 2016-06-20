@@ -9,7 +9,7 @@ PKGS_FOUND += flac
 endif
 
 $(TARBALLS)/flac-$(FLAC_VERSION).tar.xz:
-	$(call download,$(FLAC_URL))
+	$(call download_pkg,$(FLAC_URL),flac)
 
 .sum-flac: flac-$(FLAC_VERSION).tar.xz
 

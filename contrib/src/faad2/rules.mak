@@ -11,7 +11,7 @@ endif
 endif
 
 $(TARBALLS)/faad2-$(FAAD2_VERSION).tar.gz:
-	$(call download,$(FAAD2_URL))
+	$(call download_pkg,$(FAAD2_URL),faad2)
 
 .sum-faad2: faad2-$(FAAD2_VERSION).tar.gz
 

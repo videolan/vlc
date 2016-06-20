@@ -9,7 +9,7 @@ PKGS_FOUND += sdl
 endif
 
 $(TARBALLS)/SDL-$(SDL_VERSION).tar.gz:
-	$(call download,$(SDL_URL))
+	$(call download_pkg,$(SDL_URL),sdl)
 
 .sum-sdl: SDL-$(SDL_VERSION).tar.gz
 

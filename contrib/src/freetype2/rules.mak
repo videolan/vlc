@@ -9,7 +9,7 @@ PKGS_FOUND += freetype2
 endif
 
 $(TARBALLS)/freetype-$(FREETYPE2_VERSION).tar.gz:
-	$(call download,$(FREETYPE2_URL))
+	$(call download_pkg,$(FREETYPE2_URL),freetype2)
 
 .sum-freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 

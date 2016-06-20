@@ -10,7 +10,7 @@ PKGS_FOUND += jack
 endif
 
 $(TARBALLS)/jack1-$(JACK_VERSION).tar.gz:
-	$(call download,$(JACK_URL))
+	$(call download_pkg,$(JACK_URL),jack)
 
 .sum-jack: jack1-$(JACK_VERSION).tar.gz
 

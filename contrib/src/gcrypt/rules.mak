@@ -5,7 +5,7 @@ GCRYPT_URL := ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-$(GCRYPT_VERSION).t
 PKGS += gcrypt
 
 $(TARBALLS)/libgcrypt-$(GCRYPT_VERSION).tar.bz2:
-	$(call download,$(GCRYPT_URL))
+	$(call download_pkg,$(GCRYPT_URL),gcrypt)
 
 .sum-gcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 

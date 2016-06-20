@@ -7,7 +7,7 @@ PKGS_FOUND += ffi
 endif
 
 $(TARBALLS)/libffi-$(FFI_VERSION).tar.gz:
-	$(call download,$(FFI_URL))
+	$(call download_pkg,$(FFI_URL),ffi)
 
 .sum-ffi: libffi-$(FFI_VERSION).tar.gz
 

@@ -11,7 +11,7 @@ PKGS_FOUND += twolame
 endif
 
 $(TARBALLS)/twolame-$(TWOLAME_VERSION).tar.gz:
-	$(call download,$(TWOLAME_URL))
+	$(call download_pkg,$(TWOLAME_URL),twolame)
 
 .sum-twolame: twolame-$(TWOLAME_VERSION).tar.gz
 

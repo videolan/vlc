@@ -9,7 +9,7 @@ PKGS_FOUND += kate
 endif
 
 $(TARBALLS)/libkate-$(KATE_VERSION).tar.gz:
-	$(call download,$(KATE_URL))
+	$(call download_pkg,$(KATE_URL),kate)
 
 .sum-kate: libkate-$(KATE_VERSION).tar.gz
 

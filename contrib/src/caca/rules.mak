@@ -8,7 +8,7 @@ PKGS_FOUND += caca
 endif
 
 $(TARBALLS)/libcaca-$(CACA_VERSION).tar.gz:
-	$(call download,$(CACA_URL))
+	$(call download_pkg,$(CACA_URL),caca)
 
 .sum-caca: libcaca-$(CACA_VERSION).tar.gz
 

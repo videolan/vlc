@@ -10,7 +10,7 @@ PKGS_FOUND += sqlite
 endif
 
 $(TARBALLS)/sqlite-$(SQLITE_VERSION).tar.gz:
-	$(call download,$(SQLITE_URL))
+	$(call download_pkg,$(SQLITE_URL),sqlite)
 
 .sum-sqlite: sqlite-$(SQLITE_VERSION).tar.gz
 

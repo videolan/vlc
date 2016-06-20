@@ -9,7 +9,7 @@ PKGS_FOUND += gettext
 endif
 
 $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
-	$(call download,$(GETTEXT_URL))
+	$(call download_pkg,$(GETTEXT_URL),gettext)
 
 .sum-gettext: gettext-$(GETTEXT_VERSION).tar.gz
 

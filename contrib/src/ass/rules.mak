@@ -34,7 +34,7 @@ endif
 endif
 
 $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
-	$(call download,$(ASS_URL))
+	$(call download_pkg,$(ASS_URL),ass)
 
 .sum-ass: libass-$(ASS_VERSION).tar.gz
 

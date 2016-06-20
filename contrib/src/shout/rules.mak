@@ -13,7 +13,7 @@ PKGS_FOUND += shout
 endif
 
 $(TARBALLS)/libshout-$(SHOUT_VERSION).tar.gz:
-	$(call download,$(SHOUT_URL))
+	$(call download_pkg,$(SHOUT_URL),shout)
 
 .sum-shout: libshout-$(SHOUT_VERSION).tar.gz
 

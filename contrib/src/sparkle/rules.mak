@@ -8,7 +8,7 @@ PKGS += sparkle
 endif
 
 $(TARBALLS)/Sparkle-$(SPARKLE_VERSION).zip:
-	$(call download,$(SPARKLE_URL))
+	$(call download_pkg,$(SPARKLE_URL),sparkle)
 
 .sum-sparkle: Sparkle-$(SPARKLE_VERSION).zip
 

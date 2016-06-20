@@ -11,7 +11,7 @@ PKGS_FOUND += libmpeg2
 endif
 
 $(TARBALLS)/libmpeg2-$(LIBMPEG2_VERSION).tar.gz:
-	$(call download,$(LIBMPEG2_URL))
+	$(call download_pkg,$(LIBMPEG2_URL),libmpeg2)
 
 .sum-libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 

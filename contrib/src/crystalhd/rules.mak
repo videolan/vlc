@@ -7,7 +7,7 @@ PKGS += crystalhd
 endif
 
 $(TARBALLS)/crystalhd_lgpl_includes_v1.zip:
-	$(call download,$(CRYSTAL_HEADERS_URL))
+	$(call download_pkg,$(CRYSTAL_HEADERS_URL),crystalhd)
 
 CRYSTAL_SOURCES := crystalhd_lgpl_includes_v1.zip
 

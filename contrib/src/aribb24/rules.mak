@@ -9,7 +9,7 @@ PKGS_FOUND += aribb24
 endif
 
 $(TARBALLS)/aribb24-$(ARIBB24_VERSION).tar.gz:
-	$(call download,$(ARIBB24_URL))
+	$(call download_pkg,$(ARIBB24_URL),aribb24)
 
 .sum-aribb24: aribb24-$(ARIBB24_VERSION).tar.gz
 

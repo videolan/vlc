@@ -8,7 +8,7 @@ PKGS_FOUND += orc
 endif
 
 $(TARBALLS)/orc-$(ORC_VERSION).tar.gz:
-	$(call download,$(ORC_URL))
+	$(call download_pkg,$(ORC_URL),orc)
 
 .sum-orc: orc-$(ORC_VERSION).tar.gz
 

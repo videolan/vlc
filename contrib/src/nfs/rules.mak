@@ -8,7 +8,7 @@ PKGS_FOUND += nfs
 endif
 
 $(TARBALLS)/libnfs-$(NFS_VERSION).tar.gz:
-	$(call download,$(NFS_URL))
+	$(call download_pkg,$(NFS_URL),nfs)
 
 .sum-nfs: libnfs-$(NFS_VERSION).tar.gz
 

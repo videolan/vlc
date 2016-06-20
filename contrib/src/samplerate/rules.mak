@@ -10,7 +10,7 @@ PKGS_FOUND += samplerate
 endif
 
 $(TARBALLS)/libsamplerate-$(SAMPLERATE_VERSION).tar.gz:
-	$(call download,$(SAMPLERATE_URL))
+	$(call download_pkg,$(SAMPLERATE_URL),samplerate)
 
 .sum-samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz
 

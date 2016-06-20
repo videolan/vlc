@@ -9,7 +9,7 @@ PKGS_FOUND += fontconfig
 endif
 
 $(TARBALLS)/fontconfig-$(FONTCONFIG_VERSION).tar.gz:
-	$(call download,$(FONTCONFIG_URL))
+	$(call download_pkg,$(FONTCONFIG_URL),fontconfig)
 
 .sum-fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz
 

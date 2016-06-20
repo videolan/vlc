@@ -12,7 +12,7 @@ PKGS_FOUND += cddb
 endif
 
 $(TARBALLS)/libcddb-$(CDDB_VERSION).tar.bz2:
-	$(call download,$(CDDB_URL))
+	$(call download_pkg,$(CDDB_URL),cddb)
 
 .sum-cddb: libcddb-$(CDDB_VERSION).tar.bz2
 

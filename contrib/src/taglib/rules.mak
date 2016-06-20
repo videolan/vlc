@@ -9,7 +9,7 @@ PKGS_FOUND += taglib
 endif
 
 $(TARBALLS)/taglib-$(TAGLIB_VERSION).tar.gz:
-	$(call download,$(TAGLIB_URL))
+	$(call download_pkg,$(TAGLIB_URL),taglib)
 
 .sum-taglib: taglib-$(TAGLIB_VERSION).tar.gz
 

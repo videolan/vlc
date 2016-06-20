@@ -9,7 +9,7 @@ endif
 DEPS_soxr = ffmpeg $(DEPS_ffmpeg)
 
 $(TARBALLS)/soxr-$(SOXR_VERSION)-Source.tar.xz:
-	$(call download,$(SOXR_URL))
+	$(call download_pkg,$(SOXR_URL),soxr)
 
 .sum-soxr: soxr-$(SOXR_VERSION)-Source.tar.xz
 

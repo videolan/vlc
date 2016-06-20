@@ -8,7 +8,7 @@ PKGS_FOUND += protobuf
 endif
 
 $(TARBALLS)/protobuf-$(PROTOBUF_VERSION).tar.gz:
-	$(call download,$(PROTOBUF_URL))
+	$(call download_pkg,$(PROTOBUF_URL),protobuf)
 
 .sum-protobuf: protobuf-$(PROTOBUF_VERSION).tar.gz
 

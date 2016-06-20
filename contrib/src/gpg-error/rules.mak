@@ -3,7 +3,7 @@ GPGERROR_VERSION := 1.20
 GPGERROR_URL := ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-$(GPGERROR_VERSION).tar.bz2
 
 $(TARBALLS)/libgpg-error-$(GPGERROR_VERSION).tar.bz2:
-	$(call download,$(GPGERROR_URL))
+	$(call download_pkg,$(GPGERROR_URL),gpg-error)
 
 .sum-gpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2
 

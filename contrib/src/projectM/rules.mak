@@ -10,7 +10,7 @@ PKGS_FOUND += projectM
 endif
 
 $(TARBALLS)/projectM-$(PROJECTM_VERSION)-Source.tar.gz:
-	$(call download,$(PROJECTM_URL))
+	$(call download_pkg,$(PROJECTM_URL),projectM)
 
 .sum-projectM: projectM-$(PROJECTM_VERSION)-Source.tar.gz
 

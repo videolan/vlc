@@ -10,7 +10,7 @@ PKGS_FOUND += opus
 endif
 
 $(TARBALLS)/opus-$(OPUS_VERSION).tar.gz:
-	$(call download,$(OPUS_URL))
+	$(call download_pkg,$(OPUS_URL),opus)
 
 .sum-opus: opus-$(OPUS_VERSION).tar.gz
 

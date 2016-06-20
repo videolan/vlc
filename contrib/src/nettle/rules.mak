@@ -8,7 +8,7 @@ PKGS_FOUND += nettle
 endif
 
 $(TARBALLS)/nettle-$(NETTLE_VERSION).tar.gz:
-	$(call download,$(NETTLE_URL))
+	$(call download_pkg,$(NETTLE_URL),nettle)
 
 .sum-nettle: nettle-$(NETTLE_VERSION).tar.gz
 

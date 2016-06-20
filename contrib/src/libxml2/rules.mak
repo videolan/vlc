@@ -9,7 +9,7 @@ PKGS_FOUND += libxml2
 endif
 
 $(TARBALLS)/libxml2-$(LIBXML2_VERSION).tar.gz:
-	$(call download,$(LIBXML2_URL))
+	$(call download_pkg,$(LIBXML2_URL),libxml2)
 
 .sum-libxml2: libxml2-$(LIBXML2_VERSION).tar.gz
 

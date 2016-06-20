@@ -9,7 +9,7 @@ PKGS_FOUND += libdsm
 endif
 
 $(TARBALLS)/libdsm-$(LIBDSM_VERSION).tar.gz:
-	$(call download,$(LIBDSM_URL))
+	$(call download_pkg,$(LIBDSM_URL),libdsm)
 
 LIBDSM_CONF = $(HOSTCONF)
 

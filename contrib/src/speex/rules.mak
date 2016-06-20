@@ -9,7 +9,7 @@ PKGS_FOUND += speex
 endif
 
 $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
-	$(call download,$(SPEEX_URL))
+	$(call download_pkg,$(SPEEX_URL),speex)
 
 .sum-speex: speex-$(SPEEX_VERSION).tar.gz
 

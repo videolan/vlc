@@ -21,7 +21,7 @@ endif
 endif
 
 $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
-	$(call download,$(MPG123_URL))
+	$(call download_pkg,$(MPG123_URL),mpg123)
 
 .sum-mpg123: mpg123-$(MPG123_VERSION).tar.bz2
 

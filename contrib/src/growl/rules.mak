@@ -8,7 +8,7 @@ PKGS += growl
 endif
 
 $(TARBALLS)/growl-$(GROWL_VERSION).tar.bz2:
-	$(call download,$(GROWL_URL))
+	$(call download_pkg,$(GROWL_URL),growl)
 
 .sum-growl: growl-$(GROWL_VERSION).tar.bz2
 

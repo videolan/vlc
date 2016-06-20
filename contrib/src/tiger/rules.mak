@@ -12,7 +12,7 @@ PKGS_FOUND += tiger
 endif
 
 $(TARBALLS)/libtiger-$(TIGER_VERSION).tar.gz:
-	$(call download,$(TIGER_URL))
+	$(call download_pkg,$(TIGER_URL),tiger)
 
 .sum-tiger: libtiger-$(TIGER_VERSION).tar.gz
 

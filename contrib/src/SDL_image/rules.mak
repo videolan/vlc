@@ -9,7 +9,7 @@ PKGS_FOUND += SDL_image
 endif
 
 $(TARBALLS)/SDL_image-$(SDL_IMAGE_VERSION).tar.gz:
-	$(call download,$(SDL_IMAGE_URL))
+	$(call download_pkg,$(SDL_IMAGE_URL),SDL_image)
 
 .sum-SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 

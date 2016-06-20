@@ -9,7 +9,7 @@ PKGS_FOUND += modplug
 endif
 
 $(TARBALLS)/libmodplug-$(MODPLUG_VERSION).tar.gz:
-	$(call download,$(MODPLUG_URL))
+	$(call download_pkg,$(MODPLUG_URL),modplug)
 
 .sum-modplug: libmodplug-$(MODPLUG_VERSION).tar.gz
 

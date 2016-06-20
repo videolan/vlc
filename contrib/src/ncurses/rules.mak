@@ -12,7 +12,7 @@ PKGS_FOUND += ncurses
 endif
 
 $(TARBALLS)/ncurses-$(NCURSES_VERSION).tar.gz:
-	$(call download,$(NCURSES_URL))
+	$(call download_pkg,$(NCURSES_URL),ncurses)
 
 .sum-ncurses: ncurses-$(NCURSES_VERSION).tar.gz
 

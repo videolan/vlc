@@ -10,7 +10,7 @@ PKGS_FOUND += asdcplib
 endif
 
 $(TARBALLS)/asdcplib-$(ASDCPLIB_VERSION).tar.gz:
-	$(call download,$(ASDCPLIB_URL))
+	$(call download_pkg,$(ASDCPLIB_URL),asdcplib)
 
 .sum-asdcplib: asdcplib-$(ASDCPLIB_VERSION).tar.gz
 

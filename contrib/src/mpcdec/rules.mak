@@ -10,7 +10,7 @@ MUSE_REV := 481
 MUSE_URL := $(CONTRIB_VIDEOLAN)/mpcdec/musepack_src_r$(MUSE_REV).tar.gz
 
 $(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
-	$(call download,$(MUSE_URL))
+	$(call download_pkg,$(MUSE_URL),mpcdec)
 
 #MUSE_REV := 481
 #MUSE_SVN := http://svn.musepack.net/libmpc/trunk/

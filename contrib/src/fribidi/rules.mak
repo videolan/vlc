@@ -8,7 +8,7 @@ PKGS_FOUND += fribidi
 endif
 
 $(TARBALLS)/fribidi-$(FRIBIDI_VERSION).tar.bz2:
-	$(call download,$(FRIBIDI_URL))
+	$(call download_pkg,$(FRIBIDI_URL),fribidi)
 
 .sum-fribidi: fribidi-$(FRIBIDI_VERSION).tar.bz2
 

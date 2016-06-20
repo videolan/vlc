@@ -6,7 +6,7 @@ GME_URL := https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-$
 PKGS += gme
 
 $(TARBALLS)/game-music-emu-$(GME_VERSION).tar.bz2:
-	$(call download,$(GME_URL))
+	$(call download_pkg,$(GME_URL),gme)
 
 .sum-gme: game-music-emu-$(GME_VERSION).tar.bz2
 

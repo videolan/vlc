@@ -10,7 +10,7 @@ endif
 DEPS_glib = ffi $(DEPS_ffi)
 
 $(TARBALLS)/glib-$(GLIB_MINOR_VERSION).tar.xz:
-	$(call download,$(GLIB_URL))
+	$(call download_pkg,$(GLIB_URL),glib)
 
 .sum-glib: glib-$(GLIB_MINOR_VERSION).tar.xz
 

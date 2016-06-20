@@ -10,7 +10,7 @@ PKGS_FOUND += iconv
 endif
 
 $(TARBALLS)/libiconv-$(LIBICONV_VERSION).tar.gz:
-	$(call download,$(LIBICONV_URL))
+	$(call download_pkg,$(LIBICONV_URL),iconv)
 
 .sum-iconv: libiconv-$(LIBICONV_VERSION).tar.gz
 

@@ -6,7 +6,7 @@ BPG_URL := http://bellard.org/bpg/libbpg-$(BPG_VERSION).tar.gz
 # PKGS += bpg
 
 $(TARBALLS)/libbpg-$(BPG_VERSION).tar.gz:
-	$(call download,$(BPG_URL))
+	$(call download_pkg,$(BPG_URL),bpg)
 
 .sum-bpg: libbpg-$(BPG_VERSION).tar.gz
 

@@ -8,7 +8,7 @@ PKGS_FOUND += libarchive
 endif
 
 $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
-	$(call download,$(LIBARCHIVE_URL))
+	$(call download_pkg,$(LIBARCHIVE_URL),libarchive)
 
 .sum-libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz
 

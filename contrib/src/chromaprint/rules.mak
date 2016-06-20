@@ -9,7 +9,7 @@ PKGS_FOUND += chromaprint
 endif
 
 $(TARBALLS)/chromaprint-$(CHROMAPRINT_VERSION).tar.gz:
-	$(call download,$(CHROMAPRINT_URL))
+	$(call download_pkg,$(CHROMAPRINT_URL),chromaprint)
 
 .sum-chromaprint: chromaprint-$(CHROMAPRINT_VERSION).tar.gz
 
