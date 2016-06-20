@@ -457,9 +457,16 @@ int PlaylistManager::doControl(int i_query, va_list args)
         }
 
         case DEMUX_GET_PTS_DELAY:
-            *va_arg (args, int64_t *) = INT64_C(1000) *
-                var_InheritInteger(p_demux, "network-caching");
-             break;
+            if( logicType != AbstractAdaptationLogic::RateBased )
+            {
+                *va_arg (args, int64_t *) = INT64_C(1000) *
+                    var_InheritInteger(p_demux, "network-caching");
+            }
+            else
+            {
+                *va_arg (args, int64_t *) = 1000 * INT64_C(1000);
+            }
+            break;
 
         default:
             return VLC_EGENERIC;
