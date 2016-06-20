@@ -1633,15 +1633,25 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     sys->d3dregion_count = 0;
 
     if (sys->d3drenderTargetView)
+    {
         ID3D11RenderTargetView_Release(sys->d3drenderTargetView);
+        sys->d3drenderTargetView = NULL;
+    }
     if (sys->d3ddepthStencilView)
+    {
         ID3D11DepthStencilView_Release(sys->d3ddepthStencilView);
+        sys->d3ddepthStencilView = NULL;
+    }
     if (sys->pSPUPixelShader)
+    {
         ID3D11VertexShader_Release(sys->pSPUPixelShader);
+        sys->pSPUPixelShader = NULL;
+    }
 #if defined(HAVE_ID3D11VIDEODECODER) && VLC_WINSTORE_APP
     if( sys->context_lock > 0 )
     {
         CloseHandle( sys->context_lock );
+        sys->context_lock = INVALID_HANDLE_VALUE;
     }
 #endif
 
