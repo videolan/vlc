@@ -7,7 +7,7 @@ PKGS += mpcdec
 #MUSE_URL := http://files2.musepack.net/source/libmpcdec-$(MUSE_VERSION).tar.bz2
 
 MUSE_REV := 481
-MUSE_URL := $(CONTRIB_VIDEOLAN)/musepack_src_r$(MUSE_REV).tar.gz
+MUSE_URL := $(CONTRIB_VIDEOLAN)/mpcdec/musepack_src_r$(MUSE_REV).tar.gz
 
 $(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
 	$(call download,$(MUSE_URL))

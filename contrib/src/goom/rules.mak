@@ -1,7 +1,7 @@
 # goom
 
 GOOM_VERSION := 2k4-0
-GOOM_URL := $(CONTRIB_VIDEOLAN)/goom-$(GOOM_VERSION)-src.tar.gz
+GOOM_URL := $(CONTRIB_VIDEOLAN)/goom/goom-$(GOOM_VERSION)-src.tar.gz
 
 PKGS += goom
 

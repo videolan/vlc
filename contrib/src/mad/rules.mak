@@ -1,7 +1,7 @@
 # mad
 
 MAD_VERSION := 0.15.1b
-MAD_URL := $(CONTRIB_VIDEOLAN)/libmad-$(MAD_VERSION).tar.gz
+MAD_URL := $(CONTRIB_VIDEOLAN)/mad/libmad-$(MAD_VERSION).tar.gz
 
 ifdef GPL
 PKGS += mad
