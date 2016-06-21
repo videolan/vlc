@@ -121,7 +121,8 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     setFocusPolicy( Qt::NoFocus );
 
     /* Use the new/classic style */
-    setMinimumHeight( 18 );
+    qreal scalingFactorY = static_cast<qreal>(logicalDpiY()) / DPI_REF_VALUE;
+    setMinimumHeight( 18.0 * scalingFactorY );
     if( !b_classic )
     {
         alternativeStyle = new SeekStyle;
