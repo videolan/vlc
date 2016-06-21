@@ -547,7 +547,7 @@ static char *fsdir_name_from_filename(const char *psz_filename)
 
     /* remove extension */
     char *psz_ptr = strrchr(psz_name, '.');
-    if (psz_ptr)
+    if (psz_ptr && psz_ptr != psz_name)
         *psz_ptr = '\0';
 
     /* remove trailing white spaces */
