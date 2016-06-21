@@ -388,6 +388,10 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
             {
                 input_item_slave_t *p_sub_inner = pp_slaves[j];
 
+                /* A slave can be null if it's already rejected */
+                if( p_sub_inner == NULL )
+                    continue;
+
                 /* check that the filenames without extension match */
                 if( strncasecmp( p_sub->psz_uri, p_sub_inner->psz_uri,
                     strlen( p_sub->psz_uri ) - 3 ) )
