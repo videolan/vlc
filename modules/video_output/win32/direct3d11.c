@@ -723,11 +723,16 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
         D3D11_BOX box;
         box.left   = picture->format.i_x_offset;
-        box.right  = picture->format.i_x_offset + picture->format.i_visible_width;
+        /* box.right  = picture->format.i_x_offset + picture->format.i_visible_width; */
         box.top    = picture->format.i_y_offset;
-        box.bottom = picture->format.i_y_offset + picture->format.i_visible_height;
+        /* box.bottom = picture->format.i_y_offset + picture->format.i_visible_height; */
         box.back = 1;
         box.front = 0;
+
+        D3D11_TEXTURE2D_DESC dstDesc;
+        ID3D11Texture2D_GetDesc(sys->picQuad.pTexture, &dstDesc);
+        box.bottom = box.top  + dstDesc.Height;
+        box.right  = box.left + dstDesc.Width;
 
         ID3D11DeviceContext_CopySubresourceRegion(sys->d3dcontext,
                                                   (ID3D11Resource*) sys->picQuad.pTexture,
@@ -1517,6 +1522,19 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     texDesc.MiscFlags = 0;
+
+    /* remove half pixels, we don't want green lines */
+    const vlc_chroma_description_t *p_chroma_desc = vlc_fourcc_GetChromaDescription( fmt->i_chroma );
+    for (unsigned plane = 0; plane < p_chroma_desc->plane_count; ++plane)
+    {
+        unsigned i_extra;
+        i_extra = (texDesc.Width  * p_chroma_desc->p[plane].w.num) % p_chroma_desc->p[plane].w.den;
+        if ( i_extra )
+            texDesc.Width -= p_chroma_desc->p[plane].w.den / p_chroma_desc->p[plane].w.num - i_extra;
+        i_extra = (texDesc.Height  * p_chroma_desc->p[plane].h.num) % p_chroma_desc->p[plane].h.den;
+        if ( i_extra )
+            texDesc.Height -= p_chroma_desc->p[plane].h.den / p_chroma_desc->p[plane].h.num - i_extra;
+    }
 
     hr = ID3D11Device_CreateTexture2D(sys->d3ddevice, &texDesc, NULL, &quad->pTexture);
     if (FAILED(hr)) {
