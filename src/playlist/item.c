@@ -779,9 +779,11 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
        enabled*/
     char *psz_artist = input_item_GetArtist( p_item->p_input );
     char *psz_album = input_item_GetAlbum( p_item->p_input );
-    if( sys->p_preparser != NULL && !input_item_IsPreparsed( p_item->p_input )
+
+    if( sys->b_preparse && !input_item_IsPreparsed( p_item->p_input )
      && (EMPTY_STR(psz_artist) || EMPTY_STR(psz_album)) )
-        playlist_preparser_Push( sys->p_preparser, p_item->p_input, 0, -1, NULL );
+        libvlc_MetadataRequest( p_playlist->obj.libvlc, p_item->p_input, 0, -1,
+                                NULL );
     free( psz_artist );
     free( psz_album );
 }

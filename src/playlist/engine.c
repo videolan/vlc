@@ -229,6 +229,7 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->b_reset_currently_playing = true;
 
     pl_priv(p_playlist)->b_tree = var_InheritBool( p_parent, "playlist-tree" );
+    pl_priv(p_playlist)->b_preparse = var_InheritBool( p_parent, "auto-preparse" );
 
     /* Create the root, playing items and meida library nodes */
     playlist_item_t *root, *playing, *ml;
@@ -265,14 +266,6 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
 
     if (ml != NULL)
         playlist_MLLoad( p_playlist );
-
-    /* Preparser (and meta retriever) _after_ the Media Library*/
-    if( var_InheritBool( p_parent, "auto-preparse" ) )
-    {
-        p->p_preparser = playlist_preparser_New( VLC_OBJECT(p_playlist) );
-        if( unlikely(p->p_preparser == NULL) )
-            msg_Err( p_playlist, "cannot create preparser" );
-    }
 
     /* Input resources */
     p->p_input_resource = input_resource_New( VLC_OBJECT( p_playlist ) );
@@ -326,8 +319,6 @@ void playlist_Destroy( playlist_t *p_playlist )
     msg_Dbg( p_playlist, "destroying" );
 
     playlist_Deactivate( p_playlist );
-    if( p_sys->p_preparser )
-        playlist_preparser_Delete( p_sys->p_preparser );
 
     /* Release input resources */
     assert( p_sys->p_input == NULL );

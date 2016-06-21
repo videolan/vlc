@@ -47,7 +47,6 @@ void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist );
 typedef struct playlist_private_t
 {
     playlist_t           public_data;
-    playlist_preparser_t *p_preparser;  /**< Preparser data */
     struct intf_thread_t *interface; /**< Linked-list of interfaces */
 
     playlist_item_array_t items_to_delete; /**< Array of items and nodes to
@@ -87,6 +86,7 @@ typedef struct playlist_private_t
     bool     b_reset_currently_playing; /** Reset current item array */
 
     bool     b_tree; /**< Display as a tree */
+    bool     b_preparse; /**< Preparse items */
 } playlist_private_t;
 
 #define pl_priv( pl ) ((playlist_private_t *)(pl))
