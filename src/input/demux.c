@@ -552,6 +552,7 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_SET_ES:
         case DEMUX_GET_ATTACHMENTS:
         case DEMUX_CAN_RECORD:
+        case DEMUX_TEST_AND_CLEAR_FLAGS:
             return VLC_EGENERIC;
 
         case DEMUX_SET_TITLE:
