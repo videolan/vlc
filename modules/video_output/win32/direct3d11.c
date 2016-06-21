@@ -1609,15 +1609,30 @@ error:
 static void ReleaseQuad(d3d_quad_t *quad)
 {
     if (quad->pVertexBuffer)
+    {
         ID3D11Buffer_Release(quad->pVertexBuffer);
+        quad->pVertexBuffer = NULL;
+    }
     if (quad->pTexture)
+    {
         ID3D11Texture2D_Release(quad->pTexture);
+        quad->pTexture = NULL;
+    }
     if (quad->d3dresViewY)
+    {
         ID3D11ShaderResourceView_Release(quad->d3dresViewY);
+        quad->d3dresViewY = NULL;
+    }
     if (quad->d3dresViewUV)
+    {
         ID3D11ShaderResourceView_Release(quad->d3dresViewUV);
+        quad->d3dresViewUV = NULL;
+    }
     if (quad->d3dpixelShader)
+    {
         ID3D11VertexShader_Release(quad->d3dpixelShader);
+        quad->d3dpixelShader = NULL;
+    }
 }
 
 static void Direct3D11DestroyResources(vout_display_t *vd)
