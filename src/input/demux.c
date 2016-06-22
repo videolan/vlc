@@ -790,12 +790,8 @@ demux_t *demux_FilterChainNew( demux_t *p_demux, const char *psz_chain )
         demux_Delete(vlc_array_item_at_index(&module, modules));
     vlc_array_clear(&module);
 
-    /* then destroy all names and config which weren't destroyed by
-     * sout_StreamDelete */
     while(i--)
-    {
         free(vlc_array_item_at_index(&name, i));
-    }
     vlc_array_clear(&name);
 
     return NULL;
