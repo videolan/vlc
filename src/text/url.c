@@ -102,7 +102,7 @@ static char *encode_URI_bytes (const char *str, size_t *restrict lenp)
     char *out = buf;
     for (size_t i = 0; i < *lenp; i++)
     {
-        static const char hex[16] = "0123456789ABCDEF";
+        static const char hex[] = "0123456789ABCDEF";
         unsigned char c = str[i];
 
         if (isurisafe (c))
