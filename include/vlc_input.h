@@ -131,6 +131,8 @@ static inline void vlc_input_title_Delete( input_title_t *t )
 static inline input_title_t *vlc_input_title_Duplicate( const input_title_t *t )
 {
     input_title_t *dup = vlc_input_title_New( );
+    if( dup == NULL) return NULL;
+
     int i;
 
     if( t->psz_name ) dup->psz_name = strdup( t->psz_name );
