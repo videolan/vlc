@@ -133,8 +133,6 @@ static inline input_title_t *vlc_input_title_Duplicate( const input_title_t *t )
     input_title_t *dup = vlc_input_title_New( );
     if( dup == NULL) return NULL;
 
-    int i;
-
     if( t->psz_name ) dup->psz_name = strdup( t->psz_name );
     dup->i_flags     = t->i_flags;
     dup->i_length    = t->i_length;
@@ -143,7 +141,7 @@ static inline input_title_t *vlc_input_title_Duplicate( const input_title_t *t )
         dup->seekpoint = (seekpoint_t**)malloc( t->i_seekpoint * sizeof(seekpoint_t*) );
         if( likely(dup->seekpoint) )
         {
-            for( i = 0; i < t->i_seekpoint; i++ )
+            for( int i = 0; i < t->i_seekpoint; i++ )
                 dup->seekpoint[i] = vlc_seekpoint_Duplicate( t->seekpoint[i] );
             dup->i_seekpoint = t->i_seekpoint;
         }
