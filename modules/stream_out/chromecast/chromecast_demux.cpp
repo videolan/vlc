@@ -60,21 +60,17 @@ struct demux_sys_t
             }
             vlc_meta_Delete(p_meta);
         }
-        p_renderer->pf_set_input_state( p_renderer->p_opaque,
-                                        (input_state_e) var_GetInteger( p_input, "state" ) );
-        var_AddCallback( p_input, "intf-event", InputEvent, this );
     }
 
     ~demux_sys_t()
     {
-        demux_t *p_last_demux = p_demux->p_next;
-        while (p_last_demux->p_next)
-            p_last_demux = p_last_demux->p_next;
-        input_thread_t *p_input = p_last_demux->p_input;
-        var_DelCallback( p_input, "intf-event", InputEvent, this );
-
         p_renderer->pf_set_title( p_renderer->p_opaque, NULL );
         p_renderer->pf_set_artwork( p_renderer->p_opaque, NULL );
+    }
+
+    void setPauseState(bool paused)
+    {
+        p_renderer->pf_set_pause_state( p_renderer->p_opaque, paused );
     }
 
     /**
@@ -150,9 +146,6 @@ protected:
     bool          canSeek;
     /* seek time kept while waiting for the chromecast to "seek" */
     mtime_t       m_seektime;
-
-    static int InputEvent( vlc_object_t *p_this, char const *psz_var,
-                           vlc_value_t oldval, vlc_value_t val, void * );
 };
 
 static int Demux( demux_t *p_demux_filter )
@@ -245,24 +238,20 @@ static int Control( demux_t *p_demux_filter, int i_query, va_list args)
         }
         break;
     }
+    case DEMUX_SET_PAUSE_STATE:
+    {
+        va_list ap;
+
+        va_copy( ap, args );
+        int paused = va_arg( ap, int );
+        va_end( ap );
+
+        p_sys->setPauseState( paused != 0 );
+        break;
+    }
     }
 
     return demux_vaControl( p_demux_filter->p_next, i_query, args );
-}
-
-int demux_sys_t::InputEvent( vlc_object_t *p_this, char const *psz_var,
-                                    vlc_value_t oldval, vlc_value_t val, void *p_data )
-{
-    VLC_UNUSED(psz_var);
-    VLC_UNUSED(oldval);
-    input_thread_t *p_input = reinterpret_cast<input_thread_t*>( p_this );
-    demux_sys_t *p_sys = reinterpret_cast<demux_sys_t*>( p_data );
-
-    if( val.i_int == INPUT_EVENT_STATE )
-        p_sys->p_renderer->pf_set_input_state( p_sys->p_renderer->p_opaque,
-                                               (input_state_e) var_GetInteger( p_input, "state" ) );
-
-    return VLC_SUCCESS;
 }
 
 int Open(vlc_object_t *p_this)

@@ -159,7 +159,7 @@ private:
     std::atomic_bool requested_stop;
     std::atomic_bool requested_seek;
 
-    void setInputState(input_state_e state);
+    void setPauseState(bool paused);
 
     void setTitle( const char *psz_title )
     {
@@ -201,7 +201,6 @@ private:
     unsigned i_requestId;
 
     bool           has_input;
-    input_state_e  input_state;
 
     std::string GetMedia();
     std::string artwork;
@@ -266,7 +265,7 @@ private:
     static void request_seek(void*, mtime_t pos);
     static void wait_seek_done(void*);
 
-    static void set_input_state(void*, input_state_e state);
+    static void set_pause_state(void*, bool paused);
 
     static void set_title(void*, const char *psz_title);
     static void set_artwork(void*, const char *psz_artwork);
