@@ -27,6 +27,7 @@
 
 #include <vlc_vout.h>
 #include <vlc_keys.h>
+#include <vlc_renderer_discovery.h>
 
 #include "actions_manager.hpp"
 
@@ -35,10 +36,29 @@
 #include "main_interface.hpp"        /* Show playlist */
 #include "components/controller.hpp" /* Toggle FSC controller width */
 #include "components/extended_panels.hpp"
+#include "menus.hpp"
 
 ActionsManager::ActionsManager( intf_thread_t * _p_i )
 {
     p_intf = _p_i;
+    p_rd   = NULL;
+    b_rd_started = false;
+}
+
+ActionsManager::~ActionsManager()
+{
+    if ( p_rd != NULL )
+    {
+        if (b_rd_started)
+        {
+            vlc_event_manager_t *em = vlc_rd_event_manager( p_rd );
+            vlc_event_detach( em, vlc_RendererDiscoveryItemAdded, renderer_event_received, p_intf);
+            vlc_event_detach( em, vlc_RendererDiscoveryItemRemoved, renderer_event_received, p_intf);
+
+            vlc_rd_stop( p_rd );
+        }
+        vlc_rd_release( p_rd );
+    }
 }
 
 void ActionsManager::doAction( int id_action )
@@ -213,3 +233,155 @@ void ActionsManager::PPaction( QAction *a )
 
     ExtVideo::setPostprocessing( p_intf, i_q );
 }
+
+bool ActionsManager::isItemSout( QVariant & m_obj, const char *psz_sout, bool as_output )
+{
+    if ( psz_sout == NULL )
+        return false;
+    if (!m_obj.canConvert<QString>())
+        return false;
+
+    QString renderer(psz_sout);
+    if ( as_output && renderer.at(0) == '#' )
+        renderer = renderer.right( renderer.length() - 1 );
+    return QString::compare( m_obj.toString(), renderer, Qt::CaseInsensitive) == 0;
+}
+
+void ActionsManager::renderer_event_received( const vlc_event_t * p_event, void * user_data )
+{
+    intf_thread_t *p_intf = reinterpret_cast<intf_thread_t*>(user_data);
+
+    if ( p_event->type == vlc_RendererDiscoveryItemAdded )
+    {
+        vlc_renderer_item *p_item =  p_event->u.renderer_discovery_item_added.p_new_item;
+
+        QAction *firstSeparator = NULL;
+        foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
+        {
+            if (action->isSeparator())
+            {
+                firstSeparator = action;
+                break;
+            }
+            QVariant v = action->data();
+            if ( isItemSout( v, vlc_renderer_item_sout( p_item ), false ) )
+                return; /* we already have this item */
+        }
+
+        QVariant data(vlc_renderer_item_sout( p_item ));
+
+        QAction *action = new QAction( vlc_renderer_item_flags(p_item) & VLC_RENDERER_CAN_VIDEO ? QIcon( ":/sidebar/movie" ) : QIcon( ":/sidebar/music" ),
+                                       vlc_renderer_item_name(p_item), VLCMenuBar::rendererMenu );
+        action->setCheckable(true);
+        action->setData(data);
+        if (firstSeparator != NULL)
+        {
+            VLCMenuBar::rendererMenu->insertAction( firstSeparator, action );
+            VLCMenuBar::rendererGroup->addAction(action);
+        }
+
+        char *psz_renderer = var_InheritString( THEPL, "sout" );
+        if ( psz_renderer != NULL )
+        {
+            if ( isItemSout( data, psz_renderer, true ) )
+                action->setChecked( true );
+            free( psz_renderer );
+        }
+
+        CONNECT( VLCMenuBar::rendererGroup, triggered(QAction*), ActionsManager::getInstance( p_intf ), RendererSelected( QAction* ) );
+    }
+}
+
+void ActionsManager::ScanRendererAction(bool checked)
+{
+    if (checked == b_rd_started)
+        return; /* nothing changed */
+
+    if (checked)
+    {
+        /* reset the list of renderers */
+        foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
+        {
+            QVariant data = action->data();
+            if (!data.canConvert<QString>())
+                continue;
+            VLCMenuBar::rendererMenu->removeAction(action);
+            VLCMenuBar::rendererGroup->removeAction(action);
+        }
+        char *psz_renderer = var_InheritString( THEPL, "sout" );
+        if ( psz_renderer == NULL || *psz_renderer == '\0' )
+        {
+            foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
+            {
+                if (!action->data().canConvert<QString>())
+                    continue;
+                if (!action->isSeparator())
+                    action->setChecked(true);
+                break;
+            }
+        }
+        free( psz_renderer );
+
+        /* SD subnodes */
+        char **ppsz_longnames;
+        char **ppsz_names;
+        if( vlc_rd_get_names( THEPL, &ppsz_names, &ppsz_longnames ) != VLC_SUCCESS )
+            return;
+
+        char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
+        for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
+        {
+            /* TODO launch all discovery services for renderers */
+            msg_Dbg( p_intf, "starting renderer discovery service %s", *ppsz_longname );
+            if ( p_rd == NULL )
+            {
+                p_rd = vlc_rd_new( VLC_OBJECT(p_intf), *ppsz_name );
+                if( !p_rd )
+                    msg_Err( p_intf, "Could not start renderer discovery services" );
+            }
+            break;
+        }
+        free( ppsz_names );
+        free( ppsz_longnames );
+
+        if ( p_rd != NULL )
+        {
+            vlc_event_manager_t *em = vlc_rd_event_manager( p_rd );
+            vlc_event_attach( em, vlc_RendererDiscoveryItemAdded, renderer_event_received, p_intf);
+            vlc_event_attach( em, vlc_RendererDiscoveryItemRemoved, renderer_event_received, p_intf);
+
+            b_rd_started = vlc_rd_start( p_rd ) == VLC_SUCCESS;
+            if ( !b_rd_started )
+            {
+                vlc_event_detach( em, vlc_RendererDiscoveryItemAdded, renderer_event_received, p_intf);
+                vlc_event_detach( em, vlc_RendererDiscoveryItemRemoved, renderer_event_received, p_intf);
+            }
+        }
+    }
+    else
+    {
+        if ( p_rd != NULL )
+        {
+            vlc_event_manager_t *em = vlc_rd_event_manager( p_rd );
+            vlc_event_detach( em, vlc_RendererDiscoveryItemAdded, renderer_event_received, p_intf);
+            vlc_event_detach( em, vlc_RendererDiscoveryItemRemoved, renderer_event_received, p_intf);
+
+            vlc_rd_stop( p_rd );
+        }
+        b_rd_started = false;
+    }
+}
+
+void ActionsManager::RendererSelected( QAction *selected )
+{
+    QString s_sout;
+    QVariant data = selected->data();
+    if (data.canConvert<QString>())
+    {
+        s_sout.append('#');
+        s_sout.append(data.toString());
+    }
+    msg_Dbg( p_intf, "using sout: '%s'", s_sout.toUtf8().constData() );
+    var_SetString( THEPL, "sout", s_sout.toUtf8().constData() );
+}
+

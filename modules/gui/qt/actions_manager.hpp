@@ -72,9 +72,14 @@ public:
 
 private:
     ActionsManager( intf_thread_t  *_p_i );
-    virtual ~ActionsManager() {}
+    virtual ~ActionsManager();
 
     intf_thread_t       *p_intf;
+    vlc_renderer_discovery *p_rd;
+
+    bool  b_rd_started;
+    static void renderer_event_received( const vlc_event_t * p_event, void * user_data );
+    static bool isItemSout( QVariant & m_obj, const char *psz_sout, bool as_output );
 
 public slots:
     void toggleMuteAudio();
@@ -85,6 +90,8 @@ public slots:
     void skipForward();
     void skipBackward();
     void PPaction( QAction * );
+    void ScanRendererAction( bool );
+    void RendererSelected( QAction * );
 
 protected slots:
     void fullscreen();
