@@ -332,11 +332,6 @@ main(int i_argc, char *ppsz_argv[])
                        "--keystore-file=%s", psz_tmp_path) != -1);
                 i_vlc_argc++;
             }
-            else if (strcmp(psz_module, "kwallet") == 0)
-            {
-                /* See TODO in kwallet.cpp, VLCKWallet::connect() */
-                assert(libvlc_InternalAddIntf(p_libvlc->p_libvlc_int, "qt") == VLC_SUCCESS);
-            }
 
             test_module(psz_module, b_test_all, keystore_args[i].b_persistent,
                         i_vlc_argc, (const char * const *)ppsz_vlc_argv);

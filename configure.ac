@@ -4097,41 +4097,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([SECRET], [], [libsecret-1 >= 0.18], [use libsecret for keystore], [auto])
 
 dnl
-dnl  kwallet
-dnl
-AC_ARG_ENABLE(kwallet,
-  [AS_HELP_STRING([--enable-kwallet],
-    [use KWallet for keystore (default auto)])])
-have_kwallet="no"
-KWALLET_CXXFLAGS=""
-KWALLET_LIBS=""
-AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" \
-         -a "${enable_qt}" != "no" -a "${KDE4_CONFIG}" != "no" \
-         -a "${enable_kwallet}" != "no" ], [
-  VLC_SAVE_FLAGS
-  AC_LANG_PUSH([C++])
-  KWALLET_CXXFLAGS="$QT_CFLAGS $CXXFLAGS_qt -I`$KDE4_CONFIG --path include`"
-  CPPFLAGS="$CPPFLAGS $KWALLET_CXXFLAGS"
-  AC_CHECK_HEADER([kwallet.h], [
-    KWALLET_LIBS="$QT_LIBS -L`$KDE4_CONFIG --install lib` -lkdeui"
-    LDFLAGS="$LDFLAGS $KWALLET_LIBS"
-    AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <kwallet.h>], [
-KWallet::Wallet::LocalWallet();
-    ])], [
-      have_kwallet="yes"
-    ])
-  ])
-  AC_LANG_POP([C++])
-  VLC_RESTORE_FLAGS
-])
-AS_IF([test "$enable_kwallet" = "yes" -a "$have_kwallet" = "no" ], [
-  AC_MSG_ERROR([KWallet headers or so not found])
-])
-AC_SUBST(KWALLET_CXXFLAGS)
-AC_SUBST(KWALLET_LIBS)
-AM_CONDITIONAL([HAVE_KWALLET], [test "${have_kwallet}" = "yes"])
-
-dnl
 dnl  Developers helper modules (should be hidden from configure help)
 dnl
 AC_ARG_ENABLE(devtools, [], [], [enable_devtools="no"])
