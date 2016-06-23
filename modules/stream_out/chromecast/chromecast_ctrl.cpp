@@ -474,6 +474,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                         && conn_status == CHROMECAST_AUTHENTICATED)
                 {
                     msgConnect(appTransportId);
+                    setPlayerStatus(NO_CMD_PENDING);
                     setConnectionStatus(CHROMECAST_APP_STARTED);
                 }
                 else
