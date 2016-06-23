@@ -54,7 +54,11 @@ struct demux_t
     char        *psz_file;
 
     /* input stream */
-    stream_t    *s;     /* NULL in case of a access+demux in one */
+    union
+    {
+        stream_t    *s;     /* NULL in case of a access+demux in one */
+        demux_t     *p_next;/* demux_t filter chaining */
+    };
 
     /* es output */
     es_out_t    *out;   /* our p_es_out */
@@ -79,9 +83,6 @@ struct demux_t
 
     /* Weak link to parent input */
     input_thread_t *p_input;
-
-    /* demux_t filter chaining */
-    demux_t        *p_next;
 };
 
 /* pf_demux return values */

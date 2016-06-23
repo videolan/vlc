@@ -160,7 +160,6 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 
     p_demux->pf_demux   = NULL;
     p_demux->pf_control = NULL;
-    p_demux->p_next     = NULL;
     p_demux->p_sys      = NULL;
     p_demux->info.i_update = 0;
     p_demux->info.i_title  = 0;
@@ -719,7 +718,6 @@ static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
     demux_t *p_demux = &priv->demux;
 
     p_demux->p_next       = p_next;
-    p_demux->s            = NULL;
     p_demux->p_input      = NULL;
     p_demux->p_sys        = NULL;
     p_demux->psz_access   = NULL;
