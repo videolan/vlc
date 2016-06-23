@@ -122,7 +122,6 @@ struct decoder_sys_t
             int i_pixel_format;
             uint8_t i_nal_length_size;
             size_t i_h264_profile;
-            bool b_first_mp4v_iframe;
             /* stores the inflight picture for each output buffer or NULL */
             picture_sys_t** pp_inflight_pictures;
             unsigned int i_inflight_pictures;
@@ -150,7 +149,6 @@ static void CloseDecoder(vlc_object_t *);
 static int Video_OnNewBlock(decoder_t *, block_t **, int *);
 static int VideoH264_OnNewBlock(decoder_t *, block_t **, int *);
 static int VideoHEVC_OnNewBlock(decoder_t *, block_t **, int *);
-static int VideoMP4V_OnNewBlock(decoder_t *, block_t **, int *);
 static int VideoVC1_OnNewBlock(decoder_t *, block_t **, int *);
 static void Video_OnFlush(decoder_t *);
 static int Video_ProcessOutput(decoder_t *, mc_api_out *, picture_t **, block_t **);
@@ -713,9 +711,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             break;
         case VLC_CODEC_HEVC:
             p_sys->pf_on_new_block = VideoHEVC_OnNewBlock;
-            break;
-        case VLC_CODEC_MP4V:
-            p_sys->pf_on_new_block = VideoMP4V_OnNewBlock;
             break;
         case VLC_CODEC_VC1:
             p_sys->pf_on_new_block = VideoVC1_OnNewBlock;
@@ -1597,38 +1592,6 @@ static int VideoHEVC_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
     {
         h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
                                p_sys->u.video.i_nal_length_size);
-    }
-
-    return Video_OnNewBlock(p_dec, pp_block, p_flags);
-}
-
-static int VideoMP4V_OnNewBlock(decoder_t *p_dec, block_t **pp_block,
-                                int *p_flags)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block = *pp_block;
-
-    /* The first input sent to MediaCodec must be an I-Frame */
-    if (!p_sys->u.video.b_first_mp4v_iframe)
-    {
-        if ((p_block->i_flags & BLOCK_FLAG_TYPE_I))
-            p_sys->u.video.b_first_mp4v_iframe = true;
-        else
-        {
-            static const uint8_t p_mp4v_startcode[3] = {0x00, 0x00, 0x01};
-
-            if (p_block->i_buffer > 6
-             && memcmp(p_mp4v_startcode, p_block->p_buffer, 3) == 0
-             && p_block->p_buffer[3] == 0xb6)
-            {
-                bs_t s;
-                bs_init(&s, &p_block->p_buffer[4], 2);
-                if (bs_read(&s, 2) == 0)
-                    p_sys->u.video.b_first_mp4v_iframe = true;
-            }
-        }
-        if (!p_sys->u.video.b_first_mp4v_iframe)
-             return 0; /* Drop current block */
     }
 
     return Video_OnNewBlock(p_dec, pp_block, p_flags);
