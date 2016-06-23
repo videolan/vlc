@@ -105,6 +105,12 @@ static void demux_DestroyAccessDemux(demux_t *demux)
     (void) demux;
 }
 
+static void demux_DestroyDemuxFilter(demux_t *demux)
+{
+    assert(demux->p_next != NULL);
+    (void) demux;
+}
+
 /*****************************************************************************
  * demux_NewAdvanced:
  *  if s is NULL then load a access_demux
@@ -706,9 +712,11 @@ int demux_GetSeekpoint( demux_t *p_demux )
 
 static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
 {
-    demux_t *p_demux = vlc_custom_create( p_next, sizeof( demux_t ), "demux_filter" );
-    if( unlikely(p_demux == NULL) )
+    demux_priv_t *priv = vlc_custom_create(p_next, sizeof (*priv), "demux_filter");
+    if (unlikely(priv == NULL))
         return NULL;
+
+    demux_t *p_demux = &priv->demux;
 
     p_demux->p_next       = p_next;
     p_demux->s            = NULL;
@@ -719,6 +727,7 @@ static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
     p_demux->psz_location = NULL;
     p_demux->psz_file     = NULL;
     p_demux->out          = NULL;
+    priv->destroy         = demux_DestroyDemuxFilter;
     p_demux->p_module =
         module_need( p_demux, "demux_filter", p_name, p_name != NULL );
 
