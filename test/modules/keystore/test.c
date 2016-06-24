@@ -148,6 +148,7 @@ test_module(const char *psz_module, bool b_test_all, bool b_persistent,
     VALUES_INSERT(KEY_PATH, "/example/example.mkv");
     VALUES_INSERT(KEY_PORT, "88");
     VALUES_INSERT(KEY_USER, "user1");
+    VALUES_INSERT(KEY_AUTHTYPE, "Basic");
     KS_FIND();
     assert(i_entries == 0);
 
