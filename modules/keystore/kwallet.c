@@ -27,6 +27,7 @@
 #include <vlc_url.h>
 #include <vlc_plugin.h>
 #include <vlc_strings.h>
+#include <vlc_interrupt.h>
 
 #include <dbus/dbus.h>
 
@@ -35,6 +36,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <poll.h>
+#include <errno.h>
+#include <assert.h>
 
 static int Open( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -306,32 +310,167 @@ vlc_dbus_new_method( vlc_keystore* p_keystore, const char* psz_method )
     return msg;
 }
 
-static DBusMessage*
-vlc_dbus_send_message( vlc_keystore* p_keystore, DBusMessage* msg )
+#define MAX_WATCHES 2
+struct vlc_dbus_watch_data
 {
-    vlc_keystore_sys* p_sys = p_keystore->p_sys;
-    DBusMessage* repmsg;
-    DBusError error;
+    struct pollfd pollfd;
+    DBusWatch *p_watch;
+};
 
-    dbus_error_init( &error );
+static short
+vlc_dbus_watch_get_poll_events( DBusWatch *p_watch )
+{
+    unsigned int i_flags = dbus_watch_get_flags( p_watch );
+    short i_events = 0;
 
-    repmsg = dbus_connection_send_with_reply_and_block( p_sys->connection,
-                                                        msg, -1,
-                                                        &error);
-    if ( !repmsg )
+    if( i_flags & DBUS_WATCH_READABLE )
+        i_events |= POLLIN;
+    if( i_flags & DBUS_WATCH_WRITABLE )
+        i_events |= POLLOUT;
+    return i_events;
+}
+
+static struct vlc_dbus_watch_data *
+vlc_dbus_watch_get_data( DBusWatch *p_watch,
+                         struct vlc_dbus_watch_data *p_ctx )
+{
+    for( unsigned i = 0; i < MAX_WATCHES; ++i )
     {
-        msg_Err( p_keystore, "vlc_dbus_send_message : "
-                 "Failed dbus_connection_send_with_reply_and_block" );
-        return NULL;
+        if( p_ctx[i].p_watch == NULL || p_ctx[i].p_watch == p_watch )
+            return &p_ctx[i];
     }
-    if ( dbus_error_is_set( &error ) )
-    {
-        msg_Err( p_keystore, "vlc_dbus_send_message : "
-                 "dbus_connection_send_with_reply_and_block has error set" );
+    return NULL;
+}
+
+static dbus_bool_t
+vlc_dbus_watch_add_function( DBusWatch *p_watch, void *p_data )
+{
+    struct vlc_dbus_watch_data *p_ctx = vlc_dbus_watch_get_data( p_watch, p_data );
+
+    if( p_ctx == NULL )
+        return FALSE;
+
+    short i_events = POLLHUP | POLLERR;
+
+    i_events |= vlc_dbus_watch_get_poll_events( p_watch );
+
+    p_ctx->pollfd.fd = dbus_watch_get_unix_fd( p_watch );
+    p_ctx->pollfd.events = i_events;
+    p_ctx->p_watch = p_watch;
+    return TRUE;
+}
+
+static void
+vlc_dbus_watch_toggled_function( DBusWatch *p_watch, void *p_data )
+{
+    struct vlc_dbus_watch_data *p_ctx = vlc_dbus_watch_get_data( p_watch, p_data );
+    short i_events = vlc_dbus_watch_get_poll_events( p_watch );
+
+    if( dbus_watch_get_enabled( p_watch ) )
+        p_ctx->pollfd.events |= i_events;
+    else
+        p_ctx->pollfd.events &= ~i_events;
+}
+
+static void
+vlc_dbus_pending_call_notify( DBusPendingCall *p_pending_call, void *p_data )
+{
+    DBusMessage **pp_repmsg = p_data;
+    *pp_repmsg = dbus_pending_call_steal_reply( p_pending_call );
+}
+
+static DBusMessage*
+vlc_dbus_send_message( vlc_keystore* p_keystore, DBusMessage* p_msg )
+{
+    vlc_keystore_sys *p_sys = p_keystore->p_sys;
+    DBusMessage *p_repmsg = NULL;
+    DBusPendingCall *p_pending_call = NULL;
+
+    struct vlc_dbus_watch_data watch_ctx[MAX_WATCHES] = {};
+
+    for( unsigned i = 0; i < MAX_WATCHES; ++i )
+        watch_ctx[i].pollfd.fd = -1;
+
+    if( !dbus_connection_set_watch_functions( p_sys->connection,
+                                              vlc_dbus_watch_add_function,
+                                              NULL,
+                                              vlc_dbus_watch_toggled_function,
+                                              watch_ctx, NULL ) )
         return NULL;
+
+    if( !dbus_connection_send_with_reply( p_sys->connection, p_msg,
+                                          &p_pending_call,
+                                          DBUS_TIMEOUT_INFINITE ) )
+        goto end;
+
+    if( !dbus_pending_call_set_notify( p_pending_call,
+                                       vlc_dbus_pending_call_notify,
+                                       &p_repmsg, NULL ) )
+        goto end;
+
+    while( p_repmsg == NULL )
+    {
+        errno = 0;
+        struct pollfd pollfds[MAX_WATCHES];
+        int nfds = 0;
+        for( unsigned i = 0; i < MAX_WATCHES; ++i )
+        {
+            if( watch_ctx[i].pollfd.fd == -1 )
+                break;
+            pollfds[i].fd = watch_ctx[i].pollfd.fd;
+            pollfds[i].events = watch_ctx[i].pollfd.events;
+            pollfds[i].revents = 0;
+            nfds++;
+        }
+        if( nfds == 0 )
+        {
+            msg_Err( p_keystore, "vlc_dbus_send_message: watch functions not called" );
+            goto end;
+        }
+        if( vlc_poll_i11e( pollfds, nfds, -1 ) <= 0 )
+        {
+            if( errno == EINTR )
+                msg_Dbg( p_keystore, "vlc_dbus_send_message: poll was interrupted" );
+            else
+                msg_Err( p_keystore, "vlc_dbus_send_message: poll failed" );
+            goto end;
+        }
+        for( int i = 0; i < nfds; ++ i )
+        {
+            short i_events = pollfds[i].revents;
+            if( !i_events )
+                continue;
+            unsigned i_flags = 0;
+            if( i_events & POLLIN )
+                i_flags |= DBUS_WATCH_READABLE;
+            if( i_events & POLLOUT )
+                i_flags |= DBUS_WATCH_WRITABLE;
+            if( i_events & POLLHUP )
+                i_flags |= DBUS_WATCH_HANGUP;
+            if( i_events & POLLERR )
+                i_flags |= DBUS_WATCH_ERROR;
+            if( !dbus_watch_handle( watch_ctx[i].p_watch, i_flags ) )
+                goto end;
+        }
+
+        DBusDispatchStatus status;
+        while( ( status = dbus_connection_dispatch( p_sys->connection ) )
+                == DBUS_DISPATCH_DATA_REMAINS );
+        if( status == DBUS_DISPATCH_NEED_MEMORY )
+            goto end;
     }
 
-    return repmsg;
+end:
+    dbus_connection_set_watch_functions( p_sys->connection, NULL, NULL,
+                                         NULL, NULL, NULL );
+    if( p_pending_call != NULL )
+    {
+        if( p_repmsg != NULL )
+            dbus_pending_call_cancel( p_pending_call );
+        dbus_pending_call_unref( p_pending_call );
+    }
+    return p_repmsg;
+
 }
 
 static int
