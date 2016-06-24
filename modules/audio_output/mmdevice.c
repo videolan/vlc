@@ -703,7 +703,7 @@ static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
         char *id, *name;
 
         hr = IMMDeviceCollection_Item(devs, i, &dev);
-        if (FAILED(hr))
+        if (FAILED(hr) || !DeviceIsRender(dev))
             continue;
 
         /* Unique device ID */
