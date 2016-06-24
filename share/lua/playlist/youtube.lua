@@ -111,8 +111,8 @@ function js_descramble( sig, js_url )
     end
 
     -- Fetch the code of the descrambler function
-    -- var Go=function(a){a=a.split("");Fo.sH(a,2);Fo.TU(a,28);Fo.TU(a,44);Fo.TU(a,26);Fo.TU(a,40);Fo.TU(a,64);Fo.TR(a,26);Fo.sH(a,1);return a.join("")};
-    local rules = js_extract( js, "[ ,]"..descrambler.."=function%([^)]*%){(.-)};",
+    -- Go=function(a){a=a.split("");Fo.sH(a,2);Fo.TU(a,28);Fo.TU(a,44);Fo.TU(a,26);Fo.TU(a,40);Fo.TU(a,64);Fo.TR(a,26);Fo.sH(a,1);return a.join("")};
+    local rules = js_extract( js, "^"..descrambler.."=function%([^)]*%){(.-)};",
                                   -- Legacy/alternate format
                                   "function "..descrambler.."%([^)]*%){(.-)}" )
     if not rules then
