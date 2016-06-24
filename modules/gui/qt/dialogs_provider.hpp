@@ -124,9 +124,6 @@ public slots:
     void mediaCodecDialog();
     void prefsDialog();
     void extendedDialog();
-#if defined(ENABLE_SOUT)
-    void rendererDialog();
-#endif
     void synchroDialog();
     void messagesDialog();
     void sendKey( int key );

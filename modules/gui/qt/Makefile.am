@@ -67,7 +67,6 @@ libqt_plugin_la_SOURCES = \
 	dialogs/podcast_configuration.cpp dialogs/podcast_configuration.hpp \
 	dialogs/extensions.cpp dialogs/extensions.hpp \
 	dialogs/fingerprintdialog.cpp dialogs/fingerprintdialog.hpp \
-	dialogs/renderer.cpp dialogs/renderer.hpp \
 	components/extended_panels.cpp components/extended_panels.hpp \
 	components/info_panels.cpp components/info_panels.hpp \
 	components/info_widgets.cpp components/info_widgets.hpp \
@@ -167,7 +166,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	dialogs/firstrun.moc.cpp \
 	dialogs/extensions.moc.cpp \
 	dialogs/fingerprintdialog.moc.cpp \
-	dialogs/renderer.moc.cpp \
 	components/extended_panels.moc.cpp \
 	components/info_panels.moc.cpp \
 	components/info_widgets.moc.cpp \
@@ -225,7 +223,6 @@ nodist_libqt_plugin_la_SOURCES += \
 	ui/about.h \
 	ui/update.h \
 	ui/fingerprintdialog.h \
-	ui/renderer.h \
 	ui/sout.h
 
 # User interface compilation
@@ -263,7 +260,6 @@ libqt_plugin_la_UI = \
 	ui/streampanel.ui \
 	ui/messages_panel.ui \
 	ui/about.ui \
-	ui/renderer.ui \
 	ui/update.ui \
 	ui/sout.ui \
 	ui/vlm.ui \

@@ -59,7 +59,6 @@ typedef enum actionType_e
     LOOP_ACTION,
     INFO_ACTION,
     OPEN_SUB_ACTION,
-    RENDERER_ACTION,
 } actionType_e;
 
 class ActionsManager : public QObject, public Singleton<ActionsManager>

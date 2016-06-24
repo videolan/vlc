@@ -478,10 +478,6 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         CONNECT_MAP_SET( play, PLAY_ACTION );
         }
         break;
-    case RENDERER_BUTTON:{
-        NORMAL_BUTTON( RENDERER );
-        }
-        break;
     case ASPECT_RATIO_COMBOBOX:
         widget = new AspectRatioComboBox( p_intf );
         widget->setMinimumHeight( 26 );
