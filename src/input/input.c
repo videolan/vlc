@@ -1712,7 +1712,7 @@ static bool Control( input_thread_t *p_input,
         {
             if( p_input->p->b_recording )
             {
-                msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) ignored while recording" );
+                msg_Err( p_input, "INPUT_CONTROL_SET_POSITION ignored while recording" );
                 break;
             }
 
@@ -1726,7 +1726,7 @@ static bool Control( input_thread_t *p_input,
             if( demux_Control( p_input->p->master->p_demux, DEMUX_SET_POSITION,
                                (double) f_pos, !p_input->p->b_fast_seek ) )
             {
-                msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) "
+                msg_Err( p_input, "INPUT_CONTROL_SET_POSITION "
                          "%2.1f%% failed", (double)(f_pos * 100.f) );
             }
             else
@@ -1747,7 +1747,7 @@ static bool Control( input_thread_t *p_input,
 
             if( p_input->p->b_recording )
             {
-                msg_Err( p_input, "INPUT_CONTROL_SET_TIME(_OFFSET) ignored while recording" );
+                msg_Err( p_input, "INPUT_CONTROL_SET_TIME ignored while recording" );
                 break;
             }
 
@@ -1777,7 +1777,7 @@ static bool Control( input_thread_t *p_input,
             }
             if( i_ret )
             {
-                msg_Warn( p_input, "INPUT_CONTROL_SET_TIME(_OFFSET) %"PRId64
+                msg_Warn( p_input, "INPUT_CONTROL_SET_TIME %"PRId64
                          " failed or not possible", i_time );
             }
             else
