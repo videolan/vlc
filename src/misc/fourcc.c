@@ -610,6 +610,7 @@ static const struct
         VLC_CODEC_I444_16B },                  PLANAR_16(3, 1, 1, 16) },
     { { VLC_CODEC_YUVA_444_10L,
         VLC_CODEC_YUVA_444_10B },              PLANAR_16(4, 1, 1, 10) },
+    { { VLC_CODEC_P010 },                      PLANAR_16(2, 1, 2, 10) },
 
     { { VLC_CODEC_YUV_PACKED },                PACKED_FMT(2, 16) },
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,
