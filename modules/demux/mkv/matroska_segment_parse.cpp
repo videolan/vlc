@@ -588,6 +588,19 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             vars.tk->f_fps = __MAX( static_cast<float>( vfps ), 1 );
             debug( vars, "fps=%f", vars.tk->f_fps );
         }
+        E_CASE( KaxVideoColourSpace, colourspace )
+        {
+            if ( colourspace.ValidateSize() )
+            {
+                char clrspc[5];
+
+                vars.tk->fmt.i_codec = GetFOURCC( colourspace.GetBuffer() );
+
+                vlc_fourcc_to_char( vars.tk->fmt.i_codec, clrspc );
+                clrspc[4]  = '\0';
+                debug( vars, "Colour Space=%s", clrspc );
+            }
+        }
         E_CASE( KaxTrackAudio, tka ) {
             vars.tk->fmt.audio.i_channels = 1;
             vars.tk->fmt.audio.i_rate = 8000;
@@ -1371,6 +1384,9 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("V_MJPEG") {
             vars.p_fmt->i_codec = VLC_CODEC_MJPG;
+        }
+        S_CASE("V_UNCOMPRESSED") {
+            msg_Dbg( vars.p_demuxer, "uncompressed format detected");
         }
         S_CASE("A_MS/ACM") {
             mkv_track_t * p_tk = vars.p_tk;
