@@ -53,7 +53,7 @@ struct sout_stream_sys_t
 
     ~sout_stream_sys_t()
     {
-        sout_StreamChainDelete(p_out, p_out);
+        sout_StreamChainDelete(p_out, NULL);
         delete p_intf;
     }
 
@@ -189,7 +189,7 @@ static void Del(sout_stream_t *p_stream, sout_stream_id_sys_t *id)
     {
         p_sys->p_intf->requestPlayerStop();
 
-        sout_StreamChainDelete( p_sys->p_out, p_sys->p_out );
+        sout_StreamChainDelete( p_sys->p_out, NULL );
         p_sys->p_out = NULL;
         p_sys->sout = "";
     }
@@ -303,7 +303,7 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         {
             if ( unlikely( p_out != NULL ) )
             {
-                sout_StreamChainDelete( p_out, p_out );
+                sout_StreamChainDelete( p_out, NULL );
                 sout = "";
             }
 
@@ -469,7 +469,7 @@ static int Open(vlc_object_t *p_this)
         msg_Dbg(p_stream, "could not create sout chain:%s", ss.str().c_str());
         goto error;
     }
-    sout_StreamChainDelete( p_sout, p_sout );
+    sout_StreamChainDelete( p_sout, NULL );
 
     b_has_video = var_GetBool(p_stream, SOUT_CFG_PREFIX "video");
 
