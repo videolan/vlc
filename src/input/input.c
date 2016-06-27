@@ -1066,15 +1066,18 @@ static void LoadSlaves( input_thread_t *p_input )
                               &pp_slaves, &i_slaves ) == VLC_SUCCESS )
         {
             /* check that we did not add the subtitle through sub-file */
-            for( int i = 0; i < i_slaves; i++ )
+            if( psz_subtitle != NULL )
             {
-                input_item_slave_t *p_curr = pp_slaves[i];
-                if( p_curr != NULL && psz_subtitle != NULL
-                 && !strcmp( psz_subtitle, p_curr->psz_uri ) )
+                for( int i = 1; i < i_slaves; i++ )
                 {
-                    /* reject current sub */
-                    input_item_slave_Delete( p_curr );
-                    pp_slaves[i] = NULL;
+                    input_item_slave_t *p_curr = pp_slaves[i];
+                    if( p_curr != NULL 
+                     && !strcmp( psz_subtitle, p_curr->psz_uri ) )
+                    {
+                        /* reject current sub */
+                        input_item_slave_Delete( p_curr );
+                        pp_slaves[i] = NULL;
+                    }
                 }
             }
         }
@@ -1089,8 +1092,7 @@ static void LoadSlaves( input_thread_t *p_input )
     for( int i = 0; i < p_item->i_slaves; i++ )
     {
         input_item_slave_t *p_slave = p_item->pp_slaves[i];
-        if( !SlaveExists( pp_slaves, i_slaves, p_slave->psz_uri )
-         && ( !psz_subtitle || strcmp( psz_subtitle, p_slave->psz_uri ) ) )
+        if( !SlaveExists( pp_slaves, i_slaves, p_slave->psz_uri ) )
             INSERT_ELEM( pp_slaves, i_slaves, i_slaves, p_slave );
         else
             input_item_slave_Delete( p_slave );
