@@ -2997,7 +2997,9 @@ static char *input_SubtitleFile2Uri( input_thread_t *p_input,
         }
     }
 
-    return vlc_path2uri( psz_subtitle, NULL );
+    char *psz_uri = vlc_path2uri( psz_subtitle, NULL );
+    free( psz_idxpath );
+    return psz_uri;
 }
 
 /*****************************************************************************
