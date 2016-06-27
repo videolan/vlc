@@ -966,6 +966,19 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                     psz_subtitle++;
                 }
             }
+            else if( (psz_subtitle[1] == 'C' || psz_subtitle[1] == 'c' )
+                    && psz_subtitle[3] == '$' && i_len >= 7 )
+            {
+                /* Yes, they use BBGGRR, instead of RRGGBB */
+                char psz_color[7];
+                psz_color[0] = psz_subtitle[8]; psz_color[1] = psz_subtitle[9];
+                psz_color[2] = psz_subtitle[6]; psz_color[3] = psz_subtitle[7];
+                psz_color[4] = psz_subtitle[4]; psz_color[5] = psz_subtitle[5];
+                psz_color[6] = '\0';
+                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                p_segment->style->i_font_color = vlc_html_color( psz_color, NULL );
+                p_segment->style->i_features |= STYLE_HAS_FONT_COLOR;
+            }
             // Hide other {x:y} atrocities, like {c:$bbggrr} or {P:x}
             psz_subtitle = psz_tag_end + 1;
         }
