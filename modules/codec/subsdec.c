@@ -935,8 +935,11 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
         }
         /* MicroDVD extensions */
         else if( psz_subtitle[0] == '{' &&
-                 psz_subtitle[2] == ':' && strchr( psz_subtitle, '}' ) )
+                 psz_subtitle[2] == ':' && strchr( &psz_subtitle[2], '}' ) )
         {
+            const char *psz_tag_end = strchr( &psz_subtitle[2], '}' );
+            size_t i_len = psz_tag_end - &psz_subtitle[3];
+
             // FIXME: We don't do difference between X and x, and we should:
             // Capital Letters applies to the whole text and not one line
             if( psz_subtitle[1] == 'Y' || psz_subtitle[1] == 'y' )
@@ -964,7 +967,7 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                 }
             }
             // Hide other {x:y} atrocities, like {c:$bbggrr} or {P:x}
-            psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
+            psz_subtitle = psz_tag_end + 1;
         }
         else
         {
