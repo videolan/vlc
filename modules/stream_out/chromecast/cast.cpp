@@ -322,7 +322,7 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             p_sys_id->p_sub_id = sout_StreamIdAdd( p_out, &p_sys_id->fmt );
             if ( p_sys_id->p_sub_id == NULL )
             {
-                msg_Err( p_stream, "can't handle a stream" );
+                msg_Err( p_stream, "can't handle %4.4s stream", (char *)&p_sys_id->fmt.i_codec );
                 streams.erase( it, it );
             }
         }
