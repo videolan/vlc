@@ -327,8 +327,19 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             }
         }
 
-        /* tell the chromecast to load the content */
-        p_intf->setHasInput( true, mime );
+        if ( !streams.empty() )
+        {
+            /* tell the chromecast to load the content */
+            p_intf->setHasInput( true, mime );
+        }
+        else
+        {
+            p_intf->requestPlayerStop();
+
+            sout_StreamChainDelete( p_out, NULL );
+            p_out = NULL;
+            sout = "";
+        }
     }
 
     return VLC_SUCCESS;
