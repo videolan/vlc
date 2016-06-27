@@ -984,6 +984,19 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                 p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
                 p_segment->style->psz_fontname = strndup( &psz_subtitle[3], i_len );
             }
+            else if( psz_subtitle[1] == 'S' || psz_subtitle[1] == 's' )
+            {
+                char *value = strndup( &psz_subtitle[3], i_len );
+                int size = atoi( value );
+                if( size )
+                {
+                    p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                    p_segment->style->i_font_size = size;
+                    p_segment->style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE *
+                                STYLE_DEFAULT_FONT_SIZE / p_segment->style->i_font_size;
+
+                }
+            }
             // Hide other {x:y} atrocities, like {c:$bbggrr} or {P:x}
             psz_subtitle = psz_tag_end + 1;
         }
