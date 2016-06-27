@@ -979,6 +979,11 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                 p_segment->style->i_font_color = vlc_html_color( psz_color, NULL );
                 p_segment->style->i_features |= STYLE_HAS_FONT_COLOR;
             }
+            else if( psz_subtitle[1] == 'F' || psz_subtitle[1] == 'f' )
+            {
+                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                p_segment->style->psz_fontname = strndup( &psz_subtitle[3], i_len );
+            }
             // Hide other {x:y} atrocities, like {c:$bbggrr} or {P:x}
             psz_subtitle = psz_tag_end + 1;
         }
