@@ -739,6 +739,7 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
     /* */
     while( *psz_subtitle )
     {
+        /* HTML extensions */
         if( *psz_subtitle == '<' )
         {
             char *psz_tagname = GetTag( &psz_subtitle, false );
@@ -912,6 +913,7 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                 psz_subtitle++;
             }
         }
+        /* SSA extensions */
         else if( psz_subtitle[0] == '{' && psz_subtitle[1] == '\\' &&
                  strchr( psz_subtitle, '}' ) )
         {
@@ -931,36 +933,36 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
             /* Hide {\stupidity} */
             psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
         }
+        /* MicroDVD extensions */
         else if( psz_subtitle[0] == '{' &&
-                ( psz_subtitle[1] == 'Y' || psz_subtitle[1] == 'y' )
-                && psz_subtitle[2] == ':' && strchr( psz_subtitle, '}' ) )
+                 psz_subtitle[2] == ':' && strchr( psz_subtitle, '}' ) )
         {
-            // FIXME: We don't do difference between Y and y, and we should.
-            if( psz_subtitle[3] == 'i' )
+            // FIXME: We don't do difference between X and x, and we should:
+            // Capital Letters applies to the whole text and not one line
+            if( psz_subtitle[1] == 'Y' || psz_subtitle[1] == 'y' )
             {
-                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
-                p_segment->style->i_style_flags |= STYLE_ITALIC;
-                p_segment->style->i_features |= STYLE_HAS_FLAGS;
-                psz_subtitle++;
+                if( psz_subtitle[3] == 'i' )
+                {
+                    p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                    p_segment->style->i_style_flags |= STYLE_ITALIC;
+                    p_segment->style->i_features |= STYLE_HAS_FLAGS;
+                    psz_subtitle++;
+                }
+                if( psz_subtitle[3] == 'b' )
+                {
+                    p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                    p_segment->style->i_style_flags |= STYLE_BOLD;
+                    p_segment->style->i_features |= STYLE_HAS_FLAGS;
+                    psz_subtitle++;
+                }
+                if( psz_subtitle[3] == 'u' )
+                {
+                    p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                    p_segment->style->i_style_flags |= STYLE_UNDERLINE;
+                    p_segment->style->i_features |= STYLE_HAS_FLAGS;
+                    psz_subtitle++;
+                }
             }
-            if( psz_subtitle[3] == 'b' )
-            {
-                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
-                p_segment->style->i_style_flags |= STYLE_BOLD;
-                p_segment->style->i_features |= STYLE_HAS_FLAGS;
-                psz_subtitle++;
-            }
-            if( psz_subtitle[3] == 'u' )
-            {
-                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
-                p_segment->style->i_style_flags |= STYLE_UNDERLINE;
-                p_segment->style->i_features |= STYLE_HAS_FLAGS;
-                psz_subtitle++;
-            }
-            psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
-        }
-        else if( psz_subtitle[0] == '{' &&  psz_subtitle[2] == ':' && strchr( psz_subtitle, '}' ) )
-        {
             // Hide other {x:y} atrocities, like {c:$bbggrr} or {P:x}
             psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
         }
