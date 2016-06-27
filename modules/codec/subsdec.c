@@ -997,7 +997,15 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
 
                 }
             }
-            // Hide other {x:y} atrocities, like {c:$bbggrr} or {P:x}
+            /* Currently unsupported since we don't have access to the i_align flag here
+            else if( psz_subtitle[1] == 'P' )
+            {
+                if( psz_subtitle[3] == "1" )
+                    i_align = SUBPICTURE_ALIGN_TOP;
+                else if( psz_subtitle[3] == "0" )
+                    i_align = SUBPICTURE_ALIGN_BOTTOM;
+            } */
+            // Hide other {x:y} atrocities, notably {o:x}
             psz_subtitle = psz_tag_end + 1;
         }
         else
