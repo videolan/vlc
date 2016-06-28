@@ -28,14 +28,14 @@ XCBCONF := \
 	--disable-dri2 \
 	--disable-glx \
 	--enable-randr \
-	--disable-render \
+	--enable-render \
 	--disable-resource \
 	--disable-screensaver \
-	--disable-shape \
+	--enable-shape \
 	--enable-shm \
 	--disable-sync \
 	--disable-xevie \
-	--disable-xfixes \
+	--enable-xfixes \
 	--disable-xfree86-dri \
 	--disable-xinerama \
 	--disable-xinput \
