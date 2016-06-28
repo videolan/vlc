@@ -31,7 +31,7 @@ namespace adaptive
     {
         public:
             virtual ~AbstractSourceStream() {}
-            virtual stream_t *getStream() = 0;
+            virtual stream_t *makeStream() = 0;
             virtual void Reset() = 0;
     };
 
@@ -40,7 +40,7 @@ namespace adaptive
         public:
             ChunksSourceStream(vlc_object_t *, ChunksSource *);
             virtual ~ChunksSourceStream();
-            virtual stream_t *getStream(); /* impl */
+            virtual stream_t *makeStream(); /* impl */
             virtual void Reset(); /* impl */
 
         protected:
@@ -53,7 +53,7 @@ namespace adaptive
             static int seek_Callback(stream_t *, uint64_t);
             static int control_Callback( stream_t *, int i_query, va_list );
             static void delete_Callback( stream_t * );
-            stream_t *custom_stream;
+            vlc_object_t *p_obj;
             ChunksSource *source;
     };
 

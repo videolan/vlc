@@ -31,28 +31,16 @@
 
 using namespace adaptive;
 
-ChunksSourceStream::ChunksSourceStream(vlc_object_t *p_obj, ChunksSource *source_)
+ChunksSourceStream::ChunksSourceStream(vlc_object_t *p_obj_, ChunksSource *source_)
 {
     p_block = NULL;
     b_eof = false;
-
-    custom_stream = stream_CustomNew( p_obj, delete_Callback );
-    if(!custom_stream)
-        throw VLC_EGENERIC;
-
-    custom_stream->pf_control = control_Callback;
-    custom_stream->pf_read = read_Callback;
-    custom_stream->pf_readdir = NULL;
-    custom_stream->pf_seek = seek_Callback;
-    custom_stream->p_sys = reinterpret_cast<stream_sys_t*>(this);
-
+    p_obj = p_obj_;
     source = source_;
 }
 
 ChunksSourceStream::~ChunksSourceStream()
 {
-    if (custom_stream)
-        stream_Delete(custom_stream);
     Reset();
 }
 
@@ -64,9 +52,18 @@ void ChunksSourceStream::Reset()
     b_eof = false;
 }
 
-stream_t * ChunksSourceStream::getStream()
+stream_t * ChunksSourceStream::makeStream()
 {
-    return custom_stream;
+    stream_t *p_stream = stream_CustomNew( p_obj, delete_Callback );
+    if(p_stream)
+    {
+        p_stream->pf_control = control_Callback;
+        p_stream->pf_read = read_Callback;
+        p_stream->pf_readdir = NULL;
+        p_stream->pf_seek = seek_Callback;
+        p_stream->p_sys = reinterpret_cast<stream_sys_t*>(this);
+    }
+    return p_stream;
 }
 
 ssize_t ChunksSourceStream::Read(uint8_t *buf, size_t size)
