@@ -15,7 +15,7 @@ libxau: libXau-$(XAU_VERSION).tar.bz2 .sum-xau
 	$(UNPACK)
 	$(MOVE)
 
-DEPS_xau = xorg-macros $(DEPS_xorg-macros)
+DEPS_xau = xorg-macros $(DEPS_xorg-macros) xproto $(DEPS_xproto)
 
 .xau: libxau
 	$(RECONF)
