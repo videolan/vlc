@@ -53,11 +53,23 @@ struct demux_t
     char        *psz_location;
     char        *psz_file;
 
-    /* input stream */
-    union
-    {
-        stream_t    *s;     /* NULL in case of a access+demux in one */
-        demux_t     *p_next;/* demux_t filter chaining */
+    union {
+        /**
+         * Input stream
+         *
+         * Depending on the module capability:
+         * - "demux": input byte stream (not NULL)
+         * - "access_demux": a NULL pointer
+         * - "demux_filter": undefined
+         */
+        stream_t *s;
+        /**
+         * Input demuxer
+         *
+         * If the module capability is "demux_filter", this is the upstream
+         * demuxer or demux filter. Otherwise, this is undefined.
+         */
+        demux_t *p_next;
     };
 
     /* es output */
