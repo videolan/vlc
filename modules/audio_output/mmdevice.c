@@ -488,12 +488,15 @@ static bool DeviceIsRender(IMMDevice *dev)
 
     IMMEndpoint *ep = pv;
     EDataFlow flow;
-
-    if (FAILED(IMMEndpoint_GetDataFlow(ep, &flow)))
-        flow = eCapture;
+    HRESULT hr = IMMEndpoint_GetDataFlow(ep, &flow);
 
     IMMEndpoint_Release(ep);
-    return flow == eRender;
+    if (FAILED(hr) || flow != eRender)
+        return false;
+
+    DWORD pdwState;
+    hr = IMMDevice_GetState(dev, &pdwState);
+    return !FAILED(hr) && pdwState == DEVICE_STATE_ACTIVE;
 }
 
 static HRESULT DeviceUpdated(audio_output_t *aout, LPCWSTR wid)
