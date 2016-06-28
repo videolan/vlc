@@ -1,6 +1,6 @@
 # X protocol C language Bindings
 
-XCB_VERSION := 1.9
+XCB_VERSION := 1.12
 XCB_URL := http://xcb.freedesktop.org/dist/libxcb-$(XCB_VERSION).tar.bz2
 
 ifdef HAVE_LINUX
