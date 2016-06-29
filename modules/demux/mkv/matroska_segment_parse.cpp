@@ -1288,6 +1288,12 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     vars.p_fmt->p_extra = xmalloc( vars.p_fmt->i_extra );
                     memcpy( vars.p_fmt->p_extra, &p_bih[1], vars.p_fmt->i_extra );
                 }
+                else if( vars.p_fmt->i_codec == VLC_FOURCC('W','V','C','1') )
+                {
+                    vars.p_fmt->video.i_width = 0;
+                    vars.p_fmt->video.i_height = 0;
+                    vars.p_fmt->b_packetized = false;
+                }
             }
             vars.p_tk->b_dts_only = true;
         }
