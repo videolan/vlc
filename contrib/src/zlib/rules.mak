@@ -31,7 +31,7 @@ ifdef HAVE_WIN32
 	cd $< && $(HOSTVARS) $(MAKE) -fwin32/Makefile.gcc $(HOSTVARS) $(ZLIB_CONFIG_VARS) CFLAGS="$(CFLAGS) $(ZLIB_ECFLAGS)" RC="$(HOST)-windres" LD="$(CC)"
 	cd $< && $(MAKE) -fwin32/Makefile.gcc install INCLUDE_PATH="$(PREFIX)/include" LIBRARY_PATH="$(PREFIX)/lib" BINARY_PATH="$(PREFIX)/bin"
 else
-	cd $< && $(HOSTVARS) $(ZLIB_CONFIG_VARS) CFLAGS="$(CFLAGS) $(ZLIB_ECFLAGS)" ./configure --prefix=$(PREFIX) --static
+	cd $< && $(HOSTVARS_PIC) $(ZLIB_CONFIG_VARS) CFLAGS="$(CFLAGS) $(ZLIB_ECFLAGS)" ./configure --prefix=$(PREFIX)
 	cd $< && $(MAKE) install
 endif
 	touch $@
