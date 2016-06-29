@@ -124,12 +124,12 @@ namespace adaptive
     {
         public:
             virtual ~CommandsFactory() {}
-            virtual EsOutSendCommand * createEsOutSendCommand( FakeESOutID *, block_t * );
-            virtual EsOutDelCommand * createEsOutDelCommand( FakeESOutID * );
-            virtual EsOutAddCommand * createEsOutAddCommand( FakeESOutID * );
-            virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int, mtime_t );
-            virtual EsOutControlResetPCRCommand * creatEsOutControlResetPCRCommand();
-            virtual EsOutDestroyCommand * createEsOutDestroyCommand();
+            virtual EsOutSendCommand * createEsOutSendCommand( FakeESOutID *, block_t * ) const;
+            virtual EsOutDelCommand * createEsOutDelCommand( FakeESOutID * ) const;
+            virtual EsOutAddCommand * createEsOutAddCommand( FakeESOutID * ) const;
+            virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int, mtime_t ) const;
+            virtual EsOutControlResetPCRCommand * creatEsOutControlResetPCRCommand() const;
+            virtual EsOutDestroyCommand * createEsOutDestroyCommand() const;
     };
 
     /* Queuing for doing all the stuff in order */
@@ -138,7 +138,7 @@ namespace adaptive
         public:
             CommandsQueue( CommandsFactory * );
             ~CommandsQueue();
-            CommandsFactory * factory();
+            const CommandsFactory * factory() const;
             void Schedule( AbstractCommand * );
             mtime_t Process( es_out_t *out, mtime_t );
             void Abort( bool b_reset );

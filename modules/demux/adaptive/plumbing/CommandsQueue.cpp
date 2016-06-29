@@ -160,32 +160,32 @@ void EsOutControlResetPCRCommand::Execute( es_out_t * )
  * Commands Default Factory
  */
 
-EsOutSendCommand * CommandsFactory::createEsOutSendCommand( FakeESOutID *id, block_t *p_block )
+EsOutSendCommand * CommandsFactory::createEsOutSendCommand( FakeESOutID *id, block_t *p_block ) const
 {
     return new (std::nothrow) EsOutSendCommand( id, p_block );
 }
 
-EsOutDelCommand * CommandsFactory::createEsOutDelCommand( FakeESOutID *id )
+EsOutDelCommand * CommandsFactory::createEsOutDelCommand( FakeESOutID *id ) const
 {
     return new (std::nothrow) EsOutDelCommand( id );
 }
 
-EsOutAddCommand * CommandsFactory::createEsOutAddCommand( FakeESOutID *id )
+EsOutAddCommand * CommandsFactory::createEsOutAddCommand( FakeESOutID *id ) const
 {
     return new (std::nothrow) EsOutAddCommand( id );
 }
 
-EsOutControlPCRCommand * CommandsFactory::createEsOutControlPCRCommand( int group, mtime_t pcr )
+EsOutControlPCRCommand * CommandsFactory::createEsOutControlPCRCommand( int group, mtime_t pcr ) const
 {
     return new (std::nothrow) EsOutControlPCRCommand( group, pcr );
 }
 
-EsOutDestroyCommand * CommandsFactory::createEsOutDestroyCommand()
+EsOutDestroyCommand * CommandsFactory::createEsOutDestroyCommand() const
 {
     return new (std::nothrow) EsOutDestroyCommand();
 }
 
-EsOutControlResetPCRCommand * CommandsFactory::creatEsOutControlResetPCRCommand()
+EsOutControlResetPCRCommand * CommandsFactory::creatEsOutControlResetPCRCommand() const
 {
     return new (std::nothrow) EsOutControlResetPCRCommand();
 }
@@ -233,7 +233,7 @@ void CommandsQueue::Schedule( AbstractCommand *command )
     vlc_mutex_unlock(&lock);
 }
 
-CommandsFactory * CommandsQueue::factory()
+const CommandsFactory * CommandsQueue::factory() const
 {
     return commandsFactory;
 }
