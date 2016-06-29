@@ -293,4 +293,23 @@ vlc_module_begin()
 
     add_bool("http2", false, N_("Force HTTP/2"),
              N_("Force HTTP version 2.0 over TCP."), true)
+
+    add_bool("http-continuous", false, N_("Continuous stream"),
+             N_("Keep reading a resource that keeps being updated."), true)
+        change_safe()
+        change_volatile()
+    add_bool("http-forward-cookies", true, N_("Cookies forwarding"),
+             N_("Forward cookies across HTTP redirections."), true)
+    add_string("http-referrer", NULL, N_("Referrer"),
+               N_("Provide the referral URL, i.e. HTTP \"Referer\" (sic)."),
+               true)
+        change_safe()
+        change_volatile()
+    add_string("http-user-agent", NULL, N_("User agent"),
+               N_("Override the name and version of the application as "
+                  "provided to the HTTP server, i.e. the HTTP \"User-Agent\". "
+                  "Name and version must be separated by a forward slash, "
+                  "e.g. \"FooBar/1.2.3\"."), true)
+        change_safe()
+        change_private()
 vlc_module_end()

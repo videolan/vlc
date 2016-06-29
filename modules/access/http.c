@@ -71,24 +71,6 @@ static void Close( vlc_object_t * );
     "Automatically try to reconnect to the stream in case of a sudden " \
     "disconnect." )
 
-#define CONTINUOUS_TEXT N_("Continuous stream")
-#define CONTINUOUS_LONGTEXT N_("Read a file that is " \
-    "being constantly updated (for example, a JPG file on a server). " \
-    "You should not globally enable this option as it will break all other " \
-    "types of HTTP streams." )
-
-#define FORWARD_COOKIES_TEXT N_("Forward Cookies")
-#define FORWARD_COOKIES_LONGTEXT N_("Forward Cookies across http redirections.")
-
-#define REFERER_TEXT N_("HTTP referer value")
-#define REFERER_LONGTEXT N_("Customize the HTTP referer, simulating a previous document")
-
-#define UA_TEXT N_("User Agent")
-#define UA_LONGTEXT N_("The name and version of the program will be " \
-    "provided to the HTTP server. They must be separated by a forward " \
-    "slash, e.g. FooBar/1.2.3. This option can only be specified per input " \
-    "item, not globally.")
-
 vlc_module_begin ()
     set_description( N_("HTTP input") )
     set_capability( "access", 0 )
@@ -101,18 +83,8 @@ vlc_module_begin ()
     add_password( "http-proxy-pwd", NULL,
                   PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
     add_obsolete_bool( "http-use-IE-proxy" )
-    add_string( "http-referrer", NULL, REFERER_TEXT, REFERER_LONGTEXT, false )
-        change_safe()
-    add_string( "http-user-agent", NULL, UA_TEXT, UA_LONGTEXT, false )
-        change_safe()
-        change_private()
     add_bool( "http-reconnect", false, RECONNECT_TEXT,
               RECONNECT_LONGTEXT, true )
-    add_bool( "http-continuous", false, CONTINUOUS_TEXT,
-              CONTINUOUS_LONGTEXT, true )
-        change_safe()
-    add_bool( "http-forward-cookies", true, FORWARD_COOKIES_TEXT,
-              FORWARD_COOKIES_LONGTEXT, true )
     /* 'itpc' = iTunes Podcast */
     add_shortcut( "http", "https", "unsv", "itpc", "icyx" )
     set_callbacks( Open, Close )
