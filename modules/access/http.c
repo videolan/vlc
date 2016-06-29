@@ -141,7 +141,6 @@ struct access_sys_t
     bool b_seekable;
     bool b_reconnect;
     bool b_continuous;
-    bool b_pace_control;
     bool b_has_size;
 };
 
@@ -189,7 +188,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_referrer = NULL;
     p_sys->psz_username = NULL;
     p_sys->psz_password = NULL;
-    p_sys->b_pace_control = true;
     p_sys->p_creds = NULL;
     p_sys->p_tls = NULL;
     p_sys->i_icy_meta = 0;
@@ -731,11 +729,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (bool*)va_arg( args, bool* );
-
-#if 0       /* Disable for now until we have a clock synchro algo
-             * which works with something else than MPEG over UDP */
-            *pb_bool = p_sys->b_pace_control;
-#endif
             *pb_bool = true;
             break;
 
@@ -1159,7 +1152,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
                  * routine. They look very similar */
 
                 p_sys->b_reconnect = true;
-                p_sys->b_pace_control = false;
                 p_sys->b_icecast = true;
             }
         }
@@ -1202,7 +1194,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
 
             p_sys->b_icecast = true; /* be on the safeside. set it here as well. */
             p_sys->b_reconnect = true;
-            p_sys->b_pace_control = false;
         }
         else if( !strcasecmp( psz, "Icy-Genre" ) )
         {
