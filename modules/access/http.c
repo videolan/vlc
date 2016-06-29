@@ -119,7 +119,6 @@ struct access_sys_t
 
     char       *psz_mime;
     char       *psz_location;
-    bool b_mms;
     bool b_icecast;
 
     bool b_chunked;
@@ -181,7 +180,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_proxy_passbuf = NULL;
     p_sys->b_seekable = true;
     p_sys->psz_mime = NULL;
-    p_sys->b_mms = false;
     p_sys->b_icecast = false;
     p_sys->psz_location = NULL;
     p_sys->psz_user_agent = NULL;
@@ -384,17 +382,6 @@ connect:
     {
         p_access->psz_url = p_sys->psz_location;
         p_sys->psz_location = NULL;
-        ret = VLC_ACCESS_REDIRECT;
-        goto error;
-    }
-
-    if( p_sys->p_creds == NULL && p_sys->b_mms )
-    {
-        msg_Dbg( p_access, "redirecting to MMS plug-in" );
-
-        if( unlikely(asprintf( &p_access->psz_url, "mmsh://%s",
-                               p_access->psz_location ) == -1) )
-            p_access->psz_url = NULL;
         ret = VLC_ACCESS_REDIRECT;
         goto error;
     }
@@ -817,7 +804,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
 
     p_sys->psz_location = NULL;
     p_sys->psz_mime = NULL;
-    p_sys->b_mms = false;
     p_sys->b_chunked = false;
     p_sys->i_chunk = 0;
     p_sys->i_icy_meta = 0;
@@ -1131,12 +1117,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
         else if( !strcasecmp( psz, "Content-Encoding" ) )
         {
             msg_Dbg( p_access, "Content-Encoding: %s", p );
-        }
-        else if( !strcasecmp( psz, "Pragma" ) )
-        {
-            if( !strcasecmp( psz, "Pragma: features" ) )
-                p_sys->b_mms = true;
-            msg_Dbg( p_access, "Pragma: %s", p );
         }
         else if( !strcasecmp( psz, "Server" ) )
         {
