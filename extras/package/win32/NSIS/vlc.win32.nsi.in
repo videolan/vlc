@@ -229,6 +229,10 @@ ${MementoSection} $Name_Section01 SEC01
   !insertmacro MacroAllExtensions RegisterExtensionMacro
   !insertmacro MacroSkinExtensions RegisterSkinExtensionMacro
 
+  ; Add VLC to "App Paths" to run VLC from ShellExecute/ShellExecuteEx/run dialog without giving a full path
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\vlc.exe" "" "$INSTDIR\vlc.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\vlc.exe" "Path" "$INSTDIR"
+
   ; Windows default programs Registration
   ; Vista and above detection
   ${If} ${AtLeastWinVista}
@@ -945,6 +949,7 @@ Section "un.$Name_Section91" SEC91
   DeleteRegKey HKLM Software\VideoLAN
 
   DeleteRegKey HKCR Applications\vlc.exe
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\vlc.exe"
   DeleteRegKey HKCR AudioCD\shell\PlayWithVLC
   DeleteRegKey HKCR DVD\shell\PlayWithVLC
   DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDMovieOnArrival" "VLCPlayDVDMovieOnArrival"
