@@ -376,8 +376,8 @@ void EStoPES ( block_t **pp_pes,
             p_es->p_buffer[1] = 0x00;
             p_es->p_buffer[2] = 0x00;
             p_es->p_buffer[3] = 0x01;
-            p_es->p_buffer[4] = 0x09;
-            p_es->p_buffer[5] = 0xe0;
+            p_es->p_buffer[4] = 0x09; /* FIXME: primary_pic_type from SPS/PPS */
+            p_es->p_buffer[5] = 0xf0;
         }
 
     }
