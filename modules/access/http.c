@@ -39,7 +39,6 @@
 #include <vlc_meta.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
-#include <vlc_tls.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 #include <vlc_input.h>
@@ -86,7 +85,7 @@ vlc_module_begin ()
     add_bool( "http-reconnect", false, RECONNECT_TEXT,
               RECONNECT_LONGTEXT, true )
     /* 'itpc' = iTunes Podcast */
-    add_shortcut( "http", "https", "unsv", "itpc", "icyx" )
+    add_shortcut( "http", "unsv", "itpc", "icyx" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -97,8 +96,6 @@ vlc_module_end ()
 struct access_sys_t
 {
     int fd;
-    vlc_tls_creds_t *p_creds;
-    vlc_tls_t *p_tls;
 
     /* From uri */
     vlc_url_t url;
@@ -184,8 +181,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_referrer = NULL;
     p_sys->psz_username = NULL;
     p_sys->psz_password = NULL;
-    p_sys->p_creds = NULL;
-    p_sys->p_tls = NULL;
     p_sys->i_icy_meta = 0;
     p_sys->i_icy_offset = 0;
     p_sys->psz_icy_name = NULL;
@@ -212,20 +207,8 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_access, "invalid host" );
         goto error;
     }
-    if( !strcmp( p_sys->url.psz_protocol, "https" ) )
-    {
-        /* HTTP over SSL */
-        p_sys->p_creds = vlc_tls_ClientCreate( p_this );
-        if( p_sys->p_creds == NULL )
-            goto error;
-        if( p_sys->url.i_port <= 0 )
-            p_sys->url.i_port = 443;
-    }
-    else
-    {
-        if( p_sys->url.i_port <= 0 )
-            p_sys->url.i_port = 80;
-    }
+    if( p_sys->url.i_port <= 0 )
+        p_sys->url.i_port = 80;
 
     /* Determine the HTTP user agent */
     /* See RFC2616 §2.2 token and comment definition, and §3.8 and
@@ -407,7 +390,6 @@ error:
     free( p_sys->psz_password );
 
     Disconnect( p_access );
-    vlc_tls_Delete( p_sys->p_creds );
 
     free( p_sys );
     return ret;
@@ -440,7 +422,6 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_password );
 
     Disconnect( p_access );
-    vlc_tls_Delete( p_sys->p_creds );
 
     free( p_sys );
 }
@@ -457,11 +438,8 @@ static int ReadData( access_t *p_access, int *pi_read,
 
         if( p_sys->i_chunk <= 0 )
         {
-            char *psz;
-            if( p_sys->p_tls != NULL )
-                psz = vlc_tls_GetLine( p_sys->p_tls );
-            else
-                psz = net_Gets( p_access, p_sys->fd );
+            char *psz = net_Gets( p_access, p_sys->fd );
+
             /* read the chunk header */
             if( psz == NULL )
             {
@@ -483,10 +461,7 @@ static int ReadData( access_t *p_access, int *pi_read,
             i_len = p_sys->i_chunk;
     }
 
-    if( p_sys->p_tls != NULL )
-        *pi_read = vlc_tls_Read( p_sys->p_tls, p_buffer, i_len, false );
-    else
-        *pi_read = vlc_recv_i11e( p_sys->fd, p_buffer, i_len, 0 );
+    *pi_read = vlc_recv_i11e( p_sys->fd, p_buffer, i_len, 0 );
     if( *pi_read < 0 && errno != EINTR && errno != EAGAIN )
         return VLC_EGENERIC;
     if( *pi_read <= 0 )
@@ -496,12 +471,8 @@ static int ReadData( access_t *p_access, int *pi_read,
     {
         p_sys->i_chunk -= *pi_read;
         if( p_sys->i_chunk <= 0 )
-        {   /* read the empty line */
-            if( p_sys->p_tls != NULL )
-                free( vlc_tls_GetLine( p_sys->p_tls ) );
-            else
-                free( net_Gets( p_access, p_sys->fd ) );
-        }
+            /* read the empty line */
+            free( net_Gets( p_access, p_sys->fd ) );
     }
     return VLC_SUCCESS;
 }
@@ -748,9 +719,7 @@ static int WriteHeaders( access_t *access, const char *fmt, ... )
     len = vasprintf( &str, fmt, args );
     if( likely(len >= 0) )
     {
-        if( ((sys->p_tls != NULL)
-            ? vlc_tls_Write( sys->p_tls, str, len )
-            : net_Write( access, sys->fd, str, len )) < len )
+        if( net_Write( access, sys->fd, str, len ) < len )
             len = -1;
         free( str );
     }
@@ -798,75 +767,10 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     }
     setsockopt (p_sys->fd, SOL_SOCKET, SO_KEEPALIVE, &(int){ 1 }, sizeof (int));
 
-    /* Initialize TLS/SSL session */
-    if( p_sys->p_creds != NULL )
-    {
-        /* CONNECT to establish TLS tunnel through HTTP proxy */
-        if( p_sys->b_proxy )
-        {
-            char *psz;
-            unsigned i_status;
-
-            WriteHeaders( p_access,
-                          "CONNECT %s:%d HTTP/1.1\r\nHost: %s:%d\r\n\r\n",
-                          p_sys->url.psz_host, p_sys->url.i_port,
-                          p_sys->url.psz_host, p_sys->url.i_port);
-
-            psz = net_Gets( p_access, p_sys->fd );
-            if( psz == NULL )
-            {
-                msg_Err( p_access, "cannot establish HTTP/TLS tunnel" );
-                Disconnect( p_access );
-                return -1;
-            }
-
-            if( sscanf( psz, "HTTP/1.%*u %3u", &i_status ) != 1 )
-                i_status = 0;
-            free( psz );
-
-            if( ( i_status / 100 ) != 2 )
-            {
-                msg_Err( p_access, "HTTP/TLS tunnel through proxy denied" );
-                Disconnect( p_access );
-                return -1;
-            }
-
-            do
-            {
-                psz = net_Gets( p_access, p_sys->fd );
-                if( psz == NULL )
-                {
-                    msg_Err( p_access, "HTTP proxy connection failed" );
-                    Disconnect( p_access );
-                    return -1;
-                }
-
-                if( *psz == '\0' )
-                    i_status = 0;
-
-                free( psz );
-            }
-            while( i_status );
-        }
-
-        /* TLS/SSL handshake */
-        const char *alpn[] = { "http/1.1", NULL };
-
-        p_sys->p_tls = vlc_tls_ClientSessionCreateFD( p_sys->p_creds, p_sys->fd,
-                                                      p_sys->url.psz_host,
-                                                      "https", alpn, NULL );
-        if( p_sys->p_tls == NULL )
-        {
-            msg_Err( p_access, "cannot establish HTTP/TLS session" );
-            Disconnect( p_access );
-            return -1;
-        }
-    }
-
     const char *psz_path = p_sys->url.psz_path;
     if( !psz_path || !*psz_path )
         psz_path = "/";
-    if( p_sys->b_proxy && p_sys->p_tls == NULL )
+    if( p_sys->b_proxy )
         WriteHeaders( p_access, "GET http://%s:%d%s%s%s HTTP/1.1\r\n",
                       p_sys->url.psz_host, p_sys->url.i_port,
                       psz_path, p_sys->url.psz_option ? "?" : "",
@@ -875,7 +779,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         WriteHeaders( p_access, "GET %s%s%s HTTP/1.1\r\n",
                       psz_path, p_sys->url.psz_option ? "?" : "",
                       p_sys->url.psz_option ? p_sys->url.psz_option : "" );
-    if( p_sys->url.i_port != (p_sys->p_tls ? 443 : 80) )
+    if( p_sys->url.i_port != 80 )
         WriteHeaders( p_access, "Host: %s:%d\r\n",
                       p_sys->url.psz_host, p_sys->url.i_port );
     else
@@ -922,11 +826,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     }
 
     /* Read Answer */
-    char *psz;
-    if( p_sys->p_tls != NULL )
-        psz = vlc_tls_GetLine( p_sys->p_tls );
-    else
-        psz = net_Gets( p_access, p_sys->fd );
+    char *psz = net_Gets( p_access, p_sys->fd );
     if( psz == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
@@ -971,12 +871,9 @@ static int Connect( access_t *p_access, uint64_t i_tell )
 
     for( ;; )
     {
-        char *psz, *p, *p_trailing;
+        char *p, *p_trailing;
 
-        if( p_sys->p_tls != NULL )
-            psz = vlc_tls_GetLine( p_sys->p_tls );
-        else
-            psz = net_Gets( p_access, p_sys->fd );
+        char *psz = net_Gets( p_access, p_sys->fd );
         if( psz == NULL )
         {
             msg_Err( p_access, "failed to read answer" );
@@ -1044,17 +941,15 @@ static int Connect( access_t *p_access, uint64_t i_tell )
              * handle it as everyone does. */
             if( p[0] == '/' )
             {
-                const char *psz_http_ext = p_sys->p_tls ? "s" : "" ;
-
-                if( p_sys->url.i_port == ( p_sys->p_tls ? 443 : 80 ) )
+                if( p_sys->url.i_port == 80 )
                 {
-                    if( asprintf(&psz_new_loc, "http%s://%s%s", psz_http_ext,
+                    if( asprintf(&psz_new_loc, "http://%s%s",
                                  p_sys->url.psz_host, p) < 0 )
                         goto error;
                 }
                 else
                 {
-                    if( asprintf(&psz_new_loc, "http%s://%s:%d%s", psz_http_ext,
+                    if( asprintf(&psz_new_loc, "http://%s:%d%s",
                                  p_sys->url.psz_host, p_sys->url.i_port, p) < 0 )
                         goto error;
                 }
@@ -1220,11 +1115,8 @@ static void Disconnect( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    if( p_sys->p_tls != NULL)
-        vlc_tls_Close( p_sys->p_tls );
-    else if( p_sys->fd != -1)
+    if( p_sys->fd != -1)
         net_Close(p_sys->fd);
-    p_sys->p_tls = NULL;
     p_sys->fd = -1;
 }
 
