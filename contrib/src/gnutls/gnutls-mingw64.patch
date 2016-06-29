@@ -1,16 +1,16 @@
---- gnutls/lib/system.c.orig	2016-04-01 17:15:48.424481273 +0200
-+++ gnutls/lib/system.c	2016-04-01 17:15:57.200493470 +0200
+--- gnutls-3.4.13/lib/system.c.orig	2016-05-27 22:40:06.000000000 +0200
++++ gnutls-3.4.13/lib/system.c	2016-06-29 15:36:26.645190212 +0200
 @@ -34,7 +34,7 @@
  #ifdef _WIN32
  # include <windows.h>
  # include <wincrypt.h>
 -# if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
 +# if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
- typedef PCCRL_CONTEXT WINAPI(*Type_CertEnumCRLsInStore) (HCERTSTORE
+ typedef PCCRL_CONTEXT WINAPI(*CertEnumCRLsInStoreFunc) (HCERTSTORE
  							 hCertStore,
  							 PCCRL_CONTEXT
-@@ -289,7 +289,7 @@
- int gnutls_system_global_init()
+@@ -300,7 +300,7 @@
+ int gnutls_system_global_init(void)
  {
  #ifdef _WIN32
 -#if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
@@ -18,8 +18,8 @@
  	HMODULE crypto;
  	crypto = LoadLibraryA("Crypt32.dll");
  
-@@ -313,7 +313,7 @@
- void gnutls_system_global_deinit()
+@@ -325,7 +325,7 @@
+ void gnutls_system_global_deinit(void)
  {
  #ifdef _WIN32
 -#if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
