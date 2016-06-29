@@ -107,8 +107,6 @@ namespace adaptive
         bool disabled;
         bool eof;
         bool dead;
-        bool flushing;
-        mtime_t pcr;
         std::string language;
         std::string description;
 

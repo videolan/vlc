@@ -145,9 +145,12 @@ namespace adaptive
             void Commit();
             bool isEmpty() const;
             void setDrop( bool );
+            void setFlush();
+            bool isFlushing() const;
             mtime_t getDemuxedAmount() const;
             mtime_t getBufferingLevel() const;
             mtime_t getFirstDTS() const;
+            mtime_t getPCR() const;
 
         private:
             CommandsFactory *commandsFactory;
@@ -156,6 +159,8 @@ namespace adaptive
             std::list<AbstractCommand *> incoming;
             std::list<AbstractCommand *> commands;
             mtime_t bufferinglevel;
+            mtime_t pcr;
+            bool b_flushing;
             bool b_drop;
     };
 }

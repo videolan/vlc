@@ -196,7 +196,9 @@ EsOutControlResetPCRCommand * CommandsFactory::creatEsOutControlResetPCRCommand(
 CommandsQueue::CommandsQueue( CommandsFactory *f )
 {
     bufferinglevel = VLC_TS_INVALID;
+    pcr = VLC_TS_INVALID;
     b_drop = false;
+    b_flushing = false;
     commandsFactory = f;
     vlc_mutex_init(&lock);
 }
@@ -265,6 +267,11 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
         command->Execute( out );
         delete command;
     }
+    pcr = lastdts;
+
+    if(commands.empty() && b_flushing)
+        b_flushing = false;
+
     vlc_mutex_unlock(&lock);
 
     return lastdts;
@@ -295,7 +302,11 @@ void CommandsQueue::Abort( bool b_reset )
     }
 
     if( b_reset )
+    {
         bufferinglevel = VLC_TS_INVALID;
+        pcr = VLC_TS_INVALID;
+        b_flushing = false;
+    }
     vlc_mutex_unlock(&lock);
 }
 
@@ -312,6 +323,22 @@ void CommandsQueue::setDrop( bool b )
     vlc_mutex_lock(&lock);
     b_drop = b;
     vlc_mutex_unlock(&lock);
+}
+
+void CommandsQueue::setFlush()
+{
+    vlc_mutex_lock(&lock);
+    LockedCommit();
+    b_flushing = !commands.empty();
+    vlc_mutex_unlock(&lock);
+}
+
+bool CommandsQueue::isFlushing() const
+{
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    bool b = b_flushing;
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return b;
 }
 
 mtime_t CommandsQueue::getDemuxedAmount() const
@@ -343,4 +370,12 @@ mtime_t CommandsQueue::getFirstDTS() const
     }
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return i_dts;
+}
+
+mtime_t CommandsQueue::getPCR() const
+{
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    mtime_t i_pcr = pcr;
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return i_pcr;
 }

@@ -43,10 +43,8 @@ AbstractStream::AbstractStream(demux_t * demux_)
     eof = false;
     dead = false;
     disabled = false;
-    flushing = false;
     discontinuity = false;
     segmentTracker = NULL;
-    pcr = VLC_TS_INVALID;
     demuxersource = NULL;
     commandsqueue = NULL;
     demuxer = NULL;
@@ -139,7 +137,7 @@ bool AbstractStream::isEOF() const
 
 mtime_t AbstractStream::getPCR() const
 {
-    return pcr;
+    return commandsqueue->getPCR();
 }
 
 mtime_t AbstractStream::getMinAheadTime() const
@@ -169,7 +167,7 @@ bool AbstractStream::seekAble() const
     return (demuxer &&
             !fakeesout->restarting() &&
             !discontinuity &&
-            !flushing );
+            !commandsqueue->isFlushing() );
 }
 
 bool AbstractStream::isSelected() const
@@ -232,18 +230,16 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
     if(!segmentTracker || !connManager || dead)
         return AbstractStream::status_eof;
 
-    if(flushing)
+    if(commandsqueue->isFlushing())
     {
         if(!send)
             return AbstractStream::status_buffering;
 
-        pcr = commandsqueue->Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
+        (void) commandsqueue->Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
         if(!commandsqueue->isEmpty())
             return AbstractStream::status_demuxed;
 
         commandsqueue->Abort(true); /* reset buffering level */
-        flushing = false;
-        pcr = 0;
         return AbstractStream::status_dis;
     }
 
@@ -258,7 +254,7 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
                 msg_Dbg( p_realdemux, "Flushing on format change" );
                 prepareFormatChange();
                 discontinuity = false;
-                flushing = true;
+                commandsqueue->setFlush();
                 return AbstractStream::status_buffering;
             }
             dead = true; /* Prevent further retries */
@@ -280,7 +276,7 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
                 msg_Dbg( p_realdemux, "Flushing on discontinuity" );
                 prepareFormatChange();
                 discontinuity = false;
-                flushing = true;
+                commandsqueue->setFlush();
                 return AbstractStream::status_buffering;
             }
 
@@ -298,7 +294,7 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
              description.c_str(), getPCR(), getFirstDTS(), nz_deadline, getBufferingLevel()));
 
     if(send)
-        pcr = commandsqueue->Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
+        (void) commandsqueue->Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
 
     /* Disable streams that are not selected (alternate streams) */
     if(esCount() && !isSelected() && !fakeesout->restarting())
@@ -368,8 +364,8 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
 
             setTimeOffset();
         }
+        else commandsqueue->Abort( true );
 
-        pcr = VLC_TS_INVALID;
         es_out_Control(p_realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                        VLC_TS_0 + time);
     }
