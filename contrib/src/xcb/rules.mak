@@ -4,7 +4,9 @@ XCB_VERSION := 1.12
 XCB_URL := http://xcb.freedesktop.org/dist/libxcb-$(XCB_VERSION).tar.bz2
 
 ifdef HAVE_LINUX
+ifndef HAVE_ANDROID
 PKGS += xcb
+endif
 endif
 
 ifeq ($(call need_pkg,"xcb >= 1.6 xcb-shm xcb-composite xcb-xv >= 1.1.90.1"),)
