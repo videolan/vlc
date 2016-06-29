@@ -130,9 +130,6 @@ struct access_sys_t
     uint64_t offset;
     uint64_t size;
 
-    /* cookie jar borrowed from playlist, do not free */
-    vlc_http_cookie_jar_t * cookies;
-
     bool b_seekable;
     bool b_reconnect;
     bool b_continuous;
@@ -153,7 +150,6 @@ static void AuthReply( access_t *p_acces, const char *psz_prefix,
                        vlc_url_t *p_url, vlc_http_auth_t *p_auth );
 static int AuthCheckReply( access_t *p_access, const char *psz_header,
                            vlc_url_t *p_url, vlc_http_auth_t *p_auth );
-static vlc_http_cookie_jar_t *GetCookieJar( vlc_object_t *p_this );
 
 /*****************************************************************************
  * Open:
@@ -190,12 +186,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->offset = 0;
     p_sys->size = 0;
     p_access->p_sys = p_sys;
-
-    /* Only forward an store cookies if the corresponding option is activated */
-    if( var_CreateGetBool( p_access, "http-forward-cookies" ) )
-        p_sys->cookies = GetCookieJar( p_this );
-    else
-        p_sys->cookies = NULL;
 
     vlc_http_auth_Init( &p_sys->auth );
     vlc_http_auth_Init( &p_sys->proxy_auth );
@@ -794,18 +784,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         WriteHeaders( p_access, "Range: bytes=%"PRIu64"-\r\n", i_tell );
     WriteHeaders( p_access, "Connection: close\r\n" );
 
-    /* Cookies */
-    if( p_sys->cookies )
-    {
-        char * psz_cookiestring = vlc_http_cookies_for_url( p_sys->cookies, &p_sys->url );
-        if ( psz_cookiestring )
-        {
-            msg_Dbg( p_access, "Sending Cookie %s", psz_cookiestring );
-            WriteHeaders( p_access, "Cookie: %s\r\n", psz_cookiestring );
-            free( psz_cookiestring );
-        }
-    }
-
     /* Authentication */
     if( p_sys->url.psz_username && p_sys->url.psz_password )
         AuthReply( p_access, "", &p_sys->url, &p_sys->auth );
@@ -1057,18 +1035,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         {
             msg_Dbg( p_access, "Meta-Info: %s: %s", psz, p );
         }
-        else if( !strcasecmp( psz, "Set-Cookie" ) )
-        {
-            if( p_sys->cookies )
-            {
-                if ( vlc_http_cookies_append( p_sys->cookies, p, &p_sys->url ) )
-                    msg_Dbg( p_access, "Accepting Cookie: %s", p );
-                else
-                    msg_Dbg( p_access, "Rejected Cookie: %s", p );
-            }
-            else
-                msg_Dbg( p_access, "We have a Cookie we won't remember: %s", p );
-        }
         else if( !strcasecmp( psz, "www-authenticate" ) )
         {
             msg_Dbg( p_access, "Authentication header: %s", p );
@@ -1151,24 +1117,4 @@ static int AuthCheckReply( access_t *p_access, const char *psz_header,
                                                      p_url->psz_path,
                                                      p_url->psz_username,
                                                      p_url->psz_password );
-}
-
-/*****************************************************************************
- * HTTP cookies
- *****************************************************************************/
-
-/**
- * Inherit the cookie jar from the playlist
- *
- * @param p_this: http access object
- * @return A borrowed reference to a vlc_http_cookie_jar_t, do not free
- */
-static vlc_http_cookie_jar_t *GetCookieJar( vlc_object_t *p_this )
-{
-    vlc_value_t val;
-
-    if ( var_Inherit( p_this, "http-cookies", VLC_VAR_ADDRESS, &val ) == VLC_SUCCESS )
-        return val.p_address;
-    else
-        return NULL;
 }
