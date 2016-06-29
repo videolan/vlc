@@ -1,0 +1,36 @@
+--- gnutls/lib/x509/Makefile.am.ORIG	Tue Jul 21 05:42:08 2015
++++ gnutls/lib/x509/Makefile.am	Wed Jun 29 15:05:35 2016
+@@ -23,7 +23,8 @@
+ 	-I$(srcdir)/../includes		\
+ 	-I$(builddir)/../includes	\
+ 	-I$(srcdir)/..			\
+-	$(LIBOPENCDK_CFLAGS)
++	$(LIBOPENCDK_CFLAGS)		\
++	$(LIBIDN_CFLAGS)
+ 
+ if ENABLE_MINITASN1
+ AM_CPPFLAGS += -I$(srcdir)/../minitasn1
+--- gnutls/lib/ext/Makefile.am.ORIG	Wed Feb  4 23:35:05 2015
++++ gnutls/lib/ext/Makefile.am	Wed Jun 29 15:19:34 2016
+@@ -26,7 +26,8 @@
+ 	-I$(builddir)/../includes	\
+ 	-I$(builddir)/../../gl          \
+ 	-I$(srcdir)/..			\
+-	-I$(srcdir)/../opencdk
++	-I$(srcdir)/../opencdk		\
++	$(LIBIDN_CFLAGS)
+ 
+ if ENABLE_MINITASN1
+ AM_CPPFLAGS += -I$(srcdir)/../minitasn1
+--- gnutls/src/Makefile.am.ORIG	Fri Jan  8 04:10:34 2016
++++ gnutls/src/Makefile.am	Wed Jun 29 15:20:12 2016
+@@ -41,7 +41,8 @@
+ 	-I$(srcdir)/../lib/includes		\
+ 	-I$(srcdir)/../libdane/includes		\
+ 	-I$(srcdir)/../extra/includes	\
+-	$(LIBOPTS_CFLAGS)
++	$(LIBOPTS_CFLAGS)		\
++	$(LIBIDN_CFLAGS)
+ 
+ if NEED_LIBOPTS
+ LIBOPTS = libopts/libopts.la
