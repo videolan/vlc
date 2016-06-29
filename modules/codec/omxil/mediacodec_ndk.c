@@ -38,8 +38,8 @@
 
 #include "mediacodec.h"
 
-char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         size_t h264_profile);
+char* MediaCodec_GetName(vlc_object_t *, const char *, size_t,
+                         unsigned int, unsigned int);
 
 #define THREAD_NAME "mediacodec_ndk"
 
@@ -564,11 +564,12 @@ static void Clean(mc_api *api)
 /*****************************************************************************
  * Configure
  *****************************************************************************/
-static int Configure(mc_api * api, size_t i_h264_profile)
+static int Configure(mc_api * api, size_t i_h264_profile, unsigned int i_width,
+                     unsigned int i_height)
 {
     free(api->psz_name);
     api->psz_name = MediaCodec_GetName(api->p_obj, api->psz_mime,
-                                       i_h264_profile);
+                                       i_h264_profile, i_width, i_height);
     if (!api->psz_name)
         return MC_API_ERROR;
     api->i_quirks = OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,

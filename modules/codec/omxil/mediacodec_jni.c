@@ -37,8 +37,8 @@
 
 #include "mediacodec.h"
 
-char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         size_t h264_profile);
+char* MediaCodec_GetName(vlc_object_t *, const char *, size_t,
+                         unsigned int, unsigned int);
 
 #define THREAD_NAME "mediacodec_jni"
 
@@ -59,6 +59,7 @@ struct jfields
     jmethodID tostring;
     jmethodID get_codec_count, get_codec_info_at, is_encoder, get_capabilities_for_type;
     jfieldID profile_levels_field, profile_field, level_field;
+    jmethodID get_video_capabilities, is_size_supported;
     jmethodID get_supported_types, get_name;
     jmethodID create_by_codec_name, configure, start, stop, flush, release;
     jmethodID get_output_format;
@@ -117,7 +118,10 @@ static const struct member members[] = {
     { "profileLevels", "[Landroid/media/MediaCodecInfo$CodecProfileLevel;", "android/media/MediaCodecInfo$CodecCapabilities", OFF(profile_levels_field), FIELD, true },
     { "profile", "I", "android/media/MediaCodecInfo$CodecProfileLevel", OFF(profile_field), FIELD, true },
     { "level", "I", "android/media/MediaCodecInfo$CodecProfileLevel", OFF(level_field), FIELD, true },
-
+    { "getVideoCapabilities", "()Landroid/media/MediaCodecInfo$VideoCapabilities;",
+      "android/media/MediaCodecInfo$CodecCapabilities", OFF(get_video_capabilities), METHOD, false },
+    { "isSizeSupported", "(II)Z",
+      "android/media/MediaCodecInfo$VideoCapabilities", OFF(is_size_supported), METHOD, false },
     { "createByCodecName", "(Ljava/lang/String;)Landroid/media/MediaCodec;", "android/media/MediaCodec", OFF(create_by_codec_name), STATIC_METHOD, true },
     { "configure", "(Landroid/media/MediaFormat;Landroid/view/Surface;Landroid/media/MediaCrypto;I)V", "android/media/MediaCodec", OFF(configure), METHOD, true },
     { "start", "()V", "android/media/MediaCodec", OFF(start), METHOD, true },
@@ -309,7 +313,8 @@ struct mc_api_sys
  * MediaCodec_GetName
  *****************************************************************************/
 char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         size_t h264_profile)
+                         size_t h264_profile, unsigned int i_width,
+                         unsigned int i_height)
 {
     JNIEnv *env;
     int num_codecs;
@@ -333,6 +338,7 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
     for (int i = 0; i < num_codecs; i++)
     {
         jobject codec_capabilities = NULL;
+        jobject video_capabilities = NULL;
         jobject profile_levels = NULL;
         jobject info = NULL;
         jobject name = NULL;
@@ -368,6 +374,23 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
             profile_levels = (*env)->GetObjectField(env, codec_capabilities, jfields.profile_levels_field);
             if (profile_levels)
                 profile_levels_len = (*env)->GetArrayLength(env, profile_levels);
+
+            if (i_width != 0 && i_height != 0 && jfields.get_video_capabilities && jfields.is_size_supported)
+            {
+                video_capabilities = (*env)->CallObjectMethod(env, codec_capabilities,
+                                                              jfields.get_video_capabilities);
+                if (video_capabilities)
+                {
+                    if ( !(*env)->CallBooleanMethod(env, video_capabilities,
+                                                    jfields.is_size_supported,
+                                                    i_width, i_height))
+                    {
+                        msg_Err(p_obj, "Video size %d * %d not supported",
+                                i_width, i_height);
+                        goto loopclean;
+                    }
+                }
+            }
         }
         msg_Dbg(p_obj, "Number of profile levels: %d", profile_levels_len);
 
@@ -433,6 +456,8 @@ loopclean:
             (*env)->DeleteLocalRef(env, codec_capabilities);
         if (info)
             (*env)->DeleteLocalRef(env, info);
+        if (video_capabilities)
+            (*env)->DeleteLocalRef(env, video_capabilities);
         if (found)
             break;
     }
@@ -943,11 +968,12 @@ static void Clean(mc_api *api)
 /*****************************************************************************
  * Configure
  *****************************************************************************/
-static int Configure(mc_api *api, size_t i_h264_profile)
+static int Configure(mc_api *api, size_t i_h264_profile, unsigned int i_width,
+                     unsigned int i_height)
 {
     free(api->psz_name);
     api->psz_name = MediaCodec_GetName(api->p_obj, api->psz_mime,
-                                       i_h264_profile);
+                                       i_h264_profile, i_width, i_height);
     if (!api->psz_name)
         return MC_API_ERROR;
     api->i_quirks = OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,
