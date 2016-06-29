@@ -345,8 +345,20 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
         size_t i_size = 0;
         uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(p_extra, i_extra, &i_size,
                                                  &p_sys->u.video.i_nal_length_size);
-        if (!p_buf)
+
+        /* XXX h264_AVC_to_AnnexB() works only with a i_nal_length_size of 4.
+         * If nal_length_size is smaller than 4, fallback to SW decoding. I
+         * don't know if it's worth the effort to fix h264_AVC_to_AnnexB() for
+         * a smaller nal_length_size. Indeed, this case will happen only with
+         * very small resolutions, where MediaCodec is not that useful.
+         * -Thomas */
+        if (!p_buf || p_sys->u.video.i_nal_length_size != 4)
+        {
+            msg_Dbg(p_dec, "h264_avcC_to_AnnexB_NAL failed%s",
+                    p_buf ? ": nal_length_size too small" : "");
+            free(p_buf);
             return VLC_EGENERIC;
+        }
 
         int i_ret = H264SetCSD(p_dec, p_buf, i_size, NULL);
         free(p_buf);
