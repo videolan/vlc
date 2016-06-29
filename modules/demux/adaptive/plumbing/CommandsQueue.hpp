@@ -136,8 +136,9 @@ namespace adaptive
     class CommandsQueue
     {
         public:
-            CommandsQueue();
+            CommandsQueue( CommandsFactory * );
             ~CommandsQueue();
+            CommandsFactory * factory();
             void Schedule( AbstractCommand * );
             mtime_t Process( es_out_t *out, mtime_t );
             void Abort( bool b_reset );
@@ -148,6 +149,7 @@ namespace adaptive
             mtime_t getFirstDTS() const;
 
         private:
+            CommandsFactory *commandsFactory;
             vlc_mutex_t lock;
             void LockedCommit();
             std::list<AbstractCommand *> incoming;

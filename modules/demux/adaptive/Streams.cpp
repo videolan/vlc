@@ -48,6 +48,7 @@ AbstractStream::AbstractStream(demux_t * demux_, const StreamFormat &format_)
     segmentTracker = NULL;
     pcr = VLC_TS_INVALID;
 
+    commandsqueue = NULL;
     demuxer = NULL;
     fakeesout = NULL;
 
@@ -59,10 +60,25 @@ AbstractStream::AbstractStream(demux_t * demux_, const StreamFormat &format_)
     if(!demuxersource)
         throw VLC_EGENERIC;
 
-    CommandsFactory *factory = new CommandsFactory();
-    fakeesout = new (std::nothrow) FakeESOut(p_realdemux->out, factory);
+    CommandsFactory *factory = new (std::nothrow) CommandsFactory();
+    if(!factory)
+    {
+        delete demuxersource;
+        throw VLC_EGENERIC;
+    }
+
+    commandsqueue = new CommandsQueue(factory);
+    if(!commandsqueue)
+    {
+        delete factory;
+        delete demuxersource;
+        throw VLC_EGENERIC;
+    }
+
+    fakeesout = new (std::nothrow) FakeESOut(p_realdemux->out, commandsqueue);
     if(!fakeesout)
     {
+        delete commandsqueue;
         delete demuxersource;
         throw VLC_EGENERIC;
     }
@@ -77,6 +93,7 @@ AbstractStream::~AbstractStream()
     delete demuxer;
     delete demuxersource;
     delete fakeesout;
+    delete commandsqueue;
 }
 
 
@@ -96,11 +113,11 @@ void AbstractStream::prepareFormatChange()
         /* Enqueue Del Commands for all current ES */
         fakeesout->scheduleAllForDeletion();
         fakeesout->schedulePCRReset();
-        fakeesout->commandsqueue.Commit();
+        commandsqueue->Commit();
         /* ignoring demuxer's own Del commands */
-        fakeesout->commandsqueue.setDrop(true);
+        commandsqueue->setDrop(true);
         delete demuxer;
-        fakeesout->commandsqueue.setDrop(false);
+        commandsqueue->setDrop(false);
         demuxer = NULL;
     }
 }
@@ -134,12 +151,12 @@ mtime_t AbstractStream::getMinAheadTime() const
 
 mtime_t AbstractStream::getBufferingLevel() const
 {
-    return fakeesout->commandsqueue.getBufferingLevel();
+    return commandsqueue->getBufferingLevel();
 }
 
 mtime_t AbstractStream::getFirstDTS() const
 {
-    return fakeesout->commandsqueue.getFirstDTS();
+    return commandsqueue->getFirstDTS();
 }
 
 int AbstractStream::esCount() const
@@ -201,9 +218,9 @@ bool AbstractStream::restartDemux()
         /* Push all ES as recycling candidates */
         fakeesout->recycleAll();
         /* Restart with ignoring pushes to queue */
-        return demuxer->restart(fakeesout->commandsqueue);
+        return demuxer->restart(commandsqueue);
     }
-    fakeesout->commandsqueue.Commit();
+    commandsqueue->Commit();
     return true;
 }
 
@@ -223,11 +240,11 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
         if(!send)
             return AbstractStream::status_buffering;
 
-        pcr = fakeesout->commandsqueue.Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
-        if(!fakeesout->commandsqueue.isEmpty())
+        pcr = commandsqueue->Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
+        if(!commandsqueue->isEmpty())
             return AbstractStream::status_demuxed;
 
-        fakeesout->commandsqueue.Abort(true); /* reset buffering level */
+        commandsqueue->Abort(true); /* reset buffering level */
         flushing = false;
         pcr = 0;
         return AbstractStream::status_dis;
@@ -270,8 +287,8 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
                 return AbstractStream::status_buffering;
             }
 
-            fakeesout->commandsqueue.Commit();
-            if(fakeesout->commandsqueue.isEmpty())
+            commandsqueue->Commit();
+            if(commandsqueue->isEmpty())
                 return AbstractStream::status_eof;
         }
         else if(nz_deadline + VLC_TS_0 > getBufferingLevel()) /* need to read more */
@@ -284,7 +301,7 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
              description.c_str(), getPCR(), getFirstDTS(), nz_deadline, getBufferingLevel()));
 
     if(send)
-        pcr = fakeesout->commandsqueue.Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
+        pcr = commandsqueue->Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
 
     /* Disable streams that are not selected (alternate streams) */
     if(esCount() && !isSelected() && !fakeesout->restarting())

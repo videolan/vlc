@@ -193,16 +193,18 @@ EsOutControlResetPCRCommand * CommandsFactory::creatEsOutControlResetPCRCommand(
 /*
  * Commands Queue management
  */
-CommandsQueue::CommandsQueue()
+CommandsQueue::CommandsQueue( CommandsFactory *f )
 {
     bufferinglevel = VLC_TS_INVALID;
     b_drop = false;
+    commandsFactory = f;
     vlc_mutex_init(&lock);
 }
 
 CommandsQueue::~CommandsQueue()
 {
     Abort( false );
+    delete commandsFactory;
     vlc_mutex_destroy(&lock);
 }
 
@@ -229,6 +231,11 @@ void CommandsQueue::Schedule( AbstractCommand *command )
         incoming.push_back( command );
     }
     vlc_mutex_unlock(&lock);
+}
+
+CommandsFactory * CommandsQueue::factory()
+{
+    return commandsFactory;
 }
 
 mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )

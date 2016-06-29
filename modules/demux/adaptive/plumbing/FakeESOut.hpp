@@ -20,8 +20,8 @@
 #ifndef FAKEESOUT_HPP
 #define FAKEESOUT_HPP
 
-#include "CommandsQueue.hpp"
-#include <vlc_atomic.h>
+#include <vlc_common.h>
+#include <list>
 
 namespace adaptive
 {
@@ -31,10 +31,13 @@ namespace adaptive
             virtual void fillExtraFMTInfo( es_format_t * ) const = 0;
     };
 
+    class CommandsQueue;
+    class FakeESOutID;
+
     class FakeESOut
     {
         public:
-            FakeESOut( es_out_t *, CommandsFactory * );
+            FakeESOut( es_out_t *, CommandsQueue * );
             ~FakeESOut();
             es_out_t * getEsOut();
             void setTimestampOffset( mtime_t );
@@ -60,14 +63,12 @@ namespace adaptive
             static int esOutControl_Callback( es_out_t *, int, va_list );
             static void esOutDestroy_Callback( es_out_t * );
 
-            CommandsQueue commandsqueue;
-
         private:
             es_out_t *real_es_out;
             FakeESOutID * createNewID( const es_format_t * );
             ExtraFMTInfoInterface *extrainfo;
             mtime_t getTimestampOffset() const;
-            CommandsFactory *commandsFactory;
+            CommandsQueue *commandsqueue;
             es_out_t *fakeesout;
             mtime_t timestamps_offset;
             std::list<FakeESOutID *> fakeesidlist;

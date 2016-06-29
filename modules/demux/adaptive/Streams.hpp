@@ -25,6 +25,7 @@
 #include "ChunksSource.hpp"
 #include "SegmentTracker.hpp"
 
+#include "plumbing/CommandsQueue.hpp"
 #include "plumbing/Demuxer.hpp"
 #include "plumbing/SourceStream.hpp"
 #include "plumbing/FakeESOut.hpp"
@@ -111,6 +112,7 @@ namespace adaptive
         std::string language;
         std::string description;
 
+        CommandsQueue *commandsqueue;
         AbstractDemuxer *demuxer;
         AbstractSourceStream *demuxersource;
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */

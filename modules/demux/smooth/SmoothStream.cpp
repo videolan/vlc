@@ -50,7 +50,7 @@ AbstractDemuxer * SmoothStream::createDemux(const StreamFormat &format)
         delete ret;
         ret = NULL;
     }
-    else fakeesout->commandsqueue.Commit();
+    else commandsqueue->Commit();
 
     return ret;
 }

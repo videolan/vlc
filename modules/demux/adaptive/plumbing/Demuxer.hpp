@@ -36,7 +36,7 @@ namespace adaptive
             virtual int demux(mtime_t) = 0;
             virtual void drain() = 0;
             virtual bool create() = 0;
-            virtual bool restart(CommandsQueue &) = 0;
+            virtual bool restart(CommandsQueue *) = 0;
             bool alwaysStartsFromZero() const;
             bool reinitsOnSeek() const;
 
@@ -53,7 +53,7 @@ namespace adaptive
             virtual int demux(mtime_t); /* impl */
             virtual void drain(); /* impl */
             virtual bool create(); /* impl */
-            virtual bool restart(CommandsQueue &); /* impl */
+            virtual bool restart(CommandsQueue *); /* impl */
 
         protected:
             AbstractSourceStream *sourcestream;

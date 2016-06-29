@@ -24,13 +24,14 @@
 
 #include "FakeESOut.hpp"
 #include "FakeESOutID.hpp"
+#include "CommandsQueue.hpp"
 #include <vlc_es_out.h>
 #include <vlc_block.h>
 #include <cassert>
 
 using namespace adaptive;
 
-FakeESOut::FakeESOut( es_out_t *es, CommandsFactory *factory )
+FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
 {
     real_es_out = es;
     fakeesout = new es_out_t;
@@ -42,7 +43,8 @@ FakeESOut::FakeESOut( es_out_t *es, CommandsFactory *factory )
     fakeesout->pf_send = esOutSend_Callback;
     fakeesout->p_sys = (es_out_sys_t*) this;
 
-    commandsFactory = factory;
+    commandsqueue = queue;
+
     timestamps_offset = 0;
     extrainfo = NULL;
 }
@@ -54,8 +56,6 @@ es_out_t * FakeESOut::getEsOut()
 
 FakeESOut::~FakeESOut()
 {
-    delete commandsFactory;
-
     recycleAll();
     gc();
 
@@ -145,9 +145,9 @@ size_t FakeESOut::esCount() const
 
 void FakeESOut::schedulePCRReset()
 {
-    AbstractCommand *command = commandsFactory->creatEsOutControlResetPCRCommand();
+    AbstractCommand *command = commandsqueue->factory()->creatEsOutControlResetPCRCommand();
     if( likely(command) )
-        commandsqueue.Schedule( command );
+        commandsqueue->Schedule( command );
 }
 
 void FakeESOut::scheduleAllForDeletion()
@@ -158,10 +158,10 @@ void FakeESOut::scheduleAllForDeletion()
         FakeESOutID *es_id = *it;
         if(!es_id->scheduledForDeletion())
         {
-            AbstractCommand *command = commandsFactory->createEsOutDelCommand( es_id );
+            AbstractCommand *command = commandsqueue->factory()->createEsOutDelCommand( es_id );
             if( likely(command) )
             {
-                commandsqueue.Schedule( command );
+                commandsqueue->Schedule( command );
                 es_id->setScheduledForDeletion();
             }
         }
@@ -171,8 +171,8 @@ void FakeESOut::scheduleAllForDeletion()
 void FakeESOut::recycleAll()
 {
     /* Only used when demux is killed and commands queue is cancelled */
-    commandsqueue.Abort( true );
-    assert(commandsqueue.isEmpty());
+    commandsqueue->Abort( true );
+    assert(commandsqueue->isEmpty());
     recycle_candidates.splice( recycle_candidates.end(), fakeesidlist );
 }
 
@@ -229,10 +229,10 @@ es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *
     if( likely(es_id) )
     {
         assert(!es_id->scheduledForDeletion());
-        AbstractCommand *command = me->commandsFactory->createEsOutAddCommand( es_id );
+        AbstractCommand *command = me->commandsqueue->factory()->createEsOutAddCommand( es_id );
         if( likely(command) )
         {
-            me->commandsqueue.Schedule( command );
+            me->commandsqueue->Schedule( command );
             return reinterpret_cast<es_out_id_t *>(es_id);
         }
         else
@@ -255,10 +255,10 @@ int FakeESOut::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *
         if( p_block->i_pts > VLC_TS_INVALID )
                 p_block->i_pts += offset;
     }
-    AbstractCommand *command = me->commandsFactory->createEsOutSendCommand( es_id, p_block );
+    AbstractCommand *command = me->commandsqueue->factory()->createEsOutSendCommand( es_id, p_block );
     if( likely(command) )
     {
-        me->commandsqueue.Schedule( command );
+        me->commandsqueue->Schedule( command );
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
@@ -268,10 +268,10 @@ void FakeESOut::esOutDel_Callback(es_out_t *fakees, es_out_id_t *p_es)
 {
     FakeESOut *me = (FakeESOut *) fakees->p_sys;
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
-    AbstractCommand *command = me->commandsFactory->createEsOutDelCommand( es_id );
+    AbstractCommand *command = me->commandsqueue->factory()->createEsOutDelCommand( es_id );
     if( likely(command) )
     {
-        me->commandsqueue.Schedule( command );
+        me->commandsqueue->Schedule( command );
         es_id->setScheduledForDeletion();
     }
 }
@@ -292,10 +292,10 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
                 i_group = 0;
             int64_t  pcr = static_cast<int64_t>(va_arg( args, int64_t ));
             pcr += me->getTimestampOffset();
-            AbstractCommand *command = me->commandsFactory->createEsOutControlPCRCommand( i_group, pcr );
+            AbstractCommand *command = me->commandsqueue->factory()->createEsOutControlPCRCommand( i_group, pcr );
             if( likely(command) )
             {
-                me->commandsqueue.Schedule( command );
+                me->commandsqueue->Schedule( command );
                 return VLC_SUCCESS;
             }
         }
@@ -322,8 +322,8 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
 void FakeESOut::esOutDestroy_Callback(es_out_t *fakees)
 {
     FakeESOut *me = (FakeESOut *) fakees->p_sys;
-    AbstractCommand *command = me->commandsFactory->createEsOutDestroyCommand();
+    AbstractCommand *command = me->commandsqueue->factory()->createEsOutDestroyCommand();
     if( likely(command) )
-        me->commandsqueue.Schedule( command );
+        me->commandsqueue->Schedule( command );
 }
 /* !Static callbacks */
