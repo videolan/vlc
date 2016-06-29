@@ -991,8 +991,7 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
             }
             else if( psz_subtitle[1] == 'S' || psz_subtitle[1] == 's' )
             {
-                char *value = strndup( &psz_subtitle[3], i_len );
-                int size = atoi( value );
+                int size = atoi( &psz_subtitle[3] );
                 if( size )
                 {
                     p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
