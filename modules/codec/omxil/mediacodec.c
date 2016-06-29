@@ -757,7 +757,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         /* Try first to configure specific Video CSD */
         if (p_dec->fmt_in.i_cat == VIDEO_ES)
             if (ParseVideoExtra(p_dec) != VLC_SUCCESS)
-                return VLC_EGENERIC;
+                goto bailout;
 
         /* Set default CSD if ParseVideoExtra failed to configure one */
         if (!p_sys->pp_csd)
