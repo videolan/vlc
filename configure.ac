@@ -1781,7 +1781,7 @@ PKG_ENABLE_MODULES_VLC([SFTP], [sftp], [libssh2], (support SFTP file transfer vi
 dnl
 dnl nfs access support
 dnl
-PKG_ENABLE_MODULES_VLC([NFS], [nfs], [libnfs], (support nfs protocol via libnfs), [auto])
+PKG_ENABLE_MODULES_VLC([NFS], [nfs], [libnfs >= 1.10.0], (support nfs protocol via libnfs), [auto])
 
 dnl
 dnl  Video4Linux 2
