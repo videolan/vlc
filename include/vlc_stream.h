@@ -237,6 +237,67 @@ VLC_API stream_t * stream_MemoryNew(vlc_object_t *p_obj, uint8_t *p_buffer, uint
 VLC_API stream_t * stream_UrlNew(vlc_object_t *p_this, const char *psz_url );
 #define stream_UrlNew( a, b ) stream_UrlNew( VLC_OBJECT(a), b )
 
+/**
+ * \defgroup stream_fifo FIFO stream
+ * In-memory anonymous pipe
+  @{
+ */
+
+/**
+ * Creates a FIFO stream.
+ *
+ * Creates a non-seekable byte stream object whose byte stream is generated
+ * by another thread in the process. This is the LibVLC equivalent of an
+ * anonymous pipe/FIFO.
+ *
+ * On the reader side, the normal stream functions are used,
+ * e.g. stream_Read() and stream_Delete().
+ *
+ * The created stream object is automatically destroyed when both the reader
+ * and the writer sides have been closed, with stream_Delete() and
+ * vlc_stream_fifo_Close() respectively.
+ *
+ * \param parent parent VLC object for the stream
+ * \return a stream object or NULL on memory error.
+ */
+VLC_API stream_t *vlc_stream_fifo_New(vlc_object_t *parent);
+
+/**
+ * Writes a block to a FIFO stream.
+ *
+ * \param s FIFO stream created by vlc_stream_fifo_New()
+ * \param block data block to write to the stream
+ * \return 0 on success. -1 if the reader end has already been closed
+ * (errno is then set to EPIPE, and the block is deleted).
+ *
+ * \bug No congestion control is performed. If the reader end is not keeping
+ * up with the writer end, buffers will accumulate in memory.
+ */
+VLC_API int vlc_stream_fifo_Queue(stream_t *s, block_t *block);
+
+/**
+ * Writes data to a FIFO stream.
+ *
+ * This is a convenience helper for vlc_stream_fifo_Queue().
+ * \param s FIFO stream created by vlc_stream_fifo_New()
+ * \param buf start address of data to write
+ * \param len length of data to write in bytes
+ * \return len on success, or -1 on error (errno is set accordingly)
+ */
+VLC_API ssize_t vlc_stream_fifo_Write(stream_t *s, const void *buf,
+                                      size_t len);
+
+/**
+ * Terminates a FIFO stream.
+ *
+ * Marks the end of the FIFO stream and releases any underlying resources.
+ * \param s FIFO stream created by vlc_stream_fifo_New()
+ */
+VLC_API void vlc_stream_fifo_Close(stream_t *s);
+
+/**
+ * @}
+ */
 
 /**
  * Try to add a stream filter to an open stream.

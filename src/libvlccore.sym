@@ -412,6 +412,10 @@ stream_UrlNew
 stream_vaControl
 stream_ReadDir
 stream_FilterDefaultReadDir
+vlc_stream_fifo_New
+vlc_stream_fifo_Queue
+vlc_stream_fifo_Write
+vlc_stream_fifo_Close
 vlc_strfinput
 vlc_strftime
 subpicture_Delete
