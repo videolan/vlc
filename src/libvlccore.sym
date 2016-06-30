@@ -402,9 +402,6 @@ stream_Block
 stream_Control
 stream_CustomNew
 stream_Delete
-stream_DemuxNew
-stream_DemuxSend
-stream_DemuxControlVa
 stream_FilterNew
 stream_MemoryNew
 stream_Peek
