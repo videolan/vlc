@@ -1448,7 +1448,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t *pi64, i64;
     double  *pf, f;
-    bool *pb, *pb2;
+    bool *pb;
     int *pi_int;
 
     vlc_mutex_locker locker(&p_sys->timeout_mutex); /* (see same in Demux) */
