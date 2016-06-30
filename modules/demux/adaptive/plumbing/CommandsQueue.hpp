@@ -146,7 +146,9 @@ namespace adaptive
             bool isEmpty() const;
             void setDrop( bool );
             void setFlush();
+            void setEOF();
             bool isFlushing() const;
+            bool isEOF() const;
             mtime_t getDemuxedAmount() const;
             mtime_t getBufferingLevel() const;
             mtime_t getFirstDTS() const;
@@ -162,6 +164,7 @@ namespace adaptive
             mtime_t pcr;
             bool b_flushing;
             bool b_drop;
+            bool b_eof;
     };
 }
 

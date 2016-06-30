@@ -199,6 +199,7 @@ CommandsQueue::CommandsQueue( CommandsFactory *f )
     pcr = VLC_TS_INVALID;
     b_drop = false;
     b_flushing = false;
+    b_eof = false;
     commandsFactory = f;
     vlc_mutex_init(&lock);
 }
@@ -306,6 +307,7 @@ void CommandsQueue::Abort( bool b_reset )
         bufferinglevel = VLC_TS_INVALID;
         pcr = VLC_TS_INVALID;
         b_flushing = false;
+        b_eof = false;
     }
     vlc_mutex_unlock(&lock);
 }
@@ -337,6 +339,23 @@ bool CommandsQueue::isFlushing() const
 {
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     bool b = b_flushing;
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return b;
+}
+
+void CommandsQueue::setEOF()
+{
+    vlc_mutex_lock(&lock);
+    b_eof = true;
+    LockedCommit();
+    b_flushing = !commands.empty();
+    vlc_mutex_unlock(&lock);
+}
+
+bool CommandsQueue::isEOF() const
+{
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    bool b = b_eof;
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return b;
 }
