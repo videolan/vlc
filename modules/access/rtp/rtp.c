@@ -136,7 +136,7 @@ vlc_module_end ()
  * - send RTCP-RR and RTCP-BYE
  * - dynamic payload types (need SDP parser)
  * - multiple medias (need SDP parser, and RTCP-SR parser for lip-sync)
- * - support for stream_filter in case of stream_Demux (MPEG-TS)
+ * - support for stream_filter in case of chained demux (MPEG-TS)
  */
 
 #ifndef IPPROTO_DCCP
@@ -396,7 +396,7 @@ static int Control (demux_t *demux, int query, va_list args)
     }
 
     if (sys->chained_demux != NULL)
-        return stream_DemuxControlVa (sys->chained_demux, query, args);
+        return vlc_demux_chained_ControlVa (sys->chained_demux, query, args);
 
     switch (query)
     {
@@ -456,7 +456,8 @@ static void *stream_init (demux_t *demux, const char *name)
 
     if (p_sys->chained_demux != NULL)
         return NULL;
-    p_sys->chained_demux = stream_DemuxNew (demux, name, demux->out);
+    p_sys->chained_demux = vlc_demux_chained_New(VLC_OBJECT(demux), name,
+                                                 demux->out);
     return p_sys->chained_demux;
 }
 
@@ -466,7 +467,7 @@ static void stream_destroy (demux_t *demux, void *data)
 
     if (data)
     {
-        stream_Delete ((stream_t *)data);
+        vlc_demux_chained_Delete(data);
         p_sys->chained_demux = NULL;
     }
 }
@@ -475,7 +476,7 @@ static void stream_destroy (demux_t *demux, void *data)
 static void stream_decode (demux_t *demux, void *data, block_t *block)
 {
     if (data)
-        stream_DemuxSend ((stream_t *)data, block);
+        vlc_demux_chained_Send(data, block);
     else
         block_Release (block);
     (void)demux;
