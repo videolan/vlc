@@ -159,7 +159,7 @@ typedef struct
     bool            b_asf;
     block_t         *p_asf_block;
     bool            b_discard_trunc;
-    stream_t        *p_out_muxed;    /* for muxed stream */
+    vlc_demux_chained_t *p_out_muxed;    /* for muxed stream */
 
     uint8_t         *p_buffer;
     unsigned int    i_buffer;
@@ -199,7 +199,7 @@ struct demux_sys_t
 
     /* Weird formats */
     asf_header_t     asfh;
-    stream_t         *p_out_asf;
+    vlc_demux_chained_t *p_out_asf;
     bool             b_real;
 
     /* */
@@ -451,13 +451,13 @@ static void Close( vlc_object_t *p_this )
     {
         live_track_t *tk = p_sys->track[i];
 
-        if( tk->b_muxed ) stream_Delete( tk->p_out_muxed );
+        if( tk->b_muxed ) vlc_demux_chained_Delete( tk->p_out_muxed );
         es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
     }
     TAB_CLEAN( p_sys->i_track, p_sys->track );
-    if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
+    if( p_sys->p_out_asf ) vlc_demux_chained_Delete( p_sys->p_out_asf );
     delete p_sys->scheduler;
     free( p_sys->p_sdp );
     free( p_sys->psz_path );
@@ -982,8 +982,9 @@ static int SessionsSetup( demux_t *p_demux )
                 {
                     tk->b_asf = true;
                     if( p_sys->p_out_asf == NULL )
-                        p_sys->p_out_asf = stream_DemuxNew( p_demux, "asf",
-                                                            p_demux->out );
+                        p_sys->p_out_asf =
+                            vlc_demux_chained_New( VLC_OBJECT(p_demux), "asf",
+                                                   p_demux->out );
                 }
                 else if( !strcmp( sub->codecName(), "X-QT" ) ||
                          !strcmp( sub->codecName(), "X-QUICKTIME" ) )
@@ -1114,28 +1115,33 @@ static int SessionsSetup( demux_t *p_demux )
                 else if( !strcmp( sub->codecName(), "MP2T" ) )
                 {
                     tk->b_muxed = true;
-                    tk->p_out_muxed = stream_DemuxNew( p_demux, "ts", p_demux->out );
+                    tk->p_out_muxed =
+                        vlc_demux_chained_New( VLC_OBJECT(p_demux), "ts",
+                                               p_demux->out );
                 }
                 else if( !strcmp( sub->codecName(), "MP2P" ) ||
                          !strcmp( sub->codecName(), "MP1S" ) )
                 {
                     tk->b_muxed = true;
-                    tk->p_out_muxed = stream_DemuxNew( p_demux, "ps",
-                                                       p_demux->out );
+                    tk->p_out_muxed =
+                        vlc_demux_chained_New( VLC_OBJECT(p_demux), "ps",
+                                               p_demux->out );
                 }
                 else if( !strcmp( sub->codecName(), "X-ASF-PF" ) )
                 {
                     tk->b_asf = true;
                     if( p_sys->p_out_asf == NULL )
-                        p_sys->p_out_asf = stream_DemuxNew( p_demux, "asf",
-                                                            p_demux->out );;
+                        p_sys->p_out_asf =
+                            vlc_demux_chained_New( VLC_OBJECT(p_demux),
+                                                   "asf", p_demux->out );
                 }
                 else if( !strcmp( sub->codecName(), "DV" ) )
                 {
                     tk->b_muxed = true;
                     tk->b_discard_trunc = true;
-                    tk->p_out_muxed = stream_DemuxNew( p_demux, "rawdv",
-                                                       p_demux->out );
+                    tk->p_out_muxed =
+                        vlc_demux_chained_New( VLC_OBJECT(p_demux), "rawdv",
+                                               p_demux->out );
                 }
                 else if( !strcmp( sub->codecName(), "VP8" ) )
                 {
@@ -1733,7 +1739,7 @@ static int RollOverTcp( demux_t *p_demux )
     {
         live_track_t *tk = p_sys->track[i];
 
-        if( tk->b_muxed ) stream_Delete( tk->p_out_muxed );
+        if( tk->b_muxed ) vlc_demux_chained_Delete( tk->p_out_muxed );
         if( tk->p_es ) es_out_Del( p_demux->out, tk->p_es );
         if( tk->p_asf_block ) block_Release( tk->p_asf_block );
         es_format_Clean( &tk->fmt );
@@ -1741,7 +1747,7 @@ static int RollOverTcp( demux_t *p_demux )
         free( tk );
     }
     TAB_CLEAN( p_sys->i_track, p_sys->track );
-    if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
+    if( p_sys->p_out_asf ) vlc_demux_chained_Delete( p_sys->p_out_asf );
 
     p_sys->ms = NULL;
     p_sys->rtsp = NULL;
@@ -2055,9 +2061,9 @@ static void StreamRead( void *p_private, unsigned int i_size,
         }
 
         if( tk->b_muxed )
-            stream_DemuxSend( tk->p_out_muxed, p_block );
+            vlc_demux_chained_Send( tk->p_out_muxed, p_block );
         else if( tk->b_asf )
-            stream_DemuxSend( p_sys->p_out_asf, p_block );
+            vlc_demux_chained_Send( p_sys->p_out_asf, p_block );
         else
             es_out_Send( p_demux->out, tk->p_es, p_block );
     }
@@ -2208,7 +2214,7 @@ static int ParseASF( demux_t *p_demux )
     asf_HeaderParse( &p_sys->asfh, p_header->p_buffer, p_header->i_buffer );
 
     /* Send it to demuxer */
-    stream_DemuxSend( p_sys->p_out_asf, p_header );
+    vlc_demux_chained_Send( p_sys->p_out_asf, p_header );
 
     free( psz_asf );
     return VLC_SUCCESS;
