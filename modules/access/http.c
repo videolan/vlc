@@ -149,7 +149,6 @@ static int Control( access_t *, int, va_list );
 
 /* */
 static int Connect( access_t *, uint64_t );
-static int Request( access_t *p_access, uint64_t i_tell );
 static void Disconnect( access_t * );
 
 
@@ -872,15 +871,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         }
     }
 
-    return Request( p_access, i_tell ) ? -2 : 0;
-}
-
-
-static int Request( access_t *p_access, uint64_t i_tell )
-{
-    access_sys_t   *p_sys = p_access->p_sys;
-    char           *psz ;
-
     const char *psz_path = p_sys->url.psz_path;
     if( !psz_path || !*psz_path )
         psz_path = "/";
@@ -936,10 +926,11 @@ static int Request( access_t *p_access, uint64_t i_tell )
     {
         msg_Err( p_access, "failed to send request" );
         Disconnect( p_access );
-        return VLC_EGENERIC;
+        return -2;
     }
 
     /* Read Answer */
+    char *psz;
     if( p_sys->p_tls != NULL )
         psz = vlc_tls_GetLine( p_sys->p_tls );
     else
@@ -1223,11 +1214,11 @@ static int Request( access_t *p_access, uint64_t i_tell )
 
         free( psz );
     }
-    return VLC_SUCCESS;
+    return 0;
 
 error:
     Disconnect( p_access );
-    return VLC_EGENERIC;
+    return -2;
 }
 
 /*****************************************************************************
