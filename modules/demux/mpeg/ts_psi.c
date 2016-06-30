@@ -1626,8 +1626,11 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                 else
                 {
                     ts_pes_es_t *p_new = ts_pes_Extract_es( p_pes, p_pmt );
+                    ts_pes_es_t *p_old = ts_pes_Extract_es( pespid->u.p_pes, p_pmt );
                     ts_pes_Add_es( pespid->u.p_pes, p_new, false );
+                    assert(p_old == p_existing_es);
                     assert(ts_pes_Count_es(p_pes->p_es, false, NULL) == 0);
+                    ts_pes_Add_es( p_pes, p_old, false );
                     ts_pes_Del( p_demux, p_pes );
                 }
             }
