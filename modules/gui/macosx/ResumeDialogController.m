@@ -55,11 +55,6 @@
 {
     NSWindow *w = [self window];
 
-    if ([w isVisible]) {
-        msg_Err(getIntf(), "Resume dialog in use already");
-        return;
-    }
-
     currentResumeTimeout = 10;
     completionBlock = [block copy];
 
@@ -75,11 +70,11 @@
     [o_text_lbl setStringValue:labelString];
     [o_always_resume_chk setState: NSOffState];
 
-    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1
-                                             target:self
-                                           selector:@selector(updateAlertWindow:)
-                                           userInfo:nil
-                                            repeats:YES];
+    o_countdown_timer = [NSTimer scheduledTimerWithTimeInterval:1
+                                                         target:self
+                                                       selector:@selector(updateAlertWindow:)
+                                                       userInfo:nil
+                                                        repeats:YES];
 
     [w setLevel:[[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
     [w center];
@@ -130,6 +125,16 @@
 {
     if (self.isWindowLoaded && [self.window isVisible] && [self.window level] != i_level)
         [self.window setLevel: i_level];
+}
+
+- (void)cancel
+{
+    if (o_countdown_timer != nil) {
+        [o_countdown_timer invalidate];
+        o_countdown_timer = nil;
+    }
+
+    [[self window] close];
 }
 
 @end
