@@ -118,9 +118,6 @@ struct access_sys_t
     char       *psz_location;
     bool b_icecast;
 
-    bool b_chunked;
-    int64_t    i_chunk;
-
     int        i_icy_meta;
     uint64_t   i_icy_offset;
     char       *psz_icy_name;
@@ -414,54 +411,15 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-/* Read data from the socket taking care of chunked transfer if needed */
+/* Read data from the socket */
 static int ReadData( access_t *p_access, int *pi_read,
                      void *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    if( p_sys->b_chunked )
-    {
-        if( p_sys->i_chunk < 0 )
-            return VLC_EGENERIC;
-
-        if( p_sys->i_chunk <= 0 )
-        {
-            char *psz = net_Gets( p_access, p_sys->fd );
-
-            /* read the chunk header */
-            if( psz == NULL )
-            {
-                /* fatal error - end of file */
-                msg_Dbg( p_access, "failed reading chunk-header line" );
-                return VLC_EGENERIC;
-            }
-            p_sys->i_chunk = strtoll( psz, NULL, 16 );
-            free( psz );
-
-            if( p_sys->i_chunk <= 0 )   /* eof */
-            {
-                p_sys->i_chunk = -1;
-                return VLC_EGENERIC;
-            }
-        }
-
-        if( i_len > p_sys->i_chunk )
-            i_len = p_sys->i_chunk;
-    }
 
     *pi_read = vlc_recv_i11e( p_sys->fd, p_buffer, i_len, 0 );
     if( *pi_read < 0 && errno != EINTR && errno != EAGAIN )
         return VLC_EGENERIC;
-    if( *pi_read <= 0 )
-        return VLC_SUCCESS;
-
-    if( p_sys->b_chunked )
-    {
-        p_sys->i_chunk -= *pi_read;
-        if( p_sys->i_chunk <= 0 )
-            /* read the empty line */
-            free( net_Gets( p_access, p_sys->fd ) );
-    }
     return VLC_SUCCESS;
 }
 
@@ -712,8 +670,6 @@ static int Connect( access_t *p_access )
 
     p_sys->psz_location = NULL;
     p_sys->psz_mime = NULL;
-    p_sys->b_chunked = false;
-    p_sys->i_chunk = 0;
     p_sys->i_icy_meta = 0;
     p_sys->i_icy_offset = 0;
     p_sys->psz_icy_name = NULL;
@@ -737,12 +693,12 @@ static int Connect( access_t *p_access )
     if( !psz_path || !*psz_path )
         psz_path = "/";
     if( p_sys->b_proxy )
-        WriteHeaders( p_access, "GET http://%s:%d%s%s%s HTTP/1.1\r\n",
+        WriteHeaders( p_access, "GET http://%s:%d%s%s%s HTTP/1.0\r\n",
                       p_sys->url.psz_host, p_sys->url.i_port,
                       psz_path, p_sys->url.psz_option ? "?" : "",
                       p_sys->url.psz_option ? p_sys->url.psz_option : "" );
     else
-        WriteHeaders( p_access, "GET %s%s%s HTTP/1.1\r\n",
+        WriteHeaders( p_access, "GET %s%s%s HTTP/1.0\r\n",
                       psz_path, p_sys->url.psz_option ? "?" : "",
                       p_sys->url.psz_option ? p_sys->url.psz_option : "" );
     if( p_sys->url.i_port != 80 )
@@ -755,8 +711,6 @@ static int Connect( access_t *p_access )
     /* Referrer */
     if (p_sys->psz_referrer)
         WriteHeaders( p_access, "Referer: %s\r\n", p_sys->psz_referrer );
-    /* Offset */
-    WriteHeaders( p_access, "Connection: close\r\n" );
 
     /* Authentication */
     if( p_sys->url.psz_username && p_sys->url.psz_password )
@@ -917,14 +871,6 @@ static int Connect( access_t *p_access )
 
                 p_sys->b_reconnect = true;
                 p_sys->b_icecast = true;
-            }
-        }
-        else if( !strcasecmp( psz, "Transfer-Encoding" ) )
-        {
-            msg_Dbg( p_access, "Transfer-Encoding: %s", p );
-            if( !strncasecmp( p, "chunked", 7 ) )
-            {
-                p_sys->b_chunked = true;
             }
         }
         else if( !strcasecmp( psz, "Icy-MetaInt" ) )
