@@ -203,7 +203,7 @@ static int module_load (vlc_object_t *obj, module_t *m,
  *
  * \param obj VLC object
  * \param capability capability, i.e. class of module
- * \param name name name of the module asked, if any
+ * \param name name of the module asked, if any
  * \param strict if true, do not fallback to plugin with a different name
  *                 but the same capability
  * \param probe module probe callback
