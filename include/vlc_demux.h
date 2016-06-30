@@ -441,6 +441,85 @@ VLC_API void demux_PacketizerDestroy( decoder_t *p_packetizer );
     } while(0)
 
 /**
+ * \defgroup chained_demux Chained demultiplexer
+ * Demultiplexers wrapped by another demultiplexer
+ * @{
+ */
+
+typedef struct vlc_demux_chained_t vlc_demux_chained_t;
+
+/**
+ * Creates a chained demuxer.
+ *
+ * This creates a thread running a demuxer whose input stream is generated
+ * directly by the caller. This typically handles some sort of stream within a
+ * stream, e.g. MPEG-TS within something else.
+ *
+ * \note There are a number of limitations to this approach. The chained
+ * demuxer is run asynchronously in a separate thread. Most demuxer controls
+ * are synchronous and therefore unavailable in this case. Also the input
+ * stream is a simple FIFO, so the chained demuxer cannot perform seeks.
+ * Lastly, most errors cannot be detected.
+ *
+ * \param parent parent VLC object
+ * \param name chained demux module name (e.g. "ts")
+ * \param out elementary stream output for the chained demux
+ * \return a non-NULL pointer on success, NULL on failure.
+ */
+VLC_API vlc_demux_chained_t *vlc_demux_chained_New(vlc_object_t *parent,
+                                                   const char *name,
+                                                   es_out_t *out);
+
+/**
+ * Destroys a chained demuxer.
+ *
+ * Sends an end-of-stream to the chained demuxer, and releases all underlying
+ * allocated resources.
+ */
+VLC_API void vlc_demux_chained_Delete(vlc_demux_chained_t *);
+
+/**
+ * Sends data to a chained demuxer.
+ *
+ * This queues data for a chained demuxer to consume.
+ *
+ * \param block data block to queue
+ */
+VLC_API void vlc_demux_chained_Send(vlc_demux_chained_t *, block_t *block);
+
+/**
+ * Controls a chained demuxer.
+ *
+ * This performs a <b>demux</b> (i.e. DEMUX_...) control request on a chained
+ * demux.
+ *
+ * \note In most cases, vlc_demux_chained_Control() should be used instead.
+ * \warning As per vlc_demux_chained_New(), most demux controls are not, and
+ * cannot be, supported; VLC_EGENERIC is returned.
+ *
+ * \param query demux control (see \ref demux_query_e)
+ * \param args variable arguments (depending on the query)
+ */
+VLC_API int vlc_demux_chained_ControlVa(vlc_demux_chained_t *, int query,
+                                        va_list args);
+
+static inline int vlc_demux_chained_Control(vlc_demux_chained_t *dc, int query,
+                                            ...)
+{
+    va_list ap;
+    int ret;
+
+    va_start(ap, query);
+    ret = vlc_demux_chained_ControlVa(dc, query, ap);
+    va_end(ap);
+    return ret;
+}
+
+/**
+ * @}
+ */
+
+/**
  * @}
  */
 

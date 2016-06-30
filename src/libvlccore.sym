@@ -97,6 +97,10 @@ demux_PacketizerNew
 demux_New
 demux_vaControl
 demux_vaControlHelper
+vlc_demux_chained_New
+vlc_demux_chained_Send
+vlc_demux_chained_ControlVa
+vlc_demux_chained_Delete
 EndMD5
 es_format_Clean
 es_format_Copy

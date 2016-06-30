@@ -358,6 +358,7 @@ SOURCES_libvlc_common = \
 	input/decoder.c \
 	input/decoder_synchro.c \
 	input/demux.c \
+	input/demux_chained.c \
 	input/es_out.c \
 	input/es_out_timeshift.c \
 	input/event.c \
