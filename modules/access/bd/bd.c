@@ -94,7 +94,7 @@ struct demux_sys_t
     /* Current state */
     const bd_clpi_t *p_clpi;
     int             i_clpi_ep;
-    stream_t        *p_parser;
+    vlc_demux_chained_t *p_parser;
     stream_t        *p_m2ts;
     int             i_play_item;
     int             i_packet;
@@ -383,7 +383,7 @@ static int Demux( demux_t *p_demux )
         {
             p_block->i_buffer -= BD_TS_PACKET_HEADER;
             p_block->p_buffer += BD_TS_PACKET_HEADER;
-            stream_DemuxSend( p_sys->p_parser, p_block );
+            vlc_demux_chained_Send( p_sys->p_parser, p_block );
         }
 
         stream_Seek( p_sys->p_m2ts, p_sys->i_packet_start * (int64_t)BD_TS_PACKET_SIZE );
@@ -439,7 +439,7 @@ static int Demux( demux_t *p_demux )
 
     p_block->i_buffer = i_read;
     p_block->p_buffer += BD_TS_PACKET_HEADER;
-    stream_DemuxSend( p_sys->p_parser, p_block );
+    vlc_demux_chained_Send( p_sys->p_parser, p_block );
 
     p_sys->i_packet += i_read / BD_TS_PACKET_SIZE;
 
@@ -639,7 +639,7 @@ static int SetPlayItem( demux_t *p_demux, int i_mpls, int i_play_item )
      * - a way to completely flush the demuxer is also needed !
      */
     //const bool b_same_parser = b_same_play_item && false;
-    stream_t *p_parser = stream_DemuxNew( p_demux, "ts", p_sys->p_out );
+    vlc_demux_chained_t *p_parser = vlc_demux_chained_New( VLC_OBJECT(p_demux), "ts", p_sys->p_out );
     if( !p_parser )
     {
         msg_Err( p_demux, "Failed to create TS demuxer" );
@@ -702,7 +702,7 @@ static void ClosePlayItem( demux_t *p_demux )
     if( p_sys->p_m2ts )
         stream_Delete( p_sys->p_m2ts );
     if( p_sys->p_parser )
-        stream_Delete( p_sys->p_parser );
+        vlc_demux_chained_Delete( p_sys->p_parser );
 
     es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 }
