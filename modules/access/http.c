@@ -130,7 +130,6 @@ struct access_sys_t
     char       *psz_icy_genre;
     char       *psz_icy_title;
 
-    uint64_t i_remaining;
     uint64_t offset;
     uint64_t size;
 
@@ -193,7 +192,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_icy_name = NULL;
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
-    p_sys->i_remaining = 0;
     p_sys->b_has_size = false;
     p_sys->offset = 0;
     p_sys->size = 0;
@@ -523,17 +521,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_sys->fd == -1 )
         goto fatal;
 
-    if( p_sys->b_has_size )
-    {
-        /* Remaining bytes in the file */
-        uint64_t remainder = p_sys->size - p_sys->offset;
-        if( remainder < i_len )
-            i_len = remainder;
-
-        /* Remaining bytes in the response */
-        if( p_sys->i_remaining < i_len )
-            i_len = p_sys->i_remaining;
-    }
     if( i_len == 0 )
         goto fatal;
 
@@ -573,12 +560,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
     assert( i_read >= 0 );
     p_sys->offset += i_read;
-    if( p_sys->b_has_size )
-    {
-        assert( p_sys->offset <= p_sys->size );
-        assert( (unsigned)i_read <= p_sys->i_remaining );
-        p_sys->i_remaining -= i_read;
-    }
 
     return i_read;
 
@@ -811,7 +792,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     p_sys->psz_icy_name = NULL;
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
-    p_sys->i_remaining = 0;
     p_sys->b_has_size = false;
     p_sys->offset = i_tell;
     p_sys->size = 0;
@@ -900,8 +880,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
 {
     access_sys_t   *p_sys = p_access->p_sys;
     char           *psz ;
-
-    p_sys->i_remaining = 0;
 
     const char *psz_path = p_sys->url.psz_path;
     if( !psz_path || !*psz_path )
@@ -1052,12 +1030,11 @@ static int Request( access_t *p_access, uint64_t i_tell )
 
         if( !strcasecmp( psz, "Content-Length" ) )
         {
-            uint64_t i_size = i_tell + (p_sys->i_remaining = (uint64_t)atoll( p ));
+            uint64_t i_size = i_tell + (uint64_t)atoll( p );
             if(i_size > p_sys->size) {
                 p_sys->b_has_size = true;
                 p_sys->size = i_size;
             }
-            msg_Dbg( p_access, "this frame size=%"PRIu64, p_sys->i_remaining );
         }
         else if( !strcasecmp( psz, "Content-Range" ) ) {
             uint64_t i_ntell = i_tell;
@@ -1067,14 +1044,13 @@ static int Request( access_t *p_access, uint64_t i_tell )
             if(i_nend > i_ntell ) {
                 p_sys->offset = i_ntell;
                 p_sys->i_icy_offset  = i_ntell;
-                p_sys->i_remaining = i_nend+1-i_ntell;
                 uint64_t i_size = (i_nsize > i_nend) ? i_nsize : (i_nend + 1);
                 if(i_size > p_sys->size) {
                     p_sys->b_has_size = true;
                     p_sys->size = i_size;
                 }
-                msg_Dbg( p_access, "stream size=%"PRIu64",pos=%"PRIu64",remaining=%"PRIu64,
-                         i_nsize, i_ntell, p_sys->i_remaining);
+                msg_Dbg( p_access, "stream size=%"PRIu64",pos=%"PRIu64,
+                         i_nsize, i_ntell);
             }
         }
         else if( !strcasecmp( psz, "Location" ) )
