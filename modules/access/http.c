@@ -130,7 +130,6 @@ struct access_sys_t
     uint64_t offset;
     uint64_t size;
 
-    bool b_seekable;
     bool b_reconnect;
     bool b_continuous;
     bool b_has_size;
@@ -142,7 +141,7 @@ static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 
 /* */
-static int Connect( access_t *, uint64_t );
+static int Connect( access_t * );
 static void Disconnect( access_t * );
 
 
@@ -169,7 +168,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->fd = -1;
     p_sys->b_proxy = false;
     p_sys->psz_proxy_passbuf = NULL;
-    p_sys->b_seekable = true;
     p_sys->psz_mime = NULL;
     p_sys->b_icecast = false;
     p_sys->psz_location = NULL;
@@ -297,7 +295,7 @@ static int Open( vlc_object_t *p_this )
 
 connect:
     /* Connect */
-    if( Connect( p_access, 0 ) )
+    if( Connect( p_access ) )
         goto error;
 
     if( p_sys->i_code == 401 )
@@ -509,7 +507,7 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
         if( p_sys->b_reconnect )
         {
             msg_Dbg( p_access, "got disconnected, trying to reconnect" );
-            if( Connect( p_access, p_sys->offset ) )
+            if( Connect( p_access ) )
                 msg_Dbg( p_access, "reconnection failed" );
             else
                 return -1;
@@ -604,27 +602,8 @@ static int ReadICYMeta( access_t *p_access )
  *****************************************************************************/
 static int Seek( access_t *p_access, uint64_t i_pos )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
-    msg_Dbg( p_access, "trying to seek to %"PRId64, i_pos );
-    Disconnect( p_access );
-
-    if( p_sys->size && i_pos >= p_sys->size )
-    {
-        msg_Err( p_access, "seek too far" );
-        int retval = Seek( p_access, p_sys->size - 1 );
-        if( retval == VLC_SUCCESS ) {
-            uint8_t p_buffer[2];
-            Read( p_access, p_buffer, 1);
-        }
-        return retval;
-    }
-    if( Connect( p_access, i_pos ) )
-    {
-        msg_Err( p_access, "seek failed" );
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
+    (void) p_access; (void) i_pos;
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -640,9 +619,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     {
         /* */
         case STREAM_CAN_SEEK:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = p_sys->b_seekable;
-            break;
         case STREAM_CAN_FASTSEEK:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = false;
@@ -720,7 +696,7 @@ static int WriteHeaders( access_t *access, const char *fmt, ... )
 /*****************************************************************************
  * Connect:
  *****************************************************************************/
-static int Connect( access_t *p_access, uint64_t i_tell )
+static int Connect( access_t *p_access )
 {
     access_sys_t   *p_sys = p_access->p_sys;
     vlc_url_t      srv = p_sys->b_proxy ? p_sys->proxy : p_sys->url;
@@ -739,12 +715,12 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     p_sys->b_chunked = false;
     p_sys->i_chunk = 0;
     p_sys->i_icy_meta = 0;
-    p_sys->i_icy_offset = i_tell;
+    p_sys->i_icy_offset = 0;
     p_sys->psz_icy_name = NULL;
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
     p_sys->b_has_size = false;
-    p_sys->offset = i_tell;
+    p_sys->offset = 0;
     p_sys->size = 0;
 
     /* Open connection */
@@ -780,8 +756,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     if (p_sys->psz_referrer)
         WriteHeaders( p_access, "Referer: %s\r\n", p_sys->psz_referrer );
     /* Offset */
-    if( !p_sys->b_continuous )
-        WriteHeaders( p_access, "Range: bytes=%"PRIu64"-\r\n", i_tell );
     WriteHeaders( p_access, "Connection: close\r\n" );
 
     /* Authentication */
@@ -821,17 +795,12 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         msg_Dbg( p_access, "ICY answer code %d", p_sys->i_code );
         p_sys->b_icecast = true;
         p_sys->b_reconnect = true;
-        p_sys->b_seekable = false;
     }
     else
     {
         msg_Err( p_access, "invalid HTTP reply '%s'", psz );
         free( psz );
         goto error;
-    }
-    if( p_sys->i_code != 206 && p_sys->i_code != 401 )
-    {
-        p_sys->b_seekable = false;
     }
     /* Authentication error - We'll have to display the dialog */
     if( p_sys->i_code == 401 )
@@ -888,27 +857,10 @@ static int Connect( access_t *p_access, uint64_t i_tell )
 
         if( !strcasecmp( psz, "Content-Length" ) )
         {
-            uint64_t i_size = i_tell + (uint64_t)atoll( p );
+            uint64_t i_size = (uint64_t)atoll( p );
             if(i_size > p_sys->size) {
                 p_sys->b_has_size = true;
                 p_sys->size = i_size;
-            }
-        }
-        else if( !strcasecmp( psz, "Content-Range" ) ) {
-            uint64_t i_ntell = i_tell;
-            uint64_t i_nend = (p_sys->size > 0) ? (p_sys->size - 1) : i_tell;
-            uint64_t i_nsize = p_sys->size;
-            sscanf(p,"bytes %"SCNu64"-%"SCNu64"/%"SCNu64,&i_ntell,&i_nend,&i_nsize);
-            if(i_nend > i_ntell ) {
-                p_sys->offset = i_ntell;
-                p_sys->i_icy_offset  = i_ntell;
-                uint64_t i_size = (i_nsize > i_nend) ? i_nsize : (i_nend + 1);
-                if(i_size > p_sys->size) {
-                    p_sys->b_has_size = true;
-                    p_sys->size = i_size;
-                }
-                msg_Dbg( p_access, "stream size=%"PRIu64",pos=%"PRIu64,
-                         i_nsize, i_ntell);
             }
         }
         else if( !strcasecmp( psz, "Location" ) )
@@ -1058,11 +1010,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
             msg_Dbg( p_access, "Proxy Authentication Info header: %s", p );
             if( AuthCheckReply( p_access, p, &p_sys->proxy, &p_sys->proxy_auth ) )
                 goto error;
-        }
-        else if( !strcasecmp( psz, "Accept-Ranges" ) )
-        {
-            if( !strcasecmp( p, "bytes" ) )
-                p_sys->b_seekable = true;
         }
 
         free( psz );
