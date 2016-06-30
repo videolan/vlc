@@ -184,7 +184,7 @@ struct  demux_sys_t
     int                 i_spu_stream_idx;   /* Selected subtitle stream. -1 if default */
     bool                b_spu_enable;       /* enabled / disabled */
     int                 i_video_stream;
-    stream_t            *p_parser;
+    vlc_demux_chained_t *p_parser;
     bool                b_flushed;
     bool                b_pl_playing;       /* true when playing playlist */
 
@@ -882,7 +882,7 @@ static void blurayClose(vlc_object_t *object)
     blurayReleaseVout(p_demux);
 
     if (p_sys->p_parser)
-        stream_Delete(p_sys->p_parser);
+        vlc_demux_chained_Delete(p_sys->p_parser);
     if (p_sys->p_out != NULL)
         es_out_Delete(p_sys->p_out);
     assert(vlc_array_count(&p_sys->es) == 0);
@@ -1697,9 +1697,9 @@ static void blurayResetParser(demux_t *p_demux)
      */
     demux_sys_t *p_sys = p_demux->p_sys;
     if (p_sys->p_parser)
-        stream_Delete(p_sys->p_parser);
+        vlc_demux_chained_Delete(p_sys->p_parser);
 
-    p_sys->p_parser = stream_DemuxNew(p_demux, "ts", p_sys->p_out);
+    p_sys->p_parser = vlc_demux_chained_New(p_demux, "ts", p_sys->p_out);
 
     if (!p_sys->p_parser)
         msg_Err(p_demux, "Failed to create TS demuxer");
@@ -2036,7 +2036,7 @@ static void streamFlush( demux_sys_t *p_sys )
     }
     vlc_mutex_unlock(&p_sys->pl_info_lock);
 
-    stream_DemuxSend(p_sys->p_parser, p_block);
+    vlc_demux_chained_Send(p_sys->p_parser, p_block);
     p_sys->b_flushed = true;
 }
 
@@ -2406,7 +2406,7 @@ static int blurayDemux(demux_t *p_demux)
 
     stopBackground(p_demux);
 
-    stream_DemuxSend(p_sys->p_parser, p_block);
+    vlc_demux_chained_Send(p_sys->p_parser, p_block);
 
     p_sys->b_flushed = false;
 
