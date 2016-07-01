@@ -112,11 +112,14 @@ vlc_demux_chained_t *vlc_demux_chained_New(vlc_object_t *parent,
     dc->out = out;
     strcpy(dc->name, name);
 
+    vlc_mutex_init(&dc->lock);
+
     if (vlc_clone(&dc->thread, vlc_demux_chained_Thread, dc,
                   VLC_THREAD_PRIORITY_INPUT))
     {
         stream_Delete(dc->fifo);
         vlc_stream_fifo_Close(dc->fifo);
+        vlc_mutex_destroy(&dc->lock);
         free(dc);
         dc = NULL;
     }
@@ -157,5 +160,6 @@ void vlc_demux_chained_Delete(vlc_demux_chained_t *dc)
 {
     vlc_stream_fifo_Close(dc->fifo);
     vlc_join(dc->thread, NULL);
+    vlc_mutex_destroy(&dc->lock);
     free(dc);
 }
