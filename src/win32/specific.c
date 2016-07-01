@@ -34,6 +34,7 @@
 #include <mmsystem.h>
 #include <winsock.h>
 
+DWORD LoadLibraryFlags = 0;
 
 static int system_InitWSA(int hi, int lo)
 {
@@ -60,6 +61,21 @@ void system_Init(void)
 
     if (system_InitWSA(2, 2) && system_InitWSA(1, 1))
         fputs("Error: cannot initialize Winsocks\n", stderr);
+
+#if !VLC_WINSTORE_APP
+    typedef BOOL (WINAPI *SetDefaultDllDirectoriesFunc)( DWORD DirectoryFlags);
+    SetDefaultDllDirectoriesFunc pf_SetDefDllDir = (SetDefaultDllDirectoriesFunc)
+        GetProcAddress( GetModuleHandleW(TEXT("kernel32.dll")), "SetDefaultDllDirectories");
+
+    if( pf_SetDefDllDir ) {
+        pf_SetDefDllDir( LOAD_LIBRARY_SEARCH_SYSTEM32 );
+        LoadLibraryFlags = LOAD_LIBRARY_SEARCH_APPLICATION_DIR |
+                           LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR;
+    }
+#else
+    LoadLibraryFlags = LOAD_LIBRARY_SEARCH_APPLICATION_DIR |
+                       LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR;
+#endif
 }
 
 /*****************************************************************************
