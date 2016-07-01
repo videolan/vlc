@@ -824,29 +824,11 @@ AudioTrack_Recreate( JNIEnv *env, audio_output_t *p_aout )
 static int
 AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
                    unsigned int i_rate,
-                   vlc_fourcc_t i_vlc_format,
+                   int i_format,
                    uint16_t i_physical_channels )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    int i_size, i_min_buffer_size, i_channel_config, i_format;
-
-    switch( i_vlc_format )
-    {
-        case VLC_CODEC_U8:
-            i_format = jfields.AudioFormat.ENCODING_PCM_8BIT;
-            break;
-        case VLC_CODEC_S16N:
-            i_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
-            break;
-        case VLC_CODEC_FL32:
-            i_format = jfields.AudioFormat.ENCODING_PCM_FLOAT;
-            break;
-        case VLC_CODEC_SPDIFB:
-            i_format = jfields.AudioFormat.ENCODING_AC3;
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
+    int i_size, i_min_buffer_size, i_channel_config;
 
     switch( i_physical_channels )
     {
@@ -899,6 +881,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     int i_nb_channels, i_max_channels, i_native_rate = 0, i_ret;
     unsigned int i_rate;
     bool b_spdif;
+    int i_at_format;
 
     if( p_sys->at_dev == AT_DEV_HDMI )
     {
@@ -933,53 +916,69 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             i_native_rate = VLC_CLIP( p_sys->fmt.i_rate, 4000, 48000 );
     }
 
-    /* We can only accept U8, S16N, FL32, and AC3 */
-    switch( p_sys->fmt.i_format )
+    do
     {
+        /* We can only accept U8, S16N, FL32, and AC3 */
+        switch( p_sys->fmt.i_format )
+        {
         case VLC_CODEC_U8:
+            i_at_format = jfields.AudioFormat.ENCODING_PCM_8BIT;
             break;
         case VLC_CODEC_S16N:
+            i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
             break;
         case VLC_CODEC_FL32:
-            if( !jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
+            if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
+                i_at_format = jfields.AudioFormat.ENCODING_PCM_FLOAT;
+            else
+            {
                 p_sys->fmt.i_format = VLC_CODEC_S16N;
+                i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
+            }
             break;
         case VLC_CODEC_A52:
             if( jfields.AudioFormat.has_ENCODING_AC3 && b_spdif )
+            {
                 p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
+                i_at_format = jfields.AudioFormat.ENCODING_AC3;
+            }
             else if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
+            {
                 p_sys->fmt.i_format = VLC_CODEC_FL32;
+                i_at_format = jfields.AudioFormat.ENCODING_PCM_FLOAT;
+            }
             else
+            {
                 p_sys->fmt.i_format = VLC_CODEC_S16N;
+                i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
+            }
             break;
         default:
             p_sys->fmt.i_format = VLC_CODEC_S16N;
+            i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
             break;
-    }
+        }
 
-    /* Android AudioTrack supports only mono, stereo, 5.1 and 7.1.
-     * Android will downmix to stereo if audio output doesn't handle 5.1 or 7.1
-     */
-    i_nb_channels = aout_FormatNbChannels( &p_sys->fmt );
-    if( p_sys->fmt.i_format != VLC_CODEC_SPDIFB )
-        i_nb_channels = __MIN( i_max_channels, i_nb_channels );
-    if( i_nb_channels > 5 )
-    {
-        if( i_nb_channels > 7 && jfields.AudioFormat.has_CHANNEL_OUT_SIDE )
-            p_sys->fmt.i_physical_channels = AOUT_CHANS_7_1;
-        else
-            p_sys->fmt.i_physical_channels = AOUT_CHANS_5_1;
-    } else
-    {
-        if( i_nb_channels == 1 )
-            p_sys->fmt.i_physical_channels = AOUT_CHAN_LEFT;
-        else
-            p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
-    }
+        /* Android AudioTrack supports only mono, stereo, 5.1 and 7.1.
+         * Android will downmix to stereo if audio output doesn't handle 5.1 or 7.1
+         */
 
-    do
-    {
         i_nb_channels = aout_FormatNbChannels( &p_sys->fmt );
+        if( p_sys->fmt.i_format != VLC_CODEC_SPDIFB )
+            i_nb_channels = __MIN( i_max_channels, i_nb_channels );
+        if( i_nb_channels > 5 )
+        {
+            if( i_nb_channels > 7 && jfields.AudioFormat.has_CHANNEL_OUT_SIDE )
+                p_sys->fmt.i_physical_channels = AOUT_CHANS_7_1;
+            else
+                p_sys->fmt.i_physical_channels = AOUT_CHANS_5_1;
+        } else
+        {
+            if( i_nb_channels == 1 )
+                p_sys->fmt.i_physical_channels = AOUT_CHAN_LEFT;
+            else
+                p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
+        }
         i_rate = p_sys->fmt.i_format == VLC_CODEC_SPDIFB ?
                                         VLC_CLIP( p_sys->fmt.i_rate, 32000, 48000 )
                                         : (unsigned int) i_native_rate;
@@ -988,7 +987,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
          * format configuration. If AudioTrack_Create fails, try again with a
          * less advanced format (PCM S16N). If it fails again, try again with
          * Stereo channels. */
-        i_ret = AudioTrack_Create( env, p_aout, i_rate, p_sys->fmt.i_format,
+        i_ret = AudioTrack_Create( env, p_aout, i_rate, i_at_format,
                                    p_sys->fmt.i_physical_channels );
         if( i_ret != 0 )
         {
@@ -996,10 +995,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             {
                 msg_Warn( p_aout, "SPDIF configuration failed, "
                                   "fallback to PCM" );
-                if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
-                    p_sys->fmt.i_format = VLC_CODEC_FL32;
-                else
-                    p_sys->fmt.i_format = VLC_CODEC_S16N;
+                p_sys->fmt.i_format = VLC_CODEC_FL32;
             }
             else if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
             {
@@ -1007,7 +1003,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                                   "fallback to S16N PCM" );
                 p_sys->fmt.i_format = VLC_CODEC_S16N;
             }
-            else if( i_nb_channels > 5 )
+            else if( p_sys->fmt.i_physical_channels & AOUT_CHANS_5_1 )
             {
                 msg_Warn( p_aout, "5.1 or 7.1 configuration failed, "
                                   "fallback to Stereo" );
