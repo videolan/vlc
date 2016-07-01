@@ -707,7 +707,7 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
     if( i_audiotrack_us > 0 )
     {
         /* AudioTrack delay */
-        mtime_t i_delay = FRAMES_TO_US( p_sys->i_samples_written ) 
+        mtime_t i_delay = FRAMES_TO_US( p_sys->i_samples_written )
                         - i_audiotrack_us;
         if( i_delay >= 0 )
         {
