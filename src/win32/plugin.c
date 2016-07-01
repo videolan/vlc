@@ -105,15 +105,14 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     module_handle_t handle = NULL;
 #if !VLC_WINSTORE_APP
     DWORD mode;
-
     if (SetThreadErrorMode (SEM_FAILCRITICALERRORS, &mode) != 0)
-#endif
     {
         handle = LoadLibraryExW (wfile, NULL, LoadLibraryFlags );
-#if !VLC_WINSTORE_APP
         SetThreadErrorMode (mode, NULL);
-#endif
     }
+#else
+    LoadPackagedLibrary( wfile )
+#endif
     free (wfile);
 
     if( handle == NULL )

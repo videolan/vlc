@@ -72,9 +72,6 @@ void system_Init(void)
         LoadLibraryFlags = LOAD_LIBRARY_SEARCH_APPLICATION_DIR |
                            LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR;
     }
-#else
-    LoadLibraryFlags = LOAD_LIBRARY_SEARCH_APPLICATION_DIR |
-                       LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR;
 #endif
 }
 
