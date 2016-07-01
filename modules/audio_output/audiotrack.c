@@ -215,6 +215,10 @@ static struct
         jint ENCODING_AC3;
         jint ENCODING_E_AC3;
         bool has_ENCODING_AC3;
+        jint ENCODING_DTS;
+        bool has_ENCODING_DTS;
+        jint ENCODING_DTS_HD;
+        bool has_ENCODING_DTS_HD;
         jint CHANNEL_OUT_MONO;
         jint CHANNEL_OUT_STEREO;
         jint CHANNEL_OUT_FRONT_LEFT;
@@ -379,6 +383,14 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
         jfields.AudioFormat.has_ENCODING_AC3 = field != NULL;
     } else
         jfields.AudioFormat.has_ENCODING_AC3 = false;
+    GET_CONST_INT( AudioFormat.ENCODING_DTS, "ENCODING_DTS", false );
+    if ( field != NULL )
+    {
+        GET_CONST_INT( AudioFormat.ENCODING_DTS_HD, "ENCODING_DTS_HD", false );
+        jfields.AudioFormat.has_ENCODING_DTS = field != NULL;
+    }
+    else
+        jfields.AudioFormat.has_ENCODING_DTS = false;
 
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_MONO, "CHANNEL_OUT_MONO", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_STEREO, "CHANNEL_OUT_STEREO", true );
@@ -941,6 +953,23 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             {
                 p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
                 i_at_format = jfields.AudioFormat.ENCODING_AC3;
+            }
+            else if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
+            {
+                p_sys->fmt.i_format = VLC_CODEC_FL32;
+                i_at_format = jfields.AudioFormat.ENCODING_PCM_FLOAT;
+            }
+            else
+            {
+                p_sys->fmt.i_format = VLC_CODEC_S16N;
+                i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
+            }
+            break;
+        case VLC_CODEC_DTS:
+            if( jfields.AudioFormat.has_ENCODING_DTS && b_spdif )
+            {
+                p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
+                i_at_format = jfields.AudioFormat.ENCODING_DTS;
             }
             else if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
             {
