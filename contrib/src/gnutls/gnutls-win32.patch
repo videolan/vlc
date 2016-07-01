@@ -8,3 +8,14 @@
 +Libs.private: @LIBZ@ @LIBINTL@ @LIBSOCKET@ -lcrypt32 @LIBPTHREAD@ @LIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @GMP_LIBS@
  @GNUTLS_REQUIRES_PRIVATE@
  Cflags: -I${includedir}
+--- gnutls.old/lib/includes/gnutls/gnutls.h.in	2016-07-01 22:44:49.319398504 +0200
++++ gnutls/lib/includes/gnutls/gnutls.h.in	2016-07-01 22:48:00.515407625 +0200
+@@ -68,7 +68,7 @@
+ #define GNUTLS_CIPHER_ARCFOUR GNUTLS_CIPHER_ARCFOUR_128
+ 
+ #if !defined(GNUTLS_INTERNAL_BUILD) && defined(_WIN32)
+-# define _SYM_EXPORT __declspec(dllimport)
++# define _SYM_EXPORT
+ #else
+ # define _SYM_EXPORT
+ #endif
