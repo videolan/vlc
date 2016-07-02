@@ -112,7 +112,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
         {
             std::stringstream ss;
             ss.imbue(std::locale("C"));
-            ss << getLiveTemplateNumberOffset(number, templ);
+            ss << number;
             ret.replace(pos, std::string("$Number$").length(), ss.str());
         }
         else
@@ -137,7 +137,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
                         oss.imbue(std::locale("C"));
                         oss.width(width); /* set format string length */
                         oss.fill('0');
-                        oss << getLiveTemplateNumberOffset(number, templ);
+                        oss << number;
                         ret.replace(pos, fmtend - pos + 1, oss.str());
                     } catch(int) {}
                 }
@@ -175,25 +175,3 @@ mtime_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const Media
     return time;
 }
 
-uint64_t Representation::getLiveTemplateNumberOffset(uint64_t index, const MediaSegmentTemplate *templ) const
-{
-    /* live streams / templated */
-    if(getPlaylist()->isLive())
-    {
-        if(templ->segmentTimeline.Get())
-        {
-            // do nothing ?
-        }
-        else if(templ->duration.Get())
-        {
-            const time_t playbackstart = getPlaylist()->playbackStart.Get();
-            time_t streamstart = getPlaylist()->availabilityStartTime.Get();
-            streamstart += getPeriodStart();
-            const stime_t duration = templ->duration.Get();
-            const Timescale timescale = templ->inheritTimescale();
-            if(duration)
-                index += timescale.ToScaled(CLOCK_FREQ * (playbackstart - streamstart)) / duration;
-        }
-    }
-    return index;
-}

@@ -94,7 +94,10 @@ uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) c
     {
         const Element *el = *it;
         if(it == elements.begin())
+        {
             scaled -= el->t;
+            prevnumber = el->number;
+        }
 
         for(uint64_t repeat = 1 + el->r; repeat; repeat--)
         {

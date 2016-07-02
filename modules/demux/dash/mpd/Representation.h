@@ -72,7 +72,6 @@ namespace dash
 
                 /* for contextualize() */
                 mtime_t getScaledTimeBySegmentNumber(uint64_t, const MediaSegmentTemplate *) const;
-                uint64_t getLiveTemplateNumberOffset(uint64_t, const MediaSegmentTemplate *) const;
         };
     }
 }

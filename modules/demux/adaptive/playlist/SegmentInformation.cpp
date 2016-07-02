@@ -164,39 +164,75 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
 
 uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
 {
+    const mtime_t i_max_buffering = getPlaylist()->getMaxBuffering();
+
     if( mediaSegmentTemplate )
     {
+        uint64_t start = 0;
+        uint64_t end = 0;
+        const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
+
         SegmentTimeline *timeline = mediaSegmentTemplate->segmentTimeline.Get();
-        if(timeline)
+        if( timeline )
         {
-            const uint64_t start = timeline->minElementNumber();
-            const uint64_t end = timeline->maxElementNumber();
-            if(end > 2 && (end - start >= 2))
-                return end - 2;
-            else
+            start = timeline->minElementNumber();
+            end = timeline->maxElementNumber();
+            stime_t endtime, duration;
+            timeline->getScaledPlaybackTimeDurationBySegmentNumber( end, &endtime, &duration );
+
+            if( endtime + duration <= timescale.ToScaled( i_max_buffering ) )
                 return start;
+
+            uint64_t number = timeline->getElementNumberByScaledPlaybackTime(
+                                        endtime + duration - timescale.ToScaled( i_max_buffering ) );
+            if( number < start )
+                number = start;
+            return number;
         }
-        return mediaSegmentTemplate->startNumber.Get();
+        /* Else compute, current time and timeshiftdepth based */
+        else if( mediaSegmentTemplate->duration.Get() )
+        {
+            const mtime_t i_buffer_depth = getPlaylist()->timeShiftBufferDepth.Get();
+            const uint64_t startnumber = mediaSegmentTemplate->startNumber.Get();
+            end = mediaSegmentTemplate->getCurrentLiveTemplateNumber();
+
+            const uint64_t count = timescale.ToScaled( i_buffer_depth ) / mediaSegmentTemplate->duration.Get();
+            if( startnumber + count >= end )
+                start = startnumber;
+            else
+                start = end - count;
+
+            const uint64_t bufcount = ( 1 + timescale.ToScaled(i_max_buffering) /
+                                        mediaSegmentTemplate->duration.Get() );
+
+            return ( end - start > bufcount ) ? end - bufcount : start;
+        }
     }
     else if ( segmentList && !segmentList->getSegments().empty() )
     {
+        const Timescale timescale = segmentList->inheritTimescale();
         const std::vector<ISegment *> list = segmentList->getSegments();
-        if(list.size() > 3)
-            return list.at(list.size() - 3)->getSequenceNumber();
-        else if(!list.empty())
+
+        const ISegment *back = list.back();
+        const stime_t bufferingstart = back->startTime.Get() + back->duration.Get() - timescale.ToScaled( i_max_buffering );
+        uint64_t number;
+        if( !segmentList->getSegmentNumberByScaledTime( bufferingstart, &number ) )
             return list.front()->getSequenceNumber();
-        else
-            return segmentList->getStartIndex();
+        return number;
     }
     else if( segmentBase )
     {
         const std::vector<ISegment *> list = segmentBase->subSegments();
-        if(list.size() > 3)
-            return list.at(list.size() - 3)->getSequenceNumber();
-        else if(!list.empty())
-            return list.front()->getSequenceNumber();
-        else
+        if(!list.empty())
             return segmentBase->getSequenceNumber();
+
+        const Timescale timescale = inheritTimescale();
+        const ISegment *back = list.back();
+        const stime_t bufferingstart = back->startTime.Get() + back->duration.Get() - timescale.ToScaled( i_max_buffering );
+        uint64_t number;
+        if( !SegmentInfoCommon::getSegmentNumberByScaledTime( list, bufferingstart, &number ) )
+            return list.front()->getSequenceNumber();
+        return number;
     }
 
     if(parent)
@@ -300,6 +336,7 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
             return true;
         }
 
+        /* Note: incorrect for live */
         const stime_t duration = mediaSegmentTemplate->duration.Get();
         *ret = mediaSegmentTemplate->startNumber.Get();
         if(duration)
