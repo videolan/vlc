@@ -101,7 +101,8 @@ stime_t MediaSegmentTemplate::getMinAheadScaledTime(uint64_t number) const
     if( segmentTimeline.Get() )
         return segmentTimeline.Get()->getMinAheadScaledTime(number);
 
-    return duration.Get(); /* FIXME: use stream end time */
+    uint64_t current = getCurrentLiveTemplateNumber();
+    return (current - number) * duration.Get();
 }
 
 uint64_t MediaSegmentTemplate::getSequenceNumber() const
