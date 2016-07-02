@@ -44,6 +44,7 @@ namespace adaptive
                 void                            setType(const std::string &);
                 void                            setMinBuffering( mtime_t );
                 mtime_t                         getMinBuffering() const;
+                mtime_t                         getMaxBuffering() const;
                 virtual void                    debug() = 0;
 
                 void    addPeriod               (BasePeriod *period);
