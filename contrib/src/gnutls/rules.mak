@@ -54,6 +54,7 @@ GNUTLS_CONF := \
 	--without-libintl-prefix \
 	--disable-doc \
 	--disable-tests \
+	--with-included-libtasn1 \
 	$(HOSTCONF)
 
 GNUTLS_ENV := $(HOSTVARS)
