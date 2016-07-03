@@ -1854,7 +1854,12 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
             {
                 seekpoint_t *s = vlc_seekpoint_New();
 
-                s->psz_name = strndup( &p_buffer[2], i_len );
+                if( !memcmp( &p_buffer[2], "\xFF\xFE", 2 ) )
+                    s->psz_name = FromCharset("UTF-16LE", &p_buffer[2], i_len);
+                else
+                    s->psz_name = strndup( &p_buffer[2], i_len );
+                }
+
                 EnsureUTF8( s->psz_name );
 
                 s->i_time_offset = i_dts + __MAX( i_pts_delta, 0 );
