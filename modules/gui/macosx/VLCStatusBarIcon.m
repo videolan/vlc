@@ -193,6 +193,8 @@
         vlc_object_release(input);
     } else {
         /* Nothing playing */
+        [progressField setStringValue:@"--:--"];
+        [totalField setStringValue:@"--:--"];
         [self setStoppedStatus:YES];
     }
 }
