@@ -48,7 +48,7 @@
     [o_title_lbl setStringValue:_NS("Continue playback?")];
     [o_resume_btn setTitle:_NS("Continue")];
 
-    [o_always_resume_btn setTitle:_NS("Always continue")];
+    [o_always_resume_chk setTitle:_NS("Always continue media playback")];
 }
 
 - (void)showWindowWithItem:(input_item_t *)p_item withLastPosition:(NSInteger)pos completionBlock:(CompletionBlock)block
@@ -73,6 +73,7 @@
     free(psz_title_name);
     NSString *labelString = [NSString stringWithFormat:_NS("Playback of \"%@\" will continue at %@"), o_title, [[VLCStringUtility sharedInstance] stringForTime:pos]];
     [o_text_lbl setStringValue:labelString];
+    [o_always_resume_chk setState: NSOffState];
 
     NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1
                                              target:self
@@ -109,8 +110,6 @@
         resumeResult = RESUME_RESTART;
     else if (sender == o_resume_btn)
         resumeResult = RESUME_NOW;
-    else
-        resumeResult = RESUME_ALWAYS;
 
     [[self window] close];
 
@@ -118,6 +117,13 @@
         completionBlock(resumeResult);
         completionBlock = nil;
     }
+}
+
+- (IBAction)resumeSettingChanged:(id)sender
+{
+    int newState = [sender state] == NSOnState ? 1 : 0;
+    msg_Dbg(getIntf(), "Changing resume setting to %i", newState);
+    config_PutInt(getIntf(), "macosx-continue-playback", newState);
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level

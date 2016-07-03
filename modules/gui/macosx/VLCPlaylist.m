@@ -908,9 +908,6 @@
         mtime_t lastPos = (mtime_t)lastPosition.intValue * 1000000;
         msg_Dbg(getIntf(), "continuing playback at %lld", lastPos);
         var_SetInteger(p_input_thread, "time", lastPos);
-
-        if (result == RESUME_ALWAYS)
-            config_PutInt(getIntf(), "macosx-continue-playback", 1);
     };
 
     if (settingValue == 1) { // always
