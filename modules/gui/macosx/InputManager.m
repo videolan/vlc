@@ -29,6 +29,7 @@
 #import "MainWindow.h"
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
+#import "ResumeDialogController.h"
 #import "TrackSynchronization.h"
 #import "VideoView.h"
 
@@ -198,6 +199,9 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
                                                             object:nil];
     }
+
+    // Cancel pending resume dialogs
+    [[[VLCMain sharedInstance] resumeDialog] cancel];
 
     input_thread_t *p_input_changed = NULL;
 

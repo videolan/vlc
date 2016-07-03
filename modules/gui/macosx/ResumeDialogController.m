@@ -129,6 +129,9 @@
 
 - (void)cancel
 {
+    if (![self isWindowLoaded])
+        return;
+
     if (o_countdown_timer != nil) {
         [o_countdown_timer invalidate];
         o_countdown_timer = nil;

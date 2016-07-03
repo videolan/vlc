@@ -867,8 +867,6 @@
 
 - (void)continuePlaybackWhereYouLeftOff:(input_thread_t *)p_input_thread
 {
-   [[[VLCMain sharedInstance] resumeDialog] cancel];
-
     NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"recentlyPlayedMedia"];
     if (!recentlyPlayedFiles)
         return;
