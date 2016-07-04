@@ -364,7 +364,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                 text_style_t style;
                 memset( &style, 0, sizeof(text_style_t) );
                 style.i_style_flags = ConvertFlags( p_buf[6] );
-                style.f_font_relsize = p_buf[7] * 5 / 100; /* in % units of 0.05 height */
+                style.i_font_size = p_buf[7];
                 style.i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> RGB
                 style.i_font_alpha = GetDWBE(p_buf+8) & 0xFF;
                 style.i_features = STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
@@ -377,7 +377,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                         if( (p_spu_sys->p_default_style->i_style_flags = ConvertFlags( p_buf[6] )) )
                             p_spu_sys->p_default_style->i_features |= STYLE_HAS_FLAGS;
                     }
-                    p_spu_sys->p_default_style->f_font_relsize = p_buf[7] * 5 / 100;
+                    p_spu_sys->p_default_style->i_font_size = p_buf[7];
                     p_spu_sys->p_default_style->i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> ARGB
                     p_spu_sys->p_default_style->i_font_alpha = (GetDWBE(p_buf+8) & 0xFF) << 24;
                     p_spu_sys->p_default_style->i_features |= (STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA);

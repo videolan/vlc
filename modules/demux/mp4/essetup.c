@@ -1101,7 +1101,7 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             {
                 if ( p_text->i_font_size ) /* !WARN: in % of 5% height */
                 {
-                    p_style->f_font_relsize = p_text->i_font_size * 5 / 100;
+                    p_style->i_font_size = p_text->i_font_size;
                 }
                 if ( p_text->i_font_color )
                 {
