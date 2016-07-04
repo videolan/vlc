@@ -120,7 +120,7 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
             recycle_candidates.erase( it );
             break;
         }
-        else if( cand->getFmt()->i_cat == es_id->getFmt()->i_cat )
+        else if( cand->getFmt()->i_cat == es_id->getFmt()->i_cat && cand->realESID() )
         {
             /* We need to enforce same selection when not reused
                Otherwise the es will select any other compatible track
