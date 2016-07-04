@@ -237,6 +237,25 @@ bool FakeESOut::hasSelectedEs() const
     return b_selected;
 }
 
+bool FakeESOut::drain()
+{
+    bool b_drained = true;
+    std::list<FakeESOutID *>::const_iterator it;
+    vlc_mutex_lock(&lock);
+    for( it=fakeesidlist.begin(); it!=fakeesidlist.end(); ++it )
+    {
+        FakeESOutID *esID = *it;
+        if( esID->realESID() )
+        {
+            bool b_empty;
+            es_out_Control( real_es_out, ES_OUT_GET_EMPTY, &b_empty );
+            b_drained &= b_empty;
+        }
+    }
+    vlc_mutex_unlock(&lock);
+    return b_drained;
+}
+
 bool FakeESOut::restarting() const
 {
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));

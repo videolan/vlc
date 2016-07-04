@@ -43,6 +43,7 @@ namespace adaptive
             void setTimestampOffset( mtime_t );
             size_t esCount() const;
             bool hasSelectedEs() const;
+            bool drain();
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
 

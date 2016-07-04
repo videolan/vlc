@@ -76,6 +76,7 @@ namespace adaptive
                       status_buffering_ahead, /* Special case for live waiting new segments */
                       status_demuxed} status;
         status demux(mtime_t, bool);
+        bool drain();
         virtual bool setPosition(mtime_t, bool);
         mtime_t getPlaybackTime() const;
         void runUpdates();

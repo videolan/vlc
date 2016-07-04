@@ -195,6 +195,30 @@ AbstractStream::status PlaylistManager::demux(mtime_t *pi_nzbarrier, bool send)
     return i_return;
 }
 
+void PlaylistManager::drain()
+{
+    for(;;)
+    {
+        bool b_drained = true;
+        std::vector<AbstractStream *>::iterator it;
+        for(it=streams.begin(); it!=streams.end(); ++it)
+        {
+            AbstractStream *st = *it;
+
+            if (st->isDisabled())
+                continue;
+
+            b_drained &= st->drain();
+        }
+
+        if(b_drained)
+            break;
+
+        msleep(20*1000); /* ugly, but we have no way to get feedback */
+    }
+    es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
+}
+
 mtime_t PlaylistManager::getPCR() const
 {
     mtime_t pcr = VLC_TS_INVALID;

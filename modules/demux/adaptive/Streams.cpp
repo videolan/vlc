@@ -224,6 +224,11 @@ bool AbstractStream::isDisabled() const
     return disabled;
 }
 
+bool AbstractStream::drain()
+{
+    return fakeesout->drain();
+}
+
 AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
 {
     /* Ensure it is configured */
@@ -279,10 +284,6 @@ AbstractStream::status AbstractStream::demux(mtime_t nz_deadline, bool send)
                 commandsqueue->setFlush();
                 return AbstractStream::status_buffering;
             }
-
-            commandsqueue->Commit();
-            if(commandsqueue->isEmpty())
-                return AbstractStream::status_eof;
         }
         else if(nz_deadline + VLC_TS_0 > getBufferingLevel()) /* need to read more */
         {

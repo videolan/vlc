@@ -54,6 +54,8 @@ namespace adaptive
             bool    start();
 
             AbstractStream::status demux(mtime_t *, bool);
+            void drain();
+
             virtual bool needsUpdate() const;
             virtual bool updatePlaylist();
             virtual void scheduleNextUpdate();
