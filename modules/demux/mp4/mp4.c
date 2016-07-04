@@ -1857,17 +1857,18 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
             char p_buffer[256];
             const uint32_t i_read = stream_ReadU32( p_demux->s, p_buffer,
                                                     __MIN( sizeof(p_buffer), i_size ) );
-            const uint32_t i_len = __MIN( GetWBE(p_buffer), i_read-2 );
-
-            if( i_len > 0 )
+            if( i_read > 2 )
             {
+                const uint32_t i_string = __MIN( GetWBE(p_buffer), i_read-2 );
+                const char *psnz_string = &p_buffer[2];
+
                 seekpoint_t *s = vlc_seekpoint_New();
                 if( s == NULL ) continue;
 
-                if( !memcmp( &p_buffer[2], "\xFF\xFE", 2 ) )
-                    s->psz_name = FromCharset("UTF-16LE", &p_buffer[2], i_len);
+                if( i_string > 1 && !memcmp( psnz_string, "\xFF\xFE", 2 ) )
+                    s->psz_name = FromCharset( "UTF-16LE", psnz_string, i_string );
                 else
-                    s->psz_name = strndup( &p_buffer[2], i_len );
+                    s->psz_name = strndup( psnz_string, i_string );
 
                 if( s->psz_name == NULL )
                 {
