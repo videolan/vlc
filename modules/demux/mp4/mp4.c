@@ -1797,14 +1797,23 @@ static void Close ( vlc_object_t * p_this )
 static void LoadChapterGpac( demux_t  *p_demux, MP4_Box_t *p_chpl )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i;
+
+    if( BOXDATA(p_chpl)->i_chapter == 0 )
+        return;
 
     p_sys->p_title = vlc_input_title_New();
-    for( i = 0; i < BOXDATA(p_chpl)->i_chapter; i++ )
+    for( int i = 0; i < BOXDATA(p_chpl)->i_chapter && p_sys->p_title; i++ )
     {
         seekpoint_t *s = vlc_seekpoint_New();
+        if( s == NULL) continue;
 
         s->psz_name = strdup( BOXDATA(p_chpl)->chapter[i].psz_name );
+        if( s->psz_name == NULL)
+        {
+            vlc_seekpoint_Delete( s );;
+            continue;
+        }
+
         EnsureUTF8( s->psz_name );
         s->i_time_offset = BOXDATA(p_chpl)->chapter[i].i_start / 10;
         TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
@@ -1853,15 +1862,20 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
             if( i_len > 0 )
             {
                 seekpoint_t *s = vlc_seekpoint_New();
+                if( s == NULL ) continue;
 
                 if( !memcmp( &p_buffer[2], "\xFF\xFE", 2 ) )
                     s->psz_name = FromCharset("UTF-16LE", &p_buffer[2], i_len);
                 else
                     s->psz_name = strndup( &p_buffer[2], i_len );
+
+                if( s->psz_name == NULL )
+                {
+                    vlc_seekpoint_Delete( s );
+                    continue;
                 }
 
                 EnsureUTF8( s->psz_name );
-
                 s->i_time_offset = i_dts + __MAX( i_pts_delta, 0 );
 
                 if( !p_sys->p_title )
