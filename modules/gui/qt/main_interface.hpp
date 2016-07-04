@@ -170,6 +170,7 @@ private:
     bool                 b_minimalView;         ///< Minimal video
     bool                 b_interfaceFullScreen;
     bool                 b_pauseOnMinimize;
+    bool                 b_maximizedView;
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?

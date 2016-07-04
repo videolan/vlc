@@ -106,6 +106,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_interfaceFullScreen= false;
     b_hasPausedWhenMinimized = false;
     i_kc_offset          = false;
+    b_maximizedView      = false;
 
     /* Ask for Privacy */
     FirstRun::CheckAndRun( this, p_intf );
@@ -1368,6 +1369,27 @@ void MainInterface::changeEvent(QEvent *event)
         QWindowStateChangeEvent *windowStateChangeEvent = static_cast<QWindowStateChangeEvent*>(event);
         Qt::WindowStates newState = windowState();
         Qt::WindowStates oldState = windowStateChangeEvent->oldState();
+
+        /* b_maximizedView stores if the window was maximized before entering fullscreen.
+         * It is set when entering maximized mode, unset when leaving it to normal mode.
+         * Upon leaving full screen, if b_maximizedView is set,
+         * the window should be maximized again. */
+        if( newState & Qt::WindowMaximized &&
+            !( oldState & Qt::WindowMaximized ) )
+            b_maximizedView = true;
+
+        if( !( newState & Qt::WindowMaximized ) &&
+            oldState & Qt::WindowMaximized &&
+            !b_videoFullScreen )
+            b_maximizedView = false;
+
+        if( !( newState & Qt::WindowFullScreen ) &&
+            oldState & Qt::WindowFullScreen &&
+            b_maximizedView )
+        {
+            showMaximized();
+            return;
+        }
 
         if( newState & Qt::WindowMinimized )
         {
