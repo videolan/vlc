@@ -784,9 +784,33 @@ void MainInterface::setVideoSize( unsigned int w, unsigned int h )
         /* Resize video widget to video size, or keep it at the same
          * size. Call setSize() either way so that vout_window_ReportSize
          * will always get called.
+         * If the video size is too large for the screen, resize it
+         * to the screen size.
          */
         if (b_autoresize)
+        {
+            QRect screen = QApplication::desktop()->availableGeometry();
+            if( h > screen.height() )
+            {
+                w = screen.width();
+                h = screen.height();
+                if( !b_minimalView )
+                {
+                    if( menuBar()->isVisible() )
+                        h -= menuBar()->height();
+                    if( controls->isVisible() )
+                        h -= controls->height();
+                    if( statusBar()->isVisible() )
+                        h -= statusBar()->height();
+                    if( inputC->isVisible() )
+                        h -= inputC->height();
+                }
+                h -= style()->pixelMetric(QStyle::PM_TitleBarHeight);
+                h -= style()->pixelMetric(QStyle::PM_LayoutBottomMargin);
+                h -= 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+            }
             videoWidget->setSize( w, h );
+        }
         else
             videoWidget->setSize( videoWidget->width(), videoWidget->height() );
     }
