@@ -54,9 +54,9 @@ namespace adaptive
                            public SegmentTrackerListenerInterface
     {
     public:
-        AbstractStream(demux_t *, const StreamFormat &);
+        AbstractStream(demux_t *);
         virtual ~AbstractStream();
-        void bind(SegmentTracker *, HTTPConnectionManager *);
+        bool init(const StreamFormat &, SegmentTracker *, HTTPConnectionManager *);
 
         void setLanguage(const std::string &);
         void setDescription(const std::string &);

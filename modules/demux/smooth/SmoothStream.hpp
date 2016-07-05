@@ -29,7 +29,7 @@ namespace smooth
     class SmoothStream : public AbstractStream
     {
         public:
-            SmoothStream(demux_t *, const StreamFormat &);
+            SmoothStream(demux_t *);
 
         protected:
             virtual AbstractDemuxer * createDemux(const StreamFormat &); /* impl */

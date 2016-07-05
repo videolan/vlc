@@ -26,8 +26,8 @@
 
 using namespace hls;
 
-HLSStream::HLSStream(demux_t *demux, const StreamFormat &format)
-    :AbstractStream(demux, format)
+HLSStream::HLSStream(demux_t *demux)
+    : AbstractStream(demux)
 {
     b_timestamps_offset_set = false;
     i_aac_offset = 0;
@@ -158,13 +158,11 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &,
                                SegmentTracker *tracker, HTTPConnectionManager *manager) const
 {
-    HLSStream *stream;
-    try
+    HLSStream *stream = new (std::nothrow) HLSStream(realdemux);
+    if(stream && !stream->init(StreamFormat(StreamFormat::UNKNOWN), tracker, manager))
     {
-        stream = new HLSStream(realdemux, StreamFormat(StreamFormat::UNKNOWN));
-    } catch (int) {
+        delete stream;
         return NULL;
     }
-    stream->bind(tracker, manager);
     return stream;
 }

@@ -29,7 +29,7 @@ namespace hls
     class HLSStream : public AbstractStream
     {
         public:
-            HLSStream(demux_t *, const StreamFormat &);
+            HLSStream(demux_t *);
             virtual bool setPosition(mtime_t, bool); /* reimpl */
 
         protected:

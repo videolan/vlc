@@ -26,8 +26,8 @@
 
 using namespace smooth;
 
-SmoothStream::SmoothStream(demux_t *demux, const StreamFormat &format)
-    :AbstractStream(demux, format)
+SmoothStream::SmoothStream(demux_t *demux)
+    :AbstractStream(demux)
 {
 }
 
@@ -63,13 +63,11 @@ block_t * SmoothStream::checkBlock(block_t *p_block, bool)
 AbstractStream * SmoothStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
                                              SegmentTracker *tracker, HTTPConnectionManager *manager) const
 {
-    SmoothStream *stream;
-    try
+    SmoothStream *stream = new (std::nothrow) SmoothStream(realdemux);
+    if(stream && !stream->init(format,tracker, manager))
     {
-        stream = new SmoothStream(realdemux, format);
-    } catch (int) {
+        delete stream;
         return NULL;
     }
-    stream->bind(tracker, manager);
     return stream;
 }

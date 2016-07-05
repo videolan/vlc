@@ -35,10 +35,10 @@
 using namespace adaptive;
 using namespace adaptive::http;
 
-AbstractStream::AbstractStream(demux_t * demux_, const StreamFormat &format_)
+AbstractStream::AbstractStream(demux_t * demux_)
 {
     p_realdemux = demux_;
-    format = format_;
+    format = StreamFormat::UNSUPPORTED;
     currentChunk = NULL;
     eof = false;
     dead = false;
@@ -47,42 +47,50 @@ AbstractStream::AbstractStream(demux_t * demux_, const StreamFormat &format_)
     discontinuity = false;
     segmentTracker = NULL;
     pcr = VLC_TS_INVALID;
-
+    demuxersource = NULL;
     commandsqueue = NULL;
     demuxer = NULL;
     fakeesout = NULL;
+}
 
-    /* Don't even try if not supported */
-    if((unsigned)format == StreamFormat::UNSUPPORTED)
-        throw VLC_EGENERIC;
+bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, HTTPConnectionManager *conn)
+{
+    /* Don't even try if not supported or already init */
+    if((unsigned)format_ == StreamFormat::UNSUPPORTED || demuxersource)
+        return false;
 
     demuxersource = new (std::nothrow) ChunksSourceStream( VLC_OBJECT(p_realdemux), this );
-    if(!demuxersource)
-        throw VLC_EGENERIC;
-
-    CommandsFactory *factory = new (std::nothrow) CommandsFactory();
-    if(!factory)
+    if(demuxersource)
     {
+        CommandsFactory *factory = new (std::nothrow) CommandsFactory();
+        if(factory)
+        {
+            commandsqueue = new (std::nothrow) CommandsQueue(factory);
+            if(commandsqueue)
+            {
+                fakeesout = new (std::nothrow) FakeESOut(p_realdemux->out, commandsqueue);
+                if(fakeesout)
+                {
+                    /* All successfull */
+                    fakeesout->setExtraInfoProvider( this );
+                    format = format_;
+                    segmentTracker = tracker;
+                    segmentTracker->registerListener(this);
+                    connManager = conn;
+                    return true;
+                }
+                delete commandsqueue;
+                commandsqueue = NULL;
+            }
+            else
+            {
+                delete factory;
+            }
+        }
         delete demuxersource;
-        throw VLC_EGENERIC;
     }
 
-    commandsqueue = new CommandsQueue(factory);
-    if(!commandsqueue)
-    {
-        delete factory;
-        delete demuxersource;
-        throw VLC_EGENERIC;
-    }
-
-    fakeesout = new (std::nothrow) FakeESOut(p_realdemux->out, commandsqueue);
-    if(!fakeesout)
-    {
-        delete commandsqueue;
-        delete demuxersource;
-        throw VLC_EGENERIC;
-    }
-    fakeesout->setExtraInfoProvider( this );
+    return false;
 }
 
 AbstractStream::~AbstractStream()
@@ -94,14 +102,6 @@ AbstractStream::~AbstractStream()
     delete demuxersource;
     delete fakeesout;
     delete commandsqueue;
-}
-
-
-void AbstractStream::bind(SegmentTracker *tracker, HTTPConnectionManager *conn)
-{
-    segmentTracker = tracker;
-    segmentTracker->registerListener(this);
-    connManager = conn;
 }
 
 void AbstractStream::prepareFormatChange()
