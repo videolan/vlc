@@ -25,7 +25,9 @@
 # include "config.h"
 #endif
 
-#define UNICODE
+#ifndef UNICODE
+# define UNICODE
+#endif
 #include <vlc_common.h>
 #include "libvlc.h"
 #include "../lib/libvlc_internal.h"
