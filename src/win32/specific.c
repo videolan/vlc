@@ -70,7 +70,8 @@ void system_Init(void)
     if( pf_SetDefDllDir ) {
         pf_SetDefDllDir( LOAD_LIBRARY_SEARCH_SYSTEM32 );
         LoadLibraryFlags = LOAD_LIBRARY_SEARCH_APPLICATION_DIR |
-                           LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR;
+                           LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR |
+                           LOAD_LIBRARY_SEARCH_SYSTEM32;
     }
 #endif
 }
