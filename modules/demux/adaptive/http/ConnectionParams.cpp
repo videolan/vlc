@@ -64,7 +64,14 @@ void ConnectionParams::setPath(const std::string &path_)
 
     std::ostringstream os;
     os.imbue(std::locale("C"));
-    os << scheme << "://" << hostname << ":" << port;
+    os << scheme << "://";
+    if(!hostname.empty())
+    {
+        os << hostname;
+        if( (port != 80 && scheme != "http") ||
+            (port != 443 && scheme != "https") )
+            os << ":" << port;
+    }
     os << path;
     uri = os.str();
 }
