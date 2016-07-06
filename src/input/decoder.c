@@ -302,7 +302,6 @@ static int aout_update_format( decoder_t *p_dec )
         if( p_aout == NULL )
         {
             msg_Err( p_dec, "failed to create audio output" );
-            p_dec->b_error = true;
             return -1;
         }
 
