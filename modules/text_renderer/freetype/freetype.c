@@ -934,6 +934,8 @@ static void FillDefaultStyles( filter_t *p_filter )
 
     p_sys->p_default_style->i_font_alpha = var_InheritInteger( p_filter,"freetype-opacity" );
     p_sys->p_default_style->i_font_alpha = VLC_CLIP( p_sys->p_default_style->i_font_alpha, 0, 255 );
+    p_sys->p_default_style->i_font_color = var_InheritInteger( p_filter,"freetype-color" );
+    p_sys->p_default_style->i_font_color = VLC_CLIP( p_sys->p_default_style->i_font_color, 0, 0xFFFFFF );
 
     p_sys->p_default_style->i_outline_alpha = var_InheritInteger( p_filter, "freetype-outline-opacity" );
     p_sys->p_default_style->i_outline_alpha = VLC_CLIP( p_sys->p_default_style->i_outline_alpha, 0, 255 );
