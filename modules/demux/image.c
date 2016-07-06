@@ -111,17 +111,30 @@ struct demux_sys_t
 
 static block_t *Load(demux_t *demux)
 {
-    const int     max_size = 4096 * 4096 * 8;
-    const int64_t size = stream_Size(demux->s);
-    if (size < 0 || size > max_size) {
-        msg_Err(demux, "Rejecting image based on its size (%"PRId64" > %d)", size, max_size);
+    const unsigned max_size = 4096 * 4096 * 8;
+    uint64_t size;
+
+    if (stream_GetSize(demux->s, &size) == VLC_SUCCESS) {
+        if (size > max_size) {
+            msg_Err(demux, "image too large (%"PRIu64" > %u), rejected",
+                    size, max_size);
+            return NULL;
+        }
+    } else
+        size = max_size;
+
+    block_t *block = block_Alloc(size);
+    if (block == NULL)
+        return NULL;
+
+    ssize_t val = stream_Read(demux->s, block->p_buffer, size);
+    if (val < 0) {
+        block_Release(block);
         return NULL;
     }
 
-    if (size > 0)
-        return stream_Block(demux->s, size);
-    /* TODO */
-    return NULL;
+    block->i_buffer = val;
+    return block;
 }
 
 static block_t *Decode(demux_t *demux,
