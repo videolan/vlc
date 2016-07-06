@@ -125,7 +125,7 @@ HTTPChunkSource::HTTPChunkSource(const std::string& url, HTTPConnectionManager *
     prepared = false;
     eof = false;
     if(!init(url))
-        throw VLC_EGENERIC;
+        eof = true;
 }
 
 HTTPChunkSource::~HTTPChunkSource()

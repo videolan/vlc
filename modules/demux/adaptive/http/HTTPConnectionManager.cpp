@@ -96,6 +96,11 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
     if(!conn)
     {
         conn = factory->createConnection(p_object, params);
+        if(!conn)
+        {
+            vlc_mutex_unlock(&lock);
+            return NULL;
+        }
 
         connectionPool.push_back(conn);
 
