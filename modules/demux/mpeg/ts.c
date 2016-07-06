@@ -1423,7 +1423,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
                 /* Compute PCR/DTS offset if any */
                 if( p_pmt->pcr.i_pcroffset == -1 && p_block->i_dts > VLC_TS_INVALID &&
-                    p_pmt->pcr.i_current > VLC_TS_INVALID )
+                    p_pmt->pcr.i_current > VLC_TS_INVALID &&
+                   (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES) )
                 {
                     int64_t i_dts27 = (p_block->i_dts - VLC_TS_0) * 9 / 100;
                     int64_t i_pcr = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
