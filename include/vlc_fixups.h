@@ -322,8 +322,8 @@ void swab (const void *, void *, ssize_t);
 #ifndef HAVE_INET_PTON
 # ifndef _WIN32
 #  include <sys/socket.h>
-# else
-#  include <ws2tcpip.h>
+#else
+typedef int socklen_t;
 # endif
 int inet_pton(int, const char *, void *);
 const char *inet_ntop(int, const void *, char *, socklen_t);
