@@ -226,6 +226,9 @@
 /* Planar YUV 4:4:4 Y:U:V 10-bit stored on 16 bits */
 #define VLC_CODEC_I444_10L        VLC_FOURCC('I','4','A','L')
 #define VLC_CODEC_I444_10B        VLC_FOURCC('I','4','A','B')
+/* Planar YUV 4:4:4 Y:U:V 12-bit stored on 16 bits */
+#define VLC_CODEC_I444_12L        VLC_FOURCC('I','4','C','L')
+#define VLC_CODEC_I444_12B        VLC_FOURCC('I','4','C','B')
 /* Planar YUV 4:4:4 Y:U:V 16-bit */
 #define VLC_CODEC_I444_16L        VLC_FOURCC('I','4','F','L')
 #define VLC_CODEC_I444_16B        VLC_FOURCC('I','4','F','B')
