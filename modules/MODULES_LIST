@@ -328,6 +328,7 @@ $Id$
  * samplerate: Secret Rabbit Code (libsamplerate) audio resampler
  * sap: Interface module to read SAP/SDP announcements
  * sapi: Windows Text to Speech Synthetizer using the SAPI 5.1 API
+ * satip: SES Astra SAT>IP access module
  * scale: Images rescaler
  * scaletempo: Scale audio tempo in sync with playback rate
  * scene: scene video filter

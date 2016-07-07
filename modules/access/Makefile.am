@@ -442,6 +442,9 @@ access_LTLIBRARIES += libavio_plugin.la
 endif
 endif
 
+libsatip_plugin_la_SOURCES = access/satip.c
+libsatip_plugin_la_LIBADD = $(SOCKET_LIBS)
+access_LTLIBRARIES += libsatip_plugin.la
 
 ### Misc ###
 

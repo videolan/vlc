@@ -44,6 +44,7 @@ Access:
  * Named pipes and device nodes are no longer included in directory listings
    by default. Use --list-special-files to include them back.
  * Support for timeout in UDP input --udp-timeout=<seconds>
+ * New SAT>IP access module, to receive DVB-S via IP networks
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL

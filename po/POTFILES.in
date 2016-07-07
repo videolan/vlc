@@ -248,6 +248,7 @@ modules/access/rtsp/real_sdpplin.c
 modules/access/rtsp/real_sdpplin.h
 modules/access/rtsp/rtsp.c
 modules/access/rtsp/rtsp.h
+modules/access/satip.c
 modules/access/screen/mac.c
 modules/access/screen/screen.c
 modules/access/screen/screen.h
