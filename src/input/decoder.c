@@ -1025,6 +1025,11 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
                 p_packetized_block->p_next = NULL;
 
                 DecoderDecodeVideo( p_dec, p_packetized_block );
+                if( p_dec->b_error )
+                {
+                    block_ChainRelease( p_next );
+                    return;
+                }
 
                 p_packetized_block = p_next;
             }
@@ -1200,6 +1205,11 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block )
                 p_packetized_block->p_next = NULL;
 
                 DecoderDecodeAudio( p_dec, p_packetized_block );
+                if( p_dec->b_error )
+                {
+                    block_ChainRelease( p_next );
+                    return;
+                }
 
                 p_packetized_block = p_next;
             }
