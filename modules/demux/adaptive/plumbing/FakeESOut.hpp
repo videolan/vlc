@@ -64,6 +64,7 @@ namespace adaptive
             static void esOutDestroy_Callback( es_out_t * );
 
         private:
+            vlc_mutex_t lock;
             es_out_t *real_es_out;
             FakeESOutID * createNewID( const es_format_t * );
             ExtraFMTInfoInterface *extrainfo;

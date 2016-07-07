@@ -47,6 +47,7 @@ FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
 
     timestamps_offset = 0;
     extrainfo = NULL;
+    vlc_mutex_init(&lock);
 }
 
 es_out_t * FakeESOut::getEsOut()
@@ -60,16 +61,21 @@ FakeESOut::~FakeESOut()
     gc();
 
     delete fakeesout;
+    vlc_mutex_destroy(&lock);
 }
 
 void FakeESOut::setTimestampOffset(mtime_t offset)
 {
+    vlc_mutex_lock(&lock);
     timestamps_offset = offset;
+    vlc_mutex_unlock(&lock);
 }
 
 void FakeESOut::setExtraInfoProvider( ExtraFMTInfoInterface *extra )
 {
+    vlc_mutex_lock(&lock);
     extrainfo = extra;
+    vlc_mutex_unlock(&lock);
 }
 
 FakeESOutID * FakeESOut::createNewID( const es_format_t *p_fmt )
@@ -79,12 +85,16 @@ FakeESOutID * FakeESOut::createNewID( const es_format_t *p_fmt )
     es_format_Copy( &fmtcopy, p_fmt );
     fmtcopy.i_group = 0; /* Always ignore group for adaptive */
 
+    vlc_mutex_lock(&lock);
+
     if( extrainfo )
         extrainfo->fillExtraFMTInfo( &fmtcopy );
 
     FakeESOutID *es_id = new (std::nothrow) FakeESOutID( this, &fmtcopy );
     if(likely(es_id))
         fakeesidlist.push_back( es_id );
+
+    vlc_mutex_unlock(&lock);
 
     es_format_Clean( &fmtcopy );
 
@@ -95,6 +105,8 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
 {
     std::list<FakeESOutID *>::iterator it;
     es_out_id_t *realid = NULL;
+
+    vlc_mutex_lock(&lock);
 
     bool b_select = false;
     for( it=recycle_candidates.begin(); it!=recycle_candidates.end(); ++it )
@@ -126,20 +138,27 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
     }
 
     es_id->setRealESID( realid );
+
+    vlc_mutex_unlock(&lock);
 }
 
 mtime_t FakeESOut::getTimestampOffset() const
 {
-    return timestamps_offset;
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    mtime_t time = timestamps_offset;
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return time;
 }
 
 size_t FakeESOut::esCount() const
 {
     size_t i_count = 0;
     std::list<FakeESOutID *>::const_iterator it;
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     for( it=fakeesidlist.begin(); it!=fakeesidlist.end(); ++it )
         if( (*it)->realESID() )
             i_count++;
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return i_count;
 }
 
@@ -153,6 +172,7 @@ void FakeESOut::schedulePCRReset()
 void FakeESOut::scheduleAllForDeletion()
 {
     std::list<FakeESOutID *>::const_iterator it;
+    vlc_mutex_lock(&lock);
     for( it=fakeesidlist.begin(); it!=fakeesidlist.end(); ++it )
     {
         FakeESOutID *es_id = *it;
@@ -166,6 +186,7 @@ void FakeESOut::scheduleAllForDeletion()
             }
         }
     }
+    vlc_mutex_unlock(&lock);
 }
 
 void FakeESOut::recycleAll()
@@ -173,13 +194,19 @@ void FakeESOut::recycleAll()
     /* Only used when demux is killed and commands queue is cancelled */
     commandsqueue->Abort( true );
     assert(commandsqueue->isEmpty());
+    vlc_mutex_lock(&lock);
     recycle_candidates.splice( recycle_candidates.end(), fakeesidlist );
+    vlc_mutex_unlock(&lock);
 }
 
 void FakeESOut::gc()
 {
+    vlc_mutex_lock(&lock);
     if( recycle_candidates.empty() )
+    {
+        vlc_mutex_unlock(&lock);
         return;
+    }
 
     std::list<FakeESOutID *>::iterator it;
     for( it=recycle_candidates.begin(); it!=recycle_candidates.end(); ++it )
@@ -192,30 +219,38 @@ void FakeESOut::gc()
         delete *it;
     }
     recycle_candidates.clear();
+    vlc_mutex_unlock(&lock);
 }
 
 bool FakeESOut::hasSelectedEs() const
 {
     bool b_selected = false;
     std::list<FakeESOutID *>::const_iterator it;
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     for( it=fakeesidlist.begin(); it!=fakeesidlist.end() && !b_selected; ++it )
     {
         FakeESOutID *esID = *it;
         if( esID->realESID() )
             es_out_Control( real_es_out, ES_OUT_GET_ES_STATE, esID->realESID(), &b_selected );
     }
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return b_selected;
 }
 
 bool FakeESOut::restarting() const
 {
-    return !recycle_candidates.empty();
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    bool b = !recycle_candidates.empty();
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return b;
 }
 
 void FakeESOut::recycle( FakeESOutID *id )
 {
+    vlc_mutex_lock(&lock);
     fakeesidlist.remove( id );
     recycle_candidates.push_back( id );
+    vlc_mutex_unlock(&lock);
 }
 
 /* Static callbacks */
@@ -271,8 +306,8 @@ void FakeESOut::esOutDel_Callback(es_out_t *fakees, es_out_id_t *p_es)
     AbstractCommand *command = me->commandsqueue->factory()->createEsOutDelCommand( es_id );
     if( likely(command) )
     {
-        me->commandsqueue->Schedule( command );
         es_id->setScheduledForDeletion();
+        me->commandsqueue->Schedule( command );
     }
 }
 
