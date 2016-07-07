@@ -140,7 +140,10 @@ bool AbstractStream::isDead() const
 
 mtime_t AbstractStream::getPCR() const
 {
-    return commandsqueue->getPCR();
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    mtime_t pcr = (dead || disabled) ? VLC_TS_INVALID : commandsqueue->getPCR();
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return pcr;
 }
 
 mtime_t AbstractStream::getMinAheadTime() const
@@ -152,7 +155,20 @@ mtime_t AbstractStream::getMinAheadTime() const
 
 mtime_t AbstractStream::getFirstDTS() const
 {
-    return commandsqueue->getFirstDTS();
+    mtime_t dts;
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    if(dead || disabled)
+    {
+        dts = VLC_TS_INVALID;
+    }
+    else
+    {
+        dts = commandsqueue->getFirstDTS();
+        if(dts == VLC_TS_INVALID)
+            dts = commandsqueue->getPCR();
+    }
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return dts;
 }
 
 int AbstractStream::esCount() const

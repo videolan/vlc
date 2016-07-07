@@ -208,8 +208,6 @@ AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline
        i_return != AbstractStream::buffering_lessthanmin /* prevents starting before buffering is reached */ )
     {
         demux.i_nzpcr = getFirstDTS();
-        if(demux.i_nzpcr == VLC_TS_INVALID)
-            demux.i_nzpcr = getPCR();
     }
     vlc_mutex_unlock(&demux.lock);
 
@@ -265,30 +263,32 @@ void PlaylistManager::drain()
 
 mtime_t PlaylistManager::getPCR() const
 {
-    mtime_t pcr = VLC_TS_INVALID;
+    mtime_t minpcr = VLC_TS_INVALID;
     std::vector<AbstractStream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if ((*it)->isDisabled() || (*it)->isDead())
-            continue;
-        if(pcr == VLC_TS_INVALID || pcr > (*it)->getPCR())
-            pcr = (*it)->getPCR();
+        const mtime_t pcr = (*it)->getPCR();
+        if(minpcr == VLC_TS_INVALID)
+            minpcr = pcr;
+        else if(pcr > VLC_TS_INVALID)
+            minpcr = std::min(minpcr, pcr);
     }
-    return pcr;
+    return minpcr;
 }
 
 mtime_t PlaylistManager::getFirstDTS() const
 {
-    mtime_t dts = VLC_TS_INVALID;
+    mtime_t mindts = VLC_TS_INVALID;
     std::vector<AbstractStream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if ((*it)->isDisabled() || (*it)->isDead())
-            continue;
-        if(dts == VLC_TS_INVALID || dts > (*it)->getFirstDTS())
-            dts = (*it)->getFirstDTS();
+        const mtime_t dts = (*it)->getFirstDTS();
+        if(mindts == VLC_TS_INVALID)
+            mindts = dts;
+        else if(dts > VLC_TS_INVALID)
+            mindts = std::min(mindts, dts);
     }
-    return dts;
+    return mindts;
 }
 
 mtime_t PlaylistManager::getDuration() const

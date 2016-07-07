@@ -376,19 +376,21 @@ mtime_t CommandsQueue::getBufferingLevel() const
 
 mtime_t CommandsQueue::getFirstDTS() const
 {
-    mtime_t i_dts = VLC_TS_INVALID;
     std::list<AbstractCommand *>::const_iterator it;
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    mtime_t i_firstdts = pcr;
     for( it = commands.begin(); it != commands.end(); ++it )
     {
-        if( (*it)->getTime() > VLC_TS_INVALID )
+        const mtime_t i_dts = (*it)->getTime();
+        if( i_dts > VLC_TS_INVALID )
         {
-            i_dts = (*it)->getTime();
+            if( i_dts < i_firstdts || i_firstdts == VLC_TS_INVALID )
+                i_firstdts = i_dts;
             break;
         }
     }
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
-    return i_dts;
+    return i_firstdts;
 }
 
 mtime_t CommandsQueue::getPCR() const
