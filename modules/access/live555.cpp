@@ -103,7 +103,7 @@ vlc_module_begin ()
 
     add_submodule ()
         set_description( N_("RTSP/RTP access and demux") )
-        add_shortcut( "rtsp", "pnm", "live", "livedotcom", "satip" )
+        add_shortcut( "rtsp", "pnm", "live", "livedotcom" )
         set_capability( "access_demux", 0 )
         set_callbacks( Open, Close )
         add_bool( "rtsp-tcp", false,
@@ -335,18 +335,6 @@ static int  Open ( vlc_object_t *p_this )
     {
         char *p = p_sys->psz_path;
         while( (p = strchr( p, ' ' )) != NULL ) *p = '+';
-    }
-
-    if( strcasecmp( p_demux->psz_access, "satip" ) == 0 )
-    {
-        if( asprintf(&p_sys->p_sdp, "v=0\r\n"
-                     "o=- 0 %s\r\n"
-                     "s=SATIP:stream\r\n"
-                     "i=SATIP RTP Stream\r\n"
-                     "m=video 0 RTP/AVP 33\r\n"
-                     "a=control:rtsp://%s\r\n\r\n",
-                     p_sys->url.psz_host, p_sys->psz_path) < 0 )
-            abort();
     }
 
     if( p_demux->s != NULL )
