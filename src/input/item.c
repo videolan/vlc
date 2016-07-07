@@ -1138,6 +1138,7 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "raw139", ITEM_TYPE_CARD, false }, /* raw1394 */
         { "rt",     ITEM_TYPE_STREAM, true }, /* rtp, rtsp, rtmp */
         { "satell", ITEM_TYPE_CARD, false }, /* satellite */
+        { "satip",  ITEM_TYPE_STREAM, true }, /* satellite over ip */
         { "screen", ITEM_TYPE_CARD, false },
         { "sdp",    ITEM_TYPE_STREAM, true },
         { "sftp",   ITEM_TYPE_FILE, true },
