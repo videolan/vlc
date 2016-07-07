@@ -225,7 +225,7 @@ const char *vlc_fourcc_GetDescription(int cat, vlc_fourcc_t fourcc)
     VLC_CODEC_NV16, VLC_CODEC_NV61
 
 #define VLC_CODEC_YUV_PLANAR_422_16 \
-    VLC_CODEC_I422_10L, VLC_CODEC_I422_10B, VLC_CODEC_I422_9L, VLC_CODEC_I422_9B
+    VLC_CODEC_I422_12L, VLC_CODEC_I422_12B, VLC_CODEC_I422_10L, VLC_CODEC_I422_10B, VLC_CODEC_I422_9L, VLC_CODEC_I422_9B
 
 #define VLC_CODEC_YUV_PLANAR_440 \
     VLC_CODEC_I440, VLC_CODEC_J440
@@ -311,6 +311,12 @@ static const vlc_fourcc_t p_I422_10L_fallback[] = {
 };
 static const vlc_fourcc_t p_I422_10B_fallback[] = {
     VLC_CODEC_I422_10B, VLC_CODEC_I422_10L, VLC_CODEC_FALLBACK_422_16, 0
+};
+static const vlc_fourcc_t p_I422_12L_fallback[] = {
+    VLC_CODEC_I422_12L, VLC_CODEC_I422_12B, VLC_CODEC_FALLBACK_422_16, 0
+};
+static const vlc_fourcc_t p_I422_12B_fallback[] = {
+    VLC_CODEC_I422_12B, VLC_CODEC_I422_12L, VLC_CODEC_FALLBACK_422_16, 0
 };
 
 #define VLC_CODEC_FALLBACK_444 \
@@ -412,6 +418,8 @@ static const vlc_fourcc_t *pp_YUV_fallback[] = {
     p_I422_9B_fallback,
     p_I422_10L_fallback,
     p_I422_10B_fallback,
+    p_I422_12L_fallback,
+    p_I422_12B_fallback,
     p_J422_fallback,
     p_I444_fallback,
     p_J444_fallback,
@@ -617,6 +625,8 @@ static const struct
         VLC_CODEC_I420_10B },                  PLANAR_16(3, 2, 2, 12) },
     { { VLC_CODEC_I420_9L,
         VLC_CODEC_I420_9B },                   PLANAR_16(3, 2, 2,  9) },
+    { { VLC_CODEC_I422_12L,
+        VLC_CODEC_I422_12B },                  PLANAR_16(3, 2, 1, 12) },
     { { VLC_CODEC_I422_10L,
         VLC_CODEC_I422_10B },                  PLANAR_16(3, 2, 1, 10) },
     { { VLC_CODEC_I422_9L,
