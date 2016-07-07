@@ -205,7 +205,13 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
     [_name setStringValue:[currentItem name]];
     [_author setStringValue:[currentItem author]];
     [_version setStringValue:[currentItem version]];
-    [_description setString:[currentItem description]];
+
+    // Parse HTML description properly
+    NSMutableString *htmlDescription = [NSMutableString stringWithFormat:@"<style>body{ font-family: -apple-system-body, -apple-system, HelveticaNeue, Arial, sans-serif; }</style>%@", [currentItem description]];
+    [htmlDescription replaceOccurrencesOfString:@"\n" withString:@"<br />" options:NSLiteralSearch range:NSMakeRange(0, [htmlDescription length])];
+    NSAttributedString *attributedDescription = [[NSAttributedString alloc] initWithHTML:[htmlDescription dataUsingEncoding:NSUTF8StringEncoding]
+                                                                      documentAttributes:NULL];
+    [[_description textStorage] setAttributedString:attributedDescription];
 
     [self updateInstallButton:[currentItem isInstalled]];
 }
