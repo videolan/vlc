@@ -111,7 +111,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
         SetThreadErrorMode (mode, NULL);
     }
 #else
-    LoadPackagedLibrary( wfile )
+    LoadPackagedLibrary( wfile );
 #endif
     free (wfile);
 
