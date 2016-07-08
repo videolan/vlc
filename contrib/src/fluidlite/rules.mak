@@ -1,10 +1,10 @@
 # fluidlite
 
 FLUID_GITURL := https://github.com/divideconcept/FluidLite.git
-HASH := 171d222
+FLUID_HASH := 171d222
 
 $(TARBALLS)/fluidlite-git.tar.xz:
-	$(call download_git,$(FLUID_GITURL),,$(HASH))
+	$(call download_git,$(FLUID_GITURL),,$(FLUID_HASH))
 
 .sum-fluidlite: fluidlite-git.tar.xz
 	$(warning $@ not implemented)
