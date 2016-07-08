@@ -63,6 +63,11 @@ static int Open( vlc_object_t *p_this )
 
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
+    if( p_dec->fmt_out.subs.p_style )
+    {
+        p_dec->fmt_out.subs.p_style->i_font_size = 0;
+        p_dec->fmt_out.subs.p_style->f_font_relsize = 5.0;
+    }
 
     return VLC_SUCCESS;
 }
@@ -272,6 +277,26 @@ static void ApplySegmentStyle( tx3g_segment_t **pp_segment, const uint16_t i_abs
     }
 }
 
+/* Do relative size conversion using default style size (from stsd),
+   as the line should always be 5%. Apply to each segment specific text size */
+static void FontSizeConvert( const text_style_t *p_default_style, text_style_t *p_style )
+{
+    if( unlikely(!p_style) )
+    {
+        return;
+    }
+    else if( unlikely(!p_default_style) || p_default_style->i_font_size == 0 )
+    {
+        p_style->i_font_size = 0;
+        p_style->f_font_relsize = 5.0;
+    }
+    else
+    {
+        p_style->f_font_relsize = 5.0 * (float) p_style->i_font_size / p_default_style->i_font_size;
+        p_style->i_font_size = 0;
+    }
+}
+
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
@@ -412,11 +437,15 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM;
 
+    FontSizeConvert( p_dec->fmt_in.subs.p_style,  p_spu_sys->p_default_style );
+
     /* Unwrap */
     text_segment_t *p_text_segments = p_segment3g->s;
     text_segment_t *p_cur = p_text_segments;
     while( p_segment3g )
     {
+        FontSizeConvert( p_dec->fmt_in.subs.p_style, p_segment3g->s->style );
+
         tx3g_segment_t * p_old = p_segment3g;
         p_segment3g = p_segment3g->p_next3g;
         free( p_old );
