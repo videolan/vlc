@@ -355,8 +355,7 @@ static int login( access_t *p_access )
                 goto success;
         }
 
-        msg_Err( p_access, "Unable to login with username = '%s', domain = '%s'",
-                 psz_login, psz_domain );
+        msg_Err( p_access, "Unable to login" );
         goto error;
     }
     else if( smb_session_is_guest( p_sys->p_session ) == 1 )
