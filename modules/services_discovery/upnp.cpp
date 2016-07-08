@@ -1275,7 +1275,7 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
 
     #ifdef UPNP_ENABLE_IPV6
         char* psz_miface = var_InheritString( p_obj, "miface" );
-        msg_Info( p_obj, "Initializing libupnp on '%s' interface", psz_miface );
+        msg_Info( p_obj, "Initializing libupnp on '%s' interface", psz_miface ? psz_miface : "default" );
         int i_res = UpnpInit2( psz_miface, 0 );
         free( psz_miface );
     #else
