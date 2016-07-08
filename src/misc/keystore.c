@@ -309,8 +309,11 @@ credential_find_keystore(vlc_credential *p_credential, vlc_keystore *p_keystore)
      * p_credential->psz_username (default username) can be a pointer to an
      * entry */
     if (p_credential->i_entries_count > 0)
+    {
         vlc_keystore_release_entries(p_credential->p_entries,
                                      p_credential->i_entries_count);
+        p_credential->psz_username = NULL;
+    }
     p_credential->p_entries = p_entries;
     p_credential->i_entries_count = i_entries_count;
 
