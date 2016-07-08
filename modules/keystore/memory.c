@@ -50,6 +50,7 @@ vlc_module_end ()
 struct vlc_keystore_sys
 {
     struct ks_list  list;
+    vlc_mutex_t     lock;
 };
 
 static int
@@ -59,23 +60,29 @@ Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
     (void) psz_label;
     vlc_keystore_sys *p_sys = p_keystore->p_sys;
     struct ks_list *p_list = &p_sys->list;
-    vlc_keystore_entry *p_entry = ks_list_find_entry(p_list, ppsz_values, NULL);
+    vlc_keystore_entry *p_entry;
+    int i_ret = VLC_EGENERIC;
 
+    vlc_mutex_lock(&p_sys->lock);
+    p_entry = ks_list_find_entry(p_list, ppsz_values, NULL);
     if (p_entry)
         vlc_keystore_release_entry(p_entry);
     else
     {
         p_entry = ks_list_new_entry(p_list);
         if (!p_entry)
-            return VLC_EGENERIC;
+            goto end;
     }
     if (ks_values_copy((const char **)p_entry->ppsz_values, ppsz_values))
-        return VLC_EGENERIC;
+        goto end;
 
     if (vlc_keystore_entry_set_secret(p_entry, p_secret, i_secret_len))
-        return VLC_EGENERIC;
+        goto end;
 
-    return VLC_SUCCESS;
+    i_ret = VLC_SUCCESS;
+end:
+    vlc_mutex_unlock(&p_sys->lock);
+    return i_ret;
 }
 
 static unsigned int
@@ -88,6 +95,7 @@ Find(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
     vlc_keystore_entry *p_entry;
     unsigned i_index = 0;
 
+    vlc_mutex_lock(&p_sys->lock);
     while ((p_entry = ks_list_find_entry(p_list, ppsz_values, &i_index)))
     {
         vlc_keystore_entry *p_out_entry = ks_list_new_entry(&out_list);
@@ -107,6 +115,7 @@ Find(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
             break;
         }
     }
+    vlc_mutex_unlock(&p_sys->lock);
 
     *pp_entries = out_list.p_entries;
 
@@ -121,11 +130,13 @@ Remove(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX])
     vlc_keystore_entry *p_entry;
     unsigned i_index = 0, i_count = 0;
 
+    vlc_mutex_lock(&p_sys->lock);
     while ((p_entry = ks_list_find_entry(p_list, ppsz_values, &i_index)))
     {
         vlc_keystore_release_entry(p_entry);
         i_count++;
     }
+    vlc_mutex_unlock(&p_sys->lock);
 
     return i_count;
 }
@@ -137,6 +148,7 @@ Close(vlc_object_t *p_this)
     vlc_keystore_sys *p_sys = p_keystore->p_sys;
 
     ks_list_free(&p_sys->list);
+    vlc_mutex_destroy(&p_keystore->p_sys->lock);
     free(p_sys);
 }
 
@@ -148,6 +160,7 @@ Open(vlc_object_t *p_this)
     if (!p_keystore->p_sys)
         return VLC_EGENERIC;
 
+    vlc_mutex_init(&p_keystore->p_sys->lock);
     p_keystore->pf_store = Store;
     p_keystore->pf_find = Find;
     p_keystore->pf_remove = Remove;
