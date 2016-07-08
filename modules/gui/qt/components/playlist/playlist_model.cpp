@@ -794,6 +794,10 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
                                            : rootItem;
     if( !item ) return;
 
+    input_item_t* p_caller_item = caller.isValid()
+        ? static_cast<AbstractPLItem*>( caller.internalPointer() )->inputItem()
+        : NULL;
+
     int i_root_id = item->id( PLAYLIST_ID );
 
     QModelIndex qIndex = index( item, 0 );
@@ -825,10 +829,16 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
         endInsertRows( );
     }
     PL_UNLOCK;
-    /* if we have popup item, try to make sure that you keep that item visible */
-    if( caller.isValid() ) emit currentIndexChanged( caller );
 
-    else if( currentIndex().isValid() ) emit currentIndexChanged( currentIndex() );
+    /* if we have popup item, try to make sure that you keep that item visible */
+    if( p_caller_item )
+    {
+        QModelIndex idx = indexByInputItemID( p_caller_item->i_id, 0 );
+
+        emit currentIndexChanged( idx );
+    }
+    else if( currentIndex().isValid() )
+        emit currentIndexChanged( currentIndex() );
 }
 
 void PLModel::filter( const QString& search_text, const QModelIndex & idx, bool b_recursive )
