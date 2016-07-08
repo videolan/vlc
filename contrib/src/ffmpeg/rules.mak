@@ -5,12 +5,12 @@
 #USE_FFMPEG ?= 1
 
 ifdef USE_FFMPEG
-HASH=HEAD
-FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(HASH);sf=tgz
+FFMPEG_HASH=HEAD
+FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := git://git.videolan.org/ffmpeg.git
 else
-HASH=HEAD
-FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=$(HASH);sf=tgz
+FFMPEG_HASH=HEAD
+FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := git://git.libav.org/libav.git
 endif
 
@@ -189,17 +189,17 @@ endif
 
 FFMPEGCONF += --nm="$(NM)" --ar="$(AR)"
 
-$(TARBALLS)/ffmpeg-$(HASH).tar.xz:
-	$(call download_git,$(FFMPEG_GITURL),,$(HASH))
+$(TARBALLS)/ffmpeg-$(FFMPEG_HASH).tar.xz:
+	$(call download_git,$(FFMPEG_GITURL),,$(FFMPEG_HASH))
 
-.sum-ffmpeg: $(TARBALLS)/ffmpeg-$(HASH).tar.xz
+.sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_HASH).tar.xz
 	$(warning Not implemented.)
 	touch $@
 
-ffmpeg: ffmpeg-$(HASH).tar.xz .sum-ffmpeg
-	rm -Rf $@ $@-$(HASH)
-	mkdir -p $@-$(HASH)
-	$(XZCAT) "$<" | (cd $@-$(HASH) && tar xv --strip-components=1)
+ffmpeg: ffmpeg-$(FFMPEG_HASH).tar.xz .sum-ffmpeg
+	rm -Rf $@ $@-$(FFMPEG_HASH)
+	mkdir -p $@-$(FFMPEG_HASH)
+	$(XZCAT) "$<" | (cd $@-$(FFMPEG_HASH) && tar xv --strip-components=1)
 	$(MOVE)
 
 .ffmpeg: ffmpeg
