@@ -373,7 +373,7 @@
  
    if (decode_header(header, stream) == -1)
      goto fail;
-@@ -460,14 +460,14 @@
+@@ -460,14 +460,16 @@
    /* ancillary_data() */
  
    if (frame->header.layer != MAD_LAYER_III) {
@@ -385,6 +385,8 @@
  
 -    stream->anc_ptr    = stream->ptr;
 -    stream->anc_bitlen = mad_bit_length(&stream->ptr, &next_frame);
++    if (stream->l_ptr != stream->l_anc_ptr)
++      free(stream->l_anc_ptr);
 +    stream->l_anc_ptr    = stream->l_ptr;
 +    stream->anc_bitlen = mad_bit_w_len_length(stream->l_ptr, &next_frame);
  
