@@ -254,6 +254,13 @@ static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
     stream_sys_t *sys = s->p_sys;
     input_thread_t *input = s->p_input;
     ssize_t val = 0;
+    char dummy[(buf != NULL) ? 1 : (len <= 2048) ? len : 2048];
+
+    if (buf == NULL)
+    {
+        buf = dummy;
+        len = sizeof (dummy);
+    }
 
     do
     {
