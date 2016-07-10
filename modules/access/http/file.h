@@ -27,8 +27,8 @@
  * @{
  */
 
-struct vlc_http_file;
 struct vlc_http_mgr;
+struct vlc_http_resource;
 struct block_t;
 
 /**
@@ -39,29 +39,12 @@ struct block_t;
  * @param url URL of the file to read
  * @param ua user agent string (or NULL to ignore)
  * @param ref referral URL (or NULL to ignore)
- */
-struct vlc_http_file *vlc_http_file_create(struct vlc_http_mgr *mgr,
-                                           const char *url, const char *ua,
-                                           const char *ref);
-
-/**
- * Destroys an HTTP file.
  *
- * Releases all resources allocated or held by the HTTP file object.
+ * @return an HTTP resource object pointer, or NULL on error
  */
-void vlc_http_file_destroy(struct vlc_http_file *);
-
-int vlc_http_file_get_status(struct vlc_http_file *);
-
-/**
- * Gets redirection URL.
- *
- * Checks if the file URL lead to a redirection. If so, return the redirect
- * location.
- *
- * @return Heap-allocated URL or NULL if no redirection.
- */
-char *vlc_http_file_get_redirect(struct vlc_http_file *);
+struct vlc_http_resource *vlc_http_file_create(struct vlc_http_mgr *mgr,
+                                               const char *url, const char *ua,
+                                               const char *ref);
 
 /**
  * Gets file size.
@@ -70,7 +53,7 @@ char *vlc_http_file_get_redirect(struct vlc_http_file *);
  *
  * @return Bytes count or (uintmax_t)-1 if unknown.
  */
-uintmax_t vlc_http_file_get_size(struct vlc_http_file *);
+uintmax_t vlc_http_file_get_size(struct vlc_http_resource *);
 
 /**
  * Checks seeking support.
@@ -78,14 +61,7 @@ uintmax_t vlc_http_file_get_size(struct vlc_http_file *);
  * @retval true if file supports seeking
  * @retval false if file does not support seeking
  */
-bool vlc_http_file_can_seek(struct vlc_http_file *);
-
-/**
- * Gets MIME type.
- *
- * @return Heap-allocated MIME type string, or NULL if unknown.
- */
-char *vlc_http_file_get_type(struct vlc_http_file *);
+bool vlc_http_file_can_seek(struct vlc_http_resource *);
 
 /**
  * Sets the read offset.
@@ -94,11 +70,18 @@ char *vlc_http_file_get_type(struct vlc_http_file *);
  * @retval 0 if seek succeeded
  * @retval -1 if seek failed
  */
-int vlc_http_file_seek(struct vlc_http_file *, uintmax_t offset);
+int vlc_http_file_seek(struct vlc_http_resource *, uintmax_t offset);
 
 /**
  * Reads data.
+ *
+ * Reads data from a file and update the file offset.
  */
-struct block_t *vlc_http_file_read(struct vlc_http_file *);
+struct block_t *vlc_http_file_read(struct vlc_http_resource *);
+
+#define vlc_http_file_get_status vlc_http_res_get_status
+#define vlc_http_file_get_redirect vlc_http_res_get_redirect
+#define vlc_http_file_get_type vlc_http_res_get_type
+#define vlc_http_file_destroy vlc_http_res_destroy
 
 /** @} */

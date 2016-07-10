@@ -31,15 +31,8 @@
 
 #pragma GCC visibility push(default)
 
-struct vlc_http_live
-{
-    struct vlc_http_resource resource;
-    struct vlc_http_msg *resp;
-    bool failed;
-};
-
-static int vlc_http_live_req(struct vlc_http_msg *req,
-                             const struct vlc_http_resource *res, void *opaque)
+static int vlc_http_live_req(const struct vlc_http_resource *res,
+                             struct vlc_http_msg *req, void *opaque)
 {
     vlc_http_msg_add_header(req, "Accept-Encoding", "gzip, deflate");
     (void) res;
@@ -47,82 +40,47 @@ static int vlc_http_live_req(struct vlc_http_msg *req,
     return 0;
 }
 
-static struct vlc_http_msg *vlc_http_live_open(struct vlc_http_live *live)
+static int vlc_http_live_resp(const struct vlc_http_resource *res,
+                              const struct vlc_http_msg *resp, void *opaque)
 {
-    return vlc_http_res_open(&live->resource, vlc_http_live_req, NULL);
+    (void) res;
+    (void) resp;
+    (void) opaque;
+    return 0;
 }
 
-void vlc_http_live_destroy(struct vlc_http_live *live)
+static const struct vlc_http_resource_cbs vlc_http_live_callbacks =
 {
-    if (live->resp != NULL)
-        vlc_http_msg_destroy(live->resp);
-    vlc_http_res_deinit(&live->resource);
-    free(live);
-}
+    vlc_http_live_req,
+    vlc_http_live_resp,
+};
 
-struct vlc_http_live *vlc_http_live_create(struct vlc_http_mgr *mgr,
-                                           const char *uri, const char *ua,
-                                           const char *ref)
+struct vlc_http_resource *vlc_http_live_create(struct vlc_http_mgr *mgr,
+                                               const char *uri, const char *ua,
+                                               const char *ref)
 {
-    struct vlc_http_live *live = malloc(sizeof (*live));
-    if (unlikely(live == NULL))
+    struct vlc_http_resource *res = malloc(sizeof (*res));
+    if (unlikely(res == NULL))
         return NULL;
 
-    if (vlc_http_res_init(&live->resource, mgr, uri, ua, ref))
+    if (vlc_http_res_init(res, &vlc_http_live_callbacks, mgr, uri, ua, ref))
     {
-        free(live);
-        return NULL;
+        free(res);
+        res = NULL;
     }
 
-    live->resp = NULL;
-    live->failed = false;
-    return live;
+    return res;
 }
 
-int vlc_http_live_get_status(struct vlc_http_live *live)
+block_t *vlc_http_live_read(struct vlc_http_resource *res)
 {
-    if (live->resp == NULL)
-    {
-        if (live->failed)
-            return -1;
-        live->resp = vlc_http_live_open(live);
-        if (live->resp == NULL)
-        {
-            live->failed = true;
-            return -1;
-        }
-    }
-    return vlc_http_msg_get_status(live->resp);
-}
-
-char *vlc_http_live_get_redirect(struct vlc_http_live *live)
-{
-    if (vlc_http_live_get_status(live) < 0)
-        return NULL;
-    return vlc_http_res_get_redirect(&live->resource, live->resp);
-}
-
-char *vlc_http_live_get_type(struct vlc_http_live *live)
-{
-    if (vlc_http_live_get_status(live) < 0)
-        return NULL;
-    return vlc_http_res_get_type(live->resp);
-}
-
-block_t *vlc_http_live_read(struct vlc_http_live *live)
-{
-    if (vlc_http_live_get_status(live) < 0)
-        return NULL;
-
-    struct block_t *block = vlc_http_res_read(live->resp);
+    struct block_t *block = vlc_http_res_read(res);
     if (block != NULL)
         return block;
 
     /* Automatically try to reconnect */
     /* TODO: Retry-After parsing, loop and pacing timer */
-    vlc_http_msg_destroy(live->resp);
-    live->resp = NULL;
-    if (vlc_http_live_get_status(live) < 0)
-        return NULL;
-    return vlc_http_res_read(live->resp);
+    vlc_http_msg_destroy(res->response);
+    res->response = NULL;
+    return vlc_http_res_read(res);
 }

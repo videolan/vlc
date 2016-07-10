@@ -42,20 +42,19 @@
 struct vlc_http_file
 {
     struct vlc_http_resource resource;
-    struct vlc_http_msg *resp;
     uintmax_t offset;
-    bool failed;
 };
 
-static int vlc_http_file_req(struct vlc_http_msg *req,
-                             const struct vlc_http_resource *res, void *opaque)
+static int vlc_http_file_req(const struct vlc_http_resource *res,
+                             struct vlc_http_msg *req, void *opaque)
 {
     struct vlc_http_file *file = (struct vlc_http_file *)res;
     const uintmax_t *offset = opaque;
 
-    if (file->resp != NULL)
+    if (file->resource.response != NULL)
     {
-        const char *str = vlc_http_msg_get_header(file->resp, "ETag");
+        const char *str = vlc_http_msg_get_header(file->resource.response,
+                                                  "ETag");
         if (str != NULL)
         {
             if (!memcmp(str, "W/", 2))
@@ -64,7 +63,7 @@ static int vlc_http_file_req(struct vlc_http_msg *req,
         }
         else
         {
-            time_t mtime = vlc_http_msg_get_mtime(file->resp);
+            time_t mtime = vlc_http_msg_get_mtime(file->resource.response);
             if (mtime != -1)
                 vlc_http_msg_add_time(req, "If-Unmodified-Since", &mtime);
         }
@@ -76,17 +75,12 @@ static int vlc_http_file_req(struct vlc_http_msg *req,
     return 0;
 }
 
-static struct vlc_http_msg *vlc_http_file_open(struct vlc_http_file *file,
-                                               uintmax_t offset)
+static int vlc_http_file_resp(const struct vlc_http_resource *res,
+                              const struct vlc_http_msg *resp, void *opaque)
 {
-    struct vlc_http_msg *resp;
+    const uintmax_t *offset = opaque;
 
-    resp = vlc_http_res_open(&file->resource, vlc_http_file_req, &offset);
-    if (resp == NULL)
-        return NULL;
-
-    int status = vlc_http_msg_get_status(resp);
-    if (status == 206)
+    if (vlc_http_msg_get_status(resp) == 206)
     {
         const char *str = vlc_http_msg_get_header(resp, "Content-Range");
         if (str == NULL)
@@ -96,81 +90,57 @@ static struct vlc_http_msg *vlc_http_file_open(struct vlc_http_file *file,
 
         uintmax_t start, end;
         if (sscanf(str, "bytes %ju-%ju", &start, &end) != 2
-         || start != offset || start > end)
+         || start != *offset || start > end)
             /* A single range response is what we asked for, but not at that
              * start offset. */
             goto fail;
     }
 
-    return resp;
+    (void) res;
+    return 0;
+
 fail:
-    vlc_http_msg_destroy(resp);
     errno = EIO;
-    return NULL;
+    return -1;
 }
 
-void vlc_http_file_destroy(struct vlc_http_file *file)
+static const struct vlc_http_resource_cbs vlc_http_file_callbacks =
 {
-    if (file->resp != NULL)
-        vlc_http_msg_destroy(file->resp);
-    vlc_http_res_deinit(&file->resource);
-    free(file);
-}
+    vlc_http_file_req,
+    vlc_http_file_resp,
+};
 
-struct vlc_http_file *vlc_http_file_create(struct vlc_http_mgr *mgr,
-                                           const char *uri, const char *ua,
-                                           const char *ref)
+struct vlc_http_resource *vlc_http_file_create(struct vlc_http_mgr *mgr,
+                                               const char *uri, const char *ua,
+                                               const char *ref)
 {
     struct vlc_http_file *file = malloc(sizeof (*file));
     if (unlikely(file == NULL))
         return NULL;
 
-    if (vlc_http_res_init(&file->resource, mgr, uri, ua, ref))
+    if (vlc_http_res_init(&file->resource, &vlc_http_file_callbacks, mgr,
+                          uri, ua, ref))
     {
         free(file);
         return NULL;
     }
 
-    file->resp = NULL;
     file->offset = 0;
-    file->failed = false;
-    return file;
+    return &file->resource;
 }
 
-int vlc_http_file_get_status(struct vlc_http_file *file)
+uintmax_t vlc_http_file_get_size(struct vlc_http_resource *res)
 {
-    if (file->resp == NULL)
-    {
-        if (file->failed)
-            return -1;
-        file->resp = vlc_http_file_open(file, file->offset);
-        if (file->resp == NULL)
-        {
-            file->failed = true;
-            return -1;
-        }
-    }
-    return vlc_http_msg_get_status(file->resp);
-}
-
-char *vlc_http_file_get_redirect(struct vlc_http_file *file)
-{
-    if (vlc_http_file_get_status(file) < 0)
-        return NULL;
-    return vlc_http_res_get_redirect(&file->resource, file->resp);
-}
-
-uintmax_t vlc_http_file_get_size(struct vlc_http_file *file)
-{
-    int status = vlc_http_file_get_status(file);
+    int status = vlc_http_res_get_status(res);
     if (status < 0)
         return -1;
 
-    const char *range = vlc_http_msg_get_header(file->resp, "Content-Range");
+    const char *range = vlc_http_msg_get_header(res->response,
+                                                "Content-Range");
 
     if (status == 206 /* Partial Content */)
     {   /* IETF RFC7233 §4.1 */
-        assert(range != NULL); /* checked by vlc_http_file_open() */
+        assert(range != NULL); /* checked by vlc_http_file_resp() */
 
         uintmax_t end, total;
 
@@ -183,7 +153,7 @@ uintmax_t vlc_http_file_get_size(struct vlc_http_file *file)
             case 2:
                 return total;
         }
-        vlc_assert_unreachable(); /* checked by vlc_http_file_open() */
+        vlc_assert_unreachable(); /* checked by vlc_http_file_resp() */
     }
 
     if (status == 416 /* Range Not Satisfiable */)
@@ -202,36 +172,31 @@ uintmax_t vlc_http_file_get_size(struct vlc_http_file *file)
 
     /* Content-Range is meaningless here (see RFC7233 B), so check if the size
      * of the response entity body is known. */
-    return vlc_http_msg_get_size(file->resp);
+    return vlc_http_msg_get_size(res->response);
 }
 
-bool vlc_http_file_can_seek(struct vlc_http_file *file)
+bool vlc_http_file_can_seek(struct vlc_http_resource *res)
 {   /* See IETF RFC7233 */
-    int status = vlc_http_file_get_status(file);
+    int status = vlc_http_res_get_status(res);
     if (status < 0)
         return false;
     if (status == 206 || status == 416)
         return true; /* Partial Content */
 
-    return vlc_http_msg_get_token(file->resp, "Accept-Ranges",
+    return vlc_http_msg_get_token(res->response, "Accept-Ranges",
                                   "bytes") != NULL;
 }
 
-char *vlc_http_file_get_type(struct vlc_http_file *file)
+int vlc_http_file_seek(struct vlc_http_resource *res, uintmax_t offset)
 {
-    if (vlc_http_file_get_status(file) < 0)
-        return NULL;
-    return vlc_http_res_get_type(file->resp);
-}
-
-int vlc_http_file_seek(struct vlc_http_file *file, uintmax_t offset)
-{
-    struct vlc_http_msg *resp = vlc_http_file_open(file, offset);
+    struct vlc_http_msg *resp = vlc_http_res_open(res, &offset);
     if (resp == NULL)
         return -1;
 
+    struct vlc_http_file *file = (struct vlc_http_file *)res;
+
     int status = vlc_http_msg_get_status(resp);
-    if (file->resp != NULL)
+    if (res->response != NULL)
     {   /* Accept the new and ditch the old one if:
          * - requested succeeded and range was accepted (206),
          * - requested failed due to out-of-range (416),
@@ -242,26 +207,24 @@ int vlc_http_file_seek(struct vlc_http_file *file, uintmax_t offset)
             vlc_http_msg_destroy(resp);
             return -1;
         }
-        vlc_http_msg_destroy(file->resp);
+        vlc_http_msg_destroy(res->response);
     }
 
-    file->resp = resp;
+    res->response = resp;
     file->offset = offset;
     return 0;
 }
 
-block_t *vlc_http_file_read(struct vlc_http_file *file)
+block_t *vlc_http_file_read(struct vlc_http_resource *res)
 {
-    if (vlc_http_file_get_status(file) < 0)
-        return NULL;
-
-    block_t *block = vlc_http_res_read(file->resp);
+    struct vlc_http_file *file = (struct vlc_http_file *)res;
+    block_t *block = vlc_http_res_read(res);
 
     if (block == NULL)
     {   /* Automatically reconnect if server supports seek */
-        if (vlc_http_file_can_seek(file)
-         && vlc_http_file_seek(file, file->offset) == 0)
-            block = vlc_http_res_read(file->resp);
+        if (vlc_http_file_can_seek(res)
+         && vlc_http_file_seek(res, file->offset) == 0)
+            block = vlc_http_res_read(res);
 
         if (block == NULL)
             return NULL;

@@ -25,17 +25,17 @@
  * @{
  */
 
-struct vlc_http_live;
+struct vlc_http_resource;
 struct block_t;
 
-struct vlc_http_live *vlc_http_live_create(struct vlc_http_mgr *mgr,
-                                           const char *uri, const char *ua,
-                                           const char *ref);
-void vlc_http_live_destroy(struct vlc_http_live *live);
+struct vlc_http_resource *vlc_http_live_create(struct vlc_http_mgr *mgr,
+                                               const char *uri, const char *ua,
+                                               const char *ref);
+struct block_t *vlc_http_live_read(struct vlc_http_resource *);
 
-int vlc_http_live_get_status(struct vlc_http_live *live);
-char *vlc_http_live_get_redirect(struct vlc_http_live *live);
-char *vlc_http_live_get_type(struct vlc_http_live *live);
-block_t *vlc_http_live_read(struct vlc_http_live *live);
+#define vlc_http_live_get_status vlc_http_res_get_status
+#define vlc_http_live_get_redirect vlc_http_res_get_redirect
+#define vlc_http_live_get_type vlc_http_res_get_type
+#define vlc_http_live_destroye vlc_http_res_destroy
 
 /** @} */
