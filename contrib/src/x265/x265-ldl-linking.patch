@@ -1,0 +1,11 @@
+--- x265-1.9/source/CMakeLists.txt.orig	2016-01-25 06:16:50.000000000 +0100
++++ x265-1.9/source/CMakeLists.txt	2016-07-10 13:36:14.759323966 +0200
+@@ -566,7 +566,7 @@
+         if(WIN32 OR NOT ENABLE_SHARED OR INTEL_CXX)
+             # The CLI cannot link to the shared library on Windows, it
+             # requires internal APIs not exported from the DLL
+-            target_link_libraries(cli x265-static ${PLATFORM_LIBS})
++            target_link_libraries(cli x265-static ${PLATFORM_LIBS} ${CMAKE_DL_LIBS})
+         else()
+             target_link_libraries(cli x265-shared ${PLATFORM_LIBS})
+         endif()

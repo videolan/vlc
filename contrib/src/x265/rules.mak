@@ -26,6 +26,7 @@ x265: x265-$(X265_VERSION).tar.bz2 .sum-x265
 	rm -Rf $@-$(X265_VERSION)
 	mkdir -p $@-$(X265_VERSION)
 	$(BZCAT) "$<" | (cd $@-$(X265_VERSION) && tar xv --strip-components=1)
+	$(APPLY) $(SRC)/x265/x265-ldl-linking.patch
 	$(call pkg_static,"source/x265.pc.in")
 	$(MOVE)
 
