@@ -262,7 +262,6 @@ SOURCES_libvlc_darwin = \
 SOURCES_libvlc_android = \
 	linux/cpu.c \
 	linux/dirs.c \
-	android/dirs.c \
 	linux/thread.c \
 	android/thread.c \
 	android/error.c \

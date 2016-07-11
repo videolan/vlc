@@ -26,7 +26,9 @@
 
 #include <vlc_common.h>
 #include "../libvlc.h"
+#include "config/configuration.h"
 
+#include <string.h>
 #include <jni.h>
 
 static JavaVM *s_jvm = NULL;
@@ -61,4 +63,30 @@ system_Configure(libvlc_int_t *p_libvlc, int i_argc, const char *const pp_argv[]
     assert(s_jvm != NULL);
     var_Create(p_libvlc, "android-jvm", VLC_VAR_ADDRESS);
     var_SetAddress(p_libvlc, "android-jvm", s_jvm);
+}
+
+char *config_GetUserDir (vlc_userdir_t type)
+{
+    switch (type)
+    {
+        case VLC_DATA_DIR:
+            return strdup("/sdcard/Android/data/org.videolan.vlc");
+        case VLC_CACHE_DIR:
+            return strdup("/sdcard/Android/data/org.videolan.vlc/cache");
+
+        case VLC_HOME_DIR:
+        case VLC_CONFIG_DIR:
+            return NULL;
+
+        case VLC_DESKTOP_DIR:
+        case VLC_DOWNLOAD_DIR:
+        case VLC_TEMPLATES_DIR:
+        case VLC_PUBLICSHARE_DIR:
+        case VLC_DOCUMENTS_DIR:
+        case VLC_MUSIC_DIR:
+        case VLC_PICTURES_DIR:
+        case VLC_VIDEOS_DIR:
+            return NULL;
+    }
+    return NULL;
 }
