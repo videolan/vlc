@@ -1,0 +1,98 @@
+diff -ru lua.orig/src/ldump.c lua/src/ldump.c
+--- lua.orig/src/ldump.c	2011-12-14 19:26:18.000000000 +0200
++++ lua/src/ldump.c	2011-12-14 19:49:20.000000000 +0200
+@@ -44,7 +44,8 @@
+ 
+ static void DumpInt(int x, DumpState* D)
+ {
+- DumpVar(x,D);
++ int32_t i = x;
++ DumpVar(i,D);
+ }
+ 
+ static void DumpNumber(lua_Number x, DumpState* D)
+@@ -62,12 +63,12 @@
+ {
+  if (s==NULL || getstr(s)==NULL)
+  {
+-  size_t size=0;
++  uint32_t size=0;
+   DumpVar(size,D);
+  }
+  else
+  {
+-  size_t size=s->tsv.len+1;		/* include trailing '\0' */
++  uint32_t size=s->tsv.len+1;		/* include trailing '\0' */
+   DumpVar(size,D);
+   DumpBlock(getstr(s),size,D);
+  }
+diff -ru lua.orig/src/luaconf.h lua/src/luaconf.h
+--- lua.orig/src/luaconf.h	2011-12-14 19:26:18.000000000 +0200
++++ lua/src/luaconf.h	2011-12-14 19:54:25.000000000 +0200
+@@ -10,6 +10,8 @@
+ 
+ #include <limits.h>
+ #include <stddef.h>
++#include <stdint.h>
++#include <sys/types.h>
+ 
+ 
+ /*
+@@ -409,20 +411,12 @@
+ ** part always works, but may waste space on machines with 64-bit
+ ** longs.) Probably you do not need to change this.
+ */
+-#if LUAI_BITSINT >= 32
+-#define LUAI_UINT32	unsigned int
+-#define LUAI_INT32	int
+-#define LUAI_MAXINT32	INT_MAX
++
++#define LUAI_UINT32	uint32_t
++#define LUAI_INT32	int32_t
++#define LUAI_MAXINT32	0x7fffffff
+ #define LUAI_UMEM	size_t
+-#define LUAI_MEM	ptrdiff_t
+-#else
+-/* 16-bit ints */
+-#define LUAI_UINT32	unsigned long
+-#define LUAI_INT32	long
+-#define LUAI_MAXINT32	LONG_MAX
+-#define LUAI_UMEM	unsigned long
+-#define LUAI_MEM	long
+-#endif
++#define LUAI_MEM	ssize_t
+ 
+ 
+ /*
+diff -ru lua.orig/src/lundump.c lua/src/lundump.c
+--- lua.orig/src/lundump.c	2011-12-14 19:26:18.000000000 +0200
++++ lua/src/lundump.c	2011-12-14 19:50:41.000000000 +0200
+@@ -60,7 +60,7 @@
+ 
+ static int LoadInt(LoadState* S)
+ {
+- int x;
++ int32_t x;
+  LoadVar(S,x);
+  IF (x<0, "bad integer");
+  return x;
+@@ -75,7 +75,7 @@
+ 
+ static TString* LoadString(LoadState* S)
+ {
+- size_t size;
++ uint32_t size;
+  LoadVar(S,size);
+  if (size==0)
+   return NULL;
+@@ -219,8 +219,8 @@
+  *h++=(char)LUAC_VERSION;
+  *h++=(char)LUAC_FORMAT;
+  *h++=(char)*(char*)&x;				/* endianness */
+- *h++=(char)sizeof(int);
+- *h++=(char)sizeof(size_t);
++ *h++=(char)sizeof(int32_t);
++ *h++=(char)sizeof(uint32_t);
+  *h++=(char)sizeof(Instruction);
+  *h++=(char)sizeof(lua_Number);
+  *h++=(char)(((lua_Number)0.5)==0);		/* is lua_Number integral? */
