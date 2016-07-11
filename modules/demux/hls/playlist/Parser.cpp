@@ -332,6 +332,29 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
             }
             break;
 
+            case AttributesTag::EXTXMAP:
+            {
+                const AttributesTag *keytag = static_cast<const AttributesTag *>(tag);
+                const Attribute *uriAttr;
+                if(keytag && (uriAttr = keytag->getAttributeByName("URI")) &&
+                   !segmentList->initialisationSegment.Get()) /* FIXME: handle discontinuities */
+                {
+                    InitSegment *initSegment = new (std::nothrow) InitSegment(rep);
+                    if(initSegment)
+                    {
+                        initSegment->setSourceUrl(uriAttr->quotedString());
+                        const Attribute *byterangeAttr = keytag->getAttributeByName("BYTERANGE");
+                        if(byterangeAttr)
+                        {
+                            const std::pair<std::size_t,std::size_t> range = byterangeAttr->unescapeQuotes().getByteRange();
+                            initSegment->setByteRange(range.first, range.first + range.second - 1);
+                        }
+                        segmentList->initialisationSegment.Set(initSegment);
+                    }
+                }
+            }
+            break;
+
             case Tag::EXTXDISCONTINUITY:
                 discontinuity  = true;
                 break;

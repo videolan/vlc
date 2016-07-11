@@ -55,7 +55,6 @@ namespace hls
                 virtual ~HLSSegment();
                 void setEncryption(SegmentEncryption &);
                 mtime_t getUTCTime() const;
-                void debug(vlc_object_t *, int) const; /* reimpl */
                 virtual int compare(ISegment *) const; /* reimpl */
 
             protected:

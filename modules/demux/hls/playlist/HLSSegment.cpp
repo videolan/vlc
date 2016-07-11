@@ -137,18 +137,6 @@ void HLSSegment::setEncryption(SegmentEncryption &enc)
     encryption = enc;
 }
 
-void HLSSegment::debug(vlc_object_t *obj, int indent) const
-{
-    std::stringstream ss;
-    ss.imbue(std::locale("C"));
-    ss << std::string(indent, ' ') << debugName <<
-    " #" << (getSequenceNumber() - Segment::SEQUENCE_FIRST) <<
-    " url=" << getUrlSegment().toString();
-    if(startByte!=endByte)
-        ss << " @" << startByte << ".." << endByte;
-    msg_Dbg(obj, "%s", ss.str().c_str());
-}
-
 int HLSSegment::compare(ISegment *segment) const
 {
     HLSSegment *hlssegment = dynamic_cast<HLSSegment *>(segment);

@@ -111,6 +111,11 @@ std::pair<int, int> Attribute::getResolution() const
     return std::make_pair(w, h);
 }
 
+Attribute Attribute::unescapeQuotes() const
+{
+    return Attribute(this->name, quotedString());
+}
+
 std::string Attribute::quotedString() const
 {
     if(value.length() < 2)

@@ -38,6 +38,7 @@ namespace hls
             public:
                 Attribute(const std::string &, const std::string &);
 
+                Attribute unescapeQuotes() const;
                 uint64_t decimal() const;
                 std::string quotedString() const;
                 double floatingPoint() const;
