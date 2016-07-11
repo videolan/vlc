@@ -38,6 +38,7 @@
 #include <vlc_demux.h>
 #include <vlc_threads.h>
 
+#include <algorithm>
 #include <ctime>
 
 using namespace adaptive::http;

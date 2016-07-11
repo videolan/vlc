@@ -29,6 +29,8 @@
 #include <vlc_common.h>
 #include <vlc_stream.h>
 
+#include <algorithm>
+
 using namespace adaptive::playlist;
 
 AbstractPlaylist::AbstractPlaylist (vlc_object_t *p_object_) :
