@@ -47,7 +47,6 @@ lua: lua-$(LUA_VERSION).tar.gz .sum-lua
 	$(APPLY) $(SRC)/lua/lua-noreadline.patch
 	$(APPLY) $(SRC)/lua/no-dylibs.patch
 	$(APPLY) $(SRC)/lua/no-localeconv.patch
-	$(APPLY) $(SRC)/lua/lua-android-log2.patch
 ifdef HAVE_DARWIN_OS
 	(cd $(UNPACK_DIR) && \
 	sed -e 's%gcc%$(CC)%' \
