@@ -1018,7 +1018,7 @@ AS_IF([test "${enable_optimizations}" != "no"], [
   AC_LANG_POP
 
 AH_BOTTOM([
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 # pragma fenv_access(off)
 # pragma fp_contract(on)
 #elif defined(__GNUC__)
