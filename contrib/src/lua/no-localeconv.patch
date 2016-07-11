@@ -1,12 +1,11 @@
---- lua/src/luaconf.h.orig	2016-03-16 15:53:05.433295367 +0100
-+++ lua/src/luaconf.h	2016-03-16 15:53:21.497295811 +0100
-@@ -654,7 +654,8 @@
- ** macro must include header 'locale.h'.)
+--- lua/src/llex.c.orig	2016-03-16 12:21:12.567664718 +0100
++++ lua/src/llex.c	2016-03-16 12:21:39.361675706 +0100
+@@ -226,7 +226,7 @@
  */
- #if !defined(lua_getlocaledecpoint)
--#define lua_getlocaledecpoint()		(localeconv()->decimal_point[0])
-+//#define lua_getlocaledecpoint()		(localeconv()->decimal_point[0])
-+#define lua_getlocaledecpoint()		'.'
- #endif
- 
- /* }================================================================== */
+ static void trydecpoint (LexState *ls, TValue *o) {
+   char old = ls->decpoint;
+-  ls->decpoint = lua_getlocaledecpoint();
++  //ls->decpoint = lua_getlocaledecpoint();
+   buffreplace(ls, old, ls->decpoint);  /* try new decimal separator */
+   if (luaO_str2num(luaZ_buffer(ls->buff), o) == 0) {
+     /* format error with correct decimal point: no more options */
