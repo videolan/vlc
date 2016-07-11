@@ -284,10 +284,10 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
                 if(ctx_byterange)
                 {
                     std::pair<std::size_t,std::size_t> range = ctx_byterange->getValue().getByteRange();
-                    if(range.first == 0)
+                    if(range.first == 0) /* first == size, second = offset */
                         range.first = prevbyterangeoffset;
                     prevbyterangeoffset = range.first + range.second;
-                    segment->setByteRange(range.first, prevbyterangeoffset);
+                    segment->setByteRange(range.first, prevbyterangeoffset - 1);
                     ctx_byterange = NULL;
                 }
 
