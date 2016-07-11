@@ -904,8 +904,8 @@ void matroska_segment_c::ComputeTrackPriority()
 
     for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {
-        tracks_map_t::key_type    track_id = it->first;
-        tracks_map_t::mapped_type track    = it->second;
+        tracks_map_t::key_type     track_id = it->first;
+        tracks_map_t::mapped_type& track    = it->second;
 
         if( unlikely( track.fmt.i_cat == UNKNOWN_ES || !track.psz_codec ) )
         {
