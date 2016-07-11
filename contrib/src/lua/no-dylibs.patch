@@ -1,27 +1,25 @@
---- lua/src/luaconf.h.orig	2016-03-16 12:10:53.502005950 +0100
-+++ lua/src/luaconf.h	2016-03-16 12:12:59.848535297 +0100
-@@ -53,21 +53,21 @@
- 
- 
- #if defined(LUA_USE_WINDOWS)
--#define LUA_DL_DLL	/* enable support for DLL */
-+//#define LUA_DL_DLL	/* enable support for DLL */
- #define LUA_USE_C89	/* broadly, Windows is C89 */
- #endif
- 
- 
- #if defined(LUA_USE_LINUX)
- #define LUA_USE_POSIX
--#define LUA_USE_DLOPEN		/* needs an extra library: -ldl */
-+//#define LUA_USE_DLOPEN		/* needs an extra library: -ldl */
- //#define LUA_USE_READLINE	/* needs some extra libraries */
- #endif
- 
+--- lua/src/luaconf.h.orig	2013-05-09 15:29:05.797554571 +0200
++++ lua/src/luaconf.h	2013-05-09 15:29:10.337554380 +0200
+@@ -42,7 +42,7 @@
  
  #if defined(LUA_USE_MACOSX)
  #define LUA_USE_POSIX
--#define LUA_USE_DLOPEN		/* MacOS does not need -ldl */
-+//#define LUA_USE_DLOPEN		/* MacOS does not need -ldl */
- #define LUA_USE_READLINE	/* needs an extra library: -lreadline */
+-#define LUA_DL_DYLD		/* does not need extra library */
++//#define LUA_DL_DYLD		/* does not need extra library */
  #endif
+ 
+ 
+@@ -691,11 +691,11 @@
+ ** By default, _WIN32 gets LUA_DL_DLL and MAC OS X gets LUA_DL_DYLD.
+ */
+ #if defined(LUA_USE_DLOPEN)
+-#define LUA_DL_DLOPEN
++//#define LUA_DL_DLOPEN
+ #endif
+ 
+ #if defined(LUA_WIN)
+-#define LUA_DL_DLL
++//#define LUA_DL_DLL
+ #endif
+ 
  
