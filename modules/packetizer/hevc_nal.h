@@ -182,4 +182,8 @@ bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
                            bool *p_full_range );
 bool hevc_get_slice_type( const hevc_slice_segment_header_t *, enum hevc_slice_type_e * );
 
+/* Get level and Profile from DecoderConfigurationRecord */
+bool hevc_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
+                            uint8_t *pi_level, uint8_t *pi_nal_length_size);
+
 #endif /* HEVC_NAL_H */

@@ -1173,3 +1173,23 @@ bool hevc_get_slice_type( const hevc_slice_segment_header_t *p_sli, enum hevc_sl
     }
     return false;
 }
+
+bool hevc_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
+                            uint8_t *pi_level, uint8_t *pi_nal_length_size)
+{
+    const uint8_t *p = (const uint8_t*)p_fmt->p_extra;
+    if(p_fmt->i_extra < 23 || p[0] != 1)
+        return false;
+
+    /* HEVCDecoderConfigurationRecord */
+    if(pi_profile)
+        *pi_profile = p[1] & 0x1F;
+
+    if(pi_level)
+        *pi_level = p[12];
+
+    if (pi_nal_length_size)
+        *pi_nal_length_size = 1 + (p[21]&0x03);
+
+    return true;
+}
