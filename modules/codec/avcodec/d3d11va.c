@@ -881,6 +881,27 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
 #endif
         }
 
+        D3D11_VIDEO_DECODER_DESC decoderDesc;
+        ZeroMemory(&decoderDesc, sizeof(decoderDesc));
+        decoderDesc.Guid = *input;
+        decoderDesc.SampleWidth = fmt->i_width;
+        decoderDesc.SampleHeight = fmt->i_height;
+        decoderDesc.OutputFormat = processorInput[idx];
+
+        UINT cfg_count = 0;
+        hr = ID3D11VideoDevice_GetVideoDecoderConfigCount( (ID3D11VideoDevice*) dx_sys->d3ddec, &decoderDesc, &cfg_count );
+        if (FAILED(hr))
+        {
+            msg_Err( va, "Failed to get configuration for decoder %s. (hr=0x%lX)", psz_decoder_name, hr );
+            continue;
+        }
+        if (cfg_count == 0) {
+            msg_Err( va, "No decoder configuration possible for %s %dx%d",
+                     DxgiFormatToStr(decoderDesc.OutputFormat),
+                     decoderDesc.SampleWidth, decoderDesc.SampleHeight );
+            continue;
+        }
+
         msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
         va->sys->render = processorInput[idx];
         free(psz_decoder_name);
