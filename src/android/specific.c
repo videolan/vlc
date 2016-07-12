@@ -25,6 +25,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_fs.h>
 #include "../libvlc.h"
 #include "config/configuration.h"
 
@@ -65,18 +66,43 @@ system_Configure(libvlc_int_t *p_libvlc, int i_argc, const char *const pp_argv[]
     var_SetAddress(p_libvlc, "android-jvm", s_jvm);
 }
 
+static char *config_GetHomeDir(const char *psz_dir, const char *psz_default_dir)
+{
+    char *psz_home = getenv("HOME");
+    if (psz_home == NULL)
+        goto fallback;
+
+    if (psz_dir == NULL)
+        return strdup(psz_home);
+
+    char *psz_fullpath;
+    if (asprintf(&psz_fullpath, "%s/%s", psz_home, psz_dir) == -1)
+        goto fallback;
+    if (vlc_mkdir(psz_fullpath, 0700) == -1 && errno != EEXIST)
+    {
+        free(psz_fullpath);
+        goto fallback;
+    }
+    return psz_fullpath;
+
+fallback:
+    return psz_default_dir != NULL ? strdup(psz_default_dir) : NULL;
+}
+
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
     {
         case VLC_DATA_DIR:
-            return strdup("/sdcard/Android/data/org.videolan.vlc");
+            return config_GetHomeDir(".share",
+                "/sdcard/Android/data/org.videolan.vlc");
         case VLC_CACHE_DIR:
-            return strdup("/sdcard/Android/data/org.videolan.vlc/cache");
-
+            return config_GetHomeDir(".cache",
+                "/sdcard/Android/data/org.videolan.vlc/cache");
         case VLC_HOME_DIR:
+            return config_GetHomeDir(NULL, NULL);
         case VLC_CONFIG_DIR:
-            return NULL;
+            return config_GetHomeDir(".config", NULL);
 
         case VLC_DESKTOP_DIR:
         case VLC_DOWNLOAD_DIR:
