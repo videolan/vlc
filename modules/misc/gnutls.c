@@ -426,10 +426,7 @@ static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
     {
         msg_Err(creds, "Certificate verification error: %s",
                 gnutls_strerror(val));
-error:
-        if (alp != NULL)
-            free(*alp);
-        return -1;
+        goto error;
     }
 
     if (status == 0) /* Good certificate */
@@ -535,6 +532,11 @@ error:
             goto error;
     }
     return 0;
+
+error:
+    if (alp != NULL)
+        free(*alp);
+    return -1;
 }
 
 /**
