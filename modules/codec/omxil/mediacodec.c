@@ -517,10 +517,10 @@ static int StartMediaCodec(decoder_t *p_dec)
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
          && !p_sys->u.video.i_h264_profile)
         {
-            h264_get_profile_level(&p_dec->fmt_in,
-                                   &p_sys->u.video.i_h264_profile, NULL, NULL);
-            if (p_sys->u.video.i_h264_profile)
+            uint8_t i_profile;
+            if(h264_get_profile_level(&p_dec->fmt_in, &i_profile, NULL, NULL))
             {
+                p_sys->u.video.i_h264_profile = i_profile;
                 if (p_sys->api->configure(p_sys->api,
                                           p_sys->u.video.i_h264_profile, 0, 0) != 0 )
                     return VLC_EGENERIC;
@@ -668,7 +668,12 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     api->psz_mime = mime;
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-        h264_get_profile_level(&p_dec->fmt_in, &i_h264_profile, NULL, NULL);
+    {
+        uint8_t i_profile;
+        if( h264_get_profile_level(&p_dec->fmt_in, &i_profile, NULL, NULL) )
+            i_h264_profile = i_profile;
+    }
+
     if (pf_init(api) != 0)
     {
         free(api);

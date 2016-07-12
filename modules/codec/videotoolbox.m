@@ -129,7 +129,7 @@ struct decoder_sys_t
 static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    size_t i_profile = 0xFFFF, i_level = 0xFFFF;
+    uint8_t i_profile = 0xFF, i_level = 0xFF;
     bool b_ret = false;
     CMVideoCodecType codec;
 
@@ -144,7 +144,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
                 return kCMVideoCodecType_H264;
             }
 
-            msg_Dbg(p_dec, "trying to decode MPEG-4 Part 10: profile %zu, level %zu", i_profile, i_level);
+            msg_Dbg(p_dec, "trying to decode MPEG-4 Part 10: profile %" PRIx8 ", level " PRIx8, i_profile, i_level);
 
             switch (i_profile) {
                 case PROFILE_H264_BASELINE:
@@ -160,7 +160,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 
                 default:
                 {
-                    msg_Dbg(p_dec, "unsupported H264 profile %zu", i_profile);
+                    msg_Dbg(p_dec, "unsupported H264 profile %" PRIx8, i_profile);
                     return -1;
                 }
             }
@@ -169,7 +169,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
             /* a level higher than 5.2 was not tested, so don't dare to
              * try to decode it*/
             if (i_level > 52) {
-                msg_Dbg(p_dec, "unsupported H264 level %zu", i_level);
+                msg_Dbg(p_dec, "unsupported H264 level %" PRIx8, i_level);
                 return -1;
             }
 #else
@@ -177,7 +177,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
             if (i_level > 42) {
                 /* on Twister, we can do up to 5.2 */
                 if (!deviceSupportsAdvancedLevels() || i_level > 52) {
-                    msg_Dbg(p_dec, "unsupported H264 level %zu", i_level);
+                    msg_Dbg(p_dec, "unsupported H264 level %" PRIx8, i_level);
                     return -1;
                 }
             }

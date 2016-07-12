@@ -628,32 +628,38 @@ bool h264_get_chroma_luma( const h264_sequence_parameter_set_t *p_sps, uint8_t *
     return true;
 }
 
-bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
-                            size_t *p_level, uint8_t *pi_nal_length_size)
+bool h264_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
+                            uint8_t *pi_level, uint8_t *pi_nal_length_size)
 {
     uint8_t *p = (uint8_t*)p_fmt->p_extra;
-    if(!p || !p_fmt->p_extra) return false;
+    if(p_fmt->i_extra < 8)
+        return false;
 
     /* Check the profile / level */
-    if (p_fmt->i_original_fourcc == VLC_FOURCC('a','v','c','1') && p[0] == 1)
+    if (p[0] == 1 && p_fmt->i_extra >= 12)
     {
-        if (p_fmt->i_extra < 12) return false;
-        if (pi_nal_length_size) *pi_nal_length_size = 1 + (p[4]&0x03);
-        if (!(p[5]&0x1f)) return false;
+        if (pi_nal_length_size)
+            *pi_nal_length_size = 1 + (p[4]&0x03);
         p += 8;
     }
-    else
+    else if(!p[0] && !p[1]) /* FIXME: WTH is setting AnnexB data here ? */
     {
-        if (p_fmt->i_extra < 8) return false;
-        if (!p[0] && !p[1] && !p[2] && p[3] == 1) p += 4;
-        else if (!p[0] && !p[1] && p[2] == 1) p += 3;
-        else return false;
+        if (!p[2] && p[3] == 1)
+            p += 4;
+        else if (p[2] == 1)
+            p += 3;
+        else
+            return false;
     }
+    else return false;
 
     if ( ((*p++)&0x1f) != 7) return false;
 
-    /* Get profile/level out of first SPS */
-    if (p_profile) *p_profile = p[0];
-    if (p_level) *p_level = p[2];
+    if (pi_profile)
+        *pi_profile = p[0];
+
+    if (pi_level)
+        *pi_level = p[2];
+
     return true;
 }

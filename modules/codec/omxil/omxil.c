@@ -174,7 +174,7 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
-    size_t i_profile = 0xFFFF, i_level = 0xFFFF;
+    uint8_t i_profile = 0xFF, i_level = 0xFF;
 
     /* Try to find out the profile of the video */
     if(p_fmt->i_cat == VIDEO_ES && def->eDir == OMX_DirInput &&
@@ -187,7 +187,7 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
            p_fmt->i_codec == VLC_CODEC_H264 &&
            (i_profile != PROFILE_H264_BASELINE || i_level > 30))
         {
-            msg_Dbg(p_dec, "h264 profile/level not supported (0x%x, 0x%x)",
+            msg_Dbg(p_dec, "h264 profile/level not supported (0x" PRIx8 ", 0x" PRIx8 ")",
                     i_profile, i_level);
             return OMX_ErrorNotImplemented;
         }

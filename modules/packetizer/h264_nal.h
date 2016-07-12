@@ -180,8 +180,8 @@ bool h264_get_picture_size( const h264_sequence_parameter_set_t *, unsigned *p_w
 bool h264_get_chroma_luma( const h264_sequence_parameter_set_t *, uint8_t *pi_chroma_format,
                            uint8_t *pi_depth_luma, uint8_t *pi_depth_chroma );
 
-/* Get level and Profile */
-bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
-                            size_t *p_level, uint8_t *p_nal_length_size);
+/* Get level and Profile from DecoderConfigurationRecord */
+bool h264_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
+                            uint8_t *pi_level, uint8_t *p_nal_length_size);
 
 #endif /* H264_NAL_H */

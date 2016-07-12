@@ -490,7 +490,7 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
         int profile = fmt->i_profile;
         if (mode->codec == AV_CODEC_ID_H264)
         {
-            size_t h264_profile;
+            uint8_t h264_profile;
             if ( h264_get_profile_level(fmt, &h264_profile, NULL, NULL) )
                 profile = h264_profile;
         }
