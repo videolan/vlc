@@ -100,6 +100,19 @@ VLC_API char *vlc_uri_decode_duplicate(const char *str) VLC_MALLOC;
  */
 VLC_API char *vlc_uri_encode(const char *str) VLC_MALLOC;
 
+/**
+ * Fixes up a URI string.
+ *
+ * Attempts to convert a nul-terminated string into a syntactically valid URI.
+ * If the string is, or may be, a syntactically valid URI, an exact copy is
+ * returned. In any case, the result will only contain URI-safe and URI
+ * delimiter characters (generic delimiters or sub-delimiters) and all percent
+ * signs will be followed by two hexadecimal characters.
+ *
+ * @return a heap-allocated string, or NULL if on out of memory.
+ */
+VLC_API char *vlc_uri_fixup(const char *) VLC_MALLOC;
+
 /** @} */
 
 struct vlc_url_t

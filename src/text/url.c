@@ -24,11 +24,15 @@
 #endif
 
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #ifdef _WIN32
 # include <io.h>
+#endif
+#ifndef HAVE_OPEN_MEMSTREAM
+# define open_memstream(b,l) (*(b) = NULL, *(l) = 0, NULL)
 #endif
 
 #include <vlc_common.h>
@@ -480,6 +484,42 @@ void vlc_UrlClean (vlc_url_t *restrict url)
 {
     free (url->psz_host);
     free (url->psz_buffer);
+}
+
+char *vlc_uri_fixup(const char *str)
+{
+    /* Rule number one is do not change a (potentially) valid URI */
+    if (vlc_uri_component_validate(str, ":/?#[]@"))
+        return strdup(str);
+
+    bool encode_percent = false;
+    for (size_t i = 0; str[i] != '\0'; i++)
+        if (str[i] == '%' && !(isurihex(str[i+1]) && isurihex(str[i+2])))
+        {
+            encode_percent = true;
+            break;
+        }
+
+    char *buf;
+    size_t len;
+    FILE *stream = open_memstream(&buf, &len);
+    if (stream == NULL)
+        return NULL;
+
+    for (size_t i = 0; str[i] != '\0'; i++)
+    {
+        unsigned char c = str[i];
+
+        if (isurisafe(c) || isurisubdelim(c) || (strchr(":/?#[]@", c) != NULL)
+         || (c == '%' && !encode_percent))
+            fputc(c, stream);
+        else
+            fprintf(stream, "%%%02hhX", c);
+    }
+
+    if (fclose(stream))
+        buf = NULL;
+    return buf;
 }
 
 #if defined (HAVE_IDN)
