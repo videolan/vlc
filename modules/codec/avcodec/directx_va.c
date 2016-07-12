@@ -40,6 +40,7 @@
 
 #include "avcodec.h"
 #include "../../packetizer/h264_nal.h"
+#include "../../packetizer/hevc_nal.h"
 
 static const int PROF_MPEG2_SIMPLE[] = { FF_PROFILE_MPEG2_SIMPLE, 0 };
 static const int PROF_MPEG2_MAIN[]   = { FF_PROFILE_MPEG2_SIMPLE,
@@ -497,6 +498,12 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
             uint8_t h264_profile;
             if ( h264_get_profile_level(fmt, &h264_profile, NULL, NULL) )
                 profile = h264_profile;
+        }
+        if (mode->codec == AV_CODEC_ID_HEVC)
+        {
+            uint8_t hevc_profile;
+            if (hevc_get_profile_level(fmt, &hevc_profile, NULL, NULL) )
+                profile = hevc_profile;
         }
 
         if (profile <= 0)
