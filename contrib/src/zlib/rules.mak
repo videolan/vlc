@@ -14,7 +14,7 @@ endif
 endif
 
 $(TARBALLS)/zlib-$(ZLIB_VERSION).tar.gz:
-	$(call download,$(ZLIB_URL))
+	$(call download_pkg,$(ZLIB_URL),zlib)
 
 .sum-zlib: zlib-$(ZLIB_VERSION).tar.gz
 

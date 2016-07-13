@@ -9,7 +9,7 @@ PKGS_FOUND += zvbi
 endif
 
 $(TARBALLS)/zvbi-$(ZVBI_VERSION).tar.bz2:
-	$(call download,$(ZVBI_URL))
+	$(call download_pkg,$(ZVBI_URL),zvbi)
 
 .sum-zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 

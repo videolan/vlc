@@ -7,7 +7,7 @@ PKGS += upnp
 endif
 
 $(TARBALLS)/libupnp-$(UPNP_VERSION).tar.bz2:
-	$(call download,$(UPNP_URL))
+	$(call download_pkg,$(UPNP_URL),upnp)
 
 .sum-upnp: libupnp-$(UPNP_VERSION).tar.bz2
 

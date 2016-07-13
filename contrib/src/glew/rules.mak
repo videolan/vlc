@@ -3,7 +3,7 @@ GLEW_VERSION := 1.7.0
 GLEW_URL := $(SF)/glew/glew/$(GLEW_VERSION)/glew-$(GLEW_VERSION).tgz
 
 $(TARBALLS)/glew-$(GLEW_VERSION).tar.gz:
-	$(call download,$(GLEW_URL))
+	$(call download_pkg,$(GLEW_URL),glew)
 
 .sum-glew: glew-$(GLEW_VERSION).tar.gz
 
