@@ -30,6 +30,7 @@ endif
 endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
+	$(APPLY) $(SRC)/gnutls/gnutls-android.patch
 endif
 	$(APPLY) $(SRC)/gnutls/read-file-limits.h.patch
 	$(APPLY) $(SRC)/gnutls/mac-keychain-lookup.patch

@@ -1,0 +1,11 @@
+--- gnutls.old/gl/secure_getenv.c	2016-07-13 16:36:42.095099707 +0200
++++ gnutls/gl/secure_getenv.c	2016-07-13 16:43:29.440899856 +0200
+@@ -24,7 +24,7 @@
+ #  include <unistd.h>
+ # else
+ #  undef issetugid
+-#  ifdef _WIN32
++#  if defined (_WIN32) || defined(__ANDROID__)
+ #   define issetugid() 0
+ #  else
+ #   define issetugid() 1
