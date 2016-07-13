@@ -230,6 +230,7 @@ int timespec_get(struct timespec *, int);
 
 /* sys/time.h */
 #ifndef HAVE_GETTIMEOFDAY
+struct timezone;
 int gettimeofday(struct timeval *, struct timezone *);
 #endif
 
