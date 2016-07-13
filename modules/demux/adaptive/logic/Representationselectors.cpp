@@ -66,10 +66,19 @@ BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet,
     /* subset matching WxH */
     std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
     std::vector<BaseRepresentation *>::const_iterator repIt;
-    for(repIt=reps.begin(); repIt!=reps.end(); ++repIt)
+
+    if(width != 0 || height != 0)
     {
-        if((*repIt)->getWidth() == width && (*repIt)->getHeight() == height)
+        for(repIt=reps.begin(); repIt!=reps.end(); ++repIt)
+        {
+            if(width && (*repIt)->getWidth() != width)
+                continue;
+
+            if(height && (*repIt)->getHeight() != height)
+                continue;
+
             resMatchReps.push_back(*repIt);
+        }
     }
 
     if(resMatchReps.empty())
