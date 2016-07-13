@@ -94,8 +94,8 @@ vlc_module_begin ()
         add_integer( "adaptive-logic",  AbstractAdaptationLogic::Default,
                                           ADAPT_LOGIC_TEXT, NULL, false )
             change_integer_list( pi_logics, ppsz_logics )
-        add_integer( "adaptive-width",  480, ADAPT_WIDTH_TEXT,  ADAPT_WIDTH_TEXT,  true )
-        add_integer( "adaptive-height", 360, ADAPT_HEIGHT_TEXT, ADAPT_HEIGHT_TEXT, true )
+        add_integer( "adaptive-width",  0, ADAPT_WIDTH_TEXT,  ADAPT_WIDTH_TEXT,  true )
+        add_integer( "adaptive-height", 0, ADAPT_HEIGHT_TEXT, ADAPT_HEIGHT_TEXT, true )
         add_integer( "adaptive-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT,     false )
         add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT, true );
         set_callbacks( Open, Close )
