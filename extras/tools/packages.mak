@@ -4,7 +4,6 @@ SF= http://downloads.sourceforge.net/project
 VIDEOLAN=http://downloads.videolan.org/pub/contrib
 
 YASM_VERSION=1.2.0
-#YASM_URL=$(VIDEOLAN)/yasm-$(YASM_VERSION).tar.gz
 YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
 
 CMAKE_VERSION=3.4.3
@@ -23,7 +22,6 @@ M4_VERSION=1.4.16
 M4_URL=$(GNU)/m4/m4-$(M4_VERSION).tar.gz
 
 PKGCFG_VERSION=0.28-1
-#PKGCFG_URL=http://downloads.videolan.org/pub/videolan/testing/contrib/pkg-config-$(PKGCFG_VERSION).tar.gz
 PKGCFG_URL=$(SF)/pkgconfiglite/$(PKGCFG_VERSION)/pkg-config-lite-$(PKGCFG_VERSION).tar.gz
 
 TAR_VERSION=1.26
@@ -42,7 +40,7 @@ SED_VERSION=4.2.2
 SED_URL=$(GNU)/sed/sed-$(SED_VERSION).tar.bz2
 
 ANT_VERSION=1.9.7
-ANT_URL=$(VIDEOLAN)/apache-ant-$(ANT_VERSION)-bin.tar.bz2
+ANT_URL=$(APACHE)/ant/binaries/apache-ant-$(ANT_VERSION)-bin.tar.bz2
 
 PROTOBUF_VERSION := 2.6.1
 PROTOBUF_URL := https://github.com/google/protobuf/releases/download/v$(PROTOBUF_VERSION)/protobuf-$(PROTOBUF_VERSION).tar.bz2
