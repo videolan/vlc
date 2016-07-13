@@ -38,15 +38,6 @@ void stream_CommonDelete( stream_t *s );
 stream_t *stream_AccessNew(vlc_object_t *, input_thread_t *, bool, const char *);
 
 /**
- * This function creates a new stream_t filter.
- *
- * You must release it using stream_Delete unless it is used as a
- * source to another filter.
- */
-stream_t *stream_FilterNew( stream_t *p_source,
-                            const char *psz_stream_filter );
-
-/**
  * Automatically wraps a stream with any applicable stream filter.
  * @return the (outermost/downstream) stream filter; if no filters were added,
  * then the function return the source parameter.
