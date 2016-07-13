@@ -186,6 +186,7 @@ static int          EsOutSetRecord(  es_out_t *, bool b_record );
 
 static bool EsIsSelected( es_out_id_t *es );
 static void EsSelect( es_out_t *out, es_out_id_t *es );
+static void EsDeleteInfo( es_out_t *, es_out_id_t *es );
 static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update );
 static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es );
 static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_date );
@@ -3109,4 +3110,17 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     }
     /* */
     input_Control( p_input, INPUT_REPLACE_INFOS, p_cat );
+}
+
+static void EsDeleteInfo( es_out_t *out, es_out_id_t *es )
+{
+    char* psz_info_category;
+
+    if( likely( psz_info_category = EsInfoCategoryName( es ) ) )
+    {
+        input_Control( out->p_sys->p_input, INPUT_DEL_INFO,
+          psz_info_category, NULL );
+
+        free( psz_info_category );
+    }
 }
