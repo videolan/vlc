@@ -554,7 +554,8 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys, const
         {
             is_supported = profile_supported( mode, fmt );
             if (!is_supported)
-                msg_Warn( va, "Unsupported profile for HWAccel: %d", fmt->i_profile );
+                msg_Warn( va, "Unsupported profile %d for %s ",
+                          fmt->i_profile, directx_va_GetDecoderName(mode->guid) );
         }
         if (!is_supported)
             continue;
