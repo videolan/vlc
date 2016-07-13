@@ -639,7 +639,8 @@ bool matroska_segment_c::Preload( )
             IndexAppendCluster( cluster );
 
             // add first cluster as trusted seekpoint for all tracks
-            for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
+            for( tracks_map_t::const_iterator it = tracks.begin();
+                 it != tracks.end(); ++it )
             {
                 _seeker.add_seekpoint( it->first, SegmentSeeker::Seekpoint::TRUSTED,
                   cluster->GetElementPosition(), 0 );
@@ -828,7 +829,7 @@ void matroska_segment_c::Seek( mtime_t i_absolute_mk_date, mtime_t i_mk_time_off
 
     // initialize seek information in order to set up playback //
 
-    for( SegmentSeeker::tracks_seekpoint_t::iterator it = seekpoints.begin(); it != seekpoints.end(); ++it )
+    for( SegmentSeeker::tracks_seekpoint_t::const_iterator it = seekpoints.begin(); it != seekpoints.end(); ++it )
     {
         mkv_track_t& track = tracks[ it->first ];
 
@@ -889,9 +890,10 @@ void matroska_segment_c::ComputeTrackPriority()
     bool b_has_default_video = false;
     bool b_has_default_audio = false;
     /* check for default */
-    for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
+    for( tracks_map_t::const_iterator it = tracks.begin(); it != tracks.end();
+         ++it )
     {
-        tracks_map_t::mapped_type& track = it->second;
+        const tracks_map_t::mapped_type& track = it->second;
 
         bool flag = track.b_enabled && ( track.b_default || track.b_forced );
 
