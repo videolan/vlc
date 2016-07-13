@@ -44,6 +44,7 @@ M3U8::~M3U8()
 
 bool M3U8::isLive() const
 {
+    bool b_live = false;
     std::vector<BasePeriod *>::const_iterator itp;
     for(itp = periods.begin(); itp != periods.end(); ++itp)
     {
@@ -56,13 +57,18 @@ bool M3U8::isLive() const
             for(itr = adaptSet->getRepresentations().begin(); itr != adaptSet->getRepresentations().end(); ++itr)
             {
                 const Representation *rep = dynamic_cast<const Representation *>(*itr);
-                if(rep->initialized() && rep->isLive())
-                    return true;
+                if(rep->initialized())
+                {
+                    if(rep->isLive())
+                        b_live = true;
+                    else
+                        return false; /* Any non live has higher priority */
+                }
             }
         }
     }
 
-    return false;
+    return b_live;
 }
 
 void M3U8::debug()
