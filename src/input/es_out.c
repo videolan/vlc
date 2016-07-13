@@ -199,6 +199,7 @@ static char **LanguageSplit( const char *psz_langs, bool b_default_any );
 static int LanguageArrayIndex( char **ppsz_langs, const char *psz_lang );
 
 static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm );
+static char *EsInfoCategoryName( es_out_id_t* es );
 
 static const vlc_fourcc_t EsOutFourccClosedCaptions[4] = {
     VLC_FOURCC('c', 'c', '1', ' '),
@@ -1155,6 +1156,16 @@ static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm )
             return NULL;
     }
     return psz;
+}
+
+static char *EsInfoCategoryName( es_out_id_t* es )
+{
+    char *psz_category;
+
+    if( asprintf( &psz_category, _("Stream %d"), es->i_meta_id ) == -1 )
+        return NULL;
+
+    return psz_category;
 }
 
 static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_meta )
