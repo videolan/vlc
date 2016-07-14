@@ -274,7 +274,7 @@ AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
 
     if(!demuxer)
     {
-        format = segmentTracker->initialFormat();
+        format = segmentTracker->getCurrentFormat();
         if(!startDemux())
         {
             /* If demux fails because of probing failure / wrong format*/

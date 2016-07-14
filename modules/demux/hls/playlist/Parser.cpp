@@ -73,37 +73,6 @@ static void releaseTagsList(std::list<Tag *> &list)
     list.clear();
 }
 
-void M3U8Parser::setFormatFromCodecs(Representation *rep, const std::string codecsstring)
-{
-    std::list<std::string> codecs;
-    std::list<std::string> tokens = Helper::tokenize(codecsstring, ',');
-    std::list<std::string>::const_iterator it;
-    for(it=tokens.begin(); it!=tokens.end(); ++it)
-    {
-        /* Truncate init data */
-        std::size_t pos = (*it).find_first_of('.', 0);
-        if(pos != std::string::npos)
-            codecs.push_back((*it).substr(0, pos));
-        else
-            codecs.push_back(*it);
-    }
-
-    if(!codecs.empty())
-    {
-        if(codecs.size() == 1)
-        {
-            std::string codec = codecs.front();
-            transform(codec.begin(), codec.end(), codec.begin(), (int (*)(int))std::tolower);
-            if(codec == "mp4a")
-                rep->streamFormat = StreamFormat(StreamFormat::PACKEDAAC);
-        }
-        else
-        {
-            rep->streamFormat = StreamFormat(StreamFormat::MPEG2TS);
-        }
-    }
-}
-
 void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &filename)
 {
     std::size_t pos = filename.find_last_of('.');
@@ -115,9 +84,13 @@ void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &
         {
             rep->streamFormat = StreamFormat(StreamFormat::PACKEDAAC);
         }
-        else if(extension == "ts" || extension == "mp2t" || extension == "mpeg")
+        else if(extension == "ts" || extension == "mp2t" || extension == "mpeg" || extension == "m2ts")
         {
             rep->streamFormat = StreamFormat(StreamFormat::MPEG2TS);
+        }
+        else
+        {
+            rep->streamFormat = StreamFormat(StreamFormat::UNSUPPORTED);
         }
     }
 }
@@ -126,7 +99,6 @@ Representation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, c
 {
     const Attribute *uriAttr = tag->getAttributeByName("URI");
     const Attribute *bwAttr = tag->getAttributeByName("BANDWIDTH");
-    const Attribute *codecsAttr = tag->getAttributeByName("CODECS");
     const Attribute *resAttr = tag->getAttributeByName("RESOLUTION");
 
     Representation *rep = new (std::nothrow) Representation(adaptSet);
@@ -155,9 +127,6 @@ Representation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, c
 
         if(bwAttr)
             rep->setBandwidth(bwAttr->decimal());
-
-        if(codecsAttr)
-            setFormatFromCodecs(rep, codecsAttr->quotedString());
 
         if(resAttr)
         {

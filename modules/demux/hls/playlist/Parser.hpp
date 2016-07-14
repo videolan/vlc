@@ -63,7 +63,6 @@ namespace hls
                 void createAndFillRepresentation(vlc_object_t *, BaseAdaptationSet *,
                                                  const AttributesTag *, const std::list<Tag *>&);
                 void parseSegments(vlc_object_t *, Representation *, const std::list<Tag *>&);
-                void setFormatFromCodecs(Representation *, const std::string);
                 void setFormatFromExtension(Representation *rep, const std::string &);
                 std::list<Tag *> parseEntries(stream_t *);
         };

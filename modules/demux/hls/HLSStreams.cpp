@@ -58,9 +58,6 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
     AbstractDemuxer *ret = NULL;
     switch((unsigned)format)
     {
-        case StreamFormat::UNKNOWN:
-            ret = new Demuxer(p_realdemux, "any", fakeesout->getEsOut(), demuxersource);
-            break;
 
         case StreamFormat::PACKEDAAC:
             ret = new Demuxer(p_realdemux, "avformat", fakeesout->getEsOut(), demuxersource);
