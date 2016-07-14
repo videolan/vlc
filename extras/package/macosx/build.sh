@@ -25,6 +25,7 @@ OPTIONS:
    -h            Show some help
    -q            Be quiet
    -r            Rebuild everything (tools, contribs, vlc)
+   -c            Recompile contribs from sources
    -k <sdk>      Use the specified sdk (default: $SDKROOT)
    -a <arch>     Use the specified arch (default: $ARCH)
 EOF
@@ -41,7 +42,7 @@ spopd()
     popd > /dev/null
 }
 
-while getopts "hvrk:a:" OPTION
+while getopts "hvrck:a:" OPTION
 do
      case $OPTION in
          h)
@@ -54,6 +55,9 @@ do
          ;;
          r)
              REBUILD="yes"
+         ;;
+         c)
+             CONTRIBFROMSOURCE="yes"
          ;;
          a)
              ARCH=$OPTARG
@@ -123,8 +127,13 @@ mkdir -p contrib-$TRIPLET && cd contrib-$TRIPLET
 if [ "$REBUILD" = "yes" ]; then
     make clean
 fi
+if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
+    make fetch
+    make
+else
 if [ ! -e "../$TRIPLET" ]; then
     make prebuilt > $out
+fi
 fi
 spopd
 
