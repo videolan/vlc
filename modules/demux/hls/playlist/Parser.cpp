@@ -88,6 +88,10 @@ void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &
         {
             rep->streamFormat = StreamFormat(StreamFormat::MPEG2TS);
         }
+        else if(extension == "mp4" || extension == "m4s" || extension == "mov" || extension == "m4v")
+        {
+            rep->streamFormat = StreamFormat(StreamFormat::MP4);
+        }
         else
         {
             rep->streamFormat = StreamFormat(StreamFormat::UNSUPPORTED);

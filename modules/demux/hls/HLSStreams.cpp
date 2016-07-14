@@ -67,6 +67,10 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
             ret = new Demuxer(p_realdemux, "ts", fakeesout->getEsOut(), demuxersource);
             break;
 
+        case StreamFormat::MP4:
+            ret = new Demuxer(p_realdemux, "mp4", fakeesout->getEsOut(), demuxersource);
+            break;
+
         default:
         case StreamFormat::UNSUPPORTED:
             break;
