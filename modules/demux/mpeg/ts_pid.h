@@ -29,6 +29,7 @@
 typedef enum
 {
     TYPE_FREE = 0,
+    TYPE_CAT,
     TYPE_PAT,
     TYPE_PMT,
     TYPE_PES,

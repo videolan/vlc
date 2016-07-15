@@ -145,6 +145,9 @@ bool PIDSetup( demux_t *p_demux, ts_pid_type_t i_type, ts_pid_t *pid, ts_pid_t *
             PIDReset( pid );
             return true;
 
+        case TYPE_CAT:
+            return true;
+
         case TYPE_PAT:
             PIDReset( pid );
             pid->u.p_pat = ts_pat_New( p_demux );
@@ -226,6 +229,9 @@ void PIDRelease( demux_t *p_demux, ts_pid_t *pid )
         default:
         case TYPE_FREE: /* nonsense ?*/
             assert( pid->type != TYPE_FREE );
+            break;
+
+        case TYPE_CAT:
             break;
 
         case TYPE_PAT:

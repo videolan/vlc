@@ -94,6 +94,7 @@ struct demux_sys_t
     csa_t       *csa;
     int         i_csa_pkt_size;
     bool        b_split_es;
+    bool        b_valid_scrambling;
 
     bool        b_trust_pcr;
 

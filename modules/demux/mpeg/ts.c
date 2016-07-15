@@ -627,6 +627,8 @@ static int Demux( demux_t *p_demux )
             if( p_pid->type == TYPE_FREE )
                 msg_Dbg( p_demux, "pid[%d] unknown", p_pid->i_pid );
             p_pid->i_flags |= FLAG_SEEN;
+            if( p_pid->i_pid == 0x01 )
+                p_sys->b_valid_scrambling = true;
         }
 
         /* Adaptation field cannot be scrambled */
@@ -634,7 +636,7 @@ static int Demux( demux_t *p_demux )
         if( i_pcr > VLC_TS_INVALID )
             PCRHandle( p_demux, p_pid, i_pcr );
 
-        if ( SCRAMBLED(*p_pid) && !p_demux->p_sys->csa )
+        if ( SCRAMBLED(*p_pid) && !p_demux->p_sys->csa && p_sys->b_valid_scrambling )
         {
             block_Release( p_pkt );
             continue;
@@ -688,6 +690,7 @@ static int Demux( demux_t *p_demux )
             block_Release( p_pkt );
             break;
 
+        case TYPE_CAT:
         default:
             /* We have to handle PCR if present */
             block_Release( p_pkt );
@@ -1236,14 +1239,24 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
         return;
     }
 
-    if( (p_pes->i_flags & BLOCK_FLAG_SCRAMBLED) ||
-         header[0] != 0 || header[1] != 0 || header[2] != 1 )
+    if( (p_pes->i_flags & BLOCK_FLAG_SCRAMBLED) && p_demux->p_sys->b_valid_scrambling )
+    {
+        block_ChainRelease( p_pes );
+        return;
+    }
+
+    if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
         if ( !(p_pes->i_flags & BLOCK_FLAG_SCRAMBLED) )
             msg_Warn( p_demux, "invalid header [0x%02x:%02x:%02x:%02x] (pid: %d)",
                         header[0], header[1],header[2],header[3], pid->i_pid );
         block_ChainRelease( p_pes );
         return;
+    }
+    else
+    {
+        /* Incorrect transport scrambling flag set by german boxes */
+        p_pes->i_flags &= ~BLOCK_FLAG_SCRAMBLED;
     }
 
     ts_pes_es_t *p_es = pid->u.p_pes->p_es;
@@ -2284,7 +2297,7 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
             csa_Decrypt( p_demux->p_sys->csa, p_pkt->p_buffer, p_demux->p_sys->i_csa_pkt_size );
             vlc_mutex_unlock( &p_demux->p_sys->csa_lock );
         }
-        else
+        else if( p_demux->p_sys->b_valid_scrambling )
         {
             p_pkt->i_flags |= BLOCK_FLAG_SCRAMBLED;
         }
@@ -2359,16 +2372,12 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
         return i_ret;
     }
 
-    if( p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED )
-    {
-        block_Release( p_pkt );
-        return VLC_DEMUXER_SUCCESS;
-    }
-    else if( pid->u.p_pes->transport == TS_TRANSPORT_PES )
+    if( pid->u.p_pes->transport == TS_TRANSPORT_PES )
     {
         return GatherPESData( p_demux, pid, p_pkt, i_skip, b_unit_start );
     }
-    else if( pid->u.p_pes->transport == TS_TRANSPORT_SECTIONS )
+    else if( pid->u.p_pes->transport == TS_TRANSPORT_SECTIONS &&
+            !(p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) )
     {
         ts_sections_processor_Push( pid->u.p_pes->p_sections_proc, p_pkt );
         return VLC_DEMUXER_SUCCESS;
