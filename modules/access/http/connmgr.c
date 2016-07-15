@@ -34,6 +34,27 @@
 
 #pragma GCC visibility push(default)
 
+static char *vlc_http_proxy_find(const char *hostname, unsigned port,
+                                 bool secure)
+{
+    const char *fmt;
+    char *url, *proxy = NULL;
+    int canc = vlc_savecancel();
+
+    if (strchr(hostname, ':') != NULL)
+        fmt = port ? "http%s://[%s]:%u" : "http%s://[%s]";
+    else
+        fmt = port ? "http%s://%s:%u" : "http%s://%s";
+
+    if (likely(asprintf(&url, fmt, secure ? "s" : "", hostname, port) >= 0))
+    {
+        proxy = vlc_getProxyUrl(url);
+        free(url);
+    }
+    vlc_restorecancel(canc);
+    return proxy;
+}
+
 struct vlc_https_connecting
 {
     vlc_tls_creds_t *creds;
@@ -43,32 +64,12 @@ struct vlc_https_connecting
     vlc_sem_t done;
 };
 
-static char *vlc_https_proxy_find(const char *hostname, unsigned port)
-{
-    const char *fmt;
-    char *url, *proxy = NULL;
-    int canc = vlc_savecancel();
-
-    if (strchr(hostname, ':') != NULL)
-        fmt = port ? "https://[%s]:%u" : "https://[%s]";
-    else
-        fmt = port ? "https://%s:%u" : "https://%s";
-
-    if (likely(asprintf(&url, fmt, hostname, port) >= 0))
-    {
-        proxy = vlc_getProxyUrl(url);
-        free(url);
-    }
-    vlc_restorecancel(canc);
-    return proxy;
-}
-
 static void *vlc_https_connect_thread(void *data)
 {
     struct vlc_https_connecting *c = data;
     vlc_tls_t *tls;
 
-    char *proxy = vlc_https_proxy_find(c->host, c->port);
+    char *proxy = vlc_http_proxy_find(c->host, c->port, true);
     if (proxy != NULL)
     {
         tls = vlc_https_connect_proxy(c->creds, c->host, c->port, c->http2,
