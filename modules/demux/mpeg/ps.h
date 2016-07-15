@@ -423,10 +423,14 @@ static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int 
     mtime_t i_pts = -1;
     mtime_t i_dts = -1;
     uint8_t i_stream_id = 0;
+    bool b_pes_scrambling = false;
 
     if( ParsePESHeader( p_object, p_pes->p_buffer, p_pes->i_buffer,
-                        &i_skip, &i_dts, &i_pts, &i_stream_id ) != VLC_SUCCESS )
+                        &i_skip, &i_dts, &i_pts, &i_stream_id, &b_pes_scrambling ) != VLC_SUCCESS )
         return VLC_EGENERIC;
+
+    if( b_pes_scrambling )
+        p_pes->i_flags |= BLOCK_FLAG_SCRAMBLED;
 
     if( i_skip_extra >= 0 )
         i_skip += i_skip_extra;

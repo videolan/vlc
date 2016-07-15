@@ -1228,6 +1228,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     mtime_t i_pts = -1;
     mtime_t i_length = 0;
     uint8_t i_stream_id;
+    bool b_pes_scrambling = false;
     const es_mpeg4_descriptor_t *p_mpeg4desc = NULL;
 
     assert(pid->type == TYPE_PES);
@@ -1262,7 +1263,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     ts_pes_es_t *p_es = pid->u.p_pes->p_es;
 
     if( ParsePESHeader( VLC_OBJECT(p_demux), (uint8_t*)&header, i_max, &i_skip,
-                        &i_dts, &i_pts, &i_stream_id ) == VLC_EGENERIC )
+                        &i_dts, &i_pts, &i_stream_id, &b_pes_scrambling ) == VLC_EGENERIC )
     {
         block_ChainRelease( p_pes );
         return;
@@ -1273,6 +1274,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
             i_pts = TimeStampWrapAround( p_es->p_program->pcr.i_first, i_pts );
         if( i_dts != -1 && p_es->p_program )
             i_dts = TimeStampWrapAround( p_es->p_program->pcr.i_first, i_dts );
+        if( b_pes_scrambling )
+            p_pes->i_flags |= BLOCK_FLAG_SCRAMBLED;
     }
 
     if( p_es->i_sl_es_id )
@@ -1829,7 +1832,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
                     uint8_t i_stream_id;
                     if ( VLC_SUCCESS == ParsePESHeader( VLC_OBJECT(p_demux), &p_pkt->p_buffer[i_skip],
                                                         p_pkt->i_buffer - i_skip, &i_skip,
-                                                        &i_dts, &i_pts, &i_stream_id ) )
+                                                        &i_dts, &i_pts, &i_stream_id, NULL ) )
                     {
                         if( i_dts > -1 )
                             i_pcr = i_dts;
@@ -1911,7 +1914,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
 
                 if ( VLC_SUCCESS == ParsePESHeader( VLC_OBJECT(p_demux), &p_pkt->p_buffer[i_skip],
                                                     p_pkt->i_buffer - i_skip, &i_skip,
-                                                    &i_dts, &i_pts, &i_stream_id ) )
+                                                    &i_dts, &i_pts, &i_stream_id, NULL ) )
                 {
                     if( i_dts != -1 )
                         *pi_pcr = i_dts;
@@ -2121,7 +2124,7 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
         uint8_t i_stream_id;
 
         if( ParsePESHeader( VLC_OBJECT(p_demux), (uint8_t*)&header, i_max, &i_skip,
-                            &i_dts, &i_pts, &i_stream_id ) == VLC_EGENERIC )
+                            &i_dts, &i_pts, &i_stream_id, NULL ) == VLC_EGENERIC )
             continue;
 
         if (p_pmt->pcr.i_pcroffset > 0) {

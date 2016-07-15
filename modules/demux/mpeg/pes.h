@@ -43,7 +43,7 @@ static inline mtime_t ExtractMPEG1PESTimestamp( const uint8_t *p_data )
 inline
 static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size_t i_header,
                            unsigned *pi_skip, mtime_t *pi_dts, mtime_t *pi_pts,
-                           uint8_t *pi_stream_id )
+                           uint8_t *pi_stream_id, bool *pb_pes_scambling )
 {
     unsigned i_skip;
 
@@ -63,12 +63,17 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
     case 0xF2:  /* DSMCC stream */
     case 0xF8:  /* ITU-T H.222.1 type E stream */
         i_skip = 6;
+        if( pb_pes_scambling )
+            *pb_pes_scambling = false;
         break;
     default:
         if( ( p_header[6]&0xC0 ) == 0x80 )
         {
             /* mpeg2 PES */
             i_skip = p_header[8] + 9;
+
+            if( pb_pes_scambling )
+                *pb_pes_scambling = p_header[6]&0x30;
 
             if( p_header[7]&0x80 )    /* has pts */
             {
@@ -87,6 +92,10 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
         else
         {
             i_skip = 6;
+
+            if( pb_pes_scambling )
+                *pb_pes_scambling = false;
+
             if( i_header < i_skip + 1 )
                 return VLC_EGENERIC;
             while( i_skip < 23 && p_header[i_skip] == 0xff )
