@@ -30,7 +30,6 @@
 #include <vlc_common.h>
 #include <vlc_access.h>
 #include <vlc_plugin.h>
-#include <vlc_network.h> /* FIXME: only for vlc_getProxyUrl() */
 #include <vlc_url.h>
 
 #include "connmgr.h"
@@ -159,15 +158,6 @@ static int LiveControl(access_t *access, int query, va_list args)
 static int Open(vlc_object_t *obj)
 {
     access_t *access = (access_t *)obj;
-
-    if (!strcasecmp(access->psz_access, "http"))
-    {
-        char *proxy = vlc_getProxyUrl(access->psz_url);
-        free(proxy);
-        if (proxy != NULL)
-            return VLC_EGENERIC; /* FIXME not implemented yet */
-    }
-
     access_sys_t *sys = malloc(sizeof (*sys));
     int ret = VLC_ENOMEM;
 
