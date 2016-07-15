@@ -301,7 +301,7 @@ static int Demux( demux_t *p_demux )
     i_ret = ps_pkt_resynch( p_demux->s, &i_code );
     if( i_ret < 0 )
     {
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     else if( i_ret == 0 )
     {
@@ -309,7 +309,7 @@ static int Demux( demux_t *p_demux )
             msg_Warn( p_demux, "garbage at input, trying to resync..." );
 
         p_sys->b_lost_sync = true;
-        return 1;
+        return VLC_DEMUXER_SUCCESS;
     }
 
     if( p_sys->b_lost_sync ) msg_Warn( p_demux, "found sync code" );
@@ -323,7 +323,7 @@ static int Demux( demux_t *p_demux )
 
     if( ( p_pkt = ps_pkt_read( p_demux->s, i_code ) ) == NULL )
     {
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     switch( i_code )
@@ -456,7 +456,7 @@ static int Demux( demux_t *p_demux )
     }
 
     demux_UpdateTitleFromStream( p_demux );
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
