@@ -325,7 +325,7 @@ static int login( access_t *p_access )
     if( !credential.psz_username )
     {
         psz_login = "Guest";
-        psz_password = "Guest";
+        psz_password = "";
         b_guest = true;
     }
     else
