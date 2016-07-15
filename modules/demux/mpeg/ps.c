@@ -239,13 +239,13 @@ static int Demux2( demux_t *p_demux, bool b_end )
     return 1;
 }
 
-static void FindLength( demux_t *p_demux )
+static bool FindLength( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t i_current_pos = -1, i_size = 0, i_end = 0;
 
     if( !var_CreateGetBool( p_demux, "ps-trust-timestamps" ) )
-        return;
+        return true;
 
     if( p_sys->i_length == -1 ) /* First time */
     {
@@ -258,11 +258,15 @@ static void FindLength( demux_t *p_demux )
         /* Check end */
         i_size = stream_Size( p_demux->s );
         i_end = VLC_CLIP( i_size, 0, 200000 );
-        stream_Seek( p_demux->s, i_size - i_end );
-
-        i = 0;
-        while( i < 400 && Demux2( p_demux, true ) > 0 ) i++;
-        if( i_current_pos >= 0 ) stream_Seek( p_demux->s, i_current_pos );
+        if( stream_Seek( p_demux->s, i_size - i_end ) == VLC_SUCCESS )
+        {
+            i = 0;
+            while( i < 400 && Demux2( p_demux, true ) > 0 ) i++;
+            if( i_current_pos >= 0 &&
+                stream_Seek( p_demux->s, i_current_pos ) != VLC_SUCCESS )
+                    return false;
+        }
+        else return false;
     }
 
     /* Find the longest track */
@@ -281,6 +285,7 @@ static void FindLength( demux_t *p_demux )
             }
         }
     }
+    return true;
 }
 
 /*****************************************************************************
@@ -311,7 +316,10 @@ static int Demux( demux_t *p_demux )
     p_sys->b_lost_sync = false;
 
     if( p_sys->i_length < 0 && p_sys->b_seekable )
-        FindLength( p_demux );
+    {
+        if( !FindLength( p_demux ) )
+            return VLC_DEMUXER_EGENERIC;
+    }
 
     if( ( p_pkt = ps_pkt_read( p_demux->s, i_code ) ) == NULL )
     {
@@ -533,8 +541,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_current_pts = 0;
                 p_sys->i_last_scr = -1;
                 i_pos *= (float)i64 / (float)i_now;
-                stream_Seek( p_demux->s, i_pos );
-                return VLC_SUCCESS;
+
+                return stream_Seek( p_demux->s, i_pos );
             }
             return VLC_EGENERIC;
 
