@@ -385,9 +385,14 @@ int PlaylistManager::doDemux(int64_t increment)
     vlc_mutex_lock(&demux.lock);
     if(demux.i_nzpcr == VLC_TS_INVALID)
     {
-        vlc_cond_timedwait(&demux.cond, &demux.lock, mdate() + CLOCK_FREQ / 20);
+        bool b_dead = true;
+        std::vector<AbstractStream *>::const_iterator it;
+        for(it=streams.begin(); it!=streams.end(); ++it)
+            b_dead &= (*it)->isDead();
+        if(!b_dead)
+            vlc_cond_timedwait(&demux.cond, &demux.lock, mdate() + CLOCK_FREQ / 20);
         vlc_mutex_unlock(&demux.lock);
-        return AbstractStream::status_buffering;
+        return (b_dead) ? AbstractStream::status_eof : AbstractStream::status_buffering;
     }
 
     if(demux.i_firstpcr == VLC_TS_INVALID)
