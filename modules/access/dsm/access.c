@@ -301,8 +301,7 @@ static bool smb_has_invalid_creds( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     uint32_t i_nt_status = smb_session_get_nt_status( p_sys->p_session );
 
-    return i_nt_status == NT_STATUS_ACCESS_DENIED
-        || i_nt_status == NT_STATUS_LOGON_FAILURE;
+    return i_nt_status & (NT_STATUS_ACCESS_DENIED | NT_STATUS_LOGON_FAILURE);
 }
 
 /* Performs login with existing credentials and ask the user for new ones on
