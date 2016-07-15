@@ -258,11 +258,14 @@
     [self refreshAudioDeviceList];
 
     /* setup subtitles menu */
+#warning subtitles styles menu disabled due to missing adaptation to VLC 3.0
+#if 0
     [self setupMenu: _subtitle_sizeMenu withIntList:"freetype-rel-fontsize" andSelector:@selector(switchSubtitleOption:)];
     [self setupMenu: _subtitle_textcolorMenu withIntList:"freetype-color" andSelector:@selector(switchSubtitleOption:)];
     [_subtitle_bgopacity_sld setIntValue: config_GetInt(VLC_OBJECT(p_intf), "freetype-background-opacity")];
     [self setupMenu: _subtitle_bgcolorMenu withIntList:"freetype-background-color" andSelector:@selector(switchSubtitleOption:)];
     [self setupMenu: _subtitle_outlinethicknessMenu withIntList:"freetype-outline-thickness" andSelector:@selector(switchSubtitleOption:)];
+#endif
 }
 
 - (void)setupMenu: (NSMenu*)menu withIntList: (char *)psz_name andSelector:(SEL)selector
@@ -272,8 +275,10 @@
     [menu removeAllItems];
     p_item = config_FindConfig(VLC_OBJECT(getIntf()), psz_name);
 
-    /* serious problem, if no item found */
-    assert(p_item);
+    if (!p_item) {
+        msg_Err(getIntf(), "couldn't create menu int list for item '%s' as it does not exist", psz_name);
+        return;
+    }
 
     for (int i = 0; i < p_item->list_count; i++) {
         NSMenuItem *mi;
