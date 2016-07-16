@@ -227,6 +227,9 @@ void input_ControlVarInit ( input_thread_t *p_input )
  *****************************************************************************/
 void input_ControlVarStop( input_thread_t *p_input )
 {
+    demux_t* p_demux  = p_input->p->master->p_demux;
+    int i_cur_title;
+
     if( !p_input->b_preparsing )
         InputDelCallbacks( p_input, p_input_callbacks );
 
@@ -235,8 +238,6 @@ void input_ControlVarStop( input_thread_t *p_input )
 
     if( p_input->p->i_title > 0 )
     {
-        InputDelCallbacks( p_input, p_input_seekpoint_navigation_callbacks );
-
         for( int i = 0; i < p_input->p->i_title; i++ )
         {
             char name[sizeof("title ") + 3 * sizeof (int)];
@@ -244,6 +245,14 @@ void input_ControlVarStop( input_thread_t *p_input )
             sprintf( name, "title %2u", i );
             var_DelCallback( p_input, name, NavigationCallback, (void *)(intptr_t)i );
         }
+    }
+
+    if( !demux_Control( p_demux, DEMUX_GET_TITLE, &i_cur_title ) )
+    {
+        input_title_t* t = p_input->p->title[ i_cur_title ];
+
+        if( t->i_seekpoint > 1 )
+            InputDelCallbacks( p_input, p_input_seekpoint_navigation_callbacks );
     }
 }
 
