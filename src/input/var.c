@@ -230,9 +230,11 @@ void input_ControlVarStop( input_thread_t *p_input )
     if( !p_input->b_preparsing )
         InputDelCallbacks( p_input, p_input_callbacks );
 
+    if( p_input->p->i_title > 1 )
+        InputDelCallbacks( p_input, p_input_title_navigation_callbacks );
+
     if( p_input->p->i_title > 0 )
     {
-        InputDelCallbacks( p_input, p_input_title_navigation_callbacks );
         InputDelCallbacks( p_input, p_input_seekpoint_navigation_callbacks );
 
         for( int i = 0; i < p_input->p->i_title; i++ )
