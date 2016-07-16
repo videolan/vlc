@@ -156,6 +156,9 @@ static int ASF_NextObject( stream_t *s, asf_object_t *p_obj, uint64_t i_boundary
     if( p_obj->common.i_object_size <= 0 )
         return VLC_EGENERIC;
 
+    if( ( UINT64_MAX - p_obj->common.i_object_pos ) < p_obj->common.i_object_size )
+        return VLC_EGENERIC;
+
     if( p_obj->common.p_father &&
         p_obj->common.p_father->common.i_object_size != 0 )
     {
