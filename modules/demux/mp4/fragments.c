@@ -45,6 +45,22 @@ void MP4_Fragment_Clean( mp4_fragment_t *p_fragment )
     free( p_fragment->p_durations );
 }
 
+void MP4_Fragments_Remove( mp4_fragments_t *p_frags, mp4_fragment_t *p_fragment )
+{
+    mp4_fragment_t *p_current = &p_frags->moov;
+    while( p_current )
+    {
+        if( p_fragment == p_current->p_next )
+        {
+            p_current->p_next = p_fragment->p_next;
+            p_fragment->p_next = NULL;
+            if( p_frags->p_last == p_fragment )
+                p_frags->p_last = p_current;
+            return;
+        }
+    }
+}
+
 void MP4_Fragments_Clean( mp4_fragments_t *p_frags )
 {
     while( p_frags->moov.p_next )

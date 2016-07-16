@@ -65,6 +65,7 @@ static inline void MP4_Fragment_Delete( mp4_fragment_t *p_fragment )
 bool MP4_Fragments_Init(mp4_fragments_t *);
 void MP4_Fragments_Clean(mp4_fragments_t *);
 void MP4_Fragments_Insert(mp4_fragments_t *, mp4_fragment_t *);
+void MP4_Fragments_Remove( mp4_fragments_t *, mp4_fragment_t * );
 
 stime_t GetTrackTotalDuration( mp4_fragments_t *p_frags, unsigned int i_track_ID );
 mp4_fragment_t * GetFragmentByAtomPos( mp4_fragments_t *p_frags, uint64_t i_pos );

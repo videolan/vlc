@@ -5107,6 +5107,11 @@ static int DemuxAsLeaf( demux_t *p_demux )
         }
         else
         {
+            if( p_sys->context.p_fragment && !p_sys->b_seekable )
+            {
+                MP4_Fragments_Remove( &p_sys->fragments, p_sys->context.p_fragment );
+                MP4_Fragment_Delete( p_sys->context.p_fragment );
+            }
             /* skip mdat header */
             p_sys->context.p_fragment = GetFragmentByPos( &p_sys->fragments, stream_Tell( p_demux->s ) + 8, true );
         }
