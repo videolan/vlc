@@ -236,15 +236,12 @@ void input_ControlVarStop( input_thread_t *p_input )
     if( p_input->p->i_title > 1 )
         InputDelCallbacks( p_input, p_input_title_navigation_callbacks );
 
-    if( p_input->p->i_title > 0 )
+    for( int i = 0; i < p_input->p->i_title; i++ )
     {
-        for( int i = 0; i < p_input->p->i_title; i++ )
-        {
-            char name[sizeof("title ") + 3 * sizeof (int)];
+        char name[sizeof("title ") + 3 * sizeof (int)];
 
-            sprintf( name, "title %2u", i );
-            var_DelCallback( p_input, name, NavigationCallback, (void *)(intptr_t)i );
-        }
+        sprintf( name, "title %2u", i );
+        var_DelCallback( p_input, name, NavigationCallback, (void *)(intptr_t)i );
     }
 
     if( !demux_Control( p_demux, DEMUX_GET_TITLE, &i_cur_title ) )
