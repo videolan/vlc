@@ -107,6 +107,7 @@ function js_descramble( sig, js_url )
     -- c&&a.set("signature",br(c));
     local descrambler = js_extract( js, "%.set%(\"signature\",(.-)%(", nil )
     if not descrambler then
+        vlc.msg.dbg( "Couldn't extract youtube video URL signature descrambling function name" )
         return sig
     end
 
@@ -116,12 +117,14 @@ function js_descramble( sig, js_url )
                                   -- Legacy/alternate format
                                   "function "..descrambler.."%([^)]*%){(.-)}" )
     if not rules then
+        vlc.msg.dbg( "Couldn't extract youtube video URL signature descrambling rules" )
         return sig
     end
 
     -- Get the name of the helper object providing transformation definitions
     local helper = string.match( rules, ";(..)%...%(" )
     if not helper then
+        vlc.msg.dbg( "Couldn't extract youtube video URL signature transformation helper name" )
         vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
         return sig
     end
@@ -130,6 +133,7 @@ function js_descramble( sig, js_url )
     -- var Fo={TR:function(a){a.reverse()},TU:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c},sH:function(a,b){a.splice(0,b)}};
     local transformations = js_extract( js, "[ ,]"..helper.."={(.-)};", nil )
     if not transformations then
+        vlc.msg.dbg( "Couldn't extract youtube video URL signature transformation code" )
         return sig
     end
 
