@@ -107,7 +107,7 @@ static const vlc_input_callback_t p_input_callbacks[] =
 
     CALLBACK( NULL, NULL )
 };
-static const vlc_input_callback_t p_input_navigation_callbacks[] =
+static const vlc_input_callback_t p_input_title_navigation_callbacks[] =
 {
     CALLBACK( "next-title", TitleCallback ),
     CALLBACK( "prev-title", TitleCallback ),
@@ -116,7 +116,7 @@ static const vlc_input_callback_t p_input_navigation_callbacks[] =
 
     CALLBACK( NULL, NULL )
 };
-static const vlc_input_callback_t p_input_title_callbacks[] =
+static const vlc_input_callback_t p_input_seekpoint_navigation_callbacks[] =
 {
     CALLBACK( "next-chapter", SeekpointCallback ),
     CALLBACK( "prev-chapter", SeekpointCallback ),
@@ -232,8 +232,8 @@ void input_ControlVarStop( input_thread_t *p_input )
 
     if( p_input->p->i_title > 0 )
     {
-        InputDelCallbacks( p_input, p_input_navigation_callbacks );
-        InputDelCallbacks( p_input, p_input_title_callbacks );
+        InputDelCallbacks( p_input, p_input_title_navigation_callbacks );
+        InputDelCallbacks( p_input, p_input_seekpoint_navigation_callbacks );
 
         for( int i = 0; i < p_input->p->i_title; i++ )
         {
