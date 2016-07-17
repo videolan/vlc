@@ -231,6 +231,18 @@ int main (void)
                    NULL, NULL);
     test_url_parse("p://h/white%20spaced", "p", NULL, NULL, "h", 0,
                    "/white%20spaced", NULL);
+    /* Relative URIs */
+    test_url_parse("//example.com", NULL, NULL, NULL, "example.com", 0,
+                   NULL, NULL);
+    test_url_parse("/file", NULL, NULL, NULL, NULL, 0, "/file", NULL);
+    test_url_parse("?opt=val", NULL, NULL, NULL, NULL, 0, "", "opt=val");
+    test_url_parse("/f?o=v", NULL, NULL, NULL, NULL, 0, "/f", "o=v");
+    test_url_parse("//example.com/file", NULL, NULL, NULL, "example.com", 0,
+                   "/file", NULL);
+    test_url_parse("//example.com?opt=val", NULL, NULL, NULL, "example.com", 0,
+                   NULL, "opt=val");
+    test_url_parse("//example.com/f?o=v", NULL, NULL, NULL, "example.com", 0,
+                   "/f", "o=v");
     /* Invalid URIs */
     test_url_parse("p://G a r b a g e", "p", NULL, NULL, NULL, 0, NULL, NULL);
     test_url_parse("p://h/G a r b a g e", "p", NULL, NULL, "h", 0, NULL, NULL);
