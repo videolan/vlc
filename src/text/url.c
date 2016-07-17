@@ -387,20 +387,15 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
 
     char *cur = buf, *next;
 
-    /* URL scheme */
+    /* URI scheme */
     next = buf;
     while ((*next >= 'A' && *next <= 'Z') || (*next >= 'a' && *next <= 'z')
         || (*next >= '0' && *next <= '9') || memchr ("+-.", *next, 3) != NULL)
         next++;
-    /* This is not strictly correct. In principles, the scheme is always
-     * present in an absolute URL and followed by a colon. Depending on the
-     * URL scheme, the two subsequent slashes are not required.
-     * VLC uses a different scheme for historical compatibility reasons - the
-     * scheme is often implicit. */
-    if (!strncmp (next, "://", 3))
+
+    if (*next == ':')
     {
-        *next = '\0';
-        next += 3;
+        *(next++) = '\0';
         url->psz_protocol = cur;
         cur = next;
     }
@@ -413,66 +408,77 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
         url->psz_option = query;
     }
 
-    /* Path */
-    next = strchr (cur, '/');
-    if (next != NULL)
+    /* Authority */
+    if (strncmp(cur, "//", 2) == 0)
     {
-        *next = '\0'; /* temporary nul, reset to slash later */
-        url->psz_path = next;
-    }
-    /*else
-        url->psz_path = "/";*/
+        cur += 2;
 
-    /* User name */
-    next = strrchr (cur, '@');
-    if (next != NULL)
-    {
-        *(next++) = '\0';
-        url->psz_username = cur;
-        cur = next;
+        /* Path */
+        next = strchr(cur, '/');
+        if (next != NULL)
+        {
+            *next = '\0'; /* temporary nul, reset to slash later */
+            url->psz_path = next;
+        }
+        /*else
+            url->psz_path = "/";*/
 
-        /* Password (obsolete) */
-        next = strchr (url->psz_username, ':');
+        /* User name */
+        next = strrchr(cur, '@');
         if (next != NULL)
         {
             *(next++) = '\0';
-            url->psz_password = next;
-            vlc_uri_decode (url->psz_password);
+            url->psz_username = cur;
+            cur = next;
+
+            /* Password (obsolete) */
+            next = strchr(url->psz_username, ':');
+            if (next != NULL)
+            {
+                *(next++) = '\0';
+                url->psz_password = next;
+                vlc_uri_decode(url->psz_password);
+            }
+            vlc_uri_decode(url->psz_username);
         }
-        vlc_uri_decode (url->psz_username);
-    }
 
-    /* Host name */
-    if (*cur == '[' && (next = strrchr (cur, ']')) != NULL)
-    {   /* Try IPv6 numeral within brackets */
-        *(next++) = '\0';
-        url->psz_host = strdup (cur + 1);
+        /* Host name */
+        if (*cur == '[' && (next = strrchr(cur, ']')) != NULL)
+        {   /* Try IPv6 numeral within brackets */
+            *(next++) = '\0';
+            url->psz_host = strdup(cur + 1);
 
-        if (*next == ':')
-            next++;
+            if (*next == ':')
+                next++;
+            else
+                next = NULL;
+        }
         else
-            next = NULL;
+        {
+            next = strchr(cur, ':');
+            if (next != NULL)
+                *(next++) = '\0';
+
+            url->psz_host = vlc_idna_to_ascii (cur);
+        }
+        if (!vlc_uri_host_validate(url->psz_host))
+        {
+            free(url->psz_host);
+            url->psz_host = NULL;
+        }
+
+        /* Port number */
+        if (next != NULL)
+            url->i_port = atoi(next);
+
+        if (url->psz_path != NULL)
+            *url->psz_path = '/'; /* restore leading slash */
     }
     else
     {
-        next = strchr (cur, ':');
-        if (next != NULL)
-            *(next++) = '\0';
-
-        url->psz_host = vlc_idna_to_ascii (cur);
-    }
-    if (!vlc_uri_host_validate(url->psz_host))
-    {
-        free(url->psz_host);
-        url->psz_host = NULL;
+        url->psz_path = cur;
     }
 
-    /* Port number */
-    if (next != NULL)
-        url->i_port = atoi (next);
-
-    if (url->psz_path != NULL)
-        *url->psz_path = '/'; /* restore leading slash */
     if (!vlc_uri_path_validate(url->psz_path))
         url->psz_path = NULL;
 }
