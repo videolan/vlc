@@ -935,7 +935,7 @@ void EndVideoDec( decoder_t *p_dec )
     post_mt( p_sys );
 
     /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
-    if( p_sys->p_context->codec )
+    if( avcodec_is_open( p_sys->p_context ) )
         avcodec_flush_buffers( p_sys->p_context );
 
     wait_mt( p_sys );
