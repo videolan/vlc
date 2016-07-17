@@ -629,6 +629,7 @@ char *vlc_uri_compose(const vlc_url_t *uri)
                     goto error;
 
                 fprintf(stream, ":%s", enc);
+                free(enc);
             }
             fputc('@', stream);
         }
