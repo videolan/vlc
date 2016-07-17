@@ -202,7 +202,9 @@ static int Open(vlc_object_t *obj)
             free(redir);
             redir = fixed;
         }
-        access->psz_url = redir;
+
+        access->psz_url = vlc_uri_resolve(access->psz_url, redir);
+        free(redir);
         ret = VLC_ACCESS_REDIRECT;
         goto error;
     }

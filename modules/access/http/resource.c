@@ -278,18 +278,6 @@ char *vlc_http_res_get_redirect(struct vlc_http_resource *restrict res)
     /* NOTE: The anchor is discard if it is present as VLC does not support
      * HTML anchors so far. */
     size_t len = strcspn(location, "#");
-
-    /* FIXME: resolve relative URL _correctly_ */
-    if (location[0] == '/')
-    {
-        char *url;
-
-        if (unlikely(asprintf(&url, "%s://%s%.*s",
-                              res->secure ? "https" : "http", res->authority,
-                              (int)len, location) < 0))
-            return NULL;
-        return url;
-    }
     return strndup(location, len);
 }
 
