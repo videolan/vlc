@@ -796,7 +796,7 @@ Function RunUninstaller
   HideWindow
   ClearErrors
 
-  ExecWait '$R1 _?=$INSTDIR'
+  ExecWait '"$R1" _?=$INSTDIR'
 
   IfErrors no_remove_uninstaller
 
