@@ -101,6 +101,20 @@ VLC_API char *vlc_uri_decode_duplicate(const char *str) VLC_MALLOC;
 VLC_API char *vlc_uri_encode(const char *str) VLC_MALLOC;
 
 /**
+ * Composes an URI.
+ *
+ * Converts a decomposed/parsed URI structure (\ref vlc_url_t) into a
+ * nul-terminated URI literal string.
+ *
+ * See also IETF RFC3986 section 5.3 for details.
+ *
+ * \bug URI fragments (i.e. HTML anchors) are not handled
+ *
+ * \return a heap-allocated nul-terminated string or NULL if out of memory
+ */
+VLC_API char *vlc_uri_compose(const vlc_url_t *) VLC_MALLOC;
+
+/**
  * Fixes up a URI string.
  *
  * Attempts to convert a nul-terminated string into a syntactically valid URI.

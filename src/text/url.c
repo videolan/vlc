@@ -492,6 +492,67 @@ void vlc_UrlClean (vlc_url_t *restrict url)
     free (url->psz_buffer);
 }
 
+char *vlc_uri_compose(const vlc_url_t *uri)
+{
+    char *buf, *enc;
+    size_t len;
+    FILE *stream = open_memstream(&buf, &len);
+
+    if (stream == NULL)
+        return NULL;
+
+    if (uri->psz_protocol != NULL)
+        fprintf(stream, "%s:", uri->psz_protocol);
+
+    if (uri->psz_host != NULL)
+    {
+        fwrite("//", 1, 2, stream);
+
+        if (uri->psz_username != NULL)
+        {
+            enc = vlc_uri_encode(uri->psz_username);
+            if (enc == NULL)
+                goto error;
+
+            fputs(enc, stream);
+            free(enc);
+
+            if (uri->psz_password != NULL)
+            {
+                enc = vlc_uri_encode(uri->psz_password);
+                if (unlikely(enc == NULL))
+                    goto error;
+
+                fprintf(stream, ":%s", enc);
+            }
+            fputc('@', stream);
+        }
+
+        const char *fmt;
+
+        if (strchr(uri->psz_host, ':') != NULL)
+            fmt = (uri->i_port != 0) ? "[%s]:%d" : "[%s]";
+        else
+            fmt = (uri->i_port != 0) ? "%s:%d" : "%s";
+        /* No IDNA decoding here. Seems unnecessary, dangerous even. */
+        fprintf(stream, fmt, uri->psz_host, uri->i_port);
+    }
+
+    if (uri->psz_path != NULL)
+        fputs(uri->psz_path, stream);
+    if (uri->psz_option != NULL)
+        fprintf(stream, "?%s", uri->psz_option);
+    /* NOTE: fragment not handled currently */
+
+    fclose(stream);
+    return buf;
+
+error:
+    fclose(stream);
+    free(buf);
+    return NULL;
+}
+
 char *vlc_uri_fixup(const char *str)
 {
     /* Rule number one is do not change a (potentially) valid URI */
