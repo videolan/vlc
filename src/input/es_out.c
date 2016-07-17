@@ -1025,7 +1025,11 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     for( i = 0; i < p_sys->i_es; i++ )
     {
         if( p_sys->es[i]->p_pgrm == p_sys->p_pgrm )
+        {
             EsOutESVarUpdate( out, p_sys->es[i], false );
+            EsOutUpdateInfo( out, p_sys->es[i], &p_sys->es[i]->fmt, NULL );
+        }
+
         EsOutSelect( out, p_sys->es[i], false );
     }
 
@@ -1523,13 +1527,6 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
         es->pb_cc_present[i] = false;
     es->p_master = NULL;
 
-    if( es->p_pgrm == p_sys->p_pgrm )
-        EsOutESVarUpdate( out, es, false );
-
-    /* Select it if needed */
-    EsOutSelect( out, es, false );
-
-
     TAB_APPEND( out->p_sys->i_es, out->p_sys->es, es );
     p_sys->i_id++;  /* always incremented */
     switch( es->fmt.i_cat )
@@ -1545,7 +1542,11 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
             break;
     }
 
+    if( es->p_pgrm == p_sys->p_pgrm )
+        EsOutESVarUpdate( out, es, false );
+
     EsOutUpdateInfo( out, es, &es->fmt, NULL );
+    EsOutSelect( out, es, false );
 
     if( es->b_scrambled )
         EsOutProgramUpdateScrambled( out, es->p_pgrm );
@@ -2088,6 +2089,8 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
 
     if( es->p_pgrm == p_sys->p_pgrm )
         EsOutESVarUpdate( out, es, true );
+
+    EsDeleteInfo( out, es );
 
     TAB_REMOVE( p_sys->i_es, p_sys->es, es );
 
@@ -2893,10 +2896,16 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     }
 
     /* Create category */
-    char psz_cat[128];
-    snprintf( psz_cat, sizeof(psz_cat),_("Stream %d"), es->i_meta_id );
-    info_category_t *p_cat = info_category_New( psz_cat );
-    if( !p_cat )
+    char* psz_cat = EsInfoCategoryName( es );
+
+    if( unlikely( !psz_cat ) )
+        return;
+
+    info_category_t* p_cat = info_category_New( psz_cat );
+
+    free( psz_cat );
+
+    if( unlikely( !p_cat ) )
         return;
 
     /* Add information */
