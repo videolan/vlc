@@ -268,6 +268,10 @@ int unsetenv (const char *);
 int posix_memalign (void **, size_t, size_t);
 #endif
 
+#ifndef HAVE_MEMRCHR
+void *memrchr(const void *, int, size_t);
+#endif
+
 /* locale.h */
 #ifndef HAVE_USELOCALE
 #define LC_ALL_MASK      0
