@@ -139,8 +139,7 @@ int main(void)
     assert(!vlc_http_file_can_seek(f));
     assert(vlc_http_file_get_size(f) == (uintmax_t)-1);
     str = vlc_http_file_get_redirect(f);
-    assert(str != NULL
-        && !strcmp(str, "https://www.example.com:8443/somewhere/else/"));
+    assert(str != NULL && !strcmp(str, "/somewhere/else/"));
     free(str);
     vlc_http_file_destroy(f);
 
