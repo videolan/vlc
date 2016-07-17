@@ -77,6 +77,7 @@ typedef struct
 #endif
 
 #if !defined (HAVE_POSIX_MEMALIGN) || \
+    !defined (HAVE_MEMRCHR) || \
     !defined (HAVE_STRLCPY) || \
     !defined (HAVE_STRNDUP) || \
     !defined (HAVE_STRNLEN) || \
@@ -137,6 +138,10 @@ int vasprintf (char **, const char *, va_list);
 /* string.h */
 #ifndef HAVE_FFSLL
 int ffsll(unsigned long long);
+#endif
+
+#ifndef HAVE_MEMRCHR
+void *memrchr(const void *, int, size_t);
 #endif
 
 #ifndef HAVE_STRCASECMP
@@ -266,10 +271,6 @@ int unsetenv (const char *);
 
 #ifndef HAVE_POSIX_MEMALIGN
 int posix_memalign (void **, size_t, size_t);
-#endif
-
-#ifndef HAVE_MEMRCHR
-void *memrchr(const void *, int, size_t);
 #endif
 
 /* locale.h */

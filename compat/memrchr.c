@@ -20,7 +20,6 @@
 #endif
 
 #include <string.h>
-#include <stddef.h>
 
 /*
  * Reverse memchr()
