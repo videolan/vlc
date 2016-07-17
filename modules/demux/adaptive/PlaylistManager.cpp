@@ -310,7 +310,7 @@ bool PlaylistManager::setPosition(mtime_t time)
         for(it=streams.begin(); it!=streams.end(); ++it)
         {
             AbstractStream *st = *it;
-            if(!st->isDisabled())
+            if(!st->isDisabled() && !st->isDead())
                 ret &= st->setPosition(time, !real);
         }
         if(!ret)
