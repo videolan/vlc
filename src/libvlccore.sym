@@ -253,6 +253,7 @@ vlc_uri_decode
 vlc_uri_decode_duplicate
 vlc_uri_encode
 vlc_uri_compose
+vlc_uri_resolve
 vlc_uri_fixup
 mdate
 module_config_free

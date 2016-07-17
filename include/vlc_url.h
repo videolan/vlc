@@ -115,6 +115,21 @@ VLC_API char *vlc_uri_encode(const char *str) VLC_MALLOC;
 VLC_API char *vlc_uri_compose(const vlc_url_t *) VLC_MALLOC;
 
 /**
+ * Resolves an URI reference.
+ *
+ * Resolves an URI reference relative to a base URI.
+ * If the reference is an absolute URI, then this function simply returns a
+ * copy of the URI reference.
+ *
+ * \param base base URI (as a nul-terminated string)
+ * \param ref URI reference (also as a nul-terminated string)
+ *
+ * \return a heap-allocated nul-terminated string representing the resolved
+ * absolute URI, or NULL if out of memory.
+ */
+VLC_API char *vlc_uri_resolve(const char *base, const char *ref) VLC_MALLOC;
+
+/**
  * Fixes up a URI string.
  *
  * Attempts to convert a nul-terminated string into a syntactically valid URI.

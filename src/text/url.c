@@ -492,6 +492,111 @@ void vlc_UrlClean (vlc_url_t *restrict url)
     free (url->psz_buffer);
 }
 
+/**
+ * Merge paths
+ *
+ * See IETF RFC3986 section 5.2.3 for details.
+ */
+static char *vlc_uri_merge_paths(const char *base, const char *ref)
+{
+    char *str;
+    int len;
+
+    if (base == NULL)
+        len = asprintf(&str, "/%s", ref);
+    else
+    {
+        const char *end = strrchr(base, '/');
+
+        if (end != NULL)
+            end++;
+        else
+            end = base;
+
+        len = asprintf(&str, "%.*s%s", (int)(end - base), base, ref);
+    }
+
+    if (unlikely(len == -1))
+        str = NULL;
+    return str;
+}
+
+/**
+ * Remove dot segments
+ *
+ * See IETF RFC3986 section 5.2.4 for details.
+ */
+static char *vlc_uri_remove_dot_segments(char *str)
+{
+    char *input = str, *output = str;
+
+    while (input[0] != '\0')
+    {
+        assert(output <= input);
+
+        if (strncmp(input, "../", 3) == 0)
+        {
+            input += 3;
+            continue;
+        }
+        if (strncmp(input, "./", 2) == 0)
+        {
+            input += 2;
+            continue;
+        }
+        if (strncmp(input, "/./", 3) == 0)
+        {
+            input += 2;
+            continue;
+        }
+        if (strcmp(input, "/.") == 0)
+        {
+            input[1] = '\0';
+            continue;
+        }
+        if (strncmp(input, "/../", 4) == 0)
+        {
+            input += 3;
+            output = memrchr(str, '/', output - str);
+            if (output == NULL)
+                output = str;
+            continue;
+        }
+        if (strcmp(input, "/..") == 0)
+        {
+            input[1] = '\0';
+            output = memrchr(str, '/', output - str);
+            if (output == NULL)
+                output = str;
+            continue;
+        }
+        if (strcmp(input, ".") == 0)
+        {
+            input++;
+            continue;
+        }
+        if (strcmp(input, "..") == 0)
+        {
+            input += 2;
+            continue;
+        }
+
+        if (input[0] == '/')
+            *(output++) = *(input++);
+
+        size_t len = strcspn(input, "/");
+
+        if (input != output)
+            memmove(output, input, len);
+
+        input += len;
+        output += len;
+    }
+
+    output[0] = '\0';
+    return str;
+}
+
 char *vlc_uri_compose(const vlc_url_t *uri)
 {
     char *buf, *enc;
@@ -551,6 +656,66 @@ error:
     fclose(stream);
     free(buf);
     return NULL;
+}
+
+char *vlc_uri_resolve(const char *base, const char *ref)
+{
+    vlc_url_t base_uri, rel_uri;
+    vlc_url_t tgt_uri;
+    char *pathbuf = NULL, *ret = NULL;
+
+    vlc_UrlParse(&rel_uri, ref);
+
+    if (rel_uri.psz_protocol != NULL)
+    {   /* Short circuit in case of absolute URI */
+        vlc_UrlClean(&rel_uri);
+        return strdup(ref);
+    }
+
+    vlc_UrlParse(&base_uri, base);
+
+    /* RFC3986 section 5.2.2 */
+    do
+    {
+        tgt_uri = rel_uri;
+        tgt_uri.psz_protocol = base_uri.psz_protocol;
+
+        if (rel_uri.psz_host != NULL)
+            break;
+
+        tgt_uri.psz_username = base_uri.psz_username;
+        tgt_uri.psz_password = base_uri.psz_password;
+        tgt_uri.psz_host = base_uri.psz_host;
+        tgt_uri.i_port = base_uri.i_port;
+
+        if (rel_uri.psz_path == NULL || rel_uri.psz_path[0] == '\0')
+        {
+            tgt_uri.psz_path = base_uri.psz_path;
+            if (rel_uri.psz_option == NULL)
+                tgt_uri.psz_option = base_uri.psz_option;
+            break;
+        }
+
+        if (rel_uri.psz_path[0] == '/')
+            break;
+
+        pathbuf = vlc_uri_merge_paths(base_uri.psz_path, rel_uri.psz_path);
+        if (unlikely(pathbuf == NULL))
+            goto error;
+
+        tgt_uri.psz_path = pathbuf;
+    }
+    while (0);
+
+    if (tgt_uri.psz_path != NULL)
+        vlc_uri_remove_dot_segments(tgt_uri.psz_path);
+
+    ret = vlc_uri_compose(&tgt_uri);
+error:
+    free(pathbuf);
+    vlc_UrlClean(&base_uri);
+    vlc_UrlClean(&rel_uri);
+    return ret;
 }
 
 char *vlc_uri_fixup(const char *str)
