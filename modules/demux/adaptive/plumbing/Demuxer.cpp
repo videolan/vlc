@@ -35,7 +35,8 @@ using namespace adaptive;
 AbstractDemuxer::AbstractDemuxer()
 {
     b_startsfromzero = false;
-    b_reinitsonseek =true;
+    b_reinitsonseek = true;
+    b_candetectswitches = true;
 }
 
 AbstractDemuxer::~AbstractDemuxer()
@@ -48,7 +49,17 @@ bool AbstractDemuxer::alwaysStartsFromZero() const
     return b_startsfromzero;
 }
 
-bool AbstractDemuxer::reinitsOnSeek() const
+bool AbstractDemuxer::needsRestartOnSwitch() const
+{
+    return !b_candetectswitches;
+}
+
+void AbstractDemuxer::setCanDetectSwitches( bool b )
+{
+    b_candetectswitches = b;
+}
+
+bool AbstractDemuxer::needsRestartOnSeek() const
 {
     return b_reinitsonseek;
 }

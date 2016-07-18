@@ -223,7 +223,7 @@ bool AbstractStream::restartDemux()
     {
         return startDemux();
     }
-    else if(demuxer->reinitsOnSeek())
+    else if(demuxer->needsRestartOnSeek())
     {
         /* Push all ES as recycling candidates */
         fakeesout->recycleAll();
@@ -427,10 +427,10 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
     if(!seekAble())
         return false;
 
-    bool ret = segmentTracker->setPositionByTime(time, demuxer->reinitsOnSeek(), tryonly);
+    bool ret = segmentTracker->setPositionByTime(time, demuxer->needsRestartOnSeek(), tryonly);
     if(!tryonly && ret)
     {
-        if(demuxer->reinitsOnSeek())
+        if(demuxer->needsRestartOnSeek())
         {
             if(currentChunk)
                 delete currentChunk;

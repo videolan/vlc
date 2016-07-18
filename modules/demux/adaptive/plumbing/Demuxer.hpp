@@ -38,11 +38,14 @@ namespace adaptive
             virtual bool create() = 0;
             virtual bool restart(CommandsQueue *) = 0;
             bool alwaysStartsFromZero() const;
-            bool reinitsOnSeek() const;
+            bool needsRestartOnSeek() const;
+            bool needsRestartOnSwitch() const;
+            void setCanDetectSwitches(bool);
 
         protected:
             bool b_startsfromzero;
             bool b_reinitsonseek;
+            bool b_candetectswitches;
     };
 
     class Demuxer : public AbstractDemuxer
