@@ -44,6 +44,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     dead = false;
     disabled = false;
     discontinuity = false;
+    needrestart = false;
     segmentTracker = NULL;
     demuxersource = NULL;
     commandsqueue = NULL;
@@ -316,12 +317,17 @@ AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
         vlc_mutex_lock(&lock);
         if(i_ret != VLC_DEMUXER_SUCCESS)
         {
-            if(discontinuity)
+            if(discontinuity || needrestart)
             {
-                msg_Dbg( p_realdemux, "Flushing on discontinuity" );
-                prepareRestart();
-                discontinuity = false;
-                commandsqueue->setFlush();
+                msg_Dbg(p_realdemux, "Restarting demuxer");
+                prepareRestart(discontinuity);
+                if(discontinuity)
+                {
+                    msg_Dbg(p_realdemux, "Flushing on discontinuity");
+                    commandsqueue->setFlush();
+                    discontinuity = false;
+                }
+                needrestart = false;
                 vlc_mutex_unlock(&lock);
                 return AbstractStream::buffering_ongoing;
             }
@@ -388,7 +394,7 @@ block_t * AbstractStream::readNextBlock()
     if (currentChunk == NULL && !eof)
         currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
 
-    if(discontinuity)
+    if(discontinuity || needrestart)
     {
         msg_Info(p_realdemux, "Encountered discontinuity");
         /* Force stream/demuxer to end for this call */
@@ -435,6 +441,7 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
             if(currentChunk)
                 delete currentChunk;
             currentChunk = NULL;
+            needrestart = false;
 
             if( !restartDemux() )
                 dead = true;
@@ -501,6 +508,10 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
             break;
 
         case SegmentTrackerEvent::SWITCHING:
+            if(demuxer && demuxer->needsRestartOnSwitch())
+            {
+                needrestart = true;
+            }
         default:
             break;
     }

@@ -104,6 +104,7 @@ namespace adaptive
         virtual void prepareRestart(bool = true);
 
         bool discontinuity;
+        bool needrestart;
 
         demux_t *p_realdemux;
         StreamFormat format;
