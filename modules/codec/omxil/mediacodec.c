@@ -522,7 +522,7 @@ static int StartMediaCodec(decoder_t *p_dec)
             {
                 p_sys->u.video.i_h264_profile = i_profile;
                 if (p_sys->api->configure(p_sys->api,
-                                          p_sys->u.video.i_h264_profile, 0, 0) != 0 )
+                                          p_sys->u.video.i_h264_profile) != 0 )
                     return VLC_EGENERIC;
             }
         }
@@ -679,23 +679,18 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         free(api);
         return VLC_EGENERIC;
     }
-
-    if (api->configure(api, i_h264_profile,
-                       p_dec->fmt_in.video.i_width,
-                       p_dec->fmt_in.video.i_height) != 0)
+    if (api->configure(api, i_h264_profile) != 0)
     {
         /* If the device can't handle video/wvc1,
          * it can probably handle video/x-ms-wmv */
         if (!strcmp(mime, "video/wvc1") && p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
         {
             api->psz_mime = "video/x-ms-wmv";
-            if (api->configure(api, i_h264_profile,
-                               p_dec->fmt_in.video.i_width,
-                               p_dec->fmt_in.video.i_height) != 0)
+            if (api->configure(api, i_h264_profile) != 0)
             {
                 api->clean(api);
                 free(api);
-                return VLC_EGENERIC;
+                return (VLC_EGENERIC);
             }
         }
         else
