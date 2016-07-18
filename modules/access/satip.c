@@ -618,7 +618,7 @@ static int satip_open(access_t *access) {
     if (sys == NULL)
         return VLC_ENOMEM;
 
-    msg_Dbg(access, "try to open '%s'", access->psz_location);
+    msg_Dbg(access, "try to open '%s'", access->psz_url);
 
     sys->udp_sock = -1;
     sys->rtcp_sock = -1;
@@ -627,14 +627,19 @@ static int satip_open(access_t *access) {
      * uppercase parameters while most (all?) satip servers do only understand
      * parameters matching lowercase spelling as defined in the specification
      * */
-    char *psz_lower_location = strdup(access->psz_location);
-    if (psz_lower_location == NULL)
+    char *psz_lower_url = strdup(access->psz_url);
+    if (psz_lower_url == NULL)
         goto error;
 
-    for (unsigned i = 0; i < strlen(psz_lower_location); i++)
-        psz_lower_location[i] = tolower(psz_lower_location[i]);
+    for (unsigned i = 0; i < strlen(psz_lower_url); i++)
+        psz_lower_url[i] = tolower(psz_lower_url[i]);
 
-    vlc_UrlParse(&url, psz_lower_location);
+    const char* psz_lower_location = strstr( psz_lower_url, "://" );
+    if ( psz_lower_location == NULL )
+        goto error;
+    psz_lower_location += 3;
+
+    vlc_UrlParse(&url, psz_lower_url);
     if (url.i_port <= 0)
         url.i_port = RTSP_DEFAULT_PORT;
 
@@ -737,13 +742,13 @@ static int satip_open(access_t *access) {
     access->pf_control = satip_control;
     access->pf_block = satip_block;
 
-    free(psz_lower_location);
+    free(psz_lower_url);
     vlc_UrlClean(&url);
     return VLC_SUCCESS;
 
 error:
-    if (psz_lower_location)
-        free(psz_lower_location);
+    if (psz_lower_url)
+        free(psz_lower_url);
 
     vlc_UrlClean(&url);
     satip_close(access);
