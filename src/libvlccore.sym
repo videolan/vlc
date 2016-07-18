@@ -1,6 +1,5 @@
 access_vaDirectoryControlHelper
 vlc_access_NewMRL
-vlc_access_Delete
 access_fsdir_init
 access_fsdir_finish
 access_fsdir_additem

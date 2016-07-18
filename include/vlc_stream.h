@@ -50,7 +50,11 @@ struct stream_t
     /* Module properties for stream filter */
     module_t    *p_module;
 
-    char        *psz_url;
+    char        *psz_name;
+    char        *psz_url; /**< Full URL or MRL */
+    const char  *psz_location; /**< Location (URL with the scheme stripped) */
+    char        *psz_filepath; /**< Local file path (if applicable) */
+    bool         b_preparsing; /**< True if this access is used to preparse */
 
     /* Stream source for stream filter */
     stream_t *p_source;

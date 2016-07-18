@@ -35,44 +35,6 @@
  * Input byte stream modules interface
  */
 
-struct access_t
-{
-    VLC_COMMON_MEMBERS
-
-    /* Module properties */
-    module_t    *p_module;
-
-    char        *psz_name; /**< Access name */
-    char        *psz_url; /**< Full URL or MRL */
-    const char  *psz_location; /**< Location (URL with the scheme stripped) */
-    char        *psz_filepath; /**< Local file path (if applicable) */
-    bool         b_preparsing; /**< True if this access is used to preparse */
-
-    /* pf_read/pf_block/pf_readdir is used to read data.
-     * XXX A access should set one and only one of them */
-    ssize_t     (*pf_read)   ( access_t *, void *, size_t );  /* Return -1 if no data yet, 0 if no more data, else real data read */
-    block_t    *(*pf_block)  ( access_t *, bool * );             /* Return a block of data in his 'natural' size, NULL if not yet data or eof */
-    int         (*pf_readdir)( access_t *, input_item_node_t * );/* Fills the provided item_node, see doc/browsing.txt for details */
-
-    /* Called for each seek.
-     * XXX can be null */
-    int         (*pf_seek) ( access_t *, uint64_t );         /* can be null if can't seek */
-
-    /* Used to retrieve and configure the access
-     * XXX mandatory. look at stream_query_e to know what query you *have to* support */
-    int         (*pf_control)( access_t *, int i_query, va_list args);
-
-    /* Access has to maintain them uptodate */
-    struct
-    {
-        bool         b_eof;     /* idem */
-    } info;
-    void        *p_sys;
-
-    /* Weak link to parent input */
-    input_thread_t *p_input;
-};
-
 /**
  * Special redirection error code.
  *
@@ -94,113 +56,23 @@ struct access_t
  */
 VLC_API access_t *vlc_access_NewMRL(vlc_object_t *obj, const char *mrl);
 
-/**
- * Closes a byte stream.
- * \param access byte stream to close
- */
-VLC_API void vlc_access_Delete(access_t *access);
+#define vlc_access_Delete vlc_stream_Delete
 
 /**
  * Sets the read byte offset.
  */
-static inline int vlc_access_Seek(access_t *access, uint64_t offset)
-{
-    int ret = VLC_EGENERIC;
-
-    if (access->pf_seek != NULL)
-        ret = access->pf_seek(access, offset);
-    if (ret == VLC_SUCCESS)
-        access->info.b_eof = false;
-    return ret;
-}
+#define vlc_access_Seek vlc_stream_Seek
 
 /**
  * Checks if end-of-stream is reached.
  */
-static inline bool vlc_access_Eof(const access_t *access)
-{
-    return access->info.b_eof;
-}
+#define vlc_access_Eof vlc_stream_Eof
 
-/**
- * Reads a byte stream.
- *
- * This function waits for some data to be available (if necessary) and returns
- * available data (up to the requested size). Not all byte streams support
- * this. Some streams must be read with vlc_access_Block() instead.
- *
- * \note
- * A short read does <b>not</b> imply the end of the stream. It merely implies
- * that enough data is not immediately available.
- * To detect the end of the stream, either check if the function returns zero,
- * or call vlc_access_Eof().
- *
- * \note
- * The function may return a negative value spuriously. Negative error values
- * should be ignored; they do not necessarily indicate a fatal error.
- *
- * \param buf buffer to read data into
- * \param len size of the buffer in bytes
- * \return the number of bytes read (possibly less than requested),
- *         zero at end-of-stream, or -1 on <b>transient</b> errors
-  */
-static inline ssize_t vlc_access_Read(access_t *access, void *buf, size_t len)
-{
-    int ret = -1;
-
-    if (access->pf_read != NULL)
-        ret = access->pf_read(access, buf, len);
-    if (len > 0 && ret == 0)
-        access->info.b_eof = true;
-    return ret;
-}
-
-/**
- * Dequeues one block of data.
- *
- * This function waits for a block of data to be available (if necessary) and
- * returns a reference to it. Not all byte streams support this. Some streams
- * must be read with vlc_access_Read() instead.
- *
- * \note
- * The returned block may be of any size. The size is dependent on the
- * underlying implementation of the byte stream.
- *
- * \note
- * The function may return NULL spuriously. A NULL return is not indicative of
- * a fatal error.
- *
- * \return a data block (free with block_Release()) or NULL
- */
-static inline block_t *vlc_access_Block(access_t *access)
-{
-    if (access->pf_block == NULL)
-        return NULL;
-
-    return access->pf_block(access, &access->info.b_eof);
-}
-
-static inline int access_vaControl( access_t *p_access, int i_query, va_list args )
-{
-    if( !p_access ) return VLC_EGENERIC;
-    return p_access->pf_control( p_access, i_query, args );
-}
-
-static inline int access_Control( access_t *p_access, int i_query, ... )
-{
-    va_list args;
-    int     i_result;
-
-    va_start( args, i_query );
-    i_result = access_vaControl( p_access, i_query, args );
-    va_end( args );
-    return i_result;
-}
-
-static inline int access_GetSize( access_t *p_access, uint64_t *size )
-{
-    return access_Control( p_access, STREAM_GET_SIZE, size );
-}
+#define vlc_access_Read vlc_stream_ReadPartial
+#define vlc_access_Block vlc_stream_ReadBlock
+#define access_vaControl vlc_stream_vaControl
+#define access_Control vlc_stream_Control
+#define access_GetSize stream_GetSize
 
 /**
  * \defgroup access_helper Access Helpers

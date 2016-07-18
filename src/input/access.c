@@ -55,6 +55,13 @@ char *get_path(const char *location)
     return path;
 }
 
+static void vlc_access_Destroy(stream_t *access)
+{
+    module_unneed(access, access->p_module);
+    free(access->psz_filepath);
+    free(access->psz_name);
+}
+
 #define MAX_REDIR 5
 
 /*****************************************************************************
@@ -66,7 +73,7 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
     char *redirv[MAX_REDIR];
     unsigned redirc = 0;
 
-    access_t *access = vlc_custom_create(parent, sizeof (*access), "access");
+    stream_t *access = vlc_stream_CommonNew(parent, vlc_access_Destroy);
     if (unlikely(access == NULL))
         return NULL;
 
@@ -74,14 +81,7 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
     access->psz_name = NULL;
     access->psz_url = strdup(mrl);
     access->psz_filepath = NULL;
-    access->pf_read = NULL;
-    access->pf_block = NULL;
-    access->pf_readdir = NULL;
-    access->pf_seek = NULL;
-    access->pf_control = NULL;
-    access->p_sys = NULL;
     access->b_preparsing = preparsing;
-    access->info.b_eof = false;
 
     if (unlikely(access->psz_url == NULL))
         goto error;
@@ -135,25 +135,14 @@ error:
     while (redirc > 0)
         free(redirv[--redirc]);
     free(access->psz_filepath);
-    free(access->psz_url);
     free(access->psz_name);
-    vlc_object_release(access);
+    stream_CommonDelete(access);
     return NULL;
 }
 
 access_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
 {
     return access_New(parent, NULL, false, mrl);
-}
-
-void vlc_access_Delete(access_t *access)
-{
-    module_unneed(access, access->p_module);
-
-    free(access->psz_filepath);
-    free(access->psz_url);
-    free(access->psz_name);
-    vlc_object_release(access);
 }
 
 /*****************************************************************************
