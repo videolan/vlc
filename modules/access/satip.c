@@ -747,8 +747,7 @@ static int satip_open(access_t *access) {
     return VLC_SUCCESS;
 
 error:
-    if (psz_lower_url)
-        free(psz_lower_url);
+    free(psz_lower_url);
 
     vlc_UrlClean(&url);
     satip_close(access);
