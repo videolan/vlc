@@ -653,7 +653,7 @@ static int InOpen( vlc_object_t *p_this )
     p_sys->offset = 0;
     p_sys->size = UINT64_MAX;
 
-    if( readTLSMode( p_this, p_sys, p_access->psz_access ) )
+    if( readTLSMode( p_this, p_sys, p_access->psz_name ) )
         goto exit_error;
 
     if( parseURL( &p_sys->url, p_access->psz_location, p_sys->tlsmode ) )

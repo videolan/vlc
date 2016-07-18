@@ -100,11 +100,11 @@ static int Open( vlc_object_t *p_this )
     access_t *p_access = (access_t*)p_this;
 
     /* use specified method */
-    if( !strncmp( p_access->psz_access, "mmsu", 4 ) )
+    if( !strncmp( p_access->psz_name, "mmsu", 4 ) )
         return  MMSTUOpen ( p_access );
-    else if( !strncmp( p_access->psz_access, "mmst", 4 ) )
+    else if( !strncmp( p_access->psz_name, "mmst", 4 ) )
         return  MMSTUOpen ( p_access );
-    else if( !strncmp( p_access->psz_access, "mmsh", 4 ) )
+    else if( !strncmp( p_access->psz_name, "mmsh", 4 ) )
         return  MMSHOpen ( p_access );
 
     if( MMSTUOpen ( p_access ) )

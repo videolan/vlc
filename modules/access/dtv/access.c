@@ -464,7 +464,7 @@ static int Open (vlc_object_t *obj)
     uint64_t freq = var_InheritFrequency (obj);
     if (freq != 0)
     {
-        dtv_delivery_t d = GuessSystem (access->psz_access, dev);
+        dtv_delivery_t d = GuessSystem (access->psz_name, dev);
         if(d != DTV_DELIVERY_NONE)
             sys->pf_setup = dtv_get_delivery_tuner_setup(d);
 

@@ -716,9 +716,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
             if( p_sys->b_icecast && p_sys->psz_mime == NULL )
                 *type = strdup( "audio/mpeg" );
-            else if( !strcasecmp( p_access->psz_access, "itpc" ) )
+            else if( !strcasecmp( p_access->psz_name, "itpc" ) )
                 *type = strdup( "application/rss+xml" );
-            else if( !strcasecmp( p_access->psz_access, "unsv" ) &&
+            else if( !strcasecmp( p_access->psz_name, "unsv" ) &&
                 p_sys->psz_mime != NULL &&
                 !strcasecmp( p_sys->psz_mime, "misc/ultravox" ) )
                 /* Grrrr! detect ultravox server and force NSV demuxer */

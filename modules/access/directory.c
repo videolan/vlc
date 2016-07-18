@@ -57,7 +57,7 @@ int DirInit (access_t *access, DIR *dir)
     if (unlikely(sys == NULL))
         goto error;
 
-    if (!strcmp(access->psz_access, "fd"))
+    if (!strcmp(access->psz_name, "fd"))
     {
         if (unlikely(asprintf(&sys->base_uri, "fd://%s",
                               access->psz_location) == -1))

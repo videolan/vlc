@@ -71,7 +71,7 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
         return NULL;
 
     access->p_input = input;
-    access->psz_access = NULL;
+    access->psz_name = NULL;
     access->psz_url = strdup(mrl);
     access->psz_filepath = NULL;
     access->pf_read = NULL;
@@ -95,8 +95,8 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
         if (p == NULL)
             goto error;
 
-        access->psz_access = strndup(url, p - url);
-        if (unlikely(access->psz_access == NULL))
+        access->psz_name = strndup(url, p - url);
+        if (unlikely(access->psz_name == NULL))
             goto error;
 
         access->psz_location = p + 3;
@@ -104,7 +104,7 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
         if (access->psz_filepath != NULL)
             msg_Dbg(access, " (path: %s)", access->psz_filepath);
 
-        access->p_module = module_need(access, "access", access->psz_access,
+        access->p_module = module_need(access, "access", access->psz_name,
                                        true);
         if (access->p_module != NULL) /* success */
         {
@@ -136,7 +136,7 @@ error:
         free(redirv[--redirc]);
     free(access->psz_filepath);
     free(access->psz_url);
-    free(access->psz_access);
+    free(access->psz_name);
     vlc_object_release(access);
     return NULL;
 }
@@ -152,7 +152,7 @@ void vlc_access_Delete(access_t *access)
 
     free(access->psz_filepath);
     free(access->psz_url);
-    free(access->psz_access);
+    free(access->psz_name);
     vlc_object_release(access);
 }
 

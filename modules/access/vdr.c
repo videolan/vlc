@@ -166,7 +166,7 @@ static int Open( vlc_object_t *p_this )
     /* Some tests can be skipped if this module was explicitly requested.
      * That way, the user can play "corrupt" recordings if necessary
      * and we can avoid false positives in the general case. */
-    bool b_strict = strcmp( p_access->psz_access, "vdr" );
+    bool b_strict = strcmp( p_access->psz_name, "vdr" );
 
     /* Do a quick test based on the directory name to see if this
      * directory might contain a VDR recording. We can be reasonably

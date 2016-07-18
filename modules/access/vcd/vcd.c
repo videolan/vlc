@@ -118,8 +118,8 @@ static int Open( vlc_object_t *p_this )
         free( psz_dup );
 
         /* Only when selected */
-        if( strcmp( p_access->psz_access, "vcd" ) &&
-            strcmp( p_access->psz_access, "svcd" ) )
+        if( strcmp( p_access->psz_name, "vcd" ) &&
+            strcmp( p_access->psz_name, "svcd" ) )
             return VLC_EGENERIC;
 
         psz_dup = var_CreateGetString( p_access, "vcd" );

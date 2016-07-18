@@ -134,9 +134,9 @@ int OpenAvio(vlc_object_t *object)
      * - url (only a subset of available protocols).
      */
     char *url;
-    if (!strcmp(access->psz_access, "avio"))
+    if (!strcmp(access->psz_name, "avio"))
         url = strdup(access->psz_location);
-    else if (asprintf(&url, "%s://%s", access->psz_access,
+    else if (asprintf(&url, "%s://%s", access->psz_name,
                       access->psz_location) < 0)
         url = NULL;
 
@@ -389,7 +389,7 @@ static int OutControl(sout_access_out_t *p_access, int i_query, va_list args)
     switch (i_query) {
     case ACCESS_OUT_CONTROLS_PACE: {
         bool *pb = va_arg(args, bool *);
-        //*pb = strcmp(p_access->psz_access, "stream");
+        //*pb = strcmp(p_access->psz_name, "stream");
         *pb = false;
         break;
     }

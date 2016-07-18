@@ -143,7 +143,7 @@ int FileOpen( vlc_object_t *p_this )
     /* Open file */
     int fd = -1;
 
-    if (!strcasecmp (p_access->psz_access, "fd"))
+    if (!strcasecmp (p_access->psz_name, "fd"))
     {
         char *end;
         int oldfd = strtol (p_access->psz_location, &end, 10);
@@ -242,7 +242,7 @@ int FileOpen( vlc_object_t *p_this )
     else
     {
         p_access->pf_seek = NoSeek;
-        p_sys->b_pace_control = strcasecmp (p_access->psz_access, "stream");
+        p_sys->b_pace_control = strcasecmp (p_access->psz_name, "stream");
     }
 
     return VLC_SUCCESS;
