@@ -45,7 +45,7 @@ struct access_sys_t
 };
 
 static int AccessControl( access_t *p_access, int i_query, va_list args );
-static ssize_t AccessRead( access_t *, uint8_t *, size_t );
+static ssize_t AccessRead( access_t *, void *, size_t );
 static int AccessSeek( access_t *, uint64_t );
 static char *unescapeXml( const char *psz_text );
 
@@ -266,7 +266,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
  * Reads current opened file in zip. This does not open the file in zip.
  * Return -1 if no data yet, 0 if no more data, else real data read
  *****************************************************************************/
-static ssize_t AccessRead( access_t *p_access, uint8_t *p_buffer, size_t sz )
+static ssize_t AccessRead( access_t *p_access, void *p_buffer, size_t sz )
 {
     access_sys_t *p_sys = p_access->p_sys;
     unzFile file = p_sys->zipFile;

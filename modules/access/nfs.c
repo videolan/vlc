@@ -198,7 +198,7 @@ nfs_read_finished_cb(access_t *p_access)
 }
 
 static ssize_t
-FileRead(access_t *p_access, uint8_t *p_buf, size_t i_len)
+FileRead(access_t *p_access, void *p_buf, size_t i_len)
 {
     access_sys_t *p_sys = p_access->p_sys;
 

@@ -47,7 +47,7 @@ struct access_sys_t
     bool b_seekable; /* Is our archive type seekable ? */
 };
 
-static ssize_t Read(access_t *p_access, uint8_t *p_data, size_t i_size)
+static ssize_t Read(access_t *p_access, void *p_data, size_t i_size)
 {
     access_sys_t *p_sys = p_access->p_sys;
 

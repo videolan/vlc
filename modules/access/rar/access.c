@@ -72,7 +72,7 @@ static int Seek(access_t *access, uint64_t position)
     return sys->s ? stream_Seek(sys->s, offset) : VLC_EGENERIC;
 }
 
-static ssize_t Read(access_t *access, uint8_t *data, size_t size)
+static ssize_t Read(access_t *access, void *data, size_t size)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -89,7 +89,7 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 
         total += r;
         if( data )
-            data += r;
+            data = ((char *)data) + r;
         sys->position += r;
         if (sys->position >= chunk_end &&
             Seek(access, sys->position))

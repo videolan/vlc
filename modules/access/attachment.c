@@ -54,7 +54,7 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static ssize_t Read(access_t *, uint8_t *, size_t);
+static ssize_t Read(access_t *, void *, size_t);
 static int     Seek(access_t *, uint64_t);
 static int     Control(access_t *, int, va_list);
 
@@ -111,7 +111,7 @@ static void Close(vlc_object_t *object)
 }
 
 /* */
-static ssize_t Read(access_t *access, uint8_t *buffer, size_t size)
+static ssize_t Read(access_t *access, void *buffer, size_t size)
 {
     access_sys_t *sys = access->p_sys;
     input_attachment_t *a = sys->attachment;

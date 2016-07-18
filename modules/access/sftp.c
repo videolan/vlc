@@ -76,7 +76,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static ssize_t  Read( access_t *, uint8_t *, size_t );
+static ssize_t  Read( access_t *, void *, size_t );
 static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 
@@ -384,14 +384,14 @@ static void Close( vlc_object_t* p_this )
 }
 
 
-static ssize_t Read( access_t *p_access, uint8_t *buf, size_t len )
+static ssize_t Read( access_t *p_access, void *buf, size_t len )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_access->info.b_eof )
         return 0;
 
-    ssize_t val = libssh2_sftp_read(  p_sys->file, (char *)buf, len );
+    ssize_t val = libssh2_sftp_read(  p_sys->file, buf, len );
     if( val < 0 )
     {
         p_access->info.b_eof = true;

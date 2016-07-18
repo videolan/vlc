@@ -78,7 +78,7 @@ error:
     return a;
 }
 
-static ssize_t Read(access_t *access, uint8_t *buf, size_t len)
+static ssize_t Read(access_t *access, void *buf, size_t len)
 {
     access_t *a = GetAccess(access);
     if (a == NULL)

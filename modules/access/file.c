@@ -128,7 +128,7 @@ static bool IsRemote (const char *path)
 # define posix_fadvise(fd, off, len, adv)
 #endif
 
-static ssize_t Read (access_t *, uint8_t *, size_t);
+static ssize_t Read (access_t *, void *, size_t);
 static int FileSeek (access_t *, uint64_t);
 static int NoSeek (access_t *, uint64_t);
 static int FileControl (access_t *, int, va_list);
@@ -273,7 +273,7 @@ void FileClose (vlc_object_t * p_this)
 }
 
 
-static ssize_t Read (access_t *p_access, uint8_t *p_buffer, size_t i_len)
+static ssize_t Read (access_t *p_access, void *p_buffer, size_t i_len)
 {
     access_sys_t *p_sys = p_access->p_sys;
     int fd = p_sys->fd;

@@ -68,7 +68,7 @@ vlc_module_end()
  *****************************************************************************/
 
 static int  Seek( access_t *, uint64_t );
-static ssize_t Read( access_t *, uint8_t *, size_t );
+static ssize_t Read( access_t *, void *, size_t );
 static int  Control( access_t *, int, va_list );
 
 static int  open_file( access_t *, const char * );
@@ -174,7 +174,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
+static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     ssize_t i_ret;

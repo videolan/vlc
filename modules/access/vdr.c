@@ -135,7 +135,7 @@ struct access_sys_t
 #define FILE_COUNT        (unsigned)p_sys->file_sizes.i_size
 
 static int Control( access_t *, int, va_list );
-static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len );
+static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len );
 static int Seek( access_t *p_access, uint64_t i_pos);
 static void FindSeekpoint( access_t *p_access );
 static bool ScanDirectory( access_t *p_access );
@@ -337,7 +337,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * Read and concatenate files
  *****************************************************************************/
-static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
+static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
 

@@ -37,7 +37,7 @@ struct access_sys_t
     uint64_t size;
 };
 
-static ssize_t Read(access_t *access, uint8_t *buf, size_t len)
+static ssize_t Read(access_t *access, void *buf, size_t len)
 {
     access_sys_t *sys = access->p_sys;
 

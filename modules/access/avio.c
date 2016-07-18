@@ -62,7 +62,7 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static ssize_t Read   (access_t *, uint8_t *, size_t);
+static ssize_t Read   (access_t *, void *, size_t);
 static int     Seek   (access_t *, uint64_t);
 static int     Control(access_t *, int, va_list);
 static ssize_t Write(sout_access_out_t *, block_t *);
@@ -303,7 +303,7 @@ void OutCloseAvio(vlc_object_t *object)
     free(sys);
 }
 
-static ssize_t Read(access_t *access, uint8_t *data, size_t size)
+static ssize_t Read(access_t *access, void *data, size_t size)
 {
     int r = avio_read(access->p_sys->context, data, size);
     if (r <= 0) {

@@ -40,7 +40,7 @@ vlc_module_begin ()
     add_shortcut ("sdp")
 vlc_module_end()
 
-static ssize_t Read (access_t *, uint8_t *, size_t);
+static ssize_t Read (access_t *, void *, size_t);
 static int Seek (access_t *, uint64_t);
 static int Control (access_t *, int, va_list);
 
@@ -83,7 +83,7 @@ static void Close (vlc_object_t *obj)
     free (sys);
 }
 
-static ssize_t Read (access_t *access, uint8_t *buf, size_t len)
+static ssize_t Read (access_t *access, void *buf, size_t len)
 {
     access_sys_t *sys = access->p_sys;
 

@@ -87,7 +87,7 @@ struct access_t
 
     /* pf_read/pf_block/pf_readdir is used to read data.
      * XXX A access should set one and only one of them */
-    ssize_t     (*pf_read)   ( access_t *, uint8_t *, size_t );  /* Return -1 if no data yet, 0 if no more data, else real data read */
+    ssize_t     (*pf_read)   ( access_t *, void *, size_t );  /* Return -1 if no data yet, 0 if no more data, else real data read */
     block_t    *(*pf_block)  ( access_t * );                     /* Return a block of data in his 'natural' size, NULL if not yet data or eof */
     int         (*pf_readdir)( access_t *, input_item_node_t * );/* Fills the provided item_node, see doc/browsing.txt for details */
 
@@ -181,7 +181,7 @@ static inline ssize_t vlc_access_Read(access_t *access, void *buf, size_t len)
 {
     if (access->pf_read == NULL)
         return -1;
-    return access->pf_read(access, (unsigned char *)buf, len);
+    return access->pf_read(access, buf, len);
 }
 
 /**
