@@ -529,25 +529,25 @@ static int Control (access_t *access, int query, va_list args)
 
     switch (query)
     {
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
+        case STREAM_CAN_SEEK:
+        case STREAM_CAN_FASTSEEK:
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
             *va_arg (args, bool *) = false;
             break;
 
-        case ACCESS_GET_PTS_DELAY:
+        case STREAM_GET_PTS_DELAY:
         {
             int64_t *v = va_arg (args, int64_t *);
             *v = var_InheritInteger (access, "live-caching") * INT64_C(1000);
             break;
         }
 
-        case ACCESS_GET_CONTENT_TYPE:
+        case STREAM_GET_CONTENT_TYPE:
             *va_arg (args, char **) = strdup ("video/MP2T");
             break;
 
-        case ACCESS_GET_SIGNAL:
+        case STREAM_GET_SIGNAL:
             /* Fetch the signal levels only every so often to avoid stressing
              * the device bus. */
             if ((sys->signal_poll++))
@@ -557,7 +557,7 @@ static int Control (access_t *access, int query, va_list args)
             *va_arg (args, double *) = dvb_get_signal_strength (dev);
             return VLC_SUCCESS;
 
-        case ACCESS_SET_PRIVATE_ID_STATE:
+        case STREAM_SET_PRIVATE_ID_STATE:
         {
             unsigned pid = va_arg (args, int);
             bool add = va_arg (args, int);
@@ -574,7 +574,7 @@ static int Control (access_t *access, int query, va_list args)
             break;
         }
 
-        case ACCESS_SET_PRIVATE_ID_CA:
+        case STREAM_SET_PRIVATE_ID_CA:
         {
             en50221_capmt_info_t *pmt = va_arg (args, en50221_capmt_info_t *);
 
@@ -583,7 +583,7 @@ static int Control (access_t *access, int query, va_list args)
             break;
         }
 
-        case ACCESS_GET_PRIVATE_ID_STATE:
+        case STREAM_GET_PRIVATE_ID_STATE:
         {
             unsigned pid = va_arg (args, int);
             bool *on = va_arg (args, bool *);

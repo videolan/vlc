@@ -233,7 +233,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_length = -1;
     p_sys->b_preparsing_done = false;
 
-    stream_Control( p_demux->s, ACCESS_GET_PTS_DELAY, & p_sys->i_access_delay );
+    stream_Control( p_demux->s, STREAM_GET_PTS_DELAY, & p_sys->i_access_delay );
 
     /* Set exported functions */
     p_demux->pf_demux = Demux;
@@ -838,7 +838,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
 
             f = (double)va_arg( args, double );
-            if ( p_sys->i_length <= 0 || !b /* || ! ACCESS_CAN_FASTSEEK */ )
+            if ( p_sys->i_length <= 0 || !b /* || ! STREAM_CAN_FASTSEEK */ )
             {
                 Ogg_ResetStreamsHelper( p_sys );
                 Oggseek_BlindSeektoPosition( p_demux, p_stream, f, b );

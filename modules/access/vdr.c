@@ -269,28 +269,28 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
     switch( i_query )
     {
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
+        case STREAM_CAN_SEEK:
+        case STREAM_CAN_FASTSEEK:
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
             *va_arg( args, bool* ) = true;
             break;
 
-        case ACCESS_GET_SIZE:
+        case STREAM_GET_SIZE:
             *va_arg( args, uint64_t* ) = p_sys->size;
             break;
 
-        case ACCESS_GET_PTS_DELAY:
+        case STREAM_GET_PTS_DELAY:
             pi64 = va_arg( args, int64_t * );
             *pi64 = INT64_C(1000)
                   * var_InheritInteger( p_access, "file-caching" );
             break;
 
-        case ACCESS_SET_PAUSE_STATE:
+        case STREAM_SET_PAUSE_STATE:
             /* nothing to do */
             break;
 
-        case ACCESS_GET_TITLE_INFO:
+        case STREAM_GET_TITLE_INFO:
             /* return a copy of our seek points */
             if( !p_sys->p_marks )
                 return VLC_EGENERIC;
@@ -302,28 +302,28 @@ static int Control( access_t *p_access, int i_query, va_list args )
             **ppp_title = vlc_input_title_Duplicate( p_sys->p_marks );
             break;
 
-        case ACCESS_GET_TITLE:
+        case STREAM_GET_TITLE:
             *va_arg( args, unsigned * ) = 0;
             break;
 
-        case ACCESS_GET_SEEKPOINT:
+        case STREAM_GET_SEEKPOINT:
             *va_arg( args, unsigned * ) = p_sys->cur_seekpoint;
             break;
 
-        case ACCESS_GET_CONTENT_TYPE:
+        case STREAM_GET_CONTENT_TYPE:
             *va_arg( args, char ** ) =
                 strdup( p_sys->b_ts_format ? "video/MP2T" : "video/MP2P" );
             break;
 
-        case ACCESS_SET_TITLE:
+        case STREAM_SET_TITLE:
             /* ignore - only one title */
             break;
 
-        case ACCESS_SET_SEEKPOINT:
+        case STREAM_SET_SEEKPOINT:
             i = va_arg( args, int );
             return Seek( p_access, p_sys->offsets[i] );
 
-        case ACCESS_GET_META:
+        case STREAM_GET_META:
             p_meta = va_arg( args, vlc_meta_t* );
             vlc_meta_Merge( p_meta, p_sys->p_meta );
             break;
@@ -388,7 +388,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    /* might happen if called by ACCESS_SET_SEEKPOINT */
+    /* might happen if called by STREAM_SET_SEEKPOINT */
     i_pos = __MIN( i_pos, p_sys->size );
 
     p_sys->offset = i_pos;

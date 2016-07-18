@@ -68,30 +68,30 @@ static int Control(access_t *access, int query, va_list args)
 
     switch (query)
     {
-        case ACCESS_CAN_SEEK:
+        case STREAM_CAN_SEEK:
             *va_arg(args, bool *) = sys->seek_cb != NULL;
             break;
 
-        case ACCESS_CAN_FASTSEEK:
+        case STREAM_CAN_FASTSEEK:
             *va_arg(args, bool *) = false;
             break;
 
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
             *va_arg(args, bool *) = sys->seek_cb != NULL;
             break;
 
-        case ACCESS_GET_SIZE:
+        case STREAM_GET_SIZE:
             if (sys->size == UINT64_MAX)
                 return VLC_EGENERIC;
             *va_arg(args, uint64_t *) = sys->size;
             break;
 
-        case ACCESS_GET_PTS_DELAY:
+        case STREAM_GET_PTS_DELAY:
             *va_arg(args, int64_t *) = DEFAULT_PTS_DELAY;
             break;
 
-        case ACCESS_SET_PAUSE_STATE:
+        case STREAM_SET_PAUSE_STATE:
             break;
 
         default:

@@ -142,7 +142,7 @@ static int Seek(access_t *access, uint64_t position)
             break;
 
         bool can_seek;
-        access_Control(a, ACCESS_CAN_SEEK, &can_seek);
+        access_Control(a, STREAM_CAN_SEEK, &can_seek);
         if (!can_seek)
             break;
 
@@ -171,29 +171,29 @@ static int Control(access_t *access, int query, va_list args)
 
     switch (query)
     {
-        case ACCESS_CAN_SEEK:
+        case STREAM_CAN_SEEK:
             *va_arg(args, bool *) = sys->can_seek;
             break;
-        case ACCESS_CAN_FASTSEEK:
+        case STREAM_CAN_FASTSEEK:
             *va_arg(args, bool *) = sys->can_seek_fast;
             break;
-        case ACCESS_CAN_PAUSE:
+        case STREAM_CAN_PAUSE:
             *va_arg(args, bool *) = sys->can_pause;
             break;
-        case ACCESS_CAN_CONTROL_PACE:
+        case STREAM_CAN_CONTROL_PACE:
             *va_arg(args, bool *) = sys->can_control_pace;
             break;
-        case ACCESS_GET_SIZE:
+        case STREAM_GET_SIZE:
             if (sys->size == UINT64_MAX)
                 return VLC_EGENERIC;
             *va_arg(args, uint64_t *) = sys->size;
             break;
-        case ACCESS_GET_PTS_DELAY:
+        case STREAM_GET_PTS_DELAY:
             *va_arg(args, int64_t *) = sys->caching;
             break;
 
-        case ACCESS_GET_SIGNAL:
-        case ACCESS_SET_PAUSE_STATE:
+        case STREAM_GET_SIGNAL:
+        case STREAM_SET_PAUSE_STATE:
             return access_vaControl(sys->access, query, args);
 
         default:
@@ -265,13 +265,13 @@ static int Open(vlc_object_t *obj)
         memcpy(e->mrl, mrl, mlen + 1);
 
         if (sys->can_seek)
-            access_Control(a, ACCESS_CAN_SEEK, &sys->can_seek);
+            access_Control(a, STREAM_CAN_SEEK, &sys->can_seek);
         if (sys->can_seek_fast)
-            access_Control(a, ACCESS_CAN_FASTSEEK, &sys->can_seek_fast);
+            access_Control(a, STREAM_CAN_FASTSEEK, &sys->can_seek_fast);
         if (sys->can_pause)
-            access_Control(a, ACCESS_CAN_PAUSE, &sys->can_pause);
+            access_Control(a, STREAM_CAN_PAUSE, &sys->can_pause);
         if (sys->can_control_pace)
-            access_Control(a, ACCESS_CAN_CONTROL_PACE, &sys->can_control_pace);
+            access_Control(a, STREAM_CAN_CONTROL_PACE, &sys->can_control_pace);
         if (sys->size != UINT64_MAX)
         {
             uint64_t size;
@@ -283,7 +283,7 @@ static int Open(vlc_object_t *obj)
         }
 
         int64_t caching;
-        access_Control(a, ACCESS_GET_PTS_DELAY, &caching);
+        access_Control(a, STREAM_GET_PTS_DELAY, &caching);
         if (caching > sys->caching)
             sys->caching = caching;
 

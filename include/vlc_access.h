@@ -24,7 +24,7 @@
 #ifndef VLC_ACCESS_H
 #define VLC_ACCESS_H 1
 
-#include <vlc_block.h>
+#include <vlc_stream.h>
 
 /**
  * \defgroup access Access
@@ -34,42 +34,6 @@
  * \file
  * Input byte stream modules interface
  */
-
-enum access_query_e
-{
-    /* capabilities */
-    ACCESS_CAN_SEEK,        /* arg1= bool*    cannot fail */
-    ACCESS_CAN_FASTSEEK,    /* arg1= bool*    cannot fail */
-    ACCESS_CAN_PAUSE,       /* arg1= bool*    cannot fail */
-    ACCESS_CAN_CONTROL_PACE,/* arg1= bool*    cannot fail */
-    ACCESS_GET_SIZE=6,      /* arg1= uin64_t* */
-    ACCESS_IS_DIRECTORY,    /* arg1= bool *, res=can fail */
-
-    /* */
-    ACCESS_GET_PTS_DELAY = 0x101,/* arg1= int64_t*       cannot fail */
-    ACCESS_GET_TITLE_INFO,  /* arg1=input_title_t*** arg2=int*  res=can fail */
-    ACCESS_GET_TITLE,       /* arg1=unsigned * res=can fail */
-    ACCESS_GET_SEEKPOINT,   /* arg1=unsigned * res=can fail */
-
-    /* Meta data */
-    ACCESS_GET_META,        /* arg1= vlc_meta_t * res=can fail */
-    ACCESS_GET_CONTENT_TYPE,/* arg1=char **ppsz_content_type res=can fail */
-
-    ACCESS_GET_SIGNAL,      /* arg1=double *pf_quality, arg2=double *pf_strength   res=can fail */
-
-    /* */
-    ACCESS_SET_PAUSE_STATE = 0x200, /* arg1= bool           can fail */
-
-    /* */
-    ACCESS_SET_TITLE,       /* arg1= int            can fail */
-    ACCESS_SET_SEEKPOINT,   /* arg1= int            can fail */
-
-    /* Special mode for access/demux communication
-     * XXX: avoid to use it unless you can't */
-    ACCESS_SET_PRIVATE_ID_STATE = 0x1000, /* arg1= int i_private_data, bool b_selected    res=can fail */
-    ACCESS_SET_PRIVATE_ID_CA,             /* arg1= int i_program_number, uint16_t i_vpid, uint16_t i_apid1, uint16_t i_apid2, uint16_t i_apid3, uint8_t i_length, uint8_t *p_data */
-    ACCESS_GET_PRIVATE_ID_STATE,          /* arg1=int i_private_data arg2=bool *          res=can fail */
-};
 
 struct access_t
 {
@@ -96,7 +60,7 @@ struct access_t
     int         (*pf_seek) ( access_t *, uint64_t );         /* can be null if can't seek */
 
     /* Used to retrieve and configure the access
-     * XXX mandatory. look at access_query_e to know what query you *have to* support */
+     * XXX mandatory. look at stream_query_e to know what query you *have to* support */
     int         (*pf_control)( access_t *, int i_query, va_list args);
 
     /* Access has to maintain them uptodate */
@@ -236,7 +200,7 @@ static inline int access_Control( access_t *p_access, int i_query, ... )
 
 static inline int access_GetSize( access_t *p_access, uint64_t *size )
 {
-    return access_Control( p_access, ACCESS_GET_SIZE, size );
+    return access_Control( p_access, STREAM_GET_SIZE, size );
 }
 
 /**

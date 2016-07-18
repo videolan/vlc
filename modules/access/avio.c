@@ -406,8 +406,8 @@ static int Control(access_t *access, int query, va_list args)
     bool *b;
 
     switch (query) {
-    case ACCESS_CAN_SEEK:
-    case ACCESS_CAN_FASTSEEK: /* FIXME how to do that ? */
+    case STREAM_CAN_SEEK:
+    case STREAM_CAN_FASTSEEK: /* FIXME how to do that ? */
         b = va_arg(args, bool *);
 #if LIBAVFORMAT_VERSION_MAJOR < 54
         *b = !sys->context->is_streamed;
@@ -415,7 +415,7 @@ static int Control(access_t *access, int query, va_list args)
         *b = sys->context->seekable;
 #endif
         return VLC_SUCCESS;
-    case ACCESS_CAN_PAUSE:
+    case STREAM_CAN_PAUSE:
         b = va_arg(args, bool *);
 #if LIBAVFORMAT_VERSION_MAJOR < 54
         *b = sys->context->prot->url_read_pause != NULL;
@@ -423,21 +423,21 @@ static int Control(access_t *access, int query, va_list args)
         *b = sys->context->read_pause != NULL;
 #endif
         return VLC_SUCCESS;
-    case ACCESS_CAN_CONTROL_PACE:
+    case STREAM_CAN_CONTROL_PACE:
         b = va_arg(args, bool *);
         *b = true; /* FIXME */
         return VLC_SUCCESS;
-    case ACCESS_GET_SIZE:
+    case STREAM_GET_SIZE:
         if (sys->size < 0)
             return VLC_EGENERIC;
         *va_arg(args, uint64_t *) = sys->size;
         return VLC_SUCCESS;
-    case ACCESS_GET_PTS_DELAY: {
+    case STREAM_GET_PTS_DELAY: {
         int64_t *delay = va_arg(args, int64_t *);
         *delay = INT64_C(1000) * var_InheritInteger(access, "network-caching");
         return VLC_SUCCESS;
     }
-    case ACCESS_SET_PAUSE_STATE: {
+    case STREAM_SET_PAUSE_STATE: {
         bool is_paused = va_arg(args, int);
         if (avio_pause(sys->context, is_paused)< 0)
             return VLC_EGENERIC;

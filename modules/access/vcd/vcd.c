@@ -236,14 +236,14 @@ static int Control( access_t *p_access, int i_query, va_list args )
     switch( i_query )
     {
         /* */
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
+        case STREAM_CAN_SEEK:
+        case STREAM_CAN_FASTSEEK:
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
             *va_arg( args, bool* ) = true;
             break;
 
-        case ACCESS_GET_SIZE:
+        case STREAM_GET_SIZE:
         {
             int i = p_sys->i_current_title;
 
@@ -254,16 +254,16 @@ static int Control( access_t *p_access, int i_query, va_list args )
         }
 
         /* */
-        case ACCESS_GET_PTS_DELAY:
+        case STREAM_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) = INT64_C(1000)
                 * var_InheritInteger(p_access, "disc-caching");
             break;
 
         /* */
-        case ACCESS_SET_PAUSE_STATE:
+        case STREAM_SET_PAUSE_STATE:
             break;
 
-        case ACCESS_GET_TITLE_INFO:
+        case STREAM_GET_TITLE_INFO:
             ppp_title = va_arg( args, input_title_t*** );
             *va_arg( args, int* ) = p_sys->i_titles;
 
@@ -273,19 +273,19 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 (*ppp_title)[i] = vlc_input_title_New();
             break;
 
-        case ACCESS_GET_TITLE:
+        case STREAM_GET_TITLE:
             *va_arg( args, unsigned * ) = p_sys->i_current_title;
             break;
 
-        case ACCESS_GET_SEEKPOINT:
+        case STREAM_GET_SEEKPOINT:
             *va_arg( args, unsigned * ) = p_sys->i_current_seekpoint;
             break;
 
-        case ACCESS_GET_CONTENT_TYPE:
+        case STREAM_GET_CONTENT_TYPE:
             *va_arg( args, char ** ) = strdup("video/MP2P");
             break;
 
-        case ACCESS_SET_TITLE:
+        case STREAM_SET_TITLE:
         {
             int i = va_arg( args, int );
             if( i != p_sys->i_current_title )
@@ -301,7 +301,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
         }
 
-        case ACCESS_SET_SEEKPOINT:
+        case STREAM_SET_SEEKPOINT:
         {
             int i = va_arg( args, int );
             unsigned i_title = p_sys->i_current_title;

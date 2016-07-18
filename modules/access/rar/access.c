@@ -106,30 +106,30 @@ static int Control(access_t *access, int query, va_list args)
         return VLC_EGENERIC;
 
     switch (query) {
-    case ACCESS_CAN_SEEK: {
+    case STREAM_CAN_SEEK: {
         bool *b = va_arg(args, bool *);
         return stream_Control(s, STREAM_CAN_SEEK, b);
     }
-    case ACCESS_CAN_FASTSEEK: {
+    case STREAM_CAN_FASTSEEK: {
         bool *b = va_arg(args, bool *);
         return stream_Control(s, STREAM_CAN_FASTSEEK, b);
     }
     /* FIXME the following request should ask the underlying access object */
-    case ACCESS_CAN_PAUSE:
-    case ACCESS_CAN_CONTROL_PACE: {
+    case STREAM_CAN_PAUSE:
+    case STREAM_CAN_CONTROL_PACE: {
         bool *b = va_arg(args, bool *);
         *b = true;
         return VLC_SUCCESS;
     }
-    case ACCESS_GET_SIZE:
+    case STREAM_GET_SIZE:
         *va_arg(args, uint64_t *) = sys->file->size;
         return VLC_SUCCESS;
-    case ACCESS_GET_PTS_DELAY: {
+    case STREAM_GET_PTS_DELAY: {
         int64_t *delay = va_arg(args, int64_t *);
         *delay = DEFAULT_PTS_DELAY;
         return VLC_SUCCESS;
     }
-    case ACCESS_SET_PAUSE_STATE:
+    case STREAM_SET_PAUSE_STATE:
         return VLC_SUCCESS;
 
     default:

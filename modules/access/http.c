@@ -678,28 +678,28 @@ static int Control( access_t *p_access, int i_query, va_list args )
     switch( i_query )
     {
         /* */
-        case ACCESS_CAN_SEEK:
+        case STREAM_CAN_SEEK:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = p_sys->b_seekable;
             break;
-        case ACCESS_CAN_FASTSEEK:
+        case STREAM_CAN_FASTSEEK:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = false;
             break;
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = true;
             break;
 
         /* */
-        case ACCESS_GET_PTS_DELAY:
+        case STREAM_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = INT64_C(1000)
                 * var_InheritInteger( p_access, "network-caching" );
             break;
 
-        case ACCESS_GET_SIZE:
+        case STREAM_GET_SIZE:
             if( !p_sys->b_has_size )
                 return VLC_EGENERIC;
             pi_64 = (int64_t*)va_arg( args, int64_t * );
@@ -707,10 +707,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
            break;
 
         /* */
-        case ACCESS_SET_PAUSE_STATE:
+        case STREAM_SET_PAUSE_STATE:
             break;
 
-        case ACCESS_GET_CONTENT_TYPE:
+        case STREAM_GET_CONTENT_TYPE:
         {
             char **type = va_arg( args, char ** );
 

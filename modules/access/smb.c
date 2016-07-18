@@ -404,7 +404,7 @@ static int DirControl( access_t *p_access, int i_query, va_list args )
 {
     switch( i_query )
     {
-    case ACCESS_IS_DIRECTORY:
+    case STREAM_IS_DIRECTORY:
         *va_arg( args, bool * ) = true; /* might loop */
         break;
     default:
@@ -422,28 +422,28 @@ static int Control( access_t *p_access, int i_query, va_list args )
 {
     switch( i_query )
     {
-    case ACCESS_CAN_SEEK:
-    case ACCESS_CAN_PAUSE:
-    case ACCESS_CAN_CONTROL_PACE:
+    case STREAM_CAN_SEEK:
+    case STREAM_CAN_PAUSE:
+    case STREAM_CAN_CONTROL_PACE:
         *va_arg( args, bool* ) = true;
         break;
 
-    case ACCESS_CAN_FASTSEEK:
+    case STREAM_CAN_FASTSEEK:
         *va_arg( args, bool* ) = false;
         break;
 
-    case ACCESS_GET_SIZE:
+    case STREAM_GET_SIZE:
         if( p_access->pf_readdir != NULL )
             return VLC_EGENERIC;
         *va_arg( args, uint64_t * ) = p_access->p_sys->size;
         break;
 
-    case ACCESS_GET_PTS_DELAY:
+    case STREAM_GET_PTS_DELAY:
         *va_arg( args, int64_t * ) = INT64_C(1000)
             * var_InheritInteger( p_access, "network-caching" );
         break;
 
-    case ACCESS_SET_PAUSE_STATE:
+    case STREAM_SET_PAUSE_STATE:
         /* Nothing to do */
         break;
 

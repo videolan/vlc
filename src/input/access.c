@@ -165,16 +165,16 @@ int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list ar
 
     switch( i_query )
     {
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
+        case STREAM_CAN_SEEK:
+        case STREAM_CAN_FASTSEEK:
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
             *va_arg( args, bool* ) = false;
             break;
-        case ACCESS_GET_PTS_DELAY:
+        case STREAM_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) = 0;
             break;
-        case ACCESS_IS_DIRECTORY:
+        case STREAM_IS_DIRECTORY:
             *va_arg( args, bool * ) = false;
             break;
         default:
@@ -311,33 +311,10 @@ static int AStreamSeek(stream_t *s, uint64_t offset)
     return vlc_access_Seek(sys->access, offset);
 }
 
-#define static_control_match(foo) \
-    static_assert((unsigned) STREAM_##foo == ACCESS_##foo, "Mismatch")
-
 static int AStreamControl(stream_t *s, int cmd, va_list args)
 {
     stream_sys_t *sys = s->p_sys;
     access_t *access = sys->access;
-
-    static_control_match(CAN_SEEK);
-    static_control_match(CAN_FASTSEEK);
-    static_control_match(CAN_PAUSE);
-    static_control_match(CAN_CONTROL_PACE);
-    static_control_match(GET_SIZE);
-    static_control_match(IS_DIRECTORY);
-    static_control_match(GET_PTS_DELAY);
-    static_control_match(GET_TITLE_INFO);
-    static_control_match(GET_TITLE);
-    static_control_match(GET_SEEKPOINT);
-    static_control_match(GET_META);
-    static_control_match(GET_CONTENT_TYPE);
-    static_control_match(GET_SIGNAL);
-    static_control_match(SET_PAUSE_STATE);
-    static_control_match(SET_TITLE);
-    static_control_match(SET_SEEKPOINT);
-    static_control_match(SET_PRIVATE_ID_STATE);
-    static_control_match(SET_PRIVATE_ID_CA);
-    static_control_match(GET_PRIVATE_ID_STATE);
 
     switch (cmd)
     {
