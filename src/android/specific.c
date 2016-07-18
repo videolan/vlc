@@ -51,7 +51,10 @@ get_java_string(JNIEnv *env, jclass clazz, const char *psz_name)
     jfieldID id = (*env)->GetStaticFieldID(env, clazz, psz_name,
                                            "Ljava/lang/String;");
     if ((*env)->ExceptionCheck(env))
+    {
+        (*env)->ExceptionClear(env);
         return NULL;
+    }
 
     jstring jstr = (*env)->GetStaticObjectField(env, clazz, id);
 
@@ -113,12 +116,8 @@ JNI_OnLoad(JavaVM *vm, void *reserved)
     for (size_t i = 0; i < GENERIC_DIR_COUNT; ++i)
     {
         if (ppsz_env_names[i] != NULL)
-        {
             ppsz_generic_names[i] = get_java_string(env, clazz,
                                                    ppsz_env_names[i]);
-            if (!ppsz_generic_names[i])
-                goto error;
-        }
     }
 
     fields.Environment.clazz = (*env)->NewGlobalRef(env, clazz);
