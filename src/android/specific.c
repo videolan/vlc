@@ -44,6 +44,10 @@ static struct {
     struct {
         jmethodID getAbsolutePath;
     } File;
+    struct {
+        jclass clazz;
+        jmethodID getProperty;
+    } System;
 } fields = { .Environment.clazz = NULL };
 
 static char *
@@ -79,13 +83,15 @@ JNI_OnUnload(JavaVM* vm, void* reserved)
     for (size_t i = 0; i < GENERIC_DIR_COUNT; ++i)
         free(ppsz_generic_names[i]);
 
+    JNIEnv* env = NULL;
+    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_2) != JNI_OK)
+        return;
+
     if (fields.Environment.clazz)
-    {
-        JNIEnv* env = NULL;
-        if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_2) != JNI_OK)
-            return;
         (*env)->DeleteGlobalRef(env, fields.Environment.clazz);
-    }
+
+    if (fields.System.clazz)
+        (*env)->DeleteGlobalRef(env, fields.System.clazz);
 }
 
 /* This function is called when the libvlcore dynamic library is loaded via the
@@ -136,6 +142,15 @@ JNI_OnLoad(JavaVM *vm, void *reserved)
                            "()Ljava/lang/String;");
     if ((*env)->ExceptionCheck(env))
         goto error;
+    (*env)->DeleteLocalRef(env, clazz);
+
+    clazz = (*env)->FindClass(env, "java/lang/System");
+    if ((*env)->ExceptionCheck(env))
+        goto error;
+    fields.System.clazz = (*env)->NewGlobalRef(env, clazz);
+    fields.System.getProperty =
+        (*env)->GetStaticMethodID(env, clazz, "getProperty",
+                                  "(Ljava/lang/String;)Ljava/lang/String;");
     (*env)->DeleteLocalRef(env, clazz);
 
     return JNI_VERSION_1_2;
@@ -287,32 +302,91 @@ char *config_GetUserDir (vlc_userdir_t type)
     return NULL;
 }
 
-/* This is empty, of course
- *
- * The reason is that there is no simple way to get the proxy settings on all
- * supported versions of Android, even from the Java side...
- *
- * The best way would be to follow this "solution"
- * http://stackoverflow.com/questions/10811698/getting-wifi-proxy-settings-in-android/13616054#13616054
- *
- * Or, in summary, using JNI:
- * if( version >= 4.0 ) {
- *     System.getProperty( "http.proxyHost" );
- *     System.getProperty( "http.proxyPort" );
- * } else {
- *     context = magically_find_context();
- *     android.net.Proxy.getHost( context );
- *     android.net.Proxy.getPort( context );
- * }
- *
- * */
-
 /**
  * Determines the network proxy server to use (if any).
- * @param url absolute URL for which to get the proxy server
+ *
+ * This function fetch the Android proxy using the System.getProperty() method
+ * with "http.proxyHost" and "http.proxyPort" keys. This is working only for
+ * Android 4.0 and after.
+ *
+ * @param url absolute URL for which to get the proxy server (unused)
  * @return proxy URL, NULL if no proxy or error
  */
 char *vlc_getProxyUrl(const char *url)
 {
-    return NULL;
+    VLC_UNUSED(url);
+    JNIEnv *env;
+    bool b_detach;
+    char *psz_ret = NULL;
+    const char *psz_host = NULL, *psz_port = NULL;
+    jstring jhost = NULL, jport = NULL;
+
+    env = get_env(&b_detach);
+    if (env == NULL)
+        return NULL;
+
+    /* Fetch "http.proxyHost" property */
+    jstring jkey = (*env)->NewStringUTF(env, "http.proxyHost");
+    if ((*env)->ExceptionCheck(env))
+    {
+        (*env)->ExceptionClear(env);
+        jkey = NULL;
+    }
+    if (jkey == NULL)
+        goto end;
+
+    jhost = (*env)->CallStaticObjectMethod(env, fields.System.clazz,
+                                           fields.System.getProperty, jkey);
+    (*env)->DeleteLocalRef(env, jkey);
+    if (jhost == NULL)
+        goto end;
+
+    psz_host = (*env)->GetStringUTFChars(env, jhost, 0);
+    /* Ensure the property is valid */
+    if (psz_host == NULL || psz_host[0] == '\0')
+        goto end;
+
+    /* Fetch "http.proxyPort" property (only if "http.proxyHost" is valid) */
+    jkey = (*env)->NewStringUTF(env, "http.proxyPort");
+    if ((*env)->ExceptionCheck(env))
+    {
+        (*env)->ExceptionClear(env);
+        jkey = NULL;
+    }
+    if (jkey == NULL)
+        goto end;
+
+    jport = (*env)->CallStaticObjectMethod(env, fields.System.clazz,
+                                           fields.System.getProperty, jkey);
+    (*env)->DeleteLocalRef(env, jkey);
+
+    /* Ensure the property is valid */
+    if (jport != NULL)
+    {
+        psz_port = (*env)->GetStringUTFChars(env, jport, 0);
+        if (psz_port != NULL && (psz_port[0] == '\0' || psz_port[0] == '0'))
+        {
+            (*env)->ReleaseStringUTFChars(env, jport, psz_port);
+            psz_port = NULL;
+        }
+    }
+
+    /* Concat "http://" "http.proxyHost" and "http.proxyPort" */
+    if (asprintf(&psz_ret, "http://%s%s%s",
+                 psz_host,
+                 psz_port != NULL ? ":" : "",
+                 psz_port != NULL ? psz_port : "") == -1)
+        psz_ret = NULL;
+
+end:
+    if (psz_host != NULL)
+        (*env)->ReleaseStringUTFChars(env, jhost, psz_host);
+    if (jhost != NULL)
+        (*env)->DeleteLocalRef(env, jhost);
+    if (psz_port != NULL)
+        (*env)->ReleaseStringUTFChars(env, jport, psz_port);
+    if (jport != NULL)
+        (*env)->DeleteLocalRef(env, jport);
+    release_env(b_detach);
+    return psz_ret;
 }
