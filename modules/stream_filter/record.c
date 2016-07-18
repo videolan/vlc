@@ -147,12 +147,13 @@ static int Control( stream_t *s, int i_query, va_list args )
     if( i_query != STREAM_SET_RECORD_STATE )
         return stream_vaControl( s->p_source, i_query, args );
 
+    stream_sys_t *sys = s->p_sys;
     bool b_active = (bool)va_arg( args, int );
     const char *psz_extension = NULL;
     if( b_active )
         psz_extension = (const char*)va_arg( args, const char* );
 
-    if( !s->p_sys->f == !b_active )
+    if( !sys->f == !b_active )
         return VLC_SUCCESS;
 
     if( b_active )

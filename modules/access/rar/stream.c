@@ -35,18 +35,14 @@
 
 #include "rar.h"
 
-struct stream_sys_t {
-    stream_t *payload;
-};
-
 static ssize_t Read(stream_t *s, void *data, size_t size)
 {
-    return stream_Read(s->p_sys->payload, data, size);
+    return stream_Read(s->p_sys, data, size);
 }
 
 static int Seek(stream_t *s, uint64_t offset)
 {
-    return stream_Seek(s->p_sys->payload, offset);
+    return stream_Seek(s->p_sys, offset);
 }
 
 static int Control(stream_t *s, int query, va_list args)
@@ -58,7 +54,7 @@ static int Control(stream_t *s, int query, va_list args)
         return VLC_SUCCESS;
     }
     default:
-        return stream_vaControl(s->p_sys->payload, query, args);
+        return stream_vaControl(s->p_sys, query, args);
     }
 }
 
@@ -145,13 +141,7 @@ int RarStreamOpen(vlc_object_t *object)
     s->pf_read = Read;
     s->pf_seek = Seek;
     s->pf_control = Control;
-
-    stream_sys_t *sys = s->p_sys = malloc(sizeof(*sys));
-    if (!sys) {
-        stream_Delete(payload);
-        return VLC_ENOMEM;
-    }
-    sys->payload = payload;
+    s->p_sys = payload;
 
     char *tmp;
     if (asprintf(&tmp, "%s.m3u", s->psz_url) < 0) {
@@ -167,8 +157,6 @@ int RarStreamOpen(vlc_object_t *object)
 void RarStreamClose(vlc_object_t *object)
 {
     stream_t *s = (stream_t*)object;
-    stream_sys_t *sys = s->p_sys;
 
-    stream_Delete(sys->payload);
-    free(sys);
+    stream_Delete(s->p_sys);
 }

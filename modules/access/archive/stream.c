@@ -66,19 +66,21 @@ static ssize_t ReadCallback(struct archive *p_archive, void *p_object, const voi
 {
     VLC_UNUSED(p_archive);
     stream_t *p_stream = (stream_t*)p_object;
+    stream_sys_t *sys = p_stream->p_sys;
 
-    *pp_buffer = &p_stream->p_sys->buffer;
-    return stream_Read(p_stream->p_source, &p_stream->p_sys->buffer, ARCHIVE_READ_SIZE);
+    *pp_buffer = &sys->buffer;
+    return stream_Read(p_stream->p_source, &sys->buffer, ARCHIVE_READ_SIZE);
 }
 
 static ssize_t SkipCallback(struct archive *p_archive, void *p_object, ssize_t i_request)
 {
     VLC_UNUSED(p_archive);
     stream_t *p_stream = (stream_t*)p_object;
+    stream_sys_t *sys = p_stream->p_sys;
     ssize_t i_skipped = 0;
 
     /* be smart as small seeks converts to reads */
-    if (p_stream->p_sys->b_source_canseek)
+    if (sys->b_source_canseek)
     {
         int64_t i_pos = stream_Tell(p_stream->p_source);
         if (i_pos >=0)

@@ -1692,7 +1692,7 @@ static void Close( vlc_object_t *p_this )
 
     // TODO: Change here for selectable stream
     hds_stream_t *stream = vlc_array_count(p_sys->hds_streams) ?
-        s->p_sys->hds_streams->pp_elems[0] : NULL;
+        p_sys->hds_streams->pp_elems[0] : NULL;
 
     p_sys->closed = true;
     if (stream)
@@ -1839,7 +1839,7 @@ static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
         return 0;
 
     // TODO: change here for selectable stream
-    hds_stream_t *stream = s->p_sys->hds_streams->pp_elems[0];
+    hds_stream_t *stream = p_sys->hds_streams->pp_elems[0];
 
     if ( header_unfinished( p_sys ) )
         return send_flv_header( stream, p_sys, buffer, i_read );

@@ -62,7 +62,7 @@ struct stream_t
     int         (*pf_control)( stream_t *, int i_query, va_list );
 
     /* Private data for module */
-    stream_sys_t *p_sys;
+    void *p_sys;
 
     /* Weak link to parent input */
     input_thread_t *p_input;
