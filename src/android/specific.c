@@ -183,12 +183,9 @@ fallback:
     return psz_default_dir != NULL ? strdup(psz_default_dir) : NULL;
 }
 
-static char *config_GetGenericDir(const char *psz_name)
+static JNIEnv *get_env(bool *p_detach)
 {
     JNIEnv *env;
-    bool b_detach;
-    char *psz_ret = NULL;
-
     if ((*s_jvm)->GetEnv(s_jvm, (void **)&env, JNI_VERSION_1_2) != JNI_OK)
     {
         /* attach the thread to the Java VM */
@@ -200,10 +197,28 @@ static char *config_GetGenericDir(const char *psz_name)
 
         if ((*s_jvm)->AttachCurrentThread(s_jvm, &env, &args) != JNI_OK)
             return NULL;
-        b_detach = true;
+        *p_detach = true;
     }
     else
-        b_detach = false;
+        *p_detach = false;
+    return env;
+}
+
+static void release_env(bool b_detach)
+{
+    if (b_detach)
+        (*s_jvm)->DetachCurrentThread(s_jvm);
+}
+
+static char *config_GetGenericDir(const char *psz_name)
+{
+    JNIEnv *env;
+    bool b_detach;
+    char *psz_ret = NULL;
+
+    env = get_env(&b_detach);
+    if (env == NULL)
+        return NULL;
 
     jstring jname= (*env)->NewStringUTF(env, psz_name);
     if ((*env)->ExceptionCheck(env))
@@ -234,8 +249,7 @@ static char *config_GetGenericDir(const char *psz_name)
     (*env)->DeleteLocalRef(env, jpath);
 
 error:
-    if (b_detach)
-        (*s_jvm)->DetachCurrentThread(s_jvm);
+    release_env(b_detach);
     return psz_ret;
 }
 
