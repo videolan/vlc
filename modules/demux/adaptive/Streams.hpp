@@ -101,7 +101,7 @@ namespace adaptive
         virtual bool startDemux();
         virtual bool restartDemux();
 
-        virtual void prepareFormatChange();
+        virtual void prepareRestart(bool = true);
 
         bool discontinuity;
 

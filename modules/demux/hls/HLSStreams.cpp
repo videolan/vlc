@@ -86,9 +86,9 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
     return ret;
 }
 
-void HLSStream::prepareFormatChange()
+void HLSStream::prepareRestart(bool b_discontinuity)
 {
-    AbstractStream::prepareFormatChange();
+    AbstractStream::prepareRestart(b_discontinuity);
     if((unsigned)format == StreamFormat::PACKEDAAC)
     {
         fakeesout->setTimestampOffset( i_aac_offset );

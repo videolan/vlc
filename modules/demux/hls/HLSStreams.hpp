@@ -35,7 +35,7 @@ namespace hls
         protected:
             virtual AbstractDemuxer * createDemux(const StreamFormat &); /* reimpl */
             virtual bool restartDemux(); /* reimpl */
-            virtual void prepareFormatChange(); /* reimpl */
+            virtual void prepareRestart(bool = true); /* reimpl */
 
             virtual block_t *checkBlock(block_t *, bool); /* reimpl */
 

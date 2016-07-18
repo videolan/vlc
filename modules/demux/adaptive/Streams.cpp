@@ -105,7 +105,7 @@ AbstractStream::~AbstractStream()
     vlc_mutex_destroy(&lock);
 }
 
-void AbstractStream::prepareFormatChange()
+void AbstractStream::prepareRestart(bool b_discontinuity)
 {
     if(demuxer)
     {
@@ -113,7 +113,8 @@ void AbstractStream::prepareFormatChange()
         demuxer->drain();
         /* Enqueue Del Commands for all current ES */
         fakeesout->scheduleAllForDeletion();
-        fakeesout->schedulePCRReset();
+        if(b_discontinuity)
+            fakeesout->schedulePCRReset();
         commandsqueue->Commit();
         /* ignoring demuxer's own Del commands */
         commandsqueue->setDrop(true);
@@ -281,7 +282,7 @@ AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
             if(discontinuity)
             {
                 msg_Dbg( p_realdemux, "Flushing on format change" );
-                prepareFormatChange();
+                prepareRestart();
                 discontinuity = false;
                 commandsqueue->setFlush();
                 vlc_mutex_unlock(&lock);
@@ -318,7 +319,7 @@ AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
             if(discontinuity)
             {
                 msg_Dbg( p_realdemux, "Flushing on discontinuity" );
-                prepareFormatChange();
+                prepareRestart();
                 discontinuity = false;
                 commandsqueue->setFlush();
                 vlc_mutex_unlock(&lock);
