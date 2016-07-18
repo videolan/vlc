@@ -229,7 +229,7 @@ int OpenDemux( vlc_object_t *p_this )
             /* Don't handle subtitles format */
             "ass", "srt", "microdvd",
             /* No timestamps at all */
-            "hevc",
+            "hevc", "h264",
             ""
         };
 
