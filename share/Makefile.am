@@ -159,7 +159,6 @@ nobase_vlclib_DATA = \
 	lua/sd/icecast.luac \
 	lua/sd/icast.luac \
 	lua/sd/jamendo.luac \
-	lua/sd/metachannels.luac \
 	$(NULL)
 
 nobase_doc_DATA = \
