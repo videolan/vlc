@@ -349,6 +349,8 @@ static int Seek( access_t *p_access, uint64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = p_access->p_sys;
+
     switch( i_query )
     {
         case STREAM_CAN_SEEK:
@@ -358,7 +360,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *va_arg( args, bool* ) = true;
             break;
         case STREAM_GET_SIZE:
-            *va_arg( args, uint64_t * ) = p_access->p_sys->size;
+            *va_arg( args, uint64_t * ) = sys->size;
             break;
         case STREAM_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) =

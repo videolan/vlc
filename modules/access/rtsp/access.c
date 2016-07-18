@@ -277,11 +277,11 @@ static block_t *BlockRead( access_t *p_access, bool *restrict eof )
         return p_block;
     }
 
-    i_size = real_get_rdt_chunk_header( p_access->p_sys->p_rtsp, &pheader );
+    i_size = real_get_rdt_chunk_header( p_sys->p_rtsp, &pheader );
     if( i_size <= 0 ) return NULL;
 
     p_block = block_Alloc( i_size );
-    p_block->i_buffer = real_get_rdt_chunk( p_access->p_sys->p_rtsp, &pheader,
+    p_block->i_buffer = real_get_rdt_chunk( p_sys->p_rtsp, &pheader,
                                             &p_block->p_buffer );
 
     (void) eof;

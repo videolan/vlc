@@ -186,8 +186,8 @@ exit:
     {
         if( p_sys->zipFile )
         {
-            unzCloseCurrentFile( p_access->p_sys->zipFile );
-            unzClose( p_access->p_sys->zipFile );
+            unzCloseCurrentFile( p_sys->zipFile );
+            unzClose( p_sys->zipFile );
         }
         free( p_sys );
     }
@@ -217,6 +217,7 @@ void AccessClose( vlc_object_t *p_this )
  *****************************************************************************/
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = p_access->p_sys;
     bool         *pb_bool;
     int64_t      *pi_64;
 
@@ -238,7 +239,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
         {
             unz_file_info z_info;
 
-            unzGetCurrentFileInfo( p_access->p_sys->zipFile, &z_info,
+            unzGetCurrentFileInfo( sys->zipFile, &z_info,
                                    NULL, 0, NULL, 0, NULL, 0 );
             *va_arg( args, uint64_t * ) = z_info.uncompressed_size;
             break;

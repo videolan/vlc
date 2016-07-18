@@ -303,7 +303,9 @@ void OutCloseAvio(vlc_object_t *object)
 
 static ssize_t Read(access_t *access, void *data, size_t size)
 {
-    int r = avio_read(access->p_sys->context, data, size);
+    access_sys_t *sys = access->p_sys;
+
+    int r = avio_read(sys->context, data, size);
     if (r < 0)
         r = 0;
     return r;

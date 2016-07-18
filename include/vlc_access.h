@@ -67,7 +67,7 @@ struct access_t
     {
         bool         b_eof;     /* idem */
     } info;
-    access_sys_t *p_sys;
+    void        *p_sys;
 
     /* Weak link to parent input */
     input_thread_t *p_input;

@@ -400,13 +400,16 @@ static ssize_t Read( access_t *p_access, void *buf, size_t len )
 
 static int Seek( access_t* p_access, uint64_t i_pos )
 {
-    libssh2_sftp_seek( p_access->p_sys->file, i_pos );
+    access_sys_t *sys = p_access->p_sys;
+
+    libssh2_sftp_seek( sys->file, i_pos );
     return VLC_SUCCESS;
 }
 
 
 static int Control( access_t* p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = p_access->p_sys;
     bool*       pb_bool;
     int64_t*    pi_64;
 
@@ -431,7 +434,7 @@ static int Control( access_t* p_access, int i_query, va_list args )
     case STREAM_GET_SIZE:
         if( p_access->pf_readdir != NULL )
             return VLC_EGENERIC;
-        *va_arg( args, uint64_t * ) = p_access->p_sys->filesize;
+        *va_arg( args, uint64_t * ) = sys->filesize;
         break;
 
     case STREAM_GET_PTS_DELAY:

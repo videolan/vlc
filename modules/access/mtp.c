@@ -208,7 +208,9 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Seek( access_t *p_access, uint64_t i_pos )
 {
-    if (lseek( p_access->p_sys->fd, i_pos, SEEK_SET ) == (off_t)-1)
+    access_sys_t *sys = p_access->p_sys;
+
+    if (lseek( sys->fd, i_pos, SEEK_SET ) == (off_t)-1)
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }

@@ -220,6 +220,7 @@ static int ScanFrontendTuningHandler( scan_t *p_scan, void *p_privdata,
                                       const scan_tuner_config_t *p_cfg )
 {
     access_t *p_access = (access_t *) p_privdata;
+    access_sys_t *sys = p_access->p_sys;
     VLC_UNUSED(p_scan);
 
     var_SetInteger( p_access, "dvb-frequency", p_cfg->i_frequency );
@@ -235,7 +236,7 @@ static int ScanFrontendTuningHandler( scan_t *p_scan, void *p_privdata,
     msg_Dbg( p_access, " bandwidth %d", p_cfg->i_bandwidth );
 
     /* Setting frontend parameters for tuning the hardware */
-    if( FrontendSet( VLC_OBJECT(p_access), &p_access->p_sys->dvb ) < 0 )
+    if( FrontendSet( VLC_OBJECT(p_access), &sys->dvb ) < 0 )
     {
         msg_Err( p_access, "Failed to tune the frontend" );
         return VLC_EGENERIC;
@@ -247,10 +248,11 @@ static int ScanFrontendTuningHandler( scan_t *p_scan, void *p_privdata,
 static int ScanStatsCallback( scan_t *p_scan, void *p_privdata, int *pi_snr )
 {
     access_t *p_access = (access_t *) p_privdata;
+    access_sys_t *sys = p_access->p_sys;
     VLC_UNUSED(p_scan);
 
     frontend_statistic_t stat;
-    if( !FrontendGetStatistic( &p_access->p_sys->dvb, &stat ) )
+    if( !FrontendGetStatistic( &sys->dvb, &stat ) )
     {
         *pi_snr = stat.i_snr;
         return VLC_SUCCESS;
@@ -381,6 +383,7 @@ static block_t *BlockScan( access_t *p_access, bool *restrict eof )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = p_access->p_sys;
     bool         *pb_bool;
     int64_t      *pi_64;
     double       *pf1, *pf2;
@@ -410,7 +413,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             pf2 = (double*)va_arg( args, double * );
 
             *pf1 = *pf2 = 0;
-            if( !FrontendGetStatistic( &p_access->p_sys->dvb, &stat ) )
+            if( !FrontendGetStatistic( &sys->dvb, &stat ) )
             {
                 *pf1 = (double)stat.i_snr / 65535.0;
                 *pf2 = (double)stat.i_signal_strenth / 65535.0;

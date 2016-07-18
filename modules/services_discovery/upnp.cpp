@@ -1045,6 +1045,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     IXML_Document* p_action = NULL;
     IXML_Document* p_response = NULL;
     Upnp_i11e_cb *i11eCb = NULL;
+    access_sys_t *sys = (access_sys_t *)m_access->p_sys;
 
     int i_res;
 
@@ -1113,7 +1114,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     /* Setup an interruptible callback that will call sendActionCb if not
      * interrupted by vlc_interrupt_kill */
     i11eCb = new Upnp_i11e_cb( sendActionCb, &p_response );
-    i_res = UpnpSendActionAsync( m_access->p_sys->p_upnp->handle(),
+    i_res = UpnpSendActionAsync( sys->p_upnp->handle(),
               m_psz_root,
               CONTENT_DIRECTORY_SERVICE_TYPE,
               NULL, /* ignored in SDK, must be NULL */
@@ -1235,8 +1236,10 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t* p_this )
 {
     access_t* p_access = (access_t*)p_this;
-    p_access->p_sys->p_upnp->release( false );
-    delete p_access->p_sys;
+    access_sys_t *sys = (access_sys_t *)p_access->p_sys;
+
+    sys->p_upnp->release( false );
+    delete sys;
 }
 
 }

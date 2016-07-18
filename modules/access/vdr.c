@@ -443,8 +443,10 @@ static void FindSeekpoint( access_t *p_access )
  *****************************************************************************/
 static char *GetFilePath( access_t *p_access, unsigned i_file )
 {
+    access_sys_t *sys = p_access->p_sys;
     char *psz_path;
-    if( asprintf( &psz_path, p_access->p_sys->b_ts_format ?
+
+    if( asprintf( &psz_path, sys->b_ts_format ?
         "%s" DIR_SEP "%05u.ts" : "%s" DIR_SEP "%03u.vdr",
         p_access->psz_filepath, i_file + 1 ) == -1 )
         return NULL;
@@ -594,11 +596,12 @@ static void UpdateFileSize( access_t *p_access )
  *****************************************************************************/
 static FILE *OpenRelativeFile( access_t *p_access, const char *psz_file )
 {
+    access_sys_t *sys = p_access->p_sys;
+
     /* build path and add extension */
     char *psz_path;
-    if( asprintf( &psz_path, "%s" DIR_SEP "%s%s",
-        p_access->psz_filepath, psz_file,
-        p_access->p_sys->b_ts_format ? "" : ".vdr" ) == -1 )
+    if( asprintf( &psz_path, "%s" DIR_SEP "%s%s", p_access->psz_filepath,
+                  psz_file, sys->b_ts_format ? "" : ".vdr" ) == -1 )
         return NULL;
 
     FILE *file = vlc_fopen( psz_path, "rb" );

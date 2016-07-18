@@ -267,6 +267,8 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = p_access->p_sys;
+
     switch( i_query )
     {
         /* */
@@ -287,7 +289,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         /* */
         case STREAM_SET_PAUSE_STATE:
-            AVCPause( p_access, p_access->p_sys->i_node );
+            AVCPause( p_access, sys->i_node );
             break;
 
         default:
@@ -315,8 +317,9 @@ static block_t *Block( access_t *p_access, bool *restrict eof )
 static void Raw1394EventThreadCleanup( void *obj )
 {
     event_thread_t *p_ev = (event_thread_t *)obj;
+    access_sys_t *sys = p_ev->p_access->p_sys;
 
-    AVCStop( p_ev->p_access, p_ev->p_access->p_sys->i_node );
+    AVCStop( p_ev->p_access, sys->i_node );
 }
 
 static void* Raw1394EventThread( void *obj )

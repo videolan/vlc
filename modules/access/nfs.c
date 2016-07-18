@@ -101,20 +101,22 @@ static bool
 nfs_check_status(access_t *p_access, int i_status, const char *psz_error,
                  const char *psz_func)
 {
+    access_sys_t *sys = p_access->p_sys;
+
     if (i_status < 0)
     {
         if (i_status != -EINTR)
         {
             msg_Err(p_access, "%s failed: %d, '%s'", psz_func, i_status,
                     psz_error);
-            if (!p_access->p_sys->b_error)
+            if (!sys->b_error)
                 vlc_dialog_display_error(p_access,
                                          _("NFS operation failed"), "%s",
                                          psz_error);
         }
         else
             msg_Warn(p_access, "%s interrupted", psz_func);
-        p_access->p_sys->b_error = true;
+        sys->b_error = true;
         return true;
     }
     else

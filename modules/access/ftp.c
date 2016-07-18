@@ -961,6 +961,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = p_access->p_sys;
     bool    *pb_bool;
     int64_t *pi_64;
 
@@ -983,9 +984,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *pb_bool = true;    /* FIXME */
             break;
         case STREAM_GET_SIZE:
-            if( p_access->p_sys->size == UINT64_MAX )
+            if( sys->size == UINT64_MAX )
                 return VLC_EGENERIC;
-            *va_arg( args, uint64_t * ) = p_access->p_sys->size;
+            *va_arg( args, uint64_t * ) = sys->size;
             break;
 
         case STREAM_GET_PTS_DELAY:
@@ -997,7 +998,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case STREAM_SET_PAUSE_STATE:
             pb_bool = (bool*)va_arg( args, bool* );
             if ( !pb_bool )
-                 return Seek( p_access, p_access->p_sys->offset );
+                 return Seek( p_access, sys->offset );
             break;
 
         default:

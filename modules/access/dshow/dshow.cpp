@@ -827,7 +827,7 @@ static void CommonClose( vlc_object_t *p_this, access_sys_t *p_sys )
 static void AccessClose( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t *)p_this;
-    access_sys_t *p_sys    = p_access->p_sys;
+    access_sys_t *p_sys    = (access_sys_t *)p_access->p_sys;
 
     /* Stop capturing stuff */
     p_sys->p_control->Stop();
@@ -1751,7 +1751,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
  *****************************************************************************/
 static block_t *ReadCompressed( access_t *p_access, bool *eof )
 {
-    access_sys_t   *p_sys = p_access->p_sys;
+    access_sys_t   *p_sys = (access_sys_t *)p_access->p_sys;
     /* There must be only 1 elementary stream to produce a valid stream
      * of MPEG or DV data */
     dshow_stream_t *p_stream = p_sys->pp_streams[0];
@@ -1896,6 +1896,7 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = (access_sys_t *)p_access->p_sys;
     bool    *pb_bool;
     int64_t *pi_64;
 
@@ -1917,7 +1918,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
 
     case STREAM_GET_CONTENT_TYPE:
     {
-        dshow_stream_t *p_stream = p_access->p_sys->pp_streams[0];
+        dshow_stream_t *p_stream = sys->pp_streams[0];
         char **type = va_arg( args, char ** );
 
         /* Check if we need to force demuxers */

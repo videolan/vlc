@@ -420,6 +420,8 @@ static int DirControl( access_t *p_access, int i_query, va_list args )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = p_access->p_sys;
+
     switch( i_query )
     {
     case STREAM_CAN_SEEK:
@@ -435,7 +437,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     case STREAM_GET_SIZE:
         if( p_access->pf_readdir != NULL )
             return VLC_EGENERIC;
-        *va_arg( args, uint64_t * ) = p_access->p_sys->size;
+        *va_arg( args, uint64_t * ) = sys->size;
         break;
 
     case STREAM_GET_PTS_DELAY:

@@ -475,6 +475,8 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
+    access_sys_t *sys = p_access->p_sys;
+
     switch( i_query )
     {
     case STREAM_CAN_SEEK:
@@ -489,8 +491,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
     case STREAM_GET_SIZE:
     {
-        smb_stat st = smb_stat_fd( p_access->p_sys->p_session,
-                                   p_access->p_sys->i_fd );
+        smb_stat st = smb_stat_fd( p_sys->p_session, p_sys->i_fd );
         *va_arg( args, uint64_t * ) = smb_stat_get( st, SMB_STAT_SIZE );
         break;
     }
