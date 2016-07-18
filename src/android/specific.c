@@ -25,6 +25,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_network.h>
 #include <vlc_fs.h>
 #include "../libvlc.h"
 #include "config/configuration.h"
@@ -283,5 +284,35 @@ char *config_GetUserDir (vlc_userdir_t type)
                 return config_GetGenericDir(psz_name);
         }
     }
+    return NULL;
+}
+
+/* This is empty, of course
+ *
+ * The reason is that there is no simple way to get the proxy settings on all
+ * supported versions of Android, even from the Java side...
+ *
+ * The best way would be to follow this "solution"
+ * http://stackoverflow.com/questions/10811698/getting-wifi-proxy-settings-in-android/13616054#13616054
+ *
+ * Or, in summary, using JNI:
+ * if( version >= 4.0 ) {
+ *     System.getProperty( "http.proxyHost" );
+ *     System.getProperty( "http.proxyPort" );
+ * } else {
+ *     context = magically_find_context();
+ *     android.net.Proxy.getHost( context );
+ *     android.net.Proxy.getPort( context );
+ * }
+ *
+ * */
+
+/**
+ * Determines the network proxy server to use (if any).
+ * @param url absolute URL for which to get the proxy server
+ * @return proxy URL, NULL if no proxy or error
+ */
+char *vlc_getProxyUrl(const char *url)
+{
     return NULL;
 }
