@@ -39,7 +39,7 @@
 #include "ts_streams.h"
 #include "ts_streams_private.h"
 #include "ts_psi.h"
-#include "ts_psi_eit.h"
+#include "ts_si.h"
 #include "ts_psip.h"
 
 #include "ts_hotfixes.h"

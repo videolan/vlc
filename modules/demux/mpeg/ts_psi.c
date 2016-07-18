@@ -50,7 +50,7 @@
 #include "ts_sl.h"
 #include "ts_scte.h"
 #include "ts_psip.h"
-#include "ts_psi_eit.h"
+#include "ts_si.h"
 
 #include "../access/dtv/en50221_capmt.h"
 

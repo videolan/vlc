@@ -36,7 +36,7 @@
 #include <dvbpsi/tot.h> /* TDT support */
 #include <dvbpsi/dr.h>
 
-#include "ts_psi_eit.h"
+#include "ts_si.h"
 
 #include "ts_pid.h"
 #include "ts_streams_private.h"
@@ -50,11 +50,11 @@
 #include <time.h>
 #include <assert.h>
 
-#ifndef PSI_DEBUG_EIT
- #define PSI_DEBUG_TIMESHIFT(t)
+#ifndef SI_DEBUG_EIT
+ #define SI_DEBUG_TIMESHIFT(t)
 #else
  static time_t i_eit_debug_offset = 0;
- #define PSI_DEBUG_TIMESHIFT(t) \
+ #define SI_DEBUG_TIMESHIFT(t) \
     do {\
         if( i_eit_debug_offset == 0 )\
             i_eit_debug_offset = time(NULL) - t;\
@@ -395,7 +395,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
         int i_min_age = 0;
 
         i_start = EITConvertStartTime( p_evt->i_start_time );
-        PSI_DEBUG_TIMESHIFT(i_start);
+        SI_DEBUG_TIMESHIFT(i_start);
         i_duration = EITConvertDuration( p_evt->i_duration );
 
         /* We have to fix ARIB-B10 as all timestamps are JST */

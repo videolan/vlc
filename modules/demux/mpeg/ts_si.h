@@ -21,7 +21,7 @@
 
 #include "ts_pid_fwd.h"
 
-//#define PSI_DEBUG_EIT
+//#define SI_DEBUG_EIT
 
 #define TS_SI_SDT_PID 0x11
 #define TS_SI_EIT_PID 0x12
