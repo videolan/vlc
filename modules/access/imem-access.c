@@ -106,7 +106,7 @@ static int Control(access_t *access, int query, va_list args)
     return VLC_SUCCESS;
 }
 
-static int open_cb_default(void *opaque, void **datap, size_t *sizep)
+static int open_cb_default(void *opaque, void **datap, uint64_t *sizep)
 {
     *datap = opaque;
     (void) sizep;
