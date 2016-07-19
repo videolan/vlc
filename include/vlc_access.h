@@ -142,9 +142,13 @@ VLC_API void vlc_access_Delete(access_t *access);
  */
 static inline int vlc_access_Seek(access_t *access, uint64_t offset)
 {
-    if (access->pf_seek == NULL)
-        return VLC_EGENERIC;
-    return access->pf_seek(access, offset);
+    int ret = VLC_EGENERIC;
+
+    if (access->pf_seek != NULL)
+        ret = access->pf_seek(access, offset);
+    if (ret == VLC_SUCCESS)
+        access->info.b_eof = false;
+    return ret;
 }
 
 /**

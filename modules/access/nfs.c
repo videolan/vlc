@@ -243,7 +243,6 @@ static int
 FileSeek(access_t *p_access, uint64_t i_pos)
 {
     access_sys_t *p_sys = p_access->p_sys;
-    p_access->info.b_eof = false;
 
     p_sys->res.seek.b_done = false;
     if (nfs_lseek_async(p_sys->p_nfs, p_sys->p_nfsfh, i_pos, SEEK_SET,

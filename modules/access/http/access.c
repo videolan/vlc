@@ -56,7 +56,6 @@ static block_t *FileRead(access_t *access, bool *restrict eof)
 static int FileSeek(access_t *access, uint64_t pos)
 {
     access_sys_t *sys = access->p_sys;
-    access->info.b_eof = false;
 
     if (vlc_http_file_seek(sys->resource, pos))
         return VLC_EGENERIC;

@@ -426,9 +426,6 @@ static int Seek( access_t *p_access, uint64_t i_pos )
         p_sys->i_current_seekpoint = i_seekpoint;
     }
 
-    /* Reset eof */
-    p_access->info.b_eof = false;
-
     return VLC_SUCCESS;
 }
 

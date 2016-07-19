@@ -829,7 +829,6 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     if( val )
         return val;
 
-    p_access->info.b_eof = false;
     p_sys->offset = i_pos;
 
     return VLC_SUCCESS;

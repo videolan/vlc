@@ -417,7 +417,6 @@ static int Seek( access_t * p_access, uint64_t i_pos )
 
     p_sys->i_media_used += i_offset;
     p_sys->i_position = i_pos;
-    p_access->info.b_eof = false;
 
     return VLC_SUCCESS;
 }

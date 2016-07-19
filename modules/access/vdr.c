@@ -395,7 +395,6 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     i_pos = __MIN( i_pos, p_sys->size );
 
     p_sys->offset = i_pos;
-    p_access->info.b_eof = false;
 
     /* find correct chapter */
     FindSeekpoint( p_access );

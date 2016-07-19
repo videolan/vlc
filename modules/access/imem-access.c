@@ -62,8 +62,6 @@ static int Seek(access_t *access, uint64_t offset)
 
     if (sys->seek_cb(sys->opaque, offset) != 0)
         return VLC_EGENERIC;
-
-   access->info.b_eof = false;
    return VLC_SUCCESS;
 }
 

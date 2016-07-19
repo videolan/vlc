@@ -450,8 +450,6 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     if (smb_fseek(p_sys->p_session, p_sys->i_fd, i_pos, SMB_SEEK_SET) == -1)
         return VLC_EGENERIC;
 
-    p_access->info.b_eof = false;
-
     return VLC_SUCCESS;
 }
 

@@ -373,7 +373,6 @@ static int Seek(access_t *access, uint64_t position)
         if (sys->size < 0 || position != sys->size)
             return VLC_EGENERIC;
     }
-    access->info.b_eof = false;
     return VLC_SUCCESS;
 }
 

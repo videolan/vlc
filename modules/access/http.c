@@ -660,7 +660,6 @@ static int Seek( access_t *p_access, uint64_t i_pos )
         if( retval == VLC_SUCCESS ) {
             uint8_t p_buffer[2];
             Read( p_access, p_buffer, 1);
-            p_access->info.b_eof  = false;
         }
         return retval;
     }

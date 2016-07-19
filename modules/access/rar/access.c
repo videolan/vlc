@@ -59,7 +59,6 @@ static int Seek(access_t *access, uint64_t position)
         if (position < sys->chunk->cummulated_size + sys->chunk->size)
             break;
     }
-    access->info.b_eof = false;
 
     const uint64_t offset = sys->chunk->offset +
                             (position - sys->chunk->cummulated_size);

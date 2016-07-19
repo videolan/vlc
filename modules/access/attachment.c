@@ -136,7 +136,6 @@ static int Seek(access_t *access, uint64_t position)
         position = a->i_data;
 
     sys->offset = position;
-    access->info.b_eof = false;
     return VLC_SUCCESS;
 }
 
