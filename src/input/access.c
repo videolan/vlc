@@ -183,18 +183,6 @@ int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list ar
      return VLC_SUCCESS;
 }
 
-struct stream_sys_t
-{
-    access_t *access;
-    block_t  *block;
-};
-
-static ssize_t AStreamNoRead(stream_t *s, void *buf, size_t len)
-{
-    (void) s; (void) buf; (void) len;
-    return -1;
-}
-
 static int AStreamNoReadDir(stream_t *s, input_item_node_t *p_node)
 {
     (void) s; (void) p_node;
@@ -202,21 +190,25 @@ static int AStreamNoReadDir(stream_t *s, input_item_node_t *p_node)
 }
 
 /* Block access */
-static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
+static block_t *AStreamReadBlock(stream_t *s, bool *restrict eof)
 {
-    stream_sys_t *sys = s->p_sys;
+    access_t *access = s->p_sys;
     input_thread_t *input = s->p_input;
-    block_t *block = sys->block;
+    block_t * block;
 
-    while (block == NULL)
+    do
     {
-        if (vlc_access_Eof(sys->access))
-            return 0;
+        if (vlc_access_Eof(access))
+        {
+            *eof = true;
+            return NULL;
+        }
         if (vlc_killed())
-            return -1;
+            return NULL;
 
-        block = vlc_access_Block(sys->access);
+        block = vlc_access_Block(access);
     }
+    while (block == NULL);
 
     if (input != NULL)
     {
@@ -229,29 +221,13 @@ static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
         vlc_mutex_unlock(&input->p->counters.counters_lock);
     }
 
-    size_t copy = block->i_buffer < len ? block->i_buffer : len;
-
-    if (likely(copy > 0) && buf != NULL /* skipping data? */)
-        memcpy(buf, block->p_buffer, copy);
-
-    block->p_buffer += copy;
-    block->i_buffer -= copy;
-
-    if (block->i_buffer == 0)
-    {
-        block_Release(block);
-        sys->block = NULL;
-    }
-    else
-        sys->block = block;
-
-    return copy;
+    return block;
 }
 
 /* Read access */
 static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
 {
-    stream_sys_t *sys = s->p_sys;
+    access_t *access = s->p_sys;
     input_thread_t *input = s->p_input;
     ssize_t val = 0;
     char dummy[(buf != NULL) ? 1 : (len <= 2048) ? len : 2048];
@@ -264,12 +240,12 @@ static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
 
     do
     {
-        if (vlc_access_Eof(sys->access))
+        if (vlc_access_Eof(access))
             return 0;
         if (vlc_killed())
             return -1;
 
-        val = vlc_access_Read(sys->access, buf, len);
+        val = vlc_access_Read(access, buf, len);
         if (val == 0)
             return 0; /* EOF */
     }
@@ -292,47 +268,25 @@ static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
 /* Directory */
 static int AStreamReadDir(stream_t *s, input_item_node_t *p_node)
 {
-    stream_sys_t *sys = s->p_sys;
+    access_t *access = s->p_sys;
 
-    return sys->access->pf_readdir(sys->access, p_node);
+    return access->pf_readdir(access, p_node);
 }
 
 /* Common */
 static int AStreamSeek(stream_t *s, uint64_t offset)
 {
-    stream_sys_t *sys = s->p_sys;
+    access_t *access = s->p_sys;
 
-    if (sys->block != NULL)
-    {
-        block_Release(sys->block);
-        sys->block = NULL;
-    }
-
-    return vlc_access_Seek(sys->access, offset);
+    return vlc_access_Seek(access, offset);
 }
 
 static int AStreamControl(stream_t *s, int cmd, va_list args)
 {
-    stream_sys_t *sys = s->p_sys;
-    access_t *access = sys->access;
+    access_t *access = s->p_sys;
 
     switch (cmd)
     {
-        case STREAM_SET_TITLE:
-        case STREAM_SET_SEEKPOINT:
-        {
-            int ret = access_vaControl(access, cmd, args);
-            if (ret != VLC_SUCCESS)
-                return ret;
-
-            if (sys->block != NULL)
-            {
-                block_Release(sys->block);
-                sys->block = NULL;
-            }
-            break;
-        }
-
         case STREAM_GET_PRIVATE_BLOCK:
         {
             block_t **b = va_arg(args, block_t **);
@@ -354,12 +308,9 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
 
 static void AStreamDestroy(stream_t *s)
 {
-    stream_sys_t *sys = s->p_sys;
+    access_t *access = s->p_sys;
 
-    if (sys->block != NULL)
-        block_Release(sys->block);
-    vlc_access_Delete(sys->access);
-    free(sys);
+    vlc_access_Delete(access);
 }
 
 stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
@@ -369,53 +320,46 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     if (unlikely(s == NULL))
         return NULL;
 
-    stream_sys_t *sys = malloc(sizeof (*sys));
-    if (unlikely(sys == NULL))
-        goto error;
+    access_t *access = access_New(VLC_OBJECT(s), input, preparsing, url);
+    if (access == NULL)
+    {
+        stream_CommonDelete(s);
+        return NULL;
+    }
 
-    sys->access = access_New(VLC_OBJECT(s), input, preparsing, url);
-    if (sys->access == NULL)
-        goto error;
-
-    sys->block = NULL;
     s->p_input = input;
-    s->psz_url = strdup(sys->access->psz_url);
+    s->psz_url = strdup(access->psz_url);
 
     const char *cachename;
 
-    if (sys->access->pf_block != NULL)
+    if (access->pf_block != NULL)
     {
-        s->pf_read = AStreamReadBlock;
+        s->pf_block = AStreamReadBlock;
         cachename = "cache_block";
     }
     else
-    if (sys->access->pf_read != NULL)
+    if (access->pf_read != NULL)
     {
         s->pf_read = AStreamReadStream;
         cachename = "prefetch,cache_read";
     }
     else
     {
-        s->pf_read = AStreamNoRead;
         cachename = NULL;
     }
 
-    if (sys->access->pf_readdir != NULL)
+    if (access->pf_readdir != NULL)
         s->pf_readdir = AStreamReadDir;
     else
         s->pf_readdir = AStreamNoReadDir;
 
     s->pf_seek    = AStreamSeek;
     s->pf_control = AStreamControl;
-    s->p_sys      = sys;
+    s->p_sys      = access;
 
     if (cachename != NULL)
         s = stream_FilterChainNew(s, cachename);
     return s;
-error:
-    free(sys);
-    stream_CommonDelete(s);
-    return NULL;
 }
 
 static int compar_type(input_item_t *p1, input_item_t *p2)
