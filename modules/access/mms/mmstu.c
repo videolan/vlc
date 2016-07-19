@@ -381,7 +381,7 @@ static int Seek( access_t * p_access, uint64_t i_pos )
     {
         if( mms_HeaderMediaRead( p_access, MMS_PACKET_CMD ) < 0 )
         {
-            p_access->info.b_eof = true;
+            p_sys->b_eof = true;
             return VLC_EGENERIC;
         }
 
@@ -396,7 +396,7 @@ static int Seek( access_t * p_access, uint64_t i_pos )
     {
         if( mms_HeaderMediaRead( p_access, MMS_PACKET_CMD ) < 0 )
         {
-            p_access->info.b_eof = true;
+            p_sys->b_eof = true;
             return VLC_EGENERIC;
         }
         if( p_sys->i_command == 0x05 )
@@ -409,7 +409,7 @@ static int Seek( access_t * p_access, uint64_t i_pos )
     /* get a packet */
     if( mms_HeaderMediaRead( p_access, MMS_PACKET_MEDIA ) < 0 )
     {
-        p_access->info.b_eof = true;
+        p_sys->b_eof = true;
         return VLC_EGENERIC;
     }
 
@@ -428,7 +428,7 @@ static block_t *Block( access_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    if( p_access->info.b_eof )
+    if( p_sys->b_eof )
     {
         *eof = true;
         return NULL;
@@ -554,7 +554,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     p_sys->i_buffer_udp = 0;
     p_sys->p_cmd = NULL;
     p_sys->i_cmd = 0;
-    p_access->info.b_eof = false;
+    p_sys->b_eof = false;
 
     /* *** send command 1 : connection request *** */
     var_buffer_initwrite( &buffer, 0 );
@@ -1529,18 +1529,18 @@ static int mms_CommandRead( access_t *p_access, int i_command1,
             {
                 case 0x03:
                     msg_Warn( p_access, "socket closed by server" );
-                    p_access->info.b_eof = true;
+                    p_sys->b_eof = true;
                     return VLC_EGENERIC;
                 case 0x1e:
                     msg_Warn( p_access, "end of media stream" );
-                    p_access->info.b_eof = true;
+                    p_sys->b_eof = true;
                     return VLC_EGENERIC;
                 default:
                     break;
             }
         }
     }
-    p_access->info.b_eof = true;
+    p_sys->b_eof = true;
     msg_Warn( p_access, "failed to receive command (aborting)" );
 
     return VLC_EGENERIC;
@@ -1573,11 +1573,11 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
             {
                 case 0x03:
                     msg_Warn( p_access, "socket closed by server" );
-                    p_access->info.b_eof = true;
+                    p_sys->b_eof = true;
                     return -1;
                 case 0x1e:
                     msg_Warn( p_access, "end of media stream" );
-                    p_access->info.b_eof = true;
+                    p_sys->b_eof = true;
                     return -1;
                 case 0x20:
                     /* XXX not too dificult to be done EXCEPT that we
@@ -1585,7 +1585,7 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
                      * could do that :p */
                     msg_Err( p_access,
                              "reinitialization needed --> unsupported" );
-                    p_access->info.b_eof = true;
+                    p_sys->b_eof = true;
                     return -1;
                 default:
                     break;
@@ -1595,7 +1595,7 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
 
     msg_Err( p_access, "cannot receive %s (aborting)",
              ( i_type == MMS_PACKET_HEADER ) ? "header" : "media data" );
-    p_access->info.b_eof = true;
+    p_sys->b_eof = true;
     return -1;
 }
 

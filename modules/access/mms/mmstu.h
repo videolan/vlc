@@ -95,6 +95,7 @@ struct access_sys_t
 
     /* misc */
     bool  b_seekable;
+    bool  b_eof;
 
     vlc_mutex_t  lock_netwrite;
     bool         b_keep_alive;
