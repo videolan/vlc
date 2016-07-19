@@ -852,22 +852,17 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
     assert( p_sys->data.fd != -1 );
     assert( !p_sys->out );
 
-    if( p_access->info.b_eof )
-        return 0;
-
     if( p_sys->data.p_tls != NULL )
         i_read = vlc_tls_Read( p_sys->data.p_tls, p_buffer, i_len, false );
     else
         i_read = vlc_recv_i11e( p_sys->data.fd, p_buffer, i_len, 0 );
 
-    if( i_read > 0 )
+    if( i_read >= 0 )
         p_sys->offset += i_read;
-    else if( i_read == 0 )
-        p_access->info.b_eof = true;
     else if( errno != EINTR && errno != EAGAIN )
     {
         msg_Err( p_access, "receive error: %s", vlc_strerror_c(errno) );
-        p_access->info.b_eof = true;
+        i_read = 0;
     }
 
     return i_read;

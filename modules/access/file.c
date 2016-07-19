@@ -295,7 +295,6 @@ static ssize_t Read (access_t *p_access, void *p_buffer, size_t i_len)
         val = 0;
     }
 
-    p_access->info.b_eof = !val;
     return val;
 }
 

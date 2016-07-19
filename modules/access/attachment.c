@@ -116,8 +116,7 @@ static ssize_t Read(access_t *access, void *buffer, size_t size)
     access_sys_t *sys = access->p_sys;
     input_attachment_t *a = sys->attachment;
 
-    access->info.b_eof = sys->offset >= (uint64_t)a->i_data;
-    if (access->info.b_eof)
+    if (sys->offset >= (uint64_t)a->i_data)
         return 0;
 
     const size_t copy = __MIN(size, a->i_data - sys->offset);

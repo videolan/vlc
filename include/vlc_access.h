@@ -183,9 +183,13 @@ static inline bool vlc_access_Eof(const access_t *access)
   */
 static inline ssize_t vlc_access_Read(access_t *access, void *buf, size_t len)
 {
-    if (access->pf_read == NULL)
-        return -1;
-    return access->pf_read(access, buf, len);
+    int ret = -1;
+
+    if (access->pf_read != NULL)
+        ret = access->pf_read(access, buf, len);
+    if (len > 0 && ret == 0)
+        access->info.b_eof = true;
+    return ret;
 }
 
 /**

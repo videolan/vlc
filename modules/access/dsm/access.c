@@ -461,16 +461,12 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
     access_sys_t *p_sys = p_access->p_sys;
     int i_read;
 
-    if( p_access->info.b_eof ) return 0;
-
     i_read = smb_fread( p_sys->p_session, p_sys->i_fd, p_buffer, i_len );
     if( i_read < 0 )
     {
         msg_Err( p_access, "read failed" );
         return -1;
     }
-
-    if( i_read == 0 ) p_access->info.b_eof = true;
 
     return i_read;
 }

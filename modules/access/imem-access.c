@@ -48,9 +48,6 @@ static ssize_t Read(access_t *access, void *buf, size_t len)
         val = 0;
     }
 
-    if (val <= 0)
-        access->info.b_eof = true;
-
     return val;
 }
 

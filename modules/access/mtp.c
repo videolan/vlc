@@ -195,12 +195,9 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
                 vlc_dialog_display_error( p_access, _( "File reading failed" ),
                     _( "VLC could not read the file: %s" ),
                     vlc_strerror(errno) );
-                p_access->info.b_eof = true;
                 return 0;
         }
     }
-    else if( i_ret == 0 )
-        p_access->info.b_eof = true;
 
     return i_ret;
 }

@@ -88,10 +88,7 @@ static ssize_t Read (access_t *access, void *buf, size_t len)
     access_sys_t *sys = access->p_sys;
 
     if (sys->offset >= sys->length)
-    {
-        access->info.b_eof = true;
         return 0;
-    }
 
     if (len > sys->length - sys->offset)
         len = sys->length - sys->offset;

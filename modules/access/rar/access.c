@@ -94,8 +94,6 @@ static ssize_t Read(access_t *access, void *data, size_t size)
             Seek(access, sys->position))
             break;
     }
-    if (size > 0 && total <= 0)
-        access->info.b_eof = true;
     return total;
 
 }

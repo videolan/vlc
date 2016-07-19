@@ -342,11 +342,8 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_sys->fd == -1 )
-    {
         /* no more data */
-        p_access->info.b_eof = true;
         return 0;
-    }
 
     ssize_t i_ret = read( p_sys->fd, p_buffer, i_len );
 

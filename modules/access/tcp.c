@@ -136,18 +136,14 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
     access_sys_t *p_sys = p_access->p_sys;
     int i_read;
 
-    if( p_access->info.b_eof )
-        return 0;
-
     i_read = vlc_recv_i11e( p_sys->fd, p_buffer, i_len, 0 );
-    if( i_read > 0 )
-        ;
-    else if( i_read == 0 )
-        p_access->info.b_eof = true;
-    else if( errno != EINTR && errno != EAGAIN )
+    if( i_read < 0 )
     {
-        msg_Err( p_access, "receive error: %s", vlc_strerror_c(errno) );
-        p_access->info.b_eof = true;
+        if( errno != EINTR && errno != EAGAIN )
+        {
+            msg_Err( p_access, "receive error: %s", vlc_strerror_c(errno) );
+            i_read = 0;
+        }
     }
 
     return i_read;

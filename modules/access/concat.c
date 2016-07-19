@@ -63,15 +63,11 @@ static access_t *GetAccess(access_t *access)
     }
 
     if (sys->next == NULL)
-    {
-error:
-        access->info.b_eof = true;
         return NULL;
-    }
 
     a = vlc_access_NewMRL(VLC_OBJECT(access), sys->next->mrl);
     if (a == NULL)
-        goto error;
+        return NULL;
 
     sys->access = a;
     sys->next = sys->next->next;
@@ -88,10 +84,7 @@ static ssize_t Read(access_t *access, void *buf, size_t len)
      * change. We need to check it. For instance, a path could point to a
      * regular file during Open() yet point to a directory here and now. */
     if (unlikely(a->pf_read == NULL))
-    {
-        access->info.b_eof = true;
         return 0;
-    }
 
     return vlc_access_Read(a, buf, len);
 }

@@ -58,9 +58,6 @@ static ssize_t Read(access_t *p_access, void *p_data, size_t i_size)
     if (i_read < 0)
         i_read = 0;
 
-    if (i_size > 0 && i_read <= 0)
-        p_access->info.b_eof = true;
-
     return i_read;
 }
 

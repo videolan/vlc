@@ -518,10 +518,10 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
     int i_read;
 
     if( p_sys->fd == -1 )
-        goto fatal;
+        return 0;
 
     if( i_len == 0 )
-        goto fatal;
+        return 0;
 
     if( p_sys->i_icy_meta > 0 && p_sys->offset - p_sys->i_icy_offset > 0 )
     {
@@ -531,14 +531,14 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
         if( i_next == p_sys->i_icy_meta )
         {
             if( ReadICYMeta( p_access ) )
-                goto fatal;
+                return 0;
         }
         if( i_len > i_next )
             i_len = i_next;
     }
 
     if( ReadData( p_access, &i_read, p_buffer, i_len ) )
-        goto fatal;
+        return 0;
 
     if( i_read < 0 )
         return -1; /* EINTR / EAGAIN */
@@ -554,17 +554,13 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
             else
                 return -1;
         }
-        goto fatal;
+        return 0;
     }
 
     assert( i_read >= 0 );
     p_sys->offset += i_read;
 
     return i_read;
-
-fatal:
-    p_access->info.b_eof = true;
-    return 0;
 }
 
 static int ReadICYMeta( access_t *p_access )
@@ -793,7 +789,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     p_sys->b_has_size = false;
     p_sys->offset = i_tell;
     p_sys->size = 0;
-    p_access->info.b_eof  = false;
 
     /* Open connection */
     assert( p_sys->fd == -1 ); /* No open sockets (leaking fds is BAD) */

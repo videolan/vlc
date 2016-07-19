@@ -388,18 +388,12 @@ static ssize_t Read( access_t *p_access, void *buf, size_t len )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    if( p_access->info.b_eof )
-        return 0;
-
     ssize_t val = libssh2_sftp_read(  p_sys->file, buf, len );
     if( val < 0 )
     {
-        p_access->info.b_eof = true;
         msg_Err( p_access, "read failed" );
         return 0;
     }
-    else if( val == 0 )
-        p_access->info.b_eof = true;
 
     return val;
 }
