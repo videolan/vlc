@@ -661,7 +661,6 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     if( Connect( p_access, i_pos ) )
     {
         msg_Err( p_access, "seek failed" );
-        p_access->info.b_eof = true;
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
