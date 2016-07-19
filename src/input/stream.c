@@ -45,6 +45,7 @@ typedef struct stream_priv_t
 {
     stream_t stream;
     void (*destroy)(stream_t *);
+    block_t *block;
     block_t *peek;
     uint64_t offset;
     bool eof;
@@ -80,12 +81,14 @@ stream_t *stream_CommonNew(vlc_object_t *parent, void (*destroy)(stream_t *))
     s->psz_url = NULL;
     s->p_source = NULL;
     s->pf_read = NULL;
+    s->pf_block = NULL;
     s->pf_readdir = NULL;
     s->pf_control = NULL;
     s->p_sys = NULL;
     s->p_input = NULL;
     assert(destroy != NULL);
     priv->destroy = destroy;
+    priv->block = NULL;
     priv->peek = NULL;
     priv->offset = 0;
     priv->eof = false;
@@ -107,6 +110,8 @@ void stream_CommonDelete(stream_t *s)
 
     if (priv->peek != NULL)
         block_Release(priv->peek);
+    if (priv->block != NULL)
+        block_Release(priv->block);
 
     free(s->psz_url);
     vlc_object_release(s);
@@ -332,6 +337,7 @@ error:
 
 static ssize_t stream_ReadRaw(stream_t *s, void *buf, size_t len)
 {
+    stream_priv_t *priv = (stream_priv_t *)s;
     size_t copy = 0;
     ssize_t ret = 0;
 
@@ -343,7 +349,45 @@ static ssize_t stream_ReadRaw(stream_t *s, void *buf, size_t len)
             break;
         }
 
-        ret = s->pf_read(s, buf, len);
+        if (s->pf_read != NULL)
+        {
+            assert(priv->block == NULL);
+            ret = s->pf_read(s, buf, len);
+        }
+        else if (s->pf_block != NULL)
+        {
+            block_t *block = priv->block;
+            bool eof = false;
+
+            if (block == NULL)
+                block = s->pf_block(s, &eof);
+
+            if (block == NULL)
+            {
+                assert(priv->block == NULL);
+                ret = eof ? 0 : -1;
+            }
+            else if (block->i_buffer <= len)
+            {
+                if (buf != NULL)
+                    memcpy(buf, block->p_buffer, block->i_buffer);
+                ret = block->i_buffer;
+                block_Release(block);
+                priv->block = NULL;
+            }
+            else
+            {
+                if (buf != NULL)
+                    memcpy(buf, block->p_buffer, len);
+                ret = len;
+                block->p_buffer += len;
+                block->i_buffer -= len;
+                priv->block = block;
+            }
+        }
+        else
+            ret = -1;
+
         if (ret <= 0)
             break;
 
@@ -402,11 +446,16 @@ ssize_t stream_Read(stream_t *s, void *buf, size_t len)
 ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
-    block_t *peek = priv->peek;
 
-    if (peek == NULL)
+    if (priv->peek == NULL)
     {
-        peek = block_Alloc(len);
+        priv->peek = priv->block;
+        priv->block = NULL;
+    }
+
+    if (priv->peek == NULL)
+    {
+        block_t *peek = block_Alloc(len);
         if (unlikely(peek == NULL))
             return VLC_ENOMEM;
 
@@ -430,11 +479,11 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
         return ret;
     }
 
-    if (peek->i_buffer < len)
+    if (priv->peek->i_buffer < len)
     {
-        size_t avail = peek->i_buffer;
+        size_t avail = priv->peek->i_buffer;
 
-        peek = block_TryRealloc(peek, 0, len);
+        block_t *peek = block_TryRealloc(priv->peek, 0, len);
         if (unlikely(peek == NULL))
             return VLC_ENOMEM;
 
@@ -449,7 +498,7 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
     }
 
     /* Nothing to do */
-    *bufp = peek->p_buffer;
+    *bufp = priv->peek->p_buffer;
     return len;
 }
 
@@ -462,6 +511,16 @@ block_t *stream_ReadBlock(stream_t *s)
     {
         block = priv->peek;
         priv->peek = NULL;
+    }
+    else if (priv->block != NULL)
+    {
+        block = priv->block;
+        priv->block = NULL;
+    }
+    else if (s->pf_block != NULL)
+    {
+        priv->eof = false;
+        block = s->pf_block(s, &priv->eof);
     }
     else
     {
@@ -553,6 +612,12 @@ int stream_Seek(stream_t *s, uint64_t offset)
         block_Release(peek);
     }
 
+    if (priv->block != NULL)
+    {
+        block_Release(priv->block);
+        priv->block = NULL;
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -592,6 +657,13 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
                 block_Release(priv->peek);
                 priv->peek = NULL;
             }
+
+            if (priv->block != NULL)
+            {
+                block_Release(priv->block);
+                priv->block = NULL;
+            }
+
             return VLC_SUCCESS;
         }
 
