@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10102" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10102"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -100,15 +100,9 @@
                                         <button id="192">
                                             <rect key="frame" x="14" y="156" width="80" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Enable" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="193" customClass="BGHUDButtonCell">
+                                            <buttonCell key="cell" type="check" title="Enable" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="193" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="buttonType">
-                                                        <integer key="value" value="3"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="equalizerEnable:" target="-2" id="dyP-pG-TZF"/>
@@ -319,15 +313,9 @@
                                                 <button id="194">
                                                     <rect key="frame" x="109" y="159" width="88" height="18"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="check" title="2 Pass" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="195" customClass="BGHUDButtonCell">
+                                                    <buttonCell key="cell" type="check" title="2 Pass" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="195" customClass="VLCHUDCheckboxCell">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="smallSystem"/>
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                            <userDefinedRuntimeAttribute type="number" keyPath="buttonType">
-                                                                <integer key="value" value="3"/>
-                                                            </userDefinedRuntimeAttribute>
-                                                        </userDefinedRuntimeAttributes>
                                                     </buttonCell>
                                                     <connections>
                                                         <action selector="equalizerTwoPass:" target="-2" id="3IO-c8-m0p"/>
@@ -336,11 +324,7 @@
                                                 <slider horizontalHuggingPriority="750" id="196">
                                                     <rect key="frame" x="19" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="197" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="197" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerPreAmpSliderUpdated:" target="-2" id="7Xa-Z8-5gG"/>
                                                     </connections>
@@ -348,11 +332,7 @@
                                                 <slider horizontalHuggingPriority="750" id="198">
                                                     <rect key="frame" x="111" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="199" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="199" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="Pq9-mK-6gi"/>
                                                     </connections>
@@ -360,11 +340,7 @@
                                                 <slider horizontalHuggingPriority="750" id="200">
                                                     <rect key="frame" x="140" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="201" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="201" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="V5y-cd-ebf"/>
                                                     </connections>
@@ -372,11 +348,7 @@
                                                 <slider horizontalHuggingPriority="750" id="202">
                                                     <rect key="frame" x="169" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="203" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="203" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="KN9-Ll-nEK"/>
                                                     </connections>
@@ -384,11 +356,7 @@
                                                 <slider horizontalHuggingPriority="750" id="204">
                                                     <rect key="frame" x="198" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="205" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="205" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="35G-ln-i5e"/>
                                                     </connections>
@@ -396,11 +364,7 @@
                                                 <slider horizontalHuggingPriority="750" id="206">
                                                     <rect key="frame" x="227" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="207" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="207" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="LEn-my-NvY"/>
                                                     </connections>
@@ -408,11 +372,7 @@
                                                 <slider horizontalHuggingPriority="750" id="208">
                                                     <rect key="frame" x="256" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="209" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="209" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="h2x-ra-iQ3"/>
                                                     </connections>
@@ -420,11 +380,7 @@
                                                 <slider horizontalHuggingPriority="750" id="210">
                                                     <rect key="frame" x="285" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="211" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="211" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="m57-Q8-ZCE"/>
                                                     </connections>
@@ -432,11 +388,7 @@
                                                 <slider horizontalHuggingPriority="750" id="212">
                                                     <rect key="frame" x="314" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="213" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="213" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="wbc-hi-c1U"/>
                                                     </connections>
@@ -444,11 +396,7 @@
                                                 <slider horizontalHuggingPriority="750" id="214">
                                                     <rect key="frame" x="343" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="215" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="215" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="LPs-jK-YbG"/>
                                                     </connections>
@@ -456,11 +404,7 @@
                                                 <slider horizontalHuggingPriority="750" id="216">
                                                     <rect key="frame" x="372" y="39" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="217" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-20" maxValue="20" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="217" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="equalizerBandSliderUpdated:" target="-2" id="ATa-AV-o2U"/>
                                                     </connections>
@@ -478,15 +422,9 @@
                                         <button id="218">
                                             <rect key="frame" x="14" y="156" width="375" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Enable dynamic range compressor" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="219" customClass="BGHUDButtonCell">
+                                            <buttonCell key="cell" type="check" title="Enable dynamic range compressor" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="219" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="buttonType">
-                                                        <integer key="value" value="3"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="compressorEnable:" target="-2" id="uHx-ux-eWT"/>
@@ -508,11 +446,7 @@
                                                 <slider horizontalHuggingPriority="750" id="221">
                                                     <rect key="frame" x="40" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="222" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="1" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="222" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="scd-cx-Z2t"/>
                                                     </connections>
@@ -529,11 +463,7 @@
                                                 <slider horizontalHuggingPriority="750" id="225">
                                                     <rect key="frame" x="92" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1.5" maxValue="400" doubleValue="25" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="226" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1.5" maxValue="400" doubleValue="25" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="226" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="TSd-Vu-uAC"/>
                                                     </connections>
@@ -550,11 +480,7 @@
                                                 <slider horizontalHuggingPriority="750" id="229">
                                                     <rect key="frame" x="143" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="800" doubleValue="100" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="230" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="2" maxValue="800" doubleValue="100" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="230" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="tJL-Vg-pRk"/>
                                                     </connections>
@@ -571,11 +497,7 @@
                                                 <slider horizontalHuggingPriority="750" id="233">
                                                     <rect key="frame" x="196" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-30" doubleValue="-11" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="234" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-30" doubleValue="-11" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="234" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="Otq-ED-0CI"/>
                                                     </connections>
@@ -592,11 +514,7 @@
                                                 <slider horizontalHuggingPriority="750" id="237">
                                                     <rect key="frame" x="248" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="20" doubleValue="8" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="238" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="20" doubleValue="8" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="238" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="Vee-cn-Xep"/>
                                                     </connections>
@@ -613,11 +531,7 @@
                                                 <slider horizontalHuggingPriority="750" id="241">
                                                     <rect key="frame" x="300" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="10" doubleValue="2.5" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="242" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="10" doubleValue="2.5" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="242" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="gaI-my-uOm"/>
                                                     </connections>
@@ -697,11 +611,7 @@
                                                 <slider horizontalHuggingPriority="750" id="245">
                                                     <rect key="frame" x="352" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="24" doubleValue="7" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="246" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="24" doubleValue="7" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="246" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="compressorSliderUpdated:" target="-2" id="iSY-Me-sMB"/>
                                                     </connections>
@@ -709,12 +619,9 @@
                                                 <button verticalHuggingPriority="750" id="621">
                                                     <rect key="frame" x="317" y="159" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="8342E4F9-BBCD-43F2-A2E4-99E567CD1608" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="BGHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="CEBD97E7-9B4C-48EE-8F46-A4CFB512B098" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
                                                     </buttonCell>
                                                     <connections>
                                                         <action selector="resetCompressorValues:" target="-2" id="1Oo-68-moS"/>
@@ -733,15 +640,9 @@
                                         <button id="262">
                                             <rect key="frame" x="14" y="156" width="375" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Enable Spatializer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="305" customClass="BGHUDButtonCell">
+                                            <buttonCell key="cell" type="check" title="Enable Spatializer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="305" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="buttonType">
-                                                        <integer key="value" value="3"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="spatializerEnable:" target="-2" id="bpE-Et-UJk"/>
@@ -754,12 +655,9 @@
                                                 <button verticalHuggingPriority="750" id="618">
                                                     <rect key="frame" x="317" y="159" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="C2046691-FAB7-4CE8-A67B-C5F30C470745" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="BGHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="B012D5B9-9282-4637-9073-EE8929D183CC" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
                                                     </buttonCell>
                                                     <connections>
                                                         <action selector="resetSpatializerValues:" target="-2" id="LeL-eG-qna"/>
@@ -777,11 +675,7 @@
                                                 <slider horizontalHuggingPriority="750" id="266">
                                                     <rect key="frame" x="92" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="301" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="301" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="TzD-ul-6Gx"/>
                                                     </connections>
@@ -798,11 +692,7 @@
                                                 <slider horizontalHuggingPriority="750" id="268">
                                                     <rect key="frame" x="143" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="299" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="2" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="299" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="smf-XD-GHV"/>
                                                     </connections>
@@ -819,11 +709,7 @@
                                                 <slider horizontalHuggingPriority="750" id="270">
                                                     <rect key="frame" x="196" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="297" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="297" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="bnX-CW-h45"/>
                                                     </connections>
@@ -840,11 +726,7 @@
                                                 <slider horizontalHuggingPriority="750" id="272">
                                                     <rect key="frame" x="248" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="295" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="295" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="wM1-xe-t5e"/>
                                                     </connections>
@@ -861,11 +743,7 @@
                                                 <slider horizontalHuggingPriority="750" id="274">
                                                     <rect key="frame" x="300" y="52" width="19" height="101"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="293" customClass="BGHUDSliderCell">
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                        </userDefinedRuntimeAttributes>
-                                                    </sliderCell>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="293" customClass="VLCHUDSliderCell"/>
                                                     <connections>
                                                         <action selector="spatializerSliderUpdated:" target="-2" id="CoP-xd-gur"/>
                                                     </connections>
@@ -928,15 +806,9 @@
                                         <button id="343">
                                             <rect key="frame" x="14" y="156" width="335" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Volume normalization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="346" customClass="BGHUDButtonCell">
+                                            <buttonCell key="cell" type="check" title="Volume normalization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="346" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="buttonType">
-                                                        <integer key="value" value="3"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="filterEnableVolumeNorm:" target="-2" id="TN6-b4-Vnj"/>
@@ -945,15 +817,9 @@
                                         <button id="344">
                                             <rect key="frame" x="14" y="76" width="335" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Headphone virtualization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="345" customClass="BGHUDButtonCell">
+                                            <buttonCell key="cell" type="check" title="Headphone virtualization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="345" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="buttonType">
-                                                        <integer key="value" value="3"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="filterEnableHeadPhoneVirt:" target="-2" id="PHU-zj-xvf"/>
@@ -962,15 +828,9 @@
                                         <button id="709">
                                             <rect key="frame" x="14" y="96" width="335" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Karaoke" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="710" customClass="BGHUDButtonCell">
+                                            <buttonCell key="cell" type="check" title="Karaoke" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="710" customClass="VLCHUDCheckboxCell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="buttonType">
-                                                        <integer key="value" value="3"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="filterEnableKaraoke:" target="-2" id="xdG-5Z-pQZ"/>
@@ -995,11 +855,7 @@
                                                     <slider verticalHuggingPriority="750" id="342">
                                                         <rect key="frame" x="129" y="13" width="243" height="15"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="0.10000000000000001" maxValue="10" doubleValue="5" tickMarkPosition="above" sliderType="linear" id="347" customClass="BGHUDSliderCell">
-                                                            <userDefinedRuntimeAttributes>
-                                                                <userDefinedRuntimeAttribute type="string" keyPath="themeKey" value="gradientTheme"/>
-                                                            </userDefinedRuntimeAttributes>
-                                                        </sliderCell>
+                                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="0.10000000000000001" maxValue="10" doubleValue="5" tickMarkPosition="above" sliderType="linear" id="347" customClass="VLCHUDSliderCell"/>
                                                         <connections>
                                                             <action selector="filterVolumeNormSliderUpdated:" target="-2" id="YLf-gK-UkJ"/>
                                                         </connections>
@@ -1041,7 +897,7 @@
         <userDefaultsController representsSharedInstance="YES" id="350"/>
     </objects>
     <resources>
-        <image name="8342E4F9-BBCD-43F2-A2E4-99E567CD1608" width="1" height="1">
+        <image name="B012D5B9-9282-4637-9073-EE8929D183CC" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -1082,7 +938,7 @@ B04HVwdcB2QHZwdsB3sHfweGB44HmwegB6IHpAepB7EHtAe5B8EHxAfWB9kH3gAAAAAAAAIBAAAAAAAA
 AEEAAAAAAAAAAAAAAAAAAAfgA
 </mutableData>
         </image>
-        <image name="C2046691-FAB7-4CE8-A67B-C5F30C470745" width="1" height="1">
+        <image name="CEBD97E7-9B4C-48EE-8F46-A4CFB512B098" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
