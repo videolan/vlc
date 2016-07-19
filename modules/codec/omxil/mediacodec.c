@@ -1042,13 +1042,13 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             p_sys->u.video.i_stride = p_dec->fmt_out.video.i_width;
         }
 
-        p_sys->b_has_format = true;
-
         if (decoder_UpdateVideoFormat(p_dec) != 0)
         {
             msg_Err(p_dec, "decoder_UpdateVideoFormat failed");
             return -1;
         }
+
+        p_sys->b_has_format = true;
         return 0;
     }
 }
