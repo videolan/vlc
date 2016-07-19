@@ -256,9 +256,6 @@ static block_t *BlockRead(access_t *p_access)
     block_t      *p_block;
     ssize_t len;
 
-    if (p_access->info.b_eof)
-        return NULL;
-
     /* Read data */
     p_block = block_Alloc(MTU);
     len = vlc_read_i11e(p_sys->eyetvSock, p_block->p_buffer, MTU);
