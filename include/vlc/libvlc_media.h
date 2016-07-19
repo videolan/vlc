@@ -274,7 +274,7 @@ typedef enum libvlc_media_parsed_status_t
 /**
  * Type of a media slave: subtitle or audio.
  */
-typedef enum
+typedef enum libvlc_media_slave_type_t
 {
     libvlc_media_slave_type_subtitle,
     libvlc_media_slave_type_audio,
@@ -284,7 +284,7 @@ typedef enum
  * A slave of a libvlc_media_t
  * \see libvlc_media_slaves_get
  */
-typedef struct
+typedef struct libvlc_media_slave_t
 {
     char *                          psz_uri;
     libvlc_media_slave_type_t       i_type;

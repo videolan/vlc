@@ -1976,16 +1976,16 @@ LIBVLC_API int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, l
  * See \ref libvlc_media_player_set_role()
  */
 typedef enum libvlc_media_player_role {
-    libvlc_role_None = 0 /**< Don't use a media player role */,
-    libvlc_role_Music   /**< Music (or radio) playback */,
-    libvlc_role_Video /**< Video playback */,
-    libvlc_role_Communication /**< Speech, real-time communication */,
-    libvlc_role_Game /**< Video game */,
-    liblvc_role_Notification /**< User interaction feedback */,
-    libvlc_role_Animation /**< Embedded animation (e.g. in web page) */,
-    libvlc_role_Production /**< Audio editting/production */,
-    libvlc_role_Accessibility /**< Accessibility */,
-    libvlc_role_Test /** Testing */,
+    libvlc_role_None = 0, /**< Don't use a media player role */
+    libvlc_role_Music,   /**< Music (or radio) playback */
+    libvlc_role_Video, /**< Video playback */
+    libvlc_role_Communication, /**< Speech, real-time communication */
+    libvlc_role_Game, /**< Video game */
+    liblvc_role_Notification, /**< User interaction feedback */
+    libvlc_role_Animation, /**< Embedded animation (e.g. in web page) */
+    libvlc_role_Production, /**< Audio editting/production */
+    libvlc_role_Accessibility, /**< Accessibility */
+    libvlc_role_Test /** Testing */
 #define libvlc_role_Last libvlc_role_Test
 } libvlc_media_player_role_t;
 
@@ -1994,17 +1994,19 @@ typedef enum libvlc_media_player_role {
  *
  * \version LibVLC 3.0.0 and later.
  *
+ * \param p_mi media player
  * \return the media player role (\ref libvlc_media_player_role_t)
  */
-LIBVLC_API int libvlc_media_player_get_role(libvlc_media_player_t *);
+LIBVLC_API int libvlc_media_player_get_role(libvlc_media_player_t *p_mi);
 
 /**
  * Sets the media role.
  *
+ * \param p_mi media player
  * \param role the media player role (\ref libvlc_media_player_role_t)
  * \return 0 on success, -1 on error
  */
-LIBVLC_API int libvlc_media_player_set_role(libvlc_media_player_t *,
+LIBVLC_API int libvlc_media_player_set_role(libvlc_media_player_t *p_mi,
                                             unsigned role);
 
 /** @} audio */
