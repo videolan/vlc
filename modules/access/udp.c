@@ -43,6 +43,7 @@
 #include <vlc_network.h>
 #include <vlc_block.h>
 #include <vlc_interrupt.h>
+#include <vlc_atomic.h>
 #ifdef HAVE_POLL
 # include <poll.h>
 #endif
@@ -83,7 +84,7 @@ struct access_sys_t
     block_fifo_t *fifo;
     vlc_sem_t semaphore;
     vlc_thread_t thread;
-    bool timeout_reached;
+    atomic_bool timeout_reached;
 };
 
 /*****************************************************************************
@@ -193,7 +194,7 @@ static int Open( vlc_object_t *p_this )
     vlc_sem_init( &sys->semaphore, 0 );
 
     sys->timeout = var_InheritInteger( p_access, "udp-timeout");
-    sys->timeout_reached = false;
+    atomic_init(&sys->timeout_reached, false);
     if( sys->timeout > 0)
         sys->timeout *= 1000;
 
@@ -265,17 +266,15 @@ static block_t *BlockUDP( access_t *p_access, bool *restrict eof )
     access_sys_t *sys = p_access->p_sys;
     block_t *block;
 
-    if (p_access->info.b_eof)
+    if (atomic_load(&sys->timeout_reached)) {
+        *eof = true;
         return NULL;
+    }
 
     vlc_sem_wait_i11e(&sys->semaphore);
     vlc_fifo_Lock(sys->fifo);
 
     block = vlc_fifo_DequeueAllUnlocked(sys->fifo);
-
-    if (unlikely(sys->timeout_reached == true))
-        *eof = true;
-
     vlc_fifo_Unlock(sys->fifo);
 
     return block;
@@ -324,9 +323,7 @@ static void* ThreadRead( void *data )
             if (unlikely( poll_return == 0))
             {
                 msg_Err( access, "Timeout on receiving, timeout %d seconds", sys->timeout/1000 );
-                vlc_fifo_Lock(sys->fifo);
-                sys->timeout_reached=true;
-                vlc_fifo_Unlock(sys->fifo);
+                atomic_store(&sys->timeout_reached, true);
                 vlc_sem_post(&sys->semaphore);
                 len=0;
                 break;
