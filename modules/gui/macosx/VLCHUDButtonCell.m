@@ -76,7 +76,13 @@
 
 - (void) drawRoundRectButtonBezelInRect:(NSRect)rect
 {
-    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:8.0 yRadius:8.0];
+    NSBezierPath *path;
+    if (self.controlSize == NSMiniControlSize) {
+        rect = NSInsetRect(rect, 1.0, 2.0);
+        path = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:3.0 yRadius:3.0];
+    } else {
+        path = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:8.0 yRadius:8.0];
+    }
     if (self.highlighted) {
         [_pushedGradient drawInBezierPath:path angle:90.0f];
     } else if (!self.enabled) {
@@ -85,7 +91,7 @@
         [_normalGradient drawInBezierPath:path angle:90.0f];
     }
     [[NSColor colorWithCalibratedWhite:1.0 alpha:1.0] setStroke];
-    [path setLineWidth:0.5];
+    [path setLineWidth:1.0];
     [path stroke];
 }
 
