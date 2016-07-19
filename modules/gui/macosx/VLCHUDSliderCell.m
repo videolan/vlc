@@ -167,11 +167,4 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
 
 }
 
-/*
-- (void) drawFocusRingMaskWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
-
-}
-*/
-
 @end
