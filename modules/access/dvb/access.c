@@ -54,6 +54,7 @@ struct access_sys_t
 
     /* Scan */
     struct scan_t *scan;
+    bool done;
 };
 
 /*****************************************************************************
@@ -363,9 +364,10 @@ static block_t *BlockScan( access_t *p_access, bool *restrict eof )
 
     if( scan_Run( p_scan ) != VLC_SUCCESS )
     {
-        if( !p_access->info.b_eof )
+        if( !p_sys->done )
         {
-             msg_Warn( p_access, "Scanning finished" );
+             msg_Info( p_access, "Scanning finished" );
+             p_sys->done = true;
              p_block = scan_GetM3U( p_scan );
         }
         *eof = true;
