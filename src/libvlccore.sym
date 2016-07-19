@@ -405,6 +405,7 @@ stream_Block
 stream_Control
 stream_CustomNew
 stream_Delete
+stream_Eof
 stream_FilterNew
 stream_MemoryNew
 stream_Peek

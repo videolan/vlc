@@ -145,6 +145,28 @@ VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
 VLC_API uint64_t stream_Tell(const stream_t *) VLC_USED;
 
 /**
+ * Checks for end of stream.
+ *
+ * Checks if the last attempt to reads data from the stream encountered the
+ * end of stream before the attempt could be fully satisfied.
+ * The value is initially false, and is reset to false by stream_Seek().
+ *
+ * \note The function can return false even though the current stream position
+ * is equal to the stream size. It will return true after the following attempt
+ * to read more than zero bytes.
+ *
+ * \note It might be possible to read after the end of the stream.
+ * It implies the size of the stream increased asynchronously in the mean time.
+ * Streams of most types cannot trigger such a case,
+ * but regular local files notably can.
+ *
+ * \note In principles, the stream size should match the stream offset when
+ * the end-of-stream is reached. But that rule is not enforced; it is entirely
+ * dependent on the underlying implementation of the stream.
+ */
+VLC_API bool stream_Eof(const stream_t *) VLC_USED;
+
+/**
  * Sets the current stream position.
  *
  * @param offset byte offset from the beginning of the stream

@@ -47,6 +47,7 @@ typedef struct stream_priv_t
     void (*destroy)(stream_t *);
     block_t *peek;
     uint64_t offset;
+    bool eof;
 
     /* UTF-16 and UTF-32 file reading */
     struct {
@@ -87,6 +88,7 @@ stream_t *stream_CommonNew(vlc_object_t *parent, void (*destroy)(stream_t *))
     priv->destroy = destroy;
     priv->peek = NULL;
     priv->offset = 0;
+    priv->eof = false;
 
     /* UTF16 and UTF32 text file conversion */
     priv->text.conv = (vlc_iconv_t)(-1);
@@ -361,12 +363,12 @@ ssize_t stream_Read(stream_t *s, void *buf, size_t len)
     block_t *peek = priv->peek;
     size_t copy = 0;
 
+    if (unlikely(len == 0))
+        return 0;
+
     if (peek != NULL)
     {
         copy = peek->i_buffer < len ? peek->i_buffer : len;
-
-        if (unlikely(len == 0))
-            return 0;
 
         if (buf != NULL)
             memcpy(buf, peek->p_buffer, copy);
@@ -393,6 +395,7 @@ ssize_t stream_Read(stream_t *s, void *buf, size_t len)
         return ((copy > 0) ? (ssize_t)copy : ret);
     copy += ret;
     priv->offset += ret;
+    priv->eof = !ret;
     return copy;
 }
 
@@ -457,9 +460,18 @@ uint64_t stream_Tell(const stream_t *s)
     return priv->offset;
 }
 
+bool stream_Eof(const stream_t *s)
+{
+    const stream_priv_t *priv = (const stream_priv_t *)s;
+
+    return priv->eof;
+}
+
 int stream_Seek(stream_t *s, uint64_t offset)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
+
+    priv->eof = false;
 
     block_t *peek = priv->peek;
     if (peek != NULL)
