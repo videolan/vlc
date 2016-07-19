@@ -692,20 +692,41 @@ int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
 {
     aout_owner_t *owner = aout_owner (aout);
     char **tabid, **tabname;
-    unsigned count;
+    unsigned count = 0;
 
     vlc_mutex_lock (&owner->dev.lock);
-    count = owner->dev.count;
-    tabid = xmalloc (sizeof (*tabid) * count);
-    tabname = xmalloc (sizeof (*tabname) * count);
-    *ids = tabid;
-    *names = tabname;
-    for (aout_dev_t *dev = owner->dev.list; dev != NULL; dev = dev->next)
+    tabid = malloc (sizeof (*tabid) * owner->dev.count);
+    tabname = malloc (sizeof (*tabname) * owner->dev.count);
+    if(likely(tabid && tabname))
     {
-        *(tabid++) = xstrdup (dev->id);
-        *(tabname++) = xstrdup (dev->name);
+        for (aout_dev_t *dev = owner->dev.list; dev != NULL; dev = dev->next)
+        {
+            char *psz_id = strdup (dev->id);
+            if(unlikely(psz_id == NULL))
+                break;
+
+            char *psz_name = strdup (dev->name);
+            if(unlikely(psz_name == NULL))
+            {
+                free(psz_id);
+                break;
+            }
+
+            tabid[count] = psz_id;
+            tabname[count++] = psz_name;
+        }
     }
     vlc_mutex_unlock (&owner->dev.lock);
+
+    if(unlikely(count == 0))
+    {
+        free(tabid);
+        free(tabname);
+        return -1;
+    }
+
+    *ids = tabid;
+    *names = tabname;
 
     return count;
 }
