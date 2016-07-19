@@ -120,7 +120,7 @@ struct input_thread_private_t
     /* Input attachment */
     int i_attachment;
     input_attachment_t **attachment;
-    demux_t **attachment_demux;
+    const demux_t **attachment_demux;
 
     /* Main input properties */
 

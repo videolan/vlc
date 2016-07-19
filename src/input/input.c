@@ -93,8 +93,9 @@ static void InputGetExtraFiles( input_thread_t *p_input,
                                 int *pi_list, char ***pppsz_list,
                                 const char *psz_access, const char *psz_path );
 
-static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment, demux_t ***ppp_attachment_demux,
-                              int i_new, input_attachment_t **pp_new, demux_t *p_demux );
+static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
+                              const demux_t ***ppp_attachment_demux,
+                              int i_new, input_attachment_t **pp_new, const demux_t *p_demux );
 
 #define SLAVE_ADD_NOFLAG    0
 #define SLAVE_ADD_FORCED    (1<<0)
@@ -2583,8 +2584,9 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
     }
 }
 
-static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment, demux_t ***ppp_attachment_demux,
-                              int i_new, input_attachment_t **pp_new, demux_t *p_demux )
+static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
+                              const demux_t ***ppp_attachment_demux,
+                              int i_new, input_attachment_t **pp_new, const demux_t *p_demux )
 {
     int i_attachment = *pi_attachment;
     int i;
@@ -2594,7 +2596,7 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
     if( likely(pp_att) )
     {
         *ppp_attachment = pp_att;
-        demux_t **pp_attdmx = realloc( *ppp_attachment_demux,
+        const demux_t **pp_attdmx = realloc( *ppp_attachment_demux,
                         sizeof(*pp_attdmx) * ( i_attachment + i_new ) );
         if( likely(pp_attdmx) )
         {
