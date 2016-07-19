@@ -75,6 +75,7 @@ struct access_sys_t
     vlc_url_t               encoded_url;
     char *                  psz_url_decoded;
     char *                  psz_url_decoded_slash;
+    bool                    b_eof;
     bool                    b_error;
     bool                    b_auto_guid;
 
@@ -182,7 +183,7 @@ nfs_read_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
         return;
 
     if (i_status == 0)
-        p_access->info.b_eof = true;
+        p_sys->b_eof = true;
     else
     {
         p_sys->res.read.i_len = i_status;
@@ -194,13 +195,16 @@ static bool
 nfs_read_finished_cb(access_t *p_access)
 {
     access_sys_t *p_sys = p_access->p_sys;
-    return p_sys->res.read.i_len > 0 || p_access->info.b_eof;
+    return p_sys->res.read.i_len > 0 || p_sys->b_eof;
 }
 
 static ssize_t
 FileRead(access_t *p_access, void *p_buf, size_t i_len)
 {
     access_sys_t *p_sys = p_access->p_sys;
+
+    if (p_sys->b_eof)
+        return 0;
 
     p_sys->res.read.i_len = 0;
     p_sys->res.read.p_buf = p_buf;
