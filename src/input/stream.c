@@ -330,7 +330,6 @@ error:
 
 static ssize_t stream_ReadRaw(stream_t *s, void *buf, size_t len)
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
     size_t copy = 0;
     ssize_t ret = 0;
 
@@ -351,7 +350,6 @@ static ssize_t stream_ReadRaw(stream_t *s, void *buf, size_t len)
             buf = (unsigned char *)buf + ret;
         len -= ret;
         copy += ret;
-        priv->offset += ret;
     }
 
     return (copy > 0) ? (ssize_t)copy : ret;
@@ -384,13 +382,18 @@ ssize_t stream_Read(stream_t *s, void *buf, size_t len)
         if (buf != NULL)
             buf = (unsigned char *)buf + copy;
         len -= copy;
+        priv->offset += copy;
+
         if (len == 0)
             return copy;
     }
 
     ssize_t ret = stream_ReadRaw(s, buf, len);
-    return (ret >= 0) ? (ssize_t)(ret + copy)
-                      : ((copy > 0) ? (ssize_t)copy : ret);
+    if (ret < 0)
+        return ((copy > 0) ? (ssize_t)copy : ret);
+    copy += ret;
+    priv->offset += ret;
+    return copy;
 }
 
 ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
@@ -450,15 +453,8 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
 uint64_t stream_Tell(const stream_t *s)
 {
     const stream_priv_t *priv = (const stream_priv_t *)s;
-    uint64_t pos = priv->offset;
 
-    if (priv->peek != NULL)
-    {
-        assert(pos >= priv->peek->i_buffer);
-        pos -= priv->peek->i_buffer;
-    }
-
-    return pos;
+    return priv->offset;
 }
 
 int stream_Seek(stream_t *s, uint64_t offset)
@@ -468,33 +464,28 @@ int stream_Seek(stream_t *s, uint64_t offset)
     block_t *peek = priv->peek;
     if (peek != NULL)
     {
-        if ((priv->offset - peek->i_buffer) <= offset
-         && offset <= priv->offset)
-        {
-            size_t fwd = offset - (priv->offset - priv->peek->i_buffer);
-            if (fwd <= peek->i_buffer)
-            {   /* Seeking within the peek buffer */
-                peek->p_buffer += fwd;
-                peek->i_buffer -= fwd;
+        if (offset >= priv->offset
+         && offset <= (priv->offset + peek->i_buffer))
+        {   /* Seeking within the peek buffer */
+            size_t fwd = offset - priv->offset;
 
-                if (peek->i_buffer == 0)
-                {
-                    priv->peek = NULL;
-                    block_Release(peek);
-                }
+            peek->p_buffer += fwd;
+            peek->i_buffer -= fwd;
+            priv->offset = offset;
 
-                assert(stream_Tell(s) == offset);
-                return VLC_SUCCESS;
+            if (peek->i_buffer == 0)
+            {
+                priv->peek = NULL;
+                block_Release(peek);
             }
+
+            return VLC_SUCCESS;
         }
     }
     else
     {
         if (priv->offset == offset)
-        {
-            assert(stream_Tell(s) == offset);
             return VLC_SUCCESS; /* Nothing to do! */
-        }
     }
 
     if (s->pf_seek == NULL)
@@ -512,7 +503,6 @@ int stream_Seek(stream_t *s, uint64_t offset)
         block_Release(peek);
     }
 
-    assert(stream_Tell(s) == offset);
     return VLC_SUCCESS;
 }
 
