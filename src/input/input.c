@@ -2587,25 +2587,35 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
                               int i_new, input_attachment_t **pp_new, demux_t *p_demux )
 {
     int i_attachment = *pi_attachment;
-    input_attachment_t **attachment = *ppp_attachment;
-    demux_t **attachment_demux = *ppp_attachment_demux;
     int i;
 
-    attachment = xrealloc( attachment,
-                    sizeof(*attachment) * ( i_attachment + i_new ) );
-    attachment_demux = xrealloc( attachment_demux,
-                    sizeof(*attachment_demux) * ( i_attachment + i_new ) );
-    for( i = 0; i < i_new; i++ )
+    input_attachment_t **pp_att = realloc( *ppp_attachment,
+                    sizeof(*pp_att) * ( i_attachment + i_new ) );
+    if( likely(pp_att) )
     {
-        attachment[i_attachment] = pp_new[i];
-        attachment_demux[i_attachment++] = p_demux;
-    }
-    free( pp_new );
+        *ppp_attachment = pp_att;
+        demux_t **pp_attdmx = realloc( *ppp_attachment_demux,
+                        sizeof(*pp_attdmx) * ( i_attachment + i_new ) );
+        if( likely(pp_attdmx) )
+        {
+            *ppp_attachment_demux = pp_attdmx;
 
-    /* */
-    *pi_attachment = i_attachment;
-    *ppp_attachment = attachment;
-    *ppp_attachment_demux = attachment_demux;
+            for( i = 0; i < i_new; i++ )
+            {
+                pp_att[i_attachment] = pp_new[i];
+                pp_attdmx[i_attachment++] = p_demux;
+            }
+            /* */
+            *pi_attachment = i_attachment;
+            free( pp_new );
+            return;
+        }
+    }
+
+    /* on alloc errors */
+    for( i = 0; i < i_new; i++ )
+        vlc_input_attachment_Delete( pp_new[i] );
+    free( pp_new );
 }
 
 /*****************************************************************************
