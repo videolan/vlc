@@ -65,8 +65,6 @@ static struct
         jmethodID setCallback;
         jmethodID setBuffersGeometry;
         jmethodID setWindowLayout;
-        /* TODO: temporary, to remove when VLC has decoder fallback */
-        jmethodID sendHardwareAccelerationError;
     } AndroidNativeWindow;
 } jfields;
 
@@ -434,7 +432,6 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, AWindowHandler *p_awh)
     GET_METHOD(setCallback, "setCallback", "(J)Z");
     GET_METHOD(setBuffersGeometry, "setBuffersGeometry", "(Landroid/view/Surface;III)Z");
     GET_METHOD(setWindowLayout, "setWindowLayout", "(IIIIII)V");
-    GET_METHOD(sendHardwareAccelerationError, "sendHardwareAccelerationError", "()V");
 #undef CHECK_EXCEPTION
 #undef GET_METHOD
 
@@ -748,34 +745,5 @@ AWindowHandler_setWindowLayout(AWindowHandler *p_awh,
 
     JNI_CALL(CallVoidMethod, setWindowLayout, i_width, i_height,
              i_visible_width,i_visible_height, i_sar_num, i_sar_den);
-    return VLC_SUCCESS;
-}
-
-int
-AWindowHandler_sendHardwareAccelerationError(vlc_object_t *p_obj,
-                                             AWindowHandler *p_awh)
-{
-    assert(p_obj || p_awh);
-    JNIEnv *p_env;
-
-    if (p_awh)
-    {
-        p_env = AWindowHandler_getEnv(p_awh);
-        if (!p_env)
-            return VLC_EGENERIC;
-        JNI_CALL(CallVoidMethod, sendHardwareAccelerationError);
-    }
-    else
-    {
-        p_awh = AWindowHandler_new(p_obj);
-        if (!p_awh)
-            return VLC_EGENERIC;
-        p_env = AWindowHandler_getEnv(p_awh);
-        if (!p_env)
-            return VLC_EGENERIC;
-        JNI_CALL(CallVoidMethod, sendHardwareAccelerationError);
-        AWindowHandler_destroy(p_awh);
-    }
-
     return VLC_SUCCESS;
 }
