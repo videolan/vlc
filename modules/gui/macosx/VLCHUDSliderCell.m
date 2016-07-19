@@ -175,4 +175,17 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
     [path fill];
 }
 
+- (void)drawTickMarks
+{
+    for (int i = 0; i < self.numberOfTickMarks; i++) {
+        NSRect tickMarkRect = [self rectOfTickMarkAtIndex:i];
+        if (self.isEnabled) {
+            [_strokeColor setFill];
+        } else {
+            [_disabledStrokeColor setFill];
+        }
+        NSRectFill(tickMarkRect);
+    }
+}
+
 @end
