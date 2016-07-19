@@ -143,28 +143,36 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
 
 - (void)drawBarInside:(NSRect)fullRect flipped:(BOOL)flipped
 {
+    NSBezierPath *path;
+
     // Determine current position of knob
     CGFloat knobPosition = (self.doubleValue - self.minValue) / (self.maxValue - self.minValue);
 
     // Copy rect
     NSRect activeRect = fullRect;
 
-    // TODO: Implement active/inactive drawing for vetical sliders
-    if (!self.isVertical) {
-        // Calculate active rect
+    if (self.isVertical) {
+        // Calculate active rect (bottom part of slider)
+        if (flipped) {
+            activeRect.origin.y = (1 - knobPosition) * activeRect.size.height;
+            activeRect.size.height -= activeRect.origin.y - 1;
+        } else {
+            activeRect.size.height -= (1 - knobPosition) * activeRect.size.height - 1;
+        }
+    } else {
+        // Calculate active rect (left part of slider)
         activeRect.size.width = knobPosition * (self.controlView.frame.size.width - 1.0);
-
-        // Draw inactive bar
-        [_disabledSliderColor setFill];
-        NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:fullRect xRadius:2.0 yRadius:2.0];
-        [path fill];
     }
+
+    // Draw inactive bar
+    [_disabledSliderColor setFill];
+    path = [NSBezierPath bezierPathWithRoundedRect:fullRect xRadius:2.0 yRadius:2.0];
+    [path fill];
 
     // Draw active bar
     [_sliderColor setFill];
-    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:activeRect xRadius:2.0 yRadius:2.0];
+    path = [NSBezierPath bezierPathWithRoundedRect:activeRect xRadius:2.0 yRadius:2.0];
     [path fill];
-
 }
 
 @end
