@@ -214,7 +214,6 @@ int FileOpen( vlc_object_t *p_this )
     access_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (unlikely(p_sys == NULL))
         goto error;
-    access_InitFields (p_access);
     p_access->pf_read = Read;
     p_access->pf_block = NULL;
     p_access->pf_control = FileControl;

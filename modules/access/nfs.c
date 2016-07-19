@@ -635,7 +635,6 @@ Open(vlc_object_t *p_obj)
     if (unlikely(p_sys == NULL))
         goto error;
     p_access->p_sys = p_sys;
-    p_access->info.b_eof = false;
 
     p_sys->b_auto_guid = var_InheritBool(p_obj, "nfs-auto-guid");
 

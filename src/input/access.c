@@ -81,7 +81,7 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
     access->pf_control = NULL;
     access->p_sys = NULL;
     access->b_preparsing = preparsing;
-    access_InitFields(access);
+    access->info.b_eof = false;
 
     if (unlikely(access->psz_url == NULL))
         goto error;

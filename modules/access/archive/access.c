@@ -410,8 +410,6 @@ int AccessOpen(vlc_object_t *p_object)
     p_access->pf_control = Control;
     p_access->pf_seek    = Seek;
 
-    access_InitFields(p_access);
-
     return VLC_SUCCESS;
 
 error:

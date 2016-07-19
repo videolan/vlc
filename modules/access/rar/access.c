@@ -219,8 +219,6 @@ int RarAccessOpen(vlc_object_t *object)
     access->pf_control = Control;
     access->pf_seek    = Seek;
 
-    access_InitFields(access);
-
     rar_file_chunk_t dummy = {
         .mrl = base,
     };

@@ -143,7 +143,6 @@ static int Open(vlc_object_t *object)
     access->pf_control = Control;
 
     access->p_sys = sys;
-    access_InitFields(access);
     return VLC_SUCCESS;
 error:
     free(sys);

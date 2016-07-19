@@ -239,11 +239,6 @@ static inline int access_GetSize( access_t *p_access, uint64_t *size )
     return access_Control( p_access, ACCESS_GET_SIZE, size );
 }
 
-static inline void access_InitFields( access_t *p_a )
-{
-    p_a->info.b_eof = false;
-}
-
 /**
  * \defgroup access_helper Access Helpers
  * @{
@@ -264,7 +259,6 @@ VLC_API int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va
 
 #define STANDARD_READ_ACCESS_INIT \
     do { \
-        access_InitFields( p_access ); \
         ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek ); \
         p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) ); \
         if( !p_sys ) return VLC_ENOMEM;\
@@ -272,7 +266,6 @@ VLC_API int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va
 
 #define STANDARD_BLOCK_ACCESS_INIT \
     do { \
-        access_InitFields( p_access ); \
         ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek ); \
         p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) ); \
         if( !p_sys ) return VLC_ENOMEM; \

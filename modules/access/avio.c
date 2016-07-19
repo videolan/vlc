@@ -195,8 +195,6 @@ int OpenAvio(vlc_object_t *object)
     msg_Dbg(access, "%sseekable, size=%"PRIi64, seekable ? "" : "not ", size);
 
     /* */
-    access_InitFields(access);
-
     access->pf_read = Read;
     access->pf_block = NULL;
     access->pf_control = Control;

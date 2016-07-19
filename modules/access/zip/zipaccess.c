@@ -179,8 +179,6 @@ int AccessOpen( vlc_object_t *p_this )
     /* Set callback */
     ACCESS_SET_CALLBACKS( AccessRead, NULL, AccessControl, AccessSeek );
 
-    p_access->info.b_eof  = false;
-
     i_ret = VLC_SUCCESS;
 
 exit:

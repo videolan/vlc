@@ -194,7 +194,6 @@ static int Open( vlc_object_t *p_this )
 
     /* Set up access */
     p_access->pf_control = Control;
-    access_InitFields( p_access );
 
     return VLC_SUCCESS;
 }

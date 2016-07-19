@@ -197,8 +197,6 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_control = Control;
     p_access->pf_seek    = Seek;
 
-    p_access->info.b_eof       = false;
-
     p_sys->i_current_title = i_title;
     p_sys->i_current_seekpoint = i_chapter;
     p_sys->offset = (uint64_t)(p_sys->i_sector - p_sys->p_sectors[1+i_title]) *

@@ -126,7 +126,6 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_access, "opening device" );
 
     /* Set up p_access */
-    access_InitFields( p_access );
     ACCESS_SET_CALLBACKS( NULL, Block, Control, NULL );
 
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );

@@ -128,7 +128,6 @@ static int Open( vlc_object_t *p_this )
     smb_stat st;
 
     /* Init p_access */
-    access_InitFields( p_access );
     p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
     if( p_access->p_sys == NULL )
         return VLC_ENOMEM;

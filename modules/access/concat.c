@@ -295,7 +295,6 @@ static int Open(vlc_object_t *obj)
     *pp = NULL;
     sys->next = sys->first;
 
-    access_InitFields(access);
     access->pf_read = read_cb ? Read : NULL;
     access->pf_block = read_cb ? NULL : Block;
     access->pf_seek = Seek;

@@ -247,7 +247,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set up p_access */
-    access_InitFields( p_access );
     ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );
     return VLC_SUCCESS;
 

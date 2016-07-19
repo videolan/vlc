@@ -62,8 +62,6 @@ int AccessOpen( vlc_object_t *obj )
     if( access->b_preparsing )
         return VLC_EGENERIC;
 
-    access_InitFields( access );
-
     access_sys_t *sys = calloc (1, sizeof (*sys));
     if( unlikely(sys == NULL) )
         return VLC_ENOMEM;

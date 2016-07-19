@@ -111,7 +111,6 @@ static int Open( vlc_object_t *p_this )
     p_access->p_sys = sys;
 
     /* Set up p_access */
-    access_InitFields( p_access );
     ACCESS_SET_CALLBACKS( NULL, BlockUDP, Control, NULL );
 
     char *psz_name = strdup( p_access->psz_location );

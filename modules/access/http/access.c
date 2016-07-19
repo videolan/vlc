@@ -224,7 +224,6 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    access->info.b_eof = false;
     access->pf_read = NULL;
     if (live)
     {

@@ -95,7 +95,6 @@ static int Open( vlc_object_t *p_this )
     *psz_parser++ = '\0';
 
     /* Init p_access */
-    access_InitFields( p_access );
     ACCESS_SET_CALLBACKS( Read, NULL, Control, NULL );
     p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys )

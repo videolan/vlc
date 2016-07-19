@@ -65,7 +65,6 @@ static int Open (vlc_object_t *obj)
     sys->length = len;
     memcpy (sys->data, access->psz_location, len);
 
-    access_InitFields (access);
     access->pf_read = Read;
     access->pf_block = NULL;
     access->pf_seek = Seek;

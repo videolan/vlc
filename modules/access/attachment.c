@@ -91,7 +91,6 @@ static int Open(vlc_object_t *object)
     sys->offset = 0;
 
     /* */
-    access_InitFields(access);
     access->pf_read    = Read;
     access->pf_block   = NULL;
     access->pf_control = Control;

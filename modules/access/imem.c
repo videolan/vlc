@@ -304,7 +304,6 @@ static int OpenAccess(vlc_object_t *object)
     }
 
     /* */
-    access_InitFields(access);
     access->pf_control = ControlAccess;
     access->pf_read    = NULL;
     access->pf_block   = Block;

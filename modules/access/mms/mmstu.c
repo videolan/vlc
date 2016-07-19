@@ -92,7 +92,6 @@ int  MMSTUOpen( access_t *p_access )
     int             i_status;
 
     /* Set up p_access */
-    access_InitFields( p_access );
     p_access->pf_read = NULL;
     p_access->pf_block = Block;
     p_access->pf_control = Control;
