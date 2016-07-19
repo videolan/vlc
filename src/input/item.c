@@ -26,6 +26,7 @@
 #endif
 #include <assert.h>
 #include <time.h>
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_url.h>
@@ -163,41 +164,69 @@ void input_item_CopyOptions( input_item_t *p_child,
 {
     char **optv = NULL;
     uint8_t *flagv = NULL;
-    size_t optc;
+    int optc = 0;
+    char **optv_realloc = NULL;
+    uint8_t *flagv_realloc = NULL;
 
     vlc_mutex_lock( &p_parent->lock );
 
-    optc = p_parent->i_options;
-    if( optc > 0 )
+    if( p_parent->i_options > 0 )
     {
-        optv = xmalloc( optc * sizeof (*optv) );
-        for( size_t i = 0; i < optc; i++ )
-            optv[i] = xstrdup( p_parent->ppsz_options[i] );
+        optv = malloc( p_parent->i_options * sizeof (*optv) );
+        if( likely(optv) )
+            flagv = malloc( p_parent->i_options * sizeof (*flagv) );
 
-        flagv = xmalloc( optc * sizeof (*flagv) );
-        memcpy( flagv, p_parent->optflagv, optc * sizeof (*flagv) );
+        if( likely(flagv) )
+        {
+            for( int i = 0; i < p_parent->i_options; i++ )
+            {
+                char *psz_dup = strdup( p_parent->ppsz_options[i] );
+                if( likely(psz_dup) )
+                {
+                    flagv[optc] = p_parent->optflagv[i];
+                    optv[optc++] = psz_dup;
+                }
+            }
+        }
     }
 
     vlc_mutex_unlock( &p_parent->lock );
 
-    if( optc == 0 )
-        return;
+    if( likely(optv && flagv && optc ) )
+    {
+        vlc_mutex_lock( &p_child->lock );
 
-    vlc_mutex_lock( &p_child->lock );
+        if( INT_MAX - p_child->i_options >= optc &&
+            SIZE_MAX / sizeof (*flagv) >= (size_t) (p_child->i_options + optc) )
+            flagv_realloc = realloc( p_child->optflagv,
+                                    (p_child->i_options + optc) * sizeof (*flagv) );
+        if( likely(flagv_realloc) )
+        {
+            p_child->optflagv = flagv_realloc;
+            if( SIZE_MAX / sizeof (*optv) >= (size_t) (p_child->i_options + optc) )
+                optv_realloc = realloc( p_child->ppsz_options,
+                                       (p_child->i_options + optc) * sizeof (*optv) );
+            if( likely(optv_realloc) )
+            {
+                p_child->ppsz_options = optv_realloc;
+                memcpy( p_child->ppsz_options + p_child->i_options, optv,
+                        optc * sizeof (*optv) );
+                memcpy( p_child->optflagv + p_child->i_options, flagv,
+                        optc * sizeof (*flagv) );
+                p_child->i_options += optc;
+                p_child->optflagc += optc;
+            }
+        }
 
-    p_child->ppsz_options = xrealloc( p_child->ppsz_options,
-                                (p_child->i_options + optc) * sizeof (*optv) );
-    memcpy( p_child->ppsz_options + p_child->i_options, optv,
-            optc * sizeof (*optv) );
-    p_child->i_options += optc;
+        vlc_mutex_unlock( &p_child->lock );
+    }
 
-    p_child->optflagv = xrealloc( p_child->optflagv,
-                               (p_child->i_options + optc) * sizeof (*flagv) );
-    memcpy( p_child->optflagv + p_child->i_options, flagv,
-            optc * sizeof (*flagv) );
-    p_child->optflagc += optc;
-
-    vlc_mutex_unlock( &p_child->lock );
+    if( unlikely(!flagv_realloc || !optv_realloc) )
+    {
+        /* Didn't copy pointers, so need to free the strdup() */
+        for( int i=0; i<optc; i++ )
+            free( optv[i] );
+    }
 
     free( flagv );
     free( optv );
