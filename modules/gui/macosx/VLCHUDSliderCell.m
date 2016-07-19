@@ -25,7 +25,6 @@
 
 @implementation VLCHUDSliderCell
 
-
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
@@ -140,6 +139,32 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
 
     [path setLineWidth:1.0];
     [path stroke];
+}
+
+- (void)drawBarInside:(NSRect)fullRect flipped:(BOOL)flipped
+{
+    // Determine current position of knob
+    CGFloat knobPosition = (self.doubleValue - self.minValue) / (self.maxValue - self.minValue);
+
+    // Copy rect
+    NSRect activeRect = fullRect;
+
+    // TODO: Implement active/inactive drawing for vetical sliders
+    if (!self.isVertical) {
+        // Calculate active rect
+        activeRect.size.width = knobPosition * (self.controlView.frame.size.width - 1.0);
+
+        // Draw inactive bar
+        [_disabledSliderColor setFill];
+        NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:fullRect xRadius:2.0 yRadius:2.0];
+        [path fill];
+    }
+
+    // Draw active bar
+    [_sliderColor setFill];
+    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:activeRect xRadius:2.0 yRadius:2.0];
+    [path fill];
+
 }
 
 /*
