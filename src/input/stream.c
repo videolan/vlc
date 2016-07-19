@@ -621,17 +621,6 @@ int stream_Seek(stream_t *s, uint64_t offset)
     return VLC_SUCCESS;
 }
 
-static int stream_ControlInternal(stream_t *s, int cmd, ...)
-{
-    va_list ap;
-    int ret;
-
-    va_start(ap, cmd);
-    ret = s->pf_control(s, cmd, ap);
-    va_end(ap);
-    return ret;
-}
-
 /**
  * Use to control the "stream_t *". Look at #stream_query_e for
  * possible "i_query" value and format arguments.  Return VLC_SUCCESS
@@ -665,21 +654,6 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
             }
 
             return VLC_SUCCESS;
-        }
-
-        case STREAM_GET_PRIVATE_BLOCK:
-        {
-            block_t **b = va_arg(args, block_t **);
-            bool *eof = va_arg(args, bool *);
-
-            if (priv->peek != NULL)
-            {
-                *b = priv->peek;
-                priv->peek = NULL;
-                *eof = false;
-                return VLC_SUCCESS;
-            }
-            return stream_ControlInternal(s, STREAM_GET_PRIVATE_BLOCK, b, eof);
         }
     }
     return s->pf_control(s, cmd, args);

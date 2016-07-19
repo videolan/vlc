@@ -285,25 +285,7 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
 {
     access_t *access = s->p_sys;
 
-    switch (cmd)
-    {
-        case STREAM_GET_PRIVATE_BLOCK:
-        {
-            block_t **b = va_arg(args, block_t **);
-            bool *eof = va_arg(args, bool *);
-
-            if (access->pf_block == NULL)
-                return VLC_EGENERIC;
-
-            *b = vlc_access_Eof(access) ? NULL : vlc_access_Block(access);
-            *eof = (*b == NULL) && vlc_access_Eof(access);
-            break;
-        }
-
-        default:
-            return access_vaControl(access, cmd, args);
-    }
-    return VLC_SUCCESS;
+    return access_vaControl(access, cmd, args);
 }
 
 static void AStreamDestroy(stream_t *s)

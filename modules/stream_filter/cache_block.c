@@ -85,18 +85,6 @@ struct stream_sys_t
     } stat;
 };
 
-static block_t *AReadBlock(stream_t *s, bool *restrict eof)
-{
-    block_t *block;
-
-    if (stream_Control(s->p_source, STREAM_GET_PRIVATE_BLOCK, &block, eof))
-    {
-        block = NULL;
-        *eof = true;
-    }
-    return block;
-}
-
 static int AStreamRefillBlock(stream_t *s)
 {
     stream_sys_t *sys = s->p_sys;
@@ -127,15 +115,13 @@ static int AStreamRefillBlock(stream_t *s)
 
     for (;;)
     {
-        bool b_eof;
-
         if (vlc_killed())
             return VLC_EGENERIC;
 
         /* Fetch a block */
-        if ((b = AReadBlock(s, &b_eof)))
+        if ((b = stream_ReadBlock(s->p_source)))
             break;
-        if (b_eof)
+        if (stream_Eof(s->p_source))
             return VLC_EGENERIC;
     }
 
@@ -190,11 +176,10 @@ static void AStreamPrebufferBlock(stream_t *s)
         }
 
         /* Fetch a block */
-        bool eof;
-        block_t *b = AReadBlock(s, &eof);
+        block_t *b = stream_ReadBlock(s->p_source);
         if (b == NULL)
         {
-            if (eof)
+            if (stream_Eof(s->p_source))
                 break;
             continue;
         }
