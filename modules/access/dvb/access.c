@@ -104,7 +104,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Control( access_t *, int, va_list );
 
-static block_t *BlockScan( access_t * );
+static block_t *BlockScan( access_t *, bool * );
 
 #define DVB_SCAN_MAX_LOCK_TIME (2*CLOCK_FREQ)
 
@@ -356,7 +356,7 @@ static int ScanReadCallback( scan_t *p_scan, void *p_privdata,
 /*****************************************************************************
  * BlockScan:
  *****************************************************************************/
-static block_t *BlockScan( access_t *p_access )
+static block_t *BlockScan( access_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
     scan_t *p_scan = p_sys->scan;
@@ -369,7 +369,7 @@ static block_t *BlockScan( access_t *p_access )
              msg_Warn( p_access, "Scanning finished" );
              p_block = scan_GetM3U( p_scan );
         }
-        p_access->info.b_eof = true;
+        *eof = true;
     }
 
     return p_block;

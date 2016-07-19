@@ -50,7 +50,7 @@
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
-static block_t *Block( access_t * );
+static block_t *Block( access_t *, bool * );
 static int Control( access_t *, int, va_list );
 
 vlc_module_begin ()
@@ -298,7 +298,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-static block_t *Block( access_t *p_access )
+static block_t *Block( access_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
     block_t *p_block = NULL;
@@ -309,6 +309,7 @@ static block_t *Block( access_t *p_access )
     p_sys->p_frame = NULL;
     vlc_mutex_unlock( &p_sys->lock );
 
+    (void) eof;
     return p_block;
 }
 

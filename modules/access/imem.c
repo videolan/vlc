@@ -200,7 +200,7 @@ typedef void (*imem_release_t)(void *data, const char *cookie, size_t, void *);
  *****************************************************************************/
 
 /* */
-static block_t *Block(access_t *);
+static block_t *Block(access_t *, bool *);
 static int ControlAccess(access_t *, int, va_list);
 
 static int Demux(demux_t *);
@@ -366,7 +366,7 @@ static int ControlAccess(access_t *access, int i_query, va_list args)
  * It retreives data using the get() callback, copies them,
  * and then release them using the release() callback.
  */
-static block_t *Block(access_t *access)
+static block_t *Block(access_t *access, bool *restrict eof)
 {
     imem_sys_t *sys = (imem_sys_t*)access->p_sys;
 
@@ -376,7 +376,7 @@ static block_t *Block(access_t *access)
 
     if (sys->source.get(sys->source.data, sys->source.cookie,
                         NULL, NULL, &flags, &buffer_size, &buffer)) {
-        access->info.b_eof = true;
+        *eof = true;
         return NULL;
     }
 

@@ -89,7 +89,7 @@ struct access_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t *BlockUDP( access_t * );
+static block_t *BlockUDP( access_t *, bool * );
 static int Control( access_t *, int, va_list );
 static void* ThreadRead( void *data );
 
@@ -261,7 +261,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * BlockUDP:
  *****************************************************************************/
-static block_t *BlockUDP( access_t *p_access )
+static block_t *BlockUDP( access_t *p_access, bool *restrict eof )
 {
     access_sys_t *sys = p_access->p_sys;
     block_t *block;
@@ -275,7 +275,7 @@ static block_t *BlockUDP( access_t *p_access )
     block = vlc_fifo_DequeueAllUnlocked(sys->fifo);
 
     if (unlikely(sys->timeout_reached == true))
-        p_access->info.b_eof=true;
+        *eof = true;
 
     vlc_fifo_Unlock(sys->fifo);
 

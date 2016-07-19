@@ -264,7 +264,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static block_t *BlockRead( access_t *p_access )
+static block_t *BlockRead( access_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
     block_t *p_block;
@@ -285,6 +285,7 @@ static block_t *BlockRead( access_t *p_access )
     p_block->i_buffer = real_get_rdt_chunk( p_access->p_sys->p_rtsp, &pheader,
                                             &p_block->p_buffer );
 
+    (void) eof;
     return p_block;
 }
 

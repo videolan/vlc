@@ -57,7 +57,7 @@
 /*****************************************************************************
  * Access: local prototypes
  *****************************************************************************/
-static block_t *ReadCompressed( access_t * );
+static block_t *ReadCompressed( access_t *, bool * );
 static int AccessControl ( access_t *, int, va_list );
 
 static int Demux       ( demux_t * );
@@ -1749,11 +1749,8 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
 
 /*****************************************************************************
  * ReadCompressed: reads compressed (MPEG/DV) data from the device.
- *****************************************************************************
- * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
- * bytes.
  *****************************************************************************/
-static block_t *ReadCompressed( access_t *p_access )
+static block_t *ReadCompressed( access_t *p_access, bool *eof )
 {
     access_sys_t   *p_sys = p_access->p_sys;
     /* There must be only 1 elementary stream to produce a valid stream
@@ -1794,6 +1791,7 @@ static block_t *ReadCompressed( access_t *p_access )
     /* The caller got what he wanted */
 out:
     sample.p_sample->Release();
+    (void) eof;
     return p_block;
 }
 

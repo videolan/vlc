@@ -96,18 +96,21 @@ static ssize_t Read(access_t *access, void *buf, size_t len)
     return vlc_access_Read(a, buf, len);
 }
 
-static block_t *Block(access_t *access)
+static block_t *Block(access_t *access, bool *restrict eof)
 {
     access_t *a = GetAccess(access);
     if (a == NULL)
+    {
+        *eof = true;
         return NULL;
+    }
 
     if (likely(a->pf_block != NULL))
         return vlc_access_Block(a);
 
     if (a->pf_read == NULL)
     {
-        access->info.b_eof = true;
+        *eof = true;
         return NULL;
     }
 

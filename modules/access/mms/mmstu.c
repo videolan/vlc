@@ -65,7 +65,7 @@ int   MMSTUOpen   ( access_t * );
 void  MMSTUClose  ( access_t * );
 
 
-static block_t *Block( access_t * );
+static block_t *Block( access_t *, bool * );
 static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 
@@ -425,12 +425,15 @@ static int Seek( access_t * p_access, uint64_t i_pos )
 /*****************************************************************************
  * Block:
  *****************************************************************************/
-static block_t *Block( access_t *p_access )
+static block_t *Block( access_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_access->info.b_eof )
+    {
+        *eof = true;
         return NULL;
+    }
 
     if( p_sys->i_position < p_sys->i_header )
     {

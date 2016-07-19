@@ -81,7 +81,7 @@ struct access_sys_t
     int eyetvSock;
 };
 
-static block_t *BlockRead(access_t *);
+static block_t *BlockRead(access_t *, bool *);
 static int Control(access_t *, int, va_list);
 
 static void selectChannel(vlc_object_t *p_this, int theChannelNum)
@@ -250,11 +250,13 @@ static void Close(vlc_object_t *p_this)
 /*****************************************************************************
 * BlockRead: forwarding data from EyeTV plugin which was received above
 *****************************************************************************/
-static block_t *BlockRead(access_t *p_access)
+static block_t *BlockRead(access_t *p_access, bool *restrict eof)
 {
     access_sys_t *p_sys = p_access->p_sys;
     block_t      *p_block;
     ssize_t len;
+
+    (void) eof;
 
     /* Read data */
     p_block = block_Alloc(MTU);

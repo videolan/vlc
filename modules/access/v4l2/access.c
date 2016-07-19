@@ -50,8 +50,8 @@ struct access_sys_t
     vlc_v4l2_ctrl_t *controls;
 };
 
-static block_t *MMapBlock (access_t *);
-static block_t *ReadBlock (access_t *);
+static block_t *MMapBlock (access_t *, bool *);
+static block_t *ReadBlock (access_t *, bool *);
 static int AccessControl( access_t *, int, va_list );
 static int InitVideo(access_t *, int, uint32_t);
 
@@ -212,7 +212,7 @@ static int AccessPoll (access_t *access)
 }
 
 
-static block_t *MMapBlock (access_t *access)
+static block_t *MMapBlock (access_t *access, bool *restrict eof)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -225,10 +225,11 @@ static block_t *MMapBlock (access_t *access)
         block->i_pts = block->i_dts = mdate();
         block->i_flags |= sys->block_flags;
     }
+    (void) eof;
     return block;
 }
 
-static block_t *ReadBlock (access_t *access)
+static block_t *ReadBlock (access_t *access, bool *restrict eof)
 {
     access_sys_t *sys = access->p_sys;
 
@@ -244,7 +245,7 @@ static block_t *ReadBlock (access_t *access)
     {
         block_Release (block);
         msg_Err (access, "cannot read buffer: %s", vlc_strerror_c(errno));
-        access->info.b_eof = true;
+        *eof = true;
         return NULL;
     }
 

@@ -53,7 +53,7 @@
 int  MMSHOpen  ( access_t * );
 void MMSHClose ( access_t * );
 
-static block_t *Block( access_t *p_access );
+static block_t *Block( access_t *p_access, bool * );
 static int  Seek( access_t *, uint64_t );
 static int  Control( access_t *, int, va_list );
 
@@ -338,7 +338,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 /*****************************************************************************
  * Block:
  *****************************************************************************/
-static block_t *Block( access_t *p_access )
+static block_t *Block( access_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
     const unsigned i_packet_min = p_sys->asfh.i_min_data_packet_size;
@@ -395,7 +395,7 @@ static block_t *Block( access_t *p_access )
         }
         if( i_ret )
         {
-            p_access->info.b_eof = true;
+            *eof = true;
             return 0;
         }
     }

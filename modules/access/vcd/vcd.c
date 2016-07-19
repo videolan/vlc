@@ -82,7 +82,7 @@ struct access_sys_t
     int         *p_sectors;                                 /* Track sectors */
 };
 
-static block_t *Block( access_t * );
+static block_t *Block( access_t *, bool * );
 static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 static int      EntryPoints( access_t * );
@@ -330,21 +330,18 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * Block:
  *****************************************************************************/
-static block_t *Block( access_t *p_access )
+static block_t *Block( access_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_blocks = VCD_BLOCKS_ONCE;
     block_t *p_block;
-
-    /* Check end of file */
-    if( p_access->info.b_eof ) return NULL;
 
     /* Check end of title */
     while( p_sys->i_sector >= p_sys->p_sectors[p_sys->i_current_title + 2] )
     {
         if( p_sys->i_current_title + 2 >= p_sys->i_titles )
         {
-            p_access->info.b_eof = true;
+            *eof = true;
             return NULL;
         }
 

@@ -431,7 +431,7 @@ struct access_sys_t
     tuner_setup_t pf_setup;
 };
 
-static block_t *Read (access_t *);
+static block_t *Read (access_t *, bool *);
 static int Control (access_t *, int, va_list);
 static dtv_delivery_t GuessSystem (const char *, dvb_device_t *);
 static dtv_delivery_t GetDeliveryByScheme(const char *psz_scheme);
@@ -499,7 +499,7 @@ static void Close (vlc_object_t *obj)
     free (sys);
 }
 
-static block_t *Read (access_t *access)
+static block_t *Read (access_t *access, bool *restrict eof)
 {
 #define BUFSIZE (20*188)
     block_t *block = block_Alloc (BUFSIZE);
@@ -512,7 +512,7 @@ static block_t *Read (access_t *access)
     if (val <= 0)
     {
         if (val == 0)
-            access->info.b_eof = true;
+            *eof = true;
         block_Release (block);
         return NULL;
     }

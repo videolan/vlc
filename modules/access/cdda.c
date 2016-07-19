@@ -132,7 +132,7 @@ struct access_sys_t
     int         i_last_sector;
 };
 
-static block_t *Block( access_t * );
+static block_t *Block( access_t *, bool * );
 static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 
@@ -274,16 +274,18 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Block: read data (CDDA_DATA_ONCE)
  *****************************************************************************/
-static block_t *Block( access_t *p_access )
+static block_t *Block( access_t *p_access, bool *restrict eof )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_blocks = CDDA_BLOCKS_ONCE;
     block_t *p_block;
 
-    if( p_sys->i_track < 0 ) p_access->info.b_eof = true;
-
     /* Check end of file */
-    if( p_access->info.b_eof ) return NULL;
+    if( p_sys->i_track < 0 )
+    {
+        *eof = true;
+        return NULL;
+    }
 
     if( !p_sys->b_header )
     {
@@ -296,7 +298,7 @@ static block_t *Block( access_t *p_access )
 
     if( p_sys->i_sector >= p_sys->i_last_sector )
     {
-        p_access->info.b_eof = true;
+        *eof = true;
         return NULL;
     }
 

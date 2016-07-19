@@ -43,13 +43,13 @@ struct access_sys_t
     struct vlc_http_resource *resource;
 };
 
-static block_t *FileRead(access_t *access)
+static block_t *FileRead(access_t *access, bool *restrict eof)
 {
     access_sys_t *sys = access->p_sys;
 
     block_t *b = vlc_http_file_read(sys->resource);
     if (b == NULL)
-        access->info.b_eof = true;
+        *eof = true;
     return b;
 }
 
@@ -110,13 +110,13 @@ static int FileControl(access_t *access, int query, va_list args)
     return VLC_SUCCESS;
 }
 
-static block_t *LiveRead(access_t *access)
+static block_t *LiveRead(access_t *access, bool *restrict eof)
 {
     access_sys_t *sys = access->p_sys;
 
     block_t *b = vlc_http_live_read(sys->resource);
     if (b == NULL) /* TODO: loop instead of EOF, see vlc_http_live_read() */
-        access->info.b_eof = true;
+        *eof = true;
     return b;
 }
 

@@ -525,7 +525,7 @@ static void *satip_thread(void *data) {
     return NULL;
 }
 
-static block_t* satip_block(access_t *access) {
+static block_t* satip_block(access_t *access, bool *restrict eof) {
     access_sys_t *sys = access->p_sys;
     block_t *block;
 
@@ -538,7 +538,7 @@ static block_t* satip_block(access_t *access) {
     }
 
     if ((block = vlc_fifo_DequeueUnlocked(sys->fifo)) == NULL)
-        access->info.b_eof = true;
+        *eof = true;
     sys->woken = false;
     vlc_fifo_Unlock(sys->fifo);
 
