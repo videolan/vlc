@@ -138,6 +138,24 @@ VLC_API ssize_t stream_Read(stream_t *, void *, size_t) VLC_USED;
 VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
 
 /**
+ * Reads a data block from a byte stream.
+ *
+ * This function dequeues the next block of data from the byte stream. The
+ * byte stream back-end decides on the size of the block; the caller cannot
+ * make any assumption about it.
+ *
+ * The function might also return NULL spuriously - this does not necessarily
+ * imply that the stream is ended nor that it has encountered a nonrecoverable
+ * error.
+ *
+ * This function should be used instead of stream_Read() or stream_Peek() when
+ * the caller can handle reads of any size.
+ *
+ * \return either a data block or NULL
+ */
+VLC_API block_t *stream_ReadBlock(stream_t *) VLC_USED;
+
+/**
  * Tells the current stream position.
  *
  * @return the byte offset from the beginning of the stream (cannot fail)

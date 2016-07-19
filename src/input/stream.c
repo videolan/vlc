@@ -453,6 +453,44 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
     return len;
 }
 
+block_t *stream_ReadBlock(stream_t *s)
+{
+    stream_priv_t *priv = (stream_priv_t *)s;
+    block_t *block;
+
+    if (priv->peek != NULL)
+    {
+        block = priv->peek;
+        priv->peek = NULL;
+    }
+    else
+    {
+        if (vlc_killed())
+            return NULL;
+
+        block = block_Alloc(4096);
+        if (unlikely(block == NULL))
+            return NULL;
+
+        ssize_t ret = s->pf_read(s, block->p_buffer, block->i_buffer);
+        if (ret >= 0)
+        {
+            block->i_buffer = ret;
+            priv->eof = !ret;
+        }
+        else
+        {
+            block_Release(block);
+            block = NULL;
+        }
+    }
+
+    if (block != NULL)
+        priv->offset += block->i_buffer;
+
+    return block;
+}
+
 uint64_t stream_Tell(const stream_t *s)
 {
     const stream_priv_t *priv = (const stream_priv_t *)s;
