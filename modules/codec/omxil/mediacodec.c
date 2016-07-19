@@ -110,8 +110,6 @@ struct decoder_sys_t
     /* If true, the first input block was successfully dequeued */
     bool            b_input_dequeued;
     bool            b_aborted;
-    /* TODO: remove */
-    bool            b_error_signaled;
 
     union
     {
@@ -596,6 +594,10 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     /* Video or Audio if "mediacodec-audio" bool is true */
     if (p_dec->fmt_in.i_cat != VIDEO_ES && (p_dec->fmt_in.i_cat != AUDIO_ES
      || !var_InheritBool(p_dec, CFG_PREFIX "audio")))
+        return VLC_EGENERIC;
+
+    /* Fail if this module already failed to decode this ES */
+    if (var_Type(p_dec, "mediacodec-failed") != 0)
         return VLC_EGENERIC;
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
@@ -1515,9 +1517,6 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block)
         if (!p_sys->b_aborted)
             msg_Err(p_dec, "OutThread timed out");
 
-        /* In case pf_decode is called again (it shouldn't happen) */
-        p_sys->b_error_signaled = true;
-
         vlc_mutex_unlock(&p_sys->lock);
         return 0;
     }
@@ -1530,15 +1529,16 @@ end:
     }
     if (p_sys->b_aborted)
     {
-        if (!p_sys->b_error_signaled) {
-            /* Signal the error to the Java.
-             * TODO: remove this when there is a decoder fallback */
-            if (p_dec->fmt_in.i_cat == VIDEO_ES)
-                AWindowHandler_sendHardwareAccelerationError(VLC_OBJECT(p_dec),
-                                                             p_sys->u.video.p_awh);
-            p_sys->b_error_signaled = true;
-            vlc_cond_broadcast(&p_sys->cond);
+        if (!p_sys->b_has_format)
+        {
+            /* Add an empty variable so that mediacodec won't be loaded again
+             * for this ES */
+            if (var_Create(p_dec, "mediacodec-failed", VLC_VAR_VOID)
+             == VLC_SUCCESS)
+                decoder_RequestReload(p_dec);
         }
+        else
+            p_dec->b_error = true;
         vlc_mutex_unlock(&p_sys->lock);
         return -1;
     }
