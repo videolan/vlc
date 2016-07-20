@@ -172,7 +172,7 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
 
 void PLModel::dropAppendCopy( const PlMimeData *plMimeData, PLItem *target, int pos )
 {
-    PL_LOCK;
+    vlc_playlist_locker pl_lock ( THEPL );
 
     playlist_item_t *p_parent =
         playlist_ItemGetByInput( p_playlist, target->inputItem() );
@@ -188,8 +188,6 @@ void PLModel::dropAppendCopy( const PlMimeData *plMimeData, PLItem *target, int 
         if( !p_item ) continue;
         pos = playlist_NodeAddCopy( p_playlist, p_item, p_parent, pos );
     }
-
-    PL_UNLOCK;
 }
 
 void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
