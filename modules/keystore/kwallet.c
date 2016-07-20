@@ -600,13 +600,13 @@ vlc_dbus_init( vlc_keystore* p_keystore )
     p_sys->connection = dbus_bus_get_private( DBUS_BUS_SESSION, &error );
     if ( dbus_error_is_set( &error ) )
     {
-        msg_Err( p_keystore, "vlc_dbus_init : "
+        msg_Dbg( p_keystore, "vlc_dbus_init : "
                  "Connection error to session bus (%s)", error.message );
         dbus_error_free( &error );
     }
     if ( !p_sys->connection )
     {
-        msg_Err( p_keystore, "vlc_dbus_init : connection is NULL");
+        msg_Dbg( p_keystore, "vlc_dbus_init : connection is NULL");
         return VLC_EGENERIC;
     }
 
@@ -620,7 +620,7 @@ vlc_dbus_init( vlc_keystore* p_keystore )
                                        &error );
         if ( dbus_error_is_set( &error ) )
         {
-            msg_Err( p_keystore, "vlc_dbus_init : dbus_bus_request_name :"
+            msg_Dbg( p_keystore, "vlc_dbus_init : dbus_bus_request_name :"
                      " error (%s)", error.message );
             dbus_error_free( &error );
         }
@@ -633,7 +633,7 @@ vlc_dbus_init( vlc_keystore* p_keystore )
     }
     if ( p_sys->psz_app_id == NULL )
     {
-        msg_Err( p_keystore, "vlc_dbus_init : Too many kwallet instances" );
+        msg_Dbg( p_keystore, "vlc_dbus_init : Too many kwallet instances" );
         goto error;
     }
 
@@ -644,7 +644,7 @@ vlc_dbus_init( vlc_keystore* p_keystore )
         bool b_is_enabled = false;
         if ( kwallet_is_enabled( p_keystore, i, &b_is_enabled ) )
         {
-            msg_Err( p_keystore, "vlc_dbus_init : kwallet_is_enabled failed" );
+            msg_Dbg( p_keystore, "vlc_dbus_init : kwallet_is_enabled failed" );
             goto error;
         }
         if ( b_is_enabled == true )
@@ -652,7 +652,7 @@ vlc_dbus_init( vlc_keystore* p_keystore )
     }
     if ( i == SERVICE_MAX )
     {
-        msg_Err( p_keystore, "vlc_dbus_init : No kwallet service enabled" );
+        msg_Dbg( p_keystore, "vlc_dbus_init : No kwallet service enabled" );
         goto error;
     }
     p_sys->i_sid = i;
@@ -660,7 +660,7 @@ vlc_dbus_init( vlc_keystore* p_keystore )
     /* getting the name of the wallet assigned to network passwords */
     if ( kwallet_network_wallet( p_keystore ) )
     {
-        msg_Err(p_keystore, "vlc_dbus_init : kwallet_network_wallet has failed");
+        msg_Dbg(p_keystore, "vlc_dbus_init : kwallet_network_wallet has failed");
         goto error;
     }
 
@@ -1320,14 +1320,14 @@ Open( vlc_object_t* p_this )
     i_ret = vlc_dbus_init( p_keystore );
     if ( i_ret )
     {
-        msg_Err( p_keystore, "vlc_dbus_init failed" );
+        msg_Dbg( p_keystore, "vlc_dbus_init failed" );
         goto error;
     }
 
     i_ret = kwallet_open( p_keystore );
     if ( i_ret )
     {
-        msg_Err( p_keystore, "kwallet_open failed" );
+        msg_Dbg( p_keystore, "kwallet_open failed" );
         goto error;
     }
 
