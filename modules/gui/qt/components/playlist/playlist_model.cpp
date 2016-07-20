@@ -938,7 +938,9 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
         break;
 
     case ACTION_ADDTOPLAYLIST:
-        PL_LOCK;
+    {
+        vlc_playlist_locker pl_lock ( THEPL );
+
         foreach( const QModelIndex &currentIndex, indexes )
         {
             playlist_item_t *p_item = playlist_ItemGetById( THEPL, itemId( currentIndex, PLAYLIST_ID ) );
@@ -948,8 +950,8 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
                                   THEPL->p_playing,
                                   PLAYLIST_END );
         }
-        PL_UNLOCK;
         return true;
+    }
 
     case ACTION_REMOVE:
         doDelete( indexes );
