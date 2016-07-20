@@ -368,7 +368,7 @@ static int Demux( demux_t *p_demux )
     for( ;; )
     {
         if( FrameHeaderLoad( p_demux, &fh ) )
-            return 0;
+            return VLC_DEMUXER_EOF;
 
         if( fh.i_type == 'A' || fh.i_type == 'V' )
             break;
@@ -378,13 +378,13 @@ static int Demux( demux_t *p_demux )
         if( fh.i_type != 'R' && fh.i_length > 0 )
         {
             if( stream_Read( p_demux->s, NULL, fh.i_length ) != fh.i_length )
-                return -1;
+                return VLC_DEMUXER_EGENERIC;
         }
     }
 
     /* */
     if( ( p_data = stream_Block( p_demux->s, fh.i_length ) ) == NULL )
-        return 0;
+        return VLC_DEMUXER_EOF;
 
     p_data->i_dts = VLC_TS_0 + (int64_t)fh.i_timecode * 1000;
     p_data->i_pts = (fh.i_type == 'V') ? VLC_TS_INVALID : p_data->i_dts;
@@ -436,7 +436,7 @@ static int Demux( demux_t *p_demux )
         block_Release( p_data );
     }
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
