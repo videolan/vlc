@@ -901,13 +901,13 @@ void PLModel::renameNode( QModelIndex index, QString name )
 {
     if( name.isEmpty() || !index.isValid() ) return;
 
-    PL_LOCK;
+    vlc_playlist_locker pl_lock ( THEPL );
+
     if ( !index.isValid() ) index = rootIndex();
     input_item_t* p_input = this->getInputItem( index );
     input_item_SetName( p_input, qtu( name ) );
     playlist_t *p_playlist = THEPL;
     input_item_WriteMeta( VLC_OBJECT(p_playlist), p_input );
-    PL_UNLOCK;
 }
 
 bool PLModel::action( QAction *action, const QModelIndexList &indexes )
