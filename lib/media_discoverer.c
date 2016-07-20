@@ -356,11 +356,11 @@ libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis )
 
 void
 libvlc_media_discoverer_list_release( libvlc_media_discoverer_description **pp_services,
-                                      unsigned int i_count )
+                                      size_t i_count )
 {
     if( i_count > 0 )
     {
-        for( unsigned int i = 0; i < i_count; ++i )
+        for( size_t i = 0; i < i_count; ++i )
         {
             free( pp_services[i]->psz_name );
             free( pp_services[i]->psz_longname );
@@ -370,7 +370,7 @@ libvlc_media_discoverer_list_release( libvlc_media_discoverer_description **pp_s
     }
 }
 
-unsigned int
+ssize_t
 libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
                                   libvlc_media_discoverer_category i_cat,
                                   libvlc_media_discoverer_description ***ppp_services )
@@ -395,7 +395,7 @@ libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
     default:
         vlc_assert_unreachable();
         *ppp_services = NULL;
-        return 0;
+        return -1;
     }
 
     /* Fetch all sd names, longnames and categories */
@@ -411,7 +411,7 @@ libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
     }
 
     /* Count the number of sd matching our category (i_cat/i_core_cat) */
-    unsigned int i_nb_services = 0;
+    ssize_t i_nb_services = 0;
     char **ppsz_name = ppsz_names;
     int *p_category = p_categories;
     for( ; *ppsz_name != NULL; ppsz_name++, p_category++ )
@@ -437,7 +437,7 @@ libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
             free( p_services );
             pp_services = NULL;
             p_services = NULL;
-            i_nb_services = 0;
+            i_nb_services = -1;
             /* Even if alloc fails, the next loop must be run in order to free
              * names returned by vlc_sd_GetNames */
         }
