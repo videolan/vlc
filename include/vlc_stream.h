@@ -257,10 +257,7 @@ VLC_API block_t * stream_Block( stream_t *s, size_t );
 VLC_API char * stream_ReadLine( stream_t * );
 VLC_API int stream_ReadDir( stream_t *, input_item_node_t * );
 
-/**
- * Low level custom stream creation.
- */
-VLC_API stream_t *stream_CustomNew(vlc_object_t *, void (*)(stream_t *));
+VLC_API stream_t *stream_CommonNew(vlc_object_t *, void (*)(stream_t *));
 
 /**
  * Get the size of the stream.

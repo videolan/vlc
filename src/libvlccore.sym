@@ -402,8 +402,8 @@ spu_Render
 spu_RegisterChannel
 spu_ClearChannel
 stream_Block
+stream_CommonNew
 stream_Control
-stream_CustomNew
 stream_Delete
 stream_Eof
 stream_FilterNew

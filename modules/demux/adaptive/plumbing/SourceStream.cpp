@@ -54,7 +54,7 @@ void ChunksSourceStream::Reset()
 
 stream_t * ChunksSourceStream::makeStream()
 {
-    stream_t *p_stream = stream_CustomNew( p_obj, delete_Callback );
+    stream_t *p_stream = stream_CommonNew( p_obj, delete_Callback );
     if(p_stream)
     {
         p_stream->pf_control = control_Callback;
