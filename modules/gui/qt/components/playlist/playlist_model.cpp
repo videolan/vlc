@@ -408,13 +408,15 @@ bool PLModel::isParent( const QModelIndex &index, const QModelIndex &current ) c
 bool PLModel::isLeaf( const QModelIndex &index ) const
 {
     bool b_isLeaf = false;
-    PL_LOCK;
+
+    vlc_playlist_locker pl_lock ( THEPL );
+
     playlist_item_t *plItem =
         playlist_ItemGetById( p_playlist, itemId( index, PLAYLIST_ID ) );
 
     if( plItem )
         b_isLeaf = plItem->i_children == -1;
-    PL_UNLOCK;
+
     return b_isLeaf;
 }
 
