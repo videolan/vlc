@@ -4599,14 +4599,14 @@ void MP4_BoxDumpStructure( stream_t *s, const MP4_Box_t *p_box )
  **
  *****************************************************************************
  *****************************************************************************/
-static void get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
+static bool get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
 {
     size_t i_len ;
     if( !*ppsz_path[0] )
     {
         *ppsz_token = NULL;
         *pi_number = 0;
-        return;
+        return true;
     }
     i_len = strcspn( *ppsz_path, "/[" );
     if( !i_len && **ppsz_path == '/' )
@@ -4615,10 +4615,11 @@ static void get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
     }
     *ppsz_token = strndup( *ppsz_path, i_len );
     if( unlikely(!*ppsz_token) )
-        abort();
+        return false;
 
     *ppsz_path += i_len;
 
+    /* Parse the token number token[n] */
     if( **ppsz_path == '[' )
     {
         (*ppsz_path)++;
@@ -4636,10 +4637,14 @@ static void get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
     {
         *pi_number = 0;
     }
+
+    /* Forward to start of next token */
     while( **ppsz_path == '/' )
     {
         (*ppsz_path)++;
     }
+
+    return true;
 }
 
 static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p_box,
@@ -4647,7 +4652,7 @@ static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p
 {
     char *psz_dup;
     char *psz_path;
-    char *psz_token;
+    char *psz_token = NULL;
 
     if( !p_box )
     {
@@ -4671,7 +4676,8 @@ static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p
     {
         int i_number;
 
-        get_token( &psz_path, &psz_token, &i_number );
+        if( !get_token( &psz_path, &psz_token, &i_number ) )
+            goto error_box;
 //        fprintf( stderr, "path:'%s', token:'%s' n:%d\n",
 //                 psz_path,psz_token,i_number );
         if( !psz_token )
