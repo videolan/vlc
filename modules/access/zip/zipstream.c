@@ -174,7 +174,7 @@ int StreamOpen( vlc_object_t *p_this )
 
     /* Verify file format */
     const uint8_t *p_peek;
-    if( stream_Peek( s->p_source, &p_peek, i_zip_marker ) < i_zip_marker )
+    if( vlc_stream_Peek( s->p_source, &p_peek, i_zip_marker ) < i_zip_marker )
         return VLC_EGENERIC;
     if( memcmp( p_peek, p_zip_marker, i_zip_marker ) )
         return VLC_EGENERIC;
@@ -304,7 +304,7 @@ static int Control( stream_t *s, int i_query, va_list args )
         case STREAM_CAN_SEEK:
         case STREAM_CAN_FASTSEEK:
         case STREAM_SET_RECORD_STATE:
-            return stream_vaControl( s->p_source, i_query, args );
+            return vlc_stream_vaControl( s->p_source, i_query, args );
 
         default:
             return VLC_EGENERIC;
@@ -766,7 +766,7 @@ static unsigned long ZCALLBACK ZipIO_Read( void *opaque, void *stream,
 {
     (void) stream;
     stream_t *s = (stream_t*) opaque;
-    return (unsigned long) stream_Read( s->p_source, buf, (int) size );
+    return (unsigned long) vlc_stream_Read( s->p_source, buf, (int) size );
 }
 
 /** **************************************************************************
@@ -774,13 +774,13 @@ static unsigned long ZCALLBACK ZipIO_Read( void *opaque, void *stream,
  * \param opaque should be the stream
  * \param stream stream created by ZipIO_Open
  * \return size of the file / stream
- * ATTENTION: this is not stream_Tell, but stream_Size !
+ * ATTENTION: this is not vlc_stream_Tell, but stream_Size !
  *****************************************************************************/
 static long ZCALLBACK ZipIO_Tell( void *opaque, void *stream )
 {
     (void) stream;
     stream_t *s = (stream_t*) opaque;
-    return (long) stream_Size( s->p_source ); /* /!\ not stream_Tell /!\ */
+    return (long) stream_Size( s->p_source ); /* /!\ not vlc_stream_Tell /!\ */
 }
 
 /** **************************************************************************
@@ -799,7 +799,7 @@ static long ZCALLBACK ZipIO_Seek ( void *opaque, void *stream,
     long l_ret;
 
     uint64_t pos = offset + origin;
-    l_ret = (long) stream_Seek( s->p_source, pos );
+    l_ret = (long) vlc_stream_Seek( s->p_source, pos );
     return l_ret;
 }
 
@@ -817,7 +817,7 @@ static int ZCALLBACK ZipIO_Close ( void *opaque, void *stream )
 //     stream_t *s = (stream_t*) opaque;
 //    if( p_demux->p_sys && p_demux->p_sys->zipFile )
 //        p_demux->p_sys->zipFile = NULL;
-//     stream_Seek( s->p_source, 0 );
+//     vlc_stream_Seek( s->p_source, 0 );
     return VLC_SUCCESS;
 }
 

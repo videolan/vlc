@@ -41,14 +41,14 @@ uint32 vlc_stream_io_callback::read( void *p_buffer, size_t i_size )
     if( i_size <= 0 || mb_eof )
         return 0;
 
-    int i_ret = stream_Read( s, p_buffer, i_size );
+    int i_ret = vlc_stream_Read( s, p_buffer, i_size );
     return i_ret < 0 ? 0 : i_ret;
 }
 
 void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
 {
     int64_t i_pos, i_size;
-    int64_t i_current = stream_Tell( s );
+    int64_t i_current = vlc_stream_Tell( s );
 
     switch( mode )
     {
@@ -73,7 +73,7 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
     }
 
     mb_eof = false;
-    if( stream_Seek( s, i_pos ) )
+    if( vlc_stream_Seek( s, i_pos ) )
     {
         mb_eof = true;
     }
@@ -84,7 +84,7 @@ uint64 vlc_stream_io_callback::getFilePointer( void )
 {
     if ( s == NULL )
         return 0;
-    return stream_Tell( s );
+    return vlc_stream_Tell( s );
 }
 
 size_t vlc_stream_io_callback::write(const void *, size_t )
@@ -104,6 +104,6 @@ uint64 vlc_stream_io_callback::toRead( void )
     if( i_size <= 0 )
         return UINT64_MAX;
 
-    return static_cast<uint64>( i_size - stream_Tell( s ) );
+    return static_cast<uint64>( i_size - vlc_stream_Tell( s ) );
 }
 

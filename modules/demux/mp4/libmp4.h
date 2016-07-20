@@ -1723,7 +1723,7 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
     { \
         return( 0 ); \
     } \
-    i_actually_read = stream_Read( p_stream, p_peek, i_read ); \
+    i_actually_read = vlc_stream_Read( p_stream, p_peek, i_read ); \
     if( i_actually_read < 0 || i_actually_read < i_read )\
     { \
         msg_Warn( p_stream, "MP4_READBOX_ENTER: I got %zd bytes, "\

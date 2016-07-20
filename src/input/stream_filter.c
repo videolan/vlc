@@ -36,13 +36,13 @@
 
 static void StreamDelete( stream_t * );
 
-stream_t *stream_FilterNew( stream_t *p_source,
-                            const char *psz_stream_filter )
+stream_t *vlc_stream_FilterNew( stream_t *p_source,
+                                const char *psz_stream_filter )
 {
     stream_t *s;
     assert( p_source != NULL );
 
-    s = stream_CommonNew( p_source->obj.parent, StreamDelete );
+    s = vlc_stream_CommonNew( p_source->obj.parent, StreamDelete );
     if( s == NULL )
         return NULL;
 
@@ -72,7 +72,7 @@ stream_t *stream_FilterAutoNew( stream_t *p_source )
 {
     for( ;; )
     {
-        stream_t *p_filter = stream_FilterNew( p_source, NULL );
+        stream_t *p_filter = vlc_stream_FilterNew( p_source, NULL );
         if( p_filter == NULL )
             break;
 
@@ -95,7 +95,7 @@ stream_t *stream_FilterChainNew( stream_t *p_source, const char *psz_chain )
          name != NULL;
          name = strtok_r( NULL, ":", &buf ) )
     {
-        stream_t *p_filter = stream_FilterNew( p_source, name );
+        stream_t *p_filter = vlc_stream_FilterNew( p_source, name );
         if( p_filter != NULL )
             p_source = p_filter;
         else
@@ -111,11 +111,11 @@ static void StreamDelete( stream_t *s )
     module_unneed( s, s->p_module );
 
     if( s->p_source )
-        stream_Delete( s->p_source );
+        vlc_stream_Delete( s->p_source );
 }
 
-int stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node )
+int vlc_stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node )
 {
     assert( s->p_source != NULL );
-    return stream_ReadDir( s->p_source, p_node );
+    return vlc_stream_ReadDir( s->p_source, p_node );
 }

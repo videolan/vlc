@@ -724,7 +724,7 @@ int XmlFile::OpenXml()
     char *psz_uri;
 
     psz_uri = vlc_path2uri( this->s_path.c_str(), "file" );
-    this->p_stream = stream_UrlNew(this->p_demux, psz_uri );
+    this->p_stream = vlc_stream_NewMRL(this->p_demux, psz_uri );
     free(psz_uri);
     if( ! this->p_stream ) {
         return -1;
@@ -732,7 +732,7 @@ int XmlFile::OpenXml()
 
     this->p_xmlReader = xml_ReaderCreate( this->p_demux, this->p_stream);
     if( ! this->p_xmlReader ) {
-        stream_Delete( this->p_stream );
+        vlc_stream_Delete( this->p_stream );
         return -1;
     }
     return 0;
@@ -819,7 +819,7 @@ int XmlFile::isCPL()
 
 void XmlFile::CloseXml() {
     if( this->p_stream )
-        stream_Delete( this->p_stream );
+        vlc_stream_Delete( this->p_stream );
     if( this->p_xmlReader )
         xml_ReaderDelete( this->p_xmlReader );
 }

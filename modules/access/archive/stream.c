@@ -56,7 +56,7 @@ static int Control(stream_t *p_stream, int i_query, va_list args)
             return VLC_EGENERIC;
 
         default:
-            return stream_vaControl( p_stream->p_source, i_query, args );
+            return vlc_stream_vaControl( p_stream->p_source, i_query, args );
     }
 
     return VLC_SUCCESS;
@@ -69,7 +69,7 @@ static ssize_t ReadCallback(struct archive *p_archive, void *p_object, const voi
     stream_sys_t *sys = p_stream->p_sys;
 
     *pp_buffer = &sys->buffer;
-    return stream_Read(p_stream->p_source, &sys->buffer, ARCHIVE_READ_SIZE);
+    return vlc_stream_Read(p_stream->p_source, &sys->buffer, ARCHIVE_READ_SIZE);
 }
 
 static ssize_t SkipCallback(struct archive *p_archive, void *p_object, ssize_t i_request)
@@ -82,15 +82,15 @@ static ssize_t SkipCallback(struct archive *p_archive, void *p_object, ssize_t i
     /* be smart as small seeks converts to reads */
     if (sys->b_source_canseek)
     {
-        int64_t i_pos = stream_Tell(p_stream->p_source);
+        int64_t i_pos = vlc_stream_Tell(p_stream->p_source);
         if (i_pos >=0)
-            stream_Seek(p_stream->p_source, i_pos + i_request);
-        i_skipped = stream_Tell(p_stream->p_source) - i_pos;
+            vlc_stream_Seek(p_stream->p_source, i_pos + i_request);
+        i_skipped = vlc_stream_Tell(p_stream->p_source) - i_pos;
     }
     else while(i_request)
     {
         int i_skip = __MIN(INT32_MAX, i_request);
-        int i_read = stream_Read(p_stream->p_source, NULL, i_skip);
+        int i_read = vlc_stream_Read(p_stream->p_source, NULL, i_skip);
         if (i_read > 0)
             i_skipped += i_read;
         else
@@ -110,7 +110,7 @@ static ssize_t SeekCallback(struct archive *p_archive, void *p_object, ssize_t i
     switch(i_whence)
     {
     case SEEK_CUR:
-        i_pos = stream_Tell(p_stream->p_source);
+        i_pos = vlc_stream_Tell(p_stream->p_source);
         break;
     case SEEK_SET:
         i_pos = 0;
@@ -125,8 +125,8 @@ static ssize_t SeekCallback(struct archive *p_archive, void *p_object, ssize_t i
     if (i_pos < 0)
         return -1;
 
-    stream_Seek(p_stream->p_source, i_pos + i_offset); /* We don't care about return val */
-    return stream_Tell(p_stream->p_source);
+    vlc_stream_Seek(p_stream->p_source, i_pos + i_offset); /* We don't care about return val */
+    return vlc_stream_Tell(p_stream->p_source);
 }
 
 static int Browse(stream_t *p_stream, input_item_node_t *p_node)
@@ -190,7 +190,8 @@ int StreamOpen(vlc_object_t *p_object)
     EnableArchiveFormats(p_sys->p_archive);
 
     /* Seek callback must only be set if calls are guaranteed to succeed */
-    stream_Control(p_stream->p_source, STREAM_CAN_SEEK, &p_sys->b_source_canseek);
+    vlc_stream_Control(p_stream->p_source, STREAM_CAN_SEEK,
+                       &p_sys->b_source_canseek);
     if(p_sys->b_source_canseek)
         archive_read_set_seek_callback(p_sys->p_archive, SeekCallback);
 

@@ -315,7 +315,7 @@ static void* ZCALLBACK ZipIO_Open( void* opaque, const char* file, int mode )
         strcpy( fileUri, file );
     }
 
-    stream_t *s = stream_UrlNew( p_access, fileUri );
+    stream_t *s = vlc_stream_NewMRL( p_access, fileUri );
     free( fileUri );
     return s;
 }
@@ -329,7 +329,7 @@ static uLong ZCALLBACK ZipIO_Read( void* opaque, void* stream,
     (void)opaque;
     //access_t *p_access = (access_t*) opaque;
     //msg_Dbg(p_access, "read %d", size);
-    return stream_Read( (stream_t*) stream, buf, size );
+    return vlc_stream_Read( (stream_t*) stream, buf, size );
 }
 
 /** **************************************************************************
@@ -350,7 +350,7 @@ static uLong ZCALLBACK ZipIO_Write( void* opaque, void* stream,
 static long ZCALLBACK ZipIO_Tell( void* opaque, void* stream )
 {
     (void)opaque;
-    int64_t i64_tell = stream_Tell( (stream_t*) stream );
+    int64_t i64_tell = vlc_stream_Tell( (stream_t*) stream );
     //access_t *p_access = (access_t*) opaque;
     //msg_Dbg(p_access, "tell %" PRIu64, i64_tell);
     return (long)i64_tell;
@@ -367,7 +367,7 @@ static long ZCALLBACK ZipIO_Seek( void* opaque, void* stream,
     switch( origin )
     {
         case SEEK_CUR:
-            pos += stream_Tell( (stream_t*) stream );
+            pos += vlc_stream_Tell( (stream_t*) stream );
             break;
         case SEEK_SET:
             break;
@@ -379,7 +379,7 @@ static long ZCALLBACK ZipIO_Seek( void* opaque, void* stream,
     }
     if( pos < 0 )
         return -1;
-    stream_Seek( (stream_t*) stream, pos );
+    vlc_stream_Seek( (stream_t*) stream, pos );
     /* Note: in unzip.c, unzlocal_SearchCentralDir seeks to the end of
              the stream, which is doable but returns an error in VLC.
              That's why we always assume this was OK. FIXME */
@@ -392,7 +392,7 @@ static long ZCALLBACK ZipIO_Seek( void* opaque, void* stream,
 static int ZCALLBACK ZipIO_Close( void* opaque, void* stream )
 {
     (void)opaque;
-    stream_Delete( (stream_t*) stream );
+    vlc_stream_Delete( (stream_t*) stream );
     return 0;
 }
 

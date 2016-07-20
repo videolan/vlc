@@ -128,7 +128,7 @@ static int Demux( demux_t *p_demux )
     if( unlikely(block == NULL) )
         return -1;
 
-    int rd = stream_Read( p_demux->s, block->p_buffer, DUMP_BLOCKSIZE );
+    int rd = vlc_stream_Read( p_demux->s, block->p_buffer, DUMP_BLOCKSIZE );
     if ( rd <= 0 )
     {
         block_Release( block );

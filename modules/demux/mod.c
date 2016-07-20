@@ -170,7 +170,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_data = i_size;
     p_sys->p_data = malloc( p_sys->i_data );
     if( p_sys->p_data )
-        p_sys->i_data = stream_Read( p_demux->s, p_sys->p_data, p_sys->i_data );
+        p_sys->i_data = vlc_stream_Read( p_demux->s, p_sys->p_data,
+                                         p_sys->i_data );
     if( p_sys->i_data <= 0 || !p_sys->p_data )
     {
         msg_Err( p_demux, "failed to read the complete file" );
@@ -215,7 +216,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "failed to understand the file" );
         /* we try to seek to recover for other plugin */
-        stream_Seek( p_demux->s, 0 );
+        vlc_stream_Seek( p_demux->s, 0 );
         free( p_sys->p_data );
         free( p_sys );
         return VLC_EGENERIC;
@@ -516,7 +517,7 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
     }
 
     const uint8_t *p_peek;
-    const int i_peek = stream_Peek( p_demux->s, &p_peek, 2048 );
+    const int i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 2048 );
     if( i_peek < 4 )
         return VLC_EGENERIC;
 

@@ -207,7 +207,7 @@ static int Open( vlc_object_t * p_this )
     const uint8_t  *p_peek;
 
     /* Check if we are dealing with an ogg stream */
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
     if( !p_demux->obj.force && memcmp( p_peek, "OggS", 4 ) )
     {
         char *psz_mime = stream_ContentType( p_demux->s );
@@ -233,7 +233,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_length = -1;
     p_sys->b_preparsing_done = false;
 
-    stream_Control( p_demux->s, STREAM_GET_PTS_DELAY, & p_sys->i_access_delay );
+    vlc_stream_Control( p_demux->s, STREAM_GET_PTS_DELAY,
+                        &p_sys->i_access_delay );
 
     /* Set exported functions */
     p_demux->pf_demux = Demux;
@@ -316,7 +317,7 @@ static int Demux( demux_t * p_demux )
         if ( !p_sys->b_chained_boundary )
         {
             /* Find the real duration */
-            stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
+            vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
             if ( b_canseek )
                 Oggseek_ProbeEnd( p_demux );
         }
@@ -493,7 +494,7 @@ static int Demux( demux_t * p_demux )
                 }
 
                 /* update start of data pointer */
-                p_stream->i_data_start = stream_Tell( p_demux->s );
+                p_stream->i_data_start = vlc_stream_Tell( p_demux->s );
             }
 
             /* If any streams have i_skip_frames, only decode (pre-roll)
@@ -750,7 +751,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_CAN_SEEK:
-            return stream_vaControl( p_demux->s, i_query, args );
+            return vlc_stream_vaControl( p_demux->s, i_query, args );
 
         case DEMUX_GET_META:
             p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
@@ -776,7 +777,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 msg_Err( p_demux, "No selected seekable stream found" );
                 return VLC_EGENERIC;
             }
-            stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
+            vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
             if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, i64, b ) )
             {
                 Ogg_ResetStreamsHelper( p_sys );
@@ -812,7 +813,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else if( stream_Size( p_demux->s ) > 0 )
             {
-                i64 = stream_Tell( p_demux->s );
+                i64 = vlc_stream_Tell( p_demux->s );
                 *pf = (double) i64 / stream_Size( p_demux->s );
             }
             else *pf = 0.0;
@@ -835,7 +836,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
 
-            stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
+            vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
 
             f = (double)va_arg( args, double );
             if ( p_sys->i_length <= 0 || !b /* || ! STREAM_CAN_FASTSEEK */ )
@@ -916,7 +917,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
 
-            stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
+            vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
             if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, i64, b ) )
             {
                 Ogg_ResetStreamsHelper( p_sys );
@@ -952,7 +953,7 @@ static int Ogg_ReadPage( demux_t *p_demux, ogg_page *p_oggpage )
     {
         p_buffer = ogg_sync_buffer( &p_ogg->oy, OGGSEEK_BYTES_TO_READ );
 
-        i_read = stream_Read( p_demux->s, p_buffer, OGGSEEK_BYTES_TO_READ );
+        i_read = vlc_stream_Read( p_demux->s, p_buffer, OGGSEEK_BYTES_TO_READ );
         if( i_read <= 0 )
             return VLC_EGENERIC;
 

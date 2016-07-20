@@ -25,7 +25,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_stream.h>                               /* stream_Peek*/
+#include <vlc_stream.h>                               /* vlc_stream_Peek*/
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>                                  /* for compressed moov */
@@ -79,15 +79,15 @@ static inline MP4_Box_t * MP4_BoxNew( uint32_t i_type );
 static int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
 {
     bool b_canseek = false;
-    if ( stream_Control( p_stream, STREAM_CAN_SEEK, &b_canseek ) != VLC_SUCCESS ||
+    if ( vlc_stream_Control( p_stream, STREAM_CAN_SEEK, &b_canseek ) != VLC_SUCCESS ||
          b_canseek )
     {
         /* can seek or don't know */
-        return stream_Seek( p_stream, i_pos );
+        return vlc_stream_Seek( p_stream, i_pos );
     }
     /* obviously can't seek then */
 
-    int64_t i_current_pos = stream_Tell( p_stream );
+    int64_t i_current_pos = vlc_stream_Tell( p_stream );
     if ( i_current_pos < 0 || i_pos < (uint64_t)i_current_pos )
         return VLC_EGENERIC;
 
@@ -97,7 +97,8 @@ static int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
     else if( i_toread > (1<<17) )
         return VLC_EGENERIC;
     else
-        return (stream_Read( p_stream, NULL, (int)i_toread ) != (int)i_toread);
+        return vlc_stream_Read( p_stream, NULL,
+                                i_toread ) != (ssize_t)i_toread;
 }
 
 static void MP4_BoxAddChild( MP4_Box_t *p_parent, MP4_Box_t *p_childbox )
@@ -127,9 +128,9 @@ MP4_Box_t * MP4_BoxExtract( MP4_Box_t **pp_chain, uint32_t i_type )
     return NULL;
 }
 
-/* Don't use stream_Seek directly */
-#undef stream_Seek
-#define stream_Seek(a,b) __NO__
+/* Don't use vlc_stream_Seek directly */
+#undef vlc_stream_Seek
+#define vlc_stream_Seek(a,b) __NO__
 
 /*****************************************************************************
  * MP4_PeekBoxHeader : Load only common parameters for all boxes
@@ -144,11 +145,11 @@ int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
     int      i_read;
     const uint8_t  *p_peek;
 
-    if( ( ( i_read = stream_Peek( p_stream, &p_peek, 32 ) ) < 8 ) )
+    if( ( ( i_read = vlc_stream_Peek( p_stream, &p_peek, 32 ) ) < 8 ) )
     {
         return 0;
     }
-    p_box->i_pos = stream_Tell( p_stream );
+    p_box->i_pos = vlc_stream_Tell( p_stream );
 
     p_box->data.p_payload = NULL;
     p_box->p_father = NULL;
@@ -262,7 +263,7 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
     }
 
     /* Check is we consumed all data */
-    if( stream_Tell( p_stream ) < i_next )
+    if( vlc_stream_Tell( p_stream ) < i_next )
     {
         MP4_Seek( p_stream, i_next - 1 ); /*  since past seek can fail when hitting EOF */
         MP4_Seek( p_stream, i_next );
@@ -285,7 +286,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
     /* Size of root container is set to 0 when unknown, for exemple
      * with a DASH stream. In that case, we skip the following check */
     if( (p_container->i_size || p_container->p_father)
-            && ( stream_Tell( p_stream ) + ((b_indexed)?16:8) >
+            && ( vlc_stream_Tell( p_stream ) + ((b_indexed)?16:8) >
         (uint64_t)(p_container->i_pos + p_container->i_size) )
       )
     {
@@ -300,7 +301,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
     {
         if ( p_container->i_size )
         {
-            const uint64_t i_tell = stream_Tell( p_stream );
+            const uint64_t i_tell = vlc_stream_Tell( p_stream );
             if( i_tell + ((b_indexed)?16:8) >= i_end )
                 break;
         }
@@ -309,7 +310,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         if ( b_indexed )
         {
             uint8_t read[8];
-            if ( stream_Read( p_stream, read, 8 ) < 8 )
+            if ( vlc_stream_Read( p_stream, read, 8 ) < 8 )
                 break;
             i_index = GetDWBE(&read[4]);
         }
@@ -326,7 +327,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
 
         if ( p_container->i_size )
         {
-            const uint64_t i_tell = stream_Tell( p_stream );
+            const uint64_t i_tell = vlc_stream_Tell( p_stream );
             if( i_tell >= i_end )
             {
                 assert( i_tell == i_end );
@@ -339,7 +340,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
     /* Always move to end of container */
     if ( !b_onexclude &&  p_container->i_size )
     {
-        const uint64_t i_tell = stream_Tell( p_stream );
+        const uint64_t i_tell = vlc_stream_Tell( p_stream );
         if ( i_tell != i_end )
             MP4_Seek( p_stream, i_end );
     }
@@ -370,12 +371,13 @@ static int MP4_ReadBoxContainerRawInBox( stream_t *p_stream, MP4_Box_t *p_contai
 {
     if(!p_container)
         return 0;
-    stream_t *p_substream = stream_MemoryNew( p_stream, p_buffer, i_size, true );
+    stream_t *p_substream = vlc_stream_MemoryNew( p_stream, p_buffer, i_size,
+                                                  true );
     if( !p_substream )
         return 0;
     MP4_Box_t *p_last = p_container->p_last;
     MP4_ReadBoxContainerChildren( p_substream, p_container, NULL );
-    stream_Delete( p_substream );
+    vlc_stream_Delete( p_substream );
     /* do pos fixup */
     if( p_container )
     {
@@ -413,7 +415,7 @@ static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
         int     i_read;
         vlc_fourcc_t i_fcc;
 
-        i_read  = stream_Peek( p_stream, &p_peek, 44 );
+        i_read  = vlc_stream_Peek( p_stream, &p_peek, 44 );
 
         p_peek += mp4_box_headersize( p_box ) + 4;
         i_read -= mp4_box_headersize( p_box ) + 4;
@@ -444,7 +446,7 @@ static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
 
 static int MP4_ReadBox_ilst( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    if( p_box->i_size < 8 || stream_Read( p_stream, NULL, 8 ) < 8 )
+    if( p_box->i_size < 8 || vlc_stream_Read( p_stream, NULL, 8 ) < 8 )
         return 0;
 
     /* Find our handler */
@@ -3043,13 +3045,14 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
 
     /* now create a memory stream */
     p_stream_memory =
-        stream_MemoryNew( VLC_OBJECT(p_stream), p_cmvd->data.p_cmvd->p_data,
-                          p_cmvd->data.p_cmvd->i_uncompressed_size, true );
+        vlc_stream_MemoryNew( VLC_OBJECT(p_stream),
+                              p_cmvd->data.p_cmvd->p_data,
+                              p_cmvd->data.p_cmvd->i_uncompressed_size, true );
 
     /* and read uncompressd moov */
     p_box->data.p_cmov->p_moov = MP4_ReadBox( p_stream_memory, NULL );
 
-    stream_Delete( p_stream_memory );
+    vlc_stream_Delete( p_stream_memory );
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"cmov\" compressed movie header completed");
@@ -3288,9 +3291,9 @@ static int MP4_ReadBox_data( stream_t *p_stream, MP4_Box_t *p_box )
 static int MP4_ReadBox_Metadata( stream_t *p_stream, MP4_Box_t *p_box )
 {
     const uint8_t *p_peek;
-    if ( stream_Peek( p_stream, &p_peek, 16 ) < 16 )
+    if ( vlc_stream_Peek( p_stream, &p_peek, 16 ) < 16 )
         return 0;
-    if ( stream_Read( p_stream, NULL, 8 ) < 8 )
+    if ( vlc_stream_Read( p_stream, NULL, 8 ) < 8 )
         return 0;
     const uint32_t stoplist[] = { ATOM_data, 0 };
     return MP4_ReadBoxContainerChildren( p_stream, p_box, stoplist );
@@ -3538,14 +3541,14 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
     int i_actually_read;
 
     // skip over box header
-    i_actually_read = stream_Read( p_stream, meta_data, 8 );
+    i_actually_read = vlc_stream_Read( p_stream, meta_data, 8 );
     if( i_actually_read < 8 )
         return 0;
 
     if ( p_box->p_father && p_box->p_father->i_type == ATOM_udta ) /* itunes udta/meta */
     {
         /* meta content starts with a 4 byte version/flags value (should be 0) */
-        i_actually_read = stream_Read( p_stream, meta_data, 4 );
+        i_actually_read = vlc_stream_Read( p_stream, meta_data, 4 );
         if( i_actually_read < 4 || memcmp( meta_data, "\0\0\0", 4 ) )
             return 0;
     }
@@ -4481,7 +4484,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
     if( i_result && !MP4_BoxGet( p_vroot, "moov" ) )
     {
         bool b_seekable;
-        if( stream_Control( p_stream, STREAM_CAN_SEEK, &b_seekable ) != VLC_SUCCESS || !b_seekable )
+        if( vlc_stream_Control( p_stream, STREAM_CAN_SEEK, &b_seekable ) != VLC_SUCCESS || !b_seekable )
         {
             msg_Err( p_stream, "no moov before mdat and the stream is not seekable" );
             goto error;
@@ -4505,7 +4508,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
         return p_vroot;
     }
 
-    if( stream_Tell( p_stream ) + 8 < (uint64_t) stream_Size( p_stream ) )
+    if( vlc_stream_Tell( p_stream ) + 8 < (uint64_t) stream_Size( p_stream ) )
     {
         /* Get the rest of the file */
         i_result = MP4_ReadBoxContainerChildren( p_stream, p_vroot, NULL );

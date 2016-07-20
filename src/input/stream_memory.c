@@ -51,12 +51,12 @@ static void stream_MemoryDelete(stream_t *s)
     stream_MemoryPreserveDelete(s);
 }
 
-stream_t *(stream_MemoryNew)(vlc_object_t *p_this, uint8_t *p_buffer,
-                             size_t i_size, bool preserve)
+stream_t *(vlc_stream_MemoryNew)(vlc_object_t *p_this, uint8_t *p_buffer,
+                                 size_t i_size, bool preserve)
 {
-    stream_t *s = stream_CommonNew( p_this,
-                                    preserve ? stream_MemoryPreserveDelete
-                                             : stream_MemoryDelete );
+    stream_t *s = vlc_stream_CommonNew( p_this,
+                                        preserve ? stream_MemoryPreserveDelete
+                                                 : stream_MemoryDelete );
     stream_sys_t *p_sys;
 
     if( !s )
@@ -127,7 +127,7 @@ static int Control( stream_t *s, int i_query, va_list args )
             return VLC_EGENERIC;
 
         default:
-            msg_Err( s, "invalid stream_vaControl query=0x%x", i_query );
+            msg_Err( s, "invalid vlc_stream_vaControl query=0x%x", i_query );
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;

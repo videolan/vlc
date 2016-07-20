@@ -535,21 +535,21 @@ static int Handshake(intf_thread_t *p_this)
         return VLC_ENOMEM;
 
     /* send the http handshake request */
-    p_stream = stream_UrlNew(p_intf, psz_handshake_url);
+    p_stream = vlc_stream_NewMRL(p_intf, psz_handshake_url);
     free(psz_handshake_url);
 
     if (!p_stream)
         return VLC_EGENERIC;
 
     /* read answer */
-    i_ret = stream_Read(p_stream, p_buffer, sizeof(p_buffer) - 1);
+    i_ret = vlc_stream_Read(p_stream, p_buffer, sizeof(p_buffer) - 1);
     if (i_ret <= 0)
     {
-        stream_Delete(p_stream);
+        vlc_stream_Delete(p_stream);
         return VLC_EGENERIC;
     }
     p_buffer[i_ret] = '\0';
-    stream_Delete(p_stream);
+    vlc_stream_Delete(p_stream);
 
     p_buffer_pos = strstr((char*) p_buffer, "FAILED ");
     if (p_buffer_pos)

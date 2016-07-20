@@ -84,7 +84,7 @@ static int Open( vlc_object_t *p_this )
     es_format_t  fmt;
     const uint8_t *p_peek;
 
-    if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 ) return VLC_EGENERIC;
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 ) return VLC_EGENERIC;
     if( p_peek[0] != 'A' || p_peek[1] != 'V' || p_peek[4] != 0x55 )
     {
         /* In case we had forced this demuxer we try to resynch */
@@ -150,7 +150,7 @@ static int Demux( demux_t *p_demux )
     int64_t     i_pts;
     int         i_skip;
 
-    if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
     {
         msg_Warn( p_demux, "eof ?" );
         return 0;
@@ -162,7 +162,7 @@ static int Demux( demux_t *p_demux )
         {
             return -1;
         }
-        if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
+        if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
         {
             msg_Warn( p_demux, "eof ?" );
             return 0;
@@ -195,7 +195,7 @@ static int Demux( demux_t *p_demux )
             {
                 int i_pre = p_peek[5]&0x3;
 
-                if( ( p_frame = stream_Block( p_demux->s, 8 + 4 + i_pre ) ) )
+                if( ( p_frame = vlc_stream_Block( p_demux->s, 8 + 4 + i_pre ) ) )
                 {
                     i_pts = GetDWBE( &p_frame->p_buffer[8] );
                     if( p_frame->i_buffer > 12 )
@@ -225,7 +225,7 @@ static int Demux( demux_t *p_demux )
                 }
             }
 
-            if( ( p_frame = stream_Block( p_demux->s, i_size + i_skip ) ) )
+            if( ( p_frame = vlc_stream_Block( p_demux->s, i_size + i_skip ) ) )
             {
                 p_frame->p_buffer += i_skip;
                 p_frame->i_buffer -= i_skip;
@@ -255,7 +255,7 @@ static int Demux( demux_t *p_demux )
             {
                 ParsePES( p_demux );
             }
-            if( ( p_frame = stream_Block( p_demux->s, i_size + 8 ) ) )
+            if( ( p_frame = vlc_stream_Block( p_demux->s, i_size + 8 ) ) )
             {
                 p_frame->p_buffer += 8;
                 p_frame->i_buffer -= 8;
@@ -274,7 +274,7 @@ static int Demux( demux_t *p_demux )
 
         default:
             msg_Warn( p_demux, "unknown id=0x%x", p_peek[2] );
-            stream_Read( p_demux->s, NULL, i_size + 8 );
+            vlc_stream_Read( p_demux->s, NULL, i_size + 8 );
             break;
     }
     return 1;
@@ -291,13 +291,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_CAN_SEEK:
-            return stream_vaControl( p_demux->s, i_query, args );
+            return vlc_stream_vaControl( p_demux->s, i_query, args );
 
         case DEMUX_GET_POSITION:
             if( ( i64 = stream_Size( p_demux->s ) ) > 0 )
             {
                 pf = (double*) va_arg( args, double* );
-                double current = stream_Tell( p_demux->s );
+                double current = vlc_stream_Tell( p_demux->s );
                 *pf = current / (double)i64;
                 return VLC_SUCCESS;
             }
@@ -307,7 +307,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             f = (double) va_arg( args, double );
             i64 = stream_Size( p_demux->s );
 
-            if( stream_Seek( p_demux->s, (int64_t)(i64 * f) ) || ReSynch( p_demux ) )
+            if( vlc_stream_Seek( p_demux->s, (int64_t)(i64 * f) ) || ReSynch( p_demux ) )
             {
                 return VLC_EGENERIC;
             }
@@ -355,7 +355,7 @@ static int ReSynch( demux_t *p_demux )
     for( ;; )
     {
         const uint8_t *p_peek;
-        int i_peek = stream_Peek( p_demux->s, &p_peek, 1024 );
+        int i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 1024 );
         if( i_peek < 8 )
             break;
 
@@ -366,7 +366,7 @@ static int ReSynch( demux_t *p_demux )
             if( p_peek[0] == 'A' && p_peek[1] == 'V' && p_peek[4] == 0x55 )
             {
                 if( i_skip > 0
-                 && stream_Read( p_demux->s, NULL, i_skip ) < i_skip )
+                 && vlc_stream_Read( p_demux->s, NULL, i_skip ) < i_skip )
                     return VLC_EGENERIC;
                 return VLC_SUCCESS;
             }
@@ -374,7 +374,7 @@ static int ReSynch( demux_t *p_demux )
             i_skip++;
         }
 
-        if( stream_Read( p_demux->s, NULL, i_skip ) < i_skip )
+        if( vlc_stream_Read( p_demux->s, NULL, i_skip ) < i_skip )
             break;
     }
 

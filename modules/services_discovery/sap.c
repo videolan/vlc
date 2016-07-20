@@ -341,7 +341,7 @@ static int OpenDemux( vlc_object_t *p_this )
     assert( p_demux->s ); /* this is NOT an access_demux */
 
     /* Probe for SDP */
-    if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
         return VLC_EGENERIC;
 
     if( memcmp( p_peek, "v=0\r\no=", 7 ) && memcmp( p_peek, "v=0\no=", 6 ) )
@@ -360,7 +360,7 @@ static int OpenDemux( vlc_object_t *p_this )
         }
         psz_sdp = psz_sdp_new;
 
-        i_read = stream_Read( p_demux->s, &psz_sdp[i_len], i_read_max );
+        i_read = vlc_stream_Read( p_demux->s, &psz_sdp[i_len], i_read_max );
         if( (int)i_read < 0 )
         {
             msg_Err( p_demux, "cannot read SDP" );
@@ -403,7 +403,7 @@ static int OpenDemux( vlc_object_t *p_this )
 error:
     FREENULL( psz_sdp );
     if( p_sdp ) FreeSDP( p_sdp ); p_sdp = NULL;
-    stream_Seek( p_demux->s, 0 );
+    vlc_stream_Seek( p_demux->s, 0 );
     return errval;
 }
 

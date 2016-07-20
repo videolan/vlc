@@ -60,7 +60,7 @@ Manifest * SmoothManager::fetchManifest()
     if(!p_block)
         return NULL;
 
-    stream_t *memorystream = stream_MemoryNew(p_demux, p_block->p_buffer, p_block->i_buffer, true);
+    stream_t *memorystream = vlc_stream_MemoryNew(p_demux, p_block->p_buffer, p_block->i_buffer, true);
     if(!memorystream)
     {
         block_Release(p_block);
@@ -70,7 +70,7 @@ Manifest * SmoothManager::fetchManifest()
     xml::DOMParser parser(memorystream);
     if(!parser.parse(true))
     {
-        stream_Delete(memorystream);
+        vlc_stream_Delete(memorystream);
         block_Release(p_block);
         return NULL;
     }
@@ -85,7 +85,7 @@ Manifest * SmoothManager::fetchManifest()
         delete manifestParser;
     }
 
-    stream_Delete(memorystream);
+    vlc_stream_Delete(memorystream);
     block_Release(p_block);
 
     return manifest;

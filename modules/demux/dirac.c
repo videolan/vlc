@@ -94,7 +94,7 @@ static int Open( vlc_object_t * p_this )
     const uint8_t *p_peek;
     es_format_t fmt;
 
-    if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
 
     if( p_peek[0] != 'B' || p_peek[1] != 'B' ||
         p_peek[2] != 'C' || p_peek[3] != 'D') /* start of ParseInfo */
@@ -167,7 +167,7 @@ static int Demux( demux_t *p_demux)
     }
     else
     {
-        p_block_in = stream_Block( p_demux->s, DIRAC_PACKET_SIZE );
+        p_block_in = vlc_stream_Block( p_demux->s, DIRAC_PACKET_SIZE );
         if( !p_block_in )
         {
             return 0;

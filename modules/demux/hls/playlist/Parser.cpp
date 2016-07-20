@@ -163,11 +163,11 @@ bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representati
     block_t *p_block = Retrieve::HTTP(p_obj, rep->getPlaylistUrl().toString());
     if(p_block)
     {
-        stream_t *substream = stream_MemoryNew(p_obj, p_block->p_buffer, p_block->i_buffer, true);
+        stream_t *substream = vlc_stream_MemoryNew(p_obj, p_block->p_buffer, p_block->i_buffer, true);
         if(substream)
         {
             std::list<Tag *> tagslist = parseEntries(substream);
-            stream_Delete(substream);
+            vlc_stream_Delete(substream);
 
             parseSegments(p_obj, rep, tagslist);
 
@@ -382,7 +382,7 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
 }
 M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::string &playlisturl)
 {
-    char *psz_line = stream_ReadLine(p_stream);
+    char *psz_line = vlc_stream_ReadLine(p_stream);
     if(!psz_line || strcmp(psz_line, "#EXTM3U"))
     {
         free(psz_line);
@@ -517,7 +517,7 @@ std::list<Tag *> M3U8Parser::parseEntries(stream_t *stream)
     Tag *lastTag = NULL;
     char *psz_line;
 
-    while((psz_line = stream_ReadLine(stream)))
+    while((psz_line = vlc_stream_ReadLine(stream)))
     {
         if(*psz_line == '#')
         {

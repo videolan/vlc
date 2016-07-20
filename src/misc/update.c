@@ -188,7 +188,7 @@ static bool GetUpdateFile( update_t *p_update )
     char *psz_version_line = NULL;
     char *psz_update_data = NULL;
 
-    p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
+    p_stream = vlc_stream_NewMRL( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
     if( !p_stream )
     {
         msg_Err( p_update->p_libvlc, "Failed to open %s for reading",
@@ -197,7 +197,7 @@ static bool GetUpdateFile( update_t *p_update )
     }
 
     uint64_t i_read;
-    if( stream_GetSize( p_stream, &i_read ) || i_read >= UINT16_MAX )
+    if( vlc_stream_GetSize( p_stream, &i_read ) || i_read >= UINT16_MAX )
     {
         msg_Err(p_update->p_libvlc, "Status file too large");
         goto error;
@@ -207,7 +207,8 @@ static bool GetUpdateFile( update_t *p_update )
     if( !psz_update_data )
         goto error;
 
-    if( stream_Read( p_stream, psz_update_data, i_read ) != (ssize_t)i_read )
+    if( vlc_stream_Read( p_stream, psz_update_data,
+                         i_read ) != (ssize_t)i_read )
     {
         msg_Err( p_update->p_libvlc, "Couldn't download update file %s",
                 UPDATE_VLC_STATUS_URL );
@@ -215,7 +216,7 @@ static bool GetUpdateFile( update_t *p_update )
     }
     psz_update_data[i_read] = '\0';
 
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
     p_stream = NULL;
 
     /* first line : version number */
@@ -376,7 +377,7 @@ static bool GetUpdateFile( update_t *p_update )
 
 error:
     if( p_stream )
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
     free( psz_version_line );
     free( psz_update_data );
     return false;
@@ -551,7 +552,7 @@ static void* update_DownloadReal( void *obj )
     canc = vlc_savecancel ();
 
     /* Open the stream */
-    p_stream = stream_UrlNew( p_udt, p_update->release.psz_url );
+    p_stream = vlc_stream_NewMRL( p_udt, p_update->release.psz_url );
     if( !p_stream )
     {
         msg_Err( p_udt, "Failed to open %s for reading", p_update->release.psz_url );
@@ -559,7 +560,7 @@ static void* update_DownloadReal( void *obj )
     }
 
     /* Get the stream size */
-    if( stream_GetSize( p_stream, &l_size ) || l_size == 0 )
+    if( vlc_stream_GetSize( p_stream, &l_size ) || l_size == 0 )
         goto end;
 
     /* Get the file name and open it*/
@@ -604,7 +605,7 @@ static void* update_DownloadReal( void *obj )
         goto end;
 
     while( !atomic_load( &p_udt->aborted ) &&
-           ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
+           ( i_read = vlc_stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
            !vlc_dialog_is_cancelled( p_udt, p_dialog_id ) )
     {
         if( fwrite( p_buffer, i_read, 1, p_file ) < 1 )
@@ -740,7 +741,7 @@ end:
     if( p_dialog_id != NULL )
         vlc_dialog_release( p_udt, p_dialog_id );
     if( p_stream )
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
     if( p_file )
         fclose( p_file );
     free( psz_destdir );

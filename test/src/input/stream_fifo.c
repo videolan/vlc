@@ -55,37 +55,37 @@ int main(void)
 
     s = vlc_stream_fifo_New(parent);
     assert(s != NULL);
-    val = stream_Control(s, STREAM_CAN_SEEK, &b);
+    val = vlc_stream_Control(s, STREAM_CAN_SEEK, &b);
     assert(val == VLC_SUCCESS && !b);
-    val = stream_GetSize(s, &(uint64_t){ 0 });
+    val = vlc_stream_GetSize(s, &(uint64_t){ 0 });
     assert(val < 0);
-    val = stream_Control(s, STREAM_GET_PTS_DELAY, &(int64_t){ 0 });
+    val = vlc_stream_Control(s, STREAM_GET_PTS_DELAY, &(int64_t){ 0 });
     assert(val == VLC_SUCCESS);
-    stream_Delete(s);
+    vlc_stream_Delete(s);
     vlc_stream_fifo_Close(s);
 
     s = vlc_stream_fifo_New(parent);
     assert(s != NULL);
-    assert(stream_Tell(s) == 0);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 0);
+    assert(!vlc_stream_Eof(s));
     val = vlc_stream_fifo_Write(s, "123", 3);
     vlc_stream_fifo_Close(s);
 
-    val = stream_Read(s, buf, 0);
+    val = vlc_stream_Read(s, buf, 0);
     assert(val == 0);
-    assert(stream_Tell(s) == 0);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 0);
+    assert(!vlc_stream_Eof(s));
 
-    val = stream_Read(s, buf, sizeof (buf));
+    val = vlc_stream_Read(s, buf, sizeof (buf));
     assert(val == 3);
-    assert(stream_Tell(s) == 3);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 3);
+    assert(!vlc_stream_Eof(s));
     assert(memcmp(buf, "123", 3) == 0);
-    val = stream_Read(s, buf, sizeof (buf));
+    val = vlc_stream_Read(s, buf, sizeof (buf));
     assert(val == 0);
-    assert(stream_Tell(s) == 3);
-    assert(stream_Eof(s));
-    stream_Delete(s);
+    assert(vlc_stream_Tell(s) == 3);
+    assert(vlc_stream_Eof(s));
+    vlc_stream_Delete(s);
 
     s = vlc_stream_fifo_New(parent);
     assert(s != NULL);
@@ -96,10 +96,10 @@ int main(void)
     val = vlc_stream_fifo_Write(s, "blahblah", 8);
     assert(val == 8);
 
-    val = stream_Read(s, buf, 13);
+    val = vlc_stream_Read(s, buf, 13);
     assert(val == 13);
     assert(memcmp(buf, "Hello world!\n", 13) == 0);
-    stream_Delete(s);
+    vlc_stream_Delete(s);
 
     val = vlc_stream_fifo_Write(s, "cough cough", 11);
     assert(val == -1 && errno == EPIPE);
@@ -107,7 +107,7 @@ int main(void)
 
     s = vlc_stream_fifo_New(parent);
     assert(s != NULL);
-    val = stream_Peek(s, &peek, 0);
+    val = vlc_stream_Peek(s, &peek, 0);
     assert(val == 0);
     val = vlc_stream_fifo_Write(s, "1st block\n", 10);
     assert(val == 10);
@@ -116,48 +116,48 @@ int main(void)
     val = vlc_stream_fifo_Write(s, "3rd block\n", 10);
     assert(val == 10);
 
-    val = stream_Peek(s, &peek, 5);
+    val = vlc_stream_Peek(s, &peek, 5);
     assert(val == 5);
-    assert(stream_Tell(s) == 0);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 0);
+    assert(!vlc_stream_Eof(s));
     assert(memcmp(peek, "1st b", 5) == 0);
 
-    val = stream_Peek(s, &peek, 0);
+    val = vlc_stream_Peek(s, &peek, 0);
     assert(val == 0);
-    assert(stream_Tell(s) == 0);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 0);
+    assert(!vlc_stream_Eof(s));
 
-    val = stream_Peek(s, &peek, 15);
+    val = vlc_stream_Peek(s, &peek, 15);
     assert(val == 15);
-    assert(stream_Tell(s) == 0);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 0);
+    assert(!vlc_stream_Eof(s));
     assert(memcmp(peek, "1st block\n2nd b", 15) == 0);
 
     vlc_stream_fifo_Close(s);
-    val = stream_Peek(s, &peek, 40);
+    val = vlc_stream_Peek(s, &peek, 40);
     assert(val == 30);
-    assert(stream_Tell(s) == 0);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 0);
+    assert(!vlc_stream_Eof(s));
     assert(memcmp(peek, "1st block\n2nd block\n3rd block\n", 30) == 0);
 
-    val = stream_Peek(s, &peek, 25);
+    val = vlc_stream_Peek(s, &peek, 25);
     assert(val == 25);
-    assert(stream_Tell(s) == 0);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 0);
+    assert(!vlc_stream_Eof(s));
     assert(memcmp(peek, "1st block\n2nd block\n3rd b", 25) == 0);
 
-    block = stream_ReadBlock(s);
+    block = vlc_stream_ReadBlock(s);
     assert(block != NULL);
-    assert(stream_Tell(s) == block->i_buffer);
+    assert(vlc_stream_Tell(s) == block->i_buffer);
     assert(block->i_buffer <= 30);
     assert(memcmp(block->p_buffer, "1st block\n2nd block\n3rd block\n",
                   block->i_buffer) == 0);
     block_Release(block);
 
-    block = stream_ReadBlock(s);
+    block = vlc_stream_ReadBlock(s);
     assert(block == NULL);
-    assert(stream_Eof(s));
-    stream_Delete(s);
+    assert(vlc_stream_Eof(s));
+    vlc_stream_Delete(s);
 
     s = vlc_stream_fifo_New(parent);
     assert(s != NULL);
@@ -173,72 +173,72 @@ int main(void)
     assert(val == 10);
     vlc_stream_fifo_Close(s);
 
-    block = stream_ReadBlock(s);
+    block = vlc_stream_ReadBlock(s);
     assert(block != NULL);
-    assert(stream_Tell(s) == 10);
+    assert(vlc_stream_Tell(s) == 10);
     assert(block->i_buffer == 10);
     assert(memcmp(block->p_buffer, "1st block\n", 10) == 0);
     block_Release(block);
 
-    val = stream_Read(s, buf, 5);
+    val = vlc_stream_Read(s, buf, 5);
     assert(val == 5);
-    assert(stream_Tell(s) == 15);
+    assert(vlc_stream_Tell(s) == 15);
     assert(memcmp(buf, "2nd b", 5) == 0);
 
-    val = stream_Read(s, buf, 7);
+    val = vlc_stream_Read(s, buf, 7);
     assert(val == 7);
-    assert(stream_Tell(s) == 22);
+    assert(vlc_stream_Tell(s) == 22);
     assert(memcmp(buf, "lock\n3r", 7) == 0);
 
-    val = stream_Peek(s, &peek, 2);
+    val = vlc_stream_Peek(s, &peek, 2);
     assert(val == 2);
-    assert(stream_Tell(s) == 22);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 22);
+    assert(!vlc_stream_Eof(s));
     assert(memcmp(peek, "d ", 2) == 0);
 
     /* seeking within peek buffer has to work... */
-    val = stream_Seek(s, 23);
+    val = vlc_stream_Seek(s, 23);
     assert(val == VLC_SUCCESS);
-    assert(stream_Tell(s) == 23);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 23);
+    assert(!vlc_stream_Eof(s));
 
-    val = stream_Seek(s, 24);
+    val = vlc_stream_Seek(s, 24);
     assert(val == VLC_SUCCESS);
-    assert(stream_Tell(s) == 24);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 24);
+    assert(!vlc_stream_Eof(s));
 
-    val = stream_Peek(s, &peek, 2);
+    val = vlc_stream_Peek(s, &peek, 2);
     assert(val == 2);
-    assert(stream_Tell(s) == 24);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 24);
+    assert(!vlc_stream_Eof(s));
     assert(memcmp(peek, "bl", 2) == 0);
 
-    block = stream_Block(s, 3);
+    block = vlc_stream_Block(s, 3);
     assert(block != NULL);
     assert(block->i_buffer == 3);
-    assert(stream_Tell(s) == 27);
+    assert(vlc_stream_Tell(s) == 27);
     assert(memcmp(block->p_buffer, "blo", 3) == 0);
     block_Release(block);
 
-    block = stream_ReadBlock(s);
+    block = vlc_stream_ReadBlock(s);
     assert(block != NULL);
     assert(block->i_buffer == 3);
-    assert(stream_Tell(s) == 30);
+    assert(vlc_stream_Tell(s) == 30);
     assert(memcmp(block->p_buffer, "ck\n", 3) == 0);
     block_Release(block);
 
-    val = stream_Read(s, buf, 5);
+    val = vlc_stream_Read(s, buf, 5);
     assert(val == 5);
-    assert(stream_Tell(s) == 35);
-    assert(!stream_Eof(s));
+    assert(vlc_stream_Tell(s) == 35);
+    assert(!vlc_stream_Eof(s));
     assert(memcmp(buf, "4th b", 5) == 0);
 
-    block = stream_ReadBlock(s);
+    block = vlc_stream_ReadBlock(s);
     assert(block != NULL);
     assert(block->i_buffer == 5);
-    assert(stream_Tell(s) == 40);
+    assert(vlc_stream_Tell(s) == 40);
     assert(memcmp(block->p_buffer, "lock\n", 5) == 0);
-    stream_Delete(s);
+    vlc_stream_Delete(s);
     block_Release(block);
 
     libvlc_release(vlc);

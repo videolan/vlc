@@ -153,7 +153,7 @@ static int Open( vlc_object_t * p_this )
     const uint8_t     *p_peek;
 
     /* A little test to see if it could be a asf stream */
-    if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 ) return VLC_EGENERIC;
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) < 16 ) return VLC_EGENERIC;
 
     ASF_GetGUID( &guid, p_peek );
     if( !guidcmp( &guid, &asf_object_header_guid ) ) return VLC_EGENERIC;
@@ -220,7 +220,7 @@ static int Demux( demux_t *p_demux )
             p_sys->b_eos = true;
             /* Check if we have concatenated files */
             const uint8_t *p_peek;
-            if( stream_Peek( p_demux->s, &p_peek, 16 ) == 16 )
+            if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) == 16 )
             {
                 guid_t guid;
 
@@ -373,7 +373,7 @@ static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
     uint64_t i_offset = (uint64_t)p_index->index_entry[i_entry].i_packet_number *
                         p_sys->p_fp->i_min_data_packet_size;
 
-    if ( stream_Seek( p_demux->s, i_offset + p_sys->i_data_begin ) == VLC_SUCCESS )
+    if ( vlc_stream_Seek( p_demux->s, i_offset + p_sys->i_data_begin ) == VLC_SUCCESS )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_date );
         return VLC_SUCCESS;
@@ -451,12 +451,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if ( i >= 0 )
         {
             msg_Dbg( p_demux, "Requesting access to enable stream %d", i );
-            i_ret = stream_Control( p_demux->s, STREAM_SET_PRIVATE_ID_STATE, i, true );
+            i_ret = vlc_stream_Control( p_demux->s,
+                                        STREAM_SET_PRIVATE_ID_STATE, i, true );
         }
         else
         {  /* i contains -1 * es_category */
             msg_Dbg( p_demux, "Requesting access to disable stream %d", i );
-            i_ret = stream_Control( p_demux->s, STREAM_SET_PRIVATE_ID_STATE, i, false );
+            i_ret = vlc_stream_Control( p_demux->s,
+                                        STREAM_SET_PRIVATE_ID_STATE, i,
+                                        false );
         }
 
         if ( i_ret == VLC_SUCCESS )
@@ -769,7 +772,8 @@ static int DemuxInit( demux_t *p_demux )
     p_sys->meta         = NULL;
 
     /* Now load all object ( except raw data ) */
-    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_canfastseek );
+    vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK,
+                        &p_sys->b_canfastseek );
     if( !(p_sys->p_root = ASF_ReadObjectRoot(p_demux->s, p_sys->b_canfastseek)) )
     {
         msg_Warn( p_demux, "ASF plugin discarded (not a valid file)" );
@@ -852,8 +856,9 @@ static int DemuxInit( demux_t *p_demux )
         if ( strncmp( p_demux->psz_access, "mms", 3 ) )
         {
             /* Check (not mms) if this track is selected (ie will receive data) */
-            if( !stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
-                                 (int) p_sp->i_stream_number, &b_access_selected ) &&
+            if( !vlc_stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
+                                     (int) p_sp->i_stream_number,
+                                     &b_access_selected ) &&
                 !b_access_selected )
             {
                 tk->i_cat = UNKNOWN_ES;
@@ -1107,8 +1112,9 @@ static int DemuxInit( demux_t *p_demux )
 
             tk->p_es = es_out_Add( p_demux->out, &fmt );
 
-            if( !stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
-                                 (int) p_sp->i_stream_number, &b_access_selected ) &&
+            if( !vlc_stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
+                                     (int) p_sp->i_stream_number,
+                                     &b_access_selected ) &&
                 b_access_selected )
             {
                 p_sys->i_access_selected_track[fmt.i_cat] = p_sp->i_stream_number;
@@ -1140,7 +1146,7 @@ static int DemuxInit( demux_t *p_demux )
     }
 
     /* go to first packet */
-    stream_Seek( p_demux->s, p_sys->i_data_begin );
+    vlc_stream_Seek( p_demux->s, p_sys->i_data_begin );
 
     /* try to calculate movie time */
     if( p_sys->p_fp->i_data_packets_count > 0 )

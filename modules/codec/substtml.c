@@ -320,14 +320,14 @@ static void ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader )
 
 static void ParseTTMLStyles( decoder_t* p_dec )
 {
-    stream_t* p_stream = stream_MemoryNew( p_dec, (uint8_t*)p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra, true );
+    stream_t* p_stream = vlc_stream_MemoryNew( p_dec, (uint8_t*)p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra, true );
     if( unlikely( p_stream == NULL ) )
         return ;
 
     xml_reader_t* p_reader = xml_ReaderCreate( p_dec, p_stream );
     if( unlikely( p_reader == NULL ) )
     {
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
         return ;
     }
     const char* psz_name;
@@ -351,7 +351,7 @@ static void ParseTTMLStyles( decoder_t* p_dec )
         } while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_name, "head" ) && strcasecmp( psz_name, "tt:head" ) ) );
     }
     xml_ReaderDelete( p_reader );
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
 }
 
 static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_sys_t *p_update_sys, char *psz_subtitle )
@@ -362,14 +362,14 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
     text_segment_t* p_current_segment = NULL;
     style_stack_t*  p_style_stack = NULL;
 
-    p_sub = stream_MemoryNew( p_dec, (uint8_t*)psz_subtitle, strlen( psz_subtitle ), true );
+    p_sub = vlc_stream_MemoryNew( p_dec, (uint8_t*)psz_subtitle, strlen( psz_subtitle ), true );
     if( unlikely( p_sub == NULL ) )
         return NULL;
 
     p_xml_reader = xml_ReaderCreate( p_dec, p_sub );
     if( unlikely( p_xml_reader == NULL ) )
     {
-        stream_Delete( p_sub );
+        vlc_stream_Delete( p_sub );
         return NULL;
     }
 
@@ -480,7 +480,7 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
 
     ClearStack( p_style_stack );
     xml_ReaderDelete( p_xml_reader );
-    stream_Delete( p_sub );
+    vlc_stream_Delete( p_sub );
 
     return p_first_segment;
 
@@ -488,7 +488,7 @@ fail:
     text_segment_ChainDelete( p_first_segment );
     ClearStack( p_style_stack );
     xml_ReaderDelete( p_xml_reader );
-    stream_Delete( p_sub );
+    vlc_stream_Delete( p_sub );
     return NULL;
 }
 

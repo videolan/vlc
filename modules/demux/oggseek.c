@@ -188,7 +188,7 @@ static void seek_byte( demux_t *p_demux, int64_t i_pos )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
 
-    if ( ! stream_Seek( p_demux->s, i_pos ) )
+    if ( ! vlc_stream_Seek( p_demux->s, i_pos ) )
     {
         ogg_sync_reset( &p_sys->oy );
 
@@ -225,7 +225,7 @@ static int64_t get_data( demux_t *p_demux, int64_t i_bytes_to_read )
 
     buf = ogg_sync_buffer( &p_sys->oy, i_bytes_to_read );
 
-    i_result = stream_Read( p_demux->s, buf, i_bytes_to_read );
+    i_result = vlc_stream_Read( p_demux->s, buf, i_bytes_to_read );
 
     ogg_sync_wrote( &p_sys->oy, i_result );
     return i_result;
@@ -241,7 +241,7 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t i_pos, i_startpos, i_result, i_granule, i_lowerbound;
     int64_t i_length = 0;
-    int64_t i_backup_pos = stream_Tell( p_demux->s );
+    int64_t i_backup_pos = vlc_stream_Tell( p_demux->s );
     int64_t i_upperbound = stream_Size( p_demux->s );
     unsigned int i_backoffset = OGGSEEK_BYTES_TO_READ;
     assert( OGGSEEK_BYTES_TO_READ < UINT_MAX );
@@ -257,7 +257,7 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
 
     i_pos = i_startpos = __MAX( i_lowerbound, i_upperbound - i_backoffset );
 
-    if ( stream_Seek( p_demux->s, i_pos ) )
+    if ( vlc_stream_Seek( p_demux->s, i_pos ) )
     {
         ogg_sync_clear( &oy );
         ogg_stream_clear( &os );
@@ -274,7 +274,7 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
 
             buffer = ogg_sync_buffer( &oy, OGGSEEK_BYTES_TO_READ );
             if ( buffer == NULL ) goto clean;
-            i_result = stream_Read( p_demux->s, (void*) buffer, OGGSEEK_BYTES_TO_READ );
+            i_result = vlc_stream_Read( p_demux->s, (void*) buffer, OGGSEEK_BYTES_TO_READ );
             if ( i_result < 1 ) goto clean;
             i_pos += i_result;
             ogg_sync_wrote( &oy, i_result );
@@ -312,12 +312,12 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
         }
         i_pos = i_startpos;
 
-        if ( stream_Seek( p_demux->s, i_pos ) )
+        if ( vlc_stream_Seek( p_demux->s, i_pos ) )
             break;
     }
 
 clean:
-    stream_Seek( p_demux->s, i_backup_pos );
+    vlc_stream_Seek( p_demux->s, i_backup_pos );
 
     ogg_sync_clear( &oy );
     ogg_stream_clear( &os );
@@ -1052,25 +1052,25 @@ int64_t oggseek_read_page( demux_t *p_demux )
     demux_sys_t *p_sys  = p_demux->p_sys;
 
     /* store position of this page */
-    i_in_pos = p_ogg->i_input_position = stream_Tell( p_demux->s );
+    i_in_pos = p_ogg->i_input_position = vlc_stream_Tell( p_demux->s );
 
     if ( p_sys->b_page_waiting) {
         msg_Warn( p_demux, "Ogg page already loaded" );
         return 0;
     }
 
-    if ( stream_Read ( p_demux->s, header, PAGE_HEADER_BYTES ) < PAGE_HEADER_BYTES )
+    if ( vlc_stream_Read ( p_demux->s, header, PAGE_HEADER_BYTES ) < PAGE_HEADER_BYTES )
     {
-        stream_Seek( p_demux->s, i_in_pos );
+        vlc_stream_Seek( p_demux->s, i_in_pos );
         msg_Dbg ( p_demux, "Reached clean EOF in ogg file" );
         return 0;
     }
 
     i_nsegs = header[ PAGE_HEADER_BYTES - 1 ];
 
-    if ( stream_Read ( p_demux->s, header+PAGE_HEADER_BYTES, i_nsegs ) < i_nsegs )
+    if ( vlc_stream_Read ( p_demux->s, header+PAGE_HEADER_BYTES, i_nsegs ) < i_nsegs )
     {
-        stream_Seek( p_demux->s, i_in_pos );
+        vlc_stream_Seek( p_demux->s, i_in_pos );
         msg_Warn ( p_demux, "Reached broken EOF in ogg file" );
         return 0;
     }
@@ -1088,7 +1088,7 @@ int64_t oggseek_read_page( demux_t *p_demux )
 
     memcpy( buf, header, PAGE_HEADER_BYTES + i_nsegs );
 
-    i_result = stream_Read ( p_demux->s, (uint8_t*)buf + PAGE_HEADER_BYTES + i_nsegs,
+    i_result = vlc_stream_Read ( p_demux->s, (uint8_t*)buf + PAGE_HEADER_BYTES + i_nsegs,
                              i_page_size - PAGE_HEADER_BYTES - i_nsegs );
 
     ogg_sync_wrote( &p_ogg->oy, i_result + PAGE_HEADER_BYTES + i_nsegs );

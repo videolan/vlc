@@ -49,7 +49,7 @@ int Import_Dir ( vlc_object_t *p_this)
     demux_t  *p_demux = (demux_t *)p_this;
     bool b_dir_can_loop;
 
-    if( stream_Control( p_demux->s, STREAM_IS_DIRECTORY, &b_dir_can_loop ) )
+    if( vlc_stream_Control( p_demux->s, STREAM_IS_DIRECTORY, &b_dir_can_loop ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "reading directory content" );
@@ -70,7 +70,7 @@ static int Demux( demux_t *p_demux )
     input_item_node_t *p_node = input_item_node_Create( p_input );
     input_item_Release(p_input);
 
-    if( stream_ReadDir( p_demux->s, p_node ) )
+    if( vlc_stream_ReadDir( p_demux->s, p_node ) )
     {
         msg_Warn( p_demux, "unable to read directory" );
         input_item_node_Delete( p_node );

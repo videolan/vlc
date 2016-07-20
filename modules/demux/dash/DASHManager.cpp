@@ -107,7 +107,7 @@ bool DASHManager::updatePlaylist()
         if(!p_block)
             return false;
 
-        stream_t *mpdstream = stream_MemoryNew(p_demux, p_block->p_buffer, p_block->i_buffer, true);
+        stream_t *mpdstream = vlc_stream_MemoryNew(p_demux, p_block->p_buffer, p_block->i_buffer, true);
         if(!mpdstream)
         {
             block_Release(p_block);
@@ -117,7 +117,7 @@ bool DASHManager::updatePlaylist()
         xml::DOMParser parser(mpdstream);
         if(!parser.parse(true))
         {
-            stream_Delete(mpdstream);
+            vlc_stream_Delete(mpdstream);
             block_Release(p_block);
             return false;
         }
@@ -139,7 +139,7 @@ bool DASHManager::updatePlaylist()
             playlist->mergeWith(newmpd, minsegmentTime);
             delete newmpd;
         }
-        stream_Delete(mpdstream);
+        vlc_stream_Delete(mpdstream);
         block_Release(p_block);
     }
 

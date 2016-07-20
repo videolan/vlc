@@ -225,7 +225,7 @@ static int ListSkins( addons_finder_t *p_finder )
             int i_ret;
             char *psz_name = NULL;
             char *psz_source = NULL;
-            stream_t *p_stream = stream_UrlNew( p_finder, psz_uri );
+            stream_t *p_stream = vlc_stream_NewMRL( p_finder, psz_uri );
             free( psz_uri );
             if ( !p_stream )
             {
@@ -239,7 +239,7 @@ static int ListSkins( addons_finder_t *p_finder )
                     free( psz_name );
                     free( psz_source );
                 }
-                stream_Delete( p_stream );
+                vlc_stream_Delete( p_stream );
             }
 
             addon_entry_t *p_entry = addon_entry_New();
@@ -382,7 +382,7 @@ static int InstallFile( addons_storage_t *p_this, const char *psz_downloadlink,
     char buffer[1<<10];
     int i_read = 0;
 
-    p_stream = stream_UrlNew( p_this, psz_downloadlink );
+    p_stream = vlc_stream_NewMRL( p_this, psz_downloadlink );
     if( !p_stream )
     {
         msg_Err( p_this, "Failed to access Addon download url %s", psz_downloadlink );
@@ -392,7 +392,7 @@ static int InstallFile( addons_storage_t *p_this, const char *psz_downloadlink,
     char *psz_path = strdup( psz_dest );
     if ( !psz_path )
     {
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
         return VLC_ENOMEM;
     }
     char *psz_buf = strrchr( psz_path, DIR_SEP_CHAR );
@@ -408,23 +408,23 @@ static int InstallFile( addons_storage_t *p_this, const char *psz_downloadlink,
     if( !p_destfile )
     {
         msg_Err( p_this, "Failed to open Addon storage file %s", psz_dest );
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
         return VLC_EGENERIC;
     }
 
-    while ( ( i_read = stream_Read( p_stream, &buffer, 1<<10 ) ) > 0 )
+    while ( ( i_read = vlc_stream_Read( p_stream, &buffer, 1<<10 ) ) > 0 )
     {
         if ( fwrite( &buffer, i_read, 1, p_destfile ) < 1 )
         {
             msg_Err( p_this, "Failed to write to Addon file" );
             fclose( p_destfile );
-            stream_Delete( p_stream );
+            vlc_stream_Delete( p_stream );
             return VLC_EGENERIC;
         }
     }
 
     fclose( p_destfile );
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
     return VLC_SUCCESS;
 }
 
@@ -701,14 +701,14 @@ static int LoadCatalog( addons_finder_t *p_finder )
     if ( !psz_catalog_uri )
         return VLC_EGENERIC;
 
-    stream_t *p_stream = stream_UrlNew( p_finder, psz_catalog_uri );
+    stream_t *p_stream = vlc_stream_NewMRL( p_finder, psz_catalog_uri );
     free( psz_catalog_uri );
     if (! p_stream ) return VLC_EGENERIC;
 
     xml_reader_t *p_xml_reader = xml_ReaderCreate( p_finder, p_stream );
     if( !p_xml_reader )
     {
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
         return VLC_EGENERIC;
     }
 
@@ -852,7 +852,7 @@ end:
    if ( p_entry ) /* ?!? Unclosed tag */
        addon_entry_Release( p_entry );
    xml_ReaderDelete( p_xml_reader );
-   stream_Delete( p_stream );
+   vlc_stream_Delete( p_stream );
    return i_ret;
 }
 

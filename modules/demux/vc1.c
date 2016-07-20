@@ -81,7 +81,7 @@ static int Open( vlc_object_t * p_this )
     const uint8_t *p_peek;
     es_format_t fmt;
 
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
     if( p_peek[0] != 0x00 || p_peek[1] != 0x00 ||
         p_peek[2] != 0x01 || p_peek[3] != 0x0f ) /* Sequence header */
@@ -142,7 +142,8 @@ static int Demux( demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block_in, *p_block_out;
 
-    if( ( p_block_in = stream_Block( p_demux->s, VC1_PACKET_SIZE ) ) == NULL )
+    p_block_in = vlc_stream_Block( p_demux->s, VC1_PACKET_SIZE );
+    if( p_block_in == NULL )
         return 0;
 
     /*  */

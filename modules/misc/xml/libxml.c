@@ -287,7 +287,7 @@ static const char *ReaderNextAttr( xml_reader_t *p_reader, const char **pval )
 static int StreamRead( void *p_context, char *p_buffer, int i_buffer )
 {
     stream_t *s = (stream_t*)p_context;
-    return stream_Read( s, p_buffer, i_buffer );
+    return vlc_stream_Read( s, p_buffer, i_buffer );
 }
 
 static int ReaderIsEmptyElement( xml_reader_t *p_reader )

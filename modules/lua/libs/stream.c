@@ -84,7 +84,7 @@ static int vlclua_stream_new( lua_State *L )
 {
     vlc_object_t * p_this = vlclua_get_this( L );
     const char * psz_url = luaL_checkstring( L, 1 );
-    stream_t *p_stream = stream_UrlNew( p_this, psz_url );
+    stream_t *p_stream = vlc_stream_NewMRL( p_this, psz_url );
     return vlclua_stream_new_inner( L, p_stream );
 }
 
@@ -93,7 +93,7 @@ static int vlclua_memory_stream_new( lua_State *L )
     vlc_object_t * p_this = vlclua_get_this( L );
     /* FIXME: duplicating the whole buffer is suboptimal. Keeping a reference to the string so that it doesn't get garbage collected would be better */
     char * psz_content = strdup( luaL_checkstring( L, 1 ) );
-    stream_t *p_stream = stream_MemoryNew( p_this, (uint8_t *)psz_content, strlen( psz_content ), false );
+    stream_t *p_stream = vlc_stream_MemoryNew( p_this, (uint8_t *)psz_content, strlen( psz_content ), false );
     return vlclua_stream_new_inner( L, p_stream );
 }
 
@@ -105,7 +105,7 @@ static int vlclua_stream_read( lua_State *L )
     uint8_t *p_read = malloc( n );
     if( !p_read ) return vlclua_error( L );
 
-    i_read = stream_Read( *pp_stream, p_read, n );
+    i_read = vlc_stream_Read( *pp_stream, p_read, n );
     if( i_read > 0 )
         lua_pushlstring( L, (const char *)p_read, i_read );
     else
@@ -117,7 +117,7 @@ static int vlclua_stream_read( lua_State *L )
 static int vlclua_stream_readline( lua_State *L )
 {
     stream_t **pp_stream = (stream_t **)luaL_checkudata( L, 1, "stream" );
-    char *psz_line = stream_ReadLine( *pp_stream );
+    char *psz_line = vlc_stream_ReadLine( *pp_stream );
     if( psz_line )
     {
         lua_pushstring( L, psz_line );
@@ -148,7 +148,7 @@ static int vlclua_stream_add_filter( lua_State *L )
         while( true )
         {
             /* Add next automatic stream */
-            stream_t *p_filtered = stream_FilterNew( *pp_stream, NULL );
+            stream_t *p_filtered = vlc_stream_FilterNew( *pp_stream, NULL );
             if( !p_filtered )
                 break;
             else
@@ -163,7 +163,7 @@ static int vlclua_stream_add_filter( lua_State *L )
     else
     {
         /* Add a named filter */
-        stream_t *p_filter = stream_FilterNew( *pp_stream, psz_filter );
+        stream_t *p_filter = vlc_stream_FilterNew( *pp_stream, psz_filter );
         if( !p_filter )
             msg_Dbg( p_this, "Unable to open requested stream filter '%s'",
                      psz_filter );
@@ -181,7 +181,7 @@ static int vlclua_stream_add_filter( lua_State *L )
 static int vlclua_stream_delete( lua_State *L )
 {
     stream_t **pp_stream = (stream_t **)luaL_checkudata( L, 1, "stream" );
-    stream_Delete( *pp_stream );
+    vlc_stream_Delete( *pp_stream );
     return 0;
 }
 

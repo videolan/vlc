@@ -489,7 +489,7 @@ static int probeStream(demux_t *p_demux)
 {
     /* input must be seekable */
     bool b_canseek = false;
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
+    vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
     if (!b_canseek) {
         return VLC_EGENERIC;
     }
@@ -497,7 +497,7 @@ static int probeStream(demux_t *p_demux)
     /* first sector(s) should be filled with zeros */
     size_t i_peek;
     const uint8_t *p_peek;
-    i_peek = stream_Peek( p_demux->s, &p_peek, 2048 );
+    i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 2048 );
     if( i_peek != 2048 ) {
         return VLC_EGENERIC;
     }
@@ -521,11 +521,11 @@ static int blurayReadBlock(void *object, void *buf, int lba, int num_blocks)
 
     vlc_mutex_lock(&p_sys->read_block_lock);
 
-    if (stream_Seek( p_demux->s, lba * INT64_C(2048) ) == VLC_SUCCESS) {
+    if (vlc_stream_Seek( p_demux->s, lba * INT64_C(2048) ) == VLC_SUCCESS) {
         size_t  req = (size_t)2048 * num_blocks;
         ssize_t got;
 
-        got = stream_Read( p_demux->s, buf, req);
+        got = vlc_stream_Read( p_demux->s, buf, req);
         if (got < 0) {
             msg_Err(p_demux, "read from lba %d failed", lba);
         } else {
@@ -675,7 +675,7 @@ static int blurayOpen(vlc_object_t *object)
     /* Open BluRay */
 #ifdef BLURAY_DEMUX
     if (p_demux->s) {
-        i_init_pos = stream_Tell(p_demux->s);
+        i_init_pos = vlc_stream_Tell(p_demux->s);
 
         p_sys->bluray = bd_init();
         if (!bd_open_stream(p_sys->bluray, p_demux, blurayReadBlock)) {
@@ -847,7 +847,7 @@ error:
 
     if (p_demux->s != NULL) {
         /* restore stream position */
-        if (stream_Seek(p_demux->s, i_init_pos) != VLC_SUCCESS) {
+        if (vlc_stream_Seek(p_demux->s, i_init_pos) != VLC_SUCCESS) {
             msg_Err(p_demux, "Failed to seek back to stream start");
             return VLC_ETIMEOUT;
         }

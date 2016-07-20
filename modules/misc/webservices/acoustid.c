@@ -165,7 +165,7 @@ int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
     int i_saved_flags = p_obj->obj.flags;
     p_obj->obj.flags |= OBJECT_FLAGS_NOINTERACT;
 
-    stream_t *p_stream = stream_UrlNew( p_obj, psz_url );
+    stream_t *p_stream = vlc_stream_NewMRL( p_obj, psz_url );
 
     free( psz_url );
     p_obj->obj.flags = i_saved_flags;
@@ -185,17 +185,17 @@ int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
         p_buffer = realloc_or_free( p_buffer, 1 + i_ret + i_read );
         if( unlikely(p_buffer == NULL) )
         {
-            stream_Delete( p_stream );
+            vlc_stream_Delete( p_stream );
             return VLC_ENOMEM;
         }
 
-        i_read = stream_Read( p_stream, &p_buffer[i_ret], i_read );
+        i_read = vlc_stream_Read( p_stream, &p_buffer[i_ret], i_read );
         if( i_read <= 0 )
             break;
 
         i_ret += i_read;
     }
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
     p_buffer[i_ret] = 0;
 
     if ( ParseJson( p_obj, p_buffer, & p_data->results ) )

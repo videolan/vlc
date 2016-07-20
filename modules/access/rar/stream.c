@@ -37,12 +37,12 @@
 
 static ssize_t Read(stream_t *s, void *data, size_t size)
 {
-    return stream_Read(s->p_sys, data, size);
+    return vlc_stream_Read(s->p_sys, data, size);
 }
 
 static int Seek(stream_t *s, uint64_t offset)
 {
-    return stream_Seek(s->p_sys, offset);
+    return vlc_stream_Seek(s->p_sys, offset);
 }
 
 static int Control(stream_t *s, int query, va_list args)
@@ -54,7 +54,7 @@ static int Control(stream_t *s, int query, va_list args)
         return VLC_SUCCESS;
     }
     default:
-        return stream_vaControl(s->p_sys, query, args);
+        return vlc_stream_vaControl(s->p_sys, query, args);
     }
 }
 
@@ -75,13 +75,13 @@ int RarStreamOpen(vlc_object_t *object)
         unsigned int i_nbvols;
     } newscheme = { 0, NULL, 0 }, oldscheme = { 0, NULL, 0 }, *p_scheme;
 
-    const int64_t position = stream_Tell(s->p_source);
+    const int64_t position = vlc_stream_Tell(s->p_source);
 
     if (RarParse(s->p_source, &newscheme.filescount, &newscheme.files, &newscheme.i_nbvols, false)
             || (newscheme.filescount < 2 && newscheme.i_nbvols < 2) )
     {
         /* We might want to lookup old naming scheme, could be a part1.rar,part1.r00 */
-        stream_Seek(s->p_source, 0);
+        vlc_stream_Seek(s->p_source, 0);
         RarParse(s->p_source, &oldscheme.filescount, &oldscheme.files, &oldscheme.i_nbvols, true );
     }
 
@@ -97,7 +97,7 @@ int RarStreamOpen(vlc_object_t *object)
     }
     else
     {
-        stream_Seek(s->p_source, position);
+        vlc_stream_Seek(s->p_source, position);
         msg_Info(s, "Invalid or unsupported RAR archive");
         free(oldscheme.files);
         free(newscheme.files);
@@ -132,7 +132,7 @@ int RarStreamOpen(vlc_object_t *object)
     free(p_scheme->files);
     if (!data)
         return VLC_EGENERIC;
-    stream_t *payload = stream_MemoryNew(s, (uint8_t*)data, strlen(data), false);
+    stream_t *payload = vlc_stream_MemoryNew(s, (uint8_t*)data, strlen(data), false);
     if (!payload) {
         free(data);
         return VLC_EGENERIC;
@@ -158,5 +158,5 @@ void RarStreamClose(vlc_object_t *object)
 {
     stream_t *s = (stream_t*)object;
 
-    stream_Delete(s->p_sys);
+    vlc_stream_Delete(s->p_sys);
 }

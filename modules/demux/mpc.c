@@ -115,7 +115,7 @@ static int Open( vlc_object_t * p_this )
     es_format_t fmt;
     const uint8_t *p_peek;
 
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
         return VLC_EGENERIC;
 
     if( memcmp( p_peek, "MP+", 3 )
@@ -318,7 +318,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_CAN_SEEK:
-            return stream_vaControl( p_demux->s, i_query, args );
+            return vlc_stream_vaControl( p_demux->s, i_query, args );
 
         case DEMUX_HAS_UNSUPPORTED_META:
             pb_bool = (bool*)va_arg( args, bool* );
@@ -401,7 +401,7 @@ static mpc_int32_t ReaderRead( mpc_reader *p_private, void *dst, mpc_int32_t i_s
 {
     demux_t *p_demux = (demux_t*)p_private->data;
 #endif
-    return stream_Read( p_demux->s, dst, i_size );
+    return vlc_stream_Read( p_demux->s, dst, i_size );
 }
 
 #ifndef HAVE_MPC_MPCDEC_H
@@ -413,7 +413,7 @@ static mpc_bool_t ReaderSeek( mpc_reader *p_private, mpc_int32_t i_offset )
 {
     demux_t *p_demux = (demux_t*)p_private->data;
 #endif
-    return !stream_Seek( p_demux->s, i_offset );
+    return !vlc_stream_Seek( p_demux->s, i_offset );
 }
 
 #ifndef HAVE_MPC_MPCDEC_H
@@ -425,7 +425,7 @@ static mpc_int32_t ReaderTell( mpc_reader *p_private)
 {
     demux_t *p_demux = (demux_t*)p_private->data;
 #endif
-    return stream_Tell( p_demux->s );
+    return vlc_stream_Tell( p_demux->s );
 }
 
 #ifndef HAVE_MPC_MPCDEC_H
@@ -451,7 +451,7 @@ static mpc_bool_t ReaderCanSeek( mpc_reader *p_private )
 #endif
     bool b_canseek;
 
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
+    vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
     return b_canseek;
 }
 

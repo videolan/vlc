@@ -406,7 +406,7 @@ static int StreamProbeDVD( stream_t *s )
     /* first sector should be filled with zeros */
     ssize_t i_peek;
     const uint8_t *p_peek;
-    i_peek = stream_Peek( s, &p_peek, 2048 );
+    i_peek = vlc_stream_Peek( s, &p_peek, 2048 );
     if( i_peek < 512 ) {
         return VLC_EGENERIC;
     }
@@ -418,16 +418,16 @@ static int StreamProbeDVD( stream_t *s )
 
     /* ISO 9660 volume descriptor */
     char iso_dsc[6];
-    if( stream_Seek( s, 0x8000 + 1 ) != VLC_SUCCESS
-     || stream_Read( s, iso_dsc, sizeof (iso_dsc) ) < (int)sizeof (iso_dsc)
+    if( vlc_stream_Seek( s, 0x8000 + 1 ) != VLC_SUCCESS
+     || vlc_stream_Read( s, iso_dsc, sizeof (iso_dsc) ) < (int)sizeof (iso_dsc)
      || memcmp( iso_dsc, "CD001\x01", 6 ) )
         return VLC_EGENERIC;
 
     /* Try to find the anchor (2 bytes at LBA 256) */
     uint16_t anchor;
 
-    if( stream_Seek( s, 256 * DVD_VIDEO_LB_LEN ) == VLC_SUCCESS
-     && stream_Read( s, &anchor, 2 ) == 2
+    if( vlc_stream_Seek( s, 256 * DVD_VIDEO_LB_LEN ) == VLC_SUCCESS
+     && vlc_stream_Read( s, &anchor, 2 ) == 2
      && GetWLE( &anchor ) == 2 )
         return VLC_SUCCESS;
     else
@@ -439,12 +439,12 @@ static int StreamProbeDVD( stream_t *s )
  *****************************************************************************/
 static int stream_cb_seek( void *s, uint64_t pos )
 {
-    return stream_Seek( (stream_t *)s, pos );
+    return vlc_stream_Seek( (stream_t *)s, pos );
 }
 
 static int stream_cb_read( void *s, void* buffer, int size )
 {
-    return stream_Read( (stream_t *)s, buffer, size );
+    return vlc_stream_Read( (stream_t *)s, buffer, size );
 }
 
 /*****************************************************************************
@@ -464,12 +464,12 @@ static int DemuxOpen ( vlc_object_t *p_this )
 
     /* StreamProbeDVD need FASTSEEK, but if dvd is forced, we don't probe thus
      * don't need fastseek */
-    stream_Control( p_demux->s, forced ? STREAM_CAN_SEEK : STREAM_CAN_FASTSEEK,
+    vlc_stream_Control( p_demux->s, forced ? STREAM_CAN_SEEK : STREAM_CAN_FASTSEEK,
                     &b_seekable );
     if( !b_seekable )
         return VLC_EGENERIC;
 
-    i_init_pos = stream_Tell( p_demux->s );
+    i_init_pos = vlc_stream_Tell( p_demux->s );
 
     /* Try some simple probing to avoid going through dvdnav_open too often */
     if( !forced && StreamProbeDVD( p_demux->s ) != VLC_SUCCESS )
@@ -496,7 +496,7 @@ static int DemuxOpen ( vlc_object_t *p_this )
 
 bailout:
     if( i_ret != VLC_SUCCESS )
-        stream_Seek( p_demux->s, i_init_pos );
+        vlc_stream_Seek( p_demux->s, i_init_pos );
     return i_ret;
 }
 #endif

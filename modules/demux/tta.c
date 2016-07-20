@@ -91,7 +91,7 @@ static int Open( vlc_object_t * p_this )
     //char        psz_info[4096];
     //module_t    *p_id3;
 
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
         return VLC_EGENERIC;
 
     if( memcmp( p_peek, "TTA1", 4 ) )
@@ -104,7 +104,7 @@ static int Open( vlc_object_t * p_this )
                  "continuing anyway" );
     }
 
-    if( stream_Read( p_demux->s, p_header, 22 ) < 22 )
+    if( vlc_stream_Read( p_demux->s, p_header, 22 ) < 22 )
         return VLC_EGENERIC;
 
     /* Fill p_demux fields */
@@ -147,7 +147,7 @@ static int Open( vlc_object_t * p_this )
 
     memcpy( p_fullheader, p_header, 22 );
     p_fullheader += 22;
-    if( stream_Read( p_demux->s, p_fullheader, i_seektable_size )
+    if( vlc_stream_Read( p_demux->s, p_fullheader, i_seektable_size )
              != i_seektable_size )
         goto error;
 
@@ -160,7 +160,7 @@ static int Open( vlc_object_t * p_this )
         p_fullheader += 4;
     }
 
-    stream_Read( p_demux->s, p_fullheader, 4 ); /* CRC */
+    vlc_stream_Read( p_demux->s, p_fullheader, 4 ); /* CRC */
     p_fullheader += 4;
 
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
@@ -198,7 +198,8 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_currentframe >= p_sys->i_totalframes )
         return 0;
 
-    p_data = stream_Block( p_demux->s, p_sys->pi_seektable[p_sys->i_currentframe] );
+    p_data = vlc_stream_Block( p_demux->s,
+                               p_sys->pi_seektable[p_sys->i_currentframe] );
     if( p_data == NULL ) return 0;
     p_data->i_dts = p_data->i_pts = VLC_TS_0 + (int64_t)(INT64_C(1000000) * p_sys->i_currentframe) * TTA_FRAMETIME;
 
@@ -222,14 +223,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_CAN_SEEK:
-            return stream_vaControl( p_demux->s, i_query, args );
+            return vlc_stream_vaControl( p_demux->s, i_query, args );
 
         case DEMUX_GET_POSITION:
             pf = (double*) va_arg( args, double* );
             i64 = stream_Size( p_demux->s ) - p_sys->i_start;
             if( i64 > 0 )
             {
-                *pf = (double)(stream_Tell( p_demux->s ) - p_sys->i_start )/ (double)i64;
+                *pf = (double)(vlc_stream_Tell( p_demux->s ) - p_sys->i_start )/ (double)i64;
             }
             else
             {
@@ -248,7 +249,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     tmp += p_sys->pi_seektable[i];
                 }
-                stream_Seek( p_demux->s, tmp+p_sys->i_start );
+                vlc_stream_Seek( p_demux->s, tmp+p_sys->i_start );
                 p_sys->i_currentframe = i;
                 return VLC_SUCCESS;
             }

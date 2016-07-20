@@ -45,7 +45,7 @@ static int32_t ReadVarInt (stream_t *s)
 
     for (unsigned i = 0; i < 4; i++)
     {
-        if (stream_Read (s, &byte, 1) < 1)
+        if (vlc_stream_Read (s, &byte, 1) < 1)
             return -1;
 
         val = (val << 7) | (byte & 0x7f);
@@ -73,7 +73,7 @@ static int ReadDeltaTime (stream_t *s, mtrk_t *track)
 {
     int32_t delta_time;
 
-    assert (stream_Tell (s) == track->start + track->offset);
+    assert (vlc_stream_Tell (s) == track->start + track->offset);
 
     if (track->offset >= track->length)
     {
@@ -87,7 +87,7 @@ static int ReadDeltaTime (stream_t *s, mtrk_t *track)
         return -1;
 
     track->next += delta_time;
-    track->offset = stream_Tell (s) - track->start;
+    track->offset = vlc_stream_Tell (s) - track->start;
     return 0;
 }
 
@@ -119,7 +119,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
     int32_t length;
     int ret = 0;
 
-    if (stream_Read (s, &type, 1) != 1)
+    if (vlc_stream_Read (s, &type, 1) != 1)
         return -1;
 
     length = ReadVarInt (s);
@@ -128,7 +128,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
 
     payload = malloc (length + 1);
     if ((payload == NULL)
-     || (stream_Read (s, payload, length) != length))
+     || (vlc_stream_Read (s, payload, length) != length))
     {
         free (payload);
         return -1;
@@ -186,7 +186,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
             break;
 
         case 0x2F: /* End of track */
-            if (tr->start + tr->length != stream_Tell (s))
+            if (tr->start + tr->length != vlc_stream_Tell (s))
             {
                 msg_Err (p_demux, "misplaced end of track");
                 ret = -1;
@@ -262,8 +262,8 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr, es_out_t *out)
     uint8_t first, event;
     unsigned datalen;
 
-    if (stream_Seek (s, tr->start + tr->offset)
-     || (stream_Read (s, &first, 1) != 1))
+    if (vlc_stream_Seek (s, tr->start + tr->offset)
+     || (vlc_stream_Read (s, &first, 1) != 1))
         return -1;
 
     event = (first & 0x80) ? first : tr->running_event;
@@ -281,7 +281,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr, es_out_t *out)
                     if (len == -1)
                         return -1;
 
-                    block = stream_Block (s, len);
+                    block = vlc_stream_Block (s, len);
                     if (block == NULL)
                         return -1;
                     block = block_Realloc (block, 1, len);
@@ -330,7 +330,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr, es_out_t *out)
     block->p_buffer[0] = event;
     if (first & 0x80)
     {
-        stream_Read (s, block->p_buffer + 1, datalen);
+        vlc_stream_Read (s, block->p_buffer + 1, datalen);
     }
     else
     {
@@ -342,7 +342,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr, es_out_t *out)
 
         block->p_buffer[1] = first;
         if (datalen > 1)
-            stream_Read (s, block->p_buffer + 2, datalen - 1);
+            vlc_stream_Read (s, block->p_buffer + 2, datalen - 1);
     }
 
 send:
@@ -357,7 +357,7 @@ skip:
         /* If event is not real-time, update running status */
         tr->running_event = event;
 
-    tr->offset = stream_Tell (s) - tr->start;
+    tr->offset = vlc_stream_Tell (s) - tr->start;
     return 0;
 }
 
@@ -383,7 +383,7 @@ static int SeekSet0 (demux_t *demux)
          * error if the first event uses running status. */
         tr->running_event = 0xF6;
 
-        if (stream_Seek (stream, tr->start)
+        if (vlc_stream_Seek (stream, tr->start)
          || ReadDeltaTime (stream, tr))
         {
             msg_Err (demux, "fatal parsing error");
@@ -535,7 +535,7 @@ static int Open (vlc_object_t *obj)
 
     /* (Try to) parse the SMF header */
     /* Header chunk always has 6 bytes payload */
-    if (stream_Peek (stream, &peek, 14) < 14)
+    if (vlc_stream_Peek (stream, &peek, 14) < 14)
         return VLC_EGENERIC;
 
     /* Skip RIFF MIDI header if present */
@@ -544,7 +544,7 @@ static int Open (vlc_object_t *obj)
         uint32_t riff_len = GetDWLE (peek + 4);
 
         msg_Dbg (demux, "detected RIFF MIDI file (%"PRIu32" bytes)", riff_len);
-        if ((stream_Read (stream, NULL, 12) < 12))
+        if ((vlc_stream_Read (stream, NULL, 12) < 12))
             return VLC_EGENERIC;
 
         /* Look for the RIFF data chunk */
@@ -554,7 +554,7 @@ static int Open (vlc_object_t *obj)
             uint32_t chnk_len;
 
             if ((riff_len < 8)
-             || (stream_Read (stream, chnk_hdr, 8) < 8))
+             || (vlc_stream_Read (stream, chnk_hdr, 8) < 8))
                 return VLC_EGENERIC;
 
             riff_len -= 8;
@@ -566,12 +566,12 @@ static int Open (vlc_object_t *obj)
             if (!memcmp (chnk_hdr, "data", 4))
                 break; /* found! */
 
-            if (stream_Read (stream, NULL, chnk_len) < (ssize_t)chnk_len)
+            if (vlc_stream_Read (stream, NULL, chnk_len) < (ssize_t)chnk_len)
                 return VLC_EGENERIC;
         }
 
         /* Read real SMF header. Assume RIFF data chunk length is proper. */
-        if (stream_Peek (stream, &peek, 14) < 14)
+        if (vlc_stream_Peek (stream, &peek, 14) < 14)
             return VLC_EGENERIC;
     }
 
@@ -624,7 +624,7 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     /* We've had a valid SMF header - now skip it*/
-    if (stream_Read (stream, NULL, 14) < 14)
+    if (vlc_stream_Read (stream, NULL, 14) < 14)
         goto error;
 
     demux->p_sys = sys;
@@ -641,7 +641,7 @@ static int Open (vlc_object_t *obj)
         /* Seeking screws streaming up, but there is no way around this, as
          * SMF1 tracks are performed simultaneously.
          * Not a big deal as SMF1 are usually only a few kbytes anyway. */
-        if (i > 0 && stream_Seek (stream, tr[-1].start + tr[-1].length))
+        if (i > 0 && vlc_stream_Seek (stream, tr[-1].start + tr[-1].length))
         {
             msg_Err (demux, "cannot build SMF index (corrupted file?)");
             goto error;
@@ -649,7 +649,7 @@ static int Open (vlc_object_t *obj)
 
         for (;;)
         {
-            if (stream_Read (stream, head, 8) < 8)
+            if (vlc_stream_Read (stream, head, 8) < 8)
             {
                 /* FIXME: don't give up if we have at least one valid track */
                 msg_Err (demux, "incomplete SMF chunk, file is corrupted");
@@ -660,15 +660,15 @@ static int Open (vlc_object_t *obj)
                 break;
 
             msg_Dbg (demux, "skipping unknown SMF chunk");
-            stream_Read (stream, NULL, GetDWBE (head + 4));
+            vlc_stream_Read (stream, NULL, GetDWBE (head + 4));
         }
 
-        tr->start = stream_Tell (stream);
+        tr->start = vlc_stream_Tell (stream);
         tr->length = GetDWBE (head + 4);
     }
 
     bool b;
-    if (stream_Control (stream, STREAM_CAN_FASTSEEK, &b) == 0 && b)
+    if (vlc_stream_Control (stream, STREAM_CAN_FASTSEEK, &b) == 0 && b)
     {
         if (SeekSet0 (demux))
             goto error;

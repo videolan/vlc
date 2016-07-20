@@ -112,7 +112,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
 
     const uint8_t *p_peek;
 
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
         msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
@@ -147,7 +147,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_sys->b_have_pack = false;
     p_sys->b_seekable  = false;
 
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
+    vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
     ps_psm_init( &p_sys->psm );
     ps_track_init( p_sys->tk );
@@ -252,18 +252,18 @@ static bool FindLength( demux_t *p_demux )
         p_sys->i_length = 0;
         /* Check beginning */
         int i = 0;
-        i_current_pos = stream_Tell( p_demux->s );
+        i_current_pos = vlc_stream_Tell( p_demux->s );
         while( i < 40 && Demux2( p_demux, false ) > 0 ) i++;
 
         /* Check end */
         i_size = stream_Size( p_demux->s );
         i_end = VLC_CLIP( i_size, 0, 200000 );
-        if( stream_Seek( p_demux->s, i_size - i_end ) == VLC_SUCCESS )
+        if( vlc_stream_Seek( p_demux->s, i_size - i_end ) == VLC_SUCCESS )
         {
             i = 0;
             while( i < 400 && Demux2( p_demux, true ) > 0 ) i++;
             if( i_current_pos >= 0 &&
-                stream_Seek( p_demux->s, i_current_pos ) != VLC_SUCCESS )
+                vlc_stream_Seek( p_demux->s, i_current_pos ) != VLC_SUCCESS )
                     return false;
         }
         else return false;
@@ -479,7 +479,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i64 = stream_Size( p_demux->s );
             if( i64 > 0 )
             {
-                double current = stream_Tell( p_demux->s );
+                double current = vlc_stream_Tell( p_demux->s );
                 *pf = current / (double)i64;
             }
             else
@@ -494,7 +494,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_current_pts = 0;
             p_sys->i_last_scr = -1;
 
-            return stream_Seek( p_demux->s, (int64_t)(i64 * f) );
+            return vlc_stream_Seek( p_demux->s, (int64_t)(i64 * f) );
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
@@ -505,7 +505,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             if( p_sys->i_mux_rate > 0 )
             {
-                *pi64 = (int64_t)1000000 * ( stream_Tell( p_demux->s ) / 50 ) /
+                *pi64 = (int64_t)1000000 * ( vlc_stream_Tell( p_demux->s ) / 50 ) /
                     p_sys->i_mux_rate;
                 return VLC_SUCCESS;
             }
@@ -533,7 +533,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->i_time_track >= 0 && p_sys->i_current_pts > 0 )
             {
                 int64_t i_now = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track].i_first_pts;
-                int64_t i_pos = stream_Tell( p_demux->s );
+                int64_t i_pos = vlc_stream_Tell( p_demux->s );
 
                 if( !i_now )
                     return i64 ? VLC_EGENERIC : VLC_SUCCESS;
@@ -542,7 +542,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_last_scr = -1;
                 i_pos *= (float)i64 / (float)i_now;
 
-                return stream_Seek( p_demux->s, i_pos );
+                return vlc_stream_Seek( p_demux->s, i_pos );
             }
             return VLC_EGENERIC;
 
@@ -553,17 +553,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             *va_arg( args, int* ) = 0; /* Title offset */
             *va_arg( args, int* ) = 0; /* Chapter offset */
-            return stream_Control( p_demux->s, STREAM_GET_TITLE_INFO, v, c );
+            return vlc_stream_Control( p_demux->s, STREAM_GET_TITLE_INFO, v,
+                                       c );
         }
 
         case DEMUX_SET_TITLE:
-            return stream_vaControl( p_demux->s, STREAM_SET_TITLE, args );
+            return vlc_stream_vaControl( p_demux->s, STREAM_SET_TITLE, args );
 
         case DEMUX_SET_SEEKPOINT:
-            return stream_vaControl( p_demux->s, STREAM_SET_SEEKPOINT, args );
+            return vlc_stream_vaControl( p_demux->s, STREAM_SET_SEEKPOINT,
+                                         args );
 
         case DEMUX_GET_META:
-            return stream_vaControl( p_demux->s, STREAM_GET_META, args );
+            return vlc_stream_vaControl( p_demux->s, STREAM_GET_META, args );
 
         case DEMUX_GET_FPS:
         default:
@@ -585,7 +587,7 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
     int     i_peek;
     int     i_skip;
 
-    if( stream_Peek( s, &p_peek, 4 ) < 4 )
+    if( vlc_stream_Peek( s, &p_peek, 4 ) < 4 )
     {
         return -1;
     }
@@ -596,7 +598,7 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
         return 1;
     }
 
-    if( ( i_peek = stream_Peek( s, &p_peek, 512 ) ) < 4 )
+    if( ( i_peek = vlc_stream_Peek( s, &p_peek, 512 ) ) < 4 )
     {
         return -1;
     }
@@ -612,20 +614,20 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
             p_peek[3] >= 0xb9 )
         {
             *pi_code = 0x100 | p_peek[3];
-            return stream_Read( s, NULL, i_skip ) == i_skip ? 1 : -1;
+            return vlc_stream_Read( s, NULL, i_skip ) == i_skip ? 1 : -1;
         }
 
         p_peek++;
         i_peek--;
         i_skip++;
     }
-    return stream_Read( s, NULL, i_skip ) == i_skip ? 0 : -1;
+    return vlc_stream_Read( s, NULL, i_skip ) == i_skip ? 0 : -1;
 }
 
 static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
 {
     const uint8_t *p_peek;
-    int i_peek = stream_Peek( s, &p_peek, 14 );
+    int i_peek = vlc_stream_Peek( s, &p_peek, 14 );
     if( i_peek < 4 )
         return NULL;
 
@@ -636,7 +638,7 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
         i_size = 6;
         for( ;; )
         {
-            i_peek = stream_Peek( s, &p_peek, i_size + 1024 );
+            i_peek = vlc_stream_Peek( s, &p_peek, i_size + 1024 );
             if( i_peek <= i_size + 4 )
             {
                 return NULL;
@@ -646,7 +648,7 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
                 if( p_peek[i_size] == 0x00 && p_peek[i_size+1] == 0x00 &&
                     p_peek[i_size+2] == 0x01 && p_peek[i_size+3] >= 0xb9 )
                 {
-                    return stream_Block( s, i_size );
+                    return vlc_stream_Block( s, i_size );
                 }
                 i_size++;
             }
@@ -655,7 +657,7 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
     else
     {
         /* Normal case */
-        return stream_Block( s, i_size );
+        return vlc_stream_Block( s, i_size );
     }
 
     VLC_UNUSED(i_code);

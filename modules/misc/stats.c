@@ -144,7 +144,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    block_t * p_block = stream_Block( p_demux->s, kBufferSize );
+    block_t * p_block = vlc_stream_Block( p_demux->s, kBufferSize );
 
     if( !p_block ) return 1;
 

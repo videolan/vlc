@@ -298,7 +298,7 @@ static void AStreamDestroy(stream_t *s)
 stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
                            bool preparsing, const char *url)
 {
-    stream_t *s = stream_CommonNew(parent, AStreamDestroy);
+    stream_t *s = vlc_stream_CommonNew(parent, AStreamDestroy);
     if (unlikely(s == NULL))
         return NULL;
 

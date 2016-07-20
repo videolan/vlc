@@ -235,7 +235,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     stream_t *p_stream = NULL;
     uint64_t i_size;
 
-    p_stream = stream_UrlNew( p_image->p_parent, psz_url );
+    p_stream = vlc_stream_NewMRL( p_image->p_parent, psz_url );
 
     if( !p_stream )
     {
@@ -244,13 +244,13 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
         return NULL;
     }
 
-    if( stream_GetSize( p_stream, &i_size ) || i_size > SSIZE_MAX )
+    if( vlc_stream_GetSize( p_stream, &i_size ) || i_size > SSIZE_MAX )
     {
         msg_Dbg( p_image->p_parent, "could not read %s", psz_url );
         goto error;
     }
 
-    p_block = stream_Block( p_stream, i_size );
+    p_block = vlc_stream_Block( p_stream, i_size );
     if( p_block == NULL )
         goto error;
 
@@ -263,7 +263,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
             free( psz_mime );
         }
     }
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
 
     if( !p_fmt_in->i_chroma )
     {
@@ -275,7 +275,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
 
     return p_pic;
 error:
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
     return NULL;
 }
 

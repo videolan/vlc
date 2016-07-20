@@ -65,7 +65,7 @@ bool ProbeArchiveFormat(stream_t *p_stream)
     };
 
     const uint8_t *p_peek;
-    int i_peek = stream_Peek(p_stream, &p_peek, magicbytes[0].i_offset + magicbytes[0].i_length);
+    int i_peek = vlc_stream_Peek(p_stream, &p_peek, magicbytes[0].i_offset + magicbytes[0].i_length);
 
     for(int i=0; i<9;i++)
     {

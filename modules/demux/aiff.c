@@ -107,13 +107,13 @@ static int Open( vlc_object_t *p_this )
 
     const uint8_t *p_peek;
 
-    if( stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
         return VLC_EGENERIC;
     if( memcmp( p_peek, "FORM", 4 ) || memcmp( &p_peek[8], "AIFF", 4 ) )
         return VLC_EGENERIC;
 
     /* skip aiff header */
-    stream_Read( p_demux->s, NULL, 12 );
+    vlc_stream_Read( p_demux->s, NULL, 12 );
 
     /* Fill p_demux field */
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
@@ -125,7 +125,7 @@ static int Open( vlc_object_t *p_this )
     {
         uint32_t i_size;
 
-        if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
+        if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
             goto error;
 
         i_size = GetDWBE( &p_peek[4] );
@@ -134,7 +134,7 @@ static int Open( vlc_object_t *p_this )
 
         if( !memcmp( p_peek, "COMM", 4 ) )
         {
-            if( stream_Peek( p_demux->s, &p_peek, 18+8 ) < 18+8 )
+            if( vlc_stream_Peek( p_demux->s, &p_peek, 18+8 ) < 18+8 )
                 goto error;
 
             es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
@@ -148,10 +148,10 @@ static int Open( vlc_object_t *p_this )
         }
         else if( !memcmp( p_peek, "SSND", 4 ) )
         {
-            if( stream_Peek( p_demux->s, &p_peek, 8+8 ) < 8+8 )
+            if( vlc_stream_Peek( p_demux->s, &p_peek, 8+8 ) < 8+8 )
                 goto error;
 
-            p_sys->i_ssnd_pos = stream_Tell( p_demux->s );
+            p_sys->i_ssnd_pos = vlc_stream_Tell( p_demux->s );
             p_sys->i_ssnd_size = i_size;
             p_sys->i_ssnd_offset = GetDWBE( &p_peek[8] );
             p_sys->i_ssnd_blocksize = GetDWBE( &p_peek[12] );
@@ -169,7 +169,7 @@ static int Open( vlc_object_t *p_this )
         i_size += 8;
         if( (i_size % 2) != 0 )
             i_size++;
-        if( stream_Read( p_demux->s, NULL, i_size ) != (int)i_size )
+        if( vlc_stream_Read( p_demux->s, NULL, i_size ) != (int)i_size )
         {
             msg_Warn( p_demux, "incomplete file" );
             goto error;
@@ -195,7 +195,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* seek into SSND chunk */
-    if( stream_Seek( p_demux->s, p_sys->i_ssnd_start ) )
+    if( vlc_stream_Seek( p_demux->s, p_sys->i_ssnd_start ) )
     {
         msg_Err( p_demux, "cannot seek to data chunk" );
         goto error;
@@ -229,7 +229,7 @@ static void Close( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t     i_tell = stream_Tell( p_demux->s );
+    int64_t     i_tell = vlc_stream_Tell( p_demux->s );
 
     block_t     *p_block;
     int         i_read;
@@ -249,7 +249,7 @@ static int Demux( demux_t *p_demux )
     {
         i_read = p_sys->i_ssnd_end - i_tell;
     }
-    if( ( p_block = stream_Block( p_demux->s, i_read ) ) == NULL )
+    if( ( p_block = vlc_stream_Block( p_demux->s, i_read ) ) == NULL )
     {
         return 0;
     }
@@ -279,13 +279,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_CAN_SEEK:
-            return stream_vaControl( p_demux->s, i_query, args );
+            return vlc_stream_vaControl( p_demux->s, i_query, args );
 
         case DEMUX_GET_POSITION:
         {
             int64_t i_start = p_sys->i_ssnd_start;
             int64_t i_end   = p_sys->i_ssnd_end > 0 ? p_sys->i_ssnd_end : stream_Size( p_demux->s );
-            int64_t i_tell  = stream_Tell( p_demux->s );
+            int64_t i_tell  = vlc_stream_Tell( p_demux->s );
 
             pf = (double*) va_arg( args, double* );
 
@@ -309,7 +309,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 int     i_frame = (f * ( i_end - i_start )) / p_sys->i_ssnd_fsize;
                 int64_t i_new   = i_start + i_frame * p_sys->i_ssnd_fsize;
 
-                if( stream_Seek( p_demux->s, i_new ) )
+                if( vlc_stream_Seek( p_demux->s, i_new ) )
                 {
                     return VLC_EGENERIC;
                 }

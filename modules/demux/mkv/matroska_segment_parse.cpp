@@ -90,7 +90,7 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 
     i_seekhead_count++;
 
-    stream_Control( sys.demuxer.s, STREAM_CAN_SEEK, &b_seekable );
+    vlc_stream_Control( sys.demuxer.s, STREAM_CAN_SEEK, &b_seekable );
     if( !b_seekable )
         return;
 
@@ -1362,7 +1362,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("V_QUICKTIME") {
             MP4_Box_t *p_box = (MP4_Box_t*)xmalloc( sizeof( MP4_Box_t ) );
-            stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(vars.p_demuxer),
+            stream_t *p_mp4_stream = vlc_stream_MemoryNew( VLC_OBJECT(vars.p_demuxer),
                                                        vars.p_tk->p_extra_data,
                                                        vars.p_tk->i_extra_data,
                                                        true );
@@ -1386,7 +1386,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             {
                 free( p_box );
             }
-            stream_Delete( p_mp4_stream );
+            vlc_stream_Delete( p_mp4_stream );
         }
         S_CASE("V_MJPEG") {
             vars.p_fmt->i_codec = VLC_CODEC_MJPG;

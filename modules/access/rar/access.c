@@ -65,10 +65,10 @@ static int Seek(access_t *access, uint64_t position)
 
     if (strcmp(old_chunk->mrl, sys->chunk->mrl)) {
         if (sys->s)
-            stream_Delete(sys->s);
-        sys->s = stream_UrlNew(access, sys->chunk->mrl);
+            vlc_stream_Delete(sys->s);
+        sys->s = vlc_stream_NewMRL(access, sys->chunk->mrl);
     }
-    return sys->s ? stream_Seek(sys->s, offset) : VLC_EGENERIC;
+    return sys->s ? vlc_stream_Seek(sys->s, offset) : VLC_EGENERIC;
 }
 
 static ssize_t Read(access_t *access, void *data, size_t size)
@@ -82,7 +82,7 @@ static ssize_t Read(access_t *access, void *data, size_t size)
         if (max <= 0)
             break;
 
-        int r = sys->s ? stream_Read(sys->s, data, max) : -1;
+        int r = sys->s ? vlc_stream_Read(sys->s, data, max) : -1;
         if (r <= 0)
             break;
 
@@ -108,11 +108,11 @@ static int Control(access_t *access, int query, va_list args)
     switch (query) {
     case STREAM_CAN_SEEK: {
         bool *b = va_arg(args, bool *);
-        return stream_Control(s, STREAM_CAN_SEEK, b);
+        return vlc_stream_Control(s, STREAM_CAN_SEEK, b);
     }
     case STREAM_CAN_FASTSEEK: {
         bool *b = va_arg(args, bool *);
-        return stream_Control(s, STREAM_CAN_FASTSEEK, b);
+        return vlc_stream_Control(s, STREAM_CAN_FASTSEEK, b);
     }
     /* FIXME the following request should ask the underlying access object */
     case STREAM_CAN_PAUSE:
@@ -152,7 +152,7 @@ int RarAccessOpen(vlc_object_t *object)
     name++;
     vlc_uri_decode(base);
 
-    stream_t *s = stream_UrlNew(access, base);
+    stream_t *s = vlc_stream_NewMRL(access, base);
     if (!s || RarProbe(s))
         goto error;
 
@@ -167,7 +167,7 @@ int RarAccessOpen(vlc_object_t *object)
             || newscheme.filescount < 1 || newscheme.i_nbvols < 2 )
     {
         /* We might want to lookup old naming scheme, could be a part1.rar,part1.r00 */
-        stream_Seek(s, 0);
+        vlc_stream_Seek(s, 0);
         RarParse(s, &oldscheme.filescount, &oldscheme.files, &oldscheme.i_nbvols, true);
     }
 
@@ -230,7 +230,7 @@ int RarAccessOpen(vlc_object_t *object)
 
 error:
     if (s)
-        stream_Delete(s);
+        vlc_stream_Delete(s);
     free(base);
     return VLC_EGENERIC;
 }
@@ -241,7 +241,7 @@ void RarAccessClose(vlc_object_t *object)
     access_sys_t *sys = access->p_sys;
 
     if (sys->s)
-        stream_Delete(sys->s);
+        vlc_stream_Delete(sys->s);
     RarFileDelete(sys->file);
     free(sys);
 }

@@ -102,7 +102,7 @@ static int Open( vlc_object_t * p_this )
     WAVEFORMATEX         *p_wf = NULL;
 
     /* Is it a wav file ? */
-    if( stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
         return VLC_EGENERIC;
 
     b_is_rf64 = ( memcmp( p_peek, "RF64", 4 ) == 0 );
@@ -124,7 +124,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_channel_mask = 0;
 
     /* skip riff header */
-    if( stream_Read( p_demux->s, NULL, 12 ) != 12 )
+    if( vlc_stream_Read( p_demux->s, NULL, 12 ) != 12 )
         goto error;
 
     if( b_is_rf64 )
@@ -140,17 +140,17 @@ static int Open( vlc_object_t * p_this )
             msg_Err( p_demux, "invalid 'ds64' chunk" );
             goto error;
         }
-        if( stream_Read( p_demux->s, NULL, 8 ) != 8 )
+        if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
             goto error;
-        if( stream_Peek( p_demux->s, &p_peek, 24 ) < 24 )
+        if( vlc_stream_Peek( p_demux->s, &p_peek, 24 ) < 24 )
             goto error;
         i_data_size = GetQWLE( &p_peek[8] );
         if( i_data_size >> 62 )
             p_sys->i_data_size = (int64_t)1 << 62;
         else
             p_sys->i_data_size = i_data_size;
-        if( stream_Read( p_demux->s, NULL, i_size ) != (int)i_size ||
-            ( (i_size & 1) && stream_Read( p_demux->s, NULL, 1 ) != 1 ) )
+        if( vlc_stream_Read( p_demux->s, NULL, i_size ) != (int)i_size ||
+            ( (i_size & 1) && vlc_stream_Read( p_demux->s, NULL, 1 ) != 1 ) )
             goto error;
     }
 
@@ -166,7 +166,7 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_demux, "invalid 'fmt ' chunk" );
         goto error;
     }
-    if( stream_Read( p_demux->s, NULL, 8 ) != 8 )
+    if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
         goto error;
 
 
@@ -178,8 +178,8 @@ static int Open( vlc_object_t * p_this )
     p_wf         = &p_wf_ext->Format;
     p_wf->cbSize = 0;
     i_size      -= 2;
-    if( stream_Read( p_demux->s, p_wf, i_size ) != (int)i_size ||
-        ( ( i_size & 1 ) && stream_Read( p_demux->s, NULL, 1 ) != 1 ) )
+    if( vlc_stream_Read( p_demux->s, p_wf, i_size ) != (int)i_size ||
+        ( ( i_size & 1 ) && vlc_stream_Read( p_demux->s, NULL, 1 ) != 1 ) )
     {
         msg_Err( p_demux, "cannot load 'fmt ' chunk" );
         goto error;
@@ -395,9 +395,9 @@ static int Open( vlc_object_t * p_this )
     }
     if( !b_is_rf64 || i_size < UINT32_MAX )
         p_sys->i_data_size = i_size;
-    if( stream_Read( p_demux->s, NULL, 8 ) != 8 )
+    if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
         goto error;
-    p_sys->i_data_pos = stream_Tell( p_demux->s );
+    p_sys->i_data_pos = vlc_stream_Tell( p_demux->s );
 
     if( p_sys->fmt.i_bitrate <= 0 )
     {
@@ -428,7 +428,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_block;
-    const int64_t i_pos = stream_Tell( p_demux->s );
+    const int64_t i_pos = vlc_stream_Tell( p_demux->s );
     unsigned int i_read_size = p_sys->i_frame_size;
 
     if( p_sys->i_data_size > 0 )
@@ -442,7 +442,7 @@ static int Demux( demux_t *p_demux )
             i_read_size = i_end - i_pos;
     }
 
-    if( ( p_block = stream_Block( p_demux->s, i_read_size ) ) == NULL )
+    if( ( p_block = vlc_stream_Block( p_demux->s, i_read_size ) ) == NULL )
     {
         msg_Warn( p_demux, "cannot read data" );
         return 0;
@@ -506,7 +506,7 @@ static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
     {
         uint32_t i_size;
 
-        if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
+        if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
         {
             msg_Err( p_demux, "cannot peek" );
             return VLC_EGENERIC;
@@ -526,9 +526,9 @@ static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
         }
 
         /* Skip chunk */
-        if( stream_Read( p_demux->s, NULL, 8 ) != 8 ||
-            stream_Read( p_demux->s, NULL, i_size ) != (int)i_size ||
-            ( (i_size & 1) && stream_Read( p_demux->s, NULL, 1 ) != 1 ) )
+        if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 ||
+            vlc_stream_Read( p_demux->s, NULL, i_size ) != (int)i_size ||
+            ( (i_size & 1) && vlc_stream_Read( p_demux->s, NULL, 1 ) != 1 ) )
             return VLC_EGENERIC;
     }
 }

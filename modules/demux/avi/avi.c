@@ -275,7 +275,8 @@ static int Open( vlc_object_t * p_this )
     const uint8_t *p_peek;
 
     /* Is it an avi file ? */
-    if( stream_Peek( p_demux->s, &p_peek, 200 ) < 200 ) return VLC_EGENERIC;
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 200 ) < 200 )
+        return VLC_EGENERIC;
 
     for( i_peeker = 0; i_peeker < 188; i_peeker++ )
     {
@@ -297,8 +298,9 @@ static int Open( vlc_object_t * p_this )
     p_sys->meta     = NULL;
     TAB_INIT(p_sys->i_attachment, p_sys->attachment);
 
-    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_fastseekable );
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
+    vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK,
+                        &p_sys->b_fastseekable );
+    vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = (p_sys->b_seekable) ? Demux_Seekable : Demux_UnSeekable;
@@ -307,7 +309,7 @@ static int Open( vlc_object_t * p_this )
 
     if( i_peeker > 0 )
     {
-        stream_Read( p_demux->s, NULL, i_peeker );
+        vlc_stream_Read( p_demux->s, NULL, i_peeker );
     }
 
     if( AVI_ChunkReadRoot( p_demux->s, &p_sys->ck_root ) )
@@ -828,10 +830,10 @@ aviindex:
     if( p_sys->b_seekable )
     {
         /* we have read all chunk so go back to movi */
-        stream_Seek( p_demux->s, p_movi->i_chunk_pos );
+        vlc_stream_Seek( p_demux->s, p_movi->i_chunk_pos );
     }
     /* Skip movi header */
-    stream_Read( p_demux->s, NULL, 12 );
+    vlc_stream_Read( p_demux->s, NULL, 12 );
 
     p_sys->i_movi_begin = p_movi->i_chunk_pos;
     return VLC_SUCCESS;
@@ -884,7 +886,7 @@ static void Close ( vlc_object_t * p_this )
 block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
                      const int i_header, const int i_size )
 {
-    block_t *p_frame = stream_Block( p_demux->s, __EVEN( i_size ) );
+    block_t *p_frame = vlc_stream_Block( p_demux->s, __EVEN( i_size ) );
     if ( !p_frame ) return p_frame;
 
     if( i_size % 2 )    /* read was padded on word boundary */
@@ -1116,7 +1118,7 @@ static int Demux_Seekable( demux_t *p_demux )
              * in case we fail we will disable all finished stream */
             if( p_sys->b_seekable && p_sys->i_movi_lastchunk_pos >= p_sys->i_movi_begin + 12 )
             {
-                stream_Seek( p_demux->s, p_sys->i_movi_lastchunk_pos );
+                vlc_stream_Seek( p_demux->s, p_sys->i_movi_lastchunk_pos );
                 if( AVI_PacketNext( p_demux ) )
                 {
                     return( AVI_TrackStopFinishedStreams( p_demux ) ? 0 : 1 );
@@ -1124,7 +1126,7 @@ static int Demux_Seekable( demux_t *p_demux )
             }
             else
             {
-                stream_Seek( p_demux->s, p_sys->i_movi_begin + 12 );
+                vlc_stream_Seek( p_demux->s, p_sys->i_movi_begin + 12 );
             }
 
             for( ;; )
@@ -1194,13 +1196,15 @@ static int Demux_Seekable( demux_t *p_demux )
         }
         else
         {
-            if( !p_sys->b_fastseekable && (i_pos > stream_Tell( p_demux->s )) )
+            if( !p_sys->b_fastseekable
+             && (i_pos > vlc_stream_Tell( p_demux->s )) )
             {
-                stream_Read( p_demux->s, NULL, i_pos - stream_Tell( p_demux->s ) );
+                vlc_stream_Read( p_demux->s, NULL,
+                                 i_pos - vlc_stream_Tell( p_demux->s ) );
             }
             else
             {
-                stream_Seek( p_demux->s, i_pos );
+                vlc_stream_Seek( p_demux->s, i_pos );
             }
         }
 
@@ -1406,7 +1410,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 default:
                     msg_Warn( p_demux,
                               "seems to have lost position @%"PRIu64", resync",
-                              stream_Tell(p_demux->s) );
+                              vlc_stream_Tell(p_demux->s) );
                     if( AVI_PacketSearch( p_demux ) )
                     {
                         msg_Err( p_demux, "resync failed" );
@@ -1481,7 +1485,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 
     if( p_sys->b_seekable )
     {
-        int64_t i_pos_backup = stream_Tell( p_demux->s );
+        int64_t i_pos_backup = vlc_stream_Tell( p_demux->s );
 
         /* Check and lazy load indexes if it was not done (not fastseekable) */
         if ( !p_sys->b_indexloaded && ( p_sys->i_avih_flags & AVIF_HASINDEX ) )
@@ -1494,8 +1498,8 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             if ( i_ret )
             {
                 /* Go back to position before index failure */
-                if ( stream_Tell( p_demux->s ) - i_pos_backup )
-                    stream_Seek( p_demux->s, i_pos_backup );
+                if ( vlc_stream_Tell( p_demux->s ) - i_pos_backup )
+                    vlc_stream_Seek( p_demux->s, i_pos_backup );
 
                 if ( p_sys->i_avih_flags & AVIF_MUSTUSEINDEX )
                     return VLC_EGENERIC;
@@ -1589,8 +1593,8 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 
 failandresetpos:
         /* Go back to position before index failure */
-        if ( stream_Tell( p_demux->s ) - i_pos_backup )
-            stream_Seek( p_demux->s, i_pos_backup );
+        if ( vlc_stream_Tell( p_demux->s ) - i_pos_backup )
+            vlc_stream_Seek( p_demux->s, i_pos_backup );
 
         return VLC_EGENERIC;
     }
@@ -1614,7 +1618,7 @@ static double ControlGetPosition( demux_t *p_demux )
     }
     else if( stream_Size( p_demux->s ) > 0 )
     {
-        double i64 = (uint64_t)stream_Tell( p_demux->s );
+        double i64 = (uint64_t)vlc_stream_Tell( p_demux->s );
         return i64 / stream_Size( p_demux->s );
     }
     return 0.0;
@@ -1809,7 +1813,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
 
     if( p_sys->i_movi_lastchunk_pos >= p_sys->i_movi_begin + 12 )
     {
-        stream_Seek( p_demux->s, p_sys->i_movi_lastchunk_pos );
+        vlc_stream_Seek( p_demux->s, p_sys->i_movi_lastchunk_pos );
         if( AVI_PacketNext( p_demux ) )
         {
             return VLC_EGENERIC;
@@ -1817,7 +1821,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
     }
     else
     {
-        stream_Seek( p_demux->s, p_sys->i_movi_begin + 12 );
+        vlc_stream_Seek( p_demux->s, p_sys->i_movi_begin + 12 );
     }
 
     for( ;; )
@@ -2166,13 +2170,13 @@ static int AVI_PacketGetHeader( demux_t *p_demux, avi_packet_t *p_pk )
 {
     const uint8_t *p_peek;
 
-    if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
     {
         return VLC_EGENERIC;
     }
     p_pk->i_fourcc  = VLC_FOURCC( p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
     p_pk->i_size    = GetDWLE( p_peek + 4 );
-    p_pk->i_pos     = stream_Tell( p_demux->s );
+    p_pk->i_pos     = vlc_stream_Tell( p_demux->s );
     if( p_pk->i_fourcc == AVIFOURCC_LIST || p_pk->i_fourcc == AVIFOURCC_RIFF )
     {
         p_pk->i_type = VLC_FOURCC( p_peek[8],  p_peek[9],
@@ -2214,7 +2218,7 @@ static int AVI_PacketNext( demux_t *p_demux )
         i_skip = __EVEN( avi_ck.i_size ) + 8;
     }
 
-    if( stream_Read( p_demux->s, NULL, i_skip ) != i_skip )
+    if( vlc_stream_Read( p_demux->s, NULL, i_skip ) != i_skip )
     {
         return VLC_EGENERIC;
     }
@@ -2229,7 +2233,7 @@ static int AVI_PacketSearch( demux_t *p_demux )
 
     for( ;; )
     {
-        if( stream_Read( p_demux->s, NULL, 1 ) != 1 )
+        if( vlc_stream_Read( p_demux->s, NULL, 1 ) != 1 )
         {
             return VLC_EGENERIC;
         }
@@ -2342,8 +2346,8 @@ static int AVI_IndexFind_idx1( demux_t *p_demux,
     else if( p_sys->b_seekable && i_first_pos < UINT64_MAX )
     {
         const uint8_t *p_peek;
-        if( !stream_Seek( p_demux->s, i_movi_content + i_first_pos ) &&
-            stream_Peek( p_demux->s, &p_peek, 4 ) >= 4 &&
+        if( !vlc_stream_Seek( p_demux->s, i_movi_content + i_first_pos ) &&
+            vlc_stream_Peek( p_demux->s, &p_peek, 4 ) >= 4 &&
             ( !isdigit( p_peek[0] ) || !isdigit( p_peek[1] ) ||
               !isalpha( p_peek[2] ) || !isalpha( p_peek[3] ) ) )
             *pi_offset = 0;
@@ -2504,7 +2508,8 @@ static void AVI_IndexLoad_indx( demux_t *p_demux,
             avi_chunk_t    ck_sub;
             for( unsigned i = 0; i < p_indx->i_entriesinuse; i++ )
             {
-                if( stream_Seek( p_demux->s, p_indx->idx.super[i].i_offset )||
+                if( vlc_stream_Seek( p_demux->s,
+                                     p_indx->idx.super[i].i_offset ) ||
                     AVI_ChunkRead( p_demux->s, &ck_sub, NULL  ) )
                 {
                     break;
@@ -2609,7 +2614,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
     i_movi_end = __MIN( (off_t)(p_movi->i_chunk_pos + p_movi->i_chunk_size),
                         stream_Size( p_demux->s ) );
 
-    stream_Seek( p_demux->s, p_movi->i_chunk_pos + 12 );
+    vlc_stream_Seek( p_demux->s, p_movi->i_chunk_pos + 12 );
     msg_Warn( p_demux, "creating index from LIST-movi, will take time !" );
 
 
@@ -2633,7 +2638,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
             if( vlc_dialog_is_cancelled( p_demux, p_dialog_id ) )
                 break;
 
-            double f_current = stream_Tell( p_demux->s );
+            double f_current = vlc_stream_Tell( p_demux->s );
             double f_size    = stream_Size( p_demux->s );
             double f_pos     = f_current / f_size;
             vlc_dialog_update_progress( p_demux, p_dialog_id, f_pos );
@@ -2669,7 +2674,8 @@ static void AVI_IndexCreate( demux_t *p_demux )
                                             AVIFOURCC_RIFF, 1 );
 
                     msg_Dbg( p_demux, "looking for new RIFF chunk" );
-                    if( stream_Seek( p_demux->s, p_sysx->i_chunk_pos + 24 ) )
+                    if( vlc_stream_Seek( p_demux->s,
+                                         p_sysx->i_chunk_pos + 24 ) )
                         goto print_stat;
                     break;
                 }
@@ -2843,7 +2849,7 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
         if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES &&
             p_indx->i_entriesinuse > 0 )
         {
-            if( stream_Seek( p_demux->s, p_indx->idx.super[0].i_offset )||
+            if( vlc_stream_Seek( p_demux->s, p_indx->idx.super[0].i_offset ) ||
                 AVI_ChunkRead( p_demux->s, &ck, NULL  ) )
                 goto exit;
             p_indx = &ck.indx;
@@ -2892,9 +2898,9 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
         goto exit;
     }
 
-    if( stream_Seek( p_demux->s, i_position ) )
+    if( vlc_stream_Seek( p_demux->s, i_position ) )
         goto exit;
-    p_block = stream_Block( p_demux->s, i_size );
+    p_block = vlc_stream_Block( p_demux->s, i_size );
     if( !p_block )
         goto exit;
 

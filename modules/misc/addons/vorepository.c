@@ -329,7 +329,7 @@ static int Find( addons_finder_t *p_finder )
         if ( ! asprintf( &psz_uri, ADDONS_REPO_SCHEMEHOST"/xml" ) ) return VLC_ENOMEM;
         b_done = true;
 
-        stream_t *p_stream = stream_UrlNew( p_finder, psz_uri );
+        stream_t *p_stream = vlc_stream_NewMRL( p_finder, psz_uri );
         free( psz_uri );
         if ( !p_stream ) return VLC_EGENERIC;
 
@@ -339,7 +339,7 @@ static int Find( addons_finder_t *p_finder )
             b_done = true;
         }
 
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
     }
 
     return VLC_SUCCESS;
@@ -370,12 +370,12 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
             free( psz_archive_uri );
             return VLC_ENOMEM;
         }
-        p_stream = stream_UrlNew( p_finder, psz_uri );
+        p_stream = vlc_stream_NewMRL( p_finder, psz_uri );
         free( psz_uri );
     }
     else
     {
-        p_stream = stream_UrlNew( p_finder, psz_archive_uri );
+        p_stream = vlc_stream_NewMRL( p_finder, psz_archive_uri );
     }
 
     msg_Dbg( p_finder, "downloading archive %s", psz_archive_uri );
@@ -393,7 +393,7 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
     if ( !p_finder->p_sys->psz_tempfile )
     {
         msg_Err( p_finder, "Can't create temp storage file" );
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
         return VLC_EGENERIC;
     }
 
@@ -402,24 +402,24 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
     {
         msg_Err( p_finder, "Failed to open addon temp storage file" );
         FREENULL(p_finder->p_sys->psz_tempfile);
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
         return VLC_EGENERIC;
     }
 
     char buffer[1<<10];
     int i_read = 0;
-    while ( ( i_read = stream_Read( p_stream, &buffer, 1<<10 ) ) > 0 )
+    while ( ( i_read = vlc_stream_Read( p_stream, &buffer, 1<<10 ) ) > 0 )
     {
         if ( fwrite( &buffer, i_read, 1, p_destfile ) < 1 )
         {
             msg_Err( p_finder, "Failed to write to Addon file" );
             fclose( p_destfile );
-            stream_Delete( p_stream );
+            vlc_stream_Delete( p_stream );
             return VLC_EGENERIC;
         }
     }
     fclose( p_destfile );
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
 
     msg_Dbg( p_finder, "Reading manifest from %s", p_finder->p_sys->psz_tempfile );
 
@@ -434,7 +434,7 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
         return VLC_ENOMEM;
     }
 
-    p_stream = stream_UrlNew( p_finder, psz_manifest_uri );
+    p_stream = vlc_stream_NewMRL( p_finder, psz_manifest_uri );
     free( psz_manifest_uri );
     if ( !p_stream )
     {
@@ -447,7 +447,7 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
                     ? VLC_SUCCESS : VLC_EGENERIC;
     vlc_mutex_unlock( &p_entry->lock );
     free( psz_tempfileuri );
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
 
     return i_ret;
 }
@@ -461,7 +461,7 @@ static int FindDesignated( addons_finder_t *p_finder )
                    psz_path ) < 1 )
         return VLC_ENOMEM;
 
-    stream_t *p_stream = stream_UrlNew( p_finder, psz_manifest );
+    stream_t *p_stream = vlc_stream_NewMRL( p_finder, psz_manifest );
     free( psz_manifest );
     if ( !p_stream ) return VLC_EGENERIC;
 
@@ -475,11 +475,11 @@ static int FindDesignated( addons_finder_t *p_finder )
     }
     else
     {
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
         return VLC_EGENERIC;
     }
 
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
 
     return VLC_SUCCESS;
 }

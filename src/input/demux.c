@@ -96,7 +96,7 @@ typedef struct demux_priv_t
 static void demux_DestroyDemux(demux_t *demux)
 {
     assert(demux->s != NULL);
-    stream_Delete(demux->s);
+    vlc_stream_Delete(demux->s);
 }
 
 static void demux_DestroyAccessDemux(demux_t *demux)
@@ -344,7 +344,7 @@ demux_t *input_DemuxNew( vlc_object_t *obj, const char *access_name,
             path = strstr( stream->psz_url, "://" );
             if( path == NULL )
             {
-                stream_Delete( stream );
+                vlc_stream_Delete( stream );
                 goto out;
             }
             path += 3;
@@ -355,7 +355,7 @@ demux_t *input_DemuxNew( vlc_object_t *obj, const char *access_name,
         if( demux == NULL )
         {
             msg_Err( obj, "cannot parse %s://%s", access_name, path );
-            stream_Delete( stream );
+            vlc_stream_Delete( stream );
         }
     }
 out:
@@ -410,7 +410,7 @@ int demux_vaControl( demux_t *demux, int query, va_list args )
                 va_copy( ap, args );
                 ret = demux->pf_control( demux, query, args );
                 if( ret != VLC_SUCCESS )
-                    ret = stream_vaControl( demux->s, query, ap );
+                    ret = vlc_stream_vaControl( demux->s, query, ap );
                 va_end( ap );
                 return ret;
             }
@@ -434,7 +434,7 @@ int demux_vaControl( demux_t *demux, int query, va_list args )
 
                 if( demux_ControlInternal( demux, DEMUX_CAN_PAUSE,
                                            &can_pause ) )
-                    return stream_vaControl( demux->s, query, args );
+                    return vlc_stream_vaControl( demux->s, query, args );
 
                 /* The caller shall not pause if pause is unsupported. */
                 assert( can_pause );
@@ -460,7 +460,7 @@ int demux_vaControlHelper( stream_t *s,
     if( i_end < 0 )    i_end   = stream_Size( s );
     if( i_start < 0 )  i_start = 0;
     if( i_align <= 0 ) i_align = 1;
-    i_tell = stream_Tell( s );
+    i_tell = vlc_stream_Tell( s );
 
     static_control_match(CAN_PAUSE);
     static_control_match(CAN_CONTROL_PACE);
@@ -476,7 +476,7 @@ int demux_vaControlHelper( stream_t *s,
             bool *b = va_arg( args, bool * );
 
             if( (i_bitrate <= 0 && i_start >= i_end)
-             || stream_Control( s, STREAM_CAN_SEEK, b ) )
+             || vlc_stream_Control( s, STREAM_CAN_SEEK, b ) )
                 *b = false;
             break;
         }
@@ -487,7 +487,7 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_GET_META:
         case DEMUX_GET_SIGNAL:
         case DEMUX_SET_PAUSE_STATE:
-            return stream_vaControl( s, i_query, args );
+            return vlc_stream_vaControl( s, i_query, args );
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
@@ -524,7 +524,7 @@ int demux_vaControlHelper( stream_t *s,
             {
                 int64_t i_block = (f * ( i_end - i_start )) / i_align;
 
-                if( stream_Seek( s, i_start + i_block * i_align ) )
+                if( vlc_stream_Seek( s, i_start + i_block * i_align ) )
                 {
                     return VLC_EGENERIC;
                 }
@@ -537,7 +537,7 @@ int demux_vaControlHelper( stream_t *s,
             if( i_bitrate > 0 && i64 >= 0 )
             {
                 int64_t i_block = i64 * i_bitrate / INT64_C(8000000) / i_align;
-                if( stream_Seek( s, i_start + i_block * i_align ) )
+                if( vlc_stream_Seek( s, i_start + i_block * i_align ) )
                 {
                     return VLC_EGENERIC;
                 }
@@ -628,7 +628,7 @@ static bool SkipID3Tag( demux_t *p_demux )
         return false;
 
     /* Get 10 byte id3 header */
-    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
         return false;
 
     if( memcmp( p_peek, "ID3", 3 ) )
@@ -643,7 +643,7 @@ static bool SkipID3Tag( demux_t *p_demux )
     i_size += 10;
 
     /* Skip the entire tag */
-    if( stream_Read( p_demux->s, NULL, i_size ) < i_size )
+    if( vlc_stream_Read( p_demux->s, NULL, i_size ) < i_size )
         return false;
 
     msg_Dbg( p_demux, "ID3v2.%d revision %d tag found, skipping %d bytes",
@@ -661,7 +661,7 @@ static bool SkipAPETag( demux_t *p_demux )
         return false;
 
     /* Get 32 byte ape header */
-    if( stream_Peek( p_demux->s, &p_peek, 32 ) < 32 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 32 ) < 32 )
         return false;
 
     if( memcmp( p_peek, "APETAGEX", 8 ) )
@@ -675,7 +675,7 @@ static bool SkipAPETag( demux_t *p_demux )
     i_size = GetDWLE( &p_peek[8+4] ) + ( (flags&(1<<30)) ? 32 : 0 );
 
     /* Skip the entire tag */
-    if( stream_Read( p_demux->s, NULL, i_size ) < i_size )
+    if( vlc_stream_Read( p_demux->s, NULL, i_size ) < i_size )
         return false;
 
     msg_Dbg( p_demux, "AP2 v%d tag found, skipping %d bytes",

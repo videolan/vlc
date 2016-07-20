@@ -109,17 +109,17 @@ static int Open( vlc_object_t *p_this )
     int          i_cat;
     int          i_samples, i_modulo;
 
-    if( stream_Peek( p_demux->s , &p_peek, 4 ) < 4 )
+    if( vlc_stream_Peek( p_demux->s , &p_peek, 4 ) < 4 )
         return VLC_EGENERIC;
 
     if( memcmp( p_peek, ".snd", 4 ) )
         return VLC_EGENERIC;
 
     /* skip signature */
-    stream_Read( p_demux->s, NULL, 4 );   /* cannot fail */
+    vlc_stream_Read( p_demux->s, NULL, 4 );   /* cannot fail */
 
     /* read header */
-    if( stream_Read( p_demux->s, hdr, 20 ) < 20 )
+    if( vlc_stream_Read( p_demux->s, hdr, 20 ) < 20 )
     {
         msg_Err( p_demux, "cannot read" );
         return VLC_EGENERIC;
@@ -138,7 +138,7 @@ static int Open( vlc_object_t *p_this )
     /* skip extra header data */
     if( p_sys->i_header_size > 24 )
     {
-        stream_Read( p_demux->s, NULL, p_sys->i_header_size - 24 );
+        vlc_stream_Read( p_demux->s, NULL, p_sys->i_header_size - 24 );
     }
 
     /* init fmt */
@@ -302,7 +302,8 @@ static int Demux( demux_t *p_demux )
     /* set PCR */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
 
-    if( ( p_block = stream_Block( p_demux->s, p_sys->i_frame_size ) ) == NULL )
+    p_block = vlc_stream_Block( p_demux->s, p_sys->i_frame_size );
+    if( p_block == NULL )
     {
         msg_Warn( p_demux, "cannot read data" );
         return 0;

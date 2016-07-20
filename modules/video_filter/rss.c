@@ -922,7 +922,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
         /* Fetch the feed */
         msg_Dbg( p_filter, "opening %s RSS/Atom feed ...", p_feed->psz_url );
 
-        p_stream = stream_UrlNew( p_filter, p_feed->psz_url );
+        p_stream = vlc_stream_NewMRL( p_filter, p_feed->psz_url );
         if( !p_stream )
         {
             msg_Err( p_filter, "Failed to open %s for reading", p_feed->psz_url );
@@ -949,7 +949,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
 
         msg_Dbg( p_filter, "done with %s RSS/Atom feed", p_feed->psz_url );
         xml_ReaderDelete( p_xml_reader );
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
     }
 
     return p_feeds;
@@ -959,7 +959,7 @@ error:
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
     if( p_stream )
-        stream_Delete( p_stream );
+        vlc_stream_Delete( p_stream );
 
     return NULL;
 }

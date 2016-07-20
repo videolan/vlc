@@ -378,7 +378,7 @@ static int DownloadArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         goto error;
     }
 
-    stream_t *p_stream = stream_UrlNew( p_fetcher->object, psz_arturl );
+    stream_t *p_stream = vlc_stream_NewMRL( p_fetcher->object, psz_arturl );
     if( !p_stream )
         goto error;
 
@@ -395,13 +395,13 @@ static int DownloadArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         if( !p_data )
             break;
 
-        i_read = stream_Read( p_stream, &p_data[i_data], i_read );
+        i_read = vlc_stream_Read( p_stream, &p_data[i_data], i_read );
         if( i_read <= 0 )
             break;
 
         i_data += i_read;
     }
-    stream_Delete( p_stream );
+    vlc_stream_Delete( p_stream );
 
     if( p_data && i_data > 0 )
     {

@@ -165,10 +165,10 @@ static int Open(vlc_object_t *p_obj)
         {
             /* We need to probe content */
             const uint8_t *p_peek;
-            const ssize_t i_peek = stream_Peek(p_demux->s, &p_peek, 2048);
+            const ssize_t i_peek = vlc_stream_Peek(p_demux->s, &p_peek, 2048);
             if(i_peek > 0)
             {
-                stream_t *peekstream = stream_MemoryNew(p_demux, const_cast<uint8_t *>(p_peek), (size_t)i_peek, true);
+                stream_t *peekstream = vlc_stream_MemoryNew(p_demux, const_cast<uint8_t *>(p_peek), (size_t)i_peek, true);
                 if(peekstream)
                 {
                     if(xmlParser.reset(peekstream) && xmlParser.parse(false))
@@ -182,7 +182,7 @@ static int Open(vlc_object_t *p_obj)
                             p_manager = HandleSmooth(p_demux, xmlParser, playlisturl, logic);
                         }
                     }
-                    stream_Delete(peekstream);
+                    vlc_stream_Delete(peekstream);
                 }
             }
         }

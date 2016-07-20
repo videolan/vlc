@@ -70,7 +70,7 @@ int Import_M3U( vlc_object_t *p_this )
     int offset = 0;
 
     CHECK_FILE();
-    if( stream_Peek( p_demux->s, &p_peek, 3 ) == 3
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 3 ) == 3
      && !memcmp( p_peek, "\xef\xbb\xbf", 3) )
     {
         pf_dup = CheckUnicode; /* UTF-8 Byte Order Mark */
@@ -90,7 +90,7 @@ int Import_M3U( vlc_object_t *p_this )
         ; /* Guess encoding */
     else
     {
-        if( stream_Peek( p_demux->s, &p_peek, 8 + offset ) < (8 + offset) )
+        if( vlc_stream_Peek( p_demux->s, &p_peek, 8 + offset ) < (8 + offset) )
             return VLC_EGENERIC;
 
         p_peek += offset;
@@ -104,7 +104,7 @@ int Import_M3U( vlc_object_t *p_this )
             return VLC_EGENERIC;
     }
 
-    stream_Seek( p_demux->s, offset );
+    vlc_stream_Seek( p_demux->s, offset );
 
     STANDARD_DEMUX_INIT_MSG( "found valid M3U playlist" );
     p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
@@ -118,7 +118,7 @@ static bool ContainsURL( demux_t *p_demux )
     const uint8_t *p_peek, *p_peek_end;
     int i_peek;
 
-    i_peek = stream_Peek( p_demux->s, &p_peek, 1024 );
+    i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 1024 );
     if( i_peek <= 0 ) return false;
     p_peek_end = p_peek + i_peek;
 
@@ -177,7 +177,7 @@ static int Demux( demux_t *p_demux )
     input_item_t *p_current_input = GetCurrentItem(p_demux);
     input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
 
-    psz_line = stream_ReadLine( p_demux->s );
+    psz_line = vlc_stream_ReadLine( p_demux->s );
     while( psz_line )
     {
         char *psz_parse = psz_line;
@@ -278,7 +278,7 @@ static int Demux( demux_t *p_demux )
 
         /* Fetch another line */
         free( psz_line );
-        psz_line = stream_ReadLine( p_demux->s );
+        psz_line = vlc_stream_ReadLine( p_demux->s );
         if( !psz_line ) b_cleanup = true;
 
         if( b_cleanup )

@@ -121,7 +121,7 @@ stream_t *vlc_stream_fifo_New(vlc_object_t *parent)
 
     sys->eof = false;
 
-    stream_t *s = stream_CommonNew(parent, vlc_stream_fifo_Destroy);
+    stream_t *s = vlc_stream_CommonNew(parent, vlc_stream_fifo_Destroy);
     if (unlikely(s == NULL))
     {
         block_FifoRelease(sys->fifo);

@@ -55,7 +55,7 @@ static int vlclua_demux_peek( lua_State *L )
     int n = (int)luaL_checkinteger( L, 1 );
     const uint8_t *p_peek;
 
-    int i_peek = stream_Peek( p_demux->s, &p_peek, n );
+    int i_peek = vlc_stream_Peek( p_demux->s, &p_peek, n );
     if( i_peek > 0 )
         lua_pushlstring( L, (const char *)p_peek, i_peek );
     else
@@ -68,12 +68,12 @@ static int vlclua_demux_read( lua_State *L )
     demux_t *p_demux = (demux_t *)vlclua_get_this( L );
     const uint8_t *p_read;
     int n = (int)luaL_checkinteger( L, 1 );
-    int i_read = stream_Peek( p_demux->s, &p_read, n );
+    int i_read = vlc_stream_Peek( p_demux->s, &p_read, n );
 
     if( i_read > 0 )
     {
         lua_pushlstring( L, (const char *)p_read, i_read );
-        int i_seek = stream_Read( p_demux->s, NULL, i_read );
+        int i_seek = vlc_stream_Read( p_demux->s, NULL, i_read );
         assert( i_read == i_seek );
     }
     else
@@ -85,7 +85,7 @@ static int vlclua_demux_read( lua_State *L )
 static int vlclua_demux_readline( lua_State *L )
 {
     demux_t *p_demux = (demux_t *)vlclua_get_this( L );
-    char *psz_line = stream_ReadLine( p_demux->s );
+    char *psz_line = vlc_stream_ReadLine( p_demux->s );
     if( psz_line )
     {
         lua_pushstring( L, psz_line );

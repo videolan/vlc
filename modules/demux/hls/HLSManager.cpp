@@ -50,11 +50,11 @@ bool HLSManager::isHTTPLiveStreaming(stream_t *s)
 {
     const uint8_t *peek;
 
-    int size = stream_Peek(s, &peek, 7);
+    int size = vlc_stream_Peek(s, &peek, 7);
     if (size < 7 || memcmp(peek, "#EXTM3U", 7))
         return false;
 
-    size = stream_Peek(s, &peek, 8192);
+    size = vlc_stream_Peek(s, &peek, 8192);
     if (size < 7)
         return false;
 

@@ -54,13 +54,13 @@ bool AtomsReader::parseBlock(block_t *p_block)
     if(rootbox)
         clean();
 
-    stream_t *stream = stream_MemoryNew( object, p_block->p_buffer, p_block->i_buffer, true);
+    stream_t *stream = vlc_stream_MemoryNew( object, p_block->p_buffer, p_block->i_buffer, true);
     if (stream)
     {
         rootbox = new (std::nothrow) MP4_Box_t;
         if(!rootbox)
         {
-            stream_Delete(stream);
+            vlc_stream_Delete(stream);
             return false;
         }
         memset(rootbox, 0, sizeof(*rootbox));
@@ -72,7 +72,7 @@ bool AtomsReader::parseBlock(block_t *p_block)
             MP4_BoxDumpStructure(stream, rootbox);
 #endif
         }
-        stream_Delete(stream);
+        vlc_stream_Delete(stream);
     }
 
     return true;

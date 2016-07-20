@@ -128,7 +128,7 @@ struct stream_t
 };
 
 /**
- * Possible commands to send to stream_Control() and stream_vaControl()
+ * Possible commands to send to vlc_stream_Control() and vlc_stream_vaControl()
  */
 enum stream_query_e
 {
@@ -154,7 +154,7 @@ enum stream_query_e
     STREAM_SET_TITLE,       /**< arg1= int          res=can fail */
     STREAM_SET_SEEKPOINT,   /**< arg1= int          res=can fail */
 
-    /* XXX only data read through stream_Read/Block will be recorded */
+    /* XXX only data read through vlc_stream_Read/Block will be recorded */
     STREAM_SET_RECORD_STATE,     /**< arg1=bool, arg2=const char *psz_ext (if arg1 is true)  res=can fail */
 
     STREAM_SET_PRIVATE_ID_STATE = 0x1000, /* arg1= int i_private_data, bool b_selected    res=can fail */
@@ -175,14 +175,14 @@ enum stream_query_e
  * \param len number of bytes to read
  * \return the number of bytes read or a negative value on error.
  */
-VLC_API ssize_t stream_Read(stream_t *, void *, size_t) VLC_USED;
+VLC_API ssize_t vlc_stream_Read(stream_t *, void *buf, size_t len) VLC_USED;
 
 /**
  * Peeks at data from a byte stream.
  *
  * This function buffers for the requested number of bytes, waiting if
- * necessary. Then it stores a pointer to the buffer. Unlike stream_Read()
- * or stream_Block(), this function does not modify the stream read offset.
+ * necessary. Then it stores a pointer to the buffer. Unlike vlc_stream_Read()
+ * or vlc_stream_Block(), this function does not modify the stream read offset.
  *
  * \note
  * The buffer remains valid until the next read/peek or seek operation on the
@@ -193,7 +193,7 @@ VLC_API ssize_t stream_Read(stream_t *, void *, size_t) VLC_USED;
  * \return the number of bytes actually available (shorter than requested if
  * the end-of-stream is reached), or a negative value on error.
  */
-VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
+VLC_API ssize_t vlc_stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
 
 /**
  * Reads a data block from a byte stream.
@@ -206,26 +206,26 @@ VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
  * imply that the stream is ended nor that it has encountered a nonrecoverable
  * error.
  *
- * This function should be used instead of stream_Read() or stream_Peek() when
- * the caller can handle reads of any size.
+ * This function should be used instead of vlc_stream_Read() or
+ * vlc_stream_Peek() when the caller can handle reads of any size.
  *
  * \return either a data block or NULL
  */
-VLC_API block_t *stream_ReadBlock(stream_t *) VLC_USED;
+VLC_API block_t *vlc_stream_ReadBlock(stream_t *) VLC_USED;
 
 /**
  * Tells the current stream position.
  *
  * @return the byte offset from the beginning of the stream (cannot fail)
  */
-VLC_API uint64_t stream_Tell(const stream_t *) VLC_USED;
+VLC_API uint64_t vlc_stream_Tell(const stream_t *) VLC_USED;
 
 /**
  * Checks for end of stream.
  *
  * Checks if the last attempt to reads data from the stream encountered the
  * end of stream before the attempt could be fully satisfied.
- * The value is initially false, and is reset to false by stream_Seek().
+ * The value is initially false, and is reset to false by vlc_stream_Seek().
  *
  * \note The function can return false even though the current stream position
  * is equal to the stream size. It will return true after the following attempt
@@ -240,7 +240,7 @@ VLC_API uint64_t stream_Tell(const stream_t *) VLC_USED;
  * the end-of-stream is reached. But that rule is not enforced; it is entirely
  * dependent on the underlying implementation of the stream.
  */
-VLC_API bool stream_Eof(const stream_t *) VLC_USED;
+VLC_API bool vlc_stream_Eof(const stream_t *) VLC_USED;
 
 /**
  * Sets the current stream position.
@@ -248,30 +248,46 @@ VLC_API bool stream_Eof(const stream_t *) VLC_USED;
  * @param offset byte offset from the beginning of the stream
  * @return zero on success, a negative value on error
  */
-VLC_API int stream_Seek(stream_t *, uint64_t offset) VLC_USED;
+VLC_API int vlc_stream_Seek(stream_t *, uint64_t offset) VLC_USED;
 
-VLC_API int stream_vaControl( stream_t *s, int i_query, va_list args );
-VLC_API void stream_Delete( stream_t *s );
-VLC_API int stream_Control( stream_t *s, int i_query, ... );
-VLC_API block_t * stream_Block( stream_t *s, size_t );
-VLC_API char * stream_ReadLine( stream_t * );
-VLC_API int stream_ReadDir( stream_t *, input_item_node_t * );
+VLC_API int vlc_stream_vaControl(stream_t *s, int query, va_list args);
 
-VLC_API stream_t *stream_CommonNew(vlc_object_t *, void (*)(stream_t *));
+static inline int vlc_stream_Control(stream_t *s, int query, ...)
+{
+    va_list ap;
+    int ret;
+
+    va_start(ap, query);
+    ret = vlc_stream_vaControl(s, query, ap);
+    va_end(ap);
+    return ret;
+}
+
+VLC_API block_t *vlc_stream_Block(stream_t *s, size_t);
+VLC_API char *vlc_stream_ReadLine(stream_t *);
+VLC_API int vlc_stream_ReadDir(stream_t *, input_item_node_t *);
+
+/**
+ * Closes a byte stream.
+ * \param s byte stream to close
+ */
+VLC_API void vlc_stream_Delete(stream_t *s);
+
+VLC_API stream_t *vlc_stream_CommonNew(vlc_object_t *, void (*)(stream_t *));
 
 /**
  * Get the size of the stream.
  */
-VLC_USED static inline int stream_GetSize( stream_t *s, uint64_t *size )
+VLC_USED static inline int vlc_stream_GetSize( stream_t *s, uint64_t *size )
 {
-    return stream_Control( s, STREAM_GET_SIZE, size );
+    return vlc_stream_Control( s, STREAM_GET_SIZE, size );
 }
 
 static inline int64_t stream_Size( stream_t *s )
 {
     uint64_t i_pos;
 
-    if( stream_GetSize( s, &i_pos ) )
+    if( vlc_stream_GetSize( s, &i_pos ) )
         return 0;
     if( i_pos >> 62 )
         return (int64_t)1 << 62;
@@ -285,7 +301,7 @@ static inline int64_t stream_Size( stream_t *s )
 static inline char *stream_ContentType( stream_t *s )
 {
     char *res;
-    if( stream_Control( s, STREAM_GET_CONTENT_TYPE, &res ) )
+    if( vlc_stream_Control( s, STREAM_GET_CONTENT_TYPE, &res ) )
         return NULL;
     return res;
 }
@@ -299,17 +315,18 @@ static inline char *stream_ContentType( stream_t *s )
  * \param preserve if false, free(base) will be called when the stream is
  *                 destroyed; if true, the memory buffer is preserved
  */
-VLC_API stream_t *stream_MemoryNew(vlc_object_t *obj, uint8_t *base,
-                                   size_t size, bool preserve) VLC_USED;
-#define stream_MemoryNew(a, b, c, d) \
-        stream_MemoryNew(VLC_OBJECT(a), b, c, d)
+VLC_API stream_t *vlc_stream_MemoryNew(vlc_object_t *obj, uint8_t *base,
+                                       size_t size, bool preserve) VLC_USED;
+#define vlc_stream_MemoryNew(a, b, c, d) \
+        vlc_stream_MemoryNew(VLC_OBJECT(a), b, c, d)
 
 /**
  * Create a stream_t reading from a URL.
- * You must delete it using stream_Delete.
+ * You must delete it using vlc_stream_Delete.
  */
-VLC_API stream_t * stream_UrlNew(vlc_object_t *p_this, const char *psz_url );
-#define stream_UrlNew( a, b ) stream_UrlNew( VLC_OBJECT(a), b )
+VLC_API stream_t * vlc_stream_NewMRL(vlc_object_t *obj, const char *url)
+VLC_USED;
+#define vlc_stream_NewMRL(a, b) vlc_stream_NewMRL(VLC_OBJECT(a), b)
 
 /**
  * \defgroup stream_fifo FIFO stream
@@ -325,10 +342,10 @@ VLC_API stream_t * stream_UrlNew(vlc_object_t *p_this, const char *psz_url );
  * anonymous pipe/FIFO.
  *
  * On the reader side, the normal stream functions are used,
- * e.g. stream_Read() and stream_Delete().
+ * e.g. vlc_stream_Read() and vlc_stream_Delete().
  *
  * The created stream object is automatically destroyed when both the reader
- * and the writer sides have been closed, with stream_Delete() and
+ * and the writer sides have been closed, with vlc_stream_Delete() and
  * vlc_stream_fifo_Close() respectively.
  *
  * \param parent parent VLC object for the stream
@@ -377,19 +394,23 @@ VLC_API void vlc_stream_fifo_Close(stream_t *s);
  * Try to add a stream filter to an open stream.
  * @return New stream to use, or NULL if the filter could not be added.
  **/
-VLC_API stream_t* stream_FilterNew( stream_t *p_source, const char *psz_stream_filter );
+VLC_API stream_t* vlc_stream_FilterNew( stream_t *p_source, const char *psz_stream_filter );
 
 /**
  * Default ReadDir implementation for stream Filter. This implementation just
  * forward the pf_readdir call to the p_source stream.
  */
-VLC_API int stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node );
+VLC_API int vlc_stream_FilterDefaultReadDir(stream_t *s,
+                                            input_item_node_t *p_node);
 
 /**
- * Sets stream_FilterDefaultReadDir as the pf_readdir callback for this stream filter
+ * Sets vlc_stream_FilterDefaultReadDir as the pf_readdir callback for this
+ * stream filter.
  */
-#define stream_FilterSetDefaultReadDir(p_stream) \
-    p_stream->pf_readdir = stream_FilterDefaultReadDir;
+#define stream_FilterSetDefaultReadDir(stream) \
+do { \
+    (stream)->pf_readdir = vlc_stream_FilterDefaultReadDir; \
+} while (0)
 
 /**
  * @}

@@ -270,7 +270,7 @@ int UpdateHWFilter( demux_sys_t *p_sys, ts_pid_t *p_pid )
     if( !p_sys->b_access_control )
         return VLC_EGENERIC;
 
-    return stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_STATE,
+    return vlc_stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_STATE,
                            p_pid->i_pid, !!(p_pid->i_flags & FLAG_FILTERED) );
 }
 

@@ -92,7 +92,7 @@ static int Demux( demux_t *p_demux )
 
     input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
 
-    while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
+    while( ( psz_line = vlc_stream_ReadLine( p_demux->s ) ) )
     {
         if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) ||
             !strncasecmp( psz_line, "[Reference]", sizeof("[Reference]")-1 ) )

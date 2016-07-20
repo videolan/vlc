@@ -224,7 +224,7 @@ static inline bool isFQUrl( const char* url )
 static bool isHDS( stream_t *s )
 {
     const char *peek;
-    int i_size = stream_Peek( s->p_source, (const uint8_t**) &peek, 200 );
+    int i_size = vlc_stream_Peek( s->p_source, (const uint8_t**) &peek, 200 );
     if( i_size < 200 )
         return false;
 
@@ -799,7 +799,7 @@ static uint8_t* download_chunk( stream_t *s,
 
     msg_Info(s, "Downloading fragment %s",  fragment_url );
 
-    stream_t* download_stream = stream_UrlNew( s, fragment_url );
+    stream_t* download_stream = vlc_stream_NewMRL( s, fragment_url );
     if( ! download_stream )
     {
         msg_Err(s, "Failed to download fragment %s", fragment_url );
@@ -825,7 +825,7 @@ static uint8_t* download_chunk( stream_t *s,
         return NULL;
     }
 
-    int read = stream_Read( download_stream, data,
+    int read = vlc_stream_Read( download_stream, data,
                             size );
     if( read < 0 )
         read = 0;
@@ -846,7 +846,7 @@ static uint8_t* download_chunk( stream_t *s,
         chunk->failed = false;
     }
 
-    stream_Delete( download_stream );
+    vlc_stream_Delete( download_stream );
     return data;
 }
 
@@ -1136,7 +1136,7 @@ static void* live_thread( void* p )
     while( ! sys->closed )
     {
         last_dl_start_time = mdate();
-        stream_t* download_stream = stream_UrlNew( p_this, abst_url );
+        stream_t* download_stream = vlc_stream_NewMRL( p_this, abst_url );
         if( ! download_stream )
         {
             msg_Err( p_this, "Failed to download abst %s", abst_url );
@@ -1145,7 +1145,7 @@ static void* live_thread( void* p )
         {
             int64_t size = stream_Size( download_stream );
             uint8_t* data = malloc( size );
-            int read = stream_Read( download_stream, data,
+            int read = vlc_stream_Read( download_stream, data,
                                     size );
             if( read < size )
             {
@@ -1164,7 +1164,7 @@ static void* live_thread( void* p )
 
             free( data );
 
-            stream_Delete( download_stream );
+            vlc_stream_Delete( download_stream );
         }
 
         mwait( last_dl_start_time + ( ((int64_t)hds_stream->fragment_runs[hds_stream->fragment_run_count-1].fragment_duration) * 1000000LL) / ((int64_t)hds_stream->afrt_timescale) );

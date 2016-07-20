@@ -117,7 +117,7 @@ vlc_demux_chained_t *vlc_demux_chained_New(vlc_object_t *parent,
     if (vlc_clone(&dc->thread, vlc_demux_chained_Thread, dc,
                   VLC_THREAD_PRIORITY_INPUT))
     {
-        stream_Delete(dc->fifo);
+        vlc_stream_Delete(dc->fifo);
         vlc_stream_fifo_Close(dc->fifo);
         vlc_mutex_destroy(&dc->lock);
         free(dc);

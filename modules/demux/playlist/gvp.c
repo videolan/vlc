@@ -74,7 +74,7 @@ int Import_GVP( vlc_object_t *p_this )
     const uint8_t *p_peek;
 
     CHECK_FILE();
-    i_peek = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
+    i_peek = vlc_stream_Peek( p_demux->s, &p_peek, MAX_LINE );
 
     for( i = 0; i < i_peek - (int)sizeof("gvp_version:"); i++ )
     {
@@ -111,7 +111,7 @@ static int Demux( demux_t *p_demux )
 
     input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
 
-    while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
+    while( ( psz_line = vlc_stream_ReadLine( p_demux->s ) ) )
     {
         if( *psz_line == '#' )
         {

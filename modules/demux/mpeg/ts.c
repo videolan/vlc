@@ -193,7 +193,7 @@ static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_o
 {
     const uint8_t *p_peek;
 
-    if( stream_Peek( p_demux->s,
+    if( vlc_stream_Peek( p_demux->s,
                      &p_peek, i_offset + TS_PACKET_SIZE_MAX ) < i_offset + TS_PACKET_SIZE_MAX )
         return -1;
 
@@ -204,7 +204,7 @@ static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_o
 
         /* Check next 3 sync bytes */
         int i_peek = i_offset + TS_PACKET_SIZE_MAX * 3 + i_sync + 1;
-        if( ( stream_Peek( p_demux->s, &p_peek, i_peek ) ) < i_peek )
+        if( ( vlc_stream_Peek( p_demux->s, &p_peek, i_peek ) ) < i_peek )
         {
             msg_Err( p_demux, "cannot peek" );
             return -1;
@@ -250,13 +250,13 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
     *pi_header_size = 0;
     int i_packet_size = -1;
 
-    if( stream_Peek( p_demux->s,
+    if( vlc_stream_Peek( p_demux->s,
                      &p_peek, TS_PACKET_SIZE_MAX ) < TS_PACKET_SIZE_MAX )
         return -1;
 
     if( memcmp( p_peek, "TFrc", 4 ) == 0 &&
         p_peek[6] == 0 && memcmp( &p_peek[53], "\x80\x00\x00", 4 ) == 0 &&
-        stream_Peek( p_demux->s, &p_peek, TOPFIELD_HEADER_SIZE + TS_PACKET_SIZE_MAX )
+        vlc_stream_Peek( p_demux->s, &p_peek, TOPFIELD_HEADER_SIZE + TS_PACKET_SIZE_MAX )
             == TOPFIELD_HEADER_SIZE + TS_PACKET_SIZE_MAX )
     {
         i_packet_size = DetectPacketSize( p_demux, pi_header_size, TOPFIELD_HEADER_SIZE );
@@ -501,8 +501,9 @@ static int Open( vlc_object_t *p_this )
         TsChangeStandard( p_sys, TS_STANDARD_ATSC );
     }
 
-    stream_Control( p_sys->stream, STREAM_CAN_SEEK, &p_sys->b_canseek );
-    stream_Control( p_sys->stream, STREAM_CAN_FASTSEEK, &p_sys->b_canfastseek );
+    vlc_stream_Control( p_sys->stream, STREAM_CAN_SEEK, &p_sys->b_canseek );
+    vlc_stream_Control( p_sys->stream, STREAM_CAN_FASTSEEK,
+                        &p_sys->b_canfastseek );
 
     /* Preparse time */
     if( p_sys->b_canseek )
@@ -548,7 +549,7 @@ static void Close( vlc_object_t *p_this )
     if ( p_sys->arib.b25stream )
     {
         p_sys->arib.b25stream->p_source = NULL; /* don't chain kill demuxer's source */
-        stream_Delete( p_sys->arib.b25stream );
+        vlc_stream_Delete( p_sys->arib.b25stream );
     }
 
     vlc_mutex_destroy( &p_sys->csa_lock );
@@ -609,7 +610,8 @@ static int Demux( demux_t *p_demux )
         if( p_sys->b_start_record )
         {
             /* Enable recording once synchronized */
-            stream_Control( p_sys->stream, STREAM_SET_RECORD_STATE, true, "ts" );
+            vlc_stream_Control( p_sys->stream, STREAM_SET_RECORD_STATE, true,
+                                "ts" );
             p_sys->b_start_record = false;
         }
 
@@ -878,7 +880,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( (i64 = stream_Size( p_sys->stream) ) > 0 )
         {
-            int64_t offset = stream_Tell( p_sys->stream );
+            int64_t offset = vlc_stream_Tell( p_sys->stream );
             *pf = (double)offset / (double)i64;
             return VLC_SUCCESS;
         }
@@ -924,7 +926,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         i64 = stream_Size( p_sys->stream );
         if( i64 > 0 &&
-            stream_Seek( p_sys->stream, (int64_t)(i64 * f) ) == VLC_SUCCESS )
+            vlc_stream_Seek( p_sys->stream, (int64_t)(i64 * f) ) == VLC_SUCCESS )
         {
             ReadyQueuesPostSeek( p_demux );
             return VLC_SUCCESS;
@@ -1050,17 +1052,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         *va_arg( args, int* ) = 0; /* Title offset */
         *va_arg( args, int* ) = 0; /* Chapter offset */
-        return stream_Control( p_sys->stream, STREAM_GET_TITLE_INFO, v, c );
+        return vlc_stream_Control( p_sys->stream, STREAM_GET_TITLE_INFO, v,
+                                   c );
     }
 
     case DEMUX_SET_TITLE:
-        return stream_vaControl( p_sys->stream, STREAM_SET_TITLE, args );
+        return vlc_stream_vaControl( p_sys->stream, STREAM_SET_TITLE, args );
 
     case DEMUX_SET_SEEKPOINT:
-        return stream_vaControl( p_sys->stream, STREAM_SET_SEEKPOINT, args );
+        return vlc_stream_vaControl( p_sys->stream, STREAM_SET_SEEKPOINT,
+                                     args );
 
     case DEMUX_GET_META:
-        return stream_vaControl( p_sys->stream, STREAM_GET_META, args );
+        return vlc_stream_vaControl( p_sys->stream, STREAM_GET_META, args );
 
     case DEMUX_CAN_RECORD:
         pb_bool = (bool*)va_arg( args, bool * );
@@ -1071,12 +1075,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         b_bool = (bool)va_arg( args, int );
 
         if( !b_bool )
-            stream_Control( p_sys->stream, STREAM_SET_RECORD_STATE, false );
+            vlc_stream_Control( p_sys->stream, STREAM_SET_RECORD_STATE,
+                                false );
         p_sys->b_start_record = b_bool;
         return VLC_SUCCESS;
 
     case DEMUX_GET_SIGNAL:
-        return stream_vaControl( p_sys->stream, STREAM_GET_SIGNAL, args );
+        return vlc_stream_vaControl( p_sys->stream, STREAM_GET_SIGNAL, args );
 
     default:
         break;
@@ -1584,13 +1589,13 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     block_t     *p_pkt;
 
     /* Get a new TS packet */
-    if( !( p_pkt = stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
+    if( !( p_pkt = vlc_stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
     {
         int64_t size = stream_Size( p_sys->stream );
-        if( size >= 0 && (uint64_t)size == stream_Tell( p_sys->stream ) )
-            msg_Dbg( p_demux, "EOF at %"PRId64, stream_Tell( p_sys->stream ) );
+        if( size >= 0 && (uint64_t)size == vlc_stream_Tell( p_sys->stream ) )
+            msg_Dbg( p_demux, "EOF at %"PRId64, vlc_stream_Tell( p_sys->stream ) );
         else
-            msg_Dbg( p_demux, "Can't read TS packet at %"PRId64, stream_Tell(p_sys->stream) );
+            msg_Dbg( p_demux, "Can't read TS packet at %"PRId64, vlc_stream_Tell(p_sys->stream) );
         return NULL;
     }
 
@@ -1618,7 +1623,7 @@ static block_t* ReadTSPacket( demux_t *p_demux )
             int i_peek = 0;
             unsigned i_skip = 0;
 
-            i_peek = stream_Peek( p_sys->stream, &p_peek,
+            i_peek = vlc_stream_Peek( p_sys->stream, &p_peek,
                     p_sys->i_packet_size * 10 );
             if( i_peek < 0 || (unsigned)i_peek < p_sys->i_packet_size + 1 )
             {
@@ -1636,7 +1641,7 @@ static block_t* ReadTSPacket( demux_t *p_demux )
                 i_skip++;
             }
             msg_Dbg( p_demux, "skipping %d bytes of garbage", i_skip );
-            if (stream_Read( p_sys->stream, NULL, i_skip ) != i_skip)
+            if (vlc_stream_Read( p_sys->stream, NULL, i_skip ) != i_skip)
                 return NULL;
 
             if( i_skip < i_peek - p_sys->i_packet_size )
@@ -1644,7 +1649,7 @@ static block_t* ReadTSPacket( demux_t *p_demux )
                 break;
             }
         }
-        if( !( p_pkt = stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
+        if( !( p_pkt = vlc_stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
         {
             msg_Dbg( p_demux, "eof ?" );
             return NULL;
@@ -1771,12 +1776,12 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
 
     /* Deal with common but worst binary search case */
     if( p_pmt->pcr.i_first == i_scaledtime && p_sys->b_canseek )
-        return stream_Seek( p_sys->stream, 0 );
+        return vlc_stream_Seek( p_sys->stream, 0 );
 
     if( !p_sys->b_canfastseek )
         return VLC_EGENERIC;
 
-    int64_t i_initial_pos = stream_Tell( p_sys->stream );
+    int64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
 
     /* Find the time position by using binary search algorithm. */
     int64_t i_head_pos = 0;
@@ -1792,7 +1797,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
         int64_t i_div = i_splitpos % p_sys->i_packet_size;
         i_splitpos -= i_div;
 
-        if ( stream_Seek( p_sys->stream, i_splitpos ) != VLC_SUCCESS )
+        if ( vlc_stream_Seek( p_sys->stream, i_splitpos ) != VLC_SUCCESS )
             break;
 
         int64_t i_pos = i_splitpos;
@@ -1806,7 +1811,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
                 break;
             }
             else
-                i_pos = stream_Tell( p_sys->stream );
+                i_pos = vlc_stream_Tell( p_sys->stream );
 
             int i_pid = PIDGet( p_pkt );
             ts_pid_t *p_pid = GetPID(p_sys, i_pid);
@@ -1861,7 +1866,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
     if( !b_found )
     {
         msg_Dbg( p_demux, "Seek():cannot find a time position." );
-        stream_Seek( p_sys->stream, i_initial_pos );
+        vlc_stream_Seek( p_sys->stream, i_initial_pos );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -1964,7 +1969,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
 int ProbeStart( demux_t *p_demux, int i_program )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    const int64_t i_initial_pos = stream_Tell( p_sys->stream );
+    const int64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
     int64_t i_stream_size = stream_Size( p_sys->stream );
 
     int i_probe_count = 0;
@@ -1977,7 +1982,7 @@ int ProbeStart( demux_t *p_demux, int i_program )
         i_pos = p_sys->i_packet_size * i_probe_count;
         i_pos = __MIN( i_pos, i_stream_size );
 
-        if( stream_Seek( p_sys->stream, i_pos ) )
+        if( vlc_stream_Seek( p_sys->stream, i_pos ) )
             return VLC_EGENERIC;
 
         ProbeChunk( p_demux, i_program, false, &i_pcr, &b_found );
@@ -1986,7 +1991,7 @@ int ProbeStart( demux_t *p_demux, int i_program )
         i_probe_count += PROBE_CHUNK_COUNT;
     } while( i_pos > 0 && (i_pcr == -1 || !b_found) && i_probe_count < (2 * PROBE_CHUNK_COUNT) );
 
-    if( stream_Seek( p_sys->stream, i_initial_pos ) )
+    if( vlc_stream_Seek( p_sys->stream, i_initial_pos ) )
         return VLC_EGENERIC;
 
     return (b_found) ? VLC_SUCCESS : VLC_EGENERIC;
@@ -1995,7 +2000,7 @@ int ProbeStart( demux_t *p_demux, int i_program )
 int ProbeEnd( demux_t *p_demux, int i_program )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    const int64_t i_initial_pos = stream_Tell( p_sys->stream );
+    const int64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
     int64_t i_stream_size = stream_Size( p_sys->stream );
 
     int i_probe_count = PROBE_CHUNK_COUNT;
@@ -2008,7 +2013,7 @@ int ProbeEnd( demux_t *p_demux, int i_program )
         i_pos = i_stream_size - (p_sys->i_packet_size * i_probe_count);
         i_pos = __MAX( i_pos, 0 );
 
-        if( stream_Seek( p_sys->stream, i_pos ) )
+        if( vlc_stream_Seek( p_sys->stream, i_pos ) )
             return VLC_EGENERIC;
 
         ProbeChunk( p_demux, i_program, true, &i_pcr, &b_found );
@@ -2017,7 +2022,7 @@ int ProbeEnd( demux_t *p_demux, int i_program )
         i_probe_count += PROBE_CHUNK_COUNT;
     } while( i_pos > 0 && (i_pcr == -1 || !b_found) && i_probe_count < (6 * PROBE_CHUNK_COUNT) );
 
-    if( stream_Seek( p_sys->stream, i_initial_pos ) )
+    if( vlc_stream_Seek( p_sys->stream, i_initial_pos ) )
         return VLC_EGENERIC;
 
     return (b_found) ? VLC_SUCCESS : VLC_EGENERIC;

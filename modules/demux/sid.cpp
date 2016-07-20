@@ -90,7 +90,7 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
 
     const uint8_t *peek;
-    if (stream_Peek (demux->s, &peek, 4) < 4)
+    if (vlc_stream_Peek (demux->s, &peek, 4) < 4)
         return VLC_EGENERIC;
 
     /* sidplay2 can read PSID and the newer RSID formats */
@@ -101,7 +101,7 @@ static int Open (vlc_object_t *obj)
     if (unlikely (data==NULL))
         goto error;
 
-    if (stream_Read (demux->s,data,size) < size) {
+    if (vlc_stream_Read (demux->s,data,size) < size) {
         free (data);
         goto error;
     }

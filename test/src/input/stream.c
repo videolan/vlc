@@ -145,38 +145,38 @@ stream_getsize( struct reader *p_reader )
 {
     uint64_t i_size;
 
-    assert( stream_GetSize( p_reader->u.s, &i_size ) == 0 );
+    assert( vlc_stream_GetSize( p_reader->u.s, &i_size ) == 0 );
     return i_size;
 }
 
 static ssize_t
 stream_read( struct reader *p_reader, void *p_buf, size_t i_len )
 {
-    return stream_Read( p_reader->u.s, p_buf, i_len );
+    return vlc_stream_Read( p_reader->u.s, p_buf, i_len );
 }
 
 static ssize_t
 stream_peek( struct reader *p_reader, const uint8_t **pp_buf, size_t i_len )
 {
-    return stream_Peek( p_reader->u.s, pp_buf, i_len );
+    return vlc_stream_Peek( p_reader->u.s, pp_buf, i_len );
 }
 
 static uint64_t
 stream_tell( struct reader *p_reader )
 {
-    return stream_Tell( p_reader->u.s );
+    return vlc_stream_Tell( p_reader->u.s );
 }
 
 static int
 stream_seek( struct reader *p_reader, uint64_t i_offset )
 {
-    return stream_Seek( p_reader->u.s, i_offset );
+    return vlc_stream_Seek( p_reader->u.s, i_offset );
 }
 
 static void
 stream_close( struct reader *p_reader )
 {
-    stream_Delete( p_reader->u.s );
+    vlc_stream_Delete( p_reader->u.s );
     libvlc_release( p_reader->p_data );
     free( p_reader );
 }
@@ -202,7 +202,7 @@ stream_open( const char *psz_url )
     p_vlc = libvlc_new( sizeof(argv) / sizeof(argv[0]), argv );
     assert( p_vlc != NULL );
 
-    p_reader->u.s = stream_UrlNew( p_vlc->p_libvlc_int, psz_url );
+    p_reader->u.s = vlc_stream_NewMRL( p_vlc->p_libvlc_int, psz_url );
     if( !p_reader->u.s )
     {
         libvlc_release( p_vlc );

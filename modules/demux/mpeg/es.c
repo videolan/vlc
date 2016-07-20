@@ -196,7 +196,7 @@ static int OpenCommon( demux_t *p_demux,
     p_sys->f_fps = var_InheritFloat( p_demux, "es-fps" );
     p_sys->p_packetized_data = NULL;
 
-    if( stream_Seek( p_demux->s, p_sys->i_stream_offset ) )
+    if( vlc_stream_Seek( p_demux->s, p_sys->i_stream_offset ) )
     {
         free( p_sys );
         return VLC_EGENERIC;
@@ -272,7 +272,7 @@ static int OpenVideo( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     const uint8_t *p_peek;
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
         return VLC_EGENERIC;
     if( p_peek[0] != 0x00 || p_peek[1] != 0x00 || p_peek[2] != 0x01 )
     {
@@ -389,7 +389,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              * a raw approximation with time/position */
             if( i_ret && !p_sys->i_bitrate_avg )
             {
-                float f_pos = (double)(uint64_t)( stream_Tell( p_demux->s ) ) /
+                float f_pos = (double)(uint64_t)( vlc_stream_Tell( p_demux->s ) ) /
                               (double)(uint64_t)( stream_Size( p_demux->s ) );
                 /* The first few seconds are guaranteed to be very whacky,
                  * don't bother trying ... Too bad */
@@ -416,7 +416,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( !i_ret && p_sys->i_bitrate_avg > 0 &&
                 (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
             {
-                int64_t i_time = INT64_C(8000000) * ( stream_Tell(p_demux->s) - p_sys->i_stream_offset ) /
+                int64_t i_time = INT64_C(8000000) * ( vlc_stream_Tell(p_demux->s) - p_sys->i_stream_offset ) /
                     p_sys->i_bitrate_avg;
 
                 /* Fix time_offset */
@@ -445,12 +445,12 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
     if( p_sys->codec.b_use_word )
     {
         /* Make sure we are word aligned */
-        int64_t i_pos = stream_Tell( p_demux->s );
-        if( (i_pos & 1) && stream_Read( p_demux->s, NULL, 1 ) != 1 )
+        int64_t i_pos = vlc_stream_Tell( p_demux->s );
+        if( (i_pos & 1) && vlc_stream_Read( p_demux->s, NULL, 1 ) != 1 )
             return true;
     }
 
-    p_block_in = stream_Block( p_demux->s, p_sys->i_packet_size );
+    p_block_in = vlc_stream_Block( p_demux->s, p_sys->i_packet_size );
     bool b_eof = p_block_in == NULL;
 
     if( p_block_in )
@@ -536,7 +536,7 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[],
     *pi_skip = 0;
 
     /* Check if we are dealing with a WAV file */
-    if( stream_Peek( p_demux->s, &p_peek, 12+8 ) != 12 + 8 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 12+8 ) != 12 + 8 )
         return VLC_SUCCESS;
 
     if( memcmp( p_peek, "RIFF", 4 ) || memcmp( &p_peek[8], "WAVE", 4 ) )
@@ -551,7 +551,7 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[],
             return VLC_EGENERIC;
 
         i_peek += i_len + 8;
-        if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+        if( vlc_stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
             return VLC_EGENERIC;
     }
 
@@ -561,7 +561,7 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[],
         return VLC_EGENERIC;
 
     i_peek += i_len + 8;
-    if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
         return VLC_EGENERIC;
     const int i_format = GetWLE( p_peek + i_peek - i_len - 8 /* wFormatTag */ );
     int i_format_idx;
@@ -585,7 +585,7 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[],
             return VLC_EGENERIC;
 
         i_peek += i_len + 8;
-        if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+        if( vlc_stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
             return VLC_EGENERIC;
     }
     *pi_skip = i_peek;
@@ -610,7 +610,7 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
         b_forced_demux |= demux_IsForced( p_demux, ppsz_name[i] );
     }
 
-    i_offset = stream_Tell( p_demux->s );
+    i_offset = vlc_stream_Tell( p_demux->s );
 
     if( WavSkipHeader( p_demux, &i_skip, pi_wav_format, pf_format_check ) )
     {
@@ -624,7 +624,7 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
      * We will accept probing 0.5s of data in this case.
      */
     const int i_probe = i_skip + i_check_size + 8000 + ( b_wav ? (44000/2*2*2) : 0);
-    const int i_peek = stream_Peek( p_demux->s, &p_peek, i_probe );
+    const int i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_probe );
     if( i_peek < i_skip + i_check_size )
     {
         msg_Err( p_demux, "cannot peek" );
@@ -731,7 +731,7 @@ static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset )
     b_forced_demux = demux_IsForced( p_demux, "mp3" ) ||
                      demux_IsForced( p_demux, "mpga" );
 
-    i_offset = stream_Tell( p_demux->s );
+    i_offset = vlc_stream_Tell( p_demux->s );
 
     if( WavSkipHeader( p_demux, &i_skip, pi_wav, NULL ) )
     {
@@ -741,7 +741,7 @@ static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset )
         return VLC_EGENERIC;
     }
 
-    if( stream_Peek( p_demux->s, &p_peek, i_skip + 4 ) < i_skip + 4 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, i_skip + 4 ) < i_skip + 4 )
         return VLC_EGENERIC;
 
     if( !MpgaCheckSync( &p_peek[i_skip] ) )
@@ -752,7 +752,7 @@ static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset )
         if( !b_forced_demux && !b_forced )
             return VLC_EGENERIC;
 
-        i_peek = stream_Peek( p_demux->s, &p_peek, i_skip + 8096 );
+        i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_skip + 8096 );
         while( i_skip + 4 < i_peek )
         {
             if( MpgaCheckSync( &p_peek[i_skip] ) )
@@ -825,7 +825,7 @@ static int MpgaInit( demux_t *p_demux )
     p_sys->i_packet_size = 1024;
 
     /* Load a potential xing header */
-    i_peek = stream_Peek( p_demux->s, &p_peek, 4 + 1024 );
+    i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 4 + 1024 );
     if( i_peek < 4 + 21 )
         return VLC_SUCCESS;
 
@@ -922,10 +922,10 @@ static int AacProbe( demux_t *p_demux, int64_t *pi_offset )
     if( !b_forced_demux && !b_forced )
         return VLC_EGENERIC;
 
-    i_offset = stream_Tell( p_demux->s );
+    i_offset = vlc_stream_Tell( p_demux->s );
 
     /* peek the begining (10 is for adts header) */
-    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
     {
         msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
@@ -1013,7 +1013,7 @@ static int A52Init( demux_t *p_demux )
     const uint8_t *p_peek;
 
     /* peek the begining */
-    if( stream_Peek( p_demux->s, &p_peek, VLC_A52_HEADER_SIZE ) >= VLC_A52_HEADER_SIZE )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, VLC_A52_HEADER_SIZE ) >= VLC_A52_HEADER_SIZE )
     {
         A52CheckSync( p_peek, &p_sys->b_big_endian, NULL, true );
     }

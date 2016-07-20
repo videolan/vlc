@@ -341,7 +341,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int DemuxDemux( demux_t *p_demux )
 {
-    block_t *p_block = stream_Block( p_demux->s, DEMUX_BUFFER_SIZE );
+    block_t *p_block = vlc_stream_Block( p_demux->s, DEMUX_BUFFER_SIZE );
     int i_ret;
 
     if ( p_block == NULL )

@@ -92,7 +92,7 @@ static int Open( vlc_object_t * p_this )
     const uint8_t *p_buf;
 
     /* XA file heuristic */
-    if( stream_Peek( p_demux->s, &p_buf, sizeof( p_xa ) )
+    if( vlc_stream_Peek( p_demux->s, &p_buf, sizeof( p_xa ) )
             < (signed)sizeof( p_xa ) )
         return VLC_EGENERIC;
 
@@ -113,7 +113,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es         = NULL;
 
     /* skip XA header -- cannot fail */
-    stream_Read( p_demux->s, NULL, sizeof( p_xa ) );
+    vlc_stream_Read( p_demux->s, NULL, sizeof( p_xa ) );
 
     es_format_t fmt;
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('X','A','J',0) );
@@ -129,7 +129,7 @@ static int Open( vlc_object_t * p_this )
     fmt.i_bitrate = (fmt.audio.i_rate * fmt.audio.i_bytes_per_frame * 8)
                     / fmt.audio.i_frame_length;
 
-    p_sys->i_data_offset = stream_Tell( p_demux->s );
+    p_sys->i_data_offset = vlc_stream_Tell( p_demux->s );
     /* FIXME: better computation */
     p_sys->i_data_size = p_xa.iSize * 15 / 56;
     /* How many frames per block (1:1 is too CPU intensive) */
@@ -162,7 +162,7 @@ static int Demux( demux_t *p_demux )
     int64_t     i_offset;
     unsigned    i_frames = p_sys->i_block_frames;
 
-    i_offset = stream_Tell( p_demux->s );
+    i_offset = vlc_stream_Tell( p_demux->s );
 
     if( p_sys->i_data_size > 0 &&
         i_offset >= p_sys->i_data_offset + p_sys->i_data_size )
@@ -171,7 +171,7 @@ static int Demux( demux_t *p_demux )
         return 0;
     }
 
-    p_block = stream_Block( p_demux->s, p_sys->i_frame_size * i_frames );
+    p_block = vlc_stream_Block( p_demux->s, p_sys->i_frame_size * i_frames );
     if( p_block == NULL )
     {
         msg_Warn( p_demux, "cannot read data" );

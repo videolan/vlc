@@ -97,7 +97,7 @@ static int Control(demux_t *demux, int query, va_list args)
     demux_sys_t *sys = demux->p_sys;
     switch(query) {
     case DEMUX_CAN_SEEK:
-        return stream_vaControl(demux->s, query, args);
+        return vlc_stream_vaControl(demux->s, query, args);
     case DEMUX_GET_LENGTH: {
         int64_t *l = va_arg(args, int64_t *);
         *l = sys->count > 0 ? sys->index[sys->count-1].stop : 0;
@@ -117,7 +117,7 @@ static int Control(demux_t *demux, int query, va_list args)
         sys->current = 0;
         while (sys->current < sys->count) {
             if (sys->index[sys->current].stop > t) {
-                stream_Seek(demux->s, 1024 + 128LL * sys->index[sys->current].index);
+                vlc_stream_Seek(demux->s, 1024 + 128LL * sys->index[sys->current].index);
                 break;
             }
             sys->current++;
@@ -140,7 +140,7 @@ static int Demux(demux_t *demux)
         if (s->start > sys->next_date)
             break;
 
-        block_t *b = stream_Block(demux->s, 128 * s->count);
+        block_t *b = vlc_stream_Block(demux->s, 128 * s->count);
         if (b) {
             b->i_dts =
             b->i_pts = VLC_TS_0 + s->start;
@@ -158,7 +158,7 @@ static int Open(vlc_object_t *object)
     demux_t *demux = (demux_t*)object;
 
     const uint8_t *peek;
-    if (stream_Peek(demux->s, &peek, 11) != 11)
+    if (vlc_stream_Peek(demux->s, &peek, 11) != 11)
         return VLC_EGENERIC;
 
     bool is_stl_25 = !memcmp(&peek[3], "STL25.01", 8);
@@ -168,7 +168,7 @@ static int Open(vlc_object_t *object)
     const double fps = is_stl_25 ? 25 : 30;
 
     uint8_t header[1024];
-    if (stream_Read(demux->s, header, sizeof(header)) != sizeof(header)) {
+    if (vlc_stream_Read(demux->s, header, sizeof(header)) != sizeof(header)) {
         msg_Err(demux, "Incomplete EBU STL header");
         return VLC_EGENERIC;
     }
@@ -190,8 +190,8 @@ static int Open(vlc_object_t *object)
 
     for (int i = 0; i < tti_count; i++) {
         uint8_t tti[16];
-        if (stream_Read(demux->s, tti, 16) != 16 ||
-            stream_Read(demux->s, NULL, 112) != 112) {
+        if (vlc_stream_Read(demux->s, tti, 16) != 16 ||
+            vlc_stream_Read(demux->s, NULL, 112) != 112) {
             msg_Warn(demux, "Incomplete EBU STL file");
             break;
         }
@@ -214,7 +214,7 @@ static int Open(vlc_object_t *object)
             s->count = 0;
     }
     if (sys->count > 0)
-        stream_Seek(demux->s, 1024 + 128LL * sys->index[0].index);
+        vlc_stream_Seek(demux->s, 1024 + 128LL * sys->index[0].index);
 
     es_format_t fmt;
     es_format_Init(&fmt, SPU_ES, VLC_CODEC_EBU_STL);

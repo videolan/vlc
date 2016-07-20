@@ -311,7 +311,7 @@ StreamUrlConnection::~StreamUrlConnection()
 void StreamUrlConnection::reset()
 {
     if(p_streamurl)
-        stream_Delete(p_streamurl);
+        vlc_stream_Delete(p_streamurl);
     p_streamurl = NULL;
     bytesRead = 0;
     contentLength = 0;
@@ -333,15 +333,15 @@ int StreamUrlConnection::request(const std::string &path, const BytesRange &rang
     msg_Dbg(p_object, "Retrieving %s @%zu", params.getUrl().c_str(),
                       range.isValid() ? range.getStartByte() : 0);
 
-    p_streamurl = stream_UrlNew(p_object, params.getUrl().c_str());
+    p_streamurl = vlc_stream_NewMRL(p_object, params.getUrl().c_str());
     if(!p_streamurl)
         return VLC_EGENERIC;
 
     if(range.isValid() && range.getEndByte() > 0)
     {
-        if(stream_Seek(p_streamurl, range.getStartByte()) != VLC_SUCCESS)
+        if(vlc_stream_Seek(p_streamurl, range.getStartByte()) != VLC_SUCCESS)
         {
-            stream_Delete(p_streamurl);
+            vlc_stream_Delete(p_streamurl);
             return VLC_EGENERIC;
         }
         bytesRange = range;
@@ -372,7 +372,7 @@ ssize_t StreamUrlConnection::read(void *p_buffer, size_t len)
     if(len > toRead)
         len = toRead;
 
-    ssize_t ret =  stream_Read(p_streamurl, p_buffer, len);
+    ssize_t ret = vlc_stream_Read(p_streamurl, p_buffer, len);
     if(ret >= 0)
         bytesRead += ret;
 

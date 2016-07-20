@@ -123,7 +123,7 @@ static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
         p_record = malloc( i_read );
 
     /* */
-    const ssize_t i_record = stream_Read( s->p_source, p_record, i_read );
+    const ssize_t i_record = vlc_stream_Read( s->p_source, p_record, i_read );
 
     /* Dump read data */
     if( p_sys->f )
@@ -139,13 +139,13 @@ static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
 
 static int Seek( stream_t *s, uint64_t offset )
 {
-    return stream_Seek( s->p_source, offset );
+    return vlc_stream_Seek( s->p_source, offset );
 }
 
 static int Control( stream_t *s, int i_query, va_list args )
 {
     if( i_query != STREAM_SET_RECORD_STATE )
-        return stream_vaControl( s->p_source, i_query, args );
+        return vlc_stream_vaControl( s->p_source, i_query, args );
 
     stream_sys_t *sys = s->p_sys;
     bool b_active = (bool)va_arg( args, int );

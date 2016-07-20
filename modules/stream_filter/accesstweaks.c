@@ -83,12 +83,12 @@ static int Control( stream_t *p_stream, int i_query, va_list args )
         break;
     }
 
-    return stream_vaControl( p_stream->p_source, i_query, args );
+    return vlc_stream_vaControl( p_stream->p_source, i_query, args );
 }
 
 static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
 {
-    return stream_Read( s->p_source, buffer, i_read );
+    return vlc_stream_Read( s->p_source, buffer, i_read );
 }
 
 static int Seek( stream_t *s, uint64_t offset )
@@ -96,7 +96,7 @@ static int Seek( stream_t *s, uint64_t offset )
     stream_sys_t *p_sys = s->p_sys;
 
     assert( p_sys->b_seek );
-    return stream_Seek( s->p_source, offset );
+    return vlc_stream_Seek( s->p_source, offset );
 }
 
 static int Open( vlc_object_t *p_object )

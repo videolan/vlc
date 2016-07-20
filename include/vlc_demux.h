@@ -369,14 +369,15 @@ static inline void demux_UpdateTitleFromStream( demux_t *demux )
     stream_t *s = demux->s;
     unsigned title, seekpoint;
 
-    if( stream_Control( s, STREAM_GET_TITLE, &title ) == VLC_SUCCESS
+    if( vlc_stream_Control( s, STREAM_GET_TITLE, &title ) == VLC_SUCCESS
      && title != (unsigned)demux->info.i_title )
     {
         demux->info.i_title = title;
         demux->info.i_update |= INPUT_UPDATE_TITLE;
     }
 
-    if( stream_Control( s, STREAM_GET_SEEKPOINT, &seekpoint ) == VLC_SUCCESS
+    if( vlc_stream_Control( s, STREAM_GET_SEEKPOINT,
+                            &seekpoint ) == VLC_SUCCESS
      && seekpoint != (unsigned)demux->info.i_seekpoint )
     {
         demux->info.i_seekpoint = seekpoint;

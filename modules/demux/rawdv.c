@@ -141,7 +141,7 @@ static int Open( vlc_object_t * p_this )
     if( !demux_IsPathExtension( p_demux, ".dv" ) && !p_demux->obj.force )
         return VLC_EGENERIC;
 
-    if( stream_Peek( p_demux->s, &p_peek, DV_PAL_FRAME_SIZE ) <
+    if( vlc_stream_Peek( p_demux->s, &p_peek, DV_PAL_FRAME_SIZE ) <
         DV_NTSC_FRAME_SIZE )
     {
         /* Stream too short ... */
@@ -264,7 +264,7 @@ static int Demux( demux_t *p_demux )
 
     /* Call the pace control */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
-    p_block = stream_Block( p_demux->s, p_sys->frame_size );
+    p_block = vlc_stream_Block( p_demux->s, p_sys->frame_size );
     if( p_block == NULL )
     {
         /* EOF */

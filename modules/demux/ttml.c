@@ -381,9 +381,9 @@ static void ParseHead( demux_t* p_demux )
     ssize_t i_read;
 
     // Rewind since the XML parser will have consumed the entire file.
-    stream_Seek( p_demux->s, 0 );
+    vlc_stream_Seek( p_demux->s, 0 );
 
-    while ( ( i_read = stream_Read( p_demux->s, (void*)buff, 1024 ) ) > 0 )
+    while ( ( i_read = vlc_stream_Read( p_demux->s, (void*)buff, 1024 ) ) > 0 )
     {
         ssize_t i_offset = -1;
         // Ensure we can use strstr
@@ -467,7 +467,7 @@ static int Open( vlc_object_t* p_this )
         return VLC_ENOMEM;
 
     uint8_t *p_peek;
-    ssize_t i_peek = stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 2048 );
+    ssize_t i_peek = vlc_stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 2048 );
 
     if( unlikely( i_peek <= 0 ) )
     {
@@ -475,7 +475,7 @@ static int Open( vlc_object_t* p_this )
         return VLC_EGENERIC;
     }
 
-    stream_t *p_probestream = stream_MemoryNew( p_demux->s, p_peek, i_peek, true );
+    stream_t *p_probestream = vlc_stream_MemoryNew( p_demux->s, p_peek, i_peek, true );
     if( unlikely( !p_probestream ) )
     {
         Close( p_demux );
@@ -486,14 +486,14 @@ static int Open( vlc_object_t* p_this )
     if ( !p_sys->p_xml )
     {
         Close( p_demux );
-        stream_Delete( p_probestream );
+        vlc_stream_Delete( p_probestream );
         return VLC_EGENERIC;
     }
     p_sys->p_reader = xml_ReaderCreate( p_sys->p_xml, p_probestream );
     if ( !p_sys->p_reader )
     {
         Close( p_demux );
-        stream_Delete( p_probestream );
+        vlc_stream_Delete( p_probestream );
         return VLC_EGENERIC;
     }
 
@@ -505,12 +505,12 @@ static int Open( vlc_object_t* p_this )
     if ( i_type != XML_READER_STARTELEM || ( strcmp( psz_name, "tt" ) && strcmp( psz_name, "tt:tt" ) ) )
     {
         Close( p_demux );
-        stream_Delete( p_probestream );
+        vlc_stream_Delete( p_probestream );
         return VLC_EGENERIC;
     }
 
     p_sys->p_reader = xml_ReaderReset( p_sys->p_reader, p_demux->s );
-    stream_Delete( p_probestream );
+    vlc_stream_Delete( p_probestream );
     if ( !p_sys->p_reader )
     {
         Close( p_demux );

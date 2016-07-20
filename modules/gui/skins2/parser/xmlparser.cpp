@@ -42,7 +42,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const std::string &rFileName )
     LoadCatalog();
 
     char *psz_uri = vlc_path2uri( rFileName.c_str(), NULL );
-    m_pStream = stream_UrlNew( pIntf, psz_uri );
+    m_pStream = vlc_stream_NewMRL( pIntf, psz_uri );
     free( psz_uri );
     if( !m_pStream )
     {
@@ -67,7 +67,7 @@ XMLParser::~XMLParser()
 {
     if( m_pReader ) xml_ReaderDelete( m_pReader );
     if( m_pXML ) xml_Delete( m_pXML );
-    if( m_pStream ) stream_Delete( m_pStream );
+    if( m_pStream ) vlc_stream_Delete( m_pStream );
 }
 
 

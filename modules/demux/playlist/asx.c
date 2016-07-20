@@ -133,7 +133,7 @@ static void ReadElement( xml_reader_t *p_xml_reader, char **ppsz_txt )
 static bool PeekASX( demux_t *p_demux )
 {
     const uint8_t *p_peek;
-    return ( stream_Peek( p_demux->s, &p_peek, 12 ) == 12
+    return ( vlc_stream_Peek( p_demux->s, &p_peek, 12 ) == 12
              && !memcmp( p_peek, "<asx version", 12 ) );
 }
 

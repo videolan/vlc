@@ -77,7 +77,7 @@ static int Open (vlc_object_t *obj)
 
     /* Auto detection */
     const uint8_t *peek;
-    if (stream_Peek (demux->s, &peek, 4) < 4)
+    if (vlc_stream_Peek (demux->s, &peek, 4) < 4)
         return VLC_EGENERIC;
 
     const char *type = gme_identify_header (peek);
@@ -88,7 +88,7 @@ static int Open (vlc_object_t *obj)
     block_t *data = NULL;
     if (size <= 0)
     {
-        data = stream_Block (demux->s, 1 << 24);
+        data = vlc_stream_Block (demux->s, 1 << 24);
         if (data == NULL)
             return VLC_EGENERIC;
     }
@@ -178,7 +178,7 @@ static gme_err_t ReaderStream (void *data, void *buf, int length)
 {
     stream_t *s = data;
 
-    if (stream_Read (s, buf, length) < length)
+    if (vlc_stream_Read (s, buf, length) < length)
         return "short read";
     return NULL;
 }

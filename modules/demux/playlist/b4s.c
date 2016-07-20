@@ -74,7 +74,7 @@ static int Demux( demux_t *p_demux )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    free( stream_ReadLine( p_demux->s ) );
+    free( vlc_stream_ReadLine( p_demux->s ) );
 
     p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )

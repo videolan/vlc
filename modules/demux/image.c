@@ -114,7 +114,7 @@ static block_t *Load(demux_t *demux)
     const unsigned max_size = 4096 * 4096 * 8;
     uint64_t size;
 
-    if (stream_GetSize(demux->s, &size) == VLC_SUCCESS) {
+    if (vlc_stream_GetSize(demux->s, &size) == VLC_SUCCESS) {
         if (size > max_size) {
             msg_Err(demux, "image too large (%"PRIu64" > %u), rejected",
                     size, max_size);
@@ -127,7 +127,7 @@ static block_t *Load(demux_t *demux)
     if (block == NULL)
         return NULL;
 
-    ssize_t val = stream_Read(demux->s, block->p_buffer, size);
+    ssize_t val = vlc_stream_Read(demux->s, block->p_buffer, size);
     if (val < 0) {
         block_Release(block);
         return NULL;
@@ -291,7 +291,7 @@ static int Control(demux_t *demux, int query, va_list args)
 static bool IsBmp(stream_t *s)
 {
     const uint8_t *header;
-    if (stream_Peek(s, &header, 18) < 18)
+    if (vlc_stream_Peek(s, &header, 18) < 18)
         return false;
     if (memcmp(header, "BM", 2) &&
         memcmp(header, "BA", 2) &&
@@ -316,7 +316,7 @@ static bool IsBmp(stream_t *s)
 static bool IsPcx(stream_t *s)
 {
     const uint8_t *header;
-    if (stream_Peek(s, &header, 66) < 66)
+    if (vlc_stream_Peek(s, &header, 66) < 66)
         return false;
     if (header[0] != 0x0A ||                        /* marker */
         (header[1] != 0x00 && header[1] != 0x02 &&
@@ -336,7 +336,7 @@ static bool IsPcx(stream_t *s)
 static bool IsLbm(stream_t *s)
 {
     const uint8_t *header;
-    if (stream_Peek(s, &header, 12) < 12)
+    if (vlc_stream_Peek(s, &header, 12) < 12)
         return false;
     if (memcmp(&header[0], "FORM", 4) ||
         GetDWBE(&header[4]) <= 4 ||
@@ -351,7 +351,7 @@ static bool IsPnmBlank(uint8_t v)
 static bool IsPnm(stream_t *s)
 {
     const uint8_t *header;
-    int size = stream_Peek(s, &header, 256);
+    int size = vlc_stream_Peek(s, &header, 256);
     if (size < 3)
         return false;
     if (header[0] != 'P' ||
@@ -392,7 +392,7 @@ static uint8_t FindJpegMarker(int *position, const uint8_t *data, int size)
 static bool IsJfif(stream_t *s)
 {
     const uint8_t *header;
-    int size = stream_Peek(s, &header, 256);
+    int size = vlc_stream_Peek(s, &header, 256);
     int position = 0;
 
     if (FindJpegMarker(&position, header, size) != 0xd8)
@@ -410,7 +410,7 @@ static bool IsJfif(stream_t *s)
 static bool IsSpiff(stream_t *s)
 {
     const uint8_t *header;
-    if (stream_Peek(s, &header, 36) < 36) /* SPIFF header size */
+    if (vlc_stream_Peek(s, &header, 36) < 36) /* SPIFF header size */
         return false;
     if (header[0] != 0xff || header[1] != 0xd8 ||
         header[2] != 0xff || header[3] != 0xe8)
@@ -423,7 +423,7 @@ static bool IsSpiff(stream_t *s)
 static bool IsExif(stream_t *s)
 {
     const uint8_t *header;
-    int size = stream_Peek(s, &header, 256);
+    int size = vlc_stream_Peek(s, &header, 256);
     int position = 0;
 
     if (FindJpegMarker(&position, header, size) != 0xd8)
@@ -460,7 +460,7 @@ static bool IsSVG(stream_t *s)
     if (!ext) return false;
 
     const uint8_t *header;
-    int size = stream_Peek(s, &header, 4096);
+    int size = vlc_stream_Peek(s, &header, 4096);
     int position = 0;
 
     const char xml[] = "<?xml version=\"";
@@ -494,7 +494,7 @@ static bool IsTarga(stream_t *s)
      * to have a look at the footer. But doing so can be slow. So
      * try to avoid it when possible */
     const uint8_t *header;
-    if (stream_Peek(s, &header, 18) < 18)   /* Targa fixed header */
+    if (vlc_stream_Peek(s, &header, 18) < 18)   /* Targa fixed header */
         return false;
     if (header[1] > 1)                      /* Color Map Type */
         return false;
@@ -519,17 +519,17 @@ static bool IsTarga(stream_t *s)
     if (size <= 18 + 26)
         return false;
     bool can_seek;
-    if (stream_Control(s, STREAM_CAN_SEEK, &can_seek) || !can_seek)
+    if (vlc_stream_Control(s, STREAM_CAN_SEEK, &can_seek) || !can_seek)
         return false;
 
-    const int64_t position = stream_Tell(s);
-    if (stream_Seek(s, size - 26))
+    const int64_t position = vlc_stream_Tell(s);
+    if (vlc_stream_Seek(s, size - 26))
         return false;
 
     const uint8_t *footer;
-    bool is_targa = stream_Peek(s, &footer, 26) >= 26 &&
+    bool is_targa = vlc_stream_Peek(s, &footer, 26) >= 26 &&
                     !memcmp(&footer[8], "TRUEVISION-XFILE.\x00", 18);
-    stream_Seek(s, position);
+    vlc_stream_Seek(s, position);
     return is_targa;
 }
 
@@ -635,7 +635,7 @@ static int Open(vlc_object_t *object)
                 break;
         } else {
             if (peek_size < img->marker_size)
-                peek_size = stream_Peek(demux->s, &peek, img->marker_size);
+                peek_size = vlc_stream_Peek(demux->s, &peek, img->marker_size);
             if (peek_size >= img->marker_size &&
                 !memcmp(peek, img->marker, img->marker_size))
                 break;

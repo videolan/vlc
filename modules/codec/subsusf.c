@@ -975,7 +975,7 @@ static void ParseUSFHeader( decoder_t *p_dec )
     stream_t      *p_sub = NULL;
     xml_reader_t  *p_xml_reader = NULL;
 
-    p_sub = stream_MemoryNew( VLC_OBJECT(p_dec),
+    p_sub = vlc_stream_MemoryNew( VLC_OBJECT(p_dec),
                               p_dec->fmt_in.p_extra,
                               p_dec->fmt_in.i_extra,
                               true );
@@ -994,7 +994,7 @@ static void ParseUSFHeader( decoder_t *p_dec )
 
         xml_ReaderDelete( p_xml_reader );
     }
-    stream_Delete( p_sub );
+    vlc_stream_Delete( p_sub );
 }
 
 /* Function now handles tags which has attribute values, and tries

@@ -115,7 +115,7 @@ static int Open( vlc_object_t * p_this )
     es_format_t fmt;
 
     /* Have a peep at the show. */
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
     if( p_peek[0]!='f' || p_peek[1]!='L' || p_peek[2]!='a' || p_peek[3]!='C' )
     {
@@ -214,9 +214,10 @@ static void Close( vlc_object_t * p_this )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    block_t     *p_block_in, *p_block_out;
+    block_t *p_block_out;
 
-    bool b_eof = !( p_block_in = stream_Block( p_demux->s, FLAC_PACKET_SIZE ) );
+    block_t *p_block_in = vlc_stream_Block( p_demux->s, FLAC_PACKET_SIZE );
+    bool b_eof = p_block_in == NULL;
 
     if ( p_block_in )
     {
@@ -295,7 +296,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
     int i;
 
     /* */
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_seekable );
+    vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_seekable );
     if( !b_seekable )
         return VLC_EGENERIC;
 
@@ -311,7 +312,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
     /* XXX We do exact seek if it's not too far away(45s) */
     if( i_delta_time < CLOCK_FREQ * 45 )
     {
-        if( stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos ) )
+        if( vlc_stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos ) )
             return VLC_EGENERIC;
 
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_time );
@@ -343,7 +344,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
             i_delta_offset = (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) * (i_delta_time / i_time_align) /
                              ((i_next_time-p_sys->seekpoint[i]->i_time_offset) / i_time_align);
 
-        if( stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos + i_delta_offset ) )
+        if( vlc_stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos + i_delta_offset ) )
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -512,7 +513,7 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
     TAB_APPEND( p_sys->i_seekpoint, p_sys->seekpoint, s );
 
     uint8_t header[4];
-    if( stream_Read( p_demux->s, header, 4) < 4)
+    if( vlc_stream_Read( p_demux->s, header, 4) < 4)
         return VLC_EGENERIC;
 
     if (memcmp(header, "fLaC", 4))
@@ -524,7 +525,7 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
         int i_len;
         int i_type;
 
-        i_peek = stream_Peek( p_demux->s, &p_peek, 4 );
+        i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 4 );
         if( i_peek < 4 )
             break;
         b_last = p_peek[0]&0x80;
@@ -543,12 +544,13 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
             if( *pp_streaminfo == NULL )
                 return VLC_EGENERIC;
 
-            if( stream_Read( p_demux->s, NULL, 4) < 4)
+            if( vlc_stream_Read( p_demux->s, NULL, 4) < 4)
             {
                 free( *pp_streaminfo );
                 return VLC_EGENERIC;
             }
-            if( stream_Read( p_demux->s, *pp_streaminfo, STREAMINFO_SIZE ) != STREAMINFO_SIZE )
+            if( vlc_stream_Read( p_demux->s, *pp_streaminfo,
+                                 STREAMINFO_SIZE ) != STREAMINFO_SIZE )
             {
                 msg_Err( p_demux, "failed to read STREAMINFO metadata block" );
                 free( *pp_streaminfo );
@@ -563,29 +565,29 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
         }
         else if( i_type == META_SEEKTABLE )
         {
-            i_peek = stream_Peek( p_demux->s, &p_peek, 4+i_len );
+            i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 4+i_len );
             if( i_peek == 4+i_len )
                 ParseSeekTable( p_demux, p_peek, i_peek, i_sample_rate );
         }
         else if( i_type == META_COMMENT )
         {
-            i_peek = stream_Peek( p_demux->s, &p_peek, 4+i_len );
+            i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 4+i_len );
             if( i_peek == 4+i_len )
                 ParseComment( p_demux, p_peek, i_peek );
         }
         else if( i_type == META_PICTURE )
         {
-            i_peek = stream_Peek( p_demux->s, &p_peek, 4+i_len );
+            i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 4+i_len );
             if( i_peek == 4+i_len )
                 ParsePicture( p_demux, p_peek, i_peek );
         }
 
-        if( stream_Read( p_demux->s, NULL, 4+i_len ) < 4+i_len )
+        if( vlc_stream_Read( p_demux->s, NULL, 4+i_len ) < 4+i_len )
             break;
     }
 
     /* */
-    p_sys->i_data_pos = stream_Tell( p_demux->s );
+    p_sys->i_data_pos = vlc_stream_Tell( p_demux->s );
 
     if (!*pp_streaminfo)
         return VLC_EGENERIC;

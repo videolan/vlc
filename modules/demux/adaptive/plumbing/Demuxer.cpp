@@ -96,7 +96,7 @@ bool Demuxer::create()
                          p_newstream, p_es_out );
     if(!p_demux)
     {
-        stream_Delete(p_newstream);
+        vlc_stream_Delete(p_newstream);
         b_eof = true;
         return false;
     }
