@@ -642,17 +642,19 @@ void PLModel::rebuild( playlist_item_t *p_root )
 {
     beginResetModel();
 
-    PL_LOCK;
-    if( rootItem ) rootItem->clearChildren();
-    if( p_root ) // Can be NULL
     {
-        if ( rootItem ) delete rootItem;
-        rootItem = new PLItem( p_root );
+        vlc_playlist_locker pl_lock ( THEPL );
+
+        if( rootItem ) rootItem->clearChildren();
+        if( p_root ) // Can be NULL
+        {
+            if ( rootItem ) delete rootItem;
+            rootItem = new PLItem( p_root );
+        }
+        assert( rootItem );
+        /* Recreate from root */
+        updateChildren( rootItem );
     }
-    assert( rootItem );
-    /* Recreate from root */
-    updateChildren( rootItem );
-    PL_UNLOCK;
 
     /* And signal the view */
     endResetModel();
