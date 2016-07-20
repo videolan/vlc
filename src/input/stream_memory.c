@@ -74,7 +74,6 @@ stream_t *stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     s->pf_read    = Read;
     s->pf_seek    = Seek;
     s->pf_control = Control;
-    s->p_input = NULL;
 
     return s;
 }
