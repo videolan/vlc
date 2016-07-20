@@ -266,10 +266,11 @@ void PLModel::activateItem( const QModelIndex &index )
     assert( index.isValid() );
     const PLItem *item = getItem( index );
     assert( item );
-    PL_LOCK;
+
+    vlc_playlist_locker pl_lock( THEPL );
+
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_playlist_id );
     activateItem( p_item );
-    PL_UNLOCK;
 }
 
 /* Convenient overloaded private version of activateItem
