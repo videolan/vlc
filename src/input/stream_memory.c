@@ -29,22 +29,34 @@
 
 struct stream_sys_t
 {
-    bool  i_preserve_memory;
     size_t    i_pos;      /* Current reading offset */
     size_t    i_size;
     uint8_t  *p_buffer;
-
 };
 
 static ssize_t Read( stream_t *, void *p_read, size_t i_read );
 static int Seek( stream_t *, uint64_t );
 static int  Control( stream_t *, int i_query, va_list );
-static void Delete ( stream_t * );
+
+static void stream_MemoryPreserveDelete(stream_t *s)
+{
+    free(s->p_sys);
+}
+
+static void stream_MemoryDelete(stream_t *s)
+{
+    stream_sys_t *sys = s->p_sys;
+
+    free(sys->p_buffer);
+    stream_MemoryPreserveDelete(s);
+}
 
 stream_t *(stream_MemoryNew)(vlc_object_t *p_this, uint8_t *p_buffer,
-                             size_t i_size, bool i_preserve_memory)
+                             size_t i_size, bool preserve)
 {
-    stream_t *s = stream_CommonNew( p_this, Delete );
+    stream_t *s = stream_CommonNew( p_this,
+                                    preserve ? stream_MemoryPreserveDelete
+                                             : stream_MemoryDelete );
     stream_sys_t *p_sys;
 
     if( !s )
@@ -59,19 +71,12 @@ stream_t *(stream_MemoryNew)(vlc_object_t *p_this, uint8_t *p_buffer,
     p_sys->i_pos = 0;
     p_sys->i_size = i_size;
     p_sys->p_buffer = p_buffer;
-    p_sys->i_preserve_memory = i_preserve_memory;
 
     s->pf_read    = Read;
     s->pf_seek    = Seek;
     s->pf_control = Control;
 
     return s;
-}
-
-static void Delete( stream_t *s )
-{
-    if( !s->p_sys->i_preserve_memory ) free( s->p_sys->p_buffer );
-    free( s->p_sys );
 }
 
 /****************************************************************************
