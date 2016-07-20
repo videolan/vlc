@@ -38,6 +38,55 @@ static void media_parse_ended(const libvlc_event_t *event, void *user_data)
     vlc_sem_post (sem);
 }
 
+static void print_media(libvlc_media_t *media)
+{
+    libvlc_media_track_t **pp_tracks;
+    unsigned i_count = libvlc_media_tracks_get(media, &pp_tracks);
+    if (i_count > 0)
+    {
+        for (unsigned i = 0; i < i_count; ++i)
+        {
+            libvlc_media_track_t *p_track = pp_tracks[i];
+            log("\ttrack(%d/%d): codec: %4.4s/%4.4s, ", i, p_track->i_id,
+                (const char *)&p_track->i_codec,
+                (const char *)&p_track->i_original_fourcc);
+            switch (p_track->i_type)
+            {
+            case libvlc_track_audio:
+                printf("audio: channels: %u, rate: %u\n",
+                       p_track->audio->i_channels, p_track->audio->i_rate);
+                break;
+            case libvlc_track_video:
+                printf("video: %ux%u, sar: %u/%u, fps: %u/%u\n",
+                       p_track->video->i_width, p_track->video->i_height,
+                       p_track->video->i_sar_num, p_track->video->i_sar_den,
+                       p_track->video->i_frame_rate_num, p_track->video->i_frame_rate_den);
+                break;
+            case libvlc_track_text:
+                printf("text: %s\n", p_track->subtitle->psz_encoding);
+                break;
+            case libvlc_track_unknown:
+                printf("unknown\n");
+                break;
+            default:
+                vlc_assert_unreachable();
+            }
+        }
+        libvlc_media_tracks_release(pp_tracks, i_count);
+    }
+    else
+        log("\tmedia doesn't have any tracks\n");
+
+    for (enum libvlc_meta_t i = libvlc_meta_Title;
+         i <= libvlc_meta_DiscTotal; ++i)
+    {
+        char *psz_meta = libvlc_media_get_meta(media, i);
+        if (psz_meta != NULL)
+            log("\tmeta(%d): '%s'\n", i, psz_meta);
+        free(psz_meta);
+    }
+}
+
 static void test_media_preparsed(int argc, const char** argv,
                                  const char *path,
                                  const char *location,
@@ -74,6 +123,8 @@ static void test_media_preparsed(int argc, const char** argv,
 
     // We are good, now check Elementary Stream info.
     assert (libvlc_media_get_parsed_status(media) == i_expected_status);
+    if (i_expected_status == libvlc_media_parsed_status_done)
+        print_media(media);
 
     libvlc_media_release (media);
     libvlc_release (vlc);
