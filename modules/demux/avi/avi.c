@@ -1405,7 +1405,8 @@ static int Demux_UnSeekable( demux_t *p_demux )
                     return VLC_DEMUXER_EOF;
                 default:
                     msg_Warn( p_demux,
-                              "seems to have lost position @%ld, resync", stream_Tell(p_demux->s) );
+                              "seems to have lost position @%"PRIu64", resync",
+                              stream_Tell(p_demux->s) );
                     if( AVI_PacketSearch( p_demux ) )
                     {
                         msg_Err( p_demux, "resync failed" );
