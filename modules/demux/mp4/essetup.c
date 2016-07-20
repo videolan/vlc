@@ -948,6 +948,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         if ( BOXDATA(p_chan)->layout.i_channels_layout_tag == MP4_CHAN_USE_CHANNELS_BITMAP )
         {
             uint32_t rgi_chans_sequence[AOUT_CHAN_MAX + 1];
+            memset(rgi_chans_sequence, 0, sizeof(rgi_chans_sequence));
             uint16_t i_vlc_mapping = 0;
             uint8_t i_channels = 0;
             const uint32_t i_bitmap = BOXDATA(p_chan)->layout.i_channels_bitmap;
