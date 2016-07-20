@@ -844,8 +844,9 @@ void PLModel::filter( const QString& search_text, const QModelIndex & idx, bool 
     latestSearch = search_text;
 
     /** \todo Fire the search with a small delay ? */
-    PL_LOCK;
     {
+        vlc_playlist_locker pl_lock ( THEPL );
+
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                             itemId( idx, PLAYLIST_ID ) );
         assert( p_root );
@@ -863,11 +864,10 @@ void PLModel::filter( const QString& search_text, const QModelIndex & idx, bool 
             updateChildren( searchRoot ); // The PL_LOCK is needed here
             endInsertRows();
 
-            PL_UNLOCK;
             return;
         }
     }
-    PL_UNLOCK;
+
     rebuild();
 }
 
