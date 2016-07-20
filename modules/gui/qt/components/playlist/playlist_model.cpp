@@ -197,64 +197,62 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
                calloc( inputItems.count(), sizeof( playlist_item_t* ) );
     if ( !pp_items ) return;
 
-    PL_LOCK;
+    int model_pos;
 
-    playlist_item_t *p_parent =
-        playlist_ItemGetByInput( p_playlist, target->inputItem() );
-
-    if( !p_parent || row > p_parent->i_children )
     {
-        PL_UNLOCK;
-        free( pp_items );
-        return;
-    }
+        vlc_playlist_locker pl_lock ( THEPL );
 
-    int new_pos = row == -1 ? p_parent->i_children : row;
-    int model_pos = new_pos;
-    int i = 0;
+        playlist_item_t *p_parent =
+            playlist_ItemGetByInput( p_playlist, target->inputItem() );
 
-    foreach( input_item_t *p_input, inputItems )
-    {
-        playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
-        if( !p_item ) continue;
-
-        PLItem *item = findByInputId( rootItem, p_input->i_id );
-        if( !item ) continue;
-
-        /* Better not try to move a node into itself.
-           Abort the whole operation in that case,
-           because it is ambiguous. */
-        AbstractPLItem *climber = target;
-        while( climber )
+        if( !p_parent || row > p_parent->i_children )
         {
-            if( climber == item )
-            {
-                PL_UNLOCK;
-                free( pp_items );
-                return;
-            }
-            climber = climber->parent();
+            free( pp_items );
+            return;
         }
 
-        if( item->parent() == target &&
-            target->children.indexOf( item ) < new_pos )
-            model_pos--;
+        int new_pos = model_pos = row == -1 ? p_parent->i_children : row;
+        int i = 0;
 
-        model_items.append( item );
-        pp_items[i] = p_item;
-        i++;
+        foreach( input_item_t *p_input, inputItems )
+        {
+            playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
+            if( !p_item ) continue;
+
+            PLItem *item = findByInputId( rootItem, p_input->i_id );
+            if( !item ) continue;
+
+            /* Better not try to move a node into itself.
+               Abort the whole operation in that case,
+               because it is ambiguous. */
+            AbstractPLItem *climber = target;
+            while( climber )
+            {
+                if( climber == item )
+                {
+                    free( pp_items );
+                    return;
+                }
+                climber = climber->parent();
+            }
+
+            if( item->parent() == target &&
+                target->children.indexOf( item ) < new_pos )
+                model_pos--;
+
+            model_items.append( item );
+            pp_items[i] = p_item;
+            i++;
+        }
+
+        if( model_items.isEmpty() )
+        {
+            free( pp_items );
+            return;
+        }
+
+        playlist_TreeMoveMany( p_playlist, i, pp_items, p_parent, new_pos );
     }
-
-    if( model_items.isEmpty() )
-    {
-        PL_UNLOCK;
-        free( pp_items );
-        return;
-    }
-
-    playlist_TreeMoveMany( p_playlist, i, pp_items, p_parent, new_pos );
-
-    PL_UNLOCK;
 
     foreach( PLItem *item, model_items )
         takeItem( item );
