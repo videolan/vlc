@@ -614,18 +614,18 @@ void PLModel::processItemAppend( int i_pl_itemid, int i_pl_itemidparent )
         if( existing->id( PLAYLIST_ID ) == i_pl_itemid ) return;
 
     /* Find the child */
-    PL_LOCK;
-    p_item = playlist_ItemGetById( p_playlist, i_pl_itemid );
-    if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG )
     {
-        PL_UNLOCK; return;
+        vlc_playlist_locker pl_lock ( THEPL );
+
+        p_item = playlist_ItemGetById( p_playlist, i_pl_itemid );
+        if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG )
+            return;
+
+        for( pos = p_item->p_parent->i_children - 1; pos >= 0; pos-- )
+            if( p_item->p_parent->pp_children[pos] == p_item ) break;
+
+        newItem = new PLItem( p_item, nodeParentItem );
     }
-
-    for( pos = p_item->p_parent->i_children - 1; pos >= 0; pos-- )
-        if( p_item->p_parent->pp_children[pos] == p_item ) break;
-
-    newItem = new PLItem( p_item, nodeParentItem );
-    PL_UNLOCK;
 
     /* We insert the newItem (children) inside the parent */
     beginInsertRows( index( nodeParentItem, 0 ), pos, pos );
