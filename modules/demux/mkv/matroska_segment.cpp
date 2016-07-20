@@ -1249,8 +1249,9 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         E_CASE_DEFAULT( element )
         {
             VLC_UNUSED(element);
-            msg_Err( vars.p_demuxer, "invalid level = %d", vars.obj->ep->GetLevel() );
-            throw VLC_EGENERIC;
+
+            msg_Warn( vars.p_demuxer, "unknown element at { fpos: %" PRId64 ", '%s' }",
+              element.GetElementPosition(), typeid( element ).name() );
         }
     };
 
