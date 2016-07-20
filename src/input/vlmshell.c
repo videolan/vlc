@@ -583,26 +583,40 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
         }
         else if( !strcmp( ppsz_property[i], "append" ) )
         {
-            char *psz_line;
-            int j;
+            char *psz_line, *psz_realloc;
+            int j, i_ret = VLC_SUCCESS;
             /* Beware: everything behind append is considered as
              * command line */
 
             if( ++i >= i_property )
                 break;
 
-            psz_line = xstrdup( ppsz_property[i] );
+            psz_line = strdup( ppsz_property[i] );
+            if( unlikely(psz_line == NULL) )
+                goto error;
+
             for( j = i+1; j < i_property; j++ )
             {
-                psz_line = xrealloc( psz_line,
-                        strlen(psz_line) + strlen(ppsz_property[j]) + 1 + 1 );
-                strcat( psz_line, " " );
-                strcat( psz_line, ppsz_property[j] );
+                psz_realloc = realloc( psz_line,
+                                       strlen(psz_line) + strlen(ppsz_property[j]) + 1 + 1 );
+                if( likely(psz_realloc) )
+                {
+                    psz_line = psz_realloc;
+                    strcat( psz_line, " " );
+                    strcat( psz_line, ppsz_property[j] );
+                }
+                else
+                {
+                    i_ret = VLC_ENOMEM;
+                    break;
+                }
             }
 
-            int val = vlm_ScheduleSetup( p_schedule, "append", psz_line );
+            if( i_ret == VLC_SUCCESS )
+                i_ret = vlm_ScheduleSetup( p_schedule, "append", psz_line );
             free( psz_line );
-            if( val )
+
+            if( i_ret )
                 goto error;
             break;
         }
