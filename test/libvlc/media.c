@@ -41,6 +41,7 @@ static void media_parse_ended(const libvlc_event_t *event, void *user_data)
 static void test_media_preparsed(int argc, const char** argv,
                                  const char *path,
                                  const char *location,
+                                 libvlc_media_parse_flag_t parse_flags,
                                  libvlc_media_parsed_status_t i_expected_status)
 {
     log ("test_media_preparsed: %s, expected: %d\n", path ? path : location,
@@ -64,7 +65,7 @@ static void test_media_preparsed(int argc, const char** argv,
     libvlc_event_attach (em, libvlc_MediaParsedChanged, media_parse_ended, &sem);
 
     // Parse the media. This is synchronous.
-    int i_ret = libvlc_media_parse_with_options(media, libvlc_media_parse_local, -1);
+    int i_ret = libvlc_media_parse_with_options(media, parse_flags, -1);
     assert(i_ret == 0);
 
     // Wait for preparsed event
@@ -232,18 +233,43 @@ static void test_media_subitems(int argc, const char** argv)
     libvlc_release (vlc);
 }
 
-int main (void)
+int main(int i_argc, char *ppsz_argv[])
 {
     test_init();
 
+    char *psz_test_arg = i_argc > 1 ? ppsz_argv[1] : NULL;
+    if (psz_test_arg != NULL)
+    {
+        alarm(0);
+        const char *psz_test_url;
+        const char *psz_test_path;
+        if (strstr(psz_test_arg, "://") != NULL)
+        {
+            psz_test_url = psz_test_arg;
+            psz_test_path = NULL;
+        }
+        else
+        {
+            psz_test_url = NULL;
+            psz_test_path = psz_test_arg;
+        }
+        test_media_preparsed (test_defaults_nargs, test_defaults_args, psz_test_path,
+                              psz_test_url, libvlc_media_parse_network,
+                              libvlc_media_parsed_status_done);
+        return 0;
+    }
+
     test_media_preparsed (test_defaults_nargs, test_defaults_args,
                           SRCDIR"/samples/image.jpg", NULL,
+                          libvlc_media_parse_local,
                           libvlc_media_parsed_status_done);
     test_media_preparsed (test_defaults_nargs, test_defaults_args,
                           NULL, "http://parsing_should_be_skipped.org/video.mp4",
+                          libvlc_media_parse_local,
                           libvlc_media_parsed_status_skipped);
     test_media_preparsed (test_defaults_nargs, test_defaults_args,
                           NULL, "unknown://parsing_should_be_skipped.org/video.mp4",
+                          libvlc_media_parse_local,
                           libvlc_media_parsed_status_skipped);
     test_media_subitems (test_defaults_nargs, test_defaults_args);
 
