@@ -167,7 +167,13 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
     /* Audio format */
     psz_format = var_InheritString( p_aout, "audiofile-format" );
-    if ( !psz_format ) abort(); /* FIXME */
+    if ( !psz_format ) /* FIXME */
+    {
+        if( p_aout->sys->p_file != stdout )
+            fclose( p_aout->sys->p_file );
+        free( p_aout->sys );
+        return VLC_EGENERIC;
+    }
 
     while ( *ppsz_compare != NULL )
     {
