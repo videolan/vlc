@@ -41,18 +41,8 @@ static int Seek( stream_t *, uint64_t );
 static int  Control( stream_t *, int i_query, va_list );
 static void Delete ( stream_t * );
 
-#undef stream_MemoryNew
-/**
- * Create a stream from a memory buffer
- *
- * \param p_this the calling vlc_object
- * \param p_buffer the memory buffer for the stream
- * \param i_buffer the size of the buffer
- * \param i_preserve_memory if this is set to false the memory buffer
- *        pointed to by p_buffer is freed on stream_Destroy
- */
-stream_t *stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
-                            uint64_t i_size, bool i_preserve_memory )
+stream_t *(stream_MemoryNew)(vlc_object_t *p_this, uint8_t *p_buffer,
+                             size_t i_size, bool i_preserve_memory)
 {
     stream_t *s = stream_CommonNew( p_this, Delete );
     stream_sys_t *p_sys;

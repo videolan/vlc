@@ -196,11 +196,18 @@ static inline char *stream_ContentType( stream_t *s )
 }
 
 /**
- * Create a stream_t reading from memory.
- * You must delete it using stream_Delete.
+ * Create a stream from a memory buffer.
+ *
+ * \param obj parent VLC object
+ * \param base start address of the memory buffer to read from
+ * \param size size in bytes of the memory buffer
+ * \param preserve if false, free(base) will be called when the stream is
+ *                 destroyed; if true, the memory buffer is preserved
  */
-VLC_API stream_t * stream_MemoryNew(vlc_object_t *p_obj, uint8_t *p_buffer, uint64_t i_size, bool b_preserve_memory );
-#define stream_MemoryNew( a, b, c, d ) stream_MemoryNew( VLC_OBJECT(a), b, c, d )
+VLC_API stream_t *stream_MemoryNew(vlc_object_t *obj, uint8_t *base,
+                                   size_t size, bool preserve) VLC_USED;
+#define stream_MemoryNew(a, b, c, d) \
+        stream_MemoryNew(VLC_OBJECT(a), b, c, d)
 
 /**
  * Create a stream_t reading from a URL.
