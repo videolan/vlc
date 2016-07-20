@@ -355,7 +355,7 @@ libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis )
 }
 
 void
-libvlc_media_discoverer_list_release( libvlc_media_discoverer_description **pp_services,
+libvlc_media_discoverer_list_release( libvlc_media_discoverer_description_t **pp_services,
                                       size_t i_count )
 {
     if( i_count > 0 )
@@ -372,8 +372,8 @@ libvlc_media_discoverer_list_release( libvlc_media_discoverer_description **pp_s
 
 ssize_t
 libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
-                                  libvlc_media_discoverer_category i_cat,
-                                  libvlc_media_discoverer_description ***ppp_services )
+                                  libvlc_media_discoverer_category_t i_cat,
+                                  libvlc_media_discoverer_description_t ***ppp_services )
 {
     assert( p_inst != NULL && ppp_services != NULL );
 
@@ -420,7 +420,7 @@ libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
             i_nb_services++;
     }
 
-    libvlc_media_discoverer_description **pp_services = NULL, *p_services = NULL;
+    libvlc_media_discoverer_description_t **pp_services = NULL, *p_services = NULL;
     if( i_nb_services > 0 )
     {
         /* Double alloc here, so that the caller iterates through pointers of
@@ -428,9 +428,9 @@ libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
          * without breaking the API. */
 
         pp_services = malloc( i_nb_services
-                              * sizeof(libvlc_media_discoverer_description *) );
+                              * sizeof(libvlc_media_discoverer_description_t *) );
         p_services = malloc( i_nb_services
-                             * sizeof(libvlc_media_discoverer_description) );
+                             * sizeof(libvlc_media_discoverer_description_t) );
         if( pp_services == NULL || p_services == NULL )
         {
             free( pp_services );
@@ -448,7 +448,7 @@ libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
     ppsz_name = ppsz_names;
     p_category = p_categories;
     unsigned int i_service_idx = 0;
-    libvlc_media_discoverer_description *p_service = p_services;
+    libvlc_media_discoverer_description_t *p_service = p_services;
     for( ; *ppsz_name != NULL; ppsz_name++, ppsz_longname++, p_category++ )
     {
         if( pp_services != NULL && *p_category == i_core_cat )

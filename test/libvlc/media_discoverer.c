@@ -114,15 +114,15 @@ main(int i_argc, char *ppsz_argv[])
         return 0;
     }
 
-    for(libvlc_media_discoverer_category i_cat = libvlc_media_discoverer_devices;
+    for(libvlc_media_discoverer_category_t i_cat = libvlc_media_discoverer_devices;
         i_cat <= libvlc_media_discoverer_localdirs; i_cat ++)
     {
         log("== getting list of media_discoverer for %d category ==\n", i_cat);
 
-        libvlc_media_discoverer_description **pp_services;
-        unsigned int i_count =
+        libvlc_media_discoverer_description_t **pp_services;
+        ssize_t i_count =
             libvlc_media_discoverer_list_get(p_vlc, i_cat, &pp_services);
-        if (i_count == 0)
+        if (i_count <= 0)
         {
             log("warn: no discoverers (not critical)\n");
             continue;
@@ -131,7 +131,7 @@ main(int i_argc, char *ppsz_argv[])
 
         for (unsigned int i = 0; i < i_count; ++i)
         {
-            libvlc_media_discoverer_description *p_service = pp_services[i];
+            libvlc_media_discoverer_description_t *p_service = pp_services[i];
 
             assert(i_cat == p_service->i_cat);
             log("= discoverer: name: '%s', longname: '%s' =\n",

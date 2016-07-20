@@ -34,7 +34,7 @@ extern "C" {
  * Category of a media discoverer
  * \see libvlc_media_discoverer_list_get()
  */
-typedef enum libvlc_media_discoverer_category {
+typedef enum libvlc_media_discoverer_category_t {
     /** devices, like portable music player */
     libvlc_media_discoverer_devices,
     /** LAN/WAN services, like Upnp, SMB, or SAP */
@@ -43,17 +43,17 @@ typedef enum libvlc_media_discoverer_category {
     libvlc_media_discoverer_podcasts,
     /** Local directories, like Video, Music or Pictures directories */
     libvlc_media_discoverer_localdirs,
-} libvlc_media_discoverer_category;
+} libvlc_media_discoverer_category_t;
 
 /**
  * Media discoverer description
  * \see libvlc_media_discoverer_list_get()
  */
-typedef struct libvlc_media_discoverer_description {
+typedef struct libvlc_media_discoverer_description_t {
     char *psz_name;
     char *psz_longname;
-    libvlc_media_discoverer_category i_cat;
-} libvlc_media_discoverer_description;
+    libvlc_media_discoverer_category_t i_cat;
+} libvlc_media_discoverer_description_t;
 
 /** \defgroup libvlc_media_discoverer LibVLC media discovery
  * \ingroup libvlc
@@ -164,8 +164,8 @@ libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
  */
 LIBVLC_API ssize_t
 libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
-                                  libvlc_media_discoverer_category i_cat,
-                                  libvlc_media_discoverer_description ***ppp_services );
+                                  libvlc_media_discoverer_category_t i_cat,
+                                  libvlc_media_discoverer_description_t ***ppp_services );
 
 /**
  * Release an array of media discoverer services
@@ -178,7 +178,7 @@ libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
  * \param i_count number of elements in the array
  */
 LIBVLC_API void
-libvlc_media_discoverer_list_release( libvlc_media_discoverer_description **pp_services,
+libvlc_media_discoverer_list_release( libvlc_media_discoverer_description_t **pp_services,
                                       size_t i_count );
 
 /**@} */
