@@ -623,6 +623,14 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
         i_length += 1 + strlen( ppsz_filter[i] );
 
     char *psz_new = malloc( i_length + 1 );
+
+    if( unlikely( !psz_new ) )
+    {
+        free( ppsz_filter );
+        free( psz_list );
+        return false;
+    }
+
     *psz_new = '\0';
     for( int i = 0; i < i_count; i++ )
     {
