@@ -375,9 +375,12 @@ void MessagesDialog::updatePLTree()
 {
     playlist_t *p_playlist = THEPL;
     pldebugTree->clear();
-    PL_LOCK;
-    pldebugTree->addTopLevelItem( PLWalk( p_playlist->p_root_category ) );
-    PL_UNLOCK;
+
+    {
+        vlc_playlist_locker pl_lock ( THEPL );
+        pldebugTree->addTopLevelItem( PLWalk( p_playlist->p_root_category ) );
+    }
+
     pldebugTree->expandAll();
     for ( int i=0; i< 5; i++ )
         pldebugTree->resizeColumnToContents( i );
