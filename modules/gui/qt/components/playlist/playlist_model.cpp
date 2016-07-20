@@ -85,15 +85,13 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 
     if( canEdit() )
     {
-        PL_LOCK;
+        vlc_playlist_locker pl_lock ( THEPL );
+
         playlist_item_t *plItem =
             playlist_ItemGetById( p_playlist, item->i_playlist_id );
 
         if ( plItem && ( plItem->i_children > -1 ) )
             flags |= Qt::ItemIsDropEnabled;
-
-        PL_UNLOCK;
-
     }
     flags |= Qt::ItemIsDragEnabled;
 
