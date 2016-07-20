@@ -807,8 +807,9 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
         endRemoveRows( );
     }
 
-    PL_LOCK;
     {
+        vlc_playlist_locker pl_lock ( THEPL );
+
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         i_root_id );
         if( p_root )
@@ -826,7 +827,6 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
         updateChildren( item );
         endInsertRows( );
     }
-    PL_UNLOCK;
 
     /* if we have popup item, try to make sure that you keep that item visible */
     if( p_caller_item )
