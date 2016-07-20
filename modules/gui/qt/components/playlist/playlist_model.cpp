@@ -888,13 +888,13 @@ void PLModel::createNode( QModelIndex index, QString name )
 {
     if( name.isEmpty() || !index.isValid() ) return;
 
-    PL_LOCK;
+    vlc_playlist_locker pl_lock ( THEPL );
+
     index = index.parent();
     if ( !index.isValid() ) index = rootIndex();
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, itemId( index, PLAYLIST_ID ) );
     if( p_item )
         playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0, NULL );
-    PL_UNLOCK;
 }
 
 void PLModel::renameNode( QModelIndex index, QString name )
