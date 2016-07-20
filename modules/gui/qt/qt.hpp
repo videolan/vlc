@@ -98,6 +98,29 @@ struct intf_sys_t
 
 #define THEPL p_intf->p_sys->p_playlist
 
+/**
+ * This class may be used for scope-bound locking/unlocking
+ * of a playlist_t*. As hinted, the playlist is locked when
+ * the object is created, and unlocked when the object is
+ * destroyed.
+ */
+
+struct vlc_playlist_locker {
+    vlc_playlist_locker( playlist_t* p_playlist )
+        : p_playlist( p_playlist )
+    {
+        playlist_Lock( p_playlist ); 
+    }
+
+    ~vlc_playlist_locker()
+    {
+        playlist_Unlock( p_playlist );
+    }
+
+    private:
+        playlist_t* p_playlist;
+};
+
 #define THEDP DialogsProvider::getInstance()
 #define THEMIM MainInputManager::getInstance( p_intf )
 #define THEAM ActionsManager::getInstance( p_intf )
