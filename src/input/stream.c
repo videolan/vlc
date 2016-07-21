@@ -333,12 +333,8 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
     while (len > 0)
     {
         if (vlc_killed())
-        {
-            ret = -1;
-            break;
-        }
-
-        if (s->pf_read != NULL)
+            ret = 0;
+        else if (s->pf_read != NULL)
         {
             assert(priv->block == NULL);
             ret = s->pf_read(s, buf, len);
@@ -375,10 +371,12 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
             }
         }
         else
-            ret = -1;
+            ret = 0;
 
-        if (ret <= 0)
+        if (ret == 0)
             break;
+        if (ret < 0)
+            continue;
 
         assert((size_t)ret <= len);
         if (buf != NULL)
@@ -387,7 +385,7 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
         copy += ret;
     }
 
-    return (copy > 0) ? (ssize_t)copy : ret;
+    return copy;
 }
 
 ssize_t vlc_stream_Read(stream_t *s, void *buf, size_t len)
