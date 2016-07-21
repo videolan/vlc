@@ -20,6 +20,7 @@ pkginclude_HEADERS = \
 	../include/vlc/libvlc_media_list_player.h \
 	../include/vlc/libvlc_media_player.h \
 	../include/vlc/libvlc_vlm.h \
+	../include/vlc/libvlc_renderer_discoverer.h \
 	../include/vlc/vlc.h
 
 nodist_pkginclude_HEADERS = ../include/vlc/libvlc_version.h
@@ -37,6 +38,7 @@ libvlc_la_SOURCES = \
 	media_player_internal.h \
 	core.c \
 	dialog.c \
+	renderer_discoverer.c \
 	error.c \
 	log.c \
 	playlist.c \

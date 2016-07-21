@@ -34,6 +34,8 @@
 extern "C" {
 # endif
 
+typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
+
 /**
  * \ingroup libvlc_event
  * @{
@@ -110,6 +112,9 @@ enum libvlc_event_e {
      * libvlc_media_discoverer_stop()
      */
     libvlc_MediaDiscovererEnded,
+
+    libvlc_RendererDiscovererItemAdded,
+    libvlc_RendererDiscovererItemDeleted,
 
     libvlc_VlmMediaAdded=0x600,
     libvlc_VlmMediaRemoved,
@@ -269,6 +274,15 @@ typedef struct libvlc_event_t
         {
             const char *device;
         } media_player_audio_device;
+
+        struct
+        {
+            const libvlc_renderer_item_t *item;
+        } renderer_discoverer_item_added;
+        struct
+        {
+            const libvlc_renderer_item_t *item;
+        } renderer_discoverer_item_deleted;
     } u; /**< Type-dependent event description */
 } libvlc_event_t;
 

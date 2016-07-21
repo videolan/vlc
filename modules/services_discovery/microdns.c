@@ -249,6 +249,7 @@ static void
 items_timeout( struct discovery_sys *p_sys, services_discovery_t *p_sd,
                vlc_renderer_discovery_t *p_rd )
 {
+    assert( p_rd != NULL || p_sd != NULL );
     mtime_t i_now = mdate();
 
     /* Remove items that are not seen since TIMEOUT */
@@ -257,14 +258,11 @@ items_timeout( struct discovery_sys *p_sys, services_discovery_t *p_sd,
         struct item *p_item = vlc_array_item_at_index( &p_sys->items, i );
         if( i_now - p_item->i_last_seen > TIMEOUT )
         {
-            items_release( p_sys, p_item );
             if( p_sd != NULL )
                 services_discovery_RemoveItem( p_sd, p_item->p_input_item );
             else
-            {
-                assert( p_rd != NULL );
                 vlc_rd_remove_item( p_rd, p_item->p_renderer_item );
-            }
+            items_release( p_sys, p_item );
             vlc_array_remove( &p_sys->items, i-- );
         }
     }
