@@ -178,6 +178,23 @@ enum stream_query_e
 VLC_API ssize_t vlc_stream_Read(stream_t *, void *buf, size_t len) VLC_USED;
 
 /**
+ * Reads partial data from a byte stream.
+ *
+ * This function waits until some data is available for reading from the
+ * stream, a fatal error is encountered or the end-of-stream is reached.
+ *
+ * Unlike vlc_stream_Read(), this function does not wait for the full requested
+ * bytes count. It can return a short count even before the end of the stream
+ * and in the absence of any error.
+ *
+ * \param buf start of buffer to read data into [OUT]
+ * \param len buffer size (maximum number of bytes to read)
+ * \return the number of bytes read or a negative value on error.
+ */
+VLC_API ssize_t vlc_stream_ReadPartial(stream_t *, void *buf, size_t len)
+VLC_USED;
+
+/**
  * Peeks at data from a byte stream.
  *
  * This function buffers for the requested number of bytes, waiting if

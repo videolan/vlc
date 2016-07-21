@@ -430,6 +430,47 @@ ssize_t vlc_stream_Read(stream_t *s, void *buf, size_t len)
     return copy;
 }
 
+ssize_t vlc_stream_ReadPartial(stream_t *s, void *buf, size_t len)
+{
+    stream_priv_t *priv = (stream_priv_t *)s;
+
+    for (;;)
+    {
+        size_t avail = 0;
+
+        if (priv->peek != NULL)
+            avail += priv->peek->i_buffer;
+        if (priv->block != NULL)
+            avail += priv->block->i_buffer;
+        if (avail > 0)
+            return vlc_stream_Read(s, buf, (avail < len) ? avail : len);
+
+        if (s->pf_read != NULL)
+        {
+            ssize_t ret = s->pf_read(s, buf, len);
+            if (ret < 0)
+                return ret;
+
+            priv->offset += ret;
+            if (likely(len > 0))
+                priv->eof = !ret;
+
+            return ret;
+        }
+
+        if (s->pf_block != NULL)
+        {
+            bool eof;
+
+            priv->block = s->pf_block(s, &eof);
+            if (priv->block == NULL && eof)
+                return 0;
+        }
+        else
+            return 0;
+    }
+}
+
 ssize_t vlc_stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
 {
     stream_priv_t *priv = (stream_priv_t *)s;

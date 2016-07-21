@@ -411,6 +411,7 @@ vlc_stream_Peek
 vlc_stream_Read
 vlc_stream_ReadBlock
 vlc_stream_ReadLine
+vlc_stream_ReadPartial
 vlc_stream_Seek
 vlc_stream_Tell
 vlc_stream_NewMRL
