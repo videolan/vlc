@@ -317,7 +317,7 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     if (access->pf_block != NULL)
     {
         s->pf_block = AStreamReadBlock;
-        cachename = "cache_block";
+        cachename = "prefetch,cache_block";
     }
     else
     if (access->pf_read != NULL)

@@ -92,7 +92,7 @@ static int ThreadRead(stream_t *stream, size_t length)
 
     char *p = sys->buffer + (sys->buffer_offset % sys->buffer_size)
                           + sys->buffer_length;
-    ssize_t val = vlc_stream_Read(stream->p_source, p, length);
+    ssize_t val = vlc_stream_ReadPartial(stream->p_source, p, length);
 
     if (val < 0)
         msg_Err(stream, "cannot read data (at offset %"PRIu64")",
