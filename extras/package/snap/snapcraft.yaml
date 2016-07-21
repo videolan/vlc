@@ -1,0 +1,185 @@
+name: vlc
+version: "daily"
+summary: Read, capture, broadcast your multimedia streams
+description: |
+  VLC is a free and open source cross-platform multimedia player and
+  framework that plays most multimedia files as well as DVDs, Audio CDs,
+  VCDs, and various streaming protocols.
+confinement: strict
+
+apps:
+  vlc:
+    command: desktop-launch vlc
+    plugs:
+      - unity7
+      - network
+      - network-bind
+      - home
+      - opengl
+      - pulseaudio
+      - mount-observe
+      - optical-drive
+      - camera
+    slots:
+      - mpris
+
+parts:
+  vlc:
+    source: ../../../
+    source-type: git
+    plugin: autotools
+    build-packages:
+      - autopoint
+      - debhelper
+      - dh-autoreconf
+      - dh-buildinfo
+      - gettext
+      - liba52-0.7.4-dev
+      - libaa1-dev
+      - libasound2-dev
+      - libass-dev
+      - libavahi-client-dev
+      - libavc1394-dev
+      - libavcodec-dev
+      - libavformat-dev
+      - libbluray-dev
+      - libcaca-dev
+      - libcairo2-dev
+      - libcddb2-dev
+      - libcdio-dev
+      - libchromaprint-dev
+      - libcrystalhd-dev
+      - libdbus-1-dev
+      - libdc1394-22-dev
+      - libdca-dev
+      - libdirectfb-dev
+      - libdvbpsi-dev
+      - libdvdnav-dev
+      - libdvdread-dev
+      - libegl1-mesa-dev
+      - libfaad-dev
+      - libflac-dev
+      - libfluidsynth-dev
+      - libfreerdp-dev
+      - libfreetype6-dev
+      - libfribidi-dev
+      - libgl1-mesa-dev
+      - libgles1-mesa-dev
+      - libgles2-mesa-dev
+      - libgnutls28-dev
+      - libgtk2.0-dev
+      - libidn11-dev
+      - libiso9660-dev
+      - libjack-dev
+      - libkate-dev
+      - liblircclient-dev
+      - liblivemedia-dev
+      - liblua5.2-dev
+      - libmad0-dev
+      - libmatroska-dev
+      - libmodplug-dev
+      - libmpcdec-dev
+      - libmpeg2-4-dev
+      - libmtp-dev
+      - libncursesw5-dev
+      - libnotify-dev
+      - libogg-dev
+      - libomxil-bellagio-dev
+      - libopus-dev
+      - libpng12-dev
+      - libpostproc-dev
+      - libpulse-dev
+      - libqt5x11extras5-dev
+      - libraw1394-dev
+      - libresid-builder-dev
+      - librsvg2-dev
+      - libsamplerate0-dev
+      - libschroedinger-dev
+      - libsdl-image1.2-dev
+      - libsdl1.2-dev
+      - libshine-dev
+      - libshout3-dev
+      - libsidplay2-dev
+      - libsmbclient-dev
+      - libspeex-dev
+      - libspeexdsp-dev
+      - libssh2-1-dev
+      - libswscale-dev
+      - libtag1-dev
+      - libtheora-dev
+      - libtwolame-dev
+      - libudev-dev
+      - libupnp-dev
+      - libv4l-dev
+      - libva-dev
+      - libvcdinfo-dev
+      - libvdpau-dev
+      - libvncserver-dev
+      - libvorbis-dev
+      - libx11-dev
+      - libx264-dev
+      - libx265-dev
+      - libxcb-composite0-dev
+      - libxcb-keysyms1-dev
+      - libxcb-randr0-dev
+      - libxcb-shm0-dev
+      - libxcb-xv0-dev
+      - libxcb1-dev
+      - libxext-dev
+      - libxi-dev
+      - libxinerama-dev
+      - libxml2-dev
+      - libxpm-dev
+      - libzvbi-dev
+      - lua5.2
+      - pkg-config
+      - protobuf-compiler
+      - qtbase5-dev
+      - zlib1g-dev
+      - zsh
+    after: [desktop/qt5]
+
+  env:
+    plugin: nil
+    stage-packages:
+      - fonts-freefont-ttf
+      - libaa1
+      - libavcodec-ffmpeg56
+      - libavcodec-ffmpeg-extra56
+      - libavutil-ffmpeg54
+      - libcaca0
+      - libcairo2
+      - libegl1-mesa
+      - libfreerdp-client1.1
+      - libfreerdp-core1.1
+      - libfreerdp-gdi1.1
+      - libfreetype6
+      - libfribidi0
+      - libgcc1
+      - libgl1-mesa-glx
+      - libgles1-mesa
+      - libgles2-mesa
+      - libglib2.0-0
+      - libpulse0
+      - libqt5core5a
+      - librsvg2-2
+      - libsdl-image1.2
+      - libsdl1.2debian
+      - libva-drm1
+      - libva-x11-1
+      - libva1
+      - libvlccore8
+      - libvncclient1
+      - libx11-6
+      - libxcb-composite0
+      - libxcb-keysyms1
+      - libxcb-randr0
+      - libxcb-shm0
+      - libxcb-xv0
+      - libxcb1
+      - libxext6
+      - libxi6
+      - libxinerama1
+      - libxpm4
+      - zlib1g
+    after: [vlc] # VLC build fails if stage packages are present
