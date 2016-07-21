@@ -367,7 +367,10 @@ endif
 
 
 ### Common ###
+
 libflaschen_plugin_la_SOURCES = video_output/flaschen.c
+libflaschen_plugin_la_LIBADD = $(SOCKET_LIBS)
+
 libvdummy_plugin_la_SOURCES = video_output/vdummy.c
 libvmem_plugin_la_SOURCES = video_output/vmem.c
 libyuv_plugin_la_SOURCES = video_output/yuv.c
