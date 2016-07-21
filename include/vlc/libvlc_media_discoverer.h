@@ -72,10 +72,8 @@ typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;
 /**
  * Create a media discoverer object by name.
  *
- * After this object is created, you should attach to events in order to be
- * notified of the discoverer state.
- * You should also attach to media_list events in order to be notified of new
- * items discovered.
+ * After this object is created, you should attach to media_list events in
+ * order to be notified of new items discovered.
  *
  * You need to call libvlc_media_discoverer_start() in order to start the
  * discovery.
