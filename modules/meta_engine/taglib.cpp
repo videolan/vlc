@@ -165,7 +165,6 @@ public:
         : m_demux( p_demux )
         , m_previousPos( 0 )
     {
-        vlc_object_hold( m_demux );
     }
 
     ~VlcIostream()
