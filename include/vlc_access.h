@@ -56,24 +56,6 @@
  */
 VLC_API access_t *vlc_access_NewMRL(vlc_object_t *obj, const char *mrl);
 
-#define vlc_access_Delete vlc_stream_Delete
-
-/**
- * Sets the read byte offset.
- */
-#define vlc_access_Seek vlc_stream_Seek
-
-/**
- * Checks if end-of-stream is reached.
- */
-#define vlc_access_Eof vlc_stream_Eof
-
-#define vlc_access_Read vlc_stream_ReadPartial
-#define vlc_access_Block vlc_stream_ReadBlock
-#define access_vaControl vlc_stream_vaControl
-#define access_Control vlc_stream_Control
-#define access_GetSize stream_GetSize
-
 /**
  * \defgroup access_helper Access Helpers
  * @{

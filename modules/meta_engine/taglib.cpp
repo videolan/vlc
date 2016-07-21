@@ -169,7 +169,7 @@ public:
 
     ~VlcIostream()
     {
-        vlc_access_Delete( m_demux );
+        vlc_stream_Delete( m_demux );
     }
 
     FileName name() const
@@ -180,7 +180,7 @@ public:
     ByteVector readBlock(ulong length)
     {
         ByteVector res(length, 0);
-        int i_read = vlc_access_Read( m_demux, res.data(), length);
+        int i_read = vlc_stream_ReadPartial( m_demux, res.data(), length);
         if (i_read < 0)
             return ByteVector::null;;
         res.resize(i_read);
@@ -227,7 +227,7 @@ public:
             default:
                 break;
         }
-        vlc_access_Seek( m_demux, pos + offset );
+        vlc_stream_Seek( m_demux, pos + offset );
         m_previousPos = pos + offset;
     }
 
@@ -244,7 +244,7 @@ public:
     long length()
     {
         uint64_t i_size;
-        if (access_GetSize( m_demux, &i_size ) != VLC_SUCCESS)
+        if (vlc_stream_GetSize( m_demux, &i_size ) != VLC_SUCCESS)
             return -1;
         return i_size;
     }
