@@ -58,7 +58,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static block_t *BlockRead( access_t * );
+static block_t *BlockRead( access_t *, bool * );
 static int     Seek( access_t *, uint64_t );
 static int     Control( access_t *, int, va_list );
 
