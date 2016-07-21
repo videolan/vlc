@@ -2165,10 +2165,11 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
                  p_box->data.p_sample_soun->i_constbytesperaudiopacket,
                  p_box->data.p_sample_soun->i_constLPCMframesperaudiopacket );
 #endif
-        /* @72 bytes */
-        i_extoffset = VLC_CLIP( i_extoffset, i_read, p_box->i_size );
-        p_peek += i_extoffset;
-        i_read -= i_extoffset;
+        /* @72 bytes + */
+        if( i_extoffset > i_actually_read )
+            i_extoffset = i_actually_read;
+        p_peek = &p_buff[i_extoffset];
+        i_read = i_actually_read - i_extoffset;
     }
     else
     {
