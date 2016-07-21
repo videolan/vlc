@@ -1718,15 +1718,15 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
     int64_t i_read = p_box->i_size; \
     if( maxread < (uint64_t)i_read ) i_read = maxread;\
     uint8_t *p_peek, *p_buff; \
-    int i_actually_read; \
+    ssize_t i_actually_read; \
     if( !( p_peek = p_buff = malloc( i_read ) ) ) \
     { \
         return( 0 ); \
     } \
     i_actually_read = stream_Read( p_stream, p_peek, i_read ); \
-    if( i_actually_read < 0 || (int64_t)i_actually_read < i_read )\
+    if( i_actually_read < 0 || i_actually_read < i_read )\
     { \
-        msg_Warn( p_stream, "MP4_READBOX_ENTER: I got %i bytes, "\
+        msg_Warn( p_stream, "MP4_READBOX_ENTER: I got %zd bytes, "\
         "but I requested %" PRId64, i_actually_read, i_read );\
         free( p_buff ); \
         return( 0 ); \
