@@ -185,21 +185,17 @@ static block_t *AStreamReadBlock(stream_t *s, bool *restrict eof)
     input_thread_t *input = s->p_input;
     block_t * block;
 
-    do
+    if (vlc_stream_Eof(access))
     {
-        if (vlc_access_Eof(access))
-        {
-            *eof = true;
-            return NULL;
-        }
-        if (vlc_killed())
-            return NULL;
-
-        block = vlc_access_Block(access);
+        *eof = true;
+        return NULL;
     }
-    while (block == NULL);
+    if (vlc_killed())
+        return NULL;
 
-    if (input != NULL)
+    block = vlc_stream_ReadBlock(access);
+
+    if (block != NULL && input != NULL)
     {
         uint64_t total;
 
@@ -218,29 +214,15 @@ static ssize_t AStreamReadStream(stream_t *s, void *buf, size_t len)
 {
     access_t *access = s->p_sys;
     input_thread_t *input = s->p_input;
-    ssize_t val = 0;
-    char dummy[(buf != NULL) ? 1 : (len <= 2048) ? len : 2048];
 
-    if (buf == NULL)
-    {
-        buf = dummy;
-        len = sizeof (dummy);
-    }
+    if (vlc_stream_Eof(access))
+        return 0;
+    if (vlc_killed())
+        return -1;
 
-    do
-    {
-        if (vlc_access_Eof(access))
-            return 0;
-        if (vlc_killed())
-            return -1;
+    ssize_t val = vlc_stream_ReadPartial(access, buf, len);
 
-        val = vlc_access_Read(access, buf, len);
-        if (val == 0)
-            return 0; /* EOF */
-    }
-    while (val < 0);
-
-    if (input != NULL)
+    if (val > 0 && input != NULL)
     {
         uint64_t total;
 
@@ -267,21 +249,21 @@ static int AStreamSeek(stream_t *s, uint64_t offset)
 {
     access_t *access = s->p_sys;
 
-    return vlc_access_Seek(access, offset);
+    return vlc_stream_Seek(access, offset);
 }
 
 static int AStreamControl(stream_t *s, int cmd, va_list args)
 {
     access_t *access = s->p_sys;
 
-    return access_vaControl(access, cmd, args);
+    return vlc_stream_vaControl(access, cmd, args);
 }
 
 static void AStreamDestroy(stream_t *s)
 {
     access_t *access = s->p_sys;
 
-    vlc_access_Delete(access);
+    vlc_stream_Delete(access);
 }
 
 stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
