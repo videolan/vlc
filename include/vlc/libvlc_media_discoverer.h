@@ -158,9 +158,9 @@ libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
  * services (must be freed with libvlc_media_discoverer_list_release() by
  * the caller) [OUT]
  *
- * \return the number of media discoverer services or -1 on error
+ * \return the number of media discoverer services (0 on error)
  */
-LIBVLC_API ssize_t
+LIBVLC_API size_t
 libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
                                   libvlc_media_discoverer_category_t i_cat,
                                   libvlc_media_discoverer_description_t ***ppp_services );
