@@ -1,0 +1,20 @@
+Only in ffmpeg: .DS_Store
+diff -ru ffmpeg/libavcodec/audiotoolboxdec.c ffmpeg-fix/libavcodec/audiotoolboxdec.c
+--- ffmpeg/libavcodec/audiotoolboxdec.c	2016-05-09 11:44:29.000000000 +0200
++++ ffmpeg-fix/libavcodec/audiotoolboxdec.c	2016-05-09 14:01:04.000000000 +0200
+@@ -345,7 +345,6 @@
+         avctx->bit_rate = bit_rate;
+         in_format.mSampleRate = avctx->sample_rate;
+ #endif
+-#if CONFIG_AC3_AT_DECODER || CONFIG_EAC3_AT_DECODER
+     } else if (pkt && pkt->size >= 7 &&
+                (avctx->codec_id == AV_CODEC_ID_AC3 ||
+                 avctx->codec_id == AV_CODEC_ID_EAC3)) {
+@@ -358,7 +357,6 @@
+         in_format.mChannelsPerFrame = hdr.channels;
+         avctx->frame_size = hdr.num_blocks * 256;
+         avctx->bit_rate = hdr.bit_rate;
+-#endif
+     } else {
+         in_format.mSampleRate = avctx->sample_rate ? avctx->sample_rate : 44100;
+         in_format.mChannelsPerFrame = avctx->channels ? avctx->channels : 1;
