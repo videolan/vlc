@@ -213,10 +213,29 @@ static int Open( vlc_object_t* p_this )
 
     const char *fingerprint = libssh2_session_hostkey( p_sys->ssh_session, &i_len, &i_type );
     struct libssh2_knownhost *host;
+    int knownhost_fingerprint_algo;
+
+    switch( i_type )
+    {
+        case LIBSSH2_HOSTKEY_TYPE_RSA:
+            knownhost_fingerprint_algo = LIBSSH2_KNOWNHOST_KEY_SSHRSA;
+            break;
+
+        case LIBSSH2_HOSTKEY_TYPE_DSS:
+            knownhost_fingerprint_algo = LIBSSH2_KNOWNHOST_KEY_SSHDSS;
+            break;
+
+        default:
+            msg_Err( p_access, "Host uses unrecognized session-key algorithm" );
+            goto error;
+
+    }
+
     int check = libssh2_knownhost_check( ssh_knownhosts, url.psz_host,
                                          fingerprint, i_len,
                                          LIBSSH2_KNOWNHOST_TYPE_PLAIN |
-                                         LIBSSH2_KNOWNHOST_KEYENC_RAW,
+                                         LIBSSH2_KNOWNHOST_KEYENC_RAW |
+                                         knownhost_fingerprint_algo,
                                          &host );
 
     libssh2_knownhost_free( ssh_knownhosts );
