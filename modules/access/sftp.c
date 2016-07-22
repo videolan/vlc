@@ -162,7 +162,7 @@ static int Open( vlc_object_t* p_this )
     /* Check for some parameters */
     if( EMPTY_STR( url.psz_host ) )
     {
-        msg_Err( p_access, "You might give a non empty host" );
+        msg_Err( p_access, "Unable to extract host from %s", p_access->psz_url );
         goto error;
     }
 
