@@ -147,7 +147,7 @@ char *vlc_stream_ReadLine( stream_t *s )
     int i_line = 0, i_read = 0;
 
     /* Let's fail quickly if this is a readdir access */
-    if( s->pf_read == NULL )
+    if( s->pf_read == NULL && s->pf_block == NULL )
         return NULL;
 
     for( ;; )
