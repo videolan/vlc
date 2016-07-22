@@ -975,6 +975,7 @@ endif
 TESTS = test/run_vlc.sh
 dist_noinst_SCRIPTS += test/run_vlc.sh
 
+if BUILD_VLC
 ###############################################################################
 # Installing plugins cache
 ###############################################################################
@@ -987,6 +988,7 @@ install-exec-hook:
 	else \
 		echo "Cross-compilation: cache generation skipped!" ; \
 	fi
+endif
 
 uninstall-hook:
 	rm -f -- "$(DESTDIR)$(vlclibdir)/plugins/plugins.dat"
