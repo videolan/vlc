@@ -156,7 +156,7 @@ static int Open( vlc_object_t* p_this )
     vlc_credential_init( &credential, &credential_url );
 
     /* Parse the URL */
-    vlc_UrlParse( &url, p_access->psz_location );
+    vlc_UrlParse( &url, p_access->psz_url );
     vlc_uri_decode( url.psz_path );
 
     /* Check for some parameters */
