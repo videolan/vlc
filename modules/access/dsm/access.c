@@ -475,7 +475,7 @@ static ssize_t Read( access_t *p_access, void *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    access_sys_t *sys = p_access->p_sys;
+    access_sys_t *p_sys = p_access->p_sys;
 
     switch( i_query )
     {
