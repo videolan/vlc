@@ -230,8 +230,8 @@ public:
             default:
                 break;
         }
-        vlc_stream_Seek( m_stream, pos + offset );
-        m_previousPos = pos + offset;
+        if (vlc_stream_Seek( m_stream, pos + offset ) == 0)
+            m_previousPos = pos + offset;
     }
 
     void clear()
