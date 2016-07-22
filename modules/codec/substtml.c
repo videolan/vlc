@@ -198,6 +198,7 @@ static void ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader )
             p_ttml_style->font_style->i_background_alpha = (i_color & 0xFF000000) >> 24;
             p_ttml_style->font_style->i_features |= STYLE_HAS_BACKGROUND_COLOR
                                                       | STYLE_HAS_BACKGROUND_ALPHA;
+            p_ttml_style->font_style->i_style_flags |= STYLE_BACKGROUND;
         }
         else if ( !strcasecmp( "tts:textAlign", attr ) )
         {
