@@ -180,10 +180,11 @@ public:
     ByteVector readBlock(ulong length)
     {
         ByteVector res(length, 0);
-        int i_read = vlc_stream_ReadPartial( m_stream, res.data(), length);
+        ssize_t i_read = vlc_stream_Read( m_stream, res.data(), length);
         if (i_read < 0)
-            return ByteVector::null;;
-        res.resize(i_read);
+            return ByteVector::null;
+        else if ((size_t)i_read != length)
+            res.resize(i_read);
         return res;
     }
 
