@@ -190,16 +190,19 @@ public:
     void writeBlock(const ByteVector& data)
     {
         // Let's stay Read-Only for now
+        VLC_UNUSED(data);
         return;
     }
 
     void insert(const ByteVector& data, ulong start, ulong replace)
     {
+        VLC_UNUSED(data); VLC_UNUSED(start); VLC_UNUSED(replace);
         return;
     }
 
     void removeBlock(ulong start, ulong length)
     {
+        VLC_UNUSED(start); VLC_UNUSED(length);
         return;
     }
 
@@ -251,6 +254,7 @@ public:
 
     void truncate(long length)
     {
+        VLC_UNUSED(length);
         return;
     }
 
