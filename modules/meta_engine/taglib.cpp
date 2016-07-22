@@ -161,26 +161,26 @@ vlc_module_end ()
 class VlcIostream : public IOStream
 {
 public:
-    VlcIostream(access_t* p_demux)
-        : m_demux( p_demux )
+    VlcIostream(stream_t* p_stream)
+        : m_stream( p_stream )
         , m_previousPos( 0 )
     {
     }
 
     ~VlcIostream()
     {
-        vlc_stream_Delete( m_demux );
+        vlc_stream_Delete( m_stream );
     }
 
     FileName name() const
     {
-        return m_demux->psz_location;
+        return m_stream->psz_location;
     }
 
     ByteVector readBlock(ulong length)
     {
         ByteVector res(length, 0);
-        int i_read = vlc_stream_ReadPartial( m_demux, res.data(), length);
+        int i_read = vlc_stream_ReadPartial( m_stream, res.data(), length);
         if (i_read < 0)
             return ByteVector::null;;
         res.resize(i_read);
@@ -227,7 +227,7 @@ public:
             default:
                 break;
         }
-        vlc_stream_Seek( m_demux, pos + offset );
+        vlc_stream_Seek( m_stream, pos + offset );
         m_previousPos = pos + offset;
     }
 
@@ -244,7 +244,7 @@ public:
     long length()
     {
         uint64_t i_size;
-        if (vlc_stream_GetSize( m_demux, &i_size ) != VLC_SUCCESS)
+        if (vlc_stream_GetSize( m_stream, &i_size ) != VLC_SUCCESS)
             return -1;
         return i_size;
     }
@@ -255,7 +255,7 @@ public:
     }
 
 private:
-    access_t* m_demux;
+    access_t* m_stream;
     int64_t m_previousPos;
 };
 #endif /* TAGLIB_VERSION_1_11 */
@@ -838,12 +838,12 @@ static int ReadMeta( vlc_object_t* p_this)
     }
     free( psz_path );
 
-    access_t *p_access = vlc_access_NewMRL( p_this, psz_uri );
+    stream_t *p_stream = vlc_access_NewMRL( p_this, psz_uri );
     free( psz_uri );
-    if( p_access == NULL )
+    if( p_stream == NULL )
         return VLC_EGENERIC;
 
-    VlcIostream s( p_access );
+    VlcIostream s( p_stream );
     f = FileRef( &s );
 #else /* VLC_WINSTORE_APP */
     free( psz_uri );
