@@ -960,10 +960,10 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
         return true;
 
     case ACTION_SORT:
-        if ( indexes.empty() ) break;
-        index = indexes.first().parent();
-        if( !index.isValid() ) index = rootIndex();
-        sort( indexes.first(), index,
+        if ( !indexes.empty() )
+            index = indexes.first();
+
+        sort( index, rootIndex(),
               a.column > 0 ? a.column - 1 : -a.column - 1,
               a.column > 0 ? Qt::AscendingOrder : Qt::DescendingOrder );
         return true;
