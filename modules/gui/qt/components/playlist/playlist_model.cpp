@@ -888,7 +888,8 @@ void PLModel::removeAll()
 
 void PLModel::createNode( QModelIndex index, QString name )
 {
-    if( name.isEmpty() || !index.isValid() ) return;
+    if( name.isEmpty() )
+        return;
 
     vlc_playlist_locker pl_lock ( THEPL );
 
