@@ -1001,9 +1001,6 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 
 bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) const
 {
-    if( !index.isValid() )
-        return false;
-
     const PLItem *item = getItem( index );
 
     switch ( action )
