@@ -1008,9 +1008,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     {
     case ACTION_ADDTOPLAYLIST:
         /* Only if we are not already in Current Playing */
-        if ( getPLRootType() == ROOTTYPE_CURRENT_PLAYING ) return false;
-        if( index != rootIndex() )
-            return ( item->id( PLAYLIST_ID ) != THEPL->p_playing->i_id );
+		return getPLRootType() != ROOTTYPE_CURRENT_PLAYING;
     case ACTION_SORT:
         return rowCount();
     case ACTION_PLAY:
