@@ -34,6 +34,7 @@
 #include "recents.hpp"                                  /* Open:: */
 
 #include <vlc_intf_strings.h>                           /* I_DIR */
+#include <vlc_url.h>
 
 #include "sorting.h"
 
@@ -1040,7 +1041,14 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     case ACTION_REMOVE:
         return index != rootIndex() && !item->readOnly();
     case ACTION_EXPLORE:
-            return getURI( index ).startsWith( "file://" );
+    {
+        if( !item )
+            return false;
+
+        char*  psz_path = vlc_uri2path( qtu( item->getURI().toString() ) );
+        free(  psz_path );
+        return psz_path != NULL;
+    }
     case ACTION_CREATENODE:
             return canEdit() && isTree() && ( !item || !item->readOnly() );
     case ACTION_RENAMENODE:
