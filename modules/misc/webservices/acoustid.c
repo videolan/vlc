@@ -158,7 +158,7 @@ int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
     if( unlikely(asprintf( &psz_url, "http://fingerprint.videolan.org/"
                            "acoustid.php?meta=recordings+tracks+usermeta+"
                            "releases&duration=%d&fingerprint=%s",
-                           p_data->i_duration, p_data->psz_fingerprint )) )
+                           p_data->i_duration, p_data->psz_fingerprint ) < 1 ) )
          return VLC_EGENERIC;
 
     msg_Dbg( p_obj, "Querying AcoustID from %s", psz_url );
