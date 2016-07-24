@@ -1014,7 +1014,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
         if( index != rootIndex() )
             return ( item->id( PLAYLIST_ID ) != THEPL->p_playing->i_id );
     case ACTION_SORT:
-        return rowCount() && !item->readOnly();
+        return rowCount();
     case ACTION_PLAY:
     {
         PL_LOCK;
