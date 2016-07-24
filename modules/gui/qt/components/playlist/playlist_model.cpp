@@ -1042,7 +1042,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     case ACTION_EXPLORE:
             return getURI( index ).startsWith( "file://" );
     case ACTION_CREATENODE:
-            return ( isTree() && !item->readOnly() );
+            return canEdit() && isTree() && ( !item || !item->readOnly() );
     case ACTION_RENAMENODE:
             return ( index != rootIndex() ) && !isLeaf( index ) && !item->readOnly();
     case ACTION_CLEAR:
