@@ -61,6 +61,7 @@ struct fingerprinter_sys_t
 
 static int  Open            (vlc_object_t *);
 static void Close           (vlc_object_t *);
+static void CleanSys        (fingerprinter_sys_t *);
 static void *Run(void *);
 
 /*****************************************************************************
@@ -260,7 +261,8 @@ static int Open(vlc_object_t *p_this)
     return VLC_SUCCESS;
 
 error:
-    Close( p_this );
+    CleanSys( p_sys );
+    free( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -272,12 +274,15 @@ static void Close(vlc_object_t *p_this)
     fingerprinter_thread_t   *p_fingerprinter = (fingerprinter_thread_t*) p_this;
     fingerprinter_sys_t *p_sys = p_fingerprinter->p_sys;
 
-    if( p_sys->thread )
-    {
-        vlc_cancel( p_sys->thread );
-        vlc_join( p_sys->thread, NULL );
-    }
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
 
+    CleanSys( p_sys );
+    free( p_sys );
+}
+
+static void CleanSys( fingerprinter_sys_t *p_sys )
+{
     for ( int i = 0; i < vlc_array_count( p_sys->incoming.queue ); i++ )
         fingerprint_request_Delete( vlc_array_item_at_index( p_sys->incoming.queue, i ) );
     vlc_array_destroy( p_sys->incoming.queue );
@@ -293,8 +298,6 @@ static void Close(vlc_object_t *p_this)
         fingerprint_request_Delete( vlc_array_item_at_index( p_sys->results.queue, i ) );
     vlc_array_destroy( p_sys->results.queue );
     vlc_mutex_destroy( &p_sys->results.lock );
-
-    free( p_sys );
 }
 
 static void fill_metas_with_results( fingerprint_request_t *p_r, acoustid_fingerprint_t *p_f )
