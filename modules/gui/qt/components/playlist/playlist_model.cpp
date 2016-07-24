@@ -1027,10 +1027,12 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     }
     case ACTION_PAUSE:
     {
-        PL_LOCK;
-        bool b_ret = isCurrent( index ) && playlist_Status(THEPL) == PLAYLIST_RUNNING;
-        PL_UNLOCK;
-        return b_ret;
+		if( !isCurrent( index ) )
+            return false;
+
+        vlc_playlist_locker pl_lock ( THEPL );
+
+        return playlist_Status( THEPL ) == PLAYLIST_RUNNING;
     }
     case ACTION_STREAM:
     case ACTION_SAVE:
