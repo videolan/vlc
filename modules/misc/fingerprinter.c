@@ -217,7 +217,7 @@ static int Open(vlc_object_t *p_this)
     return VLC_SUCCESS;
 
 error:
-    free( p_sys );
+    Close( p_this );
     return VLC_EGENERIC;
 }
 
@@ -229,8 +229,11 @@ static void Close(vlc_object_t *p_this)
     fingerprinter_thread_t   *p_fingerprinter = (fingerprinter_thread_t*) p_this;
     fingerprinter_sys_t *p_sys = p_fingerprinter->p_sys;
 
-    vlc_cancel( p_sys->thread );
-    vlc_join( p_sys->thread, NULL );
+    if( p_sys->thread )
+    {
+        vlc_cancel( p_sys->thread );
+        vlc_join( p_sys->thread, NULL );
+    }
 
     for ( int i = 0; i < vlc_array_count( p_sys->incoming.queue ); i++ )
         fingerprint_request_Delete( vlc_array_item_at_index( p_sys->incoming.queue, i ) );
