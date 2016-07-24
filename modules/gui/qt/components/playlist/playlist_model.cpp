@@ -553,16 +553,17 @@ PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_isinputid ) const
 
 PLModel::pl_nodetype PLModel::getPLRootType() const
 {
+    vlc_playlist_locker pl_lock ( THEPL );
+
     /* can't rely on rootitem as it depends on view / rebuild() */
     AbstractPLItem *plitem = rootItem;
-    while( plitem->parent() ) plitem = plitem->parent();
+    while( plitem->parent() )plitem = plitem->parent();
 
-    const input_item_t *p_item = plitem->inputItem();
-    if( p_item == p_playlist->p_playing->p_input )
+    if( plitem->id( PLAYLIST_ID ) == p_playlist->p_playing->i_id )
         return ROOTTYPE_CURRENT_PLAYING;
 
     if( p_playlist->p_media_library &&
-        p_item == p_playlist->p_media_library->p_input )
+        plitem->id( PLAYLIST_ID ) == p_playlist->p_media_library->i_id )
         return ROOTTYPE_MEDIA_LIBRARY;
 
     return ROOTTYPE_OTHER;
