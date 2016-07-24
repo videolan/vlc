@@ -1037,9 +1037,9 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     case ACTION_STREAM:
     case ACTION_SAVE:
     case ACTION_INFO:
-        return index != rootIndex();
+        return item;
     case ACTION_REMOVE:
-        return index != rootIndex() && !item->readOnly();
+        return item && !item->readOnly();
     case ACTION_EXPLORE:
     {
         if( !item )
@@ -1052,7 +1052,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     case ACTION_CREATENODE:
             return canEdit() && isTree() && ( !item || !item->readOnly() );
     case ACTION_RENAMENODE:
-            return ( index != rootIndex() ) && !isLeaf( index ) && !item->readOnly();
+            return item && !isLeaf( index ) && !item->readOnly();
     case ACTION_CLEAR:
             return canEdit() && rowCount();
     case ACTION_ENQUEUEFILE:
