@@ -1014,10 +1014,17 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
         return rowCount();
     case ACTION_PLAY:
     {
-        PL_LOCK;
-        bool b_ret = !isCurrent( index ) || playlist_Status(THEPL) == PLAYLIST_PAUSED;
-        PL_UNLOCK;
-        return b_ret;
+        if( !item )
+            return false;
+
+        {
+            vlc_playlist_locker pl_lock ( THEPL );
+
+            if( playlist_Status( THEPL ) != PLAYLIST_RUNNING )
+                return true;
+        }
+
+        return !isCurrent( index );
     }
     case ACTION_PAUSE:
     {
