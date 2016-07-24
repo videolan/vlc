@@ -820,13 +820,13 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
                                         order == Qt::AscendingOrder ?
                                             ORDER_NORMAL : ORDER_REVERSE );
         }
-    }
 
-    if( count )
-    {
-        beginInsertRows( qIndex, 0, count - 1 );
-        updateChildren( item );
-        endInsertRows( );
+        if( count )
+        {
+            beginInsertRows( qIndex, 0, count - 1 );
+            updateChildren( item );
+            endInsertRows( );
+        }
     }
 
     /* if we have popup item, try to make sure that you keep that item visible */
