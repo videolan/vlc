@@ -325,210 +325,157 @@ error:
     return NULL;
 }
 
+static ssize_t vlc_stream_CopyBlock(block_t **restrict pp,
+                                    void *buf, size_t len)
+{
+    block_t *block = *pp;
+
+    if (block == NULL)
+        return -1;
+
+    if (len > block->i_buffer)
+        len = block->i_buffer;
+
+    if (buf != NULL)
+        memcpy(buf, block->p_buffer, len);
+
+    block->p_buffer += len;
+    block->i_buffer -= len;
+
+    if (block->i_buffer == 0)
+    {
+        block_Release(block);
+        *pp = NULL;
+    }
+
+    return likely(len > 0) ? (ssize_t)len : -1;
+}
+
 static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
-    size_t copy = 0;
-    ssize_t ret = 0;
+    ssize_t ret;
 
-    while (len > 0)
-    {
-        if (vlc_killed())
-            ret = 0;
-        else if (s->pf_read != NULL)
-        {
-            assert(priv->block == NULL);
-            ret = s->pf_read(s, buf, len);
-        }
-        else if (s->pf_block != NULL)
-        {
-            block_t *block = priv->block;
-            bool eof = false;
-
-            if (block == NULL)
-                block = s->pf_block(s, &eof);
-
-            if (block == NULL)
-            {
-                assert(priv->block == NULL);
-                ret = eof ? 0 : -1;
-            }
-            else if (block->i_buffer <= len)
-            {
-                if (buf != NULL)
-                    memcpy(buf, block->p_buffer, block->i_buffer);
-                ret = block->i_buffer;
-                block_Release(block);
-                priv->block = NULL;
-            }
-            else
-            {
-                if (buf != NULL)
-                    memcpy(buf, block->p_buffer, len);
-                ret = len;
-                block->p_buffer += len;
-                block->i_buffer -= len;
-                priv->block = block;
-            }
-        }
-        else
-            ret = 0;
-
-        if (ret == 0)
-            break;
-        if (ret < 0)
-            continue;
-
-        assert((size_t)ret <= len);
-        if (buf != NULL)
-            buf = (unsigned char *)buf + ret;
-        len -= ret;
-        copy += ret;
-    }
-
-    return copy;
-}
-
-ssize_t vlc_stream_Read(stream_t *s, void *buf, size_t len)
-{
-    stream_priv_t *priv = (stream_priv_t *)s;
-    block_t *peek = priv->peek;
-    size_t copy = 0;
-
-    if (unlikely(len == 0))
+    if (vlc_killed())
         return 0;
 
-    if (peek != NULL)
+    if (s->pf_read != NULL)
     {
-        copy = peek->i_buffer < len ? peek->i_buffer : len;
-
-        if (buf != NULL)
-            memcpy(buf, peek->p_buffer, copy);
-
-        peek->p_buffer += copy;
-        peek->i_buffer -= copy;
-        if (peek->i_buffer == 0)
-        {
-            block_Release(peek);
-            priv->peek = NULL;
-        }
-
-        if (buf != NULL)
-            buf = (unsigned char *)buf + copy;
-        len -= copy;
-        priv->offset += copy;
-
-        if (len == 0)
-            return copy;
+        assert(priv->block == NULL);
+        ret = s->pf_read(s, buf, len);
+        return ret;
     }
 
-    ssize_t ret = vlc_stream_ReadRaw(s, buf, len);
-    if (ret < 0)
-        return ((copy > 0) ? (ssize_t)copy : ret);
-    copy += ret;
-    priv->offset += ret;
-    priv->eof = !ret;
-    return copy;
+    ret = vlc_stream_CopyBlock(&priv->block, buf, len);
+    if (ret >= 0)
+        return ret;
+
+    if (s->pf_block != NULL)
+    {
+        bool eof = false;
+
+        priv->block = s->pf_block(s, &eof);
+        ret = vlc_stream_CopyBlock(&priv->block, buf, len);
+        if (ret >= 0)
+            return ret;
+        return eof ? 0 : -1;
+    }
+
+    return 0;
 }
 
 ssize_t vlc_stream_ReadPartial(stream_t *s, void *buf, size_t len)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
+    ssize_t ret;
 
-    for (;;)
+    ret = vlc_stream_CopyBlock(&priv->peek, buf, len);
+    if (ret >= 0)
     {
-        size_t avail = 0;
-
-        if (priv->peek != NULL)
-            avail += priv->peek->i_buffer;
-        if (priv->block != NULL)
-            avail += priv->block->i_buffer;
-        if (avail > 0)
-            return vlc_stream_Read(s, buf, (avail < len) ? avail : len);
-
-        if (s->pf_read != NULL)
-        {
-            ssize_t ret = s->pf_read(s, buf, len);
-            if (ret < 0)
-                return ret;
-
-            priv->offset += ret;
-            if (likely(len > 0))
-                priv->eof = !ret;
-
-            return ret;
-        }
-
-        if (s->pf_block != NULL)
-        {
-            bool eof;
-
-            priv->block = s->pf_block(s, &eof);
-            if (priv->block == NULL && eof)
-                return 0;
-        }
-        else
-            return 0;
+        priv->offset += ret;
+        return ret;
     }
+
+    ret = vlc_stream_ReadRaw(s, buf, len);
+    if (ret > 0)
+        priv->offset += ret;
+    if (ret == 0)
+        priv->eof = len != 0;
+    return ret;
+}
+
+ssize_t vlc_stream_Read(stream_t *s, void *buf, size_t len)
+{
+    size_t copied = 0;
+
+    while (len > 0)
+    {
+        ssize_t ret = vlc_stream_ReadPartial(s, buf, len);
+        if (ret < 0)
+            continue;
+        if (ret == 0)
+            break;
+
+        if (buf != NULL)
+            buf = (char *)buf + ret;
+        len -= ret;
+        copied += ret;
+    }
+
+    return copied;
 }
 
 ssize_t vlc_stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
+    block_t *peek;
 
-    if (priv->peek == NULL)
+    peek = priv->peek;
+    if (peek == NULL)
     {
-        priv->peek = priv->block;
+        peek = priv->block;
+        priv->peek = peek;
         priv->block = NULL;
     }
 
-    if (priv->peek == NULL)
+    if (peek == NULL)
     {
-        block_t *peek = block_Alloc(len);
+        peek = block_Alloc(len);
         if (unlikely(peek == NULL))
             return VLC_ENOMEM;
 
-        *bufp = peek->p_buffer;
+        peek->i_buffer = 0;
+    }
+    else
+    if (peek->i_buffer < len)
+    {
+        size_t avail = peek->i_buffer;
 
-        if (unlikely(len == 0))
-        {
-            priv->peek = peek;
-            return 0;
-        }
+        peek = block_TryRealloc(peek, 0, len);
+        if (unlikely(peek == NULL))
+            return VLC_ENOMEM;
 
-        ssize_t ret = vlc_stream_ReadRaw(s, peek->p_buffer, len);
-        if (ret < 0)
-        {
-            block_Release(peek);
-            return ret;
-        }
-
-        peek->i_buffer = ret;
-        priv->peek = peek;
-        return ret;
+        peek->i_buffer = avail;
     }
 
-    if (priv->peek->i_buffer < len)
+    priv->peek = peek;
+    *bufp = peek->p_buffer;
+
+    while (peek->i_buffer < len)
     {
-        size_t avail = priv->peek->i_buffer;
+        size_t avail = peek->i_buffer;
         ssize_t ret;
 
-        block_t *peek = block_TryRealloc(priv->peek, 0, len);
-        if (unlikely(peek == NULL))
-            return VLC_ENOMEM;
-
-        priv->peek = peek;
-        peek->i_buffer = avail;
-
         ret = vlc_stream_ReadRaw(s, peek->p_buffer + avail, len - avail);
-        *bufp = peek->p_buffer;
-        if (ret >= 0)
-            peek->i_buffer += ret;
-        return peek->i_buffer;
+        if (ret < 0)
+            continue;
+
+        peek->i_buffer += ret;
+
+        if (ret == 0)
+            return peek->i_buffer;
     }
 
-    /* Nothing to do */
-    *bufp = priv->peek->p_buffer;
     return len;
 }
 
@@ -536,6 +483,12 @@ block_t *vlc_stream_ReadBlock(stream_t *s)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
     block_t *block;
+
+    if (vlc_killed())
+    {
+        priv->eof = true;
+        return NULL;
+    }
 
     if (priv->peek != NULL)
     {
@@ -554,24 +507,20 @@ block_t *vlc_stream_ReadBlock(stream_t *s)
     }
     else
     {
-        if (vlc_killed())
-            return NULL;
-
         block = block_Alloc(4096);
         if (unlikely(block == NULL))
             return NULL;
 
         ssize_t ret = s->pf_read(s, block->p_buffer, block->i_buffer);
-        if (ret >= 0)
-        {
+        if (ret > 0)
             block->i_buffer = ret;
-            priv->eof = !ret;
-        }
         else
         {
             block_Release(block);
             block = NULL;
         }
+
+        priv->eof = !ret;
     }
 
     if (block != NULL)

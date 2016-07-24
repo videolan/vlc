@@ -79,7 +79,6 @@ int main(void)
     val = vlc_stream_Read(s, buf, sizeof (buf));
     assert(val == 3);
     assert(vlc_stream_Tell(s) == 3);
-    assert(!vlc_stream_Eof(s));
     assert(memcmp(buf, "123", 3) == 0);
     val = vlc_stream_Read(s, buf, sizeof (buf));
     assert(val == 0);
