@@ -235,10 +235,13 @@ void PLSelector::createItems()
     setCurrentItem( playlistItem->treeItem() );
 
     /* ML */
-    PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, N_("Media Library"), true ),
-                              THEPL->p_media_library );
-    ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
-    ml->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/library" ) );
+    if( THEPL->p_media_library )
+    {
+        PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, N_("Media Library"), true ),
+          THEPL->p_media_library );
+        ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
+        ml->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/library" ) );
+    }
 
     /* SD nodes */
     QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, N_("My Computer"), false, true )->treeItem();
