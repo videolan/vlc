@@ -1001,7 +1001,7 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 
 bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) const
 {
-    const PLItem *item = getItem( index );
+    AbstractPLItem const* item = VLCModel::getItem( index );
 
     switch ( action )
     {
