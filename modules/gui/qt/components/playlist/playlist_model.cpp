@@ -1046,7 +1046,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
     case ACTION_RENAMENODE:
             return ( index != rootIndex() ) && !isLeaf( index ) && !item->readOnly();
     case ACTION_CLEAR:
-            return rowCount() && !item->readOnly();
+            return canEdit() && rowCount();
     case ACTION_ENQUEUEFILE:
     case ACTION_ENQUEUEDIR:
     case ACTION_ENQUEUEGENERIC:
