@@ -316,6 +316,9 @@ static int Demux( demux_t *p_demux )
     const char *psz_node = NULL;
     char *psz_txt = NULL;
     char *psz_base = FindPrefix( p_demux );
+    if (unlikely(psz_base == NULL))
+        return VLC_DEMUXER_EOF;
+
     char *psz_title_asx = NULL;
     char *psz_entryref = NULL;
 
