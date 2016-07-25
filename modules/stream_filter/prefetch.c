@@ -90,8 +90,14 @@ static void ThreadRead(stream_t *stream, size_t length)
     vlc_mutex_unlock(&sys->lock);
     assert(length > 0);
 
-    char *p = sys->buffer + (sys->buffer_offset % sys->buffer_size)
-                          + sys->buffer_length;
+    size_t offset = (sys->buffer_offset + sys->buffer_length)
+                    % sys->buffer_size;
+    /* Do not step past the sharp edge of the circular buffer */
+    if (offset + length > sys->buffer_size)
+        length = sys->buffer_size - offset;
+    assert(length > 0);
+
+    char *p = sys->buffer + offset;
     ssize_t val = vlc_stream_ReadPartial(stream->p_source, p, length);
 
     if (val == 0)
@@ -298,7 +304,7 @@ static size_t BufferLevel(const stream_t *stream, bool *eof)
 static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
 {
     stream_sys_t *sys = stream->p_sys;
-    size_t copy;
+    size_t copy, offset;
     bool eof;
 
     if (buflen == 0)
@@ -332,10 +338,14 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
         vlc_interrupt_forward_stop(data);
     }
 
-    char *p = sys->buffer + (sys->stream_offset % sys->buffer_size);
+    offset = sys->stream_offset % sys->buffer_size;
     if (copy > buflen)
         copy = buflen;
-    memcpy(buf, p, copy);
+    /* Do not step past the sharp edge of the circular buffer */
+    if (offset + copy > sys->buffer_size)
+        copy = sys->buffer_size - offset;
+
+    memcpy(buf, sys->buffer + offset, copy);
     sys->stream_offset += copy;
     vlc_cond_signal(&sys->wait_space);
     vlc_mutex_unlock(&sys->lock);
