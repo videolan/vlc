@@ -39,7 +39,6 @@ int Import_RAM ( vlc_object_t * );
 void Close_RAM ( vlc_object_t * );
 
 int Import_PLS ( vlc_object_t * );
-void Close_PLS ( vlc_object_t * );
 
 int Import_B4S ( vlc_object_t * );
 

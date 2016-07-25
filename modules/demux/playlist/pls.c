@@ -34,11 +34,6 @@
 
 #include "playlist.h"
 
-struct demux_sys_t
-{
-    char *psz_prefix;
-};
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -61,24 +56,19 @@ int Import_PLS( vlc_object_t *p_this )
     }
     else return VLC_EGENERIC;
 
-    STANDARD_DEMUX_INIT_MSG(  "found valid PLS playlist file");
-    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
+    msg_Dbg( p_demux, "found valid PLS playlist file");
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
 
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Deactivate: frees unused data
- *****************************************************************************/
-void Close_PLS( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    free( p_demux->p_sys->psz_prefix );
-    free( p_demux->p_sys );
-}
-
 static int Demux( demux_t *p_demux )
 {
+    char *psz_prefix = FindPrefix( p_demux );
+    if( unlikely(psz_prefix == NULL) )
+        return VLC_DEMUXER_EOF;
+
     char          *psz_name = NULL;
     char          *psz_line;
     char          *psz_mrl = NULL;
@@ -162,7 +152,7 @@ static int Demux( demux_t *p_demux )
         {
             free( psz_mrl_orig );
             psz_mrl_orig =
-            psz_mrl = ProcessMRL( psz_value, p_demux->p_sys->psz_prefix );
+            psz_mrl = ProcessMRL( psz_value, psz_prefix );
 
             if( !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
             {
@@ -202,5 +192,6 @@ static int Demux( demux_t *p_demux )
     input_item_node_PostAndDelete( p_subitems );
 
     vlc_gc_decref(p_current_input);
+    free( psz_prefix );
     return 0; /* Needed for correct operation of go back */
 }
