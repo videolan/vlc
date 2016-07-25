@@ -634,14 +634,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TITLE:
             i = (int)va_arg( args, int );
-            if( ( i == 0 && dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root )
-                  != DVDNAV_STATUS_OK ) ||
-                ( i != 0 && dvdnav_title_play( p_sys->dvdnav, i )
-                  != DVDNAV_STATUS_OK ) )
+            if( i == 0 && dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root )
+                  != DVDNAV_STATUS_OK )
             {
                 msg_Warn( p_demux, "cannot set title/chapter" );
                 return VLC_EGENERIC;
             }
+
+            if( i != 0 )
+            {
+                dvdnav_still_skip( p_sys->dvdnav );
+                if( dvdnav_title_play( p_sys->dvdnav, i ) != DVDNAV_STATUS_OK )
+                {
+                    msg_Warn( p_demux, "cannot set title/chapter" );
+                    return VLC_EGENERIC;
+                }
+            }
+
             p_demux->info.i_update |=
                 INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             p_demux->info.i_title = i;
