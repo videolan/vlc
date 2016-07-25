@@ -754,21 +754,7 @@ static int satip_open(vlc_object_t *obj)
 
 error:
     free(psz_lower_url);
-
     vlc_UrlClean(&url);
-    satip_close(access);
-    return VLC_EGENERIC;
-}
-
-static void satip_close(vlc_object_t *obj)
-{
-    access_t *access = (access_t *)obj;
-    access_sys_t *sys = access->p_sys;
-
-    if (sys->thread) {
-        vlc_cancel(sys->thread);
-        vlc_join(sys->thread, NULL);
-    }
 
     satip_teardown(access);
 
@@ -781,6 +767,26 @@ static void satip_close(vlc_object_t *obj)
     if (sys->tcp_sock >= 0)
         net_Close(sys->tcp_sock);
 
+    free(sys->content_base);
+    free(sys->control);
+    free(sys);
+    return VLC_EGENERIC;
+}
+
+static void satip_close(vlc_object_t *obj)
+{
+    access_t *access = (access_t *)obj;
+    access_sys_t *sys = access->p_sys;
+
+    vlc_cancel(sys->thread);
+    vlc_join(sys->thread, NULL);
+
+    satip_teardown(access);
+
+    block_FifoRelease(sys->fifo);
+    net_Close(sys->udp_sock);
+    net_Close(sys->rtcp_sock);
+    net_Close(sys->tcp_sock);
     free(sys->content_base);
     free(sys->control);
     free(sys);
