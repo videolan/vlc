@@ -774,11 +774,11 @@ static void satip_close(access_t *access) {
     }
 #endif
 
-    if (sys->udp_sock > 0)
+    if (sys->udp_sock >= 0)
         net_Close(sys->udp_sock);
-    if (sys->rtcp_sock > 0)
+    if (sys->rtcp_sock >= 0)
         net_Close(sys->rtcp_sock);
-    if (sys->tcp_sock > 0)
+    if (sys->tcp_sock >= 0)
         net_Close(sys->tcp_sock);
 
     free(sys->content_base);
