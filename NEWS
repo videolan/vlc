@@ -238,6 +238,7 @@ Removed modules
  * Mac OS X Dialog Provider (use VLCKit instead)
  * iOS Dialog Provider (use MobileVLCKit / TVVLCKit instead)
  * QuickTime decoder module (use native codecs)
+ * BD access module (use libbluray)
 
 
 Changes between 2.2.0 and 2.2.1:

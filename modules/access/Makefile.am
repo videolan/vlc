@@ -294,10 +294,6 @@ liblibbluray_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBlibbluray)
 EXTRA_LTLIBRARIES += liblibbluray_plugin.la
 
-libaccess_bd_plugin_la_SOURCES = access/bd/bd.c access/bd/mpls.c access/bd/mpls.h access/bd/clpi.c access/bd/clpi.h
-access_LTLIBRARIES += libaccess_bd_plugin.la
-
-
 ### Digital TV ###
 
 libdtv_plugin_la_SOURCES = \

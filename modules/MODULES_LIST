@@ -5,7 +5,6 @@ $Id$
  * aa: Ascii art video output
  * access_alsa: Alsa access module
  * access_archive: libarchive based access and stream filter
- * access_bd: Blu-Ray Disc access
  * access_concat: concatenated access
  * access_eyetv: Access module to connect to our plugin running within EyeTV
  * access_imem: memory bitstream access module
