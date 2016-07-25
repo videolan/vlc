@@ -53,8 +53,8 @@
 #define KEEPALIVE_INTERVAL 60
 #define KEEPALIVE_MARGIN 5
 
-static int satip_open(access_t *);
-static void satip_close(access_t *);
+static int satip_open(vlc_object_t *);
+static void satip_close(vlc_object_t *);
 
 #define BUFFER_TEXT N_("Receive buffer")
 #define BUFFER_LONGTEXT N_("UDP receive buffer size (bytes)")
@@ -613,7 +613,9 @@ static int satip_bind_ports(access_t *access)
     return 0;
 }
 
-static int satip_open(access_t *access) {
+static int satip_open(vlc_object_t *obj)
+{
+    access_t *access = (access_t *)obj;
     access_sys_t *sys;
     vlc_url_t url;
 
@@ -758,7 +760,9 @@ error:
     return VLC_EGENERIC;
 }
 
-static void satip_close(access_t *access) {
+static void satip_close(vlc_object_t *obj)
+{
+    access_t *access = (access_t *)obj;
     access_sys_t *sys = access->p_sys;
 
     if (sys->thread) {
