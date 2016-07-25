@@ -82,7 +82,7 @@ struct stream_sys_t
     size_t       seek_threshold;
 };
 
-static int ThreadRead(stream_t *stream, size_t length)
+static void ThreadRead(stream_t *stream, size_t length)
 {
     stream_sys_t *sys = stream->p_sys;
     int canc = vlc_savecancel();
@@ -94,9 +94,6 @@ static int ThreadRead(stream_t *stream, size_t length)
                           + sys->buffer_length;
     ssize_t val = vlc_stream_ReadPartial(stream->p_source, p, length);
 
-    if (val < 0)
-        msg_Err(stream, "cannot read data (at offset %"PRIu64")",
-                sys->buffer_offset + sys->buffer_length);
     if (val == 0)
         msg_Dbg(stream, "end of stream");
 
@@ -104,7 +101,7 @@ static int ThreadRead(stream_t *stream, size_t length)
     vlc_restorecancel(canc);
 
     if (val < 0)
-        return -1;
+        return;
 
     if (val == 0)
         sys->eof = true;
@@ -113,7 +110,6 @@ static int ThreadRead(stream_t *stream, size_t length)
     sys->buffer_length += val;
     assert(sys->buffer_length <= sys->buffer_size);
     //msg_Dbg(stream, "buffer: %zu/%zu", sys->buffer_length, sys->buffer_size);
-    return 0;
 }
 
 static int ThreadSeek(stream_t *stream, uint64_t seek_offset)
@@ -258,9 +254,7 @@ static void *Thread(void *data)
         if (unused > sys->read_size)
             unused = sys->read_size;
 
-        if (ThreadRead(stream, unused))
-            break;
-
+        ThreadRead(stream, unused);
         vlc_cond_signal(&sys->wait_data);
     }
     vlc_cleanup_pop();
