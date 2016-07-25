@@ -448,7 +448,7 @@ if HAVE_GCRYPT
 libadaptive_plugin_la_CXXFLAGS += $(GCRYPT_CFLAGS)
 libadaptive_plugin_la_LIBADD += $(GCRYPT_LIBS)
 endif
-demux_LTLIBRARIES += libadaptive_plugin.la
+EXTRA_LTLIBRARIES += libadaptive_plugin.la
 
 libttml_plugin_la_SOURCES = demux/ttml.c
 demux_LTLIBRARIES += libttml_plugin.la

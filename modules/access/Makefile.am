@@ -444,7 +444,7 @@ endif
 
 libsatip_plugin_la_SOURCES = access/satip.c
 libsatip_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
-access_LTLIBRARIES += libsatip_plugin.la
+EXTRA_LTLIBRARIES += libsatip_plugin.la
 
 ### Misc ###
 
