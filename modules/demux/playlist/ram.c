@@ -56,11 +56,6 @@ http://service.real.com/help/library/guides/realone/IntroGuide/HTML/htmfiles/ram
 
 #include "playlist.h"
 
-struct demux_sys_t
-{
-    char *psz_prefix;
-};
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -92,21 +87,11 @@ int Import_RAM( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    STANDARD_DEMUX_INIT_MSG( "found valid RAM playlist" );
-    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
+    msg_Dbg( p_demux, "found valid RAM playlist" );
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
 
     return VLC_SUCCESS;
-}
-
-/**
- * Frees up memory on module close
- * @param p_this: this demux object
- */
-void Close_RAM( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    free( p_demux->p_sys->psz_prefix );
-    free( p_demux->p_sys );
 }
 
 /**
@@ -214,6 +199,10 @@ static int ParseTime( const char *s, size_t i_strlen)
  */
 static int Demux( demux_t *p_demux )
 {
+    char *psz_prefix = FindPrefix( p_demux );
+    if( unlikely(psz_prefix == NULL) )
+        return VLC_DEMUXER_EOF;
+
     char       *psz_line;
     char       *psz_artist = NULL, *psz_album = NULL, *psz_genre = NULL, *psz_year = NULL;
     char       *psz_author = NULL, *psz_title = NULL, *psz_copyright = NULL, *psz_cdnum = NULL, *psz_comments = NULL;
@@ -246,7 +235,7 @@ static int Demux( demux_t *p_demux )
             char *psz_param, *psz_value;
 
             /* Get the MRL from the file. Note that this might contain parameters of form ?param1=value1&param2=value2 in a RAM file */
-            psz_mrl = ProcessMRL( psz_parse, p_demux->p_sys->psz_prefix );
+            psz_mrl = ProcessMRL( psz_parse, psz_prefix );
 
             b_cleanup = true;
             if ( !psz_mrl ) goto error;
@@ -391,6 +380,7 @@ static int Demux( demux_t *p_demux )
     input_item_node_PostAndDelete( p_subitems );
     vlc_gc_decref(p_current_input);
     var_Destroy( p_demux, "m3u-extvlcopt" );
+    free(psz_prefix);
     return 0; /* Needed for correct operation of go back */
 }
 
