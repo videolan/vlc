@@ -78,7 +78,7 @@ void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &
     std::size_t pos = filename.find_last_of('.');
     if(pos != std::string::npos)
     {
-        std::string extension = filename.substr(pos + 1);
+        std::string extension = Helper::getFileExtension(filename);
         transform(extension.begin(), extension.end(), extension.begin(), (int (*)(int))std::tolower);
         if(extension == "aac")
         {

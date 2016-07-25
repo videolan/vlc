@@ -54,6 +54,20 @@ std::string Helper::getDirectoryPath    (const std::string &path)
     return (pos != std::string::npos) ? path.substr(0, pos) : path;
 }
 
+std::string Helper::getFileExtension (const std::string &uri)
+{
+    std::string extension;
+    std::size_t pos = uri.find_first_of("?#");
+    if(pos != std::string::npos)
+        extension = uri.substr(0, pos);
+    else
+        extension = uri;
+    pos = uri.find_last_of('.');
+    if(pos == std::string::npos)
+        return std::string();
+    return extension.substr(pos + 1);
+}
+
 bool Helper::ifind(std::string haystack, std::string needle)
 {
     transform(haystack.begin(), haystack.end(), haystack.begin(), toupper);
