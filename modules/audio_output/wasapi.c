@@ -396,7 +396,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
     WAVEFORMATEX *pwf;
     AUDCLNT_SHAREMODE shared_mode;
 
-    if (AOUT_FMT_SPDIF(fmt) && var_InheritBool(s, "spdif"))
+    if (AOUT_FMT_SPDIF(fmt))
     {
         vlc_SpdifToWave(&wf, fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
