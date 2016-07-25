@@ -691,6 +691,7 @@ error:
         UnmapViewOfFile(sys->buffer);
     }
 #endif
+    free(sys->content_type);
     free(sys);
     return VLC_ENOMEM;
 }
