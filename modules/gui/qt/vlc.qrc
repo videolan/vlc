@@ -151,7 +151,6 @@
         <file alias="frenchtv">pixmaps/playlist/sidebar-icons/sd/frenchtv.png</file>
         <file alias="jamendo">pixmaps/playlist/sidebar-icons/sd/jamendo.png</file>
         <file alias="katsomo">pixmaps/playlist/sidebar-icons/sd/katsomo.png</file>
-        <file alias="metachannels">pixmaps/playlist/sidebar-icons/sd/metachannels.png</file>
     </qresource>
     <qresource prefix="/addons">
         <file alias="default">pixmaps/addons/addon.png</file>

@@ -144,7 +144,6 @@ nobase_vlclib_DATA = \
 	lua/playlist/lelombrik.luac \
 	lua/playlist/liveleak.luac \
 	lua/playlist/metacafe.luac \
-	lua/playlist/metachannels.luac \
 	lua/playlist/mpora.luac \
 	lua/playlist/pinkbike.luac \
 	lua/playlist/pluzz.luac \
@@ -238,7 +237,6 @@ EXTRA_DIST += \
 	lua/playlist/lelombrik.lua \
 	lua/playlist/liveleak.lua \
 	lua/playlist/metacafe.lua \
-	lua/playlist/metachannels.lua \
 	lua/playlist/mpora.lua \
 	lua/playlist/pinkbike.lua \
 	lua/playlist/pluzz.lua \
@@ -253,8 +251,7 @@ EXTRA_DIST += \
 	lua/sd/fmc.lua \
 	lua/sd/icecast.lua \
 	lua/sd/icast.lua \
-	lua/sd/jamendo.lua \
-	lua/sd/metachannels.lua
+	lua/sd/jamendo.lua
 
 DIST_http_lua = \
 	lua/http/view.html \

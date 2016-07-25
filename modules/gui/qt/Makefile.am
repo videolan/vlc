@@ -327,7 +327,6 @@ DEPS_res = \
 	pixmaps/playlist/sidebar-icons/network.png \
 	pixmaps/playlist/sidebar-icons/sd/appletrailers.png \
 	pixmaps/playlist/sidebar-icons/sd/icecast.png \
-	pixmaps/playlist/sidebar-icons/sd/metachannels.png \
 	pixmaps/playlist/sidebar-icons/sd/katsomo.png \
 	pixmaps/playlist/sidebar-icons/sd/fmc.png \
 	pixmaps/playlist/sidebar-icons/sd/frenchtv.png \
