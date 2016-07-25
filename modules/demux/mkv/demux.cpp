@@ -87,9 +87,8 @@ void event_thread_t::ResetPci()
     is_running = false;
 }
 int event_thread_t::EventMouse( vlc_object_t *p_this, char const *psz_var,
-                                vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                                vlc_value_t, vlc_value_t, void *p_data )
 {
-    VLC_UNUSED( oldval ); VLC_UNUSED( newval );
     event_thread_t *p_ev = (event_thread_t *) p_data;
     vlc_mutex_lock( &p_ev->lock );
     if( psz_var[6] == 'c' )
