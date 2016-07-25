@@ -420,7 +420,7 @@ static void *satip_thread(void *data) {
     access_t *access = data;
     access_sys_t *sys = access->p_sys;
     int sock = sys->udp_sock;
-    volatile mtime_t last_recv = mdate();
+    mtime_t last_recv = mdate();
     ssize_t len;
     mtime_t next_keepalive = mdate() + sys->keepalive_interval * 1000 * 1000;
 #ifdef HAVE_RECVMMSG
