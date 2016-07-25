@@ -565,7 +565,7 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_SET_RECORD_STATE:
             assert(0);
         default:
-            msg_Err( s, "unknown query 0x%x in demux_vaControlDefault", i_query );
+            msg_Err( s, "unknown query 0x%x in %s", i_query, __func__ );
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
