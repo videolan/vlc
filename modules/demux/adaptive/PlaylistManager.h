@@ -129,6 +129,7 @@ namespace adaptive
             static void * managerThread(void *);
             vlc_mutex_t  lock;
             vlc_thread_t thread;
+            bool         b_thread;
             vlc_cond_t   waitcond;
             bool         b_buffering;
     };

@@ -58,7 +58,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
 {
     currentPeriod = playlist->getFirstPeriod();
     failedupdates = 0;
-    thread = 0;
+    b_thread = false;
     b_buffering = false;
     nextPlaylistupdate = 0;
     demux.i_nzpcr = VLC_TS_INVALID;
@@ -160,7 +160,9 @@ bool PlaylistManager::start()
     updateControlsContentType();
     updateControlsPosition();
 
-    if(vlc_clone(&thread, managerThread, reinterpret_cast<void *>(this), VLC_THREAD_PRIORITY_INPUT))
+    b_thread = !vlc_clone(&thread, managerThread,
+                          reinterpret_cast<void *>(this), VLC_THREAD_PRIORITY_INPUT);
+    if(!b_thread)
         return false;
 
     setBufferingRunState(true);
@@ -170,11 +172,11 @@ bool PlaylistManager::start()
 
 void PlaylistManager::stop()
 {
-    if(thread)
+    if(b_thread)
     {
         vlc_cancel(thread);
         vlc_join(thread, NULL);
-        thread = 0;
+        b_thread = false;
     }
 }
 

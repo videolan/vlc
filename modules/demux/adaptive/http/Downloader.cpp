@@ -33,7 +33,6 @@ Downloader::Downloader()
     vlc_mutex_init(&lock);
     vlc_cond_init(&waitcond);
     killed = false;
-    thread_handle = { 0 };
     thread_handle_valid = false;
 }
 
