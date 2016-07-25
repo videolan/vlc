@@ -1116,13 +1116,10 @@ void FullscreenControllerWidget::keyPressEvent( QKeyEvent *event )
 }
 
 /* */
-static int FullscreenControllerWidgetFullscreenChanged( vlc_object_t *vlc_object,
-                const char *variable, vlc_value_t old_val,
-                vlc_value_t new_val,  void *data )
+static int FullscreenControllerWidgetFullscreenChanged( vlc_object_t *obj,
+        const char *, vlc_value_t, vlc_value_t new_val, void *data )
 {
-    VLC_UNUSED( variable ); VLC_UNUSED( old_val );
-
-    vout_thread_t *p_vout = (vout_thread_t *) vlc_object;
+    vout_thread_t *p_vout = (vout_thread_t *) obj;
 
     msg_Dbg( p_vout, "Qt: Fullscreen state changed" );
     FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *)data;
@@ -1132,13 +1129,10 @@ static int FullscreenControllerWidgetFullscreenChanged( vlc_object_t *vlc_object
     return VLC_SUCCESS;
 }
 /* */
-static int FullscreenControllerWidgetMouseMoved( vlc_object_t *vlc_object, const char *variable,
-                                                 vlc_value_t old_val, vlc_value_t new_val,
-                                                 void *data )
+static int FullscreenControllerWidgetMouseMoved( vlc_object_t *obj,
+        const char *, vlc_value_t, vlc_value_t new_val, void *data )
 {
-    VLC_UNUSED( variable ); VLC_UNUSED( old_val );
-
-    vout_thread_t *p_vout = (vout_thread_t *)vlc_object;
+    vout_thread_t *p_vout = (vout_thread_t *) obj;
     FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *)data;
 
     /* Get the value from the Vout - Trust the vout more than Qt */

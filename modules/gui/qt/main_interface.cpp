@@ -1655,11 +1655,9 @@ void MainInterface::setRaise()
  *  We don't show the menu directly here because we don't want the
  *  caller to block for a too long time.
  *****************************************************************************/
-static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
-                        vlc_value_t old_val, vlc_value_t new_val, void *param )
+static int PopupMenuCB( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t new_val, void *param )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_variable ); VLC_UNUSED( old_val );
-
     intf_thread_t *p_intf = (intf_thread_t *)param;
 
     if( p_intf->pf_show_dialog )
@@ -1674,12 +1672,9 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
 /*****************************************************************************
  * IntfShowCB: callback triggered by the intf-toggle-fscontrol libvlc variable.
  *****************************************************************************/
-static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
-                       vlc_value_t old_val, vlc_value_t new_val, void *param )
+static int IntfShowCB( vlc_object_t *, const char *,
+                       vlc_value_t, vlc_value_t, void *param )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_variable ); VLC_UNUSED( old_val );
-    VLC_UNUSED( new_val );
-
     intf_thread_t *p_intf = (intf_thread_t *)param;
     p_intf->p_sys->p_mi->toggleFSC();
 
@@ -1690,12 +1685,9 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
 /*****************************************************************************
  * IntfRaiseMainCB: callback triggered by the intf-show-main libvlc variable.
  *****************************************************************************/
-static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
-                       vlc_value_t old_val, vlc_value_t new_val, void *param )
+static int IntfRaiseMainCB( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void *param )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_variable ); VLC_UNUSED( old_val );
-    VLC_UNUSED( new_val );
-
     intf_thread_t *p_intf = (intf_thread_t *)param;
     p_intf->p_sys->p_mi->emitRaise();
 
@@ -1705,12 +1697,9 @@ static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
 /*****************************************************************************
  * IntfBossCB: callback triggered by the intf-boss libvlc variable.
  *****************************************************************************/
-static int IntfBossCB( vlc_object_t *p_this, const char *psz_variable,
-                       vlc_value_t old_val, vlc_value_t new_val, void *param )
+static int IntfBossCB( vlc_object_t *, const char *,
+                       vlc_value_t, vlc_value_t, void *param )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_variable ); VLC_UNUSED( old_val );
-    VLC_UNUSED( new_val );
-
     intf_thread_t *p_intf = (intf_thread_t *)param;
     p_intf->p_sys->p_mi->emitBoss();
 

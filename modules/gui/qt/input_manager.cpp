@@ -318,24 +318,20 @@ inline void InputManager::delCallbacks()
 }
 
 /* Static callbacks for IM */
-int MainInputManager::ItemChanged( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *param )
+int MainInputManager::ItemChanged( vlc_object_t *, const char *,
+                                   vlc_value_t, vlc_value_t val, void *param )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
-
     InputManager *im = (InputManager*)param;
-    input_item_t *p_item = static_cast<input_item_t *>(newval.p_address);
+    input_item_t *p_item = static_cast<input_item_t *>(val.p_address);
 
     IMEvent *event = new IMEvent( IMEvent::ItemChanged, p_item );
     QApplication::postEvent( im, event );
     return VLC_SUCCESS;
 }
 
-static int InputEvent( vlc_object_t *p_this, const char *,
+static int InputEvent( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t newval, void *param )
 {
-    VLC_UNUSED( p_this );
-
     InputManager *im = (InputManager*)param;
     IMEvent *event;
 
@@ -1189,12 +1185,9 @@ bool MainInputManager::hasEmptyPlaylist()
 /****************************
  * Static callbacks for MIM *
  ****************************/
-int MainInputManager::PLItemChanged( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t val, void *param )
+int MainInputManager::PLItemChanged( vlc_object_t *, const char *,
+                                     vlc_value_t, vlc_value_t, void *param )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
-    VLC_UNUSED( val );
-
     MainInputManager *mim = (MainInputManager*)param;
 
     IMEvent *event = new IMEvent( IMEvent::ItemChanged );
@@ -1202,13 +1195,12 @@ int MainInputManager::PLItemChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-int MainInputManager::LeafToParent( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *param )
+int MainInputManager::LeafToParent( vlc_object_t *, const char *,
+                                    vlc_value_t, vlc_value_t val, void *param )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
     MainInputManager *mim = (MainInputManager*)param;
 
-    PLEvent *event = new PLEvent( PLEvent::LeafToParent, newval.i_int );
+    PLEvent *event = new PLEvent( PLEvent::LeafToParent, val.i_int );
 
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
@@ -1235,10 +1227,10 @@ void MainInputManager::menusUpdateAudio( const QString& data )
     }
 }
 
-int MainInputManager::PLItemAppended
-( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
+int MainInputManager::PLItemAppended( vlc_object_t *, const char *,
+                                      vlc_value_t, vlc_value_t cur,
+                                      void *data )
 {
-    VLC_UNUSED( obj ); VLC_UNUSED( var ); VLC_UNUSED( old );
     MainInputManager *mim = static_cast<MainInputManager*>(data);
     playlist_add_t *p_add = static_cast<playlist_add_t*>( cur.p_address );
 
@@ -1249,11 +1241,9 @@ int MainInputManager::PLItemAppended
     return VLC_SUCCESS;
 }
 
-int MainInputManager::PLItemRemoved
-( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
+int MainInputManager::PLItemRemoved( vlc_object_t *obj, const char *,
+                                     vlc_value_t, vlc_value_t cur, void *data )
 {
-    VLC_UNUSED( var ); VLC_UNUSED( old );
-
     playlist_t *pl = (playlist_t *) obj;
     MainInputManager *mim = static_cast<MainInputManager*>(data);
 
