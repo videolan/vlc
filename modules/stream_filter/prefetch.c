@@ -29,25 +29,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#ifdef HAVE_MMAP
-# include <sys/mman.h>
-# ifndef MAP_ANONYMOUS
-#  define MAP_ANONYMOUS MAP_ANON
-# endif
-#elif !defined(__OS2__)
-# include <errno.h>
-# define MAP_FAILED ((void *)-1)
-# define mmap(a,l,p,f,d,o) \
-     ((void)(a), (void)(l), (void)(d), (void)(o), errno = ENOMEM, MAP_FAILED)
-# define munmap(a,l) \
-     ((void)(a), (void)(l), errno = EINVAL, -1)
-# define sysconf(a) 1
-#endif
-
-#if defined (_WIN32)
-# include <windows.h>
-#endif
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
@@ -483,180 +464,9 @@ static int Open(vlc_object_t *obj)
     if (sys->buffer_size < sys->read_size)
         sys->buffer_size = sys->read_size;
 
-#if !defined(_WIN32) && !defined(__OS2__)
-    /* Round up to a multiple of the page size */
-    long page_size = sysconf(_SC_PAGESIZE);
-
-    sys->buffer_size += page_size - 1;
-    sys->buffer_size &= ~(page_size - 1);
-
-    sys->buffer = mmap(NULL, 2 * sys->buffer_size, PROT_NONE,
-                       MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-    if (sys->buffer == MAP_FAILED)
-        goto error;
-
-    int fd = vlc_memfd();
-    if (fd == -1)
-        goto error;
-
-    if (ftruncate(fd, sys->buffer_size)
-     || mmap(sys->buffer, sys->buffer_size,
-             PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, fd, 0) == MAP_FAILED
-     || mmap(sys->buffer + sys->buffer_size, sys->buffer_size,
-             PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, fd, 0) == MAP_FAILED)
-    {
-        vlc_close(fd);
-        goto error;
-    }
-    vlc_close(fd);
-#elif defined(__OS2__)
-    /* On OS/2 Warp, page size is 4K, but the smallest chunk size is 64K */
-    int page_size = 64 * 1024;
-
-    sys->buffer_size += page_size - 1;
-    sys->buffer_size &= ~(page_size - 1);
-    sys->buffer = NULL;
-
-    char *buffer;
-
-    if (DosAllocMem(&buffer, 2 * sys->buffer_size, fALLOC))
-        goto error;
-
-    struct buffer_list
-    {
-        char *buffer;
-        struct buffer_list *next;
-    } *buffer_list_start = NULL;
-
-    for (;;)
-    {
-        char *buf;
-        if (DosAllocMem(&buf, sys->buffer_size, fPERM | OBJ_TILE))
-            break;
-
-        struct buffer_list *new_buffer = calloc(1, sizeof(*new_buffer));
-
-        if (!new_buffer)
-        {
-            DosFreeMem(buf);
-            break;
-        }
-
-        new_buffer->buffer = buf;
-        new_buffer->next = buffer_list_start;
-
-        buffer_list_start = new_buffer;
-
-        if (buf > buffer)
-        {
-            /* Disable thread switching */
-            DosEnterCritSec();
-
-            char *addr = buffer;
-
-            DosFreeMem(buffer);
-            buffer = NULL;
-
-            if (DosAllocMem(&buf, sys->buffer_size, fALLOC))
-                goto exitcritsec;
-
-            /* Was hole ? */
-            if (buf < addr)
-            {
-                DosFreeMem(buf);
-                buf = NULL;
-
-                char *tmp;
-
-                /* Try to fill the hole out */
-                if (DosAllocMem(&tmp, addr - buf, fALLOC))
-                    goto exitcritsec;
-
-                DosAllocMem(&buf, sys->buffer_size, fALLOC);
-
-                DosFreeMem(tmp);
-            }
-
-            if (buf != addr)
-            {
-                DosFreeMem(buf);
-                goto exitcritsec;
-            }
-
-            char *alias = NULL;
-
-            if (!DosAliasMem(buf, sys->buffer_size, &alias, 0)
-             && alias == buf + sys->buffer_size)
-                sys->buffer = addr;
-            else
-            {
-                DosFreeMem(buf);
-                DosFreeMem(alias);
-            }
-
-exitcritsec:
-            /* Enable thread switching */
-            DosExitCritSec();
-            break;
-        }
-    }
-
-    DosFreeMem(buffer);
-
-    for (struct buffer_list *l = buffer_list_start, *next; l; l = next)
-    {
-        next = l->next;
-
-        DosFreeMem(l->buffer);
-        free(l);
-    }
-
+    sys->buffer = malloc(sys->buffer_size);
     if (sys->buffer == NULL)
         goto error;
-#else
-    SYSTEM_INFO info;
-    GetSystemInfo(&info);
-
-    sys->buffer_size += info.dwPageSize - 1;
-    sys->buffer_size &= ~(info.dwPageSize - 1);
-    sys->buffer = NULL;
-
-    HANDLE map = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
-                                   0, sys->buffer_size, NULL);
-    if (map == NULL)
-        goto error;
-
-    for (;;)
-    {
-        char *buffer = VirtualAlloc(NULL, 2 * sys->buffer_size, MEM_RESERVE,
-                                    PAGE_NOACCESS);
-        if (buffer == NULL)
-            break;
-
-        VirtualFree(buffer, 2 * sys->buffer_size, MEM_RELEASE);
-
-        char *a = MapViewOfFileEx(map, FILE_MAP_ALL_ACCESS, 0, 0,
-                                  sys->buffer_size, buffer);
-        char *b = MapViewOfFileEx(map, FILE_MAP_ALL_ACCESS, 0, 0,
-                                  sys->buffer_size, buffer + sys->buffer_size);
-
-        if (a == buffer && b == buffer + sys->buffer_size)
-        {
-            sys->buffer = buffer;
-            break;
-        }
-        if (b != NULL)
-            UnmapViewOfFile(b);
-        if (a != NULL)
-            UnmapViewOfFile(a);
-        if (a == NULL || b == NULL)
-            break; /* ENOMEM */
-    }
-
-    CloseHandle(map);
-    if (sys->buffer == NULL)
-        goto error;
-#endif /* _WIN32 */
 
     sys->interrupt = vlc_interrupt_create();
     if (unlikely(sys->interrupt == NULL))
@@ -685,22 +495,7 @@ exitcritsec:
     return VLC_SUCCESS;
 
 error:
-#if !defined(_WIN32) && !defined(__OS2__)
-    if (sys->buffer != MAP_FAILED)
-        munmap(sys->buffer, 2 * sys->buffer_size);
-#elif defined(__OS2__)
-    if (sys->buffer != NULL)
-    {
-        DosFreeMem(sys->buffer + sys->buffer_size);
-        DosFreeMem(sys->buffer);
-    }
-#else
-    if (sys->buffer != NULL)
-    {
-        UnmapViewOfFile(sys->buffer + sys->buffer_size);
-        UnmapViewOfFile(sys->buffer);
-    }
-#endif
+    free(sys->buffer);
     free(sys->content_type);
     free(sys);
     return VLC_ENOMEM;
@@ -723,15 +518,7 @@ static void Close (vlc_object_t *obj)
     vlc_cond_destroy(&sys->wait_data);
     vlc_mutex_destroy(&sys->lock);
 
-#if !defined(_WIN32) && !defined(__OS2__)
-    munmap(sys->buffer, 2 * sys->buffer_size);
-#elif defined(__OS2__)
-    DosFreeMem(sys->buffer + sys->buffer_size);
-    DosFreeMem(sys->buffer);
-#else
-    UnmapViewOfFile(sys->buffer + sys->buffer_size);
-    UnmapViewOfFile(sys->buffer);
-#endif
+    free(sys->buffer);
     free(sys->content_type);
     free(sys);
 }
