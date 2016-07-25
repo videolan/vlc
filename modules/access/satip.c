@@ -714,7 +714,6 @@ static int satip_open(access_t *access) {
             goto error;
         }
     }
-    net_SetCSCov(sys->udp_sock, -1, RTP_HEADER_SIZE);
 
     net_Printf(access, sys->tcp_sock,
             "PLAY %s RTSP/1.0\r\n"
