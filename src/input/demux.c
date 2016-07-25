@@ -558,6 +558,8 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_GET_ATTACHMENTS:
         case DEMUX_CAN_RECORD:
         case DEMUX_TEST_AND_CLEAR_FLAGS:
+        case DEMUX_GET_TITLE:
+        case DEMUX_GET_SEEKPOINT:
             return VLC_EGENERIC;
 
         case DEMUX_SET_TITLE:
