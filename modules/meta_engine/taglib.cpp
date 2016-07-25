@@ -188,23 +188,17 @@ public:
         return res;
     }
 
-    void writeBlock(const ByteVector& data)
+    void writeBlock(const ByteVector&)
     {
         // Let's stay Read-Only for now
-        VLC_UNUSED(data);
-        return;
     }
 
-    void insert(const ByteVector& data, ulong start, ulong replace)
+    void insert(const ByteVector&, ulong, ulong)
     {
-        VLC_UNUSED(data); VLC_UNUSED(start); VLC_UNUSED(replace);
-        return;
     }
 
-    void removeBlock(ulong start, ulong length)
+    void removeBlock(ulong, ulong)
     {
-        VLC_UNUSED(start); VLC_UNUSED(length);
-        return;
     }
 
     bool readOnly() const
@@ -253,10 +247,8 @@ public:
         return i_size;
     }
 
-    void truncate(long length)
+    void truncate(long)
     {
-        VLC_UNUSED(length);
-        return;
     }
 
 private:
