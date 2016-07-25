@@ -107,9 +107,6 @@ typedef struct access_sys_t {
     size_t fifo_size;
     block_fifo_t *fifo;
     vlc_thread_t thread;
-#ifdef HAVE_RECVMMSG
-    block_t *input_blocks[VLEN];
-#endif
     uint16_t last_seq_nr;
 
     bool woken;
@@ -324,19 +321,13 @@ static enum rtsp_result rtsp_handle(access_t *access, bool *interrupted) {
 }
 
 #ifdef HAVE_RECVMMSG
-static int alloc_input_blocks(access_t *access)
+static void satip_cleanup_blocks(void *data)
 {
-    access_sys_t *sys = access->p_sys;
-    int i;
+    block_t **input_blocks = data;
 
-    for (i = 0; i < VLEN; i++) {
-        if (!sys->input_blocks[i])
-            sys->input_blocks[i] = block_Alloc(RTSP_RECEIVE_BUFFER);
-        if (unlikely(sys->input_blocks[i] == NULL))
-            return VLC_ENOMEM;
-    }
-
-    return 0;
+    for (size_t i = 0; i < VLEN; i++)
+        if (input_blocks[i] != NULL)
+            block_Release(input_blocks[i]);
 }
 #endif
 
@@ -430,55 +421,66 @@ static void *satip_thread(void *data) {
     access_sys_t *sys = access->p_sys;
     int sock = sys->udp_sock;
     volatile mtime_t last_recv = mdate();
-    block_t *block = NULL;
     ssize_t len;
     mtime_t next_keepalive = mdate() + sys->keepalive_interval * 1000 * 1000;
-
 #ifdef HAVE_RECVMMSG
     struct mmsghdr msgs[VLEN];
     struct iovec iovecs[VLEN];
-    int retval, i;
-    memset(msgs, 0, sizeof(msgs));
+    block_t *input_blocks[VLEN];
+    int retval;
+
+    for (size_t i = 0; i < VLEN; i++) {
+        memset(&msgs[i], 0, sizeof (msgs[i]));
+        msgs[i].msg_hdr.msg_iov = &iovecs[i];
+        msgs[i].msg_hdr.msg_iovlen = 1;
+        memset(&iovecs[i], 0, sizeof (iovecs[i]));
+        iovecs[i].iov_len = RTSP_RECEIVE_BUFFER;
+        input_blocks[i] = NULL;
+    }
+#else
+    struct pollfd ufd;
+
+    ufd.fd = sock;
+    ufd.events = POLLIN;
 #endif
 
     while (last_recv > mdate() - RECV_TIMEOUT) {
 #ifdef HAVE_RECVMMSG
-        if (alloc_input_blocks(access) != 0) {
-            msg_Err(access, "Failed to allocate memory for input buffers");
-            break;
+        for (size_t i = 0; i < VLEN; i++) {
+            if (input_blocks[i] != NULL)
+                continue;
+
+            input_blocks[i] = block_Alloc(RTSP_RECEIVE_BUFFER);
+            if (unlikely(input_blocks[i] == NULL))
+                break;
+
+            iovecs[i].iov_base = input_blocks[i]->p_buffer;
         }
 
-        for(i = 0; i < VLEN; ++i) {
-            iovecs[i].iov_base = sys->input_blocks[i]->p_buffer;
-            iovecs[i].iov_len = RTSP_RECEIVE_BUFFER;
-            msgs[i].msg_hdr.msg_iov = &iovecs[i];
-            msgs[i].msg_hdr.msg_iovlen = 1;
-        }
+        vlc_cleanup_push(satip_cleanup_blocks, input_blocks);
         retval = recvmmsg(sock, msgs, VLEN, MSG_WAITFORONE, NULL);
+        vlc_cleanup_pop();
         if (retval == -1)
             continue;
 
         last_recv = mdate();
-        for(i = 0; i < retval; ++i) {
+        for (size_t i = 0; i < retval; ++i) {
+            block_t *block = input_blocks[i];
+
             len = msgs[i].msg_len;
-            block = sys->input_blocks[i];
             if (check_rtp_seq(access, block))
                 continue;
 
             block->p_buffer += RTP_HEADER_SIZE;
             block->i_buffer = len - RTP_HEADER_SIZE;
             block_FifoPut(sys->fifo, block);
-            sys->input_blocks[i] = NULL;
+            input_blocks[i] = NULL;
         }
 #else
-        struct pollfd ufd;
-
-        ufd.fd = sock;
-        ufd.events = POLLIN;
         if (poll(&ufd, 1, 20) == -1)
             continue;
 
-        block = block_Alloc(RTSP_RECEIVE_BUFFER);
+        block_t *block = block_Alloc(RTSP_RECEIVE_BUFFER);
         if (block == NULL) {
             msg_Err(access, "Failed to allocate memory for input buffer");
             break;
@@ -516,6 +518,9 @@ static void *satip_thread(void *data) {
         }
     }
 
+#ifdef HAVE_RECVMMSG
+    satip_cleanup_blocks(input_blocks);
+#endif
     msg_Dbg(access, "timed out waiting for data...");
     vlc_fifo_Lock(sys->fifo);
     sys->woken = true;
@@ -765,14 +770,6 @@ static void satip_close(access_t *access) {
 
     if (sys->fifo)
         block_FifoRelease(sys->fifo);
-
-#ifdef HAVE_RECVMMSG
-    for (int i = 0; i < VLEN; i++) {
-        if (sys->input_blocks[i])
-            block_Release(sys->input_blocks[i]);
-    }
-#endif
-
     if (sys->udp_sock >= 0)
         net_Close(sys->udp_sock);
     if (sys->rtcp_sock >= 0)
