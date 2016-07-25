@@ -253,8 +253,6 @@ char *ProcessMRL( const char *psz_mrl, const char *psz_prefix )
     /* Simple cases first */
     if( !psz_mrl || !*psz_mrl )
         return NULL;
-    if( !psz_prefix || !*psz_prefix )
-        goto uri;
 
     /* Check if the line specifies an absolute path */
     /* FIXME: that's wrong if the playlist is not a local file */
