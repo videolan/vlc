@@ -140,6 +140,8 @@ static int Demux( demux_t* p_demux )
     input_item_t* p_input = GetCurrentItem( p_demux );
     input_item_node_t* p_node = input_item_node_Create( p_input );
     p_sys->psz_prefix = FindPrefix( p_demux );
+    if( unlikely(p_sys->psz_prefix == NULL) )
+        return VLC_DEMUXER_EOF;
 
     do
     {
