@@ -1310,7 +1310,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/codec/libflac_plugin.so*
 
 %files plugin-a52
-%_vlc_pluginsdir/audio_filter/liba52tofloat32_plugin.so*
+%_vlc_pluginsdir/codec/libliba52_plugin.so*
 
 %files plugin-h264
 %_vlc_pluginsdir/codec/libx264_plugin.so*

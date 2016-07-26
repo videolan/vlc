@@ -1,7 +1,6 @@
 List of vlc plugins (475)
 $Id$
  * a52: A/52 basic parser/packetizer
- * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
  * aa: Ascii art video output
  * access_alsa: Alsa access module
  * access_archive: libarchive based access and stream filter
@@ -207,6 +206,7 @@ $Id$
  * keychain: Keystore for iOS, Mac OS X and tvOS
  * kva: OS/2 video output
  * kwallet: store secrets via KDE Kwallet
+ * liba52: A/52 audio decoder plugin, using liba52
  * libass: Subtitle renderers using libass
  * libbluray: Library to access Blu-Ray drives
  * libmpeg2: Mpeg2 video decoder using libmpeg2
