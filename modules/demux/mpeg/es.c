@@ -38,7 +38,7 @@
 #include <vlc_input.h>
 
 #include "../../packetizer/a52.h"
-#include "../../codec/dts_header.h"
+#include "../../packetizer/dts_header.h"
 
 /*****************************************************************************
  * Module descriptor

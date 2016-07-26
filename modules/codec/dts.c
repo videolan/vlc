@@ -41,7 +41,7 @@
 #include <vlc_cpu.h>
 
 #include "../packetizer/packetizer_helper.h"
-#include "dts_header.h"
+#include "../packetizer/dts_header.h"
 
 /*****************************************************************************
  * Module descriptor

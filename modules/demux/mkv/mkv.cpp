@@ -36,7 +36,7 @@
 #include <new>
 
 extern "C" {
-#include "../../modules/codec/dts_header.h"
+#include "../../packetizer/dts_header.h"
 }
 
 #include <vlc_fs.h>
