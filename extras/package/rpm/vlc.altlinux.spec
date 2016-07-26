@@ -1266,6 +1266,11 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %files plugin-live555
 %_vlc_pluginsdir/demux/liblive555_plugin.so*
 
+%if_enabled dca
+%files plugin-dca
+%_vlc_pluginsdir/codec/libdca_plugin.so*
+%endif
+
 %ifnarch x86_64
 %files plugin-loader
 %_vlc_pluginsdir/codec/libdmo_plugin.so*
@@ -1407,11 +1412,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 
 %files plugin-dvdread
 %_vlc_pluginsdir/access/libdvdread_plugin.so*
-
-%if_enabled dca
-%files plugin-dca
-%_vlc_pluginsdir/audio_filter/libdtstofloat32_plugin.so*
-%endif
 
 %if_enabled gnomevfs
 %files plugin-gnomevfs

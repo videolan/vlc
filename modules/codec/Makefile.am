@@ -23,6 +23,13 @@ libliba52_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 EXTRA_LTLIBRARIES += libliba52_plugin.la
 codec_LTLIBRARIES += $(LTLIBliba52)
 
+libdca_plugin_la_SOURCES = codec/dca.c
+libdca_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(DCA_CFLAGS)
+libdca_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libdca_plugin_la_LIBADD = $(LIBM) $(DCA_LIBS)
+EXTRA_LTLIBRARIES += libdca_plugin.la
+codec_LTLIBRARIES += $(LTLIBdca)
+
 libadpcm_plugin_la_SOURCES = codec/adpcm.c
 codec_LTLIBRARIES += libadpcm_plugin.la
 

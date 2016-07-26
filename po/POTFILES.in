@@ -284,7 +284,6 @@ modules/audio_filter/channel_mixer/simple.c
 modules/audio_filter/channel_mixer/trivial.c
 modules/audio_filter/chorus_flanger.c
 modules/audio_filter/compressor.c
-modules/audio_filter/converter/dtstofloat32.c
 modules/audio_filter/converter/format.c
 modules/audio_filter/converter/mpgatofixed32.c
 modules/audio_filter/converter/tospdif.c
@@ -353,6 +352,7 @@ modules/codec/cdg.c
 modules/codec/crystalhd.c
 modules/codec/cvdsub.c
 modules/codec/daala.c
+modules/codec/dca.c
 modules/codec/ddummy.c
 modules/codec/dmo/buffer.c
 modules/codec/dmo/dmo.c

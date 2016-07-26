@@ -91,6 +91,7 @@ $Id$
  * daala: a daala video decoder/packetizer using libdaala
  * dbus: D-Bus control interface
  * dbus_screensaver: preventing the computer from suspending
+ * dca: DTS audio decoder plugin, using libdca
  * dc1394: IIDC (DCAM) FireWire input module
  * dcp: Digital Cinema Package input
  * ddummy: dummy decoder
@@ -115,7 +116,6 @@ $Id$
  * dshow: DirectShow access plugin for encoding cards under Windows
  * dsm: SMB access module
  * dts: DTS basic parser/packetizer
- * dtstofloat32: DTS Audio converter
  * dtv: DVB support (superseds bda module for Windows)
  * dummy: dummy interface
  * dv1394: Digital Video (Firewire/IEEE1394/I-Link) access module

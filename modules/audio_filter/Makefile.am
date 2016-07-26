@@ -76,13 +76,6 @@ audio_filter_LTLIBRARIES += \
 	libtrivial_channel_mixer_plugin.la
 
 # Converters
-libdtstofloat32_plugin_la_SOURCES = audio_filter/converter/dtstofloat32.c
-libdtstofloat32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(DCA_CFLAGS)
-libdtstofloat32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(audio_filterdir)'
-libdtstofloat32_plugin_la_LIBADD = $(LIBM) $(DCA_LIBS)
-EXTRA_LTLIBRARIES += libdtstofloat32_plugin.la
-audio_filter_LTLIBRARIES += $(LTLIBdtstofloat32)
-
 libmad_plugin_la_SOURCES = audio_filter/converter/mpgatofixed32.c
 libmad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(MAD_CFLAGS)
 libmad_plugin_la_LIBADD = $(AM_LIBADD) $(MAD_LIBS)
