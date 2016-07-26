@@ -1590,7 +1590,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* Copy picture surface into texture surface
      * color space conversion happen here */
-    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &vd->sys->rect_src_clipped, destination, NULL, D3DTEXF_LINEAR);
+    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, &vd->sys->rect_src_clipped, destination, NULL, D3DTEXF_NONE );
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DDevice9_StretchRect: source 0x%p 0x%0lx",
