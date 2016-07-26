@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dts_header.c: parse DTS audio headers info
  *****************************************************************************
- * Copyright (C) 2004-2009 VLC authors and VideoLAN
+ * Copyright (C) 2004-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -22,14 +22,19 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define DTS_HEADER_SIZE 14
+#define VLC_DTS_HEADER_SIZE 14
 
-int GetSyncInfo( const uint8_t *p_buf,
-                        bool *pb_dts_hd,
-                        unsigned int *pi_sample_rate,
-                        unsigned int *pi_bit_rate,
-                        unsigned int *pi_frame_length,
-                        unsigned int *pi_audio_mode );
+typedef struct
+{
+    bool            b_dts_hd;
+    unsigned int    i_rate;
+    unsigned int    i_bitrate;
+    unsigned int    i_frame_size;
+    unsigned int    i_frame_length;
+    uint32_t        i_original_channels;
+} vlc_dts_header_t;
 
-int SyncCode( const uint8_t * );
+int     vlc_dts_header_Parse( vlc_dts_header_t *p_header,
+                              const void *p_buffer, size_t i_buffer);
 
+bool    vlc_dts_header_IsSync( const void *p_buffer, size_t i_buffer );

@@ -1025,20 +1025,12 @@ static int A52Init( demux_t *p_demux )
  *****************************************************************************/
 static int DtsCheckSync( const uint8_t *p_peek, int *pi_samples )
 {
-    unsigned int i_sample_rate, i_bit_rate, i_frame_length, i_audio_mode;
-    bool b_dts_hd;
-
     VLC_UNUSED(pi_samples);
 
-    int i_frame_size = GetSyncInfo( p_peek,
-                                    &b_dts_hd,
-                                    &i_sample_rate,
-                                    &i_bit_rate,
-                                    &i_frame_length,
-                                    &i_audio_mode );
-
-    if( i_frame_size != VLC_EGENERIC && i_frame_size <= 8192 )
-        return i_frame_size;
+    vlc_dts_header_t dts;
+    if( vlc_dts_header_Parse( &dts, p_peek, 11 ) == VLC_SUCCESS
+     && dts.i_frame_size > 0 && dts.i_frame_size <= 8192 )
+        return dts.i_frame_size;
     else
         return VLC_EGENERIC;
 }
