@@ -62,8 +62,8 @@ std::string Helper::getFileExtension (const std::string &uri)
         extension = uri.substr(0, pos);
     else
         extension = uri;
-    pos = uri.find_last_of('.');
-    if(pos == std::string::npos)
+    pos = extension.find_last_of('.');
+    if(pos == std::string::npos || extension.length() - pos < 2)
         return std::string();
     return extension.substr(pos + 1);
 }
