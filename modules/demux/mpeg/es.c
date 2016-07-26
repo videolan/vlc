@@ -37,7 +37,7 @@
 #include <vlc_codecs.h>
 #include <vlc_input.h>
 
-#include "../../codec/a52.h"
+#include "../../packetizer/a52.h"
 #include "../../codec/dts_header.h"
 
 /*****************************************************************************

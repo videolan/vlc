@@ -16,6 +16,7 @@ libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c \
 	packetizer/hevc_nal.h packetizer/hevc_nal.c \
 	packetizer/hxxx_nal.h \
 	packetizer/hxxx_common.c packetizer/hxxx_common.h
+libpacketizer_a52_plugin_la_SOURCES = packetizer/a52.c packetizer/a52.h
 
 libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
 	packetizer/avparser.h \
@@ -24,7 +25,6 @@ libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
 	codec/avcodec/fourcc.c
 libpacketizer_avparser_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AVUTIL_CFLAGS) $(AM_CFLAGS)
 libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM)
-
 
 noinst_HEADERS += packetizer/packetizer_helper.h packetizer/startcode_helper.h
 
@@ -39,6 +39,7 @@ packetizer_LTLIBRARIES = \
 	libpacketizer_flac_plugin.la \
 	libpacketizer_hevc_plugin.la \
 	libpacketizer_copy_plugin.la \
+	libpacketizer_a52_plugin.la \
 	$(NULL)
 
 if HAVE_AVCODEC

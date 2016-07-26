@@ -332,7 +332,6 @@ modules/audio_output/volume.h
 modules/audio_output/wasapi.c
 modules/audio_output/waveout.c
 modules/audio_output/windows_audio_common.h
-modules/codec/a52.c
 modules/codec/adpcm.c
 modules/codec/aes3.c
 modules/codec/araw.c
@@ -1001,6 +1000,7 @@ modules/mux/ogg.c
 modules/mux/wav.c
 modules/notify/osx_notifications.m
 modules/notify/notify.c
+modules/packetizer/a52.c
 modules/packetizer/avparser.h
 modules/packetizer/copy.c
 modules/packetizer/dirac.c

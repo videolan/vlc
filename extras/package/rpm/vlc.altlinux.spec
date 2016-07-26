@@ -1033,7 +1033,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/audio_output/libaout_file_plugin.so*
 
 %dir %_vlc_pluginsdir/codec
-%_vlc_pluginsdir/codec/liba52_plugin.so*
 %_vlc_pluginsdir/codec/libadpcm_plugin.so*
 %_vlc_pluginsdir/codec/libaraw_plugin.so*
 %_vlc_pluginsdir/codec/librawvideo_plugin.so*
@@ -1135,7 +1134,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 #%_vlc_pluginsdir/mux/libmux_ts_plugin.so*
 
 %dir %_vlc_pluginsdir/packetizer
-#_vlc_pluginsdir/packetizer/libpacketizer_a52_plugin.so*
+%_vlc_pluginsdir/packetizer/libpacketizer_a52_plugin.so*
 %_vlc_pluginsdir/packetizer/libpacketizer_copy_plugin.so*
 %_vlc_pluginsdir/packetizer/libpacketizer_mpeg4audio_plugin.so*
 %_vlc_pluginsdir/packetizer/libpacketizer_mpeg4video_plugin.so*
