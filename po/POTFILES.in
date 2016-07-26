@@ -1004,6 +1004,7 @@ modules/packetizer/a52.c
 modules/packetizer/avparser.h
 modules/packetizer/copy.c
 modules/packetizer/dirac.c
+modules/packetizer/dts.c
 modules/packetizer/flac.c
 modules/packetizer/h264.c
 modules/packetizer/hevc.c
