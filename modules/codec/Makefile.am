@@ -26,9 +26,6 @@ libaraw_plugin_la_SOURCES = codec/araw.c
 libaraw_plugin_la_LIBADD = $(LIBM)
 codec_LTLIBRARIES += libaraw_plugin.la
 
-libdts_plugin_la_SOURCES = codec/dts.c packetizer/dts_header.c packetizer/dts_header.h
-codec_LTLIBRARIES += libdts_plugin.la
-
 libfaad_plugin_la_SOURCES = codec/faad.c
 libfaad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_faad)
 libfaad_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'

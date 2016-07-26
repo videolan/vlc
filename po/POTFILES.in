@@ -358,7 +358,6 @@ modules/codec/ddummy.c
 modules/codec/dmo/buffer.c
 modules/codec/dmo/dmo.c
 modules/codec/dmo/dmo.h
-modules/codec/dts.c
 modules/codec/dvbsub.c
 modules/codec/edummy.c
 modules/codec/faad.c
