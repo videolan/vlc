@@ -7,15 +7,15 @@ libpacketizer_mpeg4audio_plugin_la_SOURCES = packetizer/mpeg4audio.c
 libpacketizer_h264_plugin_la_SOURCES = \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/h264.c packetizer/hxxx_nal.h \
-        packetizer/hxxx_common.c packetizer/hxxx_common.h
+	packetizer/hxxx_common.c packetizer/hxxx_common.h
 libpacketizer_vc1_plugin_la_SOURCES = packetizer/vc1.c
 libpacketizer_mlp_plugin_la_SOURCES = packetizer/mlp.c
 libpacketizer_dirac_plugin_la_SOURCES = packetizer/dirac.c
 libpacketizer_flac_plugin_la_SOURCES = packetizer/flac.c
 libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c \
-        packetizer/hevc_nal.h packetizer/hevc_nal.c \
-        packetizer/hxxx_nal.h \
-        packetizer/hxxx_common.c packetizer/hxxx_common.h
+	packetizer/hevc_nal.h packetizer/hevc_nal.c \
+	packetizer/hxxx_nal.h \
+	packetizer/hxxx_common.c packetizer/hxxx_common.h
 
 libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
 	packetizer/avparser.h \
