@@ -353,6 +353,7 @@ $Id$
  * sndio: OpenBSD sndio audio output
  * soxr: SoX Resampler library audio filter
  * spatializer: A spatializer audio filter
+ * spdif: S/PDIF audio pass-through decoder
  * speex: a speex audio decoder/packetizer using the libspeex library
  * speex_resampler: audio resampler using the libspeexdsp library
  * spudec: RLE DVD subtitles decoder

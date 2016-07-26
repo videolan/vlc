@@ -13,6 +13,8 @@ endif
 
 
 ### Audio codecs ###
+libspdif_plugin_la_SOURCES = codec/spdif.c
+codec_LTLIBRARIES += libspdif_plugin.la
 
 liba52_plugin_la_SOURCES = codec/a52.c codec/a52.h
 codec_LTLIBRARIES += liba52_plugin.la
