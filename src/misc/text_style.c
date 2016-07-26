@@ -240,6 +240,10 @@ unsigned int vlc_html_color( const char *psz_value, bool* ok )
     if( *psz_value == '#' )
     {
         color = strtol( psz_value + 1, &psz_end, 16 );
+        if ( psz_end - ( psz_value + 1 ) <= 6 && *psz_end == 0 )
+        {
+            color |= 0xFF000000;
+        }
         if ( ok != NULL && ( *psz_end == 0 || isspace( *psz_end ) ) )
             *ok = true;
     }
