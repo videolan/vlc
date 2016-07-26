@@ -1476,9 +1476,16 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             }
 
             vars.p_fmt->i_codec = VLC_CODEC_A52;
+            vars.p_fmt->b_packetized = false;
         }
-        S_CASE("A_EAC3") { vars.p_fmt->i_codec = VLC_CODEC_EAC3; }
-        S_CASE("A_DTS")  { vars.p_fmt->i_codec = VLC_CODEC_DTS; }
+        S_CASE("A_EAC3") {
+            vars.p_fmt->i_codec = VLC_CODEC_EAC3;
+            vars.p_fmt->b_packetized = false;
+        }
+        S_CASE("A_DTS")  {
+            vars.p_fmt->i_codec = VLC_CODEC_DTS;
+            vars.p_fmt->b_packetized = false;
+        }
         S_CASE("A_MLP")  { vars.p_fmt->i_codec = VLC_CODEC_MLP; }
         S_CASE("A_TRUEHD") { /* FIXME when more samples arrive */
             vars.p_fmt->i_codec = VLC_CODEC_TRUEHD;
