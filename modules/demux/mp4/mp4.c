@@ -434,7 +434,7 @@ static block_t * MP4_Block_Read( demux_t *p_demux, const mp4_track_t *p_track, i
 
 static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_block )
 {
-    if ( p_track->b_chans_reorder && aout_BitsPerSample( p_track->fmt.i_codec ) )
+    if ( p_track->b_chans_reorder )
     {
         aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
                              p_track->fmt.audio.i_channels,

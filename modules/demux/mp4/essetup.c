@@ -969,11 +969,17 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                 }
             }
             rgi_chans_sequence[i_channels] = 0;
-            p_track->b_chans_reorder = !!
-                    aout_CheckChannelReorder( rgi_chans_sequence, NULL, i_vlc_mapping,
-                                              p_track->rgi_chans_reordering );
-        }
+            if( aout_CheckChannelReorder( rgi_chans_sequence, NULL, i_vlc_mapping,
+                                          p_track->rgi_chans_reordering ) &&
+                aout_BitsPerSample( p_track->fmt.i_codec ) )
+            {
+                p_track->b_chans_reorder = true;
+                p_track->fmt.audio.i_channels = i_channels;
+                p_track->fmt.audio.i_physical_channels =
+                p_track->fmt.audio.i_original_channels = i_vlc_mapping;
+            }
 
+        }
     }
 
     SetupGlobalExtensions( p_track, p_sample );
