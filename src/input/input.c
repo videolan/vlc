@@ -2918,7 +2918,8 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
     if( b_forced )
         var_Change( p_input, psz_es, VLC_VAR_CHOICESCOUNT, &count, NULL );
 
-    msg_Err( p_input, "Loading %s slave: %s (forced: %d)", psz_es, psz_uri, b_forced );
+    msg_Dbg( p_input, "loading %s slave: %s (forced: %d)", psz_es, psz_uri,
+             b_forced );
 
     input_source_t *p_source = InputSourceNew( p_input, psz_uri,
                                                psz_forced_demux, b_can_fail );
