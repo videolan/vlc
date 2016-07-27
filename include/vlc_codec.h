@@ -367,6 +367,13 @@ VLC_API block_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) VLC_USED;
  */
 VLC_API subpicture_t * decoder_NewSubpicture( decoder_t *, const subpicture_updater_t * ) VLC_USED;
 
+/*
+ * Request that the decoder should be reloaded. The current module will be
+ * unloaded. Reloading a module may cause a loss of frames. There is no
+ * warranty that pf_decode_* callbacks won't be called again after this call.
+ */
+VLC_API void decoder_RequestReload( decoder_t * );
+
 /**
  * This function gives all input attachments at once.
  *

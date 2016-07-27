@@ -54,6 +54,16 @@
 
 #include "../video_output/vout_control.h"
 
+/*
+ * Possibles values set in p_owner->reload atomic
+ */
+enum reload
+{
+    RELOAD_NO_REQUEST,
+    RELOAD_DECODER,     /* Reload the decoder module */
+    RELOAD_DECODER_AOUT /* Stop the aout and reload the decoder module */
+};
+
 struct decoder_owner_sys_t
 {
     input_thread_t  *p_input;
@@ -80,6 +90,7 @@ struct decoder_owner_sys_t
     /* */
     bool           b_fmt_description;
     vlc_meta_t     *p_description;
+    atomic_int     reload;
 
     /* fifo */
     block_fifo_t *p_fifo;
@@ -191,7 +202,7 @@ static void UnloadDecoder( decoder_t *p_dec )
 }
 
 static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
-                          const es_format_t *restrict p_fmt )
+                          const es_format_t *restrict p_fmt, enum reload reload )
 {
     /* Copy p_fmt since it can be destroyed by UnloadDecoder */
     es_format_t fmt_in;
@@ -587,6 +598,14 @@ subpicture_t *decoder_NewSubpicture( decoder_t *p_decoder,
     if( !p_subpicture )
         msg_Warn( p_decoder, "can't get output subpicture" );
     return p_subpicture;
+}
+
+void decoder_RequestReload( decoder_t * p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    /* Don't override reload if it's RELOAD_DECODER_AOUT */
+    int expected = RELOAD_NO_REQUEST;
+    atomic_compare_exchange_strong( &p_owner->reload, &expected, RELOAD_DECODER );
 }
 
 /* decoder_GetInputAttachments:
@@ -1031,8 +1050,8 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
                 /* Drain the decoder module */
                 DecoderDecodeVideo( p_dec, NULL );
 
-                if( ReloadDecoder( p_dec, false,
-                                   &p_packetizer->fmt_out ) != VLC_SUCCESS )
+                if( ReloadDecoder( p_dec, false, &p_packetizer->fmt_out,
+                                   RELOAD_DECODER ) != VLC_SUCCESS )
                 {
                     block_ChainRelease( p_packetized_block );
                     return;
@@ -1213,8 +1232,8 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block )
                 /* Drain the decoder module */
                 DecoderDecodeAudio( p_dec, NULL );
 
-                if( ReloadDecoder( p_dec, false,
-                                   &p_packetizer->fmt_out ) != VLC_SUCCESS )
+                if( ReloadDecoder( p_dec, false, &p_packetizer->fmt_out,
+                                   RELOAD_DECODER ) != VLC_SUCCESS )
                 {
                     block_ChainRelease( p_packetized_block );
                     return;
@@ -1348,6 +1367,20 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
 
     if( p_dec->b_error )
         goto error;
+
+    /* Here, the atomic doesn't prevent to miss a reload request.
+     * DecoderProcess*() can still be called after the decoder module or the
+     * audio output requested a reload. This will only result in a drop of an
+     * input block or an output buffer. */
+    enum reload reload;
+    if( ( reload = atomic_exchange( &p_owner->reload, RELOAD_NO_REQUEST ) ) )
+    {
+        msg_Warn( p_dec, "Reloading the decoder module%s",
+                  reload == RELOAD_DECODER_AOUT ? " and the audio output" : "" );
+
+        if( ReloadDecoder( p_dec, false, &p_dec->fmt_in, reload ) != VLC_SUCCESS )
+            goto error;
+    }
 
     if( p_block )
     {
@@ -1597,6 +1630,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->flushing = false;
     p_owner->b_draining = false;
     atomic_init( &p_owner->drained, false );
+    atomic_init( &p_owner->reload, RELOAD_NO_REQUEST );
     p_owner->b_idle = false;
 
     es_format_Init( &p_owner->fmt, UNKNOWN_ES, 0 );
