@@ -175,22 +175,23 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         i_value[i] = 0.;
 
     /* 1 - Compute the peak values */
-    float max = 0.0;
-    for (size_t i = 0; i < p_in_buf->i_nb_samples; i++) {
+    for (size_t i = 0; i < p_in_buf->i_nb_samples; i++)
         for (int j = 0; j<nbChannels; j++) {
-            float ch = (*p_sample++);
+            float ch = *p_sample++;
             if (ch > i_value[j])
                 i_value[j] = ch;
-            if (ch > max)
-                max = ch;
         }
-    }
-    max *= max;
 
     if (p_sys->silence) {
         /* 2 - store the new value */
         ValueDate_t *new = xmalloc(sizeof(*new));
-        new->value = max;
+        new->value = 0.0;
+        for (int j = 0; j<nbChannels; j++) {
+            float ch = i_value[j];
+            if (ch > new->value)
+                new->value = ch;
+        }
+        new->value *= new->value;
         new->date = p_in_buf->i_pts;
         new->next = NULL;
         if (p_sys->last != NULL)
