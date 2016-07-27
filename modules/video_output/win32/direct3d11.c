@@ -380,6 +380,18 @@ static int OpenCoreW(vout_display_t *vd)
 }
 #endif
 
+static bool is_d3d11_opaque(vlc_fourcc_t chroma)
+{
+    switch (chroma)
+    {
+    case VLC_CODEC_D3D11_OPAQUE:
+    case VLC_CODEC_D3D11_OPAQUE_10B:
+        return true;
+    default:
+        return false;
+    }
+}
+
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
@@ -403,11 +415,11 @@ static int Open(vlc_object_t *object)
     }
 
     vout_display_info_t info  = vd->info;
-    info.is_slow              = fmt.i_chroma != VLC_CODEC_D3D11_OPAQUE;
+    info.is_slow              = !is_d3d11_opaque(fmt.i_chroma);
     info.has_double_click     = true;
     info.has_hide_mouse       = false;
     info.has_event_thread     = true;
-    info.has_pictures_invalid = fmt.i_chroma != VLC_CODEC_D3D11_OPAQUE;
+    info.has_pictures_invalid = !is_d3d11_opaque(fmt.i_chroma);
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
         vd->sys->d3dregion_format != DXGI_FORMAT_UNKNOWN)
@@ -716,7 +728,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if ( picture->format.i_chroma != VLC_CODEC_D3D11_OPAQUE &&
+    if ( !is_d3d11_opaque(picture->format.i_chroma) &&
          sys->stagingQuad.pTexture != NULL )
     {
         Direct3D11UnmapTexture(picture);
@@ -742,7 +754,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     }
 
 #ifdef HAVE_ID3D11VIDEODECODER
-    if (picture->format.i_chroma == VLC_CODEC_D3D11_OPAQUE) {
+    if (is_d3d11_opaque(picture->format.i_chroma)) {
 #if VLC_WINSTORE_APP
         if( sys->context_lock > 0 )
         {
@@ -806,7 +818,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-    if ( picture->format.i_chroma != VLC_CODEC_D3D11_OPAQUE &&
+    if ( !is_d3d11_opaque(picture->format.i_chroma) &&
          sys->stagingQuad.pTexture == NULL )
         Direct3D11UnmapTexture(picture);
 
@@ -828,7 +840,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         /* TODO device lost */
     }
 #if defined(HAVE_ID3D11VIDEODECODER) && VLC_WINSTORE_APP
-    if( picture->format.i_chroma == VLC_CODEC_D3D11_OPAQUE && sys->context_lock > 0) {
+    if( is_d3d11_opaque(picture->format.i_chroma) && sys->context_lock > 0) {
         ReleaseMutex( sys->context_lock );
     }
 #endif
@@ -904,7 +916,15 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     scd.SampleDesc.Quality = 0;
     scd.Width = fmt->i_visible_width;
     scd.Height = fmt->i_visible_height;
-    scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM; /* TODO: use DXGI_FORMAT_NV12 */
+    switch(fmt->i_chroma)
+    {
+    case VLC_CODEC_D3D11_OPAQUE_10B:
+        scd.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
+        break;
+    default:
+        scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM; /* TODO: use DXGI_FORMAT_NV12 */
+        break;
+    }
     //scd.Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
     scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
@@ -1032,13 +1052,13 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     vlc_fourcc_t i_src_chroma = fmt->i_chroma;
     fmt->i_chroma = 0;
 
-    // look for the request pixel format first
+    // look for the requested pixel format first
     UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     UINT i_formatSupport;
     for (const d3d_format_t *output_format = GetRenderFormatList();
          output_format->name != NULL; ++output_format)
     {
-        if( i_src_chroma == output_format->fourcc)
+        if( i_src_chroma == output_format->fourcc )
         {
             if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
                                                            output_format->formatTexture,
@@ -1105,7 +1125,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         sys->d3dregion_format = DXGI_FORMAT_UNKNOWN;
     }
 
-    if (sys->picQuadConfig.resourceFormatYRGB == DXGI_FORMAT_R8_UNORM)
+    if (sys->picQuadConfig.resourceFormatYRGB == DXGI_FORMAT_R8_UNORM ||
+        sys->picQuadConfig.resourceFormatYRGB == DXGI_FORMAT_R16_UNORM)
     {
         if( fmt->i_height > 576 )
             sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
@@ -1439,7 +1460,7 @@ static int Direct3D11CreatePool(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if ( fmt->i_chroma == VLC_CODEC_D3D11_OPAQUE )
+    if ( is_d3d11_opaque(fmt->i_chroma) )
         /* a D3D11VA pool will be created when needed */
         return VLC_SUCCESS;
 
