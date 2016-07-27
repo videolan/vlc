@@ -190,6 +190,30 @@ static void UnloadDecoder( decoder_t *p_dec )
     p_dec->b_error = false;
 }
 
+static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
+                          const es_format_t *restrict p_fmt )
+{
+    /* Copy p_fmt since it can be destroyed by UnloadDecoder */
+    es_format_t fmt_in;
+    es_format_Init( &fmt_in, UNKNOWN_ES, 0 );
+    if( es_format_Copy( &fmt_in, p_fmt ) != VLC_SUCCESS )
+    {
+        p_dec->b_error = true;
+        return VLC_EGENERIC;
+    }
+
+    /* Restart the decoder module */
+    UnloadDecoder( p_dec );
+    if( LoadDecoder( p_dec, b_packetizer, &fmt_in ) )
+    {
+        p_dec->b_error = true;
+        es_format_Clean( &fmt_in );
+        return VLC_EGENERIC;
+    }
+    es_format_Clean( &fmt_in );
+    return VLC_SUCCESS;
+}
+
 static void DecoderUpdateFormatLocked( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -1006,11 +1030,10 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block )
 
                 /* Drain the decoder module */
                 DecoderDecodeVideo( p_dec, NULL );
-                /* Restart the decoder module */
-                UnloadDecoder( p_dec );
-                if( LoadDecoder( p_dec, false, &p_packetizer->fmt_out ) )
+
+                if( ReloadDecoder( p_dec, false,
+                                   &p_packetizer->fmt_out ) != VLC_SUCCESS )
                 {
-                    p_dec->b_error = true;
                     block_ChainRelease( p_packetized_block );
                     return;
                 }
@@ -1189,11 +1212,10 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block )
 
                 /* Drain the decoder module */
                 DecoderDecodeAudio( p_dec, NULL );
-                /* Restart the decoder module */
-                UnloadDecoder( p_dec );
-                if( LoadDecoder( p_dec, false, &p_packetizer->fmt_out ) )
+
+                if( ReloadDecoder( p_dec, false,
+                                   &p_packetizer->fmt_out ) != VLC_SUCCESS )
                 {
-                    p_dec->b_error = true;
                     block_ChainRelease( p_packetized_block );
                     return;
                 }
