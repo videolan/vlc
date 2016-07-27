@@ -165,8 +165,7 @@ static int Convert_time( int64_t *timing_value, const char *s )
     int d1 = 0;
 
     if ( sscanf( s, "%d.%ds", &s1, &d1) == 2 ||
-         sscanf( s, "%d:%d:%d,%d", &h1, &m1, &s1, &d1 ) == 4 ||
-         sscanf( s, "%d:%d:%d.%d", &h1, &m1, &s1, &d1 ) == 4 ||
+         sscanf( s, "%d:%d:%d%*[,.]%d", &h1, &m1, &s1, &d1 ) == 4 ||
          sscanf( s, "%d:%d:%d", &h1, &m1, &s1) == 3 )
     {
         (*timing_value) = ( (int64_t)h1 * 3600 * 1000 +
