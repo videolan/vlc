@@ -45,7 +45,14 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
 
 #if LIBAVUTIL_VERSION_CHECK(54, 13, 1, 24, 100)
         case AV_PIX_FMT_D3D11VA_VLD:
-            return VLC_CODEC_D3D11_OPAQUE;
+            switch (swfmt)
+            {
+                case AV_PIX_FMT_YUV420P10LE:
+                    return VLC_CODEC_D3D11_OPAQUE_10B;
+                default:
+                    return VLC_CODEC_D3D11_OPAQUE;
+            }
+        break;
 #endif
 #if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(53, 14, 0))
         case AV_PIX_FMT_VDA:
@@ -115,7 +122,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
 
     vlc_fourcc_t chroma;
     va->setup(va, &chroma);
-    if (chroma != vlc_va_GetChroma(pix_fmt, AV_PIX_FMT_YUV420P))
+    if (chroma != vlc_va_GetChroma(pix_fmt, avctx->sw_pix_fmt))
     {   /* Mismatch, cannot work, fail */
         vlc_va_Delete(va, avctx);
 #endif

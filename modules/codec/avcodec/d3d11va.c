@@ -105,6 +105,7 @@ DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 
 struct vlc_va_sys_t
 {
     directx_sys_t                dx_sys;
+    vlc_fourcc_t                 i_chroma;
 
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                    dxgidebug_dll;
@@ -167,7 +168,7 @@ static void Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    *chroma = sys->filter == NULL ? VLC_CODEC_D3D11_OPAQUE : VLC_CODEC_YV12;
+    *chroma = sys->filter == NULL ? sys->i_chroma : VLC_CODEC_YV12;
 }
 
 void SetupAVCodecContext(vlc_va_t *va)
@@ -209,7 +210,7 @@ static picture_t *video_new_buffer(filter_t *p_filter)
 }
 
 static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
-                               vlc_fourcc_t fmt_out )
+                               vlc_fourcc_t src_chroma )
 {
     filter_t *p_filter;
 
@@ -217,11 +218,22 @@ static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in
     if (unlikely(p_filter == NULL))
         return NULL;
 
+    vlc_fourcc_t fmt_out;
+    switch (src_chroma)
+    {
+    case VLC_CODEC_D3D11_OPAQUE_10B:
+        fmt_out = VLC_CODEC_P010;
+        break;
+    case VLC_CODEC_D3D11_OPAQUE:
+        fmt_out = VLC_CODEC_YV12;
+        break;
+    }
+
     p_filter->owner.video.buffer_new = (picture_t *(*)(filter_t *))video_new_buffer;
 
     es_format_InitFromVideo( &p_filter->fmt_in,  &p_fmt_in->video );
     es_format_InitFromVideo( &p_filter->fmt_out, &p_fmt_in->video );
-    p_filter->fmt_in.i_codec  = p_filter->fmt_in.video.i_chroma  = VLC_CODEC_D3D11_OPAQUE;
+    p_filter->fmt_in.i_codec  = p_filter->fmt_in.video.i_chroma  = src_chroma;
     p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma = fmt_out;
     p_filter->p_module = module_need( p_filter, "video filter2", NULL, false );
 
@@ -242,7 +254,10 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
     vlc_va_surface_t *surface = output->context;
     int ret = VLC_SUCCESS;
 
-    if (output->format.i_chroma == VLC_CODEC_D3D11_OPAQUE)
+    switch (output->format.i_chroma)
+    {
+    case VLC_CODEC_D3D11_OPAQUE:
+    case VLC_CODEC_D3D11_OPAQUE_10B:
     {
         picture_sys_t *p_sys_out = output->p_sys;
         picture_sys_t *p_sys_in = surface->p_pic->p_sys;
@@ -308,13 +323,16 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
                                                       NULL);
         }
     }
-    else if (output->format.i_chroma == VLC_CODEC_YV12) {
+        break;
+    case VLC_CODEC_YV12:
         va->sys->filter->owner.sys = output;
         picture_Hold( surface->p_pic );
         va->sys->filter->pf_video_filter( va->sys->filter, surface->p_pic );
-    } else {
+        break;
+    default:
         msg_Err(va, "Unsupported output picture format %08X", output->format.i_chroma );
         ret = VLC_EGENERIC;
+        break;
     }
 
 
@@ -373,6 +391,18 @@ static void Close(vlc_va_t *va, AVCodecContext *ctx)
     free((char *)va->description);
     free(sys);
 }
+
+vlc_fourcc_t d3d11va_fourcc(enum PixelFormat swfmt)
+{
+    switch (swfmt)
+    {
+        case AV_PIX_FMT_YUV420P10LE:
+            return VLC_CODEC_D3D11_OPAQUE_10B;
+        default:
+            return VLC_CODEC_D3D11_OPAQUE;
+    }
+}
+
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
@@ -439,6 +469,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         }
     }
 
+    sys->i_chroma = d3d11va_fourcc(ctx->sw_pix_fmt);
+
 #if VLC_WINSTORE_APP
     err = directx_va_Open(va, &sys->dx_sys, ctx, fmt, false);
 #else
@@ -449,7 +481,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     if (p_sys == NULL)
     {
-        sys->filter = CreateFilter( VLC_OBJECT(va), fmt, VLC_CODEC_YV12);
+        sys->filter = CreateFilter( VLC_OBJECT(va), fmt, sys->i_chroma);
         if (sys->filter == NULL)
             goto error;
     }
@@ -1068,7 +1100,7 @@ static picture_t *DxAllocPicture(vlc_va_t *va, const video_format_t *fmt, unsign
 {
     vlc_va_sys_t *sys = va->sys;
     video_format_t src_fmt = *fmt;
-    src_fmt.i_chroma = VLC_CODEC_D3D11_OPAQUE;
+    src_fmt.i_chroma = sys->i_chroma;
     picture_sys_t *pic_sys = calloc(1, sizeof(*pic_sys));
     if (unlikely(pic_sys == NULL))
         return NULL;
