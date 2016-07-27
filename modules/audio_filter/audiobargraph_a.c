@@ -156,7 +156,7 @@ static void SendValues(filter_t *p_filter, float *value, int nbChannels)
         len += snprintf(msg + len, sizeof (msg) - len, "%f:", value[i]);
     }
 
-    //msg_Dbg(p_filter, "values: %s", message);
+    //msg_Dbg(p_filter, "values: %s", msg);
     var_SetString(p_filter->obj.libvlc, "audiobargraph_v-i_values", msg);
 }
 
