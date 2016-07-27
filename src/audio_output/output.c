@@ -692,41 +692,46 @@ int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
 {
     aout_owner_t *owner = aout_owner (aout);
     char **tabid, **tabname;
-    unsigned count = 0;
+    unsigned i = 0;
 
     vlc_mutex_lock (&owner->dev.lock);
     tabid = malloc (sizeof (*tabid) * owner->dev.count);
     tabname = malloc (sizeof (*tabname) * owner->dev.count);
-    if(likely(tabid && tabname))
-    {
-        for (aout_dev_t *dev = owner->dev.list; dev != NULL; dev = dev->next)
-        {
-            char *psz_id = strdup (dev->id);
-            if(unlikely(psz_id == NULL))
-                break;
 
-            char *psz_name = strdup (dev->name);
-            if(unlikely(psz_name == NULL))
-            {
-                free(psz_id);
-                break;
-            }
-
-            tabid[count] = psz_id;
-            tabname[count++] = psz_name;
-        }
-    }
-    vlc_mutex_unlock (&owner->dev.lock);
-
-    if(unlikely(count == 0))
-    {
-        free(tabid);
-        free(tabname);
-        return -1;
-    }
+    if (unlikely(tabid == NULL || tabname == NULL))
+        goto error;
 
     *ids = tabid;
     *names = tabname;
 
-    return count;
+    for (aout_dev_t *dev = owner->dev.list; dev != NULL; dev = dev->next)
+    {
+        tabid[i] = strdup(dev->id);
+        if (unlikely(tabid[i] == NULL))
+            goto error;
+
+        tabname[i] = strdup(dev->name);
+        if (unlikely(tabname[i] == NULL))
+        {
+            free(tabid[i]);
+            goto error;
+        }
+
+        i++;
+    }
+    vlc_mutex_unlock (&owner->dev.lock);
+
+    return i;
+
+error:
+    vlc_mutex_unlock(&owner->dev.lock);
+    while (i > 0)
+    {
+        i--;
+        free(tabname[i]);
+        free(tabid[i]);
+    }
+    free(tabname);
+    free(tabid);
+    return -1;
 }
