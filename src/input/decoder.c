@@ -215,6 +215,23 @@ static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
 
     /* Restart the decoder module */
     UnloadDecoder( p_dec );
+
+    if( reload == RELOAD_DECODER_AOUT )
+    {
+        decoder_owner_sys_t *p_owner = p_dec->p_owner;
+        assert( p_owner->fmt.i_cat == AUDIO_ES );
+        audio_output_t *p_aout = p_owner->p_aout;
+
+        vlc_mutex_lock( &p_owner->lock );
+        p_owner->p_aout = NULL;
+        vlc_mutex_unlock( &p_owner->lock );
+        if( p_aout )
+        {
+            aout_DecDelete( p_aout );
+            input_resource_PutAout( p_owner->p_resource, p_aout );
+        }
+    }
+
     if( LoadDecoder( p_dec, b_packetizer, &fmt_in ) )
     {
         p_dec->b_error = true;
@@ -1146,7 +1163,19 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
      && i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE
      && !DecoderTimedWait( p_dec, p_audio->i_pts - AOUT_MAX_PREPARE_TIME ) )
     {
-        aout_DecPlay( p_aout, p_audio, i_rate );
+        int status = aout_DecPlay( p_aout, p_audio, i_rate );
+        if( status == AOUT_DEC_CHANGED )
+        {
+            /* Only reload the decoder */
+            decoder_RequestReload( p_dec );
+        }
+        else if( status == AOUT_DEC_FAILED )
+        {
+            /* If we reload because the aout failed, we should release it. That
+             * way, a next call to aout_update_format() won't re-use the
+             * previous (failing) aout but will try to create a new one. */
+            atomic_store( &p_owner->reload, RELOAD_DECODER_AOUT );
+        }
     }
     else
     {
