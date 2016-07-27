@@ -135,6 +135,7 @@ static int aout_CheckReady (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
+    int status = AOUT_DEC_SUCCESS;
     int restart = atomic_exchange (&owner->restart, 0);
     if (unlikely(restart))
     {
@@ -151,6 +152,7 @@ static int aout_CheckReady (audio_output_t *aout)
                 owner->mixer_format.i_format = 0;
             aout_volume_SetFormat (owner->volume,
                                    owner->mixer_format.i_format);
+            status = AOUT_DEC_CHANGED;
         }
 
         msg_Dbg (aout, "restarting filters...");
@@ -172,7 +174,7 @@ static int aout_CheckReady (audio_output_t *aout)
          * left over by an audio visualization:
         input_resource_TerminatVout(MAGIC HERE); */
     }
-    return (owner->mixer_format.i_format) ? 0 : -1;
+    return (owner->mixer_format.i_format) ? status : AOUT_DEC_FAILED;
 }
 
 /**
@@ -339,7 +341,7 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
 /*****************************************************************************
  * aout_DecPlay : filter & mix the decoded buffer
  *****************************************************************************/
-void aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
+int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
 {
     aout_owner_t *owner = aout_owner (aout);
 
@@ -351,7 +353,8 @@ void aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
                                  / owner->input_format.i_rate;
 
     aout_OutputLock (aout);
-    if (unlikely(aout_CheckReady (aout)))
+    int ret = aout_CheckReady (aout);
+    if (unlikely(ret == AOUT_DEC_FAILED))
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
     const mtime_t now = mdate (), advance = block->i_pts - now;
@@ -388,7 +391,7 @@ void aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
     atomic_fetch_add(&owner->buffers_played, 1);
 out:
     aout_OutputUnlock (aout);
-    return;
+    return ret;
 drop:
     owner->sync.discontinuity = true;
     block_Release (block);
