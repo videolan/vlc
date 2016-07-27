@@ -1547,6 +1547,9 @@ void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_ao
 
     current->clear();
     int i_result = aout_DevicesList( p_aout, &ids, &names);
+    if( i_result < 0 )
+        return;
+
     selected = aout_DeviceGet( p_aout );
 
     QActionGroup *actionGroup = new QActionGroup(current);
