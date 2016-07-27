@@ -163,7 +163,6 @@ static int Convert_time( int64_t *timing_value, const char *s )
     int m1 = 0;
     int s1 = 0;
     int d1 = 0;
-    //char *sec = "";
     if ( sscanf( s, "%d.%ds",
                  &s1, &d1) == 2 ||
 	 sscanf( s, "%d:%d:%d,%d",
