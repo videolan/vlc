@@ -87,7 +87,8 @@ static uint16_t get_data_type( filter_t *p_filter, block_t *p_in )
     switch( p_filter->fmt_in.audio.i_format )
     {
         case VLC_CODEC_A52:
-            if( unlikely( p_in->i_buffer < 6 ) )
+            if( unlikely( p_in->i_buffer < 6
+                       || p_in->i_nb_samples != A52_FRAME_NB ) )
                 return 0;
             return ( (p_in->p_buffer[5] & 0x7) << 8 ) /* bsmod */ | IEC61937_AC3;
         case VLC_CODEC_DTS:
@@ -128,7 +129,7 @@ static bool is_big_endian( filter_t *p_filter, block_t *p_in )
  *****************************************************************************/
 static block_t *DoWork( filter_t * p_filter, block_t *p_in_buf )
 {
-    uint16_t i_length = p_in_buf->i_buffer;
+    size_t i_length = p_in_buf->i_buffer;
     uint8_t * p_in = p_in_buf->p_buffer;
     block_t *p_out_buf = NULL;
 
@@ -136,7 +137,8 @@ static block_t *DoWork( filter_t * p_filter, block_t *p_in_buf )
     if( i_data_type == 0 || ( i_length + 8 ) > AOUT_SPDIF_SIZE )
         goto out;
 
-    p_out_buf = block_Alloc( AOUT_SPDIF_SIZE );
+    size_t i_out_length = p_in_buf->i_nb_samples * 4;
+    p_out_buf = block_Alloc( i_out_length );
     if( !p_out_buf )
         goto out;
     uint8_t *p_out = p_out_buf->p_buffer;
@@ -160,7 +162,7 @@ static block_t *DoWork( filter_t * p_filter, block_t *p_in_buf )
         swab( p_in, p_out + 8, i_length & ~1 );
 
         /* If i_length is odd, we have to adjust swapping a bit... */
-        if( i_length & 1 && ( i_length + 9 ) <= AOUT_SPDIF_SIZE )
+        if( i_length & 1 && ( i_length + 9 ) <= i_out_length )
         {
             p_out[8 + i_length - 1] = 0;
             p_out[8 + i_length] = p_in[i_length-1];
@@ -169,13 +171,13 @@ static block_t *DoWork( filter_t * p_filter, block_t *p_in_buf )
     } else
         memcpy( p_out + 8, p_in, i_length );
 
-    if( 8 + i_length < AOUT_SPDIF_SIZE ) /* padding */
-        memset( p_out + 8 + i_length, 0, AOUT_SPDIF_SIZE - i_length - 8 );
+    if( 8 + i_length < i_out_length ) /* padding */
+        memset( p_out + 8 + i_length, 0, i_out_length - i_length - 8 );
 
     p_out_buf->i_dts = p_in_buf->i_dts;
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = AOUT_SPDIF_SIZE;
+    p_out_buf->i_buffer = i_out_length;
 out:
     block_Release( p_in_buf );
     return p_out_buf;
