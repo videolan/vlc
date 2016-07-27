@@ -24,30 +24,27 @@
 -- Probe function.
 function probe()
 	if vlc.access ~= "http" and vlc.access ~= "https" then
-        return false
-    end
+		return false
+	end
 
-    return ( string.match( vlc.path, "www.dailymotion.com/video" ) )
+	return ( string.match( vlc.path, "www.dailymotion.com/video/" ) )
 end
 
 -- Parse function.
 function parse()
-	prefres = vlc.var.inherit(nil, "preferred-resolution")
-
-
 	while true
-    do
-        line = vlc.readline()
-        if not line then break end
+	do
+		line = vlc.readline()
+		if not line then break end
 		if string.match( line, "<meta property=\"og:title\"" ) then
 			_,_,name = string.find( line, "content=\"(.-)\"" )
 			name = vlc.strings.resolve_xml_special_chars( name )
 		end
-		if string.match( line, "<meta name=\"description\"" ) then
+		if string.match( line, "<meta property=\"og:description\"" ) then
 			_,_,description = string.find( line, "content=\"(.-)\"" )
-            if (description ~= nil) then
-                description = vlc.strings.resolve_xml_special_chars( description )
-            end
+			if (description ~= nil) then
+				description = vlc.strings.resolve_xml_special_chars( description )
+			end
 		end
 		if string.match( line, "<meta name=\"author\"" ) then
 			_,_,artist = string.find( line, "content=\"(.-)\"" )
@@ -56,49 +53,14 @@ function parse()
 		if string.match( line, "<link rel=\"thumbnail\" type=\"image/jpeg\"" ) then
 			_,_,arturl = string.find( line, "href=\"(.-)\"" )
 		end
-    end
+	end
 
 	page_embed = string.gsub(vlc.path, "dailymotion.com/video/", "dailymotion.com/embed/video/")
 	page_url = vlc.stream(vlc.access .. "://" .. page_embed )
 	if not page_url then return nil end
-    page = page_url:read( 65653 )
+	page = page_url:read( 90000 )
 
-
-	hd1080url = string.match( page, "\"stream_h264_hd1080_url\"%s*:%s*\"([^\"]*)\"")
-	hdurl = string.match( page, "\"stream_h264_hd_url\"%s*:%s*\"([^\"]*)\"")
-	hqurl = string.match( page, "\"stream_h264_hq_url\"%s*:%s*\"([^\"]*)\"")
-	baseurl = string.match( page, "\"stream_h264_url\"%s*:%s*\"([^\"]*)\"")
-	ldurl = string.match( page, "\"stream_h264_ld_url\"%s*:%s*\"([^\"]*)\"")
-	livehlsurl = string.match( page, "\"stream_live_hls_url\"%s*:%s*\"([^\"]*)\"")
-
-
-	arr_videos_urls = {}
-	if hd1080url then	table.insert(arr_videos_urls,hd1080url)	end
-	if hdurl then table.insert(arr_videos_urls,hdurl) end
-	if hqurl then	table.insert(arr_videos_urls,hqurl)	end
-	if baseurl then table.insert(arr_videos_urls,baseurl) end
-	if ldurl then table.insert(arr_videos_urls,baseurl) end
-
-
-	if livehlsurl then
-		return { { path = livehlsurl:gsub("\\/", "/"); name = name; description = description; url = vlc.path; arturl = arturl ; artist = artist} }
-	else
-		if table.getn(arr_videos_urls) > 0 then
-			for i=1 , table.getn(arr_videos_urls)  do
-				video_url_out = arr_videos_urls[i]:gsub("\\/", "/")
-
-				if prefres < 0 then
-					break
-				end
-				height = string.match( video_url_out, "/cdn/%w+%-%d+x(%d+)/video/" )
-				if not height or tonumber(height) <= prefres then
-					break
-				end
-			end
-			return { { path = video_url_out; name = name; description = description; url = vlc.path; arturl = arturl; artist = artist} }
-		else
-			vlc.msg.err("Couldn't extract the video URL from dailymotion")
-			return { }
-		end
-	end
+	m3u8_url = string.match( page, "https:\\/\\/www.dailymotion.com\\/cdn\\/manifest\\/video\\/[^\"]+" )
+	m3u8_url = string.gsub( m3u8_url, "\\/", "/" )
+	return { { path = m3u8_url; name = name; description = description; url = vlc.path; arturl = arturl; artist = artist} }
 end
