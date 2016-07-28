@@ -656,7 +656,7 @@ static int InOpen( vlc_object_t *p_this )
     if( readTLSMode( p_this, p_sys, p_access->psz_name ) )
         goto exit_error;
 
-    if( parseURL( &p_sys->url, p_access->psz_location, p_sys->tlsmode ) )
+    if( parseURL( &p_sys->url, p_access->psz_url, p_sys->tlsmode ) )
         goto exit_error;
 
     if( Connect( p_this, p_sys ) )
