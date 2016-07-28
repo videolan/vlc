@@ -719,12 +719,12 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             encoding = PA_ENCODING_AC3_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
             break;
-        /*case VLC_CODEC_EAC3:
-            fmt->i_format = VLC_CODEC_SPDIFL FIXME;
+        case VLC_CODEC_EAC3:
+            fmt->i_format = VLC_CODEC_SPDIFL;
             encoding = PA_ENCODING_EAC3_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
             break;
-        case VLC_CODEC_MPGA:
+        /* case VLC_CODEC_MPGA:
             fmt->i_format = VLC_CODEC_SPDIFL FIXME;
             encoding = PA_ENCODING_MPEG_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
