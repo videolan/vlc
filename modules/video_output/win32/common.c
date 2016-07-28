@@ -473,6 +473,7 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
     }
 
     /*  Fill chroma planes for planar YUV */
+    else
     if (picture->format.i_chroma == VLC_CODEC_I420 ||
         picture->format.i_chroma == VLC_CODEC_J420 ||
         picture->format.i_chroma == VLC_CODEC_YV12) {
