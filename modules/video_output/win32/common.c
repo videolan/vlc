@@ -452,6 +452,8 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
     picture->p->p_pixels = data;
     picture->p->i_pitch  = pitch;
     picture->p->i_lines  = picture->format.i_height;
+    assert(picture->p->i_visible_pitch <= picture->p->i_pitch);
+    assert(picture->p->i_visible_lines <= picture->p->i_lines);
 
     /*  Fill chroma planes for biplanar YUV */
     if (picture->format.i_chroma == VLC_CODEC_NV12 ||
@@ -464,6 +466,8 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
             p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
             p->i_pitch  = pitch;
             p->i_lines  = picture->format.i_height;
+            assert(p->i_visible_pitch <= p->i_pitch);
+            assert(p->i_visible_lines <= p->i_lines);
         }
         /* The dx/d3d buffer is always allocated as NV12 */
         if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_NV12)) {
