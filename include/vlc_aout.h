@@ -76,7 +76,8 @@
 #define AOUT_FMT_SPDIF( p_format ) \
     ( ((p_format)->i_format == VLC_CODEC_SPDIFL)       \
        || ((p_format)->i_format == VLC_CODEC_SPDIFB)   \
-       || ((p_format)->i_format == VLC_CODEC_A52)       \
+       || ((p_format)->i_format == VLC_CODEC_A52)      \
+       || ((p_format)->i_format == VLC_CODEC_EAC3)     \
        || ((p_format)->i_format == VLC_CODEC_DTS) )
 
 /* Values used for the audio-channels object variable */
