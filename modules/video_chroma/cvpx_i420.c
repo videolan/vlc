@@ -89,7 +89,6 @@ static void CVPX_I420(filter_t *p_filter, picture_t *sourcePicture, picture_t *d
     }
 
     CopyFromNv12ToI420(destinationPicture, pp_plane, pi_pitch,
-                       sourcePicture->format.i_width,
                        sourcePicture->format.i_height);
 
     CVPixelBufferUnlockBaseAddress(picsys->pixelBuffer, 0);

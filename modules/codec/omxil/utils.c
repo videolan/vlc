@@ -223,7 +223,7 @@ void CopyOmxPicture( int i_color_format, picture_t *p_pic,
         copy_cache_t *p_surface_cache = (copy_cache_t*)p_architecture_specific->data;
         uint8_t *ppi_src_pointers[2] = { p_src, p_src + i_src_stride * i_slice_height };
         size_t pi_src_strides[2] = { i_src_stride, i_src_stride };
-        CopyFromNv12( p_pic, ppi_src_pointers, pi_src_strides, i_src_stride, i_slice_height, p_surface_cache );
+        CopyFromNv12( p_pic, ppi_src_pointers, pi_src_strides, i_slice_height, p_surface_cache );
         return;
     }
 #endif

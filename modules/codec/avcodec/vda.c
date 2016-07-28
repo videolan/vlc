@@ -69,7 +69,7 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
         pi_pitch[i] = CVPixelBufferGetBytesPerRowOfPlane(buffer, i);
     }
 
-    CopyFromNv12ToI420(p_pic, pp_plane, pi_pitch, i_width, i_height);
+    CopyFromNv12ToI420(p_pic, pp_plane, pi_pitch, i_height);
 
     CVPixelBufferUnlockBaseAddress(buffer, 0);
 }

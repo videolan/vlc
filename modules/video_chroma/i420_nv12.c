@@ -131,7 +131,6 @@ static void I420_YUV( filter_sys_t *p_sys, picture_t *p_src, picture_t *p_dst, b
     };
 
     CopyFromI420ToNv12( p_dst, plane, pitch,
-                        p_src->format.i_x_offset + p_src->format.i_visible_width,
                         p_src->format.i_y_offset + p_src->format.i_visible_height,
                         &p_sys->cache );
 }
