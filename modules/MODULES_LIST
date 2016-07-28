@@ -1,6 +1,5 @@
 List of vlc plugins (475)
 $Id$
- * a52: A/52 basic parser/packetizer
  * aa: Ascii art video output
  * access_alsa: Alsa access module
  * access_archive: libarchive based access and stream filter
@@ -91,8 +90,8 @@ $Id$
  * daala: a daala video decoder/packetizer using libdaala
  * dbus: D-Bus control interface
  * dbus_screensaver: preventing the computer from suspending
- * dca: DTS audio decoder plugin, using libdca
  * dc1394: IIDC (DCAM) FireWire input module
+ * dca: DTS audio decoder plugin, using libdca
  * dcp: Digital Cinema Package input
  * ddummy: dummy decoder
  * decklink: input module to read from a Blackmagic SDI card
@@ -115,7 +114,6 @@ $Id$
  * drawable: legacy LibVLC video window provider
  * dshow: DirectShow access plugin for encoding cards under Windows
  * dsm: SMB access module
- * dts: DTS basic parser/packetizer
  * dtv: DVB support (superseds bda module for Windows)
  * dummy: dummy interface
  * dv1394: Digital Video (Firewire/IEEE1394/I-Link) access module
@@ -279,9 +277,11 @@ $Id$
  * os2drive: service discovery for OS/2 drives
  * oss: audio output module using the OSS /dev/dsp interface
  * osx_notifications: announce currently playing stream to OS X/Growl
+ * packetizer_a52: A/52 basic parser/packetizer
  * packetizer_avparser: libavcodec packetizer
  * packetizer_copy: Simple copy packetizer
  * packetizer_dirac: Dirac video packetizer
+ * packetizer_dts: DTS basic parser/packetizer
  * packetizer_flac: FLAC audio packetizer
  * packetizer_h264: H264 video packetizer
  * packetizer_hevc: H.265/HEVC video packetizer
