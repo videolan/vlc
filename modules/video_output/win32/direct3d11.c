@@ -1077,6 +1077,48 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         }
     }
 
+    // look for any pixel format that we can handle with enough pixels per channel
+    if ( !fmt->i_chroma )
+    {
+        uint8_t bits_per_channel;
+        switch (i_src_chroma)
+        {
+        case VLC_CODEC_D3D11_OPAQUE:
+            bits_per_channel = 8;
+            break;
+        case VLC_CODEC_D3D11_OPAQUE_10B:
+            bits_per_channel = 10;
+            break;
+        default:
+            {
+                const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(i_src_chroma);
+                bits_per_channel = p_format == NULL || p_format->pixel_bits == 0 ? 8 : p_format->pixel_bits;
+            }
+            break;
+        }
+
+        for (const d3d_format_t *output_format = GetRenderFormatList();
+             output_format->name != NULL; ++output_format)
+        {
+            if( bits_per_channel <= output_format->bitsPerChannel )
+            {
+                if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
+                                                               output_format->formatTexture,
+                                                               &i_formatSupport)) &&
+                        ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
+                {
+                    msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", output_format->name,
+                                 (char *)&i_src_chroma );
+                    fmt->i_chroma = output_format->fourcc;
+                    DxgiFormatMask( output_format->formatTexture, fmt );
+                    sys->picQuadConfig.textureFormat      = output_format->formatTexture;
+                    sys->picQuadConfig.resourceFormatYRGB = output_format->formatY;
+                    sys->picQuadConfig.resourceFormatUV   = output_format->formatUV;
+                    break;
+                }
+            }
+        }
+    }
     // look for any pixel format that we can handle
     if ( !fmt->i_chroma )
     {

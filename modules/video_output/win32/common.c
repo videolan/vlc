@@ -457,7 +457,8 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
 
     /*  Fill chroma planes for biplanar YUV */
     if (picture->format.i_chroma == VLC_CODEC_NV12 ||
-        picture->format.i_chroma == VLC_CODEC_NV21) {
+        picture->format.i_chroma == VLC_CODEC_NV21 ||
+        picture->format.i_chroma == VLC_CODEC_P010) {
 
         for (int n = 1; n < picture->i_planes; n++) {
             const plane_t *o = &picture->p[n-1];

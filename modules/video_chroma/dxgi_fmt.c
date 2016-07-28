@@ -60,6 +60,7 @@ static const dxgi_format_t dxgi_formats[] = {
 static const d3d_format_t d3d_formats[] = {
     { "NV12",     DXGI_FORMAT_NV12,           VLC_CODEC_NV12,              8, DXGI_FORMAT_R8_UNORM,       DXGI_FORMAT_R8G8_UNORM },
     { "VA_NV12",  DXGI_FORMAT_NV12,           VLC_CODEC_D3D11_OPAQUE,      8, DXGI_FORMAT_R8_UNORM,       DXGI_FORMAT_R8G8_UNORM },
+    { "P010",     DXGI_FORMAT_P010,           VLC_CODEC_P010,             10, DXGI_FORMAT_R16_UNORM,      DXGI_FORMAT_R16G16_UNORM },
     { "VA_P010",  DXGI_FORMAT_P010,           VLC_CODEC_D3D11_OPAQUE_10B, 10, DXGI_FORMAT_R16_UNORM,      DXGI_FORMAT_R16G16_UNORM },
 #ifdef BROKEN_PIXEL
     { "YUY2",     DXGI_FORMAT_YUY2,           VLC_CODEC_I422,          8, DXGI_FORMAT_R8G8B8A8_UNORM,     0 },
@@ -67,7 +68,6 @@ static const d3d_format_t d3d_formats[] = {
     { "Y416",     DXGI_FORMAT_Y416,           VLC_CODEC_I444_16L,     16, DXGI_FORMAT_R16G16B16A16_UINT,  0 },
 #endif
 #ifdef UNTESTED
-    { "P010",     DXGI_FORMAT_P010,           VLC_CODEC_P010,         10, DXGI_FORMAT_R16_UNORM,          DXGI_FORMAT_R16G16_UNORM },
     { "Y210",     DXGI_FORMAT_Y210,           VLC_CODEC_I422_10L,     10, DXGI_FORMAT_R16G16B16A16_UNORM, 0 },
     { "Y410",     DXGI_FORMAT_Y410,           VLC_CODEC_I444,         10, DXGI_FORMAT_R10G10B10A2_UNORM,  0 },
     { "NV11",     DXGI_FORMAT_NV11,           VLC_CODEC_I411,          8, DXGI_FORMAT_R8_UNORM,           DXGI_FORMAT_R8G8_UNORM },
