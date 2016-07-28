@@ -451,5 +451,8 @@ reader:read(): read some data, return -1 on error, 0 on EOF, 1 on start of XML
 reader:name(): name of the element
 reader:value(): value of the element
 reader:next_attr(): next attribute of the element
+reader:node_empty(): queries whether the previous invocation of reader:read()
+  refers to an empty node ("<tag/>"). Returns a value less than 0 on error,
+  1 if the node is empty, and 0 if it is not.
 
 The simplexml module can also be used to parse XML documents easily.
