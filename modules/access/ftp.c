@@ -127,6 +127,7 @@ typedef struct ftp_features_t
 {
     bool b_unicode;
     bool b_authtls;
+    bool b_mlst;
 } ftp_features_t;
 
 enum tls_mode_e
@@ -522,6 +523,9 @@ static void FeaturesCheck( void *opaque, const char *feature )
     else
     if( strcasestr( feature, "AUTH TLS" ) != NULL )
         features->b_authtls = true;
+
+    if( strcasestr( feature, "MLST" ) != NULL )
+        features->b_mlst = true;
 }
 
 static const char *IsASCII( const char *str )
@@ -883,7 +887,8 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
 
     while (i_ret == VLC_SUCCESS)
     {
-        char *psz_line;
+        char *psz_line, *psz_file;
+        int type = ITEM_TYPE_UNKNOWN;
         if( p_sys->data.p_tls != NULL )
             psz_line = vlc_tls_GetLine( p_sys->data.p_tls );
         else
@@ -892,6 +897,28 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         if( psz_line == NULL )
             break;
 
+        if( p_sys->features.b_mlst )
+        {
+            /* MLST Format is key=val;key=val...; FILENAME */
+            if( strstr( psz_line, "type=dir" ) )
+                type = ITEM_TYPE_DIRECTORY;
+            if( strstr( psz_line, "type=file" ) )
+                type = ITEM_TYPE_FILE;
+
+            /* Get the filename or fail */
+            psz_file = strchr( psz_line, ' ' );
+            if( psz_file )
+                psz_file++;
+            else
+            {
+                msg_Warn( p_access, "Empty filename in MLST list" );
+                free( psz_line );
+                continue;
+            }
+        }
+        else
+            psz_file = psz_line;
+
         char *psz_uri;
         if( asprintf( &psz_uri, "%s://%s:%d%s%s/%s",
                       ( p_sys->tlsmode == NONE ) ? "ftp" :
@@ -899,10 +926,10 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
                       p_sys->url.psz_host, p_sys->url.i_port,
                       p_sys->url.psz_path ? "/" : "",
                       p_sys->url.psz_path ? p_sys->url.psz_path : "",
-                      psz_line ) != -1 )
+                      psz_file ) != -1 )
         {
-            i_ret = access_fsdir_additem( &fsdir, psz_uri, psz_line,
-                                          ITEM_TYPE_UNKNOWN, ITEM_NET );
+            i_ret = access_fsdir_additem( &fsdir, psz_uri, psz_file,
+                                          type, ITEM_NET );
             free( psz_uri );
         }
         free( psz_line );
@@ -1095,6 +1122,14 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
 
     if( b_directory )
     {
+        if( p_sys->features.b_mlst &&
+            ftp_SendCommand( p_access, p_sys, "MLSD" ) >= 0 &&
+            ftp_RecvCommand( p_access, p_sys, NULL, &psz_arg ) <= 2 )
+        {
+            msg_Dbg( p_access, "Using MLST extension to list" );
+        }
+        else
+
         if( ftp_SendCommand( p_access, p_sys, "NLST" ) < 0 ||
             ftp_RecvCommand( p_access, p_sys, NULL, &psz_arg ) > 2 )
         {
