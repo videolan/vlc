@@ -663,7 +663,7 @@ static int InOpen( vlc_object_t *p_this )
         goto exit_error;
 
     /* get size */
-    if( p_sys->url.psz_path == NULL )
+    if( p_sys->url.psz_path == NULL || !*p_sys->url.psz_path )
         b_directory = true;
     else
     if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path ) < 0 )
