@@ -144,7 +144,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
                 return kCMVideoCodecType_H264;
             }
 
-            msg_Dbg(p_dec, "trying to decode MPEG-4 Part 10: profile %" PRIx8 ", level " PRIx8, i_profile, i_level);
+            msg_Dbg(p_dec, "trying to decode MPEG-4 Part 10: profile %" PRIx8 ", level %i" PRIx8, i_profile, i_level);
 
             switch (i_profile) {
                 case PROFILE_H264_BASELINE:
@@ -913,7 +913,7 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
         pi_pitch[i] = CVPixelBufferGetBytesPerRowOfPlane(buffer, i);
     }
 
-    CopyFromNv12ToI420(p_pic, pp_plane, pi_pitch, i_width, i_height);
+    CopyFromNv12ToI420(p_pic, pp_plane, pi_pitch, i_height);
 
     CVPixelBufferUnlockBaseAddress(buffer, 0);
 }
