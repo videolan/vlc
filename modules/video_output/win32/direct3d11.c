@@ -269,6 +269,64 @@ static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
   }\
 ";
 
+static const char *globPixelShaderBiplanarYUYV_BT709_2RGB = "\
+  Texture2D shaderTextureYUYV;\
+  SamplerState SampleType;\
+  \
+  struct PS_INPUT\
+  {\
+    float4 Position   : SV_POSITION;\
+    float2 Texture    : TEXCOORD0;\
+    float  Opacity    : OPACITY;\
+  };\
+  \
+  float4 PS( PS_INPUT In ) : SV_TARGET\
+  {\
+    float3 yuv;\
+    float4 rgba;\
+    yuv.x  = shaderTextureYUYV.Sample(SampleType, In.Texture).x;\
+    yuv.y  = shaderTextureYUYV.Sample(SampleType, In.Texture).y;\
+    yuv.z  = shaderTextureYUYV.Sample(SampleType, In.Texture).a;\
+    yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
+    yuv.y  = yuv.y - 0.5;\
+    yuv.z  = yuv.z - 0.5;\
+    rgba.x = saturate(yuv.x + 1.792741071428571 * yuv.z);\
+    rgba.y = saturate(yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
+    rgba.z = saturate(yuv.x + 2.112401785714286 * yuv.y);\
+    rgba.a = In.Opacity;\
+    return rgba;\
+  }\
+";
+
+static const char *globPixelShaderBiplanarYUYV_BT601_2RGB = "\
+  Texture2D shaderTextureYUYV;\
+  SamplerState SampleType;\
+  \
+  struct PS_INPUT\
+  {\
+    float4 Position   : SV_POSITION;\
+    float2 Texture    : TEXCOORD0;\
+    float  Opacity    : OPACITY;\
+  };\
+  \
+  float4 PS( PS_INPUT In ) : SV_TARGET\
+  {\
+    float3 yuv;\
+    float4 rgba;\
+    yuv.x  = shaderTextureYUYV.Sample(SampleType, In.Texture).x;\
+    yuv.y  = shaderTextureYUYV.Sample(SampleType, In.Texture).y;\
+    yuv.z  = shaderTextureYUYV.Sample(SampleType, In.Texture).a;\
+    yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
+    yuv.y  = yuv.y - 0.5;\
+    yuv.z  = yuv.z - 0.5;\
+    rgba.x = saturate(yuv.x + 1.596026785714286 * yuv.z);\
+    rgba.y = saturate(yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
+    rgba.z = saturate(yuv.x + 2.017232142857142 * yuv.y);\
+    rgba.a = In.Opacity;\
+    return rgba;\
+  }\
+";
+
 #if !VLC_WINSTORE_APP
 static int OpenHwnd(vout_display_t *vd)
 {
@@ -1174,6 +1232,14 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
         else
             sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
+    }
+    else
+    if (fmt->i_chroma == VLC_CODEC_YUYV)
+    {
+        if( fmt->i_height > 576 )
+            sys->d3dPxShader = globPixelShaderBiplanarYUYV_BT709_2RGB;
+        else
+            sys->d3dPxShader = globPixelShaderBiplanarYUYV_BT601_2RGB;
     }
     else
         sys->d3dPxShader = globPixelShaderDefault;
