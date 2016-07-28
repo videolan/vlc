@@ -270,6 +270,9 @@ static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
     const unsigned hstep = cache_size / w16;
     assert(hstep > 0);
 
+    if (src_pitch == dst_pitch)
+        memcpy(dst, src, width * height);
+    else
     for (unsigned y = 0; y < height; y += hstep) {
         const unsigned hblock =  __MIN(hstep, height - y);
 
@@ -407,6 +410,9 @@ static void CopyPlane(uint8_t *dst, size_t dst_pitch,
                       const uint8_t *src, size_t src_pitch,
                       unsigned width, unsigned height)
 {
+    if (src_pitch == dst_pitch)
+        memcpy(dst, src, width * height);
+    else
     for (unsigned y = 0; y < height; y++) {
         memcpy(dst, src, width);
         src += src_pitch;
