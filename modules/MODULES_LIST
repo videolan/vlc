@@ -145,6 +145,7 @@ $Id$
  * fingerprinter: AcoustID audio fingerprinter using chromaprint
  * flac: Flac decoder using libflac
  * flacsys: FLAC demuxer
+ * flaschen: Flaschen-Taschen screen protocol video output
  * float_mixer: Precise float audio mixer
  * fluidsynth: Software MIDI synthetizer using libfluidsynth
  * folder: folder meta data and art finder
