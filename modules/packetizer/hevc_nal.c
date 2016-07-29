@@ -993,6 +993,16 @@ void hevc_rbsp_release_pps( hevc_picture_parameter_set_t *p_pps )
 IMPL_hevc_generic_decode( hevc_decode_pps, hevc_picture_parameter_set_t,
                           hevc_parse_pic_parameter_set_rbsp, hevc_rbsp_release_pps )
 
+uint8_t hevc_get_sps_vps_id( const hevc_sequence_parameter_set_t *p_sps )
+{
+    return p_sps->sps_video_parameter_set_id;
+}
+
+uint8_t hevc_get_pps_sps_id( const hevc_picture_parameter_set_t *p_pps )
+{
+    return p_pps->pps_seq_parameter_set_id;
+}
+
 bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *p_sps,
                             unsigned *p_w, unsigned *p_h, unsigned *p_vw, unsigned *p_vh )
 {

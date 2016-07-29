@@ -165,6 +165,10 @@ void hevc_rbsp_release_sps( hevc_sequence_parameter_set_t * );
 void hevc_rbsp_release_pps( hevc_picture_parameter_set_t * );
 void hevc_rbsp_release_slice_header( hevc_slice_segment_header_t * );
 
+/* set specific */
+uint8_t hevc_get_sps_vps_id( const hevc_sequence_parameter_set_t * );
+uint8_t hevc_get_pps_sps_id( const hevc_picture_parameter_set_t * );
+
 /* Converts HEVCDecoderConfigurationRecord to Annex B format */
 uint8_t * hevc_hvcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
                                    size_t *pi_res, uint8_t *pi_nal_length_size );
