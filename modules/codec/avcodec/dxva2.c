@@ -698,8 +698,9 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
 
     vlc_va_sys_t *p_sys = va->sys;
     directx_sys_t *sys = &va->sys->dx_sys;
+    HRESULT hr;
 
-    if (FAILED(IDirectXVideoDecoderService_CreateSurface((IDirectXVideoDecoderService*) sys->d3ddec,
+    hr = IDirectXVideoDecoderService_CreateSurface((IDirectXVideoDecoderService*) sys->d3ddec,
                                                          sys->surface_width,
                                                          sys->surface_height,
                                                          sys->surface_count - 1,
@@ -708,8 +709,9 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
                                                          0,
                                                          DXVA2_VideoDecoderRenderTarget,
                                                          (LPDIRECT3DSURFACE9*) sys->hw_surface,
-                                                         NULL))) {
-        msg_Err(va, "IDirectXVideoAccelerationService_CreateSurface failed");
+                                                         NULL);
+    if (FAILED(hr)) {
+        msg_Err(va, "IDirectXVideoAccelerationService_CreateSurface failed (hr=0x%0lx)", hr);
         sys->surface_count = 0;
         return VLC_EGENERIC;
     }
