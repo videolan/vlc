@@ -91,6 +91,7 @@ static const d3d_format_t d3d_formats[] = {
     { "YV12",   MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12 },
     { "NV12",   MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12 },
     { "IMC3",   MAKEFOURCC('I','M','C','3'),    VLC_CODEC_YV12 },
+    { "P010",   MAKEFOURCC('P','0','1','0'),    VLC_CODEC_P010 },
 
     { NULL, 0, 0 }
 };
@@ -107,6 +108,7 @@ static const d3d_format_t *D3dFindFormat(D3DFORMAT format)
 struct vlc_va_sys_t
 {
     directx_sys_t         dx_sys;
+    vlc_fourcc_t          i_chroma;
 
     /* DLL */
     HINSTANCE             hd3d9_dll;
@@ -176,7 +178,7 @@ static picture_t *video_new_buffer(filter_t *p_filter)
 }
 
 static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
-                               vlc_fourcc_t fmt_out )
+                               vlc_fourcc_t src_chroma )
 {
     filter_t *p_filter;
 
@@ -186,9 +188,20 @@ static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in
 
     p_filter->owner.video.buffer_new = (picture_t *(*)(filter_t *))video_new_buffer;
 
+    vlc_fourcc_t fmt_out;
+    switch (src_chroma)
+    {
+    case VLC_CODEC_D3D9_OPAQUE_10B:
+        fmt_out = VLC_CODEC_P010;
+        break;
+    case VLC_CODEC_D3D9_OPAQUE:
+        fmt_out = VLC_CODEC_YV12;
+        break;
+    }
+
     es_format_InitFromVideo( &p_filter->fmt_in,  &p_fmt_in->video );
     es_format_InitFromVideo( &p_filter->fmt_out, &p_fmt_in->video );
-    p_filter->fmt_in.i_codec  = p_filter->fmt_in.video.i_chroma  = VLC_CODEC_D3D9_OPAQUE;
+    p_filter->fmt_in.i_codec  = p_filter->fmt_in.video.i_chroma  = src_chroma;
     p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma = fmt_out;
     p_filter->p_module = module_need( p_filter, "video filter2", NULL, false );
 
@@ -207,7 +220,7 @@ static void Setup(vlc_va_t *va, vlc_fourcc_t *chroma)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    *chroma = sys->filter == NULL ? VLC_CODEC_D3D9_OPAQUE : VLC_CODEC_YV12;
+    *chroma = sys->filter == NULL ? sys->i_chroma : VLC_CODEC_YV12;
 }
 
 void SetupAVCodecContext(vlc_va_t *va)
@@ -228,7 +241,8 @@ static int Extract(vlc_va_t *va, picture_t *picture, uint8_t *data)
 {
     directx_sys_t *dx_sys = &va->sys->dx_sys;
     LPDIRECT3DSURFACE9 d3d = (LPDIRECT3DSURFACE9)(uintptr_t)data;
-    if (picture->format.i_chroma == VLC_CODEC_D3D9_OPAQUE)
+    if ( picture->format.i_chroma == VLC_CODEC_D3D9_OPAQUE ||
+         picture->format.i_chroma == VLC_CODEC_D3D9_OPAQUE_10B )
     {
         picture_sys_t *p_sys = picture->p_sys;
         LPDIRECT3DSURFACE9 output = p_sys->surface;
@@ -308,6 +322,20 @@ static void Close(vlc_va_t *va, AVCodecContext *ctx)
     free(sys);
 }
 
+vlc_fourcc_t d3d9va_fourcc(enum PixelFormat swfmt)
+{
+    switch (swfmt)
+    {
+        case AV_PIX_FMT_YUV420P10LE:
+            return VLC_CODEC_D3D9_OPAQUE_10B;
+        case AV_PIX_FMT_YUVJ420P:
+        case AV_PIX_FMT_YUV420P:
+            return VLC_CODEC_D3D9_OPAQUE;
+        default:
+            return VLC_CODEC_D3D9_OPAQUE;
+    }
+}
+
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
 {
@@ -351,13 +379,15 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (p_sys!=NULL)
         IDirect3DSurface9_GetDevice(p_sys->surface, (IDirect3DDevice9**) &dx_sys->d3ddev );
 
+    sys->i_chroma = d3d9va_fourcc(ctx->sw_pix_fmt);
+
     err = directx_va_Open(va, &sys->dx_sys, ctx, fmt, true);
     if (err!=VLC_SUCCESS)
         goto error;
 
     if (p_sys == NULL)
     {
-        sys->filter = CreateFilter( VLC_OBJECT(va), fmt, VLC_CODEC_YV12);
+        sys->filter = CreateFilter( VLC_OBJECT(va), fmt, sys->i_chroma);
         if (sys->filter == NULL)
             goto error;
     }
@@ -790,7 +820,7 @@ static int DxResetVideoDecoder(vlc_va_t *va)
 static picture_t *DxAllocPicture(vlc_va_t *va, const video_format_t *fmt, unsigned index)
 {
     video_format_t src_fmt = *fmt;
-    src_fmt.i_chroma = VLC_CODEC_D3D9_OPAQUE;
+    src_fmt.i_chroma = va->sys->i_chroma;
     picture_sys_t *pic_sys = calloc(1, sizeof(*pic_sys));
     if (unlikely(pic_sys == NULL))
         return NULL;
