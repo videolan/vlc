@@ -72,16 +72,72 @@ struct decoder_sys_t
     /* */
     packetizer_t packetizer;
 
-    block_t *p_frame;
-    block_t **pp_frame_last;
+    struct
+    {
+        block_t *p_chain;
+        block_t **pp_chain_last;
+    } frame, pre, post;
 
     uint8_t  i_nal_length_size;
     hevc_video_parameter_set_t    *rgi_p_decvps[HEVC_VPS_MAX];
     hevc_sequence_parameter_set_t *rgi_p_decsps[HEVC_SPS_MAX];
     hevc_picture_parameter_set_t  *rgi_p_decpps[HEVC_PPS_MAX];
+    bool b_init_sequence_complete;
 };
 
 static const uint8_t p_hevc_startcode[3] = {0x00, 0x00, 0x01};
+/****************************************************************************
+ * Helpers
+ ****************************************************************************/
+static inline void InitQueue( block_t **pp_head, block_t ***ppp_tail )
+{
+    *pp_head = NULL;
+    *ppp_tail = pp_head;
+}
+#define INITQ(name) InitQueue(&p_sys->name.p_chain, &p_sys->name.pp_chain_last)
+
+static block_t * OutputQueues(decoder_sys_t *p_sys, bool b_valid)
+{
+    block_t *p_output = NULL;
+    block_t **pp_output_last = &p_output;
+    uint32_t i_flags = 0; /* Because block_ChainGather does not merge flags or times */
+
+    if(p_sys->pre.p_chain)
+    {
+        i_flags |= p_sys->pre.p_chain->i_flags;
+        block_ChainLastAppend(&pp_output_last, p_sys->pre.p_chain);
+        INITQ(pre);
+    }
+
+    if(p_sys->frame.p_chain)
+    {
+        i_flags |= p_sys->frame.p_chain->i_flags;
+        if(p_output && p_output->i_dts == 0)
+        {
+            p_output->i_dts = p_sys->frame.p_chain->i_dts;
+            p_output->i_pts = p_sys->frame.p_chain->i_pts;
+        }
+        block_ChainLastAppend(&pp_output_last, p_sys->frame.p_chain);
+        INITQ(frame);
+    }
+
+    if(p_sys->post.p_chain)
+    {
+        i_flags |= p_sys->post.p_chain->i_flags;
+        block_ChainLastAppend(&pp_output_last, p_sys->post.p_chain);
+        INITQ(post);
+    }
+
+    if(p_output)
+    {
+        p_output->i_flags |= i_flags;
+        if(!b_valid)
+            p_output->i_flags |= BLOCK_FLAG_CORRUPTED;
+    }
+
+    return p_output;
+}
+
 
 /*****************************************************************************
  * Open
@@ -98,7 +154,9 @@ static int Open(vlc_object_t *p_this)
     if (!p_dec->p_sys)
         return VLC_ENOMEM;
 
-    p_sys->pp_frame_last = &p_sys->p_frame;
+    INITQ(pre);
+    INITQ(frame);
+    INITQ(post);
 
     packetizer_Init(&p_dec->p_sys->packetizer,
                     p_hevc_startcode, sizeof(p_hevc_startcode), startcode_FindAnnexB,
@@ -152,6 +210,10 @@ static void Close(vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
     packetizer_Clean(&p_sys->packetizer);
+
+    block_ChainRelease(p_sys->frame.p_chain);
+    block_ChainRelease(p_sys->pre.p_chain);
+    block_ChainRelease(p_sys->post.p_chain);
 
     for(unsigned i=0;i<HEVC_PPS_MAX; i++)
     {
@@ -208,14 +270,16 @@ static void PacketizeReset(void *p_private, bool b_broken)
 
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_ChainRelease(p_sys->p_frame);
 
-    p_sys->p_frame = NULL;
-    p_sys->pp_frame_last = &p_sys->p_frame;
+    block_t *p_out = OutputQueues(p_sys, false);
+    if(p_out)
+        block_ChainRelease(p_out);
+
+    p_sys->b_init_sequence_complete = false;
 }
 
 static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
-                      block_t *p_nalb)
+                      const block_t *p_nalb)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -293,29 +357,48 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
     return false;
 }
 
+static bool XPSReady(decoder_sys_t *p_sys)
+{
+    for(unsigned i=0;i<HEVC_PPS_MAX; i++)
+    {
+        const hevc_picture_parameter_set_t *p_pps = p_sys->rgi_p_decpps[i];
+        if (p_pps)
+        {
+            uint8_t id_sps = hevc_get_pps_sps_id(p_pps);
+            const hevc_sequence_parameter_set_t *p_sps = p_sys->rgi_p_decsps[id_sps];
+            if(p_sps)
+            {
+                uint8_t id_vps = hevc_get_sps_vps_id(p_sps);
+                if(p_sys->rgi_p_decvps[id_vps])
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
 static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_frame = NULL;
+    block_t *p_outputchain = NULL;
 
     const uint8_t *p_buffer = p_frag->p_buffer;
     size_t i_buffer = p_frag->i_buffer;
 
     if(unlikely(!hxxx_strip_AnnexB_startcode(&p_buffer, &i_buffer) || i_buffer < 3))
     {
-        block_ChainAppend(&p_sys->p_frame, p_frag); /* might corrupt */
+        block_ChainAppend(&p_sys->frame.p_chain, p_frag); /* might be corrupted */
         return NULL;
     }
 
+    const uint8_t i_layer = hevc_getNALLayer( p_buffer );
     bool b_first_slice_in_pic = p_buffer[2] & 0x80;
     if (b_first_slice_in_pic)
     {
-        if(p_sys->p_frame)
+        if(p_sys->frame.p_chain)
         {
-            /* Starting new frame, gather and return previous frame data */
-            p_frame = block_ChainGather(p_sys->p_frame);
-            p_sys->p_frame = NULL;
-            p_sys->pp_frame_last = &p_sys->p_frame;
+            /* Starting new frame: return previous frame data for output */
+            p_outputchain = OutputQueues(p_sys, p_sys->b_init_sequence_complete);
         }
 
         switch(i_nal_type)
@@ -351,24 +434,39 @@ static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
         }
     }
 
-    block_ChainLastAppend(&p_sys->pp_frame_last, p_frag);
+    if(!p_sys->b_init_sequence_complete && i_layer == 0 &&
+       (p_frag->i_flags & BLOCK_FLAG_TYPE_I) && XPSReady(p_sys))
+    {
+        p_sys->b_init_sequence_complete = true;
+    }
 
-    return p_frame;
+    block_ChainLastAppend(&p_sys->frame.pp_chain_last, p_frag);
+
+    return p_outputchain;
 }
 
-static block_t *ParseNonVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_nalb)
+static block_t * ParseAUHead(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_nalb)
 {
-    block_t *p_ret = p_nalb;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_ret = NULL;
+
+    if(p_sys->post.p_chain || p_sys->frame.p_chain)
+        p_ret = OutputQueues(p_sys, true);
 
     switch(i_nal_type)
     {
+        case HEVC_NAL_AUD:
+            if(!p_ret && p_sys->pre.p_chain)
+                p_ret = OutputQueues(p_sys, true);
+            break;
+
         case HEVC_NAL_VPS:
         case HEVC_NAL_SPS:
         case HEVC_NAL_PPS:
         {
             uint8_t i_id;
             if( hevc_get_xps_id(p_nalb->p_buffer, p_nalb->i_buffer, &i_id) &&
-                InsertXPS(p_dec, i_nal_type, i_id, p_nalb) ) /* also checks id range */
+                InsertXPS(p_dec, i_nal_type, i_id, p_nalb) )
             {
                 const hevc_sequence_parameter_set_t *p_sps;
                 if( i_nal_type == HEVC_NAL_SPS &&
@@ -386,16 +484,75 @@ static block_t *ParseNonVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_nal
                 }
             }
         }
-            break;
-
-        case HEVC_NAL_AUD:
-        case HEVC_NAL_EOS:
-        case HEVC_NAL_EOB:
-        case HEVC_NAL_FD:
+        // ft
+        default:
             break;
     }
 
+    block_ChainLastAppend(&p_sys->pre.pp_chain_last, p_nalb);
+
     return p_ret;
+}
+
+static block_t * ParseAUTail(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_nalb)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_ret = NULL;
+
+    block_ChainLastAppend(&p_sys->post.pp_chain_last, p_nalb);
+
+    switch(i_nal_type)
+    {
+        case HEVC_NAL_EOS:
+        case HEVC_NAL_EOB:
+            p_ret = OutputQueues(p_sys, true);
+            break;
+    }
+
+    if(!p_ret && p_sys->frame.p_chain == NULL)
+        p_ret = OutputQueues(p_sys, false);
+
+    return p_ret;
+}
+
+static block_t * ParseNonVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_nalb)
+{
+    block_t *p_ret = NULL;
+
+    if ( (i_nal_type >= HEVC_NAL_VPS        && i_nal_type <= HEVC_NAL_AUD) ||
+          i_nal_type == HEVC_NAL_PREF_SEI ||
+         (i_nal_type >= HEVC_NAL_RSV_NVCL41 && i_nal_type <= HEVC_NAL_RSV_NVCL44) ||
+         (i_nal_type >= HEVC_NAL_UNSPEC48   && i_nal_type <= HEVC_NAL_UNSPEC55) )
+    {
+        p_ret = ParseAUHead(p_dec, i_nal_type, p_nalb);
+    }
+    else
+    {
+        p_ret = ParseAUTail(p_dec, i_nal_type, p_nalb);
+    }
+
+    return p_ret;
+}
+
+static block_t *GatherAndValidateChain(block_t *p_outputchain)
+{
+    block_t *p_output = NULL;
+
+    if(p_outputchain)
+    {
+        if(p_outputchain->i_flags & BLOCK_FLAG_CORRUPTED)
+            p_output = p_outputchain; /* Avoid useless gather */
+        else
+            p_output = block_ChainGather(p_outputchain);
+    }
+
+    if(p_output && (p_output->i_flags & BLOCK_FLAG_CORRUPTED))
+    {
+        block_ChainRelease(p_output); /* Chain! see above */
+        p_output = NULL;
+    }
+
+    return p_output;
 }
 
 /*****************************************************************************
@@ -406,50 +563,40 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    block_t * p_ret = NULL;
-
     if(unlikely(p_frag->i_buffer < 5))
     {
         msg_Warn(p_dec,"NAL too small");
         block_Release(p_frag);
+        *pb_ts_used = false;
         return NULL;
     }
 
     if(p_frag->p_buffer[4] & 0x80)
     {
         msg_Warn(p_dec,"Forbidden zero bit not null, corrupted NAL");
-        block_ChainRelease(p_sys->p_frame);
         block_Release(p_frag);
-        p_sys->p_frame = NULL;
-        p_sys->pp_frame_last = &p_sys->p_frame;
-        return NULL;
+        *pb_ts_used = false;
+        return GatherAndValidateChain(OutputQueues(p_sys, false)); /* will drop */
     }
 
     /* Get NALU type */
+    block_t * p_output = NULL;
     uint8_t i_nal_type = hevc_getNALType(&p_frag->p_buffer[4]);
     if (i_nal_type < HEVC_NAL_VPS)
     {
         /* NAL is a VCL NAL */
-        p_ret = ParseVCL(p_dec, i_nal_type, p_frag);
+        p_output = ParseVCL(p_dec, i_nal_type, p_frag);
+        if (p_output && (p_output->i_flags & BLOCK_FLAG_CORRUPTED))
+            msg_Info(p_dec, "Waiting for VPS/SPS/PPS");
     }
     else
     {
-        p_ret = ParseNonVCL(p_dec, i_nal_type, p_frag);
-        if (p_sys->p_frame)
-        {
-            p_frag = p_ret;
-            if( (p_ret = block_ChainGather(p_sys->p_frame)) )
-            {
-                p_sys->p_frame = NULL;
-                p_sys->pp_frame_last = &p_sys->p_frame;
-                p_ret->p_next = p_frag;
-            }
-            else p_ret = p_frag;
-        }
+        p_output = ParseNonVCL(p_dec, i_nal_type, p_frag);
     }
 
-    *pb_ts_used = false;
-    return p_ret;
+    p_output = GatherAndValidateChain(p_output);
+    *pb_ts_used = (p_output != NULL);
+    return p_output;
 }
 
 static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *p_block)
