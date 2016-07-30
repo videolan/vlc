@@ -38,23 +38,24 @@
 static bool SkipID3Tag( demux_t * );
 static bool SkipAPETag( demux_t *p_demux );
 
-struct demux_type
+typedef const struct
 {
-    char type[20];
-    char demux[8];
-};
+    const char* key;
+    const char* name;
+
+} demux_mapping;
 
 static int typecmp( const void *k, const void *t )
 {
     const char *key = k;
-    const struct demux_type *type = t;
+    demux_mapping *type = t;
 
-    return vlc_ascii_strcasecmp( key, type->type );
+    return vlc_ascii_strcasecmp( key, type->key );
 }
 
 static const char *demux_NameFromContentType(const char *mime)
 {
-    static const struct demux_type types[] =
+    static demux_mapping types[] =
     {   /* Must be sorted in ascending ASCII order */
         { "audio/aac",           "m4a"     },
         { "audio/aacp",          "m4a"     },
@@ -67,11 +68,9 @@ static const char *demux_NameFromContentType(const char *mime)
         { "video/nsa",           "nsv"     },
         { "video/nsv",           "nsv"     },
     };
-    const struct demux_type *type;
-
-    type = bsearch( mime, types, sizeof (types) / sizeof (types[0]),
-                    sizeof (types[0]), typecmp );
-    return (type != NULL) ? type->demux : "any";
+    demux_mapping* type = bsearch( mime, types, ARRAY_SIZE( types ),
+                                   sizeof( types[0] ), typecmp );
+    return (type != NULL) ? type->name : "any";
 }
 
 /*****************************************************************************
