@@ -424,10 +424,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                  *psz_end = ',';
 
                  p_seekpoint = vlc_seekpoint_New();
-                 
+
                  if( unlikely( p_seekpoint == NULL ) )
                      break;
-                    
+
                  while( (psz_end = strchr( psz_start, ',' ) ) )
                  {
                      *psz_end = 0;
@@ -1072,7 +1072,7 @@ static void LoadSlaves( input_thread_t *p_input )
                 for( int i = 1; i < i_slaves; i++ )
                 {
                     input_item_slave_t *p_curr = pp_slaves[i];
-                    if( p_curr != NULL 
+                    if( p_curr != NULL
                      && !strcmp( psz_subtitle, p_curr->psz_uri ) )
                     {
                         /* reject current sub */
