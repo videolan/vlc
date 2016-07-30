@@ -45,12 +45,10 @@ typedef const struct
 
 } demux_mapping;
 
-static int typecmp( const void *k, const void *t )
+static int demux_mapping_cmp( const void *k, const void *v )
 {
-    const char *key = k;
-    demux_mapping *type = t;
-
-    return vlc_ascii_strcasecmp( key, type->key );
+    demux_mapping* entry = v;
+    return vlc_ascii_strcasecmp( k, entry->key );
 }
 
 static const char *demux_NameFromContentType(const char *mime)
@@ -68,8 +66,8 @@ static const char *demux_NameFromContentType(const char *mime)
         { "video/nsa",           "nsv"     },
         { "video/nsv",           "nsv"     },
     };
-    demux_mapping* type = bsearch( mime, types, ARRAY_SIZE( types ),
-                                   sizeof( types[0] ), typecmp );
+    demux_mapping *type = bsearch( mime, types, ARRAY_SIZE( types ),
+                                   sizeof( *type ), demux_mapping_cmp );
     return (type != NULL) ? type->name : "any";
 }
 
