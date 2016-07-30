@@ -51,6 +51,12 @@ static int demux_mapping_cmp( const void *k, const void *v )
     return vlc_ascii_strcasecmp( k, entry->key );
 }
 
+static demux_mapping* demux_lookup( char const* key,
+                                    demux_mapping* data, size_t size )
+{
+    return bsearch( key, data, size, sizeof( *data ), demux_mapping_cmp );
+}
+
 static const char *demux_NameFromContentType(const char *mime)
 {
     static demux_mapping types[] =
@@ -66,8 +72,7 @@ static const char *demux_NameFromContentType(const char *mime)
         { "video/nsa",           "nsv"     },
         { "video/nsv",           "nsv"     },
     };
-    demux_mapping *type = bsearch( mime, types, ARRAY_SIZE( types ),
-                                   sizeof( *type ), demux_mapping_cmp );
+    demux_mapping *type = demux_lookup( mime, types, ARRAY_SIZE( types ) );
     return (type != NULL) ? type->name : "any";
 }
 
@@ -132,9 +137,7 @@ static const char* DemuxNameFromExtension( char const* ext,
         .size = b_preparsing ? ARRAY_SIZE( quick ) : ARRAY_SIZE( strong )
     };
 
-    demux_mapping* result = bsearch( ext, lookup.data, lookup.size,
-                                     sizeof( *lookup.data ), demux_mapping_cmp );
-
+    demux_mapping* result = demux_lookup( ext, lookup.data, lookup.size );
     return result ? result->name : NULL;
 }
 
