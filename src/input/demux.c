@@ -71,6 +71,73 @@ static const char *demux_NameFromContentType(const char *mime)
     return (type != NULL) ? type->name : "any";
 }
 
+static const char* DemuxNameFromExtension( char const* ext,
+                                           bool b_preparsing )
+{
+    /* NOTE: Add only file without any problems here and with strong detection:
+     * - no .mp3, .a52, ...
+     *  - wav can't be added 'cause of a52 and dts in them as raw audio
+     */
+    static demux_mapping strong[] =
+    { /* NOTE: must be sorted in asc order */
+        { "aiff", "aiff" },
+        { "asf",  "asf" },
+        { "au",   "au" },
+        { "avi",  "avi" },
+        { "drc",  "dirac" },
+        { "dv",   "dv" },
+        { "flac", "flac" },
+        { "h264", "h264" },
+        { "kar", "smf" },
+        { "m3u",  "m3u" },
+        { "m4a",  "mp4" },
+        { "m4v",  "m4v" },
+        { "mid",  "smf" },
+        { "mka",  "mkv" },
+        { "mks",  "mkv" },
+        { "mkv",  "mkv" },
+        { "moov", "mp4" },
+        { "mov",  "mp4" },
+        { "mp4",  "mp4" },
+        { "nsv",  "nsv" },
+        { "oga",  "ogg" },
+        { "ogg",  "ogg" },
+        { "ogm",  "ogg" },
+        { "ogv",  "ogg" },
+        { "ogx",  "ogg" }, /*RFC5334*/
+        { "opus", "ogg" }, /*draft-terriberry-oggopus-01*/
+        { "pva",  "pva" },
+        { "rm",   "avformat" },
+        { "rmi",  "smf" },
+        { "spx",  "ogg" },
+        { "voc",  "voc" },
+        { "wma",  "asf" },
+        { "wmv",  "asf" },
+    };
+
+    /* Here, we don't mind if it does not work, it must be quick */
+    static demux_mapping quick[] =
+    { /* NOTE: shall be sorted in asc order */
+        { "mp3", "mpga" },
+        { "ogg", "ogg" },
+        { "wma", "asf" },
+    };
+
+    struct {
+        demux_mapping* data;
+        size_t size;
+
+    } lookup = {
+        .data = b_preparsing ? quick : strong,
+        .size = b_preparsing ? ARRAY_SIZE( quick ) : ARRAY_SIZE( strong )
+    };
+
+    demux_mapping* result = bsearch( ext, lookup.data, lookup.size,
+                                     sizeof( *lookup.data ), demux_mapping_cmp );
+
+    return result ? result->name : NULL;
+}
+
 /*****************************************************************************
  * demux_New:
  *  if s is NULL then load a access_demux
@@ -163,77 +230,20 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_demux->info.i_seekpoint = 0;
     priv->destroy = s ? demux_DestroyDemux : demux_DestroyAccessDemux;
 
-    /* NOTE: Add only file without any problems here and with strong detection:
-     * - no .mp3, .a52, ...
-     *  - wav can't be added 'cause of a52 and dts in them as raw audio
-     */
-    static const struct { char ext[5]; char demux[9]; } exttodemux[] =
-    {
-        { "aiff", "aiff" },
-        { "asf",  "asf" }, { "wmv",  "asf" }, { "wma",  "asf" },
-        { "avi",  "avi" },
-        { "au",   "au" },
-        { "flac", "flac" },
-        { "dv",   "dv" },
-        { "drc",  "dirac" },
-        { "m3u",  "m3u" },
-        { "mkv",  "mkv" }, { "mka",  "mkv" }, { "mks",  "mkv" },
-        { "mp4",  "mp4" }, { "m4a",  "mp4" }, { "mov",  "mp4" }, { "moov", "mp4" },
-        { "nsv",  "nsv" },
-        { "ogg",  "ogg" }, { "ogm",  "ogg" }, /* legacy Ogg */
-        { "oga",  "ogg" }, { "spx",  "ogg" }, { "ogv", "ogg" },
-        { "ogx",  "ogg" }, /*RFC5334*/
-        { "opus", "ogg" }, /*draft-terriberry-oggopus-01*/
-        { "pva",  "pva" },
-        { "rm",   "avformat" },
-        { "m4v",  "m4v" },
-        { "h264", "h264" },
-        { "voc",  "voc" },
-        { "mid",  "smf" }, { "rmi",  "smf" }, { "kar", "smf" },
-        { "",  "" },
-    };
-    /* Here, we don't mind if it does not work, it must be quick */
-    static const struct { char ext[4]; char demux[5]; } exttodemux_quick[] =
-    {
-        { "mp3", "mpga" },
-        { "ogg", "ogg" },
-        { "wma", "asf" },
-        { "", "" }
-    };
-
     if( s != NULL )
     {
-        const char *psz_ext;
-        const char *psz_module = p_demux->psz_demux;
+        const char *psz_module = NULL;
 
-        if( !strcmp(psz_module, "any") && p_demux->psz_file != NULL
-         && (psz_ext = strrchr( p_demux->psz_file, '.' )) != NULL )
+        if( !strcmp( p_demux->psz_demux, "any" ) && p_demux->psz_file )
         {
-            psz_ext++; // skip '.'
+            char const* psz_ext = strrchr( p_demux->psz_file, '.' );
 
-            if( !b_preparsing )
-            {
-                for( unsigned i = 0; exttodemux[i].ext[0]; i++ )
-                {
-                    if( !strcasecmp( psz_ext, exttodemux[i].ext ) )
-                    {
-                        psz_module = exttodemux[i].demux;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                for( unsigned i = 0; exttodemux_quick[i].ext[0]; i++ )
-                {
-                    if( !strcasecmp( psz_ext, exttodemux_quick[i].ext ) )
-                    {
-                        psz_module = exttodemux_quick[i].demux;
-                        break;
-                    }
-                }
-            }
+            if( psz_ext )
+                psz_module = DemuxNameFromExtension( psz_ext + 1, b_preparsing );
         }
+
+        if( psz_module == NULL )
+            psz_module = p_demux->psz_demux;
 
         /* ID3/APE tags will mess-up demuxer probing so we skip it here.
          * ID3/APE parsers will called later on in the demuxer to access the
