@@ -290,8 +290,6 @@ demux_t *input_DemuxNew( vlc_object_t *obj, const char *access_name,
 
     if( demux_name[0] == '\0' )
     {
-        /* special hack for forcing a demuxer with --demux=module
-         * (and do nothing with a list) */
         demux_var = var_InheritString( obj, "demux" );
         if( demux_var != NULL )
         {
