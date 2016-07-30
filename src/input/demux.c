@@ -52,7 +52,7 @@ static int typecmp( const void *k, const void *t )
     return vlc_ascii_strcasecmp( key, type->type );
 }
 
-static const char *demux_FromContentType(const char *mime)
+static const char *demux_NameFromContentType(const char *mime)
 {
     static const struct demux_type types[] =
     {   /* Must be sorted in ascending ASCII order */
@@ -132,7 +132,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         char *type = stream_ContentType( s );
         if( type != NULL )
         {
-            psz_demux = demux_FromContentType( type );
+            psz_demux = demux_NameFromContentType( type );
             free( type );
         }
     }
