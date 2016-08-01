@@ -708,7 +708,7 @@ static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, bool b_new,
         else if( !strcmp( psz_option, "inputdeln" ) )
         {
             MISSING( "inputdeln" );
- 
+
             int idx = atoi( psz_value );
             if( idx > 0 && idx <= p_cfg->i_input )
                 TAB_REMOVE( p_cfg->i_input, p_cfg->ppsz_input, p_cfg->ppsz_input[idx-1] );
