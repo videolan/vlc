@@ -262,7 +262,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         assert(p_sys_in->decoder == src);
 
 #if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
-        if( sys->context_mutex > 0 ) {
+        if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
             WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
         }
 #endif
@@ -334,7 +334,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 
 done:
 #if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
-    if( sys->context_mutex > 0 ) {
+    if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
         ReleaseMutex( sys->context_mutex );
     }
 #endif

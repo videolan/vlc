@@ -794,7 +794,7 @@ static void Manage(vout_display_t *vd)
         RECTHeight(size_before) != RECTHeight(sys->rect_dest_clipped))
     {
 #if defined(HAVE_ID3D11VIDEODECODER)
-        if( sys->context_lock > 0 )
+        if( sys->context_lock != INVALID_HANDLE_VALUE )
         {
             WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
         }
@@ -806,7 +806,7 @@ static void Manage(vout_display_t *vd)
 
         UpdatePicQuadPosition(vd);
 #if defined(HAVE_ID3D11VIDEODECODER)
-        if( sys->context_lock > 0 )
+        if( sys->context_lock != INVALID_HANDLE_VALUE )
         {
             ReleaseMutex( sys->context_lock );
         }
@@ -846,7 +846,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
 #ifdef HAVE_ID3D11VIDEODECODER
     if (is_d3d11_opaque(picture->format.i_chroma)) {
-        if( sys->context_lock > 0 )
+        if( sys->context_lock != INVALID_HANDLE_VALUE )
         {
             WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
         }
@@ -929,7 +929,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         /* TODO device lost */
     }
 #if defined(HAVE_ID3D11VIDEODECODER)
-    if( is_d3d11_opaque(picture->format.i_chroma) && sys->context_lock > 0) {
+    if( is_d3d11_opaque(picture->format.i_chroma) && sys->context_lock != INVALID_HANDLE_VALUE) {
         ReleaseMutex( sys->context_lock );
     }
 #endif
@@ -1298,14 +1298,14 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     UncropStagingFormat( vd, &core_source );
 
 #if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->context_lock > 0 )
+    if( sys->context_lock != INVALID_HANDLE_VALUE )
     {
         WaitForSingleObjectEx( sys->context_lock, INFINITE, FALSE );
     }
 #endif
     if (Direct3D11CreateResources(vd, fmt)) {
 #if defined(HAVE_ID3D11VIDEODECODER)
-        if( sys->context_lock > 0 )
+        if( sys->context_lock != INVALID_HANDLE_VALUE )
         {
             ReleaseMutex( sys->context_lock );
         }
@@ -1315,7 +1315,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         return VLC_EGENERIC;
     }
 #if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->context_lock > 0 )
+    if( sys->context_lock != INVALID_HANDLE_VALUE )
     {
         ReleaseMutex( sys->context_lock );
     }
@@ -1847,7 +1847,7 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
         sys->pSPUPixelShader = NULL;
     }
 #if defined(HAVE_ID3D11VIDEODECODER)
-    if( sys->context_lock > 0 )
+    if( sys->context_lock != INVALID_HANDLE_VALUE )
     {
         CloseHandle( sys->context_lock );
         sys->context_lock = INVALID_HANDLE_VALUE;
