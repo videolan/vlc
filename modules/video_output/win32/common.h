@@ -177,9 +177,10 @@ struct vout_display_sys_t
     PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN OurD3D11CreateDeviceAndSwapChain;
     PFN_D3D11_CREATE_DEVICE                OurD3D11CreateDevice;
     pD3DCompile                            OurD3DCompile;
-#else
+#endif
+#if defined(HAVE_ID3D11VIDEODECODER)
     HANDLE                   context_lock;     /* D3D11 Context lock necessary
-                                                  for hw decoding on WinRT */
+                                                  for hw decoding */
 #endif
     IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.1 swap chain */
     ID3D11Device             *d3ddevice;       /* D3D device */

@@ -116,7 +116,7 @@ struct vlc_va_sys_t
     DXGI_FORMAT                  render;
 
     ID3D11DeviceContext          *d3dctx;
-#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
+#if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
     HANDLE                       context_mutex;
 #endif
 
@@ -182,11 +182,7 @@ void SetupAVCodecContext(vlc_va_t *va)
     sys->hw.surface_count = dx_sys->surface_count;
     sys->hw.surface = (ID3D11VideoDecoderOutputView**) dx_sys->hw_surface;
 #if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
-#if VLC_WINSTORE_APP
     sys->hw.context_mutex = sys->context_mutex;
-#else
-    sys->hw.context_mutex = INVALID_HANDLE_VALUE;
-#endif
 #endif
 
     if (IsEqualGUID(&dx_sys->input, &DXVA_Intel_H264_NoFGT_ClearVideo))
@@ -265,7 +261,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         assert(p_sys_out->texture != NULL);
         assert(p_sys_in->decoder == src);
 
-#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
+#if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
         if( sys->context_mutex > 0 ) {
             WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
         }
@@ -337,7 +333,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 
 
 done:
-#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
+#if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
     if( sys->context_mutex > 0 ) {
         ReleaseMutex( sys->context_mutex );
     }
@@ -449,7 +445,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
            msg_Err(va, "Could not Query ID3D11VideoDevice Interface from the picture. (hr=0x%lX)", hr);
         } else {
             ID3D11DeviceContext_GetDevice( p_sys->context, (ID3D11Device**) &dx_sys->d3ddev );
-#if VLC_WINSTORE_APP && LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
+#if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
             HANDLE context_lock = INVALID_HANDLE_VALUE;
             UINT dataSize = sizeof(context_lock);
             hr = ID3D11Device_GetPrivateData((ID3D11Device*)dx_sys->d3ddev, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
