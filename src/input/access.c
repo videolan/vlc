@@ -603,7 +603,7 @@ void access_fsdir_init(struct access_fsdir *p_fsdir,
     p_fsdir->psz_ignored_exts = var_InheritString(p_access, "ignore-filetypes");
     p_fsdir->psz_sort = var_InheritString(p_access, "directory-sort");
     bool b_autodetect = var_InheritBool(p_access, "sub-autodetect-file");
-    p_fsdir->i_sub_autodetect_fuzzy = !b_autodetect ? 0 : 
+    p_fsdir->i_sub_autodetect_fuzzy = !b_autodetect ? 0 :
         var_InheritInteger(p_access, "sub-autodetect-fuzzy");
     TAB_INIT(p_fsdir->i_slaves, p_fsdir->pp_slaves);
 }
