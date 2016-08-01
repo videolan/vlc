@@ -449,10 +449,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             HANDLE context_lock = INVALID_HANDLE_VALUE;
             UINT dataSize = sizeof(context_lock);
             hr = ID3D11Device_GetPrivateData((ID3D11Device*)dx_sys->d3ddev, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
-            if (SUCCEEDED(hr))
-                sys->context_mutex = context_lock;
-            else
+            if (FAILED(hr))
                 msg_Warn(va, "No mutex found to lock the decoder");
+            sys->context_mutex = context_lock;
 #endif
 
             sys->d3dctx = p_sys->context;
