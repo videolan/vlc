@@ -312,11 +312,14 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
             ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
 
             /* copy decoder slice to surface */
+            D3D11_BOX copyBox = {
+                .right = dstDesc.Width, .bottom = dstDesc.Height, .back = 1,
+            };
             ID3D11DeviceContext_CopySubresourceRegion(sys->d3dctx, (ID3D11Resource*) p_sys_out->texture,
                                                       0, 0, 0, 0,
                                                       (ID3D11Resource*) p_sys_in->texture,
                                                       viewDesc.Texture2D.ArraySlice,
-                                                      NULL);
+                                                      &copyBox);
         }
     }
         break;
