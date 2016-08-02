@@ -410,7 +410,7 @@ static int Demux( demux_t *p_demux)
     p_block_in = vlc_stream_Block( p_demux->s, H26X_PACKET_SIZE );
     if( p_block_in == NULL )
     {
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in )) )
@@ -462,7 +462,7 @@ static int Demux( demux_t *p_demux)
             p_block_out = p_next;
         }
     }
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
