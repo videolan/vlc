@@ -185,8 +185,17 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 
             break;
         case VLC_CODEC_MP4V:
+        {
+            if (p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'X','V','I','D' )) {
+                msg_Warn(p_dec, "XVID decoding not implemented, fallback on software");
+                return -1;
+            }
+
+            msg_Dbg(p_dec, "Will decode MP4V with original FourCC '%4.4s'", (char *)&p_dec->fmt_in.i_original_fourcc);
             codec = kCMVideoCodecType_MPEG4Video;
+
             break;
+        }
         case VLC_CODEC_H263:
             codec = kCMVideoCodecType_H263;
             break;
