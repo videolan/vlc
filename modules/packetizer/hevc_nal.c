@@ -1003,6 +1003,18 @@ uint8_t hevc_get_pps_sps_id( const hevc_picture_parameter_set_t *p_pps )
     return p_pps->pps_seq_parameter_set_id;
 }
 
+bool hevc_get_sps_profile_tier_level( const hevc_sequence_parameter_set_t *p_sps,
+                                      uint8_t *pi_profile, uint8_t *pi_level)
+{
+    if(p_sps->profile_tier_level.general.profile_idc)
+    {
+        *pi_profile = p_sps->profile_tier_level.general.profile_idc;
+        *pi_level = p_sps->profile_tier_level.general_level_idc;
+        return true;
+    }
+    return false;
+}
+
 bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *p_sps,
                             unsigned *p_w, unsigned *p_h, unsigned *p_vw, unsigned *p_vh )
 {

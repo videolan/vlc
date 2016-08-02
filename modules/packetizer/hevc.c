@@ -487,6 +487,16 @@ static block_t * ParseAUHead(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_na
                                                      &p_dec->fmt_out.video.space,
                                                      &p_dec->fmt_out.video.b_color_range_full);
                     }
+
+                    if(p_dec->fmt_out.i_profile == -1)
+                    {
+                        uint8_t i_profile, i_level;
+                        if( hevc_get_sps_profile_tier_level( p_sps, &i_profile, &i_level ) )
+                        {
+                            p_dec->fmt_out.i_profile = i_profile;
+                            p_dec->fmt_out.i_level = i_level;
+                        }
+                    }
                 }
             }
         }
