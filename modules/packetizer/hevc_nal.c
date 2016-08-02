@@ -702,33 +702,39 @@ void hevc_rbsp_release_vps( hevc_video_parameter_set_t *p_vps )
 IMPL_hevc_generic_decode( hevc_decode_vps, hevc_video_parameter_set_t,
                           hevc_parse_video_parameter_set_rbsp, hevc_rbsp_release_vps )
 
-static bool hevc_parse_st_ref_pic_set( bs_t *p_bs, unsigned idx,
+static bool hevc_parse_st_ref_pic_set( bs_t *p_bs, unsigned stRpsIdx,
                                        unsigned num_short_term_ref_pic_sets,
                                        hevc_short_term_ref_pic_set_t *p_sets )
 {
-    if( idx && bs_read1( p_bs ) ) /* Interref pic set prediction flag */
+    if( stRpsIdx && bs_read1( p_bs ) ) /* Interref pic set prediction flag */
     {
         nal_ue_t delta_idx_minus_1 = 0;
-        if( idx == num_short_term_ref_pic_sets )
+        if( stRpsIdx == num_short_term_ref_pic_sets )
         {
             delta_idx_minus_1 = bs_read_ue( p_bs );
-            if( delta_idx_minus_1 >= idx )
+            if( delta_idx_minus_1 >= stRpsIdx )
                 return false;
         }
-        if(delta_idx_minus_1 == idx)
+        if(delta_idx_minus_1 == stRpsIdx)
             return false;
 
         nal_u1_t delta_rps_sign = bs_read1( p_bs );
         nal_ue_t abs_delta_rps_minus1 = bs_read_ue( p_bs );
-        unsigned RefRpsIdx = idx - delta_idx_minus_1 - 1;
+        unsigned RefRpsIdx = stRpsIdx - delta_idx_minus_1 - 1;
         int deltaRps = ( 1 - ( delta_rps_sign << 1 ) ) * ( abs_delta_rps_minus1 + 1 );
         VLC_UNUSED(deltaRps);
 
         unsigned numDeltaPocs = p_sets[RefRpsIdx].num_delta_pocs;
+        p_sets[stRpsIdx].num_delta_pocs = 0;
         for( unsigned j=0; j<= numDeltaPocs; j++ )
         {
-            if( !bs_read1( p_bs ) ) /* used_by_curr_pic_flag */
-                (void) bs_read1( p_bs ); /* use_delta_flag */
+            if( ! bs_read1( p_bs ) ) /* used_by_curr_pic_flag */
+            {
+                if( bs_read1( p_bs ) ) /* use_delta_flag */
+                    p_sets[stRpsIdx].num_delta_pocs++;
+            }
+            else
+                p_sets[stRpsIdx].num_delta_pocs++;
         }
     }
     else
@@ -745,7 +751,7 @@ static bool hevc_parse_st_ref_pic_set( bs_t *p_bs, unsigned idx,
             (void) bs_read_ue( p_bs ); /* delta_poc_s1_minus1 */
             (void) bs_read1( p_bs ); /* used_by_current_pic_s1_flag */
         }
-        p_sets[idx].num_delta_pocs = num_positive_pics + num_negative_pics;
+        p_sets[stRpsIdx].num_delta_pocs = num_positive_pics + num_negative_pics;
     }
 
     return true;
