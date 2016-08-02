@@ -703,7 +703,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
     hr = IDirectXVideoDecoderService_CreateSurface((IDirectXVideoDecoderService*) sys->d3ddec,
                                                          sys->surface_width,
                                                          sys->surface_height,
-                                                         sys->surface_count - 1,
+                                                         sys->surface_count,
                                                          p_sys->render,
                                                          D3DPOOL_DEFAULT,
                                                          0,
