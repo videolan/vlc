@@ -311,6 +311,10 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
             D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
             ID3D11VideoDecoderOutputView_GetDesc( src, &viewDesc );
 
+
+            D3D11_TEXTURE2D_DESC dstDesc;
+            ID3D11Texture2D_GetDesc( (ID3D11Texture2D*) p_sys_out->texture, &dstDesc);
+
             /* copy decoder slice to surface */
             D3D11_BOX copyBox = {
                 .right = dstDesc.Width, .bottom = dstDesc.Height, .back = 1,
