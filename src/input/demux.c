@@ -40,8 +40,8 @@ static bool SkipAPETag( demux_t *p_demux );
 
 typedef const struct
 {
-    const char* key;
-    const char* name;
+    char const key[20];
+    char const name[8];
 
 } demux_mapping;
 
