@@ -488,6 +488,18 @@ static block_t * ParseAUHead(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_na
                                                      &p_dec->fmt_out.video.b_color_range_full);
                     }
 
+                    unsigned sizes[4];
+                    if( hevc_get_picture_size( p_sps, &sizes[0], &sizes[1],
+                                                      &sizes[2], &sizes[3] ) )
+                    {
+                        if( p_dec->fmt_out.video.i_width != sizes[0] ||
+                            p_dec->fmt_out.video.i_height != sizes[1] )
+                        {
+                            p_dec->fmt_out.video.i_width = sizes[0];
+                            p_dec->fmt_out.video.i_height = sizes[1];
+                        }
+                    }
+
                     if(p_dec->fmt_out.i_profile == -1)
                     {
                         uint8_t i_profile, i_level;
