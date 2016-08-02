@@ -703,7 +703,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
     hr = IDirectXVideoDecoderService_CreateSurface((IDirectXVideoDecoderService*) sys->d3ddec,
                                                          sys->surface_width,
                                                          sys->surface_height,
-                                                         sys->surface_count,
+                                                         sys->surface_count - 1,
                                                          p_sys->render,
                                                          D3DPOOL_DEFAULT,
                                                          0,
@@ -711,12 +711,29 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t
                                                          (LPDIRECT3DSURFACE9*) sys->hw_surface,
                                                          NULL);
     if (FAILED(hr)) {
-        msg_Err(va, "IDirectXVideoAccelerationService_CreateSurface %d failed (hr=0x%0lx)", sys->surface_count, hr);
+        msg_Err(va, "IDirectXVideoAccelerationService_CreateSurface %d failed (hr=0x%0lx)", sys->surface_count - 1, hr);
         sys->surface_count = 0;
         return VLC_EGENERIC;
     }
     msg_Dbg(va, "IDirectXVideoAccelerationService_CreateSurface succeed with %d surfaces (%dx%d)",
             sys->surface_count, sys->surface_width, sys->surface_height);
+
+    IDirect3DSurface9 *tstCrash;
+    hr = IDirectXVideoDecoderService_CreateSurface((IDirectXVideoDecoderService*) sys->d3ddec,
+                                                         sys->surface_width,
+                                                         sys->surface_height,
+                                                         0,
+                                                         p_sys->render,
+                                                         D3DPOOL_DEFAULT,
+                                                         0,
+                                                         DXVA2_VideoDecoderRenderTarget,
+                                                         &tstCrash,
+                                                         NULL);
+    if (FAILED(hr)) {
+        msg_Err(va, "extra buffer impossible, avoid a crash (hr=0x%0lx)", hr);
+        return VLC_EGENERIC;
+    }
+    IDirect3DSurface9_Release(tstCrash);
 
     /* */
     DXVA2_VideoDesc dsc;
