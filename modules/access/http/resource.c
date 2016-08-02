@@ -275,10 +275,26 @@ char *vlc_http_res_get_redirect(struct vlc_http_resource *restrict res)
 
     /* TODO: if status is 3xx, check for Retry-After and wait */
 
-    /* NOTE: The anchor is discard if it is present as VLC does not support
+    char *base;
+
+    if (unlikely(asprintf(&base, "http%s://%s%s", res->secure ? "s" : "",
+                          res->authority, res->path) == -1))
+        return NULL;
+
+    char *fixed = vlc_uri_fixup(location);
+    if (fixed != NULL)
+        location = fixed;
+
+    char *abs = vlc_uri_resolve(base, location);
+
+    free(fixed);
+    free(base);
+
+    /* NOTE: The anchor is discarded if it is present as VLC does not support
      * HTML anchors so far. */
-    size_t len = strcspn(location, "#");
-    return strndup(location, len);
+    size_t len = strcspn(abs, "#");
+    abs[len] = '\0';
+    return abs;
 }
 
 char *vlc_http_res_get_type(struct vlc_http_resource *res)

@@ -30,7 +30,6 @@
 #include <vlc_common.h>
 #include <vlc_access.h>
 #include <vlc_plugin.h>
-#include <vlc_url.h>
 
 #include "connmgr.h"
 #include "resource.h"
@@ -195,15 +194,7 @@ static int Open(vlc_object_t *obj)
     char *redir = vlc_http_res_get_redirect(sys->resource);
     if (redir != NULL)
     {
-        char *fixed = vlc_uri_fixup(redir);
-        if (likely(fixed != NULL))
-        {
-            free(redir);
-            redir = fixed;
-        }
-
-        access->psz_url = vlc_uri_resolve(access->psz_url, redir);
-        free(redir);
+        access->psz_url = redir;
         ret = VLC_ACCESS_REDIRECT;
         goto error;
     }
