@@ -470,17 +470,23 @@ static block_t * ParseAUHead(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_na
             {
                 const hevc_sequence_parameter_set_t *p_sps;
                 if( i_nal_type == HEVC_NAL_SPS &&
-                   !p_dec->fmt_out.video.i_frame_rate_base &&
                    (p_sps = p_dec->p_sys->rgi_p_decsps[i_id]) )
                 {
-                    (void) hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps,
-                                                &p_dec->fmt_out.video.i_frame_rate,
-                                                &p_dec->fmt_out.video.i_frame_rate_base );
-                    (void) hevc_get_colorimetry( p_sps,
-                                                 &p_dec->fmt_out.video.primaries,
-                                                 &p_dec->fmt_out.video.transfer,
-                                                 &p_dec->fmt_out.video.space,
-                                                 &p_dec->fmt_out.video.b_color_range_full);
+                    if(!p_dec->fmt_out.video.i_frame_rate)
+                    {
+                        (void) hevc_get_frame_rate( p_sps, p_dec->p_sys->rgi_p_decvps,
+                                                    &p_dec->fmt_out.video.i_frame_rate,
+                                                    &p_dec->fmt_out.video.i_frame_rate_base );
+                    }
+
+                    if(p_dec->fmt_out.video.primaries == COLOR_PRIMARIES_UNDEF)
+                    {
+                        (void) hevc_get_colorimetry( p_sps,
+                                                     &p_dec->fmt_out.video.primaries,
+                                                     &p_dec->fmt_out.video.transfer,
+                                                     &p_dec->fmt_out.video.space,
+                                                     &p_dec->fmt_out.video.b_color_range_full);
+                    }
                 }
             }
         }
