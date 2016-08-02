@@ -400,12 +400,24 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
         cur = next;
     }
 
-    /* Query parameters */
-    char *query = strchr (cur, '?');
-    if (query != NULL)
+    /* Fragment */
+    next = strchr(cur, '#');
+    if (next != NULL)
     {
-        *(query++) = '\0';
-        url->psz_option = query;
+#if 0  /* TODO */
+       *(next++) = '\0';
+       url->psz_fragment = next;
+#else
+       *next = '\0';
+#endif
+    }
+
+    /* Query parameters */
+    next = strchr(cur, '?');
+    if (next != NULL)
+    {
+        *(next++) = '\0';
+        url->psz_option = next;
     }
 
     /* Authority */
