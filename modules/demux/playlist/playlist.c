@@ -282,6 +282,9 @@ char *ProcessMRL(const char *str, const char *base)
     free(rel);
     return abs;
 #else
+    if (strstr(str, "://") != NULL)
+        return strdup(str);
+
     const char *split = strrchr(base, '/');
     char *abs;
 
