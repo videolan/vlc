@@ -172,9 +172,9 @@ bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representati
             parseSegments(p_obj, rep, tagslist);
 
             releaseTagsList(tagslist);
-            return true;
         }
         block_Release(p_block);
+        return true;
     }
     return false;
 }
