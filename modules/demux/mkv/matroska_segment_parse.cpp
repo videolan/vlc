@@ -1713,13 +1713,11 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             fill_extra_data( vars.p_tk, 0 );
         }
         S_CASE_GLOB("A_QUICKTIME/*") {
+            if (vars.p_tk->i_extra_data < 4)
+                throw std::runtime_error ("invalid extradata when handling A_QUICKTIME/*");
+
             vars.p_fmt->i_cat = AUDIO_ES;
-
-            if (vars.p_tk->i_extra_data < 8)
-                throw std::runtime_error ("vars.p_tk->i_extra_data < 8 when handling A_QUICKTIME/*");
-
-            uint8_t const * p = vars.p_tk->p_extra_data;
-            vars.p_fmt->i_codec = VLC_FOURCC(p[4],p[5],p[6],p[7]);
+            vars.p_fmt->i_codec = GetFOURCC(vars.p_tk->p_extra_data);
 
             fill_extra_data( vars.p_tk, 0 );
         }
