@@ -1452,7 +1452,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
                     NULL, NULL, NULL, "VS", "vs_4_0_level_9_1", 0, 0, &pVSBlob, NULL);
 
     if( FAILED(hr)) {
-      msg_Err(vd, "The Vertex Shader is invalid.");
+      msg_Err(vd, "The Vertex Shader is invalid. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
 
@@ -1462,7 +1462,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
     if(FAILED(hr)) {
       ID3D11Device_Release(pVSBlob);
-      msg_Err(vd, "Failed to create the vertex shader.");
+      msg_Err(vd, "Failed to create the vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
     ID3D11DeviceContext_VSSetShader(sys->d3dcontext, d3dvertexShader, NULL, 0);
@@ -1481,7 +1481,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     ID3D10Blob_Release(pVSBlob);
 
     if(FAILED(hr)) {
-      msg_Err(vd, "Failed to create the vertex input layout");
+      msg_Err(vd, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
 
@@ -1535,7 +1535,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     ID3D10Blob_Release(pPSBlob);
 
     if(FAILED(hr)) {
-      msg_Err(vd, "Failed to create the pixel shader.");
+      msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
 
@@ -1556,7 +1556,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
         if(FAILED(hr)) {
           ID3D11PixelShader_Release(pPicQuadShader);
-          msg_Err(vd, "Failed to create the SPU pixel shader.");
+          msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
           return VLC_EGENERIC;
         }
     }
@@ -1675,7 +1675,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
     hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &bd, NULL, &quad->pVertexBuffer);
     if(FAILED(hr)) {
-      msg_Err(vd, "Failed to create vertex buffer.");
+      msg_Err(vd, "Failed to create vertex buffer. (hr=%lX)", hr);
       goto error;
     }
 
