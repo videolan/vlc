@@ -1800,6 +1800,13 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t * );
 MP4_Box_t *MP4_BoxGetRoot( stream_t * );
 
 /*****************************************************************************
+ * MP4_BoxNew : Allocates a new MP4 Box with its atom type
+ *****************************************************************************
+ *  returns NULL on failure
+ *****************************************************************************/
+MP4_Box_t * MP4_BoxNew( uint32_t i_type );
+
+/*****************************************************************************
  * MP4_FreeBox : free memory allocated after read with MP4_ReadBox
  *               or MP4_BoxGetRoot, this means also children boxes
  * XXX : all children have to be allocated by a malloc !! and

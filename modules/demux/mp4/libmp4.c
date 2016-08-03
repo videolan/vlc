@@ -74,7 +74,6 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date, bool b_relative )
 static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father );
 static int MP4_Box_Read_Specific( stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father );
 static void MP4_Box_Clean_Specific( MP4_Box_t *p_box );
-static inline MP4_Box_t * MP4_BoxNew( uint32_t i_type );
 
 static int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
 {
@@ -4383,7 +4382,7 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
 /*****************************************************************************
  * MP4_BoxNew : creates and initializes an arbitrary box
  *****************************************************************************/
-static inline MP4_Box_t * MP4_BoxNew( uint32_t i_type )
+MP4_Box_t * MP4_BoxNew( uint32_t i_type )
 {
     MP4_Box_t *p_box = calloc( 1, sizeof( MP4_Box_t ) );
     if( likely( p_box != NULL ) )
