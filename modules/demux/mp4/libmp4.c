@@ -2214,7 +2214,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
+static void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_sample_vide->p_qt_image_description );
 }
