@@ -1361,37 +1361,42 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             fill_extra_data( vars.p_tk, 0 );
         }
         S_CASE("V_QUICKTIME") {
-            MP4_Box_t *p_box = MP4_BoxNew(ATOM_root);
-            if( p_box )
+            if( vars.p_tk->i_extra_data > 4 )
             {
-                stream_t *p_mp4_stream = vlc_stream_MemoryNew( VLC_OBJECT(vars.p_demuxer),
-                                                               vars.p_tk->p_extra_data,
-                                                               vars.p_tk->i_extra_data,
-                                                               true );
-                if( p_mp4_stream )
+                MP4_Box_t *p_box = MP4_BoxNew(ATOM_root);
+                if( p_box )
                 {
-                    if( MP4_PeekBoxHeader( p_mp4_stream, p_box ) &&
-                        MP4_ReadBox_sample_vide( p_mp4_stream, p_box ) )
+                    stream_t *p_mp4_stream = vlc_stream_MemoryNew( VLC_OBJECT(vars.p_demuxer),
+                                                                   vars.p_tk->p_extra_data,
+                                                                   vars.p_tk->i_extra_data,
+                                                                   true );
+                    if( p_mp4_stream )
                     {
-                        const MP4_Box_data_sample_vide_t *p_sample = p_box->data.p_sample_vide;
-                        vars.p_fmt->i_codec = p_box->i_type;
-                        if( p_sample->i_width && p_sample->i_height )
+                        p_box->i_type = GetFOURCC( vars.p_tk->p_extra_data );
+                        p_box->i_size = p_box->i_shortsize = vars.p_tk->i_extra_data;
+                        if( MP4_ReadBox_sample_vide( p_mp4_stream, p_box ) )
                         {
-                            vars.p_tk->fmt.video.i_width = p_sample->i_width;
-                            vars.p_tk->fmt.video.i_height = p_sample->i_height;
+                            const MP4_Box_data_sample_vide_t *p_sample = p_box->data.p_sample_vide;
+                            vars.p_fmt->i_codec = p_box->i_type;
+                            if( p_sample->i_width && p_sample->i_height )
+                            {
+                                vars.p_tk->fmt.video.i_width = p_sample->i_width;
+                                vars.p_tk->fmt.video.i_height = p_sample->i_height;
+                            }
+                            vars.p_fmt->p_extra = malloc( p_sample->i_qt_image_description );
+                            if( vars.p_fmt->p_extra )
+                            {
+                                vars.p_fmt->i_extra = p_sample->i_qt_image_description;
+                                memcpy( vars.p_fmt->p_extra,
+                                        p_sample->p_qt_image_description, vars.p_fmt->i_extra );
+                            }
                         }
-                        vars.p_fmt->p_extra = malloc( p_sample->i_qt_image_description );
-                        if( vars.p_fmt->p_extra )
-                        {
-                            vars.p_fmt->i_extra = p_sample->i_qt_image_description;
-                            memcpy( vars.p_fmt->p_extra,
-                                    p_sample->p_qt_image_description, vars.p_fmt->i_extra );
-                        }
+                        vlc_stream_Delete( p_mp4_stream );
                     }
-                    vlc_stream_Delete( p_mp4_stream );
+                    MP4_BoxFree( p_box );
                 }
-                MP4_BoxFree( p_box );
             }
+            else throw std::runtime_error ("invalid extradata when handling V_QUICKTIME/*");
         }
         S_CASE("V_MJPEG") {
             vars.p_fmt->i_codec = VLC_CODEC_MJPG;
