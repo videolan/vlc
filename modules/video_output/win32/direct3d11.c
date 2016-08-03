@@ -1189,7 +1189,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         for (const d3d_format_t *output_format = GetRenderFormatList();
              output_format->name != NULL; ++output_format)
         {
-            if( bits_per_channel <= output_format->bitsPerChannel )
+            if( bits_per_channel <= output_format->bitsPerChannel &&
+                !is_d3d11_opaque(output_format->fourcc) )
             {
                 if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
                                                                output_format->formatTexture,
@@ -1217,7 +1218,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
                                                            output_format->formatTexture,
                                                            &i_formatSupport)) &&
-                    ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
+                    ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags &&
+                    !is_d3d11_opaque(output_format->fourcc) )
             {
                 msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", output_format->name,
                              (char *)&i_src_chroma );
