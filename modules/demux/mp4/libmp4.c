@@ -74,6 +74,7 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date, bool b_relative )
 static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father );
 static int MP4_Box_Read_Specific( stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father );
 static void MP4_Box_Clean_Specific( MP4_Box_t *p_box );
+static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box );
 
 static int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
 {
@@ -139,7 +140,7 @@ MP4_Box_t * MP4_BoxExtract( MP4_Box_t **pp_chain, uint32_t i_type )
  *
  * RETURN : 0 if it fail, 1 otherwise
  *****************************************************************************/
-int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
 {
     int      i_read;
     const uint8_t  *p_peek;
