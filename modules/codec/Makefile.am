@@ -377,7 +377,7 @@ libdxva2_plugin_la_SOURCES = \
 	codec/avcodec/dxva2.c codec/avcodec/directx_va.c codec/avcodec/directx_va.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
-libdxva2_plugin_la_LIBADD = -lole32 -lshlwapi -luuid
+libdxva2_plugin_la_LIBADD = $(LIBCOM) -lshlwapi -luuid
 if HAVE_AVCODEC_DXVA2
 codec_LTLIBRARIES += libdxva2_plugin.la
 endif
@@ -387,7 +387,7 @@ libd3d11va_plugin_la_SOURCES = \
 	video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
-libd3d11va_plugin_la_LIBADD = -lole32 -luuid
+libd3d11va_plugin_la_LIBADD = $(LIBCOM) -luuid
 if HAVE_WINSTORE
 libd3d11va_plugin_la_LIBADD += -ld3d11
 endif
@@ -547,13 +547,13 @@ libdmo_plugin_la_SOURCES = codec/dmo/dmo.c codec/dmo/dmo.h codec/dmo/buffer.c
 libqsv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libdmo_plugin_la_LIBADD = $(LIBM)
 if HAVE_WIN32
-libdmo_plugin_la_LIBADD += -lole32 -luuid
+libdmo_plugin_la_LIBADD += $(LIBCOM) -luuid
 codec_LTLIBRARIES += libdmo_plugin.la
 endif
 
 libmft_plugin_la_SOURCES = codec/mft.c packetizer/h264_nal.c packetizer/h264_nal.h
 if HAVE_WIN32
-libmft_plugin_la_LIBADD = -lole32 -luuid -lmfuuid -lmfplat
+libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfuuid -lmfplat
 codec_LTLIBRARIES += libmft_plugin.la
 endif
 

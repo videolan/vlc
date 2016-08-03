@@ -57,7 +57,7 @@ endif
 
 # SAPI TTS (win32)
 libsapi_plugin_la_SOURCES = text_renderer/sapi.cpp
-libsapi_plugin_la_LIBADD = -lole32
+libsapi_plugin_la_LIBADD = $(LIBCOM)
 if HAVE_SAPI
 text_LTLIBRARIES += libsapi_plugin.la
 endif

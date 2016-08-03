@@ -109,7 +109,7 @@ access_LTLIBRARIES += $(LTLIBaccess_qtsound)
 EXTRA_LTLIBRARIES += libaccess_qtsound_plugin.la
 
 libaccess_wasapi_plugin_la_SOURCES = access/wasapi.c
-libaccess_wasapi_plugin_la_LIBADD = -lole32 -lksuser
+libaccess_wasapi_plugin_la_LIBADD = $(LIBCOM) -lksuser
 if HAVE_WASAPI
 if !HAVE_WINSTORE
 access_LTLIBRARIES += libaccess_wasapi_plugin.la
@@ -186,7 +186,7 @@ endif
 
 libdshow_plugin_la_SOURCES = access/dshow/vlc_dshow.h access/dshow/dshow.cpp access/dshow/access.h \
 	access/dshow/filter.cpp access/dshow/filter.h access/dshow/crossbar.cpp
-libdshow_plugin_la_LIBADD = -lole32 -loleaut32 -luuid -lstrmiids -lksuser
+libdshow_plugin_la_LIBADD = $(LIBCOM) -loleaut32 -luuid -lstrmiids -lksuser
 if HAVE_WIN32_DESKTOP
 access_LTLIBRARIES += libdshow_plugin.la
 endif
@@ -315,7 +315,7 @@ if HAVE_WIN32_DESKTOP
 # Use an import library for C++ to retain C linker on other platforms.
 libbda_la_SOURCES = access/dtv/bdadefs.h access/dtv/bdagraph.cpp access/dtv/bdagraph.hpp
 libbda_la_LDFLAGS = -static
-libbda_la_LIBADD = -lstrmiids -lole32 -loleaut32 -luuid
+libbda_la_LIBADD = -lstrmiids $(LIBCOM) -loleaut32 -luuid
 noinst_LTLIBRARIES += libbda.la
 
 libdtv_plugin_la_DEPENDENCIES = libbda.la

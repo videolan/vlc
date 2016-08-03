@@ -20,7 +20,7 @@ libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
 if HAVE_OS2
 else
 if HAVE_WIN32
-libqt_plugin_la_LIBADD += -lole32 -lcomctl32 -luuid
+libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid
 else
 libqt_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIB) -lX11
 endif

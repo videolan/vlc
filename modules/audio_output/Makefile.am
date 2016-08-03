@@ -58,11 +58,11 @@ aout_LTLIBRARIES += libjack_plugin.la
 endif
 
 libmmdevice_plugin_la_SOURCES = audio_output/mmdevice.c audio_output/mmdevice.h
-libmmdevice_plugin_la_LIBADD = -lole32 $(LIBM)
+libmmdevice_plugin_la_LIBADD = $(LIBCOM) $(LIBM)
 libwinstore_plugin_la_SOURCES = audio_output/winstore.c audio_output/mmdevice.h
-libwinstore_plugin_la_LIBADD = -lole32
+libwinstore_plugin_la_LIBADD = $(LIBCOM)
 libwasapi_plugin_la_SOURCES = audio_output/wasapi.c
-libwasapi_plugin_la_LIBADD = -lole32 -lksuser
+libwasapi_plugin_la_LIBADD = $(LIBCOM) -lksuser
 if HAVE_WASAPI
 aout_LTLIBRARIES += libwasapi_plugin.la
 if !HAVE_WINSTORE
@@ -74,7 +74,7 @@ endif
 
 libdirectsound_plugin_la_SOURCES = audio_output/directsound.c \
 	audio_output/windows_audio_common.h
-libdirectsound_plugin_la_LIBADD = -lole32
+libdirectsound_plugin_la_LIBADD = $(LIBCOM)
 if HAVE_WIN32_DESKTOP
 aout_LTLIBRARIES += libdirectsound_plugin.la
 endif
