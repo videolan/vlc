@@ -1368,23 +1368,29 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                                                                vars.p_tk->p_extra_data,
                                                                vars.p_tk->i_extra_data,
                                                                true );
-                if( MP4_PeekBoxHeader( p_mp4_stream, p_box ) &&
-                    MP4_ReadBox_sample_vide( p_mp4_stream, p_box ) )
+                if( p_mp4_stream )
                 {
-                    vars.p_fmt->i_codec = p_box->i_type;
-                    uint32_t i_width = p_box->data.p_sample_vide->i_width;
-                    uint32_t i_height = p_box->data.p_sample_vide->i_height;
-                    if( i_width && i_height )
+                    if( MP4_PeekBoxHeader( p_mp4_stream, p_box ) &&
+                        MP4_ReadBox_sample_vide( p_mp4_stream, p_box ) )
                     {
-                        vars.p_tk->fmt.video.i_width = i_width;
-                        vars.p_tk->fmt.video.i_height = i_height;
+                        const MP4_Box_data_sample_vide_t *p_sample = p_box->data.p_sample_vide;
+                        vars.p_fmt->i_codec = p_box->i_type;
+                        if( p_sample->i_width && p_sample->i_height )
+                        {
+                            vars.p_tk->fmt.video.i_width = p_sample->i_width;
+                            vars.p_tk->fmt.video.i_height = p_sample->i_height;
+                        }
+                        vars.p_fmt->p_extra = malloc( p_sample->i_qt_image_description );
+                        if( vars.p_fmt->p_extra )
+                        {
+                            vars.p_fmt->i_extra = p_sample->i_qt_image_description;
+                            memcpy( vars.p_fmt->p_extra,
+                                    p_sample->p_qt_image_description, vars.p_fmt->i_extra );
+                        }
                     }
-                    vars.p_fmt->i_extra = p_box->data.p_sample_vide->i_qt_image_description;
-                    vars.p_fmt->p_extra = xmalloc( vars.p_fmt->i_extra );
-                    memcpy( vars.p_fmt->p_extra, p_box->data.p_sample_vide->p_qt_image_description, vars.p_fmt->i_extra );
+                    vlc_stream_Delete( p_mp4_stream );
                 }
                 MP4_BoxFree( p_box );
-                vlc_stream_Delete( p_mp4_stream );
             }
         }
         S_CASE("V_MJPEG") {
