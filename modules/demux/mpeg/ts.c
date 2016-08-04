@@ -1448,10 +1448,10 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                    (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES) )
                 {
                     int64_t i_dts27 = (p_block->i_dts - VLC_TS_0) * 9 / 100;
-                    int64_t i_pcr = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
-                    if( i_dts27 < i_pcr )
+                    i_dts27 = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
+                    if( i_dts27 < p_pmt->pcr.i_current )
                     {
-                        p_pmt->pcr.i_pcroffset = i_pcr - i_dts27 + 80000;
+                        p_pmt->pcr.i_pcroffset = p_pmt->pcr.i_current - i_dts27 + 80000;
                         msg_Warn( p_demux, "Broken stream: pid %d sends packets with dts %"PRId64
                                            "us later than pcr, applying delay",
                                   pid->i_pid, p_pmt->pcr.i_pcroffset * 100 / 9 );
