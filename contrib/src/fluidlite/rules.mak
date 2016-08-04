@@ -1,7 +1,7 @@
 # fluidlite
 
 FLUID_GITURL := https://github.com/divideconcept/FluidLite.git
-FLUID_HASH := 171d222
+FLUID_HASH := b9573fd
 
 $(TARBALLS)/fluidlite-git.tar.xz:
 	$(call download_git,$(FLUID_GITURL),,$(FLUID_HASH))
