@@ -536,6 +536,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
             vlc_mutex_locker locker(&lock);
             receiver_state oldPlayerState = receiverState;
             std::string newPlayerState = status[0]["playerState"].operator const char *();
+            std::string idleReason = status[0]["idleReason"].operator const char *();
 
             if (newPlayerState == "IDLE")
                 receiverState = RECEIVER_IDLE;
@@ -641,7 +642,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                 vlc_cond_signal( &seekCommandCond );
             }
 
-            if ( cmd_status != CMD_LOAD_SENT && receiverState == RECEIVER_IDLE && has_input )
+            if ( (cmd_status != CMD_LOAD_SENT || idleReason == "CANCELLED") && receiverState == RECEIVER_IDLE && has_input )
             {
                 msg_Dbg( p_module, "the device missed the LOAD command");
                 i_ts_local_start = VLC_TS_0;
