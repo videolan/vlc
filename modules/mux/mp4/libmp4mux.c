@@ -805,20 +805,16 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
     bo_t    *avcC = box_new("avcC");/* FIXME use better value */
     if(!avcC)
         return NULL;
-    uint8_t *p_sps = NULL;
-    uint8_t *p_pps = NULL;
-    uint8_t *p_ext = NULL;
-    size_t   i_sps_size = 0;
-    size_t   i_pps_size = 0;
-    size_t   i_ext_size = 0;
+    uint8_t *p_sps, *p_pps, *p_ext;
+    size_t i_sps_size, i_pps_size, i_ext_size;
 
     if( h264_get_spspps(p_fmt->p_extra, p_fmt->i_extra,
                         &p_sps, &i_sps_size,
                         &p_pps, &i_pps_size,
-                        &p_ext, &i_ext_size ) != 0 || !p_sps || !p_pps )
+                        &p_ext, &i_ext_size ) != 0 )
     {
-        bo_free(avcC);
-        return NULL;
+        p_sps = p_pps = p_ext = NULL;
+        i_sps_size = i_pps_size = i_ext_size = 0;
     }
 
     (void) hxxx_strip_AnnexB_startcode( (const uint8_t **) &p_sps, &i_sps_size );
@@ -843,11 +839,12 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
         bo_add_mem(avcC, i_pps_size, p_pps);
     }
 
-    if( p_sps[1] == PROFILE_H264_HIGH ||
+    if( i_sps_size > 3 &&
+       (p_sps[1] == PROFILE_H264_HIGH ||
         p_sps[1] == PROFILE_H264_HIGH_10 ||
         p_sps[1] == PROFILE_H264_HIGH_422 ||
         p_sps[1] == PROFILE_H264_HIGH_444 ||
-        p_sps[1] == PROFILE_H264_HIGH_444_PREDICTIVE )
+        p_sps[1] == PROFILE_H264_HIGH_444_PREDICTIVE) )
     {
         h264_sequence_parameter_set_t *p_spsdata = h264_decode_sps( p_sps, i_sps_size, true );
         if( p_spsdata )
