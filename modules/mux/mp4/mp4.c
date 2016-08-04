@@ -414,12 +414,15 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     case VLC_CODEC_SVQ3:
     case VLC_CODEC_H263:
     case VLC_CODEC_H264:
-    case VLC_CODEC_HEVC:
     case VLC_CODEC_AMR_NB:
     case VLC_CODEC_AMR_WB:
     case VLC_CODEC_YV12:
     case VLC_CODEC_YUYV:
         break;
+    case VLC_CODEC_HEVC:
+        if(!p_input->p_fmt->i_extra)
+            msg_Err(p_mux, "HEVC muxing from AnnexB source is unsupported");
+        return VLC_EGENERIC;
     case VLC_CODEC_SUBT:
         msg_Warn(p_mux, "subtitle track added like in .mov (even when creating .mp4)");
         break;
