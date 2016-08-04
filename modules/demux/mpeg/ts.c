@@ -1345,12 +1345,12 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
         block_t *p_block;
 
         if( i_dts >= 0 )
-            p_pes->i_dts = VLC_TS_0 + i_dts * 100 / 9;
+            p_pes->i_dts = FROM_SCALE(i_dts);
 
         if( i_pts >= 0 )
-            p_pes->i_pts = VLC_TS_0 + i_pts * 100 / 9;
+            p_pes->i_pts = FROM_SCALE(i_pts);
 
-        p_pes->i_length = i_length * 100 / 9;
+        p_pes->i_length = FROM_SCALE_NZ(i_length);
 
         p_block = block_ChainGather( p_pes );
         if( p_es->fmt.i_codec == VLC_CODEC_SUBT )
@@ -1373,7 +1373,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                  * In this case use the last PCR + 40ms */
                 mtime_t i_pcr = p_es->p_program->pcr.i_current;
                 if( i_pcr > VLC_TS_INVALID )
-                    p_block->i_pts = VLC_TS_0 + i_pcr * 100 / 9 + 40000;
+                    p_block->i_pts = FROM_SCALE(i_pcr) + 40000;
             }
         }
         else if( p_es->fmt.i_codec == VLC_CODEC_ARIB_A ||
@@ -1439,7 +1439,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 if ( p_pmt->pcr.b_disable && p_block->i_dts > VLC_TS_INVALID &&
                      ( p_pmt->i_pid_pcr == pid->i_pid || p_pmt->i_pid_pcr == 0x1FFF ) )
                 {
-                    ProgramSetPCR( p_demux, p_pmt, (p_block->i_dts - VLC_TS_0) * 9 / 100 - 120000 );
+                    ProgramSetPCR( p_demux, p_pmt, TO_SCALE(p_block->i_dts) - 120000 );
                 }
 
                 /* Compute PCR/DTS offset if any */
@@ -1447,14 +1447,14 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                     p_pmt->pcr.i_current > VLC_TS_INVALID &&
                    (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES) )
                 {
-                    int64_t i_dts27 = (p_block->i_dts - VLC_TS_0) * 9 / 100;
+                    int64_t i_dts27 = TO_SCALE(p_block->i_dts);
                     i_dts27 = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
                     if( i_dts27 < p_pmt->pcr.i_current )
                     {
                         p_pmt->pcr.i_pcroffset = p_pmt->pcr.i_current - i_dts27 + 80000;
                         msg_Warn( p_demux, "Broken stream: pid %d sends packets with dts %"PRId64
                                            "us later than pcr, applying delay",
-                                  pid->i_pid, p_pmt->pcr.i_pcroffset * 100 / 9 );
+                                  pid->i_pid, FROM_SCALE_NZ(p_pmt->pcr.i_pcroffset) );
                     }
                     else p_pmt->pcr.i_pcroffset = 0;
                 }
@@ -1462,9 +1462,9 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 if( p_pmt->pcr.i_pcroffset != -1 )
                 {
                     if( p_block->i_dts > VLC_TS_INVALID )
-                        p_block->i_dts += (p_pmt->pcr.i_pcroffset * 100 / 9);
+                        p_block->i_dts += FROM_SCALE_NZ(p_pmt->pcr.i_pcroffset);
                     if( p_block->i_pts > VLC_TS_INVALID )
-                        p_block->i_pts += (p_pmt->pcr.i_pcroffset * 100 / 9);
+                        p_block->i_pts += FROM_SCALE_NZ(p_pmt->pcr.i_pcroffset);
                 }
 
                 /* SL in PES */
