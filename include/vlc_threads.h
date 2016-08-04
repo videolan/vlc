@@ -383,7 +383,7 @@ VLC_API void vlc_mutex_destroy(vlc_mutex_t *);
  * \warning Beware of deadlocks when locking multiple mutexes at the same time,
  * or when using mutexes from callbacks.
  *
- * \note This function is not a cancellation-point.
+ * \note This function is not a cancellation point.
  */
 VLC_API void vlc_mutex_lock(vlc_mutex_t *);
 
@@ -394,7 +394,7 @@ VLC_API void vlc_mutex_lock(vlc_mutex_t *);
  * another thread. This function never sleeps and can be used in delay-critical
  * code paths.
  *
- * \note This function is not a cancellation-point.
+ * \note This function is not a cancellation point.
  *
  * \warning If this function fails, then the mutex is held... by another
  * thread. The calling thread must deal with the error appropriately. That
@@ -410,6 +410,8 @@ VLC_API int vlc_mutex_trylock( vlc_mutex_t * ) VLC_USED;
  * Releases a mutex.
  *
  * If the mutex is not held by the calling thread, the behaviour is undefined.
+ *
+ * \note This function is not a cancellation point.
  */
 VLC_API void vlc_mutex_unlock(vlc_mutex_t *);
 
@@ -442,11 +444,15 @@ VLC_API void vlc_cond_destroy(vlc_cond_t *);
  *
  * If any thread is currently waiting on the condition variable, at least one
  * of those threads will be woken up. Otherwise, this function has no effects.
+ *
+ * \note This function is not a cancellation point.
  */
 VLC_API void vlc_cond_signal(vlc_cond_t *);
 
 /**
  * Wakes up all threads waiting on a condition variable.
+ *
+ * \note This function is not a cancellation point.
  */
 VLC_API void vlc_cond_broadcast(vlc_cond_t *);
 
@@ -493,6 +499,9 @@ VLC_API void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex);
  * The time-out is expressed as an absolute timestamp using the same arbitrary
  * time reference as the mdate() and mwait() functions.
  *
+ * \note This function is a cancellation point. In case of thread cancellation,
+ * the mutex is always locked before cancellation proceeds.
+ *
  * \param cond condition variable to wait on
  * \param mutex mutex which is unlocked while waiting,
  *              then locked again when waking up
@@ -524,7 +533,10 @@ VLC_API void vlc_sem_destroy(vlc_sem_t *);
 
 /**
  * Increments the value of a semaphore.
- * @return 0 on success, EOVERFLOW in case of integer overflow.
+ *
+ * \note This function is not a cancellation point.
+ *
+ * \return 0 on success, EOVERFLOW in case of integer overflow.
  */
 VLC_API int vlc_sem_post(vlc_sem_t *);
 
@@ -567,6 +579,8 @@ VLC_API void vlc_rwlock_wrlock(vlc_rwlock_t *);
  * Releases a read/write lock.
  *
  * The calling thread must hold the lock. Otherwise behaviour is undefined.
+ *
+ * \note This function is not a cancellation point.
  */
 VLC_API void vlc_rwlock_unlock(vlc_rwlock_t *);
 
@@ -792,13 +806,17 @@ VLC_API mtime_t mdate(void);
  * \param deadline timestamp to wait for (\ref mdate())
  *
  * \note The deadline may be exceeded due to OS scheduling.
+ * \note This function is a cancellation point.
  */
 VLC_API void mwait(mtime_t deadline);
 
 /**
  * Waits for an interval of time.
  *
- * @param delay how long to wait (in microseconds)
+ * \param delay how long to wait (in microseconds)
+ *
+ * \note The delay may be exceeded due to OS scheduling.
+ * \note This function is a cancellation point.
  */
 VLC_API void msleep(mtime_t delay);
 
