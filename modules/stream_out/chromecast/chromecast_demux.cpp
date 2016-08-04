@@ -66,6 +66,8 @@ struct demux_sys_t
     {
         p_renderer->pf_set_title( p_renderer->p_opaque, NULL );
         p_renderer->pf_set_artwork( p_renderer->p_opaque, NULL );
+
+        demux_Delete(p_demux->p_next);
     }
 
     void setPauseState(bool paused)
