@@ -1325,7 +1325,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
             p_data->i_length = 1000;
 
         if (p_sys->first_dts == 0)
-            p_sys->first_dts = p_data->i_dts - p_sys->i_dts_delay;
+            p_sys->first_dts = p_data->i_dts;
 
         if( ( p_pcr_stream->state.i_pes_dts > 0 &&
               p_data->i_dts - 10 * CLOCK_FREQ > p_pcr_stream->state.i_pes_dts +
@@ -1388,7 +1388,8 @@ static bool MuxStreams(sout_mux_t *p_mux )
                 p_spu->p_buffer[2] = ' ';
 
                 EStoPES( &p_spu, p_input->p_fmt,
-                             p_stream->pes.i_stream_id, 1, 0, 0, 0, p_sys->first_dts );
+                         p_stream->pes.i_stream_id, 1, 0, 0, 0,
+                         p_sys->first_dts - p_sys->i_dts_delay );
                 p_data->p_next = p_spu;
             }
             break;
@@ -1435,7 +1436,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
         EStoPES ( &p_data, p_input->p_fmt, p_stream->pes.i_stream_id,
                        1, b_data_alignment, i_header_size,
-                       i_max_pes_size, p_sys->first_dts );
+                       i_max_pes_size, p_sys->first_dts - p_sys->i_dts_delay );
 
         BufferChainAppend( &p_stream->state.chain_pes, p_data );
 
@@ -1792,7 +1793,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         if( p_ts->i_flags & BLOCK_FLAG_CLOCK )
         {
             /* msg_Dbg( p_mux, "pcr=%lld ms", p_ts->i_dts / 1000 ); */
-            TSSetPCR( p_ts, p_ts->i_dts - p_sys->i_dts_delay - p_sys->first_dts );
+            TSSetPCR( p_ts, p_ts->i_dts - p_sys->first_dts );
         }
         if( p_ts->i_flags & BLOCK_FLAG_SCRAMBLED )
         {
