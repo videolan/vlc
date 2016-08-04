@@ -1,7 +1,7 @@
 # fluidlite
 
 FLUID_GITURL := https://github.com/divideconcept/FluidLite.git
-FLUID_HASH := b9573fd
+FLUID_HASH := 7b6ab58
 
 $(TARBALLS)/fluidlite-git.tar.xz:
 	$(call download_git,$(FLUID_GITURL),,$(FLUID_HASH))
@@ -20,5 +20,4 @@ fluidlite: fluidlite-git.tar.xz .sum-fluidlite
 	-cd $< && rm CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE)
 	cd $< && $(MAKE) install
-	cp $(SRC)/fluidlite/fluidlite.pc "$(PREFIX)/lib/pkgconfig"
 	touch $@
