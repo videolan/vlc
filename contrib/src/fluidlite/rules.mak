@@ -3,6 +3,14 @@
 FLUID_GITURL := https://github.com/divideconcept/FluidLite.git
 FLUID_HASH := 7b6ab58
 
+ifdef HAVE_WIN32
+PKGS += fluidite
+endif
+
+ifeq ($(call need_pkg,"fluidlite"),)
+PKGS_FOUND += fluidlite
+endif
+
 $(TARBALLS)/fluidlite-git.tar.xz:
 	$(call download_git,$(FLUID_GITURL),,$(FLUID_HASH))
 
