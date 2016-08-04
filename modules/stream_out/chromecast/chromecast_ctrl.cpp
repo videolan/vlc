@@ -1051,6 +1051,7 @@ void intf_sys_t::notifySendRequest()
 void intf_sys_t::requestPlayerStop()
 {
     requested_stop = true;
+    setHasInput(false);
     notifySendRequest();
 }
 
