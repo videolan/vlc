@@ -413,11 +413,14 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     case VLC_CODEC_SVQ1:
     case VLC_CODEC_SVQ3:
     case VLC_CODEC_H263:
-    case VLC_CODEC_H264:
     case VLC_CODEC_AMR_NB:
     case VLC_CODEC_AMR_WB:
     case VLC_CODEC_YV12:
     case VLC_CODEC_YUYV:
+        break;
+    case VLC_CODEC_H264:
+        if(!p_input->p_fmt->i_extra)
+            msg_Warn(p_mux, "H264 muxing from AnnexB source will set an incorrect default profile");
         break;
     case VLC_CODEC_HEVC:
         if(!p_input->p_fmt->i_extra)
