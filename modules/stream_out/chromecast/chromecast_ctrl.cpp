@@ -183,7 +183,7 @@ intf_sys_t::~intf_sys_t()
 void intf_sys_t::setHasInput( bool b_has_input, const std::string mime_type )
 {
     vlc_mutex_locker locker(&lock);
-    msg_Dbg( p_module, "setHasInput device:%s session:%s",
+    msg_Dbg( p_module, "setHasInput %s device:%s session:%s",b_has_input ? "true":"false",
              targetIP.c_str(), mediaSessionId.c_str() );
 
     this->has_input = b_has_input;
