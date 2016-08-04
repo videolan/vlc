@@ -2891,7 +2891,7 @@ dnl libfluidsynth (MIDI synthetizer) plugin
 dnl
 PKG_ENABLE_MODULES_VLC([FLUIDSYNTH], [], [fluidsynth >= 1.1.2], [MIDI synthetiser with libfluidsynth], [auto])
 PKG_ENABLE_MODULES_VLC([FLUIDLITE], [fluidsynth], [fluidlite], [MIDI synthetiser with libfluidsynth], [auto])
-AC_CHECK_HEADERS(fluidlite.h)
+AC_CHECK_HEADERS(fluidlite.h, [AC_SUBST([FLUIDSYNTH_LIBS], ${FLUIDLITE_LIBS})])
 
 dnl
 dnl Teletext Modules
