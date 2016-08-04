@@ -659,6 +659,10 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
             else
                 msgReceiverGetStatus();
         }
+        else if (type == "LOAD_CANCELLED")
+        {
+            msg_Dbg( p_module, "LOAD canceled by another command");
+        }
         else if (type == "INVALID_REQUEST")
         {
             msg_Dbg( p_module, "We sent an invalid request reason:%s", (*p_data)["reason"].operator const char *());
