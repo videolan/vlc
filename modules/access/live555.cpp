@@ -1260,7 +1260,7 @@ static int Play( demux_t *p_demux )
                 msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
         }
     }
-    p_sys->i_pcr = 0;
+    p_sys->i_pcr = VLC_TS_INVALID;
 
     /* Retrieve the starttime if possible */
     p_sys->f_npt_start = p_sys->ms->playStartTime();
@@ -1346,10 +1346,10 @@ static int Demux( demux_t *p_demux )
         if( tk->b_asf || tk->b_muxed )
             b_send_pcr = false;
     }
-    if( p_sys->i_pcr > 0 )
+    if( p_sys->i_pcr > VLC_TS_INVALID )
     {
         if( b_send_pcr )
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, 1 + p_sys->i_pcr );
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
     }
 
     /* First warn we want to read data */
@@ -1520,7 +1520,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                         p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
                 }
-                p_sys->i_pcr = 0;
+                p_sys->i_pcr = VLC_TS_INVALID;
 
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
@@ -1619,7 +1619,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             /* ReSync the stream */
             p_sys->f_npt_start = 0;
-            p_sys->i_pcr = 0;
+            p_sys->i_pcr = VLC_TS_INVALID;
             p_sys->f_npt = 0.0;
 
             *pi_int = (int)( INPUT_RATE_DEFAULT / p_sys->ms->scale() );
@@ -1669,7 +1669,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     live_track_t *tk = p_sys->track[i];
                     tk->b_rtcp_sync = false;
                     tk->i_pts = VLC_TS_INVALID;
-                    p_sys->i_pcr = 0;
+                    p_sys->i_pcr = VLC_TS_INVALID;
                     es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 }
             }
