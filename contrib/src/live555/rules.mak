@@ -1,6 +1,6 @@
 # live555
 
-LIVE555_FILE := live.2016.02.22.tar.gz
+LIVE555_FILE := live.2016.07.19.tar.gz
 LIVEDOTCOM_URL := http://live555.com/liveMedia/public/$(LIVE555_FILE)
 
 ifdef BUILD_NETWORK
@@ -53,7 +53,6 @@ ifdef HAVE_ANDROID
 	cd live && sed -e 's%-DPIC%-DPIC -DNO_SSTREAM=1 -DLOCALE_NOT_USED -I$(ANDROID_NDK)/platforms/$(ANDROID_API)/arch-$(PLATFORM_SHORT_ARCH)/usr/include%' -i.orig config.linux
 endif
 	cd live && patch -lfp1 < ../../src/live555/winstore.patch
-	cd live && patch -lfp1 < ../../src/live555/no-gettimeofday.patch
 	mv live $@
 	touch $@
 
