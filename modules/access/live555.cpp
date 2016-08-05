@@ -306,9 +306,6 @@ static int  Open ( vlc_object_t *p_this )
     msg_Dbg( p_demux, "version " LIVEMEDIA_LIBRARY_VERSION_STRING );
 
     TAB_INIT( p_sys->i_track, p_sys->track );
-    p_sys->f_npt = 0.;
-    p_sys->f_npt_start = 0.;
-    p_sys->f_npt_length = 0.;
     p_sys->b_no_data = true;
     p_sys->psz_path = strdup( p_demux->psz_location );
     p_sys->b_force_mcast = var_InheritBool( p_demux, "rtsp-mcast" );
