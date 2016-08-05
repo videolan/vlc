@@ -624,8 +624,10 @@ VLC_API void *vlc_threadvar_get(vlc_threadvar_t);
  * Waits on an address.
  *
  * Puts the calling thread to sleep if a specific value is stored at a
- * specified address. If the value does not match, do nothing and return
- * immediately.
+ * specified address. The thread will sleep until it is woken up by a call to
+ * vlc_addr_signal() or vlc_addr_broadcast() in another thread, or spuriously.
+ *
+ * If the value does not match, do nothing and return immediately.
  *
  * \param addr address to check for
  * \param val value to match at the address
