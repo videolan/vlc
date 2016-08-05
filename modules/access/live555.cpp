@@ -170,8 +170,10 @@ typedef struct
     unsigned int    i_buffer;
 
     bool            b_rtcp_sync;
+    bool            b_discontinuity;
     char            waiting;
-    int64_t         i_pts;
+    int64_t         i_lastpts;
+    int64_t         i_pcr;
     double          f_npt;
 
     bool            b_selected;
@@ -202,6 +204,7 @@ struct demux_sys_t
 
     /* */
     int64_t          i_pcr; /* The clock */
+    bool             b_rtcp_sync; /* At least one track received sync */
     double           f_npt;
     double           f_npt_length;
     double           f_npt_start;
@@ -824,7 +827,9 @@ static int SessionsSetup( demux_t *p_demux )
             tk->p_out_muxed = NULL;
             tk->waiting     = 0;
             tk->b_rtcp_sync = false;
-            tk->i_pts       = VLC_TS_INVALID;
+            tk->b_discontinuity = false;
+            tk->i_lastpts   = VLC_TS_INVALID;
+            tk->i_pcr       = VLC_TS_INVALID;
             tk->f_npt       = 0.;
             tk->b_selected  = true;
             tk->i_buffer    = i_frame_buffer;
@@ -1197,6 +1202,8 @@ static int SessionsSetup( demux_t *p_demux )
     /* */
     p_sys->b_no_data = true;
     p_sys->i_no_data_ti = 0;
+    p_sys->b_rtcp_sync = false;
+    p_sys->i_pcr = VLC_TS_INVALID;
 
     return i_return;
 }
@@ -1303,11 +1310,6 @@ static int Demux( demux_t *p_demux )
             b_send_pcr = false;
         }
     }
-    if( p_sys->i_pcr > VLC_TS_INVALID )
-    {
-        if( b_send_pcr )
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
-    }
 
     /* First warn we want to read data */
     p_sys->event_data = 0;
@@ -1331,23 +1333,48 @@ static int Demux( demux_t *p_demux )
     /* remove the task */
     p_sys->scheduler->unscheduleDelayedTask( task );
 
-    /* Check for gap in pts value */
-    for( i = 0; i < p_sys->i_track; i++ )
+    mtime_t i_minpcr = VLC_TS_INVALID;
+    bool b_discontinuity = false;
+
+    if( b_send_pcr )
     {
-        live_track_t *tk = p_sys->track[i];
-
-        if( tk->format != live_track_t::MULTIPLEXED_STREAM && !tk->b_rtcp_sync &&
-            tk->sub->rtpSource() && tk->sub->rtpSource()->hasBeenSynchronizedUsingRTCP() )
+        /* Check for gap in pts value */
+        for( i = 0; i < p_sys->i_track; i++ )
         {
-            msg_Dbg( p_demux, "tk->rtpSource->hasBeenSynchronizedUsingRTCP()" );
+            live_track_t *tk = p_sys->track[i];
 
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
-            tk->b_rtcp_sync = true;
-            /* reset PCR */
-            tk->i_pts = VLC_TS_INVALID;
-            tk->f_npt = 0.;
-            p_sys->i_pcr = 0;
+            if( !tk->b_selected ||
+               (p_sys->b_rtcp_sync && !tk->b_rtcp_sync) )
+                continue;
+
+            /* Check for gap in pts value */
+            b_discontinuity |= (tk->b_discontinuity);
+
+            if( i_minpcr == VLC_TS_INVALID || i_minpcr > tk->i_pcr )
+                i_minpcr = tk->i_pcr;
+        }
+
+        if( p_sys->i_pcr > VLC_TS_INVALID && b_discontinuity )
+        {
+            es_out_Control( p_demux->out, ES_OUT_MODIFY_PCR_SYSTEM, true, VLC_TS_0 + i_minpcr );
+            p_sys->i_pcr = i_minpcr;
             p_sys->f_npt = 0.;
+
+            for( i = 0; i < p_sys->i_track; i++ )
+            {
+                live_track_t *tk = p_sys->track[i];
+                tk->i_lastpts = VLC_TS_INVALID;
+                tk->i_pcr = VLC_TS_INVALID;
+                tk->f_npt = 0.;
+                tk->b_discontinuity = false;
+            }
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+        }
+        else if( p_sys->i_pcr == VLC_TS_INVALID ||
+                 i_minpcr > p_sys->i_pcr + CLOCK_FREQ / 4 )
+        {
+            p_sys->i_pcr = i_minpcr;
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
         }
     }
 
@@ -1482,7 +1509,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
                     p_sys->track[i]->b_rtcp_sync = false;
-                    p_sys->track[i]->i_pts = VLC_TS_INVALID;
+                    p_sys->track[i]->i_lastpts = VLC_TS_INVALID;
+                    p_sys->track[i]->i_pcr = VLC_TS_INVALID;
                 }
 
                 /* Retrieve the starttime if possible */
@@ -1612,7 +1640,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     live_track_t *tk = p_sys->track[i];
                     tk->b_rtcp_sync = false;
-                    tk->i_pts = VLC_TS_INVALID;
+                    tk->b_discontinuity = false;
+                    tk->i_lastpts = VLC_TS_INVALID;
+                    tk->i_pcr = VLC_TS_INVALID;
                 }
                 p_sys->i_pcr = VLC_TS_INVALID;
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
@@ -1976,9 +2006,14 @@ static void StreamRead( void *p_private, unsigned int i_size,
             memcpy( p_block->p_buffer, tk->p_buffer, i_size );
     }
 
-    if( p_sys->i_pcr < i_pts )
+    /* No data sent. Always in sync then */
+    if( !tk->b_rtcp_sync && tk->sub->rtpSource() &&
+         tk->sub->rtpSource()->hasBeenSynchronizedUsingRTCP() )
     {
-        p_sys->i_pcr = i_pts;
+        msg_Dbg( p_demux, "tk->rtpSource->hasBeenSynchronizedUsingRTCP()" );
+        p_sys->b_rtcp_sync = tk->b_rtcp_sync = true;
+        tk->b_discontinuity = ( tk->i_pcr > VLC_TS_INVALID );
+        tk->i_pcr = VLC_TS_INVALID;
     }
 
     /* Update our global npt value */
@@ -1997,13 +2032,17 @@ static void StreamRead( void *p_private, unsigned int i_size,
                 vlc_demux_chained_Send( tk->p_out_muxed, p_block );
                 break;
             default:
-                if( i_pts != tk->i_pts )
+                if( i_pts != tk->i_lastpts )
                     p_block->i_pts = VLC_TS_0 + i_pts;
-                if( i_pts > 0 )
-                    tk->i_pts = i_pts;
                 /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
                 p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? VLC_TS_INVALID : (VLC_TS_0 + i_pts);
                 es_out_Send( p_demux->out, tk->p_es, p_block );
+                if( i_pts > 0 )
+                {
+                    if( tk->i_pcr < i_pts )
+                        tk->i_pcr = i_pts;
+                    tk->i_lastpts = i_pts;
+                }
                 break;
         }
     }
