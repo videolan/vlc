@@ -85,7 +85,10 @@ void (mwait)(mtime_t deadline)
     vlc_cancel_addr_prepare(&value);
 
     while ((delay = (deadline - mdate())) > 0)
+    {
         vlc_addr_timedwait(&value, 0, delay);
+        vlc_testcancel();
+    }
 
     vlc_cancel_addr_finish(&value);
 }
