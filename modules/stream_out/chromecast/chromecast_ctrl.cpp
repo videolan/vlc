@@ -477,10 +477,6 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                     setPlayerStatus(NO_CMD_PENDING);
                     setConnectionStatus(CHROMECAST_APP_STARTED);
                 }
-                else
-                {
-                    msgPlayerGetStatus();
-                }
             }
             else
             {
