@@ -178,7 +178,7 @@ class RTSPClientVlc;
 struct demux_sys_t
 {
     char            *p_sdp;    /* XXX mallocated */
-    char            *psz_path; /* URL-encoded path */
+    char            *psz_pl_url; /* password-less URL */
     vlc_url_t       url;
 
     MediaSession     *ms;
@@ -263,6 +263,8 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
 static unsigned char* parseVorbisConfigStr( char const* configStr,
                                             unsigned int& configSize );
 
+static char *passwordLessURL( vlc_url_t *url );
+
 /*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
@@ -271,6 +273,7 @@ static int  Open ( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = NULL;
 
+    char *psz_url;
     int i_return;
     int i_error = VLC_EGENERIC;
 
@@ -304,15 +307,24 @@ static int  Open ( vlc_object_t *p_this )
 
     TAB_INIT( p_sys->i_track, p_sys->track );
     p_sys->b_no_data = true;
-    p_sys->psz_path = strdup( p_demux->psz_location );
     p_sys->b_force_mcast = var_InheritBool( p_demux, "rtsp-mcast" );
     p_sys->f_seek_request = -1;
     vlc_mutex_init(&p_sys->timeout_mutex);
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
-    vlc_UrlParse( &p_sys->url, p_sys->psz_path );
-    /* Add the access protocol to url, it will be used by vlc_credential */
-    p_sys->url.psz_protocol = p_demux->psz_access;
+    if( asprintf( &psz_url, "%s://%s", p_demux->psz_access, p_demux->psz_location ) == -1 )
+    {
+        i_error = VLC_ENOMEM;
+        goto error;
+    }
+    vlc_UrlParse( &p_sys->url, psz_url );
+    free( psz_url );
+
+    if( ( p_sys->psz_pl_url = passwordLessURL( &p_sys->url ) ) == NULL )
+    {
+        i_error = VLC_ENOMEM;
+        goto error;
+    }
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
     {
@@ -327,7 +339,7 @@ static int  Open ( vlc_object_t *p_this )
 
     if( strcasecmp( p_demux->psz_access, "sdp" ) )
     {
-        char *p = p_sys->psz_path;
+        char *p = p_sys->psz_pl_url;
         while( (p = strchr( p, ' ' )) != NULL ) *p = '+';
     }
 
@@ -370,7 +382,7 @@ static int  Open ( vlc_object_t *p_this )
     }
     else if( ( i_return = Connect( p_demux ) ) != VLC_SUCCESS )
     {
-        msg_Err( p_demux, "Failed to connect with rtsp://%s", p_sys->psz_path );
+        msg_Err( p_demux, "Failed to connect with %s", p_sys->psz_pl_url );
         goto error;
     }
 
@@ -383,7 +395,7 @@ static int  Open ( vlc_object_t *p_this )
 
     if( ( i_return = SessionsSetup( p_demux ) ) != VLC_SUCCESS )
     {
-        msg_Err( p_demux, "Nothing to play for rtsp://%s", p_sys->psz_path );
+        msg_Err( p_demux, "Nothing to play for %s", p_sys->psz_pl_url );
         goto error;
     }
 
@@ -437,7 +449,7 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_out_asf ) vlc_demux_chained_Delete( p_sys->p_out_asf );
     delete p_sys->scheduler;
     free( p_sys->p_sdp );
-    free( p_sys->psz_path );
+    free( p_sys->psz_pl_url );
 
     vlc_UrlClean( &p_sys->url );
     vlc_mutex_destroy(&p_sys->timeout_mutex);
@@ -541,30 +553,9 @@ static int Connect( demux_t *p_demux )
     vlc_credential credential;
     const char *psz_user = NULL;
     const char *psz_pwd  = NULL;
-    char *psz_url     = NULL;
     int  i_http_port  = 0;
     int  i_ret        = VLC_SUCCESS;
     const int i_timeout = var_InheritInteger( p_demux, "ipv4-timeout" );
-
-    /* Get the user name and password */
-    if( p_sys->url.psz_username || p_sys->url.psz_password )
-    {
-        /* Create the URL by stripping away the username/password part */
-        if( p_sys->url.i_port == 0 )
-            p_sys->url.i_port = 554;
-        if( asprintf( &psz_url, "rtsp://%s:%d%s%s%s",
-                      strempty( p_sys->url.psz_host ),
-                      p_sys->url.i_port,
-                      strempty( p_sys->url.psz_path ),
-                      p_sys->url.psz_option ? "?" : "",
-                      strempty(p_sys->url.psz_option) ) == -1 )
-            return VLC_ENOMEM;
-    }
-    else
-    {
-        if( asprintf( &psz_url, "rtsp://%s", p_sys->psz_path ) == -1 )
-            return VLC_ENOMEM;
-    }
 
     vlc_credential_init( &credential, &p_sys->url );
 
@@ -588,7 +579,7 @@ createnew:
     if( var_CreateGetBool( p_demux, "rtsp-http" ) )
         i_http_port = var_InheritInteger( p_demux, "rtsp-http-port" );
 
-    p_sys->rtsp = new (std::nothrow) RTSPClientVlc( *p_sys->env, psz_url,
+    p_sys->rtsp = new (std::nothrow) RTSPClientVlc( *p_sys->env, p_sys->psz_pl_url,
                                      var_InheritInteger( p_demux, "verbose" ) > 1 ? 1 : 0,
                                      "LibVLC/" VERSION, i_http_port, p_sys );
     if( !p_sys->rtsp )
@@ -662,8 +653,6 @@ describe:
         vlc_credential_store( &credential, p_demux );
 
 bailout:
-    /* malloc-ated copy */
-    free( psz_url );
     vlc_credential_clean( &credential );
 
     return i_ret;
@@ -1690,8 +1679,7 @@ static int RollOverTcp( demux_t *p_demux )
     /* Reopen rtsp client */
     if( ( i_return = Connect( p_demux ) ) != VLC_SUCCESS )
     {
-        msg_Err( p_demux, "Failed to connect with rtsp://%s",
-                 p_sys->psz_path );
+        msg_Err( p_demux, "Failed to connect with %s", p_sys->psz_pl_url );
         goto error;
     }
 
@@ -1703,7 +1691,7 @@ static int RollOverTcp( demux_t *p_demux )
 
     if( ( i_return = SessionsSetup( p_demux ) ) != VLC_SUCCESS )
     {
-        msg_Err( p_demux, "Nothing to play for rtsp://%s", p_sys->psz_path );
+        msg_Err( p_demux, "Nothing to play for %s", p_sys->psz_pl_url );
         goto error;
     }
 
@@ -2225,3 +2213,15 @@ static uint8_t *parseVorbisConfigStr( char const* configStr,
     return p_extra;
 }
 
+static char *passwordLessURL( vlc_url_t *p_url )
+{
+    vlc_url_t url;
+
+    memcpy( &url, p_url, sizeof( vlc_url_t ) );
+
+    url.psz_username = NULL;
+    url.psz_password = NULL;
+    if( url.i_port == 0 )
+        url.i_port = 554;
+    return vlc_uri_compose( &url );
+}
