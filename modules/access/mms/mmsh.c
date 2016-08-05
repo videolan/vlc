@@ -663,7 +663,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
         else if( !strcasecmp( psz, "Location" ) )
         {
             free( psz_location );
-            psz_location = strdup( p );
+            psz_location = vlc_uri_resolve( p_access->psz_url, p );
         }
         else if( !strcasecmp( psz, "Content-Length" ) )
         {
@@ -686,7 +686,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     /* Handle the redirection */
     if( ( (i_code == 301) || (i_code == 302) ||
           (i_code == 303) || (i_code == 307) ) &&
-        psz_location && *psz_location )
+        psz_location )
     {
         msg_Dbg( p_access, "redirection to %s", psz_location );
         net_Close( p_sys->fd ); p_sys->fd = -1;
