@@ -4,7 +4,7 @@ FLUID_GITURL := https://github.com/divideconcept/FluidLite.git
 FLUID_HASH := 7b6ab58
 
 ifdef HAVE_WIN32
-PKGS += fluidite
+PKGS += fluidlite
 endif
 
 ifeq ($(call need_pkg,"fluidlite"),)
