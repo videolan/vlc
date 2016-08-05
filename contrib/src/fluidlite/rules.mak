@@ -7,6 +7,10 @@ ifdef HAVE_WIN32
 PKGS += fluidlite
 endif
 
+ifdef HAVE_MACOSX
+PKGS += fluidlite
+endif
+
 ifeq ($(call need_pkg,"fluidlite"),)
 PKGS_FOUND += fluidlite
 endif
