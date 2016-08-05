@@ -52,61 +52,6 @@
  #include <errno.h>
 #endif
 
-/*****************************************************************************
- * Module descriptior
- *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
-
-#define CDAUDIO_DEV_TEXT N_("Audio CD device")
-#if defined( _WIN32 ) || defined( __OS2__ )
-# define CDAUDIO_DEV_LONGTEXT N_( \
-    "This is the default Audio CD drive (or file) to use. Don't forget the " \
-    "colon after the drive letter (e.g. D:)")
-# define CD_DEVICE      "D:"
-#else
-# define CDAUDIO_DEV_LONGTEXT N_( \
-    "This is the default Audio CD device to use." )
-# if defined(__OpenBSD__)
-#  define CD_DEVICE      "/dev/cd0c"
-# elif defined(__linux__)
-#  define CD_DEVICE      "/dev/sr0"
-# else
-#  define CD_DEVICE      "/dev/cdrom"
-# endif
-#endif
-
-vlc_module_begin ()
-    set_shortname( N_("Audio CD") )
-    set_description( N_("Audio CD input") )
-    set_capability( "access", 10 )
-    set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_ACCESS )
-    set_callbacks( Open, Close )
-
-    add_loadfile( "cd-audio", CD_DEVICE, CDAUDIO_DEV_TEXT,
-                  CDAUDIO_DEV_LONGTEXT, false )
-
-    add_usage_hint( N_("[cdda:][device][@[track]]") )
-    add_integer( "cdda-track", 0 , NULL, NULL, true )
-        change_volatile ()
-    add_integer( "cdda-first-sector", -1, NULL, NULL, true )
-        change_volatile ()
-    add_integer( "cdda-last-sector", -1, NULL, NULL, true )
-        change_volatile ()
-
-#ifdef HAVE_LIBCDDB
-    add_string( "cddb-server", "freedb.videolan.org", N_( "CDDB Server" ),
-            N_( "Address of the CDDB server to use." ), true )
-    add_integer( "cddb-port", 80, N_( "CDDB port" ),
-            N_( "CDDB Server port to use." ), true )
-        change_integer_range( 1, 65535 )
-#endif
-
-    add_shortcut( "cdda", "cddasimple" )
-vlc_module_end ()
-
-
 /* how many blocks VCDRead will read in each loop */
 #define CDDA_BLOCKS_ONCE 20
 #define CDDA_DATA_ONCE   (CDDA_BLOCKS_ONCE * CDDA_DATA_SIZE)
@@ -131,144 +76,6 @@ struct access_sys_t
     int         i_first_sector;
     int         i_last_sector;
 };
-
-static block_t *Block( access_t *, bool * );
-static int      Seek( access_t *, uint64_t );
-static int      Control( access_t *, int, va_list );
-
-static int GetTracks( access_t *p_access, input_item_t *p_current );
-
-#ifdef HAVE_LIBCDDB
-static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors );
-#endif
-
-/*****************************************************************************
- * Open: open cdda
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    access_t     *p_access = (access_t*)p_this;
-    vcddev_t     *vcddev;
-    char         *psz_name;
-
-    if( !p_access->psz_filepath || !*p_access->psz_filepath )
-    {
-        psz_name = var_InheritString( p_this, "cd-audio" );
-        if( !psz_name )
-            return VLC_EGENERIC;
-    }
-    else psz_name = ToLocaleDup( p_access->psz_filepath );
-
-#if defined( _WIN32 ) || defined( __OS2__ )
-    if( psz_name[0] && psz_name[1] == ':' &&
-        psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
-#endif
-
-    access_sys_t *p_sys = calloc( 1, sizeof (*p_sys) );
-    if( unlikely(p_sys == NULL) )
-    {
-        free( psz_name );
-        return VLC_ENOMEM;
-    }
-    p_access->p_sys = p_sys;
-
-    /* Open CDDA */
-    vcddev = ioctl_Open( VLC_OBJECT(p_access), psz_name );
-    if( vcddev == NULL )
-        msg_Warn( p_access, "could not open %s", psz_name );
-    free( psz_name );
-    if( vcddev == NULL )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-
-    p_sys->vcddev = vcddev;
-
-    /* Do we play a single track ? */
-    p_sys->i_track = var_InheritInteger( p_access, "cdda-track" ) - 1;
-
-    if( p_sys->i_track < 0 )
-    {
-        /* We only do separate items if the whole disc is requested */
-        input_thread_t *p_input = p_access->p_input;
-
-        int i_ret = -1;
-        if( p_input )
-        {
-            input_item_t *p_current = input_GetItem( p_input );
-            if( p_current )
-                i_ret = GetTracks( p_access, p_current );
-        }
-        if( i_ret < 0 )
-            goto error;
-    }
-    else
-    {
-        /* Build a WAV header for the output data */
-        memset( &p_sys->waveheader, 0, sizeof(WAVEHEADER) );
-        SetWLE( &p_sys->waveheader.Format, 1 ); /*WAVE_FORMAT_PCM*/
-        SetWLE( &p_sys->waveheader.BitsPerSample, 16);
-        p_sys->waveheader.MainChunkID = VLC_FOURCC('R', 'I', 'F', 'F');
-        p_sys->waveheader.Length = 0;               /* we just don't know */
-        p_sys->waveheader.ChunkTypeID = VLC_FOURCC('W', 'A', 'V', 'E');
-        p_sys->waveheader.SubChunkID = VLC_FOURCC('f', 'm', 't', ' ');
-        SetDWLE( &p_sys->waveheader.SubChunkLength, 16);
-        SetWLE( &p_sys->waveheader.Modus, 2);
-        SetDWLE( &p_sys->waveheader.SampleFreq, 44100);
-        SetWLE( &p_sys->waveheader.BytesPerSample,
-                    2 /*Modus*/ * 16 /*BitsPerSample*/ / 8 );
-        SetDWLE( &p_sys->waveheader.BytesPerSec,
-                    2*16/8 /*BytesPerSample*/ * 44100 /*SampleFreq*/ );
-        p_sys->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
-        p_sys->waveheader.DataLength = 0;           /* we just don't know */
-
-        p_sys->i_first_sector = var_InheritInteger( p_access,
-                                                    "cdda-first-sector" );
-        p_sys->i_last_sector  = var_InheritInteger( p_access,
-                                                    "cdda-last-sector" );
-        /* Tracknumber in MRL */
-        if( p_sys->i_first_sector < 0 || p_sys->i_last_sector < 0 )
-        {
-            const int i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
-                                                     p_sys->vcddev, &p_sys->p_sectors );
-            if( p_sys->i_track >= i_titles )
-            {
-                msg_Err( p_access, "invalid track number" );
-                goto error;
-            }
-            p_sys->i_first_sector = p_sys->p_sectors[p_sys->i_track];
-            p_sys->i_last_sector = p_sys->p_sectors[p_sys->i_track+1];
-        }
-
-        p_sys->i_sector = p_sys->i_first_sector;
-        p_sys->size = (p_sys->i_last_sector - p_sys->i_first_sector)
-                                     * (int64_t)CDDA_DATA_SIZE;
-    }
-
-    /* Set up p_access */
-    ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );
-    return VLC_SUCCESS;
-
-error:
-    free( p_sys->p_sectors );
-    ioctl_Close( VLC_OBJECT(p_access), p_sys->vcddev );
-    free( p_sys );
-    return VLC_EGENERIC;
-}
-
-/*****************************************************************************
- * Close: closes cdda
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    access_t     *p_access = (access_t *)p_this;
-    access_sys_t *p_sys = p_access->p_sys;
-
-    free( p_sys->p_sectors );
-    ioctl_Close( p_this, p_sys->vcddev );
-    free( p_sys );
-}
 
 /*****************************************************************************
  * Block: read data (CDDA_DATA_ONCE)
@@ -375,6 +182,113 @@ static int Control( access_t *p_access, int i_query, va_list args )
     }
     return VLC_SUCCESS;
 }
+
+#ifdef HAVE_LIBCDDB
+static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
+{
+    if( var_InheritInteger( p_access, "album-art" ) != ALBUM_ART_ALL &&
+        !  var_InheritBool( p_access, "metadata-network-access" ) )
+    {
+        msg_Dbg( p_access, "Album art policy set to manual; no automatic fetching" );
+        return NULL;
+    }
+
+    /* */
+    cddb_conn_t *p_cddb = cddb_new();
+    if( !p_cddb )
+    {
+        msg_Warn( p_access, "unable to use CDDB" );
+        return NULL;
+    }
+
+    /* */
+
+    cddb_http_enable( p_cddb );
+
+    char *psz_tmp = var_InheritString( p_access, "cddb-server" );
+    if( psz_tmp )
+    {
+        cddb_set_server_name( p_cddb, psz_tmp );
+        free( psz_tmp );
+    }
+
+    cddb_set_server_port( p_cddb, var_InheritInteger( p_access, "cddb-port" ) );
+
+    cddb_set_email_address( p_cddb, "vlc@videolan.org" );
+
+    cddb_set_http_path_query( p_cddb, "/~cddb/cddb.cgi" );
+    cddb_set_http_path_submit( p_cddb, "/~cddb/submit.cgi" );
+
+
+    char *psz_cachedir;
+    char *psz_temp = config_GetUserDir( VLC_CACHE_DIR );
+
+    if( asprintf( &psz_cachedir, "%s" DIR_SEP "cddb", psz_temp ) > 0 ) {
+        cddb_cache_enable( p_cddb );
+        cddb_cache_set_dir( p_cddb, psz_cachedir );
+        free( psz_cachedir );
+    }
+    free( psz_temp );
+
+    cddb_set_timeout( p_cddb, 10 );
+
+    /* */
+    cddb_disc_t *p_disc = cddb_disc_new();
+    if( !p_disc )
+    {
+        msg_Err( p_access, "unable to create CDDB disc structure." );
+        goto error;
+    }
+
+    int64_t i_length = 2000000; /* PreGap */
+    for( int i = 0; i < i_titles; i++ )
+    {
+        cddb_track_t *t = cddb_track_new();
+        cddb_track_set_frame_offset( t, p_sectors[i] + 150 );  /* Pregap offset */
+
+        cddb_disc_add_track( p_disc, t );
+        const int64_t i_size = ( p_sectors[i+1] - p_sectors[i] ) *
+                               (int64_t)CDDA_DATA_SIZE;
+        i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
+
+        msg_Dbg( p_access, "Track %i offset: %i", i, p_sectors[i] + 150 );
+    }
+
+    msg_Dbg( p_access, "Total length: %i", (int)(i_length/1000000) );
+    cddb_disc_set_length( p_disc, (int)(i_length/1000000) );
+
+    if( !cddb_disc_calc_discid( p_disc ) )
+    {
+        msg_Err( p_access, "CDDB disc ID calculation failed" );
+        goto error;
+    }
+
+    const int i_matches = cddb_query( p_cddb, p_disc );
+    if( i_matches < 0 )
+    {
+        msg_Warn( p_access, "CDDB error: %s", cddb_error_str(errno) );
+        goto error;
+    }
+    else if( i_matches == 0 )
+    {
+        msg_Dbg( p_access, "Couldn't find any matches in CDDB." );
+        goto error;
+    }
+    else if( i_matches > 1 )
+        msg_Warn( p_access, "found %d matches in CDDB. Using first one.", i_matches );
+
+    cddb_read( p_cddb, p_disc );
+
+    cddb_destroy( p_cddb);
+    return p_disc;
+
+error:
+    if( p_disc )
+        cddb_disc_destroy( p_disc );
+    cddb_destroy( p_cddb );
+    return NULL;
+}
+#endif /* HAVE_LIBCDDB */
 
 static int GetTracks( access_t *p_access, input_item_t *p_current )
 {
@@ -617,110 +531,181 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     return VLC_SUCCESS;
 }
 
-#ifdef HAVE_LIBCDDB
-static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
+/*****************************************************************************
+ * Open: open cdda
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
 {
-    if( var_InheritInteger( p_access, "album-art" ) != ALBUM_ART_ALL &&
-        !  var_InheritBool( p_access, "metadata-network-access" ) )
+    access_t     *p_access = (access_t*)p_this;
+    vcddev_t     *vcddev;
+    char         *psz_name;
+
+    if( !p_access->psz_filepath || !*p_access->psz_filepath )
     {
-        msg_Dbg( p_access, "Album art policy set to manual; no automatic fetching" );
-        return NULL;
+        psz_name = var_InheritString( p_this, "cd-audio" );
+        if( !psz_name )
+            return VLC_EGENERIC;
     }
+    else psz_name = ToLocaleDup( p_access->psz_filepath );
 
-    /* */
-    cddb_conn_t *p_cddb = cddb_new();
-    if( !p_cddb )
+#if defined( _WIN32 ) || defined( __OS2__ )
+    if( psz_name[0] && psz_name[1] == ':' &&
+        psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
+#endif
+
+    access_sys_t *p_sys = calloc( 1, sizeof (*p_sys) );
+    if( unlikely(p_sys == NULL) )
     {
-        msg_Warn( p_access, "unable to use CDDB" );
-        return NULL;
+        free( psz_name );
+        return VLC_ENOMEM;
     }
+    p_access->p_sys = p_sys;
 
-    /* */
-
-    cddb_http_enable( p_cddb );
-
-    char *psz_tmp = var_InheritString( p_access, "cddb-server" );
-    if( psz_tmp )
+    /* Open CDDA */
+    vcddev = ioctl_Open( VLC_OBJECT(p_access), psz_name );
+    if( vcddev == NULL )
+        msg_Warn( p_access, "could not open %s", psz_name );
+    free( psz_name );
+    if( vcddev == NULL )
     {
-        cddb_set_server_name( p_cddb, psz_tmp );
-        free( psz_tmp );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
 
-    cddb_set_server_port( p_cddb, var_InheritInteger( p_access, "cddb-port" ) );
+    p_sys->vcddev = vcddev;
 
-    cddb_set_email_address( p_cddb, "vlc@videolan.org" );
+    /* Do we play a single track ? */
+    p_sys->i_track = var_InheritInteger( p_access, "cdda-track" ) - 1;
 
-    cddb_set_http_path_query( p_cddb, "/~cddb/cddb.cgi" );
-    cddb_set_http_path_submit( p_cddb, "/~cddb/submit.cgi" );
-
-
-    char *psz_cachedir;
-    char *psz_temp = config_GetUserDir( VLC_CACHE_DIR );
-
-    if( asprintf( &psz_cachedir, "%s" DIR_SEP "cddb", psz_temp ) > 0 ) {
-        cddb_cache_enable( p_cddb );
-        cddb_cache_set_dir( p_cddb, psz_cachedir );
-        free( psz_cachedir );
-    }
-    free( psz_temp );
-
-    cddb_set_timeout( p_cddb, 10 );
-
-    /* */
-    cddb_disc_t *p_disc = cddb_disc_new();
-    if( !p_disc )
+    if( p_sys->i_track < 0 )
     {
-        msg_Err( p_access, "unable to create CDDB disc structure." );
-        goto error;
-    }
+        /* We only do separate items if the whole disc is requested */
+        input_thread_t *p_input = p_access->p_input;
 
-    int64_t i_length = 2000000; /* PreGap */
-    for( int i = 0; i < i_titles; i++ )
+        int i_ret = -1;
+        if( p_input )
+        {
+            input_item_t *p_current = input_GetItem( p_input );
+            if( p_current )
+                i_ret = GetTracks( p_access, p_current );
+        }
+        if( i_ret < 0 )
+            goto error;
+    }
+    else
     {
-        cddb_track_t *t = cddb_track_new();
-        cddb_track_set_frame_offset( t, p_sectors[i] + 150 );  /* Pregap offset */
+        /* Build a WAV header for the output data */
+        memset( &p_sys->waveheader, 0, sizeof(WAVEHEADER) );
+        SetWLE( &p_sys->waveheader.Format, 1 ); /*WAVE_FORMAT_PCM*/
+        SetWLE( &p_sys->waveheader.BitsPerSample, 16);
+        p_sys->waveheader.MainChunkID = VLC_FOURCC('R', 'I', 'F', 'F');
+        p_sys->waveheader.Length = 0;               /* we just don't know */
+        p_sys->waveheader.ChunkTypeID = VLC_FOURCC('W', 'A', 'V', 'E');
+        p_sys->waveheader.SubChunkID = VLC_FOURCC('f', 'm', 't', ' ');
+        SetDWLE( &p_sys->waveheader.SubChunkLength, 16);
+        SetWLE( &p_sys->waveheader.Modus, 2);
+        SetDWLE( &p_sys->waveheader.SampleFreq, 44100);
+        SetWLE( &p_sys->waveheader.BytesPerSample,
+                    2 /*Modus*/ * 16 /*BitsPerSample*/ / 8 );
+        SetDWLE( &p_sys->waveheader.BytesPerSec,
+                    2*16/8 /*BytesPerSample*/ * 44100 /*SampleFreq*/ );
+        p_sys->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
+        p_sys->waveheader.DataLength = 0;           /* we just don't know */
 
-        cddb_disc_add_track( p_disc, t );
-        const int64_t i_size = ( p_sectors[i+1] - p_sectors[i] ) *
-                               (int64_t)CDDA_DATA_SIZE;
-        i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
+        p_sys->i_first_sector = var_InheritInteger( p_access,
+                                                    "cdda-first-sector" );
+        p_sys->i_last_sector  = var_InheritInteger( p_access,
+                                                    "cdda-last-sector" );
+        /* Tracknumber in MRL */
+        if( p_sys->i_first_sector < 0 || p_sys->i_last_sector < 0 )
+        {
+            const int i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
+                                                     p_sys->vcddev, &p_sys->p_sectors );
+            if( p_sys->i_track >= i_titles )
+            {
+                msg_Err( p_access, "invalid track number" );
+                goto error;
+            }
+            p_sys->i_first_sector = p_sys->p_sectors[p_sys->i_track];
+            p_sys->i_last_sector = p_sys->p_sectors[p_sys->i_track+1];
+        }
 
-        msg_Dbg( p_access, "Track %i offset: %i", i, p_sectors[i] + 150 );
+        p_sys->i_sector = p_sys->i_first_sector;
+        p_sys->size = (p_sys->i_last_sector - p_sys->i_first_sector)
+                                     * (int64_t)CDDA_DATA_SIZE;
     }
 
-    msg_Dbg( p_access, "Total length: %i", (int)(i_length/1000000) );
-    cddb_disc_set_length( p_disc, (int)(i_length/1000000) );
-
-    if( !cddb_disc_calc_discid( p_disc ) )
-    {
-        msg_Err( p_access, "CDDB disc ID calculation failed" );
-        goto error;
-    }
-
-    const int i_matches = cddb_query( p_cddb, p_disc );
-    if( i_matches < 0 )
-    {
-        msg_Warn( p_access, "CDDB error: %s", cddb_error_str(errno) );
-        goto error;
-    }
-    else if( i_matches == 0 )
-    {
-        msg_Dbg( p_access, "Couldn't find any matches in CDDB." );
-        goto error;
-    }
-    else if( i_matches > 1 )
-        msg_Warn( p_access, "found %d matches in CDDB. Using first one.", i_matches );
-
-    cddb_read( p_cddb, p_disc );
-
-    cddb_destroy( p_cddb);
-    return p_disc;
+    /* Set up p_access */
+    ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );
+    return VLC_SUCCESS;
 
 error:
-    if( p_disc )
-        cddb_disc_destroy( p_disc );
-    cddb_destroy( p_cddb );
-    return NULL;
+    free( p_sys->p_sectors );
+    ioctl_Close( VLC_OBJECT(p_access), p_sys->vcddev );
+    free( p_sys );
+    return VLC_EGENERIC;
 }
-#endif /*HAVE_LIBCDDB*/
 
+/*****************************************************************************
+ * Close: closes cdda
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    access_t     *p_access = (access_t *)p_this;
+    access_sys_t *p_sys = p_access->p_sys;
+
+    free( p_sys->p_sectors );
+    ioctl_Close( p_this, p_sys->vcddev );
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * Module descriptior
+ *****************************************************************************/
+#define CDAUDIO_DEV_TEXT N_("Audio CD device")
+#if defined( _WIN32 ) || defined( __OS2__ )
+# define CDAUDIO_DEV_LONGTEXT N_( \
+    "This is the default Audio CD drive (or file) to use. Don't forget the " \
+    "colon after the drive letter (e.g. D:)")
+# define CD_DEVICE      "D:"
+#else
+# define CDAUDIO_DEV_LONGTEXT N_( \
+    "This is the default Audio CD device to use." )
+# if defined(__OpenBSD__)
+#  define CD_DEVICE      "/dev/cd0c"
+# elif defined(__linux__)
+#  define CD_DEVICE      "/dev/sr0"
+# else
+#  define CD_DEVICE      "/dev/cdrom"
+# endif
+#endif
+
+vlc_module_begin ()
+    set_shortname( N_("Audio CD") )
+    set_description( N_("Audio CD input") )
+    set_capability( "access", 10 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+    set_callbacks( Open, Close )
+
+    add_loadfile( "cd-audio", CD_DEVICE, CDAUDIO_DEV_TEXT,
+                  CDAUDIO_DEV_LONGTEXT, false )
+
+    add_usage_hint( N_("[cdda:][device][@[track]]") )
+    add_integer( "cdda-track", 0 , NULL, NULL, true )
+        change_volatile ()
+    add_integer( "cdda-first-sector", -1, NULL, NULL, true )
+        change_volatile ()
+    add_integer( "cdda-last-sector", -1, NULL, NULL, true )
+        change_volatile ()
+
+#ifdef HAVE_LIBCDDB
+    add_string( "cddb-server", "freedb.videolan.org", N_( "CDDB Server" ),
+            N_( "Address of the CDDB server to use." ), true )
+    add_integer( "cddb-port", 80, N_( "CDDB port" ),
+            N_( "CDDB Server port to use." ), true )
+        change_integer_range( 1, 65535 )
+#endif
+
+    add_shortcut( "cdda", "cddasimple" )
+vlc_module_end ()
