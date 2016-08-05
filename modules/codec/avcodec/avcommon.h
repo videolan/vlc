@@ -52,8 +52,9 @@ static inline AVDictionary *vlc_av_get_options(const char *psz_opts)
     config_ChainParseOptions(&cfg, psz_opts);
     while (cfg) {
         config_chain_t *next = cfg->p_next;
-        av_dict_set(&options, cfg->psz_name, cfg->psz_value,
-            AV_DICT_DONT_STRDUP_KEY | AV_DICT_DONT_STRDUP_VAL);
+        av_dict_set(&options, cfg->psz_name, cfg->psz_value, 0);
+        free(cfg->psz_name);
+        free(cfg->psz_value);
         free(cfg);
         cfg = next;
     }
