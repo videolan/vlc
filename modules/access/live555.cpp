@@ -1669,9 +1669,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     live_track_t *tk = p_sys->track[i];
                     tk->b_rtcp_sync = false;
                     tk->i_pts = VLC_TS_INVALID;
-                    p_sys->i_pcr = VLC_TS_INVALID;
-                    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 }
+                p_sys->i_pcr = VLC_TS_INVALID;
+                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             }
 
             /* Reset data received counter */
