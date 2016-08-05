@@ -72,7 +72,6 @@ struct access_sys_t
     WAVEHEADER  waveheader;
     bool        b_header;
 
-    int         i_track;
     int         i_first_sector;
     int         i_last_sector;
 };
@@ -85,13 +84,6 @@ static block_t *Block( access_t *p_access, bool *restrict eof )
     access_sys_t *p_sys = p_access->p_sys;
     int i_blocks = CDDA_BLOCKS_ONCE;
     block_t *p_block;
-
-    /* Check end of file */
-    if( p_sys->i_track < 0 )
-    {
-        *eof = true;
-        return NULL;
-    }
 
     if( !p_sys->b_header )
     {
@@ -531,6 +523,13 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     return VLC_SUCCESS;
 }
 
+static block_t *BlockDummy( access_t *p_access, bool *restrict eof )
+{
+    (void) p_access;
+    *eof = true;
+    return NULL;
+}
+
 /*****************************************************************************
  * Open: open cdda
  *****************************************************************************/
@@ -575,9 +574,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->vcddev = vcddev;
 
     /* Do we play a single track ? */
-    p_sys->i_track = var_InheritInteger( p_access, "cdda-track" ) - 1;
+    unsigned track = var_InheritInteger( p_access, "cdda-track" );
 
-    if( p_sys->i_track < 0 )
+    if( track == 0 )
     {
         /* We only do separate items if the whole disc is requested */
         input_thread_t *p_input = p_access->p_input;
@@ -591,6 +590,9 @@ static int Open( vlc_object_t *p_this )
         }
         if( i_ret < 0 )
             goto error;
+
+        p_access->pf_block = BlockDummy;
+        p_access->pf_seek = NULL;
     }
     else
     {
@@ -619,24 +621,30 @@ static int Open( vlc_object_t *p_this )
         /* Tracknumber in MRL */
         if( p_sys->i_first_sector < 0 || p_sys->i_last_sector < 0 )
         {
-            const int i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
-                                                     p_sys->vcddev, &p_sys->p_sectors );
-            if( p_sys->i_track >= i_titles )
+            unsigned titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
+                                                  p_sys->vcddev,
+                                                  &p_sys->p_sectors );
+            if( track > titles )
             {
-                msg_Err( p_access, "invalid track number" );
+                msg_Err( p_access, "invalid track number: %u/%u",
+                         track, titles );
                 goto error;
             }
-            p_sys->i_first_sector = p_sys->p_sectors[p_sys->i_track];
-            p_sys->i_last_sector = p_sys->p_sectors[p_sys->i_track+1];
+
+            p_sys->i_first_sector = p_sys->p_sectors[track - 1];
+            p_sys->i_last_sector = p_sys->p_sectors[track];
         }
 
         p_sys->i_sector = p_sys->i_first_sector;
         p_sys->size = (p_sys->i_last_sector - p_sys->i_first_sector)
                                      * (int64_t)CDDA_DATA_SIZE;
+
+        p_access->pf_block = Block;
+        p_access->pf_seek = Seek;
     }
 
-    /* Set up p_access */
-    ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );
+    p_access->pf_read = NULL;
+    p_access->pf_control = Control;
     return VLC_SUCCESS;
 
 error:
