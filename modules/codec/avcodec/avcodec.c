@@ -357,9 +357,10 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
     AVDictionary *options = NULL;
     int ret;
 
-    if (psz_opts && *psz_opts)
+    if (psz_opts) {
         options = vlc_av_get_options(psz_opts);
-    free(psz_opts);
+        free(psz_opts);
+    }
 
     vlc_avcodec_lock();
     ret = avcodec_open2( p_sys->p_context, p_sys->p_codec, options ? &options : NULL );

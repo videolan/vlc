@@ -158,7 +158,7 @@ int OpenAvio(vlc_object_t *object)
     };
     AVDictionary *options = NULL;
     char *psz_opts = var_InheritString(access, "avio-options");
-    if (psz_opts && *psz_opts) {
+    if (psz_opts) {
         options = vlc_av_get_options(psz_opts);
         free(psz_opts);
     }
@@ -238,7 +238,7 @@ int OutOpenAvio(vlc_object_t *object)
 #else
     AVDictionary *options = NULL;
     char *psz_opts = var_InheritString(access, "sout-avio-options");
-    if (psz_opts && *psz_opts) {
+    if (psz_opts) {
         options = vlc_av_get_options(psz_opts);
         free(psz_opts);
     }

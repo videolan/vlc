@@ -336,13 +336,13 @@ int OpenDemux( vlc_object_t *p_this )
     unsigned int nb_streams = p_sys->ic->nb_streams;
     for (unsigned i = 1; i < nb_streams; i++)
         options[i] = NULL;
-    if (psz_opts && *psz_opts) {
+    if (psz_opts) {
         options[0] = vlc_av_get_options(psz_opts);
         for (unsigned i = 1; i < nb_streams; i++) {
             av_dict_copy(&options[i], options[0], 0);
         }
+        free(psz_opts);
     }
-    free(psz_opts);
     vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
     error = avformat_find_stream_info( p_sys->ic, options );
     /* FIXME: what if nb_streams change after that call? */

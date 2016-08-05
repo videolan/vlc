@@ -892,9 +892,10 @@ int OpenEncoder( vlc_object_t *p_this )
     int ret;
     char *psz_opts = var_InheritString(p_enc, ENC_CFG_PREFIX "options");
     AVDictionary *options = NULL;
-    if (psz_opts && *psz_opts)
+    if (psz_opts) {
         options = vlc_av_get_options(psz_opts);
-    free(psz_opts);
+        free(psz_opts);
+    }
 
     vlc_avcodec_lock();
     ret = avcodec_open2( p_context, p_codec, options ? &options : NULL );

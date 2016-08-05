@@ -378,9 +378,10 @@ static int Mux( sout_mux_t *p_mux )
 
         char *psz_opts = var_GetNonEmptyString( p_mux, "sout-avformat-options" );
         AVDictionary *options = NULL;
-        if (psz_opts && *psz_opts)
+        if (psz_opts) {
             options = vlc_av_get_options(psz_opts);
-        free(psz_opts);
+            free(psz_opts);
+        }
         error = avformat_write_header( p_sys->oc, options ? &options : NULL);
         AVDictionaryEntry *t = NULL;
         while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
