@@ -24,7 +24,7 @@ fluidlite: fluidlite-git.tar.xz .sum-fluidlite
 	$(XZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
 	$(MOVE)
 
-.fluidlite: fluidlite
+.fluidlite: fluidlite toolchain.cmake
 	-cd $< && rm CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE)
 	cd $< && $(MAKE) install
