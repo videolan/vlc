@@ -136,7 +136,7 @@ int MMSHOpen( access_t *p_access )
     }
 
     /* open a tcp connection */
-    vlc_UrlParse( &p_sys->url, p_access->psz_location );
+    vlc_UrlParse( &p_sys->url, p_access->psz_url );
     if( ( p_sys->url.psz_host == NULL ) ||
         ( *p_sys->url.psz_host == '\0' ) )
     {

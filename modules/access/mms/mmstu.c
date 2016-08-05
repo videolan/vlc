@@ -105,7 +105,7 @@ int  MMSTUOpen( access_t *p_access )
     vlc_mutex_init( &p_sys->lock_netwrite );
 
     /* *** Parse URL and get server addr/port and path *** */
-    vlc_UrlParse( &p_sys->url, p_access->psz_location );
+    vlc_UrlParse( &p_sys->url, p_access->psz_url );
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
         msg_Err( p_access, "invalid server name" );
