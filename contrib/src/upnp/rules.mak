@@ -37,6 +37,7 @@ ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/upnp/winrt-inet.patch
 endif
 endif
+	$(APPLY) $(SRC)/upnp/libpthread.patch
 	$(APPLY) $(SRC)/upnp/libupnp-ipv6.patch
 	$(APPLY) $(SRC)/upnp/miniserver.patch
 	$(APPLY) $(SRC)/upnp/missing_win32.patch
@@ -47,9 +48,7 @@ endif
 	$(MOVE)
 
 .upnp: upnp
-ifdef HAVE_WIN32
 	$(RECONF)
-endif
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DUPNP_STATIC_LIB $(LIBUPNP_ECFLAGS)" ./configure --disable-samples --without-documentation $(CONFIGURE_ARGS) $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@

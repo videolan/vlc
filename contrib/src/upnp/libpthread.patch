@@ -1,0 +1,15 @@
+On GNU/Linux, -pthread does not work properly when linking a static
+library that depends on POSIX threads. -lpthread must be checked first.
+
+diff -Nru upnp.orig/m4/acx_pthread.m4 upnp/m4/acx_pthread.m4
+--- upnp.orig/m4/acx_pthread.m4	2016-08-06 11:54:20.990800226 +0300
++++ upnp/m4/acx_pthread.m4	2016-08-06 11:54:37.909800395 +0300
+@@ -123,7 +123,7 @@
+ # which indicates that we try without any flags at all, and "pthread-config"
+ # which is a program returning the flags for the Pth emulation library.
+ 
+-acx_pthread_flags="pthreads none -Kthread -kthread lthread -pthread -pthreads -mthreads pthread --thread-safe -mt pthread-config"
++acx_pthread_flags="pthreads none -Kthread -kthread lthread -lpthread -pthread -pthreads -mthreads pthread --thread-safe -mt pthread-config"
+ 
+ # The ordering *is* (sometimes) important.  Some notes on the
+ # individual items follow:
