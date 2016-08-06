@@ -1,0 +1,10 @@
+diff -Nru x265.orig/source/x265.pc.in x265/source/x265.pc.in
+--- x265.orig/source/x265.pc.in	2016-08-06 17:04:25.925985965 +0300
++++ x265/source/x265.pc.in	2016-08-06 17:07:06.548987568 +0300
+@@ -7,5 +7,5 @@
+ Description: H.265/HEVC video encoder
+ Version: @X265_LATEST_TAG@
+ Cflags: -I${includedir}
+-Libs:  -L${libdir} -lx265  @PRIVATE_LIBS@
++Libs:  -L${libdir} -lx265  @PRIVATE_LIBS@ -ldl -lpthread
+ Requires:  
