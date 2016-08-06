@@ -16,6 +16,7 @@ $(TARBALLS)/schroedinger-$(SCHROEDINGER_VERSION).tar.gz:
 schroedinger: schroedinger-$(SCHROEDINGER_VERSION).tar.gz .sum-schroedinger
 	$(UNPACK)
 	$(APPLY) $(SRC)/schroedinger/schroedinger-notests.patch
+	$(call pkg_static,"schroedinger.pc.in")
 	$(MOVE)
 
 DEPS_schroedinger = orc $(DEPS_orc)
