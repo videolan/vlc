@@ -173,13 +173,6 @@ typedef struct
 
 } live_track_t;
 
-struct timeout_thread_t
-{
-    demux_t     *p_demux;
-    vlc_thread_t handle;
-    bool         b_handle_keep_alive;
-};
-
 class RTSPClientVlc;
 
 struct demux_sys_t
@@ -209,9 +202,7 @@ struct demux_sys_t
     double           f_npt_start;
 
     /* timeout thread information */
-    int              i_timeout;     /* session timeout value in seconds */
-    bool             b_timeout_call;/* mark to send an RTSP call to prevent server timeout */
-    timeout_thread_t *p_timeout;    /* the actual thread that makes sure we don't timeout */
+    vlc_timer_t      timer;
     vlc_mutex_t      timeout_mutex; /* Serialise calls to live555 in timeout thread w.r.t. Demux()/Control() */
 
     /* */
@@ -265,7 +256,7 @@ static void StreamClose ( void * );
 static void TaskInterruptData( void * );
 static void TaskInterruptRTSP( void * );
 
-static void* TimeoutPrevention( void * );
+static void TimeoutPrevention( void * );
 
 static unsigned char* parseH264ConfigStr( char const* configStr,
                                           unsigned int& configSize );
@@ -302,6 +293,12 @@ static int  Open ( vlc_object_t *p_this )
     p_demux->pf_control= Control;
     p_demux->p_sys     = p_sys = (demux_sys_t*)calloc( 1, sizeof( demux_sys_t ) );
     if( !p_sys ) return VLC_ENOMEM;
+
+    if( vlc_timer_create(&p_sys->timer, TimeoutPrevention, p_demux) )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
 
     msg_Dbg( p_demux, "version " LIVEMEDIA_LIBRARY_VERSION_STRING );
 
@@ -420,12 +417,7 @@ static void Close( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_sys->p_timeout )
-    {
-        vlc_cancel( p_sys->p_timeout->handle );
-        vlc_join( p_sys->p_timeout->handle, NULL );
-        free( p_sys->p_timeout );
-    }
+    vlc_timer_destroy(p_sys->timer);
 
     if( p_sys->rtsp && p_sys->ms ) p_sys->rtsp->sendTeardownCommand( *p_sys->ms, NULL );
     if( p_sys->ms ) Medium::close( p_sys->ms );
@@ -1232,33 +1224,13 @@ static int Play( demux_t *p_demux )
         }
 
         /* Retrieve the timeout value and set up a timeout prevention thread */
-        p_sys->i_timeout = p_sys->rtsp->sessionTimeoutParameter();
-        if( p_sys->i_timeout <= 0 )
-            p_sys->i_timeout = 60; /* default value from RFC2326 */
+        int timeout = p_sys->rtsp->sessionTimeoutParameter();
+        if( timeout <= 2 )
+            timeout = 60; /* default value from RFC2326 */
+        msg_Dbg( p_demux, "We have a timeout of %d seconds", timeout );
 
-        /* start timeout-thread. GET_PARAMETER will be used if supported by
-         * the server. OPTIONS will be used as a fallback */
-        if( !p_sys->p_timeout )
-        {
-            msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
-            p_sys->p_timeout = (timeout_thread_t *)malloc( sizeof(timeout_thread_t) );
-            if( p_sys->p_timeout )
-            {
-                memset( p_sys->p_timeout, 0, sizeof(timeout_thread_t) );
-                p_sys->p_timeout->p_demux = p_demux;
-                if( vlc_clone( &p_sys->p_timeout->handle,  TimeoutPrevention,
-                               p_sys->p_timeout, VLC_THREAD_PRIORITY_LOW ) )
-                {
-                    msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
-                    free( p_sys->p_timeout );
-                    p_sys->p_timeout = NULL;
-                }
-                else
-                    msg_Dbg( p_demux, "spawned timeout thread" );
-            }
-            else
-                msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
-        }
+        mtime_t interval = (timeout - 2) * CLOCK_FREQ;
+        vlc_timer_schedule( p_sys->timer, false, interval, interval);
     }
     p_sys->i_pcr = VLC_TS_INVALID;
 
@@ -1286,20 +1258,6 @@ static int Demux( demux_t *p_demux )
     /* Protect Live555 from simultaneous calls in TimeoutPrevention()
        during pause */
     vlc_mutex_locker locker(&p_sys->timeout_mutex);
-
-    /* Check if we need to send the server a Keep-A-Live signal */
-    if( p_sys->b_timeout_call && p_sys->rtsp && p_sys->ms )
-    {
-        char *psz_bye = NULL;
-        /* Use GET_PARAMETERS if supported. wmserver dialect supports
-         * it, but does not report this properly. */
-        if( p_sys->b_get_param || var_GetBool( p_demux, "rtsp-wmserver" ) )
-            p_sys->rtsp->sendGetParameterCommand( *p_sys->ms, NULL, psz_bye );
-        else
-            p_sys->rtsp->sendOptionsCommand(NULL, NULL);
-
-        p_sys->b_timeout_call = false;
-    }
 
     for( i = 0; i < p_sys->i_track; i++ )
     {
@@ -1649,19 +1607,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->f_seek_request = -1;
             p_sys->b_paused = b_pause;
 
-            /* When we Pause, we'll need the TimeoutPrevention thread to
-             * handle sending the "Keep Alive" message to the server.
-             * Unfortunately Live555 isn't thread safe and so can't
-             * do this normally while the main Demux thread is handling
-             * a live stream. We end up with the Timeout thread blocking
-             * waiting for a response from the server. So when we PAUSE
-             * we set a flag that the TimeoutPrevention function will check
-             * and if it's set, it will trigger the GET_PARAMETER message */
-            if( p_sys->b_paused && p_sys->p_timeout != NULL )
-                p_sys->p_timeout->b_handle_keep_alive = true;
-            else if( !p_sys->b_paused && p_sys->p_timeout != NULL )
-                p_sys->p_timeout->b_handle_keep_alive = false;
-
             if( !p_sys->b_paused )
             {
                 for( int i = 0; i < p_sys->i_track; i++ )
@@ -1685,6 +1630,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->f_npt_length = p_sys->ms->playEndTime();
 
             msg_Dbg( p_demux, "pause start: %f stop:%f", p_sys->f_npt_start, p_sys->f_npt_length );
+
             return VLC_SUCCESS;
         }
         case DEMUX_GET_TITLE_INFO:
@@ -1716,6 +1662,7 @@ static int RollOverTcp( demux_t *p_demux )
     var_SetBool( p_demux, "rtsp-tcp", true );
 
     /* We close the old RTSP session */
+    vlc_timer_schedule(p_sys->timer, false, 0, 0);
     p_sys->rtsp->sendTeardownCommand( *p_sys->ms, NULL );
     Medium::close( p_sys->ms );
     RTSPClient::close( p_sys->rtsp );
@@ -2118,41 +2065,45 @@ static void TaskInterruptData( void *p_private )
 /*****************************************************************************
  *
  *****************************************************************************/
-VLC_NORETURN
-static void* TimeoutPrevention( void *p_data )
+static void TimeoutPrevention( void *p_data )
 {
-    timeout_thread_t *p_timeout = (timeout_thread_t *)p_data;
-    demux_t *p_demux = p_timeout->p_demux;
+    demux_t *p_demux = (demux_t *) p_data;
     demux_sys_t *p_sys = p_demux->p_sys;
+    char *bye = NULL;
 
-    for( ;; )
+    /* Protect Live555 from us calling their functions simultaneously
+        with Demux() or Control() */
+    vlc_mutex_locker locker(&p_sys->timeout_mutex);
+
+    /* If the timer fires while the demuxer owns the lock, and the demuxer
+     * then torns the session down, the pointers will become NULL. By the time
+     * this timer callback obtains the callback, either a new session was
+     * created and the timer is rescheduled, or the pointers are still NULL
+     * and the timer is descheduled. In the second case, bail out (then wait
+     * for the timer to be rescheduled or destroyed). In the first case, this
+     * might send an early refresh - that´s harmless but suboptimal (FIXME). */
+    if( p_sys->rtsp == NULL || p_sys->ms == NULL )
+        return;
+
+    bool use_get_param = p_sys->b_get_param;
+
+    /* Use GET_PARAMETERS if supported. wmserver dialect supports
+     * it, but does not report this properly. */
+    if( var_GetBool( p_demux, "rtsp-wmserver" ) )
+        use_get_param = true;
+
+    if( use_get_param )
+        p_sys->rtsp->sendGetParameterCommand( *p_sys->ms,
+                                              default_live555_callback, bye );
+    else
+        p_sys->rtsp->sendOptionsCommand( default_live555_callback, NULL );
+
+    if( !wait_Live555_response( p_demux ) )
     {
-        /* Voodoo (= no) thread safety here! *Ahem* */
-        if( p_timeout->b_handle_keep_alive )
-        {
-            /* Protect Live555 from us calling their functions simultaneously
-               with Demux() or Control() */
-            vlc_mutex_locker locker(&p_sys->timeout_mutex);
-
-            char *psz_bye = NULL;
-            int canc = vlc_savecancel ();
-
-            p_sys->rtsp->sendGetParameterCommand( *p_sys->ms, default_live555_callback, psz_bye );
-
-            if( !wait_Live555_response( p_demux ) )
-            {
-              msg_Err( p_demux, "GET_PARAMETER keepalive failed: %s",
-                       p_sys->env->getResultMsg() );
-              /* Just continue, worst case is we get timed out later */
-            }
-
-            vlc_restorecancel (canc);
-        }
-        p_sys->b_timeout_call = !p_timeout->b_handle_keep_alive;
-
-        msleep (((int64_t)p_sys->i_timeout - 2) * CLOCK_FREQ);
+        msg_Err( p_demux, "keep-alive failed: %s",
+                 p_sys->env->getResultMsg() );
+        /* Just continue, worst case is we get timed out later */
     }
-    vlc_assert_unreachable(); /* dead code */
 }
 
 /*****************************************************************************
