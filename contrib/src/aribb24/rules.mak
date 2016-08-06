@@ -16,6 +16,7 @@ $(TARBALLS)/aribb24-$(ARIBB24_VERSION).tar.gz:
 aribb24: aribb24-$(ARIBB24_VERSION).tar.gz .sum-aribb24
 	$(UNPACK)
 	$(APPLY) $(SRC)/aribb24/libm.patch
+	$(call pkg_static,"src/aribb24.pc.in")
 	$(MOVE)
 
 DEPS_aribb24 = png
