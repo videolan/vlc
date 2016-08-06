@@ -396,6 +396,7 @@ mostlyclean:
 	-$(RM) $(foreach p,$(PKGS_ALL),.$(p) .sum-$(p) .dep-$(p))
 	-$(RM) toolchain.cmake
 	-$(RM) -R "$(PREFIX)"
+	-$(RM) -R "$(BUILDBINDIR)"
 	-$(RM) -R */
 
 clean: mostlyclean
