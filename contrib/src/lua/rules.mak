@@ -82,7 +82,10 @@ ifdef HAVE_WIN32
 endif
 	touch $@
 
-luac: lua-$(LUA_VERSION).tar.gz .sum-lua
+.sum-luac: .sum-lua
+	touch $@
+
+luac: lua-$(LUA_VERSION).tar.gz .sum-luac
 	# DO NOT use the same intermediate directory as the lua target
 	rm -Rf -- $@-$(LUA_VERSION) $@
 	mkdir -- $@-$(LUA_VERSION)
