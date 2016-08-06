@@ -4042,28 +4042,42 @@ dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
   [  --disable-libgcrypt     gcrypt support (default enabled)])
+AC_ARG_VAR([GCRYPT_CFLAGS], [C compiler flags for gcrypt])
+AC_ARG_VAR([GCRYPT_LIBS], [linker flags flags for gcrypt])
+
 # require libgcrypt >= 1.6.0
 AS_IF([test "${enable_libgcrypt}" != "no"], [
-  AC_TRY_COMPILE([
-#include <gcrypt.h>
+  AC_CACHE_CHECK([for gcrypt 1.6.0 or later], [ac_cv_lib_gcrypt], [
+    VLC_SAVE_FLAGS
+    CFLAGS="${CFLAGS} ${GCRYPT_CFLAGS}"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+[#include <gcrypt.h>
 #if GCRYPT_VERSION_NUMBER < 0x010600
 #error
-#endif],
-  [], [
-    have_libgcrypt="yes"
+#endif]])], [
+      ac_cv_lib_gcrypt=yes
+    ], [
+      ac_cv_lib_gcrypt=no
+    ])
+    VLC_RESTORE_FLAGS
+  ])
+
+  AS_IF([test "${ac_cv_lib_gcrypt}" = "yes"], [
     AC_DEFINE([HAVE_GCRYPT], 1, [Defined if having gcrypt])
-    GCRYPT_CFLAGS="`libgcrypt-config --cflags`"
-    GCRYPT_LIBS="`libgcrypt-config --libs`"
   ], [
-    AS_IF([test "${enable_libgcrypt}" == "yes"], [
+    AS_IF([test "${enable_libgcrypt}" = "yes"], [
       AC_MSG_ERROR([libgcrypt version 1.6.0 or higher not found. Install libgcrypt or pass --disable-libgcrypt.])
     ])
   ])
 ])
 
+AS_IF([test -z "$GCRYPT_LIBS"], [
+  GCRYPT_LIBS="-lgcrypt -lgpg-error"
+])
+
 AC_SUBST(GCRYPT_CFLAGS)
 AC_SUBST(GCRYPT_LIBS)
-AM_CONDITIONAL([HAVE_GCRYPT], [test "${have_libgcrypt}" = "yes"])
+AM_CONDITIONAL([HAVE_GCRYPT], [test "${ac_cv_lib_gcrypt}" = "yes"])
 
 dnl
 dnl TLS/SSL
