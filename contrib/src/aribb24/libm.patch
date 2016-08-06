@@ -1,0 +1,26 @@
+Add missing maths library.
+
+diff -ru aribb24-1.0.3.orig/configure.ac aribb24-1.0.3/configure.ac
+--- aribb24-1.0.3.orig/configure.ac	2016-08-06 12:04:51.260806518 +0300
++++ aribb24-1.0.3/configure.ac	2016-08-06 13:45:56.424867068 +0300
+@@ -21,6 +21,12 @@
+ 
+ AC_SUBST([PKG_REQUIRES], [$(test x$enable_shared = xno && echo ${pkg_requires})])
+ 
++AC_CHECK_LIB([m], [sqrt], [
++  LIBM="-lm"
++  LIBS="$LIBM $LIBS"
++])
++AC_SUBST(LIBM)
++
+ AC_CHECK_FUNCS([vasprintf])
+ 
+ AC_CONFIG_FILES([Makefile src/aribb24.pc])
+diff -ru aribb24-1.0.3.orig/src/aribb24.pc.in aribb24-1.0.3/src/aribb24.pc.in
+--- aribb24-1.0.3.orig/src/aribb24.pc.in	2016-08-06 12:04:51.260806518 +0300
++++ aribb24-1.0.3/src/aribb24.pc.in	2016-08-06 12:05:05.406806659 +0300
+@@ -15,3 +15,4 @@
+ Requires: @PKG_REQUIRES@
+ Cflags: -I${includedir}
+ Libs: -L${libdir} -laribb24
++Libs.private: @LIBM@

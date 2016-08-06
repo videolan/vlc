@@ -15,12 +15,13 @@ $(TARBALLS)/aribb24-$(ARIBB24_VERSION).tar.gz:
 
 aribb24: aribb24-$(ARIBB24_VERSION).tar.gz .sum-aribb24
 	$(UNPACK)
+	$(APPLY) $(SRC)/aribb24/libm.patch
 	$(MOVE)
 
 DEPS_aribb24 = png
 
 .aribb24: aribb24
-	cd $< && ./bootstrap
+	cd $< && $(SHELL) ./bootstrap
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
