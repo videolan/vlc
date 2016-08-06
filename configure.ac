@@ -436,6 +436,9 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
   export PKG_CONFIG_PATH="${CONTRIB_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH"
   LDFLAGS="${LDFLAGS} -L${CONTRIB_DIR}/lib"
 
+  dnl Tempting, but needs to be set during bootstrap and make too...
+  dnl export PATH="$PATH:${CONTRIB_DIR}/../bin"
+
   AS_IF([test "${SYS}" = "darwin"], [
     export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
     export DYLD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH"
@@ -1561,7 +1564,7 @@ then
       AC_MSG_ERROR([Could not find lua. Lua is needed for some interfaces (rc, telnet, http) as well as many other custom scripts. Use --disable-lua to ignore this error.])
   fi
   AC_ARG_VAR([LUAC], [LUA byte compiler])
-  AC_CHECK_PROGS(LUAC, [${LUAC} luac], [false])
+  AC_CHECK_TOOLS(LUAC, [${LUAC} luac], [false])
   AS_IF([test "${LUAC}" = "false"], [
     AC_MSG_ERROR([Could not find the LUA byte compiler.])
   ])
