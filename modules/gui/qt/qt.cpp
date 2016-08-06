@@ -478,6 +478,10 @@ static void *Thread( void *obj )
 
     Q_INIT_RESOURCE( vlc );
 
+#if HAS_QT56
+    QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+#endif
+
     /* Start the QApplication here */
     QVLCApp app( argc, argv );
 
