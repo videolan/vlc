@@ -162,8 +162,6 @@ private:
     int i_oldvalue; /* Store the old Value before changing */
     float f_step; /* How much do we increase each time we wheel */
     bool b_isMuted;
-    int wlength;
-    int wheight;
 
     QPixmap pixGradient; /* Gradient pix storage */
     QPixmap pixGradient2; /* Muted Gradient pix storage */

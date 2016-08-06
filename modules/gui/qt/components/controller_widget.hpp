@@ -106,7 +106,6 @@ protected:
 private:
     intf_thread_t       *p_intf;
     QLabel              *volMuteLabel;
-    QSize               volMuteLabelSize;
     QAbstractSlider     *volumeSlider;
     QFrame              *volumeControlWidget;
     QMenu               *volumeMenu;

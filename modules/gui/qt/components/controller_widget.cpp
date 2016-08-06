@@ -50,8 +50,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
 
     /* We need a Label for the pix */
     volMuteLabel = new QLabel;
-    volMuteLabelSize = QSize(16.0*logicalDpiX()/DPI_REF_VALUE, 16.0*logicalDpiY()/DPI_REF_VALUE);
-    volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-medium" ).scaled(volMuteLabelSize) );
+    volMuteLabel->setPixmap( QIcon( ":/toolbar/volume-medium" ).pixmap( 16, 16 ) );
 
     /* We might need a subLayout too */
     QVBoxLayout *subLayout;
@@ -126,19 +125,23 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
 void SoundWidget::refreshLabels()
 {
     int i_sliderVolume = volumeSlider->value();
+    const char *psz_icon = ":/toolbar/volume-muted";
 
     if( b_is_muted )
     {
-        volMuteLabel->setPixmap( QPixmap(":/toolbar/volume-muted" ).scaled(volMuteLabelSize) );
+        volMuteLabel->setPixmap( QIcon( psz_icon ).pixmap( 16, 16 ) );
         volMuteLabel->setToolTip(qfu(vlc_pgettext("Tooltip|Unmute", "Unmute")));
         return;
     }
 
     if( i_sliderVolume < VOLUME_MAX / 3 )
-        volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-low" ).scaled(volMuteLabelSize) );
+        psz_icon = ":/toolbar/volume-low";
     else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
-        volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-high" ).scaled(volMuteLabelSize) );
-    else volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-medium" ).scaled(volMuteLabelSize) );
+        psz_icon = ":/toolbar/volume-high";
+    else
+        psz_icon = ":/toolbar/volume-medium";
+
+    volMuteLabel->setPixmap( QIcon( psz_icon ).pixmap( 16, 16 ) );
     volMuteLabel->setToolTip( qfu(vlc_pgettext("Tooltip|Mute", "Mute")) );
 }
 
