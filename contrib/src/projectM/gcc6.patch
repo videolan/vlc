@@ -1,0 +1,60 @@
+diff -ruN projectM-2.0.1-Source.old/Common.hpp projectM-2.0.1-Source/Common.hpp
+--- projectM-2.0.1-Source.old/Common.hpp	2016-08-06 10:57:57.678183788 +0200
++++ projectM-2.0.1-Source/Common.hpp	2016-08-06 11:01:06.714192806 +0200
+@@ -55,7 +55,7 @@
+ 
+ #ifdef LINUX
+ #include <cstdlib>
+-#define projectM_isnan isnan
++#define projectM_isnan std::isnan
+ 
+ #endif
+ 
+diff -ruN projectM-2.0.1-Source.old/MilkdropPresetFactory/Parser.cpp projectM-2.0.1-Source/MilkdropPresetFactory/Parser.cpp
+--- projectM-2.0.1-Source.old/MilkdropPresetFactory/Parser.cpp	2016-08-06 10:57:57.690183788 +0200
++++ projectM-2.0.1-Source/MilkdropPresetFactory/Parser.cpp	2016-08-06 10:58:47.634186171 +0200
+@@ -1405,7 +1405,7 @@
+   PerFrameEqn * per_frame_eqn;
+   GenExpr * gen_expr;
+ 
+-  if (fs == NULL)
++  if (fs.fail())
+     return NULL;
+   if (param_string == NULL)
+     return NULL;
+@@ -1560,7 +1560,7 @@
+ 
+   if (preset == NULL)
+     return NULL;
+-  if (fs == NULL)
++  if (fs.fail())
+     return NULL;
+ 
+   if ((token = parseToken(fs, name)) != tEq)
+@@ -1874,7 +1874,7 @@
+   /* Null argument checks */
+   if (preset == NULL)
+     return PROJECTM_FAILURE;
+-  if (fs == NULL)
++  if (fs.fail())
+     return PROJECTM_FAILURE;
+   if (token == NULL)
+     return PROJECTM_FAILURE;
+@@ -2165,7 +2165,7 @@
+ 
+   if (token == NULL)
+     return PROJECTM_FAILURE;
+-  if (fs == NULL)
++  if (fs.fail())
+     return PROJECTM_FAILURE;
+   if (preset == NULL)
+     return PROJECTM_FAILURE;
+@@ -2347,7 +2347,7 @@
+   if (token == NULL)
+ 
+     return PROJECTM_FAILURE;
+-  if (fs == NULL)
++  if (fs.fail())
+     return PROJECTM_FAILURE;
+   if (preset == NULL)
+     return PROJECTM_FAILURE;
