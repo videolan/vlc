@@ -2,7 +2,9 @@
 CACA_VERSION := 0.99.beta17
 CACA_URL := http://caca.zoy.org/files/libcaca/libcaca-$(CACA_VERSION).tar.gz
 
+ifndef HAVE_LINUX # see VLC Trac 17251
 PKGS += caca
+endif
 ifeq ($(call need_pkg,"caca >= 0.99.beta14"),)
 PKGS_FOUND += caca
 endif
