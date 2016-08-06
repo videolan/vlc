@@ -32,6 +32,9 @@ CONTRIB_VIDEOLAN := http://downloads.videolan.org/pub/contrib
 
 PREFIX ?= $(TOPDST)/$(HOST)
 PREFIX := $(abspath $(PREFIX))
+BUILDPREFIX ?= $(TOPDST)
+BUILDPREFIX := $(abspath $(BUILDPREFIX))
+BUILDBINDIR ?= $(BUILDPREFIX)/bin
 ifneq ($(HOST),$(BUILD))
 HAVE_CROSS_COMPILE = 1
 endif
