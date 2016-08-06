@@ -1561,7 +1561,7 @@ then
       AC_MSG_ERROR([Could not find lua. Lua is needed for some interfaces (rc, telnet, http) as well as many other custom scripts. Use --disable-lua to ignore this error.])
   fi
   AC_ARG_VAR([LUAC], [LUA byte compiler])
-  AC_PATH_PROGS(LUAC, [${LUAC} luac], [false])
+  AC_CHECK_PROGS(LUAC, [${LUAC} luac], [false])
   AS_IF([test "${LUAC}" = "false"], [
     AC_MSG_ERROR([Could not find the LUA byte compiler.])
   ])
@@ -3394,19 +3394,19 @@ if test "${enable_directfb}" = "yes"; then
         fi
     else
         dnl Look for directfb-config
-        AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no, ${PATH})
-        if test "${DIRECTFB_CONFIG}" != "no"; then
+        AC_CHECK_PROG(DIRECTFB_CONFIG, [directfb-config], [false])
+        AS_IF(["${DIRECTFB_CONFIG}" != "false"], [
             CPPFLAGS_mydirectfb="`${DIRECTFB_CONFIG} --cflags`"
             LIBS_mydirectfb="`${DIRECTFB_CONFIG} --libs`"
             have_directfb="true"
-        else
+        ], [
             dnl Trying with pkg-config
             PKG_CHECK_MODULES(DIRECTFB, directfb, [
                 CPPFLAGS_mydirectfb="${DIRECTFB_CFLAGS}"
                 LIBS_mydirectfb="${DIRECTFB_LIBS}"
                 have_directfb="true"
                 ], [have_directfb="false"])
-        fi
+        ])
     fi
     if test "${have_directfb}" = "true"; then
         VLC_ADD_PLUGIN([directfb])
