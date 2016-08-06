@@ -4128,10 +4128,8 @@ AC_ARG_ENABLE(update-check,
   [  --enable-update-check   update checking system (default disabled)])
 if test "${enable_update_check}" = "yes"
 then
-  if test "${have_libgcrypt}" != "yes"
-  then
-    AC_MSG_ERROR([libgcrypt is required for update checking system])
-  fi
+ AS_IF([test "${ac_cv_lib_gcrypt}" != "yes"],[
+    AC_MSG_ERROR([libgcrypt is required for update checking system]) ])
   VLC_ADD_LIBS([libvlccore], [${GCRYPT_LIBS}])
   VLC_ADD_CFLAGS([libvlccore], [${GCRYPT_CFLAGS}])
   AC_DEFINE([UPDATE_CHECK], 1, [Define if you want to use the VLC update mechanism])
