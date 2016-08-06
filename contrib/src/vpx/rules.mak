@@ -3,6 +3,11 @@
 VPX_VERSION := 1.4.0
 VPX_URL := http://storage.googleapis.com/downloads.webmproject.org/releases/webm/libvpx-$(VPX_VERSION).tar.bz2
 
+PKGS += vpx
+ifeq ($(call need_pkg,"vpx"),)
+PKGS_FOUND += vpx
+endif
+
 $(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
 	$(call download,$(VPX_URL))
 
@@ -85,7 +90,7 @@ VPX_CONF := \
 	--disable-dependency-tracking
 
 ifndef BUILD_ENCODERS
-	VPX_CONF += --disable-vp8-encoder --disable-vp9-encoder
+VPX_CONF += --disable-vp8-encoder --disable-vp9-encoder
 endif
 
 ifndef HAVE_WIN32
