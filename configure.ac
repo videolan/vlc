@@ -429,7 +429,6 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
 ])
 AS_IF([test -n "${CONTRIB_DIR}"], [
   AC_MSG_RESULT([${CONTRIB_DIR}])
-  export PATH=${CONTRIB_DIR}/bin:$PATH
   CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
   CFLAGS="${CFLAGS} -I${CONTRIB_DIR}/include"
   CXXFLAGS="${CXXFLAGS} -I${CONTRIB_DIR}/include"
@@ -3780,9 +3779,9 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
       QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix Qt5Core)"
       QT_HOST_PATH="$(eval $PKG_CONFIG --variable=host_bins Qt5Core)"
-      AC_PATH_PROGS(MOC, [moc-qt5 moc], moc, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${CONTRIB_DIR}/bin"])
-      AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${CONTRIB_DIR}/bin"])
-      AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${CONTRIB_DIR}/bin"])
+      AC_PATH_PROGS(MOC, [moc-qt5 moc], moc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
+      AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
+      AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
     ], [
       PKG_CHECK_MODULES([QT], [QtCore QtGui >= 4.8.0],, [
         AS_IF([test -n "${enable_qt}"],[
@@ -3793,9 +3792,9 @@ AS_IF([test "${enable_qt}" != "no"], [
         enable_qt="no"
       ])
       QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix QtCore)"
-      AC_PATH_PROGS(MOC, [moc-qt4 moc], moc, ["${QT_PATH}/bin" "${CONTRIB_DIR}/bin"])
-      AC_PATH_PROG(RCC, rcc, rcc, [${QT_PATH}/bin ${CONTRIB_DIR}/bin])
-      AC_PATH_PROGS(UIC, [uic-qt4 uic], uic, ["${QT_PATH}/bin" "${CONTRIB_DIR}/bin"])
+      AC_PATH_PROGS(MOC, [moc-qt4 moc], moc, ["${QT_PATH}/bin"])
+      AC_PATH_PROG(RCC, rcc, rcc, [${QT_PATH}/bin])
+      AC_PATH_PROGS(UIC, [uic-qt4 uic], uic, ["${QT_PATH}/bin"])
     ])
 ])
 AS_IF([test "${enable_qt}" != "no"], [
