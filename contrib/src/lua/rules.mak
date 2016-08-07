@@ -96,5 +96,5 @@ luac: lua-$(LUA_VERSION).tar.gz .sum-luac
 .luac: luac
 	cd $< && $(MAKE) generic
 	mkdir -p -- $(BUILDBINDIR)
-	cp -fv -- $</src/luac $(BUILDBINDIR)/$(HOST)-luac
+	install -m 0755 -s -- $</src/luac $(BUILDBINDIR)/$(HOST)-luac
 	touch $@
