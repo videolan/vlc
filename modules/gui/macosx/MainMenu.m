@@ -30,7 +30,7 @@
 
 #import "AboutWindowController.h"
 #import "open.h"
-#import "AudioEffects.h"
+#import "VLCAudioEffectsWindowController.h"
 #import "TrackSynchronization.h"
 #import "HelpWindowController.h"
 #import "VideoEffects.h"

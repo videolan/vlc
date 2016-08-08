@@ -63,7 +63,7 @@
 #import "ConvertAndSave.h"
 
 #import "VideoEffects.h"
-#import "AudioEffects.h"
+#import "VLCAudioEffectsWindowController.h"
 #import "intf-prefs.h"
 
 #ifdef HAVE_SPARKLE
@@ -177,7 +177,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCDebugMessageVisualizer *_messagePanelController;
     VLCStatusBarIcon *_statusBarIcon;
     VLCTrackSynchronization *_trackSyncPanel;
-    VLCAudioEffects *_audioEffectsPanel;
+    VLCAudioEffectsWindowController *_audioEffectsPanel;
     VLCVideoEffects *_videoEffectsPanel;
     VLCConvertAndSave *_convertAndSaveWindow;
     ExtensionsManager *_extensionsManager;
@@ -552,10 +552,10 @@ static VLCMain *sharedInstance = nil;
     return _trackSyncPanel;
 }
 
-- (VLCAudioEffects *)audioEffectsPanel
+- (VLCAudioEffectsWindowController *)audioEffectsPanel
 {
     if (!_audioEffectsPanel)
-        _audioEffectsPanel = [[VLCAudioEffects alloc] init];
+        _audioEffectsPanel = [[VLCAudioEffectsWindowController alloc] init];
 
     return _audioEffectsPanel;
 }

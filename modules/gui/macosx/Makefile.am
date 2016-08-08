@@ -25,7 +25,6 @@ libmacosx_plugin_la_SOURCES = \
 	AddonsWindowController.h AddonsWindowController.m \
 	applescript.h applescript.m \
 	AppleRemote.h AppleRemote.m \
-	AudioEffects.h AudioEffects.m \
 	BWQuincyManager.h BWQuincyManager.m \
 	BWQuincyUI.h BWQuincyUI.m \
 	CompatibilityFixes.h \
@@ -75,6 +74,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCStatusBarIcon.h VLCStatusBarIcon.m \
 	VLCVoutWindowController.h VLCVoutWindowController.m \
 	Windows.h Windows.m \
+	VLCAudioEffectsWindowController.h VLCAudioEffectsWindowController.m \
 	VLCBookmarksWindowController.h VLCBookmarksWindowController.m \
 	VLCCoreDialogProvider.h VLCCoreDialogProvider.m \
 	VLCEyeTvController.h VLCEyeTvController.m \

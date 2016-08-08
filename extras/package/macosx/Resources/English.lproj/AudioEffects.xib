@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCAudioEffects">
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCAudioEffectsWindowController">
             <connections>
                 <outlet property="compressorBand1Label" destination="248" id="qCX-jv-cwZ"/>
                 <outlet property="compressorBand1Slider" destination="221" id="mTW-zO-vyb"/>
@@ -619,7 +619,7 @@
                                                 <button verticalHuggingPriority="750" id="621">
                                                     <rect key="frame" x="317" y="159" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="CEBD97E7-9B4C-48EE-8F46-A4CFB512B098" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="9B33308E-D9B3-480C-BC58-0B776FDB6290" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -655,7 +655,7 @@
                                                 <button verticalHuggingPriority="750" id="618">
                                                     <rect key="frame" x="317" y="159" width="73" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="B012D5B9-9282-4637-9073-EE8929D183CC" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
+                                                    <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="A4069BBB-2117-4542-9BBE-3082B4161FD5" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619" customClass="VLCHUDButtonCell">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -897,7 +897,7 @@
         <userDefaultsController representsSharedInstance="YES" id="350"/>
     </objects>
     <resources>
-        <image name="B012D5B9-9282-4637-9073-EE8929D183CC" width="1" height="1">
+        <image name="9B33308E-D9B3-480C-BC58-0B776FDB6290" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -938,7 +938,7 @@ B04HVwdcB2QHZwdsB3sHfweGB44HmwegB6IHpAepB7EHtAe5B8EHxAfWB9kH3gAAAAAAAAIBAAAAAAAA
 AEEAAAAAAAAAAAAAAAAAAAfgA
 </mutableData>
         </image>
-        <image name="CEBD97E7-9B4C-48EE-8F46-A4CFB512B098" width="1" height="1">
+        <image name="A4069BBB-2117-4542-9BBE-3082B4161FD5" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw

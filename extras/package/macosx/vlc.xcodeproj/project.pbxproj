@@ -372,8 +372,8 @@
 		1CCB5F561A62A724004C3E90 /* AddonsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5318ABD6380053B874 /* AddonsWindowController.m */; };
 		1CCB5F571A62A724004C3E90 /* applescript.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6F6041643860059A3A7 /* applescript.h */; };
 		1CCB5F581A62A724004C3E90 /* applescript.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6F7041643860059A3A7 /* applescript.m */; };
-		1CCB5F591A62A724004C3E90 /* AudioEffects.h in Sources */ = {isa = PBXBuildFile; fileRef = CC5560231365CDC700D54038 /* AudioEffects.h */; };
-		1CCB5F5A1A62A724004C3E90 /* AudioEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5560241365CDC800D54038 /* AudioEffects.m */; };
+		1CCB5F591A62A724004C3E90 /* VLCAudioEffectsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC5560231365CDC700D54038 /* VLCAudioEffectsWindowController.h */; };
+		1CCB5F5A1A62A724004C3E90 /* VLCAudioEffectsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5560241365CDC800D54038 /* VLCAudioEffectsWindowController.m */; };
 		1CCB5F5B1A62A724004C3E90 /* VLCBookmarksWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0708A5724D007B10AE /* VLCBookmarksWindowController.h */; };
 		1CCB5F5C1A62A724004C3E90 /* VLCBookmarksWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */; };
 		1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */; };
@@ -1579,8 +1579,8 @@
 		CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCCoreDialogProvider.h; path = ../../../modules/gui/macosx/VLCCoreDialogProvider.h; sourceTree = SOURCE_ROOT; };
 		CC4D67F71348F601003FCC5B /* specific.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
 		CC4EFC2C13E96BD00091D19A /* dropzone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dropzone.png; path = Resources/mainwindow/dropzone.png; sourceTree = "<group>"; };
-		CC5560231365CDC700D54038 /* AudioEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioEffects.h; path = ../../../modules/gui/macosx/AudioEffects.h; sourceTree = SOURCE_ROOT; };
-		CC5560241365CDC800D54038 /* AudioEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = AudioEffects.m; path = ../../../modules/gui/macosx/AudioEffects.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		CC5560231365CDC700D54038 /* VLCAudioEffectsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCAudioEffectsWindowController.h; path = ../../../modules/gui/macosx/VLCAudioEffectsWindowController.h; sourceTree = SOURCE_ROOT; };
+		CC5560241365CDC800D54038 /* VLCAudioEffectsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = VLCAudioEffectsWindowController.m; path = ../../../modules/gui/macosx/VLCAudioEffectsWindowController.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "vlc-xmas.png"; path = "Resources/icons/vlc-xmas.png"; sourceTree = "<group>"; };
 		CC6C01A90DDF3E9200C7D754 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/minimal_macosx/intf.h; sourceTree = SOURCE_ROOT; };
 		CC6C01AA0DDF3E9200C7D754 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/minimal_macosx/intf.m; sourceTree = SOURCE_ROOT; };
@@ -1874,8 +1874,8 @@
 				7DB65D5318ABD6380053B874 /* AddonsWindowController.m */,
 				8E6BC6F6041643860059A3A7 /* applescript.h */,
 				8E6BC6F7041643860059A3A7 /* applescript.m */,
-				CC5560231365CDC700D54038 /* AudioEffects.h */,
-				CC5560241365CDC800D54038 /* AudioEffects.m */,
+				CC5560231365CDC700D54038 /* VLCAudioEffectsWindowController.h */,
+				CC5560241365CDC800D54038 /* VLCAudioEffectsWindowController.m */,
 				DCE7BD0708A5724D007B10AE /* VLCBookmarksWindowController.h */,
 				DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */,
 				CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */,
@@ -3955,8 +3955,8 @@
 				1CCB5F561A62A724004C3E90 /* AddonsWindowController.m in Sources */,
 				1CCB5F571A62A724004C3E90 /* applescript.h in Sources */,
 				1CCB5F581A62A724004C3E90 /* applescript.m in Sources */,
-				1CCB5F591A62A724004C3E90 /* AudioEffects.h in Sources */,
-				1CCB5F5A1A62A724004C3E90 /* AudioEffects.m in Sources */,
+				1CCB5F591A62A724004C3E90 /* VLCAudioEffectsWindowController.h in Sources */,
+				1CCB5F5A1A62A724004C3E90 /* VLCAudioEffectsWindowController.m in Sources */,
 				7D9516BA1C60B6AB00D14E1A /* VLCStatusBarIcon.m in Sources */,
 				1CCB5F5B1A62A724004C3E90 /* VLCBookmarksWindowController.h in Sources */,
 				1CCB5F5C1A62A724004C3E90 /* VLCBookmarksWindowController.m in Sources */,

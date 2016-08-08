@@ -1,5 +1,5 @@
 /*****************************************************************************
- * AudioEffects.h: MacOS X interface module
+ * VLCAudioEffectsWindowController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2004-2015 VLC authors and VideoLAN
  * $Id$
@@ -27,7 +27,7 @@
 @class VLCPopupPanelController;
 @class VLCTextfieldPanelController;
 
-@interface VLCAudioEffects : NSWindowController
+@interface VLCAudioEffectsWindowController : NSWindowController
 
 /* generic */
 @property (readwrite, weak) IBOutlet NSTabView *tabView;

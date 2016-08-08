@@ -1,5 +1,5 @@
 /*****************************************************************************
- * AudioEffects.m: MacOS X interface module
+ * VLCAudioEffectsWindowController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2004-2015 VLC authors and VideoLAN
  * $Id$
@@ -27,7 +27,7 @@
 #endif
 
 #import "intf.h"
-#import "AudioEffects.h"
+#import "VLCAudioEffectsWindowController.h"
 #import "../../audio_filter/equalizer_presets.h"
 #import "CompatibilityFixes.h"
 #import "SharedDialogs.h"
@@ -36,7 +36,7 @@
 
 #import <math.h>
 
-@interface VLCAudioEffects ()
+@interface VLCAudioEffectsWindowController ()
 {
     NSInteger i_old_profile_index;
 }
@@ -48,7 +48,7 @@
 #pragma mark -
 #pragma mark Initialization
 
-@implementation VLCAudioEffects
+@implementation VLCAudioEffectsWindowController
 
 + (void)initialize
 {

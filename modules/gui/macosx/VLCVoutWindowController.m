@@ -31,7 +31,7 @@
 #import "VideoView.h"
 
 #import "VideoEffects.h"
-#import "AudioEffects.h"
+#import "VLCAudioEffectsWindowController.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCBookmarksWindowController.h"
 #import "TrackSynchronization.h"
