@@ -32,7 +32,7 @@
 #import "VLCCoreInteraction.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "VLCMainMenu.h"
-#import "open.h"
+#import "VLCOpenWindowController.h"
 #import "VLCPlaylist.h"
 #import "SideBarItem.h"
 #import <math.h>

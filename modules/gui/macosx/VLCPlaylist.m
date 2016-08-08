@@ -46,7 +46,7 @@
 #import "VLCMainMenu.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCResumeDialogController.h"
-#import "open.h"
+#import "VLCOpenWindowController.h"
 
 #include <vlc_keys.h>
 #import <vlc_interface.h>

@@ -50,7 +50,7 @@
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCPlaylistInfo.h"
-#import "open.h"
+#import "VLCOpenWindowController.h"
 #import "VLCBookmarksWindowController.h"
 #import "VLCCoreDialogProvider.h"
 #import "simple_prefs.h"
@@ -167,7 +167,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCMainMenu *_mainmenu;
     VLCPrefs *_prefs;
     VLCSimplePrefs *_sprefs;
-    VLCOpen *_open;
+    VLCOpenWindowController *_open;
     VLCCoreDialogProvider *_coredialogs;
     VLCBookmarksWindowController *_bookmarks;
     VLCCoreInteraction *_coreinteraction;
@@ -584,10 +584,10 @@ static VLCMain *sharedInstance = nil;
     return _bookmarks;
 }
 
-- (VLCOpen *)open
+- (VLCOpenWindowController *)open
 {
     if (!_open)
-        _open = [[VLCOpen alloc] init];
+        _open = [[VLCOpenWindowController alloc] init];
 
     return _open;
 }

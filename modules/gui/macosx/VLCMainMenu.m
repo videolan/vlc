@@ -29,7 +29,7 @@
 #import <vlc_input.h>
 
 #import "VLCAboutWindowController.h"
-#import "open.h"
+#import "VLCOpenWindowController.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "VLCTrackSynchronizationWindowController.h"
 #import "VLCHelpWindowController.h"

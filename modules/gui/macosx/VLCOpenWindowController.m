@@ -1,5 +1,5 @@
 /*****************************************************************************
- * open.m: Open dialogues for VLC's MacOS X port
+ * VLCOpenWindowController.m: Open dialogues for VLC's MacOS X port
  *****************************************************************************
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
@@ -38,7 +38,7 @@
 
 #import "intf.h"
 #import "VLCPlaylist.h"
-#import "open.h"
+#import "VLCOpenWindowController.h"
 #import "output.h"
 #import "VLCEyeTvController.h"
 #import "misc.h"
@@ -51,7 +51,7 @@ struct display_info_t
     CGDirectDisplayID id;
 };
 
-@interface VLCOpen()
+@interface VLCOpenWindowController()
 {
     VLCOutput *_output;
     BOOL b_outputNibLoaded;
@@ -80,7 +80,7 @@ struct display_info_t
 
 @end
 
-@implementation VLCOpen
+@implementation VLCOpenWindowController
 
 #pragma mark -
 #pragma mark Init

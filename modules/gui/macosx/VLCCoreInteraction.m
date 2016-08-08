@@ -23,7 +23,7 @@
 
 #import "VLCCoreInteraction.h"
 #import "intf.h"
-#import "open.h"
+#import "VLCOpenWindowController.h"
 #import "VLCPlaylist.h"
 #import <math.h>
 #import <vlc_playlist.h>

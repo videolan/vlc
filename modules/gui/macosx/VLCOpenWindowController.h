@@ -1,5 +1,5 @@
 /*****************************************************************************
- * open.h: Open dialogues for VLC's MacOS X port
+ * VLCOpenWindowController.h: Open dialogues for VLC's MacOS X port
  *****************************************************************************
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
@@ -24,7 +24,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-@interface VLCOpen : NSWindowController
+@interface VLCOpenWindowController : NSWindowController
 
 @property (readwrite, weak) IBOutlet NSTextField *mrlTextField;
 @property (readwrite, weak) IBOutlet NSTextField *mrlLabel;
