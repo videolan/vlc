@@ -26,6 +26,8 @@
 		1C15C7DD1B5146DB003AB729 /* ResumeDialogController.m in Sources */ = {isa = PBXBuildFile; fileRef = 633121CB1B51122700E636DA /* ResumeDialogController.m */; };
 		1C51BDE51B7A221B0056B9AA /* TimeSelectionPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C51BDE31B7A221B0056B9AA /* TimeSelectionPanel.xib */; };
 		1C57690E19DC93620099F5A6 /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C57690D19DC93620099F5A6 /* topbar_background.png */; };
+		1C67C8A51D58C0980079E1C1 /* HelpWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A41D58C0980079E1C1 /* HelpWindowController.m */; };
+		1C67C8A81D58C0A40079E1C1 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A71D58C0A40079E1C1 /* AboutWindowController.m */; };
 		1C88BA5419DC7B2200645190 /* yosemite-window-close-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */; };
 		1C88BA5519DC7B2200645190 /* yosemite-window-close-graphite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */; };
 		1C88BA5619DC7B2200645190 /* yosemite-window-close-on-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2619DC7B2200645190 /* yosemite-window-close-on-graphite.png */; };
@@ -364,8 +366,6 @@
 		1C94659C1B77B9FC007C965A /* TextfieldPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C9465991B77B9FC007C965A /* TextfieldPanel.xib */; };
 		1CBB2CC81B06A6DE00110ADA /* Help.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1CBB2CC61B06A6DE00110ADA /* Help.xib */; };
 		1CC25CA81B2C585D0003F994 /* darwinvlc.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CC25CA71B2C585D0003F994 /* darwinvlc.m */; };
-		1CCB5F511A62A724004C3E90 /* about.h in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AF9F044465080059A3A7 /* about.h */; };
-		1CCB5F521A62A724004C3E90 /* about.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AFA0044465080059A3A7 /* about.m */; };
 		1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435E1972E26A0022B534 /* AddonListDataSource.h */; };
 		1CCB5F541A62A724004C3E90 /* AddonListDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435F1972E26A0022B534 /* AddonListDataSource.m */; };
 		1CCB5F551A62A724004C3E90 /* AddonsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5218ABD6380053B874 /* AddonsWindowController.h */; };
@@ -901,6 +901,10 @@
 		1C3AABB01B1BB00A00FDF001 /* VLC-dev.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = "VLC-dev.app"; path = "../VLC-dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C51BDE41B7A221B0056B9AA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/TimeSelectionPanel.xib; sourceTree = "<group>"; };
 		1C57690D19DC93620099F5A6 /* topbar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = topbar_background.png; path = Resources/mainwindow/topbar_background.png; sourceTree = "<group>"; };
+		1C67C8A31D58C0980079E1C1 /* HelpWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HelpWindowController.h; path = ../../../modules/gui/macosx/HelpWindowController.h; sourceTree = "<group>"; };
+		1C67C8A41D58C0980079E1C1 /* HelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HelpWindowController.m; path = ../../../modules/gui/macosx/HelpWindowController.m; sourceTree = "<group>"; };
+		1C67C8A61D58C0A40079E1C1 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = ../../../modules/gui/macosx/AboutWindowController.h; sourceTree = "<group>"; };
+		1C67C8A71D58C0A40079E1C1 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = ../../../modules/gui/macosx/AboutWindowController.m; sourceTree = "<group>"; };
 		1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-graphite.png"; sourceTree = "<group>"; };
 		1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-graphite@2x.png"; sourceTree = "<group>"; };
 		1C88BA2619DC7B2200645190 /* yosemite-window-close-on-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-on-graphite.png"; sourceTree = "<group>"; };
@@ -1343,8 +1347,6 @@
 		8ED6C28503E2EB1C0059A3A7 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prefs.h; path = ../../../modules/gui/macosx/prefs.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28603E2EB1C0059A3A7 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs.m; path = ../../../modules/gui/macosx/prefs.m; sourceTree = SOURCE_ROOT; };
 		8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = README.MacOSX.rtf; sourceTree = SOURCE_ROOT; };
-		8EE1AF9F044465080059A3A7 /* about.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = about.h; path = ../../../modules/gui/macosx/about.h; sourceTree = SOURCE_ROOT; };
-		8EE1AFA0044465080059A3A7 /* about.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = about.m; path = ../../../modules/gui/macosx/about.m; sourceTree = SOURCE_ROOT; };
 		CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindowTitle.h; path = ../../../modules/gui/macosx/MainWindowTitle.h; sourceTree = SOURCE_ROOT; };
 		CC017A0C14A4C8AF00C09A4F /* MainWindowTitle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindowTitle.m; path = ../../../modules/gui/macosx/MainWindowTitle.m; sourceTree = SOURCE_ROOT; };
 		CC04321313B246DF00D7D52E /* effects-double-buttons_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-double-buttons_dark.png"; path = "Resources/mainwindow_dark/effects-double-buttons_dark.png"; sourceTree = "<group>"; };
@@ -1862,8 +1864,10 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				8EE1AF9F044465080059A3A7 /* about.h */,
-				8EE1AFA0044465080059A3A7 /* about.m */,
+				1C67C8A61D58C0A40079E1C1 /* AboutWindowController.h */,
+				1C67C8A71D58C0A40079E1C1 /* AboutWindowController.m */,
+				1C67C8A31D58C0980079E1C1 /* HelpWindowController.h */,
+				1C67C8A41D58C0980079E1C1 /* HelpWindowController.m */,
 				7DF0435E1972E26A0022B534 /* AddonListDataSource.h */,
 				7DF0435F1972E26A0022B534 /* AddonListDataSource.m */,
 				7DB65D5218ABD6380053B874 /* AddonsWindowController.h */,
@@ -3945,8 +3949,6 @@
 			files = (
 				1C15C7DC1B5146DB003AB729 /* ResumeDialogController.h in Sources */,
 				1C15C7DD1B5146DB003AB729 /* ResumeDialogController.m in Sources */,
-				1CCB5F511A62A724004C3E90 /* about.h in Sources */,
-				1CCB5F521A62A724004C3E90 /* about.m in Sources */,
 				1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */,
 				1CCB5F541A62A724004C3E90 /* AddonListDataSource.m in Sources */,
 				1CCB5F551A62A724004C3E90 /* AddonsWindowController.h in Sources */,
@@ -3999,6 +4001,7 @@
 				1CCB5F7D1A62A724004C3E90 /* VLCPlaylist.h in Sources */,
 				1CCB5F7E1A62A724004C3E90 /* VLCPlaylist.m in Sources */,
 				1CCB5F7F1A62A724004C3E90 /* VLCPlaylistInfo.h in Sources */,
+				1C67C8A81D58C0A40079E1C1 /* AboutWindowController.m in Sources */,
 				1CCB5F801A62A724004C3E90 /* VLCPlaylistInfo.m in Sources */,
 				1CCB5F811A62A724004C3E90 /* prefs_widgets.h in Sources */,
 				1CCB5F821A62A724004C3E90 /* prefs_widgets.m in Sources */,
@@ -4045,6 +4048,7 @@
 				1CCB5FA91A62A724004C3E90 /* SPInvocationGrabbing.h in Sources */,
 				1CCB5FAA1A62A724004C3E90 /* SPInvocationGrabbing.m in Sources */,
 				1CCB5FAB1A62A724004C3E90 /* SPMediaKeyTap.h in Sources */,
+				1C67C8A51D58C0980079E1C1 /* HelpWindowController.m in Sources */,
 				1CCB5FAC1A62A724004C3E90 /* SPMediaKeyTap.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

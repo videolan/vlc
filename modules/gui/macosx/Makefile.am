@@ -20,7 +20,7 @@ gui_LTLIBRARIES = $(LTLIBmacosx)
 
 libmacosx_plugin_la_SOURCES = \
 	helpers.h \
-	about.h about.m \
+	AboutWindowController.h AboutWindowController.m \
 	AddonListDataSource.h AddonListDataSource.m \
 	AddonsWindowController.h AddonsWindowController.m \
 	applescript.h applescript.m \
@@ -39,6 +39,7 @@ libmacosx_plugin_la_SOURCES = \
 	ExtensionsManager.h ExtensionsManager.m \
 	eyetv.h eyetv.m \
 	fspanel.h fspanel.m \
+	HelpWindowController.h HelpWindowController.m \
 	intf-prefs.h intf-prefs.m \
 	intf.h intf.m \
 	InputManager.h InputManager.m \

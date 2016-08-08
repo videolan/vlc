@@ -1,5 +1,5 @@
 /*****************************************************************************
- * about.h: MacOS X About Panel
+ * AboutWindowController.h
  *****************************************************************************
  * Copyright (C) 2001-2013 VLC authors and VideoLAN
  * $Id$
@@ -22,12 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <WebKit/WebKit.h> //we need to be here, because we're using a WebView object below
-#import "VLCScrollingClipView.h"
+#import <Cocoa/Cocoa.h>
 
-/*****************************************************************************
- * VLAboutBox interface
- *****************************************************************************/
 @interface AboutWindowController : NSWindowController<NSWindowDelegate>
 {
     /* main about panel and stuff related to its views */
@@ -48,18 +44,5 @@
 - (void)showAbout;
 - (void)showGPL;
 - (IBAction)buttonAction:(id)sender;
-
-@end
-
-@interface HelpWindowController : NSWindowController
-{
-    IBOutlet WebView *o_help_web_view; //we may _not_ use id here because of method name collisions
-    IBOutlet id o_help_bwd_btn;
-    IBOutlet id o_help_fwd_btn;
-    IBOutlet id o_help_home_btn;
-}
-
-- (IBAction)helpGoHome:(id)sender;
-- (void)showHelp;
 
 @end

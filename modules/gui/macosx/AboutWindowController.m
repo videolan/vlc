@@ -1,5 +1,5 @@
 /*****************************************************************************
- * about.m: MacOS X About Panel
+ * AboutWindowController.m
  *****************************************************************************
  * Copyright (C) 2001-2014 VLC authors and VideoLAN
  * $Id$
@@ -25,11 +25,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#import "AboutWindowController.h"
+
 #import "intf.h"
-#import "about.h"
 #import <vlc_intf_strings.h>
 #import <vlc_about.h>
 #import "CompatibilityFixes.h"
+
+#import "VLCScrollingClipView.h"
+
 
 /* this is a bit weird, but we should be confident that there will be more than
  * one arch to support again one day */
@@ -211,52 +216,6 @@
 {
     [self showAbout];
     [self buttonAction:nil];
-}
-
-@end
-
-/*****************************************************************************
- * VLC Help Window Controller
- *****************************************************************************/
-
-@implementation HelpWindowController
-
-- (id)init
-{
-    self = [super initWithWindowNibName:@"Help"];
-    if (self) {
-
-        [self setWindowFrameAutosaveName:@"help"];
-    }
-
-    return self;
-}
-
-- (void)windowDidLoad
-{
-    [[self window] setTitle: _NS("VLC media player Help")];
-    [o_help_fwd_btn setToolTip: _NS("Next")];
-    [o_help_bwd_btn setToolTip: _NS("Previous")];
-    [o_help_home_btn setToolTip: _NS("Index")];
-}
-
-- (void)showHelp
-{
-    [self showWindow:nil];
-    [self helpGoHome:nil];
-}
-
-- (IBAction)helpGoHome:(id)sender
-{
-    [[o_help_web_view mainFrame] loadHTMLString: _NS(I_LONGHELP)
-                                        baseURL: [NSURL URLWithString:@"http://videolan.org"]];
-}
-
-- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
-{
-    /* delegate to update button states (we're the frameLoadDelegate for our help's webview)« */
-    [o_help_fwd_btn setEnabled: [o_help_web_view canGoForward]];
-    [o_help_bwd_btn setEnabled: [o_help_web_view canGoBack]];
 }
 
 @end

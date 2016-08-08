@@ -28,10 +28,11 @@
 #import <vlc_playlist.h>
 #import <vlc_input.h>
 
+#import "AboutWindowController.h"
 #import "open.h"
-#import "about.h"
 #import "AudioEffects.h"
 #import "TrackSynchronization.h"
+#import "HelpWindowController.h"
 #import "VideoEffects.h"
 #import "bookmarks.h"
 #import "simple_prefs.h"
