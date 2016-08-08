@@ -32,7 +32,7 @@
 
 #import "Windows.h"
 #import "misc.h"
-#import "fspanel.h"
+#import "VLCFSPanel.h"
 #import "MainWindowTitle.h"
 
 @class VLCDetachedVideoWindow;

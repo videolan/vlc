@@ -1,5 +1,5 @@
 /*****************************************************************************
- * fspanel.h: MacOS X full screen panel
+ * VLCFSPanel.h: MacOS X full screen panel
  *****************************************************************************
  * Copyright (C) 2006-2013 VLC authors and VideoLAN
  * $Id$

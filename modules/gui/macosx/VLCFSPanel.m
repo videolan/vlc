@@ -1,5 +1,5 @@
 /*****************************************************************************
- * fspanel.m: MacOS X full screen panel
+ * VLCFSPanel.m: MacOS X full screen panel
  *****************************************************************************
  * Copyright (C) 2006-2013 VLC authors and VideoLAN
  * $Id$
@@ -30,7 +30,7 @@
 #import "VLCCoreInteraction.h"
 #import "VLCMainWindow.h"
 #import "misc.h"
-#import "fspanel.h"
+#import "VLCFSPanel.h"
 #import "CompatibilityFixes.h"
 
 @interface VLCFSPanel()
