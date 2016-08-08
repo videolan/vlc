@@ -27,7 +27,7 @@
 		1C51BDE51B7A221B0056B9AA /* TimeSelectionPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C51BDE31B7A221B0056B9AA /* TimeSelectionPanel.xib */; };
 		1C57690E19DC93620099F5A6 /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C57690D19DC93620099F5A6 /* topbar_background.png */; };
 		1C67C8A51D58C0980079E1C1 /* HelpWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A41D58C0980079E1C1 /* HelpWindowController.m */; };
-		1C67C8A81D58C0A40079E1C1 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A71D58C0A40079E1C1 /* AboutWindowController.m */; };
+		1C67C8A81D58C0A40079E1C1 /* VLCAboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */; };
 		1C88BA5419DC7B2200645190 /* yosemite-window-close-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */; };
 		1C88BA5519DC7B2200645190 /* yosemite-window-close-graphite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */; };
 		1C88BA5619DC7B2200645190 /* yosemite-window-close-on-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2619DC7B2200645190 /* yosemite-window-close-on-graphite.png */; };
@@ -903,8 +903,8 @@
 		1C57690D19DC93620099F5A6 /* topbar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = topbar_background.png; path = Resources/mainwindow/topbar_background.png; sourceTree = "<group>"; };
 		1C67C8A31D58C0980079E1C1 /* HelpWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HelpWindowController.h; path = ../../../modules/gui/macosx/HelpWindowController.h; sourceTree = "<group>"; };
 		1C67C8A41D58C0980079E1C1 /* HelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HelpWindowController.m; path = ../../../modules/gui/macosx/HelpWindowController.m; sourceTree = "<group>"; };
-		1C67C8A61D58C0A40079E1C1 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = ../../../modules/gui/macosx/AboutWindowController.h; sourceTree = "<group>"; };
-		1C67C8A71D58C0A40079E1C1 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = ../../../modules/gui/macosx/AboutWindowController.m; sourceTree = "<group>"; };
+		1C67C8A61D58C0A40079E1C1 /* VLCAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCAboutWindowController.h; path = ../../../modules/gui/macosx/VLCAboutWindowController.h; sourceTree = "<group>"; };
+		1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCAboutWindowController.m; path = ../../../modules/gui/macosx/VLCAboutWindowController.m; sourceTree = "<group>"; };
 		1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-graphite.png"; sourceTree = "<group>"; };
 		1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-graphite@2x.png"; sourceTree = "<group>"; };
 		1C88BA2619DC7B2200645190 /* yosemite-window-close-on-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-on-graphite.png"; sourceTree = "<group>"; };
@@ -1864,8 +1864,8 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				1C67C8A61D58C0A40079E1C1 /* AboutWindowController.h */,
-				1C67C8A71D58C0A40079E1C1 /* AboutWindowController.m */,
+				1C67C8A61D58C0A40079E1C1 /* VLCAboutWindowController.h */,
+				1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */,
 				1C67C8A31D58C0980079E1C1 /* HelpWindowController.h */,
 				1C67C8A41D58C0980079E1C1 /* HelpWindowController.m */,
 				7DF0435E1972E26A0022B534 /* AddonListDataSource.h */,
@@ -4001,7 +4001,7 @@
 				1CCB5F7D1A62A724004C3E90 /* VLCPlaylist.h in Sources */,
 				1CCB5F7E1A62A724004C3E90 /* VLCPlaylist.m in Sources */,
 				1CCB5F7F1A62A724004C3E90 /* VLCPlaylistInfo.h in Sources */,
-				1C67C8A81D58C0A40079E1C1 /* AboutWindowController.m in Sources */,
+				1C67C8A81D58C0A40079E1C1 /* VLCAboutWindowController.m in Sources */,
 				1CCB5F801A62A724004C3E90 /* VLCPlaylistInfo.m in Sources */,
 				1CCB5F811A62A724004C3E90 /* prefs_widgets.h in Sources */,
 				1CCB5F821A62A724004C3E90 /* prefs_widgets.m in Sources */,

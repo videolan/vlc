@@ -28,7 +28,7 @@
 #import <vlc_playlist.h>
 #import <vlc_input.h>
 
-#import "AboutWindowController.h"
+#import "VLCAboutWindowController.h"
 #import "open.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "VLCTrackSynchronizationWindowController.h"
@@ -55,7 +55,7 @@
 
 @interface VLCMainMenu()
 {
-    AboutWindowController *_aboutWindowController;
+    VLCAboutWindowController *_aboutWindowController;
     HelpWindowController  *_helpWindowController;
     AddonsWindowController *_addonsController;
     VLCRendererDialog *_rendererDialog;
@@ -1225,7 +1225,7 @@
 - (IBAction)showAbout:(id)sender
 {
     if (!_aboutWindowController)
-        _aboutWindowController = [[AboutWindowController alloc] init];
+        _aboutWindowController = [[VLCAboutWindowController alloc] init];
 
     [_aboutWindowController showAbout];
 }
@@ -1233,7 +1233,7 @@
 - (IBAction)showLicense:(id)sender
 {
     if (!_aboutWindowController)
-        _aboutWindowController = [[AboutWindowController alloc] init];
+        _aboutWindowController = [[VLCAboutWindowController alloc] init];
 
     [_aboutWindowController showGPL];
 }

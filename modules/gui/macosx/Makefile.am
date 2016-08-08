@@ -20,7 +20,7 @@ gui_LTLIBRARIES = $(LTLIBmacosx)
 
 libmacosx_plugin_la_SOURCES = \
 	helpers.h \
-	AboutWindowController.h AboutWindowController.m \
+	VLCAboutWindowController.h VLCAboutWindowController.m \
 	AddonListDataSource.h AddonListDataSource.m \
 	AddonsWindowController.h AddonsWindowController.m \
 	applescript.h applescript.m \

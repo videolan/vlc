@@ -1,5 +1,5 @@
 /*****************************************************************************
- * AboutWindowController.m
+ * VLCAboutWindowController.m
  *****************************************************************************
  * Copyright (C) 2001-2014 VLC authors and VideoLAN
  * $Id$
@@ -26,7 +26,7 @@
  * Preamble
  *****************************************************************************/
 
-#import "AboutWindowController.h"
+#import "VLCAboutWindowController.h"
 
 #import "intf.h"
 #import <vlc_intf_strings.h>
@@ -40,16 +40,13 @@
  * one arch to support again one day */
 #define PLATFORM "Intel 64bit"
 
-/*****************************************************************************
- * AboutWindowController implementation
- *****************************************************************************/
-@interface AboutWindowController ()
+@interface VLCAboutWindowController ()
 {
     NSString *o_authors;
 }
 @end
 
-@implementation AboutWindowController
+@implementation VLCAboutWindowController
 
 - (id)init
 {

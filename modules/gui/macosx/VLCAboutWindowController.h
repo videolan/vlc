@@ -1,5 +1,5 @@
 /*****************************************************************************
- * AboutWindowController.h
+ * VLCAboutWindowController.h
  *****************************************************************************
  * Copyright (C) 2001-2013 VLC authors and VideoLAN
  * $Id$
@@ -24,7 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface AboutWindowController : NSWindowController<NSWindowDelegate>
+@interface VLCAboutWindowController : NSWindowController<NSWindowDelegate>
 {
     /* main about panel and stuff related to its views */
     IBOutlet id o_name_version_field;
