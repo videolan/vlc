@@ -23,7 +23,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "coredialogs.h"
 #import "intf.h"
 #import "VLCUIWidgets.h"
 

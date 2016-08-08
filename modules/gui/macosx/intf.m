@@ -52,7 +52,7 @@
 #import "VLCPlaylistInfo.h"
 #import "open.h"
 #import "bookmarks.h"
-#import "coredialogs.h"
+#import "VLCCoreDialogProvider.h"
 #import "simple_prefs.h"
 #import "CoreInteraction.h"
 #import "TrackSynchronization.h"

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * coredialogs.m: Mac OS X Core Dialogs
+ * VLCCoreDialogProvider.m: Mac OS X Core Dialogs
  *****************************************************************************
  * Copyright (C) 2005-2016 VLC authors and VideoLAN
  * $Id$
@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "intf.h"
-#import "coredialogs.h"
+#import "VLCCoreDialogProvider.h"
 #import "misc.h"
 
 /* for the icon in our custom error panel */

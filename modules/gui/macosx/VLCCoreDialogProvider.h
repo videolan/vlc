@@ -1,5 +1,5 @@
 /*****************************************************************************
- * coredialogs.h: Mac OS X Core Dialogs
+ * VLCCoreDialogProvider.h: Mac OS X Core Dialogs
  *****************************************************************************
  * Copyright (C) 2005-2016 VLC authors and VideoLAN
  * $Id$

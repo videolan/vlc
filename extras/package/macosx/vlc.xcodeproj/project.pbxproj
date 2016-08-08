@@ -381,8 +381,8 @@
 		1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = E0382C01160BA09E0031D7FF /* ControlsBar.m */; };
 		1CCB5F621A62A724004C3E90 /* ConvertAndSave.h in Sources */ = {isa = PBXBuildFile; fileRef = CC0663341566C34C003A411C /* ConvertAndSave.h */; };
 		1CCB5F631A62A724004C3E90 /* ConvertAndSave.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0663351566C34C003A411C /* ConvertAndSave.m */; };
-		1CCB5F641A62A724004C3E90 /* coredialogs.h in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33220F8CB017000FC4A7 /* coredialogs.h */; };
-		1CCB5F651A62A724004C3E90 /* coredialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33210F8CB017000FC4A7 /* coredialogs.m */; };
+		1CCB5F641A62A724004C3E90 /* VLCCoreDialogProvider.h in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */; };
+		1CCB5F651A62A724004C3E90 /* VLCCoreDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */; };
 		1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6013B68A0B009F72E0 /* CoreInteraction.h */; };
 		1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6113B68A0B009F72E0 /* CoreInteraction.m */; };
 		1CCB5F681A62A724004C3E90 /* DebugMessageVisualizer.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */; };
@@ -1575,8 +1575,8 @@
 		CC448A6313B68A0B009F72E0 /* MainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindow.m; path = ../../../modules/gui/macosx/MainWindow.m; sourceTree = SOURCE_ROOT; };
 		CC461F6C160078340022423C /* SharedDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SharedDialogs.h; path = ../../../modules/gui/macosx/SharedDialogs.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CC461F6D160078340022423C /* SharedDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SharedDialogs.m; path = ../../../modules/gui/macosx/SharedDialogs.m; sourceTree = SOURCE_ROOT; };
-		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
-		CC4A33220F8CB017000FC4A7 /* coredialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coredialogs.h; path = ../../../modules/gui/macosx/coredialogs.h; sourceTree = SOURCE_ROOT; };
+		CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCCoreDialogProvider.m; path = ../../../modules/gui/macosx/VLCCoreDialogProvider.m; sourceTree = SOURCE_ROOT; };
+		CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCCoreDialogProvider.h; path = ../../../modules/gui/macosx/VLCCoreDialogProvider.h; sourceTree = SOURCE_ROOT; };
 		CC4D67F71348F601003FCC5B /* specific.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
 		CC4EFC2C13E96BD00091D19A /* dropzone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dropzone.png; path = Resources/mainwindow/dropzone.png; sourceTree = "<group>"; };
 		CC5560231365CDC700D54038 /* AudioEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioEffects.h; path = ../../../modules/gui/macosx/AudioEffects.h; sourceTree = SOURCE_ROOT; };
@@ -1883,8 +1883,8 @@
 				E0382C01160BA09E0031D7FF /* ControlsBar.m */,
 				CC0663341566C34C003A411C /* ConvertAndSave.h */,
 				CC0663351566C34C003A411C /* ConvertAndSave.m */,
-				CC4A33220F8CB017000FC4A7 /* coredialogs.h */,
-				CC4A33210F8CB017000FC4A7 /* coredialogs.m */,
+				CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */,
+				CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */,
 				CC448A6013B68A0B009F72E0 /* CoreInteraction.h */,
 				CC448A6113B68A0B009F72E0 /* CoreInteraction.m */,
 				7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */,
@@ -3965,8 +3965,8 @@
 				1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */,
 				1CCB5F621A62A724004C3E90 /* ConvertAndSave.h in Sources */,
 				1CCB5F631A62A724004C3E90 /* ConvertAndSave.m in Sources */,
-				1CCB5F641A62A724004C3E90 /* coredialogs.h in Sources */,
-				1CCB5F651A62A724004C3E90 /* coredialogs.m in Sources */,
+				1CCB5F641A62A724004C3E90 /* VLCCoreDialogProvider.h in Sources */,
+				1CCB5F651A62A724004C3E90 /* VLCCoreDialogProvider.m in Sources */,
 				1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */,
 				6BBBB8AA1D108A17001BD9BA /* VLCRendererDialog.m in Sources */,
 				1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */,

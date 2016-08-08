@@ -32,7 +32,6 @@ libmacosx_plugin_la_SOURCES = \
 	CompatibilityFixes.h \
 	ControlsBar.m ControlsBar.h \
 	ConvertAndSave.h ConvertAndSave.m \
-	coredialogs.h coredialogs.m \
 	CoreInteraction.h CoreInteraction.m \
 	DebugMessageVisualizer.h DebugMessageVisualizer.m \
 	ExtensionsDialogProvider.h ExtensionsDialogProvider.m \
@@ -78,6 +77,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCStatusBarIcon.h VLCStatusBarIcon.m \
 	VLCVoutWindowController.h VLCVoutWindowController.m \
 	Windows.h Windows.m \
+	VLCCoreDialogProvider.h VLCCoreDialogProvider.m \
 	VLCHUDSliderCell.h VLCHUDSliderCell.m \
 	VLCHUDButtonCell.h VLCHUDButtonCell.m \
 	VLCHUDCheckboxCell.h VLCHUDCheckboxCell.m \
