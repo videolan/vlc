@@ -24,7 +24,7 @@
 #import <vlc_common.h>
 #import "intf.h"
 #import "MainWindowTitle.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 #import "CompatibilityFixes.h"
 #import <SystemConfiguration/SystemConfiguration.h> // for the revealInFinder clone
 

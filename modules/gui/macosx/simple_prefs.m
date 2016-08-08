@@ -37,7 +37,7 @@
 #import "intf.h"
 #import "intf-prefs.h"
 #import "AppleRemote.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                        //for o_intf_last_updateLabel

@@ -54,7 +54,7 @@
 #import "VLCBookmarksWindowController.h"
 #import "VLCCoreDialogProvider.h"
 #import "simple_prefs.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 #import "VLCTrackSynchronizationWindowController.h"
 #import "ExtensionsManager.h"
 #import "BWQuincyManager.h"

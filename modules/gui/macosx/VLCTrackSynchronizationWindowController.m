@@ -26,7 +26,7 @@
 #import "intf.h"
 #import <vlc_common.h>
 #import "VLCTrackSynchronizationWindowController.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 
 #define SUBSDELAY_CFG_MODE                     "subsdelay-mode"
 #define SUBSDELAY_CFG_FACTOR                   "subsdelay-factor"

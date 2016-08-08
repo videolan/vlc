@@ -29,8 +29,9 @@
 #import <vlc_common.h>
 #import <vlc_playlist.h>
 #import <vlc_input.h>
-#import <CoreInteraction.h>
-#import <StringUtility.h>
+
+#import "VLCCoreInteraction.h"
+#import "StringUtility.h"
 
 @interface VLCStatusBarIcon ()
 {

@@ -34,7 +34,7 @@
 #import "CompatibilityFixes.h"
 #import "intf.h"
 #import "VideoView.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 #import "VLCMainMenu.h"
 
 #import <QuartzCore/QuartzCore.h>

@@ -383,8 +383,8 @@
 		1CCB5F631A62A724004C3E90 /* VLCConvertAndSaveWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */; };
 		1CCB5F641A62A724004C3E90 /* VLCCoreDialogProvider.h in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */; };
 		1CCB5F651A62A724004C3E90 /* VLCCoreDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */; };
-		1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6013B68A0B009F72E0 /* CoreInteraction.h */; };
-		1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6113B68A0B009F72E0 /* CoreInteraction.m */; };
+		1CCB5F661A62A724004C3E90 /* VLCCoreInteraction.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6013B68A0B009F72E0 /* VLCCoreInteraction.h */; };
+		1CCB5F671A62A724004C3E90 /* VLCCoreInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */; };
 		1CCB5F681A62A724004C3E90 /* VLCDebugMessageWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B318302AC000FAE9B7 /* VLCDebugMessageWindowController.h */; };
 		1CCB5F691A62A724004C3E90 /* VLCDebugMessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B418302AC000FAE9B7 /* VLCDebugMessageWindowController.m */; };
 		1CCB5F6A1A62A724004C3E90 /* ExtensionsDialogProvider.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */; };
@@ -1569,8 +1569,8 @@
 		CC426FD01020D44F00A32659 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../../contrib/Sparkle.framework; sourceTree = "<absolute>"; };
 		CC448A5A13B61D49009F72E0 /* VLCMainMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCMainMenu.h; path = ../../../modules/gui/macosx/VLCMainMenu.h; sourceTree = SOURCE_ROOT; };
 		CC448A5B13B61D49009F72E0 /* VLCMainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCMainMenu.m; path = ../../../modules/gui/macosx/VLCMainMenu.m; sourceTree = SOURCE_ROOT; };
-		CC448A6013B68A0B009F72E0 /* CoreInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CoreInteraction.h; path = ../../../modules/gui/macosx/CoreInteraction.h; sourceTree = SOURCE_ROOT; };
-		CC448A6113B68A0B009F72E0 /* CoreInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CoreInteraction.m; path = ../../../modules/gui/macosx/CoreInteraction.m; sourceTree = SOURCE_ROOT; };
+		CC448A6013B68A0B009F72E0 /* VLCCoreInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCCoreInteraction.h; path = ../../../modules/gui/macosx/VLCCoreInteraction.h; sourceTree = SOURCE_ROOT; };
+		CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCCoreInteraction.m; path = ../../../modules/gui/macosx/VLCCoreInteraction.m; sourceTree = SOURCE_ROOT; };
 		CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCMainWindow.h; path = ../../../modules/gui/macosx/VLCMainWindow.h; sourceTree = SOURCE_ROOT; };
 		CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCMainWindow.m; path = ../../../modules/gui/macosx/VLCMainWindow.m; sourceTree = SOURCE_ROOT; };
 		CC461F6C160078340022423C /* SharedDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SharedDialogs.h; path = ../../../modules/gui/macosx/SharedDialogs.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -1885,8 +1885,8 @@
 				CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */,
 				CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */,
 				CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */,
-				CC448A6013B68A0B009F72E0 /* CoreInteraction.h */,
-				CC448A6113B68A0B009F72E0 /* CoreInteraction.m */,
+				CC448A6013B68A0B009F72E0 /* VLCCoreInteraction.h */,
+				CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */,
 				7D8BB0B318302AC000FAE9B7 /* VLCDebugMessageWindowController.h */,
 				7D8BB0B418302AC000FAE9B7 /* VLCDebugMessageWindowController.m */,
 				5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */,
@@ -3967,9 +3967,9 @@
 				1CCB5F631A62A724004C3E90 /* VLCConvertAndSaveWindowController.m in Sources */,
 				1CCB5F641A62A724004C3E90 /* VLCCoreDialogProvider.h in Sources */,
 				1CCB5F651A62A724004C3E90 /* VLCCoreDialogProvider.m in Sources */,
-				1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */,
+				1CCB5F661A62A724004C3E90 /* VLCCoreInteraction.h in Sources */,
 				6BBBB8AA1D108A17001BD9BA /* VLCRendererDialog.m in Sources */,
-				1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */,
+				1CCB5F671A62A724004C3E90 /* VLCCoreInteraction.m in Sources */,
 				1CCB5F681A62A724004C3E90 /* VLCDebugMessageWindowController.h in Sources */,
 				1CCB5F691A62A724004C3E90 /* VLCDebugMessageWindowController.m in Sources */,
 				6B846FE51CF5D88C00112E54 /* VLCHUDCheckboxCell.m in Sources */,

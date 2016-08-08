@@ -25,7 +25,7 @@
 #import "intf.h"
 #import "VLCVideoEffectsWindowController.h"
 #import "SharedDialogs.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 
 @interface VLCVideoEffectsWindowController()
 {

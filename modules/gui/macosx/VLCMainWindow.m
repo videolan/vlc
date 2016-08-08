@@ -29,7 +29,7 @@
 
 #import "intf.h"
 #import "CompatibilityFixes.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "VLCMainMenu.h"
 #import "open.h"

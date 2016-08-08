@@ -24,7 +24,7 @@
 
 #import "ControlsBar.h"
 #import "intf.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 #import "VLCMainMenu.h"
 #import "fspanel.h"
 #import "VLCPlaylist.h"

@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 #import "intf-prefs.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 
 #include <unistd.h> /* execl() */
 

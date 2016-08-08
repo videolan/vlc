@@ -24,7 +24,7 @@
 
 #import "Windows.h"
 #import "intf.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 #import "ControlsBar.h"
 #import "VideoView.h"
 #import "CompatibilityFixes.h"

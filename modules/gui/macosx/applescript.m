@@ -27,7 +27,7 @@
  *****************************************************************************/
 #import "intf.h"
 #import "applescript.h"
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 #import "VLCPlaylist.h"
 #import <vlc_url.h>
 

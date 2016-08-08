@@ -30,7 +30,7 @@ libmacosx_plugin_la_SOURCES = \
 	CompatibilityFixes.h \
 	ControlsBar.m ControlsBar.h \
 	VLCConvertAndSaveWindowController.h VLCConvertAndSaveWindowController.m \
-	CoreInteraction.h CoreInteraction.m \
+	VLCCoreInteraction.h VLCCoreInteraction.m \
 	ExtensionsDialogProvider.h ExtensionsDialogProvider.m \
 	ExtensionsManager.h ExtensionsManager.m \
 	fspanel.h fspanel.m \

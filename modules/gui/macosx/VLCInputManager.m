@@ -21,7 +21,7 @@
 
 #import "VLCInputManager.h"
 
-#import "CoreInteraction.h"
+#import "VLCCoreInteraction.h"
 #import "CompatibilityFixes.h"
 #import "ExtensionsManager.h"
 #import "intf.h"
