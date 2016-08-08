@@ -28,7 +28,7 @@
  *****************************************************************************/
 #import "intf.h"
 #import "CoreInteraction.h"
-#import "MainWindow.h"
+#import "VLCMainWindow.h"
 #import "misc.h"
 #import "fspanel.h"
 #import "CompatibilityFixes.h"

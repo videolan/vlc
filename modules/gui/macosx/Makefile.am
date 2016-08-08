@@ -43,7 +43,6 @@ libmacosx_plugin_la_SOURCES = \
 	KeyboardBacklight.h KeyboardBacklight.m \
 	macosx.m \
 	MainMenu.h MainMenu.m \
-	MainWindow.h MainWindow.m \
 	MainWindowTitle.h MainWindowTitle.m \
 	misc.h misc.m \
 	open.h open.m \
@@ -80,6 +79,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCHUDCheckboxCell.h VLCHUDCheckboxCell.m \
 	VLCHUDRadiobuttonCell.h VLCHUDRadiobuttonCell.m \
 	VLCHUDTextFieldCell.h VLCHUDTextFieldCell.m \
+	VLCMainWindow.h VLCMainWindow.m \
 	VLCRendererDiscovery.h VLCRendererDiscovery.m \
 	VLCRendererItem.h VLCRendererItem.m \
 	VLCRendererDialog.h VLCRendererDialog.m \

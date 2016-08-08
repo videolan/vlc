@@ -39,7 +39,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "misc.h"
-#import "MainWindow.h"
+#import "VLCMainWindow.h"
 #import "VLCVoutWindowController.h"
 #import "VLCStatusBarIcon.h"
 #import "StringUtility.h"

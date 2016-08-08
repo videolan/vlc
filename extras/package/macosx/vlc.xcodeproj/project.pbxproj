@@ -400,8 +400,8 @@
 		1CCB5F741A62A724004C3E90 /* macosx.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27E03E2EB1C0059A3A7 /* macosx.m */; };
 		1CCB5F751A62A724004C3E90 /* MainMenu.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A5A13B61D49009F72E0 /* MainMenu.h */; };
 		1CCB5F761A62A724004C3E90 /* MainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A5B13B61D49009F72E0 /* MainMenu.m */; };
-		1CCB5F771A62A724004C3E90 /* MainWindow.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6213B68A0B009F72E0 /* MainWindow.h */; };
-		1CCB5F781A62A724004C3E90 /* MainWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6313B68A0B009F72E0 /* MainWindow.m */; };
+		1CCB5F771A62A724004C3E90 /* VLCMainWindow.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */; };
+		1CCB5F781A62A724004C3E90 /* VLCMainWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */; };
 		1CCB5F791A62A724004C3E90 /* open.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28103E2EB1C0059A3A7 /* open.h */; };
 		1CCB5F7A1A62A724004C3E90 /* open.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28203E2EB1C0059A3A7 /* open.m */; };
 		1CCB5F7B1A62A724004C3E90 /* output.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E55FB7F0459B0FD00FB3317 /* output.h */; };
@@ -1571,8 +1571,8 @@
 		CC448A5B13B61D49009F72E0 /* MainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainMenu.m; path = ../../../modules/gui/macosx/MainMenu.m; sourceTree = SOURCE_ROOT; };
 		CC448A6013B68A0B009F72E0 /* CoreInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CoreInteraction.h; path = ../../../modules/gui/macosx/CoreInteraction.h; sourceTree = SOURCE_ROOT; };
 		CC448A6113B68A0B009F72E0 /* CoreInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CoreInteraction.m; path = ../../../modules/gui/macosx/CoreInteraction.m; sourceTree = SOURCE_ROOT; };
-		CC448A6213B68A0B009F72E0 /* MainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindow.h; path = ../../../modules/gui/macosx/MainWindow.h; sourceTree = SOURCE_ROOT; };
-		CC448A6313B68A0B009F72E0 /* MainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindow.m; path = ../../../modules/gui/macosx/MainWindow.m; sourceTree = SOURCE_ROOT; };
+		CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCMainWindow.h; path = ../../../modules/gui/macosx/VLCMainWindow.h; sourceTree = SOURCE_ROOT; };
+		CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCMainWindow.m; path = ../../../modules/gui/macosx/VLCMainWindow.m; sourceTree = SOURCE_ROOT; };
 		CC461F6C160078340022423C /* SharedDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SharedDialogs.h; path = ../../../modules/gui/macosx/SharedDialogs.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CC461F6D160078340022423C /* SharedDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SharedDialogs.m; path = ../../../modules/gui/macosx/SharedDialogs.m; sourceTree = SOURCE_ROOT; };
 		CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCCoreDialogProvider.m; path = ../../../modules/gui/macosx/VLCCoreDialogProvider.m; sourceTree = SOURCE_ROOT; };
@@ -1909,8 +1909,8 @@
 				8ED6C27E03E2EB1C0059A3A7 /* macosx.m */,
 				CC448A5A13B61D49009F72E0 /* MainMenu.h */,
 				CC448A5B13B61D49009F72E0 /* MainMenu.m */,
-				CC448A6213B68A0B009F72E0 /* MainWindow.h */,
-				CC448A6313B68A0B009F72E0 /* MainWindow.m */,
+				CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */,
+				CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */,
 				CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */,
 				CC017A0C14A4C8AF00C09A4F /* MainWindowTitle.m */,
 				8ED6C27F03E2EB1C0059A3A7 /* misc.h */,
@@ -3990,8 +3990,8 @@
 				1CCB5F741A62A724004C3E90 /* macosx.m in Sources */,
 				1CCB5F751A62A724004C3E90 /* MainMenu.h in Sources */,
 				1CCB5F761A62A724004C3E90 /* MainMenu.m in Sources */,
-				1CCB5F771A62A724004C3E90 /* MainWindow.h in Sources */,
-				1CCB5F781A62A724004C3E90 /* MainWindow.m in Sources */,
+				1CCB5F771A62A724004C3E90 /* VLCMainWindow.h in Sources */,
+				1CCB5F781A62A724004C3E90 /* VLCMainWindow.m in Sources */,
 				6B846FE61CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m in Sources */,
 				1CCB5F791A62A724004C3E90 /* open.h in Sources */,
 				1CCB5F7A1A62A724004C3E90 /* open.m in Sources */,

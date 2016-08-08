@@ -26,7 +26,7 @@
 #import "ExtensionsManager.h"
 #import "intf.h"
 #import "MainMenu.h"
-#import "MainWindow.h"
+#import "VLCMainWindow.h"
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCResumeDialogController.h"

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * MainWindow.m: MacOS X interface module
+ * VLCMainWindow.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2013 VLC authors and VideoLAN
  * $Id$
@@ -25,9 +25,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import "VLCMainWindow.h"
+
 #import "intf.h"
 #import "CompatibilityFixes.h"
-#import "MainWindow.h"
 #import "CoreInteraction.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "MainMenu.h"

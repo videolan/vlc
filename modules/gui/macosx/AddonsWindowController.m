@@ -25,7 +25,7 @@
 
 #import "AddonsWindowController.h"
 #import "intf.h"
-#import "MainWindow.h"
+#import "VLCMainWindow.h"
 #import "AddonListDataSource.h"
 
 @interface AddonsWindowController() <NSTableViewDataSource, NSTableViewDelegate>

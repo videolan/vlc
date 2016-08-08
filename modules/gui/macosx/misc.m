@@ -25,7 +25,7 @@
 #import "CompatibilityFixes.h"
 #import "misc.h"
 #import "intf.h"                                          /* VLCApplication */
-#import "MainWindow.h"
+#import "VLCMainWindow.h"
 #import "MainMenu.h"
 #import "ControlsBar.h"
 #import "CoreInteraction.h"

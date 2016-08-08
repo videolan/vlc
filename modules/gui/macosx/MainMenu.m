@@ -40,7 +40,7 @@
 #import "VLCPlaylistInfo.h"
 #import "VideoView.h"
 #import "CoreInteraction.h"
-#import "MainWindow.h"
+#import "VLCMainWindow.h"
 #import "ControlsBar.h"
 #import "ExtensionsManager.h"
 #import "ConvertAndSave.h"

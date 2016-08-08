@@ -29,7 +29,7 @@
 #import "ControlsBar.h"
 #import "MainMenu.h"
 #import "VLCPlaylistInfo.h"
-#import "MainWindow.h"
+#import "VLCMainWindow.h"
 
 #ifdef HAVE_CONFIG_H
 # import "config.h"
