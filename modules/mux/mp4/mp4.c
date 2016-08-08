@@ -396,40 +396,8 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     mp4_stream_t    *p_stream;
 
-    switch(p_input->p_fmt->i_codec)
+    if(!mp4mux_CanMux(VLC_OBJECT(p_mux), p_input->p_fmt))
     {
-    case VLC_CODEC_A52:
-    case VLC_CODEC_DTS:
-    case VLC_CODEC_EAC3:
-    case VLC_CODEC_MP4A:
-    case VLC_CODEC_MP4V:
-    case VLC_CODEC_MPGA:
-    case VLC_CODEC_MP3:
-    case VLC_CODEC_MPGV:
-    case VLC_CODEC_MP2V:
-    case VLC_CODEC_MP1V:
-    case VLC_CODEC_MJPG:
-    case VLC_CODEC_MJPGB:
-    case VLC_CODEC_SVQ1:
-    case VLC_CODEC_SVQ3:
-    case VLC_CODEC_H263:
-    case VLC_CODEC_AMR_NB:
-    case VLC_CODEC_AMR_WB:
-    case VLC_CODEC_YV12:
-    case VLC_CODEC_YUYV:
-        break;
-    case VLC_CODEC_H264:
-        if(!p_input->p_fmt->i_extra)
-            msg_Warn(p_mux, "H264 muxing from AnnexB source will set an incorrect default profile");
-        break;
-    case VLC_CODEC_HEVC:
-        if(!p_input->p_fmt->i_extra)
-            msg_Err(p_mux, "HEVC muxing from AnnexB source is unsupported");
-        return VLC_EGENERIC;
-    case VLC_CODEC_SUBT:
-        msg_Warn(p_mux, "subtitle track added like in .mov (even when creating .mp4)");
-        break;
-    default:
         msg_Err(p_mux, "unsupported codec %4.4s in mp4",
                  (char*)&p_input->p_fmt->i_codec);
         return VLC_EGENERIC;

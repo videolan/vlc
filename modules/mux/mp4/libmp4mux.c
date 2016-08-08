@@ -1835,3 +1835,47 @@ bo_t *mp4mux_GetFtyp(vlc_fourcc_t major, uint32_t minor, vlc_fourcc_t extra[], s
     }
     return box;
 }
+
+bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt)
+{
+    switch(p_fmt->i_codec)
+    {
+    case VLC_CODEC_A52:
+    case VLC_CODEC_DTS:
+    case VLC_CODEC_EAC3:
+    case VLC_CODEC_MP4A:
+    case VLC_CODEC_MP4V:
+    case VLC_CODEC_MPGA:
+    case VLC_CODEC_MP3:
+    case VLC_CODEC_MPGV:
+    case VLC_CODEC_MP2V:
+    case VLC_CODEC_MP1V:
+    case VLC_CODEC_MJPG:
+    case VLC_CODEC_MJPGB:
+    case VLC_CODEC_SVQ1:
+    case VLC_CODEC_SVQ3:
+    case VLC_CODEC_H263:
+    case VLC_CODEC_AMR_NB:
+    case VLC_CODEC_AMR_WB:
+    case VLC_CODEC_YV12:
+    case VLC_CODEC_YUYV:
+    case VLC_CODEC_VC1:
+    case VLC_CODEC_WMAP:
+        break;
+    case VLC_CODEC_H264:
+        if(!p_fmt->i_extra && p_obj)
+            msg_Warn(p_obj, "H264 muxing from AnnexB source will set an incorrect default profile");
+        break;
+    case VLC_CODEC_HEVC:
+        if(!p_fmt->i_extra && p_obj)
+            msg_Err(p_obj, "HEVC muxing from AnnexB source is unsupported");
+        return false;
+    case VLC_CODEC_SUBT:
+        if(p_obj)
+            msg_Warn(p_obj, "subtitle track added like in .mov (even when creating .mp4)");
+        break;
+    default:
+        return false;
+    }
+    return true;
+}

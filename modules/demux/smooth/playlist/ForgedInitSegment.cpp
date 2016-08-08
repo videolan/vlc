@@ -273,7 +273,11 @@ block_t * ForgedInitSegment::buildMoovBox()
         trackinfo.fmt.psz_language = strdup(language.c_str());
 
     mp4mux_trackinfo_t *p_tracks = &trackinfo;
-    bo_t *box = mp4mux_GetMoovBox(NULL, &p_tracks, 1, true, false, false, false);
+    bo_t *box = NULL;
+
+    if(mp4mux_CanMux( NULL, &trackinfo.fmt ))
+       box = mp4mux_GetMoovBox(NULL, &p_tracks, 1, true, false, false, false);
+
     mp4mux_trackinfo_Clear(&trackinfo);
 
     block_t *moov = NULL;
