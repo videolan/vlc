@@ -36,7 +36,6 @@ libmacosx_plugin_la_SOURCES = \
 	DebugMessageVisualizer.h DebugMessageVisualizer.m \
 	ExtensionsDialogProvider.h ExtensionsDialogProvider.m \
 	ExtensionsManager.h ExtensionsManager.m \
-	eyetv.h eyetv.m \
 	fspanel.h fspanel.m \
 	HelpWindowController.h HelpWindowController.m \
 	intf-prefs.h intf-prefs.m \
@@ -78,6 +77,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCVoutWindowController.h VLCVoutWindowController.m \
 	Windows.h Windows.m \
 	VLCCoreDialogProvider.h VLCCoreDialogProvider.m \
+	VLCEyeTvController.h VLCEyeTvController.m \
 	VLCHUDSliderCell.h VLCHUDSliderCell.m \
 	VLCHUDButtonCell.h VLCHUDButtonCell.m \
 	VLCHUDCheckboxCell.h VLCHUDCheckboxCell.m \

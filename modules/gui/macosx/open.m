@@ -40,7 +40,7 @@
 #import "VLCPlaylist.h"
 #import "open.h"
 #import "output.h"
-#import "eyetv.h"
+#import "VLCEyeTvController.h"
 #import "misc.h"
 
 #import <vlc_url.h>

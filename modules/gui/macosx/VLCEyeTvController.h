@@ -1,5 +1,5 @@
 /*****************************************************************************
-* eyetv.h: small class to control the notification parts of the EyeTV plugin
+* VLCEyeTVController.h: small class to control the notification parts of the EyeTV plugin
 *****************************************************************************
 * Copyright (C) 2006-2007 VLC authors and VideoLAN
 * $Id$

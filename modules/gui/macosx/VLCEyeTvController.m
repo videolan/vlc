@@ -1,5 +1,5 @@
 /*****************************************************************************
-* eyetv.m: small class to control the notification parts of the EyeTV plugin
+* VLCEyeTVController.m: small class to control the notification parts of the EyeTV plugin
 *****************************************************************************
 * Copyright (C) 2006-2011 VLC authors and VideoLAN
 * $Id$
@@ -22,7 +22,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
-#import "eyetv.h"
+#import "VLCEyeTvController.h"
+
 /* for apple event interaction [carbon] */
 //#import <Foundation/NSAppleScript>
 /* for various VLC core related calls */
