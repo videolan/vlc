@@ -71,6 +71,6 @@ bo_t *box_full_new(const char *fcc, uint8_t v, uint32_t f);
 void  box_fix     (bo_t *box, uint32_t);
 void  box_gather  (bo_t *box, bo_t *box2);
 
-bo_t *GetFtyp(vlc_fourcc_t, uint32_t, vlc_fourcc_t[], size_t i_fourcc);
-bo_t *GetMoovBox(vlc_object_t *, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
+bo_t *mp4mux_GetFtyp(vlc_fourcc_t, uint32_t, vlc_fourcc_t[], size_t i_fourcc);
+bo_t *mp4mux_GetMoovBox(vlc_object_t *, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
                  bool b_fragmented, bool b_mov, bool b_64ext, bool b_stco64);

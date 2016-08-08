@@ -215,12 +215,12 @@ static int Open(vlc_object_t *p_this)
         if(p_sys->b_3gp)
         {
             vlc_fourcc_t extra[] = {MAJOR_3gp4, MAJOR_avc1};
-            box = GetFtyp(MAJOR_3gp6, 0, extra, ARRAY_SIZE(extra));
+            box = mp4mux_GetFtyp(MAJOR_3gp6, 0, extra, ARRAY_SIZE(extra));
         }
         else
         {
             vlc_fourcc_t extra[] = {MAJOR_mp41, MAJOR_avc1};
-            box = GetFtyp(MAJOR_isom, 0, extra, ARRAY_SIZE(extra));
+            box = mp4mux_GetFtyp(MAJOR_isom, 0, extra, ARRAY_SIZE(extra));
         }
 
         if(!box)
@@ -1158,7 +1158,7 @@ static bo_t *BuildMoov(sout_mux_t *p_mux)
         for(unsigned int i=0; i<p_sys->i_nb_streams; i++)
             pp_infos[i] = &p_sys->pp_streams[i]->mux;
     }
-    bo_t *p_moov = GetMoovBox(VLC_OBJECT(p_mux), pp_infos, p_sys->i_nb_streams,
+    bo_t *p_moov = mp4mux_GetMoovBox(VLC_OBJECT(p_mux), pp_infos, p_sys->i_nb_streams,
                               p_sys->b_fragmented, p_sys->b_mov, p_sys->b_64_ext, b_stco64);
     free(pp_infos);
     return p_moov;
@@ -1169,7 +1169,7 @@ static void FlushHeader(sout_mux_t *p_mux)
     sout_mux_sys_t *p_sys = (sout_mux_sys_t*) p_mux->p_sys;
 
     /* Now add ftyp header */
-    bo_t *ftyp = GetFtyp(MAJOR_isom, 0, NULL, 0);
+    bo_t *ftyp = mp4mux_GetFtyp(MAJOR_isom, 0, NULL, 0);
     if(!ftyp)
         return;
 

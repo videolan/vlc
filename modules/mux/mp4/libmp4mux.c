@@ -1376,7 +1376,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     return stbl;
 }
 
-bo_t * GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
+bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
                   bool b_fragmented, bool b_mov, bool b_64_ext, bool b_stco64)
 {
     bo_t            *moov, *mvhd;
@@ -1817,7 +1817,7 @@ bo_t * GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, unsigned 
     return moov;
 }
 
-bo_t *GetFtyp(vlc_fourcc_t major, uint32_t minor, vlc_fourcc_t extra[], size_t i_fourcc)
+bo_t *mp4mux_GetFtyp(vlc_fourcc_t major, uint32_t minor, vlc_fourcc_t extra[], size_t i_fourcc)
 {
     bo_t *box = box_new("ftyp");
     if(box)

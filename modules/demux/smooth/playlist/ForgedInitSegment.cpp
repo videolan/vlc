@@ -273,7 +273,7 @@ block_t * ForgedInitSegment::buildMoovBox()
         trackinfo.fmt.psz_language = strdup(language.c_str());
 
     mp4mux_trackinfo_t *p_tracks = &trackinfo;
-    bo_t *box = GetMoovBox(NULL, &p_tracks, 1, true, false, false, false);
+    bo_t *box = mp4mux_GetMoovBox(NULL, &p_tracks, 1, true, false, false, false);
     mp4mux_trackinfo_Clear(&trackinfo);
 
     block_t *moov = NULL;
@@ -287,7 +287,7 @@ block_t * ForgedInitSegment::buildMoovBox()
         return NULL;
 
     vlc_fourcc_t extra[] = {MAJOR_isom, VLC_FOURCC('p','i','f','f'), VLC_FOURCC('i','s','o','2'), VLC_FOURCC('s','m','o','o')};
-    box = GetFtyp(VLC_FOURCC('i','s','m','l'), 1, extra, ARRAY_SIZE(extra));
+    box = mp4mux_GetFtyp(VLC_FOURCC('i','s','m','l'), 1, extra, ARRAY_SIZE(extra));
 
     if(box)
     {
