@@ -44,7 +44,7 @@
 #import "ControlsBar.h"
 #import "ExtensionsManager.h"
 #import "ConvertAndSave.h"
-#import "DebugMessageVisualizer.h"
+#import "VLCDebugMessageWindowController.h"
 #import "AddonsWindowController.h"
 #import "VLCTimeSelectionPanelController.h"
 #import "VLCRendererDialog.h"

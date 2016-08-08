@@ -385,8 +385,8 @@
 		1CCB5F651A62A724004C3E90 /* VLCCoreDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */; };
 		1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6013B68A0B009F72E0 /* CoreInteraction.h */; };
 		1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6113B68A0B009F72E0 /* CoreInteraction.m */; };
-		1CCB5F681A62A724004C3E90 /* DebugMessageVisualizer.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */; };
-		1CCB5F691A62A724004C3E90 /* DebugMessageVisualizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */; };
+		1CCB5F681A62A724004C3E90 /* VLCDebugMessageWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B318302AC000FAE9B7 /* VLCDebugMessageWindowController.h */; };
+		1CCB5F691A62A724004C3E90 /* VLCDebugMessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B418302AC000FAE9B7 /* VLCDebugMessageWindowController.m */; };
 		1CCB5F6A1A62A724004C3E90 /* ExtensionsDialogProvider.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */; };
 		1CCB5F6B1A62A724004C3E90 /* ExtensionsDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */; };
 		1CCB5F6C1A62A724004C3E90 /* ExtensionsManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */; };
@@ -1296,8 +1296,8 @@
 		7D871D371B5E6844000B56C0 /* intf-prefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "intf-prefs.h"; path = "../../../modules/gui/macosx/intf-prefs.h"; sourceTree = "<group>"; };
 		7D871D381B5E6844000B56C0 /* intf-prefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "intf-prefs.m"; path = "../../../modules/gui/macosx/intf-prefs.m"; sourceTree = "<group>"; };
 		7D871D391B5E684D000B56C0 /* helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = helpers.h; path = ../../../modules/gui/macosx/helpers.h; sourceTree = "<group>"; };
-		7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugMessageVisualizer.h; path = ../../../modules/gui/macosx/DebugMessageVisualizer.h; sourceTree = SOURCE_ROOT; };
-		7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugMessageVisualizer.m; path = ../../../modules/gui/macosx/DebugMessageVisualizer.m; sourceTree = SOURCE_ROOT; };
+		7D8BB0B318302AC000FAE9B7 /* VLCDebugMessageWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCDebugMessageWindowController.h; path = ../../../modules/gui/macosx/VLCDebugMessageWindowController.h; sourceTree = SOURCE_ROOT; };
+		7D8BB0B418302AC000FAE9B7 /* VLCDebugMessageWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCDebugMessageWindowController.m; path = ../../../modules/gui/macosx/VLCDebugMessageWindowController.m; sourceTree = SOURCE_ROOT; };
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
 		7D8BB0B91830367200FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistMenu.xib; sourceTree = "<group>"; };
 		7D8BB0BF1830393300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MainWindow.xib; sourceTree = "<group>"; };
@@ -1887,8 +1887,8 @@
 				CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */,
 				CC448A6013B68A0B009F72E0 /* CoreInteraction.h */,
 				CC448A6113B68A0B009F72E0 /* CoreInteraction.m */,
-				7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */,
-				7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */,
+				7D8BB0B318302AC000FAE9B7 /* VLCDebugMessageWindowController.h */,
+				7D8BB0B418302AC000FAE9B7 /* VLCDebugMessageWindowController.m */,
 				5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */,
 				5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */,
 				5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */,
@@ -3970,8 +3970,8 @@
 				1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */,
 				6BBBB8AA1D108A17001BD9BA /* VLCRendererDialog.m in Sources */,
 				1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */,
-				1CCB5F681A62A724004C3E90 /* DebugMessageVisualizer.h in Sources */,
-				1CCB5F691A62A724004C3E90 /* DebugMessageVisualizer.m in Sources */,
+				1CCB5F681A62A724004C3E90 /* VLCDebugMessageWindowController.h in Sources */,
+				1CCB5F691A62A724004C3E90 /* VLCDebugMessageWindowController.m in Sources */,
 				6B846FE51CF5D88C00112E54 /* VLCHUDCheckboxCell.m in Sources */,
 				1CCB5F6A1A62A724004C3E90 /* ExtensionsDialogProvider.h in Sources */,
 				7DBB06641CC2314D004C74D2 /* caopengllayer.m in Sources */,

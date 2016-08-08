@@ -1,5 +1,5 @@
 /*****************************************************************************
- * DebugMessageVisualizer.m: Mac OS X interface crash reporter
+ * VLCDebugMessageWindowController.m: Mac OS X interface crash reporter
  *****************************************************************************
  * Copyright (C) 2004-2013 VLC authors and VideoLAN
  * $Id$
@@ -23,7 +23,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "DebugMessageVisualizer.h"
+#import "VLCDebugMessageWindowController.h"
 #import "intf.h"
 #import <vlc_common.h>
 
@@ -35,7 +35,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
  * of this file.
  *****************************************************************************/
 
-@interface VLCDebugMessageVisualizer () <NSWindowDelegate>
+@interface VLCDebugMessageWindowController () <NSWindowDelegate>
 {
     NSMutableArray * _messageArray;
 }
@@ -47,7 +47,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 {
     @autoreleasepool {
 
-        VLCDebugMessageVisualizer *visualizer = (__bridge VLCDebugMessageVisualizer*)data;
+        VLCDebugMessageWindowController *visualizer = (__bridge VLCDebugMessageWindowController*)data;
 
         int canc = vlc_savecancel();
         char *str;
@@ -85,7 +85,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     }
 }
 
-@implementation VLCDebugMessageVisualizer
+@implementation VLCDebugMessageWindowController
 
 - (id)init
 {

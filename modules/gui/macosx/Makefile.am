@@ -31,7 +31,6 @@ libmacosx_plugin_la_SOURCES = \
 	ControlsBar.m ControlsBar.h \
 	ConvertAndSave.h ConvertAndSave.m \
 	CoreInteraction.h CoreInteraction.m \
-	DebugMessageVisualizer.h DebugMessageVisualizer.m \
 	ExtensionsDialogProvider.h ExtensionsDialogProvider.m \
 	ExtensionsManager.h ExtensionsManager.m \
 	fspanel.h fspanel.m \
@@ -72,6 +71,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCAudioEffectsWindowController.h VLCAudioEffectsWindowController.m \
 	VLCBookmarksWindowController.h VLCBookmarksWindowController.m \
 	VLCCoreDialogProvider.h VLCCoreDialogProvider.m \
+	VLCDebugMessageWindowController.h VLCDebugMessageWindowController.m \
 	VLCEyeTvController.h VLCEyeTvController.m \
 	VLCHUDSliderCell.h VLCHUDSliderCell.m \
 	VLCHUDButtonCell.h VLCHUDButtonCell.m \

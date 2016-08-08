@@ -59,7 +59,7 @@
 #import "ExtensionsManager.h"
 #import "BWQuincyManager.h"
 #import "VLCResumeDialogController.h"
-#import "DebugMessageVisualizer.h"
+#import "VLCDebugMessageWindowController.h"
 #import "ConvertAndSave.h"
 
 #import "VLCVideoEffectsWindowController.h"
@@ -174,7 +174,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCResumeDialogController *_resume_dialog;
     VLCInputManager *_input_manager;
     VLCPlaylist *_playlist;
-    VLCDebugMessageVisualizer *_messagePanelController;
+    VLCDebugMessageWindowController *_messagePanelController;
     VLCStatusBarIcon *_statusBarIcon;
     VLCTrackSynchronizationWindowController *_trackSyncPanel;
     VLCAudioEffectsWindowController *_audioEffectsPanel;
@@ -536,10 +536,10 @@ static VLCMain *sharedInstance = nil;
     return _extensionsManager;
 }
 
-- (VLCDebugMessageVisualizer *)debugMsgPanel
+- (VLCDebugMessageWindowController *)debugMsgPanel
 {
     if (!_messagePanelController)
-        _messagePanelController = [[VLCDebugMessageVisualizer alloc] init];
+        _messagePanelController = [[VLCDebugMessageWindowController alloc] init];
 
     return _messagePanelController;
 }
