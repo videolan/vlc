@@ -22,6 +22,8 @@ $(TARBALLS)/fluidlite-git.tar.xz:
 	$(warning $@ not implemented)
 	touch $@
 
+DEPS_fluidlite = ogg $(DEPS_ogg)
+
 fluidlite: fluidlite-git.tar.xz .sum-fluidlite
 	rm -Rf $@-git
 	mkdir -p $@-git
