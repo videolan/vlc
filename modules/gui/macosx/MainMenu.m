@@ -33,7 +33,7 @@
 #import "VLCAudioEffectsWindowController.h"
 #import "TrackSynchronization.h"
 #import "HelpWindowController.h"
-#import "VideoEffects.h"
+#import "VLCVideoEffectsWindowController.h"
 #import "VLCBookmarksWindowController.h"
 #import "simple_prefs.h"
 #import "VLCPlaylist.h"

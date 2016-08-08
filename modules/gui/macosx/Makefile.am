@@ -66,7 +66,6 @@ libmacosx_plugin_la_SOURCES = \
 	Spotify.h \
 	StringUtility.h StringUtility.m \
 	TrackSynchronization.h TrackSynchronization.m \
-	VideoEffects.h VideoEffects.m \
 	VideoView.h VideoView.m \
 	VLCTimeSelectionPanelController.h VLCTimeSelectionPanelController.m \
 	VLCUIWidgets.h VLCUIWidgets.m \
@@ -85,4 +84,5 @@ libmacosx_plugin_la_SOURCES = \
 	VLCHUDTextFieldCell.h VLCHUDTextFieldCell.m \
 	VLCRendererDiscovery.h VLCRendererDiscovery.m \
 	VLCRendererItem.h VLCRendererItem.m \
-	VLCRendererDialog.h VLCRendererDialog.m
+	VLCRendererDialog.h VLCRendererDialog.m \
+	VLCVideoEffectsWindowController.h VLCVideoEffectsWindowController.m

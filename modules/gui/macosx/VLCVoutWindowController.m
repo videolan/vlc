@@ -30,7 +30,7 @@
 #import "MainWindow.h"
 #import "VideoView.h"
 
-#import "VideoEffects.h"
+#import "VLCVideoEffectsWindowController.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCBookmarksWindowController.h"

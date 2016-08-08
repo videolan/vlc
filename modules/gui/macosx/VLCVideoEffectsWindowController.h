@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VideoEffects.h: MacOS X interface module
+ * VLCVideoEffectsWindowController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2011-2015 Felix Paul Kühne
  * $Id$
@@ -26,7 +26,7 @@
 @class VLCPopupPanelController;
 @class VLCTextfieldPanelController;
 
-@interface VLCVideoEffects : NSWindowController
+@interface VLCVideoEffectsWindowController : NSWindowController
 
 /* generic */
 @property (readwrite, weak) IBOutlet NSTabView *tabView;

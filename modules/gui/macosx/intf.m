@@ -62,7 +62,7 @@
 #import "DebugMessageVisualizer.h"
 #import "ConvertAndSave.h"
 
-#import "VideoEffects.h"
+#import "VLCVideoEffectsWindowController.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "intf-prefs.h"
 
@@ -178,7 +178,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCStatusBarIcon *_statusBarIcon;
     VLCTrackSynchronization *_trackSyncPanel;
     VLCAudioEffectsWindowController *_audioEffectsPanel;
-    VLCVideoEffects *_videoEffectsPanel;
+    VLCVideoEffectsWindowController *_videoEffectsPanel;
     VLCConvertAndSave *_convertAndSaveWindow;
     ExtensionsManager *_extensionsManager;
     VLCInfo *_currentMediaInfoPanel;
@@ -560,10 +560,10 @@ static VLCMain *sharedInstance = nil;
     return _audioEffectsPanel;
 }
 
-- (VLCVideoEffects *)videoEffectsPanel
+- (VLCVideoEffectsWindowController *)videoEffectsPanel
 {
     if (!_videoEffectsPanel)
-        _videoEffectsPanel = [[VLCVideoEffects alloc] init];
+        _videoEffectsPanel = [[VLCVideoEffectsWindowController alloc] init];
 
     return _videoEffectsPanel;
 }

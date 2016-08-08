@@ -422,8 +422,8 @@
 		1CCB5F8A1A62A724004C3E90 /* StringUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4715E7947F00F2FDC9 /* StringUtility.m */; };
 		1CCB5F8B1A62A724004C3E90 /* TrackSynchronization.h in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC3137464CD0003010A /* TrackSynchronization.h */; };
 		1CCB5F8C1A62A724004C3E90 /* TrackSynchronization.m in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC4137464CD0003010A /* TrackSynchronization.m */; };
-		1CCB5F8D1A62A724004C3E90 /* VideoEffects.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366D13817E4500694F2A /* VideoEffects.h */; };
-		1CCB5F8E1A62A724004C3E90 /* VideoEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366E13817E4500694F2A /* VideoEffects.m */; };
+		1CCB5F8D1A62A724004C3E90 /* VLCVideoEffectsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366D13817E4500694F2A /* VLCVideoEffectsWindowController.h */; };
+		1CCB5F8E1A62A724004C3E90 /* VLCVideoEffectsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366E13817E4500694F2A /* VLCVideoEffectsWindowController.m */; };
 		1CCB5F8F1A62A724004C3E90 /* VideoView.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCCDCA01413E1C000FE3DE1 /* VideoView.h */; };
 		1CCB5F901A62A724004C3E90 /* VideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCDCA11413E1C000FE3DE1 /* VideoView.m */; };
 		1CCB5F911A62A724004C3E90 /* VLCUIWidgets.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */; };
@@ -1752,8 +1752,8 @@
 		CCCCDCA11413E1C000FE3DE1 /* VideoView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VideoView.m; path = ../../../modules/gui/macosx/VideoView.m; sourceTree = SOURCE_ROOT; };
 		CCCDDEEF13E870BB00A35661 /* SideBarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SideBarItem.h; path = ../../../modules/gui/macosx/SideBarItem.h; sourceTree = SOURCE_ROOT; };
 		CCCDDEF013E870BB00A35661 /* SideBarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SideBarItem.m; path = ../../../modules/gui/macosx/SideBarItem.m; sourceTree = SOURCE_ROOT; };
-		CCCE366D13817E4500694F2A /* VideoEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoEffects.h; path = ../../../modules/gui/macosx/VideoEffects.h; sourceTree = SOURCE_ROOT; };
-		CCCE366E13817E4500694F2A /* VideoEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = VideoEffects.m; path = ../../../modules/gui/macosx/VideoEffects.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		CCCE366D13817E4500694F2A /* VLCVideoEffectsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCVideoEffectsWindowController.h; path = ../../../modules/gui/macosx/VLCVideoEffectsWindowController.h; sourceTree = SOURCE_ROOT; };
+		CCCE366E13817E4500694F2A /* VLCVideoEffectsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = VLCVideoEffectsWindowController.m; path = ../../../modules/gui/macosx/VLCVideoEffectsWindowController.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CCD590F010E5B73200D39094 /* dialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dialogProvider.h; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.h; sourceTree = SOURCE_ROOT; };
 		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
 		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
@@ -1937,8 +1937,8 @@
 				CC269A4715E7947F00F2FDC9 /* StringUtility.m */,
 				CC707EC3137464CD0003010A /* TrackSynchronization.h */,
 				CC707EC4137464CD0003010A /* TrackSynchronization.m */,
-				CCCE366D13817E4500694F2A /* VideoEffects.h */,
-				CCCE366E13817E4500694F2A /* VideoEffects.m */,
+				CCCE366D13817E4500694F2A /* VLCVideoEffectsWindowController.h */,
+				CCCE366E13817E4500694F2A /* VLCVideoEffectsWindowController.m */,
 				CCCCDCA01413E1C000FE3DE1 /* VideoView.h */,
 				CCCCDCA11413E1C000FE3DE1 /* VideoView.m */,
 				8ED6C28303E2EB1C0059A3A7 /* VLCPlaylist.h */,
@@ -4016,8 +4016,8 @@
 				1CCB5F8B1A62A724004C3E90 /* TrackSynchronization.h in Sources */,
 				1CCB5F8C1A62A724004C3E90 /* TrackSynchronization.m in Sources */,
 				6BBBB8B71D114628001BD9BA /* VLCRendererDiscovery.m in Sources */,
-				1CCB5F8D1A62A724004C3E90 /* VideoEffects.h in Sources */,
-				1CCB5F8E1A62A724004C3E90 /* VideoEffects.m in Sources */,
+				1CCB5F8D1A62A724004C3E90 /* VLCVideoEffectsWindowController.h in Sources */,
+				1CCB5F8E1A62A724004C3E90 /* VLCVideoEffectsWindowController.m in Sources */,
 				1CCB5F8F1A62A724004C3E90 /* VideoView.h in Sources */,
 				1CCB5F901A62A724004C3E90 /* VideoView.m in Sources */,
 				1CCB5F911A62A724004C3E90 /* VLCUIWidgets.h in Sources */,

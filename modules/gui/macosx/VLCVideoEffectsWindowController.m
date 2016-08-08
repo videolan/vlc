@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VideoEffects.m: MacOS X interface module
+ * VLCVideoEffectsWindowController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2011-2015 Felix Paul Kühne
  * $Id$
@@ -23,11 +23,11 @@
 
 #import "CompatibilityFixes.h"
 #import "intf.h"
-#import "VideoEffects.h"
+#import "VLCVideoEffectsWindowController.h"
 #import "SharedDialogs.h"
 #import "CoreInteraction.h"
 
-@interface VLCVideoEffects()
+@interface VLCVideoEffectsWindowController()
 {
     NSInteger i_old_profile_index;
 }
@@ -36,7 +36,7 @@
 #pragma mark -
 #pragma mark Initialization
 
-@implementation VLCVideoEffects
+@implementation VLCVideoEffectsWindowController
 
 + (void)initialize
 {
