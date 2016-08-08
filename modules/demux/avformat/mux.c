@@ -382,6 +382,7 @@ static int Mux( sout_mux_t *p_mux )
             options = vlc_av_get_options(psz_opts);
             free(psz_opts);
         }
+        av_dict_set( &p_sys->oc->metadata, "encoding_tool", "VLC "VERSION, 0 );
         error = avformat_write_header( p_sys->oc, options ? &options : NULL);
         AVDictionaryEntry *t = NULL;
         while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX))) {
