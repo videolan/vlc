@@ -58,7 +58,7 @@
 #import "TrackSynchronization.h"
 #import "ExtensionsManager.h"
 #import "BWQuincyManager.h"
-#import "ResumeDialogController.h"
+#import "VLCResumeDialogController.h"
 #import "DebugMessageVisualizer.h"
 #import "ConvertAndSave.h"
 
@@ -171,7 +171,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCCoreDialogProvider *_coredialogs;
     VLCBookmarksWindowController *_bookmarks;
     VLCCoreInteraction *_coreinteraction;
-    ResumeDialogController *_resume_dialog;
+    VLCResumeDialogController *_resume_dialog;
     VLCInputManager *_input_manager;
     VLCPlaylist *_playlist;
     VLCDebugMessageVisualizer *_messagePanelController;
@@ -626,10 +626,10 @@ static VLCMain *sharedInstance = nil;
     return _coredialogs;
 }
 
-- (ResumeDialogController *)resumeDialog
+- (VLCResumeDialogController *)resumeDialog
 {
     if (!_resume_dialog)
-        _resume_dialog = [[ResumeDialogController alloc] init];
+        _resume_dialog = [[VLCResumeDialogController alloc] init];
 
     return _resume_dialog;
 }

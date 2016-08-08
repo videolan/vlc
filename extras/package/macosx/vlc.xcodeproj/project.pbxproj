@@ -22,8 +22,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		1C15C7DC1B5146DB003AB729 /* ResumeDialogController.h in Sources */ = {isa = PBXBuildFile; fileRef = 633121CA1B51122700E636DA /* ResumeDialogController.h */; };
-		1C15C7DD1B5146DB003AB729 /* ResumeDialogController.m in Sources */ = {isa = PBXBuildFile; fileRef = 633121CB1B51122700E636DA /* ResumeDialogController.m */; };
+		1C15C7DC1B5146DB003AB729 /* VLCResumeDialogController.h in Sources */ = {isa = PBXBuildFile; fileRef = 633121CA1B51122700E636DA /* VLCResumeDialogController.h */; };
+		1C15C7DD1B5146DB003AB729 /* VLCResumeDialogController.m in Sources */ = {isa = PBXBuildFile; fileRef = 633121CB1B51122700E636DA /* VLCResumeDialogController.m */; };
 		1C51BDE51B7A221B0056B9AA /* TimeSelectionPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C51BDE31B7A221B0056B9AA /* TimeSelectionPanel.xib */; };
 		1C57690E19DC93620099F5A6 /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C57690D19DC93620099F5A6 /* topbar_background.png */; };
 		1C67C8A51D58C0980079E1C1 /* HelpWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A41D58C0980079E1C1 /* HelpWindowController.m */; };
@@ -1260,8 +1260,8 @@
 		5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtensionsManager.m; path = ../../../modules/gui/macosx/ExtensionsManager.m; sourceTree = SOURCE_ROOT; };
 		5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCUIWidgets.h; path = ../../../modules/gui/macosx/VLCUIWidgets.h; sourceTree = SOURCE_ROOT; };
 		5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCUIWidgets.m; path = ../../../modules/gui/macosx/VLCUIWidgets.m; sourceTree = SOURCE_ROOT; };
-		633121CA1B51122700E636DA /* ResumeDialogController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResumeDialogController.h; path = ../../../modules/gui/macosx/ResumeDialogController.h; sourceTree = "<group>"; };
-		633121CB1B51122700E636DA /* ResumeDialogController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ResumeDialogController.m; path = ../../../modules/gui/macosx/ResumeDialogController.m; sourceTree = "<group>"; };
+		633121CA1B51122700E636DA /* VLCResumeDialogController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCResumeDialogController.h; path = ../../../modules/gui/macosx/VLCResumeDialogController.h; sourceTree = "<group>"; };
+		633121CB1B51122700E636DA /* VLCResumeDialogController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCResumeDialogController.m; path = ../../../modules/gui/macosx/VLCResumeDialogController.m; sourceTree = "<group>"; };
 		633121CF1B5112C300E636DA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ResumeDialog.xib; sourceTree = "<group>"; };
 		6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCScrollingClipView.h; path = ../../../modules/gui/macosx/VLCScrollingClipView.h; sourceTree = "<group>"; };
 		6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCScrollingClipView.m; path = ../../../modules/gui/macosx/VLCScrollingClipView.m; sourceTree = "<group>"; };
@@ -1927,8 +1927,8 @@
 				8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */,
 				8ED6C28503E2EB1C0059A3A7 /* prefs.h */,
 				8ED6C28603E2EB1C0059A3A7 /* prefs.m */,
-				633121CA1B51122700E636DA /* ResumeDialogController.h */,
-				633121CB1B51122700E636DA /* ResumeDialogController.m */,
+				633121CA1B51122700E636DA /* VLCResumeDialogController.h */,
+				633121CB1B51122700E636DA /* VLCResumeDialogController.m */,
 				CC461F6C160078340022423C /* SharedDialogs.h */,
 				CC461F6D160078340022423C /* SharedDialogs.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
@@ -3947,8 +3947,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1C15C7DC1B5146DB003AB729 /* ResumeDialogController.h in Sources */,
-				1C15C7DD1B5146DB003AB729 /* ResumeDialogController.m in Sources */,
+				1C15C7DC1B5146DB003AB729 /* VLCResumeDialogController.h in Sources */,
+				1C15C7DD1B5146DB003AB729 /* VLCResumeDialogController.m in Sources */,
 				1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */,
 				1CCB5F541A62A724004C3E90 /* AddonListDataSource.m in Sources */,
 				1CCB5F551A62A724004C3E90 /* AddonsWindowController.h in Sources */,

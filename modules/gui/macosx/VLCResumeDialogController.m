@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ResumeDialogController.m: MacOS X interface module
+ * VLCResumeDialogController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2015 VLC authors and VideoLAN
  *
@@ -22,19 +22,19 @@
  *****************************************************************************/
 
 
-#import "ResumeDialogController.h"
+#import "VLCResumeDialogController.h"
 
 #import "intf.h"
 #import "StringUtility.h"
 
-@interface ResumeDialogController()
+@interface VLCResumeDialogController()
 {
     int currentResumeTimeout;
     CompletionBlock completionBlock;
 }
 @end
 
-@implementation ResumeDialogController
+@implementation VLCResumeDialogController
 
 - (id)init
 {

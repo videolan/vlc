@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ResumeDialogController.h: MacOS X interface module
+ * VLCResumeDialogController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2015 VLC authors and VideoLAN
  *
@@ -33,7 +33,7 @@ enum ResumeResult {
 
 typedef void(^CompletionBlock)(enum ResumeResult);
 
-@interface ResumeDialogController : NSWindowController
+@interface VLCResumeDialogController : NSWindowController
 {
     IBOutlet id o_title_lbl;
     IBOutlet id o_text_lbl;

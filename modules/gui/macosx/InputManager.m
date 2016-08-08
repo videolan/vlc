@@ -29,7 +29,7 @@
 #import "MainWindow.h"
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
-#import "ResumeDialogController.h"
+#import "VLCResumeDialogController.h"
 #import "TrackSynchronization.h"
 #import "VideoView.h"
 

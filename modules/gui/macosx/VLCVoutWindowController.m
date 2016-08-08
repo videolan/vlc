@@ -35,7 +35,7 @@
 #import "VLCPlaylistInfo.h"
 #import "VLCBookmarksWindowController.h"
 #import "TrackSynchronization.h"
-#import "ResumeDialogController.h"
+#import "VLCResumeDialogController.h"
 #import "VLCPlaylist.h"
 
 static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);

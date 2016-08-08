@@ -57,7 +57,6 @@ libmacosx_plugin_la_SOURCES = \
 	prefs_widgets.h prefs_widgets.m \
 	PXSourceList.h PXSourceList.m \
 	PXSourceListDataSource.h PXSourceListDelegate.h \
-	ResumeDialogController.h ResumeDialogController.m \
 	SideBarItem.h SideBarItem.m \
 	SharedDialogs.h SharedDialogs.m \
 	simple_prefs.h simple_prefs.m \
@@ -85,4 +84,5 @@ libmacosx_plugin_la_SOURCES = \
 	VLCRendererDiscovery.h VLCRendererDiscovery.m \
 	VLCRendererItem.h VLCRendererItem.m \
 	VLCRendererDialog.h VLCRendererDialog.m \
+	VLCResumeDialogController.h VLCResumeDialogController.m \
 	VLCVideoEffectsWindowController.h VLCVideoEffectsWindowController.m
