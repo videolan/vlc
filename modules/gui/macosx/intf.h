@@ -70,7 +70,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCTrackSynchronizationWindowController;
 @class VLCAudioEffectsWindowController;
 @class VLCVideoEffectsWindowController;
-@class VLCConvertAndSave;
+@class VLCConvertAndSaveWindowController;
 @class ExtensionsManager;
 @class VLCInfo;
 @class VLCStatusBarIcon;
@@ -106,7 +106,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (VLCInfo *)currentMediaInfoPanel;
 
 
-- (VLCConvertAndSave *)convertAndSaveWindow;
+- (VLCConvertAndSaveWindowController *)convertAndSaveWindow;
 
 - (void)setActiveVideoPlayback:(BOOL)b_value;
 - (BOOL)activeVideoPlayback;

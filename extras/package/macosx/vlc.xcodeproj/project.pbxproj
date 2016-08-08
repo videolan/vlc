@@ -379,8 +379,8 @@
 		1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */; };
 		1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */ = {isa = PBXBuildFile; fileRef = E0382C00160BA09E0031D7FF /* ControlsBar.h */; };
 		1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = E0382C01160BA09E0031D7FF /* ControlsBar.m */; };
-		1CCB5F621A62A724004C3E90 /* ConvertAndSave.h in Sources */ = {isa = PBXBuildFile; fileRef = CC0663341566C34C003A411C /* ConvertAndSave.h */; };
-		1CCB5F631A62A724004C3E90 /* ConvertAndSave.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0663351566C34C003A411C /* ConvertAndSave.m */; };
+		1CCB5F621A62A724004C3E90 /* VLCConvertAndSaveWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC0663341566C34C003A411C /* VLCConvertAndSaveWindowController.h */; };
+		1CCB5F631A62A724004C3E90 /* VLCConvertAndSaveWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */; };
 		1CCB5F641A62A724004C3E90 /* VLCCoreDialogProvider.h in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */; };
 		1CCB5F651A62A724004C3E90 /* VLCCoreDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */; };
 		1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6013B68A0B009F72E0 /* CoreInteraction.h */; };
@@ -1476,8 +1476,8 @@
 		CC0586B714ACF7C000659A99 /* sidebar-pictures.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-pictures.png"; path = "Resources/sidebar-icons/sidebar-pictures.png"; sourceTree = "<group>"; };
 		CC0586B814ACF7C000659A99 /* sidebar-playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-playlist.png"; path = "Resources/sidebar-icons/sidebar-playlist.png"; sourceTree = "<group>"; };
 		CC0586B914ACF7C000659A99 /* sidebar-podcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-podcast.png"; path = "Resources/sidebar-icons/sidebar-podcast.png"; sourceTree = "<group>"; };
-		CC0663341566C34C003A411C /* ConvertAndSave.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ConvertAndSave.h; path = ../../../modules/gui/macosx/ConvertAndSave.h; sourceTree = SOURCE_ROOT; };
-		CC0663351566C34C003A411C /* ConvertAndSave.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = ConvertAndSave.m; path = ../../../modules/gui/macosx/ConvertAndSave.m; sourceTree = SOURCE_ROOT; };
+		CC0663341566C34C003A411C /* VLCConvertAndSaveWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = VLCConvertAndSaveWindowController.h; path = ../../../modules/gui/macosx/VLCConvertAndSaveWindowController.h; sourceTree = SOURCE_ROOT; };
+		CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = VLCConvertAndSaveWindowController.m; path = ../../../modules/gui/macosx/VLCConvertAndSaveWindowController.m; sourceTree = SOURCE_ROOT; };
 		CC0663381566CD5A003A411C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ConvertAndSave.xib; sourceTree = "<group>"; };
 		CC0CD0DF13DE0EAE00B0D90D /* PXSourceList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceList.h; path = ../../../modules/gui/macosx/PXSourceList.h; sourceTree = SOURCE_ROOT; };
 		CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PXSourceList.m; path = ../../../modules/gui/macosx/PXSourceList.m; sourceTree = SOURCE_ROOT; };
@@ -1881,8 +1881,8 @@
 				CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */,
 				E0382C00160BA09E0031D7FF /* ControlsBar.h */,
 				E0382C01160BA09E0031D7FF /* ControlsBar.m */,
-				CC0663341566C34C003A411C /* ConvertAndSave.h */,
-				CC0663351566C34C003A411C /* ConvertAndSave.m */,
+				CC0663341566C34C003A411C /* VLCConvertAndSaveWindowController.h */,
+				CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */,
 				CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */,
 				CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */,
 				CC448A6013B68A0B009F72E0 /* CoreInteraction.h */,
@@ -3963,8 +3963,8 @@
 				1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */,
 				1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */,
 				1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */,
-				1CCB5F621A62A724004C3E90 /* ConvertAndSave.h in Sources */,
-				1CCB5F631A62A724004C3E90 /* ConvertAndSave.m in Sources */,
+				1CCB5F621A62A724004C3E90 /* VLCConvertAndSaveWindowController.h in Sources */,
+				1CCB5F631A62A724004C3E90 /* VLCConvertAndSaveWindowController.m in Sources */,
 				1CCB5F641A62A724004C3E90 /* VLCCoreDialogProvider.h in Sources */,
 				1CCB5F651A62A724004C3E90 /* VLCCoreDialogProvider.m in Sources */,
 				1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */,

@@ -43,7 +43,7 @@
 #import "VLCMainWindow.h"
 #import "ControlsBar.h"
 #import "ExtensionsManager.h"
-#import "ConvertAndSave.h"
+#import "VLCConvertAndSaveWindowController.h"
 #import "VLCDebugMessageWindowController.h"
 #import "VLCAddonsWindowController.h"
 #import "VLCTimeSelectionPanelController.h"

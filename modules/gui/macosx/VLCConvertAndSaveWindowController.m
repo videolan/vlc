@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ConvertAndSave.m: MacOS X interface module
+ * VLCConvertAndSaveWindowController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2012 Felix Paul Kühne
  * $Id$
@@ -21,7 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "ConvertAndSave.h"
+#import "VLCConvertAndSaveWindowController.h"
+
 #import "intf.h"
 #import "VLCPlaylist.h"
 #import "misc.h"
@@ -47,7 +48,7 @@
 #define ASF 12
 /* 13-15 are present, but not set */
 
-@interface VLCConvertAndSave()
+@interface VLCConvertAndSaveWindowController()
 {
     NSArray *_videoCodecs;
     NSArray *_audioCodecs;
@@ -66,7 +67,7 @@
 - (void)recreateProfilePopup;
 @end
 
-@implementation VLCConvertAndSave
+@implementation VLCConvertAndSaveWindowController
 
 #pragma mark -
 #pragma mark Initialization

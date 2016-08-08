@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ConvertAndSave.h: MacOS X interface module
+ * VLCConvertAndSaveWindowController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2012 Felix Paul Kühne
  * $Id$
@@ -28,7 +28,7 @@
 @class VLCPopupPanelController;
 @class VLCTextfieldPanelController;
 
-@interface VLCConvertAndSave : NSWindowController
+@interface VLCConvertAndSaveWindowController : NSWindowController
 
 // main panel
 @property (weak) IBOutlet VLCDragDropView *dropBox;
