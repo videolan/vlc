@@ -26,7 +26,7 @@
 #import "VLCAddonsWindowController.h"
 #import "intf.h"
 #import "VLCMainWindow.h"
-#import "AddonListDataSource.h"
+#import "VLCAddonListItem.h"
 
 @interface VLCAddonsWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
@@ -152,7 +152,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
     if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
         return;
 
-    VLCAddon *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
+    VLCAddonListItem *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
     [self _installAddonWithID:[currentAddon uuid] type:[currentAddon type]];
 
     [_installButton setEnabled:NO];
@@ -164,7 +164,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
     if (selectedRow > _displayedAddons.count - 1 || selectedRow < 0)
         return;
 
-    VLCAddon *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
+    VLCAddonListItem *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
     [self _removeAddonWithID:[currentAddon uuid] type:[currentAddon type]];
 
     [_installButton setEnabled:NO];
@@ -201,7 +201,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
         return;
     }
 
-    VLCAddon *currentItem = [_displayedAddons objectAtIndex:selectedRow];
+    VLCAddonListItem *currentItem = [_displayedAddons objectAtIndex:selectedRow];
     [_name setStringValue:[currentItem name]];
     [_author setStringValue:[currentItem author]];
     [_version setStringValue:[currentItem version]];
@@ -234,7 +234,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
     addon_entry_t *p_entry = [o_value pointerValue];
     /* no skin support on OS X so far */
     if (p_entry->e_type != ADDON_SKIN2)
-        [_addons addObject:[[VLCAddon alloc] initWithAddon:p_entry]];
+        [_addons addObject:[[VLCAddonListItem alloc] initWithAddon:p_entry]];
 }
 
 - (void)discoveryEnded
@@ -262,7 +262,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
     NSUInteger count = _addons.count;
     NSMutableArray *filteredItems = [[NSMutableArray alloc] initWithCapacity:count];
     for (NSUInteger x = 0; x < count; x++) {
-        VLCAddon *currentItem = [_addons objectAtIndex:x];
+        VLCAddonListItem *currentItem = [_addons objectAtIndex:x];
         if (type != -1) {
             if ([currentItem type] == type) {
                 if (installedOnly) {

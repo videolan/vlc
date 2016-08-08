@@ -1,5 +1,5 @@
 /*****************************************************************************
- * AddonListDataSource.m: Addons manager for the Mac
+ * VLCAddonListItem.m: Addons manager for the Mac
  ****************************************************************************
  * Copyright (C) 2014 VideoLAN and authors
  * Authors:       Felix Paul Kühne <fkuehne # videolan.org>
@@ -21,16 +21,16 @@
  *****************************************************************************/
 
 #import "intf.h"
-#import "AddonListDataSource.h"
+#import "VLCAddonListItem.h"
 #import "StringUtility.h"
 
-@interface VLCAddon ()
+@interface VLCAddonListItem ()
 {
     addon_entry_t *p_addon_entry;
 }
 @end
 
-@implementation VLCAddon
+@implementation VLCAddonListItem
 
 - (id)initWithAddon:(addon_entry_t *)p_entry
 {

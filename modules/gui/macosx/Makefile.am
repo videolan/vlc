@@ -21,7 +21,7 @@ gui_LTLIBRARIES = $(LTLIBmacosx)
 libmacosx_plugin_la_SOURCES = \
 	helpers.h \
 	VLCAboutWindowController.h VLCAboutWindowController.m \
-	AddonListDataSource.h AddonListDataSource.m \
+	VLCAddonListItem.h VLCAddonListItem.m \
 	VLCAddonsWindowController.h VLCAddonsWindowController.m \
 	applescript.h applescript.m \
 	AppleRemote.h AppleRemote.m \
