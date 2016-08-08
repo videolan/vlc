@@ -64,7 +64,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCSimplePrefs;
 @class VLCPrefs;
 @class VLCCoreDialogProvider;
-@class VLCBookmarks;
+@class VLCBookmarksWindowController;
 @class VLCOpen;
 @class VLCDebugMessageVisualizer;
 @class VLCTrackSynchronization;
@@ -86,7 +86,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
 - (VLCMainMenu *)mainMenu;
 - (VLCMainWindow *)mainWindow;
-- (VLCBookmarks *)bookmarks;
+- (VLCBookmarksWindowController *)bookmarks;
 - (VLCOpen *)open;
 - (VLCSimplePrefs *)simplePreferences;
 - (VLCPrefs *)preferences;

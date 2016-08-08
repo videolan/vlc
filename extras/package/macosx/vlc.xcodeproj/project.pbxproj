@@ -374,8 +374,8 @@
 		1CCB5F581A62A724004C3E90 /* applescript.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6F7041643860059A3A7 /* applescript.m */; };
 		1CCB5F591A62A724004C3E90 /* AudioEffects.h in Sources */ = {isa = PBXBuildFile; fileRef = CC5560231365CDC700D54038 /* AudioEffects.h */; };
 		1CCB5F5A1A62A724004C3E90 /* AudioEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5560241365CDC800D54038 /* AudioEffects.m */; };
-		1CCB5F5B1A62A724004C3E90 /* bookmarks.h in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0708A5724D007B10AE /* bookmarks.h */; };
-		1CCB5F5C1A62A724004C3E90 /* bookmarks.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0608A5724D007B10AE /* bookmarks.m */; };
+		1CCB5F5B1A62A724004C3E90 /* VLCBookmarksWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0708A5724D007B10AE /* VLCBookmarksWindowController.h */; };
+		1CCB5F5C1A62A724004C3E90 /* VLCBookmarksWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */; };
 		1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */; };
 		1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */ = {isa = PBXBuildFile; fileRef = E0382C00160BA09E0031D7FF /* ControlsBar.h */; };
 		1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = E0382C01160BA09E0031D7FF /* ControlsBar.m */; };
@@ -1781,8 +1781,8 @@
 		DC1A176914E2778A001477C6 /* qtsound.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = qtsound.m; path = ../../../modules/access/qtsound.m; sourceTree = "<group>"; };
 		DCC8017816FCA036007FE736 /* avcapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = avcapture.m; path = ../../../modules/access/avcapture.m; sourceTree = "<group>"; };
 		DCC8017916FCA0DA007FE736 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		DCE7BD0608A5724D007B10AE /* bookmarks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = bookmarks.m; path = ../../../modules/gui/macosx/bookmarks.m; sourceTree = SOURCE_ROOT; };
-		DCE7BD0708A5724D007B10AE /* bookmarks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bookmarks.h; path = ../../../modules/gui/macosx/bookmarks.h; sourceTree = SOURCE_ROOT; };
+		DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCBookmarksWindowController.m; path = ../../../modules/gui/macosx/VLCBookmarksWindowController.m; sourceTree = SOURCE_ROOT; };
+		DCE7BD0708A5724D007B10AE /* VLCBookmarksWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCBookmarksWindowController.h; path = ../../../modules/gui/macosx/VLCBookmarksWindowController.h; sourceTree = SOURCE_ROOT; };
 		E0382C00160BA09E0031D7FF /* ControlsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ControlsBar.h; path = ../../../modules/gui/macosx/ControlsBar.h; sourceTree = SOURCE_ROOT; };
 		E0382C01160BA09E0031D7FF /* ControlsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ControlsBar.m; path = ../../../modules/gui/macosx/ControlsBar.m; sourceTree = SOURCE_ROOT; };
 		E06CF7F416020F6200C698B7 /* Windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Windows.h; path = ../../../modules/gui/macosx/Windows.h; sourceTree = SOURCE_ROOT; };
@@ -1876,8 +1876,8 @@
 				8E6BC6F7041643860059A3A7 /* applescript.m */,
 				CC5560231365CDC700D54038 /* AudioEffects.h */,
 				CC5560241365CDC800D54038 /* AudioEffects.m */,
-				DCE7BD0708A5724D007B10AE /* bookmarks.h */,
-				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
+				DCE7BD0708A5724D007B10AE /* VLCBookmarksWindowController.h */,
+				DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */,
 				CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */,
 				E0382C00160BA09E0031D7FF /* ControlsBar.h */,
 				E0382C01160BA09E0031D7FF /* ControlsBar.m */,
@@ -3958,8 +3958,8 @@
 				1CCB5F591A62A724004C3E90 /* AudioEffects.h in Sources */,
 				1CCB5F5A1A62A724004C3E90 /* AudioEffects.m in Sources */,
 				7D9516BA1C60B6AB00D14E1A /* VLCStatusBarIcon.m in Sources */,
-				1CCB5F5B1A62A724004C3E90 /* bookmarks.h in Sources */,
-				1CCB5F5C1A62A724004C3E90 /* bookmarks.m in Sources */,
+				1CCB5F5B1A62A724004C3E90 /* VLCBookmarksWindowController.h in Sources */,
+				1CCB5F5C1A62A724004C3E90 /* VLCBookmarksWindowController.m in Sources */,
 				1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */,
 				1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */,
 				1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */,

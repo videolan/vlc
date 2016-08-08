@@ -1,5 +1,5 @@
 /*****************************************************************************
- * bookmarks.m: MacOS X Bookmarks window
+ * VLCBookmarksWindowController.m: MacOS X Bookmarks window
  *****************************************************************************
  * Copyright (C) 2005 - 2015 VLC authors and VideoLAN
  * $Id$
@@ -34,16 +34,16 @@
  * Preamble
  *****************************************************************************/
 
-#import "bookmarks.h"
+#import "VLCBookmarksWindowController.h"
 #import "CompatibilityFixes.h"
 
-@interface VLCBookmarks() <NSTableViewDataSource, NSTableViewDelegate>
+@interface VLCBookmarksWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
     input_thread_t *p_old_input;
 }
 @end
 
-@implementation VLCBookmarks
+@implementation VLCBookmarksWindowController
 
 /*****************************************************************************
  * GUI methods

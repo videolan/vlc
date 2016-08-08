@@ -1,5 +1,5 @@
 /*****************************************************************************
- * bookmarks.h: MacOS X Bookmarks window
+ * VLCBookmarksWindowController.h: MacOS X Bookmarks window
  *****************************************************************************
  * Copyright (C) 2005, 2007, 2015 VLC authors and VideoLAN
  * $Id$
@@ -25,7 +25,7 @@
 #import "intf.h"
 #import <vlc_common.h>
 
-@interface VLCBookmarks : NSWindowController
+@interface VLCBookmarksWindowController : NSWindowController
 
 /* main window */
 @property (readwrite, weak) IBOutlet NSButton *addButton;

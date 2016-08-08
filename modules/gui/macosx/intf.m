@@ -51,7 +51,7 @@
 #import "VLCPlaylistInfo.h"
 #import "VLCPlaylistInfo.h"
 #import "open.h"
-#import "bookmarks.h"
+#import "VLCBookmarksWindowController.h"
 #import "VLCCoreDialogProvider.h"
 #import "simple_prefs.h"
 #import "CoreInteraction.h"
@@ -169,7 +169,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCSimplePrefs *_sprefs;
     VLCOpen *_open;
     VLCCoreDialogProvider *_coredialogs;
-    VLCBookmarks *_bookmarks;
+    VLCBookmarksWindowController *_bookmarks;
     VLCCoreInteraction *_coreinteraction;
     ResumeDialogController *_resume_dialog;
     VLCInputManager *_input_manager;
@@ -576,10 +576,10 @@ static VLCMain *sharedInstance = nil;
     return _currentMediaInfoPanel;
 }
 
-- (VLCBookmarks *)bookmarks
+- (VLCBookmarksWindowController *)bookmarks
 {
     if (!_bookmarks)
-        _bookmarks = [[VLCBookmarks alloc] init];
+        _bookmarks = [[VLCBookmarksWindowController alloc] init];
 
     return _bookmarks;
 }
