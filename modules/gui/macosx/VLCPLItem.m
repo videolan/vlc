@@ -1,5 +1,5 @@
 /*****************************************************************************
- * PLItem.m: MacOS X interface module
+ * VLCPLItem.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2014 VLC authors and VideoLAN
  * $Id$
@@ -19,14 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "PLItem.h"
+#import "VLCPLItem.h"
 
 #include <vlc_playlist.h>
 #include <vlc_input_item.h>
 
 #pragma mark -
 
-@implementation PLItem
+@implementation VLCPLItem
 
 - (id)initWithPlaylistItem:(playlist_item_t *)p_item;
 {
@@ -73,14 +73,14 @@
     [_children removeAllObjects];
 }
 
-- (void)addChild:(PLItem *)item atPos:(int)pos
+- (void)addChild:(VLCPLItem *)item atPos:(int)pos
 {
     [_children insertObject:item atIndex:pos];
     [item setParent: self];
 
 }
 
-- (void)deleteChild:(PLItem *)child
+- (void)deleteChild:(VLCPLItem *)child
 {
     [child setParent:nil];
     [_children removeObject:child];

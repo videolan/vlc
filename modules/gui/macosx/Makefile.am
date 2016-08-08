@@ -48,7 +48,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCPlaylistView.h VLCPlaylistView.m \
 	VLCPlaylist.h VLCPlaylist.m \
 	VLCPlaylistInfo.h VLCPlaylistInfo.m \
-	PLItem.h PLItem.m \
+	VLCPLItem.h VLCPLItem.m \
 	PLModel.h PLModel.m \
 	prefs.h prefs.m \
 	prefs_widgets.h prefs_widgets.m \

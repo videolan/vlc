@@ -258,7 +258,7 @@
 
 - (void)currentlyPlayingItemChanged
 {
-    PLItem *item = [[self model] currentlyPlayingItem];
+    VLCPLItem *item = [[self model] currentlyPlayingItem];
     if (!item)
         return;
 
@@ -267,7 +267,7 @@
     if (itemIndex < 0) {
         // expand if needed
         while (item != nil) {
-            PLItem *parent = [item parent];
+            VLCPLItem *parent = [item parent];
 
             if (![_outlineView isExpandable: parent])
                 break;
@@ -299,7 +299,7 @@
     if (sender == _outlineView && [_outlineView clickedRow] == -1)
         return;
 
-    PLItem *o_item = [_outlineView itemAtRow:[_outlineView selectedRow]];
+    VLCPLItem *o_item = [_outlineView itemAtRow:[_outlineView selectedRow]];
     if (!o_item)
         return;
 
@@ -319,7 +319,7 @@
     if (selectedRows.count < 1)
         return;
 
-    PLItem *o_item = [_outlineView itemAtRow:selectedRows.firstIndex];
+    VLCPLItem *o_item = [_outlineView itemAtRow:selectedRows.firstIndex];
 
     char *psz_url = input_item_GetURI([o_item input]);
     if (!psz_url)
@@ -348,7 +348,7 @@
     NSUInteger indexes[i_count];
     [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
     for (int i = 0; i < i_count; i++) {
-        PLItem *o_item = [_outlineView itemAtRow:indexes[i]];
+        VLCPLItem *o_item = [_outlineView itemAtRow:indexes[i]];
         [_outlineView deselectRow: indexes[i]];
 
         if (![o_item isLeaf]) {
@@ -376,7 +376,7 @@
     NSUInteger indexes[i_count];
     [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
     for (int i = 0; i < i_count; i++) {
-        PLItem *o_item = [_outlineView itemAtRow: indexes[i]];
+        VLCPLItem *o_item = [_outlineView itemAtRow: indexes[i]];
 
         if (![o_item isLeaf])
             continue;
@@ -504,7 +504,7 @@
         if (selectedRows.count != 1)
             return NO;
 
-        PLItem *o_item = [_outlineView itemAtRow:selectedRows.firstIndex];
+        VLCPLItem *o_item = [_outlineView itemAtRow:selectedRows.firstIndex];
 
         // Check if item exists in file system
         char *psz_url = input_item_GetURI([o_item input]);

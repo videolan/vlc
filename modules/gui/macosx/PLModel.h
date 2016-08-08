@@ -21,7 +21,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "PLItem.h"
+#import "VLCPLItem.h"
 
 #include <vlc_common.h>
 
@@ -49,7 +49,7 @@ typedef enum {
 
 @interface PLModel : NSObject<NSOutlineViewDataSource>
 
-@property(readonly) PLItem *rootItem;
+@property(readonly) VLCPLItem *rootItem;
 @property(readonly, copy) NSArray *draggedItems;
 
 - (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root;
@@ -69,7 +69,7 @@ typedef enum {
 
 - (void)updateItem:(input_item_t *)p_input_item;
 
-- (PLItem *)currentlyPlayingItem;
+- (VLCPLItem *)currentlyPlayingItem;
 
 - (void)playbackModeUpdated;
 
