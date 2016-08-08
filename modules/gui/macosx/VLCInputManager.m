@@ -1,5 +1,5 @@
 /*****************************************************************************
- * InputManager.m: MacOS X interface module
+ * VLCInputManager.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2015 VLC authors and VideoLAN
  * $Id$
@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "InputManager.h"
+#import "VLCInputManager.h"
 
 #import "CoreInteraction.h"
 #import "CompatibilityFixes.h"

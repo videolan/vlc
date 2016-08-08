@@ -1315,8 +1315,8 @@
 		7DE88F291831396A00CD9DA2 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistAccessoryView.xib; sourceTree = "<group>"; };
 		7DF0435E1972E26A0022B534 /* AddonListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonListDataSource.h; path = ../../../modules/gui/macosx/AddonListDataSource.h; sourceTree = SOURCE_ROOT; };
 		7DF0435F1972E26A0022B534 /* AddonListDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonListDataSource.m; path = ../../../modules/gui/macosx/AddonListDataSource.m; sourceTree = SOURCE_ROOT; };
-		7DF812ED1B555A340052293C /* InputManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InputManager.h; path = ../../../modules/gui/macosx/InputManager.h; sourceTree = "<group>"; };
-		7DF812EE1B555A340052293C /* InputManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InputManager.m; path = ../../../modules/gui/macosx/InputManager.m; sourceTree = "<group>"; };
+		7DF812ED1B555A340052293C /* VLCInputManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCInputManager.h; path = ../../../modules/gui/macosx/VLCInputManager.h; sourceTree = "<group>"; };
+		7DF812EE1B555A340052293C /* VLCInputManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCInputManager.m; path = ../../../modules/gui/macosx/VLCInputManager.m; sourceTree = "<group>"; };
 		7DF812EF1B555C8E0052293C /* KeyboardBacklight.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeyboardBacklight.h; path = ../../../modules/gui/macosx/KeyboardBacklight.h; sourceTree = "<group>"; };
 		7DF812F01B555C8E0052293C /* KeyboardBacklight.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeyboardBacklight.m; path = ../../../modules/gui/macosx/KeyboardBacklight.m; sourceTree = "<group>"; };
 		7DF812F11B5599E40052293C /* PLItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PLItem.h; path = ../../../modules/gui/macosx/PLItem.h; sourceTree = "<group>"; };
@@ -1898,8 +1898,8 @@
 				2AEF857609A5FEC900130822 /* fspanel.h */,
 				2AEF857709A5FEC900130822 /* fspanel.m */,
 				7D871D391B5E684D000B56C0 /* helpers.h */,
-				7DF812ED1B555A340052293C /* InputManager.h */,
-				7DF812EE1B555A340052293C /* InputManager.m */,
+				7DF812ED1B555A340052293C /* VLCInputManager.h */,
+				7DF812EE1B555A340052293C /* VLCInputManager.m */,
 				7D871D371B5E6844000B56C0 /* intf-prefs.h */,
 				7D871D381B5E6844000B56C0 /* intf-prefs.m */,
 				8ED6C27C03E2EB1C0059A3A7 /* intf.h */,

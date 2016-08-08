@@ -1,5 +1,5 @@
 /*****************************************************************************
- * InputManager.h: MacOS X interface module
+ * VLCInputManager.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2015 VLC authors and VideoLAN
  * $Id$

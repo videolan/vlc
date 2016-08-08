@@ -38,7 +38,6 @@ libmacosx_plugin_la_SOURCES = \
 	HelpWindowController.h HelpWindowController.m \
 	intf-prefs.h intf-prefs.m \
 	intf.h intf.m \
-	InputManager.h InputManager.m \
 	iTunes.h \
 	KeyboardBacklight.h KeyboardBacklight.m \
 	macosx.m \
@@ -79,6 +78,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCHUDCheckboxCell.h VLCHUDCheckboxCell.m \
 	VLCHUDRadiobuttonCell.h VLCHUDRadiobuttonCell.m \
 	VLCHUDTextFieldCell.h VLCHUDTextFieldCell.m \
+	VLCInputManager.h VLCInputManager.m \
 	VLCMainWindow.h VLCMainWindow.m \
 	VLCRendererDiscovery.h VLCRendererDiscovery.m \
 	VLCRendererItem.h VLCRendererItem.m \

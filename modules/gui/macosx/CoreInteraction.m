@@ -39,7 +39,7 @@
 #include <vlc_plugin.h>
 #import "SPMediaKeyTap.h"
 #import "AppleRemote.h"
-#import "InputManager.h"
+#import "VLCInputManager.h"
 
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)

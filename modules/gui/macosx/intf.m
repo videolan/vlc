@@ -43,7 +43,7 @@
 #include <vlc_variables.h>
 
 #import "CompatibilityFixes.h"
-#import "InputManager.h"
+#import "VLCInputManager.h"
 #import "MainMenu.h"
 #import "VideoView.h"
 #import "prefs.h"
