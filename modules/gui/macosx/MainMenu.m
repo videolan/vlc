@@ -45,7 +45,7 @@
 #import "ExtensionsManager.h"
 #import "ConvertAndSave.h"
 #import "VLCDebugMessageWindowController.h"
-#import "AddonsWindowController.h"
+#import "VLCAddonsWindowController.h"
 #import "VLCTimeSelectionPanelController.h"
 #import "VLCRendererDialog.h"
 
@@ -57,7 +57,7 @@
 {
     VLCAboutWindowController *_aboutWindowController;
     VLCHelpWindowController  *_helpWindowController;
-    AddonsWindowController *_addonsController;
+    VLCAddonsWindowController *_addonsController;
     VLCRendererDialog *_rendererDialog;
 
     NSMenu *_playlistTableColumnsContextMenu;
@@ -1200,7 +1200,7 @@
 - (IBAction)openAddonManager:(id)sender
 {
     if (!_addonsController)
-        _addonsController = [[AddonsWindowController alloc] init];
+        _addonsController = [[VLCAddonsWindowController alloc] init];
 
     [_addonsController showWindow:self];
 }

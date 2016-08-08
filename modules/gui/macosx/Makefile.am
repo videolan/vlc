@@ -22,7 +22,7 @@ libmacosx_plugin_la_SOURCES = \
 	helpers.h \
 	VLCAboutWindowController.h VLCAboutWindowController.m \
 	AddonListDataSource.h AddonListDataSource.m \
-	AddonsWindowController.h AddonsWindowController.m \
+	VLCAddonsWindowController.h VLCAddonsWindowController.m \
 	applescript.h applescript.m \
 	AppleRemote.h AppleRemote.m \
 	BWQuincyManager.h BWQuincyManager.m \

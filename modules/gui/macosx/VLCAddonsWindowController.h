@@ -1,5 +1,5 @@
 /*****************************************************************************
- * AddonManager.h: Addons manager for the Mac
+ * VLCAddonsWindowController.h: Addons manager for the Mac
  ****************************************************************************
  * Copyright (C) 2014 VideoLAN and authors
  * Author:       Felix Paul Kühne <fkuehne # videolan.org>
@@ -21,7 +21,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface AddonsWindowController : NSWindowController
+@interface VLCAddonsWindowController : NSWindowController
 {
     IBOutlet NSPopUpButton *_typeSwitcher;
     IBOutlet NSButton *_localAddonsOnlyCheckbox;

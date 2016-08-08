@@ -1,5 +1,5 @@
 /*****************************************************************************
- * AddonManager.m: Addons manager for the Mac
+ * VLCAddonsWindowController.m: Addons manager for the Mac
  ****************************************************************************
  * Copyright (C) 2014 VideoLAN and authors
  * Author:       Felix Paul Kühne <fkuehne # videolan.org>
@@ -23,12 +23,12 @@
 #import <vlc_events.h>
 #import <vlc_addons.h>
 
-#import "AddonsWindowController.h"
+#import "VLCAddonsWindowController.h"
 #import "intf.h"
 #import "VLCMainWindow.h"
 #import "AddonListDataSource.h"
 
-@interface AddonsWindowController() <NSTableViewDataSource, NSTableViewDelegate>
+@interface VLCAddonsWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
     addons_manager_t *_manager;
     NSMutableArray *_addons;
@@ -44,7 +44,7 @@
 
 static void addonsEventsCallback( const vlc_event_t *event, void *data )
 {
-    AddonsWindowController *controller = (__bridge AddonsWindowController *)data;
+    VLCAddonsWindowController *controller = (__bridge VLCAddonsWindowController *)data;
 
     @autoreleasepool {
         if (event->type == vlc_AddonFound)
@@ -56,7 +56,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
     }
 }
 
-@implementation AddonsWindowController
+@implementation VLCAddonsWindowController
 
 #pragma mark - object handling
 

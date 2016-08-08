@@ -368,8 +368,8 @@
 		1CC25CA81B2C585D0003F994 /* darwinvlc.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CC25CA71B2C585D0003F994 /* darwinvlc.m */; };
 		1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435E1972E26A0022B534 /* AddonListDataSource.h */; };
 		1CCB5F541A62A724004C3E90 /* AddonListDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435F1972E26A0022B534 /* AddonListDataSource.m */; };
-		1CCB5F551A62A724004C3E90 /* AddonsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5218ABD6380053B874 /* AddonsWindowController.h */; };
-		1CCB5F561A62A724004C3E90 /* AddonsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5318ABD6380053B874 /* AddonsWindowController.m */; };
+		1CCB5F551A62A724004C3E90 /* VLCAddonsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5218ABD6380053B874 /* VLCAddonsWindowController.h */; };
+		1CCB5F561A62A724004C3E90 /* VLCAddonsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5318ABD6380053B874 /* VLCAddonsWindowController.m */; };
 		1CCB5F571A62A724004C3E90 /* applescript.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6F6041643860059A3A7 /* applescript.h */; };
 		1CCB5F581A62A724004C3E90 /* applescript.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6F7041643860059A3A7 /* applescript.m */; };
 		1CCB5F591A62A724004C3E90 /* VLCAudioEffectsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC5560231365CDC700D54038 /* VLCAudioEffectsWindowController.h */; };
@@ -1306,8 +1306,8 @@
 		7D9516B91C60B6AB00D14E1A /* VLCStatusBarIcon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCStatusBarIcon.m; path = ../../../modules/gui/macosx/VLCStatusBarIcon.m; sourceTree = "<group>"; };
 		7DA481221B5FC13700917FD7 /* VLCPlaylistView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCPlaylistView.h; path = ../../../modules/gui/macosx/VLCPlaylistView.h; sourceTree = "<group>"; };
 		7DA481231B5FC13700917FD7 /* VLCPlaylistView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCPlaylistView.m; path = ../../../modules/gui/macosx/VLCPlaylistView.m; sourceTree = "<group>"; };
-		7DB65D5218ABD6380053B874 /* AddonsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonsWindowController.h; path = ../../../modules/gui/macosx/AddonsWindowController.h; sourceTree = SOURCE_ROOT; };
-		7DB65D5318ABD6380053B874 /* AddonsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonsWindowController.m; path = ../../../modules/gui/macosx/AddonsWindowController.m; sourceTree = SOURCE_ROOT; };
+		7DB65D5218ABD6380053B874 /* VLCAddonsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCAddonsWindowController.h; path = ../../../modules/gui/macosx/VLCAddonsWindowController.h; sourceTree = SOURCE_ROOT; };
+		7DB65D5318ABD6380053B874 /* VLCAddonsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCAddonsWindowController.m; path = ../../../modules/gui/macosx/VLCAddonsWindowController.m; sourceTree = SOURCE_ROOT; };
 		7DB65D5518ABD6490053B874 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AddonManager.xib; sourceTree = "<group>"; };
 		7DBB06631CC2314D004C74D2 /* caopengllayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = caopengllayer.m; path = ../../../modules/video_output/caopengllayer.m; sourceTree = "<group>"; };
 		7DD6EC0F1B58136D0047CF5C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/SimplePreferences.xib; sourceTree = "<group>"; };
@@ -1870,8 +1870,8 @@
 				1C67C8A41D58C0980079E1C1 /* VLCHelpWindowController.m */,
 				7DF0435E1972E26A0022B534 /* AddonListDataSource.h */,
 				7DF0435F1972E26A0022B534 /* AddonListDataSource.m */,
-				7DB65D5218ABD6380053B874 /* AddonsWindowController.h */,
-				7DB65D5318ABD6380053B874 /* AddonsWindowController.m */,
+				7DB65D5218ABD6380053B874 /* VLCAddonsWindowController.h */,
+				7DB65D5318ABD6380053B874 /* VLCAddonsWindowController.m */,
 				8E6BC6F6041643860059A3A7 /* applescript.h */,
 				8E6BC6F7041643860059A3A7 /* applescript.m */,
 				CC5560231365CDC700D54038 /* VLCAudioEffectsWindowController.h */,
@@ -3951,8 +3951,8 @@
 				1C15C7DD1B5146DB003AB729 /* VLCResumeDialogController.m in Sources */,
 				1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */,
 				1CCB5F541A62A724004C3E90 /* AddonListDataSource.m in Sources */,
-				1CCB5F551A62A724004C3E90 /* AddonsWindowController.h in Sources */,
-				1CCB5F561A62A724004C3E90 /* AddonsWindowController.m in Sources */,
+				1CCB5F551A62A724004C3E90 /* VLCAddonsWindowController.h in Sources */,
+				1CCB5F561A62A724004C3E90 /* VLCAddonsWindowController.m in Sources */,
 				1CCB5F571A62A724004C3E90 /* applescript.h in Sources */,
 				1CCB5F581A62A724004C3E90 /* applescript.m in Sources */,
 				1CCB5F591A62A724004C3E90 /* VLCAudioEffectsWindowController.h in Sources */,
