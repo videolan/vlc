@@ -2,7 +2,7 @@
 
 set -e
 
-VLC="./vlc --ignore-config"
+VLC="./vlc --ignore-config --rc-fake-tty"
 
 $VLC -H
 $VLC -Idummy vlc://quit
