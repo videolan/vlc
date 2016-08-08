@@ -1,5 +1,5 @@
 /*****************************************************************************
- * StringUtility.h: MacOS X interface module
+ * VLCStringUtility.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2014 VLC authors and VideoLAN
  * $Id$

@@ -421,8 +421,8 @@
 		1CCB5F861A62A724004C3E90 /* SharedDialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = CC461F6D160078340022423C /* SharedDialogs.m */; };
 		1CCB5F871A62A724004C3E90 /* simple_prefs.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5E0D54BBAE004D780C /* simple_prefs.h */; };
 		1CCB5F881A62A724004C3E90 /* simple_prefs.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5D0D54BBAE004D780C /* simple_prefs.m */; };
-		1CCB5F891A62A724004C3E90 /* StringUtility.h in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4615E7947F00F2FDC9 /* StringUtility.h */; };
-		1CCB5F8A1A62A724004C3E90 /* StringUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4715E7947F00F2FDC9 /* StringUtility.m */; };
+		1CCB5F891A62A724004C3E90 /* VLCStringUtility.h in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4615E7947F00F2FDC9 /* VLCStringUtility.h */; };
+		1CCB5F8A1A62A724004C3E90 /* VLCStringUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4715E7947F00F2FDC9 /* VLCStringUtility.m */; };
 		1CCB5F8B1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */; };
 		1CCB5F8C1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC4137464CD0003010A /* VLCTrackSynchronizationWindowController.m */; };
 		1CCB5F8D1A62A724004C3E90 /* VLCVideoEffectsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366D13817E4500694F2A /* VLCVideoEffectsWindowController.h */; };
@@ -1556,8 +1556,8 @@
 		CC206B5F14ACFEB8007935C6 /* topbar-dark-right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "topbar-dark-right.png"; path = "Resources/mainwindow_dark/topbar-dark-right.png"; sourceTree = SOURCE_ROOT; };
 		CC206B6314AD044A007935C6 /* lion-window-minimize-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-minimize-over.png"; sourceTree = "<group>"; };
 		CC206B6914AD0A52007935C6 /* window-resize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-resize.png"; path = "Resources/mainwindow_dark/window-resize.png"; sourceTree = "<group>"; };
-		CC269A4615E7947F00F2FDC9 /* StringUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringUtility.h; path = ../../../modules/gui/macosx/StringUtility.h; sourceTree = SOURCE_ROOT; };
-		CC269A4715E7947F00F2FDC9 /* StringUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = StringUtility.m; path = ../../../modules/gui/macosx/StringUtility.m; sourceTree = SOURCE_ROOT; };
+		CC269A4615E7947F00F2FDC9 /* VLCStringUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCStringUtility.h; path = ../../../modules/gui/macosx/VLCStringUtility.h; sourceTree = SOURCE_ROOT; };
+		CC269A4715E7947F00F2FDC9 /* VLCStringUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCStringUtility.m; path = ../../../modules/gui/macosx/VLCStringUtility.m; sourceTree = SOURCE_ROOT; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
 		CC3F2E8815F5038F009D7F39 /* playlist-1btn-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "playlist-1btn-pressed.png"; path = "Resources/mainwindow/playlist-1btn-pressed.png"; sourceTree = "<group>"; };
 		CC3F2E8915F5038F009D7F39 /* playlist-1btn-pressed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "playlist-1btn-pressed@2x.png"; path = "Resources/mainwindow/playlist-1btn-pressed@2x.png"; sourceTree = "<group>"; };
@@ -1936,8 +1936,8 @@
 				CC461F6D160078340022423C /* SharedDialogs.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
 				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
-				CC269A4615E7947F00F2FDC9 /* StringUtility.h */,
-				CC269A4715E7947F00F2FDC9 /* StringUtility.m */,
+				CC269A4615E7947F00F2FDC9 /* VLCStringUtility.h */,
+				CC269A4715E7947F00F2FDC9 /* VLCStringUtility.m */,
 				CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */,
 				CC707EC4137464CD0003010A /* VLCTrackSynchronizationWindowController.m */,
 				CCCE366D13817E4500694F2A /* VLCVideoEffectsWindowController.h */,
@@ -4017,8 +4017,8 @@
 				1CCB5F861A62A724004C3E90 /* SharedDialogs.m in Sources */,
 				1CCB5F871A62A724004C3E90 /* simple_prefs.h in Sources */,
 				1CCB5F881A62A724004C3E90 /* simple_prefs.m in Sources */,
-				1CCB5F891A62A724004C3E90 /* StringUtility.h in Sources */,
-				1CCB5F8A1A62A724004C3E90 /* StringUtility.m in Sources */,
+				1CCB5F891A62A724004C3E90 /* VLCStringUtility.h in Sources */,
+				1CCB5F8A1A62A724004C3E90 /* VLCStringUtility.m in Sources */,
 				1CCB5F8B1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.h in Sources */,
 				1CCB5F8C1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.m in Sources */,
 				6BBBB8B71D114628001BD9BA /* VLCRendererDiscovery.m in Sources */,

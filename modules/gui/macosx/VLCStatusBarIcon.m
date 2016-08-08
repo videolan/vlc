@@ -31,7 +31,7 @@
 #import <vlc_input.h>
 
 #import "VLCCoreInteraction.h"
-#import "StringUtility.h"
+#import "VLCStringUtility.h"
 
 @interface VLCStatusBarIcon ()
 {

@@ -22,7 +22,7 @@
 #import "VLCTimeSelectionPanelController.h"
 
 #import "misc.h"
-#import "StringUtility.h"
+#import "VLCStringUtility.h"
 
 @interface VLCTimeSelectionPanelController()
 {

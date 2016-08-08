@@ -42,7 +42,7 @@
 #import "VLCMainWindow.h"
 #import "VLCVoutWindowController.h"
 #import "VLCStatusBarIcon.h"
-#import "StringUtility.h"
+#import "VLCStringUtility.h"
 
 /*****************************************************************************
  * Local prototypes.

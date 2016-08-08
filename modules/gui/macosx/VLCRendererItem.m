@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #import "VLCRendererItem.h"
-#import "StringUtility.h"
+#import "VLCStringUtility.h"
 
 #include <vlc_common.h>
 #include <vlc_renderer_discovery.h>

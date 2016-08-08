@@ -1,5 +1,5 @@
 /*****************************************************************************
- * StringUtility.m: MacOS X interface module
+ * VLCStringUtility.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2014 VLC authors and VideoLAN
  * $Id$
@@ -24,8 +24,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import "VLCStringUtility.h"
+
 #import "intf.h"
-#import "StringUtility.h"
 #import "CompatibilityFixes.h"
 
 #import <IOKit/storage/IOMedia.h>

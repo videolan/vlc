@@ -24,7 +24,7 @@
 #import "misc.h"    /* VLCByteCountFormatter */
 
 #import "VLCPlaylist.h"
-#import "StringUtility.h"
+#import "VLCStringUtility.h"
 #import "intf.h"
 #import "ControlsBar.h"
 #import "VLCMainMenu.h"
