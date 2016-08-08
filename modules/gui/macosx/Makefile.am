@@ -64,7 +64,6 @@ libmacosx_plugin_la_SOURCES = \
 	SPMediaKeyTap.h SPMediaKeyTap.m \
 	Spotify.h \
 	StringUtility.h StringUtility.m \
-	TrackSynchronization.h TrackSynchronization.m \
 	VideoView.h VideoView.m \
 	VLCTimeSelectionPanelController.h VLCTimeSelectionPanelController.m \
 	VLCUIWidgets.h VLCUIWidgets.m \
@@ -85,4 +84,5 @@ libmacosx_plugin_la_SOURCES = \
 	VLCRendererItem.h VLCRendererItem.m \
 	VLCRendererDialog.h VLCRendererDialog.m \
 	VLCResumeDialogController.h VLCResumeDialogController.m \
+	VLCTrackSynchronizationWindowController.h VLCTrackSynchronizationWindowController.m \
 	VLCVideoEffectsWindowController.h VLCVideoEffectsWindowController.m

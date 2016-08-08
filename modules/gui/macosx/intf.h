@@ -67,7 +67,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCBookmarksWindowController;
 @class VLCOpen;
 @class VLCDebugMessageVisualizer;
-@class VLCTrackSynchronization;
+@class VLCTrackSynchronizationWindowController;
 @class VLCAudioEffectsWindowController;
 @class VLCVideoEffectsWindowController;
 @class VLCConvertAndSave;
@@ -99,7 +99,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
 - (VLCDebugMessageVisualizer *)debugMsgPanel;
 
-- (VLCTrackSynchronization *)trackSyncPanel;
+- (VLCTrackSynchronizationWindowController *)trackSyncPanel;
 - (VLCAudioEffectsWindowController *)audioEffectsPanel;
 - (VLCVideoEffectsWindowController *)videoEffectsPanel;
 

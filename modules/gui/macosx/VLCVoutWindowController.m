@@ -34,7 +34,7 @@
 #import "VLCAudioEffectsWindowController.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCBookmarksWindowController.h"
-#import "TrackSynchronization.h"
+#import "VLCTrackSynchronizationWindowController.h"
 #import "VLCResumeDialogController.h"
 #import "VLCPlaylist.h"
 

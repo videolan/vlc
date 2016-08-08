@@ -31,7 +31,7 @@
 #import "AboutWindowController.h"
 #import "open.h"
 #import "VLCAudioEffectsWindowController.h"
-#import "TrackSynchronization.h"
+#import "VLCTrackSynchronizationWindowController.h"
 #import "HelpWindowController.h"
 #import "VLCVideoEffectsWindowController.h"
 #import "VLCBookmarksWindowController.h"

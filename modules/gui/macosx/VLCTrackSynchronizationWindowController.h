@@ -1,5 +1,5 @@
 /*****************************************************************************
- * TrackSynchronization.h: MacOS X interface module
+ * VLCTrackSynchronizationWindowController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2011-2012 VLC authors and VideoLAN
  * Copyright (C) 2011-2015 Felix Paul Kühne
@@ -24,7 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCTrackSynchronization : NSWindowController
+@interface VLCTrackSynchronizationWindowController : NSWindowController
 
 /* generic */
 @property (readwrite, weak) IBOutlet NSButton *resetButton;

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * TrackSynchronization.m: MacOS X interface module
+ * VLCTrackSynchronizationWindowController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2011-2014 VLC authors and VideoLAN
  * Copyright (C) 2011-2015 Felix Paul Kühne
@@ -25,7 +25,7 @@
 #import "CompatibilityFixes.h"
 #import "intf.h"
 #import <vlc_common.h>
-#import "TrackSynchronization.h"
+#import "VLCTrackSynchronizationWindowController.h"
 #import "CoreInteraction.h"
 
 #define SUBSDELAY_CFG_MODE                     "subsdelay-mode"
@@ -34,7 +34,7 @@
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY   1
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT 2
 
-@implementation VLCTrackSynchronization
+@implementation VLCTrackSynchronizationWindowController
 
 - (id)init
 {

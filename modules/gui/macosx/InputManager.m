@@ -30,7 +30,7 @@
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCResumeDialogController.h"
-#import "TrackSynchronization.h"
+#import "VLCTrackSynchronizationWindowController.h"
 #import "VideoView.h"
 
 #import "iTunes.h"

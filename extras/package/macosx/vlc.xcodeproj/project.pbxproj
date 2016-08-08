@@ -420,8 +420,8 @@
 		1CCB5F881A62A724004C3E90 /* simple_prefs.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5D0D54BBAE004D780C /* simple_prefs.m */; };
 		1CCB5F891A62A724004C3E90 /* StringUtility.h in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4615E7947F00F2FDC9 /* StringUtility.h */; };
 		1CCB5F8A1A62A724004C3E90 /* StringUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4715E7947F00F2FDC9 /* StringUtility.m */; };
-		1CCB5F8B1A62A724004C3E90 /* TrackSynchronization.h in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC3137464CD0003010A /* TrackSynchronization.h */; };
-		1CCB5F8C1A62A724004C3E90 /* TrackSynchronization.m in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC4137464CD0003010A /* TrackSynchronization.m */; };
+		1CCB5F8B1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */; };
+		1CCB5F8C1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC4137464CD0003010A /* VLCTrackSynchronizationWindowController.m */; };
 		1CCB5F8D1A62A724004C3E90 /* VLCVideoEffectsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366D13817E4500694F2A /* VLCVideoEffectsWindowController.h */; };
 		1CCB5F8E1A62A724004C3E90 /* VLCVideoEffectsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366E13817E4500694F2A /* VLCVideoEffectsWindowController.m */; };
 		1CCB5F8F1A62A724004C3E90 /* VideoView.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCCDCA01413E1C000FE3DE1 /* VideoView.h */; };
@@ -1593,8 +1593,8 @@
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
 		CC6EDD4F0B9CA2140096068A /* VLCEyeTvController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCEyeTvController.h; path = ../../../modules/gui/macosx/VLCEyeTvController.h; sourceTree = SOURCE_ROOT; };
 		CC6EDD500B9CA2140096068A /* VLCEyeTvController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCEyeTvController.m; path = ../../../modules/gui/macosx/VLCEyeTvController.m; sourceTree = SOURCE_ROOT; };
-		CC707EC3137464CD0003010A /* TrackSynchronization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackSynchronization.h; path = ../../../modules/gui/macosx/TrackSynchronization.h; sourceTree = SOURCE_ROOT; };
-		CC707EC4137464CD0003010A /* TrackSynchronization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackSynchronization.m; path = ../../../modules/gui/macosx/TrackSynchronization.m; sourceTree = SOURCE_ROOT; };
+		CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCTrackSynchronizationWindowController.h; path = ../../../modules/gui/macosx/VLCTrackSynchronizationWindowController.h; sourceTree = SOURCE_ROOT; };
+		CC707EC4137464CD0003010A /* VLCTrackSynchronizationWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCTrackSynchronizationWindowController.m; path = ../../../modules/gui/macosx/VLCTrackSynchronizationWindowController.m; sourceTree = SOURCE_ROOT; };
 		CC772DAC10E621C100675C9B /* VLCProgressPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCProgressPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.h; sourceTree = SOURCE_ROOT; };
 		CC772DAD10E621C100675C9B /* VLCProgressPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCProgressPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.m; sourceTree = SOURCE_ROOT; };
 		CC79F66614014FC30015D89E /* opengl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = opengl.h; path = ../../../modules/video_output/opengl.h; sourceTree = "<group>"; };
@@ -1935,8 +1935,8 @@
 				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
 				CC269A4615E7947F00F2FDC9 /* StringUtility.h */,
 				CC269A4715E7947F00F2FDC9 /* StringUtility.m */,
-				CC707EC3137464CD0003010A /* TrackSynchronization.h */,
-				CC707EC4137464CD0003010A /* TrackSynchronization.m */,
+				CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */,
+				CC707EC4137464CD0003010A /* VLCTrackSynchronizationWindowController.m */,
 				CCCE366D13817E4500694F2A /* VLCVideoEffectsWindowController.h */,
 				CCCE366E13817E4500694F2A /* VLCVideoEffectsWindowController.m */,
 				CCCCDCA01413E1C000FE3DE1 /* VideoView.h */,
@@ -4013,8 +4013,8 @@
 				1CCB5F881A62A724004C3E90 /* simple_prefs.m in Sources */,
 				1CCB5F891A62A724004C3E90 /* StringUtility.h in Sources */,
 				1CCB5F8A1A62A724004C3E90 /* StringUtility.m in Sources */,
-				1CCB5F8B1A62A724004C3E90 /* TrackSynchronization.h in Sources */,
-				1CCB5F8C1A62A724004C3E90 /* TrackSynchronization.m in Sources */,
+				1CCB5F8B1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.h in Sources */,
+				1CCB5F8C1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.m in Sources */,
 				6BBBB8B71D114628001BD9BA /* VLCRendererDiscovery.m in Sources */,
 				1CCB5F8D1A62A724004C3E90 /* VLCVideoEffectsWindowController.h in Sources */,
 				1CCB5F8E1A62A724004C3E90 /* VLCVideoEffectsWindowController.m in Sources */,

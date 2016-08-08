@@ -55,7 +55,7 @@
 #import "VLCCoreDialogProvider.h"
 #import "simple_prefs.h"
 #import "CoreInteraction.h"
-#import "TrackSynchronization.h"
+#import "VLCTrackSynchronizationWindowController.h"
 #import "ExtensionsManager.h"
 #import "BWQuincyManager.h"
 #import "VLCResumeDialogController.h"
@@ -176,7 +176,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCPlaylist *_playlist;
     VLCDebugMessageVisualizer *_messagePanelController;
     VLCStatusBarIcon *_statusBarIcon;
-    VLCTrackSynchronization *_trackSyncPanel;
+    VLCTrackSynchronizationWindowController *_trackSyncPanel;
     VLCAudioEffectsWindowController *_audioEffectsPanel;
     VLCVideoEffectsWindowController *_videoEffectsPanel;
     VLCConvertAndSave *_convertAndSaveWindow;
@@ -544,10 +544,10 @@ static VLCMain *sharedInstance = nil;
     return _messagePanelController;
 }
 
-- (VLCTrackSynchronization *)trackSyncPanel
+- (VLCTrackSynchronizationWindowController *)trackSyncPanel
 {
     if (!_trackSyncPanel)
-        _trackSyncPanel = [[VLCTrackSynchronization alloc] init];
+        _trackSyncPanel = [[VLCTrackSynchronizationWindowController alloc] init];
 
     return _trackSyncPanel;
 }
