@@ -47,7 +47,7 @@ typedef enum {
     ROOT_TYPE_OTHER
 } PLRootType;
 
-@interface PLModel : NSObject<NSOutlineViewDataSource>
+@interface VLCPLModel : NSObject<NSOutlineViewDataSource>
 
 @property(readonly) VLCPLItem *rootItem;
 @property(readonly, copy) NSArray *draggedItems;

@@ -40,7 +40,7 @@
 #import <vlc_url.h>
 #import <vlc_strings.h>
 #import <vlc_services_discovery.h>
-#import "PLModel.h"
+#import "VLCPLModel.h"
 
 #import "PXSourceList.h"
 #import "PXSourceListDataSource.h"

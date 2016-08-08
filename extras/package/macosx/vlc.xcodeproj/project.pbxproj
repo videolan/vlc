@@ -29,8 +29,8 @@
 		1C67C8A51D58C0980079E1C1 /* VLCHelpWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A41D58C0980079E1C1 /* VLCHelpWindowController.m */; };
 		1C67C8A81D58C0A40079E1C1 /* VLCAboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */; };
 		1C67C8A91D58EC1B0079E1C1 /* VLCPLItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F21B5599E40052293C /* VLCPLItem.m */; };
-		1C67C8AA1D58EC1E0079E1C1 /* PLModel.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F31B5599E40052293C /* PLModel.h */; };
-		1C67C8AB1D58EC290079E1C1 /* PLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F41B5599E40052293C /* PLModel.m */; };
+		1C67C8AA1D58EC1E0079E1C1 /* VLCPLModel.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F31B5599E40052293C /* VLCPLModel.h */; };
+		1C67C8AB1D58EC290079E1C1 /* VLCPLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F41B5599E40052293C /* VLCPLModel.m */; };
 		1C88BA5419DC7B2200645190 /* yosemite-window-close-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */; };
 		1C88BA5519DC7B2200645190 /* yosemite-window-close-graphite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */; };
 		1C88BA5619DC7B2200645190 /* yosemite-window-close-on-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2619DC7B2200645190 /* yosemite-window-close-on-graphite.png */; };
@@ -1324,8 +1324,8 @@
 		7DF812F01B555C8E0052293C /* KeyboardBacklight.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeyboardBacklight.m; path = ../../../modules/gui/macosx/KeyboardBacklight.m; sourceTree = "<group>"; };
 		7DF812F11B5599E40052293C /* VLCPLItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCPLItem.h; path = ../../../modules/gui/macosx/VLCPLItem.h; sourceTree = "<group>"; };
 		7DF812F21B5599E40052293C /* VLCPLItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCPLItem.m; path = ../../../modules/gui/macosx/VLCPLItem.m; sourceTree = "<group>"; };
-		7DF812F31B5599E40052293C /* PLModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PLModel.h; path = ../../../modules/gui/macosx/PLModel.h; sourceTree = "<group>"; };
-		7DF812F41B5599E40052293C /* PLModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PLModel.m; path = ../../../modules/gui/macosx/PLModel.m; sourceTree = "<group>"; };
+		7DF812F31B5599E40052293C /* VLCPLModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCPLModel.h; path = ../../../modules/gui/macosx/VLCPLModel.h; sourceTree = "<group>"; };
+		7DF812F41B5599E40052293C /* VLCPLModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCPLModel.m; path = ../../../modules/gui/macosx/VLCPLModel.m; sourceTree = "<group>"; };
 		7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark.png"; sourceTree = "<group>"; };
 		7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark@2x.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark@2x.png"; sourceTree = "<group>"; };
 		8E49720006417F6800370C9F /* VLCPlaylistInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCPlaylistInfo.h; path = ../../../modules/gui/macosx/VLCPlaylistInfo.h; sourceTree = SOURCE_ROOT; };
@@ -1924,8 +1924,8 @@
 				8E55FB800459B0FD00FB3317 /* VLCOutput.m */,
 				7DF812F11B5599E40052293C /* VLCPLItem.h */,
 				7DF812F21B5599E40052293C /* VLCPLItem.m */,
-				7DF812F31B5599E40052293C /* PLModel.h */,
-				7DF812F41B5599E40052293C /* PLModel.m */,
+				7DF812F31B5599E40052293C /* VLCPLModel.h */,
+				7DF812F41B5599E40052293C /* VLCPLModel.m */,
 				8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */,
 				8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */,
 				8ED6C28503E2EB1C0059A3A7 /* prefs.h */,
@@ -3961,8 +3961,8 @@
 				1CCB5F591A62A724004C3E90 /* VLCAudioEffectsWindowController.h in Sources */,
 				1CCB5F5A1A62A724004C3E90 /* VLCAudioEffectsWindowController.m in Sources */,
 				1C67C8A91D58EC1B0079E1C1 /* VLCPLItem.m in Sources */,
-				1C67C8AA1D58EC1E0079E1C1 /* PLModel.h in Sources */,
-				1C67C8AB1D58EC290079E1C1 /* PLModel.m in Sources */,
+				1C67C8AA1D58EC1E0079E1C1 /* VLCPLModel.h in Sources */,
+				1C67C8AB1D58EC290079E1C1 /* VLCPLModel.m in Sources */,
 				7D9516BA1C60B6AB00D14E1A /* VLCStatusBarIcon.m in Sources */,
 				1CCB5F5B1A62A724004C3E90 /* VLCBookmarksWindowController.h in Sources */,
 				1CCB5F5C1A62A724004C3E90 /* VLCBookmarksWindowController.m in Sources */,

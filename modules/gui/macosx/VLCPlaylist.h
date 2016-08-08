@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 #import "PXSourceList.h"
-#import "PLModel.h"
+#import "VLCPLModel.h"
 #import "VLCPlaylistView.h"
 
 @interface VLCPlaylist : NSResponder<NSOutlineViewDelegate>
@@ -45,7 +45,7 @@
 @property (nonatomic, readwrite, weak) VLCPlaylistView *outlineView;
 @property (nonatomic, readwrite, weak) NSTableHeaderView *playlistHeaderView;
 
-- (PLModel *)model;
+- (VLCPLModel *)model;
 
 - (void)reloadStyles;
 

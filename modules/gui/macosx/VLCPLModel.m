@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "PLModel.h"
+#import "VLCPLModel.h"
 
 #import "misc.h"    /* VLCByteCountFormatter */
 
@@ -45,7 +45,7 @@ static int VLCPLItemUpdated(vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     @autoreleasepool {
-        PLModel *model = (__bridge PLModel*)param;
+        VLCPLModel *model = (__bridge VLCPLModel*)param;
         [model performSelectorOnMainThread:@selector(VLCPLItemUpdated) withObject:nil waitUntilDone:NO];
 
         return VLC_SUCCESS;
@@ -58,7 +58,7 @@ static int VLCPLItemAppended(vlc_object_t *p_this, const char *psz_var,
     @autoreleasepool {
         playlist_add_t *p_add = new_val.p_address;
         NSArray *o_val = [NSArray arrayWithObjects:[NSNumber numberWithInt:p_add->i_node], [NSNumber numberWithInt:p_add->i_item], nil];
-        PLModel *model = (__bridge PLModel*)param;
+        VLCPLModel *model = (__bridge VLCPLModel*)param;
         [model performSelectorOnMainThread:@selector(VLCPLItemAppended:) withObject:o_val waitUntilDone:NO];
 
         return VLC_SUCCESS;
@@ -70,7 +70,7 @@ static int VLCPLItemRemoved(vlc_object_t *p_this, const char *psz_var,
 {
     @autoreleasepool {
         NSNumber *o_val = [NSNumber numberWithInt:new_val.i_int];
-        PLModel *model = (__bridge PLModel*)param;
+        VLCPLModel *model = (__bridge VLCPLModel*)param;
         [model performSelectorOnMainThread:@selector(VLCPLItemRemoved:) withObject:o_val waitUntilDone:NO];
 
         return VLC_SUCCESS;
@@ -81,7 +81,7 @@ static int PlaybackModeUpdated(vlc_object_t *p_this, const char *psz_var,
                                vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     @autoreleasepool {
-        PLModel *model = (__bridge PLModel*)param;
+        VLCPLModel *model = (__bridge VLCPLModel*)param;
         [model performSelectorOnMainThread:@selector(playbackModeUpdated) withObject:nil waitUntilDone:NO];
 
         return VLC_SUCCESS;
@@ -102,7 +102,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
 #pragma mark -
 
-@interface PLModel ()
+@interface VLCPLModel ()
 {
     playlist_t *p_playlist;
     __weak NSOutlineView *_outlineView;
@@ -111,7 +111,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 }
 @end
 
-@implementation PLModel
+@implementation VLCPLModel
 
 #pragma mark -
 #pragma mark Init and Stuff
@@ -467,7 +467,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 #pragma mark -
 #pragma mark Outline view data source
 
-@implementation PLModel(NSOutlineViewDataSource)
+@implementation VLCPLModel(NSOutlineViewDataSource)
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {

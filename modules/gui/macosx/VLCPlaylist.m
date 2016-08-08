@@ -76,7 +76,7 @@
 
     BOOL b_playlistmenu_nib_loaded;
 
-    PLModel *_model;
+    VLCPLModel *_model;
 
     // information for playlist table columns menu
 
@@ -141,7 +141,7 @@
     [defaults registerDefaults:appDefaults];
 }
 
-- (PLModel *)model
+- (VLCPLModel *)model
 {
     return _model;
 }
@@ -178,7 +178,7 @@
 
     playlist_t * p_playlist = pl_Get(getIntf());
 
-    _model = [[PLModel alloc] initWithOutlineView:_outlineView playlist:p_playlist rootItem:p_playlist->p_playing];
+    _model = [[VLCPLModel alloc] initWithOutlineView:_outlineView playlist:p_playlist rootItem:p_playlist->p_playing];
     [_outlineView setDataSource:_model];
     [_outlineView reloadData];
 
