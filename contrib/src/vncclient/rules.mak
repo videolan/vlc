@@ -35,4 +35,5 @@ DEPS_vncclient = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png) gnutls 
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-libva
 	cd $< && $(MAKE) -C libvncclient install
 	cd $< && $(MAKE) install-data
+	rm $(PREFIX)/lib/pkgconfig/libvncserver.pc
 	touch $@
