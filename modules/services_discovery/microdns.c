@@ -504,10 +504,13 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
             break;
         }
 
-        if( strcmp( p_srv->psz_protocol, "chromecast" ) == 0
-         && ( psz_model == NULL
-           || strcasecmp( psz_model, "Chromecast Audio" ) != 0 ) )
-            p_srv->i_renderer_flags |= VLC_RENDERER_CAN_VIDEO;
+        if( strcmp( p_srv->psz_protocol, "chromecast" ) == 0)
+        {
+            if ( psz_model == NULL
+                || strcasecmp( psz_model, "Chromecast Audio" ) != 0 )
+                p_srv->i_renderer_flags |= VLC_RENDERER_CAN_VIDEO;
+            psz_demux_filter = "cc_demux";
+        }
 
         items_add_renderer( p_sys, p_rd, p_srv->psz_device_name, psz_uri,
                             psz_demux_filter, psz_icon_uri,
