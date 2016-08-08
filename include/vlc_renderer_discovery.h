@@ -48,6 +48,7 @@
  * @param psz_uri uri of the renderer item, must contains a valid protocol and
  * a valid host
  * @param psz_extra_sout extra sout options
+ * @param psz_demux_filter demux filter to use with the renderer
  * @param psz_icon_uri icon uri of the renderer item
  * @param i_flags flags for the item
  * @return a renderer item or NULL in case of error
@@ -55,7 +56,8 @@
 VLC_API vlc_renderer_item_t *
 vlc_renderer_item_new(const char *psz_type, const char *psz_name,
                       const char *psz_uri, const char *psz_extra_sout,
-                      const char *psz_icon_uri, int i_flags) VLC_USED;
+                      const char *psz_demux_filter, const char *psz_icon_uri,
+                      int i_flags) VLC_USED;
 
 /**
  * Hold a renderer item, i.e. creates a new reference
@@ -81,6 +83,12 @@ vlc_renderer_item_name(const vlc_renderer_item_t *p_item);
  */
 VLC_API const char *
 vlc_renderer_item_type(const vlc_renderer_item_t *p_item);
+
+/**
+ * Get the demux filter to use with a renderer item
+ */
+VLC_API const char *
+vlc_renderer_item_demux_filter(const vlc_renderer_item_t *p_item);
 
 /**
  * Get the sout command of a renderer item

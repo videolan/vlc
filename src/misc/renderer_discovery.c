@@ -38,6 +38,7 @@ struct vlc_renderer_item_t
     char *psz_type;
     char *psz_sout;
     char *psz_icon_uri;
+    char *psz_demux_filter;
     int i_flags;
     atomic_uint refs;
 };
@@ -49,13 +50,15 @@ item_free(vlc_renderer_item_t *p_item)
     free(p_item->psz_type);
     free(p_item->psz_sout);
     free(p_item->psz_icon_uri);
+    free(p_item->psz_demux_filter);
     free(p_item);
 }
 
 vlc_renderer_item_t *
 vlc_renderer_item_new(const char *psz_type, const char *psz_name,
                       const char *psz_uri, const char *psz_extra_sout,
-                      const char *psz_icon_uri, int i_flags)
+                      const char *psz_demux_filter, const char *psz_icon_uri,
+                      int i_flags)
 {
     assert(psz_uri != NULL);
     vlc_renderer_item_t *p_item = NULL;
@@ -87,6 +90,9 @@ vlc_renderer_item_new(const char *psz_type, const char *psz_name,
         goto error;
 
     if ((p_item->psz_icon_uri = strdup(psz_icon_uri)) == NULL)
+        goto error;
+
+    if ((p_item->psz_demux_filter = strdup(psz_demux_filter)) == NULL)
         goto error;
 
     p_item->i_flags = i_flags;
@@ -131,6 +137,14 @@ vlc_renderer_item_icon_uri(const vlc_renderer_item_t *p_item)
     assert(p_item != NULL);
 
     return p_item->psz_icon_uri;
+}
+
+const char *
+vlc_renderer_item_demux_filter(const vlc_renderer_item_t *p_item)
+{
+    assert(p_item != NULL);
+
+    return p_item->psz_demux_filter;
 }
 
 int
