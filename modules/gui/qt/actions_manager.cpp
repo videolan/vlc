@@ -235,13 +235,14 @@ bool ActionsManager::isItemSout( QVariant & m_obj, const char *psz_sout, bool as
 {
     if ( psz_sout == NULL )
         return false;
-    if (!m_obj.canConvert<QString>())
+    if (!m_obj.canConvert<QVariantHash>())
         return false;
 
+    QVariantHash hash = m_obj.value<QVariantHash>();
     QString renderer(psz_sout);
     if ( as_output && renderer.at(0) == '#' )
         renderer = renderer.right( renderer.length() - 1 );
-    return QString::compare( m_obj.toString(), renderer, Qt::CaseInsensitive) == 0;
+    return QString::compare( hash["sout"].toString(), renderer, Qt::CaseInsensitive) == 0;
 }
 
 void ActionsManager::renderer_event_received( const vlc_event_t * p_event, void * user_data )
@@ -265,7 +266,10 @@ void ActionsManager::renderer_event_received( const vlc_event_t * p_event, void 
                 return; /* we already have this item */
         }
 
-        QVariant data(vlc_renderer_item_sout( p_item ));
+        QHash<QString,QVariant> itemData;
+        itemData.insert("sout", vlc_renderer_item_sout( p_item ));
+        itemData.insert("filter", vlc_renderer_item_demux_filter( p_item ));
+        QVariant data(itemData);
 
         QAction *action = new QAction( vlc_renderer_item_flags(p_item) & VLC_RENDERER_CAN_VIDEO ? QIcon( ":/sidebar/movie" ) : QIcon( ":/sidebar/music" ),
                                        vlc_renderer_item_name(p_item), VLCMenuBar::rendererMenu );
@@ -300,7 +304,7 @@ void ActionsManager::ScanRendererAction(bool checked)
         foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
         {
             QVariant data = action->data();
-            if (!data.canConvert<QString>())
+            if (!data.canConvert<QVariantHash>())
                 continue;
             VLCMenuBar::rendererMenu->removeAction(action);
             VLCMenuBar::rendererGroup->removeAction(action);
@@ -310,7 +314,7 @@ void ActionsManager::ScanRendererAction(bool checked)
         {
             foreach (QAction* action, VLCMenuBar::rendererMenu->actions())
             {
-                if (!action->data().canConvert<QString>())
+                if (!action->data().canConvert<QVariantHash>())
                     continue;
                 if (!action->isSeparator())
                     action->setChecked(true);
@@ -371,14 +375,17 @@ void ActionsManager::ScanRendererAction(bool checked)
 
 void ActionsManager::RendererSelected( QAction *selected )
 {
-    QString s_sout;
+    QString s_sout, s_demux_filter;
     QVariant data = selected->data();
-    if (data.canConvert<QString>())
+    if (data.canConvert<QVariantHash>())
     {
+        QVariantHash hash = data.value<QVariantHash>();
         s_sout.append('#');
-        s_sout.append(data.toString());
+        s_sout.append(hash["sout"].toString());
+        s_demux_filter.append(hash["filter"].toString());
     }
     msg_Dbg( p_intf, "using sout: '%s'", s_sout.toUtf8().constData() );
     var_SetString( THEPL, "sout", s_sout.toUtf8().constData() );
+    var_SetString( THEPL, "demux-filter", s_demux_filter.toUtf8().constData() );
 }
 
