@@ -32,7 +32,7 @@
 #import "open.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "VLCTrackSynchronizationWindowController.h"
-#import "HelpWindowController.h"
+#import "VLCHelpWindowController.h"
 #import "VLCVideoEffectsWindowController.h"
 #import "VLCBookmarksWindowController.h"
 #import "simple_prefs.h"
@@ -56,7 +56,7 @@
 @interface VLCMainMenu()
 {
     VLCAboutWindowController *_aboutWindowController;
-    HelpWindowController  *_helpWindowController;
+    VLCHelpWindowController  *_helpWindowController;
     AddonsWindowController *_addonsController;
     VLCRendererDialog *_rendererDialog;
 
@@ -1241,7 +1241,7 @@
 - (IBAction)showHelp:(id)sender
 {
     if (!_helpWindowController)
-        _helpWindowController = [[HelpWindowController alloc] init];
+        _helpWindowController = [[VLCHelpWindowController alloc] init];
 
     [_helpWindowController showHelp];
 }

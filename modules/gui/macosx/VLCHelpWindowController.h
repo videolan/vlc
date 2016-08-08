@@ -24,7 +24,7 @@
 
 #import <WebKit/WebKit.h> //we need to be here, because we're using a WebView object below
 
-@interface HelpWindowController : NSWindowController
+@interface VLCHelpWindowController : NSWindowController
 {
     IBOutlet WebView *o_help_web_view; //we may _not_ use id here because of method name collisions
     IBOutlet id o_help_bwd_btn;

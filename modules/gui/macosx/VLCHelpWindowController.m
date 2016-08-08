@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "HelpWindowController.h"
+#import "VLCHelpWindowController.h"
 
 #import "intf.h"
 #import <vlc_intf_strings.h>
@@ -30,7 +30,7 @@
 #import "CompatibilityFixes.h"
 #import "VLCScrollingClipView.h"
 
-@implementation HelpWindowController
+@implementation VLCHelpWindowController
 
 - (id)init
 {

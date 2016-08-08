@@ -34,7 +34,7 @@ libmacosx_plugin_la_SOURCES = \
 	ExtensionsDialogProvider.h ExtensionsDialogProvider.m \
 	ExtensionsManager.h ExtensionsManager.m \
 	fspanel.h fspanel.m \
-	HelpWindowController.h HelpWindowController.m \
+	VLCHelpWindowController.h VLCHelpWindowController.m \
 	intf-prefs.h intf-prefs.m \
 	intf.h intf.m \
 	iTunes.h \
