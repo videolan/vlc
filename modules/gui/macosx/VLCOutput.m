@@ -1,5 +1,5 @@
 /*****************************************************************************
- * output.m: MacOS X Output Dialog
+ * VLCOutput.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
@@ -25,8 +25,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "intf.h"
-#include "output.h"
+#import "VLCOutput.h"
+
+#import "intf.h"
 
 @interface VLCOutput()
 {

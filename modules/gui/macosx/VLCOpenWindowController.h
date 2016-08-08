@@ -24,6 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <Cocoa/Cocoa.h>
+
 @interface VLCOpenWindowController : NSWindowController
 
 @property (readwrite, weak) IBOutlet NSTextField *mrlTextField;

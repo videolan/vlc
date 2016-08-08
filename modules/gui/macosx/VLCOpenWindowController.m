@@ -39,7 +39,7 @@
 #import "intf.h"
 #import "VLCPlaylist.h"
 #import "VLCOpenWindowController.h"
-#import "output.h"
+#import "VLCOutput.h"
 #import "VLCEyeTvController.h"
 #import "misc.h"
 

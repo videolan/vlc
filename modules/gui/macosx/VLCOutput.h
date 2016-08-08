@@ -1,5 +1,5 @@
 /*****************************************************************************
- * output.h: MacOS X Output Dialog
+ * VLCOutput.h: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
@@ -23,6 +23,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
+#import <Cocoa/Cocoa.h>
 
 @interface VLCOutput : NSObject
 
