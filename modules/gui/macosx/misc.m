@@ -26,7 +26,7 @@
 #import "misc.h"
 #import "intf.h"                                          /* VLCApplication */
 #import "VLCMainWindow.h"
-#import "MainMenu.h"
+#import "VLCMainMenu.h"
 #import "ControlsBar.h"
 #import "CoreInteraction.h"
 #import <CoreAudio/CoreAudio.h>

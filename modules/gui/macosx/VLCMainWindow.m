@@ -31,7 +31,7 @@
 #import "CompatibilityFixes.h"
 #import "CoreInteraction.h"
 #import "VLCAudioEffectsWindowController.h"
-#import "MainMenu.h"
+#import "VLCMainMenu.h"
 #import "open.h"
 #import "VLCPlaylist.h"
 #import "SideBarItem.h"

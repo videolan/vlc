@@ -40,7 +40,7 @@ libmacosx_plugin_la_SOURCES = \
 	iTunes.h \
 	KeyboardBacklight.h KeyboardBacklight.m \
 	macosx.m \
-	MainMenu.h MainMenu.m \
+	VLCMainMenu.h VLCMainMenu.m \
 	MainWindowTitle.h MainWindowTitle.m \
 	misc.h misc.m \
 	open.h open.m \

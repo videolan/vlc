@@ -398,8 +398,8 @@
 		1CCB5F721A62A724004C3E90 /* intf.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27C03E2EB1C0059A3A7 /* intf.h */; };
 		1CCB5F731A62A724004C3E90 /* intf.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27D03E2EB1C0059A3A7 /* intf.m */; };
 		1CCB5F741A62A724004C3E90 /* macosx.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27E03E2EB1C0059A3A7 /* macosx.m */; };
-		1CCB5F751A62A724004C3E90 /* MainMenu.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A5A13B61D49009F72E0 /* MainMenu.h */; };
-		1CCB5F761A62A724004C3E90 /* MainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A5B13B61D49009F72E0 /* MainMenu.m */; };
+		1CCB5F751A62A724004C3E90 /* VLCMainMenu.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A5A13B61D49009F72E0 /* VLCMainMenu.h */; };
+		1CCB5F761A62A724004C3E90 /* VLCMainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A5B13B61D49009F72E0 /* VLCMainMenu.m */; };
 		1CCB5F771A62A724004C3E90 /* VLCMainWindow.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */; };
 		1CCB5F781A62A724004C3E90 /* VLCMainWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */; };
 		1CCB5F791A62A724004C3E90 /* open.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28103E2EB1C0059A3A7 /* open.h */; };
@@ -1567,8 +1567,8 @@
 		CC3F9F851350B2A000B0E885 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = ../../../contrib/Growl.framework; sourceTree = "<absolute>"; };
 		CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VLC.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC426FD01020D44F00A32659 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../../contrib/Sparkle.framework; sourceTree = "<absolute>"; };
-		CC448A5A13B61D49009F72E0 /* MainMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainMenu.h; path = ../../../modules/gui/macosx/MainMenu.h; sourceTree = SOURCE_ROOT; };
-		CC448A5B13B61D49009F72E0 /* MainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainMenu.m; path = ../../../modules/gui/macosx/MainMenu.m; sourceTree = SOURCE_ROOT; };
+		CC448A5A13B61D49009F72E0 /* VLCMainMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCMainMenu.h; path = ../../../modules/gui/macosx/VLCMainMenu.h; sourceTree = SOURCE_ROOT; };
+		CC448A5B13B61D49009F72E0 /* VLCMainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCMainMenu.m; path = ../../../modules/gui/macosx/VLCMainMenu.m; sourceTree = SOURCE_ROOT; };
 		CC448A6013B68A0B009F72E0 /* CoreInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CoreInteraction.h; path = ../../../modules/gui/macosx/CoreInteraction.h; sourceTree = SOURCE_ROOT; };
 		CC448A6113B68A0B009F72E0 /* CoreInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CoreInteraction.m; path = ../../../modules/gui/macosx/CoreInteraction.m; sourceTree = SOURCE_ROOT; };
 		CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCMainWindow.h; path = ../../../modules/gui/macosx/VLCMainWindow.h; sourceTree = SOURCE_ROOT; };
@@ -1907,8 +1907,8 @@
 				7DF812EF1B555C8E0052293C /* KeyboardBacklight.h */,
 				7DF812F01B555C8E0052293C /* KeyboardBacklight.m */,
 				8ED6C27E03E2EB1C0059A3A7 /* macosx.m */,
-				CC448A5A13B61D49009F72E0 /* MainMenu.h */,
-				CC448A5B13B61D49009F72E0 /* MainMenu.m */,
+				CC448A5A13B61D49009F72E0 /* VLCMainMenu.h */,
+				CC448A5B13B61D49009F72E0 /* VLCMainMenu.m */,
 				CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */,
 				CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */,
 				CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */,
@@ -3988,8 +3988,8 @@
 				1CD3667B1B7A242E0054E39F /* VLCTimeSelectionPanelController.m in Sources */,
 				1CCB5F731A62A724004C3E90 /* intf.m in Sources */,
 				1CCB5F741A62A724004C3E90 /* macosx.m in Sources */,
-				1CCB5F751A62A724004C3E90 /* MainMenu.h in Sources */,
-				1CCB5F761A62A724004C3E90 /* MainMenu.m in Sources */,
+				1CCB5F751A62A724004C3E90 /* VLCMainMenu.h in Sources */,
+				1CCB5F761A62A724004C3E90 /* VLCMainMenu.m in Sources */,
 				1CCB5F771A62A724004C3E90 /* VLCMainWindow.h in Sources */,
 				1CCB5F781A62A724004C3E90 /* VLCMainWindow.m in Sources */,
 				6B846FE61CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m in Sources */,

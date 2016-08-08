@@ -43,7 +43,7 @@
 
 #import "intf.h"
 #import "VLCPlaylist.h"
-#import "MainMenu.h"
+#import "VLCMainMenu.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCResumeDialogController.h"
 #import "open.h"

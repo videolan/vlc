@@ -25,7 +25,7 @@
 #import "CompatibilityFixes.h"
 #import "ExtensionsManager.h"
 #import "intf.h"
-#import "MainMenu.h"
+#import "VLCMainMenu.h"
 #import "VLCMainWindow.h"
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"

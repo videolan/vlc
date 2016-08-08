@@ -23,7 +23,7 @@
 
 #import "VLCStatusBarIcon.h"
 
-#import "MainMenu.h"
+#import "VLCMainMenu.h"
 #import "intf.h"
 
 #import <vlc_common.h>
