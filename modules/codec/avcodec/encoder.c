@@ -1283,6 +1283,10 @@ static block_t *encode_audio_buffer( encoder_t *p_enc, encoder_sys_t *p_sys,  AV
         p_block->i_dts = p_block->i_pts = packet.pts;
     else
         p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
+    if ( packet.flags & AV_PKT_FLAG_KEY )
+        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+    if ( packet.flags & AV_PKT_FLAG_CORRUPT )
+        p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
     return p_block;
 }
 
