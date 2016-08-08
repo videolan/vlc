@@ -46,7 +46,7 @@
 #import "PXSourceListDataSource.h"
 
 #import "ControlsBar.h"
-#import "VideoView.h"
+#import "VLCVoutView.h"
 #import "VLCVoutWindowController.h"
 
 

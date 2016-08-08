@@ -38,7 +38,7 @@
 #import "simple_prefs.h"
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
-#import "VideoView.h"
+#import "VLCVoutView.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainWindow.h"
 #import "ControlsBar.h"

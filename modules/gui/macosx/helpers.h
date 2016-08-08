@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 #import "intf.h"
-#import "VideoView.h"
+#import "VLCVoutView.h"
 
 static inline input_thread_t *getInput(void)
 {

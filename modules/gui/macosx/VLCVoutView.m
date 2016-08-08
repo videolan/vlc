@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VideoView.m: MacOS X video output module
+ * VLCVoutView.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2002-2014 VLC authors and VideoLAN
  * $Id$
@@ -33,7 +33,7 @@
 
 #import "CompatibilityFixes.h"
 #import "intf.h"
-#import "VideoView.h"
+#import "VLCVoutView.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainMenu.h"
 

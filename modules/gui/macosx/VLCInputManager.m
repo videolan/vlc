@@ -31,7 +31,7 @@
 #import "VLCPlaylistInfo.h"
 #import "VLCResumeDialogController.h"
 #import "VLCTrackSynchronizationWindowController.h"
-#import "VideoView.h"
+#import "VLCVoutView.h"
 
 #import "iTunes.h"
 #import "Spotify.h"

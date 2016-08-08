@@ -28,7 +28,7 @@
 #import "VLCVoutWindowController.h"
 #import "intf.h"
 #import "VLCMainWindow.h"
-#import "VideoView.h"
+#import "VLCVoutView.h"
 
 #import "VLCVideoEffectsWindowController.h"
 #import "VLCAudioEffectsWindowController.h"

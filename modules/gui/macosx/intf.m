@@ -45,7 +45,7 @@
 #import "CompatibilityFixes.h"
 #import "VLCInputManager.h"
 #import "VLCMainMenu.h"
-#import "VideoView.h"
+#import "VLCVoutView.h"
 #import "prefs.h"
 #import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"

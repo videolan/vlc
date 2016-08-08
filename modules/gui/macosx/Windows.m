@@ -26,7 +26,7 @@
 #import "intf.h"
 #import "VLCCoreInteraction.h"
 #import "ControlsBar.h"
-#import "VideoView.h"
+#import "VLCVoutView.h"
 #import "CompatibilityFixes.h"
 
 /*****************************************************************************

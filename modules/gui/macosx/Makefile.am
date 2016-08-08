@@ -61,7 +61,7 @@ libmacosx_plugin_la_SOURCES = \
 	SPMediaKeyTap.h SPMediaKeyTap.m \
 	Spotify.h \
 	VLCStringUtility.h VLCStringUtility.m \
-	VideoView.h VideoView.m \
+	VLCVoutView.h VLCVoutView.m \
 	VLCTimeSelectionPanelController.h VLCTimeSelectionPanelController.m \
 	VLCUIWidgets.h VLCUIWidgets.m \
 	VLCScrollingClipView.h VLCScrollingClipView.m \

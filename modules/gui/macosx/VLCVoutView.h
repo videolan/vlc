@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VideoView.h: MacOS X video output module
+ * VLCVoutView.h: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2002-2013 VLC authors and VideoLAN
  * $Id$
