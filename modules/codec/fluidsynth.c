@@ -124,7 +124,7 @@ static int Open (vlc_object_t *p_this)
             msg_Err (p_this, "cannot load sound fonts file %s", font_path);
         free (font_path);
     }
-#ifdef _POSIX_VERSION
+#if defined( _POSIX_VERSION ) && !defined(__ANDROID__)
     else
     {
         glob_t gl;
