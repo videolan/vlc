@@ -434,8 +434,14 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
             p_stream->mux.fmt.video.i_frame_rate = 25;
             p_stream->mux.fmt.video.i_frame_rate_base = 1;
         }
-        p_stream->mux.i_timescale = p_stream->mux.fmt.video.i_frame_rate * 1000 /
-                                       p_stream->mux.fmt.video.i_frame_rate_base;
+
+        p_stream->mux.i_timescale = p_stream->mux.fmt.video.i_frame_rate *
+                                    p_stream->mux.fmt.video.i_frame_rate_base;
+
+        if( p_stream->mux.i_timescale > CLOCK_FREQ )
+            p_stream->mux.i_timescale = CLOCK_FREQ;
+        else if( p_stream->mux.i_timescale < 90000 )
+            p_stream->mux.i_timescale = 90000;
         break;
     default:
         break;
