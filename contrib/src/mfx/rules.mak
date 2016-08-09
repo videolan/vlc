@@ -2,10 +2,11 @@
 
 mfx_GITURL := https://github.com/lu-zero/mfx_dispatch.git
 
-ifdef HAVE_WIN32
 ifeq ($(call need_pkg,"mfx"),)
 PKGS_FOUND += mfx
 endif
+ifdef HAVE_WIN32
+PKGS += mfx
 endif
 
 $(TARBALLS)/mfx-git.tar.xz:
