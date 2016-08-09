@@ -1168,6 +1168,20 @@ static bo_t *GetTextBox(void)
     return text;
 }
 
+static int64_t GetScaledEntryDuration( const mp4mux_entry_t *p_entry, uint32_t i_timescale,
+                                       mtime_t *pi_total_mtime, int64_t *pi_total_scaled )
+{
+    const mtime_t i_totalscaledtototalmtime = *pi_total_scaled * CLOCK_FREQ / i_timescale;
+    const mtime_t i_diff = *pi_total_mtime - i_totalscaledtototalmtime;
+
+    /* Ensure to compensate the drift due to loss from time, and from scale, conversions */
+    int64_t i_scaled = (p_entry->i_length + i_diff) * i_timescale / CLOCK_FREQ;
+    *pi_total_mtime += p_entry->i_length;
+    *pi_total_scaled += i_scaled;
+
+    return i_scaled;
+}
+
 static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov, bool b_stco64)
 {
     /* sample description */
@@ -1256,19 +1270,35 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     }
     bo_add_32be(stts, 0);     // entry-count (fixed latter)
 
+    mtime_t i_total_mtime = 0;
+    int64_t i_total_scaled = 0;
     unsigned i_index = 0;
     for (unsigned i = 0; i < p_track->i_entry_count; i_index++) {
         int     i_first = i;
-        mtime_t i_delta = p_track->entry[i].i_length;
 
-        for (; i < p_track->i_entry_count; ++i)
-            if (i == p_track->i_entry_count || p_track->entry[i].i_length != i_delta)
+        int64_t i_scaled = GetScaledEntryDuration(&p_track->entry[i], p_track->i_timescale,
+                                                  &i_total_mtime, &i_total_scaled);
+        for (unsigned j=i+1; j < p_track->i_entry_count; j++)
+        {
+            mtime_t i_total_mtime_next = i_total_mtime;
+            int64_t i_total_scaled_next = i_total_scaled;
+            int64_t i_scalednext = GetScaledEntryDuration(&p_track->entry[j], p_track->i_timescale,
+                                                          &i_total_mtime_next, &i_total_scaled_next);
+            if( i_scalednext != i_scaled )
                 break;
 
-        bo_add_32be(stts, i - i_first); // sample-count
-        bo_add_32be(stts, (uint64_t)i_delta  * p_track->i_timescale / CLOCK_FREQ); // sample-delta
+            i_total_mtime = i_total_mtime_next;
+            i_total_scaled = i_total_scaled_next;
+            i = j;
+        }
+
+        bo_add_32be(stts, ++i - i_first); // sample-count
+        bo_add_32be(stts, i_scaled); // sample-delta
     }
     bo_swap_32be(stts, 12, i_index);
+
+    //msg_Dbg(p_obj, "total sout duration %"PRId64" reconverted from scaled %"PRId64,
+    //                i_total_mtime, i_total_scaled * CLOCK_FREQ / p_track->i_timescale );
 
     /* composition time handling */
     bo_t *ctts = NULL;
