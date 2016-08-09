@@ -1,6 +1,6 @@
 # mfx (Media SDK)
 
-mfx_GITURL := git://git.videolan.org/mfx_dispatch
+mfx_GITURL := https://github.com/lu-zero/mfx_dispatch.git
 
 ifdef HAVE_WIN32
 ifeq ($(call need_pkg,"mfx"),)
@@ -9,7 +9,7 @@ endif
 endif
 
 $(TARBALLS)/mfx-git.tar.xz:
-	$(call download_git,$(mfx_GITURL))
+	$(call download_git,$(mfx_GITURL),,7adf2e4)
 
 .sum-mfx: mfx-git.tar.xz
 	$(warning $@ not implemented)
