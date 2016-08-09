@@ -150,8 +150,7 @@ private:
     void msgPlayerPause();
     void msgPlayerGetStatus();
     void msgPlayerSeek(const std::string & currentTime);
-    void msgPlayerSetVolume(float volume);
-    void msgPlayerSetMute(bool mute);
+    void msgPlayerSetVolume(float volume, bool mute);
 
     void processMessage(const castchannel::CastMessage &msg);
 

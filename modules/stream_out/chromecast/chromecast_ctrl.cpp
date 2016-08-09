@@ -582,10 +582,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
                     }
                     m_time_playback_started = VLC_TS_INVALID;
                     if (!mediaSessionId.empty())
-                    {
-                        msgPlayerSetMute( var_InheritBool( p_module, "mute" ) );
-                        msgPlayerSetVolume( var_InheritFloat( p_module, "volume" ) );
-                    }
+                        msgPlayerSetVolume( var_InheritFloat( p_module, "volume" ), var_InheritBool( p_module, "mute" ) );
                     break;
 
                 case RECEIVER_PLAYING:
@@ -603,10 +600,7 @@ void intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 
                 case RECEIVER_PAUSED:
                     if (!mediaSessionId.empty())
-                    {
-                        msgPlayerSetMute( var_InheritBool( p_module, "mute" ) );
-                        msgPlayerSetVolume( var_InheritFloat( p_module, "volume" ) );
-                    }
+                        msgPlayerSetVolume( var_InheritFloat( p_module, "volume" ), var_InheritBool( p_module, "mute" ) );
 
                     m_chromecast_start_time = (1 + mtime_t( double( status[0]["currentTime"] ) ) ) * 1000000L;
 #ifndef NDEBUG
@@ -854,7 +848,7 @@ void intf_sys_t::msgPlayerPause()
     pushMediaPlayerMessage( ss );
 }
 
-void intf_sys_t::msgPlayerSetVolume(float f_volume)
+void intf_sys_t::msgPlayerSetVolume(float f_volume, bool b_mute)
 {
     assert(!mediaSessionId.empty());
 
@@ -863,21 +857,7 @@ void intf_sys_t::msgPlayerSetVolume(float f_volume)
 
     std::stringstream ss;
     ss << "{\"type\":\"SET_VOLUME\","
-       <<  "\"volume\":{\"level\":" << f_volume << "},"
-       <<  "\"mediaSessionId\":" << mediaSessionId << ","
-       <<  "\"requestId\":" << i_requestId++
-       << "}";
-
-    pushMediaPlayerMessage( ss );
-}
-
-void intf_sys_t::msgPlayerSetMute(bool b_mute)
-{
-    assert(!mediaSessionId.empty());
-
-    std::stringstream ss;
-    ss << "{\"type\":\"SET_VOLUME\","
-       <<  "\"volume\":{\"muted\":" << ( b_mute ? "true" : "false" ) << "},"
+       <<  "\"volume\":{\"level\":" << f_volume << ",\"muted\":" << ( b_mute ? "true" : "false" ) << "},"
        <<  "\"mediaSessionId\":" << mediaSessionId << ","
        <<  "\"requestId\":" << i_requestId++
        << "}";
