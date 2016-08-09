@@ -338,7 +338,7 @@ dnl
 dnl Sadly autoconf does not think about testing foo.exe when ask to test
 dnl for program foo on win32
 case "${build_os}" in
-    cygwin|msys)
+    cygwin|msys|mingw32)
         ac_executable_extensions=".exe"
     ;;
     os2*)
