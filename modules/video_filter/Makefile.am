@@ -124,6 +124,10 @@ if HAVE_NEON
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm.S
 libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM
 endif
+if HAVE_ARM64
+libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm64.S
+libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM64
+endif
 video_filter_LTLIBRARIES += libdeinterlace_plugin.la
 
 libdynamicoverlay_plugin_la_SOURCES = \

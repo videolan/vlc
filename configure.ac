@@ -1432,6 +1432,26 @@ asm volatile("vqmovun.s64 d0, q1":::"d0");
 ])
 AM_CONDITIONAL(HAVE_NEON, [test "${ac_cv_arm_neon}" = "yes"])
 
+AC_ARG_ENABLE(arm64,
+  [AS_HELP_STRING([--disable-arm64],
+    [disable arm 64-bit optimizations (default auto)])],, [
+  AS_IF([test "${host_cpu}" = "aarch64"], [enable_arm64="yes"] ,[enable_arm64="no"])
+])
+AS_IF([test "${enable_arm64}" != "no"], [
+  AC_CACHE_CHECK([if $CCAS groks ARM 64 SIMD assembly], [ac_cv_arm64], [
+    AC_COMPILE_IFELSE([
+      AC_LANG_PROGRAM(,[[
+asm volatile("uhadd v0.8b, v0.8b, v1.8b":::"v0");
+]])
+    ], [
+      ac_cv_arm64="yes"
+    ], [
+      ac_cv_arm64="no"
+    ])
+  ])
+])
+AM_CONDITIONAL(HAVE_ARM64, [test "${ac_cv_arm64}" = "yes"])
+
 
 AC_ARG_ENABLE(altivec,
   [AS_HELP_STRING([--disable-altivec],

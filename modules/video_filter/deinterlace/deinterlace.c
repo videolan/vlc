@@ -700,6 +700,11 @@ notsupp:
         p_sys->pf_merge = pixel_size == 1 ? merge8_armv6 : merge16_armv6;
     else
 #endif
+#if defined(CAN_COMPILE_ARM64)
+    if( vlc_CPU_ARM64_NEON() )
+        p_sys->pf_merge = pixel_size == 1 ? merge8_arm64_neon : merge16_arm64_neon;
+    else
+#endif
     {
         p_sys->pf_merge = pixel_size == 1 ? Merge8BitGeneric : Merge16BitGeneric;
 #if defined(__i386__) || defined(__x86_64__)

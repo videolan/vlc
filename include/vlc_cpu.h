@@ -178,6 +178,8 @@ VLC_API unsigned vlc_CPU(void);
 
 # elif defined (__aarch64__)
 #  define HAVE_FPU 1
+// NEON is mandatory for general purpose ARMv8-a CPUs
+#  define vlc_CPU_ARM64_NEON() (1)
 
 # elif defined (__sparc__)
 #  define HAVE_FPU 1
