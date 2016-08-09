@@ -112,6 +112,7 @@ struct decoder_sys_t
     uint8_t                     i_nal_length_size;
 
     bool                        b_started;
+    bool                        b_is_restarting;
     bool                        b_is_avcc;
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
@@ -271,6 +272,68 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
     }
 
     return codec;
+}
+
+static int StartVideoToolboxSession(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* setup decoder callback record */
+    VTDecompressionOutputCallbackRecord decoderCallbackRecord;
+    decoderCallbackRecord.decompressionOutputCallback = DecoderCallback;
+    decoderCallbackRecord.decompressionOutputRefCon = p_dec;
+
+    /* create decompression session */
+    OSStatus status = VTDecompressionSessionCreate(kCFAllocatorDefault,
+                                                   p_sys->videoFormatDescription,
+                                                   p_sys->decoderConfiguration,
+                                                   p_sys->destinationPixelBufferAttributes,
+                                                   &decoderCallbackRecord,
+                                                   &p_sys->session);
+
+    /* check if the session is valid */
+    if (status) {
+
+        switch (status) {
+            case -12470:
+                msg_Err(p_dec, "VT is not supported on this hardware");
+                break;
+            case -12471:
+                msg_Err(p_dec, "Video format is not supported by VT");
+                break;
+            case -12903:
+                msg_Err(p_dec, "created session is invalid, could not select and open decoder instance");
+                break;
+            case -12906:
+                msg_Err(p_dec, "could not find decoder");
+                break;
+            case -12910:
+                msg_Err(p_dec, "unsupported data");
+                break;
+            case -12913:
+                msg_Err(p_dec, "VT is not available to sandboxed apps on this OS release or maximum number of decoders reached");
+                break;
+            case -12917:
+                msg_Err(p_dec, "Insufficient source color data");
+                break;
+            case -12918:
+                msg_Err(p_dec, "Could not create color correction data");
+                break;
+            case -12210:
+                msg_Err(p_dec, "Insufficient authorization to create decoder");
+                break;
+            case -8973:
+                msg_Err(p_dec, "Could not select and open decoder instance");
+                break;
+
+            default:
+                msg_Err(p_dec, "Decompression session creation failed (%i)", status);
+                break;
+        }
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
 
 static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
@@ -548,58 +611,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                          kCVPixelBufferBytesPerRowAlignmentKey,
                          i_video_width * 2);
 
-    /* setup decoder callback record */
-    VTDecompressionOutputCallbackRecord decoderCallbackRecord;
-    decoderCallbackRecord.decompressionOutputCallback = DecoderCallback;
-    decoderCallbackRecord.decompressionOutputRefCon = p_dec;
-
-    /* create decompression session */
-    status = VTDecompressionSessionCreate(kCFAllocatorDefault,
-                                          p_sys->videoFormatDescription,
-                                          p_sys->decoderConfiguration,
-                                          p_sys->destinationPixelBufferAttributes,
-                                          &decoderCallbackRecord,
-                                          &p_sys->session);
-
-    /* check if the session is valid */
-    if (status) {
-
-        switch (status) {
-            case -12470:
-                msg_Err(p_dec, "VT is not supported on this hardware");
-                break;
-            case -12471:
-                msg_Err(p_dec, "Video format is not supported by VT");
-                break;
-            case -12903:
-                msg_Err(p_dec, "created session is invalid, could not select and open decoder instance");
-                break;
-            case -12906:
-                msg_Err(p_dec, "could not find decoder");
-                break;
-            case -12910:
-                msg_Err(p_dec, "unsupported data");
-                break;
-            case -12913:
-                msg_Err(p_dec, "VT is not available to sandboxed apps on this OS release or maximum number of decoders reached");
-                break;
-            case -12917:
-                msg_Err(p_dec, "Insufficient source color data");
-                break;
-            case -12918:
-                msg_Err(p_dec, "Could not create color correction data");
-                break;
-            case -12210:
-                msg_Err(p_dec, "Insufficient authorization to create decoder");
-                break;
-            case -8973:
-                msg_Err(p_dec, "Could not select and open decoder instance");
-                break;
-
-            default:
-                msg_Err(p_dec, "Decompression session creation failed (%i)", status);
-                break;
-        }
+    if (StartVideoToolboxSession(p_dec) != VLC_SUCCESS) {
         return VLC_EGENERIC;
     }
 
@@ -624,6 +636,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     }
 
     p_sys->b_started = YES;
+    p_sys->b_is_restarting = NO;
 
     return VLC_SUCCESS;
 }
@@ -664,6 +677,34 @@ static void StopVideoToolbox(decoder_t *p_dec)
     }
 }
 
+static void RestartVideoToolbox(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    msg_Dbg(p_dec, "Restarting decoder session");
+
+    p_sys->b_is_restarting = true;
+    p_sys->b_started = false;
+
+    if (p_sys->session != nil) {
+        VTDecompressionSessionInvalidate(p_sys->session);
+        CFRelease(p_sys->session);
+        p_sys->session = nil;
+    }
+
+    p_sys->b_format_propagated = false;
+
+    Flush(p_dec);
+
+    if (StartVideoToolboxSession(p_dec) == VLC_SUCCESS) {
+        p_sys->b_started = true;
+    } else {
+        msg_Warn(p_dec, "Decoder session restart failed");
+    }
+
+    p_sys->b_is_restarting = false;
+}
+
 #pragma mark - module open and close
 
 static int OpenDecoder(vlc_object_t *p_this)
@@ -698,6 +739,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->b_is_avcc = false;
     p_sys->codec = codec;
     p_sys->videoFormatDescription = nil;
+    p_sys->decoderConfiguration = nil;
+    p_sys->destinationPixelBufferAttributes = nil;
 
     int i_ret = StartVideoToolbox(p_dec, NULL);
     if (i_ret != VLC_SUCCESS) {
@@ -964,7 +1007,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     p_block = *pp_block;
 
     if (likely(p_block != NULL)) {
-        if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED))) {
+        if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED) || p_sys->b_is_restarting)) {
             Flush(p_dec);
             block_Release(p_block);
             goto skip;
@@ -1024,7 +1067,10 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                         StopVideoToolbox(p_dec);
                     } else if (status == -8960 || status == -12911) {
                         msg_Err(p_dec, "decoder failure: internal malfunction (%i)", status);
-                        StopVideoToolbox(p_dec);
+                        RestartVideoToolbox(p_dec);
+                    } else if (status == -12903) {
+                        msg_Warn(p_dec, "decoder failure: session invalid");
+                        RestartVideoToolbox(p_dec);
                     } else
                         msg_Dbg(p_dec, "decoding frame failed (%i)", status);
                 }
