@@ -146,8 +146,9 @@ LIBVLC_API const char *libvlc_printerr (const char *fmt, ...);
  * even if it is not, in principles, necessary.
  *
  * On Microsoft Windows Vista/2008, the process error mode
- * SEM_FAILCRITICALERRORS flag <b>must</b> with the SetErrorMode() function
- * before using LibVLC. On later versions, it is optional and unnecessary.
+ * SEM_FAILCRITICALERRORS flag <b>must</b> be set with the SetErrorMode()
+ * function before using LibVLC. On later versions, it is optional and
+ * unnecessary.
  *
  * \version
  * Arguments are meant to be passed from the command line to LibVLC, just like
