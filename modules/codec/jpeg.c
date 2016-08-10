@@ -445,9 +445,6 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height = p_sys->p_jpeg.output_height;
     p_dec->fmt_out.video.i_sar_num = 1;
     p_dec->fmt_out.video.i_sar_den = 1;
-    p_dec->fmt_out.video.i_rmask = 0x000000ff;
-    p_dec->fmt_out.video.i_gmask = 0x0000ff00;
-    p_dec->fmt_out.video.i_bmask = 0x00ff0000;
 
     int i_otag; /* Orientation tag has valid range of 1-8. 1 is normal orientation, 0 = unspecified = normal */
     i_otag = jpeg_GetOrientation( &p_sys->p_jpeg );
