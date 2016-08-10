@@ -380,8 +380,8 @@
 		1CCB5F5B1A62A724004C3E90 /* VLCBookmarksWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0708A5724D007B10AE /* VLCBookmarksWindowController.h */; };
 		1CCB5F5C1A62A724004C3E90 /* VLCBookmarksWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */; };
 		1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */; };
-		1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */ = {isa = PBXBuildFile; fileRef = E0382C00160BA09E0031D7FF /* ControlsBar.h */; };
-		1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = E0382C01160BA09E0031D7FF /* ControlsBar.m */; };
+		1CCB5F601A62A724004C3E90 /* VLCControlsBarCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = E0382C00160BA09E0031D7FF /* VLCControlsBarCommon.h */; };
+		1CCB5F611A62A724004C3E90 /* VLCControlsBarCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = E0382C01160BA09E0031D7FF /* VLCControlsBarCommon.m */; };
 		1CCB5F621A62A724004C3E90 /* VLCConvertAndSaveWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC0663341566C34C003A411C /* VLCConvertAndSaveWindowController.h */; };
 		1CCB5F631A62A724004C3E90 /* VLCConvertAndSaveWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */; };
 		1CCB5F641A62A724004C3E90 /* VLCCoreDialogProvider.h in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */; };
@@ -481,6 +481,7 @@
 		6BBBB8B81D12AF72001BD9BA /* VLCRendererDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6BBBB8AC1D108A87001BD9BA /* VLCRendererDialog.xib */; };
 		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D5678ED1D5BA1DC002698F3 /* VLCApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D5678EC1D5BA1DC002698F3 /* VLCApplication.m */; };
+		7D5678F01D5BA397002698F3 /* VLCMainWindowControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D5678EF1D5BA397002698F3 /* VLCMainWindowControlsBar.m */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
 		7D8BB0C01830393300FAE9B7 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */; };
@@ -1299,6 +1300,8 @@
 		7D3F652918805297005776C4 /* BWQuincyUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyUI.m; path = ../../../modules/gui/macosx/BWQuincyUI.m; sourceTree = SOURCE_ROOT; };
 		7D5678EB1D5BA1DC002698F3 /* VLCApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCApplication.h; path = ../../../modules/gui/macosx/VLCApplication.h; sourceTree = "<group>"; };
 		7D5678EC1D5BA1DC002698F3 /* VLCApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCApplication.m; path = ../../../modules/gui/macosx/VLCApplication.m; sourceTree = "<group>"; };
+		7D5678EE1D5BA397002698F3 /* VLCMainWindowControlsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMainWindowControlsBar.h; path = ../../../modules/gui/macosx/VLCMainWindowControlsBar.h; sourceTree = "<group>"; };
+		7D5678EF1D5BA397002698F3 /* VLCMainWindowControlsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCMainWindowControlsBar.m; path = ../../../modules/gui/macosx/VLCMainWindowControlsBar.m; sourceTree = "<group>"; };
 		7D871D371B5E6844000B56C0 /* VLCMain+OldPrefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "VLCMain+OldPrefs.h"; path = "../../../modules/gui/macosx/VLCMain+OldPrefs.h"; sourceTree = "<group>"; };
 		7D871D381B5E6844000B56C0 /* VLCMain+OldPrefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "VLCMain+OldPrefs.m"; path = "../../../modules/gui/macosx/VLCMain+OldPrefs.m"; sourceTree = "<group>"; };
 		7D871D391B5E684D000B56C0 /* helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = helpers.h; path = ../../../modules/gui/macosx/helpers.h; sourceTree = "<group>"; };
@@ -1789,8 +1792,8 @@
 		DCC8017916FCA0DA007FE736 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCBookmarksWindowController.m; path = ../../../modules/gui/macosx/VLCBookmarksWindowController.m; sourceTree = SOURCE_ROOT; };
 		DCE7BD0708A5724D007B10AE /* VLCBookmarksWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCBookmarksWindowController.h; path = ../../../modules/gui/macosx/VLCBookmarksWindowController.h; sourceTree = SOURCE_ROOT; };
-		E0382C00160BA09E0031D7FF /* ControlsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ControlsBar.h; path = ../../../modules/gui/macosx/ControlsBar.h; sourceTree = SOURCE_ROOT; };
-		E0382C01160BA09E0031D7FF /* ControlsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ControlsBar.m; path = ../../../modules/gui/macosx/ControlsBar.m; sourceTree = SOURCE_ROOT; };
+		E0382C00160BA09E0031D7FF /* VLCControlsBarCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCControlsBarCommon.h; path = ../../../modules/gui/macosx/VLCControlsBarCommon.h; sourceTree = SOURCE_ROOT; };
+		E0382C01160BA09E0031D7FF /* VLCControlsBarCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCControlsBarCommon.m; path = ../../../modules/gui/macosx/VLCControlsBarCommon.m; sourceTree = SOURCE_ROOT; };
 		E06CF7F416020F6200C698B7 /* Windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Windows.h; path = ../../../modules/gui/macosx/Windows.h; sourceTree = SOURCE_ROOT; };
 		E06CF7F516020F6200C698B7 /* Windows.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Windows.m; path = ../../../modules/gui/macosx/Windows.m; sourceTree = SOURCE_ROOT; };
 		E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCVoutWindowController.h; path = ../../../modules/gui/macosx/VLCVoutWindowController.h; sourceTree = SOURCE_ROOT; };
@@ -1885,8 +1888,10 @@
 				DCE7BD0708A5724D007B10AE /* VLCBookmarksWindowController.h */,
 				DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */,
 				CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */,
-				E0382C00160BA09E0031D7FF /* ControlsBar.h */,
-				E0382C01160BA09E0031D7FF /* ControlsBar.m */,
+				E0382C00160BA09E0031D7FF /* VLCControlsBarCommon.h */,
+				E0382C01160BA09E0031D7FF /* VLCControlsBarCommon.m */,
+				7D5678EE1D5BA397002698F3 /* VLCMainWindowControlsBar.h */,
+				7D5678EF1D5BA397002698F3 /* VLCMainWindowControlsBar.m */,
 				CC0663341566C34C003A411C /* VLCConvertAndSaveWindowController.h */,
 				CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */,
 				CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */,
@@ -3971,9 +3976,10 @@
 				7D9516BA1C60B6AB00D14E1A /* VLCStatusBarIcon.m in Sources */,
 				1CCB5F5B1A62A724004C3E90 /* VLCBookmarksWindowController.h in Sources */,
 				1CCB5F5C1A62A724004C3E90 /* VLCBookmarksWindowController.m in Sources */,
+				7D5678F01D5BA397002698F3 /* VLCMainWindowControlsBar.m in Sources */,
 				1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */,
-				1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */,
-				1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */,
+				1CCB5F601A62A724004C3E90 /* VLCControlsBarCommon.h in Sources */,
+				1CCB5F611A62A724004C3E90 /* VLCControlsBarCommon.m in Sources */,
 				1CCB5F621A62A724004C3E90 /* VLCConvertAndSaveWindowController.h in Sources */,
 				1CCB5F631A62A724004C3E90 /* VLCConvertAndSaveWindowController.m in Sources */,
 				1CCB5F641A62A724004C3E90 /* VLCCoreDialogProvider.h in Sources */,

@@ -546,8 +546,8 @@ modules/gui/macosx/VLCBookmarksWindowController.h
 modules/gui/macosx/VLCBookmarksWindowController.m
 modules/gui/macosx/BWQuincyUI.h
 modules/gui/macosx/BWQuincyUI.m
-modules/gui/macosx/ControlsBar.h
-modules/gui/macosx/ControlsBar.m
+modules/gui/macosx/VLCControlsBarCommon.h
+modules/gui/macosx/VLCControlsBarCommon.m
 modules/gui/macosx/VLCConvertAndSaveWindowController.h
 modules/gui/macosx/VLCConvertAndSaveWindowController.m
 modules/gui/macosx/VLCCoreDialogProvider.h
@@ -572,6 +572,8 @@ modules/gui/macosx/VLCMainMenu.h
 modules/gui/macosx/VLCMainMenu.m
 modules/gui/macosx/VLCMainWindow.h
 modules/gui/macosx/VLCMainWindow.m
+modules/gui/macosx/VLCMainWindowControlsBar.h
+modules/gui/macosx/VLCMainWindowControlsBar.m
 modules/gui/macosx/MainWindowTitle.h
 modules/gui/macosx/MainWindowTitle.m
 modules/gui/macosx/misc.h

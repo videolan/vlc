@@ -24,59 +24,10 @@
 
 #import <Cocoa/Cocoa.h>
 #import "misc.h"
+#import "VLCControlsBarCommon.h"
 
 @class VLCFSPanel;
 @class VLCResizeControl;
-
-/*****************************************************************************
- * VLCControlsBarCommon
- *
- *  Holds all outlets, actions and code common for controls bar in detached
- *  and in main window.
- *****************************************************************************/
-
-@interface VLCControlsBarCommon : NSObject
-
-@property (readwrite, strong) IBOutlet VLCDragDropView *dropView;
-
-@property (readwrite, strong) IBOutlet NSButton *playButton;
-@property (readwrite, strong) IBOutlet NSButton *backwardButton;
-@property (readwrite, strong) IBOutlet NSButton *forwardButton;
-
-@property (readwrite, strong) IBOutlet VLCProgressView *progressView;
-@property (readwrite, strong) IBOutlet TimeLineSlider *timeSlider;
-@property (readwrite, strong) IBOutlet VLCThreePartImageView *timeSliderGradientView;
-@property (readwrite, strong) IBOutlet VLCThreePartImageView *timeSliderBackgroundView;
-@property (readwrite, strong) IBOutlet NSProgressIndicator *progressBar;
-
-@property (readwrite, strong) IBOutlet VLCTimeField *timeField;
-@property (readwrite, strong) IBOutlet NSButton *fullscreenButton;
-@property (readwrite, strong) IBOutlet VLCResizeControl *resizeView;
-
-@property (readwrite, strong) IBOutlet VLCThreePartImageView *bottomBarView;
-
-@property (readonly) BOOL darkInterface;
-@property (readonly) BOOL nativeFullscreenMode;
-
-- (CGFloat)height;
-- (void)toggleForwardBackwardMode:(BOOL)b_alt;
-
-- (IBAction)play:(id)sender;
-- (IBAction)bwd:(id)sender;
-- (IBAction)fwd:(id)sender;
-
-- (IBAction)timeSliderAction:(id)sender;
-- (IBAction)fullscreen:(id)sender;
-
-- (void)updateTimeSlider;
-- (void)drawFancyGradientEffectForTimeSlider;
-- (void)updateControls;
-- (void)setPause;
-- (void)setPlay;
-- (void)setFullscreenState:(BOOL)b_fullscreen;
-
-@end
-
 
 /*****************************************************************************
  * VLCMainWindowControlsBar

@@ -25,7 +25,7 @@
 #import "Windows.h"
 #import "VLCMain.h"
 #import "VLCCoreInteraction.h"
-#import "ControlsBar.h"
+#import "VLCControlsBarCommon.h"
 #import "VLCVoutView.h"
 #import "CompatibilityFixes.h"
 

@@ -45,7 +45,7 @@
 #import "PXSourceList.h"
 #import "PXSourceListDataSource.h"
 
-#import "ControlsBar.h"
+#import "VLCMainWindowControlsBar.h"
 #import "VLCVoutView.h"
 #import "VLCVoutWindowController.h"
 

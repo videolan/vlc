@@ -41,7 +41,7 @@
 #import "VLCVoutView.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainWindow.h"
-#import "ControlsBar.h"
+#import "VLCMainWindowControlsBar.h"
 #import "ExtensionsManager.h"
 #import "VLCConvertAndSaveWindowController.h"
 #import "VLCDebugMessageWindowController.h"
