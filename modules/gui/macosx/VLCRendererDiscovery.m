@@ -23,7 +23,7 @@
 
 #import "VLCRendererDiscovery.h"
 
-#import "intf.h"
+#import "VLCMain.h"
 
 #include <vlc_common.h>
 #include <vlc_renderer_discovery.h>

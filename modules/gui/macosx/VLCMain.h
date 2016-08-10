@@ -1,7 +1,7 @@
 /*****************************************************************************
- * intf.h: MacOS X interface module
+ * VLCMain.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2015 VLC authors and VideoLAN
+ * Copyright (C) 2002-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -115,15 +115,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (void)showFullscreenController;
 
 - (BOOL)isTerminating;
-
-@end
-
-
-/*****************************************************************************
- * VLCApplication interface
- *****************************************************************************/
-
-@interface VLCApplication : NSApplication
 
 @end
 

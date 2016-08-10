@@ -26,7 +26,7 @@
 
 #import "VLCStringUtility.h"
 
-#import "intf.h"
+#import "VLCMain.h"
 #import "CompatibilityFixes.h"
 
 #import <IOKit/storage/IOMedia.h>

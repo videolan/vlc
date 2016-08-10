@@ -28,7 +28,7 @@
 
 #import "VLCAboutWindowController.h"
 
-#import "intf.h"
+#import "VLCMain.h"
 #import <vlc_intf_strings.h>
 #import <vlc_about.h>
 #import "CompatibilityFixes.h"

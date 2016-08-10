@@ -41,7 +41,7 @@
 
 #import "CompatibilityFixes.h"
 
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCPlaylist.h"
 #import "VLCMainMenu.h"
 #import "VLCPlaylistInfo.h"

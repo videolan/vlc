@@ -27,7 +27,7 @@
 
 #import "VLCOutput.h"
 
-#import "intf.h"
+#import "VLCMain.h"
 
 @interface VLCOutput()
 {

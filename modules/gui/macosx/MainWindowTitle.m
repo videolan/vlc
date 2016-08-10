@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #import <vlc_common.h>
-#import "intf.h"
+#import "VLCMain.h"
 #import "MainWindowTitle.h"
 #import "VLCCoreInteraction.h"
 #import "CompatibilityFixes.h"

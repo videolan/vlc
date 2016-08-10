@@ -36,7 +36,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CoreMedia/CoreMedia.h>
 
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCPlaylist.h"
 #import "VLCOpenWindowController.h"
 #import "VLCOutput.h"

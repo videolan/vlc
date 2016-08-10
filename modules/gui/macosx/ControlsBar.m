@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "ControlsBar.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainMenu.h"
 #import "VLCFSPanel.h"

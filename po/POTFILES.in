@@ -538,6 +538,8 @@ modules/gui/macosx/AppleRemote.h
 modules/gui/macosx/AppleRemote.m
 modules/gui/macosx/applescript.h
 modules/gui/macosx/applescript.m
+modules/gui/macosx/VLCApplication.h
+modules/gui/macosx/VLCApplication.m
 modules/gui/macosx/VLCAudioEffectsWindowController.h
 modules/gui/macosx/VLCAudioEffectsWindowController.m
 modules/gui/macosx/VLCBookmarksWindowController.h
@@ -561,9 +563,9 @@ modules/gui/macosx/VLCEyeTvController.m
 modules/gui/macosx/VLCFSPanel.h
 modules/gui/macosx/VLCFSPanel.m
 modules/gui/macosx/helpers.h
-modules/gui/macosx/intf.h
-modules/gui/macosx/intf.m
 modules/gui/macosx/macosx.m
+modules/gui/macosx/VLCMain.h
+modules/gui/macosx/VLCMain.m
 modules/gui/macosx/VLCMain+OldPrefs.h
 modules/gui/macosx/VLCMain+OldPrefs.m
 modules/gui/macosx/VLCMainMenu.h

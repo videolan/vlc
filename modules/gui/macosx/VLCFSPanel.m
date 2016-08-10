@@ -26,7 +26,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainWindow.h"
 #import "misc.h"

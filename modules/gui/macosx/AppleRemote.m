@@ -54,7 +54,7 @@
 #import "AppleRemote.h"
 
 /* this was added by the VideoLAN team to ensure Leopard-compatibility and is VLC-only */
-#import "intf.h"
+#import "VLCMain.h"
 #import "CompatibilityFixes.h"
 
 const char* AppleRemoteDeviceName = "AppleIRController";

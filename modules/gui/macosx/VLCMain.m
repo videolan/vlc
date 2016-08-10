@@ -1,5 +1,5 @@
 /*****************************************************************************
- * intf.m: MacOS X interface module
+ * VLCMain.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
@@ -31,7 +31,7 @@
 # include "config.h"
 #endif
 
-#import "intf.h"
+#import "VLCMain.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
@@ -65,6 +65,7 @@
 #import "VLCVideoEffectsWindowController.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "VLCMain+OldPrefs.h"
+#import "VLCApplication.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
@@ -637,24 +638,6 @@ static VLCMain *sharedInstance = nil;
 - (BOOL)activeVideoPlayback
 {
     return b_active_videoplayback;
-}
-
-@end
-
-/*****************************************************************************
- * VLCApplication interface
- *****************************************************************************/
-
-@implementation VLCApplication
-// when user selects the quit menu from dock it sends a terminate:
-// but we need to send a stop: to properly exits libvlc.
-// However, we are not able to change the action-method sent by this standard menu item.
-// thus we override terminate: to send a stop:
-// see [af97f24d528acab89969d6541d83f17ce1ecd580] that introduced the removal of setjmp() and longjmp()
-- (void)terminate:(id)sender
-{
-    [self activateIgnoringOtherApps:YES];
-    [self stop:sender];
 }
 
 @end

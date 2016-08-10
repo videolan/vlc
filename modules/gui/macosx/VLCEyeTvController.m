@@ -27,7 +27,7 @@
 /* for apple event interaction [carbon] */
 //#import <Foundation/NSAppleScript>
 /* for various VLC core related calls */
-#import "intf.h"
+#import "VLCMain.h"
 
 @implementation VLCEyeTVController
 

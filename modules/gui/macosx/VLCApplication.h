@@ -1,10 +1,13 @@
 /*****************************************************************************
- * extensions_manager.h: Extensions manager for Cocoa
- ****************************************************************************
- * Copyright (C) 2012 VideoLAN and authors
+ * VLCApplication.h: MacOS X interface module
+ *****************************************************************************
+ * Copyright (C) 2002-2016 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Brendon Justin <brendonjustin@gmail.com>
+ * Authors: Derk-Jan Hartman <hartman at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
+ *          Pierre d'Herbemont <pdherbemont # videolan org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,39 +24,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#import "ExtensionsDialogProvider.h"
-#import "VLCMain.h"
-
-#import <vlc_extensions.h>
-
 #import <Cocoa/Cocoa.h>
 
-@class ExtensionsDialogProvider;
+/*****************************************************************************
+ * VLCApplication interface
+ *****************************************************************************/
 
-@protocol ExtensionsDelegate <NSObject>
-- (void)extensionsUpdated;
-@end
-
-@interface ExtensionsManager : NSObject
-
-- (void)buildMenu:(NSMenu *)extMenu;
-
-- (BOOL)loadExtensions;
-- (void)unloadExtensions;
-- (void)reloadExtensions;
-
-- (void)triggerMenu:(id)sender;
-- (void)inputChanged:(input_thread_t *)p_input;
-- (void)playingChanged:(int)state;
-- (void)metaChanged:(input_item_t *)p_input;
-
-- (BOOL)isLoaded;
-- (BOOL)cannotLoad;
-
-@property (readonly) BOOL isUnloading;
+@interface VLCApplication : NSApplication
 
 @end

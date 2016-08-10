@@ -25,7 +25,7 @@
 
 #import "VLCPlaylist.h"
 #import "VLCStringUtility.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import "ControlsBar.h"
 #import "VLCMainMenu.h"
 #import "VLCPlaylistInfo.h"

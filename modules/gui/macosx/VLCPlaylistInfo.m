@@ -23,7 +23,7 @@
  ******************************************************************************/
 
 #import "CompatibilityFixes.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCPlaylist.h"
 #import <vlc_url.h>

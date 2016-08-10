@@ -27,7 +27,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "intf.h"
+#import "VLCMain.h"
 #import "BWQuincyUI.h"
 #import "BWQuincyManager.h"
 #import <sys/sysctl.h>

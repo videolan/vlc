@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #import "CompatibilityFixes.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCVideoEffectsWindowController.h"
 #import "SharedDialogs.h"
 #import "VLCCoreInteraction.h"

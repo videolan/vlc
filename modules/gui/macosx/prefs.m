@@ -54,7 +54,7 @@
 #include <vlc_config_cat.h>
 
 #import "CompatibilityFixes.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import "prefs.h"
 #import "simple_prefs.h"
 #import "prefs_widgets.h"

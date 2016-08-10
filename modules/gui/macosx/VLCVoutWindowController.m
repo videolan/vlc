@@ -26,7 +26,7 @@
 
 #import "CompatibilityFixes.h"
 #import "VLCVoutWindowController.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCMainWindow.h"
 #import "VLCVoutView.h"
 

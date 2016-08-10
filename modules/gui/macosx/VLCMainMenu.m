@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #import "VLCMainMenu.h"
-#import "intf.h"
+#import "VLCMain.h"
 
 #import <vlc_common.h>
 #import <vlc_playlist.h>

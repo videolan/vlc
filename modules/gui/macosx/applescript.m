@@ -25,7 +25,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#import "intf.h"
+#import "VLCMain.h"
 #import "applescript.h"
 #import "VLCCoreInteraction.h"
 #import "VLCPlaylist.h"

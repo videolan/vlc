@@ -37,7 +37,7 @@
 #include <vlc_playlist.h>
 #include <vlc_vout_window.h>
 
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCMinimalVoutWindow.h"
 
 /*****************************************************************************

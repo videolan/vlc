@@ -26,7 +26,7 @@
 # import "config.h"
 #endif
 
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCAudioEffectsWindowController.h"
 #import "../../audio_filter/equalizer_presets.h"
 #import "CompatibilityFixes.h"

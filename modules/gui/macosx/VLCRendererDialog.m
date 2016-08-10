@@ -24,7 +24,7 @@
 #import "VLCRendererDialog.h"
 
 #import "VLCRendererItem.h"
-#import "intf.h"
+#import "VLCMain.h"
 
 #include <vlc_renderer_discovery.h>
 

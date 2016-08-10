@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "Windows.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCCoreInteraction.h"
 #import "ControlsBar.h"
 #import "VLCVoutView.h"

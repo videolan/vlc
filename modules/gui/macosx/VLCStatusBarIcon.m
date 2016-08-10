@@ -24,7 +24,7 @@
 #import "VLCStatusBarIcon.h"
 
 #import "VLCMainMenu.h"
-#import "intf.h"
+#import "VLCMain.h"
 
 #import <vlc_common.h>
 #import <vlc_playlist.h>
@@ -32,6 +32,8 @@
 
 #import "VLCCoreInteraction.h"
 #import "VLCStringUtility.h"
+
+#import "VLCApplication.h"
 
 @interface VLCStatusBarIcon ()
 {

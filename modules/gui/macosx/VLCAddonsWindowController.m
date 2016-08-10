@@ -24,7 +24,7 @@
 #import <vlc_addons.h>
 
 #import "VLCAddonsWindowController.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCMainWindow.h"
 #import "VLCAddonListItem.h"
 

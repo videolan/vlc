@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 #import "VLCDebugMessageWindowController.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import <vlc_common.h>
 
 static void MsgCallback(void *data, int type, const vlc_log_t *item, const char *format, va_list ap);

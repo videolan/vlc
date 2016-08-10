@@ -32,7 +32,7 @@
 #import <stdlib.h>                                                 /* free() */
 
 #import "CompatibilityFixes.h"
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCVoutView.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainMenu.h"

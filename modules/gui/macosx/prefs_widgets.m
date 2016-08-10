@@ -37,7 +37,7 @@
 #include <vlc_plugin.h>
 #include <vlc_keys.h>
 
-#include "intf.h"
+#include "VLCMain.h"
 #include "prefs_widgets.h"
 
 #define CONFIG_ITEM_STRING_LIST (CONFIG_ITEM_STRING + 10)

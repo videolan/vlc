@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "intf.h"
+#import "VLCMain.h"
 #import <vlc_common.h>
 
 @interface VLCBookmarksWindowController : NSWindowController

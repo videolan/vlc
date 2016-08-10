@@ -24,7 +24,7 @@
 
 #import "VLCResumeDialogController.h"
 
-#import "intf.h"
+#import "VLCMain.h"
 #import "VLCStringUtility.h"
 
 @interface VLCResumeDialogController()
