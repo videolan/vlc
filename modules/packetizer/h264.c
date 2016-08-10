@@ -624,13 +624,17 @@ static block_t *OutputPicture( decoder_t *p_dec )
         p_pic = block_ChainGather( p_sys->p_frame );
     }
 
-    unsigned i_num_clock_ts = 1;
-    if( p_sys->b_frame_mbs_only == 0 && p_sys->b_pic_struct_present_flag )
+    unsigned i_num_clock_ts = 2;
+    if( p_sys->b_frame_mbs_only == 0 )
     {
-        if( p_sys->i_pic_struct < 9 )
+        if( p_sys->b_pic_struct_present_flag && p_sys->i_pic_struct < 9 )
         {
             const uint8_t rgi_numclock[9] = { 1, 1, 1, 2, 2, 3, 3, 2, 3 };
             i_num_clock_ts = rgi_numclock[ p_sys->i_pic_struct ];
+        }
+        else if( p_sys->slice.i_field_pic_flag ) /* See D-1 and E-6 */
+        {
+            i_num_clock_ts = 1;
         }
     }
 
