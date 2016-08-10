@@ -35,7 +35,7 @@ libmacosx_plugin_la_SOURCES = \
 	ExtensionsManager.h ExtensionsManager.m \
 	VLCFSPanel.h VLCFSPanel.m \
 	VLCHelpWindowController.h VLCHelpWindowController.m \
-	intf-prefs.h intf-prefs.m \
+	VLCMain+OldPrefs.h VLCMain+OldPrefs.m \
 	intf.h intf.m \
 	iTunes.h \
 	KeyboardBacklight.h KeyboardBacklight.m \

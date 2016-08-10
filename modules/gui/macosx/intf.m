@@ -64,7 +64,7 @@
 
 #import "VLCVideoEffectsWindowController.h"
 #import "VLCAudioEffectsWindowController.h"
-#import "intf-prefs.h"
+#import "VLCMain+OldPrefs.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */

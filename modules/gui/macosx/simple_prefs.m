@@ -35,7 +35,7 @@
 #import <vlc_config_cat.h>
 #import "misc.h"
 #import "intf.h"
-#import "intf-prefs.h"
+#import "VLCMain+OldPrefs.h"
 #import "AppleRemote.h"
 #import "VLCCoreInteraction.h"
 

@@ -563,9 +563,9 @@ modules/gui/macosx/VLCFSPanel.m
 modules/gui/macosx/helpers.h
 modules/gui/macosx/intf.h
 modules/gui/macosx/intf.m
-modules/gui/macosx/intf-prefs.h
-modules/gui/macosx/intf-prefs.m
 modules/gui/macosx/macosx.m
+modules/gui/macosx/VLCMain+OldPrefs.h
+modules/gui/macosx/VLCMain+OldPrefs.m
 modules/gui/macosx/VLCMainMenu.h
 modules/gui/macosx/VLCMainMenu.m
 modules/gui/macosx/VLCMainWindow.h

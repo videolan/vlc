@@ -23,7 +23,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "intf-prefs.h"
+#import "VLCMain+OldPrefs.h"
 #import "VLCCoreInteraction.h"
 
 #include <unistd.h> /* execl() */
