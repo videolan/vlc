@@ -634,7 +634,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
         }
     }
 
-    if( p_sys->i_time_scale )
+    if( p_sys->i_time_scale && p_pic->i_length == 0 )
     {
         p_pic->i_length = CLOCK_FREQ * i_num_clock_ts *
                           p_sys->i_num_units_in_tick / p_sys->i_time_scale;
