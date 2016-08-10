@@ -664,6 +664,7 @@ static const staticentry_t p_list_video[] = {
     /* */
     B(VLC_CODEC_DNXHD, "DNxHD"),
         A("AVdn"),
+        E("AVdh", "DNxHR"),
     B(VLC_CODEC_8BPS, "8BPS"),
         A("8BPS"),
     B(VLC_CODEC_MIMIC, "Mimic"),
