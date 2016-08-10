@@ -85,6 +85,10 @@ endif
 .sum-luac: .sum-lua
 	touch $@
 
+ifdef HAVE_WIN32
+LUACVARS=CPPFLAGS="-DLUA_DL_DLL"
+endif
+
 luac: lua-$(LUA_VERSION).tar.gz .sum-luac
 	# DO NOT use the same intermediate directory as the lua target
 	rm -Rf -- $@-$(LUA_VERSION) $@
@@ -94,7 +98,7 @@ luac: lua-$(LUA_VERSION).tar.gz .sum-luac
 	mv luac-$(LUA_VERSION) luac
 
 .luac: luac
-	cd $< && $(MAKE) generic
+	cd $< && $(LUACVARS) $(MAKE) generic
 	mkdir -p -- $(BUILDBINDIR)
 	install -m 0755 -s -- $</src/luac $(BUILDBINDIR)/$(HOST)-luac
 	touch $@
