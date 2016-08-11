@@ -95,6 +95,19 @@ HAVE_IOS="0"
 HAVE_OSX="0"
 HAVE_TVOS="0"
 
+dnl  Set x86 asm flags and defines
+X86ASMFLAGS=""
+case "${host_cpu}" in
+    i?86)
+    X86ASMFLAGS="-f elf32"
+    X86ASMDEFS="-DARCH_X86_32=1 -DARCH_X86_64=0"
+        ;;
+    x86_64)
+    X86ASMFLAGS="-f elf64"
+    X86ASMDEFS="-DARCH_X86_32=0 -DARCH_X86_64=1"
+        ;;
+esac
+
 case "${host_os}" in
   "")
     SYS=unknown
@@ -132,6 +145,8 @@ case "${host_os}" in
     case "${host_cpu}" in
       i?86)
         ARCH_flag="-arch i386"
+        X86ASMFLAGS="-f macho32"
+        X86ASMDEFS="${X86ASMDEFS} -DPREFIX"
       ;;
       ppc64*)
         ARCH_flag="-arch ppc64"
@@ -141,6 +156,8 @@ case "${host_os}" in
       ;;
       x86_64)
         ARCH_flag="-arch x86_64"
+        X86ASMFLAGS="-f macho64"
+        X86ASMDEFS="${X86ASMDEFS} -DPREFIX"
       ;;
       arm*)
         ac_cv_c_bigendian="no"
@@ -259,10 +276,13 @@ case "${host_os}" in
                 WINDOWS_ARCH="x64"
                 PROGRAMFILES="PROGRAMFILES64"
                 LDFLAGS="${LDFLAGS} -Wl,--high-entropy-va -Wl,--image-base,0x140000000"
+                X86ASMFLAGS="-f win64"
             ;;
             *)
                 WINDOWS_ARCH="x86"
                 PROGRAMFILES="PROGRAMFILES"
+                X86ASMFLAGS="-f win32"
+                X86ASMDEFS="${X86ASMDEFS} -DPREFIX"
             ;;
         esac
         AC_SUBST([WINDOWS_ARCH])
@@ -331,6 +351,15 @@ AM_CONDITIONAL([HAVE_WIN32],   [test "${SYS}" = "mingw32"])
 AM_CONDITIONAL([HAVE_WIN64],   [test "${HAVE_WIN64}" = "1"]) dnl Only used for the packaging
 AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])
 AM_CONDITIONAL([HAVE_WIN32_DESKTOP], [test "${SYS}" = "mingw32" -a "$vlc_winstore_app" = "0"])
+
+dnl Use nasm/yasm only on x86
+AC_CHECK_PROGS(X86ASM, [nasm yasm])
+AM_CONDITIONAL([HAVE_X86ASM], [test -n "${X86ASM}" && test -n "{X86ASMFLAGS}"])
+AM_COND_IF([HAVE_X86ASM], [
+  AC_DEFINE([HAVE_X86ASM], [1], [Use external asm on x86.])
+])
+AC_SUBST([X86ASMFLAGS])
+AC_SUBST([X86ASMDEFS])
 
 dnl
 dnl Sadly autoconf does not think about testing foo.exe when ask to test
