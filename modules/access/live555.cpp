@@ -1918,20 +1918,24 @@ static void StreamRead( void *p_private, unsigned int i_size,
     {
         AMRAudioSource *amrSource = (AMRAudioSource*)tk->sub->readSource();
 
-        p_block = block_Alloc( i_size + 1 );
-        p_block->p_buffer[0] = amrSource->lastFrameHeader();
-        memcpy( p_block->p_buffer + 1, tk->p_buffer, i_size );
+        if( (p_block = block_Alloc( i_size + 1 )) )
+        {
+            p_block->p_buffer[0] = amrSource->lastFrameHeader();
+            memcpy( p_block->p_buffer + 1, tk->p_buffer, i_size );
+        }
     }
     else if( tk->fmt.i_codec == VLC_CODEC_H261 )
     {
         H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->sub->rtpSource();
         uint32_t header = h261Source->lastSpecialHeader();
-        p_block = block_Alloc( i_size + 4 );
-        memcpy( p_block->p_buffer, &header, 4 );
-        memcpy( p_block->p_buffer + 4, tk->p_buffer, i_size );
+        if( (p_block = block_Alloc( i_size + 4 )) )
+        {
+            memcpy( p_block->p_buffer, &header, 4 );
+            memcpy( p_block->p_buffer + 4, tk->p_buffer, i_size );
 
-        if( tk->sub->rtpSource()->curPacketMarkerBit() )
-            p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
+            if( tk->sub->rtpSource()->curPacketMarkerBit() )
+                p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
+        }
     }
     else if( tk->fmt.i_codec == VLC_CODEC_H264 || tk->fmt.i_codec == VLC_CODEC_HEVC )
     {
@@ -1941,12 +1945,14 @@ static void StreamRead( void *p_private, unsigned int i_size,
             msg_Warn( p_demux, "unsupported NAL type for H265" );
 
         /* Normal NAL type */
-        p_block = block_Alloc( i_size + 4 );
-        p_block->p_buffer[0] = 0x00;
-        p_block->p_buffer[1] = 0x00;
-        p_block->p_buffer[2] = 0x00;
-        p_block->p_buffer[3] = 0x01;
-        memcpy( &p_block->p_buffer[4], tk->p_buffer, i_size );
+        if( (p_block = block_Alloc( i_size + 4 )) )
+        {
+            p_block->p_buffer[0] = 0x00;
+            p_block->p_buffer[1] = 0x00;
+            p_block->p_buffer[2] = 0x00;
+            p_block->p_buffer[3] = 0x01;
+            memcpy( &p_block->p_buffer[4], tk->p_buffer, i_size );
+        }
     }
     else if( tk->b_asf )
     {
@@ -1956,8 +1962,8 @@ static void StreamRead( void *p_private, unsigned int i_size,
     }
     else
     {
-        p_block = block_Alloc( i_size );
-        memcpy( p_block->p_buffer, tk->p_buffer, i_size );
+        if( (p_block = block_Alloc( i_size )) )
+            memcpy( p_block->p_buffer, tk->p_buffer, i_size );
     }
 
     if( p_sys->i_pcr < i_pts )
