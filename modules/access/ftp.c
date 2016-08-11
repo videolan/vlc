@@ -920,18 +920,20 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
             psz_file = psz_line;
 
         char *psz_uri;
+        char *psz_filename = vlc_uri_encode( psz_file );
         if( asprintf( &psz_uri, "%s://%s:%d%s%s/%s",
                       ( p_sys->tlsmode == NONE ) ? "ftp" :
                       ( ( p_sys->tlsmode == IMPLICIT ) ? "ftps" : "ftpes" ),
                       p_sys->url.psz_host, p_sys->url.i_port,
                       p_sys->url.psz_path ? "/" : "",
                       p_sys->url.psz_path ? p_sys->url.psz_path : "",
-                      psz_file ) != -1 )
+                      psz_filename ) != -1 )
         {
             i_ret = access_fsdir_additem( &fsdir, psz_uri, psz_file,
                                           type, ITEM_NET );
             free( psz_uri );
         }
+        free( psz_filename );
         free( psz_line );
     }
 
