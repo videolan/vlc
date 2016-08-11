@@ -22,7 +22,6 @@ $(TARBALLS)/qt-$(QT_VERSION).tar.xz:
 qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(UNPACK)
 	mv qtbase-opensource-src-$(QT_VERSION) qt-$(QT_VERSION)
-	$(APPLY) $(SRC)/qt/pch.patch
 	$(MOVE)
 
 ifdef HAVE_MACOSX
@@ -35,7 +34,7 @@ endif
 
 QT_CONFIG := -static -release -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -no-dbus \
-	-no-qml-debug -no-audio-backend -no-sql-odbc \
+	-no-qml-debug -no-audio-backend -no-sql-odbc -no-pch \
 	-no-compile-examples -nomake examples
 
 .qt: qt
