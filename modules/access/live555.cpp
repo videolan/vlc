@@ -154,9 +154,14 @@ typedef struct
     es_format_t     fmt;
     es_out_id_t     *p_es;
 
-    bool            b_muxed;
-    bool            b_quicktime;
-    bool            b_asf;
+    enum
+    {
+        SINGLE_STREAM,
+        MULTIPLEXED_STREAM,
+        QUICKTIME_STREAM,
+        ASF_STREAM
+    } format;
+
     block_t         *p_asf_block;
     bool            b_discard_trunc;
     vlc_demux_chained_t *p_out_muxed;    /* for muxed stream */
@@ -440,13 +445,15 @@ static void Close( vlc_object_t *p_this )
     {
         live_track_t *tk = p_sys->track[i];
 
-        if( tk->b_muxed ) vlc_demux_chained_Delete( tk->p_out_muxed );
+        if( tk->p_out_muxed )
+            vlc_demux_chained_Delete( tk->p_out_muxed );
         es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
     }
     TAB_CLEAN( p_sys->i_track, p_sys->track );
-    if( p_sys->p_out_asf ) vlc_demux_chained_Delete( p_sys->p_out_asf );
+    if( p_sys->p_out_asf )
+        vlc_demux_chained_Delete( p_sys->p_out_asf );
     delete p_sys->scheduler;
     free( p_sys->p_sdp );
     free( p_sys->psz_pl_url );
@@ -811,10 +818,8 @@ static int SessionsSetup( demux_t *p_demux )
             tk->p_demux     = p_demux;
             tk->sub         = sub;
             tk->p_es        = NULL;
-            tk->b_quicktime = false;
-            tk->b_asf       = false;
+            tk->format      = live_track_t::SINGLE_STREAM;
             tk->p_asf_block = NULL;
-            tk->b_muxed     = false;
             tk->b_discard_trunc = false;
             tk->p_out_muxed = NULL;
             tk->waiting     = 0;
@@ -946,7 +951,7 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "X-ASF-PF" ) )
                 {
-                    tk->b_asf = true;
+                    tk->format = live_track_t::ASF_STREAM;
                     if( p_sys->p_out_asf == NULL )
                         p_sys->p_out_asf =
                             vlc_demux_chained_New( VLC_OBJECT(p_demux), "asf",
@@ -955,7 +960,7 @@ static int SessionsSetup( demux_t *p_demux )
                 else if( !strcmp( sub->codecName(), "X-QT" ) ||
                          !strcmp( sub->codecName(), "X-QUICKTIME" ) )
                 {
-                    tk->b_quicktime = true;
+                    tk->format = live_track_t::QUICKTIME_STREAM;
                 }
                 else if( !strcmp( sub->codecName(), "SPEEX" ) )
                 {
@@ -1076,11 +1081,11 @@ static int SessionsSetup( demux_t *p_demux )
                          !strcmp( sub->codecName(), "X-SV3V-ES" )  ||
                          !strcmp( sub->codecName(), "X-SORENSONVIDEO" ) )
                 {
-                    tk->b_quicktime = true;
+                    tk->format = live_track_t::QUICKTIME_STREAM;
                 }
                 else if( !strcmp( sub->codecName(), "MP2T" ) )
                 {
-                    tk->b_muxed = true;
+                    tk->format = live_track_t::MULTIPLEXED_STREAM;
                     tk->p_out_muxed =
                         vlc_demux_chained_New( VLC_OBJECT(p_demux), "ts",
                                                p_demux->out );
@@ -1088,14 +1093,14 @@ static int SessionsSetup( demux_t *p_demux )
                 else if( !strcmp( sub->codecName(), "MP2P" ) ||
                          !strcmp( sub->codecName(), "MP1S" ) )
                 {
-                    tk->b_muxed = true;
+                    tk->format = live_track_t::MULTIPLEXED_STREAM;
                     tk->p_out_muxed =
                         vlc_demux_chained_New( VLC_OBJECT(p_demux), "ps",
                                                p_demux->out );
                 }
                 else if( !strcmp( sub->codecName(), "X-ASF-PF" ) )
                 {
-                    tk->b_asf = true;
+                    tk->format = live_track_t::ASF_STREAM;
                     if( p_sys->p_out_asf == NULL )
                         p_sys->p_out_asf =
                             vlc_demux_chained_New( VLC_OBJECT(p_demux),
@@ -1103,7 +1108,7 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "DV" ) )
                 {
-                    tk->b_muxed = true;
+                    tk->format = live_track_t::MULTIPLEXED_STREAM;
                     tk->b_discard_trunc = true;
                     tk->p_out_muxed =
                         vlc_demux_chained_New( VLC_OBJECT(p_demux), "rawdv",
@@ -1151,7 +1156,7 @@ static int SessionsSetup( demux_t *p_demux )
                 tk->fmt.psz_language = strndup( p_lang, i_lang_len );
             }
 
-            if( !tk->b_quicktime && !tk->b_muxed && !tk->b_asf )
+            if( tk->format == live_track_t::SINGLE_STREAM )
             {
                 tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
             }
@@ -1161,8 +1166,10 @@ static int SessionsSetup( demux_t *p_demux )
                 sub->rtcpInstance()->setByeHandler( StreamClose, tk );
             }
 
-            if( tk->p_es || tk->b_quicktime || ( tk->b_muxed && tk->p_out_muxed ) ||
-                ( tk->b_asf && p_sys->p_out_asf ) )
+            if( tk->p_es ||
+                tk->format == live_track_t::QUICKTIME_STREAM ||
+               (tk->format == live_track_t::MULTIPLEXED_STREAM && tk->p_out_muxed ) ||
+               (tk->format == live_track_t::ASF_STREAM && p_sys->p_out_asf ) )
             {
                 TAB_APPEND_CAST( (live_track_t **), p_sys->i_track, p_sys->track, tk );
             }
@@ -1290,8 +1297,11 @@ static int Demux( demux_t *p_demux )
             }
         }
 
-        if( tk->b_asf || tk->b_muxed )
+        if( tk->format == live_track_t::ASF_STREAM ||
+            tk->format == live_track_t::MULTIPLEXED_STREAM )
+        {
             b_send_pcr = false;
+        }
     }
     if( p_sys->i_pcr > VLC_TS_INVALID )
     {
@@ -1326,7 +1336,7 @@ static int Demux( demux_t *p_demux )
     {
         live_track_t *tk = p_sys->track[i];
 
-        if( !tk->b_muxed && !tk->b_rtcp_sync &&
+        if( tk->format != live_track_t::MULTIPLEXED_STREAM && !tk->b_rtcp_sync &&
             tk->sub->rtpSource() && tk->sub->rtpSource()->hasBeenSynchronizedUsingRTCP() )
         {
             msg_Dbg( p_demux, "tk->rtpSource->hasBeenSynchronizedUsingRTCP()" );
@@ -1660,7 +1670,7 @@ static int RollOverTcp( demux_t *p_demux )
     {
         live_track_t *tk = p_sys->track[i];
 
-        if( tk->b_muxed ) vlc_demux_chained_Delete( tk->p_out_muxed );
+        if( tk->p_out_muxed ) vlc_demux_chained_Delete( tk->p_out_muxed );
         if( tk->p_es ) es_out_Del( p_demux->out, tk->p_es );
         if( tk->p_asf_block ) block_Release( tk->p_asf_block );
         es_format_Clean( &tk->fmt );
@@ -1814,7 +1824,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
     /* Retrieve NPT for this pts */
     tk->f_npt = tk->sub->getNormalPlayTime(pts);
 
-    if( tk->b_quicktime && tk->p_es == NULL )
+    if( tk->format == live_track_t::QUICKTIME_STREAM && tk->p_es == NULL )
     {
         QuickTimeGenericRTPSource *qtRTPSource =
             (QuickTimeGenericRTPSource*)tk->sub->rtpSource();
@@ -1954,7 +1964,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
             memcpy( &p_block->p_buffer[4], tk->p_buffer, i_size );
         }
     }
-    else if( tk->b_asf )
+    else if( tk->format == live_track_t::ASF_STREAM )
     {
         p_block = StreamParseAsf( p_demux, tk,
                                   tk->sub->rtpSource()->curPacketMarkerBit(),
@@ -1978,20 +1988,24 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     if( p_block )
     {
-        if( !tk->b_muxed && !tk->b_asf )
+        switch( tk->format )
         {
-            if( i_pts != tk->i_pts )
-                p_block->i_pts = VLC_TS_0 + i_pts;
-            /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
-            p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? VLC_TS_INVALID : (VLC_TS_0 + i_pts);
+            case live_track_t::ASF_STREAM:
+                vlc_demux_chained_Send( p_sys->p_out_asf, p_block );
+                break;
+            case live_track_t::MULTIPLEXED_STREAM:
+                vlc_demux_chained_Send( tk->p_out_muxed, p_block );
+                break;
+            default:
+                if( i_pts != tk->i_pts )
+                    p_block->i_pts = VLC_TS_0 + i_pts;
+                if( i_pts > 0 )
+                    tk->i_pts = i_pts;
+                /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
+                p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? VLC_TS_INVALID : (VLC_TS_0 + i_pts);
+                es_out_Send( p_demux->out, tk->p_es, p_block );
+                break;
         }
-
-        if( tk->b_muxed )
-            vlc_demux_chained_Send( tk->p_out_muxed, p_block );
-        else if( tk->b_asf )
-            vlc_demux_chained_Send( p_sys->p_out_asf, p_block );
-        else
-            es_out_Send( p_demux->out, tk->p_es, p_block );
     }
 
     /* warn that's ok */
@@ -2001,11 +2015,6 @@ static void StreamRead( void *p_private, unsigned int i_size,
     tk->waiting = 0;
     p_demux->p_sys->b_no_data = false;
     p_demux->p_sys->i_no_data_ti = 0;
-
-    if( i_pts > 0 && !tk->b_muxed )
-    {
-        tk->i_pts = i_pts;
-    }
 }
 
 /*****************************************************************************
