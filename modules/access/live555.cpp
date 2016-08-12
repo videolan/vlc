@@ -1333,11 +1333,11 @@ static int Demux( demux_t *p_demux )
     /* remove the task */
     p_sys->scheduler->unscheduleDelayedTask( task );
 
-    mtime_t i_minpcr = VLC_TS_INVALID;
-    bool b_discontinuity = false;
-
     if( b_send_pcr )
     {
+        mtime_t i_minpcr = VLC_TS_INVALID;
+        bool b_discontinuity = false;
+
         /* Check for gap in pts value */
         for( i = 0; i < p_sys->i_track; i++ )
         {
@@ -1424,7 +1424,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int64_t *pi64, i64;
     double  *pf, f;
     bool *pb;
-    int *pi_int;
 
     vlc_mutex_locker locker(&p_sys->timeout_mutex); /* (see same in Demux) */
 
@@ -1558,6 +1557,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_RATE:
         {
+            int *pi_int;
             double f_scale, f_old_scale;
 
             if( !p_sys->rtsp || (p_sys->f_npt_length <= 0) ||
