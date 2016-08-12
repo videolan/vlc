@@ -456,6 +456,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
+    bool b_new_picture = false;
 
     const int i_nal_ref_idc = (p_frag->p_buffer[4] >> 5)&0x03;
     const int i_nal_type = p_frag->p_buffer[4]&0x1f;
@@ -486,7 +487,6 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     else if( i_nal_type >= H264_NAL_SLICE && i_nal_type <= H264_NAL_SLICE_IDR )
     {
         slice_t slice;
-        bool  b_new_picture;
 
         if(ParseSlice( p_dec, &b_new_picture, &slice, i_nal_ref_idc, i_nal_type, p_frag ))
         {
@@ -553,7 +553,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
 
     *pb_ts_used = false;
     if( p_sys->i_frame_dts <= VLC_TS_INVALID &&
-        p_sys->i_frame_pts <= VLC_TS_INVALID )
+        p_sys->i_frame_pts <= VLC_TS_INVALID && b_new_picture )
     {
         p_sys->i_frame_dts = i_frag_dts;
         p_sys->i_frame_pts = i_frag_pts;
