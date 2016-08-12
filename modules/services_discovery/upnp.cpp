@@ -311,6 +311,14 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
                                                 ITEM_NET );
 
         input_item_SetSetting( p_input_item, SATIP_SERVER_DEVICE_TYPE );
+
+        char *psz_playlist_option;
+
+        if (asprintf( &psz_playlist_option, "satip-host=%s",
+                     desc->satIpHost.c_str() ) >= 0 ) {
+            input_item_AddOption( p_input_item, psz_playlist_option, 0 );
+            free( psz_playlist_option );
+        }
     } else {
         char* psz_mrl;
         // We might already have some options specified in the location.
@@ -442,6 +450,9 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
         if ( !strncmp( SATIP_SERVER_DEVICE_TYPE, psz_device_type,
                 strlen( SATIP_SERVER_DEVICE_TYPE ) - 1 ) )
         {
+            vlc_url_t url;
+            vlc_UrlParse( &url, psz_base_url );
+
             /* Check for SAT>IP m3u list, which is provided by some off-standard devices */
             const char* psz_m3u_url = xml_getChildElementValue( p_device_element, "satip:X_SATIPM3U" );
             SD::MediaServerDesc* p_server = NULL;
@@ -461,7 +472,9 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                 if ( unlikely( !p_server ) )
                     break;
 
+                p_server->satIpHost = url.psz_host;
                 p_server->isSatIp = true;
+
                 if ( !addServer( p_server ) )
                     delete p_server;
             } else {
@@ -472,28 +485,28 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
                     break;
                 }
                 char *psz_url;
-                vlc_url_t url;
-                vlc_UrlParse( &url, psz_base_url );
-
-                if (asprintf( &psz_url, "http/lua://www.satip.info/Playlists/%s.m3u?device=%s",
-                             psz_satellite,
-                             url.psz_host ) < 0 ) {
-                    vlc_UrlClean( &url );
+                if (asprintf( &psz_url, "http://www.satip.info/Playlists/%s.m3u",
+                             psz_satellite ) < 0 ) {
                     free( psz_satellite );
                     continue;
                 }
                 free( psz_satellite );
-                vlc_UrlClean( &url );
 
-                p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn,
-                                                                  psz_friendly_name, psz_url, iconUrl );
+                p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_url, iconUrl );
 
-                p_server->isSatIp = true;
-                if( !addServer( p_server ) ) {
-                    delete p_server;
+                if ( likely( p_server ) )
+                {
+                    p_server->satIpHost = url.psz_host;
+                    p_server->isSatIp = true;
+
+                    if( !addServer( p_server ) ) {
+                        delete p_server;
+                    }
                 }
+
                 free( psz_url );
             }
+            vlc_UrlClean( &url );
 
             continue;
         }

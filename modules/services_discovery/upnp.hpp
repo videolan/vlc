@@ -90,6 +90,7 @@ struct MediaServerDesc
     std::string iconUrl;
     input_item_t* inputItem;
     bool isSatIp;
+    std::string satIpHost;
 };
 
 

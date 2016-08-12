@@ -263,6 +263,7 @@ static int Demux( demux_t *p_demux )
             if( !p_input )
                 goto error;
             input_item_AddOptions( p_input, i_options, ppsz_options, 0 );
+            input_item_CopyOptions( p_input, p_current_input );
 
             if( !EMPTY_STR(psz_artist) )
                 input_item_SetArtist( p_input, psz_artist );

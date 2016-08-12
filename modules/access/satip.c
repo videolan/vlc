@@ -60,6 +60,8 @@ static void satip_close(vlc_object_t *);
 #define MULTICAST_TEXT N_("Request multicast stream")
 #define MULTICAST_LONGTEXT N_("Request server to send stream as multicast")
 
+#define SATIP_HOST_TEXT N_("Host")
+
 vlc_module_begin()
     set_shortname("satip")
     set_description( N_("SAT>IP Receiver Plugin") )
@@ -69,7 +71,9 @@ vlc_module_begin()
     set_subcategory(SUBCAT_INPUT_ACCESS)
     add_integer("satip-buffer", 0x400000, BUFFER_TEXT, BUFFER_LONGTEXT, true)
     add_bool("satip-multicast", false, MULTICAST_TEXT, MULTICAST_LONGTEXT, true)
-    add_shortcut("satip")
+    add_string("satip-host", "", SATIP_HOST_TEXT, SATIP_HOST_TEXT, true)
+    change_safe()
+    add_shortcut("rtsp", "satip")
 vlc_module_end()
 
 enum rtsp_state {
@@ -625,6 +629,8 @@ static int satip_open(vlc_object_t *obj)
 
     msg_Dbg(access, "try to open '%s'", access->psz_url);
 
+    char *psz_host = var_InheritString(access, "satip-host");
+
     sys->udp_sock = -1;
     sys->rtcp_sock = -1;
 
@@ -647,17 +653,20 @@ static int satip_open(vlc_object_t *obj)
     vlc_UrlParse(&url, psz_lower_url);
     if (url.i_port <= 0)
         url.i_port = RTSP_DEFAULT_PORT;
+    if (psz_host == NULL) {
+        psz_host = strdup(url.psz_host);
+    }
 
-    msg_Dbg(access, "connect to host '%s'", url.psz_host);
-    sys->tcp_sock = net_ConnectTCP(access, url.psz_host, url.i_port);
+    msg_Dbg(access, "connect to host '%s'", psz_host);
+    sys->tcp_sock = net_ConnectTCP(access, psz_host, url.i_port);
     if (sys->tcp_sock < 0) {
         msg_Err(access, "Failed to connect to RTSP server %s:%d",
-                url.psz_host, url.i_port);
+                psz_host, url.i_port);
         goto error;
     }
     setsockopt (sys->tcp_sock, SOL_SOCKET, SO_KEEPALIVE, &(int){ 1 }, sizeof (int));
 
-    if (asprintf(&sys->content_base, "rtsp://%s:%d/", url.psz_host,
+    if (asprintf(&sys->content_base, "rtsp://%s:%d/", psz_host,
              url.i_port) < 0) {
         sys->content_base = NULL;
         goto error;
@@ -746,11 +755,13 @@ static int satip_open(vlc_object_t *obj)
     access->pf_control = satip_control;
     access->pf_block = satip_block;
 
+    free(psz_host);
     free(psz_lower_url);
     vlc_UrlClean(&url);
     return VLC_SUCCESS;
 
 error:
+    free(psz_host);
     free(psz_lower_url);
     vlc_UrlClean(&url);
 

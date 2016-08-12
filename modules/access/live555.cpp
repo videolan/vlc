@@ -286,6 +286,22 @@ static int  Open ( vlc_object_t *p_this )
     int i_return;
     int i_error = VLC_EGENERIC;
 
+    /* if the rtsp URL may contain a sat.ip fake DNS, bail-out early and 
+     * let the SAT>IP module handle that */
+    if( !strncmp(p_demux->psz_location, "sat.ip", 6) )
+    {
+        msg_Err( p_demux, "SAT>IP server, bailing out");
+        return VLC_EGENERIC;
+    }
+    /* If satip-host is set on the item, we shall assume it is a rtsp for the
+     * SAT>IP module and bail-out early. */
+    char *psz_host = var_InheritString(p_demux, "satip-host");
+    if (psz_host != NULL) {
+        msg_Err( p_demux, "URL is for SAT>IP, bailing out");
+        free(psz_host);
+        return VLC_EGENERIC;
+    }
+
     if( p_demux->s )
     {
         /* See if it looks like a SDP
