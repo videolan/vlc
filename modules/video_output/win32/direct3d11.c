@@ -927,6 +927,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
     {
         /* TODO device lost */
+        msg_Dbg(vd, "SwapChain Present failed. (hr=0x%lX)", hr);
     }
 #if defined(HAVE_ID3D11VIDEODECODER)
     if( is_d3d11_opaque(picture->format.i_chroma) && sys->context_lock != INVALID_HANDLE_VALUE) {
