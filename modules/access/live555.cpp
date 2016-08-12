@@ -174,6 +174,7 @@ typedef struct
     char            waiting;
     int64_t         i_lastpts;
     int64_t         i_pcr;
+    int64_t         i_offset;
     double          f_npt;
 
     bool            b_selected;
@@ -1364,6 +1365,7 @@ static int Demux( demux_t *p_demux )
             {
                 live_track_t *tk = p_sys->track[i];
                 tk->i_lastpts = VLC_TS_INVALID;
+                tk->i_offset = 0;
                 tk->i_pcr = VLC_TS_INVALID;
                 tk->f_npt = 0.;
                 tk->b_discontinuity = false;
@@ -2012,9 +2014,18 @@ static void StreamRead( void *p_private, unsigned int i_size,
     {
         msg_Dbg( p_demux, "tk->rtpSource->hasBeenSynchronizedUsingRTCP()" );
         p_sys->b_rtcp_sync = tk->b_rtcp_sync = true;
-        tk->b_discontinuity = ( tk->i_pcr > VLC_TS_INVALID );
-        tk->i_pcr = VLC_TS_INVALID;
+        if( tk->i_pcr < i_pts )
+        {
+            tk->i_offset = (tk->i_pcr > 0) ? i_pts + tk->i_pcr : 0;
+        }
+        else
+        {
+            tk->b_discontinuity = ( tk->i_pcr > VLC_TS_INVALID );
+            tk->i_pcr = VLC_TS_INVALID;
+        }
     }
+
+    i_pts -= tk->i_offset;
 
     /* Update our global npt value */
     if( tk->f_npt > 0 &&
