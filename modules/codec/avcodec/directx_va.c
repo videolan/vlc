@@ -384,20 +384,24 @@ int directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys, picture_t *pic, uint8_t 
 
     vlc_mutex_lock( &dx_sys->surface_lock );
 
-    /* Grab an unused surface, in case none are, try the oldest
-     * XXX using the oldest is a workaround in case a problem happens with libavcodec */
-    int i, old;
-    for (i = 0, old = 0; i < dx_sys->surface_count; i++) {
+    /* Grab the oldest unused surface, in case none are, use the oldest used one
+     * XXX using the used one is a workaround in case a problem happens with libavcodec */
+    int i, old = -1, old_used = -1;
+
+    for (i = 0; i < dx_sys->surface_count; i++) {
         vlc_va_surface_t *surface = &dx_sys->surface[i];
-
-        if (!surface->refcount)
-            break;
-
-        if (surface->order < dx_sys->surface[old].order)
+        if ((old == -1 || surface->order < dx_sys->surface[old].order) && !surface->refcount)
             old = i;
+        if (old_used == -1 || surface->order < dx_sys->surface[old_used].order)
+            old_used = i;
     }
-    if (i >= dx_sys->surface_count)
+    if (old >= 0)
         i = old;
+    else if (old_used >= 0)
+    {
+        msg_Warn(va, "couldn't find a free decoding buffer, using index %d", old_used);
+        i = old_used;
+    }
 
     vlc_va_surface_t *surface = &dx_sys->surface[i];
 
