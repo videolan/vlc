@@ -44,16 +44,13 @@ const char* MEDIA_SERVER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:
 const char* CONTENT_DIRECTORY_SERVICE_TYPE = "urn:schemas-upnp-org:service:ContentDirectory:1";
 const char* SATIP_SERVER_DEVICE_TYPE = "urn:ses-com:device:SatIPServer:1";
 
-#define SATIP_SATELLITE N_("SAT>IP satellite")
-#define SATIP_SATELLITE_LONG N_( "VLC will download the channel list for SAT>IP " \
-"playback based on the chosen satellite.")
-static const char *const ppsz_satip_satellites[] = {
-    "ASTRA_19_2E", "ASTRA_28_2E", "ASTRA_23_5E", "eutelsat_13_0E", "eutelsat_09_0E",
-    "eutelsat_05_0W", "hispasat_30_0W"
+#define SATIP_CHANNEL_LIST N_("SAT>IP channel list")
+#define SATIP_CHANNEL_LIST_URL N_("Custom SAT>IP channel list URL")
+static const char *const ppsz_satip_channel_lists[] = {
+    "ASTRA_19_2E", "ASTRA_28_2E", "ASTRA_23_5E", "MasterList", "ServerList", "CustomList"
 };
-static const char *const ppsz_readible_satip_satellites[] = {
-    "Astra 19.2°E", "Astra 28.2°E", "Astra 23.5°E", "Eutelsat 13.0°E", "Eutelsat 09.0°E",
-    "Eutelsat 05.0°W", "Hispasat 30.0°W"
+static const char *const ppsz_readible_satip_channel_lists[] = {
+    "Astra 19.2°E", "Astra 28.2°E", "Astra 23.5°E", N_("Master List"), N_("Server List"), N_("Custom List")
 };
 
 /*
@@ -102,11 +99,12 @@ vlc_module_begin()
     set_capability( "services_discovery", 0 );
     set_callbacks( SD::Open, SD::Close );
 
-    set_description( N_("SAT>IP") )
-    add_string( "satip-satellite", "ASTRA_19_2E", SATIP_SATELLITE,
-                SATIP_SATELLITE_LONG, false )
-    change_string_list( ppsz_satip_satellites, ppsz_readible_satip_satellites )
-    change_safe ()
+    set_description( "SAT>IP" )
+    add_string( "satip-channelist", "ASTRA_19_2E", SATIP_CHANNEL_LIST,
+                SATIP_CHANNEL_LIST, false )
+    change_string_list( ppsz_satip_channel_lists, ppsz_readible_satip_channel_lists )
+    add_string( "satip-channellist-url", NULL, SATIP_CHANNEL_LIST_URL,
+                SATIP_CHANNEL_LIST_URL, false )
 
     add_submodule()
         set_category( CAT_INPUT )
@@ -450,62 +448,93 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
         if ( !strncmp( SATIP_SERVER_DEVICE_TYPE, psz_device_type,
                 strlen( SATIP_SERVER_DEVICE_TYPE ) - 1 ) )
         {
+            SD::MediaServerDesc* p_server = NULL;
+
             vlc_url_t url;
             vlc_UrlParse( &url, psz_base_url );
 
-            /* Check for SAT>IP m3u list, which is provided by some off-standard devices */
-            const char* psz_m3u_url = xml_getChildElementValue( p_device_element, "satip:X_SATIPM3U" );
-            SD::MediaServerDesc* p_server = NULL;
-            if ( psz_m3u_url ) {
+            char *psz_satip_channellist = config_GetPsz(m_sd, "satip-channelist");
+            if( !psz_satip_channellist ) {
+                break;
+            }
 
-                if ( strncmp( "http://", psz_m3u_url, 7) && strncmp( "https://", psz_m3u_url, 8) )
-                {
-                    char* psz_url = NULL;
-                    if ( UpnpResolveURL2( psz_base_url, psz_m3u_url, &psz_url ) == UPNP_E_SUCCESS )
-                    {
-                        p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_url, iconUrl );
-                        free(psz_url);
+            /* a user may have provided a custom playlist url */
+            if (strncmp(psz_satip_channellist, "CustomList", 10) == 0) {
+                char *psz_satip_playlist_url = config_GetPsz( m_sd, "satip-channellist-url" );
+                if ( psz_satip_playlist_url ) {
+                    p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_satip_playlist_url, iconUrl );
+
+                    if( likely( p_server ) ) {
+                        p_server->satIpHost = url.psz_host;
+                        p_server->isSatIp = true;
+                        if( !addServer( p_server ) ) {
+                            delete p_server;
+                        }
                     }
-                } else
-                    p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_m3u_url, iconUrl );
 
-                if ( unlikely( !p_server ) )
-                    break;
-
-                p_server->satIpHost = url.psz_host;
-                p_server->isSatIp = true;
-
-                if ( !addServer( p_server ) )
-                    delete p_server;
-            } else {
-                /* if no playlist is found, add a playlist from the web based on the chosen
-                 * satellite, which will be processed by a lua script a bit later */
-                char *psz_satellite = config_GetPsz(m_sd, "satip-satellite");
-                if( !psz_satellite ) {
-                    break;
-                }
-                char *psz_url;
-                if (asprintf( &psz_url, "http://www.satip.info/Playlists/%s.m3u",
-                             psz_satellite ) < 0 ) {
-                    free( psz_satellite );
+                    /* to comply with the SAT>IP specification, we don't fall back on another channel list if this path failed */
+                    free( psz_satip_playlist_url );
+                    vlc_UrlClean( &url );
                     continue;
                 }
-                free( psz_satellite );
+            }
 
-                p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_url, iconUrl );
+            /* If requested by the user, check for a SAT>IP m3u list, which may be provided by some rare devices */
+            if (strncmp(psz_satip_channellist, "ServerList", 10) == 0) {
+                const char* psz_m3u_url = xml_getChildElementValue( p_device_element, "satip:X_SATIPM3U" );
+                if ( psz_m3u_url ) {
+                    if ( strncmp( "http", psz_m3u_url, 4) )
+                    {
+                        char* psz_url = NULL;
+                        if ( UpnpResolveURL2( psz_base_url, psz_m3u_url, &psz_url ) == UPNP_E_SUCCESS )
+                        {
+                            p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_url, iconUrl );
+                            free(psz_url);
+                        }
+                    } else {
+                        p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_m3u_url, iconUrl );
+                    }
 
-                if ( likely( p_server ) )
-                {
+                    if ( unlikely( !p_server ) )
+                        break;
+
                     p_server->satIpHost = url.psz_host;
                     p_server->isSatIp = true;
-
-                    if( !addServer( p_server ) ) {
+                    if ( !addServer( p_server ) )
                         delete p_server;
-                    }
+
+                    free(psz_satip_channellist);
+                } else {
+                    msg_Warn( m_sd, "SAT>IP server '%s' did not provide a playlist", url.psz_host);
                 }
 
-                free( psz_url );
+                /* to comply with the SAT>IP specifications, we don't fallback on another channel list if this path failed */
+                vlc_UrlClean( &url );
+                continue;
             }
+
+            /* Normally, fetch a playlist from the web,
+             * which will be processed by a lua script a bit later */
+            char *psz_url;
+            if (asprintf( &psz_url, "http://www.satip.info/Playlists/%s.m3u",
+                         psz_satip_channellist ) < 0 ) {
+                vlc_UrlClean( &url );
+                free( psz_satip_channellist );
+                continue;
+            }
+
+            p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn,
+                                                             psz_friendly_name, psz_url, iconUrl );
+
+            if( likely( p_server ) ) {
+                p_server->satIpHost = url.psz_host;
+                p_server->isSatIp = true;
+                if( !addServer( p_server ) ) {
+                    delete p_server;
+                }
+            }
+            free( psz_url );
+            free( psz_satip_channellist );
             vlc_UrlClean( &url );
 
             continue;
