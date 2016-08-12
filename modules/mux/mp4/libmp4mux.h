@@ -36,6 +36,13 @@ typedef struct
 
 typedef struct
 {
+    uint64_t i_duration;
+    mtime_t i_start_time;
+    mtime_t i_start_offset;
+} mp4mux_edit_t;
+
+typedef struct
+{
     unsigned i_track_id;
     es_format_t   fmt;
 
@@ -50,7 +57,7 @@ typedef struct
     /* stats */
     int64_t      i_read_duration;
     uint32_t     i_timescale;
-    mtime_t      i_starttime; /* the really first packet */
+    mtime_t      i_firstdts; /* the really first packet */
     bool         b_hasbframes;
 
     /* temp stuff */
@@ -60,6 +67,10 @@ typedef struct
     /* frags */
     uint32_t     i_trex_default_length;
     uint32_t     i_trex_default_size;
+
+    /* edit list */
+    unsigned int i_edits_count;
+    mp4mux_edit_t *p_edits;
 
 } mp4mux_trackinfo_t;
 

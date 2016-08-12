@@ -55,13 +55,16 @@ bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream)
 
     p_stream->i_read_duration = 0;
     p_stream->i_timescale     = CLOCK_FREQ;
-    p_stream->i_starttime     = 0;
+    p_stream->i_firstdts     = 0;
     p_stream->b_hasbframes    = false;
 
     p_stream->i_stco_pos = 0;
 
     p_stream->i_trex_default_length = 0;
     p_stream->i_trex_default_size = 0;
+
+    p_stream->i_edits_count = 0;
+    p_stream->p_edits = NULL;
     return true;
 }
 
@@ -71,6 +74,7 @@ void mp4mux_trackinfo_Clear(mp4mux_trackinfo_t *p_stream)
     if (p_stream->a52_frame)
         block_Release(p_stream->a52_frame);
     free(p_stream->entry);
+    free(p_stream->p_edits);
 }
 
 
@@ -162,6 +166,70 @@ static void matrix_apply_rotation(es_format_t *fmt, uint32_t mvhd_matrix[9])
 
     mvhd_matrix[3] = mvhd_matrix[0] ? 0 : 0x10000;
     mvhd_matrix[4] = mvhd_matrix[1] ? 0 : 0x10000;
+}
+
+static void AddEdit(bo_t *elst,
+                    int64_t i_movie_scaled_duration,
+                    int64_t i_media_scaled_time,
+                    bool b_64_ext)
+{
+    if(b_64_ext)
+    {
+        bo_add_64be(elst, i_movie_scaled_duration);
+        bo_add_64be(elst, i_media_scaled_time);
+    }
+    else
+    {
+        bo_add_32be(elst, i_movie_scaled_duration);
+        bo_add_32be(elst, i_media_scaled_time);
+    }
+    bo_add_16be(elst, 1);
+    bo_add_16be(elst, 0);
+}
+
+static bo_t *GetEDTS( mp4mux_trackinfo_t *p_track, uint32_t i_movietimescale, bool b_64_ext)
+{
+    if(p_track->i_edits_count == 0)
+        return NULL;
+
+    bo_t *edts = box_new("edts");
+    bo_t *elst = box_full_new("elst", b_64_ext ? 1 : 0, 0);
+    if(!elst || !edts)
+    {
+        bo_free(elst);
+        bo_free(edts);
+        return NULL;
+    }
+
+    uint32_t i_total_edits = p_track->i_edits_count;
+    for(unsigned i=0; i<p_track->i_edits_count; i++)
+    {
+        /* !WARN! media time must start sample time 0, we need a -1 edit for start offsets */
+        if(p_track->p_edits[i].i_start_offset)
+            i_total_edits++;
+    }
+
+    bo_add_32be(elst, i_total_edits);
+
+    for(unsigned i=0; i<p_track->i_edits_count; i++)
+    {
+        if(p_track->p_edits[i].i_start_offset)
+        {
+            AddEdit(elst,
+                    p_track->p_edits[i].i_start_offset * i_movietimescale / CLOCK_FREQ,
+                    -1,
+                    b_64_ext);
+        }
+
+        /* !WARN AGAIN! Uses different Timescales ! */
+        AddEdit(elst,
+                p_track->p_edits[i].i_duration * i_movietimescale / CLOCK_FREQ,
+                p_track->p_edits[i].i_start_time * p_track->i_timescale / CLOCK_FREQ,
+                b_64_ext);
+    }
+
+    box_gather(edts, elst);
+    return edts;
 }
 
 static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
@@ -1573,46 +1641,9 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
         /* *** add /moov/trak/edts and elst */
         if ( !b_fragmented )
         {
-            bo_t *elst = box_full_new("elst", b_64_ext ? 1 : 0, 0);
-            if(elst)
-            {
-                if (p_stream->i_starttime > 0) {
-                    bo_add_32be(elst, 2);
-
-                    if (b_64_ext) {
-                        bo_add_64be(elst, p_stream->i_starttime *
-                                    i_movie_timescale / CLOCK_FREQ);
-                        bo_add_64be(elst, -1);
-                    } else {
-                        bo_add_32be(elst, p_stream->i_starttime *
-                                    i_movie_timescale / CLOCK_FREQ);
-                        bo_add_32be(elst, -1);
-                    }
-                    bo_add_16be(elst, 1);
-                    bo_add_16be(elst, 0);
-                } else {
-                    bo_add_32be(elst, 1);
-                }
-                if (b_64_ext) {
-                    bo_add_64be(elst, p_stream->i_read_duration *
-                                i_movie_timescale / CLOCK_FREQ);
-                    bo_add_64be(elst, 0);
-                } else {
-                    bo_add_32be(elst, p_stream->i_read_duration *
-                                i_movie_timescale / CLOCK_FREQ);
-                    bo_add_32be(elst, 0);
-                }
-                bo_add_16be(elst, 1);
-                bo_add_16be(elst, 0);
-
-                bo_t *edts = box_new("edts");
-                if(edts)
-                {
-                    box_gather(edts, elst);
-                    box_gather(trak, edts);
-                }
-                else bo_free(elst);
-            }
+            bo_t *edts = GetEDTS(p_stream, i_movie_timescale, b_64_ext);
+            if(edts)
+                box_gather(trak, edts);
         }
 
         /* *** add /moov/trak/mdia *** */
