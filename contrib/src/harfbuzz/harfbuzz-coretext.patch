@@ -1,0 +1,32 @@
+diff -ru harfbuzz/configure.ac harfbuzz/configure.ac
+--- harfbuzz/configure.ac	2016-08-13 14:38:34.000000000 +0200
++++ harfbuzz/configure.ac	2016-08-13 14:39:02.000000000 +0200
+@@ -383,25 +383,13 @@
+ 	[with_coretext=no])
+ have_coretext=false
+ if test "x$with_coretext" = "xyes" -o "x$with_coretext" = "xauto"; then
+-	AC_CHECK_TYPE(CTFontRef, have_coretext=true,, [#include <ApplicationServices/ApplicationServices.h>])
++	AC_CHECK_TYPE(CTFontRef, have_coretext=true,, [#include <CoreText/CoreText.h>])
+ 
+ 	if $have_coretext; then
+-		CORETEXT_CFLAGS=
+-		CORETEXT_LIBS="-framework ApplicationServices"
++    	CORETEXT_CFLAGS=
++		CORETEXT_LIBS="-framework CoreText -framework CoreGraphics -framework CoreFoundation"
+ 		AC_SUBST(CORETEXT_CFLAGS)
+ 		AC_SUBST(CORETEXT_LIBS)
+-	else
+-		# On iOS CoreText and CoreGraphics are stand-alone frameworks
+-		if test "x$have_coretext" != "xtrue"; then
+-			AC_CHECK_TYPE(CTFontRef, have_coretext=true,, [#include <CoreText/CoreText.h>])
+-		fi
+-
+-		if $have_coretext; then
+-			CORETEXT_CFLAGS=
+-			CORETEXT_LIBS="-framework CoreText -framework CoreGraphics"
+-			AC_SUBST(CORETEXT_CFLAGS)
+-			AC_SUBST(CORETEXT_LIBS)
+-		fi
+ 	fi
+ fi
+ if test "x$with_coretext" = "xyes" -a "x$have_coretext" != "xtrue"; then
