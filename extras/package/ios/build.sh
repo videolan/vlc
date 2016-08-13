@@ -285,6 +285,7 @@ fi
     --disable-vncclient \
     --disable-gnutls \
     --disable-lua \
+    --disable-luac \
     --disable-protobuf \
     --disable-aribb24 \
     --disable-aribb25 \
