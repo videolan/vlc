@@ -52,7 +52,7 @@ struct demux_sys_t
 static int vlclua_demux_peek( lua_State *L )
 {
     demux_t *p_demux = (demux_t *)vlclua_get_this( L );
-    int n = (int)luaL_checkinteger( L, 1 );
+    int n = luaL_checkint( L, 1 );
     const uint8_t *p_peek;
 
     int i_peek = vlc_stream_Peek( p_demux->s, &p_peek, n );
@@ -67,7 +67,7 @@ static int vlclua_demux_read( lua_State *L )
 {
     demux_t *p_demux = (demux_t *)vlclua_get_this( L );
     const uint8_t *p_read;
-    int n = (int)luaL_checkinteger( L, 1 );
+    int n = luaL_checkint( L, 1 );
     int i_read = vlc_stream_Peek( p_demux->s, &p_read, n );
 
     if( i_read > 0 )
