@@ -120,7 +120,8 @@ void box_gather (bo_t *box, bo_t *box2)
         box_fix(box2, box2->b->i_buffer);
         size_t i_offset = box->b->i_buffer;
         box->b = block_Realloc(box->b, 0, box->b->i_buffer + box2->b->i_buffer);
-        memcpy(&box->b->p_buffer[i_offset], box2->b->p_buffer, box2->b->i_buffer);
+        if(likely(box->b))
+            memcpy(&box->b->p_buffer[i_offset], box2->b->p_buffer, box2->b->i_buffer);
     }
     bo_free(box2);
 }
