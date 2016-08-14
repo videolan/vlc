@@ -554,6 +554,33 @@ static bool CreateCurrentEdit(mp4_stream_t *p_stream, mtime_t i_mux_start_dts,
     return true;
 }
 
+static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
+{
+    block_t *p_block = block_FifoGet(p_input->p_fifo);
+    if(unlikely(!p_block))
+        return NULL;
+
+    switch(p_stream->mux.fmt.i_codec)
+    {
+        case VLC_CODEC_H264:
+        case VLC_CODEC_HEVC:
+            p_block = ConvertFromAnnexB(p_block);
+            break;
+        case VLC_CODEC_SUBT:
+            p_block = ConvertSUBT(p_block);
+            break;
+        case VLC_CODEC_A52:
+        case VLC_CODEC_EAC3:
+            if (p_stream->mux.a52_frame == NULL && p_block->i_buffer >= 8)
+                p_stream->mux.a52_frame = block_Duplicate(p_block);
+            break;
+        default:
+            break;
+    }
+
+    return p_block;
+}
+
 static int Mux(sout_mux_t *p_mux)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
@@ -566,20 +593,9 @@ static int Mux(sout_mux_t *p_mux)
         sout_input_t *p_input  = p_mux->pp_inputs[i_stream];
         mp4_stream_t *p_stream = (mp4_stream_t*)p_input->p_sys;
 
-        block_t *p_data;
-        do {
-            p_data = block_FifoGet(p_input->p_fifo);
-            if (p_stream->mux.fmt.i_codec == VLC_CODEC_H264 ||
-                p_stream->mux.fmt.i_codec == VLC_CODEC_HEVC)
-                p_data = ConvertFromAnnexB(p_data);
-            else if (p_stream->mux.fmt.i_codec == VLC_CODEC_SUBT)
-                p_data = ConvertSUBT(p_data);
-            else if (p_stream->mux.fmt.i_codec == VLC_CODEC_A52 ||
-                     p_stream->mux.fmt.i_codec == VLC_CODEC_EAC3) {
-                if (p_stream->mux.a52_frame == NULL && p_data->i_buffer >= 8)
-                    p_stream->mux.a52_frame = block_Duplicate(p_data);
-            }
-        } while (!p_data);
+        block_t *p_data = BlockDequeue(p_input, p_stream);
+        if(!p_data)
+            return VLC_SUCCESS;
 
         /* Reset reference dts in case of discontinuity (ex: gather sout) */
         if (p_data->i_flags & BLOCK_FLAG_DISCONTINUITY && p_stream->mux.i_entry_count)
@@ -1441,26 +1457,12 @@ static int MuxFrag(sout_mux_t *p_mux)
     int i_stream = sout_MuxGetStream(p_mux, 1, NULL);
     if (i_stream < 0)
         return VLC_SUCCESS;
+
     sout_input_t *p_input  = p_mux->pp_inputs[i_stream];
     mp4_stream_t *p_stream = (mp4_stream_t*) p_input->p_sys;
-    block_t *p_currentblock = block_FifoGet(p_input->p_fifo);
-
-    /* do block conversion */
-    switch(p_stream->mux.fmt.i_codec)
-    {
-    case VLC_CODEC_H264:
-    case VLC_CODEC_HEVC:
-        p_currentblock = ConvertFromAnnexB(p_currentblock);
-        break;
-    case VLC_CODEC_SUBT:
-        p_currentblock = ConvertSUBT(p_currentblock);
-        break;
-    default:
-        break;
-    }
-
+    block_t *p_currentblock = BlockDequeue(p_input, p_stream);
     if( !p_currentblock )
-        return VLC_ENOMEM;
+        return VLC_SUCCESS;
 
     /* Set time ranges */
     if( p_stream->i_first_dts == VLC_TS_INVALID )
