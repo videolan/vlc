@@ -1088,6 +1088,17 @@ VLC_RESTORE_FLAGS
 SYMBOLIC_LDFLAGS="${ac_cv_ld_bsymbolic}"
 AC_SUBST(SYMBOLIC_LDFLAGS)
 
+VLC_SAVE_FLAGS
+LDFLAGS="${LDFLAGS} -Wl,-z,defs"
+AC_CACHE_CHECK([if linker supports -z,defs], [ac_cv_ld_z_defs], [
+  AC_TRY_LINK([],, [
+    ac_cv_ld_z_defs="yes"
+  ], [
+    ac_cv_ld_z_defs="no"
+  ])
+])
+AS_IF([test "${ac_cv_ld_z_defs}" = "no"], [VLC_RESTORE_FLAGS])
+
 dnl Checks for __attribute__(aligned()) directive
 VLC_SAVE_FLAGS
 CFLAGS="${CFLAGS} -Werror"
