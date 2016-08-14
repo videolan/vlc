@@ -177,7 +177,7 @@ static bo_t *BuildMoov(sout_mux_t *p_mux);
 
 static block_t *ConvertSUBT(block_t *);
 static block_t *ConvertFromAnnexB(block_t *);
-static bool CreateCurrentEdit(mp4_stream_t *, mtime_t);
+static bool CreateCurrentEdit(mp4_stream_t *, mtime_t, bool);
 static void DebugEdits(sout_mux_t *, const mp4_stream_t *);
 
 static const char avc1_short_start_code[3] = { 0, 0, 1 };
@@ -485,8 +485,11 @@ static void DelStream(sout_mux_t *p_mux, sout_input_t *p_input)
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     mp4_stream_t *p_stream = (mp4_stream_t*)p_input->p_sys;
 
-    if(CreateCurrentEdit(p_stream, p_sys->i_start_dts))
+    if(!p_sys->b_fragmented &&
+        CreateCurrentEdit(p_stream, p_sys->i_start_dts, false))
+    {
         DebugEdits(p_mux, p_stream);
+    }
 
     msg_Dbg(p_mux, "removing input");
 }
@@ -506,9 +509,11 @@ static void DebugEdits(sout_mux_t *p_mux, const mp4_stream_t *p_stream)
     }
 }
 
-static bool CreateCurrentEdit(mp4_stream_t *p_stream, mtime_t i_mux_start_dts)
+static bool CreateCurrentEdit(mp4_stream_t *p_stream, mtime_t i_mux_start_dts,
+                              bool b_fragmented)
 {
-    if(p_stream->mux.i_entry_count == 0)
+    /* Never more than first empty edit for fragmented */
+    if(p_stream->mux.i_edits_count && b_fragmented)
         return true;
 
     mp4mux_edit_t *p_realloc = realloc( p_stream->mux.p_edits, sizeof(mp4mux_edit_t) *
@@ -528,11 +533,20 @@ static bool CreateCurrentEdit(mp4_stream_t *p_stream, mtime_t i_mux_start_dts)
         p_newedit->i_start_time = p_lastedit->i_start_time + p_lastedit->i_duration;
         p_newedit->i_start_offset = 0;
     }
-    if(p_stream->i_last_pts > VLC_TS_INVALID)
-        p_newedit->i_duration = p_stream->i_last_pts - p_stream->i_first_dts;
+
+    if(b_fragmented)
+    {
+        p_newedit->i_duration = 0;
+    }
     else
-        p_newedit->i_duration = p_stream->i_last_dts - p_stream->i_first_dts;
-    p_newedit->i_duration += p_stream->mux.entry[p_stream->mux.i_entry_count - 1].i_length;
+    {
+        if(p_stream->i_last_pts > VLC_TS_INVALID)
+            p_newedit->i_duration = p_stream->i_last_pts - p_stream->i_first_dts;
+        else
+            p_newedit->i_duration = p_stream->i_last_dts - p_stream->i_first_dts;
+        if(p_stream->mux.i_entry_count)
+            p_newedit->i_duration += p_stream->mux.entry[p_stream->mux.i_entry_count - 1].i_length;
+    }
 
     p_stream->mux.p_edits = p_realloc;
     p_stream->mux.i_edits_count++;
@@ -570,7 +584,7 @@ static int Mux(sout_mux_t *p_mux)
         /* Reset reference dts in case of discontinuity (ex: gather sout) */
         if (p_data->i_flags & BLOCK_FLAG_DISCONTINUITY && p_stream->mux.i_entry_count)
         {
-            if(!CreateCurrentEdit(p_stream, p_sys->i_start_dts))
+            if(!CreateCurrentEdit(p_stream, p_sys->i_start_dts, p_sys->b_fragmented))
             {
                 block_Release( p_data );
                 return VLC_ENOMEM;
@@ -1245,6 +1259,7 @@ static int OpenFrag(vlc_object_t *p_this)
 
     p_sys->b_header_sent = false;
     p_sys->b_fragmented  = true;
+    p_sys->i_start_dts = VLC_TS_INVALID;
     p_sys->i_mfhd_sequence = 1;
 
     return VLC_SUCCESS;
@@ -1257,6 +1272,16 @@ static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
     mtime_t i_barrier_time = p_sys->i_written_duration + FRAGMENT_LENGTH;
     size_t i_mdat_size = 0;
     bool b_has_samples = false;
+
+    if(!p_sys->b_header_sent)
+    {
+        for (unsigned int j = 0; j < p_sys->i_nb_streams; j++)
+        {
+            mp4_stream_t *p_stream = p_sys->pp_streams[j];
+            if(CreateCurrentEdit(p_stream, p_sys->i_start_dts, true))
+                DebugEdits(p_mux, p_stream);
+        }
+    }
 
     for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
     {
@@ -1436,6 +1461,14 @@ static int MuxFrag(sout_mux_t *p_mux)
 
     if( !p_currentblock )
         return VLC_ENOMEM;
+
+    /* Set time ranges */
+    if( p_stream->i_first_dts == VLC_TS_INVALID )
+    {
+        p_stream->i_first_dts = p_currentblock->i_dts;
+        if( p_sys->i_start_dts == VLC_TS_INVALID )
+            p_sys->i_start_dts = p_currentblock->i_dts;
+    }
 
     /* If we have a previous entry for outgoing queue */
     if (p_stream->p_held_entry)

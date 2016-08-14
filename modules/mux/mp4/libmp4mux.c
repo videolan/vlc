@@ -1637,12 +1637,9 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
         box_gather(trak, tkhd);
 
         /* *** add /moov/trak/edts and elst */
-        if ( !b_fragmented )
-        {
-            bo_t *edts = GetEDTS(p_stream, i_movie_timescale, b_64_ext);
-            if(edts)
-                box_gather(trak, edts);
-        }
+        bo_t *edts = GetEDTS(p_stream, i_movie_timescale, b_64_ext);
+        if(edts)
+            box_gather(trak, edts);
 
         /* *** add /moov/trak/mdia *** */
         bo_t *mdia = box_new("mdia");
