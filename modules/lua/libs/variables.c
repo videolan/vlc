@@ -98,7 +98,7 @@ static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
             val->b_bool = luaL_checkboolean( L, -1 );
             break;
         case VLC_VAR_INTEGER:
-            val->i_int = (int)luaL_checkinteger( L, -1 );
+            val->i_int = luaL_checkinteger( L, -1 );
             break;
         case VLC_VAR_STRING:
             val->psz_string = (char*)luaL_checkstring( L, -1 ); /* XXX: Beware, this only stays valid as long as (L,-1) stays in the stack */
