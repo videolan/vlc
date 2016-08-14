@@ -764,7 +764,7 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
                     goto exit;
                 }
                 (*pppsz_titles)[ i_idx ] = strdup( luaL_checkstring( L, -1 ) );
-                (*ppi_ids)[ i_idx ] = (uint16_t) ( luaL_checkinteger( L, -2 ) & 0xFFFF );
+                (*ppi_ids)[ i_idx ] = luaL_checkinteger( L, -2 ) & 0xFFFF;
                 i_idx++;
                 lua_pop( L, 1 );
             }
