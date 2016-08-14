@@ -1190,7 +1190,7 @@ static bo_t *BuildMoov(sout_mux_t *p_mux)
         for(unsigned int i=0; i<p_sys->i_nb_streams; i++)
             pp_infos[i] = &p_sys->pp_streams[i]->mux;
     }
-    bo_t *p_moov = mp4mux_GetMoovBox(VLC_OBJECT(p_mux), pp_infos, p_sys->i_nb_streams,
+    bo_t *p_moov = mp4mux_GetMoovBox(VLC_OBJECT(p_mux), pp_infos, p_sys->i_nb_streams, 0,
                               p_sys->b_fragmented, p_sys->b_mov, p_sys->b_64_ext, b_stco64);
     free(pp_infos);
     return p_moov;

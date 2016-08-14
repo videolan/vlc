@@ -1475,19 +1475,19 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 }
 
 bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
-                  bool b_fragmented, bool b_mov, bool b_64_ext, bool b_stco64)
+                         int64_t i_movie_duration,
+                         bool b_fragmented, bool b_mov, bool b_64_ext, bool b_stco64 )
 {
     bo_t            *moov, *mvhd;
 
     uint32_t        i_movie_timescale = 90000;
-    int64_t         i_movie_duration  = 0;
     int64_t         i_timestamp = get_timestamp();
 
     moov = box_new("moov");
     if(!moov)
         return NULL;
     /* Create general info */
-    if ( !b_fragmented )
+    if( i_movie_duration == 0 && !b_fragmented )
     {
         for (unsigned int i = 0; i < i_tracks; i++) {
             mp4mux_trackinfo_t *p_stream = pp_tracks[i];
@@ -1498,8 +1498,6 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
 
         i_movie_duration = i_movie_duration * i_movie_timescale / CLOCK_FREQ;
     }
-    else
-        i_movie_duration = 0;
 
     /* *** add /moov/mvhd *** */
     if (!b_64_ext) {
@@ -1849,28 +1847,43 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
     if ( b_fragmented )
     {
         bo_t *mvex = box_new("mvex");
-        for (unsigned int i_trak = 0; mvex && i_trak < i_tracks; i_trak++)
+        if( mvex )
         {
-            mp4mux_trackinfo_t *p_stream = pp_tracks[i_trak];
-
-            /* Try to find some defaults */
-            if ( p_stream->i_entry_count )
+            if( i_movie_duration )
             {
-                // FIXME: find highest occurence
-                p_stream->i_trex_default_length = p_stream->entry[0].i_length;
-                p_stream->i_trex_default_size = p_stream->entry[0].i_size;
+                bo_t *mehd = box_full_new("mehd", b_64_ext ? 1 : 0, 0);
+                if(mehd)
+                {
+                    if(b_64_ext)
+                        bo_add_64be(mehd, i_movie_duration * i_movie_timescale / CLOCK_FREQ);
+                    else
+                        bo_add_32be(mehd, i_movie_duration * i_movie_timescale / CLOCK_FREQ);
+                    box_gather(mvex, mehd);
+                }
             }
+            for (unsigned int i_trak = 0; mvex && i_trak < i_tracks; i_trak++)
+            {
+                mp4mux_trackinfo_t *p_stream = pp_tracks[i_trak];
 
-            /* *** add /mvex/trex *** */
-            bo_t *trex = box_full_new("trex", 0, 0);
-            bo_add_32be(trex, p_stream->i_track_id);
-            bo_add_32be(trex, 1); // sample desc index
-            bo_add_32be(trex, (uint64_t)p_stream->i_trex_default_length * p_stream->i_timescale / CLOCK_FREQ); // sample duration
-            bo_add_32be(trex, p_stream->i_trex_default_size); // sample size
-            bo_add_32be(trex, 0); // sample flags
-            box_gather(mvex, trex);
+                /* Try to find some defaults */
+                if ( p_stream->i_entry_count )
+                {
+                    // FIXME: find highest occurence
+                    p_stream->i_trex_default_length = p_stream->entry[0].i_length;
+                    p_stream->i_trex_default_size = p_stream->entry[0].i_size;
+                }
+
+                /* *** add /mvex/trex *** */
+                bo_t *trex = box_full_new("trex", 0, 0);
+                bo_add_32be(trex, p_stream->i_track_id);
+                bo_add_32be(trex, 1); // sample desc index
+                bo_add_32be(trex, (uint64_t)p_stream->i_trex_default_length * p_stream->i_timescale / CLOCK_FREQ); // sample duration
+                bo_add_32be(trex, p_stream->i_trex_default_size); // sample size
+                bo_add_32be(trex, 0); // sample flags
+                box_gather(mvex, trex);
+            }
+            box_gather(moov, mvex);
         }
-        box_gather(moov, mvex);
     }
 
     if(moov->b)
