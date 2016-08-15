@@ -129,9 +129,7 @@ static int Open(vlc_object_t *p_obj)
     AbstractAdaptationLogic::LogicType logic =
             static_cast<AbstractAdaptationLogic::LogicType>(var_InheritInteger(p_obj, "adaptive-logic"));
 
-    std::string playlisturl(p_demux->psz_access);
-    playlisturl.append("://");
-    playlisturl.append(p_demux->psz_location);
+    std::string playlisturl(p_demux->s->psz_url);
 
     bool dashmime = DASHManager::mimeMatched(mimeType);
     bool smoothmime = SmoothManager::mimeMatched(mimeType);
