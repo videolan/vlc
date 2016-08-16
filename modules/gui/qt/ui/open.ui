@@ -169,6 +169,19 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Stop Time</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>stopTimeTimeEdit</cstring>
+        </property>
+       </widget>
+      </item>
       <item row="8" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -241,6 +254,25 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="4" colspan="2">
+       <widget class="QTimeEdit" name="stopTimeTimeEdit">
+        <property name="toolTip">
+         <string>Change the stop time for the media</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="currentSection">
+         <enum>QDateTimeEdit::HourSection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>HH'H':mm'm':ss's'.zzz</string>
+        </property>
+        <property name="timeSpec">
+         <enum>Qt::LocalTime</enum>
+        </property>
+       </widget>
+      </item>
       <item row="4" column="0" colspan="6">
        <widget class="QCheckBox" name="slaveCheckbox">
         <property name="text">
@@ -271,6 +303,7 @@
   <tabstop>advancedCheckBox</tabstop>
   <tabstop>cacheSpinBox</tabstop>
   <tabstop>startTimeTimeEdit</tabstop>
+  <tabstop>stopTimeTimeEdit</tabstop>
   <tabstop>slaveCheckbox</tabstop>
   <tabstop>slaveText</tabstop>
   <tabstop>slaveBrowseButton</tabstop>

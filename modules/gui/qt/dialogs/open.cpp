@@ -156,6 +156,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     CONNECT( ui.slaveText, textChanged( const QString& ), this, updateMRL() );
     CONNECT( ui.cacheSpinBox, valueChanged( int ), this, updateMRL() );
     CONNECT( ui.startTimeTimeEdit, timeChanged ( const QTime& ), this, updateMRL() );
+    CONNECT( ui.stopTimeTimeEdit, timeChanged ( const QTime& ), this, updateMRL() );
     BUTTONACT( ui.advancedCheckBox, toggleAdvancedPanel() );
     BUTTONACT( ui.slaveBrowseButton, browseInputSlave() );
 
@@ -179,6 +180,7 @@ OpenDialog::OpenDialog( QWidget *parent,
 
     /* enforce section due to .ui bug */
     ui.startTimeTimeEdit->setCurrentSection( QDateTimeEdit::SecondSection );
+    ui.stopTimeTimeEdit->setCurrentSection( QDateTimeEdit::SecondSection );
 
     setMinimumSize( sizeHint() );
     setMaximumWidth( 900 );
@@ -427,6 +429,11 @@ void OpenDialog::updateMRL( const QStringList& item, const QString& tempMRL )
     updateMRL();
 }
 
+/* Format the time to milliseconds */
+QString TimeToMilliseconds( const QTimeEdit *t ) {
+    return QString::number( ( t->minimumTime().msecsTo( t->time() ) ) / 1000.0, 'f', 3);
+}
+
 /* Update the complete MRL */
 void OpenDialog::updateMRL() {
     QString mrl = optionsMRL;
@@ -436,12 +443,10 @@ void OpenDialog::updateMRL() {
     mrl += QString( " :%1=%2" ).arg( storedMethod ).
                                 arg( ui.cacheSpinBox->value() );
     if( ui.startTimeTimeEdit->time() != ui.startTimeTimeEdit->minimumTime() ) {
-        mrl += QString( " :start-time=%1.%2" )
-                .arg( QString::number(
-                    ui.startTimeTimeEdit->minimumTime().secsTo(
-                        ui.startTimeTimeEdit->time()
-                ) ) )
-               .arg( ui.startTimeTimeEdit->time().msec(), 3, 10, QChar('0') );
+        mrl += " :start-time=" + TimeToMilliseconds( ui.startTimeTimeEdit );
+    }
+    if( ui.stopTimeTimeEdit->time() > ui.startTimeTimeEdit->time() ) {
+        mrl += " :stop-time=" + TimeToMilliseconds( ui.stopTimeTimeEdit );
     }
     ui.advancedLineInput->setText( mrl );
     ui.mrlLine->setText( itemsMRL.join( " " ) );

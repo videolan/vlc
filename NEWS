@@ -194,6 +194,7 @@ iOS:
 
 Qt interface:
  * Batch convert support
+ * It is now possible to specify 'stop-time' in Convert/Save dialog
 
 Skins2:
  * Support key accelerators
