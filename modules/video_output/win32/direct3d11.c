@@ -1711,6 +1711,18 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         goto error;
     }
 
+    hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if( FAILED(hr) ) {
+        msg_Err(vd, "The texture cannot be mapped. (hr=0x%lX)", hr);
+        goto error;
+    }
+    ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pTexture, 0);
+    if (mappedResource.RowPitch < p_chroma_desc->pixel_size * texDesc.Width) {
+        msg_Err( vd, "The texture row pitch is too small (%d instead of %d)", mappedResource.RowPitch,
+                 p_chroma_desc->pixel_size * texDesc.Width );
+        goto error;
+    }
+
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
     memset(&resviewDesc, 0, sizeof(resviewDesc));
     resviewDesc.Format = cfg->resourceFormatYRGB;
