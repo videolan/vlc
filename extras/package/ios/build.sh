@@ -358,7 +358,6 @@ ${VLCROOT}/configure \
     --disable-macosx-avfoundation \
     --disable-audioqueue \
     --disable-shared \
-    --enable-macosx-quartztext \
     --enable-mkv \
     --enable-opus \
     --disable-faad \

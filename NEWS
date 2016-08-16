@@ -231,7 +231,7 @@ Removed modules
  * httplive (use adaptive instead)
  * smooth (use adaptive instead)
  * Gnome-VFS access module (i.e. Gnome 2.x)
- * QuartText text renderer module (use Freetype instead)
+ * QuartzText text renderer module (use Freetype instead)
  * Win32 GDI text renderer module (use Freetype instead)
  * Growl notification (replaced by osx_notifications)
  * VCDX "extended" Video CD access module (use the normal VCD module)

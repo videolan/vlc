@@ -3331,17 +3331,6 @@ AM_CONDITIONAL([HAVE_SAPI], [test "${have_sapi}" = "yes"])
 AC_LANG_POP([C++])
 
 dnl
-dnl  QuartzText vout module (iOS/Mac OS)
-dnl
-AC_ARG_ENABLE(macosx-quartztext,
-  [  --enable-macosx-quartztext   Mac OS X quartz text module (default enabled on Mac OS X)])
-if test "x${enable_macosx_quartztext}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_quartztext}" = "yes")
-then
-  VLC_ADD_PLUGIN([quartztext])
-fi
-
-dnl
 dnl  SVG module (text rendering and image decoding)
 dnl
 PKG_ENABLE_MODULES_VLC([SVG], [], [librsvg-2.0 >= 2.9.0], [SVG rendering library],[auto])
