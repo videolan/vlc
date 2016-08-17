@@ -65,36 +65,41 @@ static void *vlc_timer_thread (void *data)
             vlc_cond_wait (&timer->reschedule, &timer->lock);
         }
 
-        if (vlc_cond_timedwait (&timer->reschedule, &timer->lock,
-                                timer->value) == 0)
+        if (timer->interval != 0)
+        {
+            mtime_t now = mdate();
+
+            if (now > timer->value)
+            {   /* Update overrun counter */
+                unsigned misses = (now - timer->value) / timer->interval;
+
+                timer->value += misses * timer->interval;
+                assert(timer->value <= now);
+                atomic_fetch_add_explicit(&timer->overruns, misses,
+                                          memory_order_relaxed);
+            }
+        }
+
+        mtime_t value = timer->value;
+
+        if (vlc_cond_timedwait(&timer->reschedule, &timer->lock, value) == 0)
             continue;
-        if (timer->interval == 0)
-            timer->value = 0; /* disarm */
+
+        if (likely(timer->value <= value))
+        {
+            timer->value += timer->interval; /* rearm */
+
+            if (timer->interval == 0)
+                timer->value = 0; /* disarm */
+        }
+
         vlc_mutex_unlock (&timer->lock);
 
         int canc = vlc_savecancel ();
         timer->func (timer->data);
         vlc_restorecancel (canc);
 
-        mtime_t now = mdate ();
-        unsigned misses;
-
         vlc_mutex_lock (&timer->lock);
-        if (timer->interval == 0)
-            continue;
-
-        misses = (now - timer->value) / timer->interval;
-        timer->value += timer->interval;
-        /* Try to compensate for one miss (mwait() will return immediately)
-         * but no more. Otherwise, we might busy loop, after extended periods
-         * without scheduling (suspend, SIGSTOP, RT preemption, ...). */
-        if (misses > 1)
-        {
-            misses--;
-            timer->value += misses * timer->interval;
-            atomic_fetch_add_explicit (&timer->overruns, misses,
-                                       memory_order_relaxed);
-        }
     }
 
     vlc_cleanup_pop ();
