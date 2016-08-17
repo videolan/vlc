@@ -60,7 +60,10 @@ static void *vlc_timer_thread (void *data)
     for (;;)
     {
         while (timer->value == 0)
+        {
+            assert(timer->interval == 0);
             vlc_cond_wait (&timer->reschedule, &timer->lock);
+        }
 
         if (vlc_cond_timedwait (&timer->reschedule, &timer->lock,
                                 timer->value) == 0)
@@ -138,7 +141,10 @@ void vlc_timer_destroy (vlc_timer_t timer)
 void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          mtime_t value, mtime_t interval)
 {
-    if (!absolute && value != 0)
+    if (value == 0)
+        interval = 0;
+    else
+    if (!absolute)
         value += mdate();
 
     vlc_mutex_lock (&timer->lock);
