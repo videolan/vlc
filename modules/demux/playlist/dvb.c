@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvb.c: LinuxTV channels list
  *****************************************************************************
- * Copyright (C) 2005-20009 VLC authors and VideoLAN
+ * Copyright (C) 2005-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
