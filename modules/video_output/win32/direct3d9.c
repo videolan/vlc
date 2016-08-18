@@ -1535,16 +1535,16 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
 }
 
 static void Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
-                                  const RECT dst,
+                                  const RECT *dst,
                                   int alpha,
                                   video_orientation_t orientation)
 {
     /* Vertices of the dst rectangle in the unrotated (clockwise) order. */
     const int vertices_coords[4][2] = {
-        { dst.left,  dst.top    },
-        { dst.right, dst.top    },
-        { dst.right, dst.bottom },
-        { dst.left,  dst.bottom },
+        { dst->left,  dst->top    },
+        { dst->right, dst->top    },
+        { dst->right, dst->bottom },
+        { dst->left,  dst->bottom },
     };
 
     /* Compute index remapping necessary to implement the rotation. */
@@ -1615,7 +1615,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* */
     region->texture = sys->d3dtex;
-    Direct3D9SetupVertices(region->vertex, vd->sys->rect_dest_clipped, 255, vd->fmt.orientation);
+    Direct3D9SetupVertices(region->vertex, &vd->sys->rect_dest_clipped, 255, vd->fmt.orientation);
     return VLC_SUCCESS;
 }
 
@@ -1733,7 +1733,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         dst.top    = video.top  + scale_h * r->i_y,
         dst.bottom = dst.top  + scale_h * r->fmt.i_visible_height,
         Direct3D9SetupVertices(d3dr->vertex,
-                              dst, subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
+                              &dst, subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
     }
 }
 
