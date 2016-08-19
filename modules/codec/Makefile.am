@@ -516,6 +516,14 @@ libvpx_plugin_la_LIBADD = $(VPX_LIBS)
 EXTRA_LTLIBRARIES += libvpx_plugin.la
 codec_LTLIBRARIES += $(LTLIBvpx)
 
+libaom_plugin_la_SOURCES = codec/aom.c
+libaom_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libaom_plugin_la_CFLAGS = $(AM_CFLAGS) $(AOM_CFLAGS) $(CPPFLAGS_aom)
+libaom_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libaom_plugin_la_LIBADD = $(AOM_LIBS) $(LIBPTHREAD)
+EXTRA_LTLIBRARIES += libaom_plugin.la
+codec_LTLIBRARIES += $(LTLIBaom)
+
 libtwolame_plugin_la_SOURCES = codec/twolame.c
 libtwolame_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DLIBTWOLAME_STATIC
 libtwolame_plugin_la_CFLAGS = $(AM_CFLAGS) $(TWOLAME_CFLAGS)

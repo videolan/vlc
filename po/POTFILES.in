@@ -332,6 +332,7 @@ modules/audio_output/waveout.c
 modules/audio_output/windows_audio_common.h
 modules/codec/adpcm.c
 modules/codec/aes3.c
+modules/codec/aom.c
 modules/codec/araw.c
 modules/codec/arib/aribsub.c
 modules/codec/avcodec/audio.c

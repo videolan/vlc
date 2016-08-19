@@ -51,6 +51,7 @@ Decoder:
  * Support 4:4:4 and 4:2:2 chroma samplings with VDPAU hw acceleration
  * Support for ARIB STD-B24 subtitles
  * Support for Daala video
+ * Support for AV1 video
  * Important improvements for the MMAL decoder and output for rPI and rPI2
  * Support HEVC hardware decoding using OMX and MediaCodec
  * Use MediaCodec via NDK native API after Android Lollipop
