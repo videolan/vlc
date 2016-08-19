@@ -86,7 +86,7 @@ aout_LTLIBRARIES += libkai_plugin.la
 endif
 
 libsndio_plugin_la_SOURCES = audio_output/sndio.c
-libsndio_plugin_la_LIBADD = -lsndio
+libsndio_plugin_la_LIBADD = -lsndio $(LIBM)
 if HAVE_SNDIO
 aout_LTLIBRARIES += libsndio_plugin.la
 endif
