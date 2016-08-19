@@ -42,10 +42,10 @@
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static const char *const ppsz_sout_options[] = { "quality-mode", NULL };
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 #ifdef ENABLE_SOUT
+static const char *const ppsz_sout_options[] = { "quality-mode", NULL };
 static int OpenEncoder(vlc_object_t *);
 static void CloseEncoder(vlc_object_t *);
 static block_t *Encode(encoder_t *p_enc, picture_t *p_pict);
