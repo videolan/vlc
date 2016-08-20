@@ -90,7 +90,7 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    [self enableMenuIcon];
+    [self configurationChanged:nil];
 
     // Set Accessibility Attributes for Image Buttons
     [backwardsButton.cell accessibilitySetOverrideValue:_NS("Go to previous track")
@@ -122,6 +122,11 @@
                                              selector:@selector(updateNowPlayingInfo)
                                                  name:VLCInputChangedNotification
                                                object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(configurationChanged:)
+                                                 name:VLCConfigurationChangedNotification
+                                               object:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -140,35 +145,59 @@
     }
 }
 
+- (void)configurationChanged:(id)obj
+{
+    if (var_InheritBool(getIntf(), "macosx-statusicon"))
+        [self enableMenuIcon];
+    else
+        [self disableStatusItem];
+}
+
 /* Enables the Status Bar Item and initializes it's image
  * and context menu
  */
 - (void)enableMenuIcon
 {
-    if (!var_InheritBool(getIntf(), "macosx-statusicon"))
-        return;
+    if (!self.statusItem) {
+        // Init the status item
+        self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+        [self.statusItem setHighlightMode:YES];
+        [self.statusItem setEnabled:YES];
 
-    // Init the status item
-    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-    [self.statusItem setHighlightMode:YES];
-    [self.statusItem setEnabled:YES];
+        // Set the status item image
+        NSImage *menuIcon = [NSImage imageNamed:@"VLCStatusBarIcon"];
+        [menuIcon setTemplate:YES];
+        [self.statusItem setImage:menuIcon];
 
-    // Sync VLC setting with status bar visibility setting (10.12 runtime only)
-    if ([self.statusItem respondsToSelector:@selector(isVisible)]) {
-        [self.statusItem setBehavior:NSStatusItemBehaviorRemovalAllowed];
-        [self.statusItem setAutosaveName:@"statusBarItem"];
-        [self.statusItem setVisible:YES];
-        [self.statusItem addObserver:self forKeyPath:NSStringFromSelector(@selector(isVisible))
-                         options:0 context:NULL];
+        // Attach pull-down menu
+        [self.statusItem setMenu:_vlcStatusBarIconMenu];
+
+        if (OSX_SIERRA) {
+            [self.statusItem setBehavior:NSStatusItemBehaviorRemovalAllowed];
+            [self.statusItem setAutosaveName:@"statusBarItem"];
+            [self.statusItem addObserver:self forKeyPath:NSStringFromSelector(@selector(isVisible))
+                                 options:0 context:NULL];
+        }
     }
 
-    // Set the status item image
-    NSImage *menuIcon = [NSImage imageNamed:@"VLCStatusBarIcon"];
-    [menuIcon setTemplate:YES];
-    [self.statusItem setImage:menuIcon];
+    if (OSX_SIERRA) {
+        // Sync VLC setting with status bar visibility setting (10.12 runtime only)
+        [self.statusItem setVisible:YES];
+    }
+}
 
-    // Attach pull-down menu
-    [self.statusItem setMenu:_vlcStatusBarIconMenu];
+- (void)disableStatusItem
+{
+    if (!self.statusItem)
+        return;
+
+    // Lets keep alive the object in Sierra, and destroy it in older OS versions
+    if (OSX_SIERRA) {
+        self.statusItem.visible = NO;
+    } else {
+        [[NSStatusBar systemStatusBar] removeStatusItem:self.statusItem];
+        self.statusItem = nil;
+    }
 }
 
 - (void)dealloc

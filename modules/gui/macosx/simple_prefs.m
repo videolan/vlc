@@ -1083,6 +1083,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
                                                             object: nil
                                                           userInfo: nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCConfigurationChangedNotification object:nil];
 }
 
 - (void)showSettingsForCategory:(id)new_categoryView
