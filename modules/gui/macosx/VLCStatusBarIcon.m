@@ -73,6 +73,19 @@
 #pragma mark -
 #pragma mark Init
 
+
+- (instancetype)init
+{
+    self = [super init];
+
+    if (self) {
+        msg_Dbg(getIntf(), "Loading VLCStatusBarIcon");
+        [NSBundle loadNibNamed:@"VLCStatusBarIconMainMenu" owner:self];
+    }
+
+    return self;
+}
+
 - (void)awakeFromNib
 {
     [super awakeFromNib];
@@ -115,6 +128,9 @@
  */
 - (void)enableMenuIcon
 {
+    if (!var_InheritBool(getIntf(), "macosx-statusicon"))
+        return;
+
     // Init the status item
     _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     [_statusItem setHighlightMode:YES];
