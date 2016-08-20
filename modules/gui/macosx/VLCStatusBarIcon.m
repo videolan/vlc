@@ -176,7 +176,7 @@
             [self.statusItem setBehavior:NSStatusItemBehaviorRemovalAllowed];
             [self.statusItem setAutosaveName:@"statusBarItem"];
             [self.statusItem addObserver:self forKeyPath:NSStringFromSelector(@selector(isVisible))
-                                 options:0 context:NULL];
+                                 options:NSKeyValueObservingOptionNew context:NULL];
         }
     }
 
