@@ -273,7 +273,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     // update badge in sidebar
     [[[VLCMain sharedInstance] mainWindow] updateWindow];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+    [[NSNotificationCenter defaultCenter] postNotificationName: VLCMediaKeySupportSettingChangedNotification
                                                         object: nil
                                                       userInfo: nil];
 }
@@ -289,7 +289,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     // update badge in sidebar
     [[[VLCMain sharedInstance] mainWindow] updateWindow];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+    [[NSNotificationCenter defaultCenter] postNotificationName: VLCMediaKeySupportSettingChangedNotification
                                                         object: nil
                                                       userInfo: nil];
 }

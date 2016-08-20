@@ -104,7 +104,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                                                                      [SPMediaKeyTap defaultMediaKeyUserBundleIdentifiers], kMediaKeyUsingBundleIdentifiersDefaultsKey,
                                                                      nil]];
         }
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(coreChangedMediaKeySupportSetting:) name: @"VLCMediaKeySupportSettingChanged" object: nil];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(coreChangedMediaKeySupportSetting:) name:VLCMediaKeySupportSettingChangedNotification object: nil];
 
         /* init Apple Remote support */
         _remote = [[AppleRemote alloc] init];

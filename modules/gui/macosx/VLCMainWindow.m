@@ -1184,7 +1184,7 @@ static const float f_min_window_height = 307.;
         [self showDropZone];
     PL_UNLOCK;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+    [[NSNotificationCenter defaultCenter] postNotificationName: VLCMediaKeySupportSettingChangedNotification
                                                         object: nil
                                                       userInfo: nil];
 }
