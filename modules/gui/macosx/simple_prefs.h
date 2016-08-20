@@ -93,6 +93,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *intf_styleLabel;
 @property (readwrite, weak) IBOutlet NSButtonCell *intf_style_darkButtonCell;
 @property (readwrite, weak) IBOutlet NSButtonCell *intf_style_brightButtonCell;
+@property (readwrite, weak) IBOutlet NSButton *intf_statusIconCheckbox;
 
 // intf pane - control box
 @property (readwrite, weak) IBOutlet NSBox *intf_playbackControlBox;
@@ -101,7 +102,6 @@
 @property (readwrite, weak) IBOutlet NSButton *intf_appleremoteCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_mediakeysCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *intf_appleremote_sysvolCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *intf_statusIconCheckbox;
 
 // intf pane - behaviour box
 @property (readwrite, weak) IBOutlet NSBox *intf_playbackBehaviourBox;

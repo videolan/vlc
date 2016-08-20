@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
@@ -82,6 +82,7 @@
                 <outlet property="intf_pauseitunesPopup" destination="3911" id="UZN-lH-STQ"/>
                 <outlet property="intf_playbackBehaviourBox" destination="EKZ-iB-CMo" id="mbV-7q-aS2"/>
                 <outlet property="intf_playbackControlBox" destination="CZP-ZN-k6p" id="voN-Ji-9aw"/>
+                <outlet property="intf_statusIconCheckbox" destination="r3P-eU-tEX" id="ixl-Al-ddh"/>
                 <outlet property="intf_styleLabel" destination="3605" id="aqL-QJ-qWd"/>
                 <outlet property="intf_style_brightButtonCell" destination="3604" id="PBI-Ye-5op"/>
                 <outlet property="intf_style_darkButtonCell" destination="3601" id="6op-ar-6O9"/>
@@ -161,7 +162,7 @@
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="105" y="903" width="570" height="38"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="2266">
                 <rect key="frame" x="0.0" y="0.0" width="570" height="38"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -248,11 +249,110 @@ Gw
         </window>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="2311" userLabel="Interface">
-            <rect key="frame" x="0.0" y="0.0" width="570" height="558"/>
+            <rect key="frame" x="0.0" y="0.0" width="570" height="571"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
+                <box title="General Settings" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="kup-aY-Wqq">
+                    <rect key="frame" x="18" y="433" width="536" height="117"/>
+                    <view key="contentView" id="wFl-aV-3Hn">
+                        <rect key="frame" x="1" y="1" width="534" height="101"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3605">
+                                <rect key="frame" x="16" y="44" width="91" height="17"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Interface style" id="3606">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3892">
+                                <rect key="frame" x="16" y="72" width="64" height="17"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Language" id="3893">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3900">
+                                <rect key="frame" x="224" y="67" width="293" height="26"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="288" id="Kfa-pp-08X"/>
+                                </constraints>
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3901">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" title="OtherViews" id="3902"/>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="interfaceSettingChanged:" target="-2" id="iZ8-Hl-fvA"/>
+                                </connections>
+                            </popUpButton>
+                            <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3600">
+                                <rect key="frame" x="226" y="43" width="288" height="18"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                <size key="cellSize" width="142" height="18"/>
+                                <size key="intercellSpacing" width="4" height="2"/>
+                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="3603">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <cells>
+                                    <column>
+                                        <buttonCell type="radio" title="Dark" imagePosition="left" alignment="left" tag="1" inset="2" id="3601">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="interfaceSettingChanged:" target="-2" id="LMY-zG-H9C"/>
+                                            </connections>
+                                        </buttonCell>
+                                    </column>
+                                    <column>
+                                        <buttonCell type="radio" title="Bright" imagePosition="left" alignment="left" state="on" inset="2" id="3604">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="interfaceSettingChanged:" target="-2" id="hh8-IG-hHT"/>
+                                            </connections>
+                                        </buttonCell>
+                                    </column>
+                                </cells>
+                                <connections>
+                                    <action selector="interfaceSettingChanged:" target="-2" id="05Z-q1-rGx"/>
+                                </connections>
+                            </matrix>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="r3P-eU-tEX">
+                                <rect key="frame" x="16" y="15" width="185" height="18"/>
+                                <buttonCell key="cell" type="check" title="Enable VLC status bar icon" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Vhy-1T-Knj">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="interfaceSettingChanged:" target="-2" id="Ys3-K6-647"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="3600" firstAttribute="top" secondItem="3900" secondAttribute="bottom" constant="9" id="2dN-5G-GEq"/>
+                            <constraint firstItem="3600" firstAttribute="leading" secondItem="3900" secondAttribute="leading" id="5RK-1H-Nma"/>
+                            <constraint firstItem="3892" firstAttribute="centerY" secondItem="3900" secondAttribute="centerY" id="I4b-x2-YzY"/>
+                            <constraint firstItem="3900" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="top" constant="10" id="TgG-fd-RuV"/>
+                            <constraint firstItem="r3P-eU-tEX" firstAttribute="leading" secondItem="3605" secondAttribute="leading" id="WDF-xK-mBg"/>
+                            <constraint firstItem="3600" firstAttribute="width" secondItem="3900" secondAttribute="width" id="a6E-AW-n1O"/>
+                            <constraint firstItem="3605" firstAttribute="centerY" secondItem="3600" secondAttribute="centerY" id="fW8-kh-B82"/>
+                            <constraint firstItem="r3P-eU-tEX" firstAttribute="top" secondItem="3605" secondAttribute="bottom" constant="13" id="hET-mA-l73"/>
+                            <constraint firstAttribute="trailing" secondItem="3900" secondAttribute="trailing" constant="20" id="tlF-b1-Tuz"/>
+                        </constraints>
+                    </view>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="530" id="BqS-Ab-rri"/>
+                        <constraint firstAttribute="height" constant="113" id="Gbi-aT-8VK"/>
+                    </constraints>
+                    <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                    <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                </box>
                 <box title="Privacy / Network Interaction" translatesAutoresizingMaskIntoConstraints="NO" id="2318">
-                    <rect key="frame" x="16" y="86" width="534" height="107"/>
+                    <rect key="frame" x="18" y="86" width="534" height="107"/>
                     <view key="contentView" id="nnH-Tj-ON7">
                         <rect key="frame" x="2" y="2" width="530" height="90"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -303,7 +403,7 @@ Gw
                     <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </box>
                 <box title="Playback control" translatesAutoresizingMaskIntoConstraints="NO" id="CZP-ZN-k6p">
-                    <rect key="frame" x="16" y="287" width="534" height="142"/>
+                    <rect key="frame" x="18" y="287" width="534" height="142"/>
                     <view key="contentView" id="gj4-zO-E26">
                         <rect key="frame" x="2" y="2" width="530" height="125"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -378,7 +478,7 @@ Gw
                     <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </box>
                 <box title="Playback behaviour" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="EKZ-iB-CMo">
-                    <rect key="frame" x="16" y="197" width="534" height="86"/>
+                    <rect key="frame" x="18" y="197" width="534" height="86"/>
                     <view key="contentView" id="BMS-wa-oJS">
                         <rect key="frame" x="1" y="1" width="532" height="70"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -429,7 +529,7 @@ Gw
                     <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </box>
                 <box title="lua" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="drh-ot-Vyn">
-                    <rect key="frame" x="15" y="16" width="536" height="64"/>
+                    <rect key="frame" x="17" y="16" width="536" height="64"/>
                     <view key="contentView" id="Who-VF-GbQ">
                         <rect key="frame" x="1" y="1" width="534" height="48"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -466,93 +566,6 @@ Gw
                     <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                     <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </box>
-                <box title="General Settings" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="kup-aY-Wqq">
-                    <rect key="frame" x="18" y="436" width="536" height="101"/>
-                    <view key="contentView" id="wFl-aV-3Hn">
-                        <rect key="frame" x="1" y="1" width="534" height="85"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3605">
-                                <rect key="frame" x="14" y="21" width="91" height="17"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Interface style" id="3606">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3892">
-                                <rect key="frame" x="14" y="49" width="64" height="17"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Language" id="3893">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3900">
-                                <rect key="frame" x="224" y="44" width="293" height="26"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="288" id="Kfa-pp-08X"/>
-                                </constraints>
-                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3901">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
-                                    <menu key="menu" title="OtherViews" id="3902"/>
-                                </popUpButtonCell>
-                                <connections>
-                                    <action selector="interfaceSettingChanged:" target="-2" id="iZ8-Hl-fvA"/>
-                                </connections>
-                            </popUpButton>
-                            <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3600">
-                                <rect key="frame" x="226" y="20" width="288" height="18"/>
-                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                <size key="cellSize" width="142" height="18"/>
-                                <size key="intercellSpacing" width="4" height="2"/>
-                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="3603">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <cells>
-                                    <column>
-                                        <buttonCell type="radio" title="Dark" imagePosition="left" alignment="left" tag="1" inset="2" id="3601">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="interfaceSettingChanged:" target="-2" id="LMY-zG-H9C"/>
-                                            </connections>
-                                        </buttonCell>
-                                    </column>
-                                    <column>
-                                        <buttonCell type="radio" title="Bright" imagePosition="left" alignment="left" state="on" inset="2" id="3604">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="interfaceSettingChanged:" target="-2" id="hh8-IG-hHT"/>
-                                            </connections>
-                                        </buttonCell>
-                                    </column>
-                                </cells>
-                                <connections>
-                                    <action selector="interfaceSettingChanged:" target="-2" id="05Z-q1-rGx"/>
-                                </connections>
-                            </matrix>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="3600" firstAttribute="top" secondItem="3900" secondAttribute="bottom" constant="9" id="2dN-5G-GEq"/>
-                            <constraint firstItem="3600" firstAttribute="leading" secondItem="3900" secondAttribute="leading" id="5RK-1H-Nma"/>
-                            <constraint firstItem="3892" firstAttribute="centerY" secondItem="3900" secondAttribute="centerY" id="I4b-x2-YzY"/>
-                            <constraint firstItem="3900" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="top" constant="17" id="TgG-fd-RuV"/>
-                            <constraint firstItem="3600" firstAttribute="width" secondItem="3900" secondAttribute="width" id="a6E-AW-n1O"/>
-                            <constraint firstItem="3605" firstAttribute="centerY" secondItem="3600" secondAttribute="centerY" id="fW8-kh-B82"/>
-                            <constraint firstAttribute="trailing" secondItem="3900" secondAttribute="trailing" constant="20" id="tlF-b1-Tuz"/>
-                        </constraints>
-                    </view>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="530" id="BqS-Ab-rri"/>
-                        <constraint firstAttribute="height" constant="97" id="Gbi-aT-8VK"/>
-                    </constraints>
-                    <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                    <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                </box>
             </subviews>
             <constraints>
                 <constraint firstItem="3884" firstAttribute="width" secondItem="3911" secondAttribute="width" id="1cb-nZ-Fup"/>
@@ -563,11 +576,11 @@ Gw
                 <constraint firstItem="2318" firstAttribute="leading" secondItem="EKZ-iB-CMo" secondAttribute="leading" id="C2v-Vz-tFm"/>
                 <constraint firstItem="3884" firstAttribute="leading" secondItem="3911" secondAttribute="leading" id="HYO-kS-Hu7"/>
                 <constraint firstItem="3900" firstAttribute="width" secondItem="3920" secondAttribute="width" id="MTr-Fo-ceM"/>
-                <constraint firstItem="CZP-ZN-k6p" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="bottom" constant="8" id="Yef-Et-tln"/>
+                <constraint firstItem="CZP-ZN-k6p" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="bottom" constant="5" id="Yef-Et-tln"/>
                 <constraint firstItem="3605" firstAttribute="leading" secondItem="3919" secondAttribute="leading" id="Z2S-1r-W1t"/>
                 <constraint firstItem="2318" firstAttribute="width" secondItem="EKZ-iB-CMo" secondAttribute="width" id="a3R-SI-UDB"/>
                 <constraint firstItem="EKZ-iB-CMo" firstAttribute="width" secondItem="CZP-ZN-k6p" secondAttribute="width" id="aXx-RF-saK"/>
-                <constraint firstItem="CZP-ZN-k6p" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" id="ai4-HU-V0z"/>
+                <constraint firstItem="CZP-ZN-k6p" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="2" id="ai4-HU-V0z"/>
                 <constraint firstItem="drh-ot-Vyn" firstAttribute="leading" secondItem="nnH-Tj-ON7" secondAttribute="leading" id="cTv-JQ-7CF"/>
                 <constraint firstItem="kup-aY-Wqq" firstAttribute="width" secondItem="gj4-zO-E26" secondAttribute="width" id="d5Z-4v-ZxX"/>
                 <constraint firstItem="EKZ-iB-CMo" firstAttribute="leading" secondItem="CZP-ZN-k6p" secondAttribute="leading" id="dO9-ft-ERv"/>
@@ -576,7 +589,7 @@ Gw
                 <constraint firstItem="3892" firstAttribute="leading" secondItem="3919" secondAttribute="leading" id="vfy-GO-DCp"/>
                 <constraint firstItem="kup-aY-Wqq" firstAttribute="leading" secondItem="2311" secondAttribute="leading" constant="21" id="xN8-XW-D0e"/>
             </constraints>
-            <point key="canvasLocation" x="245" y="246"/>
+            <point key="canvasLocation" x="245" y="252.5"/>
         </customView>
         <customView id="2330" userLabel="Audio">
             <rect key="frame" x="0.0" y="0.0" width="569" height="448"/>
@@ -2052,7 +2065,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="433" y="441" width="440" height="170"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="2678">
                 <rect key="frame" x="0.0" y="0.0" width="440" height="170"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -2122,7 +2135,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="340" y="383" width="485" height="254"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="3746">
                 <rect key="frame" x="0.0" y="0.0" width="485" height="254"/>
                 <autoresizingMask key="autoresizingMask"/>
