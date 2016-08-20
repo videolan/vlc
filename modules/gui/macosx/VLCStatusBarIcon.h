@@ -25,7 +25,7 @@
 
 @interface VLCStatusBarIcon : NSObject <NSMenuDelegate>
 
-@property NSStatusItem *statusItem;
+@property (readwrite, strong) NSStatusItem *statusItem;
 @property (readwrite, strong) IBOutlet NSMenu *vlcStatusBarIconMenu;
 
 // Get data from VLC and update the little status menu

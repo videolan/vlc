@@ -30,6 +30,7 @@
 #import <vlc_playlist.h>
 #import <vlc_input.h>
 
+#import "CompatibilityFixes.h"
 #import "VLCCoreInteraction.h"
 #import "VLCStringUtility.h"
 
@@ -123,6 +124,22 @@
                                                object:nil];
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
+{
+    if ([keyPath isEqualToString: NSStringFromSelector(@selector(isVisible))]) {
+        bool isVisible = [[change objectForKey:NSKeyValueChangeNewKey] boolValue];
+
+        // Sync status bar visibility with VLC setting
+        msg_Dbg(getIntf(), "Status bar icon visibility changed to %i", isVisible);
+        config_PutInt(getIntf(), "macosx-statusicon", isVisible ? 1 : 0);
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
 /* Enables the Status Bar Item and initializes it's image
  * and context menu
  */
@@ -132,22 +149,34 @@
         return;
 
     // Init the status item
-    _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-    [_statusItem setHighlightMode:YES];
-    [_statusItem setEnabled:YES];
-    [_statusItem setTarget:self];
+    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    [self.statusItem setHighlightMode:YES];
+    [self.statusItem setEnabled:YES];
+
+    // Sync VLC setting with status bar visibility setting (10.12 runtime only)
+    if ([self.statusItem respondsToSelector:@selector(isVisible)]) {
+        [self.statusItem setBehavior:NSStatusItemBehaviorRemovalAllowed];
+        [self.statusItem setAutosaveName:@"statusBarItem"];
+        [self.statusItem setVisible:YES];
+        [self.statusItem addObserver:self forKeyPath:NSStringFromSelector(@selector(isVisible))
+                         options:0 context:NULL];
+    }
 
     // Set the status item image
     NSImage *menuIcon = [NSImage imageNamed:@"VLCStatusBarIcon"];
     [menuIcon setTemplate:YES];
-    [_statusItem setImage:menuIcon];
+    [self.statusItem setImage:menuIcon];
 
     // Attach pull-down menu
-    [_statusItem setMenu:_vlcStatusBarIconMenu];
+    [self.statusItem setMenu:_vlcStatusBarIconMenu];
 }
 
 - (void)dealloc
 {
+    if (self.statusItem && [self.statusItem respondsToSelector:@selector(isVisible)]) {
+        [self.statusItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(isVisible)) context:NULL];
+    }
+
     // Cleanup
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
