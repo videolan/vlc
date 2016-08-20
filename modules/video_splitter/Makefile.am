@@ -15,8 +15,8 @@ if HAVE_WIN32_DESKTOP
 splitter_LTLIBRARIES += libpanoramix_plugin.la
 else
 if HAVE_XCB_RANDR
-libpanoramix_plugin_la_CFLAGS += $(XCB_RANDR_CFLAGS)
-libpanoramix_plugin_la_LIBADD += $(XCB_RANDR_LIBS)
+libpanoramix_plugin_la_CFLAGS += $(XCB_RANDR_CFLAGS) $(XCB_CFLAGS)
+libpanoramix_plugin_la_LIBADD += $(XCB_RANDR_LIBS) $(XCB_LIBS)
 splitter_LTLIBRARIES += libpanoramix_plugin.la
 endif
 endif
