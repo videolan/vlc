@@ -91,21 +91,31 @@ struct filter_sys_t
     motion_sensors_t *p_motion;
 };
 
+typedef union {
+    uint32_t u;
+    struct {
+        int16_t sin;
+        int16_t cos;
+    };
+} sincos_t;
+
 static void store_trigo( struct filter_sys_t *sys, float f_angle )
 {
+    sincos_t sincos;
+
     f_angle *= (float)(M_PI / 180.); /* degrees -> radians */
 
-    unsigned i_sin = lroundf(sinf(f_angle) * 4096.f);
-    unsigned i_cos = lroundf(cosf(f_angle) * 4096.f);
-    atomic_store( &sys->sincos, (i_cos << 16u) | (i_sin << 0u));
+    sincos.sin = lroundf(sinf(f_angle) * 4096.f);
+    sincos.cos = lroundf(cosf(f_angle) * 4096.f);
+    atomic_store(&sys->sincos, sincos.u);
 }
 
 static void fetch_trigo( struct filter_sys_t *sys, int *i_sin, int *i_cos )
 {
-    uint32_t sincos = atomic_load( &sys->sincos );
+    sincos_t sincos = { .u = atomic_load(&sys->sincos) };
 
-    *i_sin = (int16_t)(sincos & 0xFFFF);
-    *i_cos = (int16_t)(sincos >> 16);
+    *i_sin = sincos.sin;
+    *i_cos = sincos.cos;
 }
 
 /*****************************************************************************
