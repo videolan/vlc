@@ -506,6 +506,8 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_VP9, "Google/On2's VP9 Video"),
         A("VP90"),
 
+    B(VLC_CODEC_AV1, "AOMedia's AV1 Video"),
+        A("av10"),
 
     /* Xiph.org theora */
     B(VLC_CODEC_THEORA, "Xiph.org's Theora Video"),
