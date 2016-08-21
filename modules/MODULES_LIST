@@ -38,6 +38,7 @@ $Id$
  * android_native_window: Android native window provider module
  * android_window: Android direct/undirect rendering video output
  * antiflicker: anti-flicker video filter
+ * aom: AOM decoder (AV1)
  * araw: Pseudo audio decoder for raw PCM
  * aribcam: ARIB STD-B25 decoder/virtual CAM
  * aribsub: ARIB subtitles decoder
