@@ -1714,6 +1714,11 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
             // Subpictures have the correct orientation:
             vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "OrientationMatrix"), 1, GL_FALSE, identity);
+            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ProjectionMatrix"), 1, GL_FALSE, identity);
+            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ViewMatrix"), 1, GL_FALSE, identity);
+            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "YRotMatrix"), 1, GL_FALSE, identity);
+            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "XRotMatrix"), 1, GL_FALSE, identity);
+            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ZoomMatrix"), 1, GL_FALSE, identity);
 #endif
         } else {
 #ifdef SUPPORTS_FIXED_PIPELINE
