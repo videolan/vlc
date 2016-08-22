@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdalign.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,6 +48,11 @@ struct vlc_http_msg
     unsigned count;
     struct vlc_http_stream *payload;
 };
+
+/* Maximum alignment for safe conversion to/from any specific pointer type */
+static const char alignas (max_align_t) vlc_http_error_loc;
+
+void *const vlc_http_error = (char *)&vlc_http_error_loc;
 
 static bool vlc_http_is_token(const char *);
 

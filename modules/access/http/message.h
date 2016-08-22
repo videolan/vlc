@@ -280,7 +280,9 @@ struct vlc_http_msg *vlc_http_msg_get_final(struct vlc_http_msg *) VLC_USED;
  * been received, waits until data is received, the stream ends or the
  * underlying connection fails.
  *
- * @return data block, or NULL on end-of-stream or error
+ * @return data block
+ * @retval NULL on end-of-stream
+ * @retval vlc_http_error on fatal error
  */
 struct block_t *vlc_http_msg_read(struct vlc_http_msg *) VLC_USED;
 
@@ -305,6 +307,18 @@ struct block_t *vlc_http_msg_read(struct vlc_http_msg *) VLC_USED;
  */
 
 struct vlc_http_stream;
+
+/**
+ * Error pointer value
+ *
+ * This is an error value for some HTTP functions that can return NULL in
+ * non-error circumstances. Another return value is necessary to express
+ * error/failure, which this is.
+ * This compares different to NULL and to any valid pointer.
+ *
+ * @warning Dereferencing this pointer is undefined.
+ */
+extern void *const vlc_http_error;
 
 void vlc_http_msg_attach(struct vlc_http_msg *m, struct vlc_http_stream *s);
 struct vlc_http_msg *vlc_http_msg_get_initial(struct vlc_http_stream *s)
@@ -348,6 +362,10 @@ struct vlc_http_msg *vlc_http_stream_read_headers(struct vlc_http_stream *s)
  * Reads message payload data.
  *
  * Reads the next block of data from the message payload of an HTTP stream.
+ *
+ * @return a block of data (use block_Release() to free it)
+ * @retval NULL The end of the stream was reached.
+ * @retval vlc_http_error The stream encountered a fatal error.
  */
 static inline struct block_t *vlc_http_stream_read(struct vlc_http_stream *s)
 {
