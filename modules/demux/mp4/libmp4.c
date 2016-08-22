@@ -259,7 +259,6 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
     {
         msg_Warn( p_stream, "Failed reading box %4.4s", (char*) &peekbox.i_type );
         MP4_BoxFree( p_box );
-        return NULL;
     }
 
     /* Check is we consumed all data */
@@ -269,7 +268,8 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
         MP4_Seek( p_stream, i_next );
     }
 
-    MP4_BoxAddChild( p_father, p_box );
+    if ( p_box )
+        MP4_BoxAddChild( p_father, p_box );
 
     return p_box;
 }
