@@ -4091,6 +4091,12 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
                 p_sys->i_timescale = BOXDATA(p_mvhd)->i_timescale;
                 p_sys->i_overall_duration = BOXDATA(p_mvhd)->i_duration;
             }
+            else
+            {
+                p_sys->i_timescale = CLOCK_FREQ;
+                p_sys->i_overall_duration = CLOCK_FREQ;
+                msg_Warn( p_demux, "No valid mvhd found" );
+            }
 
             if ( MP4_BoxCount( p_moox, "mvex" ) || !p_mvhd )
             { /* duration might be wrong an be set to whole duration :/ */
