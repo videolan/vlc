@@ -439,7 +439,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 uint64_t i_pos = SeekByMlltTable( p_demux, &i_time );
                 int i_ret = vlc_stream_Seek( p_demux->s, p_sys->i_stream_offset + i_pos );
                 if( i_ret != VLC_SUCCESS )
-			return i_ret;
+                    return i_ret;
                 p_sys->i_time_offset = i_time - p_sys->i_pts;
                 /* And reset buffered data */
                 if( p_sys->p_packetized_data )
