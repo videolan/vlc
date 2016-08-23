@@ -179,7 +179,7 @@ libv4l2_plugin_la_SOURCES = \
 	access/v4l2/v4l2.h
 libv4l2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/v4l2
 libv4l2_plugin_la_CFLAGS = $(AM_CFLAGS) $(ZVBI_CFLAGS)
-libv4l2_plugin_la_LIBADD = $(LIBDL) $(LIBM) $(ZVBI_LIBS)
+libv4l2_plugin_la_LIBADD = $(LIBDL) $(LIBM) $(ZVBI_LIBS) $(LIBPTHREAD)
 if HAVE_V4L2
 access_LTLIBRARIES += libv4l2_plugin.la
 endif
