@@ -1,5 +1,5 @@
 # GPGERROR
-GPGERROR_VERSION := 1.20
+GPGERROR_VERSION := 1.24
 GPGERROR_URL := ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-$(GPGERROR_VERSION).tar.bz2
 
 $(TARBALLS)/libgpg-error-$(GPGERROR_VERSION).tar.bz2:
@@ -35,6 +35,6 @@ endif
 
 .gpg-error: libgpg-error
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-nls --disable-shared --disable-languages
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-nls --disable-shared --disable-languages --disable-tests
 	cd $< && $(MAKE) install
 	touch $@
