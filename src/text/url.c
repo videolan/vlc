@@ -662,11 +662,15 @@ char *vlc_uri_compose(const vlc_url_t *uri)
         fprintf(stream, "?%s", uri->psz_option);
     /* NOTE: fragment not handled currently */
 
-    fclose(stream);
+    if (ferror(stream))
+        goto error;
+    if (fclose(stream))
+        buf = NULL;
     return buf;
 
 error:
-    fclose(stream);
+    if (fclose(stream))
+        buf = NULL;
     free(buf);
     return NULL;
 }
