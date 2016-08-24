@@ -13,6 +13,7 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2:
 
 libmatroska: libmatroska-$(MATROSKA_VERSION).tar.bz2 .sum-matroska
 	$(UNPACK)
+	$(call pkg_static,"libmatroska.pc.in")
 	$(MOVE)
 
 MATROSKA_EXTRA_FLAGS = CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
