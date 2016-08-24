@@ -443,8 +443,8 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
     ])
 
     dnl Newer contribs follow usual name space rules
-    AS_IF([test -x "${CONTRIB_DIR}/../bin/${host}-luac"], [
-      LUAC="${CONTRIB_DIR}/../bin/${host}-luac"
+    AS_IF([test -x "${CONTRIB_DIR}/../bin/${host_alias}-luac"], [
+      LUAC="${CONTRIB_DIR}/../bin/${host_alias}-luac"
     ])
   ])
 
