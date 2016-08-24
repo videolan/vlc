@@ -19,6 +19,8 @@ daala: daala-$(DAALA_VERSION).tar.gz .sum-daala
 	rm -Rf $@-git $@
 	mkdir -p $@-git
 	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
+	$(call pkg_static,"daaladec.pc.in")
+	$(call pkg_static,"daalaenc.pc.in")
 	$(MOVE)
 	mkdir -p $@/m4
 
