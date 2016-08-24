@@ -1,6 +1,6 @@
 # ebml
 
-EBML_VERSION := 1.3.3
+EBML_VERSION := 1.3.4
 EBML_URL := http://dl.matroska.org/downloads/libebml/libebml-$(EBML_VERSION).tar.bz2
 
 $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2:
