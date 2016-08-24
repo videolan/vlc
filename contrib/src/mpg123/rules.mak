@@ -10,10 +10,15 @@ endif
 MPG123CONF = $(HOSTCONF)
 
 ifdef HAVE_ANDROID
-ifeq ($(ANDROID_ABI), x86)
+ifeq ($(ANDROID_ABI), armeabi-v7a)
+MPG123CONF += --with-cpu=arm_fpu
+else ifeq ($(ANDROID_ABI), arm64-v8a)
+MPG123CONF += --with-cpu=aarch64
+else
 MPG123CONF += --with-cpu=generic_fpu
 endif
 endif
+
 ifdef HAVE_VISUALSTUDIO
 ifeq ($(ARCH), x86_64)
 MPG123CONF += --with-cpu=generic_dither
