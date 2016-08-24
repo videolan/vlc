@@ -86,7 +86,9 @@ endif
 	touch $@
 
 ifdef HAVE_WIN32
+ifndef HAVE_CROSS_COMPILE
 LUACVARS=CPPFLAGS="-DLUA_DL_DLL"
+endif
 endif
 
 luac: lua-$(LUA_VERSION).tar.gz .sum-luac
