@@ -281,7 +281,7 @@ codec_LTLIBRARIES += $(LTLIBtheora)
 libdaala_plugin_la_SOURCES = codec/daala.c
 libdaala_plugin_la_CFLAGS = $(AM_CFLAGS) $(DAALA_CFLAGS)
 libdaala_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libdaala_plugin_la_LIBADD = $(DAALA_LIBS) $(LIBM) 
+libdaala_plugin_la_LIBADD = $(DAALA_LIBS)
 EXTRA_LTLIBRARIES += libdaala_plugin.la
 codec_LTLIBRARIES += $(LTLIBdaala)
 
