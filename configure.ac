@@ -2106,53 +2106,7 @@ fi
 dnl
 dnl  matroska demux plugin
 dnl
-AC_ARG_ENABLE(mkv,
-  [AS_HELP_STRING([--disable-mkv],
-    [do not use libmatroska (default auto)])])
-if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
-  AC_LANG_PUSH(C++)
-  AC_CHECK_HEADERS(ebml/EbmlVersion.h, [
-    AC_MSG_CHECKING(for libebml version >= 1.0.0)
-    AC_EGREP_CPP(yes,
-      [#include <ebml/EbmlVersion.h>
-       #ifdef LIBEBML_VERSION
-       #if LIBEBML_VERSION >= 0x010000
-       yes
-       #endif
-       #endif],
-      [AC_MSG_RESULT([yes])
-        AC_CHECK_HEADERS(matroska/KaxVersion.h, [
-          AC_MSG_CHECKING(for libmatroska version >= 1.0.0)
-          AC_EGREP_CPP(yes,
-            [#include <matroska/KaxVersion.h>
-             #ifdef LIBMATROSKA_VERSION
-             #if LIBMATROSKA_VERSION >= 0x010000
-             yes
-             #endif
-             #endif],
-            [AC_MSG_RESULT([yes])
-              AC_CHECK_HEADERS(matroska/KaxAttachments.h)
-              AC_CHECK_LIB(ebml_pic, main, [
-                VLC_ADD_PLUGIN([mkv])
-                VLC_ADD_LIBS([mkv],[-lmatroska -lebml_pic])
-              ],[
-                AC_CHECK_LIB(ebml, main, [
-                  VLC_ADD_PLUGIN([mkv])
-                  VLC_ADD_LIBS([mkv],[-lmatroska -lebml])
-                ])
-              ])
-            ], [
-              AC_MSG_RESULT([no])
-              AC_MSG_ERROR([Your libmatroska is too old: you may get a more recent one from http://dl.matroska.org/downloads/libmatroska/. Alternatively you can use --disable-mkv to disable the matroska plugin.])
-          ])
-        ])
-      ],
-      [AC_MSG_RESULT([no])
-        AC_MSG_ERROR([Your libebml is too old: you may get a more recent one from http://dl.matroska.org/downloads/libebml/. Alternatively you can use --disable-mkv to disable the matroska plugin.])
-    ])
-  ])
-  AC_LANG_POP(C++)
-fi
+PKG_ENABLE_MODULES_VLC([MATROSKA], [mkv], [libebml libmatroska], [MKV format support], [auto])
 
 dnl
 dnl  modplug demux plugin
