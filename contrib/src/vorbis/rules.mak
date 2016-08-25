@@ -24,6 +24,9 @@ $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 	$(UNPACK)
+ifeq ($(CC), clang)
+	$(APPLY) $(SRC)/vorbis/clang.patch
+endif
 	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/vorbis/vorbis-bitcode.patch
 	$(call pkg_static,"vorbis.pc.in")

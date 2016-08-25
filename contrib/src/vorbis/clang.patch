@@ -1,0 +1,15 @@
+diff -Naur libvorbis.orig/configure.ac libvorbis/configure.ac
+--- libvorbis.orig/configure.ac	2016-08-25 14:40:51.528447418 +0200
++++ libvorbis/configure.ac	2016-08-25 14:52:58.181761438 +0200
+@@ -128,9 +128,9 @@
+ 	case $host in 
+ 	*86-*-linux*)
+ 		DEBUG="-g -Wall -Wextra -D_REENTRANT -D__NO_MATH_INLINES -fsigned-char"
+-		CFLAGS="-O3 -ffast-math -mno-ieee-fp -D_REENTRANT -fsigned-char"
++		CFLAGS="-O3 -ffast-math -D_REENTRANT -fsigned-char"
+ #              	PROFILE="-Wall -Wextra -pg -g -O3 -ffast-math -D_REENTRANT -fsigned-char -fno-inline -static"
+-		PROFILE="-Wall -Wextra -pg -g -O3 -ffast-math -mno-ieee-fp -D_REENTRANT -fsigned-char -fno-inline"
++		PROFILE="-Wall -Wextra -pg -g -O3 -ffast-math -D_REENTRANT -fsigned-char -fno-inline"
+ 
+ 		# glibc < 2.1.3 has a serious FP bug in the math inline header
+ 		# that will cripple Vorbis.  Look to see if the magic FP stack
