@@ -141,8 +141,9 @@ FFMPEGCONF += --target-os=linux --enable-pic
 endif
 
 ifdef HAVE_ANDROID
+# broken text relocations
 ifeq ($(ANDROID_ABI), x86)
-FFMPEGCONF +=  --disable-mmx --disable-mmxext
+FFMPEGCONF +=  --disable-mmx --disable-mmxext --disable-inline-asm
 endif
 ifdef HAVE_NEON
 ifeq ($(ANDROID_ABI), armeabi-v7a)
