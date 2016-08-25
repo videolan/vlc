@@ -145,6 +145,9 @@ ifdef HAVE_ANDROID
 ifeq ($(ANDROID_ABI), x86)
 FFMPEGCONF +=  --disable-mmx --disable-mmxext --disable-inline-asm
 endif
+ifeq ($(ANDROID_ABI), x86_64)
+FFMPEGCONF +=  --disable-mmx --disable-mmxext --disable-inline-asm
+endif
 ifdef HAVE_NEON
 ifeq ($(ANDROID_ABI), armeabi-v7a)
 FFMPEGCONF += --as='gas-preprocessor.pl -as-type clang -arch arm $(CC)'
