@@ -113,9 +113,7 @@ endif
 ifdef HAVE_ANDROID
 # vpx configure.sh overrides our sysroot and it looks for it itself, and
 # uses that path to look for the compiler (which we already know)
-VPX_CONF += --sdk-path=$(shell dirname $(shell which $(HOST)-gcc))
-# put sysroot
-VPX_CONF += --libc=$(ANDROID_NDK)/platforms/$(ANDROID_API)/arch-$(PLATFORM_SHORT_ARCH)
+VPX_CONF += --sdk-path=$(shell dirname $(shell which $(HOST)-clang))
 endif
 
 ifndef WITH_OPTIMIZATION

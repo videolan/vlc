@@ -22,7 +22,29 @@ cpu-features.c. Additionally, we don't need to link with pthread.
  PORTS_SRCS-$(ARCH_ARM) += arm.h
 --- libvpx/build/make/configure.sh.orig	2016-05-20 12:48:54.468179035 +0200
 +++ libvpx/build/make/configure.sh	2016-05-20 12:49:30.379601840 +0200
-@@ -907,7 +907,8 @@
+@@ -628,8 +628,8 @@
+ }
+ 
+ setup_gnu_toolchain() {
+-  CC=${CC:-${CROSS}gcc}
+-  CXX=${CXX:-${CROSS}g++}
++  CC=clang
++  CXX=clang++
+   AR=${AR:-${CROSS}ar}
+   LD=${LD:-${CROSS}${link_with_cc:-ld}}
+   AS=${AS:-${CROSS}as}
+@@ -951,8 +951,8 @@
+           COMPILER_LOCATION=`find "${SDK_PATH}" \
+                              -name "arm-linux-androideabi-gcc*" -print -quit`
+           TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/arm-linux-androideabi-
+-          CC=${TOOLCHAIN_PATH}gcc
+-          CXX=${TOOLCHAIN_PATH}g++
++          CC=clang
++          CXX=clang++
+           AR=${TOOLCHAIN_PATH}ar
+           LD=${TOOLCHAIN_PATH}gcc
+           AS=${TOOLCHAIN_PATH}as
+@@ -983,7 +983,8 @@
              soft_enable runtime_cpu_detect
            fi
            if enabled runtime_cpu_detect; then
@@ -31,4 +53,14 @@ cpu-features.c. Additionally, we don't need to link with pthread.
 +            add_cflags "-I${ANDROID_NDK}/sources/android/cpufeatures"
            fi
            ;;
+ 
+@@ -1363,9 +1364,6 @@
+         ;;
+       *-android-gcc)
+         ;;
+-      *)
+-        check_header pthread.h && add_extralibs -lpthread
+-        ;;
+     esac
+   fi
  
