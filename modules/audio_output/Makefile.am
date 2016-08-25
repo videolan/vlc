@@ -40,13 +40,16 @@ endif
 libvlc_pulse_la_SOURCES = audio_output/vlcpulse.c audio_output/vlcpulse.h
 libvlc_pulse_la_CPPFLAGS = -DMODULE_STRING=\"pulse\"
 libvlc_pulse_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
-libvlc_pulse_la_LDFLAGS = -static
-libvlc_pulse_la_LIBADD = $(PULSE_LIBS)
+libvlc_pulse_la_LIBADD = $(PULSE_LIBS) $(LTLIBVLCCORE)
+libvlc_pulse_la_LDFLAGS = \
+	-no-undefined \
+	-export-symbols-regex ^vlc_pa_ \
+	-version-info 0:0:0
 libpulse_plugin_la_SOURCES = audio_output/pulse.c
 libpulse_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
 libpulse_plugin_la_LIBADD = libvlc_pulse.la $(PULSE_LIBS) $(LIBM)
 if HAVE_PULSE
-noinst_LTLIBRARIES += libvlc_pulse.la
+pkglib_LTLIBRARIES += libvlc_pulse.la
 aout_LTLIBRARIES += libpulse_plugin.la
 endif
 
