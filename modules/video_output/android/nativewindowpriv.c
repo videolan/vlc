@@ -93,6 +93,8 @@ static int window_connect( ANativeWindow *anw )
 {
 #if ANDROID_ICS_OR_LATER
     return native_window_api_connect( anw, NATIVE_WINDOW_API_MEDIA );
+#else
+    return 0;
 #endif
 }
 
@@ -100,6 +102,8 @@ static int window_disconnect( ANativeWindow *anw )
 {
 #if ANDROID_ICS_OR_LATER
     return native_window_api_disconnect( anw, NATIVE_WINDOW_API_MEDIA );
+#else
+    return 0;
 #endif
 }
 
@@ -198,8 +202,12 @@ int ANativeWindowPriv_getMinUndequeued( native_window_priv *priv, unsigned int *
     status_t err;
 
 #if ANDROID_HC_OR_LATER
-    err = priv->anw->query( priv->anw, NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS, min_undequeued );
+    int query;
+    err = priv->anw->query( priv->anw, NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS, &query );
     CHECK_ERR();
+    if( query < 0 )
+        return -1;
+    *min_undequeued = query;
 #endif
     /* set a minimum value of min_undequeued in case query fails */
     if( *min_undequeued == 0 )
