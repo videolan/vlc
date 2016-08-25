@@ -62,8 +62,11 @@ libvlc_xcb_events_la_SOURCES = \
 	video_output/xcb/events.c video_output/xcb/events.h
 libvlc_xcb_events_la_CPPFLAGS = -DMODULE_STRING=\"xcb\"
 libvlc_xcb_events_la_CFLAGS = $(AM_CFLAGS) $(XCB_CFLAGS)
-libvlc_xcb_events_la_LDFLAGS = -static
-libvlc_xcb_events_la_LIBADD = $(XCB_LIBS)
+libvlc_xcb_events_la_LDFLAGS = \
+	-no-undefined \
+	-export-symbols-regex ^vlc_xcb_ \
+	-version-info 0:0:0
+libvlc_xcb_events_la_LIBADD = $(XCB_LIBS) $(LTLIBVLCCORE)
 
 libxcb_x11_plugin_la_SOURCES = \
 	video_output/xcb/pictures.c video_output/xcb/pictures.h \
@@ -108,7 +111,7 @@ libglx_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libglx_plugin_la_LIBADD = $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
 
 if HAVE_XCB
-noinst_LTLIBRARIES += libvlc_xcb_events.la
+pkglib_LTLIBRARIES += libvlc_xcb_events.la
 vout_LTLIBRARIES += libxcb_x11_plugin.la libxcb_window_plugin.la
 if HAVE_XCB_KEYSYMS
 libxcb_window_plugin_la_CFLAGS += -DHAVE_XCB_KEYSYMS

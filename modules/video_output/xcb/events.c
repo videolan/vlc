@@ -34,6 +34,8 @@
 
 #include "events.h"
 
+#pragma GCC visibility push(default)
+
 int vlc_xcb_error_Check(vout_display_t *vd, xcb_connection_t *conn,
                         const char *str, xcb_void_cookie_t ck)
 {
