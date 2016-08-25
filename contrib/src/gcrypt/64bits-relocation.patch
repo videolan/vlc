@@ -1,0 +1,20 @@
+--- libgcrypt/cipher/rijndael.c.orig	2016-08-25 17:54:33.755153207 +0200
++++ libgcrypt/cipher/rijndael.c	2016-08-25 17:54:36.655151003 +0200
+@@ -744,7 +744,7 @@
+   const void *key = ctx->keyschenc;
+   uintptr_t rounds = ctx->rounds;
+   uintptr_t ret;
+-  asm volatile ("movq %[encT], %%r8\n\t"
++  asm volatile ("movabs %[encT], %%r8\n\t"
+                 "callq *%[ret]\n\t"
+                 : [ret] "=a" (ret),
+                   "+D" (key),
+@@ -1127,7 +1127,7 @@
+   const void *key = ctx->keyschdec;
+   uintptr_t rounds = ctx->rounds;
+   uintptr_t ret;
+-  asm volatile ("movq %[dectabs], %%r8\n\t"
++  asm volatile ("movabs %[dectabs], %%r8\n\t"
+                 "callq *%[ret]\n\t"
+                 : [ret] "=a" (ret),
+                   "+D" (key),

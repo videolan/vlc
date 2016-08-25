@@ -15,6 +15,9 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/gcrypt/winrt.patch
 endif
+ifdef HAVE_WIN64
+	$(APPLY) $(SRC)/gcrypt/64bits-relocation.patch
+endif
 	$(MOVE)
 
 DEPS_gcrypt = gpg-error
