@@ -33,12 +33,37 @@ void XCB_keyHandler_Destroy (key_handler_t *);
 int XCB_keyHandler_Process (key_handler_t *, xcb_generic_event_t *);
 
 /* events.c */
-int XCB_error_Check (vout_display_t *, xcb_connection_t *conn,
-                     const char *str, xcb_void_cookie_t);
 
-struct vout_window_t *XCB_parent_Create (vout_display_t *obj,
-                                         xcb_connection_t **,
-                                         const xcb_screen_t **);
-xcb_cursor_t XCB_cursor_Create (xcb_connection_t *, const xcb_screen_t *);
+/**
+ * Checks for an XCB error.
+ */
+int vlc_xcb_error_Check(vout_display_t *, xcb_connection_t *conn,
+                        const char *str, xcb_void_cookie_t);
 
-int XCB_Manage (vout_display_t *vd, xcb_connection_t *conn, bool *);
+/**
+ * Allocates a window for XCB-based output.
+ *
+ * Creates a VLC video X window object, connects to the corresponding X server,
+ * finds the corresponding X server screen.
+ */
+struct vout_window_t *vlc_xcb_parent_Create(vout_display_t *obj,
+                                            xcb_connection_t **connp,
+                                            const xcb_screen_t **screenp);
+
+/**
+ * Creates a blank cursor.
+ *
+ * \note Pixmaps are leaked until disconnection from the X server. Hence, this
+ * function should be called no more than once per X connection.
+ *
+ * @param conn XCB connection
+ * @param scr target XCB screen
+ * @return cursor XID
+ */
+xcb_cursor_t vlc_xcb_cursor_Create(xcb_connection_t *conn,
+                                   const xcb_screen_t *scr);
+
+/**
+ * Processes XCB events.
+ */
+int vlc_xcb_Manage(vout_display_t *vd, xcb_connection_t *conn, bool *visible);

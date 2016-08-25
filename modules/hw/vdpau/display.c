@@ -402,7 +402,7 @@ static void Manage(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
     bool visible;
 
-    XCB_Manage(vd, sys->conn, &visible);
+    vlc_xcb_Manage(vd, sys->conn, &visible);
 }
 
 static int xcb_screen_num(xcb_connection_t *conn, const xcb_screen_t *screen)
@@ -431,7 +431,7 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     const xcb_screen_t *screen;
-    sys->embed = XCB_parent_Create(vd, &sys->conn, &screen);
+    sys->embed = vlc_xcb_parent_Create(vd, &sys->conn, &screen);
     if (sys->embed == NULL)
     {
         free(sys);
@@ -599,7 +599,7 @@ static int Open(vlc_object_t *obj)
                 sys->window, sys->embed->handle.xid, place.x, place.y,
                 place.width, place.height, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT,
                 screen->root_visual, mask, values);
-        if (XCB_error_Check(vd, sys->conn, "window creation failure", c))
+        if (vlc_xcb_error_Check(vd, sys->conn, "window creation failure", c))
             goto error;
         msg_Dbg(vd, "using X11 window 0x%08"PRIx32, sys->window);
         xcb_map_window(sys->conn, sys->window);
@@ -648,7 +648,7 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    sys->cursor = XCB_cursor_Create(sys->conn, screen);
+    sys->cursor = vlc_xcb_cursor_Create(sys->conn, screen);
     sys->pool = NULL;
 
     /* */

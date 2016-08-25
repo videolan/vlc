@@ -371,7 +371,7 @@ static int Open (vlc_object_t *obj)
     /* Connect to X */
     xcb_connection_t *conn;
     const xcb_screen_t *screen;
-    p_sys->embed = XCB_parent_Create (vd, &conn, &screen);
+    p_sys->embed = vlc_xcb_parent_Create(vd, &conn, &screen);
     if (p_sys->embed == NULL)
     {
         free (p_sys);
@@ -495,7 +495,7 @@ static int Open (vlc_object_t *obj)
                  f->visual, mask, list);
             xcb_map_window (conn, p_sys->window);
 
-            if (!XCB_error_Check (vd, conn, "cannot create X11 window", c))
+            if (!vlc_xcb_error_Check(vd, conn, "cannot create X11 window", c))
             {
                 msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32
                          " (depth: %"PRIu8")", f->visual, f->depth);
@@ -550,7 +550,7 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Create cursor */
-    p_sys->cursor = XCB_cursor_Create (conn, screen);
+    p_sys->cursor = vlc_xcb_cursor_Create(conn, screen);
 
     p_sys->shm = XCB_shm_Check (obj, conn);
     p_sys->visible = false;
@@ -782,7 +782,7 @@ static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *p_sys = vd->sys;
 
-    XCB_Manage (vd, p_sys->conn, &p_sys->visible);
+    vlc_xcb_Manage(vd, p_sys->conn, &p_sys->visible);
 }
 
 static int EnumAdaptors (vlc_object_t *obj, const char *var,

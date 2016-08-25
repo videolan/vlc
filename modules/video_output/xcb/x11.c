@@ -115,7 +115,7 @@ static int Open (vlc_object_t *obj)
     /* Get window, connect to X server */
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    sys->embed = XCB_parent_Create (vd, &conn, &scr);
+    sys->embed = vlc_xcb_parent_Create(vd, &conn, &scr);
     if (sys->embed == NULL)
     {
         free (sys);
@@ -282,13 +282,13 @@ found_format:;
         /* Create graphic context (I wonder why the heck do we need this) */
         xcb_create_gc (conn, sys->gc, sys->window, 0, NULL);
 
-        if (XCB_error_Check (vd, conn, "cannot create X11 window", c))
+        if (vlc_xcb_error_Check(vd, conn, "cannot create X11 window", c))
             goto error;
     }
     msg_Dbg (vd, "using X11 window %08"PRIx32, sys->window);
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, sys->gc);
 
-    sys->cursor = XCB_cursor_Create (conn, scr);
+    sys->cursor = vlc_xcb_cursor_Create(conn, scr);
     sys->visible = false;
     if (XCB_shm_Check (obj, conn))
     {
@@ -530,7 +530,7 @@ static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    XCB_Manage (vd, sys->conn, &sys->visible);
+    vlc_xcb_Manage(vd, sys->conn, &sys->visible);
 }
 
 static void ResetPictures (vout_display_t *vd)

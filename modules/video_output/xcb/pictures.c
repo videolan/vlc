@@ -109,8 +109,8 @@ int XCB_picture_Alloc (vout_display_t *vd, picture_resource_t *res,
     if (segment != 0)
     {   /* Attach the segment to X */
         xcb_void_cookie_t ck = xcb_shm_attach_checked (conn, segment, id, 1);
-        switch (XCB_error_Check (vd, conn, "shared memory server-side error",
-                                 ck))
+        switch (vlc_xcb_error_Check(vd, conn,
+                                    "shared memory server-side error", ck))
         {
             case 0:
                 break;
@@ -123,7 +123,8 @@ int XCB_picture_Alloc (vout_display_t *vd, picture_resource_t *res,
                 buf.shm_perm.mode |= S_IRGRP|S_IROTH;
                 shmctl (id, IPC_SET, &buf);
                 ck = xcb_shm_attach_checked (conn, segment, id, 1);
-                if (XCB_error_Check (vd, conn, "same error on retry", ck) == 0)
+                if (vlc_xcb_error_Check(vd, conn, "same error on retry",
+                                        ck) == 0)
                     break;
                 /* fall through */
             }

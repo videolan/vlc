@@ -92,7 +92,7 @@ static int Open (vlc_object_t *obj)
     const xcb_screen_t *scr;
     vout_window_t *surface;
 
-    surface = XCB_parent_Create (vd, &conn, &scr);
+    surface = vlc_xcb_parent_Create(vd, &conn, &scr);
     if (surface == NULL)
     {
         free (sys);
@@ -114,7 +114,7 @@ static int Open (vlc_object_t *obj)
     if (sys->vgl == NULL)
         goto error;
 
-    sys->cursor = XCB_cursor_Create (conn, scr);
+    sys->cursor = vlc_xcb_cursor_Create(conn, scr);
     sys->visible = false;
 
     /* Setup vout_display_t once everything is fine */
@@ -259,5 +259,5 @@ static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    XCB_Manage (vd, sys->conn, &sys->visible);
+    vlc_xcb_Manage(vd, sys->conn, &sys->visible);
 }

@@ -34,11 +34,8 @@
 
 #include "events.h"
 
-/**
- * Check for an error
- */
-int XCB_error_Check (vout_display_t *vd, xcb_connection_t *conn,
-                     const char *str, xcb_void_cookie_t ck)
+int vlc_xcb_error_Check(vout_display_t *vd, xcb_connection_t *conn,
+                        const char *str, xcb_void_cookie_t ck)
 {
     xcb_generic_error_t *err;
 
@@ -120,13 +117,9 @@ static const xcb_screen_t *FindScreen (vlc_object_t *obj,
     return NULL;
 }
 
-/**
- * Create a VLC video X window object, connect to the corresponding X server,
- * find the corresponding X server screen.
- */
-vout_window_t *XCB_parent_Create (vout_display_t *vd,
-                                  xcb_connection_t **restrict pconn,
-                                  const xcb_screen_t **restrict pscreen)
+vout_window_t *vlc_xcb_parent_Create(vout_display_t *vd,
+                                     xcb_connection_t **restrict pconn,
+                                     const xcb_screen_t **restrict pscreen)
 {
     vout_window_t *wnd = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_XID);
     if (wnd == NULL)
@@ -167,15 +160,8 @@ error:
     return NULL;
 }
 
-/**
- * Create a blank cursor.
- * Note that the pixmaps are leaked (until the X disconnection). Hence, this
- * function should be called no more than once per X connection.
- * @param conn XCB connection
- * @param scr target XCB screen
- */
-xcb_cursor_t XCB_cursor_Create (xcb_connection_t *conn,
-                                const xcb_screen_t *scr)
+xcb_cursor_t vlc_xcb_cursor_Create(xcb_connection_t *conn,
+                                   const xcb_screen_t *scr)
 {
     xcb_cursor_t cur = xcb_generate_id (conn);
     xcb_pixmap_t pix = xcb_generate_id (conn);
@@ -270,10 +256,7 @@ static int ProcessEvent (vout_display_t *vd, xcb_connection_t *conn,
     return VLC_SUCCESS;
 }
 
-/**
- * Process incoming X events.
- */
-int XCB_Manage (vout_display_t *vd, xcb_connection_t *conn, bool *visible)
+int vlc_xcb_Manage(vout_display_t *vd, xcb_connection_t *conn, bool *visible)
 {
     xcb_generic_event_t *ev;
 
