@@ -420,6 +420,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     else if( i_val == 3 ) p_context->skip_loop_filter = AVDISCARD_NONKEY;
     else if( i_val == 2 ) p_context->skip_loop_filter = AVDISCARD_BIDIR;
     else if( i_val == 1 ) p_context->skip_loop_filter = AVDISCARD_NONREF;
+    else p_context->skip_loop_filter = AVDISCARD_DEFAULT;
 
     if( var_CreateGetBool( p_dec, "avcodec-fast" ) )
         p_context->flags2 |= CODEC_FLAG2_FAST;
