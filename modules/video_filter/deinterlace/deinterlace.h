@@ -124,7 +124,7 @@ struct filter_sys_t
 };
 
 /*****************************************************************************
- * video filter2 functions
+ * video filter functions
  *****************************************************************************/
 
 /**
@@ -246,7 +246,7 @@ void Close( vlc_object_t *p_this );
 
 /**
  * \file
- * Deinterlacer plugin for vlc. Data structures and video filter2 functions.
+ * Deinterlacer plugin for vlc. Data structures and video filter functions.
  *
  * Note on i_frame_offset:
  *

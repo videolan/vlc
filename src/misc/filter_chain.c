@@ -138,7 +138,7 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
         },
     };
 
-    return filter_chain_NewInner( &callbacks, "video filter2", allow_change,
+    return filter_chain_NewInner( &callbacks, "video filter", allow_change,
                                   owner );
 }
 

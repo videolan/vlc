@@ -43,7 +43,7 @@ static picture_t *Filter( filter_t *, picture_t * );
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("RV32 conversion filter") )
-    set_capability( "video filter2", 1 )
+    set_capability( "video filter", 1 )
     set_callbacks( OpenFilter, NULL )
 vlc_module_end ()
 

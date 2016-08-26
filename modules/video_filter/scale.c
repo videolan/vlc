@@ -45,7 +45,7 @@ static picture_t *Filter( filter_t *, picture_t * );
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("Video scaling filter") )
-    set_capability( "video filter2", 10 )
+    set_capability( "video filter", 10 )
     set_callbacks( OpenFilter, NULL )
 vlc_module_end ()
 

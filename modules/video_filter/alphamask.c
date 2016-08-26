@@ -65,7 +65,7 @@ vlc_module_begin ()
     set_help( ALPHAMASK_HELP )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter2", 0 )
+    set_capability( "video filter", 0 )
     add_shortcut( "alphamask", "mask" )
     set_callbacks( Create, Destroy )
 

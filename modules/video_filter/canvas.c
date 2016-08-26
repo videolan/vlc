@@ -103,7 +103,7 @@ static picture_t *Filter( filter_t *, picture_t * );
 vlc_module_begin ()
     set_shortname( N_("Canvas") )
     set_description( N_("Canvas video filter") )
-    set_capability( "video filter2", 0 )
+    set_capability( "video filter", 0 )
     set_help( CANVAS_HELP )
     set_callbacks( Activate, Destroy )
 

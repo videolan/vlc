@@ -495,7 +495,7 @@ inline void VLCProfileEditor::registerFilters()
         QListWidget *listWidget = NULL;
         QListWidgetItem *item;
 
-        if ( capability == "video filter2" )
+        if ( capability == "video filter" )
             listWidget = ui.valueholder_video_filters;
         else if ( capability == "audio filter" )
             listWidget = ui.valueholder_audio_filters;

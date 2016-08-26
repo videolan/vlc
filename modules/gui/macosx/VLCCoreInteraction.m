@@ -735,7 +735,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     if (module_provides(p_obj, "video splitter")) {
         return "video-splitter";
-    } else if (module_provides(p_obj, "video filter2")) {
+    } else if (module_provides(p_obj, "video filter")) {
         return "video-filter";
     } else if (module_provides(p_obj, "sub source")) {
         return "sub-source";

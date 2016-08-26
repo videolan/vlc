@@ -77,17 +77,17 @@ vlc_module_begin ()
 #if defined (SSE2)
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )
-    set_capability( "video filter2", 120 )
+    set_capability( "video filter", 120 )
 # define vlc_CPU_capable() vlc_CPU_SSE2()
 #elif defined (MMX)
     set_description( N_( "MMX I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )
-    set_capability( "video filter2", 100 )
+    set_capability( "video filter", 100 )
 # define vlc_CPU_capable() vlc_CPU_MMX()
 #else
     set_description( N_("I420,IYUV,YV12 to "
                        "RGB2,RV15,RV16,RV24,RV32 conversions") )
-    set_capability( "video filter2", 80 )
+    set_capability( "video filter", 80 )
 # define vlc_CPU_capable() (true)
 #endif
     set_callbacks( Activate, Deactivate )

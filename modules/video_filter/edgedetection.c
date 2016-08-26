@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_help( EDGE_DETECTION_LONGTEXT )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter2", 0 )
+    set_capability( "video filter", 0 )
     set_callbacks( Open, Close )
 
 vlc_module_end ()

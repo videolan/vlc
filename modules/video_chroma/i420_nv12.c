@@ -159,6 +159,6 @@ static void YV12_NV12( filter_t *p_filter, picture_t *p_src,
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("YUV planar to semiplanar conversions") )
-    set_capability( "video filter2", 160 )
+    set_capability( "video filter", 160 )
     set_callbacks( Create, Delete )
 vlc_module_end ()

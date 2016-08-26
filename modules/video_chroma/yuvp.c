@@ -45,7 +45,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("YUVP converter") )
-    set_capability( "video filter2", 10 )
+    set_capability( "video filter", 10 )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

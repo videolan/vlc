@@ -33,7 +33,7 @@ static int OpenScaler (vlc_object_t *);
 
 vlc_module_begin ()
     set_description (N_("OpenMAX DL image processing"))
-    set_capability ("video filter2", 90)
+    set_capability ("video filter", 90)
     set_callbacks (Open, NULL)
 vlc_module_end ()
 

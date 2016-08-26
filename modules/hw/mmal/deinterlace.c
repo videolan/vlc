@@ -47,7 +47,7 @@ static void Close(filter_t *filter);
 vlc_module_begin()
     set_shortname(N_("MMAL deinterlace"))
     set_description(N_("MMAL-based deinterlace filter plugin"))
-    set_capability("video filter2", 10)
+    set_capability("video filter", 10)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_callbacks(Open, Close)

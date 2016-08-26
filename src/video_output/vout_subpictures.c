@@ -236,7 +236,7 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
 
     scale->owner.video.buffer_new = spu_new_video_buffer;
 
-    scale->p_module = module_need(scale, "video filter2", NULL, false);
+    scale->p_module = module_need(scale, "video filter", NULL, false);
 
     return scale;
 }

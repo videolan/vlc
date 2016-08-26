@@ -103,7 +103,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin()
     set_description( N_("VHS movie effect video filter") )
     set_shortname(   N_("VHS movie" ) )
-    set_capability( "video filter2", 0 )
+    set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 

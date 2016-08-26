@@ -347,7 +347,7 @@ static const char* GetVFilterType( struct intf_thread_t *p_intf, const char *psz
 
     if( module_provides( p_obj, "video splitter" ) )
         return "video-splitter";
-    else if( module_provides( p_obj, "video filter2" ) )
+    else if( module_provides( p_obj, "video filter" ) )
         return "video-filter";
     else if( module_provides( p_obj, "sub source" ) )
         return "sub-source";

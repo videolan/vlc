@@ -93,7 +93,7 @@ vlc_module_begin ()
 
     /* video output filter submodule */
     add_submodule ()
-    set_capability("video filter2", 0)
+    set_capability("video filter", 0)
     set_callbacks(OpenVideo, Close)
     set_description(N_("Audio Bar Graph Video sub source"))
     add_shortcut("audiobargraph_v")

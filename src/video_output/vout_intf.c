@@ -448,7 +448,7 @@ void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
         return;
     }
 
-    if( module_provides( p_obj, "video filter2" ) )
+    if( module_provides( p_obj, "video filter" ) )
     {
         psz_filter_type = "video-filter";
     }

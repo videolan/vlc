@@ -203,7 +203,7 @@ static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in
     es_format_InitFromVideo( &p_filter->fmt_out, &p_fmt_in->video );
     p_filter->fmt_in.i_codec  = p_filter->fmt_in.video.i_chroma  = src_chroma;
     p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma = fmt_out;
-    p_filter->p_module = module_need( p_filter, "video filter2", NULL, false );
+    p_filter->p_module = module_need( p_filter, "video filter", NULL, false );
 
     if( !p_filter->p_module )
     {

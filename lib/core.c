@@ -250,7 +250,7 @@ libvlc_module_description_t *libvlc_audio_filter_list_get( libvlc_instance_t *p_
 
 libvlc_module_description_t *libvlc_video_filter_list_get( libvlc_instance_t *p_instance )
 {
-    return module_description_list_get( p_instance, "video filter2" );
+    return module_description_list_get( p_instance, "video filter" );
 }
 
 int64_t libvlc_clock(void)

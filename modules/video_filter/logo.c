@@ -106,7 +106,7 @@ vlc_module_begin ()
 
     /* video output filter submodule */
     add_submodule ()
-    set_capability( "video filter2", 0 )
+    set_capability( "video filter", 0 )
     set_callbacks( OpenVideo, Close )
     set_description( N_("Logo video filter") )
     add_shortcut( "logo" )
