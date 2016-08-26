@@ -191,14 +191,14 @@ static ssize_t Read( stream_t *p_stream, void *p_buf, size_t i_toread )
             {
                 msg_Err( p_stream, "decoder put failed: %s",
                          GetErrorMessage( i_ret, b25_errors ) );
-                return -1;
+                return 0;
             }
         }
         else
         {
             if ( i_srcread < 0 )
                 msg_Err( p_stream, "Can't read %lu bytes from source stream: %d", i_toread, i_srcread );
-            return -1;
+            return 0;
         }
 
         ARIB_STD_B25_BUFFER getbuf;
@@ -207,7 +207,7 @@ static ssize_t Read( stream_t *p_stream, void *p_buf, size_t i_toread )
         {
             msg_Err( p_stream, "decoder get failed: %s",
                      GetErrorMessage( i_ret, b25_errors ) );
-            return -1;
+            return 0;
         }
 
         if ( (size_t)getbuf.size > i_toread )
