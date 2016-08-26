@@ -299,10 +299,8 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
                             &id->p_encoder->fmt_in );
         if( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma )
         {
-            filter_chain_AppendFilter( id->p_uf_chain,
-                                   NULL, NULL,
-                                   p_fmt_out,
-                                   &id->p_encoder->fmt_in );
+            filter_chain_AppendConverter( id->p_uf_chain, p_fmt_out,
+                                           &id->p_encoder->fmt_in );
         }
         filter_chain_AppendFromString( id->p_uf_chain, p_stream->p_sys->psz_vf2 );
         p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
@@ -338,10 +336,8 @@ static void conversion_video_filter_append( sout_stream_id_sys_t *id )
         ( p_fmt_out->video.i_width != id->p_encoder->fmt_in.video.i_width ) ||
         ( p_fmt_out->video.i_height != id->p_encoder->fmt_in.video.i_height ) )
     {
-        filter_chain_AppendFilter( id->p_uf_chain ? id->p_uf_chain : id->p_f_chain,
-                                   NULL, NULL,
-                                   p_fmt_out,
-                                   &id->p_encoder->fmt_in );
+        filter_chain_AppendConverter( id->p_uf_chain ? id->p_uf_chain : id->p_f_chain,
+                                      p_fmt_out, &id->p_encoder->fmt_in );
     }
 }
 

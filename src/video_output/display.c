@@ -466,28 +466,27 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     es_format_InitFromVideo(&src, &v_src);
 
     /* */
-    filter_t *filter;
+    int ret;
+
     for (int i = 0; i < 1 + (v_dst_cmp.i_chroma != v_dst.i_chroma); i++) {
         es_format_t dst;
 
         es_format_InitFromVideo(&dst, i == 0 ? &v_dst : &v_dst_cmp);
 
         filter_chain_Reset(osys->filters, &src, &dst);
-        filter = filter_chain_AppendFilter(osys->filters,
-                                           NULL, NULL, &src, &dst);
+        ret = filter_chain_AppendConverter(osys->filters, &src, &dst);
         es_format_Clean(&dst);
-        if (filter)
+        if (ret == 0)
             break;
     }
     es_format_Clean(&src);
 
-    if (filter == NULL) {
+    if (ret != 0) {
         msg_Err(vd, "Failed to adapt decoder format to display");
         filter_chain_Delete(osys->filters);
         osys->filters = NULL;
-        return -1;
     }
-    return 0;
+    return ret;
 }
 
 static void VoutDisplayDestroyRender(vout_display_t *vd)

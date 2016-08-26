@@ -275,36 +275,36 @@ static int CreateChain( filter_t *p_parent, es_format_t *p_fmt_mid )
     if( p_parent->fmt_in.video.orientation != p_fmt_mid->video.orientation)
     {
         p_filter = AppendTransform( p_parent->p_sys->p_chain, &p_parent->fmt_in, p_fmt_mid );
+        // Check if filter was enough:
+        if( es_format_IsSimilar(&p_filter->fmt_out, &p_parent->fmt_out ))
+           return VLC_SUCCESS;
+        if( p_filter == NULL )
+            return VLC_EGENERIC;
     }
     else
     {
-        p_filter = filter_chain_AppendFilter( p_parent->p_sys->p_chain, NULL, NULL, NULL, p_fmt_mid );
+        if( filter_chain_AppendConverter( p_parent->p_sys->p_chain,
+                                          NULL, p_fmt_mid ) )
+            return VLC_EGENERIC;
     }
-
-    if( !p_filter )
-        return VLC_EGENERIC;
-
-    //Check if first filter was enough (transform filter most likely):
-    if( es_format_IsSimilar(&p_filter->fmt_out, &p_parent->fmt_out ))
-       return VLC_SUCCESS;
 
     if( p_fmt_mid->video.orientation != p_parent->fmt_out.video.orientation)
     {
-        p_filter = AppendTransform( p_parent->p_sys->p_chain, p_fmt_mid, &p_parent->fmt_out );
+        if( AppendTransform( p_parent->p_sys->p_chain, p_fmt_mid,
+                             &p_parent->fmt_out ) == NULL )
+            goto error;
     }
     else
     {
-        p_filter = filter_chain_AppendFilter( p_parent->p_sys->p_chain, NULL, NULL, p_fmt_mid, NULL );
+        if( filter_chain_AppendConverter( p_parent->p_sys->p_chain,
+                                          p_fmt_mid, NULL ) )
+            goto error;
     }
-
-    if( !p_filter )
-    {
-        //Clean up.
-        filter_chain_Reset( p_parent->p_sys->p_chain, NULL, NULL );
-        return VLC_EGENERIC;
-    }
-
     return VLC_SUCCESS;
+error:
+    //Clean up.
+    filter_chain_Reset( p_parent->p_sys->p_chain, NULL, NULL );
+    return VLC_EGENERIC;
 }
 
 static filter_t * AppendTransform( filter_chain_t *p_chain, es_format_t *p_fmt1, es_format_t *p_fmt2 )
