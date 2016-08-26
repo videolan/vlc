@@ -15,7 +15,6 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-Fix-build-failure-without-STATVFS.patch
-	$(APPLY) $(SRC)/libarchive/properly-check-fork.patch
 	$(MOVE)
 
 .libarchive: libarchive
