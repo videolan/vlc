@@ -617,6 +617,8 @@ static void ParseHead( demux_t* p_demux )
 
 static int Open( vlc_object_t* p_this )
 {
+    char        *psz_root_node = NULL;
+    char        *psz_end_root_node = NULL;
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     p_demux->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
@@ -640,46 +642,55 @@ static int Open( vlc_object_t* p_this )
     }
 
     p_sys->p_xml = xml_Create( p_demux );
-    if ( !p_sys->p_xml )
-    {
-        Close( p_demux );
-        vlc_stream_Delete( p_probestream );
-        return VLC_EGENERIC;
-    }
+    if( !p_sys->p_xml )
+        goto error;
+
     p_sys->p_reader = xml_ReaderCreate( p_sys->p_xml, p_probestream );
-    if ( !p_sys->p_reader )
-    {
-        Close( p_demux );
-        vlc_stream_Delete( p_probestream );
-        return VLC_EGENERIC;
-    }
+    if( !p_sys->p_reader )
+        goto error;
 
     const int i_flags = p_sys->p_reader->obj.flags;
     p_sys->p_reader->obj.flags |= OBJECT_FLAGS_QUIET;
     const char* psz_name;
     int i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
     p_sys->p_reader->obj.flags = i_flags;
-    if ( i_type != XML_READER_STARTELEM || ( strcmp( psz_name, "tt" ) && strcmp( psz_name, "tt:tt" ) ) )
+    /*
+    * We store the tt root node to wrap it around every ttml
+    * pieces sent to the codec to define the namespaces.
+    */
+    if( i_type != XML_READER_STARTELEM || ( strcasecmp( psz_name, "tt" ) && strcasecmp( psz_name, "tt:tt" ) ) )
     {
-        Close( p_demux );
-        vlc_stream_Delete( p_probestream );
-        return VLC_EGENERIC;
+        goto error;
     }
+    node_t* p_root_node = calloc( 1, sizeof( *p_root_node ) );
+    if( unlikely( p_root_node == NULL ) )
+        goto error;
+
+    if( ReadAttrNode( p_sys->p_reader, p_root_node, psz_name ) != VLC_SUCCESS )
+    {
+        ClearNode( p_root_node );
+        goto error;
+    }
+
+    psz_root_node = NodeToStr( p_root_node );
+    ClearNode( p_root_node );
+    if( unlikely( psz_root_node == NULL ) )
+        goto error;
+
+    psz_end_root_node = strdup( psz_name );
+    if( unlikely( psz_end_root_node == NULL ) )
+        goto error;
 
     p_sys->p_reader = xml_ReaderReset( p_sys->p_reader, p_demux->s );
     vlc_stream_Delete( p_probestream );
-    if ( !p_sys->p_reader )
-    {
-        Close( p_demux );
-        return VLC_EGENERIC;
-    }
+    p_probestream = NULL;
+    if( !p_sys->p_reader )
+        goto error;
 
-    if ( ReadTTML( p_demux ) != VLC_SUCCESS )
-    {
-        Close( p_demux );
-        return VLC_EGENERIC;
-    }
-    if ( p_sys->b_has_head )
+    if( ReadTTML( p_demux ) != VLC_SUCCESS )
+        goto error;
+
+    if( p_sys->b_has_head )
         ParseHead( p_demux );
 
     p_demux->pf_demux = Demux;
@@ -687,20 +698,47 @@ static int Open( vlc_object_t* p_this )
 
     es_format_t fmt;
     es_format_Init( &fmt, SPU_ES, VLC_CODEC_TTML );
-    if ( p_sys->i_head_len > 0 )
+    if( p_sys->i_head_len > 0 )
     {
+        char* psz_head = NULL;
+        if( asprintf( &psz_head, "%s%s</%s>", psz_root_node, p_sys->psz_head, psz_end_root_node ) < 0 )
+            goto error;
+
+        free( p_sys->psz_head );
+        p_sys->psz_head = psz_head;
         fmt.p_extra = p_sys->psz_head;
-        fmt.i_extra = p_sys->i_head_len;
+        fmt.i_extra = strlen( psz_head );
     }
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     es_format_Clean( &fmt );
 
-    if ( p_sys->i_subtitles > 0 )
+    if( p_sys->i_subtitles > 0 )
+    {
+        for( int i = 0; i < p_sys->i_subtitles; i++ )
+        {
+            char* p_sub = NULL;
+            if( asprintf( &p_sub, "%s%s</%s>", psz_root_node, p_sys->subtitle[i].psz_text, psz_end_root_node ) < 0 )
+                goto error;
+
+            free( p_sys->subtitle[i].psz_text );
+            p_sys->subtitle[i].psz_text = p_sub;
+        }
         p_sys->i_length = p_sys->subtitle[ p_sys->i_subtitles - 1 ].i_stop;
+    }
     else
         p_sys->i_length = 0;
 
+    free( psz_end_root_node );
+    free( psz_root_node );
     return VLC_SUCCESS;
+
+error:
+    free( p_sys->psz_head );
+    Close( p_demux );
+    free( psz_end_root_node );
+    free( psz_root_node );
+    if( p_probestream ) vlc_stream_Delete( p_probestream );
+    return VLC_EGENERIC;
 }
 
 static void Close( demux_t* p_demux )
