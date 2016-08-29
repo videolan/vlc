@@ -924,7 +924,7 @@ static int ID3Parse( demux_t *p_demux )
             uint32_t i_framesize = ID3ReadSize( &p_frame[4], b_syncsafe ) + 10;
             if( i_framesize > i_peek )
                 return VLC_EGENERIC;
-            if( !memcmp(p_frame, "MLLT", 4) && i_framesize > 20 )
+            if( i_framesize > 24 && !memcmp(p_frame, "MLLT", 4) )
             {
                 const uint8_t *p_payload = &p_frame[10];
                 p_sys->mllt.i_frames_btw_refs = GetWBE(p_payload);
