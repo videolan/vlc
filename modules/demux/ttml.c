@@ -174,7 +174,7 @@ static int Convert_time( int64_t *timing_value, const char *s )
     int s1 = 0;
     int d1 = 0;
 
-    if ( sscanf( s, "%d.%ds", &s1, &d1) == 2 ||
+    if( sscanf( s, "%d.%ds", &s1, &d1) == 2 ||
          sscanf( s, "%d:%d:%d%*[,.]%d", &h1, &m1, &s1, &d1 ) == 4 ||
          sscanf( s, "%d:%d:%d", &h1, &m1, &s1) == 3 )
     {
@@ -196,7 +196,7 @@ static char* Append( char* psz_old, const char* psz_format, ... )
     va_start (ap, psz_format);
     int ret = vasprintf( &psz_new, psz_format, ap );
     va_end (ap);
-    if ( ret < 0 )
+    if( ret < 0 )
     {
         free( psz_old );
         return NULL;
@@ -502,13 +502,13 @@ static int Demux( demux_t* p_demux )
     if( p_sys->i_subtitle >= p_sys->i_subtitles )
         return 0;
 
-    while ( p_sys->i_subtitle < p_sys->i_subtitles &&
+    while( p_sys->i_subtitle < p_sys->i_subtitles &&
             p_sys->subtitle[p_sys->i_subtitle].i_start < p_sys->i_next_demux_time )
     {
         const subtitle_t* p_subtitle = &p_sys->subtitle[p_sys->i_subtitle];
 
         block_t* p_block = block_Alloc( strlen( p_subtitle->psz_text ) + 1 );
-        if ( unlikely( p_block == NULL ) )
+        if( unlikely( p_block == NULL ) )
             return -1;
 
         p_block->i_dts =
@@ -539,55 +539,55 @@ static void ParseHead( demux_t* p_demux )
     // Rewind since the XML parser will have consumed the entire file.
     vlc_stream_Seek( p_demux->s, 0 );
 
-    while ( ( i_read = vlc_stream_Read( p_demux->s, (void*)buff, 1024 ) ) > 0 )
+    while( ( i_read = vlc_stream_Read( p_demux->s, (void*)buff, 1024 ) ) > 0 )
     {
         ssize_t i_offset = -1;
         // Ensure we can use strstr
         buff[i_read] = 0;
 
-        if ( psz_head == NULL )
+        if( psz_head == NULL )
         {
             // Seek to the opening <head> tag if we haven't seen it already
             const char* psz_head_begin = strstr( buff, "<head>" );
-            if ( psz_head_begin == NULL )
+            if( psz_head_begin == NULL )
                 psz_head_begin = strstr( buff, "<tt:head>" );
-            if ( psz_head_begin == NULL )
+            if( psz_head_begin == NULL )
                 continue;
             i_head_len = i_read - ( psz_head_begin - buff );
             i_size = i_head_len;
             psz_head = malloc( i_size * sizeof( *psz_head ) );
-            if ( unlikely( psz_head == NULL ) )
+            if( unlikely( psz_head == NULL ) )
                 return;
             memcpy( psz_head, psz_head_begin, i_head_len );
             // Avoid copying the head tag again once we search for the end tag.
             i_offset = psz_head_begin - buff;
         }
-        if ( psz_head != NULL )
+        if( psz_head != NULL )
         {
             size_t i_end_tag_len = strlen( "</head>" );
             // Or copy until the end of the head tag once we've seen the opening one
             const char* psz_end_head = strstr( buff, "</head>" );
-            if ( psz_end_head == NULL )
+            if( psz_end_head == NULL )
             {
                 psz_end_head = strstr( buff, "</tt:head>" );
                 i_end_tag_len = strlen( "</tt:head>" );
             }
             // Check if we need to extend the buffer first
             size_t i_to_copy = i_read;
-            if ( psz_end_head != NULL )
+            if( psz_end_head != NULL )
                 i_to_copy = psz_end_head - buff + i_end_tag_len;
-            if ( i_size < i_head_len + i_to_copy )
+            if( i_size < i_head_len + i_to_copy )
             {
                 i_size = __MAX(i_size * 2, i_head_len + i_to_copy);
                 psz_head = realloc_or_free( psz_head, i_size );
-                if ( unlikely( psz_head == NULL ) )
+                if( unlikely( psz_head == NULL ) )
                     return;
             }
 
-            if ( psz_end_head == NULL )
+            if( psz_end_head == NULL )
             {
                 // If we already copied the begin tag, we don't need to append this again.
-                if ( i_offset != -1 )
+                if( i_offset != -1 )
                     continue;
                 // Otherwise, simply append the entire buffer
                 memcpy( psz_head + i_head_len, buff, i_to_copy );
@@ -595,7 +595,7 @@ static void ParseHead( demux_t* p_demux )
             }
             else
             {
-                if ( i_offset == -1 )
+                if( i_offset == -1 )
                 {
                     memcpy( psz_head + i_head_len, buff, i_to_copy );
                     i_head_len += i_to_copy;
@@ -622,7 +622,7 @@ static int Open( vlc_object_t* p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     p_demux->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
-    if ( unlikely( p_sys == NULL ) )
+    if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
     uint8_t *p_peek;
@@ -744,13 +744,13 @@ error:
 static void Close( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
-    if ( p_sys->p_es )
+    if( p_sys->p_es )
         es_out_Del( p_demux->out, p_sys->p_es );
-    if ( p_sys->p_reader )
+    if( p_sys->p_reader )
         xml_ReaderDelete( p_sys->p_reader );
-    if ( p_sys->p_xml )
+    if( p_sys->p_xml )
         xml_Delete( p_sys->p_xml );
-    for ( int i = 0; i < p_sys->i_subtitles; ++i )
+    for( int i = 0; i < p_sys->i_subtitles; ++i )
     {
         free( p_sys->subtitle[i].psz_text );
     }
