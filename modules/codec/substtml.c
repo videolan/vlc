@@ -301,13 +301,13 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
         else if( !strcasecmp( "tts:textAlign", attr ) )
         {
             if( !strcasecmp ( "left", val ) )
-                p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
             else if( !strcasecmp ( "right", val ) )
-                p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT;
             else if( !strcasecmp ( "center", val ) )
                 p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM;
             else if( !strcasecmp ( "start", val ) )
-                p_ttml_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
             else if( !strcasecmp ( "end", val ) )
                 p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
         }
