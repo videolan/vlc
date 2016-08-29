@@ -80,6 +80,25 @@ struct decoder_sys_t
     size_t                  i_styles;
 };
 
+static void MergeTTMLStyle( ttml_style_t *p_dst, const ttml_style_t *p_src)
+{
+    text_style_Merge( p_dst->font_style, p_src->font_style, false );
+    if( !( p_dst->i_align & SUBPICTURE_ALIGN_MASK ) )
+        p_dst->i_align |= p_src->i_align;
+
+    if( !p_dst->i_margin_h )
+        p_dst->i_margin_h = p_src->i_margin_h;
+
+    if( !p_dst->i_margin_v )
+        p_dst->i_margin_v = p_src->i_margin_v;
+
+    if( !p_dst->i_margin_percent_h )
+        p_dst->i_margin_percent_h = p_src->i_margin_percent_h;
+
+    if( !p_dst->i_margin_percent_v )
+        p_dst->i_margin_percent_v = p_src->i_margin_percent_v;
+}
+
 static ttml_style_t *FindTextStyle( decoder_t *p_dec, const char *psz_style )
 {
     decoder_sys_t  *p_sys = p_dec->p_sys;    
