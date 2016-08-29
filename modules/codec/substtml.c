@@ -431,22 +431,35 @@ static void ParseTTMLStyles( decoder_t* p_dec )
     const char* psz_node_name;
     int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
 
-    if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_node_name, "head" ) || !strcasecmp( psz_node_name, "tt:head" ) ) )
+    if( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_node_name, "tt" ) || !strcasecmp( psz_node_name, "tt:tt" ) ) )
     {
+        int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
+        while( i_type != XML_READER_STARTELEM || ( strcasecmp( psz_node_name, "styling" ) && strcasecmp( psz_node_name, "tt:styling" ) ) )
+            i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
+
         do
         {
-            i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
-            if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( "styling", psz_node_name ) ||
-                                                     !strcasecmp( "tt:styling", psz_node_name ) ) )
+            /* region and style tag are respectively inside layout and styling tags */
+            if( !strcasecmp( psz_node_name, "styling" ) || !strcasecmp( psz_node_name, "layout" ) ||
+                !strcasecmp( psz_node_name, "tt:styling" ) || !strcasecmp( psz_node_name, "tt:layout" ) )
             {
                 i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
-                while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "styling" ) && strcasecmp( psz_node_name, "tt:styling" ) ) )
+                while( i_type != XML_READER_ENDELEM )
                 {
-                    ParseTTMLStyle( p_dec, p_reader, psz_node_name );
+                    ttml_style_t* p_ttml_style = ParseTTMLStyle( p_dec, p_reader, psz_node_name );
+                    if ( p_ttml_style == NULL )
+                    {
+                        xml_ReaderDelete( p_reader );
+                        vlc_stream_Delete( p_stream );
+                        return;
+                    }
+                    decoder_sys_t* p_sys = p_dec->p_sys;
+                    TAB_APPEND( p_sys->i_styles, p_sys->pp_styles, p_ttml_style );
                     i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
                 }
             }
-        } while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "head" ) && strcasecmp( psz_node_name, "tt:head" ) ) );
+            i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
+        }while( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "head" ) && strcasecmp( psz_node_name, "tt:head" ) ) );
     }
     xml_ReaderDelete( p_reader );
     vlc_stream_Delete( p_stream );
