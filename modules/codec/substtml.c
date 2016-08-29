@@ -428,25 +428,25 @@ static void ParseTTMLStyles( decoder_t* p_dec )
         vlc_stream_Delete( p_stream );
         return ;
     }
-    const char* psz_name;
-    int i_type = xml_ReaderNextNode( p_reader, &psz_name );
+    const char* psz_node_name;
+    int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
 
-    if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_name, "head" ) || !strcasecmp( psz_name, "tt:head" ) ) )
+    if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_node_name, "head" ) || !strcasecmp( psz_node_name, "tt:head" ) ) )
     {
         do
         {
-            i_type = xml_ReaderNextNode( p_reader, &psz_name );
-            if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( "styling", psz_name ) ||
-                                                     !strcasecmp( "tt:styling", psz_name ) ) )
+            i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
+            if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( "styling", psz_node_name ) ||
+                                                     !strcasecmp( "tt:styling", psz_node_name ) ) )
             {
-                i_type = xml_ReaderNextNode( p_reader, &psz_name );
-                while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_name, "styling" ) && strcasecmp( psz_name, "tt:styling" ) ) )
+                i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
+                while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "styling" ) && strcasecmp( psz_node_name, "tt:styling" ) ) )
                 {
-                    ParseTTMLStyle( p_dec, p_reader, psz_name );
-                    i_type = xml_ReaderNextNode( p_reader, &psz_name );
+                    ParseTTMLStyle( p_dec, p_reader, psz_node_name );
+                    i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
                 }
             }
-        } while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_name, "head" ) && strcasecmp( psz_name, "tt:head" ) ) );
+        } while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "head" ) && strcasecmp( psz_node_name, "tt:head" ) ) );
     }
     xml_ReaderDelete( p_reader );
     vlc_stream_Delete( p_stream );
