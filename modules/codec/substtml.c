@@ -182,7 +182,12 @@ static void ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader )
         }
         else if ( !strcasecmp( "tts:fontSize", attr ) )
         {
-            p_ttml_style->font_style->i_font_size  = atoi( val );
+            char* psz_end = NULL;
+            float size = strtof( val, &psz_end );
+            if( *psz_end == '%' )
+                p_ttml_style->font_style->f_font_relsize = size;
+            else
+                p_ttml_style->font_style->i_font_size = (int)( size + 0.5 );
         }
         else if ( !strcasecmp( "tts:color", attr ) )
         {
