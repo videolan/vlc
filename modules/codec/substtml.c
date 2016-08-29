@@ -472,6 +472,7 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
     text_segment_t* p_first_segment = NULL;
     text_segment_t* p_current_segment = NULL;
     style_stack_t*  p_style_stack = NULL;
+    ttml_style_t*   p_style = NULL;
 
     p_sub = vlc_stream_MemoryNew( p_dec, (uint8_t*)psz_subtitle, strlen( psz_subtitle ), true );
     if( unlikely( p_sub == NULL ) )
@@ -488,107 +489,119 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
     int i_type;
 
     i_type = xml_ReaderNextNode( p_xml_reader, &node );
-    while ( i_type != XML_READER_NONE && i_type > 0 )
+    while( i_type != XML_READER_NONE && i_type > 0 )
     {
-        if( i_type == XML_READER_STARTELEM && ( !strcasecmp( node, "p" ) || !strcasecmp( node, "tt:p" ) ) )
+        /*
+        * We parse the styles and put them on the style stack
+        * until we reach a text node.
+        */
+        if( i_type == XML_READER_STARTELEM && ( !strcasecmp( node, "p" ) || !strcasecmp( node, "tt:p" ) ||
+                                                !strcasecmp( node, "span") || !strcasecmp( node, "tt:span") ) )
         {
-            text_segment_t* p_segment = text_segment_New( NULL );
-            if ( unlikely( p_segment == NULL ) )
+            p_style = ParseTTMLStyle( p_dec, p_xml_reader, node );
+            if( unlikely( p_style == NULL ) )
                 goto fail;
-            const char* psz_attr_name;
-            const char* psz_attr_value;
-            while ( ( psz_attr_name = xml_ReaderNextAttr( p_xml_reader, &psz_attr_value ) ) != NULL )
+
+            if( p_style_stack != NULL && p_style_stack->p_style != NULL )
+                 MergeTTMLStyle( p_style, p_style_stack->p_style );
+
+            if( PushStyle( &p_style_stack, p_style ) == false )
+                goto fail;
+
+        }
+        else if( i_type == XML_READER_TEXT )
+        {
+            /*
+            * Once we have a text node, we create a segment, apply the
+            * latest style put on the style stack and fill it with the
+            * content of the node.
+            */
+            text_segment_t* p_segment = text_segment_New( NULL );
+            if( unlikely( p_segment == NULL ) )
+                goto fail;
+
+            p_segment->psz_text = strdup( node );
+            if( unlikely( p_segment->psz_text == NULL ) )
             {
-                if ( !strcasecmp( psz_attr_name, "style" ) )
-                {
-                    ttml_style_t* p_style = FindTextStyle( p_dec, psz_attr_value );
-                    if ( p_style == NULL )
-                    {
-                        msg_Warn( p_dec, "Style \"%s\" not found", psz_attr_value );
-                        break;
-                    }
-                    if( p_style->i_margin_h )
-                        p_update_sys->x = p_style->i_margin_h;
-                    else
-                        p_update_sys->x = p_style->i_margin_percent_h;
-
-                    if( p_style->i_margin_v )
-                        p_update_sys->y = p_style->i_margin_v;
-                    else
-                        p_update_sys->y = p_style->i_margin_percent_v;
-                    p_update_sys->align = p_style->i_align;
-
-                    if ( PushStyle( &p_style_stack, p_style ) == false )
-                    {
-                        text_segment_Delete( p_segment );
-                        goto fail;
-                    }
-                    p_segment->style = CurrentStyle( p_style_stack );
-                    break;
-                }
+                text_segment_Delete( p_segment );
+                goto fail;
             }
-            if ( p_segment->style == NULL )
+
+            vlc_xml_decode( p_segment->psz_text );
+            if( p_segment->style == NULL && p_style_stack == NULL )
+            {
                 p_segment->style = text_style_Create( STYLE_NO_DEFAULTS );
-            if ( p_first_segment == NULL )
+            }
+            else if( p_segment->style == NULL )
+            {
+                p_segment->style = CurrentStyle( p_style_stack );
+                if( p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
+                    p_segment->style->i_font_size = (int)( ( p_segment->style->f_font_relsize * STYLE_DEFAULT_FONT_SIZE / 100 ) + 0.5 );
+
+                if( p_style_stack->p_style->i_margin_h )
+                    p_update_sys->x = p_style_stack->p_style->i_margin_h;
+                else
+                    p_update_sys->x = p_style_stack->p_style->i_margin_percent_h;
+
+                if( p_style_stack->p_style->i_margin_v )
+                    p_update_sys->y = p_style_stack->p_style->i_margin_v;
+                else
+                    p_update_sys->y = p_style_stack->p_style->i_margin_percent_v;
+
+                p_update_sys->align |= p_style_stack->p_style->i_align;
+            }
+            if( p_first_segment == NULL )
             {
                 p_first_segment = p_segment;
                 p_current_segment = p_segment;
             }
-            else
+            else if( p_current_segment->psz_text != NULL )
             {
                 p_current_segment->p_next = p_segment;
                 p_current_segment = p_segment;
             }
-        }
-        else if ( i_type == XML_READER_ENDELEM && ( !strcasecmp( node, "p" ) || !strcasecmp( node, "tt:p" ) ) )
-        {
-            PopStyle( &p_style_stack );
-            p_current_segment = NULL;
-        }
-        else if ( i_type == XML_READER_STARTELEM && !strcasecmp( node, "br" ) )
-        {
-            if ( p_current_segment != NULL && p_current_segment->psz_text != NULL )
-            {
-                char* psz_text = NULL;
-                if ( asprintf( &psz_text, "%s\n", p_current_segment->psz_text ) != -1 )
-                {
-                    free( p_current_segment->psz_text );
-                    p_current_segment->psz_text = psz_text;
-                }
-            }
-        }
-        else if ( i_type == XML_READER_TEXT )
-        {
-            if ( p_current_segment == NULL )
-            {
-                p_current_segment = text_segment_New( node );
-                p_current_segment->style = CurrentStyle( p_style_stack );
-                if ( p_first_segment == NULL )
-                    p_first_segment = p_current_segment;
-                else
-                    p_first_segment->p_next = p_current_segment;
-            }
-            else if ( p_current_segment->psz_text == NULL )
-            {
-                p_current_segment->psz_text = strdup( node );
-                vlc_xml_decode( p_current_segment->psz_text );
-            }
             else
             {
-                size_t i_previous_len = strlen( p_current_segment->psz_text );
+                /*
+                * If p_first_segment isn't NULL but p_current_segment->psz_text is NULL
+                * this means that something went wrong in the decoding of the
+                * first segment text:
+                *
+                * Indeed, to allocate p_first_segment ( aka non NULL ), we must have
+                * - i_type == XML_READER_TEXT
+                * - passed the allocation of p_segment->psz_text without any error
+                *
+                * This would mean that vlc_xml_decode failed and p_first_segment->psz_text
+                * is NULL.
+                */
+                text_segment_Delete( p_segment );
+                goto fail;
+            }
+        }
+        else if( i_type == XML_READER_ENDELEM && ( !strcasecmp( node, "span" ) || !strcasecmp( node, "tt:span" ) ) )
+        {
+            if( p_style_stack->p_next )
+                PopStyle( &p_style_stack);
+        }
+        else if( i_type == XML_READER_ENDELEM && ( !strcasecmp( node, "p" ) || !strcasecmp( node, "tt:p" ) ) )
+        {
+            PopStyle( &p_style_stack );
+            p_current_segment->p_next = NULL;
+        }
+        else if( i_type == XML_READER_STARTELEM && !strcasecmp( node, "br" ) )
+        {
+            if( p_current_segment != NULL && p_current_segment->psz_text != NULL )
+            {
                 char* psz_text = NULL;
-                if ( asprintf( &psz_text, "%s%s", p_current_segment->psz_text, node ) != -1 )
+                if( asprintf( &psz_text, "%s\n", p_current_segment->psz_text ) != -1 )
                 {
                     free( p_current_segment->psz_text );
                     p_current_segment->psz_text = psz_text;
-                    // Don't process text multiple time, just check for the appended section
-                    vlc_xml_decode( p_current_segment->psz_text + i_previous_len );
                 }
             }
         }
         i_type = xml_ReaderNextNode( p_xml_reader, &node );
     }
-
     ClearStack( p_style_stack );
     xml_ReaderDelete( p_xml_reader );
     vlc_stream_Delete( p_sub );
