@@ -606,6 +606,7 @@ static void ParseHead( demux_t* p_demux )
                     // Though if we already have the </head> in our buffer, we need to adjust the total size
                     i_head_len = psz_end_head - buff + i_end_tag_len + i_offset;
                 }
+                psz_head[i_head_len] = 0;
                 p_sys->psz_head = psz_head;
                 p_sys->i_head_len = i_head_len;
                 break;
