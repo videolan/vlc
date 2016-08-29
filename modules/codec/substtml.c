@@ -266,6 +266,11 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
         {
             free( p_ttml_style->font_style->psz_fontname );
             p_ttml_style->font_style->psz_fontname = strdup( val );
+            if( unlikely( p_ttml_style->font_style->psz_fontname == NULL ) )
+            {
+                CleanupStyle( p_ttml_style );
+                return NULL;
+            }
         }
         else if( !strcasecmp( "tts:opacity", attr ) )
         {
