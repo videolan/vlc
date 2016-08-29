@@ -113,24 +113,21 @@ static ttml_style_t *FindTextStyle( decoder_t *p_dec, const char *psz_style )
     for( size_t i = 0; i < p_sys->i_styles; i++ )
     {
         if( !strcmp( p_sys->pp_styles[i]->psz_styleid, psz_style ) )
-        {
             return p_sys->pp_styles[i];
-        }
     }
     return NULL;
 }
 
-typedef struct style_stack style_stack_t;
-struct  style_stack
+typedef struct  style_stack_t
 {
-    ttml_style_t* p_style;
-    style_stack_t* p_next;
-};
+    ttml_style_t*  p_style;
+    struct style_stack_t* p_next;
+} style_stack_t ;
 
 static bool PushStyle( style_stack_t **pp_stack, ttml_style_t* p_style )
 {
-    style_stack_t* p_entry = malloc( sizeof( *p_entry) );
-    if ( unlikely( p_entry == NULL ) )
+    style_stack_t* p_entry = malloc( sizeof( *p_entry ) );
+    if( unlikely( p_entry == NULL ) )
         return false;
     p_entry->p_style = p_style;
     p_entry->p_next = *pp_stack;
@@ -140,7 +137,7 @@ static bool PushStyle( style_stack_t **pp_stack, ttml_style_t* p_style )
 
 static void PopStyle( style_stack_t** pp_stack )
 {
-    if ( *pp_stack == NULL )
+    if( *pp_stack == NULL )
         return;
     style_stack_t* p_next = (*pp_stack)->p_next;
     free( *pp_stack );
@@ -149,7 +146,7 @@ static void PopStyle( style_stack_t** pp_stack )
 
 static void ClearStack( style_stack_t* p_stack )
 {
-    while ( p_stack != NULL )
+    while( p_stack != NULL )
     {
         style_stack_t* p_next = p_stack->p_next;
         free( p_stack );
@@ -159,8 +156,9 @@ static void ClearStack( style_stack_t* p_stack )
 
 static text_style_t* CurrentStyle( style_stack_t* p_stack )
 {
-    if ( p_stack == NULL )
+    if( p_stack == NULL )
         return text_style_Create( STYLE_NO_DEFAULTS );
+
     return text_style_Duplicate( p_stack->p_style->font_style );
 }
 
@@ -170,10 +168,10 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
     ttml_style_t *p_ttml_style = NULL;
     ttml_style_t *p_base_style = NULL;
 
-    p_ttml_style = calloc( 1, sizeof(ttml_style_t) );
+    p_ttml_style = calloc( 1, sizeof( ttml_style_t ) );
+    if( unlikely( !p_ttml_style ) )
+        return NULL;
 
-    if ( unlikely( !p_ttml_style ) )
-        return ;
     p_ttml_style->font_style = text_style_Create( STYLE_NO_DEFAULTS );
     if( unlikely( !p_ttml_style->font_style ) )
     {
@@ -259,12 +257,12 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                 p_ttml_style = p_style;
             }
         }
-        else if ( !strcasecmp( "xml:id", attr ) )
+        else if( !strcasecmp( "xml:id", attr ) )
         {
             free( p_ttml_style->psz_styleid );
             p_ttml_style->psz_styleid = strdup( val );
         }
-        else if ( !strcasecmp ( "tts:fontFamily", attr ) )
+        else if( !strcasecmp ( "tts:fontFamily", attr ) )
         {
             free( p_ttml_style->font_style->psz_fontname );
             p_ttml_style->font_style->psz_fontname = strdup( val );
@@ -284,14 +282,14 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
             else
                 p_ttml_style->font_style->i_font_size = (int)( size + 0.5 );
         }
-        else if ( !strcasecmp( "tts:color", attr ) )
+        else if( !strcasecmp( "tts:color", attr ) )
         {
             unsigned int i_color = vlc_html_color( val, NULL );
             p_ttml_style->font_style->i_font_color = (i_color & 0xffffff);
             p_ttml_style->font_style->i_font_alpha = (i_color & 0xFF000000) >> 24;
             p_ttml_style->font_style->i_features |= STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
         }
-        else if ( !strcasecmp( "tts:backgroundColor", attr ) )
+        else if( !strcasecmp( "tts:backgroundColor", attr ) )
         {
             unsigned int i_color = vlc_html_color( val, NULL );
             p_ttml_style->font_style->i_background_color = i_color & 0xFFFFFF;
@@ -300,55 +298,55 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                                                       | STYLE_HAS_BACKGROUND_ALPHA;
             p_ttml_style->font_style->i_style_flags |= STYLE_BACKGROUND;
         }
-        else if ( !strcasecmp( "tts:textAlign", attr ) )
+        else if( !strcasecmp( "tts:textAlign", attr ) )
         {
-            if ( !strcasecmp ( "left", val ) )
+            if( !strcasecmp ( "left", val ) )
                 p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
-            else if ( !strcasecmp ( "right", val ) )
+            else if( !strcasecmp ( "right", val ) )
                 p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
-            else if ( !strcasecmp ( "center", val ) )
+            else if( !strcasecmp ( "center", val ) )
                 p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM;
-            else if ( !strcasecmp ( "start", val ) )
+            else if( !strcasecmp ( "start", val ) )
                 p_ttml_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
-            else if ( !strcasecmp ( "end", val ) )
+            else if( !strcasecmp ( "end", val ) )
                 p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
         }
-        else if ( !strcasecmp( "tts:fontStyle", attr ) )
+        else if( !strcasecmp( "tts:fontStyle", attr ) )
         {
-            if ( !strcasecmp ( "italic", val ) || !strcasecmp ( "oblique", val ) )
+            if( !strcasecmp ( "italic", val ) || !strcasecmp ( "oblique", val ) )
                 p_ttml_style->font_style->i_style_flags |= STYLE_ITALIC;
             else
                 p_ttml_style->font_style->i_style_flags &= ~STYLE_ITALIC;
             p_ttml_style->font_style->i_features |= STYLE_HAS_FLAGS;
         }
-        else if ( !strcasecmp ( "tts:fontWeight", attr ) )
+        else if( !strcasecmp ( "tts:fontWeight", attr ) )
         {
-            if ( !strcasecmp ( "bold", val ) )
+            if( !strcasecmp ( "bold", val ) )
                 p_ttml_style->font_style->i_style_flags |= STYLE_BOLD;
             else
                 p_ttml_style->font_style->i_style_flags &= ~STYLE_BOLD;
             p_ttml_style->font_style->i_features |= STYLE_HAS_FLAGS;
         }
-        else if ( !strcasecmp ( "tts:textDecoration", attr ) )
+        else if( !strcasecmp ( "tts:textDecoration", attr ) )
         {
-            if ( !strcasecmp ( "underline", val ) )
+            if( !strcasecmp ( "underline", val ) )
                 p_ttml_style->font_style->i_style_flags |= STYLE_UNDERLINE;
-            else if ( !strcasecmp ( "noUnderline", val ) )
+            else if( !strcasecmp ( "noUnderline", val ) )
                 p_ttml_style->font_style->i_style_flags &= ~STYLE_UNDERLINE;
-            if ( !strcasecmp ( "lineThrough", val ) )
+            if( !strcasecmp ( "lineThrough", val ) )
                 p_ttml_style->font_style->i_style_flags |= STYLE_STRIKEOUT;
-            else if ( !strcasecmp ( "noLineThrough", val ) )
+            else if( !strcasecmp ( "noLineThrough", val ) )
                 p_ttml_style->font_style->i_style_flags &= ~STYLE_STRIKEOUT;
             p_ttml_style->font_style->i_features |= STYLE_HAS_FLAGS;
         }
-        else if ( !strcasecmp ( "tts:origin", attr ) )
+        else if( !strcasecmp ( "tts:origin", attr ) )
         {
             const char *psz_token = val;
-            while ( isspace( *psz_token ) )
+            while( isspace( *psz_token ) )
                 psz_token++;
 
             const char *psz_separator = strchr( psz_token, ' ' );
-            if ( psz_separator == NULL )
+            if( psz_separator == NULL )
             {
                 msg_Warn( p_dec, "Invalid origin attribute: \"%s\"", val );
                 continue;
@@ -365,7 +363,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                 p_ttml_style->i_margin_h = atoi( psz_token );
                 p_ttml_style->i_margin_percent_h = 0;
             }
-            while ( isspace( *psz_separator ) )
+            while( isspace( *psz_separator ) )
                 psz_separator++;
             psz_token = psz_separator;
             psz_percent_sign = strchr( psz_token, '%' );
@@ -380,7 +378,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                 p_ttml_style->i_margin_percent_v = 0;
             }
         }
-        else if ( !strcasecmp( "tts:textOutline", attr ) )
+        else if( !strcasecmp( "tts:textOutline", attr ) )
         {
             char *value = strdup( val );
             char* psz_saveptr = NULL;
@@ -388,7 +386,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
             // <color>? <length> <length>?
             bool b_ok = false;
             unsigned int color = vlc_html_color( token, &b_ok );
-            if ( b_ok )
+            if( b_ok )
             {
                 p_ttml_style->font_style->i_outline_color = color & 0xFFFFFF;
                 p_ttml_style->font_style->i_outline_alpha = (color & 0xFF000000) >> 24;
@@ -396,7 +394,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
             }
             char* psz_end = NULL;
             int i_outline_width = strtol( token, &psz_end, 10 );
-            if ( psz_end != token )
+            if( psz_end != token )
             {
                 // Assume unit is pixel, and ignore border radius
                 p_ttml_style->font_style->i_outline_width = i_outline_width;
@@ -404,11 +402,11 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
             free( value );
         }
     }
-    if ( p_base_style != NULL )
+    if( p_base_style != NULL )
     {
         MergeTTMLStyle( p_ttml_style, p_base_style );
     }
-    if ( p_ttml_style->psz_styleid == NULL )
+    if( p_ttml_style->psz_styleid == NULL )
     {
         CleanupStyle( p_ttml_style );
         return NULL;
@@ -643,7 +641,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     psz_subtitle = malloc( p_block->i_buffer );
-    if ( unlikely( psz_subtitle == NULL ) )
+    if( unlikely( psz_subtitle == NULL ) )
         return NULL;
     memcpy( psz_subtitle, p_block->p_buffer, p_block->i_buffer );
 
@@ -695,7 +693,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if ( p_dec->fmt_in.i_codec != VLC_CODEC_TTML )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_TTML )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -703,7 +701,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    if ( p_dec->fmt_in.p_extra != NULL && p_dec->fmt_in.i_extra > 0 )
+    if( p_dec->fmt_in.p_extra != NULL && p_dec->fmt_in.i_extra > 0 )
         ParseTTMLStyles( p_dec );
 
     p_dec->pf_decode_sub = DecodeBlock;
@@ -721,7 +719,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    for ( size_t i = 0; i < p_sys->i_styles; ++i )
+    for( size_t i = 0; i < p_sys->i_styles; ++i )
     {
         free( p_sys->pp_styles[i]->psz_styleid );
         text_style_Delete( p_sys->pp_styles[i]->font_style );
