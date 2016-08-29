@@ -71,6 +71,8 @@ typedef struct
     int             i_margin_v;
     int             i_margin_percent_h;
     int             i_margin_percent_v;
+    int             i_direction;
+    bool            b_direction_set;
 }  ttml_style_t;
 
 struct decoder_sys_t
@@ -78,6 +80,14 @@ struct decoder_sys_t
     int                     i_align;
     ttml_style_t**          pp_styles;
     size_t                  i_styles;
+};
+
+enum
+{
+    UNICODE_BIDI_LTR = 0,
+    UNICODE_BIDI_RTL = 1,
+    UNICODE_BIDI_EMBEDDED = 2,
+    UNICODE_BIDI_OVERRIDE = 4,
 };
 
 static void MergeTTMLStyle( ttml_style_t *p_dst, const ttml_style_t *p_src)
@@ -97,6 +107,12 @@ static void MergeTTMLStyle( ttml_style_t *p_dst, const ttml_style_t *p_src)
 
     if( !p_dst->i_margin_percent_v )
         p_dst->i_margin_percent_v = p_src->i_margin_percent_v;
+
+    if( !p_dst->b_direction_set )
+    {
+        p_dst->i_direction = p_src->i_direction;
+        p_dst->b_direction_set = p_src->b_direction_set;
+    }
 }
 
 static ttml_style_t* DuplicateStyle( ttml_style_t* p_style_src )
@@ -434,6 +450,41 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
             }
             free( value );
         }
+        else if( !strcasecmp( "tts:direction", attr ) )
+        {
+            if( !strcasecmp( "rtl", val ) )
+            {
+                p_ttml_style->i_direction |= UNICODE_BIDI_RTL;
+                p_ttml_style->b_direction_set = true;
+            }
+            else if( !strcasecmp( "ltr", val ) )
+            {
+                p_ttml_style->i_direction |= UNICODE_BIDI_LTR;
+                p_ttml_style->b_direction_set = true;
+            }
+        }
+        else if( !strcasecmp( "tts:unicodeBidi", attr ) )
+        {
+                if( !strcasecmp( "bidiOverride", val ) )
+                    p_ttml_style->i_direction |= UNICODE_BIDI_OVERRIDE & ~UNICODE_BIDI_EMBEDDED;
+                else if( !strcasecmp( "embed", val ) )
+                    p_ttml_style->i_direction |= UNICODE_BIDI_EMBEDDED & ~UNICODE_BIDI_OVERRIDE;
+        }
+        else if( !strcasecmp( "tts:writingMode", attr ) )
+        {
+            if( !strcasecmp( "rl", val ) || !strcasecmp( "rltb", val ) )
+            {
+                p_ttml_style->i_direction = UNICODE_BIDI_RTL | UNICODE_BIDI_OVERRIDE;
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+                p_ttml_style->b_direction_set = true;
+            }
+            else if( !strcasecmp( "lr", val ) || !strcasecmp( "lrtb", val ) )
+            {
+                p_ttml_style->i_direction = UNICODE_BIDI_LTR | UNICODE_BIDI_OVERRIDE;
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+                p_ttml_style->b_direction_set = true;
+            }
+        }
     }
     if( p_base_style != NULL )
     {
@@ -580,6 +631,34 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
                     p_update_sys->y = p_style_stack->p_style->i_margin_percent_v;
 
                 p_update_sys->align |= p_style_stack->p_style->i_align;
+                /*
+                * For bidirectionnal support, we use different enum
+                * to recognize different cases, en then we add the
+                * corresponding unicode character to the text of
+                * the text_segment.
+                */
+                int i_direction = p_style_stack->p_style->i_direction;
+                static const struct
+                {
+                    const char* psz_uni_start;
+                    const char* psz_uni_end;
+                }p_bidi[] = {
+                { "\u2066", "\u2069" },
+                { "\u2067", "\u2069" },
+                { "\u202A", "\u202C" },
+                { "\u202B", "\u202C" },
+                { "\u202D", "\u202C" },
+                { "\u202E", "\u202C" },
+                };
+                if( p_style_stack->p_style->b_direction_set )
+                {
+                    char* psz_text = NULL;
+                    if( asprintf( &psz_text, "%s%s%s", p_bidi[i_direction].psz_uni_start, p_segment->psz_text, p_bidi[i_direction].psz_uni_end ) < 0 )
+                        goto fail;
+
+                    free( p_segment->psz_text );
+                    p_segment->psz_text = psz_text;
+                }
             }
             if( p_first_segment == NULL )
             {
