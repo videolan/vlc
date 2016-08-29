@@ -206,6 +206,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".rpl"
   !insertmacro ${_action} Video ".thp"
   !insertmacro ${_action} Video ".tod"
+  !insertmacro ${_action} Video ".tp"
   !insertmacro ${_action} Video ".ts"
   !insertmacro ${_action} Video ".tts"
   !insertmacro ${_action} Video ".vob"
