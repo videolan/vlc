@@ -99,6 +99,13 @@ static void MergeTTMLStyle( ttml_style_t *p_dst, const ttml_style_t *p_src)
         p_dst->i_margin_percent_v = p_src->i_margin_percent_v;
 }
 
+static void CleanupStyle( ttml_style_t* p_ttml_style )
+{
+    text_style_Delete( p_ttml_style->font_style );
+    free( p_ttml_style->psz_styleid );
+    free( p_ttml_style );
+}
+
 static ttml_style_t *FindTextStyle( decoder_t *p_dec, const char *psz_style )
 {
     decoder_sys_t  *p_sys = p_dec->p_sys;    
@@ -157,7 +164,7 @@ static text_style_t* CurrentStyle( style_stack_t* p_stack )
     return text_style_Duplicate( p_stack->p_style->font_style );
 }
 
-static void ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader )
+static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, const char* psz_node_name )
 {
     decoder_sys_t* p_sys = p_dec->p_sys;
     ttml_style_t *p_ttml_style = NULL;
@@ -171,22 +178,85 @@ static void ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader )
     if( unlikely( !p_ttml_style->font_style ) )
     {
         free( p_ttml_style );
-        return ;
+        return NULL;
     }
 
     const char *attr, *val;
 
     while( (attr = xml_ReaderNextAttr( p_reader, &val ) ) )
     {
-        if ( !strcasecmp( attr, "style" ) )
+        /* searching previous styles for inheritence */
+        if( !strcasecmp( attr, "style" ) || !strcasecmp( attr, "region" ) )
         {
-            for( size_t i = 0; i < p_sys->i_styles; i++ )
+            if( !strcasecmp( psz_node_name, "style" ) || !strcasecmp( psz_node_name, "tt:style" ) ||
+                !strcasecmp( psz_node_name, "region" ) || !strcasecmp( psz_node_name, "tt:region" ) )
             {
-                if( !strcasecmp( p_sys->pp_styles[i]->psz_styleid, val ) )
+                for( size_t i = 0; i < p_sys->i_styles; i++ )
                 {
-                    p_base_style = p_sys->pp_styles[i];
+                    if( !strcasecmp( p_sys->pp_styles[i]->psz_styleid, val ) )
+                    {
+                        p_base_style = p_sys->pp_styles[i];
+                        break;
+                    }
+                }
+            }
+            /*
+            * In p nodes, style attribute has this format :
+            * style="style1 style2 style3" where style1 and style2 are
+            * style applied on the parents of p in that order.
+            *
+            * In span node, we can apply several styles in the same order than
+            * in p nodes with the same inheritance order.
+            *
+            * In order to preserve this style predominance, we merge the styles
+            * in the from right to left ( the right one being predominant ) .
+            */
+            else if( !strcasecmp( psz_node_name, "p" ) || !strcasecmp( psz_node_name, "tt:p" ) ||
+                     !strcasecmp( psz_node_name, "span" ) || !strcasecmp( psz_node_name, "tt:span" ) )
+            {
+                char *tmp;
+                char *value = strdup( val );
+                if( unlikely( value == NULL ) )
+                    return NULL;
+
+                char *token = strtok_r( value , " ", &tmp );
+                ttml_style_t* p_style = FindTextStyle( p_dec, token );
+                if( p_style == NULL )
+                {
+                    msg_Warn( p_dec, "Style \"%s\" not found", token );
+                    free( value );
                     break;
                 }
+
+                while( ( token = strtok_r( NULL, " ", &tmp) ) != NULL )
+                {
+                    ttml_style_t* p_next_style = FindTextStyle( p_dec, token );
+                    if( p_next_style == NULL )
+                    {
+                        msg_Warn( p_dec, "Style \"%s\" not found", token );
+                        free( value );
+                        break;
+                    }
+                    MergeTTMLStyle( p_next_style, p_style );
+                    CleanupStyle( p_style );
+                    p_style = p_next_style;
+                }
+                MergeTTMLStyle( p_style, p_ttml_style );
+                free( value );
+                CleanupStyle( p_ttml_style );
+                p_ttml_style = p_style;
+            }
+            else
+            {
+                ttml_style_t* p_style = FindTextStyle( p_dec, val );
+                if( p_style == NULL )
+                {
+                    msg_Warn( p_dec, "Style \"%s\" not found", val );
+                    break;
+                }
+                MergeTTMLStyle( p_style , p_ttml_style );
+                CleanupStyle( p_ttml_style );
+                p_ttml_style = p_style;
             }
         }
         else if ( !strcasecmp( "xml:id", attr ) )
@@ -199,7 +269,13 @@ static void ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader )
             free( p_ttml_style->font_style->psz_fontname );
             p_ttml_style->font_style->psz_fontname = strdup( val );
         }
-        else if ( !strcasecmp( "tts:fontSize", attr ) )
+        else if( !strcasecmp( "tts:opacity", attr ) )
+        {
+            p_ttml_style->font_style->i_background_alpha = atoi( val );
+            p_ttml_style->font_style->i_font_alpha = atoi( val );
+            p_ttml_style->font_style->i_features |= STYLE_HAS_BACKGROUND_ALPHA | STYLE_HAS_FONT_ALPHA;
+        }
+        else if( !strcasecmp( "tts:fontSize", attr ) )
         {
             char* psz_end = NULL;
             float size = strtof( val, &psz_end );
@@ -330,17 +406,14 @@ static void ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader )
     }
     if ( p_base_style != NULL )
     {
-        text_style_Merge( p_ttml_style->font_style, p_base_style->font_style, false );
+        MergeTTMLStyle( p_ttml_style, p_base_style );
     }
     if ( p_ttml_style->psz_styleid == NULL )
     {
-        free( p_ttml_style->font_style->psz_fontname );
-        free( p_ttml_style );
-        return ;
+        CleanupStyle( p_ttml_style );
+        return NULL;
     }
-
-    TAB_APPEND( p_sys->i_styles, p_sys->pp_styles, p_ttml_style );
-    return ;
+    return p_ttml_style;
 }
 
 static void ParseTTMLStyles( decoder_t* p_dec )
@@ -369,7 +442,7 @@ static void ParseTTMLStyles( decoder_t* p_dec )
                 i_type = xml_ReaderNextNode( p_reader, &psz_name );
                 while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_name, "styling" ) && strcasecmp( psz_name, "tt:styling" ) ) )
                 {
-                    ParseTTMLStyle( p_dec, p_reader );
+                    ParseTTMLStyle( p_dec, p_reader, psz_name );
                     i_type = xml_ReaderNextNode( p_reader, &psz_name );
                 }
             }
