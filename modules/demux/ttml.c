@@ -69,6 +69,16 @@ struct demux_sys_t
     bool            b_has_head;
 };
 
+typedef struct node_t
+{
+    struct node_t* p_parent;
+    char* psz_styleid;
+    char* psz_node_name;
+    char* psz_begin;
+    char* psz_end;
+    vlc_dictionary_t attr_dict;
+} node_t;
+
 static int Control( demux_t* p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -195,148 +205,295 @@ static char* Append( char* psz_old, const char* psz_format, ... )
     ret = asprintf( &psz_concat, "%s%s", psz_old, psz_new );
     free( psz_old );
     free( psz_new );
-    if ( ret < 0 )
+    if( ret < 0 )
         return NULL;
     return psz_concat;
+}
+
+static void FreeDictAttrValue( void* p_attr_value, void* p_obj )
+{
+    VLC_UNUSED( p_obj );
+    free( p_attr_value );
+}
+
+static void ClearNode( node_t* p_node )
+{
+    free( p_node->psz_styleid );
+    free( p_node->psz_node_name );
+    free( p_node->psz_begin );
+    free( p_node->psz_end );
+    vlc_dictionary_clear( &p_node->attr_dict, FreeDictAttrValue, NULL );
+    free( p_node );
+}
+
+static void ClearNodeStack( node_t* p_node )
+{
+    while( p_node != NULL )
+    {
+        node_t* p_parent = p_node->p_parent;
+        ClearNode( p_node );
+        p_node = p_parent;
+    }
+}
+
+static int MergeAttrDict ( vlc_dictionary_t* p_dest, const vlc_dictionary_t* p_src )
+{
+    char** pp_src_keys = vlc_dictionary_all_keys( p_src );
+    if( unlikely( pp_src_keys == NULL ) )
+        return VLC_ENOMEM;
+
+    for( int i = 0; pp_src_keys[i] != NULL; i++)
+    {
+        if( !vlc_dictionary_value_for_key( p_dest, pp_src_keys[i] ) )
+            vlc_dictionary_insert( p_dest, pp_src_keys[i], vlc_dictionary_value_for_key( p_src, pp_src_keys[i] ) );
+
+        free( pp_src_keys[i] );
+    }
+    free( pp_src_keys );
+    return VLC_SUCCESS;
+}
+
+static int MergeStyles(char** pp_dest, char* p_src)
+{
+    if( p_src )
+    {
+        char *p_tmp = NULL;
+        if( asprintf( &p_tmp, "%s %s", p_src, *pp_dest ) < 0 )
+            return VLC_ENOMEM;
+
+        free( *pp_dest );
+        *pp_dest = p_tmp;
+    }
+    return VLC_SUCCESS;
+}
+
+static int MergeNodeWithParents( node_t* p_node )
+{
+    node_t *parent = p_node->p_parent;
+    while( parent != NULL)
+    {
+        if( MergeAttrDict( &p_node->attr_dict, &parent->attr_dict ) != VLC_SUCCESS ||
+            MergeStyles( &p_node->psz_styleid, parent->psz_styleid ) != VLC_SUCCESS )
+            return VLC_EGENERIC;
+
+        parent = parent->p_parent;
+    }
+    return VLC_SUCCESS;
+}
+
+static char* NodeToStr( const node_t* p_node )
+{   
+    char* psz_text = NULL;
+
+    if( asprintf( &psz_text, "<%s", p_node->psz_node_name ) < 0 )
+        return NULL;
+
+    const vlc_dictionary_t* p_attr_dict = &p_node->attr_dict;
+    char** pp_keys = vlc_dictionary_all_keys( p_attr_dict );
+    if( unlikely( pp_keys == NULL ) )
+    {
+        free( psz_text );
+        return NULL;
+    }
+
+    for( int i = 0; pp_keys[i] != NULL; i++)
+    {
+        psz_text = Append( psz_text, " %s=\"%s\"", pp_keys[i], vlc_dictionary_value_for_key( p_attr_dict, pp_keys[i] ) );
+        free( pp_keys[i] );
+    }
+    free( pp_keys );
+    if( p_node->psz_styleid )
+        psz_text = Append( psz_text, " style=\"%s\"", p_node->psz_styleid );
+
+    if( !strcasecmp( p_node->psz_node_name, "br" ) || !strcasecmp( p_node->psz_node_name, "tt:br" ) )
+        psz_text = Append( psz_text, "/>" );
+    else
+        psz_text = Append( psz_text, ">" );
+
+    return psz_text;
+}
+
+static int ReadAttrNode( xml_reader_t* reader, node_t* p_node, const char* psz_node_name )
+{
+    const char* psz_attr_value = NULL;
+
+    vlc_dictionary_init( &p_node->attr_dict, 0 );
+
+    const char* psz_attr_name = xml_ReaderNextAttr( reader, &psz_attr_value );
+    p_node->psz_node_name = strdup( psz_node_name );
+    if( unlikely( p_node->psz_node_name == NULL ) )
+        return VLC_ENOMEM;
+
+    while( psz_attr_value && psz_attr_name )
+    {
+        char* psz_value = strdup( psz_attr_value );
+        if( unlikely( psz_value == NULL ) )
+            return VLC_ENOMEM;
+
+        if( !strcasecmp( psz_attr_name, "style" ) )
+            p_node->psz_styleid = psz_value;
+        else if( !strcasecmp( psz_attr_name, "begin" ) )
+            p_node->psz_begin = psz_value;
+        else if( ! strcasecmp( psz_attr_name, "end" ) )
+            p_node->psz_end = psz_value;
+        else
+            vlc_dictionary_insert( &p_node->attr_dict, psz_attr_name, psz_value );
+
+        psz_attr_name = xml_ReaderNextAttr(reader, &psz_attr_value );
+    }
+    return VLC_SUCCESS;
 }
 
 static int ReadTTML( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
-    const char* psz_name;
+    node_t* p_parent_node = NULL;
+    char* psz_text = NULL;
+    const char* psz_node_name;
     int i_max_sub = 0;
     int i_type;
 
     do
     {
-        i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
+        i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
         if( i_type <= XML_READER_NONE )
             break;
 
-        if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_name, "head" ) || !strcasecmp( psz_name, "tt:head" ) ) )
+        if( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_node_name, "head" ) || !strcasecmp( psz_node_name, "tt:head" ) ) )
         {
             p_sys->b_has_head = true;
+            /* we don't want to parse the head content here */
+            while( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "head" ) && strcasecmp( psz_node_name, "tt:head" ) ) )
+            {
+                i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
+            }
         }
-        else if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_name, "p" ) || !strcasecmp( psz_name, "tt:p" ) ) )
+        else if( i_type == XML_READER_STARTELEM && ( strcasecmp( psz_node_name, "tt" ) && strcasecmp( psz_node_name, "tt:tt") ) )
         {
-            char* psz_text = NULL;
-            char* psz_begin = NULL;
-            char* psz_end = NULL;
-
-            if( asprintf ( &psz_text, "<%s", psz_name ) < 0 )
-                return VLC_ENOMEM;
-            const char* psz_attr_value = NULL;
-            const char* psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
-
-            while ( psz_attr_name && psz_attr_value )
+            node_t* p_node = calloc( 1, sizeof( *p_node ) );
+            if( unlikely( p_node == NULL ) )
             {
-                if ( !psz_begin && !strcasecmp( psz_attr_name, "begin" ) )
-                    psz_begin = strdup( psz_attr_value );
-                else if ( !psz_end && !strcasecmp( psz_attr_name, "end" ) )
-                    psz_end = strdup( psz_attr_value );
-                else if ( !strcasecmp( psz_attr_name, psz_attr_name ) )
-                {
-                    psz_text = Append( psz_text, " %s = \"%s\"", psz_attr_name, psz_attr_value );
-                    if ( unlikely( psz_text == NULL ) )
-                    {
-                        free( psz_begin );
-                        free( psz_end );
-                        return VLC_ENOMEM;
-                    }
-                }
-                psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
-            }
-            psz_text = Append( psz_text, ">" );
-            if ( unlikely( psz_text == NULL ) )
-            {
-                free( psz_begin );
-                free( psz_end );
+                ClearNodeStack( p_parent_node );
                 return VLC_ENOMEM;
             }
 
-            if ( psz_begin && psz_end )
+            if( ReadAttrNode( p_sys->p_reader, p_node, psz_node_name ) != VLC_SUCCESS )
             {
-                if ( p_sys->i_subtitles >= i_max_sub )
+                ClearNode( p_node );
+                ClearNodeStack( p_parent_node );
+                return VLC_ENOMEM;
+            }
+
+            p_node->p_parent = p_parent_node;
+
+            /* only in leaf p nodes */
+            if( !strcasecmp( psz_node_name, "p" ) || !strcasecmp( psz_node_name, "tt:p" ) )
+            {
+                if( MergeNodeWithParents( p_node ) != VLC_SUCCESS )
                 {
-                    i_max_sub += 500;
-                    p_sys->subtitle = realloc_or_free( p_sys->subtitle,
-                            sizeof( *p_sys->subtitle ) * i_max_sub );
-                    if ( unlikely( p_sys->subtitle == NULL ) )
-                    {
-                        free( psz_text );
-                        free( psz_begin );
-                        free( psz_end );
-                        return VLC_ENOMEM;
-                    }
-                }
-                subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
-
-                Convert_time( &p_subtitle->i_start, psz_begin );
-                Convert_time( &p_subtitle->i_stop, psz_end );
-                free( psz_begin );
-                free( psz_end );
-
-                i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
-
-                while ( i_type > XML_READER_NONE && ( i_type != XML_READER_ENDELEM
-                        || ( strcmp( psz_name, "p" ) && strcmp( psz_name, "tt:p" ) ) )
-                      )
-                {
-                    if ( i_type == XML_READER_TEXT && psz_name != NULL )
-                    {
-                        psz_text = Append( psz_text, "%s", psz_name );
-                        if ( unlikely( psz_text == NULL ) )
-                            return VLC_ENOMEM;
-                    }
-                    else if ( i_type == XML_READER_STARTELEM )
-                    {
-                        psz_text = Append( psz_text, " <%s", psz_name );
-                        if ( unlikely( psz_text == NULL ) )
-                            return VLC_ENOMEM;
-                        psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
-                        while ( psz_attr_name && psz_attr_value )
-                        {
-                            psz_text = Append( psz_text, " %s=\"%s\"", psz_attr_name, psz_attr_value );
-                            if ( unlikely( psz_text == NULL ) )
-                                return VLC_ENOMEM;
-                            psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
-                        }
-                        if ( !strcasecmp( psz_name, "tt:br" ) || !strcasecmp( psz_name, "br" ) )
-                        {
-                            psz_text = Append( psz_text, "/>" );
-                            if ( unlikely( psz_text == NULL ) )
-                                return VLC_ENOMEM;
-                        }
-                        else
-                        {
-                            psz_text = Append( psz_text, ">" );
-                            if ( unlikely( psz_text == NULL ) )
-                                return VLC_ENOMEM;
-                        }
-                    }
-                    else if ( i_type == XML_READER_ENDELEM )
-                    {
-                        psz_text = Append( psz_text, " </%s>", psz_name );
-                        if ( unlikely( psz_text == NULL ) )
-                            return VLC_ENOMEM;
-                    }
-                    i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
-                }
-                psz_text = Append( psz_text, "</p>" );
-                if ( unlikely( psz_text == NULL ) )
+                    ClearNodeStack( p_node );
                     return VLC_ENOMEM;
-                p_subtitle->psz_text = psz_text;
-                p_sys->i_subtitles++;
+                }
+
+                psz_text = NodeToStr( p_node );
+                if( unlikely( psz_text == NULL ) )
+                    goto error;
+
+                if( p_node->psz_begin && p_node->psz_end )
+                {
+                    if( p_sys->i_subtitles >= i_max_sub )
+                    {
+                        i_max_sub += 500;
+                        p_sys->subtitle = realloc_or_free( p_sys->subtitle,
+                                sizeof( *p_sys->subtitle ) * i_max_sub );
+                        if( unlikely( p_sys->subtitle == NULL ) )
+                            goto error;
+                    }
+                    subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
+
+                    Convert_time( &p_subtitle->i_start, p_node->psz_begin );
+                    Convert_time( &p_subtitle->i_stop, p_node->psz_end );
+
+                    /*
+                    * we drop metadata tag inside p tags to avoid conflict as
+                    * they are unecessary.
+                    */
+                    i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
+
+                    while( i_type > XML_READER_NONE && ( i_type != XML_READER_ENDELEM
+                            || ( strcmp( psz_node_name, "p" ) && strcmp( psz_node_name, "tt:p" ) ) )
+                          )
+                    {
+                        if( i_type == XML_READER_TEXT && psz_node_name != NULL )
+                        {
+                            psz_text = Append( psz_text, "%s", psz_node_name );
+                            if( unlikely( psz_text == NULL ) )
+                                goto error;
+                        }
+                        else if( i_type == XML_READER_STARTELEM )
+                        {
+                            node_t* p_subnode = calloc( 1, sizeof( *p_subnode ) );
+                            if( unlikely( p_subnode == NULL ) )
+                                goto error;
+
+                            if( ReadAttrNode( p_sys->p_reader, p_subnode, psz_node_name) != VLC_SUCCESS )
+                            {
+                                ClearNode( p_subnode );
+                                goto error;
+                            }
+
+                            char* psz_subnode_text = NodeToStr( p_subnode );
+                            if( unlikely( psz_subnode_text == NULL ) )
+                            {
+                                ClearNode( p_subnode );
+                                goto error;
+                            }
+
+                            psz_text = Append( psz_text, "%s", psz_subnode_text );
+                            free( psz_subnode_text);
+                            ClearNode( p_subnode );
+
+                            if( unlikely( psz_text == NULL ) )
+                                goto error;
+
+                        }
+                        else if( i_type == XML_READER_ENDELEM )
+                        {
+                            psz_text = Append( psz_text, " </%s>", psz_node_name );
+                            if( unlikely( psz_text == NULL ) )
+                                goto error;
+
+                        }
+                        i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
+                    }
+                    psz_text = Append( psz_text, "</%s>", psz_node_name );
+                    if( unlikely( psz_text == NULL ) )
+                        goto error;
+
+                    p_subtitle->psz_text = psz_text;
+                    p_sys->i_subtitles++;
+                }
+                else
+                    goto error;
             }
             else
-            {
-                free( psz_text );
-                free( psz_begin );
-                free( psz_end );
-            }
+                p_parent_node = p_node;
         }
-    } while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_name, "tt" ) && strcasecmp( psz_name, "tt:tt" ) ) );
+        /*  end tag after a p tag but inside the body */
+        else if( i_type == XML_READER_ENDELEM && ( strcasecmp( psz_node_name, "body" ) && strcasecmp( psz_node_name, "tt:body" ) ) )
+        {
+            node_t* p_parent = p_parent_node->p_parent;
+            ClearNode( p_parent_node );
+            p_parent_node = p_parent;
+        }
+    } while( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "tt" ) && strcasecmp( psz_node_name, "tt:tt" ) ) );
+    ClearNodeStack( p_parent_node );
     return VLC_SUCCESS;
+
+error:
+    free( psz_text );
+    ClearNodeStack( p_parent_node );
+    return VLC_EGENERIC;
 }
 
 static int Demux( demux_t* p_demux )
