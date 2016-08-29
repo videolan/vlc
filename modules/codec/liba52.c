@@ -173,7 +173,7 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     /* Every A/52 frame is composed of 6 blocks, each with an output of 256
      * samples for each channel. */
-    block_t *p_out_buf = decoder_NewAudioBuffer( p_dec, 6 * i_bytes_per_block );
+    block_t *p_out_buf = block_Alloc( 6 * i_bytes_per_block );
     if( unlikely(p_out_buf == NULL) )
         goto out;
 
