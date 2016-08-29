@@ -99,6 +99,30 @@ static void MergeTTMLStyle( ttml_style_t *p_dst, const ttml_style_t *p_src)
         p_dst->i_margin_percent_v = p_src->i_margin_percent_v;
 }
 
+static ttml_style_t* DuplicateStyle( ttml_style_t* p_style_src )
+{
+    ttml_style_t* p_style = calloc( 1, sizeof( *p_style ) );
+    if( unlikely( p_style == NULL ) )
+        return NULL;
+
+    *p_style = *p_style_src;
+    p_style->psz_styleid = strdup( p_style_src->psz_styleid );
+    if( unlikely( p_style->psz_styleid == NULL ) )
+    {
+        free( p_style );
+        return NULL;
+    }
+
+    p_style->font_style = text_style_Duplicate( p_style_src->font_style );
+    if( unlikely( p_style->font_style == NULL ) )
+    {
+        free( p_style->psz_styleid );
+        free( p_style );
+        return NULL;
+    }
+    return p_style;
+}
+
 static void CleanupStyle( ttml_style_t* p_ttml_style )
 {
     text_style_Delete( p_ttml_style->font_style );
@@ -113,7 +137,8 @@ static ttml_style_t *FindTextStyle( decoder_t *p_dec, const char *psz_style )
     for( size_t i = 0; i < p_sys->i_styles; i++ )
     {
         if( !strcmp( p_sys->pp_styles[i]->psz_styleid, psz_style ) )
-            return p_sys->pp_styles[i];
+            return DuplicateStyle( p_sys->pp_styles[i] );
+
     }
     return NULL;
 }
@@ -193,7 +218,10 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                 {
                     if( !strcasecmp( p_sys->pp_styles[i]->psz_styleid, val ) )
                     {
-                        p_base_style = p_sys->pp_styles[i];
+                        p_base_style = DuplicateStyle( p_sys->pp_styles[i] );
+                        if( unlikely( p_base_style == NULL ) )
+                            return NULL;
+
                         break;
                     }
                 }
