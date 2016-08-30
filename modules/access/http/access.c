@@ -29,7 +29,9 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
+#include <vlc_keystore.h>
 #include <vlc_plugin.h>
+#include <vlc_url.h>
 
 #include "connmgr.h"
 #include "resource.h"
@@ -169,6 +171,12 @@ static int Open(vlc_object_t *obj)
     if (var_InheritBool(obj, "http-forward-cookies"))
         jar = var_InheritAddress(obj, "http-cookies");
 
+    struct vlc_credential crd;
+    struct vlc_url_t crd_url;
+
+    vlc_UrlParse(&crd_url, access->psz_url);
+    vlc_credential_init(&crd, &crd_url);
+
     bool h2c = var_InheritBool(obj, "http2");
 
     sys->manager = vlc_http_mgr_create(obj, jar, h2c);
@@ -179,17 +187,45 @@ static int Open(vlc_object_t *obj)
     char *referer = var_InheritString(obj, "http-referrer");
     bool live = var_InheritBool(obj, "http-continuous");
 
-    if (live)
-        sys->resource = vlc_http_live_create(sys->manager, access->psz_url, ua,
-                                             referer);
-    else
-        sys->resource = vlc_http_file_create(sys->manager, access->psz_url, ua,
-                                             referer);
+    sys->resource = (live ? vlc_http_live_create : vlc_http_file_create)(
+        sys->manager, access->psz_url, ua, referer);
     free(referer);
     free(ua);
 
     if (sys->resource == NULL)
         goto error;
+
+    if (vlc_credential_get(&crd, obj, NULL, NULL, NULL, NULL))
+        vlc_http_res_set_login(sys->resource,
+                               crd.psz_username, crd.psz_password);
+
+    ret = VLC_EGENERIC;
+
+    int status = vlc_http_res_get_status(sys->resource);
+
+    while (status == 401) /* authentication */
+    {
+        crd.psz_authtype = "Basic";
+        free((char *)crd.psz_realm);
+        crd.psz_realm = vlc_http_res_get_basic_realm(sys->resource);
+
+        if (crd.psz_realm == NULL)
+            break;
+        if (!vlc_credential_get(&crd, obj, NULL, NULL, _("HTTP authentication"),
+                                _("Please enter a valid login name and "
+                                  "a password for realm %s."), crd.psz_realm))
+            break;
+
+        vlc_http_res_set_login(sys->resource,
+                               crd.psz_username, crd.psz_password);
+        status = vlc_http_res_get_status(sys->resource);
+    }
+
+    if (status < 0)
+    {
+        msg_Err(access, "HTTP connection failure");
+        goto error;
+    }
 
     char *redir = vlc_http_res_get_redirect(sys->resource);
     if (redir != NULL)
@@ -199,21 +235,16 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    ret = VLC_EGENERIC;
-
-    int status = vlc_http_res_get_status(sys->resource);
-    if (status < 0)
-    {
-        msg_Err(access, "HTTP connection failure");
-        goto error;
-    }
-    if (status == 401) /* authentication */
-        goto error; /* FIXME not implemented yet */
     if (status >= 300)
     {
         msg_Err(access, "HTTP %d error", status);
         goto error;
     }
+
+    vlc_credential_store(&crd, obj);
+    free((char *)crd.psz_realm);
+    vlc_credential_clean(&crd);
+    vlc_UrlClean(&crd_url);
 
     access->pf_read = NULL;
     if (live)
@@ -236,6 +267,9 @@ error:
         vlc_http_res_destroy(sys->resource);
     if (sys->manager != NULL)
         vlc_http_mgr_destroy(sys->manager);
+    free((char *)crd.psz_realm);
+    vlc_credential_clean(&crd);
+    vlc_UrlClean(&crd_url);
     free(sys);
     return ret;
 }
