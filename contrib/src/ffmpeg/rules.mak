@@ -99,6 +99,9 @@ endif
 ifeq ($(ARCH),mipsel)
 FFMPEGCONF += --arch=mips
 endif
+ifeq ($(ARCH),mips64el)
+FFMPEGCONF += --arch=mips64
+endif
 
 # x86 stuff
 ifeq ($(ARCH),i386)
