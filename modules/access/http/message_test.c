@@ -159,6 +159,27 @@ static time_t parse_date(const char *str)
     return t1;
 }
 
+static const char *check_realm(const char *line, const char *realm)
+{
+    struct vlc_http_msg *m;
+    char *value;
+
+    m = vlc_http_resp_create(401);
+    assert(m != NULL);
+    assert(vlc_http_msg_add_header(m, "WWW-Authenticate", "%s", line) == 0);
+    value = vlc_http_msg_get_basic_realm(m);
+    if (realm == NULL)
+        assert(value == NULL);
+    else
+    {
+        assert(value != NULL);
+        assert(!strcmp(value, realm));
+        free(value);
+    }
+    vlc_http_msg_destroy(m);
+    return realm;
+}
+
 int main(void)
 {
     struct vlc_http_msg *m;
@@ -201,6 +222,15 @@ int main(void)
     assert(parse_date("Sunday, 06-Nov-14 08:49:37 GMT") == 1415263777);
     assert(parse_date("Sun, 06 Bug 1994 08:49:37 GMT") == -1);
     assert(parse_date("bogus") == -1);
+
+    assert(check_realm("Basic realm=\"kingdom\"", "kingdom"));
+    assert(check_realm("BaSiC REALM= \"kingdom\"", "kingdom"));
+    assert(check_realm("basic Realm\t=\"kingdom\"", "kingdom"));
+    assert(check_realm("Basic charset=\"utf-8\", realm=\"kingdom\"",
+                       "kingdom"));
+    assert(check_realm("Basic realm=\"Realm is \\\"Hello world!\\\"\"",
+                       "Realm is \"Hello world!\""));
+    assert(check_realm("Basic", NULL) == NULL);
 
     m = vlc_http_req_create("PRI", "https", "*", NULL);
     assert(m != NULL);
