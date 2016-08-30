@@ -575,7 +575,9 @@ static void Flush( decoder_t *p_dec )
     decoder_AbortPictures( p_dec, true );
 
     post_mt( p_sys );
-    avcodec_flush_buffers( p_context );
+    /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
+    if( avcodec_is_open( p_context ) )
+        avcodec_flush_buffers( p_context );
     wait_mt( p_sys );
 
     /* Reset cancel state to false */
