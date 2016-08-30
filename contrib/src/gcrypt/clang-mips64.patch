@@ -1,0 +1,12 @@
+diff -Naur libgcrypt.orig/mpi/longlong.h libgcrypt/mpi/longlong.h
+--- libgcrypt.orig/mpi/longlong.h	2016-06-08 18:18:15.000000000 +0200
++++ libgcrypt/mpi/longlong.h	2016-08-30 12:56:30.751262074 +0200
+@@ -890,7 +890,7 @@
+  **************  MIPS/64  **************
+  ***************************************/
+ #if (defined (__mips) && __mips >= 3) && W_TYPE_SIZE == 64
+-# if (__GNUC__ >= 5) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
++# if defined (__clang__) || (__GNUC__ >= 5) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+ typedef unsigned int UTItype __attribute__ ((mode (TI)));
+ #  define umul_ppmm(w1, w0, u, v) \
+   do {                                                                 \

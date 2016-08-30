@@ -18,6 +18,11 @@ endif
 ifdef HAVE_WIN64
 	$(APPLY) $(SRC)/gcrypt/64bits-relocation.patch
 endif
+ifeq ($(CC), clang)
+ifeq ($(ARCH),mips64el)
+	$(APPLY) $(SRC)/gcrypt/clang-mips64.patch
+endif
+endif
 	$(MOVE)
 
 DEPS_gcrypt = gpg-error
