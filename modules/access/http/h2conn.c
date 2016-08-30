@@ -156,7 +156,6 @@ static int vlc_h2_stream_data(void *ctx, struct vlc_h2_frame *f)
     if (len > s->recv_cwnd)
     {
         free(f);
-        s->recv_end = true;
         return vlc_h2_stream_fatal(s, VLC_H2_FLOW_CONTROL_ERROR);
     }
     s->recv_cwnd -= len;
