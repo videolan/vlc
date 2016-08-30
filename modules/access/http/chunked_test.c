@@ -138,6 +138,25 @@ static void test_good(void)
     vlc_http_stream_close(s, false);
 }
 
+static void test_empty(void)
+{
+    struct vlc_http_stream *s;
+    block_t *b;
+
+    stream_content = "0\r\n";
+    stream_length = 3;
+    stream_bad = true;
+
+    s = vlc_chunked_open(&chunked_stream, &chunked_tls);
+    assert(s != NULL);
+
+    b = vlc_http_stream_read(s);
+    assert(b == NULL);
+    b = vlc_http_stream_read(s);
+    assert(b == NULL);
+    vlc_http_stream_close(s, false);
+}
+
 static void test_bad(const char *payload)
 {
     struct vlc_http_stream *s;
@@ -150,8 +169,11 @@ static void test_bad(const char *payload)
     s = vlc_chunked_open(&chunked_stream, &chunked_tls);
     assert(s != NULL);
 
-    while ((b = vlc_http_stream_read(s)) != NULL)
+    while ((b = vlc_http_stream_read(s)) != vlc_http_error)
+    {
+        assert(b != NULL);
         block_Release(b);
+    }
 
     vlc_http_stream_close(s, false);
 }
@@ -159,10 +181,10 @@ static void test_bad(const char *payload)
 int main(void)
 {
     test_good();
+    test_empty();
     test_bad("");
     test_bad("A\r\n" "123456789");
     test_bad("Z\r\n" "123456789");
-    test_bad("0\r\n");
 
     return 0;
 }
