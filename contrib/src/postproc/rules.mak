@@ -44,6 +44,9 @@ endif
 ifeq ($(ARCH),mipsel)
 POSTPROCCONF += --arch=mips
 endif
+ifeq ($(ARCH),mips64el)
+POSTPROCCONF += --arch=mips64
+endif
 
 # x86 stuff
 ifeq ($(ARCH),i386)
