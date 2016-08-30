@@ -9,6 +9,9 @@ ifeq ($(CC),clang)
 ifeq ($(ARCH),mipsel)
 GMP_CONF += --disable-assembly
 endif
+ifeq ($(ARCH),mips64el)
+GMP_CONF += --disable-assembly
+endif
 endif
 
 $(TARBALLS)/gmp-$(GMP_VERSION).tar.bz2:
