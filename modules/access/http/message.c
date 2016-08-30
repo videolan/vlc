@@ -619,10 +619,8 @@ const char *vlc_http_next_token(const char *value)
     return value + strspn(value, "\t ,");
 }
 
-const char *vlc_http_msg_get_token(const struct vlc_http_msg *msg,
-                                   const char *field, const char *token)
+static const char *vlc_http_get_token(const char *value, const char *token)
 {
-    const char *value = vlc_http_msg_get_header(msg, field);
     const size_t length = strlen(token);
 
     while (value != NULL)
@@ -635,6 +633,53 @@ const char *vlc_http_msg_get_token(const struct vlc_http_msg *msg,
     }
 
     return NULL;
+}
+
+static char *vlc_http_get_token_value(const char *value, const char *token)
+{
+    value = vlc_http_get_token(value, token);
+    if (value == NULL)
+        return NULL;
+
+    value += vlc_http_token_length(value);
+    value += strspn(value, " \t"); /* BWS */
+
+    if (*value != '=')
+        return NULL;
+
+    value++;
+    value += strspn(value, " \t"); /* BWS */
+
+    size_t len = vlc_http_quoted_length(value);
+    if (len == 0)
+        return NULL;
+
+    assert(len >= 2);
+    value++;
+    len -= 2;
+
+    char *out = malloc(len + 1), *p;
+    if (unlikely(out == NULL))
+        return NULL;
+
+    for (p = out; len > 0; len--)
+    {
+        char c = *(value++);
+        if (c == '\\') /* Quoted pair */
+        {
+            c = *(value++);
+            len--;
+        }
+        *(p++) = c;
+    }
+    *p = '\0';
+    return out;
+}
+
+const char *vlc_http_msg_get_token(const struct vlc_http_msg *msg,
+                                   const char *field, const char *token)
+{
+    return vlc_http_get_token(vlc_http_msg_get_header(msg, field), token);
 }
 
 static size_t vlc_http_comment_length(const char *str)
