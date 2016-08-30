@@ -98,6 +98,7 @@ struct block_t *vlc_http_res_read(struct vlc_http_resource *);
 
 int vlc_http_res_set_login(struct vlc_http_resource *res,
                            const char *username, const char *password);
+char *vlc_http_res_get_basic_realm(struct vlc_http_resource *res);
 
 /** @} */
 #endif

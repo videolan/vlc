@@ -954,6 +954,24 @@ int vlc_http_msg_add_cookies(struct vlc_http_msg *m,
     return val;
 }
 
+char *vlc_http_msg_get_basic_realm(const struct vlc_http_msg *m)
+{
+    const char *auth;
+
+    /* TODO: Support other authentication schemes. */
+    /* NOTE: In principles, RFC7235 allows for multiple authentication schemes,
+     * including multiple times Basic with a different realm each. There are no
+     * UI paradigms though. */
+    auth = vlc_http_msg_get_token(m, "WWW-Authenticate", "Basic");
+    if (auth == NULL)
+        return NULL;
+
+    auth += 5;
+    auth += strspn(auth, " "); /* 1*SP */
+
+    return vlc_http_get_token_value(auth, "realm");
+}
+
 int vlc_http_msg_add_creds_basic(struct vlc_http_msg *m, bool proxy,
                                  const char *username, const char *password)
 {

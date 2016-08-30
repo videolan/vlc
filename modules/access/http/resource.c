@@ -356,3 +356,11 @@ int vlc_http_res_set_login(struct vlc_http_resource *res,
 
     return 0;
 }
+
+char *vlc_http_res_get_basic_realm(struct vlc_http_resource *res)
+{
+    int status = vlc_http_res_get_status(res);
+    if (status != 401)
+        return NULL;
+    return vlc_http_msg_get_basic_realm(res->response);
+}
