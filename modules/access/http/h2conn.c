@@ -71,6 +71,7 @@ struct vlc_h2_stream
 
     bool interrupted;
     bool recv_end; /**< End-of-stream flag */
+    int recv_err; /**< Standard C error code */
     struct vlc_http_msg *recv_hdr; /**< Latest received headers (or NULL) */
 
     size_t recv_cwnd; /**< Free space in receive congestion window */
@@ -109,6 +110,7 @@ static int vlc_h2_stream_error(void *ctx, uint_fast32_t id, uint_fast32_t code)
 static int vlc_h2_stream_fatal(struct vlc_h2_stream *s, uint_fast32_t code)
 {
     s->recv_end = true;
+    s->recv_err = EPROTO;
     return vlc_h2_stream_error(s->conn, s->id, code);
 }
 
@@ -148,7 +150,7 @@ static int vlc_h2_stream_data(void *ctx, struct vlc_h2_frame *f)
     if (s->recv_end)
     {
         free(f);
-        return vlc_h2_stream_fatal(s, VLC_H2_STREAM_CLOSED);
+        return vlc_h2_stream_error(s->conn, s->id, VLC_H2_STREAM_CLOSED);
     }
 
     /* Enforce the congestion window as required by the protocol spec */
@@ -186,6 +188,7 @@ static int vlc_h2_stream_reset(void *ctx, uint_fast32_t code)
             s->id, vlc_h2_strerror(code), code);
 
     s->recv_end = true;
+    s->recv_err = ECONNRESET;
     vlc_cond_broadcast(&s->recv_wait);
     return 0;
 }
@@ -246,7 +249,8 @@ static struct vlc_http_msg *vlc_h2_stream_wait(struct vlc_http_stream *stream)
  * Dequeues pending incoming data for an HTTP/2 stream. If there is currently
  * no data block, wait for one.
  *
- * \return a VLC data block, or NULL on stream error or end of stream
+ * \return a VLC data block, NULL on end of stream,
+ *         or vlc_http_error on stream error
  */
 static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
 {
@@ -264,7 +268,14 @@ static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
 
     if (f == NULL)
     {
+        int err = s->recv_err;
+
         vlc_h2_stream_unlock(s);
+        if (err)
+        {
+            errno = err;
+            return vlc_http_error;
+        }
         return NULL;
     }
 
@@ -289,7 +300,7 @@ static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
     if (unlikely(block == NULL))
     {
         vlc_h2_stream_error(conn, s->id, VLC_H2_INTERNAL_ERROR);
-        return NULL;
+        return vlc_http_error;
     }
 
     size_t len;
@@ -382,6 +393,7 @@ static struct vlc_http_stream *vlc_h2_stream_open(struct vlc_http_conn *c,
     s->conn = conn;
     s->newer = NULL;
     s->recv_end = false;
+    s->recv_err = 0;
     s->recv_hdr = NULL;
     s->recv_cwnd = VLC_H2_INIT_WINDOW;
     s->recv_head = NULL;

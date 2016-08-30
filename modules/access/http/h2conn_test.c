@@ -176,7 +176,7 @@ int main(void)
     m = vlc_http_stream_read_headers(s);
     assert(m == NULL);
     b = vlc_http_stream_read(s);
-    assert(b == NULL);
+    assert(b == vlc_http_error);
     vlc_http_stream_close(s, false);
     conn_expect(RST_STREAM);
 
