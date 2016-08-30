@@ -352,7 +352,7 @@ char *vlc_b64_encode_binary( const uint8_t *src, size_t i_src )
         uint32_t v;
 
         /* 1/3 -> 1/4 */
-        v = *src++ << 24;
+        v = ((unsigned)*src++) << 24;
         *dst++ = b64[v >> 26];
         v = v << 6;
 
