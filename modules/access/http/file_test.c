@@ -59,6 +59,11 @@ int main(void)
     /* Request failure test */
     f = vlc_http_file_create(NULL, url, ua, NULL);
     assert(f != NULL);
+    vlc_http_res_set_login(f, NULL, NULL);
+    vlc_http_res_set_login(f, "john", NULL);
+    vlc_http_res_set_login(f, NULL, NULL);
+    vlc_http_res_set_login(f, "john", "secret");
+    vlc_http_res_set_login(f, NULL, NULL);
     vlc_http_file_seek(f, 0);
     assert(vlc_http_file_get_status(f) < 0);
     assert(vlc_http_file_get_redirect(f) == NULL);
