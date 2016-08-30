@@ -116,11 +116,11 @@ int main(void)
     m = vlc_http_stream_read_headers(s);
     assert(m == NULL);
     b = vlc_http_stream_read(s);
-    assert(b == NULL);
+    assert(b == vlc_http_error);
     m = vlc_http_stream_read_headers(s);
     assert(m == NULL);
     b = vlc_http_stream_read(s);
-    assert(b == NULL);
+    assert(b == vlc_http_error);
     m = vlc_http_msg_get_initial(s);
     assert(m == NULL);
 
@@ -138,7 +138,7 @@ int main(void)
     m = vlc_http_stream_read_headers(s);
     assert(m == NULL);
     b = vlc_http_stream_read(s);
-    assert(b == NULL);
+    assert(b == vlc_http_error);
     conn_destroy();
     vlc_http_stream_close(s, false);
 

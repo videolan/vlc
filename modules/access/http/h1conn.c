@@ -23,6 +23,7 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -236,7 +237,7 @@ static block_t *vlc_h1_stream_read(struct vlc_http_stream *stream)
     assert(conn->active);
 
     if (conn->conn.tls == NULL)
-        return NULL;
+        return vlc_http_error;
 
     if (size > conn->content_length)
         size = conn->content_length;
@@ -245,12 +246,19 @@ static block_t *vlc_h1_stream_read(struct vlc_http_stream *stream)
 
     block_t *block = block_Alloc(size);
     if (unlikely(block == NULL))
-        return NULL;
+        return vlc_http_error;
 
     ssize_t val = vlc_tls_Read(conn->conn.tls, block->p_buffer, size, false);
     if (val <= 0)
     {
         block_Release(block);
+        if (val < 0)
+            return vlc_http_error;
+        if (conn->content_length != UINTMAX_MAX)
+        {
+            errno = ECONNRESET;
+            return vlc_http_error;
+        }
         return NULL;
     }
 
