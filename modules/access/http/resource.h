@@ -52,6 +52,8 @@ struct vlc_http_resource
     unsigned port;
     char *authority;
     char *path;
+    char *username;
+    char *password;
     char *agent;
     char *referrer;
 };
@@ -93,6 +95,9 @@ char *vlc_http_res_get_type(struct vlc_http_resource *);
  * Reads data.
  */
 struct block_t *vlc_http_res_read(struct vlc_http_resource *);
+
+int vlc_http_res_set_login(struct vlc_http_resource *res,
+                           const char *username, const char *password);
 
 /** @} */
 #endif

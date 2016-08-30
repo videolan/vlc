@@ -58,7 +58,8 @@ vlc_http_res_req(const struct vlc_http_resource *res, void *opaque)
     }
 
     /* Authentication */
-    /* TODO: authentication */
+    if (res->username != NULL)
+        vlc_http_msg_add_creds_basic(req, false, res->username, res->password);
 
     /* Request context */
     if (res->agent != NULL)
@@ -148,6 +149,8 @@ static void vlc_http_res_deinit(struct vlc_http_resource *res)
 {
     free(res->referrer);
     free(res->agent);
+    free(res->password);
+    free(res->username);
     free(res->path);
     free(res->authority);
     free(res->host);
@@ -207,6 +210,10 @@ int vlc_http_res_init(struct vlc_http_resource *restrict res,
     res->host = strdup(url.psz_host);
     res->port = url.i_port;
     res->authority = vlc_http_authority(url.psz_host, url.i_port);
+    res->username = (url.psz_username != NULL) ? strdup(url.psz_username)
+                                               : NULL;
+    res->password = (url.psz_password != NULL) ? strdup(url.psz_password)
+                                               : NULL;
     res->agent = (ua != NULL) ? strdup(ua) : NULL;
     res->referrer = (ref != NULL) ? strdup(ref) : NULL;
 
@@ -314,4 +321,38 @@ struct block_t *vlc_http_res_read(struct vlc_http_resource *res)
         return NULL; /* do not "read" redirect or error message */
 
     return vlc_http_msg_read(res->response);
+}
+
+int vlc_http_res_set_login(struct vlc_http_resource *res,
+                           const char *username, const char *password)
+{
+    char *user = NULL;
+    char *pass = NULL;
+
+    if (username != NULL)
+    {
+        user = strdup(username);
+        if (unlikely(user == NULL))
+            return -1;
+
+        pass = strdup((password != NULL) ? password : "");
+        if (unlikely(pass == NULL))
+        {
+            free(user);
+            return -1;
+        }
+    }
+
+    free(res->password);
+    free(res->username);
+    res->username = user;
+    res->password = pass;
+
+    if (res->response != NULL && vlc_http_msg_get_status(res->response) == 401)
+    {
+        vlc_http_msg_destroy(res->response);
+        res->response = NULL;
+    }
+
+    return 0;
 }
