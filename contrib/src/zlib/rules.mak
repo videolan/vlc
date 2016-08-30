@@ -20,12 +20,12 @@ $(TARBALLS)/zlib-$(ZLIB_VERSION).tar.gz:
 
 zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
 	$(UNPACK)
+	$(APPLY) $(SRC)/zlib/no-shared.patch
 	$(MOVE)
 
 .zlib: zlib
 ifdef HAVE_WIN32
-	cd $< && $(HOSTVARS) $(MAKE) -fwin32/Makefile.gcc $(HOSTVARS) $(ZLIB_CONFIG_VARS) RC="$(HOST)-windres" LD="$(CC)"
-	cd $< && $(MAKE) -fwin32/Makefile.gcc install INCLUDE_PATH="$(PREFIX)/include" LIBRARY_PATH="$(PREFIX)/lib" BINARY_PATH="$(PREFIX)/bin"
+	cd $< && $(HOSTVARS) $(MAKE) -fwin32/Makefile.gcc install $(HOSTVARS) $(ZLIB_CONFIG_VARS) LD="$(CC)" INCLUDE_PATH="$(PREFIX)/include" LIBRARY_PATH="$(PREFIX)/lib" BINARY_PATH="$(PREFIX)/bin"
 else
 	cd $< && $(HOSTVARS_PIC) $(ZLIB_CONFIG_VARS) ./configure --prefix=$(PREFIX) --static
 	cd $< && $(MAKE) install

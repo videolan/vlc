@@ -1,0 +1,12 @@
+--- zlib/win32/Makefile.gcc.orig	2016-08-30 16:03:24.458949860 +0000
++++ zlib/win32/Makefile.gcc	2016-08-30 16:03:29.598983275 +0000
+@@ -90,7 +90,8 @@
+ $(STATICLIB): $(OBJS) $(OBJA)
+ 	$(AR) $(ARFLAGS) $@ $(OBJS) $(OBJA)
+ 
+-$(IMPLIB): $(SHAREDLIB)
++$(IMPLIB):
++	touch $@
+ 
+ $(SHAREDLIB): win32/zlib.def $(OBJS) $(OBJA) zlibrc.o
+ 	$(CC) -shared -Wl,--out-implib,$(IMPLIB) $(LDFLAGS) \
