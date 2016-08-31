@@ -434,7 +434,21 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
     */
     do
     {
-        if( i_type == XML_READER_STARTELEM )
+        if( i_type == XML_READER_STARTELEM && !strcasecmp( psz_node_name, "metadata" ) )
+        {
+            if( !xml_ReaderIsEmptyElement( p_sys->p_reader ) )
+            {
+                while ( i_type != XML_READER_ENDELEM || strcasecmp( psz_node_name, "metadata" ) )
+                {
+                    i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
+                }
+            }
+            else
+            {
+               i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
+            }
+        }
+        else if( i_type == XML_READER_STARTELEM )
         {
             node_t* p_node = calloc( 1, sizeof( *p_node ) );
             if( unlikely( p_node == NULL ) )
@@ -625,7 +639,17 @@ static int ReadTTML( demux_t* p_demux )
                     * they are unecessary.
                     */
                     i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
-
+                    if( i_type == XML_READER_STARTELEM && !strcasecmp( psz_node_name, "metadata" ) )
+                    {
+                        if( !xml_ReaderIsEmptyElement( p_sys->p_reader ) )
+                        {
+                            while ( i_type != XML_READER_ENDELEM || strcasecmp( psz_node_name, "metadata" ) )
+                            {
+                                i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
+                            }
+                        }
+                        i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
+                    }
                     while( i_type > XML_READER_NONE && ( i_type != XML_READER_ENDELEM
                             || ( strcmp( psz_node_name, "p" ) && strcmp( psz_node_name, "tt:p" ) ) )
                           )
