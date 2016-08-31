@@ -35,7 +35,7 @@
 
 #include "qt.hpp"
 
-EPGItem::EPGItem( vlc_epg_event_t *data, EPGView *view )
+EPGItem::EPGItem( const vlc_epg_event_t *data, EPGView *view )
     : m_view( view )
 {
     setData( data );
@@ -150,7 +150,7 @@ void EPGItem::setRow( unsigned int i_row_ )
     updatePos();
 }
 
-bool EPGItem::setData( vlc_epg_event_t *data )
+bool EPGItem::setData( const vlc_epg_event_t *data )
 {
     QDateTime newtime = QDateTime::fromTime_t( data->i_start );
     QString newname = qfu( data->psz_name );

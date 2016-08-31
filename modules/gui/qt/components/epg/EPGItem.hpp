@@ -37,7 +37,7 @@ class EPGView;
 class EPGItem : public QGraphicsItem
 {
 public:
-    EPGItem( vlc_epg_event_t *data, EPGView *view );
+    EPGItem( const vlc_epg_event_t *data, EPGView *view );
 
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 ) Q_DECL_OVERRIDE;
@@ -49,7 +49,7 @@ public:
     const QString& name() const { return m_name; }
     QString description() const;
     int rating() const { return m_rating; }
-    bool setData( vlc_epg_event_t * );
+    bool setData( const vlc_epg_event_t * );
     void setRow( unsigned int );
     void setCurrent( bool );
     void setDuration( int duration );
