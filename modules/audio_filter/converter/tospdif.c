@@ -25,10 +25,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -41,15 +37,8 @@
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-static block_t *DoWork( filter_t *, block_t * );
+static int Create( vlc_object_t * );
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
@@ -57,25 +46,6 @@ vlc_module_begin ()
     set_capability( "audio converter", 10 )
     set_callbacks( Create, NULL )
 vlc_module_end ()
-
-/*****************************************************************************
- * Create:
- *****************************************************************************/
-static int Create( vlc_object_t *p_this )
-{
-    filter_t * p_filter = (filter_t *)p_this;
-
-    if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_DTS &&
-          p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 ) ||
-        ( p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFL &&
-          p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFB ) )
-        return VLC_EGENERIC;
-
-    p_filter->pf_audio_filter = DoWork;
-
-    return VLC_SUCCESS;
-}
-
 
 static uint16_t get_data_type( filter_t *p_filter, block_t *p_in )
 {
@@ -124,10 +94,7 @@ static bool is_big_endian( filter_t *p_filter, block_t *p_in )
     return 0;
 }
 
-/*****************************************************************************
- * DoWork: convert a buffer
- *****************************************************************************/
-static block_t *DoWork( filter_t * p_filter, block_t *p_in_buf )
+static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
     size_t i_length = p_in_buf->i_buffer;
     uint8_t * p_in = p_in_buf->p_buffer;
@@ -183,3 +150,17 @@ out:
     return p_out_buf;
 }
 
+static int Create( vlc_object_t *p_this )
+{
+    filter_t * p_filter = (filter_t *)p_this;
+
+    if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_DTS &&
+          p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 ) ||
+        ( p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFL &&
+          p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFB ) )
+        return VLC_EGENERIC;
+
+    p_filter->pf_audio_filter = DoWork;
+
+    return VLC_SUCCESS;
+}
