@@ -344,6 +344,212 @@ static int ReadAttrNode( xml_reader_t* reader, node_t* p_node, const char* psz_n
     return VLC_SUCCESS;
 }
 
+static inline bool isVisibleSpan( subtitle_t* p_sub, mtime_t time_ref )
+{
+    return ( ( p_sub->i_start <= time_ref ) && ( p_sub->i_stop > time_ref ) );
+}
+
+static bool isInArray( vlc_array_t* p_array, mtime_t* p_elem )
+{
+    for( int i = 0; i < p_array->i_count ; i++ )
+    {
+        if( *(mtime_t*)p_array->pp_elems[i] == *p_elem )
+            return true;
+    }
+    return false;
+}
+
+static int addToArrayIfNotInside( vlc_array_t* p_array, mtime_t* p_elem )
+{
+    if( !isInArray( p_array, p_elem ) )
+    {
+        vlc_array_append( p_array, (void*)p_elem );
+        if( unlikely( p_array->pp_elems[p_array->i_count - 1] == NULL ) )
+            return VLC_ENOMEM;
+    }
+    return VLC_SUCCESS;
+}
+
+static int timeCmp( const void* p_time1, const void* p_time2 )
+{
+    return ( *(int*)p_time1 - *(int*)p_time2 );
+}
+
+/*
+* To set the span opacity to zero, we add the opacity
+* attribute after all the existing ones for him to be parsed last
+* in order to always be effective.
+*/
+static char* setOpacityToZero( char* psz_text )
+{
+    const char* psz_begin = strstr( psz_text, "<span " );
+    if( unlikely( psz_begin == NULL ) )
+        return NULL;
+
+    const char* psz_end = strstr( psz_text, ">" );
+    char* psz_cpy = malloc( strlen( psz_text ) );
+    if( unlikely( psz_cpy == NULL ) )
+        return NULL;
+
+    strncpy( psz_cpy, psz_text, psz_end - psz_begin );
+    psz_cpy = Append( psz_cpy, " tts:opacity=\"0\">%s", psz_end + 1);
+    return psz_cpy;
+}
+
+static void CleanSubs( subtitle_t** tab )
+{
+    for( int i = 0; tab[i] != NULL; i++ )
+    {
+        free( tab[i]->psz_text );
+        free( tab[i] );
+    }
+    free( tab );
+}
+
+/*
+* If the timing are set in the span tags, we will
+* create a new p tag for each time space in the
+* subtitle timeline in the function below.
+*/
+static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
+{
+    xml_reader_t* p_reader = p_sys->p_reader;
+    subtitle_t** pp_subtitles = calloc( 1, sizeof( *pp_subtitles ) );
+    if( unlikely( pp_subtitles == NULL ) )
+        return VLC_ENOMEM;
+
+    vlc_array_t* p_times = vlc_array_new();
+    if( unlikely( p_times == NULL ) )
+        goto error;
+
+    const char* psz_node_name;
+    int i_nb_span = 0;
+    int ret = VLC_ENOMEM;
+
+    int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
+    /*
+    * This loop will parse the current p tag and the
+    * spans inside, and will store every span text and times
+    * inside a subtitle_t structure.
+    */
+    do
+    {
+        if( i_type == XML_READER_STARTELEM )
+        {
+            node_t* p_node = calloc( 1, sizeof( *p_node ) );
+            if( unlikely( p_node == NULL ) )
+                goto error;
+
+            pp_subtitles[i_nb_span] = malloc( sizeof( *pp_subtitles[i_nb_span] ) );
+            if( unlikely( pp_subtitles[i_nb_span] == NULL ) )
+            {
+                ClearNode( p_node );
+                goto error;
+            }
+
+            if( ReadAttrNode( p_sys->p_reader, p_node, psz_node_name ) != VLC_SUCCESS )
+            {
+                ClearNode( p_node );
+                goto error;
+            }
+
+            if ( asprintf( &pp_subtitles[i_nb_span]->psz_text, "%s", NodeToStr( p_node ) ) < 0 )
+            {
+                ClearNode( p_node );
+                goto error;
+            }
+
+            Convert_time( &pp_subtitles[i_nb_span]->i_start, p_node->psz_begin );
+            Convert_time( &pp_subtitles[i_nb_span]->i_stop, p_node->psz_end );
+            ClearNode( p_node );
+        }
+        else if( i_type == XML_READER_TEXT )
+        {
+            pp_subtitles[i_nb_span]->psz_text = Append( pp_subtitles[i_nb_span]->psz_text, "%s", psz_node_name );
+        }
+        else if( i_type == XML_READER_ENDELEM )
+        {
+            pp_subtitles[i_nb_span]->psz_text = Append( pp_subtitles[i_nb_span]->psz_text, "</%s>", psz_node_name );
+            i_nb_span++;
+            subtitle_t** pp_tmp = realloc( pp_subtitles, ( i_nb_span + 1 ) * sizeof( *pp_subtitles ) );
+            if( unlikely( pp_tmp == NULL ) )
+                goto error;
+
+            pp_subtitles = pp_tmp;
+        }
+        i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
+
+    } while( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "p" ) && strcasecmp( psz_node_name, "tt:p" ) ) );
+
+    /*
+    * To split the timeline of the current subtitle, we take every
+    * time of the structure array once and sort them from
+    * earliest to last.
+    */
+    pp_subtitles[i_nb_span] = NULL;
+    for( int j = 0; j < i_nb_span; j++ )
+    {
+        if( addToArrayIfNotInside( p_times, &pp_subtitles[j]->i_start ) != VLC_SUCCESS )
+            goto error;
+
+        if( addToArrayIfNotInside( p_times, &pp_subtitles[j]->i_stop ) != VLC_SUCCESS )
+            goto error;
+    }
+
+    qsort( p_times->pp_elems, p_times->i_count, sizeof( mtime_t ), timeCmp );
+
+    subtitle_t* p_tmp_sub = realloc( p_sys->subtitle, sizeof( *p_sys->subtitle ) * ( p_times->i_count - 1 + p_sys->i_subtitles ) );
+    if( unlikely( p_tmp_sub == NULL ) )
+        goto error;
+
+    p_sys->subtitle = p_tmp_sub;
+    /*
+    * For each time space represented by the times inside the p_times array
+    * we create a p tag with all the spans inside.
+    *
+    * Then accroding to each span begin and end attributes,
+    * we check if it should be displayed or not, and if not,
+    * we set its opacity to zero and add the texts to the final
+    * subtitle structure.
+    */
+    for( int j = 0; j < ( p_times->i_count - 1 ); j++)
+    {
+        char* psz_sub = strdup( psz_text );
+        if( unlikely( psz_sub == NULL ) )
+            goto error;
+
+        for( int k = 0; k < i_nb_span; k++ )
+        {
+            if( isVisibleSpan( pp_subtitles[k], *(mtime_t*)p_times->pp_elems[j] ) )
+                psz_sub = Append( psz_sub, "%s", pp_subtitles[k]->psz_text );
+            else
+            {
+                char* psz_transparent= setOpacityToZero( pp_subtitles[k]->psz_text );
+                if( unlikely( psz_transparent == NULL ) )
+                    goto error;
+
+                psz_sub = Append( psz_sub, "%s",  psz_transparent );
+                free( psz_transparent );
+            }
+        }
+        if( !strncasecmp( psz_text, "<tt:p", 5) )
+            psz_sub = Append( psz_sub, "</tt:p>");
+        else
+            psz_sub = Append( psz_sub, "</p>");
+        subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
+        p_subtitle->i_start = *(mtime_t*)p_times->pp_elems[j];
+        p_subtitle->i_stop = *(mtime_t*)p_times->pp_elems[j+1];
+        p_subtitle->psz_text = psz_sub;
+        p_sys->i_subtitles++;
+    }
+    ret = VLC_SUCCESS;
+
+error:
+    CleanSubs( pp_subtitles );
+    vlc_array_destroy( p_times );
+    return ret;
+}
+
 static int ReadTTML( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
@@ -473,6 +679,8 @@ static int ReadTTML( demux_t* p_demux )
                     p_subtitle->psz_text = psz_text;
                     p_sys->i_subtitles++;
                 }
+                else if( ParseTimeOnSpan( p_sys , psz_text ) == VLC_SUCCESS )
+                    continue;
                 else
                     goto error;
             }
