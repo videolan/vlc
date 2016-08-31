@@ -90,14 +90,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     if( !p_pic ) return NULL;
 
-    if( (p_filter->fmt_in.video.i_height == 0) ||
-        (p_filter->fmt_in.video.i_width == 0) )
-        return NULL;
-
-    if( (p_filter->fmt_out.video.i_height == 0) ||
-        (p_filter->fmt_out.video.i_width == 0) )
-        return NULL;
-
     video_format_ScaleCropAr( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
 
     /* Request output picture */
