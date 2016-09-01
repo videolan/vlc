@@ -193,13 +193,23 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             /* Check if frame is valid and get frame info */
-            if( vlc_a52_header_Parse( &p_sys->frame, p_header, VLC_A52_HEADER_SIZE ) )
+            vlc_a52_header_t a52;
+            if( vlc_a52_header_Parse( &a52, p_header, VLC_A52_HEADER_SIZE ) )
             {
                 msg_Dbg( p_dec, "emulated sync word" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
                 break;
             }
+
+            if( a52.b_eac3 && a52.eac3.strmtyp != EAC3_STRMTYP_INDEPENDENT )
+            {
+                /* Use the channel configuration of the independent stream */
+                p_sys->frame.i_samples = a52.i_samples;
+                p_sys->frame.i_size = a52.i_size;
+            }
+            else
+                p_sys->frame = a52;
 
             p_sys->i_state = STATE_NEXT_SYNC;
 
@@ -288,7 +298,7 @@ static int Open( vlc_object_t *p_this )
 
     switch( p_dec->fmt_in.i_codec )
     {
-    /* TODO case VLC_CODEC_EAC3: */
+    case VLC_CODEC_EAC3:
     case VLC_CODEC_A52:
         break;
     default:
@@ -313,6 +323,7 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
 
+    p_sys->frame.b_eac3 = false;
     p_sys->frame.i_rate = p_dec->fmt_out.audio.i_rate;
     p_sys->frame.i_channels = p_dec->fmt_out.audio.i_channels;
     p_sys->frame.i_size = p_dec->fmt_out.audio.i_bytes_per_frame;
