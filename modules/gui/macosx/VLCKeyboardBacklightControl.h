@@ -1,5 +1,5 @@
 /*****************************************************************************
- * KeyboardBacklight.h: MacBook keyboard backlight control for VLC
+ * VLCKeyboardBlacklightControl.h: MacBook keyboard backlight control for VLC
  *****************************************************************************
  * Copyright (C) 2015 VLC authors and VideoLAN
  *
@@ -23,7 +23,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface KeyboardBacklight : NSObject
+@interface VLCKeyboardBacklightControl : NSObject
 
 /*!
  *  Initialize an instance of KeyboardBacklight.

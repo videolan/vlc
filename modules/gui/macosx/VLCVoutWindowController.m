@@ -197,7 +197,7 @@ void WindowClose(vout_window_t *p_wnd)
 @interface VLCVoutWindowController ()
 {
     NSMutableDictionary *o_vout_dict;
-    KeyboardBacklight *o_keyboard_backlight;
+    VLCKeyboardBacklightControl *o_keyboard_backlight;
 
     NSPoint top_left_point;
 
@@ -217,7 +217,7 @@ void WindowClose(vout_window_t *p_wnd)
     if (self) {
         atomic_store(&b_intf_starting, true);
         o_vout_dict = [[NSMutableDictionary alloc] init];
-        o_keyboard_backlight = [[KeyboardBacklight alloc] init];
+        o_keyboard_backlight = [[VLCKeyboardBacklightControl alloc] init];
         i_currentWindowLevel = NSNormalWindowLevel;
         _currentStatusWindowLevel = NSFloatingWindowLevel;
     }

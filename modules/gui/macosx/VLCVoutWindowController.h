@@ -25,7 +25,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import <vlc_vout_window.h>
-#import "KeyboardBacklight.h"
+#import "VLCKeyboardBacklightControl.h"
 
 @class VLCControlsBarCommon;
 @class VLCVideoWindowCommon;

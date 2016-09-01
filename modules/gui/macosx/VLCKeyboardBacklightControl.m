@@ -1,5 +1,5 @@
 /*****************************************************************************
- * KeyboardBacklight.m: MacBook keyboard backlight control for VLC
+ * VLCKeyboardBlacklightControl.m: MacBook keyboard backlight control for VLC
  *****************************************************************************
  * Copyright (C) 2015 VLC authors and VideoLAN
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "KeyboardBacklight.h"
+#import "VLCKeyboardBacklightControl.h"
 #import <IOKit/IOKitLib.h>
 
 enum {
@@ -31,7 +31,7 @@ enum {
     kSetLEDFadeID = 3        // setLEDFade(int, int, int, int *)
 };
 
-@implementation KeyboardBacklight {
+@implementation VLCKeyboardBacklightControl {
     io_connect_t dataPort;
 }
 

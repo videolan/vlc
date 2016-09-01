@@ -31,6 +31,8 @@
 		1C67C8A91D58EC1B0079E1C1 /* VLCPLItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F21B5599E40052293C /* VLCPLItem.m */; };
 		1C67C8AA1D58EC1E0079E1C1 /* VLCPLModel.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F31B5599E40052293C /* VLCPLModel.h */; };
 		1C67C8AB1D58EC290079E1C1 /* VLCPLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F41B5599E40052293C /* VLCPLModel.m */; };
+		1C7CB9181D787C4A00388902 /* VLCKeyboardBacklightControl.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812EF1B555C8E0052293C /* VLCKeyboardBacklightControl.h */; };
+		1C7CB9191D787C4A00388902 /* VLCKeyboardBacklightControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F01B555C8E0052293C /* VLCKeyboardBacklightControl.m */; };
 		1C88BA5419DC7B2200645190 /* yosemite-window-close-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */; };
 		1C88BA5519DC7B2200645190 /* yosemite-window-close-graphite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */; };
 		1C88BA5619DC7B2200645190 /* yosemite-window-close-on-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2619DC7B2200645190 /* yosemite-window-close-on-graphite.png */; };
@@ -1326,8 +1328,8 @@
 		7DF0435F1972E26A0022B534 /* VLCAddonListItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCAddonListItem.m; path = ../../../modules/gui/macosx/VLCAddonListItem.m; sourceTree = SOURCE_ROOT; };
 		7DF812ED1B555A340052293C /* VLCInputManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCInputManager.h; path = ../../../modules/gui/macosx/VLCInputManager.h; sourceTree = "<group>"; };
 		7DF812EE1B555A340052293C /* VLCInputManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCInputManager.m; path = ../../../modules/gui/macosx/VLCInputManager.m; sourceTree = "<group>"; };
-		7DF812EF1B555C8E0052293C /* KeyboardBacklight.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeyboardBacklight.h; path = ../../../modules/gui/macosx/KeyboardBacklight.h; sourceTree = "<group>"; };
-		7DF812F01B555C8E0052293C /* KeyboardBacklight.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeyboardBacklight.m; path = ../../../modules/gui/macosx/KeyboardBacklight.m; sourceTree = "<group>"; };
+		7DF812EF1B555C8E0052293C /* VLCKeyboardBacklightControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCKeyboardBacklightControl.h; path = ../../../modules/gui/macosx/VLCKeyboardBacklightControl.h; sourceTree = "<group>"; };
+		7DF812F01B555C8E0052293C /* VLCKeyboardBacklightControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCKeyboardBacklightControl.m; path = ../../../modules/gui/macosx/VLCKeyboardBacklightControl.m; sourceTree = "<group>"; };
 		7DF812F11B5599E40052293C /* VLCPLItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCPLItem.h; path = ../../../modules/gui/macosx/VLCPLItem.h; sourceTree = "<group>"; };
 		7DF812F21B5599E40052293C /* VLCPLItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCPLItem.m; path = ../../../modules/gui/macosx/VLCPLItem.m; sourceTree = "<group>"; };
 		7DF812F31B5599E40052293C /* VLCPLModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCPLModel.h; path = ../../../modules/gui/macosx/VLCPLModel.h; sourceTree = "<group>"; };
@@ -1917,8 +1919,8 @@
 				8ED6C27D03E2EB1C0059A3A7 /* VLCMain.m */,
 				7D5678EB1D5BA1DC002698F3 /* VLCApplication.h */,
 				7D5678EC1D5BA1DC002698F3 /* VLCApplication.m */,
-				7DF812EF1B555C8E0052293C /* KeyboardBacklight.h */,
-				7DF812F01B555C8E0052293C /* KeyboardBacklight.m */,
+				7DF812EF1B555C8E0052293C /* VLCKeyboardBacklightControl.h */,
+				7DF812F01B555C8E0052293C /* VLCKeyboardBacklightControl.m */,
 				8ED6C27E03E2EB1C0059A3A7 /* macosx.m */,
 				CC448A5A13B61D49009F72E0 /* VLCMainMenu.h */,
 				CC448A5B13B61D49009F72E0 /* VLCMainMenu.m */,
@@ -3966,6 +3968,8 @@
 				1CCB5F541A62A724004C3E90 /* VLCAddonListItem.m in Sources */,
 				1CCB5F551A62A724004C3E90 /* VLCAddonsWindowController.h in Sources */,
 				1CCB5F561A62A724004C3E90 /* VLCAddonsWindowController.m in Sources */,
+				1C7CB9181D787C4A00388902 /* VLCKeyboardBacklightControl.h in Sources */,
+				1C7CB9191D787C4A00388902 /* VLCKeyboardBacklightControl.m in Sources */,
 				1CCB5F571A62A724004C3E90 /* applescript.h in Sources */,
 				1CCB5F581A62A724004C3E90 /* applescript.m in Sources */,
 				1CCB5F591A62A724004C3E90 /* VLCAudioEffectsWindowController.h in Sources */,
