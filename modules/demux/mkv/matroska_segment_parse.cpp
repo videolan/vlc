@@ -207,9 +207,6 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     /* Init the track */
     mkv_track_t track;
 
-    track.fmt.psz_language       = strdup("English");
-    track.fmt.psz_description    = NULL;
-
     track.b_default              = true;
     track.b_enabled              = true;
     track.b_forced               = false;
@@ -230,6 +227,10 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
     std::memset(    &track.fmt, 0, sizeof( track.fmt ) );
     es_format_Init( &track.fmt, UNKNOWN_ES, 0 );
+
+    track.fmt.psz_language       = strdup("English");
+    track.fmt.psz_description    = NULL;
+
     track.f_fps = 0;
     track.p_es = NULL;
 
@@ -672,6 +673,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     else
     {
         msg_Err( &sys.demuxer, "Track Entry %u not supported", track.i_number );
+        es_format_Clean( &track.fmt );
         free(track.p_extra_data);
     }
 }
