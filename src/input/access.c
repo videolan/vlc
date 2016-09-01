@@ -128,6 +128,10 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
                 msg_Err(access, "redirection loop");
                 goto error;
             }
+
+        free(access->psz_filepath);
+        free(access->psz_name);
+        access->psz_filepath = access->psz_name = NULL;
     }
 
     msg_Err(access, "too many redirections");
