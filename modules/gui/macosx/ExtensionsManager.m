@@ -24,7 +24,7 @@
 
 #import "ExtensionsManager.h"
 
-#import "ExtensionsDialogProvider.h"
+#import "VLCExtensionsDialogProvider.h"
 
 #import <vlc_modules.h>
 #import "assert.h"
@@ -36,7 +36,7 @@
 @interface ExtensionsManager()
 {
     extensions_manager_t *p_extensions_manager;
-    ExtensionsDialogProvider *_extensionDialogProvider;
+    VLCExtensionsDialogProvider *_extensionDialogProvider;
 
     NSMutableDictionary *p_extDict;
 
@@ -54,7 +54,7 @@
 
     if (self) {
         p_extensions_manager = NULL;
-        _extensionDialogProvider = [[ExtensionsDialogProvider alloc] init];
+        _extensionDialogProvider = [[VLCExtensionsDialogProvider alloc] init];
 
         p_extDict = [[NSMutableDictionary alloc] init];
 

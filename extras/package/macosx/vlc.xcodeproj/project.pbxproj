@@ -390,8 +390,8 @@
 		1CCB5F671A62A724004C3E90 /* VLCCoreInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */; };
 		1CCB5F681A62A724004C3E90 /* VLCDebugMessageWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B318302AC000FAE9B7 /* VLCDebugMessageWindowController.h */; };
 		1CCB5F691A62A724004C3E90 /* VLCDebugMessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B418302AC000FAE9B7 /* VLCDebugMessageWindowController.m */; };
-		1CCB5F6A1A62A724004C3E90 /* ExtensionsDialogProvider.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */; };
-		1CCB5F6B1A62A724004C3E90 /* ExtensionsDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */; };
+		1CCB5F6A1A62A724004C3E90 /* VLCExtensionsDialogProvider.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71014C0D4A90057F8D1 /* VLCExtensionsDialogProvider.h */; };
+		1CCB5F6B1A62A724004C3E90 /* VLCExtensionsDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71114C0D4A90057F8D1 /* VLCExtensionsDialogProvider.m */; };
 		1CCB5F6C1A62A724004C3E90 /* ExtensionsManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */; };
 		1CCB5F6D1A62A724004C3E90 /* ExtensionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */; };
 		1CCB5F6E1A62A724004C3E90 /* VLCEyeTvController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC6EDD4F0B9CA2140096068A /* VLCEyeTvController.h */; };
@@ -1259,8 +1259,8 @@
 		1CE5ED2019DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen@2x.png"; sourceTree = "<group>"; };
 		2AEF857609A5FEC900130822 /* VLCFSPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCFSPanel.h; path = ../../../modules/gui/macosx/VLCFSPanel.h; sourceTree = SOURCE_ROOT; };
 		2AEF857709A5FEC900130822 /* VLCFSPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCFSPanel.m; path = ../../../modules/gui/macosx/VLCFSPanel.m; sourceTree = SOURCE_ROOT; };
-		5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExtensionsDialogProvider.h; path = ../../../modules/gui/macosx/ExtensionsDialogProvider.h; sourceTree = SOURCE_ROOT; };
-		5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtensionsDialogProvider.m; path = ../../../modules/gui/macosx/ExtensionsDialogProvider.m; sourceTree = SOURCE_ROOT; };
+		5CCED71014C0D4A90057F8D1 /* VLCExtensionsDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCExtensionsDialogProvider.h; path = ../../../modules/gui/macosx/VLCExtensionsDialogProvider.h; sourceTree = SOURCE_ROOT; };
+		5CCED71114C0D4A90057F8D1 /* VLCExtensionsDialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCExtensionsDialogProvider.m; path = ../../../modules/gui/macosx/VLCExtensionsDialogProvider.m; sourceTree = SOURCE_ROOT; };
 		5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExtensionsManager.h; path = ../../../modules/gui/macosx/ExtensionsManager.h; sourceTree = SOURCE_ROOT; };
 		5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtensionsManager.m; path = ../../../modules/gui/macosx/ExtensionsManager.m; sourceTree = SOURCE_ROOT; };
 		5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCUIWidgets.h; path = ../../../modules/gui/macosx/VLCUIWidgets.h; sourceTree = SOURCE_ROOT; };
@@ -1900,8 +1900,8 @@
 				CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */,
 				7D8BB0B318302AC000FAE9B7 /* VLCDebugMessageWindowController.h */,
 				7D8BB0B418302AC000FAE9B7 /* VLCDebugMessageWindowController.m */,
-				5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */,
-				5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */,
+				5CCED71014C0D4A90057F8D1 /* VLCExtensionsDialogProvider.h */,
+				5CCED71114C0D4A90057F8D1 /* VLCExtensionsDialogProvider.m */,
 				5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */,
 				5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */,
 				CC6EDD4F0B9CA2140096068A /* VLCEyeTvController.h */,
@@ -3990,9 +3990,9 @@
 				1CCB5F681A62A724004C3E90 /* VLCDebugMessageWindowController.h in Sources */,
 				1CCB5F691A62A724004C3E90 /* VLCDebugMessageWindowController.m in Sources */,
 				6B846FE51CF5D88C00112E54 /* VLCHUDCheckboxCell.m in Sources */,
-				1CCB5F6A1A62A724004C3E90 /* ExtensionsDialogProvider.h in Sources */,
+				1CCB5F6A1A62A724004C3E90 /* VLCExtensionsDialogProvider.h in Sources */,
 				7DBB06641CC2314D004C74D2 /* caopengllayer.m in Sources */,
-				1CCB5F6B1A62A724004C3E90 /* ExtensionsDialogProvider.m in Sources */,
+				1CCB5F6B1A62A724004C3E90 /* VLCExtensionsDialogProvider.m in Sources */,
 				1CCB5F6C1A62A724004C3E90 /* ExtensionsManager.h in Sources */,
 				1CCB5F6D1A62A724004C3E90 /* ExtensionsManager.m in Sources */,
 				6BBBB8B41D112BAC001BD9BA /* VLCRendererItem.m in Sources */,

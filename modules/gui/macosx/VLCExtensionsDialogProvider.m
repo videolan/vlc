@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ExtensionsDialogProvider.m: Mac OS X Extensions Dialogs
+ * VLCExtensionsDialogProvider.m: Mac OS X Extensions Dialogs
  *****************************************************************************
  * Copyright (C) 2010-2015 VLC authors and VideoLAN
  * $Id$
@@ -24,7 +24,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "ExtensionsDialogProvider.h"
+#import "VLCExtensionsDialogProvider.h"
 
 #import "VLCMain.h"
 #import "ExtensionsManager.h"
@@ -250,7 +250,7 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
 
 {
     @autoreleasepool {
-        ExtensionsDialogProvider *provider = (__bridge ExtensionsDialogProvider *)p_data;
+        VLCExtensionsDialogProvider *provider = (__bridge VLCExtensionsDialogProvider *)p_data;
         if (!provider)
             return;
 
@@ -259,7 +259,7 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
     }
 }
 
-@implementation ExtensionsDialogProvider
+@implementation VLCExtensionsDialogProvider
 
 - (id)init
 {

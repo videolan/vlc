@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ExtensionsDialogProvider.h: Mac OS X Extensions Dialogs
+ * VLCExtensionsDialogProvider.h: Mac OS X Extensions Dialogs
  *****************************************************************************
  * Copyright (C) 2005-2012 VLC authors and VideoLAN
  * $Id$
@@ -35,7 +35,7 @@
 /*****************************************************************************
  * ExtensionsDialogProvider interface
  *****************************************************************************/
-@interface ExtensionsDialogProvider : NSObject <NSWindowDelegate>
+@interface VLCExtensionsDialogProvider : NSObject <NSWindowDelegate>
 
 - (void)performEventWithObject: (NSValue *)o_value ofType:(const char*)type;
 

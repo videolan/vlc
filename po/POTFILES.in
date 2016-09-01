@@ -555,8 +555,8 @@ modules/gui/macosx/VLCCoreDialogProvider.h
 modules/gui/macosx/VLCCoreDialogProvider.m
 modules/gui/macosx/VLCCoreInteraction.h
 modules/gui/macosx/VLCCoreInteraction.m
-modules/gui/macosx/ExtensionsDialogProvider.h
-modules/gui/macosx/ExtensionsDialogProvider.m
+modules/gui/macosx/VLCExtensionsDialogProvider.h
+modules/gui/macosx/VLCExtensionsDialogProvider.m
 modules/gui/macosx/ExtensionsManager.h
 modules/gui/macosx/ExtensionsManager.m
 modules/gui/macosx/VLCEyeTvController.h

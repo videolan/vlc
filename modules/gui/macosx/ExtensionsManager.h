@@ -25,14 +25,14 @@
 # include "config.h"
 #endif
 
-#import "ExtensionsDialogProvider.h"
+#import "VLCExtensionsDialogProvider.h"
 #import "VLCMain.h"
 
 #import <vlc_extensions.h>
 
 #import <Cocoa/Cocoa.h>
 
-@class ExtensionsDialogProvider;
+@class VLCExtensionsDialogProvider;
 
 @protocol ExtensionsDelegate <NSObject>
 - (void)extensionsUpdated;
