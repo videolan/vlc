@@ -113,14 +113,10 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
     for ( int i = 0; i < p_input_item->i_epg; ++i )
     {
         vlc_epg_t *p_epg = p_input_item->pp_epg[i];
-
         /* Read current epg events from libvlc and try to insert them */
-        for ( int j = 0; j < p_epg->i_event; ++j )
-        {
-            vlc_epg_event_t *p_event = p_epg->pp_event[j];
-            m_epgView->addEPGEvent( p_event, qfu( p_epg->psz_name ),
-                                    ( p_epg->p_current == p_event ) );
-        }
+        m_epgView->addEPGEvents( p_epg->pp_event, p_epg->i_event,
+                                 qfu( p_epg->psz_name ),
+                                 p_epg->p_current );
     }
     vlc_mutex_unlock( & p_input_item->lock );
 

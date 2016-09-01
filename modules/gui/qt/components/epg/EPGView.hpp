@@ -65,7 +65,7 @@ public:
     const QDateTime& startTime() const;
     const QDateTime& baseTime() const;
 
-    bool            addEPGEvent( vlc_epg_event_t*, QString, bool );
+    bool            addEPGEvents( vlc_epg_event_t **, size_t, QString, const vlc_epg_event_t * );
     void            removeEPGEvent( vlc_epg_event_t*, QString );
     void            updateDuration();
     void            reset();

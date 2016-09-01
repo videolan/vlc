@@ -131,46 +131,19 @@ bool EPGView::hasValidData() const
     return !epgitemsByChannel.isEmpty();
 }
 
-static void cleanOverlapped( EPGEventByTimeQMap *epgItemByTime, EPGItem *epgItem, QGraphicsScene *scene )
-{
-    QDateTime epgItemTime = epgItem->start();
-    QDateTime epgItemTimeEnd = epgItem->end();
-    /* Clean overlapped programs */
-    foreach(const QDateTime existingTimes, epgItemByTime->keys())
-    {
-        if ( existingTimes > epgItemTimeEnd ) break; /* Can't overlap later items */
-        if ( existingTimes != epgItemTime )
-        {
-            EPGItem *otherEPGItem = epgItemByTime->value( existingTimes );
-            if ( otherEPGItem->playsAt( epgItemTime.addSecs( 1 ) )
-                || /* add/minus one sec because next one can start at prev end min */
-                 otherEPGItem->playsAt( epgItemTimeEnd.addSecs( -1 ) ) )
-            {
-                epgItemByTime->remove( otherEPGItem->start() );
-                scene->removeItem( otherEPGItem );
-                delete otherEPGItem;
-            }
-        }
-    }
-}
-
-bool EPGView::addEPGEvent( vlc_epg_event_t *eventdata, QString channelName, bool b_current )
+bool EPGView::addEPGEvents( vlc_epg_event_t **pp_events, size_t i_events,
+                            QString channelName, const vlc_epg_event_t *p_current )
 {
     /* Init our nested map if required */
     EPGEventByTimeQMap *epgItemByTime;
     EPGItem *epgItem;
     bool b_refresh_channels = false;
 
-    QDateTime eventStart = QDateTime::fromTime_t( eventdata->i_start );
-    if ( eventStart.addSecs( eventdata->i_duration ) < m_baseTime )
-        return false; /* EPG feed sent expired item */
-    if ( eventStart < m_startTime )
-    {
-        m_startTime = eventStart;
-        emit startTimeChanged( m_startTime );
-    }
+    if( i_events < 1 )
+        return false;
 
     mutex.lock();
+    /* First check and create channel if missing */
     if ( !epgitemsByChannel.contains( channelName ) )
     {
         epgItemByTime = new EPGEventByTimeQMap();
@@ -181,37 +154,87 @@ bool EPGView::addEPGEvent( vlc_epg_event_t *eventdata, QString channelName, bool
         epgItemByTime = epgitemsByChannel.value( channelName );
     }
 
-    if ( epgItemByTime->contains( eventStart ) )
-    {
-        /* Update our existing programs */
-        epgItem = epgItemByTime->value( eventStart );
-        epgItem->setCurrent( b_current );
-        if ( epgItem->setData( eventdata ) ) /* updates our entry */
-            cleanOverlapped( epgItemByTime, epgItem, scene() );
-        mutex.unlock();
-        return false;
-    } else {
-        /* Insert a new program entry */
-        epgItem = new EPGItem( eventdata, this );
-        cleanOverlapped( epgItemByTime, epgItem, scene() );
-        /* Effectively insert our new program */
-        epgItem->setCurrent( b_current );
-        epgItemByTime->insert( eventStart, epgItem );
-        scene()->addItem( epgItem );
-        /* update only our row (without calling the updatechannels()) */
-        epgItem->setRow( epgitemsByChannel.keys().indexOf( channelName ) );
+    QDateTime rangeStart = QDateTime::fromTime_t( pp_events[0]->i_start );
+    QDateTime rangeEnd = QDateTime::fromTime_t( pp_events[i_events - 1]->i_start );
+    rangeEnd.addSecs( pp_events[i_events - 1]->i_duration );
 
-        /* First Insert, needs to focus by default then */
-        if ( epgitemsByChannel.keys().count() == 1 &&
-             epgItemByTime->count() == 1 )
-            focusItem( epgItem );
+    EPGEventByTimeQMap::iterator itRangeBegin =
+            epgItemByTime->lowerBound( rangeStart );
+    EPGEventByTimeQMap::iterator itRangeEnd =
+            epgItemByTime->upperBound( rangeEnd );
+
+    EPGEventByTimeQMap::iterator it = itRangeBegin;
+    for( size_t i=0; i<i_events; i++ )
+    {
+        const vlc_epg_event_t *p_event = pp_events[i];
+
+        for( ; it != itRangeEnd; ++it )
+        {
+            EPGItem *epgItem = *it;
+            QDateTime eventStart = QDateTime::fromTime_t( p_event->i_start );
+            if( epgItem->start() < eventStart )
+            {
+                if( it != itRangeBegin ||
+                    epgItem->start().addSecs( epgItem->duration() ) > eventStart )
+                    delete *it++;
+            }
+            else if( epgItem->start() > eventStart )
+            {
+                break;
+            }
+        }
     }
+
     mutex.unlock();
+
+
+    bool b_added = false;
+    for( size_t i=0; i<i_events; i++ )
+    {
+        const vlc_epg_event_t *p_event = pp_events[i];
+
+        QDateTime eventStart = QDateTime::fromTime_t( p_event->i_start );
+        if ( eventStart.addSecs( p_event->i_duration ) < m_baseTime )
+            continue; /* EPG feed sent expired item */
+        if ( eventStart < m_startTime )
+        {
+            m_startTime = eventStart;
+            emit startTimeChanged( m_startTime );
+        }
+
+        mutex.lock();
+
+        if ( epgItemByTime->contains( eventStart ) )
+        {
+            /* Update our existing programs */
+            epgItem = epgItemByTime->value( eventStart );
+            epgItem->setCurrent( ( p_event == p_current ) );
+            epgItem->setData( p_event ); /* updates our entry */
+        } else {
+            /* Insert a new program entry */
+            epgItem = new EPGItem( p_event, this );
+            /* Effectively insert our new program */
+            epgItem->setCurrent( ( p_event == p_current ) );
+            epgItemByTime->insert( eventStart, epgItem );
+            scene()->addItem( epgItem );
+            /* update only our row (without calling the updatechannels()) */
+            epgItem->setRow( epgitemsByChannel.keys().indexOf( channelName ) );
+
+            /* First Insert, needs to focus by default then */
+            if ( epgitemsByChannel.keys().count() == 1 &&
+                 epgItemByTime->count() == 1 )
+                focusItem( epgItem );
+            b_added = true;
+        }
+
+        mutex.unlock();
+    }
+
 
     /* Update rows on each item */
     if ( b_refresh_channels ) updateChannels();
 
-    return true;
+    return b_added;
 }
 
 void EPGView::removeEPGEvent( vlc_epg_event_t *eventdata, QString channelName )
