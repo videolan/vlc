@@ -985,6 +985,7 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
         op.packetno = 0;
         OggFillSkeletonFishead( op.packet, p_mux );
         ogg_stream_packetin( &p_sys->skeleton.os, &op );
+        ogg_packet_clear( &op );
         p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
         block_ChainAppend( &p_hdr, p_og );
         p_sys->skeleton.b_head_done = true;
@@ -1126,6 +1127,7 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
             op.granulepos = 0;
             op.packetno = p_sys->skeleton.i_packet_no++;
             ogg_stream_packetin( &p_sys->skeleton.os, &op );
+            ogg_packet_clear( &op );
             p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
             block_ChainAppend( &p_hdr, p_og );
             p_stream->skeleton.b_fisbone_done = true;
@@ -1166,6 +1168,7 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
                 p_stream->skeleton.i_index_pageno = p_sys->skeleton.os.pageno;
 
                 ogg_stream_packetin( &p_sys->skeleton.os, &op );
+                ogg_packet_clear( &op );
                 p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
                 p_mux->p_sys->i_pos += sout_AccessOutWrite( p_mux->p_access, p_og );
             }
@@ -1331,6 +1334,7 @@ static void OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream )
             p_sys->skeleton.os.b_o_s = 1;
             p_sys->skeleton.os.e_o_s = 0;
             ogg_stream_packetin( &p_sys->skeleton.os, &op );
+            ogg_packet_clear( &op );
             p_og = OggStreamFlush( p_mux, &p_sys->skeleton.os, 0 );
             sout_AccessOutWrite( p_mux->p_access, p_og );
         }
@@ -1407,6 +1411,7 @@ static void OggRewriteFisheadPage( sout_mux_t *p_mux )
         ogg_stream_reset_serialno( &p_sys->skeleton.os, p_sys->skeleton.i_serial_no );
         OggFillSkeletonFishead( op.packet, p_mux );
         ogg_stream_packetin( &p_sys->skeleton.os, &op );
+        ogg_packet_clear( &op );
         msg_Dbg( p_mux, "rewriting fishead at %"PRId64, p_mux->p_sys->skeleton.i_fishead_offset );
         sout_AccessOutSeek( p_mux->p_access, p_mux->p_sys->skeleton.i_fishead_offset );
         sout_AccessOutWrite( p_mux->p_access,
