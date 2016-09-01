@@ -41,8 +41,6 @@
     NSMutableDictionary *p_extDict;
 
     BOOL b_failed; ///< Flag set to true if we could not load the module
-
-    id <ExtensionsDelegate> delegate;
 }
 @end
 
@@ -60,8 +58,6 @@
 
         _isUnloading = false;
         b_failed = false;
-
-        delegate = nil;
     }
 
     return self;
@@ -165,7 +161,6 @@
         p_extensions_manager = (extensions_manager_t*)vlc_object_create(p_intf, sizeof(extensions_manager_t));
         if (!p_extensions_manager) {
             b_failed = true;
-            [delegate extensionsUpdated];
             return false;
         }
 
@@ -176,14 +171,12 @@
             vlc_object_release(p_extensions_manager);
             p_extensions_manager = NULL;
             b_failed = true;
-            [delegate extensionsUpdated];
             return false;
         }
 
         _isUnloading = false;
     }
     b_failed = false;
-    [delegate extensionsUpdated];
     return true;
 }
 
@@ -202,9 +195,6 @@
 {
     [self unloadExtensions];
     [self loadExtensions];
-
-    if (delegate)
-        [delegate extensionsUpdated];
 }
 
 - (void)triggerMenu:(id)sender

@@ -34,10 +34,6 @@
 
 @class VLCExtensionsDialogProvider;
 
-@protocol ExtensionsDelegate <NSObject>
-- (void)extensionsUpdated;
-@end
-
 @interface VLCExtensionsManager : NSObject
 
 - (void)buildMenu:(NSMenu *)extMenu;
