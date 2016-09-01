@@ -439,8 +439,8 @@
 		1CCB5F981A62A724004C3E90 /* Windows.m in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F516020F6200C698B7 /* Windows.m */; };
 		1CCB5F991A62A724004C3E90 /* misc.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27F03E2EB1C0059A3A7 /* misc.h */; };
 		1CCB5F9A1A62A724004C3E90 /* misc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28003E2EB1C0059A3A7 /* misc.m */; };
-		1CCB5F9B1A62A724004C3E90 /* MainWindowTitle.h in Sources */ = {isa = PBXBuildFile; fileRef = CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */; };
-		1CCB5F9C1A62A724004C3E90 /* MainWindowTitle.m in Sources */ = {isa = PBXBuildFile; fileRef = CC017A0C14A4C8AF00C09A4F /* MainWindowTitle.m */; };
+		1CCB5F9B1A62A724004C3E90 /* VLCMainWindowTitleView.h in Sources */ = {isa = PBXBuildFile; fileRef = CC017A0B14A4C8AF00C09A4F /* VLCMainWindowTitleView.h */; };
+		1CCB5F9C1A62A724004C3E90 /* VLCMainWindowTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = CC017A0C14A4C8AF00C09A4F /* VLCMainWindowTitleView.m */; };
 		1CCB5F9D1A62A724004C3E90 /* BWQuincyManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652618805297005776C4 /* BWQuincyManager.h */; };
 		1CCB5F9E1A62A724004C3E90 /* BWQuincyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652718805297005776C4 /* BWQuincyManager.m */; };
 		1CCB5F9F1A62A724004C3E90 /* BWQuincyUI.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652818805297005776C4 /* BWQuincyUI.h */; };
@@ -1358,8 +1358,8 @@
 		8ED6C28503E2EB1C0059A3A7 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prefs.h; path = ../../../modules/gui/macosx/prefs.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28603E2EB1C0059A3A7 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs.m; path = ../../../modules/gui/macosx/prefs.m; sourceTree = SOURCE_ROOT; };
 		8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = README.MacOSX.rtf; sourceTree = SOURCE_ROOT; };
-		CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindowTitle.h; path = ../../../modules/gui/macosx/MainWindowTitle.h; sourceTree = SOURCE_ROOT; };
-		CC017A0C14A4C8AF00C09A4F /* MainWindowTitle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindowTitle.m; path = ../../../modules/gui/macosx/MainWindowTitle.m; sourceTree = SOURCE_ROOT; };
+		CC017A0B14A4C8AF00C09A4F /* VLCMainWindowTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCMainWindowTitleView.h; path = ../../../modules/gui/macosx/VLCMainWindowTitleView.h; sourceTree = SOURCE_ROOT; };
+		CC017A0C14A4C8AF00C09A4F /* VLCMainWindowTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCMainWindowTitleView.m; path = ../../../modules/gui/macosx/VLCMainWindowTitleView.m; sourceTree = SOURCE_ROOT; };
 		CC04321313B246DF00D7D52E /* effects-double-buttons_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-double-buttons_dark.png"; path = "Resources/mainwindow_dark/effects-double-buttons_dark.png"; sourceTree = "<group>"; };
 		CC04321513B246DF00D7D52E /* effects-double-buttons-pressed_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-double-buttons-pressed_dark.png"; path = "Resources/mainwindow_dark/effects-double-buttons-pressed_dark.png"; sourceTree = "<group>"; };
 		CC04321613B246DF00D7D52E /* effects-one-button_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button_dark.png"; path = "Resources/mainwindow_dark/effects-one-button_dark.png"; sourceTree = "<group>"; };
@@ -1926,8 +1926,8 @@
 				CC448A5B13B61D49009F72E0 /* VLCMainMenu.m */,
 				CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */,
 				CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */,
-				CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */,
-				CC017A0C14A4C8AF00C09A4F /* MainWindowTitle.m */,
+				CC017A0B14A4C8AF00C09A4F /* VLCMainWindowTitleView.h */,
+				CC017A0C14A4C8AF00C09A4F /* VLCMainWindowTitleView.m */,
 				8ED6C27F03E2EB1C0059A3A7 /* misc.h */,
 				8ED6C28003E2EB1C0059A3A7 /* misc.m */,
 				8ED6C28103E2EB1C0059A3A7 /* VLCOpenWindowController.h */,
@@ -4050,8 +4050,8 @@
 				1CCB5F981A62A724004C3E90 /* Windows.m in Sources */,
 				1CCB5F991A62A724004C3E90 /* misc.h in Sources */,
 				1CCB5F9A1A62A724004C3E90 /* misc.m in Sources */,
-				1CCB5F9B1A62A724004C3E90 /* MainWindowTitle.h in Sources */,
-				1CCB5F9C1A62A724004C3E90 /* MainWindowTitle.m in Sources */,
+				1CCB5F9B1A62A724004C3E90 /* VLCMainWindowTitleView.h in Sources */,
+				1CCB5F9C1A62A724004C3E90 /* VLCMainWindowTitleView.m in Sources */,
 				6B846FE41CF5D88C00112E54 /* VLCHUDButtonCell.m in Sources */,
 				1CCB5F9D1A62A724004C3E90 /* BWQuincyManager.h in Sources */,
 				1CCB5F9E1A62A724004C3E90 /* BWQuincyManager.m in Sources */,

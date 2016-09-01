@@ -43,7 +43,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCKeyboardBacklightControl.h VLCKeyboardBacklightControl.m \
 	macosx.m \
 	VLCMainMenu.h VLCMainMenu.m \
-	MainWindowTitle.h MainWindowTitle.m \
+	VLCMainWindowTitleView.h VLCMainWindowTitleView.m \
 	misc.h misc.m \
 	VLCOpenWindowController.h VLCOpenWindowController.m \
 	VLCOutput.h VLCOutput.m \
