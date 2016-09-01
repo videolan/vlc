@@ -909,7 +909,7 @@ void matroska_segment_c::ComputeTrackPriority()
         tracks_map_t::key_type     track_id = it->first;
         tracks_map_t::mapped_type& track    = it->second;
 
-        if( unlikely( track.fmt.i_cat == UNKNOWN_ES || !track.psz_codec ) )
+        if( unlikely( track.fmt.i_cat == UNKNOWN_ES || track.codec.empty() ) )
         {
             msg_Warn( &sys.demuxer, "invalid track[%d]", static_cast<int>( track_id ) );
             track.p_es = NULL;
@@ -1076,7 +1076,7 @@ bool matroska_segment_c::ESCreate()
         tracks_map_t::key_type     track_id = it->first;
         tracks_map_t::mapped_type& track    = it->second;
 
-        if( unlikely( track.fmt.i_cat == UNKNOWN_ES || !track.psz_codec ) )
+        if( unlikely( track.fmt.i_cat == UNKNOWN_ES || track.codec.empty() ) )
         {
             msg_Warn( &sys.demuxer, "invalid track[%d]", static_cast<int>( track_id ) );
             track.p_es = NULL;

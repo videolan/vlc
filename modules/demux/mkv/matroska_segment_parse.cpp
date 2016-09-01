@@ -215,7 +215,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     track.i_extra_data           = 0;
     track.p_extra_data           = NULL;
 
-    track.psz_codec              = NULL;
+    track.codec                  = "";
     track.b_dts_only             = false;
     track.b_pts_only             = false;
 
@@ -384,7 +384,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         }
         E_CASE( KaxCodecID, codecid )
         {
-            vars.tk->psz_codec = strdup( std::string( codecid ).c_str() );
+            vars.tk->codec = std::string( codecid );
             debug( vars, "Track CodecId=%s", std::string( codecid ).c_str() ) ;
         }
         E_CASE( KaxCodecPrivate, cpriv )
@@ -1245,7 +1245,7 @@ void matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
 
 int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 {
-    if( p_tk->psz_codec == NULL )
+    if( p_tk->codec.empty() )
     {
         msg_Err( &sys.demuxer, "Empty codec id" );
         p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
@@ -1819,14 +1819,14 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     };
 
     try {
-        TrackCodecHandlers::Dispatcher().send( p_tk->psz_codec,
+        TrackCodecHandlers::Dispatcher().send( p_tk->codec.c_str(),
           TrackCodecHandlers::Payload( captures )
         );
     }
     catch (std::exception const& e)
     {
         msg_Err( &sys.demuxer, "Error when trying to initiate track (codec: %s): %s",
-          p_tk->psz_codec, e.what () );
+          p_tk->codec.c_str(), e.what () );
     }
 
     return 0;

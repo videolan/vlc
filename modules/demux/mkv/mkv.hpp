@@ -193,7 +193,7 @@ class mkv_track_t
         unsigned int i_extra_data;
         uint8_t      *p_extra_data;
 
-        char         *psz_codec;
+        std::string  codec;
         bool         b_dts_only;
         bool         b_pts_only;
 
