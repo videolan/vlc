@@ -42,7 +42,7 @@
 #import "VLCCoreInteraction.h"
 #import "VLCMainWindow.h"
 #import "VLCMainWindowControlsBar.h"
-#import "ExtensionsManager.h"
+#import "VLCExtensionsManager.h"
 #import "VLCConvertAndSaveWindowController.h"
 #import "VLCDebugMessageWindowController.h"
 #import "VLCAddonsWindowController.h"
@@ -216,7 +216,7 @@
 
     /* setup extensions menu */
     /* Let the ExtensionsManager itself build the menu */
-    ExtensionsManager *extMgr = [[VLCMain sharedInstance] extensionsManager];
+    VLCExtensionsManager *extMgr = [[VLCMain sharedInstance] extensionsManager];
     [extMgr buildMenu:_extensionsMenu];
     [_extensions setEnabled: ([_extensionsMenu numberOfItems] > 0)];
 

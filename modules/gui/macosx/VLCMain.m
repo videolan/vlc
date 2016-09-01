@@ -56,7 +56,7 @@
 #import "simple_prefs.h"
 #import "VLCCoreInteraction.h"
 #import "VLCTrackSynchronizationWindowController.h"
-#import "ExtensionsManager.h"
+#import "VLCExtensionsManager.h"
 #import "BWQuincyManager.h"
 #import "VLCResumeDialogController.h"
 #import "VLCDebugMessageWindowController.h"
@@ -177,7 +177,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCAudioEffectsWindowController *_audioEffectsPanel;
     VLCVideoEffectsWindowController *_videoEffectsPanel;
     VLCConvertAndSaveWindowController *_convertAndSaveWindow;
-    ExtensionsManager *_extensionsManager;
+    VLCExtensionsManager *_extensionsManager;
     VLCInfo *_currentMediaInfoPanel;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
@@ -222,7 +222,7 @@ static VLCMain *sharedInstance = nil;
 
         // first initalize extensions dialog provider, then core dialog
         // provider which will register both at the core
-        _extensionsManager = [[ExtensionsManager alloc] init];
+        _extensionsManager = [[VLCExtensionsManager alloc] init];
         _coredialogs = [[VLCCoreDialogProvider alloc] init];
 
         _mainmenu = [[VLCMainMenu alloc] init];
@@ -524,7 +524,7 @@ static VLCMain *sharedInstance = nil;
     return _input_manager;
 }
 
-- (ExtensionsManager *)extensionsManager
+- (VLCExtensionsManager *)extensionsManager
 {
     return _extensionsManager;
 }

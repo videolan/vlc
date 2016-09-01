@@ -33,7 +33,7 @@ libmacosx_plugin_la_SOURCES = \
 	VLCConvertAndSaveWindowController.h VLCConvertAndSaveWindowController.m \
 	VLCCoreInteraction.h VLCCoreInteraction.m \
 	VLCExtensionsDialogProvider.h VLCExtensionsDialogProvider.m \
-	ExtensionsManager.h ExtensionsManager.m \
+	VLCExtensionsManager.h VLCExtensionsManager.m \
 	VLCFSPanel.h VLCFSPanel.m \
 	VLCHelpWindowController.h VLCHelpWindowController.m \
 	VLCMain+OldPrefs.h VLCMain+OldPrefs.m \

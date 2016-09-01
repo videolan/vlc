@@ -1,5 +1,5 @@
 /*****************************************************************************
- * extensions_manager.h: Extensions manager for Cocoa
+ * VLCExtensionsManager.h: Extensions manager for Cocoa
  ****************************************************************************
  * Copyright (C) 2012 VideoLAN and authors
  * $Id$
@@ -38,7 +38,7 @@
 - (void)extensionsUpdated;
 @end
 
-@interface ExtensionsManager : NSObject
+@interface VLCExtensionsManager : NSObject
 
 - (void)buildMenu:(NSMenu *)extMenu;
 

@@ -23,7 +23,7 @@
 
 #import "VLCCoreInteraction.h"
 #import "CompatibilityFixes.h"
-#import "ExtensionsManager.h"
+#import "VLCExtensionsManager.h"
 #import "VLCMain.h"
 #import "VLCMainMenu.h"
 #import "VLCMainWindow.h"

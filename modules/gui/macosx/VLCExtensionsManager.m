@@ -1,5 +1,5 @@
 /*****************************************************************************
- * extensions_manager.cpp: Extensions manager for Cocoa
+ * VLCExtensionsManager.m: Extensions manager for Cocoa
  ****************************************************************************
  * Copyright (C) 2009-2012 VideoLAN and authors
  * $Id$
@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "ExtensionsManager.h"
+#import "VLCExtensionsManager.h"
 
 #import "VLCExtensionsDialogProvider.h"
 
@@ -33,7 +33,7 @@
 #define MENU_GET_ACTION(a) ((uint16_t)(((uint32_t)a) >> 16))
 #define MENU_GET_EXTENSION(a) ((uint16_t)(((uint32_t)a) & 0xFFFF))
 
-@interface ExtensionsManager()
+@interface VLCExtensionsManager()
 {
     extensions_manager_t *p_extensions_manager;
     VLCExtensionsDialogProvider *_extensionDialogProvider;
@@ -46,7 +46,7 @@
 }
 @end
 
-@implementation ExtensionsManager
+@implementation VLCExtensionsManager
 
 - (id)init
 {

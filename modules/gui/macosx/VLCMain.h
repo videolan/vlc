@@ -73,7 +73,7 @@ static NSString * VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySu
 @class VLCAudioEffectsWindowController;
 @class VLCVideoEffectsWindowController;
 @class VLCConvertAndSaveWindowController;
-@class ExtensionsManager;
+@class VLCExtensionsManager;
 @class VLCInfo;
 @class VLCStatusBarIcon;
 
@@ -96,7 +96,7 @@ static NSString * VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySu
 - (VLCCoreDialogProvider *)coreDialogProvider;
 - (VLCResumeDialogController *)resumeDialog;
 - (VLCInputManager *)inputManager;
-- (ExtensionsManager *)extensionsManager;
+- (VLCExtensionsManager *)extensionsManager;
 - (VLCStatusBarIcon *)statusBarIcon;
 
 - (VLCDebugMessageWindowController *)debugMsgPanel;

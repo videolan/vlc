@@ -27,7 +27,7 @@
 #import "VLCExtensionsDialogProvider.h"
 
 #import "VLCMain.h"
-#import "ExtensionsManager.h"
+#import "VLCExtensionsManager.h"
 #import "misc.h"
 #import "VLCUIWidgets.h"
 
