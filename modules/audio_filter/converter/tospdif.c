@@ -37,6 +37,8 @@
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 
+#include "../packetizer/a52.h"
+
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -52,9 +54,18 @@ struct filter_sys_t
 {
     block_t *p_chain_first;
     block_t **pp_chain_last;
+
+    union
+    {
+        struct
+        {
+            unsigned int i_nb_blocks_substream0;
+        } eac3;
+    } spec;
 };
 
 #define IEC61937_AC3 0x01
+#define IEC61937_EAC3 0x15
 #define IEC61937_DTS1 0x0B
 #define IEC61937_DTS2 0x0C
 #define IEC61937_DTS3 0x0D
@@ -81,6 +92,45 @@ static int parse_header_ac3( filter_t *p_filter, block_t *p_in,
     p_res->i_data_type = ( (p_in->p_buffer[5] & 0x7) << 8 ) /* bsmod */
                    | IEC61937_AC3;
     return SPDIF_SUCCESS;
+}
+
+static int parse_header_eac3( filter_t *p_filter, block_t *p_in,
+                              struct hdr_res *p_res )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    vlc_a52_header_t a52 = { };
+    if( vlc_a52_header_Parse( &a52, p_in->p_buffer, p_in->i_buffer )
+        != VLC_SUCCESS )
+        return SPDIF_ERROR;
+
+    p_in->i_buffer = a52.i_size;
+    p_in->i_nb_samples = a52.i_samples;
+
+    if( a52.b_eac3 )
+    {
+        if( ( a52.eac3.strmtyp == EAC3_STRMTYP_INDEPENDENT
+           || a52.eac3.strmtyp == EAC3_STRMTYP_AC3_CONVERT )
+         && a52.i_blocks_per_sync_frame != 6 )
+        {
+            /* cf. Annex E 2.3.1.2 of AC3 spec */
+            if( a52.eac3.i_substreamid == 0 )
+                p_sys->spec.eac3.i_nb_blocks_substream0
+                    += a52.i_blocks_per_sync_frame;
+
+            if( p_sys->spec.eac3.i_nb_blocks_substream0 != 6 )
+                return SPDIF_MORE_DATA;
+            else
+                p_sys->spec.eac3.i_nb_blocks_substream0 = 0;
+        }
+        p_res->i_out_size_padded = AOUT_SPDIF_SIZE * 4;
+        p_res->i_data_type = IEC61937_EAC3;
+        p_res->i_length_mul = 1; /* in bytes */
+        return SPDIF_SUCCESS;
+    }
+    else
+        return SPDIF_MORE_DATA;
+
 }
 
 static int parse_header_dts( filter_t *p_filter, block_t *p_in,
@@ -115,6 +165,8 @@ static int parse_header( filter_t *p_filter, block_t *p_in,
     {
         case VLC_CODEC_A52:
             return parse_header_ac3( p_filter, p_in, p_res );
+        case VLC_CODEC_EAC3:
+            return parse_header_eac3( p_filter, p_in, p_res );
         case VLC_CODEC_DTS:
             return parse_header_dts( p_filter, p_in, p_res );
         default:
@@ -127,6 +179,7 @@ static bool is_big_endian( filter_t *p_filter, block_t *p_in )
     switch( p_filter->fmt_in.audio.i_format )
     {
         case VLC_CODEC_A52:
+        case VLC_CODEC_EAC3:
             return true;
         case VLC_CODEC_DTS:
             return p_in->p_buffer[0] == 0x1F || p_in->p_buffer[0] == 0x7F;
@@ -145,6 +198,7 @@ static void Flush( filter_t *p_filter )
         p_sys->p_chain_first = NULL;
         p_sys->pp_chain_last = &p_sys->p_chain_first;
     }
+    memset( &p_sys->spec, 0, sizeof( p_sys->spec ) );
 }
 
 static block_t *fill_output_buffer( filter_t *p_filter, struct hdr_res *p_res )
@@ -264,7 +318,8 @@ static int Open( vlc_object_t *p_this )
     filter_sys_t *p_sys;
 
     if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_DTS &&
-          p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 ) ||
+          p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 &&
+          p_filter->fmt_in.audio.i_format != VLC_CODEC_EAC3 ) ||
         ( p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFL &&
           p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFB ) )
         return VLC_EGENERIC;
@@ -274,6 +329,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->p_chain_first = NULL;
     p_sys->pp_chain_last = &p_sys->p_chain_first;
+
+    memset( &p_sys->spec, 0, sizeof( p_sys->spec ) );
 
     p_filter->pf_audio_filter = DoWork;
     p_filter->pf_flush = Flush;
