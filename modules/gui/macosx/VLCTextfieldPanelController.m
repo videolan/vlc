@@ -1,5 +1,5 @@
 /*****************************************************************************
- * SharedDialogs.m: MacOS X interface module
+ * VLCTextfieldPanelController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2012 Felix Paul Kühne
  * $Id$
@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "SharedDialogs.h"
+#import "VLCTextfieldPanelController.h"
 
 @interface VLCTextfieldPanelController()
 {
@@ -58,49 +58,6 @@
     [_cancelButton setTitle:self.cancelButtonString];
     [_okButton setTitle:self.okButtonString];
     [_textField setStringValue:@""];
-
-    _completionBlock = [handler copy];
-
-    [NSApp beginSheet:self.window modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
-}
-
-@end
-
-@interface VLCPopupPanelController()
-{
-    PopupPanelCompletionBlock _completionBlock;
-}
-@end
-
-@implementation VLCPopupPanelController
-
-- (id)init
-{
-    self = [super initWithWindowNibName:@"PopupPanel"];
-
-    return self;
-}
-
-- (IBAction)windowElementAction:(id)sender
-{
-    [self.window orderOut:sender];
-    [NSApp endSheet: self.window];
-
-    if (_completionBlock)
-        _completionBlock(sender == _okButton ? NSOKButton : NSCancelButton, [_popupButton indexOfSelectedItem]);
-}
-
-- (void)runModalForWindow:(NSWindow *)window completionHandler:(PopupPanelCompletionBlock)handler;
-{
-    [self window];
-
-    [_titleLabel setStringValue:self.titleString];
-    [_subtitleLabel setStringValue:self.subTitleString];
-    [_cancelButton setTitle:self.cancelButtonString];
-    [_okButton setTitle:self.okButtonString];
-    [_popupButton removeAllItems];
-    for (NSString *value in self.popupButtonContent)
-        [[_popupButton menu] addItemWithTitle:value action:nil keyEquivalent:@""];
 
     _completionBlock = [handler copy];
 

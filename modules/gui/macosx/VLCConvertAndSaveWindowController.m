@@ -26,7 +26,8 @@
 #import "VLCMain.h"
 #import "VLCPlaylist.h"
 #import "misc.h"
-#import "SharedDialogs.h"
+#import "VLCPopupPanelController.h"
+#import "VLCTextfieldPanelController.h"
 
 #import <vlc_common.h>
 #import <vlc_url.h>

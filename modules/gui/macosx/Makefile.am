@@ -57,7 +57,8 @@ libmacosx_plugin_la_SOURCES = \
 	PXSourceList.h PXSourceList.m \
 	PXSourceListDataSource.h PXSourceListDelegate.h \
 	SideBarItem.h SideBarItem.m \
-	SharedDialogs.h SharedDialogs.m \
+	VLCPopupPanelController.h VLCPopupPanelController.m \
+	VLCTextfieldPanelController.h VLCTextfieldPanelController.m \
 	simple_prefs.h simple_prefs.m \
 	SPInvocationGrabbing.h SPInvocationGrabbing.m \
 	SPMediaKeyTap.h SPMediaKeyTap.m \

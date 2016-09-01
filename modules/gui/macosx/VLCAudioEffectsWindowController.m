@@ -30,7 +30,8 @@
 #import "VLCAudioEffectsWindowController.h"
 #import "../../audio_filter/equalizer_presets.h"
 #import "CompatibilityFixes.h"
-#import "SharedDialogs.h"
+#import "VLCPopupPanelController.h"
+#import "VLCTextfieldPanelController.h"
 
 #import <vlc_common.h>
 

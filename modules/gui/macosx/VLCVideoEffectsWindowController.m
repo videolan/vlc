@@ -24,7 +24,8 @@
 #import "CompatibilityFixes.h"
 #import "VLCMain.h"
 #import "VLCVideoEffectsWindowController.h"
-#import "SharedDialogs.h"
+#import "VLCPopupPanelController.h"
+#import "VLCTextfieldPanelController.h"
 #import "VLCCoreInteraction.h"
 
 @interface VLCVideoEffectsWindowController()

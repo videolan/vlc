@@ -33,6 +33,7 @@
 		1C67C8AB1D58EC290079E1C1 /* VLCPLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F41B5599E40052293C /* VLCPLModel.m */; };
 		1C7CB9181D787C4A00388902 /* VLCKeyboardBacklightControl.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812EF1B555C8E0052293C /* VLCKeyboardBacklightControl.h */; };
 		1C7CB9191D787C4A00388902 /* VLCKeyboardBacklightControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F01B555C8E0052293C /* VLCKeyboardBacklightControl.m */; };
+		1C7CB91C1D787E7600388902 /* VLCPopupPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C7CB91B1D787E7600388902 /* VLCPopupPanelController.m */; };
 		1C88BA5419DC7B2200645190 /* yosemite-window-close-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */; };
 		1C88BA5519DC7B2200645190 /* yosemite-window-close-graphite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */; };
 		1C88BA5619DC7B2200645190 /* yosemite-window-close-on-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2619DC7B2200645190 /* yosemite-window-close-on-graphite.png */; };
@@ -419,8 +420,8 @@
 		1CCB5F821A62A724004C3E90 /* prefs_widgets.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */; };
 		1CCB5F831A62A724004C3E90 /* prefs.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28503E2EB1C0059A3A7 /* prefs.h */; };
 		1CCB5F841A62A724004C3E90 /* prefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28603E2EB1C0059A3A7 /* prefs.m */; };
-		1CCB5F851A62A724004C3E90 /* SharedDialogs.h in Sources */ = {isa = PBXBuildFile; fileRef = CC461F6C160078340022423C /* SharedDialogs.h */; };
-		1CCB5F861A62A724004C3E90 /* SharedDialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = CC461F6D160078340022423C /* SharedDialogs.m */; };
+		1CCB5F851A62A724004C3E90 /* VLCTextfieldPanelController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC461F6C160078340022423C /* VLCTextfieldPanelController.h */; };
+		1CCB5F861A62A724004C3E90 /* VLCTextfieldPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC461F6D160078340022423C /* VLCTextfieldPanelController.m */; };
 		1CCB5F871A62A724004C3E90 /* simple_prefs.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5E0D54BBAE004D780C /* simple_prefs.h */; };
 		1CCB5F881A62A724004C3E90 /* simple_prefs.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5D0D54BBAE004D780C /* simple_prefs.m */; };
 		1CCB5F891A62A724004C3E90 /* VLCStringUtility.h in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4615E7947F00F2FDC9 /* VLCStringUtility.h */; };
@@ -912,6 +913,8 @@
 		1C67C8A41D58C0980079E1C1 /* VLCHelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCHelpWindowController.m; path = ../../../modules/gui/macosx/VLCHelpWindowController.m; sourceTree = "<group>"; };
 		1C67C8A61D58C0A40079E1C1 /* VLCAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCAboutWindowController.h; path = ../../../modules/gui/macosx/VLCAboutWindowController.h; sourceTree = "<group>"; };
 		1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCAboutWindowController.m; path = ../../../modules/gui/macosx/VLCAboutWindowController.m; sourceTree = "<group>"; };
+		1C7CB91A1D787E7600388902 /* VLCPopupPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCPopupPanelController.h; path = ../../../modules/gui/macosx/VLCPopupPanelController.h; sourceTree = "<group>"; };
+		1C7CB91B1D787E7600388902 /* VLCPopupPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCPopupPanelController.m; path = ../../../modules/gui/macosx/VLCPopupPanelController.m; sourceTree = "<group>"; };
 		1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-graphite.png"; sourceTree = "<group>"; };
 		1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-graphite@2x.png"; sourceTree = "<group>"; };
 		1C88BA2619DC7B2200645190 /* yosemite-window-close-on-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-on-graphite.png"; sourceTree = "<group>"; };
@@ -1584,8 +1587,8 @@
 		CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCCoreInteraction.m; path = ../../../modules/gui/macosx/VLCCoreInteraction.m; sourceTree = SOURCE_ROOT; };
 		CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCMainWindow.h; path = ../../../modules/gui/macosx/VLCMainWindow.h; sourceTree = SOURCE_ROOT; };
 		CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VLCMainWindow.m; path = ../../../modules/gui/macosx/VLCMainWindow.m; sourceTree = SOURCE_ROOT; };
-		CC461F6C160078340022423C /* SharedDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SharedDialogs.h; path = ../../../modules/gui/macosx/SharedDialogs.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		CC461F6D160078340022423C /* SharedDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SharedDialogs.m; path = ../../../modules/gui/macosx/SharedDialogs.m; sourceTree = SOURCE_ROOT; };
+		CC461F6C160078340022423C /* VLCTextfieldPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = VLCTextfieldPanelController.h; path = ../../../modules/gui/macosx/VLCTextfieldPanelController.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		CC461F6D160078340022423C /* VLCTextfieldPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCTextfieldPanelController.m; path = ../../../modules/gui/macosx/VLCTextfieldPanelController.m; sourceTree = SOURCE_ROOT; };
 		CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCCoreDialogProvider.m; path = ../../../modules/gui/macosx/VLCCoreDialogProvider.m; sourceTree = SOURCE_ROOT; };
 		CC4A33220F8CB017000FC4A7 /* VLCCoreDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCCoreDialogProvider.h; path = ../../../modules/gui/macosx/VLCCoreDialogProvider.h; sourceTree = SOURCE_ROOT; };
 		CC4D67F71348F601003FCC5B /* specific.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
@@ -1944,8 +1947,10 @@
 				8ED6C28603E2EB1C0059A3A7 /* prefs.m */,
 				633121CA1B51122700E636DA /* VLCResumeDialogController.h */,
 				633121CB1B51122700E636DA /* VLCResumeDialogController.m */,
-				CC461F6C160078340022423C /* SharedDialogs.h */,
-				CC461F6D160078340022423C /* SharedDialogs.m */,
+				CC461F6C160078340022423C /* VLCTextfieldPanelController.h */,
+				CC461F6D160078340022423C /* VLCTextfieldPanelController.m */,
+				1C7CB91A1D787E7600388902 /* VLCPopupPanelController.h */,
+				1C7CB91B1D787E7600388902 /* VLCPopupPanelController.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
 				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
 				CC269A4615E7947F00F2FDC9 /* VLCStringUtility.h */,
@@ -3990,6 +3995,7 @@
 				1CCB5F651A62A724004C3E90 /* VLCCoreDialogProvider.m in Sources */,
 				1CCB5F661A62A724004C3E90 /* VLCCoreInteraction.h in Sources */,
 				6BBBB8AA1D108A17001BD9BA /* VLCRendererDialog.m in Sources */,
+				1C7CB91C1D787E7600388902 /* VLCPopupPanelController.m in Sources */,
 				1CCB5F671A62A724004C3E90 /* VLCCoreInteraction.m in Sources */,
 				1CCB5F681A62A724004C3E90 /* VLCDebugMessageWindowController.h in Sources */,
 				1CCB5F691A62A724004C3E90 /* VLCDebugMessageWindowController.m in Sources */,
@@ -4029,8 +4035,8 @@
 				1CCB5F821A62A724004C3E90 /* prefs_widgets.m in Sources */,
 				1CCB5F831A62A724004C3E90 /* prefs.h in Sources */,
 				1CCB5F841A62A724004C3E90 /* prefs.m in Sources */,
-				1CCB5F851A62A724004C3E90 /* SharedDialogs.h in Sources */,
-				1CCB5F861A62A724004C3E90 /* SharedDialogs.m in Sources */,
+				1CCB5F851A62A724004C3E90 /* VLCTextfieldPanelController.h in Sources */,
+				1CCB5F861A62A724004C3E90 /* VLCTextfieldPanelController.m in Sources */,
 				1CCB5F871A62A724004C3E90 /* simple_prefs.h in Sources */,
 				1CCB5F881A62A724004C3E90 /* simple_prefs.m in Sources */,
 				1CCB5F891A62A724004C3E90 /* VLCStringUtility.h in Sources */,

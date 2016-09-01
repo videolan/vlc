@@ -1,5 +1,5 @@
 /*****************************************************************************
- * SharedDialogs.h: MacOS X interface module
+ * VLCTextfieldPanelController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2012 Felix Paul Kühne
  * $Id$
@@ -49,39 +49,6 @@ typedef void(^TextfieldPanelCompletionBlock)(NSInteger returnCode, NSString *res
  * \param handler Completion block.
  */
 - (void)runModalForWindow:(NSWindow *)window completionHandler:(TextfieldPanelCompletionBlock)handler;
-
-- (IBAction)windowElementAction:(id)sender;
-
-@end
-
-
-@interface VLCPopupPanelController : NSWindowController
-
-@property (weak) IBOutlet NSTextField *titleLabel;
-@property (weak) IBOutlet NSTextField *subtitleLabel;
-@property (weak) IBOutlet NSPopUpButton *popupButton;
-@property (weak) IBOutlet NSButton *cancelButton;
-@property (weak) IBOutlet NSButton *okButton;
-
-@property (readwrite, assign) NSString *titleString;
-@property (readwrite, assign) NSString *subTitleString;
-@property (readwrite, assign) NSString *okButtonString;
-@property (readwrite, assign) NSString *cancelButtonString;
-@property (readwrite, assign) NSArray *popupButtonContent;
-
-/**
- * Completion handler for popup panel
- * \param returnCode Result from panel. Can be NSOKButton or NSCancelButton.
- * \param selectedIndex Selected index of the popup in panel.
- */
-typedef void(^PopupPanelCompletionBlock)(NSInteger returnCode, NSInteger selectedIndex);
-
-/**
- * Shows the panel as a modal dialog with window as its owner.
- * \param window Parent window for the dialog.
- * \param handler Completion block.
- */
-- (void)runModalForWindow:(NSWindow *)window completionHandler:(PopupPanelCompletionBlock)handler;
 
 - (IBAction)windowElementAction:(id)sender;
 
