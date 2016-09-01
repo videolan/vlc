@@ -54,6 +54,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
 {
     input_item_t *p_input = p_event->p_obj;
     playlist_t *p_playlist = (( playlist_item_t* ) user_data)->p_playlist;
+    playlist_private_t *p_sys = pl_priv( p_playlist );
     input_item_node_t *p_new_root = p_event->u.input_item_subitem_tree_added.p_root;
 
     PL_LOCK;
@@ -91,6 +92,8 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
     /* If we have to flatten out, then take the item's position in the parent as
     insertion point and delete the item */
 
+    bool b_redirect_request = false;
+
     if( b_flat )
     {
         playlist_item_t *p_parent = p_item->p_parent;
@@ -109,6 +112,17 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
 
         playlist_DeleteItem( p_playlist, p_item, true );
 
+        /* If there is a pending request referring to the item we just deleted
+         * it needs to be updated so that we do not try to play an entity that
+         * is no longer part of the playlist. */
+
+        if( p_sys->request.b_request &&
+            ( p_sys->request.p_item == p_item ||
+              p_sys->request.p_node == p_item ) )
+        {
+            b_redirect_request = true;
+        }
+
         p_item = p_parent;
     }
     else
@@ -125,6 +139,22 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
                                                  p_new_root,
                                                  pos,
                                                  b_flat );
+    if( b_redirect_request )
+    {
+        /* a redirect of the pending request is required, as such we update the
+         * request to refer to the item that would have been the next in line
+         * (if any). */
+
+        assert( b_flat );
+
+        playlist_item_t* p_redirect = NULL;
+
+        if( p_item->i_children > pos )
+            p_redirect = p_item->pp_children[pos];
+
+        p_sys->request.p_item = p_redirect;
+        p_sys->request.p_node = NULL;
+    }
 
     if( !b_flat ) var_SetInteger( p_playlist, "leaf-to-parent", p_item->i_id );
 
