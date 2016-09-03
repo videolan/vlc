@@ -139,17 +139,19 @@ end:
 static char *ArtCacheName( input_item_t *p_item, const char *psz_type )
 {
     char *psz_path = ArtCachePath( p_item );
-    if( !psz_path )
-        return NULL;
+    char *psz_ext = strdup( psz_type ? psz_type : "" );
+    char *psz_filename = NULL;
+
+    if( unlikely( !psz_path || !psz_ext ) )
+        goto end;
 
     ArtCacheCreateDir( psz_path );
-
-    char *psz_ext = strdup( psz_type ? psz_type : "" );
     filename_sanitize( psz_ext );
-    char *psz_filename;
+
     if( asprintf( &psz_filename, "%s" DIR_SEP "art%s", psz_path, psz_ext ) < 0 )
         psz_filename = NULL;
 
+end:
     free( psz_ext );
     free( psz_path );
 
