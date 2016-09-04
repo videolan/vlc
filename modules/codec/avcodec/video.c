@@ -854,23 +854,9 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if( p_block->i_buffer <= 0 )
                 eos_spotted = false;
 
-            if( i_used < 0 )
-            {
-                av_frame_free(&frame);
-                if( b_need_output_picture )
-                    msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
-                            p_block->i_buffer );
-                break;
-            }
-            else if( (unsigned)i_used > p_block->i_buffer ||
-                    p_context->thread_count > 1 )
-            {
-                i_used = p_block->i_buffer;
-            }
-
             /* Consumed bytes */
-            p_block->i_buffer -= i_used;
-            p_block->p_buffer += i_used;
+            p_block->p_buffer += p_block->i_buffer;
+            p_block->i_buffer = 0;
         }
 
         /* Nothing to display */
