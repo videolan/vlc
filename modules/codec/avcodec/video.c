@@ -338,14 +338,10 @@ static int OpenVideoCodec( decoder_t *p_dec )
 
     p_sys->p_context->width  = p_dec->fmt_in.video.i_visible_width;
     p_sys->p_context->height = p_dec->fmt_in.video.i_visible_height;
-    if (p_sys->p_context->width  == 0)
-        p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
-    else if (p_sys->p_context->width != p_dec->fmt_in.video.i_width)
-        p_sys->p_context->coded_width = p_dec->fmt_in.video.i_width;
-    if (p_sys->p_context->height == 0)
-        p_sys->p_context->height = p_dec->fmt_in.video.i_height;
-    else if (p_sys->p_context->height != p_dec->fmt_in.video.i_height)
-        p_sys->p_context->coded_height = p_dec->fmt_in.video.i_height;
+
+    p_sys->p_context->coded_width = p_dec->fmt_in.video.i_width;
+    p_sys->p_context->coded_height = p_dec->fmt_in.video.i_height;
+
     p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
     p_sys->pix_fmt = AV_PIX_FMT_NONE;
     p_sys->profile = -1;
