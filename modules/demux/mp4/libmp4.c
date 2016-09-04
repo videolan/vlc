@@ -295,11 +295,14 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         return 0;
     }
 
+    uint64_t i_last_pos = 0; /* used to detect read failure loops */
     const uint64_t i_end = p_container->i_pos + p_container->i_size;
     MP4_Box_t *p_box = NULL;
     bool b_onexclude = false;
+    bool b_continue;
     do
     {
+        b_continue = false;
         if ( p_container->i_size )
         {
             const uint64_t i_tell = vlc_stream_Tell( p_stream );
@@ -318,6 +321,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         b_onexclude = false; /* If stopped due exclude list */
         if( (p_box = MP4_ReadBoxRestricted( p_stream, p_container, NULL, excludelist, &b_onexclude )) )
         {
+            b_continue = true;
             p_box->i_index = i_index;
             for(size_t i=0; stoplist && stoplist[i]; i++)
             {
@@ -326,17 +330,23 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
             }
         }
 
-        if ( p_container->i_size )
+        const uint64_t i_tell = vlc_stream_Tell( p_stream );
+        if ( p_container->i_size && i_tell >= i_end )
         {
-            const uint64_t i_tell = vlc_stream_Tell( p_stream );
-            if( i_tell >= i_end )
-            {
-                assert( i_tell == i_end );
-                break;
-            }
+            assert( i_tell == i_end );
+            break;
         }
 
-    } while( p_box );
+        if ( !p_box )
+        {
+            /* Continue with next if box fails to load */
+            if( i_last_pos == i_tell )
+                break;
+            i_last_pos = i_tell;
+            b_continue = true;
+        }
+
+    } while( b_continue );
 
     /* Always move to end of container */
     if ( !b_onexclude &&  p_container->i_size )
