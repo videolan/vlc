@@ -3560,10 +3560,14 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
 {
     uint8_t meta_data[8];
     int i_actually_read;
+    const size_t i_headersize = mp4_box_headersize( p_box );
+
+    if( p_box->i_size < 8 || p_box->i_size - i_headersize < 4 )
+        return 0;
 
     // skip over box header
-    i_actually_read = vlc_stream_Read( p_stream, meta_data, 8 );
-    if( i_actually_read < 8 )
+    i_actually_read = vlc_stream_Read( p_stream, meta_data, i_headersize );
+    if( i_actually_read < i_headersize )
         return 0;
 
     if ( p_box->p_father && p_box->p_father->i_type == ATOM_udta ) /* itunes udta/meta */
