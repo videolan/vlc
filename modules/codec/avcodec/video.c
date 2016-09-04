@@ -795,7 +795,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     while( !p_block || p_block->i_buffer > 0 || eos_spotted )
     {
-        int i_used, b_gotpicture;
+        int i_used;
         AVPacket pkt;
 
         AVFrame *frame = av_frame_alloc();
@@ -838,9 +838,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_block->i_dts = VLC_TS_INVALID;
         }
 
-        i_used = avcodec_decode_video2( p_context, frame, &b_gotpicture,
-                                        &pkt );
-        av_free_packet( &pkt );
+        int not_able_to_send_packet = avcodec_send_packet( p_context, &pkt );
+        av_packet_unref( &pkt );
+
+        int not_received_frame = avcodec_receive_frame( p_context, frame);
+        i_used = p_block->i_size;
 
         wait_mt( p_sys );
 
@@ -872,7 +874,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
 
         /* Nothing to display */
-        if( !b_gotpicture )
+        if( not_received_frame )
         {
             av_frame_unref(frame);
             if( i_used == 0 ) break;
