@@ -323,7 +323,15 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         pkt.data = p_block->p_buffer;
         pkt.size = p_block->i_buffer;
 
-        int used = avcodec_decode_audio4( ctx, frame, &got_frame, &pkt );
+        int used = avcodec_send_packet( ctx, &pkt );
+        if( used < 0 )
+        {
+            msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
+                      p_block->i_buffer );
+            goto end;
+        }
+        used = avcodec_receive_frame( ctx, frame );
+        got_frame = used == 0;
         if( used < 0 )
         {
             msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
