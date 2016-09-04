@@ -493,7 +493,7 @@ AS_IF([test "${enable_shared}" = "no" -a "${enable_vlc}" != "no"], [
 dnl
 dnl Gettext stuff
 dnl
-AM_GNU_GETTEXT_VERSION([0.19.6])
+AM_GNU_GETTEXT_VERSION([0.19.7])
 AM_GNU_GETTEXT([external], [need-formatstring-macros])
 
 dnl
@@ -4255,6 +4255,7 @@ AC_CONFIG_FILES([
   modules/gui/qt/Makefile
   modules/gui/skins2/Makefile
   modules/hw/mmal/Makefile
+  share/vlc.appdata.xml.in
 ])
 
 AM_COND_IF([HAVE_WIN32], [
