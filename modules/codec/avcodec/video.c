@@ -874,7 +874,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         /* Nothing to display */
         if( !b_gotpicture )
         {
-            av_frame_free(&frame);
+            av_frame_unref(frame);
             if( i_used == 0 ) break;
             continue;
         }
@@ -897,7 +897,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         if( !b_need_output_picture || ( !p_sys->p_va && !frame->linesize[0] ) )
         {
-            av_frame_free(&frame);
+            av_frame_unref(frame);
             continue;
         }
 
@@ -913,7 +913,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
             if( !p_pic )
             {
-                av_frame_free(&frame);
+                av_frame_unref(frame);
                 break;
             }
 
@@ -949,7 +949,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_pic->b_progressive = !frame->interlaced_frame;
         p_pic->b_top_field_first = frame->top_field_first;
 
-        av_frame_free(&frame);
+        av_frame_unref(frame);
 
         /* Send decoded frame to vout */
         if (i_pts > VLC_TS_INVALID)
