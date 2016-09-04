@@ -2,14 +2,14 @@ CLEANFILES = skins2/default.vlt
 MOSTLYCLEANFILES =
 EXTRA_DIST =
 
-appdatadir = $(datadir)/applications
+desktopdir = $(datadir)/applications
 if !HAVE_WIN32
 if !HAVE_DARWIN
-appdata_DATA = vlc.desktop
+desktop_DATA = vlc.desktop
 endif
 endif
 EXTRA_DIST += vlc.desktop.in vlc.desktop.mimetypes
-CLEANFILES += $(appdata_DATA)
+CLEANFILES += $(desktop_DATA)
 
 vlc.desktop: vlc.desktop.in $(top_builddir)/config.status
 	$(AM_V_GEN)sed -e 's,\@bindir\@,$(bindir),g' < "$<" > tmp-$@
