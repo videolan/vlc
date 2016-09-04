@@ -2374,15 +2374,6 @@ AM_CONDITIONAL([HAVE_VAAPI_X11], [test "${have_vaapi_x11}" = "yes"])
 
 have_avcodec_vaapi="no"
 AS_IF([test "${have_vaapi}" = "yes" -a "${have_avcodec}" = "yes"], [
-  case "${avfork}" in
-    ffmpeg)
-      PKG_CHECK_EXISTS([libavcodec >= 57.10.100], [
-        PKG_CHECK_EXISTS([libavcodec <= 57.12.100], [
-          AC_MSG_ERROR([VA API requires FFmpeg libavcodec < 57.10 or > 57.12 or libav.])
-        ])
-      ])
-      ;;
-  esac
   VLC_SAVE_FLAGS
   CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
   CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
