@@ -116,9 +116,7 @@ struct vlc_va_sys_t
     DXGI_FORMAT                  render;
 
     ID3D11DeviceContext          *d3dctx;
-#if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
     HANDLE                       context_mutex;
-#endif
 
     /* Video decoder */
     D3D11_VIDEO_DECODER_CONFIG   cfg;
@@ -181,9 +179,7 @@ void SetupAVCodecContext(vlc_va_t *va)
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface_count = dx_sys->surface_count;
     sys->hw.surface = (ID3D11VideoDecoderOutputView**) dx_sys->hw_surface;
-#if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
     sys->hw.context_mutex = sys->context_mutex;
-#endif
 
     if (IsEqualGUID(&dx_sys->input, &DXVA_Intel_H264_NoFGT_ClearVideo))
         sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
@@ -261,11 +257,9 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
         assert(p_sys_out->texture != NULL);
         assert(p_sys_in->decoder == src);
 
-#if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
         if( sys->context_mutex != INVALID_HANDLE_VALUE ) {
             WaitForSingleObjectEx( sys->context_mutex, INFINITE, FALSE );
         }
-#endif
 
 #ifdef ID3D11VideoContext_VideoProcessorBlt
         if (sys->videoProcessor)
@@ -340,11 +334,9 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
 
 
 done:
-#if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
     if( sys->context_mutex  != INVALID_HANDLE_VALUE ) {
         ReleaseMutex( sys->context_mutex );
     }
-#endif
 
     return ret;
 }
@@ -452,14 +444,12 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
            msg_Err(va, "Could not Query ID3D11VideoDevice Interface from the picture. (hr=0x%lX)", hr);
         } else {
             ID3D11DeviceContext_GetDevice( p_sys->context, (ID3D11Device**) &dx_sys->d3ddev );
-#if LIBAVCODEC_VERSION_CHECK(57, 2, 0, 3, 100)
             HANDLE context_lock = INVALID_HANDLE_VALUE;
             UINT dataSize = sizeof(context_lock);
             hr = ID3D11Device_GetPrivateData((ID3D11Device*)dx_sys->d3ddev, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
             if (FAILED(hr))
                 msg_Warn(va, "No mutex found to lock the decoder");
             sys->context_mutex = context_lock;
-#endif
 
             sys->d3dctx = p_sys->context;
             sys->d3dvidctx = d3dvidctx;
