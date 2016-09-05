@@ -250,6 +250,7 @@ typedef enum video_transfer_func_t
     TRANSFER_FUNC_LINEAR,
     TRANSFER_FUNC_SRGB /*< Gamma 2.2 */,
     TRANSFER_FUNC_BT709,
+    TRANSFER_FUNC_SMPTE_ST2084,
 #define TRANSFER_FUNC_BT2020 TRANSFER_FUNC_BT709
 } video_transfer_func_t;
 
