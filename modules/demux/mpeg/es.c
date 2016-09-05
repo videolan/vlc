@@ -39,6 +39,7 @@
 
 #include "../../packetizer/a52.h"
 #include "../../packetizer/dts_header.h"
+#include "../meta_engine/ID3Tag.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -854,24 +855,6 @@ static double MpgaXingLameConvertPeak( uint32_t x )
     return x / 8388608.0; /* pow(2, 23) */
 }
 
-static uint32_t ID3ReadSize( const uint8_t *p_buffer, bool b_syncsafe )
-{
-    if( !b_syncsafe )
-        return GetDWBE( p_buffer );
-    return ( (uint32_t)p_buffer[3] & 0x7F ) |
-            (( (uint32_t)p_buffer[2] & 0x7F ) << 7) |
-            (( (uint32_t)p_buffer[1] & 0x7F ) << 14) |
-            (( (uint32_t)p_buffer[0] & 0x7F ) << 21);
-}
-
-static bool ID3IsTag( const uint8_t *p_buffer )
-{
-    return( memcmp(p_buffer, "ID3", 3) == 0 &&
-            p_buffer[3] < 0xFF &&
-            p_buffer[4] < 0xFF &&
-           ((GetDWBE(&p_buffer[6]) & 0x80808080) == 0) );
-}
-
 static uint64_t SeekByMlltTable( demux_t *p_demux, mtime_t *pi_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -899,6 +882,41 @@ static uint64_t SeekByMlltTable( demux_t *p_demux, mtime_t *pi_time )
     return p_cur->i_pos;
 }
 
+static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_t i_payload, void *p_priv )
+{
+    demux_t *p_demux = (demux_t *) p_priv;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    msg_Err( p_demux, "Callback %4.4s", (char*) &i_tag);
+    if( i_tag == VLC_FOURCC('M', 'L', 'L', 'T') )
+    {
+        if( i_payload > 20 )
+        {
+            p_sys->mllt.i_frames_btw_refs = GetWBE(p_payload);
+            p_sys->mllt.i_bytes_btw_refs = GetDWBE(&p_payload[1]) & 0x00FFFFFF;
+            p_sys->mllt.i_ms_btw_refs = GetDWBE(&p_payload[4]) & 0x00FFFFFF;
+            if( !p_sys->mllt.i_frames_btw_refs || !p_sys->mllt.i_bytes_btw_refs ||
+                    !p_sys->mllt.i_ms_btw_refs ||
+                    p_payload[8] > 31 || p_payload[9] > 31 || /* bits length sanity check */
+                    ((p_payload[8] + p_payload[9]) % 4) || p_payload[8] + p_payload[9] < 4 )
+                return VLC_EGENERIC;
+            p_sys->mllt.i_bits_per_bytes_dev = p_payload[8];
+            p_sys->mllt.i_bits_per_ms_dev = p_payload[9];
+            p_sys->mllt.p_bits = malloc(i_payload - 10);
+            if( likely(p_sys->mllt.p_bits) )
+            {
+                p_sys->mllt.i_bits = i_payload - 10;
+                memcpy(p_sys->mllt.p_bits, &p_payload[10], p_sys->mllt.i_bits);
+                msg_Dbg(p_demux, "read MLLT sync table with %zu entries",
+                        (p_sys->mllt.i_bits * 8) / (p_sys->mllt.i_bits_per_bytes_dev + p_sys->mllt.i_bits_per_ms_dev) );
+            }
+        }
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
 static int ID3Parse( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -911,45 +929,10 @@ static int ID3Parse( demux_t *p_demux )
         vlc_stream_Seek( p_demux->s, 0 ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
-    if( vlc_stream_Peek( p_demux->s, &p_peek, p_sys->i_stream_offset ) == p_sys->i_stream_offset &&
-        ID3IsTag( p_peek ) )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, p_sys->i_stream_offset ) == p_sys->i_stream_offset )
     {
-        const bool b_syncsafe = p_peek[5] & 0x80;
-        uint32_t i_peek = ID3ReadSize( &p_peek[6], true );
-        if( i_peek > p_sys->i_stream_offset - 10 )
-            return VLC_EGENERIC;
-        const uint8_t *p_frame = &p_peek[10];
-        while( i_peek > 10 )
-        {
-            uint32_t i_framesize = ID3ReadSize( &p_frame[4], b_syncsafe ) + 10;
-            if( i_framesize > i_peek )
-                return VLC_EGENERIC;
-            if( i_framesize > 24 && !memcmp(p_frame, "MLLT", 4) )
-            {
-                const uint8_t *p_payload = &p_frame[10];
-                p_sys->mllt.i_frames_btw_refs = GetWBE(p_payload);
-                p_sys->mllt.i_bytes_btw_refs = GetDWBE(&p_payload[1]) & 0x00FFFFFF;
-                p_sys->mllt.i_ms_btw_refs = GetDWBE(&p_payload[4]) & 0x00FFFFFF;
-                if( !p_sys->mllt.i_frames_btw_refs || !p_sys->mllt.i_bytes_btw_refs ||
-                    !p_sys->mllt.i_ms_btw_refs ||
-                    p_payload[8] > 31 || p_payload[9] > 31 || /* bits length sanity check */
-                    ((p_payload[8] + p_payload[9]) % 4) || p_payload[8] + p_payload[9] < 4 )
-                    return VLC_EGENERIC;
-                p_sys->mllt.i_bits_per_bytes_dev = p_payload[8];
-                p_sys->mllt.i_bits_per_ms_dev = p_payload[9];
-                p_sys->mllt.p_bits = malloc(i_framesize - 20);
-                if( likely(p_sys->mllt.p_bits) )
-                {
-                    p_sys->mllt.i_bits = i_framesize - 20;
-                    memcpy(p_sys->mllt.p_bits, &p_frame[20], p_sys->mllt.i_bits);
-                    msg_Dbg(p_demux, "read MLLT sync table with %zu entries",
-                            (p_sys->mllt.i_bits * 8) / (p_sys->mllt.i_bits_per_bytes_dev + p_sys->mllt.i_bits_per_ms_dev) );
-                }
-                break;
-            }
-            p_frame += i_framesize;
-            i_peek -= i_framesize;
-        }
+        (size_t) ID3TAG_Parse( p_peek, p_sys->i_stream_offset,
+                               ID3TAG_Parse_Handler, (void *) p_demux );
     }
 
     return vlc_stream_Seek( p_demux->s, p_sys->i_stream_offset );
