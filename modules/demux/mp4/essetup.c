@@ -562,6 +562,27 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
         }
 
+        case ATOM_vp08:
+        case ATOM_vp09:
+        case ATOM_vp10:
+        {
+            const MP4_Box_t *p_vpcC = MP4_BoxGet(  p_sample, "vpcC" );
+            if( p_vpcC && BOXDATA(p_vpcC) )
+            {
+                const MP4_Box_data_vpcC_t *p_data = BOXDATA(p_vpcC);
+                if( p_sample->i_type == ATOM_vp10 )
+                    p_track->fmt.i_codec = VLC_CODEC_VP10;
+                else if( p_sample->i_type == ATOM_vp09 )
+                    p_track->fmt.i_codec = VLC_CODEC_VP9;
+                else
+                    p_track->fmt.i_codec = VLC_CODEC_VP8;
+                p_track->fmt.i_profile = p_data->i_profile;
+                p_track->fmt.i_level = p_data->i_level;
+                p_track->fmt.i_extra = p_data->i_codec_init_datasize;
+                memcpy( p_track->fmt.p_extra, p_data->p_codec_init_data, p_data->i_codec_init_datasize );
+            }
+        }
+
         case ATOM_WMV3:
         {
             MP4_Box_t *p_strf = MP4_BoxGet(  p_sample, "strf", 0 );
