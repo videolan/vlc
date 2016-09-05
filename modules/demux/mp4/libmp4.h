@@ -218,11 +218,15 @@ typedef int64_t stime_t;
 #define ATOM_vp31 VLC_FOURCC( 'v', 'p', '3', '1' )
 #define ATOM_h264 VLC_FOURCC( 'h', '2', '6', '4' )
 #define ATOM_qdrw VLC_FOURCC( 'q', 'd', 'r', 'w' )
+#define ATOM_vp08 VLC_FOURCC( 'v', 'p', '0', '8' )
+#define ATOM_vp09 VLC_FOURCC( 'v', 'p', '0', '9' )
+#define ATOM_vp10 VLC_FOURCC( 'v', 'p', '1', '0' )
 #define ATOM_WMV3 VLC_FOURCC( 'W', 'M', 'V', '3' )
 
 #define ATOM_avc1 VLC_FOURCC( 'a', 'v', 'c', '1' )
 #define ATOM_avc3 VLC_FOURCC( 'a', 'v', 'c', '3' )
 #define ATOM_avcC VLC_FOURCC( 'a', 'v', 'c', 'C' )
+#define ATOM_vpcC VLC_FOURCC( 'v', 'p', 'c', 'C' )
 #define ATOM_m4ds VLC_FOURCC( 'm', '4', 'd', 's' )
 
 #define ATOM_fiel VLC_FOURCC( 'f', 'i', 'e', 'l' )
@@ -1235,6 +1239,19 @@ typedef struct
 
 typedef struct
 {
+    uint8_t i_profile;
+    uint8_t i_level;
+    uint8_t i_bit_depth;
+    uint8_t i_color_space;
+    uint8_t i_chroma_subsampling;
+    uint8_t i_xfer_function;
+    uint8_t i_fullrange;
+    uint16_t i_codec_init_datasize;
+    uint8_t *p_codec_init_data;
+} MP4_Box_data_vpcC_t;
+
+typedef struct
+{
     WAVEFORMATEX Format;
     uint32_t i_extra;
     char    *p_extra;
@@ -1579,6 +1596,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_sdtp_t *p_sdtp;
     MP4_Box_data_tsel_t *p_tsel;
     MP4_Box_data_load_t *p_load;
+    MP4_Box_data_vpcC_t *p_vpcC;
 
     MP4_Box_data_tfra_t *p_tfra;
     MP4_Box_data_mfro_t *p_mfro;

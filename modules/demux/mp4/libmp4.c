@@ -1620,6 +1620,41 @@ error:
     MP4_READBOX_EXIT( 0 );
 }
 
+static void MP4_FreeBox_vpcC( MP4_Box_t *p_box )
+{
+    free( p_box->data.p_vpcC->p_codec_init_data );
+}
+
+static int MP4_ReadBox_vpcC( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_vpcC_t, MP4_FreeBox_vpcC );
+    MP4_Box_data_vpcC_t *p_vpcC = p_box->data.p_vpcC;
+
+    if( p_box->i_size < 6 )
+        MP4_READBOX_EXIT( 0 );
+
+    uint8_t i_version;
+    MP4_GET1BYTE( i_version );
+    if( i_version != 0 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GET1BYTE( p_vpcC->i_profile );
+    MP4_GET1BYTE( p_vpcC->i_level );
+    MP4_GET1BYTE( p_vpcC->i_bit_depth );
+    p_vpcC->i_color_space = p_vpcC->i_bit_depth & 0x0F;
+    p_vpcC->i_bit_depth >>= 4;
+    MP4_GET1BYTE( p_vpcC->i_chroma_subsampling );
+    p_vpcC->i_xfer_function = ( p_vpcC->i_chroma_subsampling & 0x0F ) >> 1;
+    p_vpcC->i_fullrange = p_vpcC->i_chroma_subsampling & 0x01;
+    p_vpcC->i_chroma_subsampling >>= 4;
+    MP4_GET2BYTES( p_vpcC->i_codec_init_datasize );
+    if( p_vpcC->i_codec_init_datasize > i_read )
+        p_vpcC->i_codec_init_datasize = i_read;
+    memcpy( p_vpcC->p_codec_init_data, p_peek, i_read );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static void MP4_FreeBox_WMA2( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_WMA2->p_extra );
@@ -4057,6 +4092,9 @@ static const struct
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc1 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc3 },
     { ATOM_hvcC,    MP4_ReadBox_Binary,       0 },
+    { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp08 },
+    { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp09 },
+    { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp10 },
     { ATOM_dac3,    MP4_ReadBox_dac3,         0 },
     { ATOM_dec3,    MP4_ReadBox_dec3,         0 },
     { ATOM_dvc1,    MP4_ReadBox_dvc1,         ATOM_vc1  },
