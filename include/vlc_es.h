@@ -262,6 +262,9 @@ typedef enum video_color_space_t
     COLOR_SPACE_BT601,
     COLOR_SPACE_BT709,
     COLOR_SPACE_BT2020,
+#define COLOR_SPACE_SRGB      COLOR_SPACE_BT709
+#define COLOR_SPACE_SMPTE_170 COLOR_SPACE_BT601
+#define COLOR_SPACE_SMPTE_240 COLOR_SPACE_SMPTE_170
 } video_color_space_t;
 
 /**
