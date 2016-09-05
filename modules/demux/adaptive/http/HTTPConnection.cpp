@@ -204,7 +204,12 @@ int HTTPConnection::parseReply()
         return VLC_EGENERIC;
 
     if (line.compare(0, 9, "HTTP/1.1 ")!=0)
-        return VLC_ENOOBJ;
+    {
+        if(line.compare(0, 9, "HTTP/1.0 ")!=0)
+            return VLC_ENOOBJ;
+        else
+            connectionClose = true;
+    }
 
     std::istringstream ss(line.substr(9));
     ss.imbue(std::locale("C"));
