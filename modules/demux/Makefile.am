@@ -413,6 +413,7 @@ libadaptive_hls_SOURCES = \
     demux/hls/HLSManager.cpp \
     demux/hls/HLSStreams.hpp \
     demux/hls/HLSStreams.cpp
+libadaptive_hls_SOURCES += meta_engine/ID3Tag.h
 
 libadaptive_smooth_SOURCES = \
     demux/smooth/mp4/IndexReader.cpp \

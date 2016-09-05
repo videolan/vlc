@@ -24,6 +24,11 @@
 #include "HLSStreams.hpp"
 #include <vlc_demux.h>
 
+extern "C"
+{
+    #include "../meta_engine/ID3Tag.h"
+}
+
 using namespace hls;
 
 HLSStream::HLSStream(demux_t *demux)
@@ -101,58 +106,39 @@ void HLSStream::prepareRestart(bool b_discontinuity)
     }
 }
 
-static uint32_t ReadID3Size(const uint8_t *p_buffer)
+int HLSStream::ID3PrivTagHandler(const uint8_t *p_payload, size_t i_payload)
 {
-    return ( (uint32_t)p_buffer[3] & 0x7F ) |
-          (( (uint32_t)p_buffer[2] & 0x7F ) << 7) |
-          (( (uint32_t)p_buffer[1] & 0x7F ) << 14) |
-          (( (uint32_t)p_buffer[0] & 0x7F ) << 21);
+    if(i_payload == 53 &&
+       !memcmp( p_payload, "com.apple.streaming.transportStreamTimestamp", 45))
+    {
+        i_aac_offset = GetQWBE(&p_payload[45]) * 100 / 9;
+        b_timestamps_offset_set = true;
+        return VLC_EGENERIC; /* stop parsing */
+    }
+    return VLC_SUCCESS;
 }
 
-static bool IsID3Tag(const uint8_t *p_buffer, bool b_footer)
+static int ID3TAG_Parse_Handler(uint32_t i_tag, const uint8_t *p_payload, size_t i_payload, void *p_priv)
 {
-    return( memcmp(p_buffer, (b_footer) ? "3DI" : "ID3", 3) == 0 &&
-            p_buffer[3] < 0xFF &&
-            p_buffer[4] < 0xFF &&
-           ((GetDWBE(&p_buffer[6]) & 0x80808080) == 0) );
+    HLSStream *hlsstream = static_cast<HLSStream *>(p_priv);
+
+    if(i_tag == VLC_FOURCC('P', 'R', 'I', 'V'))
+        return hlsstream->ID3PrivTagHandler(p_payload, i_payload);
+
+    return VLC_SUCCESS;
 }
 
 block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 {
     if(b_first && p_block &&
-       p_block->i_buffer >= 10 && IsID3Tag(p_block->p_buffer, false))
+       p_block->i_buffer >= 10 && ID3TAG_IsTag(p_block->p_buffer, false))
     {
-        uint32_t size = ReadID3Size(&p_block->p_buffer[6]);
-        size = __MIN(p_block->i_buffer, size + 10);
-        const uint8_t *p_frame = &p_block->p_buffer[10];
-        uint32_t i_left = (size >= 10) ? size - 10 : 0;
-        while(i_left >= 10 && !b_timestamps_offset_set)
-        {
-            uint32_t i_framesize = ReadID3Size(&p_frame[4]) + 10;
-            if( i_framesize > i_left )
-                break;
-            if(i_framesize == 63 && !memcmp(p_frame, "PRIV", 4))
-            {
-                if(!memcmp(&p_frame[10], "com.apple.streaming.transportStreamTimestamp", 45))
-                {
-                    i_aac_offset = GetQWBE(&p_frame[55]) * 100 / 9;
-                    b_timestamps_offset_set = true;
-                }
-            }
-            i_left -= i_framesize;
-            p_frame += i_framesize;
-        }
+        size_t i_size = ID3TAG_Parse( p_block->p_buffer, p_block->i_buffer,
+                                      ID3TAG_Parse_Handler, static_cast<void *>(this) );
 
         /* Skip ID3 for demuxer */
-        p_block->p_buffer += size;
-        p_block->i_buffer -= size;
-
-        /* Skip ID3 footer */
-        if(p_block->i_buffer >= 10 && IsID3Tag(p_block->p_buffer, true))
-        {
-            p_block->p_buffer += 10;
-            p_block->i_buffer -= 10;
-        }
+        p_block->p_buffer += i_size;
+        p_block->i_buffer -= i_size;
     }
 
     return p_block;

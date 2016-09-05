@@ -31,6 +31,7 @@ namespace hls
         public:
             HLSStream(demux_t *);
             virtual bool setPosition(mtime_t, bool); /* reimpl */
+            int ID3PrivTagHandler( const uint8_t *, size_t );
 
         protected:
             virtual AbstractDemuxer * createDemux(const StreamFormat &); /* reimpl */
