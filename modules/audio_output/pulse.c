@@ -652,6 +652,7 @@ static int StreamMove(audio_output_t *aout, const char *name)
         msg_Dbg(aout, "will connect to sink %s", name);
         free(sys->sink_force);
         sys->sink_force = strdup(name);
+        aout_DeviceReport(aout, name);
         return 0;
     }
 
