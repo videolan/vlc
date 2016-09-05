@@ -578,6 +578,28 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                     p_track->fmt.i_codec = VLC_CODEC_VP8;
                 p_track->fmt.i_profile = p_data->i_profile;
                 p_track->fmt.i_level = p_data->i_level;
+                const uint8_t colorspacesmapping[] =
+                {
+                    COLOR_SPACE_UNDEF,
+                    COLOR_SPACE_BT601,
+                    COLOR_SPACE_BT709,
+                    COLOR_SPACE_SMPTE_170,
+                    COLOR_SPACE_SMPTE_240,
+                    COLOR_SPACE_BT2020,
+                    COLOR_SPACE_BT2020,
+                    COLOR_SPACE_SRGB,
+                };
+                if( p_data->i_color_space < ARRAY_SIZE(colorspacesmapping) )
+                    p_track->fmt.video.space = colorspacesmapping[p_data->i_color_space];
+
+                if( p_data->i_xfer_function == 0 )
+                    p_track->fmt.video.transfer = TRANSFER_FUNC_BT709;
+                else if ( p_data->i_xfer_function == 1 )
+                    p_track->fmt.video.transfer = TRANSFER_FUNC_SMPTE_ST2084;
+
+                p_track->fmt.video.b_color_range_full = p_data->i_fullrange;
+                p_track->fmt.video.i_bits_per_pixel = p_data->i_bit_depth;
+
                 p_track->fmt.i_extra = p_data->i_codec_init_datasize;
                 memcpy( p_track->fmt.p_extra, p_data->p_codec_init_data, p_data->i_codec_init_datasize );
             }
