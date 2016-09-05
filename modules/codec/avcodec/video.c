@@ -72,9 +72,6 @@ struct decoder_sys_t
     /* */
     bool palette_sent;
 
-    /* */
-    bool b_flush;
-
     /* VA API */
     vlc_va_t *p_va;
     enum PixelFormat pix_fmt;
@@ -519,7 +516,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** misc init ***** */
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_first_frame = true;
-    p_sys->b_flush = false;
     p_sys->i_late_frames = 0;
 
     /* Set output properties */
@@ -670,6 +666,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     AVCodecContext *p_context = p_sys->p_context;
     /* Boolean if we assume that we should get valid pic as result */
     bool b_need_output_picture = true;
+
+    /* Boolean for END_OF_SEQUENCE */
+    bool eos_spotted = false;
+
+
     block_t *p_block;
 
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
@@ -758,7 +759,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
      * that the real frame size */
     if( p_block && p_block->i_buffer > 0 )
     {
-        p_sys->b_flush = ( p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE ) != 0;
+        eos_spotted = ( p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE ) != 0;
 
         p_block = block_Realloc( p_block, 0,
                             p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
@@ -770,7 +771,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
-    while( !p_block || p_block->i_buffer > 0 || p_sys->b_flush )
+    while( !p_block || p_block->i_buffer > 0 || eos_spotted )
     {
         int i_used, b_gotpicture;
         AVPacket pkt;
@@ -821,13 +822,13 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         wait_mt( p_sys );
 
-        if( p_sys->b_flush )
+        if( eos_spotted )
             p_sys->b_first_frame = true;
 
         if( p_block )
         {
             if( p_block->i_buffer <= 0 )
-                p_sys->b_flush = false;
+                eos_spotted = false;
 
             if( i_used < 0 )
             {
