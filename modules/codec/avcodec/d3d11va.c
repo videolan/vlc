@@ -790,7 +790,7 @@ static bool SetupProcessor(vlc_va_t *va, const video_format_t *fmt)
     {
         /* shortcut for the rendering output */
         hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator, sys->render, &flags);
-        if (FAILED(hr) && !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
+        if (FAILED(hr) || !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
             msg_Dbg(va, "processor format %s not supported for output", DxgiFormatToStr(sys->render));
         else
             processorOutput = sys->render;
@@ -814,7 +814,7 @@ static bool SetupProcessor(vlc_va_t *va, const video_format_t *fmt)
 
                 hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(processorEnumerator,
                                                                               output->formatTexture, &flags);
-                if (FAILED(hr) && !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
+                if (FAILED(hr) || !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT))
                     msg_Dbg(va, "Processor format %s not supported for output", DxgiFormatToStr(output->formatTexture));
                 else
                 {
