@@ -41,6 +41,7 @@ typedef struct
 } d3d_format_t;
 
 extern const char *DxgiFormatToStr(DXGI_FORMAT format);
+extern vlc_fourcc_t DxgiFormatFourcc(DXGI_FORMAT format);
 extern const d3d_format_t *GetRenderFormatList(void);
 extern void DxgiFormatMask(DXGI_FORMAT format, video_format_t *);
 

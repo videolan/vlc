@@ -31,30 +31,32 @@ typedef struct
 {
     const char   *name;
     DXGI_FORMAT  format;
+    vlc_fourcc_t vlc_format;
 } dxgi_format_t;
 
 static const dxgi_format_t dxgi_formats[] = {
-    { "NV12",        DXGI_FORMAT_NV12                },
-    { "I420_OPAQUE", DXGI_FORMAT_420_OPAQUE          },
-    { "RGBA",        DXGI_FORMAT_R8G8B8A8_UNORM      },
-    { "RGBA_SRGB",   DXGI_FORMAT_R8G8B8A8_UNORM_SRGB },
-    { "BGRX",        DXGI_FORMAT_B8G8R8X8_UNORM      },
-    { "BGRA",        DXGI_FORMAT_B8G8R8A8_UNORM      },
-    { "BGRA_SRGB",   DXGI_FORMAT_B8G8R8A8_UNORM_SRGB },
-    { "AYUV",        DXGI_FORMAT_AYUV                },
-    { "YUY2",        DXGI_FORMAT_YUY2                },
-    { "AI44",        DXGI_FORMAT_AI44                },
-    { "P8",          DXGI_FORMAT_P8                  },
-    { "A8P8",        DXGI_FORMAT_A8P8                },
-    { "B5G6R5",      DXGI_FORMAT_B5G6R5_UNORM        },
-    { "Y416",        DXGI_FORMAT_Y416                },
-    { "P010",        DXGI_FORMAT_P010                },
-    { "Y210",        DXGI_FORMAT_Y210                },
-    { "Y410",        DXGI_FORMAT_Y410                },
-    { "NV11",        DXGI_FORMAT_NV11                },
-    { "UNKNOWN",     DXGI_FORMAT_UNKNOWN             },
+    { "NV12",        DXGI_FORMAT_NV12,                VLC_CODEC_NV12     },
+    { "I420_OPAQUE", DXGI_FORMAT_420_OPAQUE,          0                  },
+    { "RGBA",        DXGI_FORMAT_R8G8B8A8_UNORM,      VLC_CODEC_RGBA     },
+    { "RGBA_SRGB",   DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, VLC_CODEC_RGBA     },
+    { "BGRX",        DXGI_FORMAT_B8G8R8X8_UNORM,      VLC_CODEC_RGB32    },
+    { "BGRA",        DXGI_FORMAT_B8G8R8A8_UNORM,      VLC_CODEC_BGRA     },
+    { "BGRA_SRGB",   DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, VLC_CODEC_BGRA     },
+    { "AYUV",        DXGI_FORMAT_AYUV,                VLC_CODEC_YUVA     },
+    { "YUY2",        DXGI_FORMAT_YUY2,                VLC_CODEC_YUYV     },
+    { "AI44",        DXGI_FORMAT_AI44,                0                  },
+    { "P8",          DXGI_FORMAT_P8,                  0                  },
+    { "A8P8",        DXGI_FORMAT_A8P8,                0                  },
+    { "B5G6R5",      DXGI_FORMAT_B5G6R5_UNORM,        VLC_CODEC_RGB16    },
+    { "Y416",        DXGI_FORMAT_Y416,                0                  },
+    { "P010",        DXGI_FORMAT_P010,                VLC_CODEC_P010     },
+    { "Y210",        DXGI_FORMAT_Y210,                VLC_CODEC_YUYV     }, /* AV_PIX_FMT_YUYV422 */
+    { "Y410",        DXGI_FORMAT_Y410,                0                  },
+    { "NV11",        DXGI_FORMAT_NV11,                0                  },
+    { "RGB10A2",     DXGI_FORMAT_R10G10B10A2_UNORM,   0                  },
+    { "UNKNOWN",     DXGI_FORMAT_UNKNOWN,             0                  },
 
-    { NULL, 0,}
+    { NULL, 0, 0}
 };
 
 static const d3d_format_t d3d_formats[] = {
@@ -90,6 +92,16 @@ const char *DxgiFormatToStr(DXGI_FORMAT format)
             return f->name;
     }
     return NULL;
+}
+
+vlc_fourcc_t DxgiFormatFourcc(DXGI_FORMAT format)
+{
+    for (const dxgi_format_t *f = dxgi_formats; f->name != NULL; ++f)
+    {
+        if (f->format == format)
+            return f->vlc_format;
+    }
+    return 0;
 }
 
 const d3d_format_t *GetRenderFormatList(void)
