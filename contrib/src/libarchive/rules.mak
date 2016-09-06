@@ -7,6 +7,8 @@ ifeq ($(call need_pkg,"libarchive >= 3.1.0"),)
 PKGS_FOUND += libarchive
 endif
 
+DEPS_libarchive = zlib
+
 $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 	$(call download_pkg,$(LIBARCHIVE_URL),libarchive)
 
