@@ -155,7 +155,7 @@ static void DxDestroyVideoService(vlc_va_t *);
 static int DxGetInputList(vlc_va_t *, input_list_t *);
 static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
 
-static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id, const video_format_t *fmt, bool b_threading);
+static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id, const video_format_t *fmt);
 static void DxDestroySurfaces(vlc_va_t *);
 static void SetupAVCodecContext(vlc_va_t *);
 
@@ -943,7 +943,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
 /**
  * It creates a Direct3D11 decoder using the given video format
  */
-static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_format_t *fmt, bool b_threading)
+static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_format_t *fmt)
 {
     vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &va->sys->dx_sys;
@@ -952,7 +952,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id, const video_forma
     ID3D10Multithread *pMultithread;
     hr = ID3D11Device_QueryInterface( (ID3D11Device*) dx_sys->d3ddev, &IID_ID3D10Multithread, (void **)&pMultithread);
     if (SUCCEEDED(hr)) {
-        ID3D10Multithread_SetMultithreadProtected(pMultithread, b_threading && dx_sys->thread_count > 1);
+        ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
         ID3D10Multithread_Release(pMultithread);
     }
 

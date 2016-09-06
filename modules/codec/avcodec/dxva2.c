@@ -156,7 +156,7 @@ static int DxGetInputList(vlc_va_t *, input_list_t *);
 static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
 
 static int DxCreateVideoDecoder(vlc_va_t *,
-                                int codec_id, const video_format_t *, bool);
+                                int codec_id, const video_format_t *);
 static void DxDestroyVideoDecoder(vlc_va_t *);
 static int DxResetVideoDecoder(vlc_va_t *);
 static void SetupAVCodecContext(vlc_va_t *);
@@ -692,10 +692,8 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
 /**
  * It creates a DXVA2 decoder using the given video format
  */
-static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t *fmt, bool b_threading)
+static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id, const video_format_t *fmt)
 {
-    VLC_UNUSED(b_threading);
-
     vlc_va_sys_t *p_sys = va->sys;
     directx_sys_t *sys = &va->sys->dx_sys;
     HRESULT hr;
