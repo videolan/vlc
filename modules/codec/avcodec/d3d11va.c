@@ -475,7 +475,10 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     {
         sys->filter = CreateFilter( VLC_OBJECT(va), fmt, sys->i_chroma);
         if (sys->filter == NULL)
+        {
+            err = VLC_EGENERIC;
             goto error;
+        }
     }
 
     err = directx_va_Setup(va, &sys->dx_sys, ctx);
