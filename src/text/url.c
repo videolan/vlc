@@ -36,6 +36,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_memstream.h>
 #include <vlc_url.h>
 #include <vlc_fs.h>
 #include <ctype.h>
@@ -611,19 +612,17 @@ static char *vlc_uri_remove_dot_segments(char *str)
 
 char *vlc_uri_compose(const vlc_url_t *uri)
 {
-    char *buf, *enc;
-    size_t len;
-    FILE *stream = open_memstream(&buf, &len);
+    struct vlc_memstream stream[1];
+    char *enc;
 
-    if (stream == NULL)
-        return NULL;
+    vlc_memstream_open(stream);
 
     if (uri->psz_protocol != NULL)
-        fprintf(stream, "%s:", uri->psz_protocol);
+        vlc_memstream_printf(stream, "%s:", uri->psz_protocol);
 
     if (uri->psz_host != NULL)
     {
-        fwrite("//", 1, 2, stream);
+        vlc_memstream_write(stream, "//", 2);
 
         if (uri->psz_username != NULL)
         {
@@ -631,7 +630,7 @@ char *vlc_uri_compose(const vlc_url_t *uri)
             if (enc == NULL)
                 goto error;
 
-            fputs(enc, stream);
+            vlc_memstream_puts(stream, enc);
             free(enc);
 
             if (uri->psz_password != NULL)
@@ -640,10 +639,10 @@ char *vlc_uri_compose(const vlc_url_t *uri)
                 if (unlikely(enc == NULL))
                     goto error;
 
-                fprintf(stream, ":%s", enc);
+                vlc_memstream_printf(stream, ":%s", enc);
                 free(enc);
             }
-            fputc('@', stream);
+            vlc_memstream_putc(stream, '@');
         }
 
         const char *fmt;
@@ -653,25 +652,22 @@ char *vlc_uri_compose(const vlc_url_t *uri)
         else
             fmt = (uri->i_port != 0) ? "%s:%d" : "%s";
         /* No IDNA decoding here. Seems unnecessary, dangerous even. */
-        fprintf(stream, fmt, uri->psz_host, uri->i_port);
+        vlc_memstream_printf(stream, fmt, uri->psz_host, uri->i_port);
     }
 
     if (uri->psz_path != NULL)
-        fputs(uri->psz_path, stream);
+        vlc_memstream_puts(stream, uri->psz_path);
     if (uri->psz_option != NULL)
-        fprintf(stream, "?%s", uri->psz_option);
+        vlc_memstream_printf(stream, "?%s", uri->psz_option);
     /* NOTE: fragment not handled currently */
 
-    if (ferror(stream))
-        goto error;
-    if (fclose(stream))
-        buf = NULL;
-    return buf;
+    if (vlc_memstream_close(stream))
+        return NULL;
+    return stream->ptr;
 
 error:
-    if (fclose(stream))
-        buf = NULL;
-    free(buf);
+    if (vlc_memstream_close(stream) == 0)
+        free(stream->ptr);
     return NULL;
 }
 
