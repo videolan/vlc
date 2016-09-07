@@ -834,10 +834,10 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
 
         int not_able_to_send_packet = avcodec_send_packet( p_context, &pkt );
+        i_used = pkt.size;
         av_packet_unref( &pkt );
 
         int not_received_frame = avcodec_receive_frame( p_context, frame);
-        i_used = p_block->i_size;
 
         wait_mt( p_sys );
 
