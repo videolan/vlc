@@ -188,7 +188,7 @@ static bool cookie_should_be_sent(const http_cookie_t *cookie, bool secure,
 static bool cookie_is_valid(const http_cookie_t * cookie, bool secure,
                             const char *host, const char *path)
 {
-    return cookie && cookie->psz_name && strlen(cookie->psz_name) > 0 &&
+    return cookie && cookie->psz_name && cookie->psz_name[0] != '\0' &&
         cookie->psz_domain &&
         !cookie_domain_is_public_suffix(cookie->psz_domain) &&
         cookie_domain_matches(cookie, host);
@@ -291,7 +291,7 @@ static http_cookie_t *cookie_parse(const char *value,
     }
 
     cookie->psz_domain = cookie_get_domain(value);
-    if ( cookie->psz_domain == NULL || strlen(cookie->psz_domain) == 0 )
+    if( cookie->psz_domain == NULL || cookie->psz_domain[0] == '\0' )
     {
         free(cookie->psz_domain);
         cookie->psz_domain = strdup(host);
@@ -301,7 +301,7 @@ static http_cookie_t *cookie_parse(const char *value,
         cookie->b_host_only = false;
 
     cookie->psz_path = cookie_get_attribute_value(value, "path" );
-    if ( cookie->psz_path == NULL || strlen(cookie->psz_path) == 0 )
+    if( cookie->psz_path == NULL || cookie->psz_path[0] == '\0' )
     {
         free(cookie->psz_path);
         cookie->psz_path = cookie_default_path(path);
