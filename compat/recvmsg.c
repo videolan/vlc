@@ -54,8 +54,13 @@ ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
     DWORD dwFlags = flags;
     INT fromlen = msg->msg_namelen;
     DWORD rcvd;
-    int ret = WSARecvFrom(fd, buf, msg->msg_iovlen, &rcvd, &dwFlags,
+    int ret;
+    if (fromlen)
+        ret = WSARecvFrom(fd, buf, msg->msg_iovlen, &rcvd, &dwFlags,
                           msg->msg_name, &fromlen, NULL, NULL);
+    else
+        ret = WSARecv(fd, buf, msg->msg_iovlen, &rcvd, &dwFlags,
+                      NULL, NULL);
     free(buf);
 
     if (ret == 0)
