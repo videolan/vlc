@@ -66,6 +66,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_meta.h \
 	../include/vlc_meta_fetcher.h \
 	../include/vlc_media_library.h \
+	../include/vlc_memstream.h \
 	../include/vlc_mime.h \
 	../include/vlc_modules.h \
 	../include/vlc_mouse.h \
@@ -423,6 +424,7 @@ SOURCES_libvlc_common = \
 	network/rootbind.c \
 	network/tls.c \
 	text/charset.c \
+	text/memstream.c \
 	text/strings.c \
 	text/unicode.c \
 	text/url.c \
