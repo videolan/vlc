@@ -309,7 +309,7 @@ static http_cookie_t *cookie_parse(const char *value,
 
     cookie->b_secure = cookie_has_attribute(value, "secure" );
 
-    FREENULL( content );
+    free( content );
 
     if ( cookie->psz_domain == NULL || cookie->psz_path == NULL
      || cookie->psz_name == NULL )
