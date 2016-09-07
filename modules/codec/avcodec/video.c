@@ -793,13 +793,6 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         int i_used;
         AVPacket pkt;
 
-        AVFrame *frame = av_frame_alloc();
-        if (unlikely(frame == NULL))
-        {
-            p_dec->b_error = true;
-            break;
-        }
-
         post_mt( p_sys );
 
         av_init_packet( &pkt );
@@ -833,11 +826,31 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_block->i_dts = VLC_TS_INVALID;
         }
 
-        int not_able_to_send_packet = avcodec_send_packet( p_context, &pkt );
-        i_used = pkt.size;
+        int ret = avcodec_send_packet(p_context, &pkt);
+        if( ret != 0 && ret != AVERROR(EAGAIN) )
+        {
+            p_dec->b_error = true;
+            av_packet_unref( &pkt );
+            break;
+        }
+        i_used = ret != AVERROR(EAGAIN) ? pkt.size : 0;
         av_packet_unref( &pkt );
 
-        int not_received_frame = avcodec_receive_frame( p_context, frame);
+        AVFrame *frame = av_frame_alloc();
+        if (unlikely(frame == NULL))
+        {
+            p_dec->b_error = true;
+            break;
+        }
+
+        ret = avcodec_receive_frame(p_context, frame);
+        if( ret != 0 && ret != AVERROR(EAGAIN) )
+        {
+            p_dec->b_error = true;
+            av_frame_free(&frame);
+            break;
+        }
+        bool not_received_frame = ret;
 
         wait_mt( p_sys );
 
@@ -850,8 +863,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 eos_spotted = false;
 
             /* Consumed bytes */
-            p_block->p_buffer += p_block->i_buffer;
-            p_block->i_buffer = 0;
+            p_block->p_buffer += i_used;
+            p_block->i_buffer -= i_used;
         }
 
         /* Nothing to display */
