@@ -237,7 +237,7 @@ struct vlc_http_cookie_jar_t
     vlc_mutex_t lock;
 };
 
-vlc_http_cookie_jar_t * vlc_http_cookies_new()
+vlc_http_cookie_jar_t * vlc_http_cookies_new(void)
 {
     vlc_http_cookie_jar_t * jar = malloc( sizeof( vlc_http_cookie_jar_t ) );
     if ( unlikely(jar == NULL) )
