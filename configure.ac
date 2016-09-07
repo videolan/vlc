@@ -2318,6 +2318,7 @@ AS_IF([test "${enable_avcodec}" != "no"], [
   case "${avfork}" in
     libav) av_codec_ver="57.16.0" ;;
     ffmpeg) av_codec_ver="57.37.100" ;;
+    *) AC_MSG_ERROR([Missing libav or FFmpeg])
   esac
   PKG_CHECK_MODULES(AVCODEC,[libavcodec >= ${av_codec_ver} libavutil >= 52.0.0], [
     VLC_SAVE_FLAGS
