@@ -73,7 +73,7 @@ typedef enum {
 @property (readwrite, weak) IBOutlet NSButton           *podcastRemoveButton;
 
 // Podcast Subscribe Window outlets
-@property (readwrite, weak) IBOutlet NSWindow           *podcastSubscribeWindow;
+@property (readwrite)       IBOutlet NSWindow           *podcastSubscribeWindow;
 @property (readwrite, weak) IBOutlet NSTextField        *podcastSubscribeTitle;
 @property (readwrite, weak) IBOutlet NSTextField        *podcastSubscribeSubtitle;
 @property (readwrite, weak) IBOutlet NSTextField        *podcastSubscribeUrlField;
@@ -81,7 +81,7 @@ typedef enum {
 @property (readwrite, weak) IBOutlet NSButton           *podcastSubscribeCancelButton;
 
 // Podcast Unsubscribe Window outlets
-@property (readwrite, weak) IBOutlet NSWindow           *podcastUnsubscribeWindow;
+@property (readwrite)       IBOutlet NSWindow           *podcastUnsubscribeWindow;
 @property (readwrite, weak) IBOutlet NSTextField        *podcastUnsubscirbeTitle;
 @property (readwrite, weak) IBOutlet NSTextField        *podcastUnsubscribeSubtitle;
 @property (readwrite, weak) IBOutlet NSPopUpButton      *podcastUnsubscribePopUpButton;
