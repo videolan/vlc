@@ -289,8 +289,12 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
             if (tmp->p_current &&
                 tmp->p_current->psz_name &&
                 !strcmp(tmp->p_current->psz_name, now_playing)) {
-                epg = vlc_epg_New(tmp->psz_name);
-                vlc_epg_Merge(epg, tmp);
+                 epg = vlc_epg_New(tmp->i_id, tmp->i_source_id);
+                if(epg){
+                    if(tmp->psz_name)
+                        epg->psz_name = strdup(tmp->psz_name);
+                    vlc_epg_Merge(epg, tmp);
+                }
                 break;
             }
         }

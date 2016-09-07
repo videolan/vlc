@@ -1430,7 +1430,6 @@ static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 )
     {
         xds_meta_t *m = &p_sys->xds.meta;
         vlc_meta_t *p_meta;
-        vlc_epg_t *p_epg;
 
         /* Channel meta data */
         p_meta = vlc_meta_New();
@@ -1444,20 +1443,32 @@ static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 )
         vlc_meta_Delete( p_meta );
 
         /* Event meta data (current/future) */
-        p_epg = vlc_epg_New( NULL );
         if( m->current.psz_name )
         {
-            vlc_epg_AddEvent( p_epg, 0, 0, m->current.psz_name, NULL, NULL, 0 );
-            //if( m->current.psz_rating )
-            //  TODO but VLC cannot yet handle rating per epg event
-            vlc_epg_SetCurrent( p_epg, 0 );
+            vlc_epg_t *p_epg = vlc_epg_New( TY_ES_GROUP, TY_ES_GROUP );
+            if ( p_epg )
+            {
+                vlc_epg_event_t *p_evt = vlc_epg_event_New( 0, 0, 0 );
+                if ( p_evt )
+                {
+                    if( m->current.psz_name )
+                        p_evt->psz_name = strdup( m->current.psz_name );
+                    if( !vlc_epg_AddEvent( p_epg, p_evt ) )
+                        vlc_epg_event_Delete( p_evt );
+                }
+                //if( m->current.psz_rating )
+                //  TODO but VLC cannot yet handle rating per epg event
+                vlc_epg_SetCurrent( p_epg, 0 );
+
+                if( m->future.psz_name )
+                {
+                }
+                if( p_epg->i_event > 0 )
+                    es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG,
+                                    TY_ES_GROUP, p_epg );
+                vlc_epg_Delete( p_epg );
+            }
         }
-        if( m->future.psz_name )
-        {
-        }
-        if( p_epg->i_event > 0 )
-            es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG, TY_ES_GROUP, p_epg );
-        vlc_epg_Delete( p_epg );
     }
     p_demux->p_sys->xds.b_meta_changed = false;
 }

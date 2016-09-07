@@ -55,6 +55,17 @@
 
 #include <assert.h>
 
+static inline char *grab_notempty( char **ppsz )
+{
+    char *psz_ret = NULL;
+    if( *ppsz && **ppsz )
+    {
+        psz_ret = *ppsz;
+        *ppsz = NULL;
+    }
+    return psz_ret;
+}
+
 /*
  * Decoders activation order due to dependencies,
  * and because callbacks will be fired once per MGT/VCT version
@@ -368,8 +379,15 @@ static time_t ATSC_AddVLCEPGEvent( demux_t *p_demux, ts_psip_context_t *p_basect
         msg_Dbg( p_demux, "EIT Event time %ld +%d %s id 0x%x",
                  i_start, p_evt->i_length_seconds, psz_title, p_evt->i_event_id );
 #endif
-        vlc_epg_AddEvent( p_epg, i_start, p_evt->i_length_seconds,
-                          psz_title, psz_shortdesc_text, psz_longdesc_text, 0 );
+        vlc_epg_event_t *p_epgevt = vlc_epg_event_New( p_evt->i_event_id, i_start, p_evt->i_length_seconds );
+        if( p_epgevt )
+        {
+            p_epgevt->psz_name = grab_notempty( &psz_title );
+            p_epgevt->psz_short_description = grab_notempty( &psz_shortdesc_text );
+            p_epgevt->psz_description = grab_notempty( &psz_longdesc_text );
+            if( !vlc_epg_AddEvent( p_epg, p_epgevt ) )
+                vlc_epg_event_Delete( p_epgevt );
+        }
     }
 
     free( psz_title );
@@ -417,7 +435,8 @@ static void ATSC_EIT_Callback( void *p_pid, dvbpsi_atsc_eit_t* p_eit )
     EIT_DEBUG_TIMESHIFT( i_current_time );
 
 
-    vlc_epg_t *p_epg = vlc_epg_New( NULL );
+    vlc_epg_t *p_epg = vlc_epg_New( p_basectx->i_tabletype - ATSC_TABLE_TYPE_EIT_0,
+                                    i_program_number );
     if( !p_epg )
     {
         dvbpsi_atsc_DeleteEIT( p_eit );
@@ -510,7 +529,8 @@ static void ATSC_ETT_Callback( void *p_pid, dvbpsi_atsc_ett_t *p_ett )
 #ifdef ATSC_DEBUG_EIT
                     msg_Dbg( p_demux, "Should update EIT %x (matched EIT)", p_event->i_event_id );
 #endif
-                    vlc_epg_t *p_epg = vlc_epg_New( NULL );
+                    vlc_epg_t *p_epg = vlc_epg_New( p_basectx->i_tabletype - ATSC_TABLE_TYPE_ETT_0,
+                                                    i_program_number );
                     if( likely(p_epg) )
                     {
                         (void)

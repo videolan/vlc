@@ -682,10 +682,12 @@ vlc_timer_getoverrun
 vlc_timer_schedule
 vlc_towc
 vlc_ureduce
-vlc_epg_Init
-vlc_epg_Clean
+vlc_epg_event_Delete
+vlc_epg_event_Duplicate
+vlc_epg_event_New
 vlc_epg_New
 vlc_epg_Delete
+vlc_epg_Duplicate
 vlc_epg_AddEvent
 vlc_epg_SetCurrent
 vlc_epg_Merge

@@ -62,6 +62,17 @@
     } while(0);
 #endif
 
+static inline char *grab_notempty( char **ppsz )
+{
+    char *psz_ret = NULL;
+    if( *ppsz && **ppsz )
+    {
+        psz_ret = *ppsz;
+        *ppsz = NULL;
+    }
+    return psz_ret;
+}
+
 static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
                                 uint16_t i_extension, void *p_pid_cbdata );
 
@@ -383,7 +394,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
              p_eit->i_ts_id, p_eit->i_network_id,
              p_eit->i_segment_last_section_number, p_eit->i_last_table_id );
 
-    p_epg = vlc_epg_New( NULL );
+    p_epg = vlc_epg_New( p_eit->i_table_id, p_eit->i_extension );
     for( p_evt = p_eit->p_first_event; p_evt; p_evt = p_evt->p_next )
     {
         dvbpsi_descriptor_t *p_dr;
@@ -548,14 +559,21 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
         /* */
         if( i_start > 0 )
         {
-            vlc_epg_AddEvent( p_epg, i_start, i_duration,
-                              (psz_name && *psz_name) ? psz_name : NULL,
-                              (psz_text && *psz_text) ? psz_text : NULL,
-                              (psz_extra && *psz_extra) ? psz_extra : NULL, i_min_age );
+            vlc_epg_event_t *p_epgevt = vlc_epg_event_New( p_evt->i_event_id,
+                                                           i_start, i_duration );
+            if( p_epgevt )
+            {
+                p_epgevt->psz_name = grab_notempty( &psz_name );
+                p_epgevt->psz_short_description = grab_notempty( &psz_text );
+                p_epgevt->psz_description = grab_notempty( &psz_extra );
+                p_epgevt->i_rating = i_min_age;
+                if( !vlc_epg_AddEvent( p_epg, p_epgevt ) )
+                    vlc_epg_event_Delete( p_epgevt );
 
-            /* Update "now playing" field */
-            if( b_current_event )
-                vlc_epg_SetCurrent( p_epg, i_start );
+                /* Update "now playing" field */
+                if( b_current_event )
+                    vlc_epg_SetCurrent( p_epg, i_start );
+            }
         }
 
         free( psz_name );

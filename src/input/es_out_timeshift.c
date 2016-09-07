@@ -1426,21 +1426,9 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
 
         if( b_copy )
         {
-            p_cmd->u.control.u.int_epg.p_epg = vlc_epg_New( p_epg->psz_name );
+            p_cmd->u.control.u.int_epg.p_epg = vlc_epg_Duplicate( p_epg );
             if( !p_cmd->u.control.u.int_epg.p_epg )
                 return VLC_EGENERIC;
-            for( int i = 0; i < p_epg->i_event; i++ )
-            {
-                vlc_epg_event_t *p_evt = p_epg->pp_event[i];
-
-                vlc_epg_AddEvent( p_cmd->u.control.u.int_epg.p_epg,
-                                  p_evt->i_start, p_evt->i_duration,
-                                  p_evt->psz_name,
-                                  p_evt->psz_short_description,
-                                  p_evt->psz_description, 0 );
-            }
-            vlc_epg_SetCurrent( p_cmd->u.control.u.int_epg.p_epg,
-                                p_epg->p_current ? p_epg->p_current->i_start : -1 );
         }
         else
         {

@@ -59,7 +59,15 @@ static void assert_events( const vlc_epg_t *p_epg, const char *psz_names, int i_
 }
 
 #define EPG_ADD(epg, start, duration, a) \
-    vlc_epg_AddEvent( epg, start, duration, a, NULL, NULL, 0 )
+    do {\
+        vlc_epg_event_t *p_evt = vlc_epg_event_New( start, start, duration );\
+        if( p_evt )\
+        {\
+            p_evt->psz_name = strdup( a );\
+            if( !p_evt->psz_name || !vlc_epg_AddEvent( epg, p_evt ) )\
+                vlc_epg_event_Delete( p_evt );\
+        }\
+    } while( 0 )
 
 int main( void )
 {
@@ -69,7 +77,7 @@ int main( void )
 
     /* Simple insert/current test */
     printf("--test %d\n", i++);
-    vlc_epg_t *p_epg = vlc_epg_New( NULL );
+    vlc_epg_t *p_epg = vlc_epg_New( 0, 0 );
     assert(p_epg);
     EPG_ADD( p_epg,  42, 20, "A" );
     EPG_ADD( p_epg,  62, 20, "B" );
@@ -87,7 +95,7 @@ int main( void )
 
     /* Test reordering / head/tail inserts */
     printf("--test %d\n", i++);
-    p_epg = vlc_epg_New( NULL );
+    p_epg = vlc_epg_New( 0, 0 );
     assert(p_epg);
     EPG_ADD( p_epg,  82, 20, "C" );
     EPG_ADD( p_epg,  62, 20, "B" );
@@ -99,7 +107,7 @@ int main( void )
 
     /* Test reordering/bisect lookup on insert */
     printf("--test %d\n", i++);
-    p_epg = vlc_epg_New( NULL );
+    p_epg = vlc_epg_New( 0, 0 );
     assert(p_epg);
     EPG_ADD( p_epg, 142, 20, "F" );
     EPG_ADD( p_epg, 122, 20, "E" );
@@ -113,7 +121,7 @@ int main( void )
 
     /* Test deduplication and current pointer rebasing on insert */
     printf("--test %d\n", i++);
-    p_epg = vlc_epg_New( NULL );
+    p_epg = vlc_epg_New( 0, 0 );
     assert(p_epg);
     EPG_ADD( p_epg,  62, 20, "E" );
     EPG_ADD( p_epg,  62, 20, "F" );
@@ -130,7 +138,7 @@ int main( void )
 
     /* Test epg merging */
     printf("--test %d\n", i++);
-    p_epg = vlc_epg_New( NULL );
+    p_epg = vlc_epg_New( 0, 0 );
     assert(p_epg);
     EPG_ADD( p_epg, 142, 20, "F" );
     EPG_ADD( p_epg, 122, 20, "E" );
@@ -138,7 +146,7 @@ int main( void )
     EPG_ADD( p_epg,  62, 20, "B" );
     print_order( p_epg );
 
-    vlc_epg_t *p_epg2 = vlc_epg_New( NULL );
+    vlc_epg_t *p_epg2 = vlc_epg_New( 0, 0 );
     assert(p_epg2);
     EPG_ADD( p_epg2, 102, 20, "D" );
     EPG_ADD( p_epg2,  82, 20, "C" );
@@ -156,7 +164,7 @@ int main( void )
 
     /* Test event overlapping */
     printf("--test %d\n", i++);
-    p_epg = vlc_epg_New( NULL );
+    p_epg = vlc_epg_New( 0, 0 );
     assert(p_epg);
     EPG_ADD( p_epg,  42, 20, "A" );
     EPG_ADD( p_epg,  62, 20, "B" );
@@ -165,7 +173,7 @@ int main( void )
     print_order( p_epg );
     vlc_epg_SetCurrent( p_epg, 62 );
 
-    p_epg2 = vlc_epg_New( NULL );
+    p_epg2 = vlc_epg_New( 0, 0 );
     assert(p_epg2);
     EPG_ADD( p_epg2,  41, 30, "E" );
     print_order( p_epg2 );

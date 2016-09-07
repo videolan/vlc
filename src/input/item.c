@@ -906,26 +906,24 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
     vlc_epg_t *p_epg = NULL;
     for( int i = 0; i < p_item->i_epg; i++ )
     {
-        vlc_epg_t *p_tmp = p_item->pp_epg[i];
-
-        if( (p_tmp->psz_name == NULL) != (p_update->psz_name == NULL) )
-            continue;
-        if( p_tmp->psz_name && p_update->psz_name && strcmp(p_tmp->psz_name, p_update->psz_name) )
-            continue;
-
-        p_epg = p_tmp;
-        break;
+        if( p_item->pp_epg[i]->i_source_id == p_update->i_source_id )
+        {
+            p_epg = p_item->pp_epg[i];
+            break;
+        }
     }
 
     /* */
     if( !p_epg )
     {
-        p_epg = vlc_epg_New( p_update->psz_name );
+        p_epg = vlc_epg_Duplicate( p_update );
         if( p_epg )
             TAB_APPEND( p_item->i_epg, p_item->pp_epg, p_epg );
     }
-    if( p_epg )
+    else
+    {
         vlc_epg_Merge( p_epg, p_update );
+    }
 
     vlc_mutex_unlock( &p_item->lock );
 
@@ -940,7 +938,7 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
     input_item_DelInfo( p_item, psz_epg, NULL );
 
     vlc_mutex_lock( &p_item->lock );
-    for( int i = 0; i < p_epg->i_event; i++ )
+    for( size_t i = 0; i < p_epg->i_event; i++ )
     {
         const vlc_epg_event_t *p_evt = p_epg->pp_event[i];
         time_t t_start = (time_t)p_evt->i_start;
