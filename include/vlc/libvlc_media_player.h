@@ -104,15 +104,6 @@ typedef struct libvlc_audio_output_device_t
 } libvlc_audio_output_device_t;
 
 /**
- * Rectangle type for video geometry
- */
-typedef struct libvlc_rectangle_t
-{
-    int top, left;
-    int bottom, right;
-} libvlc_rectangle_t;
-
-/**
  * Marq options definition
  */
 typedef enum libvlc_video_marquee_option_t {
