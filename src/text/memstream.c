@@ -126,7 +126,7 @@ size_t vlc_memstream_write(struct vlc_memstream *ms, const void *ptr,
                            size_t len)
 {
     char *base = realloc(ms->ptr, ms->length + len + 1u);
-    if (ptr == NULL)
+    if (unlikely(base == NULL))
         goto error;
 
     memcpy(base + ms->length, ptr, len);
