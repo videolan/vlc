@@ -3315,7 +3315,7 @@ AS_IF([test "${enable_directx}" != "no"], [
 
   dnl OpenGL
   AC_CHECK_HEADERS(GL/wglew.h, [
-    VLC_ADD_PLUGIN([glwin32, wgl])
+    VLC_ADD_PLUGIN([glwin32 wgl])
   ],, [
     #include <windows.h>
     #include <GL/gl.h>
