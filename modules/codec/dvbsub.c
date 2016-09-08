@@ -1517,8 +1517,6 @@ static subpicture_t *render( decoder_t *p_dec )
     /* Correct positioning of SPU */
     i_base_x = p_sys->i_spu_x;
     i_base_y = p_sys->i_spu_y;
-    p_spu->i_original_picture_width = 720;
-    p_spu->i_original_picture_height = 576;
 
     p_spu->i_original_picture_width = p_sys->display.i_width;
     p_spu->i_original_picture_height = p_sys->display.i_height;
