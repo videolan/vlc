@@ -28,7 +28,7 @@
 int main(void)
 {
     fprintf(stderr, "Update checking disabled, not testing.\n");
-    return 0;
+    return 77;
 }
 
 #else
