@@ -6,11 +6,11 @@ desktopdir = $(datadir)/applications
 if !HAVE_WIN32
 if !HAVE_DARWIN
 desktop_DATA = vlc.desktop
-endif
-endif
 appdatadir = $(datarootdir)/appdata
 appdata_DATA = $(appdata_in_files:.xml.in=.xml)
 appdata_in_files = vlc.appdata.xml.in
+endif
+endif
 
 EXTRA_DIST += vlc.desktop.in vlc.desktop.mimetypes
 CLEANFILES += $(desktop_DATA) $(appdata_DATA)
