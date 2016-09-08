@@ -71,7 +71,6 @@ vlc_module_end ()
  *****************************************************************************/
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
-static void FlushQueues( demux_t *p_demux );
 
 #define MAX_ASF_TRACKS (ASF_MAX_STREAMNUMBER + 1)
 #define ASF_PREROLL_FROM_CURRENT -1
@@ -141,6 +140,9 @@ struct demux_sys_t
 
 static int      DemuxInit( demux_t * );
 static void     DemuxEnd( demux_t * );
+
+static void     FlushQueue( asf_track_t * );
+static void     FlushQueues( demux_t *p_demux );
 
 /*****************************************************************************
  * Open: check file and initializes ASF structures
@@ -390,12 +392,15 @@ static void SeekPrepare( demux_t *p_demux )
     p_sys->i_time = -1;
     p_sys->i_sendtime = -1;
     p_sys->i_preroll_start = ASFPACKET_PREROLL_FROM_CURRENT;
-    FlushQueues( p_demux );
+
     for( int i = 0; i < MAX_ASF_TRACKS ; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
         if( tk )
+        {
+            FlushQueue( tk );
             tk->i_time = -1;
+        }
     }
 
     es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
@@ -464,9 +469,29 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if ( i_ret == VLC_SUCCESS )
         {
-            SeekPrepare( p_demux );
+            asf_track_t *tk;
+            if( i >= 0 )
+            {
+                tk = p_sys->track[i];
+            }
+            else
+            {
+                for( int j = 0; j < MAX_ASF_TRACKS ; j++ )
+                {
+                    tk = p_sys->track[j];
+                    if( !tk->p_fmt || tk->p_fmt->i_cat != -1 * i )
+                        continue;
+                    if( tk )
+                    {
+                        FlushQueue( tk );
+                        tk->i_time = -1;
+                    }
+                }
+            }
+
             p_sys->i_seek_track = 0;
-            WaitKeyframe( p_demux );
+            if ( ( tk && tk->i_cat == VIDEO_ES ) || i == -1 * VIDEO_ES )
+                WaitKeyframe( p_demux );
         }
         return i_ret;
     }
@@ -829,6 +854,14 @@ static int DemuxInit( demux_t *p_demux )
         ASF_fillup_es_bitrate_priorities_ex( p_sys, p_hdr_ext, &fmt_priorities_bitrate_ex );
     }
 
+    const bool b_mms = !strncmp( p_demux->psz_access, "mms", 3 );
+
+    if( b_mms )
+    {
+        es_out_Control( p_demux->out, ES_OUT_SET_ES_CAT_POLICY,
+                        VIDEO_ES, ES_OUT_ES_POLICY_EXCLUSIVE );
+    }
+
     for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
         asf_track_t    *tk;
@@ -853,7 +886,7 @@ static int DemuxInit( demux_t *p_demux )
         tk->queue.p_first = NULL;
         tk->queue.pp_last = &tk->queue.p_first;
 
-        if ( strncmp( p_demux->psz_access, "mms", 3 ) )
+        if ( !b_mms )
         {
             /* Check (not mms) if this track is selected (ie will receive data) */
             if( !vlc_stream_Control( p_demux->s, STREAM_GET_PRIVATE_ID_STATE,
@@ -1277,6 +1310,20 @@ error:
 /*****************************************************************************
  * FlushQueues: flushes tail packets and send queues
  *****************************************************************************/
+static void FlushQueue( asf_track_t *tk )
+{
+    if( tk->info.p_frame )
+    {
+        block_ChainRelease( tk->info.p_frame );
+        tk->info.p_frame = NULL;
+    }
+    if( tk->queue.p_first )
+    {
+        block_ChainRelease( tk->queue.p_first );
+        tk->queue.p_first = NULL;
+        tk->queue.pp_last = &tk->queue.p_first;
+    }
+}
 
 static void FlushQueues( demux_t *p_demux )
 {
@@ -1286,17 +1333,7 @@ static void FlushQueues( demux_t *p_demux )
         asf_track_t *tk = p_sys->track[i];
         if( !tk )
             continue;
-        if( tk->info.p_frame )
-        {
-            block_ChainRelease( tk->info.p_frame );
-            tk->info.p_frame = NULL;
-        }
-        if( tk->queue.p_first )
-        {
-            block_ChainRelease( tk->queue.p_first );
-            tk->queue.p_first = NULL;
-            tk->queue.pp_last = &tk->queue.p_first;
-        }
+        FlushQueue( tk );
     }
 }
 
