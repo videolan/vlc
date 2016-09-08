@@ -82,7 +82,7 @@ VLC_API void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar );
  * @return true, if the cookie was added, false otherwise
  */
 VLC_API bool vlc_http_cookies_store( vlc_http_cookie_jar_t *jar,
-    const char *cookie, bool secure, const char *host, const char *path );
+    const char *cookie, const char *host, const char *path );
 
 /**
  * Returns a cookie value that match the given URL.

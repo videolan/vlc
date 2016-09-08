@@ -143,7 +143,7 @@ time_t vlc_http_msg_get_mtime(const struct vlc_http_msg *);
 unsigned vlc_http_msg_get_retry_after(const struct vlc_http_msg *);
 
 void vlc_http_msg_get_cookies(const struct vlc_http_msg *,
-                              struct vlc_http_cookie_jar_t *, bool secure,
+                              struct vlc_http_cookie_jar_t *,
                               const char *host, const char *path);
 int vlc_http_msg_add_cookies(struct vlc_http_msg *,
                              struct vlc_http_cookie_jar_t *);

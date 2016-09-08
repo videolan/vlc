@@ -99,7 +99,7 @@ retry:
         return NULL;
 
     vlc_http_msg_get_cookies(resp, vlc_http_mgr_get_jar(res->manager),
-                             res->secure, res->host, res->path);
+                             res->host, res->path);
 
     int status = vlc_http_msg_get_status(resp);
     if (status < 200 || status >= 599)

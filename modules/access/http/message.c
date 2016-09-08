@@ -902,7 +902,7 @@ uintmax_t vlc_http_msg_get_size(const struct vlc_http_msg *m)
 }
 
 void vlc_http_msg_get_cookies(const struct vlc_http_msg *m,
-                              vlc_http_cookie_jar_t *jar, bool secure,
+                              vlc_http_cookie_jar_t *jar,
                               const char *host, const char *path)
 {
     if (jar == NULL)
@@ -910,7 +910,7 @@ void vlc_http_msg_get_cookies(const struct vlc_http_msg *m,
 
     for (unsigned i = 0; i < m->count; i++)
         if (!strcasecmp(m->headers[i][0], "Set-Cookie"))
-            vlc_http_cookies_store(jar, m->headers[i][1], secure, host, path);
+            vlc_http_cookies_store(jar, m->headers[i][1], host, path);
 }
 
 int vlc_http_msg_add_cookies(struct vlc_http_msg *m,

@@ -294,7 +294,7 @@ void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
 }
 
 bool vlc_http_cookies_store(vlc_http_cookie_jar_t *p_jar, const char *cookies,
-                            bool secure, const char *host, const char *path)
+                            const char *host, const char *path)
 {
     assert(host != NULL);
     assert(path != NULL);
