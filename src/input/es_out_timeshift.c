@@ -124,6 +124,11 @@ typedef struct attribute_packed
         } es_fmt;
         struct
         {
+            int i_cat;
+            int i_policy;
+        } es_policy;
+        struct
+        {
             /* FIXME Really too big (double make the whole thing too big) */
             double  f_position;
             mtime_t i_time;
@@ -634,6 +639,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_RESTART_ES:
     case ES_OUT_SET_ES_DEFAULT:
     case ES_OUT_SET_ES_STATE:
+    case ES_OUT_SET_ES_CAT_POLICY:
     case ES_OUT_SET_ES_FMT:
     case ES_OUT_SET_TIMES:
     case ES_OUT_SET_JITTER:
@@ -1445,6 +1451,11 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         p_cmd->u.control.u.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
         break;
 
+    case ES_OUT_SET_ES_CAT_POLICY:
+        p_cmd->u.control.u.es_policy.i_cat = (int) va_arg( args, int );
+        p_cmd->u.control.u.es_policy.i_policy = (int) va_arg( args, int );
+        break;
+
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
         p_cmd->u.control.u.es_bool.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
         p_cmd->u.control.u.es_bool.b_bool = (bool)va_arg( args, int );
@@ -1547,6 +1558,10 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.es_bool.p_es->p_es,
                                                p_cmd->u.control.u.es_bool.b_bool );
+
+    case ES_OUT_SET_ES_CAT_POLICY:
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.es_policy.i_cat,
+                                               p_cmd->u.control.u.es_policy.i_policy );
 
     case ES_OUT_SET_ES_FMT:     /* arg1= es_out_id_t* arg2=es_format_t* */
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.es_fmt.p_es->p_es,
