@@ -84,8 +84,6 @@ VLC_API void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar );
 VLC_API bool vlc_http_cookies_store( vlc_http_cookie_jar_t *jar,
     const char *cookie, bool secure, const char *host, const char *path );
 
-VLC_API bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_cookie_header, const vlc_url_t * p_url );
-
 /**
  * Returns a cookie value that match the given URL.
  *
@@ -95,7 +93,5 @@ VLC_API bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char 
  */
 VLC_API char *vlc_http_cookies_fetch( vlc_http_cookie_jar_t *jar, bool secure,
                                       const char *host, const char *path );
-
-VLC_API char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t * p_url );
 
 #endif /* VLC_HTTP_H */

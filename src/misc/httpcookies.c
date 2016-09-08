@@ -347,23 +347,6 @@ bool vlc_http_cookies_store(vlc_http_cookie_jar_t *p_jar, const char *cookies,
     return true;
 }
 
-bool vlc_http_cookies_append(vlc_http_cookie_jar_t *jar,
-                             const char *cookies, const vlc_url_t *url)
-{
-    bool secure;
-
-    if (url->psz_protocol == NULL || url->psz_host == NULL
-     || url->psz_path == NULL)
-        return false;
-    else if (!vlc_ascii_strcasecmp(url->psz_protocol, "https"))
-        secure = true;
-    else
-        secure = false;
-
-    return vlc_http_cookies_store(jar, cookies, secure, url->psz_host,
-                                  url->psz_path);
-}
-
 char *vlc_http_cookies_fetch(vlc_http_cookie_jar_t *p_jar, bool secure,
                              const char *host, const char *path)
 {
@@ -397,20 +380,4 @@ char *vlc_http_cookies_fetch(vlc_http_cookie_jar_t *p_jar, bool secure,
     vlc_mutex_unlock( &p_jar->lock );
 
     return psz_cookiebuf;
-}
-
-char *vlc_http_cookies_for_url(vlc_http_cookie_jar_t *jar,
-                               const vlc_url_t *url)
-{
-    bool secure;
-
-    if (url->psz_protocol == NULL || url->psz_host == NULL
-     || url->psz_path == NULL)
-        return NULL;
-    else if (!vlc_ascii_strcasecmp(url->psz_protocol, "https"))
-        secure = true;
-    else
-        secure = false;
-
-    return vlc_http_cookies_fetch(jar, secure, url->psz_host, url->psz_path);
 }
