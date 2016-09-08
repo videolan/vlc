@@ -22,7 +22,7 @@ vlc.desktop: vlc.desktop.in $(top_builddir)/config.status
 	$(AM_V_at)mv -f tmp-$@ $@
 
 vlc.appdata.xml: vlc.appdata.xml.in
-	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
+	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@ || cp $< $@
 
 iconsdatadir = $(datadir)/icons/hicolor
 icons16dir = $(iconsdatadir)/16x16/apps
