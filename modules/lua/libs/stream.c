@@ -85,6 +85,15 @@ static int vlclua_stream_new( lua_State *L )
     vlc_object_t * p_this = vlclua_get_this( L );
     const char * psz_url = luaL_checkstring( L, 1 );
     stream_t *p_stream = vlc_stream_NewMRL( p_this, psz_url );
+
+    /* XXX: For hysterical raisins, append one stream decompression filter
+     * automatically (if applicable). */
+    if( p_stream != NULL )
+    {
+        stream_t *uncompressed = vlc_stream_FilterNew( p_stream, "decomp" );
+        if( uncompressed != NULL )
+            p_stream = uncompressed;
+    }
     return vlclua_stream_new_inner( L, p_stream );
 }
 
