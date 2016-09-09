@@ -62,7 +62,7 @@
 @property (weak) IBOutlet NSButton *streamDestinationButton;
 
 // customize panel
-@property (weak) IBOutlet NSWindow *customizePanel;
+@property ()     IBOutlet NSWindow *customizePanel;
 @property (weak) IBOutlet NSButton *customizeNewProfileButton;
 @property (weak) IBOutlet NSButton *customizeCancelButton;
 @property (weak) IBOutlet NSButton *customizeOkButton;
@@ -107,7 +107,7 @@
 @property (weak) IBOutlet NSPopUpButton *customizeSubsPopup;
 
 // stream panel
-@property (weak) IBOutlet NSWindow *streamPanel;
+@property ()     IBOutlet NSWindow *streamPanel;
 @property (weak) IBOutlet NSTextField *streamDestinationLabel;
 @property (weak) IBOutlet NSTextField *streamTypeLabel;
 @property (weak) IBOutlet NSTextField *streamAddressLabel;

@@ -51,11 +51,11 @@
 @property (readwrite, weak) IBOutlet NSButtonCell *audio_autosavevol_noButtonCell;
 
 // hotkeys pane
+@property (readwrite)       IBOutlet NSWindow *hotkeys_change_win;
 @property (readwrite, weak) IBOutlet NSButton *hotkeys_changeButton;
 @property (readwrite, weak) IBOutlet NSTextField *hotkeys_changeLabel;
 @property (readwrite, weak) IBOutlet NSTextField *hotkeys_change_keysLabel;
 @property (readwrite, weak) IBOutlet NSTextField *hotkeys_change_takenLabel;
-@property (readwrite, weak) IBOutlet NSWindow *hotkeys_change_win;
 @property (readwrite, weak) IBOutlet NSButton *hotkeys_change_cancelButton;
 @property (readwrite, weak) IBOutlet NSButton *hotkeys_change_okButton;
 @property (readwrite, weak) IBOutlet NSButton *hotkeys_clearButton;
@@ -201,7 +201,7 @@
 @property (readwrite, weak) IBOutlet NSPopUpButton *urlhandler_sftpPopup;
 @property (readwrite, weak) IBOutlet NSPopUpButton *urlhandler_smbPopup;
 @property (readwrite, weak) IBOutlet NSPopUpButton *urlhandler_udpPopup;
-@property (readwrite, weak) IBOutlet NSWindow *urlhandler_win;
+@property (readwrite)       IBOutlet NSWindow *urlhandler_win;
 
 /* toolbar */
 - (NSToolbarItem *)toolbar:(NSToolbar *)o_toolbar

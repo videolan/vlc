@@ -116,7 +116,7 @@
 @property (readwrite, weak) IBOutlet NSButton *netOpenUDPButton;
 @property (readwrite, weak) IBOutlet NSButton *netUDPCancelButton;
 @property (readwrite, weak) IBOutlet NSButton *netUDPOKButton;
-@property (readwrite, weak) IBOutlet NSWindow *netUDPPanel;
+@property (readwrite)       IBOutlet NSWindow *netUDPPanel;
 @property (readwrite, weak) IBOutlet NSTextField *netUDPPortTextField;
 @property (readwrite, weak) IBOutlet NSTextField *netUDPPortLabel;
 @property (readwrite, weak) IBOutlet NSStepper *netUDPPortStepper;
