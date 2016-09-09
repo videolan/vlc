@@ -467,6 +467,7 @@
 		1CE5ED2619DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED2019DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png */; };
 		633121D01B5112C300E636DA /* ResumeDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 633121CE1B5112C300E636DA /* ResumeDialog.xib */; };
 		6B13E2A81BC67678001AD24A /* VLCScrollingClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */; };
+		6B2260501D82DE5400D2DD26 /* vlc-xmas.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6B22604F1D82DE5400D2DD26 /* vlc-xmas.icns */; };
 		6B3F8D2C1CE58E0E002A4998 /* VLCNextTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D281CE58E0E002A4998 /* VLCNextTemplate.pdf */; };
 		6B3F8D2D1CE58E0E002A4998 /* VLCPauseTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D291CE58E0E002A4998 /* VLCPauseTemplate.pdf */; };
 		6B3F8D2E1CE58E0E002A4998 /* VLCPlayTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 6B3F8D2A1CE58E0E002A4998 /* VLCPlayTemplate.pdf */; };
@@ -713,7 +714,6 @@
 		CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
 		CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4EFC2C13E96BD00091D19A /* dropzone.png */; };
-		CC68B0331544C1AE00FD9C7F /* vlc-xmas.png in Resources */ = {isa = PBXBuildFile; fileRef = CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
 		CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
 		CC84FB481300843200816D38 /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
@@ -1275,6 +1275,7 @@
 		633121CF1B5112C300E636DA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ResumeDialog.xib; sourceTree = "<group>"; };
 		6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCScrollingClipView.h; path = ../../../modules/gui/macosx/VLCScrollingClipView.h; sourceTree = "<group>"; };
 		6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCScrollingClipView.m; path = ../../../modules/gui/macosx/VLCScrollingClipView.m; sourceTree = "<group>"; };
+		6B22604F1D82DE5400D2DD26 /* vlc-xmas.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "vlc-xmas.icns"; path = "Resources/icons/vlc-xmas.icns"; sourceTree = "<group>"; };
 		6B3F8D281CE58E0E002A4998 /* VLCNextTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCNextTemplate.pdf; path = Resources/vlcmenubaricon/VLCNextTemplate.pdf; sourceTree = "<group>"; };
 		6B3F8D291CE58E0E002A4998 /* VLCPauseTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPauseTemplate.pdf; path = Resources/vlcmenubaricon/VLCPauseTemplate.pdf; sourceTree = "<group>"; };
 		6B3F8D2A1CE58E0E002A4998 /* VLCPlayTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPlayTemplate.pdf; path = Resources/vlcmenubaricon/VLCPlayTemplate.pdf; sourceTree = "<group>"; };
@@ -1595,7 +1596,6 @@
 		CC4EFC2C13E96BD00091D19A /* dropzone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dropzone.png; path = Resources/mainwindow/dropzone.png; sourceTree = "<group>"; };
 		CC5560231365CDC700D54038 /* VLCAudioEffectsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCAudioEffectsWindowController.h; path = ../../../modules/gui/macosx/VLCAudioEffectsWindowController.h; sourceTree = SOURCE_ROOT; };
 		CC5560241365CDC800D54038 /* VLCAudioEffectsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = VLCAudioEffectsWindowController.m; path = ../../../modules/gui/macosx/VLCAudioEffectsWindowController.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "vlc-xmas.png"; path = "Resources/icons/vlc-xmas.png"; sourceTree = "<group>"; };
 		CC6C01A90DDF3E9200C7D754 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/minimal_macosx/intf.h; sourceTree = SOURCE_ROOT; };
 		CC6C01AA0DDF3E9200C7D754 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/minimal_macosx/intf.m; sourceTree = SOURCE_ROOT; };
 		CC6C01AB0DDF3E9200C7D754 /* macosx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = macosx.c; path = ../../../modules/gui/minimal_macosx/macosx.c; sourceTree = SOURCE_ROOT; };
@@ -2477,9 +2477,9 @@
 				CC0433A113B28B9C00D7D52E /* rm.icns */,
 				CC0433A213B28B9C00D7D52E /* subtitle.icns */,
 				CC0433A313B28B9C00D7D52E /* vlc.icns */,
+				6B22604F1D82DE5400D2DD26 /* vlc-xmas.icns */,
 				CC0433A413B28B9C00D7D52E /* vob.icns */,
 				CC0433A513B28B9C00D7D52E /* wav.icns */,
-				CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */,
 				CC0433A613B28B9C00D7D52E /* wma.icns */,
 				CC0433A713B28B9C00D7D52E /* wmv.icns */,
 			);
@@ -3571,7 +3571,6 @@
 				1C88BC2519DC7C8100645190 /* ys-progressbar-fill-middle_dark.png in Resources */,
 				CC0F725815063C980086B6A0 /* fullscreen-one-button-pressed_dark.png in Resources */,
 				1C88BA5D19DC7B2200645190 /* yosemite-window-close-over@2x.png in Resources */,
-				CC68B0331544C1AE00FD9C7F /* vlc-xmas.png in Resources */,
 				1C88BC3319DC7C8100645190 /* ys-repeat-all-blue_dark.png in Resources */,
 				CC0663391566CD5A003A411C /* ConvertAndSave.xib in Resources */,
 				1C88BBF619DC7C8100645190 /* ys-effects-double-buttons_dark@2x.png in Resources */,
@@ -3670,6 +3669,7 @@
 				CC9E5DF2159760B100D14E83 /* play@2x.png in Resources */,
 				1C88BCC319DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png in Resources */,
 				CC9E5DF4159760B100D14E83 /* playlist-btn@2x.png in Resources */,
+				6B2260501D82DE5400D2DD26 /* vlc-xmas.icns in Resources */,
 				1C88BB2119DC7C7800645190 /* ys-forward-6btns-pressed@2x.png in Resources */,
 				1C88BA5A19DC7B2200645190 /* yosemite-window-close-over-graphite.png in Resources */,
 				CC9E5DF5159760B100D14E83 /* playlist-btn-pressed@2x.png in Resources */,

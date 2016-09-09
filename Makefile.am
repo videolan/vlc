@@ -286,7 +286,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/icons/playlist.icns \
 	extras/package/macosx/Resources/icons/rm.icns \
 	extras/package/macosx/Resources/icons/subtitle.icns \
-	extras/package/macosx/Resources/icons/vlc-xmas.png \
+	extras/package/macosx/Resources/icons/vlc-xmas.icns \
 	extras/package/macosx/Resources/icons/vlc.icns \
 	extras/package/macosx/Resources/icons/vob.icns \
 	extras/package/macosx/Resources/icons/wav.icns \
