@@ -176,12 +176,12 @@ static int Control( access_t *p_access, int i_query, va_list args )
 }
 
 #ifdef HAVE_LIBCDDB
-static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
+static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, int i_titles, int *p_sectors )
 {
-    if( var_InheritInteger( p_access, "album-art" ) != ALBUM_ART_ALL &&
-        !  var_InheritBool( p_access, "metadata-network-access" ) )
+    if( var_InheritInteger( obj, "album-art" ) != ALBUM_ART_ALL &&
+       !var_InheritBool( obj, "metadata-network-access" ) )
     {
-        msg_Dbg( p_access, "Album art policy set to manual; no automatic fetching" );
+        msg_Dbg( obj, "album art policy set to manual: not fetching" );
         return NULL;
     }
 
@@ -189,7 +189,7 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
     cddb_conn_t *p_cddb = cddb_new();
     if( !p_cddb )
     {
-        msg_Warn( p_access, "unable to use CDDB" );
+        msg_Warn( obj, "unable to use CDDB" );
         return NULL;
     }
 
@@ -197,14 +197,14 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
 
     cddb_http_enable( p_cddb );
 
-    char *psz_tmp = var_InheritString( p_access, "cddb-server" );
+    char *psz_tmp = var_InheritString( obj, "cddb-server" );
     if( psz_tmp )
     {
         cddb_set_server_name( p_cddb, psz_tmp );
         free( psz_tmp );
     }
 
-    cddb_set_server_port( p_cddb, var_InheritInteger( p_access, "cddb-port" ) );
+    cddb_set_server_port( p_cddb, var_InheritInteger( obj, "cddb-port" ) );
 
     cddb_set_email_address( p_cddb, "vlc@videolan.org" );
 
@@ -228,7 +228,7 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
     cddb_disc_t *p_disc = cddb_disc_new();
     if( !p_disc )
     {
-        msg_Err( p_access, "unable to create CDDB disc structure." );
+        msg_Err( obj, "unable to create CDDB disc structure." );
         goto error;
     }
 
@@ -243,31 +243,31 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
                                (int64_t)CDDA_DATA_SIZE;
         i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
 
-        msg_Dbg( p_access, "Track %i offset: %i", i, p_sectors[i] + 150 );
+        msg_Dbg( obj, "Track %i offset: %i", i, p_sectors[i] + 150 );
     }
 
-    msg_Dbg( p_access, "Total length: %i", (int)(i_length/1000000) );
+    msg_Dbg( obj, "Total length: %i", (int)(i_length/1000000) );
     cddb_disc_set_length( p_disc, (int)(i_length/1000000) );
 
     if( !cddb_disc_calc_discid( p_disc ) )
     {
-        msg_Err( p_access, "CDDB disc ID calculation failed" );
+        msg_Err( obj, "CDDB disc ID calculation failed" );
         goto error;
     }
 
     const int i_matches = cddb_query( p_cddb, p_disc );
     if( i_matches < 0 )
     {
-        msg_Warn( p_access, "CDDB error: %s", cddb_error_str(errno) );
+        msg_Warn( obj, "CDDB error: %s", cddb_error_str(errno) );
         goto error;
     }
     else if( i_matches == 0 )
     {
-        msg_Dbg( p_access, "Couldn't find any matches in CDDB." );
+        msg_Dbg( obj, "Couldn't find any matches in CDDB." );
         goto error;
     }
     else if( i_matches > 1 )
-        msg_Warn( p_access, "found %d matches in CDDB. Using first one.", i_matches );
+        msg_Warn( obj, "found %d matches in CDDB. Using first one.", i_matches );
 
     cddb_read( p_cddb, p_disc );
 
@@ -284,16 +284,17 @@ error:
 
 static int GetTracks( access_t *p_access, input_item_t *p_current )
 {
+    vlc_object_t *obj = VLC_OBJECT(p_access);
     access_sys_t *p_sys = p_access->p_sys;
 
-    const int i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
-                                             p_sys->vcddev, &p_sys->p_sectors );
+    const int i_titles = ioctl_GetTracksMap( obj, p_sys->vcddev,
+                                             &p_sys->p_sectors );
     if( i_titles <= 0 )
     {
         if( i_titles < 0 )
-            msg_Err( p_access, "unable to count tracks" );
+            msg_Err( obj, "unable to count tracks" );
         else if( i_titles <= 0 )
-            msg_Err( p_access, "no audio tracks found" );
+            msg_Err( obj, "no audio tracks found" );
         return VLC_EGENERIC;;
     }
 
@@ -314,11 +315,11 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     /* Retreive CDDB information */
 #ifdef HAVE_LIBCDDB
     char psz_year_buffer[4+1];
-    msg_Dbg( p_access, "fetching infos with CDDB" );
-    cddb_disc_t *p_disc = GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
+    msg_Dbg( obj, "fetching infos with CDDB..." );
+    cddb_disc_t *p_disc = GetCDDBInfo( obj, i_titles, p_sys->p_sectors );
     if( p_disc )
     {
-        msg_Dbg( p_access, "Disc ID: %08x", cddb_disc_get_discid( p_disc ) );
+        msg_Dbg( obj, "Disc ID: %08x", cddb_disc_get_discid( p_disc ) );
         psz_album = cddb_disc_get_title( p_disc );
         psz_genre = cddb_disc_get_genre( p_disc );
 
@@ -347,16 +348,16 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         }
     }
     else
-        msg_Dbg( p_access, "GetCDDBInfo failed" );
+        msg_Dbg( obj, "GetCDDBInfo failed" );
 #endif
 
     /* CD-Text */
     vlc_meta_t **pp_cd_text;
     int        i_cd_text;
 
-    if( ioctl_GetCdText( VLC_OBJECT(p_access), p_sys->vcddev, &pp_cd_text, &i_cd_text ) )
+    if( ioctl_GetCdText( obj, p_sys->vcddev, &pp_cd_text, &i_cd_text ) )
     {
-        msg_Dbg( p_access, "CD-TEXT information missing" );
+        msg_Dbg( obj, "CD-TEXT information missing" );
         i_cd_text = 0;
         pp_cd_text = NULL;
     }
@@ -400,7 +401,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     {
         char *psz_opt, *psz_name;
 
-        msg_Dbg( p_access, "track[%d] start=%d", i, p_sys->p_sectors[i] );
+        msg_Dbg( obj, "track[%d] start=%d", i, p_sys->p_sectors[i] );
 
         /* Define a "default name" */
         if( asprintf( &psz_name, _("Audio CD - Track %02i"), (i+1) ) == -1 )
