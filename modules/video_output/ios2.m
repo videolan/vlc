@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ios2.m: iOS OpenGL ES 2 provider
  *****************************************************************************
- * Copyright (C) 2001-2015 VLC authors and VideoLAN
+ * Copyright (C) 2001-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont at videolan dot org>
@@ -194,7 +194,7 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     VLCOpenGLES2VideoView *glESView;
-    UIView* viewContainer;
+    UIView *viewContainer;
     UITapGestureRecognizer *tapRecognizer;
 
     vlc_gl_t gl;
@@ -231,50 +231,21 @@ static int Open(vlc_object_t *this)
     sys->gl.sys = NULL;
 
     @autoreleasepool {
-        /* get the object we will draw into */
-        UIView* viewContainer = var_CreateGetAddress (vd, "drawable-nsobject");
-        if (unlikely(viewContainer == nil))
+        if (vd->fmt.i_chroma == VLC_CODEC_CVPX_OPAQUE) {
+            msg_Dbg(vd, "will use zero-copy rendering");
+            sys->zero_copy = true;
+        }
+
+        /* setup the actual OpenGL ES view */
+        sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:CGRectMake(0.,0.,320.,240.) zeroCopy:sys->zero_copy voutDisplay:vd];
+        sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+        if (!sys->glESView)
             goto bailout;
 
-        [viewContainer retain];
-
-        @synchronized(viewContainer) {
-            if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)]))
-                goto bailout;
-
-            if (![viewContainer isKindOfClass:[UIView class]])
-                goto bailout;
-
-            /* This will be released in Close(), on
-             * main thread, after we are done using it. */
-            sys->viewContainer = viewContainer;
-
-            if (vd->fmt.i_chroma == VLC_CODEC_CVPX_OPAQUE) {
-                msg_Dbg(vd, "will use zero-copy rendering");
-                sys->zero_copy = true;
-            }
-
-            /* setup the actual OpenGL ES view */
-            sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:[viewContainer bounds] zeroCopy:sys->zero_copy voutDisplay:vd];
-            sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
-            if (!sys->glESView)
-                goto bailout;
-
-            [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
-                                                 withObject:sys->glESView
-                                              waitUntilDone:YES];
-
-            /* add tap gesture recognizer for DVD menus and stuff */
-            sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:sys->glESView
-                                                                         action:@selector(tapRecognized:)];
-            if (sys->viewContainer.window) {
-                if (sys->viewContainer.window.rootViewController) {
-                    if (sys->viewContainer.window.rootViewController.view)
-                        [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
-                }
-            }
-            sys->tapRecognizer.cancelsTouchesInView = NO;
+        [sys->glESView performSelectorOnMainThread:@selector(fetchViewContainer) withObject:nil waitUntilDone:YES];
+        if (!sys->viewContainer) {
+            goto bailout;
         }
 
         const vlc_fourcc_t *subpicture_chromas;
@@ -653,6 +624,48 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
     _zeroCopy = zero_copy;
 
     return self;
+}
+
+- (void)fetchViewContainer
+{
+    /* get the object we will draw into */
+    UIView *viewContainer = var_CreateGetAddress (_voutDisplay, "drawable-nsobject");
+    if (unlikely(viewContainer == nil))
+        return;
+
+    [viewContainer retain];
+
+    @synchronized(viewContainer) {
+        if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)]))
+            return;
+
+        if (![viewContainer isKindOfClass:[UIView class]])
+            return;
+
+        vout_display_sys_t *sys = _voutDisplay->sys;
+
+        /* This will be released in Close(), on
+         * main thread, after we are done using it. */
+        sys->viewContainer = viewContainer;
+
+        self.frame = viewContainer.bounds;
+        [self reshape];
+
+        [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
+                                             withObject:self
+                                          waitUntilDone:YES];
+
+        /* add tap gesture recognizer for DVD menus and stuff */
+        sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                     action:@selector(tapRecognized:)];
+        if (sys->viewContainer.window) {
+            if (sys->viewContainer.window.rootViewController) {
+                if (sys->viewContainer.window.rootViewController.view)
+                    [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
+            }
+        }
+        sys->tapRecognizer.cancelsTouchesInView = NO;
+    }
 }
 
 - (void)dealloc
