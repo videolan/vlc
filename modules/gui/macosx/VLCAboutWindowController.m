@@ -140,12 +140,9 @@
                                  "DVDs, network streams, capture cards and other media formats!</p><p><a href="
                                  "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
                                  "underline; color:#0057ae;\">Help and join us!</span></a>"));
-    NSString *fontfamily;
-    if (OSX_YOSEMITE || OSX_EL_CAPITAN || OSX_SIERRA)
-        fontfamily = @"Helvetica Neue";
-    else
-        fontfamily = @"Lucida Grande";
-    NSString *joinUsWithStyle = [NSString stringWithFormat:@"<div style=\"text-align:left;font-family:%@;\">%@</div>",
+
+    NSString *fontfamily = (OSX_YOSEMITE) ? @"Helvetica Neue" : @"Lucida Grande";
+    NSString *joinUsWithStyle = [NSString stringWithFormat:@"<div style=\"text-align:left;font-family: -apple-system, %@;\">%@</div>",
                                  fontfamily, joinus];
     NSAttributedString *joinus_readytorender = [[NSAttributedString alloc] initWithHTML:[joinUsWithStyle dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES] options:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:NSUTF8StringEncoding] forKey:NSCharacterEncodingDocumentOption] documentAttributes:NULL];
     [o_joinus_txt setAllowsEditingTextAttributes: YES];
