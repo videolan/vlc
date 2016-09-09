@@ -78,18 +78,23 @@ static void CVPX_I420(filter_t *p_filter, picture_t *sourcePicture, picture_t *d
     if (picsys->pixelBuffer == nil)
         return;
 
+    unsigned width = CVPixelBufferGetWidthOfPlane(picsys->pixelBuffer, 0);
+    unsigned height = CVPixelBufferGetHeightOfPlane(picsys->pixelBuffer, 0);
+
+    if (width == 0 || height == 0)
+        return;
+
     uint8_t *pp_plane[2];
     size_t pi_pitch[2];
 
-    CVPixelBufferLockBaseAddress(picsys->pixelBuffer, 0);
+    CVPixelBufferLockBaseAddress(picsys->pixelBuffer, kCVPixelBufferLock_ReadOnly);
 
     for (int i = 0; i < 2; i++) {
         pp_plane[i] = CVPixelBufferGetBaseAddressOfPlane(picsys->pixelBuffer, i);
         pi_pitch[i] = CVPixelBufferGetBytesPerRowOfPlane(picsys->pixelBuffer, i);
     }
 
-    CopyFromNv12ToI420(destinationPicture, pp_plane, pi_pitch,
-                       sourcePicture->format.i_height);
+    CopyFromNv12ToI420(destinationPicture, pp_plane, pi_pitch, height);
 
-    CVPixelBufferUnlockBaseAddress(picsys->pixelBuffer, 0);
+    CVPixelBufferUnlockBaseAddress(picsys->pixelBuffer, kCVPixelBufferLock_ReadOnly);
 }

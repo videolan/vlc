@@ -961,10 +961,10 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
     uint8_t *pp_plane[2];
     size_t pi_pitch[2];
 
-    if (!buffer)
+    if (!buffer || i_width == 0 || i_height == 0)
         return;
 
-    CVPixelBufferLockBaseAddress(buffer, 0);
+    CVPixelBufferLockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
 
     for (int i = 0; i < 2; i++) {
         pp_plane[i] = CVPixelBufferGetBaseAddressOfPlane(buffer, i);
@@ -973,7 +973,7 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
 
     CopyFromNv12ToI420(p_pic, pp_plane, pi_pitch, i_height);
 
-    CVPixelBufferUnlockBaseAddress(buffer, 0);
+    CVPixelBufferUnlockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
 }
 
 #pragma mark - actual decoding
