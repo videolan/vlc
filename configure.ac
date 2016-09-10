@@ -2350,7 +2350,7 @@ have_vaapi="no"
 have_vaapi_drm="no"
 have_vaapi_x11="no"
 AS_IF([test "${enable_libva}" != "no"], [
-  PKG_CHECK_EXISTS([libva], [
+  PKG_CHECK_MODULES([LIBVA], [libva], [
     have_vaapi="yes"
   ], [
     AS_IF([test -n "${enable_libva}"], [
