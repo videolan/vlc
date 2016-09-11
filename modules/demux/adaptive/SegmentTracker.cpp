@@ -278,8 +278,13 @@ void SegmentTracker::setPositionByNumber(uint64_t segnumber, bool restarted)
 mtime_t SegmentTracker::getPlaybackTime() const
 {
     mtime_t time, duration;
-    if(curRepresentation &&
-       curRepresentation->getPlaybackTimeDurationBySegmentNumber(next, &time, &duration))
+
+    BaseRepresentation *rep = curRepresentation;
+    if(!rep)
+        rep = logic->getNextRepresentation(adaptationSet, NULL);
+
+    if(rep &&
+       rep->getPlaybackTimeDurationBySegmentNumber(next, &time, &duration))
     {
         return time;
     }
