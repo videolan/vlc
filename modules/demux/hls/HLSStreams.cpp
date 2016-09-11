@@ -65,7 +65,7 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
     {
 
         case StreamFormat::PACKEDAAC:
-            ret = new Demuxer(p_realdemux, "avformat", fakeesout->getEsOut(), demuxersource);
+            ret = new Demuxer(p_realdemux, "aac", fakeesout->getEsOut(), demuxersource);
             break;
 
         case StreamFormat::MPEG2TS:
