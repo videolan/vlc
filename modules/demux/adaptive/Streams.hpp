@@ -95,7 +95,7 @@ namespace adaptive
 
     protected:
         bool seekAble() const;
-        virtual void setTimeOffset();
+        virtual void setTimeOffset(mtime_t);
         virtual block_t *checkBlock(block_t *, bool) = 0;
         virtual AbstractDemuxer * createDemux(const StreamFormat &) = 0;
         virtual bool startDemux();

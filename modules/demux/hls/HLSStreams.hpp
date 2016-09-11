@@ -30,19 +30,15 @@ namespace hls
     {
         public:
             HLSStream(demux_t *);
-            virtual bool setPosition(mtime_t, bool); /* reimpl */
             int ID3PrivTagHandler( const uint8_t *, size_t );
 
         protected:
             virtual AbstractDemuxer * createDemux(const StreamFormat &); /* reimpl */
-            virtual bool restartDemux(); /* reimpl */
-            virtual void prepareRestart(bool = true); /* reimpl */
-
+            virtual void setTimeOffset(mtime_t); /* reimpl */
             virtual block_t *checkBlock(block_t *, bool); /* reimpl */
 
         private:
-            bool b_timestamps_offset_set;
-            mtime_t i_aac_offset;
+            bool b_id3_timestamps_offset_set;
     };
 
     class HLSStreamFactory : public AbstractStreamFactory

@@ -112,6 +112,7 @@ void AbstractStream::prepareRestart(bool b_discontinuity)
     {
         /* Enqueue Del Commands for all current ES */
         demuxer->drain();
+        setTimeOffset(true);
         /* Enqueue Del Commands for all current ES */
         fakeesout->scheduleAllForDeletion();
         if(b_discontinuity)
@@ -294,7 +295,6 @@ AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
             vlc_mutex_unlock(&lock);
             return AbstractStream::buffering_end;
         }
-        setTimeOffset();
     }
 
     const int64_t i_total_buffering = i_min_buffering + i_extra_buffering;
@@ -443,10 +443,11 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
             currentChunk = NULL;
             needrestart = false;
 
+            setTimeOffset(-1);
+            setTimeOffset(segmentTracker->getPlaybackTime());
+
             if( !restartDemux() )
                 dead = true;
-
-            setTimeOffset();
         }
         else commandsqueue->Abort( true );
 
@@ -475,14 +476,19 @@ void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
         p_fmt->psz_description = strdup(description.c_str());
 }
 
-void AbstractStream::setTimeOffset()
+void AbstractStream::setTimeOffset(mtime_t i_offset)
 {
     /* Check if we need to set an offset as the demuxer
      * will start from zero from seek point */
-    if(demuxer && demuxer->alwaysStartsFromZero())
-        fakeesout->setTimestampOffset(segmentTracker->getPlaybackTime());
-    else
+    if(i_offset < 0) /* reset */
+    {
         fakeesout->setTimestampOffset(0);
+    }
+    else if(demuxer)
+    {
+        if(demuxer->alwaysStartsFromZero())
+            fakeesout->setTimestampOffset(i_offset);
+    }
 }
 
 void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)

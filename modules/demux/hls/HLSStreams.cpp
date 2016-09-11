@@ -34,28 +34,27 @@ using namespace hls;
 HLSStream::HLSStream(demux_t *demux)
     : AbstractStream(demux)
 {
-    b_timestamps_offset_set = false;
-    i_aac_offset = 0;
+    b_id3_timestamps_offset_set = false;
 }
 
-bool HLSStream::setPosition(mtime_t time, bool tryonly)
+void HLSStream::setTimeOffset(mtime_t i_offset)
 {
-    bool b_ret = AbstractStream::setPosition(time, tryonly);
-    if(!tryonly && b_ret)
+    if(i_offset >= 0)
     {
-        /* Should be correct, has a restarted demux shouldn't have been fed with data yet */
-        fakeesout->setTimestampOffset( VLC_TS_INVALID );
-        b_timestamps_offset_set = false;
+        if((unsigned)format == StreamFormat::PACKEDAAC)
+        {
+            if(!b_id3_timestamps_offset_set)
+            {
+                fakeesout->setTimestampOffset(i_offset);
+            }
+            return;
+        }
     }
-    return b_ret;
-}
-
-bool HLSStream::restartDemux()
-{
-    bool b_ret = AbstractStream::restartDemux();
-    if(b_ret)
-        b_timestamps_offset_set = false;
-    return b_ret;
+    else
+    {
+        b_id3_timestamps_offset_set = false;
+    }
+    AbstractStream::setTimeOffset(i_offset);
 }
 
 AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
@@ -93,26 +92,17 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
     return ret;
 }
 
-void HLSStream::prepareRestart(bool b_discontinuity)
-{
-    AbstractStream::prepareRestart(b_discontinuity);
-    if((unsigned)format == StreamFormat::PACKEDAAC)
-    {
-        fakeesout->setTimestampOffset( i_aac_offset );
-    }
-    else
-    {
-        fakeesout->setTimestampOffset( 0 );
-    }
-}
-
 int HLSStream::ID3PrivTagHandler(const uint8_t *p_payload, size_t i_payload)
 {
     if(i_payload == 53 &&
        !memcmp( p_payload, "com.apple.streaming.transportStreamTimestamp", 45))
     {
-        i_aac_offset = GetQWBE(&p_payload[45]) * 100 / 9;
-        b_timestamps_offset_set = true;
+        if(!b_id3_timestamps_offset_set)
+        {
+            const mtime_t i_aac_offset = GetQWBE(&p_payload[45]) * 100 / 9;
+            setTimeOffset(i_aac_offset);
+            b_id3_timestamps_offset_set = true;
+        }
         return VLC_EGENERIC; /* stop parsing */
     }
     return VLC_SUCCESS;
