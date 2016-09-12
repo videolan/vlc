@@ -121,8 +121,7 @@ enum hevc_slice_type_e
 static inline bool hevc_ishvcC( const uint8_t *p_buf, size_t i_buf )
 {
     return ( i_buf >= HEVC_MIN_HVCC_SIZE &&
-             p_buf[0] != 0x00 &&
-             p_buf[1] != 0x00
+             p_buf[0] != 0x00
 /*          /!\Broken quicktime streams does not respect reserved bits
             (p_buf[13] & 0xF0) == 0xF0 && // Match all reserved bits
             (p_buf[15] & 0xFC) == 0xFC &&
