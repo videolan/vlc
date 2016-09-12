@@ -24,7 +24,8 @@ GETTEXT_CONF = \
 	--disable-relocatable \
 	--disable-java \
 	--disable-native-java \
-	--without-emacs
+	--without-emacs \
+	--without-included-libxml
 ifdef HAVE_WIN32
 GETTEXT_CONF += --disable-threads
 GETTEXT_CFLAGS += -DLIBXML_STATIC
