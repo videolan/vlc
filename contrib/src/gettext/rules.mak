@@ -17,7 +17,7 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
 	$(MOVE)
 
-DEPS_gettext = iconv $(DEPS_iconv)
+DEPS_gettext = iconv $(DEPS_iconv) libxml2 $(DEPS_libxml2)
 
 GETTEXT_CONF = \
 	--disable-relocatable \
