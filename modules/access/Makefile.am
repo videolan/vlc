@@ -249,7 +249,7 @@ EXTRA_LTLIBRARIES += libvnc_plugin.la
 
 libcdda_plugin_la_SOURCES = access/cdda.c access/vcd/cdrom.c access/vcd/cdrom.h access/vcd/cdrom_internals.h
 libcdda_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBCDDB_CFLAGS)
-libcdda_plugin_la_LIBADD = $(LIBCDDB_LIBS)
+libcdda_plugin_la_LIBADD = $(LIBCDDB_LIBS) $(LIBM)
 libcdda_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 if HAVE_DARWIN
 libcdda_plugin_la_LIBADD += -liconv
