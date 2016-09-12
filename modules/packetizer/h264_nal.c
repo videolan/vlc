@@ -37,10 +37,13 @@
 bool h264_isavcC( const uint8_t *p_buf, size_t i_buf )
 {
     return ( i_buf >= H264_MIN_AVCC_SIZE &&
-             p_buf[0] == 0x01 &&
+             p_buf[0] != 0x00 &&
+             p_buf[1] != 0x00
+/*          /!\Broken quicktime streams does not respect reserved bits
             (p_buf[4] & 0xFC) == 0xFC &&
             (p_buf[4] & 0x03) != 0x02 &&
-            (p_buf[5] & 0x1F) > 0x00 ); /* Broken quicktime streams using reserved bits */
+            (p_buf[5] & 0x1F) > 0x00 */
+            );
 }
 
 static size_t get_avcC_to_AnnexB_NAL_size( const uint8_t *p_buf, size_t i_buf )
