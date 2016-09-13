@@ -367,7 +367,13 @@ static int addToArrayIfNotInside( vlc_array_t* p_array, mtime_t* p_elem )
 
 static int timeCmp( const void* p_time1, const void* p_time2 )
 {
-    return ( *(int*)p_time1 - *(int*)p_time2 );
+    mtime_t i_left = **(mtime_t* const*)p_time1;
+    mtime_t i_right = **(mtime_t* const*)p_time2;
+    if ( i_left == i_right )
+        return 0;
+    if ( i_left < i_right )
+        return -1;
+    return 1;
 }
 
 /*
@@ -500,7 +506,7 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
             goto error;
     }
 
-    qsort( p_times->pp_elems, p_times->i_count, sizeof( mtime_t ), timeCmp );
+    qsort( p_times->pp_elems, p_times->i_count, sizeof( mtime_t* ), timeCmp );
 
     subtitle_t* p_tmp_sub = realloc( p_sys->subtitle, sizeof( *p_sys->subtitle ) * ( p_times->i_count - 1 + p_sys->i_subtitles ) );
     if( unlikely( p_tmp_sub == NULL ) )
