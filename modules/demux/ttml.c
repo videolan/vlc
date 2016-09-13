@@ -461,8 +461,8 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
                 ClearNode( p_node );
                 goto error;
             }
-
-            if ( asprintf( &pp_subtitles[i_nb_span]->psz_text, "%s", NodeToStr( p_node ) ) < 0 )
+            pp_subtitles[i_nb_span]->psz_text = NodeToStr( p_node );
+            if( pp_subtitles[i_nb_span] == NULL )
             {
                 ClearNode( p_node );
                 goto error;
