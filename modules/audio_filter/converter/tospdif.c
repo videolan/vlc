@@ -204,7 +204,6 @@ static void Flush( filter_t *p_filter )
 static block_t *fill_output_buffer( filter_t *p_filter, struct hdr_res *p_res )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    unsigned i_nb_samples = 0;
     size_t i_out_size = 0;
     block_t *p_list = p_sys->p_chain_first;
 
@@ -213,7 +212,6 @@ static block_t *fill_output_buffer( filter_t *p_filter, struct hdr_res *p_res )
     while( p_list )
     {
         i_out_size += p_list->i_buffer;
-        i_nb_samples += p_list->i_nb_samples;
         p_list = p_list->p_next;
     }
 
@@ -274,8 +272,8 @@ static block_t *fill_output_buffer( filter_t *p_filter, struct hdr_res *p_res )
 
     p_out_buf->i_dts = p_sys->p_chain_first->i_dts;
     p_out_buf->i_pts = p_sys->p_chain_first->i_pts;
-    p_out_buf->i_nb_samples = i_nb_samples;
     p_out_buf->i_buffer = p_res->i_out_size_padded;
+    p_out_buf->i_nb_samples = p_out_buf->i_buffer / 4;
 
     return p_out_buf;
 }
