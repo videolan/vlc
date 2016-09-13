@@ -30,17 +30,27 @@
 #define INITGUID
 #define COBJMACROS
 #define CONST_VTABLE
+#define NONEWWAVE
 
 #include <stdlib.h>
 #include <assert.h>
-#include <audioclient.h>
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_plugin.h>
+
+#include <audioclient.h>
 #include "audio_output/mmdevice.h"
 
-DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL, WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+/* 00000092-0000-0010-8000-00aa00389b71 */
+DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL,
+            WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00,
+            0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+
+/* 00000008-0000-0010-8000-00aa00389b71 */
+DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DTS,
+            WAVE_FORMAT_DTS_MS, 0x0000, 0x0010, 0x80, 0x00,
+            0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 
 static BOOL CALLBACK InitFreq(INIT_ONCE *once, void *param, void **context)
 {
@@ -237,12 +247,23 @@ static const uint32_t chans_in[] = {
 static void vlc_SpdifToWave(WAVEFORMATEXTENSIBLE *restrict wf,
                             audio_sample_format_t *restrict audio)
 {
+    switch (audio->i_format)
+    {
+    case VLC_CODEC_DTS:
+        wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DTS;
+        break;
+    case VLC_CODEC_SPDIFL:
+    case VLC_CODEC_SPDIFB:
+    case VLC_CODEC_A52:
+        wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL;
+        break;
+    default:
+        vlc_assert_unreachable();
+    }
     audio->i_format = VLC_CODEC_SPDIFL;
     aout_FormatPrepare (audio);
     audio->i_bytes_per_frame = AOUT_SPDIF_SIZE;
     audio->i_frame_length = A52_FRAME_NB;
-
-    wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL;
 
     wf->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
     wf->Format.nChannels = 2; /* To prevent channel re-ordering */
