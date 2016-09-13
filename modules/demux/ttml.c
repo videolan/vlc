@@ -238,18 +238,14 @@ static void ClearNodeStack( node_t* p_node )
 
 static int MergeAttrDict ( vlc_dictionary_t* p_dest, const vlc_dictionary_t* p_src )
 {
-    char** pp_src_keys = vlc_dictionary_all_keys( p_src );
-    if( unlikely( pp_src_keys == NULL ) )
-        return VLC_ENOMEM;
-
-    for( int i = 0; pp_src_keys[i] != NULL; i++)
+    for( int i = 0; i < p_src->i_size; i++ )
     {
-        if( !vlc_dictionary_value_for_key( p_dest, pp_src_keys[i] ) )
-            vlc_dictionary_insert( p_dest, pp_src_keys[i], vlc_dictionary_value_for_key( p_src, pp_src_keys[i] ) );
-
-        free( pp_src_keys[i] );
+        for ( vlc_dictionary_entry_t* p_entry = p_src->p_entries[i] ; p_entry; p_entry = p_entry->p_next )
+        {
+            if( !vlc_dictionary_value_for_key( p_dest, p_entry->psz_key ) )
+                vlc_dictionary_insert( p_dest, p_entry->psz_key, p_entry->p_value );
+        }
     }
-    free( pp_src_keys );
     return VLC_SUCCESS;
 }
 
@@ -296,19 +292,11 @@ static char* NodeToStr( const node_t* p_node )
         return NULL;
 
     const vlc_dictionary_t* p_attr_dict = &p_node->attr_dict;
-    char** pp_keys = vlc_dictionary_all_keys( p_attr_dict );
-    if( unlikely( pp_keys == NULL ) )
+    for( int i = 0; i < p_attr_dict->i_size; ++i )
     {
-        free( psz_text );
-        return NULL;
+        for ( vlc_dictionary_entry_t* p_entry = p_attr_dict->p_entries[i]; p_entry != NULL; p_entry = p_entry->p_next )
+            psz_text = Append( psz_text, " %s=\"%s\"", p_entry->psz_key, p_entry->p_value );
     }
-
-    for( int i = 0; pp_keys[i] != NULL; i++)
-    {
-        psz_text = Append( psz_text, " %s=\"%s\"", pp_keys[i], vlc_dictionary_value_for_key( p_attr_dict, pp_keys[i] ) );
-        free( pp_keys[i] );
-    }
-    free( pp_keys );
     if( p_node->psz_styleid )
         psz_text = Append( psz_text, " style=\"%s\"", p_node->psz_styleid );
 
