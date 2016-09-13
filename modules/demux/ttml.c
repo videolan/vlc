@@ -281,6 +281,13 @@ static int MergeNodeWithParents( node_t* p_node )
     return VLC_SUCCESS;
 }
 
+static int CompareTagName( const char* psz_tagname, const char* psz_pattern )
+{
+    if( !strncasecmp( "tt:", psz_tagname, 3 ) )
+        psz_tagname += 3;
+    return strcasecmp( psz_tagname, psz_pattern );
+}
+
 static char* NodeToStr( const node_t* p_node )
 {   
     char* psz_text = NULL;
@@ -305,7 +312,7 @@ static char* NodeToStr( const node_t* p_node )
     if( p_node->psz_styleid )
         psz_text = Append( psz_text, " style=\"%s\"", p_node->psz_styleid );
 
-    if( !strcasecmp( p_node->psz_node_name, "br" ) || !strcasecmp( p_node->psz_node_name, "tt:br" ) )
+    if( !CompareTagName( p_node->psz_node_name, "br" ) )
         psz_text = Append( psz_text, "/>" );
     else
         psz_text = Append( psz_text, ">" );
@@ -493,7 +500,7 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
         }
         i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
 
-    } while( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "p" ) && strcasecmp( psz_node_name, "tt:p" ) ) );
+    } while( i_type != XML_READER_ENDELEM || CompareTagName( psz_node_name, "p" ) );
 
     /*
     * To split the timeline of the current subtitle, we take every
@@ -579,16 +586,16 @@ static int ReadTTML( demux_t* p_demux )
         if( i_type <= XML_READER_NONE )
             break;
 
-        if( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_node_name, "head" ) || !strcasecmp( psz_node_name, "tt:head" ) ) )
+        if( i_type == XML_READER_STARTELEM && !CompareTagName( psz_node_name, "head" ) )
         {
             p_sys->b_has_head = true;
             /* we don't want to parse the head content here */
-            while( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "head" ) && strcasecmp( psz_node_name, "tt:head" ) ) )
+            while( i_type != XML_READER_ENDELEM || CompareTagName( psz_node_name, "head" ) )
             {
                 i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
             }
         }
-        else if( i_type == XML_READER_STARTELEM && ( strcasecmp( psz_node_name, "tt" ) && strcasecmp( psz_node_name, "tt:tt") ) )
+        else if( i_type == XML_READER_STARTELEM && CompareTagName( psz_node_name, "tt" ) )
         {
             node_t* p_node = calloc( 1, sizeof( *p_node ) );
             if( unlikely( p_node == NULL ) )
@@ -607,7 +614,7 @@ static int ReadTTML( demux_t* p_demux )
             p_node->p_parent = p_parent_node;
 
             /* only in leaf p nodes */
-            if( !strcasecmp( psz_node_name, "p" ) || !strcasecmp( psz_node_name, "tt:p" ) )
+            if( !CompareTagName( psz_node_name, "p" ) )
             {
                 if( MergeNodeWithParents( p_node ) != VLC_SUCCESS )
                 {
@@ -651,7 +658,7 @@ static int ReadTTML( demux_t* p_demux )
                         i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
                     }
                     while( i_type > XML_READER_NONE && ( i_type != XML_READER_ENDELEM
-                            || ( strcmp( psz_node_name, "p" ) && strcmp( psz_node_name, "tt:p" ) ) )
+                            || CompareTagName( psz_node_name, "p" ) )
                           )
                     {
                         if( i_type == XML_READER_TEXT && psz_node_name != NULL )
@@ -712,13 +719,13 @@ static int ReadTTML( demux_t* p_demux )
                 p_parent_node = p_node;
         }
         /*  end tag after a p tag but inside the body */
-        else if( i_type == XML_READER_ENDELEM && ( strcasecmp( psz_node_name, "body" ) && strcasecmp( psz_node_name, "tt:body" ) ) )
+        else if( i_type == XML_READER_ENDELEM && CompareTagName( psz_node_name, "body" ) )
         {
             node_t* p_parent = p_parent_node->p_parent;
             ClearNode( p_parent_node );
             p_parent_node = p_parent;
         }
-    } while( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "tt" ) && strcasecmp( psz_node_name, "tt:tt" ) ) );
+    } while( i_type != XML_READER_ENDELEM || CompareTagName( psz_node_name, "tt" ) );
     ClearNodeStack( p_parent_node );
     return VLC_SUCCESS;
 
@@ -890,7 +897,7 @@ static int Open( vlc_object_t* p_this )
     * We store the tt root node to wrap it around every ttml
     * pieces sent to the codec to define the namespaces.
     */
-    if( i_type != XML_READER_STARTELEM || ( strcasecmp( psz_name, "tt" ) && strcasecmp( psz_name, "tt:tt" ) ) )
+    if( i_type != XML_READER_STARTELEM || CompareTagName( psz_name, "tt" ) )
     {
         goto error;
     }
