@@ -285,7 +285,7 @@ static int CompareTagName( const char* psz_tagname, const char* psz_pattern )
 }
 
 static char* NodeToStr( const node_t* p_node )
-{   
+{
     char* psz_text = NULL;
 
     if( asprintf( &psz_text, "<%s", p_node->psz_node_name ) < 0 )
