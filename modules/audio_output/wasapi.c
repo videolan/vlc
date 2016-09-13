@@ -80,8 +80,7 @@ typedef struct aout_stream_sys
 
     vlc_fourcc_t format; /**< Sample format */
     unsigned rate; /**< Sample rate */
-    unsigned bytes_per_frame;
-    unsigned frame_length;
+    unsigned block_align;
     UINT64 written; /**< Frames written to the buffer */
     UINT32 frames; /**< Total buffer size (frames) */
 } aout_stream_sys_t;
@@ -168,7 +167,7 @@ static HRESULT Play(aout_stream_t *s, block_t *block)
             break;
         }
 
-        const size_t copy = frames * sys->bytes_per_frame / sys->frame_length;
+        const size_t copy = frames * sys->block_align;
 
         memcpy(dst, block->p_buffer, copy);
         hr = IAudioRenderClient_ReleaseBuffer(render, frames, 0);
@@ -261,9 +260,6 @@ static void vlc_SpdifToWave(WAVEFORMATEXTENSIBLE *restrict wf,
         vlc_assert_unreachable();
     }
     audio->i_format = VLC_CODEC_SPDIFL;
-    aout_FormatPrepare (audio);
-    audio->i_bytes_per_frame = AOUT_SPDIF_SIZE;
-    audio->i_frame_length = A52_FRAME_NB;
 
     wf->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
     wf->Format.nChannels = 2; /* To prevent channel re-ordering */
@@ -459,6 +455,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     sys->chans_to_reorder = vlc_CheckWaveOrder(pwf, sys->chans_table);
     sys->format = fmt.i_format;
+    sys->block_align = pwf->nBlockAlign;
 
     hr = IAudioClient_Initialize(sys->client, shared_mode, 0,
                                  AOUT_MAX_PREPARE_TIME * 10, 0, pwf, sid);
@@ -488,8 +485,6 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     *pfmt = fmt;
     sys->rate = fmt.i_rate;
-    sys->bytes_per_frame = fmt.i_bytes_per_frame;
-    sys->frame_length = fmt.i_frame_length > 0 ? fmt.i_frame_length : 1;
     sys->written = 0;
     s->sys = sys;
     s->time_get = TimeGet;
