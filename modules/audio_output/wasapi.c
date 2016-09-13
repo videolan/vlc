@@ -433,7 +433,10 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     if (FAILED(hr))
     {
-        msg_Err(s, "cannot negotiate audio format (error 0x%lx)", hr);
+        msg_Err(s, "cannot negotiate audio format (error 0x%lx)%s", hr,
+                hr == AUDCLNT_E_UNSUPPORTED_FORMAT
+                && fmt.i_format == VLC_CODEC_SPDIFL ?
+                ": digital pass-through not supported" : "");
         goto error;
     }
 
