@@ -846,15 +846,17 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
                  | PA_STREAM_FIX_RATE
                  | PA_STREAM_FIX_CHANNELS);
     }
-
-    /* Fallback to PCM */
-    formatv[formatc] = pa_format_info_new();
-    formatv[formatc]->encoding = PA_ENCODING_PCM;
-    pa_format_info_set_sample_format(formatv[formatc], ss.format);
-    pa_format_info_set_rate(formatv[formatc], ss.rate);
-    pa_format_info_set_channels(formatv[formatc], ss.channels);
-    pa_format_info_set_channel_map(formatv[formatc], &map);
-    formatc++;
+    else
+    {
+        /* PCM */
+        formatv[formatc] = pa_format_info_new();
+        formatv[formatc]->encoding = PA_ENCODING_PCM;
+        pa_format_info_set_sample_format(formatv[formatc], ss.format);
+        pa_format_info_set_rate(formatv[formatc], ss.rate);
+        pa_format_info_set_channels(formatv[formatc], ss.channels);
+        pa_format_info_set_channel_map(formatv[formatc], &map);
+        formatc++;
+    }
 
     /* Create a playback stream */
     pa_proplist *props = pa_proplist_new();
@@ -911,7 +913,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (pa_stream_connect_playback(s, sys->sink_force, &attr, flags,
                                    cvolume, NULL) < 0
      || stream_wait(s, sys->mainloop)) {
-        vlc_pa_error(aout, "stream connection failure", sys->context);
+        if (encoding != PA_ENCODING_INVALID)
+            vlc_pa_error(aout, "digital pass-through stream connection failure",
+                         sys->context);
+        else
+            vlc_pa_error(aout, "stream connection failure", sys->context);
         goto fail;
     }
     sys->volume_force = PA_VOLUME_INVALID;
@@ -919,21 +925,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     free(sys->sink_force);
     sys->sink_force = NULL;
 
-    const struct pa_sample_spec *spec = pa_stream_get_sample_spec(s);
-    if (encoding != PA_ENCODING_INVALID) {
-        const pa_format_info *info = pa_stream_get_format_info(s);
-
-        assert (info != NULL);
-        if (pa_format_info_is_pcm (info)) {
-            msg_Dbg(aout, "digital pass-through not available");
-            fmt->i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
-        } else {
-            msg_Dbg(aout, "digital pass-through enabled");
-            spec = NULL;
-        }
-    }
-    if (spec != NULL)
+    if (encoding == PA_ENCODING_INVALID)
+    {
+        const struct pa_sample_spec *spec = pa_stream_get_sample_spec(s);
         fmt->i_rate = spec->rate;
+    }
 
     stream_buffer_attr_cb(s, aout);
     stream_moved_cb(s, aout);
