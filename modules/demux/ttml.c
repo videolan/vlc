@@ -377,18 +377,13 @@ static int timeCmp( const void* p_time1, const void* p_time2 )
 */
 static char* setOpacityToZero( char* psz_text )
 {
-    const char* psz_begin = strstr( psz_text, "<span " );
-    if( unlikely( psz_begin == NULL ) )
-        return NULL;
-
     const char* psz_end = strstr( psz_text, ">" );
-    char* psz_cpy = malloc( strlen( psz_text ) );
-    if( unlikely( psz_cpy == NULL ) )
-        return NULL;
 
-    strncpy( psz_cpy, psz_text, psz_end - psz_begin );
-    psz_cpy = Append( psz_cpy, " tts:opacity=\"0\">%s", psz_end + 1);
-    return psz_cpy;
+    int i_span_length = psz_end - psz_text;
+    char* psz_res;
+    if( asprintf( &psz_res, "%.*s tts:opacity=\"0\">%s", i_span_length, psz_text, psz_end + 1) < 0 )
+        psz_res = NULL;
+    return psz_res;
 }
 
 static void CleanSubs( subtitle_t** tab )
