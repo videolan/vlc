@@ -797,11 +797,13 @@ static void ATSC_NewTable_Callback( dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     switch( i_table_id )
     {
         case ATSC_ETT_TABLE_ID:
-            ATSC_ATTACH_WITH_FIXED_DECODER( p_dvbpsi, ETT, ATSC_ETT_TABLE_ID, i_extension, p_cb_pid );
+            if( !ATSC_ATTACH_WITH_FIXED_DECODER( p_dvbpsi, ETT, ATSC_ETT_TABLE_ID, i_extension, p_cb_pid ) )
+                msg_Warn( p_demux, "Cannot attach ETT decoder source %" PRIu16, i_extension );
             break;
 
         case ATSC_EIT_TABLE_ID:
-            ATSC_ATTACH( p_dvbpsi, EIT, ATSC_EIT_TABLE_ID, i_extension, p_cb_pid );
+            if( !ATSC_ATTACH( p_dvbpsi, EIT, ATSC_EIT_TABLE_ID, i_extension, p_cb_pid ) )
+                msg_Warn( p_demux, "Cannot attach EIT decoder source %" PRIu16, i_extension );
             break;
 
         default:
