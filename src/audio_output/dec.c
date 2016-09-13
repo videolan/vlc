@@ -207,7 +207,7 @@ static void aout_DecSilence (audio_output_t *aout, mtime_t length, mtime_t pts)
     size_t frames = (fmt->i_rate * length) / CLOCK_FREQ;
     block_t *block;
 
-    if (AOUT_FMT_SPDIF(fmt))
+    if (AOUT_FMT_SPDIF(fmt) || AOUT_FMT_HDMI(fmt))
         block = block_Alloc (4 * frames);
     else
         block = block_Alloc (frames * fmt->i_bytes_per_frame);

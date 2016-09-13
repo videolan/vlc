@@ -77,8 +77,12 @@
     ( ((p_format)->i_format == VLC_CODEC_SPDIFL)       \
        || ((p_format)->i_format == VLC_CODEC_SPDIFB)   \
        || ((p_format)->i_format == VLC_CODEC_A52)      \
-       || ((p_format)->i_format == VLC_CODEC_EAC3)     \
        || ((p_format)->i_format == VLC_CODEC_DTS) )
+
+/* TODO: add VLC_CODEC_MLP, VLC_CODEC_TRUEHD */
+#define AOUT_FMT_HDMI( p_format )                   \
+    ( (p_format)->i_format == VLC_CODEC_EAC3        \
+    )
 
 /* Values used for the audio-channels object variable */
 #define AOUT_VAR_CHAN_UNSET         0 /* must be zero */
