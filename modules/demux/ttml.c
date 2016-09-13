@@ -631,10 +631,11 @@ static int ReadTTML( demux_t* p_demux )
                     if( p_sys->i_subtitles >= i_max_sub )
                     {
                         i_max_sub += 500;
-                        p_sys->subtitle = realloc_or_free( p_sys->subtitle,
+                        subtitle_t* p_subtitles = realloc( p_sys->subtitle,
                                 sizeof( *p_sys->subtitle ) * i_max_sub );
-                        if( unlikely( p_sys->subtitle == NULL ) )
+                        if( unlikely( p_subtitles == NULL ) )
                             goto error;
+                        p_sys->subtitle = p_subtitles;
                     }
                     subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
 
