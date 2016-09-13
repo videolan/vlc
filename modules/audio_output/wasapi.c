@@ -369,7 +369,7 @@ static unsigned vlc_CheckWaveOrder (const WAVEFORMATEX *restrict wf,
     return aout_CheckChannelReorder(chans_in, chans_out, mask, table);
 }
 
-static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
+static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
                      const GUID *sid)
 {
     static INIT_ONCE freq_once = INIT_ONCE_STATIC_INIT;
@@ -395,24 +395,25 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
     WAVEFORMATEXTENSIBLE wf;
     WAVEFORMATEX *pwf;
     AUDCLNT_SHAREMODE shared_mode;
+    audio_sample_format_t fmt = *pfmt;
 
-    if (AOUT_FMT_SPDIF(fmt))
+    if (AOUT_FMT_SPDIF(&fmt))
     {
-        vlc_SpdifToWave(&wf, fmt);
+        vlc_SpdifToWave(&wf, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
     }
     else
     {
-        vlc_ToWave(&wf, fmt);
+        vlc_ToWave(&wf, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_SHARED;
     }
 
     hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
                                         &wf.Format, &pwf);
-    if (FAILED(hr) && AOUT_FMT_SPDIF(fmt))
+    if (FAILED(hr) && AOUT_FMT_SPDIF(&fmt))
     {
         /* Device may not support SPDIF: try again with FL32 */
-        vlc_ToWave(&wf, fmt);
+        vlc_ToWave(&wf, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_SHARED;
         hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
                                             &wf.Format, &pwf);
@@ -426,7 +427,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
     if (hr == S_FALSE)
     {
         assert(pwf != NULL);
-        if (vlc_FromWave(pwf, fmt))
+        if (vlc_FromWave(pwf, &fmt))
         {
             CoTaskMemFree(pwf);
             msg_Err(s, "unsupported audio format");
@@ -441,7 +442,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
 
     sys->chans_to_reorder = vlc_CheckWaveOrder((hr == S_OK) ? &wf.Format : pwf,
                                                sys->chans_table);
-    sys->format = fmt->i_format;
+    sys->format = fmt.i_format;
 
     hr = IAudioClient_Initialize(sys->client, shared_mode, 0,
                                  AOUT_MAX_PREPARE_TIME * 10, 0,
@@ -470,9 +471,10 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
         msg_Dbg(s, "minimum period : %"PRIu64"00 ns", minT);
     }
 
-    sys->rate = fmt->i_rate;
-    sys->bytes_per_frame = fmt->i_bytes_per_frame;
-    sys->frame_length = fmt->i_frame_length > 0 ? fmt->i_frame_length : 1;
+    *pfmt = fmt;
+    sys->rate = fmt.i_rate;
+    sys->bytes_per_frame = fmt.i_bytes_per_frame;
+    sys->frame_length = fmt.i_frame_length > 0 ? fmt.i_frame_length : 1;
     sys->written = 0;
     s->sys = sys;
     s->time_get = TimeGet;
