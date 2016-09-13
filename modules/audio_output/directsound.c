@@ -591,7 +591,7 @@ static void OutputStop( audio_output_t *aout )
 }
 
 static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
-                      audio_sample_format_t *restrict fmt )
+                      audio_sample_format_t *restrict pfmt )
 {
 #if !VLC_WINSTORE_APP
     /* Set DirectSound Cooperative level, ie what control we want over Windows
@@ -609,9 +609,10 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
         msg_Warn( obj, "cannot set direct sound cooperative level" );
 #endif
 
-    if( AOUT_FMT_HDMI( fmt ) )
+    if( AOUT_FMT_HDMI( pfmt ) )
         return E_FAIL;
 
+    audio_sample_format_t fmt = *pfmt;
     const char *const *ppsz_compare = speaker_list;
     char *psz_speaker;
     int i = 0;
@@ -642,19 +643,19 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
     vlc_mutex_init(&sys->lock);
     vlc_cond_init(&sys->cond);
 
-    if( AOUT_FMT_SPDIF( fmt ) && var_InheritBool( obj, "spdif" ) )
+    if( AOUT_FMT_SPDIF( &fmt ) && var_InheritBool( obj, "spdif" ) )
     {
         hr = CreateDSBuffer( obj, sys, VLC_CODEC_SPDIFL,
-                             fmt->i_physical_channels,
-                             aout_FormatNbChannels(fmt), fmt->i_rate, false );
+                             fmt.i_physical_channels,
+                             aout_FormatNbChannels(&fmt), fmt.i_rate, false );
         if( hr == DS_OK )
         {
             msg_Dbg( obj, "using A/52 pass-through over S/PDIF" );
-            fmt->i_format = VLC_CODEC_SPDIFL;
+            fmt.i_format = VLC_CODEC_SPDIFL;
 
             /* Calculate the frame size in bytes */
-            fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
-            fmt->i_frame_length = A52_FRAME_NB;
+            fmt.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+            fmt.i_frame_length = A52_FRAME_NB;
         }
     }
     else
@@ -666,7 +667,7 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
         {
             DWORD ui_speaker_config;
             int i_channels = 2; /* Default to stereo */
-            int i_orig_channels = aout_FormatNbChannels( fmt );
+            int i_orig_channels = aout_FormatNbChannels( &fmt );
 
             /* Check the speaker configuration to determine which channel
              * config should be the default */
@@ -722,18 +723,18 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
             switch( i_channels )
             {
                 case 8:
-                    fmt->i_physical_channels = AOUT_CHANS_7_1;
+                    fmt.i_physical_channels = AOUT_CHANS_7_1;
                     break;
                 case 7:
                 case 6:
-                    fmt->i_physical_channels = AOUT_CHANS_5_1;
+                    fmt.i_physical_channels = AOUT_CHANS_5_1;
                     break;
                 case 5:
                 case 4:
-                    fmt->i_physical_channels = AOUT_CHANS_4_0;
+                    fmt.i_physical_channels = AOUT_CHANS_4_0;
                     break;
                 default:
-                    fmt->i_physical_channels = AOUT_CHANS_2_0;
+                    fmt.i_physical_channels = AOUT_CHANS_2_0;
                     break;
             }
         }
@@ -744,33 +745,33 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
             {
                 case 1: /* Mono */
                     name = "Mono";
-                    fmt->i_physical_channels = AOUT_CHAN_CENTER;
+                    fmt.i_physical_channels = AOUT_CHAN_CENTER;
                     break;
                 case 2: /* Stereo */
                     name = "Stereo";
-                    fmt->i_physical_channels = AOUT_CHANS_2_0;
+                    fmt.i_physical_channels = AOUT_CHANS_2_0;
                     break;
                 case 3: /* Quad */
                     name = "Quad";
-                    fmt->i_physical_channels = AOUT_CHANS_4_0;
+                    fmt.i_physical_channels = AOUT_CHANS_4_0;
                     break;
                 case 4: /* 5.1 */
                     name = "5.1";
-                    fmt->i_physical_channels = AOUT_CHANS_5_1;
+                    fmt.i_physical_channels = AOUT_CHANS_5_1;
                     break;
                 case 5: /* 7.1 */
                     name = "7.1";
-                    fmt->i_physical_channels = AOUT_CHANS_7_1;
+                    fmt.i_physical_channels = AOUT_CHANS_7_1;
                     break;
             }
             msg_Dbg( obj, "%s speaker config: %s", "VLC", name );
         }
 
         /* Open the device */
-        aout_FormatPrepare( fmt );
+        aout_FormatPrepare( &fmt );
 
-        hr = CreateDSBufferPCM( obj, sys, &fmt->i_format,
-                                fmt->i_physical_channels, fmt->i_rate, false );
+        hr = CreateDSBufferPCM( obj, sys, &fmt.i_format,
+                                fmt.i_physical_channels, fmt.i_rate, false );
         if( hr != DS_OK )
         {
             msg_Err( obj, "cannot open directx audio device" );
@@ -778,7 +779,7 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
         }
     }
 
-    fmt->i_original_channels = fmt->i_physical_channels;
+    fmt.i_original_channels = fmt.i_physical_channels;
 
     int ret = vlc_clone(&sys->eraser_thread, PlayedDataEraser, (void*) obj,
                         VLC_THREAD_PRIORITY_LOW);
@@ -801,6 +802,8 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
         sys->p_dsobject = NULL;
         return ret;
     }
+
+    *pfmt = fmt;
     sys->b_playing = false;
     sys->i_write = 0;
     sys->i_last_read =  0;
