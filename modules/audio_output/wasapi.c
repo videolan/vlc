@@ -410,14 +410,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
                                         &wf.Format, &pwf);
-    if (FAILED(hr) && AOUT_FMT_SPDIF(&fmt))
-    {
-        /* Device may not support SPDIF: try again with FL32 */
-        vlc_ToWave(&wf, &fmt);
-        shared_mode = AUDCLNT_SHAREMODE_SHARED;
-        hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
-                                            &wf.Format, &pwf);
-    }
+
     if (FAILED(hr))
     {
         msg_Err(s, "cannot negotiate audio format (error 0x%lx)", hr);
