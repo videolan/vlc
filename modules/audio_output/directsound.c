@@ -609,6 +609,9 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
         msg_Warn( obj, "cannot set direct sound cooperative level" );
 #endif
 
+    if( AOUT_FMT_HDMI( fmt ) )
+        return E_FAIL;
+
     const char *const *ppsz_compare = speaker_list;
     char *psz_speaker;
     int i = 0;
