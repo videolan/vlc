@@ -476,7 +476,8 @@ struct vlc_common_members
 #if !defined(__cplusplus) && (__STDC_VERSION__ >= 201112L)
 # define VLC_OBJECT(x) \
     _Generic((x)->obj, \
-        struct vlc_common_members: (vlc_object_t *)(&(x)->obj) \
+        struct vlc_common_members: (vlc_object_t *)(&(x)->obj), \
+        const struct vlc_common_members: (const vlc_object_t *)(&(x)->obj) \
     )
 #elif VLC_GCC_VERSION(4,0)
 # ifndef __cplusplus
