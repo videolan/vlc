@@ -168,7 +168,7 @@ static inline void *realloc_down( void *ptr, size_t size )
     int low = 0, high = count - 1;   \
     answer = -1; \
     while( low <= high ) {\
-        int mid = (low + high ) / 2; /* Just don't care about 2^30 tables */ \
+        int mid = ((unsigned int)low + (unsigned int)high) >> 1;\
         zetype mid_val = entries[mid] elem;\
         if( mid_val < key ) \
             low = mid + 1; \
