@@ -107,6 +107,14 @@ extern "C" {
 # define VLC_NOTHROW
 #endif
 
+/* stddef.h */
+#ifndef HAVE_MAX_ALIGN_T
+typedef struct {
+  long long ll;
+  long double ld;
+} max_align_t;
+#endif
+
 /* stdio.h */
 #ifndef HAVE_ASPRINTF
 int asprintf (char **, const char *, ...);

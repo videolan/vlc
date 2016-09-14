@@ -650,6 +650,10 @@ dnl Check for struct timespec
 AC_CHECK_TYPES([struct timespec],,,
 [#include <time.h>])
 
+dnl Check for max_align_t
+AC_CHECK_TYPES([max_align_t],,,
+[#include <stddef.h>])
+
 dnl Checks for socket stuff
 VLC_SAVE_FLAGS
 SOCKET_LIBS=""
