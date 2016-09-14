@@ -451,6 +451,16 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
             if( unlikely( p_node == NULL ) )
                 goto error;
 
+            if( ReadAttrNode( p_sys->p_reader, p_node, psz_node_name ) != VLC_SUCCESS )
+            {
+                ClearNode( p_node );
+                goto error;
+            }
+            if( p_node->psz_begin == NULL || p_node->psz_end == NULL )
+            {
+                ClearNode( p_node );
+                continue;
+            }
             pp_subtitles[i_nb_span] = malloc( sizeof( *pp_subtitles[i_nb_span] ) );
             if( unlikely( pp_subtitles[i_nb_span] == NULL ) )
             {
@@ -458,11 +468,6 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
                 goto error;
             }
 
-            if( ReadAttrNode( p_sys->p_reader, p_node, psz_node_name ) != VLC_SUCCESS )
-            {
-                ClearNode( p_node );
-                goto error;
-            }
             pp_subtitles[i_nb_span]->psz_text = NodeToStr( p_node );
             if( pp_subtitles[i_nb_span] == NULL )
             {
@@ -476,10 +481,14 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
         }
         else if( i_type == XML_READER_TEXT )
         {
+            if ( pp_subtitles[i_nb_span] == NULL )
+                continue;
             pp_subtitles[i_nb_span]->psz_text = Append( pp_subtitles[i_nb_span]->psz_text, "%s", psz_node_name );
         }
         else if( i_type == XML_READER_ENDELEM )
         {
+            if ( pp_subtitles[i_nb_span] == NULL )
+                continue;
             pp_subtitles[i_nb_span]->psz_text = Append( pp_subtitles[i_nb_span]->psz_text, "</%s>", psz_node_name );
             i_nb_span++;
             subtitle_t** pp_tmp = realloc( pp_subtitles, ( i_nb_span + 1 ) * sizeof( *pp_subtitles ) );
