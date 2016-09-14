@@ -40,7 +40,7 @@ namespace dash
     {
         public:
             virtual AbstractStream *create(demux_t*, const StreamFormat &,
-                                   SegmentTracker *, HTTPConnectionManager *) const;
+                                   SegmentTracker *, AbstractConnectionManager *) const;
     };
 }
 

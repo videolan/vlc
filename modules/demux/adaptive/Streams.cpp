@@ -53,7 +53,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     vlc_mutex_init(&lock);
 }
 
-bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, HTTPConnectionManager *conn)
+bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, AbstractConnectionManager *conn)
 {
     /* Don't even try if not supported or already init */
     if((unsigned)format_ == StreamFormat::UNSUPPORTED || demuxersource)

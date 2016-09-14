@@ -38,7 +38,7 @@ namespace adaptive
     namespace http
     {
         class AbstractConnection;
-        class HTTPConnectionManager;
+        class AbstractConnectionManager;
         class AbstractChunk;
 
         class AbstractChunkSource
@@ -82,7 +82,7 @@ namespace adaptive
         class HTTPChunkSource : public AbstractChunkSource
         {
             public:
-                HTTPChunkSource(const std::string &url, HTTPConnectionManager *);
+                HTTPChunkSource(const std::string &url, AbstractConnectionManager *);
                 virtual ~HTTPChunkSource();
 
                 virtual block_t *   readBlock       (); /* impl */
@@ -94,7 +94,7 @@ namespace adaptive
             protected:
                 virtual bool      prepare();
                 AbstractConnection    *connection;
-                HTTPConnectionManager *connManager;
+                AbstractConnectionManager *connManager;
                 size_t              consumed; /* read pointer */
                 bool                prepared;
                 bool                eof;
@@ -109,7 +109,7 @@ namespace adaptive
             friend class Downloader;
 
             public:
-                HTTPChunkBufferedSource(const std::string &url, HTTPConnectionManager *);
+                HTTPChunkBufferedSource(const std::string &url, AbstractConnectionManager *);
                 virtual ~HTTPChunkBufferedSource();
                 virtual block_t *  readBlock       (); /* reimpl */
                 virtual block_t *  read            (size_t); /* reimpl */
@@ -134,7 +134,7 @@ namespace adaptive
         class HTTPChunk : public AbstractChunk
         {
             public:
-                HTTPChunk(const std::string &url, HTTPConnectionManager *);
+                HTTPChunk(const std::string &url, AbstractConnectionManager *);
                 virtual ~HTTPChunk();
 
                 virtual void        onDownload      (block_t **) {} /* impl */

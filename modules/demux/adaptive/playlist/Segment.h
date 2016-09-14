@@ -37,7 +37,7 @@ namespace adaptive
 {
     namespace http
     {
-        class HTTPConnectionManager;
+        class AbstractConnectionManager;
     }
 
     namespace playlist
@@ -58,7 +58,7 @@ namespace adaptive
                  *          That is basically true when using an Url, and false
                  *          when using an UrlTemplate
                  */
-                virtual SegmentChunk*                   toChunk         (size_t, BaseRepresentation *, HTTPConnectionManager *);
+                virtual SegmentChunk*                   toChunk         (size_t, BaseRepresentation *, AbstractConnectionManager *);
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual void                            setSequenceNumber(uint64_t);
                 virtual uint64_t                        getSequenceNumber() const;

@@ -135,7 +135,7 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 }
 
 AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &,
-                               SegmentTracker *tracker, HTTPConnectionManager *manager) const
+                               SegmentTracker *tracker, AbstractConnectionManager *manager) const
 {
     HLSStream *stream = new (std::nothrow) HLSStream(realdemux);
     if(stream && !stream->init(StreamFormat(StreamFormat::UNKNOWN), tracker, manager))

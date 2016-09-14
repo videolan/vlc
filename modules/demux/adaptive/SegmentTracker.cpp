@@ -112,7 +112,8 @@ void SegmentTracker::reset()
     format = StreamFormat::UNSUPPORTED;
 }
 
-SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed, HTTPConnectionManager *connManager)
+SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
+                                            AbstractConnectionManager *connManager)
 {
     BaseRepresentation *rep = NULL, *prevRep = NULL;
     ISegment *segment;

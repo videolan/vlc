@@ -66,7 +66,7 @@ void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
 
 }
 
-SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *rep, HTTPConnectionManager *connManager)
+SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *rep, AbstractConnectionManager *connManager)
 {
     const std::string url = getUrlSegment().toString(index, rep);
     HTTPChunkBufferedSource *source = new (std::nothrow) HTTPChunkBufferedSource(url, connManager);
@@ -78,7 +78,7 @@ SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *rep, HTTPConne
         SegmentChunk *chunk = new (std::nothrow) SegmentChunk(this, source, rep);
         if( chunk )
         {
-            connManager->downloader->schedule(source);
+            connManager->start(source);
             return chunk;
         }
         else

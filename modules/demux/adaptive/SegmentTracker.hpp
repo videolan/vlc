@@ -29,7 +29,7 @@ namespace adaptive
 {
     namespace http
     {
-        class HTTPConnectionManager;
+        class AbstractConnectionManager;
     }
 
     namespace logic
@@ -94,7 +94,7 @@ namespace adaptive
             StreamFormat getCurrentFormat() const;
             bool segmentsListReady() const;
             void reset();
-            SegmentChunk* getNextChunk(bool, HTTPConnectionManager *);
+            SegmentChunk* getNextChunk(bool, AbstractConnectionManager *);
             bool setPositionByTime(mtime_t, bool, bool);
             void setPositionByNumber(uint64_t, bool);
             mtime_t getPlaybackTime() const; /* Current segment start time if selected */

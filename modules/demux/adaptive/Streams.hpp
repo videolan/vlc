@@ -38,7 +38,7 @@ namespace adaptive
 
     namespace http
     {
-        class HTTPConnectionManager;
+        class AbstractConnectionManager;
     }
 
     namespace playlist
@@ -56,7 +56,7 @@ namespace adaptive
     public:
         AbstractStream(demux_t *);
         virtual ~AbstractStream();
-        bool init(const StreamFormat &, SegmentTracker *, HTTPConnectionManager *);
+        bool init(const StreamFormat &, SegmentTracker *, AbstractConnectionManager *);
 
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
@@ -109,7 +109,7 @@ namespace adaptive
         demux_t *p_realdemux;
         StreamFormat format;
 
-        HTTPConnectionManager *connManager; /* not owned */
+        AbstractConnectionManager *connManager; /* not owned */
         SegmentTracker *segmentTracker;
 
         SegmentChunk *currentChunk;
@@ -131,7 +131,7 @@ namespace adaptive
         public:
             virtual ~AbstractStreamFactory() {}
             virtual AbstractStream *create(demux_t*, const StreamFormat &,
-                                   SegmentTracker *, HTTPConnectionManager *) const = 0;
+                                   SegmentTracker *, AbstractConnectionManager *) const = 0;
     };
 }
 #endif // STREAMS_HPP

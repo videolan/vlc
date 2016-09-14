@@ -36,7 +36,7 @@ namespace adaptive
 
     namespace http
     {
-        class HTTPConnectionManager;
+        class AbstractConnectionManager;
     }
 
     using namespace playlist;
@@ -89,9 +89,9 @@ namespace adaptive
 
             /* local factories */
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType,
-                                                         HTTPConnectionManager *);
+                                                         AbstractConnectionManager *);
 
-            HTTPConnectionManager              *conManager;
+            AbstractConnectionManager           *conManager;
             AbstractAdaptationLogic::LogicType  logicType;
             AbstractAdaptationLogic             *logic;
             AbstractPlaylist                    *playlist;

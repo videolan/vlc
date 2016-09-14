@@ -72,7 +72,7 @@ AbstractDemuxer * DASHStream::createDemux(const StreamFormat &format)
 }
 
 AbstractStream * DASHStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
-                                   SegmentTracker *tracker, HTTPConnectionManager *manager) const
+                                   SegmentTracker *tracker, AbstractConnectionManager *manager) const
 {
     AbstractStream *stream = new (std::nothrow) DASHStream(realdemux);
     if(stream && !stream->init(format, tracker, manager))
