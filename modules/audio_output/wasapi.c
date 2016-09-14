@@ -413,7 +413,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     /* Configure audio stream */
     WAVEFORMATEXTENSIBLE wf;
-    WAVEFORMATEX *pwf;
+    WAVEFORMATEX *pwf = &wf.Format, *pwf_closest;
     AUDCLNT_SHAREMODE shared_mode;
     audio_sample_format_t fmt = *pfmt;
 
@@ -429,7 +429,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     }
 
     hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
-                                        &wf.Format, &pwf);
+                                        pwf, &pwf_closest);
 
     if (FAILED(hr))
     {
@@ -442,28 +442,27 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     if (hr == S_FALSE)
     {
-        assert(pwf != NULL);
-        if (vlc_FromWave(pwf, &fmt))
+        assert(pwf_closest != NULL);
+        if (vlc_FromWave(pwf_closest, &fmt))
         {
-            CoTaskMemFree(pwf);
+            CoTaskMemFree(pwf_closest);
             msg_Err(s, "unsupported audio format");
             hr = E_INVALIDARG;
             goto error;
         }
         shared_mode = AUDCLNT_SHAREMODE_SHARED;
         msg_Dbg(s, "modified format");
+        pwf = pwf_closest;
     }
     else
-        assert(pwf == NULL);
+        assert(pwf_closest == NULL);
 
-    sys->chans_to_reorder = vlc_CheckWaveOrder((hr == S_OK) ? &wf.Format : pwf,
-                                               sys->chans_table);
+    sys->chans_to_reorder = vlc_CheckWaveOrder(pwf, sys->chans_table);
     sys->format = fmt.i_format;
 
     hr = IAudioClient_Initialize(sys->client, shared_mode, 0,
-                                 AOUT_MAX_PREPARE_TIME * 10, 0,
-                                 (hr == S_OK) ? &wf.Format : pwf, sid);
-    CoTaskMemFree(pwf);
+                                 AOUT_MAX_PREPARE_TIME * 10, 0, pwf, sid);
+    CoTaskMemFree(pwf_closest);
     if (FAILED(hr))
     {
         msg_Err(s, "cannot initialize audio client (error 0x%lx)", hr);
