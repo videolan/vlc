@@ -616,7 +616,7 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
     const char *const *ppsz_compare = speaker_list;
     char *psz_speaker;
     int i = 0;
-    HRESULT hr;
+    HRESULT hr = DSERR_UNSUPPORTED;
 
     /* Retrieve config values */
     var_Create( obj, "directx-audio-float32",
@@ -643,11 +643,13 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
     vlc_mutex_init(&sys->lock);
     vlc_cond_init(&sys->cond);
 
-    if( AOUT_FMT_SPDIF( &fmt ) && var_InheritBool( obj, "spdif" ) )
+    if( AOUT_FMT_SPDIF( &fmt ) )
     {
-        hr = CreateDSBuffer( obj, sys, VLC_CODEC_SPDIFL,
-                             fmt.i_physical_channels,
-                             aout_FormatNbChannels(&fmt), fmt.i_rate, false );
+        if( var_InheritBool( obj, "spdif" ) )
+            hr = CreateDSBuffer( obj, sys, VLC_CODEC_SPDIFL,
+                                 fmt.i_physical_channels,
+                                 aout_FormatNbChannels(&fmt), fmt.i_rate, false );
+
         if( hr == DS_OK )
         {
             msg_Dbg( obj, "using A/52 pass-through over S/PDIF" );
@@ -657,9 +659,13 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
             fmt.i_bytes_per_frame = AOUT_SPDIF_SIZE;
             fmt.i_frame_length = A52_FRAME_NB;
         }
+        else
+        {
+            vlc_mutex_destroy(&sys->lock);
+            vlc_cond_destroy(&sys->cond);
+            return E_FAIL;
+        }
     }
-    else
-        hr = DSERR_UNSUPPORTED;
 
     if( hr != DS_OK )
     {
