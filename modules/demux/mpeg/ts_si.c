@@ -150,7 +150,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
             {
                 sdt->u.p_si->eitpid = eitpid;
                 SetPIDFilter( p_demux->p_sys, eitpid, true );
-                msg_Dbg( p_demux, "  * pid=%d listening for EIT", eitpid->i_pid );
+                msg_Dbg( p_demux, "  * pid=%"PRIu16" listening for EIT", eitpid->i_pid );
             }
         }
 
@@ -166,13 +166,13 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
             {
                 sdt->u.p_si->tdtpid = tdtpid;
                 SetPIDFilter( p_demux->p_sys, tdtpid, true );
-                msg_Dbg( p_demux, "  * pid=%d listening for TDT", tdtpid->i_pid );
+                msg_Dbg( p_demux, "  * pid=%"PRIu16" listening for TDT", tdtpid->i_pid );
             }
         }
     }
 
-    msg_Dbg( p_demux, "new SDT ts_id=%d version=%d current_next=%d "
-             "network_id=%d",
+    msg_Dbg( p_demux, "new SDT ts_id=%"PRIu16" version=%"PRIu8" current_next=%d "
+             "network_id=%"PRIu16,
              p_sdt->i_extension,
              p_sdt->i_version, p_sdt->b_current_next,
              p_sdt->i_network_id );
@@ -187,8 +187,8 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
         const char *psz_type = NULL;
         const char *psz_status = NULL;
 
-        msg_Dbg( p_demux, "  * service id=%d eit schedule=%d present=%d "
-                 "running=%d free_ca=%d",
+        msg_Dbg( p_demux, "  * service id=%"PRIu16" eit schedule=%d present=%d "
+                 "running=%"PRIu8" free_ca=%d",
                  p_srv->i_service_id, p_srv->b_eit_schedule,
                  p_srv->b_eit_present, p_srv->i_running_status,
                  p_srv->b_free_ca );
@@ -260,7 +260,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                                         pD->i_service_name_length,
                                         p_sys->b_broken_charset );
 
-                msg_Dbg( p_demux, "    - type=%d provider=%s name=%s",
+                msg_Dbg( p_demux, "    - type=%"PRIu8" provider=%s name=%s",
                          pD->i_service_type, str1, str2 );
 
                 vlc_meta_SetTitle( p_meta, str2 );
@@ -375,9 +375,9 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
         return;
     }
 
-    msg_Dbg( p_demux, "new EIT service_id=%d version=%d current_next=%d "
-             "ts_id=%d network_id=%d segment_last_section_number=%d "
-             "last_table_id=%d",
+    msg_Dbg( p_demux, "new EIT service_id=%"PRIu16" version=%"PRIu8" current_next=%d "
+             "ts_id=%"PRIu16" network_id=%"PRIu16" segment_last_section_number=%"PRIu8" "
+             "last_table_id=%"PRIu8,
              p_eit->i_extension,
              p_eit->i_version, p_eit->b_current_next,
              p_eit->i_ts_id, p_eit->i_network_id,
@@ -405,9 +405,9 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
             i_start += 9 * 3600;
         }
 
-        msg_Dbg( p_demux, "  * event id=%d start_time:%d duration=%d "
-                          "running=%d free_ca=%d",
-                 p_evt->i_event_id, (int)i_start, (int)i_duration,
+        msg_Dbg( p_demux, "  * event id=%"PRIu16" start_time:%"PRId64" duration=%d "
+                          "running=%"PRIu8" free_ca=%d",
+                 p_evt->i_event_id, i_start, i_duration,
                  p_evt->i_running_status, p_evt->b_free_ca );
 
         for( p_dr = p_evt->p_first_descriptor; p_dr; p_dr = p_dr->p_next )
@@ -440,7 +440,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                 dvbpsi_extended_event_dr_t *pE = dvbpsi_DecodeExtendedEventDr( p_dr );
                 if( pE )
                 {
-                    msg_Dbg( p_demux, "    - extended event lang=%3.3s [%d/%d]",
+                    msg_Dbg( p_demux, "    - extended event lang=%3.3s [%"PRIu8"/%"PRIu8"]",
                              pE->i_iso_639_code,
                              pE->i_descriptor_number, pE->i_last_descriptor_number );
 
@@ -523,7 +523,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                 break;
 
             default:
-                msg_Dbg( p_demux, "    - event unknown dr 0x%x(%d)", p_dr->i_tag, p_dr->i_tag );
+                msg_Dbg( p_demux, "    - event unknown dr 0x%"PRIx8"(%"PRIu8")", p_dr->i_tag, p_dr->i_tag );
                 break;
             }
         }
@@ -595,7 +595,7 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
 #endif
     if( p_pid->i_pid == TS_SI_SDT_PID && i_table_id == 0x42 )
     {
-        msg_Dbg( p_demux, "SINewTableCallback: table 0x%x(%d) ext=0x%x(%d)",
+        msg_Dbg( p_demux, "SINewTableCallback: table 0x%"PRIx8"(%"PRIu16") ext=0x%"PRIx16"(%"PRIu16")",
                  i_table_id, i_table_id, i_extension, i_extension );
 
         if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_demux ) )
@@ -605,7 +605,7 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
              ( i_table_id == 0x4e || /* Current/Following */
                (i_table_id >= 0x50 && i_table_id <= 0x5f) ) ) /* Schedule */
     {
-        msg_Dbg( p_demux, "SINewTableCallback: table 0x%x(%d) ext=0x%x(%d)",
+        msg_Dbg( p_demux, "SINewTableCallback: table 0x%"PRIx8"(%"PRIu16") ext=0x%"PRIx16"(%"PRIu16")",
                  i_table_id, i_table_id, i_extension, i_extension );
 
         /* Do not attach decoders if we can't decode timestamps */
@@ -619,7 +619,7 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
     else if( p_pid->i_pid == TS_SI_TDT_PID &&
             (i_table_id == TS_SI_TDT_TABLE_ID || i_table_id == TS_SI_TOT_TABLE_ID) )
     {
-         msg_Dbg( p_demux, "SINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
+         msg_Dbg( p_demux, "SINewTableCallBack: table 0x%"PRIx8"(%"PRIu16") ext=0x%"PRIx16"(%"PRIu16")",
                  i_table_id, i_table_id, i_extension, i_extension );
 
         if( !dvbpsi_tot_attach( h, i_table_id, i_extension, (dvbpsi_tot_callback)TDTCallBack, p_demux ) )
