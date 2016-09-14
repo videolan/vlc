@@ -422,13 +422,14 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
     int i_nb_span = 0;
     int ret = VLC_ENOMEM;
 
-    int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
     /*
     * This loop will parse the current p tag and the
     * spans inside, and will store every span text and times
     * inside a subtitle_t structure.
     */
-    do
+    for( int i_type = XML_READER_STARTELEM;
+         i_type != XML_READER_ENDELEM || CompareTagName( psz_node_name, "p" );
+         i_type = xml_ReaderNextNode( p_reader, &psz_node_name ) )
     {
         if( i_type == XML_READER_STARTELEM && !strcasecmp( psz_node_name, "metadata" ) )
         {
@@ -487,9 +488,7 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
 
             pp_subtitles = pp_tmp;
         }
-        i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
-
-    } while( i_type != XML_READER_ENDELEM || CompareTagName( psz_node_name, "p" ) );
+    }
 
     /*
     * To split the timeline of the current subtitle, we take every
