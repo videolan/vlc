@@ -733,7 +733,7 @@ static int DevicesEnum(audio_output_t *aout, IMMDeviceEnumerator *it)
     return n;
 }
 
-static int DeviceSelect(audio_output_t *aout, const char *id)
+static int DeviceSelectLocked(audio_output_t *aout, const char *id)
 {
     aout_sys_t *sys = aout->sys;
     wchar_t *device;
@@ -747,19 +747,25 @@ static int DeviceSelect(audio_output_t *aout, const char *id)
     else
         device = default_device;
 
-    EnterCriticalSection(&sys->lock);
     assert(sys->device == NULL);
     sys->device = device;
 
     WakeConditionVariable(&sys->work);
     while (sys->device != NULL)
         SleepConditionVariableCS(&sys->ready, &sys->lock, INFINITE);
-    LeaveCriticalSection(&sys->lock);
 
     if (sys->stream != NULL && sys->dev != NULL)
         /* Request restart of stream with the new device */
         aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
     return (sys->dev != NULL) ? 0 : -1;
+}
+
+static int DeviceSelect(audio_output_t *aout, const char *id)
+{
+    EnterCriticalSection(&aout->sys->lock);
+    int ret = DeviceSelectLocked(aout, id);
+    LeaveCriticalSection(&aout->sys->lock);
+    return ret;
 }
 
 /*** Initialization / deinitialization **/
@@ -1081,20 +1087,22 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (unlikely(s == NULL))
         return -1;
 
-    s->owner.device = sys->dev;
     s->owner.activate = ActivateDevice;
 
     EnterMTA();
+    EnterCriticalSection(&sys->lock);
     for (;;)
     {
         HRESULT hr;
+        s->owner.device = sys->dev;
 
         /* TODO: Do not overload the "aout" configuration item. */
         sys->module = vlc_module_load(s, "aout stream", "$aout", false,
                                       aout_stream_Start, s, fmt, &hr);
-        if (hr != AUDCLNT_E_DEVICE_INVALIDATED || DeviceSelect(aout, NULL))
+        if (hr != AUDCLNT_E_DEVICE_INVALIDATED || DeviceSelectLocked(aout, NULL))
             break;
     }
+    LeaveCriticalSection(&sys->lock);
     LeaveMTA();
 
     if (sys->module == NULL)
