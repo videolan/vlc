@@ -186,9 +186,12 @@ subpicture_region_private_t *subpicture_region_private_New( video_format_t *p_fm
         return NULL;
 
     if ( video_format_Copy( &p_private->fmt, p_fmt ) != VLC_SUCCESS )
+    {
+        free( p_private );
         return NULL;
-    p_private->p_picture = NULL;
+    }
 
+    p_private->p_picture = NULL;
     return p_private;
 }
 
