@@ -572,6 +572,7 @@ static int ReadTTML( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
     node_t* p_parent_node = NULL;
+    node_t* p_node = NULL;
     char* psz_text = NULL;
     const char* psz_node_name;
     int i_max_sub = 0;
@@ -594,19 +595,12 @@ static int ReadTTML( demux_t* p_demux )
         }
         else if( i_type == XML_READER_STARTELEM && CompareTagName( psz_node_name, "tt" ) )
         {
-            node_t* p_node = calloc( 1, sizeof( *p_node ) );
+            p_node = calloc( 1, sizeof( *p_node ) );
             if( unlikely( p_node == NULL ) )
-            {
-                ClearNodeStack( p_parent_node );
-                return VLC_ENOMEM;
-            }
+                goto error;
 
             if( ReadAttrNode( p_sys->p_reader, p_node, psz_node_name ) != VLC_SUCCESS )
-            {
-                ClearNode( p_node );
-                ClearNodeStack( p_parent_node );
-                return VLC_ENOMEM;
-            }
+                goto error;
 
             p_node->p_parent = p_parent_node;
 
@@ -614,10 +608,7 @@ static int ReadTTML( demux_t* p_demux )
             if( !CompareTagName( psz_node_name, "p" ) )
             {
                 if( MergeNodeWithParents( p_node ) != VLC_SUCCESS )
-                {
-                    ClearNodeStack( p_node );
-                    return VLC_ENOMEM;
-                }
+                    goto error;
 
                 psz_text = NodeToStr( p_node );
                 if( unlikely( psz_text == NULL ) )
@@ -631,7 +622,10 @@ static int ReadTTML( demux_t* p_demux )
                         subtitle_t* p_subtitles = realloc( p_sys->subtitle,
                                 sizeof( *p_sys->subtitle ) * i_max_sub );
                         if( unlikely( p_subtitles == NULL ) )
+                        {
+                            ClearNode( p_node );
                             goto error;
+                        }
                         p_sys->subtitle = p_subtitles;
                     }
                     subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
@@ -714,7 +708,10 @@ static int ReadTTML( demux_t* p_demux )
                     goto error;
             }
             else
+            {
                 p_parent_node = p_node;
+                p_node = NULL;
+            }
         }
         /*  end tag after a p tag but inside the body */
         else if( i_type == XML_READER_ENDELEM && CompareTagName( psz_node_name, "body" ) )
