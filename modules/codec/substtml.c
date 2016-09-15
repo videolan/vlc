@@ -234,10 +234,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                 {
                     if( !strcasecmp( p_sys->pp_styles[i]->psz_styleid, val ) )
                     {
-                        p_base_style = DuplicateStyle( p_sys->pp_styles[i] );
-                        if( unlikely( p_base_style == NULL ) )
-                            return NULL;
-
+                        p_base_style = p_sys->pp_styles[i];
                         break;
                     }
                 }
