@@ -259,7 +259,10 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                 char *tmp;
                 char *value = strdup( val );
                 if( unlikely( value == NULL ) )
+                {
+                    CleanupStyle( p_ttml_style );
                     return NULL;
+                }
 
                 char *token = strtok_r( value , " ", &tmp );
                 ttml_style_t* p_style = FindTextStyle( p_dec, token );
