@@ -625,10 +625,7 @@ static int ReadTTML( demux_t* p_demux )
                         subtitle_t* p_subtitles = realloc( p_sys->subtitle,
                                 sizeof( *p_sys->subtitle ) * i_max_sub );
                         if( unlikely( p_subtitles == NULL ) )
-                        {
-                            ClearNode( p_node );
                             goto error;
-                        }
                         p_sys->subtitle = p_subtitles;
                     }
                     subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
@@ -729,6 +726,7 @@ static int ReadTTML( demux_t* p_demux )
 
 error:
     free( psz_text );
+    ClearNode( p_node );
     ClearNodeStack( p_parent_node );
     return VLC_EGENERIC;
 }
