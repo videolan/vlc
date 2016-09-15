@@ -265,7 +265,7 @@ static int MergeStyles(char** pp_dest, char* p_src)
 
 static int MergeNodeWithParents( node_t* p_node )
 {
-    node_t *parent = p_node->p_parent;
+    const node_t *parent = p_node->p_parent;
     while( parent != NULL)
     {
         if( MergeAttrDict( &p_node->attr_dict, &parent->attr_dict ) != VLC_SUCCESS ||
