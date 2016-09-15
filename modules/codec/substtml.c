@@ -148,7 +148,7 @@ static void CleanupStyle( ttml_style_t* p_ttml_style )
 
 static ttml_style_t *FindTextStyle( decoder_t *p_dec, const char *psz_style )
 {
-    decoder_sys_t  *p_sys = p_dec->p_sys;    
+    decoder_sys_t  *p_sys = p_dec->p_sys;
 
     for( size_t i = 0; i < p_sys->i_styles; i++ )
     {
