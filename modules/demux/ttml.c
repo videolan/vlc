@@ -701,11 +701,14 @@ static int ReadTTML( demux_t* p_demux )
 
                     p_subtitle->psz_text = psz_text;
                     p_sys->i_subtitles++;
+                    ClearNode( p_node );
                 }
-                else if( ParseTimeOnSpan( p_sys , psz_text ) == VLC_SUCCESS )
-                    continue;
                 else
-                    goto error;
+                {
+                    ClearNode( p_node );
+                    if( ParseTimeOnSpan( p_sys , psz_text ) != VLC_SUCCESS )
+                        goto error;
+                }
             }
             else
             {
