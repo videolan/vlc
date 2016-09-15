@@ -1078,10 +1078,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
 
     if( *psz_ip )
     {
-        char psz_fmt[7] = "(|||%u";
-        psz_fmt[1] = psz_fmt[2] = psz_fmt[3] = psz_parser[1];
-
-        if( sscanf( psz_parser, psz_fmt, &i_port ) < 1 )
+        if( sscanf( psz_parser, "(%*3c%u", &i_port ) < 1 )
         {
             free( psz_arg );
             msg_Err( p_access, "cannot parse passive mode response" );
