@@ -118,7 +118,8 @@ static int DeviceSelect(audio_output_t *, const char *);
 static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
 {
     /* Select the default device (and restart) on unplug */
-    if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED))
+    if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED ||
+                 hr == AUDCLNT_E_RESOURCES_INVALIDATED))
         DeviceSelect(aout, NULL);
     return SUCCEEDED(hr) ? 0 : -1;
 }
