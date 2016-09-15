@@ -427,8 +427,8 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
     * spans inside, and will store every span text and times
     * inside a subtitle_t structure.
     */
-    for( int i_type = XML_READER_STARTELEM;
-         i_type != XML_READER_ENDELEM || CompareTagName( psz_node_name, "p" );
+    int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
+    for( ; i_type != XML_READER_ENDELEM || CompareTagName( psz_node_name, "p" );
          i_type = xml_ReaderNextNode( p_reader, &psz_node_name ) )
     {
         if( i_type == XML_READER_STARTELEM && !strcasecmp( psz_node_name, "metadata" ) )
