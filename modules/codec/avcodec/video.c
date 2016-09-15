@@ -829,7 +829,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         int ret = avcodec_send_packet(p_context, &pkt);
         if( ret != 0 && ret != AVERROR(EAGAIN) )
         {
-            p_dec->b_error = true;
+            if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
+            {
+                msg_Err(p_dec, "avcodec_send_packet critical error");
+                p_dec->b_error = true;
+            }
             av_packet_unref( &pkt );
             break;
         }
@@ -846,7 +850,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         ret = avcodec_receive_frame(p_context, frame);
         if( ret != 0 && ret != AVERROR(EAGAIN) )
         {
-            p_dec->b_error = true;
+            if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
+            {
+                msg_Err(p_dec, "avcodec_receive_frame critical error");
+                p_dec->b_error = true;
+            }
             av_frame_free(&frame);
             break;
         }
