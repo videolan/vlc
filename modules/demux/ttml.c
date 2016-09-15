@@ -414,13 +414,13 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
     if( unlikely( pp_subtitles == NULL ) )
         return VLC_ENOMEM;
 
+    int ret = VLC_ENOMEM;
     vlc_array_t* p_times = vlc_array_new();
     if( unlikely( p_times == NULL ) )
         goto error;
 
     const char* psz_node_name;
     int i_nb_span = 0;
-    int ret = VLC_ENOMEM;
 
     /*
     * This loop will parse the current p tag and the
