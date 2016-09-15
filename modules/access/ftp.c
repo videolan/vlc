@@ -1137,14 +1137,13 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     {
         if( p_sys->features.b_mlst &&
             ftp_SendCommand( p_access, p_sys, "MLSD" ) >= 0 &&
-            ftp_RecvCommand( p_access, p_sys, NULL, &psz_arg ) <= 2 )
+            ftp_RecvCommand( p_access, p_sys, NULL, NULL ) <= 2 )
         {
             msg_Dbg( p_access, "Using MLST extension to list" );
         }
         else
-
         if( ftp_SendCommand( p_access, p_sys, "NLST" ) < 0 ||
-            ftp_RecvCommand( p_access, p_sys, NULL, &psz_arg ) > 2 )
+            ftp_RecvCommand( p_access, p_sys, NULL, NULL ) > 2 )
         {
             msg_Err( p_access, "cannot list directory contents" );
             return VLC_EGENERIC;
