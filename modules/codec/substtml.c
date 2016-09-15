@@ -588,7 +588,10 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
                  MergeTTMLStyle( p_style, p_style_stack->p_style );
 
             if( PushStyle( &p_style_stack, p_style ) == false )
+            {
+                CleanupStyle( p_style );
                 goto fail;
+            }
 
         }
         else if( i_type == XML_READER_TEXT )
