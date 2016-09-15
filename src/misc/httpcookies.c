@@ -203,6 +203,9 @@ static http_cookie_t *cookie_parse(const char *value,
     if (unlikely(cookie == NULL))
         return NULL;
 
+    cookie->psz_domain = NULL;
+    cookie->psz_path = NULL;
+
     /* Get the NAME=VALUE part of the Cookie */
     size_t value_length = strcspn(value, ";");
     const char *p = memchr(value, '=', value_length);
