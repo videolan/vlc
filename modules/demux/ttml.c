@@ -544,7 +544,10 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
             {
                 char* psz_transparent= setOpacityToZero( pp_subtitles[k]->psz_text );
                 if( unlikely( psz_transparent == NULL ) )
+                {
+                    free( psz_sub );
                     goto error;
+                }
 
                 psz_sub = Append( psz_sub, "%s",  psz_transparent );
                 free( psz_transparent );
