@@ -775,7 +775,11 @@ static void ParseHead( demux_t* p_demux )
     ssize_t i_read;
 
     // Rewind since the XML parser will have consumed the entire file.
-    vlc_stream_Seek( p_demux->s, 0 );
+    if ( vlc_stream_Seek( p_demux->s, 0 ) != VLC_SUCCESS )
+    {
+        msg_Warn( p_demux, "Failed to rewind to parse <head>. No style will be available" );
+        return;
+    }
 
     while( ( i_read = vlc_stream_Read( p_demux->s, (void*)buff, 1024 ) ) > 0 )
     {
