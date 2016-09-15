@@ -181,6 +181,7 @@ static void PopStyle( style_stack_t** pp_stack )
     if( *pp_stack == NULL )
         return;
     style_stack_t* p_next = (*pp_stack)->p_next;
+    CleanupStyle( (*pp_stack)->p_style );
     free( *pp_stack );
     *pp_stack = p_next;
 }
@@ -190,6 +191,7 @@ static void ClearStack( style_stack_t* p_stack )
     while( p_stack != NULL )
     {
         style_stack_t* p_next = p_stack->p_next;
+        CleanupStyle( p_stack->p_style );
         free( p_stack );
         p_stack = p_next;
     }
