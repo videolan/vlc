@@ -646,7 +646,7 @@ static int InOpen( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     char         *psz_arg;
-    bool          b_directory = false;
+    bool          b_directory;
 
     /* Init p_access */
     p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
@@ -666,30 +666,43 @@ static int InOpen( vlc_object_t *p_this )
     if( Connect( p_this, p_sys ) )
         goto exit_error;
 
-    /* get size */
-    if( p_sys->url.psz_path == NULL || !*p_sys->url.psz_path )
-        b_directory = true;
-    else
-    if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path ) < 0 )
-        goto error;
-    else
-    if ( ftp_RecvCommand( p_this, p_sys, NULL, &psz_arg ) == 2 )
-    {
-        p_sys->size = atoll( &psz_arg[4] );
-        free( psz_arg );
-        msg_Dbg( p_access, "file size: %"PRIu64, p_sys->size );
-    }
-    else
-    if( ftp_SendCommand( p_this, p_sys, "CWD %s", p_sys->url.psz_path ) < 0 )
-        goto error;
-    else
-    if( ftp_RecvCommand( p_this, p_sys, NULL, NULL ) != 2 )
-    {
+    do {
+        /* get size */
+        if( p_sys->url.psz_path == NULL || !*p_sys->url.psz_path )
+        {
+            b_directory = true;
+            break;
+        }
+
+        if( ftp_SendCommand( p_this, p_sys, "SIZE %s",
+                             p_sys->url.psz_path ) < 0 )
+            goto error;
+
+        int val = ftp_RecvCommand( p_this, p_sys, NULL, &psz_arg );
+        if( val == 2 )
+        {
+            b_directory = false;
+            p_sys->size = atoll( &psz_arg[4] );
+            free( psz_arg );
+            msg_Dbg( p_access, "file size: %"PRIu64, p_sys->size );
+            break;
+        }
+        if( val >= 0 )
+            free( psz_arg );
+
+        if( ftp_SendCommand( p_this, p_sys, "CWD %s",
+                             p_sys->url.psz_path ) < 0 )
+            goto error;
+
+        if( ftp_RecvCommand( p_this, p_sys, NULL, NULL ) == 2 )
+        {
+            b_directory = true;
+            break;
+        }
+
         msg_Err( p_this, "file or directory does not exist" );
         goto error;
-    }
-    else
-        b_directory = true;
+    } while (0);
 
     if( b_directory )
     {
