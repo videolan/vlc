@@ -276,7 +276,6 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                     if( p_next_style == NULL )
                     {
                         msg_Warn( p_dec, "Style \"%s\" not found", token );
-                        free( value );
                         break;
                     }
                     MergeTTMLStyle( p_next_style, p_style );
