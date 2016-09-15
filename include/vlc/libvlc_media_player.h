@@ -285,7 +285,7 @@ typedef void *(*libvlc_video_lock_cb)(void *opaque, void **planes);
  * This callback might not be needed at all. It is only an indication that the
  * application can now read the pixel values if it needs to.
  *
- * \warning A picture buffer is unlocked after the picture is decoded,
+ * \note A picture buffer is unlocked after the picture is decoded,
  * but before the picture is displayed.
  *
  * \param opaque private pointer as passed to libvlc_video_set_callbacks() [IN]
@@ -354,6 +354,30 @@ typedef void (*libvlc_video_cleanup_cb)(void *opaque);
  * in memory.
  * Use libvlc_video_set_format() or libvlc_video_set_format_callbacks()
  * to configure the decoded format.
+ *
+ * \warning Rendering video into custom memory buffers is considerably less
+ * efficient than rendering in a custom window as normal.
+ *
+ * For optimal perfomances, VLC media player renders into a custom window, and
+ * does not use this function and associated callbacks. It is <b>highly
+ * recommended</b> that other LibVLC-based application do likewise.
+ * To embed video in a window, use libvlc_media_player_set_xid() or equivalent
+ * depending on the operating system.
+ *
+ * If window embedding does not fit the application use case, then a custom
+ * LibVLC video output display plugin is required to maintain optimal video
+ * rendering performances.
+ *
+ * The following limitations affect performance:
+ * - Hardware video decoding acceleration will either be disabled completely,
+ *   or require (relatively slow) copy from video/DSP memory to main memory.
+ * - Sub-pictures (subtitles, on-screen display, etc.) must be blent into the
+ *   main picture by the CPU instead of the GPU.
+ * - Depending on the video format, pixel format conversion, picture scaling,
+ *   cropping and/or picture re-orientation, must be performed by the CPU
+ *   instead of the GPU.
+ * - Memory copying is required between LibVLC reference picture buffers and
+ *   application buffers (between lock and unlock callbacks).
  *
  * \param mp the media player
  * \param lock callback to lock video memory (must not be NULL)
