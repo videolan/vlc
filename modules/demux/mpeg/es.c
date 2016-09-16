@@ -931,8 +931,15 @@ static int ID3Parse( demux_t *p_demux, uint64_t i_stream_offset,
     int64_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_stream_offset );
     if( i_peek > 0 && (uint64_t) i_peek == i_stream_offset )
     {
-        (size_t) ID3TAG_Parse( p_peek, i_stream_offset,
-                               pf_callback, (void *) p_demux );
+        while( i_peek > 0 )
+        {
+            size_t i_forward =  ID3TAG_Parse( p_peek, i_peek,
+                                              pf_callback, (void *) p_demux );
+            if(i_forward == 0)
+                break;
+            p_peek += i_forward;
+            i_peek -= i_forward;
+        }
     }
 
     return vlc_stream_Seek( p_demux->s, i_stream_offset );
