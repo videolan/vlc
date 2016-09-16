@@ -39,7 +39,7 @@ namespace adaptive
                 virtual ~RateBasedAdaptationLogic   ();
 
                 BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const;
-                virtual void updateDownloadRate(size_t, mtime_t); /* reimpl */
+                virtual void updateDownloadRate(const ID &, size_t, mtime_t); /* reimpl */
                 virtual void trackerEvent(const SegmentTrackerEvent &); /* reimpl */
 
             private:

@@ -46,10 +46,10 @@ AbstractConnectionManager::~AbstractConnectionManager()
 
 }
 
-void AbstractConnectionManager::updateDownloadRate(size_t size, mtime_t time)
+void AbstractConnectionManager::updateDownloadRate(const ID &sourceid, size_t size, mtime_t time)
 {
     if(rateObserver)
-        rateObserver->updateDownloadRate(size, time);
+        rateObserver->updateDownloadRate(sourceid, size, time);
 }
 
 void AbstractConnectionManager::setDownloadRateObserver(IDownloadRateObserver *obs)

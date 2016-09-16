@@ -54,6 +54,7 @@ namespace adaptive
                  *          Will be a valid value, as the parser refuses Representation
                  *          without bandwidth.
                  */
+                BaseAdaptationSet*  getAdaptationSet        ();
                 uint64_t            getBandwidth            () const;
                 void                setBandwidth            ( uint64_t bandwidth );
                 const std::list<std::string> & getCodecs    () const;

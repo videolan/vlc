@@ -37,7 +37,7 @@ block_t * Retrieve::HTTP(vlc_object_t *obj, const std::string &uri)
     HTTPChunk *datachunk;
     try
     {
-        datachunk = new HTTPChunk(uri, &connManager);
+        datachunk = new HTTPChunk(uri, &connManager, ID());
     } catch (int) {
         return NULL;
     }

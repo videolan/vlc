@@ -27,6 +27,7 @@
 #endif
 
 #include "Segment.h"
+#include "BaseAdaptationSet.h"
 #include "BaseRepresentation.h"
 #include "AbstractPlaylist.hpp"
 #include "SegmentChunk.hpp"
@@ -69,7 +70,8 @@ void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
 SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *rep, AbstractConnectionManager *connManager)
 {
     const std::string url = getUrlSegment().toString(index, rep);
-    HTTPChunkBufferedSource *source = new (std::nothrow) HTTPChunkBufferedSource(url, connManager);
+    HTTPChunkBufferedSource *source = new (std::nothrow) HTTPChunkBufferedSource(url, connManager,
+                                                                                 rep->getAdaptationSet()->getID());
     if( source )
     {
         if(startByte != endByte)

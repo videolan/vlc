@@ -27,6 +27,7 @@
 
 #include "BytesRange.hpp"
 #include "ConnectionParams.hpp"
+#include "../ID.hpp"
 #include <vector>
 #include <string>
 #include <stdint.h>
@@ -82,7 +83,8 @@ namespace adaptive
         class HTTPChunkSource : public AbstractChunkSource
         {
             public:
-                HTTPChunkSource(const std::string &url, AbstractConnectionManager *);
+                HTTPChunkSource(const std::string &url, AbstractConnectionManager *,
+                                const ID &);
                 virtual ~HTTPChunkSource();
 
                 virtual block_t *   readBlock       (); /* impl */
@@ -98,6 +100,7 @@ namespace adaptive
                 size_t              consumed; /* read pointer */
                 bool                prepared;
                 bool                eof;
+                ID                  sourceid;
 
             private:
                 bool init(const std::string &);
@@ -109,7 +112,8 @@ namespace adaptive
             friend class Downloader;
 
             public:
-                HTTPChunkBufferedSource(const std::string &url, AbstractConnectionManager *);
+                HTTPChunkBufferedSource(const std::string &url, AbstractConnectionManager *,
+                                        const ID &);
                 virtual ~HTTPChunkBufferedSource();
                 virtual block_t *  readBlock       (); /* reimpl */
                 virtual block_t *  read            (size_t); /* reimpl */
@@ -134,7 +138,8 @@ namespace adaptive
         class HTTPChunk : public AbstractChunk
         {
             public:
-                HTTPChunk(const std::string &url, AbstractConnectionManager *);
+                HTTPChunk(const std::string &url, AbstractConnectionManager *,
+                          const ID &);
                 virtual ~HTTPChunk();
 
                 virtual void        onDownload      (block_t **) {} /* impl */

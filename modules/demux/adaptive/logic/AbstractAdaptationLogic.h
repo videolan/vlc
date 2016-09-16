@@ -48,7 +48,7 @@ namespace adaptive
                 virtual ~AbstractAdaptationLogic    ();
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const = 0;
-                virtual void                updateDownloadRate     (size_t, mtime_t);
+                virtual void                updateDownloadRate     (const ID &, size_t, mtime_t);
                 virtual void                trackerEvent           (const SegmentTrackerEvent &) {}
 
                 enum LogicType

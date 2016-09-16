@@ -53,6 +53,11 @@ StreamFormat BaseRepresentation::getStreamFormat() const
     return StreamFormat();
 }
 
+BaseAdaptationSet * BaseRepresentation::getAdaptationSet()
+{
+    return adaptationSet;
+}
+
 uint64_t     BaseRepresentation::getBandwidth            () const
 {
     return bandwidth;
