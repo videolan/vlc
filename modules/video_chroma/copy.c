@@ -370,7 +370,7 @@ static void SSE_CopyFromNv12ToNv12(picture_t *dst,
 }
 
 static void SSE_CopyFromI420ToNv12(picture_t *dst,
-                             uint8_t *src[2], size_t src_pitch[2],
+                             uint8_t *src[3], size_t src_pitch[3],
                              unsigned height,
                              copy_cache_t *cache, unsigned cpu)
 {
