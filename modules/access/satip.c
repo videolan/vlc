@@ -464,7 +464,7 @@ static void *satip_thread(void *data) {
             continue;
 
         last_recv = mdate();
-        for (size_t i = 0; i < retval; ++i) {
+        for (int i = 0; i < retval; ++i) {
             block_t *block = input_blocks[i];
 
             len = msgs[i].msg_len;
