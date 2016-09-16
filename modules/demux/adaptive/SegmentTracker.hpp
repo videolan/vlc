@@ -20,13 +20,15 @@
 #ifndef SEGMENTTRACKER_HPP
 #define SEGMENTTRACKER_HPP
 
-#include <StreamFormat.hpp>
+#include "StreamFormat.hpp"
 
 #include <vlc_common.h>
 #include <list>
 
 namespace adaptive
 {
+    class ID;
+
     namespace http
     {
         class AbstractConnectionManager;
@@ -54,11 +56,13 @@ namespace adaptive
             SegmentTrackerEvent(SegmentChunk *);
             SegmentTrackerEvent(BaseRepresentation *, BaseRepresentation *);
             SegmentTrackerEvent(const StreamFormat *);
+            SegmentTrackerEvent(const ID &, bool);
             enum
             {
                 DISCONTINUITY,
                 SWITCHING,
                 FORMATCHANGE,
+                BUFFERING_STATE,
             } type;
             union
             {
@@ -75,6 +79,11 @@ namespace adaptive
                {
                     const StreamFormat *f;
                } format;
+               struct
+               {
+                   const ID *id;
+                   bool enabled;
+               } buffering;
             } u;
     };
 
@@ -98,6 +107,7 @@ namespace adaptive
             void setPositionByNumber(uint64_t, bool);
             mtime_t getPlaybackTime() const; /* Current segment start time if selected */
             mtime_t getMinAheadTime() const;
+            void notifyBufferingState(bool) const;
             void registerListener(SegmentTrackerListenerInterface *);
             void updateSelected();
 

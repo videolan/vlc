@@ -53,6 +53,13 @@ SegmentTrackerEvent::SegmentTrackerEvent(const StreamFormat *fmt)
     u.format.f = fmt;
 }
 
+SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, bool enabled)
+{
+    type = BUFFERING_STATE;
+    u.buffering.enabled = enabled;
+    u.buffering.id = &id;
+}
+
 SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
 {
     first = true;
@@ -300,6 +307,11 @@ mtime_t SegmentTracker::getMinAheadTime() const
     if(rep)
         return rep->getMinAheadTime(curNumber);
     return 0;
+}
+
+void SegmentTracker::notifyBufferingState(bool enabled) const
+{
+    notify(SegmentTrackerEvent(adaptationSet->getID(), enabled));
 }
 
 void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)

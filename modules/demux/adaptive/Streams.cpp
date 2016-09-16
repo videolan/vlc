@@ -23,6 +23,7 @@
 #endif
 
 #include "Streams.hpp"
+#include "logic/AbstractAdaptationLogic.h"
 #include "http/HTTPConnection.hpp"
 #include "http/HTTPConnectionManager.h"
 #include "playlist/BaseRepresentation.h"
@@ -77,6 +78,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
                     format = format_;
                     segmentTracker = tracker;
                     segmentTracker->registerListener(this);
+                    segmentTracker->notifyBufferingState(true);
                     connManager = conn;
                     return true;
                 }
@@ -97,6 +99,8 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
 AbstractStream::~AbstractStream()
 {
     delete currentChunk;
+    if(segmentTracker)
+        segmentTracker->notifyBufferingState(false);
     delete segmentTracker;
 
     delete demuxer;
@@ -234,6 +238,8 @@ bool AbstractStream::restartDemux()
 
 void AbstractStream::setDisabled(bool b)
 {
+    if(disabled != b)
+        segmentTracker->notifyBufferingState(!b);
     disabled = b;
 }
 
