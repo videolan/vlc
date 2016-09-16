@@ -34,11 +34,12 @@
 
 namespace adaptive
 {
+    class ID;
+
     namespace playlist
     {
         class BaseRepresentation;
         class BasePeriod;
-        class ID;
 
         class BaseAdaptationSet : public CommonAttributesElements,
                                   public SegmentInformation

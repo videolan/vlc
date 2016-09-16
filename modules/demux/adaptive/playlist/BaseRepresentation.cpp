@@ -31,7 +31,7 @@
 #include "BaseAdaptationSet.h"
 #include "SegmentTemplate.h"
 #include "SegmentTimeline.h"
-#include "ID.hpp"
+#include "../ID.hpp"
 
 using namespace adaptive;
 using namespace adaptive::playlist;

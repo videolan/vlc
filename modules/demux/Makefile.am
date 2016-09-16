@@ -283,8 +283,6 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/playlist/CommonAttributesElements.cpp \
     demux/adaptive/playlist/CommonAttributesElements.h \
     demux/adaptive/playlist/ICanonicalUrl.hpp \
-    demux/adaptive/playlist/ID.hpp \
-    demux/adaptive/playlist/ID.cpp \
     demux/adaptive/playlist/Inheritables.hpp \
     demux/adaptive/playlist/Inheritables.cpp \
     demux/adaptive/playlist/Segment.cpp \
@@ -344,6 +342,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/plumbing/SourceStream.cpp \
     demux/adaptive/plumbing/SourceStream.hpp \
     demux/adaptive/ChunksSource.hpp \
+    demux/adaptive/ID.hpp \
+    demux/adaptive/ID.cpp \
     demux/adaptive/PlaylistManager.cpp \
     demux/adaptive/PlaylistManager.h \
     demux/adaptive/SegmentTracker.cpp \

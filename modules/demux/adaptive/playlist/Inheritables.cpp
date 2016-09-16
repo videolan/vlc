@@ -26,6 +26,7 @@
 #include "SegmentTimeline.h"
 
 using namespace adaptive::playlist;
+using namespace adaptive;
 
 Timelineable::Timelineable()
 {

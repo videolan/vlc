@@ -1,5 +1,5 @@
 /*
- * ID.cpp
+ * ID.hpp
  *****************************************************************************
  * Copyright (C) 2015 - VideoLAN and VLC authors
  *
@@ -17,35 +17,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#ifndef ID_HPP
+#define ID_HPP
 
-#include "ID.hpp"
-#include <sstream>
+#include <string>
+#include <inttypes.h>
 
-using namespace adaptive::playlist;
-
-ID::ID(const std::string &id_)
+namespace adaptive
 {
-    id = id_;
+    class ID
+    {
+        public:
+            ID(const std::string &);
+            ID(uint64_t = 0);
+            bool operator==(const ID &) const;
+            std::string str() const;
+
+        private:
+            std::string id;
+    };
 }
 
-ID::ID(uint64_t id_)
-{
-    std::stringstream ss;
-    ss.imbue(std::locale("C"));
-    ss << "default_id#" << id_;
-    id = ss.str();
-}
-
-bool ID::operator==(const ID &other) const
-{
-    return (!id.empty() && id == other.id);
-}
-
-std::string ID::str() const
-{
-    return id;
-}
-
+#endif // ID_HPP
