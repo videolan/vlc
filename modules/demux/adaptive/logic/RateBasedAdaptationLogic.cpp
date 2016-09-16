@@ -55,7 +55,7 @@ RateBasedAdaptationLogic::~RateBasedAdaptationLogic()
     vlc_mutex_destroy(&lock);
 }
 
-BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *currep) const
+BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *currep)
 {
     if(adaptSet == NULL)
         return NULL;
@@ -131,7 +131,7 @@ FixedRateAdaptationLogic::FixedRateAdaptationLogic(size_t bps) :
     currentBps = bps;
 }
 
-BaseRepresentation *FixedRateAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *) const
+BaseRepresentation *FixedRateAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *)
 {
     if(adaptSet == NULL)
         return NULL;

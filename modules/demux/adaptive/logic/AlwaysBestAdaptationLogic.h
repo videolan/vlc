@@ -36,7 +36,7 @@ namespace adaptive
             public:
                 AlwaysBestAdaptationLogic           ();
 
-                virtual BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const;
+                virtual BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *);
         };
     }
 }

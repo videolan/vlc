@@ -47,7 +47,7 @@ namespace adaptive
                 AbstractAdaptationLogic             ();
                 virtual ~AbstractAdaptationLogic    ();
 
-                virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const = 0;
+                virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) = 0;
                 virtual void                updateDownloadRate     (const ID &, size_t, mtime_t);
                 virtual void                trackerEvent           (const SegmentTrackerEvent &) {}
 

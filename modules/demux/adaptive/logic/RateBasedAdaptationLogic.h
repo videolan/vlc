@@ -39,7 +39,7 @@ namespace adaptive
                 RateBasedAdaptationLogic            (vlc_object_t *, int, int);
                 virtual ~RateBasedAdaptationLogic   ();
 
-                BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const;
+                BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *);
                 virtual void updateDownloadRate(const ID &, size_t, mtime_t); /* reimpl */
                 virtual void trackerEvent(const SegmentTrackerEvent &); /* reimpl */
 
@@ -64,7 +64,7 @@ namespace adaptive
             public:
                 FixedRateAdaptationLogic(size_t);
 
-                BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) const;
+                BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *);
 
             private:
                 size_t                  currentBps;

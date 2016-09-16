@@ -32,7 +32,7 @@ AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic():
 {
 }
 
-BaseRepresentation *AlwaysLowestAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *) const
+BaseRepresentation *AlwaysLowestAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *)
 {
     RepresentationSelector selector;
     return selector.select(adaptSet, 0);
