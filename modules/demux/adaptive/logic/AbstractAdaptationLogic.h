@@ -53,11 +53,12 @@ namespace adaptive
 
                 enum LogicType
                 {
-                    Default,
+                    Default = 0,
                     AlwaysBest,
                     AlwaysLowest,
                     RateBased,
-                    FixedRate
+                    FixedRate,
+                    Predictive
                 };
         };
     }

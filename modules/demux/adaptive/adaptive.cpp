@@ -75,12 +75,16 @@ static void Close   (vlc_object_t *);
 #define ADAPT_ACCESS_TEXT N_("Use regular HTTP modules")
 #define ADAPT_ACCESS_LONGTEXT N_("Connect using http access instead of custom http code")
 
-static const int pi_logics[] = {AbstractAdaptationLogic::RateBased,
+static const int pi_logics[] = {AbstractAdaptationLogic::Default,
+                                AbstractAdaptationLogic::Predictive,
+                                AbstractAdaptationLogic::RateBased,
                                 AbstractAdaptationLogic::FixedRate,
                                 AbstractAdaptationLogic::AlwaysLowest,
                                 AbstractAdaptationLogic::AlwaysBest};
 
-static const char *const ppsz_logics[] = { N_("Bandwidth Adaptive"),
+static const char *const ppsz_logics[] = { N_("Default"),
+                                           N_("Predictive"),
+                                           N_("Bandwidth Adaptive"),
                                            N_("Fixed Bandwidth"),
                                            N_("Lowest Bandwidth/Quality"),
                                            N_("Highest Bandwidth/Quality")};

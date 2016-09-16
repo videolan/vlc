@@ -311,6 +311,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/logic/AlwaysLowestAdaptationLogic.cpp \
     demux/adaptive/logic/AlwaysLowestAdaptationLogic.hpp \
     demux/adaptive/logic/IDownloadRateObserver.h \
+    demux/adaptive/logic/PredictiveAdaptationLogic.hpp \
+    demux/adaptive/logic/PredictiveAdaptationLogic.cpp \
     demux/adaptive/logic/RateBasedAdaptationLogic.h \
     demux/adaptive/logic/RateBasedAdaptationLogic.cpp \
     demux/adaptive/logic/Representationselectors.hpp \

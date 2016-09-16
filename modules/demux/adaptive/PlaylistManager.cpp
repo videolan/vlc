@@ -33,6 +33,7 @@
 #include "logic/AlwaysBestAdaptationLogic.h"
 #include "logic/RateBasedAdaptationLogic.h"
 #include "logic/AlwaysLowestAdaptationLogic.hpp"
+#include "logic/PredictiveAdaptationLogic.hpp"
 #include "tools/Debug.hpp"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
@@ -723,9 +724,18 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
             int height = var_InheritInteger(p_demux, "adaptive-height");
             RateBasedAdaptationLogic *logic =
                     new (std::nothrow) RateBasedAdaptationLogic(VLC_OBJECT(p_demux), width, height);
-            conn->setDownloadRateObserver(logic);
+            if(logic)
+                conn->setDownloadRateObserver(logic);
             return logic;
         }
+        case AbstractAdaptationLogic::Predictive:
+        {
+            AbstractAdaptationLogic *logic = new (std::nothrow) PredictiveAdaptationLogic(VLC_OBJECT(p_demux));
+            if(logic)
+                conn->setDownloadRateObserver(logic);
+            return logic;
+        }
+
         default:
             return NULL;
     }
