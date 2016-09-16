@@ -31,6 +31,7 @@
 #include <vlc_input.h>
 #include <vlc_player.h>
 #include <vlc_atomic.h>
+#include <vlc_http.h>
 
 struct libvlc_media_t
 {
@@ -50,6 +51,7 @@ struct libvlc_media_t
     atomic_uint worker_count;
 
     _Atomic libvlc_media_parsed_status_t parsed_status;
+    vlc_http_cookie_jar_t *p_cookie_jar;
 };
 
 /* Media Descriptor */

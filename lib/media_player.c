@@ -613,6 +613,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);
     var_Create (mp, "sout", VLC_VAR_STRING);
     var_Create (mp, "demux-filter", VLC_VAR_STRING);
+    var_Create (mp, "http-cookies", VLC_VAR_ADDRESS);
 
     /* Video */
     var_Create (mp, "vout", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
@@ -937,6 +938,12 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
 {
     vlc_player_t *player = p_mi->player;
     vlc_player_Lock(player);
+
+    if( p_mi->p_md->p_cookie_jar )
+    {
+        vlc_value_t cookies = { .p_address = p_mi->p_md->p_cookie_jar };
+        var_SetChecked( p_mi, "http-cookies", VLC_VAR_ADDRESS, cookies );
+    }
 
     int ret = vlc_player_Start(player);
     if (ret == VLC_SUCCESS)
