@@ -44,8 +44,6 @@
 #include <errno.h>
 #include <assert.h>
 
-#undef HAVE_RECVMMSG
-
 #define RTSP_DEFAULT_PORT 554
 #define RTSP_RECEIVE_BUFFER 2048
 #define RTP_HEADER_SIZE 12
