@@ -70,6 +70,7 @@ VLC_API char *vlc_http_auth_FormatAuthorizationHeader
 typedef struct vlc_http_cookie_jar_t vlc_http_cookie_jar_t;
 
 VLC_API vlc_http_cookie_jar_t * vlc_http_cookies_new( void ) VLC_USED;
+VLC_API void vlc_http_cookies_clear( vlc_http_cookie_jar_t * p_jar );
 VLC_API void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar );
 
 /**

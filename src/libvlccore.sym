@@ -137,6 +137,7 @@ vlc_http_auth_ParseAuthenticationInfoHeader
 vlc_http_auth_FormatAuthorizationHeader
 vlc_http_cookies_new
 vlc_http_cookies_destroy
+vlc_http_cookies_clear
 vlc_http_cookies_store
 vlc_http_cookies_fetch
 httpd_ClientIP

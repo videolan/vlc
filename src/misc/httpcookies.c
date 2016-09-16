@@ -280,7 +280,7 @@ vlc_http_cookie_jar_t * vlc_http_cookies_new(void)
     return jar;
 }
 
-void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
+void vlc_http_cookies_clear( vlc_http_cookie_jar_t * p_jar )
 {
     if ( !p_jar )
         return;
@@ -289,7 +289,11 @@ void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
         cookie_destroy( vlc_array_item_at_index( &p_jar->cookies, i ) );
 
     vlc_array_clear( &p_jar->cookies );
+}
 
+void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
+{
+    vlc_http_cookies_clear( p_jar );
     free( p_jar );
 }
 
