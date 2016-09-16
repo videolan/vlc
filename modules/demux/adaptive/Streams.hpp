@@ -67,6 +67,7 @@ namespace adaptive
         int esCount() const;
         bool isSelected() const;
         virtual bool reactivate(mtime_t);
+        void setDisabled(bool);
         bool isDisabled() const;
         typedef enum {
             status_eof = 0, /* prioritized */
@@ -113,9 +114,7 @@ namespace adaptive
         SegmentTracker *segmentTracker;
 
         SegmentChunk *currentChunk;
-        bool disabled;
         bool eof;
-        bool dead;
         std::string language;
         std::string description;
 
@@ -124,6 +123,10 @@ namespace adaptive
         AbstractSourceStream *demuxersource;
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
         vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
+
+    private:
+        bool dead;
+        bool disabled;
     };
 
     class AbstractStreamFactory

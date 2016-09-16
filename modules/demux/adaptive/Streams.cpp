@@ -144,7 +144,7 @@ bool AbstractStream::isDead() const
 mtime_t AbstractStream::getPCR() const
 {
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    mtime_t pcr = (dead || disabled) ? VLC_TS_INVALID : commandsqueue->getPCR();
+    mtime_t pcr = (isDead() || isDisabled()) ? VLC_TS_INVALID : commandsqueue->getPCR();
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return pcr;
 }
@@ -160,7 +160,7 @@ mtime_t AbstractStream::getFirstDTS() const
 {
     mtime_t dts;
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    if(dead || disabled)
+    if(isDead() || isDisabled())
     {
         dts = VLC_TS_INVALID;
     }
@@ -196,7 +196,7 @@ bool AbstractStream::reactivate(mtime_t basetime)
 {
     if(setPosition(basetime, false))
     {
-        disabled = false;
+        setDisabled(false);
         return true;
     }
     else
@@ -236,6 +236,11 @@ bool AbstractStream::restartDemux()
     return true;
 }
 
+void AbstractStream::setDisabled(bool b)
+{
+    disabled = b;
+}
+
 bool AbstractStream::isDisabled() const
 {
     return disabled;
@@ -261,7 +266,7 @@ AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
     /* Disable streams that are not selected (alternate streams) */
     if(esCount() && !isSelected() && !fakeesout->restarting())
     {
-        disabled = true;
+        setDisabled(true);
         segmentTracker->reset();
         commandsqueue->Abort(false);
         msg_Dbg(p_realdemux, "deactivating stream %s", format.str().c_str());
@@ -354,7 +359,7 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 
     *pi_pcr = nz_deadline;
 
-    if (disabled || dead)
+    if (isDisabled() || isDead())
         return AbstractStream::status_eof;
 
     if(commandsqueue->isFlushing())
