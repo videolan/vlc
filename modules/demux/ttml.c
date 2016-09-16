@@ -705,9 +705,9 @@ static int ReadTTML( demux_t* p_demux )
                 }
                 else
                 {
-                    ClearNode( p_node );
                     if( ParseTimeOnSpan( p_sys , psz_text ) != VLC_SUCCESS )
                         goto error;
+                    ClearNode( p_node );
                 }
             }
             else
