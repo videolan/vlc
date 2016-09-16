@@ -658,7 +658,10 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
                 {
                     char* psz_text = NULL;
                     if( asprintf( &psz_text, "%s%s%s", p_bidi[i_direction].psz_uni_start, p_segment->psz_text, p_bidi[i_direction].psz_uni_end ) < 0 )
+                    {
+                        text_segment_Delete( p_segment );
                         goto fail;
+                    }
 
                     free( p_segment->psz_text );
                     p_segment->psz_text = psz_text;
