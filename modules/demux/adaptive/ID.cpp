@@ -44,6 +44,11 @@ bool ID::operator==(const ID &other) const
     return (!id.empty() && id == other.id);
 }
 
+bool ID::operator<(const ID &other) const
+{
+    return (id.compare(other.id) < 0);
+}
+
 std::string ID::str() const
 {
     return id;

@@ -31,6 +31,7 @@ namespace adaptive
             ID(const std::string &);
             ID(uint64_t = 0);
             bool operator==(const ID &) const;
+            bool operator<(const ID &) const;
             std::string str() const;
 
         private:
