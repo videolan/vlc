@@ -90,7 +90,6 @@ namespace adaptive
             SegmentTracker(AbstractAdaptationLogic *, BaseAdaptationSet *);
             ~SegmentTracker();
 
-            void setAdaptationLogic(AbstractAdaptationLogic *);
             StreamFormat getCurrentFormat() const;
             bool segmentsListReady() const;
             void reset();
@@ -103,6 +102,7 @@ namespace adaptive
             void updateSelected();
 
         private:
+            void setAdaptationLogic(AbstractAdaptationLogic *);
             void notify(const SegmentTrackerEvent &);
             bool first;
             bool initializing;
