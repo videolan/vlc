@@ -256,7 +256,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "Error while running script %s, "
                   "function parse() not found", psz_filename );
-        return VLC_EGENERIC;
+        return VLC_DEMUXER_EGENERIC;
     }
 
     if( lua_pcall( L, 0, 1, 0 ) )
@@ -264,7 +264,7 @@ static int Demux( demux_t *p_demux )
         msg_Warn( p_demux, "Error while running script %s, "
                   "function parse(): %s", psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
-        return VLC_EGENERIC;
+        return VLC_DEMUXER_EGENERIC;
     }
 
     if( lua_gettop( L ) )
@@ -272,7 +272,7 @@ static int Demux( demux_t *p_demux )
     else
         msg_Err( p_demux, "Script went completely foobar" );
 
-    return -1; /* Needed for correct operation of go back */
+    return VLC_DEMUXER_EOF;
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
