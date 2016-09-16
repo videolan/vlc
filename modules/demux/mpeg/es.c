@@ -887,7 +887,6 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
     demux_t *p_demux = (demux_t *) p_priv;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    msg_Err( p_demux, "Callback %4.4s", (char*) &i_tag);
     if( i_tag == VLC_FOURCC('M', 'L', 'L', 'T') )
     {
         if( i_payload > 20 )
