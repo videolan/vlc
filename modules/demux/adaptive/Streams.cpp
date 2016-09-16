@@ -136,15 +136,10 @@ void AbstractStream::setDescription(const std::string &desc)
     description = desc;
 }
 
-bool AbstractStream::isDead() const
-{
-    return dead;
-}
-
 mtime_t AbstractStream::getPCR() const
 {
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    mtime_t pcr = (isDead() || isDisabled()) ? VLC_TS_INVALID : commandsqueue->getPCR();
+    mtime_t pcr = isDisabled() ? VLC_TS_INVALID : commandsqueue->getPCR();
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return pcr;
 }
@@ -160,7 +155,7 @@ mtime_t AbstractStream::getFirstDTS() const
 {
     mtime_t dts;
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    if(isDead() || isDisabled())
+    if(isDisabled())
     {
         dts = VLC_TS_INVALID;
     }
@@ -243,7 +238,12 @@ void AbstractStream::setDisabled(bool b)
 
 bool AbstractStream::isDisabled() const
 {
-    return disabled;
+    return dead || disabled;
+}
+
+bool AbstractStream::canActivate() const
+{
+    return !dead;
 }
 
 bool AbstractStream::drain()
@@ -359,7 +359,7 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 
     *pi_pcr = nz_deadline;
 
-    if (isDisabled() || isDead())
+    if (isDisabled())
         return AbstractStream::status_eof;
 
     if(commandsqueue->isFlushing())

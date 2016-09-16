@@ -60,12 +60,12 @@ namespace adaptive
 
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
-        bool isDead() const;
         mtime_t getPCR() const;
         mtime_t getMinAheadTime() const;
         mtime_t getFirstDTS() const;
         int esCount() const;
         bool isSelected() const;
+        bool canActivate() const;
         virtual bool reactivate(mtime_t);
         void setDisabled(bool);
         bool isDisabled() const;
