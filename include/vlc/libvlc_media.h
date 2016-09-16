@@ -876,6 +876,41 @@ LIBVLC_API
 void libvlc_media_slaves_release( libvlc_media_slave_t **pp_slaves,
                                   unsigned int i_count );
 
+/**
+ * Parse a value of an incoming Set-Cookie header (see RFC 6265) and append the
+ * cookie to the cookie jar if appropriate. The "secure" attribute can be added
+ * to psz_cookie to limit the scope of the cookie to secured channels (https).
+ *
+ * \note must be called before the first call of libvlc_media_player_play() to
+ * take effect. The cookie jar is only used for http/https accesses.
+ *
+ * \version LibVLC 3.0.0 and later.
+ *
+ * \param p_md media descriptor object
+ * \param psz_cookie header field value of Set-Cookie:
+ * "name=value<;attributes>" (must not be NULL)
+ * \param psz_host host to which the cookie will be sent (must not be NULL)
+ * \param psz_path scope of the cookie (must not be NULL)
+ *
+ * \return 0 on success, -1 on error.
+ */
+LIBVLC_API int
+libvlc_media_cookie_jar_store( libvlc_media_t *p_md, const char *psz_cookie,
+                               const char *psz_host, const char *psz_path );
+
+/**
+ * Clear the cookie jar of a media.
+ *
+ * \note must be called before the first call of libvlc_media_player_play() to
+ * take effect.
+ *
+ * \version LibVLC 3.0.0 and later.
+ *
+ * \param p_md media descriptor object
+ */
+LIBVLC_API void
+libvlc_media_cookie_jar_clear( libvlc_media_t *p_md );
+
 /** @}*/
 
 # ifdef __cplusplus

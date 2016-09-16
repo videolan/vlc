@@ -210,6 +210,8 @@ libvlc_media_set_user_data
 libvlc_media_subitems
 libvlc_media_tracks_get
 libvlc_media_tracks_release
+libvlc_media_cookie_jar_store
+libvlc_media_cookie_jar_clear
 libvlc_new
 libvlc_playlist_play
 libvlc_release

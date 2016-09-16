@@ -524,6 +524,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     p_md->p_input_item->libvlc_owner = p_md;
 
     libvlc_event_manager_init( &p_md->event_manager, p_md );
+    p_md->p_cookie_jar      = NULL;
 
     input_item_Hold( p_md->p_input_item );
 
@@ -670,6 +671,9 @@ void libvlc_media_release( libvlc_media_t *p_md )
         libvlc_media_list_release( p_md->p_subitems );
 
     input_item_Release( p_md->p_input_item );
+
+    if( p_md->p_cookie_jar )
+        vlc_http_cookies_destroy( p_md->p_cookie_jar );
 
     libvlc_event_manager_destroy( &p_md->event_manager );
     libvlc_release( p_md->p_libvlc_instance );
@@ -1354,4 +1358,25 @@ void libvlc_media_slaves_release( libvlc_media_slave_t **pp_slaves,
             free( pp_slaves[i] );
     }
     free( pp_slaves );
+}
+
+int
+libvlc_media_cookie_jar_store( libvlc_media_t *p_md, const char *psz_cookie,
+                               const char *psz_host, const char *psz_path )
+{
+    if( !p_md->p_cookie_jar )
+    {
+        p_md->p_cookie_jar = vlc_http_cookies_new();
+        if( !p_md->p_cookie_jar )
+            return -1;
+    }
+    return vlc_http_cookies_store( p_md->p_cookie_jar, psz_cookie, psz_host,
+                                   psz_path ) ? 0 : -1;
+}
+
+void
+libvlc_media_cookie_jar_clear( libvlc_media_t *p_md )
+{
+    if( p_md->p_cookie_jar )
+        vlc_http_cookies_clear( p_md->p_cookie_jar );
 }
