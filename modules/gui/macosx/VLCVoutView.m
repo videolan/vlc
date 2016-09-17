@@ -255,7 +255,7 @@
 
     // A mouse scroll wheel has lower sensitivity. We want to scroll at least
     // with every event here.
-    BOOL isMouseScrollWheel = ([theEvent subtype] == NSEventSubtypeMouseEvent);
+    BOOL isMouseScrollWheel = ([theEvent subtype] == NSMouseEventSubtype);
     if (isMouseScrollWheel && f_deltaYAbs < f_yThreshold)
         f_deltaY = f_deltaY > 0. ? f_yThreshold : -f_yThreshold;
 
