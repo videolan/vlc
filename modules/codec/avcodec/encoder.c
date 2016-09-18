@@ -1113,6 +1113,43 @@ static block_t *vlc_av_packet_Wrap(AVPacket *packet, mtime_t i_length, AVCodecCo
     return p_block;
 }
 
+static void check_hurry_up( encoder_sys_t *p_sys, AVFrame *frame, encoder_t *p_enc )
+{
+    mtime_t current_date = mdate();
+
+    if ( current_date + HURRY_UP_GUARD3 > frame->pts )
+    {
+        p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
+        p_sys->p_context->trellis = 0;
+        msg_Dbg( p_enc, "hurry up mode 3" );
+    }
+    else
+    {
+        p_sys->p_context->mb_decision = p_sys->i_hq;
+
+        if ( current_date + HURRY_UP_GUARD2 > frame->pts )
+        {
+            p_sys->p_context->trellis = 0;
+            p_sys->p_context->noise_reduction = p_sys->i_noise_reduction
+                + (HURRY_UP_GUARD2 + current_date - frame->pts) / 500;
+            msg_Dbg( p_enc, "hurry up mode 2" );
+        }
+        else
+        {
+            p_sys->p_context->trellis = p_sys->b_trellis;
+
+            p_sys->p_context->noise_reduction =
+               p_sys->i_noise_reduction;
+        }
+    }
+
+    if ( current_date + HURRY_UP_GUARD1 > frame->pts )
+    {
+        frame->pict_type = AV_PICTURE_TYPE_P;
+        /* msg_Dbg( p_enc, "hurry up mode 1 %lld", current_date + HURRY_UP_GUARD1 - frame.pts ); */
+    }
+}
+
 /****************************************************************************
  * EncodeVideo: the whole thing
  ****************************************************************************/
@@ -1153,41 +1190,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             frame->pts = AV_NOPTS_VALUE;
 
         if ( p_sys->b_hurry_up && frame->pts != AV_NOPTS_VALUE )
-        {
-            mtime_t current_date = mdate();
-
-            if ( current_date + HURRY_UP_GUARD3 > frame->pts )
-            {
-                p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
-                p_sys->p_context->trellis = 0;
-                msg_Dbg( p_enc, "hurry up mode 3" );
-            }
-            else
-            {
-                p_sys->p_context->mb_decision = p_sys->i_hq;
-
-                if ( current_date + HURRY_UP_GUARD2 > frame->pts )
-                {
-                    p_sys->p_context->trellis = 0;
-                    p_sys->p_context->noise_reduction = p_sys->i_noise_reduction
-                        + (HURRY_UP_GUARD2 + current_date - frame->pts) / 500;
-                    msg_Dbg( p_enc, "hurry up mode 2" );
-                }
-                else
-                {
-                    p_sys->p_context->trellis = p_sys->b_trellis;
-
-                    p_sys->p_context->noise_reduction =
-                       p_sys->i_noise_reduction;
-                }
-            }
-
-            if ( current_date + HURRY_UP_GUARD1 > frame->pts )
-            {
-                frame->pict_type = AV_PICTURE_TYPE_P;
-                /* msg_Dbg( p_enc, "hurry up mode 1 %lld", current_date + HURRY_UP_GUARD1 - frame.pts ); */
-            }
-        }
+            check_hurry_up( p_sys, frame, p_enc );
 
         if ( ( frame->pts != AV_NOPTS_VALUE ) && ( frame->pts != VLC_TS_INVALID ) )
         {
