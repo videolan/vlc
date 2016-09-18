@@ -257,6 +257,11 @@ AbstractStream::buffering_status AbstractStream::getLastBufferStatus() const
     return last_buffer_status;
 }
 
+mtime_t AbstractStream::getDemuxedAmount() const
+{
+    return commandsqueue->getDemuxedAmount();
+}
+
 AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
                                                            unsigned i_min_buffering, unsigned i_extra_buffering)
 {

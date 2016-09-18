@@ -84,6 +84,7 @@ namespace adaptive
         } buffering_status;
         buffering_status bufferize(mtime_t, unsigned, unsigned);
         buffering_status getLastBufferStatus() const;
+        mtime_t getDemuxedAmount() const;
         status dequeue(mtime_t, mtime_t *);
         bool drain();
         virtual bool setPosition(mtime_t, bool);

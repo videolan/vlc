@@ -180,13 +180,31 @@ void PlaylistManager::stop()
     }
 }
 
+static bool streamCompare(AbstractStream *a,  AbstractStream *b)
+{
+    AbstractStream::buffering_status ba = a->getLastBufferStatus();
+    AbstractStream::buffering_status bb = b->getLastBufferStatus();
+    if( ba >= bb ) /* Highest prio is higer value in enum */
+    {
+        if ( ba == bb ) /* Highest prio is lowest buffering */
+           return a->getDemuxedAmount() < b->getDemuxedAmount();
+        else
+            return true;
+    }
+    return false;
+}
+
 AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline,
                                                             unsigned i_min_buffering, unsigned i_extra_buffering)
 {
     AbstractStream::buffering_status i_return = AbstractStream::buffering_end;
 
+    /* First reorder by status >> buffering level */
+    std::vector<AbstractStream *> prioritized_streams(streams);
+    std::sort(prioritized_streams.begin(), prioritized_streams.end(), streamCompare);
+
     std::vector<AbstractStream *>::iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
+    for(it=prioritized_streams.begin(); it!=prioritized_streams.end(); ++it)
     {
         AbstractStream *st = *it;
 
