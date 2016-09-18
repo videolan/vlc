@@ -1221,9 +1221,16 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
     av_init_packet( &av_pkt );
 
-    if( avcodec_encode_video2( p_sys->p_context, &av_pkt, frame, &is_data ) < 0
-     || is_data == 0 )
+    int ret = avcodec_send_frame( p_sys->p_context, frame );
+    if( ret != 0 && ret != AVERROR(EAGAIN) )
     {
+        msg_Warn( p_enc, "cannot send one frame to encoder");
+        return NULL;
+    }
+    ret = avcodec_receive_packet( p_sys->p_context, &av_pkt );
+    if( ret != 0 && ret != AVERROR(EAGAIN) )
+    {
+        msg_Warn( p_enc, "cannot encode one frame" );
         return NULL;
     }
 
