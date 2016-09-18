@@ -50,6 +50,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     commandsqueue = NULL;
     demuxer = NULL;
     fakeesout = NULL;
+    last_buffer_status = buffering_lessthanmin;
     vlc_mutex_init(&lock);
 }
 
@@ -251,8 +252,20 @@ bool AbstractStream::drain()
     return fakeesout->drain();
 }
 
+AbstractStream::buffering_status AbstractStream::getLastBufferStatus() const
+{
+    return last_buffer_status;
+}
+
 AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
                                                            unsigned i_min_buffering, unsigned i_extra_buffering)
+{
+    last_buffer_status = doBufferize(nz_deadline, i_min_buffering, i_extra_buffering);
+    return last_buffer_status;
+}
+
+AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline,
+                                                             unsigned i_min_buffering, unsigned i_extra_buffering)
 {
     vlc_mutex_lock(&lock);
 
