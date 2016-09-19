@@ -254,7 +254,7 @@ static int MergeStyles(char** pp_dest, char* p_src)
     if( p_src )
     {
         char *p_tmp = NULL;
-        if( asprintf( &p_tmp, "%s %s", p_src, *pp_dest ) < 0 )
+        if( asprintf( &p_tmp, "%s %s", p_src, *pp_dest ? *pp_dest : "" ) < 0 )
             return VLC_ENOMEM;
 
         free( *pp_dest );
