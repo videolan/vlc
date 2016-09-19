@@ -264,6 +264,16 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                 }
 
                 char *token = strtok_r( value , " ", &tmp );
+
+                if( token == NULL )
+                {
+                    msg_Warn( p_dec, "No IDREF specified in attribute "
+                                     "'%s' on tag '%s', ignoring.", attr,
+                                     psz_node_name );
+                    free( value );
+                    continue;
+                }
+
                 ttml_style_t* p_style = FindTextStyle( p_dec, token );
                 if( p_style == NULL )
                 {
