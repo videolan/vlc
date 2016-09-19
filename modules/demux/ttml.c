@@ -719,9 +719,12 @@ static int ReadTTML( demux_t* p_demux )
         /*  end tag after a p tag but inside the body */
         else if( i_type == XML_READER_ENDELEM && CompareTagName( psz_node_name, "body" ) )
         {
-            node_t* p_parent = p_parent_node->p_parent;
-            ClearNode( p_parent_node );
-            p_parent_node = p_parent;
+            if( p_parent_node )
+            {
+                node_t* p_parent = p_parent_node->p_parent;
+                ClearNode( p_parent_node );
+                p_parent_node = p_parent;
+            }
         }
     } while( i_type != XML_READER_ENDELEM || CompareTagName( psz_node_name, "tt" ) );
     ClearNodeStack( p_parent_node );
