@@ -516,11 +516,17 @@ static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
 
     qsort( p_times->pp_elems, p_times->i_count, sizeof( mtime_t* ), timeCmp );
 
-    subtitle_t* p_tmp_sub = realloc( p_sys->subtitle, sizeof( *p_sys->subtitle ) * ( p_times->i_count - 1 + p_sys->i_subtitles ) );
-    if( unlikely( p_tmp_sub == NULL ) )
-        goto error;
+    ssize_t total_count = p_times->i_count + p_sys->i_subtitles - 1;
 
-    p_sys->subtitle = p_tmp_sub;
+    if( total_count > 0 )
+    {
+        subtitle_t* p_tmp_sub = realloc( p_sys->subtitle, sizeof( *p_sys->subtitle ) * total_count );
+
+        if( unlikely( p_tmp_sub == NULL ) )
+            goto error;
+
+        p_sys->subtitle = p_tmp_sub;
+    }
     /*
     * For each time space represented by the times inside the p_times array
     * we create a p tag with all the spans inside.
