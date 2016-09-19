@@ -407,7 +407,7 @@ static void CleanSubs( subtitle_t** tab )
 * create a new p tag for each time space in the
 * subtitle timeline in the function below.
 */
-static int ParseTimeOnSpan( demux_sys_t* p_sys, char* psz_text )
+static int ParseTimeOnSpan( demux_sys_t* p_sys, const char* psz_text )
 {
     xml_reader_t* p_reader = p_sys->p_reader;
     subtitle_t** pp_subtitles = calloc( 1, sizeof( *pp_subtitles ) );
