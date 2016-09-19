@@ -357,11 +357,8 @@ static bool isInArray( vlc_array_t* p_array, mtime_t* p_elem )
 static int addToArrayIfNotInside( vlc_array_t* p_array, mtime_t* p_elem )
 {
     if( !isInArray( p_array, p_elem ) )
-    {
         vlc_array_append( p_array, p_elem );
-        if( unlikely( p_array->pp_elems[p_array->i_count - 1] == NULL ) )
-            return VLC_ENOMEM;
-    }
+
     return VLC_SUCCESS;
 }
 
