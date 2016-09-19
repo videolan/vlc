@@ -90,6 +90,14 @@ enum
     UNICODE_BIDI_OVERRIDE = 4,
 };
 
+static int tagnamecmp( char const* tagname, char const* needle )
+{
+    if( !strncasecmp( "tt:", tagname, 3 ) )
+        tagname += 3;
+
+    return strcasecmp( tagname, needle );
+}
+
 static void MergeTTMLStyle( ttml_style_t *p_dst, const ttml_style_t *p_src)
 {
     text_style_Merge( p_dst->font_style, p_src->font_style, false );
@@ -229,8 +237,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
         /* searching previous styles for inheritence */
         if( !strcasecmp( attr, "style" ) || !strcasecmp( attr, "region" ) )
         {
-            if( !strcasecmp( psz_node_name, "style" ) || !strcasecmp( psz_node_name, "tt:style" ) ||
-                !strcasecmp( psz_node_name, "region" ) || !strcasecmp( psz_node_name, "tt:region" ) )
+            if( !tagnamecmp( psz_node_name, "style" ) || !tagnamecmp( psz_node_name, "region" ) )
             {
                 for( size_t i = 0; i < p_sys->i_styles; i++ )
                 {
@@ -252,8 +259,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
             * In order to preserve this style predominance, we merge the styles
             * in the from right to left ( the right one being predominant ) .
             */
-            else if( !strcasecmp( psz_node_name, "p" ) || !strcasecmp( psz_node_name, "tt:p" ) ||
-                     !strcasecmp( psz_node_name, "span" ) || !strcasecmp( psz_node_name, "tt:span" ) )
+            else if( !tagnamecmp( psz_node_name, "p" ) || !tagnamecmp( psz_node_name, "span" ) )
             {
                 char *tmp;
                 char *value = strdup( val );
@@ -524,18 +530,17 @@ static void ParseTTMLStyles( decoder_t* p_dec )
     const char* psz_node_name;
     int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
 
-    if( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_node_name, "tt" ) || !strcasecmp( psz_node_name, "tt:tt" ) ) )
+    if( i_type == XML_READER_STARTELEM && !tagnamecmp( psz_node_name, "tt" ) )
     {
         int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
 
-        while( i_type != XML_READER_STARTELEM || ( strcasecmp( psz_node_name, "head" ) && strcasecmp( psz_node_name, "tt:head" ) ) )
+        while( i_type != XML_READER_STARTELEM || tagnamecmp( psz_node_name, "head" ) )
             i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
 
         do
         {
             /* region and style tag are respectively inside layout and styling tags */
-            if( !strcasecmp( psz_node_name, "styling" ) || !strcasecmp( psz_node_name, "layout" ) ||
-                !strcasecmp( psz_node_name, "tt:styling" ) || !strcasecmp( psz_node_name, "tt:layout" ) )
+            if( !tagnamecmp( psz_node_name, "styling" ) || !tagnamecmp( psz_node_name, "layout" ) )
             {
                 i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
                 while( i_type != XML_READER_ENDELEM )
@@ -553,7 +558,7 @@ static void ParseTTMLStyles( decoder_t* p_dec )
                 }
             }
             i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
-        }while( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_node_name, "head" ) && strcasecmp( psz_node_name, "tt:head" ) ) );
+        }while( i_type != XML_READER_ENDELEM || tagnamecmp( psz_node_name, "head" ) );
     }
     xml_ReaderDelete( p_reader );
     vlc_stream_Delete( p_stream );
@@ -589,8 +594,7 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
         * We parse the styles and put them on the style stack
         * until we reach a text node.
         */
-        if( i_type == XML_READER_STARTELEM && ( !strcasecmp( node, "p" ) || !strcasecmp( node, "tt:p" ) ||
-                                                !strcasecmp( node, "span") || !strcasecmp( node, "tt:span") ) )
+        if( i_type == XML_READER_STARTELEM && ( !tagnamecmp( node, "p") || !tagnamecmp( node, "span" ) ) )
         {
             p_style = ParseTTMLStyle( p_dec, p_xml_reader, node );
             if( unlikely( p_style == NULL ) )
@@ -706,12 +710,12 @@ static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_
                 goto fail;
             }
         }
-        else if( i_type == XML_READER_ENDELEM && ( !strcasecmp( node, "span" ) || !strcasecmp( node, "tt:span" ) ) )
+        else if( i_type == XML_READER_ENDELEM && !tagnamecmp( node, "span" ) )
         {
             if( p_style_stack->p_next )
                 PopStyle( &p_style_stack);
         }
-        else if( i_type == XML_READER_ENDELEM && ( !strcasecmp( node, "p" ) || !strcasecmp( node, "tt:p" ) ) )
+        else if( i_type == XML_READER_ENDELEM && !tagnamecmp( node, "p" ) )
         {
             PopStyle( &p_style_stack );
             p_current_segment->p_next = NULL;
