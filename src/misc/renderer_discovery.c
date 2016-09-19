@@ -37,7 +37,6 @@ struct vlc_renderer_item
     char *psz_name;
     char *psz_sout;
     char *psz_icon_uri;
-    void *p_ctx;
     int i_flags;
     atomic_uint refs;
 };
@@ -123,22 +122,6 @@ vlc_renderer_item_flags(const vlc_renderer_item *p_item)
     assert(p_item != NULL);
 
     return p_item->i_flags;
-}
-
-void
-vlc_renderer_item_set_ctx(vlc_renderer_item *p_item, void *p_ctx)
-{
-    assert(p_item != NULL);
-
-    p_item->p_ctx = p_ctx;
-}
-
-void*
-vlc_renderer_item_ctx(const vlc_renderer_item *p_item)
-{
-    assert(p_item != NULL);
-
-    return p_item->p_ctx;
 }
 
 vlc_renderer_item *

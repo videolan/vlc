@@ -95,18 +95,6 @@ VLC_API int
 vlc_renderer_item_flags(const vlc_renderer_item *p_item);
 
 /**
- * Set an opaque context
- */
-VLC_API void
-vlc_renderer_item_set_ctx(vlc_renderer_item *p_item, void *p_ctx);
-
-/**
- * Get the opaque context previously set
- */
-VLC_API void*
-vlc_renderer_item_ctx(const vlc_renderer_item *p_item);
-
-/**
  * @}
  * @defgroup vlc_renderer_discovery VLC renderer discovery interface
  * @{
