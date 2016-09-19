@@ -283,7 +283,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                 ttml_style_t* p_style = FindTextStyle( p_dec, token );
                 if( p_style == NULL )
                 {
-                    msg_Warn( p_dec, "Style \"%s\" not found", token );
+                    msg_Warn( p_dec, "IDREF '%s' in '%s' not found", token, attr );
                     free( value );
                     break;
                 }
@@ -293,7 +293,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                     ttml_style_t* p_next_style = FindTextStyle( p_dec, token );
                     if( p_next_style == NULL )
                     {
-                        msg_Warn( p_dec, "Style \"%s\" not found", token );
+                        msg_Warn( p_dec, "IDREF '%s' in '%s' not found", token, attr );
                         break;
                     }
                     MergeTTMLStyle( p_next_style, p_style );
@@ -310,7 +310,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
                 ttml_style_t* p_style = FindTextStyle( p_dec, val );
                 if( p_style == NULL )
                 {
-                    msg_Warn( p_dec, "Style \"%s\" not found", val );
+                    msg_Warn( p_dec, "IDREF '%s' in '%s' not found", val, attr );
                     break;
                 }
                 MergeTTMLStyle( p_style , p_ttml_style );
