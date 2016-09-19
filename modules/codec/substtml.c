@@ -517,7 +517,8 @@ static void ParseTTMLStyles( decoder_t* p_dec )
     if( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_node_name, "tt" ) || !strcasecmp( psz_node_name, "tt:tt" ) ) )
     {
         int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
-        while( i_type != XML_READER_STARTELEM || ( strcasecmp( psz_node_name, "styling" ) && strcasecmp( psz_node_name, "tt:styling" ) ) )
+
+        while( i_type != XML_READER_STARTELEM || ( strcasecmp( psz_node_name, "head" ) && strcasecmp( psz_node_name, "tt:head" ) ) )
             i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
 
         do
