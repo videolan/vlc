@@ -111,7 +111,7 @@ struct item
 {
     char *              psz_uri;
     input_item_t *      p_input_item;
-    vlc_renderer_item * p_renderer_item;
+    vlc_renderer_item_t*p_renderer_item;
     mtime_t             i_last_seen;
 };
 
@@ -181,7 +181,7 @@ items_add_input( struct discovery_sys *p_sys, services_discovery_t *p_sd,
 }
 
 static int
-items_add_renderer( struct discovery_sys *p_sys, vlc_renderer_discovery *p_rd,
+items_add_renderer( struct discovery_sys *p_sys, vlc_renderer_discovery_t *p_rd,
                     const char *psz_name, char *psz_uri,
                     const char *psz_icon_uri, int i_flags )
 {
@@ -191,7 +191,7 @@ items_add_renderer( struct discovery_sys *p_sys, vlc_renderer_discovery *p_rd,
 
     const char *psz_extra_uri = i_flags & VLC_RENDERER_CAN_VIDEO ? NULL : "video=0";
 
-    vlc_renderer_item *p_renderer_item =
+    vlc_renderer_item_t *p_renderer_item =
         vlc_renderer_item_new( psz_name, psz_uri, psz_extra_uri, psz_icon_uri, i_flags );
     if( p_renderer_item == NULL )
     {
@@ -245,7 +245,7 @@ items_exists( struct discovery_sys *p_sys, const char *psz_uri )
 
 static void
 items_timeout( struct discovery_sys *p_sys, services_discovery_t *p_sd,
-               vlc_renderer_discovery *p_rd )
+               vlc_renderer_discovery_t *p_rd )
 {
     mtime_t i_now = mdate();
 
@@ -437,7 +437,7 @@ RunSD( void *p_this )
 static void
 new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries )
 {
-    vlc_renderer_discovery *p_rd = (vlc_renderer_discovery *)p_this;
+    vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)p_this;
     struct discovery_sys *p_sys = &p_rd->p_sys->s;
     if( i_status < 0 )
     {
@@ -519,7 +519,7 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
 static bool
 stop_rd_cb( void *p_this )
 {
-    vlc_renderer_discovery *p_rd = ( vlc_renderer_discovery* )p_this;
+    vlc_renderer_discovery_t *p_rd = p_this;
     struct discovery_sys *p_sys = &p_rd->p_sys->s;
 
     if( atomic_load( &p_sys->stop ) )
@@ -534,7 +534,7 @@ stop_rd_cb( void *p_this )
 static void *
 RunRD( void *p_this )
 {
-    vlc_renderer_discovery *p_rd = ( vlc_renderer_discovery* )p_this;
+    vlc_renderer_discovery_t *p_rd = p_this;
     struct discovery_sys *p_sys = &p_rd->p_sys->s;
 
     int i_status = mdns_listen( p_sys->p_microdns,
@@ -632,7 +632,7 @@ CloseSD( vlc_object_t *p_this )
 static int
 OpenRD( vlc_object_t *p_obj )
 {
-    vlc_renderer_discovery *p_rd = (vlc_renderer_discovery *)p_obj;
+    vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)p_obj;
 
     p_rd->p_sys = calloc( 1, sizeof(vlc_renderer_discovery_sys) );
     if( !p_rd->p_sys )
@@ -646,7 +646,7 @@ OpenRD( vlc_object_t *p_obj )
 static void
 CloseRD( vlc_object_t *p_this )
 {
-    vlc_renderer_discovery *p_rd = (vlc_renderer_discovery *) p_this;
+    vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *) p_this;
 
     CleanCommon( &p_rd->p_sys->s );
     free( p_rd->p_sys );

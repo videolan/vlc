@@ -250,7 +250,7 @@ void ActionsManager::renderer_event_received( const vlc_event_t * p_event, void 
 
     if ( p_event->type == vlc_RendererDiscoveryItemAdded )
     {
-        vlc_renderer_item *p_item =  p_event->u.renderer_discovery_item_added.p_new_item;
+        vlc_renderer_item_t *p_item =  p_event->u.renderer_discovery_item_added.p_new_item;
 
         QAction *firstSeparator = NULL;
         foreach (QAction* action, VLCMenuBar::rendererMenu->actions())

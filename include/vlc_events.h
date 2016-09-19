@@ -205,11 +205,11 @@ typedef struct vlc_event_t
         /* Renderer discovery events */
         struct vlc_renderer_discovery_item_added
         {
-            vlc_renderer_item * p_new_item;
+            vlc_renderer_item_t * p_new_item;
         } renderer_discovery_item_added;
         struct vlc_renderer_discovery_item_removed
         {
-            vlc_renderer_item * p_item;
+            vlc_renderer_item_t * p_item;
         } renderer_discovery_item_removed;
 
         /* Addons */

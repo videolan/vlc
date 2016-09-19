@@ -37,8 +37,6 @@
  * @{
  */
 
-typedef struct vlc_renderer_item vlc_renderer_item;
-
 #define VLC_RENDERER_CAN_AUDIO 0x0001
 #define VLC_RENDERER_CAN_VIDEO 0x0002
 
@@ -53,7 +51,7 @@ typedef struct vlc_renderer_item vlc_renderer_item;
  * @param i_flags flags for the item
  * @return a renderer item or NULL in case of error
  */
-VLC_API vlc_renderer_item *
+VLC_API vlc_renderer_item_t *
 vlc_renderer_item_new(const char *psz_name, const char *psz_uri,
                       const char *psz_extra_sout, const char *psz_icon_uri,
                       int i_flags) VLC_USED;
@@ -61,38 +59,38 @@ vlc_renderer_item_new(const char *psz_name, const char *psz_uri,
 /**
  * Hold a renderer item, i.e. creates a new reference
  */
-VLC_API vlc_renderer_item *
-vlc_renderer_item_hold(vlc_renderer_item *p_item);
+VLC_API vlc_renderer_item_t *
+vlc_renderer_item_hold(vlc_renderer_item_t *p_item);
 
 /**
  * Releases a renderer item, i.e. decrements its reference counter
  */
 VLC_API void
-vlc_renderer_item_release(vlc_renderer_item *p_item);
+vlc_renderer_item_release(vlc_renderer_item_t *p_item);
 
 /**
  * Get the human readable name of a renderer item
  */
 VLC_API const char *
-vlc_renderer_item_name(const vlc_renderer_item *p_item);
+vlc_renderer_item_name(const vlc_renderer_item_t *p_item);
 
 /**
  * Get the sout command of a renderer item
  */
 VLC_API const char *
-vlc_renderer_item_sout(const vlc_renderer_item *p_item);
+vlc_renderer_item_sout(const vlc_renderer_item_t *p_item);
 
 /**
  * Get the icon uri of a renderer item
  */
 VLC_API const char *
-vlc_renderer_item_icon_uri(const vlc_renderer_item *p_item);
+vlc_renderer_item_icon_uri(const vlc_renderer_item_t *p_item);
 
 /**
  * Get the flags of a renderer item
  */
 VLC_API int
-vlc_renderer_item_flags(const vlc_renderer_item *p_item);
+vlc_renderer_item_flags(const vlc_renderer_item_t *p_item);
 
 /**
  * @}
@@ -100,7 +98,6 @@ vlc_renderer_item_flags(const vlc_renderer_item *p_item);
  * @{
  */
 
-typedef struct vlc_renderer_discovery vlc_renderer_discovery;
 typedef struct vlc_renderer_discovery_sys vlc_renderer_discovery_sys;
 
 /**
@@ -127,7 +124,7 @@ vlc_rd_get_names(vlc_object_t *p_obj, char ***pppsz_names,
  * @return a valid vlc_renderer_discovery, need to be released with
  * vlc_rd_release()
  */
-VLC_API vlc_renderer_discovery *
+VLC_API vlc_renderer_discovery_t *
 vlc_rd_new(vlc_object_t *p_obj, const char *psz_name) VLC_USED;
 
 #define vlc_rd_release(p_rd) vlc_object_release(p_rd)
@@ -139,22 +136,22 @@ vlc_rd_new(vlc_object_t *p_obj, const char *psz_name) VLC_USED;
  * @see vlc_RendererDiscoveryItemRemoved
  */
 VLC_API vlc_event_manager_t *
-vlc_rd_event_manager(vlc_renderer_discovery *p_rd);
+vlc_rd_event_manager(vlc_renderer_discovery_t *p_rd);
 
 /**
  * Start the renderer discovery module
  *
- * Once started, the module can send new vlc_renderer_item via the
+ * Once started, the module can send new vlc_renderer_item_t via the
  * vlc_RendererDiscoveryItemAdded event.
  */
 VLC_API int
-vlc_rd_start(vlc_renderer_discovery *p_rd);
+vlc_rd_start(vlc_renderer_discovery_t *p_rd);
 
 /**
  * Stop the renderer discovery module
  */
 VLC_API void
-vlc_rd_stop(vlc_renderer_discovery *p_rd);
+vlc_rd_stop(vlc_renderer_discovery_t *p_rd);
 
 /**
  * @}
@@ -162,7 +159,7 @@ vlc_rd_stop(vlc_renderer_discovery *p_rd);
  * @{
  */
 
-struct vlc_renderer_discovery
+struct vlc_renderer_discovery_t
 {
     VLC_COMMON_MEMBERS
     module_t *          p_module;
@@ -181,7 +178,7 @@ struct vlc_renderer_discovery
  * This will send the vlc_RendererDiscoveryItemAdded event
  */
 VLC_API void
-vlc_rd_add_item(vlc_renderer_discovery * p_rd, vlc_renderer_item * p_item);
+vlc_rd_add_item(vlc_renderer_discovery_t * p_rd, vlc_renderer_item_t * p_item);
 
 /**
  * Add a new renderer item
@@ -189,7 +186,7 @@ vlc_rd_add_item(vlc_renderer_discovery * p_rd, vlc_renderer_item * p_item);
  * This will send the vlc_RendererDiscoveryItemRemoved event
  */
 VLC_API void
-vlc_rd_remove_item(vlc_renderer_discovery * p_rd, vlc_renderer_item * p_item);
+vlc_rd_remove_item(vlc_renderer_discovery_t * p_rd, vlc_renderer_item_t * p_item);
 
 /**
  * Renderer Discovery proble helpers

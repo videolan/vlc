@@ -32,7 +32,7 @@
 #include <vlc_modules.h>
 #include <libvlc.h>
 
-struct vlc_renderer_item
+struct vlc_renderer_item_t
 {
     char *psz_name;
     char *psz_sout;
@@ -41,20 +41,20 @@ struct vlc_renderer_item
     atomic_uint refs;
 };
 
-vlc_renderer_item *
+vlc_renderer_item_t *
 vlc_renderer_item_new(const char *psz_name, const char *psz_uri,
                       const char *psz_extra_sout, const char *psz_icon_uri,
                       int i_flags)
 {
     assert(psz_uri != NULL);
-    vlc_renderer_item *p_item = NULL;
+    vlc_renderer_item_t *p_item = NULL;
     vlc_url_t url;
     vlc_UrlParse(&url, psz_uri);
 
     if (url.psz_protocol == NULL || url.psz_host == NULL)
         goto error;
 
-    p_item = calloc(1, sizeof(vlc_renderer_item));
+    p_item = calloc(1, sizeof(vlc_renderer_item_t));
     if (unlikely(p_item == NULL))
         goto error;
 
@@ -93,7 +93,7 @@ error:
 }
 
 const char *
-vlc_renderer_item_name(const vlc_renderer_item *p_item)
+vlc_renderer_item_name(const vlc_renderer_item_t *p_item)
 {
     assert(p_item != NULL);
 
@@ -101,7 +101,7 @@ vlc_renderer_item_name(const vlc_renderer_item *p_item)
 }
 
 const char *
-vlc_renderer_item_sout(const vlc_renderer_item *p_item)
+vlc_renderer_item_sout(const vlc_renderer_item_t *p_item)
 {
     assert(p_item != NULL);
 
@@ -109,7 +109,7 @@ vlc_renderer_item_sout(const vlc_renderer_item *p_item)
 }
 
 const char *
-vlc_renderer_item_icon_uri(const vlc_renderer_item *p_item)
+vlc_renderer_item_icon_uri(const vlc_renderer_item_t *p_item)
 {
     assert(p_item != NULL);
 
@@ -117,15 +117,15 @@ vlc_renderer_item_icon_uri(const vlc_renderer_item *p_item)
 }
 
 int
-vlc_renderer_item_flags(const vlc_renderer_item *p_item)
+vlc_renderer_item_flags(const vlc_renderer_item_t *p_item)
 {
     assert(p_item != NULL);
 
     return p_item->i_flags;
 }
 
-vlc_renderer_item *
-vlc_renderer_item_hold(vlc_renderer_item *p_item)
+vlc_renderer_item_t *
+vlc_renderer_item_hold(vlc_renderer_item_t *p_item)
 {
     assert(p_item != NULL);
 
@@ -134,7 +134,7 @@ vlc_renderer_item_hold(vlc_renderer_item *p_item)
 }
 
 void
-vlc_renderer_item_release(vlc_renderer_item *p_item)
+vlc_renderer_item_release(vlc_renderer_item_t *p_item)
 {
     assert(p_item != NULL);
 
@@ -208,7 +208,7 @@ vlc_rd_get_names(vlc_object_t *p_obj, char ***pppsz_names,
 static void
 rd_destructor(vlc_object_t *p_obj)
 {
-    vlc_renderer_discovery * p_rd =(vlc_renderer_discovery *)p_obj;
+    vlc_renderer_discovery_t * p_rd =(vlc_renderer_discovery_t *)p_obj;
     assert(!p_rd->p_module); /* Forgot to call Stop */
 
     config_ChainDestroy(p_rd->p_cfg);
@@ -216,10 +216,10 @@ rd_destructor(vlc_object_t *p_obj)
     vlc_event_manager_fini(&p_rd->event_manager);
 }
 
-vlc_renderer_discovery *
+vlc_renderer_discovery_t *
 vlc_rd_new(vlc_object_t *p_obj, const char *psz_name)
 {
-    vlc_renderer_discovery *p_rd;
+    vlc_renderer_discovery_t *p_rd;
 
     p_rd = vlc_custom_create(p_obj, sizeof(*p_rd), "renderer discovery");
     if(!p_rd)
@@ -236,13 +236,13 @@ vlc_rd_new(vlc_object_t *p_obj, const char *psz_name)
 }
 
 VLC_API vlc_event_manager_t *
-vlc_rd_event_manager(vlc_renderer_discovery *p_rd)
+vlc_rd_event_manager(vlc_renderer_discovery_t *p_rd)
 {
     return &p_rd->event_manager;
 }
 
 int
-vlc_rd_start(vlc_renderer_discovery *p_rd)
+vlc_rd_start(vlc_renderer_discovery_t *p_rd)
 {
     assert(!p_rd->p_module);
 
@@ -258,14 +258,14 @@ vlc_rd_start(vlc_renderer_discovery *p_rd)
 }
 
 void
-vlc_rd_stop(vlc_renderer_discovery * p_rd)
+vlc_rd_stop(vlc_renderer_discovery_t * p_rd)
 {
     module_unneed(p_rd, p_rd->p_module);
     p_rd->p_module = NULL;
 }
 
 void
-vlc_rd_add_item(vlc_renderer_discovery * p_rd, vlc_renderer_item * p_item)
+vlc_rd_add_item(vlc_renderer_discovery_t * p_rd, vlc_renderer_item_t * p_item)
 {
     vlc_event_t event;
     event.type = vlc_RendererDiscoveryItemAdded;
@@ -275,7 +275,7 @@ vlc_rd_add_item(vlc_renderer_discovery * p_rd, vlc_renderer_item * p_item)
 }
 
 void
-vlc_rd_remove_item(vlc_renderer_discovery * p_rd, vlc_renderer_item * p_item)
+vlc_rd_remove_item(vlc_renderer_discovery_t * p_rd, vlc_renderer_item_t * p_item)
 {
     vlc_event_t event;
     event.type = vlc_RendererDiscoveryItemRemoved;

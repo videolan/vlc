@@ -74,7 +74,7 @@ private:
     virtual ~ActionsManager();
 
     intf_thread_t       *p_intf;
-    vlc_renderer_discovery *p_rd;
+    vlc_renderer_discovery_t *p_rd;
 
     bool  b_rd_started;
     static void renderer_event_received( const vlc_event_t * p_event, void * user_data );
