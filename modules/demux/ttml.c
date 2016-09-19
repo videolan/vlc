@@ -358,7 +358,7 @@ static int addToArrayIfNotInside( vlc_array_t* p_array, mtime_t* p_elem )
 {
     if( !isInArray( p_array, p_elem ) )
     {
-        vlc_array_append( p_array, (void*)p_elem );
+        vlc_array_append( p_array, p_elem );
         if( unlikely( p_array->pp_elems[p_array->i_count - 1] == NULL ) )
             return VLC_ENOMEM;
     }
@@ -792,7 +792,7 @@ static void ParseHead( demux_t* p_demux )
         return;
     }
 
-    while( ( i_read = vlc_stream_Read( p_demux->s, (void*)buff, 1024 ) ) > 0 )
+    while( ( i_read = vlc_stream_Read( p_demux->s, buff, 1024 ) ) > 0 )
     {
         ssize_t i_offset = -1;
         // Ensure we can use strstr
