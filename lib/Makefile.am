@@ -36,6 +36,7 @@ libvlc_la_SOURCES = \
 	media_internal.h \
 	media_list_internal.h \
 	media_player_internal.h \
+	renderer_discoverer_internal.h \
 	core.c \
 	dialog.c \
 	renderer_discoverer.c \

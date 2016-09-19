@@ -27,6 +27,7 @@
 #include <assert.h>
 
 #include <vlc/libvlc.h>
+#include <vlc/libvlc_renderer_discoverer.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_events.h>
 
@@ -39,6 +40,7 @@
 #include "libvlc_internal.h"
 #include "media_internal.h" // libvlc_media_set_state()
 #include "media_player_internal.h"
+#include "renderer_discoverer_internal.h"
 
 static int
 input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
@@ -601,6 +603,8 @@ libvlc_media_player_new( libvlc_instance_t *instance )
 
     /* Input */
     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);
+    var_Create (mp, "sout", VLC_VAR_STRING);
+    var_Create (mp, "demux-filter", VLC_VAR_STRING);
 
     /* Video */
     var_Create (mp, "vout", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
@@ -1052,6 +1056,19 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
     unlock_input(p_mi);
 }
 
+int libvlc_media_player_set_renderer( libvlc_media_player_t *p_mi,
+                                      const libvlc_renderer_item_t *p_litem )
+{
+    const vlc_renderer_item_t *p_item = libvlc_renderer_item_to_vlc( p_litem );
+    char *psz_sout;
+    if( asprintf( &psz_sout, "#%s", vlc_renderer_item_sout( p_item ) ) == -1 )
+        return -1;
+
+    var_SetString( p_mi, "sout", psz_sout );
+    var_SetString( p_mi, "demux-filter", vlc_renderer_item_demux_filter( p_item ) );
+    free( psz_sout );
+    return 0;
+}
 
 void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
     void *(*lock_cb) (void *, void **),

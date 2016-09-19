@@ -263,6 +263,22 @@ LIBVLC_API void libvlc_media_player_pause ( libvlc_media_player_t *p_mi );
 LIBVLC_API void libvlc_media_player_stop ( libvlc_media_player_t *p_mi );
 
 /**
+ * Set a renderer to the media player
+ *
+ * \note must be called before the first call of libvlc_media_player_play() to
+ * take effect.
+ *
+ * \see libvlc_renderer_discoverer_new
+ *
+ * \param p_mi the Media Player
+ * \param p_item an item discovered by libvlc_renderer_discoverer_start()
+ * \return 0 on success, -1 on error.
+ * \version LibVLC 3.0.0 or later
+ */
+LIBVLC_API int libvlc_media_player_set_renderer( libvlc_media_player_t *p_mi,
+                                                 const libvlc_renderer_item_t *p_item );
+
+/**
  * Callback prototype to allocate and lock a picture buffer.
  *
  * Whenever a new video frame needs to be decoded, the lock callback is
