@@ -694,6 +694,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     {
         vgl->f_teta = vgl->fmt.f_pose_roll_degrees / 180. * (float) M_PI;
         vgl->f_phi  = vgl->fmt.f_pose_yaw_degrees  / 180. * (float) M_PI;
+        vgl->f_teta -= (float) M_PI/2;
     }
 
     /* */
