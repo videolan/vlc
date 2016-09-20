@@ -156,6 +156,12 @@ std::string BaseRepresentation::contextualize(size_t, const std::string &compone
     return component;
 }
 
+bool BaseRepresentation::bwCompare(const BaseRepresentation *a,
+                                   const BaseRepresentation *b)
+{
+    return a->getBandwidth() < b->getBandwidth();
+}
+
 bool BaseRepresentation::validateCodec(const std::string &) const
 {
     return true;

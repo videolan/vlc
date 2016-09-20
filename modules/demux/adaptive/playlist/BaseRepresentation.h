@@ -73,6 +73,8 @@ namespace adaptive
                 virtual std::string contextualize(size_t, const std::string &,
                                                   const BaseSegmentTemplate *) const;
 
+                static bool         bwCompare(const BaseRepresentation *a,
+                                              const BaseRepresentation *b);
             protected:
                 virtual bool        validateCodec(const std::string &) const;
                 BaseAdaptationSet                  *adaptationSet;

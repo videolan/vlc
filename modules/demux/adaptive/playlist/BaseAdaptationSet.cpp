@@ -36,6 +36,8 @@
 #include "BasePeriod.h"
 #include "Inheritables.hpp"
 
+#include <algorithm>
+
 using namespace adaptive;
 using namespace adaptive::playlist;
 
@@ -78,7 +80,11 @@ BaseRepresentation * BaseAdaptationSet::getRepresentationByID(const ID &id)
 
 void BaseAdaptationSet::addRepresentation(BaseRepresentation *rep)
 {
-    representations.push_back(rep);
+    representations.insert(std::upper_bound(representations.begin(),
+                                            representations.end(),
+                                            rep,
+                                            BaseRepresentation::bwCompare),
+                           rep);
     childs.push_back(rep);
 }
 
