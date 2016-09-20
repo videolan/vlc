@@ -40,6 +40,10 @@ namespace adaptive
         public:
             RepresentationSelector();
              ~RepresentationSelector();
+            BaseRepresentation * lowest(BaseAdaptationSet *) const;
+            BaseRepresentation * highest(BaseAdaptationSet *) const;
+            BaseRepresentation * higher(BaseAdaptationSet *, BaseRepresentation *) const;
+            BaseRepresentation * lower(BaseAdaptationSet *, BaseRepresentation *) const;
             BaseRepresentation * select(BaseAdaptationSet *) const;
             BaseRepresentation * select(BaseAdaptationSet *, uint64_t bitrate) const;
             BaseRepresentation * select(BaseAdaptationSet *, uint64_t bitrate,

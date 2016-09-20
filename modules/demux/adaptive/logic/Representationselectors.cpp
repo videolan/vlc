@@ -26,6 +26,7 @@
 #include "../playlist/BaseAdaptationSet.h"
 #include "../playlist/BasePeriod.h"
 #include <limits>
+#include <algorithm>
 
 using namespace adaptive::logic;
 
@@ -35,6 +36,34 @@ RepresentationSelector::RepresentationSelector()
 
 RepresentationSelector::~RepresentationSelector()
 {
+}
+
+BaseRepresentation * RepresentationSelector::lowest(BaseAdaptationSet *adaptSet) const
+{
+    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
+    return (reps.empty()) ? NULL : *(reps.begin());
+}
+
+BaseRepresentation * RepresentationSelector::highest(BaseAdaptationSet *adaptSet) const
+{
+    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
+    return (reps.empty()) ? NULL : *reps.rbegin();
+}
+
+BaseRepresentation * RepresentationSelector::higher(BaseAdaptationSet *adaptSet, BaseRepresentation *rep) const
+{
+    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
+    std::vector<BaseRepresentation *>::iterator it = std::upper_bound(reps.begin(), reps.end(), rep,
+                                                                      BaseRepresentation::bwCompare);
+    return (it == reps.end()) ? rep : *it;
+}
+
+BaseRepresentation * RepresentationSelector::lower(BaseAdaptationSet *adaptSet, BaseRepresentation *rep) const
+{
+    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
+    std::vector<BaseRepresentation *>::iterator it = std::lower_bound(reps.begin(), reps.end(), rep,
+                                                                      BaseRepresentation::bwCompare);
+    return (it > reps.begin()) ? *(--it) : rep;
 }
 
 BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet) const
