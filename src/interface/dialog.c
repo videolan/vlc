@@ -245,6 +245,8 @@ libvlc_InternalDialogClean(libvlc_int_t *p_libvlc)
     assert(p_libvlc != NULL);
     vlc_dialog_provider *p_provider = libvlc_priv(p_libvlc)->p_dialog_provider;
 
+    if (p_provider == NULL)
+        return;
     vlc_mutex_lock(&p_provider->lock);
     dialog_clear_all_locked(p_provider);
     vlc_mutex_unlock(&p_provider->lock);
