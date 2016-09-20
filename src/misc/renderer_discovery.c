@@ -35,6 +35,7 @@
 struct vlc_renderer_item_t
 {
     char *psz_name;
+    char *psz_type;
     char *psz_sout;
     char *psz_icon_uri;
     int i_flags;
@@ -45,15 +46,16 @@ static void
 item_free(vlc_renderer_item_t *p_item)
 {
     free(p_item->psz_name);
+    free(p_item->psz_type);
     free(p_item->psz_sout);
     free(p_item->psz_icon_uri);
     free(p_item);
 }
 
 vlc_renderer_item_t *
-vlc_renderer_item_new(const char *psz_name, const char *psz_uri,
-                      const char *psz_extra_sout, const char *psz_icon_uri,
-                      int i_flags)
+vlc_renderer_item_new(const char *psz_type, const char *psz_name,
+                      const char *psz_uri, const char *psz_extra_sout,
+                      const char *psz_icon_uri, int i_flags)
 {
     assert(psz_uri != NULL);
     vlc_renderer_item_t *p_item = NULL;
@@ -65,6 +67,9 @@ vlc_renderer_item_new(const char *psz_name, const char *psz_uri,
 
     p_item = calloc(1, sizeof(vlc_renderer_item_t));
     if (unlikely(p_item == NULL))
+        goto error;
+
+    if ((p_item->psz_type = strdup(psz_type)) == NULL)
         goto error;
 
     if (psz_name != NULL)
@@ -102,6 +107,14 @@ vlc_renderer_item_name(const vlc_renderer_item_t *p_item)
     assert(p_item != NULL);
 
     return p_item->psz_name;
+}
+
+const char *
+vlc_renderer_item_type(const vlc_renderer_item_t *p_item)
+{
+    assert(p_item != NULL);
+
+    return p_item->psz_type;
 }
 
 const char *

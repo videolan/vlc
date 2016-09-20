@@ -43,6 +43,7 @@
 /**
  * Create a new renderer item
  *
+ * @param psz_type type of the item
  * @param psz_name name of the item
  * @param psz_uri uri of the renderer item, must contains a valid protocol and
  * a valid host
@@ -52,9 +53,9 @@
  * @return a renderer item or NULL in case of error
  */
 VLC_API vlc_renderer_item_t *
-vlc_renderer_item_new(const char *psz_name, const char *psz_uri,
-                      const char *psz_extra_sout, const char *psz_icon_uri,
-                      int i_flags) VLC_USED;
+vlc_renderer_item_new(const char *psz_type, const char *psz_name,
+                      const char *psz_uri, const char *psz_extra_sout,
+                      const char *psz_icon_uri, int i_flags) VLC_USED;
 
 /**
  * Hold a renderer item, i.e. creates a new reference
@@ -73,6 +74,13 @@ vlc_renderer_item_release(vlc_renderer_item_t *p_item);
  */
 VLC_API const char *
 vlc_renderer_item_name(const vlc_renderer_item_t *p_item);
+
+/**
+ * Get the type (not translated) of a renderer item. For now, the type can only
+ * be "chromecast" ("upnp", "airplay" may come later).
+ */
+VLC_API const char *
+vlc_renderer_item_type(const vlc_renderer_item_t *p_item);
 
 /**
  * Get the sout command of a renderer item

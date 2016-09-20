@@ -192,7 +192,8 @@ items_add_renderer( struct discovery_sys *p_sys, vlc_renderer_discovery_t *p_rd,
     const char *psz_extra_uri = i_flags & VLC_RENDERER_CAN_VIDEO ? NULL : "video=0";
 
     vlc_renderer_item_t *p_renderer_item =
-        vlc_renderer_item_new( psz_name, psz_uri, psz_extra_uri, psz_icon_uri, i_flags );
+        vlc_renderer_item_new( "chromecast", psz_name, psz_uri, psz_extra_uri,
+                               psz_icon_uri, i_flags );
     if( p_renderer_item == NULL )
     {
         free( psz_uri );
