@@ -93,6 +93,8 @@ endif
 
 ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
+else
+VPX_CONF += --extra-cflags="-mstackrealign"
 endif
 ifdef HAVE_MACOSX
 VPX_CONF += --sdk-path=$(MACOSX_SDK)
