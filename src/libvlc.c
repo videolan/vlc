@@ -125,6 +125,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     char *       psz_parser = NULL;
     char *       psz_control = NULL;
     char        *psz_val;
+    int          i_ret = VLC_EGENERIC;
 
     /* System specific initialization code */
     system_Init();
@@ -168,11 +169,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
     int vlc_optind;
     if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, &vlc_optind ) )
-    {
-        vlc_LogDeinit (p_libvlc);
-        module_EndBank (true);
-        return VLC_EGENERIC;
-    }
+        goto error;
 
     vlc_LogInit(p_libvlc);
 
@@ -188,16 +185,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if (config_PrintHelp (VLC_OBJECT(p_libvlc)))
     {
-        module_EndBank (true);
+        libvlc_InternalCleanup (p_libvlc);
         exit(0);
     }
 
     if( module_count <= 1 )
     {
         msg_Err( p_libvlc, "No plugins found! Check your VLC installation.");
-        vlc_LogDeinit (p_libvlc);
-        module_EndBank (true);
-        return VLC_ENOMOD;
+        i_ret = VLC_ENOMOD;
+        goto error;
     }
 
 #ifdef HAVE_DAEMON
@@ -207,9 +203,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( daemon( 1, 0) != 0 )
         {
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
-            vlc_LogDeinit (p_libvlc);
-            module_EndBank (true);
-            return VLC_ENOMEM;
+            goto error;
         }
 
         /* lets check if we need to write the pidfile */
@@ -236,12 +230,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 #endif
 
+    i_ret = VLC_ENOMEM;
+
     if( libvlc_InternalDialogInit( p_libvlc ) != VLC_SUCCESS )
-    {
-        vlc_LogDeinit (p_libvlc);
-        module_EndBank (true);
-        return VLC_ENOMEM;
-    }
+        goto error;
     if( libvlc_InternalKeystoreInit( p_libvlc ) != VLC_SUCCESS )
         msg_Warn( p_libvlc, "memory keystore init failed" );
 
@@ -367,11 +359,15 @@ dbus_out:
      * Initialize hotkey handling
      */
     priv->actions = vlc_InitActions( p_libvlc );
+    if( !priv->actions )
+        goto error;
 
     /*
      * Meta data handling
      */
     priv->parser = playlist_preparser_New(VLC_OBJECT(p_libvlc));
+    if( !priv->parser )
+        goto error;
 
     /* Create a variable for showing the fullscreen interface */
     var_Create( p_libvlc, "intf-toggle-fscontrol", VLC_VAR_BOOL );
@@ -498,6 +494,10 @@ dbus_out:
     }
 
     return VLC_SUCCESS;
+
+error:
+    libvlc_InternalCleanup( p_libvlc );
+    return i_ret;
 }
 
 /**
@@ -510,7 +510,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
-    libvlc_Quit( p_libvlc );
     intf_DestroyAll( p_libvlc );
 
     libvlc_InternalDialogClean( p_libvlc );
