@@ -499,11 +499,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
         fclose (file);
         goto error;
     }
-#if defined(__APPLE__) || defined(__ANDROID__)
-    fsync (fd); /* Flush from OS */
-#else
     fdatasync (fd); /* Flush from OS */
-#endif
 #if defined (_WIN32) || defined (__OS2__)
     /* Windows cannot (re)move open files nor overwrite existing ones */
     fclose (file);
