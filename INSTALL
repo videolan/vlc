@@ -30,7 +30,7 @@ symbols:
    make distclean ; ./configure --enable-debug
 
 We recommend using GCC to build VLC, though some people reported success
-with the Intel C compiler (version 8) as well. GCC version 3.3 or higher is
+with the Intel C compiler (version 8) as well. GCC version 4.8 or higher is
 required. On older systems (e.g. FreeBSD 4.x), please select a more recent
 version manually by setting the CC and CXX environment variables
 appropriately while running the ./configure shell script.
