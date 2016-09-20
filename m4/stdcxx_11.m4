@@ -29,7 +29,7 @@
 #   Copyright (c) 2013 Roy Stogner <roystgnr@ices.utexas.edu>
 #   Copyright (c) 2014 Alexey Sokolov <sokolov@google.com>
 #   Copyright (c) 2014, 2015 Google Inc.
-#   Copyright (c) 2015 VLC authors and VideoLAN
+#   Copyright (c) 2015, 2016 VLC authors and VideoLAN
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice
@@ -84,7 +84,13 @@ m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
     }
 
     #include <cinttypes>
-    constexpr uint64_t constantname = UINT64_C(0x100000000);
+    #include <climits>
+    #include <cstddef>
+
+    constexpr uint64_t constant_u64 = UINT64_C(0x100000000);
+    constexpr unsigned constant_lim = UINT_MAX;
+    const char *constant_fmt = "%" PRIu64, *constant_scn = "%" SCNu64;
+    constexpr size_t constant_align = alignof (max_align_t);
 ]])
 
 AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
