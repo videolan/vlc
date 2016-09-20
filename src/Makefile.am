@@ -347,46 +347,7 @@ libvlccore_la_SOURCES = \
 	misc/text_style.c \
 	misc/subpicture.c \
 	misc/subpicture.h
-if HAVE_DARWIN
-libvlccore_la_SOURCES += \
-	darwin/dirs.c \
-	posix/filesystem.c \
-	posix/plugin.c \
-	darwin/thread.c \
-	posix/timer.c \
-	darwin/specific.c \
-	posix/rand.c \
-	darwin/error.c \
-	darwin/netconf.c
-else
-if HAVE_ANDROID
-libvlccore_la_SOURCES += \
-	linux/cpu.c \
-	linux/dirs.c \
-	linux/thread.c \
-	android/thread.c \
-	android/error.c \
-	posix/filesystem.c \
-	posix/plugin.c \
-	posix/timer.c \
-	android/specific.c  \
-	posix/rand.c
-else
-if HAVE_LINUX
-libvlccore_la_SOURCES += \
-	linux/cpu.c \
-	linux/dirs.c \
-	posix/dirs.c \
-	posix/error.c \
-	posix/filesystem.c \
-	posix/netconf.c \
-	posix/plugin.c \
-	linux/thread.c \
-	posix/thread.c \
-	posix/timer.c \
-	posix/specific.c \
-	posix/rand.c
-else
+
 if HAVE_WIN32
 libvlccore_la_SOURCES += \
 	win32/dirs.c \
@@ -394,37 +355,57 @@ libvlccore_la_SOURCES += \
 	win32/filesystem.c \
 	win32/netconf.c \
 	win32/plugin.c \
-	win32/thread.c \
+	win32/rand.c \
 	win32/specific.c \
-	win32/winsock.c \
-	win32/rand.c
+	win32/thread.c \
+	win32/winsock.c
 else
 if HAVE_OS2
 libvlccore_la_SOURCES += \
-	os2/getaddrinfo.c \
 	os2/dirs.c \
 	darwin/error.c \
 	os2/filesystem.c \
+	os2/getaddrinfo.c \
 	os2/netconf.c \
 	os2/plugin.c \
-	os2/thread.c \
 	os2/specific.c \
-	os2/rand.c
+	os2/rand.c \
+	os2/thread.c
+else
+libvlccore_la_SOURCES += \
+	posix/filesystem.c \
+	posix/plugin.c \
+	posix/rand.c \
+	posix/timer.c
+if HAVE_ANDROID
+libvlccore_la_SOURCES += \
+	android/error.c \
+	android/specific.c \
+	android/thread.c
+else
+if HAVE_DARWIN
+libvlccore_la_SOURCES += \
+	darwin/dirs.c \
+	darwin/error.c \
+	darwin/netconf.c \
+	darwin/specific.c \
+	darwin/thread.c
 else
 libvlccore_la_SOURCES += \
 	posix/dirs.c \
 	posix/error.c \
-	posix/filesystem.c \
 	posix/netconf.c \
-	posix/thread.c \
-	posix/timer.c \
-	posix/plugin.c \
 	posix/specific.c \
-	posix/rand.c
+	posix/thread.c
 endif
 endif
 endif
 endif
+if HAVE_LINUX
+libvlccore_la_SOURCES += \
+	linux/cpu.c \
+	linux/dirs.c \
+	linux/thread.c
 endif
 
 if BUILD_HTTPD
