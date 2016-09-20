@@ -6,7 +6,7 @@
 # notice and this notice are preserved.  This file is offered as-is,
 # without any warranty.
 #
-# Origin: gettext-0.19.6
+# Origin: gettext-0.19.7
 GETTEXT_MACRO_VERSION = 0.19
 
 PACKAGE = @PACKAGE@
@@ -42,6 +42,11 @@ mkinstalldirs = $(SHELL) @install_sh@ -d
 install_sh = $(SHELL) @install_sh@
 MKDIR_P = @MKDIR_P@
 mkdir_p = @mkdir_p@
+
+# When building gettext-tools, we prefer to use the built programs
+# rather than installed programs.  However, we can't do that when we
+# are cross compiling.
+CROSS_COMPILING = @CROSS_COMPILING@
 
 GMSGFMT_ = @GMSGFMT@
 GMSGFMT_no = @GMSGFMT@
@@ -430,7 +435,7 @@ update-po: Makefile
 
 .nop.po-update:
 	@lang=`echo $@ | sed -e 's/\.po-update$$//'`; \
-	if test "$(PACKAGE)" = "gettext-tools"; then PATH=`pwd`/../src:$$PATH; fi; \
+	if test "$(PACKAGE)" = "gettext-tools" && test "$(CROSS_COMPILING)" != "yes"; then PATH=`pwd`/../src:$$PATH; fi; \
 	tmpdir=`pwd`; \
 	echo "$$lang:"; \
 	test "$(srcdir)" = . && cdcmd="" || cdcmd="cd $(srcdir) && "; \
