@@ -108,7 +108,7 @@ extern "C" {
 #endif
 
 /* stddef.h */
-#ifndef HAVE_MAX_ALIGN_T
+#if !defined (__cplusplus) && !defined (HAVE_MAX_ALIGN_T)
 typedef struct {
   long long ll;
   long double ld;
