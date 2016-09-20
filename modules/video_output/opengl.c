@@ -1532,7 +1532,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
-        float sar = vgl->fmt.i_visible_width / vgl->fmt.i_visible_height;
+        float sar = (float) vgl->fmt.i_visible_width / vgl->fmt.i_visible_height;
         getProjectionMatrix(sar, projectionMatrix);
         getViewMatrix(viewMatrix);
         getYRotMatrix(vgl->f_teta, yRotMatrix);
