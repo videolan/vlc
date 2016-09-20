@@ -33,6 +33,10 @@ RepresentationSelector::RepresentationSelector()
 {
 }
 
+RepresentationSelector::~RepresentationSelector()
+{
+}
+
 BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet) const
 {
     return select(adaptSet, std::numeric_limits<uint64_t>::max());
