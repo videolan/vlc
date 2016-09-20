@@ -57,10 +57,8 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 
 void vlc_timer_destroy (vlc_timer_t timer)
 {
-#if !VLC_WINSTORE_APP
     if (timer->handle != INVALID_HANDLE_VALUE)
         DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
-#endif
     free (timer);
 }
 
@@ -69,9 +67,7 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
 {
     if (timer->handle != INVALID_HANDLE_VALUE)
     {
-#if !VLC_WINSTORE_APP
         DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
-#endif
         timer->handle = INVALID_HANDLE_VALUE;
     }
     if (value == 0)
@@ -86,10 +82,8 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
     value = (value + 999) / 1000;
     interval = (interval + 999) / 1000;
 
-#if !VLC_WINSTORE_APP
     if (!CreateTimerQueueTimer (&timer->handle, NULL, vlc_timer_do, timer,
                                 value, interval, WT_EXECUTEDEFAULT))
-#endif
         abort ();
 }
 

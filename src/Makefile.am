@@ -358,8 +358,12 @@ libvlccore_la_SOURCES += \
 	win32/rand.c \
 	win32/specific.c \
 	win32/thread.c \
-	win32/timer.c \
 	win32/winsock.c
+if HAVE_WINSTORE
+libvlccore_la_SOURCES += posix/timer.c
+else
+libvlccore_la_SOURCES += win32/timer.c
+endif
 else
 if HAVE_OS2
 libvlccore_la_SOURCES += \
