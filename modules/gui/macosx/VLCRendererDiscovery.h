@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCRendererDiscovery.h: Wrapper class for vlc_renderer_discovery
+ * VLCRendererDiscovery.h: Wrapper class for vlc_renderer_discovery_t
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  * $Id$
@@ -29,7 +29,7 @@
 
 /**
  \c VLCRendererDiscovery is a simple wrapper class for libvlc’s
- \c vlc_renderer_discovery. It's initialized with the renderer name and
+ \c vlc_renderer_discovery_t. It's initialized with the renderer name and
  manages the underlying renderer discovery.
  */
 @interface VLCRendererDiscovery : NSObject
@@ -69,7 +69,7 @@
  \param longname    Renderer longname as C string
 
  \returns   Initialized class that already created the underlying
-            \c vlc_renderer_discovery structure or nil on failure.
+            \c vlc_renderer_discovery_t structure or nil on failure.
  */
 - (instancetype)initWithName:(const char*)name andLongname:(const char*)longname;
 

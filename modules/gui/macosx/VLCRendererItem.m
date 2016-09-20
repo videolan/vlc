@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCRendererItem.m: Wrapper class for vlc_renderer_item
+ * VLCRendererItem.m: Wrapper class for vlc_renderer_item_t
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  * $Id$
@@ -29,7 +29,7 @@
 
 @implementation VLCRendererItem
 
-- (instancetype)initWithRendererItem:(vlc_renderer_item*)item
+- (instancetype)initWithRendererItem:(vlc_renderer_item_t*)item
 {
     self = [super init];
     if (self) {

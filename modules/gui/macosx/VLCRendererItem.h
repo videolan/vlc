@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCRendererItem.h: Wrapper class for vlc_renderer_item
+ * VLCRendererItem.h: Wrapper class for vlc_renderer_item_t
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  * $Id$
@@ -28,21 +28,21 @@
 
 /**
  \c VLCRendererItem is a simple wrapper class for libvlc’s
- \c vlc_renderer_item. It's initialized with the renderer item and
+ \c vlc_renderer_item_t. It's initialized with the renderer item and
  manages it's lifetime.
  */
 @interface VLCRendererItem : NSObject
 
 /**
  Initialize the object with a renderer item, typically received from
- a \c vlc_renderer_discovery event.
+ a \c vlc_renderer_discovery_t event.
  */
-- (instancetype)initWithRendererItem:(vlc_renderer_item*)item;
+- (instancetype)initWithRendererItem:(vlc_renderer_item_t*)item;
 
 /**
- The underlying \c vlc_renderer_item item
+ The underlying \c vlc_renderer_item_t item
  */
-@property (readonly) vlc_renderer_item* rendererItem;
+@property (readonly) vlc_renderer_item_t* rendererItem;
 
 /**
  The name of the renderer item

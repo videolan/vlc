@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCRendererDiscovery.m: Wrapper class for vlc_renderer_discovery
+ * VLCRendererDiscovery.m: Wrapper class for vlc_renderer_discovery_t
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  * $Id$
@@ -30,8 +30,8 @@
 
 @interface VLCRendererDiscovery ()
 {
-    intf_thread_t          *p_intf;
-    vlc_renderer_discovery *p_rd;
+    intf_thread_t               *p_intf;
+    vlc_renderer_discovery_t    *p_rd;
 }
 
 - (void)handleEvent:(const vlc_event_t *)event;
@@ -120,7 +120,7 @@ static void renderer_event_received(const vlc_event_t *p_event, void *user_data)
 - (void)handleEvent:(const vlc_event_t *)event
 {
     if (event->type == vlc_RendererDiscoveryItemAdded) {
-        vlc_renderer_item *base_item =  event->u.renderer_discovery_item_added.p_new_item;
+        vlc_renderer_item_t *base_item =  event->u.renderer_discovery_item_added.p_new_item;
         VLCRendererItem *item = [[VLCRendererItem alloc] initWithRendererItem:base_item];
         [_rendererItems addObject:item];
         if (_delegate)
@@ -128,7 +128,7 @@ static void renderer_event_received(const vlc_event_t *p_event, void *user_data)
         return;
     }
     if (event->type == vlc_RendererDiscoveryItemRemoved) {
-        vlc_renderer_item *base_item =  event->u.renderer_discovery_item_removed.p_item;
+        vlc_renderer_item_t *base_item =  event->u.renderer_discovery_item_removed.p_item;
 
         VLCRendererItem *result_item = nil;
         for (VLCRendererItem *item in _rendererItems) {

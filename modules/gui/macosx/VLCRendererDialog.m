@@ -37,7 +37,7 @@
     NSMutableArray<VLCRendererDiscovery*> *renderer_discoveries;
 
     intf_thread_t          *p_intf;
-    vlc_renderer_discovery *p_rd;
+    vlc_renderer_discovery_t *p_rd;
 }
 @end
 
