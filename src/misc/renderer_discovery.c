@@ -41,6 +41,15 @@ struct vlc_renderer_item_t
     atomic_uint refs;
 };
 
+static void
+item_free(vlc_renderer_item_t *p_item)
+{
+    free(p_item->psz_name);
+    free(p_item->psz_sout);
+    free(p_item->psz_icon_uri);
+    free(p_item);
+}
+
 vlc_renderer_item_t *
 vlc_renderer_item_new(const char *psz_name, const char *psz_uri,
                       const char *psz_extra_sout, const char *psz_icon_uri,
@@ -83,12 +92,7 @@ vlc_renderer_item_new(const char *psz_name, const char *psz_uri,
 error:
     vlc_UrlClean(&url);
     if (p_item != NULL)
-    {
-        free(p_item->psz_name);
-        free(p_item->psz_sout);
-        free(p_item->psz_icon_uri);
-        free(p_item);
-    }
+        item_free(p_item);
     return NULL;
 }
 
@@ -140,10 +144,7 @@ vlc_renderer_item_release(vlc_renderer_item_t *p_item)
 
     if (atomic_fetch_sub(&p_item->refs, 1) != 1)
         return;
-    free(p_item->psz_name);
-    free(p_item->psz_sout);
-    free(p_item->psz_icon_uri);
-    free(p_item);
+    item_free(p_item);
 }
 
 struct vlc_rd_probe
