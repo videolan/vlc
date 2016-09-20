@@ -358,6 +358,7 @@ libvlccore_la_SOURCES += \
 	win32/rand.c \
 	win32/specific.c \
 	win32/thread.c \
+	win32/timer.c \
 	win32/winsock.c
 else
 if HAVE_OS2
