@@ -17,7 +17,8 @@ CLEANFILES += $(desktop_DATA) $(appdata_DATA)
 
 vlc.desktop: vlc.desktop.in $(top_builddir)/config.status
 	$(AM_V_GEN)sed -e 's,\@bindir\@,$(bindir),g' < "$<" > tmp-$@
-	$(AM_V_GEN)mimetypes="$$(sed 's/\s*#.*$$//g' $(srcdir)/vlc.desktop.mimetypes | egrep -v '^$$' | tr "\n" ';')"; sed -i "s,\@MIMETYPES\@,$$mimetypes,g" tmp-$@
+	$(AM_V_GEN)mimetypes="$$(sed 's/\s*#.*$$//g' $(srcdir)/vlc.desktop.mimetypes | egrep -v '^$$' | tr "\n" ';')"; sed -e "s,\@MIMETYPES\@,$$mimetypes,g" < tmp-$@ > tmp2-$@
+	$(AM_V_at)mv -f tmp2-$@ tmp-$@
 	$(AM_V_at)$(DESKTOP_FILE_VALIDATE) tmp-$@
 	$(AM_V_at)mv -f tmp-$@ $@
 
