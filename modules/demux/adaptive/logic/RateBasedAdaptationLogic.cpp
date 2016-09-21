@@ -99,13 +99,13 @@ void RateBasedAdaptationLogic::updateDownloadRate(const ID &, size_t size, mtime
     BwDebug(msg_Dbg(p_obj, "alpha1 %lf alpha0 %lf dmax %ld ds %ld", alpha,
                     (double)deltamax / diffsum, deltamax, diffsum));
     BwDebug(msg_Dbg(p_obj, "bw estimation bps %zu -> avg %zu",
-                            bps / 8192, bpsAvg / 8192));
+                            bps / 8000, bpsAvg / 8000));
 
     currentBps = bpsAvg * 3/4;
     dlsize = dllength = 0;
 
     BwDebug(msg_Info(p_obj, "Current bandwidth %zu KiB/s using %u%%",
-                    (bpsAvg / 8192), (bpsAvg) ? (unsigned)(usedBps * 100.0 / bpsAvg) : 0));
+                    (bpsAvg / 8000), (bpsAvg) ? (unsigned)(usedBps * 100.0 / bpsAvg) : 0));
     vlc_mutex_unlock(&lock);
 }
 
@@ -120,7 +120,7 @@ void RateBasedAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
             usedBps += event.u.switching.next->getBandwidth();
 
         BwDebug(msg_Info(p_obj, "New bandwidth usage %zu KiB/s %u%%",
-                        (usedBps / 8192), (bpsAvg) ? (unsigned)(usedBps * 100.0 / bpsAvg) : 0 ));
+                        (usedBps / 8000), (bpsAvg) ? (unsigned)(usedBps * 100.0 / bpsAvg) : 0 ));
         vlc_mutex_unlock(&lock);
     }
 }
