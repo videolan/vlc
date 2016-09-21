@@ -717,7 +717,6 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
             return new (std::nothrow) AlwaysLowestAdaptationLogic();
         case AbstractAdaptationLogic::AlwaysBest:
             return new (std::nothrow) AlwaysBestAdaptationLogic();
-        case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::RateBased:
         {
             int width = var_InheritInteger(p_demux, "adaptive-width");
@@ -728,6 +727,7 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
                 conn->setDownloadRateObserver(logic);
             return logic;
         }
+        case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::Predictive:
         {
             AbstractAdaptationLogic *logic = new (std::nothrow) PredictiveAdaptationLogic(VLC_OBJECT(p_demux));
