@@ -218,6 +218,10 @@ AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline
             if(i_ret > i_return)
                 i_return = i_ret;
         }
+
+        /* Bail out, will start again (high prio could be same starving stream) */
+        if( i_return == AbstractStream::buffering_lessthanmin )
+            break;
     }
 
     vlc_mutex_lock(&demux.lock);
