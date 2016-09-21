@@ -57,12 +57,14 @@ namespace adaptive
             SegmentTrackerEvent(BaseRepresentation *, BaseRepresentation *);
             SegmentTrackerEvent(const StreamFormat *);
             SegmentTrackerEvent(const ID &, bool);
+            SegmentTrackerEvent(const ID &, mtime_t, mtime_t);
             enum
             {
                 DISCONTINUITY,
                 SWITCHING,
                 FORMATCHANGE,
                 BUFFERING_STATE,
+                BUFFERING_LEVEL_CHANGE,
             } type;
             union
             {
@@ -84,6 +86,12 @@ namespace adaptive
                    const ID *id;
                    bool enabled;
                } buffering;
+               struct
+               {
+                   const ID *id;
+                   mtime_t current;
+                   mtime_t target;
+               } buffering_level;
             } u;
     };
 
@@ -108,6 +116,7 @@ namespace adaptive
             mtime_t getPlaybackTime() const; /* Current segment start time if selected */
             mtime_t getMinAheadTime() const;
             void notifyBufferingState(bool) const;
+            void notifyBufferingLevel(mtime_t, mtime_t) const;
             void registerListener(SegmentTrackerListenerInterface *);
             void updateSelected();
 
