@@ -103,7 +103,7 @@ namespace adaptive
 
         private:
             void setAdaptationLogic(AbstractAdaptationLogic *);
-            void notify(const SegmentTrackerEvent &);
+            void notify(const SegmentTrackerEvent &) const;
             bool first;
             bool initializing;
             bool index_sent;

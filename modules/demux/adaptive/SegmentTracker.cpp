@@ -316,7 +316,7 @@ void SegmentTracker::updateSelected()
     }
 }
 
-void SegmentTracker::notify(const SegmentTrackerEvent &event)
+void SegmentTracker::notify(const SegmentTrackerEvent &event) const
 {
     std::list<SegmentTrackerListenerInterface *>::const_iterator it;
     for(it=listeners.begin();it != listeners.end(); ++it)
