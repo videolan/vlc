@@ -58,6 +58,7 @@ namespace adaptive
             SegmentTrackerEvent(const StreamFormat *);
             SegmentTrackerEvent(const ID &, bool);
             SegmentTrackerEvent(const ID &, mtime_t, mtime_t);
+            SegmentTrackerEvent(const ID &, mtime_t);
             enum
             {
                 DISCONTINUITY,
@@ -65,6 +66,7 @@ namespace adaptive
                 FORMATCHANGE,
                 BUFFERING_STATE,
                 BUFFERING_LEVEL_CHANGE,
+                SEGMENT_CHANGE,
             } type;
             union
             {
@@ -92,6 +94,11 @@ namespace adaptive
                    mtime_t current;
                    mtime_t target;
                } buffering_level;
+               struct
+               {
+                    const ID *id;
+                   mtime_t duration;
+               } segment;
             } u;
     };
 

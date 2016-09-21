@@ -68,6 +68,13 @@ SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, mtime_t current, mtime_t 
     u.buffering.id = &id;
 }
 
+SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, mtime_t duration)
+{
+    type = SEGMENT_CHANGE;
+    u.segment.duration = duration;
+    u.segment.id = &id;
+}
+
 SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
 {
     first = true;
@@ -240,6 +247,14 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     }
 
     SegmentChunk *chunk = segment->toChunk(next, rep, connManager);
+
+    /* Notify new segment length for stats / logic */
+    if(chunk)
+    {
+        const Timescale timescale = rep->inheritTimescale();
+        notify(SegmentTrackerEvent(rep->getAdaptationSet()->getID(),
+                                   timescale.ToTime(segment->duration.Get())));
+    }
 
     /* We need to check segment/chunk format changes, as we can't rely on representation's (HLS)*/
     if(chunk && format != chunk->getStreamFormat())
