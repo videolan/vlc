@@ -594,6 +594,9 @@ static int DecoderGetDisplayRate( decoder_t *p_dec )
  *****************************************************************************/
 block_t *decoder_NewAudioBuffer( decoder_t *dec, int samples )
 {
+    assert( dec->fmt_out.audio.i_frame_length > 0
+         && dec->fmt_out.audio.i_bytes_per_frame  > 0 );
+
     size_t length = samples * dec->fmt_out.audio.i_bytes_per_frame
                             / dec->fmt_out.audio.i_frame_length;
     block_t *block = block_Alloc( length );
