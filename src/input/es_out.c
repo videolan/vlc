@@ -130,7 +130,7 @@ struct es_out_sys_t
         int i_count; /* es count */
         int i_id;
         int i_last;
-        const es_out_id_t *p_main_es; /* current main es */
+        es_out_id_t *p_main_es; /* current main es */
         enum es_out_policy_e e_policy;
     } video, audio, sub;
 
@@ -1834,17 +1834,6 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                     p_sys->audio.p_main_es->fmt.i_priority < es->fmt.i_priority )
                     i_wanted = es->i_channel;
             }
-
-            if( p_sys->audio.i_last >= 0 )
-                i_wanted = p_sys->audio.i_last;
-
-            if( p_sys->audio.i_id >= 0 )
-            {
-                if( es->i_id == p_sys->audio.i_id )
-                    i_wanted = es->i_channel;
-                else
-                    return;
-            }
         }
         else if( i_cat == SPU_ES )
         {
@@ -1852,7 +1841,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
             {
                 int es_idx = LanguageArrayIndex( p_sys->ppsz_sub_language,
                                      es->psz_language_code );
-                if( !p_sys->video.p_main_es )
+                if( !p_sys->sub.p_main_es )
                 {
                     /* Select the language if it's in the list */
                     if( es_idx >= 0 ||
@@ -1868,12 +1857,12 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                 {
                     int selected_es_idx =
                         LanguageArrayIndex( p_sys->ppsz_sub_language,
-                                            p_sys->video.p_main_es->psz_language_code );
+                                            p_sys->sub.p_main_es->psz_language_code );
 
                     if( es_idx >= 0 &&
                         ( selected_es_idx < 0 || es_idx < selected_es_idx ||
                           ( es_idx == selected_es_idx &&
-                            p_sys->video.p_main_es->fmt.i_priority < es->fmt.i_priority ) ) )
+                            p_sys->sub.p_main_es->fmt.i_priority < es->fmt.i_priority ) ) )
                         i_wanted = es->i_channel;
                 }
             }
@@ -1891,15 +1880,15 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
             {
                 /* If there is no user preference, select the default subtitle
                  * or adapt by ES priority */
-                if( ( !p_sys->video.p_main_es &&
+                if( ( !p_sys->sub.p_main_es &&
                       ( p_sys->i_default_sub_id >= 0 &&
                         es->i_id == p_sys->i_default_sub_id ) ) ||
-                    ( p_sys->video.p_main_es &&
-                      p_sys->video.p_main_es->fmt.i_priority < es->fmt.i_priority ) )
+                    ( p_sys->sub.p_main_es &&
+                      p_sys->sub.p_main_es->fmt.i_priority < es->fmt.i_priority ) )
                     i_wanted = es->i_channel;
-                else if( p_sys->video.p_main_es &&
-                         p_sys->video.p_main_es->fmt.i_priority >= es->fmt.i_priority )
-                    i_wanted = p_sys->video.p_main_es->i_channel;
+                else if( p_sys->sub.p_main_es &&
+                         p_sys->sub.p_main_es->fmt.i_priority >= es->fmt.i_priority )
+                    i_wanted = p_sys->sub.p_main_es->i_channel;
             }
         }
         else if( i_cat == VIDEO_ES )
@@ -1909,12 +1898,12 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
 
         if( p_esprops )
         {
-            if( p_sys->sub.i_last >= 0 )
-                i_wanted  = p_sys->sub.i_last;
+            if( p_esprops->i_last >= 0 )
+                i_wanted  = p_esprops->i_last;
 
-            if( p_sys->sub.i_id >= 0 )
+            if( p_esprops->i_id >= 0 )
             {
-                if( es->i_id == p_sys->sub.i_id )
+                if( es->i_id == p_esprops->i_id )
                     i_wanted = es->i_channel;
                 else
                     return;
