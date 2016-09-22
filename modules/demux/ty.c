@@ -771,10 +771,10 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
     for( i = 0; i < 4; i++ )
     {
         static const vlc_fourcc_t fcc[4] = {
-            VLC_FOURCC('c', 'c', '1', ' '),
-            VLC_FOURCC('c', 'c', '2', ' '),
-            VLC_FOURCC('c', 'c', '3', ' '),
-            VLC_FOURCC('c', 'c', '4', ' ')
+            VLC_CODEC_EIA608_1,
+            VLC_CODEC_EIA608_2,
+            VLC_CODEC_EIA608_3,
+            VLC_CODEC_EIA608_4,
         };
         static const char *ppsz_description[4] = {
             N_("Closed captions 1"),

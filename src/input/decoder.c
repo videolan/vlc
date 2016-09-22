@@ -2112,10 +2112,10 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
     if( b_decode )
     {
         static const vlc_fourcc_t fcc[4] = {
-            VLC_FOURCC('c', 'c', '1', ' '),
-            VLC_FOURCC('c', 'c', '2', ' '),
-            VLC_FOURCC('c', 'c', '3', ' '),
-            VLC_FOURCC('c', 'c', '4', ' '),
+            VLC_CODEC_EIA608_1,
+            VLC_CODEC_EIA608_2,
+            VLC_CODEC_EIA608_3,
+            VLC_CODEC_EIA608_4,
         };
         decoder_t *p_cc;
         es_format_t fmt;

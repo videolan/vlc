@@ -200,10 +200,10 @@ static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm );
 static char *EsInfoCategoryName( es_out_id_t* es );
 
 static const vlc_fourcc_t EsOutFourccClosedCaptions[4] = {
-    VLC_FOURCC('c', 'c', '1', ' '),
-    VLC_FOURCC('c', 'c', '2', ' '),
-    VLC_FOURCC('c', 'c', '3', ' '),
-    VLC_FOURCC('c', 'c', '4', ' '),
+    VLC_CODEC_EIA608_1,
+    VLC_CODEC_EIA608_2,
+    VLC_CODEC_EIA608_3,
+    VLC_CODEC_EIA608_4,
 };
 static inline int EsOutGetClosedCaptionsChannel( vlc_fourcc_t fcc )
 {
