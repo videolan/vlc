@@ -972,6 +972,12 @@ static void *DecBlock( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
+        if( decoder_UpdateAudioFormat( p_dec ) )
+        {
+            p_out->vt->Release( (IUnknown *)p_out );
+            return NULL;
+        }
+
         block_t *p_aout_buffer;
         int i_samples = block_out.i_buffer /
             ( p_dec->fmt_out.audio.i_bitspersample *

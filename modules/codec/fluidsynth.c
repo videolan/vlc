@@ -297,6 +297,8 @@ static block_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
     if (samples == 0)
         goto drop;
 
+    if (decoder_UpdateAudioFormat (p_dec))
+        goto drop;
     p_out = decoder_NewAudioBuffer (p_dec, samples);
     if (p_out == NULL)
         goto drop;

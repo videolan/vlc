@@ -146,6 +146,8 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( !p_block )
         return NULL;
 
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        goto exit;
     p_aout_buffer = decoder_NewAudioBuffer( p_dec, i_frame_length );
     if( p_aout_buffer == NULL )
         goto exit;

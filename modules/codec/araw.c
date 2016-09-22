@@ -347,6 +347,8 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( p_sys->decode != NULL )
     {
+        if( decoder_UpdateAudioFormat( p_dec ) )
+            goto skip;
         block_t *p_out = decoder_NewAudioBuffer( p_dec, samples );
         if( p_out == NULL )
             goto skip;

@@ -732,8 +732,11 @@ static block_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block )
       Ask for a new audio output buffer and make sure
       we get one.
     */
-    p_aout_buffer = decoder_NewAudioBuffer( p_dec,
-        p_sys->p_header->frame_size );
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        p_aout_buffer = NULL;
+    else
+        p_aout_buffer = decoder_NewAudioBuffer( p_dec,
+            p_sys->p_header->frame_size );
     if ( !p_aout_buffer || p_aout_buffer->i_buffer == 0 )
     {
         msg_Err(p_dec, "Oops: No new buffer was returned!");
@@ -795,6 +798,8 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         if( p_sys->p_header->frame_size == 0 )
             return NULL;
 
+        if( decoder_UpdateAudioFormat( p_dec ) )
+            return NULL;
         p_aout_buffer =
             decoder_NewAudioBuffer( p_dec, p_sys->p_header->frame_size );
         if( !p_aout_buffer )

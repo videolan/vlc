@@ -176,6 +176,8 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Request a new audio buffer */
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        goto error;
     block_t *p_out = decoder_NewAudioBuffer( p_dec, p_block->i_nb_samples );
     if( unlikely( !p_out ) )
         goto error;

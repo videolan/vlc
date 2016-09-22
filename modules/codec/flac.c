@@ -180,6 +180,9 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
 
     const unsigned char *pi_reorder = ppi_reorder[p_dec->fmt_out.audio.i_channels];
 
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+
     p_sys->p_aout_buffer =
         decoder_NewAudioBuffer( p_dec, frame->header.blocksize );
 

@@ -454,6 +454,8 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
         /* */
         block_t *p_aout_buffer;
+        if( decoder_UpdateAudioFormat( p_dec ) )
+            return NULL;
         p_aout_buffer = decoder_NewAudioBuffer( p_dec, i_frame_length );
         if( !p_aout_buffer )
             return NULL;

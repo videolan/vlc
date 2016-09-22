@@ -563,6 +563,8 @@ static block_t *GetAoutBuffer( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_buf;
 
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        return NULL;
     p_buf = decoder_NewAudioBuffer( p_dec, p_sys->i_frame_length );
     if( p_buf == NULL ) return NULL;
 

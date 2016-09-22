@@ -263,6 +263,11 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
+    if( decoder_UpdateAudioFormat( p_dec ) )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
     block_t *p_out = decoder_NewAudioBuffer( p_dec, samples );
     if( p_out == NULL )
     {

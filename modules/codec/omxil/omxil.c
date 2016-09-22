@@ -1706,6 +1706,8 @@ block_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
             i_samples = p_header->nFilledLen / p_sys->out.p_fmt->audio.i_channels / 2;
         if(i_samples)
         {
+            if( decoder_UpdateAudioFormat( p_dec ) )
+                break;
             p_buffer = decoder_NewAudioBuffer( p_dec, i_samples );
             if( !p_buffer ) break; /* No audio buffer available */
 

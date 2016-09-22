@@ -688,6 +688,8 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, void **result)
         }
         else
         {
+            if (decoder_UpdateAudioFormat(p_dec))
+                goto error;
             if (p_dec->fmt_out.audio.i_bitspersample == 0 || p_dec->fmt_out.audio.i_channels == 0)
                 goto error;
             int samples = total_length / (p_dec->fmt_out.audio.i_bitspersample * p_dec->fmt_out.audio.i_channels / 8);

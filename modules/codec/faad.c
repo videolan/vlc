@@ -492,7 +492,10 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_dec->fmt_out.audio.i_physical_channels;
         }
         p_dec->fmt_out.audio.i_channels = nbChannels;
-        p_out = decoder_NewAudioBuffer( p_dec, frame.samples / nbChannels );
+        if( decoder_UpdateAudioFormat( p_dec ) )
+            p_out = NULL;
+        else
+            p_out = decoder_NewAudioBuffer( p_dec, frame.samples / nbChannels );
         if( p_out == NULL )
         {
             p_sys->i_buffer = 0;

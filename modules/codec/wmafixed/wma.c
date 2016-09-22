@@ -98,6 +98,8 @@ static block_t *SplitBuffer( decoder_t *p_dec )
 
     if( i_samples == 0 ) return NULL;
 
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        return NULL;
     if( !( p_buffer = decoder_NewAudioBuffer( p_dec, i_samples ) ) )
         return NULL;
 

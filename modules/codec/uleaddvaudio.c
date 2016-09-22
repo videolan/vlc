@@ -97,6 +97,8 @@ static block_t *Decode(decoder_t *dec, block_t **block_ptr)
 
         int sample_count = dv_get_audio_sample_count(&src[244], sys->is_pal);
 
+        if( decoder_UpdateAudioFormat(dec))
+            return NULL;
         block_t *output = decoder_NewAudioBuffer(dec, sample_count);
         if (!output)
             return NULL;

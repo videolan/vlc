@@ -436,6 +436,8 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     if(!i_nb_samples)
         i_nb_samples = spp;
 
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        return NULL;
     block_t *p_aout_buffer=decoder_NewAudioBuffer( p_dec, spp );
     if ( !p_aout_buffer )
     {
