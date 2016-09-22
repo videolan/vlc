@@ -1797,7 +1797,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
     }
     else if( p_sys->i_mode == ES_OUT_MODE_AUTO )
     {
-        int i_wanted  = -1;
+        const es_out_id_t *wanted_es = NULL;
 
         if( es->p_pgrm != p_sys->p_pgrm || !p_esprops )
             return;
@@ -1812,7 +1812,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                 {
                     /* Only select the language if it's in the list */
                     if( es_idx >= 0 )
-                        i_wanted = es->i_channel;
+                        wanted_es = es;
                 }
                 else
                 {
@@ -1823,7 +1823,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                         ( selected_es_idx < 0 || es_idx < selected_es_idx ||
                           ( es_idx == selected_es_idx &&
                             p_sys->audio.p_main_es->fmt.i_priority < es->fmt.i_priority ) ) )
-                        i_wanted = es->i_channel;
+                        wanted_es = es;
                 }
             }
             else
@@ -1832,7 +1832,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                  * then choose by ES priority */
                 if( !p_sys->audio.p_main_es ||
                     p_sys->audio.p_main_es->fmt.i_priority < es->fmt.i_priority )
-                    i_wanted = es->i_channel;
+                    wanted_es = es;
             }
         }
         else if( i_cat == SPU_ES )
@@ -1851,7 +1851,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                           /* check if the subtitle isn't forbidden by none */
                           LanguageArrayIndex( p_sys->ppsz_sub_language, "none" ) < 0 &&
                           es->i_id == p_sys->i_default_sub_id ) )
-                        i_wanted = es->i_channel;
+                        wanted_es = es;
                 }
                 else
                 {
@@ -1863,7 +1863,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                         ( selected_es_idx < 0 || es_idx < selected_es_idx ||
                           ( es_idx == selected_es_idx &&
                             p_sys->sub.p_main_es->fmt.i_priority < es->fmt.i_priority ) ) )
-                        i_wanted = es->i_channel;
+                        wanted_es = es;
                 }
             }
             else if ( es->fmt.i_codec == EsOutFourccClosedCaptions[0] ||
@@ -1885,32 +1885,32 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                         es->i_id == p_sys->i_default_sub_id ) ) ||
                     ( p_sys->sub.p_main_es &&
                       p_sys->sub.p_main_es->fmt.i_priority < es->fmt.i_priority ) )
-                    i_wanted = es->i_channel;
+                    wanted_es = es;
                 else if( p_sys->sub.p_main_es &&
                          p_sys->sub.p_main_es->fmt.i_priority >= es->fmt.i_priority )
-                    i_wanted = p_sys->sub.p_main_es->i_channel;
+                    wanted_es = p_sys->sub.p_main_es;
             }
         }
         else if( i_cat == VIDEO_ES )
         {
-            i_wanted  = es->i_channel;
+            wanted_es = es;
         }
 
         if( p_esprops )
         {
-            if( p_esprops->i_last >= 0 )
-                i_wanted  = p_esprops->i_last;
+            if( p_esprops->i_last == es->i_channel )
+                wanted_es = es;
 
             if( p_esprops->i_id >= 0 )
             {
                 if( es->i_id == p_esprops->i_id )
-                    i_wanted = es->i_channel;
+                    wanted_es = es;
                 else
                     return;
             }
         }
 
-        if( i_wanted == es->i_channel && !EsIsSelected( es ) )
+        if( wanted_es == es && !EsIsSelected( es ) )
             EsSelect( out, es );
     }
 
