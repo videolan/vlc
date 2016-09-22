@@ -263,11 +263,11 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
                       bool *p_size_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL, *p_ext_buf = NULL;
+    const uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL, *p_ext_buf = NULL;
     size_t i_sps_size = 0, i_pps_size = 0, i_ext_size = 0;
 
     /* Check if p_buf contains a valid SPS PPS */
-    if (h264_get_spspps(p_buf, i_size,
+    if (h264_AnnexB_get_spspps(p_buf, i_size,
                         &p_sps_buf, &i_sps_size,
                         &p_pps_buf, &i_pps_size,
                         &p_ext_buf, &i_ext_size) == 0 )

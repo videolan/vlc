@@ -27,7 +27,7 @@
 #include "libmp4mux.h"
 #include "../demux/mp4/libmp4.h" /* flags */
 #include "../packetizer/hevc_nal.h"
-#include "../packetizer/h264_nal.h" /* h264_get_spspps */
+#include "../packetizer/h264_nal.h" /* h264_AnnexB_get_spspps */
 #include "../packetizer/hxxx_nal.h"
 
 #include <vlc_es.h>
@@ -874,10 +874,10 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
     bo_t    *avcC = box_new("avcC");/* FIXME use better value */
     if(!avcC)
         return NULL;
-    uint8_t *p_sps, *p_pps, *p_ext;
+    const uint8_t *p_sps, *p_pps, *p_ext;
     size_t i_sps_size, i_pps_size, i_ext_size;
 
-    if( h264_get_spspps(p_fmt->p_extra, p_fmt->i_extra,
+    if( h264_AnnexB_get_spspps(p_fmt->p_extra, p_fmt->i_extra,
                         &p_sps, &i_sps_size,
                         &p_pps, &i_pps_size,
                         &p_ext, &i_ext_size ) != 0 )
@@ -886,9 +886,9 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
         i_sps_size = i_pps_size = i_ext_size = 0;
     }
 
-    (void) hxxx_strip_AnnexB_startcode( (const uint8_t **) &p_sps, &i_sps_size );
-    (void) hxxx_strip_AnnexB_startcode( (const uint8_t **) &p_sps, &i_sps_size );
-    (void) hxxx_strip_AnnexB_startcode( (const uint8_t **) &p_ext, &i_ext_size );
+    (void) hxxx_strip_AnnexB_startcode( &p_sps, &i_sps_size );
+    (void) hxxx_strip_AnnexB_startcode( &p_sps, &i_sps_size );
+    (void) hxxx_strip_AnnexB_startcode( &p_ext, &i_ext_size );
 
     bo_add_8(avcC, 1);      /* configuration version */
     bo_add_8(avcC, i_sps_size > 3 ? p_sps[1] : PROFILE_H264_MAIN);

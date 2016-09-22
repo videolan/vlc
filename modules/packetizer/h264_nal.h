@@ -158,10 +158,10 @@ void h264_AVC_to_AnnexB( uint8_t *p_buf, uint32_t i_len,
 
 /* Get the SPS/PPS pointers from an Annex B buffer
  * Returns 0 if a SPS and/or a PPS is found */
-int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
-                     uint8_t **pp_sps, size_t *p_sps_size,
-                     uint8_t **pp_pps, size_t *p_pps_size,
-                     uint8_t **pp_ext, size_t *p_ext_size );
+int h264_AnnexB_get_spspps( const uint8_t *p_buf, size_t i_buf,
+                            const uint8_t **pp_sps, size_t *p_sps_size,
+                            const uint8_t **pp_pps, size_t *p_pps_size,
+                            const uint8_t **pp_ext, size_t *p_ext_size );
 
 /* Create a AVCDecoderConfigurationRecord from SPS/PPS
  * Returns a valid block_t on success, must be freed with block_Release */
