@@ -199,11 +199,11 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 
             break;
         }
+#if !TARGET_OS_IPHONE
         case VLC_CODEC_H263:
             codec = kCMVideoCodecType_H263;
             break;
 
-#if !TARGET_OS_IPHONE
             /* there are no DV or ProRes decoders on iOS, so bailout early */
         case VLC_CODEC_PRORES:
             /* the VT decoder can't differenciate between the ProRes flavors, so we do it */
