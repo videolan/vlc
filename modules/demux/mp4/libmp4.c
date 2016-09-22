@@ -1650,7 +1650,14 @@ static int MP4_ReadBox_vpcC( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_vpcC->i_codec_init_datasize );
     if( p_vpcC->i_codec_init_datasize > i_read )
         p_vpcC->i_codec_init_datasize = i_read;
-    memcpy( p_vpcC->p_codec_init_data, p_peek, i_read );
+
+    if( p_vpcC->i_codec_init_datasize )
+    {
+        p_vpcC->p_codec_init_data = malloc( i_read );
+        if( !p_vpcC->p_codec_init_data )
+            MP4_READBOX_EXIT( 0 );
+        memcpy( p_vpcC->p_codec_init_data, p_peek, i_read );
+    }
 
     MP4_READBOX_EXIT( 1 );
 }
