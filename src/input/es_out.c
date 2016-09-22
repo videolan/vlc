@@ -1799,7 +1799,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
     {
         int i_wanted  = -1;
 
-        if( es->p_pgrm != p_sys->p_pgrm )
+        if( es->p_pgrm != p_sys->p_pgrm || !p_esprops )
             return;
 
         if( i_cat == AUDIO_ES )
