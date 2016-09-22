@@ -485,6 +485,10 @@ void freeaddrinfo (struct addrinfo *res);
 FILE *vlc_win32_tmpfile(void);
 #endif
 
+#ifdef __APPLE__
+# define fdatasync fsync
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
