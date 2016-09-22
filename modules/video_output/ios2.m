@@ -240,11 +240,14 @@ static int Open(vlc_object_t *this)
         sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:CGRectMake(0.,0.,320.,240.) zeroCopy:sys->zero_copy voutDisplay:vd];
         sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
-        if (!sys->glESView)
+        if (!sys->glESView) {
+            msg_Err(vd, "Creating OpenGL ES 2 view failed");
             goto bailout;
+        }
 
         [sys->glESView performSelectorOnMainThread:@selector(fetchViewContainer) withObject:nil waitUntilDone:YES];
         if (!sys->viewContainer) {
+            msg_Err(vd, "Fetching view container failed");
             goto bailout;
         }
 
@@ -630,17 +633,23 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 {
     /* get the object we will draw into */
     UIView *viewContainer = var_CreateGetAddress (_voutDisplay, "drawable-nsobject");
-    if (unlikely(viewContainer == nil))
+    if (unlikely(viewContainer == nil)) {
+        msg_Err(_voutDisplay, "provided view container is nil");
         return;
+    }
 
     [viewContainer retain];
 
     @synchronized(viewContainer) {
-        if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)]))
+        if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)])) {
+            msg_Err(_voutDisplay, "void pointer not an ObjC object");
             return;
+        }
 
-        if (![viewContainer isKindOfClass:[UIView class]])
+        if (![viewContainer isKindOfClass:[UIView class]]) {
+            msg_Err(_voutDisplay, "passed ObjC object not of class UIView");
             return;
+        }
 
         vout_display_sys_t *sys = _voutDisplay->sys;
 
