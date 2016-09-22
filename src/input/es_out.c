@@ -128,8 +128,8 @@ struct es_out_sys_t
     struct es_out_es_props_s
     {
         int i_count; /* es count */
-        int i_id;
-        int i_last;
+        int i_id; /* es id as set by es fmt.id */
+        int i_channel; /* es number in creation order */
         es_out_id_t *p_main_es; /* current main es */
         enum es_out_policy_e e_policy;
     } video, audio, sub;
@@ -271,19 +271,19 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->video.e_policy = ES_OUT_ES_POLICY_SIMULTANEOUS;
     p_sys->video.i_count = 0;
     p_sys->video.i_id = -1;
-    p_sys->video.i_last = -1;
+    p_sys->video.i_channel = -1;
     p_sys->video.p_main_es = NULL;
 
     p_sys->audio.e_policy = ES_OUT_ES_POLICY_EXCLUSIVE;
     p_sys->audio.i_count = 0;
     p_sys->audio.i_id = var_GetInteger( p_input, "audio-track-id" );
-    p_sys->audio.i_last = var_GetInteger( p_input, "audio-track" );
+    p_sys->audio.i_channel = var_GetInteger( p_input, "audio-track" );
     p_sys->audio.p_main_es = NULL;
 
     p_sys->sub.e_policy = ES_OUT_ES_POLICY_EXCLUSIVE;
     p_sys->sub.i_count = 0;
     p_sys->sub.i_id = var_GetInteger( p_input, "sub-track-id" );
-    p_sys->sub.i_last = var_GetInteger( p_input, "sub-track" );
+    p_sys->sub.i_channel = var_GetInteger( p_input, "sub-track" );
     p_sys->sub.p_main_es = NULL;
 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
@@ -1898,7 +1898,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
 
         if( p_esprops )
         {
-            if( p_esprops->i_last == es->i_channel )
+            if( p_esprops->i_channel == es->i_channel )
                 wanted_es = es;
 
             if( p_esprops->i_id >= 0 )
@@ -2049,7 +2049,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         es->pb_cc_present[i] = true;
 
         /* Enable if user specified on command line */
-        if (p_sys->sub.i_last == i)
+        if (p_sys->sub.i_channel == i)
             EsOutSelect(out, es->pp_cc_es[i], true);
     }
 
