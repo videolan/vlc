@@ -131,7 +131,6 @@ struct decoder_sys_t
 
 static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t i_profile = 0xFF, i_level = 0xFF;
     bool b_ret = false;
     CMVideoCodecType codec;
