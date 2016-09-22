@@ -146,7 +146,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
                 return kCMVideoCodecType_H264;
             }
 
-            msg_Dbg(p_dec, "trying to decode MPEG-4 Part 10: profile %" PRIx8 ", level %i" PRIx8, i_profile, i_level);
+            msg_Dbg(p_dec, "trying to decode MPEG-4 Part 10: profile %" PRIx8 ", level %" PRIx8, i_profile, i_level);
 
             switch (i_profile) {
                 case PROFILE_H264_BASELINE:
