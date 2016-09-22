@@ -75,6 +75,7 @@ struct aout_sys_t
     char *sink_force; /**< Forced sink name (stream must be NULL) */
 
     struct sink *sinks; /**< Locally-cached list of sinks */
+    bool passthrough;
 };
 
 static void VolumeReport(audio_output_t *aout)
@@ -655,6 +656,15 @@ static int StreamMove(audio_output_t *aout, const char *name)
         aout_DeviceReport(aout, name);
         return 0;
     }
+    else if (sys->passthrough)
+    {
+        /* A sink connected with a passthrough input cannot be moved */
+        msg_Dbg(aout, "request restart to connect to sink %s", name);
+        free(sys->sink_force);
+        sys->sink_force = strdup(name);
+        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
+        return 0;
+    }
 
     pa_operation *op;
     uint32_t idx = pa_stream_get_index(sys->stream);
@@ -924,6 +934,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->flags_force = PA_STREAM_NOFLAGS;
     free(sys->sink_force);
     sys->sink_force = NULL;
+    sys->passthrough = fmt->i_format == VLC_CODEC_SPDIFL;
 
     if (encoding == PA_ENCODING_INVALID)
     {
