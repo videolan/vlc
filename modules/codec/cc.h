@@ -205,7 +205,7 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
             if( i_field != 0 && i_field != 1 )
                 continue;
             if( c->i_data + 3 > CC_MAX_DATA_SIZE )
-                continue;
+                break;
 
             cc_AppendData( c, cc[0], &cc[1] );
         }
