@@ -54,7 +54,7 @@
 /* Codec Specific Data */
 struct csd
 {
-    uint8_t *p_buf;
+    const uint8_t *p_buf;
     size_t i_size;
 };
 
