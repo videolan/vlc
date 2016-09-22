@@ -125,7 +125,7 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
         return NULL;
     }
 
-    *pkt_pts = block->i_pts;
+    *pkt_pts = block->i_pts ? block->i_pts : block->i_dts;
 
     vpx_codec_err_t err;
     err = vpx_codec_decode(ctx, block->p_buffer, block->i_buffer, pkt_pts, 0);
