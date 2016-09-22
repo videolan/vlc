@@ -561,6 +561,7 @@ void aout_OutputUnlock (audio_output_t *aout)
         aout_OutputDeviceSet (aout, owner->req.device);
         free (owner->req.device);
         owner->req.device = (char *)unset_str;
+        owner->device_changed = true;
     }
 
     if (owner->req.volume >= 0.f)

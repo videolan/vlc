@@ -83,6 +83,7 @@ int aout_DecNew( audio_output_t *p_aout,
     owner->input_format = *p_format;
     owner->mixer_format = owner->input_format;
     owner->request_vout = *p_request_vout;
+    owner->device_changed = false;
 
     if (aout_OutputNew (p_aout, &owner->mixer_format))
         goto error;
@@ -173,6 +174,11 @@ static int aout_CheckReady (audio_output_t *aout)
         /* TODO: This would be a good time to call clean up any video output
          * left over by an audio visualization:
         input_resource_TerminatVout(MAGIC HERE); */
+    }
+    if (owner->device_changed)
+    {
+        owner->device_changed = false;
+        status = AOUT_DEC_CHANGED;
     }
     return (owner->mixer_format.i_format) ? status : AOUT_DEC_FAILED;
 }
