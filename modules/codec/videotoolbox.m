@@ -408,7 +408,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         }
         else
         {
-            assert_unreachable();
+            vlc_assert_unreachable();
             return VLC_EGENERIC;
         }
 
