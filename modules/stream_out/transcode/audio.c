@@ -245,6 +245,10 @@ int transcode_audio_process( sout_stream_t *p_stream,
             if( transcode_audio_initialize_encoder( id, p_stream ) )
             {
                 msg_Err( p_stream, "cannot create audio chain" );
+
+                block_Release( in );
+                block_Release( p_audio_buf );
+
                 return VLC_EGENERIC;
             }
             if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys,
