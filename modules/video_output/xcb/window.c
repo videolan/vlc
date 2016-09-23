@@ -538,12 +538,15 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
         used[n] = used[n + 1];
     while (used[++n]);
 
-    if (n == 0)
-         var_SetAddress (obj->obj.libvlc, "xid-in-use", NULL);
+    if (!used[0])
+        var_SetAddress (obj->obj.libvlc, "xid-in-use", NULL);
+    else
+        used = NULL;
+
     vlc_mutex_unlock (&serializer);
 
-    if (n == 0)
-        free (used);
+    free( used );
+
     /* Variables are reference-counted... */
     var_Destroy (obj->obj.libvlc, "xid-in-use");
 }
