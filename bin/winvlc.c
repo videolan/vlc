@@ -246,10 +246,8 @@ static void check_crashdump(void)
                     MessageBox( NULL, L"Report sent correctly. Thanks a lot " \
                                 "for the help.", L"Report sent", MB_OK);
                 else
-                    MessageBox( NULL, L"There was an error while "\
-                                "transferring the data to the FTP server.\n"\
-                                "Thanks a lot for the help.",
-                                L"Report sending failed", MB_OK);
+                    fprintf(stderr,"Couldn't send report to FTP server");
+
                 InternetCloseHandle(ftp);
             }
             else
