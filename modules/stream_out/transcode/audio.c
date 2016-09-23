@@ -253,7 +253,12 @@ int transcode_audio_process( sout_stream_t *p_stream,
             }
             if( unlikely( transcode_audio_initialize_filters( p_stream, id, p_sys,
                           &id->p_decoder->fmt_out.audio ) != VLC_SUCCESS ) )
+            {
+                block_Release( in );
+                block_Release( p_audio_buf );
+
                 return VLC_EGENERIC;
+            }
             date_Init( &id->next_input_pts, id->p_decoder->fmt_out.audio.i_rate, 1 );
             date_Set( &id->next_input_pts, p_audio_buf->i_pts );
         }
