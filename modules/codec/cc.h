@@ -99,7 +99,7 @@ static inline void cc_AppendData( cc_data_t *c, uint8_t cc_preamble, const uint8
 static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8_t *p_src, int i_src )
 {
     static const uint8_t p_cc_ga94[4] = { 0x47, 0x41, 0x39, 0x34 };
-    static const uint8_t p_cc_dvd[4] = { 0x43, 0x43, 0x01, 0xf8 };
+    static const uint8_t p_cc_dvd[4] = { 0x43, 0x43, 0x01, 0xf8 }; /* ascii 'CC', type_code, cc_block_size */
     static const uint8_t p_cc_replaytv4a[2] = { 0xbb, 0x02 };
     static const uint8_t p_cc_replaytv4b[2] = { 0xcc, 0x02 };
     static const uint8_t p_cc_replaytv5a[2] = { 0x99, 0x02 };
@@ -215,6 +215,19 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
     }
     else if( i_payload_type == CC_PAYLOAD_DVD )
     {
+        /* user_data
+         *          (u32 stripped earlier)
+         *          u32 (0x43 0x43 0x01 0xf8)
+         *          u1 caption_odd_field_first (CC1/CC2)
+         *          u1 caption_filler
+         *          u5 cc_block_count  (== cc_count / 2)
+         *          u1 caption_extra_field_added (because odd cc_count)
+         *          for cc_block_count * 2 + caption_extra_field_added
+         *              u7 cc_filler_1
+         *              u1 cc_field_is_odd
+         *              u8 cc_data_1
+         *              u8 cc_data_2
+         */
         const int b_truncate = p_src[4] & 0x01;
         const int i_field_first = (p_src[4] & 0x80) ? 0 : 1;
         const int i_count_cc2 = (p_src[4] >> 1) & 0xf;
@@ -232,7 +245,7 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
 
                 if( b_truncate && i == i_count_cc2 - 1 && j == 1 )
                     break;
-                if( cc[0] != 0xff && cc[0] != 0xfe )
+                if( (cc[0] & 0xfe) != 0xfe )
                     continue;
                 if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                     continue;
