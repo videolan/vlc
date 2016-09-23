@@ -171,6 +171,7 @@ struct es_out_sys_t
 };
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, const es_format_t * );
+static es_out_id_t *EsOutAddSlave( es_out_t *, const es_format_t *, es_out_id_t * );
 static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
@@ -1441,6 +1442,16 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
  */
 static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
 {
+#ifndef NDEBUG
+    if( fmt->i_cat == SPU_ES )
+        for( int i=0; i<4; i++ )
+            assert( fmt->i_codec != EsOutFourccClosedCaptions[i] );
+#endif
+    return EsOutAddSlave( out, fmt, NULL );
+}
+
+static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out_id_t *p_master )
+{
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
 
@@ -1547,7 +1558,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
     es->p_dec_record = NULL;
     for( i = 0; i < 4; i++ )
         es->pb_cc_present[i] = false;
-    es->p_master = NULL;
+    es->p_master = p_master;
 
     TAB_APPEND( out->p_sys->i_es, out->p_sys->es, es );
     p_sys->i_id++;  /* always incremented */
@@ -1866,16 +1877,6 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                         wanted_es = es;
                 }
             }
-            else if ( es->fmt.i_codec == EsOutFourccClosedCaptions[0] ||
-                      es->fmt.i_codec == EsOutFourccClosedCaptions[1] ||
-                      es->fmt.i_codec == EsOutFourccClosedCaptions[2] ||
-                      es->fmt.i_codec == EsOutFourccClosedCaptions[3])
-            {
-                    /* We don't want to enable on initial create since p_master
-                       isn't set yet (otherwise we will think it's a standard
-                       ES_SUB stream and cause a resource leak) */
-                    return;
-            }
             else
             {
                 /* If there is no user preference, select the default subtitle
@@ -2041,8 +2042,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         if( asprintf( &fmt.psz_description,
                       _("Closed captions %u"), 1 + i ) == -1 )
             fmt.psz_description = NULL;
-        es->pp_cc_es[i] = EsOutAdd( out, &fmt );
-        es->pp_cc_es[i]->p_master = es;
+        es->pp_cc_es[i] = EsOutAddSlave( out, &fmt, es );
         es_format_Clean( &fmt );
 
         /* */
