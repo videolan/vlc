@@ -1042,7 +1042,7 @@ static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block
     if( p_sys->cc.i_data + 3 > CC_MAX_DATA_SIZE )
         return 0;
 
-    cc_AppendData( &p_sys->cc, i_field, rec_hdr->ex );
+    cc_AppendData( &p_sys->cc, CC_PKT_BYTE0(i_field), rec_hdr->ex );
     return 0;
 }
 

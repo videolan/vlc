@@ -28,6 +28,8 @@
 
 #define BLOCK_FLAG_ORDERED_CAPTIONS (0x01 << BLOCK_FLAG_PRIVATE_SHIFT)
 
+#define CC_PKT_BYTE0(field) (0xFC | (0x03 & field))
+
 /* CC have a maximum rate of 9600 bit/s (per field?) */
 #define CC_MAX_DATA_SIZE (2 * 3*600)
 enum
@@ -235,7 +237,7 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
                 if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                     continue;
 
-                cc_AppendData( c, i_field, &cc[1] );
+                cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[1] );
             }
         }
         c->b_reorder = false;
@@ -251,7 +253,7 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
         {
             const int i_field = i == 0 ? 1 : 0;
 
-            cc_AppendData( c, i_field, &cc[2] );
+            cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[2] );
         }
         c->b_reorder = false;
     }
@@ -284,7 +286,7 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
             if (!b_top_field_first)
                 i_field ^= 1;
 
-            cc_AppendData( c, i_field, &cc[0] );
+            cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[0] );
         }
         c->b_reorder = true;
     }

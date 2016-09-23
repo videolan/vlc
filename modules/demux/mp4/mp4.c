@@ -368,7 +368,7 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
 
     do
     {
-        p_write[i_copied++] = 0; /* cc1 == field 0 */
+        p_write[i_copied++] = CC_PKT_BYTE0(0); /* cc1 == field 0 */
         p_write[i_copied++] = p_read[0];
         p_write[i_copied++] = p_read[1];
         p_read += 2;
@@ -387,7 +387,7 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
         i_remaining -= 8;
         do
         {
-            p_write[i_copied++] = 0; /* cc1 == field 0 */
+            p_write[i_copied++] = CC_PKT_BYTE0(0); /* cc1 == field 0 */
             p_write[i_copied++] = p_read[0];
             p_write[i_copied++] = p_read[1];
             p_read += 2;
