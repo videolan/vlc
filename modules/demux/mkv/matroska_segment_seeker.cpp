@@ -326,18 +326,18 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
             block_pts = block->GlobalTimecode() / 1000;
         }
 
-        if( ! ms.FindTrackByBlock( &i_track, block, simpleblock ) )
+        bool const b_valid_track = !ms.FindTrackByBlock( &i_track, block, simpleblock );
+
+        delete block;
+
+        if( b_valid_track )
         {
             if( b_key_picture )
-            {
                 add_seekpoint( i_track->first, Seekpoint::TRUSTED, block_pos, block_pts );
-            }
 
             if( max_pts < block_pts )
                 break;
         }
-
-        delete block;
     }
 
     search_area.end = ms.es.I_O().getFilePointer();
