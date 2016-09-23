@@ -36,6 +36,7 @@
 #include <assert.h>
 
 #include "packetizer_helper.h"
+#include "a52.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -240,69 +241,15 @@ static int SyncInfo( const uint8_t *p_hdr, bool *pb_mlp, mlp_header_t *p_mlp )
 }
 
 /**
- * It returns the size of an AC3 frame (or 0 if invalid)
- */
-static int GetAc3Size( const uint8_t *p_buf )
-{
-    static const int pi_rate[] = { 32,  40,  48,  56,  64,  80,  96, 112,
-                                128, 160, 192, 224, 256, 320, 384, 448,
-                                512, 576, 640 };
-    /* */
-    const int i_frmsizecod = p_buf[4] & 63;
-    if( i_frmsizecod >= 38 )
-        return 0;
-
-    const int bitrate = pi_rate[i_frmsizecod >> 1];
-
-    switch( p_buf[4] & 0xc0 )
-    {
-    case 0:
-        return 4 * bitrate;
-    case 0x40:
-        return 2 * (320 * bitrate / 147 + (i_frmsizecod & 1));
-    case 0x80:
-        return 6 * bitrate;
-    default:
-        return 0;
-    }
-}
-
-/**
- * It return the size of a EAC3 frame (or 0 if invalid)
- */
-static int GetEac3Size( const uint8_t *p_buf )
-{
-    int i_frame_size;
-    int i_bytes;
-
-    i_frame_size = ( ( p_buf[2] << 8 ) | p_buf[3] ) & 0x7ff;
-    if( i_frame_size < 2 )
-        return 0;
-    i_bytes = 2 * ( i_frame_size + 1 );
-
-    return i_bytes;
-}
-
-/**
  * It returns the size of an AC3/EAC3 frame (or 0 if invalid)
  */
 static int SyncInfoDolby( const uint8_t *p_buf )
 {
-    int bsid;
-
-    /* Check synword */
-    if( p_buf[0] != 0x0b || p_buf[1] != 0x77 )
-        return 0;
-
-    /* Check bsid */
-    bsid = p_buf[5] >> 3;
-    if( bsid > 16 )
-        return 0;
-
-    if( bsid <= 10 )
-        return GetAc3Size( p_buf );
+    vlc_a52_header_t a52;
+    if( vlc_a52_header_Parse( &a52, p_buf, MLP_HEADER_SIZE ) == VLC_SUCCESS )
+        return a52.i_size;
     else
-        return GetEac3Size( p_buf );
+        return 0;
 }
 
 static void Flush( decoder_t *p_dec )
