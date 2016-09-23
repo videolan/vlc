@@ -803,6 +803,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
             {
                 picture_Release( p_pic );
+                block_Release( in );
                 transcode_video_close( p_stream, id );
                 id->b_transcode = false;
                 return VLC_EGENERIC;
