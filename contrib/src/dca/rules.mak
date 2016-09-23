@@ -25,6 +25,7 @@ libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 	$(MOVE)
 
 .dca: libdca
+	$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -std=gnu89" ./configure $(HOSTCONF)
 	cd $< && $(MAKE) -C include install
 	cd $< && $(MAKE) -C libdca install
