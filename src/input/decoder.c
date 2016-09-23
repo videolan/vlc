@@ -817,6 +817,9 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
                          (char *)&p_owner->fmt.i_codec );
                 p_dec->b_error = true;
 
+                if(p_block)
+                    block_Release(p_block);
+
                 block_ChainRelease(p_sout_block);
                 break;
             }
