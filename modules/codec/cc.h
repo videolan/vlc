@@ -104,8 +104,8 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
     static const uint8_t p_cc_replaytv4b[2] = { 0xcc, 0x02 };
     static const uint8_t p_cc_replaytv5a[2] = { 0x99, 0x02 };
     static const uint8_t p_cc_replaytv5b[2] = { 0xaa, 0x02 };
-    static const uint8_t p_cc_scte20[2] = { 0x03, 0x81 };
-    static const uint8_t p_cc_scte20_old[2] = { 0x03, 0x01 };
+    static const uint8_t p_cc_scte20[2] = { 0x03, 0x81 };    /* user_data_type_code, SCTE 20 */
+    static const uint8_t p_cc_scte20_old[2] = { 0x03, 0x01 };/* user_data_type_code, old, Note 1 */
 
     if( i_src < 4 )
         return;
@@ -270,8 +270,22 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
         }
         c->b_reorder = false;
     }
-    else
+    else /* CC_PAYLOAD_SCTE20 */
     {
+        /* user_data(2)
+         *          (u32 stripped earlier)
+         *          u16 p_cc_scte20
+         *          u5 cc_count
+         *          for cc_count
+         *              u2 cc_priority
+         *              u2 cc_field_num
+         *              u5 cc_line_offset
+         *              u8 cc_data_1[1:8]
+         *              u8 cc_data_2[1:8]
+         *              u1 marker bit
+         *          un additional_realtimevideodata
+         *          un reserved
+         */
         bs_t s;
         bs_init( &s, &p_src[2], i_src - 2 );
         const int i_cc_count = bs_read( &s, 5 );
