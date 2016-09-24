@@ -1548,7 +1548,9 @@ static bool MuxStreams(sout_mux_t *p_mux )
         /* Write PAT/PMT before every keyframe if use-key-frames is enabled,
          * this helps to do segmenting with livehttp-output so it can cut segment
          * and start new one with pat,pmt,keyframe*/
-        if( ( p_sys->b_use_key_frames ) && ( p_ts->i_flags & BLOCK_FLAG_TYPE_I ) )
+        if( ( p_sys->b_use_key_frames ) &&
+            ( p_input->p_fmt->i_cat == VIDEO_ES ) &&
+            ( p_ts->i_flags & BLOCK_FLAG_TYPE_I ) )
         {
             if( likely( !pat_was_previous ) )
             {
