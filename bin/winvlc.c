@@ -246,7 +246,7 @@ static void check_crashdump(void)
                     MessageBox( NULL, L"Report sent correctly. Thanks a lot " \
                                 "for the help.", L"Report sent", MB_OK);
                 else
-                    fprintf(stderr,"Couldn't send report to FTP server");
+                    fprintf(stderr,"Couldn't send report to FTP server\n");
 
                 InternetCloseHandle(ftp);
             }
