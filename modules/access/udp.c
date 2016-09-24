@@ -274,7 +274,7 @@ static block_t *BlockUDP( access_t *p_access, bool *restrict eof )
     vlc_sem_wait_i11e(&sys->semaphore);
     vlc_fifo_Lock(sys->fifo);
 
-    block = vlc_fifo_DequeueAllUnlocked(sys->fifo);
+    block = vlc_fifo_DequeueUnlocked(sys->fifo);
     vlc_fifo_Unlock(sys->fifo);
 
     return block;
@@ -324,7 +324,6 @@ static void* ThreadRead( void *data )
             {
                 msg_Err( access, "Timeout on receiving, timeout %d seconds", sys->timeout/1000 );
                 atomic_store(&sys->timeout_reached, true);
-                vlc_sem_post(&sys->semaphore);
                 len=0;
                 break;
             }
