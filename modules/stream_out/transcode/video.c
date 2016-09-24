@@ -81,6 +81,7 @@ static void* EncoderThread( void *obj )
         while( !p_sys->b_abort &&
                (p_pic = picture_fifo_Pop( p_sys->pp_pics )) == NULL )
             vlc_cond_wait( &p_sys->cond, &p_sys->lock_out );
+        vlc_sem_post( &p_sys->picture_pool_has_room );
 
         if( p_pic )
         {
@@ -100,6 +101,7 @@ static void* EncoderThread( void *obj )
     /*Encode what we have in the buffer on closing*/
     while( (p_pic = picture_fifo_Pop( p_sys->pp_pics )) != NULL )
     {
+        vlc_sem_post( &p_sys->picture_pool_has_room );
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
         picture_Release( p_pic );
         block_ChainAppend( &p_sys->p_buffers, p_block );
@@ -227,6 +229,9 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
         free( id->p_decoder->p_owner );
         return VLC_ENOMEM;
     }
+    /* We allow at max 500 pictures in pool before we wait for room */
+    vlc_sem_init( &p_sys->picture_pool_has_room, p_sys->pool_size );
+
     vlc_mutex_init( &p_sys->lock_out );
     vlc_cond_init( &p_sys->cond );
     p_sys->p_buffers = NULL;
@@ -705,6 +710,7 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
 
     if( p_sys->i_threads )
     {
+        vlc_sem_wait( &p_sys->picture_pool_has_room );
         vlc_mutex_lock( &p_sys->lock_out );
         picture_fifo_Push( p_sys->pp_pics, p_pic );
         vlc_cond_signal( &p_sys->cond );

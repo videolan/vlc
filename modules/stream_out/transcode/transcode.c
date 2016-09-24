@@ -131,6 +131,9 @@
 #define HP_LONGTEXT N_( \
     "Runs the optional encoder thread at the OUTPUT priority instead of " \
     "VIDEO." )
+#define POOL_TEXT N_("Picture pool size")
+#define POOL_LONGTEXT N_( "Defines how many pictures we allow to be in pool "\
+    "between decoder/encoder threads when threads > 0" )
 
 
 static const char *const ppsz_deinterlace_type[] =
@@ -216,6 +219,8 @@ vlc_module_begin ()
     set_section( N_("Miscellaneous"), NULL )
     add_integer( SOUT_CFG_PREFIX "threads", 0, THREADS_TEXT,
                  THREADS_LONGTEXT, true )
+    add_integer( SOUT_CFG_PREFIX "pool-size", 10, POOL_TEXT, POOL_LONGTEXT, true )
+        change_integer_range( 1, 1000 )
     add_bool( SOUT_CFG_PREFIX "high-priority", false, HP_TEXT, HP_LONGTEXT,
               true )
 
@@ -226,7 +231,7 @@ static const char *const ppsz_sout_options[] = {
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
     "deinterlace-module", "threads", "aenc", "acodec", "ab", "alang",
     "afilter", "samplerate", "channels", "senc", "scodec", "soverlay",
-    "sfilter", "osd", "high-priority", "maxwidth", "maxheight",
+    "sfilter", "osd", "high-priority", "maxwidth", "maxheight", "pool-size",
     NULL
 };
 
@@ -374,6 +379,7 @@ static int Open( vlc_object_t *p_this )
     free( psz_string );
 
     p_sys->i_threads = var_GetInteger( p_stream, SOUT_CFG_PREFIX "threads" );
+    p_sys->pool_size = var_GetInteger( p_stream, SOUT_CFG_PREFIX "pool-size" );
     p_sys->b_high_priority = var_GetBool( p_stream, SOUT_CFG_PREFIX "high-priority" );
 
     if( p_sys->i_vcodec )
