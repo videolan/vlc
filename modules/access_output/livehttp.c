@@ -187,8 +187,10 @@ struct sout_access_out_sys_t
     uint32_t i_segment;
     size_t  i_seglen;
     float   f_seglen;
-    block_t *block_buffer;
-    block_t **last_block_buffer;
+    block_t *full_segments;
+    block_t **full_segments_end;
+    block_t *ongoing_segment;
+    block_t **ongoing_segment_end;
     int i_handle;
     unsigned i_numsegs;
     unsigned i_initial_segment;
@@ -231,11 +233,15 @@ static int Open( vlc_object_t *p_this )
     if( unlikely( !( p_sys = calloc ( 1, sizeof( *p_sys ) ) ) ) )
         return VLC_ENOMEM;
 
-    p_sys->i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
     /* Try to get within asked segment length */
+    p_sys->i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
+
     p_sys->i_seglenm = CLOCK_FREQ * p_sys->i_seglen;
-    p_sys->block_buffer = NULL;
-    p_sys->last_block_buffer = &p_sys->block_buffer;
+    p_sys->full_segments = NULL;
+    p_sys->full_segments_end = &p_sys->full_segments;
+
+    p_sys->ongoing_segment = NULL;
+    p_sys->ongoing_segment_end = &p_sys->ongoing_segment;
 
     p_sys->i_numsegs = var_GetInteger( p_access, SOUT_CFG_PREFIX "numsegs" );
     p_sys->i_initial_segment = var_GetInteger( p_access, SOUT_CFG_PREFIX "initial-segment-number" );
@@ -757,44 +763,39 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    block_t *output_block = p_sys->block_buffer;
-    p_sys->block_buffer = NULL;
-    p_sys->last_block_buffer = &p_sys->block_buffer;
+
+    if( p_sys->ongoing_segment )
+        block_ChainLastAppend( &p_sys->full_segments_end, p_sys->ongoing_segment );
+    p_sys->ongoing_segment = NULL;
+    p_sys->ongoing_segment_end = &p_sys->ongoing_segment;
+
+    block_t *output_block = p_sys->full_segments;
+    p_sys->full_segments = NULL;
+    p_sys->full_segments_end = &p_sys->full_segments;
 
     while( output_block )
     {
         block_t *p_next = output_block->p_next;
         output_block->p_next = NULL;
 
-        /* Since we are flushing, check the segment change by hand and don't wait
-         * possible keyframe*/
-        if( p_sys->b_segment_has_data &&  (float)(output_block->i_length + p_sys->i_dts_offset +
-                     output_block->i_dts - p_sys->i_opendts) >= p_sys->i_seglenm )
-        {
-            closeCurrentSegment( p_access, p_sys, false );
-            p_sys->i_dts_offset = 0;
-            if( unlikely(openNextFile( p_access, p_sys ) < 0 ) )
-            {
-                block_ChainRelease( output_block );
-                output_block = NULL;
-                block_ChainRelease( p_next );
-
-                /* Jump out of the loop so we can close rest of the stuff*/
-                continue;
-            }
-            p_sys->i_opendts = p_sys->block_buffer ? p_sys->block_buffer->i_dts : output_block->i_dts;
-        }
         Write( p_access, output_block );
         output_block = p_next;
+    }
+    if( p_sys->ongoing_segment )
+    {
+        block_ChainLastAppend( &p_sys->full_segments_end, p_sys->ongoing_segment );
+        p_sys->ongoing_segment = NULL;
+        p_sys->ongoing_segment_end = &p_sys->ongoing_segment;
     }
 
     ssize_t writevalue = writeSegment( p_access );
     msg_Dbg( p_access, "Writing.. %zd", writevalue );
     if( unlikely( writevalue < 0 ) )
     {
-        block_ChainRelease( p_sys->block_buffer );
-        p_sys->block_buffer = NULL;
-        p_sys->last_block_buffer = &p_sys->block_buffer;
+        if( p_sys->full_segments )
+            block_ChainRelease( p_sys->full_segments );
+        if( p_sys->ongoing_segment )
+            block_ChainRelease( p_sys->ongoing_segment );
     }
 
     closeCurrentSegment( p_access, p_sys, true );
@@ -910,48 +911,53 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
 static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    block_t *output = p_sys->block_buffer;
-
-    /* let's check if we need to store offset to keep
-     * better count of actual duration */
-    if( unlikely( p_buffer->i_dts < p_sys->i_opendts ) )
-    {
-        block_t *last_buffer = p_sys->block_buffer;
-        while( last_buffer->p_next )
-            last_buffer = last_buffer->p_next;
-        p_sys->i_dts_offset += last_buffer->i_dts - p_sys->i_opendts;
-        p_sys->i_opendts    = p_buffer->i_dts;
-        msg_Dbg( p_access, "dts offset %"PRId64, p_sys->i_dts_offset );
-    }
+    ssize_t writevalue = 0;
 
     if( p_sys->i_handle > 0 && p_sys->b_segment_has_data &&
-       (( p_buffer->i_length + p_buffer->i_dts - p_sys->i_opendts +
-          p_sys->i_dts_offset ) >= p_sys->i_seglenm ) )
+       (( p_buffer->i_length + p_buffer->i_dts - p_sys->i_opendts ) >= p_sys->i_seglenm ) )
     {
+        writevalue = writeSegment( p_access );
+        if( unlikely( writevalue < 0 ) )
+        {
+            block_ChainRelease ( p_buffer );
+            return -1;
+        }
         closeCurrentSegment( p_access, p_sys, false );
+        return writevalue;
     }
 
     if ( unlikely( p_sys->i_handle < 0 ) )
     {
-        p_sys->i_dts_offset = 0;
-        p_sys->i_opendts = output ? output->i_dts : p_buffer->i_dts;
-        //For first segment we can get negative duration otherwise...?
-        if( ( p_sys->i_opendts != VLC_TS_INVALID ) &&
-            ( p_buffer->i_dts < p_sys->i_opendts ) )
-            p_sys->i_opendts = p_buffer->i_dts;
+        p_sys->i_opendts = p_buffer->i_dts;
+
+        if( p_sys->ongoing_segment && ( p_sys->ongoing_segment->i_dts < p_sys->i_opendts) )
+            p_sys->i_opendts = p_sys->ongoing_segment->i_dts;
+
+        if( p_sys->full_segments && ( p_sys->full_segments->i_dts < p_sys->i_opendts) )
+            p_sys->i_opendts = p_sys->full_segments->i_dts;
+
+        msg_Dbg( p_access, "Setting new opendts %"PRId64, p_sys->i_opendts );
 
         if ( openNextFile( p_access, p_sys ) < 0 )
-           return VLC_EGENERIC;
+           return -1;
     }
-    return VLC_SUCCESS;
+    return writevalue;
 }
 
 static ssize_t writeSegment( sout_access_out_t *p_access )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    block_t *output = p_sys->block_buffer;
-    p_sys->block_buffer = NULL;
-    p_sys->last_block_buffer = &p_sys->block_buffer;
+    msg_Dbg( p_access, "Writing all full segments" );
+
+    block_t *output = p_sys->full_segments;
+    mtime_t output_last_length = 0;
+    if( output )
+        output_last_length = output->i_length;
+    if( *p_sys->full_segments_end )
+        output_last_length = (*p_sys->full_segments_end)->i_length;
+    p_sys->full_segments = NULL;
+    p_sys->full_segments_end = &p_sys->full_segments;
+
     ssize_t i_write=0;
     bool crypted = false;
     while( output )
@@ -996,8 +1002,8 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
         }
 
         p_sys->f_seglen =
-            (float)(output->i_length +
-                    output->i_dts - p_sys->i_opendts + p_sys->i_dts_offset) / CLOCK_FREQ;
+            (float)(output_last_length +
+                    output->i_dts - p_sys->i_opendts) / CLOCK_FREQ;
 
         if ( (size_t)val >= output->i_buffer )
         {
@@ -1023,30 +1029,31 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     size_t i_write = 0;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    block_t *p_temp;
     while( p_buffer )
     {
-        if( ( p_sys->b_splitanywhere  || ( p_buffer->i_flags & BLOCK_FLAG_HEADER ) ) )
+        /* Check if current block is already past segment-lenght
+            and we want to write gathered blocks into segment
+            and update playlist */
+        if( p_sys->ongoing_segment && ( p_sys->b_splitanywhere  || ( p_buffer->i_flags & BLOCK_FLAG_HEADER ) ) )
         {
-            if( unlikely( CheckSegmentChange( p_access, p_buffer ) != VLC_SUCCESS ) )
-            {
-                block_ChainRelease ( p_buffer );
-                return -1;
-            }
-
-            ssize_t writevalue = writeSegment( p_access );
-            if( unlikely( writevalue < 0 ) )
-            {
-                block_ChainRelease ( p_buffer );
-                return -1;
-            }
+            msg_Dbg( p_access, "Moving ongoing segment to full segments-queue" );
+            block_ChainLastAppend( &p_sys->full_segments_end, p_sys->ongoing_segment );
+            p_sys->ongoing_segment = NULL;
+            p_sys->ongoing_segment_end = &p_sys->ongoing_segment;
             p_sys->b_segment_has_data = true;
-            i_write += writevalue;
         }
 
-        p_temp = p_buffer->p_next;
+        ssize_t ret = CheckSegmentChange( p_access, p_buffer );
+        if( ret < 0 )
+        {
+            msg_Err( p_access, "Error in write loop");
+            return ret;
+        }
+        i_write += ret;
+
+        block_t *p_temp = p_buffer->p_next;
         p_buffer->p_next = NULL;
-        block_ChainLastAppend( &p_sys->last_block_buffer, p_buffer );
+        block_ChainLastAppend( &p_sys->ongoing_segment_end, p_buffer );
         p_buffer = p_temp;
     }
 
