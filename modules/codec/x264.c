@@ -443,9 +443,9 @@ static const char *const direct_pred_list_text[] =
   { N_("None"), N_("Spatial"), N_("Temporal"), N_("Auto") };
 
 static const int framepacking_list[] =
-  { -1, 0, 1, 2, 3, 4, 5 };
+  { -1, 0, 1, 2, 3, 4, 5, 6 };
 static const char *const framepacking_list_text[] =
-  { "", N_("checkerboard"), N_("column alternation"), N_("row alternation"), N_("side by side"), N_("top bottom"), N_("frame alternation") };
+  { "", N_("checkerboard"), N_("column alternation"), N_("row alternation"), N_("side by side"), N_("top bottom"), N_("frame alternation"), N_("2D") };
 
 vlc_module_begin ()
 #ifdef MODULE_NAME_IS_x26410b
@@ -547,7 +547,7 @@ vlc_module_begin ()
 #if X264_BUILD >= 111
     add_integer( SOUT_CFG_PREFIX "frame-packing", -1, FRAMEPACKING_TEXT, FRAMEPACKING_LONGTEXT, true )
         change_integer_list( framepacking_list, framepacking_list_text )
-        change_integer_range( -1, 5)
+        change_integer_range( -1, 6)
 #endif
 
     add_integer( SOUT_CFG_PREFIX "slices", 0, SLICE_COUNT, SLICE_COUNT_LONGTEXT, true )
