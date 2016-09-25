@@ -85,7 +85,8 @@ VPX_CONF := \
 	--disable-unit-tests \
 	--disable-install-bins \
 	--disable-install-docs \
-	--disable-dependency-tracking
+	--disable-dependency-tracking \
+	--enable-vp9-highbitdepth
 
 ifndef BUILD_ENCODERS
 VPX_CONF += --disable-vp8-encoder --disable-vp9-encoder
