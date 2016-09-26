@@ -177,7 +177,11 @@ static int ftp_SendCommand( vlc_object_t *obj, access_sys_t *sys,
     if( unlikely(val == -1) )
         return -1;
 
-    msg_Dbg( obj, "sending request: \"%.*s\" (%d bytes)", val - 2, cmd, val );
+    if( strncmp( cmd, "PASS ", 5 ) && strncmp( cmd, "ACCT ", 5 ) )
+        msg_Dbg( obj, "sending request: \"%.*s\" (%d bytes)", val-2, cmd, val );
+    else
+        msg_Dbg( obj, "sending request: \"%.*s XXXX\" (XX bytes)", 4, cmd );
+
     if( ((sys->cmd.p_tls != NULL)
             ? vlc_tls_Write( sys->cmd.p_tls, cmd, val )
             : net_Write( obj, sys->cmd.fd, cmd, val )) != val )
