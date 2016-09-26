@@ -498,6 +498,7 @@ static int vout_update_format( decoder_t *p_dec )
 static picture_t *vout_new_buffer( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    assert( p_owner->p_vout );
 
     return vout_GetPicture( p_owner->p_vout );
 }
