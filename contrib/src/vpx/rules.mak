@@ -4,7 +4,7 @@ VPX_VERSION := 1.6.0
 VPX_URL := http://storage.googleapis.com/downloads.webmproject.org/releases/webm/libvpx-$(VPX_VERSION).tar.bz2
 
 PKGS += vpx
-ifeq ($(call need_pkg,"vpx"),)
+ifeq ($(call need_pkg,"vpx >= 1.4.0"),)
 PKGS_FOUND += vpx
 endif
 
