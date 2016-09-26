@@ -457,6 +457,7 @@ static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
 
         pthread_attr_setschedpolicy (attr, policy);
         pthread_attr_setschedparam (attr, &sp);
+        pthread_attr_setinheritsched (attr, PTHREAD_EXPLICIT_SCHED);
     }
 #else
     (void) priority;
