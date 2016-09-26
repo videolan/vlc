@@ -521,12 +521,9 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_dec->fmt_out.video.orientation = p_dec->fmt_in.video.orientation;
 
-    if( p_dec->fmt_in.video.p_palette ) {
+    if( p_dec->fmt_in.video.p_palette )
         p_sys->palette_sent = false;
-        p_dec->fmt_out.video.p_palette = malloc( sizeof(video_palette_t) );
-        if( p_dec->fmt_out.video.p_palette )
-            *p_dec->fmt_out.video.p_palette = *p_dec->fmt_in.video.p_palette;
-    } else
+    else
         p_sys->palette_sent = true;
 
     /* ***** init this codec with special data ***** */
