@@ -667,6 +667,7 @@ vlc_dbus_init( vlc_keystore* p_keystore )
     return VLC_SUCCESS;
 
 error:
+    FREENULL( p_sys->psz_app_id );
     dbus_connection_close( p_sys->connection );
     dbus_connection_unref( p_sys->connection );
     return VLC_EGENERIC;
