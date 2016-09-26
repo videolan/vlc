@@ -95,7 +95,7 @@ static void Close( vlc_object_t * );
 #define KEYFILE_LONGTEXT N_("File containing the 16 bytes encryption key")
 
 #define KEYLOADFILE_TEXT N_("File where vlc reads key-uri and keyfile-location")
-#define KEYLOADFILE_LONGTEXT N_("File is read when segment starts and is assumet to be in format: "\
+#define KEYLOADFILE_LONGTEXT N_("File is read when segment starts and is assumed to be in format: "\
                                 "key-uri\\nkey-file. File is read on the segment opening and "\
                                 "values are used on that segment.")
 
@@ -544,7 +544,7 @@ static bool isFirstItemRemovable( sout_access_out_sys_t *p_sys, uint32_t i_first
 {
     float duration = .0f;
 
-    /* Check that segment has been out of playlist for seglenght + (p_sys->i_numsegs * p_sys->i_seglen) amount
+    /* Check that segment has been out of playlist for seglength + (p_sys->i_numsegs * p_sys->i_seglen) amount
      * We check this by calculating duration of the items that replaced first item in playlist
      */
     for( unsigned int index = 0; index < i_index_offset; index++ )
@@ -1031,7 +1031,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     while( p_buffer )
     {
-        /* Check if current block is already past segment-lenght
+        /* Check if current block is already past segment-length
             and we want to write gathered blocks into segment
             and update playlist */
         if( p_sys->ongoing_segment && ( p_sys->b_splitanywhere  || ( p_buffer->i_flags & BLOCK_FLAG_HEADER ) ) )
