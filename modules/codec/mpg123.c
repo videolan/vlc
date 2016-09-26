@@ -159,6 +159,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     p_dec->fmt_out.audio.i_physical_channels =
         p_dec->fmt_out.audio.i_original_channels & AOUT_CHAN_PHYSMASK;
+    aout_FormatPrepare( &p_dec->fmt_out.audio );
 
     /* Date management */
     if( p_dec->fmt_out.audio.i_rate != p_sys->frame_info.rate )
