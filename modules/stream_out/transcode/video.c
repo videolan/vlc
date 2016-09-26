@@ -229,9 +229,8 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
         free( id->p_decoder->p_owner );
         return VLC_ENOMEM;
     }
-    /* We allow at max 500 pictures in pool before we wait for room */
-    vlc_sem_init( &p_sys->picture_pool_has_room, p_sys->pool_size );
 
+    vlc_sem_init( &p_sys->picture_pool_has_room, p_sys->pool_size );
     vlc_mutex_init( &p_sys->lock_out );
     vlc_cond_init( &p_sys->cond );
     p_sys->p_buffers = NULL;
