@@ -252,10 +252,6 @@ static void check_crashdump(void)
             }
             else
             {
-                MessageBox( NULL, L"There was an error while connecting to " \
-                                "the FTP server. "\
-                                "Thanks a lot for the help.",
-                                L"Report sending failed", MB_OK);
                 fprintf(stderr,"Can't connect to FTP server 0x%08lu\n",
                         (unsigned long)GetLastError());
             }
@@ -263,9 +259,8 @@ static void check_crashdump(void)
         }
         else
         {
-              MessageBox( NULL, L"There was an error while connecting to the Internet.\n"\
-                                "Thanks a lot for the help anyway.",
-                                L"Report sending failed", MB_OK);
+              fprintf(stderr,"There was an error while connecting to the Internet  0x%08lu\n",
+                      (unsigned long)GetLastError());
         }
     }
 
