@@ -838,10 +838,15 @@ static void OpenglSwap (vlc_gl_t *gl)
 {
     [super viewWillMoveToWindow:newWindow];
 
-    if (newWindow != nil) {
-        @synchronized(newWindow) {
-            [newWindow setColorSpace:vd->sys->nsColorSpace];
+    @try {
+        if (newWindow != nil) {
+            @synchronized(newWindow) {
+                [newWindow setColorSpace:vd->sys->nsColorSpace];
+            }
         }
+    }
+    @catch (NSException *exception) {
+        msg_Warn(vd, "Setting the window color space failed due to an Obj-C exception (%s, %s", [exception.name UTF8String], [exception.reason UTF8String]);
     }
 }
 
