@@ -558,15 +558,7 @@ static void continueAfterOPTIONS( RTSPClient* client, int result_code,
       result_code == 0
       && result_string != NULL
       && strstr( result_string, "GET_PARAMETER" ) != NULL;
-    if( p_sys->p_sdp == NULL )
-    {
-        client->sendDescribeCommand( continueAfterDESCRIBE );
-    }
-    else
-    {
-        p_sys->b_error = false;
-        p_sys->event_rtsp = 1;
-    }
+    client->sendDescribeCommand( continueAfterDESCRIBE );
     delete[] result_string;
 }
 
