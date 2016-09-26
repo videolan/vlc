@@ -234,6 +234,24 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
 
     v->b_color_range_full = img->range == VPX_CR_FULL_RANGE;
 
+    switch( img->cs )
+    {
+        case VPX_CS_SRGB:
+        case VPX_CS_BT_709:
+            v->space = COLOR_SPACE_BT709;
+            break;
+        case VPX_CS_BT_601:
+        case VPX_CS_SMPTE_170:
+        case VPX_CS_SMPTE_240:
+            v->space = COLOR_SPACE_BT601;
+            break;
+        case VPX_CS_BT_2020:
+            v->space = COLOR_SPACE_BT2020;
+            break;
+        default:
+            break;
+    }
+
     if (decoder_UpdateVideoFormat(dec))
         return NULL;
     picture_t *pic = decoder_NewPicture(dec);
