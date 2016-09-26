@@ -1585,7 +1585,7 @@ static bool EsIsSelected( es_out_id_t *es )
         bool b_decode = false;
         if( es->p_master->p_dec )
         {
-            int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_codec );
+            int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_original_fourcc );
             if( i_channel != -1 )
                 input_DecoderGetCcState( es->p_master->p_dec, &b_decode, i_channel );
         }
@@ -1651,7 +1651,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
         if( !es->p_master->p_dec )
             return;
 
-        i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_codec );
+        i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_original_fourcc );
         if( i_channel == -1 || input_DecoderSetCcState( es->p_master->p_dec, true, i_channel ) )
             return;
     }
@@ -1712,7 +1712,7 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
     {
         if( es->p_master->p_dec )
         {
-            int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_codec );
+            int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_original_fourcc );
             if( i_channel != -1 )
                 input_DecoderSetCcState( es->p_master->p_dec, false, i_channel );
         }
