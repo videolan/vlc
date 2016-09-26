@@ -1384,6 +1384,8 @@ static int DecodeVideoOutput( decoder_t *p_dec, OmxPort *p_port, picture_t **pp_
             p_port->b_update_def = 0;
             CHECK_ERROR(omx_error, "GetPortDefinition failed");
         }
+        if( decoder_UpdateVideoFormat( p_dec ) )
+            goto error;
 
         if( p_port->p_hwbuf )
         {
@@ -1621,7 +1623,9 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
            playback is paused. */
         if( p_sys->out.p_hwbuf && attempts == max_polling_attempts ) {
 #ifdef USE_IOMX
-            picture_t *invalid_picture = decoder_NewPicture(p_dec);
+            picture_t *invalid_picture = NULL;
+            if( !decoder_UpdateVideoFormat(p_dec))
+                invalid_picture = decoder_NewPicture(p_dec);
             if (invalid_picture) {
                 invalid_picture->date = VLC_TS_INVALID;
                 picture_sys_t *p_picsys = invalid_picture->p_sys;

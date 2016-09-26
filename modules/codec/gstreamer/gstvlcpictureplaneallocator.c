@@ -159,12 +159,13 @@ void gst_vlc_picture_plane_allocator_release(
 bool gst_vlc_picture_plane_allocator_hold(
     GstVlcPicturePlaneAllocator *p_allocator, GstBuffer *p_buffer )
 {
-    picture_t* p_pic;
+    picture_t* p_pic = NULL;
     decoder_t* p_dec = p_allocator->p_dec;
     GstVlcPicturePlane *p_mem;
     int i_plane;
 
-    p_pic = decoder_NewPicture( p_dec );
+    if( !decoder_UpdateVideoFormat( p_dec ) )
+        p_pic = decoder_NewPicture( p_dec );
     if( !p_pic )
     {
         msg_Err( p_allocator->p_dec, "failed to acquire picture from vout" );
@@ -253,7 +254,7 @@ static bool gst_vlc_video_info_from_vout( GstVideoInfo *p_info,
         picture_t *p_pic_info )
 {
     const GstVideoFormatInfo *p_vinfo = p_info->finfo;
-    picture_t *p_pic;
+    picture_t *p_pic = NULL;
     int i;
 
     /* Ensure the queue is empty */
@@ -269,7 +270,8 @@ static bool gst_vlc_video_info_from_vout( GstVideoInfo *p_info,
     /* Acquire a picture and release it. This is to get the picture
      * stride/offsets info for the Gstreamer decoder looking to use
      * downstream bufferpool directly; Zero-Copy */
-    p_pic = decoder_NewPicture( p_dec );
+    if( !decoder_UpdateVideoFormat( p_dec ) )
+        p_pic = decoder_NewPicture( p_dec );
     if( !p_pic )
     {
         msg_Err( p_dec, "failed to acquire picture from vout; for pic info" );

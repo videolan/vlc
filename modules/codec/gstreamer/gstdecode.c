@@ -784,6 +784,8 @@ check_messages:
             GstVideoFrame frame;
 
             /* Get a new picture */
+            if( decoder_UpdateVideoFormat( p_dec ) )
+                goto done;
             p_pic = decoder_NewPicture( p_dec );
             if( !p_pic )
                 goto done;

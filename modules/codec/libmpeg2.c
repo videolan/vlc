@@ -658,6 +658,8 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
         VLC_CODEC_I420 : VLC_CODEC_I422;
 
     /* Get a new picture */
+    if( decoder_UpdateVideoFormat( p_dec ) )
+        return NULL;
     p_pic = decoder_NewPicture( p_dec );
 
     if( p_pic == NULL )

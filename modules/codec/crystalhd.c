@@ -400,7 +400,10 @@ static BC_STATUS ourCallback(void *shnd, uint32_t width, uint32_t height, uint32
     /* Do not allocate for the second-field in the pair, in interlaced */
     if( !(proc_in->PicInfo.flags & VDEC_FLAG_INTERLACED_SRC) ||
         !(proc_in->PicInfo.flags & VDEC_FLAG_FIELDPAIR) )
-        p_dec->p_sys->p_pic = decoder_NewPicture( p_dec );
+    {
+        if( !decoder_UpdateVideoFormat( p_dec ) )
+            p_dec->p_sys->p_pic = decoder_NewPicture( p_dec );
+    }
 
     /* */
     picture_t *p_pic = p_dec->p_sys->p_pic;

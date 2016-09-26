@@ -521,6 +521,8 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         return NULL;
 
     /* Get a new picture */
+    if( decoder_UpdateVideoFormat( p_dec ) )
+        return NULL;
     p_pic = decoder_NewPicture( p_dec );
     if( !p_pic ) return NULL;
 

@@ -676,6 +676,8 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, void **result)
 
         if (p_dec->fmt_in.i_cat == VIDEO_ES)
         {
+            if (decoder_UpdateVideoFormat(p_dec))
+                return VLC_SUCCESS;
             picture = decoder_NewPicture(p_dec);
             if (!picture)
                 return VLC_SUCCESS;

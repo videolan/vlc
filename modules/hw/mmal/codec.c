@@ -426,7 +426,7 @@ static int send_output_buffer(decoder_t *dec)
     decoder_sys_t *sys = dec->p_sys;
     MMAL_BUFFER_HEADER_T *buffer;
     picture_sys_t *p_sys;
-    picture_t *picture;
+    picture_t *picture = NULL;
     MMAL_STATUS_T status;
     unsigned buffer_size = 0;
     int ret = 0;
@@ -444,7 +444,8 @@ static int send_output_buffer(decoder_t *dec)
         }
     }
 
-    picture = decoder_NewPicture(dec);
+    if (!decoder_UpdateVideoFormat(dec))
+        picture = decoder_NewPicture(dec);
     if (!picture) {
         msg_Warn(dec, "Failed to get new picture");
         ret = -1;

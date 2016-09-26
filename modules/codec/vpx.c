@@ -169,6 +169,8 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
         dec->fmt_out.video.i_sar_den = 1;
     }
 
+    if (decoder_UpdateVideoFormat(dec))
+        return NULL;
     picture_t *pic = decoder_NewPicture(dec);
     if (!pic)
         return NULL;

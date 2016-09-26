@@ -467,6 +467,8 @@ static picture_t *DecodePacket( decoder_t *p_dec, daala_packet *p_dpacket )
         p_sys->b_decoded_first_keyframe = true;
 
     /* Get a new picture */
+    if( decoder_UpdateVideoFormat( p_dec ) )
+        return NULL;
     p_pic = decoder_NewPicture( p_dec );
     if( !p_pic ) return NULL;
 

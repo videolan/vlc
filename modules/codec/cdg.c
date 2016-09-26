@@ -173,6 +173,8 @@ static picture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( (p_sys->i_packet%3) == 1 && p_block->i_pts == p_block->i_dts )
     {
         /* Get a new picture */
+        if( decoder_UpdateVideoFormat( p_dec ) )
+            goto exit;
         p_pic = decoder_NewPicture( p_dec );
         if( !p_pic )
             goto exit;

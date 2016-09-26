@@ -957,6 +957,8 @@ static void *DecBlock( decoder_t *p_dec, block_t **pp_block )
     if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
         /* Get a new picture */
+        if( decoder_UpdateVideoFormat( p_dec ) )
+            return NULL;
         picture_t *p_pic = decoder_NewPicture( p_dec );
         if( !p_pic ) return NULL;
 

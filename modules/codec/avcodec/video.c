@@ -913,7 +913,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if (p_sys->p_va == NULL
              && lavc_UpdateVideoFormat(p_dec, p_context, p_context->pix_fmt,
                                        p_context->pix_fmt) == 0)
-                p_pic = decoder_GetPicture(p_dec);
+                p_pic = decoder_NewPicture(p_dec);
 
             if( !p_pic )
             {
@@ -1210,7 +1210,7 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     }
     post_mt(sys);
 
-    pic = decoder_GetPicture(dec);
+    pic = decoder_NewPicture(dec);
     if (pic == NULL)
         return -ENOMEM;
 
@@ -1308,7 +1308,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
             continue; /* Unsupported brand of hardware acceleration */
         post_mt(p_sys);
 
-        picture_t *test_pic = decoder_GetPicture(p_dec);
+        picture_t *test_pic = decoder_NewPicture(p_dec);
         assert(!test_pic || test_pic->format.i_chroma == p_dec->fmt_out.video.i_chroma);
         vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt,
                                   &p_dec->fmt_in,

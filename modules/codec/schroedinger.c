@@ -666,6 +666,8 @@ static SchroFrame *CreateSchroFrameFromPic( decoder_t *p_dec )
     if( !p_schroframe )
         return NULL;
 
+    if( decoder_UpdateVideoFormat( p_dec ) )
+        return NULL;
     p_pic = decoder_NewPicture( p_dec );
 
     if( !p_pic )

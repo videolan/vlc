@@ -193,6 +193,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     video_format_FixRgb(&p_dec->fmt_out.video);
 
     /* Get a new picture */
+    if( decoder_UpdateVideoFormat( p_dec ) )
+        goto done;
     p_pic = decoder_NewPicture( p_dec );
     if( !p_pic )
         goto done;

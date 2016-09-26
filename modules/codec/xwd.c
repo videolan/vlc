@@ -134,6 +134,8 @@ static picture_t *Decode (decoder_t *dec, block_t **pp)
      || (block->i_buffer / pitch) < dec->fmt_out.video.i_height)
         goto drop;
 
+    if (decoder_UpdateVideoFormat(dec))
+        goto drop;
     pic = decoder_NewPicture(dec);
     if (pic == NULL)
         goto drop;

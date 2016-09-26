@@ -227,7 +227,9 @@ static picture_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* Get a new picture */
-    picture_t *p_pic = decoder_NewPicture( p_dec );
+    picture_t *p_pic = NULL;
+    if( !decoder_UpdateVideoFormat( p_dec ) )
+        p_pic = decoder_NewPicture( p_dec );
     if( p_pic == NULL )
     {
         block_Release( p_block );
