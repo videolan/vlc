@@ -631,49 +631,55 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 
 - (void)fetchViewContainer
 {
-    /* get the object we will draw into */
-    UIView *viewContainer = var_CreateGetAddress (_voutDisplay, "drawable-nsobject");
-    if (unlikely(viewContainer == nil)) {
-        msg_Err(_voutDisplay, "provided view container is nil");
-        return;
-    }
-
-    [viewContainer retain];
-
-    @synchronized(viewContainer) {
-        if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)])) {
-            msg_Err(_voutDisplay, "void pointer not an ObjC object");
+    @try {
+        /* get the object we will draw into */
+        UIView *viewContainer = var_CreateGetAddress (_voutDisplay, "drawable-nsobject");
+        if (unlikely(viewContainer == nil)) {
+            msg_Err(_voutDisplay, "provided view container is nil");
             return;
         }
 
-        if (![viewContainer isKindOfClass:[UIView class]]) {
-            msg_Err(_voutDisplay, "passed ObjC object not of class UIView");
-            return;
-        }
+        [viewContainer retain];
 
-        vout_display_sys_t *sys = _voutDisplay->sys;
-
-        /* This will be released in Close(), on
-         * main thread, after we are done using it. */
-        sys->viewContainer = viewContainer;
-
-        self.frame = viewContainer.bounds;
-        [self reshape];
-
-        [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
-                                             withObject:self
-                                          waitUntilDone:YES];
-
-        /* add tap gesture recognizer for DVD menus and stuff */
-        sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                     action:@selector(tapRecognized:)];
-        if (sys->viewContainer.window) {
-            if (sys->viewContainer.window.rootViewController) {
-                if (sys->viewContainer.window.rootViewController.view)
-                    [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
+        @synchronized(viewContainer) {
+            if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)])) {
+                msg_Err(_voutDisplay, "void pointer not an ObjC object");
+                return;
             }
+
+            if (![viewContainer isKindOfClass:[UIView class]]) {
+                msg_Err(_voutDisplay, "passed ObjC object not of class UIView");
+                return;
+            }
+
+            vout_display_sys_t *sys = _voutDisplay->sys;
+
+            /* This will be released in Close(), on
+             * main thread, after we are done using it. */
+            sys->viewContainer = viewContainer;
+
+            self.frame = viewContainer.bounds;
+            [self reshape];
+
+            [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
+                                                 withObject:self
+                                              waitUntilDone:YES];
+
+            /* add tap gesture recognizer for DVD menus and stuff */
+            sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                         action:@selector(tapRecognized:)];
+            if (sys->viewContainer.window) {
+                if (sys->viewContainer.window.rootViewController) {
+                    if (sys->viewContainer.window.rootViewController.view)
+                        [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
+                }
+            }
+            sys->tapRecognizer.cancelsTouchesInView = NO;
         }
-        sys->tapRecognizer.cancelsTouchesInView = NO;
+    } @catch (NSException *exception) {
+        msg_Err(_voutDisplay, "Handling the view container failed due to an Obj-C exception (%s, %s", [exception.name UTF8String], [exception.reason UTF8String]);
+        vout_display_sys_t *sys = _voutDisplay->sys;
+        sys->viewContainer = nil;
     }
 }
 
