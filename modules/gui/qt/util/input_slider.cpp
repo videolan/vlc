@@ -475,17 +475,24 @@ bool SeekSlider::eventFilter( QObject *obj, QEvent *event )
 {
     if( obj == mTimeTooltip )
     {
+        if( event->type() == QEvent::MouseMove )
+        {
+            QMouseEvent* mev = static_cast<QMouseEvent*>( event );
+
+            if( rect().contains( mapFromGlobal( mev->globalPos() ) ) )
+                return false;
+        }
+
         if( event->type() == QEvent::Leave ||
             event->type() == QEvent::MouseMove )
         {
-            QMouseEvent *e = static_cast<QMouseEvent*>( event );
-            if( !rect().contains( mapFromGlobal( e->globalPos() ) ) )
-                mTimeTooltip->hide();
+            mTimeTooltip->hide();
         }
+
         return false;
     }
-    else
-        return QSlider::eventFilter( obj, event );
+
+    return QSlider::eventFilter( obj, event );
 }
 
 QSize SeekSlider::sizeHint() const
