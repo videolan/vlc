@@ -99,7 +99,68 @@ static void vpx_err_msg(vlc_object_t *this, struct vpx_codec_ctx *ctx,
 struct decoder_sys_t
 {
     struct vpx_codec_ctx ctx;
+    vpx_codec_caps_t codec_caps;
 };
+
+static const struct
+{
+    vlc_fourcc_t     i_chroma;
+    enum vpx_img_fmt i_chroma_id;
+    uint8_t          i_bitdepth;
+    uint8_t          i_needs_hack;
+
+} chroma_table[] =
+{
+    { VLC_CODEC_I420, VPX_IMG_FMT_I420, 8, 0 },
+    { VLC_CODEC_I422, VPX_IMG_FMT_I422, 8, 0 },
+    { VLC_CODEC_I444, VPX_IMG_FMT_I444, 8, 0 },
+    { VLC_CODEC_I440, VPX_IMG_FMT_I440, 8, 0 },
+
+    { VLC_CODEC_YV12, VPX_IMG_FMT_YV12, 8, 0 },
+    { VLC_CODEC_YUVA, VPX_IMG_FMT_444A, 8, 0 },
+    { VLC_CODEC_YUYV, VPX_IMG_FMT_YUY2, 8, 0 },
+    { VLC_CODEC_UYVY, VPX_IMG_FMT_UYVY, 8, 0 },
+    { VLC_CODEC_YVYU, VPX_IMG_FMT_YVYU, 8, 0 },
+
+    { VLC_CODEC_RGB15, VPX_IMG_FMT_RGB555, 8, 0 },
+    { VLC_CODEC_RGB16, VPX_IMG_FMT_RGB565, 8, 0 },
+    { VLC_CODEC_RGB24, VPX_IMG_FMT_RGB24, 8, 0 },
+    { VLC_CODEC_RGB32, VPX_IMG_FMT_RGB32, 8, 0 },
+
+    { VLC_CODEC_ARGB, VPX_IMG_FMT_ARGB, 8, 0 },
+    { VLC_CODEC_BGRA, VPX_IMG_FMT_ARGB_LE, 8, 0 },
+
+    { VLC_CODEC_GBR_PLANAR, VPX_IMG_FMT_I444, 8, 1 },
+    { VLC_CODEC_GBR_PLANAR_10L, VPX_IMG_FMT_I44416, 10, 1 },
+
+    { VLC_CODEC_I420_10L, VPX_IMG_FMT_I42016, 10, 0 },
+    { VLC_CODEC_I422_10L, VPX_IMG_FMT_I42216, 10, 0 },
+    { VLC_CODEC_I444_10L, VPX_IMG_FMT_I44416, 10, 0 },
+
+    { VLC_CODEC_I420_12L, VPX_IMG_FMT_I42016, 12, 0 },
+    { VLC_CODEC_I422_12L, VPX_IMG_FMT_I42216, 12, 0 },
+    { VLC_CODEC_I444_12L, VPX_IMG_FMT_I44416, 12, 0 },
+
+    { VLC_CODEC_I444_16L, VPX_IMG_FMT_I44416, 16, 0 },
+
+    { 0, 0, 0, 0 },
+};
+
+static vlc_fourcc_t FindVlcChroma( struct vpx_image *img, vpx_codec_caps_t codec_caps )
+{
+    uint8_t hack = (img->fmt & VPX_IMG_FMT_I444) && (img->cs == VPX_CS_SRGB);
+
+    if( img->bit_depth > 8 && !(codec_caps & VPX_CODEC_CAP_HIGHBITDEPTH) )
+        return 0;
+
+    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
+        if( chroma_table[i].i_chroma_id == img->fmt &&
+            chroma_table[i].i_bitdepth == img->bit_depth &&
+            chroma_table[i].i_needs_hack == hack )
+            return chroma_table[i].i_chroma;
+
+    return 0;
+}
 
 /****************************************************************************
  * Decode: the whole thing
@@ -151,7 +212,9 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
     mtime_t pts = *pkt_pts;
     free(pkt_pts);
 
-    if (img->fmt != VPX_IMG_FMT_I420) {
+    dec->fmt_out.i_codec = FindVlcChroma(img, dec->p_sys->codec_caps);
+
+    if( dec->fmt_out.i_codec == 0 ) {
         msg_Err(dec, "Unsupported output colorspace %d", img->fmt);
         return NULL;
     }
@@ -168,6 +231,8 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
         dec->fmt_out.video.i_sar_num = 1;
         dec->fmt_out.video.i_sar_den = 1;
     }
+
+    v->b_color_range_full = img->range == VPX_CR_FULL_RANGE;
 
     if (decoder_UpdateVideoFormat(dec))
         return NULL;
@@ -202,6 +267,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *dec = (decoder_t *)p_this;
     const struct vpx_codec_iface *iface;
+    vpx_codec_caps_t codec_caps = 0;
     int vp_version;
 
     switch (dec->fmt_in.i_codec)
@@ -214,6 +280,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 #endif
 #ifdef ENABLE_VP9_DECODER
     case VLC_CODEC_VP9:
+        codec_caps = vpx_codec_get_caps(vpx_codec_vp9_cx());
         iface = &vpx_codec_vp9_dx_algo;
         vp_version = 9;
         break;
@@ -240,12 +307,13 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_EGENERIC;;
     }
 
+    dec->p_sys->codec_caps = codec_caps;
+
     dec->pf_decode_video = Decode;
 
     dec->fmt_out.i_cat = VIDEO_ES;
     dec->fmt_out.video.i_width = dec->fmt_in.video.i_width;
     dec->fmt_out.video.i_height = dec->fmt_in.video.i_height;
-    dec->fmt_out.i_codec = VLC_CODEC_I420;
 
     return VLC_SUCCESS;
 }
