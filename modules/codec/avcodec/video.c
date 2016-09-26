@@ -135,6 +135,13 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
         if (GetVlcChroma(fmt, pix_fmt))
             return -1;
 
+        /* The libavcodec palette can only be fetched when the first output
+         * frame is decoded. Assume that the current chroma is RGB32 while we
+         * are waiting for a valid palette. Indeed, fmt_out.video.p_palette
+         * doesn't trigger a new vout request, but a new chroma yes. */
+        if (pix_fmt == AV_PIX_FMT_PAL8 && !dec->fmt_out.video.p_palette)
+            fmt->i_chroma = VLC_CODEC_RGB32;
+
         avcodec_align_dimensions2(ctx, &width, &height, aligns);
     }
     else /* hardware decoding */
@@ -900,6 +907,36 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         {
             av_frame_free(&frame);
             continue;
+        }
+
+        if( p_context->pix_fmt == AV_PIX_FMT_PAL8
+         && !p_dec->fmt_out.video.p_palette )
+        {
+            /* See AV_PIX_FMT_PAL8 comment in avc_GetVideoFormat(): update the
+             * fmt_out palette and change the fmt_out chroma to request a new
+             * vout */
+            assert( p_dec->fmt_out.video.i_chroma != VLC_CODEC_RGBP );
+
+            video_palette_t *p_palette;
+            p_palette = p_dec->fmt_out.video.p_palette
+                      = malloc( sizeof(video_palette_t) );
+            if( !p_palette )
+            {
+                p_dec->b_error = true;
+                av_frame_free(&frame);
+                break;
+            }
+            static_assert( sizeof(p_palette->palette) == AVPALETTE_SIZE,
+                           "Palette size mismatch between vlc and libavutil" );
+            assert( frame->data[1] != NULL );
+            memcpy( p_palette->palette, frame->data[1], AVPALETTE_SIZE );
+            p_palette->i_entries = AVPALETTE_COUNT;
+            p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBP;
+            if( decoder_UpdateVideoFormat( p_dec ) )
+            {
+                av_frame_free(&frame);
+                continue;
+            }
         }
 
         picture_t *p_pic = frame->opaque;
