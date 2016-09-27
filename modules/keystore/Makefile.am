@@ -19,10 +19,8 @@ libsecret_plugin_la_LIBADD = $(SECRET_LIBS)
 
 libkwallet_plugin_la_SOURCES = keystore/kwallet.c
 libkwallet_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
+libkwallet_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(keystoredir)'
 libkwallet_plugin_la_LIBADD = $(DBUS_LIBS) $(LIBM)
-if HAVE_DBUS
-keystore_LTLIBRARIES += libkwallet_plugin.la
-endif
 
 libkeychain_plugin_la_SOURCES = keystore/keychain.m
 libkeychain_plugin_la_OBJCFLAGS = $(AM_CFLAGS) -fobjc-arc
@@ -33,7 +31,9 @@ keystore_LTLIBRARIES += libkeychain_plugin.la
 endif
 
 keystore_LTLIBRARIES += \
-	$(LTLIBsecret)
+	$(LTLIBsecret) \
+	$(LTLIBkwallet)
 
 EXTRA_LTLIBRARIES += \
-	libsecret_plugin.la
+	libsecret_plugin.la \
+	libkwallet_plugin.la

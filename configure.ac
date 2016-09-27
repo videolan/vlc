@@ -3795,7 +3795,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 AM_CONDITIONAL(ENABLE_QT, [test "$enable_qt" != "no"])
 
 dnl
-dnl detect kde4-config patch (used for kde solids and kwallet).
+dnl detect kde4-config patch (used for kde solids).
 dnl
 AC_ARG_VAR([KDE4_CONFIG], [kde4-config utility])
 AS_IF([test "x$KDE4_CONFIG" = "x"], [
@@ -4103,6 +4103,11 @@ dnl
 dnl  libsecret
 dnl
 PKG_ENABLE_MODULES_VLC([SECRET], [], [libsecret-1 >= 0.18], [use libsecret for keystore], [auto])
+
+dnl
+dnl  kwallet
+dnl
+PKG_ENABLE_MODULES_VLC([KWALLET], [], [dbus-1 >= 1.6.0], [use kwallet for keystore], [auto])
 
 dnl
 dnl  Developers helper modules (should be hidden from configure help)
