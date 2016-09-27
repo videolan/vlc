@@ -28,6 +28,7 @@
 #include <vlc_plugin.h>
 #include <vlc_strings.h>
 #include <vlc_interrupt.h>
+#include <vlc_memstream.h>
 
 #include <dbus/dbus.h>
 
@@ -111,57 +112,54 @@ typedef struct vlc_keystore_sys
 static char*
 values2key( const char* const* ppsz_values, bool b_search )
 {
-    FILE* stream;
-    size_t size = 0;
     char* psz_b64_realm = NULL;
     char* psz_b64_auth = NULL;
-    char* psz_key = NULL;
     bool b_state = false;
 
     if ( ( !ppsz_values[KEY_PROTOCOL] || !ppsz_values[KEY_SERVER] )
          && !b_search )
         return NULL;
 
-    stream = open_memstream( &psz_key, &size );
-    if ( !stream )
+    struct vlc_memstream ms;
+    if ( vlc_memstream_open( &ms ) )
         return NULL;
 
     /* Protocol section */
     if ( ppsz_values[KEY_PROTOCOL] )
-        fprintf( stream, "%s://", ppsz_values[KEY_PROTOCOL] );
+        vlc_memstream_printf( &ms, "%s://", ppsz_values[KEY_PROTOCOL] );
     else if ( b_search )
-        fprintf( stream, "*://" );
+        vlc_memstream_printf( &ms, "*://" );
 
     /* User section */
     if ( ppsz_values[KEY_USER] )
-        fprintf( stream, "%s@", ppsz_values[KEY_USER] );
+        vlc_memstream_printf( &ms, "%s@", ppsz_values[KEY_USER] );
     else if ( b_search )
-        fprintf( stream, "*" );
+        vlc_memstream_printf( &ms, "*" );
 
     /* Server section */
     if ( ppsz_values[KEY_SERVER] )
-        fprintf( stream, "%s", ppsz_values[KEY_SERVER] );
+        vlc_memstream_printf( &ms, "%s", ppsz_values[KEY_SERVER] );
     else if ( b_search )
-        fprintf( stream, "*" );
+        vlc_memstream_printf( &ms, "*" );
 
     /* Port section */
     if ( ppsz_values[KEY_PORT] )
-        fprintf( stream, ":%s", ppsz_values[KEY_PORT] );
+        vlc_memstream_printf( &ms, ":%s", ppsz_values[KEY_PORT] );
     else if ( b_search )
-        fprintf( stream, "*" );
+        vlc_memstream_printf( &ms, "*" );
 
     /* Path section */
     if ( ppsz_values[KEY_PATH] && ppsz_values[KEY_PATH][0] == '/')
-        fprintf( stream, "%s", ppsz_values[KEY_PATH] );
+        vlc_memstream_printf( &ms, "%s", ppsz_values[KEY_PATH] );
     else if ( ppsz_values[KEY_PATH] && ppsz_values[KEY_PATH][0] != '/' )
-        fprintf( stream, "/%s", ppsz_values[KEY_PATH] );
+        vlc_memstream_printf( &ms, "/%s", ppsz_values[KEY_PATH] );
     else if ( b_search )
-        fprintf( stream, "*" );
+        vlc_memstream_printf( &ms, "*" );
 
     /* Realm and authtype section */
     if ( ppsz_values[KEY_REALM] || ppsz_values[KEY_AUTHTYPE] || b_search )
     {
-        fprintf( stream, "?" );
+        vlc_memstream_printf( &ms, "?" );
 
         /* Realm section */
         if ( ppsz_values[KEY_REALM] || b_search )
@@ -172,13 +170,13 @@ values2key( const char* const* ppsz_values, bool b_search )
                                                        strlen(ppsz_values[KEY_REALM] ) );
                 if ( !psz_b64_realm )
                     goto end;
-                fprintf( stream, "realm=%s", psz_b64_realm );
+                vlc_memstream_printf( &ms, "realm=%s", psz_b64_realm );
             }
             else
-                fprintf( stream, "*" );
+                vlc_memstream_printf( &ms, "*" );
 
             if ( ppsz_values[KEY_AUTHTYPE] )
-                fprintf( stream, "&" );
+                vlc_memstream_printf( &ms, "&" );
         }
 
         /* Authtype section */
@@ -191,10 +189,10 @@ values2key( const char* const* ppsz_values, bool b_search )
                                                       strlen(ppsz_values[KEY_AUTHTYPE] ) );
                 if ( !psz_b64_auth )
                     goto end;
-                fprintf( stream, "authtype=%s", psz_b64_auth );
+                vlc_memstream_printf( &ms, "authtype=%s", psz_b64_auth );
             }
             else
-                fprintf( stream, "*" );
+                vlc_memstream_printf( &ms, "*" );
         }
 
     }
@@ -202,15 +200,16 @@ values2key( const char* const* ppsz_values, bool b_search )
     b_state = true;
 
 end:
+    free( psz_b64_realm );
+    free( psz_b64_auth );
+    if ( vlc_memstream_flush( &ms ) != 0 )
+        b_state = false;
+    char *psz_key = vlc_memstream_close( &ms ) == 0 ? ms.ptr : NULL;
     if ( !b_state )
     {
         free( psz_key );
         psz_key = NULL;
     }
-    fflush( stream );
-    fclose( stream );
-    free( psz_b64_realm );
-    free( psz_b64_auth );
     return psz_key;
 }
 
