@@ -30,6 +30,8 @@
 
 #include <vlc_threads.h>
 #include <vlc_fs.h>
+#include <vlc_input_item.h>
+#include <vlc_events.h>
 
 static void media_parse_ended(const libvlc_event_t *event, void *user_data)
 {
@@ -123,6 +125,54 @@ static void test_media_preparsed(libvlc_instance_t *vlc, const char *path,
         print_media(media);
 
     libvlc_media_release (media);
+}
+
+static void input_item_preparse_timeout( const vlc_event_t *p_event,
+                                         void *user_data )
+{
+    vlc_sem_t *p_sem = user_data;
+
+    assert( p_event->u.input_item_preparse_ended.new_status == ITEM_PREPARSE_TIMEOUT );
+    vlc_sem_post(p_sem);
+}
+
+static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
+                                        int wait_and_cancel)
+{
+    log ("test_input_metadata_timeout: timeout: %d, wait_and_cancel: %d\n",
+         timeout, wait_and_cancel);
+
+    int i_ret, p_pipe[2];
+    i_ret = vlc_pipe(p_pipe);
+    assert(i_ret == 0 && p_pipe[1] >= 0);
+
+    char psz_fd_uri[strlen("fd://") + 11];
+    sprintf(psz_fd_uri, "fd://%u", (unsigned) p_pipe[1]);
+    input_item_t *p_item = input_item_NewFile(psz_fd_uri, "test timeout", 0,
+                                              ITEM_LOCAL);
+    assert(p_item != NULL);
+
+    vlc_sem_t sem;
+    vlc_sem_init (&sem, 0);
+    i_ret = vlc_event_attach(&p_item->event_manager, vlc_InputItemPreparseEnded,
+                             input_item_preparse_timeout, &sem);
+    assert(i_ret == 0);
+    i_ret = libvlc_MetadataRequest(vlc->p_libvlc_int, p_item,
+                                   META_REQUEST_OPTION_SCOPE_LOCAL, timeout, vlc);
+    assert(i_ret == 0);
+
+    if (wait_and_cancel > 0)
+    {
+        msleep(wait_and_cancel * 1000);
+        libvlc_MetadataCancel(vlc->p_libvlc_int, vlc);
+
+    }
+    vlc_sem_wait(&sem);
+
+    input_item_Release(p_item);
+    vlc_sem_destroy(&sem);
+    vlc_close(p_pipe[0]);
+    vlc_close(p_pipe[1]);
 }
 
 #define TEST_SUBITEMS_COUNT 6
@@ -315,6 +365,14 @@ int main(int i_argc, char *ppsz_argv[])
                           libvlc_media_parse_local,
                           libvlc_media_parsed_status_skipped);
     test_media_subitems (vlc);
+
+    /* Testing libvlc_MetadataRequest timeout and libvlc_MetadataCancel. For
+     * that, we need to create a local input_item_t based on a pipe. There is
+     * no way to do that with a libvlc_media_t, that's why we don't use
+     * libvlc_media_parse*() */
+
+    test_input_metadata_timeout (vlc, 100, 0);
+    test_input_metadata_timeout (vlc, 0, 100);
 
     libvlc_release (vlc);
 
