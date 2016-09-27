@@ -87,17 +87,13 @@ static void print_media(libvlc_media_t *media)
     }
 }
 
-static void test_media_preparsed(int argc, const char** argv,
-                                 const char *path,
+static void test_media_preparsed(libvlc_instance_t *vlc, const char *path,
                                  const char *location,
                                  libvlc_media_parse_flag_t parse_flags,
                                  libvlc_media_parsed_status_t i_expected_status)
 {
     log ("test_media_preparsed: %s, expected: %d\n", path ? path : location,
          i_expected_status);
-
-    libvlc_instance_t *vlc = libvlc_new (argc, argv);
-    assert (vlc != NULL);
 
     libvlc_media_t *media;
     if (path != NULL)
@@ -127,7 +123,6 @@ static void test_media_preparsed(int argc, const char** argv,
         print_media(media);
 
     libvlc_media_release (media);
-    libvlc_release (vlc);
 }
 
 #define TEST_SUBITEMS_COUNT 6
@@ -230,12 +225,10 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play,
     }
 }
 
-static void test_media_subitems(int argc, const char** argv)
+static void test_media_subitems(libvlc_instance_t *vlc)
 {
     const char *subitems_path = SRCDIR"/samples/subitems";
 
-    libvlc_instance_t *vlc = libvlc_new (argc, argv);
-    assert (vlc != NULL);
     libvlc_media_t *media;
 
     log ("Testing media_subitems: path: '%s'\n", subitems_path);
@@ -280,13 +273,15 @@ static void test_media_subitems(int argc, const char** argv)
     assert (media != NULL);
     test_media_subitems_media (media, false, false);
     libvlc_media_release (media);
-
-    libvlc_release (vlc);
 }
 
 int main(int i_argc, char *ppsz_argv[])
 {
     test_init();
+
+    libvlc_instance_t *vlc = libvlc_new (test_defaults_nargs,
+                                         test_defaults_args);
+    assert (vlc != NULL);
 
     char *psz_test_arg = i_argc > 1 ? ppsz_argv[1] : NULL;
     if (psz_test_arg != NULL)
@@ -304,25 +299,24 @@ int main(int i_argc, char *ppsz_argv[])
             psz_test_url = NULL;
             psz_test_path = psz_test_arg;
         }
-        test_media_preparsed (test_defaults_nargs, test_defaults_args, psz_test_path,
-                              psz_test_url, libvlc_media_parse_network,
+        test_media_preparsed (vlc, psz_test_path, psz_test_url,
+                              libvlc_media_parse_network,
                               libvlc_media_parsed_status_done);
         return 0;
     }
 
-    test_media_preparsed (test_defaults_nargs, test_defaults_args,
-                          SRCDIR"/samples/image.jpg", NULL,
+    test_media_preparsed (vlc, SRCDIR"/samples/image.jpg", NULL,
                           libvlc_media_parse_local,
                           libvlc_media_parsed_status_done);
-    test_media_preparsed (test_defaults_nargs, test_defaults_args,
-                          NULL, "http://parsing_should_be_skipped.org/video.mp4",
+    test_media_preparsed (vlc, NULL, "http://parsing_should_be_skipped.org/video.mp4",
                           libvlc_media_parse_local,
                           libvlc_media_parsed_status_skipped);
-    test_media_preparsed (test_defaults_nargs, test_defaults_args,
-                          NULL, "unknown://parsing_should_be_skipped.org/video.mp4",
+    test_media_preparsed (vlc, NULL, "unknown://parsing_should_be_skipped.org/video.mp4",
                           libvlc_media_parse_local,
                           libvlc_media_parsed_status_skipped);
-    test_media_subitems (test_defaults_nargs, test_defaults_args);
+    test_media_subitems (vlc);
+
+    libvlc_release (vlc);
 
     return 0;
 }
