@@ -142,8 +142,6 @@ static const struct
     { VLC_CODEC_I444_12L, VPX_IMG_FMT_I44416, 12, 0 },
 
     { VLC_CODEC_I444_16L, VPX_IMG_FMT_I44416, 16, 0 },
-
-    { 0, 0, 0, 0 },
 };
 
 static vlc_fourcc_t FindVlcChroma( struct vpx_image *img, vpx_codec_caps_t codec_caps )
@@ -153,7 +151,7 @@ static vlc_fourcc_t FindVlcChroma( struct vpx_image *img, vpx_codec_caps_t codec
     if( img->bit_depth > 8 && !(codec_caps & VPX_CODEC_CAP_HIGHBITDEPTH) )
         return 0;
 
-    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
+    for( unsigned int i = 0; i < ARRAY_SIZE(chroma_table); i++ )
         if( chroma_table[i].i_chroma_id == img->fmt &&
             chroma_table[i].i_bitdepth == img->bit_depth &&
             chroma_table[i].i_needs_hack == hack )
