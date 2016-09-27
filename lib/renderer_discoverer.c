@@ -204,7 +204,7 @@ libvlc_renderer_discoverer_list_release( libvlc_rd_description_t **pp_services,
     }
 }
 
-ssize_t
+size_t
 libvlc_renderer_discoverer_list_get( libvlc_instance_t *p_inst,
                                      libvlc_rd_description_t ***ppp_services )
 {
@@ -218,7 +218,7 @@ libvlc_renderer_discoverer_list_get( libvlc_instance_t *p_inst,
     if( i_ret != VLC_SUCCESS )
     {
         *ppp_services = NULL;
-        return -1;
+        return 0;
     }
 
     /* Count the number of sd matching our category (i_cat/i_core_cat) */
@@ -247,7 +247,7 @@ libvlc_renderer_discoverer_list_get( libvlc_instance_t *p_inst,
             free( p_services );
             pp_services = NULL;
             p_services = NULL;
-            i_nb_services = -1;
+            i_nb_services = 0;
             /* Even if alloc fails, the next loop must be run in order to free
              * names returned by vlc_sd_GetNames */
         }

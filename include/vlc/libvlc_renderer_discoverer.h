@@ -202,9 +202,9 @@ libvlc_renderer_discoverer_event_manager( libvlc_renderer_discoverer_t *p_rd );
  * discoverer services (must be freed with libvlc_renderer_list_release() by
  * the caller) [OUT]
  *
- * \return the number of media discoverer services or -1 on error
+ * \return the number of media discoverer services (0 on error)
  */
-LIBVLC_API ssize_t
+LIBVLC_API size_t
 libvlc_renderer_discoverer_list_get( libvlc_instance_t *p_inst,
                                      libvlc_rd_description_t ***ppp_services );
 
