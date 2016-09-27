@@ -288,9 +288,6 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
     es_format_Clean( &filter->fmt_out );
     es_format_Clean( &filter->fmt_in );
 
-    if( filter->p_cfg )
-        config_ChainDestroy( filter->p_cfg );
-
     vlc_object_release( filter );
     /* FIXME: check fmt_in/fmt_out consitency */
 }
@@ -315,11 +312,13 @@ int filter_chain_AppendFromString( filter_chain_t *chain, const char *str )
 
         filter_t *filter = filter_chain_AppendFilter( chain, name, cfg,
                                                       NULL, NULL );
+        if( cfg )
+            config_ChainDestroy( cfg );
+
         if( filter == NULL )
         {
             msg_Err( obj, "Failed to append '%s' to chain", name );
             free( name );
-            free( cfg );
             goto error;
         }
 
