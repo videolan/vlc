@@ -49,10 +49,7 @@ endif
 FLAC_CFLAGS := $(CFLAGS)
 ifdef HAVE_WIN32
 FLAC_CFLAGS += -mstackrealign
-endif
-
-ifdef HAVE_WIN32
-	FLAC_CFLAGS="-DFLAC__NO_DLL"
+FLAC_CFLAGS +="-DFLAC__NO_DLL"
 endif
 
 DEPS_flac = ogg $(DEPS_ogg)
