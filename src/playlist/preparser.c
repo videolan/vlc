@@ -54,7 +54,6 @@ struct playlist_preparser_t
 
     void                *input_id;
     enum {
-        INPUT_INIT,
         INPUT_RUNNING,
         INPUT_STOPPED,
         INPUT_CANCELED,
@@ -80,7 +79,7 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
         return NULL;
 
     p_preparser->input_id = NULL;
-    p_preparser->input_state = INPUT_INIT;
+    p_preparser->input_state = INPUT_RUNNING;
     p_preparser->object = parent;
     p_preparser->default_timeout = var_InheritInteger( parent, "preparse-timeout" );
     p_preparser->p_fetcher = playlist_fetcher_New( parent );
@@ -201,11 +200,8 @@ static int InputEvent( vlc_object_t *obj, const char *varname,
     {
         vlc_mutex_lock( &preparser->lock );
 
-        if( preparser->input_state != INPUT_INIT )
-        {
-            preparser->input_state = INPUT_STOPPED;
-            vlc_cond_signal( &preparser->thread_wait );
-        }
+        preparser->input_state = INPUT_STOPPED;
+        vlc_cond_signal( &preparser->thread_wait );
 
         vlc_mutex_unlock( &preparser->lock );
     }
@@ -254,9 +250,6 @@ static void Preparse( playlist_preparser_t *preparser,
         {
             vlc_mutex_lock( &preparser->lock );
 
-            preparser->input_state = INPUT_RUNNING;
-            preparser->input_id = p_entry->id;
-
             if( p_entry->timeout > 0 )
             {
                 mtime_t deadline = mdate() + p_entry->timeout;
@@ -276,8 +269,6 @@ static void Preparse( playlist_preparser_t *preparser,
                  || preparser->input_state == INPUT_CANCELED );
             status = preparser->input_state == INPUT_STOPPED ?
                      ITEM_PREPARSE_DONE : ITEM_PREPARSE_TIMEOUT;
-            preparser->input_state = INPUT_INIT;
-            preparser->input_id = NULL;
 
             vlc_mutex_unlock( &preparser->lock );
         }
@@ -351,14 +342,17 @@ static void *Thread( void *data )
 
         vlc_mutex_lock( &p_preparser->lock );
         /* */
+        p_preparser->input_state = INPUT_RUNNING;
         if( p_preparser->i_waiting > 0 )
         {
             p_entry = p_preparser->pp_waiting[0];
+            p_preparser->input_id = p_entry->id;
             REMOVE_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting, 0 );
         }
         else
         {
             p_preparser->b_live = false;
+            p_preparser->input_id = NULL;
             vlc_cond_signal( &p_preparser->wait );
             vlc_mutex_unlock( &p_preparser->lock );
             break;
