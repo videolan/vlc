@@ -86,7 +86,7 @@ parts:
       - libogg-dev
       - libomxil-bellagio-dev
       - libopus-dev
-      - libpng12-dev
+      - libpng-dev
       - libpostproc-dev
       - libpulse-dev
       - libqt5x11extras5-dev
