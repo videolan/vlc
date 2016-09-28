@@ -2933,7 +2933,9 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
             break;
 
         case( ATOM_hint ):
-            if( !MP4_BoxGet( p_box_trak, "mdia/minf/hmhd" ) )
+            /* RTP Reception Hint tracks */
+            if( !MP4_BoxGet( p_box_trak, "mdia/minf/hmhd" ) ||
+                !MP4_BoxGet( p_box_trak, "mdia/minf/stbl/stsd/rrtp" ) )
             {
                 break;
             }
