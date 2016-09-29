@@ -174,6 +174,7 @@ static int OpenDecoder( vlc_object_t *p_this )
             break;
         case VLC_CODEC_ADPCM_IMA_WAV: /* IMA ADPCM */
             p_sys->codec = ADPCM_IMA_WAV;
+            i_max_channels = 2;
             break;
         case VLC_CODEC_ADPCM_MS: /* MS ADPCM */
             p_sys->codec = ADPCM_MS;
