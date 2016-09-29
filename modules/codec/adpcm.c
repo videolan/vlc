@@ -151,14 +151,6 @@ static int OpenDecoder( vlc_object_t *p_this )
             return VLC_EGENERIC;
     }
 
-    if( p_dec->fmt_in.audio.i_channels <= 0 ||
-        p_dec->fmt_in.audio.i_channels > 5 )
-    {
-        msg_Err( p_dec, "invalid number of channel (not between 1 and 5): %i",
-                 p_dec->fmt_in.audio.i_channels );
-        return VLC_EGENERIC;
-    }
-
     if( p_dec->fmt_in.audio.i_rate <= 0 )
     {
         msg_Err( p_dec, "bad samplerate" );
@@ -172,7 +164,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_sys->prev = NULL;
 
-    uint8_t i_max_channels = 32;
+    uint8_t i_max_channels = 5;
     switch( p_dec->fmt_in.i_codec )
     {
         case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
@@ -188,9 +180,11 @@ static int OpenDecoder( vlc_object_t *p_this )
             break;
         case VLC_CODEC_ADPCM_DK4: /* Duck DK4 ADPCM */
             p_sys->codec = ADPCM_DK4;
+            i_max_channels = 2;
             break;
         case VLC_CODEC_ADPCM_DK3: /* Duck DK3 ADPCM */
             p_sys->codec = ADPCM_DK3;
+            i_max_channels = 2;
             break;
         case VLC_FOURCC('X','A','J', 0): /* EA ADPCM */
             p_sys->codec = ADPCM_EA;
