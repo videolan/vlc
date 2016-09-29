@@ -438,9 +438,10 @@ static void DecodeAdpcmMs( decoder_t *p_dec, int16_t *p_sample,
 {
     decoder_sys_t *p_sys  = p_dec->p_sys;
     adpcm_ms_channel_t channel[2];
-    int i_nibbles;
     int b_stereo;
     int i_block_predictor;
+
+    size_t i_total_samples = p_sys->i_samplesperblock;
 
     b_stereo = p_dec->fmt_in.audio.i_channels == 2 ? 1 : 0;
 
@@ -487,8 +488,7 @@ static void DecodeAdpcmMs( decoder_t *p_dec, int16_t *p_sample,
         *p_sample++ = channel[0].i_sample1;
     }
 
-    for( i_nibbles = 2 * (p_sys->i_block - 7 * p_dec->fmt_in.audio.i_channels);
-         i_nibbles > 0; i_nibbles -= 2, p_buffer++ )
+    for( i_total_samples -= 2; i_total_samples >= 2; i_total_samples -= 2, p_buffer++ )
     {
         *p_sample++ = AdpcmMsExpandNibble( &channel[0], (*p_buffer) >> 4);
         *p_sample++ = AdpcmMsExpandNibble( &channel[b_stereo ? 1 : 0],
