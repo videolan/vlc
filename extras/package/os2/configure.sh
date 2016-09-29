@@ -13,7 +13,6 @@ OPTIONS="
       --enable-realrtsp
       --enable-dvbpsi
       --enable-ogg
-      --enable-mkv
       --enable-mad
       --enable-merge-ffmpeg
       --enable-avcodec
