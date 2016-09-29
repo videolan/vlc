@@ -473,6 +473,11 @@ struct addrinfo
 };
 
 void freeaddrinfo (struct addrinfo *res);
+
+# include <errno.h>
+# ifndef EPROTO
+#  define EPROTO (ELAST + 1)
+# endif
 #endif
 
 /* math.h */
