@@ -172,22 +172,19 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_sys->prev = NULL;
 
+    uint8_t i_max_channels = 32;
     switch( p_dec->fmt_in.i_codec )
     {
         case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
-            if (p_dec->fmt_in.audio.i_channels > 2) {
-                free(p_sys);
-                msg_Err(p_dec, "Invalid number of channels %i",
-                        p_dec->fmt_in.audio.i_channels );
-                return VLC_EGENERIC;
-            }
             p_sys->codec = ADPCM_IMA_QT;
+            i_max_channels = 2;
             break;
         case VLC_CODEC_ADPCM_IMA_WAV: /* IMA ADPCM */
             p_sys->codec = ADPCM_IMA_WAV;
             break;
         case VLC_CODEC_ADPCM_MS: /* MS ADPCM */
             p_sys->codec = ADPCM_MS;
+            i_max_channels = 2;
             break;
         case VLC_CODEC_ADPCM_DK4: /* Duck DK4 ADPCM */
             p_sys->codec = ADPCM_DK4;
@@ -205,6 +202,15 @@ static int OpenDecoder( vlc_object_t *p_this )
                 return VLC_ENOMEM;
             }
             break;
+    }
+
+    if (p_dec->fmt_in.audio.i_channels > i_max_channels ||
+        p_dec->fmt_in.audio.i_channels == 0)
+    {
+        free(p_sys->prev);
+        free(p_sys);
+        msg_Err( p_dec, "Invalid number of channels %i", p_dec->fmt_in.audio.i_channels );
+        return VLC_EGENERIC;
     }
 
     if( p_dec->fmt_in.audio.i_blockalign <= 0 )
