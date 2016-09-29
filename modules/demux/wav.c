@@ -271,11 +271,24 @@ static int Open( vlc_object_t * p_this )
             }
         }
     }
-    else if( GetWLE( &p_wf->wFormatTag ) == WAVE_FORMAT_PCM &&
-             p_sys->fmt.audio.i_channels > 2 && p_sys->fmt.audio.i_channels <= AOUT_CHAN_MAX )
+    if( p_sys->i_channel_mask == 0 && p_sys->fmt.audio.i_channels > 2 )
     {
-        for( int i = 0; i < p_sys->fmt.audio.i_channels; i++ )
-            p_sys->i_channel_mask |= pi_channels_aout[i];
+        /* A dwChannelMask of 0 tells the audio device to render the first
+         * channel to the first port on the device, the second channel to the
+         * second port on the device, and so on. pi_default_channels is
+         * different than pi_channels_aout. Indeed FLC/FRC must be treated a
+         * SL/SR in that case. See "Default Channel Ordering" and "Details
+         * about dwChannelMask" from msdn */
+
+        static const uint32_t pi_default_channels[] = {
+            AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+            AOUT_CHAN_LFE, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+            AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, AOUT_CHAN_REARCENTER };
+
+        for( unsigned i = 0; i < p_sys->fmt.audio.i_channels &&
+             i < (sizeof(pi_default_channels) / sizeof(*pi_default_channels));
+             i++ )
+            p_sys->i_channel_mask |= pi_default_channels[i];
     }
 
     if( p_sys->i_channel_mask )
