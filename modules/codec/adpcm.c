@@ -464,6 +464,8 @@ static void DecodeAdpcmMs( decoder_t *p_dec, int16_t *p_sample,
     int i_block_predictor;
 
     size_t i_total_samples = p_sys->i_samplesperblock;
+    if(i_total_samples < 2)
+        return;
 
     b_stereo = p_dec->fmt_in.audio.i_channels == 2 ? 1 : 0;
 
