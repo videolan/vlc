@@ -296,7 +296,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 #endif
 #ifdef ENABLE_VP9_DECODER
     case VLC_CODEC_VP9:
-        codec_caps = vpx_codec_get_caps(vpx_codec_vp9_cx());
+        codec_caps = vpx_codec_get_caps(vpx_codec_vp9_dx());
         iface = &vpx_codec_vp9_dx_algo;
         vp_version = 9;
         break;
