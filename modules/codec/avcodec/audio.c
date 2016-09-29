@@ -500,34 +500,28 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         p_sys->i_previous_layout = p_sys->p_context->channel_layout;
     }
 
-    /* Specified order
-     * FIXME should we use fmt_in.audio.i_physical_channels or not ?
-     */
-    const unsigned i_order_max = 8 * sizeof(p_sys->p_context->channel_layout);
+    const unsigned i_order_max = sizeof(pi_channels_map)/sizeof(*pi_channels_map);
     uint32_t pi_order_src[i_order_max];
-    int i_channels_src = 0;
 
-    if( p_sys->p_context->channel_layout )
+    int i_channels_src = 0;
+    int64_t channel_layout =
+        p_sys->p_context->channel_layout ? p_sys->p_context->channel_layout :
+        av_get_default_channel_layout( p_sys->p_context->channels );
+
+    if( channel_layout )
     {
-        for( unsigned i = 0; i < sizeof(pi_channels_map)/sizeof(*pi_channels_map); i++ )
+        for( unsigned i = 0; i < i_order_max
+         && i_channels_src < p_sys->p_context->channels; i++ )
         {
-            if( p_sys->p_context->channel_layout & pi_channels_map[i][0] )
+            if( channel_layout & pi_channels_map[i][0] )
                 pi_order_src[i_channels_src++] = pi_channels_map[i][1];
         }
+
+        if( i_channels_src != p_sys->p_context->channels && b_trust )
+            msg_Err( p_dec, "Channel layout not understood" );
     }
     else
-    {
-        /* Create default order  */
-        if( b_trust )
-            msg_Warn( p_dec, "Physical channel configuration not set : guessing" );
-        for( unsigned int i = 0; i < __MIN( i_order_max, (unsigned)p_sys->p_context->channels ); i++ )
-        {
-            if( i < sizeof(pi_channels_map)/sizeof(*pi_channels_map) )
-                pi_order_src[i_channels_src++] = pi_channels_map[i][1];
-        }
-    }
-    if( i_channels_src != p_sys->p_context->channels && b_trust )
-        msg_Err( p_dec, "Channel layout not understood" );
+        msg_Warn( p_dec, "no channel layout found");
 
     uint32_t i_layout_dst;
     int      i_channels_dst;
