@@ -18,6 +18,7 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
 	$(APPLY) $(SRC)/vpx/libvpx-ios.patch
 	$(APPLY) $(SRC)/vpx/libvpx-arm.patch
+	$(APPLY) $(SRC)/vpx/libvpx-noencoder.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/vpx/libvpx-android.patch
 endif
