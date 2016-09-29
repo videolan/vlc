@@ -385,9 +385,6 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 
     *pi_pcr = nz_deadline;
 
-    if (isDisabled())
-        return AbstractStream::status_eof;
-
     if(commandsqueue->isFlushing())
     {
         *pi_pcr = commandsqueue->Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
@@ -401,7 +398,7 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
         }
     }
 
-    if(commandsqueue->isEOF())
+    if(isDisabled() || commandsqueue->isEOF())
     {
         *pi_pcr = nz_deadline;
         return AbstractStream::status_eof;
