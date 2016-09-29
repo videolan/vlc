@@ -163,6 +163,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->prev = NULL;
+    p_sys->i_samplesperblock = 0;
 
     uint8_t i_max_channels = 5;
     switch( p_dec->fmt_in.i_codec )
@@ -225,28 +226,41 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_sys->i_samplesperblock = 64;
         break;
     case ADPCM_IMA_WAV:
-        p_sys->i_samplesperblock =
-            2 * ( p_sys->i_block - 4 * p_dec->fmt_in.audio.i_channels ) /
-            p_dec->fmt_in.audio.i_channels;
+        if( p_sys->i_block >= 4 * p_dec->fmt_in.audio.i_channels )
+        {
+            p_sys->i_samplesperblock =
+                2 * ( p_sys->i_block - 4 * p_dec->fmt_in.audio.i_channels ) /
+                p_dec->fmt_in.audio.i_channels;
+        }
         break;
     case ADPCM_MS:
-        p_sys->i_samplesperblock =
-            2 * (p_sys->i_block - 7 * p_dec->fmt_in.audio.i_channels) /
-            p_dec->fmt_in.audio.i_channels + 2;
+        if( p_sys->i_block >= 7 * p_dec->fmt_in.audio.i_channels )
+        {
+            p_sys->i_samplesperblock =
+                2 * (p_sys->i_block - 7 * p_dec->fmt_in.audio.i_channels) /
+                p_dec->fmt_in.audio.i_channels + 2;
+        }
         break;
     case ADPCM_DK4:
-        p_sys->i_samplesperblock =
-            2 * (p_sys->i_block - 4 * p_dec->fmt_in.audio.i_channels) /
-            p_dec->fmt_in.audio.i_channels + 1;
+        if( p_sys->i_block >= 4 * p_dec->fmt_in.audio.i_channels )
+        {
+            p_sys->i_samplesperblock =
+                2 * (p_sys->i_block - 4 * p_dec->fmt_in.audio.i_channels) /
+                p_dec->fmt_in.audio.i_channels + 1;
+        }
         break;
     case ADPCM_DK3:
         p_dec->fmt_in.audio.i_channels = 2;
-        p_sys->i_samplesperblock = ( 4 * ( p_sys->i_block - 16 ) + 2 )/ 3;
+        if( p_sys->i_block >= 16 )
+            p_sys->i_samplesperblock = ( 4 * ( p_sys->i_block - 16 ) + 2 )/ 3;
         break;
     case ADPCM_EA:
-        p_sys->i_samplesperblock =
-            2 * (p_sys->i_block - p_dec->fmt_in.audio.i_channels) /
-            p_dec->fmt_in.audio.i_channels;
+        if( p_sys->i_block >= p_dec->fmt_in.audio.i_channels )
+        {
+            p_sys->i_samplesperblock =
+                2 * (p_sys->i_block - p_dec->fmt_in.audio.i_channels) /
+                p_dec->fmt_in.audio.i_channels;
+        }
     }
 
     msg_Dbg( p_dec, "format: samplerate:%d Hz channels:%d bits/sample:%d "
@@ -254,6 +268,14 @@ static int OpenDecoder( vlc_object_t *p_this )
              p_dec->fmt_in.audio.i_rate, p_dec->fmt_in.audio.i_channels,
              p_dec->fmt_in.audio.i_bitspersample, p_sys->i_block,
              p_sys->i_samplesperblock );
+
+    if (p_sys->i_samplesperblock == 0)
+    {
+        free(p_sys->prev);
+        free(p_sys);
+        msg_Err( p_dec, "Error computing number of samples per block");
+        return VLC_EGENERIC;
+    }
 
     p_dec->p_sys = p_sys;
     p_dec->fmt_out.i_cat = AUDIO_ES;
