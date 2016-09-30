@@ -46,6 +46,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     disabled = false;
     discontinuity = false;
     needrestart = false;
+    inrestart = false;
     segmentTracker = NULL;
     demuxersource = NULL;
     commandsqueue = NULL;
@@ -221,22 +222,28 @@ bool AbstractStream::startDemux()
 
 bool AbstractStream::restartDemux()
 {
+    bool b_ret = true;
     if(!demuxer)
     {
-        return startDemux();
+        b_ret = startDemux();
     }
     else if(demuxer->needsRestartOnSeek())
     {
+        inrestart = true;
         /* Push all ES as recycling candidates */
         fakeesout->recycleAll();
         /* Restart with ignoring es_Del pushes to queue when terminating demux */
         commandsqueue->setDrop(true);
         demuxer->destroy();
         commandsqueue->setDrop(false);
-        return demuxer->create();
+        b_ret = demuxer->create();
+        inrestart = false;
     }
-    commandsqueue->Commit();
-    return true;
+    else
+    {
+        commandsqueue->Commit();
+    }
+    return b_ret;
 }
 
 void AbstractStream::setDisabled(bool b)
@@ -545,7 +552,7 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
             break;
 
         case SegmentTrackerEvent::SWITCHING:
-            if(demuxer && demuxer->needsRestartOnSwitch())
+            if(demuxer && demuxer->needsRestartOnSwitch() && !inrestart)
             {
                 needrestart = true;
             }
