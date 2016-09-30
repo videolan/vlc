@@ -1282,8 +1282,8 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
     p_sys->frame->format     = p_sys->p_context->sample_fmt;
     p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
 
-
-    p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
+    p_sys->frame->pts        = date_Get( &p_sys->buffer_date ) * p_sys->p_context->time_base.den /
+                                CLOCK_FREQ / p_sys->p_context->time_base.num;
 
     if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
         date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
@@ -1407,7 +1407,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         else
             p_sys->frame->nb_samples = p_sys->i_frame_size;
         p_sys->frame->format     = p_sys->p_context->sample_fmt;
-        p_sys->frame->pts        = date_Get( &p_sys->buffer_date );
+        p_sys->frame->pts        = date_Get( &p_sys->buffer_date ) * p_sys->p_context->time_base.den /
+                                    CLOCK_FREQ / p_sys->p_context->time_base.num;
 
         const int in_bytes = p_sys->frame->nb_samples *
             p_sys->p_context->channels * p_sys->i_sample_bytes;
