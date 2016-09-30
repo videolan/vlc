@@ -102,7 +102,11 @@ BaseRepresentation *PredictiveAdaptationLogic::getNextRepresentation(BaseAdaptat
         else
         {
             const unsigned i_available_bw = getAvailableBw(i_max_bitrate, prevRep);
-            if(f_buffering_level > 0.8)
+            if(!prevRep)
+            {
+                rep = selector.select(adaptSet, i_available_bw);
+            }
+            else if(f_buffering_level > 0.8)
             {
                 rep = selector.select(adaptSet, std::max((uint64_t) i_available_bw,
                                                          (uint64_t) prevRep->getBandwidth()));
