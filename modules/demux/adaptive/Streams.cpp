@@ -229,8 +229,11 @@ bool AbstractStream::restartDemux()
     {
         /* Push all ES as recycling candidates */
         fakeesout->recycleAll();
-        /* Restart with ignoring pushes to queue */
-        return demuxer->restart(commandsqueue);
+        /* Restart with ignoring es_Del pushes to queue when terminating demux */
+        commandsqueue->setDrop(true);
+        demuxer->destroy();
+        commandsqueue->setDrop(false);
+        return demuxer->create();
     }
     commandsqueue->Commit();
     return true;

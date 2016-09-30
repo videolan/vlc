@@ -25,7 +25,6 @@
 
 namespace adaptive
 {
-    class CommandsQueue;
     class AbstractSourceStream;
 
     class AbstractDemuxer
@@ -36,7 +35,7 @@ namespace adaptive
             virtual int demux(mtime_t) = 0;
             virtual void drain() = 0;
             virtual bool create() = 0;
-            virtual bool restart(CommandsQueue *) = 0;
+            virtual void destroy() = 0;
             bool alwaysStartsFromZero() const;
             bool needsRestartOnSeek() const;
             bool needsRestartOnSwitch() const;
@@ -56,7 +55,7 @@ namespace adaptive
             virtual int demux(mtime_t); /* impl */
             virtual void drain(); /* impl */
             virtual bool create(); /* impl */
-            virtual bool restart(CommandsQueue *); /* impl */
+            virtual void destroy(); /* impl */
 
         protected:
             AbstractSourceStream *sourcestream;

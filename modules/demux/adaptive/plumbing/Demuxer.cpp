@@ -103,17 +103,14 @@ bool Demuxer::create()
     return true;
 }
 
-bool Demuxer::restart(CommandsQueue *queue)
+void Demuxer::destroy()
 {
     if(p_demux)
     {
-        queue->setDrop(true);
         demux_Delete(p_demux);
         p_demux = NULL;
-        queue->setDrop(false);
     }
     sourcestream->Reset();
-    return create();
 }
 
 void Demuxer::drain()
