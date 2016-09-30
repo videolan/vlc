@@ -315,6 +315,10 @@ static int Open( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
+    if( p_filter->fmt_in.audio.i_frame_length == 0
+     || p_filter->fmt_in.audio.i_bytes_per_frame == 0 )
+        return VLC_EGENERIC;
+
     if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_DTS &&
           p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 &&
           p_filter->fmt_in.audio.i_format != VLC_CODEC_EAC3 ) ||
