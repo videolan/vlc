@@ -1157,7 +1157,6 @@ static block_t *encode_avframe( encoder_t *p_enc, encoder_sys_t *p_sys, AVFrame 
     AVPacket av_pkt;
     av_pkt.data = NULL;
     av_pkt.size = 0;
-    int is_data;
 
     av_init_packet( &av_pkt );
 
