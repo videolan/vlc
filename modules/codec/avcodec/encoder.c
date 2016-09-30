@@ -1107,6 +1107,8 @@ static block_t *vlc_av_packet_Wrap(AVPacket *packet, mtime_t i_length, AVCodecCo
     p_block->i_dts = packet->dts;
     if( unlikely( packet->flags & AV_PKT_FLAG_CORRUPT ) )
         p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
+    if( packet->flags & AV_PKT_FLAG_KEY )
+        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
     p_block->i_pts = p_block->i_pts * CLOCK_FREQ * context->time_base.num / context->time_base.den;
     p_block->i_dts = p_block->i_dts * CLOCK_FREQ * context->time_base.num / context->time_base.den;
 
