@@ -1150,6 +1150,38 @@ static void check_hurry_up( encoder_sys_t *p_sys, AVFrame *frame, encoder_t *p_e
     }
 }
 
+static block_t *encode_avframe( encoder_t *p_enc, encoder_sys_t *p_sys, AVFrame *frame )
+{
+    AVPacket av_pkt;
+    av_pkt.data = NULL;
+    av_pkt.size = 0;
+    int is_data;
+
+    av_init_packet( &av_pkt );
+
+    int ret = avcodec_send_frame( p_sys->p_context, frame );
+    if( frame && ret != 0 && ret != AVERROR(EAGAIN) )
+    {
+        msg_Warn( p_enc, "cannot send one frame to encoder");
+        return NULL;
+    }
+    ret = avcodec_receive_packet( p_sys->p_context, &av_pkt );
+    if( ret != 0 && ret != AVERROR(EAGAIN) )
+    {
+        msg_Warn( p_enc, "cannot encode one frame" );
+        return NULL;
+    }
+
+    block_t *p_block = vlc_av_packet_Wrap( &av_pkt,
+            av_pkt.duration / p_sys->p_context->time_base.den, p_sys->p_context );
+    if( unlikely(p_block == NULL) )
+    {
+        av_free_packet( &av_pkt );
+        return NULL;
+    }
+    return p_block;
+}
+
 /****************************************************************************
  * EncodeVideo: the whole thing
  ****************************************************************************/
@@ -1214,89 +1246,29 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame->quality = p_sys->i_quality;
     }
 
-    AVPacket av_pkt;
-    av_pkt.data = NULL;
-    av_pkt.size = 0;
-    int is_data;
+    block_t *p_block = encode_avframe( p_enc, p_sys, frame );
 
-    av_init_packet( &av_pkt );
-
-    int ret = avcodec_send_frame( p_sys->p_context, frame );
-    if( ret != 0 && ret != AVERROR(EAGAIN) )
+    if( p_block )
     {
-        msg_Warn( p_enc, "cannot send one frame to encoder");
-        return NULL;
-    }
-    ret = avcodec_receive_packet( p_sys->p_context, &av_pkt );
-    if( ret != 0 && ret != AVERROR(EAGAIN) )
-    {
-        msg_Warn( p_enc, "cannot encode one frame" );
-        return NULL;
-    }
-
-    block_t *p_block = vlc_av_packet_Wrap( &av_pkt,
-            av_pkt.duration / p_sys->p_context->time_base.den, p_sys->p_context );
-    if( unlikely(p_block == NULL) )
-    {
-        av_free_packet( &av_pkt );
-        return NULL;
+       switch ( p_sys->p_context->coded_frame->pict_type )
+       {
+       case AV_PICTURE_TYPE_I:
+       case AV_PICTURE_TYPE_SI:
+           p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+           break;
+       case AV_PICTURE_TYPE_P:
+       case AV_PICTURE_TYPE_SP:
+           p_block->i_flags |= BLOCK_FLAG_TYPE_P;
+           break;
+       case AV_PICTURE_TYPE_B:
+       case AV_PICTURE_TYPE_BI:
+           p_block->i_flags |= BLOCK_FLAG_TYPE_B;
+           break;
+       default:
+           p_block->i_flags |= BLOCK_FLAG_TYPE_PB;
+       }
     }
 
-    switch ( p_sys->p_context->coded_frame->pict_type )
-    {
-    case AV_PICTURE_TYPE_I:
-    case AV_PICTURE_TYPE_SI:
-        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
-        break;
-    case AV_PICTURE_TYPE_P:
-    case AV_PICTURE_TYPE_SP:
-        p_block->i_flags |= BLOCK_FLAG_TYPE_P;
-        break;
-    case AV_PICTURE_TYPE_B:
-    case AV_PICTURE_TYPE_BI:
-        p_block->i_flags |= BLOCK_FLAG_TYPE_B;
-        break;
-    default:
-        p_block->i_flags |= BLOCK_FLAG_TYPE_PB;
-    }
-
-    return p_block;
-}
-
-static block_t *encode_audio_buffer( encoder_t *p_enc, encoder_sys_t *p_sys,  AVFrame *frame )
-{
-    int got_packet, i_out;
-    got_packet=i_out=0;
-    AVPacket packet = {0};
-    block_t *p_block = block_Alloc( p_sys->i_buffer_out );
-    av_init_packet( &packet );
-    packet.data = p_block->p_buffer;
-    packet.size = p_block->i_buffer;
-
-    i_out = avcodec_encode_audio2( p_sys->p_context, &packet, frame, &got_packet );
-    if( unlikely( !got_packet || ( i_out < 0 ) ) )
-    {
-        if( i_out < 0 )
-        {
-            msg_Err( p_enc,"Encoding problem..");
-        }
-        block_Release( p_block );
-        return NULL;
-    }
-    p_block->i_buffer = packet.size;
-
-    p_block->i_length = (mtime_t)CLOCK_FREQ *
-     (mtime_t)p_sys->i_frame_size /
-     (mtime_t)p_sys->p_context->sample_rate;
-
-    if( likely( packet.pts != AV_NOPTS_VALUE ) )
-        p_block->i_dts = p_block->i_pts = packet.pts;
-    else
-        p_block->i_dts = p_block->i_pts = VLC_TS_INVALID;
-    if ( packet.flags & AV_PKT_FLAG_KEY )
-        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
-    if ( packet.flags & AV_PKT_FLAG_CORRUPT )
-        p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
     return p_block;
 }
 
@@ -1355,7 +1327,7 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
 
     p_sys->i_samples_delay = 0;
 
-    p_block = encode_audio_buffer( p_enc, p_sys, p_sys->frame );
+    p_block = encode_avframe( p_enc, p_sys, p_sys->frame );
 
     return p_block;
 }
@@ -1415,7 +1387,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     {
         msg_Dbg(p_enc,"Flushing..");
         do {
-            p_block = encode_audio_buffer( p_enc, p_sys, NULL );
+            p_block = encode_avframe( p_enc, p_sys, NULL );
             if( likely( p_block ) )
             {
                 block_ChainAppend( &p_chain, p_block );
@@ -1467,7 +1439,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         if( likely( p_sys->frame->pts != AV_NOPTS_VALUE) )
             date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
 
-        p_block = encode_audio_buffer( p_enc, p_sys, p_sys->frame );
+        p_block = encode_avframe( p_enc, p_sys, p_sys->frame );
         if( likely( p_block ) )
             block_ChainAppend( &p_chain, p_block );
     }
