@@ -1085,7 +1085,7 @@ static void vlc_av_packet_Release(block_t *block)
 {
     vlc_av_packet_t *b = (void *) block;
 
-    av_free_packet(&b->packet);
+    av_packet_unref(&b->packet);
     free(b);
 }
 
@@ -1177,7 +1177,7 @@ static block_t *encode_avframe( encoder_t *p_enc, encoder_sys_t *p_sys, AVFrame 
             av_pkt.duration / p_sys->p_context->time_base.den, p_sys->p_context );
     if( unlikely(p_block == NULL) )
     {
-        av_free_packet( &av_pkt );
+        av_packet_unref( &av_pkt );
         return NULL;
     }
     return p_block;
