@@ -64,7 +64,7 @@ vlc_module_begin ()
         set_capability( "demux", 6 )
         add_float( "hevc-fps", 0.0, FPS_TEXT, FPS_LONGTEXT, true )
         set_callbacks( OpenHEVC, Close )
-        add_shortcut( "hevc" )
+        add_shortcut( "hevc", "h265" )
 
 vlc_module_end ()
 
