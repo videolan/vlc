@@ -2631,7 +2631,7 @@ dnl
 AC_ARG_ENABLE(vpx,
     AS_HELP_STRING([--enable-vpx],[libvpx VP8/VP9 encoder and decoder (default auto)]))
 AS_IF([test "${enable_vpx}" != "no"],[
-    PKG_CHECK_MODULES([VPX], [vpx >= 1.4.0], [
+    PKG_CHECK_MODULES([VPX], [vpx >= 1.5.0], [
         VLC_ADD_PLUGIN([vpx])
         VLC_ADD_CPPFLAGS([vpx], [${VPX_CFLAGS}])
         VLC_ADD_LIBS([vpx], [${VPX_LIBS}])
@@ -2649,7 +2649,7 @@ AS_IF([test "${enable_vpx}" != "no"],[
         ], [], [${VPX_LIBS}])
     ], [
     AS_IF([test "${enable_vpx}" = "yes"],[
-        AC_MSG_ERROR([libvpx 1.4.0 or higher was not found])
+        AC_MSG_ERROR([libvpx 1.5.0 or higher was not found])
     ])])
 ])
 
