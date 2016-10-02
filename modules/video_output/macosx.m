@@ -51,6 +51,10 @@
 
 #define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404)
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED < 1011
+const CFStringRef kCGColorSpaceITUR_2020 = CFSTR("kCGColorSpaceITUR_2020");
+#endif
+
 /**
  * Forward declarations
  */
@@ -184,7 +188,7 @@ static int Open (vlc_object_t *this)
                 case COLOR_PRIMARIES_BT2020:
                 {
                     msg_Dbg(vd, "Using BT.2020 color space");
-                    sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+                    sys->cgColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_2020);
                     break;
                 }
                 case COLOR_PRIMARIES_DCI_P3:
