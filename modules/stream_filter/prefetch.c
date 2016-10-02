@@ -156,18 +156,17 @@ static void *Thread(void *data)
     mutex_cleanup_push(&sys->lock);
     for (;;)
     {
-        if (paused)
-        {
-            if (sys->paused)
-            {   /* Wait for resumption */
-                vlc_cond_wait(&sys->wait_space, &sys->lock);
-                continue;
-            }
+        if (sys->paused != paused)
+        {   /* Update pause state */
+            msg_Dbg(stream, paused ? "resuming" : "pausing");
+            paused = sys->paused;
+            ThreadControl(stream, STREAM_SET_PAUSE_STATE, paused);
+            continue;
+        }
 
-            /* Resume the underlying stream */
-            msg_Dbg(stream, "resuming");
-            ThreadControl(stream, STREAM_SET_PAUSE_STATE, false);
-            paused = false;
+        if (paused)
+        {   /* Wait for resumption */
+            vlc_cond_wait(&sys->wait_space, &sys->lock);
             continue;
         }
 
@@ -205,17 +204,7 @@ static void *Thread(void *data)
         if (unused == 0)
         {   /* Buffer is full */
             if (history == 0)
-            {
-                if (sys->paused)
-                {   /* Pause the stream once the buffer is full
-                     * (and assuming pause was actually requested) */
-                    msg_Dbg(stream, "pausing");
-                    ThreadControl(stream, STREAM_SET_PAUSE_STATE, true);
-                    paused = true;
-                    continue;
-                }
-
-                /* Wait for data to be read */
+            {   /* Wait for data to be read */
                 vlc_cond_wait(&sys->wait_space, &sys->lock);
                 continue;
             }
