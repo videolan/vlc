@@ -174,6 +174,10 @@ static void *Thread(void *data)
         {   /* Need to seek backward */
             if (ThreadSeek(stream, sys->stream_offset))
                 break;
+
+            sys->buffer_offset = sys->stream_offset;
+            sys->buffer_length = 0;
+            sys->eof = false;
             continue;
         }
 
@@ -195,6 +199,10 @@ static void *Thread(void *data)
         {   /* Large skip: seek forward */
             if (ThreadSeek(stream, sys->stream_offset))
                 break;
+
+            sys->buffer_offset = sys->stream_offset;
+            sys->buffer_length = 0;
+            sys->eof = false;
             continue;
         }
 
