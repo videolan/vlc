@@ -33,6 +33,7 @@ OPTIONS="
         --disable-skins2
         --disable-xcb
         --disable-caca
+        --disable-pulse
         --disable-sdl
         --disable-vnc
         --with-macosx-version-min=10.7
