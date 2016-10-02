@@ -99,7 +99,6 @@ static void vpx_err_msg(vlc_object_t *this, struct vpx_codec_ctx *ctx,
 struct decoder_sys_t
 {
     struct vpx_codec_ctx ctx;
-    vpx_codec_caps_t codec_caps;
 };
 
 static const struct
@@ -144,12 +143,9 @@ static const struct
     { VLC_CODEC_I444_16L, VPX_IMG_FMT_I44416, 16, 0 },
 };
 
-static vlc_fourcc_t FindVlcChroma( struct vpx_image *img, vpx_codec_caps_t codec_caps )
+static vlc_fourcc_t FindVlcChroma( struct vpx_image *img )
 {
     uint8_t hack = (img->fmt & VPX_IMG_FMT_I444) && (img->cs == VPX_CS_SRGB);
-
-    if( img->bit_depth > 8 && !(codec_caps & VPX_CODEC_CAP_HIGHBITDEPTH) )
-        return 0;
 
     for( unsigned int i = 0; i < ARRAY_SIZE(chroma_table); i++ )
         if( chroma_table[i].i_chroma_id == img->fmt &&
@@ -210,7 +206,7 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
     mtime_t pts = *pkt_pts;
     free(pkt_pts);
 
-    dec->fmt_out.i_codec = FindVlcChroma(img, dec->p_sys->codec_caps);
+    dec->fmt_out.i_codec = FindVlcChroma(img);
 
     if( dec->fmt_out.i_codec == 0 ) {
         msg_Err(dec, "Unsupported output colorspace %d", img->fmt);
@@ -283,7 +279,6 @@ static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *dec = (decoder_t *)p_this;
     const struct vpx_codec_iface *iface;
-    vpx_codec_caps_t codec_caps = 0;
     int vp_version;
 
     switch (dec->fmt_in.i_codec)
@@ -296,7 +291,6 @@ static int OpenDecoder(vlc_object_t *p_this)
 #endif
 #ifdef ENABLE_VP9_DECODER
     case VLC_CODEC_VP9:
-        codec_caps = vpx_codec_get_caps(vpx_codec_vp9_dx());
         iface = &vpx_codec_vp9_dx_algo;
         vp_version = 9;
         break;
@@ -322,8 +316,6 @@ static int OpenDecoder(vlc_object_t *p_this)
         free(sys);
         return VLC_EGENERIC;;
     }
-
-    dec->p_sys->codec_caps = codec_caps;
 
     dec->pf_decode_video = Decode;
 
