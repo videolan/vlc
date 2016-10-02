@@ -170,6 +170,10 @@
 - (id)init
 {
     self = [super initWithWindowNibName:@"Preferences"];
+    if (self) {
+        o_emptyView = [[NSView alloc] init];
+        _rootTreeItem = [[VLCTreeMainItem alloc] init];
+    }
 
     return self;
 }
@@ -177,9 +181,6 @@
 - (void)windowDidLoad
 
 {
-    o_emptyView = [[NSView alloc] init];
-    _rootTreeItem = [[VLCTreeMainItem alloc] init];
-
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     [self.window setHidesOnDeactivate:YES];
 
