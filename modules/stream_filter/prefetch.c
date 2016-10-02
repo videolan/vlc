@@ -63,7 +63,7 @@ struct stream_sys_t
     size_t       seek_threshold;
 };
 
-static void ThreadRead(stream_t *stream, size_t length)
+static ssize_t ThreadRead(stream_t *stream, void *buf, size_t length)
 {
     stream_sys_t *sys = stream->p_sys;
     int canc = vlc_savecancel();
@@ -71,32 +71,11 @@ static void ThreadRead(stream_t *stream, size_t length)
     vlc_mutex_unlock(&sys->lock);
     assert(length > 0);
 
-    size_t offset = (sys->buffer_offset + sys->buffer_length)
-                    % sys->buffer_size;
-    /* Do not step past the sharp edge of the circular buffer */
-    if (offset + length > sys->buffer_size)
-        length = sys->buffer_size - offset;
-    assert(length > 0);
-
-    char *p = sys->buffer + offset;
-    ssize_t val = vlc_stream_ReadPartial(stream->p_source, p, length);
-
-    if (val == 0)
-        msg_Dbg(stream, "end of stream");
+    ssize_t val = vlc_stream_ReadPartial(stream->p_source, buf, length);
 
     vlc_mutex_lock(&sys->lock);
     vlc_restorecancel(canc);
-
-    if (val < 0)
-        return;
-
-    if (val == 0)
-        sys->eof = true;
-
-    assert((size_t)val <= length);
-    sys->buffer_length += val;
-    assert(sys->buffer_length <= sys->buffer_size);
-    //msg_Dbg(stream, "buffer: %zu/%zu", sys->buffer_length, sys->buffer_size);
+    return val;
 }
 
 static int ThreadSeek(stream_t *stream, uint64_t seek_offset)
@@ -113,13 +92,7 @@ static int ThreadSeek(stream_t *stream, uint64_t seek_offset)
     vlc_mutex_lock(&sys->lock);
     vlc_restorecancel(canc);
 
-    if (val != VLC_SUCCESS)
-        return -1;
-
-    sys->buffer_offset = seek_offset;
-    sys->buffer_length = 0;
-    sys->eof = false;
-    return 0;
+    return (val == VLC_SUCCESS) ? 0 : -1;
 }
 
 static int ThreadControl(stream_t *stream, int query, ...)
@@ -208,8 +181,8 @@ static void *Thread(void *data)
 
         assert(sys->buffer_size >= sys->buffer_length);
 
-        size_t unused = sys->buffer_size - sys->buffer_length;
-        if (unused == 0)
+        size_t len = sys->buffer_size - sys->buffer_length;
+        if (len == 0)
         {   /* Buffer is full */
             if (history == 0)
             {   /* Wait for data to be read */
@@ -218,27 +191,44 @@ static void *Thread(void *data)
             }
 
             /* Discard some historical data to make room. */
-            size_t discard = sys->read_size;
-            if (discard > history)
-                discard = history;
+            len = history;
+            if (len > sys->read_size)
+                len = sys->read_size;
 
-            /* discard <= sys->read_size <= sys->buffer_size = ...
-             * ... unused + sys->buffer_length = 0 + sys->buffer_length */
-            assert(discard <= sys->buffer_length);
-            sys->buffer_offset += discard;
-            sys->buffer_length -= discard;
-            history -= discard;
-            unused = discard;
+            assert(len <= sys->buffer_length);
+            sys->buffer_offset += len;
+            sys->buffer_length -= len;
+        }
+        else
+        {   /* Some streams cannot return a short data count and just wait for
+             * all requested data to become available (e.g. regular files). So
+             * we have to limit the data read in a single operation to avoid
+             * blocking for too long. */
+            if (len > sys->read_size)
+                len = sys->read_size;
         }
 
-        /* Some streams cannot return a short data count and just wait for all
-         * requested data to become available (e.g. regular files). So we have
-         * to limit the data read in a single operation to avoid blocking for
-         * too long. */
-        if (unused > sys->read_size)
-            unused = sys->read_size;
+        size_t offset = (sys->buffer_offset + sys->buffer_length)
+                        % sys->buffer_size;
+         /* Do not step past the sharp edge of the circular buffer */
+        if (offset + len > sys->buffer_size)
+            len = sys->buffer_size - offset;
 
-        ThreadRead(stream, unused);
+        ssize_t val = ThreadRead(stream, sys->buffer + offset, len);
+        if (val < 0)
+            continue;
+        if (val == 0)
+        {
+            assert(len > 0);
+            msg_Dbg(stream, "end of stream");
+            sys->eof = true;
+        }
+
+        assert((size_t)val <= len);
+        sys->buffer_length += val;
+        assert(sys->buffer_length <= sys->buffer_size);
+        //msg_Dbg(stream, "buffer: %zu/%zu", sys->buffer_length,
+        //        sys->buffer_size);
         vlc_cond_signal(&sys->wait_data);
     }
     vlc_cleanup_pop();
