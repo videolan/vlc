@@ -693,18 +693,34 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
     }
     else if( idu == IDU_TYPE_FRAME_USER_DATA )
     {
-        const uint8_t *p_data = &p_frag->p_buffer[4];
-        const unsigned i_data = (p_frag->i_buffer > 4) ? p_frag->i_buffer - 4 : 0;
-        /* TS 101 154 Auxiliary Data and VC-1 video */
-        static const uint8_t p_DVB1_user_identifier[] = {
-            0x47, 0x41, 0x39, 0x34 /* user identifier */
-        };
+        bs_t s;
+        unsigned i_bitflow = 0;
+        const size_t i_size = p_frag->i_buffer - 4;
+        bs_init( &s, &p_frag->p_buffer[4], i_size );
+        s.p_fwpriv = &i_bitflow;
+        s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
 
-        /* Check if we have DVB1_data() */
-        if( i_data >= sizeof(p_DVB1_user_identifier) &&
-            !memcmp( p_data, p_DVB1_user_identifier, sizeof(p_DVB1_user_identifier) ) )
+        unsigned i_data;
+        uint8_t *p_data = malloc( i_size );
+        if( p_data )
         {
-            cc_Extract( &p_sys->cc_next, true, p_data, i_data );
+            /* store converted data */
+            for( i_data = 0; i_data<i_size && bs_remain( &s ) >= 16 /* trailing 0x80 flush byte */; i_data++ )
+                p_data[i_data] = bs_read( &s, 8 );
+
+            /* TS 101 154 Auxiliary Data and VC-1 video */
+            static const uint8_t p_DVB1_user_identifier[] = {
+                0x47, 0x41, 0x39, 0x34 /* user identifier */
+            };
+
+            /* Check if we have DVB1_data() */
+            if( i_data >= sizeof(p_DVB1_user_identifier) &&
+                !memcmp( p_data, p_DVB1_user_identifier, sizeof(p_DVB1_user_identifier) ) )
+            {
+                cc_Extract( &p_sys->cc_next, true, p_data, i_data );
+            }
+
+            free( p_data );
         }
     }
 
