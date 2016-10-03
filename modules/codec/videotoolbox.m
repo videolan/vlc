@@ -1257,34 +1257,28 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         return;
     }
 
-    if (imageBuffer == nil)
-        return;
-
     if (infoFlags & kVTDecodeInfo_FrameDropped) {
         msg_Dbg(p_dec, "decoder dropped frame");
-        if (imageBuffer != nil)
+        if (imageBuffer)
             CFRelease(imageBuffer);
-        imageBuffer = nil;
         return;
     }
 
-    NSString *timeStamp = nil;
+    if (!imageBuffer)
+        return;
 
-    if (CMTIME_IS_VALID(pts))
-        timeStamp = [[NSNumber numberWithLongLong:pts.value] stringValue];
-    else {
+    if (!CMTIME_IS_VALID(pts)) {
         msg_Dbg(p_dec, "invalid timestamp, dropping frame");
         CFRelease(imageBuffer);
         return;
     }
 
-    if (timeStamp) {
-        id imageBufferObject = (__bridge id)imageBuffer;
-        @synchronized(p_sys->outputTimeStamps) {
-            [p_sys->outputTimeStamps addObject:timeStamp];
-        }
-        @synchronized(p_sys->outputFrames) {
-            [p_sys->outputFrames setObject:imageBufferObject forKey:timeStamp];
-        }
+    NSNumber *timeStamp = [NSNumber numberWithLongLong:pts.value];
+    id imageBufferObject = (__bridge id)imageBuffer;
+    @synchronized(p_sys->outputTimeStamps) {
+        [p_sys->outputTimeStamps addObject:timeStamp];
+    }
+    @synchronized(p_sys->outputFrames) {
+        [p_sys->outputFrames setObject:imageBufferObject forKey:timeStamp];
     }
 }
