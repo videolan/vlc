@@ -57,6 +57,7 @@ struct picture_sys_t
     ID3D11VideoDecoderOutputView  *decoder; /* may be NULL for pictures from the pool */
     ID3D11Texture2D               *texture;
     ID3D11DeviceContext           *context;
+    unsigned                      slice_index;
     HINSTANCE                     hd3d11_dll; /* TODO */
 };
 

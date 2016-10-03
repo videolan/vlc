@@ -139,6 +139,7 @@ struct picture_sys_t
     ID3D11VideoDecoderOutputView  *decoder; /* may be NULL for pictures from the pool */
     ID3D11Texture2D               *texture;
     ID3D11DeviceContext           *context;
+    unsigned                      slice_index;
     ID3D11VideoProcessorInputView *inputView; /* when used as processor input */
 };
 
@@ -314,7 +315,7 @@ static int Extract(vlc_va_t *va, picture_t *output, uint8_t *data)
                 .right = dstDesc.Width, .bottom = dstDesc.Height, .back = 1,
             };
             ID3D11DeviceContext_CopySubresourceRegion(sys->d3dctx, (ID3D11Resource*) p_sys_out->texture,
-                                                      0, 0, 0, 0,
+                                                      p_sys_out->slice_index, 0, 0, 0,
                                                       (ID3D11Resource*) p_sys_in->texture,
                                                       viewDesc.Texture2D.ArraySlice,
                                                       &copyBox);
