@@ -390,7 +390,7 @@ int directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys, picture_t *pic, uint8_t 
 
     for (i = 0; i < dx_sys->surface_count; i++) {
         vlc_va_surface_t *surface = &dx_sys->surface[i];
-        if ((old == -1 || surface->order < dx_sys->surface[old].order) && !surface->refcount)
+        if (((old == -1 || surface->order < dx_sys->surface[old].order)) && !surface->refcount)
             old = i;
         if (old_used == -1 || surface->order < dx_sys->surface[old_used].order)
             old_used = i;
