@@ -1026,12 +1026,13 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
                     0x03  /* Captions */
                 };
 
-                const unsigned i_t35 = i_size;
-                uint8_t *p_t35 = malloc( i_t35 );
+                unsigned i_t35;
+                uint8_t *p_t35 = malloc( i_size );
                 if( !p_t35 )
                     break;
-                for( unsigned i=0; i<i_t35; i++ )
-                    p_t35[i] = bs_read( &s, 8 );
+
+                for( i_t35 = 0; i_t35<i_size && bs_remain( &s ) >= 8; i_t35++ )
+                    p_t35[i_t35] = bs_read( &s, 8 );
 
                 /* Check for we have DVB1_data() */
                 if( i_t35 >= sizeof(p_DVB1_data_start_code) &&
