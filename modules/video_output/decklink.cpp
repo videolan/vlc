@@ -229,7 +229,9 @@ static struct decklink_sys_t *GetDLSys(vlc_object_t *obj)
             sys->p_output = NULL;
             sys->offset = 0;
             sys->users = 0;
-            sys->i_rate = -1;
+            sys->i_rate = var_InheritInteger(obj, AUDIO_CFG_PREFIX "audio-rate");
+            if(sys->i_rate > 0)
+                sys->i_rate = -1;
             vlc_mutex_init(&sys->lock);
             vlc_cond_init(&sys->cond);
             var_Create(libvlc, "decklink-sys", VLC_VAR_ADDRESS);
