@@ -39,6 +39,7 @@
 #include <vlc_block_helper.h>
 #include "../codec/cc.h"
 #include "packetizer_helper.h"
+#include "hxxx_nal.h"
 #include "startcode_helper.h"
 
 /*****************************************************************************
@@ -306,30 +307,6 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
     return VLC_SUCCESS;
 }
 
-
-/* DecodeRIDU: decode the startcode emulation prevention (same than h264) */
-static void DecodeRIDU( uint8_t *p_ret, int *pi_ret, uint8_t *src, int i_src )
-{
-    uint8_t *end = &src[i_src];
-    uint8_t *dst_end = &p_ret[*pi_ret];
-    uint8_t *dst = p_ret;
-
-    while( src < end && dst < dst_end )
-    {
-        if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00 &&
-            src[2] == 0x03 && dst < dst_end - 1 )
-        {
-            *dst++ = 0x00;
-            *dst++ = 0x00;
-
-            src += 3;
-            continue;
-        }
-        *dst++ = *src++;
-    }
-
-    *pi_ret = dst - p_ret;
-}
 /* BuildExtraData: gather sequence header and entry point */
 static void BuildExtraData( decoder_t *p_dec )
 {
@@ -461,25 +438,21 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
     {
         es_format_t *p_es = &p_dec->fmt_out;
         bs_t s;
+        unsigned i_bitflow = 0;
         int i_profile;
-        uint8_t ridu[32];
-        int     i_ridu = sizeof(ridu);
 
         /* */
         if( p_sys->sh.p_sh )
             block_Release( p_sys->sh.p_sh );
         p_sys->sh.p_sh = block_Duplicate( p_frag );
 
-        /* Extract the raw IDU */
-        DecodeRIDU( ridu, &i_ridu, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
-
         /* Auto detect VC-1_SPMP_PESpacket_PayloadFormatHeader (SMPTE RP 227) for simple/main profile
          * TODO find a test case and valid it */
-        if( i_ridu > 4 && (ridu[0]&0x80) == 0 ) /* for advanced profile, the first bit is 1 */
+        if( p_frag->i_buffer > 8 && (p_frag->p_buffer[4]&0x80) == 0 ) /* for advanced profile, the first bit is 1 */
         {
             video_format_t *p_v = &p_dec->fmt_in.video;
-            const size_t i_potential_width  = GetWBE( &ridu[0] );
-            const size_t i_potential_height = GetWBE( &ridu[2] );
+            const size_t i_potential_width  = GetWBE( &p_frag->p_buffer[4] );
+            const size_t i_potential_height = GetWBE( &p_frag->p_buffer[6] );
 
             if( i_potential_width >= 2  && i_potential_width <= 8192 &&
                 i_potential_height >= 2 && i_potential_height <= 8192 )
@@ -500,7 +473,10 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
         }
 
         /* Parse it */
-        bs_init( &s, ridu, i_ridu );
+        bs_init( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
+        s.p_fwpriv = &i_bitflow;
+        s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+
         i_profile = bs_read( &s, 2 );
         if( i_profile == 3 )
         {
@@ -639,14 +615,12 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
     else if( idu == IDU_TYPE_FRAME )
     {
         bs_t s;
-        uint8_t ridu[8];
-        int     i_ridu = sizeof(ridu);
-
-        /* Extract the raw IDU */
-        DecodeRIDU( ridu, &i_ridu, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
+        unsigned i_bitflow = 0;
 
         /* Parse it + interpolate pts/dts if possible */
-        bs_init( &s, ridu, i_ridu );
+        bs_init( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
+        s.p_fwpriv = &i_bitflow;
+        s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
 
         if( p_sys->sh.b_advanced_profile )
         {
