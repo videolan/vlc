@@ -73,14 +73,6 @@ enum h264_nal_unit_type_e
     H264_NAL_RESERVED_23 = 23,
 };
 
-/* Defined in H.264 annex D */
-enum h264_sei_type_e
-{
-    H264_SEI_PIC_TIMING = 1,
-    H264_SEI_USER_DATA_REGISTERED_ITU_T_T35 = 4,
-    H264_SEI_RECOVERY_POINT = 6
-};
-
 typedef struct h264_sequence_parameter_set_t h264_sequence_parameter_set_t;
 typedef struct h264_picture_parameter_set_t h264_picture_parameter_set_t;
 
