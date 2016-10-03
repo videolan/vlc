@@ -32,7 +32,7 @@
 
 #import "Windows.h"
 #import "misc.h"
-#import "VLCFSPanel.h"
+#import "VLCFSPanelController.h"
 #import "VLCMainWindowTitleView.h"
 
 @class VLCDetachedVideoWindow;
@@ -91,7 +91,7 @@ typedef enum {
 @property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;
 
-@property (readonly) VLCFSPanel* fspanel;
+@property (readonly) VLCFSPanelController* fspanel;
 
 - (void)changePlaylistState:(VLCPlaylistStateEvent)event;
 

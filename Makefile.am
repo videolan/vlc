@@ -162,6 +162,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/VideoEffects.xib \
 	extras/package/macosx/Resources/English.lproj/VLCStatusBarIconMainMenu.xib \
 	extras/package/macosx/Resources/English.lproj/VLCRendererDialog.xib \
+	extras/package/macosx/Resources/English.lproj/VLCFullScreenPanel.xib \
 	extras/package/macosx/Resources/fspanel/fs_background.png \
 	extras/package/macosx/Resources/fspanel/fs_background@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen.png \
@@ -863,6 +864,12 @@ EXTRA_DIST += \
    	extras/package/macosx/Resources/vlcmenubaricon/VLCPreviousTemplate.pdf \
    	extras/package/macosx/Resources/vlcmenubaricon/VLCShuffleTemplate.pdf \
    	extras/package/macosx/Resources/vlcmenubaricon/VLCStatusBarIcon.pdf \
+   	extras/package/macosx/Resources/Button-Icons/VLCBackwardTemplate.pdf \
+   	extras/package/macosx/Resources/Button-Icons/VLCForwardTemplate.pdf \
+   	extras/package/macosx/Resources/Button-Icons/VLCVolumeOnTemplate.pdf \
+   	extras/package/macosx/Resources/Button-Icons/VLCVolumeOffTemplate.pdf \
+   	extras/package/macosx/Resources/Button-Icons/VLCVolumeOnTemplate.pdf \
+   	extras/package/macosx/Resources/Button-Icons/VLCVolumeOffTemplate.pdf \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
 	extras/package/macosx/ub.sh \

@@ -89,4 +89,5 @@ libmacosx_plugin_la_SOURCES = \
 	VLCRendererDialog.h VLCRendererDialog.m \
 	VLCResumeDialogController.h VLCResumeDialogController.m \
 	VLCTrackSynchronizationWindowController.h VLCTrackSynchronizationWindowController.m \
-	VLCVideoEffectsWindowController.h VLCVideoEffectsWindowController.m
+	VLCVideoEffectsWindowController.h VLCVideoEffectsWindowController.m \
+	VLCFSPanelController.h VLCFSPanelController.m

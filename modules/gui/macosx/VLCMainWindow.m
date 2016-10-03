@@ -236,10 +236,8 @@ static const float f_min_window_height = 307.;
     frame.size.height = frame.size.height - 1.0;
     [_searchField setFrame:frame];
 
-    _fspanel = [[VLCFSPanel alloc] initWithContentRect:NSMakeRect(110.,267.,549.,87.)
-                                             styleMask:NSTexturedBackgroundWindowMask
-                                               backing:NSBackingStoreBuffered
-                                                 defer:YES];
+    _fspanel = [[VLCFSPanelController alloc] init];
+    [_fspanel showWindow:self];
 
     /* make sure we display the desired default appearance when VLC launches for the first time */
     if (![defaults objectForKey:@"VLCFirstRun"]) {
@@ -476,7 +474,7 @@ static const float f_min_window_height = 307.;
     [_splitView setHidden:NO];
     if (self.nativeFullscreenMode && [self fullscreen]) {
         [[self.controlsBar bottomBarView] setHidden:NO];
-        [self.fspanel setNonActive:nil];
+        [self.fspanel setNonActive];
     }
 
     [self makeFirstResponder:_playlistScrollView];
@@ -493,7 +491,7 @@ static const float f_min_window_height = 307.;
     [self.videoView setHidden:NO];
     if (self.nativeFullscreenMode && [self fullscreen]) {
         [[self.controlsBar bottomBarView] setHidden:YES];
-        [self.fspanel setActive:nil];
+        [self.fspanel setActive];
     }
 
     if ([[self.videoView subviews] count] > 0)
@@ -850,10 +848,10 @@ static const float f_min_window_height = 307.;
     if (self.nativeFullscreenMode) {
         if ([self hasActiveVideo] && [self fullscreen]) {
             [[self.controlsBar bottomBarView] setHidden: b_videoPlayback];
-            [self.fspanel setActive: nil];
+            [self.fspanel setActive];
         } else {
             [[self.controlsBar bottomBarView] setHidden: NO];
-            [self.fspanel setNonActive: nil];
+            [self.fspanel setNonActive];
         }
     }
 }
