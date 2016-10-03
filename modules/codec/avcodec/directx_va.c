@@ -406,7 +406,7 @@ int directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys, picture_t *pic, uint8_t 
     vlc_va_surface_t *surface = &dx_sys->surface[i];
 
     surface->refcount = 1;
-    surface->order = dx_sys->surface_order++;
+    surface->order = ++dx_sys->surface_order;
     *data = (void *)dx_sys->hw_surface[i];
     pic->context = surface;
 
