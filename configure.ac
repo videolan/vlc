@@ -118,6 +118,7 @@ case "${host_os}" in
     CFLAGS="${CFLAGS} -pthread"
     CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
     LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+    ac_cv_ld_z_defs=no
     ;;
   openbsd*)
     SYS=openbsd
