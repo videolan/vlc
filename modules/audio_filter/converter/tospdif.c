@@ -52,8 +52,8 @@ vlc_module_end ()
 
 struct filter_sys_t
 {
-    block_t *p_chain_first;
-    block_t **pp_chain_last;
+    block_t *p_out_buf;
+    size_t i_out_offset;
 
     union
     {
@@ -64,6 +64,8 @@ struct filter_sys_t
     } spec;
 };
 
+#define SPDIF_HEADER_SIZE 8
+
 #define IEC61937_AC3 0x01
 #define IEC61937_EAC3 0x15
 #define IEC61937_DTS1 0x0B
@@ -73,39 +75,157 @@ struct filter_sys_t
 #define SPDIF_MORE_DATA 1
 #define SPDIF_SUCCESS VLC_SUCCESS
 #define SPDIF_ERROR VLC_EGENERIC
-struct hdr_res
-{
-    uint16_t    i_data_type;
-    size_t      i_out_size_padded;
-    size_t      i_length_mul;
-};
 
-static int parse_header_ac3( filter_t *p_filter, block_t *p_in,
-                             struct hdr_res *p_res )
+static bool is_big_endian( filter_t *p_filter, block_t *p_in_buf )
 {
-    (void) p_filter;
+    switch( p_filter->fmt_in.audio.i_format )
+    {
+        case VLC_CODEC_A52:
+        case VLC_CODEC_EAC3:
+            return true;
+        case VLC_CODEC_DTS:
+            return p_in_buf->p_buffer[0] == 0x1F
+                || p_in_buf->p_buffer[0] == 0x7F;
+        default:
+            vlc_assert_unreachable();
+    }
+}
 
-    if( unlikely( p_in->i_buffer < 6 || p_in->i_nb_samples != A52_FRAME_NB ) )
+static inline void write_16( filter_t *p_filter, void *p_buf, uint16_t i_val )
+{
+    if( p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB )
+        SetWBE( p_buf, i_val );
+    else
+        SetWLE( p_buf, i_val );
+}
+
+static void write_padding( filter_t *p_filter, size_t i_size )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    assert( p_sys->p_out_buf != NULL );
+
+    assert( p_sys->p_out_buf->i_buffer - p_sys->i_out_offset >= i_size );
+
+    uint8_t *p_out = &p_sys->p_out_buf->p_buffer[p_sys->i_out_offset];
+    memset( p_out, 0, i_size );
+    p_sys->i_out_offset += i_size;
+}
+
+static void write_data( filter_t *p_filter, const void *p_buf, size_t i_size,
+                        bool b_input_big_endian )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    assert( p_sys->p_out_buf != NULL );
+
+    bool b_output_big_endian =
+        p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB;
+    uint8_t *p_out = &p_sys->p_out_buf->p_buffer[p_sys->i_out_offset];
+    const uint8_t *p_in = p_buf;
+
+    assert( p_sys->p_out_buf->i_buffer - p_sys->i_out_offset >= i_size );
+
+    if( b_input_big_endian != b_output_big_endian )
+        swab( p_in, p_out, i_size & ~1 );
+    else
+        memcpy( p_out, p_in, i_size & ~1 );
+    p_sys->i_out_offset += ( i_size & ~1 );
+
+    if( i_size & 1 )
+    {
+        assert( p_sys->p_out_buf->i_buffer - p_sys->i_out_offset >= 2 );
+        p_out += ( i_size & ~1 );
+        write_16( p_filter, p_out, p_in[i_size - 1] << 8 );
+        p_sys->i_out_offset += 2;
+    }
+}
+
+static void write_buffer( filter_t *p_filter, block_t *p_in_buf )
+{
+    write_data( p_filter, p_in_buf->p_buffer, p_in_buf->i_buffer,
+                is_big_endian( p_filter, p_in_buf ) );
+    p_filter->p_sys->p_out_buf->i_length += p_in_buf->i_length;
+}
+
+static int write_init( filter_t *p_filter, block_t *p_in_buf,
+                       size_t i_out_size, unsigned i_nb_samples )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    assert( p_sys->p_out_buf == NULL );
+    assert( i_out_size > SPDIF_HEADER_SIZE && ( i_out_size & 3 ) == 0 );
+
+    p_sys->p_out_buf = block_Alloc( i_out_size );
+    if( !p_sys->p_out_buf )
+        return VLC_ENOMEM;
+    p_sys->p_out_buf->i_dts = p_in_buf->i_dts;
+    p_sys->p_out_buf->i_pts = p_in_buf->i_pts;
+    p_sys->p_out_buf->i_nb_samples = i_nb_samples;
+
+    p_sys->i_out_offset = SPDIF_HEADER_SIZE; /* Place for the S/PDIF header */
+    return VLC_SUCCESS;
+}
+
+static void write_finalize( filter_t *p_filter, uint16_t i_data_type,
+                            uint8_t i_length_mul )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    assert( p_sys->p_out_buf != NULL );
+    uint8_t *p_out = p_sys->p_out_buf->p_buffer;
+
+    assert( p_sys->i_out_offset > SPDIF_HEADER_SIZE );
+    assert( i_data_type != 0 );
+    assert( i_length_mul == 1 || i_length_mul == 8 );
+
+    /* S/PDIF header */
+    write_16( p_filter, &p_out[0], 0xf872 ); /* syncword 1 */
+    write_16( p_filter, &p_out[2], 0x4e1f ); /* syncword 2 */
+    write_16( p_filter, &p_out[4], i_data_type ); /* data type */
+    /* length in bits or bytes */
+    write_16( p_filter, &p_out[6], ( p_sys->i_out_offset - SPDIF_HEADER_SIZE )
+                                   * i_length_mul );
+
+    /* 0 padding */
+    if( p_sys->i_out_offset < p_sys->p_out_buf->i_buffer )
+        write_padding( p_filter,
+                       p_sys->p_out_buf->i_buffer - p_sys->i_out_offset );
+}
+
+static int write_buffer_ac3( filter_t *p_filter, block_t *p_in_buf )
+{
+    if( unlikely( p_in_buf->i_buffer < 6
+     || p_in_buf->i_buffer > A52_FRAME_NB * 4
+     || p_in_buf->i_nb_samples != A52_FRAME_NB ) )
         return SPDIF_ERROR;
-    p_res->i_length_mul = 8; /* in bits */
-    p_res->i_out_size_padded = A52_FRAME_NB * 4;
-    p_res->i_data_type = ( (p_in->p_buffer[5] & 0x7) << 8 ) /* bsmod */
-                   | IEC61937_AC3;
+
+    if( write_init( p_filter, p_in_buf, A52_FRAME_NB * 4, A52_FRAME_NB ) )
+        return SPDIF_ERROR;
+    write_buffer( p_filter, p_in_buf );
+    write_finalize( p_filter, IEC61937_AC3 |
+                    ( ( p_in_buf->p_buffer[5] & 0x7 ) << 8 ) /* bsmod */,
+                    8 /* in bits */ );
+
     return SPDIF_SUCCESS;
 }
 
-static int parse_header_eac3( filter_t *p_filter, block_t *p_in,
-                              struct hdr_res *p_res )
+static int write_buffer_eac3( filter_t *p_filter, block_t *p_in_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vlc_a52_header_t a52 = { };
-    if( vlc_a52_header_Parse( &a52, p_in->p_buffer, p_in->i_buffer )
+    if( vlc_a52_header_Parse( &a52, p_in_buf->p_buffer, p_in_buf->i_buffer )
         != VLC_SUCCESS )
         return SPDIF_ERROR;
 
-    p_in->i_buffer = a52.i_size;
-    p_in->i_nb_samples = a52.i_samples;
+    p_in_buf->i_buffer = a52.i_size;
+    p_in_buf->i_nb_samples = a52.i_samples;
+
+    if( !p_sys->p_out_buf
+     && write_init( p_filter, p_in_buf, AOUT_SPDIF_SIZE * 4, AOUT_SPDIF_SIZE ) )
+        return SPDIF_ERROR;
+    if( p_in_buf->i_buffer > p_sys->p_out_buf->i_buffer - p_sys->i_out_offset )
+        return SPDIF_ERROR;
+
+    write_buffer( p_filter, p_in_buf );
 
     if( a52.b_eac3 )
     {
@@ -123,9 +243,7 @@ static int parse_header_eac3( filter_t *p_filter, block_t *p_in,
             else
                 p_sys->spec.eac3.i_nb_blocks_substream0 = 0;
         }
-        p_res->i_out_size_padded = AOUT_SPDIF_SIZE * 4;
-        p_res->i_data_type = IEC61937_EAC3;
-        p_res->i_length_mul = 1; /* in bytes */
+        write_finalize( p_filter, IEC61937_EAC3, 1 /* in bytes */ );
         return SPDIF_SUCCESS;
     }
     else
@@ -133,149 +251,45 @@ static int parse_header_eac3( filter_t *p_filter, block_t *p_in,
 
 }
 
-static int parse_header_dts( filter_t *p_filter, block_t *p_in,
-                             struct hdr_res *p_res )
+static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
 {
-    if( unlikely( p_in->i_buffer < 1 ) )
-        return SPDIF_ERROR;
-    p_res->i_out_size_padded = p_in->i_nb_samples * 4;
-    p_res->i_length_mul = 8; /* in bits */
-    switch( p_in->i_nb_samples )
+    uint16_t i_data_type;
+    switch( p_in_buf->i_nb_samples )
     {
     case  512:
-        p_res->i_data_type = IEC61937_DTS1;
-        return SPDIF_SUCCESS;
+        i_data_type = IEC61937_DTS1;
+        break;
     case 1024:
-        p_res->i_data_type = IEC61937_DTS2;
-        return SPDIF_SUCCESS;
+        i_data_type = IEC61937_DTS2;
+        break;
     case 2048:
-        p_res->i_data_type = IEC61937_DTS3;
-        return SPDIF_SUCCESS;
+        i_data_type = IEC61937_DTS3;
+        break;
     default:
         msg_Err( p_filter, "Frame size %d not supported",
-                 p_in->i_nb_samples );
+                 p_in_buf->i_nb_samples );
         return SPDIF_ERROR;
     }
-}
 
-static int parse_header( filter_t *p_filter, block_t *p_in,
-                         struct hdr_res *p_res )
-{
-    switch( p_filter->fmt_in.audio.i_format )
-    {
-        case VLC_CODEC_A52:
-            return parse_header_ac3( p_filter, p_in, p_res );
-        case VLC_CODEC_EAC3:
-            return parse_header_eac3( p_filter, p_in, p_res );
-        case VLC_CODEC_DTS:
-            return parse_header_dts( p_filter, p_in, p_res );
-        default:
-            vlc_assert_unreachable();
-    }
-}
-
-static bool is_big_endian( filter_t *p_filter, block_t *p_in )
-{
-    switch( p_filter->fmt_in.audio.i_format )
-    {
-        case VLC_CODEC_A52:
-        case VLC_CODEC_EAC3:
-            return true;
-        case VLC_CODEC_DTS:
-            return p_in->p_buffer[0] == 0x1F || p_in->p_buffer[0] == 0x7F;
-        default:
-            vlc_assert_unreachable();
-    }
+    if( p_in_buf->i_buffer > p_in_buf->i_nb_samples * 4
+     || write_init( p_filter, p_in_buf, p_in_buf->i_nb_samples * 4,
+                    p_in_buf->i_nb_samples ) )
+        return SPDIF_ERROR;
+    write_buffer( p_filter, p_in_buf );
+    write_finalize( p_filter, i_data_type, 8 /* in bits */ );
+    return SPDIF_SUCCESS;
 }
 
 static void Flush( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_sys->p_chain_first != NULL )
+    if( p_sys->p_out_buf != NULL )
     {
-        block_ChainRelease( p_sys->p_chain_first );
-        p_sys->p_chain_first = NULL;
-        p_sys->pp_chain_last = &p_sys->p_chain_first;
+        block_Release( p_sys->p_out_buf );
+        p_sys->p_out_buf = NULL;
     }
     memset( &p_sys->spec, 0, sizeof( p_sys->spec ) );
-}
-
-static block_t *fill_output_buffer( filter_t *p_filter, struct hdr_res *p_res )
-{
-    filter_sys_t *p_sys = p_filter->p_sys;
-    size_t i_out_size = 0;
-    block_t *p_list = p_sys->p_chain_first;
-
-    assert( p_list != NULL );
-
-    while( p_list )
-    {
-        i_out_size += p_list->i_buffer;
-        p_list = p_list->p_next;
-    }
-
-    if( i_out_size + 8 > p_res->i_out_size_padded )
-    {
-        msg_Warn( p_filter, "buffer too big for a S/PDIF frame" );
-        return NULL;
-    }
-
-    block_t *p_out_buf = block_Alloc( p_res->i_out_size_padded );
-    if( unlikely(!p_out_buf) )
-        return NULL;
-    uint8_t *p_out = p_out_buf->p_buffer;
-
-    /* Copy the S/PDIF headers. */
-    void (*write16)(void *, uint16_t) =
-        ( p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB )
-        ? SetWBE : SetWLE;
-
-    write16( &p_out[0], 0xf872 ); /* syncword 1 */
-    write16( &p_out[2], 0x4e1f ); /* syncword 2 */
-    write16( &p_out[4], p_res->i_data_type ); /* data type */
-    write16( &p_out[6], i_out_size * p_res->i_length_mul ); /* length in bits or bytes */
-
-    p_list = p_sys->p_chain_first;
-    bool b_input_big_endian = is_big_endian( p_filter, p_list );
-    bool b_output_big_endian =
-        p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB;
-
-    p_out += 8;
-    while( p_list )
-    {
-        uint8_t *p_in = p_list->p_buffer;
-        size_t i_in_size = p_list->i_buffer;
-
-        if( b_input_big_endian != b_output_big_endian )
-        {
-            swab( p_in, p_out, i_in_size & ~1 );
-
-            if( i_in_size & 1 && ( i_out_size + 9 ) <= p_res->i_out_size_padded )
-            {
-                p_out[i_in_size - 1] = 0;
-                p_out[i_in_size] = p_in[i_in_size - 1];
-                i_out_size++;
-                p_out++;
-            }
-            p_out += i_in_size;
-        } else
-        {
-            memcpy( p_out, p_in, i_in_size );
-            p_out += i_in_size;
-        }
-        p_list = p_list->p_next;
-    }
-
-    if( 8 + i_out_size < p_res->i_out_size_padded ) /* padding */
-        memset( p_out, 0, p_res->i_out_size_padded - i_out_size - 8 );
-
-    p_out_buf->i_dts = p_sys->p_chain_first->i_dts;
-    p_out_buf->i_pts = p_sys->p_chain_first->i_pts;
-    p_out_buf->i_buffer = p_res->i_out_size_padded;
-    p_out_buf->i_nb_samples = p_out_buf->i_buffer / 4;
-
-    return p_out_buf;
 }
 
 static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
@@ -283,30 +297,37 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     filter_sys_t *p_sys = p_filter->p_sys;
     block_t *p_out_buf = NULL;
 
-    struct hdr_res res;
-    int i_ret = parse_header( p_filter, p_in_buf, &res );
+    int i_ret;
+    switch( p_filter->fmt_in.audio.i_format )
+    {
+        case VLC_CODEC_A52:
+            i_ret = write_buffer_ac3( p_filter, p_in_buf );
+            break;
+        case VLC_CODEC_EAC3:
+            i_ret = write_buffer_eac3( p_filter, p_in_buf );
+            break;
+        case VLC_CODEC_DTS:
+            i_ret = write_buffer_dts( p_filter, p_in_buf );
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
     switch( i_ret )
     {
         case SPDIF_SUCCESS:
-            block_ChainLastAppend( &p_sys->pp_chain_last, p_in_buf );
+            assert( p_sys->p_out_buf->i_buffer == p_sys->i_out_offset );
+            p_out_buf = p_sys->p_out_buf;
+            p_sys->p_out_buf = NULL;
             break;
         case SPDIF_MORE_DATA:
-            block_ChainLastAppend( &p_sys->pp_chain_last, p_in_buf );
-            return NULL;
+            break;
         case SPDIF_ERROR:
             Flush( p_filter );
-            goto out;
+            break;
     }
-    assert( res.i_data_type > 0 );
-    assert( res.i_out_size_padded > 0 );
-    assert( res.i_length_mul == 1 || res.i_length_mul == 8 );
 
-    p_out_buf = fill_output_buffer( p_filter, &res );
-out:
-    block_ChainRelease( p_sys->p_chain_first );
-    p_sys->p_chain_first = NULL;
-    p_sys->pp_chain_last = &p_sys->p_chain_first;
-
+    block_Release( p_in_buf );
     return p_out_buf;
 }
 
@@ -329,8 +350,7 @@ static int Open( vlc_object_t *p_this )
     p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
-    p_sys->p_chain_first = NULL;
-    p_sys->pp_chain_last = &p_sys->p_chain_first;
+    p_sys->p_out_buf = NULL;
 
     memset( &p_sys->spec, 0, sizeof( p_sys->spec ) );
 
