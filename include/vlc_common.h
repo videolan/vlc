@@ -537,7 +537,7 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
 
 /** Count leading zeroes */
 VLC_USED
-static inline unsigned clz (unsigned x)
+static inline unsigned (clz)(unsigned x)
 {
 #if VLC_GCC_VERSION(3,4)
     return __builtin_clz (x);
@@ -560,7 +560,7 @@ static inline unsigned clz (unsigned x)
 
 /** Count trailing zeroes */
 VLC_USED
-static inline unsigned ctz (unsigned x)
+static inline unsigned (ctz)(unsigned x)
 {
 #if VLC_GCC_VERSION(3,4)
     return __builtin_ctz (x);
@@ -578,7 +578,7 @@ static inline unsigned ctz (unsigned x)
 
 /** Bit weight */
 VLC_USED
-static inline unsigned popcount (unsigned x)
+static inline unsigned (popcount)(unsigned x)
 {
 #if VLC_GCC_VERSION(3,4)
     return __builtin_popcount (x);
@@ -595,7 +595,7 @@ static inline unsigned popcount (unsigned x)
 
 /** Bit weight of long long */
 VLC_USED
-static inline int popcountll(unsigned long long x)
+static inline int (popcountll)(unsigned long long x)
 {
 #if VLC_GCC_VERSION(3,4)
     return __builtin_popcountll(x);
@@ -611,7 +611,7 @@ static inline int popcountll(unsigned long long x)
 }
 
 VLC_USED
-static inline unsigned parity (unsigned x)
+static inline unsigned (parity)(unsigned x)
 {
 #if VLC_GCC_VERSION(3,4)
     return __builtin_parity (x);
@@ -622,22 +622,16 @@ static inline unsigned parity (unsigned x)
 #endif
 }
 
-#ifdef __OS2__
-#   undef bswap16
-#   undef bswap32
-#   undef bswap64
-#endif
-
 /** Byte swap (16 bits) */
 VLC_USED
-static inline uint16_t bswap16 (uint16_t x)
+static inline uint16_t (bswap16)(uint16_t x)
 {
     return (x << 8) | (x >> 8);
 }
 
 /** Byte swap (32 bits) */
 VLC_USED
-static inline uint32_t bswap32 (uint32_t x)
+static inline uint32_t (bswap32)(uint32_t x)
 {
 #if VLC_GCC_VERSION(4,3) || defined(__clang__)
     return __builtin_bswap32 (x);
@@ -651,7 +645,7 @@ static inline uint32_t bswap32 (uint32_t x)
 
 /** Byte swap (64 bits) */
 VLC_USED
-static inline uint64_t bswap64 (uint64_t x)
+static inline uint64_t (bswap64)(uint64_t x)
 {
 #if VLC_GCC_VERSION(4,3) || defined(__clang__)
     return __builtin_bswap64 (x);
