@@ -577,9 +577,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     texDesc.Format = vd->sys->picQuadConfig.textureFormat;
     texDesc.SampleDesc.Count = 1;
     texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
-    texDesc.Usage = D3D11_USAGE_DYNAMIC;
-    texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.BindFlags = D3D11_BIND_DECODER;
+    texDesc.CPUAccessFlags = 0;
 
     texDesc.ArraySize = pool_size;
 
