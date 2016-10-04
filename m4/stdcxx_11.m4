@@ -90,7 +90,7 @@ m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
     constexpr uint64_t constant_u64 = UINT64_C(0x100000000);
     constexpr unsigned constant_lim = UINT_MAX;
     const char *constant_fmt = "%" PRIu64, *constant_scn = "%" SCNu64;
-    constexpr size_t constant_align = alignof (max_align_t);
+    constexpr size_t constant_align = alignof (std::max_align_t);
 ]])
 
 AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
