@@ -18,7 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "../../libvlc/test.h"
 #ifdef NDEBUG
  #undef NDEBUG
 #endif
@@ -27,6 +26,56 @@
 #include <vlc_block.h>
 #include "../modules/packetizer/hxxx_nal.h"
 #include "../modules/packetizer/hxxx_nal.c"
+
+static void test_iterators( const uint8_t *p_ab, size_t i_ab, /* AnnexB */
+                            const uint8_t **pp_prefix, size_t *pi_prefix /* Prefixed */ )
+{
+    printf("INPUT SET    : ");
+    for(size_t j=0; j<i_ab; j++)
+        printf("0x%.2x, ", p_ab[j] );
+    printf("\n");
+
+    for( unsigned int i=0; i<3; i++)
+    {
+        const uint8_t *p_prefix = pp_prefix[i];
+        size_t i_prefix = pi_prefix[i];
+
+        printf("Test with prefix len %d:\n", 1 << i);
+
+        hxxx_iterator_ctx_t it_ab;
+        hxxx_iterator_init( &it_ab, p_ab, i_ab, 0 );
+
+        hxxx_iterator_ctx_t it_prefix;
+        hxxx_iterator_init( &it_prefix, p_prefix, i_prefix, 1 << i );
+
+        const uint8_t *p_start_ab; size_t i_size_ab;
+        const uint8_t *p_start_prefix; size_t i_size_prefix;
+
+        bool b1 = true;
+        bool b2 = true;
+
+        int i_nal = 0;
+        while(b1 && b2)
+        {
+            b1 = hxxx_annexb_iterate_next( &it_ab, &p_start_ab, &i_size_ab );
+            b2 = hxxx_iterate_next( &it_prefix, &p_start_prefix, &i_size_prefix );
+            printf("NAL %d ", i_nal++);
+            if( b1 != b2 )
+                printf(", returns %d != %d\n", b1, b2);
+            assert(b1 == b2);
+            if( b1 && b2 )
+            {
+                assert(i_size_ab == i_size_prefix);
+                assert(memcmp(p_start_ab, p_start_prefix, i_size_ab) == 0);
+                for(size_t j=0; j<i_size_ab; j++)
+                    printf("0x%.2x, ", p_start_ab[j] );
+                printf("\n");
+            }
+        }
+        printf("\n");
+
+    }
+}
 
 static void testannexbin( const uint8_t *p_data, size_t i_data,
                           const uint8_t **pp_res, size_t *pi_res )
@@ -65,12 +114,12 @@ static void testannexbin( const uint8_t *p_data, size_t i_data,
         }
     }
 }
-#define runtest(number, name) \
+#define runtest(number, name, testfunction) \
     printf("\nTEST %d %s\n", number, name);\
     p_res[0] = test##number##_avcdata1;  rgi_res[0] = sizeof(test##number##_avcdata1);\
     p_res[1] = test##number##_avcdata2;  rgi_res[1] = sizeof(test##number##_avcdata2);\
     p_res[2] = test##number##_avcdata4;  rgi_res[2] = sizeof(test##number##_avcdata4);\
-    testannexbin( test##number##_annexbdata, sizeof(test##number##_annexbdata), \
+    testfunction( test##number##_annexbdata, sizeof(test##number##_annexbdata), \
                   p_res, rgi_res )
 
 static void test_annexb()
@@ -130,18 +179,37 @@ static void test_annexb()
     const uint8_t test6_avcdata2[] =   { 0, 1, 0x11, 0, 0, 0, 0 };
     const uint8_t test6_avcdata4[] =   { 0, 0, 0, 1, 0x11, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    runtest(4, "empty nal test");
-    runtest(2, "single nal test");
-    runtest(3, "single nal test, startcode 3");
-    runtest(5, "4 bytes prefixed nal only (4 prefix optz)");
-    runtest(1, "mixed nal set");
-    runtest(6, "startcode repeat / empty nal");
+    /* empty nal variation test */
+    const uint8_t test7_annexbdata[] = { 0, 0, 0, 1 };
+    const uint8_t test7_avcdata1[]   = { 0 };
+    const uint8_t test7_avcdata2[]   = { 0, 0 };
+    const uint8_t test7_avcdata4[]   = { 0, 0, 0, 0 };
+
+    runtest(4, "empty nal test", testannexbin);
+    runtest(2, "single nal test", testannexbin);
+    runtest(3, "single nal test, startcode 3", testannexbin);
+    runtest(5, "4 bytes prefixed nal only (4 prefix optz)", testannexbin);
+    runtest(1, "mixed nal set", testannexbin);
+    runtest(6, "startcode repeat / empty nal", testannexbin);
+
+    runtest(1, "IT mixed nal set", test_iterators);
+    runtest(2, "IT single nal test", test_iterators);
+    runtest(3, "IT single nal test, startcode 3", test_iterators);
+    runtest(4, "IT empty nal test", test_iterators);
+    runtest(5, "IT 4 bytes prefixed nal only (4 prefix optz)", test_iterators);
+    runtest(6, "startcode repeat / empty nal", test_iterators);
+    runtest(7, "IT empty nal", test_iterators);
+
+    printf("\nTEST 8 borkage test\n");\
+    rgi_res[0] = 0;
+    rgi_res[1] = rgi_res[2] = 1;
+    p_res[0] = NULL;
+    p_res[1] = p_res[2] = test7_avcdata1;
+    test_iterators( NULL, 0, p_res, rgi_res );
 }
 
 int main( void )
 {
-    test_init();
-
     test_annexb();
 
     return 0;
