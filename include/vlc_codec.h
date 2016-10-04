@@ -212,7 +212,7 @@ struct encoder_t
  * This function notifies the video output pipeline of a new video output
  * format (fmt_out.video). If there was no video output from the decoder so far
  * or if the video output format has changed, a new video output will be set
- * up. decoder_GetPicture() can then be used to allocate picture buffers.
+ * up. decoder_NewPicture() can then be used to allocate picture buffers.
  *
  * If the format is unchanged, this function has no effects and returns zero.
  *
@@ -253,12 +253,11 @@ static inline picture_t *decoder_NewPicture( decoder_t *dec )
 }
 
 /**
- * Abort any calls of decoder_NewPicture / decoder_GetPicture
+ * Abort any calls of decoder_NewPicture
  *
- * If b_abort is true, all pending and futures calls of decoder_NewPicture /
- * decoder_GetPicture will be aborted. This function can be used by
- * asynchronous video decoders to unblock a thread that is waiting for a
- * picture.
+ * If b_abort is true, all pending and futures calls of decoder_NewPicture
+ * will be aborted. This function can be used by asynchronous video decoders
+ * to unblock a thread that is waiting for a picture.
  */
 VLC_API void decoder_AbortPictures( decoder_t *dec, bool b_abort );
 
