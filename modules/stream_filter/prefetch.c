@@ -137,8 +137,8 @@ static void *Thread(void *data)
             continue;
         }
 
-        if (paused)
-        {   /* Wait for resumption */
+        if (paused || sys->eof || sys->error)
+        {   /* Wait for not paused, not at EOF and not failed state */
             vlc_cond_wait(&sys->wait_space, &sys->lock);
             continue;
         }
@@ -146,17 +146,14 @@ static void *Thread(void *data)
         if (sys->stream_offset < sys->buffer_offset)
         {   /* Need to seek backward */
             if (ThreadSeek(stream, sys->stream_offset))
-                break;
+            {
+                sys->error = true;
+                vlc_cond_signal(&sys->wait_data);
+                continue;
+            }
 
             sys->buffer_offset = sys->stream_offset;
             sys->buffer_length = 0;
-            sys->eof = false;
-            continue;
-        }
-
-        if (sys->eof)
-        {   /* At EOF, wait for backward seek */
-            vlc_cond_wait(&sys->wait_space, &sys->lock);
             continue;
         }
 
@@ -167,15 +164,17 @@ static void *Thread(void *data)
          * Unread data is however given precedence if the buffer is full. */
         uint64_t history = sys->stream_offset - sys->buffer_offset;
 
+        /* If upstream supports seeking and if the downstream offset is far
+         * beyond the upstream offset, then attempt to skip forward.
+         * If it fails, assume upstream is well-behaved such that the failed
+         * seek is a no-op, and continue as if seeking was not supported.
+         * WARNING: Except problems with misbehaving access plug-ins. */
         if (sys->can_seek
-         && history >= (sys->buffer_length + sys->seek_threshold))
-        {   /* Large skip: seek forward */
-            if (ThreadSeek(stream, sys->stream_offset))
-                break;
-
+         && history >= (sys->buffer_length + sys->seek_threshold)
+         && ThreadSeek(stream, sys->stream_offset) == 0)
+        {
             sys->buffer_offset = sys->stream_offset;
             sys->buffer_length = 0;
-            sys->eof = false;
             continue;
         }
 
@@ -231,11 +230,8 @@ static void *Thread(void *data)
         //        sys->buffer_size);
         vlc_cond_signal(&sys->wait_data);
     }
+    vlc_assert_unreachable();
     vlc_cleanup_pop();
-
-    sys->error = true;
-    vlc_cond_signal(&sys->wait_data);
-    vlc_mutex_unlock(&sys->lock);
     return NULL;
 }
 
@@ -244,11 +240,10 @@ static int Seek(stream_t *stream, uint64_t offset)
     stream_sys_t *sys = stream->p_sys;
 
     vlc_mutex_lock(&sys->lock);
-    if (sys->stream_offset != offset)
-    {
-        sys->stream_offset = offset;
-        vlc_cond_signal(&sys->wait_space);
-    }
+    sys->stream_offset = offset;
+    sys->eof = false;
+    sys->error = false;
+    vlc_cond_signal(&sys->wait_space);
     vlc_mutex_unlock(&sys->lock);
     return 0;
 }
@@ -277,13 +272,15 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
 
     if (buflen == 0)
         return buflen;
-    if (buf == NULL)
-    {
-        Seek(stream, sys->stream_offset + buflen);
-        return buflen;
-    }
 
     vlc_mutex_lock(&sys->lock);
+    if (buf == NULL)
+    {
+        sys->stream_offset += buflen;
+        copy = buflen;
+        goto out;
+    }
+
     if (sys->paused)
     {
         msg_Err(stream, "reading while paused (buggy demux?)");
@@ -315,6 +312,7 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
 
     memcpy(buf, sys->buffer + offset, copy);
     sys->stream_offset += copy;
+out:
     vlc_cond_signal(&sys->wait_space);
     vlc_mutex_unlock(&sys->lock);
     return copy;
