@@ -41,6 +41,9 @@
 #ifdef MODULE_NAME_IS_direct2d
 # include <d2d1.h>
 #endif
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+# include <dxgidebug.h>
+#endif
 
 /*****************************************************************************
  * event_thread_t: event thread
@@ -94,6 +97,10 @@ struct vout_display_sys_t
 
     /* size of the overall window (including black bands) */
     RECT         rect_parent;
+
+# if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    HINSTANCE     dxgidebug_dll;
+# endif
 
     unsigned changes;        /* changes made to the video display */
 

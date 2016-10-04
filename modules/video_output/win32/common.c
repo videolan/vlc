@@ -39,6 +39,10 @@
 #include <assert.h>
 
 #define COBJMACROS
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+# define INITGUID
+# include <dxgidebug.h>
+#endif
 #include <shobjidl.h>
 
 #include "common.h"
@@ -107,6 +111,9 @@ int CommonInit(vout_display_t *vd)
     }
 
     DisableScreensaver (vd);
+#endif
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
 #endif
 
     return VLC_SUCCESS;
@@ -355,6 +362,21 @@ void CommonClean(vout_display_t *vd)
     }
 
     RestoreScreensaver(vd);
+
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    HRESULT (WINAPI  * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
+    if (sys->dxgidebug_dll) {
+        pf_DXGIGetDebugInterface = (void *)GetProcAddress(sys->dxgidebug_dll, "DXGIGetDebugInterface");
+        if (pf_DXGIGetDebugInterface) {
+            IDXGIDebug *pDXGIDebug = NULL;
+            HRESULT hr = pf_DXGIGetDebugInterface(&IID_IDXGIDebug, (void**)&pDXGIDebug);
+            if (SUCCEEDED(hr) && pDXGIDebug) {
+                hr = IDXGIDebug_ReportLiveObjects(pDXGIDebug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+            }
+        }
+        FreeLibrary(sys->dxgidebug_dll);
+    }
+#endif
 }
 
 void CommonManage(vout_display_t *vd)
