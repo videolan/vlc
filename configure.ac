@@ -4107,7 +4107,12 @@ PKG_ENABLE_MODULES_VLC([SECRET], [], [libsecret-1 >= 0.18], [use libsecret for k
 dnl
 dnl  kwallet
 dnl
-PKG_ENABLE_MODULES_VLC([KWALLET], [], [dbus-1 >= 1.6.0], [use kwallet for keystore], [auto])
+AC_ARG_ENABLE(kwallet,
+  [AS_HELP_STRING([--enable-kwallet],
+    [use kwallet (via D-Bus) for keystore (default enabled)])])
+AS_IF([test "${enable_kwallet}" != "no" -a "${have_dbus}" = "yes"], [
+  VLC_ADD_PLUGIN([kwallet])
+])
 
 dnl
 dnl  Developers helper modules (should be hidden from configure help)
