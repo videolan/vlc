@@ -47,6 +47,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <limits.h>
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_access.h>
