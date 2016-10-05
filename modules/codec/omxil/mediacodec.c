@@ -578,7 +578,7 @@ static void StopMediaCodec(decoder_t *p_dec)
     p_sys->api->stop(p_sys->api);
     if (p_dec->fmt_in.i_cat == VIDEO_ES && p_sys->u.video.p_awh)
         AWindowHandler_releaseANativeWindow(p_sys->u.video.p_awh, AWindow_Video,
-                                            false);
+                                            true);
 }
 
 /*****************************************************************************
