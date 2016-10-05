@@ -41,14 +41,12 @@ void HxxxParseSEI(decoder_t *p_dec, const uint8_t *p_buf, size_t i_buf,
     bs_t s;
     unsigned i_bitflow = 0;
 
-    if( i_buf < 2 )
+    if( i_buf <= i_header )
         return;
 
-    bs_init( &s, p_buf, i_buf );
+    bs_init( &s, &p_buf[i_header], i_buf - i_header ); /* skip nal unit header */
     s.p_fwpriv = &i_bitflow;
     s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
-
-    bs_skip( &s, i_header * 8 ); /* nal unit header */
 
     while( bs_remain( &s ) >= 8 && bs_aligned( &s ) )
     {
