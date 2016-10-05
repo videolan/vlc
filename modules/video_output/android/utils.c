@@ -118,7 +118,7 @@ NativeSurface_getHandle(JNIEnv *p_env, jobject jsurf)
 {
     jclass clz;
     jfieldID fid;
-    intptr_t p_surface_handle = NULL;
+    intptr_t p_surface_handle = 0;
 
     clz = (*p_env)->GetObjectClass(p_env, jsurf);
     if ((*p_env)->ExceptionCheck(p_env))
