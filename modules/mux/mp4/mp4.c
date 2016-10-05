@@ -42,6 +42,7 @@
 
 #include "../demux/mp4/libmp4.h"
 #include "libmp4mux.h"
+#include "../packetizer/hxxx_nal.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -176,12 +177,8 @@ static void box_send(sout_mux_t *p_mux,  bo_t *box);
 static bo_t *BuildMoov(sout_mux_t *p_mux);
 
 static block_t *ConvertSUBT(block_t *);
-static block_t *ConvertFromAnnexB(block_t *);
 static bool CreateCurrentEdit(mp4_stream_t *, mtime_t, bool);
 static void DebugEdits(sout_mux_t *, const mp4_stream_t *);
-
-static const char avc1_short_start_code[3] = { 0, 0, 1 };
-static const char avc1_start_code[4] = { 0, 0, 0, 1 };
 
 /*****************************************************************************
  * Open:
@@ -564,7 +561,7 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
     {
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
-            p_block = ConvertFromAnnexB(p_block);
+            p_block = hxxx_AnnexB_to_xVC(p_block, 4);
             break;
         case VLC_CODEC_SUBT:
             p_block = ConvertSUBT(p_block);
@@ -769,78 +766,6 @@ static block_t *ConvertSUBT(block_t *p_block)
     p_block->p_buffer[0] = ((p_block->i_buffer - 2) >> 8)&0xff;
     p_block->p_buffer[1] = ((p_block->i_buffer - 2)     )&0xff;
 
-    return p_block;
-}
-
-static block_t *ConvertFromAnnexB(block_t *p_block)
-{
-    if(p_block->i_buffer < 4)
-    {
-        block_Release(p_block);
-        return NULL;
-    }
-
-    if(memcmp(p_block->p_buffer, avc1_start_code, 4))
-    {
-        if(!memcmp(p_block->p_buffer, avc1_short_start_code, 3))
-        {
-            p_block = block_Realloc(p_block, 1, p_block->i_buffer);
-            if( !p_block )
-                return NULL;
-        }
-        else /* No startcode on start */
-        {
-            block_Release(p_block);
-            return NULL;
-        }
-    }
-
-    uint8_t *last = p_block->p_buffer;
-    uint8_t *dat  = &p_block->p_buffer[4];
-    uint8_t *end = &p_block->p_buffer[p_block->i_buffer];
-
-    /* Replace the 4 bytes start code with 4 bytes size */
-    while (dat < end) {
-        while (dat < end - 4) {
-            if (!memcmp(dat, avc1_start_code, 4))
-            {
-                break;
-            }
-            else if(!memcmp(dat, avc1_short_start_code, 3))
-            {
-                /* save offsets as we don't know if realloc will replace buffer */
-                size_t i_last = last - p_block->p_buffer;
-                size_t i_dat = dat - p_block->p_buffer;
-                size_t i_end = end - p_block->p_buffer;
-
-                p_block = block_Realloc(p_block, 0, p_block->i_buffer + 1);
-                if( !p_block )
-                    return NULL;
-
-                /* restore offsets */
-                last = &p_block->p_buffer[i_last];
-                dat = &p_block->p_buffer[i_dat];
-                end = &p_block->p_buffer[i_end];
-
-                /* Shift data */
-                memmove(&dat[4], &dat[3], end - &dat[3]);
-                end++;
-                break;
-            }
-            dat++;
-        }
-        if (dat >= end - 4)
-            dat = end;
-
-        /* Fix size */
-        SetDWBE(last, dat - &last[4]);
-
-        /* Skip blocks with SPS/PPS */
-        //if ((last[4]&0x1f) == 7 || (last[4]&0x1f) == 8)
-        //    ; // FIXME Find a way to skip dat without frelling everything
-        last = dat;
-        dat += 4;
-    }
     return p_block;
 }
 
