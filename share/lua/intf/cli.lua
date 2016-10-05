@@ -488,9 +488,12 @@ function rate(name,client,value)
         vlc.var.set(input, "rate", common.us_tonumber(value))
     elseif name == "normal" then
         vlc.var.set(input,"rate",1)
-    else
-        vlc.var.set(input,"rate-"..name,nil)
     end
+end
+
+function rate_var(name,client,value)
+    local playlist = vlc.object.playlist()
+    vlc.var.trigger_callback(playlist,"rate-"..name)
 end
 
 function frame(name,client)
@@ -566,8 +569,8 @@ commands_ordered = {
     { "pause"; { func = skip2(vlc.playlist.pause); help = "toggle pause" } };
     { "fastforward"; { func = setarg(common.hotkey,"key-jump+extrashort"); help = "set to maximum rate" } };
     { "rewind"; { func = setarg(common.hotkey,"key-jump-extrashort"); help = "set to minimum rate" } };
-    { "faster"; { func = rate; help = "faster playing of stream" } };
-    { "slower"; { func = rate; help = "slower playing of stream" } };
+    { "faster"; { func = rate_var; help = "faster playing of stream" } };
+    { "slower"; { func = rate_var; help = "slower playing of stream" } };
     { "normal"; { func = rate; help = "normal playing of stream" } };
     { "rate"; { func = rate; args = "[playback rate]"; help = "set playback rate to value" } };
     { "frame"; { func = frame; help = "play frame by frame" } };
