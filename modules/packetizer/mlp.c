@@ -424,8 +424,11 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_dec->fmt_out.audio.i_channels = p_sys->mlp.i_channels;
             p_dec->fmt_out.audio.i_original_channels = p_sys->mlp.i_channels_conf;
             p_dec->fmt_out.audio.i_physical_channels = p_sys->mlp.i_channels_conf;
+            p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size;
+            p_dec->fmt_out.audio.i_frame_length = p_sys->mlp.i_samples;
 
             p_out_buffer->i_pts = p_out_buffer->i_dts = date_Get( &p_sys->end_date );
+            p_out_buffer->i_nb_samples = p_sys->mlp.i_samples;
 
             p_out_buffer->i_length =
                 date_Increment( &p_sys->end_date, p_sys->mlp.i_samples ) - p_out_buffer->i_pts;
