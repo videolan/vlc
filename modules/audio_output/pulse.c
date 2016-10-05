@@ -765,50 +765,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         return VLC_EGENERIC;
     }
 
-    /* Channel mapping (order defined in vlc_aout.h) */
-    struct pa_channel_map map;
-    map.channels = 0;
-
-    if (fmt->i_physical_channels & AOUT_CHAN_LEFT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT;
-    if (fmt->i_physical_channels & AOUT_CHAN_RIGHT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT;
-    if (fmt->i_physical_channels & AOUT_CHAN_MIDDLELEFT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_LEFT;
-    if (fmt->i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_RIGHT;
-    if (fmt->i_physical_channels & AOUT_CHAN_REARLEFT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_LEFT;
-    if (fmt->i_physical_channels & AOUT_CHAN_REARRIGHT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_RIGHT;
-    if (fmt->i_physical_channels & AOUT_CHAN_REARCENTER)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_CENTER;
-    if (fmt->i_physical_channels & AOUT_CHAN_CENTER)
-    {
-        if (ss.channels == 1)
-            map.map[map.channels++] = PA_CHANNEL_POSITION_MONO;
-        else
-            map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_CENTER;
-    }
-    if (fmt->i_physical_channels & AOUT_CHAN_LFE)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_LFE;
-    fmt->i_original_channels = fmt->i_physical_channels;
-
-    static_assert(AOUT_CHAN_MAX == 9, "Missing channels");
-
-    for (unsigned i = 0; map.channels < ss.channels; i++) {
-        map.map[map.channels++] = PA_CHANNEL_POSITION_AUX0 + i;
-        msg_Warn(aout, "mapping channel %"PRIu8" to AUX%u", map.channels, i);
-    }
-
-    if (!pa_channel_map_valid(&map)) {
-        msg_Err(aout, "unsupported channel map");
-        return VLC_EGENERIC;
-    } else {
-        const char *name = pa_channel_map_to_name(&map);
-        msg_Dbg(aout, "using %s channel map", (name != NULL) ? name : "?");
-    }
-
     /* Stream parameters */
     pa_stream_flags_t flags = sys->flags_force
                             | PA_STREAM_START_CORKED
@@ -847,7 +803,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         formatv[formatc]->encoding = encoding;
         pa_format_info_set_rate(formatv[formatc], ss.rate);
         pa_format_info_set_channels(formatv[formatc], ss.channels);
-        pa_format_info_set_channel_map(formatv[formatc], &map);
         formatc++;
 
         /* FIX flags are only permitted for PCM, and there is no way to pass
@@ -858,6 +813,50 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
     else
     {
+        /* Channel mapping (order defined in vlc_aout.h) */
+        struct pa_channel_map map;
+        map.channels = 0;
+
+        if (fmt->i_physical_channels & AOUT_CHAN_LEFT)
+            map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT;
+        if (fmt->i_physical_channels & AOUT_CHAN_RIGHT)
+            map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT;
+        if (fmt->i_physical_channels & AOUT_CHAN_MIDDLELEFT)
+            map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_LEFT;
+        if (fmt->i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
+            map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_RIGHT;
+        if (fmt->i_physical_channels & AOUT_CHAN_REARLEFT)
+            map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_LEFT;
+        if (fmt->i_physical_channels & AOUT_CHAN_REARRIGHT)
+            map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_RIGHT;
+        if (fmt->i_physical_channels & AOUT_CHAN_REARCENTER)
+            map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_CENTER;
+        if (fmt->i_physical_channels & AOUT_CHAN_CENTER)
+        {
+            if (ss.channels == 1)
+                map.map[map.channels++] = PA_CHANNEL_POSITION_MONO;
+            else
+                map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_CENTER;
+        }
+        if (fmt->i_physical_channels & AOUT_CHAN_LFE)
+            map.map[map.channels++] = PA_CHANNEL_POSITION_LFE;
+        fmt->i_original_channels = fmt->i_physical_channels;
+
+        static_assert(AOUT_CHAN_MAX == 9, "Missing channels");
+
+        for (unsigned i = 0; map.channels < ss.channels; i++) {
+            map.map[map.channels++] = PA_CHANNEL_POSITION_AUX0 + i;
+            msg_Warn(aout, "mapping channel %"PRIu8" to AUX%u", map.channels, i);
+        }
+
+        if (!pa_channel_map_valid(&map)) {
+            msg_Err(aout, "unsupported channel map");
+            return VLC_EGENERIC;
+        } else {
+            const char *name = pa_channel_map_to_name(&map);
+            msg_Dbg(aout, "using %s channel map", (name != NULL) ? name : "?");
+        }
+
         /* PCM */
         formatv[formatc] = pa_format_info_new();
         formatv[formatc]->encoding = PA_ENCODING_PCM;
