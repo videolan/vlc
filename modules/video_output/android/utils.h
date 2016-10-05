@@ -139,11 +139,10 @@ bool AWindowHandler_getWindowSize(AWindowHandler *p_awh,
 
 /**
  * This function returns the Video or the Subtitles Android Surface attached to
- * the MediaPlayer. It can be released with AWindowHandler_releaseSurface or by
- * AWindowHandler_destroy.
+ * the MediaPlayer. It can be released with AWindowHandler_releaseANativeWindow
+ * or by AWindowHandler_destroy.
  */
 jobject AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id);
-void AWindowHandler_releaseSurface(AWindowHandler *p_awh, enum AWindow_ID id);
 
 /**
  * This function returns the Video or the Subtitles ANativeWindow attached to
