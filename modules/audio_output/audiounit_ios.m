@@ -138,6 +138,9 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
     struct aout_sys_t *p_sys = NULL;
 
+    if (aout_FormatNbChannels(fmt) == 0)
+        return VLC_EGENERIC;
+
     p_sys = p_aout->sys;
     p_sys->au_component = NULL;
     p_sys->au_unit = NULL;

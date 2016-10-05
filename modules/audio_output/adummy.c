@@ -55,6 +55,9 @@ static void Flush(audio_output_t *aout, bool wait)
 
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
+    if (aout_FormatNbChannels(fmt) == 0)
+        return VLC_EGENERIC;
+
     if (AOUT_FMT_SPDIF(fmt) && var_InheritBool(aout, "spdif"))
     {
         fmt->i_format = VLC_CODEC_SPDIFL;

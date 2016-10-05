@@ -66,6 +66,9 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
 
+    if (aout_FormatNbChannels(fmt) == 0)
+        return VLC_EGENERIC;
+
     sys->hdl = sio_open (NULL, SIO_PLAY, 0 /* blocking */);
     if (sys->hdl == NULL)
     {

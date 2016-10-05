@@ -167,6 +167,9 @@ vlc_module_end ()
  *****************************************************************************/
 static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 {
+    if( aout_FormatNbChannels( fmt ) == 0 )
+        return VLC_EGENERIC;
+
     p_aout->time_get = WaveOutTimeGet;
     p_aout->play = Play;
     p_aout->pause = WaveOutPause;

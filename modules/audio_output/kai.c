@@ -135,6 +135,9 @@ static int Start ( audio_output_t *p_aout, audio_sample_format_t *fmt )
     vlc_value_t val, text;
     audio_sample_format_t format = *fmt;
 
+    if( aout_FormatNbChannels( fmt ) == 0 )
+        return VLC_EGENERIC;
+
     psz_mode = var_InheritString( p_aout, "kai-audio-device" );
     if( !psz_mode )
         psz_mode = ( char * )ppsz_kai_audio_device[ 0 ];  // "auto"

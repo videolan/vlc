@@ -593,6 +593,9 @@ static void OutputStop( audio_output_t *aout )
 static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
                       audio_sample_format_t *restrict pfmt )
 {
+    if( aout_FormatNbChannels( pfmt ) == 0 )
+        return E_FAIL;
+
 #if !VLC_WINSTORE_APP
     /* Set DirectSound Cooperative level, ie what control we want over Windows
      * sound device. In our case, DSSCL_EXCLUSIVE means that we can modify the

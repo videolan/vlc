@@ -121,6 +121,9 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     unsigned int i;
     int i_error;
 
+    if( aout_FormatNbChannels( fmt ) == 0 )
+        return VLC_EGENERIC;
+
     p_sys->latency = 0;
     p_sys->paused = VLC_TS_INVALID;
 

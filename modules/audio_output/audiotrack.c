@@ -895,6 +895,9 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     bool b_spdif;
     int i_at_format;
 
+    if (aout_FormatNbChannels(p_fmt) == 0)
+        return VLC_EGENERIC;
+
     if( p_sys->at_dev == AT_DEV_HDMI )
     {
         b_spdif = true;

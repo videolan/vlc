@@ -461,6 +461,11 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         }
         return filters;
     }
+    if (aout_FormatNbChannels(infmt) == 0 || aout_FormatNbChannels(outfmt) == 0)
+    {
+        msg_Warn (obj, "No channel mask, cannot setup filters");
+        goto error;
+    }
 
     /* parse user filter lists */
     if (var_InheritBool (obj, "audio-time-stretch"))

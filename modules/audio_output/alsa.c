@@ -287,6 +287,9 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     snd_pcm_format_t pcm_format; /* ALSA sample format */
     bool spdif = false;
 
+    if (aout_FormatNbChannels(fmt) == 0)
+        return VLC_EGENERIC;
+
     switch (fmt->i_format)
     {
         case VLC_CODEC_FL64:

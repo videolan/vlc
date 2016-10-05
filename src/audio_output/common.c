@@ -87,7 +87,10 @@ unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
  *****************************************************************************/
 void aout_FormatPrepare( audio_sample_format_t * p_format )
 {
-    p_format->i_channels = aout_FormatNbChannels( p_format );
+
+    unsigned i_channels = aout_FormatNbChannels( p_format );
+    if( i_channels > 0 )
+        p_format->i_channels = i_channels;
     p_format->i_bitspersample = aout_BitsPerSample( p_format->i_format );
     if( p_format->i_bitspersample > 0 )
     {
@@ -213,7 +216,7 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
         return "3F2M3R/LFE";
     }
 
-    return "ERROR";
+    return AOUT_FMT_LINEAR( p_format ) ? "ERROR" : "Unknown-chan-mask";
 }
 
 #undef aout_FormatPrint

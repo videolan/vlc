@@ -196,6 +196,9 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
+    if( aout_FormatNbChannels( p_fmt ) == 0 )
+        return VLC_EGENERIC;
+
     aout_FormatPrint( p_aout, "Tizen audio is looking for:", p_fmt );
 
     /* Sample rate: tizen accept rate between 8000 and 48000 Hz */

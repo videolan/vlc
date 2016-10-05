@@ -379,6 +379,9 @@ static int aout_get_native_sample_rate(audio_output_t *aout)
  *****************************************************************************/
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
+    if (aout_FormatNbChannels(fmt) == 0)
+        return VLC_EGENERIC;
+
     SLresult       result;
 
     aout_sys_t *sys = aout->sys;
