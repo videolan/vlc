@@ -504,12 +504,26 @@ AWindowHandler_new(vlc_object_t *p_obj)
 
 static void
 AWindowHandler_releaseANativeWindowEnv(AWindowHandler *p_awh, JNIEnv *p_env,
-                                       enum AWindow_ID id)
+                                       enum AWindow_ID id, bool b_clear)
 {
     assert(id < AWindow_Max);
 
     if (p_awh->views[id].p_anw)
     {
+        if (b_clear && p_awh->anw_api.setBuffersGeometry)
+        {
+            /* Clear the surface by displaying a 1x1 black RGB buffer */
+            ANativeWindow *p_anw = p_awh->views[id].p_anw;
+            p_awh->anw_api.setBuffersGeometry(p_anw, 1, 1,
+                                              WINDOW_FORMAT_RGB_565);
+            ANativeWindow_Buffer buf;
+            if (p_awh->anw_api.winLock(p_anw, &buf, NULL) == 0)
+            {
+                uint16_t *p_bit = buf.bits;
+                p_bit[0] = 0x0000;
+                p_awh->anw_api.unlockAndPost(p_anw);
+            }
+        }
         p_awh->pf_winRelease(p_awh->views[id].p_anw);
         p_awh->views[id].p_anw = NULL;
     }
@@ -530,8 +544,10 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
     {
         if (p_awh->event.b_registered)
             JNI_CALL(CallBooleanMethod, setCallback, (jlong)0LL);
-        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video);
-        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles);
+        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video,
+                                               false);
+        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles,
+                                               false);
         (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
     }
 
@@ -613,11 +629,11 @@ AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id)
 
 
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
-                                         enum AWindow_ID id)
+                                         enum AWindow_ID id, bool b_clear)
 {
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
     if (p_env)
-        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, id);
+        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, id, b_clear);
 }
 
 static inline AWindowHandler *jlong_AWindowHandler(jlong handle)

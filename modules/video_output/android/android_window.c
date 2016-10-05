@@ -335,7 +335,7 @@ static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,
         p_window->p_handle_priv = NULL;
     }
     if (p_window->p_handle) {
-        AWindowHandler_releaseANativeWindow(sys->p_awh, p_window->id);
+        AWindowHandler_releaseANativeWindow(sys->p_awh, p_window->id, false);
         p_window->p_handle = NULL;
     }
 }

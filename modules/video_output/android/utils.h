@@ -153,7 +153,7 @@ jobject AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id);
 ANativeWindow *AWindowHandler_getANativeWindow(AWindowHandler *p_awh,
                                                enum AWindow_ID id);
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
-                                         enum AWindow_ID id);
+                                         enum AWindow_ID id, bool b_clear);
 /**
  * This function is a fix up of ANativeWindow_setBuffersGeometry that doesn't
  * work before Android ICS. It configures the Surface from the Android
