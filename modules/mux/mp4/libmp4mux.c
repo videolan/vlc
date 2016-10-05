@@ -877,18 +877,14 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
     const uint8_t *p_sps, *p_pps, *p_ext;
     size_t i_sps_size, i_pps_size, i_ext_size;
 
-    if( h264_AnnexB_get_spspps(p_fmt->p_extra, p_fmt->i_extra,
+    if(! h264_AnnexB_get_spspps(p_fmt->p_extra, p_fmt->i_extra,
                         &p_sps, &i_sps_size,
                         &p_pps, &i_pps_size,
-                        &p_ext, &i_ext_size ) != 0 )
+                        &p_ext, &i_ext_size ) )
     {
         p_sps = p_pps = p_ext = NULL;
         i_sps_size = i_pps_size = i_ext_size = 0;
     }
-
-    (void) hxxx_strip_AnnexB_startcode( &p_sps, &i_sps_size );
-    (void) hxxx_strip_AnnexB_startcode( &p_sps, &i_sps_size );
-    (void) hxxx_strip_AnnexB_startcode( &p_ext, &i_ext_size );
 
     bo_add_8(avcC, 1);      /* configuration version */
     bo_add_8(avcC, i_sps_size > 3 ? p_sps[1] : PROFILE_H264_MAIN);

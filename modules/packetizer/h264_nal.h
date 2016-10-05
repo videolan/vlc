@@ -148,12 +148,12 @@ bool h264_isavcC( const uint8_t *, size_t );
 void h264_AVC_to_AnnexB( uint8_t *p_buf, uint32_t i_len,
                          uint8_t i_nal_length_size );
 
-/* Get the SPS/PPS pointers from an Annex B buffer
- * Returns 0 if a SPS and/or a PPS is found */
-int h264_AnnexB_get_spspps( const uint8_t *p_buf, size_t i_buf,
-                            const uint8_t **pp_sps, size_t *p_sps_size,
-                            const uint8_t **pp_pps, size_t *p_pps_size,
-                            const uint8_t **pp_ext, size_t *p_ext_size );
+/* Get the First SPS/PPS NAL pointers from an Annex B buffer
+ * Returns TRUE if a SPS and/or a PPS is found */
+bool h264_AnnexB_get_spspps( const uint8_t *p_buf, size_t i_buf,
+                             const uint8_t **pp_sps, size_t *p_sps_size,
+                             const uint8_t **pp_pps, size_t *p_pps_size,
+                             const uint8_t **pp_ext, size_t *p_ext_size );
 
 /* Create a AVCDecoderConfigurationRecord from SPS/PPS
  * Returns a valid block_t on success, must be freed with block_Release */
@@ -162,6 +162,12 @@ block_t *h264_AnnexB_NAL_to_avcC( uint8_t i_nal_length_size,
                                   size_t i_sps_size,
                                   const uint8_t *p_pps_buf,
                                   size_t i_pps_size );
+/* Same from raw / non prefixed NAL */
+block_t *h264_NAL_to_avcC( uint8_t i_nal_length_size,
+                           const uint8_t *p_sps_buf,
+                           size_t i_sps_size,
+                           const uint8_t *p_pps_buf,
+                           size_t i_pps_size );
 
 /* Convert AVCDecoderConfigurationRecord SPS/PPS to Annex B format */
 uint8_t * h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,

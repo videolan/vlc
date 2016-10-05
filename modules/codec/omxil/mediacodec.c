@@ -258,29 +258,38 @@ static bool CSDCmp(decoder_t *p_dec, struct csd *p_csd, size_t i_csd_count)
     return true;
 }
 
+static inline uint8_t RestoreSyncCode( const uint8_t *p_bufhead,
+                                       const uint8_t **pp_buf, size_t *pi_size )
+{
+    *pp_buf -= 3;
+    *pi_size += 3;
+    if( *pp_buf > p_bufhead && (*pp_buf)[-1] == 0 )
+    {
+        *pp_buf -= 1;
+        *pi_size += 1;
+        return 4;
+    }
+    return 3;
+}
+
 /* Fill the p_sys->p_csd struct with H264 Parameter Sets */
 static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
                       bool *p_size_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    const uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL, *p_ext_buf = NULL;
-    size_t i_sps_size = 0, i_pps_size = 0, i_ext_size = 0;
+    const uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
+    size_t i_sps_size = 0, i_pps_size = 0;
 
     /* Check if p_buf contains a valid SPS PPS */
     if (h264_AnnexB_get_spspps(p_buf, i_size,
                         &p_sps_buf, &i_sps_size,
                         &p_pps_buf, &i_pps_size,
-                        &p_ext_buf, &i_ext_size) == 0 )
+                        NULL, NULL))
     {
         struct csd csd[2];
         int i_csd_count = 0;
 
-        const uint8_t *p_buffer = p_sps_buf;
-        size_t i_buffer = i_sps_size;
-        if(!hxxx_strip_AnnexB_startcode(&p_buffer, &i_buffer))
-            return VLC_EGENERIC;
-
-        h264_sequence_parameter_set_t *p_sps = h264_decode_sps(p_buffer, i_buffer, true);
+        h264_sequence_parameter_set_t *p_sps = h264_decode_sps(p_sps_buf, i_sps_size, true);
         if( !p_sps )
             return VLC_EGENERIC;
 
@@ -288,13 +297,13 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
         (void) h264_get_picture_size( p_sps, &vsize[0], &vsize[1], &vsize[2], &vsize[3] );
         /* FIXME: what to do with visible width/height ? */
 
-        if (i_sps_size)
+        if (i_sps_size && RestoreSyncCode( p_buf, &p_sps_buf, &i_sps_size ) == 4)
         {
             csd[i_csd_count].p_buf = p_sps_buf;
             csd[i_csd_count].i_size = i_sps_size;
             i_csd_count++;
         }
-        if (i_pps_size)
+        if (i_pps_size && RestoreSyncCode( p_buf, &p_pps_buf, &i_pps_size ) == 4)
         {
             csd[i_csd_count].p_buf = p_pps_buf;
             csd[i_csd_count].i_size = i_pps_size;
