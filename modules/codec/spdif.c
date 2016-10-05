@@ -67,6 +67,8 @@ OpenDecoder(vlc_object_t *p_this)
         break;
     case VLC_CODEC_A52:
     case VLC_CODEC_EAC3:
+    case VLC_CODEC_MLP:
+    case VLC_CODEC_TRUEHD:
     case VLC_CODEC_DTS:
     case VLC_CODEC_SPDIFL:
     case VLC_CODEC_SPDIFB:
