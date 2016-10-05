@@ -605,6 +605,8 @@ AC_CHECK_FUNC(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
 
+VLC_REPLACE_DECL([realpath], [#include <stdlib.h>])
+
 dnl mingw64 implements those as static inline, not functions with C linkage
 VLC_REPLACE_DECL([asprintf], [#include <stdio.h>])
 VLC_REPLACE_DECL([vasprintf], [#include <stdio.h>])

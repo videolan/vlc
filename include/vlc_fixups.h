@@ -481,6 +481,10 @@ void freeaddrinfo (struct addrinfo *res);
 #define nanf(tagp) NAN
 #endif
 
+#ifndef HAVE_REALPATH
+char *realpath(const char * restrict pathname, char * restrict resolved_path);
+#endif
+
 #ifdef _WIN32
 FILE *vlc_win32_tmpfile(void);
 #endif
