@@ -373,12 +373,13 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     if (hevc_ishvcC(p_extra, i_extra))
     {
         struct csd csd;
-        csd.p_buf = hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra, &csd.i_size,
-                                            &p_sys->u.video.i_nal_length_size);
-        if (csd.p_buf)
+        uint8_t *p_buf = hevc_hvcC_to_AnnexB_NAL(p_extra, i_extra, &csd.i_size,
+                                                 &p_sys->u.video.i_nal_length_size);
+        if (p_buf)
         {
+            csd.p_buf = p_buf;
             CSDDup(p_dec, &csd, 1);
-            free(csd.p_buf);
+            free(p_buf);
         }
     }
     /* FIXME: what to do with AnnexB ? */
