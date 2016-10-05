@@ -61,6 +61,10 @@ struct filter_sys_t
         {
             unsigned int i_nb_blocks_substream0;
         } eac3;
+        struct
+        {
+            unsigned int i_frame_count;
+        } truehd;
     } spec;
 };
 
@@ -68,6 +72,7 @@ struct filter_sys_t
 
 #define IEC61937_AC3 0x01
 #define IEC61937_EAC3 0x15
+#define IEC61937_TRUEHD 0x16
 #define IEC61937_DTS1 0x0B
 #define IEC61937_DTS2 0x0C
 #define IEC61937_DTS3 0x0D
@@ -82,6 +87,8 @@ static bool is_big_endian( filter_t *p_filter, block_t *p_in_buf )
     {
         case VLC_CODEC_A52:
         case VLC_CODEC_EAC3:
+        case VLC_CODEC_MLP:
+        case VLC_CODEC_TRUEHD:
             return true;
         case VLC_CODEC_DTS:
             return p_in_buf->p_buffer[0] == 0x1F
@@ -251,6 +258,85 @@ static int write_buffer_eac3( filter_t *p_filter, block_t *p_in_buf )
 
 }
 
+/* Adapted from libavformat/spdifenc.c:
+ * It seems Dolby TrueHD frames have to be encapsulated in MAT frames before
+ * they can be encapsulated in IEC 61937.
+ * Here we encapsulate 24 TrueHD frames in a single MAT frame, padding them
+ * to achieve constant rate.
+ * The actual format of a MAT frame is unknown, but the below seems to work.
+ * However, it seems it is not actually necessary for the 24 TrueHD frames to
+ * be in an exact alignment with the MAT frame
+ */
+static int write_buffer_truehd( filter_t *p_filter, block_t *p_in_buf )
+{
+#define TRUEHD_FRAME_OFFSET     2560
+
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( !p_sys->p_out_buf
+     && write_init( p_filter, p_in_buf, 61440, 61440 / 16 ) )
+        return SPDIF_ERROR;
+
+    int i_padding = 0;
+    if( p_sys->spec.truehd.i_frame_count == 0 )
+    {
+        static const char p_mat_start_code[20] = {
+            0x07, 0x9E, 0x00, 0x03, 0x84, 0x01, 0x01, 0x01, 0x80, 0x00,
+            0x56, 0xA5, 0x3B, 0xF4, 0x81, 0x83, 0x49, 0x80, 0x77, 0xE0
+        };
+        write_data( p_filter, p_mat_start_code, 20, true );
+        /* We need to include the S/PDIF header in the first MAT frame */
+        i_padding = TRUEHD_FRAME_OFFSET - p_in_buf->i_buffer - 20
+                  - SPDIF_HEADER_SIZE;
+    }
+    else if( p_sys->spec.truehd.i_frame_count == 11 )
+    {
+        /* The middle mat code need to be at the ((2560 * 12) - 4) offset */
+        i_padding = TRUEHD_FRAME_OFFSET - p_in_buf->i_buffer - 4;
+    }
+    else if( p_sys->spec.truehd.i_frame_count == 12 )
+    {
+        static const char p_mat_middle_code[12] = {
+            0xC3, 0xC1, 0x42, 0x49, 0x3B, 0xFA,
+            0x82, 0x83, 0x49, 0x80, 0x77, 0xE0
+        };
+        write_data( p_filter, p_mat_middle_code, 12, true );
+        i_padding = TRUEHD_FRAME_OFFSET - p_in_buf->i_buffer - ( 12 - 4 );
+    }
+    else if( p_sys->spec.truehd.i_frame_count == 23 )
+    {
+        static const char p_mat_end_code[16] = {
+            0xC3, 0xC2, 0xC0, 0xC4, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x97, 0x11
+        };
+
+        /* The end mat code need to be at the ((2560 * 24) - 24) offset */
+        i_padding = TRUEHD_FRAME_OFFSET - p_in_buf->i_buffer - 24;
+
+        if( i_padding < 0 || p_in_buf->i_buffer + i_padding >
+            p_sys->p_out_buf->i_buffer - p_sys->i_out_offset )
+            return SPDIF_ERROR;
+
+        write_buffer( p_filter, p_in_buf );
+        write_padding( p_filter, i_padding );
+        write_data( p_filter, p_mat_end_code, 16, true );
+        write_finalize( p_filter, IEC61937_TRUEHD, 1 /* in bytes */ );
+        p_sys->spec.truehd.i_frame_count = 0;
+        return SPDIF_SUCCESS;
+    }
+    else
+        i_padding = TRUEHD_FRAME_OFFSET - p_in_buf->i_buffer;
+
+    if( i_padding < 0 || p_in_buf->i_buffer + i_padding >
+        p_sys->p_out_buf->i_buffer - p_sys->i_out_offset )
+        return SPDIF_ERROR;
+
+    write_buffer( p_filter, p_in_buf );
+    write_padding( p_filter, i_padding );
+    p_sys->spec.truehd.i_frame_count++;
+    return SPDIF_MORE_DATA;
+}
+
 static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
 {
     uint16_t i_data_type;
@@ -306,6 +392,10 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         case VLC_CODEC_EAC3:
             i_ret = write_buffer_eac3( p_filter, p_in_buf );
             break;
+        case VLC_CODEC_MLP:
+        case VLC_CODEC_TRUEHD:
+            i_ret = write_buffer_truehd( p_filter, p_in_buf );
+            break;
         case VLC_CODEC_DTS:
             i_ret = write_buffer_dts( p_filter, p_in_buf );
             break;
@@ -342,7 +432,9 @@ static int Open( vlc_object_t *p_this )
 
     if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_DTS &&
           p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 &&
-          p_filter->fmt_in.audio.i_format != VLC_CODEC_EAC3 ) ||
+          p_filter->fmt_in.audio.i_format != VLC_CODEC_EAC3 &&
+          p_filter->fmt_in.audio.i_format != VLC_CODEC_MLP &&
+          p_filter->fmt_in.audio.i_format != VLC_CODEC_TRUEHD ) ||
         ( p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFL &&
           p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFB ) )
         return VLC_EGENERIC;
