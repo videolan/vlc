@@ -48,5 +48,6 @@ typedef struct
 
 typedef void (*pf_hxxx_sei_callback)(decoder_t *, const hxxx_sei_data_t *);
 void HxxxParseSEI(decoder_t *, const uint8_t *, size_t, uint8_t, pf_hxxx_sei_callback);
+void HxxxParse_AnnexB_SEI(decoder_t *, const uint8_t *, size_t, uint8_t, pf_hxxx_sei_callback);
 
 #endif

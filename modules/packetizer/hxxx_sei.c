@@ -28,19 +28,23 @@
 #include "hxxx_sei.h"
 #include "hxxx_nal.h"
 
-void HxxxParseSEI(decoder_t *p_dec, const uint8_t *p_buffer, size_t i_buffer,
+void HxxxParse_AnnexB_SEI(decoder_t *p_dec, const uint8_t *p_buf, size_t i_buf,
+                          uint8_t i_header, pf_hxxx_sei_callback cb)
+{
+    if( hxxx_strip_AnnexB_startcode( &p_buf, &i_buf ) )
+        HxxxParseSEI(p_dec, p_buf, i_buf, i_header, cb);
+}
+
+void HxxxParseSEI(decoder_t *p_dec, const uint8_t *p_buf, size_t i_buf,
                   uint8_t i_header, pf_hxxx_sei_callback pf_callback)
 {
     bs_t s;
     unsigned i_bitflow = 0;
 
-    const uint8_t *p_stripped = p_buffer;
-    size_t i_stripped = i_buffer;
-
-    if( !hxxx_strip_AnnexB_startcode( &p_stripped, &i_stripped ) || i_stripped < 2 )
+    if( i_buf < 2 )
         return;
 
-    bs_init( &s, p_stripped, i_stripped );
+    bs_init( &s, p_buf, i_buf );
     s.p_fwpriv = &i_bitflow;
     s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
 
