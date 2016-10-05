@@ -58,6 +58,11 @@ DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS,
             0x000a, 0x0cea, 0x0010, 0x80, 0x00,
             0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 
+/* 0000000c-0cea-0010-8000-00aa00389b71 */
+DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP,
+            0x000c, 0x0cea, 0x0010, 0x80, 0x00,
+            0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+
 static BOOL CALLBACK InitFreq(INIT_ONCE *once, void *param, void **context)
 {
     (void) once; (void) context;
@@ -261,8 +266,12 @@ static void vlc_HdmiToWave(WAVEFORMATEXTENSIBLE_IEC61937 *restrict wf_iec61937,
         wf->Format.nChannels = 2;
         wf->dwChannelMask = KSAUDIO_SPEAKER_5POINT1;
         break;
-    /* TODO case VLC_CODEC_TRUEHD */
-    /* TODO case VLC_CODEC_MLP */
+    case VLC_CODEC_TRUEHD:
+    case VLC_CODEC_MLP:
+        wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP;
+        wf->Format.nChannels = 8;
+        wf->dwChannelMask = KSAUDIO_SPEAKER_7POINT1;
+        break;
     default:
         vlc_assert_unreachable();
     }
