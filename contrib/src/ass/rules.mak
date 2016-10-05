@@ -1,5 +1,5 @@
 # ASS
-ASS_VERSION := 0.13.2
+ASS_VERSION := 0.13.4
 ASS_URL := https://github.com/libass/libass/releases/download/$(ASS_VERSION)/libass-$(ASS_VERSION).tar.gz
 
 PKGS += ass
@@ -41,7 +41,6 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
 	$(APPLY) $(SRC)/ass/ass-macosx.patch
-	$(APPLY) $(SRC)/ass/ass-solaris.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/ass/use-topendir.patch
 endif
