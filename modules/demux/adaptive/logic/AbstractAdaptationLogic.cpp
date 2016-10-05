@@ -37,6 +37,6 @@ AbstractAdaptationLogic::~AbstractAdaptationLogic   ()
 {
 }
 
-void AbstractAdaptationLogic::updateDownloadRate    (const ID &, size_t, mtime_t)
+void AbstractAdaptationLogic::updateDownloadRate    (const adaptive::ID &, size_t, mtime_t)
 {
 }

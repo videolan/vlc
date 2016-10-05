@@ -117,7 +117,7 @@ block_t * AbstractChunk::read(size_t size)
 }
 
 HTTPChunkSource::HTTPChunkSource(const std::string& url, AbstractConnectionManager *manager,
-                                 const ID &id) :
+                                 const adaptive::ID &id) :
     AbstractChunkSource(),
     connection   (NULL),
     connManager  (manager),
@@ -234,7 +234,7 @@ block_t * HTTPChunkSource::readBlock()
 }
 
 HTTPChunkBufferedSource::HTTPChunkBufferedSource(const std::string& url, AbstractConnectionManager *manager,
-                                                 const ID &sourceid) :
+                                                 const adaptive::ID &sourceid) :
     HTTPChunkSource(url, manager, sourceid),
     p_head     (NULL),
     pp_tail    (&p_head),
@@ -447,7 +447,7 @@ block_t * HTTPChunkBufferedSource::read(size_t readsize)
 }
 
 HTTPChunk::HTTPChunk(const std::string &url, AbstractConnectionManager *manager,
-                     const ID &id):
+                     const adaptive::ID &id):
     AbstractChunk(new HTTPChunkSource(url, manager, id))
 {
 

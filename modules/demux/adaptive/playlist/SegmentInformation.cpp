@@ -410,7 +410,7 @@ bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     return false;
 }
 
-SegmentInformation * SegmentInformation::getChildByID(const ID &id)
+SegmentInformation * SegmentInformation::getChildByID(const adaptive::ID &id)
 {
     std::vector<SegmentInformation *>::const_iterator it;
     for(it=childs.begin(); it!=childs.end(); ++it)
