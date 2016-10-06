@@ -376,7 +376,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
     else if( newval.i_int == INPUT_EVENT_CACHE )
     {
         event.type = libvlc_MediaPlayerBuffering;
-        event.u.media_player_buffering.new_cache = (int)(100 *
+        event.u.media_player_buffering.new_cache = (100 *
             var_GetFloat( p_input, "cache" ));
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
