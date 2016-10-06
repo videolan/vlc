@@ -280,12 +280,13 @@ static void vlc_HdmiToWave(WAVEFORMATEXTENSIBLE_IEC61937 *restrict wf_iec61937,
     wf_iec61937->dwAverageBytesPerSec = 0;
 
     audio->i_format = VLC_CODEC_SPDIFL;
+    audio->i_bytes_per_frame = wf->Format.nBlockAlign;
+    audio->i_frame_length = 1;
 }
 
 static void vlc_SpdifToWave(WAVEFORMATEXTENSIBLE *restrict wf,
                             audio_sample_format_t *restrict audio)
 {
-
     switch (audio->i_format)
     {
     case VLC_CODEC_DTS:
@@ -299,7 +300,6 @@ static void vlc_SpdifToWave(WAVEFORMATEXTENSIBLE *restrict wf,
     default:
         vlc_assert_unreachable();
     }
-    audio->i_format = VLC_CODEC_SPDIFL;
 
     wf->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
     wf->Format.nChannels = 2; /* To prevent channel re-ordering */
@@ -312,6 +312,10 @@ static void vlc_SpdifToWave(WAVEFORMATEXTENSIBLE *restrict wf,
     wf->Samples.wValidBitsPerSample = wf->Format.wBitsPerSample;
 
     wf->dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT;
+
+    audio->i_format = VLC_CODEC_SPDIFL;
+    audio->i_bytes_per_frame = wf->Format.nBlockAlign;
+    audio->i_frame_length = 1;
 }
 
 static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
