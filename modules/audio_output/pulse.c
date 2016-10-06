@@ -719,11 +719,15 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             break;
         case VLC_CODEC_A52:
             fmt->i_format = VLC_CODEC_SPDIFL;
+            fmt->i_bytes_per_frame = 4;
+            fmt->i_frame_length = 1;
             encoding = PA_ENCODING_AC3_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
             break;
         case VLC_CODEC_EAC3:
             fmt->i_format = VLC_CODEC_SPDIFL;
+            fmt->i_bytes_per_frame = 4;
+            fmt->i_frame_length = 1;
             encoding = PA_ENCODING_EAC3_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
             break;
@@ -734,8 +738,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             break;*/
         case VLC_CODEC_DTS:
             fmt->i_format = VLC_CODEC_SPDIFL;
+            fmt->i_bytes_per_frame = 4;
+            fmt->i_frame_length = 1;
             encoding = PA_ENCODING_DTS_IEC61937;
             ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
+
             break;
         default:
             if (HAVE_FPU)
