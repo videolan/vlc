@@ -28,15 +28,15 @@
 #include "hxxx_sei.h"
 #include "hxxx_nal.h"
 
-void HxxxParse_AnnexB_SEI(decoder_t *p_dec, const uint8_t *p_buf, size_t i_buf,
-                          uint8_t i_header, pf_hxxx_sei_callback cb)
+void HxxxParse_AnnexB_SEI(const uint8_t *p_buf, size_t i_buf,
+                          uint8_t i_header, pf_hxxx_sei_callback cb, void *cbdata)
 {
     if( hxxx_strip_AnnexB_startcode( &p_buf, &i_buf ) )
-        HxxxParseSEI(p_dec, p_buf, i_buf, i_header, cb);
+        HxxxParseSEI(p_buf, i_buf, i_header, cb, cbdata);
 }
 
-void HxxxParseSEI(decoder_t *p_dec, const uint8_t *p_buf, size_t i_buf,
-                  uint8_t i_header, pf_hxxx_sei_callback pf_callback)
+void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
+                  uint8_t i_header, pf_hxxx_sei_callback pf_callback, void *cbdata)
 {
     bs_t s;
     unsigned i_bitflow = 0;
@@ -85,7 +85,7 @@ void HxxxParseSEI(decoder_t *p_dec, const uint8_t *p_buf, size_t i_buf,
             case HXXX_SEI_PIC_TIMING:
             {
                 sei_data.p_bs = &s;
-                pf_callback( p_dec, &sei_data );
+                pf_callback( &sei_data, cbdata );
             } break;
 
             /* Look for user_data_registered_itu_t_t35 */
@@ -120,7 +120,7 @@ void HxxxParseSEI(decoder_t *p_dec, const uint8_t *p_buf, size_t i_buf,
                 {
                     sei_data.itu_t35.i_cc = i_t35 - 3;
                     sei_data.itu_t35.p_cc = &p_t35[3];
-                    pf_callback( p_dec, &sei_data );
+                    pf_callback( &sei_data, cbdata );
                 }
 
                 free( p_t35 );
@@ -133,7 +133,7 @@ void HxxxParseSEI(decoder_t *p_dec, const uint8_t *p_buf, size_t i_buf,
                 //bool b_exact_match = bs_read( &s, 1 );
                 //bool b_broken_link = bs_read( &s, 1 );
                 //int i_changing_slice_group = bs_read( &s, 2 );
-                pf_callback( p_dec, &sei_data );
+                pf_callback( &sei_data, cbdata );
             } break;
 
             default:

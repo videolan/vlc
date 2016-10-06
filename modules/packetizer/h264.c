@@ -167,7 +167,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag );
 static void PutPPS( decoder_t *p_dec, block_t *p_frag );
 static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,
                         int i_nal_ref_idc, int i_nal_type, const block_t *p_frag );
-static void ParseSeiCallback( decoder_t *p_dec, const hxxx_sei_data_t * );
+static void ParseSeiCallback( const hxxx_sei_data_t *, void * );
 
 
 static const uint8_t p_h264_startcode[3] = { 0x00, 0x00, 0x01 };
@@ -532,7 +532,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         /* Parse SEI for CC support */
         if( i_nal_type == H264_NAL_SEI )
         {
-            HxxxParseSEI( p_dec, p_frag->p_buffer, p_frag->i_buffer, 1, ParseSeiCallback );
+            HxxxParse_AnnexB_SEI( p_frag->p_buffer, p_frag->i_buffer,
+                                  1 /* nal header */, ParseSeiCallback, p_dec );
         }
         else if( i_nal_type == H264_NAL_AU_DELIMITER )
         {
@@ -949,8 +950,9 @@ static bool ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     return true;
 }
 
-static void ParseSeiCallback( decoder_t *p_dec, const hxxx_sei_data_t *p_sei_data )
+static void ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
 {
+    decoder_t *p_dec = (decoder_t *) cbdata;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     switch( p_sei_data->i_type )
