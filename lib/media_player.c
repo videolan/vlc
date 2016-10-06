@@ -1744,7 +1744,7 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi )
 void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
                                    unsigned navigate )
 {
-    static const vlc_action_t map[] =
+    static const enum input_query_e map[] =
     {
         INPUT_NAV_ACTIVATE, INPUT_NAV_UP, INPUT_NAV_DOWN,
         INPUT_NAV_LEFT, INPUT_NAV_RIGHT, INPUT_NAV_POPUP,
@@ -1928,7 +1928,8 @@ int libvlc_media_player_add_slave( libvlc_media_player_t *p_mi,
     }
     else
     {
-        int i_ret = input_AddSlave( p_input_thread, i_type, psz_uri, b_select );
+        int i_ret = input_AddSlave( p_input_thread, (enum slave_type) i_type,
+                                    psz_uri, b_select );
         vlc_object_release( p_input_thread );
 
         return i_ret == VLC_SUCCESS ? 0 : -1;
