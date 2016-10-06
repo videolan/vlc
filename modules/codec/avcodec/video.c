@@ -894,7 +894,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
 
         /* Compute the PTS */
+#ifdef FF_API_PKT_PTS
+        mtime_t i_pts = frame->pts;
+#else
         mtime_t i_pts = frame->pkt_pts;
+#endif
         if (i_pts == AV_NOPTS_VALUE )
             i_pts = frame->pkt_dts;
 
