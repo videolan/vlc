@@ -40,6 +40,7 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
 {
     bs_t s;
     unsigned i_bitflow = 0;
+    bool b_continue = true;
 
     if( i_buf <= i_header )
         return;
@@ -48,7 +49,7 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
     s.p_fwpriv = &i_bitflow;
     s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
 
-    while( bs_remain( &s ) >= 8 && bs_aligned( &s ) )
+    while( bs_remain( &s ) >= 8 && bs_aligned( &s ) && b_continue )
     {
         /* Read type */
         unsigned i_type = 0;
@@ -85,7 +86,7 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
             case HXXX_SEI_PIC_TIMING:
             {
                 sei_data.p_bs = &s;
-                pf_callback( &sei_data, cbdata );
+                b_continue = pf_callback( &sei_data, cbdata );
             } break;
 
             /* Look for user_data_registered_itu_t_t35 */
@@ -120,7 +121,7 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
                 {
                     sei_data.itu_t35.i_cc = i_t35 - 3;
                     sei_data.itu_t35.p_cc = &p_t35[3];
-                    pf_callback( &sei_data, cbdata );
+                    b_continue = pf_callback( &sei_data, cbdata );
                 }
 
                 free( p_t35 );
@@ -133,7 +134,7 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
                 //bool b_exact_match = bs_read( &s, 1 );
                 //bool b_broken_link = bs_read( &s, 1 );
                 //int i_changing_slice_group = bs_read( &s, 2 );
-                pf_callback( &sei_data, cbdata );
+                b_continue = pf_callback( &sei_data, cbdata );
             } break;
 
             default:

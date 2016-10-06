@@ -46,7 +46,7 @@ typedef struct
     };
 } hxxx_sei_data_t;
 
-typedef void (*pf_hxxx_sei_callback)(const hxxx_sei_data_t *, void *);
+typedef bool (*pf_hxxx_sei_callback)(const hxxx_sei_data_t *, void *);
 void HxxxParseSEI(const uint8_t *, size_t, uint8_t, pf_hxxx_sei_callback, void *);
 void HxxxParse_AnnexB_SEI(const uint8_t *, size_t, uint8_t, pf_hxxx_sei_callback, void *);
 
