@@ -485,12 +485,14 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
          * is no such limitation for PCM). */
         buffer_duration = CLOCK_FREQ * 10 * 1024 * 1024 / pwf->nAvgBytesPerSec;
     }
-    else
+    else if (AOUT_FMT_LINEAR(&fmt))
     {
         vlc_ToWave(pwfe, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_SHARED;
         buffer_duration = AOUT_MAX_PREPARE_TIME * 10;
     }
+    else
+        goto error;
 
     hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
                                         pwf, &pwf_closest);
