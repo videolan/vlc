@@ -120,6 +120,7 @@ struct aout_sys_t {
 
     enum {
         WRITE_BYTEARRAY,
+        WRITE_BYTEARRAYV23,
         WRITE_BYTEBUFFER,
         WRITE_FLOATARRAY
     } i_write_type;
@@ -192,6 +193,7 @@ static struct
         jmethodID flush;
         jmethodID pause;
         jmethodID write;
+        jmethodID writeV23;
         jmethodID writeBufferV21;
         jmethodID writeFloat;
         jmethodID getPlaybackHeadPosition;
@@ -308,8 +310,11 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     GET_ID( GetMethodID, AudioTrack.flush, "flush", "()V", true );
     GET_ID( GetMethodID, AudioTrack.pause, "pause", "()V", true );
 
-    GET_ID( GetMethodID, AudioTrack.writeBufferV21, "write", "(Ljava/nio/ByteBuffer;II)I", false );
-    if( jfields.AudioTrack.writeBufferV21 )
+    GET_ID( GetMethodID, AudioTrack.writeV23, "write", "([BIII)I", false );
+    if( !jfields.AudioTrack.writeV23 )
+        GET_ID( GetMethodID, AudioTrack.writeBufferV21, "write", "(Ljava/nio/ByteBuffer;II)I", false );
+
+    if( jfields.AudioTrack.writeV23 || jfields.AudioTrack.writeBufferV21 )
     {
         GET_CONST_INT( AudioTrack.WRITE_NON_BLOCKING, "WRITE_NON_BLOCKING", true );
 #ifdef AUDIOTRACK_USE_FLOAT
@@ -1076,6 +1081,11 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
         msg_Dbg( p_aout, "using WRITE_FLOATARRAY");
         p_sys->i_write_type = WRITE_FLOATARRAY;
     }
+    else if( jfields.AudioTrack.writeV23 )
+    {
+        msg_Dbg( p_aout, "using WRITE_BYTEARRAYV23");
+        p_sys->i_write_type = WRITE_BYTEARRAYV23;
+    }
     else if( jfields.AudioTrack.writeBufferV21 )
     {
         msg_Dbg( p_aout, "using WRITE_BYTEBUFFER");
@@ -1098,6 +1108,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     switch( p_sys->i_write_type )
     {
         case WRITE_BYTEARRAY:
+        case WRITE_BYTEARRAYV23:
         {
             jbyteArray p_bytearray;
 
@@ -1213,6 +1224,7 @@ Stop( audio_output_t *p_aout )
     switch( p_sys->i_write_type )
     {
     case WRITE_BYTEARRAY:
+    case WRITE_BYTEARRAYV23:
         if( p_sys->circular.u.p_bytearray )
         {
             (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_bytearray );
@@ -1277,6 +1289,22 @@ AudioTrack_PlayByteArray( JNIEnv *env, audio_output_t *p_aout,
 
     return JNI_AT_CALL_INT( write, p_sys->circular.u.p_bytearray,
                             i_data_offset, i_data_size );
+}
+
+/**
+ * Non blocking write function for Android M and after, run from
+ * AudioTrack_Thread. It calls a new write method with WRITE_NON_BLOCKING
+ * flags.
+ */
+static int
+AudioTrack_PlayByteArrayV23( JNIEnv *env, audio_output_t *p_aout,
+                             size_t i_data_size, size_t i_data_offset )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    return JNI_AT_CALL_INT( writeV23, p_sys->circular.u.p_bytearray,
+                            i_data_offset, i_data_size,
+                            jfields.AudioTrack.WRITE_NON_BLOCKING );
 }
 
 /**
@@ -1346,6 +1374,10 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout, size_t i_data_size,
 
     switch( p_sys->i_write_type )
     {
+    case WRITE_BYTEARRAYV23:
+        i_ret = AudioTrack_PlayByteArrayV23( env, p_aout, i_data_size,
+                                             i_data_offset );
+        break;
     case WRITE_BYTEBUFFER:
         i_ret = AudioTrack_PlayByteBuffer( env, p_aout, i_data_size,
                                            i_data_offset );
@@ -1533,6 +1565,7 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
         switch( p_sys->i_write_type )
         {
         case WRITE_BYTEARRAY:
+        case WRITE_BYTEARRAYV23:
             (*env)->SetByteArrayRegion( env, p_sys->circular.u.p_bytearray,
                                         i_data_offset, i_data_size,
                                         (jbyte *)p_buffer->p_buffer
