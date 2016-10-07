@@ -40,7 +40,6 @@
 
 #include <vlc_block_helper.h>
 #include <vlc_bits.h>
-#include "../codec/cc.h"
 #include "h264_nal.h"
 #include "hxxx_nal.h"
 #include "hxxx_sei.h"
@@ -141,12 +140,7 @@ struct decoder_sys_t
     mtime_t i_prev_dts;
 
     /* */
-    uint32_t i_cc_flags;
-    mtime_t i_cc_pts;
-    mtime_t i_cc_dts;
-    cc_data_t cc;
-
-    cc_data_t cc_next;
+    cc_storage_t *p_ccs;
 };
 
 #define BLOCK_FLAG_PRIVATE_AUD (1 << BLOCK_FLAG_PRIVATE_SHIFT)
@@ -193,6 +187,13 @@ static int Open( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc( sizeof(decoder_sys_t) ) ) == NULL )
     {
+        return VLC_ENOMEM;
+    }
+
+    p_sys->p_ccs = cc_storage_new();
+    if( unlikely(!p_sys->p_ccs) )
+    {
+        free( p_dec->p_sys );
         return VLC_ENOMEM;
     }
 
@@ -313,13 +314,6 @@ static int Open( vlc_object_t *p_this )
     p_dec->pf_get_cc = GetCc;
     p_dec->pf_flush = PacketizeFlush;
 
-    /* */
-    p_sys->i_cc_pts = VLC_TS_INVALID;
-    p_sys->i_cc_dts = VLC_TS_INVALID;
-    p_sys->i_cc_flags = 0;
-    cc_Init( &p_sys->cc );
-    cc_Init( &p_sys->cc_next );
-
     return VLC_SUCCESS;
 }
 
@@ -346,8 +340,7 @@ static void Close( vlc_object_t *p_this )
     }
     packetizer_Clean( &p_sys->packetizer );
 
-    cc_Exit( &p_sys->cc_next );
-    cc_Exit( &p_sys->cc );
+    cc_storage_delete( p_sys->p_ccs );
 
     free( p_sys );
 }
@@ -389,25 +382,7 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
  *****************************************************************************/
 static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_cc;
-
-    for( int i = 0; i < 4; i++ )
-        pb_present[i] = p_sys->cc.pb_present[i];
-
-    if( p_sys->cc.i_data <= 0 )
-        return NULL;
-
-    p_cc = block_Alloc( p_sys->cc.i_data);
-    if( p_cc )
-    {
-        memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
-        p_cc->i_dts =
-        p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
-        p_cc->i_flags = ( p_sys->cc.b_reorder  ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P ) & BLOCK_FLAG_TYPE_MASK;
-    }
-    cc_Flush( &p_sys->cc );
-    return p_cc;
+    return cc_storage_get_current( p_dec->p_sys->p_ccs, pb_present );
 }
 
 /****************************************************************************
@@ -479,7 +454,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         p_sys->b_frame_sps = false;
         p_sys->b_frame_pps = false;
         p_sys->b_slice = false;
-        cc_Flush( &p_sys->cc_next );
+        cc_storage_reset( p_sys->p_ccs );
     }
 
     if( ( !p_sys->b_sps || !p_sys->b_pps ) &&
@@ -723,12 +698,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_sys->b_slice = false;
 
     /* CC */
-    p_sys->i_cc_pts = p_pic->i_pts;
-    p_sys->i_cc_dts = p_pic->i_dts;
-    p_sys->i_cc_flags = p_pic->i_flags;
-
-    p_sys->cc = p_sys->cc_next;
-    cc_Flush( &p_sys->cc_next );
+    cc_storage_commit( p_sys->p_ccs, p_pic );
 
     return p_pic;
 }
@@ -977,7 +947,7 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
             /* Look for user_data_registered_itu_t_t35 */
         case HXXX_SEI_USER_DATA_REGISTERED_ITU_T_T35:
         {
-            cc_Extract( &p_sys->cc_next, true, p_sei_data->itu_t35.p_cc, p_sei_data->itu_t35.i_cc );
+            cc_storage_append( p_sys->p_ccs, true, p_sei_data->itu_t35.p_cc, p_sei_data->itu_t35.i_cc );
         } break;
 
             /* Look for SEI recovery point */
