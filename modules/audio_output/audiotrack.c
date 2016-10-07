@@ -121,6 +121,7 @@ struct aout_sys_t {
     enum {
         WRITE_BYTEARRAY,
         WRITE_BYTEARRAYV23,
+        WRITE_SHORTARRAYV23,
         WRITE_BYTEBUFFER,
         WRITE_FLOATARRAY
     } i_write_type;
@@ -148,6 +149,7 @@ struct aout_sys_t {
         union {
             jbyteArray p_bytearray;
             jfloatArray p_floatarray;
+            jshortArray p_shortarray;
             struct {
                 uint8_t *p_data;
                 jobject p_obj;
@@ -194,6 +196,7 @@ static struct
         jmethodID pause;
         jmethodID write;
         jmethodID writeV23;
+        jmethodID writeShortV23;
         jmethodID writeBufferV21;
         jmethodID writeFloat;
         jmethodID getPlaybackHeadPosition;
@@ -216,9 +219,10 @@ static struct
         jint ENCODING_E_AC3;
         bool has_ENCODING_AC3;
         jint ENCODING_DTS;
-        bool has_ENCODING_DTS;
         jint ENCODING_DTS_HD;
-        bool has_ENCODING_DTS_HD;
+        bool has_ENCODING_DTS;
+        jint ENCODING_IEC61937;
+        bool has_ENCODING_IEC61937;
         jint CHANNEL_OUT_MONO;
         jint CHANNEL_OUT_STEREO;
         jint CHANNEL_OUT_FRONT_LEFT;
@@ -311,6 +315,7 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     GET_ID( GetMethodID, AudioTrack.pause, "pause", "()V", true );
 
     GET_ID( GetMethodID, AudioTrack.writeV23, "write", "([BIII)I", false );
+    GET_ID( GetMethodID, AudioTrack.writeShortV23, "write", "([SIII)I", false );
     if( !jfields.AudioTrack.writeV23 )
         GET_ID( GetMethodID, AudioTrack.writeBufferV21, "write", "(Ljava/nio/ByteBuffer;II)I", false );
 
@@ -379,21 +384,32 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
 #else
     jfields.AudioFormat.has_ENCODING_PCM_FLOAT = false;
 #endif
-    GET_CONST_INT( AudioFormat.ENCODING_AC3, "ENCODING_AC3", false );
-    if( field != NULL )
+
+    if( jfields.AudioTrack.writeShortV23 )
     {
-        GET_CONST_INT( AudioFormat.ENCODING_E_AC3, "ENCODING_E_AC3", false );
-        jfields.AudioFormat.has_ENCODING_AC3 = field != NULL;
-    } else
-        jfields.AudioFormat.has_ENCODING_AC3 = false;
-    GET_CONST_INT( AudioFormat.ENCODING_DTS, "ENCODING_DTS", false );
-    if ( field != NULL )
-    {
-        GET_CONST_INT( AudioFormat.ENCODING_DTS_HD, "ENCODING_DTS_HD", false );
-        jfields.AudioFormat.has_ENCODING_DTS = field != NULL;
+        GET_CONST_INT( AudioFormat.ENCODING_IEC61937, "ENCODING_IEC61937", false );
+        jfields.AudioFormat.has_ENCODING_IEC61937 = field != NULL;
     }
     else
-        jfields.AudioFormat.has_ENCODING_DTS = false;
+        jfields.AudioFormat.has_ENCODING_IEC61937 = false;
+    if( !jfields.AudioFormat.has_ENCODING_IEC61937 )
+    {
+        GET_CONST_INT( AudioFormat.ENCODING_AC3, "ENCODING_AC3", false );
+        if( field != NULL )
+        {
+            GET_CONST_INT( AudioFormat.ENCODING_E_AC3, "ENCODING_E_AC3", false );
+            jfields.AudioFormat.has_ENCODING_AC3 = field != NULL;
+        } else
+            jfields.AudioFormat.has_ENCODING_AC3 = false;
+        GET_CONST_INT( AudioFormat.ENCODING_DTS, "ENCODING_DTS", false );
+        if ( field != NULL )
+        {
+            GET_CONST_INT( AudioFormat.ENCODING_DTS_HD, "ENCODING_DTS_HD", false );
+            jfields.AudioFormat.has_ENCODING_DTS = field != NULL;
+        }
+        else
+            jfields.AudioFormat.has_ENCODING_DTS = false;
+    }
 
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_MONO, "CHANNEL_OUT_MONO", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_STEREO, "CHANNEL_OUT_STEREO", true );
@@ -897,9 +913,6 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     bool b_spdif;
     int i_at_format;
 
-    if (aout_FormatNbChannels(p_fmt) == 0)
-        return VLC_EGENERIC;
-
     if( p_sys->at_dev == AT_DEV_HDMI )
     {
         b_spdif = true;
@@ -951,22 +964,69 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             }
             break;
         case VLC_CODEC_A52:
-            if( jfields.AudioFormat.has_ENCODING_AC3 && b_spdif )
-            {
-                p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
-                i_at_format = jfields.AudioFormat.ENCODING_AC3;
-            }
-            else
-                return VLC_EGENERIC;
-            break;
+        case VLC_CODEC_EAC3:
+#if 0
+        case VLC_CODEC_TRUEHD:
+        case VLC_CODEC_MLP:
+#endif
         case VLC_CODEC_DTS:
-            if( jfields.AudioFormat.has_ENCODING_DTS && b_spdif )
+            if( !b_spdif )
+                return VLC_EGENERIC;
+            if( jfields.AudioFormat.has_ENCODING_IEC61937 )
             {
-                p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
-                i_at_format = jfields.AudioFormat.ENCODING_DTS;
+                i_at_format = jfields.AudioFormat.ENCODING_IEC61937;
+                switch( p_sys->fmt.i_format )
+                {
+                    /* Not supported yet */
+#if 0
+                    case VLC_CODEC_TRUEHD:
+                    case VLC_CODEC_MLP:
+                        p_sys->fmt.i_rate = 192000;
+                        p_sys->fmt.i_bytes_per_frame = 16;
+                        break;
+#endif
+                    case VLC_CODEC_EAC3:
+                        p_sys->fmt.i_rate = 192000;
+                    default:
+                        p_sys->fmt.i_bytes_per_frame = 4;
+                        break;
+                }
+                p_sys->fmt.i_frame_length = 1;
+                p_sys->fmt.i_physical_channels =
+                p_sys->fmt.i_original_channels = AOUT_CHANS_STEREO;
+                p_sys->fmt.i_channels = 2;
+                p_sys->fmt.i_format = VLC_CODEC_SPDIFL;
             }
             else
-                return VLC_EGENERIC;
+            {
+                switch( p_sys->fmt.i_format )
+                {
+                    case VLC_CODEC_A52:
+                        if( jfields.AudioFormat.has_ENCODING_AC3 )
+                            i_at_format = jfields.AudioFormat.ENCODING_AC3;
+                        else
+                            return VLC_EGENERIC;
+                        break;
+                    case VLC_CODEC_EAC3:
+                        if( jfields.AudioFormat.has_ENCODING_AC3 )
+                            i_at_format = jfields.AudioFormat.ENCODING_E_AC3;
+                        else
+                            return VLC_EGENERIC;
+                        p_sys->fmt.i_rate = 192000;
+                        break;
+                    case VLC_CODEC_DTS:
+                        if( jfields.AudioFormat.has_ENCODING_DTS )
+                            i_at_format = jfields.AudioFormat.ENCODING_DTS;
+                        else
+                            return VLC_EGENERIC;
+                        break;
+                    default:
+                        return VLC_EGENERIC;
+                }
+                p_sys->fmt.i_bytes_per_frame = 4;
+                p_sys->fmt.i_frame_length = 1;
+                p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
+            }
             break;
         default:
             if( !AOUT_FMT_LINEAR( &p_sys->fmt ) )
@@ -981,7 +1041,9 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
          */
 
         i_nb_channels = aout_FormatNbChannels( &p_sys->fmt );
-        if( p_sys->fmt.i_format != VLC_CODEC_SPDIFB )
+        if( i_nb_channels == 0 )
+            return VLC_EGENERIC;
+        if( AOUT_FMT_LINEAR( &p_sys->fmt ) )
             i_nb_channels = __MIN( i_max_channels, i_nb_channels );
         if( i_nb_channels > 5 )
         {
@@ -1005,7 +1067,8 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                                    p_sys->fmt.i_physical_channels );
         if( i_ret != 0 )
         {
-            if( p_sys->fmt.i_format == VLC_CODEC_SPDIFB )
+            if( p_sys->fmt.i_format == VLC_CODEC_SPDIFB
+             || p_sys->fmt.i_format == VLC_CODEC_SPDIFL )
             {
                 msg_Warn( p_aout, "SPDIF configuration failed" );
                 return VLC_EGENERIC;
@@ -1030,13 +1093,9 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     if( i_ret != 0 )
         return VLC_EGENERIC;
 
-    p_sys->b_spdif = p_sys->fmt.i_format == VLC_CODEC_SPDIFB;
-    if( p_sys->b_spdif )
-    {
-        p_sys->fmt.i_bytes_per_frame = AOUT_SPDIF_SIZE;
-        p_sys->fmt.i_frame_length = A52_FRAME_NB;
-    }
-    else
+    p_sys->b_spdif = p_sys->fmt.i_format == VLC_CODEC_SPDIFB ||
+                     p_sys->fmt.i_format == VLC_CODEC_SPDIFL;
+    if( !p_sys->b_spdif )
     {
         uint32_t p_chans_out[AOUT_CHAN_MAX];
 
@@ -1072,6 +1131,12 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     {
         msg_Dbg( p_aout, "using WRITE_FLOATARRAY");
         p_sys->i_write_type = WRITE_FLOATARRAY;
+    }
+    else if( jfields.AudioFormat.has_ENCODING_IEC61937
+          && i_at_format == jfields.AudioFormat.ENCODING_IEC61937 )
+    {
+        msg_Dbg( p_aout, "using WRITE_SHORTARRAYV23");
+        p_sys->i_write_type = WRITE_SHORTARRAYV23;
     }
     else if( jfields.AudioTrack.writeV23 )
     {
@@ -1114,6 +1179,24 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             if( !p_sys->circular.u.p_bytearray )
             {
                 msg_Err(p_aout, "byte array allocation failed");
+                goto error;
+            }
+            break;
+        }
+        case WRITE_SHORTARRAYV23:
+        {
+            jshortArray p_shortarray;
+
+            p_shortarray = (*env)->NewShortArray( env,
+                                                  p_sys->circular.i_size / 2 );
+            if( p_shortarray )
+            {
+                p_sys->circular.u.p_shortarray = (*env)->NewGlobalRef( env, p_shortarray );
+                (*env)->DeleteLocalRef( env, p_shortarray );
+            }
+            if( !p_sys->circular.u.p_shortarray )
+            {
+                msg_Err(p_aout, "short array allocation failed");
                 goto error;
             }
             break;
@@ -1223,12 +1306,20 @@ Stop( audio_output_t *p_aout )
             p_sys->circular.u.p_bytearray = NULL;
         }
         break;
+    case WRITE_SHORTARRAYV23:
+        if( p_sys->circular.u.p_shortarray )
+        {
+            (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_shortarray );
+            p_sys->circular.u.p_shortarray = NULL;
+        }
+        break;
     case WRITE_FLOATARRAY:
         if( p_sys->circular.u.p_floatarray )
         {
             (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_floatarray );
             p_sys->circular.u.p_floatarray = NULL;
         }
+        break;
     case WRITE_BYTEBUFFER:
         free( p_sys->circular.u.bytebuffer.p_data );
         p_sys->circular.u.bytebuffer.p_data = NULL;
@@ -1337,6 +1428,27 @@ AudioTrack_PlayByteBuffer( JNIEnv *env, audio_output_t *p_aout,
 }
 
 /**
+ * Non blocking short write function for Android M and after, run from
+ * AudioTrack_Thread. It calls a new write method with WRITE_NON_BLOCKING
+ * flags.
+ */
+static int
+AudioTrack_PlayShortArrayV23( JNIEnv *env, audio_output_t *p_aout,
+                               size_t i_data_size, size_t i_data_offset )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    int i_ret;
+
+    i_ret = JNI_AT_CALL_INT( writeShortV23, p_sys->circular.u.p_shortarray,
+                             i_data_offset / 2, i_data_size / 2,
+                             jfields.AudioTrack.WRITE_NON_BLOCKING );
+    if( i_ret < 0 )
+        return i_ret;
+    else
+        return i_ret * 2;
+}
+
+/**
  * Non blocking play float function for Lollipop and after, run from
  * AudioTrack_Thread. It calls a new write method with WRITE_NON_BLOCKING
  * flags.
@@ -1373,6 +1485,10 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout, size_t i_data_size,
     case WRITE_BYTEBUFFER:
         i_ret = AudioTrack_PlayByteBuffer( env, p_aout, i_data_size,
                                            i_data_offset );
+        break;
+    case WRITE_SHORTARRAYV23:
+        i_ret = AudioTrack_PlayShortArrayV23( env, p_aout, i_data_size,
+                                              i_data_offset );
         break;
     case WRITE_BYTEARRAY:
         i_ret = AudioTrack_PlayByteArray( env, p_aout, i_data_size,
@@ -1562,6 +1678,14 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
                                         i_data_offset, i_data_size,
                                         (jbyte *)p_buffer->p_buffer
                                         + i_buffer_offset);
+            break;
+        case WRITE_SHORTARRAYV23:
+            i_data_offset &= ~1;
+            i_data_size &= ~1;
+            (*env)->SetShortArrayRegion( env, p_sys->circular.u.p_shortarray,
+                                         i_data_offset / 2, i_data_size / 2,
+                                         (jshort *)p_buffer->p_buffer
+                                         + i_buffer_offset / 2);
             break;
         case WRITE_FLOATARRAY:
             i_data_offset &= ~3;
