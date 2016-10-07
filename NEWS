@@ -110,13 +110,15 @@ Demux filter:
 
 Audio output:
  * Complete rewrite of the AudioTrack Android module. This is now the default.
-   It now supports HDMI/SPDIF passthrough for AC3, 5.1/7.1 and float output.
+   It now supports HDMI/SPDIF passthrough for AC3/DTS/EAC3, 5.1/7.1 and float
+   output.
  * Added Tizen audio module.
- * HDMI/SPDIF pass-through support for WASAPI
+ * HDMI/SPDIF pass-through support for WASAPI (AC3/DTS/EAC3/TRUEHD).
 
 Audio filters and output:
  * Add SoX Resampler library audio filter module (converter and resampler)
- * a52tospdif and dtstospdif audio converters are merged into tospdif
+ * a52tospdif and dtstospdif audio converters are merged into tospdif. This new
+ * converter can convert AC3, DTS, EAC3 and TRUEHD to a IEC61937.
 
 Video ouput:
  * Linux/BSD default video output is now OpenGL, instead of Xvideo
