@@ -192,7 +192,7 @@ static struct
         jmethodID flush;
         jmethodID pause;
         jmethodID write;
-        jmethodID writeV21;
+        jmethodID writeBufferV21;
         jmethodID writeFloat;
         jmethodID getPlaybackHeadPosition;
         jmethodID getTimestamp;
@@ -308,8 +308,8 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     GET_ID( GetMethodID, AudioTrack.flush, "flush", "()V", true );
     GET_ID( GetMethodID, AudioTrack.pause, "pause", "()V", true );
 
-    GET_ID( GetMethodID, AudioTrack.writeV21, "write", "(Ljava/nio/ByteBuffer;II)I", false );
-    if( jfields.AudioTrack.writeV21 )
+    GET_ID( GetMethodID, AudioTrack.writeBufferV21, "write", "(Ljava/nio/ByteBuffer;II)I", false );
+    if( jfields.AudioTrack.writeBufferV21 )
     {
         GET_CONST_INT( AudioTrack.WRITE_NON_BLOCKING, "WRITE_NON_BLOCKING", true );
 #ifdef AUDIOTRACK_USE_FLOAT
@@ -1076,7 +1076,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
         msg_Dbg( p_aout, "using WRITE_FLOATARRAY");
         p_sys->i_write_type = WRITE_FLOATARRAY;
     }
-    else if( jfields.AudioTrack.writeV21 )
+    else if( jfields.AudioTrack.writeBufferV21 )
     {
         msg_Dbg( p_aout, "using WRITE_BYTEBUFFER");
         p_sys->i_write_type = WRITE_BYTEBUFFER;
@@ -1291,7 +1291,8 @@ AudioTrack_PlayByteBuffer( JNIEnv *env, audio_output_t *p_aout,
     aout_sys_t *p_sys = p_aout->sys;
 
     /* The same DirectByteBuffer will be used until the data_offset reaches 0.
-     * The internal position of this buffer is moved by the writeV21 wall. */
+     * The internal position of this buffer is moved by the writeBufferV21
+     * wall. */
     if( i_data_offset == 0 )
     {
         /* No need to get a global ref, this object will be only used from the
@@ -1310,7 +1311,7 @@ AudioTrack_PlayByteBuffer( JNIEnv *env, audio_output_t *p_aout,
         }
     }
 
-    return JNI_AT_CALL_INT( writeV21, p_sys->circular.u.bytebuffer.p_obj,
+    return JNI_AT_CALL_INT( writeBufferV21, p_sys->circular.u.bytebuffer.p_obj,
                             i_data_size,
                             jfields.AudioTrack.WRITE_NON_BLOCKING );
 }
