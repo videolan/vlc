@@ -957,16 +957,8 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                 p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
                 i_at_format = jfields.AudioFormat.ENCODING_AC3;
             }
-            else if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
-            {
-                p_sys->fmt.i_format = VLC_CODEC_FL32;
-                i_at_format = jfields.AudioFormat.ENCODING_PCM_FLOAT;
-            }
             else
-            {
-                p_sys->fmt.i_format = VLC_CODEC_S16N;
-                i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
-            }
+                return VLC_EGENERIC;
             break;
         case VLC_CODEC_DTS:
             if( jfields.AudioFormat.has_ENCODING_DTS && b_spdif )
@@ -974,18 +966,12 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                 p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
                 i_at_format = jfields.AudioFormat.ENCODING_DTS;
             }
-            else if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
-            {
-                p_sys->fmt.i_format = VLC_CODEC_FL32;
-                i_at_format = jfields.AudioFormat.ENCODING_PCM_FLOAT;
-            }
             else
-            {
-                p_sys->fmt.i_format = VLC_CODEC_S16N;
-                i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
-            }
+                return VLC_EGENERIC;
             break;
         default:
+            if( !AOUT_FMT_LINEAR( &p_sys->fmt ) )
+                return VLC_EGENERIC;
             p_sys->fmt.i_format = VLC_CODEC_S16N;
             i_at_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
             break;
@@ -1025,9 +1011,8 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
         {
             if( p_sys->fmt.i_format == VLC_CODEC_SPDIFB )
             {
-                msg_Warn( p_aout, "SPDIF configuration failed, "
-                                  "fallback to PCM" );
-                p_sys->fmt.i_format = VLC_CODEC_FL32;
+                msg_Warn( p_aout, "SPDIF configuration failed" );
+                return VLC_EGENERIC;
             }
             else if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
             {
