@@ -33,12 +33,14 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_block.h>
+#include <vlc_bits.h>
 
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
 #include "startcode_helper.h"
 #include "hevc_nal.h"
 #include "hxxx_nal.h"
+#include "hxxx_sei.h"
 #include "hxxx_common.h"
 
 /*****************************************************************************
@@ -66,6 +68,8 @@ static void PacketizeReset(void *p_private, bool b_broken);
 static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *);
 static block_t *ParseNALBlock(decoder_t *, bool *pb_ts_used, block_t *);
 static int PacketizeValidate(void *p_private, block_t *);
+static bool ParseSEICallback( const hxxx_sei_data_t *, void * );
+static block_t *GetCc( decoder_t *, bool pb_present[4] );
 
 struct decoder_sys_t
 {
@@ -83,6 +87,9 @@ struct decoder_sys_t
     hevc_sequence_parameter_set_t *rgi_p_decsps[HEVC_SPS_MAX];
     hevc_picture_parameter_set_t  *rgi_p_decpps[HEVC_PPS_MAX];
     bool b_init_sequence_complete;
+
+    /* */
+    cc_storage_t *p_ccs;
 };
 
 static const uint8_t p_hevc_startcode[3] = {0x00, 0x00, 0x01};
@@ -154,6 +161,13 @@ static int Open(vlc_object_t *p_this)
     if (!p_dec->p_sys)
         return VLC_ENOMEM;
 
+    p_sys->p_ccs = cc_storage_new();
+    if(unlikely(!p_sys->p_ccs))
+    {
+        free(p_dec->p_sys);
+        return VLC_ENOMEM;
+    }
+
     INITQ(pre);
     INITQ(frame);
     INITQ(post);
@@ -191,6 +205,7 @@ static int Open(vlc_object_t *p_this)
         p_dec->pf_packetize = PacketizeAnnexB;
     }
     p_dec->pf_flush = PacketizeFlush;
+    p_dec->pf_get_cc = GetCc;
 
     if(p_dec->fmt_out.i_extra)
     {
@@ -233,6 +248,8 @@ static void Close(vlc_object_t *p_this)
             hevc_rbsp_release_vps(p_sys->rgi_p_decvps[i]);
     }
 
+    cc_storage_delete( p_sys->p_ccs );
+
     free(p_sys);
 }
 
@@ -259,6 +276,14 @@ static void PacketizeFlush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     packetizer_Flush( &p_sys->packetizer );
+}
+
+/*****************************************************************************
+ * GetCc:
+ *****************************************************************************/
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
+{
+    return cc_storage_get_current( p_dec->p_sys->p_ccs, pb_present );
 }
 
 /****************************************************************************
@@ -440,6 +465,9 @@ static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
         p_sys->b_init_sequence_complete = true;
     }
 
+    if( !p_sys->b_init_sequence_complete )
+        cc_storage_reset( p_sys->p_ccs );
+
     block_ChainLastAppend(&p_sys->frame.pp_chain_last, p_frag);
 
     return p_outputchain;
@@ -511,8 +539,14 @@ static block_t * ParseAUHead(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_na
                     }
                 }
             }
+            break;
         }
-        // ft
+
+        case HEVC_NAL_PREF_SEI:
+            HxxxParse_AnnexB_SEI( p_nalb->p_buffer, p_nalb->i_buffer,
+                                  2 /* nal header */, ParseSEICallback, p_dec );
+            break;
+
         default:
             break;
     }
@@ -534,6 +568,11 @@ static block_t * ParseAUTail(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_na
         case HEVC_NAL_EOS:
         case HEVC_NAL_EOB:
             p_ret = OutputQueues(p_sys, true);
+            break;
+
+        case HEVC_NAL_SUFF_SEI:
+            HxxxParse_AnnexB_SEI( p_nalb->p_buffer, p_nalb->i_buffer,
+                                  2 /* nal header */, ParseSEICallback, p_dec );
             break;
     }
 
@@ -630,12 +669,17 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
 static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *p_block)
 {
     decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* Remove trailing 0 bytes */
     while (p_block->i_buffer > 5 && p_block->p_buffer[p_block->i_buffer-1] == 0x00 )
         p_block->i_buffer--;
 
-    return ParseNALBlock( p_dec, pb_ts_used, p_block );
+    p_block = ParseNALBlock( p_dec, pb_ts_used, p_block );
+    if( p_block )
+        cc_storage_commit( p_sys->p_ccs, p_block );
+
+    return p_block;
 }
 
 static int PacketizeValidate( void *p_private, block_t *p_au )
@@ -643,4 +687,15 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
     VLC_UNUSED(p_private);
     VLC_UNUSED(p_au);
     return VLC_SUCCESS;
+}
+
+static bool ParseSEICallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
+{
+    decoder_t *p_dec = (decoder_t *) cbdata;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sei_data->i_type == HXXX_SEI_USER_DATA_REGISTERED_ITU_T_T35 )
+        cc_storage_append( p_sys->p_ccs, true, p_sei_data->itu_t35.p_cc, p_sei_data->itu_t35.i_cc );
+
+    return true;
 }
