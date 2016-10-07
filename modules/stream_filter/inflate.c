@@ -160,7 +160,7 @@ static int Open(vlc_object_t *obj)
     if ((peek[0] & 0xF) == 8 && (peek[0] >> 4) < 8 && (U16_AT(peek) % 31) == 0)
         bits = 15; /* zlib */
     else
-    if (!memcmp(peek, "\x1F\x08B", 2))
+    if (!memcmp(peek, "\x1F\x8B", 2))
         bits = 15 + 32; /* gzip */
     else
         return VLC_EGENERIC;
