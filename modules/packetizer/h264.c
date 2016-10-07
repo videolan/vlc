@@ -264,12 +264,14 @@ static int Open( vlc_object_t *p_this )
             if(!p_dec->fmt_out.p_extra)
             {
                 msg_Err( p_dec, "Invalid AVC extradata");
+                Close( p_this );
                 return VLC_EGENERIC;
             }
         }
         else
         {
             msg_Err( p_dec, "Invalid or missing AVC extradata");
+            Close( p_this );
             return VLC_EGENERIC;
         }
 
@@ -299,6 +301,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_dec, "Invalid or missing SPS %d or PPS %d in AVC extradata",
                      p_sys->b_sps, p_sys->b_pps );
+            Close( p_this );
             return VLC_EGENERIC;
         }
 
