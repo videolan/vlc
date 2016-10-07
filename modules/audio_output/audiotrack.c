@@ -893,8 +893,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
-    int i_nb_channels, i_max_channels, i_native_rate = 0, i_ret;
-    unsigned int i_rate;
+    int i_nb_channels, i_max_channels, i_ret;
     bool b_spdif;
     int i_at_format;
 
@@ -921,17 +920,14 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 
     p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
 
-    if( b_spdif )
+    if( !b_spdif )
     {
-        i_native_rate = p_sys->fmt.i_rate;
-    }
-    else
-    {
+        int i_rate = 0;
         if (jfields.AudioTrack.getNativeOutputSampleRate)
-            i_native_rate = JNI_AT_CALL_STATIC_INT( getNativeOutputSampleRate,
-                                                    jfields.AudioManager.STREAM_MUSIC );
-        if( i_native_rate <= 0 )
-            i_native_rate = VLC_CLIP( p_sys->fmt.i_rate, 4000, 48000 );
+            i_rate = JNI_AT_CALL_STATIC_INT( getNativeOutputSampleRate,
+                                             jfields.AudioManager.STREAM_MUSIC );
+        p_sys->fmt.i_rate = i_rate > 0 ? i_rate
+                          : VLC_CLIP( p_sys->fmt.i_rate, 4000, 48000 );
     }
 
     do
@@ -1000,15 +996,12 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             else
                 p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
         }
-        i_rate = p_sys->fmt.i_format == VLC_CODEC_SPDIFB ?
-                                        VLC_CLIP( p_sys->fmt.i_rate, 32000, 48000 )
-                                        : (unsigned int) i_native_rate;
 
         /* Try to create an AudioTrack with the most advanced channel and
          * format configuration. If AudioTrack_Create fails, try again with a
          * less advanced format (PCM S16N). If it fails again, try again with
          * Stereo channels. */
-        i_ret = AudioTrack_Create( env, p_aout, i_rate, i_at_format,
+        i_ret = AudioTrack_Create( env, p_aout, p_sys->fmt.i_rate, i_at_format,
                                    p_sys->fmt.i_physical_channels );
         if( i_ret != 0 )
         {
@@ -1037,7 +1030,6 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     if( i_ret != 0 )
         return VLC_EGENERIC;
 
-    p_sys->fmt.i_rate = i_rate;
     p_sys->b_spdif = p_sys->fmt.i_format == VLC_CODEC_SPDIFB;
     if( p_sys->b_spdif )
     {
@@ -1099,7 +1091,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 
     p_sys->circular.i_read = p_sys->circular.i_write = 0;
     /* 2 seconds of buffering */
-    p_sys->circular.i_size = (int)i_rate * AOUT_MAX_PREPARE_TIME
+    p_sys->circular.i_size = (int)p_sys->fmt.i_rate * AOUT_MAX_PREPARE_TIME
                            * p_sys->fmt.i_bytes_per_frame
                            / p_sys->fmt.i_frame_length
                            / CLOCK_FREQ;
