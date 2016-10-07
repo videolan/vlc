@@ -113,8 +113,6 @@ struct aout_sys_t {
         mtime_t i_latency_us;
     } smoothpos;
 
-    uint32_t i_bytes_per_frame; /* byte per frame */
-    uint32_t i_frame_length; /* frame length */
     uint32_t i_max_audiotrack_samples;
     bool b_spdif;
     uint8_t i_chans_to_reorder; /* do we need channel reordering */
@@ -474,7 +472,7 @@ frames_to_us( aout_sys_t *p_sys, uint64_t i_nb_frames )
 static inline uint64_t
 bytes_to_frames( aout_sys_t *p_sys, size_t i_bytes )
 {
-    return i_bytes * p_sys->i_frame_length / p_sys->i_bytes_per_frame;
+    return i_bytes * p_sys->fmt.i_frame_length / p_sys->fmt.i_bytes_per_frame;
 }
 #define BYTES_TO_FRAMES(x) bytes_to_frames( p_sys, (x) )
 #define BYTES_TO_US(x) frames_to_us( p_sys, bytes_to_frames( p_sys, (x) ) )
@@ -482,7 +480,7 @@ bytes_to_frames( aout_sys_t *p_sys, size_t i_bytes )
 static inline size_t
 frames_to_bytes( aout_sys_t *p_sys, uint64_t i_frames )
 {
-    return i_frames * p_sys->i_bytes_per_frame / p_sys->i_frame_length;
+    return i_frames * p_sys->fmt.i_bytes_per_frame / p_sys->fmt.i_frame_length;
 }
 #define FRAMES_TO_BYTES(x) frames_to_bytes( p_sys, (x) )
 
@@ -1038,9 +1036,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     p_sys->b_spdif = p_sys->fmt.i_format == VLC_CODEC_SPDIFB;
     if( p_sys->b_spdif )
     {
-        p_sys->i_bytes_per_frame =
         p_sys->fmt.i_bytes_per_frame = AOUT_SPDIF_SIZE;
-        p_sys->i_frame_length =
         p_sys->fmt.i_frame_length = A52_FRAME_NB;
     }
     else
@@ -1053,10 +1049,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             aout_CheckChannelReorder( NULL, p_chans_out,
                                       p_sys->fmt.i_physical_channels,
                                       p_sys->p_chan_table );
-        p_sys->i_bytes_per_frame = i_nb_channels
-                                 * aout_BitsPerSample( p_sys->fmt.i_format )
-                                 / 8;
-        p_sys->i_frame_length = 1;
+        aout_FormatPrepare( &p_sys->fmt );
     }
     p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( p_sys->audiotrack_args.i_size );
 
@@ -1097,8 +1090,8 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     p_sys->circular.i_read = p_sys->circular.i_write = 0;
     /* 2 seconds of buffering */
     p_sys->circular.i_size = (int)i_rate * AOUT_MAX_PREPARE_TIME
-                           * p_sys->i_bytes_per_frame
-                           / p_sys->i_frame_length
+                           * p_sys->fmt.i_bytes_per_frame
+                           / p_sys->fmt.i_frame_length
                            / CLOCK_FREQ;
 
     /* Allocate circular buffer */
