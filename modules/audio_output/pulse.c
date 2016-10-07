@@ -744,10 +744,9 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             ss.format = PA_SAMPLE_S16NE;
 
             break;
-        case VLC_CODEC_TRUEHD:
-        case VLC_CODEC_MLP:
-            return VLC_EGENERIC;
         default:
+            if (!AOUT_FMT_LINEAR(fmt))
+                return VLC_EGENERIC;
             if (HAVE_FPU)
             {
                 fmt->i_format = VLC_CODEC_FL32;
