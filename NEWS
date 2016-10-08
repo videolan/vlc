@@ -11,23 +11,30 @@ Important changes:
  * Mac OS X 10.6 support is now removed. You need OS X 10.7 to run VLC.
 
 Core:
- * Support wayland surface type
- * Allow to start the video paused on the first frame
- * Support portable version of Windows build
  * Support network browsing for distant file system (SMB, FTP, SFTP, ...)
    and rewrite the parsing of those files
- * VLC now assumes vlcrc config file is in UTF-8
  * Add a keystore API: fetch and store password for common protocols (HTTP,
    SMB, SFTP, FTP, RTSP ...)
- * Autodetect external audio tracks (ac3,m4a,aac,dts...)
+ * Autodetect external audio tracks (ac3, m4a, aac, dts...), similar to subs
+ * Support HDMI passthrough for Audio HD codecs, like E-AC3, TrueHD
+ * Support for 12bits codec and extended colorspaces (HDR)
+ * Support output renderers, like ChromeCast
+ * VLC now assumes vlcrc config file is in UTF-8
+ * Support portable version of Windows build
+ * Support wayland surface type
+ * Allow to start the video paused on the first frame
+ * Refactor preparsing input
 
 Access:
  * New NFS access module using libnfs
- * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
  * New SMB access module using libdsm
  * Rewrite MPEG-DASH (Dynamic Adaptive Streaming over HTTP) support, including
    MPEG2TS and ISOFF profiles
+ * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
  * Large rework of the Smooth Streaming module
+ * Replaced httplive stream filter with new HLS demuxer, replaced smooth
+   stream filter with new Smooth demuxer, both using unified adaptive module
+ * Support HLSv4-7, including TS and raw muxing and ID3 tags
  * Screen capture plugin for Wayland display
  * Support decompression and extraction through libarchive (tar, zip, rar...)
  * Improvements of cookie handling (share cookies between playlist items,
@@ -38,50 +45,57 @@ Access:
  * New UPnP access module, to list directories without infinite recursions
  * New WASAPI audio capture module on Windows
  * SMB/FTP/SFTP accesses can list directories
- * Support for SAT>IP server dialect for RTSP (satip://)
  * New "concat" access module for concatenating byte streams
  * New HTTP/TLS access module for HTTP 2.0 support
  * Named pipes and device nodes are no longer included in directory listings
    by default. Use --list-special-files to include them back.
  * Support for timeout in UDP input --udp-timeout=<seconds>
  * New SAT>IP access module, to receive DVB-S via IP networks
+ * Improvements on DVB scanning
+ * BluRay module can open ISO over network and has full BD-J support
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
  * Support 4:4:4 and 4:2:2 chroma samplings with VDPAU hw acceleration
  * Support for ARIB STD-B24 subtitles
- * Support for Daala video
- * Support for AV1 video
+ * Support for experimental Daala video
+ * Support for experimental AV1 video
  * Important improvements for the MMAL decoder and output for rPI and rPI2
- * Support HEVC hardware decoding using OMX and MediaCodec
+ * Support HEVC hardware decoding on Windows, using DxVA2 and D3D11
+ * Support hardware decoding using Direct3D11, including GPU-zerocopy mode
+ * DxVA2 GPU-zerocopy for hardware decoding and displaying on Windows
+ * Support HEVC hardware decoding using OMX and MediaCodec (Android)
  * Use MediaCodec via NDK native API after Android Lollipop
+ * Support MPEG-2, VC1/WMV3 on Android using MediaCodec
  * Support VP9 and WMV3 decoding using OMX and performance improvements
  * New MPEG-1 & 2 audio layer I, II, III + MPEG 2.5 decoder based on libmpg123
  * New BPG decoder based on libbpg
  * Fixed uncompressed DVD-Audio (AOB) LPCM decoding
  * Rewrite WPL playlists and add ZPL playlists support (Zune)
- * Support TDSC, Canopus HQX
- * Support HEVC hardware decoding on Windows, using DxVA2
- * Basic TTML subtitles support
- * Support hardware decoding using Direct3D11, including GPU-zerocopy mode
- * DxVA2 GPU-zerocopy for hardware decoding and displaying on Windows
+ * Support TDSC, Canopus HQX codecs
+ * TTML subtitles support, including EBU-TT-D variant
  * Support 9-bit and 10-bit GBR planar formats
  * New hardware accelerated decoder for OS X and and iOS based on Video Toolbox
    supporting H.263, H.264/MPEG-4 AVC, MPEG-4 Part 2, and DV depending on device
    and OS version
  * Support for the OggSpots video codec
  * JPEG images correctly oriented using embedded orientation tag, if present
+ * Support VPX high bit depth support
+ * Extend MicroDVD support with color, fontname, size, position extensions
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
  * Support Opus in MPEG Transport Stream
  * Support Daala in Ogg
- * Important rework of the MP4 demuxer, including fragments
- * Support EIA-608 subtitles in MP4/mov
- * Support SBV subtitles
- * Support WMV and WMAV in MP4/mov, aka Flip4Mac files
- * Support bitmap audio channel reordering in MP4/mov
- * Support AlbumArtist and DiscNumber metadata
+ * Important rework of the MP4 demuxer, including:
+     * Support for fragmented MP4
+     * Support EIA-608 subtitles in MP4/mov
+     * Support WMV and WMAV in MP4/mov, aka Flip4Mac files
+     * Support bitmap audio channel reordering in MP4/mov
+     * Support for RTP Reception Hint Track with H.264, GSM and Speex payloads
+     * Support for XiphQt(MP4) vorbis and Flac
+     * Support for VP8/VP9/VP10 in MP4
+     * Support GoPro HiLight chapters
  * Important rework of the TS demuxer, including:
     * Fixed program selection with recorded TS (TopField, DreamBox and others)
     * Fixed TS playback with PAT/PMT less recordings
@@ -90,35 +104,37 @@ Demuxers:
  * Fixes for DTS detection in WAV and MKV files
  * Support for Creative ADPCM/alaw/ulaw/S16L in VOC files
  * Support for Creative ADPCM in AVI
+ * Support WMV extended content metadata
  * Directory Demux can now sort items, ignore extensions and hidden files
- * Replaced httplive stream filter with new HLS demuxer, replaced smooth 
-   stream filter with new Smooth demuxer, both using unified adaptive module
- * Improved smooth streaming compatibility
+ * Support SBV subtitles
+ * Support AlbumArtist and DiscNumber metadata
  * Support SCTE-18 / EAS inside TS
- * Support for RTP Reception Hint Track In MP4 with H.264, GSM and Speex payloads.
- * Support for XiphQt(MP4) vorbis and Flac
- * Support for VP8/VP9/VP10 in MP4
+ * Support raw h265/hevc files
+ * Support multi-channel WAV without channel-maps
+ * Rewrite MKV seeking
+ * Fix Quicktime Mp4 inside MKV and unpacketized VC1
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
  * Added stream prebuffering plugin
  * Removed HTTP Live streaming stream filter
  * Added zlib (a.k.a. deflate) decompression filter
- 
+
 Demux filter:
  * Added a demuxer filter chain to filter or intercept control commands and demuxing
 
 Audio output:
- * Complete rewrite of the AudioTrack Android module. This is now the default.
-   It now supports HDMI/SPDIF passthrough for AC3/DTS/EAC3, 5.1/7.1 and float
-   output.
- * Added Tizen audio module.
- * HDMI/SPDIF pass-through support for WASAPI (AC3/DTS/EAC3/TRUEHD).
+ * Complete rewrite of the AudioTrack Android module, it is now the default
+   module for Android. It now supports HDMI/SPDIF passthrough for AC3/DTS/EAC3,
+   5.1/7.1 channels and float output, depending on the Android version.
+ * Added Tizen audio module
+ * HDMI/SPDIF pass-through support for WASAPI (AC3/DTS/EAC3/TRUEHD)
+ * Support EAC3 and TRUEHD pass-through for PulseAudio
 
-Audio filters and output:
+Audio filters:
  * Add SoX Resampler library audio filter module (converter and resampler)
- * a52tospdif and dtstospdif audio converters are merged into tospdif. This new
- * converter can convert AC3, DTS, EAC3 and TRUEHD to a IEC61937.
+ * a52tospdif and dtstospdif audio converters are merged into tospdif,
+   this new converter can convert AC3, DTS, EAC3 and TRUEHD to a IEC61937 frame
 
 Video ouput:
  * Linux/BSD default video output is now OpenGL, instead of Xvideo
