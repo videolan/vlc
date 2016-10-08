@@ -44,6 +44,7 @@
 
 #include "ts_hotfixes.h"
 #include "ts_sl.h"
+#include "ts_metadata.h"
 #include "sections.h"
 #include "pes.h"
 #include "timestamps.h"
@@ -1467,6 +1468,13 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                         p_block->i_pts += FROM_SCALE_NZ(p_pmt->pcr.i_pcroffset);
                 }
 
+                /* METADATA in PES */
+                if( pid->u.p_pes->i_stream_type == 0x15 && i_stream_id == 0xbd )
+                {
+                    ProcessMetadata( p_demux->out, p_es->metadata.i_format, p_pmt->i_number,
+                                     p_block->p_buffer, p_block->i_buffer );
+                }
+
                 /* SL in PES */
                 if( pid->u.p_pes->i_stream_type == 0x12 &&
                     ((i_stream_id & 0xFE) == 0xFA) /* 0xFA || 0xFB */ )
@@ -2486,6 +2494,7 @@ static bool PIDReferencedByProgram( const ts_pmt_t *p_pmt, uint16_t i_pid )
 static void DoCreateES( demux_t *p_demux, ts_pes_es_t *p_es, const ts_pes_es_t *p_parent_es )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
     for( ; p_es ; p_es = p_es->p_next )
     {
         if( !p_es->id )

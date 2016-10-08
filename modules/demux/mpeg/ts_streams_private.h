@@ -85,6 +85,12 @@ struct ts_pes_es_t
     ts_pes_es_t *p_next; /* Next es on same pid from different pmt (shared pid) */
     /* J2K stuff */
     uint8_t  b_interlaced;
+    /* Metadata */
+    struct
+    {
+        uint8_t i_service_id;
+        uint32_t i_format;
+    } metadata;
 };
 
 typedef enum

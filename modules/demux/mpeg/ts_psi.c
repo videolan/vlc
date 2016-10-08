@@ -405,6 +405,26 @@ static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_t *p_pes,
     }
 }
 
+static void SetupMetadataDescriptors( demux_t *p_demux, ts_pes_es_t *p_es, const dvbpsi_pmt_es_t *p_dvbpsies )
+{
+    const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x26 );
+    if( p_dr && p_dr->i_length >= 13 )
+    {
+        /* app format 0xFFFF
+         * metadata_application_format_identifier ID3\x20
+         * i_metadata_format 0xFF
+         * metadata_format_identifier ID3\x20 */
+        if( !memcmp( p_dr->p_data, "\xFF\xFFID3 \xFFID3 ", 11 ) &&
+            (p_dr->p_data[12] & 0xF0) == 0x00 )
+        {
+            p_es->metadata.i_format = VLC_FOURCC('I', 'D', '3', ' ');
+            p_es->metadata.i_service_id = p_dr->p_data[11];
+            msg_Dbg( p_demux, "     - found Metadata_descriptor type ID3 with service_id=0x%"PRIx8,
+                     p_dr->p_data[11] );
+        }
+    }
+}
+
 static void SetupAVCDescriptors( demux_t *p_demux, ts_pes_es_t *p_es, const dvbpsi_pmt_es_t *p_dvbpsies )
 {
     const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x28 );
@@ -1334,6 +1354,9 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
         case 0x11:
         case 0x12:
             SetupISO14496Descriptors( p_demux, p_pes, p_pmt, p_dvbpsies );
+            break;
+        case 0x15:
+            SetupMetadataDescriptors( p_demux, p_pes->p_es, p_dvbpsies );
             break;
         case 0x1b:
             SetupAVCDescriptors( p_demux, p_pes->p_es, p_dvbpsies );

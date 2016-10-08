@@ -174,6 +174,8 @@ ts_pes_es_t * ts_pes_es_New( ts_pmt_t *p_program )
         p_es->b_interlaced = false;
         es_format_Init( &p_es->fmt, UNKNOWN_ES, 0 );
         p_es->fmt.i_group = p_program->i_number;
+        p_es->metadata.i_format = 0;
+        p_es->metadata.i_service_id = 0;
     }
     return p_es;
 }
