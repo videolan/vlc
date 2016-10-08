@@ -29,6 +29,7 @@ libmacosx_plugin_la_SOURCES = \
 	BWQuincyUI.h BWQuincyUI.m \
 	CompatibilityFixes.h \
 	VLCControlsBarCommon.m VLCControlsBarCommon.h \
+	VLCDocumentController.m VLCDocumentController.h \
 	VLCMainWindowControlsBar.m VLCMainWindowControlsBar.h \
 	VLCConvertAndSaveWindowController.h VLCConvertAndSaveWindowController.m \
 	VLCCoreInteraction.h VLCCoreInteraction.m \

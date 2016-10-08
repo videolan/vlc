@@ -24,6 +24,7 @@
 /* Begin PBXBuildFile section */
 		1C15C7DC1B5146DB003AB729 /* VLCResumeDialogController.h in Sources */ = {isa = PBXBuildFile; fileRef = 633121CA1B51122700E636DA /* VLCResumeDialogController.h */; };
 		1C15C7DD1B5146DB003AB729 /* VLCResumeDialogController.m in Sources */ = {isa = PBXBuildFile; fileRef = 633121CB1B51122700E636DA /* VLCResumeDialogController.m */; };
+		1C39ABBE1DA9AB9B00FE052A /* VLCDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C39ABBD1DA9AB9B00FE052A /* VLCDocumentController.m */; };
 		1C51BDE51B7A221B0056B9AA /* TimeSelectionPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C51BDE31B7A221B0056B9AA /* TimeSelectionPanel.xib */; };
 		1C57690E19DC93620099F5A6 /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C57690D19DC93620099F5A6 /* topbar_background.png */; };
 		1C67C8A51D58C0980079E1C1 /* VLCHelpWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A41D58C0980079E1C1 /* VLCHelpWindowController.m */; };
@@ -905,6 +906,8 @@
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		1C39ABBC1DA9AB9B00FE052A /* VLCDocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCDocumentController.h; path = ../../../modules/gui/macosx/VLCDocumentController.h; sourceTree = "<group>"; };
+		1C39ABBD1DA9AB9B00FE052A /* VLCDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCDocumentController.m; path = ../../../modules/gui/macosx/VLCDocumentController.m; sourceTree = "<group>"; };
 		1C3AABAC1B1BAE7B00FDF001 /* VLC.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = VLC.app; path = ../VLC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C3AABB01B1BB00A00FDF001 /* VLC-dev.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = "VLC-dev.app"; path = "../VLC-dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C51BDE41B7A221B0056B9AA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/TimeSelectionPanel.xib; sourceTree = "<group>"; };
@@ -1905,6 +1908,8 @@
 				CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */,
 				7D8BB0B318302AC000FAE9B7 /* VLCDebugMessageWindowController.h */,
 				7D8BB0B418302AC000FAE9B7 /* VLCDebugMessageWindowController.m */,
+				1C39ABBC1DA9AB9B00FE052A /* VLCDocumentController.h */,
+				1C39ABBD1DA9AB9B00FE052A /* VLCDocumentController.m */,
 				5CCED71014C0D4A90057F8D1 /* VLCExtensionsDialogProvider.h */,
 				5CCED71114C0D4A90057F8D1 /* VLCExtensionsDialogProvider.m */,
 				5CCED71214C0D4A90057F8D1 /* VLCExtensionsManager.h */,
@@ -4041,6 +4046,7 @@
 				1CCB5F881A62A724004C3E90 /* simple_prefs.m in Sources */,
 				1CCB5F891A62A724004C3E90 /* VLCStringUtility.h in Sources */,
 				1CCB5F8A1A62A724004C3E90 /* VLCStringUtility.m in Sources */,
+				1C39ABBE1DA9AB9B00FE052A /* VLCDocumentController.m in Sources */,
 				1CCB5F8B1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.h in Sources */,
 				1CCB5F8C1A62A724004C3E90 /* VLCTrackSynchronizationWindowController.m in Sources */,
 				6BBBB8B71D114628001BD9BA /* VLCRendererDiscovery.m in Sources */,
