@@ -278,6 +278,10 @@ void FakeESOut::recycle( FakeESOutID *id )
 es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *p_fmt)
 {
     FakeESOut *me = (FakeESOut *) fakees->p_sys;
+
+    if( p_fmt->i_cat != VIDEO_ES && p_fmt->i_cat != AUDIO_ES && p_fmt->i_cat != SPU_ES )
+        return NULL;
+
     /* Feed the slave demux/stream_Demux with FakeESOutID struct,
      * we'll create real ES later on main demux on execution */
     FakeESOutID *es_id = me->createNewID( p_fmt );
