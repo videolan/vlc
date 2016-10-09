@@ -575,6 +575,13 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [_intf_languagePopup selectItemAtIndex:sel];
 
     [self setupButton:_intf_continueplaybackPopup forIntList: "macosx-continue-playback"];
+    if (!var_InheritBool(p_intf, "macosx-recentitems")) {
+        [_intf_continueplaybackPopup setEnabled: NO];
+        [_intf_continueplaybackPopup setToolTip: _NS("Media files cannot be resumed because keeping recent media items is disabled.")];
+    } else {
+        [_intf_continueplaybackPopup setEnabled: YES];
+    }
+
     [self setupButton:_intf_appleremoteCheckbox forBoolValue: "macosx-appleremote"];
     [self setupButton:_intf_appleremote_sysvolCheckbox forBoolValue: "macosx-appleremote-sysvol"];
     [self setupButton:_intf_statusIconCheckbox forBoolValue: "macosx-statusicon"];
