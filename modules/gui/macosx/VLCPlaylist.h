@@ -83,8 +83,18 @@
 
 /**
  * Simplified version to add new items at the end of the current playlist
+ * @param o_array array of items. Each item is a Dictionary with meta info.
  */
 - (void)addPlaylistItems:(NSArray*)o_array;
+
+/**
+ * Add new items to playlist, with the possibility to check if an item can be added
+ * to the currently playing media as subtitle.
+ *
+ * @param array array of items. Each item is a Dictionary with meta info.
+ * @param isSubtitle if YES, method tries to add the item as a subtitle
+ */
+- (void)addPlaylistItems:(NSArray*)array tryAsSubtitle:(BOOL)isSubtitle;
 
 /**
  * Adds new items to the playlist, at specified parent node and index.

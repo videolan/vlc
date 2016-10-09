@@ -665,6 +665,28 @@
     [self addPlaylistItems:array withParentItemId:i_plItemId atPos:-1 startPlayback:b_autoplay];
 }
 
+- (void)addPlaylistItems:(NSArray*)array tryAsSubtitle:(BOOL)isSubtitle
+{
+    input_thread_t *p_input = pl_CurrentInput(getIntf());
+    if (isSubtitle && array.count == 1 && p_input) {
+        char *path = vlc_uri2path([[[array firstObject] objectForKey:@"ITEM_URL"] UTF8String]);
+
+        if (path) {
+            int i_result = input_AddSubtitleOSD(p_input, path, true, true);
+            free(path);
+            if (i_result == VLC_SUCCESS) {
+                vlc_object_release(p_input);
+                return;
+            }
+        }
+    }
+
+    if (p_input)
+        vlc_object_release(p_input);
+
+    [self addPlaylistItems:array];
+}
+
 - (void)addPlaylistItems:(NSArray*)array withParentItemId:(int)i_plItemId atPos:(int)i_position startPlayback:(BOOL)b_start
 {
     playlist_t * p_playlist = pl_Get(getIntf());

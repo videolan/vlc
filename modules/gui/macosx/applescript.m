@@ -42,26 +42,11 @@
 
     if ([o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"]) {
         if (o_urlString) {
-            NSURL * o_url = [NSURL fileURLWithPath: o_urlString];
-            if (o_url != nil)
-                [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_url];
 
-            input_thread_t * p_input = pl_CurrentInput(getIntf());
-            BOOL b_returned = NO;
+            NSDictionary *o_dic = [NSDictionary dictionaryWithObject:o_urlString forKey:@"ITEM_URL"];
+            NSArray* item = [NSArray arrayWithObject:o_dic];
 
-            if (p_input) {
-                b_returned = input_AddSubtitle(p_input, [o_urlString UTF8String], true);
-                vlc_object_release(p_input);
-                if (!b_returned)
-                    return nil;
-            }
-
-            NSDictionary *o_dic;
-            NSArray *o_array;
-            o_dic = [NSDictionary dictionaryWithObject:o_urlString forKey:@"ITEM_URL"];
-            o_array = [NSArray arrayWithObject: o_dic];
-
-            [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_array];
+            [[[VLCMain sharedInstance] playlist] addPlaylistItems:item tryAsSubtitle:YES];
         }
     }
     return nil;

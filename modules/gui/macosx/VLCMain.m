@@ -441,35 +441,19 @@ static VLCMain *sharedInstance = nil;
         }
     }
 
-    char *psz_uri = vlc_path2uri([[o_names firstObject] UTF8String], NULL);
-
-    // try to add file as subtitle
-    if ([o_names count] == 1 && psz_uri) {
-        input_thread_t * p_input = pl_CurrentInput(getIntf());
-        if (p_input) {
-            int i_result = input_AddSubtitleOSD(p_input, [[o_names firstObject] UTF8String], true, true);
-            vlc_object_release(p_input);
-            if (i_result == VLC_SUCCESS) {
-                free(psz_uri);
-                return;
-            }
-        }
-    }
-    free(psz_uri);
-
     NSArray *o_sorted_names = [o_names sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
     NSMutableArray *o_result = [NSMutableArray arrayWithCapacity: [o_sorted_names count]];
     for (NSUInteger i = 0; i < [o_sorted_names count]; i++) {
-        psz_uri = vlc_path2uri([[o_sorted_names objectAtIndex:i] UTF8String], "file");
+        char *psz_uri = vlc_path2uri([[o_sorted_names objectAtIndex:i] UTF8String], "file");
         if (!psz_uri)
             continue;
 
         NSDictionary *o_dic = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
-        free(psz_uri);
         [o_result addObject: o_dic];
+        free(psz_uri);
     }
 
-    [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_result];
+    [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_result tryAsSubtitle:YES];
 }
 
 /* When user click in the Dock icon our double click in the finder */

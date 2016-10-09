@@ -637,26 +637,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (items.count == 0)
         return NO;
 
-    // Try to add file as a subtitle
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    if (items.count == 1 && p_input) {
-        NSString *url = [[items firstObject] valueForKey:@"ITEM_URL"];
-        char *path = vlc_uri2path([url UTF8String]);
-
-        if (path) {
-            int i_result = input_AddSubtitleOSD(p_input, path, true, true);
-            free(path);
-            if (i_result == VLC_SUCCESS) {
-                vlc_object_release(p_input);
-                return YES;
-            }
-        }
-    }
-
-    if (p_input)
-        vlc_object_release(p_input);
-
-    [[[VLCMain sharedInstance] playlist] addPlaylistItems:items];
+    [[[VLCMain sharedInstance] playlist] addPlaylistItems:items tryAsSubtitle:YES];
     return YES;
 }
 
