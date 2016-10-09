@@ -621,7 +621,7 @@
     }
 
     /* Recent documents menu */
-    if (url != nil && (BOOL)config_GetInt(p_playlist, "macosx-recentitems") == YES)
+    if (url != nil && var_InheritBool(getIntf(), "macosx-recentitems"))
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL:url];
 
     return p_input;
