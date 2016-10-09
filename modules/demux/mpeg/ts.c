@@ -2514,13 +2514,15 @@ void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid, bool b_create_delayed )
 
     if( pid && p_sys->es_creation == CREATE_ES )
     {
-        DoCreateES( p_demux, pid->u.p_pes->p_es, NULL );
+        ts_pes_es_t *p_es = pid->u.p_pes->p_es;
+        DoCreateES( p_demux, p_es, NULL );
 
         /* Update the default program == first created ES group */
-        if( p_sys->b_default_selection && p_sys->programs.i_size > 0)
+        if( p_sys->b_default_selection && p_sys->programs.i_size > 0 &&
+            (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES) )
         {
             p_sys->b_default_selection = false;
-            const int i_first_program = pid->u.p_pes->p_es->p_program->i_number;
+            const int i_first_program = p_es->p_program->i_number;
             if( p_sys->programs.p_elems[0] != i_first_program )
                 p_sys->programs.p_elems[0] = i_first_program;
             msg_Dbg( p_demux, "Default program is %d", i_first_program );
