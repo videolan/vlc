@@ -41,6 +41,7 @@ void EndVideoDec( decoder_t *p_dec );
 
 /* Audio Decoder */
 int InitAudioDec( decoder_t *, AVCodecContext *, const AVCodec * );
+void EndAudioDec( decoder_t *p_dec );
 
 /* Subtitle Decoder */
 int InitSubtitleDec( decoder_t *, AVCodecContext *, const AVCodec * );

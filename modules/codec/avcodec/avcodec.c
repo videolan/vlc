@@ -336,10 +336,18 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
 
-    if( p_dec->fmt_out.i_cat == VIDEO_ES )
-        EndVideoDec( p_dec );
-    else
-        ffmpeg_CloseCodec( p_dec );
+    switch( p_dec->fmt_out.i_cat )
+    {
+        case VIDEO_ES:
+            EndVideoDec( p_dec );
+            break;
+        case AUDIO_ES:
+            EndAudioDec( p_dec );
+            break;
+        default:
+            ffmpeg_CloseCodec( p_dec );
+            break;
+    }
 
     decoder_sys_t *p_sys = p_dec->p_sys;
 
