@@ -2683,13 +2683,13 @@ then
       CPPFLAGS_test="-I${with_a52}/include"
     fi
     VLC_SAVE_FLAGS
-    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_test} ${CPPFLAGS_liba52}"
-    LDFLAGS="${LDFLAGS} ${LDFLAGS_test} ${LIBS_liba52}"
+    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_test} ${CPPFLAGS_a52}"
+    LDFLAGS="${LDFLAGS} ${LDFLAGS_test} ${LIBS_a52}"
     AC_CHECK_HEADERS(a52dec/a52.h, [
       AC_CHECK_LIB(a52, a52_free, [
-        VLC_ADD_PLUGIN([liba52])
-        VLC_ADD_LIBS([liba52],[${LDFLAGS_test} -la52])
-        VLC_ADD_CPPFLAGS([liba52],[${CPPFLAGS_test}])
+        VLC_ADD_PLUGIN([a52])
+        VLC_ADD_LIBS([a52],[${LDFLAGS_test} -la52])
+        VLC_ADD_CPPFLAGS([a52],[${CPPFLAGS_test}])
       ],[
         AC_MSG_ERROR([Could not find liba52 on your system: you may get it from http://liba52.sf.net/. Alternatively you can use --disable-a52 to disable the a52 plugin.])
         ], [$LIBM])

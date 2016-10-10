@@ -1,5 +1,5 @@
 /*****************************************************************************
- * liba52.c: ATSC A/52 aka AC-3 decoder plugin for VLC.
+ * a52.c: ATSC A/52 aka AC-3 decoder plugin for VLC.
  *   This plugin makes use of liba52 to decode A/52 audio
  *   (http://liba52.sf.net/).
  *****************************************************************************
