@@ -279,7 +279,7 @@ static void Close( vlc_object_t * p_this )
 
     for( int i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
     {
-        asf_track_t *track = (asf_track_t *)vlc_array_item_at_index( p_sys->p_tracks, i );
+        asf_track_t *track = vlc_array_item_at_index( p_sys->p_tracks, i );
         free( track->p_extra );
         es_format_Clean( &track->fmt );
         free( track );
