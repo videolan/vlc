@@ -176,8 +176,6 @@ void vlc_meta_SetStatus( vlc_meta_t *m, int status )
  */
 void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
 {
-    char **ppsz_all_keys;
-
     if( !dst || !src )
         return;
 
@@ -191,7 +189,7 @@ void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
     }
 
     /* XXX: If speed up are needed, it is possible */
-    ppsz_all_keys = vlc_dictionary_all_keys( &src->extra_tags );
+    char **ppsz_all_keys = vlc_dictionary_all_keys( &src->extra_tags );
     for( int i = 0; ppsz_all_keys && ppsz_all_keys[i]; i++ )
     {
         /* Always try to remove the previous value */
