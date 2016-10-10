@@ -653,9 +653,14 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
 
 static int ItemIndex ( playlist_item_t *p_item )
 {
-    for( int i = 0; i < p_item->p_parent->i_children; i++ )
-        if( p_item->p_parent->pp_children[i] == p_item ) return i;
-    return -1;
+    int idx;
+
+    TAB_FIND( p_item->p_parent->i_children,
+              p_item->p_parent->pp_children,
+              p_item,
+              idx );
+
+    return idx;
 }
 
 /**
