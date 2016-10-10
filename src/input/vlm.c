@@ -379,7 +379,7 @@ static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
 static void* Manage( void* p_object )
 {
     vlm_t *vlm = (vlm_t*)p_object;
-    int i, j;
+    int j;
     time_t lastcheck, now, nextschedule = 0;
 
     time(&lastcheck);
@@ -406,7 +406,7 @@ static void* Manage( void* p_object )
         int canc = vlc_savecancel ();
         /* destroy the inputs that wants to die, and launch the next input */
         vlc_mutex_lock( &vlm->lock );
-        for( i = 0; i < vlm->i_media; i++ )
+        for( int i = 0; i < vlm->i_media; i++ )
         {
             vlm_media_sys_t *p_media = vlm->media[i];
 
@@ -445,7 +445,7 @@ static void* Manage( void* p_object )
         time(&now);
         nextschedule = 0;
 
-        for( i = 0; i < vlm->i_schedule; i++ )
+        for( int i = 0; i < vlm->i_schedule; i++ )
         {
             time_t real_date = vlm->schedule[i]->date;
 
@@ -535,9 +535,7 @@ typedef struct
 /* */
 static vlm_media_sys_t *vlm_ControlMediaGetById( vlm_t *p_vlm, int64_t id )
 {
-    int i;
-
-    for( i = 0; i < p_vlm->i_media; i++ )
+    for( int i = 0; i < p_vlm->i_media; i++ )
     {
         if( p_vlm->media[i]->cfg.id == id )
             return p_vlm->media[i];
@@ -546,9 +544,7 @@ static vlm_media_sys_t *vlm_ControlMediaGetById( vlm_t *p_vlm, int64_t id )
 }
 static vlm_media_sys_t *vlm_ControlMediaGetByName( vlm_t *p_vlm, const char *psz_name )
 {
-    int i;
-
-    for( i = 0; i < p_vlm->i_media; i++ )
+    for( int i = 0; i < p_vlm->i_media; i++ )
     {
         if( !strcmp( p_vlm->media[i]->cfg.psz_name, psz_name ) )
             return p_vlm->media[i];
@@ -557,13 +553,11 @@ static vlm_media_sys_t *vlm_ControlMediaGetByName( vlm_t *p_vlm, const char *psz
 }
 static int vlm_MediaDescriptionCheck( vlm_t *p_vlm, vlm_media_t *p_cfg )
 {
-    int i;
-
     if( !p_cfg || !p_cfg->psz_name ||
         !strcmp( p_cfg->psz_name, "all" ) || !strcmp( p_cfg->psz_name, "media" ) || !strcmp( p_cfg->psz_name, "schedule" ) )
         return VLC_EGENERIC;
 
-    for( i = 0; i < p_vlm->i_media; i++ )
+    for( int i = 0; i < p_vlm->i_media; i++ )
     {
         if( p_vlm->media[i]->cfg.id == p_cfg->id )
             continue;
@@ -593,7 +587,6 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             char *psz_output;
             char *psz_header;
             char *psz_dup;
-            int i;
 
             vlc_gc_decref( p_media->vod.p_item );
 
@@ -623,7 +616,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             }
             free( psz_output );
 
-            for( i = 0; i < p_cfg->i_option; i++ )
+            for( int i = 0; i < p_cfg->i_option; i++ )
                 input_item_AddOption( p_media->vod.p_item,
                                       p_cfg->ppsz_option[i], VLC_INPUT_OPTION_TRUSTED );
 
@@ -818,10 +811,9 @@ static int vlm_ControlMediaGets( vlm_t *p_vlm, vlm_media_t ***ppp_dsc, int *pi_d
 {
     vlm_media_t **pp_dsc;
     int                     i_dsc;
-    int i;
 
     TAB_INIT( i_dsc, pp_dsc );
-    for( i = 0; i < p_vlm->i_media; i++ )
+    for( int i = 0; i < p_vlm->i_media; i++ )
     {
         vlm_media_t *p_dsc = vlm_media_Duplicate( &p_vlm->media[i]->cfg );
         TAB_APPEND( i_dsc, pp_dsc, p_dsc );
@@ -860,9 +852,7 @@ static int vlm_ControlMediaGetId( vlm_t *p_vlm, const char *psz_name, int64_t *p
 
 static vlm_media_instance_sys_t *vlm_ControlMediaInstanceGetByName( vlm_media_sys_t *p_media, const char *psz_id )
 {
-    int i;
-
-    for( i = 0; i < p_media->i_instance; i++ )
+    for( int i = 0; i < p_media->i_instance; i++ )
     {
         const char *psz = p_media->instance[i]->psz_name;
         if( ( psz == NULL && psz_id == NULL ) ||
@@ -933,7 +923,6 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     if( !p_instance )
     {
         vlm_media_t *p_cfg = &p_media->cfg;
-        int i;
 
         p_instance = vlm_MediaInstanceNew( p_vlm, psz_id );
         if( !p_instance )
@@ -961,7 +950,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             }
         }
 
-        for( i = 0; i < p_cfg->i_option; i++ )
+        for( int i = 0; i < p_cfg->i_option; i++ )
         {
             if( !strcmp( p_cfg->ppsz_option[i], "sout-keep" ) )
                 p_instance->b_sout_keep = true;
@@ -1117,13 +1106,12 @@ static int vlm_ControlMediaInstanceGets( vlm_t *p_vlm, int64_t id, vlm_media_ins
     vlm_media_sys_t *p_media = vlm_ControlMediaGetById( p_vlm, id );
     vlm_media_instance_t **pp_idsc;
     int                              i_idsc;
-    int i;
 
     if( !p_media )
         return VLC_EGENERIC;
 
     TAB_INIT( i_idsc, pp_idsc );
-    for( i = 0; i < p_media->i_instance; i++ )
+    for( int i = 0; i < p_media->i_instance; i++ )
     {
         vlm_media_instance_sys_t *p_instance = p_media->instance[i];
         vlm_media_instance_t *p_idsc = vlm_media_instance_New();
