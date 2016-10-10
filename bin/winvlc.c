@@ -243,8 +243,7 @@ static void check_crashdump(void)
 
                 if( FtpPutFile( ftp, mv_crashdump_path, remote_file,
                             FTP_TRANSFER_TYPE_BINARY, 0) )
-                    MessageBox( NULL, L"Report sent correctly. Thanks a lot " \
-                                "for the help.", L"Report sent", MB_OK);
+                    fprintf(stderr, "Report sent correctly to FTP.\n");
                 else
                     fprintf(stderr,"Couldn't send report to FTP server\n");
 
@@ -262,6 +261,8 @@ static void check_crashdump(void)
               fprintf(stderr,"There was an error while connecting to the Internet  0x%08lu\n",
                       (unsigned long)GetLastError());
         }
+        MessageBox( NULL, L"Thanks a lot for helping improving VLC!",
+                    L"VLC crash report" , MB_OK);
     }
 
     _wremove(mv_crashdump_path);
