@@ -1,5 +1,5 @@
 /*****************************************************************************
- * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
+ * mpegaudio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2016 VLC authors and VideoLAN
  * $Id$
@@ -40,7 +40,7 @@
 
 #include <vlc_block_helper.h>
 
-#include "../packetizer/packetizer_helper.h"
+#include "packetizer_helper.h"
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor

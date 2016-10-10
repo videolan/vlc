@@ -244,7 +244,6 @@ $Id$
  * motiondetect: Motion detection filter
  * mp4: MP4 file input module
  * mpc: Musepack decoder
- * mpeg_audio: MPEG audio parser/packetizer
  * mpg123: MPEG-1 & 2 audio layer I, II, III + MPEG 2.5 decoder using mpg123
  * mpgv: MPEG-I/II Video demuxer
  * mtp: MTP interface module
@@ -291,6 +290,7 @@ $Id$
  * packetizer_mlp: MLP/TrueHD audio packetizer
  * packetizer_mpeg4audio: MPEG4 audio packetizer
  * packetizer_mpeg4video: MPEG4 video packetizer
+ * packetizer_mpegaudio: MPEG audio packetizer
  * packetizer_mpegvideo: MPEG video packetizer
  * packetizer_vc1: VC-1 video packetizer
  * panoramix: image wall panoramic video with edge blending filter

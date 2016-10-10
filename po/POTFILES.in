@@ -373,7 +373,6 @@ modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mad.c
 modules/codec/mft.c
-modules/codec/mpeg_audio.c
 modules/codec/mpg123.c
 modules/codec/omxil/mediacodec.c
 modules/codec/omxil/mediacodec_jni.c
@@ -1015,6 +1014,7 @@ modules/packetizer/hevc.c
 modules/packetizer/mlp.c
 modules/packetizer/mpeg4audio.c
 modules/packetizer/mpeg4video.c
+modules/packetizer/mpegaudio.c
 modules/packetizer/mpegvideo.c
 modules/packetizer/vc1.c
 modules/services_discovery/avahi.c

@@ -510,7 +510,7 @@ libmod
 libdash
 libmpgv
 dolby_surround
-mpeg_audio"
+mpegaudio"
 fi
 
 echo ${blacklist}

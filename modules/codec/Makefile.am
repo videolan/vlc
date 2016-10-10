@@ -63,10 +63,6 @@ endif
 liblpcm_plugin_la_SOURCES = codec/lpcm.c
 codec_LTLIBRARIES += liblpcm_plugin.la
 
-libmpeg_audio_plugin_la_SOURCES = codec/mpeg_audio.c
-libmpeg_audio_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-codec_LTLIBRARIES += libmpeg_audio_plugin.la
-
 libmad_plugin_la_SOURCES = codec/mad.c
 libmad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(MAD_CFLAGS)
 libmad_plugin_la_LIBADD = $(AM_LIBADD) $(MAD_LIBS)

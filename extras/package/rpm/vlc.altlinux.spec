@@ -1039,7 +1039,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/codec/libcinepak_plugin.so*
 %_vlc_pluginsdir/codec/libdts_plugin.so*
 %_vlc_pluginsdir/codec/liblpcm_plugin.so*
-%_vlc_pluginsdir/codec/libmpeg_audio_plugin.so*
 %_vlc_pluginsdir/codec/libspudec_plugin.so*
 %_vlc_pluginsdir/codec/libfake_plugin.so*
 %_vlc_pluginsdir/codec/libsubsdec_plugin.so*
@@ -1138,7 +1137,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/packetizer/libpacketizer_copy_plugin.so*
 %_vlc_pluginsdir/packetizer/libpacketizer_mpeg4audio_plugin.so*
 %_vlc_pluginsdir/packetizer/libpacketizer_mpeg4video_plugin.so*
-#%_vlc_pluginsdir/packetizer/libpacketizer_mpegaudio_plugin.so*
+%_vlc_pluginsdir/packetizer/libpacketizer_mpegaudio_plugin.so*
 %_vlc_pluginsdir/packetizer/libpacketizer_mpegvideo_plugin.so*
 %_vlc_pluginsdir/packetizer/libpacketizer_vc1_plugin.so*
 

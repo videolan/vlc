@@ -4,6 +4,7 @@ libpacketizer_copy_plugin_la_SOURCES = packetizer/copy.c
 libpacketizer_mpegvideo_plugin_la_SOURCES = packetizer/mpegvideo.c
 libpacketizer_mpeg4video_plugin_la_SOURCES = packetizer/mpeg4video.c
 libpacketizer_mpeg4audio_plugin_la_SOURCES = packetizer/mpeg4audio.c
+libpacketizer_mpegaudio_plugin_la_SOURCES = packetizer/mpegaudio.c
 libpacketizer_h264_plugin_la_SOURCES = \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/h264.c packetizer/hxxx_nal.h \
@@ -37,6 +38,7 @@ packetizer_LTLIBRARIES = \
 	libpacketizer_mpegvideo_plugin.la \
 	libpacketizer_mpeg4video_plugin.la \
 	libpacketizer_mpeg4audio_plugin.la \
+	libpacketizer_mpegaudio_plugin.la \
 	libpacketizer_h264_plugin.la \
 	libpacketizer_vc1_plugin.la \
 	libpacketizer_mlp_plugin.la \
