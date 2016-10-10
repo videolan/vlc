@@ -859,8 +859,7 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
     block_t *p_cc;
     bool pb_present[4];
     bool b_processed = false;
-    int i;
-    int i_cc_decoder;
+    int i_cc_decoder = 0;
 
     assert( p_dec_cc->pf_get_cc != NULL );
 
@@ -873,14 +872,14 @@ static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
         return;
 
     vlc_mutex_lock( &p_owner->lock );
-    for( i = 0, i_cc_decoder = 0; i < 4; i++ )
+    for( int i = 0; i < 4; i++ )
     {
         p_owner->cc.pb_present[i] |= pb_present[i];
         if( p_owner->cc.pp_decoder[i] )
             i_cc_decoder++;
     }
 
-    for( i = 0; i < 4; i++ )
+    for( int i = 0; i < 4; i++ )
     {
         if( !p_owner->cc.pp_decoder[i] )
             continue;
@@ -1974,8 +1973,7 @@ void input_DecoderDelete( decoder_t *p_dec )
     /* */
     if( p_dec->p_owner->cc.b_supported )
     {
-        int i;
-        for( i = 0; i < 4; i++ )
+        for( int i = 0; i < 4; i++ )
             input_DecoderSetCcState( p_dec, false, i );
     }
 
@@ -2100,10 +2098,9 @@ void input_DecoderFlush( decoder_t *p_dec )
 void input_DecoderIsCcPresent( decoder_t *p_dec, bool pb_present[4] )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    int i;
 
     vlc_mutex_lock( &p_owner->lock );
-    for( i = 0; i < 4; i++ )
+    for( int i = 0; i < 4; i++ )
         pb_present[i] =  p_owner->cc.pb_present[i];
     vlc_mutex_unlock( &p_owner->lock );
 }
