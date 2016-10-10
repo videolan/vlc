@@ -631,8 +631,7 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
                                                     playlist_item_t *p_root,
                                                     bool b_items_only )
 {
-    int i;
-    for( i = 0 ; i< p_root->i_children ; i++ )
+    for( int i = 0 ; i< p_root->i_children ; i++ )
     {
         if( ( b_items_only ? p_root->pp_children[i]->i_children == -1 : 1 ) &&
             p_root->pp_children[i]->p_input == p_item )
@@ -713,8 +712,7 @@ int playlist_TreeMoveMany( playlist_t *p_playlist,
 
     if ( p_node->i_children == -1 ) return VLC_EGENERIC;
 
-    int i;
-    for( i = 0; i < i_items; i++ )
+    for( int i = 0; i < i_items; i++ )
     {
         playlist_item_t *p_item = pp_items[i];
         int i_index = ItemIndex( p_item );
@@ -722,7 +720,7 @@ int playlist_TreeMoveMany( playlist_t *p_playlist,
         REMOVE_ELEM( p_parent->pp_children, p_parent->i_children, i_index );
         if ( p_parent == p_node && i_index < i_newpos ) i_newpos--;
     }
-    for( i = i_items - 1; i >= 0; i-- )
+    for( int i = i_items - 1; i >= 0; i-- )
     {
         playlist_item_t *p_item = pp_items[i];
         INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
