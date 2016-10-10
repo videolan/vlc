@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
- * Copyright (C) 2001-2003 VLC authors and VideoLAN
+ * Copyright (C) 2001-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -47,10 +47,6 @@
  *****************************************************************************/
 struct decoder_sys_t
 {
-#ifdef HAVE_MPGA_FILTER
-    /* Module mode */
-    bool b_packetizer;
-#endif
     /*
      * Input properties
      */
@@ -73,11 +69,6 @@ struct decoder_sys_t
     bool   b_discontinuity;
 };
 
-/* This isn't the place to put mad-specific stuff. However, it makes the
- * mad plug-in's life much easier if we put 8 extra bytes at the end of the
- * buffer, because that way it doesn't have to copy the block_t to a bigger
- * buffer. This has no implication on other plug-ins, and we only lose 8 bytes
- * per frame. --Meuuh */
 #define MAD_BUFFER_GUARD 8
 #define MPGA_HEADER_SIZE 4
 
@@ -85,9 +76,6 @@ struct decoder_sys_t
  * Local prototypes
  ****************************************************************************/
 
-#ifdef HAVE_MPGA_FILTER
-static int  OpenDecoder   ( vlc_object_t * );
-#endif
 static int  Open( vlc_object_t * );
 static void Close(  vlc_object_t * );
 
@@ -100,12 +88,6 @@ vlc_module_begin ()
     set_description( N_("MPEG audio layer I/II/III packetizer") )
     set_capability( "packetizer", 10 )
     set_callbacks( Open, Close )
-#ifdef HAVE_MPGA_FILTER
-    add_submodule ()
-    set_description( N_("MPEG audio layer I/II/III decoder") )
-    set_capability( "decoder", 100 )
-    set_callbacks( OpenDecoder, Close )
-#endif
 vlc_module_end ()
 
 /*****************************************************************************
@@ -119,53 +101,6 @@ static void Flush( decoder_t *p_dec )
     p_sys->i_state = STATE_NOSYNC;
     block_BytestreamEmpty( &p_sys->bytestream );
     p_sys->b_discontinuity = true;
-}
-
-#ifdef HAVE_MPGA_FILTER
-/*****************************************************************************
- * GetAoutBuffer:
- *****************************************************************************/
-static block_t *GetAoutBuffer( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_buf;
-
-    if( decoder_UpdateAudioFormat( p_dec ) )
-        return NULL;
-    p_buf = decoder_NewAudioBuffer( p_dec, p_sys->i_frame_length );
-    if( p_buf == NULL ) return NULL;
-
-    p_buf->i_pts = date_Get( &p_sys->end_date );
-    p_buf->i_length = date_Increment( &p_sys->end_date, p_sys->i_frame_length )
-                      - p_buf->i_pts;
-    if( p_sys->b_discontinuity )
-        p_buf->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-    p_sys->b_discontinuity = false;
-
-    /* Hack for libmad filter */
-    p_buf = block_Realloc( p_buf, 0, p_sys->i_frame_size + MAD_BUFFER_GUARD );
-
-    return p_buf;
-}
-#endif
-
-/*****************************************************************************
- * GetSoutBuffer:
- *****************************************************************************/
-static block_t *GetSoutBuffer( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
-
-    p_block = block_Alloc( p_sys->i_frame_size );
-    if( p_block == NULL ) return NULL;
-
-    p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
-
-    p_block->i_length =
-        date_Increment( &p_sys->end_date, p_sys->i_frame_length ) - p_block->i_pts;
-
-    return p_block;
 }
 
 /*****************************************************************************
@@ -188,8 +123,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
     p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
     p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
     p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
-    p_dec->fmt_out.audio.i_bytes_per_frame =
-        p_sys->i_max_frame_size + MAD_BUFFER_GUARD;
+    p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_max_frame_size;
 
     p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
     p_dec->fmt_out.audio.i_physical_channels =
@@ -197,21 +131,16 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 
     p_dec->fmt_out.i_bitrate = p_sys->i_bit_rate * 1000;
 
-#ifdef HAVE_MPGA_FILTER
-    if( !p_sys->b_packetizer )
-    {
-        block_t *p_aout_buffer = GetAoutBuffer( p_dec );
-        p_buf = p_aout_buffer ? p_aout_buffer->p_buffer : NULL;
-        *pp_out_buffer = p_aout_buffer;
-    }
-    else
-#endif
-    {
-        block_t *p_sout_buffer = GetSoutBuffer( p_dec );
-        p_buf = p_sout_buffer ? p_sout_buffer->p_buffer : NULL;
-        *pp_out_buffer = p_sout_buffer;
-    }
-    return p_buf;
+    block_t *p_block = block_Alloc( p_sys->i_frame_size );
+    if( p_block == NULL )
+        return NULL;
+
+    p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
+    p_block->i_length =
+        date_Increment( &p_sys->end_date, p_sys->i_frame_length ) - p_block->i_pts;
+
+    *pp_out_buffer = p_block;
+    return p_block->p_buffer;
 }
 
 /*****************************************************************************
@@ -623,15 +552,6 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
 
-#ifdef HAVE_MPGA_FILTER
-            /* Get beginning of next frame for libmad */
-            if( !p_sys->b_packetizer )
-            {
-                assert( p_out_buffer->i_buffer >= (unsigned)p_sys->i_frame_size + MAD_BUFFER_GUARD );
-                memcpy( p_buf + p_sys->i_frame_size,
-                        p_header, MAD_BUFFER_GUARD );
-            }
-#endif
             p_sys->i_state = STATE_NOSYNC;
 
             /* Make sure we don't reuse the same pts twice */
@@ -685,9 +605,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Misc init */
-#ifdef HAVE_MPGA_FILTER
-    p_sys->b_packetizer = true;
-#endif
     p_sys->i_state = STATE_NOSYNC;
     date_Set( &p_sys->end_date, 0 );
     block_BytestreamInit( &p_sys->bytestream );
@@ -705,7 +622,6 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
 
     /* Set callback */
-    p_dec->pf_decode_audio = DecodeBlock;
     p_dec->pf_packetize    = DecodeBlock;
     p_dec->pf_flush        = Flush;
 
@@ -714,21 +630,3 @@ static int Open( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
-
-#ifdef HAVE_MPGA_FILTER
-static int OpenDecoder( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-
-    /* HACK: Don't use this codec if we don't have an mpga audio filter */
-    if( !module_exists( "mad" ) )
-        return VLC_EGENERIC;
-
-    int i_ret = Open( p_this );
-    if( i_ret != VLC_SUCCESS )
-        return i_ret;
-
-    p_dec->p_sys->b_packetizer = false;
-    return VLC_SUCCESS;
-}
-#endif

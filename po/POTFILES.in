@@ -285,7 +285,6 @@ modules/audio_filter/channel_mixer/trivial.c
 modules/audio_filter/chorus_flanger.c
 modules/audio_filter/compressor.c
 modules/audio_filter/converter/format.c
-modules/audio_filter/converter/mpgatofixed32.c
 modules/audio_filter/converter/tospdif.c
 modules/audio_filter/equalizer.c
 modules/audio_filter/equalizer_presets.h
@@ -372,6 +371,7 @@ modules/codec/kate.c
 modules/codec/libass.c
 modules/codec/libmpeg2.c
 modules/codec/lpcm.c
+modules/codec/mad.c
 modules/codec/mft.c
 modules/codec/mpeg_audio.c
 modules/codec/mpg123.c

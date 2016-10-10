@@ -76,13 +76,6 @@ audio_filter_LTLIBRARIES += \
 	libtrivial_channel_mixer_plugin.la
 
 # Converters
-libmad_plugin_la_SOURCES = audio_filter/converter/mpgatofixed32.c
-libmad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(MAD_CFLAGS)
-libmad_plugin_la_LIBADD = $(AM_LIBADD) $(MAD_LIBS)
-if HAVE_MAD
-audio_filter_LTLIBRARIES += libmad_plugin.la
-endif
-
 libaudio_format_plugin_la_SOURCES = audio_filter/converter/format.c
 libaudio_format_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libaudio_format_plugin_la_LIBADD = $(LIBM)

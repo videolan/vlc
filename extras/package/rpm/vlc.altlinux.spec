@@ -1281,7 +1281,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/misc/libxosd_plugin.so*
 
 %files plugin-mad
-%_vlc_pluginsdir/audio_filter/libmpgatofixed32_plugin.so*
+%_vlc_pluginsdir/codec/libmad_plugin.so*
 #%_vlc_pluginsdir/demux/libid3tag_plugin.so*
 
 %files plugin-matroska
