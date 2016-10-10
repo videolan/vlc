@@ -310,6 +310,8 @@ libvlccore_la_SOURCES = \
 	text/filesystem.c \
 	text/iso_lang.c \
 	text/iso-639_def.h \
+	misc/background_worker.c \
+	misc/background_worker.h \
 	misc/md5.c \
 	misc/probe.c \
 	misc/rand.c \
