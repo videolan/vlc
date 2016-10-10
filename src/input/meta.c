@@ -109,8 +109,7 @@ static void vlc_meta_FreeExtraKey( void *p_data, void *p_obj )
 
 void vlc_meta_Delete( vlc_meta_t *m )
 {
-    int i;
-    for( i = 0; i < VLC_META_TYPE_COUNT ; i++ )
+    for( int i = 0; i < VLC_META_TYPE_COUNT ; i++ )
         free( m->ppsz_meta[i] );
     vlc_dictionary_clear( &m->extra_tags, vlc_meta_FreeExtraKey, NULL );
     free( m );
@@ -178,12 +177,11 @@ void vlc_meta_SetStatus( vlc_meta_t *m, int status )
 void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
 {
     char **ppsz_all_keys;
-    int i;
 
     if( !dst || !src )
         return;
 
-    for( i = 0; i < VLC_META_TYPE_COUNT; i++ )
+    for( int i = 0; i < VLC_META_TYPE_COUNT; i++ )
     {
         if( src->ppsz_meta[i] )
         {
@@ -194,7 +192,7 @@ void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
 
     /* XXX: If speed up are needed, it is possible */
     ppsz_all_keys = vlc_dictionary_all_keys( &src->extra_tags );
-    for( i = 0; ppsz_all_keys && ppsz_all_keys[i]; i++ )
+    for( int i = 0; ppsz_all_keys && ppsz_all_keys[i]; i++ )
     {
         /* Always try to remove the previous value */
         vlc_dictionary_remove_value_for_key( &dst->extra_tags, ppsz_all_keys[i], vlc_meta_FreeExtraKey, NULL );
