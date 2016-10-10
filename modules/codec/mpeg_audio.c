@@ -87,20 +87,9 @@ struct decoder_sys_t
 
 #ifdef HAVE_MPGA_FILTER
 static int  OpenDecoder   ( vlc_object_t * );
-static block_t *GetAoutBuffer( decoder_t * );
 #endif
 static int  Open( vlc_object_t * );
-static block_t *DecodeBlock  ( decoder_t *, block_t ** );
-static void Flush( decoder_t * );
-static uint8_t *GetOutBuffer ( decoder_t *, block_t ** );
-static block_t *GetSoutBuffer( decoder_t * );
 static void Close(  vlc_object_t * );
-static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
-                     unsigned int * pi_channels_conf,
-                     unsigned int * pi_sample_rate, unsigned int * pi_bit_rate,
-                     unsigned int * pi_frame_length,
-                     unsigned int * pi_max_frame_size,
-                     unsigned int * pi_layer );
 
 /*****************************************************************************
  * Module descriptor
@@ -120,74 +109,6 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /*****************************************************************************
- * Open: probe the decoder and return score
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys;
-
-    if(( p_dec->fmt_in.i_codec != VLC_CODEC_MPGA ) &&
-       ( p_dec->fmt_in.i_codec != VLC_CODEC_MP3 ) )
-    {
-        return VLC_EGENERIC;
-    }
-
-    /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
-        return VLC_ENOMEM;
-
-    /* Misc init */
-#ifdef HAVE_MPGA_FILTER
-    p_sys->b_packetizer = true;
-#endif
-    p_sys->i_state = STATE_NOSYNC;
-    date_Set( &p_sys->end_date, 0 );
-    block_BytestreamInit( &p_sys->bytestream );
-    p_sys->i_pts = VLC_TS_INVALID;
-    p_sys->b_discontinuity = false;
-    p_sys->i_frame_size = 0;
-
-    p_sys->i_channels_conf = p_sys->i_channels = p_sys->i_rate =
-    p_sys->i_max_frame_size = p_sys->i_frame_length = p_sys->i_layer =
-    p_sys->i_bit_rate = 0;
-
-    /* Set output properties */
-    p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = VLC_CODEC_MPGA;
-    p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
-
-    /* Set callback */
-    p_dec->pf_decode_audio = DecodeBlock;
-    p_dec->pf_packetize    = DecodeBlock;
-    p_dec->pf_flush        = Flush;
-
-    /* Start with the minimum size for a free bitrate frame */
-    p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
-
-    return VLC_SUCCESS;
-}
-
-#ifdef HAVE_MPGA_FILTER
-static int OpenDecoder( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-
-    /* HACK: Don't use this codec if we don't have an mpga audio filter */
-    if( !module_exists( "mad" ) )
-        return VLC_EGENERIC;
-
-    int i_ret = Open( p_this );
-    if( i_ret != VLC_SUCCESS )
-        return i_ret;
-
-    p_dec->p_sys->b_packetizer = false;
-    return VLC_SUCCESS;
-}
-#endif
-
-/*****************************************************************************
  * Flush:
  *****************************************************************************/
 static void Flush( decoder_t *p_dec )
@@ -198,6 +119,229 @@ static void Flush( decoder_t *p_dec )
     p_sys->i_state = STATE_NOSYNC;
     block_BytestreamEmpty( &p_sys->bytestream );
     p_sys->b_discontinuity = true;
+}
+
+#ifdef HAVE_MPGA_FILTER
+/*****************************************************************************
+ * GetAoutBuffer:
+ *****************************************************************************/
+static block_t *GetAoutBuffer( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_buf;
+
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        return NULL;
+    p_buf = decoder_NewAudioBuffer( p_dec, p_sys->i_frame_length );
+    if( p_buf == NULL ) return NULL;
+
+    p_buf->i_pts = date_Get( &p_sys->end_date );
+    p_buf->i_length = date_Increment( &p_sys->end_date, p_sys->i_frame_length )
+                      - p_buf->i_pts;
+    if( p_sys->b_discontinuity )
+        p_buf->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    p_sys->b_discontinuity = false;
+
+    /* Hack for libmad filter */
+    p_buf = block_Realloc( p_buf, 0, p_sys->i_frame_size + MAD_BUFFER_GUARD );
+
+    return p_buf;
+}
+#endif
+
+/*****************************************************************************
+ * GetSoutBuffer:
+ *****************************************************************************/
+static block_t *GetSoutBuffer( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block;
+
+    p_block = block_Alloc( p_sys->i_frame_size );
+    if( p_block == NULL ) return NULL;
+
+    p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
+
+    p_block->i_length =
+        date_Increment( &p_sys->end_date, p_sys->i_frame_length ) - p_block->i_pts;
+
+    return p_block;
+}
+
+/*****************************************************************************
+ * GetOutBuffer:
+ *****************************************************************************/
+static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    uint8_t *p_buf;
+
+    if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate )
+    {
+        msg_Dbg( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
+                  p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
+
+        date_Init( &p_sys->end_date, p_sys->i_rate, 1 );
+        date_Set( &p_sys->end_date, p_sys->i_pts );
+    }
+
+    p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
+    p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
+    p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
+    p_dec->fmt_out.audio.i_bytes_per_frame =
+        p_sys->i_max_frame_size + MAD_BUFFER_GUARD;
+
+    p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
+    p_dec->fmt_out.audio.i_physical_channels =
+        p_sys->i_channels_conf & AOUT_CHAN_PHYSMASK;
+
+    p_dec->fmt_out.i_bitrate = p_sys->i_bit_rate * 1000;
+
+#ifdef HAVE_MPGA_FILTER
+    if( !p_sys->b_packetizer )
+    {
+        block_t *p_aout_buffer = GetAoutBuffer( p_dec );
+        p_buf = p_aout_buffer ? p_aout_buffer->p_buffer : NULL;
+        *pp_out_buffer = p_aout_buffer;
+    }
+    else
+#endif
+    {
+        block_t *p_sout_buffer = GetSoutBuffer( p_dec );
+        p_buf = p_sout_buffer ? p_sout_buffer->p_buffer : NULL;
+        *pp_out_buffer = p_sout_buffer;
+    }
+    return p_buf;
+}
+
+/*****************************************************************************
+ * SyncInfo: parse MPEG audio sync info
+ *****************************************************************************/
+static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
+                     unsigned int * pi_channels_conf,
+                     unsigned int * pi_sample_rate, unsigned int * pi_bit_rate,
+                     unsigned int * pi_frame_length,
+                     unsigned int * pi_max_frame_size, unsigned int * pi_layer)
+{
+    static const int ppi_bitrate[2][3][16] =
+    {
+        {
+            /* v1 l1 */
+            { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384,
+              416, 448, 0},
+            /* v1 l2 */
+            { 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256,
+              320, 384, 0},
+            /* v1 l3 */
+            { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224,
+              256, 320, 0}
+        },
+
+        {
+            /* v2 l1 */
+            { 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192,
+              224, 256, 0},
+            /* v2 l2 */
+            { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128,
+              144, 160, 0},
+            /* v2 l3 */
+            { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128,
+              144, 160, 0}
+        }
+    };
+
+    static const int ppi_samplerate[2][4] = /* version 1 then 2 */
+    {
+        { 44100, 48000, 32000, 0 },
+        { 22050, 24000, 16000, 0 }
+    };
+
+    int i_version, i_mode, i_emphasis;
+    bool b_padding, b_mpeg_2_5;
+    int i_frame_size = 0;
+    int i_bitrate_index, i_samplerate_index;
+    int i_max_bit_rate;
+
+    b_mpeg_2_5  = 1 - ((i_header & 0x100000) >> 20);
+    i_version   = 1 - ((i_header & 0x80000) >> 19);
+    *pi_layer   = 4 - ((i_header & 0x60000) >> 17);
+    //bool b_crc = !((i_header >> 16) & 0x01);
+    i_bitrate_index = (i_header & 0xf000) >> 12;
+    i_samplerate_index = (i_header & 0xc00) >> 10;
+    b_padding   = (i_header & 0x200) >> 9;
+    /* Extension */
+    i_mode      = (i_header & 0xc0) >> 6;
+    /* Modeext, copyright & original */
+    i_emphasis  = i_header & 0x3;
+
+    if( *pi_layer != 4 &&
+        i_bitrate_index < 0x0f &&
+        i_samplerate_index != 0x03 &&
+        i_emphasis != 0x02 )
+    {
+        switch ( i_mode )
+        {
+        case 0: /* stereo */
+        case 1: /* joint stereo */
+            *pi_channels = 2;
+            *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+            break;
+        case 2: /* dual-mono */
+            *pi_channels = 2;
+            *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                                | AOUT_CHAN_DUALMONO;
+            break;
+        case 3: /* mono */
+            *pi_channels = 1;
+            *pi_channels_conf = AOUT_CHAN_CENTER;
+            break;
+        }
+        *pi_bit_rate = ppi_bitrate[i_version][*pi_layer-1][i_bitrate_index];
+        i_max_bit_rate = ppi_bitrate[i_version][*pi_layer-1][14];
+        *pi_sample_rate = ppi_samplerate[i_version][i_samplerate_index];
+
+        if ( b_mpeg_2_5 )
+        {
+            *pi_sample_rate >>= 1;
+        }
+
+        switch( *pi_layer )
+        {
+        case 1:
+            i_frame_size = ( 12000 * *pi_bit_rate / *pi_sample_rate +
+                           b_padding ) * 4;
+            *pi_max_frame_size = ( 12000 * i_max_bit_rate /
+                                 *pi_sample_rate + 1 ) * 4;
+            *pi_frame_length = 384;
+            break;
+
+        case 2:
+            i_frame_size = 144000 * *pi_bit_rate / *pi_sample_rate + b_padding;
+            *pi_max_frame_size = 144000 * i_max_bit_rate / *pi_sample_rate + 1;
+            *pi_frame_length = 1152;
+            break;
+
+        case 3:
+            i_frame_size = ( i_version ? 72000 : 144000 ) *
+                           *pi_bit_rate / *pi_sample_rate + b_padding;
+            *pi_max_frame_size = ( i_version ? 72000 : 144000 ) *
+                                 i_max_bit_rate / *pi_sample_rate + 1;
+            *pi_frame_length = i_version ? 576 : 1152;
+            break;
+
+        default:
+            break;
+        }
+
+        /* Free bitrate mode can support higher bitrates */
+        if( !*pi_bit_rate ) *pi_max_frame_size *= 2;
+    }
+    else
+    {
+        return -1;
+    }
+
+    return i_frame_size;
 }
 
 /****************************************************************************
@@ -509,99 +653,6 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 }
 
 /*****************************************************************************
- * GetOutBuffer:
- *****************************************************************************/
-static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *p_buf;
-
-    if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate )
-    {
-        msg_Dbg( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
-                  p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
-
-        date_Init( &p_sys->end_date, p_sys->i_rate, 1 );
-        date_Set( &p_sys->end_date, p_sys->i_pts );
-    }
-
-    p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
-    p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
-    p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
-    p_dec->fmt_out.audio.i_bytes_per_frame =
-        p_sys->i_max_frame_size + MAD_BUFFER_GUARD;
-
-    p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
-    p_dec->fmt_out.audio.i_physical_channels =
-        p_sys->i_channels_conf & AOUT_CHAN_PHYSMASK;
-
-    p_dec->fmt_out.i_bitrate = p_sys->i_bit_rate * 1000;
-
-#ifdef HAVE_MPGA_FILTER
-    if( !p_sys->b_packetizer )
-    {
-        block_t *p_aout_buffer = GetAoutBuffer( p_dec );
-        p_buf = p_aout_buffer ? p_aout_buffer->p_buffer : NULL;
-        *pp_out_buffer = p_aout_buffer;
-    }
-    else
-#endif
-    {
-        block_t *p_sout_buffer = GetSoutBuffer( p_dec );
-        p_buf = p_sout_buffer ? p_sout_buffer->p_buffer : NULL;
-        *pp_out_buffer = p_sout_buffer;
-    }
-    return p_buf;
-}
-
-#ifdef HAVE_MPGA_FILTER
-/*****************************************************************************
- * GetAoutBuffer:
- *****************************************************************************/
-static block_t *GetAoutBuffer( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_buf;
-
-    if( decoder_UpdateAudioFormat( p_dec ) )
-        return NULL;
-    p_buf = decoder_NewAudioBuffer( p_dec, p_sys->i_frame_length );
-    if( p_buf == NULL ) return NULL;
-
-    p_buf->i_pts = date_Get( &p_sys->end_date );
-    p_buf->i_length = date_Increment( &p_sys->end_date, p_sys->i_frame_length )
-                      - p_buf->i_pts;
-    if( p_sys->b_discontinuity )
-        p_buf->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-    p_sys->b_discontinuity = false;
-
-    /* Hack for libmad filter */
-    p_buf = block_Realloc( p_buf, 0, p_sys->i_frame_size + MAD_BUFFER_GUARD );
-
-    return p_buf;
-}
-#endif
-
-/*****************************************************************************
- * GetSoutBuffer:
- *****************************************************************************/
-static block_t *GetSoutBuffer( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
-
-    p_block = block_Alloc( p_sys->i_frame_size );
-    if( p_block == NULL ) return NULL;
-
-    p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
-
-    p_block->i_length =
-        date_Increment( &p_sys->end_date, p_sys->i_frame_length ) - p_block->i_pts;
-
-    return p_block;
-}
-
-/*****************************************************************************
  * Close: clean up the decoder
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
@@ -615,131 +666,69 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * SyncInfo: parse MPEG audio sync info
+ * Open: probe the decoder and return score
  *****************************************************************************/
-static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
-                     unsigned int * pi_channels_conf,
-                     unsigned int * pi_sample_rate, unsigned int * pi_bit_rate,
-                     unsigned int * pi_frame_length,
-                     unsigned int * pi_max_frame_size, unsigned int * pi_layer)
+static int Open( vlc_object_t *p_this )
 {
-    static const int ppi_bitrate[2][3][16] =
+    decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys;
+
+    if(( p_dec->fmt_in.i_codec != VLC_CODEC_MPGA ) &&
+       ( p_dec->fmt_in.i_codec != VLC_CODEC_MP3 ) )
     {
-        {
-            /* v1 l1 */
-            { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384,
-              416, 448, 0},
-            /* v1 l2 */
-            { 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256,
-              320, 384, 0},
-            /* v1 l3 */
-            { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224,
-              256, 320, 0}
-        },
-
-        {
-            /* v2 l1 */
-            { 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192,
-              224, 256, 0},
-            /* v2 l2 */
-            { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128,
-              144, 160, 0},
-            /* v2 l3 */
-            { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128,
-              144, 160, 0}
-        }
-    };
-
-    static const int ppi_samplerate[2][4] = /* version 1 then 2 */
-    {
-        { 44100, 48000, 32000, 0 },
-        { 22050, 24000, 16000, 0 }
-    };
-
-    int i_version, i_mode, i_emphasis;
-    bool b_padding, b_mpeg_2_5;
-    int i_frame_size = 0;
-    int i_bitrate_index, i_samplerate_index;
-    int i_max_bit_rate;
-
-    b_mpeg_2_5  = 1 - ((i_header & 0x100000) >> 20);
-    i_version   = 1 - ((i_header & 0x80000) >> 19);
-    *pi_layer   = 4 - ((i_header & 0x60000) >> 17);
-    //bool b_crc = !((i_header >> 16) & 0x01);
-    i_bitrate_index = (i_header & 0xf000) >> 12;
-    i_samplerate_index = (i_header & 0xc00) >> 10;
-    b_padding   = (i_header & 0x200) >> 9;
-    /* Extension */
-    i_mode      = (i_header & 0xc0) >> 6;
-    /* Modeext, copyright & original */
-    i_emphasis  = i_header & 0x3;
-
-    if( *pi_layer != 4 &&
-        i_bitrate_index < 0x0f &&
-        i_samplerate_index != 0x03 &&
-        i_emphasis != 0x02 )
-    {
-        switch ( i_mode )
-        {
-        case 0: /* stereo */
-        case 1: /* joint stereo */
-            *pi_channels = 2;
-            *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-            break;
-        case 2: /* dual-mono */
-            *pi_channels = 2;
-            *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                                | AOUT_CHAN_DUALMONO;
-            break;
-        case 3: /* mono */
-            *pi_channels = 1;
-            *pi_channels_conf = AOUT_CHAN_CENTER;
-            break;
-        }
-        *pi_bit_rate = ppi_bitrate[i_version][*pi_layer-1][i_bitrate_index];
-        i_max_bit_rate = ppi_bitrate[i_version][*pi_layer-1][14];
-        *pi_sample_rate = ppi_samplerate[i_version][i_samplerate_index];
-
-        if ( b_mpeg_2_5 )
-        {
-            *pi_sample_rate >>= 1;
-        }
-
-        switch( *pi_layer )
-        {
-        case 1:
-            i_frame_size = ( 12000 * *pi_bit_rate / *pi_sample_rate +
-                           b_padding ) * 4;
-            *pi_max_frame_size = ( 12000 * i_max_bit_rate /
-                                 *pi_sample_rate + 1 ) * 4;
-            *pi_frame_length = 384;
-            break;
-
-        case 2:
-            i_frame_size = 144000 * *pi_bit_rate / *pi_sample_rate + b_padding;
-            *pi_max_frame_size = 144000 * i_max_bit_rate / *pi_sample_rate + 1;
-            *pi_frame_length = 1152;
-            break;
-
-        case 3:
-            i_frame_size = ( i_version ? 72000 : 144000 ) *
-                           *pi_bit_rate / *pi_sample_rate + b_padding;
-            *pi_max_frame_size = ( i_version ? 72000 : 144000 ) *
-                                 i_max_bit_rate / *pi_sample_rate + 1;
-            *pi_frame_length = i_version ? 576 : 1152;
-            break;
-
-        default:
-            break;
-        }
-
-        /* Free bitrate mode can support higher bitrates */
-        if( !*pi_bit_rate ) *pi_max_frame_size *= 2;
-    }
-    else
-    {
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    return i_frame_size;
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys = p_sys =
+          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+        return VLC_ENOMEM;
+
+    /* Misc init */
+#ifdef HAVE_MPGA_FILTER
+    p_sys->b_packetizer = true;
+#endif
+    p_sys->i_state = STATE_NOSYNC;
+    date_Set( &p_sys->end_date, 0 );
+    block_BytestreamInit( &p_sys->bytestream );
+    p_sys->i_pts = VLC_TS_INVALID;
+    p_sys->b_discontinuity = false;
+    p_sys->i_frame_size = 0;
+
+    p_sys->i_channels_conf = p_sys->i_channels = p_sys->i_rate =
+    p_sys->i_max_frame_size = p_sys->i_frame_length = p_sys->i_layer =
+    p_sys->i_bit_rate = 0;
+
+    /* Set output properties */
+    p_dec->fmt_out.i_cat = AUDIO_ES;
+    p_dec->fmt_out.i_codec = VLC_CODEC_MPGA;
+    p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
+
+    /* Set callback */
+    p_dec->pf_decode_audio = DecodeBlock;
+    p_dec->pf_packetize    = DecodeBlock;
+    p_dec->pf_flush        = Flush;
+
+    /* Start with the minimum size for a free bitrate frame */
+    p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
+
+    return VLC_SUCCESS;
 }
+
+#ifdef HAVE_MPGA_FILTER
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    decoder_t *p_dec = (decoder_t *)p_this;
+
+    /* HACK: Don't use this codec if we don't have an mpga audio filter */
+    if( !module_exists( "mad" ) )
+        return VLC_EGENERIC;
+
+    int i_ret = Open( p_this );
+    if( i_ret != VLC_SUCCESS )
+        return i_ret;
+
+    p_dec->p_sys->b_packetizer = false;
+    return VLC_SUCCESS;
+}
+#endif
