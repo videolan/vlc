@@ -342,12 +342,11 @@ void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
         /* We need to proceed line by line */
         uint8_t *p_in = p_src->p_pixels;
         uint8_t *p_out = p_dst->p_pixels;
-        int i_line;
 
         assert( p_in );
         assert( p_out );
 
-        for( i_line = i_height; i_line--; )
+        for( int i_line = i_height; i_line--; )
         {
             memcpy( p_out, p_in, i_width );
             p_in += p_src->i_pitch;
@@ -368,9 +367,7 @@ void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src )
 
 void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src )
 {
-    int i;
-
-    for( i = 0; i < p_src->i_planes ; i++ )
+    for( int i = 0; i < p_src->i_planes ; i++ )
         plane_CopyPixels( p_dst->p+i, p_src->p+i );
 }
 
