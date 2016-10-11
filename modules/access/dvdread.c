@@ -253,9 +253,8 @@ static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i;
 
-    for( i = 0; i < PS_TK_COUNT; i++ )
+    for( int i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
         if( tk->b_seen )
@@ -444,7 +443,6 @@ static int Demux( demux_t *p_demux )
 
     uint8_t p_buffer[DVD_VIDEO_LB_LEN * DVD_BLOCK_READ_ONCE];
     int i_blocks_once, i_read;
-    int i;
 
     /*
      * Playback by cell in this pgc, starting at the cell for our chapter.
@@ -542,7 +540,7 @@ static int Demux( demux_t *p_demux )
              i_read, p_sys->i_pack_len, p_sys->i_cur_block );
 #endif
 
-    for( i = 0; i < i_read; i++ )
+    for( int i = 0; i < i_read; i++ )
     {
         DemuxBlock( p_demux, p_buffer + i * DVD_VIDEO_LB_LEN,
                     DVD_VIDEO_LB_LEN );
@@ -722,7 +720,6 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
 
     demux_sys_t *p_sys = p_demux->p_sys;
     int pgc_id = 0, pgn = 0;
-    int i;
 
 #define p_pgc p_sys->p_cur_pgc
 #define p_vmg p_sys->p_vmg_file
@@ -782,7 +779,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         p_sys->i_title_offset = 0;
 
         p_sys->i_title_blocks = 0;
-        for( i = i_start_cell; i <= i_end_cell; i++ )
+        for( int i = i_start_cell; i <= i_end_cell; i++ )
         {
             p_sys->i_title_blocks += p_pgc->cell_playback[i].last_sector -
                 p_pgc->cell_playback[i].first_sector + 1;
@@ -841,7 +838,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
          */
         es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
-        for( i = 0; i < PS_TK_COUNT; i++ )
+        for( int i = 0; i < PS_TK_COUNT; i++ )
         {
             ps_track_t *tk = &p_sys->tk[i];
             if( tk->b_seen )
@@ -904,7 +901,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
     p_sys->p_vts_file->vts_pgcit->pgci_srp[pgc_id-1].pgc->audio_control[i-1]
 
         /* Audio ES, in the order they appear in the .ifo */
-        for( i = 1; i <= p_vts->vtsi_mat->nr_of_vts_audio_streams; i++ )
+        for( int i = 1; i <= p_vts->vtsi_mat->nr_of_vts_audio_streams; i++ )
         {
             int i_position = 0;
             uint16_t i_id;
@@ -953,7 +950,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
     p_sys->p_vts_file->vts_pgcit->pgci_srp[pgc_id-1].pgc->subp_control[i-1]
 
         /* Sub Picture ES */
-        for( i = 1; i <= p_vts->vtsi_mat->nr_of_vts_subp_streams; i++ )
+        for( int i = 1; i <= p_vts->vtsi_mat->nr_of_vts_subp_streams; i++ )
         {
             int i_position = 0;
             uint16_t i_id;
@@ -1021,7 +1018,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         DvdReadFindCell( p_demux );
 
         p_sys->i_title_offset = 0;
-        for( i = p_sys->i_title_start_cell; i < p_sys->i_cur_cell; i++ )
+        for( int i = p_sys->i_title_start_cell; i < p_sys->i_cur_cell; i++ )
         {
             p_sys->i_title_offset += p_pgc->cell_playback[i].last_sector -
                 p_pgc->cell_playback[i].first_sector + 1;
