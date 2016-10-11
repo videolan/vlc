@@ -245,13 +245,11 @@ static int Open( vlc_object_t *p_this )
    /*  if( var_GetBool( p_demux, "jack-input-auto-connect" ) && p_sys->psz_ports ) */
     if( p_sys->psz_ports )
     {
-        int i_input_ports;
-
         if( p_sys->i_match_ports > 0 )
         {
             for( int j = 0; j < p_sys->i_match_ports; j++ )
             {
-                i_input_ports = j % p_sys->i_channels;
+                int i_input_ports = j % p_sys->i_channels;
                 jack_connect( p_sys->p_jack_client, p_sys->pp_jack_port_table[j],
                     jack_port_name( p_sys->pp_jack_port_input[i_input_ports] ) );
             }
@@ -261,10 +259,8 @@ static int Open( vlc_object_t *p_this )
     /* connect vlc input to all jack output ports if requested */
     if( var_GetBool( p_demux, "jack-input-auto-connect" ) && !p_sys->psz_ports )
     {
-        int i_input_ports;
-        const char **pp_jack_port_output;
-
-        pp_jack_port_output = jack_get_ports( p_sys->p_jack_client, NULL, NULL, JackPortIsOutput );
+        const char **pp_jack_port_output = jack_get_ports( p_sys->p_jack_client,
+                                                           NULL, NULL, JackPortIsOutput );
 
         while( pp_jack_port_output && pp_jack_port_output[i_out_ports] )
         {
@@ -274,7 +270,7 @@ static int Open( vlc_object_t *p_this )
         {
             for( int j = 0; j < i_out_ports; j++ )
             {
-                i_input_ports = j % p_sys->i_channels;
+                int i_input_ports = j % p_sys->i_channels;
                 jack_connect( p_sys->p_jack_client, pp_jack_port_output[j],
                     jack_port_name( p_sys->pp_jack_port_input[i_input_ports] ) );
             }
@@ -436,12 +432,11 @@ int Process( jack_nframes_t i_frames, void *p_arg )
  *****************************************************************************/
 static block_t *GrabJack( demux_t *p_demux )
 {
-    size_t i_read;
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
 
     /* read signal from ring buffer */
-    i_read = jack_ringbuffer_read_space( p_sys->p_jack_ringbuffer );
+    size_t i_read = jack_ringbuffer_read_space( p_sys->p_jack_ringbuffer );
 
     if( i_read < 100 ) /* avoid small read */
     {   /* vlc has too much free time on its hands? */
