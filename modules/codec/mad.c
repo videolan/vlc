@@ -86,52 +86,65 @@ vlc_module_end ()
 static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_out_buf = NULL, *p_last_buf = NULL;
 
-    if( !pp_block || !*pp_block )
-        return NULL;
-    block_t *p_in_buf = *pp_block, *p_out_buf = NULL, *p_last_buf = NULL;
-    *pp_block = NULL;
-
-    if( p_in_buf->i_buffer < MAD_BUFFER_GUARD )
+    if( !pp_block )
     {
-        block_Release( p_in_buf );
-        return NULL;
+        /* Drain */
+        p_last_buf = p_sys->p_last_buf;
+        p_sys->p_last_buf = NULL;
+        if( !p_last_buf )
+            return NULL;
     }
-
-    /* Buffers passed to the mad_stream_buffer() function need to ends with the
-     * header (MAD_BUFFER_GUARD) of the following block. Therefore, this
-     * DecodeBlock() function will always return the output buffer
-     * corresponding to the last input buffer. */
-    if( !p_sys->p_last_buf )
+    else
     {
-        /* Wait for the next block */
+        if( !*pp_block )
+            return NULL;
+        block_t *p_in_buf = *pp_block;
+        *pp_block = NULL;
+
+        if( p_in_buf->i_buffer < MAD_BUFFER_GUARD )
+        {
+            block_Release( p_in_buf );
+            return NULL;
+        }
+
+        /* Buffers passed to the mad_stream_buffer() function need to ends with
+         * the header (MAD_BUFFER_GUARD) of the following block. Therefore,
+         * this DecodeBlock() function will always return the output buffer
+         * corresponding to the last input buffer. */
+        if( !p_sys->p_last_buf )
+        {
+            /* Wait for the next block */
+            p_sys->p_last_buf = p_in_buf;
+            return NULL;
+        }
+        p_last_buf = p_sys->p_last_buf;
         p_sys->p_last_buf = p_in_buf;
-        return NULL;
-    }
-    p_last_buf = p_sys->p_last_buf;
-    p_sys->p_last_buf = p_in_buf;
 
-    /* Put the header of the current buffer at the end of the last one.
-     * Normally, this won't do a real realloc() since VLC blocks are allocated
-     * with pre and post padding */
-    p_last_buf = block_Realloc( p_last_buf, 0,
-                                p_last_buf->i_buffer + MAD_BUFFER_GUARD );
-    if( !p_last_buf )
-        return NULL;
-    memcpy( &p_last_buf->p_buffer[p_last_buf->i_buffer - MAD_BUFFER_GUARD],
-            p_in_buf->p_buffer, MAD_BUFFER_GUARD);
+        /* Put the header of the current buffer at the end of the last one.
+         * Normally, this won't do a real realloc() since VLC blocks are
+         * allocated with pre and post padding */
+        p_last_buf = block_Realloc( p_last_buf, 0,
+                                    p_last_buf->i_buffer + MAD_BUFFER_GUARD );
+        if( !p_last_buf )
+            return NULL;
+        memcpy( &p_last_buf->p_buffer[p_last_buf->i_buffer - MAD_BUFFER_GUARD],
+                p_in_buf->p_buffer, MAD_BUFFER_GUARD);
+    }
 
     mad_stream_buffer( &p_sys->mad_stream, p_last_buf->p_buffer,
                        p_last_buf->i_buffer );
-    /* Do the actual decoding now. */
-    if ( mad_frame_decode( &p_sys->mad_frame, &p_sys->mad_stream ) == -1 )
+    /* Do the actual decoding now (ignore EOF error when draining). */
+    if ( mad_frame_decode( &p_sys->mad_frame, &p_sys->mad_stream ) == -1
+     && ( pp_block != NULL || p_sys->mad_stream.error != MAD_ERROR_BUFLEN ) )
     {
         msg_Err( p_dec, "libmad error: %s",
                   mad_stream_errorstr( &p_sys->mad_stream ) );
         if( !MAD_RECOVERABLE( p_sys->mad_stream.error ) )
             p_sys->i_reject_count = 3;
     }
-    else if( p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    else if( p_last_buf->i_flags & BLOCK_FLAG_DISCONTINUITY )
     {
         p_sys->i_reject_count = 3;
     }
