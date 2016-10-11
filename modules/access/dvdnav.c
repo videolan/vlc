@@ -1196,13 +1196,12 @@ static void DemuxTitles( demux_t *p_demux )
 
     for( int i = 1; i <= i_titles; i++ )
     {
-        int32_t i_chapters;
         uint64_t i_title_length;
         uint64_t *p_chapters_time;
 
-        i_chapters = dvdnav_describe_title_chapters( p_sys->dvdnav, i,
-                                                     &p_chapters_time,
-                                                     &i_title_length );
+        int32_t i_chapters = dvdnav_describe_title_chapters( p_sys->dvdnav, i,
+                                                            &p_chapters_time,
+                                                            &i_title_length );
         if( i_chapters < 1 )
         {
             i_title_length = 0;
