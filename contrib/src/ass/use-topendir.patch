@@ -1,5 +1,5 @@
---- libass/libass/ass_fontselect.c.orig	2016-04-07 14:00:48.412620215 +0200
-+++ libass/libass/ass_fontselect.c	2016-04-07 14:51:29.220686538 +0200
+--- libass-0.13.4/libass/ass_fontselect.c.orig	2016-07-11 23:29:00.000000000 +0200
++++ libass-0.13.4/libass/ass_fontselect.c	2016-10-11 11:14:24.387661958 +0200
 @@ -47,6 +47,9 @@
  #include "ass_font.h"
  #include "ass_string.h"
@@ -10,10 +10,11 @@
  #define ABS(x) ((x) < 0 ? -(x) : (x))
  #define MAX_FULLNAME 100
  
-@@ -161,28 +164,61 @@
+@@ -161,28 +164,63 @@
      .destroy_font      = destroy_font_ft,
  };
  
++#ifdef _WIN32
 +static inline char *FromWide (const wchar_t *wide)
 +{
 +    size_t len = WideCharToMultiByte (CP_UTF8, 0, wide, -1, NULL, 0, NULL, NULL);
@@ -39,6 +40,7 @@
 +        MultiByteToWideChar (CP_UTF8, 0, utf8, -1, out, len);
 +    return out;
 +}
++#endif
 +
  static void load_fonts_from_dir(ASS_Library *library, const char *dir)
  {
@@ -63,7 +65,7 @@
 -        snprintf(fullname, sizeof(fullname), "%s/%s", dir, entry->d_name);
 +        _snprintf(fullname, sizeof(fullname), "%s/%s", dir, d_name);
          size_t bufsize = 0;
-         ass_msg(library, MSGL_WARN, "Loading font file '%s'", fullname);
+         ass_msg(library, MSGL_INFO, "Loading font file '%s'", fullname);
          void *data = read_file(library, fullname, &bufsize);
          if (data) {
 -            ass_add_font(library, entry->d_name, data, bufsize);
