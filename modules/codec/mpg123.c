@@ -70,6 +70,40 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /*****************************************************************************
+ * MPG123Open
+ *****************************************************************************/
+static int MPG123Open( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* Open a new bitstream */
+    if( mpg123_open_feed( p_sys->p_handle ) != MPG123_OK )
+    {
+        msg_Err( p_dec, "mpg123 error: can't open feed" );
+        return VLC_EGENERIC;
+    }
+
+    /* Disable resync stream after error */
+    mpg123_param( p_sys->p_handle, MPG123_ADD_FLAGS, MPG123_NO_RESYNC, 0 );
+
+    /* Setup output format */
+    mpg123_format_none( p_sys->p_handle );
+
+    if( MPG123_OK != mpg123_format( p_sys->p_handle,
+                                    p_dec->fmt_in.audio.i_rate,
+                                    MPG123_MONO | MPG123_STEREO,
+                                    MPG123_ENC_FLOAT_32 ) )
+    {
+        msg_Err( p_dec, "mpg123 error: %s",
+                 mpg123_strerror( p_sys->p_handle ) );
+        mpg123_close( p_sys->p_handle );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * Flush:
  *****************************************************************************/
 static void Flush( decoder_t *p_dec )
@@ -77,6 +111,10 @@ static void Flush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     date_Set( &p_sys->end_date, 0 );
+
+    mpg123_close( p_sys->p_handle );
+    if( MPG123Open( p_dec ) )
+        p_dec->b_error = true;
 }
 
 static int UpdateAudioFormat( decoder_t *p_dec )
@@ -313,29 +351,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( ( p_sys->p_handle = mpg123_new( NULL, NULL ) ) == NULL )
         goto error;
 
-    /* Open a new bitstream */
-    if( mpg123_open_feed( p_sys->p_handle ) != MPG123_OK )
-    {
-        msg_Err( p_this, "mpg123 error: can't open feed" );
+    if( MPG123Open( p_dec ) )
         goto error;
-    }
-
-    /* Disable resync stream after error */
-    mpg123_param( p_sys->p_handle, MPG123_ADD_FLAGS, MPG123_NO_RESYNC, 0 );
-
-    /* Setup output format */
-    mpg123_format_none( p_sys->p_handle );
-
-    if( MPG123_OK != mpg123_format( p_sys->p_handle,
-                                    p_dec->fmt_in.audio.i_rate,
-                                    MPG123_MONO | MPG123_STEREO,
-                                    MPG123_ENC_FLOAT_32 ) )
-    {
-        msg_Err( p_this, "mpg123 error: %s",
-                mpg123_strerror( p_sys->p_handle ) );
-        mpg123_close( p_sys->p_handle );
-        goto error;
-    }
 
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
