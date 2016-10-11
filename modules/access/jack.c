@@ -122,9 +122,9 @@ static block_t *GrabJack( demux_t * );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    demux_t             *p_demux = ( demux_t* )p_this;
-    demux_sys_t         *p_sys;
-    es_format_t         fmt;
+    demux_t *p_demux = ( demux_t* )p_this;
+    demux_sys_t *p_sys;
+    es_format_t fmt;
     int i_out_ports = 0;
 
     p_demux->pf_demux = Demux;
@@ -245,9 +245,9 @@ static int Open( vlc_object_t *p_this )
    /*  if( var_GetBool( p_demux, "jack-input-auto-connect" ) && p_sys->psz_ports ) */
     if( p_sys->psz_ports )
     {
-        int        i_input_ports;
- 
-    if( p_sys->i_match_ports > 0 )
+        int i_input_ports;
+
+        if( p_sys->i_match_ports > 0 )
         {
             for( int j = 0; j < p_sys->i_match_ports; j++ )
             {
@@ -261,7 +261,7 @@ static int Open( vlc_object_t *p_this )
     /* connect vlc input to all jack output ports if requested */
     if( var_GetBool( p_demux, "jack-input-auto-connect" ) && !p_sys->psz_ports )
     {
-        int        i_input_ports;
+        int i_input_ports;
         const char **pp_jack_port_output;
 
         pp_jack_port_output = jack_get_ports( p_sys->p_jack_client, NULL, NULL, JackPortIsOutput );
@@ -331,8 +331,8 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    bool  *pb;
-    int64_t     *pi64;
+    bool *pb;
+    int64_t *pi64;
     demux_sys_t *p_sys = p_demux->p_sys;
 
     switch( i_query )
@@ -375,9 +375,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int Demux( demux_t *p_demux )
 {
-
     demux_sys_t *p_sys;
-    es_out_id_t  *p_es;
+    es_out_id_t *p_es;
     block_t *p_block;
 
     p_sys = p_demux->p_sys;
@@ -399,8 +398,8 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 int Process( jack_nframes_t i_frames, void *p_arg )
 {
-    demux_t            *p_demux = ( demux_t* )p_arg;
-    demux_sys_t        *p_sys = p_demux->p_sys;
+    demux_t *p_demux = ( demux_t* )p_arg;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     /* Get and interlace buffers */
     for ( unsigned i = 0; i < p_sys->i_channels ; i++ )
@@ -437,9 +436,9 @@ int Process( jack_nframes_t i_frames, void *p_arg )
  *****************************************************************************/
 static block_t *GrabJack( demux_t *p_demux )
 {
-    size_t      i_read;
+    size_t i_read;
     demux_sys_t *p_sys = p_demux->p_sys;
-    block_t     *p_block;
+    block_t *p_block;
 
     /* read signal from ring buffer */
     i_read = jack_ringbuffer_read_space( p_sys->p_jack_ringbuffer );
@@ -465,7 +464,7 @@ static block_t *GrabJack( demux_t *p_demux )
         msg_Warn( p_demux, "cannot get block" );
         return 0;
     }
- 
+
     //Find the previous power of 2, this algo assumes size_t has the same size on all arch
     i_read >>= 1;
     i_read--;
@@ -475,16 +474,16 @@ static block_t *GrabJack( demux_t *p_demux )
     i_read |= i_read >> 8;
     i_read |= i_read >> 16;
     i_read++;
- 
+
     i_read = jack_ringbuffer_read( p_sys->p_jack_ringbuffer, ( char * ) p_block->p_buffer, i_read );
- 
+
     p_block->i_dts = p_block->i_pts =    date_Increment( &p_sys->pts,
          i_read/(p_sys->i_channels * p_sys->jack_sample_size) );
 
     p_sys->p_block_audio = p_block;
     p_block->i_buffer = i_read;
     p_sys->p_block_audio = 0;
- 
+
     return p_block;
 }
 
@@ -494,7 +493,6 @@ static block_t *GrabJack( demux_t *p_demux )
  *****************************************************************************/
 static void Port_finder( demux_t *p_demux )
 {
-
     demux_sys_t *p_sys = p_demux->p_sys;
     char *psz_expr = p_sys->psz_ports;
     char *token = NULL;
