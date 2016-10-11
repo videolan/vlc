@@ -143,16 +143,18 @@ static void *Thread(void *data)
             continue;
         }
 
-        if (sys->stream_offset < sys->buffer_offset)
+        uint_fast64_t stream_offset = sys->stream_offset;
+
+        if (stream_offset < sys->buffer_offset)
         {   /* Need to seek backward */
-            if (ThreadSeek(stream, sys->stream_offset))
+            if (ThreadSeek(stream, stream_offset))
             {
                 sys->error = true;
                 vlc_cond_signal(&sys->wait_data);
                 continue;
             }
 
-            sys->buffer_offset = sys->stream_offset;
+            sys->buffer_offset = stream_offset;
             sys->buffer_length = 0;
             assert(!sys->error);
             sys->eof = false;
@@ -165,12 +167,12 @@ static void *Thread(void *data)
             continue;
         }
 
-        assert(sys->stream_offset >= sys->buffer_offset);
+        assert(stream_offset >= sys->buffer_offset);
 
         /* As long as there is space, the buffer will retain already read
          * ("historical") data. The data can be used if/when seeking backward.
          * Unread data is however given precedence if the buffer is full. */
-        uint64_t history = sys->stream_offset - sys->buffer_offset;
+        uint64_t history = stream_offset - sys->buffer_offset;
 
         /* If upstream supports seeking and if the downstream offset is far
          * beyond the upstream offset, then attempt to skip forward.
@@ -179,9 +181,9 @@ static void *Thread(void *data)
          * WARNING: Except problems with misbehaving access plug-ins. */
         if (sys->can_seek
          && history >= (sys->buffer_length + sys->seek_threshold)
-         && ThreadSeek(stream, sys->stream_offset) == 0)
+         && ThreadSeek(stream, stream_offset) == 0)
         {
-            sys->buffer_offset = sys->stream_offset;
+            sys->buffer_offset = stream_offset;
             sys->buffer_length = 0;
             assert(!sys->error);
             assert(!sys->eof);
