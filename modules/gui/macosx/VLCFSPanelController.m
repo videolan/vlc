@@ -26,6 +26,7 @@
 
 #import "VLCFSPanelController.h"
 #import "VLCCoreInteraction.h"
+#import "CompatibilityFixes.h"
 #import "VLCMain.h"
 
 @interface VLCFSPanelController () {
@@ -58,9 +59,17 @@
     [self.window setStyleMask:self.window.styleMask | NSResizableWindowMask];
     [self.window setBackgroundColor:[NSColor clearColor]];
 
+#ifdef MAC_OS_X_VERSION_10_10
     /* Inject correct background view depending on OS support */
-    [self injectVisualEffectView];
-    //[self injectBackgroundView];
+    if (OSX_YOSEMITE_OR_HIGHER) {
+        [self injectVisualEffectView];
+    } else {
+        [self injectBackgroundView];
+    }
+#else
+    /* Compiled with old SDK, always use legacy style */
+    [self injectBackgroundView];
+#endif
 
     [(NSButtonCell*)[_playPauseButton cell] setHighlightsBy:NSPushInCellMask];
     [(NSButtonCell*)[_playPauseButton cell] setShowsStateBy:NSContentsCellMask];
@@ -321,6 +330,7 @@
 #pragma mark -
 #pragma mark Helpers
 
+#ifdef MAC_OS_X_VERSION_10_10
 /**
  Create an image mask for the NSVisualEffectView
  with rounded corners in the given rect
@@ -371,6 +381,7 @@
     [_controllsView setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
     [self.window.contentView addSubview:_controllsView];
 }
+#endif
 
 /**
  Injects the standard background view in the Windows view hierarchy

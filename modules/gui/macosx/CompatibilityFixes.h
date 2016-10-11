@@ -32,6 +32,8 @@
 #define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404 && NSAppKitVersionNumber < 1485)
 #define OSX_SIERRA (NSAppKitVersionNumber >= 1485)
 
+#define OSX_YOSEMITE_OR_HIGHER (NSAppKitVersionNumber >= 1334)
+
 // Sierra only APIs
 #ifndef MAC_OS_X_VERSION_10_12
 
