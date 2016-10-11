@@ -251,15 +251,15 @@ static void check_crashdump(void)
             }
             else
             {
-                fprintf(stderr,"Can't connect to FTP server 0x%08lu\n",
+                fprintf(stderr, "Can't connect to FTP server 0x%08lx\n",
                         (unsigned long)GetLastError());
             }
             InternetCloseHandle(Hint);
         }
         else
         {
-              fprintf(stderr,"There was an error while connecting to the Internet  0x%08lu\n",
-                      (unsigned long)GetLastError());
+              fprintf(stderr, "There was an error while connecting to the "
+                      "Internet  0x%08lx\n", (unsigned long)GetLastError());
         }
         MessageBox( NULL, L"Thanks a lot for helping improving VLC!",
                     L"VLC crash report" , MB_OK);
