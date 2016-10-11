@@ -81,7 +81,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
     add_bool( "a52-dynrng", true, DYNRNG_TEXT, DYNRNG_LONGTEXT, false )
-    set_capability( "decoder", 100 )
+    set_capability( "decoder", 60 )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
