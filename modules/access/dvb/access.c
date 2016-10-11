@@ -464,9 +464,8 @@ static void FilterSet( access_t *p_access, int i_pid, int i_type )
 static void FilterUnset( access_t *p_access, int i_max )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i;
 
-    for( i = 0; i < i_max; i++ )
+    for( int i = 0; i < i_max; i++ )
     {
         if( p_sys->p_demux_handles[i].i_type )
         {
