@@ -245,14 +245,11 @@ static int Open( vlc_object_t *p_this )
    /*  if( var_GetBool( p_demux, "jack-input-auto-connect" ) && p_sys->psz_ports ) */
     if( p_sys->psz_ports )
     {
-        if( p_sys->i_match_ports > 0 )
+        for( int j = 0; j < p_sys->i_match_ports; j++ )
         {
-            for( int j = 0; j < p_sys->i_match_ports; j++ )
-            {
-                int i_input_ports = j % p_sys->i_channels;
-                jack_connect( p_sys->p_jack_client, p_sys->pp_jack_port_table[j],
-                    jack_port_name( p_sys->pp_jack_port_input[i_input_ports] ) );
-            }
+            int i_input_ports = j % p_sys->i_channels;
+            jack_connect( p_sys->p_jack_client, p_sys->pp_jack_port_table[j],
+                jack_port_name( p_sys->pp_jack_port_input[i_input_ports] ) );
         }
     }
 
@@ -266,15 +263,14 @@ static int Open( vlc_object_t *p_this )
         {
             i_out_ports++;
         }
-        if( i_out_ports > 0 )
+
+        for( int j = 0; j < i_out_ports; j++ )
         {
-            for( int j = 0; j < i_out_ports; j++ )
-            {
-                int i_input_ports = j % p_sys->i_channels;
-                jack_connect( p_sys->p_jack_client, pp_jack_port_output[j],
-                    jack_port_name( p_sys->pp_jack_port_input[i_input_ports] ) );
-            }
+            int i_input_ports = j % p_sys->i_channels;
+            jack_connect( p_sys->p_jack_client, pp_jack_port_output[j],
+                jack_port_name( p_sys->pp_jack_port_input[i_input_ports] ) );
         }
+
         free( pp_jack_port_output );
     }
 
