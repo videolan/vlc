@@ -137,8 +137,8 @@ static void *Thread(void *data)
             continue;
         }
 
-        if (paused || sys->eof || sys->error)
-        {   /* Wait for not paused, not at EOF and not failed state */
+        if (paused || sys->error)
+        {   /* Wait for not paused and not failed */
             vlc_cond_wait(&sys->wait_space, &sys->lock);
             continue;
         }
@@ -154,6 +154,14 @@ static void *Thread(void *data)
 
             sys->buffer_offset = sys->stream_offset;
             sys->buffer_length = 0;
+            assert(!sys->error);
+            sys->eof = false;
+            continue;
+        }
+
+        if (sys->eof)
+        {   /* Do not attempt to read at EOF - would busy loop */
+            vlc_cond_wait(&sys->wait_space, &sys->lock);
             continue;
         }
 
@@ -175,6 +183,8 @@ static void *Thread(void *data)
         {
             sys->buffer_offset = sys->stream_offset;
             sys->buffer_length = 0;
+            assert(!sys->error);
+            assert(!sys->eof);
             continue;
         }
 
@@ -241,7 +251,6 @@ static int Seek(stream_t *stream, uint64_t offset)
 
     vlc_mutex_lock(&sys->lock);
     sys->stream_offset = offset;
-    sys->eof = false;
     sys->error = false;
     vlc_cond_signal(&sys->wait_space);
     vlc_mutex_unlock(&sys->lock);
