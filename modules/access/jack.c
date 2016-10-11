@@ -401,8 +401,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
 {
     demux_t            *p_demux = ( demux_t* )p_arg;
     demux_sys_t        *p_sys = p_demux->p_sys;
-    size_t              i_write;
- 
+
     /* Get and interlace buffers */
     for ( unsigned i = 0; i < p_sys->i_channels ; i++ )
     {
@@ -420,9 +419,9 @@ int Process( jack_nframes_t i_frames, void *p_arg )
                 msg_Err( p_demux, "buffer overflow");
                 return 0; // buffer overflow
             }
-            i_write = jack_ringbuffer_write( p_sys->p_jack_ringbuffer,
-                                             ( char * ) (p_sys->pp_jack_buffer[i]+j),
-                                             p_sys->jack_sample_size );
+            size_t i_write = jack_ringbuffer_write( p_sys->p_jack_ringbuffer,
+                                                    ( char * ) (p_sys->pp_jack_buffer[i]+j),
+                                                    p_sys->jack_sample_size );
             if (i_write != p_sys->jack_sample_size ) {
                 msg_Warn( p_demux, "error writing on ring buffer");
             }
