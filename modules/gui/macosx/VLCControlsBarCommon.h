@@ -25,7 +25,6 @@
 #import <Cocoa/Cocoa.h>
 #import "misc.h"
 
-@class VLCFSPanel;
 @class VLCResizeControl;
 
 /*****************************************************************************

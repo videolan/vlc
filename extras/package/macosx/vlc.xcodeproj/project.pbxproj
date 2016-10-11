@@ -400,8 +400,6 @@
 		1CCB5F6D1A62A724004C3E90 /* VLCExtensionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71314C0D4A90057F8D1 /* VLCExtensionsManager.m */; };
 		1CCB5F6E1A62A724004C3E90 /* VLCEyeTvController.h in Sources */ = {isa = PBXBuildFile; fileRef = CC6EDD4F0B9CA2140096068A /* VLCEyeTvController.h */; };
 		1CCB5F6F1A62A724004C3E90 /* VLCEyeTvController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6EDD500B9CA2140096068A /* VLCEyeTvController.m */; };
-		1CCB5F701A62A724004C3E90 /* VLCFSPanel.h in Sources */ = {isa = PBXBuildFile; fileRef = 2AEF857609A5FEC900130822 /* VLCFSPanel.h */; };
-		1CCB5F711A62A724004C3E90 /* VLCFSPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AEF857709A5FEC900130822 /* VLCFSPanel.m */; };
 		1CCB5F721A62A724004C3E90 /* VLCMain.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27C03E2EB1C0059A3A7 /* VLCMain.h */; };
 		1CCB5F731A62A724004C3E90 /* VLCMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27D03E2EB1C0059A3A7 /* VLCMain.m */; };
 		1CCB5F741A62A724004C3E90 /* macosx.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27E03E2EB1C0059A3A7 /* macosx.m */; };
@@ -1273,8 +1271,6 @@
 		1CE5ED1E19DD6AB700FCEFD3 /* lion-window-fullscreen-over@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-over@2x.png"; sourceTree = "<group>"; };
 		1CE5ED1F19DD6AB700FCEFD3 /* lion-window-fullscreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen.png"; sourceTree = "<group>"; };
 		1CE5ED2019DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen@2x.png"; sourceTree = "<group>"; };
-		2AEF857609A5FEC900130822 /* VLCFSPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCFSPanel.h; path = ../../../modules/gui/macosx/VLCFSPanel.h; sourceTree = SOURCE_ROOT; };
-		2AEF857709A5FEC900130822 /* VLCFSPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCFSPanel.m; path = ../../../modules/gui/macosx/VLCFSPanel.m; sourceTree = SOURCE_ROOT; };
 		5CCED71014C0D4A90057F8D1 /* VLCExtensionsDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCExtensionsDialogProvider.h; path = ../../../modules/gui/macosx/VLCExtensionsDialogProvider.h; sourceTree = SOURCE_ROOT; };
 		5CCED71114C0D4A90057F8D1 /* VLCExtensionsDialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCExtensionsDialogProvider.m; path = ../../../modules/gui/macosx/VLCExtensionsDialogProvider.m; sourceTree = SOURCE_ROOT; };
 		5CCED71214C0D4A90057F8D1 /* VLCExtensionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCExtensionsManager.h; path = ../../../modules/gui/macosx/VLCExtensionsManager.h; sourceTree = SOURCE_ROOT; };
@@ -1933,8 +1929,6 @@
 				5CCED71314C0D4A90057F8D1 /* VLCExtensionsManager.m */,
 				CC6EDD4F0B9CA2140096068A /* VLCEyeTvController.h */,
 				CC6EDD500B9CA2140096068A /* VLCEyeTvController.m */,
-				2AEF857609A5FEC900130822 /* VLCFSPanel.h */,
-				2AEF857709A5FEC900130822 /* VLCFSPanel.m */,
 				6BCB59091DA247CD009BCA66 /* VLCFSPanelController.h */,
 				6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */,
 				7D871D391B5E684D000B56C0 /* helpers.h */,
@@ -4046,9 +4040,7 @@
 				6BBBB8B41D112BAC001BD9BA /* VLCRendererItem.m in Sources */,
 				1CCB5F6E1A62A724004C3E90 /* VLCEyeTvController.h in Sources */,
 				1CCB5F6F1A62A724004C3E90 /* VLCEyeTvController.m in Sources */,
-				1CCB5F701A62A724004C3E90 /* VLCFSPanel.h in Sources */,
 				7D5678ED1D5BA1DC002698F3 /* VLCApplication.m in Sources */,
-				1CCB5F711A62A724004C3E90 /* VLCFSPanel.m in Sources */,
 				1CCB5F721A62A724004C3E90 /* VLCMain.h in Sources */,
 				6B13E2A81BC67678001AD24A /* VLCScrollingClipView.m in Sources */,
 				1CD3667B1B7A242E0054E39F /* VLCTimeSelectionPanelController.m in Sources */,

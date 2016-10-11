@@ -35,7 +35,6 @@ libmacosx_plugin_la_SOURCES = \
 	VLCCoreInteraction.h VLCCoreInteraction.m \
 	VLCExtensionsDialogProvider.h VLCExtensionsDialogProvider.m \
 	VLCExtensionsManager.h VLCExtensionsManager.m \
-	VLCFSPanel.h VLCFSPanel.m \
 	VLCHelpWindowController.h VLCHelpWindowController.m \
 	VLCMain+OldPrefs.h VLCMain+OldPrefs.m \
 	VLCMain.h VLCMain.m \

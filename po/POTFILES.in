@@ -560,8 +560,6 @@ modules/gui/macosx/VLCExtensionsManager.h
 modules/gui/macosx/VLCExtensionsManager.m
 modules/gui/macosx/VLCEyeTvController.h
 modules/gui/macosx/VLCEyeTvController.m
-modules/gui/macosx/VLCFSPanel.h
-modules/gui/macosx/VLCFSPanel.m
 modules/gui/macosx/helpers.h
 modules/gui/macosx/macosx.m
 modules/gui/macosx/VLCMain.h
