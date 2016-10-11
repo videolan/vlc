@@ -147,17 +147,18 @@ static void *Thread(void *data)
 
         if (stream_offset < sys->buffer_offset)
         {   /* Need to seek backward */
-            if (ThreadSeek(stream, stream_offset))
+            if (ThreadSeek(stream, stream_offset) == 0)
+            {
+                sys->buffer_offset = stream_offset;
+                sys->buffer_length = 0;
+                assert(!sys->error);
+                sys->eof = false;
+            }
+            else
             {
                 sys->error = true;
                 vlc_cond_signal(&sys->wait_data);
-                continue;
             }
-
-            sys->buffer_offset = stream_offset;
-            sys->buffer_length = 0;
-            assert(!sys->error);
-            sys->eof = false;
             continue;
         }
 
@@ -180,13 +181,24 @@ static void *Thread(void *data)
          * seek is a no-op, and continue as if seeking was not supported.
          * WARNING: Except problems with misbehaving access plug-ins. */
         if (sys->can_seek
-         && history >= (sys->buffer_length + sys->seek_threshold)
-         && ThreadSeek(stream, stream_offset) == 0)
+         && history >= (sys->buffer_length + sys->seek_threshold))
         {
-            sys->buffer_offset = stream_offset;
-            sys->buffer_length = 0;
-            assert(!sys->error);
-            assert(!sys->eof);
+            if (ThreadSeek(stream, stream_offset) == 0)
+            {
+                sys->buffer_offset = stream_offset;
+                sys->buffer_length = 0;
+                assert(!sys->error);
+                assert(!sys->eof);
+            }
+            else
+            {   /* Seek failure is not necessarily fatal here. We could read
+                 * data instead until the desired seek offset. But in practice,
+                 * not all upstream accesses handle reads after failed seek
+                 * correctly. Furthermore, sys->stream_offset and/or
+                 * sys->paused might have changed in the mean time. */
+                sys->error = true;
+                vlc_cond_signal(&sys->wait_data);
+            }
             continue;
         }
 
