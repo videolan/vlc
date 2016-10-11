@@ -122,7 +122,6 @@ static block_t *GrabJack( demux_t * );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    unsigned int i;
     demux_t             *p_demux = ( demux_t* )p_this;
     demux_sys_t         *p_sys;
     es_format_t         fmt;
@@ -193,7 +192,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* register input ports */
-    for( i = 0; i <  p_sys->i_channels; i++ )
+    for( unsigned i = 0; i <  p_sys->i_channels; i++ )
     {
         char p_input_name[32];
         snprintf( p_input_name, 32, "vlc_in_%d", i+1 );
@@ -216,7 +215,7 @@ static int Open( vlc_object_t *p_this )
         * sizeof( jack_default_audio_sample_t * ) );
     if( p_sys->pp_jack_buffer == NULL )
     {
-        for( i = 0; i < p_sys->i_channels; i++ )
+        for( unsigned i = 0; i < p_sys->i_channels; i++ )
             jack_port_unregister( p_sys->p_jack_client, p_sys->pp_jack_port_input[i] );
         jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
         free( p_sys->pp_jack_port_input );
@@ -233,7 +232,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "failed to activate JACK client" );
         free( p_sys->pp_jack_buffer );
-        for( i = 0; i < p_sys->i_channels; i++ )
+        for( unsigned i = 0; i < p_sys->i_channels; i++ )
             jack_port_unregister( p_sys->p_jack_client, p_sys->pp_jack_port_input[i] );
         jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
         free( p_sys->pp_jack_port_input );
@@ -247,11 +246,10 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->psz_ports )
     {
         int        i_input_ports;
-        int        j;
  
     if( p_sys->i_match_ports > 0 )
         {
-            for( j = 0; j < p_sys->i_match_ports; j++ )
+            for( int j = 0; j < p_sys->i_match_ports; j++ )
             {
                 i_input_ports = j % p_sys->i_channels;
                 jack_connect( p_sys->p_jack_client, p_sys->pp_jack_port_table[j],
@@ -264,7 +262,6 @@ static int Open( vlc_object_t *p_this )
     if( var_GetBool( p_demux, "jack-input-auto-connect" ) && !p_sys->psz_ports )
     {
         int        i_input_ports;
-        int        j;
         const char **pp_jack_port_output;
 
         pp_jack_port_output = jack_get_ports( p_sys->p_jack_client, NULL, NULL, JackPortIsOutput );
@@ -275,7 +272,7 @@ static int Open( vlc_object_t *p_this )
         }
         if( i_out_ports > 0 )
         {
-            for( j = 0; j < i_out_ports; j++ )
+            for( int j = 0; j < i_out_ports; j++ )
             {
                 i_input_ports = j % p_sys->i_channels;
                 jack_connect( p_sys->p_jack_client, pp_jack_port_output[j],
@@ -404,20 +401,19 @@ int Process( jack_nframes_t i_frames, void *p_arg )
 {
     demux_t            *p_demux = ( demux_t* )p_arg;
     demux_sys_t        *p_sys = p_demux->p_sys;
-    unsigned int        i, j;
     size_t              i_write;
  
     /* Get and interlace buffers */
-    for ( i = 0; i < p_sys->i_channels ; i++ )
+    for ( unsigned i = 0; i < p_sys->i_channels ; i++ )
     {
         p_sys->pp_jack_buffer[i] = jack_port_get_buffer(
             p_sys->pp_jack_port_input[i], i_frames );
     }
 
     /* fill ring buffer with signal */
-    for( j = 0; j < i_frames; j++ )
+    for( unsigned j = 0; j < i_frames; j++ )
     {
-        for( i = 0; i <p_sys->i_channels; i++ )
+        for( unsigned i = 0; i <p_sys->i_channels; i++ )
         {
             if( jack_ringbuffer_write_space( p_sys->p_jack_ringbuffer ) <
                 p_sys->jack_sample_size ) {
