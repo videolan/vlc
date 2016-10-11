@@ -525,7 +525,6 @@ int RSAKey::readDER( unsigned char const* ps_data_der, size_t length )
     struct tag_info tag_inf;
     gcry_mpi_t key_params[8];
     gcry_error_t err;
-    int i;
 
     /* parse the ASN1 structure */
     if( parseTag( &ps_data_der, &length, &tag_inf )
@@ -539,7 +538,7 @@ int RSAKey::readDER( unsigned char const* ps_data_der, size_t length )
     ps_data_der += tag_inf.length;
     length -= tag_inf.length;
 
-    for( i = 0; i < 8; i++ )
+    for( int i = 0; i < 8; i++ )
     {
         if( parseTag( &ps_data_der, &length, &tag_inf )
                 || tag_inf.tag != TAG_INTEGER || tag_inf.class_ || tag_inf.cons || tag_inf.ndef )
@@ -575,7 +574,7 @@ int RSAKey::readDER( unsigned char const* ps_data_der, size_t length )
     }
 
     /* clear data */
-    for( i = 0; i < 8; i++ )
+    for( int i = 0; i < 8; i++ )
         gcry_mpi_release( key_params[i] );
     return VLC_SUCCESS;
 
@@ -583,7 +582,7 @@ bad_asn1:
     msg_Err( this->p_demux, "could not parse ASN1 structure; key might be corrupted" );
 
 error:
-    for( i = 0; i < 8; i++ )
+    for( int i = 0; i < 8; i++ )
         gcry_mpi_release( key_params[i] );
     return VLC_EGENERIC;
 }
