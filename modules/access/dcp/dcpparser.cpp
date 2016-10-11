@@ -740,16 +740,13 @@ int XmlFile::OpenXml()
 
 int XmlFile::ReadNextNode( demux_t *p_demux, xml_reader_t *p_xmlReader, string& p_node )
 {
-    string s_node;
     const char * c_node;
-    int i;
-    size_t ui_pos;
-
-    i = xml_ReaderNextNode( p_xmlReader, &c_node );
+    int i = xml_ReaderNextNode( p_xmlReader, &c_node );
 
     /* remove namespaces, if there are any */
-    s_node = c_node;
-    ui_pos = s_node.find( ":" );
+    string s_node = c_node;
+    size_t ui_pos = s_node.find( ":" );
+
     if( ( i == XML_READER_STARTELEM || i == XML_READER_ENDELEM ) && ( ui_pos != string::npos ) )
     {
         try
