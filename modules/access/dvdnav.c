@@ -930,7 +930,6 @@ static int Demux( demux_t *p_demux )
     {
         int32_t i_title = 0;
         int32_t i_part  = 0;
-        int i;
 
         dvdnav_vts_change_event_t *event = (dvdnav_vts_change_event_t*)packet;
         msg_Dbg( p_demux, "DVDNAV_VTS_CHANGE" );
@@ -940,7 +939,7 @@ static int Demux( demux_t *p_demux )
         /* reset PCR */
         es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
-        for( i = 0; i < PS_TK_COUNT; i++ )
+        for( int i = 0; i < PS_TK_COUNT; i++ )
         {
             ps_track_t *tk = &p_sys->tk[i];
             if( tk->b_seen )
@@ -1153,7 +1152,6 @@ static void DemuxTitles( demux_t *p_demux )
     input_title_t *t;
     seekpoint_t *s;
     int32_t i_titles;
-    int i;
 
     /* Menu */
     t = vlc_input_title_New();
@@ -1196,7 +1194,7 @@ static void DemuxTitles( demux_t *p_demux )
     if( i_titles > 90 )
         msg_Err( p_demux, "This is probably an Arccos Protected DVD. This could take time..." );
 
-    for( i = 1; i <= i_titles; i++ )
+    for( int i = 1; i <= i_titles; i++ )
     {
         int32_t i_chapters;
         uint64_t i_title_length;
