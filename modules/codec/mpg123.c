@@ -41,10 +41,6 @@
  *****************************************************************************/
 static int      OpenDecoder( vlc_object_t * );
 static void     CloseDecoder( vlc_object_t * );
-static block_t *DecodeBlock( decoder_t *, block_t ** );
-static void     Flush( decoder_t * );
-static int      InitMPG123( void );
-static void     ExitMPG123( void );
 
 static unsigned int mpg123_refcount = 0;
 static vlc_mutex_t mpg123_mutex = VLC_STATIC_MUTEX;
@@ -219,6 +215,38 @@ error:
     return NULL;
 }
 
+
+/*****************************************************************************
+ * InitMPG123 : initialize the mpg123 library (reentrant)
+ *****************************************************************************/
+static int InitMPG123( void )
+{
+    int i_ret;
+    vlc_mutex_lock( &mpg123_mutex );
+    if( mpg123_refcount > 0 )
+    {
+        mpg123_refcount++;
+        vlc_mutex_unlock( &mpg123_mutex );
+        return MPG123_OK;
+    }
+    if( ( i_ret = mpg123_init() ) == MPG123_OK )
+        mpg123_refcount++;
+    vlc_mutex_unlock( &mpg123_mutex );
+    return i_ret;
+}
+
+/*****************************************************************************
+ * ExitMPG123 : close down the mpg123 library (reentrant)
+ *****************************************************************************/
+static void ExitMPG123( void )
+{
+    vlc_mutex_lock( &mpg123_mutex );
+    mpg123_refcount--;
+    if( mpg123_refcount == 0 )
+        mpg123_exit();
+    vlc_mutex_unlock( &mpg123_mutex );
+}
+
 /*****************************************************************************
  * OpenDecoder :
  *****************************************************************************/
@@ -301,35 +329,4 @@ static void CloseDecoder( vlc_object_t *p_this )
     mpg123_delete( p_sys->p_handle );
     ExitMPG123();
     free( p_sys );
-}
-
-/*****************************************************************************
- * InitMPG123 : initialize the mpg123 library (reentrant)
- *****************************************************************************/
-static int InitMPG123( void )
-{
-    int i_ret;
-    vlc_mutex_lock( &mpg123_mutex );
-    if( mpg123_refcount > 0 )
-    {
-        mpg123_refcount++;
-        vlc_mutex_unlock( &mpg123_mutex );
-        return MPG123_OK;
-    }
-    if( ( i_ret = mpg123_init() ) == MPG123_OK )
-        mpg123_refcount++;
-    vlc_mutex_unlock( &mpg123_mutex );
-    return i_ret;
-}
-
-/*****************************************************************************
- * ExitMPG123 : close down the mpg123 library (reentrant)
- *****************************************************************************/
-static void ExitMPG123( void )
-{
-    vlc_mutex_lock( &mpg123_mutex );
-    mpg123_refcount--;
-    if( mpg123_refcount == 0 )
-        mpg123_exit();
-    vlc_mutex_unlock( &mpg123_mutex );
 }
