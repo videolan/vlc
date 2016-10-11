@@ -1248,19 +1248,19 @@ int Reel::ParseAsset(string p_node, int p_type, TrackType_t e_track) {
                 } else if (node == "AnnotationText") {
                     if ( XmlFile::ReadEndNode( this->p_demux, this->p_xmlReader, node, type, s_value ) )
                         return -1;
-                        asset->setAnnotation(s_value);
+                    asset->setAnnotation(s_value);
                 } else if (node == "IntrinsicDuration") {
                     if ( XmlFile::ReadEndNode( this->p_demux, this->p_xmlReader, node, type, s_value ) )
                         return -1;
-                        asset->setIntrinsicDuration(atoi(s_value.c_str()));
+                    asset->setIntrinsicDuration(atoi(s_value.c_str()));
                 } else if (node == "EntryPoint") {
                     if ( XmlFile::ReadEndNode( this->p_demux, this->p_xmlReader, node, type, s_value ) )
                         return -1;
-                        asset->setEntryPoint(atoi(s_value.c_str()));
+                    asset->setEntryPoint(atoi(s_value.c_str()));
                 } else if (node == "Duration") {
                     if ( XmlFile::ReadEndNode( this->p_demux, this->p_xmlReader, node, type, s_value ) )
                         return -1;
-                        asset->setDuration(atoi(s_value.c_str()));
+                    asset->setDuration(atoi(s_value.c_str()));
                 } else if (node == "KeyId") {
                     if ( XmlFile::ReadEndNode( this->p_demux, this->p_xmlReader, node, type, s_value ) )
                         return -1;
