@@ -1106,14 +1106,14 @@ static const char *const ppsz_prefres[] = {
      "These options define the behavior of the playlist. Some " \
      "of them can be overridden in the playlist dialog box." )
 
-#define PREPARSE_TEXT N_( "Automatically preparse files")
+#define PREPARSE_TEXT N_( "Automatically preparse items")
 #define PREPARSE_LONGTEXT N_( \
-    "Automatically preparse files added to the playlist " \
+    "Automatically preparse items added to the playlist " \
     "(to retrieve some metadata)." )
 
 #define PREPARSE_TIMEOUT_TEXT N_( "Preparsing timeout" )
 #define PREPARSE_TIMEOUT_LONGTEXT N_( \
-    "Maximum time allowed to preparse a file" )
+    "Maximum time (in milliseconds) allowed to preparse an item" )
 
 #define METADATA_NETWORK_TEXT N_( "Allow metadata network access" )
 
