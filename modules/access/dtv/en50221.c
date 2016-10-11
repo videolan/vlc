@@ -145,10 +145,9 @@ static uint8_t *GetLength( uint8_t *p_data, int *pi_length )
     if ( (*pi_length & SIZE_INDICATOR) != 0 )
     {
         int l = *pi_length & ~SIZE_INDICATOR;
-        int i;
 
         *pi_length = 0;
-        for ( i = 0; i < l; i++ )
+        for ( int i = 0; i < l; i++ )
             *pi_length = (*pi_length << 8) | *p_data++;
     }
 
@@ -218,10 +217,9 @@ static uint8_t *SetLength( uint8_t *p_data, int i_length )
 static void Dump( bool b_outgoing, uint8_t *p_data, int i_size )
 {
 #ifdef DEBUG_TPDU
-    int i;
 #define MAX_DUMP 256
     fprintf(stderr, "%s ", b_outgoing ? "-->" : "<--");
-    for ( i = 0; i < i_size && i < MAX_DUMP; i++)
+    for ( int i = 0; i < i_size && i < MAX_DUMP; i++)
         fprintf(stderr, "%02X ", p_data[i]);
     fprintf(stderr, "%s\n", i_size >= MAX_DUMP ? "..." : "");
 #else
