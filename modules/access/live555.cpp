@@ -1474,7 +1474,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_TIME:
             if( p_sys->rtsp && (p_sys->f_npt_length > 0) )
             {
-                int i;
                 float time;
 
                 if( (i_query == DEMUX_SET_TIME) && (p_sys->f_npt > 0) )
@@ -1515,7 +1514,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
                 p_sys->i_pcr = VLC_TS_INVALID;
 
-                for( i = 0; i < p_sys->i_track; i++ )
+                for( int i = 0; i < p_sys->i_track; i++ )
                 {
                     p_sys->track[i]->b_rtcp_sync = false;
                     p_sys->track[i]->i_lastpts = VLC_TS_INVALID;
