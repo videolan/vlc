@@ -40,7 +40,7 @@ static int VlmEvent( vlc_object_t *p_this, const char * name,
 {
     VLC_UNUSED(p_this);
     VLC_UNUSED(name);
-    VLC_UNUSED(old_val);    
+    VLC_UNUSED(old_val);
     vlm_event_t *event = (vlm_event_t*)newval.p_address;
     libvlc_event_manager_t *p_event_manager = (libvlc_event_manager_t *) param;
     libvlc_event_t libvlc_event;
