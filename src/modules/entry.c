@@ -29,6 +29,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <limits.h>
+#include <float.h>
 
 #include "modules/modules.h"
 #include "config/configuration.h"
@@ -130,6 +131,11 @@ static module_config_t *vlc_config_create (module_t *module, int type)
     {
         tab[confsize].max.i = INT_MAX;
         tab[confsize].min.i = INT_MIN;
+    }
+    else if( IsConfigFloatType (type))
+    {
+        tab[confsize].max.f = FLT_MAX;
+        tab[confsize].min.f = FLT_MIN;
     }
     tab[confsize].i_type = type;
 
