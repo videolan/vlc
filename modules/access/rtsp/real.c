@@ -361,7 +361,6 @@ static void real_calc_response_and_checksum (access_t *p_access, char *response,
 static int select_mlti_data(access_t *p_access, const char *mlti_chunk, int mlti_size, int selection, char **out) {
 
   int numrules, codec, size;
-  int i;
 
   /* MLTI chunk should begin with MLTI */
   if ((mlti_chunk[0] != 'M')
@@ -401,7 +400,8 @@ static int select_mlti_data(access_t *p_access, const char *mlti_chunk, int mlti
   mlti_chunk+=2;
 
   /* now seek to selected codec */
-  for (i=0; i<codec; i++) {
+  for( int i = 0; i < codec; i++ )
+  {
     size=BE_32(mlti_chunk);
     mlti_chunk+=size+4;
   }
