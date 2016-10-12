@@ -392,10 +392,9 @@ static vlc_v4l2_ctrl_t *ControlAddInteger (vlc_object_t *obj, int fd,
         val.i_int = ctrl.value;
         var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
     }
-    val.i_int = query->minimum;
-    var_Change (obj, c->name, VLC_VAR_SETMIN, &val, NULL);
-    val.i_int = query->maximum;
-    var_Change (obj, c->name, VLC_VAR_SETMAX, &val, NULL);
+    var_Change (obj, c->name, VLC_VAR_SETMINMAX,
+        &(vlc_value_t){ .i_int = query->minimum },
+        &(vlc_value_t){ .i_int = query->maximum } );
     if (query->step != 1)
     {
         val.i_int = query->step;
@@ -467,10 +466,9 @@ static vlc_v4l2_ctrl_t *ControlAddMenu (vlc_object_t *obj, int fd,
         val.i_int = ctrl.value;
         var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
     }
-    val.i_int = query->minimum;
-    var_Change (obj, c->name, VLC_VAR_SETMIN, &val, NULL);
-    val.i_int = query->maximum;
-    var_Change (obj, c->name, VLC_VAR_SETMAX, &val, NULL);
+    var_Change (obj, c->name, VLC_VAR_SETMINMAX,
+        &(vlc_value_t){ .i_int = query->minimum },
+        &(vlc_value_t){ .i_int = query->maximum } );
     val.i_int = query->default_value;
     var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
 
@@ -629,10 +627,9 @@ static vlc_v4l2_ctrl_t *ControlAddBitMask (vlc_object_t *obj, int fd,
         val.i_int = ctrl.value;
         var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
     }
-    val.i_int = 0;
-    var_Change (obj, c->name, VLC_VAR_SETMIN, &val, NULL);
-    val.i_int = (uint32_t)query->maximum;
-    var_Change (obj, c->name, VLC_VAR_SETMAX, &val, NULL);
+    var_Change (obj, c->name, VLC_VAR_SETMINMAX,
+        &(vlc_value_t){ .i_int = 0 },
+        &(vlc_value_t){ .i_int = (uint32_t)query->maximum } );
     val.i_int = query->default_value;
     var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
     return c;
@@ -666,10 +663,9 @@ static vlc_v4l2_ctrl_t *ControlAddIntMenu (vlc_object_t *obj, int fd,
         val.i_int = ctrl.value;
         var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
     }
-    val.i_int = query->minimum;
-    var_Change (obj, c->name, VLC_VAR_SETMIN, &val, NULL);
-    val.i_int = query->maximum;
-    var_Change (obj, c->name, VLC_VAR_SETMAX, &val, NULL);
+    var_Change (obj, c->name, VLC_VAR_SETMINMAX,
+        &(vlc_value_t){ .i_int = query->minimum },
+        &(vlc_value_t){ .i_int = query->maximum } );
     val.i_int = query->default_value;
     var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
 
