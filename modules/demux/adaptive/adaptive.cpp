@@ -98,6 +98,12 @@ static const char *const ppsz_logics[] = { N_("Default"),
                                            N_("Lowest Bandwidth/Quality"),
                                            N_("Highest Bandwidth/Quality")};
 
+static_assert( ARRAY_SIZE( pi_logics ) == ARRAY_SIZE( ppsz_logics ),
+    "pi_logics and ppsz_logics shall have the same number of elements" );
+
+static_assert( ARRAY_SIZE( pi_logics ) == ARRAY_SIZE( ppsz_logics_values ),
+    "pi_logics and ppsz_logics_values shall have the same number of elements" );
+
 vlc_module_begin ()
         set_shortname( N_("Adaptive"))
         set_description( N_("Unified adaptive streaming for DASH/HLS") )
