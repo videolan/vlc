@@ -196,9 +196,8 @@ static char* recurse_answer( vlm_message_t *p_answer, const char* psz_delim,
     char* psz_childdelim = NULL;
     char* psz_nametag = NULL;
     char* psz_response = strdup( "" );
-    char *psz_tmp;
     int i_success = 0;
-    int i;
+
     vlm_message_t *aw_child, **paw_child;
 
     i_success = asprintf( &psz_childdelim, "%s\t", psz_delim);
@@ -208,8 +207,9 @@ static char* recurse_answer( vlm_message_t *p_answer, const char* psz_delim,
     paw_child = p_answer->child;
     aw_child = *( paw_child );
     /* Iterate over children */
-    for( i = 0; i < p_answer->i_child; i++ )
+    for( int i = 0; i < p_answer->i_child; i++ )
     {
+        char *psz_tmp;
         /* Spare comma if it is the last element */
         char c_comma = ',';
         if( i == (p_answer->i_child - 1) )
