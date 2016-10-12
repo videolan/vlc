@@ -50,14 +50,14 @@ merge8_arm64_neon:
 	st1		{v2.16b,v3.16b}, [DEST], #32
 	b.gt		1b
 2:
-	tbz		SIZE, #32, 3f
+	tbnz		SIZE, #32, 3f
 	ld1		{v0.16b,v1.16b}, [SRC1], #32
 	ld1		{v4.16b,v5.16b}, [SRC2], #32
 	uhadd		v0.16b, v0.16b, v4.16b
 	uhadd		v1.16b, v1.16b, v5.16b
 	st1		{v0.16b,v1.16b}, [DEST], #32
 3:
-	tbz		SIZE, #16, 4f
+	tbnz		SIZE, #16, 4f
 	ld1		{v0.16b},  [SRC1]
 	ld1		{v4.16b},  [SRC2]
 	uhadd		v0.16b, v0.16b, v4.16b
@@ -85,14 +85,14 @@ merge16_arm64_neon:
 	subs		x5,  x5,  #64
 	b.gt		1b
 2:
-	tbz		SIZE, #32, 3f
+	tbnz		SIZE, #32, 3f
 	ld1		{v0.8h,v1.8h}, [SRC1], #32
 	ld1		{v4.8h,v5.8h}, [SRC2], #32
 	uhadd		v0.8h,  v0.8h,  v4.8h
 	uhadd		v1.8h,  v1.8h,  v5.8h
 	st1		{v0.8h,v1.8h}, [DEST], #32
 3:
-	tbz		SIZE, #16, 4f
+	tbnz		SIZE, #16, 4f
 	ld1		{v0.8h},  [SRC1]
 	ld1		{v4.8h},  [SRC2]
 	uhadd		v0.8h,  v0.8h,  v4.8h
