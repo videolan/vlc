@@ -1,5 +1,5 @@
 /*****************************************************************************
- * adaptive.cpp: Adaptative streaming module
+ * adaptive.cpp: Adaptive streaming module
  *****************************************************************************
  * Copyright © 2015 - VideoLAN and VLC Authors
  *
@@ -70,7 +70,7 @@ static void Close   (vlc_object_t *);
 #define ADAPT_BW_TEXT N_("Fixed Bandwidth in KiB/s")
 #define ADAPT_BW_LONGTEXT N_("Preferred bandwidth for non adaptive streams")
 
-#define ADAPT_LOGIC_TEXT N_("Adaptation Logic")
+#define ADAPT_LOGIC_TEXT N_("Adaptive Logic")
 
 #define ADAPT_ACCESS_TEXT N_("Use regular HTTP modules")
 #define ADAPT_ACCESS_LONGTEXT N_("Connect using http access instead of custom http code")
@@ -99,7 +99,7 @@ static const char *const ppsz_logics[] = { N_("Default"),
                                            N_("Highest Bandwidth/Quality")};
 
 vlc_module_begin ()
-        set_shortname( N_("Adaptative"))
+        set_shortname( N_("Adaptive"))
         set_description( N_("Unified adaptive streaming for DASH/HLS") )
         set_capability( "demux", 12 )
         set_category( CAT_INPUT )
