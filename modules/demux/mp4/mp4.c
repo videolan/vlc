@@ -3399,6 +3399,11 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
             case VLC_CODEC_AMR_WB:
                 i_max_v0_samples = 16;
                 break;
+            case VLC_CODEC_MPGA:
+            case VLC_CODEC_MP2:
+            case VLC_CODEC_MP3:
+                i_max_v0_samples = 1;
+                break;
             default:
                 /* Read 25ms of samples (uncompressed) */
                 i_max_v0_samples = p_track->fmt.audio.i_rate / 40 *
