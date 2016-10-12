@@ -529,6 +529,25 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             else
                 ret = VLC_EGENERIC;
             break;
+        case VLC_VAR_SETMINMAX:
+            if( p_var->i_type & VLC_VAR_HASMIN )
+            {
+                p_var->ops->pf_free( &p_var->min );
+            }
+            p_var->i_type |= VLC_VAR_HASMIN;
+            p_var->min = *p_val;
+            p_var->ops->pf_dup( &p_var->min );
+
+            if( p_var->i_type & VLC_VAR_HASMAX )
+            {
+                p_var->ops->pf_free( &p_var->max );
+            }
+            p_var->i_type |= VLC_VAR_HASMAX;
+            p_var->max = *p_val2;
+            p_var->ops->pf_dup( &p_var->max );
+
+            break;
+
         case VLC_VAR_SETSTEP:
             if( p_var->i_type & VLC_VAR_HASSTEP )
             {
