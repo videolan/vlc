@@ -443,8 +443,7 @@ int libvlc_media_list_index_of_item( libvlc_media_list_t * p_mlist,
                                      libvlc_media_t * p_searched_md )
 {
     libvlc_media_t * p_md;
-    int i;
-    for ( i = 0; i < vlc_array_count( &p_mlist->items ); i++ )
+    for ( int i = 0; i < vlc_array_count( &p_mlist->items ); i++ )
     {
         p_md = vlc_array_item_at_index( &p_mlist->items, i );
         if( p_searched_md == p_md )
