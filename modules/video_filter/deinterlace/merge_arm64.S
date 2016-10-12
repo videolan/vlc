@@ -43,7 +43,6 @@ merge8_arm64_neon:
 	uhadd		v0.16b, v0.16b, v4.16b
 	ld1		{v6.16b,v7.16b}, [x12], x10
 	subs		x5,  x5,  #64
-	uhadd		v0.16b, v0.16b, v4.16b
 	uhadd		v1.16b, v1.16b, v5.16b
 	uhadd		v2.16b, v2.16b, v6.16b
 	uhadd		v3.16b, v3.16b, v7.16b
