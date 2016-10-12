@@ -34,8 +34,10 @@
 #include <vlc_common.h>
 #include "libvlc.h"
 #include <vlc_charset.h>
+#include <vlc_plugin.h>
 
 #include "vlc_interface.h"
+#include "configuration.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -284,6 +286,24 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
         if( var_Create( p_this, name,
                         config_GetType( p_this, name ) | VLC_VAR_DOINHERIT ) )
             return /* VLC_xxx */;
+
+        module_config_t* p_conf = config_FindConfig( p_this, name );
+        if( p_conf )
+        {
+            switch( CONFIG_CLASS( p_conf->i_type ) )
+            {
+                case CONFIG_ITEM_INTEGER:
+                    var_Change( p_this, name, VLC_VAR_SETMINMAX,
+                        &(vlc_value_t){ .i_int = p_conf->min.i },
+                        &(vlc_value_t){ .i_int = p_conf->max.i } );
+                    break;
+                case CONFIG_ITEM_FLOAT:
+                    var_Change( p_this, name, VLC_VAR_SETMINMAX,
+                        &(vlc_value_t){ .f_float = p_conf->min.f },
+                        &(vlc_value_t){ .f_float = p_conf->max.f } );
+                    break;
+            }
+        }
     }
 
     /* Now parse options and set value */
