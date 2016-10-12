@@ -635,21 +635,6 @@ LIBVLC_API libvlc_time_t
    libvlc_media_get_duration( libvlc_media_t *p_md );
 
 /**
- * Parse a media.
- *
- * This fetches (local) art, meta data and tracks information.
- * The method is synchronous.
- *
- * \see libvlc_media_parse_with_options
- * \see libvlc_media_get_meta
- * \see libvlc_media_get_tracks_info
- *
- * \param p_md media descriptor object
- */
-LIBVLC_API void
-libvlc_media_parse( libvlc_media_t *p_md );
-
-/**
  * Parse the media asynchronously with options.
  *
  * This fetches (local or network) art, meta data and/or tracks information.
