@@ -277,8 +277,6 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 void
 libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
 {
-    int i;
-
     vlc_event_detach( services_discovery_EventManager( p_mdis->p_sd ),
                      vlc_ServicesDiscoveryItemAdded,
                      services_discovery_item_added,
@@ -301,7 +299,7 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
 
     /* Free catname_to_submedialist and all the mlist */
     char ** all_keys = vlc_dictionary_all_keys( &p_mdis->catname_to_submedialist );
-    for( i = 0; all_keys[i]; i++ )
+    for( int i = 0; all_keys[i]; i++ )
     {
         libvlc_media_list_t * p_catmlist = vlc_dictionary_value_for_key( &p_mdis->catname_to_submedialist, all_keys[i] );
         libvlc_media_list_release( p_catmlist );
