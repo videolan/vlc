@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <wchar.h>
 #include <wctype.h>
+#include <limits.h>
+#include <float.h>
 
 #include <vlc_common.h>
 #include <vlc_modules.h>
@@ -432,7 +434,7 @@ static void print_item(const module_t *m, const module_config_t *item,
                             module_gettext(m, item->list_text[i]));
                 }
             }
-            else if (item->min.i != 0 || item->max.i != 0)
+            else if (item->min.i != INT_MIN || item->max.i != INT_MAX)
             {
                 if (asprintf(&typebuf, "%s [%"PRId64" .. %"PRId64"]",
                              type, item->min.i, item->max.i) >= 0)
@@ -444,7 +446,7 @@ static void print_item(const module_t *m, const module_config_t *item,
 
         case CONFIG_ITEM_FLOAT:
             type = _("float");
-            if (item->min.f != 0.f || item->max.f != 0.f)
+            if (item->min.f != FLT_MIN || item->max.f != FLT_MAX)
             {
                 if (asprintf(&typebuf, "%s [%f .. %f]", type,
                              item->min.f, item->max.f) >= 0)
