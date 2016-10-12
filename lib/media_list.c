@@ -190,7 +190,6 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
 void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
 {
     libvlc_media_t * p_md;
-    int i;
 
     vlc_mutex_lock( &p_mlist->refcount_lock );
     p_mlist->i_refcount--;
@@ -207,7 +206,7 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
 
     libvlc_media_release( p_mlist->p_md );
 
-    for ( i = 0; i < vlc_array_count( &p_mlist->items ); i++ )
+    for ( int i = 0; i < vlc_array_count( &p_mlist->items ); i++ )
     {
         p_md = vlc_array_item_at_index( &p_mlist->items, i );
         libvlc_media_release( p_md );
