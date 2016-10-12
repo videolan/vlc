@@ -35,5 +35,5 @@ AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic():
 BaseRepresentation *AlwaysLowestAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *)
 {
     RepresentationSelector selector;
-    return selector.select(adaptSet, 0);
+    return selector.lowest(adaptSet);
 }

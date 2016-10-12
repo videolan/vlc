@@ -39,5 +39,5 @@ AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    () :
 BaseRepresentation *AlwaysBestAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *)
 {
     RepresentationSelector selector;
-    return selector.select(adaptSet);
+    return selector.highest(adaptSet);
 }
