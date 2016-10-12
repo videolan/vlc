@@ -455,8 +455,6 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
         if( pp_sectors )
         {
-             int i;
-
              *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
              if( *pp_sectors == NULL )
                  return 0;
@@ -484,7 +482,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
              }
 
              /* Fill the p_sectors structure with the track/sector matches */
-             for( i = 0 ; i <= i_tracks ; i++ )
+             for( int i = 0 ; i <= i_tracks ; i++ )
              {
 #if defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
                  /* FIXME: is this ok? */
@@ -510,14 +508,12 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
         if( pp_sectors )
         {
-            int i;
-
             *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
             if( *pp_sectors == NULL )
                 return 0;
 
             /* Fill the p_sectors structure with the track/sector matches */
-            for( i = 0 ; i <= i_tracks ; i++ )
+            for( int i = 0 ; i <= i_tracks ; i++ )
             {
                 tocent.cdte_format = CDROM_LBA;
                 tocent.cdte_track =
@@ -547,7 +543,6 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                        int i_sector, uint8_t *p_buffer, int i_nb, int i_type )
 {
     uint8_t *p_block;
-    int i;
 
     if( i_type == VCD_TYPE )
         p_block = malloc( VCD_SECTOR_SIZE * i_nb );
@@ -711,7 +706,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         }
 
 #else
-        for( i = 0; i < i_nb; i++ )
+        for( int i = 0; i < i_nb; i++ )
         {
             int i_dummy = i_sector + i + 2 * CD_FRAMES;
 
@@ -740,7 +735,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
      * sectors read */
     if( i_type == VCD_TYPE )
     {
-        for( i = 0; i < i_nb; i++ )
+        for( int i = 0; i < i_nb; i++ )
         {
             memcpy( p_buffer + i * VCD_DATA_SIZE,
                     p_block + i * VCD_SECTOR_SIZE + VCD_DATA_START,
