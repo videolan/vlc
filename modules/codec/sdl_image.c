@@ -186,14 +186,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         case 8:
         {
-            uint8_t *p_src, *p_dst;
-            uint8_t r, g, b;
             for ( int i = 0; i < p_surface->h; i++ )
             {
-                p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
-                p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
+                uint8_t *p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
+                uint8_t *p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
                 for ( int j = 0; j < p_surface->w; j++ )
                 {
+                    uint8_t r, g, b;
                     SDL_GetRGB( *(p_src++), p_surface->format,
                                 &r, &g, &b );
                     *(p_dst++) = r;
@@ -220,14 +219,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
         case 24:
         {
-            uint8_t *p_src, *p_dst;
-            uint8_t r, g, b;
             for ( int i = 0; i < p_surface->h; i++ )
             {
-                p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
-                p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
+                uint8_t *p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
+                uint8_t *p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
                 for ( int j = 0; j < p_surface->w; j++ )
                 {
+                    uint8_t r, g, b;
                     SDL_GetRGB( *(uint32_t*)p_src, p_surface->format,
                                 &r, &g, &b );
                     *(p_dst++) = r;
@@ -240,14 +238,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
         case 32:
         {
-            uint8_t *p_src, *p_dst;
-            uint8_t r, g, b, a;
             for ( int i = 0; i < p_surface->h; i++ )
             {
-                p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
-                p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
+                uint8_t *p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
+                uint8_t *p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
                 for ( int j = 0; j < p_surface->w; j++ )
                 {
+                    uint8_t r, g, b, a;
                     SDL_GetRGBA( *(uint32_t*)p_src, p_surface->format,
                                 &r, &g, &b, &a );
                     *(p_dst++) = b;
