@@ -939,7 +939,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if (subpicture) {
         // draw the additional vertices
         for (int i = 0; i < sys->d3dregion_count; ++i) {
-            DisplayD3DPicture(sys, (d3d_quad_t *) sys->d3dregions[i]->p_sys);
+            if (sys->d3dregions[i])
+                DisplayD3DPicture(sys, (d3d_quad_t *) sys->d3dregions[i]->p_sys);
         }
     }
 
@@ -1979,6 +1980,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
     int i = 0;
     for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
+        if (!r->fmt.i_width || !r->fmt.i_height)
+            continue; // won't render anything, keep the cache for later
+
         for (int j = 0; j < sys->d3dregion_count; j++) {
             picture_t *cache = sys->d3dregions[j];
             if (cache != NULL && ((d3d_quad_t *) cache->p_sys)->pTexture) {
