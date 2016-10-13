@@ -3238,7 +3238,7 @@ if test "${enable_freetype}" != "no"; then
       VLC_ADD_LIBS([skins2],[${FREETYPE_LIBS}])
 
       dnl fontconfig support
-      if test "${SYS}" != "mingw32"; then
+      if test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" ; then
           if test "${enable_fontconfig}" != "no"; then
             AC_CHECK_HEADERS(fontconfig/fontconfig.h, [
               have_fontconfig="yes"
