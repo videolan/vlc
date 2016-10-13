@@ -377,7 +377,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         }
 
         size_t i_buf;
-        uint8_t *p_buf = NULL;
+        const uint8_t *p_buf = NULL;
         uint8_t *p_alloc_buf = NULL;
         int i_ret = 0;
 
