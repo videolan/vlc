@@ -744,7 +744,6 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_chain;
-    unsigned int i;
 
     /* FIXME: p_aout_buf is NULL when it's time to flush*/
     if( unlikely( !p_aout_buf ) ) return NULL;
@@ -763,7 +762,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         p_sys->i_buffer = p_aout_buf->i_buffer * 2;
     }
 
-    for( i = 0 ; i < p_aout_buf->i_buffer / 2 ; i++ )
+    for( unsigned i = 0 ; i < p_aout_buf->i_buffer / 2 ; i++ )
     {
         p_sys->p_buffer[i]= ((int16_t *)p_aout_buf->p_buffer)[i];
     }
