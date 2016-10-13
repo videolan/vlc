@@ -2021,7 +2021,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             (*region)[i] = picture_NewFromResource(&r->fmt, &picres);
             if ((*region)[i] == NULL) {
                 msg_Err(vd, "Failed to create %dx%d picture for OSD",
-                        r->fmt.i_visible_width, r->fmt.i_visible_height);
+                        r->fmt.i_width, r->fmt.i_height);
                 ReleaseQuad(d3dquad);
                 continue;
             }
