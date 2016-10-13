@@ -236,7 +236,7 @@ AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline
     return i_return;
 }
 
-AbstractStream::status PlaylistManager::dequeue(mtime_t *pi_nzbarrier)
+AbstractStream::status PlaylistManager::dequeue(mtime_t i_floor, mtime_t *pi_nzbarrier)
 {
     AbstractStream::status i_return = AbstractStream::status_eof;
 
@@ -252,7 +252,7 @@ AbstractStream::status PlaylistManager::dequeue(mtime_t *pi_nzbarrier)
         if( i_ret > i_return )
             i_return = i_ret;
 
-        if( i_pcr > VLC_TS_INVALID )
+        if( i_pcr > i_floor )
             *pi_nzbarrier = std::min( *pi_nzbarrier, i_pcr - VLC_TS_0 );
     }
 
@@ -422,7 +422,7 @@ int PlaylistManager::doDemux(int64_t increment)
     mtime_t i_nzbarrier = demux.i_nzpcr + increment;
     vlc_mutex_unlock(&demux.lock);
 
-    AbstractStream::status status = dequeue(&i_nzbarrier);
+    AbstractStream::status status = dequeue(demux.i_nzpcr, &i_nzbarrier);
 
     updateControlsContentType();
     updateControlsPosition();
