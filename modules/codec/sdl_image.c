@@ -186,14 +186,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         case 8:
         {
-            int i, j;
             uint8_t *p_src, *p_dst;
             uint8_t r, g, b;
-            for ( i = 0; i < p_surface->h; i++ )
+            for ( int i = 0; i < p_surface->h; i++ )
             {
                 p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
                 p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
-                for ( j = 0; j < p_surface->w; j++ )
+                for ( int j = 0; j < p_surface->w; j++ )
                 {
                     SDL_GetRGB( *(p_src++), p_surface->format,
                                 &r, &g, &b );
@@ -206,13 +205,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
         case 16:
         {
-            int i;
             uint8_t *p_src = p_surface->pixels;
             uint8_t *p_dst = p_pic->p[0].p_pixels;
             int i_pitch = p_pic->p[0].i_pitch < p_surface->pitch ?
                 p_pic->p[0].i_pitch : p_surface->pitch;
 
-            for ( i = 0; i < p_surface->h; i++ )
+            for ( int i = 0; i < p_surface->h; i++ )
             {
                 memcpy( p_dst, p_src, i_pitch );
                 p_src += p_surface->pitch;
@@ -222,14 +220,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
         case 24:
         {
-            int i, j;
             uint8_t *p_src, *p_dst;
             uint8_t r, g, b;
-            for ( i = 0; i < p_surface->h; i++ )
+            for ( int i = 0; i < p_surface->h; i++ )
             {
                 p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
                 p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
-                for ( j = 0; j < p_surface->w; j++ )
+                for ( int j = 0; j < p_surface->w; j++ )
                 {
                     SDL_GetRGB( *(uint32_t*)p_src, p_surface->format,
                                 &r, &g, &b );
@@ -243,14 +240,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
         case 32:
         {
-            int i, j;
             uint8_t *p_src, *p_dst;
             uint8_t r, g, b, a;
-            for ( i = 0; i < p_surface->h; i++ )
+            for ( int i = 0; i < p_surface->h; i++ )
             {
                 p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
                 p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
-                for ( j = 0; j < p_surface->w; j++ )
+                for ( int j = 0; j < p_surface->w; j++ )
                 {
                     SDL_GetRGBA( *(uint32_t*)p_src, p_surface->format,
                                 &r, &g, &b, &a );
