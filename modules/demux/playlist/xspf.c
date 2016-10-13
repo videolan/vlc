@@ -484,24 +484,19 @@ static bool parse_track_node COMPLEX_INTERFACE
             if (psz_value == NULL)
                 input_item_SetURI(p_new_input, "vlc://nop");
             else
-            /* FIXME (#4005): This is broken. Scheme-relative (//...) locations
-             * and anchors (#...) are not resolved correctly. Also,
-             * host-relative (/...) and directory-relative locations
-             * ("relative path" in vernacular) should be resolved.
-             * -- Courmisch */
-            if (p_sys->psz_base && !strstr(psz_value, "://"))
             {
-                char* psz_tmp;
-                if (asprintf(&psz_tmp, "%s%s", p_sys->psz_base, psz_value)
-                    == -1)
+                char* psz_uri = ProcessMRL( psz_value, p_sys->psz_base );
+
+                if( !psz_uri )
                 {
+                    msg_Warn( p_demux, "unable to process MRL: %s", psz_value );
                     goto end;
                 }
-                input_item_SetURI(p_new_input, psz_tmp);
-                free(psz_tmp);
+
+                input_item_SetURI(p_new_input, psz_uri);
+                free(psz_uri);
             }
-            else
-                input_item_SetURI(p_new_input, psz_value);
+
             input_item_CopyOptions(p_new_input, p_input_item);
         }
         else
