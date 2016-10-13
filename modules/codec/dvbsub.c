@@ -1471,10 +1471,8 @@ static void free_all( decoder_t *p_dec )
 
     for( p_reg = p_sys->p_regions; p_reg != NULL; p_reg = p_reg_next )
     {
-        int i;
-
         p_reg_next = p_reg->p_next;
-        for( i = 0; i < p_reg->i_object_defs; i++ )
+        for( int i = 0; i < p_reg->i_object_defs; i++ )
             free( p_reg->p_object_defs[i].psz_text );
         if( p_reg->i_object_defs ) free( p_reg->p_object_defs );
         free( p_reg->p_pixbuf );
@@ -2160,7 +2158,6 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
     encoder_sys_t *p_sys = p_enc->p_sys;
     subpicture_region_t *p_region = p_subpic->p_region;
     video_palette_t *p_pal, pal;
-    int i;
 
     /* Sanity check */
     if( !p_region ) return;
@@ -2172,7 +2169,7 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
     else
     {
         pal.i_entries = 4;
-        for( i = 0; i < 4; i++ )
+        for( int i = 0; i < 4; i++ )
         {
             pal.palette[i][0] = 0;
             pal.palette[i][1] = 0;
@@ -2191,7 +2188,7 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
     bs_write( s, 4, p_sys->i_clut_ver++ );
     bs_write( s, 4, 0 ); /* Reserved */
 
-    for( i = 0; i < p_pal->i_entries; i++ )
+    for( int i = 0; i < p_pal->i_entries; i++ )
     {
         bs_write( s, 8, i ); /* Clut entry id */
         bs_write( s, 1, p_pal->i_entries == 4 );   /* 2bit/entry flag */
