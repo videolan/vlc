@@ -70,7 +70,7 @@ motion_sensors_t *motion_create( vlc_object_t *obj )
         return NULL;
     }
 
-    if( access( "/sys/devices/platform/hdaps/position", R_OK ) == 0 
+    if( access( "/sys/devices/platform/hdaps/position", R_OK ) == 0
         && ( f = fopen( "/sys/devices/platform/hdaps/calibrate", "re" ) ) )
     {
         /* IBM HDAPS support */
@@ -85,7 +85,7 @@ motion_sensors_t *motion_create( vlc_object_t *obj )
         motion->sensor = AMS_SENSOR;
         msg_Dbg( obj, "AMS motion detection correctly loaded" );
     }
-    else if( access( "/sys/devices/platform/applesmc.768/position", R_OK ) == 0 
+    else if( access( "/sys/devices/platform/applesmc.768/position", R_OK ) == 0
              && ( f = fopen( "/sys/devices/platform/applesmc.768/calibrate", "re" ) ) )
     {
         /* Apple SMC (newer macbooks) */
