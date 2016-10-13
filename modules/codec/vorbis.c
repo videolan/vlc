@@ -678,14 +678,10 @@ static void ConfigureChannelOrder(uint8_t *pi_chan_table, int i_channels,
             pi_channels_in = pi_3channels_in;
             break;
         default:
-            {
-                int i;
-                for( i = 0; i< i_channels; ++i )
-                {
-                    pi_chan_table[i] = i;
-                }
-                return;
-            }
+            for( int i = 0; i< i_channels; ++i )
+                pi_chan_table[i] = i;
+
+            return;
     }
 
     if( b_decode )
