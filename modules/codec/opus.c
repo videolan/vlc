@@ -472,8 +472,7 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     {
         float gain = pow(10., p_sys->header.gain/5120.);
         float *buf =(float *)p_aout_buffer->p_buffer;
-        int i;
-        for( i = 0; i < i_nb_samples*p_sys->header.channels; i++)
+        for( int i = 0; i < i_nb_samples*p_sys->header.channels; i++)
             buf[i] *= gain;
     }
 #endif
