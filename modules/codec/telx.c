@@ -334,9 +334,8 @@ static void decode_string( char * res, int res_len,
 {
     char utf8[7];
     char * pt = res;
-    int i;
 
-    for ( i = 0; i < len; i++ )
+    for ( int i = 0; i < len; i++ )
     {
         int in = bytereverse( packet[i] ) & 0x7f;
         uint16_t out = 32;
@@ -436,7 +435,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     subpicture_t  *p_spu = NULL;
     video_format_t fmt;
     /* int erase = 0; */
-    int len, offset;
+    int len;
 #if 0
     int i_wanted_magazine = i_conf_wanted_page / 100;
     int i_wanted_page = 0x10 * ((i_conf_wanted_page % 100) / 10)
@@ -455,7 +454,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     dbg((p_dec, "start of telx packet with header %2x\n",
                 * (uint8_t *) p_block->p_buffer));
     len = p_block->i_buffer;
-    for ( offset = 1; offset + 46 <= len; offset += 46 )
+    for ( int offset = 1; offset + 46 <= len; offset += 46 )
     {
         uint8_t * packet = (uint8_t *) p_block->p_buffer+offset;
 //        int vbi = ((0x20 & packet[2]) != 0 ? 0 : 313) + (0x1F & packet[2]);
@@ -490,9 +489,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         {
             /* row 0 : flags and header line */
             int flag = 0;
-            int a;
 
-            for ( a = 0; a < 6; a++ )
+            for ( int a = 0; a < 6; a++ )
             {
                 flag |= (0xF & (bytereverse( hamming_8_4(packet[8 + a]) ) >> 4))
                           << (a * 4);
@@ -545,12 +543,10 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             if ( /*p_block->i_pts > p_sys->prev_pts + 1500000 && */
                  p_sys->b_erase[magazine] )
             {
-                int i;
-
                 dbg((p_dec, "ERASE !\n"));
 
                 p_sys->b_erase[magazine] = 0;
-                for ( i = 1; i < 32; i++ )
+                for ( int i = 1; i < 32; i++ )
                 {
                     if ( !p_sys->ppsz_lines[i][0] ) continue;
                     /* b_update = true; */
