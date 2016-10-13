@@ -1142,9 +1142,8 @@ out:
 
 static void print_playlist( intf_thread_t *p_intf, playlist_item_t *p_item, int i_level )
 {
-    int i;
     char psz_buffer[MSTRTIME_MAX_SIZE];
-    for( i = 0; i< p_item->i_children; i++ )
+    for( int i = 0; i< p_item->i_children; i++ )
     {
         if( p_item->pp_children[i]->p_input->i_duration != -1 )
         {
@@ -1548,7 +1547,6 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         /* get */
         vlc_value_t val_name;
         vlc_value_t val, text;
-        int i;
         float f_value = 0.;
         char *psz_value = NULL;
 
@@ -1580,7 +1578,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         msg_rc( "+----[ %s ]", val_name.psz_string );
         if( !strcmp( psz_variable, "zoom" ) )
         {
-            for ( i = 0; i < val.p_list->i_count; i++ )
+            for ( int i = 0; i < val.p_list->i_count; i++ )
             {
                 if ( f_value == val.p_list->p_values[i].f_float )
                     msg_rc( "| %f - %s *", val.p_list->p_values[i].f_float,
@@ -1592,7 +1590,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            for ( i = 0; i < val.p_list->i_count; i++ )
+            for ( int i = 0; i < val.p_list->i_count; i++ )
             {
                 if ( !strcmp( psz_value, val.p_list->p_values[i].psz_string ) )
                     msg_rc( "| %s - %s *", val.p_list->p_values[i].psz_string,
@@ -1908,7 +1906,7 @@ static input_item_t *parse_MRL( const char *mrl )
     input_item_t *p_item = NULL;
     char *psz_item = NULL, *psz_item_mrl = NULL, *psz_orig, *psz_mrl;
     char **ppsz_options = NULL;
-    int i, i_options = 0;
+    int i_options = 0;
 
     if( !mrl ) return 0;
 
@@ -1970,7 +1968,7 @@ static input_item_t *parse_MRL( const char *mrl )
     if( psz_item_mrl )
     {
         p_item = input_item_New( psz_item_mrl, NULL );
-        for( i = 0; i < i_options; i++ )
+        for( int i = 0; i < i_options; i++ )
         {
             input_item_AddOption( p_item, ppsz_options[i], VLC_INPUT_OPTION_TRUSTED );
         }
