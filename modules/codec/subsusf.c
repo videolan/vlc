@@ -182,8 +182,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     if( p_sys->pp_ssa_styles )
     {
-        int i;
-        for( i = 0; i < p_sys->i_ssa_styles; i++ )
+        for( int i = 0; i < p_sys->i_ssa_styles; i++ )
         {
             if( !p_sys->pp_ssa_styles[i] )
                 continue;
@@ -196,8 +195,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     }
     if( p_sys->pp_images )
     {
-        int i;
-        for( i = 0; i < p_sys->i_images; i++ )
+        for( int i = 0; i < p_sys->i_images; i++ )
         {
             if( !p_sys->pp_images[i] )
                 continue;
@@ -312,9 +310,7 @@ static ssa_style_t *ParseStyle( decoder_sys_t *p_sys, char *psz_subtitle )
 
     if( psz_style )
     {
-        int i;
-
-        for( i = 0; i < p_sys->i_ssa_styles; i++ )
+        for( int i = 0; i < p_sys->i_ssa_styles; i++ )
         {
             if( !strcmp( p_sys->pp_ssa_styles[i]->psz_stylename, psz_style ) )
                 p_ssa_style = p_sys->pp_ssa_styles[i];
@@ -440,9 +436,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
         p_ssa_style = ParseStyle( p_sys, psz_subtitle );
         if( !p_ssa_style )
         {
-            int i;
-
-            for( i = 0; i < p_sys->i_ssa_styles; i++ )
+            for( int i = 0; i < p_sys->i_ssa_styles; i++ )
             {
                 if( !strcasecmp( p_sys->pp_ssa_styles[i]->psz_stylename, "Default" ) )
                     p_ssa_style = p_sys->pp_ssa_styles[i];
@@ -488,12 +482,11 @@ static int ParseImageAttachments( decoder_t *p_dec )
     decoder_sys_t        *p_sys = p_dec->p_sys;
     input_attachment_t  **pp_attachments;
     int                   i_attachments_cnt;
-    int                   k = 0;
 
     if( VLC_SUCCESS != decoder_GetInputAttachments( p_dec, &pp_attachments, &i_attachments_cnt ))
         return VLC_EGENERIC;
 
-    for( k = 0; k < i_attachments_cnt; k++ )
+    for( int k = 0; k < i_attachments_cnt; k++ )
     {
         input_attachment_t *p_attach = pp_attachments[k];
 
@@ -1082,7 +1075,6 @@ static char *CreatePlainText( char *psz_subtitle )
     s = strpbrk( psz_text, "\t\r\n " );
     while( s )
     {
-        int   k;
         char  spc = ' ';
         int   i_whitespace = strspn( s, "\t\r\n " );
 
@@ -1090,7 +1082,7 @@ static char *CreatePlainText( char *psz_subtitle )
          * occurs in the whitespace use a '\n' as our value,
          * otherwise just use a ' '
          */
-        for( k = 0; k < i_whitespace; k++ )
+        for( int k = 0; k < i_whitespace; k++ )
             if( s[k] == '\n' ) spc = '\n';
 
         if( i_whitespace > 1 )
