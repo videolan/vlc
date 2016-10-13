@@ -2048,12 +2048,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
         d3d_quad_t *quad = (d3d_quad_t *) quad_picture->p_sys;
 
-        quad->cropViewport.Width =  (FLOAT) r->fmt.i_visible_width * RECTHeight(sys->rect_dest) / subpicture->i_original_picture_height;
-        quad->cropViewport.Height = (FLOAT) r->fmt.i_visible_height * RECTWidth(sys->rect_dest) / subpicture->i_original_picture_width;
+        quad->cropViewport.Width =  (FLOAT) r->fmt.i_visible_width  * RECTWidth(sys->rect_dest)  / subpicture->i_original_picture_width;
+        quad->cropViewport.Height = (FLOAT) r->fmt.i_visible_height * RECTHeight(sys->rect_dest) / subpicture->i_original_picture_height;
         quad->cropViewport.MinDepth = 0.0f;
         quad->cropViewport.MaxDepth = 1.0f;
-        quad->cropViewport.TopLeftX = r->i_x * RECTHeight(sys->rect_dest) / subpicture->i_original_picture_height;
-        quad->cropViewport.TopLeftY = r->i_y * RECTWidth(sys->rect_dest) / subpicture->i_original_picture_width;
+        quad->cropViewport.TopLeftX = sys->rect_dest.left + (FLOAT) r->i_x * RECTWidth(sys->rect_dest) / subpicture->i_original_picture_width;
+        quad->cropViewport.TopLeftY = sys->rect_dest.top  + (FLOAT) r->i_y * RECTHeight(sys->rect_dest) / subpicture->i_original_picture_height;
 
         UpdateQuadOpacity(vd, quad, r->i_alpha / 255.0f );
     }
