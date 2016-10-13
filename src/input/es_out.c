@@ -1337,7 +1337,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     {
         const vlc_epg_t *p_tmp = p_item->pp_epg[i];
 
-        if( p_tmp->psz_name && !strcmp(p_tmp->psz_name, psz_cat) )
+        if( p_tmp->i_source_id == p_pgrm->i_id )
         {
             if( p_tmp->p_current && p_tmp->p_current->psz_name && *p_tmp->p_current->psz_name )
                 p_pgrm->psz_now_playing = strdup( p_tmp->p_current->psz_name );
