@@ -639,7 +639,12 @@ static void mpv_decode (demux_t *demux, void *data, block_t *block)
  */
 static void *ts_init (demux_t *demux)
 {
-    return stream_init (demux, *demux->psz_demux ? demux->psz_demux : "ts");
+    char const* name = demux->psz_demux;
+
+    if (*name == '\0' || !strcasecmp(name, "any"))
+        name = NULL;
+
+    return stream_init (demux, name ? name : "ts");
 }
 
 
