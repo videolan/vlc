@@ -519,12 +519,21 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
         vlc_meta_Set##metaName( p_meta,                                        \
                                 (*list.begin())->toString().toCString( true ) );
 
+#define SET_EXTRA( tagName, metaName )\
+    list = tag->frameListMap()[tagName];\
+    if( !list.isEmpty() )\
+        vlc_meta_AddExtra( p_meta, metaName,\
+                           (*list.begin())->toString().toCString( true ) );
+
+
     SET( "TCOP", Copyright );
     SET( "TENC", EncodedBy );
     SET( "TLAN", Language );
     SET( "TPUB", Publisher );
     SET( "TPE2", AlbumArtist );
+    SET_EXTRA( "USLT", "Lyrics" );
 
+#undef SET_EXTRA
 #undef SET
 
     /* */
