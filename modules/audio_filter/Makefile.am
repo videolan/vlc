@@ -81,7 +81,8 @@ libaudio_format_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libaudio_format_plugin_la_LIBADD = $(LIBM)
 
 libtospdif_plugin_la_SOURCES = audio_filter/converter/tospdif.c \
-	packetizer/a52.h
+	packetizer/a52.h \
+	packetizer/dts_header.c packetizer/dts_header.h
 
 audio_filter_LTLIBRARIES += \
 	libtospdif_plugin.la \

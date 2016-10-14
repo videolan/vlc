@@ -38,6 +38,7 @@
 #include <vlc_filter.h>
 
 #include "../packetizer/a52.h"
+#include "../packetizer/dts_header.h"
 
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -202,7 +203,16 @@ static int write_buffer_ac3( filter_t *p_filter, block_t *p_in_buf )
     if( unlikely( p_in_buf->i_buffer < 6
      || p_in_buf->i_buffer > A52_FRAME_NB * 4
      || p_in_buf->i_nb_samples != A52_FRAME_NB ) )
-        return SPDIF_ERROR;
+    {
+        /* Input is not correctly packetizer. Try to parse the buffer in order
+         * to get the mandatory informations to play AC3 over S/PDIF */
+        vlc_a52_header_t a52;
+        if( vlc_a52_header_Parse( &a52, p_in_buf->p_buffer, p_in_buf->i_buffer )
+            != VLC_SUCCESS || a52.b_eac3 )
+            return SPDIF_ERROR;
+        p_in_buf->i_buffer = a52.i_size;
+        p_in_buf->i_nb_samples = a52.i_samples;
+    }
 
     if( write_init( p_filter, p_in_buf, A52_FRAME_NB * 4, A52_FRAME_NB ) )
         return SPDIF_ERROR;
@@ -340,6 +350,17 @@ static int write_buffer_truehd( filter_t *p_filter, block_t *p_in_buf )
 static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
 {
     uint16_t i_data_type;
+    if( p_in_buf->i_nb_samples == 0 )
+    {
+        /* Input is not correctly packetizer. Try to parse the buffer in order
+         * to get the mandatory informations to play DTS over S/PDIF */
+        vlc_dts_header_t header;
+        if( vlc_dts_header_Parse( &header, p_in_buf->p_buffer,
+                                  p_in_buf->i_buffer ) != VLC_SUCCESS )
+            return SPDIF_ERROR;
+        p_in_buf->i_nb_samples = header.i_frame_length;
+        p_in_buf->i_buffer = header.i_frame_size;
+    }
     switch( p_in_buf->i_nb_samples )
     {
     case  512:
@@ -425,10 +446,6 @@ static int Open( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-
-    if( p_filter->fmt_in.audio.i_frame_length == 0
-     || p_filter->fmt_in.audio.i_bytes_per_frame == 0 )
-        return VLC_EGENERIC;
 
     if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_DTS &&
           p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 &&

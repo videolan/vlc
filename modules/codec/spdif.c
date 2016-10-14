@@ -85,8 +85,6 @@ OpenDecoder(vlc_object_t *p_this)
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
 
     if (p_dec->fmt_out.audio.i_channels == 0
-     || p_dec->fmt_out.audio.i_bytes_per_frame == 0
-     || p_dec->fmt_out.audio.i_frame_length == 0
      || decoder_UpdateAudioFormat(p_dec))
     {
         es_format_Init(&p_dec->fmt_out, UNKNOWN_ES, 0);
