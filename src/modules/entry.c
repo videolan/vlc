@@ -129,8 +129,8 @@ static module_config_t *vlc_config_create (module_t *module, int type)
     memset (tab + confsize, 0, sizeof (tab[confsize]));
     if (IsConfigIntegerType (type))
     {
-        tab[confsize].max.i = INT_MAX;
-        tab[confsize].min.i = INT_MIN;
+        tab[confsize].max.i = INT64_MAX;
+        tab[confsize].min.i = INT64_MIN;
     }
     else if( IsConfigFloatType (type))
     {
