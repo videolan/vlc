@@ -167,7 +167,12 @@ DEPS_ffmpeg += directx
 endif
 endif
 FFMPEGCONF += --target-os=mingw32
-FFMPEGCONF += --enable-w32threads --enable-dxva2
+FFMPEGCONF += --enable-w32threads
+ifndef HAVE_WINSTORE
+FFMPEGCONF += --enable-dxva2
+else
+FFMPEGCONF += --disable-dxva2
+endif
 
 ifdef USE_FFMPEG
 FFMPEGCONF += --enable-memalign-hack
