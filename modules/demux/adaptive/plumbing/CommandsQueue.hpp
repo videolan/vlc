@@ -119,6 +119,19 @@ namespace adaptive
             EsOutControlResetPCRCommand();
     };
 
+    class EsOutMetaCommand : public AbstractCommand
+    {
+        friend class CommandsFactory;
+        public:
+            virtual void Execute( es_out_t *out );
+
+        protected:
+            EsOutMetaCommand( int, vlc_meta_t * );
+            virtual ~EsOutMetaCommand();
+            int group;
+            vlc_meta_t *p_meta;
+    };
+
     /* Factory so we can alter behaviour and filter on execution */
     class CommandsFactory
     {
@@ -130,6 +143,7 @@ namespace adaptive
             virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int, mtime_t ) const;
             virtual EsOutControlResetPCRCommand * creatEsOutControlResetPCRCommand() const;
             virtual EsOutDestroyCommand * createEsOutDestroyCommand() const;
+            virtual EsOutMetaCommand * createEsOutMetaCommand( int, const vlc_meta_t * ) const;
     };
 
     /* Queuing for doing all the stuff in order */

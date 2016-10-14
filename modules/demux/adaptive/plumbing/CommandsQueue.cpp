@@ -26,6 +26,7 @@
 #include "FakeESOut.hpp"
 #include <vlc_es_out.h>
 #include <vlc_block.h>
+#include <vlc_meta.h>
 #include <algorithm>
 
 using namespace adaptive;
@@ -156,6 +157,24 @@ void EsOutControlResetPCRCommand::Execute( es_out_t * )
 {
 }
 
+EsOutMetaCommand::EsOutMetaCommand( int i_group, vlc_meta_t *p_meta ) :
+    AbstractCommand( ES_OUT_SET_GROUP_META )
+{
+    group = i_group;
+    this->p_meta = p_meta;
+}
+
+EsOutMetaCommand::~EsOutMetaCommand()
+{
+    if( p_meta )
+        vlc_meta_Delete( p_meta );
+}
+
+void EsOutMetaCommand::Execute( es_out_t *out )
+{
+    es_out_Control( out, ES_OUT_SET_GROUP_META, group, p_meta );
+}
+
 /*
  * Commands Default Factory
  */
@@ -188,6 +207,17 @@ EsOutDestroyCommand * CommandsFactory::createEsOutDestroyCommand() const
 EsOutControlResetPCRCommand * CommandsFactory::creatEsOutControlResetPCRCommand() const
 {
     return new (std::nothrow) EsOutControlResetPCRCommand();
+}
+
+EsOutMetaCommand * CommandsFactory::createEsOutMetaCommand( int group, const vlc_meta_t *p_meta ) const
+{
+    vlc_meta_t *p_dup = vlc_meta_New();
+    if( p_dup )
+    {
+        vlc_meta_Merge( p_dup, p_meta );
+        return new (std::nothrow) EsOutMetaCommand( group, p_dup );
+    }
+    return NULL;
 }
 
 /*
