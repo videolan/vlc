@@ -698,9 +698,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     struct pa_sample_spec ss;
     pa_encoding_t encoding = PA_ENCODING_INVALID;
 
-    if (aout_FormatNbChannels(fmt) == 0)
-        return VLC_EGENERIC;
-
     switch (fmt->i_format)
     {
         case VLC_CODEC_FL64:
@@ -742,11 +739,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_frame_length = 1;
             encoding = PA_ENCODING_DTS_IEC61937;
             ss.format = PA_SAMPLE_S16NE;
-
             break;
         default:
-            if (!AOUT_FMT_LINEAR(fmt))
+            if (!AOUT_FMT_LINEAR(fmt) || aout_FormatNbChannels(fmt) == 0)
                 return VLC_EGENERIC;
+
             if (HAVE_FPU)
             {
                 fmt->i_format = VLC_CODEC_FL32;
@@ -761,7 +758,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     ss.rate = fmt->i_rate;
-    ss.channels = aout_FormatNbChannels(fmt);
+    ss.channels = fmt->i_channels;
     if (!pa_sample_spec_valid(&ss)) {
         msg_Err(aout, "unsupported sample specification");
         return VLC_EGENERIC;
