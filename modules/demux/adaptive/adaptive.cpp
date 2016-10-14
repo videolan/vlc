@@ -134,6 +134,9 @@ static int Open(vlc_object_t *p_obj)
 {
     demux_t *p_demux = (demux_t*) p_obj;
 
+    if(!p_demux->s->psz_url)
+        return VLC_EGENERIC;
+
     std::string mimeType;
 
     char *psz_mime = stream_ContentType(p_demux->s);
