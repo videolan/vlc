@@ -133,6 +133,20 @@ static void test_rfc3986(const char *reference, const char *expected)
     test_url_resolve("http://a/b/c/d;p?q", reference, expected);
 }
 
+static void test_fixup_noop(const char *expected)
+{
+    fprintf(stderr, "\"%s\" -> \"%s\" ?\n", expected, expected);
+
+    char *result = vlc_uri_fixup(expected);
+    assert(result != NULL);
+    if (strcmp(result, expected))
+    {
+        fprintf(stderr, " ERROR: got \"%s\"\n", result);
+        abort();
+    }
+    free(result);
+}
+
 int main (void)
 {
     int val;
@@ -321,6 +335,27 @@ int main (void)
 
     for (size_t i = 0; i < ARRAY_SIZE(rfc3986_cases); i += 2)
         test_rfc3986(rfc3986_cases[i], rfc3986_cases[i + 1]);
+
+    /* Check that fixup does not mangle valid URIs */
+    static const char *valid_uris[] =
+    {
+        "#href", "?opt=val",
+        ".", "..", "/", "../../dir/subdir/subsubdir/file.ext",
+        "//example.com?q=info",
+        "//192.0.2.1/index.html",
+        "//[2001:db8::1]/index.html",
+        "https://www.example.com:8443/?opt1=val1&opt2=val2",
+        "https://192.0.2.1:8443/#foobar",
+        "https://[2001:db8::1]:8443/file?opt=val#foobar",
+        "https://[v9.abcd:efgh]:8443/welcome?to=the#future",
+        "mailto:john@example.com",
+        "mailto:mailman@example.com?subject=help",
+        "mailto:mailman@example.com?body=subscribe%20news-flash",
+        "mailto:literal@[192.0.2.1],literal@[IPv6:2001:db8::1]",
+    };
+
+    for (size_t i = 0; i < ARRAY_SIZE(valid_uris); i++)
+        test_fixup_noop(valid_uris[i]);
 
     return 0;
 }
