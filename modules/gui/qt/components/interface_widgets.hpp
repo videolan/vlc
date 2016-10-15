@@ -74,6 +74,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *) Q_DECL_OVERRIDE;
     void mouseDoubleClickEvent(QMouseEvent *) Q_DECL_OVERRIDE;
+    QSize physicalSize() const;
 
 private:
     int qtMouseButton2VLC( Qt::MouseButton );
@@ -82,6 +83,9 @@ private:
 
     QWidget *stable;
     QLayout *layout;
+
+    void reportSize();
+
 signals:
     void sizeChanged( int, int );
 

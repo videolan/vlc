@@ -59,6 +59,11 @@
 # include <QWindow>
 #endif
 
+#if defined(_WIN32) && HAS_QT5
+#include <QWindow>
+#include <qpa/qplatformnativeinterface.h>
+#endif
+
 #include <math.h>
 #include <assert.h>
 
@@ -176,6 +181,56 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
     return true;
 }
 
+QSize VideoWidget::physicalSize() const
+{
+#if defined(HAVE_X11_XLIB_H) && HAS_QT5
+    if ( QX11Info::isPlatformX11() )
+    {
+        Display *p_x_display = QX11Info::display();
+        Window x_window = stable->winId();
+        XWindowAttributes x_attributes;
+
+        XGetWindowAttributes( p_x_display, x_window, &x_attributes );
+
+        return QSize( x_attributes.width, x_attributes.height );
+    }
+#endif
+#if defined(_WIN32) && HAS_QT5
+    HWND hwnd;
+    RECT rect;
+
+    QWindow *window = stable->windowHandle();
+    hwnd = static_cast<HWND>(QGuiApplication::platformNativeInterface()->nativeResourceForWindow("handle", window));
+
+    GetClientRect(hwnd, &rect);
+
+    return QSize( rect.right, rect.bottom );
+#endif
+
+    QSize current_size = size();
+
+#   if HAS_QT56
+    /* Android-like scaling */
+    current_size *= devicePixelRatioF();
+#   elif HAS_QT54
+    /* OSX-like scaling */
+    current_size *= devicePixelRatio();
+#   else
+#       warning "No HiDPI support"
+#   endif
+
+    return current_size;
+}
+
+void VideoWidget::reportSize()
+{
+    if( !p_window )
+        return;
+
+    QSize size = physicalSize();
+    vout_window_ReportSize( p_window, size.width(), size.height() );
+}
+
 /* Set the Widget to the correct Size */
 /* Function has to be called by the parent
    Parent has to care about resizing itself */
@@ -186,8 +241,7 @@ void VideoWidget::setSize( unsigned int w, unsigned int h )
      */
     if( (unsigned)size().width() == w && (unsigned)size().height() == h )
     {
-        if( p_window != NULL )
-            vout_window_ReportSize( p_window, w, h );
+        reportSize();
         return;
     }
 
@@ -205,11 +259,9 @@ void VideoWidget::setSize( unsigned int w, unsigned int h )
 
 void VideoWidget::resizeEvent( QResizeEvent *event )
 {
-    if( p_window != NULL )
-        vout_window_ReportSize( p_window, event->size().width(),
-                                event->size().height() );
-
     QWidget::resizeEvent( event );
+
+    reportSize();
 }
 
 int VideoWidget::qtMouseButton2VLC( Qt::MouseButton qtButton )

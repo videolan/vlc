@@ -47,6 +47,7 @@
 #endif
 
 #define HAS_QT5  ( QT_VERSION >= 0x050000 )
+#define HAS_QT54 ( QT_VERSION >= 0x050400 )
 #define HAS_QT56 ( QT_VERSION >= 0x050600 )
 
 /* Q_DECL_OVERRIDE is a Qt5 feature, add empty define to not break with Qt4 */
