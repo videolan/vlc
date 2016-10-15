@@ -182,18 +182,19 @@ static int Open( vlc_object_t *p_this )
     p_sys->size = 0;
     p_access->p_sys = p_sys;
 
-    vlc_http_auth_Init( &p_sys->auth );
-    vlc_http_auth_Init( &p_sys->proxy_auth );
-    vlc_UrlParse( &p_sys->url, psz_url );
-    vlc_credential_init( &credential, &p_sys->url );
-
-    if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
+    if( vlc_UrlParse( &p_sys->url, psz_url ) || p_sys->url.psz_host == NULL )
     {
-        msg_Warn( p_access, "invalid host" );
-        goto error;
+        msg_Err( p_access, "invalid URL" );
+        vlc_UrlClean( &p_sys->url );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
     if( p_sys->url.i_port <= 0 )
         p_sys->url.i_port = 80;
+
+    vlc_http_auth_Init( &p_sys->auth );
+    vlc_http_auth_Init( &p_sys->proxy_auth );
+    vlc_credential_init( &credential, &p_sys->url );
 
     /* Determine the HTTP user agent */
     /* See RFC2616 §2.2 token and comment definition, and §3.8 and
