@@ -185,7 +185,8 @@ int vlc_http_res_init(struct vlc_http_resource *restrict res,
     vlc_url_t url;
     bool secure;
 
-    vlc_UrlParse(&url, uri);
+    if (vlc_UrlParse(&url, uri))
+        goto error;
     if (url.psz_protocol == NULL || url.psz_host == NULL)
     {
         errno = EINVAL;
