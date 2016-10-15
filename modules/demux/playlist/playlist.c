@@ -255,7 +255,6 @@ char *ProcessMRL(const char *str, const char *base)
     /* TODO: drive-relative path: if (str[0] == '\\') */
 #endif
 
-#ifdef HAVE_OPEN_MEMSTREAM
     /* The base URL is always an URL: it is the URL of the playlist.
      *
      * However it is not always known if the input string is a valid URL, a
@@ -281,19 +280,6 @@ char *ProcessMRL(const char *str, const char *base)
     char *abs = vlc_uri_resolve(base, str);
     free(rel);
     return abs;
-#else
-    if (strstr(str, "://") != NULL)
-        return strdup(str);
-
-    const char *split = strrchr(base, '/');
-    char *abs;
-
-    assert(split != NULL);
-
-    if (asprintf(&abs, "%.*s/%s", (int)(split - base), base, str) == -1)
-        abs = NULL;
-    return abs;
-#endif
 }
 
 /**
