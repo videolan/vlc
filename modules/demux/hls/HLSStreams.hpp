@@ -30,7 +30,7 @@ namespace hls
     {
         public:
             HLSStream(demux_t *);
-            int ID3PrivTagHandler( const uint8_t *, size_t );
+            virtual ~HLSStream();
 
         protected:
             virtual AbstractDemuxer * createDemux(const StreamFormat &); /* reimpl */
@@ -38,7 +38,12 @@ namespace hls
             virtual block_t *checkBlock(block_t *, bool); /* reimpl */
 
         private:
+            static int ID3TAG_Parse_Handler(uint32_t, const uint8_t *, size_t, void *);
+            int ParseID3Tag(uint32_t, const uint8_t *, size_t);
+            int ParseID3PrivTag(const uint8_t *, size_t);
             bool b_id3_timestamps_offset_set;
+            vlc_meta_t *p_meta;
+            bool b_meta_updated;
     };
 
     class HLSStreamFactory : public AbstractStreamFactory

@@ -23,10 +23,12 @@
 
 #include "HLSStreams.hpp"
 #include <vlc_demux.h>
+#include <vlc_meta.h>
 
 extern "C"
 {
     #include "../meta_engine/ID3Tag.h"
+    #include "../meta_engine/ID3Meta.h"
 }
 
 using namespace hls;
@@ -35,6 +37,14 @@ HLSStream::HLSStream(demux_t *demux)
     : AbstractStream(demux)
 {
     b_id3_timestamps_offset_set = false;
+    p_meta = vlc_meta_New();
+    b_meta_updated = false;
+}
+
+HLSStream::~HLSStream()
+{
+    if(p_meta)
+        vlc_meta_Delete(p_meta);
 }
 
 void HLSStream::setTimeOffset(mtime_t i_offset)
@@ -92,7 +102,7 @@ AbstractDemuxer * HLSStream::createDemux(const StreamFormat &format)
     return ret;
 }
 
-int HLSStream::ID3PrivTagHandler(const uint8_t *p_payload, size_t i_payload)
+int HLSStream::ParseID3PrivTag(const uint8_t *p_payload, size_t i_payload)
 {
     if(i_payload == 53 &&
        !memcmp( p_payload, "com.apple.streaming.transportStreamTimestamp", 45))
@@ -103,19 +113,20 @@ int HLSStream::ID3PrivTagHandler(const uint8_t *p_payload, size_t i_payload)
             setTimeOffset(i_aac_offset);
             b_id3_timestamps_offset_set = true;
         }
-        return VLC_EGENERIC; /* stop parsing */
     }
     return VLC_SUCCESS;
 }
 
-static int ID3TAG_Parse_Handler(uint32_t i_tag, const uint8_t *p_payload, size_t i_payload, void *p_priv)
+int HLSStream::ParseID3Tag(uint32_t i_tag, const uint8_t *p_payload, size_t i_payload)
+{
+    (void) ID3HandleTag(p_payload, i_payload, i_tag, p_meta, &b_meta_updated);
+    return VLC_SUCCESS;
+}
+
+int HLSStream::ID3TAG_Parse_Handler(uint32_t i_tag, const uint8_t *p_payload, size_t i_payload, void *p_priv)
 {
     HLSStream *hlsstream = static_cast<HLSStream *>(p_priv);
-
-    if(i_tag == VLC_FOURCC('P', 'R', 'I', 'V'))
-        return hlsstream->ID3PrivTagHandler(p_payload, i_payload);
-
-    return VLC_SUCCESS;
+    return hlsstream->ParseID3Tag(i_tag, p_payload, i_payload);
 }
 
 block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
@@ -133,6 +144,14 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
             if( i_size == 0 )
                 break;
         }
+    }
+
+    if( b_meta_updated )
+    {
+        b_meta_updated = false;
+        AbstractCommand *command = commandsqueue->factory()->createEsOutMetaCommand( -1, p_meta );
+        if( command )
+            commandsqueue->Schedule( command );
     }
 
     return p_block;
