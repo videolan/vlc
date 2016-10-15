@@ -360,6 +360,19 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
         }
         break;
 
+        case ES_OUT_SET_GROUP_META:
+        {
+            static_cast<void>(va_arg( args, int )); /* ignore group */
+            const vlc_meta_t *p_meta = static_cast<const vlc_meta_t *>(va_arg( args, const vlc_meta_t * ));
+            AbstractCommand *command = me->commandsqueue->factory()->createEsOutMetaCommand( -1, p_meta );
+            if( likely(command) )
+            {
+                me->commandsqueue->Schedule( command );
+                return VLC_SUCCESS;
+            }
+        }
+        break;
+
         /* For others, we don't have the delorean, so always lie */
         case ES_OUT_GET_ES_STATE:
         {
