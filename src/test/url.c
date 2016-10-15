@@ -256,6 +256,8 @@ int main (void)
                    NULL, NULL);
     test_url_parse("/file", NULL, NULL, NULL, NULL, 0, "/file", NULL);
     test_url_parse("?opt=val", NULL, NULL, NULL, NULL, 0, "", "opt=val");
+    test_url_parse("?o1=v1&o2=v2", NULL, NULL, NULL, NULL, 0, "",
+                   "o1=v1&o2=v2");
     test_url_parse("/f?o=v", NULL, NULL, NULL, NULL, 0, "/f", "o=v");
     test_url_parse("//example.com/file", NULL, NULL, NULL, "example.com", 0,
                    "/file", NULL);
