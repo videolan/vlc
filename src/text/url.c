@@ -768,9 +768,20 @@ static char *vlc_idna_to_ascii (const char *idn)
 #if defined (HAVE_IDN)
     char *adn;
 
-    if (idna_to_ascii_8z (idn, &adn, IDNA_ALLOW_UNASSIGNED) != IDNA_SUCCESS)
-        return NULL;
-    return adn;
+    switch (idna_to_ascii_8z(idn, &adn, IDNA_ALLOW_UNASSIGNED))
+    {
+        case IDNA_SUCCESS:
+            return adn;
+        case IDNA_MALLOC_ERROR:
+            errno = ENOMEM;
+            return NULL;
+        case IDNA_DLOPEN_ERROR:
+            errno = ENOSYS;
+            return NULL;
+        default:
+            errno = EINVAL;
+            return NULL;
+    }
 
 #elif defined (_WIN32) && (_WIN32_WINNT >= 0x0601)
     char *ret = NULL;
@@ -781,7 +792,10 @@ static char *vlc_idna_to_ascii (const char *idn)
 
     int len = IdnToAscii (IDN_ALLOW_UNASSIGNED, wide, -1, NULL, 0);
     if (len == 0)
+    {
+        errno = EINVAL;
         goto error;
+    }
 
     wchar_t *buf = malloc (sizeof (*buf) * len);
     if (unlikely(buf == NULL))
@@ -789,6 +803,7 @@ static char *vlc_idna_to_ascii (const char *idn)
     if (!IdnToAscii (IDN_ALLOW_UNASSIGNED, wide, -1, buf, len))
     {
         free (buf);
+        errno = EINVAL;
         goto error;
     }
     ret = FromWide (buf);
@@ -801,7 +816,10 @@ error:
     /* No IDN support, filter out non-ASCII domain names */
     for (const char *p = idn; *p; p++)
         if (((unsigned char)*p) >= 0x80)
+        {
+            errno = ENOSYS;
             return NULL;
+        }
 
     return strdup (idn);
 
