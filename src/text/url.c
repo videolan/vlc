@@ -678,7 +678,11 @@ char *vlc_uri_resolve(const char *base, const char *ref)
     vlc_url_t tgt_uri;
     char *pathbuf = NULL, *ret = NULL;
 
-    vlc_UrlParse(&rel_uri, ref);
+    if (vlc_UrlParse(&rel_uri, ref))
+    {
+        vlc_UrlClean(&rel_uri);
+        return NULL;
+    }
 
     if (rel_uri.psz_protocol != NULL)
     {   /* Short circuit in case of absolute URI */
