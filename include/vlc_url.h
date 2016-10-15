@@ -142,8 +142,6 @@ VLC_API char *vlc_uri_resolve(const char *base, const char *ref) VLC_MALLOC;
  */
 VLC_API char *vlc_uri_fixup(const char *) VLC_MALLOC;
 
-/** @} */
-
 struct vlc_url_t
 {
     char *psz_protocol;
@@ -157,7 +155,22 @@ struct vlc_url_t
     char *psz_buffer; /* to be freed */
 };
 
-VLC_API void vlc_UrlParse (vlc_url_t *, const char *);
-VLC_API void vlc_UrlClean (vlc_url_t *);
+/**
+ * Splits an URL into parts.
+ *
+ * \param url structure of URL parts [OUT]
+ * \param str nul-terminated URL string to split
+ * \note Use vlc_UrlClean() to free associated resources
+ * \bug Errors cannot be detected.
+ * \return nothing
+ */
+VLC_API void vlc_UrlParse(vlc_url_t *url, const char *str);
+
+/**
+ * Releases resources allocated by vlc_UrlParse().
+ */
+VLC_API void vlc_UrlClean(vlc_url_t *);
+
+/** @} */
 
 #endif

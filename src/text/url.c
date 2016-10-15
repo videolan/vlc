@@ -356,14 +356,6 @@ static bool vlc_uri_path_validate(const char *str)
     return vlc_uri_component_validate(str, "/@:");
 }
 
-/**
- * Splits an URL into parts.
- * \param url structure of URL parts [OUT]
- * \param str nul-terminated URL string to split
- * \note Use vlc_UrlClean() to free associated resources
- * \bug Errors cannot be detected.
- * \return nothing
- */
 void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
 {
     url->psz_protocol = NULL;
@@ -493,9 +485,6 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
         url->psz_path = NULL;
 }
 
-/**
- * Releases resources allocated by vlc_UrlParse().
- */
 void vlc_UrlClean (vlc_url_t *restrict url)
 {
     free (url->psz_host);
