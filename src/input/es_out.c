@@ -1211,6 +1211,13 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     {
         return;
     }
+
+    if( i_group < 0 )
+    {
+        EsOutMeta( out, p_meta );
+        return;
+    }
+
     /* Find program */
     if( !EsOutIsProgramVisible( out, i_group ) )
         return;
