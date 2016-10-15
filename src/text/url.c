@@ -325,8 +325,7 @@ static char *vlc_idna_to_ascii (const char *);
 
 static bool vlc_uri_component_validate(const char *str, const char *extras)
 {
-    if (str == NULL)
-        return false;
+    assert(str != NULL);
 
     for (size_t i = 0; str[i] != '\0'; i++)
     {
@@ -356,7 +355,7 @@ static bool vlc_uri_path_validate(const char *str)
     return vlc_uri_component_validate(str, "/@:");
 }
 
-void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
+int vlc_UrlParse(vlc_url_t *restrict url, const char *str)
 {
     url->psz_protocol = NULL;
     url->psz_username = NULL;
@@ -368,14 +367,18 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
     url->psz_buffer = NULL;
 
     if (str == NULL)
-        return;
+    {
+        errno = EINVAL;
+        return -1;
+    }
 
     char *buf = strdup (str);
     if (unlikely(buf == NULL))
-        abort ();
+        return -1;
     url->psz_buffer = buf;
 
     char *cur = buf, *next;
+    int ret = 0;
 
     /* URI scheme */
     next = buf;
@@ -463,10 +466,16 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
 
             url->psz_host = vlc_idna_to_ascii (cur);
         }
+
+        if (url->psz_host == NULL)
+            ret = -1;
+        else
         if (!vlc_uri_host_validate(url->psz_host))
         {
             free(url->psz_host);
             url->psz_host = NULL;
+            errno = EINVAL;
+            ret = -1;
         }
 
         /* Port number */
@@ -481,8 +490,14 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
         url->psz_path = cur;
     }
 
-    if (!vlc_uri_path_validate(url->psz_path))
+    if (url->psz_path != NULL && !vlc_uri_path_validate(url->psz_path))
+    {
         url->psz_path = NULL;
+        errno = EINVAL;
+        ret = -1;
+    }
+
+    return ret;
 }
 
 void vlc_UrlClean (vlc_url_t *restrict url)
