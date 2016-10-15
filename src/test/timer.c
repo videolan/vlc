@@ -37,7 +37,7 @@ struct timer_data
     vlc_cond_t  wait;
     unsigned count;
 };
-
+/***********************/
 static void callback (void *ptr)
 {
     struct timer_data *data = ptr;
