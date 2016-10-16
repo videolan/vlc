@@ -434,7 +434,7 @@ static void print_item(const module_t *m, const module_config_t *item,
                             module_gettext(m, item->list_text[i]));
                 }
             }
-            else if (item->min.i != INT_MIN || item->max.i != INT_MAX)
+            else if (item->min.i != INT64_MIN || item->max.i != INT64_MAX )
             {
                 if (asprintf(&typebuf, "%s [%"PRId64" .. %"PRId64"]",
                              type, item->min.i, item->max.i) >= 0)
