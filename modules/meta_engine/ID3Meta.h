@@ -51,9 +51,6 @@ static bool ID3TextTagHandler( const uint8_t *p_buf, size_t i_buf,
     const char *psz;
     if( i_buf > 3 && p_meta && p_buf[0] < 0x04 )
     {
-        if( p_buf[ i_buf - 1 ] != 0x00 )
-            return false;
-
         switch( p_buf[0] )
         {
             case 0x00:
@@ -67,7 +64,19 @@ static bool ID3TextTagHandler( const uint8_t *p_buf, size_t i_buf,
                 break;
             default:
             case 0x03:
-                psz = (const char *) &p_buf[1];
+                if( p_buf[ i_buf - 1 ] != 0x00 )
+                {
+                    psz = p_alloc = (char *) malloc( i_buf );
+                    if( p_alloc )
+                    {
+                        memcpy( p_alloc, &p_buf[1], i_buf - 1 );
+                        p_alloc[i_buf - 1] = 0;
+                    }
+                }
+                else
+                {
+                    psz = (const char *) &p_buf[1];
+                }
                 break;
         }
 
