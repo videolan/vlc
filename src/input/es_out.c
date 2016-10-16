@@ -1206,8 +1206,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     /* Check against empty meta data (empty for what we handle) */
     if( !vlc_meta_Get( p_meta, vlc_meta_Title) &&
         !vlc_meta_Get( p_meta, vlc_meta_ESNowPlaying) &&
-        !vlc_meta_Get( p_meta, vlc_meta_Publisher) &&
-        vlc_meta_GetExtraCount( p_meta ) <= 0 )
+        !vlc_meta_Get( p_meta, vlc_meta_Publisher) )
     {
         return;
     }
