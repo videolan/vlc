@@ -215,7 +215,7 @@ bool AbstractStream::startDemux()
     demuxersource->Reset();
     demuxer = createDemux(format);
     if(!demuxer && format != StreamFormat())
-        msg_Err(p_realdemux, "Failed to create demuxer");
+        msg_Err(p_realdemux, "Failed to create demuxer %x %s", demuxer, format.str().c_str());
 
     return !!demuxer;
 }
