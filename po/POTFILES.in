@@ -1017,6 +1017,7 @@ modules/spu/mosaic.c
 modules/spu/remoteosd.c
 modules/spu/rss.c
 modules/spu/subsdelay.c
+modules/stream_extractor/archive.c
 modules/stream_filter/adf.c
 modules/stream_filter/aribcam.c
 modules/stream_filter/cache_block.c

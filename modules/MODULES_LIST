@@ -41,6 +41,7 @@ $Id$
  * antiflicker: anti-flicker video filter
  * aom: AOM decoder (AV1)
  * araw: Pseudo audio decoder for raw PCM
+ * archive: libarchive based access and stream filter and stream_extractor
  * aribcam: ARIB STD-B25 decoder/virtual CAM
  * aribsub: ARIB subtitles decoder
  * asf: ASF demuxer

@@ -128,6 +128,7 @@ Stream filter:
  * Added ADF stream filter
  * Added ARIB STD-B25 TS streams decoder
  * Added stream prebuffering plugin
+ * Rewrite libarchive module as a stream_extractor
  * Removed HTTP Live streaming stream filter
  * Added zlib (a.k.a. deflate) decompression filter
 
