@@ -1896,7 +1896,7 @@ if test "${enable_decklink}" != "no"
 then
   if test "${with_decklink_sdk}" != "no" -a -n "${with_decklink_sdk}"
   then
-    VLC_ADD_CPPFLAGS([decklink decklinkoutput],[-I${with_decklink_sdk}/include])
+    VLC_ADD_CPPFLAGS([decklink decklinkoutput stream_out_sdi],[-I${with_decklink_sdk}/include])
   fi
   VLC_SAVE_FLAGS
   CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_decklink}"

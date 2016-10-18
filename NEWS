@@ -37,6 +37,10 @@ Video output:
  * Remove RealRTSP plugin
  * Remove Real demuxer plugin
 
+Stream output:
+ * New SDI output with improved audio and ancillary support.
+   Candidate for deprecation of decklink vout/aout modules.
+
 macOS:
  * Remove Growl notification support
 

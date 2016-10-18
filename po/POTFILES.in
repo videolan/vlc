@@ -1076,6 +1076,7 @@ modules/stream_out/rtp.c
 modules/stream_out/rtpfmt.c
 modules/stream_out/rtp.h
 modules/stream_out/rtsp.c
+modules/stream_out/sdi/sdiout.cpp
 modules/stream_out/setid.c
 modules/stream_out/smem.c
 modules/stream_out/stats.c

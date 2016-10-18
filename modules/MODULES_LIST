@@ -340,6 +340,7 @@ $Id$
  * scte18: SCTE-18/Emergency Alert Messaging for Cable decoder
  * scte27: SCTE-27/Digicipher subtitles decoder
  * sd_journal: logger output to SystemD journal
+ * sdiout: SDI stream output
  * sdl_image: SDL-based image decoder
  * sdp: SDP fake access
  * secret: store secrets via Gnome libsecret
