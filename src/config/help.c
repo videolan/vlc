@@ -496,7 +496,7 @@ static void print_item(const module_t *m, const module_config_t *item,
     }
 
     printf("%*s", offset, "");
-    print_desc(module_gettext(m, item->psz_longtext),
+    print_desc(module_gettext(m, item->psz_text),
                PADDING_SPACES + LINE_START, color);
 
     if (suffix != NULL)
