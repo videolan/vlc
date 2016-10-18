@@ -501,7 +501,7 @@ static void print_item(const module_t *m, const module_config_t *item,
 
     if (suffix != NULL)
     {
-        printf("%*s", offset, "");
+        printf("%*s", PADDING_SPACES + LINE_START, "");
         print_desc(suffix, PADDING_SPACES + LINE_START, color);
     }
 
