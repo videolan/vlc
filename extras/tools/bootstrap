@@ -60,7 +60,7 @@ check_version_majmin() {
 }
 
 check_tar() {
-if ! tar PcJ /dev/null >/dev/null 2>&1
+if ! tar PcJ /dev/null >/dev/null 2>&1 && ! tar PcJf /dev/null /dev/null 2>&1
 then
     echo "tar doesn't support xz (J option)"
     NEEDED="$NEEDED .tar .xz"
