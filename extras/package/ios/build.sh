@@ -178,6 +178,8 @@ export SDK_VERSION=$SDK_VERSION
 export VLCSDKROOT=$SDKROOT
 
 CFLAGS="-isysroot ${SDKROOT} -arch ${ACTUAL_ARCH} ${OPTIM}"
+OBJCFLAGS="${OPTIM}"
+info "OBJCFLAGS = ${OBJCFLAGS}"
 
 if [ "$PLATFORM" = "OS" ]; then
 if [ "$ARCH" != "aarch64" ]; then
@@ -196,7 +198,7 @@ fi
 export CFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
 export CPPFLAGS="${CFLAGS}"
-
+export OBJCFLAGS="${OBJCFLAGS}"
 export CPP="xcrun cc -E"
 export CXXCPP="xcrun c++ -E"
 
