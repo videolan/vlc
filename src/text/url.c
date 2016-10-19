@@ -24,6 +24,7 @@
 #endif
 
 #include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -95,6 +96,8 @@ static bool isurihex(int c)
         || ((unsigned char)(c - 'a') < 6);
 }
 
+static const char urihex[] = "0123456789ABCDEF";
+
 static char *encode_URI_bytes (const char *str, size_t *restrict lenp)
 {
     char *buf = malloc (3 * *lenp + 1);
@@ -104,7 +107,6 @@ static char *encode_URI_bytes (const char *str, size_t *restrict lenp)
     char *out = buf;
     for (size_t i = 0; i < *lenp; i++)
     {
-        static const char hex[] = "0123456789ABCDEF";
         unsigned char c = str[i];
 
         if (isurisafe (c))
@@ -114,8 +116,8 @@ static char *encode_URI_bytes (const char *str, size_t *restrict lenp)
         else
         {
             *(out++) = '%';
-            *(out++) = hex[c >> 4];
-            *(out++) = hex[c & 0xf];
+            *(out++) = urihex[c >> 4];
+            *(out++) = urihex[c & 0xf];
         }
     }
 
@@ -323,6 +325,49 @@ out:
 
 static char *vlc_idna_to_ascii (const char *);
 
+/* RFC3987 §3.1 */
+static char *vlc_iri2uri(const char *iri)
+{
+    size_t a = 0, u = 0;
+
+    for (size_t i = 0; iri[i] != '\0'; i++)
+    {
+        unsigned char c = iri[i];
+
+        if (c < 128)
+            a++;
+        else
+            u++;
+    }
+
+    if (unlikely((a + u) > (SIZE_MAX / 4)))
+    {
+        errno = ENOMEM;
+        return NULL;
+    }
+
+    char *uri = malloc(a + 3 * u + 1), *p;
+    if (unlikely(uri == NULL))
+        return NULL;
+
+    for (p = uri; *iri != '\0'; iri++)
+    {
+        unsigned char c = *iri;
+
+        if (c < 128)
+            *(p++) = c;
+        else
+        {
+            *(p++) = '%';
+            *(p++) = urihex[c >> 4];
+            *(p++) = urihex[c & 0xf];
+        }
+    }
+
+    *p = '\0';
+    return uri;
+}
+
 static bool vlc_uri_component_validate(const char *str, const char *extras)
 {
     assert(str != NULL);
@@ -372,7 +417,7 @@ int vlc_UrlParse(vlc_url_t *restrict url, const char *str)
         return -1;
     }
 
-    char *buf = strdup (str);
+    char *buf = vlc_iri2uri(str);
     if (unlikely(buf == NULL))
         return -1;
     url->psz_buffer = buf;
@@ -464,7 +509,7 @@ int vlc_UrlParse(vlc_url_t *restrict url, const char *str)
             if (next != NULL)
                 *(next++) = '\0';
 
-            url->psz_host = vlc_idna_to_ascii (cur);
+            url->psz_host = vlc_idna_to_ascii(vlc_uri_decode(cur));
         }
 
         if (url->psz_host == NULL)

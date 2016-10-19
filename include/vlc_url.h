@@ -156,7 +156,7 @@ struct vlc_url_t
 };
 
 /**
- * Splits an URL into parts.
+ * Parses an URI or IRI.
  *
  * Extracts the following parts from an URI string:
  *  - scheme (i.e. protocol),
@@ -167,8 +167,10 @@ struct vlc_url_t
  *  - path (including the filename preceded by any and all directories)
  *  - request parameters (excluding the leading question mark '?').
  *
- * If the host name uses IDN, it is decoded to ASCII, as appropriate for DNS
- * resolution. If the host is an IPv6 address literal, brackets are stripped.
+ * The function accepts URIs, as well as UTF-8-encoded IRIs. For IRIs, the hier
+ * part (specifically, the host name) is assumed to be an IDN and is decoded to
+ * ASCII according, so it can be used for DNS resolution. If the host is an
+ * IPv6 address literal, brackets are stripped.
  *
  * Any missing part is set to nul. For historical reasons, the target structure
  * is always initialized, even if parsing the URI string fails.
