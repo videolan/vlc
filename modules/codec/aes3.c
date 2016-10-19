@@ -208,7 +208,7 @@ static block_t *Decode( decoder_t *p_dec, block_t **pp_block )
         while( p_block->i_buffer / 5 )
         {
             *(p_out++) =  reverse[p_block->p_buffer[0]]
-                        | reverse[p_block->p_buffer[1]];
+                        |(reverse[p_block->p_buffer[1]] <<  8);
             *(p_out++) = (reverse[p_block->p_buffer[2]] >>  4)
                        | (reverse[p_block->p_buffer[3]] <<  4)
                        | (reverse[p_block->p_buffer[4]] << 12);
