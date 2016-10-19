@@ -310,7 +310,6 @@ $Id$
  * pva: PVA demuxer
  * qsv: QuickSyncVideo Encoder for Intel hardware
  * qt: interface module using the cross-platform Qt widget library
- * rar: RAR access and stream filter
  * rawaud: raw audio input module for vlc
  * rawdv: Raw DV demuxer
  * rawvid: raw video input module for vlc

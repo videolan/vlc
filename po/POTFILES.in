@@ -226,10 +226,6 @@ modules/access_output/livehttp.c
 modules/access_output/shout.c
 modules/access_output/udp.c
 modules/access/pulse.c
-modules/access/rar/access.c
-modules/access/rar/rar.c
-modules/access/rar/rar.h
-modules/access/rar/stream.c
 modules/access/rdp.c
 modules/access/rtp/input.c
 modules/access/rtp/rtp.c

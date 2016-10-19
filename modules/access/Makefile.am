@@ -36,11 +36,6 @@ access_LTLIBRARIES += libimem_plugin.la
 libaccess_imem_plugin_la_SOURCES = access/imem.c
 access_LTLIBRARIES += libaccess_imem_plugin.la
 
-librar_plugin_la_SOURCES = access/rar/rar.c access/rar/rar.h \
-	access/rar/access.c access/rar/stream.c access/rar/module.c
-librar_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-access_LTLIBRARIES += librar_plugin.la
-
 libsdp_plugin_la_SOURCES = access/sdp.c
 access_LTLIBRARIES += libsdp_plugin.la
 

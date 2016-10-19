@@ -280,6 +280,7 @@ Removed modules
  * BD access module (use libbluray)
  * Direct2D module (use Direct3D11)
  * EyeTV access module
+ * Rar access and stream filter: use libarchive
 
 
 Changes between 2.2.0 and 2.2.1:
