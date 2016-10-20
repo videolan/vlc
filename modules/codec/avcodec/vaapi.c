@@ -167,7 +167,7 @@ static int Get( vlc_va_t *va, picture_t *pic, uint8_t **data )
     return VLC_SUCCESS;
 }
 
-static void Release( void *opaque, uint8_t *data )
+static void Release( void *opaque )
 {
     picture_t *pic = opaque;
     VASurfaceID *surface = pic->context;
@@ -182,7 +182,6 @@ static void Release( void *opaque, uint8_t *data )
 
     pic->context = NULL;
     picture_Release(pic);
-    (void) data;
 }
 
 static void Delete( vlc_va_t *va, AVCodecContext *avctx )

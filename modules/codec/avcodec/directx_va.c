@@ -415,7 +415,7 @@ int directx_va_Get(vlc_va_t *va, directx_sys_t *dx_sys, picture_t *pic, uint8_t 
     return VLC_SUCCESS;
 }
 
-void directx_va_Release(void *opaque, uint8_t *data)
+void directx_va_Release(void *opaque)
 {
     picture_t *pic = opaque;
     vlc_va_surface_t *surface = pic->context;
@@ -424,7 +424,6 @@ void directx_va_Release(void *opaque, uint8_t *data)
     surface->refcount--;
     pic->context = NULL;
     picture_Release(pic);
-    (void) data;
 
     vlc_mutex_unlock( surface->p_lock );
 }

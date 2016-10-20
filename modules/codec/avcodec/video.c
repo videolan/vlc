@@ -1105,12 +1105,11 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
     }
 }
 
-static void lavc_ReleaseFrame(void *opaque, uint8_t *data)
+static void lavc_ReleaseFrame(void *opaque)
 {
     picture_t *picture = opaque;
 
     picture_Release(picture);
-    (void) data;
 }
 
 static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
@@ -1129,14 +1128,14 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
      * data[3] actually contains the format-specific surface handle. */
     frame->data[3] = frame->data[0];
 
-    void (*release)(void *, uint8_t *) = va->release;
+    void (*release)(void *) = va->release;
     if (va->release == NULL)
         release = lavc_ReleaseFrame;
 
     frame->buf[0] = av_buffer_create(frame->data[0], 0, release, pic, 0);
     if (unlikely(frame->buf[0] == NULL))
     {
-        release(pic, frame->data[0]);
+        release(pic);
         return -1;
     }
 
