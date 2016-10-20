@@ -552,6 +552,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if ( vd->sys->pool != NULL )
         return vd->sys->pool;
 
+    if (pool_size > 30) {
+        msg_Err(vd, "Avoid crashing when using ID3D11VideoDecoderOutputView with too many slices");
+        return NULL;
+    }
+
 #ifdef HAVE_ID3D11VIDEODECODER
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
