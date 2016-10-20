@@ -89,10 +89,30 @@ static int MPG123Open( decoder_t *p_dec )
     /* Setup output format */
     mpg123_format_none( p_sys->p_handle );
 
-    if( MPG123_OK != mpg123_format( p_sys->p_handle,
-                                    p_dec->fmt_in.audio.i_rate,
+    int i_ret = MPG123_OK;
+    if( p_dec->fmt_in.audio.i_rate != 0 )
+    {
+        i_ret =  mpg123_format( p_sys->p_handle, p_dec->fmt_in.audio.i_rate,
+                                MPG123_MONO | MPG123_STEREO,
+                                MPG123_ENC_FLOAT_32 );
+    }
+    else
+    {
+        /* The rate from the input is unknown. Tell mpg123 to accept all rates
+         * to avoid conversion on their side */
+        static const long mp3_rates[] = {
+            8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000,
+        };
+        for( size_t i = 0;
+            i < sizeof(mp3_rates) / sizeof(*mp3_rates) && i_ret == MPG123_OK;
+            ++i )
+        {
+            i_ret =  mpg123_format( p_sys->p_handle, mp3_rates[i],
                                     MPG123_MONO | MPG123_STEREO,
-                                    MPG123_ENC_FLOAT_32 ) )
+                                    MPG123_ENC_FLOAT_32 );
+        }
+    }
+    if( i_ret != MPG123_OK )
     {
         msg_Err( p_dec, "mpg123 error: %s",
                  mpg123_strerror( p_sys->p_handle ) );
