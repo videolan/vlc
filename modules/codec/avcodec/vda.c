@@ -58,6 +58,7 @@ static void copy420YpCbCr8Planar(picture_t *p_pic,
 {
     uint8_t *pp_plane[2];
     size_t pi_pitch[2];
+    VLC_UNUSED(i_width);
 
     if (!buffer)
         return;
@@ -101,8 +102,6 @@ static int Open(vlc_va_t *va,
 
     (void) fmt;
     (void) p_sys;
-
-    size_t i_profile = 0xFFFF, i_level = 0xFFFF;
 
     switch (avctx->codec_id) {
         case AV_CODEC_ID_H264:
