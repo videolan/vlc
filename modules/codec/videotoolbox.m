@@ -420,9 +420,8 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                       &p_sps_nal, &i_sps_nalsize,
                                       &p_pps_nal, &i_pps_nalsize,
                                       NULL, NULL) ? VLC_SUCCESS : VLC_EGENERIC;
-        if(p_alloc_buf)
-            free(p_alloc_buf);
         if (i_ret != VLC_SUCCESS) {
+            free(p_alloc_buf);
             msg_Warn(p_dec, "sps pps detection failed");
             return VLC_EGENERIC;
         }
@@ -433,6 +432,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             h264_sequence_parameter_set_t *p_sps_data;
             if( !( p_sps_data = h264_decode_sps(p_sps_nal, i_sps_nalsize, true) ) )
             {
+                free(p_alloc_buf);
                 msg_Warn(p_dec, "sps pps parsing failed");
                 return VLC_EGENERIC;
             }
@@ -473,6 +473,8 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                      p_dec->fmt_in.p_extra,
                                      p_dec->fmt_in.i_extra);
         }
+
+        free(p_alloc_buf);
 
         if (extradata)
             CFDictionarySetValue(extradata_info, CFSTR("avcC"), extradata);
