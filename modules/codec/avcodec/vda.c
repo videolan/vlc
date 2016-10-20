@@ -183,14 +183,9 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 
     CVPixelBufferRef cv_buffer = (CVPixelBufferRef)data;
 
-    if( !cv_buffer )
+    if( !cv_buffer || !CVPixelBufferGetDataSize(cv_buffer) )
     {
         msg_Dbg( va, "Frame buffer is empty.");
-        return VLC_EGENERIC;
-    }
-    if (!CVPixelBufferGetDataSize(cv_buffer) > 0)
-    {
-        msg_Dbg( va, "Empty frame buffer");
         return VLC_EGENERIC;
     }
 
