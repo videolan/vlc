@@ -53,12 +53,10 @@ static void Release( void *opaque, uint8_t *data );
 
 static void copy420YpCbCr8Planar(picture_t *p_pic,
                                  CVPixelBufferRef buffer,
-                                 unsigned i_width,
                                  unsigned i_height)
 {
     uint8_t *pp_plane[2];
     size_t pi_pitch[2];
-    VLC_UNUSED(i_width);
 
     if (!buffer)
         return;
@@ -87,7 +85,6 @@ vlc_module_end ()
 struct vlc_va_sys_t
 {
     AVVDAContext *vdactx;
-    int i_width;
     int i_height;
 };
 
@@ -133,7 +130,6 @@ static int Open(vlc_va_t *va,
 
     sys->vdactx = av_vda_alloc_context();
     sys->vdactx->cv_pix_fmt_type = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
-    sys->i_width = avctx->width;
     sys->i_height = avctx->height;
 
     int i_ret = av_vda_default_init2(avctx, sys->vdactx);
@@ -188,7 +184,7 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
         return VLC_EGENERIC;
     }
 
-    copy420YpCbCr8Planar( p_picture, cv_buffer, sys->i_width, sys->i_height );
+    copy420YpCbCr8Planar( p_picture, cv_buffer, sys->i_height );
 
     return VLC_SUCCESS;
 }
