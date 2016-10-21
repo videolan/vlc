@@ -360,6 +360,25 @@ static int Create( vlc_object_t *p_this )
     }
 #endif
 
+    if( aout_FormatNbChannels( outfmt ) == aout_FormatNbChannels( infmt ) )
+    {
+        /* Channel layouts can be different but the channel order can be the
+         * same. This is the case for AOUT_CHANS_5_1 <-> AOUT_CHANS_5_1_MIDDLE
+         * for example. */
+        bool b_equals = true;
+        for( unsigned i = 0; i < aout_FormatNbChannels( outfmt ); ++i )
+            if( channel_map[i] == -1 || (unsigned) channel_map[i] != i )
+            {
+                b_equals = false;
+                break;
+            }
+        if( b_equals )
+        {
+            p_filter->pf_audio_filter = Equals;
+            return VLC_SUCCESS;
+        }
+    }
+
     p_filter->p_sys = malloc( sizeof(*p_filter->p_sys) );
     if(! p_filter->p_sys )
         return VLC_ENOMEM;
