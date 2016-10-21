@@ -89,7 +89,9 @@ skins2_default_vlt_FILES = \
 
 skins2/default.vlt: $(skins2_default_vlt_FILES)
 	mkdir -p skins2
-	tar cvvzf skins2/default.vlt -C $(srcdir)/skins2 default/
+	tar cvvzf skins2/default.vlt \
+		--owner=root --group=root --directory="$(srcdir)/skins2" \
+		default/
 
 #
 # LUA
