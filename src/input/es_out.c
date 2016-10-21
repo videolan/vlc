@@ -110,6 +110,7 @@ typedef struct
     enum es_out_policy_e e_policy;
 
     /* Parameters used for es selection */
+    bool        b_autoselect; /* if we want to select an es when no user prefs */
     int         i_id;       /* es id as set by es fmt.id */
     int         i_demux_id; /* same as previous, demuxer set default value */
     int         i_channel;  /* es number in creation order */
@@ -197,7 +198,7 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta );
 
 static char *LanguageGetName( const char *psz_code );
 static char *LanguageGetCode( const char *psz_lang );
-static char **LanguageSplit( const char *psz_langs, bool b_default_any );
+static char **LanguageSplit( const char *psz_langs );
 static int LanguageArrayIndex( char **ppsz_langs, const char *psz_lang );
 
 static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm );
@@ -252,6 +253,7 @@ static void EsOutPropsCleanup( es_out_es_props_t *p_props )
 }
 
 static void EsOutPropsInit( es_out_es_props_t *p_props,
+                            bool autoselect,
                             input_thread_t *p_input,
                             enum es_out_policy_e e_default_policy,
                             const char *psz_trackidvar,
@@ -261,6 +263,7 @@ static void EsOutPropsInit( es_out_es_props_t *p_props,
 {
     p_props->e_policy = e_default_policy;
     p_props->i_count = 0;
+    p_props->b_autoselect = autoselect;
     p_props->i_id = (psz_trackidvar) ? var_GetInteger( p_input, psz_trackidvar ): -1;
     p_props->i_channel = (psz_trackvar) ? var_GetInteger( p_input, psz_trackvar ): -1;
     p_props->i_demux_id = -1;
@@ -269,7 +272,7 @@ static void EsOutPropsInit( es_out_es_props_t *p_props,
     if( !p_input->b_preparsing && psz_langvar )
     {
         char *psz_string = var_GetString( p_input, psz_langvar );
-        p_props->ppsz_language = LanguageSplit( psz_string, true );
+        p_props->ppsz_language = LanguageSplit( psz_string );
         if( p_props->ppsz_language )
         {
             for( int i = 0; p_props->ppsz_language[i]; i++ )
@@ -314,11 +317,11 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     TAB_INIT( p_sys->i_es, p_sys->es );
 
     /* */
-    EsOutPropsInit( &p_sys->video, p_input, ES_OUT_ES_POLICY_SIMULTANEOUS,
+    EsOutPropsInit( &p_sys->video, true, p_input, ES_OUT_ES_POLICY_SIMULTANEOUS,
                     NULL, NULL, NULL, NULL );
-    EsOutPropsInit( &p_sys->audio, p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
+    EsOutPropsInit( &p_sys->audio, true, p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
                     "audio-track-id", "audio-track", "audio-language", "audio" );
-    EsOutPropsInit( &p_sys->sub,   p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
+    EsOutPropsInit( &p_sys->sub,  false, p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
                     "sub-track-id", "sub-track", "sub-language", "sub" );
 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
@@ -1862,24 +1865,40 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                         wanted_es = es;
                     }
                 }
-                else if( i_stop_idx < 0 &&
-                         ( p_esprops->p_main_es == NULL ||
-                           (     p_esprops->i_demux_id >= 0 &&
-                                 current_es_idx < 0 &&
-                                 es->i_id == p_esprops->i_demux_id ) ) )
+                /* We did not find a language matching our prefs */
+                else if( i_stop_idx < 0 ) /* If not fallback disabled by 'none' */
+                {
+                    /* Select if asked by demuxer */
+                    if( current_es_idx < 0 ) /* No es is currently selected by lang pref */
                     {
-                        wanted_es = es;
+                        /* If demux has specified a track */
+                        if( p_esprops->i_demux_id >= 0 && es->i_id == p_esprops->i_demux_id )
+                        {
+                            wanted_es = es;
+                        }
+                        /* Otherwise, fallback by priority */
+                        else if( p_esprops->p_main_es == NULL ||
+                                 es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority )
+                        {
+                            if( p_esprops->b_autoselect )
+                                wanted_es = es;
+                        }
                     }
+                }
             }
 
         }
         /* If there is no user preference, select the default subtitle
          * or adapt by ES priority */
-        else if( (  p_esprops->i_demux_id >= 0 && es->i_id == p_esprops->i_demux_id ) ||
-                 p_esprops->p_main_es == NULL ||
-                 es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority )
+        else if( p_esprops->i_demux_id >= 0 && es->i_id == p_esprops->i_demux_id )
         {
             wanted_es = es;
+        }
+        else if( p_esprops->p_main_es == NULL ||
+                 es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority )
+        {
+            if( p_esprops->b_autoselect )
+                wanted_es = es;
         }
 
         if( wanted_es == es && !EsIsSelected( es ) )
@@ -2777,7 +2796,7 @@ static char *LanguageGetCode( const char *psz_lang )
     return strdup("??");
 }
 
-static char **LanguageSplit( const char *psz_langs, bool b_default_any )
+static char **LanguageSplit( const char *psz_langs )
 {
     char *psz_dup;
     char *psz_parser;
@@ -2822,8 +2841,6 @@ static char **LanguageSplit( const char *psz_langs, bool b_default_any )
 
     if( i_psz )
     {
-        if( b_default_any && strcmp( ppsz[i_psz - 1], "none" ) )
-            TAB_APPEND( i_psz, ppsz, strdup("any") );
         TAB_APPEND( i_psz, ppsz, NULL );
     }
 
@@ -2839,7 +2856,7 @@ static int LanguageArrayIndex( char **ppsz_langs, const char *psz_lang )
     for( int i = 0; ppsz_langs[i]; i++ )
     {
         if( !strcasecmp( ppsz_langs[i], psz_lang ) ||
-            !strcasecmp( ppsz_langs[i], "any" ) )
+            ( !strcasecmp( ppsz_langs[i], "any" ) && strcasecmp( psz_lang, "none") ) )
             return i;
         if( !strcasecmp( ppsz_langs[i], "none" ) )
             break;

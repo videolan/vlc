@@ -1683,7 +1683,7 @@ vlc_module_begin ()
                  INPUT_AUDIOTRACK_LANG_TEXT, INPUT_AUDIOTRACK_LANG_LONGTEXT,
                   false )
         change_safe ()
-    add_string( "sub-language", "none",
+    add_string( "sub-language", "",
                  INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT,
                   false )
         change_safe ()
