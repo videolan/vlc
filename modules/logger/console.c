@@ -95,7 +95,7 @@ static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
         if (str != NULL)
            verbosity = atoi(str);
         else
-            verbosity = var_InheritInteger(obj, "verbose");
+           verbosity = var_InheritInteger(obj, "verbose");
     }
 
     if (verbosity < 0)
