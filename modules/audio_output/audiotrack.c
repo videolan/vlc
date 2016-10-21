@@ -876,10 +876,11 @@ AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
         case AOUT_CHAN_LEFT:
             i_channel_config = jfields.AudioFormat.CHANNEL_OUT_MONO;
             break;
-        default:
         case AOUT_CHANS_STEREO:
             i_channel_config = jfields.AudioFormat.CHANNEL_OUT_STEREO;
             break;
+        default:
+            vlc_assert_unreachable();
     }
 
     i_min_buffer_size = JNI_AT_CALL_STATIC_INT( getMinBufferSize, i_rate,
