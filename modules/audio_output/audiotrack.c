@@ -1059,6 +1059,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             else
                 p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
         }
+        p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
 
         /* Try to create an AudioTrack with the most advanced channel and
          * format configuration. If AudioTrack_Create fails, try again with a
