@@ -262,31 +262,108 @@ static int Create( vlc_object_t *p_this )
         }
     }
 
-    p_filter->p_sys = malloc( sizeof(*p_filter->p_sys) );
-    if(! p_filter->p_sys )
-        return VLC_ENOMEM;
-
     /* Setup channel order */
+    uint16_t i_in_physical_channels = infmt->i_physical_channels;
+    uint16_t i_out_physical_channels = outfmt->i_physical_channels;
+
+    /* Fill src_chans: contains a sorted index of all presents in channels */
     int i_src_idx = 0;
+    int src_chans[AOUT_CHAN_MAX];
+    for( unsigned i = 0; i < AOUT_CHAN_MAX; ++i )
+        src_chans[i] = pi_vlc_chan_order_wg4[i] & i_in_physical_channels ?
+                       i_src_idx++ : -1;
+
     unsigned i_dst_idx = 0;
+    int channel_map[AOUT_CHAN_MAX];
     for( unsigned i = 0; i < AOUT_CHAN_MAX; ++i )
     {
-        if( pi_vlc_chan_order_wg4[i] & outfmt->i_physical_channels )
+        const uint32_t i_chan = pi_vlc_chan_order_wg4[i];
+        if( !( i_chan & i_out_physical_channels ) )
+            continue; /* Output channel not present */
+
+        if( aout_FormatNbChannels( infmt ) == 1 )
         {
-            p_filter->p_sys->channel_map[i_dst_idx++] =
-                pi_vlc_chan_order_wg4[i] & infmt->i_physical_channels ?
-                i_src_idx : -1;
+            /* Input is mono, copy the mono channel to Left,Right,Centers */
+            if( i_chan & ( AOUT_CHANS_FRONT|AOUT_CHANS_CENTER ) )
+                channel_map[i_dst_idx] = 0;
+            else
+                channel_map[i_dst_idx] = -1;
         }
-        if( pi_vlc_chan_order_wg4[i] & infmt->i_physical_channels )
-            i_src_idx++;
+        else if( src_chans[i] != -1 )
+        {
+            /* Input and output have the same channel */
+            assert( i_chan & i_in_physical_channels );
+            channel_map[i_dst_idx] = src_chans[i];
+        }
+        else
+        {
+#define AOUT_CHAN_LEFT_IDX 0
+#define AOUT_CHAN_RIGHT_IDX 1
+#define AOUT_CHAN_MIDDLELEFT_IDX 2
+#define AOUT_CHAN_MIDDLERIGHT_IDX 3
+#define AOUT_CHAN_REARLEFT_IDX 4
+#define AOUT_CHAN_REARRIGHT_IDX 5
+#define AOUT_CHAN_REARCENTER_IDX 6
+#define AOUT_CHAN_CENTER_IDX 7
+#define AOUT_CHAN_LFE_IDX 8
+
+            /* There is no corresponding input channel for the output channel.
+             * Try to match an input channel of the same side. For example, if
+             * there is an output ML, but no input ML, try to use RL or L
+             * instead. */
+            if( unlikely( i_chan == AOUT_CHAN_LEFT ) )
+                channel_map[i_dst_idx] =
+                    src_chans[AOUT_CHAN_MIDDLELEFT_IDX] != -1 ?
+                    src_chans[AOUT_CHAN_MIDDLELEFT_IDX] :
+                    src_chans[AOUT_CHAN_REARLEFT_IDX];
+            else if( unlikely( i_chan == AOUT_CHAN_RIGHT ) )
+                channel_map[i_dst_idx] =
+                    src_chans[AOUT_CHAN_MIDDLERIGHT_IDX] != -1 ?
+                    src_chans[AOUT_CHAN_MIDDLERIGHT_IDX] :
+                    src_chans[AOUT_CHAN_REARRIGHT_IDX];
+            else if( i_chan == AOUT_CHAN_MIDDLELEFT )
+                channel_map[i_dst_idx] =
+                    src_chans[AOUT_CHAN_REARLEFT_IDX] != -1 ?
+                    src_chans[AOUT_CHAN_REARLEFT_IDX] :
+                    src_chans[AOUT_CHAN_LEFT_IDX];
+            else if( i_chan == AOUT_CHAN_MIDDLERIGHT )
+                channel_map[i_dst_idx] =
+                    src_chans[AOUT_CHAN_REARRIGHT_IDX] != -1 ?
+                    src_chans[AOUT_CHAN_REARRIGHT_IDX] :
+                    src_chans[AOUT_CHAN_RIGHT_IDX];
+            else if( i_chan == AOUT_CHAN_REARLEFT )
+                channel_map[i_dst_idx] =
+                    src_chans[AOUT_CHAN_MIDDLELEFT_IDX] != -1 ?
+                    src_chans[AOUT_CHAN_MIDDLELEFT_IDX] :
+                    src_chans[AOUT_CHAN_LEFT_IDX];
+            else if( i_chan == AOUT_CHAN_REARRIGHT )
+                channel_map[i_dst_idx] =
+                    src_chans[AOUT_CHAN_MIDDLERIGHT_IDX] != -1 ?
+                    src_chans[AOUT_CHAN_MIDDLERIGHT_IDX] :
+                    src_chans[AOUT_CHAN_RIGHT_IDX];
+            else if( i_chan == AOUT_CHAN_REARCENTER )
+                channel_map[i_dst_idx] =
+                    src_chans[AOUT_CHAN_CENTER_IDX];
+            else if( i_chan == AOUT_CHAN_CENTER )
+                channel_map[i_dst_idx] =
+                    src_chans[AOUT_CHAN_REARCENTER_IDX];
+            else /* LFE */
+                channel_map[i_dst_idx] = -1;
+        }
+        i_dst_idx++;
     }
 #ifndef NDEBUG
     for( unsigned i = 0; i < aout_FormatNbChannels( outfmt ); ++i )
     {
-        assert( p_filter->p_sys->channel_map[i] == -1
-             || (unsigned) p_filter->p_sys->channel_map[i] < aout_FormatNbChannels( infmt ) );
+        assert( channel_map[i] == -1
+             || (unsigned) channel_map[i] < aout_FormatNbChannels( infmt ) );
     }
 #endif
+
+    p_filter->p_sys = malloc( sizeof(*p_filter->p_sys) );
+    if(! p_filter->p_sys )
+        return VLC_ENOMEM;
+    memcpy( p_filter->p_sys->channel_map, channel_map, sizeof(channel_map) );
 
     if( aout_FormatNbChannels( outfmt ) > aout_FormatNbChannels( infmt ) )
         p_filter->pf_audio_filter = Upmix;
