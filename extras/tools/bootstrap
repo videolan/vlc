@@ -60,7 +60,7 @@ else
     needminor=`echo $2|cut -d. -f2`
     needmicro=`echo $2|cut -d. -f3`
     [ -z "$needmicro" ] && needmicro=0
-    if [ "$needmajor" -gt "$gotmajor" \
+    if [ "$needmajor" -ne "$gotmajor" \
          -o "$needmajor" -eq "$gotmajor" -a "$needminor" -gt "$gotminor" \
          -o "$needmajor" -eq "$gotmajor" -a "$needminor" -eq "$gotminor" -a "$needmicro" -gt "$gotmicro" ]
     then
