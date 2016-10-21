@@ -75,6 +75,7 @@ static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
     if (verbosity < 0)
         return NULL;
 
+    verbosity += VLC_MSG_ERR;
     *sysp = (void *)(uintptr_t)verbosity;
 
     return AndroidPrintMsg;
