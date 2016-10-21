@@ -190,6 +190,12 @@ static block_t *ReverseStereo( filter_t *p_filter, block_t *p_buf )
     return p_buf;
 }
 
+static block_t *Equals( filter_t *p_filter, block_t *p_buf )
+{
+    (void) p_filter;
+    return p_buf;
+}
+
 /**
  * Probes the trivial channel mixer
  */
@@ -247,6 +253,11 @@ static int Create( vlc_object_t *p_this )
         if( mono && (infmt->i_original_channels & AOUT_CHAN_RIGHT) )
         {
             p_filter->pf_audio_filter = ExtractRight;
+            return VLC_SUCCESS;
+        }
+        if( aout_FormatNbChannels( infmt ) == 1 )
+        {
+            p_filter->pf_audio_filter = Equals;
             return VLC_SUCCESS;
         }
     }
