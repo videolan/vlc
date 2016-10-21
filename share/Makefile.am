@@ -89,10 +89,7 @@ skins2_default_vlt_FILES = \
 
 skins2/default.vlt: $(skins2_default_vlt_FILES)
 	mkdir -p skins2
-	(cd "$(srcdir)/skins2"; find default -print0 | \
-		LC_ALL=C sort -z | \
-		tar cvv --exclude .svn --no-recursion --null -T -) | \
-	gzip -n > skins2/default.vlt
+	tar cvvzf skins2/default.vlt -C $(srcdir)/skins2 default/
 
 #
 # LUA
