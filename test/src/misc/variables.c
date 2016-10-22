@@ -403,15 +403,12 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
 
     assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val, NULL ) != 0
          || val.i_int == INT64_MIN );
-    val.i_int = 4212;
-    var_Change( p_libvlc, "bla", VLC_VAR_SETMIN, &val, NULL );
-    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val, NULL ) == 0
-         && val.i_int == 4212 );
-
     assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL ) != 0
          || val.i_int == INT64_MAX );
     val.i_int = 4212;
-    var_Change( p_libvlc, "bla", VLC_VAR_SETMAX, &val, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_SETMINMAX, &val, &val );
+    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val, NULL ) == 0
+         && val.i_int == 4212 );
     assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL ) == 0
          && val.i_int == 4212 );
 
@@ -441,20 +438,6 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
 
     var_Create( p_libvlc, "bla", VLC_VAR_INTEGER );
-    var_Change( p_libvlc, "bla", VLC_VAR_SETMIN, &val, NULL );
-    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
-    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND) );
-    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE ) == VLC_SUCCESS );
-    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASCHOICE) );
-
-    var_Destroy( p_libvlc, "bla" );
-    var_Destroy( p_libvlc, "bla" );
-    var_Destroy( p_libvlc, "bla" );
-    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
-
-    var_Create( p_libvlc, "bla", VLC_VAR_INTEGER );
-    var_Change( p_libvlc, "bla", VLC_VAR_SETMAX, &val, NULL );
-    var_Change( p_libvlc, "bla", VLC_VAR_SETSTEP, &val, NULL );
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
     assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND) );
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE ) == VLC_SUCCESS );

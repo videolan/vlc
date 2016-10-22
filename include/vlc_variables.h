@@ -77,18 +77,6 @@
  * @{
  */
 
-/**
- * Set the minimum value of this variable
- * \param p_val The new minimum value
- * \param p_val2 Unused
- */
-#define VLC_VAR_SETMIN              0x0010
-/**
- * Set the maximum value of this variable
- * \param p_val The new maximum value
- * \param p_val2 Unused
- */
-#define VLC_VAR_SETMAX              0x0011
 #define VLC_VAR_SETSTEP             0x0012
 
 /**
