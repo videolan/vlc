@@ -88,9 +88,6 @@ struct variable_t
     /** If the variable has min/max/step values */
     vlc_value_t  min, max, step;
 
-    /** Index of the default choice, if the variable is to be chosen in
-     * a list */
-    int          i_default;
     /** List of choices */
     vlc_list_t   choices;
     /** List of friendly names for the choices */
@@ -312,7 +309,6 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 
     p_var->i_usage = 1;
 
-    p_var->i_default = -1;
     p_var->choices.i_count = 0;
     p_var->choices.p_values = NULL;
     p_var->choices_text.i_count = 0;
@@ -535,11 +531,6 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
                 return VLC_EGENERIC;
             }
 
-            if( p_var->i_default > i )
-                p_var->i_default--;
-            else if( p_var->i_default == i )
-                p_var->i_default = -1;
-
             p_var->ops->pf_free( &p_var->choices.p_values[i] );
             free( p_var->choices_text.p_values[i].psz_string );
             REMOVE_ELEM( p_var->choices.p_values, p_var->choices.i_count, i );
@@ -567,25 +558,8 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             p_var->choices.p_values = NULL;
             p_var->choices_text.i_count = 0;
             p_var->choices_text.p_values = NULL;
-            p_var->i_default = -1;
             TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_CLEARCHOICES, NULL);
             break;
-        case VLC_VAR_SETDEFAULT:
-        {
-            int i;
-            /* FIXME: the list is sorted, dude. Use something cleverer. */
-            for( i = 0 ; i < p_var->choices.i_count ; i++ )
-                if( p_var->ops->pf_cmp( p_var->choices.p_values[i], *p_val ) == 0 )
-                    break;
-
-            if( i == p_var->choices.i_count )
-                /* Not found */
-                break;
-
-            p_var->i_default = i;
-            CheckValue( p_var, &p_var->val );
-            break;
-        }
         case VLC_VAR_SETVALUE:
             /* Duplicate data if needed */
             newval = *p_val;
