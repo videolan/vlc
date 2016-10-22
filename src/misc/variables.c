@@ -375,7 +375,7 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     {
         assert (((i_type ^ p_oldvar->i_type) & VLC_VAR_CLASS) == 0);
         p_oldvar->i_usage++;
-        p_oldvar->i_type |= i_type & (VLC_VAR_ISCOMMAND|VLC_VAR_HASCHOICE);
+        p_oldvar->i_type |= i_type & VLC_VAR_ISCOMMAND;
     }
     vlc_mutex_unlock( &p_priv->var_lock );
 

@@ -232,7 +232,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     char *str;
 
     /* Visualizations */
-    var_Create (aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+    var_Create (aout, "visual", VLC_VAR_STRING);
     text.psz_string = _("Visualizations");
     var_Change (aout, "visual", VLC_VAR_SETTEXT, &text, NULL);
     val.psz_string = (char *)"";

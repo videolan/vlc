@@ -54,8 +54,7 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
     vlc_value_t val, text;
 
     // Create a variable to add items in wxwindows popup menu
-    var_Create( pIntf, "intf-skins", VLC_VAR_STRING |
-                VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
+    var_Create( pIntf, "intf-skins", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Select skin");
     var_Change( pIntf, "intf-skins", VLC_VAR_SETTEXT, &text, NULL );
 

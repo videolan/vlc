@@ -195,7 +195,7 @@ static int OpenPostproc( vlc_object_t *p_this )
                        p_filter->p_cfg );
 
     var_Create( p_filter, FILTER_PREFIX "q", VLC_VAR_INTEGER |
-                VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+                VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
 
     text.psz_string = _("Post processing");
     var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_SETTEXT, &text, NULL );

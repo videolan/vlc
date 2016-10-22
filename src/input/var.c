@@ -151,14 +151,12 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "time-offset", VLC_VAR_INTEGER );    /* relative */
 
     /* Bookmark */
-    var_Create( p_input, "bookmark", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
-                VLC_VAR_ISCOMMAND );
+    var_Create( p_input, "bookmark", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     val.psz_string = _("Bookmark");
     var_Change( p_input, "bookmark", VLC_VAR_SETTEXT, &val, NULL );
 
     /* Program */
-    var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
-                VLC_VAR_DOINHERIT );
+    var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_input, "program", &val );
     if( val.i_int <= 0 )
         var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val, NULL );
@@ -171,12 +169,12 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Change( p_input, "programs", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Title */
-    var_Create( p_input, "title", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_input, "title", VLC_VAR_INTEGER );
     text.psz_string = _("Title");
     var_Change( p_input, "title", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Chapter */
-    var_Create( p_input, "chapter", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_input, "chapter", VLC_VAR_INTEGER );
     text.psz_string = _("Chapter");
     var_Change( p_input, "chapter", VLC_VAR_SETTEXT, &text, NULL );
 
@@ -187,17 +185,17 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "spu-delay", VLC_VAR_INTEGER );
 
     /* Video ES */
-    var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_input, "video-es", VLC_VAR_INTEGER );
     text.psz_string = _("Video Track");
     var_Change( p_input, "video-es", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Audio ES */
-    var_Create( p_input, "audio-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_input, "audio-es", VLC_VAR_INTEGER );
     text.psz_string = _("Audio Track");
     var_Change( p_input, "audio-es", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Spu ES */
-    var_Create( p_input, "spu-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_input, "spu-es", VLC_VAR_INTEGER );
     text.psz_string = _("Subtitle Track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
 
@@ -304,8 +302,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         /* Add Navigation entries */
         sprintf( title, "title %2u", i );
         var_Destroy( p_input, title );
-        var_Create( p_input, title,
-                    VLC_VAR_INTEGER|VLC_VAR_HASCHOICE|VLC_VAR_ISCOMMAND );
+        var_Create( p_input, title, VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
         var_AddCallback( p_input, title,
                          NavigationCallback, (void *)(intptr_t)i );
 

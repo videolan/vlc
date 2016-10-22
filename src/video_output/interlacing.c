@@ -173,7 +173,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
 
     /* Create the configuration variables */
     /* */
-    var_Create(vout, "deinterlace", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_HASCHOICE);
+    var_Create(vout, "deinterlace", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     int deinterlace_state = var_GetInteger(vout, "deinterlace");
 
     text.psz_string = _("Deinterlace");
@@ -189,7 +189,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
         }
     var_AddCallback(vout, "deinterlace", DeinterlaceCallback, NULL);
     /* */
-    var_Create(vout, "deinterlace-mode", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_HASCHOICE);
+    var_Create(vout, "deinterlace-mode", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     char *deinterlace_mode = var_GetNonEmptyString(vout, "deinterlace-mode");
 
     text.psz_string = _("Deinterlace mode");

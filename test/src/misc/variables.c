@@ -324,8 +324,7 @@ static void test_limits( libvlc_int_t *p_libvlc )
 static void test_choices( libvlc_int_t *p_libvlc )
 {
     vlc_value_t val, val2;
-    var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
-                                 VLC_VAR_ISCOMMAND );
+    var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     val.i_int = 1;
     val2.psz_string = (char*)"one";
     var_Change( p_libvlc, "bla", VLC_VAR_ADDCHOICE, &val, &val2 );
@@ -429,9 +428,6 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
     assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND) );
 
-    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASCHOICE ) == VLC_SUCCESS );
-    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASCHOICE) );
-
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );
@@ -440,8 +436,6 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     var_Create( p_libvlc, "bla", VLC_VAR_INTEGER );
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
     assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND) );
-    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE ) == VLC_SUCCESS );
-    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASCHOICE) );
 
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );

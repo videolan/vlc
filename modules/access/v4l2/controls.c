@@ -445,8 +445,7 @@ static vlc_v4l2_ctrl_t *ControlAddMenu (vlc_object_t *obj, int fd,
     if (unlikely(c == NULL))
         return NULL;
 
-    if (var_Create (obj, c->name, VLC_VAR_INTEGER | VLC_VAR_HASCHOICE
-                                                  | VLC_VAR_ISCOMMAND))
+    if (var_Create (obj, c->name, VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND))
     {
         free (c);
         return NULL;
@@ -638,8 +637,7 @@ static vlc_v4l2_ctrl_t *ControlAddIntMenu (vlc_object_t *obj, int fd,
     if (unlikely(c == NULL))
         return NULL;
 
-    if (var_Create (obj, c->name, VLC_VAR_INTEGER | VLC_VAR_HASCHOICE
-                                                  | VLC_VAR_ISCOMMAND))
+    if (var_Create (obj, c->name, VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND))
     {
         free (c);
         return NULL;
@@ -701,7 +699,7 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
 {
     /* A list of controls that can be modified at run-time is stored in the
      * "controls" variable. The V4L2 controls dialog can be built from this. */
-    var_Create (obj, "controls", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE);
+    var_Create (obj, "controls", VLC_VAR_INTEGER);
 
     static const ctrl_type_cb handlers[] =
     {

@@ -78,8 +78,7 @@ int intf_Create( playlist_t *playlist, const char *chain )
 
     /* Variable used for interface spawning */
     vlc_value_t val, text;
-    var_Create( p_intf, "intf-add", VLC_VAR_STRING |
-                VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
+    var_Create( p_intf, "intf-add", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Add Interface");
     var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text, NULL );
 #if !defined(_WIN32) && defined(HAVE_ISATTY)
