@@ -353,30 +353,36 @@ static void test_choices( libvlc_int_t *p_libvlc )
 
 static void test_change( libvlc_int_t *p_libvlc )
 {
-    /* Add min, max and step
-       Yes we can have min > max but we don't really care */
-    vlc_value_t val;
-    int i_min, i_max, i_step;
+    vlc_value_t val, min, max, step;
+
+    min.i_int = -1242;
+    max.i_int = +42;
+    step.i_int = 13;
 
     var_Create( p_libvlc, "bla", VLC_VAR_INTEGER );
-    val.i_int = i_min = rand();
-    var_Change( p_libvlc, "bla", VLC_VAR_SETMIN, &val, NULL );
-    val.i_int = i_max = rand();
-    var_Change( p_libvlc, "bla", VLC_VAR_SETMAX, &val, NULL );
-    val.i_int = i_step = rand();
-    var_Change( p_libvlc, "bla", VLC_VAR_SETSTEP, &val, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_SETMINMAX, &min, &max );
+    var_Change( p_libvlc, "bla", VLC_VAR_SETSTEP, &step, NULL );
 
-    /* Do something */
-    var_SetInteger( p_libvlc, "bla", rand() );
-    val.i_int = var_GetInteger( p_libvlc, "bla" ); /* dummy read */
+    var_SetInteger( p_libvlc, "bla", 13 );
+    assert( var_GetInteger( p_libvlc, "bla" ) == 13 );
+    var_SetInteger( p_libvlc, "bla", 27 );
+    assert( var_GetInteger( p_libvlc, "bla" ) == 26 );
+    var_SetInteger( p_libvlc, "bla", 35 );
+    assert( var_GetInteger( p_libvlc, "bla" ) == 39 );
+    var_SetInteger( p_libvlc, "bla", -2 );
+    assert( var_GetInteger( p_libvlc, "bla" ) == 0 );
+    var_SetInteger( p_libvlc, "bla", -9 );
+    assert( var_GetInteger( p_libvlc, "bla" ) == -13 );
+    var_SetInteger( p_libvlc, "bla", -27 );
+    assert( var_GetInteger( p_libvlc, "bla" ) == -26 );
 
     /* Test everything is right */
     var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val, NULL );
-    assert( val.i_int == i_min );
+    assert( val.i_int == min.i_int );
     var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL );
-    assert( val.i_int == i_max );
+    assert( val.i_int == max.i_int );
     var_Change( p_libvlc, "bla", VLC_VAR_GETSTEP, &val, NULL );
-    assert( val.i_int == i_step );
+    assert( val.i_int == step.i_int );
 
     var_Destroy( p_libvlc, "bla" );
 }
