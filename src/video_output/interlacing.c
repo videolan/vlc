@@ -152,7 +152,7 @@ static int DeinterlaceCallback(vlc_object_t *object, char const *cmd,
     var_SetString(vout, "sout-deinterlace-mode", mode);
 
     msg_Dbg(vout, "deinterlace %d, mode %s, is_needed %d", deinterlace_state, mode, is_needed);
-    if (deinterlace_state == 0 || (deinterlace_state == -1 && !is_needed))
+    if (deinterlace_state == 0 || (deinterlace_state < 0 && !is_needed))
         DeinterlaceRemove(vout);
     else if (!DeinterlaceIsPresent(vout))
         DeinterlaceAdd(vout);
@@ -175,7 +175,6 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
     /* */
     var_Create(vout, "deinterlace", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_HASCHOICE);
     int deinterlace_state = var_GetInteger(vout, "deinterlace");
-    deinterlace_state = VLC_CLIP(deinterlace_state, -1, 1);
 
     text.psz_string = _("Deinterlace");
     var_Change(vout, "deinterlace", VLC_VAR_SETTEXT, &text, NULL);
