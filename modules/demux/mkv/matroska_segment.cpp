@@ -686,7 +686,8 @@ bool matroska_segment_c::Preload( )
 
     b_preloaded = true;
 
-    EnsureDuration();
+    if( cluster == NULL || cluster->IsFiniteSize() )
+        EnsureDuration();
 
     return true;
 }
@@ -1025,6 +1026,12 @@ void matroska_segment_c::EnsureDuration()
         if( p_last_cluster == NULL )
             return;
         ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA );
+
+        if( p_last_cluster->IsFiniteSize() == false )
+        {
+            es.I_O().setFilePointer( i_current_position, seek_beginning );
+            return;
+        }
 
         // use the last block + duration
         uint64 i_last_timecode = p_last_cluster->GlobalTimecode();
