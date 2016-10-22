@@ -430,14 +430,7 @@ void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
     for (size_t i = 0; i < n; i++)
     {
         vout_thread_t *p_vout = pp_vouts[i];
-        vlc_value_t val;
 
-        /* Make sure the geometry is in the choice list */
-        /* Earlier choices are removed to not grow a long list over time. */
-        /* FIXME: not atomic - lock? */
-        val.psz_string = (char *)psz_geometry;
-        var_Change (p_vout, "crop", VLC_VAR_CLEARCHOICES, NULL, NULL);
-        var_Change (p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &val);
         var_SetString (p_vout, "crop", psz_geometry);
         vlc_object_release (p_vout);
     }
