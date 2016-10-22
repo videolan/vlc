@@ -75,7 +75,7 @@ static inline void vlc_init_avutil(vlc_object_t *obj)
             level = AV_LOG_WARNING;
             break;
         case VLC_MSG_DBG:
-            level = AV_LOG_DEBUG;
+            level = AV_LOG_VERBOSE;
         default:
             break;
         }
