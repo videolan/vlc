@@ -219,8 +219,7 @@ static void CheckValue(variable_t *var, vlc_value_t *val)
                val->i_int = var->min.i_int;
             if ((var->i_type & VLC_VAR_HASMAX) && val->i_int > var->max.i_int)
                 val->i_int = var->max.i_int;
-            if ((var->i_type & VLC_VAR_HASSTEP) && var->step.i_int
-             && (val->i_int % var->step.i_int))
+            if (var->step.i_int != 0 && (val->i_int % var->step.i_int))
                 val->i_int = (val->i_int + (var->step.i_int / 2))
                            / var->step.i_int * var->step.i_int;
             break;
@@ -232,7 +231,7 @@ static void CheckValue(variable_t *var, vlc_value_t *val)
             if ((var->i_type & VLC_VAR_HASMAX)
              && isgreater(val->f_float, var->max.f_float))
                 val->f_float = var->max.f_float;
-            if ((var->i_type & VLC_VAR_HASSTEP) && var->step.f_float)
+            if (var->step.f_float != 0.f)
                 val->f_float = var->step.f_float
                               * roundf(val->f_float / var->step.f_float);
             break;
@@ -549,20 +548,29 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             break;
 
         case VLC_VAR_SETSTEP:
-            if( p_var->i_type & VLC_VAR_HASSTEP )
-            {
-                p_var->ops->pf_free( &p_var->step );
-            }
-            p_var->i_type |= VLC_VAR_HASSTEP;
+            p_var->ops->pf_free( &p_var->step );
             p_var->step = *p_val;
             p_var->ops->pf_dup( &p_var->step );
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_GETSTEP:
-            if( p_var->i_type & VLC_VAR_HASSTEP )
-                *p_val = p_var->step;
-            else
-                ret = VLC_EGENERIC;
+            switch (p_var->i_type & VLC_VAR_TYPE)
+            {
+                case VLC_VAR_INTEGER:
+                    if (p_var->step.i_int != 0)
+                        *p_val = p_var->step;
+                    else
+                        ret = VLC_EGENERIC;
+                    break;
+                case VLC_VAR_FLOAT:
+                    if (p_var->step.f_float != 0.f)
+                        *p_val = p_var->step;
+                    else
+                        ret = VLC_EGENERIC;
+                    break;
+                default:
+                    ret = VLC_EGENERIC;
+            }
             break;
         case VLC_VAR_ADDCHOICE:
         {

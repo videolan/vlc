@@ -440,9 +440,9 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     var_Change( p_libvlc, "bla", VLC_VAR_SETMAX, &val, NULL );
     var_Change( p_libvlc, "bla", VLC_VAR_SETSTEP, &val, NULL );
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
-    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMAX | VLC_VAR_HASSTEP) );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMAX) );
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE ) == VLC_SUCCESS );
-    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMAX | VLC_VAR_HASSTEP | VLC_VAR_HASCHOICE) );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMAX | VLC_VAR_HASCHOICE) );
 
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );
