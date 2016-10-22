@@ -215,26 +215,26 @@ static void CheckValue(variable_t *var, vlc_value_t *val)
     switch (var->i_type & VLC_VAR_TYPE)
     {
         case VLC_VAR_INTEGER:
-            if ((var->i_type & VLC_VAR_HASSTEP) && var->step.i_int
-             && (val->i_int % var->step.i_int))
-                val->i_int = (val->i_int + (var->step.i_int / 2))
-                           / var->step.i_int * var->step.i_int;
             if ((var->i_type & VLC_VAR_HASMIN) && val->i_int < var->min.i_int)
                val->i_int = var->min.i_int;
             if ((var->i_type & VLC_VAR_HASMAX) && val->i_int > var->max.i_int)
                 val->i_int = var->max.i_int;
+            if ((var->i_type & VLC_VAR_HASSTEP) && var->step.i_int
+             && (val->i_int % var->step.i_int))
+                val->i_int = (val->i_int + (var->step.i_int / 2))
+                           / var->step.i_int * var->step.i_int;
             break;
 
         case VLC_VAR_FLOAT:
+            if ((var->i_type & VLC_VAR_HASMIN)
+             && isless(val->f_float, var->min.f_float))
+                val->f_float = var->min.f_float;
+            if ((var->i_type & VLC_VAR_HASMAX)
+             && isgreater(val->f_float, var->max.f_float))
+                val->f_float = var->max.f_float;
             if ((var->i_type & VLC_VAR_HASSTEP) && var->step.f_float)
                 val->f_float = var->step.f_float
                               * roundf(val->f_float / var->step.f_float);
-            if ((var->i_type & VLC_VAR_HASMIN)
-             && val->f_float < var->min.f_float)
-                val->f_float = var->min.f_float;
-            if ((var->i_type & VLC_VAR_HASMAX)
-             && val->f_float > var->max.f_float)
-                val->f_float = var->max.f_float;
             break;
     }
 }
