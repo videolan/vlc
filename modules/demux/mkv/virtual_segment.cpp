@@ -408,6 +408,17 @@ virtual_chapter_c* virtual_edition_c::getChapterbyTimecode( int64_t time )
             return vchapters[i]->getSubChapterbyTimecode( time );
     }
 
+    if( vchapters.size() )
+    {
+        virtual_chapter_c* last_chapter = vchapters.back();
+
+        if( last_chapter->i_mk_virtual_start_time <= time &&
+            last_chapter->i_mk_virtual_stop_time < 0 )
+        {
+            return last_chapter;
+        }
+    }
+
     return NULL;
 }
 
