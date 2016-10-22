@@ -404,17 +404,18 @@ void (var_Destroy)(vlc_object_t *p_this, const char *psz_name)
 
     p_var = Lookup( p_this, psz_name );
     if( p_var == NULL )
+        msg_Dbg( p_this, "attempt to destroy nonexistent variable \"%s\"",
+                 psz_name );
+    else if( --p_var->i_usage == 0 )
     {
-        vlc_mutex_unlock( &p_priv->var_lock );
-        return;
-    }
-
-    WaitUnused( p_this, p_var );
-
-    if( --p_var->i_usage == 0 )
+        assert(!p_var->b_incallback);
         tdelete( p_var, &p_priv->var_root, varcmp );
+    }
     else
+    {
+        assert(p_var->i_usage != -1u);
         p_var = NULL;
+    }
     vlc_mutex_unlock( &p_priv->var_lock );
 
     if( p_var != NULL )
