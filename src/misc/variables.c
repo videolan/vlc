@@ -221,8 +221,14 @@ static void CheckValue(variable_t *var, vlc_value_t *val)
             if (val->i_int > var->max.i_int)
                 val->i_int = var->max.i_int;
             if (var->step.i_int != 0 && (val->i_int % var->step.i_int))
-                val->i_int = (val->i_int + (var->step.i_int / 2))
-                           / var->step.i_int * var->step.i_int;
+            {
+                if (val->i_int > 0)
+                    val->i_int = (val->i_int + (var->step.i_int / 2))
+                                 / var->step.i_int * var->step.i_int;
+                else
+                    val->i_int = (val->i_int - (var->step.i_int / 2))
+                                 / var->step.i_int * var->step.i_int;
+            }
             break;
 
         case VLC_VAR_FLOAT:
