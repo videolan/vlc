@@ -187,31 +187,9 @@ static void Destroy( variable_t *p_var )
  * - If the value is lower than the minimum, use the minimum.
  * - If the value is higher than the maximum, use the maximum.
  * - If the variable has steps, round the value to the nearest step.
- * - If the value is not a permitted choice, pick the default.
  */
 static void CheckValue(variable_t *var, vlc_value_t *val)
 {
-    /* Check that our variable is in the list */
-    if ((var->i_type & VLC_VAR_HASCHOICE) && var->choices.i_count > 0)
-    {
-        int i;
-
-        /* This list is not sorted so go throug it (this is a small list) */
-        for (i = 0; i < var->choices.i_count; i++)
-            if(var->ops->pf_cmp(*val, var->choices.p_values[i]) == 0)
-                break;
-
-        /* If not found, change it to anything vaguely valid */
-        if (i >= var->choices.i_count)
-        {
-            /* Free the old variable, get the new one, dup it */
-            var->ops->pf_free(val);
-            *val = var->choices.p_values[var->i_default >= 0
-                                          ? var->i_default : 0];
-            var->ops->pf_dup(val);
-        }
-    }
-
     /* Check that our variable is within the bounds */
     switch (var->i_type & VLC_VAR_TYPE)
     {
@@ -383,22 +361,8 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             vlc_assert_unreachable ();
     }
 
-    if( (i_type & VLC_VAR_DOINHERIT)
-     && var_Inherit( p_this, psz_name, i_type, &p_var->val ) == 0 )
-    {
-        if( i_type & VLC_VAR_HASCHOICE )
-        {
-            /* We must add the inherited value to our choice list */
-            p_var->i_default = 0;
-
-            INSERT_ELEM( p_var->choices.p_values, p_var->choices.i_count,
-                         0, p_var->val );
-            INSERT_ELEM( p_var->choices_text.p_values,
-                         p_var->choices_text.i_count, 0, p_var->val );
-            p_var->ops->pf_dup( &p_var->choices.p_values[0] );
-            p_var->choices_text.p_values[0].psz_string = NULL;
-        }
-    }
+    if (i_type & VLC_VAR_DOINHERIT)
+        var_Inherit(p_this, psz_name, i_type, &p_var->val);
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
     variable_t **pp_var, *p_oldvar;
