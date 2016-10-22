@@ -104,7 +104,9 @@ int main(void)
     conn_create();
     conn_shutdown(SHUT_RD);
     s = stream_open();
-    assert(s == NULL);
+    if (s != NULL)
+        /* Remote read shutdown does not result in an error on some systems. */
+        vlc_http_stream_close(s, true);
     conn_destroy();
 
     /* Test rejected stream */
