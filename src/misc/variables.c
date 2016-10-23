@@ -512,8 +512,6 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
                 ( p_val2 && p_val2->psz_string ) ?
                 strdup( p_val2->psz_string ) : NULL;
 
-            CheckValue( p_var, &p_var->val );
-
             TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_ADDCHOICE, p_val);
             break;
         }
@@ -537,8 +535,6 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             REMOVE_ELEM( p_var->choices.p_values, p_var->choices.i_count, i );
             REMOVE_ELEM( p_var->choices_text.p_values,
                          p_var->choices_text.i_count, i );
-
-            CheckValue( p_var, &p_var->val );
 
             TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_DELCHOICE, p_val);
             break;
