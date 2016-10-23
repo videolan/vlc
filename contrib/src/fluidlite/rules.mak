@@ -1,7 +1,7 @@
 # fluidlite
 
 FLUID_GITURL := https://github.com/divideconcept/FluidLite.git
-FLUID_HASH := 7b6ab58
+FLUID_HASH := 9fca275
 
 ifdef HAVE_WIN32
 PKGS += fluidlite
