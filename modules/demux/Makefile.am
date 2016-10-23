@@ -187,7 +187,7 @@ libmkv_plugin_la_SOURCES = \
 	demux/mkv/mkv.hpp demux/mkv/mkv.cpp \
 	demux/windows_audio_commons.h
 libmkv_plugin_la_SOURCES += packetizer/dts_header.h packetizer/dts_header.c
-libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CFLAGS_mkv)
 libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libmkv_plugin_la_LIBADD = $(LIBS_mkv)
 if HAVE_ZLIB
