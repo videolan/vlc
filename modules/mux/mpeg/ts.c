@@ -1248,10 +1248,11 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
         if( i == -1 )
             p_input = p_sys->p_pcr_input;
-        else if( p_mux->pp_inputs[i]->p_sys == p_pcr_stream )
-            continue;
-        else
+        else if( p_mux->pp_inputs[i] != p_sys->p_pcr_input )
             p_input = p_mux->pp_inputs[i];
+        else
+            continue;
+
         sout_input_sys_t *p_stream = (sout_input_sys_t*)p_input->p_sys;
 
         if( ( p_stream != p_pcr_stream ||
