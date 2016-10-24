@@ -115,6 +115,7 @@ Demuxers:
  * Fix Quicktime Mp4 inside MKV and unpacketized VC1
 
 Stream filter:
+ * Added ADF stream filter
  * Added ARIB STD-B25 TS streams decoder
  * Added stream prebuffering plugin
  * Removed HTTP Live streaming stream filter

@@ -24,6 +24,7 @@ $Id$
  * adaptive: Unified adaptive streaming module (DASH/HLS)
  * addonsfsstorage: Local storage extensions repository
  * addonsvorepository: Videolan extensions repository
+ * adf: ADF stream_filter module
  * adjust: Contrast/Hue/saturation/Brightness adjust module
  * adpcm: ADPCM audio decoder
  * adummy: dummy audio output

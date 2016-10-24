@@ -1029,6 +1029,7 @@ modules/services_discovery/udev.c
 modules/services_discovery/upnp.cpp
 modules/services_discovery/windrive.c
 modules/services_discovery/xcb_apps.c
+modules/stream_filter/adf.c
 modules/stream_filter/aribcam.c
 modules/stream_filter/cache_block.c
 modules/stream_filter/cache_read.c
