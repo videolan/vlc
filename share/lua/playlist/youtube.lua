@@ -398,10 +398,7 @@ function parse()
         return { { path = path, title = title, artist = artist, arturl = arturl } }
 
     else -- Other supported URL formats
-        _,_,video_id = string.find( vlc.path, "/v/([^?]*)" )
-        if not video_id then
-            video_id = string.match( vlc.path, "/embed/([^?]*)" )
-        end
+        local video_id = string.match( vlc.path, "/[^/]+/([^?]*)" )
         if not video_id then
             vlc.msg.err( "Couldn't extract youtube video URL" )
             return { }
