@@ -25,13 +25,16 @@
 
 #undef NDEBUG
 
-#include <vlc_common.h>
-#include "vlc_url.h"
-#include "vlc_strings.h"
-
+#include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+
+#include <vlc_common.h>
+#include <vlc_url.h>
+#include <vlc_strings.h>
+
+static int exitcode = 0;
 
 typedef char * (*conv_t) (const char *);
 
@@ -101,11 +104,20 @@ static void test_url_parse(const char* in, const char* protocol, const char* use
         assert(b != NULL && !strcmp((a), (b)))
 
     vlc_url_t url;
-    vlc_UrlParse( &url, in );
+    int ret = vlc_UrlParse(&url, in);
+
     CHECK( url.psz_protocol, protocol );
     CHECK( url.psz_username, user );
     CHECK( url.psz_password, pass );
-    CHECK( url.psz_host, host );
+
+    if (ret != 0 && errno == ENOSYS)
+    {
+        assert(url.psz_host == NULL);
+        exitcode = 77;
+    }
+    else
+        CHECK(url.psz_host, host);
+
     CHECK( url.psz_path, path );
     assert( url.i_port == i_port );
     CHECK( url.psz_option, option );
@@ -363,5 +375,5 @@ int main (void)
     for (size_t i = 0; i < ARRAY_SIZE(valid_uris); i++)
         test_fixup_noop(valid_uris[i]);
 
-    return 0;
+    return exitcode;
 }
