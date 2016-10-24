@@ -243,7 +243,7 @@ function probe()
             or string.match( vlc.path, "/get_video_info%?" ) -- info API
             or string.match( vlc.path, "/v/" ) -- video in swf player
             or string.match( vlc.path, "/embed/" ) -- embedded player iframe
-            or string.match( vlc.path, "/player2.swf" ) ) -- another player url
+           )
 end
 
 -- Parse function.
@@ -397,11 +397,8 @@ function parse()
 
         return { { path = path, title = title, artist = artist, arturl = arturl } }
 
-    else -- This is the flash player's URL
-        video_id = get_url_param( vlc.path, "video_id" )
-        if not video_id then
-            _,_,video_id = string.find( vlc.path, "/v/([^?]*)" )
-        end
+    else -- Other supported URL formats
+        _,_,video_id = string.find( vlc.path, "/v/([^?]*)" )
         if not video_id then
             video_id = string.match( vlc.path, "/embed/([^?]*)" )
         end
