@@ -225,25 +225,16 @@ end
 
 -- Probe function.
 function probe()
-    if vlc.access ~= "http" and vlc.access ~= "https" then
-        return false
-    end
-    youtube_site = string.match( string.sub( vlc.path, 1, 8 ), "youtube" )
-    if not youtube_site then
-        -- FIXME we should be using a builtin list of known youtube websites
-        -- like "fr.youtube.com", "uk.youtube.com" etc..
-        youtube_site = string.find( vlc.path, ".youtube.com" )
-        if youtube_site == nil then
-            return false
-        end
-    end
-    return (  string.match( vlc.path, "/watch%?" ) -- the html page
+    return ( ( vlc.access == "http" or vlc.access == "https" )
+             and string.match( vlc.path, "^www%.youtube%.com/" )
+             and (
+               string.match( vlc.path, "/watch%?" ) -- the html page
             or string.match( vlc.path, "/live$" ) -- user live stream html page
             or string.match( vlc.path, "/live%?" ) -- user live stream html page
             or string.match( vlc.path, "/get_video_info%?" ) -- info API
             or string.match( vlc.path, "/v/" ) -- video in swf player
             or string.match( vlc.path, "/embed/" ) -- embedded player iframe
-           )
+             ) )
 end
 
 -- Parse function.
