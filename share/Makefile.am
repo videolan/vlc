@@ -158,6 +158,7 @@ nobase_vlclib_DATA = \
 	lua/playlist/rockbox_fm_presets.luac \
 	lua/playlist/soundcloud.luac \
 	lua/playlist/vimeo.luac \
+	lua/playlist/vocaroo.luac \
 	lua/playlist/youtube.luac \
 	lua/playlist/youtube_homepage.luac \
 	lua/playlist/zapiks.luac \
@@ -250,6 +251,7 @@ EXTRA_DIST += \
 	lua/playlist/rockbox_fm_presets.lua \
 	lua/playlist/soundcloud.lua \
 	lua/playlist/vimeo.lua \
+	lua/playlist/vocaroo.lua \
 	lua/playlist/youtube.lua \
 	lua/playlist/youtube_homepage.lua \
 	lua/playlist/zapiks.lua \
