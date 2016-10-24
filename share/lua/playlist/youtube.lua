@@ -24,6 +24,12 @@ function get_url_param( url, name )
     return res
 end
 
+-- Helper function to copy a parameter when building a new URL
+function copy_url_param( url, name )
+    local value = get_url_param( url, name )
+    return ( value and "&"..name.."="..value or "" ) -- Ternary operator
+end
+
 function get_arturl()
     local iurl = get_url_param( vlc.path, "iurl" )
     if iurl then
@@ -314,15 +320,10 @@ function parse()
         if not path then
             local video_id = get_url_param( vlc.path, "v" )
             if video_id then
-                if fmt then
-                    format = "&fmt=" .. fmt
-                else
-                    format = ""
-                end
                 -- Without "el=detailpage", /get_video_info fails for many
                 -- music videos with errors about copyrighted content being
                 -- "restricted from playback on certain sites"
-                path = vlc.access.."://www.youtube.com/get_video_info?video_id="..video_id..format.."&el=detailpage"
+                path = vlc.access.."://www.youtube.com/get_video_info?video_id="..video_id.."&el=detailpage"..copy_url_param( vlc.path, "fmt" )
                 vlc.msg.warn( "Couldn't extract video URL, falling back to alternate youtube API" )
             end
         end
@@ -394,12 +395,6 @@ function parse()
             vlc.msg.err( "Couldn't extract youtube video URL" )
             return { }
         end
-        fmt = get_url_param( vlc.path, "fmt" )
-        if fmt then
-            format = "&fmt=" .. fmt
-        else
-            format = ""
-        end
-        return { { path = vlc.access.."://www.youtube.com/watch?v="..video_id..format } }
+        return { { path = vlc.access.."://www.youtube.com/watch?v="..video_id..copy_url_param( vlc.path, "fmt" ) } }
     end
 end
