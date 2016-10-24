@@ -4,7 +4,7 @@
 
  $Id$
 
- Copyright © 2007-2011 the VideoLAN team
+ Copyright © 2007-2016 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -32,9 +32,6 @@ end
 
 -- Parse function.
 function parse()
-	prefres = vlc.var.inherit(nil, "preferred-resolution")
-
-
 	while true
     do
         line = vlc.readline()
@@ -49,56 +46,46 @@ function parse()
                 description = vlc.strings.resolve_xml_special_chars( description )
             end
 		end
-		if string.match( line, "<meta name=\"author\"" ) then
-			_,_,artist = string.find( line, "content=\"(.-)\"" )
-			artist = vlc.strings.resolve_xml_special_chars( artist )
-		end
 		if string.match( line, "<link rel=\"thumbnail\" type=\"image/jpeg\"" ) then
 			_,_,arturl = string.find( line, "href=\"(.-)\"" )
 		end
+
+        if string.match( line, "var config = {" ) then
+            artist = string.match( line, '"username":"([^"]+)"' )
+
+            local streams = string.match( line, "\"qualities\":{(.-%])}" )
+            if streams then
+                local prefres = vlc.var.inherit(nil, "preferred-resolution")
+                local file = nil
+                local live = nil
+                for height,stream in string.gmatch( streams, "\"(%w+)\":%[(.-)%]" ) do
+                    -- Apparently formats are listed in increasing quality
+                    -- order, so we take the first, lowest quality as
+                    -- fallback, then pick the last one that matches.
+                    if string.match( height, "^(%d+)$" ) and ( ( not file ) or prefres < 0 or tonumber( height ) <= prefres ) then
+                        local f = string.match( stream, '"type":"video\\/[^"]+","url":"([^"]+)"' )
+                        if f then
+                            file = f
+                        end
+                    end
+                    if not live then
+                        live = string.match( stream, '"type":"application\\/x%-mpegURL","url":"([^"]+)"' )
+                    end
+                end
+
+                -- Pick live streaming only as a fallback
+                path = file or live
+                if path then
+                    path = string.gsub( path, "\\/", "/")
+                end
+            end
+        end
     end
 
-	page_embed = string.gsub(vlc.path, "dailymotion.com/video/", "dailymotion.com/embed/video/")
-	page_url = vlc.stream(vlc.access .. "://" .. page_embed )
-	if not page_url then return nil end
-    page = page_url:read( 65653 )
+    if not path then
+        vlc.msg.err("Couldn't extract the video URL from dailymotion")
+        return { }
+    end
 
-
-	hd1080url = string.match( page, "\"stream_h264_hd1080_url\"%s*:%s*\"([^\"]*)\"")
-	hdurl = string.match( page, "\"stream_h264_hd_url\"%s*:%s*\"([^\"]*)\"")
-	hqurl = string.match( page, "\"stream_h264_hq_url\"%s*:%s*\"([^\"]*)\"")
-	baseurl = string.match( page, "\"stream_h264_url\"%s*:%s*\"([^\"]*)\"")
-	ldurl = string.match( page, "\"stream_h264_ld_url\"%s*:%s*\"([^\"]*)\"")
-	livehlsurl = string.match( page, "\"stream_live_hls_url\"%s*:%s*\"([^\"]*)\"")
-
-
-	arr_videos_urls = {}
-	if hd1080url then	table.insert(arr_videos_urls,hd1080url)	end
-	if hdurl then table.insert(arr_videos_urls,hdurl) end
-	if hqurl then	table.insert(arr_videos_urls,hqurl)	end
-	if baseurl then table.insert(arr_videos_urls,baseurl) end
-	if ldurl then table.insert(arr_videos_urls,baseurl) end
-
-
-	if livehlsurl then
-		return { { path = livehlsurl:gsub("\\/", "/"); name = name; description = description; url = vlc.path; arturl = arturl ; artist = artist} }
-	else
-		if table.getn(arr_videos_urls) > 0 then
-			for i=1 , table.getn(arr_videos_urls)  do
-				video_url_out = arr_videos_urls[i]:gsub("\\/", "/")
-
-				if prefres < 0 then
-					break
-				end
-				height = string.match( video_url_out, "/cdn/%w+%-%d+x(%d+)/video/" )
-				if not height or tonumber(height) <= prefres then
-					break
-				end
-			end
-			return { { path = video_url_out; name = name; description = description; url = vlc.path; arturl = arturl; artist = artist} }
-		else
-			vlc.msg.err("Couldn't extract the video URL from dailymotion")
-			return { }
-		end
-	end
+    return { { path = path; name = name; description = description; url = vlc.path; arturl = arturl; artist = artist } }
 end
