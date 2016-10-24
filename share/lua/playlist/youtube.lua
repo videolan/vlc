@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2007-2015 the VideoLAN team
+ Copyright © 2007-2016 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -253,7 +253,7 @@ function parse()
         or string.match( vlc.path, "/live%?" )
     then -- This is the HTML page's URL
         -- fmt is the format of the video
-        -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs)
+        -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_formats)
         fmt = get_url_param( vlc.path, "fmt" )
         while true do
             -- Try to find the video's title
