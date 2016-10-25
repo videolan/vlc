@@ -675,7 +675,7 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
 
         if( b_verbose )
         {
-            char *const *pp_shortcuts = p_parser->pp_shortcuts;
+            const char *const *pp_shortcuts = p_parser->pp_shortcuts;
             for( unsigned i = 0; i < p_parser->i_shortcuts; i++ )
                 if( strcmp( pp_shortcuts[i], objname ) )
                     printf(color ? CYAN"   s %s\n"GRAY : "   s %s\n",

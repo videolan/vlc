@@ -202,7 +202,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
              if (!DeinterlaceIsModeValid(optm->list.psz[i]))
                  continue;
 
-             val.psz_string  = optm->list.psz[i];
+             val.psz_string  = (char *)optm->list.psz[i];
              text.psz_string = vlc_gettext(optm->list_text[i]);
              var_Change(vout, "deinterlace-mode", VLC_VAR_ADDCHOICE,
                         &val, &text);

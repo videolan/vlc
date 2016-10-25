@@ -64,16 +64,16 @@ struct module_t
 
     /** Shortcuts to the module */
     unsigned    i_shortcuts;
-    char        **pp_shortcuts;
+    const char **pp_shortcuts;
 
     /*
      * Variables set by the module to identify itself
      */
-    char *psz_shortname;                              /**< Module name */
-    char *psz_longname;                   /**< Module descriptive name */
-    char *psz_help;        /**< Long help string for "special" modules */
+    const char *psz_shortname;                              /**< Module name */
+    const char *psz_longname;                   /**< Module descriptive name */
+    const char *psz_help;        /**< Long help string for "special" modules */
 
-    char    *psz_capability;                                 /**< Capability */
+    const char *psz_capability;                              /**< Capability */
     int      i_score;                          /**< Score for the capability */
 
     bool          b_loaded;        /* Set to true if the dll is loaded */
@@ -97,7 +97,7 @@ struct module_t
     /* Plugin-specific stuff */
     module_handle_t     handle;                             /* Unique handle */
     char *              psz_filename;                     /* Module filename */
-    char *              domain;                            /* gettext domain */
+    const char *        domain;                            /* gettext domain */
 };
 
 module_t *vlc_plugin_describe (vlc_plugin_cb);

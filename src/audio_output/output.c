@@ -304,7 +304,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     if (likely(cfg != NULL))
         for (unsigned i = 0; i < cfg->list_count; i++)
         {
-            val.psz_string = cfg->list.psz[i];
+            val.psz_string = (char *)cfg->list.psz[i];
             text.psz_string = vlc_gettext(cfg->list_text[i]);
             var_Change (aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
                             &val, &text);

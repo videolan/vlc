@@ -100,7 +100,7 @@ static int vlc_cache_load_bool(bool *out, block_t *in)
     return 0;
 }
 
-static int vlc_cache_load_string(char **restrict p, block_t *file)
+static int vlc_cache_load_string(const char **restrict p, block_t *file)
 {
     uint16_t size;
 
@@ -113,16 +113,13 @@ static int vlc_cache_load_string(char **restrict p, block_t *file)
         return 0;
     }
 
-    char *str = malloc(size);
-    if (unlikely(str == NULL))
+    const char *str = (char *)file->p_buffer;
+
+    if (file->i_buffer < size || str[size - 1] != '\0')
         return -1;
 
-    if (vlc_cache_load_immediate(str, file, size) || str[size - 1] != '\0')
-    {
-        free(str);
-        return -1;
-    }
-
+    file->p_buffer += size;
+    file->i_buffer -= size;
     *p = str;
     return 0;
 }
@@ -181,11 +178,10 @@ static int CacheLoadConfig(module_config_t *cfg, block_t *file)
 
     if (IsConfigStringType (cfg->i_type))
     {
-        LOAD_STRING (cfg->orig.psz);
-        if (cfg->orig.psz != NULL)
-            cfg->value.psz = strdup (cfg->orig.psz);
-        else
-            cfg->value.psz = NULL;
+        const char *psz;
+        LOAD_STRING(psz);
+        cfg->orig.psz = (char *)psz;
+        cfg->value.psz = (psz != NULL) ? strdup (cfg->orig.psz) : NULL;
 
         if (cfg->list_count)
             cfg->list.psz = xmalloc (cfg->list_count * sizeof (char *));
@@ -411,7 +407,6 @@ size_t CacheLoad(vlc_object_t *p_this, const char *dir, module_cache_t **r,
 
     module_cache_t *cache = NULL;
     size_t count = 0;
-    char *path = NULL;
 
     for (;;)
     {
@@ -423,6 +418,7 @@ size_t CacheLoad(vlc_object_t *p_this, const char *dir, module_cache_t **r,
             goto error;
         }
 
+        const char *path;
         struct stat st;
 
         /* Load common info */
@@ -433,8 +429,6 @@ size_t CacheLoad(vlc_object_t *p_this, const char *dir, module_cache_t **r,
         LOAD_IMMEDIATE(st.st_size);
 
         CacheAdd (&cache, &count, path, &st, module);
-        free (path);
-        path = NULL;
         /* TODO: deal with errors */
     }
 
@@ -444,7 +438,6 @@ size_t CacheLoad(vlc_object_t *p_this, const char *dir, module_cache_t **r,
     return count;
 
 error:
-    free( path );
     msg_Warn( p_this, "plugins cache not loaded (corrupted)" );
 
     /* TODO: cleanup */
