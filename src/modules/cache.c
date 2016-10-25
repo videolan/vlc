@@ -28,6 +28,7 @@
 # include "config.h"
 #endif
 
+#include <stdalign.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -56,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 24
+#define CACHE_SUBVERSION_NUM 25
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -126,6 +127,25 @@ static int vlc_cache_load_string(char **restrict p, block_t *file)
     return 0;
 }
 
+static int vlc_cache_load_align(size_t align, block_t *file)
+{
+    assert(align > 0);
+
+    size_t skip = (-(uintptr_t)file->p_buffer) % align;
+    if (skip == 0)
+        return 0;
+
+    assert(skip < align);
+
+    if (file->i_buffer < skip)
+        return -1;
+
+    file->p_buffer += skip;
+    file->i_buffer -= skip;
+    assert((((uintptr_t)file->p_buffer) % align) == 0);
+    return 0;
+}
+
 #define LOAD_IMMEDIATE(a) \
     if (vlc_cache_load_immediate(&(a), file, sizeof (a))) \
         goto error
@@ -139,6 +159,9 @@ static int vlc_cache_load_string(char **restrict p, block_t *file)
     } while (0)
 #define LOAD_STRING(a) \
     if (vlc_cache_load_string(&(a), file)) \
+        goto error
+#define LOAD_ALIGNOF(t) \
+    if (vlc_cache_load_align(alignof(t), file)) \
         goto error
 
 static int CacheLoadConfig(module_config_t *cfg, block_t *file)
@@ -184,9 +207,13 @@ static int CacheLoadConfig(module_config_t *cfg, block_t *file)
         cfg->value = cfg->orig;
 
         if (cfg->list_count)
+        {
+            LOAD_ALIGNOF(*cfg->list.i);
             cfg->list.i = xmalloc (cfg->list_count * sizeof (int));
+        }
         else /* TODO: fix config_GetPszChoices() instead of this hack: */
             LOAD_IMMEDIATE(cfg->list.i_cb);
+
         for (unsigned i = 0; i < cfg->list_count; i++)
              LOAD_IMMEDIATE (cfg->list.i[i]);
     }
@@ -451,6 +478,22 @@ error:
     if (CacheSaveString (file, (a))) \
         goto error
 
+static int CacheSaveAlign(FILE *file, size_t align)
+{
+    assert(align > 0);
+
+    size_t skip = (-ftell(file)) % align;
+    if (skip == 0)
+        return 0;
+
+    assert(((ftell(file) + skip) % align) == 0);
+    return fseek(file, skip, SEEK_CUR);
+}
+
+#define SAVE_ALIGNOF(t) \
+    if (CacheSaveAlign(file, alignof (t))) \
+        goto error
+
 static int CacheSaveConfig (FILE *file, const module_config_t *cfg)
 {
     SAVE_IMMEDIATE (cfg->i_type);
@@ -471,6 +514,7 @@ static int CacheSaveConfig (FILE *file, const module_config_t *cfg)
         SAVE_STRING (cfg->orig.psz);
         if (cfg->list_count == 0)
             SAVE_IMMEDIATE (cfg->list.psz_cb); /* XXX: see CacheLoadConfig() */
+
         for (unsigned i = 0; i < cfg->list_count; i++)
             SAVE_STRING (cfg->list.psz[i]);
     }
@@ -479,8 +523,14 @@ static int CacheSaveConfig (FILE *file, const module_config_t *cfg)
         SAVE_IMMEDIATE (cfg->orig);
         SAVE_IMMEDIATE (cfg->min);
         SAVE_IMMEDIATE (cfg->max);
-        if (cfg->list_count == 0)
+
+        if (cfg->list_count > 0)
+        {
+            SAVE_ALIGNOF(*cfg->list.i);
+        }
+        else
             SAVE_IMMEDIATE (cfg->list.i_cb); /* XXX: see CacheLoadConfig() */
+
         for (unsigned i = 0; i < cfg->list_count; i++)
              SAVE_IMMEDIATE (cfg->list.i[i]);
     }
