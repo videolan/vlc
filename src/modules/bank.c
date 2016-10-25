@@ -41,6 +41,7 @@
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_fs.h>
+#include <vlc_block.h>
 #include "libvlc.h"
 #include "config/configuration.h"
 #include "modules/modules.h"
@@ -49,8 +50,9 @@ static struct
 {
     vlc_mutex_t lock;
     module_t *head;
+    block_t *caches;
     unsigned usage;
-} modules = { VLC_STATIC_MUTEX, NULL, 0 };
+} modules = { VLC_STATIC_MUTEX, NULL, NULL, 0 };
 
 static void module_StoreBank (module_t *module)
 {
@@ -321,7 +323,7 @@ static void AllocatePluginPath (vlc_object_t *p_this, const char *path,
     switch( mode )
     {
         case CACHE_USE:
-            count = CacheLoad( p_this, path, &cache );
+            count = CacheLoad(p_this, path, &cache, &modules.caches);
             break;
         case CACHE_RESET:
             CacheDelete( p_this, path );
@@ -460,6 +462,7 @@ void module_InitBank (void)
 void module_EndBank (bool b_plugins)
 {
     module_t *head = NULL;
+    block_t *caches = NULL;
 
     /* If plugins were _not_ loaded, then the caller still has the bank lock
      * from module_InitBank(). */
@@ -473,7 +476,9 @@ void module_EndBank (bool b_plugins)
     {
         config_UnsortConfig ();
         head = modules.head;
+        caches = modules.caches;
         modules.head = NULL;
+        modules.caches = NULL;
     }
     vlc_mutex_unlock (&modules.lock);
 
@@ -491,6 +496,8 @@ void module_EndBank (bool b_plugins)
 #endif
         vlc_module_destroy (module);
     }
+
+    block_ChainRelease(caches);
 }
 
 #undef module_LoadPlugins

@@ -122,7 +122,7 @@ void module_Unload (module_handle_t);
 /* Plugins cache */
 void   CacheMerge (vlc_object_t *, module_t *, module_t *);
 void   CacheDelete(vlc_object_t *, const char *);
-size_t CacheLoad  (vlc_object_t *, const char *, module_cache_t **);
+size_t CacheLoad(vlc_object_t *, const char *, module_cache_t **, block_t **);
 
 struct stat;
 

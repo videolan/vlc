@@ -37,6 +37,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_block.h>
 #include "libvlc.h"
 
 #include <vlc_plugin.h>
@@ -76,12 +77,18 @@ void CacheDelete( vlc_object_t *obj, const char *dir )
     free( path );
 }
 
-static int vlc_cache_load_immediate(void *out, FILE *in, size_t size)
+static int vlc_cache_load_immediate(void *out, block_t *in, size_t size)
 {
-    return fread(out, sizeof (char), size, in) == size ? 0 : -1;
+    if (in->i_buffer < size)
+        return -1;
+
+    memcpy(out, in->p_buffer, size);
+    in->p_buffer += size;
+    in->i_buffer -= size;
+    return 0;
 }
 
-static int vlc_cache_load_bool(bool *out, FILE *in)
+static int vlc_cache_load_bool(bool *out, block_t *in)
 {
     unsigned char b;
 
@@ -92,7 +99,7 @@ static int vlc_cache_load_bool(bool *out, FILE *in)
     return 0;
 }
 
-static int vlc_cache_load_string(char **restrict p, FILE *file)
+static int vlc_cache_load_string(char **restrict p, block_t *file)
 {
     uint16_t size;
 
@@ -135,7 +142,7 @@ static int vlc_cache_load_string(char **restrict p, FILE *file)
     if (vlc_cache_load_string(&(a), file)) \
         goto error
 
-static int CacheLoadConfig (module_config_t *cfg, FILE *file)
+static int CacheLoadConfig(module_config_t *cfg, block_t *file)
 {
     LOAD_IMMEDIATE (cfg->i_type);
     LOAD_IMMEDIATE (cfg->i_short);
@@ -198,7 +205,7 @@ error:
     return -1; /* FIXME: leaks */
 }
 
-static int CacheLoadModuleConfig (module_t *module, FILE *file)
+static int CacheLoadModuleConfig(module_t *module, block_t *file)
 {
     uint16_t lines;
 
@@ -230,7 +237,7 @@ error:
     return -1; /* FIXME: leaks */
 }
 
-static module_t *CacheLoadModule (FILE *file)
+static module_t *CacheLoadModule(block_t *file)
 {
     module_t *module = vlc_module_create (NULL);
     if (unlikely(module == NULL))
@@ -304,10 +311,10 @@ error:
  * actually load the dynamically loadable module.
  * This allows us to only fully load plugins when they are actually used.
  */
-size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
+size_t CacheLoad(vlc_object_t *p_this, const char *dir, module_cache_t **r,
+                 block_t **backingp)
 {
     char *psz_filename;
-    FILE *file;
 
     assert( dir != NULL );
 
@@ -317,36 +324,34 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
 
     msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
 
-    file = vlc_fopen( psz_filename, "rb" );
-    if( !file )
-    {
-        msg_Warn( p_this, "cannot read %s: %s", psz_filename,
-                  vlc_strerror_c(errno) );
-        free( psz_filename );
+    block_t *file = block_FilePath(psz_filename);
+    if (file == NULL)
+        msg_Warn(p_this, "cannot read %s: %s", psz_filename,
+                 vlc_strerror_c(errno));
+    free(psz_filename);
+    if (file == NULL)
         return 0;
-    }
-    free( psz_filename );
 
     /* Check the file is a plugins cache */
-    char cachestring[sizeof (CACHE_STRING) - 1];
+    char cachestr[sizeof (CACHE_STRING) - 1];
 
-    if (vlc_cache_load_immediate(cachestring, file, sizeof (cachestring))
-     || memcmp(cachestring, CACHE_STRING, sizeof (cachestring)))
+    if (vlc_cache_load_immediate(cachestr, file, sizeof (cachestr))
+     || memcmp(cachestr, CACHE_STRING, sizeof (cachestr)))
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
-        fclose( file );
+        block_Release(file);
         return 0;
     }
 
 #ifdef DISTRO_VERSION
     /* Check for distribution specific version */
-    char distrostring[sizeof (DISTRO_VERSION) - 1];
+    char distrostr[sizeof (DISTRO_VERSION) - 1];
 
-    if (vlc_cache_load_immediate(distrostring, file, sizeof (distrostring))
-     || memcmp(distrostring, DISTRO_VERSION, sizeof (distrostring)))
+    if (vlc_cache_load_immediate(distrostr, file, sizeof (distrostr))
+     || memcmp(distrostr, DISTRO_VERSION, sizeof (distrostr)))
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
-        fclose( file );
+        block_Release(file);
         return 0;
     }
 #endif
@@ -359,17 +364,22 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted header)" );
-        fclose( file );
+        block_Release(file);
         return 0;
     }
 
     /* Check header marker */
     if (vlc_cache_load_immediate(&marker, file, sizeof (marker))
-     || marker != (ftell(file) - sizeof (marker)))
+#ifdef DISTRO_VERSION
+     || marker != (sizeof (cachestr) + sizeof (distrostr) + sizeof (marker))
+#else
+     || marker != (sizeof (cachestr) + sizeof (marker))
+#endif
+        )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted header)" );
-        fclose( file );
+        block_Release(file);
         return 0;
     }
 
@@ -382,7 +392,7 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
         module_t *module = CacheLoadModule (file);
         if (module == NULL)
         {
-            if (feof (file))
+            if (file->i_buffer == 0)
                 break;
             goto error;
         }
@@ -402,19 +412,17 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
         /* TODO: deal with errors */
     }
 
-    fclose( file );
-
+    file->p_next = *backingp;
+    *backingp = file;
     *r = cache;
     return count;
 
 error:
     free( path );
-    if (ferror (file))
-        msg_Err(p_this, "plugins cache read error: %s", vlc_strerror_c(errno));
     msg_Warn( p_this, "plugins cache not loaded (corrupted)" );
 
     /* TODO: cleanup */
-    fclose( file );
+    block_Release(file);
     return 0;
 }
 
