@@ -137,3 +137,72 @@ FORCE:
 	@exit 1
 
 .PHONY: FORCE
+
+libvlc_demux_run_la_SOURCES = src/input/demux-run.c src/input/demux-run.h
+libvlc_demux_run_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
+	-DTOP_SRCDIR=\"$$(cd "$(top_srcdir)"; pwd)\"
+libvlc_demux_run_la_LDFLAGS = -no-install -static
+libvlc_demux_run_la_LIBADD = \
+	../lib/libvlc.la ../src/libvlccore.la ../compat/libcompat.la
+if !HAVE_DYNAMIC_PLUGINS
+libvlc_demux_run_la_CPPFLAGS += -DHAVE_STATIC_MODULES
+libvlc_demux_run_la_LIBADD += \
+	../modules/libaiff_plugin.la \
+	../modules/libasf_plugin.la \
+	../modules/libau_plugin.la \
+	../modules/libavi_plugin.la \
+	../modules/libcaf_plugin.la \
+	../modules/libdiracsys_plugin.la \
+	../modules/libes_plugin.la \
+	../modules/libflacsys_plugin.la \
+	../modules/libh26x_plugin.la \
+	../modules/libmjpeg_plugin.la \
+	../modules/libmkv_plugin.la \
+	../modules/libmp4_plugin.la \
+	../modules/libnsc_plugin.la \
+	../modules/libnsv_plugin.la \
+	../modules/libnuv_plugin.la \
+	../modules/libps_plugin.la \
+	../modules/libpva_plugin.la \
+	../modules/libsap_plugin.la \
+	../modules/libsmf_plugin.la \
+	../modules/libsubtitle_plugin.la \
+	../modules/libtta_plugin.la \
+	../modules/libttml_plugin.la \
+	../modules/libty_plugin.la \
+	../modules/libvoc_plugin.la \
+	../modules/libwav_plugin.la \
+	../modules/libxa_plugin.la \
+	../modules/libpacketizer_a52_plugin.la \
+	../modules/libpacketizer_dts_plugin.la \
+	../modules/libpacketizer_dirac_plugin.la \
+	../modules/libpacketizer_flac_plugin.la \
+	../modules/libpacketizer_h264_plugin.la \
+	../modules/libpacketizer_hevc_plugin.la \
+	../modules/libpacketizer_mlp_plugin.la \
+	../modules/libpacketizer_mpeg4audio_plugin.la \
+	../modules/libpacketizer_mpeg4video_plugin.la \
+	../modules/libpacketizer_mpegaudio_plugin.la \
+	../modules/libpacketizer_mpegvideo_plugin.la \
+	../modules/libpacketizer_vc1_plugin.la \
+	../modules/libfilesystem_plugin.la \
+	../modules/libxml_plugin.la \
+	-lstdc++
+if HAVE_DVBPSI
+libvlc_demux_run_la_CPPFLAGS += -DHAVE_DVBPSI
+libvlc_demux_run_la_LIBADD += ../modules/libts_plugin.la
+endif
+endif
+noinst_LTLIBRARIES = libvlc_demux_run.la
+
+#
+# Fuzzers
+#
+vlc_demux_run_LDFLAGS = -no-install -static
+vlc_demux_run_LDADD = libvlc_demux_run.la
+noinst_PROGRAMS = vlc-demux-run
+
+vlc_demux_libfuzzer_CPPFLAGS = $(vlc_static_CPPFLAGS)
+vlc_demux_libfuzzer_LDADD = -lFuzzer libvlc_demux_run.la
+EXTRA_PROGRAMS += vlc-demux-libfuzzer
