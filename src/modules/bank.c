@@ -203,17 +203,11 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
     /* We have not already scanned and inserted this module */
     assert (module->next == NULL);
 
-    /* Unload plugin until we really need it */
-    if (module->b_loaded && module->b_unloadable)
-    {
-        module_Unload (module->handle);
-        module->b_loaded = false;
-    }
-
     /* For now we force loading if the module's config contains callbacks.
      * Could be optimized by adding an API call.*/
     for (size_t n = module->confsize, i = 0; i < n; i++)
-         if (module->p_config[i].list_count == 0
+         if (!module->b_loaded
+          && module->p_config[i].list_count == 0
           && (module->p_config[i].list.psz_cb != NULL || module->p_config[i].list.i_cb != NULL))
          {
              /* !unloadable not allowed for plugins with callbacks */
