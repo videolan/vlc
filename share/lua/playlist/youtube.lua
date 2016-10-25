@@ -257,9 +257,11 @@ function parse()
                 name = vlc.strings.resolve_xml_special_chars( name )
             end
 
-            if string.match( line, "<p id=\"eow[-]description\" >" ) then
-                _,_,description = string.find( line, "<p id=\"eow[-]description\" >(.-)<[/]p>" )
-                description = vlc.strings.resolve_xml_special_chars( description )
+            if not description then
+                description = string.match( line, "<p id=\"eow%-description\"[^>]*>(.-)</p>" )
+                if description then
+                    description = vlc.strings.resolve_xml_special_chars( description )
+                end
             end
 
 
