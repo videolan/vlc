@@ -365,13 +365,7 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
                 break; /* nothing to do */
             /* Copy values */
             if (IsConfigIntegerType (item->i_type))
-            {
-                const int *src = va_arg (ap, const int *);
-                int *dst = xmalloc (sizeof (int) * len);
-
-                memcpy (dst, src, sizeof (int) * len);
-                item->list.i = dst;
-            }
+                item->list.i = va_arg(ap, const int *);
             else
             if (IsConfigStringType (item->i_type))
             {

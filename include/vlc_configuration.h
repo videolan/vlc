@@ -82,7 +82,7 @@ struct module_config_t
     union
     {
         const char **psz;          /* List of possible values for the option */
-        int   *i;
+        const int  *i;
         vlc_string_list_cb psz_cb;
         vlc_integer_list_cb i_cb;
     } list;

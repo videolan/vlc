@@ -587,12 +587,6 @@ void config_Free (module_config_t *tab, size_t confsize)
     {
         module_config_t *p_item = &tab[j];
 
-        if (IsConfigIntegerType (p_item->i_type))
-        {
-            if (p_item->list_count)
-                free (p_item->list.i);
-        }
-        else
         if (IsConfigStringType (p_item->i_type))
         {
             free (p_item->value.psz);

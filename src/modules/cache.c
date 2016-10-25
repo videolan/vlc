@@ -100,6 +100,29 @@ static int vlc_cache_load_bool(bool *out, block_t *in)
     return 0;
 }
 
+static int vlc_cache_load_array(const void **p, size_t size, size_t n,
+                                block_t *file)
+{
+    if (n == 0)
+    {
+        *p = NULL;
+        return 0;
+    }
+
+    if (unlikely(size * n < size))
+        return -1;
+
+    size *= n;
+
+    if (file->i_buffer < size)
+        return -1;
+
+    *p = file->p_buffer;
+    file->p_buffer += size;
+    file->i_buffer -= size;
+    return 0;
+}
+
 static int vlc_cache_load_string(const char **restrict p, block_t *file)
 {
     uint16_t size;
@@ -154,6 +177,14 @@ static int vlc_cache_load_align(size_t align, block_t *file)
             goto error; \
         (a) = b; \
     } while (0)
+#define LOAD_ARRAY(a,n) \
+    do \
+    { \
+        const void *base; \
+        if (vlc_cache_load_array(&base, sizeof (*(a)), (n), file)) \
+            goto error; \
+        (a) = base; \
+    } while (0)
 #define LOAD_STRING(a) \
     if (vlc_cache_load_string(&(a), file)) \
         goto error
@@ -205,14 +236,13 @@ static int CacheLoadConfig(module_config_t *cfg, block_t *file)
         if (cfg->list_count)
         {
             LOAD_ALIGNOF(*cfg->list.i);
-            cfg->list.i = xmalloc (cfg->list_count * sizeof (int));
         }
         else /* TODO: fix config_GetPszChoices() instead of this hack: */
             LOAD_IMMEDIATE(cfg->list.i_cb);
 
-        for (unsigned i = 0; i < cfg->list_count; i++)
-             LOAD_IMMEDIATE (cfg->list.i[i]);
+        LOAD_ARRAY(cfg->list.i, cfg->list_count);
     }
+
     cfg->list_text = xmalloc (cfg->list_count * sizeof (char *));
     for (unsigned i = 0; i < cfg->list_count; i++)
     {
