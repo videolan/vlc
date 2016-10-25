@@ -283,8 +283,8 @@ static int Create( vlc_object_t *p_this )
 
         if( aout_FormatNbChannels( infmt ) == 1 )
         {
-            /* Input is mono, copy the mono channel to Left,Right,Centers */
-            if( i_chan & ( AOUT_CHANS_FRONT|AOUT_CHANS_CENTER ) )
+            /* Input is mono, copy the mono channel to Left,Right */
+            if( i_chan & AOUT_CHANS_FRONT )
                 channel_map[i_dst_idx] = 0;
             else
                 channel_map[i_dst_idx] = -1;
