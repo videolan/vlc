@@ -297,57 +297,23 @@ static int Create( vlc_object_t *p_this )
         }
         else
         {
-#define AOUT_CHAN_LEFT_IDX 0
-#define AOUT_CHAN_RIGHT_IDX 1
-#define AOUT_CHAN_MIDDLELEFT_IDX 2
-#define AOUT_CHAN_MIDDLERIGHT_IDX 3
-#define AOUT_CHAN_REARLEFT_IDX 4
-#define AOUT_CHAN_REARRIGHT_IDX 5
-#define AOUT_CHAN_REARCENTER_IDX 6
-#define AOUT_CHAN_CENTER_IDX 7
-#define AOUT_CHAN_LFE_IDX 8
-
-            /* There is no corresponding input channel for the output channel.
-             * Try to match an input channel of the same side. For example, if
-             * there is an output ML, but no input ML, try to use RL or L
-             * instead. */
-            if( unlikely( i_chan == AOUT_CHAN_LEFT ) )
-                channel_map[i_dst_idx] =
-                    src_chans[AOUT_CHAN_MIDDLELEFT_IDX] != -1 ?
-                    src_chans[AOUT_CHAN_MIDDLELEFT_IDX] :
-                    src_chans[AOUT_CHAN_REARLEFT_IDX];
-            else if( unlikely( i_chan == AOUT_CHAN_RIGHT ) )
-                channel_map[i_dst_idx] =
-                    src_chans[AOUT_CHAN_MIDDLERIGHT_IDX] != -1 ?
-                    src_chans[AOUT_CHAN_MIDDLERIGHT_IDX] :
-                    src_chans[AOUT_CHAN_REARRIGHT_IDX];
-            else if( i_chan == AOUT_CHAN_MIDDLELEFT )
-                channel_map[i_dst_idx] =
-                    src_chans[AOUT_CHAN_REARLEFT_IDX] != -1 ?
-                    src_chans[AOUT_CHAN_REARLEFT_IDX] :
-                    src_chans[AOUT_CHAN_LEFT_IDX];
-            else if( i_chan == AOUT_CHAN_MIDDLERIGHT )
-                channel_map[i_dst_idx] =
-                    src_chans[AOUT_CHAN_REARRIGHT_IDX] != -1 ?
-                    src_chans[AOUT_CHAN_REARRIGHT_IDX] :
-                    src_chans[AOUT_CHAN_RIGHT_IDX];
-            else if( i_chan == AOUT_CHAN_REARLEFT )
-                channel_map[i_dst_idx] =
-                    src_chans[AOUT_CHAN_MIDDLELEFT_IDX] != -1 ?
-                    src_chans[AOUT_CHAN_MIDDLELEFT_IDX] :
-                    src_chans[AOUT_CHAN_LEFT_IDX];
-            else if( i_chan == AOUT_CHAN_REARRIGHT )
-                channel_map[i_dst_idx] =
-                    src_chans[AOUT_CHAN_MIDDLERIGHT_IDX] != -1 ?
-                    src_chans[AOUT_CHAN_MIDDLERIGHT_IDX] :
-                    src_chans[AOUT_CHAN_RIGHT_IDX];
-            else if( i_chan == AOUT_CHAN_REARCENTER )
-                channel_map[i_dst_idx] =
-                    src_chans[AOUT_CHAN_CENTER_IDX];
-            else if( i_chan == AOUT_CHAN_CENTER )
-                channel_map[i_dst_idx] =
-                    src_chans[AOUT_CHAN_REARCENTER_IDX];
-            else /* LFE */
+            if( ( i_chan & AOUT_CHANS_MIDDLE )
+             && !( i_out_physical_channels & AOUT_CHANS_REAR ) )
+            {
+                /* Use Rear chans as Middle chans if Rear chans are not used */
+                assert( i + 2 < AOUT_CHAN_MAX );
+                assert( pi_vlc_chan_order_wg4[i + 2] & AOUT_CHANS_REAR );
+                channel_map[i_dst_idx] = src_chans[i + 2];
+            }
+            else if( ( i_chan & AOUT_CHANS_REAR )
+                  && !( i_out_physical_channels & AOUT_CHANS_MIDDLE ) )
+            {
+                /* Use Middle chans as Rear chans if Middle chans are not used */
+                assert( (int) i - 2 >= 0 );
+                assert( pi_vlc_chan_order_wg4[i - 2] & AOUT_CHANS_MIDDLE );
+                channel_map[i_dst_idx] = src_chans[i - 2];
+            }
+            else
                 channel_map[i_dst_idx] = -1;
         }
         i_dst_idx++;
