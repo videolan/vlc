@@ -76,48 +76,64 @@ void CacheDelete( vlc_object_t *obj, const char *dir )
     free( path );
 }
 
-#define LOAD_IMMEDIATE(a) \
-    if (fread (&(a), sizeof (char), sizeof (a), file) != sizeof (a)) \
-        goto error
-#define LOAD_FLAG(a) \
-    do { \
-        unsigned char b; \
-        LOAD_IMMEDIATE(b); \
-        if (b > 1) \
-            goto error; \
-        (a) = b; \
-    } while (0)
-
-static int CacheLoadString (char **p, FILE *file)
+static int vlc_cache_load_immediate(void *out, FILE *in, size_t size)
 {
-    char *psz = NULL;
-    uint16_t size;
+    return fread(out, sizeof (char), size, in) == size ? 0 : -1;
+}
 
-    LOAD_IMMEDIATE (size);
-    if (size > 16384)
-    {
-error:
+static int vlc_cache_load_bool(bool *out, FILE *in)
+{
+    unsigned char b;
+
+    if (vlc_cache_load_immediate(&b, in, 1) || b > 1)
         return -1;
-    }
 
-    if (size > 0)
-    {
-        psz = malloc (size+1);
-        if (unlikely(psz == NULL))
-            goto error;
-        if (fread (psz, 1, size, file) != size)
-        {
-            free (psz);
-            goto error;
-        }
-        psz[size] = '\0';
-    }
-    *p = psz;
+    *out = b;
     return 0;
 }
 
+static int vlc_cache_load_string(char **restrict p, FILE *file)
+{
+    uint16_t size;
+
+    if (vlc_cache_load_immediate(&size, file, sizeof (size)) || size > 16384)
+        return -1;
+
+    if (size == 0)
+    {
+        *p = NULL;
+        return 0;
+    }
+
+    char *str = malloc(size + 1);
+    if (unlikely(str == NULL))
+        return -1;
+
+    if (vlc_cache_load_immediate(str, file, size))
+    {
+        free(str);
+        return -1;
+    }
+
+    str[size] = '\0';
+    *p = str;
+    return 0;
+}
+
+#define LOAD_IMMEDIATE(a) \
+    if (vlc_cache_load_immediate(&(a), file, sizeof (a))) \
+        goto error
+#define LOAD_FLAG(a) \
+    do \
+    { \
+        bool b; \
+        if (vlc_cache_load_bool(&b, file)) \
+            goto error; \
+        (a) = b; \
+    } while (0)
 #define LOAD_STRING(a) \
-    if (CacheLoadString (&(a), file)) goto error
+    if (vlc_cache_load_string(&(a), file)) \
+        goto error
 
 static int CacheLoadConfig (module_config_t *cfg, FILE *file)
 {
