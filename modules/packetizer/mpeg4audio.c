@@ -330,6 +330,8 @@ static block_t *PacketizeRawBlock(decoder_t *p_dec, block_t **pp_block)
         return NULL;
     } else if (p_block->i_pts > VLC_TS_INVALID &&
              p_block->i_pts != date_Get(&p_sys->end_date)) {
+        if(date_Get(&p_sys->end_date) > 0)
+            p_sys->b_discontuinity = true;
         date_Set(&p_sys->end_date, p_block->i_pts);
     }
 

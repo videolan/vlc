@@ -558,6 +558,12 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
                 p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
 
+            if( p_sys->b_discontinuity )
+            {
+                p_out_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                p_sys->b_discontinuity = false;
+            }
+
             /* So p_block doesn't get re-added several times */
             p_block = block_BytestreamPop( &p_sys->bytestream );
             if (pp_block)
