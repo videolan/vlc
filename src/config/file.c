@@ -236,7 +236,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
                 break;
 
             default:
-                free ((char *)item->value.psz);
+                free (item->value.psz);
                 item->value.psz = strdupnull (psz_option_value);
                 break;
         }
