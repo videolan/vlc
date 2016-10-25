@@ -194,7 +194,7 @@ static int CacheLoadModuleConfig (module_t *module, FILE *file)
     /* Allocate memory */
     if (lines)
     {
-        module->p_config = malloc (lines * sizeof (module_config_t));
+        module->p_config = calloc (1, lines * sizeof (module_config_t));
         if (unlikely(module->p_config == NULL))
         {
             module->confsize = 0;
