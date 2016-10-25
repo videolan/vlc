@@ -144,7 +144,6 @@ nobase_vlclib_DATA = \
 	lua/playlist/dailymotion.luac \
 	lua/playlist/extreme.luac \
 	lua/playlist/france2.luac \
-	lua/playlist/googlevideo.luac \
 	lua/playlist/jamendo.luac \
 	lua/playlist/joox.luac \
 	lua/playlist/katsomo.luac \
@@ -237,7 +236,6 @@ EXTRA_DIST += \
 	lua/playlist/dailymotion.lua \
 	lua/playlist/extreme.lua \
 	lua/playlist/france2.lua \
-	lua/playlist/googlevideo.lua \
 	lua/playlist/jamendo.lua \
 	lua/playlist/joox.lua \
 	lua/playlist/katsomo.lua \
