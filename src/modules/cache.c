@@ -56,7 +56,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 23
+#define CACHE_SUBVERSION_NUM 24
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -112,17 +112,16 @@ static int vlc_cache_load_string(char **restrict p, block_t *file)
         return 0;
     }
 
-    char *str = malloc(size + 1);
+    char *str = malloc(size);
     if (unlikely(str == NULL))
         return -1;
 
-    if (vlc_cache_load_immediate(str, file, size))
+    if (vlc_cache_load_immediate(str, file, size) || str[size - 1] != '\0')
     {
         free(str);
         return -1;
     }
 
-    str[size] = '\0';
     *p = str;
     return 0;
 }
@@ -437,10 +436,10 @@ error:
 
 static int CacheSaveString (FILE *file, const char *str)
 {
-    uint16_t size = (str != NULL) ? strlen (str) : 0;
+    uint16_t size = (str != NULL) ? (strlen (str) + 1) : 0;
 
     SAVE_IMMEDIATE (size);
-    if (size != 0 && fwrite (str, 1, size, file) != size)
+    if (size != 0 && fwrite(str, 1, size, file) != size)
     {
 error:
         return -1;
