@@ -308,9 +308,6 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
 {
     char *psz_filename;
     FILE *file;
-    int i_size, i_read;
-    char p_cachestring[sizeof(CACHE_STRING)];
-    int32_t i_marker;
 
     assert( dir != NULL );
 
@@ -331,10 +328,10 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
     free( psz_filename );
 
     /* Check the file is a plugins cache */
-    i_size = sizeof(CACHE_STRING) - 1;
-    i_read = fread( p_cachestring, 1, i_size, file );
-    if( i_read != i_size ||
-        memcmp( p_cachestring, CACHE_STRING, i_size ) )
+    char cachestring[sizeof (CACHE_STRING) - 1];
+
+    if (vlc_cache_load_immediate(cachestring, file, sizeof (cachestring))
+     || memcmp(cachestring, CACHE_STRING, sizeof (cachestring)))
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
         fclose( file );
@@ -343,11 +340,10 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
 
 #ifdef DISTRO_VERSION
     /* Check for distribution specific version */
-    char p_distrostring[sizeof( DISTRO_VERSION )];
-    i_size = sizeof( DISTRO_VERSION ) - 1;
-    i_read = fread( p_distrostring, 1, i_size, file );
-    if( i_read != i_size ||
-        memcmp( p_distrostring, DISTRO_VERSION, i_size ) )
+    char distrostring[sizeof (DISTRO_VERSION) - 1];
+
+    if (vlc_cache_load_immediate(distrostring, file, sizeof (distrostring))
+     || memcmp(distrostring, DISTRO_VERSION, sizeof (distrostring)))
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
         fclose( file );
@@ -356,8 +352,10 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
 #endif
 
     /* Check sub-version number */
-    i_read = fread( &i_marker, 1, sizeof(i_marker), file );
-    if( i_read != sizeof(i_marker) || i_marker != CACHE_SUBVERSION_NUM )
+    uint32_t marker;
+
+    if (vlc_cache_load_immediate(&marker, file, sizeof (marker))
+     || marker != CACHE_SUBVERSION_NUM)
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted header)" );
@@ -366,9 +364,8 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
     }
 
     /* Check header marker */
-    i_read = fread( &i_marker, 1, sizeof(i_marker), file );
-    if( i_read != sizeof(i_marker) ||
-        i_marker != ftell( file ) - (int)sizeof(i_marker) )
+    if (vlc_cache_load_immediate(&marker, file, sizeof (marker))
+     || marker != (ftell(file) - sizeof (marker)))
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted header)" );
