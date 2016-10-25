@@ -128,6 +128,7 @@ struct decoder_sys_t
      */
     date_t  end_date;
     mtime_t i_pts;
+    bool b_discontuinity;
 
     int i_frame_size;
     unsigned int i_channels;
@@ -210,6 +211,7 @@ static int OpenPacketizer(vlc_object_t *p_this)
 
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
+    p_sys->b_discontuinity = false;
     date_Set(&p_sys->end_date, 0);
     block_BytestreamInit(&p_sys->bytestream);
     p_sys->b_latm_cfg = false;
@@ -296,7 +298,7 @@ static void ClosePacketizer(vlc_object_t *p_this)
 static void FlushRawBlock(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-
+    p_sys->b_discontuinity = true;
     date_Set(&p_sys->end_date, 0);
 }
 
@@ -339,6 +341,12 @@ static block_t *PacketizeRawBlock(decoder_t *p_dec, block_t **pp_block)
 
     p_block->i_length = date_Increment(&p_sys->end_date,
         p_dec->fmt_out.audio.i_frame_length) - p_block->i_pts;
+
+    if(p_sys->b_discontuinity)
+    {
+        p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+        p_sys->b_discontuinity = false;
+    }
 
     return p_block;
 }
@@ -957,6 +965,7 @@ static void FlushStreamBlock(decoder_t *p_dec)
     p_sys->i_state = STATE_NOSYNC;
     block_BytestreamEmpty(&p_sys->bytestream);
     date_Set(&p_sys->end_date, VLC_TS_INVALID);
+    p_sys->b_discontuinity = true;
 }
 
 /****************************************************************************
@@ -1133,6 +1142,12 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
         *pp_block = block_BytestreamPop(&p_sys->bytestream);
 
         p_sys->i_state = STATE_NOSYNC;
+
+        if(p_sys->b_discontuinity)
+        {
+            p_out_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+            p_sys->b_discontuinity = false;
+        }
 
         return p_out_buffer;
     }
