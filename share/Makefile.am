@@ -145,7 +145,6 @@ nobase_vlclib_DATA = \
 	lua/playlist/extreme.luac \
 	lua/playlist/france2.luac \
 	lua/playlist/jamendo.luac \
-	lua/playlist/joox.luac \
 	lua/playlist/katsomo.luac \
 	lua/playlist/koreus.luac \
 	lua/playlist/lelombrik.luac \
@@ -237,7 +236,6 @@ EXTRA_DIST += \
 	lua/playlist/extreme.lua \
 	lua/playlist/france2.lua \
 	lua/playlist/jamendo.lua \
-	lua/playlist/joox.lua \
 	lua/playlist/katsomo.lua \
 	lua/playlist/koreus.lua \
 	lua/playlist/lelombrik.lua \
