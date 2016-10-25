@@ -109,7 +109,6 @@ static void Flush( decoder_t *p_dec )
 static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *p_buf;
 
     if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate )
     {
