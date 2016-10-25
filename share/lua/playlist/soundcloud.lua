@@ -23,8 +23,10 @@
 
 -- Probe function.
 function probe()
+    local path = vlc.path
+    path = path:gsub("^www%.", "")
     return ( vlc.access == "http" or vlc.access == "https" )
-        and string.match( vlc.path, "soundcloud%.com/.+/.+" )
+        and string.match( path, "^soundcloud%.com/.+/.+" )
 end
 
 function fix_quotes( value )
