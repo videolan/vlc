@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 26
+#define CACHE_SUBVERSION_NUM 27
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -313,10 +313,6 @@ static module_t *vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
     LOAD_IMMEDIATE(module->i_score);
     LOAD_IMMEDIATE(module->b_unloadable);
 
-    /* Config stuff */
-    if (CacheLoadModuleConfig (module, file) != VLC_SUCCESS)
-        goto error;
-
     LOAD_STRING(module->domain);
     if (module->domain != NULL)
         vlc_bindtextdomain (module->domain);
@@ -346,6 +342,10 @@ static module_t *vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
         LOAD_STRING(submodule->psz_capability);
         LOAD_IMMEDIATE(submodule->i_score);
     }
+
+    /* Config stuff */
+    if (CacheLoadModuleConfig(module, file) != VLC_SUCCESS)
+        goto error;
 
     return module;
 error:
@@ -650,15 +650,15 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
         SAVE_IMMEDIATE(module->i_score);
         SAVE_IMMEDIATE(module->b_unloadable);
 
-        /* Config stuff */
-        if (CacheSaveModuleConfig (file, module))
-            goto error;
-
         SAVE_STRING(module->domain);
 
         i_submodule = module->submodule_count;
         SAVE_IMMEDIATE( i_submodule );
         if (CacheSaveSubmodule (file, module->submodule))
+            goto error;
+
+        /* Config stuff */
+        if (CacheSaveModuleConfig (file, module))
             goto error;
 
         /* Save common info */
