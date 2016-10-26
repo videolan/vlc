@@ -83,6 +83,7 @@ struct decoder_sys_t
      * Common properties
      */
     date_t  end_date;
+    bool    b_discontinuity;
 
     mtime_t i_pts;
     int i_frame_size;
@@ -258,6 +259,7 @@ static void Flush( decoder_t *p_dec )
 
     p_sys->b_mlp = false;
     p_sys->i_state = STATE_NOSYNC;
+    p_sys->b_discontinuity = true;
     block_BytestreamEmpty( &p_sys->bytestream );
     date_Set( &p_sys->end_date, 0 );
 }
@@ -446,6 +448,12 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
                 p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
 
+            if( p_sys->b_discontinuity )
+            {
+                p_out_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                p_sys->b_discontinuity = false;
+            }
+
             /* So p_block doesn't get re-added several times */
             if( pp_block )
                 *pp_block = block_BytestreamPop( &p_sys->bytestream );
@@ -479,6 +487,7 @@ static int Open( vlc_object_t *p_this )
 
     block_BytestreamInit( &p_sys->bytestream );
     p_sys->b_mlp = false;
+    p_sys->b_discontinuity = false;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
