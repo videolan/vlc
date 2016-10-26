@@ -355,7 +355,7 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
                      uint8_t *p_vol, int i_vol )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_vo_type, i_vo_ver_id, i_ar, i_shape;
+    int i_vo_ver_id, i_ar, i_shape;
     bs_t s;
 
     for( ;; )
@@ -370,7 +370,7 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
     bs_init( &s, &p_vol[4], i_vol - 4 );
 
     bs_skip( &s, 1 );   /* random access */
-    i_vo_type = bs_read( &s, 8 );
+    bs_skip( &s, 8 );   /* vo_type */
     if( bs_read1( &s ) )
     {
         i_vo_ver_id = bs_read( &s, 4 );
@@ -383,19 +383,14 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
     i_ar = bs_read( &s, 4 );
     if( i_ar == 0xf )
     {
-        int i_ar_width, i_ar_height;
-
-        i_ar_width = bs_read( &s, 8 );
-        i_ar_height= bs_read( &s, 8 );
+        bs_skip( &s, 8 );  /* ar_width */
+        bs_skip( &s, 8 );  /* ar_height */
     }
     if( bs_read1( &s ) )
     {
-        int i_chroma_format;
-        int i_low_delay;
-
         /* vol control parameter */
-        i_chroma_format = bs_read( &s, 2 );
-        i_low_delay = bs_read1( &s );
+        bs_skip( &s, 2 ); /* chroma_format */
+        bs_read1( &s ); /* low_delay */
 
         if( bs_read1( &s ) )
         {
