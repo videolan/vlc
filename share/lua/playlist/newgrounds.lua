@@ -70,7 +70,7 @@ function parse()
     end
 
     if not path then
-        vlc.msg.err( "Couldn't extract newsgrounds media URL" )
+        vlc.msg.err( "Couldn't extract newgrounds media URL" )
         return { }
     end
 
