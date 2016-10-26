@@ -56,7 +56,10 @@ static void *vlc_demux_chained_Thread(void *data)
     demux_t *demux = demux_NewAdvanced(dc->fifo, NULL, "", dc->name, "",
                                        dc->fifo, dc->out, false);
     if (demux == NULL)
+    {
+        vlc_stream_Delete(dc->fifo);
         return NULL;
+    }
 
     /* Stream FIFO cannot apply DVB filters.
      * Get all programs and let the E/S output sort them out. */
