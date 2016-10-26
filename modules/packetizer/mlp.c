@@ -334,6 +334,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->i_pts > VLC_TS_INVALID &&
                 p_sys->i_pts != date_Get( &p_sys->end_date ) )
             {
+                if( date_Get( &p_sys->end_date ) != VLC_TS_INVALID )
+                    p_sys->b_discontinuity = true;
                 date_Set( &p_sys->end_date, p_sys->i_pts );
             }
             p_sys->i_state = STATE_HEADER;
@@ -428,6 +430,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                     const mtime_t i_end_date = date_Get( &p_sys->end_date );
                     date_Init( &p_sys->end_date, p_sys->mlp.i_rate, 1 );
                     date_Set( &p_sys->end_date, i_end_date );
+                    if( i_end_date != VLC_TS_INVALID )
+                        p_sys->b_discontinuity = true;
                 }
             }
 
