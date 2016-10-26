@@ -27,10 +27,13 @@ XMLCONF = --with-minimal     \
           --without-iconv    \
           --without-http     \
           --without-ftp      \
-          --without-debug    \
           --without-docbook  \
           --without-regexps  \
           --without-python
+
+ifdef WITH_OPTIMIZATION
+XMLCONF+= --without-debug
+endif
 
 libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 	$(UNPACK)
