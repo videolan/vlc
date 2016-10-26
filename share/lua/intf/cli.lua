@@ -355,12 +355,20 @@ end
 function input_info(name,client)
     local item = vlc.input.item()
     if(item == nil) then return end
-    local categories = item:info()
-    categories["Meta data"] = item:metas()
-    for cat, infos in pairs(categories) do
+    local infos = item:info()
+    infos["Meta data"] = item:metas()
+
+    -- Sort categories so the output is consistent
+    local categories = {}
+    for cat in pairs(infos) do
+        table.insert(categories, cat)
+    end
+    table.sort(categories)
+
+    for _, cat in ipairs(categories) do
         client:append("+----[ "..cat.." ]")
         client:append("|")
-        for name, value in pairs(infos) do
+        for name, value in pairs(infos[cat]) do
             client:append("| "..name..": "..value)
         end
         client:append("|")
