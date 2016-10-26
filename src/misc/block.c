@@ -359,7 +359,7 @@ ssize_t pread (int fd, void *buf, size_t count, off_t offset)
 }
 #endif
 
-block_t *block_File (int fd)
+block_t *block_File(int fd, bool write)
 {
     size_t length;
     struct stat st;
@@ -396,9 +396,10 @@ block_t *block_File (int fd)
 #ifdef HAVE_MMAP
     if (length > 0)
     {
-        void *addr;
+        int prot = PROT_READ | (write ? PROT_WRITE : 0);
+        int flags = write ? MAP_PRIVATE : MAP_SHARED;
+        void *addr = mmap(NULL, length, prot, flags, fd, 0);
 
-        addr = mmap (NULL, length, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
         if (addr != MAP_FAILED)
             return block_mmap_Alloc (addr, length);
     }
@@ -425,13 +426,15 @@ block_t *block_File (int fd)
     return block;
 }
 
-block_t *block_FilePath (const char *path)
+block_t *block_FilePath(const char *path, bool write)
 {
+    /* NOTE: Writeable shared mappings are not supported here. So there are no
+     * needs to open the file for writing (even if the mapping is writable). */
     int fd = vlc_open (path, O_RDONLY);
     if (fd == -1)
         return NULL;
 
-    block_t *block = block_File (fd);
+    block_t *block = block_File(fd, write);
     vlc_close (fd);
     return block;
 }

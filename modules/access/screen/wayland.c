@@ -208,7 +208,7 @@ static block_t *Shoot(demux_t *demux)
         wl_display_roundtrip(sys->display);
 
     wl_buffer_destroy(buffer);
-    block = block_File(fd);
+    block = block_File(fd, true);
 
     if (block != NULL)
     {

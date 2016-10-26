@@ -271,19 +271,24 @@ VLC_API block_t * block_shm_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC
  * due to memory space constraints.
  *
  * @param fd file descriptor to load from
+ * @param write If true, request a read/write private mapping.
+ *              If false, request a read-only potentially shared mapping.
  *
  * @return a new block with the file content at p_buffer, and file length at
  * i_buffer (release it with block_Release()), or NULL upon error (see errno).
  */
-VLC_API block_t *block_File(int fd, bool) VLC_USED VLC_MALLOC;
+VLC_API block_t *block_File(int fd, bool write) VLC_USED VLC_MALLOC;
 
 /**
  * Maps a file in memory.
  *
  * Loads a file into a block of memory from a path to the file.
  * See also block_File().
+ *
+ * @param write If true, request a read/write private mapping.
+ *              If false, request a read-only potentially shared mapping.
  */
-VLC_API block_t *block_FilePath(const char *, bool) VLC_USED VLC_MALLOC;
+VLC_API block_t *block_FilePath(const char *, bool write) VLC_USED VLC_MALLOC;
 
 static inline void block_Cleanup (void *block)
 {

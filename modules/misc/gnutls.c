@@ -643,7 +643,7 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
         return VLC_ENOMEM;
     }
 
-    block_t *certblock = block_FilePath (cert);
+    block_t *certblock = block_FilePath(cert, false);
     if (certblock == NULL)
     {
         msg_Err (crd, "cannot read certificate chain from %s: %s", cert,
@@ -651,7 +651,7 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
         goto error;
     }
 
-    block_t *keyblock = block_FilePath (key);
+    block_t *keyblock = block_FilePath(key, false);
     if (keyblock == NULL)
     {
         msg_Err (crd, "cannot read private key from %s: %s", key,

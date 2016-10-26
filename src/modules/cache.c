@@ -376,7 +376,7 @@ size_t CacheLoad(vlc_object_t *p_this, const char *dir, module_cache_t **r,
 
     msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
 
-    block_t *file = block_FilePath(psz_filename);
+    block_t *file = block_FilePath(psz_filename, false);
     if (file == NULL)
         msg_Warn(p_this, "cannot read %s: %s", psz_filename,
                  vlc_strerror_c(errno));

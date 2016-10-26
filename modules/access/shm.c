@@ -329,7 +329,7 @@ static void DemuxFile (void *data)
     demux_sys_t *sys = demux->p_sys;
 
     /* Copy frame */
-    block_t *block = block_File (sys->fd);
+    block_t *block = block_File(sys->fd, true);
     if (block == NULL)
         return;
     block->i_pts = block->i_dts = mdate ();

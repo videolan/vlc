@@ -34,7 +34,7 @@ static const char text[] =
     "This is a test!\n"
     "This file can be deleted safely!\n";
 
-static void test_block_File (void)
+static void test_block_File(bool write)
 {
     FILE *stream;
     int res;
@@ -47,12 +47,14 @@ static void test_block_File (void)
     res = fflush (stream);
     assert (res != EOF);
 
-    block_t *block = block_File (fileno (stream));
+    block_t *block = block_File(fileno(stream), write);
     fclose (stream);
 
     assert (block != NULL);
     assert (block->i_buffer == strlen (text));
     assert (!memcmp (block->p_buffer, text, block->i_buffer));
+    if (write)
+        memset(block->p_buffer, 'A', block->i_buffer);
     block_Release (block);
 
     remove ("testfile.txt");
@@ -86,7 +88,8 @@ static void test_block (void)
 
 int main (void)
 {
-    test_block_File ();
+    test_block_File(false);
+    test_block_File(true);
     test_block ();
     return 0;
 }
