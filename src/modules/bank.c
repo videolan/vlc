@@ -168,7 +168,7 @@ typedef struct module_bank
     size_t         i_cache;
     module_cache_t *cache;
 
-    int            i_loaded_cache;
+    size_t         i_loaded_cache;
     module_cache_t *loaded_cache;
 } module_bank_t;
 
@@ -307,34 +307,23 @@ static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
  * Scans for plug-ins within a file system hierarchy.
  * \param path base directory to browse
  */
-static void AllocatePluginPath (vlc_object_t *p_this, const char *path,
-                                cache_mode_t mode)
+static void AllocatePluginPath(vlc_object_t *obj, const char *path,
+                               cache_mode_t mode)
 {
-    module_bank_t bank;
-    module_cache_t *cache = NULL;
-    size_t count = 0;
-
-    switch( mode )
+    module_bank_t bank =
     {
-        case CACHE_USE:
-            count = CacheLoad(p_this, path, &cache, &modules.caches);
-            break;
-        case CACHE_RESET:
-            CacheDelete( p_this, path );
-            break;
-        case CACHE_IGNORE:
-            msg_Dbg( p_this, "ignoring plugins cache file" );
-    }
+        .obj = obj,
+        .base = path,
+        .mode = mode,
+    };
 
-    msg_Dbg( p_this, "recursively browsing `%s'", path );
+    if (mode == CACHE_USE)
+        bank.i_loaded_cache = CacheLoad(bank.obj, bank.base,
+                                        &bank.loaded_cache, &modules.caches);
+    else
+        msg_Dbg(bank.obj, "ignoring plugins cache file");
 
-    bank.obj = p_this;
-    bank.base = path;
-    bank.mode = mode;
-    bank.cache = NULL;
-    bank.i_cache = 0;
-    bank.loaded_cache = cache;
-    bank.i_loaded_cache = count;
+    msg_Dbg(obj, "recursively browsing `%s'", bank.base);
 
     /* Don't go deeper than 5 subdirectories */
     AllocatePluginDir (&bank, 5, path, NULL);
@@ -343,19 +332,19 @@ static void AllocatePluginPath (vlc_object_t *p_this, const char *path,
     {
         case CACHE_USE:
             /* Discard unmatched cache entries */
-            for( size_t i = 0; i < count; i++ )
+            for (size_t i = 0; i < bank.i_loaded_cache; i++)
             {
-                if (cache[i].p_module != NULL)
-                   vlc_module_destroy (cache[i].p_module);
-                free (cache[i].path);
+                if (bank.loaded_cache[i].p_module != NULL)
+                    vlc_module_destroy(bank.loaded_cache[i].p_module);
+                free(bank.loaded_cache[i].path);
             }
-            free( cache );
+            free(bank.loaded_cache);
             for (size_t i = 0; i < bank.i_cache; i++)
-                free (bank.cache[i].path);
-            free (bank.cache);
+                free(bank.cache[i].path);
+            free(bank.cache);
             break;
         case CACHE_RESET:
-            CacheSave (p_this, path, bank.cache, bank.i_cache);
+            CacheSave(obj, path, bank.cache, bank.i_cache);
         case CACHE_IGNORE:
             break;
     }
