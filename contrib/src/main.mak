@@ -216,7 +216,7 @@ PKG_CONFIG_PATH := /usr/share/pkgconfig
 PKG_CONFIG_LIBDIR := /usr/$(HOST)/lib/pkgconfig
 export PKG_CONFIG_LIBDIR
 endif
-PKG_CONFIG_PATH := $(PKG_CONFIG_PATH):$(PREFIX)/lib/pkgconfig
+PKG_CONFIG_PATH := $(PREFIX)/lib/pkgconfig:$(PKG_CONFIG_PATH)
 export PKG_CONFIG_PATH
 
 ifndef GIT
