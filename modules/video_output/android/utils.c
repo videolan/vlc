@@ -510,7 +510,11 @@ AWindowHandler_releaseANativeWindowEnv(AWindowHandler *p_awh, JNIEnv *p_env,
 
     if (p_awh->views[id].p_anw)
     {
-        if (b_clear && p_awh->anw_api.setBuffersGeometry)
+        /* Clear the surface starting Android M (anwp is NULL in that case).
+         * Don't do it earlier because MediaCodec may not be able to connect to
+         * the surface anymore. */
+        if (b_clear && p_awh->anw_api.setBuffersGeometry
+         && AWindowHandler_getANativeWindowPrivAPI(p_awh) == NULL)
         {
             /* Clear the surface by displaying a 1x1 black RGB buffer */
             ANativeWindow *p_anw = p_awh->views[id].p_anw;
