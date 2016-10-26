@@ -537,11 +537,11 @@ static bool module_match(const module_t *m, const char *pattern, bool strict)
     return false;
 }
 
-static bool module_show(const module_t *m, bool advanced)
+static bool plugin_show(const vlc_plugin_t *plugin, bool advanced)
 {
-    for (size_t i = 0; i < m->confsize; i++)
+    for (size_t i = 0; i < plugin->conf.size; i++)
     {
-        const module_config_t *item = m->p_config + i;
+        const module_config_t *item = plugin->conf.items + i;
 
         if (!CONFIG_ITEM(item->i_type))
             continue;
@@ -576,25 +576,21 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     const bool desc = var_InheritBool(p_this, "help-verbose");
     const bool advanced = var_InheritBool(p_this, "advanced");
 
-    /* List all modules */
-    size_t count;
-    module_t **list = module_list_get (&count);
-
     /* Enumerate the config for each module */
-    for (size_t i = 0; i < count; i++)
+    for (const vlc_plugin_t *p = vlc_plugins; p != NULL; p = p->next)
     {
-        const module_t *m = list[i];
+        const module_t *m = p->module;
         const module_config_t *section = NULL;
         const char *objname = module_get_object(m);
 
-        if (m->i_config_items == 0)
+        if (p->conf.count == 0)
             continue; /* Ignore modules without config options */
         if (!module_match(m, psz_search, strict))
             continue;
         found = true;
 
-        if (!module_show(m, advanced))
-        {   /* Ignore modules with only advanced config options if requested */
+        if (!plugin_show(p, advanced))
+        {   /* Ignore plugins with only advanced config options if requested */
             i_only_advanced++;
             continue;
         }
@@ -607,9 +603,9 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
                    module_gettext(m, m->psz_help));
 
         /* Print module options */
-        for (size_t j = 0; j < m->confsize; j++)
+        for (size_t j = 0; j < p->conf.size; j++)
         {
-            const module_config_t *item = m->p_config + j;
+            const module_config_t *item = p->conf.items + j;
 
             if (item->b_removed)
                 continue; /* Skip removed options */
@@ -638,9 +634,6 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         printf(color ? "\n" WHITE "%s" GRAY "\n" : "\n%s\n",
                _("No matching module found. Use --list or "
                  "--list-verbose to list available modules."));
-
-    /* Release the module list */
-    module_list_free (list);
 }
 
 /*****************************************************************************

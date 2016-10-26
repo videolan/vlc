@@ -24,6 +24,7 @@
 #ifndef LIBVLC_MODULES_H
 # define LIBVLC_MODULES_H 1
 
+/** VLC plugin */
 typedef struct vlc_plugin_t
 {
     struct vlc_plugin_t *next;
@@ -33,8 +34,23 @@ typedef struct vlc_plugin_t
     off_t size; /**< File size */
 
     module_t *module;
+
+    /**
+     * Variables set by the module to store its config options
+     */
+    struct
+    {
+        module_config_t *items; /**< Table of configuration parameters */
+        size_t size; /**< Size of items table */
+        size_t count; /**< Number of configuration items */
+        size_t booleans; /**< Number of booleal config items */
+    } conf;
 } vlc_plugin_t;
 
+/**
+ * List of all plug-ins.
+ */
+extern struct vlc_plugin_t *vlc_plugins;
 
 #define MODULE_SHORTCUT_MAX 20
 
@@ -77,14 +93,6 @@ struct module_t
     /* Callbacks */
     void *pf_activate;
     void *pf_deactivate;
-
-    /*
-     * Variables set by the module to store its config options
-     */
-    module_config_t *p_config;             /* Module configuration structure */
-    size_t           confsize;            /* Number of module_config_t items */
-    unsigned int     i_config_items;        /* number of configuration items */
-    unsigned int     i_bool_items;            /* number of bool config items */
 
     /*
      * Variables used internally by the module manager

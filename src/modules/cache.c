@@ -179,7 +179,7 @@ static int vlc_cache_load_align(size_t align, block_t *file)
     if (vlc_cache_load_align(alignof(t), file)) \
         goto error
 
-static int CacheLoadConfig(module_config_t *cfg, block_t *file)
+static int vlc_cache_load_config(module_config_t *cfg, block_t *file)
 {
     LOAD_IMMEDIATE (cfg->i_type);
     LOAD_IMMEDIATE (cfg->i_short);
@@ -244,7 +244,7 @@ error:
     return -1; /* FIXME: leaks */
 }
 
-static int CacheLoadModuleConfig(module_t *module, block_t *file)
+static int vlc_cache_load_plugin_config(vlc_plugin_t *plugin, block_t *file)
 {
     uint16_t lines;
 
@@ -254,30 +254,31 @@ static int CacheLoadModuleConfig(module_t *module, block_t *file)
     /* Allocate memory */
     if (lines)
     {
-        module->p_config = calloc (1, lines * sizeof (module_config_t));
-        if (unlikely(module->p_config == NULL))
+        plugin->conf.items = calloc(sizeof (module_config_t), lines);
+        if (unlikely(plugin->conf.items == NULL))
         {
-            module->confsize = 0;
+            plugin->conf.size = 0;
             return -1;
         }
     }
     else
-        module->p_config = NULL;
-    module->confsize = lines;
+        plugin->conf.items = NULL;
+
+    plugin->conf.size = lines;
 
     /* Do the duplication job */
     for (size_t i = 0; i < lines; i++)
-        if (CacheLoadConfig (module->p_config + i, file))
+    {
+        module_config_t *item = plugin->conf.items + i;
+
+        if (vlc_cache_load_config(item, file))
             return -1;
 
-    for (size_t i = 0; i < lines; i++)
-    {
-        unsigned type = module->p_config[i].i_type;
-        if (CONFIG_ITEM(type))
+        if (CONFIG_ITEM(item->i_type))
         {
-            module->i_config_items++;
-            if (type == CONFIG_ITEM_BOOL)
-                module->i_bool_items++;
+            plugin->conf.count++;
+            if (item->i_type == CONFIG_ITEM_BOOL)
+                plugin->conf.booleans++;
         }
     }
 
@@ -343,10 +344,6 @@ static module_t *vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
         LOAD_IMMEDIATE(submodule->i_score);
     }
 
-    /* Config stuff */
-    if (CacheLoadModuleConfig(module, file) != VLC_SUCCESS)
-        goto error;
-
     return module;
 error:
     vlc_module_destroy(module);
@@ -360,7 +357,15 @@ static vlc_plugin_t *vlc_cache_load_plugin(block_t *file)
         return NULL;
 
     plugin->module = NULL;
+    plugin->conf.items = NULL;
+    plugin->conf.size = 0;
+    plugin->conf.count = 0;
+    plugin->conf.booleans = 0;
+
     if (vlc_cache_load_module(plugin, file) == NULL)
+        goto error;
+
+    if (vlc_cache_load_plugin_config(plugin, file))
         goto error;
 
     const char *path;
@@ -574,14 +579,14 @@ error:
     return -1;
 }
 
-static int CacheSaveModuleConfig (FILE *file, const module_t *module)
+static int CacheSaveModuleConfig(FILE *file, const vlc_plugin_t *plugin)
 {
-    uint16_t lines = module->confsize;
+    uint16_t lines = plugin->conf.size;
 
     SAVE_IMMEDIATE (lines);
 
     for (size_t i = 0; i < lines; i++)
-        if (CacheSaveConfig (file, module->p_config + i))
+        if (CacheSaveConfig(file, plugin->conf.items + i))
            goto error;
 
     return 0;
@@ -635,7 +640,8 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
 
     for (size_t i = 0; i < n; i++)
     {
-        const module_t *module = cache[i]->module;
+        const vlc_plugin_t *plugin = cache[i];
+        const module_t *module = plugin->module;
         uint32_t i_submodule;
 
         /* Save additional infos */
@@ -658,13 +664,13 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
             goto error;
 
         /* Config stuff */
-        if (CacheSaveModuleConfig (file, module))
+        if (CacheSaveModuleConfig(file, plugin))
             goto error;
 
         /* Save common info */
-        SAVE_STRING(cache[i]->path);
-        SAVE_IMMEDIATE(cache[i]->mtime);
-        SAVE_IMMEDIATE(cache[i]->size);
+        SAVE_STRING(plugin->path);
+        SAVE_IMMEDIATE(plugin->mtime);
+        SAVE_IMMEDIATE(plugin->size);
     }
 
     if (fflush (file)) /* flush libc buffers */

@@ -422,8 +422,17 @@ bool module_exists (const char * psz_name)
  */
 module_config_t *module_config_get( const module_t *module, unsigned *restrict psize )
 {
+    const vlc_plugin_t *plugin = module->plugin;
+
+    if (plugin->module != NULL)
+    {   /* For backward compatibility, pretend non-first modules have no
+         * configuration items. */
+        *psize = 0;
+        return NULL;
+    }
+
     unsigned i,j;
-    unsigned size = module->confsize;
+    size_t size = plugin->conf.size;
     module_config_t *config = malloc( size * sizeof( *config ) );
 
     assert( psize != NULL );
@@ -434,7 +443,7 @@ module_config_t *module_config_get( const module_t *module, unsigned *restrict p
 
     for( i = 0, j = 0; i < size; i++ )
     {
-        const module_config_t *item = module->p_config + i;
+        const module_config_t *item = plugin->conf.items + i;
         if( item->b_internal /* internal option */
          || item->b_removed /* removed option */ )
             continue;

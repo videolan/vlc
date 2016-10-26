@@ -49,16 +49,17 @@
 static struct
 {
     vlc_mutex_t lock;
-    vlc_plugin_t *libs;
     block_t *caches;
     unsigned usage;
-} modules = { VLC_STATIC_MUTEX, NULL, NULL, 0 };
+} modules = { VLC_STATIC_MUTEX, NULL, 0 };
+
+vlc_plugin_t *vlc_plugins = NULL;
 
 static void module_StoreBank(vlc_plugin_t *lib)
 {
     /*vlc_assert_locked (&modules.lock);*/
-    lib->next = modules.libs;
-    modules.libs = lib;
+    lib->next = vlc_plugins;
+    vlc_plugins = lib;
 }
 
 /**
@@ -211,10 +212,11 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
 
     /* For now we force loading if the module's config contains callbacks.
      * Could be optimized by adding an API call.*/
-    for (size_t n = module->confsize, i = 0; i < n; i++)
+    for (size_t i = 0; i < plugin->conf.size; i++)
          if (!module->b_loaded
-          && module->p_config[i].list_count == 0
-          && (module->p_config[i].list.psz_cb != NULL || module->p_config[i].list.i_cb != NULL))
+          && plugin->conf.items[i].list_count == 0
+          && (plugin->conf.items[i].list.psz_cb != NULL
+           || plugin->conf.items[i].list.i_cb != NULL))
          {
              /* !unloadable not allowed for plugins with callbacks */
              vlc_plugin_destroy(plugin);
@@ -459,9 +461,9 @@ void module_EndBank (bool b_plugins)
     if (--modules.usage == 0)
     {
         config_UnsortConfig ();
-        libs = modules.libs;
+        libs = vlc_plugins;
         caches = modules.caches;
-        modules.libs = NULL;
+        vlc_plugins = NULL;
         modules.caches = NULL;
     }
     vlc_mutex_unlock (&modules.lock);
@@ -540,7 +542,7 @@ module_t **module_list_get (size_t *n)
 
     assert (n != NULL);
 
-    for (vlc_plugin_t *lib = modules.libs; lib != NULL; lib = lib->next)
+    for (vlc_plugin_t *lib = vlc_plugins; lib != NULL; lib = lib->next)
     {
         module_t *mod = lib->module;
         assert(mod != NULL);
@@ -586,7 +588,7 @@ ssize_t module_list_cap (module_t ***restrict list, const char *cap)
 
     assert (list != NULL);
 
-    for (vlc_plugin_t *lib = modules.libs; lib != NULL; lib = lib->next)
+    for (vlc_plugin_t *lib = vlc_plugins; lib != NULL; lib = lib->next)
     {
          module_t *mod = lib->module;
          assert(mod != NULL);
@@ -603,7 +605,7 @@ ssize_t module_list_cap (module_t ***restrict list, const char *cap)
     if (unlikely(tab == NULL))
         return -1;
 
-    for (vlc_plugin_t *lib = modules.libs; lib != NULL; lib = lib->next)
+    for (vlc_plugin_t *lib = vlc_plugins; lib != NULL; lib = lib->next)
     {
          module_t *mod = lib->module;
          assert(mod != NULL);

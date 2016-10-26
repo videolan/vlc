@@ -511,26 +511,22 @@ static struct
  */
 int config_SortConfig (void)
 {
-    size_t nmod, nconf = 0;
-    module_t **mlist = module_list_get (&nmod);
+    vlc_plugin_t *p;
+    size_t nconf = 0;
 
-    for (size_t i = 0; i < nmod; i++)
-         nconf  += mlist[i]->confsize;
+    for (p = vlc_plugins; p != NULL; p = p->next)
+         nconf += p->conf.size;
 
     module_config_t **clist = malloc (sizeof (*clist) * nconf);
     if (unlikely(clist == NULL))
-    {
-        module_list_free (mlist);
         return VLC_ENOMEM;
-    }
 
     nconf = 0;
-    for (size_t i = 0; i < nmod; i++)
+    for (p = vlc_plugins; p != NULL; p = p->next)
     {
-        module_t *parser = mlist[i];
         module_config_t *item, *end;
 
-        for (item = parser->p_config, end = item + parser->confsize;
+        for (item = p->conf.items, end = item + p->conf.size;
              item < end;
              item++)
         {
@@ -539,7 +535,6 @@ int config_SortConfig (void)
             clist[nconf++] = item;
         }
     }
-    module_list_free (mlist);
 
     qsort (clist, nconf, sizeof (*clist), confcmp);
 
@@ -606,17 +601,12 @@ void config_Free (module_config_t *tab, size_t confsize)
  *****************************************************************************/
 void config_ResetAll( vlc_object_t *p_this )
 {
-    size_t count;
-    module_t **list = module_list_get (&count);
-
     vlc_rwlock_wrlock (&config_lock);
-    for (size_t j = 0; j < count; j++)
+    for (vlc_plugin_t *p = vlc_plugins; p != NULL; p = p->next)
     {
-        module_t *p_module = list[j];
-
-        for (size_t i = 0; i < p_module->confsize; i++ )
+        for (size_t i = 0; i < p->conf.size; i++ )
         {
-            module_config_t *p_config = p_module->p_config + i;
+            module_config_t *p_config = p->conf.items + i;
 
             if (IsConfigIntegerType (p_config->i_type))
                 p_config->value.i = p_config->orig.i;
@@ -634,6 +624,5 @@ void config_ResetAll( vlc_object_t *p_this )
     }
     vlc_rwlock_unlock (&config_lock);
 
-    module_list_free (list);
     VLC_UNUSED(p_this);
 }

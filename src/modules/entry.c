@@ -67,10 +67,6 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
     module->b_unloadable = parent == NULL;
     module->pf_activate = NULL;
     module->pf_deactivate = NULL;
-    module->p_config = NULL;
-    module->confsize = 0;
-    module->i_config_items = 0;
-    module->i_bool_items = 0;
     /*module->handle = garbage */
     module->psz_filename = NULL;
     module->domain = NULL;
@@ -90,7 +86,6 @@ void vlc_module_destroy (module_t *module)
         vlc_module_destroy (m);
     }
 
-    config_Free (module->p_config, module->confsize);
     free (module->psz_filename);
     free (module->pp_shortcuts);
     free (module);
@@ -108,14 +103,15 @@ void vlc_plugin_destroy(vlc_plugin_t *plugin)
     if (plugin->module != NULL)
         vlc_module_destroy(plugin->module);
 
+    config_Free(plugin->conf.items, plugin->conf.size);
     free(plugin->path);
     free(plugin);
 }
 
-static module_config_t *vlc_config_create (module_t *module, int type)
+static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
 {
-    unsigned confsize = module->confsize;
-    module_config_t *tab = module->p_config;
+    unsigned confsize = plugin->conf.size;
+    module_config_t *tab = plugin->conf.items;
 
     if ((confsize & 0xf) == 0)
     {
@@ -123,7 +119,7 @@ static module_config_t *vlc_config_create (module_t *module, int type)
         if (tab == NULL)
             return NULL;
 
-        module->p_config = tab;
+        plugin->conf.items = tab;
     }
 
     memset (tab + confsize, 0, sizeof (tab[confsize]));
@@ -141,12 +137,12 @@ static module_config_t *vlc_config_create (module_t *module, int type)
 
     if (CONFIG_ITEM(type))
     {
-        module->i_config_items++;
+        plugin->conf.count++;
         if (type == CONFIG_ITEM_BOOL)
-            module->i_bool_items++;
+            plugin->conf.booleans++;
     }
 
-    module->confsize++;
+    plugin->conf.size++;
     return tab + confsize;
 }
 
@@ -198,7 +194,7 @@ static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
             int type = va_arg (ap, int);
             module_config_t **pp = va_arg (ap, module_config_t **);
 
-            item = vlc_config_create(plugin->module, type);
+            item = vlc_config_create(plugin, type);
             if (unlikely(item == NULL))
             {
                 ret = -1;
@@ -438,6 +434,11 @@ vlc_plugin_t *vlc_plugin_describe(vlc_plugin_cb entry)
 
     plugin->path = NULL;
     plugin->module = NULL;
+
+    plugin->conf.items = NULL;
+    plugin->conf.size = 0;
+    plugin->conf.count = 0;
+    plugin->conf.booleans = 0;
 
     if (entry(vlc_plugin_setter, plugin) != 0)
     {
