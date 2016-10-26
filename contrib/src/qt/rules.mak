@@ -32,10 +32,16 @@ QT_SPEC := win32-g++
 QT_PLATFORM := -xplatform win32-g++ -device-option CROSS_COMPILE=$(HOST)-
 endif
 
-QT_CONFIG := -static -release -opensource -confirm-license -no-pkg-config \
+QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -no-dbus \
 	-no-qml-debug -no-audio-backend -no-sql-odbc -no-pch \
 	-no-compile-examples -nomake examples
+
+ifndef WITH_OPTIMIZATION
+QT_CONFIG += -debug
+else
+QT_CONFIG += -release
+endif
 
 .qt: qt
 	cd $< && ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
