@@ -28,7 +28,7 @@
 
 /**
  * \defgroup access Access
- * \ingroup input
+ * \ingroup stream
  * Raw input byte streams
  * @{
  * \file
