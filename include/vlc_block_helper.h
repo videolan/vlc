@@ -29,9 +29,9 @@
 typedef struct block_bytestream_t
 {
     block_t *p_chain;  /**< byte stream head block */
+    block_t **pp_last; /**< tail ppointer for appends */
     block_t *p_block;  /**< byte stream read pointer block */
     size_t   i_offset; /**< byte stream read pointer offset within block */
-    /* TODO? add tail pointer for faster push? */
 } block_bytestream_t;
 
 /*****************************************************************************
@@ -40,6 +40,7 @@ typedef struct block_bytestream_t
 static inline void block_BytestreamInit( block_bytestream_t *p_bytestream )
 {
     p_bytestream->p_chain = p_bytestream->p_block = NULL;
+    p_bytestream->pp_last = &p_bytestream->p_chain;
     p_bytestream->i_offset = 0;
 }
 
@@ -82,12 +83,14 @@ static inline void block_BytestreamFlush( block_bytestream_t *p_bytestream )
     }
 
     p_bytestream->p_chain = p_bytestream->p_block = block;
+    if( p_bytestream->p_chain == NULL )
+        p_bytestream->pp_last = &p_bytestream->p_chain;
 }
 
 static inline void block_BytestreamPush( block_bytestream_t *p_bytestream,
                                          block_t *p_block )
 {
-    block_ChainAppend( &p_bytestream->p_chain, p_block );
+    block_ChainLastAppend( &p_bytestream->pp_last, p_block );
     if( !p_bytestream->p_block ) p_bytestream->p_block = p_block;
 }
 
@@ -109,6 +112,7 @@ static inline block_t *block_BytestreamPop( block_bytestream_t *p_bytestream )
         p_block->i_buffer -= p_bytestream->i_offset;
         p_bytestream->i_offset = 0;
         p_bytestream->p_chain = p_bytestream->p_block = NULL;
+        p_bytestream->pp_last = &p_bytestream->p_chain;
         return p_block;
     }
 
@@ -118,6 +122,7 @@ static inline block_t *block_BytestreamPop( block_bytestream_t *p_bytestream )
     block_t *p_block_old = p_block;
     p_block = p_block->p_next;
     p_block_old->p_next = NULL;
+    p_bytestream->pp_last = &p_block_old->p_next;
 
     return p_block;
 }
