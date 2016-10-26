@@ -23,11 +23,8 @@
 
 -- Probe function.
 function probe()
-	if vlc.access ~= "http" and vlc.access ~= "https" then
-        return false
-    end
-
-    return ( string.match( vlc.path, "www.dailymotion.com/video" ) )
+    return ( vlc.access == "http" or vlc.access == "https" )
+        and string.match( vlc.path, "^www%.dailymotion%.com/video/" )
 end
 
 -- Parse function.
