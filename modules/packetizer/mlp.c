@@ -268,29 +268,36 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     uint8_t p_header[MLP_HEADER_SIZE];
     block_t *p_out_buffer;
 
-    /* */
-    if( !pp_block || !*pp_block )
-        return NULL;
+    block_t *p_block = pp_block ? *pp_block : NULL;
 
-    /* */
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    if ( p_block )
     {
-        Flush( p_dec );
-        if( (*pp_block)->i_flags&(BLOCK_FLAG_CORRUPTED) )
+        if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
         {
-            block_Release( *pp_block );
+            /* First always drain complete blocks before discontinuity */
+            block_t *p_drain = Packetize( p_dec, NULL );
+            if( p_drain )
+                return p_drain;
+
+            Flush( p_dec );
+
+            if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+            {
+                block_Release( p_block );
+                return NULL;
+            }
+        }
+
+        if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
+        {
+            /* We've just started the stream, wait for the first PTS. */
+            msg_Dbg( p_dec, "waiting for PTS" );
+            block_Release( p_block );
             return NULL;
         }
-    }
 
-    if( !date_Get( &p_sys->end_date ) && !(*pp_block)->i_pts )
-    {
-        /* We've just started the stream, wait for the first PTS. */
-        block_Release( *pp_block );
-        return NULL;
+        block_BytestreamPush( &p_sys->bytestream, p_block );
     }
-
-    block_BytestreamPush( &p_sys->bytestream, *pp_block );
 
     for( ;; )
     {
@@ -352,13 +359,15 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_state = STATE_NEXT_SYNC;
 
         case STATE_NEXT_SYNC:
-            /* TODO: If pp_block == NULL, flush the buffer without checking the
-             * next sync word */
-
             /* Check if next expected frame contains the sync word */
             if( block_PeekOffsetBytes( &p_sys->bytestream,
                                        p_sys->i_frame_size, p_header, MLP_HEADER_SIZE ) )
             {
+                if( p_block == NULL ) /* drain */
+                {
+                    p_sys->i_state = STATE_SEND_DATA;
+                    break;
+                }
                 /* Need more data */
                 return NULL;
             }
@@ -438,7 +447,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
 
             /* So p_block doesn't get re-added several times */
-            *pp_block = block_BytestreamPop( &p_sys->bytestream );
+            if( pp_block )
+                *pp_block = block_BytestreamPop( &p_sys->bytestream );
 
             p_sys->i_state = STATE_NOSYNC;
 
