@@ -215,7 +215,8 @@ function playlist(name,client,arg)
     function playlist0(item,prefix)
         local prefix = prefix or ""
         if not item.flags.disabled then
-            local str = "| "..prefix..tostring(item.id).." - "..item.name
+            local str = "| "..prefix..tostring(item.id).." - "..
+                            ( item.name or item.path )
             if item.duration > 0 then
                 str = str.." ("..common.durationtostring(item.duration)..")"
             end
