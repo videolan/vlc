@@ -127,8 +127,8 @@ int module_get_score( const module_t *m )
  */
 const char *module_gettext (const module_t *m, const char *str)
 {
-    if (m->parent != NULL)
-        m = m->parent;
+    m = m->plugin->module;
+
     if (unlikely(str == NULL || *str == '\0'))
         return "";
 #ifdef ENABLE_NLS

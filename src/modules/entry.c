@@ -35,26 +35,24 @@
 #include "config/configuration.h"
 #include "libvlc.h"
 
-module_t *vlc_module_create (module_t *parent)
+module_t *vlc_module_create(vlc_plugin_t *plugin)
 {
     module_t *module = malloc (sizeof (*module));
     if (module == NULL)
         return NULL;
 
-    /* TODO: replace module/submodules with plugin/modules */
+    /* TODO: finish replacing module/submodules with plugin/modules */
+    module_t *parent = plugin->module;
     if (parent == NULL)
-    {
         module->next = NULL;
-        module->parent = NULL;
-    }
     else
     {
         module->next = parent->submodule;
         parent->submodule = module;
         parent->submodule_count++;
-        module->parent = parent;
     }
 
+    module->plugin = plugin;
     module->submodule = NULL;
     module->submodule_count = 0;
 
@@ -80,8 +78,7 @@ module_t *vlc_module_create (module_t *parent)
 }
 
 /**
- * Destroys a plug-in.
- * @warning If the plug-in is loaded in memory, the handle will be leaked.
+ * Destroys a module.
  */
 void vlc_module_destroy (module_t *module)
 {
@@ -97,6 +94,22 @@ void vlc_module_destroy (module_t *module)
     free (module->psz_filename);
     free (module->pp_shortcuts);
     free (module);
+}
+
+/**
+ * Destroys a plug-in.
+ * @warning If the plug-in was dynamically loaded in memory, the library handle
+ * and associated memory mappings and linker resources will be leaked.
+ */
+void vlc_plugin_destroy(vlc_plugin_t *plugin)
+{
+    assert(plugin != NULL);
+
+    if (plugin->module != NULL)
+        vlc_module_destroy(plugin->module);
+
+    free(plugin->path);
+    free(plugin);
 }
 
 static module_config_t *vlc_config_create (module_t *module, int type)
@@ -141,9 +154,9 @@ static module_config_t *vlc_config_create (module_t *module, int type)
 /**
  * Callback for the plugin descriptor functions.
  */
-static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
+static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
 {
-    module_t **pprimary = plugin;
+    vlc_plugin_t *plugin = ctx;
     module_t *module = tgt;
     module_config_t *item = tgt;
     va_list ap;
@@ -154,8 +167,8 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
     {
         case VLC_MODULE_CREATE:
         {
-            module = *pprimary;
-            module_t *submodule = vlc_module_create (module);
+            module_t *module = plugin->module;
+            module_t *submodule = vlc_module_create(plugin);
             if (unlikely(submodule == NULL))
             {
                 ret = -1;
@@ -163,11 +176,12 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
             }
 
             *(va_arg (ap, module_t **)) = submodule;
-            if (*pprimary == NULL)
+            if (module == NULL)
             {
-                *pprimary = submodule;
+                plugin->module = submodule;
                 break;
             }
+
             /* Inheritance. Ugly!! */
             submodule->pp_shortcuts = xmalloc (sizeof ( *submodule->pp_shortcuts ));
             submodule->pp_shortcuts[0] = module->pp_shortcuts[0];
@@ -184,7 +198,7 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
             int type = va_arg (ap, int);
             module_config_t **pp = va_arg (ap, module_config_t **);
 
-            item = vlc_config_create (*pprimary, type);
+            item = vlc_config_create(plugin->module, type);
             if (unlikely(item == NULL))
             {
                 ret = -1;
@@ -234,7 +248,7 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
             break;
 
         case VLC_MODULE_NO_UNLOAD:
-            assert (module->parent == NULL);
+            assert(module->plugin->module == module);
             module->b_unloadable = false;
             break;
 
@@ -253,7 +267,8 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
         }
 
         case VLC_MODULE_SHORTNAME:
-            assert (module->psz_shortname == NULL || module->parent != NULL);
+            assert(module->psz_shortname == NULL
+                || module->plugin->module != module);
             module->psz_shortname = va_arg (ap, const char *);
             break;
 
@@ -263,13 +278,13 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
             break;
 
         case VLC_MODULE_HELP:
-            assert (module->parent == NULL);
-            assert (module->psz_help == NULL);
+            assert(module->plugin->module == module);
+            assert(module->psz_help == NULL);
             module->psz_help = va_arg (ap, const char *);
             break;
 
         case VLC_MODULE_TEXTDOMAIN:
-            assert (module->parent == NULL);
+            assert(module->plugin->module == NULL);
             assert (module->domain == NULL);
             module->domain = va_arg (ap, const char *);
             break;
@@ -411,17 +426,23 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
 }
 
 /**
- * Runs a plug-in descriptor. This loads the plug-in meta-data in memory.
+ * Runs a plug-in descriptor.
+ *
+ * This loads the plug-in meta-data in memory.
  */
-module_t *vlc_plugin_describe (vlc_plugin_cb entry)
+vlc_plugin_t *vlc_plugin_describe(vlc_plugin_cb entry)
 {
-    module_t *module = NULL;
+    vlc_plugin_t *plugin = malloc(sizeof (*plugin));
+    if (unlikely(plugin == NULL))
+        return NULL;
 
-    if (entry (vlc_plugin_setter, &module) != 0)
+    plugin->path = NULL;
+    plugin->module = NULL;
+
+    if (entry(vlc_plugin_setter, plugin) != 0)
     {
-        if (module != NULL) /* partially initialized plug-in... */
-            vlc_module_destroy (module);
-        module = NULL;
+        vlc_plugin_destroy(plugin); /* partially initialized plug-in... */
+        plugin = NULL;
     }
-    return module;
+    return plugin;
 }

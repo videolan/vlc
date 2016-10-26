@@ -24,21 +24,16 @@
 #ifndef LIBVLC_MODULES_H
 # define LIBVLC_MODULES_H 1
 
-typedef struct module_cache_t module_cache_t;
-
-/*****************************************************************************
- * Module cache description structure
- *****************************************************************************/
-struct module_cache_t
+typedef struct vlc_plugin_t
 {
-    /* Mandatory cache entry header */
-    char  *path;
-    time_t mtime;
-    off_t  size;
+    struct vlc_plugin_t *next;
 
-    /* Optional extra data */
-    module_t *p_module;
-};
+    char *path; /**< Relative path */
+    time_t mtime; /**< Last modification time */
+    off_t size; /**< File size */
+
+    module_t *module;
+} vlc_plugin_t;
 
 
 #define MODULE_SHORTCUT_MAX 20
@@ -57,8 +52,8 @@ int vlc_entry__core (int (*)(void *, void *, int, ...), void *);
  */
 struct module_t
 {
+    vlc_plugin_t *plugin; /**< Plug-in/library containing the module */
     module_t   *next;
-    module_t   *parent;
     module_t   *submodule;
     unsigned    submodule_count;
 
@@ -100,8 +95,9 @@ struct module_t
     const char *        domain;                            /* gettext domain */
 };
 
-module_t *vlc_plugin_describe (vlc_plugin_cb);
-module_t *vlc_module_create (module_t *);
+vlc_plugin_t *vlc_plugin_describe(vlc_plugin_cb);
+void vlc_plugin_destroy(vlc_plugin_t *);
+module_t *vlc_module_create(vlc_plugin_t *);
 void vlc_module_destroy (module_t *);
 
 void module_InitBank (void);
@@ -121,14 +117,13 @@ void module_Unload (module_handle_t);
 
 /* Plugins cache */
 void   CacheMerge (vlc_object_t *, module_t *, module_t *);
-size_t CacheLoad(vlc_object_t *, const char *, module_cache_t **, block_t **);
+vlc_plugin_t *vlc_cache_load(vlc_object_t *, const char *, block_t **);
 
 struct stat;
+vlc_plugin_t *vlc_cache_lookup(vlc_plugin_t **,
+                               const char *relpath, const struct stat *st);
 
-int CacheAdd (module_cache_t **, size_t *,
-              const char *, const struct stat *, module_t *);
-void CacheSave  (vlc_object_t *, const char *, module_cache_t *, size_t);
-module_t *CacheFind (module_cache_t *, size_t,
-                     const char *, const struct stat *);
+int CacheAdd(vlc_plugin_t ***, size_t *, vlc_plugin_t *);
+void CacheSave(vlc_object_t *, const char *, vlc_plugin_t *const *, size_t);
 
 #endif /* !LIBVLC_MODULES_H */

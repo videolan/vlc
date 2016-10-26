@@ -49,31 +49,32 @@
 static struct
 {
     vlc_mutex_t lock;
-    module_t *head;
+    vlc_plugin_t *libs;
     block_t *caches;
     unsigned usage;
 } modules = { VLC_STATIC_MUTEX, NULL, NULL, 0 };
 
-static void module_StoreBank (module_t *module)
+static void module_StoreBank(vlc_plugin_t *lib)
 {
     /*vlc_assert_locked (&modules.lock);*/
-    module->next = modules.head;
-    modules.head = module;
+    lib->next = modules.libs;
+    modules.libs = lib;
 }
 
 /**
  * Registers a statically-linked plug-in.
  */
-static module_t *module_InitStatic (vlc_plugin_cb entry)
+static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
 {
-    /* Initializes the module */
-    module_t *module = vlc_plugin_describe (entry);
-    if (unlikely(module == NULL))
+    /* Initializes the statically-linked library */
+    vlc_plugin_t *lib = vlc_plugin_describe (entry);
+    if (unlikely(lib == NULL))
         return NULL;
 
-    module->b_loaded = true;
-    module->b_unloadable = false;
-    return module;
+    assert(lib->module != NULL);
+    lib->module->b_loaded = true;
+    lib->module->b_unloadable = false;
+    return lib;
 }
 
 #if defined(__ELF__) || !HAVE_DYNAMIC_PLUGINS
@@ -89,10 +90,11 @@ static void module_InitStaticModules(void)
     if (!vlc_static_modules)
         return;
 
-    for (unsigned i = 0; vlc_static_modules[i]; i++) {
-        module_t *module = module_InitStatic (vlc_static_modules[i]);
-        if (likely(module != NULL))
-            module_StoreBank (module);
+    for (unsigned i = 0; vlc_static_modules[i]; i++)
+    {
+        vlc_plugin_t *lib = module_InitStatic(vlc_static_modules[i]);
+        if (likely(lib != NULL))
+            module_StoreBank(lib);
     }
 }
 #else
@@ -115,8 +117,8 @@ static void module_InitStaticModules(void) { }
  * \param fast whether to optimize loading for speed or safety
  *             (fast is used when the plug-in is registered but not used)
  */
-static module_t *module_InitDynamic (vlc_object_t *obj, const char *path,
-                                     bool fast)
+static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
+                                        bool fast)
 {
     module_handle_t handle;
 
@@ -134,8 +136,8 @@ static module_t *module_InitDynamic (vlc_object_t *obj, const char *path,
     }
 
     /* We can now try to call the symbol */
-    module_t *module = vlc_plugin_describe (entry);
-    if (unlikely(module == NULL))
+    vlc_plugin_t *plugin = vlc_plugin_describe(entry);
+    if (unlikely(plugin == NULL))
     {
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
@@ -143,15 +145,17 @@ static module_t *module_InitDynamic (vlc_object_t *obj, const char *path,
         goto error;
     }
 
-    module->psz_filename = strdup (path);
-    if (unlikely(module->psz_filename == NULL))
+    assert(plugin->module != NULL);
+
+    plugin->module->psz_filename = strdup (path);
+    if (unlikely(plugin->module->psz_filename == NULL))
     {
-        vlc_module_destroy (module);
+        vlc_plugin_destroy(plugin);
         goto error;
     }
-    module->handle = handle;
-    module->b_loaded = true;
-    return module;
+    plugin->module->handle = handle;
+    plugin->module->b_loaded = true;
+    return plugin;
 error:
     module_Unload( handle );
     return NULL;
@@ -165,11 +169,9 @@ typedef struct module_bank
     const char   *base;
     cache_mode_t  mode;
 
-    size_t         i_cache;
-    module_cache_t *cache;
-
-    size_t         i_loaded_cache;
-    module_cache_t *loaded_cache;
+    size_t        size;
+    vlc_plugin_t **plugins;
+    vlc_plugin_t *cache;
 } module_bank_t;
 
 /**
@@ -178,30 +180,34 @@ typedef struct module_bank
 static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
                                const char *relpath, const struct stat *st)
 {
-    module_t *module = NULL;
+    vlc_plugin_t *plugin = NULL;
 
     /* Check our plugins cache first then load plugin if needed */
     if (bank->mode == CACHE_USE)
     {
-        module = CacheFind (bank->loaded_cache, bank->i_loaded_cache,
-                            relpath, st);
-        if (module != NULL)
+        vlc_plugin_t *cache = vlc_cache_lookup(&bank->cache, relpath, st);
+        if (cache != NULL)
         {
-            module->psz_filename = strdup (abspath);
-            if (unlikely(module->psz_filename == NULL))
-            {
-                vlc_module_destroy (module);
-                module = NULL;
-            }
+            assert(cache->module != NULL);
+            cache->module->psz_filename = strdup(abspath);
+            if (likely(cache->module->psz_filename != NULL))
+                plugin = cache;
+            else
+                vlc_plugin_destroy(cache);
         }
     }
-    if (module == NULL)
-        module = module_InitDynamic (bank->obj, abspath, true);
-    if (module == NULL)
+    if (plugin == NULL)
+    {
+        plugin = module_InitDynamic(bank->obj, abspath, true);
+        plugin->path = xstrdup(relpath);
+        plugin->mtime = st->st_mtime;
+        plugin->size = st->st_size;
+    }
+    if (plugin == NULL)
         return -1;
 
-    /* We have not already scanned and inserted this module */
-    assert (module->next == NULL);
+    module_t *module = plugin->module;
+    assert(module != NULL);
 
     /* For now we force loading if the module's config contains callbacks.
      * Could be optimized by adding an API call.*/
@@ -211,17 +217,19 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
           && (module->p_config[i].list.psz_cb != NULL || module->p_config[i].list.i_cb != NULL))
          {
              /* !unloadable not allowed for plugins with callbacks */
-             vlc_module_destroy (module);
-             module = module_InitDynamic (bank->obj, abspath, false);
-             if (unlikely(module == NULL))
+             vlc_plugin_destroy(plugin);
+
+             assert(bank->mode != CACHE_RESET);
+             plugin = module_InitDynamic(bank->obj, abspath, false);
+             if (unlikely(plugin == NULL))
                  return -1;
              break;
          }
 
-    module_StoreBank (module);
+    module_StoreBank(plugin);
 
-    if (bank->mode != CACHE_IGNORE) /* Add entry to cache */
-        CacheAdd (&bank->cache, &bank->i_cache, relpath, st, module);
+    if (bank->mode != CACHE_IGNORE) /* Add entry to bank */
+        CacheAdd(&bank->plugins, &bank->size, plugin);
     /* TODO: deal with errors */
     return  0;
 }
@@ -318,8 +326,7 @@ static void AllocatePluginPath(vlc_object_t *obj, const char *path,
     };
 
     if (mode == CACHE_USE)
-        bank.i_loaded_cache = CacheLoad(bank.obj, bank.base,
-                                        &bank.loaded_cache, &modules.caches);
+        bank.cache = vlc_cache_load(obj, path, &modules.caches);
     else
         msg_Dbg(bank.obj, "ignoring plugins cache file");
 
@@ -328,26 +335,19 @@ static void AllocatePluginPath(vlc_object_t *obj, const char *path,
     /* Don't go deeper than 5 subdirectories */
     AllocatePluginDir (&bank, 5, path, NULL);
 
-    switch( mode )
+    /* Discard unmatched cache entries */
+    while (bank.cache != NULL)
     {
-        case CACHE_USE:
-            /* Discard unmatched cache entries */
-            for (size_t i = 0; i < bank.i_loaded_cache; i++)
-            {
-                if (bank.loaded_cache[i].p_module != NULL)
-                    vlc_module_destroy(bank.loaded_cache[i].p_module);
-                free(bank.loaded_cache[i].path);
-            }
-            free(bank.loaded_cache);
-            for (size_t i = 0; i < bank.i_cache; i++)
-                free(bank.cache[i].path);
-            free(bank.cache);
-            break;
-        case CACHE_RESET:
-            CacheSave(obj, path, bank.cache, bank.i_cache);
-        case CACHE_IGNORE:
-            break;
+        vlc_plugin_t *plugin = bank.cache;
+
+        bank.cache = plugin->next;
+        vlc_plugin_destroy(plugin);
     }
+
+    if (mode == CACHE_RESET)
+        CacheSave(obj, path, bank.plugins, bank.size);
+
+    free(bank.plugins);
 }
 
 /**
@@ -421,9 +421,10 @@ void module_InitBank (void)
          * library just as another module, and for instance the configuration
          * options of core will be available in the module bank structure just
          * as for every other module. */
-        module_t *module = module_InitStatic (vlc_entry__core);
-        if (likely(module != NULL))
-            module_StoreBank (module);
+        vlc_plugin_t *plugin = module_InitStatic(vlc_entry__core);
+        assert(plugin != NULL);
+        if (likely(plugin != NULL))
+            module_StoreBank(plugin);
         config_SortConfig ();
     }
     modules.usage++;
@@ -444,7 +445,7 @@ void module_InitBank (void)
  */
 void module_EndBank (bool b_plugins)
 {
-    module_t *head = NULL;
+    vlc_plugin_t *libs = NULL;
     block_t *caches = NULL;
 
     /* If plugins were _not_ loaded, then the caller still has the bank lock
@@ -458,26 +459,27 @@ void module_EndBank (bool b_plugins)
     if (--modules.usage == 0)
     {
         config_UnsortConfig ();
-        head = modules.head;
+        libs = modules.libs;
         caches = modules.caches;
-        modules.head = NULL;
+        modules.libs = NULL;
         modules.caches = NULL;
     }
     vlc_mutex_unlock (&modules.lock);
 
-    while (head != NULL)
+    while (libs != NULL)
     {
-        module_t *module = head;
+        vlc_plugin_t *lib = libs;
 
-        head = module->next;
+        libs = lib->next;
 #ifdef HAVE_DYNAMIC_PLUGINS
-        if (module->b_loaded && module->b_unloadable)
+        assert(lib->module != NULL);
+        if (lib->module->b_loaded && lib->module->b_unloadable)
         {
-            module_Unload (module->handle);
-            module->b_loaded = false;
+            module_Unload(lib->module->handle);
+            lib->module->b_loaded = false;
         }
 #endif
-        vlc_module_destroy (module);
+        vlc_plugin_destroy(lib);
     }
 
     block_ChainRelease(caches);
@@ -538,8 +540,11 @@ module_t **module_list_get (size_t *n)
 
     assert (n != NULL);
 
-    for (module_t *mod = modules.head; mod; mod = mod->next)
+    for (vlc_plugin_t *lib = modules.libs; lib != NULL; lib = lib->next)
     {
+        module_t *mod = lib->module;
+        assert(mod != NULL);
+
          module_t **nt;
          nt  = realloc (tab, (i + 1 + mod->submodule_count) * sizeof (*tab));
          if (unlikely(nt == NULL))
@@ -581,8 +586,11 @@ ssize_t module_list_cap (module_t ***restrict list, const char *cap)
 
     assert (list != NULL);
 
-    for (module_t *mod = modules.head; mod != NULL; mod = mod->next)
+    for (vlc_plugin_t *lib = modules.libs; lib != NULL; lib = lib->next)
     {
+         module_t *mod = lib->module;
+         assert(mod != NULL);
+
          if (module_provides (mod, cap))
              n++;
          for (module_t *subm = mod->submodule; subm != NULL; subm = subm->next)
@@ -595,8 +603,11 @@ ssize_t module_list_cap (module_t ***restrict list, const char *cap)
     if (unlikely(tab == NULL))
         return -1;
 
-    for (module_t *mod = modules.head; mod != NULL; mod = mod->next)
+    for (vlc_plugin_t *lib = modules.libs; lib != NULL; lib = lib->next)
     {
+         module_t *mod = lib->module;
+         assert(mod != NULL);
+
          if (module_provides (mod, cap))
              *(tab++)= mod;
          for (module_t *subm = mod->submodule; subm != NULL; subm = subm->next)
@@ -616,22 +627,25 @@ ssize_t module_list_cap (module_t ***restrict list, const char *cap)
 int module_Map (vlc_object_t *obj, module_t *module)
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+    vlc_plugin_t *plugin = module->plugin;
 
-    if (module->parent != NULL)
-        module = module->parent;
+    assert(plugin != NULL);
+    module = plugin->module;
+    assert(module != NULL);
 
     vlc_mutex_lock(&lock);
     if (!module->b_loaded)
     {
-        module_t *uncache;
+        vlc_plugin_t *uncache;
 
         assert (module->psz_filename != NULL);
 #ifdef HAVE_DYNAMIC_PLUGINS
         uncache = module_InitDynamic (obj, module->psz_filename, false);
         if (uncache != NULL)
         {
-            CacheMerge (obj, module, uncache);
-            vlc_module_destroy (uncache);
+            assert(uncache->module != NULL);
+            CacheMerge(obj, module, uncache->module);
+            vlc_plugin_destroy(uncache);
         }
         else
 #endif

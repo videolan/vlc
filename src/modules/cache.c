@@ -276,12 +276,13 @@ error:
     return -1; /* FIXME: leaks */
 }
 
-static module_t *CacheLoadModule(block_t *file)
+static module_t *vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
 {
-    module_t *module = vlc_module_create (NULL);
+    module_t *module = vlc_module_create(plugin);
     if (unlikely(module == NULL))
         return NULL;
 
+    plugin->module = module;
     /* Load additional infos */
     LOAD_STRING(module->psz_shortname);
     LOAD_STRING(module->psz_longname);
@@ -315,7 +316,7 @@ static module_t *CacheLoadModule(block_t *file)
 
     for (; submodules > 0; submodules--)
     {
-        module_t *submodule = vlc_module_create (module);
+        module_t *submodule = vlc_module_create(plugin);
 
         free (submodule->pp_shortcuts);
         LOAD_STRING(submodule->psz_shortname);
@@ -342,6 +343,34 @@ error:
     return NULL;
 }
 
+static vlc_plugin_t *vlc_cache_load_plugin(block_t *file)
+{
+    vlc_plugin_t *plugin = malloc(sizeof (*plugin));
+    if (unlikely(plugin == NULL))
+        return NULL;
+
+    plugin->module = NULL;
+    if (vlc_cache_load_module(plugin, file) == NULL)
+        goto error;
+
+    const char *path;
+    LOAD_STRING(path);
+    if (path == NULL)
+        goto error;
+
+    plugin->path = strdup(path);
+    if (unlikely(plugin->path == NULL))
+        goto error;
+
+    LOAD_IMMEDIATE(plugin->mtime);
+    LOAD_IMMEDIATE(plugin->size);
+    return plugin;
+
+error:
+    vlc_plugin_destroy(plugin);
+    return NULL;
+}
+
 /**
  * Loads a plugins cache file.
  *
@@ -350,14 +379,13 @@ error:
  * actually load the dynamically loadable module.
  * This allows us to only fully load plugins when they are actually used.
  */
-size_t CacheLoad(vlc_object_t *p_this, const char *dir, module_cache_t **r,
-                 block_t **backingp)
+vlc_plugin_t *vlc_cache_load(vlc_object_t *p_this, const char *dir,
+                             block_t **backingp)
 {
     char *psz_filename;
 
     assert( dir != NULL );
 
-    *r = NULL;
     if( asprintf( &psz_filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1 )
         return 0;
 
@@ -422,44 +450,28 @@ size_t CacheLoad(vlc_object_t *p_this, const char *dir, module_cache_t **r,
         return 0;
     }
 
-    module_cache_t *cache = NULL;
-    size_t count = 0;
+    vlc_plugin_t *cache = NULL;
 
-    for (;;)
+    while (file->i_buffer > 0)
     {
-        module_t *module = CacheLoadModule (file);
-        if (module == NULL)
-        {
-            if (file->i_buffer == 0)
-                break;
+        vlc_plugin_t *plugin = vlc_cache_load_plugin(file);
+        if (plugin == NULL)
             goto error;
-        }
 
-        const char *path;
-        struct stat st;
-
-        /* Load common info */
-        LOAD_STRING(path);
-        if (path == NULL)
-            goto error;
-        LOAD_IMMEDIATE(st.st_mtime);
-        LOAD_IMMEDIATE(st.st_size);
-
-        CacheAdd (&cache, &count, path, &st, module);
-        /* TODO: deal with errors */
+        plugin->next = cache;
+        cache = plugin;
     }
 
     file->p_next = *backingp;
     *backingp = file;
-    *r = cache;
-    return count;
+    return cache;
 
 error:
     msg_Warn( p_this, "plugins cache not loaded (corrupted)" );
 
     /* TODO: cleanup */
     block_Release(file);
-    return 0;
+    return NULL;
 }
 
 #define SAVE_IMMEDIATE( a ) \
@@ -590,8 +602,7 @@ error:
     return -1;
 }
 
-static int CacheSaveBank (FILE *file, const module_cache_t *cache,
-                          size_t i_cache)
+static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
 {
     uint32_t i_file_size = 0;
 
@@ -614,9 +625,9 @@ static int CacheSaveBank (FILE *file, const module_cache_t *cache,
     if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1)
         goto error;
 
-    for (unsigned i = 0; i < i_cache; i++)
+    for (size_t i = 0; i < n; i++)
     {
-        module_t *module = cache[i].p_module;
+        const module_t *module = cache[i]->module;
         uint32_t i_submodule;
 
         /* Save additional infos */
@@ -643,9 +654,9 @@ static int CacheSaveBank (FILE *file, const module_cache_t *cache,
             goto error;
 
         /* Save common info */
-        SAVE_STRING(cache[i].path);
-        SAVE_IMMEDIATE(cache[i].mtime);
-        SAVE_IMMEDIATE(cache[i].size);
+        SAVE_STRING(cache[i]->path);
+        SAVE_IMMEDIATE(cache[i]->mtime);
+        SAVE_IMMEDIATE(cache[i]->size);
     }
 
     if (fflush (file)) /* flush libc buffers */
@@ -659,8 +670,8 @@ error:
 /**
  * Saves a module cache to disk, and release cache data from memory.
  */
-void CacheSave (vlc_object_t *p_this, const char *dir,
-               module_cache_t *entries, size_t n)
+void CacheSave(vlc_object_t *p_this, const char *dir,
+               vlc_plugin_t *const *entries, size_t n)
 {
     char *filename = NULL, *tmpname = NULL;
 
@@ -680,7 +691,7 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
         goto out;
     }
 
-    if (CacheSaveBank (file, entries, n))
+    if (CacheSaveBank(file, entries, n))
     {
         msg_Warn (p_this, "cannot write %s: %s", tmpname,
                   vlc_strerror_c(errno));
@@ -701,10 +712,6 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
 out:
     free (filename);
     free (tmpname);
-
-    for (size_t i = 0; i < n; i++)
-        free (entries[i].path);
-    free (entries);
 }
 
 /*****************************************************************************
@@ -738,45 +745,43 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
 /**
  * Looks up a plugin file in a table of cached plugins.
  */
-module_t *CacheFind (module_cache_t *cache, size_t count,
-                     const char *path, const struct stat *st)
+vlc_plugin_t *vlc_cache_lookup(vlc_plugin_t **cache,
+                               const char *path, const struct stat *st)
 {
-    while (count > 0)
+    vlc_plugin_t **pp = cache, *plugin;
+
+    while ((plugin = *pp) != NULL)
     {
-        if (cache->path != NULL
-         && !strcmp (cache->path, path)
-         && cache->mtime == st->st_mtime
-         && cache->size == st->st_size)
-       {
-            module_t *module = cache->p_module;
-            cache->p_module = NULL;
-            return module;
-       }
-       cache++;
-       count--;
+        /* TODO: Preemptively delete plugins with matching name and different
+         * stats. This will save time in following look-ups. */
+        if (plugin->path != NULL
+         && !strcmp(plugin->path, path)
+         && plugin->mtime == st->st_mtime
+         && plugin->size == st->st_size)
+        {
+            *pp = plugin->next;
+            plugin->next = NULL;
+            return plugin;
+        }
+
+        pp = &plugin->next;
     }
 
     return NULL;
 }
 
 /** Adds entry to the cache */
-int CacheAdd (module_cache_t **cachep, size_t *countp,
-              const char *path, const struct stat *st, module_t *module)
+int CacheAdd(vlc_plugin_t ***cachep, size_t *countp, vlc_plugin_t *plugin)
 {
-    module_cache_t *cache = *cachep;
-    const size_t count = *countp;
+    vlc_plugin_t **cache = *cachep;
+    size_t count = *countp;
 
-    cache = realloc (cache, (count + 1) * sizeof (*cache));
+    cache = realloc(cache, (count + 1) * sizeof (*cache));
     if (unlikely(cache == NULL))
         return -1;
-    *cachep = cache;
 
-    cache += count;
-    /* NOTE: strdup() could be avoided, but it would be a bit ugly */
-    cache->path = strdup (path);
-    cache->mtime = st->st_mtime;
-    cache->size = st->st_size;
-    cache->p_module = module;
+    cache[count] = plugin;
+    *cachep = cache;
     *countp = count + 1;
     return 0;
 }
