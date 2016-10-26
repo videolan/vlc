@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 25
+#define CACHE_SUBVERSION_NUM 26
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -249,8 +249,6 @@ static int CacheLoadModuleConfig(module_t *module, block_t *file)
     uint16_t lines;
 
     /* Calculate the structure length */
-    LOAD_IMMEDIATE (module->i_config_items);
-    LOAD_IMMEDIATE (module->i_bool_items);
     LOAD_IMMEDIATE (lines);
 
     /* Allocate memory */
@@ -271,6 +269,18 @@ static int CacheLoadModuleConfig(module_t *module, block_t *file)
     for (size_t i = 0; i < lines; i++)
         if (CacheLoadConfig (module->p_config + i, file))
             return -1;
+
+    for (size_t i = 0; i < lines; i++)
+    {
+        unsigned type = module->p_config[i].i_type;
+        if (CONFIG_ITEM(type))
+        {
+            module->i_config_items++;
+            if (type == CONFIG_ITEM_BOOL)
+                module->i_bool_items++;
+        }
+    }
+
     return 0;
 error:
     return -1; /* FIXME: leaks */
@@ -568,8 +578,6 @@ static int CacheSaveModuleConfig (FILE *file, const module_t *module)
 {
     uint16_t lines = module->confsize;
 
-    SAVE_IMMEDIATE (module->i_config_items);
-    SAVE_IMMEDIATE (module->i_bool_items);
     SAVE_IMMEDIATE (lines);
 
     for (size_t i = 0; i < lines; i++)
