@@ -33,10 +33,6 @@
 #include "libvlc.h"
 
 /**
- * @section Thread-safe block queue functions
- */
-
-/**
  * Internal state for block queues
  */
 struct block_fifo_t
@@ -50,56 +46,21 @@ struct block_fifo_t
     size_t              i_size;
 };
 
-/**
- * Locks a block FIFO. No more than one thread can lock the FIFO at any given
- * time, and no other thread can modify the FIFO while it is locked.
- * vlc_fifo_Unlock() releases the lock.
- *
- * @note If the FIFO is already locked by another thread, this function waits.
- * This function is not a cancellation point.
- *
- * @warning Recursively locking a single FIFO is undefined. Locking more than
- * one FIFO at a time may lead to lock inversion; mind the locking order.
- */
 void vlc_fifo_Lock(vlc_fifo_t *fifo)
 {
     vlc_mutex_lock(&fifo->lock);
 }
 
-/**
- * Unlocks a block FIFO previously locked by block_FifoLock().
- *
- * @note This function is not a cancellation point.
- *
- * @warning Unlocking a FIFO not locked by the calling thread is undefined.
- */
 void vlc_fifo_Unlock(vlc_fifo_t *fifo)
 {
     vlc_mutex_unlock(&fifo->lock);
 }
 
-/**
- * Wakes up one thread waiting on the FIFO, if any.
- *
- * @note This function is not a cancellation point.
- *
- * @warning For race-free operations, the FIFO should be locked by the calling
- * thread. The function can be called on a unlocked FIFO however.
- */
 void vlc_fifo_Signal(vlc_fifo_t *fifo)
 {
     vlc_cond_signal(&fifo->wait);
 }
 
-/**
- * Atomically unlocks the FIFO and waits until one thread signals the FIFO,
- * then locks the FIFO again. A signal can be sent by queueing a block to the
- * previously empty FIFO or by calling vlc_fifo_Signal() directly.
- * This function may also return spuriously at any moment.
- *
- * @note This function is a cancellation point. In case of cancellation, the
- * the FIFO will be locked before cancellation cleanup handlers are processed.
- */
 void vlc_fifo_Wait(vlc_fifo_t *fifo)
 {
     vlc_fifo_WaitCond(fifo, &fifo->wait);
@@ -110,60 +71,21 @@ void vlc_fifo_WaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar)
     vlc_cond_wait(condvar, &fifo->lock);
 }
 
-/**
- * Atomically unlocks the FIFO and waits until one thread signals the FIFO up
- * to a certain date, then locks the FIFO again. See vlc_fifo_Wait().
- */
 int vlc_fifo_TimedWaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar, mtime_t deadline)
 {
     return vlc_cond_timedwait(condvar, &fifo->lock, deadline);
 }
 
-/**
- * Checks how many blocks are queued in a locked FIFO.
- *
- * @note This function is not cancellation point.
- *
- * @warning The FIFO must be locked by the calling thread using
- * vlc_fifo_Lock(). Otherwise behaviour is undefined.
- *
- * @return the number of blocks in the FIFO (zero if it is empty)
- */
 size_t vlc_fifo_GetCount(const vlc_fifo_t *fifo)
 {
     return fifo->i_depth;
 }
 
-/**
- * Checks how many bytes are queued in a locked FIFO.
- *
- * @note This function is not cancellation point.
- *
- * @warning The FIFO must be locked by the calling thread using
- * vlc_fifo_Lock(). Otherwise behaviour is undefined.
- *
- * @return the total number of bytes
- *
- * @note Zero bytes does not necessarily mean that the FIFO is empty since
- * a block could contain zero bytes. Use vlc_fifo_GetCount() to determine if
- * a FIFO is empty.
- */
 size_t vlc_fifo_GetBytes(const vlc_fifo_t *fifo)
 {
     return fifo->i_size;
 }
 
-/**
- * Queues a linked-list of blocks into a locked FIFO.
- *
- * @param block the head of the list of blocks
- *              (if NULL, this function has no effects)
- *
- * @note This function is not a cancellation point.
- *
- * @warning The FIFO must be locked by the calling thread using
- * vlc_fifo_Lock(). Otherwise behaviour is undefined.
- */
 void vlc_fifo_QueueUnlocked(block_fifo_t *fifo, block_t *block)
 {
     vlc_assert_locked(&fifo->lock);
@@ -183,16 +105,6 @@ void vlc_fifo_QueueUnlocked(block_fifo_t *fifo, block_t *block)
     vlc_fifo_Signal(fifo);
 }
 
-/**
- * Dequeues the first block from a locked FIFO, if any.
- *
- * @note This function is not a cancellation point.
- *
- * @warning The FIFO must be locked by the calling thread using
- * vlc_fifo_Lock(). Otherwise behaviour is undefined.
- *
- * @return the first block in the FIFO or NULL if the FIFO is empty
- */
 block_t *vlc_fifo_DequeueUnlocked(block_fifo_t *fifo)
 {
     vlc_assert_locked(&fifo->lock);
@@ -215,18 +127,6 @@ block_t *vlc_fifo_DequeueUnlocked(block_fifo_t *fifo)
     return block;
 }
 
-/**
- * Dequeues the all blocks from a locked FIFO. This is equivalent to calling
- * vlc_fifo_DequeueUnlocked() repeatedly until the FIFO is emptied, but this
- * function is faster.
- *
- * @note This function is not a cancellation point.
- *
- * @warning The FIFO must be locked by the calling thread using
- * vlc_fifo_Lock(). Otherwise behaviour is undefined.
- *
- * @return a linked-list of all blocks in the FIFO (possibly NULL)
- */
 block_t *vlc_fifo_DequeueAllUnlocked(block_fifo_t *fifo)
 {
     vlc_assert_locked(&fifo->lock);
@@ -241,12 +141,6 @@ block_t *vlc_fifo_DequeueAllUnlocked(block_fifo_t *fifo)
     return block;
 }
 
-
-/**
- * Creates a thread-safe FIFO queue of blocks.
- * See also block_FifoPut() and block_FifoGet().
- * @return the FIFO or NULL on memory error
- */
 block_fifo_t *block_FifoNew( void )
 {
     block_fifo_t *p_fifo = malloc( sizeof( block_fifo_t ) );
@@ -262,10 +156,6 @@ block_fifo_t *block_FifoNew( void )
     return p_fifo;
 }
 
-/**
- * Destroys a FIFO created by block_FifoNew().
- * Any queued blocks are also destroyed.
- */
 void block_FifoRelease( block_fifo_t *p_fifo )
 {
     block_ChainRelease( p_fifo->p_first );
@@ -274,9 +164,6 @@ void block_FifoRelease( block_fifo_t *p_fifo )
     free( p_fifo );
 }
 
-/**
- * Clears all blocks in a FIFO.
- */
 void block_FifoEmpty(block_fifo_t *fifo)
 {
     block_t *block;
@@ -287,11 +174,6 @@ void block_FifoEmpty(block_fifo_t *fifo)
     block_ChainRelease(block);
 }
 
-/**
- * Immediately queue one block at the end of a FIFO.
- * @param fifo queue
- * @param block head of a block list to queue (may be NULL)
- */
 void block_FifoPut(block_fifo_t *fifo, block_t *block)
 {
     vlc_fifo_Lock(fifo);
@@ -299,12 +181,6 @@ void block_FifoPut(block_fifo_t *fifo, block_t *block)
     vlc_fifo_Unlock(fifo);
 }
 
-/**
- * Dequeue the first block from the FIFO. If necessary, wait until there is
- * one block in the queue. This function is (always) cancellation point.
- *
- * @return a valid block
- */
 block_t *block_FifoGet(block_fifo_t *fifo)
 {
     block_t *block;
@@ -324,17 +200,6 @@ block_t *block_FifoGet(block_fifo_t *fifo)
     return block;
 }
 
-/**
- * Peeks the first block in the FIFO.
- *
- * @warning This function leaves the block in the FIFO.
- * You need to protect against concurrent threads who could dequeue the block.
- * Preferably, there should be only one thread reading from the FIFO.
- *
- * @warning This function is undefined if the FIFO is empty.
- *
- * @return a valid block.
- */
 block_t *block_FifoShow( block_fifo_t *p_fifo )
 {
     block_t *b;

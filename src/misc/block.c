@@ -21,9 +21,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -37,10 +34,6 @@
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include <vlc_fs.h>
-
-/**
- * @section Block handling functions.
- */
 
 #ifndef NDEBUG
 static void BlockNoRelease( block_t *b )
@@ -252,18 +245,6 @@ static void block_heap_Release (block_t *block)
     free (block);
 }
 
-/**
- * Creates a block from a heap allocation.
- * This is provided by LibVLC so that manually heap-allocated blocks can safely
- * be deallocated even after the origin plugin has been unloaded from memory.
- *
- * When block_Release() is called, VLC will free() the specified pointer.
- *
- * @param addr base address of the heap allocation (will be free()'d)
- * @param length bytes length of the heap allocation
- * @return NULL in case of error (ptr free()'d in that case), or a valid
- * block_t pointer.
- */
 block_t *block_heap_Alloc (void *addr, size_t length)
 {
     block_t *block = malloc (sizeof (*block));
@@ -288,16 +269,6 @@ static void block_mmap_Release (block_t *block)
     free (block);
 }
 
-/**
- * Creates a block from a virtual address memory mapping (mmap).
- * This is provided by LibVLC so that mmap blocks can safely be deallocated
- * even after the allocating plugin has been unloaded from memory.
- *
- * @param addr base address of the mapping (as returned by mmap)
- * @param length length (bytes) of the mapping (as passed to mmap)
- * @return NULL if addr is MAP_FAILED, or an error occurred (in the later
- * case, munmap(addr, length) is invoked before returning).
- */
 block_t *block_mmap_Alloc (void *addr, size_t length)
 {
     if (addr == MAP_FAILED)
@@ -344,16 +315,6 @@ static void block_shm_Release (block_t *block)
     free (p_sys);
 }
 
-/**
- * Creates a block from a System V shared memory segment (shmget()).
- * This is provided by LibVLC so that segments can safely be deallocated
- * even after the allocating plugin has been unloaded from memory.
- *
- * @param addr base address of the segment (as returned by shmat())
- * @param length length (bytes) of the segment (as passed to shmget())
- * @return NULL if an error occurred (in that case, shmdt(addr) is invoked
- * before returning NULL).
- */
 block_t *block_shm_Alloc (void *addr, size_t length)
 {
     block_shm_t *block = malloc (sizeof (*block));
@@ -398,19 +359,6 @@ ssize_t pread (int fd, void *buf, size_t count, off_t offset)
 }
 #endif
 
-/**
- * Loads a file into a block of memory through a file descriptor.
- * If possible a private file mapping is created. Otherwise, the file is read
- * normally. This function is a cancellation point.
- *
- * @note On 32-bits platforms,
- * this function will not work for very large files,
- * due to memory space constraints.
- *
- * @param fd file descriptor to load from
- * @return a new block with the file content at p_buffer, and file length at
- * i_buffer (release it with block_Release()), or NULL upon error (see errno).
- */
 block_t *block_File (int fd)
 {
     size_t length;
@@ -477,10 +425,6 @@ block_t *block_File (int fd)
     return block;
 }
 
-/**
- * Loads a file into a block of memory from the file path.
- * See also block_File().
- */
 block_t *block_FilePath (const char *path)
 {
     int fd = vlc_open (path, O_RDONLY);

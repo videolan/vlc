@@ -25,9 +25,20 @@
 #define VLC_BLOCK_H 1
 
 /**
- * \file
- * This file implements functions and structures to handle blocks of data in vlc
+ * \defgroup block Data blocks
+ * \ingroup input
  *
+ * Blocks of binary data.
+ *
+ * @ref block_t is a generic structure to represent a binary blob within VLC.
+ * The primary goal of the structure is to avoid memory copying as data is
+ * passed around. It is notably used between the \ref demux, the packetizer
+ * (if present) and the \ref decoder, and for audio, between the \ref decoder,
+ * the audio filters, and the \ref audio_output.
+ *
+ * @{
+ * \file
+ * Data block definition and functions
  */
 
 #include <sys/types.h>  /* for ssize_t */
@@ -120,26 +131,60 @@ struct block_t
     block_free_t pf_release;
 };
 
-/****************************************************************************
- * Blocks functions:
- ****************************************************************************
- * - block_Alloc : create a new block with the requested size ( >= 0 ), return
- *      NULL for failure.
- * - block_Release : release a block allocated with block_Alloc.
- * - block_Realloc : realloc a block,
- *      i_pre: how many bytes to insert before body if > 0, else how many
- *      bytes of body to skip (the latter can be done without using
- *      block_Realloc i_buffer -= -i_pre, p_buffer += -i_pre as i_pre < 0)
- *      i_body (>= 0): the final size of the body (decreasing it can directly
- *      be done with i_buffer = i_body).
- *      with preheader and or body (increase
- *      and decrease are supported). Use it as it is optimised.
- * - block_Duplicate : create a copy of a block.
- ****************************************************************************/
 VLC_API void block_Init( block_t *, void *, size_t );
-VLC_API block_t *block_Alloc( size_t ) VLC_USED VLC_MALLOC;
+
+/**
+ * Allocates a block.
+ *
+ * Creates a new block with the requested size.
+ * The block must be released with block_Release().
+ *
+ * @param size size in bytes (possibly zero)
+ * @return the created block, or NULL on memory error.
+ */
+VLC_API block_t *block_Alloc(size_t size) VLC_USED VLC_MALLOC;
+
 block_t *block_TryRealloc(block_t *, ssize_t pre, size_t body) VLC_USED;
-VLC_API block_t *block_Realloc( block_t *, ssize_t i_pre, size_t i_body ) VLC_USED;
+
+/**
+ * Reallocates a block.
+ *
+ * This function expands, shrinks or moves a data block.
+ * In many cases, this function can return without any memory allocation by
+ * reusing spare buffer space. Otherwise, a new block is created and data is
+ * copied.
+ *
+ * @param pre count of bytes to prepend if positive,
+ *            count of leading bytes to discard if negative
+ * @param body new bytes size of the block
+ *
+ * @return the reallocated block on succes, NULL on error.
+ *
+ * @note Skipping leading bytes can be achieved directly by substracting from
+ * block_t.i_buffer and adding block_t.p_buffer.
+ * @note Discard trailing bytes can be achieved directly by substracting from
+ * block_t.i_buffer.
+ * @note On error, the block is discarded.
+ * To avoid that, use block_TryRealloc() instead.
+ */
+VLC_API block_t *block_Realloc(block_t *, ssize_t pre, size_t body) VLC_USED;
+
+/**
+ * Releases a block.
+ *
+ * This function works for any @ref block_t block, regardless of the way it was
+ * allocated.
+ *
+ * @note
+ * If the block is in a chain, this function does <b>not</b> release any
+ * subsequent block in the chain. Use block_ChainRelease() for that purpose. 
+ *
+ * @param block block to release (cannot be NULL)
+ */
+static inline void block_Release(block_t *block)
+{
+    block->pf_release(block);
+}
 
 static inline void block_CopyProperties( block_t *dst, block_t *src )
 {
@@ -150,6 +195,13 @@ static inline void block_CopyProperties( block_t *dst, block_t *src )
     dst->i_length  = src->i_length;
 }
 
+/**
+ * Duplicates a block.
+ *
+ * Creates a writeable duplicate of a block.
+ *
+ * @return the duplicate on success, NULL on error.
+ */
 VLC_USED
 static inline block_t *block_Duplicate( block_t *p_block )
 {
@@ -163,22 +215,86 @@ static inline block_t *block_Duplicate( block_t *p_block )
     return p_dup;
 }
 
-static inline void block_Release( block_t *p_block )
-{
-    p_block->pf_release( p_block );
-}
-
+/**
+ * Wraps heap in a block.
+ *
+ * Creates a @ref block_t out of an existing heap allocation.
+ * This is provided by LibVLC so that manually heap-allocated blocks can safely
+ * be deallocated even after the origin plugin has been unloaded from memory.
+ *
+ * When block_Release() is called, VLC will free() the specified pointer.
+ *
+ * @param addr base address of the heap allocation (will be free()'d)
+ * @param length bytes length of the heap allocation
+ * @return NULL in case of error (ptr free()'d in that case), or a valid
+ * block_t pointer.
+ */
 VLC_API block_t *block_heap_Alloc(void *, size_t) VLC_USED VLC_MALLOC;
+
+/**
+ * Wraps a memory mapping in a block
+ *
+ * Creates a @ref block_t from a virtual address memory mapping (mmap).
+ * This is provided by LibVLC so that mmap blocks can safely be deallocated
+ * even after the allocating plugin has been unloaded from memory.
+ *
+ * @param addr base address of the mapping (as returned by mmap)
+ * @param length length (bytes) of the mapping (as passed to mmap)
+ * @return NULL if addr is MAP_FAILED, or an error occurred (in the later
+ * case, munmap(addr, length) is invoked before returning).
+ */
 VLC_API block_t *block_mmap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
+
+/**
+ * Wraps a System V memory segment in a block
+ *
+ * Creates a @ref block_t from a System V shared memory segment (shmget()).
+ * This is provided by LibVLC so that segments can safely be deallocated
+ * even after the allocating plugin has been unloaded from memory.
+ *
+ * @param addr base address of the segment (as returned by shmat())
+ * @param length length (bytes) of the segment (as passed to shmget())
+ * @return NULL if an error occurred (in that case, shmdt(addr) is invoked
+ * before returning NULL).
+ */
 VLC_API block_t * block_shm_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
-VLC_API block_t *block_File(int fd) VLC_USED VLC_MALLOC;
-VLC_API block_t *block_FilePath(const char *) VLC_USED VLC_MALLOC;
+
+/**
+ * Maps a file handle in memory.
+ *
+ * Loads a file into a block of memory through a file descriptor.
+ * If possible a private file mapping is created. Otherwise, the file is read
+ * normally. This function is a cancellation point.
+ *
+ * @note On 32-bits platforms,
+ * this function will not work for very large files,
+ * due to memory space constraints.
+ *
+ * @param fd file descriptor to load from
+ *
+ * @return a new block with the file content at p_buffer, and file length at
+ * i_buffer (release it with block_Release()), or NULL upon error (see errno).
+ */
+VLC_API block_t *block_File(int fd, bool) VLC_USED VLC_MALLOC;
+
+/**
+ * Maps a file in memory.
+ *
+ * Loads a file into a block of memory from a path to the file.
+ * See also block_File().
+ */
+VLC_API block_t *block_FilePath(const char *, bool) VLC_USED VLC_MALLOC;
 
 static inline void block_Cleanup (void *block)
 {
     block_Release ((block_t *)block);
 }
 #define block_cleanup_push( block ) vlc_cleanup_push (block_Cleanup, block)
+
+/**
+ * \defgroup block_fifo Block chain
+ * @{
+ */
 
 /****************************************************************************
  * Chains of blocks functions helper
@@ -294,43 +410,199 @@ static inline block_t *block_ChainGather( block_t *p_list )
     return g;
 }
 
-/****************************************************************************
- * Fifos of blocks.
- ****************************************************************************
- * - block_FifoNew : create and init a new fifo
- * - block_FifoRelease : destroy a fifo and free all blocks in it.
- * - block_FifoEmpty : free all blocks in a fifo
- * - block_FifoPut : put a block
- * - block_FifoGet : get a packet from the fifo (and wait if it is empty)
- * - block_FifoShow : show the first packet of the fifo (and wait if
- *      needed), be careful, you can use it ONLY if you are sure to be the
- *      only one getting data from the fifo.
- * - block_FifoCount : how many packets are waiting in the fifo
- *
- * block_FifoGet and block_FifoShow are cancellation points.
- ****************************************************************************/
+/**
+ * @}
+ * \defgroup fifo Block FIFO
+ * Thread-safe block queue functions
+ * @{
+ */
 
-VLC_API block_fifo_t *block_FifoNew( void ) VLC_USED VLC_MALLOC;
-VLC_API void block_FifoRelease( block_fifo_t * );
-VLC_API void block_FifoEmpty( block_fifo_t * );
-VLC_API void block_FifoPut( block_fifo_t *, block_t * );
-VLC_API block_t * block_FifoGet( block_fifo_t * ) VLC_USED;
-VLC_API block_t * block_FifoShow( block_fifo_t * );
-size_t block_FifoSize(block_fifo_t *) VLC_USED;
-VLC_API size_t block_FifoCount(block_fifo_t *) VLC_USED;
+/**
+ * Creates a thread-safe FIFO queue of blocks.
+ *
+ * See also block_FifoPut() and block_FifoGet().
+ * The created queue must be released with block_FifoRelease().
+ *
+ * @return the FIFO or NULL on memory error
+ */
+VLC_API block_fifo_t *block_FifoNew(void) VLC_USED VLC_MALLOC;
+
+/**
+ * Destroys a FIFO created by block_FifoNew().
+ *
+ * @note Any queued blocks are also destroyed.
+ * @warning No other threads may be using the FIFO when this function is
+ * called. Otherwise, undefined behaviour will occur.
+ */
+VLC_API void block_FifoRelease(block_fifo_t *);
+
+/**
+ * Clears all blocks in a FIFO.
+ */
+VLC_API void block_FifoEmpty(block_fifo_t *);
+
+/**
+ * Immediately queue one block at the end of a FIFO.
+ *
+ * @param fifo queue
+ * @param block head of a block list to queue (may be NULL)
+ */
+VLC_API void block_FifoPut(block_fifo_t *fifo, block_t *block);
+
+/**
+ * Dequeue the first block from the FIFO. If necessary, wait until there is
+ * one block in the queue. This function is (always) cancellation point.
+ *
+ * @return a valid block
+ */
+VLC_API block_t *block_FifoGet(block_fifo_t *) VLC_USED;
+
+/**
+ * Peeks the first block in the FIFO.
+ *
+ * @warning This function leaves the block in the FIFO.
+ * You need to protect against concurrent threads who could dequeue the block.
+ * Preferably, there should be only one thread reading from the FIFO.
+ *
+ * @warning This function is undefined if the FIFO is empty.
+ *
+ * @return a valid block.
+ */
+VLC_API block_t *block_FifoShow(block_fifo_t *);
+
+size_t block_FifoSize(block_fifo_t *) VLC_USED VLC_DEPRECATED;
+VLC_API size_t block_FifoCount(block_fifo_t *) VLC_USED VLC_DEPRECATED;
 
 typedef struct block_fifo_t vlc_fifo_t;
 
+/**
+ * Locks a block FIFO.
+ *
+ * No more than one thread can lock the FIFO at any given
+ * time, and no other thread can modify the FIFO while it is locked.
+ * vlc_fifo_Unlock() releases the lock.
+ *
+ * @note If the FIFO is already locked by another thread, this function waits.
+ * This function is not a cancellation point.
+ *
+ * @warning Recursively locking a single FIFO is undefined. Locking more than
+ * one FIFO at a time may lead to lock inversion; mind the locking order.
+ */
 VLC_API void vlc_fifo_Lock(vlc_fifo_t *);
+
+/**
+ * Unlocks a block FIFO.
+ *
+ * The calling thread must have locked the FIFO previously with
+ * vlc_fifo_Lock(). Otherwise, the behaviour is undefined.
+ *
+ * @note This function is not a cancellation point.
+ */
 VLC_API void vlc_fifo_Unlock(vlc_fifo_t *);
+
+/**
+ * Wakes up one thread waiting on the FIFO, if any.
+ *
+ * @note This function is not a cancellation point.
+ *
+ * @warning For race-free operations, the FIFO should be locked by the calling
+ * thread. The function can be called on a unlocked FIFO however.
+ */
 VLC_API void vlc_fifo_Signal(vlc_fifo_t *);
+
+/**
+ * Waits on the FIFO.
+ *
+ * Atomically unlocks the FIFO and waits until one thread signals the FIFO,
+ * then locks the FIFO again. A signal can be sent by queueing a block to the
+ * previously empty FIFO or by calling vlc_fifo_Signal() directly.
+ * This function may also return spuriously at any moment.
+ *
+ * @note This function is a cancellation point. In case of cancellation, the
+ * the FIFO will be locked before cancellation cleanup handlers are processed.
+ */
 VLC_API void vlc_fifo_Wait(vlc_fifo_t *);
+
 VLC_API void vlc_fifo_WaitCond(vlc_fifo_t *, vlc_cond_t *);
+
+/**
+ * Timed variant of vlc_fifo_WaitCond().
+ *
+ * Atomically unlocks the FIFO and waits until one thread signals the FIFO up
+ * to a certain date, then locks the FIFO again. See vlc_fifo_Wait().
+ */
 int vlc_fifo_TimedWaitCond(vlc_fifo_t *, vlc_cond_t *, mtime_t);
+
+/**
+ * Queues a linked-list of blocks into a locked FIFO.
+ *
+ * @param block the head of the list of blocks
+ *              (if NULL, this function has no effects)
+ *
+ * @note This function is not a cancellation point.
+ *
+ * @warning The FIFO must be locked by the calling thread using
+ * vlc_fifo_Lock(). Otherwise behaviour is undefined.
+ */
 VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *, block_t *);
+
+/**
+ * Dequeues the first block from a locked FIFO, if any.
+ *
+ * @note This function is not a cancellation point.
+ *
+ * @warning The FIFO must be locked by the calling thread using
+ * vlc_fifo_Lock(). Otherwise behaviour is undefined.
+ *
+ * @return the first block in the FIFO or NULL if the FIFO is empty
+ */
 VLC_API block_t *vlc_fifo_DequeueUnlocked(vlc_fifo_t *) VLC_USED;
+
+/**
+ * Dequeues the all blocks from a locked FIFO.
+ *
+ * This is equivalent to calling vlc_fifo_DequeueUnlocked() repeatedly until
+ * the FIFO is emptied, but this function is much faster.
+ *
+ * @note This function is not a cancellation point.
+ *
+ * @warning The FIFO must be locked by the calling thread using
+ * vlc_fifo_Lock(). Otherwise behaviour is undefined.
+ *
+ * @return a linked-list of all blocks in the FIFO (possibly NULL)
+ */
 VLC_API block_t *vlc_fifo_DequeueAllUnlocked(vlc_fifo_t *) VLC_USED;
+
+/**
+ * Counts blocks in a FIFO.
+ *
+ * Checks how many blocks are queued in a locked FIFO.
+ *
+ * @note This function is not cancellation point.
+ *
+ * @warning The FIFO must be locked by the calling thread using
+ * vlc_fifo_Lock(). Otherwise behaviour is undefined.
+ *
+ * @return the number of blocks in the FIFO (zero if it is empty)
+ */
 VLC_API size_t vlc_fifo_GetCount(const vlc_fifo_t *) VLC_USED;
+
+/**
+ * Counts bytes in a FIFO.
+ *
+ * Checks how many bytes are queued in a locked FIFO.
+ *
+ * @note This function is not cancellation point.
+ *
+ * @warning The FIFO must be locked by the calling thread using
+ * vlc_fifo_Lock(). Otherwise behaviour is undefined.
+ *
+ * @return the total number of bytes
+ *
+ * @note Zero bytes does not necessarily mean that the FIFO is empty since
+ * a block could contain zero bytes. Use vlc_fifo_GetCount() to determine if
+ * a FIFO is empty.
+ */
 VLC_API size_t vlc_fifo_GetBytes(const vlc_fifo_t *) VLC_USED;
 
 VLC_USED static inline bool vlc_fifo_IsEmpty(const vlc_fifo_t *fifo)
@@ -343,5 +615,9 @@ static inline void vlc_fifo_Cleanup(void *fifo)
     vlc_fifo_Unlock((vlc_fifo_t *)fifo);
 }
 #define vlc_fifo_CleanupPush(fifo) vlc_cleanup_push(vlc_fifo_Cleanup, fifo)
+
+/** @} */
+
+/** @} */
 
 #endif /* VLC_BLOCK_H */
