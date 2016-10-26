@@ -286,27 +286,27 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
 static int
 LoadNativeWindowPrivAPI(native_window_priv_api_t *native)
 {
-    native->connect = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_connect");
-    native->disconnect = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_disconnect");
-    native->setUsage = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setUsage");
-    native->setBuffersGeometry = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setBuffersGeometry");
-    native->getMinUndequeued = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_getMinUndequeued");
-    native->getMaxBufferCount = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_getMaxBufferCount");
-    native->setBufferCount = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setBufferCount");
-    native->setCrop = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setCrop");
-    native->dequeue = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_dequeue");
-    native->lock = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_lock");
-    native->lockData = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_lockData");
-    native->unlockData = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_unlockData");
-    native->queue = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_queue");
-    native->cancel = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_cancel");
-    native->setOrientation = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setOrientation");
-
-    return native->connect && native->disconnect && native->setUsage &&
-        native->setBuffersGeometry && native->getMinUndequeued &&
-        native->getMaxBufferCount && native->setBufferCount && native->setCrop &&
-        native->dequeue && native->lock && native->lockData && native->unlockData &&
-        native->queue && native->cancel && native->setOrientation ? 0 : -1;
+#define LOAD(symbol) do { \
+if ((native->symbol = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_" #symbol)) == NULL) \
+    return -1; \
+} while(0)
+    LOAD(connect);
+    LOAD(disconnect);
+    LOAD(setUsage);
+    LOAD(setBuffersGeometry);
+    LOAD(getMinUndequeued);
+    LOAD(getMaxBufferCount);
+    LOAD(setBufferCount);
+    LOAD(setCrop);
+    LOAD(dequeue);
+    LOAD(lock);
+    LOAD(lockData);
+    LOAD(unlockData);
+    LOAD(queue);
+    LOAD(cancel);
+    LOAD(setOrientation);
+    return 0;
+#undef LOAD
 }
 
 /*
