@@ -356,6 +356,7 @@ function input_info(name,client)
     local item = vlc.input.item()
     if(item == nil) then return end
     local categories = item:info()
+    categories["Meta data"] = item:metas()
     for cat, infos in pairs(categories) do
         client:append("+----[ "..cat.." ]")
         client:append("|")
