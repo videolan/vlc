@@ -151,6 +151,7 @@ nobase_vlclib_DATA = \
 	lua/playlist/liveleak.luac \
 	lua/playlist/metacafe.luac \
 	lua/playlist/mpora.luac \
+	lua/playlist/newgrounds.luac \
 	lua/playlist/pinkbike.luac \
 	lua/playlist/pluzz.luac \
 	lua/playlist/rockbox_fm_presets.luac \
@@ -242,6 +243,7 @@ EXTRA_DIST += \
 	lua/playlist/liveleak.lua \
 	lua/playlist/metacafe.lua \
 	lua/playlist/mpora.lua \
+	lua/playlist/newgrounds.lua \
 	lua/playlist/pinkbike.lua \
 	lua/playlist/pluzz.lua \
 	lua/playlist/rockbox_fm_presets.lua \
