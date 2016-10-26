@@ -1,0 +1,34 @@
+--- libxml2/parser.c	2015-11-20 08:56:41.000000000 +0100
++++ libxml2/parser.c.lzma	2016-10-24 18:05:57.199914200 +0200
+@@ -82,6 +82,8 @@
+ #endif
+ #ifdef HAVE_LZMA_H
+ #include <lzma.h>
++#else
++#undef LIBXML_LZMA_ENABLED
+ #endif
+ 
+ #include "buf.h"
+--- libxml2/xmlIO.c	2016-10-26 10:07:38.573134100 +0200
++++ libxml2/xmlIO.c.lzma	2016-10-26 10:14:05.434206600 +0200
+@@ -37,6 +37,8 @@
+ #endif
+ #ifdef HAVE_LZMA_H
+ #include <lzma.h>
++#else
++#undef LIBXML_LZMA_ENABLED
+ #endif
+ 
+ #if defined(WIN32) || defined(_WIN32)
+--- libxml2/xzlib.c	2016-10-26 10:19:32.708734300 +0200
++++ libxml2/xzlib.c.lzma	2016-10-26 10:18:58.428464300 +0200
+@@ -8,6 +8,9 @@
+  */
+ #define IN_LIBXML
+ #include "libxml.h"
++#ifndef HAVE_LZMA_H
++#undef LIBXML_LZMA_ENABLED
++#endif
+ #ifdef LIBXML_LZMA_ENABLED
+ 
+ #include <string.h>
