@@ -67,6 +67,7 @@ struct decoder_sys_t
     bool    b_date_set;
 
     mtime_t i_pts;
+    bool    b_discontuinity;
 
     vlc_a52_header_t frame;
 };
@@ -75,6 +76,7 @@ static void PacketizeFlush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    p_sys->b_discontuinity = true;
     date_Set( &p_sys->end_date, 0 );
     p_sys->i_state = STATE_NOSYNC;
     block_BytestreamEmpty( &p_sys->bytestream );
@@ -271,6 +273,12 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
                 p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
 
+            if( p_sys->b_discontuinity )
+            {
+                p_out_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                p_sys->b_discontuinity = false;
+            }
+
             /* So p_block doesn't get re-added several times */
             *pp_block = block_BytestreamPop( &p_sys->bytestream );
 
@@ -315,6 +323,7 @@ static int Open( vlc_object_t *p_this )
     date_Set( &p_sys->end_date, 0 );
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_date_set = false;
+    p_sys->b_discontuinity = false;
 
     block_BytestreamInit( &p_sys->bytestream );
 
