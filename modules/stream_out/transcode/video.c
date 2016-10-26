@@ -808,8 +808,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             id->p_encoder->fmt_out.video.i_visible_height = p_sys->i_height & ~1;
             id->p_encoder->fmt_out.video.i_sar_num = id->p_encoder->fmt_out.video.i_sar_den = 0;
 
-            transcode_video_filter_init( p_stream, id );
             transcode_video_encoder_init( p_stream, id );
+            transcode_video_filter_init( p_stream, id );
             conversion_video_filter_append( id );
             memcpy( &id->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
         }
@@ -823,8 +823,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 filter_chain_Delete( id->p_uf_chain );
             id->p_f_chain = id->p_uf_chain = NULL;
 
-            transcode_video_filter_init( p_stream, id );
             transcode_video_encoder_init( p_stream, id );
+            transcode_video_filter_init( p_stream, id );
             conversion_video_filter_append( id );
             memcpy( &id->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
 
