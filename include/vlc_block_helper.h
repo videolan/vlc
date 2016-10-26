@@ -45,13 +45,7 @@ static inline void block_BytestreamInit( block_bytestream_t *p_bytestream )
 
 static inline void block_BytestreamRelease( block_bytestream_t *p_bytestream )
 {
-    for( block_t *block = p_bytestream->p_chain; block != NULL; )
-    {
-        block_t *p_next = block->p_next;
-
-        block_Release( block );
-        block = p_next;
-    }
+    block_ChainRelease( p_bytestream->p_chain );
 }
 
 /**
