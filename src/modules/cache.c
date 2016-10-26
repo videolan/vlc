@@ -569,60 +569,26 @@ error:
     return -1;
 }
 
-static int CacheSaveBank( FILE *file, const module_cache_t *, size_t );
-
-/**
- * Saves a module cache to disk, and release cache data from memory.
- */
-void CacheSave (vlc_object_t *p_this, const char *dir,
-               module_cache_t *entries, size_t n)
+static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
 {
-    char *filename = NULL, *tmpname = NULL;
+    if( !p_module )
+        return 0;
+    if( CacheSaveSubmodule( file, p_module->next ) )
+        goto error;
 
-    if (asprintf (&filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1)
-        goto out;
+    SAVE_STRING( p_module->psz_shortname );
+    SAVE_STRING( p_module->psz_longname );
+    SAVE_IMMEDIATE( p_module->i_shortcuts );
+    for( unsigned j = 0; j < p_module->i_shortcuts; j++ )
+         SAVE_STRING( p_module->pp_shortcuts[j] );
 
-    if (asprintf (&tmpname, "%s.%"PRIu32, filename, (uint32_t)getpid ()) == -1)
-        goto out;
-    msg_Dbg (p_this, "saving plugins cache %s", filename);
+    SAVE_STRING( p_module->psz_capability );
+    SAVE_IMMEDIATE( p_module->i_score );
+    return 0;
 
-    FILE *file = vlc_fopen (tmpname, "wb");
-    if (file == NULL)
-    {
-        if (errno != EACCES && errno != ENOENT)
-            msg_Warn (p_this, "cannot create %s: %s", tmpname,
-                      vlc_strerror_c(errno));
-        goto out;
-    }
-
-    if (CacheSaveBank (file, entries, n))
-    {
-        msg_Warn (p_this, "cannot write %s: %s", tmpname,
-                  vlc_strerror_c(errno));
-        clearerr (file);
-        fclose (file);
-        vlc_unlink (tmpname);
-        goto out;
-    }
-
-#if !defined( _WIN32 ) && !defined( __OS2__ )
-    vlc_rename (tmpname, filename); /* atomically replace old cache */
-    fclose (file);
-#else
-    vlc_unlink (filename);
-    fclose (file);
-    vlc_rename (tmpname, filename);
-#endif
-out:
-    free (filename);
-    free (tmpname);
-
-    for (size_t i = 0; i < n; i++)
-        free (entries[i].path);
-    free (entries);
+error:
+    return -1;
 }
-
-static int CacheSaveSubmodule (FILE *, const module_t *);
 
 static int CacheSaveBank (FILE *file, const module_cache_t *cache,
                           size_t i_cache)
@@ -690,25 +656,55 @@ error:
     return -1;
 }
 
-static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
+/**
+ * Saves a module cache to disk, and release cache data from memory.
+ */
+void CacheSave (vlc_object_t *p_this, const char *dir,
+               module_cache_t *entries, size_t n)
 {
-    if( !p_module )
-        return 0;
-    if( CacheSaveSubmodule( file, p_module->next ) )
-        goto error;
+    char *filename = NULL, *tmpname = NULL;
 
-    SAVE_STRING( p_module->psz_shortname );
-    SAVE_STRING( p_module->psz_longname );
-    SAVE_IMMEDIATE( p_module->i_shortcuts );
-    for( unsigned j = 0; j < p_module->i_shortcuts; j++ )
-         SAVE_STRING( p_module->pp_shortcuts[j] );
+    if (asprintf (&filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1)
+        goto out;
 
-    SAVE_STRING( p_module->psz_capability );
-    SAVE_IMMEDIATE( p_module->i_score );
-    return 0;
+    if (asprintf (&tmpname, "%s.%"PRIu32, filename, (uint32_t)getpid ()) == -1)
+        goto out;
+    msg_Dbg (p_this, "saving plugins cache %s", filename);
 
-error:
-    return -1;
+    FILE *file = vlc_fopen (tmpname, "wb");
+    if (file == NULL)
+    {
+        if (errno != EACCES && errno != ENOENT)
+            msg_Warn (p_this, "cannot create %s: %s", tmpname,
+                      vlc_strerror_c(errno));
+        goto out;
+    }
+
+    if (CacheSaveBank (file, entries, n))
+    {
+        msg_Warn (p_this, "cannot write %s: %s", tmpname,
+                  vlc_strerror_c(errno));
+        clearerr (file);
+        fclose (file);
+        vlc_unlink (tmpname);
+        goto out;
+    }
+
+#if !defined( _WIN32 ) && !defined( __OS2__ )
+    vlc_rename (tmpname, filename); /* atomically replace old cache */
+    fclose (file);
+#else
+    vlc_unlink (filename);
+    fclose (file);
+    vlc_rename (tmpname, filename);
+#endif
+out:
+    free (filename);
+    free (tmpname);
+
+    for (size_t i = 0; i < n; i++)
+        free (entries[i].path);
+    free (entries);
 }
 
 /*****************************************************************************
