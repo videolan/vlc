@@ -21,7 +21,7 @@
 
 -- Probe function.
 function probe()
-    if( not string.match( string.upper( vlc.path ), ".CUE$" ) ) then
+    if( not string.match( vlc.path, "%.[cC][uU][eE]$" ) ) then
         return false
     end
     header = vlc.peek( 2048 )
