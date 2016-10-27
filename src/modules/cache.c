@@ -605,20 +605,6 @@ error:
     return -1;
 }
 
-static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
-{
-    if( !p_module )
-        return 0;
-    if( CacheSaveSubmodule( file, p_module->next ) )
-        goto error;
-    if (CacheSaveModule(file, p_module))
-        goto error;
-    return 0;
-
-error:
-    return -1;
-}
-
 static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
 {
     uint32_t i_file_size = 0;
@@ -653,8 +639,10 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
 
         i_submodule = module->submodule_count;
         SAVE_IMMEDIATE( i_submodule );
-        if (CacheSaveSubmodule (file, module->submodule))
-            goto error;
+
+        for (module = module->submodule; module != NULL; module = module->next)
+            if (CacheSaveModule(file, module))
+                goto error;
 
         /* Config stuff */
         if (CacheSaveModuleConfig(file, plugin))
