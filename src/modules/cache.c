@@ -744,21 +744,4 @@ vlc_plugin_t *vlc_cache_lookup(vlc_plugin_t **cache, const char *path)
 
     return NULL;
 }
-
-/** Adds entry to the cache */
-int CacheAdd(vlc_plugin_t ***cachep, size_t *countp, vlc_plugin_t *plugin)
-{
-    vlc_plugin_t **cache = *cachep;
-    size_t count = *countp;
-
-    cache = realloc(cache, (count + 1) * sizeof (*cache));
-    if (unlikely(cache == NULL))
-        return -1;
-
-    cache[count] = plugin;
-    *cachep = cache;
-    *countp = count + 1;
-    return 0;
-}
-
 #endif /* HAVE_DYNAMIC_PLUGINS */

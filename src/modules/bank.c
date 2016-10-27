@@ -197,8 +197,14 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
 
     module_StoreBank(plugin);
 
-    if (bank->mode != CACHE_IGNORE) /* Add entry to bank */
-        CacheAdd(&bank->plugins, &bank->size, plugin);
+    if (bank->mode == CACHE_RESET) /* Add entry to to-be-saved cache */
+    {
+        bank->plugins = xrealloc(bank->plugins,
+                                 (bank->size + 1) * sizeof (vlc_plugin_t *));
+        bank->plugins[bank->size] = plugin;
+        bank->size++;
+    }
+
     /* TODO: deal with errors */
     return  0;
 }
