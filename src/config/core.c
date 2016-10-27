@@ -355,6 +355,12 @@ ssize_t config_GetIntChoices (vlc_object_t *obj, const char *name,
     size_t count = cfg->list_count;
     if (count == 0)
     {
+        if (module_Map(obj, cfg->owner))
+        {
+            errno = EIO;
+            return -1;
+        }
+
         if (cfg->list.i_cb == NULL)
             return 0;
         return cfg->list.i_cb(obj, name, values, texts);
@@ -465,6 +471,12 @@ ssize_t config_GetPszChoices (vlc_object_t *obj, const char *name,
     size_t count = cfg->list_count;
     if (count == 0)
     {
+        if (module_Map(obj, cfg->owner))
+        {
+            errno = EIO;
+            return -1;
+        }
+
         if (cfg->list.psz_cb == NULL)
             return 0;
         return cfg->list.psz_cb(obj, name, values, texts);

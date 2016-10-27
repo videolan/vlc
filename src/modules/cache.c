@@ -280,6 +280,7 @@ static int vlc_cache_load_plugin_config(vlc_plugin_t *plugin, block_t *file)
             if (item->i_type == CONFIG_ITEM_BOOL)
                 plugin->conf.booleans++;
         }
+        item->owner = plugin;
     }
 
     return 0;

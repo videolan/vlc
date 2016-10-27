@@ -201,25 +201,6 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
     if (plugin == NULL)
         return -1;
 
-    module_t *module = plugin->module;
-    assert(module != NULL);
-
-    /* For now we force loading if the module's config contains callbacks.
-     * Could be optimized by adding an API call.*/
-    for (size_t i = 0; i < plugin->conf.size; i++)
-         if (!atomic_load_explicit(&plugin->loaded, memory_order_relaxed)
-          && plugin->conf.items[i].list_cb_name != NULL)
-         {
-             /* !unloadable not allowed for plugins with callbacks */
-             vlc_plugin_destroy(plugin);
-
-             assert(bank->mode != CACHE_RESET);
-             plugin = module_InitDynamic(bank->obj, abspath, false);
-             if (unlikely(plugin == NULL))
-                 return -1;
-             break;
-         }
-
     module_StoreBank(plugin);
 
     if (bank->mode != CACHE_IGNORE) /* Add entry to bank */

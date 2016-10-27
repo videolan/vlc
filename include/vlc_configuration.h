@@ -88,6 +88,7 @@ struct module_config_t
     } list;
     const char **list_text;                /* Friendly names for list values */
     const char *list_cb_name;
+    void *owner;
 };
 
 /*****************************************************************************

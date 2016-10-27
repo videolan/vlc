@@ -142,17 +142,20 @@ static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
     }
 
     memset (tab + confsize, 0, sizeof (tab[confsize]));
+    tab += confsize;
+    tab->owner = plugin;
+
     if (IsConfigIntegerType (type))
     {
-        tab[confsize].max.i = INT64_MAX;
-        tab[confsize].min.i = INT64_MIN;
+        tab->max.i = INT64_MAX;
+        tab->min.i = INT64_MIN;
     }
     else if( IsConfigFloatType (type))
     {
-        tab[confsize].max.f = FLT_MAX;
-        tab[confsize].min.f = FLT_MIN;
+        tab->max.f = FLT_MAX;
+        tab->min.f = FLT_MIN;
     }
-    tab[confsize].i_type = type;
+    tab->i_type = type;
 
     if (CONFIG_ITEM(type))
     {
@@ -160,9 +163,9 @@ static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
         if (type == CONFIG_ITEM_BOOL)
             plugin->conf.booleans++;
     }
-
     plugin->conf.size++;
-    return tab + confsize;
+
+    return tab;
 }
 
 /**
