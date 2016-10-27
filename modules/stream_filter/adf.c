@@ -69,6 +69,16 @@ static int Open( vlc_object_t *p_object )
 {
     stream_t *p_stream = (stream_t *)p_object;
 
+    /* Require .adf extension unless forced. */
+    if( !p_stream->obj.force )
+    {
+        if( !p_stream->psz_url )
+            return VLC_EGENERIC;
+        const char *psz_ext = strrchr( p_stream->psz_url, '.' );
+        if( !psz_ext || strncmp( psz_ext, ".adf", 4 ) )
+            return VLC_EGENERIC;
+    }
+
     const uint8_t *peek;
     if( vlc_stream_Peek( p_stream->p_source, &peek, 3 ) < 3 )
         return VLC_EGENERIC;
