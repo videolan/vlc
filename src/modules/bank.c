@@ -603,7 +603,7 @@ module_t **module_list_get (size_t *n)
 
          tab = nt;
          tab[i++] = mod;
-         for (module_t *subm = mod->submodule; subm; subm = subm->next)
+         for (module_t *subm = mod->next; subm != NULL; subm = subm->next)
              tab[i++] = subm;
     }
     *n = i;
@@ -634,16 +634,9 @@ ssize_t module_list_cap (module_t ***restrict list, const char *cap)
     assert (list != NULL);
 
     for (vlc_plugin_t *lib = vlc_plugins; lib != NULL; lib = lib->next)
-    {
-         module_t *mod = lib->module;
-         assert(mod != NULL);
-
-         if (module_provides (mod, cap))
-             n++;
-         for (module_t *subm = mod->submodule; subm != NULL; subm = subm->next)
-             if (module_provides (subm, cap))
+         for (module_t *m = lib->module; m != NULL; m = m->next)
+             if (module_provides(m, cap))
                  n++;
-    }
 
     module_t **tab = malloc (sizeof (*tab) * n);
     *list = tab;
@@ -651,16 +644,9 @@ ssize_t module_list_cap (module_t ***restrict list, const char *cap)
         return -1;
 
     for (vlc_plugin_t *lib = vlc_plugins; lib != NULL; lib = lib->next)
-    {
-         module_t *mod = lib->module;
-         assert(mod != NULL);
-
-         if (module_provides (mod, cap))
-             *(tab++)= mod;
-         for (module_t *subm = mod->submodule; subm != NULL; subm = subm->next)
-             if (module_provides (subm, cap))
-                 *(tab++) = subm;
-    }
+         for (module_t *m = lib->module; m != NULL; m = m->next)
+             if (module_provides (m, cap))
+                 *(tab++) = m;
 
     assert (tab == *list + n);
     qsort (*list, n, sizeof (*tab), modulecmp);

@@ -79,7 +79,6 @@ struct module_t
 {
     vlc_plugin_t *plugin; /**< Plug-in/library containing the module */
     module_t   *next;
-    module_t   *submodule;
     unsigned    submodule_count;
 
     /** Shortcuts to the module */

@@ -640,7 +640,7 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
         i_submodule = module->submodule_count;
         SAVE_IMMEDIATE( i_submodule );
 
-        for (module = module->submodule; module != NULL; module = module->next)
+        for (module = module->next; module != NULL; module = module->next)
             if (CacheSaveModule(file, module))
                 goto error;
 

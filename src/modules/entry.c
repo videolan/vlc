@@ -44,19 +44,21 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
     if (module == NULL)
         return NULL;
 
-    /* TODO: finish replacing module/submodules with plugin/modules */
+    /* NOTE XXX: For backward compatibility with preferences UIs, the first
+     * module must stay first. That defines under which module, the
+     * configuration items of the plugin belong. The order of the following
+     * entries is irrelevant. */
     module_t *parent = plugin->module;
     if (parent == NULL)
         module->next = NULL;
     else
     {
-        module->next = parent->submodule;
-        parent->submodule = module;
+        module->next = parent->next;
+        parent->next = module;
         parent->submodule_count++;
     }
 
     module->plugin = plugin;
-    module->submodule = NULL;
     module->submodule_count = 0;
 
     module->psz_shortname = NULL;
@@ -78,14 +80,14 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
  */
 void vlc_module_destroy (module_t *module)
 {
-    for (module_t *m = module->submodule, *next; m != NULL; m = next)
+    while (module != NULL)
     {
-        next = m->next;
-        vlc_module_destroy (m);
-    }
+        module_t *next = module->next;
 
-    free (module->pp_shortcuts);
-    free (module);
+        free(module->pp_shortcuts);
+        free(module);
+        module = next;
+    }
 }
 
 vlc_plugin_t *vlc_plugin_create(void)
@@ -592,16 +594,9 @@ int vlc_plugin_resolve(vlc_plugin_t *plugin, vlc_plugin_cb entry)
     int ret = -1;
 
     /* Resolve modules activate/deactivate callbacks */
-    module_t *module = plugin->module;
-    assert(module != NULL);
-
-    if (vlc_plugin_get_symbol(syms, module->activate_name,
-                              &module->pf_activate)
-     || vlc_plugin_get_symbol(syms, module->deactivate_name,
-                              &module->pf_deactivate))
-        goto error;
-
-    for (module = module->submodule; module != NULL; module = module->next)
+    for (module_t *module = plugin->module;
+         module != NULL;
+         module = module->next)
     {
         if (vlc_plugin_get_symbol(syms, module->activate_name,
                                   &module->pf_activate)
