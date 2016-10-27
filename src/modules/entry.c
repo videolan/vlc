@@ -252,10 +252,12 @@ static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
             break;
 
         case VLC_MODULE_CB_OPEN:
+            va_arg(ap, const char *);
             module->pf_activate = va_arg (ap, void *);
             break;
 
         case VLC_MODULE_CB_CLOSE:
+            va_arg(ap, const char *);
             module->pf_deactivate = va_arg (ap, void *);
             break;
 
@@ -415,6 +417,7 @@ static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
         }
 
         case VLC_CONFIG_LIST_CB:
+            va_arg(ap, const char *);
             if (IsConfigIntegerType (item->i_type))
                item->list.i_cb = va_arg (ap, vlc_integer_list_cb);
             else

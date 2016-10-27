@@ -103,7 +103,7 @@ enum vlc_module_properties
 
     VLC_CONFIG_LIST_CB,
     /* callback for suggested values
-     * (args=size_t (*)(vlc_object_t *, <type> **, char ***)) */
+     * (args=const char *, size_t (*)(vlc_object_t *, <type> **, char ***)) */
 
     /* Insert new VLC_CONFIG_* here */
 };
@@ -188,8 +188,8 @@ enum vlc_module_properties
 /**
  * Current plugin ABI version
  */
-# define MODULE_SYMBOL 3_0_0c
-# define MODULE_SUFFIX "__3_0_0c"
+# define MODULE_SYMBOL 3_0_0d
+# define MODULE_SUFFIX "__3_0_0d"
 
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
@@ -299,8 +299,8 @@ VLC_METADATA_EXPORTS
         goto error;
 
 #define set_callbacks( activate, deactivate ) \
-    if (vlc_module_set (VLC_MODULE_CB_OPEN, activate) \
-     || vlc_module_set (VLC_MODULE_CB_CLOSE, deactivate)) \
+    if (vlc_module_set (VLC_MODULE_CB_OPEN, #activate, activate) \
+     || vlc_module_set (VLC_MODULE_CB_CLOSE, #deactivate, deactivate)) \
         goto error;
 
 #define cannot_unload_broken_library( ) \
@@ -470,7 +470,7 @@ VLC_METADATA_EXPORTS
                     (const char *const *)(list_text));
 
 #define change_string_cb( cb ) \
-    vlc_config_set (VLC_CONFIG_LIST_CB, (cb));
+    vlc_config_set (VLC_CONFIG_LIST_CB, #cb, (cb));
 
 #define change_integer_list( list, list_text ) \
     vlc_config_set (VLC_CONFIG_LIST, \
@@ -479,7 +479,7 @@ VLC_METADATA_EXPORTS
                     (const char *const *)(list_text));
 
 #define change_integer_cb( cb ) \
-    vlc_config_set (VLC_CONFIG_LIST_CB, (cb));
+    vlc_config_set (VLC_CONFIG_LIST_CB, #cb, (cb));
 
 #define change_integer_range( minv, maxv ) \
     vlc_config_set (VLC_CONFIG_RANGE, (int64_t)(minv), (int64_t)(maxv));
