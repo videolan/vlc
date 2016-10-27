@@ -320,7 +320,6 @@ static module_t *vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
     {
         module_t *submodule = vlc_module_create(plugin);
 
-        free (submodule->pp_shortcuts);
         LOAD_STRING(submodule->psz_shortname);
         LOAD_STRING(submodule->psz_longname);
 
