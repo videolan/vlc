@@ -185,8 +185,6 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->i_pts > VLC_TS_INVALID &&
                 p_sys->i_pts != date_Get( &p_sys->end_date ) )
             {
-                if( date_Get( &p_sys->end_date ) > VLC_TS_INVALID )
-                    p_sys->b_discontuinity = true;
                 date_Set( &p_sys->end_date, p_sys->i_pts );
             }
             p_sys->i_state = STATE_HEADER;
