@@ -575,22 +575,31 @@ error:
     return -1;
 }
 
+static int CacheSaveModule(FILE *file, const module_t *module)
+{
+    SAVE_STRING(module->psz_shortname);
+    SAVE_STRING(module->psz_longname);
+    SAVE_STRING(module->psz_help);
+    SAVE_IMMEDIATE(module->i_shortcuts);
+
+    for (size_t j = 0; j < module->i_shortcuts; j++)
+         SAVE_STRING(module->pp_shortcuts[j]);
+
+    SAVE_STRING(module->psz_capability);
+    SAVE_IMMEDIATE(module->i_score);
+    return 0;
+error:
+    return -1;
+}
+
 static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
 {
     if( !p_module )
         return 0;
     if( CacheSaveSubmodule( file, p_module->next ) )
         goto error;
-
-    SAVE_STRING( p_module->psz_shortname );
-    SAVE_STRING( p_module->psz_longname );
-    SAVE_STRING(p_module->psz_help);
-    SAVE_IMMEDIATE( p_module->i_shortcuts );
-    for( unsigned j = 0; j < p_module->i_shortcuts; j++ )
-         SAVE_STRING( p_module->pp_shortcuts[j] );
-
-    SAVE_STRING( p_module->psz_capability );
-    SAVE_IMMEDIATE( p_module->i_score );
+    if (CacheSaveModule(file, p_module))
+        goto error;
     return 0;
 
 error:
@@ -626,16 +635,8 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
         const module_t *module = plugin->module;
         uint32_t i_submodule;
 
-        /* Save additional infos */
-        SAVE_STRING(module->psz_shortname);
-        SAVE_STRING(module->psz_longname);
-        SAVE_STRING(module->psz_help);
-        SAVE_IMMEDIATE(module->i_shortcuts);
-        for (unsigned j = 0; j < module->i_shortcuts; j++)
-            SAVE_STRING(module->pp_shortcuts[j]);
-
-        SAVE_STRING(module->psz_capability);
-        SAVE_IMMEDIATE(module->i_score);
+        if (CacheSaveModule(file, module))
+            goto error;
 
         i_submodule = module->submodule_count;
         SAVE_IMMEDIATE( i_submodule );
