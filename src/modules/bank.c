@@ -175,8 +175,9 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
     {
         plugin = vlc_cache_lookup(&bank->cache, relpath);
 
-        if (plugin->mtime != (int64_t)st->st_mtime
-         || plugin->size != (uint64_t)st->st_size)
+        if (plugin != NULL
+         && (plugin->mtime != (int64_t)st->st_mtime
+          || plugin->size != (uint64_t)st->st_size))
         {
             msg_Err(bank->obj, "stale plugins cache: modified %s",
                     plugin->abspath);
