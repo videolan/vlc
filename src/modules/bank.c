@@ -591,14 +591,14 @@ module_t **module_list_get (size_t *n)
     for (vlc_plugin_t *lib = vlc_plugins; lib != NULL; lib = lib->next)
     {
         module_t **nt = realloc(tab, (i + lib->modules_count) * sizeof (*tab));
-         if (unlikely(nt == NULL))
-         {
-             free (tab);
-             *n = 0;
-             return NULL;
-         }
+        if (unlikely(nt == NULL))
+        {
+            free (tab);
+            *n = 0;
+            return NULL;
+        }
 
-         tab = nt;
+        tab = nt;
         for (module_t *m = lib->module; m != NULL; m = m->next)
             tab[i++] = m;
     }
