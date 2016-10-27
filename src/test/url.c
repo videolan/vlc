@@ -300,6 +300,10 @@ int main (void)
     /* Invalid URIs */
     test_url_parse("p://G a r b a g e", "p", NULL, NULL, NULL, 0, NULL, NULL);
     test_url_parse("p://h/G a r b a g e", "p", NULL, NULL, "h", 0, NULL, NULL);
+    test_url_parse("http://example.com:", "http", NULL, NULL, "example.com", 0,
+                    NULL, NULL);
+    test_url_parse("http://example.com:123xyz", "http", NULL, NULL,
+                   "example.com", 123, NULL, NULL);
 
     /* Reference test cases for reference URI resolution */
     static const char *rfc3986_cases[] =
