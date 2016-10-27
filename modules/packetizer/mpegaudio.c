@@ -344,18 +344,10 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
             p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-            if( p_sys->i_pts > VLC_TS_INVALID )
+            if( p_sys->i_pts > VLC_TS_INVALID &&
+                p_sys->i_pts != date_Get( &p_sys->end_date ) )
             {
-                /* start or discontinuity */
-                if( date_Get( &p_sys->end_date ) == 0 )
-                {
-                    date_Set( &p_sys->end_date, p_sys->i_pts );
-                }
-                else if( date_Get( &p_sys->end_date ) != p_sys->i_pts )
-                {
-                    date_Set( &p_sys->end_date, p_sys->i_pts );
-                    p_sys->b_discontinuity = true;
-                }
+                date_Set( &p_sys->end_date, p_sys->i_pts );
             }
             p_sys->i_state = STATE_HEADER;
 
