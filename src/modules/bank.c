@@ -103,12 +103,6 @@ static void module_InitStaticModules(void) { }
 #endif
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-#ifdef __OS2__
-#   define EXTERN_PREFIX "_"
-#else
-#   define EXTERN_PREFIX
-#endif
-
 /**
  * Loads a dynamically-linked plug-in into memory and initialize it.
  *
@@ -127,7 +121,7 @@ static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
         return NULL;
 
     /* Try to resolve the symbol */
-    static const char entry_name[] = EXTERN_PREFIX "vlc_entry" MODULE_SUFFIX;
+    static const char entry_name[] = "vlc_entry" MODULE_SUFFIX;
     vlc_plugin_cb entry =
         (vlc_plugin_cb) module_Lookup (handle, entry_name);
     if (entry == NULL)

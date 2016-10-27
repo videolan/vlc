@@ -30,6 +30,8 @@
 # include "config.h"
 #endif
 
+#include <string.h>
+
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include "modules/modules.h"
@@ -90,5 +92,8 @@ void module_Unload( module_handle_t handle )
  */
 void *module_Lookup( module_handle_t handle, const char *psz_function )
 {
-    return dlsym( handle, psz_function );
+    char buf[strlen(psz_function) + 2];
+    buf[0] = '_';
+    strcpy(buf + 1, psz_function);
+    return dlsym( handle, buf );
 }
