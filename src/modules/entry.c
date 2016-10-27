@@ -30,7 +30,9 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <float.h>
-#include <search.h>
+#ifdef HAVE_SEARCH_H
+# include <search.h>
+#endif
 
 #include "modules/modules.h"
 #include "config/configuration.h"
