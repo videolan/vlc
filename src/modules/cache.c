@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 30
+#define CACHE_SUBVERSION_NUM 31
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -750,8 +750,8 @@ vlc_plugin_t *vlc_cache_lookup(vlc_plugin_t **cache,
          * stats. This will save time in following look-ups. */
         if (plugin->path != NULL
          && !strcmp(plugin->path, path)
-         && plugin->mtime == st->st_mtime
-         && plugin->size == st->st_size)
+         && plugin->mtime == (int64_t)st->st_mtime
+         && plugin->size == (uint64_t)st->st_size)
         {
             *pp = plugin->next;
             plugin->next = NULL;

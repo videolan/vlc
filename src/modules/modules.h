@@ -55,8 +55,8 @@ typedef struct vlc_plugin_t
     char *abspath; /**< Absolute path */
 
     char *path; /**< Relative path (within plug-in directory) */
-    time_t mtime; /**< Last modification time */
-    off_t size; /**< File size */
+    int64_t mtime; /**< Last modification time */
+    uint64_t size; /**< File size */
 } vlc_plugin_t;
 
 /**
