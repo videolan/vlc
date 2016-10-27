@@ -141,14 +141,6 @@ static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
         goto error;
     }
 
-    assert(plugin->module != NULL);
-
-    plugin->abspath = strdup(path);
-    if (unlikely(plugin->abspath == NULL))
-    {
-        vlc_plugin_destroy(plugin);
-        goto error;
-    }
     plugin->handle = handle;
     atomic_init(&plugin->loaded, true);
     return plugin;
