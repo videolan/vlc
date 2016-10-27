@@ -422,7 +422,7 @@ module_config_t *module_config_get( const module_t *module, unsigned *restrict p
 {
     const vlc_plugin_t *plugin = module->plugin;
 
-    if (plugin->module != NULL)
+    if (plugin->module != module)
     {   /* For backward compatibility, pretend non-first modules have no
          * configuration items. */
         *psize = 0;
