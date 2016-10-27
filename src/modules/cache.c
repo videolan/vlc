@@ -726,19 +726,13 @@ out:
 /**
  * Looks up a plugin file in a table of cached plugins.
  */
-vlc_plugin_t *vlc_cache_lookup(vlc_plugin_t **cache,
-                               const char *path, const struct stat *st)
+vlc_plugin_t *vlc_cache_lookup(vlc_plugin_t **cache, const char *path)
 {
     vlc_plugin_t **pp = cache, *plugin;
 
     while ((plugin = *pp) != NULL)
     {
-        /* TODO: Preemptively delete plugins with matching name and different
-         * stats. This will save time in following look-ups. */
-        if (plugin->path != NULL
-         && !strcmp(plugin->path, path)
-         && plugin->mtime == (int64_t)st->st_mtime
-         && plugin->size == (uint64_t)st->st_size)
+        if (plugin->path != NULL && !strcmp(plugin->path, path))
         {
             *pp = plugin->next;
             plugin->next = NULL;

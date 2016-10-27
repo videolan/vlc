@@ -172,7 +172,19 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
 
     /* Check our plugins cache first then load plugin if needed */
     if (bank->mode == CACHE_USE)
-        plugin = vlc_cache_lookup(&bank->cache, relpath, st);
+    {
+        plugin = vlc_cache_lookup(&bank->cache, relpath);
+
+        if (plugin->mtime != (int64_t)st->st_mtime
+         || plugin->size != (uint64_t)st->st_size)
+        {
+            msg_Err(bank->obj, "stale plugins cache: modified %s",
+                    plugin->abspath);
+            vlc_plugin_destroy(plugin);
+            plugin = NULL;
+        }
+    }
+
     if (plugin == NULL)
     {
         plugin = module_InitDynamic(bank->obj, abspath, true);

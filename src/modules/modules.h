@@ -128,10 +128,7 @@ void module_Unload (module_handle_t);
 
 /* Plugins cache */
 vlc_plugin_t *vlc_cache_load(vlc_object_t *, const char *, block_t **);
-
-struct stat;
-vlc_plugin_t *vlc_cache_lookup(vlc_plugin_t **,
-                               const char *relpath, const struct stat *st);
+vlc_plugin_t *vlc_cache_lookup(vlc_plugin_t **, const char *relpath);
 
 int CacheAdd(vlc_plugin_t ***, size_t *, vlc_plugin_t *);
 void CacheSave(vlc_object_t *, const char *, vlc_plugin_t *const *, size_t);
