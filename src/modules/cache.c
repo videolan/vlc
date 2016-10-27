@@ -287,14 +287,8 @@ error:
     return -1; /* FIXME: leaks */
 }
 
-static module_t *vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
+static int vlc_cache_load_module(module_t *module, block_t *file)
 {
-    module_t *module = vlc_module_create(plugin);
-    if (unlikely(module == NULL))
-        return NULL;
-
-    plugin->module = module;
-    /* Load additional infos */
     LOAD_STRING(module->psz_shortname);
     LOAD_STRING(module->psz_longname);
     LOAD_STRING(module->psz_help);
@@ -312,37 +306,9 @@ static module_t *vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
 
     LOAD_STRING(module->psz_capability);
     LOAD_IMMEDIATE(module->i_score);
-
-    uint32_t submodules;
-    LOAD_IMMEDIATE(submodules);
-
-    for (; submodules > 0; submodules--)
-    {
-        module_t *submodule = vlc_module_create(plugin);
-
-        LOAD_STRING(submodule->psz_shortname);
-        LOAD_STRING(submodule->psz_longname);
-        LOAD_STRING(submodule->psz_help);
-
-        LOAD_IMMEDIATE(submodule->i_shortcuts);
-        if (submodule->i_shortcuts > MODULE_SHORTCUT_MAX)
-            goto error;
-        else
-        {
-            submodule->pp_shortcuts =
-                xmalloc (sizeof (*submodule->pp_shortcuts) * submodule->i_shortcuts);
-            for (unsigned j = 0; j < submodule->i_shortcuts; j++)
-                LOAD_STRING(submodule->pp_shortcuts[j]);
-        }
-
-        LOAD_STRING(submodule->psz_capability);
-        LOAD_IMMEDIATE(submodule->i_score);
-    }
-
-    return module;
+    return 0;
 error:
-    vlc_module_destroy(module);
-    return NULL;
+    return -1;
 }
 
 static vlc_plugin_t *vlc_cache_load_plugin(block_t *file)
@@ -351,8 +317,27 @@ static vlc_plugin_t *vlc_cache_load_plugin(block_t *file)
     if (unlikely(plugin == NULL))
         return NULL;
 
-    if (vlc_cache_load_module(plugin, file) == NULL)
+    module_t *module = vlc_module_create(plugin);
+    if (unlikely(module == NULL))
         goto error;
+
+    plugin->module = module;
+
+    if (vlc_cache_load_module(module, file))
+        goto error;
+
+    uint32_t submodules;
+    LOAD_IMMEDIATE(submodules);
+
+    for (size_t i = 0; i < submodules; i++)
+    {
+        module = vlc_module_create(plugin);
+        if (unlikely(module == NULL))
+            goto error;
+
+        if (vlc_cache_load_module(module, file))
+            goto error;
+    }
 
     if (vlc_cache_load_plugin_config(plugin, file))
         goto error;
