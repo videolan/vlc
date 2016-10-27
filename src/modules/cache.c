@@ -714,33 +714,6 @@ out:
     free (tmpname);
 }
 
-/*****************************************************************************
- * CacheMerge: Merge a cache module descriptor with a full module descriptor.
- *****************************************************************************/
-void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
-{
-    (void)p_this;
-
-    p_cache->pf_activate = p_module->pf_activate;
-    p_cache->pf_deactivate = p_module->pf_deactivate;
-
-    /* FIXME: This looks too simplistic an algorithm to me. What if the module
-     * file was altered such that the number of order of submodules was
-     * altered... after VLC started -- Courmisch, 09/2008 */
-    module_t *p_child = p_module->submodule,
-             *p_cchild = p_cache->submodule;
-    while( p_child && p_cchild )
-    {
-        p_cchild->pf_activate = p_child->pf_activate;
-        p_cchild->pf_deactivate = p_child->pf_deactivate;
-        p_child = p_child->next;
-        p_cchild = p_cchild->next;
-    }
-
-    p_cache->plugin->handle = p_module->plugin->handle;
-    atomic_init(&p_module->plugin->loaded, false);
-}
-
 /**
  * Looks up a plugin file in a table of cached plugins.
  */

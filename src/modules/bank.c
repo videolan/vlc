@@ -103,6 +103,8 @@ static void module_InitStaticModules(void) { }
 #endif
 
 #ifdef HAVE_DYNAMIC_PLUGINS
+static const char vlc_entry_name[] = "vlc_entry" MODULE_SUFFIX;
+
 /**
  * Loads a dynamically-linked plug-in into memory and initialize it.
  *
@@ -121,9 +123,8 @@ static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
         return NULL;
 
     /* Try to resolve the symbol */
-    static const char entry_name[] = "vlc_entry" MODULE_SUFFIX;
     vlc_plugin_cb entry =
-        (vlc_plugin_cb) module_Lookup (handle, entry_name);
+        (vlc_plugin_cb) module_Lookup(handle, vlc_entry_name);
     if (entry == NULL)
     {
         msg_Warn (obj, "cannot find plug-in entry point in %s", path);
@@ -408,32 +409,40 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
     if (atomic_load_explicit(&plugin->loaded, memory_order_acquire))
-        return 0;
+        return 0; /* fast path: already loaded */
 
-    vlc_plugin_t *uncache;
+    /* Try to load the plug-in (without locks, so read-only) */
+    module_handle_t handle;
 
     assert(plugin->abspath != NULL);
-    uncache = module_InitDynamic(obj, plugin->abspath, false);
-    if (uncache == NULL)
+
+    if (module_Load(obj, plugin->abspath, &handle, false))
+        return -1;
+
+    vlc_plugin_cb entry =
+        (vlc_plugin_cb) module_Lookup(handle, vlc_entry_name);
+    if (entry == NULL)
     {
-        msg_Err(obj, "corrupt module: %s", plugin->abspath);
+        msg_Err(obj, "cannot find plug-in entry point in %s", plugin->abspath);
+        module_Unload(handle);
         return -1;
     }
 
-    assert(uncache->module != NULL);
-
     vlc_mutex_lock(&lock);
     if (!atomic_load_explicit(&plugin->loaded, memory_order_relaxed))
-    {
-        CacheMerge(obj, plugin->module, uncache->module);
+    {   /* Lock is held, update the plug-in structure */
+        if (vlc_plugin_resolve(plugin, entry))
+        {
+            vlc_mutex_unlock(&lock);
+            return -1;
+        }
+
+        plugin->handle = handle;
         atomic_store_explicit(&plugin->loaded, true, memory_order_release);
     }
-    else
-        uncache = NULL;
+    else /* Another thread won the race to load the plugin */
+        module_Unload(handle);
     vlc_mutex_unlock(&lock);
-
-    if (likely(uncache != NULL))
-        vlc_plugin_destroy(uncache);
 
     return 0;
 }

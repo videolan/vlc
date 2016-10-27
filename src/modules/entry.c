@@ -30,6 +30,7 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <float.h>
+#include <search.h>
 
 #include "modules/modules.h"
 #include "config/configuration.h"
@@ -164,11 +165,13 @@ static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
     return tab + confsize;
 }
 
-
 /**
- * Callback for the plugin descriptor functions.
+ * Plug-in descriptor callback.
+ *
+ * This callback populates modules, configuration items and properties of a
+ * plug-in from the plug-in descriptor.
  */
-static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
+static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
 {
     vlc_plugin_t *plugin = ctx;
     module_t *module = tgt;
@@ -457,10 +460,171 @@ vlc_plugin_t *vlc_plugin_describe(vlc_plugin_cb entry)
     if (unlikely(plugin == NULL))
         return NULL;
 
-    if (entry(vlc_plugin_setter, plugin) != 0)
+    if (entry(vlc_plugin_desc_cb, plugin) != 0)
     {
         vlc_plugin_destroy(plugin); /* partially initialized plug-in... */
         plugin = NULL;
     }
     return plugin;
+}
+
+struct vlc_plugin_symbol
+{
+    const char *name;
+    void *addr;
+};
+
+static int vlc_plugin_symbol_compare(const void *a, const void *b)
+{
+    const struct vlc_plugin_symbol *sa = a , *sb = b;
+
+    return strcmp(sa->name, sb->name);
+}
+
+/**
+ * Plug-in symbols callback.
+ *
+ * This callback generates a mapping of plugin symbol names to symbol
+ * addresses.
+ */
+static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
+{
+    void **rootp = ctx;
+    const char *name;
+    void *addr;
+
+    (void) tgt;
+
+    switch (propid)
+    {
+        case VLC_MODULE_CB_OPEN:
+        case VLC_MODULE_CB_CLOSE:
+        case VLC_CONFIG_LIST_CB:
+        {
+            va_list ap;
+
+            va_start(ap, propid);
+            name = va_arg(ap, const char *);
+            addr = va_arg(ap, void *);
+            va_end (ap);
+            break;
+        }
+        default:
+            return 0;
+    }
+
+    struct vlc_plugin_symbol *sym = malloc(sizeof (*sym));
+
+    sym->name = name;
+    sym->addr = addr;
+
+    struct vlc_plugin_symbol **symp = tsearch(sym, rootp,
+                                              vlc_plugin_symbol_compare);
+    if (unlikely(symp == NULL))
+    {   /* Memory error */
+        free(sym);
+        return -1;
+    }
+
+    if (*symp != sym)
+    {   /* Duplicate symbol */
+        assert((*symp)->addr == sym->addr);
+        free(sym);
+    }
+    return 0;
+}
+
+/**
+ * Gets the symbols of a plugin.
+ *
+ * This function generates a list of symbol names and addresses for a given
+ * plugin descriptor. The result can be used with vlc_plugin_get_symbol()
+ * to resolve a symbol name to an address.
+ *
+ * The result must be freed with vlc_plugin_free_symbols(). The result is only
+ * meaningful until the plugin is unloaded.
+ */
+static void *vlc_plugin_get_symbols(vlc_plugin_cb entry)
+{
+    void *root = NULL;
+
+    if (entry(vlc_plugin_gpa_cb, &root))
+    {
+        tdestroy(root, free);
+        return NULL;
+    }
+
+    return root;
+}
+
+static void vlc_plugin_free_symbols(void *root)
+{
+    tdestroy(root, free);
+}
+
+static int vlc_plugin_get_symbol(void *root, const char *name,
+                                 void **restrict addrp)
+{
+    if (name == NULL)
+    {   /* TODO: use this; do not define "NULL" as a name for NULL? */
+        *addrp = NULL;
+        return 0;
+    }
+
+    const struct vlc_plugin_symbol **symp = tfind(&name, &root,
+                                                  vlc_plugin_symbol_compare);
+
+    if (symp == NULL)
+        return -1;
+
+    *addrp = (*symp)->addr;
+    return 0;
+}
+
+int vlc_plugin_resolve(vlc_plugin_t *plugin, vlc_plugin_cb entry)
+{
+    void *syms = vlc_plugin_get_symbols(entry);
+    int ret = -1;
+
+    /* Resolve modules activate/deactivate callbacks */
+    module_t *module = plugin->module;
+    assert(module != NULL);
+
+    if (vlc_plugin_get_symbol(syms, module->activate_name,
+                              &module->pf_activate)
+     || vlc_plugin_get_symbol(syms, module->deactivate_name,
+                              &module->pf_deactivate))
+        goto error;
+
+    for (module = module->submodule; module != NULL; module = module->next)
+    {
+        if (vlc_plugin_get_symbol(syms, module->activate_name,
+                                  &module->pf_activate)
+         || vlc_plugin_get_symbol(syms, module->deactivate_name,
+                                  &module->pf_deactivate))
+            goto error;
+    }
+
+    /* Resolve configuration callbacks */
+    for (size_t i = 0; i < plugin->conf.size; i++)
+    {
+        module_config_t *item = plugin->conf.items + i;
+        void *cb;
+
+        if (item->list_cb_name == NULL)
+            continue;
+        if (vlc_plugin_get_symbol(syms, item->list_cb_name, &cb))
+            goto error;
+
+        if (IsConfigIntegerType (item->i_type))
+            item->list.i_cb = cb;
+        else
+        if (IsConfigStringType (item->i_type))
+            item->list.psz_cb = cb;
+    }
+
+    ret = 0;
+error:
+    vlc_plugin_free_symbols(syms);
+    return ret;
 }
