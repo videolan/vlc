@@ -69,7 +69,6 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
     module->pf_deactivate = NULL;
     /*module->handle = garbage */
     module->psz_filename = NULL;
-    module->domain = NULL;
     return module;
 }
 
@@ -99,7 +98,7 @@ vlc_plugin_t *vlc_plugin_create(void)
 
     plugin->path = NULL;
     plugin->module = NULL;
-
+    plugin->textdomain = NULL;
     plugin->conf.items = NULL;
     plugin->conf.size = 0;
     plugin->conf.count = 0;
@@ -297,9 +296,8 @@ static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
             break;
 
         case VLC_MODULE_TEXTDOMAIN:
-            assert(module->plugin->module == NULL);
-            assert (module->domain == NULL);
-            module->domain = va_arg (ap, const char *);
+            assert(plugin->textdomain == NULL);
+            plugin->textdomain = va_arg(ap, const char *);
             break;
 
         case VLC_CONFIG_NAME:

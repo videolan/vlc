@@ -127,12 +127,10 @@ int module_get_score( const module_t *m )
  */
 const char *module_gettext (const module_t *m, const char *str)
 {
-    m = m->plugin->module;
-
     if (unlikely(str == NULL || *str == '\0'))
         return "";
 #ifdef ENABLE_NLS
-    const char *domain = m->domain;
+    const char *domain = m->plugin->textdomain;
     return dgettext ((domain != NULL) ? domain : PACKAGE_NAME, str);
 #else
     (void)m;

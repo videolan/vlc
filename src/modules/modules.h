@@ -35,6 +35,8 @@ typedef struct vlc_plugin_t
 
     module_t *module;
 
+    const char *textdomain; /**< gettext domain (or NULL) */
+
     /**
      * Variables set by the module to store its config options
      */
@@ -100,7 +102,6 @@ struct module_t
     /* Plugin-specific stuff */
     module_handle_t     handle;                             /* Unique handle */
     char *              psz_filename;                     /* Module filename */
-    const char *        domain;                            /* gettext domain */
 };
 
 vlc_plugin_t *vlc_plugin_create(void);
