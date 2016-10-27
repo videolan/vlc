@@ -367,6 +367,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->p_out = NULL;
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+
     /* Create our mpg123 handle */
     if( ( p_sys->p_handle = mpg123_new( NULL, NULL ) ) == NULL )
         goto error;
