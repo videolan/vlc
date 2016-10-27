@@ -24,6 +24,8 @@
 #ifndef LIBVLC_MODULES_H
 # define LIBVLC_MODULES_H 1
 
+# include <vlc_atomic.h>
+
 /** The plugin handle type */
 typedef void *module_handle_t;
 
@@ -47,7 +49,7 @@ typedef struct vlc_plugin_t
         size_t booleans; /**< Number of booleal config items */
     } conf;
 
-    bool loaded; /**< Whether the plug-in is mapped in memory */
+    atomic_bool loaded; /**< Whether the plug-in is mapped in memory */
     bool unloadable; /**< Whether the plug-in can be unloaded safely */
     module_handle_t handle; /**< Run-time linker handle (if loaded) */
     char *abspath; /**< Absolute path */
@@ -109,7 +111,7 @@ void module_InitBank (void);
 size_t module_LoadPlugins( vlc_object_t * );
 #define module_LoadPlugins(a) module_LoadPlugins(VLC_OBJECT(a))
 void module_EndBank (bool);
-int module_Map (vlc_object_t *, module_t *);
+int module_Map(vlc_object_t *, vlc_plugin_t *);
 
 ssize_t module_list_cap (module_t ***, const char *);
 

@@ -172,7 +172,7 @@ static int module_load (vlc_object_t *obj, module_t *m,
 {
     int ret = VLC_SUCCESS;
 
-    if (module_Map (obj, m))
+    if (module_Map(obj, m->plugin))
         return VLC_EGENERIC;
 
     if (m->pf_activate != NULL)

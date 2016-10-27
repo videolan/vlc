@@ -73,7 +73,7 @@ static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
         return NULL;
 
     assert(lib->module != NULL);
-    lib->loaded = true;
+    atomic_init(&lib->loaded, true);
     lib->unloadable = false;
     return lib;
 }
@@ -155,7 +155,7 @@ static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
         goto error;
     }
     plugin->handle = handle;
-    plugin->loaded = true;
+    atomic_init(&plugin->loaded, true);
     return plugin;
 error:
     module_Unload( handle );
@@ -212,7 +212,7 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
     /* For now we force loading if the module's config contains callbacks.
      * Could be optimized by adding an API call.*/
     for (size_t i = 0; i < plugin->conf.size; i++)
-         if (!plugin->loaded
+         if (!atomic_load_explicit(&plugin->loaded, memory_order_relaxed)
           && plugin->conf.items[i].list_count == 0
           && (plugin->conf.items[i].list.psz_cb != NULL
            || plugin->conf.items[i].list.i_cb != NULL))
@@ -403,6 +403,77 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
 
     free( paths );
 }
+
+/**
+ * Ensures that a plug-in is loaded.
+ *
+ * \note This function is thread-safe but not re-entrant.
+ *
+ * \return 0 on success, -1 on failure
+ */
+int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
+{
+    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+
+    if (atomic_load_explicit(&plugin->loaded, memory_order_acquire))
+        return 0;
+
+    vlc_plugin_t *uncache;
+
+    assert(plugin->abspath != NULL);
+    uncache = module_InitDynamic(obj, plugin->abspath, false);
+    if (uncache == NULL)
+    {
+        msg_Err(obj, "corrupt module: %s", plugin->abspath);
+        return -1;
+    }
+
+    assert(uncache->module != NULL);
+
+    vlc_mutex_lock(&lock);
+    if (!atomic_load_explicit(&plugin->loaded, memory_order_relaxed))
+    {
+        CacheMerge(obj, plugin->module, uncache->module);
+        atomic_store_explicit(&plugin->loaded, true, memory_order_release);
+    }
+    else
+        uncache = NULL;
+    vlc_mutex_unlock(&lock);
+
+    if (likely(uncache != NULL))
+        vlc_plugin_destroy(uncache);
+
+    return 0;
+}
+
+/**
+ * Ensures that a module is not loaded.
+ *
+ * \note This function is not thread-safe. The caller must ensure that the
+ * plug-in is no longer used before calling this function.
+ */
+static void module_Unmap(vlc_plugin_t *plugin)
+{
+    if (!plugin->unloadable)
+        return;
+    if (!atomic_exchange_explicit(&plugin->loaded, false,
+                                  memory_order_acquire))
+        return;
+
+    assert(plugin->handle != NULL);
+    module_Unload(plugin->handle);
+}
+#else
+int module_Map(vlc_object_t *obj, module_t *module)
+{
+    (void) obj; (void) module;
+    return 0;
+}
+
+static void module_Unmap(vlc_plugin_t *plugin)
+{
+    (void) plugin;
+}
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
 /**
@@ -472,14 +543,7 @@ void module_EndBank (bool b_plugins)
         vlc_plugin_t *lib = libs;
 
         libs = lib->next;
-#ifdef HAVE_DYNAMIC_PLUGINS
-        assert(lib->module != NULL);
-        if (lib->loaded && lib->unloadable)
-        {
-            module_Unload(lib->handle);
-            lib->loaded = false;
-        }
-#endif
+        module_Unmap(lib);
         vlc_plugin_destroy(lib);
     }
 
@@ -619,40 +683,4 @@ ssize_t module_list_cap (module_t ***restrict list, const char *cap)
     assert (tab == *list + n);
     qsort (*list, n, sizeof (*tab), modulecmp);
     return n;
-}
-
-/**
- * Makes sure the module is loaded in memory.
- * \return 0 on success, -1 on failure
- */
-int module_Map (vlc_object_t *obj, module_t *module)
-{
-    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
-    vlc_plugin_t *plugin = module->plugin;
-
-    assert(plugin != NULL);
-
-    vlc_mutex_lock(&lock);
-    if (!plugin->loaded)
-    {
-        vlc_plugin_t *uncache;
-
-        assert(plugin->abspath != NULL);
-#ifdef HAVE_DYNAMIC_PLUGINS
-        uncache = module_InitDynamic(obj, plugin->abspath, false);
-        if (uncache != NULL)
-        {
-            assert(uncache->module != NULL);
-            CacheMerge(obj, plugin->module, uncache->module);
-            vlc_plugin_destroy(uncache);
-        }
-        else
-#endif
-        {
-            msg_Err(obj, "corrupt module: %s", plugin->abspath);
-            module = NULL;
-        }
-    }
-    vlc_mutex_unlock(&lock);
-    return -(module == NULL);
 }

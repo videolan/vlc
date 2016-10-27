@@ -95,7 +95,7 @@ vlc_plugin_t *vlc_plugin_create(void)
     plugin->conf.count = 0;
     plugin->conf.booleans = 0;
     plugin->abspath = NULL;
-    plugin->loaded = false;
+    atomic_init(&plugin->loaded, false);
     plugin->unloadable = true;
     plugin->handle = NULL;
     plugin->abspath = NULL;
@@ -113,7 +113,7 @@ vlc_plugin_t *vlc_plugin_create(void)
 void vlc_plugin_destroy(vlc_plugin_t *plugin)
 {
     assert(plugin != NULL);
-    assert(!plugin->loaded || !plugin->unloadable);
+    assert(!plugin->unloadable || !atomic_load(&plugin->loaded));
 
     if (plugin->module != NULL)
         vlc_module_destroy(plugin->module);

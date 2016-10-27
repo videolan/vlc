@@ -747,10 +747,7 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
     }
 
     p_cache->plugin->handle = p_module->plugin->handle;
-    assert(!p_cache->plugin->loaded);
-    p_cache->plugin->loaded = true;
-    assert(p_module->plugin->loaded);
-    p_module->plugin->loaded = false;
+    atomic_init(&p_module->plugin->loaded, false);
 }
 
 /**
