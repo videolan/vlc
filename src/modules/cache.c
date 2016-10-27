@@ -457,6 +457,14 @@ vlc_plugin_t *vlc_cache_load(vlc_object_t *p_this, const char *dir,
         if (plugin == NULL)
             goto error;
 
+        if (unlikely(asprintf(&plugin->abspath, "%s" DIR_SEP "%s", dir,
+                              plugin->path) == -1))
+        {
+            plugin->abspath = NULL;
+            vlc_plugin_destroy(plugin);
+            goto error;
+        }
+
         plugin->next = cache;
         cache = plugin;
     }
