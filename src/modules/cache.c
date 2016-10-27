@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 29
+#define CACHE_SUBVERSION_NUM 30
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -322,6 +322,7 @@ static module_t *vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
 
         LOAD_STRING(submodule->psz_shortname);
         LOAD_STRING(submodule->psz_longname);
+        LOAD_STRING(submodule->psz_help);
 
         LOAD_IMMEDIATE(submodule->i_shortcuts);
         if (submodule->i_shortcuts > MODULE_SHORTCUT_MAX)
@@ -598,6 +599,7 @@ static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
 
     SAVE_STRING( p_module->psz_shortname );
     SAVE_STRING( p_module->psz_longname );
+    SAVE_STRING(p_module->psz_help);
     SAVE_IMMEDIATE( p_module->i_shortcuts );
     for( unsigned j = 0; j < p_module->i_shortcuts; j++ )
          SAVE_STRING( p_module->pp_shortcuts[j] );
