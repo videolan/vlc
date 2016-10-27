@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 32
+#define CACHE_SUBVERSION_NUM 33
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -288,8 +288,12 @@ error:
     return -1; /* FIXME: leaks */
 }
 
-static int vlc_cache_load_module(module_t *module, block_t *file)
+static int vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
 {
+    module_t *module = vlc_module_create(plugin);
+    if (unlikely(module == NULL))
+        return -1;
+
     LOAD_STRING(module->psz_shortname);
     LOAD_STRING(module->psz_longname);
     LOAD_STRING(module->psz_help);
@@ -320,27 +324,12 @@ static vlc_plugin_t *vlc_cache_load_plugin(block_t *file)
     if (unlikely(plugin == NULL))
         return NULL;
 
-    module_t *module = vlc_module_create(plugin);
-    if (unlikely(module == NULL))
-        goto error;
+    uint32_t modules;
+    LOAD_IMMEDIATE(modules);
 
-    plugin->module = module;
-
-    if (vlc_cache_load_module(module, file))
-        goto error;
-
-    uint32_t submodules;
-    LOAD_IMMEDIATE(submodules);
-
-    for (size_t i = 0; i < submodules; i++)
-    {
-        module = vlc_module_create(plugin);
-        if (unlikely(module == NULL))
+    for (size_t i = 0; i < modules; i++)
+        if (vlc_cache_load_module(plugin, file))
             goto error;
-
-        if (vlc_cache_load_module(module, file))
-            goto error;
-    }
 
     if (vlc_cache_load_plugin_config(plugin, file))
         goto error;
@@ -631,16 +620,13 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
     for (size_t i = 0; i < n; i++)
     {
         const vlc_plugin_t *plugin = cache[i];
-        const module_t *module = plugin->module;
-        uint32_t i_submodule;
+        uint32_t count = plugin->modules_count;
 
-        if (CacheSaveModule(file, module))
-            goto error;
+        SAVE_IMMEDIATE(count);
 
-        i_submodule = module->submodule_count;
-        SAVE_IMMEDIATE( i_submodule );
-
-        for (module = module->next; module != NULL; module = module->next)
+        for (module_t *module = plugin->module;
+             module != NULL;
+             module = module->next)
             if (CacheSaveModule(file, module))
                 goto error;
 

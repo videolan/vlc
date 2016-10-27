@@ -50,16 +50,18 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
      * entries is irrelevant. */
     module_t *parent = plugin->module;
     if (parent == NULL)
+    {
         module->next = NULL;
+        plugin->module = module;
+    }
     else
     {
         module->next = parent->next;
         parent->next = module;
-        parent->submodule_count++;
     }
 
+    plugin->modules_count++;
     module->plugin = plugin;
-    module->submodule_count = 0;
 
     module->psz_shortname = NULL;
     module->psz_longname = NULL;
@@ -96,6 +98,7 @@ vlc_plugin_t *vlc_plugin_create(void)
     if (unlikely(plugin == NULL))
         return NULL;
 
+    plugin->modules_count = 0;
     plugin->textdomain = NULL;
     plugin->conf.items = NULL;
     plugin->conf.size = 0;
@@ -201,10 +204,7 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
 
             *(va_arg (ap, module_t **)) = submodule;
             if (module == NULL)
-            {
-                plugin->module = submodule;
                 break;
-            }
 
             /* Inheritance. Ugly!! */
             submodule->pp_shortcuts = xmalloc (sizeof ( *submodule->pp_shortcuts ));

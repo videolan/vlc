@@ -33,8 +33,8 @@ typedef void *module_handle_t;
 typedef struct vlc_plugin_t
 {
     struct vlc_plugin_t *next;
-
     module_t *module;
+    unsigned modules_count;
 
     const char *textdomain; /**< gettext domain (or NULL) */
 
@@ -79,7 +79,6 @@ struct module_t
 {
     vlc_plugin_t *plugin; /**< Plug-in/library containing the module */
     module_t   *next;
-    unsigned    submodule_count;
 
     /** Shortcuts to the module */
     unsigned    i_shortcuts;
