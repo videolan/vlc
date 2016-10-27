@@ -299,12 +299,10 @@ picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
        needs it. */
     if( p_sys->b_use_frame_history )
     {
-        /* Duplicate the picture
-         * TODO when the vout rework is finished, picture_Hold() might be enough
-         * but becarefull, the pitches must match */
-        picture_t *p_dup = picture_NewFromFormat( &p_pic->format );
-        if( p_dup )
-            picture_Copy( p_dup, p_pic );
+        /* Keep reference for the picture */
+        picture_t *p_dup = picture_Hold( p_pic );
+        if( unlikely( p_dup == NULL ) )
+            return NULL;
 
         /* Slide the history */
         if( p_sys->pp_history[0] )
