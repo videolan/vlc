@@ -352,15 +352,9 @@ error:
 
 static vlc_plugin_t *vlc_cache_load_plugin(block_t *file)
 {
-    vlc_plugin_t *plugin = malloc(sizeof (*plugin));
+    vlc_plugin_t *plugin = vlc_plugin_create();
     if (unlikely(plugin == NULL))
         return NULL;
-
-    plugin->module = NULL;
-    plugin->conf.items = NULL;
-    plugin->conf.size = 0;
-    plugin->conf.count = 0;
-    plugin->conf.booleans = 0;
 
     if (vlc_cache_load_module(plugin, file) == NULL)
         goto error;

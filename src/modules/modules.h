@@ -103,6 +103,7 @@ struct module_t
     const char *        domain;                            /* gettext domain */
 };
 
+vlc_plugin_t *vlc_plugin_create(void);
 vlc_plugin_t *vlc_plugin_describe(vlc_plugin_cb);
 void vlc_plugin_destroy(vlc_plugin_t *);
 module_t *vlc_module_create(vlc_plugin_t *);

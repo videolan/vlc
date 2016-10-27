@@ -91,6 +91,23 @@ void vlc_module_destroy (module_t *module)
     free (module);
 }
 
+vlc_plugin_t *vlc_plugin_create(void)
+{
+    vlc_plugin_t *plugin = malloc(sizeof (*plugin));
+    if (unlikely(plugin == NULL))
+        return NULL;
+
+    plugin->path = NULL;
+    plugin->module = NULL;
+
+    plugin->conf.items = NULL;
+    plugin->conf.size = 0;
+    plugin->conf.count = 0;
+    plugin->conf.booleans = 0;
+
+    return plugin;
+}
+
 /**
  * Destroys a plug-in.
  * @warning If the plug-in was dynamically loaded in memory, the library handle
@@ -428,17 +445,9 @@ static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
  */
 vlc_plugin_t *vlc_plugin_describe(vlc_plugin_cb entry)
 {
-    vlc_plugin_t *plugin = malloc(sizeof (*plugin));
+    vlc_plugin_t *plugin = vlc_plugin_create();
     if (unlikely(plugin == NULL))
         return NULL;
-
-    plugin->path = NULL;
-    plugin->module = NULL;
-
-    plugin->conf.items = NULL;
-    plugin->conf.size = 0;
-    plugin->conf.count = 0;
-    plugin->conf.booleans = 0;
 
     if (entry(vlc_plugin_setter, plugin) != 0)
     {
