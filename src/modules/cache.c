@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 28
+#define CACHE_SUBVERSION_NUM 29
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -312,7 +312,6 @@ static module_t *vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
 
     LOAD_STRING(module->psz_capability);
     LOAD_IMMEDIATE(module->i_score);
-    LOAD_IMMEDIATE(module->b_unloadable);
 
     uint32_t submodules;
     LOAD_IMMEDIATE(submodules);
@@ -369,6 +368,7 @@ static vlc_plugin_t *vlc_cache_load_plugin(block_t *file)
     if (unlikely(plugin->path == NULL))
         goto error;
 
+    LOAD_FLAG(plugin->unloadable);
     LOAD_IMMEDIATE(plugin->mtime);
     LOAD_IMMEDIATE(plugin->size);
 
@@ -650,7 +650,6 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
 
         SAVE_STRING(module->psz_capability);
         SAVE_IMMEDIATE(module->i_score);
-        SAVE_IMMEDIATE(module->b_unloadable);
 
         i_submodule = module->submodule_count;
         SAVE_IMMEDIATE( i_submodule );
@@ -664,6 +663,7 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
         /* Save common info */
         SAVE_STRING(plugin->textdomain);
         SAVE_STRING(plugin->path);
+        SAVE_FLAG(plugin->unloadable);
         SAVE_IMMEDIATE(plugin->mtime);
         SAVE_IMMEDIATE(plugin->size);
     }
@@ -732,7 +732,6 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
 
     p_cache->pf_activate = p_module->pf_activate;
     p_cache->pf_deactivate = p_module->pf_deactivate;
-    p_cache->handle = p_module->handle;
 
     /* FIXME: This looks too simplistic an algorithm to me. What if the module
      * file was altered such that the number of order of submodules was
@@ -747,8 +746,11 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
         p_cchild = p_cchild->next;
     }
 
-    p_cache->b_loaded = true;
-    p_module->b_loaded = false;
+    p_cache->plugin->handle = p_module->plugin->handle;
+    assert(!p_cache->plugin->loaded);
+    p_cache->plugin->loaded = true;
+    assert(p_module->plugin->loaded);
+    p_module->plugin->loaded = false;
 }
 
 /**

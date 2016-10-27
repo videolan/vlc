@@ -1,7 +1,7 @@
 /*****************************************************************************
  * modules.h : Module management functions.
  *****************************************************************************
- * Copyright (C) 2001 VLC authors and VideoLAN
+ * Copyright (C) 2001-2016 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -24,14 +24,13 @@
 #ifndef LIBVLC_MODULES_H
 # define LIBVLC_MODULES_H 1
 
+/** The plugin handle type */
+typedef void *module_handle_t;
+
 /** VLC plugin */
 typedef struct vlc_plugin_t
 {
     struct vlc_plugin_t *next;
-
-    char *path; /**< Relative path */
-    time_t mtime; /**< Last modification time */
-    off_t size; /**< File size */
 
     module_t *module;
 
@@ -47,6 +46,15 @@ typedef struct vlc_plugin_t
         size_t count; /**< Number of configuration items */
         size_t booleans; /**< Number of booleal config items */
     } conf;
+
+    bool loaded; /**< Whether the plug-in is mapped in memory */
+    bool unloadable; /**< Whether the plug-in can be unloaded safely */
+    module_handle_t handle; /**< Run-time linker handle (if loaded) */
+    char *abspath; /**< Absolute path */
+
+    char *path; /**< Relative path (within plug-in directory) */
+    time_t mtime; /**< Last modification time */
+    off_t size; /**< File size */
 } vlc_plugin_t;
 
 /**
@@ -55,9 +63,6 @@ typedef struct vlc_plugin_t
 extern struct vlc_plugin_t *vlc_plugins;
 
 #define MODULE_SHORTCUT_MAX 20
-
-/** The module handle type */
-typedef void *module_handle_t;
 
 /** Plugin entry point prototype */
 typedef int (*vlc_plugin_cb) (int (*)(void *, void *, int, ...), void *);
@@ -89,19 +94,9 @@ struct module_t
     const char *psz_capability;                              /**< Capability */
     int      i_score;                          /**< Score for the capability */
 
-    bool          b_loaded;        /* Set to true if the dll is loaded */
-    bool b_unloadable;                        /**< Can we be dlclosed? */
-
     /* Callbacks */
     void *pf_activate;
     void *pf_deactivate;
-
-    /*
-     * Variables used internally by the module manager
-     */
-    /* Plugin-specific stuff */
-    module_handle_t     handle;                             /* Unique handle */
-    char *              psz_filename;                     /* Module filename */
 };
 
 vlc_plugin_t *vlc_plugin_create(void);

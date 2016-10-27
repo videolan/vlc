@@ -63,12 +63,8 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
     module->i_shortcuts = 0;
     module->psz_capability = NULL;
     module->i_score = (parent != NULL) ? parent->i_score : 1;
-    module->b_loaded = false;
-    module->b_unloadable = parent == NULL;
     module->pf_activate = NULL;
     module->pf_deactivate = NULL;
-    /*module->handle = garbage */
-    module->psz_filename = NULL;
     return module;
 }
 
@@ -77,15 +73,12 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
  */
 void vlc_module_destroy (module_t *module)
 {
-    assert (!module->b_loaded || !module->b_unloadable);
-
     for (module_t *m = module->submodule, *next; m != NULL; m = next)
     {
         next = m->next;
         vlc_module_destroy (m);
     }
 
-    free (module->psz_filename);
     free (module->pp_shortcuts);
     free (module);
 }
@@ -96,13 +89,18 @@ vlc_plugin_t *vlc_plugin_create(void)
     if (unlikely(plugin == NULL))
         return NULL;
 
-    plugin->path = NULL;
-    plugin->module = NULL;
     plugin->textdomain = NULL;
     plugin->conf.items = NULL;
     plugin->conf.size = 0;
     plugin->conf.count = 0;
     plugin->conf.booleans = 0;
+    plugin->abspath = NULL;
+    plugin->loaded = false;
+    plugin->unloadable = true;
+    plugin->handle = NULL;
+    plugin->abspath = NULL;
+    plugin->path = NULL;
+    plugin->module = NULL;
 
     return plugin;
 }
@@ -115,11 +113,13 @@ vlc_plugin_t *vlc_plugin_create(void)
 void vlc_plugin_destroy(vlc_plugin_t *plugin)
 {
     assert(plugin != NULL);
+    assert(!plugin->loaded || !plugin->unloadable);
 
     if (plugin->module != NULL)
         vlc_module_destroy(plugin->module);
 
     config_Free(plugin->conf.items, plugin->conf.size);
+    free(plugin->abspath);
     free(plugin->path);
     free(plugin);
 }
@@ -260,8 +260,7 @@ static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
             break;
 
         case VLC_MODULE_NO_UNLOAD:
-            assert(module->plugin->module == module);
-            module->b_unloadable = false;
+            plugin->unloadable = false;
             break;
 
         case VLC_MODULE_NAME:
