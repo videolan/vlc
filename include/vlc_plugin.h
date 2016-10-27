@@ -299,8 +299,9 @@ VLC_METADATA_EXPORTS
         goto error;
 
 #define set_callbacks( activate, deactivate ) \
-    if (vlc_module_set (VLC_MODULE_CB_OPEN, #activate, activate) \
-     || vlc_module_set (VLC_MODULE_CB_CLOSE, #deactivate, deactivate)) \
+    if (vlc_module_set(VLC_MODULE_CB_OPEN, #activate, (void *)(activate)) \
+     || vlc_module_set(VLC_MODULE_CB_CLOSE, #deactivate, \
+                       (void *)(deactivate))) \
         goto error;
 
 #define cannot_unload_broken_library( ) \
@@ -470,7 +471,7 @@ VLC_METADATA_EXPORTS
                     (const char *const *)(list_text));
 
 #define change_string_cb( cb ) \
-    vlc_config_set (VLC_CONFIG_LIST_CB, #cb, (cb));
+    vlc_config_set (VLC_CONFIG_LIST_CB, #cb, (void *)(cb));
 
 #define change_integer_list( list, list_text ) \
     vlc_config_set (VLC_CONFIG_LIST, \

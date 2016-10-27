@@ -417,15 +417,21 @@ static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
         }
 
         case VLC_CONFIG_LIST_CB:
+        {
+            void *cb;
+
             va_arg(ap, const char *);
+            cb = va_arg(ap, void *);
+
             if (IsConfigIntegerType (item->i_type))
-               item->list.i_cb = va_arg (ap, vlc_integer_list_cb);
+               item->list.i_cb = cb;
             else
             if (IsConfigStringType (item->i_type))
-               item->list.psz_cb = va_arg (ap, vlc_string_list_cb);
+               item->list.psz_cb = cb;
             else
                 break;
             break;
+        }
 
         default:
             fprintf (stderr, "LibVLC: unknown module property %d\n", propid);
