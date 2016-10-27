@@ -24,6 +24,7 @@
 #endif
 
 #include <errno.h>
+#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -525,7 +526,18 @@ int vlc_UrlParse(vlc_url_t *restrict url, const char *str)
 
         /* Port number */
         if (next != NULL)
-            url->i_port = atoi(next);
+        {
+            char *end;
+            unsigned long u = strtoul(next, &end, 10);
+
+            url->i_port = u;
+            if (end == next || *end != '\0' || u == ULONG_MAX)
+                ret = -1;
+#if (ULONG_MAX > UINT_MAX)
+            if (u > UINT_MAX)
+                ret = -1;
+#endif
+        }
 
         if (url->psz_path != NULL)
             *url->psz_path = '/'; /* restore leading slash */
