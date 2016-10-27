@@ -87,6 +87,7 @@ struct module_config_t
         vlc_integer_list_cb i_cb;
     } list;
     const char **list_text;                /* Friendly names for list values */
+    const char *list_cb_name;
 };
 
 /*****************************************************************************

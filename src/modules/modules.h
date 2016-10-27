@@ -97,6 +97,8 @@ struct module_t
     int      i_score;                          /**< Score for the capability */
 
     /* Callbacks */
+    const char *activate_name;
+    const char *deactivate_name;
     void *pf_activate;
     void *pf_deactivate;
 };

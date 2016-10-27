@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 31
+#define CACHE_SUBVERSION_NUM 32
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -203,8 +203,8 @@ static int vlc_cache_load_config(module_config_t *cfg, block_t *file)
 
         if (cfg->list_count)
             cfg->list.psz = xmalloc (cfg->list_count * sizeof (char *));
-        else /* TODO: fix config_GetPszChoices() instead of this hack: */
-            LOAD_IMMEDIATE(cfg->list.psz_cb);
+        else
+            LOAD_STRING(cfg->list_cb_name);
         for (unsigned i = 0; i < cfg->list_count; i++)
         {
             LOAD_STRING (cfg->list.psz[i]);
@@ -224,8 +224,8 @@ static int vlc_cache_load_config(module_config_t *cfg, block_t *file)
         {
             LOAD_ALIGNOF(*cfg->list.i);
         }
-        else /* TODO: fix config_GetPszChoices() instead of this hack: */
-            LOAD_IMMEDIATE(cfg->list.i_cb);
+        else
+            LOAD_IMMEDIATE(cfg->list_cb_name);
 
         LOAD_ARRAY(cfg->list.i, cfg->list_count);
     }
@@ -304,6 +304,8 @@ static int vlc_cache_load_module(module_t *module, block_t *file)
             LOAD_STRING(module->pp_shortcuts[j]);
     }
 
+    LOAD_STRING(module->activate_name);
+    LOAD_STRING(module->deactivate_name);
     LOAD_STRING(module->psz_capability);
     LOAD_IMMEDIATE(module->i_score);
     return 0;
@@ -531,7 +533,7 @@ static int CacheSaveConfig (FILE *file, const module_config_t *cfg)
     {
         SAVE_STRING (cfg->orig.psz);
         if (cfg->list_count == 0)
-            SAVE_IMMEDIATE (cfg->list.psz_cb); /* XXX: see CacheLoadConfig() */
+            SAVE_STRING(cfg->list_cb_name);
 
         for (unsigned i = 0; i < cfg->list_count; i++)
             SAVE_STRING (cfg->list.psz[i]);
@@ -547,7 +549,7 @@ static int CacheSaveConfig (FILE *file, const module_config_t *cfg)
             SAVE_ALIGNOF(*cfg->list.i);
         }
         else
-            SAVE_IMMEDIATE (cfg->list.i_cb); /* XXX: see CacheLoadConfig() */
+            SAVE_IMMEDIATE (cfg->list_cb_name);
 
         for (unsigned i = 0; i < cfg->list_count; i++)
              SAVE_IMMEDIATE (cfg->list.i[i]);
@@ -585,6 +587,8 @@ static int CacheSaveModule(FILE *file, const module_t *module)
     for (size_t j = 0; j < module->i_shortcuts; j++)
          SAVE_STRING(module->pp_shortcuts[j]);
 
+    SAVE_STRING(module->activate_name);
+    SAVE_STRING(module->deactivate_name);
     SAVE_STRING(module->psz_capability);
     SAVE_IMMEDIATE(module->i_score);
     return 0;

@@ -207,9 +207,7 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
      * Could be optimized by adding an API call.*/
     for (size_t i = 0; i < plugin->conf.size; i++)
          if (!atomic_load_explicit(&plugin->loaded, memory_order_relaxed)
-          && plugin->conf.items[i].list_count == 0
-          && (plugin->conf.items[i].list.psz_cb != NULL
-           || plugin->conf.items[i].list.i_cb != NULL))
+          && plugin->conf.items[i].list_cb_name != NULL)
          {
              /* !unloadable not allowed for plugins with callbacks */
              vlc_plugin_destroy(plugin);

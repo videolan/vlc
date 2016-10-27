@@ -63,6 +63,8 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
     module->i_shortcuts = 0;
     module->psz_capability = NULL;
     module->i_score = (parent != NULL) ? parent->i_score : 1;
+    module->activate_name = NULL;
+    module->deactivate_name = NULL;
     module->pf_activate = NULL;
     module->pf_deactivate = NULL;
     return module;
@@ -252,12 +254,12 @@ static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
             break;
 
         case VLC_MODULE_CB_OPEN:
-            va_arg(ap, const char *);
+            module->activate_name = va_arg(ap, const char *);
             module->pf_activate = va_arg (ap, void *);
             break;
 
         case VLC_MODULE_CB_CLOSE:
-            va_arg(ap, const char *);
+            module->deactivate_name = va_arg(ap, const char *);
             module->pf_deactivate = va_arg (ap, void *);
             break;
 
@@ -420,7 +422,7 @@ static int vlc_plugin_setter(void *ctx, void *tgt, int propid, ...)
         {
             void *cb;
 
-            va_arg(ap, const char *);
+            item->list_cb_name = va_arg(ap, const char *);
             cb = va_arg(ap, void *);
 
             if (IsConfigIntegerType (item->i_type))
