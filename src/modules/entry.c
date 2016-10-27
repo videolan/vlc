@@ -292,8 +292,6 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
         }
 
         case VLC_MODULE_SHORTNAME:
-            assert(module->psz_shortname == NULL
-                || module->plugin->module != module);
             module->psz_shortname = va_arg (ap, const char *);
             break;
 
@@ -303,13 +301,10 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             break;
 
         case VLC_MODULE_HELP:
-            assert(module->plugin->module == module);
-            assert(module->psz_help == NULL);
             module->psz_help = va_arg (ap, const char *);
             break;
 
         case VLC_MODULE_TEXTDOMAIN:
-            assert(plugin->textdomain == NULL);
             plugin->textdomain = va_arg(ap, const char *);
             break;
 

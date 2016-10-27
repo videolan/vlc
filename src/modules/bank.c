@@ -72,7 +72,6 @@ static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
     if (unlikely(lib == NULL))
         return NULL;
 
-    assert(lib->module != NULL);
     atomic_init(&lib->loaded, true);
     lib->unloadable = false;
     return lib;
@@ -477,7 +476,6 @@ void module_InitBank (void)
          * options of core will be available in the module bank structure just
          * as for every other module. */
         vlc_plugin_t *plugin = module_InitStatic(vlc_entry__core);
-        assert(plugin != NULL);
         if (likely(plugin != NULL))
             module_StoreBank(plugin);
         config_SortConfig ();
