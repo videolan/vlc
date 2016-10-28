@@ -617,6 +617,11 @@ static int Open (vlc_object_t *obj)
     }
     else
     {
+        if (ppqn == 0)
+        {
+            msg_Err(demux, "invalid SMF file PPQN: %u", ppqn);
+            return VLC_EGENERIC;
+        }
         msg_Dbg (demux, " %u pulses per quarter note", ppqn);
     }
 
