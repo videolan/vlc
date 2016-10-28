@@ -312,6 +312,11 @@ int main (void)
     test_url_parse("p://G a r b a g e", NULL, NULL, NULL, NULL, 0, NULL, NULL);
     test_url_parse("p://h/G a r b a g e", NULL, NULL, NULL, NULL, 0, NULL, NULL);
     test_url_parse("http://example.com:123xyz", NULL, NULL, NULL, NULL, 0, NULL, NULL);
+    test_url_parse("http://example.com: 123", NULL, NULL, NULL, NULL, 0, NULL, NULL );
+    test_url_parse("http://example.com:+123", NULL, NULL, NULL, NULL, 0, NULL, NULL );
+    test_url_parse("http://example.com:-123", NULL, NULL, NULL, NULL, 0, NULL, NULL );
+    test_url_parse("http://example.com:-4294967298", NULL, NULL, NULL, NULL, 0, NULL, NULL );
+    test_url_parse("http://example.com:-18446744073709551615", NULL, NULL, NULL, NULL, 0, NULL, NULL );
 
     /* Reference test cases for reference URI resolution */
     static const char *rfc3986_cases[] =
