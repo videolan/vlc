@@ -124,7 +124,6 @@ static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
 static uint32_t MP4_TrackGetReadSize( mp4_track_t *, uint32_t * );
 static int      MP4_TrackNextSample( demux_t *, mp4_track_t *, uint32_t );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
-static bool     MP4_TrackIsInterleaved( const mp4_track_t * );
 
 static void     MP4_UpdateSeekpoint( demux_t * );
 
@@ -399,6 +398,64 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
     p_newblock->i_buffer = i_copied;
     p_newblock->i_flags = BLOCK_FLAG_ORDERED_CAPTIONS;
     return p_newblock;
+}
+
+/* Analyzes chunks to find max interleave length
+ * sets flat flag if no interleaving is in use */
+static void MP4_GetInterleaving( demux_t *p_demux, uint64_t *pi_max_contiguous, bool *pb_flat )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    *pi_max_contiguous = 0;
+    *pb_flat = true;
+
+    /* Find first recorded chunk */
+    mp4_track_t *tk = NULL;
+    uint64_t i_duration = 0;
+    for( unsigned i=0; i < p_sys->i_tracks; i++ )
+    {
+        mp4_track_t *cur = &p_sys->track[i];
+        if( !cur->i_chunk_count )
+            continue;
+
+        if( tk == NULL || cur->chunk[0].i_offset < tk->chunk[0].i_offset )
+            tk = cur;
+    }
+
+    for( ; tk != NULL; )
+    {
+        i_duration += tk->chunk[tk->i_chunk].i_duration;
+        tk->i_chunk++;
+
+        /* Find next chunk in data order */
+        mp4_track_t *nexttk = NULL;
+        for( unsigned i=0; i < p_sys->i_tracks; i++ )
+        {
+            mp4_track_t *cur = &p_sys->track[i];
+            if( cur->i_chunk == cur->i_chunk_count )
+                continue;
+
+            if( nexttk == NULL ||
+                cur->chunk[cur->i_chunk].i_offset < nexttk->chunk[nexttk->i_chunk].i_offset )
+                nexttk = cur;
+        }
+
+        if( tk != nexttk )
+        {
+            i_duration = i_duration * CLOCK_FREQ / tk->i_timescale;
+            if( i_duration > *pi_max_contiguous )
+                *pi_max_contiguous = i_duration;
+            i_duration = 0;
+
+            if( tk->i_chunk != tk->i_chunk_count )
+                *pb_flat = false;
+        }
+
+        tk = nexttk;
+    }
+
+    /* reset */
+    for( unsigned i=0; i < p_sys->i_tracks; i++ )
+        p_sys->track[i].i_chunk = 0;
 }
 
 static block_t * MP4_Block_Read( demux_t *p_demux, const mp4_track_t *p_track, int i_size )
@@ -844,15 +901,13 @@ static int Open( vlc_object_t * p_this )
 
     if( !p_sys->b_fragmented && p_sys->i_tracks > 1 && p_sys->b_seekable && !p_sys->b_seekmode )
     {
-        for( unsigned i = 0; i < p_sys->i_tracks; i++ )
+        uint64_t i_max_continuity;
+        bool b_flat;
+        MP4_GetInterleaving( p_demux, &i_max_continuity, &b_flat );
+        if( b_flat )
         {
-            mp4_track_t *tk = &p_sys->track[i];
-            if( !MP4_TrackIsInterleaved( tk ) )
-            {
                 msg_Warn( p_demux, "that media doesn't look interleaved, will need to seek");
                 p_sys->b_seekmode = true;
-                break;
-            }
         }
     }
 
@@ -1940,21 +1995,6 @@ static void LoadChapter( demux_t  *p_demux )
         p_sys->p_title->i_length = CLOCK_FREQ *
                        (uint64_t)p_sys->i_overall_duration / (uint64_t)p_sys->i_timescale;
     }
-}
-
-static bool MP4_TrackIsInterleaved( const mp4_track_t *p_track )
-{
-    const MP4_Box_t *p_stsc = MP4_BoxGet( p_track->p_stbl, "stsc" );
-    const MP4_Box_t *p_stsz = MP4_BoxGet( p_track->p_stbl, "stsz" );
-    if( p_stsc && BOXDATA(p_stsc) && p_stsz && BOXDATA(p_stsz) )
-    {
-        if( BOXDATA(p_stsc)->i_entry_count == 1 &&
-            BOXDATA(p_stsz)->i_sample_count > 1 &&
-            BOXDATA(p_stsc)->i_samples_per_chunk[0] == BOXDATA(p_stsz)->i_sample_count )
-            return false;
-    }
-
-    return true;
 }
 
 /* now create basic chunk data, the rest will be filled by MP4_CreateSamplesIndex */
