@@ -246,7 +246,6 @@ static void BuildVertexShader(vout_display_opengl_t *vgl,
         "attribute vec3 VertexPosition;"
         "uniform mat4 OrientationMatrix;"
         "uniform mat4 ProjectionMatrix;"
-        "uniform mat4 ViewMatrix;"
         "uniform mat4 XRotMatrix;"
         "uniform mat4 YRotMatrix;"
         "uniform mat4 ZoomMatrix;"
@@ -1027,18 +1026,6 @@ static const GLfloat identity[] = {
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
-static void getViewMatrix(GLfloat matrix[static 16]) {
-    // 90° rotation on the Y axis
-    const GLfloat m[] = {
-        0.0f,  0.0f, 1.0f, 0.0f,
-        0.0f,  1.0f, 0.0f, 0.0f,
-        -1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f,  0.0f, 0.0f, 1.0f
-    };
-
-     memcpy(matrix, m, sizeof(m));
-}
-
 /* rotation around the Y axis */
 static void getYRotMatrix(float teta, GLfloat matrix[static 16]) {
 
@@ -1530,7 +1517,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     if (i_ret != VLC_SUCCESS)
         return;
 
-    GLfloat projectionMatrix[16], viewMatrix[16],
+    GLfloat projectionMatrix[16],
             yRotMatrix[16], xRotMatrix[16],
             zoomMatrix[16], orientationMatrix[16];
 
@@ -1541,7 +1528,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     {
         float sar = (float) vgl->fmt.i_visible_width / vgl->fmt.i_visible_height;
         getProjectionMatrix(sar, projectionMatrix);
-        getViewMatrix(viewMatrix);
         getYRotMatrix(vgl->f_teta, yRotMatrix);
         getXRotMatrix(vgl->f_phi, xRotMatrix);
         getZoomMatrix(vgl->f_zoom, zoomMatrix);
@@ -1549,7 +1535,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
     else
     {
         memcpy(projectionMatrix, identity, sizeof(identity));
-        memcpy(viewMatrix, identity, sizeof(identity));
         memcpy(yRotMatrix, identity, sizeof(identity));
         memcpy(xRotMatrix, identity, sizeof(identity));
         memcpy(zoomMatrix, identity, sizeof(identity));
@@ -1584,7 +1569,6 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
 
     vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "OrientationMatrix"), 1, GL_FALSE, orientationMatrix);
     vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "ProjectionMatrix"), 1, GL_FALSE, projectionMatrix);
-    vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "ViewMatrix"), 1, GL_FALSE, viewMatrix);
     vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "YRotMatrix"), 1, GL_FALSE, yRotMatrix);
     vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "XRotMatrix"), 1, GL_FALSE, xRotMatrix);
     vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[program], "ZoomMatrix"), 1, GL_FALSE, zoomMatrix);
@@ -1722,7 +1706,6 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             // Subpictures have the correct orientation:
             vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "OrientationMatrix"), 1, GL_FALSE, identity);
             vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ProjectionMatrix"), 1, GL_FALSE, identity);
-            vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ViewMatrix"), 1, GL_FALSE, identity);
             vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "YRotMatrix"), 1, GL_FALSE, identity);
             vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "XRotMatrix"), 1, GL_FALSE, identity);
             vgl->UniformMatrix4fv(vgl->GetUniformLocation(vgl->program[1], "ZoomMatrix"), 1, GL_FALSE, identity);
