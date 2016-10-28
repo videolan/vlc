@@ -200,21 +200,24 @@ static void write_finalize( filter_t *p_filter, uint16_t i_data_type,
 
 static int write_buffer_ac3( filter_t *p_filter, block_t *p_in_buf )
 {
+    static const size_t a52_size = A52_FRAME_NB * 4;
+
     if( unlikely( p_in_buf->i_buffer < 6
-     || p_in_buf->i_buffer > A52_FRAME_NB * 4
+     || p_in_buf->i_buffer > a52_size
      || p_in_buf->i_nb_samples != A52_FRAME_NB ) )
     {
         /* Input is not correctly packetizer. Try to parse the buffer in order
          * to get the mandatory informations to play AC3 over S/PDIF */
         vlc_a52_header_t a52;
         if( vlc_a52_header_Parse( &a52, p_in_buf->p_buffer, p_in_buf->i_buffer )
-            != VLC_SUCCESS || a52.b_eac3 )
+            != VLC_SUCCESS || a52.b_eac3 || a52.i_size > p_in_buf->i_buffer )
             return SPDIF_ERROR;
         p_in_buf->i_buffer = a52.i_size;
         p_in_buf->i_nb_samples = a52.i_samples;
     }
 
-    if( write_init( p_filter, p_in_buf, A52_FRAME_NB * 4, A52_FRAME_NB ) )
+    if( p_in_buf->i_buffer + SPDIF_HEADER_SIZE > a52_size
+     || write_init( p_filter, p_in_buf, a52_size, A52_FRAME_NB ) )
         return SPDIF_ERROR;
     write_buffer( p_filter, p_in_buf );
     write_finalize( p_filter, IEC61937_AC3 |
@@ -230,7 +233,7 @@ static int write_buffer_eac3( filter_t *p_filter, block_t *p_in_buf )
 
     vlc_a52_header_t a52 = { };
     if( vlc_a52_header_Parse( &a52, p_in_buf->p_buffer, p_in_buf->i_buffer )
-        != VLC_SUCCESS )
+        != VLC_SUCCESS || a52.i_size > p_in_buf->i_buffer )
         return SPDIF_ERROR;
 
     p_in_buf->i_buffer = a52.i_size;
@@ -378,7 +381,7 @@ static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
         return SPDIF_ERROR;
     }
 
-    if( p_in_buf->i_buffer > p_in_buf->i_nb_samples * 4
+    if( p_in_buf->i_buffer + SPDIF_HEADER_SIZE > p_in_buf->i_nb_samples * 4
      || write_init( p_filter, p_in_buf, p_in_buf->i_nb_samples * 4,
                     p_in_buf->i_nb_samples ) )
         return SPDIF_ERROR;
