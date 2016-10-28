@@ -148,7 +148,12 @@ error:
     return NULL;
 }
 
-typedef enum { CACHE_USE, CACHE_RESET, CACHE_IGNORE } cache_mode_t;
+typedef enum
+{
+    CACHE_READ_FILE  = 0x1,
+    CACHE_SCAN_DIR   = 0x2,
+    CACHE_WRITE_FILE = 0x4,
+} cache_mode_t;
 
 typedef struct module_bank
 {
@@ -170,7 +175,7 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
     vlc_plugin_t *plugin = NULL;
 
     /* Check our plugins cache first then load plugin if needed */
-    if (bank->mode == CACHE_USE)
+    if (bank->mode & CACHE_READ_FILE)
     {
         plugin = vlc_cache_lookup(&bank->cache, relpath);
 
@@ -202,7 +207,7 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
 
     module_StoreBank(plugin);
 
-    if (bank->mode == CACHE_RESET) /* Add entry to to-be-saved cache */
+    if (bank->mode & CACHE_WRITE_FILE) /* Add entry to to-be-saved cache */
     {
         bank->plugins = xrealloc(bank->plugins,
                                  (bank->size + 1) * sizeof (vlc_plugin_t *));
@@ -305,26 +310,32 @@ static void AllocatePluginPath(vlc_object_t *obj, const char *path,
         .mode = mode,
     };
 
-    if (mode == CACHE_USE)
+    if (mode & CACHE_READ_FILE)
         bank.cache = vlc_cache_load(obj, path, &modules.caches);
     else
         msg_Dbg(bank.obj, "ignoring plugins cache file");
 
-    msg_Dbg(obj, "recursively browsing `%s'", bank.base);
+    if (mode & CACHE_SCAN_DIR)
+    {
+        msg_Dbg(obj, "recursively browsing `%s'", bank.base);
 
-    /* Don't go deeper than 5 subdirectories */
-    AllocatePluginDir (&bank, 5, path, NULL);
+        /* Don't go deeper than 5 subdirectories */
+        AllocatePluginDir(&bank, 5, path, NULL);
+    }
 
-    /* Discard unmatched cache entries */
+    /* Deal with unmatched cache entries from cache file */
     while (bank.cache != NULL)
     {
         vlc_plugin_t *plugin = bank.cache;
 
         bank.cache = plugin->next;
-        vlc_plugin_destroy(plugin);
+        if (mode & CACHE_SCAN_DIR)
+            vlc_plugin_destroy(plugin);
+        else
+            module_StoreBank(plugin);
     }
 
-    if (mode == CACHE_RESET)
+    if (mode & CACHE_WRITE_FILE)
         CacheSave(obj, path, bank.plugins, bank.size);
 
     free(bank.plugins);
@@ -341,14 +352,14 @@ static void AllocatePluginPath(vlc_object_t *obj, const char *path,
 static void AllocateAllPlugins (vlc_object_t *p_this)
 {
     char *paths;
-    cache_mode_t mode;
+    cache_mode_t mode = 0;
 
-    if( !var_InheritBool( p_this, "plugins-cache" ) )
-        mode = CACHE_IGNORE;
-    else if( var_InheritBool( p_this, "reset-plugins-cache" ) )
-        mode = CACHE_RESET;
-    else
-        mode = CACHE_USE;
+    if (var_InheritBool(p_this, "plugins-cache"))
+        mode |= CACHE_READ_FILE;
+    if (var_InheritBool(p_this, "plugins-scan"))
+        mode |= CACHE_SCAN_DIR;
+    if (var_InheritBool(p_this, "reset-plugins-cache"))
+        mode = (mode | CACHE_WRITE_FILE) & ~CACHE_READ_FILE;
 
 #if VLC_WINSTORE_APP
     /* Windows Store Apps can not load external plugins with absolute paths. */
