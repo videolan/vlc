@@ -66,7 +66,7 @@ static int Seek(access_t *access, uint64_t position)
     if (strcmp(old_chunk->mrl, sys->chunk->mrl)) {
         if (sys->s)
             vlc_stream_Delete(sys->s);
-        sys->s = vlc_stream_NewMRL(access, sys->chunk->mrl);
+        sys->s = vlc_stream_NewURL(access, sys->chunk->mrl);
     }
     return sys->s ? vlc_stream_Seek(sys->s, offset) : VLC_EGENERIC;
 }
@@ -152,7 +152,7 @@ int RarAccessOpen(vlc_object_t *object)
     name++;
     vlc_uri_decode(base);
 
-    stream_t *s = vlc_stream_NewMRL(access, base);
+    stream_t *s = vlc_stream_NewURL(access, base);
     if (!s || RarProbe(s))
         goto error;
 

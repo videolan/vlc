@@ -117,7 +117,7 @@ static int FindVolumes(access_t *p_access, struct archive *p_archive, const char
                 /* Probe URI */
                 int i_savedflags = p_access->obj.flags;
                 p_access->obj.flags |= OBJECT_FLAGS_NOINTERACT;
-                stream_t *p_stream = vlc_stream_NewMRL(p_access, psz_newuri);
+                stream_t *p_stream = vlc_stream_NewURL(p_access, psz_newuri);
                 p_access->obj.flags = i_savedflags;
                 if (p_stream)
                 {
@@ -221,7 +221,7 @@ static int SwitchCallback(struct archive *p_archive, void *p_object, void *p_obj
 
     msg_Dbg(p_data->p_access, "opening next volume %s", p_nextdata->psz_uri);
     vlc_stream_Delete(p_sys->p_stream);
-    p_sys->p_stream = vlc_stream_NewMRL(p_nextdata->p_access, p_nextdata->psz_uri);
+    p_sys->p_stream = vlc_stream_NewURL(p_nextdata->p_access, p_nextdata->psz_uri);
     return p_sys->p_stream ? ARCHIVE_OK : ARCHIVE_FATAL;
 }
 
@@ -231,7 +231,7 @@ static int OpenCallback(struct archive *p_archive, void *p_object)
     callback_data_t *p_data = (callback_data_t *) p_object;
     access_sys_t *p_sys = p_data->p_access->p_sys;
 
-    p_sys->p_stream = vlc_stream_NewMRL( p_data->p_access, p_data->psz_uri );
+    p_sys->p_stream = vlc_stream_NewURL( p_data->p_access, p_data->psz_uri );
     if(!p_sys->p_stream)
         return ARCHIVE_FATAL;
 

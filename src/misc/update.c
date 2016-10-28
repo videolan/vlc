@@ -188,7 +188,7 @@ static bool GetUpdateFile( update_t *p_update )
     char *psz_version_line = NULL;
     char *psz_update_data = NULL;
 
-    p_stream = vlc_stream_NewMRL( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
+    p_stream = vlc_stream_NewURL( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
     if( !p_stream )
     {
         msg_Err( p_update->p_libvlc, "Failed to open %s for reading",
@@ -552,7 +552,7 @@ static void* update_DownloadReal( void *obj )
     canc = vlc_savecancel ();
 
     /* Open the stream */
-    p_stream = vlc_stream_NewMRL( p_udt, p_update->release.psz_url );
+    p_stream = vlc_stream_NewURL( p_udt, p_update->release.psz_url );
     if( !p_stream )
     {
         msg_Err( p_udt, "Failed to open %s for reading", p_update->release.psz_url );

@@ -235,7 +235,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     stream_t *p_stream = NULL;
     uint64_t i_size;
 
-    p_stream = vlc_stream_NewMRL( p_image->p_parent, psz_url );
+    p_stream = vlc_stream_NewURL( p_image->p_parent, psz_url );
 
     if( !p_stream )
     {

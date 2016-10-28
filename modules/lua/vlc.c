@@ -770,7 +770,7 @@ int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *curi )
         free( uri );
         return ret;
     }
-    stream_t *s = vlc_stream_NewMRL( p_this, uri );
+    stream_t *s = vlc_stream_NewURL( p_this, uri );
     if( !s )
     {
         free( uri );

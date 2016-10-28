@@ -42,7 +42,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const std::string &rFileName )
     LoadCatalog();
 
     char *psz_uri = vlc_path2uri( rFileName.c_str(), NULL );
-    m_pStream = vlc_stream_NewMRL( pIntf, psz_uri );
+    m_pStream = vlc_stream_NewURL( pIntf, psz_uri );
     free( psz_uri );
     if( !m_pStream )
     {

@@ -315,7 +315,7 @@ static void* ZCALLBACK ZipIO_Open( void* opaque, const char* file, int mode )
         strcpy( fileUri, file );
     }
 
-    stream_t *s = vlc_stream_NewMRL( p_access, fileUri );
+    stream_t *s = vlc_stream_NewURL( p_access, fileUri );
     free( fileUri );
     return s;
 }

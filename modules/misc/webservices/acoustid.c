@@ -165,7 +165,7 @@ int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
     int i_saved_flags = p_obj->obj.flags;
     p_obj->obj.flags |= OBJECT_FLAGS_NOINTERACT;
 
-    stream_t *p_stream = vlc_stream_NewMRL( p_obj, psz_url );
+    stream_t *p_stream = vlc_stream_NewURL( p_obj, psz_url );
 
     free( psz_url );
     p_obj->obj.flags = i_saved_flags;

@@ -201,7 +201,7 @@ static int Android_ParseFamily( filter_t *p_filter, xml_reader_t *p_xml )
 static int Android_ParseSystemFonts( filter_t *p_filter, const char *psz_path )
 {
     int i_ret = VLC_SUCCESS;
-    stream_t *p_stream = vlc_stream_NewMRL( p_filter, psz_path );
+    stream_t *p_stream = vlc_stream_NewURL( p_filter, psz_path );
 
     if( !p_stream )
         return VLC_EGENERIC;

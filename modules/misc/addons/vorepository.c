@@ -329,7 +329,7 @@ static int Find( addons_finder_t *p_finder )
         if ( ! asprintf( &psz_uri, ADDONS_REPO_SCHEMEHOST"/xml" ) ) return VLC_ENOMEM;
         b_done = true;
 
-        stream_t *p_stream = vlc_stream_NewMRL( p_finder, psz_uri );
+        stream_t *p_stream = vlc_stream_NewURL( p_finder, psz_uri );
         free( psz_uri );
         if ( !p_stream ) return VLC_EGENERIC;
 
@@ -370,12 +370,12 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
             free( psz_archive_uri );
             return VLC_ENOMEM;
         }
-        p_stream = vlc_stream_NewMRL( p_finder, psz_uri );
+        p_stream = vlc_stream_NewURL( p_finder, psz_uri );
         free( psz_uri );
     }
     else
     {
-        p_stream = vlc_stream_NewMRL( p_finder, psz_archive_uri );
+        p_stream = vlc_stream_NewURL( p_finder, psz_archive_uri );
     }
 
     msg_Dbg( p_finder, "downloading archive %s", psz_archive_uri );
@@ -434,7 +434,7 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
         return VLC_ENOMEM;
     }
 
-    p_stream = vlc_stream_NewMRL( p_finder, psz_manifest_uri );
+    p_stream = vlc_stream_NewURL( p_finder, psz_manifest_uri );
     free( psz_manifest_uri );
     if ( !p_stream )
     {
@@ -461,7 +461,7 @@ static int FindDesignated( addons_finder_t *p_finder )
                    psz_path ) < 1 )
         return VLC_ENOMEM;
 
-    stream_t *p_stream = vlc_stream_NewMRL( p_finder, psz_manifest );
+    stream_t *p_stream = vlc_stream_NewURL( p_finder, psz_manifest );
     free( psz_manifest );
     if ( !p_stream ) return VLC_EGENERIC;
 

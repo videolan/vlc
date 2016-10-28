@@ -724,7 +724,7 @@ int XmlFile::OpenXml()
     char *psz_uri;
 
     psz_uri = vlc_path2uri( this->s_path.c_str(), "file" );
-    this->p_stream = vlc_stream_NewMRL(this->p_demux, psz_uri );
+    this->p_stream = vlc_stream_NewURL(this->p_demux, psz_uri );
     free(psz_uri);
     if( ! this->p_stream ) {
         return -1;

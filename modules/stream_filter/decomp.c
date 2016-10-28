@@ -65,7 +65,7 @@ vlc_module_begin ()
     add_submodule ()
     set_description (N_("Burrows-Wheeler decompression"))
     set_callbacks (OpenBzip2, Close)
-    /* TODO: access shortnames for vlc_stream_NewMRL() */
+    /* TODO: access shortnames for vlc_stream_NewURL() */
 
     add_submodule ()
     set_description (N_("gzip decompression"))

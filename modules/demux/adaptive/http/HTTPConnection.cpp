@@ -399,7 +399,7 @@ int StreamUrlConnection::request(const std::string &path, const BytesRange &rang
     msg_Dbg(p_object, "Retrieving %s @%zu", params.getUrl().c_str(),
                       range.isValid() ? range.getStartByte() : 0);
 
-    p_streamurl = vlc_stream_NewMRL(p_object, params.getUrl().c_str());
+    p_streamurl = vlc_stream_NewURL(p_object, params.getUrl().c_str());
     if(!p_streamurl)
         return VLC_EGENERIC;
 

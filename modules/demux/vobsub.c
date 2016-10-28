@@ -186,7 +186,7 @@ static int Open ( vlc_object_t *p_this )
     if( i_len >= 4 ) memcpy( psz_vobname + i_len - 4, ".sub", 4 );
 
     /* open file */
-    p_sys->p_vobsub_stream = vlc_stream_NewMRL( p_demux, psz_vobname );
+    p_sys->p_vobsub_stream = vlc_stream_NewURL( p_demux, psz_vobname );
     if( p_sys->p_vobsub_stream == NULL )
     {
         msg_Err( p_demux, "couldn't open .sub Vobsub file: %s",

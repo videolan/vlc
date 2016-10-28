@@ -345,9 +345,9 @@ VLC_API stream_t *vlc_stream_MemoryNew(vlc_object_t *obj, uint8_t *base,
  * Create a stream_t reading from a URL.
  * You must delete it using vlc_stream_Delete.
  */
-VLC_API stream_t * vlc_stream_NewMRL(vlc_object_t *obj, const char *url)
+VLC_API stream_t * vlc_stream_NewURL(vlc_object_t *obj, const char *url)
 VLC_USED;
-#define vlc_stream_NewMRL(a, b) vlc_stream_NewMRL(VLC_OBJECT(a), b)
+#define vlc_stream_NewURL(a, b) vlc_stream_NewURL(VLC_OBJECT(a), b)
 
 /**
  * \defgroup stream_fifo FIFO stream

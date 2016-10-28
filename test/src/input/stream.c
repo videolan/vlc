@@ -202,7 +202,7 @@ stream_open( const char *psz_url )
     p_vlc = libvlc_new( sizeof(argv) / sizeof(argv[0]), argv );
     assert( p_vlc != NULL );
 
-    p_reader->u.s = vlc_stream_NewMRL( p_vlc->p_libvlc_int, psz_url );
+    p_reader->u.s = vlc_stream_NewURL( p_vlc->p_libvlc_int, psz_url );
     if( !p_reader->u.s )
     {
         libvlc_release( p_vlc );

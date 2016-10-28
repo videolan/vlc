@@ -799,7 +799,7 @@ static uint8_t* download_chunk( stream_t *s,
 
     msg_Info(s, "Downloading fragment %s",  fragment_url );
 
-    stream_t* download_stream = vlc_stream_NewMRL( s, fragment_url );
+    stream_t* download_stream = vlc_stream_NewURL( s, fragment_url );
     if( ! download_stream )
     {
         msg_Err(s, "Failed to download fragment %s", fragment_url );
@@ -1136,7 +1136,7 @@ static void* live_thread( void* p )
     while( ! sys->closed )
     {
         last_dl_start_time = mdate();
-        stream_t* download_stream = vlc_stream_NewMRL( p_this, abst_url );
+        stream_t* download_stream = vlc_stream_NewURL( p_this, abst_url );
         if( ! download_stream )
         {
             msg_Err( p_this, "Failed to download abst %s", abst_url );

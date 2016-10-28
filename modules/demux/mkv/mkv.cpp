@@ -203,7 +203,7 @@ static int Open( vlc_object_t * p_this )
                             const uint8_t *p_peek;
                             bool          file_ok = false;
                             char          *psz_url = vlc_path2uri( s_filename.c_str(), "file" );
-                            stream_t      *p_file_stream = vlc_stream_NewMRL(
+                            stream_t      *p_file_stream = vlc_stream_NewURL(
                                                             p_demux,
                                                             psz_url );
                             /* peek the begining */

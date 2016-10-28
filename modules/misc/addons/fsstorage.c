@@ -225,7 +225,7 @@ static int ListSkins( addons_finder_t *p_finder )
             int i_ret;
             char *psz_name = NULL;
             char *psz_source = NULL;
-            stream_t *p_stream = vlc_stream_NewMRL( p_finder, psz_uri );
+            stream_t *p_stream = vlc_stream_NewURL( p_finder, psz_uri );
             free( psz_uri );
             if ( !p_stream )
             {
@@ -382,7 +382,7 @@ static int InstallFile( addons_storage_t *p_this, const char *psz_downloadlink,
     char buffer[1<<10];
     int i_read = 0;
 
-    p_stream = vlc_stream_NewMRL( p_this, psz_downloadlink );
+    p_stream = vlc_stream_NewURL( p_this, psz_downloadlink );
     if( !p_stream )
     {
         msg_Err( p_this, "Failed to access Addon download url %s", psz_downloadlink );
@@ -701,7 +701,7 @@ static int LoadCatalog( addons_finder_t *p_finder )
     if ( !psz_catalog_uri )
         return VLC_EGENERIC;
 
-    stream_t *p_stream = vlc_stream_NewMRL( p_finder, psz_catalog_uri );
+    stream_t *p_stream = vlc_stream_NewURL( p_finder, psz_catalog_uri );
     free( psz_catalog_uri );
     if (! p_stream ) return VLC_EGENERIC;
 

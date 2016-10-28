@@ -535,7 +535,7 @@ static int Handshake(intf_thread_t *p_this)
         return VLC_ENOMEM;
 
     /* send the http handshake request */
-    p_stream = vlc_stream_NewMRL(p_intf, psz_handshake_url);
+    p_stream = vlc_stream_NewURL(p_intf, psz_handshake_url);
     free(psz_handshake_url);
 
     if (!p_stream)

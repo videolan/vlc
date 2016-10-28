@@ -937,7 +937,7 @@ public_key_t *download_key( vlc_object_t *p_this,
                     p_longid[4], p_longid[5], p_longid[6], p_longid[7] ) == -1 )
         return NULL;
 
-    stream_t *p_stream = vlc_stream_NewMRL( p_this, psz_url );
+    stream_t *p_stream = vlc_stream_NewURL( p_this, psz_url );
     free( psz_url );
     if( !p_stream )
         return NULL;
@@ -1003,7 +1003,7 @@ int download_signature( vlc_object_t *p_this, signature_packet_t *p_sig,
     strcpy( psz_sig, psz_url );
     strcat( psz_sig, ".asc" );
 
-    stream_t *p_stream = vlc_stream_NewMRL( p_this, psz_sig );
+    stream_t *p_stream = vlc_stream_NewURL( p_this, psz_sig );
     free( psz_sig );
 
     if( !p_stream )

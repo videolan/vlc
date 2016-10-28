@@ -122,7 +122,7 @@ void vlc_stream_Delete(stream_t *s)
     stream_CommonDelete(s);
 }
 
-stream_t *(vlc_stream_NewMRL)(vlc_object_t *p_parent, const char *psz_url)
+stream_t *(vlc_stream_NewURL)(vlc_object_t *p_parent, const char *psz_url)
 {
     if( !psz_url )
         return NULL;
