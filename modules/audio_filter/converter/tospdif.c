@@ -180,17 +180,19 @@ static void write_finalize( filter_t *p_filter, uint16_t i_data_type,
     assert( p_sys->p_out_buf != NULL );
     uint8_t *p_out = p_sys->p_out_buf->p_buffer;
 
-    assert( p_sys->i_out_offset > SPDIF_HEADER_SIZE );
-    assert( i_data_type != 0 );
-    assert( i_length_mul == 1 || i_length_mul == 8 );
-
     /* S/PDIF header */
-    write_16( p_filter, &p_out[0], 0xf872 ); /* syncword 1 */
-    write_16( p_filter, &p_out[2], 0x4e1f ); /* syncword 2 */
-    write_16( p_filter, &p_out[4], i_data_type ); /* data type */
-    /* length in bits or bytes */
-    write_16( p_filter, &p_out[6], ( p_sys->i_out_offset - SPDIF_HEADER_SIZE )
-                                   * i_length_mul );
+    if( i_data_type != 0 )
+    {
+        assert( p_sys->i_out_offset > SPDIF_HEADER_SIZE );
+        assert( i_length_mul == 1 || i_length_mul == 8 );
+
+        write_16( p_filter, &p_out[0], 0xf872 ); /* syncword 1 */
+        write_16( p_filter, &p_out[2], 0x4e1f ); /* syncword 2 */
+        write_16( p_filter, &p_out[4], i_data_type ); /* data type */
+        /* length in bits or bytes */
+        write_16( p_filter, &p_out[6],
+                  ( p_sys->i_out_offset - SPDIF_HEADER_SIZE ) * i_length_mul );
+    }
 
     /* 0 padding */
     if( p_sys->i_out_offset < p_sys->p_out_buf->i_buffer )
@@ -381,10 +383,22 @@ static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
         return SPDIF_ERROR;
     }
 
-    if( p_in_buf->i_buffer + SPDIF_HEADER_SIZE > p_in_buf->i_nb_samples * 4
-     || write_init( p_filter, p_in_buf, p_in_buf->i_nb_samples * 4,
+    if( p_in_buf->i_buffer == p_in_buf->i_nb_samples * 4 )
+    {
+        /* No enough room to put the S/PDIF header. This is the case for DTS
+         * inside WAV. */
+        i_data_type = 0;
+    }
+    else if( p_in_buf->i_buffer + SPDIF_HEADER_SIZE > p_in_buf->i_nb_samples * 4 )
+        return SPDIF_ERROR;
+
+    if( write_init( p_filter, p_in_buf, p_in_buf->i_nb_samples * 4,
                     p_in_buf->i_nb_samples ) )
         return SPDIF_ERROR;
+
+    if( i_data_type == 0 )
+        p_filter->p_sys->i_out_offset = 0;
+
     write_buffer( p_filter, p_in_buf );
     write_finalize( p_filter, i_data_type, 8 /* in bits */ );
     return SPDIF_SUCCESS;
