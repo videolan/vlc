@@ -34,6 +34,9 @@ CACA_CONF := \
 ifdef HAVE_MACOSX
 CACA_CONF += --disable-x11
 endif
+ifdef HAVE_WIN32
+CACA_CONF += --disable-ncurses
+endif
 
 .caca: caca
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CACA_CONF)
