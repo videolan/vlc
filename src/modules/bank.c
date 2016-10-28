@@ -188,10 +188,15 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
     if (plugin == NULL)
     {
         plugin = module_InitDynamic(bank->obj, abspath, true);
-        plugin->path = xstrdup(relpath);
-        plugin->mtime = st->st_mtime;
-        plugin->size = st->st_size;
+
+        if (plugin != NULL)
+        {
+            plugin->path = xstrdup(relpath);
+            plugin->mtime = st->st_mtime;
+            plugin->size = st->st_size;
+        }
     }
+
     if (plugin == NULL)
         return -1;
 
