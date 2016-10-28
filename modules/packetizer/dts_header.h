@@ -26,7 +26,7 @@
 
 typedef struct
 {
-    bool            b_dts_hd;
+    bool            b_substream;
     unsigned int    i_rate;
     unsigned int    i_bitrate;
     unsigned int    i_frame_size;

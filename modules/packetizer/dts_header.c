@@ -34,20 +34,6 @@
 
 #include <assert.h>
 
-static void SyncInfo16be( const uint8_t *p_buf, uint8_t *pi_nblks,
-                          uint16_t *pi_fsize, uint8_t *pi_amode,
-                          uint8_t *pi_sfreq, uint8_t *pi_rate, bool *pb_lfe )
-{
-    *pi_nblks = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
-    *pi_fsize = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
-
-    *pi_amode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
-    *pi_sfreq = (p_buf[8] >> 2) & 0x0f;
-    *pi_rate = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
-
-    *pb_lfe = (p_buf[10] >> 1) & 0x03;
-}
-
 static void BufLeToBe( uint8_t *p_out, const uint8_t *p_in, int i_in )
 {
     int i;
@@ -105,36 +91,42 @@ static int Buf14To16( uint8_t *p_out, const uint8_t *p_in, int i_in, int i_le )
     return i_out;
 }
 
-bool vlc_dts_header_IsSync( const void *p_buffer, size_t i_buffer )
-{
-    if( i_buffer < 6 )
-        return false;
+enum dts_bitsteam_type {
+    DTS_SYNC_CORE_BE,
+    DTS_SYNC_CORE_LE,
+    DTS_SYNC_CORE_14BITS_BE,
+    DTS_SYNC_CORE_14BITS_LE,
+    DTS_SYNC_SUBSTREAM,
+};
 
-    const uint8_t *p_buf = p_buffer;
-    /* 14 bits, little endian version of the bitstream */
-    if( p_buf[0] == 0xff && p_buf[1] == 0x1f &&
-        p_buf[2] == 0x00 && p_buf[3] == 0xe8 &&
-        (p_buf[4] & 0xf0) == 0xf0 && p_buf[5] == 0x07 )
-        return true;
-    /* 14 bits, big endian version of the bitstream */
-    else if( p_buf[0] == 0x1f && p_buf[1] == 0xff &&
-             p_buf[2] == 0xe8 && p_buf[3] == 0x00 &&
-             p_buf[4] == 0x07 && (p_buf[5] & 0xf0) == 0xf0 )
-        return true;
-    /* 16 bits, big endian version of the bitstream */
-    else if( p_buf[0] == 0x7f && p_buf[1] == 0xfe &&
-             p_buf[2] == 0x80 && p_buf[3] == 0x01 )
-        return true;
-    /* 16 bits, little endian version of the bitstream */
-    else if( p_buf[0] == 0xfe && p_buf[1] == 0x7f &&
-             p_buf[2] == 0x01 && p_buf[3] == 0x80 )
-        return true;
-    /* DTS-HD */
-    else if( p_buf[0] == 0x64 && p_buf[1] ==  0x58 &&
-             p_buf[2] == 0x20 && p_buf[3] ==  0x25 )
-        return true;
+static bool dts_header_IsSync( const uint8_t *p_buf,
+                               enum dts_bitsteam_type *p_bitstream_type )
+{
+    if( memcmp( p_buf, "\x7F\xFE\x80\x01", 4 ) == 0 )
+        *p_bitstream_type = DTS_SYNC_CORE_BE;
+    else
+    if( memcmp( p_buf, "\xFE\x7F\x01\x80", 4 ) == 0 )
+        *p_bitstream_type = DTS_SYNC_CORE_LE;
+    else
+    if( memcmp( p_buf, "\x64\x58\x20\x25", 4 ) == 0 )
+        *p_bitstream_type = DTS_SYNC_SUBSTREAM;
+    else
+    if( memcmp( p_buf, "\x1F\xFF\xE8\x00", 4 ) == 0
+     && p_buf[4] == 0x07 && (p_buf[5] & 0xf0) == 0xf0 )
+        *p_bitstream_type = DTS_SYNC_CORE_14BITS_BE;
+    else
+    if( memcmp( p_buf, "\xFF\x1F\x00\xE8", 4 ) == 0
+     && (p_buf[4] & 0xf0) == 0xf0 && p_buf[5] == 0x07 )
+        *p_bitstream_type = DTS_SYNC_CORE_14BITS_LE;
     else
         return false;
+    return true;
+}
+
+bool vlc_dts_header_IsSync( const void *p_buf, size_t i_buf )
+{
+    return i_buf >= 6
+        && dts_header_IsSync( p_buf, &(enum dts_bitsteam_type) { 0 } );
 }
 
 static unsigned int dca_get_samplerate( uint8_t i_sfreq )
@@ -246,110 +238,91 @@ static uint32_t dca_get_channels( uint8_t i_amode, bool b_lfe )
     return i_original_channels;
 }
 
-int vlc_dts_header_Parse( vlc_dts_header_t *p_header,
-                          const void *p_buffer, size_t i_buffer)
+static int dts_header_ParseSubstream( vlc_dts_header_t *p_header,
+                                      const void *p_buffer )
 {
-    const uint8_t *p_buf = p_buffer;
-    unsigned int i_frame_size;
-    bool b_lfe;
-    uint16_t i_fsize;
-    uint8_t i_nblks, i_rate, i_sfreq, i_amode;
-
-    if( i_buffer < 11 )
-        return VLC_EGENERIC;
-
-    /* 14 bits, little endian version of the bitstream */
-    if( p_buf[0] == 0xff && p_buf[1] == 0x1f &&
-        p_buf[2] == 0x00 && p_buf[3] == 0xe8 &&
-        (p_buf[4] & 0xf0) == 0xf0 && p_buf[5] == 0x07 )
+    bs_t s;
+    bs_init( &s, p_buffer, VLC_DTS_HEADER_SIZE );
+    bs_skip( &s, 32 /*SYNCEXTSSH*/ + 8 /*UserDefinedBits*/ + 2 /*nExtSSIndex*/ );
+    uint8_t bHeaderSizeType = bs_read1( &s );
+    uint32_t nuBits4ExSSFsize;
+    if( bHeaderSizeType == 0 )
     {
-        if( i_buffer < VLC_DTS_HEADER_SIZE )
-            return VLC_EGENERIC;
-
-        uint8_t conv_buf[VLC_DTS_HEADER_SIZE];
-        Buf14To16( conv_buf, p_buf, VLC_DTS_HEADER_SIZE, 1 );
-        SyncInfo16be( conv_buf, &i_nblks, &i_fsize, &i_amode, &i_sfreq,
-                      &i_rate, &b_lfe );
-        i_frame_size = (i_fsize + 1) * 8 / 14 * 2;
-    }
-    /* 14 bits, big endian version of the bitstream */
-    else if( p_buf[0] == 0x1f && p_buf[1] == 0xff &&
-             p_buf[2] == 0xe8 && p_buf[3] == 0x00 &&
-             p_buf[4] == 0x07 && (p_buf[5] & 0xf0) == 0xf0 )
-    {
-        if( i_buffer < VLC_DTS_HEADER_SIZE )
-            return VLC_EGENERIC;
-
-        uint8_t conv_buf[VLC_DTS_HEADER_SIZE];
-        Buf14To16( conv_buf, p_buf, VLC_DTS_HEADER_SIZE, 0 );
-        SyncInfo16be( conv_buf, &i_nblks, &i_fsize, &i_amode, &i_sfreq,
-                      &i_rate, &b_lfe );
-        i_frame_size = (i_fsize + 1) * 8 / 14 * 2;
-    }
-    /* 16 bits, big endian version of the bitstream */
-    else if( p_buf[0] == 0x7f && p_buf[1] == 0xfe &&
-             p_buf[2] == 0x80 && p_buf[3] == 0x01 )
-    {
-        SyncInfo16be( p_buf, &i_nblks, &i_fsize, &i_amode, &i_sfreq,
-                      &i_rate, &b_lfe );
-        i_frame_size = i_fsize + 1;
-    }
-    /* 16 bits, little endian version of the bitstream */
-    else if( p_buf[0] == 0xfe && p_buf[1] == 0x7f &&
-             p_buf[2] == 0x01 && p_buf[3] == 0x80 )
-    {
-        if( i_buffer < VLC_DTS_HEADER_SIZE )
-            return VLC_EGENERIC;
-
-        uint8_t conv_buf[VLC_DTS_HEADER_SIZE];
-        BufLeToBe( conv_buf, p_buf, VLC_DTS_HEADER_SIZE );
-        SyncInfo16be( conv_buf, &i_nblks, &i_fsize, &i_amode, &i_sfreq,
-                      &i_rate, &b_lfe );
-        i_frame_size = i_fsize + 1;
-    }
-    /* DTS-HD */
-    else if( p_buf[0] == 0x64 && p_buf[1] ==  0x58 &&
-                p_buf[2] == 0x20 && p_buf[3] ==  0x25 )
-    {
-        if( i_buffer < VLC_DTS_HEADER_SIZE )
-            return VLC_EGENERIC;
-
-        int i_dts_hd_size;
-        bs_t s;
-        bs_init( &s, &p_buf[4], VLC_DTS_HEADER_SIZE - 4 );
-
-        bs_skip( &s, 8 + 2 );
-
-        if( bs_read1( &s ) )
-        {
-            bs_skip( &s, 12 );
-            i_dts_hd_size = bs_read( &s, 20 ) + 1;
-        }
-        else
-        {
-            bs_skip( &s, 8 );
-            i_dts_hd_size = bs_read( &s, 16 ) + 1;
-        }
-        //uint16_t s0 = bs_read( &s, 16 );
-        //uint16_t s1 = bs_read( &s, 16 );
-        //fprintf( stderr, "DTS HD=%d : %x %x\n", i_dts_hd_size, s0, s1 );
-
-        /* As we ignore the stream, do not modify those variables: */
-        memset(p_header, 0, sizeof(*p_header));
-        p_header->b_dts_hd = true;
-        p_header->i_frame_size = i_dts_hd_size;
-        return VLC_SUCCESS;
+        bs_skip( &s, 8 /*nuBits4Header*/ );
+        nuBits4ExSSFsize = bs_read( &s, 16 );
     }
     else
-        return VLC_EGENERIC;
+    {
+        bs_skip( &s, 12 /*nuBits4Header*/ );
+        nuBits4ExSSFsize = bs_read( &s, 20 );
+    }
+    memset( p_header, 0, sizeof(*p_header) );
+    p_header->b_substream = true;
+    p_header->i_frame_size = nuBits4ExSSFsize + 1;
+    return VLC_SUCCESS;
+}
 
-    p_header->b_dts_hd = false;
+static int dts_header_ParseCore( vlc_dts_header_t *p_header,
+                                 const void *p_buffer, bool b_14b )
+{
+    bs_t s;
+    bs_init( &s, p_buffer, VLC_DTS_HEADER_SIZE );
+    bs_skip( &s, 32 /*SYNC*/ + 1 /*FTYPE*/ + 5 /*SHORT*/ + 1 /*CPF*/ );
+    uint8_t i_nblks = bs_read( &s, 7 );
+    uint16_t i_fsize = bs_read( &s, 14 );
+    uint8_t i_amode = bs_read( &s, 6 );
+    uint8_t i_sfreq = bs_read( &s, 4 );
+    uint8_t i_rate = bs_read( &s, 5 );
+    bs_skip( &s, 1 /*FixedBit*/ + 1 /*DYNF*/ + 1 /*TIMEF*/ + 1 /*AUXF*/ +
+             1 /*HDCD*/ + 3 /*EXT_AUDIO_ID*/ + 1 /*EXT_AUDIO */ + 1 /*ASPF*/ );
+    uint8_t i_lff = bs_read( &s, 2 );
+
+    bool b_lfe = i_lff == 1 || i_lff == 2;
+
+    p_header->b_substream = false;
     p_header->i_rate = dca_get_samplerate( i_sfreq );
     p_header->i_bitrate = dca_get_bitrate( i_rate );
-    p_header->i_frame_size = i_frame_size;
+    p_header->i_frame_size = !b_14b ? ( i_fsize + 1 )
+                                    : ( i_fsize + 1 ) * 16 / 14;
     /* See ETSI TS 102 114, table 5-2 */
     p_header->i_frame_length = (i_nblks + 1) * 32;
     p_header->i_original_channels = dca_get_channels( i_amode, b_lfe );
 
     return VLC_SUCCESS;
+}
+
+int vlc_dts_header_Parse( vlc_dts_header_t *p_header,
+                          const void *p_buffer, size_t i_buffer)
+{
+    enum dts_bitsteam_type bitstream_type;
+
+    if( i_buffer < VLC_DTS_HEADER_SIZE )
+        return VLC_EGENERIC;
+
+    if( !dts_header_IsSync( p_buffer, &bitstream_type ) )
+        return VLC_EGENERIC;
+
+    switch( bitstream_type )
+    {
+        case DTS_SYNC_CORE_LE:
+        {
+            uint8_t conv_buf[VLC_DTS_HEADER_SIZE];
+            BufLeToBe( conv_buf, p_buffer, VLC_DTS_HEADER_SIZE );
+            return dts_header_ParseCore( p_header, conv_buf, false );
+        }
+        case DTS_SYNC_CORE_BE:
+            return dts_header_ParseCore( p_header, p_buffer, false );
+        case DTS_SYNC_CORE_14BITS_BE:
+        case DTS_SYNC_CORE_14BITS_LE:
+        {
+            uint8_t conv_buf[VLC_DTS_HEADER_SIZE];
+            Buf14To16( conv_buf, p_buffer, VLC_DTS_HEADER_SIZE,
+                       bitstream_type == DTS_SYNC_CORE_14BITS_LE );
+            return dts_header_ParseCore( p_header, conv_buf, true );
+        }
+        case DTS_SYNC_SUBSTREAM:
+            return dts_header_ParseSubstream( p_header, p_buffer );
+        default:
+            vlc_assert_unreachable();
+    }
 }

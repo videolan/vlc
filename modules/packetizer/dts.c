@@ -251,7 +251,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_state = STATE_SEND_DATA;
 
         case STATE_SEND_DATA:
-            if( p_sys->dts.b_dts_hd  )
+            if( p_sys->dts.b_substream  )
             {
                 /* FIXME: DTSHD is ignored for now */
                 block_SkipBytes( &p_sys->bytestream, p_sys->dts.i_frame_size );
