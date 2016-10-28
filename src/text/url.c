@@ -525,18 +525,18 @@ int vlc_UrlParse(vlc_url_t *restrict url, const char *str)
         }
 
         /* Port number */
-        if (next != NULL)
+        if (next != NULL && *next)
         {
-            char *end;
-            unsigned long u = strtoul(next, &end, 10);
+            char* end;
+            unsigned long port = strtoul(next, &end, 10);
 
-            url->i_port = u;
-            if (end == next || *end != '\0' || u == ULONG_MAX)
+            if (strchr("0123456789", *next) == NULL || *end || port > UINT_MAX)
+            {
+                errno = EINVAL;
                 ret = -1;
-#if (ULONG_MAX > UINT_MAX)
-            if (u > UINT_MAX)
-                ret = -1;
-#endif
+            }
+
+            url->i_port = port;
         }
 
         if (url->psz_path != NULL)
