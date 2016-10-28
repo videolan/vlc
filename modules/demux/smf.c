@@ -337,6 +337,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr, es_out_t *out)
         if (datalen == 0)
         {
             msg_Err (p_demux, "malformatted MIDI event");
+            block_Release(block);
             return -1; /* implicit running status requires non-empty payload */
         }
 
