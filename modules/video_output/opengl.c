@@ -1070,17 +1070,17 @@ static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
 /* perspective matrix see https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml */
 static void getProjectionMatrix(float sar, GLfloat matrix[static 16]) {
 
-    float f = 3;
-    float n = 0.1;
+    float zFar  = 10;
+    float zNear = 0.1;
 
     float fovy = (float) M_PI / 3;
-    float d = 1 / tan(fovy / 2);
+    float f = 1 / tan(fovy / 2);
 
     const GLfloat m[] = {
-        d / sar, 0.0, 0.0,                   0.0,
-        0.0,     d,   0.0,                   0.0,
-        0.0,     0.0, (n + f) / (n - f),     -1.0,
-        0.0,     0.0, (2 * n * f) / (n - f), 0.0};
+        f / sar, 0.0,                   0.0,                0.0,
+        0.0,     f,                     0.0,                0.0,
+        0.0,     0.0,     (zNear + zFar) / (zNear - zFar), -1.0,
+        0.0,     0.0, (2 * zNear * zFar) / (zNear - zFar),  0.0};
 
      memcpy(matrix, m, sizeof(m));
 }
