@@ -142,6 +142,12 @@ static int Open( vlc_object_t * p_this )
              (char *)&fmt.i_codec, fmt.audio.i_channels, fmt.audio.i_rate,
              fmt.i_bitrate / 8192, fmt.audio.i_blockalign );
 
+    if( fmt.audio.i_rate == 0 || fmt.audio.i_channels == 0 )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
     date_Init( &p_sys->pts, fmt.audio.i_rate, 1 );
