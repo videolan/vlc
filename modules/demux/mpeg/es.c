@@ -1163,7 +1163,11 @@ static int DtsCheckSync( const uint8_t *p_peek, int *pi_samples )
     vlc_dts_header_t dts;
     if( vlc_dts_header_Parse( &dts, p_peek, 11 ) == VLC_SUCCESS
      && dts.i_frame_size > 0 && dts.i_frame_size <= 8192 )
+    {
+        if( pi_samples )
+            *pi_samples = dts.i_frame_length;
         return dts.i_frame_size;
+    }
     else
         return VLC_EGENERIC;
 }
