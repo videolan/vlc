@@ -268,6 +268,8 @@ int main (void)
                    "/", NULL);
     test_url_parse("http://[2001:db8::1]", "http", NULL, NULL, "2001:db8::1",
                    0, NULL, NULL);
+    test_url_parse("http://example.com:", "http", NULL, NULL, "example.com", 0,
+                    NULL, NULL);
     test_url_parse("protocol://john:doe@1.2.3.4:567", "protocol", "john", "doe", "1.2.3.4", 567, NULL, NULL);
     test_url_parse("http://a.b/?opt=val", "http", NULL, NULL, "a.b", 0, "/", "opt=val");
     test_url_parse("p://u:p@host:123/a/b/c?o=v", "p", "u", "p", "host", 123, "/a/b/c", "o=v");
@@ -300,8 +302,6 @@ int main (void)
     /* Invalid URIs */
     test_url_parse("p://G a r b a g e", "p", NULL, NULL, NULL, 0, NULL, NULL);
     test_url_parse("p://h/G a r b a g e", "p", NULL, NULL, "h", 0, NULL, NULL);
-    test_url_parse("http://example.com:", "http", NULL, NULL, "example.com", 0,
-                    NULL, NULL);
     test_url_parse("http://example.com:123xyz", "http", NULL, NULL,
                    "example.com", 123, NULL, NULL);
 
