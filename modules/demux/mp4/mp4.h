@@ -44,7 +44,7 @@ typedef struct
 
     /* with this we can calculate dts/pts without waste memory */
     uint64_t     i_first_dts;   /* DTS of the first sample */
-    uint64_t     i_last_dts;    /* DTS of the last sample */
+    uint64_t     i_duration;    /* total duration of all samples */
 
     uint32_t     i_entries_dts;
     uint32_t     *p_sample_count_dts;

@@ -2206,7 +2206,6 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
 
             /* save first dts */
             ck->i_first_dts = i_next_dts;
-            ck->i_last_dts  = i_next_dts;
 
             /* count how many entries are needed for this chunk
              * for p_sample_delta_dts and p_sample_count_dts */
@@ -2241,10 +2240,10 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 {
                     if ( i_current_index_samples_left > i_sample_count )
                     {
-                        if ( i_sample_count ) ck->i_last_dts = i_next_dts;
                         ck->p_sample_count_dts[i] = i_sample_count;
                         ck->p_sample_delta_dts[i] = stts->pi_sample_delta[i_index];
                         i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
+                        if ( i_sample_count ) ck->i_duration = i_next_dts - ck->i_first_dts;
                         i_current_index_samples_left -= i_sample_count;
                         i_sample_count = 0;
                         assert( i == ck->i_entries_dts - 1 );
@@ -2252,10 +2251,10 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     }
                     else
                     {
-                        if ( i_current_index_samples_left ) ck->i_last_dts = i_next_dts;
                         ck->p_sample_count_dts[i] = i_current_index_samples_left;
                         ck->p_sample_delta_dts[i] = stts->pi_sample_delta[i_index];
                         i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
+                        if ( i_current_index_samples_left ) ck->i_duration = i_next_dts - ck->i_first_dts;
                         i_sample_count -= i_current_index_samples_left;
                         i_current_index_samples_left = 0;
                         i_index++;
@@ -2265,10 +2264,10 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 {
                     if ( stts->pi_sample_count[i_index] > i_sample_count )
                     {
-                        if ( i_sample_count ) ck->i_last_dts = i_next_dts;
                         ck->p_sample_count_dts[i] = i_sample_count;
                         ck->p_sample_delta_dts[i] = stts->pi_sample_delta[i_index];
                         i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
+                        if ( i_sample_count ) ck->i_duration = i_next_dts - ck->i_first_dts;
                         i_current_index_samples_left = stts->pi_sample_count[i_index] - i_sample_count;
                         i_sample_count = 0;
                         assert( i == ck->i_entries_dts - 1 );
@@ -2276,10 +2275,10 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     }
                     else
                     {
-                        if ( stts->pi_sample_count[i_index] ) ck->i_last_dts = i_next_dts;
                         ck->p_sample_count_dts[i] = stts->pi_sample_count[i_index];
                         ck->p_sample_delta_dts[i] = stts->pi_sample_delta[i_index];
                         i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
+                        if ( stts->pi_sample_count[i_index] ) ck->i_duration = i_next_dts - ck->i_first_dts;
                         i_sample_count -= stts->pi_sample_count[i_index];
                         i_index++;
                     }
@@ -2427,21 +2426,20 @@ static void TrackGetESSampleRate( demux_t *p_demux,
     }
 
     uint64_t i_sample = 0;
-    uint64_t i_first_dts = p_chunk->i_first_dts;
-    uint64_t i_last_dts;
+    uint64_t i_total_duration = 0;
     do
     {
         i_sample += p_chunk->i_sample_count;
-        i_last_dts = p_chunk->i_last_dts;
+        i_total_duration += p_chunk->i_duration;
         p_chunk++;
     }
     while( p_chunk < &p_track->chunk[p_track->i_chunk_count] &&
            p_chunk->i_sample_description_index == i_sd_index );
 
-    if( i_sample > 1 && i_first_dts < i_last_dts )
+    if( i_sample > 0 && i_total_duration )
         vlc_ureduce( pi_num, pi_den,
-                     ( i_sample - 1) *  p_track->i_timescale,
-                     i_last_dts - i_first_dts,
+                     i_sample * p_track->i_timescale,
+                     i_total_duration,
                      UINT16_MAX);
 }
 
@@ -3780,7 +3778,7 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
         return VLC_ENOMEM;
 
     uint32_t dur = 0, i_mdatlen = 0, len;
-    uint32_t chunk_duration = 0, chunk_size = 0;
+    uint32_t chunk_size = 0;
 
     /* Skip header of mdat */
     uint8_t mdat[8];
@@ -3797,7 +3795,7 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
         else
             dur = default_duration;
         ret->p_sample_delta_dts[i] = dur;
-        chunk_duration += dur;
+        ret->i_duration += dur;
 
         ret->p_sample_count_dts[i] = ret->p_sample_count_pts[i] = 1;
 
@@ -3827,8 +3825,7 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
             return VLC_EGENERIC;
         chunk_size += len;
     }
-    ret->i_last_dts = ret->i_first_dts + chunk_duration - dur;
-    p_track->i_first_dts = chunk_duration + ret->i_first_dts;
+    p_track->i_first_dts = ret->i_duration + ret->i_first_dts;
 
     if( p_track->b_codec_need_restart )
     {
