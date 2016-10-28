@@ -353,8 +353,12 @@ function help(name,client,arg)
     client:append("+----[ end of help ]")
 end
 
-function input_info(name,client)
-    local item = vlc.input.item()
+function input_info(name,client,id)
+    local item = nil;
+
+    if id then item = (vlc.playlist.get(id) or {})["item"]
+    else       item = vlc.input.item() end
+
     if(item == nil) then return end
     local infos = item:info()
     infos["Meta data"] = item:metas()
@@ -585,7 +589,7 @@ commands_ordered = {
     { "rate"; { func = rate; args = "[playback rate]"; help = "set playback rate to value" } };
     { "frame"; { func = frame; help = "play frame by frame" } };
     { "fullscreen"; { func = skip2(vlc.video.fullscreen); args = "[on|off]"; help = "toggle fullscreen"; aliases = { "f", "F" } } };
-    { "info"; { func = input_info; help = "information about the current stream" } };
+    { "info"; { func = input_info; args= "[X]"; help = "information about the current stream (or specified id)" } };
     { "stats"; { func = stats; help = "show statistical information" } };
     { "get_time"; { func = get_time("time"); help = "seconds elapsed since stream's beginning" } };
     { "is_playing"; { func = is_playing; help = "1 if a stream plays, 0 otherwise" } };
