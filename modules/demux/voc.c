@@ -309,6 +309,8 @@ static int ReadBlockHeader( demux_t *p_demux )
             }
 
             new_fmt.i_codec = VLC_CODEC_U8;
+            if (buf[3] >= 32)
+                goto corrupt;
             new_fmt.audio.i_channels = buf[3] + 1; /* can't be nul */
             new_fmt.audio.i_rate = 256000000L /
                           ((65536L - GetWLE(buf)) * new_fmt.audio.i_channels);
