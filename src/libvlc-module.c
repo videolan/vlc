@@ -1971,7 +1971,7 @@ vlc_module_begin ()
                 VOD_SERVER_LONGTEXT, true )
 
     set_section( N_("Plugins" ), NULL )
-#if HAVE_DYNAMIC_PLUGINS
+#ifdef HAVE_DYNAMIC_PLUGINS
     add_bool( "plugins-cache", true, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, true )
     add_bool( "plugins-scan", true, PLUGINS_SCAN_TEXT,
