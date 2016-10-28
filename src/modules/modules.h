@@ -49,6 +49,7 @@ typedef struct vlc_plugin_t
         size_t booleans; /**< Number of booleal config items */
     } conf;
 
+#ifdef HAVE_DYNAMIC_PLUGINS
     atomic_bool loaded; /**< Whether the plug-in is mapped in memory */
     bool unloadable; /**< Whether the plug-in can be unloaded safely */
     module_handle_t handle; /**< Run-time linker handle (if loaded) */
@@ -57,6 +58,7 @@ typedef struct vlc_plugin_t
     char *path; /**< Relative path (within plug-in directory) */
     int64_t mtime; /**< Last modification time */
     uint64_t size; /**< File size */
+#endif
 } vlc_plugin_t;
 
 /**

@@ -72,8 +72,10 @@ static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
     if (unlikely(lib == NULL))
         return NULL;
 
+#ifdef HAVE_DYNAMIC_PLUGINS
     atomic_init(&lib->loaded, true);
     lib->unloadable = false;
+#endif
     return lib;
 }
 
@@ -462,9 +464,9 @@ static void module_Unmap(vlc_plugin_t *plugin)
     module_Unload(plugin->handle);
 }
 #else
-int module_Map(vlc_object_t *obj, module_t *module)
+int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
 {
-    (void) obj; (void) module;
+    (void) obj; (void) plugin;
     return 0;
 }
 

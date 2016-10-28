@@ -1971,11 +1971,13 @@ vlc_module_begin ()
                 VOD_SERVER_LONGTEXT, true )
 
     set_section( N_("Plugins" ), NULL )
+#if HAVE_DYNAMIC_PLUGINS
     add_bool( "plugins-cache", true, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, true )
     add_bool( "plugins-scan", true, PLUGINS_SCAN_TEXT,
               PLUGINS_SCAN_LONGTEXT, true )
     add_obsolete_string( "plugin-path" ) /* since 2.0.0 */
+#endif
     add_obsolete_string( "data-path" ) /* since 2.1.0 */
     add_string( "keystore", NULL, KEYSTORE_TEXT,
                 KEYSTORE_LONGTEXT, true )
@@ -2708,9 +2710,11 @@ vlc_module_begin ()
     add_obsolete_bool( "save-config" )
     add_bool( "reset-config", false, RESET_CONFIG_TEXT, "", false )
         change_volatile ()
+#ifdef HAVE_DYNAMIC_PLUGINS
     add_bool( "reset-plugins-cache", false,
               RESET_PLUGINS_CACHE_TEXT, "", false )
         change_volatile ()
+#endif
     add_bool( "version", false, VERSION_TEXT, "", false )
         change_volatile ()
     add_string( "config", NULL, CONFIG_TEXT, "", false )
