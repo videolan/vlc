@@ -106,6 +106,15 @@ static void test_url_parse(const char* in, const char* protocol, const char* use
     vlc_url_t url;
     int ret = vlc_UrlParse(&url, in);
 
+    /* XXX: only checking that the port-part is parsed correctly, and
+     *      equal to 0, is currently not supported due to the below. */
+    if( !protocol && !user && !pass && !host && !i_port && !path && !option )
+    {
+        vlc_UrlClean( &url );
+        assert( ret == -1 );
+        return;
+    }
+
     CHECK( url.psz_protocol, protocol );
     CHECK( url.psz_username, user );
     CHECK( url.psz_password, pass );
@@ -300,10 +309,9 @@ int main (void)
     test_url_parse("//example.com/f?o=v", NULL, NULL, NULL, "example.com", 0,
                    "/f", "o=v");
     /* Invalid URIs */
-    test_url_parse("p://G a r b a g e", "p", NULL, NULL, NULL, 0, NULL, NULL);
-    test_url_parse("p://h/G a r b a g e", "p", NULL, NULL, "h", 0, NULL, NULL);
-    test_url_parse("http://example.com:123xyz", "http", NULL, NULL,
-                   "example.com", 123, NULL, NULL);
+    test_url_parse("p://G a r b a g e", NULL, NULL, NULL, NULL, 0, NULL, NULL);
+    test_url_parse("p://h/G a r b a g e", NULL, NULL, NULL, NULL, 0, NULL, NULL);
+    test_url_parse("http://example.com:123xyz", NULL, NULL, NULL, NULL, 0, NULL, NULL);
 
     /* Reference test cases for reference URI resolution */
     static const char *rfc3986_cases[] =
