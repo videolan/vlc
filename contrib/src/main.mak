@@ -123,7 +123,7 @@ EXTRA_CFLAGS += -m32
 EXTRA_LDFLAGS += -m32
 endif
 
-XCODE_FLAGS = -sdk macosx$(OSX_VERSION) -arch $(ARCH)
+XCODE_FLAGS = MACOSX_DEPLOYMENT_TARGET=$(MIN_OSX_VERSION) -sdk macosx$(OSX_VERSION) -arch $(ARCH)
 
 endif
 
