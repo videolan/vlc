@@ -231,7 +231,6 @@ struct input_thread_t
     VLC_COMMON_MEMBERS
 
     bool b_preparsing;
-    bool b_dead VLC_DEPRECATED;
 
     /* All other data is input_thread is PRIVATE. You can't access it
      * outside of src/input */
