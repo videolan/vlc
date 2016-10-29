@@ -253,15 +253,12 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
     else if( i_payload_type == CC_PAYLOAD_REPLAYTV )
     {
         const uint8_t *cc = &p_src[0];
-        int i;
-        if( c->i_data + 2*3 > CC_MAX_DATA_SIZE )
-            return;
-
-        for( i = 0; i < 2; i++, cc += 4 )
+        for( int i_cc_count = i_src >> 2; i_cc_count > 0;
+             i_cc_count--, cc += 4 )
         {
-            const int i_field = i == 0 ? 1 : 0;
-
-            cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[2] );
+            if( c->i_data + 3 > CC_MAX_DATA_SIZE )
+                return;
+            cc_AppendData( c, CC_PKT_BYTE0(i_cc_count % 2), &cc[2] );
         }
         c->b_reorder = false;
     }
