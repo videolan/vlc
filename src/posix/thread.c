@@ -102,9 +102,6 @@ static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
 #else /* _POSIX_TIMERS */
 
 # include <sys/time.h> /* gettimeofday() */
-# if defined (HAVE_DECL_NANOSLEEP) && !HAVE_DECL_NANOSLEEP
-int nanosleep (struct timespec *, struct timespec *);
-# endif
 
 # define vlc_clock_setup() (void)0
 # warning Monotonic clock not available. Expect timing issues.
