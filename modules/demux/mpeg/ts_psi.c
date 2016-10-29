@@ -877,14 +877,16 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pes_t *p_pes,
         /* and check that it maps to something ARIB STD B14 Table 5.1/5.2 */
         if ( p_dr && p_dr->i_length >= 2 )
         {
-            if( !memcmp( p_dr->p_data, "\x00\x08", 2 ) &&
+            /* See STD-B10 Annex J, table J-1 mappings */
+            const uint16_t i_data_component_id = GetWBE(p_dr->p_data);
+            if( i_data_component_id == 0x0008 &&
                 PMTEsHasComponentTagBetween( p_dvbpsies, 0x30, 0x37 ) )
             {
                 es_format_Init( p_fmt, SPU_ES, VLC_CODEC_ARIB_A );
                 p_fmt->psz_language = strndup ( "jpn", 3 );
                 p_fmt->psz_description = strdup( _("ARIB subtitles") );
             }
-            else if( !memcmp( p_dr->p_data, "\x00\x12", 2 ) &&
+            else if( i_data_component_id == 0x0012 &&
                      PMTEsHasComponentTagBetween( p_dvbpsies, 0x87, 0x88 ) )
             {
                 es_format_Init( p_fmt, SPU_ES, VLC_CODEC_ARIB_C );
