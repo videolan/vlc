@@ -258,7 +258,8 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
         {
             if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                 return;
-            cc_AppendData( c, CC_PKT_BYTE0(i_cc_count % 2), &cc[2] );
+            uint8_t i_field = (cc[0] & 0x02) >> 1;
+            cc_AppendData( c, CC_PKT_BYTE0(i_field), &cc[2] );
         }
         c->b_reorder = false;
     }
