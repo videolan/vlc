@@ -3,8 +3,10 @@
 LIBMICRODNS_VERSION := 0.0.3
 LIBMICRODNS_URL := https://github.com/videolabs/libmicrodns/releases/download/$(LIBMICRODNS_VERSION)/microdns-$(LIBMICRODNS_VERSION).tar.gz
 
+ifndef HAVE_MACOSX
 ifdef BUILD_NETWORK
 PKGS += microdns
+endif
 endif
 ifeq ($(call need_pkg,"microdns >= 0.0.1"),)
 PKGS_FOUND += microdns
