@@ -58,6 +58,7 @@
 
 static void PIDFillFormat( demux_t *, ts_pes_t *p_pes, int i_stream_type, ts_transport_type_t * );
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt );
+static ts_standards_e ProbePMTStandard( const dvbpsi_pmt_t *p_dvbpsipmt );
 
 static int PATCheck( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 {
@@ -261,38 +262,47 @@ static void ParsePMTRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t  
         registration_type = TS_PMT_REGISTRATION_ARIB;
     }
 
-    /* Now process private descriptors >= 0x40 */
+    *p_registration_type = registration_type;
+}
+
+static void ParsePMTPrivateRegistrations( demux_t *p_demux, const dvbpsi_descriptor_t *p_firstdr,
+                                          ts_pmt_t *p_pmt, ts_standards_e i_standard )
+{
+    VLC_UNUSED(p_pmt);
+     /* Now process private descriptors >= 0x40 */
     for( const dvbpsi_descriptor_t *p_dr = p_firstdr; p_dr != NULL; p_dr = p_dr->p_next )
     {
         if( p_dr->i_tag < 0x40 )
             continue;
 
-        if( registration_type == TS_PMT_REGISTRATION_NONE )
+        switch( i_standard )
         {
-            switch(p_dr->i_tag)
+            case TS_STANDARD_ARIB:
             {
-                case 0x88: /* EACEM Simulcast HD Logical channels ordering */
-                    if( registration_type == TS_PMT_REGISTRATION_NONE )
-                        msg_Dbg( p_demux, PMT_DESC_PREFIX "EACEM Simulcast HD" );
-                        /* TODO: apply visibility flags */
-                    break;
-
-                default:
+                const char *psz_desc = ARIB_B10_Get_PMT_Descriptor_Description( p_dr->i_tag );
+                if( psz_desc )
+                    msg_Dbg( p_demux, PMT_DESC_PREFIX "%s (0x%x)", psz_desc, p_dr->i_tag );
+                else
                     msg_Dbg( p_demux, PMT_DESC_PREFIX "Unknown Private (0x%x)", p_dr->i_tag );
-                    break;
             }
-        }
-        else if( registration_type == TS_PMT_REGISTRATION_ARIB )
-        {
-            const char *psz_desc = ARIB_B10_Get_PMT_Descriptor_Description( p_dr->i_tag );
-            if( psz_desc )
-                msg_Dbg( p_demux, PMT_DESC_PREFIX "%s (0x%x)", psz_desc, p_dr->i_tag );
-            else
+
+            case TS_STANDARD_DVB:
+            case TS_STANDARD_AUTO:
+            {
+                if( p_dr->i_tag == 0x88 )
+                {
+                    /* EACEM Simulcast HD Logical channels ordering */
+                    /* TODO: apply visibility flags */
+                    msg_Dbg( p_demux, PMT_DESC_PREFIX "EACEM Simulcast HD" );
+                    break;
+                }
+                //ft
+            }
+            default:
                 msg_Dbg( p_demux, PMT_DESC_PREFIX "Unknown Private (0x%x)", p_dr->i_tag );
+                break;
         }
     }
-
-    *p_registration_type = registration_type;
 }
 
 /*****************************************************************************
@@ -335,6 +345,29 @@ static bool PMTEsHasComponentTagBetween( const dvbpsi_pmt_es_t *p_es,
         return false;
 
     return p_si->i_component_tag >= i_low && p_si->i_component_tag <= i_high;
+}
+
+static ts_standards_e ProbePMTStandard( const dvbpsi_pmt_t *p_dvbpsipmt )
+{
+    dvbpsi_pmt_es_t *p_dvbpsies;
+    for( p_dvbpsies = p_dvbpsipmt->p_first_es; p_dvbpsies; p_dvbpsies = p_dvbpsies->p_next )
+    {
+        if( p_dvbpsies->i_type == 0x06 )
+        {
+            /* Probe for ARIB subtitles */
+            dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0xFD );
+            if( p_dr && p_dr->i_length >= 2 )
+            {
+                const uint16_t i_data_component_id = GetWBE(p_dr->p_data);
+                if( ( i_data_component_id == 0x0008 &&
+                      PMTEsHasComponentTagBetween( p_dvbpsies, 0x30, 0x37 ) ) ||
+                    ( i_data_component_id == 0x0012 &&
+                      PMTEsHasComponentTagBetween( p_dvbpsies, 0x87, 0x88 ) ) )
+                    return TS_STANDARD_ARIB;
+            }
+        }
+    }
+    return TS_STANDARD_AUTO;
 }
 
 static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_t *p_pes,
@@ -1512,9 +1545,14 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             case TS_PMT_REGISTRATION_ATSC:
                 TsChangeStandard( p_sys, TS_STANDARD_ATSC );
             default:
+                /* Probe using ES */
+                p_sys->standard = ProbePMTStandard( p_dvbpsipmt );
                 break;
         }
     }
+
+    /* Private descriptors depends on standard */
+    ParsePMTPrivateRegistrations( p_demux, p_dvbpsipmt->p_first_descriptor, p_pmt, p_sys->standard );
 
     dvbpsi_pmt_es_t *p_dvbpsies;
     for( p_dvbpsies = p_dvbpsipmt->p_first_es; p_dvbpsies != NULL; p_dvbpsies = p_dvbpsies->p_next )
