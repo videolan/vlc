@@ -127,7 +127,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
         .ai_flags = AI_NUMERICSERV | AI_IDN,
     }, *res;
 
-    int val = vlc_getaddrinfo (psz_realhost, i_realport, &hints, &res);
+    int val = vlc_getaddrinfo_i11e(psz_realhost, i_realport, &hints, &res);
     if (val)
     {
         msg_Err (p_this, "cannot resolve %s port %d : %s", psz_realhost,
@@ -435,7 +435,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         };
         struct addrinfo *res;
 
-        if (vlc_getaddrinfo (psz_host, 0, &hints, &res))
+        if (vlc_getaddrinfo_i11e(psz_host, 0, &hints, &res))
             return VLC_EGENERIC;
 
         buffer[0] = i_socks_version;

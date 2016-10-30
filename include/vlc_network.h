@@ -231,7 +231,8 @@ VLC_API int  getnameinfo ( const struct sockaddr *, socklen_t,
 VLC_API int vlc_getnameinfo( const struct sockaddr *, int, char *, int, int *, int );
 VLC_API int vlc_getaddrinfo (const char *, unsigned,
                              const struct addrinfo *, struct addrinfo **);
-
+int vlc_getaddrinfo_i11e(const char *, unsigned, const struct addrinfo *,
+                         struct addrinfo **);
 
 #ifdef __OS2__
 /* OS/2 does not support IPv6, yet. But declare these only for compilation */
