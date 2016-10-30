@@ -379,6 +379,7 @@ libvlccore_la_SOURCES += \
 else
 libvlccore_la_SOURCES += \
 	posix/filesystem.c \
+	posix/getaddrinfo.c \
 	posix/plugin.c \
 	posix/rand.c \
 	posix/timer.c
