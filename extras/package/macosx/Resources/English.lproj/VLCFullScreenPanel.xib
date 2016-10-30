@@ -10,7 +10,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCFSPanelController">
             <connections>
                 <outlet property="backwardButton" destination="7QH-jb-QdM" id="VnK-HH-sNu"/>
-                <outlet property="controllsView" destination="Npt-C5-K77" id="LzR-iZ-qy0"/>
+                <outlet property="controlsView" destination="Npt-C5-K77" id="Dnt-ku-O6u"/>
                 <outlet property="elapsedTime" destination="nJc-M4-sMF" id="DFf-yw-e6A"/>
                 <outlet property="forwardButton" destination="jSN-hV-r5D" id="3PN-jP-xPY"/>
                 <outlet property="mediaTitle" destination="Vd8-0f-Usz" id="NZ0-KY-l4T"/>

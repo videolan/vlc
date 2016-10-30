@@ -378,8 +378,8 @@
 
     /* Inject view in view hierarchy */
     [self.window setContentView:view];
-    [_controllsView setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
-    [self.window.contentView addSubview:_controllsView];
+    [_controlsView setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
+    [self.window.contentView addSubview:_controlsView];
 }
 #endif
 
@@ -403,7 +403,7 @@
 
     /* Inject view in view hierarchy */
     [self.window setContentView:view];
-    [self.window.contentView addSubview:_controllsView];
+    [self.window.contentView addSubview:_controlsView];
 }
 
 - (void)dealloc

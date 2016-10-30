@@ -34,7 +34,7 @@
 @property (readwrite)       NSWindow  *voutWindow;
 @property (readwrite, weak) NSTimer   *hideTimer;
 
-@property IBOutlet NSView       *controllsView;
+@property IBOutlet NSView       *controlsView;
 @property IBOutlet NSButton     *playPauseButton;
 @property IBOutlet NSButton     *forwardButton;
 @property IBOutlet NSButton     *backwardButton;
