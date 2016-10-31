@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
+#include <limits.h>
 
 /* TODO:
  *  - ...
@@ -123,14 +124,14 @@ static int Open( vlc_object_t *p_this )
 
     for( ;; )
     {
-        uint32_t i_size;
-
         if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
             goto error;
 
-        i_size = GetDWBE( &p_peek[4] );
+        uint32_t i_data_size = GetDWBE( &p_peek[4] );
+        uint64_t i_chunk_size = UINT64_C( 8 ) + i_data_size + ( i_data_size & 1 );
 
-        msg_Dbg( p_demux, "chunk fcc=%4.4s size=%d", p_peek, i_size );
+        msg_Dbg( p_demux, "chunk fcc=%4.4s size=%" PRIu64 " data_size=%" PRIu32,
+            p_peek, i_chunk_size, i_data_size );
 
         if( !memcmp( p_peek, "COMM", 4 ) )
         {
@@ -152,7 +153,7 @@ static int Open( vlc_object_t *p_this )
                 goto error;
 
             p_sys->i_ssnd_pos = vlc_stream_Tell( p_demux->s );
-            p_sys->i_ssnd_size = i_size;
+            p_sys->i_ssnd_size = i_data_size;
             p_sys->i_ssnd_offset = GetDWBE( &p_peek[8] );
             p_sys->i_ssnd_blocksize = GetDWBE( &p_peek[12] );
 
@@ -165,14 +166,19 @@ static int Open( vlc_object_t *p_this )
             break;
         }
 
-        /* Skip this chunk */
-        i_size += 8;
-        if( (i_size % 2) != 0 )
-            i_size++;
-        if( vlc_stream_Read( p_demux->s, NULL, i_size ) != (int)i_size )
+        /* consume chunk data */
+        for( ssize_t i_req; i_chunk_size; i_chunk_size -= i_req )
         {
-            msg_Warn( p_demux, "incomplete file" );
-            goto error;
+#if SSIZE_MAX < UINT64_MAX
+            i_req = __MIN( SSIZE_MAX, i_chunk_size );
+#else
+            i_req = i_chunk_size;
+#endif
+            if( vlc_stream_Read( p_demux->s, NULL, i_req ) != i_req )
+            {
+                msg_Warn( p_demux, "incomplete file" );
+                goto error;
+            }
         }
     }
 
