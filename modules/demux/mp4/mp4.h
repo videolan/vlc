@@ -82,6 +82,7 @@ typedef struct
 
     es_format_t fmt;
     uint32_t    i_block_flags;
+    uint32_t    i_next_block_flags;
     uint8_t     rgi_chans_reordering[AOUT_CHAN_MAX];
     bool        b_chans_reorder;
     es_out_id_t *p_es;

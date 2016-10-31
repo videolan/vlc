@@ -443,6 +443,11 @@ static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_b
     }
 
     p_block->i_flags |= p_track->i_block_flags;
+    if( p_track->i_next_block_flags )
+    {
+        p_block->i_flags |= p_track->i_next_block_flags;
+        p_track->i_next_block_flags = 0;
+    }
 
     /* ASF packets in mov */
     if( p_track->p_asf )
@@ -3582,6 +3587,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
     if( i_elst_last != tk->i_elst )
     {
         msg_Warn( p_demux, "elst old=%d new=%d", i_elst_last, tk->i_elst );
+        tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
     }
 }
 
