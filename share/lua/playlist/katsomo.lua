@@ -61,13 +61,13 @@ function parse()
             name = vlc.strings.resolve_xml_special_chars( name )
             name = vlc.strings.from_charset( "ISO_8859-1", name )
             path = "http://www.katsomo.fi/?treeId="..treeid
-            table.insert( p, { path = path; name = name; url = vlc.path; arturl=arturl; } )
+            table.insert( p, { path = path; name = name; arturl=arturl; } )
         end
         for programid in string.gmatch( line, "<li class=\"program.*\" id=\"program(%d+)\" title=\".+\"" ) do
            description = vlc.strings.resolve_xml_special_chars( find( line, "title=\"(.+)\"" ) )
            description = vlc.strings.from_charset( "ISO_8859-1", description )
            path = "http://www.katsomo.fi/metafile.asx?p="..programid.."&bw=800"
-           table.insert( p, { path = path; name = description; url = vlc.path; arturl=arturl; } )
+           table.insert( p, { path = path; name = description; arturl=arturl; } )
         end
     end
     return p

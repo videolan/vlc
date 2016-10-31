@@ -84,5 +84,5 @@ function parse()
         return { }
     end
 
-    return { { path = path; name = name; description = description; url = vlc.path; arturl = arturl; artist = artist } }
+    return { { path = path; name = name; description = description; arturl = arturl; artist = artist } }
 end
