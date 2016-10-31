@@ -1228,14 +1228,23 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
         return false;
     }
 
+    bool b_has_timecode = false;
+
     for( unsigned int i = 0; i < cluster->ListSize(); ++i )
     {
         if( MKV_CHECKED_PTR_DECL( p_ctc, KaxClusterTimecode, (*cluster)[i] ) )
         {
             cluster->InitTimecode( static_cast<uint64>( *p_ctc ), i_timescale );
             _seeker.add_cluster( cluster );
+            b_has_timecode = true;
             break;
         }
+    }
+
+    if( !b_has_timecode )
+    {
+        msg_Err( &sys.demuxer, "Detected cluster without mandatory timecode" );
+        return false;
     }
 
     if( b_update_start_time )
