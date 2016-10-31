@@ -356,6 +356,8 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
     stream_priv_t *priv = (stream_priv_t *)s;
     ssize_t ret;
 
+    assert(len <= SSIZE_MAX);
+
     if (vlc_killed())
         return 0;
 
