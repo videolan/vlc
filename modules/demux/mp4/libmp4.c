@@ -1421,20 +1421,21 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
         {
             MP4_GET2BYTES( es_descriptor.i_depend_on_ES_ID );
         }
-        if( es_descriptor.b_url )
+        if( es_descriptor.b_url && i_read > 0 )
         {
-            unsigned int i_len;
+            uint8_t i_url;
 
-            MP4_GET1BYTE( i_len );
-            i_len = __MIN(i_read, i_len);
-            es_descriptor.psz_URL = malloc( i_len + 1 );
+            MP4_GET1BYTE( i_url );
+            if( i_url > i_read )
+                MP4_READBOX_EXIT( 1 );
+            es_descriptor.psz_URL = malloc( (unsigned) i_url + 1 );
             if( es_descriptor.psz_URL )
             {
-                memcpy( es_descriptor.psz_URL, p_peek, i_len );
-                es_descriptor.psz_URL[i_len] = 0;
+                memcpy( es_descriptor.psz_URL, p_peek, i_url );
+                es_descriptor.psz_URL[i_url] = 0;
             }
-            p_peek += i_len;
-            i_read -= i_len;
+            p_peek += i_url;
+            i_read -= i_url;
         }
         else
         {
