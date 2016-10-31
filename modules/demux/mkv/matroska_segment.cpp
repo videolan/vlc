@@ -492,8 +492,8 @@ bool matroska_segment_c::PreloadClusters(uint64 i_cluster_pos)
 
         E_CASE( KaxCluster, kcluster )
         {
-            vars.obj->ParseCluster( &kcluster, false );
-            vars.obj->IndexAppendCluster( &kcluster );
+            if( vars.obj->ParseCluster( &kcluster, false ) )
+                vars.obj->IndexAppendCluster( &kcluster );
         }
 
         E_CASE_DEFAULT( el )
@@ -633,9 +633,10 @@ bool matroska_segment_c::Preload( )
             }
             msg_Dbg( &sys.demuxer, "|   + Cluster" );
 
-            cluster = kc_ptr;
+            if( !ParseCluster( kc_ptr ) )
+                break;
 
-            ParseCluster( cluster );
+            cluster = kc_ptr;
             IndexAppendCluster( cluster );
 
             // add first cluster as trusted seekpoint for all tracks
@@ -1025,7 +1026,9 @@ void matroska_segment_c::EnsureDuration()
         KaxCluster *p_last_cluster = static_cast<KaxCluster*>( eparser.Get() );
         if( p_last_cluster == NULL )
             return;
-        ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA );
+
+        if( !ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA ) )
+            return;
 
         if( p_last_cluster->IsFiniteSize() == false )
         {

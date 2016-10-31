@@ -1207,12 +1207,12 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
     KaxChapterHandler::Dispatcher().iterate( chapters->begin(), chapters->end(), KaxChapterHandler::Payload( *this ) );
 }
 
-void matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_time, ScopeMode read_fully )
+bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_time, ScopeMode read_fully )
 {
     if( unlikely( cluster->IsFiniteSize() && cluster->GetSize() >= SIZE_MAX ) )
     {
         msg_Err( &sys.demuxer, "Cluster too big, aborting" );
-        return;
+        return false;
     }
 
     try
@@ -1225,7 +1225,7 @@ void matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
     catch(...)
     {
         msg_Err( &sys.demuxer, "Error while reading cluster" );
-        return;
+        return false;
     }
 
     for( unsigned int i = 0; i < cluster->ListSize(); ++i )
@@ -1240,6 +1240,8 @@ void matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
 
     if( b_update_start_time )
         i_mk_start_time = cluster->GlobalTimecode() / INT64_C( 1000 );
+
+    return true;
 }
 
 
