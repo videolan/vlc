@@ -1147,9 +1147,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         int64_t            & i_duration;
         bool               & b_key_picture;
         bool               & b_discardable_picture;
+        bool                 b_cluster_timecode;
+
     } payload = {
         this, ep, &sys.demuxer, pp_block, pp_simpleblock,
-        *pi_duration, *pb_key_picture, *pb_discardable_picture
+        *pi_duration, *pb_key_picture, *pb_discardable_picture, true
     };
 
     MKV_SWITCH_CREATE( EbmlTypeDispatcher, BlockGetHandler_l1, BlockPayload )
@@ -1159,7 +1161,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         E_CASE( KaxCluster, kcluster )
         {
             vars.obj->cluster = &kcluster;
-
+            vars.b_cluster_timecode = false;
             vars.ep->Down ();
         }
         E_CASE( KaxCues, kcue )
@@ -1183,6 +1185,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             ktimecode.ReadData( vars.obj->es.I_O(), SCOPE_ALL_DATA );
             vars.obj->cluster->InitTimecode( static_cast<uint64>( ktimecode ), vars.obj->i_timescale );
             vars.obj->IndexAppendCluster( vars.obj->cluster );
+            vars.b_cluster_timecode = true;
         }
         E_CASE( KaxClusterSilentTracks, ksilent )
         {
@@ -1197,6 +1200,12 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         }
         E_CASE( KaxSimpleBlock, ksblock )
         {
+            if( vars.b_cluster_timecode == false )
+            {
+                msg_Warn( vars.p_demuxer, "ignoring SimpleBlock prior to mandatory Timecode" );
+                return;
+            }
+
             vars.simpleblock = &ksblock;
             vars.simpleblock->ReadData( vars.obj->es.I_O() );
             vars.simpleblock->SetParent( *vars.obj->cluster );
