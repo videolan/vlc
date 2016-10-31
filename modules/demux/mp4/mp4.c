@@ -439,6 +439,11 @@ static void MP4_GetInterleaving( demux_t *p_demux, uint64_t *pi_max_contiguous, 
                 nexttk = cur;
         }
 
+        /* copy previous run */
+        if( nexttk && nexttk->i_chunk > 0 )
+            nexttk->chunk[nexttk->i_chunk].i_virtual_run_number =
+                    nexttk->chunk[nexttk->i_chunk - 1].i_virtual_run_number;
+
         if( tk != nexttk )
         {
             i_duration = i_duration * CLOCK_FREQ / tk->i_timescale;
@@ -448,6 +453,9 @@ static void MP4_GetInterleaving( demux_t *p_demux, uint64_t *pi_max_contiguous, 
 
             if( tk->i_chunk != tk->i_chunk_count )
                 *pb_flat = false;
+
+            if( nexttk && nexttk->i_chunk > 0 ) /* new run number */
+                nexttk->chunk[nexttk->i_chunk].i_virtual_run_number++;
         }
 
         tk = nexttk;
