@@ -218,10 +218,9 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const mp4_chunk_t *p_chunk;
-    if( p_sys->b_fragmented )
-        p_chunk = p_track->cchunk;
-    else
-        p_chunk = &p_track->chunk[p_track->i_chunk];
+
+    p_chunk = ( p_track->cchunk ) ? p_track->cchunk /* DemuxFrg */
+                                  : &p_track->chunk[p_track->i_chunk];
 
     unsigned int i_index = 0;
     unsigned int i_sample = p_track->i_sample - p_chunk->i_sample_first;
@@ -246,7 +245,6 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
     /* now handle elst */
     if( p_track->p_elst )
     {
-        demux_sys_t         *p_sys = p_demux->p_sys;
         MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
 
         /* convert to offset */
@@ -270,12 +268,10 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 static inline bool MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track,
                                          int64_t *pi_delta )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    VLC_UNUSED( p_demux );
     mp4_chunk_t *ck;
-    if( p_sys->b_fragmented )
-        ck = p_track->cchunk;
-    else
-        ck = &p_track->chunk[p_track->i_chunk];
+    ck = ( p_track->cchunk ) ? p_track->cchunk /* DemuxFrg */
+                             : &p_track->chunk[p_track->i_chunk];
 
     unsigned int i_index = 0;
     unsigned int i_sample = p_track->i_sample - ck->i_sample_first;
