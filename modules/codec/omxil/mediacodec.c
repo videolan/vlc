@@ -313,7 +313,7 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
         /* Compare the SPS PPS with the old one */
         if (!CSDCmp(p_dec, csd, i_csd_count))
         {
-            msg_Warn(p_dec, "New SPS/PPS found, id: %d size: %ux%u sps: %d pps: %d",
+            msg_Warn(p_dec, "New SPS/PPS found, id: %" PRIu8 " size: %ux%u sps: %d pps: %d",
                      p_sps->i_id, vsize[0], vsize[1],
                      i_sps_size, i_pps_size);
 

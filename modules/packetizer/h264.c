@@ -101,8 +101,8 @@ struct decoder_sys_t
     bool   b_header;
     bool   b_sps;
     bool   b_pps;
-    block_t *pp_sps[H264_SPS_MAX];
-    block_t *pp_pps[H264_PPS_MAX];
+    block_t *pp_sps[H264_SPS_ID_MAX + 1];
+    block_t *pp_pps[H264_PPS_ID_MAX + 1];
     int    i_recovery_frames;  /* -1 = no recovery */
 
     /* avcC data */
@@ -211,9 +211,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_header= false;
     p_sys->b_sps   = false;
     p_sys->b_pps   = false;
-    for( i = 0; i < H264_SPS_MAX; i++ )
+    for( i = 0; i <= H264_SPS_ID_MAX; i++ )
         p_sys->pp_sps[i] = NULL;
-    for( i = 0; i < H264_PPS_MAX; i++ )
+    for( i = 0; i <= H264_PPS_ID_MAX; i++ )
         p_sys->pp_pps[i] = NULL;
     p_sys->i_recovery_frames = -1;
 
@@ -328,12 +328,12 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->p_frame )
         block_ChainRelease( p_sys->p_frame );
-    for( i = 0; i < H264_SPS_MAX; i++ )
+    for( i = 0; i < H264_SPS_ID_MAX; i++ )
     {
         if( p_sys->pp_sps[i] )
             block_Release( p_sys->pp_sps[i] );
     }
-    for( i = 0; i < H264_PPS_MAX; i++ )
+    for( i = 0; i < H264_PPS_ID_MAX; i++ )
     {
         if( p_sys->pp_pps[i] )
             block_Release( p_sys->pp_pps[i] );
@@ -578,12 +578,12 @@ static block_t *OutputPicture( decoder_t *p_dec )
 
         block_t *p_list = NULL;
         block_t **pp_list_tail = &p_list;
-        for( int i = 0; i < H264_SPS_MAX && (b_sps_pps_i || p_sys->b_frame_sps); i++ )
+        for( int i = 0; i <= H264_SPS_ID_MAX && (b_sps_pps_i || p_sys->b_frame_sps); i++ )
         {
             if( p_sys->pp_sps[i] )
                 block_ChainLastAppend( &pp_list_tail, block_Duplicate( p_sys->pp_sps[i] ) );
         }
-        for( int i = 0; i < H264_PPS_MAX && (b_sps_pps_i || p_sys->b_frame_pps); i++ )
+        for( int i = 0; i < H264_PPS_ID_MAX && (b_sps_pps_i || p_sys->b_frame_pps); i++ )
         {
             if( p_sys->pp_pps[i] )
                 block_ChainLastAppend( &pp_list_tail, block_Duplicate( p_sys->pp_pps[i] ) );

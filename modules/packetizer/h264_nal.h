@@ -41,8 +41,8 @@
 #define PROFILE_H264_MVC_MULTIVIEW_DEPTH_HIGH          138
 #define PROFILE_H264_MVC_ENHANCED_MULTIVIEW_DEPTH_HIGH 139
 
-#define H264_SPS_MAX (32)
-#define H264_PPS_MAX (256)
+#define H264_SPS_ID_MAX (31)
+#define H264_PPS_ID_MAX (255)
 
 enum h264_nal_unit_type_e
 {
@@ -84,7 +84,7 @@ void h264_release_pps( h264_picture_parameter_set_t * );
 
 struct h264_sequence_parameter_set_t
 {
-    int i_id;
+    uint8_t i_id;
     uint8_t i_profile, i_level;
     uint8_t i_constraint_set_flags;
     /* according to avcC, 3 bits max for those */
@@ -129,8 +129,8 @@ struct h264_sequence_parameter_set_t
 
 struct h264_picture_parameter_set_t
 {
-    int i_id;
-    int i_sps_id;
+    uint8_t i_id;
+    uint8_t i_sps_id;
     int i_pic_order_present_flag;
 };
 

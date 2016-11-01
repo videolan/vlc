@@ -215,9 +215,10 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     p_sps->i_constraint_set_flags = bs_read( p_bs, 8 );
     p_sps->i_level = bs_read( p_bs, 8 );
     /* sps id */
-    p_sps->i_id = bs_read_ue( p_bs );
-    if( p_sps->i_id >= H264_SPS_MAX )
+    uint32_t i_sps_id = bs_read_ue( p_bs );
+    if( i_sps_id > H264_SPS_ID_MAX )
         return false;
+    p_sps->i_id = i_sps_id;
 
     if( i_profile_idc == PROFILE_H264_HIGH ||
         i_profile_idc == PROFILE_H264_HIGH_10 ||
@@ -467,10 +468,12 @@ void h264_release_pps( h264_picture_parameter_set_t *p_pps )
 static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
                                                    h264_picture_parameter_set_t *p_pps )
 {
-    p_pps->i_id = bs_read_ue( p_bs ); // pps id
-    p_pps->i_sps_id = bs_read_ue( p_bs ); // sps id
-    if( p_pps->i_id >= H264_PPS_MAX || p_pps->i_sps_id >= H264_SPS_MAX )
+    uint32_t i_pps_id = bs_read_ue( p_bs ); // pps id
+    uint32_t i_sps_id = bs_read_ue( p_bs ); // sps id
+    if( i_pps_id > H264_PPS_ID_MAX || i_sps_id > H264_SPS_ID_MAX )
         return false;
+    p_pps->i_id = i_pps_id;
+    p_pps->i_sps_id = i_sps_id;
 
     bs_skip( p_bs, 1 ); // entropy coding mode flag
     p_pps->i_pic_order_present_flag = bs_read( p_bs, 1 );
