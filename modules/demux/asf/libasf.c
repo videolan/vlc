@@ -25,6 +25,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
+
 #include <vlc_demux.h>
 #include <vlc_charset.h>          /* FromCharset */
 
@@ -528,8 +530,16 @@ static void ASF_FreeObject_header_extension( asf_object_t *p_obj )
 static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_stream_properties_t *p_sp = &p_obj->stream_properties;
-    size_t        i_peek;
+    ssize_t i_peek;
     const uint8_t *p_peek;
+
+#if UINT64_MAX > SSIZE_MAX
+    if( p_sp->i_object_size > SSIZE_MAX )
+    {
+        msg_Err( s, "unable to peek: object size is too large" );
+        return VLC_EGENERIC;
+    }
+#endif
 
     if( ( i_peek = vlc_stream_Peek( s, &p_peek,  p_sp->i_object_size ) ) < 78 )
        return VLC_EGENERIC;
