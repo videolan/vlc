@@ -136,6 +136,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys;
     p_sys->b_start = true;
+    p_sys->p_packetizer = NULL;
     p_sys->p_meta = NULL;
     p_sys->i_length = 0;
     p_sys->i_pts = 0;
@@ -148,10 +149,7 @@ static int Open( vlc_object_t * p_this )
 
     /* We need to read and store the STREAMINFO metadata */
     if( ReadMeta( p_demux, &p_streaminfo, &i_streaminfo ) )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
+        goto error;
 
     /* Load the FLAC packetizer */
     /* Store STREAMINFO for the decoder and packetizer */
@@ -161,10 +159,7 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "flac" );
     if( !p_sys->p_packetizer )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
+        goto error;
 
     if( p_sys->i_cover_idx < p_sys->i_attachments )
     {
@@ -176,6 +171,9 @@ static int Open( vlc_object_t * p_this )
         vlc_meta_Set( p_sys->p_meta, vlc_meta_ArtworkURL, psz_url );
     }
     return VLC_SUCCESS;
+error:
+    Close( p_this );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -199,7 +197,8 @@ static void Close( vlc_object_t * p_this )
     TAB_CLEAN( p_sys->i_title_seekpoints, p_sys->pp_title_seekpoints );
 
     /* Delete the decoder */
-    demux_PacketizerDestroy( p_sys->p_packetizer );
+    if( p_sys->p_packetizer )
+        demux_PacketizerDestroy( p_sys->p_packetizer );
 
     if( p_sys->p_meta )
         vlc_meta_Delete( p_sys->p_meta );
