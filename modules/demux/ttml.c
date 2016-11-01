@@ -712,6 +712,7 @@ static int ReadTTML( demux_t* p_demux )
                         goto error;
 
                     free( psz_text );
+                    psz_text = NULL;
                     ClearNode( p_node );
                 }
             }
