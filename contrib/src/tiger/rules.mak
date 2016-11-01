@@ -19,6 +19,7 @@ $(TARBALLS)/libtiger-$(TIGER_VERSION).tar.gz:
 libtiger: libtiger-$(TIGER_VERSION).tar.gz .sum-tiger
 	$(UNPACK)
 	$(APPLY) $(SRC)/tiger/autotools.patch
+	$(call pkg_static,"misc/pkgconfig/tiger.pc.in")
 	$(MOVE)
 
 DEPS_tiger = kate $(DEPS_kate)
