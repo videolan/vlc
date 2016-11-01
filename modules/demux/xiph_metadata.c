@@ -26,13 +26,15 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>
 #include <vlc_input.h>
 #include "xiph_metadata.h"
 
-input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data,
+input_attachment_t* ParseFlacPicture( const uint8_t *p_data, size_t size,
     int i_attachments, int *i_cover_score, int *i_cover_idx )
 {
     /* TODO: Merge with ID3v2 copy in modules/meta_engine/taglib.cpp. */
@@ -60,57 +62,99 @@ input_attachment_t* ParseFlacPicture( const uint8_t *p_data, int i_data,
         2   /* Logo of the publisher (record company). */
     };
 
-    int i_len;
-    int i_type;
-    char *psz_mime = NULL;
-    char psz_name[128];
-    char *psz_description = NULL;
-    input_attachment_t *p_attachment = NULL;
+    uint32_t type, len;
 
-    if( i_data < 4 + 3*4 )
+    if( size < 8 )
         return NULL;
-#define RM(x) do { i_data -= (x); p_data += (x); } while(0)
+#define RM(x) \
+    do { \
+        assert(size >= (x)); \
+        size -= (x); \
+        p_data += (x); \
+    } while (0)
 
-    i_type = GetDWBE( p_data ); RM(4);
-    i_len = GetDWBE( p_data ); RM(4);
+    type = GetDWBE( p_data );
+    RM(4);
+    len = GetDWBE( p_data );
+    RM(4);
 
-    if( i_len < 0 || i_data < i_len + 4 )
+    if( size < len )
+        return NULL;
+
+    char *mime = strndup( (const char *)p_data, len );
+    if( unlikely(mime == NULL) )
+        return NULL;
+    RM(len);
+
+    if( size < 4 )
+    {
+        free( mime );
+        return NULL;
+    }
+
+    len = GetDWBE( p_data );
+    RM(4);
+
+    if( size < len )
+    {
+        free( mime );
+        return NULL;
+    }
+
+    input_attachment_t *p_attachment = NULL;
+    char *description = strndup( (const char *)p_data, len );
+    if( unlikely(description == NULL) )
         goto error;
-    psz_mime = strndup( (const char*)p_data, i_len ); RM(i_len);
-    i_len = GetDWBE( p_data ); RM(4);
-    if( i_len < 0 || i_data < i_len + 4*4 + 4)
-        goto error;
-    psz_description = strndup( (const char*)p_data, i_len ); RM(i_len);
-    EnsureUTF8( psz_description );
-    RM(4*4);
-    i_len = GetDWBE( p_data ); RM(4);
-    if( i_len < 0 || i_len > i_data )
+    RM(len);
+
+    EnsureUTF8( description );
+
+    if( size < 20 )
         goto error;
 
-    /* printf( "Picture type=%d mime=%s description='%s' file length=%d\n",
-             i_type, psz_mime, psz_description, i_len ); */
+    RM(4 * 4); /* skip */
 
-    snprintf( psz_name, sizeof(psz_name), "picture%d", i_attachments );
-    if( !strcasecmp( psz_mime, "image/jpeg" ) )
-        strcat( psz_name, ".jpg" );
-    else if( !strcasecmp( psz_mime, "image/png" ) )
-        strcat( psz_name, ".png" );
+    len = GetDWBE( p_data );
+    RM(4);
 
-    p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
-            psz_description, p_data, i_data );
+    if( size < len )
+        goto error;
 
-    if( i_type >= 0 && (unsigned int)i_type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
-        *i_cover_score < pi_cover_score[i_type] )
+    /* printf( "Picture type=%"PRIu32" mime=%s description='%s' "
+               "file length=%zu\n", type, mime, description, len ); */
+
+    char name[7 + (sizeof (i_attachments) * 3) + 4 + 1];
+
+    snprintf( name, sizeof (name), "picture%u", i_attachments );
+
+    if( !strcasecmp( mime, "image/jpeg" ) )
+        strcat( name, ".jpg" );
+    else if( !strcasecmp( mime, "image/png" ) )
+        strcat( name, ".png" );
+
+    p_attachment = vlc_input_attachment_New( name, mime, description, p_data,
+                                             size /* XXX: len instead? */ );
+
+    if( type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
+        *i_cover_score < pi_cover_score[type] )
     {
         *i_cover_idx = i_attachments;
-        *i_cover_score = pi_cover_score[i_type];
+        *i_cover_score = pi_cover_score[type];
     }
 
 error:
-    free( psz_mime );
-    free( psz_description );
+    free( mime );
+    free( description );
     return p_attachment;
 }
+
+#undef RM
+#define RM(x) \
+    do { \
+        i_data -= (x); \
+        p_data += (x); \
+    } while (0)
+
 
 typedef struct chapters_array_t
 {
