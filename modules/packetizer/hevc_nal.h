@@ -23,9 +23,9 @@
 # include <vlc_common.h>
 # include <vlc_es.h>
 
-#define HEVC_VPS_MAX 16
-#define HEVC_SPS_MAX 16
-#define HEVC_PPS_MAX 64
+#define HEVC_VPS_ID_MAX 15
+#define HEVC_SPS_ID_MAX 15
+#define HEVC_PPS_ID_MAX 63
 
 enum hevc_general_profile_idc_e
 {

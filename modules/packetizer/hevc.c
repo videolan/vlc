@@ -83,9 +83,9 @@ struct decoder_sys_t
     } frame, pre, post;
 
     uint8_t  i_nal_length_size;
-    hevc_video_parameter_set_t    *rgi_p_decvps[HEVC_VPS_MAX];
-    hevc_sequence_parameter_set_t *rgi_p_decsps[HEVC_SPS_MAX];
-    hevc_picture_parameter_set_t  *rgi_p_decpps[HEVC_PPS_MAX];
+    hevc_video_parameter_set_t    *rgi_p_decvps[HEVC_VPS_ID_MAX + 1];
+    hevc_sequence_parameter_set_t *rgi_p_decsps[HEVC_SPS_ID_MAX + 1];
+    hevc_picture_parameter_set_t  *rgi_p_decpps[HEVC_PPS_ID_MAX + 1];
     bool b_init_sequence_complete;
 
     /* */
@@ -230,19 +230,19 @@ static void Close(vlc_object_t *p_this)
     block_ChainRelease(p_sys->pre.p_chain);
     block_ChainRelease(p_sys->post.p_chain);
 
-    for(unsigned i=0;i<HEVC_PPS_MAX; i++)
+    for(unsigned i=0;i<=HEVC_PPS_ID_MAX; i++)
     {
         if(p_sys->rgi_p_decpps[i])
             hevc_rbsp_release_pps(p_sys->rgi_p_decpps[i]);
     }
 
-    for(unsigned i=0;i<HEVC_SPS_MAX; i++)
+    for(unsigned i=0;i<=HEVC_SPS_ID_MAX; i++)
     {
         if(p_sys->rgi_p_decsps[i])
             hevc_rbsp_release_sps(p_sys->rgi_p_decsps[i]);
     }
 
-    for(unsigned i=0;i<HEVC_VPS_MAX; i++)
+    for(unsigned i=0;i<=HEVC_VPS_ID_MAX; i++)
     {
         if(p_sys->rgi_p_decvps[i])
             hevc_rbsp_release_vps(p_sys->rgi_p_decvps[i]);
@@ -311,15 +311,15 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
     switch(i_nal_type)
     {
         case HEVC_NAL_VPS:
-            if(i_id >= HEVC_VPS_MAX)
+            if(i_id > HEVC_VPS_ID_MAX)
                 return false;
             break;
         case HEVC_NAL_SPS:
-            if(i_id >= HEVC_SPS_MAX)
+            if(i_id > HEVC_SPS_ID_MAX)
                 return false;
             break;
         case HEVC_NAL_PPS:
-            if(i_id >= HEVC_PPS_MAX)
+            if(i_id > HEVC_PPS_ID_MAX)
                 return false;
             break;
         default:
@@ -384,7 +384,7 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
 
 static bool XPSReady(decoder_sys_t *p_sys)
 {
-    for(unsigned i=0;i<HEVC_PPS_MAX; i++)
+    for(unsigned i=0;i<=HEVC_PPS_ID_MAX; i++)
     {
         const hevc_picture_parameter_set_t *p_pps = p_sys->rgi_p_decpps[i];
         if (p_pps)

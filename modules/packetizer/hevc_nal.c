@@ -771,7 +771,7 @@ static bool hevc_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         return false;
 
     p_sps->sps_seq_parameter_set_id = bs_read_ue( p_bs );
-    if( p_sps->sps_seq_parameter_set_id >= HEVC_SPS_MAX )
+    if( p_sps->sps_seq_parameter_set_id > HEVC_SPS_ID_MAX )
         return false;
 
     p_sps->chroma_format_idc = bs_read_ue( p_bs );
@@ -899,10 +899,10 @@ static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
     if( bs_remain( p_bs ) < 1 )
         return false;
     p_pps->pps_pic_parameter_set_id = bs_read_ue( p_bs );
-    if( p_pps->pps_pic_parameter_set_id >= HEVC_PPS_MAX || bs_remain( p_bs ) < 1 )
+    if( p_pps->pps_pic_parameter_set_id > HEVC_PPS_ID_MAX || bs_remain( p_bs ) < 1 )
         return false;
     p_pps->pps_seq_parameter_set_id = bs_read_ue( p_bs );
-    if( p_pps->pps_seq_parameter_set_id >= HEVC_SPS_MAX )
+    if( p_pps->pps_seq_parameter_set_id > HEVC_SPS_ID_MAX )
         return false;
     p_pps->dependent_slice_segments_enabled_flag = bs_read1( p_bs );
     p_pps->output_flag_present_flag = bs_read1( p_bs );
@@ -1099,7 +1099,7 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
     if( i_nal_type >= HEVC_NAL_BLA_W_LP && i_nal_type <= HEVC_NAL_IRAP_VCL23 )
         p_sl->no_output_of_prior_pics_flag = bs_read1( p_bs );
     p_sl->slice_pic_parameter_set_id = bs_read_ue( p_bs );
-    if( p_sl->slice_pic_parameter_set_id >= HEVC_PPS_MAX || bs_remain( p_bs ) < 1 )
+    if( p_sl->slice_pic_parameter_set_id > HEVC_PPS_ID_MAX || bs_remain( p_bs ) < 1 )
         return false;
 
     const hevc_picture_parameter_set_t *p_pps = pp_pps[p_sl->slice_pic_parameter_set_id];
