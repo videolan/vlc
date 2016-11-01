@@ -54,7 +54,7 @@ namespace adaptive
     };
 
     template <class T>
-    MovingAverage<T>::MovingAverage(unsigned nbobs)
+    MovingAverage<T>::MovingAverage(unsigned nbobs) : avg(0)
     {
         if(nbobs < 1)
             throw new std::exception();
