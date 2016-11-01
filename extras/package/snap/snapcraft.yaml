@@ -144,9 +144,9 @@ parts:
     stage-packages:
       - fonts-freefont-ttf
       - libaa1
-      - libavcodec-ffmpeg56
-      - libavcodec-ffmpeg-extra56
-      - libavutil-ffmpeg54
+      - libavcodec57
+      - libavcodec-extra57
+      - libavutil55
       - libcaca0
       - libcairo2
       - libegl1-mesa
