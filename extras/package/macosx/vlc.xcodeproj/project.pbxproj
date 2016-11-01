@@ -319,6 +319,8 @@
 		1C94659C1B77B9FC007C965A /* TextfieldPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C9465991B77B9FC007C965A /* TextfieldPanel.xib */; };
 		1CBB2CC81B06A6DE00110ADA /* Help.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1CBB2CC61B06A6DE00110ADA /* Help.xib */; };
 		1CC25CA81B2C585D0003F994 /* darwinvlc.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CC25CA71B2C585D0003F994 /* darwinvlc.m */; };
+		1CC30CE81DC8D561001400E2 /* VLCFSPanelController.h in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB59091DA247CD009BCA66 /* VLCFSPanelController.h */; };
+		1CC30CE91DC8D561001400E2 /* VLCFSPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */; };
 		1CCB5F531A62A724004C3E90 /* VLCAddonListItem.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435E1972E26A0022B534 /* VLCAddonListItem.h */; };
 		1CCB5F541A62A724004C3E90 /* VLCAddonListItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435F1972E26A0022B534 /* VLCAddonListItem.m */; };
 		1CCB5F551A62A724004C3E90 /* VLCAddonsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5218ABD6380053B874 /* VLCAddonsWindowController.h */; };
@@ -434,7 +436,6 @@
 		6BBBB8B41D112BAC001BD9BA /* VLCRendererItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBB8B11D10A994001BD9BA /* VLCRendererItem.m */; };
 		6BBBB8B71D114628001BD9BA /* VLCRendererDiscovery.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBB8B61D114628001BD9BA /* VLCRendererDiscovery.m */; };
 		6BBBB8B81D12AF72001BD9BA /* VLCRendererDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6BBBB8AC1D108A87001BD9BA /* VLCRendererDialog.xib */; };
-		6BCB590C1DA247CD009BCA66 /* VLCFSPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */; };
 		6BCB59111DA25799009BCA66 /* VLCFullScreenPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6BCB590E1DA2482A009BCA66 /* VLCFullScreenPanel.xib */; };
 		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D5678ED1D5BA1DC002698F3 /* VLCApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D5678EC1D5BA1DC002698F3 /* VLCApplication.m */; };
@@ -3558,6 +3559,8 @@
 				1CCB5F561A62A724004C3E90 /* VLCAddonsWindowController.m in Sources */,
 				1C7CB9181D787C4A00388902 /* VLCKeyboardBacklightControl.h in Sources */,
 				1C7CB9191D787C4A00388902 /* VLCKeyboardBacklightControl.m in Sources */,
+				1CC30CE81DC8D561001400E2 /* VLCFSPanelController.h in Sources */,
+				1CC30CE91DC8D561001400E2 /* VLCFSPanelController.m in Sources */,
 				1CCB5F571A62A724004C3E90 /* applescript.h in Sources */,
 				1CCB5F581A62A724004C3E90 /* applescript.m in Sources */,
 				1CCB5F591A62A724004C3E90 /* VLCAudioEffectsWindowController.h in Sources */,
@@ -3599,7 +3602,6 @@
 				1CCB5F741A62A724004C3E90 /* macosx.m in Sources */,
 				1CCB5F751A62A724004C3E90 /* VLCMainMenu.h in Sources */,
 				1CCB5F761A62A724004C3E90 /* VLCMainMenu.m in Sources */,
-				6BCB590C1DA247CD009BCA66 /* VLCFSPanelController.m in Sources */,
 				1CCB5F771A62A724004C3E90 /* VLCMainWindow.h in Sources */,
 				1CCB5F781A62A724004C3E90 /* VLCMainWindow.m in Sources */,
 				6B846FE61CF5D88C00112E54 /* VLCHUDRadiobuttonCell.m in Sources */,
