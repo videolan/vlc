@@ -201,9 +201,13 @@ int main(void)
     answer = 1;
     val = securepair(&th, &tls, alpnv, &alp);
     assert(val == 0);
+
+    /* SecureTransport, used on apple platforms, does not support ALPN */
+#ifndef __APPLE__
     assert(alp != NULL);
     assert(!strcmp(alp, "bar"));
     free(alp);
+#endif
 
     /* Do some I/O */
     char buf[12];
