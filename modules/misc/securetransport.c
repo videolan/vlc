@@ -618,7 +618,10 @@ static int st_SessionOpenCommon (vlc_tls_creds_t *crd, vlc_tls_t *tls,
 static int st_ClientSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *tls,
                                  vlc_tls_t *sock, const char *hostname,
                                  const char *const *alpn) {
-    VLC_UNUSED(alpn);
+
+    if (alpn != NULL)
+        return VLC_EGENERIC;
+
     msg_Dbg(crd, "open TLS session for %s", hostname);
 
     int ret = st_SessionOpenCommon(crd, tls, sock, false);
