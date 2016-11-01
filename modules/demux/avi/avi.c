@@ -484,7 +484,7 @@ static int Open( vlc_object_t * p_this )
                 {
                     int i_chunk = AVIFOURCC_IAS1 + ((i - 1) << 24);
                     avi_chunk_STRING_t *p_lang = AVI_ChunkFind( p_info, i_chunk, 0 );
-                    if( p_lang != NULL )
+                    if( p_lang != NULL && p_lang->p_str != NULL )
                         fmt.psz_language = FromACP( p_lang->p_str );
                 }
 
@@ -693,7 +693,7 @@ static int Open( vlc_object_t * p_this )
                 free( tk );
                 continue;
         }
-        if( p_strn )
+        if( p_strn && p_strn->p_str )
             fmt.psz_description = FromACP( p_strn->p_str );
         tk->p_es = es_out_Add( p_demux->out, &fmt );
         TAB_APPEND( p_sys->i_track, p_sys->track, tk );
@@ -2759,7 +2759,7 @@ static void AVI_MetaLoad( demux_t *p_demux,
     for( int i = 0; p_dsc[i].i_id != 0; i++ )
     {
         avi_chunk_STRING_t *p_strz = AVI_ChunkFind( p_info, p_dsc[i].i_id, 0 );
-        if( !p_strz )
+        if( !p_strz || !p_strz->p_str )
             continue;
         char *psz_value = FromACP( p_strz->p_str );
         if( !psz_value )
@@ -2783,7 +2783,7 @@ static void AVI_MetaLoad( demux_t *p_demux,
     for( int i = 0; p_extra[i] != 0; i++ )
     {
         avi_chunk_STRING_t *p_strz = AVI_ChunkFind( p_info, p_extra[i], 0 );
-        if( !p_strz )
+        if( !p_strz || !p_strz->p_str )
             continue;
         char *psz_value = FromACP( p_strz->p_str );
         if( !psz_value )
@@ -2931,7 +2931,7 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
     i_size -= 6;
 
     if( !psz_description )
-        psz_description = p_strn ? FromACP( p_strn->p_str ) : NULL;
+        psz_description = p_strn && p_strn->p_str ? FromACP( p_strn->p_str ) : NULL;
     char *psz_name;
     if( asprintf( &psz_name, "subtitle%d.srt", p_sys->i_attachment ) <= 0 )
         psz_name = NULL;
