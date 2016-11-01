@@ -18,7 +18,7 @@ codec_LTLIBRARIES += libspdif_plugin.la
 
 liba52_plugin_la_SOURCES = codec/a52.c
 liba52_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_a52)
-liba52_plugin_la_LIBADD = $(LIBM) $(LIBS_a52)
+liba52_plugin_la_LIBADD = $(LIBS_a52) $(LIBM)
 liba52_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 EXTRA_LTLIBRARIES += liba52_plugin.la
 codec_LTLIBRARIES += $(LTLIBa52)
