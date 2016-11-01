@@ -212,7 +212,8 @@ static int Demux( demux_t *p_demux )
             tk->b_selected = false;
     }
 
-    while( !p_sys->b_eos && p_sys->i_sendtime - p_sys->i_time < (mtime_t)p_sys->p_fp->i_preroll * 1000 + CHUNK )
+    while( !p_sys->b_eos && ( ( p_sys->i_sendtime - p_sys->i_time - CHUNK ) /
+                                UINT64_C( 1000 ) < p_sys->p_fp->i_preroll ) )
     {
         /* Read and demux a packet */
         if( DemuxASFPacket( &p_sys->packet_sys,
@@ -239,8 +240,8 @@ static int Demux( demux_t *p_demux )
             p_sys->i_time = p_sys->i_sendtime;
     }
 
-    if( p_sys->b_eos ||
-       (p_sys->i_sendtime >= p_sys->i_time + (mtime_t)p_sys->p_fp->i_preroll * 1000 + CHUNK) )
+    if( p_sys->b_eos || ( ( p_sys->i_sendtime - p_sys->i_time - CHUNK ) /
+                          UINT64_C( 1000 ) >= p_sys->p_fp->i_preroll ) )
     {
         bool b_data = Block_Dequeue( p_demux, p_sys->i_time + CHUNK );
 
