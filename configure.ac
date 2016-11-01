@@ -1518,8 +1518,8 @@ AS_IF([test "${enable_altivec}" = "yes"], [
     CPPFLAGS="${CPPFLAGS} ${ac_cv_c_altivec}"
     AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, [Define to 1 if C AltiVec extensions are available.])
     VLC_ADD_CFLAGS([libvlccore],[${ac_cv_c_altivec}])
-    ALTIVEC_CFLAGS="$ALTIVEC_CFLAGS ${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}"
-    VLC_ADD_CFLAGS([deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
+    ALTIVEC_CFLAGS="$ALTIVEC_CFLAGS ${ac_cv_c_altivec}"
+    VLC_ADD_CFLAGS([deinterlace],[${ac_cv_c_altivec}])
     have_altivec="yes"
   ])
   AC_CHECK_HEADERS(altivec.h)
