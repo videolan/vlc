@@ -390,7 +390,11 @@ if HAVE_ANDROID
 libvlccore_la_SOURCES += \
 	android/error.c \
 	android/specific.c \
-	android/thread.c
+	android/thread.c \
+	linux/cpu.c \
+	linux/dirs.c \
+	linux/thread.c \
+	posix/getaddrinfo.c
 else
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
