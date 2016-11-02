@@ -138,28 +138,17 @@ nobase_vlclib_DATA = \
 	lua/playlist/anevia_xml.luac \
 	lua/playlist/appletrailers.luac \
 	lua/playlist/bbc_co_uk.luac \
-	lua/playlist/break.luac \
-	lua/playlist/canalplus.luac \
 	lua/playlist/cue.luac \
 	lua/playlist/dailymotion.luac \
-	lua/playlist/extreme.luac \
-	lua/playlist/france2.luac \
 	lua/playlist/jamendo.luac \
-	lua/playlist/katsomo.luac \
 	lua/playlist/koreus.luac \
-	lua/playlist/lelombrik.luac \
 	lua/playlist/liveleak.luac \
-	lua/playlist/metacafe.luac \
-	lua/playlist/mpora.luac \
 	lua/playlist/newgrounds.luac \
-	lua/playlist/pinkbike.luac \
-	lua/playlist/pluzz.luac \
 	lua/playlist/rockbox_fm_presets.luac \
 	lua/playlist/soundcloud.luac \
 	lua/playlist/vimeo.luac \
 	lua/playlist/vocaroo.luac \
 	lua/playlist/youtube.luac \
-	lua/playlist/zapiks.luac \
 	lua/sd/fmc.luac \
 	lua/sd/icecast.luac \
 	lua/sd/icast.luac \
