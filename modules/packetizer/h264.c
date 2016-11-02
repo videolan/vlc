@@ -138,6 +138,7 @@ struct decoder_sys_t
     mtime_t i_frame_dts;
     mtime_t i_prev_pts;
     mtime_t i_prev_dts;
+    uint8_t i_dpb_output_delay;
 
     /* */
     cc_storage_t *p_ccs;
@@ -239,6 +240,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_prev_dts = VLC_TS_INVALID;
     p_sys->i_prev_pts = VLC_TS_INVALID;
+    p_sys->i_dpb_output_delay = 0;
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -624,7 +626,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
                           p_sys->i_num_units_in_tick / p_sys->i_time_scale;
     }
 
-    mtime_t i_field_pts = VLC_TS_INVALID;
+    mtime_t i_field_pts_diff = -1;
     if( p_sys->b_frame_mbs_only == 0 && p_sys->b_pic_struct_present_flag )
     {
         switch( p_sys->i_pic_struct )
@@ -640,7 +642,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
             else if( p_pic->i_pts <= VLC_TS_INVALID && p_sys->i_prev_pts > VLC_TS_INVALID && p_pic->i_length )
             {
                 /* interpolate from even frame */
-                i_field_pts = p_sys->i_prev_pts + p_pic->i_length;
+                i_field_pts_diff = p_pic->i_length;
             }
 
             p_sys->b_even_frame = !p_sys->b_even_frame;
@@ -675,8 +677,14 @@ static block_t *OutputPicture( decoder_t *p_dec )
         p_pic->i_dts = p_sys->i_prev_dts;
 
     /* PTS Fixup, interlaced fields (multiple AU/block) */
-    if( p_pic->i_pts <= VLC_TS_INVALID && i_field_pts != VLC_TS_INVALID )
-        p_pic->i_pts = i_field_pts;
+    if( p_pic->i_pts <= VLC_TS_INVALID && p_sys->i_time_scale )
+    {
+        mtime_t i_pts_delay = CLOCK_FREQ * p_sys->i_dpb_output_delay *
+                              p_sys->i_num_units_in_tick / p_sys->i_time_scale;
+        p_pic->i_pts = p_pic->i_dts + i_pts_delay;
+        if( i_field_pts_diff >= 0 )
+            p_pic->i_pts += i_field_pts_diff;
+    }
 
     /* save for next pic fixups */
     p_sys->i_prev_dts = p_pic->i_dts;
@@ -690,6 +698,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     /* reset after output */
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
+    p_sys->i_dpb_output_delay = 0;
     p_sys->slice.i_frame_type = 0;
     p_sys->p_frame = NULL;
     p_sys->pp_frame_last = &p_sys->p_frame;
@@ -936,7 +945,8 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
             if( p_sys->b_cpb_dpb_delays_present_flag )
             {
                 bs_read( p_sei_data->p_bs, p_sys->i_cpb_removal_delay_length_minus1 + 1 );
-                bs_read( p_sei_data->p_bs, p_sys->i_dpb_output_delay_length_minus1 + 1 );
+                p_sys->i_dpb_output_delay =
+                        bs_read( p_sei_data->p_bs, p_sys->i_dpb_output_delay_length_minus1 + 1 );
             }
 
             if( p_sys->b_pic_struct_present_flag )
