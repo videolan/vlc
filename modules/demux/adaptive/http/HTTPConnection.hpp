@@ -84,11 +84,15 @@ namespace adaptive
                 virtual std::string extraRequestHeaders() const;
                 virtual std::string buildRequestHeader(const std::string &path) const;
 
+                ssize_t         readChunk   (void *p_buffer, size_t len);
                 int parseReply();
                 std::string readLine();
                 char * psz_useragent;
 
                 bool                connectionClose;
+                bool                chunked;
+                bool                chunked_eof;
+                size_t              chunkLength;
                 bool                queryOk;
                 int                 retries;
                 static const int    retryCount = 5;

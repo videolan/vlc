@@ -66,6 +66,9 @@ HTTPConnection::HTTPConnection(vlc_object_t *p_object_, Socket *socket_, bool pe
     queryOk = false;
     retries = 0;
     connectionClose = !persistent;
+    chunked = false;
+    chunked_eof = false;
+    chunkLength = 0;
 }
 
 HTTPConnection::~HTTPConnection()
@@ -98,6 +101,8 @@ void HTTPConnection::disconnect()
     queryOk = false;
     bytesRead = 0;
     contentLength = 0;
+    chunked = false;
+    chunkLength = 0;
     bytesRange = BytesRange();
     socket->disconnect();
 }
@@ -105,6 +110,9 @@ void HTTPConnection::disconnect()
 int HTTPConnection::request(const std::string &path, const BytesRange &range)
 {
     queryOk = false;
+    chunked = false;
+    chunked_eof = false;
+    chunkLength = 0;
 
     /* Set new path for this query */
     params.setPath(path);
@@ -172,7 +180,8 @@ ssize_t HTTPConnection::read(void *p_buffer, size_t len)
     if(len > toRead)
         len = toRead;
 
-    ssize_t ret = socket->read(p_object, p_buffer, len);
+    ssize_t ret = ( chunked ) ? readChunk(p_buffer, len)
+                              : socket->read(p_object, p_buffer, len);
     if(ret >= 0)
         bytesRead += ret;
 
@@ -235,6 +244,54 @@ int HTTPConnection::parseReply()
     return VLC_SUCCESS;
 }
 
+ssize_t HTTPConnection::readChunk(void *p_buffer, size_t len)
+{
+    size_t copied = 0;
+
+    for( ; copied < len && !chunked_eof; )
+    {
+        /* adapted from access/http/chunked.c */
+        if(chunkLength == 0)
+        {
+            std::string line = readLine();
+            int end;
+            if (std::sscanf(line.c_str(), "%zx%n", &chunkLength, &end) < 1
+                    || (line[end] != '\0' && line[end] != ';' /* ignore extension(s) */))
+                return -1;
+        }
+
+        if(chunkLength > 0)
+        {
+            size_t toread = len - copied;
+            if(toread > chunkLength)
+                toread = chunkLength;
+
+            ssize_t in = socket->read(p_object, &((uint8_t*)p_buffer)[copied], toread);
+            if(in < 0)
+            {
+                return (copied == 0) ? in : copied;
+            }
+            else if((size_t)in < toread)
+            {
+               return copied + in;
+            }
+            copied += in;
+            chunkLength -= in;
+        }
+        else chunked_eof = true;
+
+        if(chunkLength == 0)
+        {
+            char crlf[2];
+            ssize_t in = socket->read(p_object, &crlf, 2);
+            if(in < 2 || memcmp(crlf, "\r\n", 2))
+                return (copied == 0) ? -1 : copied;
+        }
+    }
+
+    return copied;
+}
+
 std::string HTTPConnection::readLine()
 {
     return socket->readline(p_object);
@@ -272,6 +329,10 @@ void HTTPConnection::onHeader(const std::string &key,
     {
         connectionClose = true;
     }
+    else if (key == "Transfer-Encoding" && value == "chunked")
+    {
+        chunked = true;
+    }
 }
 
 std::string HTTPConnection::buildRequestHeader(const std::string &path) const
@@ -280,7 +341,6 @@ std::string HTTPConnection::buildRequestHeader(const std::string &path) const
     req << "GET " << path << " HTTP/1.1\r\n" <<
            "Host: " << params.getHostname() << "\r\n" <<
            "Cache-Control: no-cache" << "\r\n" <<
-           "Accept-Encoding: identity" << "\r\n" <<
            "User-Agent: " << std::string(psz_useragent) << "\r\n";
     req << extraRequestHeaders();
     return req.str();
