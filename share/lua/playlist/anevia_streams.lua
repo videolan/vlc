@@ -27,7 +27,7 @@
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "list_streams.idp" )
+        and string.match( vlc.path, "/list_streams%.idp" )
 end
 
 -- Parse function.
