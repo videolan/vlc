@@ -25,7 +25,7 @@ require "simplexml"
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "api.jamendo.com/" )
+        and string.match( vlc.path, "^api%.jamendo%.com/" )
         and string.match( vlc.path, "get2" )
         and string.match( vlc.path, "track" )
         and string.match( vlc.path, "xml" )

@@ -20,8 +20,9 @@
 
 -- Probe function.
 function probe()
+    local path = vlc.path:gsub("^www%.", "")
     return vlc.access == "http"
-        and string.match( vlc.path, "metacafe.com" ) 
+        and string.match( vlc.path, "^metacafe%.com/" )
         and (  string.match( vlc.path, "watch/" )
             or string.match( vlc.path, "mediaURL=" ) )
 end
