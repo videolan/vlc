@@ -238,7 +238,7 @@ static inline uint32_t bs_read_ue( bs_t * bs )
     while( bs_read1( bs ) == 0 && bs->p < bs->p_end && i < 31 )
         i++;
 
-    return (1 << i) - 1 + bs_read( bs, i );
+    return ((uint32_t)1 << i) - 1 + bs_read( bs, i );
 }
 
 /* Read signed Exp-Golomb code */
