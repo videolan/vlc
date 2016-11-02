@@ -393,8 +393,7 @@ libvlccore_la_SOURCES += \
 	android/thread.c \
 	linux/cpu.c \
 	linux/dirs.c \
-	linux/thread.c \
-	posix/getaddrinfo.c
+	linux/thread.c
 else
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
