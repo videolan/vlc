@@ -1084,7 +1084,8 @@ static block_t * MP4_RTPHint_Convert( demux_t *p_demux, block_t *p_block, vlc_fo
  *****************************************************************************
  * TODO check for newly selected track (ie audio upt to now )
  *****************************************************************************/
-static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos )
+static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
+                       unsigned i_max_preload )
 {
     uint32_t i_nb_samples = 0;
     uint32_t i_samplessize = 0;
@@ -1097,8 +1098,8 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos )
 
     uint32_t i_run_seq = MP4_TrackGetRunSeq( tk );
     mtime_t i_current_nzdts = MP4_TrackGetDTS( p_demux, tk );
-    const mtime_t i_demux_max_nzdts = i_current_nzdts + DEMUX_TRACK_MAX_PRELOAD;
-    for( ; i_demux_max_nzdts > i_current_nzdts; )
+    const mtime_t i_demux_max_nzdts = i_current_nzdts + i_max_preload;
+    for( ; i_demux_max_nzdts >= i_current_nzdts; )
     {
         if( tk->i_sample >= tk->i_sample_count )
             break;
@@ -1219,6 +1220,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_pcr == VLC_TS_INVALID )
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + i_nztime );
 
+    const unsigned i_max_preload = ( p_sys->b_fastseekable ) ? 0 : DEMUX_TRACK_MAX_PRELOAD;
     const mtime_t i_scaledincrement = DEMUX_INCREMENT * p_sys->i_timescale / CLOCK_FREQ;
     int i_status;
     /* demux up to increment amount of data on every track, or just set pcr if empty data */
@@ -1247,7 +1249,7 @@ static int Demux( demux_t *p_demux )
             /* Second pass, refine and find any best candidate having a chunk pos closer than
              * current candidate (avoids seeks when increment falls between the 2) from
              * current position, but within extended interleave time */
-            for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+            for( i_track = 0; i_max_preload > 0 && i_track < p_sys->i_tracks; i_track++ )
             {
                 mp4_track_t *tk_tmp = &p_sys->track[i_track];
                 if( tk_tmp == tk ||
@@ -1267,7 +1269,7 @@ static int Demux( demux_t *p_demux )
             }
 
             uint64_t i_pos = MP4_TrackGetPos( tk );
-            int i_ret = DemuxTrack( p_demux, tk, i_pos );
+            int i_ret = DemuxTrack( p_demux, tk, i_pos, i_max_preload );
             if( i_ret == VLC_DEMUXER_SUCCESS )
                 i_status = VLC_DEMUXER_SUCCESS;
         }
