@@ -741,6 +741,8 @@ static bool hevc_parse_st_ref_pic_set( bs_t *p_bs, unsigned stRpsIdx,
     {
         nal_ue_t num_negative_pics = bs_read_ue( p_bs );
         nal_ue_t num_positive_pics = bs_read_ue( p_bs );
+        if( bs_remain( p_bs ) < ((uint64_t)num_negative_pics + num_positive_pics) * 2 )
+            return false;
         for(unsigned int i=0; i<num_negative_pics; i++)
         {
             (void) bs_read_ue( p_bs ); /* delta_poc_s0_minus1 */
