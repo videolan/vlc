@@ -23,7 +23,7 @@
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "jt.france2.fr/player/" )
+        and string.match( vlc.path, "^www%.francetvinfo%.fr/replay%-jt/.+" )
 end
 
 -- Parse function.

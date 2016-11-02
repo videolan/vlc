@@ -22,8 +22,8 @@
 
 -- Probe function.
 function probe()
-    return vlc.access == "http"
-        and string.match( vlc.path, "video%.mpora%.com/watch/" )
+    return ( vlc.access == "http" or vlc.access == "https" )
+        and string.match( vlc.path, "^mpora%.com/videos/" )
 end
 
 -- Parse function.
