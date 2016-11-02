@@ -1,0 +1,10 @@
+--- gnutls/lib/gnutls.pc.in    2015-11-03 21:47:28.000000000 +0000
++++ gnutls.patched/lib/gnutls.pc.in    2016-11-02 22:53:04.272156182 +0000
+@@ -19,6 +19,6 @@
+ URL: http://www.gnutls.org/
+ Version: @VERSION@
+ Libs: -L${libdir} -lgnutls
+-Libs.private: @LIBZ@ @LIBINTL@ @LIBSOCKET@ @LIBPTHREAD@ @LIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @GMP_LIBS@
++Libs.private: @LIBZ@ @LIBINTL@ @LIBSOCKET@ @LIBPTHREAD@ @LIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @GMP_LIBS@ @NETTLE_LIBS@ @LIBIDN_LIBS@ @HOGWEED_LIBS@
+ @GNUTLS_REQUIRES_PRIVATE@
+ Cflags: -I${includedir}

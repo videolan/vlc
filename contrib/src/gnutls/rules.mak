@@ -38,6 +38,7 @@ ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-osx.patch
 endif
 	$(APPLY) $(SRC)/gnutls/gnutls-libidn.patch
+	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-static.patch
 	$(call pkg_static,"lib/gnutls.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
