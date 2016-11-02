@@ -433,10 +433,14 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
             {
                 p_sps->vui.b_hrd_parameters_present_flag = true;
                 uint32_t count = bs_read_ue( p_bs ) + 1;
+                if( count > 31 )
+                    return false;
                 bs_read( p_bs, 4 );
                 bs_read( p_bs, 4 );
                 for( uint32_t i=0; i<count; i++ )
                 {
+                    if( bs_remain( p_bs ) < 23 )
+                        return false;
                     bs_read_ue( p_bs );
                     bs_read_ue( p_bs );
                     bs_read( p_bs, 1 );
