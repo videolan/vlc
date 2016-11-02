@@ -26,7 +26,7 @@ local fmt = "mp3"
 -- Probe function.
 function probe()
     return ( vlc.access == "http" or vlc.access == "https" )
-        and string.match( vlc.path, "vocaroo%.com/i/" )
+        and string.match( vlc.path, "^vocaroo%.com/i/" )
 end
 
 -- Parse function.
