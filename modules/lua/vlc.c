@@ -492,7 +492,6 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                 {
                     char         *psz_oldurl   = NULL;
                     const char   *psz_path     = NULL;
-                    char         *psz_u8path   = NULL;
                     const char   *psz_name     = NULL;
                     char        **ppsz_options = NULL;
                     int           i_options    = 0;
@@ -517,7 +516,6 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     {
                         if( !lua_isnil( L, -1 ) )
                             msg_Warn( p_this, "Playlist item name should be a string." );
-                        psz_name = NULL;
                     }
 
                     /* Read duration */
@@ -589,7 +587,6 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     while( i_options > 0 )
                         free( ppsz_options[--i_options] );
                     free( ppsz_options );
-                    free( psz_u8path );
                 }
                 else
                 {
