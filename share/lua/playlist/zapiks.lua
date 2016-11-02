@@ -22,10 +22,11 @@
 
 -- Probe function.
 function probe()
+    local path = vlc.path:gsub("^www%.", "")
     return vlc.access == "http"
-        and string.match( vlc.path, "zapiks.fr/(.*).html" )
-            or string.match( vlc.path, "zapiks.fr/view/." )
-            or string.match( vlc.path, "26in.fr/videos/." )
+        and ( string.match( vlc.path, "^zapiks%.fr/(.*)%.html" )
+            or string.match( vlc.path, "^zapiks%.fr/view/.+" )
+            or string.match( vlc.path, "^26in%.fr/videos/.+" ) )
 end
 
 -- Parse function.
