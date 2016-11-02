@@ -939,6 +939,9 @@ static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
         p_pps->uniform_spacing_flag = bs_read1( p_bs );
         if( !p_pps->uniform_spacing_flag )
         {
+            if( bs_remain( p_bs ) < (uint64_t) p_pps->num_tile_columns_minus1 +
+                                               p_pps->num_tile_rows_minus1 + 1 )
+                return false;
             for( unsigned i=0; i< p_pps->num_tile_columns_minus1; i++ )
                 (void) bs_read_ue( p_bs );
             for( unsigned i=0; i< p_pps->num_tile_rows_minus1; i++ )
