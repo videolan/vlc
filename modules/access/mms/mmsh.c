@@ -77,7 +77,6 @@ int MMSHOpen( access_t *p_access )
 {
     access_sys_t    *p_sys;
     char            *psz_location = NULL;
-    char            *psz_proxy;
 
     STANDARD_BLOCK_ACCESS_INIT
 
@@ -87,39 +86,15 @@ int MMSHOpen( access_t *p_access )
 
     /* Handle proxy */
     p_sys->b_proxy = false;
-    memset( &p_sys->proxy, 0, sizeof(p_sys->proxy) );
 
     /* Check proxy */
-    /* TODO reuse instead http-proxy from http access ? */
-    psz_proxy = var_CreateGetNonEmptyString( p_access, "mmsh-proxy" );
-    if( !psz_proxy )
-    {
-        char *psz_http_proxy = var_InheritString( p_access, "http-proxy" );
-        if( psz_http_proxy )
-        {
-            psz_proxy = psz_http_proxy;
-            var_SetString( p_access, "mmsh-proxy", psz_proxy );
-        }
-    }
-
-    if( psz_proxy )
+    char *psz_proxy = vlc_getProxyUrl( p_access->psz_url );
+    if( psz_proxy != NULL )
     {
         p_sys->b_proxy = true;
         vlc_UrlParse( &p_sys->proxy, psz_proxy );
         free( psz_proxy );
-    }
-    else
-    {
-        const char *http_proxy = getenv( "http_proxy" );
-        if( http_proxy )
-        {
-            p_sys->b_proxy = true;
-            vlc_UrlParse( &p_sys->proxy, http_proxy );
-        }
-    }
 
-    if( p_sys->b_proxy )
-    {
         if( ( p_sys->proxy.psz_host == NULL ) ||
             ( *p_sys->proxy.psz_host == '\0' ) )
         {
@@ -172,7 +147,8 @@ int MMSHOpen( access_t *p_access )
     return VLC_SUCCESS;
 
 error:
-    vlc_UrlClean( &p_sys->proxy );
+    if( p_sys->b_proxy )
+        vlc_UrlClean( &p_sys->proxy );
     vlc_UrlClean( &p_sys->url );
     free( p_sys );
     return VLC_EGENERIC;
@@ -189,7 +165,8 @@ void  MMSHClose ( access_t *p_access )
 
     free( p_sys->p_header );
 
-    vlc_UrlClean( &p_sys->proxy );
+    if( p_sys->b_proxy )
+        vlc_UrlClean( &p_sys->proxy );
     vlc_UrlClean( &p_sys->url );
     free( p_sys );
 }

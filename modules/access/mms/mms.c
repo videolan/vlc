@@ -55,12 +55,6 @@ static void Close( vlc_object_t * );
 #define BITRATE_LONGTEXT N_( \
     "Select the stream with the maximum bitrate under that limit."  )
 
-#define PROXY_TEXT N_("HTTP proxy")
-#define PROXY_LONGTEXT N_( \
-    "HTTP proxy to be used It must be of the form " \
-    "http://[user[:pass]@]myproxy.mydomain:myport/ ; " \
-    "if empty, the http_proxy environment variable will be tried." )
-
 #define TIMEOUT_TEXT N_("TCP/UDP timeout (ms)")
 #define TIMEOUT_LONGTEXT N_("Amount of time (in ms) to wait before aborting network reception of data. Note that there will be 10 retries before completely giving up.")
 
@@ -77,8 +71,7 @@ vlc_module_begin ()
     add_bool( "mms-all", false, ALL_TEXT, ALL_LONGTEXT, true )
     add_integer( "mms-maxbitrate", 0, BITRATE_TEXT, BITRATE_LONGTEXT ,
                  false )
-    add_string( "mmsh-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,
-                    false )
+    add_obsolete_string( "mmsh-proxy" ) /* since 3.0.0 */
 
     add_shortcut( "mms", "mmsu", "mmst", "mmsh" )
     set_callbacks( Open, Close )
