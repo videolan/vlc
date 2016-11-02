@@ -1,0 +1,11 @@
+--- zvbi/configure.in   2013-08-28 13:52:48.000000000 +0000
++++ zvbi.patched/configure.in   2016-11-02 21:25:34.292580446 +0000
+@@ -244,7 +244,7 @@
+ dnl
+ HAVE_PNG="yes"
+ AC_CHECK_LIB(png, png_destroy_write_struct,
+-  LIBS="$LIBS -lpng -lz", HAVE_PNG="no", -lz -lm)
++  LIBS="-lpng -lz $LIBS", HAVE_PNG="no", -lz -lm)
+ if test "x$HAVE_PNG" = xyes; then
+   AC_DEFINE(HAVE_LIBPNG, 1, [Define if you have libpng])
+ fi
