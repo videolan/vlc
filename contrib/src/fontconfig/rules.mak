@@ -19,6 +19,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/fontconfig/fontconfig-win32.patch
 	$(APPLY) $(SRC)/fontconfig/fontconfig-noxml2.patch
 endif
+	$(call pkg_static, "fontconfig.pc.in")
 	$(MOVE)
 
 FONTCONFIG_CONF := $(HOSTCONF) \
