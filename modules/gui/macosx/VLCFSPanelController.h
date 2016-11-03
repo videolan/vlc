@@ -46,6 +46,8 @@
 @property IBOutlet NSSlider     *timeSlider;
 @property IBOutlet NSSlider     *volumeSlider;
 
+@property (assign) IBOutlet NSLayoutConstraint *heightMaxConstraint;
+
 - (IBAction)togglePlayPause:(id)sender;
 - (IBAction)jumpForward:(id)sender;
 - (IBAction)jumpBackward:(id)sender;

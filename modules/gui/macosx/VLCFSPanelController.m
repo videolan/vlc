@@ -404,6 +404,11 @@
     /* Inject view in view hierarchy */
     [self.window setContentView:view];
     [self.window.contentView addSubview:_controlsView];
+
+    /* Disable adjusting height to workaround autolayout problems */
+    [_heightMaxConstraint setConstant:42.0];
+    [self.window setMaxSize:NSMakeSize(4068, 80)];
+    [self.window setMinSize:NSMakeSize(480, 80)];
 }
 
 - (void)dealloc

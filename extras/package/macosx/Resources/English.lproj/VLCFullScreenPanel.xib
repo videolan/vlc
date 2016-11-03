@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16A323" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16A323" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -13,6 +14,7 @@
                 <outlet property="controlsView" destination="Npt-C5-K77" id="Dnt-ku-O6u"/>
                 <outlet property="elapsedTime" destination="nJc-M4-sMF" id="DFf-yw-e6A"/>
                 <outlet property="forwardButton" destination="jSN-hV-r5D" id="3PN-jP-xPY"/>
+                <outlet property="heightMaxConstraint" destination="Vwe-uz-fKC" id="yz0-Rh-MKt"/>
                 <outlet property="mediaTitle" destination="Vd8-0f-Usz" id="NZ0-KY-l4T"/>
                 <outlet property="nextButton" destination="2ai-dB-Wpq" id="Axl-RO-LfI"/>
                 <outlet property="playPauseButton" destination="YSL-bH-k6U" id="I6W-Cy-q85"/>
@@ -151,6 +153,7 @@
                             <constraint firstAttribute="bottom" secondItem="TVM-DT-2yo" secondAttribute="bottom" constant="7" id="RYT-zW-Br7"/>
                             <constraint firstItem="2ai-dB-Wpq" firstAttribute="top" secondItem="VLH-qy-cwr" secondAttribute="top" constant="6" id="SQA-fK-Mpa"/>
                             <constraint firstItem="TVM-DT-2yo" firstAttribute="leading" secondItem="Ihl-7x-5mN" secondAttribute="trailing" priority="250" constant="20" id="UBD-5x-a7g"/>
+                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="52" identifier="customViewHeightMax" id="Vwe-uz-fKC"/>
                             <constraint firstAttribute="bottom" secondItem="YSL-bH-k6U" secondAttribute="bottom" constant="7" id="Wu7-Pv-Dqf"/>
                             <constraint firstItem="TVM-DT-2yo" firstAttribute="top" secondItem="VLH-qy-cwr" secondAttribute="top" constant="6" id="YDA-hw-CAe"/>
                             <constraint firstAttribute="bottom" secondItem="2ai-dB-Wpq" secondAttribute="bottom" constant="7" id="ae5-nP-phG"/>
@@ -217,7 +220,7 @@
                 <constraints>
                     <constraint firstItem="T3x-es-c7v" firstAttribute="leading" secondItem="Vd8-0f-Usz" secondAttribute="trailing" constant="5" id="1vL-HQ-doh"/>
                     <constraint firstItem="VLH-qy-cwr" firstAttribute="leading" secondItem="Npt-C5-K77" secondAttribute="leading" id="AXK-9N-Zst"/>
-                    <constraint firstItem="VLH-qy-cwr" firstAttribute="top" secondItem="Npt-C5-K77" secondAttribute="top" constant="38" id="FRE-MB-iBT"/>
+                    <constraint firstItem="VLH-qy-cwr" firstAttribute="top" secondItem="Npt-C5-K77" secondAttribute="top" priority="750" constant="38" id="FRE-MB-iBT"/>
                     <constraint firstItem="f9T-Kg-gn6" firstAttribute="leading" secondItem="Npt-C5-K77" secondAttribute="leading" constant="20" id="Ibl-1I-f2u"/>
                     <constraint firstItem="f9T-Kg-gn6" firstAttribute="top" secondItem="Npt-C5-K77" secondAttribute="top" constant="25" id="N8D-Lc-aKn"/>
                     <constraint firstItem="f9T-Kg-gn6" firstAttribute="top" secondItem="nJc-M4-sMF" secondAttribute="bottom" constant="2" id="Pix-DL-2C0"/>
