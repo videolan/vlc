@@ -394,10 +394,10 @@
 - (void)injectBackgroundView
 {
     /* Setup the view */
-    NSColor *color = [NSColor colorWithCalibratedWhite:0.0 alpha:0.8];
+    CGColorRef color = CGColorCreateGenericGray(0.0, 0.8);
     NSView *view = [[NSView alloc] initWithFrame:self.window.contentView.frame];
     [view setWantsLayer:YES];
-    [view.layer setBackgroundColor:[color CGColor]];
+    [view.layer setBackgroundColor:color];
     [view.layer setCornerRadius:8.0];
     [view setAutoresizesSubviews:YES];
 
