@@ -400,6 +400,7 @@
     [view.layer setBackgroundColor:color];
     [view.layer setCornerRadius:8.0];
     [view setAutoresizesSubviews:YES];
+    CGColorRelease(color);
 
     /* Inject view in view hierarchy */
     [self.window setContentView:view];
