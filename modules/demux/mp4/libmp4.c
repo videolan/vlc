@@ -272,6 +272,12 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
     {
         MP4_Seek( p_stream, i_next - 1 ); /*  since past seek can fail when hitting EOF */
         MP4_Seek( p_stream, i_next );
+        if( vlc_stream_Tell( p_stream ) < i_next - 1 ) /* Truncated box */
+        {
+            msg_Warn( p_stream, "truncated box %4.4s discarded", (char*) &peekbox.i_type );
+            MP4_BoxFree( p_box );
+            p_box = NULL;
+        }
     }
 
     if ( p_box )
