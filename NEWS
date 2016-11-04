@@ -186,6 +186,8 @@ Mac OS X Interface
  * Support for building with disabled sparkle update mechanism
  * New configure flag to disable automatic updates
  * Expanded AppleScript API for menu detection and navigation
+ * New resizable fullscreen controller with improved design
+ * Add status bar icon which displays metadata and play controls
 
 iOS:
  * Dropped support for iOS 6.x
