@@ -687,7 +687,7 @@ bool matroska_segment_c::Preload( )
 
     b_preloaded = true;
 
-    if( cluster == NULL || cluster->IsFiniteSize() )
+    if( cluster && cluster->IsFiniteSize() )
         EnsureDuration();
 
     return true;
