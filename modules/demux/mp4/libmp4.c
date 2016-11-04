@@ -169,6 +169,8 @@ static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_box->i_shortsize == 1 )
     {
+        if( i_read < 8 )
+            return 0;
         /* get the true size on 64 bits */
         MP4_GET8BYTES( p_box->i_size );
     }
@@ -178,8 +180,13 @@ static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
         /* XXX size of 0 means that the box extends to end of file */
     }
 
-    if( p_box->i_type == ATOM_uuid && i_read >= 16 )
+    if( UINT64_MAX - p_box->i_size < p_box->i_pos )
+        return 0;
+
+    if( p_box->i_type == ATOM_uuid )
     {
+        if( i_read < 16 )
+            return 0;
         /* get extented type on 16 bytes */
         GetUUID( &p_box->i_uuid, p_peek );
     }
