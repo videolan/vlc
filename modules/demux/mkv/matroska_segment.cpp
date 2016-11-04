@@ -687,7 +687,7 @@ bool matroska_segment_c::Preload( )
 
     b_preloaded = true;
 
-    if( cluster && cluster->IsFiniteSize() )
+    if( cluster )
         EnsureDuration();
 
     return true;
@@ -981,61 +981,53 @@ void matroska_segment_c::EnsureDuration()
 
     bool b_seekable;
 
-    vlc_stream_Control( sys.demuxer.s, STREAM_CAN_FASTSEEK, &b_seekable );
-    if ( !b_seekable )
+    if( vlc_stream_Control( sys.demuxer.s, STREAM_CAN_FASTSEEK, &b_seekable ) ||
+        !b_seekable )
     {
         msg_Warn( &sys.demuxer, "could not look for the segment duration" );
         return;
     }
 
     uint64 i_current_position = es.I_O().getFilePointer();
-    uint64 i_last_cluster_pos = 0;
+    uint64 i_last_cluster_pos = cluster->GetElementPosition();
 
     // find the last Cluster from the Cues
+
     if ( b_cues && _seeker._cluster_positions.size() )
-    {
         i_last_cluster_pos = *_seeker._cluster_positions.rbegin();
-    }
+    else if( !cluster->IsFiniteSize() )
+        return;
 
-    // find the last Cluster manually
-    if ( !i_last_cluster_pos && cluster != NULL )
+    es.I_O().setFilePointer( i_last_cluster_pos, seek_beginning );
+
+    EbmlParser eparser ( &es, segment, &sys.demuxer, var_InheritBool(
+          &sys.demuxer, "mkv-use-dummy" ) );
+
+    // locate the definitely last cluster in the stream
+
+    while( EbmlElement* el = eparser.Get() )
     {
-        es.I_O().setFilePointer( cluster->GetElementPosition(), seek_beginning );
-
-        EbmlElement* el;
-        EbmlParser ep( &es, segment, &sys.demuxer,
-                             var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
-
-        while( ( el = ep.Get() ) != NULL )
-        {
-            if ( MKV_IS_ID( el, KaxCluster ) )
-            {
-                i_last_cluster_pos = el->GetElementPosition();
-            }
-        }
-    }
-
-    // find the last timecode in the Cluster
-    if ( i_last_cluster_pos )
-    {
-        es.I_O().setFilePointer( i_last_cluster_pos, seek_beginning );
-
-        EbmlParser eparser (
-            &es , segment, &sys.demuxer, var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
-
-        KaxCluster *p_last_cluster = static_cast<KaxCluster*>( eparser.Get() );
-        if( p_last_cluster == NULL )
-            return;
-
-        if( !ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA ) )
-            return;
-
-        if( p_last_cluster->IsFiniteSize() == false )
+        if( !el->IsFiniteSize() && el->GetElementPosition() != i_last_cluster_pos )
         {
             es.I_O().setFilePointer( i_current_position, seek_beginning );
             return;
         }
 
+        if( MKV_IS_ID( el, KaxCluster ) )
+            i_last_cluster_pos = el->GetElementPosition();
+    }
+
+    // find the last timecode in the Cluster
+
+    eparser.Reset( &sys.demuxer );
+    es.I_O().setFilePointer( i_last_cluster_pos, seek_beginning );
+
+    EbmlElement* el = eparser.Get();
+    MKV_CHECKED_PTR_DECL( p_last_cluster, KaxCluster, el );
+
+    if( p_last_cluster &&
+        ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA ) )
+    {
         // use the last block + duration
         uint64 i_last_timecode = p_last_cluster->GlobalTimecode();
         for( unsigned int i = 0; i < p_last_cluster->ListSize(); i++ )
