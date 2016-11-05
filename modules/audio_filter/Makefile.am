@@ -101,7 +101,7 @@ libsamplerate_plugin_la_LIBADD = $(SAMPLERATE_LIBS) $(LIBM)
 libsoxr_plugin_la_SOURCES = audio_filter/resampler/soxr.c
 libsoxr_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SOXR_CFLAGS)
 libsoxr_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(audio_filterdir)'
-libsoxr_plugin_la_LIBADD = $(LIBM) $(SOXR_LIBS)
+libsoxr_plugin_la_LIBADD = $(SOXR_LIBS) $(LIBM)
 
 audio_filter_LTLIBRARIES += \
 	$(LTLIBsamplerate) \
