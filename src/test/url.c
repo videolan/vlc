@@ -23,9 +23,6 @@
 # include "config.h"
 #endif
 
-#undef NDEBUG
-
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,36 +33,35 @@
 
 static int exitcode = 0;
 
+static void test_compare(const char *in, const char *exp, const char *res)
+{
+    if (res == NULL)
+    {
+        if (exp != NULL)
+            fprintf(stderr, "\"%s\" returned NULL, expected \"%s\"", in, exp);
+        else
+            return;
+    }
+    else
+    {
+        if (exp == NULL)
+            fprintf(stderr, "\"%s\" returned \"%s\", expected NULL", in, res);
+        else
+        if (strcmp(res, exp))
+            fprintf(stderr, "\"%s\" returned \"%s\", expected \"%s\"\n", in,
+                    res, exp);
+        else
+            return;
+    }
+    exit(2);
+}
+
 typedef char * (*conv_t) (const char *);
 
 static void test (conv_t f, const char *in, const char *out)
 {
     char *res = f(in);
-
-    if (res == NULL)
-    {
-        if (out == NULL)
-            return; /* good: NULL -> NULL */
-
-        fprintf(stderr, "\"%s\" returned NULL, expected \"%s\"", in, out);
-        exit(2);
-    }
-
-    if (out == NULL)
-    {
-        fprintf(stderr, "\"%s\" returned \"%s\", expected NULL", in, res);
-        free(res);
-        exit(2);
-    }
-
-    if (strcmp(res, out))
-    {
-        fprintf(stderr, "\"%s\" returned \"%s\", expected \"%s\"\n", in, res,
-                out);
-        free(res);
-        exit(2);
-    }
-
+    test_compare(in, out, res);
     free(res);
 }
 
@@ -93,53 +89,58 @@ static inline void test_current_directory_path (const char *in, const char *cwd,
 {
     char *expected_result;
     int val = asprintf (&expected_result, "file://%s/%s", cwd, out);
-    assert (val != -1);
+    if (val < 0)
+        abort();
 
     test (make_URI_def, in, expected_result);
     free(expected_result);
 }
 
-static void test_url_parse(const char* in, const char* protocol, const char* user,
-                           const char* pass, const char* host, unsigned i_port,
-                           const char* path, const char* option )
+static void test_url_parse(const char *in, const char *protocol,
+                           const char *user, const char *pass,
+                           const char *host, unsigned port,
+                           const char *path, const char *option)
 {
-#define CHECK( a, b ) \
-    if (a == NULL) \
-        assert(b == NULL); \
-    else \
-        assert(b != NULL && !strcmp((a), (b)))
-
     vlc_url_t url;
     int ret = vlc_UrlParse(&url, in);
 
     /* XXX: only checking that the port-part is parsed correctly, and
      *      equal to 0, is currently not supported due to the below. */
-    if( !protocol && !user && !pass && !host && !i_port && !path && !option )
+    if (protocol == NULL && user == NULL && pass == NULL && host == NULL
+     && port == 0 && path == NULL && option == NULL)
     {
-        vlc_UrlClean( &url );
-        assert( ret == -1 );
+        vlc_UrlClean(&url);
+
+        if (ret != -1)
+        {
+            fprintf(stderr, "\"%s\" accepted, expected rejection\n", in);
+            exit(2);
+        }
         return;
     }
 
-    CHECK( url.psz_protocol, protocol );
-    CHECK( url.psz_username, user );
-    CHECK( url.psz_password, pass );
+    test_compare(in, url.psz_protocol, protocol);
+    test_compare(in, url.psz_username, user);
+    test_compare(in, url.psz_password, pass);
 
     if (ret != 0 && errno == ENOSYS)
     {
-        assert(url.psz_host == NULL);
+        test_compare(in, url.psz_host, NULL);
         exitcode = 77;
     }
     else
-        CHECK(url.psz_host, host);
+        test_compare(in, url.psz_host, host);
 
-    CHECK( url.psz_path, path );
-    assert( url.i_port == i_port );
-    CHECK( url.psz_option, option );
+    if (url.i_port != port)
+    {
+        fprintf(stderr, "\"%s\" returned %u, expected %u\n", in, url.i_port,
+                port);
+        exit(2);
+    }
 
-    vlc_UrlClean( &url );
-
-#undef CHECK
+    test_compare(in, url.psz_path, path);
+    test_compare(in, url.psz_option, option);
+    vlc_UrlClean(&url);
 }
 
 static char *vlc_uri_resolve_rfc3986_test(const char *in)
@@ -159,8 +160,6 @@ static void test_fixup_noop(const char *expected)
 
 int main (void)
 {
-    int val;
-
     (void)setvbuf (stdout, NULL, _IONBF, 0);
     test_decode ("this_should_not_be_modified_1234",
                  "this_should_not_be_modified_1234");
@@ -206,15 +205,22 @@ int main (void)
 
     /*int fd = open (".", O_RDONLY);
     assert (fd != -1);*/
-    val = chdir ("/tmp");
-    assert (val != -1);
-
-    char buf[256];
-    char * tmpdir;
-    tmpdir = getcwd(buf, sizeof(buf)/sizeof(*buf));
-    assert (tmpdir);
 
 #ifndef _WIN32 /* FIXME: deal with anti-slashes */
+    if (chdir ("/tmp"))
+    {
+        perror("/tmp");
+        exit(1);
+    }
+
+    char buf[256];
+    char *tmpdir = getcwd(buf, sizeof (buf) / sizeof (*buf));
+    if (tmpdir == NULL)
+    {
+        perror("getcwd");
+        exit(1);
+    }
+
     test_current_directory_path ("movie.ogg", tmpdir, "movie.ogg");
     test_current_directory_path (".", tmpdir, ".");
     test_current_directory_path ("", tmpdir, "");
