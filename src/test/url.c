@@ -142,38 +142,19 @@ static void test_url_parse(const char* in, const char* protocol, const char* use
 #undef CHECK
 }
 
-static void test_url_resolve(const char *base, const char *reference,
-                             const char *expected)
+static char *vlc_uri_resolve_rfc3986_test(const char *in)
 {
-    fprintf(stderr, "(%s) \"%s\" -> \"%s\" ?\n", base, reference, expected);
-
-    char *result = vlc_uri_resolve(base, reference);
-    assert(result != NULL);
-    if (strcmp(result, expected))
-    {
-        fprintf(stderr, " ERROR: got \"%s\"\n", result);
-        abort();
-    }
-    free(result);
+    return vlc_uri_resolve("http://a/b/c/d;p?q", in);
 }
 
 static void test_rfc3986(const char *reference, const char *expected)
 {
-    test_url_resolve("http://a/b/c/d;p?q", reference, expected);
+    test(vlc_uri_resolve_rfc3986_test, reference, expected);
 }
 
 static void test_fixup_noop(const char *expected)
 {
-    fprintf(stderr, "\"%s\" -> \"%s\" ?\n", expected, expected);
-
-    char *result = vlc_uri_fixup(expected);
-    assert(result != NULL);
-    if (strcmp(result, expected))
-    {
-        fprintf(stderr, " ERROR: got \"%s\"\n", result);
-        abort();
-    }
-    free(result);
+    test(vlc_uri_fixup, expected, expected);
 }
 
 int main (void)
