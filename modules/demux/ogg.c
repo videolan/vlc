@@ -249,7 +249,7 @@ static int Open( vlc_object_t * p_this )
 
     while ( !p_sys->b_preparsing_done && p_demux->pf_demux( p_demux ) > 0 )
     {}
-    if ( p_sys->b_preparsing_done && p_demux->p_input->b_preparsing )
+    if ( p_sys->b_preparsing_done && p_demux->b_preparsing )
         Ogg_CreateES( p_demux );
 
     return VLC_SUCCESS;
