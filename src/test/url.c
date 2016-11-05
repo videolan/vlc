@@ -40,27 +40,33 @@ typedef char * (*conv_t) (const char *);
 
 static void test (conv_t f, const char *in, const char *out)
 {
-    char *res;
+    char *res = f(in);
 
-    if (out != NULL)
-       printf ("\"%s\" -> \"%s\" ?\n", in, out);
-    else
-       printf ("\"%s\" -> NULL ?\n", in);
-    res = f (in);
     if (res == NULL)
     {
         if (out == NULL)
             return; /* good: NULL -> NULL */
-        puts (" ERROR: got NULL");
-        exit (2);
-    }
-    if (out == NULL || strcmp (res, out))
-    {
-        printf (" ERROR: got \"%s\"\n", res);
-        exit (2);
+
+        fprintf(stderr, "\"%s\" returned NULL, expected \"%s\"", in, out);
+        exit(2);
     }
 
-    free (res);
+    if (out == NULL)
+    {
+        fprintf(stderr, "\"%s\" returned \"%s\", expected NULL", in, res);
+        free(res);
+        exit(2);
+    }
+
+    if (strcmp(res, out))
+    {
+        fprintf(stderr, "\"%s\" returned \"%s\", expected \"%s\"\n", in, res,
+                out);
+        free(res);
+        exit(2);
+    }
+
+    free(res);
 }
 
 static inline void test_decode (const char *in, const char *out)
