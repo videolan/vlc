@@ -213,11 +213,6 @@ static inline input_attachment_t *vlc_input_attachment_Duplicate( const input_at
  *****************************************************************************/
 
 /**
- * This defines private core storage for an input.
- */
-typedef struct input_thread_private_t input_thread_private_t;
-
-/**
  * This defines an opaque input resource handler.
  */
 typedef struct input_resource_t input_resource_t;
@@ -231,10 +226,6 @@ struct input_thread_t
     VLC_COMMON_MEMBERS
 
     bool b_preparsing;
-
-    /* All other data is input_thread is PRIVATE. You can't access it
-     * outside of src/input */
-    input_thread_private_t *p;
 };
 
 /**

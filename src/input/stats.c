@@ -80,43 +80,45 @@ input_stats_t *stats_NewInputStats( input_thread_t *p_input )
 
 void stats_ComputeInputStats(input_thread_t *input, input_stats_t *st)
 {
+    input_thread_private_t *priv = input_priv(input);
+
     if (!libvlc_stats(input))
         return;
 
-    vlc_mutex_lock(&input->p->counters.counters_lock);
+    vlc_mutex_lock(&priv->counters.counters_lock);
     vlc_mutex_lock(&st->lock);
 
     /* Input */
-    st->i_read_packets = stats_GetTotal(input->p->counters.p_read_packets);
-    st->i_read_bytes = stats_GetTotal(input->p->counters.p_read_bytes);
-    st->f_input_bitrate = stats_GetRate(input->p->counters.p_input_bitrate);
-    st->i_demux_read_bytes = stats_GetTotal(input->p->counters.p_demux_read);
-    st->f_demux_bitrate = stats_GetRate(input->p->counters.p_demux_bitrate);
-    st->i_demux_corrupted = stats_GetTotal(input->p->counters.p_demux_corrupted);
-    st->i_demux_discontinuity = stats_GetTotal(input->p->counters.p_demux_discontinuity);
+    st->i_read_packets = stats_GetTotal(priv->counters.p_read_packets);
+    st->i_read_bytes = stats_GetTotal(priv->counters.p_read_bytes);
+    st->f_input_bitrate = stats_GetRate(priv->counters.p_input_bitrate);
+    st->i_demux_read_bytes = stats_GetTotal(priv->counters.p_demux_read);
+    st->f_demux_bitrate = stats_GetRate(priv->counters.p_demux_bitrate);
+    st->i_demux_corrupted = stats_GetTotal(priv->counters.p_demux_corrupted);
+    st->i_demux_discontinuity = stats_GetTotal(priv->counters.p_demux_discontinuity);
 
     /* Decoders */
-    st->i_decoded_video = stats_GetTotal(input->p->counters.p_decoded_video);
-    st->i_decoded_audio = stats_GetTotal(input->p->counters.p_decoded_audio);
+    st->i_decoded_video = stats_GetTotal(priv->counters.p_decoded_video);
+    st->i_decoded_audio = stats_GetTotal(priv->counters.p_decoded_audio);
 
     /* Sout */
-    if (input->p->counters.p_sout_send_bitrate)
+    if (priv->counters.p_sout_send_bitrate)
     {
-        st->i_sent_packets = stats_GetTotal(input->p->counters.p_sout_sent_packets);
-        st->i_sent_bytes = stats_GetTotal(input->p->counters.p_sout_sent_bytes);
-        st->f_send_bitrate = stats_GetRate(input->p->counters.p_sout_send_bitrate);
+        st->i_sent_packets = stats_GetTotal(priv->counters.p_sout_sent_packets);
+        st->i_sent_bytes = stats_GetTotal(priv->counters.p_sout_sent_bytes);
+        st->f_send_bitrate = stats_GetRate(priv->counters.p_sout_send_bitrate);
     }
 
     /* Aout */
-    st->i_played_abuffers = stats_GetTotal(input->p->counters.p_played_abuffers);
-    st->i_lost_abuffers = stats_GetTotal(input->p->counters.p_lost_abuffers);
+    st->i_played_abuffers = stats_GetTotal(priv->counters.p_played_abuffers);
+    st->i_lost_abuffers = stats_GetTotal(priv->counters.p_lost_abuffers);
 
     /* Vouts */
-    st->i_displayed_pictures = stats_GetTotal(input->p->counters.p_displayed_pictures);
-    st->i_lost_pictures = stats_GetTotal(input->p->counters.p_lost_pictures);
+    st->i_displayed_pictures = stats_GetTotal(priv->counters.p_displayed_pictures);
+    st->i_lost_pictures = stats_GetTotal(priv->counters.p_lost_pictures);
 
     vlc_mutex_unlock(&st->lock);
-    vlc_mutex_unlock(&input->p->counters.counters_lock);
+    vlc_mutex_unlock(&priv->counters.counters_lock);
 }
 
 void stats_ReinitInputStats( input_stats_t *p_stats )

@@ -24,6 +24,8 @@
 #ifndef LIBVLC_INPUT_INTERNAL_H
 #define LIBVLC_INPUT_INTERNAL_H 1
 
+#include <stddef.h>
+
 #include <vlc_access.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
@@ -79,8 +81,10 @@ typedef struct
 } input_control_t;
 
 /** Private input fields */
-struct input_thread_private_t
+typedef struct input_thread_private_t
 {
+    struct input_thread_t input;
+
     /* Global properties */
     bool        b_can_pause;
     bool        b_can_rate_control;
@@ -167,7 +171,12 @@ struct input_thread_private_t
 
     vlc_thread_t thread;
     vlc_interrupt_t interrupt;
-};
+} input_thread_private_t;
+
+static inline input_thread_private_t *input_priv(input_thread_t *input)
+{
+    return (void *)(((char *)input) - offsetof(input_thread_private_t, input));
+}
 
 /***************************************************************************
  * Internal control helpers

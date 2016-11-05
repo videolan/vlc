@@ -388,7 +388,7 @@ static void EsOutTerminate( es_out_t *out )
 
     p_sys->p_pgrm = NULL;
 
-    input_item_SetEpgOffline( p_sys->p_input->p->p_item );
+    input_item_SetEpgOffline( input_priv(p_sys->p_input)->p_item );
     input_SendEventMetaEpg( p_sys->p_input );
 }
 
@@ -403,10 +403,10 @@ static mtime_t EsOutGetWakeup( es_out_t *out )
     /* We do not have a wake up date if the input cannot have its speed
      * controlled or sout is imposing its own or while buffering
      *
-     * FIXME for !p_input->p->b_can_pace_control a wake-up time is still needed
+     * FIXME for !input_priv(p_input)->b_can_pace_control a wake-up time is still needed
      * to avoid too heavy buffering */
-    if( !p_input->p->b_can_pace_control ||
-        p_input->p->b_out_pace_control ||
+    if( !input_priv(p_input)->b_can_pace_control ||
+        input_priv(p_input)->b_out_pace_control ||
         p_sys->b_buffering )
         return 0;
 
@@ -567,7 +567,7 @@ static void EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
             if( !i_ret )
             {
                 /* FIXME pcr != exactly what wanted */
-                const mtime_t i_used = /*(i_stream_duration - p_sys->p_input->p->i_pts_delay)*/ p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial;
+                const mtime_t i_used = /*(i_stream_duration - input_priv(p_sys->p_input)->i_pts_delay)*/ p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial;
                 i_date -= i_used;
             }
             p_sys->i_buffering_extra_initial = 0;
@@ -695,7 +695,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
               (int)(mdate() - i_decoder_buffering_start)/1000 );
 
     /* Here is a good place to destroy unused vout with every demuxer */
-    input_resource_TerminateVout( p_sys->p_input->p->p_resource );
+    input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
 
     /* */
     const mtime_t i_wakeup_delay = 10*1000; /* FIXME CLEANUP thread wake up time*/
@@ -1056,9 +1056,9 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     }
 
     /* Update now playing */
-    input_item_SetESNowPlaying( p_input->p->p_item,
+    input_item_SetESNowPlaying( input_priv(p_input)->p_item,
                                 p_pgrm->p_meta ? vlc_meta_Get( p_pgrm->p_meta, vlc_meta_ESNowPlaying ) : NULL );
-    input_item_SetPublisher( p_input->p->p_item,
+    input_item_SetPublisher( input_priv(p_input)->p_item,
                              p_pgrm->p_meta ? vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Publisher ) : NULL);
 
     input_SendEventMeta( p_input );
@@ -1305,7 +1305,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     {
         if( p_sys->p_pgrm == p_pgrm )
         {
-            input_item_SetPublisher( p_input->p->p_item, psz_provider );
+            input_item_SetPublisher( input_priv(p_input)->p_item, psz_provider );
             input_SendEventMeta( p_input );
         }
         if( p_cat )
@@ -1320,7 +1320,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
-    input_item_t      *p_item = p_input->p->p_item;
+    input_item_t      *p_item = input_priv(p_input)->p_item;
     es_out_pgrm_t     *p_pgrm;
     char *psz_cat;
 
@@ -1372,7 +1372,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
                                  vlc_meta_Get( p_pgrm->p_meta, vlc_meta_ESNowPlaying ) : NULL;
     if( p_pgrm == p_sys->p_pgrm )
     {
-        input_item_SetESNowPlaying( p_input->p->p_item, psz_nowplaying );
+        input_item_SetESNowPlaying( input_priv(p_input)->p_item, psz_nowplaying );
         input_SendEventMeta( p_input );
     }
 
@@ -1444,7 +1444,7 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
     if( psz_arturl != NULL && !strncmp( psz_arturl, "attachment://", 13 ) )
     {   /* Clear art cover if streaming out.
          * FIXME: Why? Remove this when sout gets meta data support. */
-        if( p_input->p->p_sout && !p_input->b_preparsing )
+        if( input_priv(p_input)->p_sout && !p_input->b_preparsing )
             input_item_SetArtURL( p_item, NULL );
         else
             input_ExtractAttachmentAndCacheArt( p_input, psz_arturl + 13 );
@@ -1535,9 +1535,9 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
         es->i_channel = p_sys->audio.i_count;
 
         memset( &rg, 0, sizeof(rg) );
-        vlc_mutex_lock( &p_input->p->p_item->lock );
-        vlc_audio_replay_gain_MergeFromMeta( &rg, p_input->p->p_item->p_meta );
-        vlc_mutex_unlock( &p_input->p->p_item->lock );
+        vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
+        vlc_audio_replay_gain_MergeFromMeta( &rg, input_priv(p_input)->p_item->p_meta );
+        vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
 
         for( i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
         {
@@ -1632,7 +1632,7 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
 
-    p_es->p_dec = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_input->p->p_sout );
+    p_es->p_dec = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, input_priv(p_input)->p_sout );
     if( p_es->p_dec )
     {
         if( p_sys->b_buffering )
@@ -1688,7 +1688,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     }
     else
     {
-        const bool b_sout = p_input->p->p_sout != NULL;
+        const bool b_sout = input_priv(p_input)->p_sout != NULL;
         if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
         {
             if( !var_GetBool( p_input, b_sout ? "sout-video" : "video" ) )
@@ -1937,22 +1937,22 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     {
         uint64_t i_total;
 
-        vlc_mutex_lock( &p_input->p->counters.counters_lock );
-        stats_Update( p_input->p->counters.p_demux_read,
+        vlc_mutex_lock( &input_priv(p_input)->counters.counters_lock );
+        stats_Update( input_priv(p_input)->counters.p_demux_read,
                       p_block->i_buffer, &i_total );
-        stats_Update( p_input->p->counters.p_demux_bitrate, i_total, NULL );
+        stats_Update( input_priv(p_input)->counters.p_demux_bitrate, i_total, NULL );
 
         /* Update number of corrupted data packats */
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
-            stats_Update( p_input->p->counters.p_demux_corrupted, 1, NULL );
+            stats_Update( input_priv(p_input)->counters.p_demux_corrupted, 1, NULL );
         }
         /* Update number of discontinuities */
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         {
-            stats_Update( p_input->p->counters.p_demux_discontinuity, 1, NULL );
+            stats_Update( input_priv(p_input)->counters.p_demux_discontinuity, 1, NULL );
         }
-        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+        vlc_mutex_unlock( &input_priv(p_input)->counters.counters_lock );
     }
 
     vlc_mutex_lock( &p_sys->lock );
@@ -1976,20 +1976,20 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     }
 
     /* Check for sout mode */
-    if( p_input->p->p_sout )
+    if( input_priv(p_input)->p_sout )
     {
         /* FIXME review this, proper lock may be missing */
-        if( p_input->p->p_sout->i_out_pace_nocontrol > 0 &&
-            p_input->p->b_out_pace_control )
+        if( input_priv(p_input)->p_sout->i_out_pace_nocontrol > 0 &&
+            input_priv(p_input)->b_out_pace_control )
         {
             msg_Dbg( p_input, "switching to sync mode" );
-            p_input->p->b_out_pace_control = false;
+            input_priv(p_input)->b_out_pace_control = false;
         }
-        else if( p_input->p->p_sout->i_out_pace_nocontrol <= 0 &&
-                 !p_input->p->b_out_pace_control )
+        else if( input_priv(p_input)->p_sout->i_out_pace_nocontrol <= 0 &&
+                 !input_priv(p_input)->b_out_pace_control )
         {
             msg_Dbg( p_input, "switching to async mode" );
-            p_input->p->b_out_pace_control = true;
+            input_priv(p_input)->b_out_pace_control = true;
         }
     }
 
@@ -1999,10 +1999,10 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         block_t *p_dup = block_Duplicate( p_block );
         if( p_dup )
             input_DecoderDecode( es->p_dec_record, p_dup,
-                                 p_input->p->b_out_pace_control );
+                                 input_priv(p_input)->b_out_pace_control );
     }
     input_DecoderDecode( es->p_dec, p_block,
-                         p_input->p->b_out_pace_control );
+                         input_priv(p_input)->b_out_pace_control );
 
     es_format_t fmt_dsc;
     vlc_meta_t  *p_meta_dsc;
@@ -2202,7 +2202,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                     break;
             }
             if( i >= p_sys->i_es )
-                input_resource_TerminateVout( p_sys->p_input->p->p_resource );
+                input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
         }
         p_sys->b_active = i_mode != ES_OUT_MODE_NONE;
         p_sys->i_mode = i_mode;
@@ -2351,7 +2351,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         bool b_late;
         input_clock_Update( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
                             &b_late,
-                            p_sys->p_input->p->b_can_pace_control || p_sys->b_buffering,
+                            input_priv(p_sys->p_input)->b_can_pace_control || p_sys->b_buffering,
                             EsOutIsExtraBufferingAllowed( out ),
                             i_pcr, mdate() );
 
@@ -2365,8 +2365,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         }
         else if( p_pgrm == p_sys->p_pgrm )
         {
-            if( b_late && ( !p_sys->p_input->p->p_sout ||
-                                 !p_sys->p_input->p->b_out_pace_control ) )
+            if( b_late && ( !input_priv(p_sys->p_input)->p_sout ||
+                            !input_priv(p_sys->p_input)->b_out_pace_control ) )
             {
                 const mtime_t i_pts_delay_base = p_sys->i_pts_delay - p_sys->i_pts_jitter;
                 mtime_t i_pts_delay = input_clock_GetJitter( p_pgrm->p_clock );
@@ -2529,7 +2529,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         /* Clean up vout after user action (in active mode only).
          * FIXME it does not work well with multiple video windows */
         if( p_sys->b_active )
-            input_resource_TerminateVout( p_sys->p_input->p->p_resource );
+            input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
         return i_ret;
     }
 
@@ -2639,8 +2639,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             mtime_t i_delay;
 
             /* Fix for buffering delay */
-            if( !p_sys->p_input->p->p_sout ||
-                !p_sys->p_input->p->b_out_pace_control )
+            if( !input_priv(p_sys->p_input)->p_sout ||
+                !input_priv(p_sys->p_input)->b_out_pace_control )
                 i_delay = EsOutGetBuffering( out );
             else
                 i_delay = 0;
