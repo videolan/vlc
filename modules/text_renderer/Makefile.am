@@ -9,7 +9,7 @@ libfreetype_plugin_la_SOURCES = \
 	text_renderer/freetype/text_layout.c text_renderer/freetype/text_layout.h
 
 libfreetype_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(FREETYPE_CFLAGS)
-libfreetype_plugin_la_LIBADD =
+libfreetype_plugin_la_LIBADD = $(LIBM) $(FREETYPE_LIBS)
 libfreetype_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(FREETYPE_LDFLAGS) -rpath '$(textdir)'
 
 if HAVE_WIN32_DESKTOP
@@ -19,7 +19,7 @@ endif
 if HAVE_FONTCONFIG
 libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/fontconfig.c
 libfreetype_plugin_la_CPPFLAGS += -DHAVE_FONTCONFIG
-libfreetype_plugin_la_LIBADD += -lfontconfig $(LIBXML2_LIBS)
+libfreetype_plugin_la_LIBADD += -lfontconfig
 endif
 if HAVE_ANDROID
 libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/android.c
@@ -36,7 +36,6 @@ if HAVE_HARFBUZZ
 libfreetype_plugin_la_CPPFLAGS += $(HARFBUZZ_CFLAGS) -DHAVE_HARFBUZZ
 libfreetype_plugin_la_LIBADD += $(HARFBUZZ_LIBS)
 endif
-libfreetype_plugin_la_LIBADD += $(LIBM) $(LIBS_freetype) $(FREETYPE_LIBS)
 if HAVE_FREETYPE
 text_LTLIBRARIES += libfreetype_plugin.la
 endif
