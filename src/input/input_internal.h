@@ -86,6 +86,7 @@ typedef struct input_thread_private_t
     struct input_thread_t input;
 
     /* Global properties */
+    bool        b_preparsing;
     bool        b_can_pause;
     bool        b_can_rate_control;
     bool        b_can_pace_control;

@@ -216,7 +216,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
     /* Add all callbacks
      * XXX we put callback only in non preparsing mode. We need to create the variable
      * unless someone want to check all var_Get/var_Change return value ... */
-    if( !p_input->b_preparsing )
+    if( !input_priv(p_input)->b_preparsing )
         InputAddCallbacks( p_input, p_input_callbacks );
 }
 
@@ -228,7 +228,7 @@ void input_ControlVarStop( input_thread_t *p_input )
     demux_t* p_demux  = input_priv(p_input)->master->p_demux;
     int i_cur_title;
 
-    if( !p_input->b_preparsing )
+    if( !input_priv(p_input)->b_preparsing )
         InputDelCallbacks( p_input, p_input_callbacks );
 
     if( input_priv(p_input)->i_title > 1 )
@@ -423,7 +423,7 @@ void input_ConfigVarInit ( input_thread_t *p_input )
 {
     /* Create Object Variables for private use only */
 
-    if( !p_input->b_preparsing )
+    if( !input_priv(p_input)->b_preparsing )
     {
         var_Create( p_input, "video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Create( p_input, "audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );

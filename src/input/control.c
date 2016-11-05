@@ -163,7 +163,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                                             "%s", psz_value );
             free( psz_value );
 
-            if( !p_input->b_preparsing && !i_ret )
+            if( !priv->b_preparsing && !i_ret )
                 input_SendEventMetaInfo( p_input );
             return i_ret;
         }
@@ -177,7 +177,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             else
                 input_item_MergeInfos( priv->p_item, p_cat );
 
-            if( !p_input->b_preparsing )
+            if( !priv->b_preparsing )
                 input_SendEventMetaInfo( p_input );
             return VLC_SUCCESS;
         }
@@ -188,7 +188,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             int i_ret = input_item_DelInfo( priv->p_item, psz_cat, psz_name );
 
-            if( !p_input->b_preparsing && !i_ret )
+            if( !priv->b_preparsing && !i_ret )
                 input_SendEventMetaInfo( p_input );
             return i_ret;
         }
@@ -213,7 +213,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             input_item_SetName( priv->p_item, psz_name );
 
-            if( !p_input->b_preparsing )
+            if( !priv->b_preparsing )
                 input_SendEventMetaName( p_input, psz_name );
             return VLC_SUCCESS;
         }

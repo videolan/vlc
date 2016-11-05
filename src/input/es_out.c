@@ -269,7 +269,7 @@ static void EsOutPropsInit( es_out_es_props_t *p_props,
     p_props->i_demux_id = -1;
     p_props->p_main_es = NULL;
 
-    if( !p_input->b_preparsing && psz_langvar )
+    if( !input_priv(p_input)->b_preparsing && psz_langvar )
     {
         char *psz_string = var_GetString( p_input, psz_langvar );
         p_props->ppsz_language = LanguageSplit( psz_string );

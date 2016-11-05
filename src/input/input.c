@@ -169,7 +169,7 @@ int input_Start( input_thread_t *p_input )
     input_thread_private_t *priv = input_priv(p_input);
     void *(*func)(void *) = Run;
 
-    if( p_input->b_preparsing )
+    if( priv->b_preparsing )
         func = Preparse;
 
     assert( !priv->is_running );
@@ -293,17 +293,18 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     snprintf( psz_timer_name, sizeof(psz_timer_name),
               "input launching for '%s'", psz_name );
 
-    msg_Dbg( p_input, "Creating an input for %s'%s'", b_preparsing ? "preparsing " : "", psz_name);
+    msg_Dbg( p_input, "Creating an input for %s'%s'",
+             b_preparsing ? "preparsing " : "", psz_name);
 
     free( psz_name );
 
     /* Parse input options */
     input_item_ApplyOptions( VLC_OBJECT(p_input), p_item );
 
-    p_input->b_preparsing = b_preparsing;
     p_input->obj.header = psz_header ? strdup( psz_header ) : NULL;
 
     /* Init Common fields */
+    priv->b_preparsing = b_preparsing;
     priv->b_can_pace_control = true;
     priv->i_start = 0;
     priv->i_time  = 0;
@@ -335,7 +336,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* setup the preparse depth of the item
      * if we are preparsing, use the i_preparse_depth of the parent item */
-    if( !p_input->b_preparsing )
+    if( !priv->b_preparsing )
     {
         char *psz_rec = var_InheritString( p_parent, "recursive" );
 
@@ -351,9 +352,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
         } else
             p_item->i_preparse_depth = -1;
     }
-
-    /* */
-    if( p_input->b_preparsing )
+    else
         p_input->obj.flags |= OBJECT_FLAGS_QUIET | OBJECT_FLAGS_NOINTERACT;
 
     /* Make sure the interaction option is honored */
@@ -399,7 +398,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_ControlVarInit( p_input );
 
     /* */
-    if( !p_input->b_preparsing )
+    if( !priv->b_preparsing )
     {
         char *psz_bookmarks = var_GetNonEmptyString( p_input, "bookmarks" );
         if( psz_bookmarks )
@@ -789,7 +788,7 @@ static void InitStatistics( input_thread_t *p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
 
-    if( p_input->b_preparsing ) return;
+    if( priv->b_preparsing ) return;
 
     /* Prepare statistics */
 #define INIT_COUNTER( c, compute ) priv->counters.p_##c = \
@@ -821,7 +820,7 @@ static int InitSout( input_thread_t * p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
 
-    if( p_input->b_preparsing )
+    if( priv->b_preparsing )
         return VLC_SUCCESS;
 
     /* Find a usable sout and attach it to p_input */
@@ -859,7 +858,7 @@ static void InitTitle( input_thread_t * p_input )
     input_thread_private_t *priv = input_priv(p_input);
     input_source_t *p_master = priv->master;
 
-    if( p_input->b_preparsing )
+    if( priv->b_preparsing )
         return;
 
     vlc_mutex_lock( &priv->p_item->lock );
@@ -1312,7 +1311,7 @@ static int Init( input_thread_t * p_input )
 
     input_SendEventPosition( p_input, 0.0, 0 );
 
-    if( !p_input->b_preparsing )
+    if( !priv->b_preparsing )
     {
         StartTitle( p_input );
         SetSubtitlesOptions( p_input );
@@ -1327,7 +1326,7 @@ static int Init( input_thread_t * p_input )
         }
     }
 
-    if( !p_input->b_preparsing && input_priv(p_input)->p_sout )
+    if( !priv->b_preparsing && priv->p_sout )
     {
         priv->b_out_pace_control = priv->p_sout->i_out_pace_nocontrol > 0;
 
@@ -1376,7 +1375,7 @@ error:
             input_resource_Terminate( input_priv(p_input)->p_resource_private );
     }
 
-    if( !p_input->b_preparsing && libvlc_stats( p_input ) )
+    if( !priv->b_preparsing && libvlc_stats( p_input ) )
     {
 #define EXIT_COUNTER( c ) do { if( input_priv(p_input)->counters.p_##c ) \
                                    stats_CounterClean( input_priv(p_input)->counters.p_##c );\
@@ -1441,7 +1440,7 @@ static void End( input_thread_t * p_input )
         es_out_Delete( priv->p_es_out );
     es_out_SetMode( priv->p_es_out_display, ES_OUT_MODE_END );
 
-    if( !p_input->b_preparsing )
+    if( !priv->b_preparsing )
     {
 #define CL_CO( c ) \
 do { \
@@ -2297,7 +2296,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
 
     in->p_demux = input_DemuxNew( VLC_OBJECT(in), psz_access, psz_demux,
                                   psz_path, input_priv(p_input)->p_es_out,
-                                  p_input->b_preparsing, p_input );
+                                  input_priv(p_input)->b_preparsing, p_input );
     free( psz_dup );
 
     if( in->p_demux == NULL )
@@ -2367,7 +2366,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
 
     /* get attachment
      * FIXME improve for b_preparsing: move it after GET_META and check psz_arturl */
-    if( !p_input->b_preparsing )
+    if( !input_priv(p_input)->b_preparsing )
     {
         if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
                            &in->title, &in->i_title,

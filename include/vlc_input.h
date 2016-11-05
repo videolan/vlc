@@ -224,8 +224,6 @@ typedef struct input_resource_t input_resource_t;
 struct input_thread_t
 {
     VLC_COMMON_MEMBERS
-
-    bool b_preparsing;
 };
 
 /**
