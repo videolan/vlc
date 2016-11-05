@@ -114,7 +114,7 @@ EXTRA_LTLIBRARIES += \
 
 libspeex_resampler_plugin_la_SOURCES = audio_filter/resampler/speex.c
 libspeex_resampler_plugin_la_CFLAGS = $(AM_CFLAGS) $(SPEEXDSP_CFLAGS)
-libspeex_resampler_plugin_la_LIBADD = $(SPEEXDSP_LIBS)
+libspeex_resampler_plugin_la_LIBADD = $(SPEEXDSP_LIBS) $(LIBM)
 if HAVE_SPEEXDSP
 audio_filter_LTLIBRARIES += libspeex_resampler_plugin.la
 endif
