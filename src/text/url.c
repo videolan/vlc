@@ -862,6 +862,9 @@ static char *vlc_idna_to_ascii (const char *idn)
 #elif defined (_WIN32) && (_WIN32_WINNT >= 0x0601)
     char *ret = NULL;
 
+    if (idn[0] == '\0')
+        return strdup("");
+
     wchar_t *wide = ToWide (idn);
     if (wide == NULL)
         return NULL;
