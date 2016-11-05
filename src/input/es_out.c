@@ -1444,7 +1444,7 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
     if( psz_arturl != NULL && !strncmp( psz_arturl, "attachment://", 13 ) )
     {   /* Clear art cover if streaming out.
          * FIXME: Why? Remove this when sout gets meta data support. */
-        if( input_priv(p_input)->p_sout && !p_input->b_preparsing )
+        if( input_priv(p_input)->p_sout != NULL )
             input_item_SetArtURL( p_item, NULL );
         else
             input_ExtractAttachmentAndCacheArt( p_input, psz_arturl + 13 );
