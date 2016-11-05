@@ -785,12 +785,14 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     }
 }
 
-static void InitStatistics( input_thread_t * p_input )
+static void InitStatistics( input_thread_t *p_input )
 {
+    input_thread_private_t *priv = input_priv(p_input);
+
     if( p_input->b_preparsing ) return;
 
     /* Prepare statistics */
-#define INIT_COUNTER( c, compute ) input_priv(p_input)->counters.p_##c = \
+#define INIT_COUNTER( c, compute ) priv->counters.p_##c = \
  stats_CounterCreate( STATS_##compute);
     if( libvlc_stats( p_input ) )
     {
@@ -808,24 +810,26 @@ static void InitStatistics( input_thread_t * p_input )
         INIT_COUNTER( decoded_audio, COUNTER );
         INIT_COUNTER( decoded_video, COUNTER );
         INIT_COUNTER( decoded_sub, COUNTER );
-        input_priv(p_input)->counters.p_sout_send_bitrate = NULL;
-        input_priv(p_input)->counters.p_sout_sent_packets = NULL;
-        input_priv(p_input)->counters.p_sout_sent_bytes = NULL;
+        priv->counters.p_sout_send_bitrate = NULL;
+        priv->counters.p_sout_sent_packets = NULL;
+        priv->counters.p_sout_sent_bytes = NULL;
     }
 }
 
 #ifdef ENABLE_SOUT
 static int InitSout( input_thread_t * p_input )
 {
+    input_thread_private_t *priv = input_priv(p_input);
+
     if( p_input->b_preparsing )
         return VLC_SUCCESS;
 
     /* Find a usable sout and attach it to p_input */
     char *psz = var_GetNonEmptyString( p_input, "sout" );
-    if( psz && strncasecmp( input_priv(p_input)->p_item->psz_uri, "vlc:", 4 ) )
+    if( psz && strncasecmp( priv->p_item->psz_uri, "vlc:", 4 ) )
     {
-        input_priv(p_input)->p_sout  = input_resource_RequestSout( input_priv(p_input)->p_resource, NULL, psz );
-        if( !input_priv(p_input)->p_sout )
+        priv->p_sout  = input_resource_RequestSout( priv->p_resource, NULL, psz );
+        if( priv->p_sout == NULL )
         {
             input_ChangeState( p_input, ERROR_S );
             msg_Err( p_input, "cannot start stream output instance, " \
@@ -842,7 +846,7 @@ static int InitSout( input_thread_t * p_input )
     }
     else
     {
-        input_resource_RequestSout( input_priv(p_input)->p_resource, NULL, NULL );
+        input_resource_RequestSout( priv->p_resource, NULL, NULL );
     }
     free( psz );
 
@@ -852,18 +856,19 @@ static int InitSout( input_thread_t * p_input )
 
 static void InitTitle( input_thread_t * p_input )
 {
-    input_source_t *p_master = input_priv(p_input)->master;
+    input_thread_private_t *priv = input_priv(p_input);
+    input_source_t *p_master = priv->master;
 
     if( p_input->b_preparsing )
         return;
 
-    vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
+    vlc_mutex_lock( &priv->p_item->lock );
     /* Create global title (from master) */
-    input_priv(p_input)->i_title = p_master->i_title;
-    input_priv(p_input)->title   = p_master->title;
-    input_priv(p_input)->i_title_offset = p_master->i_title_offset;
-    input_priv(p_input)->i_seekpoint_offset = p_master->i_seekpoint_offset;
-    if( input_priv(p_input)->i_title > 0 )
+    priv->i_title = p_master->i_title;
+    priv->title   = p_master->title;
+    priv->i_title_offset = p_master->i_title_offset;
+    priv->i_seekpoint_offset = p_master->i_seekpoint_offset;
+    if( priv->i_title > 0 )
     {
         /* Setup variables */
         input_ControlVarNavigation( p_input );
@@ -871,61 +876,61 @@ static void InitTitle( input_thread_t * p_input )
     }
 
     /* Global flag */
-    input_priv(p_input)->b_can_pace_control    = p_master->b_can_pace_control;
-    input_priv(p_input)->b_can_pause        = p_master->b_can_pause;
-    input_priv(p_input)->b_can_rate_control = p_master->b_can_rate_control;
-    vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
+    priv->b_can_pace_control = p_master->b_can_pace_control;
+    priv->b_can_pause        = p_master->b_can_pause;
+    priv->b_can_rate_control = p_master->b_can_rate_control;
+    vlc_mutex_unlock( &priv->p_item->lock );
 }
 
 static void StartTitle( input_thread_t * p_input )
 {
+    input_thread_private_t *priv = input_priv(p_input);
     vlc_value_t val;
 
     /* Start title/chapter */
-    val.i_int = input_priv(p_input)->master->i_title_start -
-                input_priv(p_input)->master->i_title_offset;
-    if( val.i_int > 0 && val.i_int < input_priv(p_input)->master->i_title )
+    val.i_int = priv->master->i_title_start - priv->master->i_title_offset;
+    if( val.i_int > 0 && val.i_int < priv->master->i_title )
         input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &val );
 
-    val.i_int = input_priv(p_input)->master->i_seekpoint_start -
-                input_priv(p_input)->master->i_seekpoint_offset;
+    val.i_int = priv->master->i_seekpoint_start -
+                priv->master->i_seekpoint_offset;
     if( val.i_int > 0 /* TODO: check upper boundary */ )
         input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 
     /* Start/stop/run time */
-    input_priv(p_input)->i_start = llroundf(1000000.f
+    priv->i_start = llroundf(1000000.f
                                      * var_GetFloat( p_input, "start-time" ));
-    input_priv(p_input)->i_stop  = llroundf(1000000.f
+    priv->i_stop  = llroundf(1000000.f
                                      * var_GetFloat( p_input, "stop-time" ));
-    if( input_priv(p_input)->i_stop <= 0 )
+    if( priv->i_stop <= 0 )
     {
-        input_priv(p_input)->i_stop = llroundf(1000000.f
+        priv->i_stop = llroundf(1000000.f
                                      * var_GetFloat( p_input, "run-time" ));
-        if( input_priv(p_input)->i_stop < 0 )
+        if( priv->i_stop < 0 )
         {
             msg_Warn( p_input, "invalid run-time ignored" );
-            input_priv(p_input)->i_stop = 0;
+            priv->i_stop = 0;
         }
         else
-            input_priv(p_input)->i_stop += input_priv(p_input)->i_start;
+            priv->i_stop += priv->i_start;
     }
 
-    if( input_priv(p_input)->i_start > 0 )
+    if( priv->i_start > 0 )
     {
         vlc_value_t s;
 
-        msg_Dbg( p_input, "starting at time: %ds",
-                 (int)( input_priv(p_input)->i_start / CLOCK_FREQ ) );
+        msg_Dbg( p_input, "starting at time: %"PRId64"s",
+                 priv->i_start / CLOCK_FREQ );
 
-        s.i_int = input_priv(p_input)->i_start;
+        s.i_int = priv->i_start;
         input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &s );
     }
-    if( input_priv(p_input)->i_stop > 0 && input_priv(p_input)->i_stop <= input_priv(p_input)->i_start )
+    if( priv->i_stop > 0 && priv->i_stop <= priv->i_start )
     {
         msg_Warn( p_input, "invalid stop-time ignored" );
-        input_priv(p_input)->i_stop = 0;
+        priv->i_stop = 0;
     }
-    input_priv(p_input)->b_fast_seek = var_GetBool( p_input, "input-fast-seek" );
+    priv->b_fast_seek = var_GetBool( p_input, "input-fast-seek" );
 }
 
 static int SlaveCompare(const void *a, const void *b)
@@ -1260,6 +1265,7 @@ static void InitPrograms( input_thread_t * p_input )
 
 static int Init( input_thread_t * p_input )
 {
+    input_thread_private_t *priv = input_priv(p_input);
     input_source_t *master;
 
     if( var_Type( p_input->obj.parent, "meta-file" ) )
@@ -1280,18 +1286,18 @@ static int Init( input_thread_t * p_input )
 #endif
 
     /* Create es out */
-    input_priv(p_input)->p_es_out = input_EsOutTimeshiftNew( p_input, input_priv(p_input)->p_es_out_display, input_priv(p_input)->i_rate );
+    priv->p_es_out = input_EsOutTimeshiftNew( p_input, priv->p_es_out_display,
+                                              priv->i_rate );
 
     /* */
     input_ChangeState( p_input, OPENING_S );
     input_SendEventCache( p_input, 0.0 );
 
     /* */
-    master = InputSourceNew( p_input, input_priv(p_input)->p_item->psz_uri, NULL,
-                             false );
+    master = InputSourceNew( p_input, priv->p_item->psz_uri, NULL, false );
     if( master == NULL )
         goto error;
-    input_priv(p_input)->master = master;
+    priv->master = master;
 
     InitTitle( p_input );
 
@@ -1301,7 +1307,7 @@ static int Init( input_thread_t * p_input )
     if( demux_Control( master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
         i_length = 0;
     if( i_length <= 0 )
-        i_length = input_item_GetDuration( input_priv(p_input)->p_item );
+        i_length = input_item_GetDuration( priv->p_item );
     input_SendEventLength( p_input, i_length );
 
     input_SendEventPosition( p_input, 0.0, 0 );
@@ -1323,10 +1329,10 @@ static int Init( input_thread_t * p_input )
 
     if( !p_input->b_preparsing && input_priv(p_input)->p_sout )
     {
-        input_priv(p_input)->b_out_pace_control = (input_priv(p_input)->p_sout->i_out_pace_nocontrol > 0);
+        priv->b_out_pace_control = priv->p_sout->i_out_pace_nocontrol > 0;
 
-        msg_Dbg( p_input, "starting in %s mode",
-                 input_priv(p_input)->b_out_pace_control ? "async" : "sync" );
+        msg_Dbg( p_input, "starting in %ssync mode",
+                 priv->b_out_pace_control ? "a" : "" );
     }
 
     vlc_meta_t *p_meta = vlc_meta_New();
@@ -1339,10 +1345,10 @@ static int Init( input_thread_t * p_input )
         InputSourceMeta( p_input, master, p_meta );
 
         /* And from slave */
-        for( int i = 0; i < input_priv(p_input)->i_slave; i++ )
-            InputSourceMeta( p_input, input_priv(p_input)->slave[i], p_meta );
+        for( int i = 0; i < priv->i_slave; i++ )
+            InputSourceMeta( p_input, priv->slave[i], p_meta );
 
-        es_out_ControlSetMeta( input_priv(p_input)->p_es_out, p_meta );
+        es_out_ControlSetMeta( priv->p_es_out, p_meta );
         vlc_meta_Delete( p_meta );
     }
 
@@ -1411,6 +1417,8 @@ error:
  *****************************************************************************/
 static void End( input_thread_t * p_input )
 {
+    input_thread_private_t *priv = input_priv(p_input);
+
     /* We are at the end */
     input_ChangeState( p_input, END_S );
 
@@ -1418,28 +1426,33 @@ static void End( input_thread_t * p_input )
     input_ControlVarStop( p_input );
 
     /* Stop es out activity */
-    es_out_SetMode( input_priv(p_input)->p_es_out, ES_OUT_MODE_NONE );
+    es_out_SetMode( priv->p_es_out, ES_OUT_MODE_NONE );
 
     /* Delete slave */
-    for( int i = 0; i < input_priv(p_input)->i_slave; i++ )
-        InputSourceDestroy( input_priv(p_input)->slave[i] );
-    free( input_priv(p_input)->slave );
+    for( int i = 0; i < priv->i_slave; i++ )
+        InputSourceDestroy( priv->slave[i] );
+    free( priv->slave );
 
     /* Clean up master */
-    InputSourceDestroy( input_priv(p_input)->master );
+    InputSourceDestroy( priv->master );
 
     /* Unload all modules */
-    if( input_priv(p_input)->p_es_out )
-        es_out_Delete( input_priv(p_input)->p_es_out );
-    es_out_SetMode( input_priv(p_input)->p_es_out_display, ES_OUT_MODE_END );
+    if( priv->p_es_out )
+        es_out_Delete( priv->p_es_out );
+    es_out_SetMode( priv->p_es_out_display, ES_OUT_MODE_END );
 
     if( !p_input->b_preparsing )
     {
-#define CL_CO( c ) stats_CounterClean( input_priv(p_input)->counters.p_##c ); input_priv(p_input)->counters.p_##c = NULL;
+#define CL_CO( c ) \
+do { \
+    stats_CounterClean( priv->counters.p_##c ); \
+    priv->counters.p_##c = NULL; \
+} while (0)
+
         if( libvlc_stats( p_input ) )
         {
             /* make sure we are up to date */
-            stats_ComputeInputStats( p_input, input_priv(p_input)->p_item->p_stats );
+            stats_ComputeInputStats( p_input, priv->p_item->p_stats );
             CL_CO( read_bytes );
             CL_CO( read_packets );
             CL_CO( demux_read );
@@ -1457,7 +1470,7 @@ static void End( input_thread_t * p_input )
         }
 
         /* Close optional stream output instance */
-        if( input_priv(p_input)->p_sout )
+        if( priv->p_sout )
         {
             CL_CO( sout_sent_packets );
             CL_CO( sout_sent_bytes );
@@ -1466,14 +1479,14 @@ static void End( input_thread_t * p_input )
 #undef CL_CO
     }
 
-    vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
-    if( input_priv(p_input)->i_attachment > 0 )
+    vlc_mutex_lock( &priv->p_item->lock );
+    if( priv->i_attachment > 0 )
     {
-        for( int i = 0; i < input_priv(p_input)->i_attachment; i++ )
-            vlc_input_attachment_Delete( input_priv(p_input)->attachment[i] );
-        TAB_CLEAN( input_priv(p_input)->i_attachment, input_priv(p_input)->attachment );
-        free( input_priv(p_input)->attachment_demux);
-        input_priv(p_input)->attachment_demux = NULL;
+        for( int i = 0; i < priv->i_attachment; i++ )
+            vlc_input_attachment_Delete( priv->attachment[i] );
+        TAB_CLEAN( priv->i_attachment, priv->attachment );
+        free( priv->attachment_demux);
+        priv->attachment_demux = NULL;
     }
     vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
 
