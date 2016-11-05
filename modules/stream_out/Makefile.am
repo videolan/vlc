@@ -69,7 +69,7 @@ endif
 # Chromaprint plugin
 libstream_out_chromaprint_plugin_la_SOURCES = stream_out/chromaprint.c stream_out/chromaprint_data.h dummy.cpp
 libstream_out_chromaprint_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CHROMAPRINT_CFLAGS)
-libstream_out_chromaprint_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(soutdir)' $(SYMBOLIC_LDFLAGS)
+libstream_out_chromaprint_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(soutdir)'
 libstream_out_chromaprint_plugin_la_LIBADD = $(CHROMAPRINT_LIBS)
 EXTRA_LTLIBRARIES += libstream_out_chromaprint_plugin.la
 sout_LTLIBRARIES += $(LTLIBstream_out_chromaprint)
