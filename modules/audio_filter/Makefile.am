@@ -96,7 +96,7 @@ libugly_resampler_plugin_la_SOURCES = audio_filter/resampler/ugly.c
 libsamplerate_plugin_la_SOURCES = audio_filter/resampler/src.c
 libsamplerate_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SAMPLERATE_CFLAGS)
 libsamplerate_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(audio_filterdir)'
-libsamplerate_plugin_la_LIBADD = $(LIBM) $(SAMPLERATE_LIBS)
+libsamplerate_plugin_la_LIBADD = $(SAMPLERATE_LIBS) $(LIBM)
 
 libsoxr_plugin_la_SOURCES = audio_filter/resampler/soxr.c
 libsoxr_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SOXR_CFLAGS)
