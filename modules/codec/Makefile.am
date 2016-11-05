@@ -172,7 +172,7 @@ liblibass_plugin_la_SOURCES = codec/libass.c
 liblibass_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_libass)
 liblibass_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBASS_CFLAGS)
 liblibass_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-liblibass_plugin_la_LIBADD = $(LIBASS_LIBS) $(LIBS_libass) $(LIBS_freetype) $(FREETYPE_LIBS)
+liblibass_plugin_la_LIBADD = $(LIBS_libass) $(LIBASS_LIBS) $(LIBS_freetype) $(FREETYPE_LIBS)
 EXTRA_LTLIBRARIES += liblibass_plugin.la
 codec_LTLIBRARIES += $(LTLIBlibass)
 
