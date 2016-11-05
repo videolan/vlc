@@ -29,7 +29,7 @@ function probe()
     return ( vlc.access == "http" or vlc.access == "https" )
         and ( string.match( path, "^vimeo%.com/%d+$" )
               or string.match( path, "^vimeo%.com/channels/(.-)/%d+$" )
-              or string.match( path, "^player%.vimeo%.com" ) )
+              or string.match( path, "^player%.vimeo%.com/" ) )
         -- do not match other addresses,
         -- else we'll also try to decode the actual video url
 end
