@@ -339,7 +339,7 @@
         }
 
         // Get Titel
-        tmp_cstr = input_item_GetTitle(item);
+        tmp_cstr = input_item_GetTitleFbName(item);
         if (tmp_cstr) {
             title = toNSStr(tmp_cstr);
             FREENULL(tmp_cstr);
