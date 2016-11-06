@@ -277,7 +277,15 @@ static int Demux( demux_t *p_demux )
         if( i_size > 0 && ( p_frame = vlc_stream_Block( p_demux->s, i_size ) ) )
         {
             p_frame->i_dts = VLC_TS_0 + p_sys->i_pcr;
-            es_out_Send( p_demux->out, p_sys->p_video, p_frame );
+
+            if( p_sys->p_video )
+                es_out_Send( p_demux->out, p_sys->p_video, p_frame );
+            else
+            {
+                block_Release( p_frame );
+                msg_Dbg( p_demux, "ignoring unsupported video frame (size=%d)",
+                         i_size );
+            }
         }
     }
 
@@ -305,7 +313,15 @@ static int Demux( demux_t *p_demux )
         {
             p_frame->i_dts =
             p_frame->i_pts = VLC_TS_0 + p_sys->i_pcr;
-            es_out_Send( p_demux->out, p_sys->p_audio, p_frame );
+
+            if( p_sys->p_audio )
+                es_out_Send( p_demux->out, p_sys->p_audio, p_frame );
+            else
+            {
+                block_Release( p_frame );
+                msg_Dbg( p_demux, "ignoring unsupported audio frame (size=%d)",
+                         i_size );
+            }
         }
     }
 
