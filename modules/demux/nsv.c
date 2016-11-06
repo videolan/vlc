@@ -502,7 +502,7 @@ static int ReadNSVs( demux_t *p_demux )
         case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             break;
         default:
-            msg_Warn( p_demux, "unknown codec %4.4s", (char *)&fcc );
+            msg_Err( p_demux, "unsupported video codec %4.4s", (char *)&fcc );
             break;
     }
     if( fcc != VLC_FOURCC( 'N', 'O', 'N', 'E' ) && fcc != p_sys->fmt_video.i_codec  )
@@ -543,7 +543,7 @@ static int ReadNSVs( demux_t *p_demux )
         case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             break;
         default:
-            msg_Warn( p_demux, "unknown codec %4.4s", (char *)&fcc );
+            msg_Err( p_demux, "unsupported audio codec %4.4s", (char *)&fcc );
             break;
     }
 
