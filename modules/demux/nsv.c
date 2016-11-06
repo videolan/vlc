@@ -595,6 +595,12 @@ static int ReadNSVs( demux_t *p_demux )
     }
     //msg_Dbg( p_demux, "    - fps=%.3f", 1000000.0 / (double)p_sys->i_pcr_inc );
 
+    if( p_sys->p_audio == NULL && p_sys->p_video == NULL )
+    {
+        msg_Err( p_demux, "unable to play neither audio nor video, aborting." );
+        return VLC_EGENERIC;
+    }
+
     return VLC_SUCCESS;
 }
 
