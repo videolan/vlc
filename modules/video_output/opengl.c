@@ -692,8 +692,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
-        vgl->f_teta = vgl->fmt.f_pose_roll_degrees / 180. * M_PI;
-        vgl->f_phi  = vgl->fmt.f_pose_yaw_degrees  / 180. * M_PI;
+        vgl->f_teta = vgl->fmt.f_pose_roll_degrees / 180. * (float) M_PI;
+        vgl->f_phi  = vgl->fmt.f_pose_yaw_degrees  / 180. * (float) M_PI;
     }
 
     /* */
@@ -1079,7 +1079,7 @@ static void getProjectionMatrix(float sar, GLfloat matrix[static 16]) {
     float f = 3;
     float n = 0.1;
 
-    float fovy = M_PI / 3;
+    float fovy = (float) M_PI / 3;
     float d = 1 / tan(fovy / 2);
 
     const GLfloat m[] = {
@@ -1234,12 +1234,12 @@ static int BuildSphere(unsigned nbPlanes,
     }
 
     for (unsigned lat = 0; lat <= nbLatBands; lat++) {
-        float theta = lat * M_PI / nbLatBands;
+        float theta = lat * (float) M_PI / nbLatBands;
         float sinTheta = sin(theta);
         float cosTheta = cos(theta);
 
         for (unsigned lon = 0; lon <= nbLonBands; lon++) {
-            float phi = lon * 2 * M_PI / nbLonBands;
+            float phi = lon * 2 * (float) M_PI / nbLonBands;
             float sinPhi = sin(phi);
             float cosPhi = cos(phi);
 
