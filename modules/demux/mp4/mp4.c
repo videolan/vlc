@@ -2092,15 +2092,32 @@ static int TrackCreateChunksIndex( demux_t *p_demux,
         i_last = BOXDATA(p_stsc)->i_first_chunk[i_index] - 1;
     }
 
+    p_demux_track->i_sample_count = 0;
+    bool b_broken = false;
     if ( p_demux_track->i_chunk_count )
     {
         p_demux_track->chunk[0].i_sample_first = 0;
+        p_demux_track->i_sample_count += p_demux_track->chunk[0].i_sample_count;
+
+        const mp4_chunk_t *prev = &p_demux_track->chunk[0];
         for( i_chunk = 1; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
         {
-            p_demux_track->chunk[i_chunk].i_sample_first =
-                p_demux_track->chunk[i_chunk-1].i_sample_first +
-                    p_demux_track->chunk[i_chunk-1].i_sample_count;
+            mp4_chunk_t *cur = &p_demux_track->chunk[i_chunk];
+            if( unlikely(UINT32_MAX - cur->i_sample_count < p_demux_track->i_sample_count) )
+            {
+                b_broken = true;
+                break;
+            }
+            p_demux_track->i_sample_count += cur->i_sample_count;
+            cur->i_sample_first = prev->i_sample_first + prev->i_sample_count;
+            prev = cur;
         }
+    }
+
+    if( unlikely(b_broken) )
+    {
+        msg_Err( p_demux, "Overflow in chunks total samples count" );
+        return VLC_EGENERIC;
     }
 
     msg_Dbg( p_demux, "track[Id 0x%x] read %d chunk",
@@ -2187,7 +2204,14 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
     stsz = p_box->data.p_stsz;
 
     /* Use stsz table to create a sample number -> sample size table */
-    p_demux_track->i_sample_count = stsz->i_sample_count;
+    if( p_demux_track->i_sample_count != stsz->i_sample_count )
+    {
+        msg_Warn( p_demux, "Incorrect total samples stsc %" PRIu32 " <> stsz %"PRIu32 ", "
+                           " expect truncated media playback",
+                           p_demux_track->i_sample_count, stsz->i_sample_count );
+        p_demux_track->i_sample_count = __MIN(p_demux_track->i_sample_count, stsz->i_sample_count);
+    }
+
     if( stsz->i_sample_size )
     {
         /* 1: all sample have the same size, so no need to construct a table */
