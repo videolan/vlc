@@ -1207,7 +1207,7 @@ static int Demux( demux_t *p_demux )
         for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
         {
             mp4_track_t *tk = &p_sys->track[i_track];
-            if( !tk->b_ok || tk->b_chapters_source || tk->i_sample_count == 0 )
+            if( !tk->b_ok || tk->b_chapters_source || tk->i_sample >= tk->i_sample_count )
                 continue;
             /* Test for EOF on each track (samples count, edit list) */
             b_eof &= ( i_nztime > MP4_TrackGetDTS( p_demux, tk ) );
