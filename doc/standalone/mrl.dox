@@ -60,11 +60,48 @@
  *
  * \subsection mrl_technical_fragment 3.5. Fragment
  *
- * \em MRL does not inherently change the <a
+ * \em MRL extends the <a
  * href="https://tools.ietf.org/html/rfc5234">ABNF</a> for \em fragment-data as
- * specified by <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a>, it
- * does however provide special meaning to data matching the patterns listed in
- * this section.
+ * specified by <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a> so
+ * that individual pieces can be identified within the payload.
+ *
+ * \verbatim
+mrlfrag-query     = query
+mrlfrag-subdelims = "$" / "&" / "'" / "(" / ")" / "*" / "+" /
+                    "," / ";" / "=" / pct-encoded
+mrlfrag-entity    = "!/" *( mrlfrag-subdelims )
+fragment          =/ ( *( mrlfrag-entity ) [ "?" mrlfrag-query ] ) /
+                    mrlfrag-query / mrl-section
+\endverbatim
+ *
+ * <h4>Generating `fragment` </h4>
+ *
+ * 1. Start with an empty payload
+ * 2. For each subentry (from top to bottom)
+ *   - append `"!/"` to the payload
+ *   - url-encode characters not matching `mrlfrag-subdelims`
+ *   - append the url-encoded data
+ * 3. If the payload is not empty, and there is a `mrlfrag-query`
+ *   - append "?" to the payload
+ * 4. append the `mrlfrag-query` to the payload
+ *
+ * <h4>Parsing `fragment`</h4>
+ *
+ * 1. If the payload begins with `"!/"`
+ *   - skip the initial two characters
+ *   - extract data up until the first occurance of either `?` or `!`
+ *   - url-decode the extracted data
+ *   - the decoded data is a `mrlfrag-entity`
+ *   - goto step `1` with the data following the extracted data
+ * 2. If the payload begins with `"?"`
+ *   - skip the initial character
+ * 3. the payload contains the `mrlfrag-query`
+ *
+ * \subsubsection mrl_technical_fragment_query Fragment Query
+ *
+ * Data within `fragment`, as defined by the previous section, can have special
+ * meaning if it matches the entities listed below (priority in order of
+ * appearance).
  *
  * - \parblock
  *  <h4>`mrl-section`</h4>
@@ -87,4 +124,19 @@ mrl-section = mrl-title [ ":" mrl-chapter ] [ "-" mrl-title [ ":" mrl-chapter ] 
  *
  *  \endparblock
  *
+ * - \parblock
+ *  <h4>`mrlfrag-query`</h4>
+ *
+ *  The data within the `mrlfrag-query` shall be `key=value` pairs, each
+ *  delimited by an ampersand (this means that an ampersand in either \em key
+     *  or \em value must be URL-encoded). \em key-value pairs not specified in
+ *  the table below are ignored.
+ *
+ *  <table>
+ *    <tr> <td></td>  <th>Value</th> <th>Description</th> </tr>
+ *    <tr> <th>t</th> <td>Integer</td> <td>specifies where to start playback (in seconds)</td> </tr>
+ *    <tr> <th>s</th> <td>Integer</td> <td>specifies where to stop playback (in seconds)</td> </tr>
+ *  </table>
+ *
+ *  \endparblock
  **/
