@@ -19,6 +19,7 @@ $(TARBALLS)/gnutls-$(GNUTLS_VERSION).tar.xz:
 
 gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	$(UNPACK)
+	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-static.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-mingw64.patch
@@ -38,7 +39,6 @@ ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-osx.patch
 endif
 	$(APPLY) $(SRC)/gnutls/gnutls-libidn.patch
-	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-static.patch
 	$(call pkg_static,"lib/gnutls.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
