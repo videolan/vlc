@@ -69,6 +69,7 @@ struct decoder_sys_t
     bool    b_discontinuity;
 
     vlc_dts_header_t dts;
+    size_t  i_input_size;
 };
 
 static void PacketizeFlush( decoder_t *p_dec )
@@ -109,7 +110,7 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
 
     p_dec->fmt_out.i_bitrate = p_sys->dts.i_bitrate;
 
-    block_t *p_block = block_Alloc( p_sys->dts.i_frame_size );
+    block_t *p_block = block_Alloc( p_sys->i_input_size );
     if( p_block == NULL )
         return NULL;
 
@@ -205,7 +206,18 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            p_sys->i_next_offset = p_sys->dts.i_frame_size;
+            if( p_sys->dts.b_substream  )
+            {
+                msg_Warn( p_dec, "substream without the paired core stream, "
+                          "skip it" );
+                p_sys->i_state = STATE_NOSYNC;
+                if( block_SkipBytes( &p_sys->bytestream,
+                                     p_sys->dts.i_frame_size ) != VLC_SUCCESS )
+                    return NULL;
+                break;
+            }
+            p_sys->i_input_size = p_sys->i_next_offset
+                                = p_sys->dts.i_frame_size;
             p_sys->i_state = STATE_NEXT_SYNC;
 
         case STATE_NEXT_SYNC:
@@ -213,7 +225,8 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             while( p_sys->i_state == STATE_NEXT_SYNC )
             {
                 if( block_PeekOffsetBytes( &p_sys->bytestream,
-                                           p_sys->i_next_offset, p_header, 6 )
+                                           p_sys->i_next_offset, p_header,
+                                           VLC_DTS_HEADER_SIZE )
                                            != VLC_SUCCESS )
                 {
                     if( p_block == NULL ) /* drain */
@@ -232,13 +245,26 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                     continue;
                 }
 
-                if( !vlc_dts_header_IsSync( p_header, 6 ) )
+                if( !vlc_dts_header_IsSync( p_header, VLC_DTS_HEADER_SIZE ) )
                 {
                     msg_Dbg( p_dec, "emulated sync word "
                              "(no sync on following frame)" );
                     p_sys->i_state = STATE_NOSYNC;
                     block_SkipByte( &p_sys->bytestream );
                     break;
+                }
+
+                /* Check if a DTS substream packet is located just after
+                 * the core packet */
+                if( p_sys->i_next_offset == p_sys->dts.i_frame_size )
+                {
+                    vlc_dts_header_t next_header;
+                    if( vlc_dts_header_Parse( &next_header, p_header,
+                                              VLC_DTS_HEADER_SIZE )
+                        == VLC_SUCCESS && next_header.b_substream )
+                    {
+                        p_sys->i_input_size += next_header.i_frame_size;
+                    }
                 }
                 p_sys->i_state = STATE_GET_DATA;
             }
@@ -247,7 +273,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_GET_DATA:
             /* Make sure we have enough data. */
             if( block_WaitBytes( &p_sys->bytestream,
-                                 p_sys->dts.i_frame_size ) != VLC_SUCCESS )
+                                 p_sys->i_input_size ) != VLC_SUCCESS )
             {
                 /* Need more data */
                 return NULL;
@@ -255,16 +281,6 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_state = STATE_SEND_DATA;
 
         case STATE_SEND_DATA:
-            if( p_sys->dts.b_substream  )
-            {
-                /* FIXME: DTSHD is ignored for now */
-                p_sys->i_state = STATE_NOSYNC;
-                if( block_SkipBytes( &p_sys->bytestream,
-                                     p_sys->dts.i_frame_size ) != VLC_SUCCESS )
-                    return NULL;
-                break;
-            }
-
             if( !(p_out_buffer = GetOutBuffer( p_dec )) )
             {
                 //p_dec->b_error = true;
@@ -274,7 +290,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             /* Copy the whole frame into the buffer. When we reach this point
              * we already know we have enough data available. */
             block_GetBytes( &p_sys->bytestream, p_out_buffer->p_buffer,
-                            __MIN( p_sys->dts.i_frame_size, p_out_buffer->i_buffer ) );
+                            p_out_buffer->i_buffer );
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
