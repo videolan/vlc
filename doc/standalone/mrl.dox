@@ -1,0 +1,90 @@
+/**
+ * \defgroup mrl Media Resource Locator (MRL)
+ *
+ * The \em MRL-specification is a VLC intrinsic extension to <a
+ * href="https://tools.ietf.org/html/rfc3986">RFC3986</a>, providing means to
+ * associate extra media-related information within the \em resource-identifier.
+ *
+ * \note \em MRLs are only used when an item is to be played by \em VLC,
+ *       through a direct (or indirect) call to \ref input_Create and \ref
+ *       input_CreatePreparser, which means that they are not handled by
+ *       functions such as \ref vlc_UrlParse and \ref vlc_stream_NewURL (as
+ *       implied by their names).
+ *
+ * \section mrl_introduction Introduction
+ *
+ * As an example, with the use of an \em MRL one can specify that a certain \ref
+ * demux is to be unconditionally used for a specific resource, such as in the
+ * below (forcing usage of \em demuxdump).
+ *
+ * \verbatim http/demuxdump,none://example.com/path/to/media\endverbatim
+ *
+ * There is also the possibility of specifying attributes related to the
+ * playback behavior of the referred to resource, such as what range of titles
+ * and chapters that are to be played.
+ *
+ * \verbatim http://example.com/media.mkv#0:1-1:5\endverbatim
+ *
+ * \section mrl_technical Technical Information
+ *
+ * The overall specification in <a
+ * href="https://tools.ietf.org/html/rfc3986">RFC3986</a> are inherited by \em
+ * MRLs, though some entities have been redefined in order to provide support
+ * for additional \em media-related \em information, other entities (treated as
+ * arbitrary data in a \em URI) is explicitly defined to have special meaning
+ * within an \em MRL.
+ *
+ * \subsection mrl_technical_scheme 3.1. Scheme
+ *
+ * In an \em MRL, what <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a>
+ * refers to as `scheme` is allowed to contain a \em forward-slash, and if such
+ * is present, the data prior to the slash denotes the \em scheme (as originally
+ * defined by \em RFC3986), whereas the data that follows specifies a list of
+ * \link demux demultiplexers\endlink to probe when dealing with the resource.
+ *
+ *     mrl-scheme   = *( %x20-7E )
+ *     mrl-demux    = *( %x20-2B / %x2D-7E )
+ *     mrl-demuxers = mrl-demux *( "," mrl-demux )
+ *     scheme       =/ ( mrl-scheme [ "/" mrl-demuxers ] )
+ *
+ *  - `mrl-demuxers` is a \em comma-delimited list of individual \ref
+ *    demux that will be tried in order of appearance when the
+ *    resource requires a \ref demux to be created.
+ *
+ *  - If the currently processed `mrl-demux` is `"any"`
+ *    (case-insensitive), than any \ref demux is allowed to be probed
+ *    (and potentially used) at that stage.
+ *
+ *  - If no specified \ref demux specified in `mrl-demuxers` can
+ *    handle the resource, the media shall fail to open.
+ *
+ * \subsection mrl_technical_fragment 3.5. Fragment
+ *
+ * \em MRL does not inherently change the <a
+ * href="https://tools.ietf.org/html/rfc5234">ABNF</a> for \em fragment-data as
+ * specified by <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a>, it
+ * does however provide special meaning to data matching the patterns listed in
+ * this section.
+ *
+ * - \parblock
+ *  <h4>`mrl-section`</h4>
+ *  \verbatim
+mrl-title   = DIGIT *DIGIT
+mrl-chapter = DIGIT *DIGIT
+mrl-section = mrl-title [ ":" mrl-chapter ] [ "-" mrl-title [ ":" mrl-chapter ] ]
+\endverbatim
+ *  If the data contained in the `fragmentof` an \em MRL matches
+ *  `mrl-section`, the data denotes the offset to start, and conditionally stop
+ *  (if present), the resource during playback,
+ *
+ *  `mrl-title` and `mrl-chapter` refers to the index of the \em title and \em
+ *  chapter, respectively. Data before the optional hyphen denotes the starting
+ *  position, and data following it, if any, denotes where to stop.
+ *
+ *  The range is specified as `[start,stop)`, meaning that playback will
+ *  continue until \em stop has been reached, it does not include the contents
+ *  of the entity referred to by \em stop.
+ *
+ *  \endparblock
+ *
+ **/
