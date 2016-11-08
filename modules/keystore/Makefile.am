@@ -10,6 +10,10 @@ libfile_keystore_plugin_la_SOURCES = keystore/file.c \
 if HAVE_ANDROID
 libfile_keystore_plugin_la_SOURCES += keystore/file_crypt_android.c
 endif
+if HAVE_WIN32
+libfile_keystore_plugin_la_SOURCES += keystore/file_crypt_win32.c
+libfile_keystore_plugin_la_LIBADD = -lcrypt32
+endif
 keystore_LTLIBRARIES += libfile_keystore_plugin.la
 
 libsecret_plugin_la_SOURCES = keystore/secret.c

@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__ANDROID__) /* TODO || defined(_WIN32) */
+#if defined(__ANDROID__) || defined(_WIN32)
 # define CRYPTFILE
 
 struct crypt
