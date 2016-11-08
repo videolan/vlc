@@ -107,11 +107,19 @@ struct ts_pes_t
     uint8_t i_stream_type;
 
     ts_transport_type_t transport;
-    int         i_data_size;
-    int         i_data_gathered;
-    block_t     *p_data;
-    block_t     **pp_last;
+
+    struct
+    {
+        size_t      i_data_size;
+        size_t      i_gathered;
+        block_t     *p_data;
+        block_t     **pp_last;
+        uint8_t     saved[5];
+        size_t      i_saved;
+    } gather;
+
     bool        b_always_receive;
+    bool        b_broken_PUSI_conformance;
     ts_sections_processor_t *p_sections_proc;
 
     block_t *   p_prepcr_outqueue;
