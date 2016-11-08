@@ -35,10 +35,6 @@
 
 #include <new>
 
-extern "C" {
-#include "../../packetizer/dts_header.h"
-}
-
 #include <vlc_fs.h>
 #include <vlc_url.h>
 
@@ -618,18 +614,6 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 VLC_TS_INVALID;
             continue;
          }
-
-        case VLC_CODEC_DTS:
-        {
-            /* Check if packetization is correct and without padding.
-             * example: Test_mkv_div3_DTS_1920x1080_1785Kbps_23,97fps.mkv */
-            vlc_dts_header_t dts;
-            if( vlc_dts_header_Parse( &dts, p_block->p_buffer, p_block->i_buffer )
-                == VLC_SUCCESS && dts.i_frame_size > 0 )
-                p_block->i_buffer = __MIN(p_block->i_buffer,
-                                          (size_t)dts.i_frame_size);
-            break;
-        }
 
          case VLC_CODEC_OPUS:
             mtime_t i_length = i_duration * track. f_timecodescale *
