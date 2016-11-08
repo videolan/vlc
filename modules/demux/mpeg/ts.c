@@ -2285,7 +2285,7 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
 
     /* transport_scrambling_control is ignored */
     int         i_skip = 0;
-    bool        i_ret  = false;
+    bool        b_ret  = false;
 
 #if 0
     msg_Dbg( p_demux, "pid=%d unit_start=%d adaptation=%d payload=%d "
@@ -2385,7 +2385,7 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
     if( i_skip >= 188 )
     {
         block_Release( p_pkt );
-        return i_ret;
+        return b_ret;
     }
 
     if( pid->u.p_pes->transport == TS_TRANSPORT_PES )
@@ -2396,12 +2396,12 @@ static bool ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt )
             !(p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) )
     {
         ts_sections_processor_Push( pid->u.p_pes->p_sections_proc, p_pkt );
-        return VLC_DEMUXER_SUCCESS;
+        return true;
     }
     else // pid->u.p_pes->transport == TS_TRANSPORT_IGNORE
     {
         block_Release( p_pkt );
-        return VLC_DEMUXER_SUCCESS;
+        return true;
     }
 }
 
