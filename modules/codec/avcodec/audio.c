@@ -318,7 +318,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
     {
         if( pp_block )
             p_block = *pp_block;
-        goto end;
+        goto drop;
     }
 
     /* Flushing or decoding, we return any block ready from multiple frames output */
@@ -340,7 +340,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
             Flush( p_dec );
-            goto end;
+            goto drop;
         }
 
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
@@ -350,10 +350,10 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 
         /* We've just started the stream, wait for the first PTS. */
         if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
-            goto end;
+            goto drop;
 
         if( p_block->i_buffer <= 0 )
-            goto end;
+            goto drop;
 
         if( (p_block->i_flags & BLOCK_FLAG_PRIVATE_REALLOCATED) == 0 )
         {
@@ -417,7 +417,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
             {
                 msg_Warn( p_dec, "invalid audio properties channels count %d, sample rate %d",
                           ctx->channels, ctx->sample_rate );
-                goto end;
+                goto drop;
             }
             else if( p_dec->fmt_out.audio.i_rate != (unsigned int)ctx->sample_rate )
             {
