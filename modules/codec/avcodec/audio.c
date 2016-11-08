@@ -401,7 +401,10 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
             }
             else if ( ret != AVERROR(EAGAIN) ) /* Errors other than buffer full */
             {
-                goto end;
+                if( ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL) )
+                    goto end;
+                else
+                    goto drop;
             }
         }
 
