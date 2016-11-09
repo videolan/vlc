@@ -1039,9 +1039,11 @@ static void getViewMatrix(GLfloat matrix[static 16]) {
      memcpy(matrix, m, sizeof(m));
 }
 
+/* rotation around the Y axis */
 static void getYRotMatrix(float teta, GLfloat matrix[static 16]) {
 
     const GLfloat m[] = {
+        /* x        y       z          w */
         cos(teta), 0.0f, -sin(teta), 0.0f,
         0.0f,      1.0f, 0.0f,       0.0f,
         sin(teta), 0.0f, cos(teta),  0.0f,
@@ -1051,9 +1053,11 @@ static void getYRotMatrix(float teta, GLfloat matrix[static 16]) {
     memcpy(matrix, m, sizeof(m));
 }
 
+/* rotation around the X axis */
 static void getXRotMatrix(float phi, GLfloat matrix[static 16]) {
 
     const GLfloat m[] = {
+        /* x        y       z          w */
         1.0f, 0.0f,      0.0f,     0.0f,
         0.0f, cos(phi),  sin(phi), 0.0f,
         0.0f, -sin(phi), cos(phi), 0.0f,
@@ -1066,6 +1070,7 @@ static void getXRotMatrix(float phi, GLfloat matrix[static 16]) {
 static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
 
     const GLfloat m[] = {
+        /* x   y     z     w */
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
@@ -1075,6 +1080,7 @@ static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
     memcpy(matrix, m, sizeof(m));
 }
 
+/* perspective matrix see https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml */
 static void getProjectionMatrix(float sar, GLfloat matrix[static 16]) {
 
     float f = 3;
