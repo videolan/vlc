@@ -732,11 +732,12 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
         if( i_ts_bound != INT64_MAX )
             i_ts_bound += i_es_delay;
         if( input_clock_ConvertTS( VLC_OBJECT(p_dec), p_clock, &i_rate, pi_ts0, pi_ts1, i_ts_bound ) ) {
+            const char *psz_name = module_get_name( p_dec->p_module, false );
             if( pi_ts1 != NULL )
                 msg_Err(p_dec, "Could not convert timestamps %"PRId64
-                        ", %"PRId64"", *pi_ts0, *pi_ts1);
+                        ", %"PRId64" for %s", *pi_ts0, *pi_ts1, psz_name );
             else
-                msg_Err(p_dec, "Could not convert timestamp %"PRId64, *pi_ts0);
+                msg_Err(p_dec, "Could not convert timestamp %"PRId64" for %s", *pi_ts0, psz_name );
             *pi_ts0 = VLC_TS_INVALID;
         }
     }
