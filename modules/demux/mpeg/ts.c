@@ -889,12 +889,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_POSITION:
         f = (double) va_arg( args, double );
+        b_bool = (int) va_arg( args, int ); /* precise */
 
         if(!p_sys->b_canseek)
             break;
 
         if( p_sys->b_access_control &&
-           !p_sys->b_force_seek_per_percent && p_pmt )
+           !p_sys->b_force_seek_per_percent && b_bool && p_pmt )
         {
             time_t i_time, i_length;
             if( !EITCurrentEventTime( p_pmt, p_sys, &i_time, &i_length ) &&
@@ -907,7 +908,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
         }
 
-        if( !p_sys->b_force_seek_per_percent && p_pmt &&
+        if( !p_sys->b_force_seek_per_percent && b_bool && p_pmt &&
              p_pmt->pcr.i_first > -1 && p_pmt->i_last_dts > VLC_TS_INVALID &&
              p_pmt->pcr.i_current > -1 )
         {
