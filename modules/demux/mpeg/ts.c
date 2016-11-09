@@ -1587,7 +1587,7 @@ static bool PushPESBlock( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, bool 
         p_pes->gather.p_data = NULL;
         p_pes->gather.i_data_size = 0;
         p_pes->gather.i_gathered = 0;
-        p_pes->gather.pp_last = &pid->u.p_pes->gather.p_data;
+        p_pes->gather.pp_last = &p_pes->gather.p_data;
         ParsePESDataChain( p_demux, pid, p_datachain );
         b_ret = true;
     }
@@ -1599,6 +1599,7 @@ static bool PushPESBlock( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, bool 
     {
         /* msg_Dbg( p_demux, "broken packet" ); */
         block_Release( p_pkt );
+        return b_ret;
     }
 
     block_ChainLastAppend( &p_pes->gather.pp_last, p_pkt );
