@@ -1450,10 +1450,11 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                    (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES) )
                 {
                     int64_t i_dts27 = TO_SCALE(p_block->i_dts);
-                    i_dts27 = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
-                    if( i_dts27 < p_pmt->pcr.i_current )
+                    i_dts27 = TimeStampWrapAround( p_pmt->pcr.i_first, i_dts27 );
+                    int64_t i_pcr = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
+                    if( i_dts27 < i_pcr )
                     {
-                        p_pmt->pcr.i_pcroffset = p_pmt->pcr.i_current - i_dts27 + 80000;
+                        p_pmt->pcr.i_pcroffset = i_pcr - i_dts27 + 80000;
                         msg_Warn( p_demux, "Broken stream: pid %d sends packets with dts %"PRId64
                                            "us later than pcr, applying delay",
                                   pid->i_pid, FROM_SCALE_NZ(p_pmt->pcr.i_pcroffset) );
