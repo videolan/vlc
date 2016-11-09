@@ -87,16 +87,12 @@ check xz
 [ -n "$NEEDED" ] && mkdir -p build/ && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
 
 CPUS=
-CC=
-CXX=
 case `uname` in
     Linux|MINGW32*|MINGW64*)
         CPUS=`grep -c ^processor /proc/cpuinfo`
      ;;
     Darwin)
         CPUS=`sysctl hw.ncpu|cut -d" " -f2`
-        gcc-4.2 --version >/dev/null 2>&1 && CC=CC=gcc-4.2
-        g++-4.2 --version >/dev/null 2>&1 && CXX=CXX=g++-4.2
     ;;
     SunOS)
         CPUS=`/usr/bin/kstat -p :::state | grep 'on-line$' | wc -l | sed 's/ //g'`
@@ -110,8 +106,6 @@ esac
 cat > Makefile << EOF
 MAKEFLAGS += -j$CPUS
 CMAKEFLAGS += --parallel=$CPUS
-$CC
-$CXX
 PREFIX=\$(abspath ./build)
 
 all: $NEEDED
