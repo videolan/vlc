@@ -171,6 +171,7 @@ typedef struct
 
     bool            b_rtcp_sync;
     bool            b_discontinuity;
+    int             i_next_block_flags;
     char            waiting;
     int64_t         i_lastpts;
     int64_t         i_pcr;
@@ -837,6 +838,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->waiting     = 0;
             tk->b_rtcp_sync = false;
             tk->b_discontinuity = false;
+            tk->i_next_block_flags = 0;
             tk->i_lastpts   = VLC_TS_INVALID;
             tk->i_pcr       = VLC_TS_INVALID;
             tk->f_npt       = 0.;
@@ -1377,6 +1379,7 @@ static int Demux( demux_t *p_demux )
                 tk->i_pcr = VLC_TS_INVALID;
                 tk->f_npt = 0.;
                 tk->b_discontinuity = false;
+                tk->i_next_block_flags = BLOCK_FLAG_DISCONTINUITY;
             }
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
         }
@@ -2054,6 +2057,11 @@ static void StreamRead( void *p_private, unsigned int i_size,
                     p_block->i_pts = VLC_TS_0 + i_pts;
                 /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
                 p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? VLC_TS_INVALID : (VLC_TS_0 + i_pts);
+                if( unlikely(tk->i_next_block_flags) )
+                {
+                    p_block->i_flags |= tk->i_next_block_flags;
+                    tk->i_next_block_flags = 0;
+                }
                 es_out_Send( p_demux->out, tk->p_es, p_block );
                 if( i_pts > 0 )
                 {
