@@ -241,9 +241,9 @@ static int Demux( demux_t *p_demux )
             p_sys->i_time = p_sys->i_sendtime;
     }
 
-    if( !p_sys->b_eos && ( p_sys->i_sendtime - p_sys->i_time - CHUNK >= 0 &&
-                         ( p_sys->i_sendtime - p_sys->i_time - CHUNK ) /
-                           UINT64_C( 1000 ) >= p_sys->p_fp->i_preroll ) )
+    if( p_sys->b_eos || ( p_sys->i_sendtime - p_sys->i_time - CHUNK >= 0 &&
+                        ( p_sys->i_sendtime - p_sys->i_time - CHUNK ) /
+                          UINT64_C( 1000 ) >= p_sys->p_fp->i_preroll ) )
     {
         bool b_data = Block_Dequeue( p_demux, p_sys->i_time + CHUNK );
 
