@@ -57,7 +57,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 33
+#define CACHE_SUBVERSION_NUM 34
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -225,7 +225,7 @@ static int vlc_cache_load_config(module_config_t *cfg, block_t *file)
             LOAD_ALIGNOF(*cfg->list.i);
         }
         else
-            LOAD_IMMEDIATE(cfg->list_cb_name);
+            LOAD_STRING(cfg->list_cb_name);
 
         LOAD_ARRAY(cfg->list.i, cfg->list_count);
     }
@@ -547,7 +547,7 @@ static int CacheSaveConfig (FILE *file, const module_config_t *cfg)
             SAVE_ALIGNOF(*cfg->list.i);
         }
         else
-            SAVE_IMMEDIATE (cfg->list_cb_name);
+            SAVE_STRING(cfg->list_cb_name);
 
         for (unsigned i = 0; i < cfg->list_count; i++)
              SAVE_IMMEDIATE (cfg->list.i[i]);
