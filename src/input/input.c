@@ -324,6 +324,12 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     priv->p_sout   = NULL;
     priv->b_out_pace_control = false;
 
+    vlc_viewpoint_t *p_viewpoint = var_InheritAddress( p_input, "viewpoint" );
+    if (likely(p_viewpoint != NULL))
+        priv->viewpoint = *p_viewpoint;
+    else
+        vlc_viewpoint_init( &priv->viewpoint );
+
     vlc_gc_incref( p_item ); /* Released in Destructor() */
     priv->p_item = p_item;
 
@@ -1655,6 +1661,10 @@ static void ControlRelease( int i_type, vlc_value_t val )
         if( val.p_address )
             input_item_slave_Delete( val.p_address );
         break;
+    case INPUT_CONTROL_SET_VIEWPOINT:
+    case INPUT_CONTROL_UPDATE_VIEWPOINT:
+        free( val.p_address );
+        break;
 
     default:
         break;
@@ -1917,6 +1927,39 @@ static bool Control( input_thread_t *p_input,
             es_out_Control( input_priv(p_input)->p_es_out_display,
                             ES_OUT_RESTART_ES_BY_ID, (int)val.i_int );
             break;
+
+        case INPUT_CONTROL_SET_VIEWPOINT:
+        case INPUT_CONTROL_UPDATE_VIEWPOINT:
+        {
+            input_thread_private_t *priv = input_priv(p_input);
+            const vlc_viewpoint_t *p_vp = val.p_address;
+            if ( i_type == INPUT_CONTROL_SET_VIEWPOINT)
+                priv->viewpoint = *p_vp;
+            else
+            {
+                priv->viewpoint.yaw   += p_vp->yaw;
+                priv->viewpoint.pitch += p_vp->pitch;
+                priv->viewpoint.roll  += p_vp->roll;
+                priv->viewpoint.fov   += p_vp->fov;
+                priv->viewpoint.zoom  += p_vp->zoom;
+            }
+
+            priv->viewpoint.yaw = fmodf( priv->viewpoint.yaw, 360.f );
+            priv->viewpoint.pitch = fmodf( priv->viewpoint.pitch, 360.f );
+            priv->viewpoint.roll = fmodf( priv->viewpoint.roll, 360.f );
+            priv->viewpoint.fov = VLC_CLIP( priv->viewpoint.fov, 0.f, 180.f );
+
+            vout_thread_t **pp_vout;
+            size_t i_vout;
+            input_resource_HoldVouts( priv->p_resource, &pp_vout, &i_vout );
+
+            for( size_t i = 0; i < i_vout; ++i )
+            {
+                var_SetAddress( pp_vout[i], "viewpoint", &priv->viewpoint );
+                vlc_object_release( pp_vout[i] );
+            }
+            break;
+        }
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
             input_SendEventAudioDelay( p_input, val.i_int );

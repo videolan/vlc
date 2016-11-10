@@ -519,6 +519,20 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             input_ControlPush( p_input, INPUT_CONTROL_RESTART_ES, &val );
             return VLC_SUCCESS;
 
+        case INPUT_UPDATE_VIEWPOINT:
+        {
+            vlc_viewpoint_t *p_viewpoint = malloc( sizeof(*p_viewpoint) );
+            if( unlikely(p_viewpoint == NULL) )
+                return VLC_ENOMEM;
+            val.p_address = p_viewpoint;
+            *p_viewpoint = *va_arg( args, const vlc_viewpoint_t* );
+            if ( va_arg( args, int ) )
+                input_ControlPush( p_input, INPUT_CONTROL_SET_VIEWPOINT, &val );
+            else
+                input_ControlPush( p_input, INPUT_CONTROL_UPDATE_VIEWPOINT, &val );
+            return VLC_SUCCESS;
+        }
+
         case INPUT_GET_AOUT:
         {
             audio_output_t *p_aout = input_resource_HoldAout( priv->p_resource );
