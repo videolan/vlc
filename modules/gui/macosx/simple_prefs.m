@@ -437,7 +437,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 
 /* TODO: move this part to core */
 #define config_GetLabel(a,b) __config_GetLabel(VLC_OBJECT(a),b)
-static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_name)
+static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *psz_name)
 {
     module_config_t *p_config;
 
