@@ -30,6 +30,7 @@
 #include <vlc_subpicture.h>
 #include <vlc_keys.h>
 #include <vlc_mouse.h>
+#include <vlc_vout.h>
 #include <vlc_vout_window.h>
 
 /**
@@ -115,6 +116,7 @@ typedef struct {
         int den;
     } zoom;
 
+    vlc_viewpoint_t viewpoint;
 } vout_display_cfg_t;
 
 /**
@@ -175,6 +177,10 @@ enum {
      * The cropping requested is stored by video_format_t::i_x/y_offset and
      * video_format_t::i_visible_width/height */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,   /* const video_format_t *p_source */
+
+    /* Ask the module to acknowledge/refuse VR/360° viewing direction after
+     * being requested externally */
+    VOUT_DISPLAY_CHANGE_VIEWPOINT,   /* const vout_display_cfg_t *p_cfg */
 };
 
 /**

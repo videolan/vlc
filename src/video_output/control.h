@@ -58,6 +58,7 @@ enum {
     VOUT_CONTROL_CROP_BORDER,           /* border */
     VOUT_CONTROL_CROP_RATIO,            /* pair */
     VOUT_CONTROL_CROP_WINDOW,           /* window */
+    VOUT_CONTROL_VIEWPOINT,             /* viewpoint */
 };
 
 typedef struct {
@@ -95,6 +96,7 @@ typedef struct {
         } window;
         const vout_configuration_t *cfg;
         subpicture_t *subpicture;
+        vlc_viewpoint_t viewpoint;
     } u;
 } vout_control_cmd_t;
 

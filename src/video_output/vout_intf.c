@@ -73,6 +73,8 @@ static int SubFilterCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 static int SubMarginCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
+static int ViewpointCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_IntfInit: called during the vout creation to initialise misc things.
@@ -301,6 +303,10 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "mouse-moved", VLC_VAR_COORDS );
     var_Create( p_vout, "mouse-clicked", VLC_VAR_COORDS );
 
+    /* Viewpoint */
+    var_Create( p_vout, "viewpoint", VLC_VAR_ADDRESS  | VLC_VAR_DOINHERIT );
+    var_AddCallback( p_vout, "viewpoint", ViewpointCallback, NULL );
+
     vout_IntfReinit( p_vout );
 }
 
@@ -317,6 +323,7 @@ void vout_IntfReinit( vout_thread_t *p_vout )
     var_TriggerCallback( p_vout, "sub-source" );
     var_TriggerCallback( p_vout, "sub-filter" );
     var_TriggerCallback( p_vout, "sub-margin" );
+    var_TriggerCallback( p_vout, "viewpoint" );
 }
 
 /*****************************************************************************
@@ -692,3 +699,13 @@ static int SubMarginCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
+static int ViewpointCallback( vlc_object_t *p_this, char const *psz_cmd,
+                              vlc_value_t oldval, vlc_value_t newval, void *p_data)
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+
+    if( newval.p_address != NULL )
+        vout_ControlChangeViewpoint( p_vout, newval.p_address );
+    return VLC_SUCCESS;
+}

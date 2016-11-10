@@ -145,6 +145,7 @@ void vout_ControlChangeFilters(vout_thread_t *, const char *);
 void vout_ControlChangeSubSources(vout_thread_t *, const char *);
 void vout_ControlChangeSubFilters(vout_thread_t *, const char *);
 void vout_ControlChangeSubMargin(vout_thread_t *, int);
+void vout_ControlChangeViewpoint( vout_thread_t *, const vlc_viewpoint_t *);
 
 /* */
 void vout_IntfInit( vout_thread_t * );
