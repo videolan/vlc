@@ -206,6 +206,7 @@ struct vout_display_opengl_t {
     float f_teta;
     float f_phi;
     float f_roll;
+    float f_fov;
     float f_zoom;
 };
 
@@ -696,6 +697,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->f_teta = vgl->fmt.f_pose_yaw_degrees   / 180. * (float) M_PI;
         vgl->f_phi  = vgl->fmt.f_pose_pitch_degrees / 180. * (float) M_PI;
         vgl->f_roll = vgl->fmt.f_pose_roll_degrees  / 180. * (float) M_PI;
+        vgl->f_fov  = vgl->fmt.f_pose_fov_degrees   / 180. * (float) M_PI;
         vgl->f_teta -= (float) M_PI/2;
     }
 
@@ -1097,12 +1099,11 @@ static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
 }
 
 /* perspective matrix see https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml */
-static void getProjectionMatrix(float sar, GLfloat matrix[static 16]) {
+static void getProjectionMatrix(float sar, float fovy, GLfloat matrix[static 16]) {
 
     float zFar  = 1000;
     float zNear = 0.01;
 
-    float fovy = (float) M_PI / 3;
     float f = 1.f / tanf(fovy / 2.f);
 
     const GLfloat m[] = {
@@ -1558,7 +1559,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl,
         || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
         float sar = (float) vgl->fmt.i_visible_width / vgl->fmt.i_visible_height;
-        getProjectionMatrix(sar, projectionMatrix);
+        getProjectionMatrix(sar, vgl->f_fov, projectionMatrix);
         getYRotMatrix(vgl->f_teta, yRotMatrix);
         getXRotMatrix(vgl->f_phi, xRotMatrix);
         getZRotMatrix(vgl->f_roll, zRotMatrix);
