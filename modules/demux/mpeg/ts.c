@@ -1816,14 +1816,15 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
     if( p_pmt->pcr.i_first == i_scaledtime && p_sys->b_canseek )
         return vlc_stream_Seek( p_sys->stream, 0 );
 
-    if( !p_sys->b_canfastseek )
+    const int64_t i_stream_size = stream_Size( p_sys->stream );
+    if( !p_sys->b_canfastseek || i_stream_size < p_sys->i_packet_size )
         return VLC_EGENERIC;
 
-    int64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
+    const uint64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
 
     /* Find the time position by using binary search algorithm. */
-    int64_t i_head_pos = 0;
-    int64_t i_tail_pos = stream_Size( p_sys->stream ) - p_sys->i_packet_size;
+    uint64_t i_head_pos = 0;
+    uint64_t i_tail_pos = (uint64_t) i_stream_size - p_sys->i_packet_size;
     if( i_head_pos >= i_tail_pos )
         return VLC_EGENERIC;
 
@@ -1831,15 +1832,15 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
     while( (i_head_pos + p_sys->i_packet_size) <= i_tail_pos && !b_found )
     {
         /* Round i_pos to a multiple of p_sys->i_packet_size */
-        int64_t i_splitpos = i_head_pos + (i_tail_pos - i_head_pos) / 2;
-        int64_t i_div = i_splitpos % p_sys->i_packet_size;
+        uint64_t i_splitpos = i_head_pos + (i_tail_pos - i_head_pos) / 2;
+        uint64_t i_div = i_splitpos % p_sys->i_packet_size;
         i_splitpos -= i_div;
 
         if ( vlc_stream_Seek( p_sys->stream, i_splitpos ) != VLC_SUCCESS )
             break;
 
-        int64_t i_pos = i_splitpos;
-        while( i_pos > -1 && i_pos < i_tail_pos )
+        uint64_t i_pos = i_splitpos;
+        while( i_pos < i_tail_pos )
         {
             int64_t i_pcr = -1;
             block_t *p_pkt = ReadTSPacket( p_demux );
@@ -1888,7 +1889,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
             {
                 int64_t i_diff = i_scaledtime - TimeStampWrapAround( p_pmt->pcr.i_first, i_pcr );
                 if ( i_diff < 0 )
-                    i_tail_pos = i_splitpos - p_sys->i_packet_size;
+                    i_tail_pos = (i_splitpos >= p_sys->i_packet_size) ? i_splitpos - p_sys->i_packet_size : 0;
                 else if( i_diff < TO_SCALE(VLC_TS_0 + CLOCK_FREQ / 2) ) // 500ms
                     b_found = true;
                 else
@@ -1897,8 +1898,8 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
             }
         }
 
-        if ( !b_found && i_pos > i_tail_pos - p_sys->i_packet_size )
-            i_tail_pos = i_splitpos - p_sys->i_packet_size;
+        if ( !b_found && i_pos + p_sys->i_packet_size > i_tail_pos )
+            i_tail_pos = (i_splitpos >= p_sys->i_packet_size) ? i_splitpos - p_sys->i_packet_size : 0;
     }
 
     if( !b_found )
