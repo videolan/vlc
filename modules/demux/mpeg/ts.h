@@ -60,7 +60,7 @@ struct demux_sys_t
     /* how many TS packet we read at once */
     unsigned    i_ts_read;
 
-    bool        b_force_seek_per_percent;
+    bool        b_ignore_time_for_positions;
 
     ts_standards_e standard;
 

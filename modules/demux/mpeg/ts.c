@@ -477,7 +477,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_canseek = false;
     p_sys->b_canfastseek = false;
-    p_sys->b_force_seek_per_percent = var_InheritBool( p_demux, "ts-seek-percent" );
+    p_sys->b_ignore_time_for_positions = var_InheritBool( p_demux, "ts-seek-percent" );
 
     p_sys->standard = TS_STANDARD_AUTO;
     char *psz_standard = var_InheritString( p_demux, "ts-standard" );
@@ -895,7 +895,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             break;
 
         if( p_sys->b_access_control &&
-           !p_sys->b_force_seek_per_percent && b_bool && p_pmt )
+           !p_sys->b_ignore_time_for_positions && b_bool && p_pmt )
         {
             time_t i_time, i_length;
             if( !EITCurrentEventTime( p_pmt, p_sys, &i_time, &i_length ) &&
@@ -908,7 +908,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
         }
 
-        if( !p_sys->b_force_seek_per_percent && b_bool && p_pmt &&
+        if( !p_sys->b_ignore_time_for_positions && b_bool && p_pmt &&
              p_pmt->pcr.i_first > -1 && p_pmt->i_last_dts > VLC_TS_INVALID &&
              p_pmt->pcr.i_current > -1 )
         {
