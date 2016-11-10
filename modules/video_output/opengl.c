@@ -691,8 +691,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
-        vgl->f_teta = vgl->fmt.f_pose_roll_degrees / 180. * (float) M_PI;
-        vgl->f_phi  = vgl->fmt.f_pose_yaw_degrees  / 180. * (float) M_PI;
+        vgl->f_teta = vgl->fmt.f_pose_yaw_degrees   / 180. * (float) M_PI;
+        vgl->f_phi  = vgl->fmt.f_pose_pitch_degrees / 180. * (float) M_PI;
         vgl->f_teta -= (float) M_PI/2;
     }
 
