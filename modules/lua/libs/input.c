@@ -34,7 +34,7 @@
 
 #include <vlc_common.h>
 #include <vlc_meta.h>
-
+#include <vlc_url.h>
 #include <vlc_playlist.h>
 
 #include <assert.h>
@@ -114,13 +114,28 @@ static int vlclua_input_metas_internal( lua_State *L, input_item_t *p_item )
     }
 
     lua_newtable( L );
-    char *psz_name;
     const char *psz_meta;
 
-    psz_name = input_item_GetName( p_item );
-    lua_pushstring( L, psz_name );
+    char* psz_uri = input_item_GetURI( p_item );
+    char* psz_filename = psz_uri ? strrchr( psz_uri, '/' ) : NULL;
+
+    if( psz_filename && psz_filename[1] == '\0' )
+    {
+        /* trailing slash, get the preceeding data */
+        psz_filename[0] = '\0';
+        psz_filename = strrchr( psz_uri, '/' );
+    }
+
+    if( psz_filename )
+    {
+        /* url decode, without leading slash */
+        psz_filename = vlc_uri_decode( psz_filename + 1 );
+    }
+
+    lua_pushstring( L, psz_filename );
     lua_setfield( L, -2, "filename" );
-    free( psz_name );
+
+    free( psz_uri );
 
 #define PUSH_META( n, m ) \
     psz_meta = vlc_meta_Get( p_item->p_meta, vlc_meta_ ## n ); \
