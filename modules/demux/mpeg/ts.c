@@ -882,7 +882,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( (i64 = stream_Size( p_sys->stream) ) > 0 )
         {
-            int64_t offset = vlc_stream_Tell( p_sys->stream );
+            uint64_t offset = vlc_stream_Tell( p_sys->stream );
             *pf = (double)offset / (double)i64;
             return VLC_SUCCESS;
         }
@@ -1630,9 +1630,9 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     {
         int64_t size = stream_Size( p_sys->stream );
         if( size >= 0 && (uint64_t)size == vlc_stream_Tell( p_sys->stream ) )
-            msg_Dbg( p_demux, "EOF at %"PRId64, vlc_stream_Tell( p_sys->stream ) );
+            msg_Dbg( p_demux, "EOF at %"PRIu64, vlc_stream_Tell( p_sys->stream ) );
         else
-            msg_Dbg( p_demux, "Can't read TS packet at %"PRId64, vlc_stream_Tell(p_sys->stream) );
+            msg_Dbg( p_demux, "Can't read TS packet at %"PRIu64, vlc_stream_Tell(p_sys->stream) );
         return NULL;
     }
 
@@ -2008,7 +2008,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
 int ProbeStart( demux_t *p_demux, int i_program )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    const int64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
+    const uint64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
     int64_t i_stream_size = stream_Size( p_sys->stream );
 
     int i_probe_count = 0;
@@ -2039,7 +2039,7 @@ int ProbeStart( demux_t *p_demux, int i_program )
 int ProbeEnd( demux_t *p_demux, int i_program )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    const int64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
+    const uint64_t i_initial_pos = vlc_stream_Tell( p_sys->stream );
     int64_t i_stream_size = stream_Size( p_sys->stream );
 
     int i_probe_count = PROBE_CHUNK_COUNT;
