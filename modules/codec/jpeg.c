@@ -247,6 +247,83 @@ de_get32( void * ptr, uint endian ) {
     return val;
 }
 
+static bool getRDFFloat(const char *psz_rdf, float *out, const char *psz_var)
+{
+    char *p_start = strcasestr(psz_rdf, psz_var);
+    if (p_start == NULL)
+        return false;
+
+    size_t varlen = strlen(psz_var);
+    char *p_end = strchr(p_start + varlen, '"');
+    if (unlikely(p_end == NULL || p_end == p_start + 1))
+        return false;
+
+    *out = strtof(p_start + varlen, NULL);
+    return true;
+}
+
+#define EXIF_JPEG_MARKER    0xE1
+#define EXIF_XMP_STRING     "http://ns.adobe.com/xap/1.0/\000"
+
+/* read XMP metadata for projection according to
+ * https://developers.google.com/streetview/spherical-metadata */
+static void jpeg_GetProjection(j_decompress_ptr cinfo, video_format_t *fmt)
+{
+    jpeg_saved_marker_ptr xmp_marker = NULL;
+    jpeg_saved_marker_ptr cmarker = cinfo->marker_list;
+
+    while (cmarker)
+    {
+        if (cmarker->marker == EXIF_JPEG_MARKER)
+        {
+            if (!memcmp(cmarker->data, EXIF_XMP_STRING, 29))
+            {
+                xmp_marker = cmarker;
+                break;
+            }
+        }
+        cmarker = cmarker->next;
+    }
+
+    if (xmp_marker == NULL || xmp_marker->data_length < 32)
+        return;
+    char *psz_rdf = malloc(xmp_marker->data_length - 29);
+    if (unlikely(psz_rdf == NULL))
+        return;
+    memcpy(psz_rdf, xmp_marker->data + 29, xmp_marker->data_length - 29);
+
+    /* Try to find the string "GSpherical:Spherical" because the v1
+        spherical video spec says the tag must be there. */
+    if (strcasestr(psz_rdf, "ProjectionType=\"equirectangular\""))
+        fmt->projection_mode = PROJECTION_MODE_EQUIRECTANGULAR;
+
+    /* pose handling */
+    float value;
+    if (getRDFFloat(psz_rdf, &value, "PoseHeadingDegrees=\""))
+        fmt->f_pose_yaw_degrees = value;
+
+    if (getRDFFloat(psz_rdf, &value, "PosePitchDegrees=\""))
+        fmt->f_pose_pitch_degrees = value;
+
+    if (getRDFFloat(psz_rdf, &value, "PoseRollDegrees=\""))
+        fmt->f_pose_roll_degrees = value;
+
+    /* initial view */
+    if (getRDFFloat(psz_rdf, &value, "InitialViewHeadingDegrees=\""))
+        fmt->f_pose_yaw_degrees = value;
+
+    if (getRDFFloat(psz_rdf, &value, "InitialViewPitchDegrees=\""))
+        fmt->f_pose_pitch_degrees = value;
+
+    if (getRDFFloat(psz_rdf, &value, "InitialViewRollDegrees=\""))
+        fmt->f_pose_roll_degrees = value;
+
+    if (getRDFFloat(psz_rdf, &value, "InitialHorizontalFOVDegrees=\""))
+        fmt->f_pose_fov_degrees = value;
+
+    free(psz_rdf);
+}
+
 /*
  * Look through the meta data in the libjpeg decompress structure to determine
  * if an EXIF Orientation tag is present. If so return its value (1-8),
@@ -276,7 +353,6 @@ jpeg_GetOrientation( j_decompress_ptr cinfo )
     const char leth[] = { 0x49, 0x49, 0x2a, 0x00 }; /* Little endian TIFF header */
     const char beth[] = { 0x4d, 0x4d, 0x00, 0x2a }; /* Big endian TIFF header */
 
-    #define EXIF_JPEG_MARKER    0xE1
     #define EXIF_IDENT_STRING   "Exif\000\000"
     #define EXIF_ORIENT_TAGID   0x112
 
@@ -453,6 +529,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
         msg_Dbg( p_dec, "Jpeg orientation is %d", i_otag );
         p_dec->fmt_out.video.orientation = ORIENT_FROM_EXIF( i_otag );
     }
+    jpeg_GetProjection(&p_sys->p_jpeg, &p_dec->fmt_out.video);
 
     /* Get a new picture */
     if (decoder_UpdateVideoFormat(p_dec))
