@@ -983,7 +983,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
         }
 
-        if( p_pmt &&
+        if( !p_sys->b_ignore_time_for_positions &&
+            p_pmt &&
            ( p_pmt->pcr.i_first > -1 || p_pmt->pcr.i_first_dts > VLC_TS_INVALID ) &&
              p_pmt->i_last_dts > 0 )
         {
