@@ -3096,6 +3096,8 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                                   fmt->video.f_pose_pitch_degrees );
            info_category_AddInfo( p_cat, _("Roll"), "%.2f",
                                   fmt->video.f_pose_roll_degrees );
+           info_category_AddInfo( p_cat, _("Field of view"), "%.2f",
+                                  fmt->video.f_pose_fov_degrees );
        }
        break;
 

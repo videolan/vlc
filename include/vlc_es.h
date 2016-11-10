@@ -282,6 +282,8 @@ typedef enum video_chroma_location_t
     CHROMA_LOCATION_BOTTOM_CENTER,
 } video_chroma_location_t;
 
+#define DEFAULT_FIELD_OF_VIEW_DEGREES  80.f
+
 /**
  * video format description
  */
@@ -322,6 +324,7 @@ struct video_format_t
     float f_pose_yaw_degrees;      /**< view point yaw in degrees ]-180;180] */
     float f_pose_pitch_degrees;    /**< view point pitch in degrees ]-90;90] */
     float f_pose_roll_degrees;    /**< view point roll in degrees ]-180;180] */
+    float f_pose_fov_degrees;         /**< view point fov in degrees ]0;180[ */
     uint32_t i_cubemap_padding; /**< padding in pixels of the cube map faces */
 };
 
