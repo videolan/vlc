@@ -3081,6 +3081,22 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            info_category_AddInfo( p_cat, _("Chroma location"), "%s",
                    _(c_loc_names[fmt->video.chroma_location]) );
        }
+       if( fmt->video.projection_mode != PROJECTION_MODE_RECTANGULAR )
+       {
+           static const char *c_loc_names[] = { N_("Rectangular"),
+               N_("Equirectangular"),
+               N_("Cubemap"),
+           };
+           info_category_AddInfo( p_cat, _("Projection"), "%s",
+                   _(c_loc_names[fmt->video.projection_mode]) );
+
+           info_category_AddInfo( p_cat, _("Yaw"), "%.2f",
+                                  fmt->video.f_pose_yaw_degrees );
+           info_category_AddInfo( p_cat, _("Pitch"), "%.2f",
+                                  fmt->video.f_pose_pitch_degrees );
+           info_category_AddInfo( p_cat, _("Roll"), "%.2f",
+                                  fmt->video.f_pose_roll_degrees );
+       }
        break;
 
     case SPU_ES:
