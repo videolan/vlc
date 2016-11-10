@@ -37,6 +37,7 @@
 #include <vlc_subpicture.h>
 #include <vlc_opengl.h>
 #include <vlc_memory.h>
+#include <vlc_vout.h>
 
 #include "opengl.h"
 
@@ -694,11 +695,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
-        vgl->f_teta = vgl->fmt.f_pose_yaw_degrees   / 180. * (float) M_PI;
-        vgl->f_phi  = vgl->fmt.f_pose_pitch_degrees / 180. * (float) M_PI;
-        vgl->f_roll = vgl->fmt.f_pose_roll_degrees  / 180. * (float) M_PI;
-        vgl->f_fov  = vgl->fmt.f_pose_fov_degrees   / 180. * (float) M_PI;
-        vgl->f_teta -= (float) M_PI/2;
+        vout_display_opengl_SetViewpoint(vgl, &(vlc_viewpoint_t) {
+            .yaw = vgl->fmt.f_pose_yaw_degrees,
+            .pitch = vgl->fmt.f_pose_pitch_degrees,
+            .roll = vgl->fmt.f_pose_roll_degrees,
+            .fov = vgl->fmt.f_pose_fov_degrees,
+            .zoom = 0.f } );
     }
 
     /* */
@@ -779,6 +781,23 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     if (vgl->pool)
         picture_pool_Release(vgl->pool);
     free(vgl);
+}
+
+int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
+                                     const vlc_viewpoint_t *p_vp)
+{
+#define RAD(d) ((float) (d * M_PI / 180.f))
+    float f_fov = RAD(p_vp->fov);
+    if (f_fov > (float) M_PI -0.001f || f_fov < 0.001f)
+        return VLC_EBADVAR;
+    vgl->f_teta = RAD(p_vp->yaw) - (float) M_PI / 2;
+    vgl->f_phi  = RAD(p_vp->pitch);
+    vgl->f_roll = RAD(p_vp->roll);
+    vgl->f_fov  = RAD(p_vp->fov);
+    vgl->f_zoom = p_vp->zoom;
+
+    return VLC_SUCCESS;
+#undef RAD
 }
 
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
