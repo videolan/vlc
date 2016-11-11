@@ -1337,8 +1337,9 @@ static bool MuxStreams(sout_mux_t *p_mux )
               p_data->i_dts - 10 * CLOCK_FREQ > p_stream->state.i_pes_dts +
               p_stream->state.i_pes_length ) )
         {
-            msg_Warn( p_mux, "packet with too strange dts "
+            msg_Warn( p_mux, "packet with too strange dts on pid %d (%4.4s)"
                       "(dts=%"PRId64",old=%"PRId64",pcr=%"PRId64")",
+                      p_stream->ts.i_pid, (char *) &p_stream->pes.i_codec,
                       p_data->i_dts, p_stream->state.i_pes_dts,
                       p_pcr_stream->state.i_pes_dts );
             block_Release( p_data );
