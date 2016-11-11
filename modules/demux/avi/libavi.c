@@ -439,12 +439,12 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             }
 #ifdef AVI_DEBUG
             msg_Dbg( (vlc_object_t*)s,
-                     "strf: audio:0x%4.4x channels:%d %dHz %dbits/sample %dkb/s",
+                     "strf: audio:0x%4.4x channels:%d %dHz %dbits/sample %dkbps",
                      p_chk->strf.auds.p_wf->wFormatTag,
                      p_chk->strf.auds.p_wf->nChannels,
                      p_chk->strf.auds.p_wf->nSamplesPerSec,
                      p_chk->strf.auds.p_wf->wBitsPerSample,
-                     p_chk->strf.auds.p_wf->nAvgBytesPerSec * 8 / 1024 );
+                     p_chk->strf.auds.p_wf->nAvgBytesPerSec * 8 / 1000 );
 #endif
             break;
         case( AVIFOURCC_vids ):
