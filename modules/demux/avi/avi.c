@@ -470,6 +470,14 @@ static int Open( vlc_object_t * p_this )
                     tk->i_rate = p_auds->p_wf->nSamplesPerSec;
                 }
 
+                /* From libavformat */
+                /* Fix broken sample size (which is mp2 num samples / frame) #12722 */
+                if( tk->i_codec == VLC_CODEC_MPGA &&
+                    tk->i_samplesize == 1152 && p_auds->p_wf->nBlockAlign == 1152 )
+                {
+                    p_auds->p_wf->nBlockAlign = tk->i_samplesize = 0;
+                }
+
                 es_format_Init( &fmt, AUDIO_ES, tk->i_codec );
 
                 fmt.audio.i_channels        = p_auds->p_wf->nChannels;
