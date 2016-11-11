@@ -97,14 +97,6 @@ VLC_API void vlc_meta_SetStatus( vlc_meta_t *m, int status );
  */
 VLC_API const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type );
 
-/* deprecated (album-art variable) */
-enum {
-    ALBUM_ART_WHEN_ASKED,
-    ALBUM_ART_WHEN_PLAYED,
-    ALBUM_ART_ALL
-};
-
-
 typedef struct meta_export_t
 {
     VLC_COMMON_MEMBERS

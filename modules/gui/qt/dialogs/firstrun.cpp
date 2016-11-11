@@ -37,9 +37,6 @@ FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf  )
     setVisible( true );
 }
 
-#define ALBUM_ART_WHEN_ASKED 0
-#define ALBUM_ART_ALL 2
-
 void FirstRun::save()
 {
     config_PutInt( p_intf,  "metadata-network-access", checkbox->isChecked() );

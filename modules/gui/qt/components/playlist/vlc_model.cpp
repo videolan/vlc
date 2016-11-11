@@ -196,9 +196,8 @@ void VLCModel::ensureArtRequested( const QModelIndex &index )
 {
     if ( index.isValid() && hasChildren( index ) )
     {
-        int i_art_policy = var_GetInteger( THEPL, "album-art" );
         bool b_access = var_InheritBool( THEPL, "metadata-network-access" );
-        if ( i_art_policy != ALBUM_ART_ALL && ! b_access ) return;
+        if ( !b_access ) return;
         int nbnodes = rowCount( index );
         QModelIndex child;
         for( int row = 0 ; row < nbnodes ; row++ )

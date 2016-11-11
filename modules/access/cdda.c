@@ -259,8 +259,7 @@ struct access_sys_t
 #ifdef HAVE_LIBCDDB
 static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, int i_titles, int *p_sectors )
 {
-    if( var_InheritInteger( obj, "album-art" ) != ALBUM_ART_ALL &&
-       !var_InheritBool( obj, "metadata-network-access" ) )
+    if( !var_InheritBool( obj, "metadata-network-access" ) )
     {
         msg_Dbg( obj, "album art policy set to manual: not fetching" );
         return NULL;
