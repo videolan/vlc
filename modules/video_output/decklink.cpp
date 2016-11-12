@@ -70,6 +70,12 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
     "After this delay we black out the video."\
     )
 
+#define AFD_INDEX_TEXT "Active Format Descriptor"
+#define AFD_INDEX_LONGTEXT AFD_INDEX_TEXT " value"
+
+#define AR_INDEX_TEXT "Aspect Ratio"
+#define AR_INDEX_LONGTEXT AR_INDEX_TEXT " of the source picture"
+
 #define AFDLINE_INDEX_TEXT N_("Active Format Descriptor line.")
 #define AFDLINE_INDEX_LONGTEXT N_("VBI line on which to output Active Format Descriptor.")
 
@@ -123,10 +129,36 @@ static const char *const ppsz_videoconns_text[] = {
     N_("SDI"), N_("HDMI"), N_("Optical SDI"), N_("Component"), N_("Composite"), N_("S-video")
 };
 
+static const int rgi_afd_values[] = {
+    0, 2, 3, 4, 8, 9, 10, 11, 13, 14, 15,
+};
+static const char * const rgsz_afd_text[] = {
+    "0:  Undefined",
+    "2:  Box 16:9 (top aligned)",
+    "3:  Box 14:9 (top aligned)",
+    "4:  Box > 16:9 (centre aligned)",
+    "8:  Same as coded frame (full frame)",
+    "9:   4:3 (centre aligned)",
+    "10: 16:9 (centre aligned)",
+    "11: 14:9 (centre aligned)",
+    "13:  4:3 (with shoot and protect 14:9 centre)",
+    "14: 16:9 (with shoot and protect 14:9 centre)",
+    "15: 16:9 (with shoot and protect  4:3 centre)",
+};
+
+static const int rgi_ar_values[] = {
+    0, 1,
+};
+static const char * const rgsz_ar_text[] = {
+    "0:   4:3",
+    "1:  16:9",
+};
+
 struct vout_display_sys_t
 {
     picture_pool_t *pool;
     bool tenbits;
+    uint8_t afd, ar;
     int nosignal_delay;
     picture_t *pic_nosignal;
 };
@@ -198,6 +230,12 @@ vlc_module_begin()
                 NOSIGNAL_INDEX_TEXT, NOSIGNAL_INDEX_LONGTEXT, true)
     add_integer(VIDEO_CFG_PREFIX "afd-line", 16,
                 AFDLINE_INDEX_TEXT, AFDLINE_INDEX_LONGTEXT, true)
+    add_integer_with_range(VIDEO_CFG_PREFIX "afd", 8, 0, 16,
+                AFD_INDEX_TEXT, AFD_INDEX_LONGTEXT, true)
+                change_integer_list(rgi_afd_values, rgsz_afd_text)
+    add_integer_with_range(VIDEO_CFG_PREFIX "ar", 1, 0, 1,
+                AR_INDEX_TEXT, AR_INDEX_LONGTEXT, true)
+                change_integer_list(rgi_ar_values, rgsz_ar_text)
     add_loadfile(VIDEO_CFG_PREFIX "nosignal-image", NULL,
                 NOSIGNAL_IMAGE_TEXT, NOSIGNAL_IMAGE_LONGTEXT, true)
 
@@ -682,7 +720,7 @@ static void v210_convert(void *frame_bytes, picture_t *pic, int dst_stride)
     }
 }
 
-static void send_AFD(vout_display_t *vd, uint8_t *buf)
+static void send_AFD(uint8_t afdcode, uint8_t ar, uint8_t *buf)
 {
     const size_t len = 6 /* vanc header */ + 8 /* AFD data */ + 1 /* csum */;
     const size_t s = ((len + 5) / 6) * 6; // align for v210
@@ -696,13 +734,11 @@ static void send_AFD(vout_display_t *vd, uint8_t *buf)
     afd[4] = 0x05; // SDID
     afd[5] = 8; // Data Count
 
-    int afd_code = 0;
-    int AR = 0;
     int bar_data_flags = 0;
     int bar_data_val1 = 0;
     int bar_data_val2 = 0;
 
-    afd[ 6] = (afd_code << 3) | (AR << 2);
+    afd[ 6] = ((afdcode & 0x0F) << 3) | ((ar & 0x01) << 2); /* SMPTE 2016-1 */
     afd[ 7] = 0; // reserved
     afd[ 8] = 0; // reserved
     afd[ 9] = bar_data_flags << 4;
@@ -812,7 +848,7 @@ static void DisplayVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
             msg_Err(vd, "Failed to get VBI line %d: %d", line, result);
             goto end;
         }
-        send_AFD(vd, (uint8_t*)buf);
+        send_AFD(vd->sys->afd, vd->sys->ar, (uint8_t*)buf);
 
         v210_convert(frame_bytes, picture, stride);
 
@@ -880,6 +916,8 @@ static int OpenVideo(vlc_object_t *p_this)
 
     sys->tenbits = var_InheritBool(p_this, VIDEO_CFG_PREFIX "tenbits");
     sys->nosignal_delay = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "nosignal-delay");
+    sys->afd = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "afd");
+    sys->ar = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "ar");
     sys->pic_nosignal = NULL;
 
     decklink_sys = OpenDecklink(vd);
