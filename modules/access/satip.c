@@ -653,9 +653,10 @@ static int satip_open(vlc_object_t *obj)
     vlc_UrlParse(&url, psz_lower_url);
     if (url.i_port <= 0)
         url.i_port = RTSP_DEFAULT_PORT;
-    if (psz_host == NULL) {
+    if (psz_host == NULL && url.psz_host )
         psz_host = strdup(url.psz_host);
-    }
+    if (psz_host == NULL )
+        goto error;
 
     msg_Dbg(access, "connect to host '%s'", psz_host);
     sys->tcp_sock = net_ConnectTCP(access, psz_host, url.i_port);
