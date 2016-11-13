@@ -1728,11 +1728,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             input_attachment_t ***ppp_attach = va_arg( args, input_attachment_t*** );
             int *pi_int = va_arg( args, int * );
 
-            *pi_int     = p_sys->i_attachment;
-            *ppp_attach = calloc( p_sys->i_attachment, sizeof(**ppp_attach));
-            for( unsigned i = 0; i < p_sys->i_attachment && *ppp_attach; i++ )
-                (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachment[i] );
-            return VLC_SUCCESS;
+            *ppp_attach = calloc( p_sys->i_attachment, sizeof(**ppp_attach) );
+            if( likely(*ppp_attach) )
+            {
+                *pi_int = p_sys->i_attachment;
+                for( unsigned i = 0; i < p_sys->i_attachment; i++ )
+                    (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachment[i] );
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
         }
 
         default:
