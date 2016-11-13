@@ -294,6 +294,8 @@ static int Open( vlc_object_t * p_this )
 
     /* Initialize input structures. */
     p_sys = p_demux->p_sys = calloc( 1, sizeof(demux_sys_t) );
+    if( unlikely(!p_sys) )
+        return VLC_EGENERIC;
     p_sys->b_odml   = false;
     p_sys->track    = NULL;
     p_sys->meta     = NULL;
