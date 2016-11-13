@@ -223,7 +223,7 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
 
     if( peekbox.i_size < 8 )
     {
-        msg_Warn( p_stream, "found an invalid sized %"PRIu64" box %4.4s @%ld",
+        msg_Warn( p_stream, "found an invalid sized %"PRIu64" box %4.4s @%"PRIu64 ,
                   peekbox.i_size, (char *) &peekbox.i_type, vlc_stream_Tell(p_stream) );
         return NULL;
     }
