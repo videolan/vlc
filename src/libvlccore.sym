@@ -117,7 +117,6 @@ filter_chain_GetFmtOut
 filter_chain_GetLength
 filter_chain_MouseFilter
 filter_chain_MouseEvent
-filter_chain_New
 filter_chain_NewVideo
 filter_chain_Reset
 filter_chain_SubFilter
