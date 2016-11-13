@@ -665,15 +665,16 @@ static int Open( vlc_object_t * p_this )
                      * directly after BITMAPINFORHEADER in the BITMAPINFO structure */
                     if( fmt.i_extra > 0 )
                     {
-                        const uint8_t *p_pal = fmt.p_extra;
-
                         fmt.video.p_palette = calloc( 1, sizeof(video_palette_t) );
-                        fmt.video.p_palette->i_entries = __MIN(fmt.i_extra/4, 256);
-
-                        for( int k = 0; k < fmt.video.p_palette->i_entries; k++ )
+                        if( likely(fmt.video.p_palette) )
                         {
-                            for( int j = 0; j < 4; j++ )
-                                fmt.video.p_palette->palette[k][j] = p_pal[4*k+j];
+                            const uint8_t *p_pal = fmt.p_extra;
+                            fmt.video.p_palette->i_entries = __MIN(fmt.i_extra/4, 256);
+                            for( int k = 0; k < fmt.video.p_palette->i_entries; k++ )
+                            {
+                                for( int j = 0; j < 4; j++ )
+                                    fmt.video.p_palette->palette[k][j] = p_pal[4*k+j];
+                            }
                         }
                     }
                 }
