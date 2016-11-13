@@ -477,16 +477,6 @@ static bool AppendCharacter( text_segment_t* p_segment, char c )
     return true;
 }
 
-static bool AppendWideCharacter( text_segment_t* p_segment, wchar_t c )
-{
-    char* tmp;
-    if ( asprintf( &tmp, "%s%lc", p_segment->psz_text ? p_segment->psz_text : "", c ) < 0 )
-        return false;
-    free( p_segment->psz_text );
-    p_segment->psz_text = tmp;
-    return true;
-}
-
 static bool AppendString( text_segment_t* p_segment, const char* psz_str )
 {
     char* tmp;
@@ -1025,7 +1015,7 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
             }
             else if( !strncasecmp( psz_subtitle, "\\h", 2 ) )
             {
-                if ( !AppendWideCharacter( p_segment, L'\u00A0' ) )
+                if ( !AppendString( p_segment, "\xC2\xA0" ) )
                     goto fail;
                 psz_subtitle += 2;
             }
