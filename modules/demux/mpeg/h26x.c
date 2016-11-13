@@ -443,7 +443,8 @@ static int Demux( demux_t *p_demux)
                 if( !p_sys->frame_rate_den )
                 {
                     /* Use packetizer's one */
-                    if( p_sys->p_packetizer->fmt_out.video.i_frame_rate_base )
+                    if( p_sys->p_packetizer->fmt_out.video.i_frame_rate_base &&
+                        p_sys->p_packetizer->fmt_out.video.i_frame_rate )
                     {
                         p_sys->frame_rate_num = p_sys->p_packetizer->fmt_out.video.i_frame_rate;
                         p_sys->frame_rate_den = p_sys->p_packetizer->fmt_out.video.i_frame_rate_base;
