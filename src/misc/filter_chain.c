@@ -94,14 +94,13 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
 /**
  * Filter chain initialisation
  */
-filter_chain_t *filter_chain_New( vlc_object_t *obj, const char *cap,
-                                  bool fmt_out_change )
+filter_chain_t *filter_chain_New( vlc_object_t *obj, const char *cap )
 {
     filter_owner_t callbacks = {
         .sys = obj,
     };
 
-    return filter_chain_NewInner( &callbacks, cap, fmt_out_change, NULL );
+    return filter_chain_NewInner( &callbacks, cap, false, NULL );
 }
 
 /** Chained filter picture allocator function */

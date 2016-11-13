@@ -273,12 +273,11 @@ typedef struct filter_chain_t filter_chain_t;
  *
  * \param p_object pointer to a vlc object
  * \param psz_capability vlc capability of filters in filter chain
- * \param b_allow_format_fmt_change allow changing of fmt
  * \return pointer to a filter chain
  */
-filter_chain_t * filter_chain_New( vlc_object_t *, const char *, bool )
+filter_chain_t * filter_chain_New( vlc_object_t *, const char * )
 VLC_USED;
-#define filter_chain_New( a, b, c ) filter_chain_New( VLC_OBJECT( a ), b, c )
+#define filter_chain_New( a, b ) filter_chain_New( VLC_OBJECT( a ), b )
 
 /**
  * Creates a new video filter chain.

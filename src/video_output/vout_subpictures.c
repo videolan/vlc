@@ -1212,8 +1212,8 @@ spu_t *spu_Create(vlc_object_t *object)
     sys->filter_chain_update = NULL;
     vlc_mutex_init(&sys->source_chain_lock);
     vlc_mutex_init(&sys->filter_chain_lock);
-    sys->source_chain = filter_chain_New(spu, "sub source", false);
-    sys->filter_chain = filter_chain_New(spu, "sub filter", false);
+    sys->source_chain = filter_chain_New(spu, "sub source");
+    sys->filter_chain = filter_chain_New(spu, "sub filter");
 
     /* Load text and scale module */
     sys->text = SpuRenderCreateAndLoadText(spu);
