@@ -59,7 +59,7 @@ struct filter_chain_t
     es_format_t fmt_out; /**< Chain current output format */
     unsigned length; /**< Number of filters */
     bool b_allow_fmt_out_change; /**< Can the output format be changed? */
-    char psz_capability[]; /**< Module capability for all chained filters */
+    const char *filter_cap; /**< Filter modules capability */
 };
 
 /**
@@ -73,7 +73,7 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
     assert( callbacks != NULL && callbacks->sys != NULL );
     assert( cap != NULL );
 
-    filter_chain_t *chain = malloc( sizeof(*chain) + strlen( cap ) + 1 );
+    filter_chain_t *chain = malloc( sizeof (*chain) );
     if( unlikely(chain == NULL) )
         return NULL;
 
@@ -86,8 +86,7 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
     es_format_Init( &chain->fmt_out, UNKNOWN_ES, 0 );
     chain->length = 0;
     chain->b_allow_fmt_out_change = fmt_out_change;
-    strcpy( chain->psz_capability, cap );
-
+    chain->filter_cap = cap;
     return chain;
 }
 
@@ -208,7 +207,7 @@ filter_t *filter_chain_AppendFilter( filter_chain_t *chain, const char *name,
     filter->owner = chain->callbacks;
     filter->owner.sys = chain;
 
-    filter->p_module = module_need( filter, chain->psz_capability, name,
+    filter->p_module = module_need( filter, chain->filter_cap, name,
                                     name != NULL );
     if( filter->p_module == NULL )
         goto error;
@@ -244,10 +243,10 @@ filter_t *filter_chain_AppendFilter( filter_chain_t *chain, const char *name,
 
 error:
     if( name != NULL )
-        msg_Err( parent, "Failed to create %s '%s'", chain->psz_capability,
+        msg_Err( parent, "Failed to create %s '%s'", chain->filter_cap,
                  name );
     else
-        msg_Err( parent, "Failed to create %s", chain->psz_capability );
+        msg_Err( parent, "Failed to create %s", chain->filter_cap );
     es_format_Clean( &filter->fmt_out );
     es_format_Clean( &filter->fmt_in );
     vlc_object_release( filter );
