@@ -412,7 +412,7 @@ static block_t *ParseVCL(decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag)
 
     if(unlikely(!hxxx_strip_AnnexB_startcode(&p_buffer, &i_buffer) || i_buffer < 3))
     {
-        block_ChainAppend(&p_sys->frame.p_chain, p_frag); /* might be corrupted */
+        block_ChainLastAppend(&p_sys->frame.pp_chain_last, p_frag); /* might be corrupted */
         return NULL;
     }
 
