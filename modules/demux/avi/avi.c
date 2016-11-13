@@ -511,6 +511,7 @@ static int Open( vlc_object_t * p_this )
                     fmt.p_extra = malloc( i_extra );
                     if( unlikely(fmt.p_extra == NULL) )
                     {
+                        es_format_Clean( &fmt );
                         free( tk );
                         goto error;
                     }
@@ -641,6 +642,7 @@ static int Open( vlc_object_t * p_this )
                         fmt.p_extra = malloc( i_extra );
                         if( unlikely(fmt.p_extra == NULL) )
                         {
+                            es_format_Clean( &fmt );
                             free( tk );
                             goto error;
                         }
