@@ -231,22 +231,23 @@ static inline void bs_align_1( bs_t *s )
 }
 
 /* Read unsigned Exp-Golomb code */
-static inline uint32_t bs_read_ue( bs_t * bs )
+static inline uint_fast32_t bs_read_ue( bs_t * bs )
 {
-    int32_t i = 0;
+    unsigned i = 0;
 
     while( bs_read1( bs ) == 0 && bs->p < bs->p_end && i < 31 )
         i++;
 
-    return ((uint32_t)1 << i) - 1 + bs_read( bs, i );
+    return (1U << i) - 1 + bs_read( bs, i );
 }
 
 /* Read signed Exp-Golomb code */
-static inline int32_t bs_read_se( bs_t *s )
+static inline int_fast32_t bs_read_se( bs_t *s )
 {
-    int val = bs_read_ue( s );
+    uint_fast32_t val = bs_read_ue( s );
 
-    return val&0x01 ? (val+1)/2 : -(val/2);
+    return (val & 0x01) ? (int_fast32_t)((val + 1) / 2)
+                        : -(int_fast32_t)(val / 2);
 }
 
 #undef bs_forward
