@@ -751,6 +751,11 @@ AC_CHECK_LIB(m,lrintf, [
 AC_CHECK_LIB(m,nanf,
   AC_DEFINE(HAVE_NANF, 1, [Define to 1 if you have the NANF function])
 )
+AC_CHECK_LIB(m,sincos, [
+  AC_DEFINE(HAVE_SINCOS, 1, [Define to 1 if you have the sincos function.])
+], [
+  AC_LIBOBJ([sincos])
+])
 
 dnl Check for dynamic plugins
 LIBDL=""

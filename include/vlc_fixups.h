@@ -481,6 +481,11 @@ void freeaddrinfo (struct addrinfo *res);
 #define nanf(tagp) NAN
 #endif
 
+#ifndef HAVE_SINCOS
+void sincos(double, double *, double *);
+void sincosf(float, float *, float *);
+#endif
+
 #ifndef HAVE_REALPATH
 char *realpath(const char * restrict pathname, char * restrict resolved_path);
 #endif
