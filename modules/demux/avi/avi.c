@@ -30,6 +30,7 @@
 #endif
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -2204,7 +2205,7 @@ static int AVI_PacketGetHeader( demux_t *p_demux, avi_packet_t *p_pk )
 static int AVI_PacketNext( demux_t *p_demux )
 {
     avi_packet_t    avi_ck;
-    int             i_skip = 0;
+    size_t          i_skip = 0;
 
     if( AVI_PacketGetHeader( p_demux, &avi_ck ) )
     {
@@ -2223,10 +2224,16 @@ static int AVI_PacketNext( demux_t *p_demux )
     }
     else
     {
+        if( avi_ck.i_size > UINT32_MAX - 9 )
+            return VLC_EGENERIC;
         i_skip = __EVEN( avi_ck.i_size ) + 8;
     }
 
-    if( vlc_stream_Read( p_demux->s, NULL, i_skip ) != i_skip )
+    if( i_skip > SSIZE_MAX )
+        return VLC_EGENERIC;
+
+    ssize_t i_ret = vlc_stream_Read( p_demux->s, NULL, i_skip );
+    if( i_ret < 0 || (size_t) i_ret != i_skip )
     {
         return VLC_EGENERIC;
     }
