@@ -383,7 +383,7 @@ strings.resolve_xml_special_chars( [str1, [str2, [...]]] ): Resolve XML
 strings.convert_xml_special_chars( [str1, [str2, [...]]] ): Do the inverse
   operation.
 strings.from_charset( charset, str ): convert a string from a specified
-  character encoding into UTF-8.
+  character encoding into UTF-8; return an empty string on error.
 
 Variables
 ---------
