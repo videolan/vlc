@@ -1030,42 +1030,54 @@ static const GLfloat identity[] = {
 };
 
 /* rotation around the Z axis */
-static void getZRotMatrix(float teta, GLfloat matrix[static 16]) {
+static void getZRotMatrix(float theta, GLfloat matrix[static 16])
+{
+    float st, ct;
+
+    sincosf(theta, &st, &ct);
 
     const GLfloat m[] = {
-        /* x        y       z          w */
-        cos(teta), -sin(teta), 0.0f, 0.0f,
-        sin(teta), cos(teta),  0.0f, 0.0f,
-        0.0f,       0.0f,      1.0f, 0.0f,
-        0.0f,       0.0f,      0.0f, 1.0f
+    /*  x    y    z    w */
+        ct,  -st, 0.f, 0.f,
+        st,  ct,  0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f
     };
 
     memcpy(matrix, m, sizeof(m));
 }
 
 /* rotation around the Y axis */
-static void getYRotMatrix(float teta, GLfloat matrix[static 16]) {
+static void getYRotMatrix(float theta, GLfloat matrix[static 16])
+{
+    float st, ct;
+
+    sincosf(theta, &st, &ct);
 
     const GLfloat m[] = {
-        /* x        y       z          w */
-        cos(teta), 0.0f, -sin(teta), 0.0f,
-        0.0f,      1.0f, 0.0f,       0.0f,
-        sin(teta), 0.0f, cos(teta),  0.0f,
-        0.0f,      0.0f, 0.0f,       1.0f
+    /*  x    y    z    w */
+        ct,  0.f, -st, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        st,  0.f, ct,  0.f,
+        0.f, 0.f, 0.f, 1.f
     };
 
     memcpy(matrix, m, sizeof(m));
 }
 
 /* rotation around the X axis */
-static void getXRotMatrix(float phi, GLfloat matrix[static 16]) {
+static void getXRotMatrix(float phi, GLfloat matrix[static 16])
+{
+    float sp, cp;
+
+    sincosf(phi, &sp, &cp);
 
     const GLfloat m[] = {
-        /* x        y       z          w */
-        1.0f, 0.0f,      0.0f,     0.0f,
-        0.0f, cos(phi),  sin(phi), 0.0f,
-        0.0f, -sin(phi), cos(phi), 0.0f,
-        0.0f, 0.0f,      0.0f,     1.0f
+    /*  x    y    z    w */
+        1.f, 0.f, 0.f, 0.f,
+        0.f, cp,  sp,  0.f,
+        0.f, -sp, cp,  0.f,
+        0.f, 0.f, 0.f, 1.f
     };
 
     memcpy(matrix, m, sizeof(m));
@@ -1091,13 +1103,13 @@ static void getProjectionMatrix(float sar, GLfloat matrix[static 16]) {
     float zNear = 0.01;
 
     float fovy = (float) M_PI / 3;
-    float f = 1 / tan(fovy / 2);
+    float f = 1.f / tanf(fovy / 2.f);
 
     const GLfloat m[] = {
-        f / sar, 0.0,                   0.0,                0.0,
-        0.0,     f,                     0.0,                0.0,
-        0.0,     0.0,     (zNear + zFar) / (zNear - zFar), -1.0,
-        0.0,     0.0, (2 * zNear * zFar) / (zNear - zFar),  0.0};
+        f / sar, 0.f,                   0.f,                0.f,
+        0.f,     f,                     0.f,                0.f,
+        0.f,     0.f,     (zNear + zFar) / (zNear - zFar), -1.f,
+        0.f,     0.f, (2 * zNear * zFar) / (zNear - zFar),  0.f};
 
      memcpy(matrix, m, sizeof(m));
 }
@@ -1246,13 +1258,15 @@ static int BuildSphere(unsigned nbPlanes,
 
     for (unsigned lat = 0; lat <= nbLatBands; lat++) {
         float theta = lat * (float) M_PI / nbLatBands;
-        float sinTheta = sin(theta);
-        float cosTheta = cos(theta);
+        float sinTheta, cosTheta;
+
+        sincosf(theta, &sinTheta, &cosTheta);
 
         for (unsigned lon = 0; lon <= nbLonBands; lon++) {
             float phi = lon * 2 * (float) M_PI / nbLonBands;
-            float sinPhi = sin(phi);
-            float cosPhi = cos(phi);
+            float sinPhi, cosPhi;
+
+            sincosf(phi, &sinPhi, &cosPhi);
 
             float x = cosPhi * sinTheta;
             float y = cosTheta;
