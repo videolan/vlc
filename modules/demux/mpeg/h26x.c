@@ -429,7 +429,10 @@ static int Demux( demux_t *p_demux)
                 p_sys->p_packetizer->fmt_out.b_packetized = true;
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out );
                 if( !p_sys->p_es )
+                {
+                    block_ChainRelease( p_block_out );
                     return VLC_DEMUXER_EOF;
+                }
             }
 
             /* h264 packetizer does merge multiple NAL into AU, but slice flag persists */
