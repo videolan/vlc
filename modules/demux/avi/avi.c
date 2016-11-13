@@ -504,16 +504,17 @@ static int Open( vlc_object_t * p_this )
                     p_auds->p_wf->nSamplesPerSec,
                     p_auds->p_wf->wBitsPerSample );
 
-                fmt.i_extra = __MIN( p_auds->p_wf->cbSize,
-                    p_auds->i_chunk_size - sizeof(WAVEFORMATEX) );
-                if( fmt.i_extra > 0 )
+                if( p_auds->p_wf->cbSize > 0 && p_auds->i_chunk_size > sizeof(WAVEFORMATEX) )
                 {
-                    fmt.p_extra = malloc( fmt.i_extra );
+                    int i_extra = __MIN( p_auds->p_wf->cbSize,
+                                         p_auds->i_chunk_size - sizeof(WAVEFORMATEX) );
+                    fmt.p_extra = malloc( i_extra );
                     if( unlikely(fmt.p_extra == NULL) )
                     {
                         free( tk );
                         goto error;
                     }
+                    fmt.i_extra = i_extra;
                     memcpy( fmt.p_extra, &p_auds->p_wf[1], fmt.i_extra );
                 }
                 break;
@@ -632,16 +633,20 @@ static int Open( vlc_object_t * p_this )
                     fmt.video.i_sar_den = ((i_frame_aspect_ratio >>  0) & 0xffff) * fmt.video.i_width;
                 }
                 /* Extradata is the remainder of the chunk less the BIH */
-                fmt.i_extra = p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
-                if( fmt.i_extra > 0 )
+                if( p_vids->i_chunk_size <= INT_MAX - sizeof(VLC_BITMAPINFOHEADER) )
                 {
-                    fmt.p_extra = malloc( fmt.i_extra );
-                    if( unlikely(fmt.p_extra == NULL) )
+                    int i_extra = p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
+                    if( i_extra > 0 )
                     {
-                        free( tk );
-                        goto error;
+                        fmt.p_extra = malloc( i_extra );
+                        if( unlikely(fmt.p_extra == NULL) )
+                        {
+                            free( tk );
+                            goto error;
+                        }
+                        fmt.i_extra = i_extra;
+                        memcpy( fmt.p_extra, &p_vids->p_bih[1], fmt.i_extra );
                     }
-                    memcpy( fmt.p_extra, &p_vids->p_bih[1], fmt.i_extra );
                 }
 
                 msg_Dbg( p_demux, "stream[%d] video(%4.4s) %"PRIu32"x%"PRIu32" %dbpp %ffps",
@@ -656,7 +661,7 @@ static int Open( vlc_object_t * p_this )
                 {
                     /* The palette should not be included in biSize, but come
                      * directly after BITMAPINFORHEADER in the BITMAPINFO structure */
-                    if( fmt.i_extra > 0 && fmt.p_extra )
+                    if( fmt.i_extra > 0 )
                     {
                         const uint8_t *p_pal = fmt.p_extra;
 
