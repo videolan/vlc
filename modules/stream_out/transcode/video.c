@@ -265,7 +265,7 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
     filter_chain_Reset( id->p_f_chain, p_fmt_out, p_fmt_out );
 
     /* Deinterlace */
-    if( p_stream->p_sys->b_deinterlace )
+    if( p_stream->p_sys->psz_deinterlace != NULL )
     {
         filter_chain_AppendFilter( id->p_f_chain,
                                    p_stream->p_sys->psz_deinterlace,

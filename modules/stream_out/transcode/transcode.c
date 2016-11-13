@@ -363,19 +363,14 @@ static int Open( vlc_object_t *p_this )
         p_sys->psz_vf2 = NULL;
     free( psz_string );
 
-    p_sys->b_deinterlace = var_GetBool( p_stream, SOUT_CFG_PREFIX "deinterlace" );
+    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "deinterlace" ) )
+        psz_string = var_GetString( p_stream,
+                                    SOUT_CFG_PREFIX "deinterlace-module" );
+    else
+        psz_string = NULL;
 
-    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "deinterlace-module" );
-    p_sys->psz_deinterlace = NULL;
-    p_sys->p_deinterlace_cfg = NULL;
-    if( psz_string && *psz_string )
-    {
-        char *psz_next;
-        psz_next = config_ChainCreate( &p_sys->psz_deinterlace,
-                                   &p_sys->p_deinterlace_cfg,
-                                   psz_string );
-        free( psz_next );
-    }
+    free( config_ChainCreate( &p_sys->psz_deinterlace,
+                              &p_sys->p_deinterlace_cfg, psz_string ) );
     free( psz_string );
 
     p_sys->i_threads = var_GetInteger( p_stream, SOUT_CFG_PREFIX "threads" );
