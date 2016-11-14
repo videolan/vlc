@@ -454,8 +454,6 @@ void es_format_Init( es_format_t *fmt,
     memset( &fmt->video, 0, sizeof(video_format_t) );
     memset( &fmt->subs, 0, sizeof(subs_format_t) );
 
-    fmt->video.f_pose_fov_degrees = DEFAULT_FIELD_OF_VIEW_DEGREES;
-
     fmt->b_packetized           = true;
     fmt->i_bitrate              = 0;
     fmt->i_extra                = 0;
