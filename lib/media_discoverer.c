@@ -57,13 +57,12 @@ struct libvlc_media_discoverer_t
  *       services_discovery_item_added (Private) (VLC event callback)
  **************************************************************************/
 
-static void services_discovery_item_added( const vlc_event_t * p_event,
-                                           void * user_data )
+static void services_discovery_item_added( services_discovery_t *sd,
+                                           input_item_t *p_item,
+                                           const char *psz_cat )
 {
-    input_item_t * p_item = p_event->u.services_discovery_item_added.p_new_item;
-    const char * psz_cat = p_event->u.services_discovery_item_added.psz_category;
     libvlc_media_t * p_md;
-    libvlc_media_discoverer_t * p_mdis = user_data;
+    libvlc_media_discoverer_t *p_mdis = sd->owner.sys;
     libvlc_media_list_t * p_mlist = p_mdis->p_mlist;
 
     p_md = libvlc_media_new_from_input_item( p_mdis->p_libvlc_instance,
@@ -107,12 +106,11 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
  *       services_discovery_item_removed (Private) (VLC event callback)
  **************************************************************************/
 
-static void services_discovery_item_removed( const vlc_event_t * p_event,
-                                             void * user_data )
+static void services_discovery_item_removed( services_discovery_t *sd,
+                                             input_item_t *p_item )
 {
-    input_item_t * p_item = p_event->u.services_discovery_item_added.p_new_item;
     libvlc_media_t * p_md;
-    libvlc_media_discoverer_t * p_mdis = user_data;
+    libvlc_media_discoverer_t *p_mdis = sd->owner.sys;
 
     int i, count = libvlc_media_list_count( p_mdis->p_mlist );
     libvlc_media_list_lock( p_mdis->p_mlist );
@@ -166,8 +164,14 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
         return NULL;
     }
 
+    struct services_discovery_owner_t owner = {
+        p_mdis,
+        services_discovery_item_added,
+        services_discovery_item_removed,
+    };
+
     p_mdis->p_sd = vlc_sd_Create( (vlc_object_t*)p_inst->p_libvlc_int,
-                                  psz_name );
+                                  psz_name, &owner );
     if( unlikely(p_mdis->p_sd == NULL) )
     {
         libvlc_printerr( "%s: no such discovery module found", psz_name );
@@ -176,15 +180,6 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
         free( p_mdis );
         return NULL;
     }
-
-    vlc_event_attach( services_discovery_EventManager( p_mdis->p_sd ),
-                      vlc_ServicesDiscoveryItemAdded,
-                      services_discovery_item_added,
-                      p_mdis );
-    vlc_event_attach( services_discovery_EventManager( p_mdis->p_sd ),
-                      vlc_ServicesDiscoveryItemRemoved,
-                      services_discovery_item_removed,
-                      p_mdis );
 
     libvlc_retain( p_inst );
     return p_mdis;
@@ -256,15 +251,6 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 void
 libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
 {
-    vlc_event_detach( services_discovery_EventManager( p_mdis->p_sd ),
-                     vlc_ServicesDiscoveryItemAdded,
-                     services_discovery_item_added,
-                     p_mdis );
-    vlc_event_detach( services_discovery_EventManager( p_mdis->p_sd ),
-                     vlc_ServicesDiscoveryItemRemoved,
-                     services_discovery_item_removed,
-                     p_mdis );
-
     if( p_mdis->running )
         libvlc_media_discoverer_stop( p_mdis );
 

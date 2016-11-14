@@ -27,7 +27,6 @@
 
 #include <vlc_common.h>
 #include "vlc_playlist.h"
-#include "vlc_events.h"
 #include <vlc_services_discovery.h>
 #include <vlc_probe.h>
 #include <vlc_modules.h>
@@ -99,9 +98,6 @@ char **vlc_sd_GetNames (vlc_object_t *obj, char ***pppsz_longnames, int **pp_cat
     return names;
 }
 
-
-static void services_discovery_Destructor ( vlc_object_t *p_obj );
-
 /*
  * Services discovery
  * Basically you just listen to Service discovery event through the
@@ -109,26 +105,18 @@ static void services_discovery_Destructor ( vlc_object_t *p_obj );
  * That's how the playlist get's Service Discovery information
  */
 
-/*******************************************************************//**
- * Create a Service discovery
- ***********************************************************************/
-services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
-                                     const char *cfg )
+services_discovery_t *vlc_sd_Create(vlc_object_t *parent, const char *cfg,
+    const struct services_discovery_owner_t *restrict owner)
 {
-    services_discovery_t *p_sd;
-
-    p_sd = vlc_custom_create( p_super, sizeof( *p_sd ), "services discovery" );
-    if( !p_sd )
+    services_discovery_t *sd = vlc_custom_create(parent, sizeof (*sd),
+                                                 "services discovery");
+    if (unlikely(sd == NULL))
         return NULL;
-    free(config_ChainCreate( &p_sd->psz_name, &p_sd->p_cfg, cfg ));
 
-    vlc_event_manager_t *em = &p_sd->event_manager;
-    vlc_event_manager_init( em, p_sd );
-    vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryItemAdded);
-    vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryItemRemoved);
+    free(config_ChainCreate(&sd->psz_name, &sd->p_cfg, cfg));
+    sd->owner = *owner;
 
-    vlc_object_set_destructor( p_sd, services_discovery_Destructor );
-    return p_sd;
+    return sd;
 }
 
 /*******************************************************************//**
@@ -169,16 +157,6 @@ void vlc_sd_Destroy( services_discovery_t *p_sd )
 }
 
 /*******************************************************************//**
- * Destructor of the Service Discovery
- ***********************************************************************/
-static void services_discovery_Destructor ( vlc_object_t *p_obj )
-{
-    services_discovery_t * p_sd = (services_discovery_t *)p_obj;
-    assert(!p_sd->p_module); /* Forgot to call Stop */
-    vlc_event_manager_fini( &p_sd->event_manager );
-}
-
-/*******************************************************************//**
  * Get the Localized Name
  *
  * This is useful for interfaces and libVLC
@@ -189,46 +167,6 @@ services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
     if (p_sd->p_module == NULL)
         return NULL;
     return strdup( module_get_name( p_sd->p_module, true ) );
-}
-
-/*******************************************************************//**
- * Getter for the EventManager
- *
- * You can receive event notification
- * This is the preferred way to get new items
- ***********************************************************************/
-vlc_event_manager_t *
-services_discovery_EventManager ( services_discovery_t * p_sd )
-{
-    return &p_sd->event_manager;
-}
-
-/*******************************************************************//**
- * Add an item to the Service Discovery listing
- ***********************************************************************/
-void
-services_discovery_AddItem ( services_discovery_t * p_sd, input_item_t * p_item,
-                             const char * psz_category )
-{
-    vlc_event_t event;
-    event.type = vlc_ServicesDiscoveryItemAdded;
-    event.u.services_discovery_item_added.p_new_item = p_item;
-    event.u.services_discovery_item_added.psz_category = psz_category;
-
-    vlc_event_send( &p_sd->event_manager, &event );
-}
-
-/*******************************************************************//**
- * Remove an item from the Service Discovery listing
- ***********************************************************************/
-void
-services_discovery_RemoveItem ( services_discovery_t * p_sd, input_item_t * p_item )
-{
-    vlc_event_t event;
-    event.type = vlc_ServicesDiscoveryItemRemoved;
-    event.u.services_discovery_item_removed.p_item = p_item;
-
-    vlc_event_send( &p_sd->event_manager, &event );
 }
 
 /*
@@ -244,11 +182,11 @@ struct vlc_sd_internal_t
 };
 
  /* A new item has been added to a certain sd */
-static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_data )
+static void playlist_sd_item_added(services_discovery_t *sd,
+                                   input_item_t *p_input, const char *psz_cat)
 {
-    input_item_t * p_input = p_event->u.services_discovery_item_added.p_new_item;
-    const char * psz_cat = p_event->u.services_discovery_item_added.psz_category;
-    playlist_item_t * p_parent = user_data;
+    vlc_sd_internal_t *sds = sd->owner.sys;
+    playlist_item_t *p_parent = sds->node;
     playlist_t * p_playlist = p_parent->p_playlist;
 
     msg_Dbg( p_playlist, "Adding %s in %s",
@@ -278,10 +216,11 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
 }
 
  /* A new item has been removed from a certain sd */
-static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_data )
+static void playlist_sd_item_removed(services_discovery_t *sd,
+                                     input_item_t *p_input)
 {
-    input_item_t * p_input = p_event->u.services_discovery_item_removed.p_item;
-    playlist_item_t * p_sd_node = user_data;
+    vlc_sd_internal_t *sds = sd->owner.sys;
+    playlist_item_t *p_sd_node = sds->node;
     playlist_t *p_playlist = p_sd_node->p_playlist;
 
     PL_LOCK;
@@ -339,8 +278,14 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
         return VLC_ENOMEM;
     }
 
+    struct services_discovery_owner_t owner = {
+        sds,
+        playlist_sd_item_added,
+        playlist_sd_item_removed,
+    };
+
     /* Perform the addition */
-    sds->sd = vlc_sd_Create(VLC_OBJECT(playlist), chain);
+    sds->sd = vlc_sd_Create(VLC_OBJECT(playlist), chain, &owner);
     if (unlikely(sds->sd == NULL))
     {
         playlist_Lock(playlist);
@@ -349,12 +294,6 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
         free(sds);
         return VLC_ENOMEM;
     }
-
-    vlc_event_manager_t *em = services_discovery_EventManager(sds->sd);
-    vlc_event_attach(em, vlc_ServicesDiscoveryItemAdded,
-                     playlist_sd_item_added, sds->node);
-    vlc_event_attach(em, vlc_ServicesDiscoveryItemRemoved,
-                     playlist_sd_item_removed, sds->node);
 
     if (!vlc_sd_Start(sds->sd))
     {
@@ -379,13 +318,6 @@ static void playlist_ServicesDiscoveryInternalRemove(playlist_t *playlist,
 {
     assert(sds->sd != NULL);
     vlc_sd_Stop(sds->sd);
-
-    vlc_event_detach(services_discovery_EventManager(sds->sd),
-                     vlc_ServicesDiscoveryItemAdded,
-                     playlist_sd_item_added, sds->node);
-    vlc_event_detach(services_discovery_EventManager(sds->sd),
-                     vlc_ServicesDiscoveryItemRemoved,
-                     playlist_sd_item_removed, sds->node);
     vlc_sd_Destroy(sds->sd);
 
     /* Remove the sd playlist node if it exists */

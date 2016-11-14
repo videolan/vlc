@@ -121,12 +121,8 @@ typedef enum vlc_event_type_t {
     vlc_InputItemErrorWhenReadingChanged,
     vlc_InputItemPreparseEnded,
 
-    /* Service Discovery event */
-    vlc_ServicesDiscoveryItemAdded,
-    vlc_ServicesDiscoveryItemRemoved,
-
     /* Renderer Discovery events */
-    vlc_RendererDiscoveryItemAdded=vlc_ServicesDiscoveryItemRemoved+4,
+    vlc_RendererDiscoveryItemAdded=vlc_InputItemPreparseEnded+6,
     vlc_RendererDiscoveryItemRemoved,
 
     /* Addons Manager events */

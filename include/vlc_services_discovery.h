@@ -25,7 +25,6 @@
 #define VLC_SERVICES_DISCOVERY_H_
 
 #include <vlc_input.h>
-#include <vlc_events.h>
 #include <vlc_probe.h>
 
 /**
@@ -41,6 +40,14 @@ extern "C" {
  * @{
  */
 
+struct services_discovery_owner_t
+{
+    void *sys; /**< Private data for the owner callbacks */
+    void (*item_added)(struct services_discovery_t *sd, input_item_t *item,
+                       const char *category);
+    void (*item_removed)(struct services_discovery_t *sd, input_item_t *item);
+};
+
 /**
  * Main service discovery structure to build a SD module
  */
@@ -48,10 +55,6 @@ struct services_discovery_t
 {
     VLC_COMMON_MEMBERS
     module_t *          p_module;             /**< Loaded module */
-
-    /**< Event manager
-     * You should access it through setters, outside of the core */
-    vlc_event_manager_t event_manager;
 
     char *psz_name;                           /**< Main name of the SD */
     config_chain_t *p_cfg;                    /**< Configuration for the SD */
@@ -62,6 +65,8 @@ struct services_discovery_t
     int ( *pf_control ) ( services_discovery_t *, int, va_list );
 
     services_discovery_sys_t *p_sys;          /**< Custom private data */
+
+    struct services_discovery_owner_t owner; /**< Owner callbacks */
 };
 
 /**
@@ -131,8 +136,13 @@ VLC_API char ** vlc_sd_GetNames( vlc_object_t *, char ***, int ** ) VLC_USED;
 #define vlc_sd_GetNames(obj, pln, pcat ) \
         vlc_sd_GetNames(VLC_OBJECT(obj), pln, pcat)
 
-/* Creation of a services_discovery object */
-VLC_API services_discovery_t * vlc_sd_Create( vlc_object_t *, const char * ) VLC_USED;
+/**
+ * Creates a services discoverer.
+ */
+VLC_API services_discovery_t *vlc_sd_Create(vlc_object_t *parent,
+    const char *chain, const struct services_discovery_owner_t *owner)
+VLC_USED;
+
 VLC_API bool vlc_sd_Start( services_discovery_t * );
 VLC_API void vlc_sd_Stop( services_discovery_t * );
 VLC_API void vlc_sd_Destroy( services_discovery_t * );
@@ -152,12 +162,39 @@ VLC_API char * services_discovery_GetLocalizedName( services_discovery_t * p_thi
 /* Receive event notification (preferred way to get new items) */
 VLC_API vlc_event_manager_t * services_discovery_EventManager( services_discovery_t * p_this ) VLC_USED;
 
-/* Used by services_discovery to post update about their items */
-    /* About the psz_category, it is a legacy way to add info to the item,
-     * for more options, directly set the (meta) data on the input item */
-VLC_API void services_discovery_AddItem( services_discovery_t * p_this, input_item_t * p_item, const char * psz_category );
-VLC_API void services_discovery_RemoveItem( services_discovery_t * p_this, input_item_t * p_item );
+/**
+ * Added service callback.
+ *
+ * A services discovery module invokes this function when it "discovers" a new
+ * service, i.e. a new input item.
+ *
+ * @note The function does not take ownership of the input item; it might
+ * however add one of more references. The caller is responsible for releasing
+ * its reference to the input item.
+ *
+ * @param sd services discoverer / services discovery module instance
+ * @param item input item to add
+ * @param category Optional name of a group that the item belongs in
+ *                 (for backward compatibility with legacy modules)
+ */
+static inline void services_discovery_AddItem(services_discovery_t *sd,
+                                              input_item_t *item,
+                                              const char *category)
+{
+    return sd->owner.item_added(sd, item, category);
+}
 
+/**
+ * Removed service callback.
+ *
+ * A services discovery module invokes this function when it senses that a
+ * service is no longer available.
+ */
+static inline void services_discovery_RemoveItem(services_discovery_t *sd,
+                                                 input_item_t *item)
+{
+    return sd->owner.item_removed(sd, item);
+}
 
 /* SD probing */
 
