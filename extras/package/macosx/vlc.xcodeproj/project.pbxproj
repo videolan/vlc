@@ -1437,8 +1437,6 @@
 		CC6EDD500B9CA2140096068A /* VLCEyeTvController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCEyeTvController.m; path = ../../../modules/gui/macosx/VLCEyeTvController.m; sourceTree = SOURCE_ROOT; };
 		CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCTrackSynchronizationWindowController.h; path = ../../../modules/gui/macosx/VLCTrackSynchronizationWindowController.h; sourceTree = SOURCE_ROOT; };
 		CC707EC4137464CD0003010A /* VLCTrackSynchronizationWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCTrackSynchronizationWindowController.m; path = ../../../modules/gui/macosx/VLCTrackSynchronizationWindowController.m; sourceTree = SOURCE_ROOT; };
-		CC772DAC10E621C100675C9B /* VLCProgressPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCProgressPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.h; sourceTree = SOURCE_ROOT; };
-		CC772DAD10E621C100675C9B /* VLCProgressPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCProgressPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.m; sourceTree = SOURCE_ROOT; };
 		CC79F66614014FC30015D89E /* opengl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = opengl.h; path = ../../../modules/video_output/opengl.h; sourceTree = "<group>"; };
 		CC8062631021F8790021EB9A /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = Resources/dsa_pub.pem; sourceTree = "<group>"; };
 		CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = ../../../contrib/BGHUDAppKit.framework; sourceTree = "<absolute>"; };
@@ -1569,10 +1567,6 @@
 		CCCDDEF013E870BB00A35661 /* SideBarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SideBarItem.m; path = ../../../modules/gui/macosx/SideBarItem.m; sourceTree = SOURCE_ROOT; };
 		CCCE366D13817E4500694F2A /* VLCVideoEffectsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VLCVideoEffectsWindowController.h; path = ../../../modules/gui/macosx/VLCVideoEffectsWindowController.h; sourceTree = SOURCE_ROOT; };
 		CCCE366E13817E4500694F2A /* VLCVideoEffectsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = VLCVideoEffectsWindowController.m; path = ../../../modules/gui/macosx/VLCVideoEffectsWindowController.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		CCD590F010E5B73200D39094 /* dialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dialogProvider.h; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.h; sourceTree = SOURCE_ROOT; };
-		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
-		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
-		CCD590F310E5B76300D39094 /* VLCLoginPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCLoginPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.m; sourceTree = SOURCE_ROOT; };
 		CCD83E2C13FE9B90004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		CCD83E2F13FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/About.xib; sourceTree = "<group>"; };
 		CCD83E3113FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AudioEffects.xib; sourceTree = "<group>"; };
@@ -1638,7 +1632,6 @@
 		089C166AFE841209C02AAC07 /* vlc */ = {
 			isa = PBXGroup;
 			children = (
-				CCD590EF10E5B71300D39094 /* Minimal Dialog Provider */,
 				CC6C01A40DDF3E7800C7D754 /* Minimal Mac OS X Classes */,
 				CCC8957F0D9A8A61005AE59C /* OSX-specific source files */,
 				08FB77AFFE84173DC02AAC07 /* Classes */,
@@ -2614,19 +2607,6 @@
 				CCDDF1B0172FF4E2007729A1 /* access */,
 			);
 			name = "OSX-specific source files";
-			sourceTree = "<group>";
-		};
-		CCD590EF10E5B71300D39094 /* Minimal Dialog Provider */ = {
-			isa = PBXGroup;
-			children = (
-				CC772DAC10E621C100675C9B /* VLCProgressPanel.h */,
-				CC772DAD10E621C100675C9B /* VLCProgressPanel.m */,
-				CCD590F010E5B73200D39094 /* dialogProvider.h */,
-				CCD590F110E5B73200D39094 /* dialogProvider.m */,
-				CCD590F210E5B76300D39094 /* VLCLoginPanel.h */,
-				CCD590F310E5B76300D39094 /* VLCLoginPanel.m */,
-			);
-			name = "Minimal Dialog Provider";
 			sourceTree = "<group>";
 		};
 		CCDDF1AE172FF4CE007729A1 /* vout */ = {
