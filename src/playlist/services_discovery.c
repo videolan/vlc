@@ -126,8 +126,6 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
     vlc_event_manager_init( em, p_sd );
     vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryItemAdded);
     vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryItemRemoved);
-    vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryStarted);
-    vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryEnded);
 
     vlc_object_set_destructor( p_sd, services_discovery_Destructor );
     return p_sd;
@@ -148,10 +146,6 @@ bool vlc_sd_Start ( services_discovery_t * p_sd )
         return false;
     }
 
-    vlc_event_t event = {
-        .type = vlc_ServicesDiscoveryStarted
-    };
-    vlc_event_send( &p_sd->event_manager, &event );
     return true;
 }
 
@@ -160,12 +154,6 @@ bool vlc_sd_Start ( services_discovery_t * p_sd )
  ***********************************************************************/
 void vlc_sd_Stop ( services_discovery_t * p_sd )
 {
-    vlc_event_t event = {
-        .type = vlc_ServicesDiscoveryEnded
-    };
-
-    vlc_event_send( &p_sd->event_manager, &event );
-
     module_unneed( p_sd, p_sd->p_module );
     p_sd->p_module = NULL;
 }
