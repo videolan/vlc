@@ -27,6 +27,8 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
+#include <vlc_charset.h>
+
 #include <jpeglib.h>
 #include <setjmp.h>
 
@@ -258,7 +260,7 @@ static bool getRDFFloat(const char *psz_rdf, float *out, const char *psz_var)
     if (unlikely(p_end == NULL || p_end == p_start + 1))
         return false;
 
-    *out = strtof(p_start + varlen, NULL);
+    *out = us_strtof(p_start + varlen, NULL);
     return true;
 }
 
