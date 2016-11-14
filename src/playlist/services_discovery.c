@@ -374,6 +374,29 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
     return VLC_SUCCESS;
 }
 
+static void playlist_ServicesDiscoveryInternalRemove(playlist_t *playlist,
+                                                     vlc_sd_internal_t *sds)
+{
+    assert(sds->sd != NULL);
+    vlc_sd_Stop(sds->sd);
+
+    vlc_event_detach(services_discovery_EventManager(sds->sd),
+                     vlc_ServicesDiscoveryItemAdded,
+                     playlist_sd_item_added, sds->node);
+    vlc_event_detach(services_discovery_EventManager(sds->sd),
+                     vlc_ServicesDiscoveryItemRemoved,
+                     playlist_sd_item_removed, sds->node);
+    vlc_sd_Destroy(sds->sd);
+
+    /* Remove the sd playlist node if it exists */
+    playlist_Lock(playlist);
+    playlist_NodeDelete(playlist, sds->node, true, false);
+    playlist_Unlock(playlist);
+
+    free(sds);
+}
+
+
 int playlist_ServicesDiscoveryRemove(playlist_t *playlist, const char *name)
 {
     playlist_private_t *priv = pl_priv(playlist);
@@ -399,25 +422,7 @@ int playlist_ServicesDiscoveryRemove(playlist_t *playlist, const char *name)
         return VLC_EGENERIC;
     }
 
-    assert(sds->sd != NULL);
-
-    vlc_sd_Stop(sds->sd);
-
-    vlc_event_detach(services_discovery_EventManager(sds->sd),
-                     vlc_ServicesDiscoveryItemAdded,
-                     playlist_sd_item_added, sds->node);
-    vlc_event_detach(services_discovery_EventManager(sds->sd),
-                     vlc_ServicesDiscoveryItemRemoved,
-                     playlist_sd_item_removed, sds->node);
-    vlc_sd_Destroy(sds->sd);
-
-    /* Remove the sd playlist node if it exists */
-    playlist_Lock(playlist);
-    playlist_NodeDelete(playlist, sds->node, true, false);
-    playlist_Unlock(playlist);
-
-    free(sds);
-
+    playlist_ServicesDiscoveryInternalRemove(playlist, sds);
     return VLC_SUCCESS;
 }
 
@@ -468,11 +473,12 @@ int playlist_ServicesDiscoveryControl( playlist_t *p_playlist, const char *psz_n
     return i_ret;
 }
 
-void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist )
+void playlist_ServicesDiscoveryKillAll(playlist_t *playlist)
 {
-    playlist_private_t *priv = pl_priv( p_playlist );
+    playlist_private_t *priv = pl_priv(playlist);
 
-    while( priv->i_sds > 0 )
-        playlist_ServicesDiscoveryRemove(p_playlist,
-                                         priv->pp_sds[0]->name);
+    for (int i = 0; i < priv->i_sds; i++)
+        playlist_ServicesDiscoveryInternalRemove(playlist, priv->pp_sds[i]);
+
+    TAB_CLEAN(priv->i_sds, priv->pp_sds);
 }
