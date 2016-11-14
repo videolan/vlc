@@ -1325,14 +1325,14 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "playlist" ) )
     {
         msg_rc( "+----[ Playlist ]" );
-        print_playlist( p_intf, p_playlist->p_root_category, 0 );
+        print_playlist( p_intf, p_playlist->p_root, 0 );
         msg_rc( "+----[ End of playlist ]" );
     }
 
     else if( !strcmp( psz_cmd, "sort" ))
     {
         PL_LOCK;
-        playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_onelevel,
+        playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root,
                                     SORT_ARTIST, ORDER_NORMAL );
         PL_UNLOCK;
     }

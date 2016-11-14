@@ -279,7 +279,7 @@ static VLCMain *sharedInstance = nil;
 
     playlist_t * p_playlist = pl_Get(getIntf());
     PL_LOCK;
-    items_at_launch = p_playlist->p_local_category->i_children;
+    items_at_launch = p_playlist->p_playing->i_children;
     PL_UNLOCK;
 
 #ifdef HAVE_SPARKLE
@@ -322,7 +322,7 @@ static VLCMain *sharedInstance = nil;
     // note that PLAYLIST_PLAY will not stop any playback if already started
     playlist_t * p_playlist = pl_Get(getIntf());
     PL_LOCK;
-    BOOL kidsAround = p_playlist->p_local_category->i_children != 0;
+    BOOL kidsAround = p_playlist->p_playing->i_children != 0;
     if (kidsAround && var_GetBool(p_playlist, "playlist-autostart"))
         playlist_Control(p_playlist, PLAYLIST_PLAY, true);
     PL_UNLOCK;

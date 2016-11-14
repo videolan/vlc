@@ -252,12 +252,6 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     p_playlist->p_root = root;
     p_playlist->p_playing = playing;
     p_playlist->p_media_library = ml;
-    p_playlist->p_root_category = p_playlist->p_root;
-    p_playlist->p_root_onelevel = p_playlist->p_root;
-    p_playlist->p_local_category = p_playlist->p_playing;
-    p_playlist->p_local_onelevel = p_playlist->p_playing;
-    p_playlist->p_ml_category = p_playlist->p_media_library;
-    p_playlist->p_ml_onelevel = p_playlist->p_media_library;;
 
     /* Initial status */
     pl_priv(p_playlist)->status.p_item = NULL;

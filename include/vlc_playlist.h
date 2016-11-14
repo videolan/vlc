@@ -174,14 +174,6 @@ struct playlist_t
     playlist_item_t *     p_root;
     playlist_item_t *     p_playing;
     playlist_item_t *     p_media_library;
-
-    //Phony ones, point to those above;
-    playlist_item_t *     p_root_category; /**< Root of category tree */
-    playlist_item_t *     p_root_onelevel; /**< Root of onelevel tree */
-    playlist_item_t *     p_local_category; /** < "Playlist" in CATEGORY view */
-    playlist_item_t *     p_ml_category; /** < "Library" in CATEGORY view */
-    playlist_item_t *     p_local_onelevel; /** < "Playlist" in ONELEVEL view */
-    playlist_item_t *     p_ml_onelevel; /** < "Library" in ONELEVEL view */
 };
 
 /** Helper to add an item */

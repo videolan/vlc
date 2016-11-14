@@ -420,7 +420,7 @@ static void PlaylistRebuild(intf_thread_t *intf)
     playlist_t *p_playlist = pl_Get(intf);
 
     PlaylistDestroy(sys);
-    PlaylistAddNode(sys, p_playlist->p_root_onelevel, "");
+    PlaylistAddNode(sys, p_playlist->p_root, "");
 }
 
 static int ItemChanged(vlc_object_t *p_this, const char *variable,
@@ -1316,7 +1316,7 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
     /* Playlist sort */
     case 'o':
     case 'O':
-        playlist_RecursiveNodeSort(p_playlist, p_playlist->p_root_onelevel,
+        playlist_RecursiveNodeSort(p_playlist, p_playlist->p_root,
                                     SORT_TITLE_NODES_FIRST,
                                     (key == 'o')? ORDER_NORMAL : ORDER_REVERSE);
         vlc_mutex_lock(&sys->pl_lock);
@@ -1439,13 +1439,13 @@ static bool HandleBrowseKey(intf_thread_t *intf, int key)
             p_parent = item ? item->p_parent : NULL;
             PL_UNLOCK;
             if (!p_parent)
-                p_parent = p_playlist->p_local_onelevel;
+                p_parent = p_playlist->p_playing;
         }
 
         while (p_parent->p_parent && p_parent->p_parent->p_parent)
             p_parent = p_parent->p_parent;
 
-        input_item_t *p_input = p_playlist->p_local_onelevel->p_input;
+        input_item_t *p_input = p_playlist->p_playing->p_input;
         playlist_Add(p_playlist, uri, NULL, PLAYLIST_APPEND,
                       PLAYLIST_END, p_parent->p_input == p_input, false);
 
@@ -1475,7 +1475,7 @@ static void OpenSelection(intf_thread_t *intf)
         current= playlist_CurrentPlayingItem(p_playlist);
         p_parent = current ? current->p_parent : NULL;
         if (!p_parent)
-            p_parent = p_playlist->p_local_onelevel;
+            p_parent = p_playlist->p_playing;
     }
 
     while (p_parent->p_parent && p_parent->p_parent->p_parent)
@@ -1484,7 +1484,7 @@ static void OpenSelection(intf_thread_t *intf)
 
     playlist_Add(p_playlist, uri, NULL,
             PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
-            p_parent->p_input == p_playlist->p_local_onelevel->p_input,
+            p_parent->p_input == p_playlist->p_playing->p_input,
             false);
 
     sys->plidx_follow = true;

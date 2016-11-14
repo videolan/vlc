@@ -38,7 +38,7 @@ void CmdPlaytreeSort::execute()
     /// \todo Choose the correct view
     playlist_t *p_playlist = getIntf()->p_sys->p_playlist;
     PL_LOCK;
-    playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_onelevel,
+    playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root,
                                 SORT_TITLE, ORDER_NORMAL );
     PL_UNLOCK;
 

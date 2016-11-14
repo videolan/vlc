@@ -1133,7 +1133,7 @@
 
             playlist_Export(p_playlist,
                             [actualFilename fileSystemRepresentation],
-                            p_playlist->p_local_category, "export-m3u");
+                            p_playlist->p_playing, "export-m3u");
         } else if ([_playlistSaveAccessoryPopup indexOfSelectedItem] == 1) {
             NSString *actualFilename;
             NSRange range;
@@ -1147,7 +1147,7 @@
 
             playlist_Export(p_playlist,
                             [actualFilename fileSystemRepresentation],
-                            p_playlist->p_local_category, "export-xspf");
+                            p_playlist->p_playing, "export-xspf");
         } else {
             NSString *actualFilename;
             NSRange range;
@@ -1161,7 +1161,7 @@
 
             playlist_Export(p_playlist,
                             [actualFilename fileSystemRepresentation],
-                            p_playlist->p_local_category, "export-html");
+                            p_playlist->p_playing, "export-html");
         }
     }
 }

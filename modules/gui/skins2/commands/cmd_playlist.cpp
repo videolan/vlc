@@ -99,7 +99,7 @@ void CmdPlaylistSave::execute()
         }
 
         playlist_Export( pPlaylist, m_file.c_str(),
-                         pPlaylist->p_local_category, psz_module );
+                         pPlaylist->p_playing, psz_module );
     }
 }
 

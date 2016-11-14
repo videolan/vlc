@@ -952,9 +952,9 @@ static const float f_min_window_height = 307.;
 
     PL_LOCK;
     if (root == ROOT_TYPE_PLAYLIST)
-        [_categoryLabel setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_local_category]]];
+        [_categoryLabel setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_playing]]];
     else if (root == ROOT_TYPE_MEDIALIBRARY)
-        [_categoryLabel setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_ml_category]]];
+        [_categoryLabel setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_playing]]];
 
     PL_UNLOCK;
 }
@@ -1051,15 +1051,15 @@ static const float f_min_window_height = 307.;
 
     if ([[item identifier] isEqualToString: @"playlist"]) {
         PL_LOCK;
-        i_playlist_size = p_playlist->p_local_category->i_children;
+        i_playlist_size = p_playlist->p_playing->i_children;
         PL_UNLOCK;
 
         return i_playlist_size;
     }
     if ([[item identifier] isEqualToString: @"medialibrary"]) {
         PL_LOCK;
-        if (p_playlist->p_ml_category)
-            i_playlist_size = p_playlist->p_ml_category->i_children;
+        if (p_playlist->p_media_library)
+            i_playlist_size = p_playlist->p_media_library->i_children;
         PL_UNLOCK;
 
         return i_playlist_size;
@@ -1151,7 +1151,7 @@ static const float f_min_window_height = 307.;
         [self _updatePlaylistTitle];
 
     } else if ([[item identifier] isEqualToString:@"medialibrary"]) {
-        if (p_playlist->p_ml_category) {
+        if (p_playlist->p_media_library) {
 
             PL_LOCK;
             [[[[VLCMain sharedInstance] playlist] model] changeRootItem:p_playlist->p_media_library];

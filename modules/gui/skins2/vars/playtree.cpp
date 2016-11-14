@@ -288,7 +288,7 @@ void Playtree::insertItems( VarTree& elem, const std::list<std::string>& files, 
     {
         for( Iterator it = m_children.begin(); it != m_children.end(); ++it )
         {
-            if( it->getId() == m_pPlaylist->p_local_category->i_id )
+            if( it->getId() == m_pPlaylist->p_playing->i_id )
             {
                 p_elem = &*it;
                 break;
@@ -296,15 +296,15 @@ void Playtree::insertItems( VarTree& elem, const std::list<std::string>& files, 
         }
     }
 
-    if( p_elem->getId() == m_pPlaylist->p_local_category->i_id )
+    if( p_elem->getId() == m_pPlaylist->p_playing->i_id )
     {
-        p_node = m_pPlaylist->p_local_category;
+        p_node = m_pPlaylist->p_playing;
         i_pos = 0;
         p_elem->setExpanded( true );
     }
-    else if( p_elem->getId() == m_pPlaylist->p_ml_category->i_id )
+    else if( p_elem->getId() == m_pPlaylist->p_media_library->i_id )
     {
-        p_node = m_pPlaylist->p_ml_category;
+        p_node = m_pPlaylist->p_media_library;
         i_pos = 0;
         p_elem->setExpanded( true );
     }
