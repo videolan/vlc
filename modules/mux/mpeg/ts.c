@@ -1221,6 +1221,56 @@ static block_t *Pack_Opus(block_t *p_data)
     return p_data;
 }
 
+static void SetBlockDuration( sout_input_t *p_input, block_t *p_data )
+{
+    sout_input_sys_t *p_stream = (sout_input_sys_t*) p_input->p_sys;
+
+    if( p_input->p_fmt->i_cat != SPU_ES &&
+        block_FifoCount( p_input->p_fifo ) > 0 )
+    {
+        block_t *p_next = block_FifoShow( p_input->p_fifo );
+        mtime_t i_diff = p_next->i_dts - p_data->i_dts;
+        if( i_diff > 0 &&
+                (p_next->i_flags & BLOCK_FLAG_DISCONTINUITY) == 0 )
+        {
+            p_data->i_length = i_diff;
+        }
+        else if ( p_data->i_length == 0 )
+        {
+            /* Try rates */
+            if( p_input->p_fmt->i_cat == VIDEO_ES &&
+                p_input->p_fmt->video.i_frame_rate &&
+                p_input->p_fmt->video.i_frame_rate_base )
+            {
+                p_data->i_length = CLOCK_FREQ *
+                                   p_input->p_fmt->video.i_frame_rate /
+                                   p_input->p_fmt->video.i_frame_rate_base;
+            }
+            else if( p_input->p_fmt->i_cat == AUDIO_ES &&
+                     p_input->p_fmt->audio.i_bytes_per_frame &&
+                     p_input->p_fmt->audio.i_frame_length )
+            {
+                p_data->i_length = p_data->i_buffer *
+                                   p_input->p_fmt->audio.i_frame_length /
+                                   p_input->p_fmt->audio.i_bytes_per_frame;
+            }
+            /* Try a previous duration */
+            else if( p_stream->state.chain_pes.p_first )
+                p_data->i_length = p_stream->state.chain_pes.p_first->i_length;
+            /* Or next */
+            else if( p_next->i_length > 0 )
+                p_data->i_length = p_next->i_length;
+            /* or worse */
+            else
+                p_data->i_length = 1000;
+        }
+    }
+    else if( p_input->p_fmt->i_codec != VLC_CODEC_SUBT )
+    {
+        p_data->i_length = 1000;
+    }
+}
+
 /* returns true if needs more data */
 static bool MuxStreams(sout_mux_t *p_mux )
 {
@@ -1315,15 +1365,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
         else
             p_data = FixPES( p_mux, p_input->p_fifo );
 
-        if( block_FifoCount( p_input->p_fifo ) > 0 &&
-            p_input->p_fmt->i_cat != SPU_ES )
-        {
-            block_t *p_next = block_FifoShow( p_input->p_fifo );
-            p_data->i_length = p_next->i_dts - p_data->i_dts;
-        }
-        else if( p_input->p_fmt->i_codec !=
-                   VLC_CODEC_SUBT )
-            p_data->i_length = 1000;
+        SetBlockDuration( p_input, p_data );
 
         if (p_sys->first_dts == 0)
             p_sys->first_dts = p_data->i_dts;
