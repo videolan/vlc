@@ -176,8 +176,6 @@ static void *Run( void *data )
     services_discovery_t *p_sd = data;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    int canc = vlc_savecancel();
-
     int num_dir = sizeof( p_sys->psz_dir ) / sizeof( p_sys->psz_dir[0] );
     for( int i = 0; i < num_dir; i++ )
     {
@@ -214,7 +212,6 @@ static void *Run( void *data )
         free( psz_uri );
     }
 
-    vlc_restorecancel(canc);
     return NULL;
 }
 
@@ -226,7 +223,6 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = (services_discovery_t *)p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
 
     var_DelCallback( p_sd->obj.libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
