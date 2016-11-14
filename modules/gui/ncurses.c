@@ -501,7 +501,7 @@ static inline bool IsIndex(intf_sys_t *sys, playlist_t *p_playlist, int i)
 
     playlist_item_t *p_played_item = playlist_CurrentPlayingItem(p_playlist);
     if (p_played_item && item->p_input && p_played_item->p_input)
-        return item->p_input->i_id == p_played_item->p_input->i_id;
+        return item->p_input == p_played_item->p_input;
 
     return false;
 }
