@@ -147,15 +147,6 @@ VLC_API bool vlc_sd_Start( services_discovery_t * );
 VLC_API void vlc_sd_Stop( services_discovery_t * );
 VLC_API void vlc_sd_Destroy( services_discovery_t * );
 
-/**
- * Helper to stop and destroy the Service Discovery
- */
-static inline void vlc_sd_StopAndDestroy( services_discovery_t * p_this )
-{
-    vlc_sd_Stop( p_this );
-    vlc_sd_Destroy( p_this );
-}
-
 /* Read info from discovery object */
 VLC_API char * services_discovery_GetLocalizedName( services_discovery_t * p_this ) VLC_USED;
 
