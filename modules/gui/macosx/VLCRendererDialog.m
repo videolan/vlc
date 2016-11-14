@@ -34,7 +34,11 @@
     IBOutlet NSTableView *tableView;
     IBOutlet NSArrayController *arrayController;
 
+#ifdef MAC_OS_X_VERSION_10_11
     NSMutableArray<VLCRendererDiscovery*> *renderer_discoveries;
+#else
+    NSMutableArray *renderer_discoveries;
+#endif
 
     intf_thread_t          *p_intf;
     vlc_renderer_discovery_t *p_rd;

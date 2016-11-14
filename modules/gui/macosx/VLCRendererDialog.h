@@ -28,7 +28,11 @@
 
 @interface VLCRendererDialog : NSWindowController <VLCRendererDiscoveryDelegate, NSWindowDelegate>
 
+#ifdef MAC_OS_X_VERSION_10_11
 @property NSMutableArray<VLCRendererItem*> *rendererItems;
+#else
+@property NSMutableArray *rendererItems;
+#endif
 
 - (IBAction)selectRenderer:(id)sender;
 
