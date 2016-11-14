@@ -176,17 +176,6 @@ typedef struct vlc_event_t
             int new_status;
         } input_item_preparse_ended;
 
-        /* Service discovery events */
-        struct vlc_services_discovery_item_added
-        {
-            input_item_t * p_new_item;
-            const char * psz_category;
-        } services_discovery_item_added;
-        struct vlc_services_discovery_item_removed
-        {
-            input_item_t * p_item;
-        } services_discovery_item_removed;
-
         /* Renderer discovery events */
         struct vlc_renderer_discovery_item_added
         {
