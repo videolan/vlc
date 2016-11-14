@@ -32,6 +32,7 @@
 #include <vlc_xml.h>
 #include <vlc_stream.h>
 #include <vlc_text_style.h>
+#include <vlc_charset.h>
 
 #include "substext.h"
 
@@ -342,7 +343,7 @@ static ttml_style_t* ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader, c
         else if( !strcasecmp( "tts:fontSize", attr ) )
         {
             char* psz_end = NULL;
-            float size = strtof( val, &psz_end );
+            float size = us_strtof( val, &psz_end );
             if( *psz_end == '%' )
                 p_ttml_style->font_style->f_font_relsize = size;
             else
