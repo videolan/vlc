@@ -116,44 +116,25 @@ services_discovery_t *vlc_sd_Create(vlc_object_t *parent, const char *cfg,
     free(config_ChainCreate(&sd->psz_name, &sd->p_cfg, cfg));
     sd->owner = *owner;
 
+    sd->p_module = module_need(sd, "services_discovery",
+                               sd->psz_name, true);
+    if (sd->p_module == NULL)
+    {
+        msg_Err(sd, "no suitable services discovery module");
+        vlc_sd_Destroy(sd);
+        sd = NULL;
+    }
+
     return sd;
 }
 
-/*******************************************************************//**
- * Start a Service Discovery
- ***********************************************************************/
-bool vlc_sd_Start ( services_discovery_t * p_sd )
+void vlc_sd_Destroy(services_discovery_t *sd)
 {
-    assert(!p_sd->p_module);
-
-    p_sd->p_module = module_need( p_sd, "services_discovery",
-                                  p_sd->psz_name, true );
-    if( p_sd->p_module == NULL )
-    {
-        msg_Err( p_sd, "no suitable services discovery module" );
-        return false;
-    }
-
-    return true;
-}
-
-/*******************************************************************//**
- * Stop a Service Discovery
- ***********************************************************************/
-void vlc_sd_Stop ( services_discovery_t * p_sd )
-{
-    module_unneed( p_sd, p_sd->p_module );
-    p_sd->p_module = NULL;
-}
-
-/*******************************************************************//**
- * Destroy a Service Discovery
- ***********************************************************************/
-void vlc_sd_Destroy( services_discovery_t *p_sd )
-{
-    config_ChainDestroy( p_sd->p_cfg );
-    free( p_sd->psz_name );
-    vlc_object_release( p_sd );
+    if (sd->p_module != NULL)
+        module_unneed(sd, sd->p_module);
+    config_ChainDestroy(sd->p_cfg);
+    free(sd->psz_name);
+    vlc_object_release(sd);
 }
 
 /*******************************************************************//**
@@ -295,16 +276,6 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
         return VLC_ENOMEM;
     }
 
-    if (!vlc_sd_Start(sds->sd))
-    {
-        vlc_sd_Destroy(sds->sd);
-        playlist_Lock(playlist);
-        playlist_NodeDelete(playlist, sds->node, true, false);
-        playlist_Unlock(playlist);
-        free(sds);
-        return VLC_EGENERIC;
-    }
-
     strcpy(sds->name, chain);
 
     playlist_Lock(playlist);
@@ -317,7 +288,6 @@ static void playlist_ServicesDiscoveryInternalRemove(playlist_t *playlist,
                                                      vlc_sd_internal_t *sds)
 {
     assert(sds->sd != NULL);
-    vlc_sd_Stop(sds->sd);
     vlc_sd_Destroy(sds->sd);
 
     /* Remove the sd playlist node if it exists */

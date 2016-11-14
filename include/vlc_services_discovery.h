@@ -143,8 +143,6 @@ VLC_API services_discovery_t *vlc_sd_Create(vlc_object_t *parent,
     const char *chain, const struct services_discovery_owner_t *owner)
 VLC_USED;
 
-VLC_API bool vlc_sd_Start( services_discovery_t * );
-VLC_API void vlc_sd_Stop( services_discovery_t * );
 VLC_API void vlc_sd_Destroy( services_discovery_t * );
 
 /* Read info from discovery object */
