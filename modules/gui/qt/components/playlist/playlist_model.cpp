@@ -590,7 +590,7 @@ void PLModel::processInputItemUpdate( )
 
 void PLModel::processInputItemUpdate( input_item_t *p_item )
 {
-    if( !p_item ||  p_item->i_id <= 0 ) return;
+    if( !p_item ) return;
     PLItem *item = findByInputId( rootItem, p_item->i_id );
     if( item )
         updateTreeItem( item );
