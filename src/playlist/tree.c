@@ -80,8 +80,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     ARRAY_APPEND(pl_priv(p_playlist)->all_items, p_item);
 
     if( p_parent != NULL )
-        playlist_NodeInsert( p_playlist, p_item, p_parent,
-                             i_pos == PLAYLIST_END ? -1 : i_pos );
+        playlist_NodeInsert( p_playlist, p_item, p_parent, i_pos );
     playlist_SendAddNotify( p_playlist, p_item->i_id,
                             p_parent ? p_parent->i_id : -1,
                             !( i_flags & PLAYLIST_NO_REBUILD ));
@@ -192,22 +191,6 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     }
 
     playlist_ItemRelease( p_root );
-}
-
-
-/**
- * Adds an item to the children of a node
- *
- * \param p_playlist the playlist
- * \param p_item the item to append
- * \param p_parent the parent node
- * \return VLC_SUCCESS or an error
- */
-int playlist_NodeAppend( playlist_t *p_playlist,
-                         playlist_item_t *p_item,
-                         playlist_item_t *p_parent )
-{
-    return playlist_NodeInsert( p_playlist, p_item, p_parent, -1 );
 }
 
 int playlist_NodeInsert( playlist_t *p_playlist,

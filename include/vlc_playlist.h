@@ -225,7 +225,7 @@ enum
 #define PLAYLIST_SPREPARSE       0x0010
 #define PLAYLIST_NO_REBUILD      0x0020
 
-#define PLAYLIST_END           -666
+#define PLAYLIST_END           -1
 
 enum pl_locked_state
 {

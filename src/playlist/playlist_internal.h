@@ -127,7 +127,6 @@ int playlist_InsertInputItemTree ( playlist_t *,
         playlist_item_t *, input_item_node_t *, int, bool );
 
 /* Tree walking */
-int playlist_NodeAppend(playlist_t *, playlist_item_t*, playlist_item_t *);
 int playlist_NodeInsert(playlist_t *, playlist_item_t*, playlist_item_t *,
                         int);
 
