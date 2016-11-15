@@ -250,6 +250,14 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
     strcpy(sds->name, chain);
 
     playlist_Lock(playlist);
+    /* Backward compatibility with Qt UI: create the node even if the SD
+     * has not discovered any item. */
+    if (sds->node == NULL && sds->sd->description != NULL)
+        sds->node = playlist_NodeCreate(playlist, sds->sd->description,
+                                        playlist->p_root, PLAYLIST_END,
+                                        PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG,
+                                        NULL);
+
     TAB_APPEND(pl_priv(playlist)->i_sds, pl_priv(playlist)->pp_sds, sds);
     playlist_Unlock(playlist);
     return VLC_SUCCESS;
