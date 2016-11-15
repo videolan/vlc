@@ -1169,7 +1169,7 @@ static const float f_min_window_height = 307.;
     }
 
     // Note the order: first hide the podcast controls, then show the drop zone
-    if ([[item identifier] isEqualToString:@"podcast{longname=\"Podcasts\"}"])
+    if ([[item identifier] isEqualToString:@"podcast"])
         [self showPodcastControls];
     else
         [self hidePodcastControls];
@@ -1314,7 +1314,7 @@ static const float f_min_window_height = 307.;
         free(psz_urls);
 
         /* update playlist table */
-        if (playlist_IsServicesDiscoveryLoaded(p_playlist, "podcast{longname=\"Podcasts\"}")) {
+        if (playlist_IsServicesDiscoveryLoaded(p_playlist, "podcast")) {
             [[[VLCMain sharedInstance] playlist] playlistUpdated];
         }
     }

@@ -193,8 +193,7 @@ VLC_API int vlc_sd_probe_Add(vlc_probe_t *, const char *, const char *, int cate
 #define VLC_SD_PROBE_HELPER(name, longname, cat) \
 static int vlc_sd_probe_Open (vlc_object_t *obj) \
 { \
-    return vlc_sd_probe_Add ((struct vlc_probe_t *)obj, \
-                             name "{longname=\"" longname "\"}", \
+    return vlc_sd_probe_Add ((struct vlc_probe_t *)obj, name, \
                              longname, cat); \
 }
 
