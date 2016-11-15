@@ -237,10 +237,10 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
     msg_Dbg(playlist, "adding services_discovery %s...", name);
 
     for (config_chain_t *p = cfg; p != NULL; p = p->p_next)
-        if (cfg->psz_name != NULL && !strcmp(cfg->psz_name, "longname"))
+        if (p->psz_name != NULL && !strcmp(p->psz_name, "longname"))
         {
-            if (cfg->psz_value != NULL)
-                longname = cfg->psz_value;
+            if (p->psz_value != NULL)
+                longname = p->psz_value;
             break;
         }
 
