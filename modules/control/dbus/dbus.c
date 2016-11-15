@@ -1162,13 +1162,14 @@ int GetInputMeta( playlist_item_t *item, DBusMessageIter *args )
 
     const char* ppsz_meta_items[] =
     {
-    "mpris:trackid", "xesam:url", "xesam:title", "xesam:artist", "xesam:album",
-    "xesam:tracknumber", "vlc:time", "mpris:length", "xesam:genre",
-    "xesam:userRating", "xesam:contentCreated", "mpris:artUrl", "mb:trackId",
-    "vlc:audio-bitrate", "vlc:audio-samplerate", "vlc:video-bitrate",
-    "vlc:audio-codec", "vlc:copyright", "xesam:comment", "vlc:encodedby",
-    "language", "vlc:length", "vlc:nowplaying", "vlc:publisher", "vlc:setting",
-    "status", "vlc:url", "vlc:video-codec"
+        "mpris:trackid", "xesam:url", "xesam:title", "xesam:artist",
+        "xesam:album", "xesam:tracknumber", "vlc:time", "mpris:length",
+        "xesam:genre", "xesam:userRating", "xesam:contentCreated",
+        "mpris:artUrl", "mb:trackId", "vlc:audio-bitrate",
+        "vlc:audio-samplerate", "vlc:video-bitrate", "vlc:audio-codec",
+        "vlc:copyright", "xesam:comment", "vlc:encodedby", "language",
+        "vlc:length", "vlc:nowplaying", "vlc:publisher", "vlc:setting",
+        "status", "vlc:url", "vlc:video-codec"
     };
 
     dbus_message_iter_open_container( args, DBUS_TYPE_ARRAY, "{sv}", &dict );
