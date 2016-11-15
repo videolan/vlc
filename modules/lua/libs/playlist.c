@@ -214,7 +214,6 @@ static void push_playlist_item( lua_State *L, playlist_item_t *p_item )
     CHECK_AND_SET_FLAG( SKIP, skip )
     CHECK_AND_SET_FLAG( DBL, disabled )
     CHECK_AND_SET_FLAG( RO, ro )
-    CHECK_AND_SET_FLAG( REMOVE, remove )
     CHECK_AND_SET_FLAG( EXPANDED, expanded )
 #undef CHECK_AND_SET_FLAG
     lua_setfield( L, -2, "flags" );
