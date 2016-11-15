@@ -141,6 +141,9 @@ void playlist_NodeEmpty( playlist_t *, playlist_item_t *, bool );
 void ResetCurrentlyPlaying( playlist_t *p_playlist, playlist_item_t *p_cur );
 void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur );
 
+playlist_item_t * playlist_GetNextLeaf( playlist_t *, playlist_item_t *p_root,
+    playlist_item_t *p_item, bool b_ena, bool b_unplayed ) VLC_USED;
+
 #define PLAYLIST_DEBUG 1
 //#undef PLAYLIST_DEBUG2
 
