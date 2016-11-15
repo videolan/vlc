@@ -91,7 +91,6 @@ static const DBusObjectPathVTable dbus_mpris_vtable = {
 typedef struct
 {
     int signal;
-    int i_node;
 } callback_info_t;
 
 enum
@@ -983,10 +982,7 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
     else if( !strcmp( "intf-change", psz_var ) )
         info.signal = SIGNAL_INTF_CHANGE;
     else if( !strcmp( "playlist-item-append", psz_var ) )
-    {
         info.signal = SIGNAL_PLAYLIST_ITEM_APPEND;
-        info.i_node = ((playlist_add_t*)newval.p_address)->i_node;
-    }
     else if( !strcmp( "playlist-item-deleted", psz_var ) )
         info.signal = SIGNAL_PLAYLIST_ITEM_DELETED;
     else if( !strcmp( "random", psz_var ) )
