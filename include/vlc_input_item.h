@@ -57,8 +57,6 @@ struct info_category_t
  */
 struct input_item_t
 {
-    int        i_id;                 /**< Identifier of the item */
-
     char       *psz_name;            /**< text describing this item */
     char       *psz_uri;             /**< mrl of this item */
 

@@ -363,7 +363,7 @@ static QTreeWidgetItem * PLWalk( playlist_item_t *p_node )
     current->setText( 0, qfu( p_node->p_input->psz_name ) );
     current->setToolTip( 0, qfu( p_node->p_input->psz_uri ) );
     current->setText( 1, QString("%1").arg( p_node->i_id ) );
-    current->setText( 2, QString("%1").arg( p_node->p_input->i_id ) );
+    current->setText( 2, QString("%1").arg( (uintptr_t)p_node->p_input ) );
     current->setText( 3, QString("0x%1").arg( p_node->i_flags, 0, 16 ) );
     current->setText( 4, QString("0x%1").arg(  p_node->p_input->i_type, 0, 16 ) );
     for ( int i = 0; p_node->i_children > 0 && i < p_node->i_children; i++ )

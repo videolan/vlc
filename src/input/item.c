@@ -1014,8 +1014,6 @@ input_item_t *
 input_item_NewExt( const char *psz_uri, const char *psz_name,
                    mtime_t duration, int type, enum input_item_net_type i_net )
 {
-    static atomic_uint last_input_id = ATOMIC_VAR_INIT(0);
-
     input_item_owner_t *owner = calloc( 1, sizeof( *owner ) );
     if( unlikely(owner == NULL) )
         return NULL;
@@ -1025,7 +1023,6 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
     input_item_t *p_input = &owner->item;
     vlc_event_manager_t * p_em = &p_input->event_manager;
 
-    p_input->i_id = atomic_fetch_add(&last_input_id, 1);
     vlc_mutex_init( &p_input->lock );
 
     p_input->psz_name = NULL;
