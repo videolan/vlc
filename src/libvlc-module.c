@@ -1262,13 +1262,13 @@ static const char *const mouse_wheel_texts[] = {
 #define QUIT_KEY_TEXT N_("Quit")
 #define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application.")
 #define NAV_UP_KEY_TEXT N_("Navigate up")
-#define NAV_UP_KEY_LONGTEXT N_("Select the key to move the selector up in DVD menus.")
+#define NAV_UP_KEY_LONGTEXT N_("Select the key to move the selector up in DVD menus / Move viewpoint to up (pitch).")
 #define NAV_DOWN_KEY_TEXT N_("Navigate down")
-#define NAV_DOWN_KEY_LONGTEXT N_("Select the key to move the selector down in DVD menus.")
+#define NAV_DOWN_KEY_LONGTEXT N_("Select the key to move the selector down in DVD menus / Move viewpoint to down (pitch).")
 #define NAV_LEFT_KEY_TEXT N_("Navigate left")
-#define NAV_LEFT_KEY_LONGTEXT N_("Select the key to move the selector left in DVD menus.")
+#define NAV_LEFT_KEY_LONGTEXT N_("Select the key to move the selector left in DVD menus / Move viewpoint to left (yaw).")
 #define NAV_RIGHT_KEY_TEXT N_("Navigate right")
-#define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in DVD menus.")
+#define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in DVD menus / Move viewpoint to right (yaw).")
 #define NAV_ACTIVATE_KEY_TEXT N_("Activate")
 #define NAV_ACTIVATE_KEY_LONGTEXT N_("Select the key to activate selected item in DVD menus.")
 #define DISC_MENU_TEXT N_("Go to the DVD menu")
@@ -1421,6 +1421,12 @@ static const char *const mouse_wheel_texts[] = {
 #define CROP_RIGHT_KEY_LONGTEXT N_("Crop one pixel from the right of the video")
 #define UNCROP_RIGHT_KEY_TEXT N_("Uncrop one pixel from the right of the video")
 #define UNCROP_RIGHT_KEY_LONGTEXT N_("Uncrop one pixel from the right of the video")
+
+/* 360° Viewpoint */
+#define VIEWPOINT_FOV_IN_KEY_TEXT N_("Shrink field of view")
+#define VIEWPOINT_FOV_IN_KEY_LONGTEXT N_("Shrink the viewpoint field of view")
+#define VIEWPOINT_FOV_OUT_KEY_TEXT N_("Expand field of view")
+#define VIEWPOINT_FOV_OUT_KEY_LONGTEXT N_("Expand the viewpoint field of view")
 
 #define WALLPAPER_KEY_TEXT N_("Toggle wallpaper mode in video output")
 #define WALLPAPER_KEY_LONGTEXT N_( \
@@ -2226,6 +2232,10 @@ vlc_module_begin ()
 #   define KEY_CROP_RIGHT         "Alt+l"
 #   define KEY_UNCROP_RIGHT       "Alt+Shift+l"
 
+/* 360° Viewpoint */
+#   define KEY_VIEWPOINT_FOV_IN   "Page Up"
+#   define KEY_VIEWPOINT_FOV_OUT  "Page Down"
+
 /* the macosx-interface already has bindings */
 #   define KEY_ZOOM_QUARTER       NULL
 #   define KEY_ZOOM_HALF          "Command+0"
@@ -2368,6 +2378,10 @@ vlc_module_begin ()
 #   define KEY_UNCROP_BOTTOM      "Alt+Shift+c"
 #   define KEY_CROP_RIGHT         "Alt+f"
 #   define KEY_UNCROP_RIGHT       "Alt+Shift+f"
+
+/* 360° Viewpoint */
+#   define KEY_VIEWPOINT_FOV_IN   "Page Up"
+#   define KEY_VIEWPOINT_FOV_OUT  "Page Down"
 
 /* Zooming */
 #   define KEY_ZOOM_QUARTER       "Alt+1"
@@ -2561,6 +2575,11 @@ vlc_module_begin ()
              RANDOM_KEY_TEXT, RANDOM_KEY_LONGTEXT, false )
     add_key( "key-loop", KEY_LOOP,
              LOOP_KEY_TEXT, LOOP_KEY_LONGTEXT, false )
+
+    add_key( "key-viewpoint-fov-in", KEY_VIEWPOINT_FOV_IN,
+             VIEWPOINT_FOV_IN_KEY_TEXT, VIEWPOINT_FOV_IN_KEY_LONGTEXT, true )
+    add_key( "key-viewpoint-fov-out", KEY_VIEWPOINT_FOV_OUT,
+             VIEWPOINT_FOV_OUT_KEY_TEXT, VIEWPOINT_FOV_OUT_KEY_LONGTEXT, true )
 
     set_section ( N_("Zoom" ), NULL )
     add_key( "key-zoom-quarter",  KEY_ZOOM_QUARTER,

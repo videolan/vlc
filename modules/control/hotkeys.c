@@ -767,13 +767,40 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 var_SetInteger( p_input, "title  0", 2 );
             break;
         case ACTIONID_NAV_ACTIVATE:
-        case ACTIONID_NAV_UP:
-        case ACTIONID_NAV_DOWN:
-        case ACTIONID_NAV_LEFT:
-        case ACTIONID_NAV_RIGHT:
             if( p_input )
-                input_Control( p_input, i_action - ACTIONID_NAV_ACTIVATE
-                               + INPUT_NAV_ACTIVATE, NULL );
+                input_Control( p_input, INPUT_NAV_ACTIVATE, NULL );
+            break;
+        case ACTIONID_NAV_UP:
+            if( p_vout )
+                input_UpdateViewpoint( p_input,
+                                       &(vlc_viewpoint_t) { .pitch = -1.f },
+                                       false );
+            if( p_input )
+                input_Control( p_input, INPUT_NAV_UP, NULL );
+            break;
+        case ACTIONID_NAV_DOWN:
+            if( p_vout )
+                input_UpdateViewpoint( p_input,
+                                       &(vlc_viewpoint_t) { .pitch = 1.f },
+                                       false );
+            if( p_input )
+                input_Control( p_input, INPUT_NAV_DOWN, NULL );
+            break;
+        case ACTIONID_NAV_LEFT:
+            if( p_vout )
+                input_UpdateViewpoint( p_input,
+                                       &(vlc_viewpoint_t) { .yaw = -1.f },
+                                       false );
+            if( p_input )
+                input_Control( p_input, INPUT_NAV_LEFT, NULL );
+            break;
+        case ACTIONID_NAV_RIGHT:
+            if( p_vout )
+                input_UpdateViewpoint( p_input,
+                                       &(vlc_viewpoint_t) { .yaw = 1.f },
+                                       false );
+            if( p_input )
+                input_Control( p_input, INPUT_NAV_RIGHT, NULL );
             break;
 
         /* Video Output actions */
@@ -890,6 +917,19 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_UNCROP_RIGHT:
             if( p_vout )
                 var_DecInteger( p_vout, "crop-right" );
+            break;
+
+        case ACTIONID_FOV_IN:
+            if( p_vout )
+                input_UpdateViewpoint( p_input,
+                                       &(vlc_viewpoint_t) { .fov = -1.f },
+                                       false );
+            break;
+        case ACTIONID_FOV_OUT:
+            if( p_vout )
+                input_UpdateViewpoint( p_input,
+                                       &(vlc_viewpoint_t) { .fov = 1.f },
+                                       false );
             break;
 
          case ACTIONID_TOGGLE_AUTOSCALE:
