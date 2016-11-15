@@ -1232,11 +1232,13 @@ int MainInputManager::PLItemAppended( vlc_object_t *, const char *,
                                       void *data )
 {
     MainInputManager *mim = static_cast<MainInputManager*>(data);
-    playlist_add_t *p_add = static_cast<playlist_add_t*>( cur.p_address );
+    playlist_item_t *item = static_cast<playlist_item_t *>( cur.p_address );
 
-    PLEvent *event = new PLEvent( PLEvent::PLItemAppended, p_add->i_item, p_add->i_node  );
+    PLEvent *event = new PLEvent( PLEvent::PLItemAppended, item->i_id,
+        (item->p_parent != NULL) ? item->p_parent->i_id : -1  );
     QApplication::postEvent( mim, event );
-    event = new PLEvent( PLEvent::PLEmpty, p_add->i_item, 0  );
+
+    event = new PLEvent( PLEvent::PLEmpty, item->i_id, 0  );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }

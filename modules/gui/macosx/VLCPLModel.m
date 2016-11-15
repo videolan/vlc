@@ -1,4 +1,5 @@
 /*****************************************************************************
+>>>>>>> Stashed changes
  * VLCPLItem.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2014 VLC authors and VideoLAN
@@ -56,8 +57,9 @@ static int VLCPLItemAppended(vlc_object_t *p_this, const char *psz_var,
                           vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     @autoreleasepool {
-        playlist_add_t *p_add = new_val.p_address;
-        NSArray *o_val = [NSArray arrayWithObjects:[NSNumber numberWithInt:p_add->i_node], [NSNumber numberWithInt:p_add->i_item], nil];
+        playlist_item_t *p_item = new_val.p_address;
+        int i_node = p_item->p_parent ? p_item->p_parent->i_id : -1;
+        NSArray *o_val = [NSArray arrayWithObjects:[NSNumber numberWithInt:i_node], [NSNumber numberWithInt:p_item->i_id], nil];
         VLCPLModel *model = (__bridge VLCPLModel*)param;
         [model performSelectorOnMainThread:@selector(VLCPLItemAppended:) withObject:o_val waitUntilDone:NO];
 

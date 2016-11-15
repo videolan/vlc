@@ -739,8 +739,8 @@ int playlist_TreeMoveMany( playlist_t *p_playlist,
  * \param b_signal TRUE if the function must send a signal
  * \return nothing
  */
-void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
-                             int i_node_id, bool b_signal )
+void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item,
+                             bool b_signal )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
     PL_ASSERT_LOCKED;
@@ -749,11 +749,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     if( b_signal )
         vlc_cond_signal( &p_sys->signal );
 
-    playlist_add_t add;
-    add.i_item = i_item_id;
-    add.i_node = i_node_id;
-
-    var_SetAddress( p_playlist, "playlist-item-append", &add );
+    var_SetAddress( p_playlist, "playlist-item-append", item );
 }
 
 /**
@@ -823,7 +819,7 @@ static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     ARRAY_APPEND(pl_priv(p_playlist)->all_items, p_item);
 
     playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
-    playlist_SendAddNotify( p_playlist, p_item->i_id, p_node->i_id,
+    playlist_SendAddNotify( p_playlist, p_item,
                             !( i_mode & PLAYLIST_NO_REBUILD ) );
 }
 

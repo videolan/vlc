@@ -264,9 +264,9 @@ int VlcProc::onItemAppend( vlc_object_t *pObj, const char *pVariable,
     (void)pObj; (void)pVariable; (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
 
-    playlist_add_t *p_add = static_cast<playlist_add_t*>(newVal.p_address);
+    playlist_item_t *item = static_cast<playlist_item_t *>(newVal.p_address);
     CmdPlaytreeAppend *pCmdTree =
-        new CmdPlaytreeAppend( pThis->getIntf(), p_add->i_item );
+        new CmdPlaytreeAppend( pThis->getIntf(), item->i_id );
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );

@@ -105,7 +105,7 @@ struct intf_thread_t;
  * item monitored by the playlist.
  * item being played.
  *
- * - "playlist-item-append": It will contain a pointer to a playlist_add_t.
+ * - "playlist-item-append": It will contain a pointer to a playlist_item_t.
  * - "playlist-item-deleted": It will contain the playlist_item_t->i_id of a
  * deleted playlist_item_t.
  *
@@ -171,13 +171,6 @@ struct playlist_t
     playlist_item_t *     p_root;
     playlist_item_t *     p_playing;
     playlist_item_t *     p_media_library;
-};
-
-/** Helper to add an item */
-struct playlist_add_t
-{
-    int i_node; /**< Playist id of the parent node */
-    int i_item; /**< Playist id of the playlist_item_t */
 };
 
 /* A bit of macro magic to generate an enum out of the following list,

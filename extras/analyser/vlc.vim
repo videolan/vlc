@@ -35,7 +35,6 @@ function VlcSyntax()
   " Playlist
   syn keyword cType playlist_t playlist_item_t
   syn keyword cType services_discovery_t services_discovery_sys_t
-  syn keyword cType playlist_add_t playlist_preparse_t
   syn keyword cType item_info_t item_info_category_t 
   syn keyword cType sout_format_t playlist_export_t playlist_import_t
   " Intf
