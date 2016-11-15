@@ -49,7 +49,7 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER("avahi", "Zeroconf network services", SD_CAT_LAN)
+VLC_SD_PROBE_HELPER("avahi", N_("Zeroconf network services"), SD_CAT_LAN)
 
 vlc_module_begin ()
     set_shortname( "Avahi" )

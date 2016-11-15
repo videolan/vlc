@@ -33,7 +33,7 @@
 
 static int Open (vlc_object_t *);
 
-VLC_SD_PROBE_HELPER("disc", "Discs", SD_CAT_DEVICES)
+VLC_SD_PROBE_HELPER("disc", N_("Discs"), SD_CAT_DEVICES)
 
 /*
  * Module descriptor

@@ -34,7 +34,7 @@
 static int Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER( "Bonjour", "Bonjour Network Discovery", SD_CAT_LAN )
+VLC_SD_PROBE_HELPER( "Bonjour", N_("Bonjour Network Discovery"), SD_CAT_LAN )
 
 /*
  * Module descriptor

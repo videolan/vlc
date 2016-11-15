@@ -86,7 +86,7 @@ namespace Access
     static void Close( vlc_object_t* );
 }
 
-VLC_SD_PROBE_HELPER( "upnp", "Universal Plug'n'Play", SD_CAT_LAN )
+VLC_SD_PROBE_HELPER( "upnp", N_("Universal Plug'n'Play"), SD_CAT_LAN )
 
 /*
  * Module descriptor

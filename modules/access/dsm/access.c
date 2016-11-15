@@ -58,7 +58,7 @@ int bdsm_sd_probe_Open( vlc_object_t * );
 static int Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER( "dsm", "Windows networks", SD_CAT_LAN )
+VLC_SD_PROBE_HELPER( "dsm", N_("Windows networks"), SD_CAT_LAN )
 
 #define BDSM_HELP N_("libdsm's SMB (Windows network shares) input and browser")
 

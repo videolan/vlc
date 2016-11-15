@@ -41,7 +41,7 @@ static void CloseSD( vlc_object_t * );
 static int OpenRD( vlc_object_t * );
 static void CloseRD( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER( "microdns", "mDNS Network Discovery", SD_CAT_LAN )
+VLC_SD_PROBE_HELPER( "microdns", N_("mDNS Network Discovery"), SD_CAT_LAN )
 VLC_RD_PROBE_HELPER( "microdns_renderer", "mDNS renderer Discovery" )
 
 #define CFG_PREFIX "sd-microdns-"
