@@ -222,7 +222,6 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
 
     ARRAY_INIT( p_playlist->items );
     ARRAY_INIT( p_playlist->all_items );
-    ARRAY_INIT( pl_priv(p_playlist)->items_to_delete );
     ARRAY_INIT( p_playlist->current );
 
     p_playlist->i_current_index = 0;
@@ -338,12 +337,6 @@ void playlist_Destroy( playlist_t *p_playlist )
         free( p_del );
     FOREACH_END();
     ARRAY_RESET( p_playlist->all_items );
-    FOREACH_ARRAY( playlist_item_t *p_del, p_sys->items_to_delete )
-        free( p_del->pp_children );
-        vlc_gc_decref( p_del->p_input );
-        free( p_del );
-    FOREACH_END();
-    ARRAY_RESET( p_sys->items_to_delete );
 
     ARRAY_RESET( p_playlist->items );
     ARRAY_RESET( p_playlist->current );

@@ -49,9 +49,6 @@ typedef struct playlist_private_t
     playlist_t           public_data;
     struct intf_thread_t *interface; /**< Linked-list of interfaces */
 
-    playlist_item_array_t items_to_delete; /**< Array of items and nodes to
-            delete... At the very end. This sucks. */
-
     vlc_sd_internal_t   **pp_sds;
     int                   i_sds;   /**< Number of service discovery modules */
     input_thread_t *      p_input;  /**< the input thread associated
