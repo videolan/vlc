@@ -657,11 +657,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             free(infolog);
         }
 
+        /* YUV/XYZ & Vertex shaders */
         vgl->program[0] = vgl->CreateProgram();
         vgl->AttachShader(vgl->program[0], vgl->shader[0]);
         vgl->AttachShader(vgl->program[0], vgl->shader[2]);
         vgl->LinkProgram(vgl->program[0]);
 
+        /* RGA & Vertex shaders */
         vgl->program[1] = vgl->CreateProgram();
         vgl->AttachShader(vgl->program[1], vgl->shader[1]);
         vgl->AttachShader(vgl->program[1], vgl->shader[2]);
