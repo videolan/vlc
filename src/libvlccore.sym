@@ -343,7 +343,6 @@ playlist_Deactivate
 playlist_DeleteFromInput
 playlist_Export
 playlist_GetNextLeaf
-playlist_GetPrevLeaf
 playlist_GetNodeDuration
 playlist_Import
 playlist_IsServicesDiscoveryLoaded
