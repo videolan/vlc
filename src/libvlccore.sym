@@ -351,10 +351,8 @@ playlist_LiveSearchUpdate
 playlist_Lock
 playlist_NodeAddCopy
 playlist_NodeAddInput
-playlist_NodeAppend
 playlist_NodeCreate
 playlist_NodeDelete
-playlist_NodeInsert
 playlist_RecursiveNodeSort
 playlist_ServicesDiscoveryAdd
 playlist_ServicesDiscoveryControl
