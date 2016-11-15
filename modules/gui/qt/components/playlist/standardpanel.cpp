@@ -144,7 +144,7 @@ void StandardPLPanel::gotoPlayingItem()
 void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
     assert( currentView );
-    if( currentRootIndexPLId != -1 && currentRootIndexPLId != model->itemId( index.parent(), PLAYLIST_ID ) )
+    if( currentRootIndexPLId != -1 && currentRootIndexPLId != model->itemId( index.parent() ) )
         browseInto( index.parent() );
     currentView->scrollTo( index );
 }
@@ -509,7 +509,7 @@ void StandardPLPanel::browseInto( const QModelIndex &index )
             currentView->scrollTo( newIndex );
 
         /* Store new rootindexid*/
-        currentRootIndexPLId = model->itemId( index, PLAYLIST_ID );
+        currentRootIndexPLId = model->itemId( index );
 
         model->ensureArtRequested( index );
     }
@@ -802,7 +802,7 @@ void StandardPLPanel::activate( const QModelIndex &index )
         else
         {
             playlist_Lock( THEPL );
-            playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index, PLAYLIST_ID ) );
+            playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index ) );
             if ( p_item )
             {
                 p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;

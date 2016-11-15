@@ -34,12 +34,6 @@
 #include <QString>
 #include <QUrl>
 
-enum
-{
-    INPUTITEM_ID = 1,
-    PLAYLIST_ID,
-};
-
 class AbstractPLItem
 {
     friend class PLItem; /* super ugly glue stuff */
@@ -52,7 +46,7 @@ public:
     virtual ~AbstractPLItem() {}
 
 protected:
-    virtual int id( int type ) const = 0;
+    virtual int id( ) const = 0;
     int childCount() const { return children.count(); }
     int indexOf( AbstractPLItem *item ) const { return children.indexOf( item ); };
     int lastIndexOf( AbstractPLItem *item ) const { return children.lastIndexOf( item ); };
@@ -82,7 +76,7 @@ public:
 
 private:
     /* AbstractPLItem */
-    int id( int type ) const Q_DECL_OVERRIDE;
+    int id() const Q_DECL_OVERRIDE;
     input_item_t *inputItem() Q_DECL_OVERRIDE { return p_input; }
     AbstractPLItem *child( int id ) const Q_DECL_OVERRIDE { return children.value( id ); };
     virtual QUrl getURI() const Q_DECL_OVERRIDE;

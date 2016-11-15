@@ -71,8 +71,8 @@ public:
     virtual void filter( const QString& search_text, const QModelIndex & root, bool b_recursive ) = 0;
     virtual QModelIndex currentIndex() const = 0;
     virtual QModelIndex indexByPLID( const int i_plid, const int c ) const = 0;
-    virtual QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const = 0;
-    virtual int itemId( const QModelIndex &, int type ) const = 0;
+    virtual QModelIndex indexByInputItem( const input_item_t *, const int c ) const = 0;
+    virtual int itemId( const QModelIndex & ) const = 0;
     virtual bool isTree() const = 0;
     virtual bool canEdit() const = 0;
     virtual QString getURI( const QModelIndex &index ) const = 0;
@@ -129,7 +129,7 @@ public:
     QVariant headerData( int, Qt::Orientation, int ) const Q_DECL_OVERRIDE;
 
     /*** VLCModelSubInterface subclassing ***/
-    int itemId( const QModelIndex &, int type ) const Q_DECL_OVERRIDE;
+    int itemId( const QModelIndex & ) const Q_DECL_OVERRIDE;
     QString getURI( const QModelIndex &index ) const Q_DECL_OVERRIDE;
     input_item_t *getInputItem( const QModelIndex & ) const Q_DECL_OVERRIDE;
     QString getTitle( const QModelIndex &index ) const Q_DECL_OVERRIDE;

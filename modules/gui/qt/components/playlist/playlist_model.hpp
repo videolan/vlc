@@ -101,7 +101,7 @@ public:
     virtual void filter( const QString& search_text, const QModelIndex & root, bool b_recursive ) Q_DECL_OVERRIDE;
     virtual QModelIndex currentIndex() const Q_DECL_OVERRIDE;
     virtual QModelIndex indexByPLID( const int i_plid, const int c ) const Q_DECL_OVERRIDE;
-    virtual QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const Q_DECL_OVERRIDE;
+    virtual QModelIndex indexByInputItem( const input_item_t *, const int c ) const Q_DECL_OVERRIDE;
     virtual bool isTree() const Q_DECL_OVERRIDE;
     virtual bool canEdit() const Q_DECL_OVERRIDE;
     virtual bool action( QAction *action, const QModelIndexList &indexes ) Q_DECL_OVERRIDE;
@@ -142,8 +142,7 @@ private:
 
     /* Lookups */
     PLItem *findByPLId( PLItem *, int i_plitemid ) const;
-    PLItem *findByInputId( PLItem *, int i_input_itemid ) const;
-    PLItem *findInner(PLItem *, int i_id, bool b_isinputid ) const;
+    PLItem *findByInput( PLItem *, const input_item_t * ) const;
     enum pl_nodetype
     {
         ROOTTYPE_CURRENT_PLAYING,

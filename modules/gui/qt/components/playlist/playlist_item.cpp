@@ -85,18 +85,9 @@ PLItem::~PLItem()
     children.clear();
 }
 
-int PLItem::id( int type ) const
+int PLItem::id() const
 {
-    switch( type )
-    {
-    case INPUTITEM_ID:
-        return p_input->i_id;
-    case PLAYLIST_ID:
-        return i_playlist_id;
-    default:
-        vlc_assert_unreachable();
-        return -1;
-    }
+    return i_playlist_id;
 }
 
 void PLItem::takeChildAt( int index )

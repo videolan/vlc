@@ -220,7 +220,7 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
             playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
             if( !p_item ) continue;
 
-            PLItem *item = findByInputId( rootItem, p_input->i_id );
+            PLItem *item = findByInput( rootItem, p_input );
             if( !item ) continue;
 
             /* Better not try to move a node into itself.
@@ -282,7 +282,7 @@ void PLModel::activateItem( playlist_item_t *p_item )
     playlist_item_t *p_parent = p_item;
     while( p_parent )
     {
-        if( p_parent->i_id == rootItem->id( PLAYLIST_ID ) ) break;
+        if( p_parent->i_id == rootItem->id() ) break;
         p_parent = p_parent->p_parent;
     }
     if( p_parent )
@@ -414,7 +414,7 @@ bool PLModel::isLeaf( const QModelIndex &index ) const
     vlc_playlist_locker pl_lock ( THEPL );
 
     playlist_item_t *plItem =
-        playlist_ItemGetById( p_playlist, itemId( index, PLAYLIST_ID ) );
+        playlist_ItemGetById( p_playlist, itemId( index ) );
 
     if( plItem )
         b_isLeaf = plItem->i_children == -1;
@@ -446,19 +446,19 @@ QModelIndex PLModel::indexByPLID( const int i_plid, const int c ) const
     return index( findByPLId( rootItem, i_plid ), c );
 }
 
-QModelIndex PLModel::indexByInputItemID( const int i_inputitem_id, const int c ) const
+QModelIndex PLModel::indexByInputItem( const input_item_t *item, const int c ) const
 {
-    return index( findByInputId( rootItem, i_inputitem_id ), c );
+    return index( findByInput( rootItem, item ), c );
 }
 
 QModelIndex PLModel::rootIndex() const
 {
-    return index( findByPLId( rootItem, rootItem->id( PLAYLIST_ID ) ), 0 );
+    return index( findByPLId( rootItem, rootItem->id() ), 0 );
 }
 
 bool PLModel::isTree() const
 {
-    return ( ( rootItem && rootItem->id( PLAYLIST_ID ) != p_playlist->p_playing->i_id )
+    return ( ( rootItem && rootItem->id() != p_playlist->p_playing->i_id )
              || var_InheritBool( p_intf, "playlist-tree" ) );
 }
 
@@ -477,7 +477,7 @@ QModelIndex PLModel::currentIndex() const
 {
     input_thread_t *p_input_thread = THEMIM->getInput();
     if( !p_input_thread ) return QModelIndex();
-    PLItem *item = findByInputId( rootItem, input_GetItem( p_input_thread )->i_id );
+    PLItem *item = findByInput( rootItem, input_GetItem( p_input_thread ) );
     return index( item, 0 );
 }
 
@@ -509,46 +509,44 @@ int PLModel::rowCount( const QModelIndex &parent ) const
 }
 
 /************************* Lookups *****************************/
-PLItem *PLModel::findByPLId( PLItem *root, int i_plitemid ) const
-{
-    return findInner( root, i_plitemid, false );
-}
-
-PLItem *PLModel::findByInputId( PLItem *root, int i_input_itemid ) const
-{
-    PLItem *result = findInner( root, i_input_itemid, true );
-    return result;
-}
-
-PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_isinputid ) const
+PLItem *PLModel::findByPLId( PLItem *root, int i_id ) const
 {
     if( !root ) return NULL;
 
-    if( !b_isinputid && root->id( PLAYLIST_ID ) == i_id )
-        return root;
-
-    else if( b_isinputid && root->id( INPUTITEM_ID ) == i_id )
+    if( root->id() == i_id )
         return root;
 
     QList<AbstractPLItem *>::iterator it = root->children.begin();
     while ( it != root->children.end() )
     {
         PLItem *item = static_cast<PLItem *>(*it);
-        if( !b_isinputid && item->id( PLAYLIST_ID ) == i_id )
-            return item;
-
-        else if( b_isinputid && item->id( INPUTITEM_ID ) == i_id )
+        if( item->id() == i_id )
             return item;
 
         if( item->childCount() )
         {
-            PLItem *childFound = findInner( item, i_id, b_isinputid );
+            PLItem *childFound = findByPLId( item, i_id );
             if( childFound )
                 return childFound;
         }
         ++it;
     }
     return NULL;
+}
+
+PLItem *PLModel::findByInput( PLItem *root, const input_item_t *input ) const
+{
+    int i_id;
+    {
+        playlist_item_t *item;
+
+        vlc_playlist_locker pl_lock ( THEPL );
+        item = playlist_ItemGetByInput( THEPL, input );
+        if( item == NULL )
+            return NULL;
+        i_id = item->i_id;
+    }
+    return findByPLId( root, i_id );
 }
 
 PLModel::pl_nodetype PLModel::getPLRootType() const
@@ -559,11 +557,11 @@ PLModel::pl_nodetype PLModel::getPLRootType() const
     AbstractPLItem *plitem = rootItem;
     while( plitem->parent() )plitem = plitem->parent();
 
-    if( plitem->id( PLAYLIST_ID ) == p_playlist->p_playing->i_id )
+    if( plitem->id() == p_playlist->p_playing->i_id )
         return ROOTTYPE_CURRENT_PLAYING;
 
     if( p_playlist->p_media_library &&
-        plitem->id( PLAYLIST_ID ) == p_playlist->p_media_library->i_id )
+        plitem->id() == p_playlist->p_media_library->i_id )
         return ROOTTYPE_MEDIA_LIBRARY;
 
     return ROOTTYPE_OTHER;
@@ -582,7 +580,7 @@ void PLModel::processInputItemUpdate( )
     input_thread_t *p_input = THEMIM->getInput();
     if( !p_input ) return;
 
-    PLItem *item = findByInputId( rootItem, input_GetItem( p_input )->i_id );
+    PLItem *item = findByInput( rootItem, input_GetItem( p_input ) );
     if( item ) emit currentIndexChanged( index( item, 0 ) );
 
     processInputItemUpdate( input_GetItem( p_input ) );
@@ -591,7 +589,7 @@ void PLModel::processInputItemUpdate( )
 void PLModel::processInputItemUpdate( input_item_t *p_item )
 {
     if( !p_item ) return;
-    PLItem *item = findByInputId( rootItem, p_item->i_id );
+    PLItem *item = findByInput( rootItem, p_item );
     if( item )
         updateTreeItem( item );
 }
@@ -614,7 +612,7 @@ void PLModel::processItemAppend( int i_pl_itemid, int i_pl_itemidparent )
 
     /* Search for an already matching children */
     foreach( AbstractPLItem *existing, nodeParentItem->children )
-        if( existing->id( PLAYLIST_ID ) == i_pl_itemid ) return;
+        if( existing->id() == i_pl_itemid ) return;
 
     /* Find the child */
     {
@@ -713,7 +711,7 @@ void PLModel::removeItem( PLItem *item )
 /* This function must be entered WITH the playlist lock */
 void PLModel::updateChildren( PLItem *root )
 {
-    playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->id( PLAYLIST_ID ) );
+    playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->id() );
     updateChildren( p_node, root );
 }
 
@@ -781,7 +779,7 @@ void PLModel::recurseDelete( QList<AbstractPLItem*> children, QModelIndexList *f
 /******* Volume III: Sorting and searching ********/
 void PLModel::sort( const int column, Qt::SortOrder order )
 {
-    sort( QModelIndex(), indexByPLID( rootItem->id( PLAYLIST_ID ), 0 ) , column, order );
+    sort( QModelIndex(), indexByPLID( rootItem->id(), 0 ) , column, order );
 }
 
 void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column, Qt::SortOrder order )
@@ -799,7 +797,7 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
         ? static_cast<AbstractPLItem*>( caller.internalPointer() )->inputItem()
         : NULL;
 
-    int i_root_id = item->id( PLAYLIST_ID );
+    int i_root_id = item->id();
 
     QModelIndex qIndex = index( item, 0 );
     int count = item->childCount();
@@ -834,7 +832,7 @@ void PLModel::sort( QModelIndex caller, QModelIndex rootIndex, const int column,
     /* if we have popup item, try to make sure that you keep that item visible */
     if( p_caller_item )
     {
-        QModelIndex idx = indexByInputItemID( p_caller_item->i_id, 0 );
+        QModelIndex idx = indexByInputItem( p_caller_item, 0 );
 
         emit currentIndexChanged( idx );
     }
@@ -851,7 +849,7 @@ void PLModel::filter( const QString& search_text, const QModelIndex & idx, bool 
         vlc_playlist_locker pl_lock ( THEPL );
 
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
-                                            itemId( idx, PLAYLIST_ID ) );
+                                                        itemId( idx ) );
         assert( p_root );
         playlist_LiveSearchUpdate( p_playlist, p_root, qtu( search_text ),
                                    b_recursive );
@@ -896,7 +894,7 @@ void PLModel::createNode( QModelIndex index, QString name )
 
     index = index.parent();
     if ( !index.isValid() ) index = rootIndex();
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, itemId( index, PLAYLIST_ID ) );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, itemId( index ) );
     if( p_item )
         playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0, NULL );
 }
@@ -947,7 +945,7 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
 
         foreach( const QModelIndex &currentIndex, indexes )
         {
-            playlist_item_t *p_item = playlist_ItemGetById( THEPL, itemId( currentIndex, PLAYLIST_ID ) );
+            playlist_item_t *p_item = playlist_ItemGetById( THEPL, itemId( currentIndex ) );
             if( !p_item ) continue;
 
             playlist_NodeAddCopy( THEPL, p_item,

@@ -145,11 +145,11 @@ int VLCModel::metaToColumn( int _meta )
     return column;
 }
 
-int VLCModel::itemId( const QModelIndex &index, int type ) const
+int VLCModel::itemId( const QModelIndex &index ) const
 {
     AbstractPLItem *item = getItem( index );
     if ( !item ) return -1;
-    return item->id( type );
+    return item->id();
 }
 
 AbstractPLItem *VLCModel::getItem( const QModelIndex &index ) const

@@ -267,7 +267,7 @@ void LocationBar::setIndex( const QModelIndex &index )
         actions.append( action );
         CONNECT( btn, clicked(), action, trigger() );
 
-        mapper->setMapping( action, model->itemId( i, PLAYLIST_ID ) );
+        mapper->setMapping( action, model->itemId( i ) );
         CONNECT( action, triggered(), mapper, map() );
 
         first = false;
