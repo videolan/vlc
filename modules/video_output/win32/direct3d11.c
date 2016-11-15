@@ -1688,11 +1688,12 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     vout_display_sys_t *sys = vd->sys;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     HRESULT hr;
+    quad->vertexCount = 4;
 
     D3D11_BUFFER_DESC bd;
     memset(&bd, 0, sizeof(bd));
     bd.Usage = D3D11_USAGE_DYNAMIC;
-    bd.ByteWidth = sizeof(d3d_vertex_t) * 4;
+    bd.ByteWidth = sizeof(d3d_vertex_t) * quad->vertexCount;
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
@@ -1947,10 +1948,8 @@ static void UpdateQuadOpacity(vout_display_t *vd, const d3d_quad_t *quad, float 
     if (SUCCEEDED(hr)) {
         d3d_vertex_t *dst_data = mappedResource.pData;
 
-        dst_data[0].opacity = opacity;
-        dst_data[1].opacity = opacity;
-        dst_data[2].opacity = opacity;
-        dst_data[3].opacity = opacity;
+        for (size_t i=0; i<quad->vertexCount; ++i)
+            dst_data[i].opacity = opacity;
 
         ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
     }

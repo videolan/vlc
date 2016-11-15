@@ -61,6 +61,7 @@ typedef struct
 typedef struct
 {
     ID3D11Buffer              *pVertexBuffer;
+    UINT                      vertexCount;
     ID3D11Texture2D           *pTexture;
     ID3D11ShaderResourceView  *d3dresViewY;
     ID3D11ShaderResourceView  *d3dresViewUV;
