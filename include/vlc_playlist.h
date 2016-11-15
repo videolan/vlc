@@ -106,8 +106,8 @@ struct intf_thread_t;
  * item being played.
  *
  * - "playlist-item-append": It will contain a pointer to a playlist_item_t.
- * - "playlist-item-deleted": It will contain the playlist_item_t->i_id of a
- * deleted playlist_item_t.
+ * - "playlist-item-deleted": It will contain a pointer to the playlist_item_t
+ * about to be deleted.
  *
  * - "leaf-to-parent": It will contain the playlist_item_t->i_id of an item that is transformed
  *   into a node.

@@ -1248,8 +1248,9 @@ int MainInputManager::PLItemRemoved( vlc_object_t *obj, const char *,
 {
     playlist_t *pl = (playlist_t *) obj;
     MainInputManager *mim = static_cast<MainInputManager*>(data);
+    playlist_item_t *item = static_cast<playlist_item_t *>( cur.p_address );
 
-    PLEvent *event = new PLEvent( PLEvent::PLItemRemoved, cur.i_int, 0  );
+    PLEvent *event = new PLEvent( PLEvent::PLItemRemoved, item->i_id, 0  );
     QApplication::postEvent( mim, event );
     // can't use playlist_IsEmpty(  ) as it isn't true yet
     if ( pl->items.i_size == 1 ) // lock is held

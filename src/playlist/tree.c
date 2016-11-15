@@ -148,7 +148,7 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     pl_priv(p_playlist)->b_reset_currently_playing = true;
 
     int i;
-    var_SetInteger( p_playlist, "playlist-item-deleted", p_root->i_id );
+    var_SetAddress( p_playlist, "playlist-item-deleted", p_root );
     ARRAY_BSEARCH( pl_priv(p_playlist)->all_items, ->i_id, int, p_root->i_id, i );
     if( i != -1 )
         ARRAY_REMOVE( pl_priv(p_playlist)->all_items, i );

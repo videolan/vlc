@@ -71,7 +71,8 @@ static int VLCPLItemRemoved(vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     @autoreleasepool {
-        NSNumber *o_val = [NSNumber numberWithInt:new_val.i_int];
+        playlist_item_t *p_item = new_val.p_address;
+        NSNumber *o_val = [NSNumber numberWithInt:p_item->i_id];
         VLCPLModel *model = (__bridge VLCPLModel*)param;
         [model performSelectorOnMainThread:@selector(VLCPLItemRemoved:) withObject:o_val waitUntilDone:NO];
 

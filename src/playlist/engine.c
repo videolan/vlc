@@ -420,10 +420,8 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "item-change", VLC_VAR_ADDRESS );
     var_Create( p_playlist, "leaf-to-parent", VLC_VAR_INTEGER );
 
-    var_Create( p_playlist, "playlist-item-deleted", VLC_VAR_INTEGER );
-    var_SetInteger( p_playlist, "playlist-item-deleted", -1 );
-
     var_Create( p_playlist, "playlist-item-append", VLC_VAR_ADDRESS );
+    var_Create( p_playlist, "playlist-item-deleted", VLC_VAR_ADDRESS );
 
     var_Create( p_playlist, "input-current", VLC_VAR_ADDRESS );
 

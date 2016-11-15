@@ -282,9 +282,9 @@ int VlcProc::onItemDelete( vlc_object_t *pObj, const char *pVariable,
     (void)pObj; (void)pVariable; (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
 
-    int i_id = newVal.i_int;
+    playlist_item_t *item = static_cast<playlist_item_t *>(newVal.p_address);
     CmdPlaytreeDelete *pCmdTree =
-        new CmdPlaytreeDelete( pThis->getIntf(), i_id);
+        new CmdPlaytreeDelete( pThis->getIntf(), item->i_id);
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
