@@ -363,7 +363,6 @@ VLC_API int playlist_LiveSearchUpdate(playlist_t *, playlist_item_t *, const cha
 VLC_API playlist_item_t * playlist_NodeCreate( playlist_t *, const char *, playlist_item_t * p_parent, int i_pos, int i_flags, input_item_t * );
 VLC_API int playlist_NodeAppend(playlist_t *,playlist_item_t*,playlist_item_t *);
 VLC_API int playlist_NodeInsert(playlist_t *,playlist_item_t*,playlist_item_t *, int);
-VLC_API int playlist_NodeRemoveItem(playlist_t *,playlist_item_t*,playlist_item_t *);
 VLC_API playlist_item_t * playlist_ChildSearchName(playlist_item_t*, const char* ) VLC_USED;
 VLC_API void playlist_NodeDelete( playlist_t *, playlist_item_t *, bool , bool );
 

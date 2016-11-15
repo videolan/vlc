@@ -178,8 +178,18 @@ void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     PL_DEBUG( "deleting item `%s'", p_root->p_input->psz_name );
 
     /* Remove the item from its parent */
-    if( p_root->p_parent )
-        playlist_NodeRemoveItem( p_playlist, p_root, p_root->p_parent );
+    playlist_item_t *p_parent = p_root->p_parent;
+    if( p_parent != NULL )
+    {
+        for( int i = 0; i < p_parent->i_children ; i++ )
+        {
+            if( p_parent->pp_children[i] == p_root )
+            {
+                REMOVE_ELEM( p_parent->pp_children, p_parent->i_children, i );
+                assert( p_root->p_parent == p_parent );
+            }
+        }
+    }
 
     playlist_ItemRelease( p_root );
 }
@@ -222,40 +232,6 @@ int playlist_NodeInsert( playlist_t *p_playlist,
         p_item->i_flags |= (p_parent->i_flags & (PLAYLIST_RO_FLAG | PLAYLIST_SKIP_FLAG));
 
     return VLC_SUCCESS;
-}
-
-/**
- * Deletes an item from the children of a node
- *
- * \param p_playlist the playlist
- * \param p_item the item to remove
- * \param p_parent the parent node
- * \return VLC_SUCCESS or an error
- */
-int playlist_NodeRemoveItem( playlist_t *p_playlist,
-                        playlist_item_t *p_item,
-                        playlist_item_t *p_parent )
-{
-    PL_ASSERT_LOCKED;
-    (void)p_playlist;
-
-    int ret = VLC_EGENERIC;
-
-    for(int i= 0; i< p_parent->i_children ; i++ )
-    {
-        if( p_parent->pp_children[i] == p_item )
-        {
-            REMOVE_ELEM( p_parent->pp_children, p_parent->i_children, i );
-            ret = VLC_SUCCESS;
-        }
-    }
-
-    if( ret == VLC_SUCCESS ) {
-        assert( p_item->p_parent == p_parent );
-        p_item->p_parent = NULL;
-    }
-
-    return ret;
 }
 
 /**
