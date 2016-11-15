@@ -110,7 +110,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
         }
         assert( i < p_parent->i_children );
 
-        playlist_DeleteItem( p_playlist, p_item, true );
+        playlist_NodeDelete( p_playlist, p_item, true, false );
 
         /* If there is a pending request referring to the item we just deleted
          * it needs to be updated so that we do not try to play an entity that
@@ -337,7 +337,7 @@ static int DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
     playlist_item_t *p_item = playlist_ItemFindFromInputAndRoot(
         p_playlist, p_input, p_root, false );
     if( !p_item ) return VLC_EGENERIC;
-    return playlist_DeleteItem( p_playlist, p_item, b_do_stop );
+    return playlist_NodeDelete( p_playlist, p_item, true, false );
 }
 
 /**
@@ -409,7 +409,7 @@ int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
     PL_ASSERT_LOCKED;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
     if( !p_item ) return VLC_EGENERIC;
-    return playlist_DeleteItem( p_playlist, p_item, true );
+    return playlist_NodeDelete( p_playlist, p_item, true, false );
 }
 
 /***************************************************************************
@@ -857,14 +857,6 @@ static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item )
     ARRAY_BSEARCH( p_playlist->items,->i_id, int, p_item->i_id, i );
     if( i != -1 )
         ARRAY_REMOVE( p_playlist->items, i );
-}
-
-/* Do the actual removal */
-int playlist_DeleteItem( playlist_t * p_playlist, playlist_item_t *p_item,
-                        bool b_stop )
-{
-    assert( b_stop );
-    return playlist_NodeDelete( p_playlist, p_item, true, false );
 }
 
 static int RecursiveAddIntoParent (
