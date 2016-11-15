@@ -50,9 +50,6 @@ static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root )
         playlist_item_t *p_current = p_root->pp_children[i];
         assert( p_current );
 
-        if( p_current->i_flags & PLAYLIST_SAVE_FLAG )
-            continue;
-
         if( p_current->i_children >= 0 )
         {
             DoChildren( p_export, p_current );

@@ -211,7 +211,6 @@ static void push_playlist_item( lua_State *L, playlist_item_t *p_item )
         lua_pushboolean( L, 1 ); \
         lua_setfield( L, -2, #label ); \
     }
-    CHECK_AND_SET_FLAG( SAVE, save )
     CHECK_AND_SET_FLAG( SKIP, skip )
     CHECK_AND_SET_FLAG( DBL, disabled )
     CHECK_AND_SET_FLAG( RO, ro )
