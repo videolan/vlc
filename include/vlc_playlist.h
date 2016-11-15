@@ -165,7 +165,6 @@ struct playlist_t
     VLC_COMMON_MEMBERS
 
     playlist_item_array_t items; /**< Arrays of items */
-    playlist_item_array_t all_items; /**< Array of items and nodes */
 
     playlist_item_array_t current; /**< Items currently being played */
     int                   i_current_index; /**< Index in current array */

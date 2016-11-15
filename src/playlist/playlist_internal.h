@@ -49,6 +49,8 @@ typedef struct playlist_private_t
     playlist_t           public_data;
     struct intf_thread_t *interface; /**< Linked-list of interfaces */
 
+    playlist_item_array_t all_items; /**< Array of items and nodes */
+
     vlc_sd_internal_t   **pp_sds;
     int                   i_sds;   /**< Number of service discovery modules */
     input_thread_t *      p_input;  /**< the input thread associated

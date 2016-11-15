@@ -820,7 +820,7 @@ static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 {
     PL_ASSERT_LOCKED;
     ARRAY_APPEND(p_playlist->items, p_item);
-    ARRAY_APPEND(p_playlist->all_items, p_item);
+    ARRAY_APPEND(pl_priv(p_playlist)->all_items, p_item);
 
     if( i_pos == PLAYLIST_END )
         playlist_NodeAppend( p_playlist, p_item, p_node );

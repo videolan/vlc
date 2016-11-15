@@ -45,9 +45,9 @@ playlist_item_t* playlist_ItemGetById( playlist_t * p_playlist , int i_id )
 {
     int i;
     PL_ASSERT_LOCKED;
-    ARRAY_BSEARCH( p_playlist->all_items,->i_id, int, i_id, i );
+    ARRAY_BSEARCH( pl_priv(p_playlist)->all_items,->i_id, int, i_id, i );
     if( i != -1 )
-        return ARRAY_VAL( p_playlist->all_items, i );
+        return ARRAY_VAL( pl_priv(p_playlist)->all_items, i );
     else
         return NULL;
 }
@@ -62,7 +62,6 @@ playlist_item_t* playlist_ItemGetById( playlist_t * p_playlist , int i_id )
 playlist_item_t* playlist_ItemGetByInput( playlist_t * p_playlist,
                                           const input_item_t *p_item )
 {
-    int i;
     PL_ASSERT_LOCKED;
     if( get_current_status_item( p_playlist ) &&
         get_current_status_item( p_playlist )->p_input == p_item )
@@ -70,11 +69,11 @@ playlist_item_t* playlist_ItemGetByInput( playlist_t * p_playlist,
         return get_current_status_item( p_playlist );
     }
     /** \todo Check if this is always incremental and whether we can bsearch */
-    for( i =  0 ; i < p_playlist->all_items.i_size; i++ )
+    for( int i =  0 ; i < pl_priv(p_playlist)->all_items.i_size; i++ )
     {
-        if( ARRAY_VAL(p_playlist->all_items, i)->p_input == p_item )
+        if( ARRAY_VAL(pl_priv(p_playlist)->all_items, i)->p_input == p_item )
         {
-            return ARRAY_VAL(p_playlist->all_items, i);
+            return ARRAY_VAL(pl_priv(p_playlist)->all_items, i);
         }
     }
     return NULL;
