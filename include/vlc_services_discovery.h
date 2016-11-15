@@ -148,9 +148,6 @@ VLC_API void vlc_sd_Destroy( services_discovery_t * );
 /* Read info from discovery object */
 VLC_API char * services_discovery_GetLocalizedName( services_discovery_t * p_this ) VLC_USED;
 
-/* Receive event notification (preferred way to get new items) */
-VLC_API vlc_event_manager_t * services_discovery_EventManager( services_discovery_t * p_this ) VLC_USED;
-
 /**
  * Added service callback.
  *
