@@ -92,7 +92,6 @@ typedef struct
 {
     int signal;
     int i_node;
-    int i_item;
 } callback_info_t;
 
 enum
@@ -616,20 +615,8 @@ static void ProcessEvents( intf_thread_t *p_intf,
             vlc_dictionary_insert( &player_properties, "CanPause", NULL );
             break;
         case SIGNAL_SEEK:
-        {
-            input_thread_t *p_input;
-            input_item_t *p_item;
-            p_input = pl_CurrentInput( p_intf );
-            if( p_input )
-            {
-                p_item = input_GetItem( p_input );
-                vlc_object_release( p_input );
-
-                if( p_item && ( p_item->i_id == p_events[i]->i_item ) )
-                    SeekedEmit( p_intf );
-            }
+            SeekedEmit( p_intf );
             break;
-        }
         default:
             vlc_assert_unreachable();
         }
@@ -946,7 +933,6 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
                 break;
 
             p_info->signal = SIGNAL_SEEK;
-            p_info->i_item = input_GetItem( p_input )->i_id;
             break;
         }
         default:
