@@ -426,7 +426,7 @@ static void SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
                         unsigned height)
 {
     for (unsigned y = 0; y < height; y++) {
-        for (unsigned x = 0; x < src_pitch; x++) {
+        for (unsigned x = 0; x < src_pitch / 2; x++) {
             dstu[x] = src[2*x+0];
             dstv[x] = src[2*x+1];
         }
