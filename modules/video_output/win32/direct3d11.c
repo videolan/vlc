@@ -912,7 +912,8 @@ static void DisplayD3DPicture(vout_display_sys_t *sys, d3d_quad_t *quad)
         ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 1, 1, &quad->d3dresViewUV);
 
     ID3D11DeviceContext_IASetVertexBuffers(sys->d3dcontext, 0, 1, &quad->pVertexBuffer, &stride, &offset);
-    ID3D11DeviceContext_DrawIndexed(sys->d3dcontext, 6, 0, 0);
+    ID3D11DeviceContext_IASetIndexBuffer(sys->d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    ID3D11DeviceContext_DrawIndexed(sys->d3dcontext, quad->indexCount, 0, 0);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
@@ -1511,32 +1512,6 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     ID3D11DeviceContext_IASetInputLayout(sys->d3dcontext, pVertexLayout);
     ID3D11SamplerState_Release(pVertexLayout);
 
-    /* create the index of the vertices */
-    WORD indices[] = {
-      3, 1, 0,
-      2, 1, 3,
-    };
-
-    D3D11_BUFFER_DESC quadDesc = {
-        .Usage = D3D11_USAGE_DEFAULT,
-        .ByteWidth = sizeof(WORD) * 6,
-        .BindFlags = D3D11_BIND_INDEX_BUFFER,
-        .CPUAccessFlags = 0,
-    };
-
-    D3D11_SUBRESOURCE_DATA quadIndicesInit = {
-        .pSysMem = indices,
-    };
-
-    ID3D11Buffer* pIndexBuffer = NULL;
-    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &quadDesc, &quadIndicesInit, &pIndexBuffer);
-    if(FAILED(hr)) {
-        msg_Err(vd, "Could not Create the common quad indices. (hr=0x%lX)", hr);
-        return VLC_EGENERIC;
-    }
-    ID3D11DeviceContext_IASetIndexBuffer(sys->d3dcontext, pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-    ID3D11Buffer_Release(pIndexBuffer);
-
     ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     ID3DBlob* pPSBlob = NULL;
@@ -1689,6 +1664,7 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     HRESULT hr;
     quad->vertexCount = 4;
+    quad->indexCount = 2 * 3;
 
     D3D11_BUFFER_DESC bd;
     memset(&bd, 0, sizeof(bd));
@@ -1701,6 +1677,20 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create vertex buffer. (hr=%lX)", hr);
       goto error;
+    }
+
+    /* create the index of the vertices */
+    D3D11_BUFFER_DESC quadDesc = {
+        .Usage = D3D11_USAGE_DYNAMIC,
+        .ByteWidth = sizeof(WORD) * quad->indexCount,
+        .BindFlags = D3D11_BIND_INDEX_BUFFER,
+        .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
+    };
+
+    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &quadDesc, NULL, &quad->pIndexBuffer);
+    if(FAILED(hr)) {
+        msg_Err(vd, "Could not create the quad indices. (hr=0x%lX)", hr);
+        goto error;
     }
 
     D3D11_TEXTURE2D_DESC texDesc;
@@ -1824,6 +1814,25 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         else {
             msg_Err(vd, "Failed to lock the subpicture vertex buffer (hr=0x%lX)", hr);
         }
+
+        /* create the vertex indices */
+        hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        if (SUCCEEDED(hr)) {
+            WORD *dst_data = mappedResource.pData;
+
+            dst_data[0] = 3;
+            dst_data[1] = 1;
+            dst_data[2] = 0;
+
+            dst_data[3] = 2;
+            dst_data[4] = 1;
+            dst_data[5] = 3;
+
+            ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0);
+        }
+        else {
+            msg_Err(vd, "Failed to lock the index buffer (hr=0x%lX)", hr);
+        }
     }
 
     return VLC_SUCCESS;
@@ -1839,6 +1848,11 @@ static void ReleaseQuad(d3d_quad_t *quad)
     {
         ID3D11Buffer_Release(quad->pVertexBuffer);
         quad->pVertexBuffer = NULL;
+    }
+    if (quad->pIndexBuffer)
+    {
+        ID3D11Buffer_Release(quad->pIndexBuffer);
+        quad->pIndexBuffer = NULL;
     }
     if (quad->pTexture)
     {
