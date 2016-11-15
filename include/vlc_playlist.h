@@ -323,7 +323,7 @@ VLC_API int playlist_Import( playlist_t *p_playlist, const char *psz_file );
 
 /********************** Services discovery ***********************/
 
-/** Add a list of comma-separated service discovery modules */
+/** Add a service discovery module */
 VLC_API int playlist_ServicesDiscoveryAdd(playlist_t *, const char *);
 /** Remove a services discovery module by name */
 VLC_API int playlist_ServicesDiscoveryRemove(playlist_t *, const char *);
