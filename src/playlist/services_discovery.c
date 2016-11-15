@@ -138,19 +138,6 @@ void vlc_sd_Destroy(services_discovery_t *sd)
     vlc_object_release(sd);
 }
 
-/*******************************************************************//**
- * Get the Localized Name
- *
- * This is useful for interfaces and libVLC
- ***********************************************************************/
-char *
-services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
-{
-    if (p_sd->p_module == NULL)
-        return NULL;
-    return strdup( module_get_name( p_sd->p_module, true ) );
-}
-
 /*
  * Playlist - Services discovery bridge
  */

@@ -274,7 +274,9 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
 char *
 libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis )
 {
-    return services_discovery_GetLocalizedName( p_mdis->p_sd );
+    if( p_mdis->p_sd == NULL || p_mdis->p_sd->description == NULL )
+        return NULL;
+    return strdup( p_mdis->p_sd->description );
 }
 
 /**************************************************************************

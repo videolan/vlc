@@ -375,7 +375,6 @@ playlist_MuteGet
 sdp_AddAttribute
 sdp_AddMedia
 secstotimestr
-services_discovery_GetLocalizedName
 sout_AccessOutControl
 sout_AccessOutDelete
 sout_AccessOutNew
