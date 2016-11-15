@@ -864,6 +864,46 @@ static const char *GetIso639_2LangCode(const char *lang)
     return pl->psz_iso639_2T;   /* returns the english code */
 }
 
+static void SelectPCRStream( sout_mux_t *p_mux, sout_input_t *p_removed_pcr_input )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+
+    /* Find a new pcr stream (Prefer Video Stream) */
+    if( p_removed_pcr_input != NULL )
+    {
+        p_sys->i_pcr_pid = 0x1fff;
+        p_sys->p_pcr_input = NULL;
+    }
+
+    for ( int i = 0; i < p_mux->i_nb_inputs; i++ )
+    {
+        sout_input_t *p_input = p_mux->pp_inputs[i];
+        if( p_input == p_removed_pcr_input )
+            continue;
+
+        if( p_input->p_fmt->i_cat == VIDEO_ES &&
+            p_sys->p_pcr_input->fmt.i_cat != VIDEO_ES )
+        {
+            p_sys->p_pcr_input = p_input;
+            break;
+        }
+        else if( p_input->p_fmt->i_cat != SPU_ES &&
+                 p_sys->p_pcr_input == NULL )
+        {
+            p_sys->p_pcr_input = p_input;
+        }
+    }
+
+    if( p_sys->p_pcr_input )
+    {
+        p_sys->i_pcr_pid = ((sout_input_sys_t*)p_sys->p_pcr_input->p_sys)->ts.i_pid;
+        /* Empty TS buffer */
+        /* FIXME */
+    }
+    msg_Dbg( p_mux, "new PCR PID is %d", p_sys->i_pcr_pid );
+
+}
+
 /*****************************************************************************
  * AddStream: called for each stream addition
  *****************************************************************************/
@@ -1092,19 +1132,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_sys->i_pmt_version_number = ( p_sys->i_pmt_version_number + 1 )%32;
 
     /* Update pcr_pid */
-    if( p_input->p_fmt->i_cat != SPU_ES &&
-        ( p_sys->i_pcr_pid == 0x1fff || p_input->p_fmt->i_cat == VIDEO_ES ) )
-    {
-        if( p_sys->p_pcr_input )
-        {
-            /* There was already a PCR stream, so clean context */
-            /* FIXME */
-        }
-        p_sys->i_pcr_pid   = p_stream->ts.i_pid;
-        p_sys->p_pcr_input = p_input;
-
-        msg_Dbg( p_mux, "new PCR PID is %d", p_sys->i_pcr_pid );
-    }
+    SelectPCRStream( p_mux, NULL );
 
     return VLC_SUCCESS;
 
@@ -1128,39 +1156,10 @@ static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     msg_Dbg( p_mux, "removing input pid=%d", p_stream->ts.i_pid );
 
-    if( p_sys->i_pcr_pid == p_stream->ts.i_pid )
+    if( p_sys->p_pcr_input == p_input )
     {
-        /* Find a new pcr stream (Prefer Video Stream) */
-        p_sys->i_pcr_pid = 0x1fff;
-        p_sys->p_pcr_input = NULL;
-        for (int i = 0; i < p_mux->i_nb_inputs; i++ )
-        {
-            if( p_mux->pp_inputs[i] == p_input )
-            {
-                continue;
-            }
-
-            if( p_mux->pp_inputs[i]->p_fmt->i_cat == VIDEO_ES )
-            {
-                p_sys->i_pcr_pid  =
-                    ((sout_input_sys_t*)p_mux->pp_inputs[i]->p_sys)->ts.i_pid;
-                p_sys->p_pcr_input= p_mux->pp_inputs[i];
-                break;
-            }
-            else if( p_mux->pp_inputs[i]->p_fmt->i_cat != SPU_ES &&
-                     p_sys->i_pcr_pid == 0x1fff )
-            {
-                p_sys->i_pcr_pid  =
-                    ((sout_input_sys_t*)p_mux->pp_inputs[i]->p_sys)->ts.i_pid;
-                p_sys->p_pcr_input= p_mux->pp_inputs[i];
-            }
-        }
-        if( p_sys->p_pcr_input )
-        {
-            /* Empty TS buffer */
-            /* FIXME */
-        }
-        msg_Dbg( p_mux, "new PCR PID is %d", p_sys->i_pcr_pid );
+        /* Repick new PCR */
+        SelectPCRStream( p_mux, p_input );
     }
 
     /* Empty all data in chain_pes */
