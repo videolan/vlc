@@ -568,6 +568,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     bool need_fs_yuv = false;
     bool need_fs_xyz = false;
     bool need_fs_rgba = USE_OPENGL_ES == 2;
+    bool need_vs = fmt->projection_mode != PROJECTION_MODE_RECTANGULAR;
     float yuv_range_correction = 1.0;
 
     if (max_texture_units >= 3 && supports_shaders && vlc_fourcc_IsYUV(fmt->i_chroma)) {
@@ -632,7 +633,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->shader[1] =
     vgl->shader[2] = -1;
     vgl->local_count = 0;
-    if (supports_shaders && (need_fs_yuv || need_fs_xyz|| need_fs_rgba)) {
+    if (supports_shaders && (need_vs || need_fs_yuv || need_fs_xyz|| need_fs_rgba)) {
 #ifdef SUPPORTS_SHADERS
         if (need_fs_xyz)
             BuildXYZFragmentShader(vgl, &vgl->shader[0]);
