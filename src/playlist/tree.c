@@ -99,20 +99,17 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
  * \param p_playlist the playlist
  * \param p_root the node
  * \param b_delete_items do we have to delete the children items ?
- * \return VLC_SUCCESS or an error
  */
-int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
+void playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
                         bool b_delete_items )
 {
     PL_ASSERT_LOCKED;
-    int i;
+
     if( p_root->i_children == -1 )
-    {
-        return VLC_EGENERIC;
-    }
+        return;
 
     /* Delete the children */
-    for( i =  p_root->i_children-1 ; i >= 0 ;i-- )
+    for( int i = p_root->i_children-1 ; i >= 0 ;i-- )
     {
         if( p_root->pp_children[i]->i_children > -1 )
         {
@@ -126,7 +123,6 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
                                        p_root->pp_children[i]->i_id );
         }
     }
-    return VLC_SUCCESS;
 }
 
 /**
@@ -135,10 +131,9 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
  * \param p_playlist the playlist
  * \param p_root the node
  * \param b_delete_items do we have to delete the children items ?
- * \return VLC_SUCCESS or an error
  */
-int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
-                         bool b_delete_items, bool b_force )
+void playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
+                          bool b_delete_items, bool b_force )
 {
     PL_ASSERT_LOCKED;
 
@@ -150,7 +145,7 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
 
     /* Delete the node */
     if( p_root->i_flags & PLAYLIST_RO_FLAG && !b_force )
-        return VLC_SUCCESS;
+        return;
 
     pl_priv(p_playlist)->b_reset_currently_playing = true;
 
@@ -187,7 +182,6 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         playlist_NodeRemoveItem( p_playlist, p_root, p_root->p_parent );
 
     playlist_ItemRelease( p_root );
-    return VLC_SUCCESS;
 }
 
 

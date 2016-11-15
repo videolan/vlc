@@ -134,9 +134,9 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
 int playlist_DeleteFromInputInParent( playlist_t *, input_item_t *,
                                       playlist_item_t *, bool );
 int playlist_DeleteFromItemId( playlist_t*, int );
-int playlist_ItemRelease( playlist_item_t * );
+void playlist_ItemRelease( playlist_item_t * );
 
-int playlist_NodeEmpty( playlist_t *, playlist_item_t *, bool );
+void playlist_NodeEmpty( playlist_t *, playlist_item_t *, bool );
 
 void ResetCurrentlyPlaying( playlist_t *p_playlist, playlist_item_t *p_cur );
 void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur );

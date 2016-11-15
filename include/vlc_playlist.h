@@ -365,7 +365,7 @@ VLC_API int playlist_NodeAppend(playlist_t *,playlist_item_t*,playlist_item_t *)
 VLC_API int playlist_NodeInsert(playlist_t *,playlist_item_t*,playlist_item_t *, int);
 VLC_API int playlist_NodeRemoveItem(playlist_t *,playlist_item_t*,playlist_item_t *);
 VLC_API playlist_item_t * playlist_ChildSearchName(playlist_item_t*, const char* ) VLC_USED;
-VLC_API int playlist_NodeDelete( playlist_t *, playlist_item_t *, bool , bool );
+VLC_API void playlist_NodeDelete( playlist_t *, playlist_item_t *, bool , bool );
 
 VLC_API playlist_item_t * playlist_GetNextLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) VLC_USED;
 VLC_API playlist_item_t * playlist_GetPrevLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) VLC_USED;
