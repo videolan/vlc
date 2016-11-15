@@ -327,11 +327,10 @@ int playlist_ItemRelease( playlist_item_t *p_item )
  * \param p_playlist playlist object
  * \param p_input the input to delete
  * \param p_root root playlist item
- * \param b_do_stop must stop or not the playlist
  * \return VLC_SUCCESS or VLC_EGENERIC
 */
 static int DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
-                            playlist_item_t *p_root, bool b_do_stop )
+                            playlist_item_t *p_root )
 {
     PL_ASSERT_LOCKED;
     playlist_item_t *p_item = playlist_ItemFindFromInputAndRoot(
@@ -356,7 +355,7 @@ int playlist_DeleteFromInputInParent( playlist_t *p_playlist,
 {
     int i_ret;
     PL_LOCK_IF( !b_locked );
-    i_ret = DeleteFromInput( p_playlist, p_item, p_root, true );
+    i_ret = DeleteFromInput( p_playlist, p_item, p_root );
     PL_UNLOCK_IF( !b_locked );
     return i_ret;
 }
@@ -375,8 +374,7 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
 {
     int i_ret;
     PL_LOCK_IF( !b_locked );
-    i_ret = DeleteFromInput( p_playlist, p_input,
-                             p_playlist->p_root, true );
+    i_ret = DeleteFromInput( p_playlist, p_input, p_playlist->p_root );
     PL_UNLOCK_IF( !b_locked );
     return ( i_ret == VLC_SUCCESS ? VLC_SUCCESS : VLC_ENOITEM );
 }
