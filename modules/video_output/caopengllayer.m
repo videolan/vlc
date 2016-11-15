@@ -45,7 +45,9 @@
 
 #define OSX_EL_CAPITAN (NSAppKitVersionNumber >= 1404)
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED < 1011
+#ifndef MAC_OS_X_VERSION_10_11
+const CFStringRef kCGColorSpaceDCIP3 = CFSTR("kCGColorSpaceDCIP3");
+const CFStringRef kCGColorSpaceITUR_709 = CFSTR("kCGColorSpaceITUR_709");
 const CFStringRef kCGColorSpaceITUR_2020 = CFSTR("kCGColorSpaceITUR_2020");
 #endif
 
