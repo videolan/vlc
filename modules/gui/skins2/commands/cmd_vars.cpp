@@ -63,7 +63,7 @@ bool CmdItemUpdate::checkRemove( CmdGeneric *pQueuedCommand ) const
 
 void CmdPlaytreeAppend::execute()
 {
-    VlcProc::instance( getIntf() )->getPlaytreeVar().onAppend( m_pAdd );
+    VlcProc::instance( getIntf() )->getPlaytreeVar().onAppend( m_id );
 }
 
 void CmdPlaytreeDelete::execute()

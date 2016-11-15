@@ -205,40 +205,43 @@ void Playtree::onDelete( int i_id )
     }
 }
 
-void Playtree::onAppend( playlist_add_t *p_add )
+void Playtree::onAppend( int i_id )
 {
-    Iterator it_node = findById( p_add->i_node );
+    playlist_item_t *pItem;
+
+    playlist_Lock( m_pPlaylist );
+    pItem = playlist_ItemGetById( m_pPlaylist, i_id );
+    if( !pItem || !pItem->p_parent )
+    {
+        playlist_Unlock( m_pPlaylist );
+        return;
+    }
+
+    Iterator it_node = findById( pItem->p_parent->i_id );
     if( it_node != m_children.end() )
     {
-        playlist_Lock( m_pPlaylist );
-        playlist_item_t *pItem =
-            playlist_ItemGetById( m_pPlaylist, p_add->i_item );
-        if( !pItem )
-        {
-            playlist_Unlock( m_pPlaylist );
-            return;
-        }
-
-        int pos;
-        for( pos = 0; pos < pItem->p_parent->i_children; pos++ )
-            if( pItem->p_parent->pp_children[pos] == pItem ) break;
-
-        UString *pName = getTitle( pItem->p_input );
-        playlist_item_t* current = playlist_CurrentPlayingItem( m_pPlaylist );
-
-        Iterator it = it_node->add(
-            p_add->i_item, UStringPtr( pName ), false, pItem == current,
-            false, pItem->i_flags & PLAYLIST_RO_FLAG, pos );
-
-        m_allItems[pItem->i_id] = &*it;
-
         playlist_Unlock( m_pPlaylist );
-
-        tree_update descr(
-            tree_update::ItemInserted,
-            IteratorVisible( it, this ) );
-        notify( &descr );
+        return;
     }
+
+    int pos;
+    for( pos = 0; pos < pItem->p_parent->i_children; pos++ )
+        if( pItem->p_parent->pp_children[pos] == pItem ) break;
+
+    UString *pName = getTitle( pItem->p_input );
+    playlist_item_t* current = playlist_CurrentPlayingItem( m_pPlaylist );
+
+    Iterator it = it_node->add(
+        i_id, UStringPtr( pName ), false, pItem == current,
+        false, pItem->i_flags & PLAYLIST_RO_FLAG, pos );
+
+    m_allItems[i_id] = &*it;
+
+    playlist_Unlock( m_pPlaylist );
+
+    tree_update descr( tree_update::ItemInserted,
+                       IteratorVisible( it, this ) );
+    notify( &descr );
 }
 
 void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )

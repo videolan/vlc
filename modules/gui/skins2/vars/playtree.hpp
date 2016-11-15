@@ -53,7 +53,7 @@ public:
     void onUpdateCurrent( bool b_active );
 
     /// Function called to notify playlist item append
-    void onAppend( playlist_add_t * );
+    void onAppend( int );
 
     /// Function called to notify playlist item delete
     void onDelete( int );

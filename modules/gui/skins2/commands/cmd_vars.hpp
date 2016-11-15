@@ -69,24 +69,15 @@ private:
 class CmdPlaytreeAppend: public CmdGeneric
 {
 public:
-    CmdPlaytreeAppend( intf_thread_t *pIntf, playlist_add_t *p_add ):
-        CmdGeneric( pIntf ), m_pAdd( NULL )
-    {
-        if( p_add )
-        {
-            m_pAdd = new playlist_add_t;
-            *m_pAdd = *p_add;
-        }
-    }
-    virtual ~CmdPlaytreeAppend()
-    {
-        delete m_pAdd;
-    }
+    CmdPlaytreeAppend( intf_thread_t *pIntf, int i_id ):
+        CmdGeneric( pIntf ), m_id( i_id )
+    { }
+    virtual ~CmdPlaytreeAppend() { }
     virtual void execute();
     virtual std::string getType() const { return "playtree append"; }
 
 private:
-    playlist_add_t * m_pAdd;
+    int m_id;
 };
 
 /// Command to notify the playtree of an item deletion
