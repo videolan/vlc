@@ -427,7 +427,8 @@ static void BuildXYZFragmentShader(vout_display_opengl_t *vgl,
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
-                                               vlc_gl_t *gl)
+                                               vlc_gl_t *gl,
+                                               const vlc_viewpoint_t *viewpoint)
 {
     vout_display_opengl_t *vgl = calloc(1, sizeof(*vgl));
     if (!vgl)
@@ -738,6 +739,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->region_count = 0;
     vgl->region = NULL;
     vgl->pool = NULL;
+
+    if (vgl->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
+     && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
+    {
+        vout_display_opengl_Delete(vgl);
+        return NULL;
+    }
 
     *fmt = vgl->fmt;
     if (subpicture_chromas) {

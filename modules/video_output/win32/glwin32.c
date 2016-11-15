@@ -210,7 +210,8 @@ static int Open(vlc_object_t *object)
 
     video_format_t fmt = vd->fmt;
     const vlc_fourcc_t *subpicture_chromas;
-    sys->vgl = vout_display_opengl_New(&fmt, &subpicture_chromas, &sys->gl);
+    sys->vgl = vout_display_opengl_New(&fmt, &subpicture_chromas, &sys->gl,
+                                       &vd->cfg->viewpoint);
     if (!sys->vgl)
         goto error;
 

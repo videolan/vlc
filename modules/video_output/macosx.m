@@ -260,7 +260,8 @@ static int Open (vlc_object_t *this)
         sys->gl.sys = sys;
         const vlc_fourcc_t *subpicture_chromas;
 
-        sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl);
+        sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl,
+                                            &vd->cfg->viewpoint);
         if (!sys->vgl) {
             msg_Err(vd, "Error while initializing opengl display.");
             sys->gl.sys = NULL;
