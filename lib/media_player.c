@@ -719,6 +719,10 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     if( aout != NULL )
         input_resource_PutAout(mp->input.p_resource, aout);
 
+    vlc_viewpoint_init(&mp->viewpoint);
+
+    var_Create (mp, "viewpoint", VLC_VAR_ADDRESS);
+    var_SetAddress( mp, "viewpoint", &mp->viewpoint );
     vlc_mutex_init (&mp->input.lock);
     mp->i_refcount = 1;
     mp->p_event_manager = libvlc_event_manager_new(mp);

@@ -1167,6 +1167,48 @@ LIBVLC_API char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi );
 LIBVLC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi, const char *psz_aspect );
 
 /**
+ * Viewpoint for video outputs
+ *
+ * \warning allocate using libvlc_video_new_viewpoint()
+ */
+typedef struct libvlc_video_viewpoint_t
+{
+    float f_yaw;           /**< view point yaw in degrees */
+    float f_pitch;         /**< view point pitch in degrees */
+    float f_roll;          /**< view point roll in degrees */
+    float f_field_of_view; /**< field of view in degrees (default 80.0f) */
+} libvlc_video_viewpoint_t;
+
+/**
+ * Create a video viewpoint structure.
+ *
+ * \version LibVLC 3.0.0 and later
+ *
+ * \return video viewpoint or NULL
+ *         (the result must be released with free() or libvlc_free()).
+ */
+LIBVLC_API libvlc_video_viewpoint_t *libvlc_video_new_viewpoint(void);
+
+/**
+ * Update the video viewpoint information.
+ *
+ * \note It is safe to call this function before the media player is started.
+ *
+ * \version LibVLC 3.0.0 and later
+ *
+ * \param p_mi the media player
+ * \param p_viewpoint video viewpoint allocated via libvlc_video_new_viewpoint()
+ * \param b_absolute if true replace the old viewpoint with the new one. If
+ * false, increase/decrease it.
+ * \return -1 in case of error, 0 otherwise
+ *
+ * \note the values are set asynchronously, it will be used by the next frame displayed.
+ */
+LIBVLC_API int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
+                                              const libvlc_video_viewpoint_t *p_viewpoint,
+                                              bool b_absolute);
+
+/**
  * Get current video subtitle.
  *
  * \param p_mi the media player
