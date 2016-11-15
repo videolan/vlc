@@ -38,7 +38,6 @@ enum
 {
     INPUTITEM_ID = 1,
     PLAYLIST_ID,
-    MLMEDIA_ID
 };
 
 class AbstractPLItem
