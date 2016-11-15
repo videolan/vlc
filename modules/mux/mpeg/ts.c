@@ -328,7 +328,6 @@ typedef struct
 
 struct sout_mux_sys_t
 {
-    int             i_pcr_pid;
     sout_input_t    *p_pcr_input;
 
     vlc_mutex_t     csa_lock;
@@ -668,8 +667,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pid_audio = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-audio" );
     p_sys->i_pid_spu = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-spu" );
 
-    p_sys->i_pcr_pid = 0x1fff;
-
     /* Allow to create constrained stream */
     p_sys->i_bitrate_min = var_GetInteger( p_mux, SOUT_CFG_PREFIX "bmin" );
 
@@ -870,10 +867,7 @@ static void SelectPCRStream( sout_mux_t *p_mux, sout_input_t *p_removed_pcr_inpu
 
     /* Find a new pcr stream (Prefer Video Stream) */
     if( p_removed_pcr_input != NULL )
-    {
-        p_sys->i_pcr_pid = 0x1fff;
         p_sys->p_pcr_input = NULL;
-    }
 
     for ( int i = 0; i < p_mux->i_nb_inputs; i++ )
     {
@@ -896,11 +890,11 @@ static void SelectPCRStream( sout_mux_t *p_mux, sout_input_t *p_removed_pcr_inpu
 
     if( p_sys->p_pcr_input )
     {
-        p_sys->i_pcr_pid = ((sout_input_sys_t*)p_sys->p_pcr_input->p_sys)->ts.i_pid;
         /* Empty TS buffer */
         /* FIXME */
+        msg_Dbg( p_mux, "new PCR PID is %d",
+                 ((sout_input_sys_t *)p_sys->p_pcr_input->p_sys)->ts.i_pid );
     }
-    msg_Dbg( p_mux, "new PCR PID is %d", p_sys->i_pcr_pid );
 
 }
 
@@ -1626,7 +1620,7 @@ static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
 
-    if( p_sys->i_pcr_pid == 0x1fff )
+    if( p_sys->p_pcr_input == NULL )
     {
         for (int i = 0; i < p_mux->i_nb_inputs; i++ )
         {
@@ -2005,7 +1999,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     BuildPMT( p_sys->p_dvbpsi, VLC_OBJECT(p_mux),
               c, (PEStoTSCallback)BufferChainAppend,
               p_sys->i_tsid, p_sys->i_pmt_version_number,
-              p_sys->i_pcr_pid,
+              ((sout_input_sys_t *)p_sys->p_pcr_input->p_sys)->ts.i_pid,
               &p_sys->sdt,
               p_sys->i_num_pmt, p_sys->pmt, p_sys->i_pmt_program_number,
               p_mux->i_nb_inputs, mappeds );
