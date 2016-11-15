@@ -1689,7 +1689,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     }
 
 #ifdef SUPPORTS_SHADERS
-    if (vgl->program[0] && (vgl->chroma->plane_count == 3 || vgl->chroma->plane_count == 1))
+    if (vgl->program[0] && (vgl->chroma->plane_count == 3 || vgl->chroma->plane_count == 2))
         DrawWithShaders(vgl, left, top, right, bottom, 0);
     else if (vgl->program[1] && vgl->chroma->plane_count == 1)
         DrawWithShaders(vgl, left, top, right, bottom, 1);
