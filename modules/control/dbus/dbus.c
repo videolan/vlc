@@ -1146,9 +1146,9 @@ int DemarshalSetPropertyValue( DBusMessage *p_msg, void *p_arg )
         free( psz ); \
     }
 
-int GetInputMeta( input_item_t* p_input,
-                  DBusMessageIter *args )
+int GetInputMeta( playlist_item_t *item, DBusMessageIter *args )
 {
+    input_item_t *p_input = item->p_input;
     DBusMessageIter dict, dict_entry, variant, list;
     /** The duration of the track can be expressed in second, milli-seconds and
         µ-seconds */
@@ -1157,7 +1157,7 @@ int GetInputMeta( input_item_t* p_input,
     dbus_int64_t i_length = i_mtime / 1000;
     char *psz_trackid;
 
-    if( -1 == asprintf( &psz_trackid, MPRIS_TRACKID_FORMAT, p_input->i_id ) )
+    if( -1 == asprintf( &psz_trackid, MPRIS_TRACKID_FORMAT, item->i_id ) )
         return VLC_ENOMEM;
 
     const char* ppsz_meta_items[] =

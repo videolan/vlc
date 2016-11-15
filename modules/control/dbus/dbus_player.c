@@ -66,14 +66,17 @@ DBUS_METHOD( SetPosition )
 
     REPLY_INIT;
     dbus_int64_t i_pos;
-    char *psz_trackid, *psz_dbus_trackid;
-    input_item_t *p_item;
+    const char *psz_trackid;
+    playlist_t *playlist = pl_Get(p_this);
+    playlist_item_t *item;
+    input_thread_t *input = NULL;
+    int i_id;
 
     DBusError error;
     dbus_error_init( &error );
 
     dbus_message_get_args( p_from, &error,
-            DBUS_TYPE_OBJECT_PATH, &psz_dbus_trackid,
+            DBUS_TYPE_OBJECT_PATH, &psz_trackid,
             DBUS_TYPE_INT64, &i_pos,
             DBUS_TYPE_INVALID );
 
@@ -85,28 +88,20 @@ DBUS_METHOD( SetPosition )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    input_thread_t *p_input = pl_CurrentInput( p_this );
+    if( sscanf( psz_trackid, MPRIS_TRACKID_FORMAT, &i_id ) < 1 )
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-    if( p_input )
+    playlist_Lock( playlist );
+    item = playlist_CurrentPlayingItem( playlist );
+    if( item != NULL && item->i_id == i_id )
+        input = playlist_CurrentInputLocked( playlist );
+    playlist_Unlock( playlist );
+
+    if( input != NULL )
     {
-        if( ( p_item = input_GetItem( p_input ) ) )
-        {
-            if( -1 == asprintf( &psz_trackid,
-                                MPRIS_TRACKID_FORMAT,
-                                p_item->i_id ) )
-            {
-                vlc_object_release( p_input );
-                return DBUS_HANDLER_RESULT_NEED_MEMORY;
-            }
-
-            if( !strcmp( psz_trackid, psz_dbus_trackid ) )
-                var_SetInteger( p_input, "time", i_pos );
-            free( psz_trackid );
-        }
-
-        vlc_object_release( p_input );
+        var_SetInteger( input, "time", i_pos );
+        vlc_object_release( input );
     }
-
 
     REPLY_SEND;
 }
@@ -513,37 +508,27 @@ DBUS_METHOD( LoopStatusSet )
 static int
 MarshalMetadata( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    DBusMessageIter a;
-    input_thread_t *p_input = pl_CurrentInput( p_intf );
-    input_item_t   *p_item  = NULL;
+    playlist_t *playlist = pl_Get( p_intf );
+    playlist_item_t *item;
+    int result = VLC_SUCCESS;
 
-    if( p_input != NULL )
-    {
-        p_item = input_GetItem( p_input );
+    playlist_Lock( playlist );
+    item = playlist_CurrentPlayingItem( playlist );
 
-        if( p_item )
-        {
-            int result = GetInputMeta( p_item, container );
+    if( item != NULL )
+        result = GetInputMeta( item, container );
+    else
+    {   // avoid breaking the type marshalling
+        DBusMessageIter a;
 
-            if (result != VLC_SUCCESS)
-            {
-                vlc_object_release( (vlc_object_t*) p_input );
-                return result;
-            }
-        }
-
-        vlc_object_release( (vlc_object_t*) p_input );
+        if( !dbus_message_iter_open_container( container, DBUS_TYPE_ARRAY,
+                                               "{sv}", &a ) ||
+            !dbus_message_iter_close_container( container, &a ) )
+            result = VLC_ENOMEM;
     }
 
-    if (!p_item)
-    {
-        // avoid breaking the type marshalling
-        if( !dbus_message_iter_open_container( container, DBUS_TYPE_ARRAY, "{sv}", &a ) ||
-              !dbus_message_iter_close_container( container, &a ) )
-            return VLC_ENOMEM;
-    }
-
-    return VLC_SUCCESS;
+    playlist_Unlock( playlist );
+    return result;
 }
 
 

@@ -139,7 +139,7 @@ enum
 };
 
 int DemarshalSetPropertyValue( DBusMessage *p_msg, void *p_arg );
-int GetInputMeta  ( input_item_t* p_input, DBusMessageIter *args );
+int GetInputMeta( playlist_item_t *, DBusMessageIter *args );
 int AddProperty ( intf_thread_t *p_intf,
                   DBusMessageIter *p_container,
                   const char* psz_property_name,
