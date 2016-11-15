@@ -350,7 +350,9 @@ VLC_API int playlist_NodeAddCopy( playlist_t *, playlist_item_t *, playlist_item
 
 /********************************** Item search *************************/
 VLC_API playlist_item_t * playlist_ItemGetById(playlist_t *, int ) VLC_USED;
-VLC_API playlist_item_t * playlist_ItemGetByInput(playlist_t *,input_item_t * ) VLC_USED;
+VLC_API playlist_item_t *playlist_ItemGetByInput(playlist_t *,
+                                                 const input_item_t * )
+VLC_USED;
 
 VLC_API int playlist_LiveSearchUpdate(playlist_t *, playlist_item_t *, const char *, bool );
 

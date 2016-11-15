@@ -60,7 +60,7 @@ playlist_item_t* playlist_ItemGetById( playlist_t * p_playlist , int i_id )
  * @return the item, or NULL on failure
  */
 playlist_item_t* playlist_ItemGetByInput( playlist_t * p_playlist,
-                                          input_item_t *p_item )
+                                          const input_item_t *p_item )
 {
     int i;
     PL_ASSERT_LOCKED;
