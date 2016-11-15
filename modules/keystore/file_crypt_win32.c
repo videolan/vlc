@@ -28,8 +28,8 @@
 #include <windows.h>
 #include <wincrypt.h>
 
-typedef WINBOOL WINAPI (*ProcessFunc)(DATA_BLOB*, LPCWSTR, DATA_BLOB*, PVOID, CRYPTPROTECT_PROMPTSTRUCT*,
-                                      DWORD, DATA_BLOB*);
+typedef BOOL (WINAPI *ProcessFunc)(DATA_BLOB*, LPCWSTR, DATA_BLOB*, PVOID,
+                                   CRYPTPROTECT_PROMPTSTRUCT*, DWORD, DATA_BLOB*);
 
 static size_t Process(const uint8_t *p_src, size_t i_src_len, uint8_t **pp_dst, ProcessFunc pf_process)
 {
