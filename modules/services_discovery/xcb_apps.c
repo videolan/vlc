@@ -97,6 +97,7 @@ static int Open (vlc_object_t *obj)
     if (p_sys == NULL)
         return VLC_ENOMEM;
     sd->p_sys = p_sys;
+    sd->description = _("Screen capture");
 
     /* Connect to X server */
     char *display = var_InheritString (obj, "x11-display");

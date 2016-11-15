@@ -79,6 +79,7 @@ static int Open (vlc_object_t *obj)
     }
 
     sd->p_sys = sys;
+    sd->description = _("Audio capture");
     sys->context = ctx;
     sys->root = NULL;
 

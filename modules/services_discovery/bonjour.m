@@ -226,6 +226,8 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
     }
 
+    p_sd->description = _("Bonjour Network Discovery");
+
     VLCNetServiceDiscoveryController *discoveryController = [[VLCNetServiceDiscoveryController alloc] init];
     discoveryController.p_sd = p_sd;
 

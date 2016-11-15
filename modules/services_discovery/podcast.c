@@ -142,6 +142,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->update_type = UPDATE_URLS;
 
     p_sd->p_sys  = p_sys;
+    p_sd->description = _("Podcasts");
 
     /* Launch the callback associated with this variable */
     vlc_object_t *pl = p_sd->obj.parent;

@@ -93,6 +93,7 @@ static int Open( vlc_object_t *p_this )
     if( !( p_sys = malloc( sizeof( services_discovery_sys_t ) ) ) )
         return VLC_ENOMEM;
     p_sd->p_sys = p_sys;
+    p_sd->description = _("MTP devices");
     p_sys->psz_name = NULL;
 
     vlc_mutex_lock( &mtp_lock );

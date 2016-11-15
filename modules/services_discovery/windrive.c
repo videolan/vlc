@@ -56,6 +56,8 @@ static int Open (vlc_object_t *obj)
 {
     services_discovery_t *sd = (services_discovery_t *)obj;
 
+    sd->description = _("Discs");
+
     LONG drives = GetLogicalDrives ();
     char mrl[12] = "file:///A:/", name[3] = "A:";
     TCHAR path[4] = TEXT("A:\\");

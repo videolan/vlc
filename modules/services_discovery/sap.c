@@ -301,6 +301,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_timeout = var_CreateGetInteger( p_sd, "sap-timeout" );
 
     p_sd->p_sys  = p_sys;
+    p_sd->description = _("Network streams (SAP)");
 
     p_sys->pi_fd = NULL;
     p_sys->i_fd = 0;

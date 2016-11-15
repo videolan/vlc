@@ -83,6 +83,15 @@ int Open_LuaSD( vlc_object_t *p_this )
         psz_name = strdup(p_sd->psz_name);
     }
 
+    p_sd->description = p_sd->psz_name;
+
+    for( const config_chain_t *cc = p_sd->p_cfg; cc != NULL; cc = cc->p_next )
+        if( strcmp( cc->psz_name, "longname" ) == 0 )
+        {
+            p_sd->description = cc->psz_value;
+            break;
+        }
+
     if( !( p_sys = malloc( sizeof( services_discovery_sys_t ) ) ) )
     {
         free( psz_name );

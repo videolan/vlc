@@ -59,6 +59,8 @@ struct services_discovery_t
     char *psz_name;                           /**< Main name of the SD */
     config_chain_t *p_cfg;                    /**< Configuration for the SD */
 
+    const char *description; /**< Human-readable name */
+
     /** Control function
      * \see services_discovery_command_e
      */

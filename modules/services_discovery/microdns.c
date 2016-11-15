@@ -620,6 +620,7 @@ OpenSD( vlc_object_t *p_obj )
     if( !p_sd->p_sys )
         return VLC_ENOMEM;
 
+    p_sd->description = _("mDNS Network Discovery");
     config_ChainParse( p_sd, CFG_PREFIX, ppsz_options, p_sd->p_cfg );
 
     return OpenCommon( p_obj, &p_sd->p_sys->s, false );

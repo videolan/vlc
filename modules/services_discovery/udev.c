@@ -119,6 +119,7 @@ struct device
 struct subsys
 {
     const char *name;
+    const char *description;
     char * (*get_mrl) (struct udev_device *dev);
     char * (*get_name) (struct udev_device *dev);
     int item_type;
@@ -233,6 +234,8 @@ static int Open (vlc_object_t *obj, const struct subsys *subsys)
 
     if (p_sys == NULL)
         return VLC_ENOMEM;
+
+    sd->description = vlc_gettext(subsys->description);
     sd->p_sys = p_sys;
     p_sys->subsys = subsys;
     p_sys->root = NULL;
@@ -441,7 +444,8 @@ static char *v4l_get_name (struct udev_device *dev)
 int OpenV4L (vlc_object_t *obj)
 {
     static const struct subsys subsys = {
-        "video4linux", v4l_get_mrl, v4l_get_name, ITEM_TYPE_CARD,
+        "video4linux", N_("Video capture"),
+        v4l_get_mrl, v4l_get_name, ITEM_TYPE_CARD,
     };
 
     return Open (obj, &subsys);
@@ -515,7 +519,8 @@ out:
 int OpenALSA (vlc_object_t *obj)
 {
     static const struct subsys subsys = {
-        "sound", alsa_get_mrl, alsa_get_name, ITEM_TYPE_CARD,
+        "sound", N_("Audio capture"),
+        alsa_get_mrl, alsa_get_name, ITEM_TYPE_CARD,
     };
 
     return Open (obj, &subsys);
@@ -619,7 +624,7 @@ static char *disc_get_name (struct udev_device *dev)
 int OpenDisc (vlc_object_t *obj)
 {
     static const struct subsys subsys = {
-        "block", disc_get_mrl, disc_get_name, ITEM_TYPE_DISC,
+        "block", N_("Discs"), disc_get_mrl, disc_get_name, ITEM_TYPE_DISC,
     };
 
     return Open (obj, &subsys);

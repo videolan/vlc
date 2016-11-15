@@ -114,6 +114,7 @@ services_discovery_t *vlc_sd_Create(vlc_object_t *parent, const char *cfg,
         return NULL;
 
     free(config_ChainCreate(&sd->psz_name, &sd->p_cfg, cfg));
+    sd->description = NULL;
     sd->owner = *owner;
 
     sd->p_module = module_need(sd, "services_discovery",

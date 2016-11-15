@@ -135,6 +135,7 @@ int bdsm_SdOpen (vlc_object_t *p_this)
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
+    p_sd->description = _("Windows networks");
     p_sd->p_sys = p_sys;
     p_sys->p_entry_item_list = vlc_array_new();
     if ( p_sys->p_entry_item_list == NULL )

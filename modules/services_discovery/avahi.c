@@ -274,6 +274,8 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
+    p_sd->description = _("Zeroconf network services");
+
     vlc_dictionary_init( &p_sys->services_name_to_input_item, 1 );
 
     p_sys->poll = avahi_threaded_poll_new();
