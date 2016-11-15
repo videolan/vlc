@@ -168,33 +168,35 @@ static void playlist_sd_item_added(services_discovery_t *sd,
                                    input_item_t *p_input, const char *psz_cat)
 {
     vlc_sd_internal_t *sds = sd->owner.sys;
-    playlist_item_t *p_parent = sds->node;
-    playlist_t * p_playlist = p_parent->p_playlist;
+    playlist_t *playlist = (playlist_t *)sd->obj.parent;
+    playlist_item_t *parent;
+    const char *longname = (sd->description != NULL) ? sd->description : "?";
 
-    msg_Dbg( p_playlist, "Adding %s in %s",
-                p_input->psz_name ? p_input->psz_name : "(null)",
-                psz_cat ? psz_cat : "(null)" );
+    msg_Dbg(sd, "adding %s", p_input->psz_name ? p_input->psz_name : "(null)");
 
-    PL_LOCK;
+    playlist_Lock(playlist);
+    if (sds->node == NULL)
+        sds->node = playlist_NodeCreate(playlist, longname, playlist->p_root,
+                                        PLAYLIST_END,
+                                        PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG,
+                                        NULL);
+
     /* If p_parent is in root category (this is clearly a hack) and we have a cat */
-    if( !EMPTY_STR(psz_cat) )
+    if (psz_cat == NULL)
+        parent = sds->node;
+    else
     {
-        /* */
-        playlist_item_t * p_cat;
-        p_cat = playlist_ChildSearchName( p_parent, psz_cat );
-        if( !p_cat )
-        {
-            p_cat = playlist_NodeCreate( p_playlist, psz_cat,
-                                         p_parent, PLAYLIST_END, 0, NULL );
-            p_cat->i_flags |= PLAYLIST_RO_FLAG | PLAYLIST_SKIP_FLAG;
-        }
-        p_parent = p_cat;
+        parent = playlist_ChildSearchName(sds->node, psz_cat);
+        if (parent == NULL)
+            parent = playlist_NodeCreate(playlist, psz_cat, sds->node,
+                                         PLAYLIST_END,
+                                         PLAYLIST_RO_FLAG | PLAYLIST_SKIP_FLAG,
+                                         NULL);
     }
 
-    playlist_NodeAddInput( p_playlist, p_input, p_parent,
-                           PLAYLIST_APPEND, PLAYLIST_END,
-                           pl_Locked );
-    PL_UNLOCK;
+    playlist_NodeAddInput(playlist, p_input, sds->node,
+                          PLAYLIST_APPEND, PLAYLIST_END, pl_Locked);
+    playlist_Unlock(playlist);
 }
 
  /* A new item has been removed from a certain sd */
@@ -229,36 +231,7 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
     if (unlikely(sds == NULL))
         return VLC_ENOMEM;
 
-    /* Look for configuration chain "longname" */
-    const char *longname = "?";
-    config_chain_t *cfg;
-    char *name;
-
-    free(config_ChainCreate(&name, &cfg, chain));
-    msg_Dbg(playlist, "adding services_discovery %s...", name);
-
-    for (config_chain_t *p = cfg; p != NULL; p = p->p_next)
-        if (p->psz_name != NULL && !strcmp(p->psz_name, "longname"))
-        {
-            if (p->psz_value != NULL)
-                longname = p->psz_value;
-            break;
-        }
-
-    playlist_Lock(playlist);
-    sds->node = playlist_NodeCreate(playlist, longname, playlist->p_root,
-                                    PLAYLIST_END,
-                                    PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG, NULL);
-    playlist_Unlock(playlist);
-
-    config_ChainDestroy(cfg);
-    free(name);
-
-    if (unlikely(sds->node == NULL))
-    {
-        free(sds);
-        return VLC_ENOMEM;
-    }
+    sds->node = NULL;
 
     struct services_discovery_owner_t owner = {
         sds,
@@ -270,9 +243,6 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
     sds->sd = vlc_sd_Create(VLC_OBJECT(playlist), chain, &owner);
     if (unlikely(sds->sd == NULL))
     {
-        playlist_Lock(playlist);
-        playlist_NodeDelete(playlist, sds->node, true, false);
-        playlist_Unlock(playlist);
         free(sds);
         return VLC_ENOMEM;
     }
@@ -293,7 +263,8 @@ static void playlist_ServicesDiscoveryInternalRemove(playlist_t *playlist,
 
     /* Remove the sd playlist node if it exists */
     playlist_Lock(playlist);
-    playlist_NodeDelete(playlist, sds->node, true, false);
+    if (sds->node != NULL)
+        playlist_NodeDelete(playlist, sds->node, true, false);
     playlist_Unlock(playlist);
 
     free(sds);
