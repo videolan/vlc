@@ -360,12 +360,24 @@ void playlist_Destroy( playlist_t *p_playlist )
 
 /** Get current playing input.
  */
+input_thread_t *playlist_CurrentInputLocked( playlist_t *p_playlist )
+{
+    PL_ASSERT_LOCKED;
+
+    input_thread_t *p_input = pl_priv(p_playlist)->p_input;
+    if( p_input != NULL )
+        vlc_object_hold( p_input );
+    return p_input;
+}
+
+
+/** Get current playing input.
+ */
 input_thread_t * playlist_CurrentInput( playlist_t * p_playlist )
 {
     input_thread_t * p_input;
     PL_LOCK;
-    p_input = pl_priv(p_playlist)->p_input;
-    if( p_input ) vlc_object_hold( p_input );
+    p_input = playlist_CurrentInputLocked( p_playlist );
     PL_UNLOCK;
     return p_input;
 }
