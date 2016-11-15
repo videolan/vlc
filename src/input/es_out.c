@@ -1506,34 +1506,23 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
     es->p_pgrm = p_pgrm;
     es_format_Copy( &es->fmt, fmt );
     if( es->fmt.i_id < 0 )
-        es->fmt.i_id = out->p_sys->i_id;
+        es->fmt.i_id = p_sys->i_id;
     if( !es->fmt.i_original_fourcc )
         es->fmt.i_original_fourcc = es->fmt.i_codec;
-    if( es->fmt.i_cat == AUDIO_ES )
-        es->fmt.i_codec = vlc_fourcc_GetCodecAudio( es->fmt.i_codec,
-                                                    es->fmt.audio.i_bitspersample );
-    else
-        es->fmt.i_codec = vlc_fourcc_GetCodec( es->fmt.i_cat,
-                                               es->fmt.i_codec );
-    if( es->fmt.i_cat == VIDEO_ES
-     && (!es->fmt.video.i_visible_width || !es->fmt.video.i_visible_height))
-    {
-        es->fmt.video.i_visible_width = es->fmt.video.i_width;
-        es->fmt.video.i_visible_height = es->fmt.video.i_height;
-    }
 
     es->i_id = es->fmt.i_id;
-    es->i_meta_id = out->p_sys->i_id;
+    es->i_meta_id = p_sys->i_id++; /* always incremented */
     es->b_scrambled = false;
 
     switch( es->fmt.i_cat )
     {
     case AUDIO_ES:
     {
+        es->fmt.i_codec = vlc_fourcc_GetCodecAudio( es->fmt.i_codec,
+                                                    es->fmt.audio.i_bitspersample );
+        es->i_channel = p_sys->audio.i_count++;
+
         audio_replay_gain_t rg;
-
-        es->i_channel = p_sys->audio.i_count;
-
         memset( &rg, 0, sizeof(rg) );
         vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
         vlc_audio_replay_gain_MergeFromMeta( &rg, input_priv(p_input)->p_item->p_meta );
@@ -1556,7 +1545,15 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
     }
 
     case VIDEO_ES:
-        es->i_channel = p_sys->video.i_count;
+        es->fmt.i_codec = vlc_fourcc_GetCodec( es->fmt.i_cat, es->fmt.i_codec );
+        es->i_channel = p_sys->video.i_count++;
+
+        if( !es->fmt.video.i_visible_width || !es->fmt.video.i_visible_height )
+        {
+            es->fmt.video.i_visible_width = es->fmt.video.i_width;
+            es->fmt.video.i_visible_height = es->fmt.video.i_height;
+        }
+
         if( es->fmt.video.i_frame_rate && es->fmt.video.i_frame_rate_base )
             vlc_ureduce( &es->fmt.video.i_frame_rate,
                          &es->fmt.video.i_frame_rate_base,
@@ -1565,7 +1562,8 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
         break;
 
     case SPU_ES:
-        es->i_channel = p_sys->sub.i_count;
+        es->fmt.i_codec = vlc_fourcc_GetCodec( es->fmt.i_cat, es->fmt.i_codec );
+        es->i_channel = p_sys->sub.i_count++;
         break;
 
     default:
@@ -1580,20 +1578,7 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
         es->pb_cc_present[i] = false;
     es->p_master = p_master;
 
-    TAB_APPEND( out->p_sys->i_es, out->p_sys->es, es );
-    p_sys->i_id++;  /* always incremented */
-    switch( es->fmt.i_cat )
-    {
-        case AUDIO_ES:
-            p_sys->audio.i_count++;
-            break;
-        case SPU_ES:
-            p_sys->sub.i_count++;
-            break;
-        case VIDEO_ES:
-            p_sys->video.i_count++;
-            break;
-    }
+    TAB_APPEND( p_sys->i_es, p_sys->es, es );
 
     if( es->p_pgrm == p_sys->p_pgrm )
         EsOutESVarUpdate( out, es, false );
