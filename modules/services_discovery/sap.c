@@ -402,7 +402,7 @@ static int OpenDemux( vlc_object_t *p_this )
 
 error:
     FREENULL( psz_sdp );
-    if( p_sdp ) FreeSDP( p_sdp ); p_sdp = NULL;
+    if( p_sdp ) FreeSDP( p_sdp );
     vlc_stream_Seek( p_demux->s, 0 );
     return errval;
 }
