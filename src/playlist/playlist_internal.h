@@ -134,8 +134,6 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
 
 void playlist_ItemRelease( playlist_item_t * );
 
-void playlist_NodeEmpty( playlist_t *, playlist_item_t * );
-
 void ResetCurrentlyPlaying( playlist_t *p_playlist, playlist_item_t *p_cur );
 void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur );
 

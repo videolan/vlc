@@ -87,26 +87,6 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
 }
 
 /**
- * Remove all the children of a node
- *
- * This function must be entered with the playlist lock
- *
- * \param p_playlist the playlist
- * \param p_root the node
- */
-void playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root )
-{
-    PL_ASSERT_LOCKED;
-
-    if( p_root->i_children == -1 )
-        return;
-
-    /* Delete the children */
-    for( int i = p_root->i_children-1 ; i >= 0 ;i-- )
-        playlist_NodeDelete( p_playlist, p_root->pp_children[i], false );
-}
-
-/**
  * Remove all the children of a node and removes the node
  *
  * \param p_playlist the playlist
