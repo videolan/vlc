@@ -420,7 +420,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
         return VLC_ENOMEM;
     input_item_AddOptions( p_input, i_options, ppsz_options, i_option_flags );
     i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos,
-                               b_playlist, false );
+                               b_playlist );
     vlc_gc_decref( p_input );
     return i_ret;
 }
@@ -435,21 +435,19 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of its size
  * \param b_playlist TRUE for playlist, FALSE for media library
- * \param b_locked TRUE if the playlist is locked
  * \return VLC_SUCCESS or VLC_ENOMEM or VLC_EGENERIC
 */
 int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
-                       int i_mode, int i_pos, bool b_playlist,
-                       bool b_locked )
+                       int i_mode, int i_pos, bool b_playlist )
 {
     playlist_item_t *item;
 
-    PL_LOCK_IF( !b_locked );
+    PL_LOCK;
     item = b_playlist ? p_playlist->p_playing
                       : p_playlist->p_media_library;
 
     item = playlist_NodeAddInput( p_playlist, p_input, item, i_mode, i_pos );
-    PL_UNLOCK_IF( !b_locked );
+    PL_UNLOCK;
     return (item != NULL) ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
