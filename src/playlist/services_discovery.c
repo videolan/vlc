@@ -181,7 +181,7 @@ static void playlist_sd_item_added(services_discovery_t *sd,
                                          NULL);
     }
 
-    playlist_NodeAddInput(playlist, p_input, sds->node,
+    playlist_NodeAddInput(playlist, p_input, parent,
                           PLAYLIST_APPEND, PLAYLIST_END, pl_Locked);
     playlist_Unlock(playlist);
 }
