@@ -558,6 +558,9 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     const vlc_viewpoint_t *p_viewpoint = var_InheritAddress(vout, "viewpoint");
     if (p_viewpoint != NULL)
         cfg->viewpoint = *p_viewpoint;
+    else
+        vlc_viewpoint_init( &cfg->viewpoint );
+
     cfg->display.title = title;
     const int display_width = var_CreateGetInteger(vout, "width");
     const int display_height = var_CreateGetInteger(vout, "height");
