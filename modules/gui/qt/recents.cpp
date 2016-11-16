@@ -159,7 +159,7 @@ void RecentsMRL::save()
 playlist_item_t *RecentsMRL::toPlaylist(int length)
 {
     playlist_Lock(THEPL);
-    playlist_item_t *p_node_recent = playlist_NodeCreate(THEPL, _("Recently Played"), THEPL->p_root, PLAYLIST_END, PLAYLIST_RO_FLAG, NULL);
+    playlist_item_t *p_node_recent = playlist_NodeCreate(THEPL, _("Recently Played"), THEPL->p_root, PLAYLIST_END, PLAYLIST_RO_FLAG);
     playlist_Unlock(THEPL);
 
     if ( p_node_recent == NULL )  return NULL;

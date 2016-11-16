@@ -165,8 +165,7 @@ static void playlist_sd_item_added(services_discovery_t *sd,
     if (sds->node == NULL)
         sds->node = playlist_NodeCreate(playlist, longname, playlist->p_root,
                                         PLAYLIST_END,
-                                        PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG,
-                                        NULL);
+                                        PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG);
 
     /* If p_parent is in root category (this is clearly a hack) and we have a cat */
     if (psz_cat == NULL)
@@ -177,8 +176,7 @@ static void playlist_sd_item_added(services_discovery_t *sd,
         if (parent == NULL)
             parent = playlist_NodeCreate(playlist, psz_cat, sds->node,
                                          PLAYLIST_END,
-                                         PLAYLIST_RO_FLAG | PLAYLIST_SKIP_FLAG,
-                                         NULL);
+                                         PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG);
     }
 
     playlist_NodeAddInput(playlist, p_input, parent,
@@ -241,8 +239,7 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
     if (sds->node == NULL && sds->sd->description != NULL)
         sds->node = playlist_NodeCreate(playlist, sds->sd->description,
                                         playlist->p_root, PLAYLIST_END,
-                                        PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG,
-                                        NULL);
+                                        PLAYLIST_RO_FLAG|PLAYLIST_SKIP_FLAG);
 
     TAB_APPEND(pl_priv(playlist)->i_sds, pl_priv(playlist)->pp_sds, sds);
     playlist_Unlock(playlist);

@@ -58,21 +58,18 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
 playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
                                        const char *psz_name,
                                        playlist_item_t *p_parent, int i_pos,
-                                       int i_flags, input_item_t *p_input )
+                                       int i_flags )
 {
-    input_item_t *p_new_input = NULL;
+    input_item_t *p_new_input;
     playlist_item_t *p_item;
 
     PL_ASSERT_LOCKED;
     if( !psz_name ) psz_name = _("Undefined");
 
-    if( !p_input )
-        p_new_input = input_item_NewExt( NULL, psz_name, -1, ITEM_TYPE_NODE,
-                                         ITEM_NET_UNKNOWN );
-    p_item = playlist_ItemNewFromInput( p_playlist,
-                                        p_input ? p_input : p_new_input );
-    if( p_new_input )
-        vlc_gc_decref( p_new_input );
+    p_new_input = input_item_NewExt( NULL, psz_name, -1, ITEM_TYPE_NODE,
+                                     ITEM_NET_UNKNOWN );
+    p_item = playlist_ItemNewFromInput( p_playlist, p_new_input );
+    vlc_gc_decref( p_new_input );
 
     if( p_item == NULL )  return NULL;
     p_item->i_children = 0;

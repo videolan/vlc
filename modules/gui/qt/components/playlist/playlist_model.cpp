@@ -896,7 +896,7 @@ void PLModel::createNode( QModelIndex index, QString name )
     if ( !index.isValid() ) index = rootIndex();
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, itemId( index ) );
     if( p_item )
-        playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0, NULL );
+        playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0 );
 }
 
 void PLModel::renameNode( QModelIndex index, QString name )
