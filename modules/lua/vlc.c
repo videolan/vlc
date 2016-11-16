@@ -168,8 +168,6 @@ vlc_module_begin ()
         set_capability( "services_discovery", 0 )
         add_string( "lua-sd", "", NULL, NULL, false )
             change_volatile()
-        add_string( "lua-longname", "", NULL, NULL, false )
-            change_volatile()
         set_callbacks( Open_LuaSD, Close_LuaSD )
 
     VLC_SD_PROBE_SUBMODULE
@@ -686,17 +684,13 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                 psz_longname = *ppsz_file;
 
             char *psz_file_esc = config_StringEscape( *ppsz_file );
-            char *psz_longname_esc = config_StringEscape( psz_longname );
-            if( asprintf( &psz_name, "lua{sd='%s',longname='%s'}",
-                          psz_file_esc, psz_longname_esc ) < 0 )
+            if( asprintf( &psz_name, "lua{sd='%s'}", psz_file_esc ) < 0 )
             {
                 free( psz_file_esc );
-                free( psz_longname_esc );
                 free( psz_filename );
                 goto error;
             }
             free( psz_file_esc );
-            free( psz_longname_esc );
             vlc_sd_probe_Add( probe, psz_name, psz_longname, SD_CAT_INTERNET );
             free( psz_name );
             free( psz_filename );

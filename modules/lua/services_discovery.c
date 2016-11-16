@@ -76,7 +76,7 @@ const char *vlclua_sd_description( vlc_object_t *obj, lua_State *L,
 }
 #define vlclua_sd_description(a, b, c) vlclua_sd_description(VLC_OBJECT(a), b, c)
 
-static const char * const ppsz_sd_options[] = { "sd", "longname", NULL };
+static const char * const ppsz_sd_options[] = { "sd", NULL };
 
 /*****************************************************************************
  * Local structures
