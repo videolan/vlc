@@ -100,6 +100,11 @@ static inline void vout_SendEventMouseHidden(vout_thread_t *vout)
     /* TODO */
     VLC_UNUSED(vout);
 }
+static inline void vout_SendEventViewpointChangeable(vout_thread_t *vout,
+                                                     bool b_can_change)
+{
+    var_SetBool(vout, "viewpoint-changeable", b_can_change);
+}
 
 #if 0
 static inline void vout_SendEventSnapshot(vout_thread_t *vout, const char *filename)

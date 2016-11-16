@@ -1319,6 +1319,9 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         osys->sar.den != source->i_sar_den)
         osys->ch_sar = true;
 
+    vout_SendEventViewpointChangeable(osys->vout,
+        p_display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
+
     return p_display;
 error:
     vlc_mutex_destroy(&osys->lock);
