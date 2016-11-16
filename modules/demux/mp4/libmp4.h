@@ -1176,6 +1176,7 @@ typedef struct
 typedef struct
 {
     char *psz_text;
+    uint64_t i_length;
 
 } MP4_Box_data_string_t;
 
