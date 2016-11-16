@@ -128,7 +128,10 @@ static int vlclua_var_inherit( lua_State *L )
         return 0;
 
     lua_pop( L, 2 );
-    return vlclua_pushvalue( L, i_type, val );
+    vlclua_pushvalue( L, i_type, val );
+    if( i_type == VLC_VAR_STRING )
+        free( val.psz_string );
+    return 1;
 }
 
 static int vlclua_var_get( lua_State *L )
@@ -142,7 +145,10 @@ static int vlclua_var_get( lua_State *L )
         return 0;
 
     lua_pop( L, 2 );
-    return vlclua_pushvalue( L, i_type, val );
+    vlclua_pushvalue( L, i_type, val );
+    if( i_type == VLC_VAR_STRING )
+        free( val.psz_string );
+    return 1;
 }
 
 static int vlclua_var_set( lua_State *L )
