@@ -102,7 +102,7 @@
 struct intf_sys_t
 {
     VLCGrowlDelegate *o_growl_delegate;
-    int             i_id;
+    input_item_t *current_item;
     int             i_item_changes;
 };
 
@@ -144,7 +144,12 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->o_growl_delegate = [[VLCGrowlDelegate alloc] initWithInterfaceThread:p_intf];
     if( !p_sys->o_growl_delegate )
-      return VLC_ENOMEM;
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
+    p_sys->current_item = NULL;
 
     p_playlist = pl_Get( p_intf );
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
@@ -166,6 +171,9 @@ static void Close( vlc_object_t *p_this )
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_DelCallback( p_playlist, "input-current", ItemChange, p_intf );
 
+    if( p_sys->current_item != NULL )
+        input_item_Release( p_sys->current_item );
+
     [GrowlApplicationBridge setGrowlDelegate:nil];
     [p_sys->o_growl_delegate release];
     free( p_sys );
@@ -180,11 +188,11 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     VLC_UNUSED(oldval);
 
     intf_thread_t *p_intf = (intf_thread_t *)param;
+    intf_sys_t *p_sys = p_intf->p_sys;
     char *psz_tmp           = NULL;
     char *psz_title         = NULL;
     char *psz_artist        = NULL;
     char *psz_album         = NULL;
-    input_item_t *p_item = newval.p_address;
 
     bool b_is_item_current = !strcmp( "input-current", psz_var );
 
@@ -195,31 +203,34 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         if( !p_input )
             return VLC_SUCCESS;
 
-        p_item = input_GetItem( p_input );
-        if( p_intf->p_sys->i_id != p_item->i_id )
+        input_item_t *p_item = input_GetItem( p_input );
+        if( p_sys->current_item != p_item )
         {
-            p_intf->p_sys->i_id = p_item->i_id;
-            p_intf->p_sys->i_item_changes = 0;
+            input_item_Release( p_sys->current_item );
+            p_sys->current_item = input_item_Hold( p_item );
+            p_sys->i_item_changes = 0;
         }
 
         return VLC_SUCCESS;
     }
+
+    input_item_t *p_item = newval.p_address;
+
     /* ignore items which weren't pre-parsed yet */
-    else if( !input_item_IsPreparsed(p_item) )
+    if( !input_item_IsPreparsed(p_item) )
         return VLC_SUCCESS;
-    else
-    {   /* "item-change" */
-        if( p_item->i_id != p_intf->p_sys->i_id )
-            return VLC_SUCCESS;
 
-        /* Some variable bitrate inputs call "item-change" callbacks each time
-         * their length is updated, that is several times per second.
-         * We'll limit the number of changes to 1 per input. */
-        if( p_intf->p_sys->i_item_changes > 0 )
-            return VLC_SUCCESS;
+    /* "item-change" */
+    if( p_sys->current_item != p_item )
+        return VLC_SUCCESS;
 
-        p_intf->p_sys->i_item_changes++;
-    }
+    /* Some variable bitrate inputs call "item-change" callbacks each time
+     * their length is updated, that is several times per second.
+     * We'll limit the number of changes to 1 per input. */
+    if( p_sys->i_item_changes > 0 )
+        return VLC_SUCCESS;
+
+    p_sys->i_item_changes++;
 
     /* Playing something ... */
     if( input_item_GetNowPlayingFb( p_item ) )
