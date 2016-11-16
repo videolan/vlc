@@ -945,6 +945,19 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                        false );
             break;
 
+        case ACTIONID_VIEWPOINT_ROLL_CLOCK:
+            if( p_vout )
+                input_UpdateViewpoint( p_input,
+                                       &(vlc_viewpoint_t) { .roll = -1.f },
+                                       false );
+            break;
+        case ACTIONID_VIEWPOINT_ROLL_ANTICLOCK:
+            if( p_vout )
+                input_UpdateViewpoint( p_input,
+                                       &(vlc_viewpoint_t) { .roll = 1.f },
+                                       false );
+            break;
+
          case ACTIONID_TOGGLE_AUTOSCALE:
             if( p_vout )
             {
