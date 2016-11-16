@@ -73,7 +73,6 @@ typedef struct playlist_private_t
         bool          b_request;/**< Set to true by the requester
                                            The playlist sets it back to false
                                            when processing the request */
-        vlc_mutex_t         lock;     /**< Lock to protect request */
     } request;
 
     vlc_thread_t thread; /**< engine thread */
