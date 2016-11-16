@@ -919,13 +919,13 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 var_DecInteger( p_vout, "crop-right" );
             break;
 
-        case ACTIONID_FOV_IN:
+        case ACTIONID_VIEWPOINT_FOV_IN:
             if( p_vout )
                 input_UpdateViewpoint( p_input,
                                        &(vlc_viewpoint_t) { .fov = -1.f },
                                        false );
             break;
-        case ACTIONID_FOV_OUT:
+        case ACTIONID_VIEWPOINT_FOV_OUT:
             if( p_vout )
                 input_UpdateViewpoint( p_input,
                                        &(vlc_viewpoint_t) { .fov = 1.f },
