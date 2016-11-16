@@ -37,6 +37,7 @@
 #include "vlc.h"
 
 #include <vlc_plugin.h>
+#include <vlc_arrays.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 #include <vlc_services_discovery.h>
@@ -619,7 +620,9 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
 
 static int vlc_sd_probe_Open( vlc_object_t *obj )
 {
-    int r = VLC_PROBE_CONTINUE;
+    vlc_dictionary_t name_d;
+    vlc_dictionary_init( &name_d, 32 );
+
     char **ppsz_dir_list;
     vlclua_dir_list( "sd", &ppsz_dir_list );
     for( char **ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
@@ -635,18 +638,30 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
             char *temp = strchr( *ppsz_file, '.' );
             if( temp )
                 *temp = '\0';
-            r = vlclua_probe_sd( obj, *ppsz_file );
+
+            if( vlc_dictionary_value_for_key( &name_d, *ppsz_file ) ==
+                    kVLCDictionaryNotFound )
+                vlc_dictionary_insert( &name_d, *ppsz_file, &name_d );
+            free( *ppsz_file );
+        }
+        free( ppsz_filelist );
+    }
+    vlclua_dir_list_free( ppsz_dir_list );
+
+    int r = VLC_PROBE_CONTINUE;
+    char **names = vlc_dictionary_all_keys( &name_d );
+    if( names != NULL )
+    {
+        for( char **name = names; *name != NULL; name++ )
+        {
+            r = vlclua_probe_sd( obj, *name );
             if( r != VLC_PROBE_CONTINUE )
                 break;
         }
-        for( char **ppsz_file = ppsz_filelist;
-             ppsz_file < ppsz_filelist + i_files; ppsz_file++ )
-            free( *ppsz_file );
-        free( ppsz_filelist );
-        if( r != VLC_PROBE_CONTINUE )
-            break;
+        free( names );
     }
-    vlclua_dir_list_free( ppsz_dir_list );
+    vlc_dictionary_clear( &name_d, NULL, NULL );
+
     return r;
 }
 
