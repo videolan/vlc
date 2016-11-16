@@ -696,17 +696,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #endif
     }
 
-    if (vgl->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
-        || vgl->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
-    {
-        vout_display_opengl_SetViewpoint(vgl, &(vlc_viewpoint_t) {
-            .yaw = vgl->fmt.f_pose_yaw_degrees,
-            .pitch = vgl->fmt.f_pose_pitch_degrees,
-            .roll = vgl->fmt.f_pose_roll_degrees,
-            .fov = vgl->fmt.f_pose_fov_degrees,
-            .zoom = 0.f } );
-    }
-
     /* */
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
