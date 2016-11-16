@@ -299,13 +299,13 @@ VLC_API int playlist_Status( playlist_t * );
 
 /**
  * Export a node of the playlist to a certain type of playlistfile
- * \param p_playlist the playlist to export
+ * \param b_playlist true for the playlist, false for the media library
  * \param psz_filename the location where the exported file will be saved
- * \param p_export_root the root node to export
  * \param psz_type the type of playlist file to create (m3u, pls, ..)
  * \return VLC_SUCCESS on success
  */
-VLC_API int playlist_Export( playlist_t *p_playlist, const char *psz_name, playlist_item_t *p_export_root, const char *psz_type );
+VLC_API int playlist_Export( playlist_t *p_playlist, const char *psz_name,
+                             bool b_playlist, const char *psz_type );
 
 /**
  * Open a playlist file, add its content to the current playlist

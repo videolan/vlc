@@ -39,22 +39,19 @@
 #include <vlc_modules.h>
 
 int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
-                     playlist_item_t *p_export_root, const char *psz_type )
+                     bool b_playlist, const char *psz_type )
 {
-    if( p_export_root == NULL ) return VLC_EGENERIC;
-
     playlist_export_t *p_export =
         vlc_custom_create( p_playlist, sizeof( *p_export ), "playlist export" );
     if( unlikely(p_export == NULL) )
         return VLC_ENOMEM;
 
     msg_Dbg( p_export, "saving %s to file %s",
-             p_export_root->p_input->psz_name, psz_filename );
+             b_playlist ? "playlist" : "media library", psz_filename );
 
     int ret = VLC_EGENERIC;
 
     /* Prepare the playlist_export_t structure */
-    p_export->p_root = p_export_root;
     p_export->psz_filename = psz_filename;
     p_export->p_file = vlc_fopen( psz_filename, "wt" );
     if( p_export->p_file == NULL )
@@ -68,6 +65,9 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
 
     /* And call the module ! All work is done now */
     playlist_Lock( p_playlist );
+    p_export->p_root = b_playlist ? p_playlist->p_playing
+                                  : p_playlist->p_media_library;
+
     p_module = module_need( p_export, "playlist export", psz_type, true );
     playlist_Unlock( p_playlist );
 
@@ -209,8 +209,7 @@ int playlist_MLDump( playlist_t *p_playlist )
     if ( asprintf( &psz_temp, "%s.tmp%"PRIu32, psz_dirname, (uint32_t)getpid() ) < 1 )
         return VLC_EGENERIC;
 
-    int i_ret = playlist_Export( p_playlist, psz_temp, p_playlist->p_media_library,
-                     "export-xspf" );
+    int i_ret = playlist_Export( p_playlist, psz_temp, false, "export-xspf" );
     if ( i_ret != VLC_SUCCESS )
     {
         vlc_unlink( psz_temp );

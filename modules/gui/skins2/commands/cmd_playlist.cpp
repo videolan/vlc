@@ -98,8 +98,7 @@ void CmdPlaylistSave::execute()
             return;
         }
 
-        playlist_Export( pPlaylist, m_file.c_str(),
-                         pPlaylist->p_playing, psz_module );
+        playlist_Export( pPlaylist, m_file.c_str(), true, psz_module );
     }
 }
 
