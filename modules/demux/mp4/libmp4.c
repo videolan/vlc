@@ -767,6 +767,58 @@ static int MP4_ReadBox_uuid( stream_t *p_stream, MP4_Box_t *p_box )
     return 1;
 }
 
+static int MP4_ReadBox_st3d( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_st3d_t, NULL );
+
+    MP4_Box_data_st3d_t *p_data = p_box->data.p_st3d;
+    MP4_GET1BYTE( p_data->i_stereo_mode );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_prhd( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_prhd_t, NULL );
+
+    MP4_Box_data_prhd_t *p_data = p_box->data.p_prhd;
+    int32_t fixed16_16;
+    MP4_GET4BYTES( fixed16_16 );
+    p_data->f_pose_yaw_degrees   = (float) fixed16_16 / 65536.0f;
+
+    MP4_GET4BYTES( fixed16_16 );
+    p_data->f_pose_pitch_degrees = (float) fixed16_16 / 65536.0f;
+
+    MP4_GET4BYTES( fixed16_16 );
+    p_data->f_pose_roll_degrees  = (float) fixed16_16 / 65536.0f;
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_equi( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_equi_t, NULL );
+
+    MP4_Box_data_equi_t *p_data = p_box->data.p_equi;
+    MP4_GET4BYTES( p_data->i_projection_bounds_top );
+    MP4_GET4BYTES( p_data->i_projection_bounds_bottom );
+    MP4_GET4BYTES( p_data->i_projection_bounds_left );
+    MP4_GET4BYTES( p_data->i_projection_bounds_right );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_cbmp( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_cbmp_t, NULL );
+
+    MP4_Box_data_cbmp_t *p_data = p_box->data.p_cbmp;
+    MP4_GET4BYTES( p_data->i_layout );
+    MP4_GET4BYTES( p_data->i_padding );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static void MP4_FreeBox_sidx( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_sidx->p_items );
@@ -4410,6 +4462,16 @@ static const struct
     { ATOM_tfra,    MP4_ReadBox_tfra,        ATOM_mfra },
     { ATOM_mfro,    MP4_ReadBox_mfro,        ATOM_mfra },
     { ATOM_uuid,    MP4_ReadBox_uuid,        0 },
+
+    /* spatial/360°/VR */
+    { ATOM_st3d,    MP4_ReadBox_st3d,        ATOM_avc1 },
+    { ATOM_st3d,    MP4_ReadBox_st3d,        ATOM_mp4v },
+    { ATOM_sv3d,    MP4_ReadBoxContainer,    ATOM_avc1 },
+    { ATOM_sv3d,    MP4_ReadBoxContainer,    ATOM_mp4v },
+    { ATOM_proj,    MP4_ReadBoxContainer,    ATOM_sv3d },
+    { ATOM_prhd,    MP4_ReadBox_prhd,        ATOM_proj },
+    { ATOM_equi,    MP4_ReadBox_equi,        ATOM_proj },
+    { ATOM_cbmp,    MP4_ReadBox_cbmp,        ATOM_proj },
 
     /* Last entry */
     { 0,              MP4_ReadBox_default,   0 }

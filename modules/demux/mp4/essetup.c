@@ -346,6 +346,7 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     }
 
     /* Set 360 video mode */
+    p_track->fmt.video.projection_mode = PROJECTION_MODE_RECTANGULAR;
     const MP4_Box_t *p_uuid = MP4_BoxGet( p_track->p_track, "uuid" );
     for( ; p_uuid; p_uuid = p_uuid->p_next)
     {
@@ -354,6 +355,44 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             && p_uuid->data.p_360 )
             p_track->fmt.video.projection_mode = p_uuid->data.p_360->i_projection_mode;
     }
+
+    const MP4_Box_t *p_st3d = MP4_BoxGet( p_sample, "st3d" );
+    if (p_st3d && BOXDATA(p_st3d))
+    {
+        switch( BOXDATA(p_st3d)->i_stereo_mode )
+        {
+        case ST3D_MONOSCOPIC:
+            p_track->fmt.video.multiview_mode = MULTIVIEW_2D;
+            break;
+        case ST3D_STEREOSCOPIC_TOP_BOTTOM:
+            p_track->fmt.video.multiview_mode = MULTIVIEW_STEREO_TB;
+            break;
+        case ST3D_STEREOSCOPIC_LEFT_RIGHT:
+            p_track->fmt.video.multiview_mode = MULTIVIEW_STEREO_SBS;
+            break;
+        default:
+            msg_Warn( p_demux, "Unknown stereo mode %d", BOXDATA(p_st3d)->i_stereo_mode );
+            break;
+        }
+    }
+
+    const MP4_Box_t *p_prhd = MP4_BoxGet( p_sample, "sv3d/proj/prhd" );
+    if (p_prhd && BOXDATA(p_prhd))
+    {
+        p_track->fmt.video.f_pose_yaw_degrees
+                = BOXDATA(p_prhd)->f_pose_yaw_degrees;
+        p_track->fmt.video.f_pose_pitch_degrees
+                = BOXDATA(p_prhd)->f_pose_pitch_degrees;
+        p_track->fmt.video.f_pose_roll_degrees
+                = BOXDATA(p_prhd)->f_pose_roll_degrees;
+    }
+
+    const MP4_Box_t *p_equi = MP4_BoxGet( p_sample, "sv3d/proj/equi" );
+    const MP4_Box_t *p_cbmp = MP4_BoxGet( p_sample, "sv3d/proj/cbmp" );
+    if (p_equi && BOXDATA(p_equi))
+        p_track->fmt.video.projection_mode = PROJECTION_MODE_EQUIRECTANGULAR;
+    else if (p_cbmp && BOXDATA(p_cbmp))
+        p_track->fmt.video.projection_mode = PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD;
 
     /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )

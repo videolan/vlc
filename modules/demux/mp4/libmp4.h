@@ -118,6 +118,13 @@ typedef int64_t stime_t;
 #define ATOM_tfra VLC_FOURCC( 't', 'f', 'r', 'a' )
 #define ATOM_keys VLC_FOURCC( 'k', 'e', 'y', 's' )
 
+#define ATOM_st3d VLC_FOURCC( 's', 't', '3', 'd' )
+#define ATOM_sv3d VLC_FOURCC( 's', 'v', '3', 'd' )
+#define ATOM_proj VLC_FOURCC( 'p', 'r', 'o', 'j' )
+#define ATOM_prhd VLC_FOURCC( 'p', 'r', 'h', 'd' )
+#define ATOM_cbmp VLC_FOURCC( 'c', 'b', 'm', 'p' )
+#define ATOM_equi VLC_FOURCC( 'e', 'q', 'u', 'i' )
+
 #define ATOM_nmhd VLC_FOURCC( 'n', 'm', 'h', 'd' )
 #define ATOM_mp2v VLC_FOURCC( 'm', 'p', '2', 'v' )
 #define ATOM_mp4v VLC_FOURCC( 'm', 'p', '4', 'v' )
@@ -1544,6 +1551,38 @@ typedef struct
     uint32_t i_projection_mode;
 } MP4_Box_data_360_t;
 
+
+typedef struct
+{
+    enum {
+        ST3D_MONOSCOPIC = 0,
+        ST3D_STEREOSCOPIC_TOP_BOTTOM = 1,
+        ST3D_STEREOSCOPIC_LEFT_RIGHT = 2,
+    } e_stereo_mode;
+    uint8_t i_stereo_mode;
+} MP4_Box_data_st3d_t;
+
+typedef struct
+{
+    float f_pose_yaw_degrees;
+    float f_pose_pitch_degrees;
+    float f_pose_roll_degrees;
+} MP4_Box_data_prhd_t;
+
+typedef struct
+{
+    uint32_t i_projection_bounds_top;
+    uint32_t i_projection_bounds_bottom;
+    uint32_t i_projection_bounds_left;
+    uint32_t i_projection_bounds_right;
+} MP4_Box_data_equi_t;
+
+typedef struct
+{
+    uint32_t i_layout;
+    uint32_t i_padding;
+} MP4_Box_data_cbmp_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -1650,6 +1689,10 @@ typedef union MP4_Box_data_s
     MP4_Box_data_ASF_t  *p_asf;  /* flip4mac asf streams indicator */
 
     MP4_Box_data_360_t  *p_360;
+    MP4_Box_data_st3d_t *p_st3d;
+    MP4_Box_data_prhd_t *p_prhd;
+    MP4_Box_data_equi_t *p_equi;
+    MP4_Box_data_cbmp_t *p_cbmp;
 
     /* for generic handlers */
     MP4_Box_data_binary_t *p_binary;
